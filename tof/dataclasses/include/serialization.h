@@ -1,0 +1,143 @@
+#ifndef SERIALIZATION_H_INCLUDED
+#define SERIALIZATION_H_INCLUDED
+
+/**
+ * Serializer/Deserializers
+ *
+ *
+ *
+ */
+
+#include <iostream>
+#include <sstream>
+#include <bitset>
+#include <vector>
+#include <numeric>
+#include <assert.h>
+
+#include "TOFCommon.h"
+
+// this is the current size of a blobevent 
+// in the serial representation
+static const size_t BLOBEVENTSIZE=18530;
+
+/************************************************/
+
+/* TYPE DEFINITIONS */
+
+typedef const std::vector<unsigned char> payload_t;
+typedef std::vector<unsigned char> mutable_payload_t;
+
+/***********************************************/
+
+unsigned short decode_ushort(payload_t& bytestream,
+                             unsigned int start_pos=0);
+
+/***********************************************/
+
+short decode_short(payload_t& bytestream,
+                   unsigned int start_pos=0);
+
+/***********************************************/
+
+unsigned short decode_ushort_rev(payload_t& bytestream,
+                             unsigned int start_pos=0);
+
+/***********************************************/
+
+short decode_short_rev(payload_t& bytestream,
+                       unsigned int start_pos=0);
+
+/***********************************************/
+
+void encode_ushort(unsigned short value, mutable_payload_t& bytestream, unsigned int start_pos=0);
+void encode_ushort_rev(unsigned short value, mutable_payload_t& bytestream, unsigned int start_pos=0);
+
+/***********************************************/
+
+uint32_t decode_uint32(payload_t& bytestream,
+                       unsigned int start_pos=0);
+
+/***********************************************/
+
+uint32_t decode_uint32_rev(payload_t& bytestream,
+                           unsigned int start_pos=0);
+
+/***********************************************/
+
+void encode_uint32(uint32_t value, std::vector<unsigned char>& bytestream, unsigned int start_pos=0);
+void encode_uint32_rev(uint32_t value, std::vector<unsigned char>& bytestream, unsigned int start_pos=0);
+
+/***********************************************/
+
+void encode_48(uint64_t value, std::vector<unsigned char>& bytestream, unsigned int start_pos=0);
+
+/***********************************************/
+
+void encode_48_rev(uint64_t value, std::vector<unsigned char>& bytestream, unsigned int start_pos=0);
+
+/***********************************************/
+
+uint64_t decode_uint64(payload_t& bytestream,
+                       unsigned int start_pos=0);
+
+/***********************************************/
+
+uint64_t decode_uint64_rev(const std::vector<unsigned char>& bytestream,
+                           unsigned int start_pos=0);
+
+/***********************************************/
+
+void encode_uint64(uint64_t value, std::vector<unsigned char>& bytestream, unsigned int start_pos=0);
+void encode_uint64_rev(uint64_t value, std::vector<unsigned char>& bytestream, unsigned int start_pos=0);
+
+//! encodes timestamp according to BlobEvent format - 48 bits instead of 64 and adds appropriate padding 
+void encode_timestamp(uint64_t value, std::vector<unsigned char>& bytestream, unsigned int start_pos=0);
+
+/***********************************************/
+
+uint64_t decode_timestamp(std::vector<unsigned char>& bytestream, unsigned int start_pos=0);
+
+/***********************************************/
+
+uint16_t encode_12bitsensor(float value, float minrannge, float maxrange);
+
+/***********************************************/
+
+float decode_12bitsensor(uint16_t value, float minrange, float maxrange);
+
+/***********************************************/
+
+//int16_t encode_14bit(float value, float minrannge, float maxrange);
+
+/***********************************************/
+
+int16_t decode_14bit(const std::vector<unsigned char>& bytestream,
+                     unsigned int start_pos=0);
+
+/***********************************************/
+
+void encode_blobevent(const BlobEvt_t* evt, std::vector<uint8_t> &bytestream, unsigned int start_pos);
+
+/***********************************************/
+
+BlobEvt_t decode_blobevent(const std::vector<uint8_t> &bytestream,
+                           unsigned int start_pos,
+                           unsigned int end_pos=-1);
+
+/***********************************************/
+
+std::vector<BlobEvt_t> get_events_from_stream(const std::vector<uint8_t> &bytestream, unsigned int start_pos);
+
+/***********************************************/
+long unsigned int search_for_2byte_marker(const std::vector<uint8_t> &bytestream,
+                            uint8_t marker,
+                            bool &has_ended,
+                            int32_t start_pos=0,
+                            int32_t end_pos=-1);
+
+/***********************************************/
+
+std::vector<uint32_t> get_2byte_markers_indices(const std::vector<uint8_t> &bytestream, uint8_t marker);
+
+#endif

@@ -1,0 +1,223 @@
+#include <string>
+#include <sstream>
+#include <iostream>
+#include <cstddef>
+#include <cstring>
+
+#include "serialization.h"
+#include "packets/REventPacket.h"
+
+void REventPacket::reset()
+{
+   head = 0xAAAA;
+
+   p_length_fixed = REVENTPACKETSIZEFIXED;
+   p_length  = 0;
+   event_ctr = 0;
+   utc_timestamp = 0;
+
+   primary_beta        = 0;
+   primary_beta_unc    = 0;
+   primary_charge      = 0;
+   primary_charge_unc  = 0;
+   primary_outer_tof_x = 0;
+   primary_outer_tof_y = 0;
+   primary_outer_tof_z = 0;
+   primary_inner_tof_x = 0;
+   primary_inner_tof_y = 0;
+   primary_inner_tof_z = 0;
+
+   nhit_outer_tof = 0x00      ;
+   nhit_inner_tof = 0x00      ;
+
+   trigger_info   = 0x00      ;
+   ctr_etx        = 0x00      ;
+
+   paddle_info.clear();
+
+   tail = 0x5555;
+}
+
+/*******************************************/
+
+unsigned short REventPacket::calculate_length() const
+{
+
+  // currently we have a fixed length + the size of 
+  // 1 paddle packet per hit paddle
+  
+  // fixed part is 42 byte
+  return p_length_fixed + (RPaddlePacket::calculate_length()*paddle_info.size());
+}
+
+/*******************************************/
+
+void REventPacket::add_paddle_packet(RPaddlePacket const &pkt)
+{
+   paddle_info.push_back(pkt);
+}
+
+/*******************************************/
+
+std::vector<unsigned char> REventPacket::serialize() const
+{
+  // this takes into acount variable sized part
+  unsigned short packet_length = calculate_length();
+  //std::cout << "Got packet length : " << packet_length << std::endl;
+  std::vector<unsigned char> buffer(p_length_fixed);
+  //std::cout << "Allocated buffer of size " << buffer.size() << std::endl;  
+
+  unsigned short pos = 0; // position in bytestream
+  encode_ushort(head, buffer, pos); pos+=2;
+  encode_ushort(packet_length, buffer, pos); pos+=2;
+  encode_uint32(event_ctr, buffer, pos); pos+=4;
+  encode_uint64(utc_timestamp, buffer, pos); pos+=8;
+
+  encode_ushort(primary_beta,       buffer,  pos);pos+=2;  
+  encode_ushort(primary_beta_unc,   buffer,  pos);pos+=2;  
+  encode_ushort(primary_charge,     buffer,  pos);pos+=2;  
+  encode_ushort(primary_charge_unc, buffer,  pos);pos+=2;  
+  encode_ushort(primary_outer_tof_x, buffer, pos);pos+=2;  
+  encode_ushort(primary_outer_tof_y, buffer, pos);pos+=2;  
+  encode_ushort(primary_outer_tof_z, buffer, pos);pos+=2;  
+  encode_ushort(primary_inner_tof_x, buffer, pos);pos+=2;  
+  encode_ushort(primary_inner_tof_y, buffer, pos);pos+=2;  
+  encode_ushort(primary_inner_tof_z, buffer, pos);pos+=2;  
+
+  buffer[pos] = nhit_outer_tof; pos+=1;
+  buffer[pos] = nhit_inner_tof; pos+=1;
+  buffer[pos] = trigger_info;   pos+=1;
+  buffer[pos] = ctr_etx;        pos+=1;
+
+  // payload following
+  // FIXME
+  std::vector<unsigned char> paddle_payload;
+  unsigned short npaddles = paddle_info.size();
+  for (const auto& pinfo : paddle_info)
+    {
+        paddle_payload = pinfo.serialize();
+        buffer.insert(buffer.end(), paddle_payload.begin(), paddle_payload.end()); 
+        //std::cout <<  "[DEBUG] added paddle of size " << paddle_payload.size() 
+        //              << " bytes to buffer" << std::endl;
+        pos += paddle_payload.size();
+    } 
+  unsigned short payload_tail;
+  encode_ushort(tail, buffer, pos); pos+=2;  // done
+
+  //std::cout << "[INFO]<serialize> buffer size : " << buffer.size() << std::endl;
+  
+  return buffer; 
+}
+
+/*******************************************/
+
+unsigned int REventPacket::deserialize(std::vector<unsigned char>& bytestream,
+                                       unsigned int start_pos)
+{
+ reset ();
+
+ // start from position in bytestream
+ //unsigned short value; 
+ //unsigned int end_pos = start_pos;
+ // check if we find the header at start_pos
+ uint16_t value = decode_ushort(bytestream, start_pos);
+ if (!(value == head))
+    {std::cerr << "[ERROR] no header found!" << std::endl;}
+ uint16_t pos = 2 + start_pos; // position in bytestream, 2 since we 
+                   // just decoded the header
+
+ unsigned short expected_packet_size = decode_ushort(bytestream, pos);pos+=2;  
+ p_length = expected_packet_size;
+ // in the expected packet size, we can see how many 
+ // paddle packets we expect
+ unsigned short expected_paddle_packets = (expected_packet_size - p_length_fixed)/RPaddlePacket::calculate_length();
+ 
+ //std::cout << "[INFO] Expecting " << expected_paddle_packets << " paddle info objects" << std::endl; 
+
+ event_ctr           = decode_uint32(bytestream, pos); pos+=4;
+ utc_timestamp       = decode_uint64(bytestream, pos); pos+=8;
+ //std::cout << "[INFO] Found timestamp " << utc_timestamp << std::endl;
+ primary_beta        = decode_ushort(bytestream,  pos);pos+=2;  
+ primary_beta_unc    = decode_ushort(bytestream,  pos);pos+=2;  
+ primary_charge      = decode_ushort(bytestream,  pos);pos+=2;  
+ primary_charge_unc  = decode_ushort(bytestream,  pos);pos+=2;  
+ primary_outer_tof_x = decode_ushort(bytestream,  pos);pos+=2;  
+ primary_outer_tof_y = decode_ushort(bytestream,  pos);pos+=2;  
+ primary_outer_tof_z = decode_ushort(bytestream,  pos);pos+=2;  
+ primary_inner_tof_x = decode_ushort(bytestream,  pos);pos+=2;  
+ primary_inner_tof_y = decode_ushort(bytestream,  pos);pos+=2;  
+ primary_inner_tof_z = decode_ushort(bytestream,  pos);pos+=2;  
+
+ nhit_outer_tof = bytestream[pos];pos+=1;
+ nhit_inner_tof = bytestream[pos];pos+=1;
+ trigger_info   = bytestream[pos];pos+=1;
+ ctr_etx        = bytestream[pos];pos+=1;
+ 
+ paddle_info.reserve(expected_paddle_packets);
+ RPaddlePacket p;
+ for (size_t k=0;k<expected_paddle_packets;k++)
+   {  
+    p.deserialize(bytestream, pos);
+    paddle_info.push_back(p);
+    pos += p.calculate_length();
+   }
+
+ // FIXME checks - packetlength, checksum ?
+ unsigned short payload_tail = decode_ushort(bytestream, pos); pos+=2;
+ //std::cout << "[DEBUG] expected packet size = " << expected_packet_size << " received " << pos << " bytes!" << std::endl; 
+ if ((payload_tail != tail) || (expected_packet_size != pos))
+    {
+        std::cerr << "[ERROR] broken package! Tail flag "<< payload_tail << " expected size " << expected_packet_size << " received " << pos << " bytes!" << std::endl;
+        broken = true;
+    }
+ // checks for debugging
+ //assert (payload_tail == tail);
+ //assert (expected_packet_size == pos);
+ return pos; 
+}
+
+std::string REventPacket::to_string(bool summarize_paddle_packets) const
+{
+  std::string output;
+   output += "### REVENTPACKET-----------------------\n";
+   output += "\tHEAD \t"                + std::to_string(head) +  "\n";
+   output += "\tPACKET_LENGTH \t"       + std::to_string(calculate_length()) + "\n";
+   output += "\tEVENT CTR \t"           + std::to_string(event_ctr)         + "\n";
+   output += "\tUTC TS \t"              + std::to_string(utc_timestamp)     + "\n";
+   output += "\tPRIMARY BETA \t"        + std::to_string(primary_beta)     + "\n";
+   output += "\tPRIMARY BETA UNC \t"    + std::to_string(primary_beta_unc) + "\n";
+   output += "\tPRIMARY CHARGE \t"      + std::to_string(primary_charge)   + "\n";
+   output += "\tPRIMARY CHARGE UNC \t"  + std::to_string(primary_charge_unc)  + "\n";
+   output += "\tPRIMARY OUTER TOF X \t" + std::to_string(primary_outer_tof_x) + "\n";
+   output += "\tPRIMARY OUTER TOF Y \t" + std::to_string(primary_outer_tof_y) + "\n";
+   output += "\tPRIMARY OUTER TOR Z \t" + std::to_string(primary_outer_tof_z) + "\n";
+   output += "\tPRIMARY INNER TOF X \t" + std::to_string(primary_inner_tof_x) + "\n";
+   output += "\tPRIMARY INNER TOF Y \t" + std::to_string(primary_inner_tof_y) + "\n";
+   output += "\tPRIMARY INNER TOF Z \t" + std::to_string(primary_inner_tof_z) + "\n";
+   output += "\tNHIT OUTER \t"          + std::to_string(nhit_outer_tof) + "\n";
+   output += "\tNHIT INNER \t"          + std::to_string(nhit_inner_tof) + "\n";
+   output += "\tTRG INFO \t"            + std::to_string(trigger_info) + "\n";
+   output += "\tCTR ETX \t"             + std::to_string(ctr_etx) + "\n";
+   output += "\tNPADDLE PACKETS \t"     + std::to_string(paddle_info.size()) + "\n";
+   if (summarize_paddle_packets) 
+    { output += "\t[ " + std::to_string(paddle_info.size()) + " PADDLE PACKETS ... ]\n";} 
+   else {
+    for (auto p : paddle_info) 
+      { output +=  p.to_string() + "\n";}
+   }
+   output += "\tTAIL \t" + std::to_string(tail) + "\n";
+  return output;
+}
+
+bool REventPacket::is_broken()
+{
+  return broken;
+}
+
+std::ostream& operator<<(std::ostream& os, const REventPacket& evt)
+{
+   os << evt.to_string();
+   return os;
+}
+
+
