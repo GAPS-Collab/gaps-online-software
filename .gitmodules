@@ -1,0 +1,3 @@
+[submodule "resources/extern/corrosion"]
+	path = resources/extern/corrosion
+	url = https://github.com/corrosion-rs/corrosion.git
