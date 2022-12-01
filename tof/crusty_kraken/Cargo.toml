@@ -1,0 +1,8 @@
+[package]
+name = "crusty_kraken" # the name of the package
+version = "0.1.0"    # the current version, obeying semver
+authors = ["J.A. Stoessl <stoessl@hawaii.edu>"]
+
+
+[dependencies]
+zmq = "0.10.0"
