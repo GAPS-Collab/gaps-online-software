@@ -8,8 +8,11 @@
 #define RPADDLEPACKETSIZE 26
 #define RPADDLEPACKETVERSION "rev1.0"
 
-
-
+/***********************************************************
+ * The "reduced paddle packet" holds analyzed waveform 
+ * information. 
+ *
+ **********************************************************/
 struct RPaddlePacket  {
 
   unsigned short head = 0xF0F0;

@@ -6,3 +6,8 @@ authors = ["J.A. Stoessl <stoessl@hawaii.edu>"]
 
 [dependencies]
 zmq = "0.10.0"
+# this is technically optional
+# it is just used to integrate
+# with the general cmake
+cmake = "0.1.49"
+

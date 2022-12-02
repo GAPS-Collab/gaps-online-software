@@ -25,8 +25,15 @@ static constexpr uint8_t ENVAVERAGEINTERVAL = ENVHEARTBEATSECONDS;
 // FIXME - use the prooper ids as they are in the database
 static const std::vector<uint8_t> READOUTBOARDIDS = std::vector<uint8_t> {1,2,3};
 
+namespace GAPS {
 
+  enum class PADDLE_END : std::uint16_t {
+      A = 10,
+      B = 20,
+      UNKNOWN = 30
+  }
 
+}
 enum TOFDATA_TYPE { TOFDATA_NONE,     TOFDATA_EVENT, TOFDATA_FULL,
 		    TOFDATA_INTEREST, TOFDATA_ALL};
 

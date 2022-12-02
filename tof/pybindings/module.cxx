@@ -13,15 +13,16 @@
 #include "serialization.h"
 #include "blobroutines.h"
 #include "WaveGAPS.h"
+#include "TOFCommon.h"
+
+#include "TOFTypeDefs.h"
 
 using namespace GAPS;
 
-typedef std::vector<unsigned char> BSTREAM;
-
 /***********************************************/
 
-BSTREAM wrap_encode_ushort(unsigned short value, uint start_pos) {
-  BSTREAM stream;
+bytestream wrap_encode_ushort(u16 value, u32 start_pos) {
+  bytestream stream;
   for (size_t foo=0; foo<2; foo++) stream.push_back(0);
   encode_ushort(value, stream, start_pos);
   return stream;
@@ -29,8 +30,8 @@ BSTREAM wrap_encode_ushort(unsigned short value, uint start_pos) {
 
 /***********************************************/
 
-BSTREAM wrap_encode_ushort_rev(unsigned short value, uint start_pos) {
-  BSTREAM stream;
+bytestream wrap_encode_ushort_rev(u16 value, size_t start_pos) {
+  bytestream stream;
   for (size_t foo=0; foo<2; foo++) stream.push_back(0);
   encode_ushort_rev(value, stream, start_pos);
   return stream;
@@ -38,8 +39,8 @@ BSTREAM wrap_encode_ushort_rev(unsigned short value, uint start_pos) {
 
 /***********************************************/
 
-BSTREAM wrap_encode_uint32(uint32_t value, uint start_pos) {
-  BSTREAM stream;
+bytestream wrap_encode_uint32(u32 value, size_t start_pos) {
+  bytestream stream;
   for (size_t foo=0; foo<4; foo++) stream.push_back(0);
   encode_uint32(value, stream, start_pos);
   return stream;
@@ -47,8 +48,8 @@ BSTREAM wrap_encode_uint32(uint32_t value, uint start_pos) {
 
 /***********************************************/
 
-BSTREAM wrap_encode_uint32_rev(uint32_t value, uint start_pos) {
-  BSTREAM stream;
+bytestream wrap_encode_uint32_rev(u32 value, size_t start_pos) {
+  bytestream stream;
   for (size_t foo=0; foo<4; foo++) stream.push_back(0);
   encode_uint32_rev(value, stream, start_pos);
   return stream;
@@ -56,8 +57,8 @@ BSTREAM wrap_encode_uint32_rev(uint32_t value, uint start_pos) {
 
 /***********************************************/
 
-BSTREAM wrap_encode_uint64_rev(uint64_t value, uint start_pos) {
-  BSTREAM stream;
+bytestream wrap_encode_uint64_rev(u64 value, size_t start_pos) {
+  bytestream stream;
   for (size_t foo=0; foo<8; foo++) stream.push_back(0);
   encode_uint64_rev(value, stream, start_pos);
   return stream;
@@ -65,8 +66,8 @@ BSTREAM wrap_encode_uint64_rev(uint64_t value, uint start_pos) {
 
 /***********************************************/
 
-BSTREAM wrap_encode_uint64(uint64_t value, uint start_pos) {
-  BSTREAM stream;
+bytestream wrap_encode_uint64(u64 value, size_t start_pos) {
+  bytestream stream;
   for (size_t foo=0; foo<8; foo++) stream.push_back(0);
   encode_uint64(value, stream, start_pos);
   return stream;
@@ -79,25 +80,25 @@ int static_helper(RPaddlePacket& pp){
     return RPaddlePacket::calculate_length();
 }
 
-std::vector<unsigned short> ch_head_getter(BlobEvt_t evt)
+vec_u16 ch_head_getter(BlobEvt_t evt)
 {
-    std::vector<unsigned short> ch_head;
+    vec_u16 ch_head;
     for (size_t k=0; k<NCHN; k++) 
     {ch_head.push_back(evt.ch_head[k]);}
     return ch_head;
 }
 
-std::vector<unsigned long> ch_trail_getter(BlobEvt_t evt)
+vec_u64 ch_trail_getter(BlobEvt_t evt)
 {
-    std::vector<unsigned long> ch_trail;
+    vec_u64 ch_trail;
     for (size_t k=0; k<NCHN; k++) 
     {ch_trail.push_back(evt.ch_trail[k]);}
     return ch_trail;
 }
 
-std::vector<std::vector<short>> ch_getter(BlobEvt_t evt)
+vec_vec_i16 ch_getter(BlobEvt_t evt)
 {
-    std::vector<std::vector<short>> channels;
+    vec_vec_i16 channels;
     for (size_t k=0; k<NCHN; k++) 
       {  channels.push_back({});
          for (size_t l=0; l < NWORDS; l++)
@@ -113,9 +114,9 @@ size_t get_current_blobevent_size()
   return 36 + (NCHN*2) + (NCHN*NWORDS*2) + (NCHN*4) + 8;
 }
 
-BSTREAM blobevent_encoder(BlobEvt_t evt, uint startpos)
+bytestream blobevent_encoder(BlobEvt_t evt, size_t startpos)
 {
-  BSTREAM buffer;
+  bytestream buffer;
   buffer.reserve(get_current_blobevent_size());
   for (size_t k=0; k<get_current_blobevent_size(); k++)
   {buffer.push_back(0);}
@@ -123,7 +124,7 @@ BSTREAM blobevent_encoder(BlobEvt_t evt, uint startpos)
   return buffer;
 }
 
-BlobEvt_t blobevent_decoder(BSTREAM buffer, uint startpos)
+BlobEvt_t blobevent_decoder(bytestream buffer, size_t startpos)
 {
   BlobEvt_t evt = decode_blobevent(buffer, startpos);
   return evt;
@@ -158,7 +159,7 @@ void nullsetter(T foo)
 
 /********************/
 
-BlobEvt_t read_event_helper(std::string filename, int n)
+BlobEvt_t read_event_helper(std::string filename, i32 n)
 {
     FILE* f = fopen(filename.c_str(), "rb");
     BlobEvt_t event;
@@ -174,8 +175,8 @@ BlobEvt_t read_event_helper(std::string filename, int n)
 int get_nevents_from_file(std::string filename){
   FILE* f = fopen(filename.c_str(), "rb");
   BlobEvt_t event;
-  int result = 0;
-  uint nevents = 0;
+  i32 result = 0;
+  u32 nevents = 0;
   while (result >= 0) {
     result = ReadEvent(f, &event, false);
     nevents++;
@@ -192,14 +193,14 @@ std::vector<Calibrations_t> read_calibration_file (std::string filename) {
     std::cerr << "[ERROR] Can't open " << filename << " - not calibrating" << std::endl;
     return all_channel_calibrations;
   }
-  for (int i=0; i<NCHN; i++) {
-    for (int j=0; j<NWORDS; j++)
+  for (size_t i=0; i<NCHN; i++) {
+    for (size_t j=0; j<NWORDS; j++)
       calfile >> all_channel_calibrations[i].vofs[j];
-    for (int j=0; j<NWORDS; j++)
+    for (size_t j=0; j<NWORDS; j++)
       calfile >> all_channel_calibrations[i].vdip[j];
-    for (int j=0; j<NWORDS; j++)
+    for (size_t j=0; j<NWORDS; j++)
       calfile >> all_channel_calibrations[i].vinc[j];
-    for (int j=0; j<NWORDS; j++)
+    for (size_t j=0; j<NWORDS; j++)
       calfile >> all_channel_calibrations[i].tbin[j];
   }
   return all_channel_calibrations;
@@ -207,12 +208,12 @@ std::vector<Calibrations_t> read_calibration_file (std::string filename) {
 
 /********************/
 
-std::vector<std::vector<double>> offset_getter(const std::vector<Calibrations_t> &cal)
+vec_vec_f64 offset_getter(const std::vector<Calibrations_t> &cal)
 {
-  std::vector<std::vector<double>> offsets;
-  for (uint k=0; k<NCHN; k++) 
+  vec_vec_f64 offsets;
+  for (size_t k=0; k<NCHN; k++) 
     {  offsets.push_back({});
-       for (uint l=0; l < NWORDS; l++)
+       for (size_t l=0; l < NWORDS; l++)
           {
              offsets[k].push_back(cal[k].vofs[l]);
           }
@@ -220,12 +221,12 @@ std::vector<std::vector<double>> offset_getter(const std::vector<Calibrations_t>
   return offsets;
 }
 
-std::vector<std::vector<double>> dip_getter(const std::vector<Calibrations_t> &cal)
+vec_vec_f64 dip_getter(const std::vector<Calibrations_t> &cal)
 {
-    std::vector<std::vector<double>> dips;
-    for (uint k=0; k<NCHN; k++) 
+    vec_vec_f64 dips;
+    for (size_t k=0; k<NCHN; k++) 
       {  dips.push_back({});
-         for (uint l=0; l < NWORDS; l++)
+         for (size_t l=0; l < NWORDS; l++)
            {
              dips[k].push_back(cal[k].vdip[l]);
            }
@@ -233,10 +234,10 @@ std::vector<std::vector<double>> dip_getter(const std::vector<Calibrations_t> &c
     return dips;
 }
 
-std::vector<std::vector<double>> increment_getter(const std::vector<Calibrations_t> &cal)
+vec_vec_f64 increment_getter(const std::vector<Calibrations_t> &cal)
 {
-  std::vector<std::vector<double>> incs;
-  for (uint k=0; k<NCHN; k++) 
+  vec_vec_f64 incs;
+  for (size_t k=0; k<NCHN; k++) 
     {  incs.push_back({});
        for (uint l=0; l < NWORDS; l++)
         {
@@ -246,12 +247,12 @@ std::vector<std::vector<double>> increment_getter(const std::vector<Calibrations
   return incs;
 }
 
-std::vector<std::vector<double>> tbin_getter(const std::vector<Calibrations_t> cal)
+vec_vec_f64 tbin_getter(const std::vector<Calibrations_t> cal)
 {
-    std::vector<std::vector<double>> tbins;
-    for (uint k=0; k<NCHN; k++) 
+    vec_vec_f64 tbins;
+    for (size_t k=0; k<NCHN; k++) 
       {  tbins.push_back({});
-         for (uint l=0; l < NWORDS; l++)
+         for (size_t l=0; l < NWORDS; l++)
             {
               tbins[k].push_back(cal[k].tbin[l]);
             }
@@ -259,29 +260,29 @@ std::vector<std::vector<double>> tbin_getter(const std::vector<Calibrations_t> c
     return tbins;
 }
 
-std::vector<std::vector<double>> voltage_calibration_helper(const BlobEvt_t &evt,
-                                                            std::vector<Calibrations_t> cal)
+vec_vec_f64 voltage_calibration_helper(const BlobEvt_t &evt,
+                                                         std::vector<Calibrations_t> cal)
 {
-  std::vector<std::vector<double>> result;
+  vec_vec_f64 result;
   for (size_t k=0; k<NCHN; k++) {
-    double trace_out[NWORDS];
-    int n = sizeof(trace_out)/sizeof(trace_out[0]);
+    f64 trace_out[NWORDS];
+    u32 n = sizeof(trace_out)/sizeof(trace_out[0]);
     VoltageCalibration(const_cast<short int*>(evt.ch_adc[k]),
                        trace_out,
                        evt.stop_cell,
                        cal[k]);
-    result.push_back(std::vector<double>(trace_out, trace_out + n));
+    result.push_back(std::vector<f64>(trace_out, trace_out + n));
   }
   return result;
 }
 
-std::vector<std::vector<double>> timing_calibration_helper(const BlobEvt_t &evt,
+vec_vec_f64 timing_calibration_helper(const BlobEvt_t &evt,
                                                             std::vector<Calibrations_t> cal)
 {
-  std::vector<std::vector<double>> result;
+  vec_vec_f64 result;
   for (size_t k=0; k<NCHN; k++) {
-    double times[NWORDS];
-    int n = sizeof(times)/sizeof(times[0]);
+    f64 times[NWORDS];
+    size_t n = sizeof(times)/sizeof(times[0]);
     TimingCalibration(times,
                       evt.stop_cell,
                       cal[k]);
@@ -292,12 +293,12 @@ std::vector<std::vector<double>> timing_calibration_helper(const BlobEvt_t &evt,
 
 /********************/
 
-std::vector<std::vector<double>> remove_spikes_helper(std::vector<std::vector<double>> waveforms, 
-                                                      const BlobEvt_t &ev)
+vec_vec_f64 remove_spikes_helper(vec_vec_f64 waveforms, 
+                                 const BlobEvt_t &ev)
 {  
-   double wf [NCHN][NWORDS];
-   int spikes[NWORDS];
-   std::vector<std::vector<double>> unspiked;
+   f64 wf [NCHN][NWORDS];
+   i32 spikes[NWORDS];
+   vec_vec_f64 unspiked;
    for (size_t ch=0; ch<NCHN; ch++) {
      unspiked.push_back({});
      for (size_t n=0; n<NWORDS; n++) {
@@ -316,7 +317,9 @@ std::vector<std::vector<double>> remove_spikes_helper(std::vector<std::vector<do
 
 /********************/
 
-double calculate_pedestal_helper(std::vector<double> wave, std::vector<double> time, int ch)
+double calculate_pedestal_helper(vec_f64 wave,
+                                 vec_f64 time,
+                                 size_t ch)
 {
   double* wave_arr = wave.data();
   double* time_arr = time.data();
@@ -333,9 +336,14 @@ double calculate_pedestal_helper(std::vector<double> wave, std::vector<double> t
 
 namespace py = pybind11;
 PYBIND11_MODULE(gaps_tof, m) {
-    m.doc() = "Pybindings for Tof packet builder";
-
-
+    m.doc() = "GAPS Tof dataclasses and utility tools";
+    
+    py::enum_<PADDLE_END>(m, "PADDLE_END")
+        .value("A", PADDLE_END::A)
+        .value("B", PADDLE_END::B)
+        .value("UNKNOWN", PADDLE_END::UNKNOWN)
+        .export_values();
+    
     py::class_<REventPacket>(m, "REventPacket")
         .def(py::init())
         .def("serialize",         &REventPacket::serialize)

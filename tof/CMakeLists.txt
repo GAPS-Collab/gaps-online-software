@@ -193,6 +193,7 @@ add_library(${GAPSTOF_LIBRARY_SHARED}
                     dataclasses/src/REventPacket.cxx
                     dataclasses/src/RBEnvPacket.cxx
                     dataclasses/src/RPaddlePacket.cxx
+                    dataclasses/src/WfPaddlePacket.cxx
                     dataclasses/src/serialization.cxx
                     dataclasses/src/CraneLogging.cc
                     dataclasses/src/WaveGAPS.cpp
