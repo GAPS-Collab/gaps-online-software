@@ -4,6 +4,7 @@ use crate::reduced_tofevent::PaddlePacket;
 
 use crate::calibrations::{Calibrations,
                           read_calibration_file,
+                          remove_spikes,
                           voltage_calibration, 
                           timing_calibration};
 
@@ -40,11 +41,11 @@ fn get_file_as_byte_vec(filename: &String) -> Vec<u8> {
 
 /*************************************/
 
-fn get_blobs(buffer         : &Vec<u8>,
-             rb_id          : usize,
-             print_events   : bool,
-             do_calibration : bool,
-             pack_data      : bool)
+fn analyze_blobs(buffer         : &Vec<u8>,
+                 rb_id          : usize,
+                 print_events   : bool,
+                 do_calibration : bool,
+                 pack_data      : bool)
 {
   let mut blob_data = BlobData {..Default::default()};
   let mut header_found_start    = false;
@@ -99,9 +100,9 @@ fn get_blobs(buffer         : &Vec<u8>,
               // 3) paak-finding
               // 4) cfd algorithm
               // 5) paddle packaging
-              const npaddles : usize = (NCHN - 1)/2; // assuming one channel 
+              const NPADDLES : usize = (NCHN - 1)/2; // assuming one channel 
                                            // is the channel 9
-              let mut paddle_packets_this_rb = [PaddlePacket::new(); npaddles];             
+              let mut paddle_packets_this_rb = [PaddlePacket::new(); NPADDLES];             
               // binary switch - false for side a and
               // true for side b
               let mut is_bside : bool = false;
@@ -133,10 +134,10 @@ fn get_blobs(buffer         : &Vec<u8>,
                 let cfd_time = waveform.find_cfd_simple(0);
 
                 // packing part
-                if (n == 0 || n == 1) {paddle_number = 0;}
-                if (n == 2 || n == 3) {paddle_number = 1;}
-                if (n == 4 || n == 5) {paddle_number = 2;}
-                if (n == 6 || n == 7) {paddle_number = 3;}
+                if n == 0 || n == 1 {paddle_number = 0;}
+                if n == 2 || n == 3 {paddle_number = 1;}
+                if n == 4 || n == 5 {paddle_number = 2;}
+                if n == 6 || n == 7 {paddle_number = 3;}
                 paddle_packets_this_rb[paddle_number].set_time(cfd_time, n%2);
               }
             }
@@ -160,7 +161,7 @@ fn get_blobs(buffer         : &Vec<u8>,
 fn get_blobs_from_file (rb_id : usize) {
   let filepath = String::from("/data0/gfp-data-aug/Aug/run4a/d20220809_195753_4.dat");
   let blobs = get_file_as_byte_vec(&filepath);
-  get_blobs(&blobs, rb_id, false, false, false);  
+  analyze_blobs(&blobs, rb_id, false, false, false);  
 }
 
 /*************************************/
@@ -221,7 +222,7 @@ pub fn readoutboard_communicator(socket      : &zmq::Socket,
               Err(_) => println!("Warn - remote socket problems")
           }
           // do the work
-          get_blobs(&buffer, board_id, false, false, false);
+          analyze_blobs(&buffer, board_id, false, false, false);
 
           //thread::sleep(Duration::from_millis(1500));
       }

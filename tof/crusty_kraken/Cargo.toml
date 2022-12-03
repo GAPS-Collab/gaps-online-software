@@ -1,8 +1,16 @@
 [package]
-name = "crusty_kraken" # the name of the package
-version = "0.1.0"    # the current version, obeying semver
-authors = ["J.A. Stoessl <stoessl@hawaii.edu>"]
+name        = "crusty-kraken" # the name of the package
+version     = "0.1.0"    # the current version, obeying semver
+authors     = ["J.A. Stoessl <stoessl@hawaii.edu>", "Jeff Zweerink <zweering@astro.ucla.edu>"]
+description = "A programm for the GAPS science instrument. Read out the time-of-flight detectors and process their data."
 
+#[[bin]]
+#name  = 'crusty-kraken"
+#test  = false
+#bench = false
+
+[features]
+cargo = []
 
 [dependencies]
 zmq = "0.10.0"
@@ -10,4 +18,5 @@ zmq = "0.10.0"
 # it is just used to integrate
 # with the general cmake
 cmake = "0.1.49"
-
+# parse command line arguments
+clap = { version = "4.0", features = ["derive"] }

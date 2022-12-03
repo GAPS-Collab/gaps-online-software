@@ -130,7 +130,7 @@ impl CalibratedWaveform<'_> {
     }
     if ( lval > threshold) && (size != 1) {
       return self.times[idx];
-    } else if (lval == hval) {
+    } else if lval == hval {
       return self.times[idx];
     } else {
       time = self.wave[idx] + (threshold-lval)/(hval-lval) * (self.wave[idx+1]-self.wave[idx]);
@@ -138,7 +138,6 @@ impl CalibratedWaveform<'_> {
       //  (thresh-lval)/(hval-lval) * (WaveTime[idx+1]-WaveTime[idx]) ;
       return time;
       }
-    return time;
   }
 
 
@@ -163,11 +162,11 @@ impl CalibratedWaveform<'_> {
       pos += 1;
     }
     for n in pos..start_bin + window_bin {
-      if (self.wave[n] > threshold) {
+      if self.wave[n] > threshold {
         peak_bins += 1;
-        if (peak_bins == min_peak_width) {
+        if peak_bins == min_peak_width {
           // we have a new peak
-          if (n_peaks_detected == MAX_NUM_PEAKS) {
+          if n_peaks_detected == MAX_NUM_PEAKS {
             println!("Max number of peaks reached in this waveform");
             break;
           }
@@ -175,12 +174,12 @@ impl CalibratedWaveform<'_> {
           self.spikes    [peak_ctr] = 0;
           self.end_peak  [peak_ctr] = 0;
           peak_ctr += 1;
-        } else if (peak_bins > min_peak_width) {
+        } else if peak_bins > min_peak_width {
           for k in 0..3 {
-            if (self.wave[n-k] > self.wave[n-(k+1)])
+            if self.wave[n-k] > self.wave[n-(k+1)]
               {continue;}
           }
-          if (self.end_peak[peak_ctr-1] == 0){
+          if self.end_peak[peak_ctr-1] == 0 {
             self.end_peak[peak_ctr-1] = n; // Set last bin included in peak
           }
         } else {
@@ -201,71 +200,6 @@ impl CalibratedWaveform<'_> {
     self.begin_peak[peak_ctr] = NWORDS; // Need this to measure last peak correctly
     //peaks_found = 1;
   }
-
-//void Waveform::FindPeaks(float start, float size) {
-//  pulse_start = start;
-//  CleanUpPeaks();
-//  // Turn time values into bin numbers
-//  int start_bin = Time2Bin(start);
-//  int size_bin = Time2Bin(start + size) - start_bin;
-//  // Check limits
-//  if ((start_bin + size_bin) > wf_size)
-//    size_bin = wf_size - start_bin;
-//
-//  // Modified FindNumPeaks
-//  int min_wid = 3;     // minimum peak width
-//  int pk_ctr = 0;      // current number of peaks
-//  int pos = start_bin; // current position
-//  int peak_bins = 0;   // current peak width (in bins)
-//  begin_pk  = new int[max_num_peaks];
-//  end_pk    = new int[max_num_peaks];
-//  spikes    = new int[max_num_peaks];
-//  // Step through trace until we are above threshold
-//  while ((WaveData[pos] < Threshold) && (pos < wf_size))
-//    pos++;
-//  for (int i = pos; i < start_bin + size_bin; i++) {
-//    if (WaveData[i] > Threshold) {
-//      peak_bins++;
-//      if (peak_bins == min_wid) { // new peak detected
-//        if (pk_ctr == max_num_peaks) {
-//          Message("Maximum number of peaks exceeded");
-//          break;
-//        }
-//    begin_pk[pk_ctr] = i - (min_wid - 1); 
-//        spikes[pk_ctr] = 0;
-//        end_pk[pk_ctr] = 0;
-//        pk_ctr++;
-//      } else if (peak_bins > min_wid) {
-//        // each "bump" counts as a separate peak
-//        int grad = 1;
-//        for (int k = 0; k < 3; k++) {
-//          if (WaveData[i-k] > WaveData[i-(k+1)])
-//            grad = 0;
-//        }
-//        if (grad == 0)
-//          continue;
-//        if (end_pk[pk_ctr-1] == 0)
-//          end_pk[pk_ctr-1] = i; // Set last bin included in peak
-//      }   
-//    } else {
-//      peak_bins = 0;  // Reset bin counter at each bin not meeting requirement
-//    }   
-//  }
-//  num_peaks = pk_ctr;
-//  begin_pk[num_peaks] = wf_size; // Need this to measure last peak correctly
-//  peaks_found = 1;
-//  
-//  // Alocate memory and get peak parameters
-//  AllocatePeaks();
-//  /* Commented out for now because they are unused (working) calculations
-//    for(int i = 0; i < num_peaks; i++) {
-//    peaks[i]  = GetMaxBin(begin_pk[i], end_pk[i]-begin_pk[i]);
-//    height[i] = WaveData[peaks[i]];
-//    width[i]  = CalculateWidth(i, 0.5*height[i]);
-//    charge[i] = Integrate( WaveTime[peaks[i]]+(int)PEAK_OFFSET, PEAK_LENGTH);
-//  }
-//  */
-//}
 
 
 } // end imple

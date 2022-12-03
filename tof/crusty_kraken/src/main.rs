@@ -6,6 +6,8 @@ mod reduced_tofevent;
 mod constants;
 mod waveform;
 
+extern crate clap;
+
 use crate::calibrations::{Calibrations, read_calibration_file};
 
 //use crate::readoutboard_blob::{BlobData, BLOBEVENTSIZE};
@@ -20,97 +22,183 @@ use std::{thread,
           path::Path};
 
 
+use clap::Parser;
+use clap::{arg, command, value_parser, ArgAction, Command};
+
+
+/*************************************/
+
+#[derive(Parser, Debug)]
+#[command(author = "J.A.Stoessl", version, about, long_about = None)]
+struct Args {
+    /// Increase output for debugging
+    #[arg(short, long, default_value_t = false)]
+    debug: bool,
+    /// A json config file with detector information
+    #[arg(short, long)]
+    json_config: Option<std::path::PathBuf>,
+}
+
+
 
 /*************************************/
 
 fn main() {
 
-    // read calibration data
-    let mut calibrations = [[Calibrations {..Default::default()}; NCHN]; NBOARDS];
-    let mut rb_id = 0usize;
-    for n in 0..NBOARDS {
-        rb_id = n + 1;
-        let file_name = "/srv/gaps/gfp-data/gaps-gfp/TOFsoftware/server/datafiles/rb".to_owned() + &rb_id.to_string() + "_cal.txt";
-        println!("Reading calibrations from file {}", file_name);
-        let file_path = Path::new(&file_name);
-        calibrations[n] = read_calibration_file(file_path); 
+   let args = Args::parse();
+   match args.json_config {
+     None => println!("No config file provided!"),
+     Some(ref json_file_path) => {
+       if !args.json_config.as_ref().unwrap().exists() {
+           panic!("The file {} does not exist!", args.json_config.as_ref().unwrap().display());
+       }
+       println!("Found config file {}", args.json_config.as_ref().unwrap().display());
+     }
+   }
+
+
+   //let matches = command!() // requires `cargo` feature
+   //     //.arg(arg!([name] "Optional name to operate on"))
+   //     .arg(
+   //         arg!(
+   //             -c --json-config <FILE> "Sets a custom config file"
+   //         )
+   //         // We don't have syntax yet for optional options, so manually calling `required`
+   //         .required(true)
+   //         .value_parser(value_parser!(std::path::PathBuf)),
+   //     )
+   //     .arg(arg!(
+   //         -d --debug ... "Turn debugging information on"
+   //     ))
+   //     //.subcommand(
+   //     //    Command::new("test")
+   //     //        .about("does testing things")
+   //     //        .arg(arg!(-l --list "lists test values").action(ArgAction::SetTrue)),
+   //     //)
+   //     .get_matches();
+
+   // // You can check the value provided by positional arguments, or option arguments
+   // //if let Some(name) = matches.get_one::<String>("name") {
+   // //    println!("Value for name: {}", name);
+   // //}
+
+   // if let Some(config_path) = matches.get_one::<std::path::PathBuf>("json-config") {
+   //     println!("Value for config: {}", config_path.display());
+   // }
+
+   // // You can see how many times a particular flag or argument occurred
+   // // Note, only flags can have multiple occurrences
+   // match matches
+   //     .get_one::<u8>("debug")
+   //     .expect("Count's are defaulted")
+   // {
+   //     0 => println!("Debug mode is off"),
+   //     1 => println!("Debug mode is kind of on"),
+   //     2 => println!("Debug mode is on"),
+   //     _ => println!("Don't be crazy"),
+   // }
+
+    //// You can check for the existence of subcommands, and if found use their
+    //// matches just as you would the top level cmd
+    //if let Some(matches) = matches.subcommand_matches("test") {
+    //    // "$ myapp test" was run
+    //    if *matches.get_one::<bool>("list").expect("defaulted by clap") {
+    //        // "$ myapp test -l" was run
+    //        println!("Printing testing lists...");
+    //    } else {
+    //        println!("Not printing testing lists...");
+    //    }
+    //}
+
+    // Continued program logic goes here...
+
+
+  // read calibration data
+  let mut calibrations = [[Calibrations {..Default::default()}; NCHN]; NBOARDS];
+  let mut rb_id = 0usize;
+  for n in 0..NBOARDS {
+      rb_id = n + 1;
+      let file_name = "/srv/gaps/gfp-data/gaps-gfp/TOFsoftware/server/datafiles/rb".to_owned() + &rb_id.to_string() + "_cal.txt";
+      println!("Reading calibrations from file {}", file_name);
+      let file_path = Path::new(&file_name);
+      calibrations[n] = read_calibration_file(file_path); 
+  }
+  
+  // each readoutboard gets its own worker
+  let rbcomm_workers = ThreadPool::new(NBOARDS);
+  
+  // open a zmq context
+  let ctx = zmq::Context::new();
+  // FIXME - port and address need to be 
+  // configurable
+  let mut port = 38830usize;
+  let address_ip = "tcp://127.0.0.1";
+  
+  let mut address : String;
+  for n in 0..NBOARDS {
+    let rb_comm_socket = ctx.socket(zmq::REP).unwrap();
+    address = address_ip.to_owned() + ":" + &port.to_string();
+    println!("Will bind to port for rb comm at {}", address);
+    let result = rb_comm_socket.bind(&address);
+    match result {
+        Ok(_)    => println!("Bound socket to {}", address),
+        Err(err) => panic!("Can not communicate with rb at address {}, error {}",address, err)
     }
-
-    // each readoutboard gets its own worker
-    let rbcomm_workers = ThreadPool::new(NBOARDS);
-
-    // open a zmq context
-    let ctx = zmq::Context::new();
-    // FIXME - port and address need to be 
-    // configurable
-    let mut port = 38830usize;
-    let address_ip = "tcp://127.0.0.1";
-    
-    let mut address : String;
-    for n in 0..NBOARDS {
-      let rb_comm_socket = ctx.socket(zmq::REP).unwrap();
-      address = address_ip.to_owned() + ":" + &port.to_string();
-      println!("Will bind to port for rb comm at {}", address);
-      let result = rb_comm_socket.bind(&address);
-      match result {
-          Ok(_)    => println!("Bound socket to {}", address),
-          Err(err) => panic!("Can not communicate with rb at address {}, error {}",address, err)
-      }
-      rbcomm_workers.execute(move || {
-          readoutboard_communicator(&rb_comm_socket, n); 
-      });
-      port += 1;
-    }
-
-//    let mut blob_data = BlobData {..Default::default()};
-//    let filepath = String::from("/data0/gfp-data-aug/Aug/run4a/d20220809_195753_4.dat");
-//    let blobs = get_file_as_byte_vec(&filepath);
-//
-//    let mut header_found_start    = false;
-//
-//    let mut nblobs = 0usize;
-//    let mut ncorrupt_blobs = 0usize;
-//    let mut pos = 0usize;
-//    let blobdata_size = blobs.len();
-//    let mut byte;
-//    
-//    loop {
-//      if pos + BLOBEVENTSIZE() >= (blobdata_size -1) {break;}
-//      byte = blobs[pos];
-//
-//      if !header_found_start {
-//        if byte == 0xaa {
-//          header_found_start = true;
-//        }
-//        pos +=1;
-//        continue;
-//      }
-//
-//      if header_found_start {
-//        pos += 1;
-//        if byte == 0xaa {
-//          header_found_start = false;
-//          blob_data.deserialize(&blobs, pos-2);
-//          nblobs += 1;
-//          blob_data.print();
-//          if blob_data.tail == 0x5555 {
-//              pos += BLOBEVENTSIZE() - 2; 
-//          } else {
-//              // the event is corrupt
-//              println!("{}", blob_data.head);
-//              ncorrupt_blobs += 1;
-//          }
-//        } else {
-//            // it wasn't an actual header
-//            header_found_start = false;
-//        }
-//      }
-//    }// end loop
-//    println!("==> Deserialized {} blobs! {} blobs were corrupt", nblobs, ncorrupt_blobs);
-let one_minute = time::Duration::from_millis(60000);
-//let now = time::Instant::now();
-
-thread::sleep(2*one_minute);
+    rbcomm_workers.execute(move || {
+        readoutboard_communicator(&rb_comm_socket, n); 
+    });
+    port += 1;
+  }
+  
+  //    let mut blob_data = BlobData {..Default::default()};
+  //    let filepath = String::from("/data0/gfp-data-aug/Aug/run4a/d20220809_195753_4.dat");
+  //    let blobs = get_file_as_byte_vec(&filepath);
+  //
+  //    let mut header_found_start    = false;
+  //
+  //    let mut nblobs = 0usize;
+  //    let mut ncorrupt_blobs = 0usize;
+  //    let mut pos = 0usize;
+  //    let blobdata_size = blobs.len();
+  //    let mut byte;
+  //    
+  //    loop {
+  //      if pos + BLOBEVENTSIZE() >= (blobdata_size -1) {break;}
+  //      byte = blobs[pos];
+  //
+  //      if !header_found_start {
+  //        if byte == 0xaa {
+  //          header_found_start = true;
+  //        }
+  //        pos +=1;
+  //        continue;
+  //      }
+  //
+  //      if header_found_start {
+  //        pos += 1;
+  //        if byte == 0xaa {
+  //          header_found_start = false;
+  //          blob_data.deserialize(&blobs, pos-2);
+  //          nblobs += 1;
+  //          blob_data.print();
+  //          if blob_data.tail == 0x5555 {
+  //              pos += BLOBEVENTSIZE() - 2; 
+  //          } else {
+  //              // the event is corrupt
+  //              println!("{}", blob_data.head);
+  //              ncorrupt_blobs += 1;
+  //          }
+  //        } else {
+  //            // it wasn't an actual header
+  //            header_found_start = false;
+  //        }
+  //      }
+  //    }// end loop
+  //    println!("==> Deserialized {} blobs! {} blobs were corrupt", nblobs, ncorrupt_blobs);
+  let one_minute = time::Duration::from_millis(60000);
+  //let now = time::Instant::now();
+  
+  thread::sleep(2*one_minute);
 
 
 
