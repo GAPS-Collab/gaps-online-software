@@ -4,13 +4,13 @@ use std::sync::Arc;
 use std::sync::Mutex;
 
 enum Message {
-    NewJob(Job),
-    Terminate,
+  NewJob(Job),
+  Terminate,
 }
 
 pub struct ThreadPool {
-    workers: Vec<Worker>,
-    sender: mpsc::Sender<Message>,
+  workers: Vec<Worker>,
+  sender: mpsc::Sender<Message>,
 }
 
 trait FnBox {
@@ -18,12 +18,12 @@ trait FnBox {
 }
 
 impl<F: FnOnce()> FnBox for F {
-    fn call_box(self: Box<F>) {
-        (*self)()
-    }
+  fn call_box(self: Box<F>) {
+      (*self)()
+  }
 }
 
-type Job = Box<FnBox + Send + 'static>;
+type Job = Box<dyn FnBox + Send + 'static>;
 
 impl ThreadPool {
     /// Create a new ThreadPool.
@@ -37,9 +37,7 @@ impl ThreadPool {
         assert!(size > 0);
 
         let (sender, receiver) = mpsc::channel();
-
         let receiver = Arc::new(Mutex::new(receiver));
-
         let mut workers = Vec::with_capacity(size);
 
         for id in 0..size {

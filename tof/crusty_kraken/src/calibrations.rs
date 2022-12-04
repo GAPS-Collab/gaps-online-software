@@ -64,7 +64,7 @@ pub fn timing_calibration(times    : &mut [f64;NWORDS],
                           cal      : &Calibrations)
 {
     times[0] = 0.0;
-    for n in 0..NWORDS {
+    for n in 1..NWORDS {
       times[n] = times[n-1] + cal.tbin[(n-1+(t_cell as usize))%1024];
     }
 }
@@ -73,93 +73,94 @@ pub fn timing_calibration(times    : &mut [f64;NWORDS],
 
 pub fn read_calibration_file(filename : &Path) -> [Calibrations; NCHN ]
 {
-    let mut cals = [Calibrations {..Default::default()}; NCHN];
-    for n in 0..NCHN {
-        cals[n] = Calibrations {..Default::default()};
-    }
+  println!("Will try to open file {}", filename.display());
+  let mut cals = [Calibrations {..Default::default()}; NCHN];
+  for n in 0..NCHN {
+      cals[n] = Calibrations {..Default::default()};
+  }
 
-    //let mut cal =  Calibrations {..Default::default()};
-    //first we count the lines to see if the file is sane
-    let file = BufReader::new(File::open(filename).expect("Unable to open file"));
-    let mut cnt  = 0;
+  //let mut cal =  Calibrations {..Default::default()};
+  //first we count the lines to see if the file is sane
+  let file = BufReader::new(File::open(filename).expect("Unable to open file {}"));
+  let mut cnt  = 0;
 
-    for _ in file.lines() {
-        cnt += 1;
-    }
-    
-    if cnt != NCHN*4 {panic! ("The calibration file {} does not have the proper format! It has {} lines", filename.display(), cnt);}
+  for _ in file.lines() {
+      cnt += 1;
+  }
+  
+  if cnt != NCHN*4 {panic! ("The calibration file {} does not have the proper format! It has {} lines", filename.display(), cnt);}
 
-    cnt = 0;
-    let mut vals = 0usize;
+  cnt = 0;
+  let mut vals = 0usize;
 
-    if let Ok(lines) = read_lines(filename) {
-        // we have NCHN-1*4 lines (no calibration data for channel 9)
-        for line in lines {
-          if let Ok(data) = line {
-              
-              let values: Vec<&str> = data.split(' ').collect();
-              match values.len() {
-                NWORDS => {
-                  if vals == 0 {
-                   for n in 0..NWORDS {
-                       // this will throw an error if calibration data 
-                       // is not following conventioss
-                       let data : f64 = values[n].parse::<f64>().unwrap();
-                       cals[cnt].v_offsets[n] = data;
-                      }
-                  vals += 1;
-                  continue;
-                  }
-                  if vals == 1 {
-                   for n in 0..NWORDS {
-                       // this will throw an error if calibration data 
-                       // is not following conventioss
-                       let data : f64 = values[n].parse::<f64>().unwrap();
-                       cals[cnt].v_dips[n] = data;
-                      }
-                  vals += 1;
-                  continue;
-                  }
-                  if vals == 2 {
-                   for n in 0..NWORDS {
-                       // this will throw an error if calibration data 
-                       // is not following conventioss
-                       let data : f64 = values[n].parse::<f64>().unwrap();
-                       cals[cnt].v_inc[n] = data;
-                      }
-                  vals += 1;
-                  continue;
-                  }
-                  if vals == 3 {
-                   for n in 0..NWORDS {
-                       // this will throw an error if calibration data 
-                       // is not following conventioss
-                       let data : f64 = values[n].parse::<f64>().unwrap();
-                       cals[cnt].tbin[n] = data;
-                       // reset vals & cnts
-                      }
-                  vals = 0;
-                  cnt += 1;
-                  //println!("counter {} vals {}", cnt, vals);
-                  continue;
-                  }
-                  //let strdata = values[0].parse::<String>();
-                  //let intdata =  values[1].parse::<i32>();
-                  //println!("Got: {:?} {:?}", strdata, intdata);
-                },
-                _ => panic!("Invalid input line {}", data),
-              }; // end Ok lines
-              vals += 1;
-          }
+  if let Ok(lines) = read_lines(filename) {
+      // we have NCHN-1*4 lines (no calibration data for channel 9)
+      for line in lines {
+        if let Ok(data) = line {
+            
+            let values: Vec<&str> = data.split(' ').collect();
+            match values.len() {
+              NWORDS => {
+                if vals == 0 {
+                 for n in 0..NWORDS {
+                     // this will throw an error if calibration data 
+                     // is not following conventioss
+                     let data : f64 = values[n].parse::<f64>().unwrap();
+                     cals[cnt].v_offsets[n] = data;
+                    }
+                vals += 1;
+                continue;
+                }
+                if vals == 1 {
+                 for n in 0..NWORDS {
+                     // this will throw an error if calibration data 
+                     // is not following conventioss
+                     let data : f64 = values[n].parse::<f64>().unwrap();
+                     cals[cnt].v_dips[n] = data;
+                    }
+                vals += 1;
+                continue;
+                }
+                if vals == 2 {
+                 for n in 0..NWORDS {
+                     // this will throw an error if calibration data 
+                     // is not following conventioss
+                     let data : f64 = values[n].parse::<f64>().unwrap();
+                     cals[cnt].v_inc[n] = data;
+                    }
+                vals += 1;
+                continue;
+                }
+                if vals == 3 {
+                 for n in 0..NWORDS {
+                     // this will throw an error if calibration data 
+                     // is not following conventioss
+                     let data : f64 = values[n].parse::<f64>().unwrap();
+                     cals[cnt].tbin[n] = data;
+                     // reset vals & cnts
+                    }
+                vals = 0;
+                cnt += 1;
+                //println!("counter {} vals {}", cnt, vals);
+                continue;
+                }
+                //let strdata = values[0].parse::<String>();
+                //let intdata =  values[1].parse::<i32>();
+                //println!("Got: {:?} {:?}", strdata, intdata);
+              },
+              _ => panic!("Invalid input line {}", data),
+            }; // end Ok lines
+            vals += 1;
         }
-    }
-    return cals;
+      }
+  }
+  return cals;
 }
 
 /***********************************/
 
 pub fn remove_spikes (waveform : &mut [[f64;NWORDS];NCHN],
-                      t_cell : usize,
+                      t_cell : u16,
                       spikes : &mut [i32;10]) {
 
   //let mut spikes  : [i32;10] = [0;10];
@@ -175,8 +176,9 @@ pub fn remove_spikes (waveform : &mut [[f64;NWORDS];NCHN],
   let mut rsp : [i32;10]    = [-1;10];
   //let mut spikes : [i32;10] = [-1;10
   // to me, this seems that should be u32
-  let mut sp   : [[usize;NCHN];10] = [[0;NCHN];10];
-  let mut n_sp : [usize;NCHN]      = [0;NCHN];
+  // the 10 is for a maximum of 10 spikes (Jeff)
+  let mut sp   : [[usize;10];NCHN] = [[0;10];NCHN];
+  let mut n_sp : [usize;10]      = [0;10];
 
   for j in 0..NWORDS as usize {
     for i in 0..NCHN as usize {
@@ -208,7 +210,7 @@ pub fn remove_spikes (waveform : &mut [[f64;NWORDS];NCHN],
       for k in 0..NCHN {
         for l in 0..n_sp[k] as usize {
         //check if this spike has a symmetric partner in any channel
-          if (sp[i][j] + sp[k][l] - 2 * t_cell) as usize % NWORDS == 1022 {
+          if (sp[i][j] as i32 + sp[k][l] as i32 - 2 * t_cell as i32) as i32 % NWORDS as i32 == 1022 {
             n_symmetric += 1;
             break;
           }
@@ -246,11 +248,16 @@ pub fn remove_spikes (waveform : &mut [[f64;NWORDS];NCHN],
   let mut x : f64;
   let mut y : f64;
 
-  for mut k in 0..n_rsp {
+  let mut skip_next : bool = false;
+  for k in 0..n_rsp {
+    if skip_next {
+      skip_next = false;
+      continue;
+    }
     spikes[k] = rsp[k];
     //for (i = 0; i < nChn; i++)
     for i in 0..NCHN {
-      if (k < n_rsp && i32::abs(rsp[k] as i32 - rsp[k + 1] as i32 % NWORDS as i32) == 2)
+      if k < n_rsp && i32::abs(rsp[k] as i32 - rsp[k + 1] as i32 % NWORDS as i32) == 2
       {
         // remove double spike 
         let j = if rsp[k] > rsp[k + 1] {rsp[k + 1] as usize}  else {rsp[k] as usize};
@@ -287,8 +294,8 @@ pub fn remove_spikes (waveform : &mut [[f64;NWORDS];NCHN],
         }
       } // end loop over nchn
     } // end loop over n_rsp
-    if (k < n_rsp && i32::abs(rsp[k] - rsp[k + 1] % NWORDS as i32) == 2)
-      {k += 1} // skip second half of double spike
+    if k < n_rsp && i32::abs(rsp[k] - rsp[k + 1] % NWORDS as i32) == 2
+      {skip_next = true;} // skip second half of double spike
   } // end loop over k
 }
 

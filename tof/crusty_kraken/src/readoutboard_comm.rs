@@ -1,27 +1,25 @@
-//mod reduced_tofevent;
+use std::{fs, fs::File, path::Path};
+use std::io::Read;
+#[cfg(feature = "diagnostics")]
+use waveform::CalibratedWaveformForDiagnostics;
+#[cfg(feature = "diagnostics")]
+use hdf5;
+#[cfg(feature = "diagnostics")]
+use ndarray::{arr1};
 
+
+use crate::errors::BlobError;
 use crate::reduced_tofevent::PaddlePacket;
-
 use crate::calibrations::{Calibrations,
                           read_calibration_file,
                           remove_spikes,
                           voltage_calibration, 
                           timing_calibration};
-
-
-use std::{fs, fs::File, path::Path};
-use std::io::Read;
-
-
 use crate::readoutboard_blob::{BlobData,
-                               BLOBEVENTSIZE};
-
-use crate::constants::{NBOARDS,
-                       NCHN,
+                               get_constant_blobeventsize};
+use crate::constants::{NCHN,
                        NWORDS};
-
 use crate::waveform::CalibratedWaveform;
-
 
 /*************************************/
 
@@ -41,12 +39,12 @@ fn get_file_as_byte_vec(filename: &String) -> Vec<u8> {
 
 /*************************************/
 
-fn analyze_blobs(buffer         : &Vec<u8>,
-                 rb_id          : usize,
-                 print_events   : bool,
-                 do_calibration : bool,
-                 pack_data      : bool)
-{
+fn analyze_blobs(buffer               : &Vec<u8>,
+                 rb_id                : usize,
+                 print_events         : bool,
+                 do_calibration       : bool,
+                 pack_data            : bool)
+-> Result<usize, BlobError> {
   let mut blob_data = BlobData {..Default::default()};
   let mut header_found_start    = false;
   let mut nblobs = 0usize;
@@ -54,7 +52,6 @@ fn analyze_blobs(buffer         : &Vec<u8>,
   let mut pos = 0usize;
   let blobdata_size = buffer.len();
   let mut byte;
-  
   let mut events : Vec<BlobData> = Vec::new();
 
   // in case we want to do calibratoins
@@ -67,9 +64,26 @@ fn analyze_blobs(buffer         : &Vec<u8>,
     calibrations = read_calibration_file(cal_file_path); 
   }
 
+  // allocate some memory we are using in 
+  // every iteration of the loop
+  const NPADDLES : usize = (NCHN - 1)/2; // assuming one channel 
+                                           // is the channel 9
+  let mut paddle_packets_this_rb = [PaddlePacket::new(); NPADDLES];             
+  // binary switch - false for side a and
+  // true for side b
+  let mut is_bside : bool = false;
+  let mut trace_out : [f64;NWORDS] = [0.0;NWORDS];
+  let mut times     : [f64;NWORDS] = [0.0;NWORDS];
+
+  // remove_spikes requires two dimensional array
+  let mut all_channel_waveforms : [[f64;NWORDS];NCHN] = [[0.0;NWORDS];NCHN];
+  let mut all_channel_times     : [[f64;NWORDS];NCHN] = [[0.0;NWORDS];NCHN];
+
+  #[cfg(feature = "diagnostics")]
+  let mut diagnostics_wf : Vec<CalibratedWaveformForDiagnostics> = Vec::new();
 
   loop {
-    if pos + BLOBEVENTSIZE() >= (blobdata_size -1) {break;}
+    if pos + get_constant_blobeventsize() >= (blobdata_size -1) {break;}
     byte = buffer[pos];
 
     if !header_found_start {
@@ -88,9 +102,8 @@ fn analyze_blobs(buffer         : &Vec<u8>,
         nblobs += 1;
         
         if blob_data.tail == 0x5555 {
-            if print_events
-                {blob_data.print();}
-            pos += BLOBEVENTSIZE() - 2; 
+            if print_events {blob_data.print();}
+            pos += get_constant_blobeventsize() - 2; 
             if do_calibration {
               
               // the order of tasks should be something 
@@ -100,12 +113,6 @@ fn analyze_blobs(buffer         : &Vec<u8>,
               // 3) paak-finding
               // 4) cfd algorithm
               // 5) paddle packaging
-              const NPADDLES : usize = (NCHN - 1)/2; // assuming one channel 
-                                           // is the channel 9
-              let mut paddle_packets_this_rb = [PaddlePacket::new(); NPADDLES];             
-              // binary switch - false for side a and
-              // true for side b
-              let mut is_bside : bool = false;
               // the paddle mapping is HARDCODED here
               // FIXME: We make the assumption that nchanel -> paddle side
               //                                    0 -> Paddle0/A Side
@@ -119,8 +126,6 @@ fn analyze_blobs(buffer         : &Vec<u8>,
 
               let mut paddle_number = 0;
               for n in 0..NCHN {
-                let mut trace_out : [f64;NWORDS] = [0.0;NWORDS];
-                let mut times     : [f64;NWORDS] = [0.0;NWORDS];
                 voltage_calibration(&blob_data.ch_adc[n],
                                     &mut trace_out,
                                     blob_data.stop_cell,
@@ -128,17 +133,36 @@ fn analyze_blobs(buffer         : &Vec<u8>,
                 timing_calibration(&mut times,
                                    blob_data.stop_cell,
                                    &calibrations[n]);
+                all_channel_waveforms[n] = trace_out;
+                all_channel_times[n]     = times;
+                let mut spikes : [i32;10] = [0;10];
+                remove_spikes(&mut all_channel_waveforms,
+                              blob_data.stop_cell,
+                              &mut spikes);
+              }
+
+
+              for n in 0..NCHN {
 
                 // analysis part
-                let waveform = CalibratedWaveform::new(&trace_out, &times);
+                let waveform = CalibratedWaveform::new(&all_channel_waveforms[n],
+                                                       &all_channel_times[n]);
                 let cfd_time = waveform.find_cfd_simple(0);
-
+                //waveform.print();
                 // packing part
                 if n == 0 || n == 1 {paddle_number = 0;}
                 if n == 2 || n == 3 {paddle_number = 1;}
                 if n == 4 || n == 5 {paddle_number = 2;}
                 if n == 6 || n == 7 {paddle_number = 3;}
                 paddle_packets_this_rb[paddle_number].set_time(cfd_time, n%2);
+                
+                #[cfg(feature = "diagnostics")]
+                {
+                  let diag_wf = CalibratedWaveformForDiagnostics::new(&waveform);
+                  //diag_wf.print();
+                  diagnostics_wf.push (diag_wf);
+                  //hdf_dataset.write(&arr1(&[diag_wf]));
+                }
               }
             }
             events.push(blob_data);
@@ -153,7 +177,20 @@ fn analyze_blobs(buffer         : &Vec<u8>,
       }
     }
   }// end loop
+  #[cfg(feature = "diagnostics")]
+  {
+    let hdf_diagnostics_file =  "waveforms_".to_owned() + &rb_id.to_string() + ".hdf";
+    let hdf_file    = hdf5::File::create(hdf_diagnostics_file).unwrap(); // open for writing
+    hdf_file.create_group("waveforms");
+    let hdf_group = hdf_file.group("waveforms").unwrap();
+    let hdf_dataset = hdf_group.new_dataset::<CalibratedWaveformForDiagnostics>().shape(diagnostics_wf.len()).create("wf").unwrap();
+    //hdf_dataset.write(&arr1(&[diag_wf]));
+    hdf_dataset.write(&arr1(&diagnostics_wf));
+    hdf_file.close();
+  }
   println!("==> Deserialized {} blobs! {} blobs were corrupt", nblobs, ncorrupt_blobs);
+  panic!("You shall not pass!");
+  Ok(nblobs)
 }
 
 /*************************************/
@@ -161,7 +198,14 @@ fn analyze_blobs(buffer         : &Vec<u8>,
 fn get_blobs_from_file (rb_id : usize) {
   let filepath = String::from("/data0/gfp-data-aug/Aug/run4a/d20220809_195753_4.dat");
   let blobs = get_file_as_byte_vec(&filepath);
-  analyze_blobs(&blobs, rb_id, false, false, false);  
+  match analyze_blobs(&blobs,
+                      rb_id,
+                      false,
+                      false,
+                      false) {
+      Ok(nblobs) => println!("Read {} blobs from file", nblobs), 
+      Err(err)     => panic!("Was not able to read blobs! Err {}", err)
+  }
 }
 
 /*************************************/
@@ -204,7 +248,8 @@ pub fn readoutboard_communicator(socket      : &zmq::Socket,
           // check for rb ping signal
           let rb_ping = identifiy_readoutboard(&msg);
           if rb_ping {
-            let result = socket.send_str("[SVR]: R'cvd RBping", 0);
+            //let result = socket.send_str("[SVR]: R'cvd RBping", 0);
+            let result = socket.send("[SVR]: R'cvd RBping", 0);
             match result {
               Ok(_) => println!("RB board ping received"),
               Err(_) => println!("Can not send ping!")
@@ -216,13 +261,21 @@ pub fn readoutboard_communicator(socket      : &zmq::Socket,
           let mut buffer = tvec![u8;msg.len()];
           buffer = msg.to_vec();
           println!("received message with len : {}", size);
-          let result = socket.send_str("[SVR]: Received data",0);
+          //let result = socket.send_str("[SVR]: Received data",0);
+          let result = socket.send("[SVR]: Received data",0);
           match result {
               Ok(_) => println!("Reply sent!"),
               Err(_) => println!("Warn - remote socket problems")
           }
           // do the work
-          analyze_blobs(&buffer, board_id, false, false, false);
+          match analyze_blobs(&buffer,
+                              board_id,
+                              false,
+                              true,
+                              false) {
+            Ok(nblobs) => println!("Read {} blobs from file", nblobs),
+            Err(err)     => panic!("Was not able to read blobs! {}", err )
+          }
 
           //thread::sleep(Duration::from_millis(1500));
       }

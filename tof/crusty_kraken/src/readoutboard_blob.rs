@@ -3,10 +3,8 @@
 
 use crate::constants::{NWORDS, NCHN};
 
-pub fn BLOBEVENTSIZE() -> usize {
+pub fn get_constant_blobeventsize() -> usize {
   let size = 36 + (NCHN*2) + (NCHN*NWORDS*2) + (NCHN*4) + 8;
-  //let return_value : usize;
-  //return_value = size as usize;
   return size;
 }
 

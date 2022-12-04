@@ -15,7 +15,7 @@ using namespace TOF;
 int main() {
 
   std::vector<std::string> blobfiles;
-  std::string blob_basename = "../test/readoutboard-emulator/resources/example-data/../test/readoutboard-emulator/resources/example-data";
+  std::string blob_basename = "/srv/gaps/gfp-data/gaps-gfp/TOFsoftware/server/test/readoutboard-emulator/resources/example-data/d20220708_rb_";
   for (int k=1;k<5;k++) {
     blobfiles.push_back(blob_basename + std::to_string(k) + ".dat");
   }
