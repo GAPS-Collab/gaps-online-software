@@ -7,6 +7,9 @@ mod constants;
 mod waveform;
 mod errors;
 
+extern crate pretty_env_logger;
+#[macro_use] extern crate log;
+
 extern crate clap;
 
 extern crate hdf5;
@@ -47,19 +50,32 @@ struct Args {
 /*************************************/
 
 fn main() {
-
+   pretty_env_logger::init();
    let args = Args::parse();
+
+   // some bytes, in a vector
+   let sparkle_heart         = vec![240, 159, 146, 150];
+   let kraken                = vec![240, 159, 144, 153];
+   let sattelite_antenna     = vec![240, 159, 147, 161];
+   // We know these bytes are valid, so we'll use `unwrap()`.
+   let sparkle_heart = String::from_utf8(sparkle_heart).unwrap();
+   let kraken        = String::from_utf8(kraken).unwrap();
+   let sattelite_antenna = String::from_utf8(sattelite_antenna).unwrap();
+
+   // welcome banner!
+   println!("-----------------------------------------------------------------------");
+   println!("Welcome to crusty_kraken {}, a server software {} for the time-of-flight instrument for the GAPS experiment {}",kraken, sattelite_antenna, sparkle_heart);
+   println!("");
+   println!("-----------------------------------------------------------------------");
    match args.json_config {
-     None => println!("No config file provided!"),
+     None => warn!("No config file provided!"),
      Some(ref json_file_path) => {
        if !args.json_config.as_ref().unwrap().exists() {
            panic!("The file {} does not exist!", args.json_config.as_ref().unwrap().display());
        }
-       println!("Found config file {}", args.json_config.as_ref().unwrap().display());
+       info!("Found config file {}", args.json_config.as_ref().unwrap().display());
      }
    }
-
-
    //let matches = command!() // requires `cargo` feature
    //     //.arg(arg!([name] "Optional name to operate on"))
    //     .arg(
@@ -122,7 +138,7 @@ fn main() {
   for n in 0..NBOARDS {
       rb_id = n + 1;
       let file_name = "/srv/gaps/gfp-data/gaps-gfp/TOFsoftware/server/datafiles/rb".to_owned() + &rb_id.to_string() + "_cal.txt";
-      println!("Reading calibrations from file {}", file_name);
+      info!("Reading calibrations from file {}", file_name);
       let file_path = Path::new(&file_name);
       calibrations[n] = read_calibration_file(file_path); 
   }
@@ -141,10 +157,10 @@ fn main() {
   for n in 0..NBOARDS {
     let rb_comm_socket = ctx.socket(zmq::REP).unwrap();
     address = address_ip.to_owned() + ":" + &port.to_string();
-    println!("Will bind to port for rb comm at {}", address);
+    info!("Will bind to port for rb comm at {}", address);
     let result = rb_comm_socket.bind(&address);
     match result {
-        Ok(_)    => println!("Bound socket to {}", address),
+        Ok(_)    => info!("Bound socket to {}", address),
         Err(err) => panic!("Can not communicate with rb at address {}, error {}",address, err)
     }
     rbcomm_workers.execute(move || {

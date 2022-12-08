@@ -1,6 +1,5 @@
 /*****************************************/
 
-
 use crate::constants::{NWORDS,
                        MAX_NUM_PEAKS,
                        WF_VOLTAGE_THRESHOLD};
@@ -27,9 +26,12 @@ pub enum WaveformError {
 /// Hold calibrated (voltage) and timing
 /// data for a single waveform.
 ///
-pub struct CalibratedWaveform<'a> {
-  wave  : &'a[f64;NWORDS],
-  times : &'a[f64;NWORDS],
+//pub struct CalibratedWaveform<'a> {
+//  wave  : &'a[f64;NWORDS],
+//  times : &'a[f64;NWORDS],
+pub struct CalibratedWaveform {
+  wave  : [f64;NWORDS],
+  times : [f64;NWORDS],
   /// peak properties
   /// bin positions
   peaks   : [usize;MAX_NUM_PEAKS],
@@ -42,23 +44,44 @@ pub struct CalibratedWaveform<'a> {
   begin_peak : [usize;MAX_NUM_PEAKS],
   end_peak   : [usize;MAX_NUM_PEAKS],
   spikes     : [usize;MAX_NUM_PEAKS],
+
+  // these values are for baseline 
+  // subtraction, cfd calculation etc.
+  threshold      : f64,
+  cfds_fraction  : f64,
+  ped_begin_bin  : usize,
+  ped_bin_range  : usize,    
+  pedestal       : f64,
+  pedestal_sigma : f64
+
 }
 
-impl CalibratedWaveform<'_> {
 
-  pub fn new<'a>(wave: &'a[f64;NWORDS], times: &'a[f64;NWORDS]) -> CalibratedWaveform<'a> {
-    CalibratedWaveform { wave       : wave,
-                         times      : times,
-                         peaks      : [0;  MAX_NUM_PEAKS],
-                         tdcs       : [0.0;MAX_NUM_PEAKS],
-                         charge     : [0.0;MAX_NUM_PEAKS],
-                         width      : [0.0;MAX_NUM_PEAKS],
-                         height     : [0.0;MAX_NUM_PEAKS],
-                         num_peaks  : 0,
-                         stop_cell  : 0,
-                         begin_peak : [0;MAX_NUM_PEAKS],
-                         end_peak   : [0;MAX_NUM_PEAKS],
-                         spikes     : [0;MAX_NUM_PEAKS]
+// FIXME - I think instead of borrowing it here with a livetime, I'd rather have
+// it moved. 
+//impl CalibratedWaveform<'_> {
+impl CalibratedWaveform {
+
+  //pub fn new<'a>(wave: &'a[f64;NWORDS], times: &'a[f64;NWORDS]) -> CalibratedWaveform<'a> {
+  pub fn new(wave : [f64;NWORDS], times : [f64;NWORDS]) ->CalibratedWaveform {
+    CalibratedWaveform { wave           : wave,
+                         times          : times,
+                         peaks          : [0;  MAX_NUM_PEAKS],
+                         tdcs           : [0.0;MAX_NUM_PEAKS],
+                         charge         : [0.0;MAX_NUM_PEAKS],
+                         width          : [0.0;MAX_NUM_PEAKS],
+                         height         : [0.0;MAX_NUM_PEAKS],
+                         num_peaks      : 0,
+                         stop_cell      : 0,
+                         begin_peak     : [0;MAX_NUM_PEAKS],
+                         end_peak       : [0;MAX_NUM_PEAKS],
+                         spikes         : [0;MAX_NUM_PEAKS],
+                         threshold      : 0.0,
+                         cfds_fraction  : 0.0,
+                         ped_begin_bin  : 0,
+                         ped_bin_range  : 0,
+                         pedestal       : 0.0,
+                         pedestal_sigma : 0.0
     }
   }
 
@@ -77,6 +100,53 @@ impl CalibratedWaveform<'_> {
       print!("{},", self.tdcs[n]);  
     }
     println!("*************************");
+  }
+
+  pub fn set_threshold(&mut self, thr : f64) {
+      self.threshold = thr;
+  }
+
+  pub fn set_cfds_fraction(&mut self, fraction : f64) {
+      self.cfds_fraction = fraction;
+  }
+  
+  pub fn set_ped_begin(&mut self, time : f64) {
+      match self.time_2_bin(time) {
+          Err(err) => println!("Can not find bin for time {}, err FIXME", time),
+          Ok(begin) => {self.ped_begin_bin = begin;}
+      }
+  }
+
+  pub fn set_ped_range(&mut self, range : f64) {
+    // This is a little convoluted, but we must convert the range (in
+    // ns) into bins
+    match self.time_2_bin(self.times[self.ped_begin_bin] + range) {
+        Err(err)      => println!("Can not set pedestal range for range {}", range),
+        Ok(bin_range) => {self.ped_bin_range = bin_range;}
+    }
+  }
+
+  pub fn subtract_pedestal(&mut self) {
+    for n in 0..NWORDS {
+      self.wave[n] -= self.pedestal;
+    }
+  }
+
+
+  pub fn calc_ped_range(&mut self) {
+    let mut sum  = 0f64;
+    let mut sum2 = 0f64;
+
+    for n in self.ped_begin_bin..self.ped_begin_bin + self.ped_bin_range {
+      if f64::abs(self.wave[n]) < 10.0 {
+        sum  += self.wave[n];
+        sum2 += self.wave[n]*self.wave[n];
+      }
+    }
+    let average = sum/(self.ped_bin_range as f64);
+    self.pedestal = average;
+    self.pedestal_sigma = f64::sqrt(sum2/(self.ped_bin_range as f64 - (average*average)))
+
   }
 
 
@@ -275,8 +345,10 @@ impl CalibratedWaveformForDiagnostics {
 
   pub fn new(wf : &CalibratedWaveform) -> CalibratedWaveformForDiagnostics {
     CalibratedWaveformForDiagnostics {
-      wave       : *wf.wave, //[0.0;NWORDS],
-      times      : *wf.times,
+      //wave       : *wf.wave, //[0.0;NWORDS],
+      //times      : *wf.times,
+      wave       : wf.wave, //[0.0;NWORDS],
+      times      : wf.times,
       peaks      : wf.peaks,
       tdcs       : wf.tdcs,
       charge     : wf.charge,

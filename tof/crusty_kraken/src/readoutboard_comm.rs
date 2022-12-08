@@ -11,10 +11,10 @@ use ndarray::{arr1};
 use crate::errors::BlobError;
 use crate::reduced_tofevent::PaddlePacket;
 use crate::calibrations::{Calibrations,
-                          read_calibration_file,
-                          remove_spikes,
-                          voltage_calibration, 
-                          timing_calibration};
+                          read_calibration_file};
+                          //remove_spikes,
+                          //voltage_calibration, 
+                          //timing_calibration};
 use crate::readoutboard_blob::{BlobData,
                                get_constant_blobeventsize};
 use crate::constants::{NCHN,
@@ -59,7 +59,7 @@ fn analyze_blobs(buffer               : &Vec<u8>,
 
   if do_calibration {
     let cal_file_name = "/srv/gaps/gfp-data/gaps-gfp/TOFsoftware/server/datafiles/rb".to_owned() + &rb_id.to_string() + "_cal.txt";
-    println!("Reading calibrations from file {}", cal_file_name);
+    info!("Reading calibrations from file {}", cal_file_name);
     let cal_file_path = Path::new(&cal_file_name);
     calibrations = read_calibration_file(cal_file_path); 
   }
@@ -83,6 +83,7 @@ fn analyze_blobs(buffer               : &Vec<u8>,
   let mut diagnostics_wf : Vec<CalibratedWaveformForDiagnostics> = Vec::new();
 
   loop {
+    // if the following is true, we scanned throught the whole stream  
     if pos + get_constant_blobeventsize() >= (blobdata_size -1) {break;}
     byte = buffer[pos];
 
@@ -98,7 +99,9 @@ fn analyze_blobs(buffer               : &Vec<u8>,
       pos += 1;
       if byte == 0xaa {
         header_found_start = false;
-        blob_data.deserialize(&buffer, pos-2);
+        // we have found our 0xaaaa marker!
+        // include it in the stream to deserialize
+        blob_data.from_bytestream(&buffer, pos-2);
         nblobs += 1;
         
         if blob_data.tail == 0x5555 {
@@ -125,29 +128,21 @@ fn analyze_blobs(buffer               : &Vec<u8>,
               //                                    7 -> Paddle3/B Side
 
               let mut paddle_number = 0;
-              for n in 0..NCHN {
-                voltage_calibration(&blob_data.ch_adc[n],
-                                    &mut trace_out,
-                                    blob_data.stop_cell,
-                                    &calibrations[n]);
-                timing_calibration(&mut times,
-                                   blob_data.stop_cell,
-                                   &calibrations[n]);
-                all_channel_waveforms[n] = trace_out;
-                all_channel_times[n]     = times;
-                let mut spikes : [i32;10] = [0;10];
-                remove_spikes(&mut all_channel_waveforms,
-                              blob_data.stop_cell,
-                              &mut spikes);
-              }
-
-
+              let mut spikes : [i32;10] = [0;10];
+              blob_data.calibrate(&calibrations);
+              blob_data.remove_spikes(&mut spikes);
               for n in 0..NCHN {
 
                 // analysis part
-                let waveform = CalibratedWaveform::new(&all_channel_waveforms[n],
-                                                       &all_channel_times[n]);
-                let cfd_time = waveform.find_cfd_simple(0);
+                //let mut waveform = CalibratedWaveform::new(all_channel_waveforms[n],
+                //                                           all_channel_times[n]);
+                blob_data.set_threshold(5.0, n);
+                blob_data.set_cfds_fraction(0.10, n);
+                blob_data.set_ped_begin(10.0, n);// 10-100                               
+                blob_data.set_ped_range(50.0, n);
+                blob_data.calc_ped_range(n);
+                blob_data.subtract_pedestal(n);
+                let cfd_time = blob_data.find_cfd_simple(0, n);
                 //waveform.print();
                 // packing part
                 if n == 0 || n == 1 {paddle_number = 0;}
@@ -157,11 +152,10 @@ fn analyze_blobs(buffer               : &Vec<u8>,
                 paddle_packets_this_rb[paddle_number].set_time(cfd_time, n%2);
                 
                 #[cfg(feature = "diagnostics")]
-                {
-                  let diag_wf = CalibratedWaveformForDiagnostics::new(&waveform);
-                  //diag_wf.print();
-                  diagnostics_wf.push (diag_wf);
-                  //hdf_dataset.write(&arr1(&[diag_wf]));
+                {  
+                  //events.push(blob_data);
+                  //let diag_wf = CalibratedWaveformForDiagnostics::new(&waveform);
+                  //diagnostics_wf.push (diag_wf);
                 }
               }
             }
@@ -177,18 +171,23 @@ fn analyze_blobs(buffer               : &Vec<u8>,
       }
     }
   }// end loop
+
+  // in case of diagnostics, we 
+  // write an hdf file with calibrated 
+  // waveforms for later analysis.
   #[cfg(feature = "diagnostics")]
   {
     let hdf_diagnostics_file =  "waveforms_".to_owned() + &rb_id.to_string() + ".hdf";
     let hdf_file    = hdf5::File::create(hdf_diagnostics_file).unwrap(); // open for writing
     hdf_file.create_group("waveforms");
     let hdf_group = hdf_file.group("waveforms").unwrap();
-    let hdf_dataset = hdf_group.new_dataset::<CalibratedWaveformForDiagnostics>().shape(diagnostics_wf.len()).create("wf").unwrap();
-    //hdf_dataset.write(&arr1(&[diag_wf]));
-    hdf_dataset.write(&arr1(&diagnostics_wf));
-    hdf_file.close();
+    //let hdf_dataset = hdf_group.new_dataset::<CalibratedWaveformForDiagnostics>().shape(diagnostics_wf.len()).create("wf").unwrap();
+    let hdf_dataset = hdf_group.new_dataset::<BlobData>().shape(events.len()).create("wf").unwrap();
+    //hdf_dataset.write(&arr1(&diagnostics_wf))?;
+    hdf_dataset.write(&arr1(&events))?;
+    hdf_file.close()?;
   }
-  println!("==> Deserialized {} blobs! {} blobs were corrupt", nblobs, ncorrupt_blobs);
+  info!("==> Deserialized {} blobs! {} blobs were corrupt", nblobs, ncorrupt_blobs);
   panic!("You shall not pass!");
   Ok(nblobs)
 }
@@ -203,13 +202,18 @@ fn get_blobs_from_file (rb_id : usize) {
                       false,
                       false,
                       false) {
-      Ok(nblobs) => println!("Read {} blobs from file", nblobs), 
+      Ok(nblobs)   => info!("Read {} blobs from file", nblobs), 
       Err(err)     => panic!("Was not able to read blobs! Err {}", err)
   }
 }
 
 /*************************************/
 
+///
+/// Check an incoming message for readout board 
+/// handshake/ping signal
+///
+///
 fn identifiy_readoutboard(msg : &zmq::Message) -> bool
 {
   let size     = msg.len();
@@ -222,13 +226,13 @@ fn identifiy_readoutboard(msg : &zmq::Message) -> bool
   }
   // the signature for RB's is "RBXX"
   if size < 5 {
-      // FIXME - pattern recognition, 
-      // extract rb id
-      let rb_ping = msg.as_str().unwrap();
-      println!("Received RB ping signal {}", rb_ping);
-      return true;
+    // FIXME - pattern recognition, 
+    // extract rb id
+    let rb_ping = msg.as_str().unwrap();
+    debug!("Received RB ping signal {}", rb_ping);
+    return true;
   } else {
-      println!("Received RB {}", msg.as_str().unwrap());
+    println!("Received RB {}", msg.as_str().unwrap());
   }
   return false;
 }
@@ -238,21 +242,21 @@ fn identifiy_readoutboard(msg : &zmq::Message) -> bool
 pub fn readoutboard_communicator(socket      : &zmq::Socket,
                                  board_id    : usize)
 { 
-  println!("readoutboard_communicator initializing for board {}!", board_id);
+  trace!("initializing for board {}!", board_id);
   let mut msg = zmq::Message::new();
   let mut n_errors = 0usize;
   loop {
     match socket.recv(&mut msg, 0) {
       Ok(_) => {
-          println!("Working...");
+          trace!("Working...");
           // check for rb ping signal
           let rb_ping = identifiy_readoutboard(&msg);
           if rb_ping {
             //let result = socket.send_str("[SVR]: R'cvd RBping", 0);
             let result = socket.send("[SVR]: R'cvd RBping", 0);
             match result {
-              Ok(_) => println!("RB board ping received"),
-              Err(_) => println!("Can not send ping!")
+              Ok(_)    => debug!("RB {} handshake complete!", board_id),
+              Err(err) => warn!("Not able to send back reply when negotiating RB comms, handshake possibly failed..")
             }
             continue;
           }
@@ -260,12 +264,12 @@ pub fn readoutboard_communicator(socket      : &zmq::Socket,
           if size == 0 {continue;}
           let mut buffer = tvec![u8;msg.len()];
           buffer = msg.to_vec();
-          println!("received message with len : {}", size);
+          debug!("received message with len : {}", size);
           //let result = socket.send_str("[SVR]: Received data",0);
           let result = socket.send("[SVR]: Received data",0);
           match result {
-              Ok(_) => println!("Reply sent!"),
-              Err(_) => println!("Warn - remote socket problems")
+              Ok(_)    => debug!("Received data of len {} and acknowledged!", size),
+              Err(err) => warn!("Not able to send back reply to acknowleded received data!")
           }
           // do the work
           match analyze_blobs(&buffer,
@@ -273,14 +277,15 @@ pub fn readoutboard_communicator(socket      : &zmq::Socket,
                               false,
                               true,
                               false) {
-            Ok(nblobs) => println!("Read {} blobs from file", nblobs),
-            Err(err)     => panic!("Was not able to read blobs! {}", err )
+            Ok(nblobs)   => debug!("Read {} blobs from file", nblobs),
+            Err(err)     => warn!("Was not able to read blobs! {}", err )
           }
 
           //thread::sleep(Duration::from_millis(1500));
       }
-      Err(_) => {
+      Err(err) => {
           n_errors += 1;
+          warn!("Receiving from socket raised error {}", err);
           //println!("Terminating rb commmunications");
           //println!("Received garbage or nothing...");
           //break;

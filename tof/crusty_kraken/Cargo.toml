@@ -28,3 +28,7 @@ ndarray = "0.15"
 
 # parse command line arguments
 clap = { version = "4.0", features = ["derive"] }
+
+# logging
+log = "0.4"
+pretty_env_logger = "0.4"

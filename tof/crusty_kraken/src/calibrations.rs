@@ -40,6 +40,7 @@ impl Default for Calibrations {
 
 /***********************************/
 
+#[deprecated(since="0.2.0", note="please use `BlobEvent::calibrate` instead")]
 pub fn voltage_calibration(trace_in    : &[i16;NWORDS],
                            trace_out   : &mut [f64;NWORDS],
                            t_cell      : u16,
@@ -59,6 +60,7 @@ pub fn voltage_calibration(trace_in    : &[i16;NWORDS],
 
 /***********************************/
 
+#[deprecated(since="0.2.0", note="please use `BlobEvent::calibrate` instead")]
 pub fn timing_calibration(times    : &mut [f64;NWORDS],
                           t_cell   : u16,
                           cal      : &Calibrations)
@@ -73,7 +75,7 @@ pub fn timing_calibration(times    : &mut [f64;NWORDS],
 
 pub fn read_calibration_file(filename : &Path) -> [Calibrations; NCHN ]
 {
-  println!("Will try to open file {}", filename.display());
+  info!("Attempting to open file {}", filename.display());
   let mut cals = [Calibrations {..Default::default()}; NCHN];
   for n in 0..NCHN {
       cals[n] = Calibrations {..Default::default()};
@@ -159,6 +161,7 @@ pub fn read_calibration_file(filename : &Path) -> [Calibrations; NCHN ]
 
 /***********************************/
 
+#[deprecated(since="0.2.0", note="please use `BlobEvent::calibrate` instead")]
 pub fn remove_spikes (waveform : &mut [[f64;NWORDS];NCHN],
                       t_cell : u16,
                       spikes : &mut [i32;10]) {
