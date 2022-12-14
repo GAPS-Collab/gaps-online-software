@@ -1,3 +1,12 @@
 [submodule "resources/extern/corrosion"]
 	path = resources/extern/corrosion
 	url = https://github.com/corrosion-rs/corrosion.git
+[submodule "resources/extern/pybind11_protobuf"]
+	path = resources/extern/pybind11_protobuf
+	url = https://github.com/pybind/pybind11_protobuf.git
+[submodule "dataclasses/resources/extern/abseil-cpp"]
+	path = dataclasses/resources/extern/abseil-cpp
+	url = https://github.com/abseil/abseil-cpp.git
+[submodule "dataclasses/resources/extern/protobuf"]
+	path = dataclasses/resources/extern/protobuf
+	url = https://github.com/protocolbuffers/protobuf.git

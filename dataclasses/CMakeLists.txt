@@ -82,6 +82,70 @@ if (BUILD_PROTOBUF_DATACLASSES)
                     )
 #
 
+    if(BUILD_PYBINDINGS)
+      message(STATUS "Building pybindings for protobuf dataclasses...")
+      message(STATUS " ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/pybind11_protobuf")
+
+      set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
+      set(pybindings "pb_dataclasses")
+      # now it gets a bit complicated, since we want to have that
+      # nice pybind11 protobuf going
+      add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/resources/extern/abseil-cpp)
+
+      file(GLOB pybind11_protobuf_SRC ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/pybind11_protobuf/pybind11_protobuf/*.cc)
+      pybind11_add_module(${pybindings} MODULE
+                            ${pybind11_protobuf_SRC}
+                            ${CMAKE_CURRENT_SOURCE_DIR}/resources/extern/abseil-cpp
+                            pybindings/WaveGAPS.cpp
+                            pybindings/waveform.cxx)
+                         #110     target_include_directories(_pyWaveform
+                         #111       PUBLIC
+                         #112       "${CMAKE_CURRENT_SOURCE_DIR}/external/pybind11_protobuf"
+                         #113       "${CMAKE_CURRENT_SOURCE_DIR}/external/abseil-cpp"
+                         #114       "${CMAKE_CURRENT_SOURCE_DIR}/external/protobuf"
+                         #115       "${CMAKE_CURRENT_SOURCE_DIR}/TOFsoftware/analysis/include"
+                         #116       "${CMAKE_CURRENT_SOURCE_DIR}/dataclasses"
+                         #117     )
+      target_include_directories(${pybindings}
+                            PUBLIC
+                              "${CMAKE_CURRENT_SOURCE_DIR}/resources/extern/abseil-cpp" 
+                              "${CMAKE_CURRENT_SOURCE_DIR}/resources/extern/protobuf"
+                              "${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/pybind11_protobuf/"
+                              "${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/pybind11_protobuf/pybind11_protobuf/"
+                              "${CMAKE_CURRENT_SOURCE_DIR}/include"
+                            )
+                            #get_property(the_include_dirs TARGET ${pybindings} PROPERTY INCLUDE_DIRECTORIES)
+                            #foreach(dir ${the_include_dirs})
+                            #message(STATUS "dir='${dir}'")
+                            #endforeach()
+                            #list(REMOVE_ITEM ${the_include_dirs} "/usr/include/python2.7")
+                            #list(APPEND ${the_include_dirs} "/usr/include/python3.8")
+                            #string(REPLACE "/usr/include/python2.7" ";;"  new_include_dirs ${the_include_dirs})
+                            #list(APPEND ${new_include_dirs} "/usr/include/python3.8")
+                            ##set(pybind_include_dirs "/usr/include/python3.8"  "${CMAKE_CURRENT_SOURCE_DIR}/include") 
+                            #set(pybind_include_dirs ${new_include_dirs})
+                            #foreach(dir ${pybind_include_dirs})
+                            #message(STATUS "dir='${dir}'")
+                            #endforeach()
+                            #set_property(TARGET ${pybindings} PROPERTY INCLUDE_DIRECTORIES ${pybind_include_dirs})
+      target_link_libraries(${pybindings}
+                          PRIVATE
+                          ${Protobuf_LIBRARIES}
+                          absl::strings
+                          absl::hash
+                          absl::low_level_hash
+                          absl::core_headers
+                          absl::btree
+                          absl::flat_hash_map
+                          absl::flat_hash_set
+                          absl::node_hash_map
+                          absl::node_hash_set
+                          #${GAPSSERVER_LIBRARY_SHARED})
+                          )
+      add_dependencies(${pybindings} protobuf-dataclasses)
+
+    endif(BUILD_PYBINDINGS)
+
 
   else()
     message(WARN "Did NOT find google protobuf libraries, can not build dataclasses!")

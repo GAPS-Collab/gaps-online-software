@@ -1,10 +1,10 @@
-cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
+#cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
 
-project(GAPS_ONLINE_SOFTWARE VERSION 0.0.1 LANGUAGES C CXX)
-message(STATUS "Running cmake for ${CMAKE_PROJECT_NAME} softwere version ${GAPS_ONLINE_SOFTWARE__VERSION}")
-message(STATUS "Using build directory: ${PROJECT_BINARY_DIR}")
-set(CMAKE_WARN_DEPRECATED ON)
-set(CMAKE_CXX_STANDARD 17 CACHE STRING "C++ standard has to be >= 17")
+#project(GAPS_ONLINE_SOFTWARE VERSION 0.0.1 LANGUAGES C CXX)
+#message(STATUS "Running cmake for ${CMAKE_PROJECT_NAME} softwere version ${GAPS_ONLINE_SOFTWARE__VERSION}")
+#message(STATUS "Using build directory: ${PROJECT_BINARY_DIR}")
+#set(CMAKE_WARN_DEPRECATED ON)
+#set(CMAKE_CXX_STANDARD 17 CACHE STRING "C++ standard has to be >= 17")
 
 # rust part
 #set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/corrosion/cmake/)
@@ -28,12 +28,6 @@ option(USE_BOOST_LOG "use boost logging library" OFF)
 ## in case of Release build, we set the NDEBUG preprocessor directive
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG=1")
 
-## do a release build by default
-if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE "Release" CACHE STRING
-      "Choose the type of build, options are: Debug Release."
-      FORCE)
-endif(NOT CMAKE_BUILD_TYPE)
 
 
 ################
@@ -60,18 +54,6 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/include/TOFCommon.h.in ${
 configure_file(${RBEMULATOR_DIR}/bin/RBEmulator.cxx.in ${RBEMULATOR_DIR}/bin/RBEmulator.cxx @ONLY)
 
 
-# -- pybindings with pybind11
-option(BUILD_PYBINDINGS "build pybindings with pybind11" OFF)
-if (BUILD_PYBINDINGS)
-message(STATUS "Checking for pyoind11....")
-find_package(pybind11 )
-  if(NOT ${pybind11_FOUND})
-    message(WARNING "-- Can not find pybind11! Please install with sudo apt install pybind11-dev on a linux system!")
-    set(BUILD_PYBINDINGS OFF CACHE BOOL "build pybindings with pybind11" FORCE)
-  else()
-    message(STATUS "-- found pybind11, building pybindings.")
-  endif()
-endif(BUILD_PYBINDINGS)
 
 
 # ROOT part is still needed for the blobroutines!
