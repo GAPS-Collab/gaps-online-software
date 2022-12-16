@@ -79,6 +79,9 @@ pub struct BlobData
   pub begin_peak : [[usize;MAX_NUM_PEAKS];NCHN],
   pub end_peak   : [[usize;MAX_NUM_PEAKS];NCHN],
   pub spikes     : [[usize;MAX_NUM_PEAKS];NCHN],
+  
+  pub impedance  : f64,
+
 } 
 
 /***********************************/
@@ -437,6 +440,11 @@ impl BlobData {
   pub fn find_cfd_simple(&mut self, peak_num : usize, ch : usize) -> f64 {
     if peak_num > self.num_peaks[ch] {return self.voltages[ch][NWORDS];}
     // FIXME
+    // FIXME - this needs some serious error checking
+    if self.end_peak[ch][peak_num] < self.begin_peak[ch][peak_num] {
+        warn!("failed!!");
+        return 0.0;
+    }
     let mut idx = self.get_max_bin(self.begin_peak[ch][peak_num],
                                    self.end_peak[ch][peak_num]-self.begin_peak[ch][peak_num],
                                    ch);
@@ -511,11 +519,10 @@ impl BlobData {
       }
   }
 
-  fn find_peaks(&mut self,
-                start_time  : f64,
-                window_size : f64,
-                threshold   : f64,
-                ch          : usize) {
+  pub fn find_peaks(&mut self,
+                    start_time  : f64,
+                    window_size : f64,
+                    ch          : usize) {
     // FIXME - replace unwrap calls
     let start_bin  = self.time_2_bin(start_time, ch).unwrap();
     let window_bin = self.time_2_bin(start_time + window_size, ch).unwrap() - start_bin;
@@ -528,11 +535,11 @@ impl BlobData {
     let mut peak_bins        = 0usize;
     let mut n_peaks_detected = 0usize;
     let mut peak_ctr         = 0usize;
-    while (self.voltages[ch][pos] < threshold) && (pos < NWORDS) {
+    while (self.voltages[ch][pos] < self.threshold[ch]) && (pos < NWORDS - 1) {
       pos += 1;
     }
     for n in pos..start_bin + window_bin {
-      if self.voltages[ch][n] > threshold {
+      if self.voltages[ch][n] > self.threshold[ch] {
         peak_bins += 1;
         if peak_bins == min_peak_width {
           // we have a new peak
@@ -570,6 +577,35 @@ impl BlobData {
     self.begin_peak[ch][peak_ctr] = NWORDS; // Need this to measure last peak correctly
     //peaks_found = 1;
   }
+
+  pub fn integrate(&mut self, lower_bound : f64, size : f64, channel : usize) ->Result<f64, WaveformError>  {
+    if lower_bound < 0.0 { 
+        return Err(WaveformError::NegativeLowerBound);
+    }
+
+
+    let lo_bin   = self.time_2_bin(lower_bound, channel)?;
+    let mut size_bin = self.time_2_bin(lower_bound + size, channel)?;
+    size_bin = size_bin - lo_bin;
+    if lo_bin + size_bin > NWORDS {
+        warn!("Limiting integration range to waveform size!");
+        size_bin = NWORDS - lo_bin;
+    }
+    let mut sum = 0f64;
+    let upper_bin = lo_bin + size_bin;
+    for n in lo_bin..upper_bin {
+        sum += self.voltages[channel][n] * (self.nanoseconds[channel][n] - self.nanoseconds[channel][n-1]) ;
+    }
+    sum /= self.impedance;
+
+    // FIXME - this is not how it is intended
+    self.charge[channel][0] = sum;
+    Ok(sum)
+
+
+  }
+
+
 
   pub fn print (&self) {
     println!("======");
@@ -637,6 +673,7 @@ impl Default for BlobData {
             begin_peak : [[0;MAX_NUM_PEAKS];NCHN],
             end_peak   : [[0;MAX_NUM_PEAKS];NCHN],
             spikes     : [[0;MAX_NUM_PEAKS];NCHN],
+            impedance  : 50.0,
         }
     }
 }

@@ -59,14 +59,12 @@ if __name__ == '__main__':
     thisevent = 0
     for k in event_ids_over_thr:
         event_hdfdata = hdfdata[hdfdata['event_ctr'] == k[0]]
-        if not event_hdfdata:
+        if not event_hdfdata['event_ctr'].any():
             continue
         for ch in k[1]:
-            print (ch)
             try:
                 tdcs.append(event_hdfdata['tdcs'][ch])
             except:
-                print ('fail')
                 continue
 #hist = d.factory.hist1d(alltimes, 100)
     #hist.line()

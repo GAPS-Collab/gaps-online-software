@@ -24,17 +24,17 @@ impl fmt::Display for BlobError {
     }
 }
 
-impl Error for BlobError {
-    fn description(&self) -> &str {
-        &self.details
-    }
-}
+//impl Error for BlobError {
+//    fn description(&self) -> &str {
+//        &self.details
+//    }
+//}
 
 
 #[cfg(feature = "diagnostics")]
 impl From<hdf5::Error> for BlobError {
     fn from(err: hdf5::Error) -> Self {
-        BlobError::new(err.description())
+        BlobError::new(&err.to_string())
     }
 }
 

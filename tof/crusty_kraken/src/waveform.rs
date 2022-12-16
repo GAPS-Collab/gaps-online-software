@@ -4,6 +4,7 @@ use crate::constants::{NWORDS,
                        MAX_NUM_PEAKS,
                        WF_VOLTAGE_THRESHOLD};
 
+use crate::readoutboard_blob::BlobData;
 
 #[cfg(feature = "diagnostics")]
 #[cfg(feature = "blosc")]
@@ -19,6 +20,7 @@ use hdf5;
 pub enum WaveformError {
     TimeIndexOutOfBounds,
     TimesTooSmall,
+    NegativeLowerBound
 }
 
 /*****************************************/
@@ -29,7 +31,12 @@ pub enum WaveformError {
 //pub struct CalibratedWaveform<'a> {
 //  wave  : &'a[f64;NWORDS],
 //  times : &'a[f64;NWORDS],
+#[derive(Clone, PartialEq, Debug)] // register with HDF5
+#[cfg_attr(feature = "diagnostics", derive(hdf5::H5Type))]
+#[cfg_attr(feature = "diagnostics", repr(C))]
 pub struct CalibratedWaveform {
+  pub event_ctr : u32,
+  pub channel   : usize,
   wave  : [f64;NWORDS],
   times : [f64;NWORDS],
   /// peak properties
@@ -63,25 +70,28 @@ pub struct CalibratedWaveform {
 impl CalibratedWaveform {
 
   //pub fn new<'a>(wave: &'a[f64;NWORDS], times: &'a[f64;NWORDS]) -> CalibratedWaveform<'a> {
-  pub fn new(wave : [f64;NWORDS], times : [f64;NWORDS]) ->CalibratedWaveform {
-    CalibratedWaveform { wave           : wave,
-                         times          : times,
-                         peaks          : [0;  MAX_NUM_PEAKS],
-                         tdcs           : [0.0;MAX_NUM_PEAKS],
-                         charge         : [0.0;MAX_NUM_PEAKS],
-                         width          : [0.0;MAX_NUM_PEAKS],
-                         height         : [0.0;MAX_NUM_PEAKS],
-                         num_peaks      : 0,
-                         stop_cell      : 0,
-                         begin_peak     : [0;MAX_NUM_PEAKS],
-                         end_peak       : [0;MAX_NUM_PEAKS],
-                         spikes         : [0;MAX_NUM_PEAKS],
-                         threshold      : 0.0,
-                         cfds_fraction  : 0.0,
-                         ped_begin_bin  : 0,
-                         ped_bin_range  : 0,
-                         pedestal       : 0.0,
-                         pedestal_sigma : 0.0
+  //pub fn new(times : [f64;NWORDS], wave : [f64;NWORDS]) ->CalibratedWaveform {
+  pub fn new(blob_data : &BlobData, channel : usize) ->CalibratedWaveform {
+    CalibratedWaveform { event_ctr      : blob_data.event_ctr,
+                         channel        : channel,
+                         wave           : blob_data.voltages[channel],
+                         times          : blob_data.nanoseconds[channel],
+                         peaks          : blob_data.peaks[channel],
+                         tdcs           : blob_data.tdcs[channel],
+                         charge         : blob_data.charge[channel],
+                         width          : blob_data.width[channel],
+                         height         : blob_data.height[channel],
+                         num_peaks      : blob_data.num_peaks[channel],
+                         stop_cell      : blob_data.stop_cell,
+                         begin_peak     : blob_data.begin_peak[channel],
+                         end_peak       : blob_data.end_peak[channel],
+                         spikes         : blob_data.spikes[channel],
+                         threshold      : blob_data.threshold[channel],
+                         cfds_fraction  : blob_data.cfds_fraction[channel],
+                         ped_begin_bin  : blob_data.ped_begin_bin[channel],
+                         ped_bin_range  : blob_data.ped_bin_range[channel],
+                         pedestal       : blob_data.pedestal[channel],
+                         pedestal_sigma : blob_data.pedestal_sigma[channel]
     }
   }
 
@@ -314,6 +324,9 @@ impl CalibratedWaveform {
 
 } // end impl
 
+
+
+/*
 ///
 /// Waveform type which owns the data. This is 
 /// solely used for diagnostics (slow) and can
@@ -384,4 +397,4 @@ impl CalibratedWaveformForDiagnostics {
 
 }
 
-
+*/

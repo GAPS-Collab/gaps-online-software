@@ -1,7 +1,7 @@
 use std::{fs, fs::File, path::Path};
 use std::io::Read;
 #[cfg(feature = "diagnostics")]
-use waveform::CalibratedWaveformForDiagnostics;
+//use waveform::CalibratedWaveformForDiagnostics;
 #[cfg(feature = "diagnostics")]
 use hdf5;
 #[cfg(feature = "diagnostics")]
@@ -80,7 +80,7 @@ fn analyze_blobs(buffer               : &Vec<u8>,
   let mut all_channel_times     : [[f64;NWORDS];NCHN] = [[0.0;NWORDS];NCHN];
 
   #[cfg(feature = "diagnostics")]
-  let mut diagnostics_wf : Vec<CalibratedWaveformForDiagnostics> = Vec::new();
+  let mut diagnostics_wf : Vec<CalibratedWaveform> = Vec::new();
 
   loop {
     // if the following is true, we scanned throught the whole stream  
@@ -136,12 +136,14 @@ fn analyze_blobs(buffer               : &Vec<u8>,
                 // analysis part
                 //let mut waveform = CalibratedWaveform::new(all_channel_waveforms[n],
                 //                                           all_channel_times[n]);
-                blob_data.set_threshold(5.0, n);
-                blob_data.set_cfds_fraction(0.10, n);
+                blob_data.set_threshold(10.0, n);
+                blob_data.set_cfds_fraction(0.20, n);
                 blob_data.set_ped_begin(10.0, n);// 10-100                               
                 blob_data.set_ped_range(50.0, n);
                 blob_data.calc_ped_range(n);
                 blob_data.subtract_pedestal(n);
+                blob_data.integrate(270.0, 70.0, n);
+                blob_data.find_peaks(270.0,70.0, n);
                 let cfd_time = blob_data.find_cfd_simple(0, n);
                 //waveform.print();
                 // packing part
@@ -154,10 +156,10 @@ fn analyze_blobs(buffer               : &Vec<u8>,
                 #[cfg(feature = "diagnostics")]
                 {  
                   //events.push(blob_data);
-                  //let diag_wf = CalibratedWaveformForDiagnostics::new(&waveform);
-                  //diagnostics_wf.push (diag_wf);
+                  let diag_wf = CalibratedWaveform::new(&blob_data, n);
+                  diagnostics_wf.push (diag_wf);
                 }
-              }
+              } // end loop over nchannel
             }
             events.push(blob_data);
         } else {
@@ -181,10 +183,10 @@ fn analyze_blobs(buffer               : &Vec<u8>,
     let hdf_file    = hdf5::File::create(hdf_diagnostics_file).unwrap(); // open for writing
     hdf_file.create_group("waveforms");
     let hdf_group = hdf_file.group("waveforms").unwrap();
-    //let hdf_dataset = hdf_group.new_dataset::<CalibratedWaveformForDiagnostics>().shape(diagnostics_wf.len()).create("wf").unwrap();
-    let hdf_dataset = hdf_group.new_dataset::<BlobData>().shape(events.len()).create("wf").unwrap();
+    let hdf_dataset = hdf_group.new_dataset::<CalibratedWaveform>().shape(diagnostics_wf.len()).create("wf").unwrap();
+    //let hdf_dataset = hdf_group.new_dataset::<BlobData>().shape(events.len()).create("wf").unwrap();
     //hdf_dataset.write(&arr1(&diagnostics_wf))?;
-    hdf_dataset.write(&arr1(&events))?;
+    hdf_dataset.write(&arr1(&diagnostics_wf))?;
     hdf_file.close()?;
   }
   info!("==> Deserialized {} blobs! {} blobs were corrupt", nblobs, ncorrupt_blobs);
