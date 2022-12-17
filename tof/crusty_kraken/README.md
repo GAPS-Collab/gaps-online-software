@@ -10,3 +10,14 @@ its tasks are the following:
 * Packaging this information into a binary format
 * Sending the packaged information elsewhere
 
+
+### How to run
+
+`cargo run --features="diagnostics"` switches on diagnostic feature which writes hdf files with calibrated waveform data
+
+### tests
+
+Test can be run with 
+`cargo test --nocapture`
+
+

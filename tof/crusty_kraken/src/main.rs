@@ -7,6 +7,13 @@ mod constants;
 mod waveform;
 mod errors;
 
+
+// this is a list of tests
+// FIXME - this should follow
+// the "official" structure
+// for now, let's just keep it here
+mod test_blobdata;
+
 extern crate pretty_env_logger;
 #[macro_use] extern crate log;
 

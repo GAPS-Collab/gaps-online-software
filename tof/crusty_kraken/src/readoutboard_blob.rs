@@ -191,10 +191,107 @@ impl BlobData {
   }
 
 
+  /// serialize, so the blob can be written to 
+  /// disk - this is not strictly needed and 
+  /// might be part of a feature in the future
+  pub fn to_bytestream(&self) ->Vec<u8> {
+    let mut bytestream : Vec<u8> = Vec::<u8>::new();
+    
+    // containers for the individual byte words
+    let mut two_bytes   : [u8;2];
+    let mut four_bytes  : [u8;4];
+    let mut four_bytes_shuffle  : [u8;4]; 
+    let mut eight_bytes : [u8;8];
+    let mut eight_bytes_shuffle : [u8;8];
+    let mut six_bytes_shuffle   : [u8;6];
+    // begin serialization
+    two_bytes = self.head.to_le_bytes();
+    bytestream.extend_from_slice(&two_bytes);
+    
+    two_bytes = self.status.to_le_bytes();
+    bytestream.extend_from_slice(&two_bytes);
+    
+    two_bytes = self.len.to_le_bytes();
+    bytestream.extend_from_slice(&two_bytes);
+    
+    two_bytes = self.roi.to_le_bytes();
+    bytestream.extend_from_slice(&two_bytes);
+
+    eight_bytes = self.dna.to_be_bytes();
+    eight_bytes_shuffle  = [eight_bytes[1],
+                            eight_bytes[0],
+                            eight_bytes[3],
+                            eight_bytes[2],
+                            eight_bytes[5],
+                            eight_bytes[4],
+                            eight_bytes[7],
+                            eight_bytes[6]];
+    bytestream.extend_from_slice(&eight_bytes_shuffle);
+
+    two_bytes = self.fw_hash.to_le_bytes();
+    bytestream.extend_from_slice(&two_bytes);
+    
+    two_bytes = self.id.to_le_bytes();   
+    bytestream.extend_from_slice(&two_bytes);
+    
+    two_bytes = self.ch_mask.to_le_bytes();
+    bytestream.extend_from_slice(&two_bytes);
+
+    four_bytes = self.event_ctr.to_be_bytes();
+    four_bytes_shuffle = [four_bytes[1],
+                          four_bytes[0],
+                          four_bytes[3],
+                          four_bytes[2]];
+    bytestream.extend_from_slice(&four_bytes_shuffle); 
+ 
+    two_bytes = self.dtap0.to_le_bytes();
+    bytestream.extend_from_slice(&two_bytes);
+
+    two_bytes = self.dtap1.to_le_bytes();
+    bytestream.extend_from_slice(&two_bytes);
+    
+    eight_bytes          = self.timestamp.to_be_bytes();
+    six_bytes_shuffle    = [eight_bytes[1 + 2],
+                            eight_bytes[0 + 2],
+                            eight_bytes[3 + 2],
+                            eight_bytes[2 + 2],
+                            eight_bytes[5 + 2],
+                            eight_bytes[4 + 2]];
+    bytestream.extend_from_slice(&six_bytes_shuffle);
+    
+    for n in 0..NCHN {
+      two_bytes = self.ch_head[n].to_le_bytes();
+      bytestream.extend_from_slice(&two_bytes);
+      for k in 0..NWORDS {
+        two_bytes = self.ch_adc[n][k].to_le_bytes();
+        bytestream.extend_from_slice(&two_bytes);
+      }
+      four_bytes  = self.ch_trail[n].to_be_bytes();
+      four_bytes_shuffle = [four_bytes[1],
+                            four_bytes[0],
+                            four_bytes[3],
+                            four_bytes[2]];
+      bytestream.extend_from_slice(&four_bytes_shuffle);
+    }
+    two_bytes = self.stop_cell.to_le_bytes();
+    bytestream.extend_from_slice(&two_bytes);
+
+    four_bytes = self.crc32.to_be_bytes();
+    four_bytes_shuffle  = [four_bytes[1],
+                           four_bytes[0],
+                           four_bytes[3],
+                           four_bytes[2]];
+    
+    bytestream.extend_from_slice(&four_bytes_shuffle);
+    
+    two_bytes = self.tail.to_le_bytes();
+    bytestream.extend_from_slice(&two_bytes);
+
+    bytestream
+  }
+
   /// Apply the calibration for time
   /// and voltage.
-
-
   pub fn calibrate (&mut self, cal : &[Calibrations;NCHN]) {
     self.voltage_calibration(&cal);
     self.timing_calibration(&cal);
