@@ -20,7 +20,8 @@ use hdf5;
 pub enum WaveformError {
     TimeIndexOutOfBounds,
     TimesTooSmall,
-    NegativeLowerBound
+    NegativeLowerBound,
+    OutOfRangeUpperBound
 }
 
 /*****************************************/

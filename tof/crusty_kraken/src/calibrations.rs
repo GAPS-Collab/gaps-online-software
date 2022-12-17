@@ -156,6 +156,22 @@ pub fn read_calibration_file(filename : &Path) -> [Calibrations; NCHN ]
         }
       }
   }
+
+  // debug
+  /*
+  println!("offsets..");
+  for k in 0..10 {
+      println!("{}",cals[0].v_offsets[k]);
+  }
+  println!("dips...");
+  for k in 0..10 {
+      println!("{}",cals[0].v_dips[k]);
+  }
+  println!("v_incs...");
+  for k in 0..10 {
+      println!("{}",cals[0].v_inc[k]);
+  }
+  */
   return cals;
 }
 

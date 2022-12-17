@@ -205,9 +205,9 @@ impl BlobData {
     for n in 0..NCHN {
       for m in 0..NWORDS {
         value  = self.ch_adc[n][m] as f64;
-        value -= cal[n].v_offsets[(n + (self.stop_cell as usize)) %NWORDS];
-        value -= cal[n].v_dips[n];
-        value *= cal[n].v_inc[(n + (self.stop_cell as usize)) %NWORDS];
+        value -= cal[n].v_offsets[(m + (self.stop_cell as usize)) %NWORDS];
+        value -= cal[n].v_dips[m];
+        value *= cal[n].v_inc[(m + (self.stop_cell as usize)) %NWORDS];
         self.voltages[n][m] = value;
         }
       }
@@ -420,47 +420,70 @@ impl BlobData {
   // 
   // Return the bin with the maximum DC value
   //
-  fn get_max_bin(&self, lower_bound : usize, upper_bound : usize, ch : usize ) -> usize {
-    let rel_upper_bound = NWORDS - upper_bound;
-    //println!("{} {} {}", lower_bound, upper_bound, rel_upper_bound);
-    assert!((rel_upper_bound - lower_bound) <= NWORDS);
+  fn get_max_bin(&self,
+                 lower_bound : usize,
+                 window : usize,
+                 ch : usize ) -> Result<usize, WaveformError> {
+    if lower_bound < 0 {
+      return Err(WaveformError::NegativeLowerBound);
+    }
+    if lower_bound + window > NWORDS {
+      return Err(WaveformError::OutOfRangeUpperBound);
+    }
     let mut maxval = self.voltages[ch][lower_bound];
     let mut maxbin = lower_bound;
-    for n in lower_bound+1..lower_bound+rel_upper_bound {
-      // I think the - sign is bc of pmt waveforms...
-      //if maxval < self.wave[n] {
-      if maxval > self.voltages[ch][n] {
+    for n in lower_bound..lower_bound + window {
+      if self.voltages[ch][n] > maxval {
         maxval  = self.voltages[ch][n];
         maxbin  = n;
       }
     } // end for
-    return maxbin;
+    trace!("Got maxbin {} with a value of {}", maxbin, maxval);
+    Ok(maxbin)
   } // end fn
 
   pub fn find_cfd_simple(&mut self, peak_num : usize, ch : usize) -> f64 {
-    if peak_num > self.num_peaks[ch] {return self.voltages[ch][NWORDS];}
+    if self.num_peaks[ch] == 0 {
+      trace!("No peaks for ch {}!", ch);
+      return 0.0;
+    }
+    if peak_num > self.num_peaks[ch] {
+      warn!("Requested peak {} is larger than detected peaks (={})", peak_num, self.num_peaks[ch]); 
+      return self.nanoseconds[ch][NWORDS];
+    }
     // FIXME
     // FIXME - this needs some serious error checking
     if self.end_peak[ch][peak_num] < self.begin_peak[ch][peak_num] {
-        warn!("failed!!");
+        warn!("cfd simple method failed!! Peak begin {}, peak end {}", self.begin_peak[ch][peak_num], self.end_peak[ch][peak_num]);
         return 0.0;
     }
-    let mut idx = self.get_max_bin(self.begin_peak[ch][peak_num],
-                                   self.end_peak[ch][peak_num]-self.begin_peak[ch][peak_num],
-                                   ch);
+    let mut idx = 0usize;
+    match self.get_max_bin(self.begin_peak[ch][peak_num],
+                           self.end_peak[ch][peak_num]-self.begin_peak[ch][peak_num],
+                           ch) {
+      Err(err) => {warn!("Can not find cfd due to err {:?}",err);
+                   return 0.0;
+      }
+      Ok(maxbin)  => {trace!("Got bin {} for max val", maxbin);
+                      idx = maxbin;
+      }
 
+    }
+    trace!("Got max bin {} for peak {} .. {}", idx, self.begin_peak[ch][peak_num], self.end_peak[ch][peak_num]);
+    trace!("Voltage at max {}", self.voltages[ch][idx]);
     if idx < 1 {idx = 1;}
     let mut sum : f64 = 0.0;
     for n in idx-1..idx+1 {sum += self.voltages[ch][n];}
     let cfds_frac  : f64 = 0.2;
     let tmp_thresh : f64 = f64::abs(cfds_frac * (sum / 3.0));
-
+    trace!("Calculated tmp threshold of {}", tmp_thresh);
     // Now scan through the waveform around the peak to find the bin
     // crossing the calculated threshold. Bin idx is the peak so it is
     // definitely above threshold. So let's walk backwards through the
     // trace until we find a bin value less than the threshold.
     let mut lo_bin : usize = NWORDS;
     let mut n = idx;
+    assert!(idx >= self.begin_peak[ch][peak_num]);
     if self.begin_peak[ch][peak_num] >= 10 {
       while n > self.begin_peak[ch][peak_num] - 10 {
       //for n in (idx..self.begin_peak[peak_num] - 10).rev() {
@@ -471,12 +494,12 @@ impl BlobData {
         n -= 1;
       }  
     }
-
+    warn!("Lo bin {} , begin peak {}", lo_bin, self.begin_peak[ch][peak_num]);
     let mut cfd_time : f64 = 0.0;
-    if lo_bin < NWORDS {
-      cfd_time = self.find_interpolated_time(tmp_thresh, lo_bin, 1, ch);  
+    if lo_bin < NWORDS -1 {
+      cfd_time = self.find_interpolated_time(tmp_thresh, lo_bin, 1, ch).unwrap();  
     }
-    else {cfd_time = self.voltages[ch][NWORDS - 1];} 
+    else {cfd_time = self.nanoseconds[ch][NWORDS - 1];} 
 
     // save it in member variable
     self.tdcs[ch][peak_num] = cfd_time;
@@ -489,8 +512,12 @@ impl BlobData {
                                  mut threshold : f64,
                                  mut idx       : usize,
                                  size          : usize, 
-                                 ch            : usize) -> f64 
+                                 ch            : usize) -> Result<f64, WaveformError> 
   {
+    if idx + 1 > NWORDS {
+      return Err(WaveformError::OutOfRangeUpperBound);
+    }
+    
     threshold = threshold.abs();
     let mut lval  = (self.voltages[ch][idx]).abs();
     let mut hval : f64 = 0.0; 
@@ -507,13 +534,13 @@ impl BlobData {
       }
     }
     if ( lval > threshold) && (size != 1) {
-      return self.nanoseconds[ch][idx];
+      return Ok(self.nanoseconds[ch][idx]);
     } else if lval == hval {
-      return self.nanoseconds[ch][idx];
+      return Ok(self.nanoseconds[ch][idx]);
     } else {
-      return self.voltages[ch][idx] 
-          + (threshold-lval)/(hval-lval) * (self.voltages[ch][idx+1]
-          - self.voltages[ch][idx]);
+      return Ok(self.nanoseconds[ch][idx] 
+                + (threshold-lval)/(hval-lval) * (self.nanoseconds[ch][idx+1]
+                - self.nanoseconds[ch][idx]));
       //float time = WaveTime[idx] +  
       //  (thresh-lval)/(hval-lval) * (WaveTime[idx+1]-WaveTime[idx]) ;
       }
@@ -526,25 +553,29 @@ impl BlobData {
     // FIXME - replace unwrap calls
     let start_bin  = self.time_2_bin(start_time, ch).unwrap();
     let window_bin = self.time_2_bin(start_time + window_size, ch).unwrap() - start_bin;
-
     // minimum number of bins a peak must have
     // over threshold so that we consider it 
     // a peak
     let min_peak_width       = 3usize; 
     let mut pos              = 0usize;
     let mut peak_bins        = 0usize;
-    let mut n_peaks_detected = 0usize;
     let mut peak_ctr         = 0usize;
-    while (self.voltages[ch][pos] < self.threshold[ch]) && (pos < NWORDS - 1) {
+    while (self.voltages[ch][pos] < self.threshold[ch])  {
       pos += 1;
+      if pos == NWORDS {
+        pos = NWORDS -1;
+        break;
+      }
     }
-    for n in pos..start_bin + window_bin {
+    //narn!("{} {}", pos, self.voltages[ch][pos]);
+    for n in pos..(start_bin + window_bin) {
       if self.voltages[ch][n] > self.threshold[ch] {
+        //warn!("{} {}", peak_bins, window_bin);
         peak_bins += 1;
         if peak_bins == min_peak_width {
           // we have a new peak
-          if n_peaks_detected == MAX_NUM_PEAKS {
-            println!("Max number of peaks reached in this waveform");
+          if peak_ctr == MAX_NUM_PEAKS {
+            info!("Max number of peaks reached in this waveform");
             break;
           }
           self.begin_peak[ch][peak_ctr] = n - (min_peak_width - 1); 
@@ -552,18 +583,22 @@ impl BlobData {
           self.end_peak  [ch][peak_ctr] = 0;
           peak_ctr += 1;
         } else if peak_bins > min_peak_width {
+          let mut grad = 1;
           for k in 0..3 {
             if self.voltages[ch][n-k] > self.voltages[ch][n-(k+1)]
-              {continue;}
+              {grad = 0;}
           }
+          if grad == 0 {continue;}
           if self.end_peak[ch][peak_ctr-1] == 0 {
             self.end_peak[ch][peak_ctr-1] = n; // Set last bin included in peak
           }
-        } else {
-          peak_bins = 0;
         }
-      }
-    }
+      } else {
+          // this is for the case when the 
+          // voltage is NOT over threshold
+          peak_bins = 0;
+      } 
+    } // end for loop
 
     
     //for pos in start_bin..NWORDS {
@@ -574,7 +609,18 @@ impl BlobData {
 
     //((self.wave[pos] < WF_VOLTAGE_THRESHOLD) && (pos < wf_size))
     self.num_peaks[ch] = peak_ctr;
-    self.begin_peak[ch][peak_ctr] = NWORDS; // Need this to measure last peak correctly
+    // some debugging information
+    debug!("{} peaks found for ch {} -- ", peak_ctr, ch);
+    for n in 0..peak_ctr {
+      trace!("Found peak {} : {}.. {} ",n,  self.begin_peak[ch][n], self.end_peak[ch][n]);
+    }
+    if peak_ctr > 0 {
+      if self.end_peak[ch][peak_ctr-1] < self.begin_peak[ch][peak_ctr] {
+
+          self.end_peak[ch][peak_ctr] = NWORDS; // Need this to measure last peak correctly
+          trace!("Reset the last peak (={}) to  {}..{}", peak_ctr, self.begin_peak[ch][peak_ctr], self.end_peak[ch][peak_ctr] );
+      }
+    }
     //peaks_found = 1;
   }
 
@@ -605,6 +651,47 @@ impl BlobData {
 
   }
 
+  pub fn reset(&mut self) {
+    self.head            =  0; // Head of event marker
+    self.status          =  0;
+    self.len             =  0;
+    self.roi             =  0;
+    self.dna             =  0; 
+    self.fw_hash         =  0;
+    self.id              =  0;   
+    self.ch_mask         =  0;
+    self.event_ctr       =  0;
+    self.dtap0           =  0;
+    self.dtap1           =  0;
+    self.timestamp       =  0;
+    self.ch_head         =  [0; NCHN];
+    self.ch_adc          =  [[0; NWORDS]; NCHN];
+    self.ch_trail        =  [0; NCHN];
+    self.stop_cell       =  0;
+    self.crc32           =  0;
+    self.tail            =  0; // End of event marker
+
+    self.voltages        = [[0.0; NWORDS]; NCHN];
+    self.nanoseconds     = [[0.0; NWORDS]; NCHN];
+    
+    self.threshold       = [0.0;NCHN];
+    self.cfds_fraction   = [0.0;NCHN];
+    self.ped_begin_bin   = [0;NCHN];
+    self.ped_bin_range   = [0;NCHN];    
+    self.pedestal        = [0.0;NCHN];
+    self.pedestal_sigma  = [0.0;NCHN];
+    
+    self.peaks           = [[0;MAX_NUM_PEAKS];NCHN];
+    self.tdcs            = [[0.0;MAX_NUM_PEAKS];NCHN];
+    self.charge          = [[0.0;MAX_NUM_PEAKS];NCHN];
+    self.width           = [[0.0;MAX_NUM_PEAKS];NCHN]; 
+    self.height          = [[0.0;MAX_NUM_PEAKS];NCHN];    
+    self.num_peaks       = [0;NCHN];
+    self.begin_peak      = [[0;MAX_NUM_PEAKS];NCHN];
+    self.end_peak        = [[0;MAX_NUM_PEAKS];NCHN];
+    self.spikes          = [[0;MAX_NUM_PEAKS];NCHN];
+    self.impedance       = 50.0;
+  }
 
 
   pub fn print (&self) {

@@ -62,6 +62,7 @@ fn analyze_blobs(buffer               : &Vec<u8>,
     info!("Reading calibrations from file {}", cal_file_name);
     let cal_file_path = Path::new(&cal_file_name);
     calibrations = read_calibration_file(cal_file_path); 
+    //if rb_id == 2 {panic!("HERE");} 
   }
 
   // allocate some memory we are using in 
@@ -101,6 +102,7 @@ fn analyze_blobs(buffer               : &Vec<u8>,
         header_found_start = false;
         // we have found our 0xaaaa marker!
         // include it in the stream to deserialize
+        blob_data.reset();
         blob_data.from_bytestream(&buffer, pos-2);
         nblobs += 1;
         

@@ -63,10 +63,12 @@ fn main() {
    let sattelite_antenna = String::from_utf8(sattelite_antenna).unwrap();
 
    // welcome banner!
-   println!("-----------------------------------------------------------------------");
-   println!("Welcome to crusty_kraken {}, a server software {} for the time-of-flight instrument for the GAPS experiment {}",kraken, sattelite_antenna, sparkle_heart);
+   println!("-----------------------------------------------");
+   println!("Welcome to crusty_kraken {}", kraken);
+   println!(" .. TOF C&C and data acquistion suite");
+   println!(" .. for the GAPS experiment {}", sparkle_heart);
+   println!("-----------------------------------------------");
    println!("");
-   println!("-----------------------------------------------------------------------");
    match args.json_config {
      None => warn!("No config file provided!"),
      Some(ref json_file_path) => {
