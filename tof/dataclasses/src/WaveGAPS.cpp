@@ -462,7 +462,7 @@ void Waveform::FindPeaks(float start, float size) {
           Message("Maximum number of peaks exceeded");
           break;
         }
-	begin_pk[pk_ctr] = i - (min_wid - 1);
+	    begin_pk[pk_ctr] = i - (min_wid - 1);
         spikes[pk_ctr] = 0;
         end_pk[pk_ctr] = 0;
         pk_ctr++;
