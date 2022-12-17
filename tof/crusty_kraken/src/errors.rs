@@ -4,6 +4,18 @@ use std::fmt;
 #[cfg(feature = "diagnostics")]
 use hdf5;
 
+/*************************************/
+
+#[derive(Debug)]
+pub enum WaveformError {
+    TimeIndexOutOfBounds,
+    TimesTooSmall,
+    NegativeLowerBound,
+    OutOfRangeUpperBound
+}
+
+/*************************************/
+
 #[derive(Debug)]
 pub struct BlobError {
     //DeserializationError,
@@ -23,12 +35,6 @@ impl fmt::Display for BlobError {
         write!(f,"{}",self.details)
     }
 }
-
-//impl Error for BlobError {
-//    fn description(&self) -> &str {
-//        &self.details
-//    }
-//}
 
 
 #[cfg(feature = "diagnostics")]

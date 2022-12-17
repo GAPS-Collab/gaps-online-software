@@ -4,6 +4,7 @@ use crate::constants::{NWORDS,
                        MAX_NUM_PEAKS,
                        WF_VOLTAGE_THRESHOLD};
 
+use crate::errors::WaveformError;
 use crate::readoutboard_blob::BlobData;
 
 #[cfg(feature = "diagnostics")]
@@ -13,16 +14,6 @@ use hdf5::filters::blosc_set_nthreads;
 #[cfg(feature = "diagnostics")]
 use hdf5;
 
-
-/*****************************************/
-
-#[derive(Debug)]
-pub enum WaveformError {
-    TimeIndexOutOfBounds,
-    TimesTooSmall,
-    NegativeLowerBound,
-    OutOfRangeUpperBound
-}
 
 /*****************************************/
 

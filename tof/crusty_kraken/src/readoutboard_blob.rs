@@ -10,7 +10,7 @@
  ***********************************/
 
 use crate::constants::{NWORDS, NCHN, MAX_NUM_PEAKS};
-use crate::waveform::WaveformError;
+use crate::errors::WaveformError;
 
 use crate::calibrations::Calibrations;
 
@@ -546,6 +546,14 @@ impl BlobData {
       }
   }
 
+  ///
+  /// Find peaks in a given time window (in ns) by 
+  /// comparing the waveform voltages with the 
+  /// given threshold. 
+  /// Minimum peak width is currently hardcoded to 
+  /// be 3 bins in time.
+  ///
+  ///
   pub fn find_peaks(&mut self,
                     start_time  : f64,
                     window_size : f64,
