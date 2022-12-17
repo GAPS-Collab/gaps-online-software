@@ -591,7 +591,7 @@ impl BlobData {
         n -= 1;
       }  
     }
-    warn!("Lo bin {} , begin peak {}", lo_bin, self.begin_peak[ch][peak_num]);
+    trace!("Lo bin {} , begin peak {}", lo_bin, self.begin_peak[ch][peak_num]);
     let mut cfd_time : f64 = 0.0;
     if lo_bin < NWORDS -1 {
       cfd_time = self.find_interpolated_time(tmp_thresh, lo_bin, 1, ch).unwrap();  

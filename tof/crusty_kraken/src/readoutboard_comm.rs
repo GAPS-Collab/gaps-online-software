@@ -39,6 +39,16 @@ fn get_file_as_byte_vec(filename: &String) -> Vec<u8> {
 
 /*************************************/
 
+
+/// write a bytestream to a file on disk
+fn write_stream_to_file(filename: &Path, bytestream: &Vec<u8>) -> Result<usize, std::io::Error>{
+    fs::write(filename, bytestream)?;
+    debug!("{} bytes written to {}", bytestream.len(), filename.display());
+    Ok(bytestream.len())
+}
+
+/*************************************/
+
 fn analyze_blobs(buffer               : &Vec<u8>,
                  rb_id                : usize,
                  print_events         : bool,
@@ -192,7 +202,6 @@ fn analyze_blobs(buffer               : &Vec<u8>,
     hdf_file.close()?;
   }
   info!("==> Deserialized {} blobs! {} blobs were corrupt", nblobs, ncorrupt_blobs);
-  panic!("You shall not pass!");
   Ok(nblobs)
 }
 
@@ -243,12 +252,22 @@ fn identifiy_readoutboard(msg : &zmq::Message) -> bool
 
 /*************************************/
 
+
+///
+/// Receive binary blobs from readout boards,
+/// and perform specified tasks
+///
+///
 pub fn readoutboard_communicator(socket      : &zmq::Socket,
-                                 board_id    : usize)
-{ 
+                                 board_id    : usize,
+                                 write_blob  : bool)
+{
   trace!("initializing for board {}!", board_id);
   let mut msg = zmq::Message::new();
   let mut n_errors = 0usize;
+  let mut lost_blob_files = 0usize;
+  // how many chunks ("buffers") we dealt with
+  let mut n_chunk  = 0usize;
   loop {
     match socket.recv(&mut msg, 0) {
       Ok(_) => {
@@ -260,7 +279,7 @@ pub fn readoutboard_communicator(socket      : &zmq::Socket,
             let result = socket.send("[SVR]: R'cvd RBping", 0);
             match result {
               Ok(_)    => debug!("RB {} handshake complete!", board_id),
-              Err(err) => warn!("Not able to send back reply when negotiating RB comms, handshake possibly failed..")
+              Err(err) => error!("Not able to send back reply when negotiating RB comms, handshake possibly failed..")
             }
             continue;
           }
@@ -273,7 +292,7 @@ pub fn readoutboard_communicator(socket      : &zmq::Socket,
           let result = socket.send("[SVR]: Received data",0);
           match result {
               Ok(_)    => debug!("Received data of len {} and acknowledged!", size),
-              Err(err) => warn!("Not able to send back reply to acknowleded received data!")
+              Err(err) => error!("Not able to send back reply to acknowleded received data!")
           }
           // do the work
           match analyze_blobs(&buffer,
@@ -281,18 +300,37 @@ pub fn readoutboard_communicator(socket      : &zmq::Socket,
                               false,
                               true,
                               false) {
-            Ok(nblobs)   => debug!("Read {} blobs from file", nblobs),
-            Err(err)     => warn!("Was not able to read blobs! {}", err )
+            Ok(nblobs)   => debug!("Read {} blobs from buffer", nblobs),
+            Err(err)     => error!("Was not able to read blobs! {}", err )
           }
-
+          // write blob to disk if desired
+          if write_blob {
+            let blobfile_name = "blob_".to_owned() 
+                                 + &n_chunk.to_string() 
+                                 + "_"
+                                 + &board_id.to_string()
+                                 + ".blob";
+            info!("Writing blobs to {}", blobfile_name );
+            let blobfile_path = Path::new(&blobfile_name);
+            match write_stream_to_file(blobfile_path, &buffer) {
+              Ok(size)  => debug!("Writing blob file successful!"),
+              Err(err)  => {
+                error!("Unable to write blob to disk! {}", err );
+                lost_blob_files += 1;
+              }
+            } // end match
+          } // end if write_blob
           //thread::sleep(Duration::from_millis(1500));
+          n_chunk += 1;
+
+          // currently, for debugging just stop after one 
+          // chunk
+          panic!("You shall not pass!");
+          
       }
       Err(err) => {
           n_errors += 1;
-          warn!("Receiving from socket raised error {}", err);
-          //println!("Terminating rb commmunications");
-          //println!("Received garbage or nothing...");
-          //break;
+          error!("Receiving from socket raised error {}", err);
       }
     }
   }

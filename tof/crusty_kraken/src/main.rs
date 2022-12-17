@@ -47,6 +47,8 @@ struct Args {
     /// Increase output for debugging
     #[arg(short, long, default_value_t = false)]
     debug: bool,
+    #[arg(short, long, default_value_t = false)]
+    write_blob: bool,
     /// A json config file with detector information
     #[arg(short, long)]
     json_config: Option<std::path::PathBuf>,
@@ -71,11 +73,17 @@ fn main() {
 
    // welcome banner!
    println!("-----------------------------------------------");
-   println!("Welcome to crusty_kraken {}", kraken);
+   println!(" ** Welcome to crusty_kraken {} *****", kraken);
    println!(" .. TOF C&C and data acquistion suite");
    println!(" .. for the GAPS experiment {}", sparkle_heart);
    println!("-----------------------------------------------");
    println!("");
+
+   let write_blob = args.write_blob;
+   if write_blob {
+     info!("Will write blob data to file!");
+   }
+
    match args.json_config {
      None => warn!("No config file provided!"),
      Some(ref json_file_path) => {
@@ -173,7 +181,9 @@ fn main() {
         Err(err) => panic!("Can not communicate with rb at address {}, error {}",address, err)
     }
     rbcomm_workers.execute(move || {
-        readoutboard_communicator(&rb_comm_socket, n + 1); 
+        readoutboard_communicator(&rb_comm_socket,
+                                  n + 1,
+                                  write_blob); 
     });
     port += 1;
   }
