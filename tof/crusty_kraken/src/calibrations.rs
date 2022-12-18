@@ -172,6 +172,7 @@ pub fn read_calibration_file(filename : &Path) -> [Calibrations; NCHN ]
       println!("{}",cals[0].v_inc[k]);
   }
   */
+  info!(".. reading of calibration file complete!");
   return cals;
 }
 

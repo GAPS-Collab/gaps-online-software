@@ -53,7 +53,9 @@ fn analyze_blobs(buffer               : &Vec<u8>,
                  rb_id                : usize,
                  print_events         : bool,
                  do_calibration       : bool,
-                 pack_data            : bool)
+                 pack_data            : bool,
+                 calibrations         : &[Calibrations; NCHN],
+                 n_chunk              : usize)
 -> Result<usize, BlobError> {
   let mut blob_data = BlobData {..Default::default()};
   let mut header_found_start    = false;
@@ -64,16 +66,6 @@ fn analyze_blobs(buffer               : &Vec<u8>,
   let mut byte;
   let mut events : Vec<BlobData> = Vec::new();
 
-  // in case we want to do calibratoins
-  let mut calibrations = [Calibrations {..Default::default()};NCHN];
-
-  if do_calibration {
-    let cal_file_name = "/srv/gaps/gfp-data/gaps-gfp/TOFsoftware/server/datafiles/rb".to_owned() + &rb_id.to_string() + "_cal.txt";
-    info!("Reading calibrations from file {}", cal_file_name);
-    let cal_file_path = Path::new(&cal_file_name);
-    calibrations = read_calibration_file(cal_file_path); 
-    //if rb_id == 2 {panic!("HERE");} 
-  }
 
   // allocate some memory we are using in 
   // every iteration of the loop
@@ -141,7 +133,7 @@ fn analyze_blobs(buffer               : &Vec<u8>,
 
               let mut paddle_number = 0;
               let mut spikes : [i32;10] = [0;10];
-              blob_data.calibrate(&calibrations);
+              blob_data.calibrate(calibrations);
               blob_data.remove_spikes(&mut spikes);
               for n in 0..NCHN {
 
@@ -191,7 +183,11 @@ fn analyze_blobs(buffer               : &Vec<u8>,
   // waveforms for later analysis.
   #[cfg(feature = "diagnostics")]
   {
-    let hdf_diagnostics_file =  "waveforms_".to_owned() + &rb_id.to_string() + ".hdf";
+    let hdf_diagnostics_file =  "waveforms_".to_owned()
+                                + &n_chunk.to_string()
+                                + "_"
+                                + &rb_id.to_string()
+                                + ".hdf";
     let hdf_file    = hdf5::File::create(hdf_diagnostics_file).unwrap(); // open for writing
     hdf_file.create_group("waveforms");
     let hdf_group = hdf_file.group("waveforms").unwrap();
@@ -210,11 +206,15 @@ fn analyze_blobs(buffer               : &Vec<u8>,
 fn get_blobs_from_file (rb_id : usize) {
   let filepath = String::from("/data0/gfp-data-aug/Aug/run4a/d20220809_195753_4.dat");
   let blobs = get_file_as_byte_vec(&filepath);
+  // FIXME - this must be thre real calibrations
+  let calibrations = [Calibrations {..Default::default()};NCHN];
   match analyze_blobs(&blobs,
                       rb_id,
                       false,
                       false,
-                      false) {
+                      false,
+                      &calibrations,
+                      0) {
       Ok(nblobs)   => info!("Read {} blobs from file", nblobs), 
       Err(err)     => panic!("Was not able to read blobs! Err {}", err)
   }
@@ -258,16 +258,29 @@ fn identifiy_readoutboard(msg : &zmq::Message) -> bool
 /// and perform specified tasks
 ///
 ///
-pub fn readoutboard_communicator(socket      : &zmq::Socket,
-                                 board_id    : usize,
-                                 write_blob  : bool)
+pub fn readoutboard_communicator(socket           : &zmq::Socket,
+                                 board_id         : usize,
+                                 write_blob       : bool,
+                                 calibration_file : &str)
 {
-  trace!("initializing for board {}!", board_id);
+  info!("initializing for board {}!", board_id);
   let mut msg = zmq::Message::new();
   let mut n_errors = 0usize;
   let mut lost_blob_files = 0usize;
   // how many chunks ("buffers") we dealt with
   let mut n_chunk  = 0usize;
+
+  // in case we want to do calibratoins
+  let mut calibrations = [Calibrations {..Default::default()};NCHN];
+  let do_calibration = true;
+  if do_calibration {
+    info!("Reading calibrations from file {}", calibration_file);
+    let cal_file_path = Path::new(&calibration_file);
+    calibrations = read_calibration_file(cal_file_path); 
+  }
+
+
+
   loop {
     match socket.recv(&mut msg, 0) {
       Ok(_) => {
@@ -299,7 +312,9 @@ pub fn readoutboard_communicator(socket      : &zmq::Socket,
                               board_id,
                               false,
                               true,
-                              false) {
+                              false,
+                              &calibrations,
+                              n_chunk) {
             Ok(nblobs)   => debug!("Read {} blobs from buffer", nblobs),
             Err(err)     => error!("Was not able to read blobs! {}", err )
           }

@@ -665,7 +665,7 @@ impl BlobData {
     let mut pos              = 0usize;
     let mut peak_bins        = 0usize;
     let mut peak_ctr         = 0usize;
-    while (self.voltages[ch][pos] < self.threshold[ch])  {
+    while self.voltages[ch][pos] < self.threshold[ch]  {
       pos += 1;
       if pos == NWORDS {
         pos = NWORDS -1;

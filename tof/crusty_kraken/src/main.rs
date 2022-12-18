@@ -18,13 +18,12 @@ extern crate pretty_env_logger;
 #[macro_use] extern crate log;
 
 extern crate clap;
-
+extern crate json;
 extern crate hdf5;
 extern crate ndarray;
 
-use crate::calibrations::{Calibrations, read_calibration_file};
 
-use crate::constants::{NBOARDS, NCHN};
+use crate::constants::{MAX_NBOARDS, NCHN};
 
 use crate::readoutboard_comm::readoutboard_communicator;
 
@@ -84,13 +83,26 @@ fn main() {
      info!("Will write blob data to file!");
    }
 
+
+   let mut json_content  : String;
+   let mut config        : json::JsonValue;
+   let mut nboards       = 0usize;
    match args.json_config {
-     None => warn!("No config file provided!"),
+     None => panic!("No .json config file provided! Please provide a config file with --json-config or -j flag!"),
      Some(ref json_file_path) => {
        if !args.json_config.as_ref().unwrap().exists() {
            panic!("The file {} does not exist!", args.json_config.as_ref().unwrap().display());
        }
-       info!("Found config file {}", args.json_config.as_ref().unwrap().display());
+       println!("=> Found config file {}", args.json_config.as_ref().unwrap().display());
+       json_content = std::fs::read_to_string(args.json_config.as_ref().unwrap()).unwrap();
+       config = json::parse(&json_content).unwrap();
+       //println!(" .. .. using config:");
+       //println!("  {}", config.pretty(2));
+       nboards = config["readout_boards"].len();
+       println!("=> Found configuration for {} readout boards!", nboards);
+       for n in 0..config["readout_boards"].len() {
+          println!(" {}", config["readout_boards"][n].pretty(2));
+       }
      }
    }
    //let matches = command!() // requires `cargo` feature
@@ -149,43 +161,49 @@ fn main() {
     // Continued program logic goes here...
 
 
-  // read calibration data
-  let mut calibrations = [[Calibrations {..Default::default()}; NCHN]; NBOARDS];
   let mut rb_id = 0usize;
-  for n in 0..NBOARDS {
-      rb_id = n + 1;
-      let file_name = "/srv/gaps/gfp-data/gaps-gfp/TOFsoftware/server/datafiles/rb".to_owned() + &rb_id.to_string() + "_cal.txt";
-      info!("Reading calibrations from file {}", file_name);
-      let file_path = Path::new(&file_name);
-      calibrations[n] = read_calibration_file(file_path); 
-  }
+  println!(" .. .. .. .. .. .. .. ..");
   
   // each readoutboard gets its own worker
-  let rbcomm_workers = ThreadPool::new(NBOARDS);
+  let rbcomm_workers = ThreadPool::new(nboards);
   
   // open a zmq context
   let ctx = zmq::Context::new();
   // FIXME - port and address need to be 
   // configurable
-  let mut port = 38830usize;
-  let address_ip = "tcp://127.0.0.1";
+  let mut port       : usize;
   
   let mut address : String;
-  for n in 0..NBOARDS {
+  let mut cali_file_name : String;
+  let mut cali_file_path : &Path;
+  let mut board_config : &json::JsonValue;
+  for n in 0..nboards {
+    board_config   = &config["readout_boards"][n];
+    let mut address_ip = String::from("tcp://");
     let rb_comm_socket = ctx.socket(zmq::REP).unwrap();
+    rb_id = board_config["id"].as_usize().unwrap();
+    address_ip += board_config["ip_address"].as_str().unwrap();
+    port        = board_config["port"].as_usize().unwrap();
     address = address_ip.to_owned() + ":" + &port.to_string();
     info!("Will bind to port for rb comm at {}", address);
+    cali_file_name = "".to_owned() + board_config["calibration_file"].as_str().unwrap();
+    cali_file_path = Path::new(&cali_file_name);
+    if !cali_file_path.exists() {
+      panic!("The desired configuration file {} does not exist!", cali_file_name);
+    }
+
+
     let result = rb_comm_socket.bind(&address);
     match result {
         Ok(_)    => info!("Bound socket to {}", address),
-        Err(err) => panic!("Can not communicate with rb at address {}, error {}",address, err)
+        Err(err) => panic!("Can not communicate with rb at address {}. Maybe you want to check your .json configuration file?, error {}",address, err)
     }
     rbcomm_workers.execute(move || {
         readoutboard_communicator(&rb_comm_socket,
-                                  n + 1,
-                                  write_blob); 
+                                  rb_id,
+                                  write_blob,
+                                  &cali_file_name); 
     });
-    port += 1;
   }
   
   let one_minute = time::Duration::from_millis(60000);
