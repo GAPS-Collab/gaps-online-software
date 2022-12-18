@@ -521,9 +521,6 @@ impl BlobData {
                  lower_bound : usize,
                  window : usize,
                  ch : usize ) -> Result<usize, WaveformError> {
-    if lower_bound < 0 {
-      return Err(WaveformError::NegativeLowerBound);
-    }
     if lower_bound + window > NWORDS {
       return Err(WaveformError::OutOfRangeUpperBound);
     }

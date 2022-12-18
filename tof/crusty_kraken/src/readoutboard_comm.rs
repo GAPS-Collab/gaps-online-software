@@ -279,8 +279,6 @@ pub fn readoutboard_communicator(socket           : &zmq::Socket,
     calibrations = read_calibration_file(cal_file_path); 
   }
 
-
-
   loop {
     match socket.recv(&mut msg, 0) {
       Ok(_) => {

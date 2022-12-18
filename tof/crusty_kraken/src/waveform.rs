@@ -1,8 +1,7 @@
 /*****************************************/
 
 use crate::constants::{NWORDS,
-                       MAX_NUM_PEAKS,
-                       WF_VOLTAGE_THRESHOLD};
+                       MAX_NUM_PEAKS};
 
 use crate::errors::WaveformError;
 use crate::readoutboard_blob::BlobData;

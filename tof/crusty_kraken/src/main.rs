@@ -6,7 +6,9 @@ mod reduced_tofevent;
 mod constants;
 mod waveform;
 mod errors;
-
+mod commands;
+mod master_trigger;
+mod monitoring;
 
 // this is a list of tests
 // FIXME - this should follow
@@ -64,13 +66,14 @@ fn main() {
    // some bytes, in a vector
    let sparkle_heart         = vec![240, 159, 146, 150];
    let kraken                = vec![240, 159, 144, 153];
-   let sattelite_antenna     = vec![240, 159, 147, 161];
+   let satelite_antenna      = vec![240, 159, 147, 161];
    // We know these bytes are valid, so we'll use `unwrap()`.
-   let sparkle_heart = String::from_utf8(sparkle_heart).unwrap();
-   let kraken        = String::from_utf8(kraken).unwrap();
-   let sattelite_antenna = String::from_utf8(sattelite_antenna).unwrap();
+   let sparkle_heart    = String::from_utf8(sparkle_heart).unwrap();
+   let kraken           = String::from_utf8(kraken).unwrap();
+   let satelite_antenna = String::from_utf8(sattelite_antenna).unwrap();
 
    // welcome banner!
+   //
    println!("-----------------------------------------------");
    println!(" ** Welcome to crusty_kraken {} *****", kraken);
    println!(" .. TOF C&C and data acquistion suite");
