@@ -65,6 +65,7 @@ if (BUILD_PROTOBUF_DATACLASSES)
         ${CMAKE_CURRENT_SOURCE_DIR}/src/GapsEvent.pb.cc
     )
     add_dependencies(${GAPS_GP_DATACLASSES} protobuf-dataclasses)
+    add_dependencies(${GAPS_GP_DATACLASSES} protobuf-dataclasses-build)
     target_compile_options(${GAPS_GP_DATACLASSES} PRIVATE -Wall -Wextra -Wpedantic)# -Werror)
     target_include_directories(${GAPS_GP_DATACLASSES}
                             PUBLIC

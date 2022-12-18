@@ -7,40 +7,22 @@
   },
   "readout_boards" : [
     {
-      "id"               : 1,
+      "id"               : 16,
       "dna"              : "foobar",
       "n_data_channels"  : 8,
       "nwords"           : 1024,
-      "calibration_file" : "/srv/gaps/gfp-data/gaps-gfp/TOFsoftware/server/datafiles/rb1_cal.txt",
-      "ip_address"       : "127.0.0.1",
-      "port"             : 38830
+      "calibration_file" : "/home/achim/gaps/software/gaps-online-software/tof/resources/calibrations/rb1_cal.txt",
+      "ip_address"       : "10.97.108.16",
+      "port"             : 46212
     },
     {
-      "id"               : 2,
+      "id"               : 17,
       "dna"              : "foobar",
       "n_data_channels"  : 8,
       "nwords"           : 1024,
-      "calibration_file" : "/srv/gaps/gfp-data/gaps-gfp/TOFsoftware/server/datafiles/rb2_cal.txt",
-      "ip_address"       : "127.0.0.1",
-      "port"             : 38831
-    },
-    {
-      "id"               : 3,
-      "dna"              : "foobar",
-      "n_data_channels"  : 8,
-      "nwords"           : 1024,
-      "calibration_file" : "/srv/gaps/gfp-data/gaps-gfp/TOFsoftware/server/datafiles/rb3_cal.txt",
-      "ip_address"       : "127.0.0.1",
-      "port"             : 38832
-    },
-    {
-      "id"               : 4,
-      "dna"              : "foobar",
-      "n_data_channels"  : 8,
-      "nwords"           : 1024,
-      "calibration_file" : "/srv/gaps/gfp-data/gaps-gfp/TOFsoftware/server/datafiles/rb4_cal.txt",
-      "ip_address"       : "127.0.0.1",
-      "port"             : 38833
+      "calibration_file" : "/home/achim/gaps/software/gaps-online-software/tof/resources/calibrations/rb2_cal.txt",
+      "ip_address"       : "10.97.108.17",
+      "port"             : 51422
     }
   ]
 }
