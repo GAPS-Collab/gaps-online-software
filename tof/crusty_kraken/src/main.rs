@@ -61,7 +61,6 @@ struct Args {
 
 fn main() {
    pretty_env_logger::init();
-   let args = Args::parse();
 
    // some bytes, in a vector
    let sparkle_heart         = vec![240, 159, 146, 150];
@@ -80,6 +79,7 @@ fn main() {
    println!(" .. for the GAPS experiment {}", sparkle_heart);
    println!("-----------------------------------------------");
    println!("");
+   let args = Args::parse();
 
    let write_blob = args.write_blob;
    if write_blob {
