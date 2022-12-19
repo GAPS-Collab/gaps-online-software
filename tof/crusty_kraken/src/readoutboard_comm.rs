@@ -8,7 +8,6 @@
 
 use std::{fs, fs::File, path::Path};
 use std::io::Read;
-use std::collections::VecDeque;
 use std::sync::mpsc::{Sender, channel};
 
 #[cfg(feature = "diagnostics")]
@@ -29,8 +28,7 @@ use crate::calibrations::{Calibrations,
 use crate::readoutboard_blob::{BlobData,
                                get_constant_blobeventsize};
 use crate::constants::{NCHN,
-                       NWORDS,
-                       RB_THREAD_EVENT_CACHE_SIZE};
+                       NWORDS};
 use crate::waveform::CalibratedWaveform;
 
 /*************************************/
@@ -72,8 +70,6 @@ fn write_stream_to_file(filename: &Path, bytestream: &Vec<u8>) -> Result<usize, 
 /// PaddlePacket queue : I don't think is needed for anything
 /// since we are sending the packets right away
 fn analyze_blobs(buffer               : &Vec<u8>,
-                 blob_events          : &mut VecDeque<BlobData>,
-                 paddle_packets       : &mut VecDeque<PaddlePacket>, 
                  pp_sender            : &Sender<PaddlePacket>,
                  send_packets         : bool,
                  rb_id                : usize,
@@ -261,13 +257,11 @@ fn analyze_blobs(buffer               : &Vec<u8>,
                 }
               } // end loop over readout board channels
             }
-            blob_events.push_back(blob_data);
 
             // put the finished paddle packets in 
             // our container
             for n in 0..NPADDLES {
               if paddles_over_threshold[n] {
-                paddle_packets.push_back(pp_this_event[n]);
                 pp_sender.send(pp_this_event[n]);
               }
             }
@@ -281,19 +275,6 @@ fn analyze_blobs(buffer               : &Vec<u8>,
           header_found_start = false;
       }
     } // endif header_found_start
-
-    // we have to check that our queues do not 
-    // use more space than we originally want
-    if blob_events.len() > RB_THREAD_EVENT_CACHE_SIZE {
-      error!("Event cache limit of {} reached. Will drop blob data!", RB_THREAD_EVENT_CACHE_SIZE);
-      blob_events.pop_front();
-      // FIXME - let somebody now that we dropped something
-    }
-    if paddle_packets.len() > RB_THREAD_EVENT_CACHE_SIZE {
-      error!("Event cache limit of {} reached. Will drop paddle packets!", RB_THREAD_EVENT_CACHE_SIZE);
-      paddle_packets.pop_front();
-      // FIXME - let somebody now that we dropped something
-    }
   }// end loop
 
   // in case of diagnostics, we 
@@ -326,13 +307,9 @@ fn get_blobs_from_file (rb_id : usize) {
   let blobs = get_file_as_byte_vec(&filepath);
   // FIXME - this must be thre real calibrations
   let calibrations = [Calibrations {..Default::default()};NCHN];
-  let mut blob_events    : VecDeque<BlobData>     = VecDeque::with_capacity(RB_THREAD_EVENT_CACHE_SIZE);
-  let mut paddle_packets : VecDeque<PaddlePacket> = VecDeque::with_capacity(RB_THREAD_EVENT_CACHE_SIZE);
   //let sender = Sender::<PaddlePacket>();
   let (sender, receiver) = channel();
   match analyze_blobs(&blobs,
-                      &mut blob_events,
-                      &mut paddle_packets,
                       &sender,
                       false,
                       rb_id,
@@ -405,23 +382,7 @@ pub fn readoutboard_communicator(socket           : &zmq::Socket,
     calibrations = read_calibration_file(cal_file_path); 
   }
 
-  let mut blob_events    : VecDeque<BlobData>     = VecDeque::with_capacity(RB_THREAD_EVENT_CACHE_SIZE);
-  let mut paddle_packets : VecDeque<PaddlePacket> = VecDeque::with_capacity(RB_THREAD_EVENT_CACHE_SIZE);
-  // we do two things here:
-  // 1) Waiting for new blobs over our zmq socket
-  // 2) As long as we are not busy receiving/analyzing 
-  //    blobs, we work on the sending events out 
-  //    to the eventbuilder
   loop {
-    // work through our backlog and send everything 
-    // should we load that work of to the event builder 
-    // and just send everything right away?
-    println!("We have to work on {} paddle packets!", paddle_packets.len());
-    for n in 0..paddle_packets.len() 
-      {
-        let pp = paddle_packets.pop_front();    
-      } 
-
 
     // check if we got new data
     // this is blocking the thread
@@ -452,8 +413,6 @@ pub fn readoutboard_communicator(socket           : &zmq::Socket,
           }
           // do the work
           match analyze_blobs(&buffer,
-                              &mut blob_events,
-                              &mut paddle_packets,
                               &pp_pusher,
                               true,
                               board_id,
