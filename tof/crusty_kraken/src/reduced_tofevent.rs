@@ -41,12 +41,12 @@ impl PaddlePacket {
 
   }
 
-  fn set_time_a(&mut self, time : f64 ) {
+  pub fn set_time_a(&mut self, time : f64 ) {
     let prec : f64 = 0.004;
     self.time_a = (time as f64/prec) as u16;
   }
 
-  fn set_time_b(&mut self, time : f64 ) {
+  pub fn set_time_b(&mut self, time : f64 ) {
     let prec : f64 = 0.004;
     self.time_b = (time as f64/prec) as u16;
   }

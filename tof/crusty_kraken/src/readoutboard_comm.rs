@@ -1,3 +1,11 @@
+///
+///
+///
+///
+///
+
+
+
 use std::{fs, fs::File, path::Path};
 use std::io::Read;
 #[cfg(feature = "diagnostics")]
@@ -18,7 +26,8 @@ use crate::calibrations::{Calibrations,
 use crate::readoutboard_blob::{BlobData,
                                get_constant_blobeventsize};
 use crate::constants::{NCHN,
-                       NWORDS};
+                       NWORDS,
+                       RB_THREAD_EVENT_CACHE_SIZE};
 use crate::waveform::CalibratedWaveform;
 
 /*************************************/
@@ -57,14 +66,15 @@ fn analyze_blobs(buffer               : &Vec<u8>,
                  calibrations         : &[Calibrations; NCHN],
                  n_chunk              : usize)
 -> Result<usize, BlobError> {
-  let mut blob_data = BlobData {..Default::default()};
-  let mut header_found_start    = false;
-  let mut nblobs = 0usize;
-  let mut ncorrupt_blobs = 0usize;
-  let mut pos = 0usize;
-  let blobdata_size = buffer.len();
-  let mut byte;
-  let mut events : Vec<BlobData> = Vec::new();
+  let mut blob_data              = BlobData {..Default::default()};
+  let mut header_found_start     = false;
+  let mut nblobs                 = 0usize;
+  let mut ncorrupt_blobs         = 0usize;
+  let mut pos                    = 0usize;
+  let blobdata_size              = buffer.len();
+  let mut byte                   : u8;
+  let mut blob_events    : Vec<BlobData>     = Vec::with_capacity(RB_THREAD_EVENT_CACHE_SIZE);
+  let mut paddle_packets : Vec<PaddlePacket> = Vec::with_capacity(RB_THREAD_EVENT_CACHE_SIZE);
 
 
   // allocate some memory we are using in 
@@ -81,6 +91,8 @@ fn analyze_blobs(buffer               : &Vec<u8>,
   // remove_spikes requires two dimensional array
   let mut all_channel_waveforms : [[f64;NWORDS];NCHN] = [[0.0;NWORDS];NCHN];
   let mut all_channel_times     : [[f64;NWORDS];NCHN] = [[0.0;NWORDS];NCHN];
+
+  let mut channels_over_threshold : Vec<usize> = Vec::with_capacity(8);
 
   #[cfg(feature = "diagnostics")]
   let mut diagnostics_wf : Vec<CalibratedWaveform> = Vec::new();
@@ -135,37 +147,68 @@ fn analyze_blobs(buffer               : &Vec<u8>,
               let mut spikes : [i32;10] = [0;10];
               blob_data.calibrate(calibrations);
               blob_data.remove_spikes(&mut spikes);
-              for n in 0..NCHN {
+              for ch in 0..NCHN {
 
                 // analysis part
                 //let mut waveform = CalibratedWaveform::new(all_channel_waveforms[n],
                 //                                           all_channel_times[n]);
-                blob_data.set_threshold(10.0, n);
-                blob_data.set_cfds_fraction(0.20, n);
-                blob_data.set_ped_begin(10.0, n);// 10-100                               
-                blob_data.set_ped_range(50.0, n);
-                blob_data.calc_ped_range(n);
-                blob_data.subtract_pedestal(n);
-                blob_data.integrate(270.0, 70.0, n);
-                blob_data.find_peaks(270.0,70.0, n);
-                let cfd_time = blob_data.find_cfd_simple(0, n);
+                // first, subtract the pedestal
+                blob_data.set_ped_begin(10.0, ch);// 10-100                               
+                blob_data.set_ped_range(50.0, ch);
+                blob_data.calc_ped_range(ch);
+                blob_data.subtract_pedestal(ch);
+                
+                // then we set the threshold and check
+                // if the wf went over threashold
+                let is_ot = blob_data.set_threshold(10.0, ch);
+                if !is_ot {continue;}
+                channels_over_threshold.push(ch);
+                blob_data.set_cfds_fraction(0.20, ch);
+                blob_data.integrate(270.0, 70.0, ch);
+                blob_data.find_peaks(270.0,70.0, ch);
+                // analysis
+                let cfd_time = blob_data.find_cfd_simple(0, ch);
                 //waveform.print();
                 // packing part
-                if n == 0 || n == 1 {paddle_number = 0;}
-                if n == 2 || n == 3 {paddle_number = 1;}
-                if n == 4 || n == 5 {paddle_number = 2;}
-                if n == 6 || n == 7 {paddle_number = 3;}
-                paddle_packets_this_rb[paddle_number].set_time(cfd_time, n%2);
+                match ch {
+                  0 => {
+                    paddle_packets_this_rb[0].set_time_a(cfd_time);
+                  },
+                  1 => {
+                    paddle_packets_this_rb[1].set_time_b(cfd_time);
+                  },
+                  2 => {
+                    paddle_packets_this_rb[1].set_time_b(cfd_time);
+                  },
+                  3 => {
+                    paddle_packets_this_rb[1].set_time_b(cfd_time);
+                  },
+                  4 => {
+                    paddle_packets_this_rb[1].set_time_b(cfd_time);
+                  },
+                  5 => {
+                    paddle_packets_this_rb[1].set_time_b(cfd_time);
+                  },
+                  6 => {
+                    paddle_packets_this_rb[1].set_time_b(cfd_time);
+                  },
+                  7 => {
+                    paddle_packets_this_rb[1].set_time_b(cfd_time);
+                  },
+                  _ => {
+                    debug!("Won't do anything for ch {}",ch);
+                  }
+                }
                 
                 #[cfg(feature = "diagnostics")]
                 {  
                   //events.push(blob_data);
-                  let diag_wf = CalibratedWaveform::new(&blob_data, n);
+                  let diag_wf = CalibratedWaveform::new(&blob_data, ch);
                   diagnostics_wf.push (diag_wf);
                 }
               } // end loop over nchannel
             }
-            events.push(blob_data);
+            blob_events.push(blob_data);
         } else {
             // the event is corrupt
             //println!("{}", blob_data.head);

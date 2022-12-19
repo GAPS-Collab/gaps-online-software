@@ -1,3 +1,5 @@
+# vim fragments
+*.swp
 
 # this file gets configured by cmake
 tof/readoutboard-emulator/bin/RBEmulator.cxx

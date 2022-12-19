@@ -9,6 +9,7 @@ mod errors;
 mod commands;
 mod master_trigger;
 mod monitoring;
+mod event_builder;
 
 // this is a list of tests
 // FIXME - this should follow
@@ -21,12 +22,17 @@ extern crate pretty_env_logger;
 
 extern crate clap;
 extern crate json;
+#[cfg(feature = "diagnostics")]
 extern crate hdf5;
+#[cfg(feature = "diagnostics")]
 extern crate ndarray;
 
 use std::{thread,
           time,
-          path::Path};
+          path::Path,
+          sync::mpsc::Sender,
+          sync::mpsc::Receiver,
+          sync::mpsc::channel};
 
 use clap::{arg,
            command,
@@ -38,6 +44,7 @@ use clap::{arg,
 use crate::constants::{MAX_NBOARDS, NCHN};
 use crate::readoutboard_comm::readoutboard_communicator;
 use crate::master_trigger::master_and_commander;
+use crate::event_builder::event_builder;
 use crate::threading::ThreadPool;
 
 /*************************************/
@@ -90,13 +97,13 @@ fn main() {
     info!("Will write blob data to file!");
   }
   
-  let mut json_content  : String;
-  let mut config        : json::JsonValue;
+  let json_content  : String;
+  let config        : json::JsonValue;
   
   let mut nboards       = 0usize;
 
   let master_trigger = args.master_trigger;
-  let mut master_trigger_ip   = "";
+  let mut master_trigger_ip   = String::from("");
   let mut master_trigger_port = 0usize;
 
   match args.json_config {
@@ -118,7 +125,7 @@ fn main() {
   } // end match
   
   if master_trigger {
-   master_trigger_ip = config["master_trigger"]["ip"].as_str().unwrap();
+   master_trigger_ip   = config["master_trigger"]["ip"].as_str().unwrap().to_owned();
    master_trigger_port = config["master_trigger"]["port"].as_usize().unwrap();
    info!("Will connect to the master trigger board at {}:{}", master_trigger_ip, master_trigger_port);
   }
@@ -185,19 +192,40 @@ fn main() {
   let mut address : String;
   let mut cali_file_name : String;
   let mut cali_file_path : &Path;
-  let mut board_config : &json::JsonValue;
+  let mut board_config   : &json::JsonValue;
   let mut rb_id = 0usize;
- 
+
+  // prepare channels for inter thread communications
+  let (master_ev_send, master_ev_receiv): (Sender<u32>, Receiver<u32>) = channel(); 
+  
+  // prepare a thread pool. Currently we have
+  // 1 thread per rb, 1 master trigger thread
+  // and 1 event builder thread. There might
+  // be a monitoring thread, too.
+  // The number of threads should be fixed at 
+  // runtime, but it should be possible to 
+  // respawn them
+  let nthreads = nboards + 2; // 
+  let worker_threads = ThreadPool::new(nthreads);
+  
+
   // for debugging, if master trigger only 
   // run master trigger thread
   if master_trigger {
-    master_and_commander(master_trigger_ip, 
-                         master_trigger_port);
-    panic!("Done with the master trigger debugging!");
+    worker_threads.execute(move || {
+                           master_and_commander(&master_trigger_ip, 
+                                                master_trigger_port,
+                                                &master_ev_send);
+    });
+    // start the event builder thread
+    worker_threads.execute(move || {
+                           event_builder(&master_ev_receiv);
+    });
   }
 
-  // each readoutboard gets its own worker
-  let rbcomm_workers = ThreadPool::new(nboards);
+  let one_minute = time::Duration::from_millis(60000);
+  thread::sleep(2*one_minute);
+
   
   // open a zmq context
   let ctx = zmq::Context::new();
@@ -221,16 +249,11 @@ fn main() {
         Ok(_)    => info!("Bound socket to {}", address),
         Err(err) => panic!("Can not communicate with rb at address {}. Maybe you want to check your .json configuration file?, error {}",address, err)
     }
-    rbcomm_workers.execute(move || {
+    worker_threads.execute(move || {
       readoutboard_communicator(&rb_comm_socket,
                                 rb_id,
                                 write_blob,
                                 &cali_file_name); 
     });
-  }
-  
-  let one_minute = time::Duration::from_millis(60000);
-  //let now = time::Instant::now();
-  
-  thread::sleep(2*one_minute);
+  } // end for loop over nboards
 }

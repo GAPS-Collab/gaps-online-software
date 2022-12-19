@@ -7,10 +7,12 @@
 
 // to measure the rate
 use std::time::{Duration, Instant};
-
+use std::thread;
 use std::net::UdpSocket;
+use std::sync::mpsc::Sender;
 
-const MT_MAX_PACKSIZE   : usize = 4096;
+//const MT_MAX_PACKSIZE   : usize = 4096;
+const MT_MAX_PACKSIZE   : usize = 512;
 
 
 #[derive(PartialEq, Copy, Clone)]
@@ -149,13 +151,53 @@ fn read_event_cnt(socket : &UdpSocket,
   event_count
 }
 
+fn read_daq(socket : &UdpSocket,
+            target_address : &str,
+            buffer : &mut [u8;MT_MAX_PACKSIZE]) -> u32 {
+  // check if the queue is full
+  let mut event_ctr  = 0u32;
+  let mut timestamp  = 0u32;
+  let mut timecode32 = 0u32;
+  let mut timecode16 = 0u32;
+  let mut mask       = 0u32;
+  let mut hits       = 0u32;
+  let mut crc        = 0u32;
+  let mut trailer    = 0u32;
+
+  let word = read_register(socket, target_address, 0x11, buffer);
+  
+  if word == 0xAAAAAAAA {
+    // we start a new daq package
+    event_ctr   = read_register(socket, target_address, 0x11, buffer);
+    timestamp   = read_register(socket, target_address, 0x11, buffer);
+    timecode32  = read_register(socket, target_address, 0x11, buffer);
+    timecode16  = read_register(socket, target_address, 0x11, buffer);
+    mask        = read_register(socket, target_address, 0x11, buffer);
+    hits        = read_register(socket, target_address, 0x11, buffer);
+    crc         = read_register(socket, target_address, 0x11, buffer);
+    trailer     = read_register(socket, target_address, 0x11, buffer);
+ 
+    println!("event_ctr {}, ts {} , tc32 {}, tc16 {}, mask {}, hits {}, crc {}, trailer {}", event_ctr, timestamp, timecode32, timecode16, mask, hits, crc, trailer);
+  } // end header found
+    //AAAAAAAA (Header)
+    //0286A387 (Event cnt)
+    //00000000 (Timestamp)
+    //00000000 (Timecode 32 bits)
+    //00000000 (Timecode 16 bits)
+    //00000001 (Mask)
+    //00000003 (Hits)
+    //97041A48 (CRC)
+    //55555555 (Trailer)
+  event_ctr
+}
 
 ///
 /// Communications with the master trigger
 ///
 ///
 pub fn master_and_commander(mt_ip   : &str, 
-                            mt_port : usize) {
+                            mt_port : usize,
+                            evid_sender : &Sender<u32>) {
 
   let mt_address = mt_ip.to_owned() + ":" + &mt_port.to_string();
   //let mut socket : UdpSocket;
@@ -184,18 +226,24 @@ pub fn master_and_commander(mt_ip   : &str,
   // and reuse it for all operations
   let mut buffer = [0u8;MT_MAX_PACKSIZE];  
   
-  let mut event_cnt : u32;
+  let mut event_cnt      = 0u32;
   let mut last_event_cnt = 0u32;
-  let mut missing_evids = 0usize;
-  let mut event_missing = false;
-  let mut n_events = 0usize;
+  let mut missing_evids  = 0usize;
+  let mut event_missing  = false;
+  let mut n_events       = 0usize;
   // these are the number of expected events
   // (missing included)
   let mut n_events_expected = 0usize;
   let mut rate = 0f64;
   // for rate measurement
   let start = Instant::now();
+
+  // limit polling rate to a maximum
+  let max_rate = 1000.0; // hz
   loop {
+    // limit the max polling rate
+    let milli_sleep = Duration::from_millis((1000.0/max_rate) as u64);
+    thread::sleep(milli_sleep);
   //  let received = socket.recv_from(&mut buffer);
 
   //  match received {
@@ -205,7 +253,14 @@ pub fn master_and_commander(mt_ip   : &str,
   //      continue;
   //    }
   //  } // end match
+    
+    // daq not ready
+    if 0 != (read_register(&socket, &mt_address, 0x12, &mut buffer) & 0x2) {
+      continue;
+    }
+    
     event_cnt = read_event_cnt(&socket, &mt_address, &mut buffer);
+    //event_cnt = read_daq(&socket, &mt_address, &mut buffer);
     if event_cnt == last_event_cnt {
       continue;
     }
@@ -224,24 +279,26 @@ pub fn master_and_commander(mt_ip   : &str,
       if missing < 200 {
         missing_evids += missing as usize;
       } else {
-        info!("We missed too many event ids from the master trigger!");
+        warn!("We missed too many event ids from the master trigger!");
       }
-      error!("We missed {} events!", missing);
+      //error!("We missed {} events!", missing);
       event_missing = true;
     }
     
     // new event
+    // send it down the pip
+    evid_sender.send(event_cnt);
     last_event_cnt = event_cnt;
     n_events += 1;
     n_events_expected = n_events + missing_evids;
 
     // measure rate every 100 events
-    if n_events % 100 == 0 {
+    if n_events % 1000 == 0 {
       let elapsed = start.elapsed().as_secs();
       rate = n_events as f64 / elapsed as f64;
-      println!("==> {} events recorded, trigger rate: {} Hz", n_events, rate);
+      println!("==> {} events recorded, trigger rate: {:.2} Hz", n_events, rate);
       rate = n_events_expected as f64 / elapsed as f64;
-      println!("==> -- expected rate {} Hz", rate);   
+      println!("==> -- expected rate {:.2} Hz", rate);   
     } 
     // end new event
   } // end loop

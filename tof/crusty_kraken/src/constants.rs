@@ -5,3 +5,9 @@ pub const NWORDS        : usize = 1024;
 pub const MAX_NBOARDS   : usize = 4;
 
 pub const MAX_NUM_PEAKS : usize = 50;
+
+///! Readout board event cache size - if we collect 
+///  more events than these, they will be dropped
+///  this affects both, blob events as well as 
+///  reduced packages
+pub const RB_THREAD_EVENT_CACHE_SIZE : usize = 50;

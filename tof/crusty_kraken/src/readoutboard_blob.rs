@@ -456,8 +456,15 @@ impl BlobData {
     } // end loop over k
   }
   
-  pub fn set_threshold(&mut self, thr : f64, ch : usize) {
-      self.threshold[ch] = thr;
+  ///! Set the threshold and check if the waveform got over threahshold
+  pub fn set_threshold(&mut self, thr : f64, ch : usize) -> bool {
+    self.threshold[ch] = thr;
+    for n in 0..NWORDS {
+      if self.voltages[ch][n] > thr {
+        return true;
+      }
+    }
+    false
   }
 
   pub fn set_cfds_fraction(&mut self, fraction : f64, ch : usize) {
