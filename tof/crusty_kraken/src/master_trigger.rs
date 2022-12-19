@@ -5,10 +5,12 @@
  *
  */ 
 
+// to measure the rate
+use std::time::{Duration, Instant};
 
 use std::net::UdpSocket;
 
-pub const MT_MAX_PACKSIZE   : usize = 4096;
+const MT_MAX_PACKSIZE   : usize = 4096;
 
 
 #[derive(PartialEq, Copy, Clone)]
@@ -141,9 +143,10 @@ fn read_register(socket      : &UdpSocket,
 
 fn read_event_cnt(socket : &UdpSocket,
                   target_address : &str,
-                  buffer : &mut [u8;MT_MAX_PACKSIZE]) {
+                  buffer : &mut [u8;MT_MAX_PACKSIZE]) -> u32 {
   let event_count = read_register(socket, target_address, 0xd, buffer);
-  println!("Got event count! {} ", event_count);
+  debug!("Got event count! {} ", event_count);
+  event_count
 }
 
 
@@ -180,6 +183,18 @@ pub fn master_and_commander(mt_ip   : &str,
   // we only allocate the buffer once
   // and reuse it for all operations
   let mut buffer = [0u8;MT_MAX_PACKSIZE];  
+  
+  let mut event_cnt : u32;
+  let mut last_event_cnt = 0u32;
+  let mut missing_evids = 0usize;
+  let mut event_missing = false;
+  let mut n_events = 0usize;
+  // these are the number of expected events
+  // (missing included)
+  let mut n_events_expected = 0usize;
+  let mut rate = 0f64;
+  // for rate measurement
+  let start = Instant::now();
   loop {
   //  let received = socket.recv_from(&mut buffer);
 
@@ -190,7 +205,45 @@ pub fn master_and_commander(mt_ip   : &str,
   //      continue;
   //    }
   //  } // end match
-    read_event_cnt(&socket, &mt_address, &mut buffer);
+    event_cnt = read_event_cnt(&socket, &mt_address, &mut buffer);
+    if event_cnt == last_event_cnt {
+      continue;
+    }
+
+    // we have a new event
+    //println!("** ** evid: {}",event_cnt);
+    if event_cnt < last_event_cnt {
+      error!("Event counter id overflow!!");
+      last_event_cnt = 0;
+    }
+    
+    if event_cnt - last_event_cnt > 1 {
+      let missing = event_cnt - last_event_cnt;
+      
+      // FIXME
+      if missing < 200 {
+        missing_evids += missing as usize;
+      } else {
+        info!("We missed too many event ids from the master trigger!");
+      }
+      error!("We missed {} events!", missing);
+      event_missing = true;
+    }
+    
+    // new event
+    last_event_cnt = event_cnt;
+    n_events += 1;
+    n_events_expected = n_events + missing_evids;
+
+    // measure rate every 100 events
+    if n_events % 100 == 0 {
+      let elapsed = start.elapsed().as_secs();
+      rate = n_events as f64 / elapsed as f64;
+      println!("==> {} events recorded, trigger rate: {} Hz", n_events, rate);
+      rate = n_events_expected as f64 / elapsed as f64;
+      println!("==> -- expected rate {} Hz", rate);   
+    } 
+    // end new event
   } // end loop
 }
 
