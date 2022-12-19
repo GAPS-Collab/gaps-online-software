@@ -41,11 +41,11 @@ use clap::{arg,
            //Command,
            Parser};
 
-use crate::constants::{MAX_NBOARDS, NCHN};
 use crate::readoutboard_comm::readoutboard_communicator;
 use crate::master_trigger::master_and_commander;
 use crate::event_builder::event_builder;
 use crate::threading::ThreadPool;
+use crate::reduced_tofevent::PaddlePacket;
 
 /*************************************/
 
@@ -196,8 +196,9 @@ fn main() {
   let mut rb_id = 0usize;
 
   // prepare channels for inter thread communications
-  let (master_ev_send, master_ev_receiv): (Sender<u32>, Receiver<u32>) = channel(); 
-  
+  let (master_ev_send, master_ev_rec): (Sender<u32>, Receiver<u32>) = channel(); 
+  let (pp_send, pp_rec) : (Sender<PaddlePacket>, Receiver<PaddlePacket>) = channel(); 
+
   // prepare a thread pool. Currently we have
   // 1 thread per rb, 1 master trigger thread
   // and 1 event builder thread. There might
@@ -219,14 +220,14 @@ fn main() {
     });
     // start the event builder thread
     worker_threads.execute(move || {
-                           event_builder(&master_ev_receiv);
+                           event_builder(&master_ev_rec,
+                                         &pp_rec);
     });
   }
 
   let one_minute = time::Duration::from_millis(60000);
   thread::sleep(2*one_minute);
 
-  
   // open a zmq context
   let ctx = zmq::Context::new();
   for n in 0..nboards {
@@ -249,8 +250,10 @@ fn main() {
         Ok(_)    => info!("Bound socket to {}", address),
         Err(err) => panic!("Can not communicate with rb at address {}. Maybe you want to check your .json configuration file?, error {}",address, err)
     }
+    let this_rb_pp_sender = pp_send.clone();
     worker_threads.execute(move || {
       readoutboard_communicator(&rb_comm_socket,
+                                this_rb_pp_sender,
                                 rb_id,
                                 write_blob,
                                 &cali_file_name); 

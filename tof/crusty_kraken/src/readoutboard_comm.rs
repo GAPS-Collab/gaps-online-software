@@ -8,6 +8,9 @@
 
 use std::{fs, fs::File, path::Path};
 use std::io::Read;
+use std::collections::VecDeque;
+use std::sync::mpsc::{Sender, channel};
+
 #[cfg(feature = "diagnostics")]
 //use waveform::CalibratedWaveformForDiagnostics;
 #[cfg(feature = "diagnostics")]
@@ -58,11 +61,24 @@ fn write_stream_to_file(filename: &Path, bytestream: &Vec<u8>) -> Result<usize, 
 
 /*************************************/
 
+///
+///
+///
+///
+/// FIXME - we have to think again, which queues are really 
+/// needed. I think:
+/// BlobData queue : only needed when diagnostics feature is
+/// set to write the waveforms to hdf
+/// PaddlePacket queue : I don't think is needed for anything
+/// since we are sending the packets right away
 fn analyze_blobs(buffer               : &Vec<u8>,
+                 blob_events          : &mut VecDeque<BlobData>,
+                 paddle_packets       : &mut VecDeque<PaddlePacket>, 
+                 pp_sender            : &Sender<PaddlePacket>,
+                 send_packets         : bool,
                  rb_id                : usize,
                  print_events         : bool,
                  do_calibration       : bool,
-                 pack_data            : bool,
                  calibrations         : &[Calibrations; NCHN],
                  n_chunk              : usize)
 -> Result<usize, BlobError> {
@@ -73,15 +89,18 @@ fn analyze_blobs(buffer               : &Vec<u8>,
   let mut pos                    = 0usize;
   let blobdata_size              = buffer.len();
   let mut byte                   : u8;
-  let mut blob_events    : Vec<BlobData>     = Vec::with_capacity(RB_THREAD_EVENT_CACHE_SIZE);
-  let mut paddle_packets : Vec<PaddlePacket> = Vec::with_capacity(RB_THREAD_EVENT_CACHE_SIZE);
-
 
   // allocate some memory we are using in 
   // every iteration of the loop
   const NPADDLES : usize = (NCHN - 1)/2; // assuming one channel 
                                            // is the channel 9
-  let mut paddle_packets_this_rb = [PaddlePacket::new(); NPADDLES];             
+
+  // each event has NPADDLES per readout board
+  // this holds all for a single event
+  // (needs to be reset each event)
+  let mut pp_this_event = [PaddlePacket::new(); NPADDLES];        
+
+
   // binary switch - false for side a and
   // true for side b
   let mut is_bside : bool = false;
@@ -92,12 +111,15 @@ fn analyze_blobs(buffer               : &Vec<u8>,
   let mut all_channel_waveforms : [[f64;NWORDS];NCHN] = [[0.0;NWORDS];NCHN];
   let mut all_channel_times     : [[f64;NWORDS];NCHN] = [[0.0;NWORDS];NCHN];
 
-  let mut channels_over_threshold : Vec<usize> = Vec::with_capacity(8);
-
-  #[cfg(feature = "diagnostics")]
-  let mut diagnostics_wf : Vec<CalibratedWaveform> = Vec::new();
+  // bitmask to keep track which channels/paddles are
+  // over threshold
+  let mut channels_over_threshold = [false;NCHN];
+  let mut paddles_over_threshold  = [false;NPADDLES];
 
   loop {
+    #[cfg(feature = "diagnostics")]
+    let mut diagnostics_wf : Vec<CalibratedWaveform> = Vec::new();
+    
     // if the following is true, we scanned throught the whole stream  
     if pos + get_constant_blobeventsize() >= (blobdata_size -1) {break;}
     byte = buffer[pos];
@@ -149,6 +171,15 @@ fn analyze_blobs(buffer               : &Vec<u8>,
               blob_data.remove_spikes(&mut spikes);
               for ch in 0..NCHN {
 
+                // reset our channels_over_threshold
+                channels_over_threshold[ch] = false;
+
+                // reset paddle packets for this event
+                for n in 0..NPADDLES {
+                  pp_this_event[n].reset();
+                  paddles_over_threshold[n] = false;
+                }
+
                 // analysis part
                 //let mut waveform = CalibratedWaveform::new(all_channel_waveforms[n],
                 //                                           all_channel_times[n]);
@@ -162,7 +193,8 @@ fn analyze_blobs(buffer               : &Vec<u8>,
                 // if the wf went over threashold
                 let is_ot = blob_data.set_threshold(10.0, ch);
                 if !is_ot {continue;}
-                channels_over_threshold.push(ch);
+                channels_over_threshold[ch] = true;
+                
                 blob_data.set_cfds_fraction(0.20, ch);
                 blob_data.integrate(270.0, 70.0, ch);
                 blob_data.find_peaks(270.0,70.0, ch);
@@ -170,54 +202,97 @@ fn analyze_blobs(buffer               : &Vec<u8>,
                 let cfd_time = blob_data.find_cfd_simple(0, ch);
                 //waveform.print();
                 // packing part
+                
+                // FIXME - this is not independent
+                // of the number of channels for the 
+                // readout board
                 match ch {
                   0 => {
-                    paddle_packets_this_rb[0].set_time_a(cfd_time);
+                    paddles_over_threshold[0] = true;
+                    pp_this_event[0].set_time_a(cfd_time);
                   },
                   1 => {
-                    paddle_packets_this_rb[1].set_time_b(cfd_time);
+                    paddles_over_threshold[0] = true;
+                    pp_this_event[0].set_time_b(cfd_time);
                   },
                   2 => {
-                    paddle_packets_this_rb[1].set_time_b(cfd_time);
+                    paddles_over_threshold[1] = true;
+                    pp_this_event[1].set_time_a(cfd_time);
                   },
                   3 => {
-                    paddle_packets_this_rb[1].set_time_b(cfd_time);
+                    paddles_over_threshold[1] = true;
+                    pp_this_event[1].set_time_b(cfd_time);
                   },
                   4 => {
-                    paddle_packets_this_rb[1].set_time_b(cfd_time);
+                    paddles_over_threshold[2] = true;
+                    pp_this_event[2].set_time_a(cfd_time);
                   },
                   5 => {
-                    paddle_packets_this_rb[1].set_time_b(cfd_time);
+                    paddles_over_threshold[2] = true;
+                    pp_this_event[2].set_time_b(cfd_time);
                   },
                   6 => {
-                    paddle_packets_this_rb[1].set_time_b(cfd_time);
+                    paddles_over_threshold[3] = true;
+                    pp_this_event[3].set_time_a(cfd_time);
                   },
                   7 => {
-                    paddle_packets_this_rb[1].set_time_b(cfd_time);
+                    paddles_over_threshold[3] = true;
+                    pp_this_event[3].set_time_b(cfd_time);
                   },
                   _ => {
                     debug!("Won't do anything for ch {}",ch);
+                  }
+                } // end match
+
+                // now set general properties on the 
+                // paddles
+                for n in 0..NPADDLES {
+                  // FIXME
+                  pp_this_event[n].paddle_id = n as u8;
+                  if paddles_over_threshold[n] {
+                    pp_this_event[n].event_id = blob_data.event_ctr;
                   }
                 }
                 
                 #[cfg(feature = "diagnostics")]
                 {  
-                  //events.push(blob_data);
                   let diag_wf = CalibratedWaveform::new(&blob_data, ch);
                   diagnostics_wf.push (diag_wf);
                 }
-              } // end loop over nchannel
+              } // end loop over readout board channels
             }
-            blob_events.push(blob_data);
+            blob_events.push_back(blob_data);
+
+            // put the finished paddle packets in 
+            // our container
+            for n in 0..NPADDLES {
+              if paddles_over_threshold[n] {
+                paddle_packets.push_back(pp_this_event[n]);
+                pp_sender.send(pp_this_event[n]);
+              }
+            }
         } else {
-            // the event is corrupt
-            //println!("{}", blob_data.head);
-            ncorrupt_blobs += 1;
+          // the event is corrupt
+          //println!("{}", blob_data.head);
+          ncorrupt_blobs += 1;
         }
       } else {
           // it wasn't an actual header
           header_found_start = false;
       }
+    } // endif header_found_start
+
+    // we have to check that our queues do not 
+    // use more space than we originally want
+    if blob_events.len() > RB_THREAD_EVENT_CACHE_SIZE {
+      error!("Event cache limit of {} reached. Will drop blob data!", RB_THREAD_EVENT_CACHE_SIZE);
+      blob_events.pop_front();
+      // FIXME - let somebody now that we dropped something
+    }
+    if paddle_packets.len() > RB_THREAD_EVENT_CACHE_SIZE {
+      error!("Event cache limit of {} reached. Will drop paddle packets!", RB_THREAD_EVENT_CACHE_SIZE);
+      paddle_packets.pop_front();
+      // FIXME - let somebody now that we dropped something
     }
   }// end loop
 
@@ -251,9 +326,16 @@ fn get_blobs_from_file (rb_id : usize) {
   let blobs = get_file_as_byte_vec(&filepath);
   // FIXME - this must be thre real calibrations
   let calibrations = [Calibrations {..Default::default()};NCHN];
+  let mut blob_events    : VecDeque<BlobData>     = VecDeque::with_capacity(RB_THREAD_EVENT_CACHE_SIZE);
+  let mut paddle_packets : VecDeque<PaddlePacket> = VecDeque::with_capacity(RB_THREAD_EVENT_CACHE_SIZE);
+  //let sender = Sender::<PaddlePacket>();
+  let (sender, receiver) = channel();
   match analyze_blobs(&blobs,
-                      rb_id,
+                      &mut blob_events,
+                      &mut paddle_packets,
+                      &sender,
                       false,
+                      rb_id,
                       false,
                       false,
                       &calibrations,
@@ -302,13 +384,14 @@ fn identifiy_readoutboard(msg : &zmq::Message) -> bool
 ///
 ///
 pub fn readoutboard_communicator(socket           : &zmq::Socket,
+                                 pp_pusher        : Sender<PaddlePacket>,
                                  board_id         : usize,
                                  write_blob       : bool,
                                  calibration_file : &str)
 {
-  info!("initializing for board {}!", board_id);
-  let mut msg = zmq::Message::new();
-  let mut n_errors = 0usize;
+  info!("initializing RB thread for board {}!", board_id);
+  let mut msg             = zmq::Message::new();
+  let mut n_errors        = 0usize;
   let mut lost_blob_files = 0usize;
   // how many chunks ("buffers") we dealt with
   let mut n_chunk  = 0usize;
@@ -322,7 +405,26 @@ pub fn readoutboard_communicator(socket           : &zmq::Socket,
     calibrations = read_calibration_file(cal_file_path); 
   }
 
+  let mut blob_events    : VecDeque<BlobData>     = VecDeque::with_capacity(RB_THREAD_EVENT_CACHE_SIZE);
+  let mut paddle_packets : VecDeque<PaddlePacket> = VecDeque::with_capacity(RB_THREAD_EVENT_CACHE_SIZE);
+  // we do two things here:
+  // 1) Waiting for new blobs over our zmq socket
+  // 2) As long as we are not busy receiving/analyzing 
+  //    blobs, we work on the sending events out 
+  //    to the eventbuilder
   loop {
+    // work through our backlog and send everything 
+    // should we load that work of to the event builder 
+    // and just send everything right away?
+    println!("We have to work on {} paddle packets!", paddle_packets.len());
+    for n in 0..paddle_packets.len() 
+      {
+        let pp = paddle_packets.pop_front();    
+      } 
+
+
+    // check if we got new data
+    // this is blocking the thread
     match socket.recv(&mut msg, 0) {
       Ok(_) => {
           trace!("Working...");
@@ -350,10 +452,13 @@ pub fn readoutboard_communicator(socket           : &zmq::Socket,
           }
           // do the work
           match analyze_blobs(&buffer,
+                              &mut blob_events,
+                              &mut paddle_packets,
+                              &pp_pusher,
+                              true,
                               board_id,
                               false,
                               true,
-                              false,
                               &calibrations,
                               n_chunk) {
             Ok(nblobs)   => debug!("Read {} blobs from buffer", nblobs),

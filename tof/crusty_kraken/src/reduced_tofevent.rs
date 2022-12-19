@@ -11,6 +11,7 @@ pub struct PaddlePacket  {
   //unsigned short head = 0xF0F0;
   pub head         : u16,
   //pub p_length     : u16,
+  pub paddle_id    : u8,
   pub time_a       : u16,
   pub time_b       : u16,
   pub peak_a       : u16,
@@ -22,22 +23,28 @@ pub struct PaddlePacket  {
   pub t_average    : u16,
   pub ctr_etx      : u8,
   pub tail         : u16,
+
+  // fields which won't get 
+  // serialized
+  pub event_id     : u32
 }
 
 impl PaddlePacket {
   pub fn new() -> PaddlePacket {
-    PaddlePacket{head  :   61680, // 0xF0F0
-                 time_a:   0,
-                 time_b:   0,
-                 peak_a:   0,
-                 peak_b:   0,
-                 charge_a: 0,
-                 charge_b: 0,
-                 charge_min_i: 0,
-                 pos_across: 0,
-                 t_average : 0,
-                 ctr_etx   : 0,
-                 tail      :3855}// 0xF0F);
+    PaddlePacket{head         : 61680, // 0xF0F0
+                 event_id     : 0,
+                 paddle_id    : 0,
+                 time_a       : 0,
+                 time_b       : 0,
+                 peak_a       : 0,
+                 peak_b       : 0,
+                 charge_a     : 0,
+                 charge_b     : 0,
+                 charge_min_i : 0,
+                 pos_across   : 0,
+                 t_average    : 0,
+                 ctr_etx      : 0,
+                 tail         :3855}// 0xF0F);
 
   }
 
@@ -55,6 +62,19 @@ impl PaddlePacket {
     assert!(side == 0 || side == 1);
     if side == 0 {self.set_time_a(time);}
     if side == 1 {self.set_time_b(time);}
+  }
+
+  pub fn reset(&mut self) {
+    self.time_a       =  0;
+    self.time_b       =  0;
+    self.peak_a       =  0;
+    self.peak_b       =  0;
+    self.charge_a     =  0;
+    self.charge_b     =  0;
+    self.charge_min_i =  0;
+    self.pos_across   =  0;
+    self.t_average    =  0;
+    self.ctr_etx      =  0;
   }
 
 
