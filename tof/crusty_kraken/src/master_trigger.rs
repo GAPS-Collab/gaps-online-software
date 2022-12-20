@@ -185,8 +185,8 @@ fn read_event_cnt(socket : &UdpSocket,
   event_count
 }
 
-fn reset_event_cnt(socket : &UdpSocket,
-                   target_address : &str) {
+pub fn reset_event_cnt(socket : &UdpSocket,
+                       target_address : &str) {
   debug!("Resetting event counter!");
   let mut buffer = [0u8;MT_MAX_PACKSIZE];
   write_register(socket, target_address, 0xc,1,&mut buffer);
@@ -295,8 +295,9 @@ pub fn master_and_commander(mt_ip   : &str,
   // for rate measurement
   let start = Instant::now();
 
+  let mut next_beat = true;
   // limit polling rate to a maximum
-  let max_rate = 1000.0; // hz
+  let max_rate = 200.0; // hz
     
   // this is not strrictly necessary, but 
   // it is nice to limit communications
@@ -306,7 +307,9 @@ pub fn master_and_commander(mt_ip   : &str,
   }
   // reset the master trigger before acquisiton
   reset_daq(&socket, &mt_address);  
-  reset_event_cnt(&socket, &mt_address); 
+  // the event counter has to be reset before 
+  // we connect to the readoutboards
+  //reset_event_cnt(&socket, &mt_address); 
  
   loop {
     // limit the max polling rate
@@ -333,7 +336,7 @@ pub fn master_and_commander(mt_ip   : &str,
     // 2 - empty
     //if 0 != (read_register(&socket, &mt_address, 0x12, &mut buffer) & 0x2) {
     if read_register(&socket, &mt_address, 0x12, &mut buffer) == 2 {
-      info!("No new information from DAQ");
+      trace!("No new information from DAQ");
       //reset_daq(&socket, &mt_address);  
       continue;
     }
@@ -341,7 +344,7 @@ pub fn master_and_commander(mt_ip   : &str,
     //event_cnt = read_event_cnt(&socket, &mt_address, &mut buffer);
     (event_cnt, n_paddles_expected) = read_daq(&socket, &mt_address, &mut buffer);
     if event_cnt == last_event_cnt {
-      info!("Same event!");
+      trace!("Same event!");
       continue;
     }
 
@@ -353,13 +356,14 @@ pub fn master_and_commander(mt_ip   : &str,
     }
     
     if event_cnt - last_event_cnt > 1 {
-      let missing = event_cnt - last_event_cnt;
+      let mut missing = event_cnt - last_event_cnt;
       
       // FIXME
       if missing < 200 {
         missing_evids += missing as usize;
       } else {
         warn!("We missed too many event ids from the master trigger!");
+        missing = 0;
       }
       //error!("We missed {} events!", missing);
       event_missing = true;
@@ -384,13 +388,16 @@ pub fn master_and_commander(mt_ip   : &str,
 
     // a heartbeat every 10 s
     let elapsed = start.elapsed().as_secs();
-    if elapsed % 10 == 0 {
+    if (elapsed % 10 == 0) && next_beat {
       println!("== == == == == == == == HEARTBEAT! {} seconds passed!", elapsed);
       rate = n_events as f64 / elapsed as f64;
       println!("==> {} events recorded, trigger rate: {:.3} Hz", n_events, rate);
       rate = n_events_expected as f64 / elapsed as f64;
       println!("==> -- expected rate {:.3} Hz", rate);   
       println!("== == == == == == == == END HEARTBEAT!");
+      next_beat = false;
+    } else if elapsed % 10 != 0 {
+      next_beat = true;
     }
 
   } // end loop

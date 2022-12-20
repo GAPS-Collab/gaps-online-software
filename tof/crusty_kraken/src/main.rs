@@ -131,6 +131,7 @@ fn main() {
    master_trigger_port = config["master_trigger"]["port"].as_usize().unwrap();
    info!("Will connect to the master trigger board at {}:{}", master_trigger_ip, master_trigger_port);
   }
+  
 
   //let matches = command!() // requires `cargo` feature
   //     //.arg(arg!([name] "Optional name to operate on"))
@@ -211,21 +212,21 @@ fn main() {
   let nthreads = nboards + 2; // 
   let worker_threads = ThreadPool::new(nthreads);
   
-
-  // for debugging, if master trigger only 
-  // run master trigger thread
+  println!("==> Starting event builder and master trigger threads...");
   if master_trigger {
-    worker_threads.execute(move || {
-                           master_and_commander(&master_trigger_ip, 
-                                                master_trigger_port,
-                                                &master_ev_send);
-    });
     // start the event builder thread
     worker_threads.execute(move || {
                            event_builder(&master_ev_rec,
                                          &pp_rec);
     });
+    // master trigger
+    worker_threads.execute(move || {
+                           master_and_commander(&master_trigger_ip, 
+                                                master_trigger_port,
+                                                &master_ev_send);
+    });
   }
+  println!("==> Will now start rb threads..");
 
 
   // open a zmq context
@@ -245,22 +246,31 @@ fn main() {
       panic!("The desired configuration file {} does not exist!", cali_file_name);
     }
 
-    //let result = rb_comm_socket.bind(&address);
-    //match result {
-    //    Ok(_)    => info!("Bound socket to {}", address),
-    //    Err(err) => panic!("Can not communicate with rb at address {}. Maybe you want to check your .json configuration file?, error {}",address, err)
-    //}
-    //let this_rb_pp_sender = pp_send.clone();
-    //worker_threads.execute(move || {
-    //  readoutboard_communicator(&rb_comm_socket,
-    //                            this_rb_pp_sender,
-    //                            rb_id,
-    //                            write_blob,
-    //                            &cali_file_name); 
-    //});
+    let result = rb_comm_socket.bind(&address);
+    match result {
+        Ok(_)    => info!("Bound socket to {}", address),
+        Err(err) => panic!("Can not communicate with rb at address {}. Maybe you want to check your .json configuration file?, error {}",address, err)
+    }
+    let this_rb_pp_sender = pp_send.clone();
+    worker_threads.execute(move || {
+      readoutboard_communicator(&rb_comm_socket,
+                                this_rb_pp_sender,
+                                rb_id,
+                                write_blob,
+                                &cali_file_name); 
+    });
   } // end for loop over nboards
-
   let one_minute = time::Duration::from_millis(60000);
+  let one_second = time::Duration::from_millis(1000);
+  
+  // now as we have the readoutboard threads started, 
+  // give them some time to fire up and then let the 
+  // event builder and finally the master trigger 
+  // thread start
+  
+  //println!("==> Sleeping a bit to give the rb's a chance to fire up..");
+  //thread::sleep(10*one_second);
+
   thread::sleep(10*one_minute);
   println!("Program terminating after specified runtime! So long and thanks for all the {}", fish); 
 }

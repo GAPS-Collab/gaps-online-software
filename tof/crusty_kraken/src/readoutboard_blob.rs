@@ -555,7 +555,7 @@ impl BlobData {
     // FIXME
     // FIXME - this needs some serious error checking
     if self.end_peak[ch][peak_num] < self.begin_peak[ch][peak_num] {
-        warn!("cfd simple method failed!! Peak begin {}, peak end {}", self.begin_peak[ch][peak_num], self.end_peak[ch][peak_num]);
+        debug!("cfd simple method failed!! Peak begin {}, peak end {}", self.begin_peak[ch][peak_num], self.end_peak[ch][peak_num]);
         return 0.0;
     }
     let mut idx : usize;
@@ -683,8 +683,8 @@ impl BlobData {
         peak_bins += 1;
         if peak_bins == min_peak_width {
           // we have a new peak
-          if peak_ctr == MAX_NUM_PEAKS {
-            info!("Max number of peaks reached in this waveform");
+          if peak_ctr == MAX_NUM_PEAKS -1 {
+            debug!("Max number of peaks reached in this waveform");
             break;
           }
           self.begin_peak[ch][peak_ctr] = n - (min_peak_width - 1); 

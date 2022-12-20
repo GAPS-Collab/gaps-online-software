@@ -260,7 +260,8 @@ fn analyze_blobs(buffer               : &Vec<u8>,
             // put the finished paddle packets in 
             // our container
             for n in 0..NPADDLES {
-              if paddles_over_threshold[n] {
+              //if paddles_over_threshold[n] {
+              if true {
                 pp_sender.send(pp_this_event[n]);
               }
             }
@@ -444,7 +445,7 @@ pub fn readoutboard_communicator(socket           : &zmq::Socket,
 
           // currently, for debugging just stop after one 
           // chunk
-          panic!("You shall not pass!");
+          //panic!("You shall not pass!");
           
       }
       Err(err) => {

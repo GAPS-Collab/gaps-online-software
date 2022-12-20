@@ -11,18 +11,18 @@
       "dna"              : "foobar",
       "n_data_channels"  : 8,
       "nwords"           : 1024,
-      "calibration_file" : "/home/achim/gaps/software/gaps-online-software/tof/resources/calibrations/rb1_cal.txt",
-      "ip_address"       : "10.97.108.16",
-      "port"             : 46212
+      "calibration_file" : "/home/gaps/astoessl/gaps-online-software/tof/resources/calibrations/rb1_cal.txt",
+      "ip_address"       : "10.97.108.31",
+      "port"             : 38830
     },
     {
       "id"               : 17,
       "dna"              : "foobar",
       "n_data_channels"  : 8,
       "nwords"           : 1024,
-      "calibration_file" : "/home/achim/gaps/software/gaps-online-software/tof/resources/calibrations/rb2_cal.txt",
-      "ip_address"       : "10.97.108.17",
-      "port"             : 51422
+      "calibration_file" : "/home/gaps/astoessl/gaps-online-software/tof/resources/calibrations/rb2_cal.txt",
+      "ip_address"       : "10.97.108.31",
+      "port"             : 38831
     }
   ]
 }
