@@ -104,7 +104,7 @@ fn main() {
   let json_content  : String;
   let config        : json::JsonValue;
   
-  let mut nboards   : usize;
+  let nboards       : usize;
 
   let master_trigger = args.master_trigger;
   let mut master_trigger_ip   = String::from("");
@@ -203,7 +203,7 @@ fn main() {
   // prepare channels for inter thread communications
   let (master_ev_send, master_ev_rec): (Sender<MasterTriggerEvent>, Receiver<MasterTriggerEvent>) = channel(); 
   let (pp_send, pp_rec) : (Sender<PaddlePacket>, Receiver<PaddlePacket>) = channel(); 
-
+  let (id_send, id_rec) : (Sender<u32>, Receiver<u32>) = channel();
   // prepare a thread pool. Currently we have
   // 1 thread per rb, 1 master trigger thread
   // and 1 event builder thread. There might
@@ -219,6 +219,7 @@ fn main() {
     // start the event builder thread
     worker_threads.execute(move || {
                            event_builder(&master_ev_rec,
+                                         &id_send,
                                          &pp_rec);
     });
     // master trigger

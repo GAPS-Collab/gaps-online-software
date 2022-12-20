@@ -8,7 +8,8 @@
 ///
 
 
-use std::sync::mpsc::Receiver;
+use std::sync::mpsc::{Sender,
+                      Receiver};
 use std::collections::VecDeque;
 //use std::collections::HashMap;
 
@@ -17,114 +18,221 @@ use time::{Duration,
 
 use crate::reduced_tofevent::{PaddlePacket, TofEvent};
 use crate::master_trigger::MasterTriggerEvent;
+use crate::constants::EVENT_BUILDER_EVID_CACHE_SIZE;
+
+//fn paddle_query (timeout_in_mus : u64,
+//                 event_id : u32,
+//                 event    : &mut TofEvent,
+//                 pp_query : &Receiver<PaddlePacket>) {
+//
+//  let start = Instant::now();
+//  let timeout = Duration::from_micros(timeout_in_mus)
+//                .as_micros();
+//  pp_query.send(event.event_id);
+//  while (start.elapsed().as_millis() < timeout) {
+//    let mut n_pad = 0;
+//    match pp_query.try_recv() { 
+//      Err(_) => {}
+//      Ok(pp) => {
+//        event.paddle_packets.push(pp);
+//        n_pad += 1
+//      }
+//    } // end match
+//    if event.is_complete() {
+//      trace!("Event {} building complete!", event.n_paddles);
+//      break;
+//    }
+//  } // end while not timeout
+//} // end fn
+
 
 ///
 ///
 ///
 ///
 pub fn event_builder (master_id      : &Receiver<MasterTriggerEvent>,
+                      pp_query       : &Sender<u32>,
                       paddle_packets : &Receiver<PaddlePacket>) {
 
-  let n_events_backlog = 10;
+  let mut event_cache = VecDeque::<TofEvent>::with_capacity(EVENT_BUILDER_EVID_CACHE_SIZE);
 
-  let mut last_event_id : u32;
-  //
-  let mut events_backlog_prev = VecDeque::<PaddlePacket>::with_capacity(100);
-  let mut events_backlog_new  = VecDeque::<PaddlePacket>::with_capacity(100);
-  //let mut events_backlog : HashMap<u32,TofEvent> = HashMap::with_capacity(100);
+  // timeout in microsecnds
+  let timeout_micro = 100;
+ 
+  // we try to receive eventids from the master trigger
+  loop {
+   // let's work on our backlog and check if we can complete 
+   // events
+   for ev in event_cache.iter_mut() {
+     let start = Instant::now();
+     let timeout = Duration::from_micros(timeout_micro)
+                   .as_micros();
+     pp_query.send(ev.event_id);
+     while (start.elapsed().as_micros() < timeout) {
+       let mut n_pad = 0;
+       match paddle_packets.try_recv() { 
+         Err(_) => {}
+         Ok(pp) => {
+           ev.paddle_packets.push(pp);
+           n_pad += 1
+         }
+       } // end match
+       if ev.is_complete() {
+         trace!("Event {} building complete!", ev.event_id);
+         break; // on to the next event in cache
+       }
+     } // end while not timeout
+   }
+   // clean the cache - remove all completed events
+   event_cache.retain(|ev| !ev.is_complete());
 
-  // FIXME make this configurable
-  let wait_for_pp_timeout = Duration::from_millis(20).as_millis();
+   // every iteration, we welcome a new master event
+   match master_id.try_recv() {
+     Err(_) => {
+       trace!("No new event ready yet!");
+       continue;
+     }   
+     Ok(mt) => {
+       trace!("Got trigger for event {} with {} expected hit paddles"
+              , mt.event_id
+              , mt.n_paddles);
+       let mut event = TofEvent::new(mt.event_id, mt.n_paddles);
+       // let's query the paddle packet cache for a certain time
+       // and then move on and try later again      
+       let start = Instant::now();
+       let timeout = Duration::from_micros(timeout_micro)
+                     .as_micros();
+       pp_query.send(mt.event_id);
+       while (start.elapsed().as_micros() < timeout) {
+         let mut n_pad = 0;
+         match paddle_packets.try_recv() { 
+           Err(_) => {}
+           Ok(pp) => {
+             event.paddle_packets.push(pp);
+             n_pad += 1
 
-  // the first iteration of the loop waits
-  // till we are in sync
-  let mut first = true;
-  
-  let mut mt_is_behind = false;
-  // the events might not be in order here
-  // so we have to check the incoming event ids
+           }
+         } // end match
+         if event.paddle_packets.len() == mt.n_paddles as usize {
+           trace!("Event {} building complete!", mt.event_id);
+           break;
+         }
+       } // end while not timeout
+       if event.paddle_packets.len() == mt.n_paddles as usize {
+         trace!("Event {} building complete!", mt.event_id);
+         continue; // on to the next mt event
+       } else {
+         // we have to put the event on the stack and try
+         // again later
+         event_cache.push_back(event);
+       }
+     }
+    } // end match Ok(mt)
+  trace!("Size of event cache {}", event_cache.len());
 
-  let mut n_triggers = 0usize;
-  for master_event in master_id {
-    let m_id = master_event.event_id;
-    let n_paddles = master_event.n_paddles;
-    n_triggers += 1;
-    if n_triggers % 100 == 0 {
-      println!("Got {} triggers", n_triggers);
-      println!("Last trigger {}", m_id);
-      println!("Length of backlog {}", events_backlog_prev.len());
-      if events_backlog_prev.len() > 0 {
-        println!("First bl event id {}", events_backlog_prev[0].event_id);
-      }
-    }
-
-    // two scenarios 
-    // 1) the mt is behind
-    // 2) th pps are behind
-    if n_paddles == 0 {
-      error!("Received master event id {}, but there are no hit paddles with it!", m_id);
-      continue;
-    }
-    trace!("Received master event id {} with n_paddles {}", m_id, n_paddles);
-    //println!("==> Received master event id {} with n_paddles {}", m_id, n_paddles);
-    events_backlog_new.clear();
-
-    let mut event = TofEvent::new(m_id, n_paddles as u8);  
+  } // end loop
 
 
-    while events_backlog_prev.len() > 0 {
-      let pp = events_backlog_prev.pop_front().unwrap();
-      if pp.event_id == m_id {
-        event.paddle_packets.push(pp);
-      } else { 
-        events_backlog_new.push_back(pp);
-      }
-    }
-    
-    if event.is_complete() {
-      println!("==> Event with id {} ready to be sent!", m_id);
-      event.paddle_packets[0].print();
-      continue;
-    }
-
-    let start = Instant::now();
-    while (start.elapsed().as_millis() < wait_for_pp_timeout) || first {
-      //for pp in paddle_packets {
-      match paddle_packets.try_recv() {
-        Ok(pp) => {  
-          trace!("Got pp with id {}, m_id {}", pp.event_id, event.event_id); 
-          if pp.event_id < event.event_id {
-            // if we are here currently we can not do anything
-            // the event is lost
-            break;
-          }
-          if pp.event_id == m_id {
-            event.paddle_packets.push(pp);    
-          } else {
-            events_backlog_new.push_back(pp);
-          }
-          if event.is_complete() {
-            println!("==> Event with id {} ready to be sent!", m_id);
-            event.paddle_packets[0].print();
-            first = false;
-            break;
-          }
-      
-          //// alternatively, if the timeout runs out, 
-          //// break here
-          //if start.elapsed() > wait_for_pp_timeout {
-          //  break;
-          //}
-        },
-        Err(_) => {break;}
-      }
-    trace!("TIMEOUT!");
-    continue;
-    }
-
-    // this is expensive!
-    events_backlog_prev = events_backlog_new.clone();
-  
-  }
+//  let n_events_backlog = 10;
+//
+//  let mut last_event_id : u32;
+//  //
+//  let mut events_backlog_prev = VecDeque::<PaddlePacket>::with_capacity(100);
+//  let mut events_backlog_new  = VecDeque::<PaddlePacket>::with_capacity(100);
+//  //let mut events_backlog : HashMap<u32,TofEvent> = HashMap::with_capacity(100);
+//
+//  // FIXME make this configurable
+//  let wait_for_pp_timeout = Duration::from_millis(20).as_millis();
+//
+//  // the first iteration of the loop waits
+//  // till we are in sync
+//  let mut first = true;
+//  
+//  let mut mt_is_behind = false;
+//  // the events might not be in order here
+//  // so we have to check the incoming event ids
+//
+//  let mut n_triggers = 0usize;
+//  for master_event in master_id {
+//    let m_id = master_event.event_id;
+//    let n_paddles = master_event.n_paddles;
+//    n_triggers += 1;
+//    if n_triggers % 100 == 0 {
+//      println!("Got {} triggers", n_triggers);
+//      println!("Last trigger {}", m_id);
+//      println!("Length of backlog {}", events_backlog_prev.len());
+//      if events_backlog_prev.len() > 0 {
+//        println!("First bl event id {}", events_backlog_prev[0].event_id);
+//      }
+//    }
+//
+//    // two scenarios 
+//    // 1) the mt is behind
+//    // 2) th pps are behind
+//    if n_paddles == 0 {
+//      error!("Received master event id {}, but there are no hit paddles with it!", m_id);
+//      continue;
+//    }
+//    trace!("Received master event id {} with n_paddles {}", m_id, n_paddles);
+//    //println!("==> Received master event id {} with n_paddles {}", m_id, n_paddles);
+//    events_backlog_new.clear();
+//
+//    let mut event = TofEvent::new(m_id, n_paddles as u8);  
+//
+//
+//    while events_backlog_prev.len() > 0 {
+//      let pp = events_backlog_prev.pop_front().unwrap();
+//      if pp.event_id == m_id {
+//        event.paddle_packets.push(pp);
+//      } else { 
+//        events_backlog_new.push_back(pp);
+//      }
+//    }
+//    
+//    if event.is_complete() {
+//      println!("==> Event with id {} ready to be sent!", m_id);
+//      event.paddle_packets[0].print();
+//      continue;
+//    }
+//
+//    let start = Instant::now();
+//    while (start.elapsed().as_millis() < wait_for_pp_timeout) || first {
+//      //for pp in paddle_packets {
+//      match paddle_packets.try_recv() {
+//        Ok(pp) => {  
+//          trace!("Got pp with id {}, m_id {}", pp.event_id, event.event_id); 
+//          if pp.event_id < event.event_id {
+//            // if we are here currently we can not do anything
+//            // the event is lost
+//            break;
+//          }
+//          if pp.event_id == m_id {
+//            event.paddle_packets.push(pp);    
+//          } else {
+//            events_backlog_new.push_back(pp);
+//          }
+//          if event.is_complete() {
+//            println!("==> Event with id {} ready to be sent!", m_id);
+//            event.paddle_packets[0].print();
+//            first = false;
+//            break;
+//          }
+//      
+//          //// alternatively, if the timeout runs out, 
+//          //// break here
+//          //if start.elapsed() > wait_for_pp_timeout {
+//          //  break;
+//          //}
+//        },
+//        Err(_) => {break;}
+//      }
+//    trace!("TIMEOUT!");
+//    continue;
+//    }
+//
+//    // this is expensive!
+//    events_backlog_prev = events_backlog_new.clone();
+//  
+//  }
 }
 
