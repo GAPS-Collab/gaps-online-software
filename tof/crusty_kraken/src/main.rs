@@ -10,6 +10,7 @@ mod commands;
 mod master_trigger;
 mod monitoring;
 mod event_builder;
+mod paddle_packet_cache;
 
 // this is a list of tests
 // FIXME - this should follow

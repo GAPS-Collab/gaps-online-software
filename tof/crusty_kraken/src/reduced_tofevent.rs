@@ -26,13 +26,13 @@ pub struct PaddlePacket  {
 
   // fields which won't get 
   // serialized
-  pub event_id     : u32
+  pub event_id     : u32,
+  pub valid        : bool
 }
 
 impl PaddlePacket {
   pub fn new() -> PaddlePacket {
     PaddlePacket{head         : 61680, // 0xF0F0
-                 event_id     : 0,
                  paddle_id    : 0,
                  time_a       : 0,
                  time_b       : 0,
@@ -44,8 +44,16 @@ impl PaddlePacket {
                  pos_across   : 0,
                  t_average    : 0,
                  ctr_etx      : 0,
-                 tail         :3855}// 0xF0F);
+                 tail         : 3855,
+                 // non-serialize fields
+                 event_id     : 0,
+                 valid        : true
+                 }// 0xF0F);
 
+  }
+
+  pub fn invalidate(&mut self) {
+    self.valid = false;
   }
 
   pub fn set_time_a(&mut self, time : f64 ) {
@@ -75,6 +83,8 @@ impl PaddlePacket {
     self.pos_across   =  0;
     self.t_average    =  0;
     self.ctr_etx      =  0;
+    self.event_id     =  0;
+    self.valid        =  true;
   }
 
 
