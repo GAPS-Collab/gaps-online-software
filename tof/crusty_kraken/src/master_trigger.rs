@@ -25,6 +25,16 @@ enum PACKET_TYPE {
 }
 
 
+fn count_ones(input :u32) -> u32 {
+  let mut count = 0u32;
+  let mut value = input;
+  while value > 0 {
+    count += value & 1;
+    value >>= 1;
+  }
+  count
+}
+
 
 ///
 ///
@@ -143,29 +153,72 @@ fn read_register(socket      : &UdpSocket,
   data
 }
 
+// FIXME - there is no verification step!
+fn write_register(socket      : &UdpSocket,
+                  target_addr : &str,
+                  reg_addr    : u32,
+                  data        : u32,
+                  buffer      : &mut [u8;MT_MAX_PACKSIZE]){
+
+  let send_data = Vec::<u32>::from([data]);
+  let message   = encode_ipbus(reg_addr,
+                               PACKET_TYPE::WRITE,
+                               &send_data);
+  socket.send_to(message.as_slice(), target_addr);
+  let (number_of_bytes, src_addr) = socket.recv_from(buffer).expect("No data!");
+  trace!("Received {} bytes from master trigger", number_of_bytes);
+  //let data = decode_ipbus(buffer, false)[0];
+//def wReg(address, data, verify=False):
+//    s.sendto(encode_ipbus(addr=address, packet_type=WRITE, data=[data]), target_ad    dress)
+//    s.recvfrom(4096)
+//    rdback = rReg(address)
+//    if (verify and rdback != data):
+//        print("Error!")
+//
+}
+
 fn read_event_cnt(socket : &UdpSocket,
                   target_address : &str,
                   buffer : &mut [u8;MT_MAX_PACKSIZE]) -> u32 {
   let event_count = read_register(socket, target_address, 0xd, buffer);
-  debug!("Got event count! {} ", event_count);
+  trace!("Got event count! {} ", event_count);
   event_count
+}
+
+fn reset_event_cnt(socket : &UdpSocket,
+                   target_address : &str) {
+  debug!("Resetting event counter!");
+  let mut buffer = [0u8;MT_MAX_PACKSIZE];
+  write_register(socket, target_address, 0xc,1,&mut buffer);
+}
+
+fn reset_daq(socket : &UdpSocket,
+             target_address : &str) {
+  debug!("Resetting DAQ!");
+  let mut buffer = [0u8;MT_MAX_PACKSIZE];
+  write_register(socket, target_address, 0x10, 1,&mut buffer);
 }
 
 fn read_daq(socket : &UdpSocket,
             target_address : &str,
-            buffer : &mut [u8;MT_MAX_PACKSIZE]) -> u32 {
+            buffer : &mut [u8;MT_MAX_PACKSIZE]) -> (u32, u32) {
   // check if the queue is full
   let mut event_ctr  = 0u32;
   let mut timestamp  = 0u32;
   let mut timecode32 = 0u32;
   let mut timecode16 = 0u32;
   let mut mask       = 0u32;
-  let mut hits       = 0u32;
+  //let mut hits       = 0u32;
   let mut crc        = 0u32;
   let mut trailer    = 0u32;
 
   let word = read_register(socket, target_address, 0x11, buffer);
-  
+  let mut hit_paddles = 0u32;
+  // this will eventually determin, 
+  // how often we will read the 
+  // hit register
+  let mut paddles_rxd     = 1u32;
+  let mut hits = Vec::<u32>::with_capacity(24);
   if word == 0xAAAAAAAA {
     // we start a new daq package
     event_ctr   = read_register(socket, target_address, 0x11, buffer);
@@ -173,11 +226,20 @@ fn read_daq(socket : &UdpSocket,
     timecode32  = read_register(socket, target_address, 0x11, buffer);
     timecode16  = read_register(socket, target_address, 0x11, buffer);
     mask        = read_register(socket, target_address, 0x11, buffer);
-    hits        = read_register(socket, target_address, 0x11, buffer);
+    hit_paddles = count_ones(mask);
+    hits.push     (read_register(socket, target_address, 0x11, buffer));
+    //allhits.push(hits);  
+    while paddles_rxd < hit_paddles {
+      hits.push(read_register(socket, target_address, 0x11, buffer));
+      paddles_rxd += 1;
+    }
     crc         = read_register(socket, target_address, 0x11, buffer);
     trailer     = read_register(socket, target_address, 0x11, buffer);
- 
-    println!("event_ctr {}, ts {} , tc32 {}, tc16 {}, mask {}, hits {}, crc {}, trailer {}", event_ctr, timestamp, timecode32, timecode16, mask, hits, crc, trailer);
+
+    debug!("event_ctr {}, ts {} , tc32 {}, tc16 {}, mask {}, crc {}, trailer {}", event_ctr, timestamp, timecode32, timecode16, hit_paddles, crc, trailer);
+    for n in 0..hits.len() {
+      debug!(" -- -- hit {}", hits[n]);
+    }
   } // end header found
     //AAAAAAAA (Header)
     //0286A387 (Event cnt)
@@ -188,7 +250,7 @@ fn read_daq(socket : &UdpSocket,
     //00000003 (Hits)
     //97041A48 (CRC)
     //55555555 (Trailer)
-  event_ctr
+  (event_ctr, hit_paddles)
 }
 
 ///
@@ -197,7 +259,7 @@ fn read_daq(socket : &UdpSocket,
 ///
 pub fn master_and_commander(mt_ip   : &str, 
                             mt_port : usize,
-                            evid_sender : &Sender<u32>) {
+                            evid_sender : &Sender<(u32, u32)>) {
 
   let mt_address = mt_ip.to_owned() + ":" + &mt_port.to_string();
   //let mut socket : UdpSocket;
@@ -215,12 +277,6 @@ pub fn master_and_commander(mt_ip   : &str,
  
   //socket.set_nonblocking(true).unwrap();
   
-  // this is not strrictly necessary, but 
-  // it is nice to limit communications
-  match socket.connect(&mt_address) {
-    Err(err) => panic!("Can not connect to master trigger at {}, err {}", mt_address, err),
-    Ok(_)    => info!("Successfully connected to the master trigger at {}", mt_address)
-  }
   
   // we only allocate the buffer once
   // and reuse it for all operations
@@ -234,34 +290,58 @@ pub fn master_and_commander(mt_ip   : &str,
   // these are the number of expected events
   // (missing included)
   let mut n_events_expected = 0usize;
+  let mut n_paddles_expected : u32;
   let mut rate = 0f64;
   // for rate measurement
   let start = Instant::now();
 
   // limit polling rate to a maximum
   let max_rate = 1000.0; // hz
+    
+  // this is not strrictly necessary, but 
+  // it is nice to limit communications
+  match socket.connect(&mt_address) {
+    Err(err) => panic!("Can not connect to master trigger at {}, err {}", mt_address, err),
+    Ok(_)    => info!("Successfully connected to the master trigger at {}", mt_address)
+  }
+  // reset the master trigger before acquisiton
+  reset_daq(&socket, &mt_address);  
+  reset_event_cnt(&socket, &mt_address); 
+ 
   loop {
     // limit the max polling rate
     let milli_sleep = Duration::from_millis((1000.0/max_rate) as u64);
     thread::sleep(milli_sleep);
-  //  let received = socket.recv_from(&mut buffer);
+  
+    //match socket.connect(&mt_address) {
+    //  Err(err) => panic!("Can not connect to master trigger at {}, err {}", mt_address, err),
+    //  Ok(_)    => info!("Successfully connected to the master trigger at {}", mt_address)
+    //}
+    //  let received = socket.recv_from(&mut buffer);
 
-  //  match received {
-  //    Ok((size, addr)) => println!("Received {} bytes from address {}", size, addr),
-  //    Err(err)         => {
-  //      println!("Received nothing! err {}", err);
-  //      continue;
-  //    }
-  //  } // end match
+    //  match received {
+    //    Ok((size, addr)) => println!("Received {} bytes from address {}", size, addr),
+    //    Err(err)         => {
+    //      println!("Received nothing! err {}", err);
+    //      continue;
+    //    }
+    //  } // end match
     
-    // daq not ready
-    if 0 != (read_register(&socket, &mt_address, 0x12, &mut buffer) & 0x2) {
+    // daq queue states
+    // 0 - full
+    // 1 - something
+    // 2 - empty
+    //if 0 != (read_register(&socket, &mt_address, 0x12, &mut buffer) & 0x2) {
+    if read_register(&socket, &mt_address, 0x12, &mut buffer) == 2 {
+      info!("No new information from DAQ");
+      //reset_daq(&socket, &mt_address);  
       continue;
     }
     
-    event_cnt = read_event_cnt(&socket, &mt_address, &mut buffer);
-    //event_cnt = read_daq(&socket, &mt_address, &mut buffer);
+    //event_cnt = read_event_cnt(&socket, &mt_address, &mut buffer);
+    (event_cnt, n_paddles_expected) = read_daq(&socket, &mt_address, &mut buffer);
     if event_cnt == last_event_cnt {
+      info!("Same event!");
       continue;
     }
 
@@ -287,20 +367,32 @@ pub fn master_and_commander(mt_ip   : &str,
     
     // new event
     // send it down the pip
-    evid_sender.send(event_cnt);
+    evid_sender.send((event_cnt, n_paddles_expected));
     last_event_cnt = event_cnt;
     n_events += 1;
     n_events_expected = n_events + missing_evids;
 
+    let elapsed = start.elapsed().as_secs();
     // measure rate every 100 events
-    if n_events % 1000 == 0 {
-      let elapsed = start.elapsed().as_secs();
+    if n_events % 10 == 0 {
       rate = n_events as f64 / elapsed as f64;
-      println!("==> {} events recorded, trigger rate: {:.2} Hz", n_events, rate);
+      println!("==> {} events recorded, trigger rate: {:.3} Hz", n_events, rate);
       rate = n_events_expected as f64 / elapsed as f64;
-      println!("==> -- expected rate {:.2} Hz", rate);   
+      println!("==> -- expected rate {:.3} Hz", rate);   
     } 
     // end new event
+
+    // a heartbeat every 10 s
+    let elapsed = start.elapsed().as_secs();
+    if elapsed % 10 == 0 {
+      println!("== == == == == == == == HEARTBEAT! {} seconds passed!", elapsed);
+      rate = n_events as f64 / elapsed as f64;
+      println!("==> {} events recorded, trigger rate: {:.3} Hz", n_events, rate);
+      rate = n_events_expected as f64 / elapsed as f64;
+      println!("==> -- expected rate {:.3} Hz", rate);   
+      println!("== == == == == == == == END HEARTBEAT!");
+    }
+
   } // end loop
 }
 

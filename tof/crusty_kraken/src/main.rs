@@ -74,12 +74,14 @@ fn main() {
   // some bytes, in a vector
   let sparkle_heart         = vec![240, 159, 146, 150];
   let kraken                = vec![240, 159, 144, 153];
-  let satelite_antenna      = vec![240, 159, 147, 161];
+  //let satelite_antenna      = vec![240, 159, 147, 161];
+  let fish                  = vec![240, 159, 144, 159];
+
   // We know these bytes are valid, so we'll use `unwrap()`.
   let sparkle_heart    = String::from_utf8(sparkle_heart).unwrap();
   let kraken           = String::from_utf8(kraken).unwrap();
-  let satelite_antenna = String::from_utf8(satelite_antenna).unwrap();
-
+  //let satelite_antenna = String::from_utf8(satelite_antenna).unwrap();
+  let fish             = String::from_utf8(fish).unwrap();
   // welcome banner!
   //
   println!("-----------------------------------------------");
@@ -100,7 +102,7 @@ fn main() {
   let json_content  : String;
   let config        : json::JsonValue;
   
-  let mut nboards       = 0usize;
+  let mut nboards   : usize;
 
   let master_trigger = args.master_trigger;
   let mut master_trigger_ip   = String::from("");
@@ -108,7 +110,7 @@ fn main() {
 
   match args.json_config {
     None => panic!("No .json config file provided! Please provide a config file with --json-config or -j flag!"),
-    Some(ref json_file_path) => {
+    Some(_) => {
       if !args.json_config.as_ref().unwrap().exists() {
           panic!("The file {} does not exist!", args.json_config.as_ref().unwrap().display());
       }
@@ -193,10 +195,10 @@ fn main() {
   let mut cali_file_name : String;
   let mut cali_file_path : &Path;
   let mut board_config   : &json::JsonValue;
-  let mut rb_id = 0usize;
+  let mut rb_id          : usize;
 
   // prepare channels for inter thread communications
-  let (master_ev_send, master_ev_rec): (Sender<u32>, Receiver<u32>) = channel(); 
+  let (master_ev_send, master_ev_rec): (Sender<(u32, u32)>, Receiver<(u32, u32)>) = channel(); 
   let (pp_send, pp_rec) : (Sender<PaddlePacket>, Receiver<PaddlePacket>) = channel(); 
 
   // prepare a thread pool. Currently we have
@@ -225,8 +227,6 @@ fn main() {
     });
   }
 
-  let one_minute = time::Duration::from_millis(60000);
-  thread::sleep(2*one_minute);
 
   // open a zmq context
   let ctx = zmq::Context::new();
@@ -245,18 +245,22 @@ fn main() {
       panic!("The desired configuration file {} does not exist!", cali_file_name);
     }
 
-    let result = rb_comm_socket.bind(&address);
-    match result {
-        Ok(_)    => info!("Bound socket to {}", address),
-        Err(err) => panic!("Can not communicate with rb at address {}. Maybe you want to check your .json configuration file?, error {}",address, err)
-    }
-    let this_rb_pp_sender = pp_send.clone();
-    worker_threads.execute(move || {
-      readoutboard_communicator(&rb_comm_socket,
-                                this_rb_pp_sender,
-                                rb_id,
-                                write_blob,
-                                &cali_file_name); 
-    });
+    //let result = rb_comm_socket.bind(&address);
+    //match result {
+    //    Ok(_)    => info!("Bound socket to {}", address),
+    //    Err(err) => panic!("Can not communicate with rb at address {}. Maybe you want to check your .json configuration file?, error {}",address, err)
+    //}
+    //let this_rb_pp_sender = pp_send.clone();
+    //worker_threads.execute(move || {
+    //  readoutboard_communicator(&rb_comm_socket,
+    //                            this_rb_pp_sender,
+    //                            rb_id,
+    //                            write_blob,
+    //                            &cali_file_name); 
+    //});
   } // end for loop over nboards
+
+  let one_minute = time::Duration::from_millis(60000);
+  thread::sleep(10*one_minute);
+  println!("Program terminating after specified runtime! So long and thanks for all the {}", fish); 
 }

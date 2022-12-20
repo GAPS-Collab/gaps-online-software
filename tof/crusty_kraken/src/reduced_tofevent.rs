@@ -5,7 +5,7 @@ pub const RPADDLEPACKETSIZE    : usize = 26;
 pub const RPADDLEPACKETVERSION : &str = "rev1.0";
 
 
-#[derive(Copy, Clone)]
+#[derive(Debug,Copy,Clone)]
 pub struct PaddlePacket  {
   
   //unsigned short head = 0xF0F0;
@@ -98,6 +98,51 @@ impl PaddlePacket {
   }
 }
 
+
+#[derive(Debug, Clone)]
+pub struct TofEvent  {
+  
+  //unsigned short head = 0xF0F0;
+  pub head         : u16,
+  pub event_id     : u32,
+  pub n_paddles    : u8, // we don't have more than 
+                         // 256 paddles.
+                         // HOWEVER!! For future gaps
+                         // flights, we might...
+                         // This will then overflow 
+                         // and cause problems.
+
+  pub paddle_packets : Vec::<PaddlePacket>,
+
+  //pub p_length     : u16,
+  pub tail         : u16,
+
+  // fields which won't get 
+  // serialized
+  pub n_paddles_expected : u8
+}
+
+
+impl TofEvent {
+
+  pub fn new(event_id : u32,
+             n_paddles_expected : u8) -> TofEvent {
+    TofEvent { 
+      head           : 0,
+      event_id       : event_id,
+      n_paddles      : 0, // we don't have more than 
+      paddle_packets : Vec::<PaddlePacket>::new(),
+      tail           : 0,
+
+      n_paddles_expected : n_paddles_expected
+    }
+  }
+
+  pub fn is_complete(&self) -> bool {
+    self.n_paddles == self.n_paddles_expected
+  }
+
+}
   //  unsigned short p_length= RPADDLEPACKETSIZE;
 //
 //  unsigned char paddle_id;

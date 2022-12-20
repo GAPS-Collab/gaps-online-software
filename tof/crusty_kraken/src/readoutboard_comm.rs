@@ -161,7 +161,6 @@ fn analyze_blobs(buffer               : &Vec<u8>,
               //                                    6 -> Paddle3/A Side
               //                                    7 -> Paddle3/B Side
 
-              let mut paddle_number = 0;
               let mut spikes : [i32;10] = [0;10];
               blob_data.calibrate(calibrations);
               blob_data.remove_spikes(&mut spikes);
@@ -433,7 +432,7 @@ pub fn readoutboard_communicator(socket           : &zmq::Socket,
             info!("Writing blobs to {}", blobfile_name );
             let blobfile_path = Path::new(&blobfile_name);
             match write_stream_to_file(blobfile_path, &buffer) {
-              Ok(size)  => debug!("Writing blob file successful!"),
+              Ok(size)  => debug!("Writing blob file successful! {} bytes written", size),
               Err(err)  => {
                 error!("Unable to write blob to disk! {}", err );
                 lost_blob_files += 1;

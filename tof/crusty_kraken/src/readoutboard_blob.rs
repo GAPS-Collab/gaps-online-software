@@ -473,7 +473,7 @@ impl BlobData {
   
   pub fn set_ped_begin(&mut self, time : f64, ch : usize) {
       match self.time_2_bin(time, ch) {
-          Err(err) => println!("Can not find bin for time {}, ch {}, err FIXME", time, ch),
+          Err(err) => println!("Can not find bin for time {}, ch {}, err {:?}", time, ch, err),
           Ok(begin) => {self.ped_begin_bin[ch] = begin;}
       }
   }
@@ -482,7 +482,7 @@ impl BlobData {
     // This is a little convoluted, but we must convert the range (in
     // ns) into bins
     match self.time_2_bin(self.nanoseconds[ch][self.ped_begin_bin[ch]] + range, ch) {
-        Err(err)      => println!("Can not set pedestal range for range {} for ch {}", range, ch),
+        Err(err)      => println!("Can not set pedestal range for range {} for ch {}, err {:?}", range, ch, err),
         Ok(bin_range) => {self.ped_bin_range[ch] = bin_range;}
     }
   }
@@ -558,7 +558,7 @@ impl BlobData {
         warn!("cfd simple method failed!! Peak begin {}, peak end {}", self.begin_peak[ch][peak_num], self.end_peak[ch][peak_num]);
         return 0.0;
     }
-    let mut idx = 0usize;
+    let mut idx : usize;
     match self.get_max_bin(self.begin_peak[ch][peak_num],
                            self.end_peak[ch][peak_num]-self.begin_peak[ch][peak_num],
                            ch) {
