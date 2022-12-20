@@ -16,11 +16,13 @@ use time::{Duration,
            Instant};
 
 use crate::reduced_tofevent::{PaddlePacket, TofEvent};
+use crate::master_trigger::MasterTriggerEvent;
+
 ///
 ///
 ///
 ///
-pub fn event_builder (master_id      : &Receiver<(u32, u32)>,
+pub fn event_builder (master_id      : &Receiver<MasterTriggerEvent>,
                       paddle_packets : &Receiver<PaddlePacket>) {
 
   let n_events_backlog = 10;
@@ -43,7 +45,9 @@ pub fn event_builder (master_id      : &Receiver<(u32, u32)>,
   // so we have to check the incoming event ids
 
   let mut n_triggers = 0usize;
-  for (m_id, n_paddles) in master_id {
+  for master_event in master_id {
+    let m_id = master_event.event_id;
+    let n_paddles = master_event.n_paddles;
     n_triggers += 1;
     if n_triggers % 100 == 0 {
       println!("Got {} triggers", n_triggers);

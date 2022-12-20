@@ -43,7 +43,8 @@ use clap::{arg,
            Parser};
 
 use crate::readoutboard_comm::readoutboard_communicator;
-use crate::master_trigger::master_and_commander;
+use crate::master_trigger::{master_and_commander,
+                            MasterTriggerEvent};
 use crate::event_builder::event_builder;
 use crate::threading::ThreadPool;
 use crate::reduced_tofevent::PaddlePacket;
@@ -200,7 +201,7 @@ fn main() {
   let mut rb_id          : usize;
 
   // prepare channels for inter thread communications
-  let (master_ev_send, master_ev_rec): (Sender<(u32, u32)>, Receiver<(u32, u32)>) = channel(); 
+  let (master_ev_send, master_ev_rec): (Sender<MasterTriggerEvent>, Receiver<MasterTriggerEvent>) = channel(); 
   let (pp_send, pp_rec) : (Sender<PaddlePacket>, Receiver<PaddlePacket>) = channel(); 
 
   // prepare a thread pool. Currently we have

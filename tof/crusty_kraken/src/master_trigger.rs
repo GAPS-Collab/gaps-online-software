@@ -24,6 +24,30 @@ enum PACKET_TYPE {
   RMW            = 4
 }
 
+#[derive(Debug, Copy, Clone)]
+pub struct MasterTriggerEvent {
+  pub event_id  : u32,
+  pub n_paddles : u8, 
+  pub valid     : bool
+}
+
+impl MasterTriggerEvent {
+  pub fn new(event_id  : u32, 
+             n_paddles : u8) -> MasterTriggerEvent {
+    MasterTriggerEvent {
+      event_id  : event_id,
+      n_paddles : n_paddles,
+      valid     : true
+
+    }   
+  }
+  
+  pub fn invalidate(&mut self) {
+    self.valid = false;
+  }
+}
+
+
 
 fn count_ones(input :u32) -> u32 {
   let mut count = 0u32;
@@ -259,7 +283,7 @@ fn read_daq(socket : &UdpSocket,
 ///
 pub fn master_and_commander(mt_ip   : &str, 
                             mt_port : usize,
-                            evid_sender : &Sender<(u32, u32)>) {
+                            evid_sender : &Sender<MasterTriggerEvent>) {
 
   let mt_address = mt_ip.to_owned() + ":" + &mt_port.to_string();
   //let mut socket : UdpSocket;
@@ -371,7 +395,8 @@ pub fn master_and_commander(mt_ip   : &str,
     
     // new event
     // send it down the pip
-    evid_sender.send((event_cnt, n_paddles_expected));
+    let mt_event = MasterTriggerEvent::new(event_cnt, n_paddles_expected as u8);
+    evid_sender.send(mt_event);
     last_event_cnt = event_cnt;
     n_events += 1;
     n_events_expected = n_events + missing_evids;
