@@ -1,6 +1,7 @@
+///! Event strucutures for data reconrded byi the tof
 ///
-///
-///
+///  These are used internally, and will get
+///  serialized and send over the write
 ///
 ///
 ///
@@ -10,20 +11,28 @@ use std::time::SystemTime;
 
 use crate::constants::EVENT_TIMEOUT;
 
-pub const RPADDLEPACKETSIZE    : usize = 26;
-pub const RPADDLEPACKETVERSION : &str = "rev1.0";
 
 ///! Microseconds since epock
 fn elapsed_since_epoch() -> u128 {
   SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_micros()
 }
 
+///! Representation of analyzed data from a paddle
+///
+///  Holds the results of waveform analysis for a 
+///  paddle, that is the reustl for 2 individual 
+///  waveforms from each end of the paddle.
+///
+///  Thus it is having methods like `get_time_a`
+///  where a and be refere to different 
+///  paddle ends.
+///
+///
 #[derive(Debug,Copy,Clone)]
 pub struct PaddlePacket  {
   
   //unsigned short head = 0xF0F0;
   pub head         : u16,
-  //pub p_length     : u16,
   pub paddle_id    : u8,
   pub time_a       : u16,
   pub time_b       : u16,
@@ -44,6 +53,10 @@ pub struct PaddlePacket  {
 }
 
 impl PaddlePacket {
+
+  pub const FixedPaddlePacketSize    : usize = 24;
+  pub const PaddlePacketVersion      : &'static str = "1.1";
+
   pub fn new() -> PaddlePacket {
     PaddlePacket{head         : 61680, // 0xF0F0
                  paddle_id    : 0,
@@ -117,7 +130,33 @@ impl PaddlePacket {
     println!("=> ctr_etx       {}", self.ctr_etx);
     println!("=> tail          {}", self.tail);
     println!("*****");
+  }
 
+  ///! Serialize the packet
+  ///
+  ///  Not all fields witll get serialized, 
+  ///  only the relevant data for the 
+  ///  flight computer
+  ///
+  pub fn to_bytestream(&self) -> Vec<u8> {
+
+    let mut bytestream = Vec::<u8>::with_capacity(PaddlePacket::FixedPaddlePacketSize);
+
+    bytestream.extend_from_slice(&self.head.to_le_bytes());
+    bytestream.extend_from_slice(&self.paddle_id   .to_le_bytes()); 
+    bytestream.extend_from_slice(&self.time_a      .to_le_bytes()); 
+    bytestream.extend_from_slice(&self.time_b      .to_le_bytes()); 
+    bytestream.extend_from_slice(&self.peak_a      .to_le_bytes()); 
+    bytestream.extend_from_slice(&self.peak_b      .to_le_bytes()); 
+    bytestream.extend_from_slice(&self.charge_a    .to_le_bytes()); 
+    bytestream.extend_from_slice(&self.charge_b    .to_le_bytes()); 
+    bytestream.extend_from_slice(&self.charge_min_i.to_le_bytes()); 
+    bytestream.extend_from_slice(&self.pos_across  .to_le_bytes()); 
+    bytestream.extend_from_slice(&self.t_average   .to_le_bytes()); 
+    bytestream.extend_from_slice(&self.ctr_etx     .to_le_bytes()); 
+    bytestream.extend_from_slice(&self.tail        .to_le_bytes()); 
+
+    bytestream
   }
 }
 
@@ -256,8 +295,4 @@ impl TofEvent {
 
 //std::ostream& operator<<(std::ostream& os, const RPaddlePacket& pad);
 
-
-/***********************************/
-
-/***********************************/
 

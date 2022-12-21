@@ -5,8 +5,8 @@
 #include <vector>
 #include <string>
 
-#define RPADDLEPACKETSIZE 26
-#define RPADDLEPACKETVERSION "rev1.0"
+#define RPADDLEPACKETSIZE 24
+#define RPADDLEPACKETVERSION "1.1"
 
 /***********************************************************
  * The "reduced paddle packet" holds analyzed waveform 
@@ -16,10 +16,6 @@
 struct RPaddlePacket  {
 
   unsigned short head = 0xF0F0;
-
-  unsigned short p_length= RPADDLEPACKETSIZE;
-  //uint32_t event_ctr;
-  //unsigned char utc_timestamp[8];
 
   unsigned char paddle_id;
   unsigned short time_a;

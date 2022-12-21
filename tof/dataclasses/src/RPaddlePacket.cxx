@@ -6,7 +6,6 @@ void RPaddlePacket::reset()
   //head = 0xAAAA;
   // define a different header
   head = 0xF0F0;
-  p_length = RPADDLEPACKETSIZE;
   //event_ctr = 0;
   //for (size_t k=0;k<8;k++) utc_timestamp[k] = 0x00;
 
@@ -105,12 +104,10 @@ float RPaddlePacket::get_t_avg() const
 
 std::vector<unsigned char> RPaddlePacket::serialize() const
 {
-  unsigned short packet_length = calculate_length();
-  std::vector<unsigned char> buffer(packet_length);
+  std::vector<unsigned char> buffer(RPADDLEPACKETSIZE);
   unsigned short pos = 0; // position in bytestream
+
   encode_ushort(head, buffer, pos); pos+=2;
-  encode_ushort(p_length, buffer, pos); pos+=2;
-  //encode_uint32(event_ctr, buffer, pos); pos+=4;
   buffer[pos] = paddle_id; pos+=1;
 
   //encode_ushort(paddle_id, buffer, pos); pos+=2;
@@ -181,7 +178,6 @@ std::string RPaddlePacket::to_string() const
   std::string repr = "";
   repr += "RPADDLEPACKET-----------------------\n";
   repr += "HEAD "          + std::to_string(head              ) + "\n";
-  repr += "PACKET_LENGTH " + std::to_string(p_length          ) + "\n";
   //repr += "EVENT CTR "     + std::to_string(event_ctr         ) + "\n";
   //repr += "UTC TS "        + std::to_string(utc_timestamp     ) + "\n";
   repr += "PADDLE ID "     + std::to_string(get_paddle_id()   ) + "\n";
