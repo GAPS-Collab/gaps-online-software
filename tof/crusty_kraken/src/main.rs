@@ -28,6 +28,10 @@ extern crate hdf5;
 #[cfg(feature = "diagnostics")]
 extern crate ndarray;
 
+#[cfg(feature="random")]
+extern crate rand;
+
+
 use std::{thread,
           time,
           path::Path,

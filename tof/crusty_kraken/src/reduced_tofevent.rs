@@ -10,12 +10,47 @@
 use std::time::SystemTime;
 
 use crate::constants::EVENT_TIMEOUT;
+use crate::errors::SerializationError;
+
+
+#[cfg(feature="random")]
+use rand::Rng;
 
 
 ///! Microseconds since epock
 fn elapsed_since_epoch() -> u128 {
   SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_micros()
 }
+
+///! check for a certain number in a bytestream
+fn search_for_u16(number : u16, bytestream : &Vec<u8>, start_pos : usize) 
+  -> Result<usize, SerializationError> {
+
+  if start_pos > bytestream.len() {
+    return Err(SerializationError::StreamTooShort);
+  }
+
+  let mut pos = start_pos;
+
+  let mut two_bytes : [u8;2]; 
+  // will find the next header
+  two_bytes = [bytestream[pos], bytestream[pos + 1]];
+  pos += 2;
+  if (u16::from_le_bytes(two_bytes)) != PaddlePacket::Head {
+    // we search for the next packet
+    for n in pos..bytestream.len() {
+      two_bytes = [bytestream[pos], bytestream[pos + 1]];
+      if (u16::from_le_bytes(two_bytes)) != number {
+        pos += n;
+        break;
+      }
+    }
+    // FIXME - this should return a better error
+    return Err(SerializationError::ValueNotFound);
+  }
+  Ok(pos)
+}
+
 
 ///! Representation of analyzed data from a paddle
 ///
@@ -28,11 +63,10 @@ fn elapsed_since_epoch() -> u128 {
 ///  paddle ends.
 ///
 ///
-#[derive(Debug,Copy,Clone)]
+#[derive(Debug,Copy,Clone, PartialEq)]
 pub struct PaddlePacket  {
   
   //unsigned short head = 0xF0F0;
-  pub head         : u16,
   pub paddle_id    : u8,
   pub time_a       : u16,
   pub time_b       : u16,
@@ -44,7 +78,6 @@ pub struct PaddlePacket  {
   pub pos_across   : u16,
   pub t_average    : u16,
   pub ctr_etx      : u8,
-  pub tail         : u16,
 
   // fields which won't get 
   // serialized
@@ -54,27 +87,28 @@ pub struct PaddlePacket  {
 
 impl PaddlePacket {
 
-  pub const FixedPaddlePacketSize    : usize = 24;
-  pub const PaddlePacketVersion      : &'static str = "1.1";
+  pub const PacketSize    : usize = 24;
+  pub const Version       : &'static str = "1.1";
+  pub const Head          : u16  = 61680; //0xF0F0)
+  pub const Tail          : u16  = 3855;
 
   pub fn new() -> PaddlePacket {
-    PaddlePacket{head         : 61680, // 0xF0F0
-                 paddle_id    : 0,
-                 time_a       : 0,
-                 time_b       : 0,
-                 peak_a       : 0,
-                 peak_b       : 0,
-                 charge_a     : 0,
-                 charge_b     : 0,
-                 charge_min_i : 0,
-                 pos_across   : 0,
-                 t_average    : 0,
-                 ctr_etx      : 0,
-                 tail         : 3855,
-                 // non-serialize fields
-                 event_id     : 0,
-                 valid        : true
-                 }// 0xF0F);
+    PaddlePacket{
+                  paddle_id    : 0,
+                  time_a       : 0,
+                  time_b       : 0,
+                  peak_a       : 0,
+                  peak_b       : 0,
+                  charge_a     : 0,
+                  charge_b     : 0,
+                  charge_min_i : 0,
+                  pos_across   : 0,
+                  t_average    : 0,
+                  ctr_etx      : 0,
+                  // non-serialize fields
+                  event_id     : 0,
+                  valid        : true
+                }
 
   }
 
@@ -99,6 +133,7 @@ impl PaddlePacket {
   }
 
   pub fn reset(&mut self) {
+    self.paddle_id    =  0;
     self.time_a       =  0;
     self.time_b       =  0;
     self.peak_a       =  0;
@@ -117,7 +152,7 @@ impl PaddlePacket {
   pub fn print(&self)
   {
     println!("***** paddle packet *****");
-    println!("=> head          {}", self.head);
+    println!("==> VALID        {}", self.valid);
     println!("=> time_a        {}", self.time_a);
     println!("=> time_b        {}", self.time_b);
     println!("=> peak_a        {}", self.peak_a);
@@ -128,7 +163,6 @@ impl PaddlePacket {
     println!("=> pos_across    {}", self.pos_across);
     println!("=> t_average     {}", self.t_average);
     println!("=> ctr_etx       {}", self.ctr_etx);
-    println!("=> tail          {}", self.tail);
     println!("*****");
   }
 
@@ -140,10 +174,10 @@ impl PaddlePacket {
   ///
   pub fn to_bytestream(&self) -> Vec<u8> {
 
-    let mut bytestream = Vec::<u8>::with_capacity(PaddlePacket::FixedPaddlePacketSize);
+    let mut bytestream = Vec::<u8>::with_capacity(PaddlePacket::PacketSize);
 
-    bytestream.extend_from_slice(&self.head.to_le_bytes());
-    bytestream.extend_from_slice(&self.paddle_id   .to_le_bytes()); 
+    bytestream.extend_from_slice(&PaddlePacket::Head.to_le_bytes());
+    bytestream.push(self.paddle_id); 
     bytestream.extend_from_slice(&self.time_a      .to_le_bytes()); 
     bytestream.extend_from_slice(&self.time_b      .to_le_bytes()); 
     bytestream.extend_from_slice(&self.peak_a      .to_le_bytes()); 
@@ -153,19 +187,107 @@ impl PaddlePacket {
     bytestream.extend_from_slice(&self.charge_min_i.to_le_bytes()); 
     bytestream.extend_from_slice(&self.pos_across  .to_le_bytes()); 
     bytestream.extend_from_slice(&self.t_average   .to_le_bytes()); 
-    bytestream.extend_from_slice(&self.ctr_etx     .to_le_bytes()); 
-    bytestream.extend_from_slice(&self.tail        .to_le_bytes()); 
+    bytestream.push(self.ctr_etx); 
+    bytestream.extend_from_slice(&PaddlePacket::Tail        .to_le_bytes()); 
 
     bytestream
   }
+
+
+  ///! Deserialization
+  ///
+  ///
+  ///  # Arguments:
+  ///
+  ///  * bytestream : 
+  pub fn from_bytestream(bytestream : &Vec<u8>, start_pos : usize) 
+    -> Result<(PaddlePacket),SerializationError> {
+    let mut pp  = PaddlePacket::new();
+    let mut pos = start_pos;
+    let mut two_bytes : [u8;2];
+
+    pos = search_for_u16(PaddlePacket::Head, &bytestream, pos)?;
+
+    pp.paddle_id = bytestream[pos];
+    pos += 1;
+
+    two_bytes = [bytestream[pos], bytestream[pos + 1]];
+    pp.time_a       =  u16::from_le_bytes(two_bytes);
+    pos += 2;
+
+    two_bytes = [bytestream[pos], bytestream[pos + 1]];
+    pp.time_b       =  u16::from_le_bytes(two_bytes);
+    pos += 2;
+    
+    two_bytes = [bytestream[pos], bytestream[pos + 1]];
+    pp.peak_a       =  u16::from_le_bytes(two_bytes);
+    pos += 2;
+    
+    two_bytes = [bytestream[pos], bytestream[pos + 1]];
+    pp.peak_b       =  u16::from_le_bytes(two_bytes);
+    pos += 2;
+
+    two_bytes = [bytestream[pos], bytestream[pos + 1]];
+    pp.charge_a     =  u16::from_le_bytes(two_bytes);
+    pos += 2;
+
+    two_bytes = [bytestream[pos], bytestream[pos + 1]];
+    pp.charge_b     =  u16::from_le_bytes(two_bytes);
+    pos += 2;
+
+    two_bytes = [bytestream[pos], bytestream[pos + 1]];
+    pp.charge_min_i =  u16::from_le_bytes(two_bytes);
+    pos += 2;
+
+    two_bytes = [bytestream[pos], bytestream[pos + 1]];
+    pp.pos_across   =  u16::from_le_bytes(two_bytes);
+    pos += 2;
+
+    two_bytes = [bytestream[pos], bytestream[pos + 1]];
+    pp.t_average    =  u16::from_le_bytes(two_bytes);
+    pos += 2;
+
+    pp.ctr_etx      =  bytestream[pos];
+    pos += 1;
+
+    // at this postiion, there must be the footer
+    two_bytes = [bytestream[pos], bytestream[pos + 1]];
+    if (u16::from_le_bytes(two_bytes)) != PaddlePacket::Tail {
+      pp.valid = false;
+      return Err(SerializationError::TailInvalid);
+    }
+    pos += 2;
+    assert! ((pos - start_pos) == PaddlePacket::PacketSize);
+    pp.valid        =  true;
+    Ok(pp)
+  }
+
+  #[cfg(feature="random")]
+  pub fn from_random() -> PaddlePacket {
+    let mut pp = PaddlePacket::new();
+    let mut rng = rand::thread_rng();
+
+    pp.paddle_id    = rng.gen::<u8> ();
+    pp.time_a       = rng.gen::<u16>();
+    pp.time_b       = rng.gen::<u16>();
+    pp.peak_a       = rng.gen::<u16>();
+    pp.peak_b       = rng.gen::<u16>();
+    pp.charge_a     = rng.gen::<u16>();
+    pp.charge_b     = rng.gen::<u16>();
+    pp.charge_min_i = rng.gen::<u16>();
+    pp.pos_across   = rng.gen::<u16>();
+    pp.t_average    = rng.gen::<u16>();
+    pp.ctr_etx      = rng.gen::<u8>();
+
+    pp
+  }
+
 }
 
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct TofEvent  {
   
-  //unsigned short head = 0xF0F0;
-  pub head         : u16,
   pub event_id     : u32,
   pub n_paddles    : u8, // we don't have more than 
                          // 256 paddles.
@@ -175,9 +297,6 @@ pub struct TofEvent  {
                          // and cause problems.
 
   pub paddle_packets : Vec::<PaddlePacket>,
-
-  //pub p_length     : u16,
-  pub tail         : u16,
 
   // fields which won't get 
   // serialized
@@ -197,6 +316,12 @@ pub struct TofEvent  {
 
 
 impl TofEvent {
+  
+  pub const PacketSizeFixed    : usize = 24;
+  pub const Version            : &'static str = "1.0";
+  pub const Head               : u16  = 43690; //0xAAAA
+  pub const Tail               : u16  = 21845; //0x5555
+  
 
   pub fn new(event_id : u32,
              n_paddles_expected : u8) -> TofEvent {
@@ -205,11 +330,9 @@ impl TofEvent {
                          .unwrap().as_micros();
 
     TofEvent { 
-      head           : 0,
       event_id       : event_id,
-      n_paddles      : 0, // we don't have more than 
+      n_paddles      : 0,  
       paddle_packets : Vec::<PaddlePacket>::with_capacity(20),
-      tail           : 0,
 
       n_paddles_expected : n_paddles_expected,
 
@@ -219,6 +342,61 @@ impl TofEvent {
 
       valid          : true,
     }
+  }
+
+  pub fn from_bytestream(bytestream : &Vec<u8>, start_pos : usize)
+     -> Result<TofEvent, SerializationError> {
+    let mut event = TofEvent::new(9,0);
+    let mut pos = start_pos;
+
+    pos = search_for_u16(TofEvent::Head, &bytestream, pos)?;
+   
+    let mut raw_bytes_4  = [bytestream[pos + 1],
+                            bytestream[pos + 0],
+                            bytestream[pos + 3],
+                            bytestream[pos + 2]];
+    pos   += 4; 
+    event.event_id = u32::from_be_bytes(raw_bytes_4); 
+
+    event.n_paddles      = bytestream[pos];
+    pos += 1; 
+   
+    for n in 0..event.n_paddles {
+      match PaddlePacket::from_bytestream(&bytestream, pos) {
+        Err(err) => {
+          return Err(err);
+        }
+        Ok(pp)   => {
+          event.paddle_packets.push(pp);
+          pos += PaddlePacket::PacketSize;
+        }
+      }
+    }
+    Ok(event) 
+  }
+  
+  pub fn to_bytestream(&self) -> Vec<u8> {
+
+    let mut bytestream = Vec::<u8>::with_capacity(TofEvent::PacketSizeFixed + (self.n_paddles as usize)*PaddlePacket::PacketSize as usize);
+
+    bytestream.extend_from_slice(&TofEvent::Head.to_le_bytes());
+    let mut evid = self.event_id.to_be_bytes();
+
+    evid  = [evid[1],
+             evid[0],
+             evid[3],
+             evid[2]];
+    bytestream.extend_from_slice(&evid);
+    bytestream.push(self.n_paddles);
+    for n in 0..self.n_paddles as usize {
+      let pp = self.paddle_packets[n];
+      bytestream.extend_from_slice(&pp.to_bytestream());
+
+    }
+    bytestream.extend_from_slice(&TofEvent::Tail        .to_le_bytes()); 
+
+    bytestream
+
   }
 
   pub fn has_timed_out(&self) -> bool {
@@ -239,60 +417,56 @@ impl TofEvent {
     return self.is_complete() || self.has_timed_out();
   }
 }
-  //  unsigned short p_length= RPADDLEPACKETSIZE;
-//
-//  unsigned char paddle_id;
-//  unsigned short time_a;
-//  unsigned short time_b;
-//  unsigned short peak_a;
-//  unsigned short peak_b;
-//  unsigned short charge_a;
-//  unsigned short charge_b;
-//  unsigned short charge_min_i;
-//  unsigned short x_pos;
-//  unsigned short t_average;
-//
-//  unsigned char ctr_etx;
-//  unsigned short tail = 0xF0F;
-//
-//  // convert the truncated values
-//  unsigned short get_paddle_id() const;
-//  float get_time_a()             const;
-//  float get_time_b()             const;
-//  float get_peak_a()             const;
-//  float get_peak_b()             const;
-//  float get_charge_a()     const;
-//  float get_charge_b()     const;
-//  float get_charge_min_i() const;
-//  float get_x_pos()        const;
-//  float get_t_avg()        const;
-//  // setters
-//  void set_time_a(double);
-//  void set_time_b(double);
-//  void set_peak_a(double);
-//  void set_peak_b(double);
-//  void set_charge_a(double);
-//  void set_charge_b(double);
-//  void set_charge_min_i(double);
-//  void set_x_pos(double);
-//  void set_t_avg(double);
-//
-//  // don't serialize (?)
-//  std::string version = RPADDLEPACKETVERSION; // packet version
-//
-//
-//  // PaddlePacket legth is fixed
-//  static unsigned short calculate_length();
-//  void reset();
-//
-//  std::vector<unsigned char> serialize() const;
-//  unsigned int deserialize(std::vector<unsigned char>& bytestream,
-//                                unsigned int start_pos);
-//
-//  // easier print out
-//  std::string to_string() const;
-//}
 
-//std::ostream& operator<<(std::ostream& os, const RPaddlePacket& pad);
 
+///
+/// TESTS
+///
+/// ============================================
+
+#[test]
+fn serialize_deserialize_pp_roundabout() {
+  let mut pp = PaddlePacket::from_random();
+  // a fresh packet is always valid
+  assert!(pp.valid);
+  // FIXME - as an idea. If we use
+  // 4 byte emoji data, we can easily
+  // check if a bytestream is that what
+  // we expect visually 
+   
+  
+  //let mut bytestream = Vec<u8>::new();
+  let mut bytestream = pp.to_bytestream();
+  match PaddlePacket::from_bytestream(&bytestream, 0) {
+    Err(err) => {
+      error!("Got deserialization error! {:?}", err);
+    },
+    Ok(new_pp)   => {
+      assert_eq!(new_pp, pp);
+    }
+  }
+}
+
+#[test]
+fn serialize_deserialize_tofevent_roundabout() {
+  let mut event = TofEvent::new(0,0);
+
+  // let's add 10 random paddles
+  for n in 0..10 {
+    let pp = PaddlePacket::from_random();
+    event.paddle_packets.push(pp);
+  }
+  assert!(event.valid);
+
+  //let mut bytestream = Vec<u8>::new();
+  let mut bytestream = event.to_bytestream();
+  match TofEvent::from_bytestream(&bytestream, 0) {
+    Err(err) => {
+      error!("Got deserialization error! {:?}", err);
+    },
+    Ok(new_event)   => {
+      assert_eq!(new_event, event);
+    }
+  }
+}
 

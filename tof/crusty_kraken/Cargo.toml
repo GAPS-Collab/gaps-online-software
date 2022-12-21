@@ -15,6 +15,10 @@ description = "A programm for the GAPS science instrument. Read out the time-of-
 # hdf
 diagnostics = []
 
+# allows for the generation 
+# of random data
+random =[]
+
 [dependencies]
 zmq = "0.10.0"
 # this is technically optional
@@ -25,6 +29,9 @@ cmake = "0.1.49"
 # used only for diagnostics
 hdf5    = "0.8.1"
 ndarray = "0.15"
+
+# used for the random number generation
+rand = "0.8"
 
 # parse command line arguments
 clap = { version = "4.0", features = ["derive"] }
