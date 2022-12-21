@@ -26,27 +26,33 @@ use crate::constants::PADDLE_PACKET_CACHE_SIZE;
 ///  This responsibility is by the 
 ///  event_builder 
 ///
+///  # Arguments:
+///
+///  * 
+///
 pub fn paddle_packet_cache (evid_rec    : &Receiver<Option<u32>>,
                             pp_rec      : &Receiver<PaddlePacket>,
                             pp_send     : &Sender<Option<PaddlePacket>>) {
-  
+
+  info!("Initializing paddle packet cache!");
   let mut pp_cache           = VecDeque::<PaddlePacket>::with_capacity(PADDLE_PACKET_CACHE_SIZE);
   //// received event ids from the eventbuilder, 
   //// which have to be worked on
   ////let mut m_evid_cache = VecDeque::<MasterTriggerEvent>::with_capacity(EVENT_BUILDER_EVID_CACHE_SIZE); 
+  let n_tries = 20;
   loop {
 
     // every iteration, we welcome new paddle packets
     // and keep them. Let's try to receive a certain 
     // number of paddles, and then move on
-    let n_tries = 20;
     let mut try = 0;
     match pp_rec.try_recv() {
       Ok(pp) => {
         trace!("Got paddle packet for event {}", pp.event_id);
         pp_cache.push_back(pp);
       }
-      Err(_) => {
+      Err(err) => {
+        //error!("Can not receive paddle packet!, err {}", err);
         try += 1;
         if try == n_tries {
           try = 0;
@@ -55,11 +61,13 @@ pub fn paddle_packet_cache (evid_rec    : &Receiver<Option<u32>>,
       } // end Err
     } // end match
 
+    trace!("Size of paddle_cache   {}", pp_cache.len());
     
     // after we recieved the paddles,
     // let's try to answer event id requests.
     match evid_rec.try_recv() {
-      Err(_)          => {
+      Err(err)          => {
+        //error!("Can not receive event id! {}", err);
         continue;
       },
       Ok(evid_option) => {
@@ -67,6 +75,7 @@ pub fn paddle_packet_cache (evid_rec    : &Receiver<Option<u32>>,
           None => {
             // just send the first entry from the cach
             if pp_cache.len() == 0 {
+              pp_send.send(None);
               continue;
             }
 
@@ -107,7 +116,6 @@ pub fn paddle_packet_cache (evid_rec    : &Receiver<Option<u32>>,
   // FIXME - find something faster!
   // I saw comments that retain might be very slow
   pp_cache.retain(|&x| x.valid);
-  //trace!("Size of event id cache {}", m_evid_cache.len());
-  trace!("Size of paddle_cache   {}", pp_cache.len());
+  info!("Size of paddle_cache {} after clean up", pp_cache.len());
   } // end loop
 }

@@ -719,7 +719,7 @@ impl BlobData {
     //((self.wave[pos] < WF_VOLTAGE_THRESHOLD) && (pos < wf_size))
     self.num_peaks[ch] = peak_ctr;
     // some debugging information
-    debug!("{} peaks found for ch {} -- ", peak_ctr, ch);
+    trace!("{} peaks found for ch {} -- ", peak_ctr, ch);
     for n in 0..peak_ctr {
       trace!("Found peak {} : {}.. {} ",n,  self.begin_peak[ch][n], self.end_peak[ch][n]);
     }

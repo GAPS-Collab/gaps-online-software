@@ -235,7 +235,7 @@ fn analyze_blobs(buffer               : &Vec<u8>,
                     pp_this_event[3].set_time_b(cfd_time);
                   },
                   _ => {
-                    debug!("Won't do anything for ch {}",ch);
+                    trace!("Won't do anything for ch {}",ch);
                   }
                 } // end match
 
@@ -244,6 +244,7 @@ fn analyze_blobs(buffer               : &Vec<u8>,
                 for n in 0..NPADDLES {
                   // FIXME
                   pp_this_event[n].paddle_id = n as u8;
+                  pp_this_event[n].event_id = blob_data.event_ctr;
                   if paddles_over_threshold[n] {
                     pp_this_event[n].event_id = blob_data.event_ctr;
                   }
@@ -262,6 +263,7 @@ fn analyze_blobs(buffer               : &Vec<u8>,
             for n in 0..NPADDLES {
               //if paddles_over_threshold[n] {
               if true {
+                trace!("Sending pp to cache for evid {}", pp_this_event[n].event_id);
                 pp_sender.send(pp_this_event[n]);
               }
             }

@@ -62,22 +62,24 @@ fn build_events_in_cache(event_cache   : &mut VecDeque<TofEvent>,
         }
       } // end match
 
-      if ev.is_complete()  {
-        trace!("Event {} building complete!", ev.event_id);
-        ev.valid = false;
-        error!("Not implemented!! We have to do something with the event, but we don!");
-        break; // on to the next event in cache
-      }
+      //if ev.is_complete()  {
+      //  trace!("Event {} building complete!", ev.event_id);
+      //  ev.valid = false;
+      //  //error!("Not implemented!! We have to do something with the event, but we don't!");
+      //  break; // on to the next event in cache
+      //}
       if ev.has_timed_out() {
-        trace!("Event has timed out! {}", ev.event_id);
+        info!("Event has timed out! {}", ev.event_id);
         ev.valid = false;
-        error!("Not implemented!! We have to do something with the event, but we don!");
+        //error!("Not implemented!! We have to do something with the event, but we don!");
         break;
       }
     } // end while not timeout
   }
   // clean the cache - remove all completed events
+  info!("Size of cache before clean up {}", event_cache.len());
   event_cache.retain(|ev| ev.valid);
+  info!("Size of cache after clean up {}", event_cache.len());
 }
 
 
@@ -128,10 +130,11 @@ fn build_events_in_cache(event_cache   : &mut VecDeque<TofEvent>,
 pub fn event_builder_no_master(evid_query : &Sender<Option<u32>>,
                                pp_recv    : &Receiver<Option<PaddlePacket>>) {
 
+  info!("Initializing event builder without master trigger support!");
   let clock = Instant::now();
 
   let mut event_cache = VecDeque::<TofEvent>::with_capacity(EVENT_BUILDER_EVID_CACHE_SIZE);
-  let timeout_micro : u64 = 20;
+  let timeout_micro : u64 = 2000;
 
   let mut n_packets = 0usize;
   let max_packets   : usize  = 10;
@@ -141,15 +144,19 @@ pub fn event_builder_no_master(evid_query : &Sender<Option<u32>>,
       Err(_) => {continue;},
       Ok(_) => {
         match pp_recv.recv() {
-          Err(_) => {continue;},
+          Err(err) => {
+            error!("Connection error or nothing in channel!");
+            continue;
+          },
           Ok(pp_option) => {
             match pp_option {
               None => {
-                break;
+                continue;
               },
               Some(pp) => {
                 event.event_id = pp.event_id;
                 event.paddle_packets.push(pp);
+                info!("Have event with event id {}", event.event_id);
                 n_packets += 1;
               }
             } // end inner match
@@ -157,12 +164,13 @@ pub fn event_builder_no_master(evid_query : &Sender<Option<u32>>,
         }// end match
       } // end outer ok
     } // end match
-    if n_packets == max_packets {
-      break;
-    }
+    //if n_packets == max_packets {
+    //  break;
+    //}
     event_cache.push_back(event);
     build_events_in_cache(&mut event_cache, timeout_micro,
                           evid_query, pp_recv);
+    info!("Current size of event cache {}", event_cache.len());
   } // end loop
   //  event.event_id = pp.event_id;
   //  event.paddle_packets.push(pp);
