@@ -20,6 +20,68 @@ use crate::reduced_tofevent::{PaddlePacket, TofEvent};
 use crate::master_trigger::MasterTriggerEvent;
 use crate::constants::EVENT_BUILDER_EVID_CACHE_SIZE;
 
+
+///! Serialize a tof event and send it 
+///  over th provided zmq socket
+///
+///  # Arguments:
+///
+///  * event (TofEvent) : the fully assembled event
+///
+fn pack_and_send(event : &TofEvent) {
+  println!("Packing event {}", event.event_id);
+}
+
+///! Walk over the event cache and check for each event
+///  if new paddles can be added.
+///
+///  # Arguments:
+///
+fn build_events_in_cache(event_cache   : &mut VecDeque<TofEvent>,
+                         timeout_micro : u64,
+                         evid_query    : &Sender<Option<u32>>,
+                         pp_recv       : &Receiver<Option<PaddlePacket>>) {
+
+  for ev in event_cache.iter_mut() {
+    let start   = Instant::now();
+    let timeout = Duration::from_micros(timeout_micro)
+                  .as_micros();
+    evid_query.send(Some(ev.event_id));
+    while start.elapsed().as_micros() < timeout {
+      match pp_recv.try_recv() { 
+        Err(_) => {}
+        Ok(pp_option) => {
+          match pp_option {
+            None => {
+              continue;
+            },
+            Some(pp) => {
+              ev.paddle_packets.push(pp);
+            }
+          }
+        }
+      } // end match
+
+      if ev.is_complete()  {
+        trace!("Event {} building complete!", ev.event_id);
+        ev.valid = false;
+        error!("Not implemented!! We have to do something with the event, but we don!");
+        break; // on to the next event in cache
+      }
+      if ev.has_timed_out() {
+        trace!("Event has timed out! {}", ev.event_id);
+        ev.valid = false;
+        error!("Not implemented!! We have to do something with the event, but we don!");
+        break;
+      }
+    } // end while not timeout
+  }
+  // clean the cache - remove all completed events
+  event_cache.retain(|ev| ev.valid);
+}
+
+
+
 //fn paddle_query (timeout_in_mus : u64,
 //                 event_id : u32,
 //                 event    : &mut TofEvent,
@@ -45,14 +107,92 @@ use crate::constants::EVENT_BUILDER_EVID_CACHE_SIZE;
 //  } // end while not timeout
 //} // end fn
 
+///  An event builder which works without the 
+///  master trigger. 
+///
+///  The event id is coming from the readout board 
+///  blobs, as these might not be coming in sequence,
+///  Paddle packets have to be received and ordered.
+///  The event is declared as "finished" when we have
+///  incoming blobls from all readout boards and we 
+///  can check that the time has passed
+///
+///  # Arguments
+///
+///  * pp_query  - a std::net::Sender, which is expected
+///                to have its receiver with a paddle_cache.
+///                The pp_query will be used to ask the 
+///                cache to send the packets for a certain
+///                event id it has in store
+///
+pub fn event_builder_no_master(evid_query : &Sender<Option<u32>>,
+                               pp_recv    : &Receiver<Option<PaddlePacket>>) {
 
+  let clock = Instant::now();
+
+  let mut event_cache = VecDeque::<TofEvent>::with_capacity(EVENT_BUILDER_EVID_CACHE_SIZE);
+  let timeout_micro : u64 = 20;
+
+  let mut n_packets = 0usize;
+  let max_packets   : usize  = 10;
+  loop {
+    let mut event = TofEvent::new(0,0);
+    match evid_query.send(None) {
+      Err(_) => {continue;},
+      Ok(_) => {
+        match pp_recv.recv() {
+          Err(_) => {continue;},
+          Ok(pp_option) => {
+            match pp_option {
+              None => {
+                break;
+              },
+              Some(pp) => {
+                event.event_id = pp.event_id;
+                event.paddle_packets.push(pp);
+                n_packets += 1;
+              }
+            } // end inner match
+          } // end ok
+        }// end match
+      } // end outer ok
+    } // end match
+    if n_packets == max_packets {
+      break;
+    }
+    event_cache.push_back(event);
+    build_events_in_cache(&mut event_cache, timeout_micro,
+                          evid_query, pp_recv);
+  } // end loop
+  //  event.event_id = pp.event_id;
+  //  event.paddle_packets.push(pp);
+  //  event.timeout = clock.elapsed().as_micros();
+}
+
+
+/// The event builder, assembling events from an id given by the 
+/// master trigger
 ///
+/// This requires the master trigger sending `MasterTriggerEvents`
+/// over the channel. The event builder then will querey the 
+/// paddle_packet cache for paddle packets with the same event id
+/// Queries which can not be satisfied will lead to events being 
+/// cached until they can be completed, or discarded after 
+/// a timeout.
 ///
+/// # Arguments
 ///
+/// * master_id : Receive a `MasterTriggerEvent` over this 
+///               channel. The event will be either build 
+///               immediatly, or cached. 
+///
+/// * pp_query       : Send request to a paddle_packet cache
+/// * paddle_packets : Receive paddle_packets from a paddle_packet
+///                    cache
 ///
 pub fn event_builder (master_id      : &Receiver<MasterTriggerEvent>,
-                      pp_query       : &Sender<u32>,
-                      paddle_packets : &Receiver<PaddlePacket>) {
+                      pp_query       : &Sender<Option<u32>>,
+                      paddle_packets : &Receiver<Option<PaddlePacket>>) {
 
   let mut event_cache = VecDeque::<TofEvent>::with_capacity(EVENT_BUILDER_EVID_CACHE_SIZE);
 
@@ -67,14 +207,21 @@ pub fn event_builder (master_id      : &Receiver<MasterTriggerEvent>,
      let start = Instant::now();
      let timeout = Duration::from_micros(timeout_micro)
                    .as_micros();
-     pp_query.send(ev.event_id);
-     while (start.elapsed().as_micros() < timeout) {
+     pp_query.send(Some(ev.event_id));
+     while start.elapsed().as_micros() < timeout {
        let mut n_pad = 0;
        match paddle_packets.try_recv() { 
          Err(_) => {}
-         Ok(pp) => {
-           ev.paddle_packets.push(pp);
-           n_pad += 1
+         Ok(pp_or_none) => {
+           match pp_or_none {
+             Some(pp) => {
+               ev.paddle_packets.push(pp);
+               n_pad += 1
+             },
+             None => {
+               break;
+             }
+           }
          }
        } // end match
        if ev.is_complete() {
@@ -102,15 +249,21 @@ pub fn event_builder (master_id      : &Receiver<MasterTriggerEvent>,
        let start = Instant::now();
        let timeout = Duration::from_micros(timeout_micro)
                      .as_micros();
-       pp_query.send(mt.event_id);
-       while (start.elapsed().as_micros() < timeout) {
+       pp_query.send(Some(mt.event_id));
+       while start.elapsed().as_micros() < timeout {
          let mut n_pad = 0;
          match paddle_packets.try_recv() { 
            Err(_) => {}
-           Ok(pp) => {
-             event.paddle_packets.push(pp);
-             n_pad += 1
-
+           Ok(pp_or_none) => {
+             match pp_or_none {
+               Some(pp) => {
+                 event.paddle_packets.push(pp);
+                 n_pad += 1
+               }
+               None => {
+                 break;
+               }
+             } 
            }
          } // end match
          if event.paddle_packets.len() == mt.n_paddles as usize {

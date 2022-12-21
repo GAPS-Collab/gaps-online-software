@@ -6,11 +6,30 @@ pub const MAX_NBOARDS   : usize = 4;
 
 pub const MAX_NUM_PEAKS : usize = 50;
 
+///! Expected maximum trigger rate
+///
+///  This impacts the cache sizes, the 
+///  frequnecy we can poll the master 
+///  trigger, etc.
+///  Value in Hz
+///
+pub const MAX_TRIGGER_RATE : usize = 200;
+
+///! How long to wait for paddles packets for each event 
+///  in microseconds. This does highly depend on the 
+///  frequency with which the readoutboards are emitting
+///  For now, lets use 30s. 
+///  This will impact also the size of the caches 
+///  (see below)
+pub const EVENT_TIMEOUT : u128 = 30000000;
+
+
 ///! Limit the size of the internal paddle packet cache
 /// - all packets abvoe this value will be dropped
 pub const PADDLE_PACKET_CACHE_SIZE : usize = 20000;
 
 ///! Limit the size of the evids the event builder
 ///  is currently waiting to get paddles for
-///  FIXME - this should maybe be rate dependent?
+///  (this shoudl be rate*event_timeout
 pub const EVENT_BUILDER_EVID_CACHE_SIZE : usize = 10000;
+

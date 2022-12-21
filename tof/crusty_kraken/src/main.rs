@@ -202,8 +202,10 @@ fn main() {
 
   // prepare channels for inter thread communications
   let (master_ev_send, master_ev_rec): (Sender<MasterTriggerEvent>, Receiver<MasterTriggerEvent>) = channel(); 
-  let (pp_send, pp_rec) : (Sender<PaddlePacket>, Receiver<PaddlePacket>) = channel(); 
-  let (id_send, id_rec) : (Sender<u32>, Receiver<u32>) = channel();
+  let (pp_send, pp_rec) : (Sender<Option<PaddlePacket>>, Receiver<Option<PaddlePacket>>) = channel(); 
+  // pp RB -> 
+  let (rb_send, rb_rec) : (Sender<PaddlePacket>, Receiver<PaddlePacket>) = channel();
+  let (id_send, id_rec) : (Sender<Option<u32>>, Receiver<Option<u32>>) = channel();
   // prepare a thread pool. Currently we have
   // 1 thread per rb, 1 master trigger thread
   // and 1 event builder thread. There might
@@ -254,7 +256,7 @@ fn main() {
         Ok(_)    => info!("Bound socket to {}", address),
         Err(err) => panic!("Can not communicate with rb at address {}. Maybe you want to check your .json configuration file?, error {}",address, err)
     }
-    let this_rb_pp_sender = pp_send.clone();
+    let this_rb_pp_sender = rb_send.clone();
     worker_threads.execute(move || {
       readoutboard_communicator(&rb_comm_socket,
                                 this_rb_pp_sender,

@@ -1,9 +1,22 @@
-/***********************************/
+///
+///
+///
+///
+///
+///
+///
 
+use std::time::SystemTime;
+
+use crate::constants::EVENT_TIMEOUT;
 
 pub const RPADDLEPACKETSIZE    : usize = 26;
 pub const RPADDLEPACKETVERSION : &str = "rev1.0";
 
+///! Microseconds since epock
+fn elapsed_since_epoch() -> u128 {
+  SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_micros()
+}
 
 #[derive(Debug,Copy,Clone)]
 pub struct PaddlePacket  {
@@ -129,7 +142,18 @@ pub struct TofEvent  {
 
   // fields which won't get 
   // serialized
-  pub n_paddles_expected : u8
+  pub n_paddles_expected : u8,
+
+  /// for the event builder. 
+  /// if not using the master trigger,
+  /// we can look at the time the event has first
+  /// been seen and then it will be declared complete
+  /// after timeout microseconds
+  /// thus we are saving the time, this isntance has 
+  /// been created.
+  pub creation_time      : u128,
+
+  pub valid              : bool,
 }
 
 
@@ -137,21 +161,44 @@ impl TofEvent {
 
   pub fn new(event_id : u32,
              n_paddles_expected : u8) -> TofEvent {
+    let creation_time  = SystemTime::now()
+                         .duration_since(SystemTime::UNIX_EPOCH)
+                         .unwrap().as_micros();
+
     TofEvent { 
       head           : 0,
       event_id       : event_id,
       n_paddles      : 0, // we don't have more than 
-      paddle_packets : Vec::<PaddlePacket>::new(),
+      paddle_packets : Vec::<PaddlePacket>::with_capacity(20),
       tail           : 0,
 
-      n_paddles_expected : n_paddles_expected
+      n_paddles_expected : n_paddles_expected,
+
+      // This is strictly for when working
+      // with event timeouts
+      creation_time  : creation_time,
+
+      valid          : true,
     }
+  }
+
+  pub fn has_timed_out(&self) -> bool {
+    return elapsed_since_epoch() - self.creation_time > EVENT_TIMEOUT;
   }
 
   pub fn is_complete(&self) -> bool {
     self.n_paddles == self.n_paddles_expected
   }
 
+  ///! This means that all analysis is 
+  ///  done, and it is fully assembled
+  ///
+  ///  Alternatively, the timeout has 
+  ///  been passed
+  ///
+  pub fn ready_to_send(&self) -> bool{
+    return self.is_complete() || self.has_timed_out();
+  }
 }
   //  unsigned short p_length= RPADDLEPACKETSIZE;
 //
