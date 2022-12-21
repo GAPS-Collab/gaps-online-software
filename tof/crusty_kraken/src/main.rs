@@ -45,9 +45,11 @@ use clap::{arg,
 use crate::readoutboard_comm::readoutboard_communicator;
 use crate::master_trigger::{master_and_commander,
                             MasterTriggerEvent};
-use crate::event_builder::event_builder;
+use crate::event_builder::{event_builder,
+                           event_builder_no_master};
 use crate::threading::ThreadPool;
 use crate::reduced_tofevent::PaddlePacket;
+use crate::paddle_packet_cache::paddle_packet_cache;
 
 /*************************************/
 
@@ -201,21 +203,39 @@ fn main() {
   let mut rb_id          : usize;
 
   // prepare channels for inter thread communications
+  
+  // master thread -> event builder ocmmuncations
   let (master_ev_send, master_ev_rec): (Sender<MasterTriggerEvent>, Receiver<MasterTriggerEvent>) = channel(); 
+  // event builder  <-> paddle cache communications
   let (pp_send, pp_rec) : (Sender<Option<PaddlePacket>>, Receiver<Option<PaddlePacket>>) = channel(); 
-  // pp RB -> 
+  // readout boards <-> paddle cache communications 
   let (rb_send, rb_rec) : (Sender<PaddlePacket>, Receiver<PaddlePacket>) = channel();
+  // paddle cache <-> event builder communications
   let (id_send, id_rec) : (Sender<Option<u32>>, Receiver<Option<u32>>) = channel();
   // prepare a thread pool. Currently we have
   // 1 thread per rb, 1 master trigger thread
-  // and 1 event builder thread. There might
+  // and 1 event builder thread.
+  // Also, the paddle cache is its separate 
+  // thread.
+  // There might
   // be a monitoring thread, too.
   // The number of threads should be fixed at 
   // runtime, but it should be possible to 
   // respawn them
-  let nthreads = nboards + 2; // 
+  let mut nthreads = nboards + 2; // 
+  if master_trigger { 
+    nthreads += 1;
+  }
+
   let worker_threads = ThreadPool::new(nthreads);
-  
+ 
+  println!("==> Starting paddle cache trhead...");
+  worker_threads.execute(move || {
+                         paddle_packet_cache(&id_rec,
+                                             &rb_rec,
+                                             &pp_send);
+  });
+
   println!("==> Starting event builder and master trigger threads...");
   if master_trigger {
     // start the event builder thread
@@ -230,9 +250,15 @@ fn main() {
                                                 master_trigger_port,
                                                 &master_ev_send);
     });
+  } else {
+    // we start the event builder without 
+    // depending on the master trigger
+    worker_threads.execute(move || {
+                           event_builder_no_master(&id_send,
+                                                   &pp_rec);
+    });
   }
   println!("==> Will now start rb threads..");
-
 
   // open a zmq context
   let ctx = zmq::Context::new();
