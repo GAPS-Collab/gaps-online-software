@@ -13,8 +13,8 @@ use std::sync::mpsc::{Sender,
 use std::collections::VecDeque;
 //use std::collections::HashMap;
 
-use time::{Duration, 
-           Instant};
+use std::time::{Duration, 
+                Instant};
 
 use crate::reduced_tofevent::{PaddlePacket, TofEvent};
 use crate::master_trigger::MasterTriggerEvent;
