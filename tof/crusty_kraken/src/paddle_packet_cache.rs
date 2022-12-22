@@ -40,8 +40,10 @@ pub fn paddle_packet_cache (evid_rec    : &Receiver<Option<u32>>,
   //// which have to be worked on
   ////let mut m_evid_cache = VecDeque::<MasterTriggerEvent>::with_capacity(EVENT_BUILDER_EVID_CACHE_SIZE); 
   let n_tries = 20;
-  loop {
 
+  let mut n_iter = 0usize;
+  loop {
+    
     // every iteration, we welcome new paddle packets
     // and keep them. Let's try to receive a certain 
     // number of paddles, and then move on
@@ -116,6 +118,8 @@ pub fn paddle_packet_cache (evid_rec    : &Receiver<Option<u32>>,
   // FIXME - find something faster!
   // I saw comments that retain might be very slow
   pp_cache.retain(|&x| x.valid);
-  info!("Size of paddle_cache {} after clean up", pp_cache.len());
+  if n_iter % 1000 == 0 {
+    info!("Size of paddle_cache {} after clean up", pp_cache.len());
+  }
   } // end loop
 }
