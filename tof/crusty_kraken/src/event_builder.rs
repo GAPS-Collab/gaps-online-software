@@ -40,7 +40,8 @@ fn pack_and_send(event : &TofEvent) {
 fn build_events_in_cache(event_cache   : &mut VecDeque<TofEvent>,
                          timeout_micro : u64,
                          evid_query    : &Sender<Option<u32>>,
-                         pp_recv       : &Receiver<Option<PaddlePacket>>) {
+                         pp_recv       : &Receiver<Option<PaddlePacket>>,
+                         socket        : &zmq::Socket) {
 
   for ev in event_cache.iter_mut() {
     let start   = Instant::now();
@@ -68,12 +69,16 @@ fn build_events_in_cache(event_cache   : &mut VecDeque<TofEvent>,
       //  //error!("Not implemented!! We have to do something with the event, but we don't!");
       //  break; // on to the next event in cache
       //}
-      if ev.has_timed_out() {
-        info!("Event has timed out! {}", ev.event_id);
+      if ev.ready_to_send() {
         ev.valid = false;
-        //error!("Not implemented!! We have to do something with the event, but we don!");
-        break;
+        let bytestream = ev.to_bytestream();
+        match socket.send(&bytestream.as_slice(), 0) {
+          Err(err) => warn!("Packet sending failed! Err {}", err),
+          Ok(_)    => trace!("Event {} sent!", ev.event_id) 
+        }
       }
+      //error!("Not implemented!! We have to do something with the event, but we don!");
+      break;
     } // end while not timeout
   }
   // clean the cache - remove all completed events
@@ -128,7 +133,8 @@ fn build_events_in_cache(event_cache   : &mut VecDeque<TofEvent>,
 ///                event id it has in store
 ///
 pub fn event_builder_no_master(evid_query : &Sender<Option<u32>>,
-                               pp_recv    : &Receiver<Option<PaddlePacket>>) {
+                               pp_recv    : &Receiver<Option<PaddlePacket>>,
+                               socket     : &zmq::Socket) {
 
   info!("Initializing event builder without master trigger support!");
   let clock = Instant::now();
@@ -140,6 +146,9 @@ pub fn event_builder_no_master(evid_query : &Sender<Option<u32>>,
   let max_packets   : usize  = 10;
   loop {
     let mut event = TofEvent::new(0,0);
+    // we set the number of expected paddles to 
+    // unrealistic high number (max u8)
+    event.n_paddles_expected = 255; 
     match evid_query.send(None) {
       Err(_) => {continue;},
       Ok(_) => {
@@ -169,7 +178,7 @@ pub fn event_builder_no_master(evid_query : &Sender<Option<u32>>,
     //}
     event_cache.push_back(event);
     build_events_in_cache(&mut event_cache, timeout_micro,
-                          evid_query, pp_recv);
+                          evid_query, pp_recv, &socket);
     info!("Current size of event cache {}", event_cache.len());
   } // end loop
   //  event.event_id = pp.event_id;
@@ -200,7 +209,8 @@ pub fn event_builder_no_master(evid_query : &Sender<Option<u32>>,
 ///
 pub fn event_builder (master_id      : &Receiver<MasterTriggerEvent>,
                       pp_query       : &Sender<Option<u32>>,
-                      paddle_packets : &Receiver<Option<PaddlePacket>>) {
+                      pp_recv        : &Receiver<Option<PaddlePacket>>,
+                      socket         : &zmq::Socket) {
 
   let mut event_cache = VecDeque::<TofEvent>::with_capacity(EVENT_BUILDER_EVID_CACHE_SIZE);
 
@@ -209,37 +219,37 @@ pub fn event_builder (master_id      : &Receiver<MasterTriggerEvent>,
  
   // we try to receive eventids from the master trigger
   loop {
-   // let's work on our backlog and check if we can complete 
-   // events
-   for ev in event_cache.iter_mut() {
-     let start = Instant::now();
-     let timeout = Duration::from_micros(timeout_micro)
-                   .as_micros();
-     pp_query.send(Some(ev.event_id));
-     while start.elapsed().as_micros() < timeout {
-       let mut n_pad = 0;
-       match paddle_packets.try_recv() { 
-         Err(_) => {}
-         Ok(pp_or_none) => {
-           match pp_or_none {
-             Some(pp) => {
-               ev.paddle_packets.push(pp);
-               n_pad += 1
-             },
-             None => {
-               break;
-             }
-           }
-         }
-       } // end match
-       if ev.is_complete() {
-         trace!("Event {} building complete!", ev.event_id);
-         break; // on to the next event in cache
-       }
-     } // end while not timeout
-   }
-   // clean the cache - remove all completed events
-   event_cache.retain(|ev| !ev.is_complete());
+   //// let's work on our backlog and check if we can complete 
+   //// events
+   //for ev in event_cache.iter_mut() {
+   //  let start = Instant::now();
+   //  let timeout = Duration::from_micros(timeout_micro)
+   //                .as_micros();
+   //  pp_query.send(Some(ev.event_id));
+   //  while start.elapsed().as_micros() < timeout {
+   //    let mut n_pad = 0;
+   //    match paddle_packets.try_recv() { 
+   //      Err(_) => {}
+   //      Ok(pp_or_none) => {
+   //        match pp_or_none {
+   //          Some(pp) => {
+   //            ev.paddle_packets.push(pp);
+   //            n_pad += 1
+   //          },
+   //          None => {
+   //            break;
+   //          }
+   //        }
+   //      }
+   //    } // end match
+   //    if ev.is_complete() {
+   //      trace!("Event {} building complete!", ev.event_id);
+   //      break; // on to the next event in cache
+   //    }
+   //  } // end while not timeout
+   //}
+   //// clean the cache - remove all completed events
+   //event_cache.retain(|ev| !ev.is_complete());
 
    // every iteration, we welcome a new master event
    match master_id.try_recv() {
@@ -260,7 +270,7 @@ pub fn event_builder (master_id      : &Receiver<MasterTriggerEvent>,
        pp_query.send(Some(mt.event_id));
        while start.elapsed().as_micros() < timeout {
          let mut n_pad = 0;
-         match paddle_packets.try_recv() { 
+         match pp_recv.try_recv() { 
            Err(_) => {}
            Ok(pp_or_none) => {
              match pp_or_none {
@@ -279,16 +289,20 @@ pub fn event_builder (master_id      : &Receiver<MasterTriggerEvent>,
            break;
          }
        } // end while not timeout
-       if event.paddle_packets.len() == mt.n_paddles as usize {
-         trace!("Event {} building complete!", mt.event_id);
-         continue; // on to the next mt event
-       } else {
-         // we have to put the event on the stack and try
-         // again later
-         event_cache.push_back(event);
-       }
+       event_cache.push_back(event);
+       //if event.paddle_packets.len() == mt.n_paddles as usize {
+       //  trace!("Event {} building complete!", mt.event_id);
+       //  continue; // on to the next mt event
+       //} else {
+       //  // we have to put the event on the stack and try
+       //  // again later
+       //}
      }
     } // end match Ok(mt)
+
+  build_events_in_cache(&mut event_cache, timeout_micro,
+                        pp_query, pp_recv, &socket);
+
   trace!("Size of event cache {}", event_cache.len());
 
   } // end loop

@@ -39,6 +39,7 @@ macro_rules! tvec [
 
 /*************************************/
 
+
 fn get_file_as_byte_vec(filename: &String) -> Vec<u8> {
     let mut f = File::open(&filename).expect("no file found");
     let metadata = fs::metadata(&filename).expect("unable to read metadata");
@@ -457,6 +458,4 @@ pub fn readoutboard_communicator(socket           : &zmq::Socket,
     }
   }
 }
-
-/*************************************/
 

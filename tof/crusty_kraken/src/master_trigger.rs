@@ -31,6 +31,11 @@ pub struct MasterTriggerEvent {
   pub valid     : bool
 }
 
+#[derive(Debug, Copy, Clone)]
+struct IPbusPackage {
+}
+
+
 impl MasterTriggerEvent {
   pub fn new(event_id  : u32, 
              n_paddles : u8) -> MasterTriggerEvent {
@@ -281,9 +286,9 @@ fn read_daq(socket : &UdpSocket,
 /// Communications with the master trigger
 ///
 ///
-pub fn master_and_commander(mt_ip   : &str, 
-                            mt_port : usize,
-                            evid_sender : &Sender<MasterTriggerEvent>) {
+pub fn master_trigger(mt_ip   : &str, 
+                      mt_port : usize,
+                      evid_sender : &Sender<MasterTriggerEvent>) {
 
   let mt_address = mt_ip.to_owned() + ":" + &mt_port.to_string();
   //let mut socket : UdpSocket;

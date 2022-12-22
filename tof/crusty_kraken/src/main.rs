@@ -47,7 +47,7 @@ use clap::{arg,
            Parser};
 
 use crate::readoutboard_comm::readoutboard_communicator;
-use crate::master_trigger::{master_and_commander,
+use crate::master_trigger::{master_trigger,
                             MasterTriggerEvent};
 use crate::event_builder::{event_builder,
                            event_builder_no_master};
@@ -66,7 +66,7 @@ struct Args {
   #[arg(short, long, default_value_t = false)]
   write_blob: bool,
   #[arg(short, long, default_value_t = false)]
-  master_trigger: bool,
+  use_master_trigger: bool,
   /// A json config file with detector information
   #[arg(short, long)]
   json_config: Option<std::path::PathBuf>,
@@ -112,7 +112,7 @@ fn main() {
   
   let nboards       : usize;
 
-  let master_trigger = args.master_trigger;
+  let use_master_trigger = args.use_master_trigger;
   let mut master_trigger_ip   = String::from("");
   let mut master_trigger_port = 0usize;
 
@@ -134,7 +134,7 @@ fn main() {
     } // end Some
   } // end match
   
-  if master_trigger {
+  if use_master_trigger {
    master_trigger_ip   = config["master_trigger"]["ip"].as_str().unwrap().to_owned();
    master_trigger_port = config["master_trigger"]["port"].as_usize().unwrap();
    info!("Will connect to the master trigger board at {}:{}", master_trigger_ip, master_trigger_port);
@@ -227,7 +227,7 @@ fn main() {
   // runtime, but it should be possible to 
   // respawn them
   let mut nthreads = nboards + 2; // 
-  if master_trigger { 
+  if use_master_trigger { 
     nthreads += 1;
   }
 
@@ -240,32 +240,37 @@ fn main() {
                                              &pp_send);
   });
 
+  // open a zmq context
+  println!("==> Seting up zmq context and opening socket for event builder!");
+  let ctx = zmq::Context::new();
+  let evb_comm_socket = ctx.socket(zmq::PUB).unwrap();
+
   println!("==> Starting event builder and master trigger threads...");
-  if master_trigger {
+  if use_master_trigger {
     // start the event builder thread
     worker_threads.execute(move || {
                            event_builder(&master_ev_rec,
                                          &id_send,
-                                         &pp_rec);
+                                         &pp_rec,
+                                         &evb_comm_socket);
     });
     // master trigger
     worker_threads.execute(move || {
-                           master_and_commander(&master_trigger_ip, 
-                                                master_trigger_port,
-                                                &master_ev_send);
+                           master_trigger(&master_trigger_ip, 
+                                          master_trigger_port,
+                                          &master_ev_send);
     });
   } else {
     // we start the event builder without 
     // depending on the master trigger
     worker_threads.execute(move || {
                            event_builder_no_master(&id_send,
-                                                   &pp_rec);
+                                                   &pp_rec,
+                                                   &evb_comm_socket);
     });
   }
   println!("==> Will now start rb threads..");
 
-  // open a zmq context
-  let ctx = zmq::Context::new();
   for n in 0..nboards {
     board_config   = &config["readout_boards"][n];
     let mut address_ip = String::from("tcp://");
