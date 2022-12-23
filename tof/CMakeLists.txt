@@ -49,7 +49,7 @@ else()
   message(WARNING " -- Will compile software for the use with channel 9! No synchronisation across boards possible!")
   set(NCHANNELS 8 CACHE INTERNAL "Number of readoutboard channels" FORCE)
 endif(USE_CHANNEL_9) 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/include/TOFCommon.h.in ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/include/TOFCommon.h @ONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include/TOFCommon.h.in ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include/TOFCommon.h @ONLY)
 #configure_file(${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/threads/TOFParam.cpp.in ${CMAKE_CURRENT_SOURCE_DIR}/threads/TOFParam.cpp @ONLY)
 configure_file(${RBEMULATOR_DIR}/bin/RBEmulator.cxx.in ${RBEMULATOR_DIR}/bin/RBEmulator.cxx @ONLY)
 
@@ -136,7 +136,7 @@ if (BUILD_RBEMULATOR)
                   )
     target_include_directories(${RBEMULATOR_BIN}
                                 PUBLIC
-                                ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/include
+                                ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
                                 ${RBEMULATOR_DIR}/include
                               )
     target_link_libraries(${RBEMULATOR_BIN}
@@ -170,21 +170,21 @@ endif(BUILD_RBEMULATOR)
 
 set(GAPSTOF_LIBRARY_SHARED GapsTof CACHE INTERNAL "GapsTof shared library" FORCE)
 add_library(${GAPSTOF_LIBRARY_SHARED}
-             SHARED dataclasses/src/blobroutines.cpp 
-                    dataclasses/src/TofPacket.cxx
-                    dataclasses/src/REventPacket.cxx
-                    dataclasses/src/RBEnvPacket.cxx
-                    dataclasses/src/RPaddlePacket.cxx
-                    dataclasses/src/WfPaddlePacket.cxx
-                    dataclasses/src/serialization.cxx
-                    dataclasses/src/CraneLogging.cc
-                    dataclasses/src/WaveGAPS.cpp
+    SHARED dataclasses/C++/src/blobroutines.cpp 
+    dataclasses/C++/src/TofPacket.cxx
+    dataclasses/C++/src/REventPacket.cxx
+    dataclasses/C++/src/RBEnvPacket.cxx
+    dataclasses/C++/src/RPaddlePacket.cxx
+    dataclasses/C++/src/WfPaddlePacket.cxx
+    dataclasses/C++/src/serialization.cxx
+    dataclasses/C++/src/CraneLogging.cc
+    dataclasses/C++/src/WaveGAPS.cpp
                 )
 
 target_compile_options(${GAPSTOF_LIBRARY_SHARED} PRIVATE -Wall -Wextra -Wpedantic)# -Werror)
 target_include_directories(${GAPSTOF_LIBRARY_SHARED}
                             PUBLIC
-                              ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/include
+                            ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
                               $<$<BOOL:${BUILD_ROOTCOMPONENTS}>:${ROOT_INCLUDE_DIRS}>
                               ${Boost_INCLUDE_DIR}
                           )
@@ -228,7 +228,7 @@ if (BUILD_PYBINDINGS)
   pybind11_add_module(${pybindings} MODULE pybindings/module.cxx)
   target_include_directories(${pybindings}
                             PUBLIC
-                              ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/include
+                            ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
                             )
   get_property(the_include_dirs TARGET ${pybindings} PROPERTY INCLUDE_DIRECTORIES)
   foreach(dir ${the_include_dirs})

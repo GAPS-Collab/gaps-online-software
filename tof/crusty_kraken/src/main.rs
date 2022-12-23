@@ -31,6 +31,7 @@ extern crate ndarray;
 #[cfg(feature="random")]
 extern crate rand;
 
+extern crate tof_dataclasses;
 
 use std::{thread,
           time,
@@ -52,7 +53,9 @@ use crate::master_trigger::{master_trigger,
 use crate::event_builder::{event_builder,
                            event_builder_no_master};
 use crate::threading::ThreadPool;
-use crate::reduced_tofevent::PaddlePacket;
+//use crate::reduced_tofevent::PaddlePacket;
+
+use tof_dataclasses::packets::paddle_packet::PaddlePacket;
 use crate::paddle_packet_cache::paddle_packet_cache;
 
 /*************************************/
@@ -244,6 +247,16 @@ fn main() {
   println!("==> Seting up zmq context and opening socket for event builder!");
   let ctx = zmq::Context::new();
   let evb_comm_socket = ctx.socket(zmq::PUB).unwrap();
+  let mut address_ip = String::from("tcp://");
+  address_ip += config["flight_computer"]["ip_address"].as_str().unwrap();
+  port        = config["flight_computer"]["port"].as_usize().unwrap();
+  address = address_ip.to_owned() + ":" + &port.to_string();
+  info!("Will bind to port for flight comp comm at {}", address);
+  let evb_comm_ok = evb_comm_socket.bind(&address);
+  match evb_comm_ok {
+      Ok(_)    => info!("Bound socket to {}", address),
+      Err(err) => panic!("Can not communicate with rb at address {}. Maybe you want to check your .json configuration file?, error {}",address, err)
+  }
 
   println!("==> Starting event builder and master trigger threads...");
   if use_master_trigger {
@@ -273,7 +286,7 @@ fn main() {
 
   for n in 0..nboards {
     board_config   = &config["readout_boards"][n];
-    let mut address_ip = String::from("tcp://");
+    address_ip = String::from("tcp://");
     let rb_comm_socket = ctx.socket(zmq::REP).unwrap();
     rb_id = board_config["id"].as_usize().unwrap();
     address_ip += board_config["ip_address"].as_str().unwrap();

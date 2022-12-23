@@ -5,17 +5,129 @@
 ///
 ///
 
-
+use std::time::SystemTime;
 use std::sync::mpsc::{Sender,
                       Receiver};
 
+use std::collections::HashMap;
+
 use std::collections::VecDeque;
 
-use crate::reduced_tofevent::PaddlePacket;
+//use crate::reduced_tofevent::{PaddlePacket,
+//                              TofEvent};
+use crate::reduced_tofevent::TofEvent;
 use crate::master_trigger::MasterTriggerEvent;
-use crate::constants::PADDLE_PACKET_CACHE_SIZE;
+use crate::constants::{PADDLE_PACKET_CACHE_SIZE,
+                       EVENT_CACHE_SIZE,
+                       EXP_N_PADDLES_PER_EVENT};
 
+use tof_dataclasses::packets::paddle_packet::PaddlePacket;
 
+///////struct EventCache {
+///////
+///////  event_cache : HashMap::<u32, TofEvent>, 
+///////}
+///////
+///////impl EventCache {
+///////
+///////  pub fn new() -> EventCache {
+///////    EventCache {
+///////      event_cache : HashMap::<u32,TofEvent>::with_capacity(EVENT_CACHE_SIZE)
+///////    }
+///////  }
+///////
+///////  pub fn init(&mut self) {
+///////    for n in 0..EVENT_CACHE_SIZE as u32 {
+///////      self.event_cache.get_mut(n) = TofEvent::new(0,0);
+///////    }
+///////  }
+///////
+///////  pub fn add_pp(&mut self, pp : PaddlePacket) {
+///////    match self.event_cache.get_mut(pp.event_id) {
+///////      Err(_) => self.event_cache.insert
+///////    }
+///////        .add_paddle(pp);
+///////  }
+///////}
+///////
+///////pub fn event_cache (evid_rec    : &Receiver<Option<u32>>,
+///////                    pp_rec      : &Receiver<PaddlePacket>,
+///////                    pp_send     : &Sender<Option<PaddlePacket>>) {
+///////}
+/////////struct PaddlePacketCache {
+/////////
+/////////  //event_cache     : [TofEvent;PADDLE_PACKET_CACHE_SIZE],
+/////////  //eventid_idx_map : [u32;PADDLE_PACKET_CACHE_SIZE],
+/////////  ////packet_cache    : [Vec<PaddlePacket>;PADDLE_PACKET_CACHE_SIZE],
+/////////  //idx : usize,
+/////////  //first_id : u32
+/////////}
+/////////
+/////////impl PaddlePacketCache {
+/////////
+/////////  pub fn new() -> PaddlePacketCache {
+/////////    //const INIT : Vec::<PaddlePacket> = Vec::<PaddlePacket>::new();
+/////////    //let creation_time  = SystemTime::now()
+/////////    //                     .duration_since(SystemTime::UNIX_EPOCH)
+/////////    //                     .unwrap().as_micros();
+/////////
+/////////    //const INIT : TofEvent = TofEvent { 
+/////////    //  event_id       : 0,
+/////////    //  n_paddles      : 0,  
+/////////    //  paddle_packets : vec![],
+/////////
+/////////    //  n_paddles_expected : 0,
+/////////
+/////////    //  // This is strictly for when working
+/////////    //  // with event timeouts
+/////////    //  creation_time  : 0,
+/////////
+/////////    //  valid          : true,
+/////////    //};
+/////////    //PaddlePacketCache {
+/////////    //  event_cache     : [INIT;PADDLE_PACKET_CACHE_SIZE],
+/////////    //  eventid_idx_map : [0;PADDLE_PACKET_CACHE_SIZE],
+/////////    //  //packet_cache : [INIT;PADDLE_PACKET_CACHE_SIZE],
+/////////    //  idx : 0,
+/////////    //  first_id       : 0
+/////////    //}
+/////////  }
+/////////
+/////////  ///! Initialize the cache
+/////////  ///
+/////////  ///  Warning, the initial paddle 
+/////////  ///  packet will be thrown away!
+/////////  ///
+/////////  ///
+/////////  //pub fn init(&mut self, pp : PaddlePacket) {
+/////////    //for n in 0..PADDLE_PACKET_CACHE_SIZE { 
+/////////    //  self.eventid_idx_map[n] = 0;
+/////////    //  self.event_cache[n]     = TofEvent::new(0,0);
+/////////    //}
+/////////    //self.idx = 0;
+/////////    //self.first_id = pp.event_id;
+/////////  //}
+/////////
+/////////  //fn calculate_event_hash(&mut self, event_id : u32) {
+/////////  //  /// assuming a max rate of 1k, we will get
+/////////  //  /// 30000 events in 30 sec
+/////////  //  let delta_evid  = event_id as i32 - self.first_id as i32;
+/////////  //  if delta_evid
+/////////  //  self.idx = (event_id - self.first_id) - 1000;
+/////////
+/////////  //}
+/////////
+/////////  //pub fn add_packet(&mut self, pp : PaddlePacket) {
+/////////  //  // to calculate our event hash
+/////////  //  //
+/////////
+/////////
+/////////  //  self.idx += 1;
+/////////  //  //self.packet_cache[self.idx].push(pp);
+/////////  //}
+/////////
+/////////}
+///////
 ///! The cache stores paddle packets as they 
 ///  are coming from the readoutboard threads.
 ///
@@ -115,11 +227,14 @@ pub fn paddle_packet_cache (evid_rec    : &Receiver<Option<u32>>,
       } // end match
     } // end ok
   } // end match
-  // FIXME - find something faster!
-  // I saw comments that retain might be very slow
-  pp_cache.retain(|&x| x.valid);
-  if n_iter % 1000 == 0 {
-    info!("Size of paddle_cache {} after clean up", pp_cache.len());
+  if n_iter % 10000 == 0 {
+    let size_b4 = pp_cache.len();
+    // FIXME - find something faster!
+    // I saw comments that retain might be very slow
+    pp_cache.retain(|&x| x.valid);
+    let size_af = pp_cache.len();
+    info!("Size of paddle_cache {} before and {} after clean up", size_b4, size_af);
   }
+  n_iter += 1;
   } // end loop
 }

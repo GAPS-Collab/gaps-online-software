@@ -1,6 +1,10 @@
 {
   "meta" : "",
   "unix_time" : "",
+  "flight_computer" : {
+      "ip_address" : "127.0.0.1",
+      "port"       : 30000
+  },
   "readout_boards" : [
     {
       "id"               : 1,

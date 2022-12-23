@@ -28,8 +28,14 @@ pub const EVENT_TIMEOUT : u128 = 30000000;
 /// - all packets abvoe this value will be dropped
 pub const PADDLE_PACKET_CACHE_SIZE : usize = 20000;
 
+///! This should be rate dependent
+pub const EVENT_CACHE_SIZE : usize = 30000;
+
 ///! Limit the size of the evids the event builder
 ///  is currently waiting to get paddles for
 ///  (this shoudl be rate*event_timeout
 pub const EVENT_BUILDER_EVID_CACHE_SIZE : usize = 10000;
+
+///! Average number of paddle packets per event
+pub const EXP_N_PADDLES_PER_EVENT : usize = 10;
 

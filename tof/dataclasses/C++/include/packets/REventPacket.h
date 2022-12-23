@@ -7,18 +7,26 @@
 
 // no JOKE!
 #define REVENTPACKETSIZEFIXED 42 
-#define REVENTPACKETVERSION "rev1.0"
+#define REVENTPACKETVERSION "rev1.1"
 
 /**
  * Version 1.0
  * -> extends head and tail to 2 bytes
+ *
+ * Version 1.1
+ * -> adds n_paddles (char) field. This 
+ *    is used to calculate the total length
+ *    of the packet. We use the p_length field
+ *    for that and just rename it. 
  */
 struct REventPacket {
   unsigned short head = 0xAAAA;
 
-  unsigned short p_length;
+  unsigned short n_paddles;
   uint32_t event_ctr;
   uint64_t utc_timestamp;
+
+  
 
   // reconstructed quantities
   uint16_t primary_beta;

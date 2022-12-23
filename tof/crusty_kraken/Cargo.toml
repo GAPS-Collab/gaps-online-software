@@ -24,6 +24,9 @@ diagnostics = []
 random =[]
 
 [dependencies]
+
+tof-dataclasses = { path = "../dataclasses/rust/tof-dataclasses" } 
+
 zmq = "0.10.0"
 # this is technically optional
 # it is just used to integrate

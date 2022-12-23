@@ -1,4 +1,4 @@
-///
+///! Assemble tof packets to full events
 ///
 ///
 ///
@@ -16,11 +16,11 @@ use std::collections::VecDeque;
 use std::time::{Duration, 
                 Instant};
 
-use crate::reduced_tofevent::{PaddlePacket, TofEvent};
+use crate::reduced_tofevent::TofEvent;
 use crate::master_trigger::MasterTriggerEvent;
 use crate::constants::EVENT_BUILDER_EVID_CACHE_SIZE;
 
-
+use tof_dataclasses::packets::paddle_packet::PaddlePacket;
 ///! Serialize a tof event and send it 
 ///  over th provided zmq socket
 ///
@@ -37,16 +37,24 @@ fn pack_and_send(event : &TofEvent) {
 ///
 ///  # Arguments:
 ///
+///
+///  * clean_up : call vec::retain to only keep events which 
+///               have not yet been sent.
 fn build_events_in_cache(event_cache   : &mut VecDeque<TofEvent>,
                          timeout_micro : u64,
                          evid_query    : &Sender<Option<u32>>,
                          pp_recv       : &Receiver<Option<PaddlePacket>>,
+                         clean_up      : bool,
+                         use_timeout   : bool, 
                          socket        : &zmq::Socket) {
 
   for ev in event_cache.iter_mut() {
     let start   = Instant::now();
     let timeout = Duration::from_micros(timeout_micro)
                   .as_micros();
+    if !ev.valid {
+      continue;
+    }
     evid_query.send(Some(ev.event_id));
     while start.elapsed().as_micros() < timeout {
       match pp_recv.try_recv() { 
@@ -57,20 +65,14 @@ fn build_events_in_cache(event_cache   : &mut VecDeque<TofEvent>,
               continue;
             },
             Some(pp) => {
-              ev.paddle_packets.push(pp);
+              ev.add_paddle(pp);
             }
           }
         }
       } // end match
 
-      //if ev.is_complete()  {
-      //  trace!("Event {} building complete!", ev.event_id);
-      //  ev.valid = false;
-      //  //error!("Not implemented!! We have to do something with the event, but we don't!");
-      //  break; // on to the next event in cache
-      //}
-      if ev.ready_to_send() {
-        ev.valid = false;
+      if ev.is_ready_to_send(use_timeout) {
+        (*ev).valid = false;
         let bytestream = ev.to_bytestream();
         match socket.send(&bytestream.as_slice(), 0) {
           Err(err) => warn!("Packet sending failed! Err {}", err),
@@ -78,13 +80,16 @@ fn build_events_in_cache(event_cache   : &mut VecDeque<TofEvent>,
         }
       }
       //error!("Not implemented!! We have to do something with the event, but we don!");
-      break;
+      //break;
     } // end while not timeout
-  }
+  } // end iter over cache
   // clean the cache - remove all completed events
-  info!("Size of cache before clean up {}", event_cache.len());
-  event_cache.retain(|ev| ev.valid);
-  info!("Size of cache after clean up {}", event_cache.len());
+  if clean_up {
+    let size_b4 = event_cache.len();
+    event_cache.retain(|ev| ev.valid);
+    let size_af = event_cache.len();
+    info!("Size of event cache before {} and after clean up {}", size_b4, size_af);
+  }
 }
 
 
@@ -144,6 +149,13 @@ pub fn event_builder_no_master(evid_query : &Sender<Option<u32>>,
 
   let mut n_packets = 0usize;
   let max_packets   : usize  = 10;
+  let mut n_iter = 0; // don't worry, it'll simply get wrapped around
+
+  //// how many new events per 
+  //// iteration do we want to allow?
+  //let max_new_events : usize = 100;
+  //let evid_seen = [0
+
   loop {
     let mut event = TofEvent::new(0,0);
     // we set the number of expected paddles to 
@@ -164,8 +176,8 @@ pub fn event_builder_no_master(evid_query : &Sender<Option<u32>>,
               },
               Some(pp) => {
                 event.event_id = pp.event_id;
-                event.paddle_packets.push(pp);
-                info!("Have event with event id {}", event.event_id);
+                event.add_paddle(pp);
+                trace!("Have event with event id {}", event.event_id);
                 n_packets += 1;
               }
             } // end inner match
@@ -177,9 +189,24 @@ pub fn event_builder_no_master(evid_query : &Sender<Option<u32>>,
     //  break;
     //}
     event_cache.push_back(event);
-    build_events_in_cache(&mut event_cache, timeout_micro,
-                          evid_query, pp_recv, &socket);
-    info!("Current size of event cache {}", event_cache.len());
+    if n_iter % 100 == 0 {
+      build_events_in_cache(&mut event_cache,
+                            timeout_micro,
+                            evid_query,
+                            pp_recv,
+                            true,
+                            true,
+                            &socket);
+    } else {
+      build_events_in_cache(&mut event_cache,
+                            timeout_micro,
+                            evid_query,
+                            pp_recv,
+                            false,
+                            true,
+                            &socket);
+    }
+    n_iter += 1;
   } // end loop
   //  event.event_id = pp.event_id;
   //  event.paddle_packets.push(pp);
@@ -216,7 +243,7 @@ pub fn event_builder (master_id      : &Receiver<MasterTriggerEvent>,
 
   // timeout in microsecnds
   let timeout_micro = 100;
- 
+  let mut n_iter = 0; // don't worry it'll be simply wrapped around
   // we try to receive eventids from the master trigger
   loop {
    //// let's work on our backlog and check if we can complete 
@@ -275,7 +302,7 @@ pub fn event_builder (master_id      : &Receiver<MasterTriggerEvent>,
            Ok(pp_or_none) => {
              match pp_or_none {
                Some(pp) => {
-                 event.paddle_packets.push(pp);
+                 event.add_paddle(pp);
                  n_pad += 1
                }
                None => {
@@ -284,7 +311,7 @@ pub fn event_builder (master_id      : &Receiver<MasterTriggerEvent>,
              } 
            }
          } // end match
-         if event.paddle_packets.len() == mt.n_paddles as usize {
+         if event.is_complete() {
            trace!("Event {} building complete!", mt.event_id);
            break;
          }
@@ -299,12 +326,15 @@ pub fn event_builder (master_id      : &Receiver<MasterTriggerEvent>,
        //}
      }
     } // end match Ok(mt)
-
-  build_events_in_cache(&mut event_cache, timeout_micro,
-                        pp_query, pp_recv, &socket);
-
-  trace!("Size of event cache {}", event_cache.len());
-
+    if n_iter % 1000 == 0 {
+      build_events_in_cache(&mut event_cache, timeout_micro,
+                            pp_query,
+                            pp_recv,
+                            true,
+                            false,
+                            &socket);
+    }
+    n_iter += 1;
   } // end loop
 
 

@@ -130,7 +130,7 @@ BlobEvt_t* TOF::BlobFileServer::GetNextEvent(){
       std::cout << "[DEBUG] inevent " << inevent[k] << std::endl;
       
       // at the very last, read the next event if there is one more      
-      std::cout<<"[DEBUG] Reading events.."<< std::endl;
+      //std::cout<<"[DEBUG] Reading events.."<< std::endl;
       if (inevent[k]==1 && status_[k] != -1 ) { // status=-1 -> EOF
           status_[k] = ReadEvent(blob_files_[k], &event_[k]);
           nevents_processed_++;
@@ -435,13 +435,13 @@ void TOF::BlobFileServer::Serve()
           {// lets use ReadEvent to get the packet length
 
             //if (inevent[k]==1 && status_[k] != -1 ) { // status=-1 -> EOF
-            std::cout << "[INFO] Reading events..." << std::endl;
+            //std::cout << "[INFO] Reading events..." << std::endl;
             status_[k] = ReadEvent(blob_files_[k], &event_[k]);
-            std::cout << "[INFO] Read event success flag " << status_[k] << std::endl;
+            //std::cout << "[INFO] Read event success flag " << status_[k] << std::endl;
             if (status_[k] == -1) all_files_ended[k] = true;
             //if (status_[k] == -1) std::exit(1);
             lSize = event_[k].len;
-            std::cout << "[INFO] status, len, evt ctr, tail " <<  event_[k].status << " " << event_[k].len << " " << event_[k].event_ctr << " " << event_[k].tail << std::endl;
+            //std::cout << "[INFO] status, len, evt ctr, tail " <<  event_[k].status << " " << event_[k].len << " " << event_[k].event_ctr << " " << event_[k].tail << std::endl;
 
             // modify the event counter so that it just rises continously
             //event_[k].event_ctr += nevents_processed_ + j;
@@ -451,8 +451,8 @@ void TOF::BlobFileServer::Serve()
             if (j > 0)
                 {encode_blobevent(&event_[k], cachebuffer, (j*BLOBEVENTSIZE + npadbytes )); }
             else { encode_blobevent(&event_[k], cachebuffer, 0); }
-            std::cout << "-- " << j << " --"  << std::endl;
-            std::cout << "CHECK " << event_[k].head << " " << event_[k].tail << std::endl;
+            //std::cout << "-- " << j << " --"  << std::endl;
+            //std::cout << "CHECK " << event_[k].head << " " << event_[k].tail << std::endl;
             // add some padding after each event
             //std::cout << event_[k].head << "\n";
             //std::cout << event_[k].status << "\n";
@@ -475,7 +475,7 @@ void TOF::BlobFileServer::Serve()
            //std::cout << status_[k] << std::endl;//
           } // end loop over events per board to emulate cache
           
-          std::cout << "[DEBUG] encoding finished!" << std::endl;
+          //std::cout << "[DEBUG] encoding finished!" << std::endl;
         
         //all_files_ended = (all_files_ended || (status_[k] == -1));
         //std::cout << " read " << result << std::endl;
@@ -491,7 +491,7 @@ void TOF::BlobFileServer::Serve()
         //sockets_[k];
         //
         zmq::message_t msg(cachebuffer.data(),cachebuffer.size());
-        std::cout << "[DEBUG] we are sending a buffer of size " << cachebuffer.size() << std::endl;
+        //std::cout << "[DEBUG] we are sending a buffer of size " << cachebuffer.size() << std::endl;
         //std::cout << " -- raw binary data -- " << cachebuffer.data() << std::endl;
         zmq::message_t server_response("hello world!", 12);
         try { 
@@ -505,7 +505,7 @@ void TOF::BlobFileServer::Serve()
             std::cout << "[WARN] sending message failed " << std::endl;
         }
         //zframe_send(&frame, sockets_[k],0);
-        std::cout << "[DEBUG] frame send!" << std::endl;
+        //std::cout << "[DEBUG] frame send!" << std::endl;
         //zframe_destroy (&frame);
         //std::cout << "[DEBUG] frame destroyed!" << std::endl;
         npackets_sent++;

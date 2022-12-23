@@ -17,9 +17,9 @@ use hdf5;
 #[cfg(feature = "diagnostics")]
 use ndarray::{arr1};
 
-
+use tof_dataclasses::packets::paddle_packet::PaddlePacket;
 use crate::errors::BlobError;
-use crate::reduced_tofevent::PaddlePacket;
+//use crate::reduced_tofevent::PaddlePacket;
 use crate::calibrations::{Calibrations,
                           read_calibration_file};
                           //remove_spikes,
