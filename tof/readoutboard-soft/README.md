@@ -8,3 +8,6 @@
 * Send blob information per request over zmq socket
 
 
+### Helpful resources
+
+https://linux-kernel-labs.github.io/refs/heads/master/labs/memory_mapping.html

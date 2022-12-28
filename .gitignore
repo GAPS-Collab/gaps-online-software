@@ -7,6 +7,8 @@ tof/readoutboard-emulator/bin/RBEmulator.cxx
 tof/crusty_kraken/target/*
 tof/crusty_kraken/*.hdf
 
+tof/dataclasses/rust/tof_dataclasses/target/*
+
 # files created by google protocol buffers
 dataclasses/*pb.h
 dataclasses/*pb.cc

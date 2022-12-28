@@ -13,3 +13,6 @@ random=[]
 log = "0.4"
 pretty_env_logger = "0.4"
 
+# for testing
+# used for the random number generation
+rand = "0.8"

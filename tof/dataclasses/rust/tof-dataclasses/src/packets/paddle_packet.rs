@@ -15,8 +15,9 @@ use crate::errors::SerializationError;
 use crate::serialization::search_for_u16;
 
 #[cfg(feature="random")]
+extern crate rand;
+#[cfg(feature="random")]
 use rand::Rng;
-
 
 
 ///! Representation of analyzed data from a paddle
@@ -231,7 +232,7 @@ impl PaddlePacket {
 
   #[cfg(feature="random")]
   pub fn from_random() -> PaddlePacket {
-    let mut pp = PaddlePacket::new();
+    let mut pp  = PaddlePacket::new();
     let mut rng = rand::thread_rng();
 
     pp.paddle_id    = rng.gen::<u8> ();
