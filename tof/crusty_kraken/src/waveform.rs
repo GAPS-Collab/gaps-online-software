@@ -1,10 +1,10 @@
 /*****************************************/
 
-use crate::constants::{NWORDS,
-                       MAX_NUM_PEAKS};
+use tof_dataclasses::constants::{NWORDS,
+                                 MAX_NUM_PEAKS};
 
-use crate::errors::WaveformError;
-use crate::readoutboard_blob::BlobData;
+use tof_dataclasses::errors::WaveformError;
+use tof_dataclasses::events::blob::BlobData;
 
 #[cfg(feature = "diagnostics")]
 #[cfg(feature = "blosc")]
@@ -28,20 +28,20 @@ use hdf5;
 pub struct CalibratedWaveform {
   pub event_ctr : u32,
   pub channel   : usize,
-  wave  : [f64;NWORDS],
-  times : [f64;NWORDS],
+  wave          : [f64;NWORDS],
+  times         : [f64;NWORDS],
   /// peak properties
   /// bin positions
-  peaks   : [usize;MAX_NUM_PEAKS],
-  tdcs    : [f64;MAX_NUM_PEAKS],
-  charge  : [f64;MAX_NUM_PEAKS],
-  width   : [f64;MAX_NUM_PEAKS], 
-  height  : [f64;MAX_NUM_PEAKS],    
-  num_peaks  : usize,
-  stop_cell  : u16,
-  begin_peak : [usize;MAX_NUM_PEAKS],
-  end_peak   : [usize;MAX_NUM_PEAKS],
-  spikes     : [usize;MAX_NUM_PEAKS],
+  peaks         : [usize;MAX_NUM_PEAKS],
+  tdcs          : [f64;MAX_NUM_PEAKS],
+  charge        : [f64;MAX_NUM_PEAKS],
+  width         : [f64;MAX_NUM_PEAKS], 
+  height        : [f64;MAX_NUM_PEAKS],    
+  num_peaks     : usize,
+  stop_cell     : u16,
+  begin_peak    : [usize;MAX_NUM_PEAKS],
+  end_peak      : [usize;MAX_NUM_PEAKS],
+  spikes        : [usize;MAX_NUM_PEAKS],
 
   // these values are for baseline 
   // subtraction, cfd calculation etc.
@@ -112,18 +112,18 @@ impl CalibratedWaveform {
   }
   
   pub fn set_ped_begin(&mut self, time : f64) {
-      match self.time_2_bin(time) {
-          Err(err) => println!("Can not find bin for time {}, err FIXME", time),
-          Ok(begin) => {self.ped_begin_bin = begin;}
-      }
+    match self.time_2_bin(time) {
+      Err(err) => println!("Can not find bin for time {}, err FIXME", time),
+      Ok(begin) => {self.ped_begin_bin = begin;}
+    }
   }
 
   pub fn set_ped_range(&mut self, range : f64) {
     // This is a little convoluted, but we must convert the range (in
     // ns) into bins
     match self.time_2_bin(self.times[self.ped_begin_bin] + range) {
-        Err(err)      => println!("Can not set pedestal range for range {}", range),
-        Ok(bin_range) => {self.ped_bin_range = bin_range;}
+      Err(err)      => println!("Can not set pedestal range for range {}", range),
+      Ok(bin_range) => {self.ped_bin_range = bin_range;}
     }
   }
 
@@ -311,81 +311,4 @@ impl CalibratedWaveform {
     self.begin_peak[peak_ctr] = NWORDS; // Need this to measure last peak correctly
     //peaks_found = 1;
   }
-
-
 } // end impl
-
-
-
-/*
-///
-/// Waveform type which owns the data. This is 
-/// solely used for diagnostics (slow) and can
-/// be written to an hdf file for later
-/// analysis
-///
-#[cfg(feature = "diagnostics")]
-#[derive(hdf5::H5Type, Clone, PartialEq, Debug)] // register with HDF5
-#[repr(C)]
-pub struct CalibratedWaveformForDiagnostics{
-  pub wave  :   [f64;NWORDS],
-  pub times :   [f64;NWORDS],
-  /// peak properties
-  /// bin positions
-  pub peaks   : [usize;MAX_NUM_PEAKS],
-  pub tdcs    : [f64;MAX_NUM_PEAKS],
-  pub charge  : [f64;MAX_NUM_PEAKS],
-  pub width   : [f64;MAX_NUM_PEAKS], 
-  pub height  : [f64;MAX_NUM_PEAKS],    
-  pub num_peaks  : usize,
-  pub stop_cell  : u16,
-  pub begin_peak : [usize;MAX_NUM_PEAKS],
-  pub end_peak   : [usize;MAX_NUM_PEAKS],
-  pub spikes     : [usize;MAX_NUM_PEAKS],
-}
-
-#[cfg(feature = "diagnostics")]
-impl CalibratedWaveformForDiagnostics {
-
-  pub fn new(wf : &CalibratedWaveform) -> CalibratedWaveformForDiagnostics {
-    CalibratedWaveformForDiagnostics {
-      //wave       : *wf.wave, //[0.0;NWORDS],
-      //times      : *wf.times,
-      wave       : wf.wave, //[0.0;NWORDS],
-      times      : wf.times,
-      peaks      : wf.peaks,
-      tdcs       : wf.tdcs,
-      charge     : wf.charge,
-      width      : wf.width, 
-      height     : wf.height,    
-      num_peaks  : wf.num_peaks,
-      stop_cell  : wf.stop_cell,
-      begin_peak : wf.begin_peak,
-      end_peak   : wf.end_peak,
-      spikes     : wf.spikes
-    }      
-  }
-  
-  pub fn print(&self) {
-    println!("<=== Diagnositcs waveform with {} entries ===>", NWORDS);
-    println!(" .. wave: [");
-    for n in 0..5 {
-      print!("{},", self.wave[n]);  
-    }
-    println!("..]");
-    println!(" .. times:");
-    for n in 0..5 {
-      print!("{},", self.times[n]);  
-    }
-    println!("..]");
-    println!(" .. tdcs:");
-    for n in 0..5 {
-      print!("{},", self.tdcs[n]);  
-    }
-    println!("..]");
-    println!("*************************");
-  }
-
-}
-
-*/

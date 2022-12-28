@@ -20,14 +20,14 @@ use ndarray::{arr1};
 use tof_dataclasses::packets::paddle_packet::PaddlePacket;
 use crate::errors::BlobError;
 //use crate::reduced_tofevent::PaddlePacket;
-use crate::calibrations::{Calibrations,
-                          read_calibration_file};
-                          //remove_spikes,
-                          //voltage_calibration, 
-                          //timing_calibration};
-use crate::readoutboard_blob::{BlobData,
-                               get_constant_blobeventsize};
-use crate::constants::{NCHN,
+use tof_dataclasses::calibrations::{Calibrations,
+                                    read_calibration_file};
+                                    //remove_spikes,
+                                    //voltage_calibration, 
+                                    //timing_calibration};
+use tof_dataclasses::events::blob::{BlobData,
+                                    get_constant_blobeventsize};
+use tof_dataclasses::constants::{NCHN,
                        NWORDS};
 use crate::waveform::CalibratedWaveform;
 
