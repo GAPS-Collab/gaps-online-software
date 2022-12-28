@@ -7,3 +7,11 @@ pub enum SerializationError {
     ValueNotFound
 }
 
+
+#[derive(Debug)]
+pub enum WaveformError {
+    TimeIndexOutOfBounds,
+    TimesTooSmall,
+    NegativeLowerBound,
+    OutOfRangeUpperBound
+}
