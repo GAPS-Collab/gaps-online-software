@@ -11,7 +11,7 @@
 
 use crate::constants::{NWORDS, NCHN, MAX_NUM_PEAKS};
 use crate::errors::WaveformError;
-
+use crate::serialization::search_for_u16;
 use crate::calibrations::Calibrations;
 
 pub fn get_constant_blobeventsize() -> usize {
@@ -91,9 +91,85 @@ impl BlobData {
   ///
   ///FIXME - more correctly, this should be 
   ///"deserialize from readoutboard_blob
+  ///
+  // the size currently a blob occupies
+  // in memory or disk in serialized form
+  pub const SERIALIZED_SIZE : usize = 18530; 
+  pub const HEAD            : u16   = 0xAAAA; // 43690 
+  pub const TAIL            : u16   = 0x5555; // 21845 
+  pub fn new() -> BlobData {
+    BlobData {
+      head            : 0, // Head of event marker
+      status          : 0,
+      len             : 0,
+      roi             : 0,
+      dna             : 0,
+      fw_hash         : 0,
+      id              : 0,
+      ch_mask         : 0,
+      event_ctr       : 0,
+      dtap0           : 0,
+      dtap1           : 0,
+      timestamp       : 0,
+      ch_head         : [0; NCHN],
+      ch_adc          : [[0; NWORDS]; NCHN],
+      ch_trail        : [0; NCHN],
+      stop_cell       : 0,
+      crc32           : 0,
+      tail            : 0, // End of event marker
 
-  pub fn from_bytestream(&mut self, bytestream : &Vec<u8>, start_pos : usize ) -> usize {
+      voltages        : [[0.0; NWORDS]; NCHN],
+      nanoseconds     : [[0.0; NWORDS]; NCHN],
+
+      threshold      : [0.0;NCHN],
+      cfds_fraction  : [0.0;NCHN],
+      ped_begin_bin  : [0;NCHN],
+      ped_bin_range  : [0;NCHN],
+      pedestal       : [0.0;NCHN],
+      pedestal_sigma : [0.0;NCHN],
+
+      peaks      : [[0;MAX_NUM_PEAKS];NCHN],
+      tdcs       : [[0.0;MAX_NUM_PEAKS];NCHN],
+      charge     : [[0.0;MAX_NUM_PEAKS];NCHN],
+      width      : [[0.0;MAX_NUM_PEAKS];NCHN],
+      height     : [[0.0;MAX_NUM_PEAKS];NCHN],
+      num_peaks  : [0;NCHN],
+      //stop_cell  : [u16;NCHN],
+      begin_peak : [[0;MAX_NUM_PEAKS];NCHN],
+      end_peak   : [[0;MAX_NUM_PEAKS];NCHN],
+      spikes     : [[0;MAX_NUM_PEAKS];NCHN],
+      impedance  : 50.0,
+    }
+  }
+
+  ///! EXPERIMENTAL Initialize the blob from a bytestream. 
+  ///
+  ///  This is a member here, so this can be done
+  ///  repeatedly without re-allocation of the 
+  ///  blob arrays.
+  ///
+  ///  THIS VERSION IS DEDICATED TO OPERATE ON THE RB!
+  ///
+  ///  # Arguments
+  ///
+  ///  * search_start : automatically look ahead 
+  ///                   from start_pos unitl HEAD
+  ///                   is found
+  ///
+  ///FIXME - this should return Result!                   
+  pub fn from_bytestream_experimental(&mut self,
+                                      bytestream   : &Vec<u8>,
+                                      start_pos    : usize,
+                                      search_start : bool) -> usize {
     let mut pos = start_pos;
+    
+    if search_start {
+      match search_for_u16(BlobData::HEAD, &bytestream, start_pos) {
+        Err(err) => warn!("Can not find blob in selected range from {start_pos} to end! Error {:?}", err),
+        Ok(n)    => {pos = n;}
+      }
+    }
+
     let mut raw_bytes_2  = [bytestream[pos],bytestream[pos + 1]];
     pos   += 2;
     self.head    = u16::from_le_bytes(raw_bytes_2);
@@ -110,16 +186,152 @@ impl BlobData {
     pos   += 2;
     self.roi     = u16::from_le_bytes(raw_bytes_2); 
 
-    let mut raw_bytes_8  = [bytestream[pos + 1],
-                            bytestream[pos + 0],
-                            bytestream[pos + 3],
+    let mut raw_bytes_8  = [bytestream[pos + 0],
+                            bytestream[pos + 1],
                             bytestream[pos + 2],
-                            bytestream[pos + 5],
+                            bytestream[pos + 3],
                             bytestream[pos + 4],
-                            bytestream[pos + 7],
-                            bytestream[pos + 6]];
+                            bytestream[pos + 5],
+                            bytestream[pos + 6],
+                            bytestream[pos + 7]];
     pos   += 8;
-    self.dna     = u64::from_be_bytes(raw_bytes_8);
+    self.dna     = u64::from_le_bytes(raw_bytes_8);
+
+    raw_bytes_2  = [bytestream[pos],bytestream[pos + 1]];
+    pos   += 2;
+    self.fw_hash = u16::from_le_bytes(raw_bytes_2); 
+    
+    raw_bytes_2  = [bytestream[pos],bytestream[pos + 1]];
+    pos   += 2;
+    self.id      = u16::from_le_bytes(raw_bytes_2);    
+    
+    raw_bytes_2  = [bytestream[pos],bytestream[pos + 1]];
+    pos   += 2;
+    self.ch_mask = u16::from_le_bytes(raw_bytes_2); 
+   
+    let mut raw_bytes_4  = [bytestream[pos + 0],
+                            bytestream[pos + 1],
+                            bytestream[pos + 2],
+                            bytestream[pos + 3]];
+    pos   += 4; 
+    self.event_ctr = u32::from_le_bytes(raw_bytes_4); 
+
+
+    raw_bytes_2  = [bytestream[pos],bytestream[pos + 1]];
+    pos   += 2;
+    self.dtap0   = u16::from_le_bytes(raw_bytes_2); 
+
+    raw_bytes_2  = [bytestream[pos],bytestream[pos + 1]];
+    pos   += 2;
+    self.dtap1   = u16::from_le_bytes(raw_bytes_2); 
+    
+    raw_bytes_8  = [bytestream[pos + 0],
+                    bytestream[pos + 1],
+                    bytestream[pos + 2],
+                    bytestream[pos + 3],
+                    bytestream[pos + 4],
+                    bytestream[pos + 5],
+                    bytestream[pos + 6],
+                    bytestream[pos + 7]];
+    pos += 8;
+    self.timestamp  = u64::from_le_bytes(raw_bytes_8); 
+    for n in 0..NCHN {
+      raw_bytes_2  = [bytestream[pos],bytestream[pos + 1]];
+      self.ch_head[n] = u16::from_le_bytes(raw_bytes_2);
+      pos   += 2;
+      for k in 0..NWORDS {
+        raw_bytes_2  = [bytestream[pos],bytestream[pos + 1]];
+        self.ch_adc[n][k] = i16::from_le_bytes(raw_bytes_2);
+        pos += 2;
+      }
+      raw_bytes_4  = [bytestream[pos + 0],
+                      bytestream[pos + 1],
+                      bytestream[pos + 2],
+                      bytestream[pos + 3]];
+      pos   += 4; 
+      self.ch_trail[n] = u32::from_le_bytes(raw_bytes_4); 
+    }
+
+    raw_bytes_2  = [bytestream[pos+0],bytestream[pos + 1]];
+    pos   += 2;
+    self.stop_cell       = u16::from_le_bytes(raw_bytes_2); 
+    raw_bytes_4  = [bytestream[pos + 0],
+                    bytestream[pos + 1],
+                    bytestream[pos + 2],
+                    bytestream[pos + 3]];
+    pos   += 4; 
+    self.crc32   = u32::from_le_bytes(raw_bytes_4); 
+
+    raw_bytes_2  = [bytestream[pos],bytestream[pos + 1]];
+    pos   += 2;
+    self.tail    = u16::from_le_bytes(raw_bytes_2);  // End of event marker
+    return pos;
+  }
+
+  ///! Initialize the blob from a bytestream. 
+  ///
+  ///  This is a member here, so this can be done
+  ///  repeatedly without re-allocation of the 
+  ///  blob arrays
+  ///
+  ///  # Arguments
+  ///
+  ///  * search_start : automatically look ahead 
+  ///                   from start_pos unitl HEAD
+  ///                   is found
+  ///
+  ///FIXME - this should return Result!                   
+  pub fn from_bytestream(&mut self,
+                         bytestream   : &Vec<u8>,
+                         start_pos    : usize,
+                         search_start : bool) -> usize {
+    let mut pos = start_pos;
+    
+    if search_start {
+      match search_for_u16(BlobData::HEAD, &bytestream, start_pos) {
+        Err(err) => warn!("Can not find blob in selected range from {start_pos} to end! Error {:?}", err),
+        Ok(n)    => {pos = n;}
+      }
+    }
+
+    let mut raw_bytes_2  = [bytestream[pos],bytestream[pos + 1]];
+    pos   += 2;
+    self.head    = u16::from_le_bytes(raw_bytes_2);
+    
+    raw_bytes_2  = [bytestream[pos],bytestream[pos + 1]];
+    pos   += 2;
+    self.status  = u16::from_le_bytes(raw_bytes_2); 
+    
+    raw_bytes_2  = [bytestream[pos],bytestream[pos + 1]];
+    pos   += 2;
+    self.len     = u16::from_le_bytes(raw_bytes_2); 
+    
+    raw_bytes_2  = [bytestream[pos],bytestream[pos + 1]];
+    pos   += 2;
+    self.roi     = u16::from_le_bytes(raw_bytes_2); 
+
+    // these two should ultimatly be the same
+    let mut raw_bytes_8  = [bytestream[pos + 6],
+                            bytestream[pos + 7],
+                            bytestream[pos + 4],
+                            bytestream[pos + 5],
+                            bytestream[pos + 2],
+                            bytestream[pos + 3],
+                            bytestream[pos + 0],
+                            bytestream[pos + 1]];
+    pos   += 8;
+    self.dna     = u64::from_le_bytes(raw_bytes_8);
+    
+    //let mut raw_bytes_8  = [bytestream[pos + 1],
+    //                        bytestream[pos + 0],
+    //                        bytestream[pos + 3],
+    //                        bytestream[pos + 2],
+    //                        bytestream[pos + 5],
+    //                        bytestream[pos + 4],
+    //                        bytestream[pos + 7],
+    //                        bytestream[pos + 6]];
+    //pos   += 8;
+    //self.dna     = u64::from_be_bytes(raw_bytes_8);
 
     raw_bytes_2  = [bytestream[pos],bytestream[pos + 1]];
     pos   += 2;
@@ -158,20 +370,20 @@ impl BlobData {
     pos += 6;
     self.timestamp  = u64::from_be_bytes(raw_bytes_8); 
     for n in 0..NCHN {
+      raw_bytes_2  = [bytestream[pos],bytestream[pos + 1]];
+      self.ch_head[n] = u16::from_le_bytes(raw_bytes_2);
+      pos   += 2;
+      for k in 0..NWORDS {
         raw_bytes_2  = [bytestream[pos],bytestream[pos + 1]];
-        self.ch_head[n] = u16::from_le_bytes(raw_bytes_2);
-        pos   += 2;
-        for k in 0..NWORDS {
-            raw_bytes_2  = [bytestream[pos],bytestream[pos + 1]];
-            self.ch_adc[n][k] = i16::from_le_bytes(raw_bytes_2);
-            pos += 2;
-        }
-        raw_bytes_4  = [bytestream[pos + 1],
-                        bytestream[pos + 0],
-                        bytestream[pos + 3],
-                        bytestream[pos + 2]];
-        pos   += 4; 
-        self.ch_trail[n] = u32::from_be_bytes(raw_bytes_4); 
+        self.ch_adc[n][k] = i16::from_le_bytes(raw_bytes_2);
+        pos += 2;
+      }
+      raw_bytes_4  = [bytestream[pos + 1],
+                      bytestream[pos + 0],
+                      bytestream[pos + 3],
+                      bytestream[pos + 2]];
+      pos   += 4; 
+      self.ch_trail[n] = u32::from_be_bytes(raw_bytes_4); 
     }
 
     raw_bytes_2  = [bytestream[pos+0],bytestream[pos + 1]];
@@ -828,50 +1040,9 @@ impl BlobData {
 /***********************************/
 
 impl Default for BlobData {
-    fn default() -> BlobData {
-        BlobData {
-            head            : 0, // Head of event marker
-            status          : 0,
-            len             : 0,
-            roi             : 0,
-            dna             : 0, 
-            fw_hash         : 0,
-            id              : 0,   
-            ch_mask         : 0,
-            event_ctr       : 0,
-            dtap0           : 0,
-            dtap1           : 0,
-            timestamp       : 0,
-            ch_head         : [0; NCHN],
-            ch_adc          : [[0; NWORDS]; NCHN],
-            ch_trail        : [0; NCHN],
-            stop_cell       : 0,
-            crc32           : 0,
-            tail            : 0, // End of event marker
-
-            voltages        : [[0.0; NWORDS]; NCHN],
-            nanoseconds     : [[0.0; NWORDS]; NCHN],
-  
-            threshold      : [0.0;NCHN],
-            cfds_fraction  : [0.0;NCHN],
-            ped_begin_bin  : [0;NCHN],
-            ped_bin_range  : [0;NCHN],    
-            pedestal       : [0.0;NCHN],
-            pedestal_sigma : [0.0;NCHN],
-  
-            peaks      : [[0;MAX_NUM_PEAKS];NCHN],
-            tdcs       : [[0.0;MAX_NUM_PEAKS];NCHN],
-            charge     : [[0.0;MAX_NUM_PEAKS];NCHN],
-            width      : [[0.0;MAX_NUM_PEAKS];NCHN], 
-            height     : [[0.0;MAX_NUM_PEAKS];NCHN],    
-            num_peaks  : [0;NCHN],
-            //stop_cell  : [u16;NCHN],
-            begin_peak : [[0;MAX_NUM_PEAKS];NCHN],
-            end_peak   : [[0;MAX_NUM_PEAKS];NCHN],
-            spikes     : [[0;MAX_NUM_PEAKS];NCHN],
-            impedance  : 50.0,
-        }
-    }
+  fn default() -> BlobData {
+    BlobData::new()
+  }    
 }
 
 /***********************************/
@@ -879,15 +1050,15 @@ impl Default for BlobData {
 
 #[cfg(test)]
 mod test_readoutboard_blob {
-  use crate::readoutboard_blob::{BlobData, get_constant_blobeventsize};
+  use crate::events::blob::{BlobData, get_constant_blobeventsize};
   #[test]
   fn serialize_deserialize_roundabout () {
     let mut blob = BlobData {..Default::default()};
-    blob.head = 142;
+    blob.head = BlobData::HEAD;
     blob.status = 212;
     blob.len  = 42;
     blob.roi = 100;
-    blob.dna = 1000;
+    blob.dna = 4294967298;
     blob.fw_hash = 42;
     blob.id = 5;
     blob.ch_mask = 111;
@@ -897,15 +1068,17 @@ mod test_readoutboard_blob {
     blob.timestamp = 1123456;
     blob.stop_cell = 4;
     blob.crc32  = 88888;
-    blob.tail   = 1000;
+    blob.tail   = 0x5555;
+    blob.print();
     let mut bytestream = blob.to_bytestream();
-    for n in 0..get_constant_blobeventsize() {
-        bytestream.push(0);
-    }
-    blob.from_bytestream(&bytestream, 0);
+    //for _n in 0..get_constant_blobeventsize() {
+    //    bytestream.push(0);
+    //}
+    blob.from_bytestream(&bytestream, 0, true);
+    let read_back_bytes = blob.to_bytestream();
     blob.print();
 
-    assert_eq!(1,1);
+    assert_eq!(bytestream,read_back_bytes);
   }
 }
 

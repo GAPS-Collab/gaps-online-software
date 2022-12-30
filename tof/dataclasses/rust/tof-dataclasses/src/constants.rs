@@ -1,4 +1,4 @@
-pub const NCHN          : usize = 9; // even though this is well in range of u8, 
+pub const NCHN          : usize = 8; // even though this is well in range of u8, 
                         // we need it to be u16 so it can be multiplied
 pub const NWORDS        : usize = 1024;
 // the maximum number or readout boards
