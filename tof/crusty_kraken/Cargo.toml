@@ -25,7 +25,7 @@ random =[]
 
 [dependencies]
 
-tof-dataclasses = { path = "../dataclasses/rust/tof-dataclasses" , features = ["random"]} 
+tof-dataclasses = { path = "../dataclasses/rust/tof-dataclasses" , features = ["random"], verison = "0.2"} 
 
 zmq = "0.10.0"
 # this is technically optional

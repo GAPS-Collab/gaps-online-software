@@ -63,7 +63,7 @@ impl CalibratedWaveform {
   //pub fn new<'a>(wave: &'a[f64;NWORDS], times: &'a[f64;NWORDS]) -> CalibratedWaveform<'a> {
   //pub fn new(times : [f64;NWORDS], wave : [f64;NWORDS]) ->CalibratedWaveform {
   pub fn new(blob_data : &BlobData, channel : usize) ->CalibratedWaveform {
-    CalibratedWaveform { event_ctr      : blob_data.event_ctr,
+    CalibratedWaveform { event_ctr      : blob_data.event_id,
                          channel        : channel,
                          wave           : blob_data.voltages[channel],
                          times          : blob_data.nanoseconds[channel],

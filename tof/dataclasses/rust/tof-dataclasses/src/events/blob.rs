@@ -10,7 +10,8 @@
  ***********************************/
 
 use crate::constants::{NWORDS, NCHN, MAX_NUM_PEAKS};
-use crate::errors::WaveformError;
+use crate::errors::{WaveformError, 
+                    SerializationError};
 use crate::serialization::search_for_u16;
 use crate::calibrations::Calibrations;
 
@@ -27,6 +28,46 @@ use hdf5::filters::blosc_set_nthreads;
 #[cfg(feature = "diagnostics")]
 use hdf5;
 
+#[derive(Debug, Clone)]
+pub struct RBEventPayload {
+  pub event_id : u32,
+  pub payload  : Vec<u8>
+}
+
+impl RBEventPayload {
+
+  pub fn new(event_id : u32, payload : Vec<u8>) -> RBEventPayload {
+    RBEventPayload {
+      event_id : event_id,
+      payload  : payload
+    }
+  }
+
+  pub fn from_bytestream(bytestream  : &Vec<u8>,
+                         start_pos   : usize,
+                         no_fragment : bool)
+      -> Result<RBEventPayload, SerializationError> {
+    let head_pos = search_for_u16(BlobData::HEAD, bytestream, start_pos)?; 
+    let tail_pos = search_for_u16(BlobData::TAIL, bytestream, head_pos)?;
+    // At this state, this can be a header or a full event. Check here and
+    // proceed depending on the options
+    if head_pos - tail_pos != BlobData::SERIALIZED_SIZE
+        && no_fragment { 
+      return Err(SerializationError::EventFragment);
+    }
+
+    // we have to find and decode the event id.
+    // FIXME - if we do this smarter, we can 
+    //         most likely save a clone operation
+    let slice          = &bytestream[head_pos..=tail_pos+2];
+    let event_id       = BlobData::decode_event_id(slice); 
+    let mut payload    = Vec::<u8>::with_capacity(BlobData::SERIALIZED_SIZE);
+    payload.extend_from_slice(slice);
+    let ev_payload     = RBEventPayload::new(event_id, payload.clone());
+    Ok(ev_payload)
+  }
+}
+
 /***********************************/
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -42,7 +83,7 @@ pub struct BlobData
   pub fw_hash         : u16,
   pub id              : u16,   
   pub ch_mask         : u16,
-  pub event_ctr       : u32,
+  pub event_id       : u32,
   pub dtap0           : u16,
   pub dtap1           : u16,
   pub timestamp       : u64,
@@ -107,7 +148,7 @@ impl BlobData {
       fw_hash         : 0,
       id              : 0,
       ch_mask         : 0,
-      event_ctr       : 0,
+      event_id       : 0,
       dtap0           : 0,
       dtap1           : 0,
       timestamp       : 0,
@@ -140,6 +181,21 @@ impl BlobData {
       spikes     : [[0;MAX_NUM_PEAKS];NCHN],
       impedance  : 50.0,
     }
+  }
+
+  ///! Only decode the event id from a bytestream
+  ///  
+  ///  The bytestream has to be starting with 
+  ///  HEAD
+  pub fn decode_event_id(bytestream : &[u8]) -> u32 {
+    let evid_pos = 22; // the eventid is 22 bytes from the 
+                       // start including HEAD
+    let raw_bytes_4  = [bytestream[evid_pos + 1],
+                        bytestream[evid_pos + 0],
+                        bytestream[evid_pos + 3],
+                        bytestream[evid_pos + 2]];
+    let event_id = u32::from_be_bytes(raw_bytes_4); 
+    event_id
   }
 
   ///! EXPERIMENTAL Initialize the blob from a bytestream. 
@@ -214,7 +270,7 @@ impl BlobData {
                             bytestream[pos + 2],
                             bytestream[pos + 3]];
     pos   += 4; 
-    self.event_ctr = u32::from_le_bytes(raw_bytes_4); 
+    self.event_id = u32::from_le_bytes(raw_bytes_4); 
 
 
     raw_bytes_2  = [bytestream[pos],bytestream[pos + 1]];
@@ -350,7 +406,7 @@ impl BlobData {
                             bytestream[pos + 3],
                             bytestream[pos + 2]];
     pos   += 4; 
-    self.event_ctr = u32::from_be_bytes(raw_bytes_4); 
+    self.event_id = u32::from_be_bytes(raw_bytes_4); 
 
 
     raw_bytes_2  = [bytestream[pos],bytestream[pos + 1]];
@@ -449,7 +505,7 @@ impl BlobData {
     two_bytes = self.ch_mask.to_le_bytes();
     bytestream.extend_from_slice(&two_bytes);
 
-    four_bytes = self.event_ctr.to_be_bytes();
+    four_bytes = self.event_id.to_be_bytes();
     four_bytes_shuffle = [four_bytes[1],
                           four_bytes[0],
                           four_bytes[3],
@@ -981,7 +1037,7 @@ impl BlobData {
     self.fw_hash         =  0;
     self.id              =  0;   
     self.ch_mask         =  0;
-    self.event_ctr       =  0;
+    self.event_id       =  0;
     self.dtap0           =  0;
     self.dtap1           =  0;
     self.timestamp       =  0;
@@ -1025,7 +1081,7 @@ impl BlobData {
     println!("==> FW_HASH    {} ", self.fw_hash);
     println!("==> ID         {} ", self.id);
     println!("==> CH_MASK    {} ", self.ch_mask);
-    println!("==> EVT_CTR    {} ", self.event_ctr);
+    println!("==> EVT_CTR    {} ", self.event_id);
     println!("==> DTAP0      {} ", self.dtap0);
     println!("==> DTAP1      {} ", self.dtap1);
     println!("==> TIMESTAMP  {} ", self.timestamp);
@@ -1062,7 +1118,7 @@ mod test_readoutboard_blob {
     blob.fw_hash = 42;
     blob.id = 5;
     blob.ch_mask = 111;
-    blob.event_ctr = 9800001;
+    blob.event_id = 9800001;
     blob.dtap0 = 10000;
     blob.dtap1 = 11000;
     blob.timestamp = 1123456;

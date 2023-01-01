@@ -4,7 +4,8 @@ pub enum SerializationError {
     //HeaderNotFound,
     TailInvalid,
     StreamTooShort,
-    ValueNotFound
+    ValueNotFound,
+    EventFragment
 }
 
 

@@ -136,7 +136,7 @@ fn analyze_blobs(buffer               : &Vec<u8>,
         // we have found our 0xaaaa marker!
         // include it in the stream to deserialize
         blob_data.reset();
-        blob_data.from_bytestream(&buffer, pos-2);
+        blob_data.from_bytestream(&buffer, pos-2, false);
         nblobs += 1;
         
         if blob_data.tail == 0x5555 {
@@ -245,9 +245,9 @@ fn analyze_blobs(buffer               : &Vec<u8>,
                 for n in 0..NPADDLES {
                   // FIXME
                   pp_this_event[n].paddle_id = n as u8;
-                  pp_this_event[n].event_id = blob_data.event_ctr;
+                  pp_this_event[n].event_id = blob_data.event_id;
                   if paddles_over_threshold[n] {
-                    pp_this_event[n].event_id = blob_data.event_ctr;
+                    pp_this_event[n].event_id = blob_data.event_id;
                   }
                 }
                 

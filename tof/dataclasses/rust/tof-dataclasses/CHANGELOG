@@ -1,0 +1,13 @@
+0.2.0 
+
+API change - 
+
+* Rename BlobData::event_ctr to 
+  BlobData::event_id, to not get 
+  confused with actual event counters
+
+NEW FEATURES
+
+* extends BlobData with ::decode_eventid 
+* introduces RBEventPayload - which is a 
+  binary stream together with an event id
