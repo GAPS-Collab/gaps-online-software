@@ -12,6 +12,7 @@ pub mod errors;
 pub mod serialization;
 pub mod constants;
 pub mod calibrations;
+pub mod threading;
 
 extern crate pretty_env_logger;
 #[macro_use] extern crate log;

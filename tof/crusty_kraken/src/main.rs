@@ -1,5 +1,4 @@
 mod readoutboard_comm;
-mod threading;
 mod reduced_tofevent;
 mod constants;
 mod waveform;
@@ -50,7 +49,7 @@ use crate::master_trigger::{master_trigger,
                             MasterTriggerEvent};
 use crate::event_builder::{event_builder,
                            event_builder_no_master};
-use crate::threading::ThreadPool;
+use tof_dataclasses::threading::ThreadPool;
 //use crate::reduced_tofevent::PaddlePacket;
 
 use tof_dataclasses::packets::paddle_packet::PaddlePacket;
