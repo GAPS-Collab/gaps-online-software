@@ -3,6 +3,7 @@
 pub enum SerializationError {
     //HeaderNotFound,
     TailInvalid,
+    HeadInvalid,
     StreamTooShort,
     ValueNotFound,
     EventFragment
