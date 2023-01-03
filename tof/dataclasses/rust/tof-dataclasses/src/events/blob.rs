@@ -1106,7 +1106,7 @@ impl Default for BlobData {
 
 #[cfg(test)]
 mod test_readoutboard_blob {
-  use crate::events::blob::{BlobData, get_constant_blobeventsize};
+  use crate::events::blob::BlobData;
   #[test]
   fn serialize_deserialize_roundabout () {
     let mut blob = BlobData {..Default::default()};
@@ -1126,7 +1126,7 @@ mod test_readoutboard_blob {
     blob.crc32  = 88888;
     blob.tail   = 0x5555;
     blob.print();
-    let mut bytestream = blob.to_bytestream();
+    let bytestream = blob.to_bytestream();
     //for _n in 0..get_constant_blobeventsize() {
     //    bytestream.push(0);
     //}
