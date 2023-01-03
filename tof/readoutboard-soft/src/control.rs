@@ -151,6 +151,7 @@ pub fn set_master_trigger_mode() -> Result<(), RegisterError> {
   Ok(())
 }
 
-
-
-
+pub fn get_board_id() -> Result<u32, RegisterError> { 
+  let board_id = read_reg(UIO0, BOARD_ID)?;
+  Ok(board_id)
+}

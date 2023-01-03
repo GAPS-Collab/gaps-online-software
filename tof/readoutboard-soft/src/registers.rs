@@ -98,5 +98,6 @@ pub const CNT_RESET                  : u32 = 0x160; //[0]Reset the counters
 pub const DNA_LSBS : u32 = 0x80;    //[31:0]    Device DNA [31:0]
 pub const DNA_MSBS : u32 = 0x84;    //[24:0]    Device DNA [56:32]
 
-
+// FPGA
+pub const BOARD_ID : u32 = 0xa8;    //[7:0]	    Board ID Number
 

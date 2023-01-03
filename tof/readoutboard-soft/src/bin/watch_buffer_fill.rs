@@ -8,10 +8,10 @@ use std::{thread, time};
 use indicatif::MultiProgress;
 
 
-use crate::api::*;
-use crate::control::*;
-use crate::memory::BlobBuffer;
-use crate::registers::{UIO1_TRIP, UIO2_TRIP};
+use self::api::*;
+use self::control::*;
+use self::memory::BlobBuffer;
+use self::registers::{UIO1_TRIP, UIO2_TRIP};
 
 extern crate pretty_env_logger;
 #[macro_use] extern crate log;

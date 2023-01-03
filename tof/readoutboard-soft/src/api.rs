@@ -2,6 +2,8 @@
 ///  configure the drs4, etc.
 
 use std::{thread, time};
+use std::sync::mpsc::{Sender,
+                      Receiver};
 
 // just for fun
 use indicatif::{ProgressBar,
@@ -11,7 +13,11 @@ use crate::control::*;
 use crate::registers::*;
 use crate::memory::*;
 
-use tof_dataclasses::events::blob::BlobData;
+use zmq::{Socket,
+          Message};
+
+use tof_dataclasses::events::blob::{BlobData,
+                                    RBEventPayload};
 use tof_dataclasses::serialization::search_for_u16;
 
 
@@ -75,12 +81,77 @@ pub fn setup_progress_bar(msg : String, size : u64, format_string : String) -> P
   bar
 }
 
+pub fn data_buffer_worker(which      : &BlobBuffer,
+                          sender     : Option<&Sender<Vec<u8>>>,
+                          size       : usize,
+                          buff_start : u32) {
+  let bytestream : Vec<u8>;
+  match which {
+    BlobBuffer::A => { 
+      bytestream = get_bytestream(UIO1, buff_start, size).unwrap();
+    }
+    BlobBuffer::B => {
+      bytestream = get_bytestream(UIO2, buff_start, size).unwrap();
+    }
+  }
+  match sender {
+    Some(snd) => snd.send(bytestream),
+    None      => Ok(()),
+  };
+  ()
+}
+
+///! Get the raw bytestream and do related tasks
+///
+///  #Arguments
+/// 
+///  * bs_recv : A receiver for bytestreams. The 
+///              bytestream comes directly from 
+///              the data buffers.
+///
+pub fn bytestream_worker(bs_recv : &Receiver<Vec<u8>>,
+                         socket  : &Socket) {
+  loop {
+    let mut start_pos : usize = 0;
+    match bs_recv.recv() {
+      Ok(bytestream) => {
+        loop {
+          // for now, just push out the bytestream to 
+          // the socket
+          let message = Message::from_slice(bytestream.as_slice());
+          socket.send_msg(message,0);
+          match search_for_u16(BlobData::HEAD, &bytestream, start_pos) {
+            Ok(head_pos) => {
+              let tail_pos   = head_pos + BlobData::SERIALIZED_SIZE;
+              let event_id   = BlobData::decode_event_id(&bytestream[head_pos..=tail_pos]);
+              start_pos = tail_pos;
+              println!("Got event_id! {event_id}");
+            },
+            Err(_) => {continue;}
+          }
+        }
+      },
+      Err(_) => {continue;}
+    }
+  }
+}
+
+///! Deal with the data buffers.
+
+
 pub fn buff_handler(which      : &BlobBuffer,
-                buff_start : u32,
-                prog_bar   : Option<&ProgressBar>) -> u32 {
+                    buff_start : u32,
+                    bs_sender  : Option<&Sender<Vec<u8>>>,
+                    prog_bar   : Option<&ProgressBar>) -> u32 {
   
   let mut buff_start_temp = buff_start.clone();
   let mut buff_size : u32;
+
+  let mut full : u32;
+  match which {
+    BlobBuffer::A => full = UIO1_FULL as u32,
+    BlobBuffer::B => full = UIO2_FULL as u32
+  }
 
   match get_buff_size(&which, &mut buff_start_temp) {
     Ok(sz) => buff_size = sz,
@@ -89,14 +160,9 @@ pub fn buff_handler(which      : &BlobBuffer,
       // the buffer is actually full and needs to be reset
       //switch_ram_buffer();
       //thread::sleep_ms(SLEEP_AFTER_REG_WRITE);
+      data_buffer_worker(&which, bs_sender, 0, full); 
       blob_buffer_reset(&which);
       thread::sleep_ms(SLEEP_AFTER_REG_WRITE);
-      let bytestream = get_bytestream(UIO1, buff_start_temp, 10).unwrap();
-      let blob_size  = BlobData::SERIALIZED_SIZE;
-      let mut a_blob = BlobData::new();
-      let mut start_pos  = search_for_u16(BlobData::HEAD, &bytestream, blob_size*5).unwrap();
-      a_blob.from_bytestream_experimental(&bytestream, start_pos, true);
-      a_blob.print();
       match get_buff_size(&which, &mut buff_start_temp) {
         Ok(sz) => buff_size = sz,
         Err(_) => buff_size = 0
@@ -110,6 +176,8 @@ pub fn buff_handler(which      : &BlobBuffer,
     // reset the buffers
     //switch_ram_buffer();
     //thread::sleep_ms(SLEEP_AFTER_REG_WRITE);
+    println!("{buff_size} .. {buff_start_temp}");
+    data_buffer_worker(&which, bs_sender, buff_size as usize, buff_start_temp); 
     blob_buffer_reset(&which);
     thread::sleep_ms(SLEEP_AFTER_REG_WRITE);
     // get the new size after reset
@@ -129,7 +197,8 @@ pub fn buff_handler(which      : &BlobBuffer,
 
 ///! Prepare the whole readoutboard for data taking.
 ///
-///  This sets up the drs4 and clears the memory of 
+///  This sets up the drs4 and c
+///  lears the memory of 
 ///  the data buffers.
 ///
 /// 
@@ -204,6 +273,5 @@ pub fn setup_drs4() -> Result<(), RegisterError> {
   thread::sleep(one_milli);
   Ok(())
 }
-
 
 

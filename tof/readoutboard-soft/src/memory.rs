@@ -133,28 +133,58 @@ where
     });
 }
 
-///! Return the bytes located at the memory
+///! Read the data buffers and return a bytestream 
+///  from the given address with the length in events.
+///
 pub fn get_bytestream(addr_space : &str, 
-                  addr : u32,
-                  len  : usize) -> Result<Vec::<u8>, RegisterError> {
+                      addr       : u32,
+                      size       : usize) -> Result<Vec::<u8>, RegisterError> 
+  where
+    u32: std::fmt::LowerHex, {
 
-  let blobsize = BlobData::SERIALIZED_SIZE;
-  let vec_size = blobsize*len;
+  //let blobsize = BlobData::SERIALIZED_SIZE;
+  //let vec_size = blobsize*len;
   // FIXME - allocate the vector elsewhere and 
   // pass it by reference
-  let mut bytestream = Vec::<u8>::with_capacity(vec_size);
+  let mut bytestream = Vec::<u8>::with_capacity(size);
 
   let sz = std::mem::size_of::<u8>();
-  let m = match map_physical_mem_read(addr_space, addr, vec_size * sz) {
+  let mut failed = false;
+  let mut m = match map_physical_mem_read(addr_space, addr, size * sz) {
     Ok(m) => m,
     Err(err) => {
       let error = RegisterError {};
       println!("Failed to mmap: Err={:?}", err);
-      return Err(error);
+      failed = true;
+      map_physical_mem_read(addr_space, 0x0, 1).unwrap()
+      //return Err(error);
     }
   };
+  
+  let mut n_iter = 0;
+  let mut foo;
+  //let test = u32::LowerHex(addr);
+  while failed {
+ 
+    m = match map_physical_mem_read(addr_space, 0x0, size * sz - n_iter) {
+      Ok(m) => {
+        failed = false;
+        foo = size * sz - n_iter;
+        println!("We were successful with a size of {foo}");
+        m
+      }
+      Err(err) => {
+        let error = RegisterError {};
+        println!("Failed to mmap: Err={:?}", err);
+        failed = true;
+        n_iter += 1;
+        map_physical_mem_read(addr_space, 0x0, 1).unwrap()
+        //return Err(error);
+      }
+    };
+  }
   let p = m.as_ptr() as *const u8;
-  (0..vec_size).for_each(|x| unsafe {
+  (0..size).for_each(|x| unsafe {
     let value = std::ptr::read_volatile(p.offset(x as isize));
     bytestream.push(value); // push is free, since we 
                             // allocated the vector in the 
