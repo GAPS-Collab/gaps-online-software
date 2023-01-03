@@ -5,7 +5,6 @@ mod waveform;
 mod errors;
 mod commands;
 mod master_trigger;
-mod monitoring;
 mod event_builder;
 mod paddle_packet_cache;
 
@@ -112,7 +111,7 @@ fn main() {
   
   let nboards       : usize;
 
-  let use_master_trigger = args.use_master_trigger;
+  let use_master_trigger      = args.use_master_trigger;
   let mut master_trigger_ip   = String::from("");
   let mut master_trigger_port = 0usize;
 
