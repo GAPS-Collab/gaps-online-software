@@ -5,6 +5,7 @@ pub enum SerializationError {
     TailInvalid,
     HeadInvalid,
     StreamTooShort,
+    StreamTooLong,
     ValueNotFound,
     EventFragment
 }

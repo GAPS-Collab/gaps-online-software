@@ -99,6 +99,23 @@ impl ValuePacket {
     let mp = ValuePacket::new(label, payload);
     Ok(mp)
   }
+
+  ///! Keep the label the same, but 
+  ///  exchange the payload
+  ///
+  ///  The old payload gets deleted
+  pub fn update_payload(&mut self, 
+                        payload : Vec<u8>) 
+    -> Result<(), SerializationError> {
+    if payload.len() > 255 {
+      return Err(SerializationError::StreamTooLong {});
+    }
+    let payload_size  = payload.len() as u8;
+    self.payload      = payload;
+    self.payload_size = payload_size;
+    Ok(())
+  }
+
 }
 
 
