@@ -73,8 +73,8 @@ impl ValuePacket {
     // we don't like long labels
     
     let label_bytes = label.as_bytes();
-    let label_len   = label_bytes.len();
-    if label_len > 255 {
+    let label_size  = label_bytes.len();
+    if label_size > 255 {
       panic!("The label is too long and has more than 255 characters! label {}, Please restrict yourself to shorter labels", label); 
     } 
 
@@ -82,13 +82,14 @@ impl ValuePacket {
       panic!("The payload is too long and has more than 255 characters!" ); 
     }
 
-    let payload_len = payload.len() as u8;
+    let payload_size = payload.len() as u8;
+    let label_size   = label_size as u8;
     // we disect the value in bytes here
     ValuePacket  { 
-      label         : label,
-      label_size    : label_len as u8,
-      payload       : payload,
-      payload_size  : payload_len
+      label,
+      label_size,
+      payload,
+      payload_size
     }
   }
 
