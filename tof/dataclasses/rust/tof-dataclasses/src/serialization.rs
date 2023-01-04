@@ -1,5 +1,17 @@
 use crate::errors::SerializationError;
 
+pub trait Serialization {
+  fn from_bytestream(bytestream : &Vec<u8>, 
+                     start_pos  : usize)
+    -> Result<Self, SerializationError>
+    where Self : Sized;
+
+  //pub fn to_bytestream(&self, &
+}
+
+
+
+
 ///! check for a certain number in a bytestream
 pub fn search_for_u16(number : u16, bytestream : &Vec<u8>, start_pos : usize) 
   -> Result<usize, SerializationError> {

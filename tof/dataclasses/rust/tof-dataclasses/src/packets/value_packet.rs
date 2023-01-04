@@ -1,4 +1,5 @@
 use crate::errors::SerializationError;
+use crate::serialization::Serialization;
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub enum Encoding<T> {
@@ -21,6 +22,46 @@ pub struct ValuePacket {
   pub label_size    : u8,
   pub payload       : Vec<u8>,
   pub payload_size  : u8
+}
+
+impl Serialization for ValuePacket {
+  fn from_bytestream(bytestream : &Vec<u8>, start_pos : usize) 
+    -> Result<ValuePacket, SerializationError> {
+    
+    let mut two_bytes : [u8;2];
+    two_bytes = [bytestream[start_pos],
+                 bytestream[start_pos+1]];
+        
+
+    if ValuePacket::HEAD != u16::from_le_bytes(two_bytes) {
+      warn!("Packet does not start with HEAD signature");
+      return Err(SerializationError::HeadInvalid {});
+    }
+   
+    
+    let mut payload  = Vec::<u8>::new();
+    let label_size   = bytestream[2];
+    let label        = String::from_utf8((&bytestream[3..label_size as usize + 3]).to_vec()).unwrap();
+    let payload_size = bytestream[3+label_size as usize];
+    println!("{} {} {}", label_size, label, payload_size);
+    println!("{bytestream:?}");
+    println!("{}", bytestream.len());
+    if bytestream.len() <= label_size as usize + payload_size as usize + 4 {
+      return Err(SerializationError::StreamTooShort {});
+    }// head, tail, and the actual sizes 
+
+    payload.extend_from_slice(&bytestream[4 + label_size as usize..payload_size as usize + label_size as usize +4]);
+
+    two_bytes = [bytestream[payload_size as usize + label_size as usize + 4],
+                 bytestream[payload_size as usize + label_size as usize + 5]];
+
+    if ValuePacket::TAIL != u16::from_le_bytes(two_bytes) {
+      warn!("Packet does not end with TAIL signature");
+      return Err(SerializationError::TailInvalid {});
+    }
+    let mp = ValuePacket::new(label, payload);
+    Ok(mp)
+  }
 }
 
 impl ValuePacket {
@@ -62,43 +103,6 @@ impl ValuePacket {
     bytestream
   }
   
-  pub fn from_bytestream(bytestream : Vec<u8>, start_pos : usize) 
-    -> Result<ValuePacket, SerializationError> {
-    
-    let mut two_bytes : [u8;2];
-    two_bytes = [bytestream[start_pos],
-                 bytestream[start_pos+1]];
-        
-
-    if ValuePacket::HEAD != u16::from_le_bytes(two_bytes) {
-      warn!("Packet does not start with HEAD signature");
-      return Err(SerializationError::HeadInvalid {});
-    }
-   
-    
-    let mut payload  = Vec::<u8>::new();
-    let label_size   = bytestream[2];
-    let label        = String::from_utf8((&bytestream[3..label_size as usize + 3]).to_vec()).unwrap();
-    let payload_size = bytestream[3+label_size as usize];
-    println!("{} {} {}", label_size, label, payload_size);
-    println!("{bytestream:?}");
-    println!("{}", bytestream.len());
-    if bytestream.len() <= label_size as usize + payload_size as usize + 4 {
-      return Err(SerializationError::StreamTooShort {});
-    }// head, tail, and the actual sizes 
-
-    payload.extend_from_slice(&bytestream[4 + label_size as usize..payload_size as usize + label_size as usize +4]);
-
-    two_bytes = [bytestream[payload_size as usize + label_size as usize + 4],
-                 bytestream[payload_size as usize + label_size as usize + 5]];
-
-    if ValuePacket::TAIL != u16::from_le_bytes(two_bytes) {
-      warn!("Packet does not end with TAIL signature");
-      return Err(SerializationError::TailInvalid {});
-    }
-    let mp = ValuePacket::new(label, payload);
-    Ok(mp)
-  }
 
   ///! Keep the label the same, but 
   ///  exchange the payload
