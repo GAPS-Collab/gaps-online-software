@@ -1,18 +1,21 @@
+///! Registers of the DRS4 are accessed through
+///  the sytem ram (Addr8). It is a 32bit system, 
+///  so the address format is u32.
+///  _ a note here _ : Each register is 32bit. This means for 
+///  the Addr8 (8 refers to bits) a register occupies 4 bytes, 
+///  so a new register will be the previous register + 4.
+///  If the register is the same as another, then the register
+///  holds different fields for the different bits in the register.
+///
+///  Please refere to 
+///  https://gitlab.com/ucla-gaps-tof/firmware/-/blob/develop/regmap/rb_address_table.org
+///  DRS4 readout
 
-//const UIO_BUFFSIZE : usize = 64000000;
-/// memory locations for the control 
-/// registers
-/// /dev/uio0 - DRS4 control
-/// /dev/uio1 - buffer 1 for blobs
-/// /dev/uio2 - buffer 2 for blobs
-pub const UIO0 : &'static str = "/dev/uio0";
-pub const UIO1 : &'static str = "/dev/uio1";
-pub const UIO2 : &'static str = "/dev/uio2";
 
 /// The buffersize for the blob buffers
 //const UI1_BUFFSIZE : usize = ;
-pub const UIO1_TRIP : u32 = 66520576;
-pub const UIO2_TRIP : u32 = 66520576;
+//pub const UIO1_TRIP : u32 = 66520576;
+//pub const UIO2_TRIP : u32 = 66520576;
 //const UIO1_TRIP : u32 = 48000000;
 //const UIO2_TRIP : u32 = 48000000;
 // This is the SOFTWARE from the original script
@@ -20,25 +23,13 @@ pub const UIO2_TRIP : u32 = 66520576;
 // const UIO2_TRIP : u32 = 16188928;
 
 // blobs full
-pub const UIO1_FULL : u32 = 68157440;
-pub const UIO2_FULL : u32 = 135266304;
+//pub const UIO1_FULL : u32 = 68157440;
+//pub const UIO2_FULL : u32 = 135266304;
 
 //========== DRS4 Registers =============
 //
 //=======================================
 
-/// Registers of the DRS4 are accessed through
-/// the sytem ram (Addr8). It is a 32bit system, 
-/// so the address format is u32.
-/// _ a note here _ : Each register is 32bit. This means for 
-/// the Addr8 (8 refers to bits) a register occupies 4 bytes, 
-/// so a new register will be the previous register + 4.
-/// If the register is the same as another, then the register
-/// holds different fields for the different bits in the register.
-///
-/// Please refere to 
-/// https://gitlab.com/ucla-gaps-tof/firmware/-/blob/develop/regmap/rb_address_table.org
-/// DRS4 readout
 pub const ROI_MODE         : u32 =   0x40;    //00x1  Set to 1 to enable Region of Interest Readout
 pub const BUSY             : u32 =   0x40;    //1 DRS is busy
 pub const ADC_LATENCY      : u32 =   0x40;    //[9:4] rw  0x9 Latency from first sr clock to when ADC data should be valid
@@ -73,8 +64,6 @@ pub const RAM_A_OCCUPANCY  :u32 =  0x408;//[31:0] RAM buffer a occupancy
 pub const RAM_B_OCCUPANCY  :u32 =  0x40c;//[31:0] RAM buffer b occupancy
 pub const DMA_POINTER      :u32 =  0x410;//[31:0] DMA controller pointer
 pub const TOGGLE_RAM       :u32 =  0x414;//[0] Write 1 to switch the dma buffer to the other half
-
-
 
 /// DRS trigger
 pub const MT_TRIGGER_MODE            : u32 = 0x114; //1 to use the MT as the source of the trigger
