@@ -3,13 +3,13 @@
 
 /**************************************************/
 
-std::vector<uint8_t> TofPacket::serialize() const
+vec_u8 TofPacket::serialize() const
 {
 
   // first we need to hold only 5 bytes, then 
   // the payload will grow the vector with "insert"
-  std::vector<uint8_t> buffer(5);
-  uint16_t pos = 0; // position in bytestream
+  vec_u8 buffer(5);
+  usize pos = 0; // position in bytestream
   encode_ushort(head, buffer, pos); pos+=2;
   buffer[pos] = packet_type; pos += 1;
   //buffer.push_back(packet_type);    pos+=1;
@@ -22,23 +22,23 @@ std::vector<uint8_t> TofPacket::serialize() const
 
 /**************************************************/
 
-uint16_t TofPacket::deserialize(std::vector<uint8_t>& bytestream,
-                                uint16_t start_pos)
+u16 TofPacket::deserialize(vec_u8& bytestream,
+                           usize   start_pos)
 {
-    uint16_t value = decode_ushort(bytestream, start_pos);
+    u16 value = decode_ushort(bytestream, start_pos);
     if (!(value == head))
         {std::cerr << "[ERROR] no header found!" << std::endl;}
     head = value;
-    uint16_t pos = 2 + start_pos; // position in bytestream, 2 since we 
+    u16 pos = 2 + start_pos; // position in bytestream, 2 since we 
     packet_type = bytestream[pos]; pos+=1;
     //std::cout << "found packet type : " << packet_type << std::endl;
     payload_size = decode_ushort(bytestream, pos); pos+=2;
     //std::cout << "found payload size " << payload_size << std::endl;
     //size_t payload_end = pos + bytestream.size() - 2;
-    size_t payload_end = pos + bytestream.size();
+    usize payload_end = pos + bytestream.size();
     //std::cout << " found payload end " << payload_end << std::endl;
-    std::vector<uint8_t> packet_bytestream(bytestream.begin()+ pos,
-                                           bytestream.begin()+ payload_end)  ;
+    vec_u8 packet_bytestream(bytestream.begin()+ pos,
+                             bytestream.begin()+ payload_end)  ;
     payload = packet_bytestream;
     tail = decode_ushort(bytestream, pos); pos +=2;
     return pos;

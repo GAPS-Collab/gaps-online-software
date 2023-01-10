@@ -4,27 +4,45 @@
 #include <cstdint>
 #include <vector>
 
+#include "TofTypeDefs.h"
+
 #include "RBEnvPacket.h"
 
-enum TofPacketType : uint8_t {
-    UNKNOWN     = 0,
-    EVENT       = 10,
-    ENVIRONMENT = 20
+enum PacketType : u8 {
+    Unknown   =  0,
+    Command   = 10,
+    RBEvent   = 20,
+    Monitor   = 30,
+    HeartBeat = 40 
 };
 
+/*********************************************************
+ * The most basic of all packets
+ *
+ * A wrapper packet for an arbitrary bytestream
+ * 
+ * It looks like the following
+ * 
+ * HEAD    : u16 = 0xAAAA
+ * TYPE    : u8  = PacketType
+ * SIZE    : u64
+ * PAYLOAD : [u8;6-SIZE]
+ * TAIL    : u16 = 0x5555
+ *
+ */
 struct TofPacket {
   
-   uint16_t head = 0xAAAA;
-   uint16_t tail = 0x5555;
+   u16 head = 0xAAAA;
+   u16 tail = 0x5555;
 
-   uint8_t  packet_type; 
+   u8  packet_type; 
    // just the size of the payload, 
-   // not iuncluding type, header or tail
-   uint16_t payload_size;
+   // not including type, header or tail
+   u64 payload_size;
 
-   std::vector<uint8_t> payload;
+   vec_u8 payload;
 
-   std::vector<uint8_t> serialize() const;
+   vec_u8 serialize() const;
 
    /**
     * Transcode from bytestream
@@ -34,8 +52,8 @@ struct TofPacket {
     *    (tail position +=1, so that bytestream can be iterated
     *    over easily)
     */
-   uint16_t deserialize(std::vector<uint8_t>& payload,
-                            uint16_t start_pos=0);
+   u16 deserialize(vec_u8& payload,
+                   usize start_pos=0);
 
 
    //! Just to be used for debugging - NO SERIALIZATION. 

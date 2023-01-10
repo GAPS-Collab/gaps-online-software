@@ -7,9 +7,15 @@ pub enum SerializationError {
     StreamTooShort,
     StreamTooLong,
     ValueNotFound,
-    EventFragment
+    EventFragment,
+    UnknownPayload
 }
 
+#[derive(Debug)]
+pub enum DecodingError {
+    //HeaderNotFound,
+    UnknownType
+}
 
 #[derive(Debug)]
 pub enum WaveformError {

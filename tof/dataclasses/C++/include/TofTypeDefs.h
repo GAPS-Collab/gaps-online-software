@@ -1,0 +1,37 @@
+#ifndef GAPSTOFTYPEDEFS_H_INCLUDED
+#define GAPSTOFTYPEDEFS_H_INCLUDED
+
+#include <vector>
+#include <cstddef>
+#include <string>
+
+/******************************************
+ * Basic typedefs to be used with all tof
+ * related code
+ *
+ *
+ */
+
+typedef uint8_t  u8;
+typedef uint16_t u16;
+typedef uint32_t u32;
+typedef uint64_t u64;
+typedef int8_t   i8;
+typedef int16_t  i16;
+typedef int32_t  i32;
+typedef int64_t  i64;
+typedef size_t   usize;
+typedef float    f32;
+typedef double   f64;
+typedef std::string String;
+
+// vectors
+typedef std::vector<u8>  vec_u8; // this is used for (de)serialization
+typedef vec_u8 bytestream;
+typedef std::vector<u16> vec_u16;
+typedef std::vector<u64> vec_u64;
+typedef std::vector<f64> vec_f64;
+typedef std::vector<std::vector<f64>> vec_vec_f64;
+typedef std::vector<std::vector<i16>> vec_vec_i16;
+
+#endif

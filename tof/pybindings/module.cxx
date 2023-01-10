@@ -15,7 +15,7 @@
 #include "WaveGAPS.h"
 #include "TOFCommon.h"
 
-#include "TOFTypeDefs.h"
+#include "TofTypeDefs.h"
 
 using namespace GAPS;
 
@@ -155,6 +155,19 @@ template<class T>
 void nullsetter(T foo) 
 {
     std::cerr << "Can not set this property!" << std::endl;
+}
+
+void set_payload_helper(TofPacket &packet,
+                        const vec_u8 payload)
+{
+    packet.payload = payload;
+    packet.payload_size = payload.size();
+}
+
+void set_ptype_helper(TofPacket &packet,
+                      const PacketType &ptype)
+{
+    packet.packet_type = ptype;
 }
 
 /********************/
@@ -337,7 +350,15 @@ double calculate_pedestal_helper(vec_f64 wave,
 namespace py = pybind11;
 PYBIND11_MODULE(gaps_tof, m) {
     m.doc() = "GAPS Tof dataclasses and utility tools";
-    
+   
+    py::enum_<PacketType>(m, "PacketType")
+      .value("Unknown", PacketType::Unknown   )
+      .value("Command", PacketType::Command   )
+      .value("RBEvent", PacketType::RBEvent   )
+      .value("Monitor", PacketType::Monitor   )
+      .value("HeartBeat", PacketType::HeartBeat )
+      .export_values();
+
     py::enum_<PADDLE_END>(m, "PADDLE_END")
         .value("A", PADDLE_END::A)
         .value("B", PADDLE_END::B)
@@ -376,6 +397,8 @@ PYBIND11_MODULE(gaps_tof, m) {
         .def(py::init())
         .def("serialize",             &TofPacket::serialize)
         .def("deserialize",           &TofPacket::deserialize)
+        .def("set_payload",           &set_payload_helper)
+        .def("set_packet_type",       &set_ptype_helper) 
         .def_readonly("head",         &TofPacket::head)
         .def_readonly("tail",         &TofPacket::tail)
         .def_readonly("payload",      &TofPacket::payload)

@@ -66,6 +66,29 @@ impl RBEventPayload {
     let ev_payload     = RBEventPayload::new(event_id, payload.clone());
     Ok(ev_payload)
   }
+  
+ 
+  ///!  
+  ///
+  ///
+  pub fn from_slice(slice       : &[u8],
+                    do_checks   : bool)
+      -> Result<RBEventPayload, SerializationError> {
+    let payload        = Vec::<u8>::with_capacity(BlobData::SERIALIZED_SIZE);
+    if do_checks {
+      let head_pos = search_for_u16(BlobData::HEAD, &payload, 000000000)?; 
+      let tail_pos = search_for_u16(BlobData::TAIL, &payload, head_pos)?;
+      // At this state, this can be a header or a full event. Check here and
+      // proceed depending on the options
+      if head_pos - tail_pos != BlobData::SERIALIZED_SIZE { 
+        return Err(SerializationError::EventFragment);
+      }
+    }
+    //payload.extend_from_slice(slice);
+    let event_id       = BlobData::decode_event_id(slice);
+    let ev_payload     = RBEventPayload::new(event_id, payload.clone()); 
+    Ok(ev_payload)
+  }
 }
 
 /***********************************/

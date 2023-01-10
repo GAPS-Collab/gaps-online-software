@@ -15,6 +15,8 @@ use indicatif::{MultiProgress,
 
 use local_ip_address::local_ip;
 
+use std::collections::HashMap;
+
 use crate::api::*;
 use crate::control::*;
 use crate::memory::{BlobBuffer,
@@ -23,8 +25,10 @@ use crate::memory::{BlobBuffer,
                     UIO1_MIN_OCCUPANCY,
                     UIO2_MIN_OCCUPANCY};
 use tof_dataclasses::threading::ThreadPool;
-use tof_dataclasses::packets::value_packet::ValuePacket;
+use tof_dataclasses::packets::generic_packet::GenericPacket;
 use tof_dataclasses::events::blob::RBEventPayload;
+use tof_dataclasses::commands::TofCommand;
+use tof_dataclasses::commands as cmd;
 
 extern crate clap;
 use clap::{arg,
@@ -54,6 +58,9 @@ struct Args {
   /// Acquire this many events
   #[arg(short, long, default_value_t = 10000)]
   nevents: u64,
+  /// Cache size of the internal event cache in events
+  #[arg(short, long, default_value_t = 10000)]
+  cache_size: usize,
   ///// A json config file with detector information
   //#[arg(short, long)]
   //json_config: Option<std::path::PathBuf>,
@@ -69,6 +76,8 @@ const TEMPLATE_BAR_B  : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {ba
 const TEMPLATE_BAR_EV : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.red/grey} {pos:>7}/{len:7}";
 
 const HEARTBEAT : u64 = 5; // heartbeat in s
+
+///! Keep track of send/receive state of 0MQ socket
 
 /**********************************************
  * Threads:
@@ -100,45 +109,134 @@ const HEARTBEAT : u64 = 5; // heartbeat in s
 ///  
 pub fn server(socket     : &zmq::Socket,
               recv_bs    : Receiver<Vec<u8>>,
-              recv_ev_pl : Receiver<RBEventPayload>) {
+              recv_ev_pl : Receiver<RBEventPayload>,
+              cache_size : usize) {
   
-  let one_milli   = time::Duration::from_millis(1);
-  let mut message = zmq::Message::new();
-  
+  let one_milli    = time::Duration::from_millis(1);
+  let mut message  = zmq::Message::new();
+  let mut response = zmq::Message::new();
+  let mut socket_state = ZMQSocketState::Send;
+  // a cache for the events from this specific board
+  let mut event_cache : HashMap::<u32, RBEventPayload> = HashMap::new();
+
+  // keep track of the "oldest" key
+  let mut oldest_event_id : u32 = 0;
+
+  // 
+  let mut evid : u32 = 0;
+
+  // last moni packet
+  let mut last_moni : Vec<u8> = Vec::new();
   // we basically wait for incoming stuff and 
   // send it over the network unchecked for now
   loop {
     // check for a new connection
-    println!("Server loop");
-    match recv_bs.recv() {
-      Err(_) => (),
-      Ok(payload)  => {
-        println!("Received next payload!");
-        message = zmq::Message::from_slice(&payload
-                                          .as_slice());
-        match socket.send(message, zmq::DONTWAIT) {
-          Err(err) => debug!("Unable to send monitoring payload over 0MQ socket! err {err}"),
-          Ok(_)    => debug!("Payload sent!")
+    trace!("Server loop");
+    // this works on 3 things\
+    // 1) check if there is incoming monitoring data
+    // 2) check if there is incoming event data
+    // 3) check if a send request for cached event data
+    //    has been made
 
-        }
-      }// end Ok
-    } // end match
-    println!("checking events.. ");
-    match recv_ev_pl.recv() {
-      Err(_) => {continue;}
+
+    match recv_bs.recv() {
+      Err(err) => debug!("Can not get bytestream payload, err {err}"),
       Ok(payload)  => {
+        last_moni = payload;
+        //println!("Received next payload!");
+        //message = zmq::Message::from_slice(&payload
+        //                                  .as_slice());
+        //match socket.send(message, zmq::DONTWAIT) {
+        //  Err(err) => {
+        //    debug!("Unable to send monitoring payload over 0MQ socket! err {err}");
+        //    socket.recv(&mut response, zmq::DONTWAIT);
+        //  },
+        //  Ok(_)    => {
+        //    debug!("Payload sent!");
+        //    socket.recv(&mut response, zmq::DONTWAIT);
+        //    socket_state = ZMQSocketState::Receive;
+        //    println!("{}", response.as_str().unwrap());
+        //  }
+        //}
+      }// end Ok
+    } // end match
+    match recv_ev_pl.recv() {
+      Err(err) => {
+        debug!("No event payload! {err}");
+        continue;
+      }
+      Ok(event)  => {
         println!("Received next RBEvent!");
-        message = zmq::Message::from_slice(&payload
-                                           .payload
-                                          .as_slice());
-        match socket.send(message, zmq::DONTWAIT) {
-          Err(err) => debug!("Unable to send event payload over 0MQ socket! err {err}"),
-          Ok(_)    => debug!("Payload sent!")
+        //let mut rbeventdata = Vec::<u8>::new();
+        //rbeventdata.extend_from_slice(payload); 
+        //let event : RBEventPayload;
+        //match RBEventPayload::from_bytestream(&payload,0, true ) {
+        //  Ok(pl)   => event = pl,
+        //  Err(err) => {
+        //    debug!("Error serializing event payload! {?}", err);
+        //    continue;
+        //  }
+        //}
+        if oldest_event_id == 0 {
+          oldest_event_id = event.event_id;
         }
+        // store the event in the cache
+        event_cache.insert(event.event_id, event);   
+        // keep track of the oldest event_id
+        println!("We have a cache size of {}", event_cache.len());
+        if event_cache.len() > cache_size {
+          event_cache.remove(&oldest_event_id);
+          oldest_event_id += 1;
+        }
+        //message = zmq::Message::from_slice(&payload
+        //                                   .payload
+        //                                  .as_slice());
+        //match socket.send(message, zmq::DONTWAIT) {
+        //  Err(err) => debug!("Unable to send event payload over 0MQ socket! err {err}"),
+        //  Ok(_)    => {
+        //    debug!("Payload sent!");
+        //    socket.recv(&mut response, zmq::DONTWAIT);
+        //    println!("{}", response.as_str().unwrap());
+        //  }
+        //}
       }// end Ok
     } // end match
       //
-      //
+    match socket.recv_bytes()(zmq::DONTWAIT) {
+      Err(err)  => {debug!("Can't receive over 0MQ, error {err}");},
+      Ok(bytes) => { 
+        let cp = cmd::CommandPacket::from_bytestream(bytes, 0);
+        //match vp {
+        //  Err(err) => {
+        //    debug!("Can not get value packet from bytes! {?}", err);
+        //    continue;
+        //  }
+        //  Ok(value) => {
+        //    let command = TofCommand::from_vp(value);
+        //    match command {
+        //      TofCommand::
+        //      TofCommand::Unknown => {
+        //        debug!("Received Unknown Tof Command!");
+        //        continue;
+        //      }
+        //      _ => {
+        //        debug!("Received garbage..");
+        //        continue;
+        //      }
+        //      None => {
+        //        debug!("This is not a command!");
+        //        continue;
+        //    }
+        //  }
+        //}
+      }
+    }
+    debug!("Received request for event: {evid}");
+    if let Some(event) = event_cache.remove(&evid) {
+      //eventmessage = zmq::Message::from_slice(&event.payload
+                                              .as_slice());
+      //socket.send(eventmessage, zmq::DONTWAIT);
+    }
     thread::sleep(one_milli);
   } // end loop
 }
@@ -152,8 +250,8 @@ fn monitoring(send_bs : Sender<Vec<u8>>) {
   let mut rate: u32  = 0; 
   let mut bytestream = Vec::<u8>::new();
   bytestream.extend_from_slice(&rate.to_le_bytes());
-  let mut packet         = ValuePacket::new(String::from("rate"),
-                                        bytestream);
+  let mut packet         = GenericPacket::new(String::from("rate"),
+                                              bytestream);
   loop {
    //if now.elapsed().as_secs() >= HEARTBEAT {
    //}
@@ -168,7 +266,10 @@ fn monitoring(send_bs : Sender<Vec<u8>>) {
        //message = zmq::Message::from_slice(&packet
        //                                   .to_bytestream()
        //                                   .as_slice());
-       send_bs.send(payload);
+       match send_bs.send(payload) {
+         Err(err) => {debug!("Issue sending payload (err)")},
+         Ok(_)    => {debug!("Send payload successfully!")}
+       }
      }
 
      Err(_)   => {
@@ -185,8 +286,8 @@ fn monitoring(send_bs : Sender<Vec<u8>>) {
 ///  the thread dealing with it
 fn read_data_buffers(bs_send     : Sender<Vec<u8>>,
                      buff_trip   : u32,
-                     bar_a       : Option<&ProgressBar>,
-                     bar_b       : Option<&ProgressBar>, 
+                     bar_a_op    : Option<Box<ProgressBar>>,
+                     bar_b_op    : Option<Box<ProgressBar>>, 
                      switch_buff : bool) {
   let buf_a = BlobBuffer::A;
   let buf_b = BlobBuffer::B;
@@ -220,12 +321,12 @@ fn read_data_buffers(bs_send     : Sender<Vec<u8>>,
     buff_handler(&buf_a,
                  buff_trip,
                  Some(&bs_send),
-                 bar_a, 
+                 &bar_a_op, 
                  switch_buff); 
     buff_handler(&buf_b,
                  buff_trip,
                  Some(&bs_send),
-                 bar_b,
+                 &bar_b_op,
                  switch_buff); 
   }
 }
@@ -286,6 +387,7 @@ fn main() {
   let switch_buff   = args.switch_buffers;    
   let max_event     = args.nevents;
   let show_progress = args.show_progress;
+  let cache_size    = args.cache_size;
 
   let mut uio1_total_size = (UIO1_MAX_OCCUPANCY - UIO1_MIN_OCCUPANCY) as u64;
   let mut uio2_total_size = (UIO2_MAX_OCCUPANCY - UIO2_MIN_OCCUPANCY) as u64;
@@ -319,6 +421,7 @@ fn main() {
   let (bs_send, bs_recv)       : (Sender<Vec<u8>>, Receiver<Vec<u8>>) = channel(); 
   let (moni_send, moni_recv)   : (Sender<Vec<u8>>, Receiver<Vec<u8>>) = channel(); 
   let (ev_pl_send, ev_pl_recv) : (Sender<RBEventPayload>, Receiver<RBEventPayload>) = channel();
+  info!("Will start ThreadPool with {n_threads} threads");
   let workforce = ThreadPool::new(n_threads);
   
 
@@ -341,54 +444,82 @@ fn main() {
   reset_dma().unwrap();
   thread::sleep(one_milli);
   
+  if buff_trip != 66520576 {
+    uio1_total_size = buff_trip as u64;
+    uio2_total_size = buff_trip as u64;
+  }
+  
   // now we are ready to receive data 
 
   // set up some progress bars, so we 
   // can see what is going on 
   // this is optional
   // FIXME - feature?
-  let mut prog_op_a  : Option<&ProgressBar> = None;
-  let mut prog_op_b  : Option<&ProgressBar> = None;
-  let mut prog_op_ev : Option<&ProgressBar> = None;
-  let multi_bar = MultiProgress::new();
-  let floppy    = vec![240, 159, 146, 190];
-  let floppy    = String::from_utf8(floppy).unwrap();
-  let label_a   = String::from("Buff A");
-  let label_b   = String::from("Buff B");
-  let sty_a = ProgressStyle::with_template(TEMPLATE_BAR_A)
+  //let mut prog_op_a     : Option<&ProgressBar> = None;
+  //let mut prog_op_b     : Option<&ProgressBar> = None;
+  //let mut prog_op_ev    : Option<&ProgressBar> = None;
+  let mut prog_op_a     : Option<Box<ProgressBar>>   = None; 
+  let mut prog_op_b     : Option<Box<ProgressBar>>   = None;
+  let mut prog_op_ev    : Option<Box<ProgressBar>>   = None;
+  let mut multi_prog_op : Option<Box<MultiProgress>> = None;
+ 
+
+  if show_progress {
+    multi_prog_op = Some(Box::new(MultiProgress::new()));
+    let floppy    = vec![240, 159, 146, 190];
+    let floppy    = String::from_utf8(floppy).unwrap();
+    let label_a   = String::from("Buff A");
+    let label_b   = String::from("Buff B");
+    let sty_a = ProgressStyle::with_template(TEMPLATE_BAR_A)
     .unwrap();
     //.progress_chars("##-");
-  let sty_b = ProgressStyle::with_template(TEMPLATE_BAR_B)
+    let sty_b = ProgressStyle::with_template(TEMPLATE_BAR_B)
     .unwrap();
     //.progress_chars("##-");
-  let sty_ev = ProgressStyle::with_template(TEMPLATE_BAR_EV)
+    let sty_ev = ProgressStyle::with_template(TEMPLATE_BAR_EV)
     .unwrap();
     //.progress_chars("##>");
 
-  if buff_trip != 66520576 {
-    uio1_total_size = buff_trip as u64;
-    uio2_total_size = buff_trip as u64;
-  }
-  let bar_a  : ProgressBar = multi_bar.add(ProgressBar::new(uio1_total_size)); 
-  let bar_b  : ProgressBar = multi_bar.insert_after(&bar_a, ProgressBar::new(uio2_total_size));
-  let bar_ev : ProgressBar = multi_bar.insert_after(&bar_b, ProgressBar::new(max_event as u64));         
-  bar_a.set_message(label_a);
-  bar_b.set_message(label_b);
-  bar_ev.set_message("EVENTS");
-  bar_a.set_prefix(floppy.clone());
-  bar_b.set_prefix(floppy.clone());
-  bar_ev.set_prefix(sparkles.clone());
-  bar_a.set_style(sty_a);
-  bar_b.set_style(sty_b);
-  bar_ev.set_style(sty_ev);
-  prog_op_a  = Some(&bar_a);
-  prog_op_b  = Some(&bar_b);
-  prog_op_ev = Some(&bar_ev); 
-  
-  if !show_progress {
-    prog_op_ev = None;
-    prog_op_a  = None;
-    prog_op_b  = None;
+    //let bar_a  : ProgressBar = multi_bar.add(ProgressBar::new(uio1_total_size)); 
+    //let bar_b  : ProgressBar = multi_bar.insert_after(&bar_a, ProgressBar::new(uio2_total_size));
+    //let bar_ev : ProgressBar = multi_bar.insert_after(&bar_b, ProgressBar::new(max_event as u64));         
+    prog_op_a  = Some(Box::new(multi_prog_op
+                               .as_mut()
+                               .unwrap()
+                               .add(ProgressBar::new(uio1_total_size)))); 
+    prog_op_b  = Some(Box::new(multi_prog_op
+                               .as_mut()
+                               .unwrap()
+                               .insert_after(&prog_op_a.as_mut().unwrap(), ProgressBar::new(uio2_total_size)))); 
+    prog_op_ev = Some(Box::new(multi_prog_op
+                               .as_mut()
+                               .unwrap()
+                               .insert_after(&prog_op_b.as_mut().unwrap(), ProgressBar::new(max_event as u64)))); 
+
+    match prog_op_a {
+      None => (),
+      Some(ref bar) => {
+        bar.set_message(label_a);
+        bar.set_prefix(floppy.clone());
+        bar.set_style(sty_a);
+      }
+    }
+    match prog_op_b {
+      None => (),
+      Some(ref bar) => {
+        bar.set_message(label_b);
+        bar.set_prefix(floppy.clone());
+        bar.set_style(sty_b);
+      }
+    }
+    match prog_op_ev {
+      None => (),
+      Some(ref bar) => {
+        bar.set_style(sty_ev);
+        bar.set_prefix(sparkles.clone());
+        bar.set_message("EVENTS");
+      }
+    }
   }
   // this thread deals with the bytestream and 
   // performs analysis or just sneds it over 
@@ -408,30 +539,14 @@ fn main() {
   // buffers. It reads them and then 
   // passes on the data
   let rdb_sender = bs_send.clone();
-  if !show_progress{
-    workforce.execute(move || {
-      read_data_buffers(rdb_sender,
-                        buff_trip,
-                        None,
-                        None,
-                        switch_buff);
-    });
-  } else {
-    workforce.execute(move || {
-      read_data_buffers(rdb_sender,
-                        buff_trip,
-                        //prog_op_a,
-                        //prog_op_b, 
-                        Some(&bar_a),
-                        Some(&bar_b),
-                        switch_buff); 
-    });
-  }
+  workforce.execute(move || {
+    read_data_buffers(rdb_sender,
+                      buff_trip,
+                      prog_op_a,
+                      prog_op_b,
+                      switch_buff);
+  });
   if !dont_listen {
-    let moni_sender = moni_send.clone();
-    workforce.execute(move || {
-      monitoring(moni_sender);
-    });
     
     debug!("Will set up zmq socket at address {address}");
     let ctx = zmq::Context::new();
@@ -450,11 +565,16 @@ fn main() {
     let response = String::from("[MAIN] - connected");
     message = zmq::Message::from(&response);
     //socket.send(message,zmq::DONTWAIT);
+    let moni_sender = moni_send.clone();
+    workforce.execute(move || {
+      monitoring(moni_sender);
+    });
     println!("Executing sender thread!");
     workforce.execute(move || {
                       server(&socket, 
                              moni_recv,
-                             ev_pl_recv);
+                             ev_pl_recv,
+                             cache_size);
     });
   }
   info!("Starting daq!");
@@ -510,7 +630,7 @@ fn main() {
     n_events += 1;
     match prog_op_ev {
       None => (),
-      Some(bar) => {
+      Some(ref bar) => {
         bar.inc(delta_events);   
       }
     }
@@ -521,7 +641,7 @@ fn main() {
       thread::sleep(one_milli);
       match prog_op_ev {
         None => (),
-        Some(bar) => {
+        Some(ref bar) => {
           bar.finish();
         }
       }

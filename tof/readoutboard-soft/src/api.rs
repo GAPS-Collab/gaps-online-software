@@ -60,7 +60,7 @@ pub fn get_buff_size(which : &BlobBuffer) ->Result<u32, RegisterError> {
 pub fn buff_handler(which       : &BlobBuffer,
                     buff_trip   : u32,
                     bs_sender   : Option<&Sender<Vec<u8>>>,
-                    prog_bar    : Option<&ProgressBar>,
+                    prog_bar    : &Option<Box<ProgressBar>>,
                     switch_buff : bool) {
   let buff_size : u32;
   match get_buff_size(&which) {
