@@ -3,27 +3,28 @@
 
 /**************************************************/
 
-vec_u8 TofPacket::serialize() const
+vec_u8 TofPacket::to_bytestream() const
 {
 
   // first we need to hold only 5 bytes, then 
   // the payload will grow the vector with "insert"
-  vec_u8 buffer(5);
+  vec_u8 buffer(p_size_fixed + payload.size());
   usize pos = 0; // position in bytestream
   encode_ushort(head, buffer, pos); pos+=2;
   buffer[pos] = packet_type; pos += 1;
   //buffer.push_back(packet_type);    pos+=1;
-  encode_ushort(payload_size, buffer, pos);  pos+=2;
-  buffer.insert(buffer.end(), payload.begin(), payload.end()); pos += payload.size();
+  encode_uint64(payload_size, buffer, pos);  pos+=8;
+  buffer.insert(buffer.begin() + 11, payload.begin(), payload.end()); pos += payload.size();
   std::cout << "buffer size " << buffer.size() << std::endl;
+  pos += payload_size;
   encode_ushort(tail, buffer, pos); pos+=2;
   return buffer;
 }
 
 /**************************************************/
 
-u16 TofPacket::deserialize(vec_u8& bytestream,
-                           usize   start_pos)
+u16 TofPacket::from_bytestream(vec_u8& bytestream,
+                               usize   start_pos)
 {
     u16 value = decode_ushort(bytestream, start_pos);
     if (!(value == head))
@@ -32,10 +33,10 @@ u16 TofPacket::deserialize(vec_u8& bytestream,
     u16 pos = 2 + start_pos; // position in bytestream, 2 since we 
     packet_type = bytestream[pos]; pos+=1;
     //std::cout << "found packet type : " << packet_type << std::endl;
-    payload_size = decode_ushort(bytestream, pos); pos+=2;
+    payload_size = decode_uint64(bytestream, pos); pos+=8;
     //std::cout << "found payload size " << payload_size << std::endl;
     //size_t payload_end = pos + bytestream.size() - 2;
-    usize payload_end = pos + bytestream.size();
+    usize payload_end = pos + payload_size;
     //std::cout << " found payload end " << payload_end << std::endl;
     vec_u8 packet_bytestream(bytestream.begin()+ pos,
                              bytestream.begin()+ payload_end)  ;

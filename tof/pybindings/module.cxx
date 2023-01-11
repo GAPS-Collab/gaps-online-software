@@ -451,8 +451,8 @@ PYBIND11_MODULE(gaps_tof, m) {
     ;
     py::class_<TofPacket>(m, "TofPacket")
         .def(py::init())
-        .def("serialize",             &TofPacket::serialize)
-        .def("deserialize",           &TofPacket::deserialize)
+        .def("to_bytestream",         &TofPacket::to_bytestream)
+        .def("from_bytestream",       &TofPacket::from_bytestream)
         .def("set_payload",           &set_payload_helper)
         .def("set_packet_type",       &set_ptype_helper) 
         .def_readonly("head",         &TofPacket::head)
