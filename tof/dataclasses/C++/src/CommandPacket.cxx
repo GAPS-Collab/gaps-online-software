@@ -17,7 +17,7 @@ vec_u8 CommandPacket::to_bytestream() {
   usize pos    = 0;
   encode_ushort(head, buffer, pos); pos+=2;
   u8 cmd_class = (u8)command; 
-  buffer[2] = cmd_class; 
+  buffer[2] = cmd_class; pos += 1; 
   encode_uint32(value, buffer, pos); pos+=4;
   encode_ushort(tail, buffer, pos);  pos+=2;
   return buffer;

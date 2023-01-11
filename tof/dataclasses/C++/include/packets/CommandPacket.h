@@ -54,8 +54,8 @@ enum class TofCommand {
 struct CommandPacket {
   u16 head = 0xAAAA;
   u16 tail = 0x5555;
-  // every command packet is 65 bytes
-  u16 p_length_fixed = 65;
+  // every command packet is 10 bytes
+  u16 p_length_fixed = 10;
   TofCommand command;
   u32 value;
 
