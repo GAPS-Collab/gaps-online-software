@@ -1,4 +1,4 @@
-use crate::errors::SerializationError;
+pub use crate::errors::SerializationError;
 
 pub trait Serialization {
 

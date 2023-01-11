@@ -104,6 +104,14 @@ std::string tof_command_to_str(const TofCommand &cmd) {
  return "Unknown";
 }
 
+std::string tof_response_to_str(const TofResponse &cmd) {
+ switch (cmd) {
+   case TofResponse::Success     : {return "Success"     ;}
+   case TofResponse::GeneralFailure : {return "GeneralFailure" ;}
+ } // end case   
+ return "Unknown";
+}
+
 vec_u16 ch_head_getter(BlobEvt_t evt)
 {
     vec_u16 ch_head;
@@ -409,6 +417,27 @@ PYBIND11_MODULE(gaps_tof, m) {
                                   }) 
     ;
 
+    py::enum_<TofResponse>(m, "TofResponse")
+      .value("Success"              ,TofResponse::Success) 
+      .value("GeneralFailure"          ,TofResponse::GeneralFailure) 
+      .value("Unknonw"              ,TofResponse::Unknown) 
+      .export_values()
+    ;
+   
+    py::class_<ResponsePacket>(m, "ResponsePacket") 
+      .def(py::init<TofResponse const&, u32 const>())  
+      .def("to_bytestream",   &ResponsePacket::to_bytestream)
+      .def("from_bytestream", &ResponsePacket::from_bytestream)
+      .def("get_response"   ,    [](const ResponsePacket &pk) {
+                                  return pk.response;
+                              })
+      .def("__repr__",        [](const ResponsePacket &pk) {
+                                  return "<ResponsePacket : "
+                                  + tof_response_to_str(pk.response)
+                                  + " "
+                                  + std::to_string(pk.value) + ">";
+                                  }) 
+    ;
     py::enum_<PacketType>(m, "PacketType")
       .value("Unknown", PacketType::Unknown   )
       .value("Command", PacketType::Command   )
