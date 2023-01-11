@@ -33,7 +33,7 @@ usize CommandPacket::from_bytestream(vec_u8 &payload,
     std::cerr << "[WARN] no header found!" << std::endl; 
   } 
   pos += 2;
-  u8 cmd_class   = payload[2]       ; pos += 1;
+  command        = static_cast<TofCommand>(payload[2])       ; pos += 1;
   value          = decode_uint32(payload, pos); pos += 4;
   u16 tail_flag  = decode_ushort(payload, pos); pos += 2;
   if (tail_flag != tail) {
