@@ -396,7 +396,7 @@ PYBIND11_MODULE(gaps_tof, m) {
 
     py::class_<CommandPacket>(m, "CommandPacket") 
       .def(py::init<TofCommand const&, u32 const>())  
-      .def("to_bytesream",    &CommandPacket::to_bytestream)
+      .def("to_bytestream",   &CommandPacket::to_bytestream)
       .def("from_bytestream", &CommandPacket::from_bytestream)
       .def("get_command" ,    [](const CommandPacket &pk) {
                                   return pk.command;

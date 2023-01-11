@@ -210,6 +210,7 @@ pub fn server(socket     : &zmq::Socket,
         match tp {
           Err(err) => {
             debug!("Got broken package! {:?}", err);
+            socket.send("[SRV] broken package", zmq::DONTWAIT);
             continue;
           },
           Ok(_) => ()
@@ -219,6 +220,8 @@ pub fn server(socket     : &zmq::Socket,
         match cmd_pk {
           None => {
             debug!("Don't understand command!")
+            socket.send("[SRV] don't understand command", zmq::DONTWAIT);
+            continue;
           },
           Some(cmd) => {
             match cmd {
@@ -229,6 +232,8 @@ pub fn server(socket     : &zmq::Socket,
                   socket.send(eventmessage, zmq::DONTWAIT);
                 } else {
                   debug!{"Event {event_id} not found in cache!"};
+                  socket.send("[SRV] don't have that event", zmq::DONTWAIT);
+                  continue;
                 }
               },
               _ => warn!("Currently only RequestEvent is implemented!")
@@ -557,14 +562,14 @@ fn main() {
 
     debug!("... done");
     info!("0MQ socket listening at {address}");
-    println!("Waiting for client to connect");
+    print!("Waiting for client to connect");
     let client_connected = socket.recv(&mut message,0);
     let txt = message.as_str().unwrap();
     println!("Got a client connected!");
     println!("Received {txt}");
     let response = String::from("[MAIN] - connected");
     message = zmq::Message::from(&response);
-    //socket.send(message,zmq::DONTWAIT);
+    socket.send(message, 0);
     let moni_sender = moni_send.clone();
     workforce.execute(move || {
       monitoring(moni_sender);

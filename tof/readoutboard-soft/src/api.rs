@@ -38,7 +38,7 @@ const SLEEP_AFTER_REG_WRITE : u32 = 1; // sleep time after register write in ms
 pub fn get_buff_size(which : &BlobBuffer) ->Result<u32, RegisterError> {
   let size : u32;
   let occ = get_blob_buffer_occ(&which)?;
-  debug!("Got occupancy of {occ} for buff {which:?}");
+  trace!("Got occupancy of {occ} for buff {which:?}");
 
   // the buffer sizes is UIO1_MAX_OCCUPANCY -  occ
   match which {

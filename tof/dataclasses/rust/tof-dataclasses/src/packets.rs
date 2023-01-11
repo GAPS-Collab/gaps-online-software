@@ -30,7 +30,7 @@ use crate::errors::SerializationError;
 //use nom::number::complete::*;
 //use nom::bytes::complete::{tag, take, take_until};
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 //#[repr(u8)]
 pub enum PacketType {
   Unknown   , 
@@ -71,7 +71,17 @@ impl PacketType {
 ///  
 ///  A type and a payload. This wraps
 ///  all other packets.
-
+///
+///
+///  HEAD : u16
+///  TYPE : u8
+///  PAYLOAD_SIZE : u64
+///  PYALOAD : [u8;PAYLOAD_SIZE]
+///  TAIL : u16
+///
+///  => Fixed size is 13
+///
+#[derive(Debug, PartialEq)]
 pub struct TofPacket {
   pub packet_type : PacketType,
   pub payload     : Vec<u8>
@@ -98,6 +108,8 @@ impl TofPacket {
     let p_type = PacketType::as_u8(&self.packet_type);
     bytestream.push(p_type);
     let payload_len = self.payload.len() as u64;
+    let foo = &payload_len.to_le_bytes();
+    println!("{foo:?}");
     bytestream.extend_from_slice(&payload_len.to_le_bytes());
     bytestream.extend_from_slice(self.payload.as_slice());
     bytestream.extend_from_slice(&TofPacket::TAIL.to_le_bytes());
@@ -143,15 +155,18 @@ impl Serialization for TofPacket {
                        stream[pos+5],
                        stream[pos+6],
                        stream[pos+7]];
+    println!("{eight_bytes:?}");
     let payload_size = u64::from_le_bytes(eight_bytes);
+    println!("{payload_size}");
     pos += 8;
-    two_bytes = [stream[pos], stream[pos + payload_size as usize]];
+    println!("{pos}");
+    two_bytes = [stream[pos + payload_size as usize], stream[pos + 1 + payload_size as usize]];
     if TofPacket::TAIL != u16::from_le_bytes(two_bytes) {
       warn!("Packet does not end with TAIL signature");
       return Err(SerializationError::TailInvalid {});
     }
-    let mut payload = Vec::<u8>::with_capacity(payload_size as usize - 13);
-    payload.extend_from_slice(&stream[pos..=pos+payload_size as usize]);
+    let mut payload = Vec::<u8>::with_capacity(payload_size as usize);
+    payload.extend_from_slice(&stream[pos..pos+payload_size as usize]);
     Ok(TofPacket {
       packet_type,
       payload
@@ -159,4 +174,20 @@ impl Serialization for TofPacket {
   }
 }
 
-
+#[test]
+fn test_tof_packet_serialize_roundabout() ->Result<(), SerializationError> {
+  let mut pk     = TofPacket::new();
+  pk.packet_type = PacketType::Command;
+  let mut pl     = Vec::<u8>::new();
+  for n in 0..200000 {
+    pl.push(n as u8);
+  }
+  pk.payload = pl;
+  //pk.payload     = vec![1,2,3,4];
+  let bs = pk.to_bytestream();
+  println!("{bs:?}");
+  let pk2 = TofPacket::from_bytestream(&bs, 0)?;
+  
+  assert_eq!(pk, pk2);
+  Ok(())
+}

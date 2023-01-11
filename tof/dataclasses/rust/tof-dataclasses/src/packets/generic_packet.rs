@@ -146,7 +146,7 @@ fn serialize_deserialize_roundabout() {
     println!("{}", bytestream[k]);
   }
   println!("{bytestream:?}");
-  let vp_verify  = GenericPacket::from_bytestream(bytestream, 0).unwrap();
+  let vp_verify  = GenericPacket::from_bytestream(&bytestream, 0).unwrap();
   assert_eq!(vp, vp_verify);
 }
 
