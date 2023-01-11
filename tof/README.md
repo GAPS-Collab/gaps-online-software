@@ -8,7 +8,7 @@ _obviously, this is subject to change_
 
 Each command has a CommandClass ID and can have a value of size u32
 
-Commands will be filled in a `CommandPacket` with a fixed size of 10 bytes
+Commands will be filled in a `CommandPacket` with a fixed size of 9 bytes
 and the following structure:
 ```
   HEAD         : u16 = 0xAAAA
@@ -23,16 +23,16 @@ This does not follow exactly Sydney's proposal, but has some advantages:
   event query.
 
 The CommandClass is a number (u8) so at max 255 different commands are available.
-We divide the CommandClass in several subgroups
-* <Reserved>  : 0-9
-* <Reserved>  : 100 - 199
-* <Reserved>  : 200 - 255
+We divide the CommandClass in several subgroups. Currently, a large number of 
+the command space is reserved.
+* `<Reserved>`  : 0-9
+* `<Reserved>`  : 100 - 199
+* `<Reserved>`  : 200 - 255
 * Power       : 10  - 19
 * Config      : 20  - 29
 * Run         : 30  - 39
 * Request     : 40  - 49
 * Calibration : 50  - 59
-At the time of writing, this leaves us with 4 unused subroups
 
 
 The commands follow Sydney's list:
