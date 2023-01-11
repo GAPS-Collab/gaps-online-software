@@ -12,7 +12,7 @@
       "n_data_channels"  : 8,
       "nwords"           : 1024,
       "calibration_file" : "/home/gaps/astoessl/gaps-online-software/tof/resources/calibrations/rb1_cal.txt",
-      "ip_address"       : "10.97.108.31",
+      "ip_address"       : "10.0.1.1",
       "port"             : 38830
     },
     {
@@ -21,7 +21,7 @@
       "n_data_channels"  : 8,
       "nwords"           : 1024,
       "calibration_file" : "/home/gaps/astoessl/gaps-online-software/tof/resources/calibrations/rb2_cal.txt",
-      "ip_address"       : "10.97.108.31",
+      "ip_address"       : "10.0.1.1",
       "port"             : 38831
     }
   ]

@@ -6,11 +6,13 @@ from enum import Enum
 PACKET_ID = 0
 IPADDR = "192.168.36.121"
 IPADDR = "10.97.108.15"
+IPADDR = "10.0.1.10"
 PORT = 50001
 
 # Create a UDP socket and bind the socket to the port
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-target_address = ("", 0)
+#target_address = ("", 0)
+target_address = (IPADDR, PORT)
 
 READ = 0
 WRITE = 1
@@ -328,6 +330,14 @@ def fw_info():
     print(" > FW_VER  = %08X" % rReg(0x202))
     print(" > FW_SHA  =  %07X" % rReg(0x203))
 
+def monitor_event_id():
+    last_event_id = 0
+    while True:
+        event_id = read_event_cnt()
+        if event_id != last_event_id:
+            print (f"EVID: {event_id}")
+        last_event_id = event_id
+
 if __name__ == '__main__':
 
     import argparse
@@ -347,6 +357,7 @@ if __name__ == '__main__':
     argParser.add_argument('--reset_event_cnt', action='store_true', default=False, help="Reset Event Counter")
     argParser.add_argument('--read_event_cnt',  action='store_true', default=False, help="Read Event Counter")
     argParser.add_argument('--read_daq',        action='store_true', default=False, help="Read DAQ")
+    argParser.add_argument('--monitor_evid',    action='store_true', default=False, help="Show incoming event ids")
 
     args = argParser.parse_args()
 
@@ -379,3 +390,6 @@ if __name__ == '__main__':
         loopback()
     if args.read_daq:
         read_daq()
+
+    if args.monitor_evid:
+        monitor_event_id()
