@@ -8,7 +8,8 @@ pub enum SerializationError {
     StreamTooLong,
     ValueNotFound,
     EventFragment,
-    UnknownPayload
+    UnknownPayload,
+    WrongByteSize
 }
 
 #[derive(Debug)]

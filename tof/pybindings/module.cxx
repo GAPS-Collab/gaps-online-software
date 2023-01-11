@@ -9,6 +9,8 @@
 #include "packets/REventPacket.h"
 #include "packets/RPaddlePacket.h"
 #include "packets/TofPacket.h"
+#include "packets/CommandPacket.h"
+#include "packets/RBEnvPacket.h"
 
 #include "serialization.h"
 #include "blobroutines.h"
@@ -78,6 +80,28 @@ bytestream wrap_encode_uint64(u64 value, size_t start_pos) {
 
 int static_helper(RPaddlePacket& pp){
     return RPaddlePacket::calculate_length();
+}
+
+std::string tof_command_to_str(const TofCommand &cmd) {
+ switch (cmd) {
+   case TofCommand::PowerOn               : {return "PowerOn"              ;}
+   case TofCommand::PowerOff              : {return "PowerOff"             ;}
+   case TofCommand::PowerCycle            : {return "PowerCycle"           ;} 
+   case TofCommand::RBSetup               : {return "RBSetup"              ;}
+   case TofCommand::SetThresholds         : {return "SetThresholds"        ;} 
+   case TofCommand::SetMtConfig           : {return "SetMtConfig"          ;}
+   case TofCommand::StartValidationRun    : {return "StartValidationRun"   ;}
+   case TofCommand::RequestWaveforms      : {return "RequestWaveforms"     ;}
+   case TofCommand::DataRunStart          : {return "DataRunStart"         ;}
+   case TofCommand::DataRunEnd            : {return "DataRunEnd"           ;}
+   case TofCommand::VoltageCalibration    : {return "VoltageCalibration"   ;}
+   case TofCommand::TimingCalibration     : {return "TimingCalibration"    ;}
+   case TofCommand::CreateCalibrationFile : {return "CreateCalibrationFile";}
+   case TofCommand::RequestEvent          : {return "RequestEvent"         ;}
+   case TofCommand::RequestMoni           : {return "RequestMoni"          ;}
+   case TofCommand::Unknown               : {return "Unknown"              ;}
+ } // end case   
+ return "Unknown";
 }
 
 vec_u16 ch_head_getter(BlobEvt_t evt)
@@ -351,6 +375,40 @@ namespace py = pybind11;
 PYBIND11_MODULE(gaps_tof, m) {
     m.doc() = "GAPS Tof dataclasses and utility tools";
    
+    py::enum_<TofCommand>(m, "TofCommand")
+     .value("PowerOn"              ,TofCommand::PowerOn) 
+      .value("PowerOff"             ,TofCommand::PowerOff) 
+      .value("PowerCycle"           ,TofCommand::PowerCycle) 
+      .value("RBSetup"              ,TofCommand::RBSetup) 
+      .value("SetThresholds"        ,TofCommand::SetThresholds) 
+      .value("SetMtConfig"          ,TofCommand::SetMtConfig) 
+      .value("StartValidationRun"   ,TofCommand::StartValidationRun) 
+      .value("RequestWaveforms"     ,TofCommand::RequestWaveforms) 
+      .value("DataRunStart"         ,TofCommand::DataRunStart) 
+      .value("DataRunEnd"           ,TofCommand::DataRunEnd)    
+      .value("VoltageCalibration"   ,TofCommand::VoltageCalibration) 
+      .value("TimingCalibration"    ,TofCommand::TimingCalibration)
+      .value("CreateCalibrationFile",TofCommand::CreateCalibrationFile) 
+      .value("RequestEvent"         ,TofCommand::RequestEvent) 
+      .value("RequestMoni"          ,TofCommand::RequestMoni) 
+      .value("Unknown"              ,TofCommand::Unknown) 
+      .export_values();
+
+    py::class_<CommandPacket>(m, "CommandPacket") 
+      .def(py::init<TofCommand const&, u32 const>())  
+      .def("to_bytesream",    &CommandPacket::to_bytestream)
+      .def("from_bytestream", &CommandPacket::from_bytestream)
+      .def("get_command" ,    [](const CommandPacket &pk) {
+                                  return pk.command;
+                              })
+      .def("__repr__",        [](const CommandPacket &pk) {
+                                  return "<CommandPacket : "
+                                  + tof_command_to_str(pk.command)
+                                  + " "
+                                  + std::to_string(pk.value) + ">";
+                                  }) 
+    ;
+
     py::enum_<PacketType>(m, "PacketType")
       .value("Unknown", PacketType::Unknown   )
       .value("Command", PacketType::Command   )
@@ -386,8 +444,6 @@ PYBIND11_MODULE(gaps_tof, m) {
         .def_readwrite("primary_inner_tof_x",&REventPacket::primary_inner_tof_x)
         .def_readwrite("primary_inner_tof_y",&REventPacket::primary_inner_tof_y)
         .def_readwrite("primary_inner_tof_z",&REventPacket::primary_inner_tof_z)
-
-
         .def("__repr__",          [](const REventPacket &ev) {
                                   return "<REventPacket : " + ev.to_string(true) + "'>";
                                   }) 

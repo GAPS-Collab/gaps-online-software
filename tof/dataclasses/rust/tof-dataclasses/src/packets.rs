@@ -38,6 +38,7 @@ pub enum PacketType {
   RBEvent   ,
   Monitor   ,
   HeartBeat ,
+  Scalar    ,
 }
 
 impl PacketType {
@@ -48,6 +49,7 @@ impl PacketType {
       PacketType::RBEvent   => 20,
       PacketType::Monitor   => 30,
       PacketType::HeartBeat => 40,
+      PacketType::Scalar    => 50
     }
 
   }
@@ -58,7 +60,8 @@ impl PacketType {
       10  => Some(PacketType::Command), 
       20  => Some(PacketType::RBEvent), 
       30  => Some(PacketType::Monitor), 
-      40  => Some(PacketType::HeartBeat), 
+      40  => Some(PacketType::HeartBeat),
+      50  => Some(PacketType::Scalar),
       _   => None,
     }
   }

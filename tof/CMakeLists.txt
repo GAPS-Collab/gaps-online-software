@@ -179,7 +179,8 @@ add_library(${GAPSTOF_LIBRARY_SHARED}
     dataclasses/C++/src/serialization.cxx
     dataclasses/C++/src/CraneLogging.cc
     dataclasses/C++/src/WaveGAPS.cpp
-                )
+    dataclasses/C++/src/CommandPacket.cxx
+)
 
 target_compile_options(${GAPSTOF_LIBRARY_SHARED} PRIVATE -Wall -Wextra -Wpedantic)# -Werror)
 target_include_directories(${GAPSTOF_LIBRARY_SHARED}

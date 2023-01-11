@@ -97,7 +97,7 @@ pub fn buff_handler(which       : &BlobBuffer,
       Err(_) => warn!("Unable to reset buffer!")
     }
     match prog_bar {
-      Some(bar) => bar.reset(),
+      Some(bar) => bar.set_position(0),
       None      => () 
     }
     thread::sleep_ms(SLEEP_AFTER_REG_WRITE);

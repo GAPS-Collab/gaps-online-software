@@ -1,12 +1,21 @@
 use crate::errors::SerializationError;
 
 pub trait Serialization {
+
+
+  ///! Decode a serializable from a bytestream  
   fn from_bytestream(bytestream : &Vec<u8>, 
                      start_pos  : usize)
     -> Result<Self, SerializationError>
     where Self : Sized;
 
   //pub fn to_bytestream(&self, &
+
+  /////! Add the payload of the serializable to the pre allocated bytestream
+  //fn into_bytestream(bytestream : &mut Vec<u8>,
+  //                   start_pos  : usize)
+  //  -> Result<Self, SerializationError>
+  //  where Self : Sized;
 }
 
 

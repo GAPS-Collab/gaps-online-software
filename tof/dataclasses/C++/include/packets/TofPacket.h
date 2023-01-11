@@ -6,7 +6,6 @@
 
 #include "TofTypeDefs.h"
 
-#include "RBEnvPacket.h"
 
 enum PacketType : u8 {
     Unknown   =  0,

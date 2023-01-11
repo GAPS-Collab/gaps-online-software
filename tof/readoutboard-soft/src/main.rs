@@ -25,11 +25,12 @@ use crate::memory::{BlobBuffer,
                     UIO1_MIN_OCCUPANCY,
                     UIO2_MIN_OCCUPANCY};
 use tof_dataclasses::threading::ThreadPool;
+use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::packets::generic_packet::GenericPacket;
 use tof_dataclasses::events::blob::RBEventPayload;
 use tof_dataclasses::commands::TofCommand;
 use tof_dataclasses::commands as cmd;
-
+use tof_dataclasses::serialization::Serialization;
 extern crate clap;
 use clap::{arg,
            command,
@@ -113,9 +114,9 @@ pub fn server(socket     : &zmq::Socket,
               cache_size : usize) {
   
   let one_milli    = time::Duration::from_millis(1);
-  let mut message  = zmq::Message::new();
+  let mut message       = zmq::Message::new();
+  let mut eventmessage  = zmq::Message::new();
   let mut response = zmq::Message::new();
-  let mut socket_state = ZMQSocketState::Send;
   // a cache for the events from this specific board
   let mut event_cache : HashMap::<u32, RBEventPayload> = HashMap::new();
 
@@ -202,41 +203,40 @@ pub fn server(socket     : &zmq::Socket,
       }// end Ok
     } // end match
       //
-    match socket.recv_bytes()(zmq::DONTWAIT) {
+    match socket.recv_bytes(zmq::DONTWAIT) {
       Err(err)  => {debug!("Can't receive over 0MQ, error {err}");},
-      Ok(bytes) => { 
-        let cp = cmd::CommandPacket::from_bytestream(bytes, 0);
-        //match vp {
-        //  Err(err) => {
-        //    debug!("Can not get value packet from bytes! {?}", err);
-        //    continue;
-        //  }
-        //  Ok(value) => {
-        //    let command = TofCommand::from_vp(value);
-        //    match command {
-        //      TofCommand::
-        //      TofCommand::Unknown => {
-        //        debug!("Received Unknown Tof Command!");
-        //        continue;
-        //      }
-        //      _ => {
-        //        debug!("Received garbage..");
-        //        continue;
-        //      }
-        //      None => {
-        //        debug!("This is not a command!");
-        //        continue;
-        //    }
-        //  }
-        //}
-      }
-    }
-    debug!("Received request for event: {evid}");
-    if let Some(event) = event_cache.remove(&evid) {
-      //eventmessage = zmq::Message::from_slice(&event.payload
-                                              .as_slice());
-      //socket.send(eventmessage, zmq::DONTWAIT);
-    }
+      Ok(bytes) => {
+        let tp = TofPacket::from_bytestream(&bytes, 0);
+        match tp {
+          Err(err) => {
+            debug!("Got broken package! {:?}", err);
+            continue;
+          },
+          Ok(_) => ()
+        } // end match
+        let tp = tp.unwrap();
+        let cmd_pk = cmd::TofCommand::from_tof_packet(&tp);
+        match cmd_pk {
+          None => {
+            debug!("Don't understand command!")
+          },
+          Some(cmd) => {
+            match cmd {
+              TofCommand::RequestEvent(event_id) => {
+                debug!("Received request for event: {evid}");
+                if let Some(event) = event_cache.remove(&evid) {
+                  eventmessage = zmq::Message::from_slice(&event.payload);
+                  socket.send(eventmessage, zmq::DONTWAIT);
+                } else {
+                  debug!{"Event {event_id} not found in cache!"};
+                }
+              },
+              _ => warn!("Currently only RequestEvent is implemented!")
+            }
+          }// end Some
+        } // end match
+      } // end Ok
+    }// end match
     thread::sleep(one_milli);
   } // end loop
 }
