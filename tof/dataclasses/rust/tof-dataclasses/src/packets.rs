@@ -131,11 +131,12 @@ impl TofPacket {
 impl Serialization for TofPacket {
   fn from_bytestream(stream : &Vec<u8>, start_pos : usize)
   -> Result<TofPacket, SerializationError> {
+    let mut pos = start_pos;
     let mut two_bytes : [u8;2];
     two_bytes = [stream[start_pos],
                  stream[start_pos+1]];
         
-    let mut pos = start_pos + 2;
+    pos += start_pos + 2;
     if TofPacket::HEAD != u16::from_le_bytes(two_bytes) {
       warn!("Packet does not start with HEAD signature");
       return Err(SerializationError::HeadInvalid {});
@@ -167,6 +168,7 @@ impl Serialization for TofPacket {
     }
     let mut payload = Vec::<u8>::with_capacity(payload_size as usize);
     payload.extend_from_slice(&stream[pos..pos+payload_size as usize]);
+    println!("PAYLOAD: {payload:?}");
     Ok(TofPacket {
       packet_type,
       payload

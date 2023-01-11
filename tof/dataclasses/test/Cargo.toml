@@ -1,0 +1,23 @@
+[package]
+name = "tof-dataclasses-test"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[features]
+random=[]
+
+[dependencies]
+# logging
+log = "0.4"
+pretty_env_logger = "0.4"
+
+zmq = "0.10.0"
+local-ip-address = "0.5"
+# for testing
+# used for the random number generation
+rand = "0.8"
+
+tof-dataclasses = { path = "../rust/tof-dataclasses" , features = ["random"]}
+#nom = "7.1"

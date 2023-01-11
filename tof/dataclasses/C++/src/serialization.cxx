@@ -181,6 +181,21 @@ uint64_t decode_uint64_rev(const std::vector<unsigned char>& bytestream,
 
 /***********************************************/
 
+void u64_to_le_bytes(u64 value,
+                     vec_u8 &bytestream,
+                     u64 start_pos) {
+  bytestream[start_pos + 7] = (value >> 56) & 0xFF;
+  bytestream[start_pos + 6] = (value >> 48) & 0xFF;
+  bytestream[start_pos + 5] = (value >> 40) & 0xFF;
+  bytestream[start_pos + 4] = (value >> 32) & 0xFF;
+  bytestream[start_pos + 3] = (value >> 24) & 0xFF;
+  bytestream[start_pos + 2] = (value >> 16) & 0xFF;
+  bytestream[start_pos + 1] = (value >> 8) & 0xFF;
+  bytestream[start_pos + 0] = value & 0xFF; 
+}
+
+/***********************************************/
+
 void encode_uint64(uint64_t value, 
                    std::vector<unsigned char>& bytestream, 
                    unsigned int start_pos)

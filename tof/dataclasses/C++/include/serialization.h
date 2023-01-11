@@ -16,6 +16,7 @@
 #include <assert.h>
 
 #include "TOFCommon.h"
+#include "TofTypeDefs.h"
 
 // this is the current size of a blobevent 
 // in the serial representation
@@ -87,6 +88,8 @@ uint64_t decode_uint64_rev(const std::vector<unsigned char>& bytestream,
                            unsigned int start_pos=0);
 
 /***********************************************/
+
+void u64_to_le_bytes(u64 value, vec_u8 &bytestream, u64 start_pos=0);
 
 void encode_uint64(uint64_t value, std::vector<unsigned char>& bytestream, unsigned int start_pos=0);
 void encode_uint64_rev(uint64_t value, std::vector<unsigned char>& bytestream, unsigned int start_pos=0);
