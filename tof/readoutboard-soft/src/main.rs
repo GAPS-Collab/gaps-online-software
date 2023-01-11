@@ -247,7 +247,8 @@ pub fn server(socket     : &zmq::Socket,
                       socket.send(eventmessage, zmq::DONTWAIT);
                     } else {
                       debug!{"Event {event_id} not found in cache!"};
-                      socket.send("[SRV] don't have that event", zmq::DONTWAIT);
+                      let response = cmd::TofResponse::EventNotReady(event_id);
+                      socket.send(response.to_bytestream(), zmq::DONTWAIT);
                       continue;
                     }
                   },
