@@ -275,7 +275,7 @@ fn monitoring(send_bs : Sender<Vec<u8>>) {
        //                                   .to_bytestream()
        //                                   .as_slice());
        match send_bs.send(payload) {
-         Err(err) => {debug!("Issue sending payload (err)")},
+         Err(err) => {debug!("Issue sending payload {:?}", err)},
          Ok(_)    => {debug!("Send payload successfully!")}
        }
      }

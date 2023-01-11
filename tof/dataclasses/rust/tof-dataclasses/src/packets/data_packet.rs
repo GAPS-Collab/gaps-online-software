@@ -19,7 +19,7 @@ pub struct DataPacket<T> {
   pub label : String
 }
 
-pub type CommandPacket = DataPacket::<u32>;
+//pub type CommandPacket = DataPacket::<u32>;
 
 impl DataPacket::<u8> {
   pub fn from_gp(packet : &GenericPacket)

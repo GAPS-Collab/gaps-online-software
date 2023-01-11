@@ -25,30 +25,46 @@
 
 
 
-pub use crate::packets::data_packet::CommandPacket;
+//pub use crate::packets::data_packet::CommandPacket;
 
 use crate::serialization::Serialization;
 use crate::packets::{TofPacket,
+                     CommandPacket,
                      PacketType};
 
 
-///! Command string (Sydney's commands
-pub const CMD_PON                : &'static str = "CMD::PON";       
-pub const CMD_POFF               : &'static str = "CMD::POFF";        
-pub const CMD_PCYCLE             : &'static str = "CMD::PCYCLE";        
-pub const CMD_RBSETUP            : &'static str = "CMD::RBSETUP";         
-pub const CMD_SETTHRESHOLD       : &'static str = "CMD::SETTHR";         
-pub const CMD_SETMTCONFIG        : &'static str = "CMD::SETMTCONF";        
-pub const CMD_STARTVALIDATIONRUN : &'static str = "CMD::STARTVRUN";         
-pub const CMD_GETFULLWAVEFORMS   : &'static str = "CMD::GETWF";      
-pub const CMD_DATARUNSTART       : &'static str = "CMD::DATARUNSTART";    
-pub const CMD_REQEUESTEVENT      : &'static str = "CMD::REQUESTEVENT";      
-pub const CMD_DATARUNSTOP        : &'static str = "CMD::DATARUNSTOP";  
-pub const CMD_VCALIB             : &'static str = "CMD::VCALIB";       
-pub const CMD_TCALIB             : &'static str = "CMD::TCALIB";      
-pub const CMD_CREATECALIBF       : &'static str = "CMD::CREATECFILE";   
+//pub const CMD_PON                : &'static str = "CMD::PON";       
+//pub const CMD_POFF               : &'static str = "CMD::POFF";        
+//pub const CMD_PCYCLE             : &'static str = "CMD::PCYCLE";        
+//pub const CMD_RBSETUP            : &'static str = "CMD::RBSETUP";         
+//pub const CMD_SETTHRESHOLD       : &'static str = "CMD::SETTHR";         
+//pub const CMD_SETMTCONFIG        : &'static str = "CMD::SETMTCONF";        
+//pub const CMD_STARTVALIDATIONRUN : &'static str = "CMD::STARTVRUN";         
+//pub const CMD_GETFULLWAVEFORMS   : &'static str = "CMD::GETWF";      
+//pub const CMD_DATARUNSTART       : &'static str = "CMD::DATARUNSTART";    
+//pub const CMD_REQEUESTEVENT      : &'static str = "CMD::REQUESTEVENT";      
+//pub const CMD_DATARUNSTOP        : &'static str = "CMD::DATARUNSTOP";  
+//pub const CMD_VCALIB             : &'static str = "CMD::VCALIB";       
+//pub const CMD_TCALIB             : &'static str = "CMD::TCALIB";      
+//pub const CMD_CREATECALIBF       : &'static str = "CMD::CREATECFILE";   
+///! Command string (Sydney's commands)
+pub const CMD_POFF               : u8 = 10;        
+pub const CMD_PON                : u8 = 11;       
+pub const CMD_PCYCLE             : u8 = 12;        
+pub const CMD_RBSETUP            : u8 = 20;         
+pub const CMD_SETTHRESHOLD       : u8 = 21;         
+pub const CMD_SETMTCONFIG        : u8 = 22;        
+pub const CMD_DATARUNSTOP        : u8 = 30;  
+pub const CMD_DATARUNSTART       : u8 = 31;    
+pub const CMD_STARTVALIDATIONRUN : u8 = 32;         
+pub const CMD_GETFULLWAVEFORMS   : u8 = 41;      
+pub const CMD_REQEUESTEVENT      : u8 = 42; 
+pub const CMS_REQUESTMONI        : u8 = 43;
+pub const CMD_VCALIB             : u8 = 51;       
+pub const CMD_TCALIB             : u8 = 52;      
+pub const CMD_CREATECALIBF       : u8 = 53;   
 
-
+#[derive(Debug, PartialEq)]
 pub enum TofCommand {
   PowerOn(u32),
   PowerOff(u32),
@@ -56,7 +72,7 @@ pub enum TofCommand {
   RBSetup(u32), 
   SetThresholds(u32),
   SetMtConfig(u32),
-  StartValidationRun(u32),
+  StartValidationRun,
   RequestWaveforms(u32),
   DataRunStart , 
   DataRunEnd   ,
@@ -69,27 +85,46 @@ pub enum TofCommand {
 }
 
 impl TofCommand {
-  pub fn from_command_packet(packet : &CommandPacket)
-    -> Option<TofCommand> {
-    if !packet.label.starts_with("CMD::") {
-      return None;
+  
+  pub fn from_command_code(cc : u8, value : u32) -> TofCommand {
+    match cc {
+      CMD_POFF               => TofCommand::PowerOff             (value) ,        
+      CMD_PON                => TofCommand::PowerOn              (value) ,       
+      CMD_PCYCLE             => TofCommand::PowerCycle           (value) ,        
+      CMD_RBSETUP            => TofCommand::RBSetup              (value) ,         
+      CMD_SETTHRESHOLD       => TofCommand::SetThresholds        (value) ,         
+      CMD_SETMTCONFIG        => TofCommand::SetMtConfig          (value) ,        
+      CMD_DATARUNSTOP        => TofCommand::DataRunStart          ,  
+      CMD_DATARUNSTART       => TofCommand::DataRunEnd            ,    
+      CMD_STARTVALIDATIONRUN => TofCommand::StartValidationRun    ,         
+      CMD_GETFULLWAVEFORMS   => TofCommand::RequestWaveforms     (value) ,      
+      CMD_REQEUESTEVENT      => TofCommand::RequestEvent         (value) , 
+      CMS_REQUESTMONI        => TofCommand::RequestMoni           ,
+      CMD_VCALIB             => TofCommand::VoltageCalibration    ,       
+      CMD_TCALIB             => TofCommand::TimingCalibration     ,      
+      CMD_CREATECALIBF       => TofCommand::CreateCalibrationFile ,   
+      _                      => TofCommand::Unknown               , 
     }
-    match packet.label.as_str() {
-      CMD_PON                => Some(TofCommand::PowerOn           (packet.data)), 
-      CMD_POFF               => Some(TofCommand::PowerOff          (packet.data)), 
-      CMD_PCYCLE             => Some(TofCommand::PowerCycle        (packet.data)), 
-      CMD_RBSETUP            => Some(TofCommand::RBSetup           (packet.data)),  
-      CMD_SETTHRESHOLD       => Some(TofCommand::SetThresholds     (packet.data)), 
-      CMD_SETMTCONFIG        => Some(TofCommand::SetMtConfig       (packet.data)),   
-      CMD_STARTVALIDATIONRUN => Some(TofCommand::StartValidationRun(packet.data)),    
-      CMD_GETFULLWAVEFORMS   => Some(TofCommand::RequestWaveforms  (packet.data)), 
-      CMD_DATARUNSTART       => Some(TofCommand::DataRunStart),  
-      CMD_REQEUESTEVENT      => Some(TofCommand::RequestEvent      (packet.data)),    
-      CMD_DATARUNSTOP        => Some(TofCommand::DataRunEnd), 
-      CMD_VCALIB             => Some(TofCommand::VoltageCalibration), 
-      CMD_TCALIB             => Some(TofCommand::TimingCalibration), 
-      CMD_CREATECALIBF       => Some(TofCommand::CreateCalibrationFile), 
-      _                => Some(TofCommand::Unknown     ) 
+  }
+    
+  pub fn to_command_code(cmd : &TofCommand) -> Option<u8> {
+    match cmd {
+      TofCommand::PowerOff      (_)        => Some(CMD_POFF              ),        
+      TofCommand::PowerOn       (_)        => Some(CMD_PON               ),       
+      TofCommand::PowerCycle    (_)        => Some(CMD_PCYCLE            ),        
+      TofCommand::RBSetup       (_)        => Some(CMD_RBSETUP           ),         
+      TofCommand::SetThresholds (_)        => Some(CMD_SETTHRESHOLD      ),         
+      TofCommand::SetMtConfig   (_)        => Some(CMD_SETMTCONFIG       ),        
+      TofCommand::DataRunStart             => Some(CMD_DATARUNSTOP       ),  
+      TofCommand::DataRunEnd               => Some(CMD_DATARUNSTART      ),    
+      TofCommand::StartValidationRun       => Some(CMD_STARTVALIDATIONRUN),         
+      TofCommand::RequestWaveforms (_)     => Some(CMD_GETFULLWAVEFORMS  ),      
+      TofCommand::RequestEvent     (_)     => Some(CMD_REQEUESTEVENT     ), 
+      TofCommand::RequestMoni              => Some(CMS_REQUESTMONI       ), 
+      TofCommand::VoltageCalibration       => Some(CMD_VCALIB            ),       
+      TofCommand::TimingCalibration        => Some(CMD_TCALIB            ),      
+      TofCommand::CreateCalibrationFile    => Some(CMD_CREATECALIBF      ),   
+      TofCommand::Unknown                  => None                  , 
     }
   }
 
@@ -109,23 +144,10 @@ impl TofCommand {
         return None;
       }
       Ok(cmd) => {
-        TofCommand::from_command_packet(&cmd)
-
+        Some(cmd.command) 
       }
     } // end match
   }
-
-  //////! Get the command from a value packet
-  //////
-  //////  In case the value packet contains something
-  //////  else, return None
-  /////pub fn from_generic_packet(packet : &GenericPacket) 
-  /////  -> Option<TofCommand> {
-  /////  let data = CommandPacket::from_vp(packet)?;
-  /////  let command = TofCommand::from_command_packet(&data);
-  /////  command
-  /////}
-
 }
 
 

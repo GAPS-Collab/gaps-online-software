@@ -17,11 +17,11 @@
 pub mod paddle_packet;
 pub mod generic_packet;
 pub mod data_packet;
+pub mod command_packet;
 
 pub use crate::packets::generic_packet::GenericPacket;
-pub use crate::packets::data_packet::{DataPacket,
-                                      CommandPacket};
-
+pub use crate::packets::data_packet::DataPacket;
+pub use crate::packets::command_packet::CommandPacket;
 use crate::serialization::{Serialization};
 use crate::errors::SerializationError;
 

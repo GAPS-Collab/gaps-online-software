@@ -66,6 +66,8 @@ uint32_t decode_uint32_rev(payload_t& bytestream,
 
 /***********************************************/
 
+void u32_to_le_bytes(u32 value, vec_u8 &bytestream, u8 start_pos);
+
 void encode_uint32(uint32_t value, std::vector<unsigned char>& bytestream, unsigned int start_pos=0);
 void encode_uint32_rev(uint32_t value, std::vector<unsigned char>& bytestream, unsigned int start_pos=0);
 
