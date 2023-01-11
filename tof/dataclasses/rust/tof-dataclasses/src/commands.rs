@@ -88,6 +88,7 @@ pub enum TofCommand {
 pub enum TofResponse {
   Success(u32),
   GeneralFail(u32),
+  EventNotReady(u32),
   Unknown
 }
 
@@ -104,6 +105,7 @@ impl TofResponse {
     match self {
       TofResponse::Success(data)     => value = *data,
       TofResponse::GeneralFail(data) => value = *data,
+      TofResponse::EventNotReady(data) => value = *data,
       TofResponse::Unknown => ()
     }
     bytestream.extend_from_slice(&value.to_le_bytes());
@@ -154,8 +156,9 @@ impl Serialization for TofResponse {
 impl From<TofResponse> for u8 {
   fn from(input : TofResponse) -> u8 {
     match input {
-      TofResponse::Success(_) => 1,
-      TofResponse::GeneralFail(_) => 2,
+      TofResponse::Success(_)       => 1,
+      TofResponse::GeneralFail(_)   => 2,
+      TofResponse::EventNotReady(_) => 3,
       TofResponse::Unknown => 0
     }
   }
@@ -167,6 +170,7 @@ impl From<(u8, u32)> for TofResponse {
     match input {
       1 => TofResponse::Success(value),
       2 => TofResponse::GeneralFail(value),
+      3 => TofResponse::EventNotReady(value),
       _ => TofResponse::Unknown
     }
   }
