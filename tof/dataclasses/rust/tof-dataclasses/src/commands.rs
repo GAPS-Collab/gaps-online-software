@@ -27,7 +27,7 @@
 
 //pub use crate::packets::data_packet::CommandPacket;
 
-use crate::serialization::Serialization;
+use crate::serialization::{Serialization, SerializationError};
 use crate::packets::{TofPacket,
                      CommandPacket,
                      PacketType};
@@ -82,6 +82,94 @@ pub enum TofCommand {
   RequestEvent(u32),
   RequestMoni ,
   Unknown
+}
+
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub enum TofResponse {
+  Success(u32),
+  GeneralFail(u32),
+  Unknown
+}
+
+impl TofResponse {
+  const HEAD : u16 = 0xAAAA;
+  const TAIL : u16 = 0x5555;
+
+  pub fn to_bytestream(&self) -> Vec<u8> {
+    let mut bytestream = Vec::<u8>::with_capacity(9);
+    bytestream.extend_from_slice(&TofResponse::HEAD.to_le_bytes());
+    let cc = u8::from(*self);
+    bytestream.push(cc);
+    let mut value : u32 = 0;
+    match self {
+      TofResponse::Success(data)     => value = *data,
+      TofResponse::GeneralFail(data) => value = *data,
+      TofResponse::Unknown => ()
+    }
+    bytestream.extend_from_slice(&value.to_le_bytes());
+    bytestream.extend_from_slice(&TofResponse::TAIL.to_le_bytes());
+    bytestream
+  }
+}
+
+impl Serialization for TofResponse {
+
+  fn from_bytestream(stream    : &Vec<u8>, 
+                     start_pos : usize) 
+    -> Result<TofResponse, SerializationError>{
+  
+    let mut pos      = start_pos; 
+    let mut two_bytes : [u8;2];
+    let four_bytes    : [u8;4];
+    two_bytes = [stream[pos],
+                 stream[pos+1]];
+    pos += 2;
+    if TofResponse::HEAD != u16::from_le_bytes(two_bytes) {
+      warn!("Packet does not start with HEAD signature");
+      return Err(SerializationError::HeadInvalid {});
+    }
+   
+    let cc   = stream[pos];
+    pos += 1;
+    four_bytes = [stream[pos],
+                  stream[pos+1],
+                  stream[pos+2],
+                  stream[pos+3]];
+    pos += 4;
+    let value = u32::from_le_bytes(four_bytes);
+    two_bytes = [stream[pos],
+                 stream[pos+1]];
+    let pair = (cc, value);
+    let response = TofResponse::from(pair);
+    if TofResponse::TAIL != u16::from_le_bytes(two_bytes) {
+      warn!("Packet does not end with TAIL signature");
+      return Err(SerializationError::TailInvalid {});
+    }
+    Ok(response)
+  }
+}
+
+
+
+impl From<TofResponse> for u8 {
+  fn from(input : TofResponse) -> u8 {
+    match input {
+      TofResponse::Success(_) => 1,
+      TofResponse::GeneralFail(_) => 2,
+      TofResponse::Unknown => 0
+    }
+  }
+}
+
+impl From<(u8, u32)> for TofResponse {
+  fn from(pair : (u8, u32)) -> TofResponse {
+    let (input, value) = pair;
+    match input {
+      1 => TofResponse::Success(value),
+      2 => TofResponse::GeneralFail(value),
+      _ => TofResponse::Unknown
+    }
+  }
 }
 
 impl TofCommand {

@@ -5,6 +5,8 @@
 #include <vector>
 #include <string>
 
+#include "TofTypeDefs.h"
+
 #define RPADDLEPACKETSIZE 24
 #define RPADDLEPACKETVERSION "1.1"
 
@@ -15,43 +17,43 @@
  **********************************************************/
 struct RPaddlePacket  {
 
-  unsigned short head = 0xF0F0;
+  u16 head = 0xF0F0;
 
-  unsigned char paddle_id;
-  unsigned short time_a;
-  unsigned short time_b;
-  unsigned short peak_a;
-  unsigned short peak_b;
-  unsigned short charge_a;
-  unsigned short charge_b;
-  unsigned short charge_min_i;
-  unsigned short x_pos;
-  unsigned short t_average;
+  u8 paddle_id;
+  u16 time_a;
+  u16 time_b;
+  u16 peak_a;
+  u16 peak_b;
+  u16 charge_a;
+  u16 charge_b;
+  u16 charge_min_i;
+  u16 x_pos;
+  u16 t_average;
 
-  unsigned char ctr_etx;
-  unsigned short tail = 0xF0F; 
+  u8 ctr_etx;
+  u16 tail = 0xF0F; 
 
   // convert the truncated values
-  unsigned short get_paddle_id() const;
-  float get_time_a()             const;
-  float get_time_b()             const;
-  float get_peak_a()             const;
-  float get_peak_b()             const;
-  float get_charge_a()     const;
-  float get_charge_b()     const;
-  float get_charge_min_i() const;
-  float get_x_pos()        const;
-  float get_t_avg()        const;
+  u16 get_paddle_id()    const;
+  f32 get_time_a()       const;
+  f32 get_time_b()       const;
+  f32 get_peak_a()       const;
+  f32 get_peak_b()       const;
+  f32 get_charge_a()     const;
+  f32 get_charge_b()     const;
+  f32 get_charge_min_i() const;
+  f32 get_x_pos()        const;
+  f32 get_t_avg()        const;
   // setters
-  void set_time_a(double);
-  void set_time_b(double);
-  void set_peak_a(double);
-  void set_peak_b(double);
-  void set_charge_a(double);
-  void set_charge_b(double);
-  void set_charge_min_i(double);
-  void set_x_pos(double);
-  void set_t_avg(double);
+  void set_time_a      (f64);
+  void set_time_b      (f64);
+  void set_peak_a      (f64);
+  void set_peak_b      (f64);
+  void set_charge_a    (f64);
+  void set_charge_b    (f64);
+  void set_charge_min_i(f64);
+  void set_x_pos       (f64);
+  void set_t_avg       (f64);
 
   // don't serialize (?)
   std::string version = RPADDLEPACKETVERSION; // packet version
@@ -61,9 +63,9 @@ struct RPaddlePacket  {
   static unsigned short calculate_length();
   void reset();
 
-  std::vector<unsigned char> serialize() const; 
-  unsigned int deserialize(std::vector<unsigned char>& bytestream, 
-                                unsigned int start_pos);
+  vec_u8 serialize() const; 
+  u32 deserialize(vec_u8 &bytestream, 
+                  u32 start_pos);
  
   // easier print out
   std::string to_string() const;

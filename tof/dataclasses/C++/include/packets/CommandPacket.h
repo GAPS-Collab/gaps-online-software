@@ -36,6 +36,12 @@ enum class TofCommand {
   Unknown
 };
 
+enum class TofResponse {
+  Success        = 1,
+  GeneralFailure = 2,
+  Unknown
+};
+
 
 /*********************************************
  * This packet holds all kinds of commands
@@ -67,5 +73,20 @@ struct CommandPacket {
 
 };
 
+struct ResponsePacket {
+  u16 head = 0xAAAA;
+  u16 tail = 0x5555;
+  // every command packet is 9 bytes
+  u16 p_length_fixed = 9;
+  TofResponse response;
+  u32 value;
+
+  ResponsePacket(const TofResponse &resp, const u32 value);
+  vec_u8 to_bytestream();
+
+  usize from_bytestream(vec_u8& payload,
+                        usize start_pos=0);
+
+};
 
 #endif

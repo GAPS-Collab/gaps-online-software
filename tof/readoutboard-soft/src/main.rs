@@ -95,6 +95,36 @@ const HEARTBEAT : u64 = 5; // heartbeat in s
  *
  ********************************************/
 
+///! Recieve the events and hold them in a cache 
+///  until they are arequested
+fn event_cacher(recv_ev_pl : Receiver<RBEventPayload>,
+                cache_size : usize) {
+  let mut oldest_event_id : u32 = 0;
+  let mut event_cache : HashMap::<u32, RBEventPayload> = HashMap::new();
+  'main : loop {
+    match recv_ev_pl.recv() {
+      Err(err) => {
+        debug!("No event payload! {err}");
+        continue;
+      } // end err
+      Ok(event)  => {
+        println!("Received next RBEvent!");
+        if oldest_event_id == 0 {
+          oldest_event_id = event.event_id;
+        } //endif
+        // store the event in the cache
+        event_cache.insert(event.event_id, event);   
+        // keep track of the oldest event_id
+        println!("We have a cache size of {}", event_cache.len());
+        if event_cache.len() > cache_size {
+          event_cache.remove(&oldest_event_id);
+          oldest_event_id += 1;
+        } //endif
+      }// end Ok
+    } // end match
+  } // end 'main loop
+}
+
 ///! The actual "server" thread. Manage requests 
 ///  from the clients
 ///
@@ -112,75 +142,49 @@ pub fn server(socket     : &zmq::Socket,
               recv_bs    : Receiver<Vec<u8>>,
               recv_ev_pl : Receiver<RBEventPayload>,
               cache_size : usize) {
-  
-  let one_milli    = time::Duration::from_millis(1);
-  let mut message       = zmq::Message::new();
+ 
+  //let one_milli    = time::Duration::from_millis(1);
+  //let mut message       = zmq::Message::new();
   let mut eventmessage  = zmq::Message::new();
-  let mut response = zmq::Message::new();
+  //let mut response = zmq::Message::new();
   // a cache for the events from this specific board
   let mut event_cache : HashMap::<u32, RBEventPayload> = HashMap::new();
 
   // keep track of the "oldest" key
   let mut oldest_event_id : u32 = 0;
 
-  // 
-  let mut evid : u32 = 0;
-
+  
   // last moni packet
   let mut last_moni : Vec<u8> = Vec::new();
-  // we basically wait for incoming stuff and 
-  // send it over the network unchecked for now
+  // this works on 3 things in decreasing 
+  // priority
+  // 1) check if there is incoming event data
+  // 3) check if a send request for cached event data
+  //    has been made
+  // 2) check if there is incoming monitoring data
+  //    has been made
+  let sock_timeout : i64 = 1;
+  
+  // How many events shall we receive through 
+  // the channel before we try polling the 0MQ
+  // socket?
+  // FIXME - this might need to be 
+  // configurable
+  let recv_ev_per_poll : u8 = 10;
+  let mut n_iter : u8 = 0;
   loop {
     // check for a new connection
     trace!("Server loop");
-    // this works on 3 things\
-    // 1) check if there is incoming monitoring data
-    // 2) check if there is incoming event data
-    // 3) check if a send request for cached event data
-    //    has been made
-
-
-    match recv_bs.recv() {
-      Err(err) => debug!("Can not get bytestream payload, err {err}"),
-      Ok(payload)  => {
-        last_moni = payload;
-        //println!("Received next payload!");
-        //message = zmq::Message::from_slice(&payload
-        //                                  .as_slice());
-        //match socket.send(message, zmq::DONTWAIT) {
-        //  Err(err) => {
-        //    debug!("Unable to send monitoring payload over 0MQ socket! err {err}");
-        //    socket.recv(&mut response, zmq::DONTWAIT);
-        //  },
-        //  Ok(_)    => {
-        //    debug!("Payload sent!");
-        //    socket.recv(&mut response, zmq::DONTWAIT);
-        //    socket_state = ZMQSocketState::Receive;
-        //    println!("{}", response.as_str().unwrap());
-        //  }
-        //}
-      }// end Ok
-    } // end match
     match recv_ev_pl.recv() {
       Err(err) => {
         debug!("No event payload! {err}");
         continue;
-      }
+      } // end err
       Ok(event)  => {
         println!("Received next RBEvent!");
-        //let mut rbeventdata = Vec::<u8>::new();
-        //rbeventdata.extend_from_slice(payload); 
-        //let event : RBEventPayload;
-        //match RBEventPayload::from_bytestream(&payload,0, true ) {
-        //  Ok(pl)   => event = pl,
-        //  Err(err) => {
-        //    debug!("Error serializing event payload! {?}", err);
-        //    continue;
-        //  }
-        //}
         if oldest_event_id == 0 {
           oldest_event_id = event.event_id;
-        }
+        } //endif
         // store the event in the cache
         event_cache.insert(event.event_id, event);   
         // keep track of the oldest event_id
@@ -188,64 +192,79 @@ pub fn server(socket     : &zmq::Socket,
         if event_cache.len() > cache_size {
           event_cache.remove(&oldest_event_id);
           oldest_event_id += 1;
+        } //endif
+        n_iter += 1;
+        if n_iter < recv_ev_per_poll {
+          continue;
+        } else {
+          n_iter=0;
         }
-        //message = zmq::Message::from_slice(&payload
-        //                                   .payload
-        //                                  .as_slice());
-        //match socket.send(message, zmq::DONTWAIT) {
-        //  Err(err) => debug!("Unable to send event payload over 0MQ socket! err {err}"),
-        //  Ok(_)    => {
-        //    debug!("Payload sent!");
-        //    socket.recv(&mut response, zmq::DONTWAIT);
-        //    println!("{}", response.as_str().unwrap());
-        //  }
-        //}
       }// end Ok
     } // end match
-      //
-    match socket.recv_bytes(zmq::DONTWAIT) {
-      Err(err)  => {
-        debug!("Can't receive over 0MQ, error {err}");
-        continue;
-      },
-      Ok(bytes) => {
-        let tp = TofPacket::from_bytestream(&bytes, 0);
-        match tp {
-          Err(err) => {
-            debug!("Got broken package! {:?}", err);
-            socket.send("[SRV] broken package", zmq::DONTWAIT);
+
+
+    match recv_bs.recv() {
+      Err(err) => debug!("Can not get bytestream payload, err {err}"),
+      Ok(payload)  => {
+        last_moni = payload;
+      }// end Ok
+    } // end match
+    
+    match socket.poll(zmq::PollEvents::POLLIN, sock_timeout) {
+      Ok(0) => continue,
+      Err(err) => warn!("0MQ socket poll failed! err {err}"),
+      Ok(1) => {
+        match socket.recv_bytes(zmq::DONTWAIT) {
+          Err(err)  => {
+            debug!("Can't receive over 0MQ, error {err}");
             continue;
-          },
-          Ok(_) => ()
-        } // end match
-        let tp = tp.unwrap();
-        let cmd_pk = cmd::TofCommand::from_tof_packet(&tp);
-        match cmd_pk {
-          None => {
-            debug!("Don't understand command!");
-            socket.send("[SRV] don't understand command", zmq::DONTWAIT);
-            continue;
-          },
-          Some(cmd) => {
-            match cmd {
-              TofCommand::RequestEvent(event_id) => {
-                debug!("Received request for event: {evid}");
-                if let Some(event) = event_cache.remove(&evid) {
-                  eventmessage = zmq::Message::from_slice(&event.payload);
-                  socket.send(eventmessage, zmq::DONTWAIT);
-                } else {
-                  debug!{"Event {event_id} not found in cache!"};
-                  socket.send("[SRV] don't have that event", zmq::DONTWAIT);
-                  continue;
-                }
+          }, // end Err
+          Ok(bytes) => {
+            let tp = TofPacket::from_bytestream(&bytes, 0);
+            match tp {
+              Err(err) => {
+                debug!("Got broken package! {:?}", err);
+                let response = cmd::TofResponse::GeneralFail(0);
+                socket.send(response.to_bytestream(), zmq::DONTWAIT);
+                continue;
               },
-              _ => warn!("Currently only RequestEvent is implemented!")
-            }
-          }// end Some
-        } // end match
-      } // end Ok
-    }// end match
-    thread::sleep(one_milli);
+              Ok(_) => ()
+            } // end match
+            let tp = tp.unwrap();
+            let cmd_pk = cmd::TofCommand::from_tof_packet(&tp);
+            match cmd_pk {
+              None => {
+                debug!("Don't understand command!");
+                socket.send("[SRV] don't understand command", zmq::DONTWAIT);
+                continue;
+              },
+              Some(cmd) => {
+                match cmd {
+                  TofCommand::RequestEvent(event_id) => {
+                    debug!("Received request for event: {event_id}");
+                    if let Some(event) = event_cache.remove(&event_id) {
+                      eventmessage = zmq::Message::from_slice(&event.payload);
+                      socket.send(eventmessage, zmq::DONTWAIT);
+                    } else {
+                      debug!{"Event {event_id} not found in cache!"};
+                      socket.send("[SRV] don't have that event", zmq::DONTWAIT);
+                      continue;
+                    }
+                  },
+                  TofCommand::RequestMoni => {
+                  },
+                  _ => warn!("Currently only RequestEvent is implemented!")
+                }
+              }// end Some
+            } // end match
+          } // end Ok
+        } //
+      }// end ok
+      Ok(_) => {
+        warn!("0MQ broke it's contract. Not sure what to do. Continuig..");
+        continue;
+      }
+    } // end poll = 1
   } // end loop
 }
 
@@ -271,9 +290,6 @@ fn monitoring(send_bs : Sender<Vec<u8>>) {
        bytestream.extend_from_slice(&rate.to_le_bytes());
        packet.update_payload(bytestream);
        let payload = packet.to_bytestream();
-       //message = zmq::Message::from_slice(&packet
-       //                                   .to_bytestream()
-       //                                   .as_slice());
        match send_bs.send(payload) {
          Err(err) => {debug!("Issue sending payload {:?}", err)},
          Ok(_)    => {debug!("Send payload successfully!")}
@@ -369,14 +385,19 @@ fn main() {
   match this_board_ip {
     IpAddr::V4(ip) => address_ip += &ip.to_string(),
     IpAddr::V6(ip) => panic!("Currently, we do not support IPV6!")
-
-      //  Ipv4Addr(address) => address_ip( 
   }
   //// the port will be 38830 + board id
   //address_ip += "10.0.1.1";
   let port = 38830 + get_board_id().unwrap();
   let address : String = address_ip + ":" + &port.to_string();
-  //info!("Will use ip address {address}");
+  
+  let args = Args::parse();                   
+  let buff_trip     = args.buff_trip;         
+  let switch_buff   = args.switch_buffers;    
+  let max_event     = args.nevents;
+  let show_progress = args.show_progress;
+  let cache_size    = args.cache_size;
+  let dont_listen = args.dont_listen;
 
   // welcome banner!
   println!("-----------------------------------------------");
@@ -386,16 +407,12 @@ fn main() {
   println!("-----------------------------------------------");
   println!(" => Running client for RB {}", rb_id);
   println!(" => RB had DNA {}", dna);
-  println!(" => Will bind local ZMQ socket to {}", address);
+  if !dont_listen { 
+    println!(" => Will bind local ZMQ socket to {}", address);
+  } 
   println!("-----------------------------------------------");
   println!("");                             
                                             
-  let args = Args::parse();                   
-  let buff_trip     = args.buff_trip;         
-  let switch_buff   = args.switch_buffers;    
-  let max_event     = args.nevents;
-  let show_progress = args.show_progress;
-  let cache_size    = args.cache_size;
 
   let mut uio1_total_size = (UIO1_MAX_OCCUPANCY - UIO1_MIN_OCCUPANCY) as u64;
   let mut uio2_total_size = (UIO2_MAX_OCCUPANCY - UIO2_MIN_OCCUPANCY) as u64;
@@ -406,8 +423,6 @@ fn main() {
   }
 
   info!("Will set buffer trip size to {buff_trip}");
-  let dont_listen = args.dont_listen;
-  //info!("Will listen to the the tof computer");
 
 
   // some pre-defined time units for 
@@ -432,9 +447,6 @@ fn main() {
   info!("Will start ThreadPool with {n_threads} threads");
   let workforce = ThreadPool::new(n_threads);
   
-
-
-
   // wait until we receive the 
   // rsponse from the server
 
@@ -488,9 +500,6 @@ fn main() {
     .unwrap();
     //.progress_chars("##>");
 
-    //let bar_a  : ProgressBar = multi_bar.add(ProgressBar::new(uio1_total_size)); 
-    //let bar_b  : ProgressBar = multi_bar.insert_after(&bar_a, ProgressBar::new(uio2_total_size));
-    //let bar_ev : ProgressBar = multi_bar.insert_after(&bar_b, ProgressBar::new(max_event as u64));         
     prog_op_a  = Some(Box::new(multi_prog_op
                                .as_mut()
                                .unwrap()
@@ -532,12 +541,6 @@ fn main() {
   // this thread deals with the bytestream and 
   // performs analysis or just sneds it over 
   // zmq
-  //let mut sock_op : Option<&zmq::Socket>;
-  //if !dont_listen {
-  //  sock_op = Some(&socket);
-  //} else {
-  //  sock_op = None;
-  //}
   let pl_sender = ev_pl_send.clone();
   workforce.execute(move || {
                     event_payload_worker(&bs_recv, pl_sender);
@@ -614,8 +617,6 @@ fn main() {
 
   let mut first_iter       = true;
 
-  //let bar_a  = multi_bar.add(setup_progress_bar(String::from("buff A"), UIO1_TRIP as u64, String::from(TEMPLATE_BAR_A)));  
-  //let bar_b  = multi_bar.insert_after(&bar_a,setup_progress_bar(String::from("buff B"), UIO2_TRIP as u64, String::from(TEMPLATE_BAR_B))); 
   loop {
     evt_cnt = get_event_count().unwrap();
     if first_iter {
@@ -626,9 +627,6 @@ fn main() {
       thread::sleep(one_milli);
       continue;
     }
-    // let's do some work
-    //buf_a_start = buff_handler(&buf_a, buf_a_start, Some(&bs_send), Some(&bar_a)); 
-    //buf_b_start = buff_handler(&buf_b, buf_b_start, Some(&bs_send), Some(&bar_b)); 
     
     delta_events = (evt_cnt - last_evt_cnt) as u64;
     if delta_events > 1 {
@@ -665,5 +663,4 @@ fn main() {
     last_evt_cnt = evt_cnt;
   }
 } // end main
-  //
 

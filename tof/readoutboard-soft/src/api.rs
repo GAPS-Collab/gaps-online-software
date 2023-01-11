@@ -12,7 +12,6 @@ use indicatif::{ProgressBar,
 use crate::control::*;
 use crate::memory::*;
 
-use zmq;
 
 use tof_dataclasses::events::blob::{BlobData,
                                     RBEventPayload};
@@ -145,30 +144,21 @@ pub fn setup_progress_bar(msg : String, size : u64, format_string : String) -> P
 ///
 pub fn event_payload_worker(bs_recv   : &Receiver<Vec<u8>>,
                             ev_sender : Sender<RBEventPayload>) {
-  let mut n_events : u32 = 0;
+  let mut n_events : u32;
   let mut event_id : u32 = 0;
-  loop {
+  'main : loop {
     let mut start_pos : usize = 0;
+    n_events = 0;
     match bs_recv.recv() {
       Ok(bytestream) => {
-        loop {
-          // for now, just push out the bytestream to 
-          // the socket
-          //let message = zmq::Message::from_slice(bytestream.as_slice());
-          //socket.send_msg(message, 0);
-          //match socket {
-          //  None => (),
-          //  Some(s) => {
-          //    s.send_msg(message,0);
-          //  }
-          //}
+        'bytestream : loop {
           match search_for_u16(BlobData::HEAD, &bytestream, start_pos) {
             Ok(head_pos) => {
               let tail_pos   = head_pos + BlobData::SERIALIZED_SIZE;
               if tail_pos > bytestream.len() - 1 {
                 // we are finished here
-                println!("Send {n_events} events. Got last event_id! {event_id}");
-                break;
+                debug!("Work on current blob complete. Extracted {n_events} events. Got last event_id! {event_id}");
+                break 'bytestream;
               }
               event_id   = BlobData::decode_event_id(&bytestream[head_pos..tail_pos]);
               n_events += 1;
@@ -177,15 +167,19 @@ pub fn event_payload_worker(bs_recv   : &Receiver<Vec<u8>>,
               payload.extend_from_slice(&bytestream[head_pos..tail_pos]);
               let rb_payload = RBEventPayload::new(event_id, payload); 
               ev_sender.send(rb_payload);
+              continue 'bytestream;
             },
             Err(err) => {
               println!("Send {n_events} events. Got last event_id! {event_id}");
               warn!("Got bytestream, but can not find HEAD bytes, err {err:?}");
-              break;}
+              break 'bytestream;}
           } // end loop
         } // end ok
       }, // end Ok(bytestream)
-      Err(_) => {continue;}
+      Err(err) => {
+        warn!("Received Garbage! Err {err}");
+        continue 'main;
+      }
     }// end match 
   } // end outer loop
 }
