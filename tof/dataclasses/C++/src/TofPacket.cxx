@@ -14,8 +14,17 @@ vec_u8 TofPacket::to_bytestream() const
   buffer[pos] = packet_type; pos += 1;
   //buffer.push_back(packet_type);    pos+=1;
   encode_uint64(payload_size, buffer, pos);  pos+=8;
-  buffer.insert(buffer.begin() + 11, payload.begin(), payload.end()); pos += payload.size();
+  std::cout << buffer[pos-8] << std::endl;
+  std::cout << buffer[pos-7] << std::endl;
+  std::cout << buffer[pos-6] << std::endl;
+  std::cout << buffer[pos-5] << std::endl;
+  std::cout << buffer[pos-4] << std::endl;
+  std::cout << buffer[pos-3] << std::endl;
+  std::cout << buffer[pos-2] << std::endl;
+  std::cout << buffer[pos-1] << std::endl;
+
   std::cout << "buffer size " << buffer.size() << std::endl;
+  buffer.insert(buffer.begin() + 11, payload.begin(), payload.end()); pos += payload.size();
   pos += payload_size;
   encode_ushort(tail, buffer, pos); pos+=2;
   return buffer;

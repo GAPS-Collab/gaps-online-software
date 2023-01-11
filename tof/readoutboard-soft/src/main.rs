@@ -204,7 +204,10 @@ pub fn server(socket     : &zmq::Socket,
     } // end match
       //
     match socket.recv_bytes(zmq::DONTWAIT) {
-      Err(err)  => {debug!("Can't receive over 0MQ, error {err}");},
+      Err(err)  => {
+        debug!("Can't receive over 0MQ, error {err}");
+        continue;
+      },
       Ok(bytes) => {
         let tp = TofPacket::from_bytestream(&bytes, 0);
         match tp {
@@ -219,7 +222,7 @@ pub fn server(socket     : &zmq::Socket,
         let cmd_pk = cmd::TofCommand::from_tof_packet(&tp);
         match cmd_pk {
           None => {
-            debug!("Don't understand command!")
+            debug!("Don't understand command!");
             socket.send("[SRV] don't understand command", zmq::DONTWAIT);
             continue;
           },
