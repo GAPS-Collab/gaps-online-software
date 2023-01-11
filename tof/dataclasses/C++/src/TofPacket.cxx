@@ -13,7 +13,7 @@ vec_u8 TofPacket::to_bytestream() const
   encode_ushort(head, buffer, pos); pos+=2;
   buffer[pos] = packet_type; pos += 1;
   //buffer.push_back(packet_type);    pos+=1;
-  encode_uint64(payload_size, buffer, pos);  pos+=8;
+  encode_uint64_rev(payload_size, buffer, pos);  pos+=8;
   std::cout << buffer[pos-8] << std::endl;
   std::cout << buffer[pos-7] << std::endl;
   std::cout << buffer[pos-6] << std::endl;
@@ -42,7 +42,7 @@ u16 TofPacket::from_bytestream(vec_u8& bytestream,
     u16 pos = 2 + start_pos; // position in bytestream, 2 since we 
     packet_type = bytestream[pos]; pos+=1;
     //std::cout << "found packet type : " << packet_type << std::endl;
-    payload_size = decode_uint64(bytestream, pos); pos+=8;
+    payload_size = decode_uint64_rev(bytestream, pos); pos+=8;
     //std::cout << "found payload size " << payload_size << std::endl;
     //size_t payload_end = pos + bytestream.size() - 2;
     usize payload_end = pos + payload_size;
