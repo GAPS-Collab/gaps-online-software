@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":[["Genlmsghdr","Struct representing generic netlink header and payload"],["Nlattr","Struct representing netlink attributes and payloads"]]};

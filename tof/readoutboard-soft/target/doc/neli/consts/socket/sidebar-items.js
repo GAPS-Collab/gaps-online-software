@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":[["AddrFamily","General address families for sockets"],["NlFamily","Values for `nl_family` in `NlSocket`"]]};

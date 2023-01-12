@@ -1,0 +1,158 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/achim/.cargo/registry/src/github.com-1ecc6299db9ec823/neli-0.5.3/src/consts/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../../neli/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
+<span id="2">2</span>
+<span id="3">3</span>
+<span id="4">4</span>
+<span id="5">5</span>
+<span id="6">6</span>
+<span id="7">7</span>
+<span id="8">8</span>
+<span id="9">9</span>
+<span id="10">10</span>
+<span id="11">11</span>
+<span id="12">12</span>
+<span id="13">13</span>
+<span id="14">14</span>
+<span id="15">15</span>
+<span id="16">16</span>
+<span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+</pre><pre class="rust"><code><span class="doccomment">//! # High level notes
+//!
+//! The contents of this module are generated mostly by macros, which
+//! implement the appropriate traits necessary to both be
+//! serialized/deserialized and also provide an additional level of
+//! type safety when contstructing netlink packets. Some of the traits
+//! generated in this module allow netlink structures to implement
+//! trait bounds assuring that only compatible constant-based enums
+//! are allowed to be passed in as parameters.  The macros are
+//! exported - you can use them too! See [impl_var], [impl_trait], and
+//! [impl_flags] for more details.
+//!
+//! Note that most of these constants come from the Linux kernel
+//! headers, which can be found in `/usr/include/linux` on many
+//! distros. You can also see `man 3 netlink`, `man 7 netlink`,
+//! and `man 7 rtnetlink` for more information.
+//!
+//! # Design decisions
+//!
+//! * Macros are exported so that these conventions are extensible and
+//! usable for data types implemented by the user in the case of new
+//! netlink families (which is supported by the protocol). In this
+//! case, there is no way in which I can support every custom netlink
+//! family but my aim is to make this library as flexible as possible
+//! so that it is painless to hook your custom netlink data type into
+//! the existing library support.
+//! * Enums are used so that:
+//!   * Values can be checked based on a finite number of inputs as
+//!   opposed to the range of whatever integer data type C defines as
+//!   the struct member type. This makes it easier to catch garbage
+//!   responses and corruption when an invalid netlink message is sent
+//!   to the kernel.
+//!   * Only the enum or an enum implementing a marker trait in the
+//!   case of type parameters can be used in the appropriate places
+//!   when constructing netlink messages. This takes guess work out of
+//!   which constants can be used where. Netlink documentation is not
+//!   always complete and sometimes takes a bit of trial and error
+//!   sending messages to the kernel to figure out if you are using
+//!   the correct constants. This setup should let you know at compile
+//!   time if you are doing something you should not be doing.
+//! * `UnrecognizedVariant` is included in each enum because
+//! completeness cannot be guaranteed for every constant for every
+//! protocol. This allows you to inspect the integer value returned
+//! and if you are sure that it is correct, you can use it. If it is
+//! a garbage value, this can also be useful for error reporting.
+
+</span><span class="attribute">#[macro_use]
+</span><span class="kw">mod </span>macros;
+
+<span class="doccomment">/// Constants related to generic netlink
+</span><span class="kw">pub mod </span>genl;
+<span class="doccomment">/// Constants related to netfilter netlink integration
+</span><span class="kw">pub mod </span>netfilter;
+<span class="doccomment">/// Constants related to generic netlink top level headers
+</span><span class="kw">pub mod </span>nl;
+<span class="doccomment">/// Constants related to rtnetlink
+</span><span class="kw">pub mod </span>rtnl;
+<span class="doccomment">/// Constants related to netlink socket operations
+</span><span class="kw">pub mod </span>socket;
+
+<span class="doccomment">/// Reimplementation of alignto macro in C
+</span><span class="kw">pub fn </span>alignto(len: usize) -&gt; usize {
+    (len + libc::NLA_ALIGNTO <span class="kw">as </span>usize - <span class="number">1</span>) &amp; !(libc::NLA_ALIGNTO <span class="kw">as </span>usize - <span class="number">1</span>)
+}
+
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use </span><span class="kw">super</span>::genl::<span class="kw-2">*</span>;
+
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_generated_enum_into_from() {
+        <span class="kw">let </span>unspec: u8 = CtrlCmd::Unspec.into();
+        <span class="macro">assert_eq!</span>(unspec, libc::CTRL_CMD_UNSPEC <span class="kw">as </span>u8);
+
+        <span class="kw">let </span>unspec_variant = CtrlCmd::from(libc::CTRL_CMD_UNSPEC <span class="kw">as </span>u8);
+        <span class="macro">assert_eq!</span>(unspec_variant, CtrlCmd::Unspec);
+    }
+}
+</code></pre></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="neli" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0 (69f9c33d7 2022-12-12)" ></div></body></html>

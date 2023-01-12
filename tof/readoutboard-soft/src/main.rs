@@ -28,7 +28,8 @@ use tof_dataclasses::threading::ThreadPool;
 use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::packets::generic_packet::GenericPacket;
 use tof_dataclasses::events::blob::RBEventPayload;
-use tof_dataclasses::commands::TofCommand;
+use tof_dataclasses::commands::{TofCommand,
+                                TofResponse};
 use tof_dataclasses::commands as cmd;
 use tof_dataclasses::serialization::Serialization;
 extern crate clap;
@@ -82,24 +83,22 @@ const DATAPORT_START : u32 = 30000;
 ///! The 0MP REP port is defined as CMDPORT_START + readoutboard_id
 const CMDPORT_START  : u32 = 40000;
 
-const HEARTBEAT : u64 = 5; // heartbeat in s
 
 ///! Keep track of send/receive state of 0MQ socket
 
-/**********************************************
- * Threads:
- *
- * - server          : comms with tof computer
- * - monitoring      : read out environmental
- *                     data
- * - buffer handling : check the fill level of
- *                     the buffers and switch
- *                     if necessary
- * - data handling   : Identify event id, 
- *                     (Analyze data),
- *                     pack data
- *
- ********************************************/
+///!  Threads:
+///! 
+///!  - server          : comms with tof computer
+///!  - monitoring      : read out environmental
+///!                      data
+///!  - buffer handling : check the fill level of
+///!                      the buffers and switch
+///!                      if necessary
+///!  - data handling   : Identify event id, 
+///!                      (Analyze data),
+///!                      pack data
+///! 
+///! 
 
 
 ///! The actual "server" thread. Manage requests 
@@ -148,7 +147,7 @@ pub fn server(socket     : &zmq::Socket,
   let recv_ev_per_poll : u8 = 10;
   let mut n_iter : u8 = 0;
   loop {
-    let mut now        = time::Instant::now();
+    let now        = time::Instant::now();
     // check for a new connection
     trace!("Server loop");
     match recv_ev_pl.recv() {
@@ -177,7 +176,6 @@ pub fn server(socket     : &zmq::Socket,
         }
       }// end Ok
     } // end match
-
 
     match recv_bs.recv() {
       Err(err) => debug!("Can not get bytestream payload, err {err}"),
@@ -366,7 +364,7 @@ fn main() {
   let this_board_ip = local_ip().unwrap();
   match this_board_ip {
     IpAddr::V4(ip) => address_ip += &ip.to_string(),
-    IpAddr::V6(ip) => panic!("Currently, we do not support IPV6!")
+    IpAddr::V6(_) => panic!("Currently, we do not support IPV6!")
   }
   
   // Set up 2 ports for 0MQ communications
@@ -384,7 +382,7 @@ fn main() {
   let max_event     = args.nevents;
   let show_progress = args.show_progress;
   let cache_size    = args.cache_size;
-  let dont_listen = args.dont_listen;
+  let dont_listen   = args.dont_listen;
 
   // welcome banner!
   println!("-----------------------------------------------");
@@ -423,14 +421,14 @@ fn main() {
   // * buffer reader thread
   // * data analysis/sender thread
   // * monitoring thread
+  // * run thread
   // + main thread, which does not need a 
   //   separate thread
-  let mut n_threads = 3;
-  if !dont_listen {
-    n_threads += 1
-  }
-  let (bs_send, bs_recv)       : (Sender<Vec<u8>>, Receiver<Vec<u8>>) = channel(); 
-  let (moni_send, moni_recv)   : (Sender<Vec<u8>>, Receiver<Vec<u8>>) = channel(); 
+  let mut n_threads = 5;
+  
+  let (kill_run, run_gets_killed)    : (Sender<bool>, Receiver<bool>)       = channel();
+  let (bs_send, bs_recv)             : (Sender<Vec<u8>>, Receiver<Vec<u8>>) = channel(); 
+  let (moni_send, moni_recv)         : (Sender<Vec<u8>>, Receiver<Vec<u8>>) = channel(); 
   let (ev_pl_to_cache, ev_pl_from_builder) : 
       (Sender<RBEventPayload>, Receiver<RBEventPayload>) = channel();
   let (ev_pl_to_cmdr,  ev_pl_from_cache)   : 
@@ -441,19 +439,24 @@ fn main() {
   
   // wait until we receive the 
   // rsponse from the server
-
-  info!("Setting daq to idle mode");
-  match idle_drs4_daq() {
-    Ok(_)    => info!("DRS4 set to idle:"),
-    Err(_)   => panic!("Can't set DRS4 to idle!!")
-  }
-  thread::sleep(one_milli);
-  match setup_drs4() {
-    Ok(_)    => info!("DRS4 setup routine complete!"),
-    Err(_)   => panic!("Failed to setup DRS4!!")
-  }
-  
-  reset_dma().unwrap();
+  // This is all done by the runner now!
+  //info!("Setting daq to idle mode");
+  //match idle_drs4_daq() {
+  //  Ok(_)    => info!("DRS4 set to idle:"),
+  //  Err(_)   => panic!("Can't set DRS4 to idle!!")
+  //}
+  //thread::sleep(one_milli);
+  //match setup_drs4() {
+  //  Ok(_)    => info!("DRS4 setup routine complete!"),
+  //  Err(_)   => panic!("Failed to setup DRS4!!")
+  //}
+  //
+  //match reset_dma() {
+  //  Ok(_)    => info!("DMA reset successful"),
+  //  Err(_)   => {
+  //    warn!("Can not reset DMA! Will run more aggressive reset procedure!");
+  //  }
+  //}
   thread::sleep(one_milli);
   
   if buff_trip != 66520576 {
@@ -535,13 +538,21 @@ fn main() {
   // zmq
   //let pl_sender = ev_pl_send.clone();
 
+  // Setup routines 
+  // Start the individual worker threads
+  // in meaningfull order
+  // - higher level threads first, then 
+  // the more gnarly ones.
+  let moni_sender = moni_send.clone();
+  workforce.execute(move || {
+      monitoring(moni_sender);
+  });
   workforce.execute(move || {
                     event_cache(ev_pl_from_builder,
                                 ev_pl_to_cmdr,
                                 evid_from_cmdr,
-                                10000)
+                                cache_size)
   });
-
   workforce.execute(move || {
                     event_payload_worker(&bs_recv, ev_pl_to_cache);
   });
@@ -561,8 +572,8 @@ fn main() {
   // create 0MQ sockedts
   let ctx = zmq::Context::new();
   let cmd_socket = ctx.socket(zmq::REP).expect("Unable to create 0MQ REP socket!");
-  if !dont_listen {
-    
+
+  if !dont_listen {  
     info!("Will set up 0MQ REP socket at address {cmd_address}");
     cmd_socket.bind(&cmd_address);
     
@@ -574,58 +585,43 @@ fn main() {
     println!("Client connected! Response {resp}");
     let response = String::from("[MAIN] - connected");
     cmd_socket.send(response.as_bytes(), 0);
-    let moni_sender = moni_send.clone();
+  } else {
+    // if we are not listening to a C&C server, we have to kickstart
+    // our run ourselves.
     workforce.execute(move || {
-      monitoring(moni_sender);
+        runner(Some(max_event),
+               None,
+               None,
+               None,
+               prog_op_ev);
     });
-    println!("Executing sender thread!");
-    //workforce.execute(move || {
-    //                  server(&socket, 
-    //                         moni_recv,
-    //                         ev_pl_recv,
-    //                         cache_size);
-    //});
   }
 
-  // Now set up PUB socket
+  // Now set up PUB socket 
+  // The pub socket is always present, even in don't listen configuration
+  // (Nobody is forced to listen to it, and it will just drop its data 
+  // if it does not have any subscribers)
   let data_socket = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
   data_socket.bind(&data_address);
   info!("0MQ SUB socket bound to address {data_address}");
 
-  info!("Starting daq!");
-  match start_drs4_daq() {
-    Ok(_)    => info!(".. successful!"),
-    Err(_)   => panic!("DRS4 start failed!")
-  }
+  //info!("Starting daq!");
+  //match start_drs4_daq() {
+  //  Ok(_)    => info!(".. successful!"),
+  //  Err(_)   => panic!("DRS4 start failed!")
+  //}
 
   // let go for a few seconds to get a 
   // rate estimate
-  //println!("getting rate estimate..");
-  thread::sleep(two_seconds);
-  let rate = get_trigger_rate().unwrap();
-  info!("Current trigger rate: {rate}Hz");
-  // the trigger rate defines at what intervals 
-  // we want to print out stuff
-  // let's print out something apprx every 2
-  // seconds
-  let n_evts_print : u64 = 2*rate as u64;
-
-  // event loop
-  let mut evt_cnt          : u32;
-  let mut last_evt_cnt     : u32 = 0;
-
-  let mut n_events         : u64 = 0;
-
-  let mut skipped_events   : u64 = 0;
-  let mut delta_events     : u64;
-
-  let mut first_iter       = true;
-
-  let mut command  : cmd::TofCommand;
+  //thread::sleep(two_seconds);
+  //let rate = get_trigger_rate().unwrap();
+  //info!("Current trigger rate: {rate}Hz");
+  //let mut command  : cmd::TofCommand;
   let mut resp     : cmd::TofResponse;
   let executor = Commander::new(data_socket,
                                 evid_to_cache,
                                 ev_pl_from_cache);
+  let mut run_active = false;
   loop {
     // query the command socket
     // this can block. The actual 
@@ -651,63 +647,55 @@ fn main() {
         continue;
       },
       Ok(c) => {
-        let result = executor.command(&c);
-        match result {
-          Err(err) => {
-            warn!("Command Failed!");
-            // FIXME - work on error codes
-            resp = cmd::TofResponse::GeneralFail(cmd::RESP_ERR_UNEXECUTABLE);
-            cmd_socket.send(resp.to_bytestream(),0);
+        let mut result = Ok(TofResponse::Unknown);
+        // intercept commands which require to spawn/kill 
+        // threads
+        match c {
+          TofCommand::DataRunStart (max_event) => {
+          // let's start a run. The value of the TofCommnad shall be 
+          // nevents
+          if run_active {
+            result = Ok(TofResponse::GeneralFail(cmd::RESP_ERR_RUNACTIVE));
+          } else {
+            workforce.execute(move || {
+                runner(Some(max_event as u64),
+                       None,
+                       None,
+                       None,
+                       //FIXME - maybe use crossbeam?
+                       //Some(&run_gets_killed),
+                       None);
+            }); 
           }
-          Ok(r) =>  {
-            cmd_socket.send(r.to_bytestream(),0);
-          }
-        }
+          run_active = true;
+          result = Ok(TofResponse::Success(cmd::RESP_SUCC_FINGERS_CROSSED));
+          },
+          TofCommand::DataRunEnd   => {
+            if !run_active {
+              result = Ok(TofResponse::GeneralFail(cmd::RESP_ERR_NORUNACTIVE));
+            }
+            warn!("Will kill current run!");
+            kill_run.send(true);
+            result = Ok(TofResponse::Success(cmd::RESP_SUCC_FINGERS_CROSSED));
+          },
+          _ => {
+            // forward the rest to the executor
+            result = executor.command(&c);
+            match result {
+              Err(err) => {
+                warn!("Command Failed! Err {:?}", err);
+                // FIXME - work on error codes
+                resp = cmd::TofResponse::GeneralFail(cmd::RESP_ERR_UNEXECUTABLE);
+                cmd_socket.send(resp.to_bytestream(),0);
+              }
+              Ok(r) =>  {
+                cmd_socket.send(r.to_bytestream(),0);
+              }
+            }
+          } // end all other commands
+        } // end match
       }
     }
   } // end loop
 } // end main
-  //  evt_cnt = get_event_count().unwrap();
-  //  if first_iter {
-  //    last_evt_cnt = evt_cnt;
-  //    first_iter = false;
-  //  }
-  //  if evt_cnt == last_evt_cnt {
-  //    thread::sleep(one_milli);
-  //    continue;
-  //  }
-  //  
-  //  delta_events = (evt_cnt - last_evt_cnt) as u64;
-  //  if delta_events > 1 {
-  //    skipped_events += delta_events;
-  //  }
-  //  
-  //  n_events += 1;
-  //  match prog_op_ev {
-  //    None => (),
-  //    Some(ref bar) => {
-  //      bar.inc(delta_events);   
-  //    }
-  //  }
-  //  // exit loop on n event basis
-  //  if n_events > max_event {
-  //    idle_drs4_daq().expect("Can not set DRS4 to idle mode!");
-  //    println!("We skipped {skipped_events} events");
-  //    thread::sleep(one_milli);
-  //    match prog_op_ev {
-  //      None => (),
-  //      Some(ref bar) => {
-  //        bar.finish();
-  //      }
-  //    }
-  //    break;
-  //  }
-
-  //  //if n_events % n_evts_print == 0 {
-  //  //  println!("Current event count {n_events}");
-  //  //  println!("We skipped {skipped_events} events");
-  //  //}
-  //  
-  //  //println!("Got {evt_cnt} event!");
-  //  last_evt_cnt = evt_cnt;
 

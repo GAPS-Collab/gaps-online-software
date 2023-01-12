@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":[["NlPayload","An enum representing either the desired payload as requested by the payload type parameter, an ACK received at the end of a message or stream of messages, or an error."]],"struct":[["Nlmsghdr","Top level netlink header and payload"]]};

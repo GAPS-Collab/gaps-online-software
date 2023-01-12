@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":[["DataPacket","! A packet with a single value and a  label"]]};

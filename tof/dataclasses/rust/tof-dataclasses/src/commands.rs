@@ -68,7 +68,7 @@ pub const CMD_CREATECALIBF       : u8 = 53;
 ///  These are long (4 bytes) but 
 ///  this allows to convey more information
 ///  e.g. event id
-pub const RESP_ERR_UNEXECUTABLE              : u32 = 202;
+pub const RESP_ERR_UNEXECUTABLE              : u32 = 500;
 pub const RESP_ERR_NOTIMPLEMENTED            : u32 = 404; 
 pub const RESP_ERR_LEVEL_NOPROBLEM           : u32 = 4000; 
 pub const RESP_ERR_LEVEL_MEDIUM              : u32 = 4010; 
@@ -76,8 +76,9 @@ pub const RESP_ERR_LEVEL_SEVERE              : u32 = 4020;
 pub const RESP_ERR_LEVEL_CRITICAL            : u32 = 4040; 
 pub const RESP_ERR_LEVEL_MISSION_CRITICAL    : u32 = 4040; 
 pub const RESP_ERR_LEVEL_RUN_FOOL_RUN        : u32 = 99999; 
-
-
+pub const RESP_SUCC_FINGERS_CROSSED          : u32 = 200;
+pub const RESP_ERR_NORUNACTIVE               : u32 = 501;
+pub const RESP_ERR_RUNACTIVE                 : u32 = 502;
 
 #[derive(Debug, PartialEq)]
 pub enum TofCommand {
@@ -89,7 +90,7 @@ pub enum TofCommand {
   SetMtConfig(u32),
   StartValidationRun,
   RequestWaveforms(u32),
-  DataRunStart , 
+  DataRunStart(u32), 
   DataRunEnd   ,
   VoltageCalibration,
   TimingCalibration,
@@ -105,6 +106,7 @@ pub enum TofResponse {
   GeneralFail(u32),
   EventNotReady(u32),
   SerializationIssue(u32),
+  ZMQProblem(u32),
   Unknown
 }
 
@@ -123,6 +125,7 @@ impl TofResponse {
       TofResponse::GeneralFail(data)        => value = *data,
       TofResponse::EventNotReady(data)      => value = *data,
       TofResponse::SerializationIssue(data) => value = *data,
+      TofResponse::ZMQProblem(data)         => value = *data,
       TofResponse::Unknown => ()
     }
     bytestream.extend_from_slice(&value.to_le_bytes());
@@ -175,6 +178,7 @@ impl From<TofResponse> for u8 {
       TofResponse::GeneralFail(_)   => 2,
       TofResponse::EventNotReady(_) => 3,
       TofResponse::SerializationIssue(_) => 4,
+      TofResponse::ZMQProblem(_) => 5,
       TofResponse::Unknown => 0
     }
   }
@@ -184,10 +188,12 @@ impl From<(u8, u32)> for TofResponse {
   fn from(pair : (u8, u32)) -> TofResponse {
     let (input, value) = pair;
     match input {
+
       1 => TofResponse::Success(value),
       2 => TofResponse::GeneralFail(value),
       3 => TofResponse::EventNotReady(value),
       4 => TofResponse::SerializationIssue(value),
+      5 => TofResponse::ZMQProblem(value),
       _ => TofResponse::Unknown
     }
   }
@@ -206,7 +212,7 @@ impl TofCommand {
       CMD_RBSETUP            => TofCommand::RBSetup              (value) ,         
       CMD_SETTHRESHOLD       => TofCommand::SetThresholds        (value) ,         
       CMD_SETMTCONFIG        => TofCommand::SetMtConfig          (value) ,        
-      CMD_DATARUNSTOP        => TofCommand::DataRunStart          ,  
+      CMD_DATARUNSTOP        => TofCommand::DataRunStart         (value) ,  
       CMD_DATARUNSTART       => TofCommand::DataRunEnd            ,    
       CMD_STARTVALIDATIONRUN => TofCommand::StartValidationRun    ,         
       CMD_GETFULLWAVEFORMS   => TofCommand::RequestWaveforms     (value) ,      
@@ -227,8 +233,8 @@ impl TofCommand {
       TofCommand::RBSetup       (_)        => Some(CMD_RBSETUP           ),         
       TofCommand::SetThresholds (_)        => Some(CMD_SETTHRESHOLD      ),         
       TofCommand::SetMtConfig   (_)        => Some(CMD_SETMTCONFIG       ),        
-      TofCommand::DataRunStart             => Some(CMD_DATARUNSTOP       ),  
-      TofCommand::DataRunEnd               => Some(CMD_DATARUNSTART      ),    
+      TofCommand::DataRunStart  (_)        => Some(CMD_DATARUNSTART       ),  
+      TofCommand::DataRunEnd               => Some(CMD_DATARUNSTOP      ),    
       TofCommand::StartValidationRun       => Some(CMD_STARTVALIDATIONRUN),         
       TofCommand::RequestWaveforms (_)     => Some(CMD_GETFULLWAVEFORMS  ),      
       TofCommand::RequestEvent     (_)     => Some(CMD_REQEUESTEVENT     ), 
@@ -272,7 +278,7 @@ impl From<(u8, u32)> for TofCommand {
       CMD_RBSETUP            => TofCommand::RBSetup              (value) ,         
       CMD_SETTHRESHOLD       => TofCommand::SetThresholds        (value) ,         
       CMD_SETMTCONFIG        => TofCommand::SetMtConfig          (value) ,        
-      CMD_DATARUNSTOP        => TofCommand::DataRunStart          ,  
+      CMD_DATARUNSTOP        => TofCommand::DataRunStart         (value) ,  
       CMD_DATARUNSTART       => TofCommand::DataRunEnd            ,    
       CMD_STARTVALIDATIONRUN => TofCommand::StartValidationRun    ,         
       CMD_GETFULLWAVEFORMS   => TofCommand::RequestWaveforms     (value) ,      

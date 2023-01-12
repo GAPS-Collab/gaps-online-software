@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":[["serialize","Convenience method for allocating a buffer for serialization."]],"struct":[["NetlinkBitArray","A bit array meant to be compatible with the bit array returned by the `NETLINK_LIST_MEMBERSHIPS` socket operation on netlink sockets."]]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":[["IterationBehavior","Define iteration behavior when traversing a stream of netlink messages."]],"struct":[["NlMessageIter","Iterator over messages in an [`NlSocketHandle`][crate::socket::NlSocketHandle] type."]]};

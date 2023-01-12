@@ -1,0 +1,1404 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/main.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>main.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><div class="width-limiter"><nav class="sub"><a class="sub-logo-container" href="../../rb_soft/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
+<span id="2">2</span>
+<span id="3">3</span>
+<span id="4">4</span>
+<span id="5">5</span>
+<span id="6">6</span>
+<span id="7">7</span>
+<span id="8">8</span>
+<span id="9">9</span>
+<span id="10">10</span>
+<span id="11">11</span>
+<span id="12">12</span>
+<span id="13">13</span>
+<span id="14">14</span>
+<span id="15">15</span>
+<span id="16">16</span>
+<span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
+<span id="90">90</span>
+<span id="91">91</span>
+<span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
+<span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
+<span id="383">383</span>
+<span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
+<span id="390">390</span>
+<span id="391">391</span>
+<span id="392">392</span>
+<span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
+<span id="399">399</span>
+<span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
+<span id="405">405</span>
+<span id="406">406</span>
+<span id="407">407</span>
+<span id="408">408</span>
+<span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
+<span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
+<span id="546">546</span>
+<span id="547">547</span>
+<span id="548">548</span>
+<span id="549">549</span>
+<span id="550">550</span>
+<span id="551">551</span>
+<span id="552">552</span>
+<span id="553">553</span>
+<span id="554">554</span>
+<span id="555">555</span>
+<span id="556">556</span>
+<span id="557">557</span>
+<span id="558">558</span>
+<span id="559">559</span>
+<span id="560">560</span>
+<span id="561">561</span>
+<span id="562">562</span>
+<span id="563">563</span>
+<span id="564">564</span>
+<span id="565">565</span>
+<span id="566">566</span>
+<span id="567">567</span>
+<span id="568">568</span>
+<span id="569">569</span>
+<span id="570">570</span>
+<span id="571">571</span>
+<span id="572">572</span>
+<span id="573">573</span>
+<span id="574">574</span>
+<span id="575">575</span>
+<span id="576">576</span>
+<span id="577">577</span>
+<span id="578">578</span>
+<span id="579">579</span>
+<span id="580">580</span>
+<span id="581">581</span>
+<span id="582">582</span>
+<span id="583">583</span>
+<span id="584">584</span>
+<span id="585">585</span>
+<span id="586">586</span>
+<span id="587">587</span>
+<span id="588">588</span>
+<span id="589">589</span>
+<span id="590">590</span>
+<span id="591">591</span>
+<span id="592">592</span>
+<span id="593">593</span>
+<span id="594">594</span>
+<span id="595">595</span>
+<span id="596">596</span>
+<span id="597">597</span>
+<span id="598">598</span>
+<span id="599">599</span>
+<span id="600">600</span>
+<span id="601">601</span>
+<span id="602">602</span>
+<span id="603">603</span>
+<span id="604">604</span>
+<span id="605">605</span>
+<span id="606">606</span>
+<span id="607">607</span>
+<span id="608">608</span>
+<span id="609">609</span>
+<span id="610">610</span>
+<span id="611">611</span>
+<span id="612">612</span>
+<span id="613">613</span>
+<span id="614">614</span>
+<span id="615">615</span>
+<span id="616">616</span>
+<span id="617">617</span>
+<span id="618">618</span>
+<span id="619">619</span>
+<span id="620">620</span>
+<span id="621">621</span>
+<span id="622">622</span>
+<span id="623">623</span>
+<span id="624">624</span>
+<span id="625">625</span>
+<span id="626">626</span>
+<span id="627">627</span>
+<span id="628">628</span>
+<span id="629">629</span>
+<span id="630">630</span>
+<span id="631">631</span>
+<span id="632">632</span>
+<span id="633">633</span>
+<span id="634">634</span>
+<span id="635">635</span>
+<span id="636">636</span>
+<span id="637">637</span>
+<span id="638">638</span>
+<span id="639">639</span>
+<span id="640">640</span>
+<span id="641">641</span>
+<span id="642">642</span>
+<span id="643">643</span>
+<span id="644">644</span>
+<span id="645">645</span>
+<span id="646">646</span>
+<span id="647">647</span>
+<span id="648">648</span>
+<span id="649">649</span>
+<span id="650">650</span>
+<span id="651">651</span>
+<span id="652">652</span>
+<span id="653">653</span>
+<span id="654">654</span>
+<span id="655">655</span>
+<span id="656">656</span>
+<span id="657">657</span>
+<span id="658">658</span>
+<span id="659">659</span>
+<span id="660">660</span>
+<span id="661">661</span>
+<span id="662">662</span>
+<span id="663">663</span>
+<span id="664">664</span>
+<span id="665">665</span>
+<span id="666">666</span>
+<span id="667">667</span>
+<span id="668">668</span>
+<span id="669">669</span>
+<span id="670">670</span>
+<span id="671">671</span>
+<span id="672">672</span>
+<span id="673">673</span>
+<span id="674">674</span>
+<span id="675">675</span>
+<span id="676">676</span>
+<span id="677">677</span>
+<span id="678">678</span>
+<span id="679">679</span>
+<span id="680">680</span>
+<span id="681">681</span>
+<span id="682">682</span>
+<span id="683">683</span>
+<span id="684">684</span>
+<span id="685">685</span>
+<span id="686">686</span>
+<span id="687">687</span>
+<span id="688">688</span>
+<span id="689">689</span>
+<span id="690">690</span>
+<span id="691">691</span>
+<span id="692">692</span>
+<span id="693">693</span>
+<span id="694">694</span>
+<span id="695">695</span>
+<span id="696">696</span>
+<span id="697">697</span>
+<span id="698">698</span>
+<span id="699">699</span>
+<span id="700">700</span>
+<span id="701">701</span>
+</pre><pre class="rust"><code><span class="kw">mod </span>registers;
+<span class="kw">mod </span>memory;
+<span class="kw">mod </span>control;
+<span class="kw">mod </span>api;
+
+<span class="kw">use </span>std::{thread, time};
+<span class="kw">use </span>std:: {sync::mpsc::Sender,
+           sync::mpsc::Receiver,
+           sync::mpsc::channel};
+<span class="kw">use </span>std::net::IpAddr;
+
+<span class="kw">use </span>indicatif::{MultiProgress,
+                ProgressBar,
+                ProgressStyle};
+
+<span class="kw">use </span>local_ip_address::local_ip;
+
+<span class="kw">use </span>std::collections::HashMap;
+
+<span class="kw">use </span><span class="kw">crate</span>::api::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::control::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::memory::{BlobBuffer,
+                    UIO1_MAX_OCCUPANCY,
+                    UIO2_MAX_OCCUPANCY,
+                    UIO1_MIN_OCCUPANCY,
+                    UIO2_MIN_OCCUPANCY};
+<span class="kw">use </span>tof_dataclasses::threading::ThreadPool;
+<span class="kw">use </span>tof_dataclasses::packets::TofPacket;
+<span class="kw">use </span>tof_dataclasses::packets::generic_packet::GenericPacket;
+<span class="kw">use </span>tof_dataclasses::events::blob::RBEventPayload;
+<span class="kw">use </span>tof_dataclasses::commands::{TofCommand,
+                                TofResponse};
+<span class="kw">use </span>tof_dataclasses::commands <span class="kw">as </span>cmd;
+<span class="kw">use </span>tof_dataclasses::serialization::Serialization;
+<span class="kw">extern crate </span>clap;
+<span class="kw">use </span>clap::{arg,
+           command,
+           <span class="comment">//value_parser,
+           //ArgAction,
+           //Command,
+           </span>Parser};
+
+<span class="attribute">#[derive(Parser, Debug)]
+#[command(author = <span class="string">&quot;J.A.Stoessl&quot;</span>, version, about, long_about = <span class="prelude-val">None</span>)]
+</span><span class="kw">struct </span>Args {
+  <span class="doccomment">/// Value for wich the buffers are forced to 
+  /// be read out!
+  </span><span class="attribute">#[arg(short, long, default_value_t = <span class="number">66520576</span>)]
+  </span>buff_trip: u32,
+  <span class="doccomment">/// Listen to the server at the tof computer
+  </span><span class="attribute">#[arg(short, long, default_value_t = <span class="bool-val">false</span>)]
+  </span>dont_listen: bool,
+  <span class="doccomment">/// Allow the software to switch buffers manually.
+  /// This might be needed for custom values of buff-trip
+  </span><span class="attribute">#[arg(short, long, default_value_t = <span class="bool-val">false</span>)]
+  </span>switch_buffers: bool,
+  <span class="doccomment">/// Show progress bars to indicate buffer fill values and number of acquired events
+  </span><span class="attribute">#[arg(long, default_value_t = <span class="bool-val">false</span>)]
+  </span>show_progress: bool,
+  <span class="doccomment">/// Acquire this many events
+  </span><span class="attribute">#[arg(short, long, default_value_t = <span class="number">10000</span>)]
+  </span>nevents: u64,
+  <span class="doccomment">/// Cache size of the internal event cache in events
+  </span><span class="attribute">#[arg(short, long, default_value_t = <span class="number">10000</span>)]
+  </span>cache_size: usize,
+  <span class="comment">///// A json config file with detector information
+  //#[arg(short, long)]
+  //json_config: Option&lt;std::path::PathBuf&gt;,
+</span>}
+
+
+<span class="kw">extern crate </span>pretty_env_logger;
+<span class="attribute">#[macro_use] </span><span class="kw">extern crate </span>log;
+
+<span class="doccomment">/// Non-register related constants
+</span><span class="kw">const </span>TEMPLATE_BAR_A  : <span class="kw-2">&amp;</span>str = <span class="string">&quot;[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.blue/grey} {bytes:&gt;7}/{total_bytes:7} &quot;</span>;
+<span class="kw">const </span>TEMPLATE_BAR_B  : <span class="kw-2">&amp;</span>str = <span class="string">&quot;[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.green/grey} {bytes:&gt;7}/{total_bytes:7} &quot;</span>;
+<span class="kw">const </span>TEMPLATE_BAR_EV : <span class="kw-2">&amp;</span>str = <span class="string">&quot;[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.red/grey} {pos:&gt;7}/{len:7}&quot;</span>;
+
+<span class="doccomment">///! The 0MQ PUB port is defined as DATAPORT_START + readoutboard_id
+</span><span class="kw">const </span>DATAPORT_START : u32 = <span class="number">30000</span>;
+
+<span class="doccomment">///! The 0MP REP port is defined as CMDPORT_START + readoutboard_id
+</span><span class="kw">const </span>CMDPORT_START  : u32 = <span class="number">40000</span>;
+
+
+<span class="doccomment">///! Keep track of send/receive state of 0MQ socket
+
+///!  Threads:
+///! 
+///!  - server          : comms with tof computer
+///!  - monitoring      : read out environmental
+///!                      data
+///!  - buffer handling : check the fill level of
+///!                      the buffers and switch
+///!                      if necessary
+///!  - data handling   : Identify event id, 
+///!                      (Analyze data),
+///!                      pack data
+///! 
+///! 
+
+
+///! The actual &quot;server&quot; thread. Manage requests 
+///  from the clients
+///
+///  This acts as global sync for all 
+///  bytestreams.
+///
+///  # Arguments
+///  
+///  * address   : our server side address
+///                we are listening on
+///  * recv_bs   : A channel for receiving
+///                binary payloads
+///  
+</span><span class="kw">pub fn </span>server(socket     : <span class="kw-2">&amp;</span>zmq::Socket,
+              recv_bs    : Receiver&lt;Vec&lt;u8&gt;&gt;,
+              recv_ev_pl : Receiver&lt;RBEventPayload&gt;,
+              cache_size : usize) {
+ 
+  <span class="comment">//let one_milli    = time::Duration::from_millis(1);
+  //let mut message       = zmq::Message::new();
+  //let mut response = zmq::Message::new();
+  // a cache for the events from this specific board
+  </span><span class="kw">let </span><span class="kw-2">mut </span>event_cache : HashMap::&lt;u32, RBEventPayload&gt; = HashMap::new();
+
+  <span class="comment">// keep track of the &quot;oldest&quot; key
+  </span><span class="kw">let </span><span class="kw-2">mut </span>oldest_event_id : u32 = <span class="number">0</span>;
+
+  <span class="comment">// last moni packet
+  </span><span class="kw">let </span><span class="kw-2">mut </span>last_moni : Vec&lt;u8&gt; = Vec::new();
+  <span class="comment">// this works on 3 things in decreasing 
+  // priority
+  // 1) check if there is incoming event data
+  // 3) check if a send request for cached event data
+  //    has been made
+  // 2) check if there is incoming monitoring data
+  //    has been made
+  </span><span class="kw">let </span>sock_timeout : i64 = <span class="number">1</span>;
+  
+  <span class="comment">// How many events shall we receive through 
+  // the channel before we try polling the 0MQ
+  // socket?
+  // FIXME - this might need to be 
+  // configurable
+  </span><span class="kw">let </span>recv_ev_per_poll : u8 = <span class="number">10</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>n_iter : u8 = <span class="number">0</span>;
+  <span class="kw">loop </span>{
+    <span class="kw">let </span>now        = time::Instant::now();
+    <span class="comment">// check for a new connection
+    </span><span class="macro">trace!</span>(<span class="string">&quot;Server loop&quot;</span>);
+    <span class="kw">match </span>recv_ev_pl.recv() {
+      <span class="prelude-val">Err</span>(err) =&gt; {
+        <span class="macro">debug!</span>(<span class="string">&quot;No event payload! {err}&quot;</span>);
+        <span class="kw">continue</span>;
+      } <span class="comment">// end err
+      </span><span class="prelude-val">Ok</span>(event)  =&gt; {
+        <span class="kw">if </span>oldest_event_id == <span class="number">0 </span>{
+          oldest_event_id = event.event_id;
+        } <span class="comment">//endif
+        // store the event in the cache
+        </span><span class="macro">trace!</span>(<span class="string">&quot;Adding RBEvent : {} to cache&quot;</span>, event.event_id);
+        event_cache.insert(event.event_id, event);   
+        <span class="comment">// keep track of the oldest event_id
+        </span><span class="macro">debug!</span>(<span class="string">&quot;We have a cache size of {}&quot;</span>, event_cache.len());
+        <span class="kw">if </span>event_cache.len() &gt; cache_size {
+          event_cache.remove(<span class="kw-2">&amp;</span>oldest_event_id);
+          oldest_event_id += <span class="number">1</span>;
+        } <span class="comment">//endif
+        </span>n_iter += <span class="number">1</span>;
+        <span class="kw">if </span>n_iter &lt; recv_ev_per_poll {
+          <span class="kw">continue</span>;
+        } <span class="kw">else </span>{
+          n_iter=<span class="number">0</span>;
+        }
+      }<span class="comment">// end Ok
+    </span>} <span class="comment">// end match
+
+    </span><span class="kw">match </span>recv_bs.recv() {
+      <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">debug!</span>(<span class="string">&quot;Can not get bytestream payload, err {err}&quot;</span>),
+      <span class="prelude-val">Ok</span>(payload)  =&gt; {
+        last_moni = payload;
+      }<span class="comment">// end Ok
+    </span>} <span class="comment">// end match
+    
+    </span><span class="kw">match </span>socket.poll(zmq::PollEvents::POLLIN, sock_timeout) {
+      <span class="prelude-val">Ok</span>(<span class="number">0</span>) =&gt; <span class="kw">continue</span>,
+      <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">&quot;0MQ socket poll failed! err {err}&quot;</span>),
+      <span class="prelude-val">Ok</span>(<span class="number">1</span>) =&gt; {
+        <span class="kw">match </span>socket.recv_bytes(zmq::DONTWAIT) {
+          <span class="prelude-val">Err</span>(err)  =&gt; {
+            <span class="macro">debug!</span>(<span class="string">&quot;Can&#39;t receive over 0MQ, error {err}&quot;</span>);
+            <span class="kw">continue</span>;
+          }, <span class="comment">// end Err
+          </span><span class="prelude-val">Ok</span>(bytes) =&gt; {
+            <span class="kw">let </span>tp = TofPacket::from_bytestream(<span class="kw-2">&amp;</span>bytes, <span class="number">0</span>);
+            <span class="kw">match </span>tp {
+              <span class="prelude-val">Err</span>(err) =&gt; {
+                <span class="macro">debug!</span>(<span class="string">&quot;Got broken package! {:?}&quot;</span>, err);
+                <span class="kw">let </span>response = cmd::TofResponse::GeneralFail(<span class="number">0</span>);
+                socket.send(response.to_bytestream(), zmq::DONTWAIT);
+                <span class="kw">continue</span>;
+              },
+              <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; ()
+            } <span class="comment">// end match
+            </span><span class="kw">let </span>tp = tp.unwrap();
+            <span class="kw">let </span>cmd_pk = cmd::TofCommand::from_tof_packet(<span class="kw-2">&amp;</span>tp);
+            <span class="kw">match </span>cmd_pk {
+              <span class="prelude-val">None </span>=&gt; {
+                <span class="macro">debug!</span>(<span class="string">&quot;Don&#39;t understand command!&quot;</span>);
+                socket.send(<span class="string">&quot;[SRV] don&#39;t understand command&quot;</span>, zmq::DONTWAIT);
+                <span class="kw">continue</span>;
+              },
+              <span class="prelude-val">Some</span>(cmd) =&gt; {
+                <span class="kw">match </span>cmd {
+                  TofCommand::RequestEvent(event_id) =&gt; {
+                    <span class="macro">debug!</span>(<span class="string">&quot;Received request for event: {event_id}&quot;</span>);
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(event) = event_cache.remove(<span class="kw-2">&amp;</span>event_id) {
+                      socket.send(event.payload, zmq::DONTWAIT);
+                    } <span class="kw">else </span>{
+                      <span class="macro">debug!</span>{<span class="string">&quot;Event {event_id} not found in cache!&quot;</span>};
+                      <span class="kw">let </span>response = cmd::TofResponse::EventNotReady(event_id);
+                      socket.send(response.to_bytestream(), zmq::DONTWAIT);
+                      <span class="kw">continue</span>;
+                    }
+                  },
+                  TofCommand::RequestMoni =&gt; {
+                  },
+                  <span class="kw">_ </span>=&gt; <span class="macro">warn!</span>(<span class="string">&quot;Currently only RequestEvent is implemented!&quot;</span>)
+                }
+              }<span class="comment">// end Some
+            </span>} <span class="comment">// end match
+          </span>} <span class="comment">// end Ok
+        </span>} <span class="comment">//
+      </span>}<span class="comment">// end ok
+      </span><span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
+        <span class="macro">warn!</span>(<span class="string">&quot;0MQ broke it&#39;s contract. Not sure what to do. Continuig..&quot;</span>);
+        <span class="kw">continue</span>;
+      }
+    } <span class="comment">// end poll = 1
+  </span><span class="kw">let </span>time = now.elapsed().as_millis();
+  <span class="macro">println!</span>(<span class="string">&quot;Server loop took {}&quot;</span>, time);
+  } <span class="comment">// end loop
+</span>}
+
+
+<span class="doccomment">///! A monitoring thread, which communicates with the 
+///  server program
+</span><span class="kw">fn </span>monitoring(send_bs : Sender&lt;Vec&lt;u8&gt;&gt;) {
+  <span class="comment">//let mut now        = time::Instant::now();
+  </span><span class="kw">let </span>heartbeat      = time::Duration::from_secs(HEARTBEAT);
+  <span class="kw">let </span><span class="kw-2">mut </span>rate: u32  = <span class="number">0</span>; 
+  <span class="kw">let </span><span class="kw-2">mut </span>bytestream = Vec::&lt;u8&gt;::new();
+  bytestream.extend_from_slice(<span class="kw-2">&amp;</span>rate.to_le_bytes());
+  <span class="kw">let </span><span class="kw-2">mut </span>packet         = GenericPacket::new(String::from(<span class="string">&quot;rate&quot;</span>),
+                                              bytestream);
+  <span class="kw">loop </span>{
+   <span class="comment">//if now.elapsed().as_secs() &gt;= HEARTBEAT {
+   //}
+   </span><span class="kw">let </span>rate_query = get_trigger_rate();
+   <span class="kw">match </span>rate_query {
+     <span class="prelude-val">Ok</span>(rate) =&gt; {
+       <span class="macro">debug!</span>(<span class="string">&quot;Monitoring thread -&gt; Rate: {rate}Hz &quot;</span>);
+       bytestream = Vec::&lt;u8&gt;::new();
+       bytestream.extend_from_slice(<span class="kw-2">&amp;</span>rate.to_le_bytes());
+       packet.update_payload(bytestream);
+       <span class="kw">let </span>payload = packet.to_bytestream();
+       <span class="kw">match </span>send_bs.send(payload) {
+         <span class="prelude-val">Err</span>(err) =&gt; {<span class="macro">debug!</span>(<span class="string">&quot;Issue sending payload {:?}&quot;</span>, err)},
+         <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {<span class="macro">debug!</span>(<span class="string">&quot;Send payload successfully!&quot;</span>)}
+       }
+     }
+
+     <span class="prelude-val">Err</span>(<span class="kw">_</span>)   =&gt; {
+       <span class="macro">warn!</span>(<span class="string">&quot;Can not send rate monitoring packet, register problem&quot;</span>);
+     }
+   }
+   thread::sleep(heartbeat);
+  }
+}
+
+
+<span class="doccomment">///! Read the data buffers when they are full and 
+///  then send the stream over the channel to 
+///  the thread dealing with it
+///
+///  # Arguments
+///
+///
+</span><span class="kw">fn </span>read_data_buffers(bs_send     : Sender&lt;Vec&lt;u8&gt;&gt;,
+                     buff_trip   : u32,
+                     bar_a_op    : <span class="prelude-ty">Option</span>&lt;Box&lt;ProgressBar&gt;&gt;,
+                     bar_b_op    : <span class="prelude-ty">Option</span>&lt;Box&lt;ProgressBar&gt;&gt;, 
+                     switch_buff : bool) {
+  <span class="kw">let </span>buf_a = BlobBuffer::A;
+  <span class="kw">let </span>buf_b = BlobBuffer::B;
+  <span class="kw">let </span>sleeptime = time::Duration::from_millis(<span class="number">1000</span>);
+
+  <span class="comment">//let mut max_buf_a : u64 = 0;
+  //let mut max_buf_b : u64 = 0;
+  //let mut min_buf_a : u64 = 4294967295;
+  //let mut min_buf_b : u64 = 4294967295;
+  // let&#39;s do some work
+  </span><span class="kw">loop </span>{
+    <span class="comment">//let a_occ = get_blob_buffer_occ(&amp;buf_a).unwrap() as u64;
+    //let b_occ = get_blob_buffer_occ(&amp;buf_b).unwrap() as u64;
+    //if a_occ &gt; max_buf_a {
+    //  max_buf_a = a_occ;
+    //  println!(&quot;New MAX size for A {max_buf_a}&quot;);
+    //}
+    //if b_occ &gt; max_buf_b  {
+    //  max_buf_b = b_occ;
+    //  println!(&quot;New MAX size for B {max_buf_b}&quot;);
+    //}
+    //if a_occ &lt; min_buf_a {
+    //  min_buf_a = a_occ;
+    //  println!(&quot;New MIN size for A {min_buf_a}&quot;);
+    //}
+    //if b_occ &lt; min_buf_b  {
+    //  min_buf_b = b_occ;
+    //  println!(&quot;New MIN size for B {min_buf_b}&quot;);
+    //}
+    </span>thread::sleep(sleeptime);
+    buff_handler(<span class="kw-2">&amp;</span>buf_a,
+                 buff_trip,
+                 <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>bs_send),
+                 <span class="kw-2">&amp;</span>bar_a_op, 
+                 switch_buff); 
+    buff_handler(<span class="kw-2">&amp;</span>buf_b,
+                 buff_trip,
+                 <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>bs_send),
+                 <span class="kw-2">&amp;</span>bar_b_op,
+                 switch_buff); 
+  }
+}
+
+<span class="comment">/***** END THREAD IMPLEMENTATION ******/ 
+
+</span><span class="kw">fn </span>main() {
+  pretty_env_logger::init();
+
+  <span class="kw">let </span>sparkle_heart         = <span class="macro">vec!</span>[<span class="number">240</span>, <span class="number">159</span>, <span class="number">146</span>, <span class="number">150</span>];
+  <span class="kw">let </span>kraken                = <span class="macro">vec!</span>[<span class="number">240</span>, <span class="number">159</span>, <span class="number">144</span>, <span class="number">153</span>];
+  <span class="kw">let </span>fish                  = <span class="macro">vec!</span>[<span class="number">240</span>, <span class="number">159</span>, <span class="number">144</span>, <span class="number">159</span>];
+  <span class="kw">let </span>sparkles              = <span class="macro">vec!</span>[<span class="number">226</span>, <span class="number">156</span>, <span class="number">168</span>];
+
+  <span class="comment">// We know these bytes are valid, so we&#39;ll use `unwrap()`.
+  </span><span class="kw">let </span>sparkle_heart    = String::from_utf8(sparkle_heart).unwrap();
+  <span class="kw">let </span>kraken           = String::from_utf8(kraken).unwrap();
+  <span class="kw">let </span>fish             = String::from_utf8(fish).unwrap();
+  <span class="kw">let </span>sparkles         = String::from_utf8(sparkles).unwrap();
+
+
+  <span class="comment">// General parameters, readout board id,, 
+  // ip to tof computer
+
+  </span><span class="kw">let </span>rb_id = get_board_id().expect(<span class="string">&quot;Unable to obtain board ID!&quot;</span>);
+  <span class="kw">let </span>dna   = get_device_dna().expect(<span class="string">&quot;Unable to obtain device DNA!&quot;</span>); 
+  <span class="comment">// this is currently not needed, since 
+  // we are using the server/client setup wher
+  // this is the client
+  </span><span class="kw">let </span><span class="kw-2">mut </span>address_ip = String::from(<span class="string">&quot;tcp://&quot;</span>);
+  <span class="kw">let </span>this_board_ip = local_ip().unwrap();
+  <span class="kw">match </span>this_board_ip {
+    IpAddr::V4(ip) =&gt; address_ip += <span class="kw-2">&amp;</span>ip.to_string(),
+    IpAddr::V6(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Currently, we do not support IPV6!&quot;</span>)
+  }
+  
+  <span class="comment">// Set up 2 ports for 0MQ communications
+  // 1) control flow REP 
+  // 2) data flow PUB
+  </span><span class="kw">let </span>cmd_port    = CMDPORT_START + get_board_id().unwrap();
+  <span class="kw">let </span>cmd_address : String = address_ip.clone() + <span class="string">&quot;:&quot; </span>+ <span class="kw-2">&amp;</span>cmd_port.to_string();
+  
+  <span class="kw">let </span>data_port    = DATAPORT_START + get_board_id().unwrap();
+  <span class="kw">let </span>data_address : String = address_ip + <span class="string">&quot;:&quot; </span>+ <span class="kw-2">&amp;</span>data_port.to_string();
+  
+  <span class="kw">let </span>args = Args::parse();                   
+  <span class="kw">let </span>buff_trip     = args.buff_trip;         
+  <span class="kw">let </span>switch_buff   = args.switch_buffers;    
+  <span class="kw">let </span>max_event     = args.nevents;
+  <span class="kw">let </span>show_progress = args.show_progress;
+  <span class="kw">let </span>cache_size    = args.cache_size;
+  <span class="kw">let </span>dont_listen   = args.dont_listen;
+
+  <span class="comment">// welcome banner!
+  </span><span class="macro">println!</span>(<span class="string">&quot;-----------------------------------------------&quot;</span>);
+  <span class="macro">println!</span>(<span class="string">&quot; ** Welcome to tof-kraken {} *****&quot;</span>, kraken);
+  <span class="macro">println!</span>(<span class="string">&quot; .. TOF C&amp;C and data acquistion suite&quot;</span>);
+  <span class="macro">println!</span>(<span class="string">&quot; .. for the GAPS experiment {}&quot;</span>, sparkle_heart);
+  <span class="macro">println!</span>(<span class="string">&quot;-----------------------------------------------&quot;</span>);
+  <span class="macro">println!</span>(<span class="string">&quot; =&gt; Running client for RB {}&quot;</span>, rb_id);
+  <span class="macro">println!</span>(<span class="string">&quot; =&gt; RB had DNA {}&quot;</span>, dna);
+  <span class="macro">println!</span>(<span class="string">&quot; =&gt; Will bind local ZMQ PUB socket for data stream to {}&quot;</span>, data_address);
+  <span class="kw">if </span>!dont_listen { 
+    <span class="macro">println!</span>(<span class="string">&quot; =&gt; Will bind local ZMQ REP socket for control to {}&quot;  </span>, cmd_address);
+  } 
+  <span class="macro">println!</span>(<span class="string">&quot;-----------------------------------------------&quot;</span>);
+  <span class="macro">println!</span>(<span class="string">&quot;&quot;</span>);                             
+                                            
+  <span class="kw">let </span><span class="kw-2">mut </span>uio1_total_size = (UIO1_MAX_OCCUPANCY - UIO1_MIN_OCCUPANCY) <span class="kw">as </span>u64;
+  <span class="kw">let </span><span class="kw-2">mut </span>uio2_total_size = (UIO2_MAX_OCCUPANCY - UIO2_MIN_OCCUPANCY) <span class="kw">as </span>u64;
+
+  <span class="kw">if </span>(buff_trip &gt; uio1_total_size <span class="kw">as </span>u32 ) || (buff_trip &gt; uio2_total_size <span class="kw">as </span>u32) {
+    <span class="macro">println!</span>(<span class="string">&quot;Invalid value for --buff-trip. Panicking!&quot;</span>);
+    <span class="macro">panic!</span>(<span class="string">&quot;Tripsize of {buff_trip} exceeds buffer sizes of A : {uio1_total_size} or B : {uio2_total_size}&quot;</span>);
+  }
+
+  <span class="macro">info!</span>(<span class="string">&quot;Will set buffer trip size to {buff_trip}&quot;</span>);
+
+
+  <span class="comment">// some pre-defined time units for 
+  // sleeping
+  </span><span class="kw">let </span>two_seconds = time::Duration::from_millis(<span class="number">2000</span>);
+  <span class="kw">let </span>one_milli   = time::Duration::from_millis(<span class="number">1</span>);
+  
+  <span class="comment">// threads and inter-thread communications
+  // We have
+  // * event_cache thread
+  // * buffer reader thread
+  // * data analysis/sender thread
+  // * monitoring thread
+  // * run thread
+  // + main thread, which does not need a 
+  //   separate thread
+  </span><span class="kw">let </span><span class="kw-2">mut </span>n_threads = <span class="number">5</span>;
+  
+  <span class="kw">let </span>(kill_run, run_gets_killed)    : (Sender&lt;bool&gt;, Receiver&lt;bool&gt;)       = channel();
+  <span class="kw">let </span>(bs_send, bs_recv)             : (Sender&lt;Vec&lt;u8&gt;&gt;, Receiver&lt;Vec&lt;u8&gt;&gt;) = channel(); 
+  <span class="kw">let </span>(moni_send, moni_recv)         : (Sender&lt;Vec&lt;u8&gt;&gt;, Receiver&lt;Vec&lt;u8&gt;&gt;) = channel(); 
+  <span class="kw">let </span>(ev_pl_to_cache, ev_pl_from_builder) : 
+      (Sender&lt;RBEventPayload&gt;, Receiver&lt;RBEventPayload&gt;) = channel();
+  <span class="kw">let </span>(ev_pl_to_cmdr,  ev_pl_from_cache)   : 
+    (Sender&lt;<span class="prelude-ty">Option</span>&lt;RBEventPayload&gt;&gt;, Receiver&lt;<span class="prelude-ty">Option</span>&lt;RBEventPayload&gt;&gt;) = channel();
+  <span class="kw">let </span>(evid_to_cache, evid_from_cmdr)   : (Sender&lt;u32&gt;, Receiver&lt;u32&gt;) = channel();
+  <span class="macro">info!</span>(<span class="string">&quot;Will start ThreadPool with {n_threads} threads&quot;</span>);
+  <span class="kw">let </span>workforce = ThreadPool::new(n_threads);
+  
+  <span class="comment">// wait until we receive the 
+  // rsponse from the server
+  // This is all done by the runner now!
+  //info!(&quot;Setting daq to idle mode&quot;);
+  //match idle_drs4_daq() {
+  //  Ok(_)    =&gt; info!(&quot;DRS4 set to idle:&quot;),
+  //  Err(_)   =&gt; panic!(&quot;Can&#39;t set DRS4 to idle!!&quot;)
+  //}
+  //thread::sleep(one_milli);
+  //match setup_drs4() {
+  //  Ok(_)    =&gt; info!(&quot;DRS4 setup routine complete!&quot;),
+  //  Err(_)   =&gt; panic!(&quot;Failed to setup DRS4!!&quot;)
+  //}
+  //
+  //match reset_dma() {
+  //  Ok(_)    =&gt; info!(&quot;DMA reset successful&quot;),
+  //  Err(_)   =&gt; {
+  //    warn!(&quot;Can not reset DMA! Will run more aggressive reset procedure!&quot;);
+  //  }
+  //}
+  </span>thread::sleep(one_milli);
+  
+  <span class="kw">if </span>buff_trip != <span class="number">66520576 </span>{
+    uio1_total_size = buff_trip <span class="kw">as </span>u64;
+    uio2_total_size = buff_trip <span class="kw">as </span>u64;
+  }
+  
+  <span class="comment">// now we are ready to receive data 
+
+  // set up some progress bars, so we 
+  // can see what is going on 
+  // this is optional
+  // FIXME - feature?
+  //let mut prog_op_a     : Option&lt;&amp;ProgressBar&gt; = None;
+  //let mut prog_op_b     : Option&lt;&amp;ProgressBar&gt; = None;
+  //let mut prog_op_ev    : Option&lt;&amp;ProgressBar&gt; = None;
+  </span><span class="kw">let </span><span class="kw-2">mut </span>prog_op_a     : <span class="prelude-ty">Option</span>&lt;Box&lt;ProgressBar&gt;&gt;   = <span class="prelude-val">None</span>; 
+  <span class="kw">let </span><span class="kw-2">mut </span>prog_op_b     : <span class="prelude-ty">Option</span>&lt;Box&lt;ProgressBar&gt;&gt;   = <span class="prelude-val">None</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>prog_op_ev    : <span class="prelude-ty">Option</span>&lt;Box&lt;ProgressBar&gt;&gt;   = <span class="prelude-val">None</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>multi_prog_op : <span class="prelude-ty">Option</span>&lt;Box&lt;MultiProgress&gt;&gt; = <span class="prelude-val">None</span>;
+ 
+
+  <span class="kw">if </span>show_progress {
+    multi_prog_op = <span class="prelude-val">Some</span>(Box::new(MultiProgress::new()));
+    <span class="kw">let </span>floppy    = <span class="macro">vec!</span>[<span class="number">240</span>, <span class="number">159</span>, <span class="number">146</span>, <span class="number">190</span>];
+    <span class="kw">let </span>floppy    = String::from_utf8(floppy).unwrap();
+    <span class="kw">let </span>label_a   = String::from(<span class="string">&quot;Buff A&quot;</span>);
+    <span class="kw">let </span>label_b   = String::from(<span class="string">&quot;Buff B&quot;</span>);
+    <span class="kw">let </span>sty_a = ProgressStyle::with_template(TEMPLATE_BAR_A)
+    .unwrap();
+    <span class="comment">//.progress_chars(&quot;##-&quot;);
+    </span><span class="kw">let </span>sty_b = ProgressStyle::with_template(TEMPLATE_BAR_B)
+    .unwrap();
+    <span class="comment">//.progress_chars(&quot;##-&quot;);
+    </span><span class="kw">let </span>sty_ev = ProgressStyle::with_template(TEMPLATE_BAR_EV)
+    .unwrap();
+    <span class="comment">//.progress_chars(&quot;##&gt;&quot;);
+
+    </span>prog_op_a  = <span class="prelude-val">Some</span>(Box::new(multi_prog_op
+                               .as_mut()
+                               .unwrap()
+                               .add(ProgressBar::new(uio1_total_size)))); 
+    prog_op_b  = <span class="prelude-val">Some</span>(Box::new(multi_prog_op
+                               .as_mut()
+                               .unwrap()
+                               .insert_after(<span class="kw-2">&amp;</span>prog_op_a.as_mut().unwrap(), ProgressBar::new(uio2_total_size)))); 
+    prog_op_ev = <span class="prelude-val">Some</span>(Box::new(multi_prog_op
+                               .as_mut()
+                               .unwrap()
+                               .insert_after(<span class="kw-2">&amp;</span>prog_op_b.as_mut().unwrap(), ProgressBar::new(max_event <span class="kw">as </span>u64)))); 
+
+    <span class="kw">match </span>prog_op_a {
+      <span class="prelude-val">None </span>=&gt; (),
+      <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>bar) =&gt; {
+        bar.set_message(label_a);
+        bar.set_prefix(floppy.clone());
+        bar.set_style(sty_a);
+      }
+    }
+    <span class="kw">match </span>prog_op_b {
+      <span class="prelude-val">None </span>=&gt; (),
+      <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>bar) =&gt; {
+        bar.set_message(label_b);
+        bar.set_prefix(floppy.clone());
+        bar.set_style(sty_b);
+      }
+    }
+    <span class="kw">match </span>prog_op_ev {
+      <span class="prelude-val">None </span>=&gt; (),
+      <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>bar) =&gt; {
+        bar.set_style(sty_ev);
+        bar.set_prefix(sparkles.clone());
+        bar.set_message(<span class="string">&quot;EVENTS&quot;</span>);
+      }
+    }
+  }
+  <span class="comment">// this thread deals with the bytestream and 
+  // performs analysis or just sneds it over 
+  // zmq
+  //let pl_sender = ev_pl_send.clone();
+
+  // Setup routines 
+  // Start the individual worker threads
+  // in meaningfull order
+  // - higher level threads first, then 
+  // the more gnarly ones.
+  </span><span class="kw">let </span>moni_sender = moni_send.clone();
+  workforce.execute(<span class="kw">move </span>|| {
+      monitoring(moni_sender);
+  });
+  workforce.execute(<span class="kw">move </span>|| {
+                    event_cache(ev_pl_from_builder,
+                                ev_pl_to_cmdr,
+                                evid_from_cmdr,
+                                cache_size)
+  });
+  workforce.execute(<span class="kw">move </span>|| {
+                    event_payload_worker(<span class="kw-2">&amp;</span>bs_recv, ev_pl_to_cache);
+  });
+  
+  <span class="comment">// this thread deals JUST with the data
+  // buffers. It reads them and then 
+  // passes on the data
+  </span><span class="kw">let </span>rdb_sender = bs_send.clone();
+  workforce.execute(<span class="kw">move </span>|| {
+    read_data_buffers(rdb_sender,
+                      buff_trip,
+                      prog_op_a,
+                      prog_op_b,
+                      switch_buff);
+  });
+
+  <span class="comment">// create 0MQ sockedts
+  </span><span class="kw">let </span>ctx = zmq::Context::new();
+  <span class="kw">let </span>cmd_socket = ctx.socket(zmq::REP).expect(<span class="string">&quot;Unable to create 0MQ REP socket!&quot;</span>);
+
+  <span class="kw">if </span>!dont_listen {  
+    <span class="macro">info!</span>(<span class="string">&quot;Will set up 0MQ REP socket at address {cmd_address}&quot;</span>);
+    cmd_socket.bind(<span class="kw-2">&amp;</span>cmd_address);
+    
+    <span class="macro">info!</span>(<span class="string">&quot;0MQ REP socket listening at {cmd_address}&quot;</span>);
+    <span class="macro">println!</span>(<span class="string">&quot;Waiting for client to connect...&quot;</span>);
+    <span class="comment">// block until we get a client
+    </span><span class="kw">let </span>client_response = cmd_socket.recv_bytes(<span class="number">0</span>).expect(<span class="string">&quot;Communication to client failed!&quot;</span>);
+    <span class="kw">let </span>resp =  String::from_utf8(client_response).expect(<span class="string">&quot;Got garbage response from client. If we start like this, I panic right away...&quot;</span>);
+    <span class="macro">println!</span>(<span class="string">&quot;Client connected! Response {resp}&quot;</span>);
+    <span class="kw">let </span>response = String::from(<span class="string">&quot;[MAIN] - connected&quot;</span>);
+    cmd_socket.send(response.as_bytes(), <span class="number">0</span>);
+  } <span class="kw">else </span>{
+    <span class="comment">// if we are not listening to a C&amp;C server, we have to kickstart
+    // our run ourselves.
+    </span>workforce.execute(<span class="kw">move </span>|| {
+        runner(<span class="prelude-val">Some</span>(max_event),
+               <span class="prelude-val">None</span>,
+               <span class="prelude-val">None</span>,
+               <span class="prelude-val">None</span>,
+               prog_op_ev);
+    });
+  }
+
+  <span class="comment">// Now set up PUB socket 
+  // The pub socket is always present, even in don&#39;t listen configuration
+  // (Nobody is forced to listen to it, and it will just drop its data 
+  // if it does not have any subscribers)
+  </span><span class="kw">let </span>data_socket = ctx.socket(zmq::PUB).expect(<span class="string">&quot;Unable to create 0MQ PUB socket!&quot;</span>);
+  data_socket.bind(<span class="kw-2">&amp;</span>data_address);
+  <span class="macro">info!</span>(<span class="string">&quot;0MQ SUB socket bound to address {data_address}&quot;</span>);
+
+  <span class="comment">//info!(&quot;Starting daq!&quot;);
+  //match start_drs4_daq() {
+  //  Ok(_)    =&gt; info!(&quot;.. successful!&quot;),
+  //  Err(_)   =&gt; panic!(&quot;DRS4 start failed!&quot;)
+  //}
+
+  // let go for a few seconds to get a 
+  // rate estimate
+  //thread::sleep(two_seconds);
+  //let rate = get_trigger_rate().unwrap();
+  //info!(&quot;Current trigger rate: {rate}Hz&quot;);
+  //let mut command  : cmd::TofCommand;
+  </span><span class="kw">let </span><span class="kw-2">mut </span>resp     : cmd::TofResponse;
+  <span class="kw">let </span>executor = Commander::new(data_socket,
+                                evid_to_cache,
+                                ev_pl_from_cache);
+  <span class="kw">let </span><span class="kw-2">mut </span>run_active = <span class="bool-val">false</span>;
+  <span class="kw">loop </span>{
+    <span class="comment">// query the command socket
+    // this can block. The actual 
+    // work is done by other stuff
+    </span><span class="kw">if </span>dont_listen {
+      <span class="kw">continue</span>;
+    }
+    <span class="kw">let </span>incoming = cmd_socket.recv_bytes(<span class="number">0</span>);
+    <span class="kw">match </span>incoming {
+      <span class="prelude-val">Err</span>(err) =&gt; {
+        <span class="macro">warn!</span>(<span class="string">&quot;CMD socket error {err}&quot;</span>);
+        <span class="kw">continue</span>;
+      },
+      <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; (),
+    }
+    <span class="kw">let </span>raw_command = incoming.unwrap();
+    <span class="kw">match </span>TofCommand::from_bytestream(<span class="kw-2">&amp;</span>raw_command,<span class="number">0</span>) {
+      <span class="prelude-val">Err</span>(err) =&gt; {
+        <span class="macro">warn!</span>(<span class="string">&quot;Can not decode Command! Err {:?}&quot;</span>, err);
+        <span class="macro">warn!</span>(<span class="string">&quot;Received {:?} &quot;</span>, raw_command);
+        <span class="kw">let </span>resp = cmd::TofResponse::SerializationIssue(cmd::RESP_ERR_LEVEL_MEDIUM);
+        cmd_socket.send(resp.to_bytestream(),<span class="number">0</span>);
+        <span class="kw">continue</span>;
+      },
+      <span class="prelude-val">Ok</span>(c) =&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>result = <span class="prelude-val">Ok</span>(TofResponse::Unknown);
+        <span class="comment">// intercept commands which require to spawn/kill 
+        // threads
+        </span><span class="kw">match </span>c {
+          TofCommand::DataRunStart (max_event) =&gt; {
+          <span class="comment">// let&#39;s start a run. The value of the TofCommnad shall be 
+          // nevents
+          </span><span class="kw">if </span>run_active {
+            result = <span class="prelude-val">Ok</span>(TofResponse::GeneralFail(cmd::RESP_ERR_RUNACTIVE));
+          } <span class="kw">else </span>{
+            workforce.execute(<span class="kw">move </span>|| {
+                runner(<span class="prelude-val">Some</span>(max_event <span class="kw">as </span>u64),
+                       <span class="prelude-val">None</span>,
+                       <span class="prelude-val">None</span>,
+                       <span class="prelude-val">None</span>,
+                       <span class="comment">//FIXME - maybe use crossbeam?
+                       //Some(&amp;run_gets_killed),
+                       </span><span class="prelude-val">None</span>);
+            }); 
+          }
+          run_active = <span class="bool-val">true</span>;
+          result = <span class="prelude-val">Ok</span>(TofResponse::Success(cmd::RESP_SUCC_FINGERS_CROSSED));
+          },
+          TofCommand::DataRunEnd   =&gt; {
+            <span class="kw">if </span>!run_active {
+              result = <span class="prelude-val">Ok</span>(TofResponse::GeneralFail(cmd::RESP_ERR_NORUNACTIVE));
+            }
+            <span class="macro">warn!</span>(<span class="string">&quot;Will kill current run!&quot;</span>);
+            kill_run.send(<span class="bool-val">true</span>);
+            result = <span class="prelude-val">Ok</span>(TofResponse::Success(cmd::RESP_SUCC_FINGERS_CROSSED));
+          },
+          <span class="kw">_ </span>=&gt; {
+            <span class="comment">// forward the rest to the executor
+            </span>result = executor.command(<span class="kw-2">&amp;</span>c);
+            <span class="kw">match </span>result {
+              <span class="prelude-val">Err</span>(err) =&gt; {
+                <span class="macro">warn!</span>(<span class="string">&quot;Command Failed! Err {:?}&quot;</span>, err);
+                <span class="comment">// FIXME - work on error codes
+                </span>resp = cmd::TofResponse::GeneralFail(cmd::RESP_ERR_UNEXECUTABLE);
+                cmd_socket.send(resp.to_bytestream(),<span class="number">0</span>);
+              }
+              <span class="prelude-val">Ok</span>(r) =&gt;  {
+                cmd_socket.send(r.to_bytestream(),<span class="number">0</span>);
+              }
+            }
+          } <span class="comment">// end all other commands
+        </span>} <span class="comment">// end match
+      </span>}
+    }
+  } <span class="comment">// end loop
+</span>} <span class="comment">// end main
+
+</span></code></pre></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rb_soft" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0 (69f9c33d7 2022-12-12)" ></div></body></html>

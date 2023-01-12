@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":[["get_constant_blobeventsize",""]],"struct":[["BlobData",""],["RBEventPayload",""],["ReducedRBEvent",""]]};

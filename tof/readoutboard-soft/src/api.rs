@@ -1,5 +1,5 @@
-///! Higher level functions, to deal with events/binary reprentation of it, 
-///  configure the drs4, etc.
+//! Higher level functions, to deal with events/binary reprentation of it, 
+//!  configure the drs4, etc.
 
 use std::collections::HashMap;
 
@@ -20,15 +20,340 @@ use tof_dataclasses::events::blob::{BlobData,
 use tof_dataclasses::serialization::search_for_u16;
 use tof_dataclasses::commands::{TofCommand,
                                 TofResponse};
+use tof_dataclasses::threading::ThreadPool;
+ 
+ 
+pub const HEARTBEAT : u64 = 5; // heartbeat in s
 
 const SLEEP_AFTER_REG_WRITE : u32 = 1; // sleep time after register write in ms
+const DMA_RESET_TRIES : u8 = 10;   // if we can not reset the DMA after this number
+                                   // of retries, we'll panic!
+const SAVE_RESTART_TRIES : u8 = 5; // if we are not successfull, to get it going, 
+                                   // panic
+///! Little helper
+fn debug_and_ok() -> Result<(), RegisterError> {
+  debug!("Raised RegisterError!");
+  Ok(())
+}
+
+///! Send out a signal periodically
+///  to all the threads. 
+///  If they don't answer in timely 
+///  manner, call a doctor.
+fn heartbeat() {
+  let mut now = time::Instant::now();
+  loop {
+    if now.elapsed().as_secs() >= HEARTBEAT {
+      //FIXME
+      println!("BEAT");
+      now = time::Instant::now();
+    }
+  }
+}
+
+
+///! Somehow, it is not always successful to reset 
+///  the DMA and the data buffers. Let's try an 
+///  aggressive scheme and do it several times.
+///  If we fail, something is wrong and we panic
+fn reset_data_memory_aggressively() {
+  let one_milli = time::Duration::from_millis(1);
+  let five_milli = time::Duration::from_millis(5);
+  let buf_a = BlobBuffer::A;
+  let buf_b = BlobBuffer::B;
+  let mut n_tries : u8 = 0;
+  
+  for _ in 0..DMA_RESET_TRIES {
+    match reset_dma() {
+      Ok(_)    => (),
+      Err(err) => {
+        debug!("Resetting dma failed, err {:?}", err);
+        thread::sleep(five_milli);
+        continue;
+      }
+    }
+    thread::sleep(one_milli);
+  }
+  let mut buf_a_occ = UIO1_MAX_OCCUPANCY;
+  let mut buf_b_occ = UIO2_MAX_OCCUPANCY;
+  match get_blob_buffer_occ(&buf_a) {
+    Err(_) => debug!("Error reseting blob buffer A"),
+    Ok(val)  => {
+      buf_a_occ = val;
+    }
+  }
+  thread::sleep(one_milli);
+  match get_blob_buffer_occ(&buf_b) {
+    Err(_) => debug!("Error reseting blob buffer B"),
+    Ok(val)  => {
+      buf_b_occ = val;
+    }
+  }
+  thread::sleep(one_milli);
+  while buf_a_occ != UIO1_MIN_OCCUPANCY {
+    blob_buffer_reset(&buf_a).or_else(|_| debug_and_ok() ); 
+    thread::sleep(five_milli);
+    match get_blob_buffer_occ(&buf_a) {
+      Err(_) => debug!("Error reseting blob buffer A"),
+      Ok(val)  => {
+        buf_a_occ = val;
+        thread::sleep(five_milli);
+        n_tries += 1;
+        if n_tries == DMA_RESET_TRIES {
+          panic!("We were unable to reset DMA and the data buffers!");
+        }
+        continue;
+      }
+    }
+  }
+  n_tries = 0;
+  while buf_b_occ != UIO2_MIN_OCCUPANCY {
+    blob_buffer_reset(&buf_b).or_else(|_| debug_and_ok());
+    match get_blob_buffer_occ(&buf_b) {
+      Err(_) => debug!("Error reseting blob buffer B"),
+      Ok(val)  => {
+        buf_b_occ = val;
+        thread::sleep(five_milli);
+        n_tries += 1;
+        if n_tries == DMA_RESET_TRIES {
+          panic!("We were unable to reset DMA and the data buffers!");
+        }
+        continue;
+      }
+    }
+  }
+}
+
+///  Ensure the buffers are filled and everything is prepared for data
+///  taking
+///
+///  The whole procedure takes several seconds. We have to find out
+///  how much we can sacrifice from our run time.
+///
+///  # Arguments 
+///
+///  * will_panic : The function calls itself recursively and 
+///                 will panic after this many calls to itself
+///
+fn make_sure_it_runs(will_panic : &mut u8) {
+  let when_panic : u8 = 5;
+  *will_panic += 1;
+  if *will_panic == when_panic {
+    // it is hopeless. Let's give up.
+    // Let's try to stop the DRS4 before
+    // we're killing ourselves
+    idle_drs4_daq().unwrap_or(());
+    // FIXME - send out Alert
+    panic!("I can not get this run to start. I'll kill myself!");
+  }
+  let five_milli = time::Duration::from_millis(5); 
+  let two_secs   = time::Duration::from_secs(2);
+  let five_secs  = time::Duration::from_secs(5);
+  idle_drs4_daq().unwrap_or(());
+  thread::sleep(five_milli);
+  setup_drs4().unwrap_or(());
+  thread::sleep(five_milli);
+  reset_data_memory_aggressively();
+  thread::sleep(five_milli);
+  match start_drs4_daq() {
+    Err(err) => {
+      debug!("Got err {:?} when trying to start the drs4 DAQ!", err);
+    }
+    Ok(_)  => {
+      trace!("Starting DRS4..");
+    }
+  }
+  // check that the data buffers are filling
+  let buf_a = BlobBuffer::A;
+  let buf_b = BlobBuffer::B;
+  let buf_size_a = get_buff_size(&buf_a).unwrap_or(0);
+  let buf_size_b = get_buff_size(&buf_b).unwrap_or(0); 
+  thread::sleep(five_secs);
+  if get_buff_size(&buf_a).unwrap_or(0) == buf_size_a &&  
+      get_buff_size(&buf_b).unwrap_or(0) == buf_size_b {
+    warn!("Buffers are not filling! Running setup again!");
+    make_sure_it_runs(will_panic);
+  } 
+}
 
 // palceholder
+#[derive(Debug)]
 pub struct FIXME {
 }
 
-///! Recieve the events and hold them in a cache 
-///  until they are arequested
+
+/// Make sure a run stops
+///
+/// This will recursively call 
+/// drs4_idle to stop data taking
+///
+/// # Arguments:
+///
+/// * will_panic : After this many calls to 
+///                itself, kill_run will 
+///                panic.
+///
+fn kill_run(will_panic : &mut u8) {
+  let when_panic : u8 = 5;
+  *will_panic += 1;
+  if when_panic == *will_panic {
+    panic!("We can not kill the run! I'll kill myself!");
+  }
+  let one_milli        = time::Duration::from_millis(1);
+  match idle_drs4_daq() {
+    Ok(_)  => (),
+    Err(_) => {
+      warn!("Can not end run!");
+      thread::sleep(one_milli);
+      kill_run(will_panic)
+    }
+  }
+}
+
+///  A simple routine which runs until 
+///  a certain amoutn of events are 
+///  acquired
+///
+///  The runner will setup the DRS4, and 
+///  set it to idle state when it is 
+///  finished.
+///
+///  To be resource friendly, this thread
+///  goes with 1 second precision.
+///
+///  # Arguments
+///
+///  * max_events  : Acqyire this number of events
+///  * max_seconds : Let go for the specific runtime
+///  * max_errors  : End myself when I see a certain
+///                  number of errors
+///  * kill_signal : End run when this line is at bool 
+///                  1
+///
+pub fn runner(max_events  : Option<u64>,
+              max_seconds : Option<u64>,
+              max_errors  : Option<u64>,
+              kill_signal : Option<&Receiver<bool>>,
+              prog_op_ev  : Option<Box<ProgressBar>>) {
+  
+  let one_milli        = time::Duration::from_millis(1);
+  let one_sec          = time::Duration::from_secs(1);
+  let mut first_iter   = true; 
+  let mut last_evt_cnt : u32 = 0;
+  let mut evt_cnt      : u32 = 0;
+  let mut delta_events : u64 = 0;
+  let mut n_events     : u64 = 0;
+  let mut n_errors     : u64 = 0;
+  let now = time::Instant::now();
+
+  let mut terminate = false;
+  // the runner will specifically set up the DRS4
+  let mut will_panic : u8 = 0;
+  make_sure_it_runs(&mut will_panic);
+
+  loop {
+    info!("Begin Run!");
+    match get_event_count() {
+      Err (err) => {
+        debug!("Can not obtaine event count! Err {:?}", err);
+        thread::sleep(one_sec);    
+        continue;
+      }
+      Ok (cnt) => {
+        evt_cnt = cnt;
+        if first_iter {
+          last_evt_cnt = evt_cnt;
+          first_iter = false;
+          continue;
+        }
+        if evt_cnt == last_evt_cnt {
+          thread::sleep(one_sec);
+          continue;
+        }
+      }
+    } // end match
+    delta_events = (evt_cnt - last_evt_cnt) as u64;
+    n_events += delta_events;
+    last_evt_cnt = evt_cnt;
+    
+    match prog_op_ev {
+      None => (),
+      Some(ref bar) => {
+        bar.inc(delta_events);   
+      }
+    }
+    // terminate if one of the 
+    // criteria is fullfilled
+    match kill_signal {
+      Some(ks) => {
+        match ks.recv() {
+          Ok(signal) => {
+            terminate = signal;
+          },
+          Err(_) => ()
+        }
+      },
+      None => ()
+    }
+    match max_events {
+      None => (),
+      Some(max_e) => {
+        if n_events > max_e {
+          terminate = true;
+        }
+      }
+    }
+    
+    match max_seconds {
+      None => (),
+      Some(max_t) => {
+        if now.elapsed().as_secs() > max_t {
+          terminate = true;
+        }
+      }
+    }
+
+    match max_errors {
+      None => (),
+      Some(max_e) => {
+        if n_errors > max_e {
+          terminate = true;
+        }
+      }
+    }
+    // exit loop on n event basis
+    if terminate {
+      match prog_op_ev {
+        None => (),
+        Some(ref bar) => {
+          bar.finish();
+        }
+      }
+      break;
+    }
+    // save cpu
+    thread::sleep(one_sec);
+  } // end loop 
+
+  // if the end condition is met, we stop the run
+  let mut will_panic : u8 = 0;
+  kill_run(&mut will_panic);
+}
+
+
+/// Recieve the events and hold them in a cache 
+/// until they are requested
+/// 
+/// The function should be wired to a producer
+/// of RBEventPayloads
+///
+/// Requests come in as event ids through `recv_evid`
+/// and will be answered through `send_ev_pl`, if 
+/// they are in the cache, else None
+///
+/// # Arguments
+///
+///
 pub fn event_cache(recv_ev_pl : Receiver<RBEventPayload>,
                    send_ev_pl : Sender<Option<RBEventPayload>>,
                    recv_evid  : Receiver<u32>,
@@ -38,7 +363,7 @@ pub fn event_cache(recv_ev_pl : Receiver<RBEventPayload>,
   'main : loop {
     match recv_evid.recv() {
       Err(err) => {
-        trace!("Issue receiving event id!");
+        trace!("Issue receiving event id! Err: {err}");
         continue;
       },
       Ok(event_id) => {
@@ -78,6 +403,11 @@ pub fn event_cache(recv_ev_pl : Receiver<RBEventPayload>,
   } // end 'main loop
 }
 
+/// Deal with incoming commands
+///
+///
+///
+///
 pub struct Commander {
 
   pub evid_send      : Sender<u32>,
@@ -87,16 +417,30 @@ pub struct Commander {
 
 impl Commander {
 
-  pub fn new (socket  : zmq::Socket,
-              send_ev : Sender<u32>,
-              recv_ev : Receiver<Option<RBEventPayload>>) 
+  pub fn new (socket     : zmq::Socket,
+              send_ev    : Sender<u32>,
+              recv_ev    : Receiver<Option<RBEventPayload>>)
     -> Commander {
+
     Commander {
       evid_send      : send_ev,
       rb_evt_recv    : recv_ev,
-      zmq_pub_socket : socket
+      zmq_pub_socket : socket,
     }
   }
+
+
+  /// Interpret an incoming command 
+  ///
+  /// The command comes most likely somehow over 
+  /// the wir from the tof computer
+  ///
+  /// Match with a list of known commands and 
+  /// take action.
+  ///
+  /// # Arguments
+  ///
+  ///
   pub fn command (&self, cmd : &TofCommand)
     -> Result<TofResponse, FIXME> {
     match cmd {
@@ -128,14 +472,26 @@ impl Commander {
         warn!("Not implemented");
         return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
       },
-      TofCommand::DataRunStart => {
-        warn!("Not implemented");
-        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
-      }, 
-      TofCommand::DataRunEnd   => {
-        warn!("Not implemented");
-        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
-      },
+      //TofCommand::DataRunStart (max_event) => {
+      //  // let's start a run. The value of the TofCommnad shall be 
+      //  // nevents
+      //  self.workforce.execute(move || {
+      //      runner(Some(*max_event as u64),
+      //             None,
+      //             None,
+      //             self.get_killed_chn,
+      //             None);
+      //  }); 
+      //  return Ok(TofResponse::Success(RESP_SUCC_FINGERS_CROSSED));
+      //}, 
+      //TofCommand::DataRunEnd   => {
+      //  if !self.run_active {
+      //    return Ok(TofResponse::GeneralFail(RESP_ERR_NORUNACTIVE));
+      //  }
+      //  warn!("Will kill current run!");
+      //  self.kill_chn.send(true);
+      //  return Ok(TofResponse::Success(RESP_SUCC_FINGERS_CROSSED));
+      //},
       TofCommand::VoltageCalibration => {
         warn!("Not implemented");
         return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
@@ -151,6 +507,7 @@ impl Commander {
       TofCommand::RequestEvent(eventid) => {
         match self.evid_send.send(*eventid) {
           Err(err) => {
+            debug!("Problem sending event id to cache! Err {err}");
             return Ok(TofResponse::GeneralFail(*eventid));
           },
           Ok(event) => (),
@@ -166,8 +523,15 @@ impl Commander {
                 return Ok(TofResponse::EventNotReady(*eventid));
               },
               Some(event) => {
-                self.zmq_pub_socket.send(event.payload, zmq::DONTWAIT);
-                return Ok(TofResponse::Success(*eventid));
+                match self.zmq_pub_socket.send(event.payload, zmq::DONTWAIT) {
+                  Ok(_)  => {
+                    return Ok(TofResponse::Success(*eventid));
+                  }
+                  Err(err) => {
+                    debug!("Problem with PUB socket! Err {err}"); 
+                    return Ok(TofResponse::ZMQProblem(*eventid));
+                  }
+                }
               }
             }
           }
@@ -186,7 +550,7 @@ impl Commander {
   }
 }
 
-///! Get the blob buffer size from occupancy register
+///  Get the blob buffer size from occupancy register
 ///
 ///  Read out the occupancy register and compare to 
 ///  a previously recoreded value. 
@@ -212,7 +576,7 @@ pub fn get_buff_size(which : &BlobBuffer) ->Result<u32, RegisterError> {
   Ok(size)
 }
 
-///! Deal with the raw data buffers.
+///  Deal with the raw data buffers.
 ///
 ///  Read out when they exceed the 
 ///  tripping threshold and pass 
@@ -299,7 +663,10 @@ pub fn buff_handler(which       : &BlobBuffer,
 //}
 
 
-///! Transforms raw bytestream to RBEventPayload
+///  Transforms raw bytestream to RBEventPayload
+///
+///  This allows to get the eventid from the 
+///  binrary form of the RBEvent
 ///
 ///  #Arguments
 /// 
@@ -331,7 +698,10 @@ pub fn event_payload_worker(bs_recv   : &Receiver<Vec<u8>>,
               let mut payload = Vec::<u8>::new();
               payload.extend_from_slice(&bytestream[head_pos..tail_pos]);
               let rb_payload = RBEventPayload::new(event_id, payload); 
-              ev_sender.send(rb_payload);
+              match ev_sender.send(rb_payload) {
+                Ok(_) => (),
+                Err(err) => debug!("Problem sending RBEventPayload over channel!"),
+              }
               continue 'bytestream;
             },
             Err(err) => {
@@ -350,13 +720,14 @@ pub fn event_payload_worker(bs_recv   : &Receiver<Vec<u8>>,
 }
 
 
-///! Prepare the whole readoutboard for data taking.
+///  Prepare the whole readoutboard for data taking.
 ///
 ///  This sets up the drs4 and c
 ///  lears the memory of 
 ///  the data buffers.
-///
-/// 
+///  
+///  This will make several writes to the /dev/uio0
+///  memory map.
 pub fn setup_drs4() -> Result<(), RegisterError> {
 
   let buf_a = BlobBuffer::A;

@@ -1,0 +1,154 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Type safety for the weary netlink user"><meta name="keywords" content="rust, rustlang, rust-lang, neli"><title>neli - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../normalize.css"><link rel="stylesheet" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../ayu.css" disabled><link rel="stylesheet" href="../dark.css" disabled><link rel="stylesheet" href="../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../storage.js"></script><script defer src="../crates.js"></script><script defer src="../main.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../favicon.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../neli/index.html"><div class="logo-container"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></div></a><h2></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../neli/index.html"><div class="logo-container"><img class="rust-logo" src="../rust-logo.svg" alt="logo"></div></a><h2 class="location"><a href="#">Crate neli</a></h2><div class="sidebar-elems"><ul class="block"><li class="version">Version 0.5.3</li><li><a id="all-types" href="all.html">All Items</a></li></ul><section><ul class="block"><li><a href="#modules">Modules</a></li><li><a href="#macros">Macros</a></li><li><a href="#structs">Structs</a></li><li><a href="#constants">Constants</a></li><li><a href="#traits">Traits</a></li></ul></section></div></nav><main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../wheel.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1 class="fqn">Crate <a class="mod" href="#">neli</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="srclink" href="../src/neli/lib.rs.html#1-629">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><h2 id="type-safety-for-the-weary-netlink-user"><a href="#type-safety-for-the-weary-netlink-user">Type safety for the weary netlink user</a></h2><h3 id="rationale"><a href="#rationale">Rationale</a></h3>
+<p>This crate aims to be a pure Rust implementation that defines
+the necessary constants and wraps them in enums to distinguish
+between various categories of constants in the context of netlink.</p>
+<h3 id="the-project-is-broken-down-into-the-following-modules"><a href="#the-project-is-broken-down-into-the-following-modules">The project is broken down into the following modules:</a></h3>
+<ul>
+<li><code>attr</code> - This defines a generic interface for netlink attributes
+(both generic and routing netlink attributes).</li>
+<li><code>consts</code> - This is where all of the C-defined constants are
+wrapped into type safe enums for use in the library.</li>
+<li><code>err</code> - This module contains all of the protocol and
+library-level errors encountered in the code.</li>
+<li><code>genl</code> - This code provides parsing for the generic netlink
+subsystem of the netlink protocol.</li>
+<li><code>nl</code> - This is the top level netlink header code that handles
+the header that all netlink messages are encapsulated in.</li>
+<li><code>rtnl</code> - This module is for the routing netlink subsystem of the
+netlink protocol.</li>
+<li><code>socket</code> - This provides a socket structure for use in sending
+and receiving messages and a number of convenience functions for
+commonly encountered use cases.</li>
+</ul>
+<h3 id="nl-trait"><a href="#nl-trait"><code>Nl</code> trait</a></h3>
+<p><code>lib.rs</code> at the top level contains the <a href="trait.Nl.html" title="Nl"><code>Nl</code></a> trait which
+provides buffer size calculation functions, a serialization
+method, and a deserialization method. It also contains
+implementations of <a href="trait.Nl.html" title="Nl"><code>Nl</code></a> for common types.</p>
+<h3 id="design-decisions"><a href="#design-decisions">Design decisions</a></h3>
+<p>This is a fairly low level library that currently does not have a
+whole lot of higher level handle-type data structures and
+relies mostly on the <a href="socket/struct.NlSocket.html" title="crate::socket::NlSocket"><code>NlSocket</code></a> and
+<a href="socket/struct.NlSocketHandle.html" title="crate::socket::NlSocketHandle"><code>NlSocketHandle</code></a> structs
+to provide most of the convenience functions. I hope to add a
+higher level API sometime in the <code>v0.5.x</code> releases to ease some of
+the workflows that have been brought to my attention.</p>
+<p>The goal of this library is completeness for handling netlink and
+am working to incorporate features that will make this library
+easier to use in all use cases. If you have a use case you
+would like to see supported, please open an issue on Github.</p>
+<h3 id="examples"><a href="#examples">Examples</a></h3>
+<p>Examples of working code exist in the <code>examples/</code> subdirectory on
+Github. They have a separate <code>Cargo.toml</code> file to provide easy
+testing and use.</p>
+<p>Workflows seem to usually follow a pattern of socket creation,and
+then either sending and receiving messages in request/response
+formats:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>neli::{
+    consts::{genl::<span class="kw-2">*</span>, nl::<span class="kw-2">*</span>, socket::<span class="kw-2">*</span>},
+    err::NlError,
+    genl::{Genlmsghdr, Nlattr},
+    nl::{Nlmsghdr, NlPayload},
+    socket::NlSocketHandle,
+    types::{Buffer, GenlBuffer},
+};
+
+<span class="kw">const </span>GENL_VERSION: u8 = <span class="number">1</span>;
+
+<span class="kw">fn </span>request_response() -&gt; <span class="prelude-ty">Result</span>&lt;(), NlError&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>socket = NlSocketHandle::connect(
+        NlFamily::Generic,
+        <span class="prelude-val">None</span>,
+        <span class="kw-2">&amp;</span>[],
+    )<span class="question-mark">?</span>;
+
+    <span class="kw">let </span>attrs: GenlBuffer&lt;Index, Buffer&gt; = GenlBuffer::new();
+    <span class="kw">let </span>genlhdr = Genlmsghdr::new(
+        CtrlCmd::Getfamily,
+        GENL_VERSION,
+        attrs,
+    );
+    <span class="kw">let </span>nlhdr = {
+        <span class="kw">let </span>len = <span class="prelude-val">None</span>;
+        <span class="kw">let </span>nl_type = GenlId::Ctrl;
+        <span class="kw">let </span>flags = NlmFFlags::new(<span class="kw-2">&amp;</span>[NlmF::Request, NlmF::Dump]);
+        <span class="kw">let </span>seq = <span class="prelude-val">None</span>;
+        <span class="kw">let </span>pid = <span class="prelude-val">None</span>;
+        <span class="kw">let </span>payload = NlPayload::Payload(genlhdr);
+        Nlmsghdr::new(len, nl_type, flags, seq, pid, payload)
+    };
+    socket.send(nlhdr)<span class="question-mark">?</span>;
+     
+    <span class="comment">// Do things with multi-message response to request...
+    </span><span class="kw">let </span><span class="kw-2">mut </span>iter = socket.iter::&lt;Genlmsghdr&lt;CtrlCmd, CtrlAttr&gt;&gt;(<span class="bool-val">false</span>);
+    <span class="kw">while let </span><span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(response)) = iter.next() {
+        <span class="comment">// Do things with response here...
+    </span>}
+     
+    <span class="comment">// Or get single message back...
+    </span><span class="kw">let </span>msg = socket.recv::&lt;Nlmsg, Genlmsghdr&lt;CtrlCmd, CtrlAttr&gt;&gt;()<span class="question-mark">?</span>;
+
+    <span class="prelude-val">Ok</span>(())
+}</code></pre></div>
+<p>or a subscriptions to a stream of event notifications from netlink:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::error::Error;
+
+<span class="kw">use </span>neli::{
+    consts::{genl::<span class="kw-2">*</span>, socket::<span class="kw-2">*</span>},
+    err::NlError,
+    genl::Genlmsghdr,
+    socket,
+};
+
+<span class="kw">fn </span>subscribe_to_mcast() -&gt; <span class="prelude-ty">Result</span>&lt;(), Box&lt;<span class="kw">dyn </span>Error&gt;&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>s = socket::NlSocketHandle::connect(
+        NlFamily::Generic,
+        <span class="prelude-val">None</span>,
+        <span class="kw-2">&amp;</span>[],
+    )<span class="question-mark">?</span>;
+    <span class="kw">let </span>id = s.resolve_nl_mcast_group(
+        <span class="string">&quot;my_family_name&quot;</span>,
+        <span class="string">&quot;my_multicast_group_name&quot;</span>,
+    )<span class="question-mark">?</span>;
+    s.add_mcast_membership(<span class="kw-2">&amp;</span>[id])<span class="question-mark">?</span>;
+    <span class="kw">for </span>next <span class="kw">in </span>s.iter::&lt;Genlmsghdr&lt;u8, u16&gt;&gt;(<span class="bool-val">true</span>) {
+        <span class="comment">// Do stuff here with parsed packets...
+     
+        // like printing a debug representation of them:
+        </span><span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, next<span class="question-mark">?</span>);
+    }
+
+    <span class="prelude-val">Ok</span>(())
+}</code></pre></div>
+<h3 id="documentation"><a href="#documentation">Documentation</a></h3>
+<p>Each module has been documented extensively to provide information
+on how to use the code contained in the module. Pull requests for
+documentation mistakes, updates, and rewording for clarity is a
+valuable contribution as this project aims to be as simple to use
+as possible.</p>
+</div></details><h2 id="modules" class="small-section-header"><a href="#modules">Modules</a></h2><div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="attr/index.html" title="neli::attr mod">attr</a></div><div class="item-right docblock-short">Shared attribute code for all types of netlink attributes.</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="consts/index.html" title="neli::consts mod">consts</a></div><div class="item-right docblock-short">High level notes</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="err/index.html" title="neli::err mod">err</a></div><div class="item-right docblock-short">This is the module that contains the error types used in <code>neli</code></div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="genl/index.html" title="neli::genl mod">genl</a></div><div class="item-right docblock-short">This module contains generic netlink parsing data structures.
+This is all handled by the <a href="genl/struct.Genlmsghdr.html" title="crate::genl::Genlmsghdr"><code>Genlmsghdr</code></a>
+header struct which contains all of the information needed for
+the generic netlink layer.</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="iter/index.html" title="neli::iter mod">iter</a></div><div class="item-right docblock-short">Module for iteration over netlink responses</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="nl/index.html" title="neli::nl mod">nl</a></div><div class="item-right docblock-short">This module contains the top level netlink header code. Every
+netlink message will be encapsulated in a top level <code>Nlmsghdr</code>.</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="rtnl/index.html" title="neli::rtnl mod">rtnl</a></div><div class="item-right docblock-short">This module provides an implementation of routing netlink
+structures and the routing attributes that are at the end of
+most routing netlink responses.</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="socket/index.html" title="neli::socket mod">socket</a></div><div class="item-right docblock-short">This module provides code that glues all of the other modules
+together and allows message send and receive operations.</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="types/index.html" title="neli::types mod">types</a></div><div class="item-right docblock-short">Module containing various types used across the various netlink
+structures used in <code>neli</code>.</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="utils/index.html" title="neli::utils mod">utils</a></div><div class="item-right docblock-short">A module containing utilities for working with constructs like
+bitflags and other low level operations.</div></div></div><h2 id="macros" class="small-section-header"><a href="#macros">Macros</a></h2><div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.deserialize.html" title="neli::deserialize macro">deserialize</a></div><div class="item-right docblock-short">This macro can be used to declaratively define deserialization for a struct.</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.deserialize_type_size.html" title="neli::deserialize_type_size macro">deserialize_type_size</a></div><div class="item-right docblock-short">This macro calculates size from
+<a href="trait.Nl.html#tymethod.type_size" title="crate::Nl::type_size"><code>type_size</code></a> methods and returns an error
+if <a href="trait.Nl.html#tymethod.type_size" title="crate::Nl::type_size"><code>type_size</code></a> evaluates to <a href="https://doc.rust-lang.org/1.66.0/core/option/enum.Option.html#variant.None" title="None"><code>None</code></a>.</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.drive_deserialize.html" title="neli::drive_deserialize macro">drive_deserialize</a></div><div class="item-right docblock-short">This macro can be used to deserialize a single field in a struct.</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.drive_serialize.html" title="neli::drive_serialize macro">drive_serialize</a></div><div class="item-right docblock-short">This macro can be used to serialize a single field in a struct.</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.impl_flags.html" title="neli::impl_flags macro">impl_flags</a></div><div class="item-right docblock-short">Implement a container for bit flag enums where the set of flags
+will be condensed into a single value.</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.impl_trait.html" title="neli::impl_trait macro">impl_trait</a></div><div class="item-right docblock-short">For generating a marker trait that flags a new enum as usable in a
+field that accepts a generic type. This way, the type parameter
+can be constrained by a trait bound to only accept enums that
+implement the marker trait.</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.impl_var.html" title="neli::impl_var macro">impl_var</a></div><div class="item-right docblock-short">For naming a new enum, passing in what type it serializes to and
+deserializes from, and providing a mapping from variants to
+expressions (such as libc consts) that will ultimately be used in
+the serialization/deserialization step when sending the netlink
+message over the wire.</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.serialize.html" title="neli::serialize macro">serialize</a></div><div class="item-right docblock-short">This macro can be used to declaratively define serialization for a struct.</div></div></div><h2 id="structs" class="small-section-header"><a href="#structs">Structs</a></h2><div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.BeU64.html" title="neli::BeU64 struct">BeU64</a></div><div class="item-right docblock-short">A <code>u64</code> data type that will always be serialized as big endian</div></div></div><h2 id="constants" class="small-section-header"><a href="#constants">Constants</a></h2><div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="constant" href="constant.MAX_NL_LENGTH.html" title="neli::MAX_NL_LENGTH constant">MAX_NL_LENGTH</a></div><div class="item-right docblock-short">Max supported message length for netlink messages supported by
+the kernel.</div></div></div><h2 id="traits" class="small-section-header"><a href="#traits">Traits</a></h2><div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.Nl.html" title="neli::Nl trait">Nl</a></div><div class="item-right docblock-short">Trait defining basic actions required for netlink communication.
+Implementations for basic and <code>neli</code>’s types are provided (see below). Create new
+implementations if you have to work with a Netlink API that uses
+values of more unusual types.</div></div></div></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="neli" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0 (69f9c33d7 2022-12-12)" ></div></body></html>
