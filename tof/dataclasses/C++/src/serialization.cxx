@@ -502,7 +502,7 @@ std::vector<BlobEvt_t> get_events_from_stream(const vec_u8 &bytestream, u64 star
   usize ncorrupt_blobs = 0;
   bool header_found_start= false;
   while (true) {
-    if (pos + BLOBEVENTSIZE >= bytestream.size()) {
+    if (pos + BLOBEVENTSIZE > bytestream.size()) {
       std::cout << "[INFO] Stream not long enough! size: " << bytestream.size() << std::endl;
       break;
     }
