@@ -1,6 +1,8 @@
 ///! Higher level functions, to deal with events/binary reprentation of it, 
 ///  configure the drs4, etc.
 
+use std::collections::HashMap;
+
 use std::{thread, time};
 use std::sync::mpsc::{Sender,
                       Receiver};
@@ -11,15 +13,178 @@ use indicatif::{ProgressBar,
 
 use crate::control::*;
 use crate::memory::*;
-
+use tof_dataclasses::commands::*;
 
 use tof_dataclasses::events::blob::{BlobData,
                                     RBEventPayload};
 use tof_dataclasses::serialization::search_for_u16;
-
+use tof_dataclasses::commands::{TofCommand,
+                                TofResponse};
 
 const SLEEP_AFTER_REG_WRITE : u32 = 1; // sleep time after register write in ms
 
+// palceholder
+pub struct FIXME {
+}
+
+///! Recieve the events and hold them in a cache 
+///  until they are arequested
+pub fn event_cache(recv_ev_pl : Receiver<RBEventPayload>,
+                   send_ev_pl : Sender<Option<RBEventPayload>>,
+                   recv_evid  : Receiver<u32>,
+                   cache_size : usize) {
+  let mut oldest_event_id : u32 = 0;
+  let mut event_cache : HashMap::<u32, RBEventPayload> = HashMap::new();
+  'main : loop {
+    match recv_evid.recv() {
+      Err(err) => {
+        trace!("Issue receiving event id!");
+        continue;
+      },
+      Ok(event_id) => {
+        let has_it = event_cache.contains_key(&event_id);
+        if !has_it {
+          send_ev_pl.send(None);
+          // hamwanich
+          debug!("We don't have {event_id}!");
+        } else {
+          let event = event_cache.remove(&event_id).unwrap();
+          send_ev_pl.send(Some(event));
+        }
+      },
+    } // end match
+
+    // store incoming events in the cache  
+    match recv_ev_pl.recv() {
+      Err(err) => {
+        debug!("No event payload! {err}");
+        continue;
+      } // end err
+      Ok(event)  => {
+        println!("Received next RBEvent!");
+        if oldest_event_id == 0 {
+          oldest_event_id = event.event_id;
+        } //endif
+        // store the event in the cache
+        event_cache.insert(event.event_id, event);   
+        // keep track of the oldest event_id
+        println!("We have a cache size of {}", event_cache.len());
+        if event_cache.len() > cache_size {
+          event_cache.remove(&oldest_event_id);
+          oldest_event_id += 1;
+        } //endif
+      }// end Ok
+    } // end match
+  } // end 'main loop
+}
+
+pub struct Commander {
+
+  pub evid_send      : Sender<u32>,
+  pub rb_evt_recv    : Receiver<Option<RBEventPayload>>,
+  pub zmq_sub_socket : zmq::Socket,
+}
+
+impl Commander {
+
+  pub fn new (socket  : zmq::Socket,
+              send_ev : Sender<u32>,
+              recv_ev : Receiver<Option<RBEventPayload>>) 
+    -> Commander {
+    Commander {
+      evid_send      : send_ev,
+      rb_evt_recv    : recv_ev,
+      zmq_sub_socket : socket
+    }
+  }
+  pub fn command (&self, cmd : &TofCommand)
+    -> Result<TofResponse, FIXME> {
+    match cmd {
+      TofCommand::PowerOn   (mask) => {
+        warn!("Not implemented");
+        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
+      },
+      TofCommand::PowerOff  (mask) => {
+        warn!("Not implemented");
+        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
+      },
+      TofCommand::PowerCycle(mask) => {
+        warn!("Not implemented");
+        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
+      },
+      TofCommand::RBSetup   (mask) => {
+        warn!("Not implemented");
+        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
+      }, 
+      TofCommand::SetThresholds   (thresholds) =>  {
+        warn!("Not implemented");
+        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
+      },
+      TofCommand::StartValidationRun => {
+        warn!("Not implemented");
+        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
+      },
+      TofCommand::RequestWaveforms (eventid) => {
+        warn!("Not implemented");
+        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
+      },
+      TofCommand::DataRunStart => {
+        warn!("Not implemented");
+        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
+      }, 
+      TofCommand::DataRunEnd   => {
+        warn!("Not implemented");
+        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
+      },
+      TofCommand::VoltageCalibration => {
+        warn!("Not implemented");
+        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
+      },
+      TofCommand::TimingCalibration => {
+        warn!("Not implemented");
+        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
+      },
+      TofCommand::CreateCalibrationFile => {
+        warn!("Not implemented");
+        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
+      },
+      TofCommand::RequestEvent(eventid) => {
+        match self.evid_send.send(*eventid) {
+          Err(err) => {
+            return Ok(TofResponse::GeneralFail(*eventid));
+          },
+          Ok(event) => (),
+        }
+        match self.rb_evt_recv.recv() {
+          Err(err) => {
+            return Ok(TofResponse::EventNotReady(*eventid));
+          }
+          Ok(event_op) => {
+            // FIXME - prefix topic
+            match event_op {
+              None => {
+                return Ok(TofResponse::EventNotReady(*eventid));
+              },
+              Some(event) => {
+                self.zmq_sub_socket.send(event.payload, zmq::DONTWAIT);
+                return Ok(TofResponse::Success(*eventid));
+              }
+            }
+          }
+        }
+      },
+      TofCommand::RequestMoni => {
+      },
+      TofCommand::Unknown => {
+      }
+      _ => {
+      }
+    }
+  
+    let response = TofResponse::Success(1);
+    Ok(response)
+  }
+}
 
 ///! Get the blob buffer size from occupancy register
 ///
@@ -108,30 +273,30 @@ pub fn buff_handler(which       : &BlobBuffer,
   }
 }
 
-///! FIXME - should become a feature
-pub fn setup_progress_bar(msg : String, size : u64, format_string : String) -> ProgressBar {
-  let mut bar = ProgressBar::new(size).with_style(
-    //ProgressStyle::with_template("[{elapsed_precise}] {bar:40.cyan/blue} {pos:>7}/{len:7} {msg}")
-    ProgressStyle::with_template(&format_string)
-    .unwrap()
-    .progress_chars("##-"));
-  //);
-  bar.set_message(msg);
-  //bar.finish_and_clear();
-  ////let mut style_found = false;
-  //let style_ok = ProgressStyle::with_template("[{elapsed_precise}] {bar:40.cyan/blue} {pos:>7}/{len:7} {msg}");
-  //match style_ok {
-  //  Ok(_) => { 
-  //    style_found = true;
-  //  },
-  //  Err(ref err)  => { warn!("Can not go with chosen style! Not using any! Err {err}"); }
-  //}  
-  //if style_found { 
-  //  bar.set_style(style_ok.unwrap()
-  //                .progress_chars("##-"));
-  //}
-  bar
-}
+/////! FIXME - should become a feature
+//pub fn setup_progress_bar(msg : String, size : u64, format_string : String) -> ProgressBar {
+//  let mut bar = ProgressBar::new(size).with_style(
+//    //ProgressStyle::with_template("[{elapsed_precise}] {bar:40.cyan/blue} {pos:>7}/{len:7} {msg}")
+//    ProgressStyle::with_template(&format_string)
+//    .unwrap()
+//    .progress_chars("##-"));
+//  //);
+//  bar.set_message(msg);
+//  //bar.finish_and_clear();
+//  ////let mut style_found = false;
+//  //let style_ok = ProgressStyle::with_template("[{elapsed_precise}] {bar:40.cyan/blue} {pos:>7}/{len:7} {msg}");
+//  //match style_ok {
+//  //  Ok(_) => { 
+//  //    style_found = true;
+//  //  },
+//  //  Err(ref err)  => { warn!("Can not go with chosen style! Not using any! Err {err}"); }
+//  //}  
+//  //if style_found { 
+//  //  bar.set_style(style_ok.unwrap()
+//  //                .progress_chars("##-"));
+//  //}
+//  bar
+//}
 
 
 ///! Transforms raw bytestream to RBEventPayload

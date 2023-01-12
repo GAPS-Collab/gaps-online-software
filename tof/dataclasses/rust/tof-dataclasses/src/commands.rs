@@ -47,7 +47,7 @@ use crate::packets::{TofPacket,
 //pub const CMD_VCALIB             : &'static str = "CMD::VCALIB";       
 //pub const CMD_TCALIB             : &'static str = "CMD::TCALIB";      
 //pub const CMD_CREATECALIBF       : &'static str = "CMD::CREATECFILE";   
-///! Command string (Sydney's commands)
+///! Command codes (Sydney's commands)
 pub const CMD_POFF               : u8 = 10;        
 pub const CMD_PON                : u8 = 11;       
 pub const CMD_PCYCLE             : u8 = 12;        
@@ -63,6 +63,21 @@ pub const CMS_REQUESTMONI        : u8 = 43;
 pub const CMD_VCALIB             : u8 = 51;       
 pub const CMD_TCALIB             : u8 = 52;      
 pub const CMD_CREATECALIBF       : u8 = 53;   
+
+///! Specific response codes
+///  These are long (4 bytes) but 
+///  this allows to convey more information
+///  e.g. event id
+pub const RESP_ERR_UNEXECUTABLE              : u32 = 202;
+pub const RESP_ERR_NOTIMPLEMENTED            : u32 = 404; 
+pub const RESP_ERR_LEVEL_NOPROBLEM           : u32 = 4000; 
+pub const RESP_ERR_LEVEL_MEDIUM              : u32 = 4010; 
+pub const RESP_ERR_LEVEL_SEVERE              : u32 = 4020; 
+pub const RESP_ERR_LEVEL_CRITICAL            : u32 = 4040; 
+pub const RESP_ERR_LEVEL_MISSION_CRITICAL    : u32 = 4040; 
+pub const RESP_ERR_LEVEL_RUN_FOOL_RUN        : u32 = 99999; 
+
+
 
 #[derive(Debug, PartialEq)]
 pub enum TofCommand {
@@ -89,6 +104,7 @@ pub enum TofResponse {
   Success(u32),
   GeneralFail(u32),
   EventNotReady(u32),
+  SerializationIssue(u32),
   Unknown
 }
 
@@ -103,9 +119,10 @@ impl TofResponse {
     bytestream.push(cc);
     let mut value : u32 = 0;
     match self {
-      TofResponse::Success(data)     => value = *data,
-      TofResponse::GeneralFail(data) => value = *data,
-      TofResponse::EventNotReady(data) => value = *data,
+      TofResponse::Success(data)            => value = *data,
+      TofResponse::GeneralFail(data)        => value = *data,
+      TofResponse::EventNotReady(data)      => value = *data,
+      TofResponse::SerializationIssue(data) => value = *data,
       TofResponse::Unknown => ()
     }
     bytestream.extend_from_slice(&value.to_le_bytes());
@@ -151,14 +168,13 @@ impl Serialization for TofResponse {
   }
 }
 
-
-
 impl From<TofResponse> for u8 {
   fn from(input : TofResponse) -> u8 {
     match input {
       TofResponse::Success(_)       => 1,
       TofResponse::GeneralFail(_)   => 2,
       TofResponse::EventNotReady(_) => 3,
+      TofResponse::SerializationIssue(_) => 4,
       TofResponse::Unknown => 0
     }
   }
@@ -171,12 +187,16 @@ impl From<(u8, u32)> for TofResponse {
       1 => TofResponse::Success(value),
       2 => TofResponse::GeneralFail(value),
       3 => TofResponse::EventNotReady(value),
+      4 => TofResponse::SerializationIssue(value),
       _ => TofResponse::Unknown
     }
   }
 }
 
 impl TofCommand {
+  
+  const HEAD : u16 = 0xAAAA;
+  const TAIL : u16 = 0x5555;
   
   pub fn from_command_code(cc : u8, value : u32) -> TofCommand {
     match cc {
@@ -240,6 +260,66 @@ impl TofCommand {
       }
     } // end match
   }
+} // end impl TofCommand
+
+impl From<(u8, u32)> for TofCommand {
+  fn from(pair : (u8, u32)) -> TofCommand {
+    let (input, value) = pair;
+    match input {
+      CMD_POFF               => TofCommand::PowerOff             (value) ,        
+      CMD_PON                => TofCommand::PowerOn              (value) ,       
+      CMD_PCYCLE             => TofCommand::PowerCycle           (value) ,        
+      CMD_RBSETUP            => TofCommand::RBSetup              (value) ,         
+      CMD_SETTHRESHOLD       => TofCommand::SetThresholds        (value) ,         
+      CMD_SETMTCONFIG        => TofCommand::SetMtConfig          (value) ,        
+      CMD_DATARUNSTOP        => TofCommand::DataRunStart          ,  
+      CMD_DATARUNSTART       => TofCommand::DataRunEnd            ,    
+      CMD_STARTVALIDATIONRUN => TofCommand::StartValidationRun    ,         
+      CMD_GETFULLWAVEFORMS   => TofCommand::RequestWaveforms     (value) ,      
+      CMD_REQEUESTEVENT      => TofCommand::RequestEvent         (value) , 
+      CMS_REQUESTMONI        => TofCommand::RequestMoni           ,
+      CMD_VCALIB             => TofCommand::VoltageCalibration    ,       
+      CMD_TCALIB             => TofCommand::TimingCalibration     ,      
+      CMD_CREATECALIBF       => TofCommand::CreateCalibrationFile ,   
+      _                      => TofCommand::Unknown               , 
+    }
+  }
 }
 
+impl Serialization for TofCommand {
+
+  fn from_bytestream(stream    : &Vec<u8>, 
+                     start_pos : usize) 
+    -> Result<TofCommand, SerializationError>{
+  
+    let mut pos      = start_pos; 
+    let mut two_bytes : [u8;2];
+    let four_bytes    : [u8;4];
+    two_bytes = [stream[pos],
+                 stream[pos+1]];
+    pos += 2;
+    if TofCommand::HEAD != u16::from_le_bytes(two_bytes) {
+      warn!("Packet does not start with HEAD signature");
+      return Err(SerializationError::HeadInvalid {});
+    }
+   
+    let cc   = stream[pos];
+    pos += 1;
+    four_bytes = [stream[pos],
+                  stream[pos+1],
+                  stream[pos+2],
+                  stream[pos+3]];
+    pos += 4;
+    let value = u32::from_le_bytes(four_bytes);
+    two_bytes = [stream[pos],
+                 stream[pos+1]];
+    let pair    = (cc, value);
+    let command = TofCommand::from(pair);
+    if TofCommand::TAIL != u16::from_le_bytes(two_bytes) {
+      warn!("Packet does not end with TAIL signature");
+      return Err(SerializationError::TailInvalid {});
+    }
+    Ok(command)
+  }
+}
 

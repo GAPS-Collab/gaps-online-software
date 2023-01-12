@@ -4,7 +4,7 @@
 
 use crate::serialization::Serialization;
 use crate::errors::SerializationError;
-use crate::commands::{TofCommand, TofResponse};
+use crate::commands::TofCommand;
 
 #[derive(Debug, PartialEq)]
 pub struct CommandPacket {

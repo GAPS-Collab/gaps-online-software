@@ -135,6 +135,7 @@ BlobEvt_t decode_blobevent(const std::vector<uint8_t> &bytestream,
 std::vector<BlobEvt_t> get_events_from_stream(const std::vector<uint8_t> &bytestream, unsigned int start_pos);
 
 /***********************************************/
+
 long unsigned int search_for_2byte_marker(const std::vector<uint8_t> &bytestream,
                             uint8_t marker,
                             bool &has_ended,

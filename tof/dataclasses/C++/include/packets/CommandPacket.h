@@ -37,9 +37,10 @@ enum class TofCommand {
 };
 
 enum class TofResponse {
-  Success        = 1,
-  GeneralFailure = 2,
-  EventNotReady  = 3,
+  Success            = 1,
+  GeneralFailure     = 2,
+  EventNotReady      = 3,
+  SerializationIssue = 4,
   Unknown
 };
 
