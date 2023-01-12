@@ -5,9 +5,26 @@
 # Container Scanning customization: https://docs.gitlab.com/ee/user/application_security/container_scanning/#customizing-the-container-scanning-settings
 # Note that environment variables can be set in several places
 # See https://docs.gitlab.com/ee/ci/variables/#cicd-variable-precedence
-stages:
-- test
-sast:
-  stage: test
-include:
-- template: Security/SAST.gitlab-ci.yml
+
+#stages:
+#- test
+#sast:
+#  stage: test
+#include:
+#- template: Security/SAST.gitlab-ci.yml
+pages:
+  stage: publish
+  image: alpine
+  dependencies:
+    - build:amd64
+    - rustdoc
+  script:
+    - mkdir -p public
+    - mv target/doc public/doc
+    - mv target/release/rust-gitlab-example
+  artifacts:
+    paths:
+      - public
+  only:
+    - master
+
