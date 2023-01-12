@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"struct":[["NlSocket","Low level access to a netlink socket."],["NlSocketHandle","Higher level handle for socket operations."]]};

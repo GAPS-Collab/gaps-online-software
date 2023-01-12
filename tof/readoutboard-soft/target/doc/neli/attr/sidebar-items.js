@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":[["AttrHandle","Handle returned for traversing nested attribute structures"],["AttrHandleMut","Handle for traversing nested attribute structures mutably"]],"trait":[["Attribute","Trait that defines shared operations for netlink attributes. Currently, this applies to generic netlink and routing netlink attributes."]]};

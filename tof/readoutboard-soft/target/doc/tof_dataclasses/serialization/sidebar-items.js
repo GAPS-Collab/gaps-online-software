@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":[["search_for_u16","! check for a certain number in a bytestream"]],"trait":[["Serialization",""]]};

@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":[["Error",""]],"fn":[["local_ip","Retrieves the local ip address of the machine in the local network from the `AF_INET` family."]],"mod":[["linux",""]]};

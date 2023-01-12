@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"struct":[["PaddlePacket","! Representation of analyzed data from a paddle"]]};

@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":[["PacketType",""]],"mod":[["command_packet",""],["data_packet",""],["generic_packet",""],["paddle_packet","! Packets are a way to send data over the network."]],"struct":[["TofPacket","! The most basic of all packets"]]};

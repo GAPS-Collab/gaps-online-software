@@ -1,3 +1,0 @@
-(function() {var implementors = {
-"neli":[["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.66.0/core/convert/trait.TryFrom.html\" title=\"trait core::convert::TryFrom\">TryFrom</a>&lt;&amp;<a class=\"struct\" href=\"neli/consts/rtnl/struct.IfaFFlags.html\" title=\"struct neli::consts::rtnl::IfaFFlags\">IfaFFlags</a>&gt; for <a class=\"type\" href=\"libc/unix/type.c_uchar.html\" title=\"type libc::unix::c_uchar\">c_uchar</a>"]]
-};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

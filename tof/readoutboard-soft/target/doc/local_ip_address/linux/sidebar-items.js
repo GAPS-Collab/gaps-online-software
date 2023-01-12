@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":[["list_afinet_netifas","Perform a search over the system’s network interfaces using `getifaddrs`, retrieved network interfaces belonging to both socket address families `AF_INET` and `AF_INET6` are retrieved along with the interface address name."],["local_ip","Retrieves the local IP address fo this system"]]};
