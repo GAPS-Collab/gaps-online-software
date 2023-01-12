@@ -25,7 +25,7 @@ pub trait Serialization {
 pub fn search_for_u16(number : u16, bytestream : &Vec<u8>, start_pos : usize) 
   -> Result<usize, SerializationError> {
 
-  if start_pos > bytestream.len() {
+  if start_pos > bytestream.len() - 1 {
     return Err(SerializationError::StreamTooShort);
   }
 
@@ -34,6 +34,7 @@ pub fn search_for_u16(number : u16, bytestream : &Vec<u8>, start_pos : usize)
   let mut two_bytes : [u8;2]; 
   // will find the next header
   two_bytes = [bytestream[pos], bytestream[pos + 1]];
+  // FIXME - this should be little endian?
   if u16::from_be_bytes(two_bytes) == number {
     return Ok(pos);
   }
@@ -43,7 +44,7 @@ pub fn search_for_u16(number : u16, bytestream : &Vec<u8>, start_pos : usize)
   let mut found = false;
   if u16::from_be_bytes(two_bytes) != number {
     // we search for the next packet
-    for n in pos..bytestream.len() {
+    for n in pos..bytestream.len() - 1 {
       two_bytes = [bytestream[n], bytestream[n + 1]];
       if (u16::from_be_bytes(two_bytes)) == number {
         pos = n;

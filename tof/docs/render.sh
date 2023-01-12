@@ -4,4 +4,5 @@
 #
 
 mmdc -i dataflow.mmd -o dataflow.pdf #-b transparent
-mupdf dataflow.pdf
+mmdc -i readoutboard-soft.mmd -o readoutboard-soft.pdf #-b transparent
+mupdf readoutboard-soft.pdf

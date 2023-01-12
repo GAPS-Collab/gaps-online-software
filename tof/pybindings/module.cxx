@@ -106,9 +106,10 @@ std::string tof_command_to_str(const TofCommand &cmd) {
 
 std::string tof_response_to_str(const TofResponse &cmd) {
  switch (cmd) {
-   case TofResponse::Success        : {return "Success"     ;}
-   case TofResponse::GeneralFailure : {return "GeneralFailure" ;}
-   case TofResponse::EventNotReady  : {return "EventNotReady" ;}
+   case TofResponse::Success            : {return "Success"     ;}
+   case TofResponse::GeneralFailure     : {return "GeneralFailure" ;}
+   case TofResponse::EventNotReady      : {return "EventNotReady" ;}
+   case TofResponse::SerializationIssue : {return "SerializationIssue" ;}
  } // end case   
  return "Unknown";
 }
@@ -419,10 +420,11 @@ PYBIND11_MODULE(gaps_tof, m) {
     ;
 
     py::enum_<TofResponse>(m, "TofResponse")
-      .value("Success"              ,TofResponse::Success) 
-      .value("GeneralFailure"       ,TofResponse::GeneralFailure) 
-      .value("EventNotReady"        ,TofResponse::EventNotReady) 
-      .value("Unknown"              ,TofResponse::Unknown) 
+      .value("Success"                 ,TofResponse::Success) 
+      .value("GeneralFailure"          ,TofResponse::GeneralFailure) 
+      .value("EventNotReady"           ,TofResponse::EventNotReady) 
+      .value("EventSerializationIssue" ,TofResponse::SerializationIssue) 
+      .value("Unknown"                 ,TofResponse::Unknown) 
       .export_values()
     ;
    
