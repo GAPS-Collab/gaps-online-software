@@ -478,17 +478,17 @@ std::vector<uint32_t> get_2byte_markers_indices(const std::vector<uint8_t> &byte
 
 /***********************************************/
 
-std::vector<BlobEvt_t> get_events_from_stream(const std::vector<uint8_t> &bytestream, unsigned     int start_pos)
+std::vector<BlobEvt_t> get_events_from_stream(const vec_u8 &bytestream, u64 start_pos)
 {
-  uint nevents_in_stream = (float)bytestream.size()/BLOBEVENTSIZE;
+  u64 nevents_in_stream = (float)bytestream.size()/BLOBEVENTSIZE;
   std::cout << "[INFO] There might be at max " << nevents_in_stream<< " events in the stream" << std::endl;
   std::vector<BlobEvt_t> events; 
   BlobEvt_t event;
 
   bool finished = false;
-  int64_t head_index, tail_index;
-  size_t current_index = 0;
-  long int event_size; // can be negative if things go wrong
+  u64 head_index, tail_index;
+  usize current_index = 0;
+  i64 event_size; // can be negative if things go wrong
 
   size_t n_events_found = 0;
   uint32_t n_iter_debug = 0;
@@ -497,12 +497,15 @@ std::vector<BlobEvt_t> get_events_from_stream(const std::vector<uint8_t> &bytest
   //unsigned long head_start = 0;
   uint nheaders = 0;
   uint ntails   = 0;
-  size_t pos = 0;
-  size_t nblobs = 0;
-  size_t ncorrupt_blobs = 0;
+  usize pos = 0;
+  usize nblobs = 0;
+  usize ncorrupt_blobs = 0;
   bool header_found_start= false;
   while (true) {
-    if (pos + BLOBEVENTSIZE >= (bytestream.size() -1)) {break;}
+    if (pos + BLOBEVENTSIZE >= (bytestream.size() -1)) {
+      std::cout << "[INFO] Stream not long enough! size: " << bytestream.size() << std::endl;
+      break;
+    }
     auto byte = bytestream[pos];
 
     if (!header_found_start) {

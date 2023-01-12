@@ -82,7 +82,7 @@ pub struct Commander {
 
   pub evid_send      : Sender<u32>,
   pub rb_evt_recv    : Receiver<Option<RBEventPayload>>,
-  pub zmq_sub_socket : zmq::Socket,
+  pub zmq_pub_socket : zmq::Socket,
 }
 
 impl Commander {
@@ -94,7 +94,7 @@ impl Commander {
     Commander {
       evid_send      : send_ev,
       rb_evt_recv    : recv_ev,
-      zmq_sub_socket : socket
+      zmq_pub_socket : socket
     }
   }
   pub fn command (&self, cmd : &TofCommand)
@@ -166,7 +166,7 @@ impl Commander {
                 return Ok(TofResponse::EventNotReady(*eventid));
               },
               Some(event) => {
-                self.zmq_sub_socket.send(event.payload, zmq::DONTWAIT);
+                self.zmq_pub_socket.send(event.payload, zmq::DONTWAIT);
                 return Ok(TofResponse::Success(*eventid));
               }
             }

@@ -588,7 +588,7 @@ fn main() {
   }
 
   // Now set up PUB socket
-  let data_socket = ctx.socket(zmq::SUB).expect("Unable to create 0MQ PUB socket!");
+  let data_socket = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
   data_socket.bind(&data_address);
   info!("0MQ SUB socket bound to address {data_address}");
 
