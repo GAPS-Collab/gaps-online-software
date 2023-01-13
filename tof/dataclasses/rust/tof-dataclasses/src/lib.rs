@@ -22,6 +22,7 @@ pub mod constants;
 pub mod calibrations;
 pub mod threading;
 pub mod commands;
+pub mod monitoring;
 
 extern crate pretty_env_logger;
 #[macro_use] extern crate log;
