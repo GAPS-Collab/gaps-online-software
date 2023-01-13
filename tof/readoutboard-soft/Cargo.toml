@@ -19,7 +19,8 @@ path = "src/main.rs"
 memmap = "0.7"
 
 # multi-producer/multi-consumer channels
-crossbeam = "0.8"
+#crossbeam = "0.8"
+crossbeam-channel = "0.5"
 
 tof-dataclasses = { path = "../dataclasses/rust/tof-dataclasses" , features = ["random"]} 
 

@@ -4,8 +4,10 @@
 use std::collections::HashMap;
 
 use std::{thread, time};
-use std::sync::mpsc::{Sender,
-                      Receiver};
+use crossbeam_channel::{Sender,
+                        Receiver};
+//use std::sync::mpsc::{Sender,
+//                      Receiver};
 
 // just for fun
 use indicatif::{ProgressBar,

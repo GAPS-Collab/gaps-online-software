@@ -4,9 +4,16 @@ mod control;
 mod api;
 
 use std::{thread, time};
-use std:: {sync::mpsc::Sender,
-           sync::mpsc::Receiver,
-           sync::mpsc::channel};
+
+extern crate crossbeam_channel;
+use crossbeam_channel::{unbounded,
+                        Sender,
+                        Receiver};
+//use std:: {sync::mpsc::Sender,
+//           sync::mpsc::Receiver,
+//           sync::mpsc::channel};
+//
+
 use std::net::IpAddr;
 
 use indicatif::{MultiProgress,
@@ -427,14 +434,14 @@ fn main() {
   //   separate thread
   let mut n_threads = 5;
   
-  let (kill_run, run_gets_killed)    : (Sender<bool>, Receiver<bool>)       = channel();
-  let (bs_send, bs_recv)             : (Sender<Vec<u8>>, Receiver<Vec<u8>>) = channel(); 
-  let (moni_send, moni_recv)         : (Sender<Vec<u8>>, Receiver<Vec<u8>>) = channel(); 
+  let (kill_run, run_gets_killed)    : (Sender<bool>, Receiver<bool>)       = unbounded();
+  let (bs_send, bs_recv)             : (Sender<Vec<u8>>, Receiver<Vec<u8>>) = unbounded(); 
+  let (moni_send, moni_recv)         : (Sender<Vec<u8>>, Receiver<Vec<u8>>) = unbounded(); 
   let (ev_pl_to_cache, ev_pl_from_builder) : 
-      (Sender<RBEventPayload>, Receiver<RBEventPayload>) = channel();
+      (Sender<RBEventPayload>, Receiver<RBEventPayload>)                    = unbounded();
   let (ev_pl_to_cmdr,  ev_pl_from_cache)   : 
-    (Sender<Option<RBEventPayload>>, Receiver<Option<RBEventPayload>>) = channel();
-  let (evid_to_cache, evid_from_cmdr)   : (Sender<u32>, Receiver<u32>) = channel();
+    (Sender<Option<RBEventPayload>>, Receiver<Option<RBEventPayload>>)      = unbounded();
+  let (evid_to_cache, evid_from_cmdr)   : (Sender<u32>, Receiver<u32>)      = unbounded();
   info!("Will start ThreadPool with {n_threads} threads");
   let workforce = ThreadPool::new(n_threads);
   
