@@ -30,7 +30,7 @@ const DMA_RESET_TRIES : u8 = 10;   // if we can not reset the DMA after this num
                                    // of retries, we'll panic!
 const SAVE_RESTART_TRIES : u8 = 5; // if we are not successfull, to get it going, 
                                    // panic
-///! Little helper
+/// Little helper
 fn debug_and_ok() -> Result<(), RegisterError> {
   debug!("Raised RegisterError!");
   Ok(())
@@ -267,12 +267,12 @@ pub fn runner(max_events  : Option<u64>,
   // the runner will specifically set up the DRS4
   let mut will_panic : u8 = 0;
   make_sure_it_runs(&mut will_panic);
+  info!("Begin Run!");
 
   loop {
-    info!("Begin Run!");
     match get_event_count() {
       Err (err) => {
-        debug!("Can not obtaine event count! Err {:?}", err);
+        debug!("Can not obtain event count! Err {:?}", err);
         thread::sleep(one_sec);    
         continue;
       }

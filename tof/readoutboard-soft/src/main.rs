@@ -589,12 +589,19 @@ fn main() {
   } else {
     // if we are not listening to a C&C server, we have to kickstart
     // our run ourselves.
+    let bar_clone = prog_op_ev.clone();
+    //match prog_op_ev {
+    //  None => (),
+    //  Some(bar) => {
+    //    &bar.suspend(|| { loop {}} );
+    //  }
+    //}
     workforce.execute(move || {
         runner(Some(max_event),
                None,
                None,
                None,
-               prog_op_ev);
+               bar_clone);
     });
   }
 
@@ -666,6 +673,7 @@ fn main() {
               result = Ok(TofResponse::GeneralFail(cmd::RESP_ERR_RUNACTIVE));
             } else {
               info!("Attempting to launch a new runner with {max_event} events!");
+              let bar_clone = prog_op_ev.clone();
               workforce.execute(move || {
                   runner(Some(max_event as u64),
                          None,
@@ -673,7 +681,7 @@ fn main() {
                          None,
                          //FIXME - maybe use crossbeam?
                          //Some(&run_gets_killed),
-                         None);
+                         bar_clone);
               }); 
               run_active = true;
               result = Ok(TofResponse::Success(cmd::RESP_SUCC_FINGERS_CROSSED));

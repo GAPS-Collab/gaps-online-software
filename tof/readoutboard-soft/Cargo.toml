@@ -15,7 +15,11 @@ path = "src/main.rs"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+# addess raw memeory, e.g. /dev/uio0
 memmap = "0.7"
+
+# multi-producer/multi-consumer channels
+crossbeam = "0.8"
 
 tof-dataclasses = { path = "../dataclasses/rust/tof-dataclasses" , features = ["random"]} 
 
