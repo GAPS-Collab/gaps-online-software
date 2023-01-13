@@ -386,7 +386,7 @@ PYBIND11_MODULE(gaps_tof, m) {
     m.doc() = "GAPS Tof dataclasses and utility tools";
    
     py::enum_<TofCommand>(m, "TofCommand")
-     .value("PowerOn"              ,TofCommand::PowerOn) 
+      .value("PowerOn"              ,TofCommand::PowerOn) 
       .value("PowerOff"             ,TofCommand::PowerOff) 
       .value("PowerCycle"           ,TofCommand::PowerCycle) 
       .value("RBSetup"              ,TofCommand::RBSetup) 
@@ -406,8 +406,8 @@ PYBIND11_MODULE(gaps_tof, m) {
 
     py::class_<CommandPacket>(m, "CommandPacket") 
       .def(py::init<TofCommand const&, u32 const>())  
-      .def("to_bytestream",   &CommandPacket::to_bytestream)
-      .def("from_bytestream", &CommandPacket::from_bytestream)
+      .def("to_bytestream",   &CommandPacket::to_bytestream  , "Translate the command to a list of bytes")
+      .def("from_bytestream", &CommandPacket::from_bytestream, "Retrieve a command from a list of bytes")
       .def("get_command" ,    [](const CommandPacket &pk) {
                                   return pk.command;
                               })
@@ -432,14 +432,17 @@ PYBIND11_MODULE(gaps_tof, m) {
       .def(py::init<TofResponse const&, u32 const>())  
       .def("to_bytestream",   &ResponsePacket::to_bytestream)
       .def("from_bytestream", &ResponsePacket::from_bytestream)
+      .def("translate_response_code", &ResponsePacket::translate_response_code,
+                                      "Translate the response code into some human readable string")
       .def("get_response"   ,    [](const ResponsePacket &pk) {
-                                  return pk.response;
-                              })
+                                  return pk.response; 
+                                 }
+                              , "Get the RESPONSE_CODE from the response. This will provide further information.")
       .def("__repr__",        [](const ResponsePacket &pk) {
                                   return "<ResponsePacket : "
                                   + tof_response_to_str(pk.response)
                                   + " "
-                                  + std::to_string(pk.value) + ">";
+                                  + pk.translate_response_code(pk.value) + ">";
                                   }) 
     ;
     py::enum_<PacketType>(m, "PacketType")
@@ -653,19 +656,19 @@ PYBIND11_MODULE(gaps_tof, m) {
    ;
 
    // serialization functions
-   m.def("decode_ushort",         &decode_ushort);
-   m.def("encode_ushort",         &wrap_encode_ushort);
+   m.def("decode_u16",         &decode_ushort);
+   m.def("encode_u16",         &wrap_encode_ushort);
    m.def("encode_ushort_rev",     &wrap_encode_ushort_rev);
    
-   m.def("decode_uint32",         &decode_uint32);
-   m.def("encode_uint32",         &wrap_encode_uint32);
-   m.def("encode_uint32_rev",     &wrap_encode_uint32_rev);
+   m.def("decode_u32",         &decode_uint32);
+   m.def("encode_u32",         &wrap_encode_uint32);
+   m.def("encode_u32_rev",     &wrap_encode_uint32_rev);
 
    m.def("encode_48",             &encode_48);
    m.def("encode_48_rev",         &encode_48_rev);
 
-   m.def("decode_uint64",         &decode_uint64);
-   m.def("encode_uint64",         &wrap_encode_uint64);
+   m.def("decode_u64",         &decode_uint64);
+   m.def("encode_u64",         &wrap_encode_uint64);
    m.def("encode_uint64_rev",     &wrap_encode_uint64_rev);
 
    m.def("encode_blobevent",      &blobevent_encoder);
@@ -681,7 +684,7 @@ PYBIND11_MODULE(gaps_tof, m) {
 
    m.def("voltage_calibration",      &voltage_calibration_helper);
    m.def("timing_calibration",       &timing_calibration_helper);
-   m.def("remove_spikes",           &remove_spikes_helper);
+   m.def("remove_spikes",            &remove_spikes_helper);
    m.def("read_calibration_file",    &read_calibration_file);
    m.def("get_offsets",              &offset_getter);
    m.def("get_vincs",                &increment_getter);

@@ -1,11 +1,19 @@
-///! Tof dataclasses
-///
-///
-///
-///
+//! Tof dataclasses
+//!     
+//! This crate provides tof related dataclasses for 
+//!
+//! * events
+//!
+//! * network i/o wrappers ("packets") for classes
+//!
+//! * function related constants
+//!
+//! * calibration
+//!
+//! * commands/responses
+//!
+//! * TODO: alerts
 
-//pub mod events::blob;
-//pub mod events::tof_event;
 pub mod events;
 pub mod packets;
 pub mod errors;

@@ -61,8 +61,14 @@ uint32_t decode_uint32(payload_t& bytestream,
 
 /***********************************************/
 
+[[deprecated("The assumed byteorder in this function is unclear/confusing")]]
 uint32_t decode_uint32_rev(payload_t& bytestream,
                            unsigned int start_pos=0);
+
+/***********************************************/
+
+u32 u32_from_le_bytes(const vec_u8 &bytestream,
+                      u64 start_pos);
 
 /***********************************************/
 

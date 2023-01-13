@@ -1,12 +1,16 @@
-/// Classes to hold calibration values and 
-/// read calibration textfiles.
-/// 
-///
-///
-///
-///
-///
-///
+//! Work with calibration files
+//!
+//! Read out calibration files.
+//! 
+//! The `Calibration` class then 
+//! holds the results for a single 
+//! channel
+//!
+//!
+//!
+//!
+//!
+//!
 
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
@@ -47,6 +51,9 @@ impl Default for Calibrations {
 
 /***********************************/
 
+/// Reads a textfile with calibration data
+///
+///
 pub fn read_calibration_file(filename : &Path) -> [Calibrations; NCHN ]
 {
   info!("Attempting to open file {}", filename.display());

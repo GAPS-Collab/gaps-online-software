@@ -34,7 +34,7 @@ usize CommandPacket::from_bytestream(vec_u8 &payload,
   } 
   pos += 2;
   command        = static_cast<TofCommand>(payload[2])       ; pos += 1;
-  value          = decode_uint32(payload, pos); pos += 4;
+  value          = u32_from_le_bytes(payload, pos); pos += 4;
   u16 tail_flag  = decode_ushort(payload, pos); pos += 2;
   if (tail_flag != tail) {
     std::cerr << "[WARN] no tail found!" << std::endl; 
@@ -54,7 +54,7 @@ ResponsePacket::ResponsePacket(const TofResponse &resp,
   value   = val;
 }
 
-vec_u8 ResponsePacket::to_bytestream() {
+vec_u8 ResponsePacket::to_bytestream() const {
   vec_u8 buffer = std::vector<u8>(p_length_fixed );
   usize pos    = 0;
   encode_ushort(head, buffer, pos); pos+=2;
@@ -65,6 +65,22 @@ vec_u8 ResponsePacket::to_bytestream() {
   return buffer;
 }
 
+std::string ResponsePacket::translate_response_code(u32 code) const {
+  switch (code) {
+    case ResponsePacket::RESP_ERR_LEVEL_NOPROBLEM        : { return "RESP_ERR_LEVEL_NOPROBLEM";};
+    case ResponsePacket::RESP_ERR_LEVEL_MEDIUM           : { return "RESP_ERR_LEVEL_MEDIUM";};
+    case ResponsePacket::RESP_ERR_LEVEL_CRITICAL         : { return "RESP_ERR_LEVEL_CRITICAL";};
+    case ResponsePacket::RESP_ERR_LEVEL_MISSION_CRITICAL : { return "RESP_ERR_LEVEL_MISSION_CRITICAL";};
+    case ResponsePacket::RESP_ERR_LEVEL_RUN_FOOL_RUN     : { return "RESP_ERR_LEVEL_RUN_FOOL_RUN";};
+    case ResponsePacket::RESP_ERR_LEVEL_SEVERE           : { return "RESP_ERR_LEVEL_SEVERE";};
+    case ResponsePacket::RESP_ERR_NORUNACTIVE            : { return "RESP_ERR_NORUNACTIVE";};
+    case ResponsePacket::RESP_ERR_NOTIMPLEMENTED         : { return "RESP_ERR_NOTIMPLEMENTED";};
+    case ResponsePacket::RESP_ERR_RUNACTIVE              : { return "RESP_ERR_RUNACTIVE";};
+    case ResponsePacket::RESP_ERR_UNEXECUTABLE           : { return "RESP_ERR_UNEXECUTABLE";};
+    case ResponsePacket::RESP_SUCC_FINGERS_CROSSED       : { return "RESP_SUCC_FINGERS_CROSSED";};
+  }
+  return "UNKNOWN RESPONSE CODE " + std::to_string(code);
+}
 
 usize ResponsePacket::from_bytestream(vec_u8 &payload,
                                       usize start_pos) {

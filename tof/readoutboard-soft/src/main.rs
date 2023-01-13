@@ -281,11 +281,11 @@ fn monitoring(send_bs : Sender<Vec<u8>>) {
 }
 
 
-///! Read the data buffers when they are full and 
-///  then send the stream over the channel to 
-///  the thread dealing with it
+/// Read the data buffers when they are full and 
+/// then send the stream over the channel to 
+/// the thread dealing with it
 ///
-///  # Arguments
+/// # Arguments
 ///
 ///
 fn read_data_buffers(bs_send     : Sender<Vec<u8>>,
@@ -414,7 +414,8 @@ fn main() {
   // sleeping
   let two_seconds = time::Duration::from_millis(2000);
   let one_milli   = time::Duration::from_millis(1);
-  
+  let one_sec     = time::Duration::from_secs(1);  
+
   // threads and inter-thread communications
   // We have
   // * event_cache thread
@@ -633,11 +634,14 @@ fn main() {
     match incoming {
       Err(err) => {
         warn!("CMD socket error {err}");
+        // sleep for a bit and see if it recovers
+        thread::sleep(one_sec);
         continue;
       },
       Ok(_) => (),
     }
     let raw_command = incoming.unwrap();
+    debug!("Raw command bytes : {:?}", raw_command);
     match TofCommand::from_bytestream(&raw_command,0) {
       Err(err) => {
         warn!("Can not decode Command! Err {:?}", err);
@@ -648,35 +652,45 @@ fn main() {
       },
       Ok(c) => {
         let mut result = Ok(TofResponse::Unknown);
+
+        // at this point, we have a valid command!
+        info!("Received command {:?}", c);
         // intercept commands which require to spawn/kill 
         // threads
         match c {
           TofCommand::DataRunStart (max_event) => {
-          // let's start a run. The value of the TofCommnad shall be 
-          // nevents
-          if run_active {
-            result = Ok(TofResponse::GeneralFail(cmd::RESP_ERR_RUNACTIVE));
-          } else {
-            workforce.execute(move || {
-                runner(Some(max_event as u64),
-                       None,
-                       None,
-                       None,
-                       //FIXME - maybe use crossbeam?
-                       //Some(&run_gets_killed),
-                       None);
-            }); 
-          }
-          run_active = true;
-          result = Ok(TofResponse::Success(cmd::RESP_SUCC_FINGERS_CROSSED));
+            // let's start a run. The value of the TofCommnad shall be 
+            // nevents
+            if run_active {
+              warn!("Can not start a new run, stop the current first!");  
+              result = Ok(TofResponse::GeneralFail(cmd::RESP_ERR_RUNACTIVE));
+            } else {
+              info!("Attempting to launch a new runner with {max_event} events!");
+              workforce.execute(move || {
+                  runner(Some(max_event as u64),
+                         None,
+                         None,
+                         None,
+                         //FIXME - maybe use crossbeam?
+                         //Some(&run_gets_killed),
+                         None);
+              }); 
+              run_active = true;
+              result = Ok(TofResponse::Success(cmd::RESP_SUCC_FINGERS_CROSSED));
+              cmd_socket.send(result.unwrap().to_bytestream(),0);
+            }
           },
           TofCommand::DataRunEnd   => {
             if !run_active {
+              warn!("Can not kill run, since there is currently none in progress!");
               result = Ok(TofResponse::GeneralFail(cmd::RESP_ERR_NORUNACTIVE));
+              cmd_socket.send(result.unwrap().to_bytestream(),0);
+            } else {
+              warn!("Attempting to kill current run!");
+              kill_run.send(true);
+              result = Ok(TofResponse::Success(cmd::RESP_SUCC_FINGERS_CROSSED));
+              cmd_socket.send(result.unwrap().to_bytestream(),0);
             }
-            warn!("Will kill current run!");
-            kill_run.send(true);
-            result = Ok(TofResponse::Success(cmd::RESP_SUCC_FINGERS_CROSSED));
           },
           _ => {
             // forward the rest to the executor

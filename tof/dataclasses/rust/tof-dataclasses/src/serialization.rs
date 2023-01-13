@@ -1,5 +1,12 @@
+//! Serialization/Deserialization helpers
+//!
+//!
+
+
 pub use crate::errors::SerializationError;
 
+
+/// En/Decode to a bytestream, that is `Vec<u8>`
 pub trait Serialization {
 
 
@@ -21,7 +28,7 @@ pub trait Serialization {
 
 
 
-///! check for a certain number in a bytestream
+/// Search for a certain number of type `u16` in a bytestream
 pub fn search_for_u16(number : u16, bytestream : &Vec<u8>, start_pos : usize) 
   -> Result<usize, SerializationError> {
 

@@ -1,32 +1,28 @@
-///! Commmands which can be issued
-///  to the various components of 
-///  the tof system.
-///
-///
-///  Here is a comprehensive list (Sydney)
-///  * Power on/off to PBs+RBs+LTBs+preamps (all at once) or MT
-///  * Power on/off to LTB or preamp < 2/day Command to power on/off various components (to TOF -> to RB) 5 B:
-///  * RBsetup ? Command to run rbsetup on a particular RB (to TOF -> to RBs) 8 B:
-///  * Set Thresholds < 3/day Command to set a threshold level on all LTBs (to TOF -> to RBs) 8 B:
-///  * Set MT Config 1/run, <10/day? Command to set MT trigger config (to TOF -> to MT) 4 B:
-///  * Start Validation Run 1/run, <10/day? Command to take a small amount of data (some number E events, I
-///  * 360xE full waveforms (from TOF)
-///  
-///  * Start Data-Taking Run 1/run, <10/day? Command to take regular data (to TOF -> to RBs)
-///  * Reduced data packet (from Flight computer)
-///  * Stop Run < 1/run, < 10/day Command to stop a run (to TOF -> to RBs) 2 B = command name 6
-///  
-///  * Voltage Calibration Runs 1/day Command to take 2 voltage calibration runs (to TOF -> to RBs) 12 B:
-///  * Timing Calibration Run 1/day Command to take a timing calibration run (to TOF -> to RBs) 8 B:
-///  * Create New Calibration File 1/day Command to create a new calibration file using data from the three
-///  
-
-
-
-
-
-//pub use crate::packets::data_packet::CommandPacket;
-
+//! Commmands which can be issued
+//! to the various components of 
+//! the tof system.
+//!
+//!
+//! Here is a comprehensive list (Sydney)
+//! * Power on/off to PBs+RBs+LTBs+preamps (all at once) or MT
+//! * Power on/off to LTB or preamp < 2/day Command to power on/off various components (to TOF -> to RB) 5 B:
+//! * RBsetup ? Command to run rbsetup on a particular RB (to TOF -> to RBs) 8 B:
+//! * Set Thresholds < 3/day Command to set a threshold level on all LTBs (to TOF -> to RBs) 8 B:
+//! * Set MT Config 1/run, <10/day? Command to set MT trigger config (to TOF -> to MT) 4 B:
+//! * Start Validation Run 1/run, <10/day? Command to take a small amount of data (some number E events, I
+//! * 360xE full waveforms (from TOF)
+//! 
+//! * Start Data-Taking Run 1/run, <10/day? Command to take regular data (to TOF -> to RBs)
+//! * Reduced data packet (from Flight computer)
+//! * Stop Run < 1/run, < 10/day Command to stop a run (to TOF -> to RBs) 2 B = command name 6
+//! 
+//! * Voltage Calibration Runs 1/day Command to take 2 voltage calibration runs (to TOF -> to RBs) 12 B:
+//! * Timing Calibration Run 1/day Command to take a timing calibration run (to TOF -> to RBs) 8 B:
+//! * Create New Calibration File 1/day Command to create a new calibration file using data from the three
+//! 
+//! Each command will be answered by a specific response. The responses 
+//! consists of a class, `TofResponse` together with a 32bit response code.
+//!
 use crate::serialization::{Serialization, SerializationError};
 use crate::packets::{TofPacket,
                      CommandPacket,
@@ -47,39 +43,85 @@ use crate::packets::{TofPacket,
 //pub const CMD_VCALIB             : &'static str = "CMD::VCALIB";       
 //pub const CMD_TCALIB             : &'static str = "CMD::TCALIB";      
 //pub const CMD_CREATECALIBF       : &'static str = "CMD::CREATECFILE";   
-///! Command codes (Sydney's commands)
-pub const CMD_POFF               : u8 = 10;        
-pub const CMD_PON                : u8 = 11;       
-pub const CMD_PCYCLE             : u8 = 12;        
-pub const CMD_RBSETUP            : u8 = 20;         
-pub const CMD_SETTHRESHOLD       : u8 = 21;         
-pub const CMD_SETMTCONFIG        : u8 = 22;        
-pub const CMD_DATARUNSTOP        : u8 = 30;  
-pub const CMD_DATARUNSTART       : u8 = 31;    
-pub const CMD_STARTVALIDATIONRUN : u8 = 32;         
-pub const CMD_GETFULLWAVEFORMS   : u8 = 41;      
-pub const CMD_REQEUESTEVENT      : u8 = 42; 
-pub const CMS_REQUESTMONI        : u8 = 43;
-pub const CMD_VCALIB             : u8 = 51;       
-pub const CMD_TCALIB             : u8 = 52;      
-pub const CMD_CREATECALIBF       : u8 = 53;   
 
-///! Specific response codes
-///  These are long (4 bytes) but 
-///  this allows to convey more information
-///  e.g. event id
+
+
+/// command code for "Power off"
+pub const CMD_POFF                : u8 = 10;        
+/// command code for "Power on"
+pub const CMD_PON                 : u8 = 11;       
+/// command code for "Power cycle"
+pub const CMD_PCYCLE              : u8 = 12;        
+/// command code for "Run RBSetup"
+pub const CMD_RBSETUP             : u8 = 20;         
+/// command code for "Set LTB Thresholds"
+pub const CMD_SETTHRESHOLD        : u8 = 21;         
+/// command code for "Configure MTB"
+pub const CMD_SETMTCONFIG         : u8 = 22;        
+/// command code for "Stop Data taking"
+pub const CMD_DATARUNSTOP         : u8 = 30;  
+/// command code for "Start Data taking"
+pub const CMD_DATARUNSTART        : u8 = 31;    
+/// command code for "Start validation run"
+pub const CMD_STARTVALIDATIONRUN  : u8 = 32;         
+/// command code for "Get all waveforms"
+pub const CMD_GETFULLWAVEFORMS    : u8 = 41;      
+/// command code for "Get waveforms/data for specific event"
+pub const CMD_REQEUESTEVENT       : u8 = 42; 
+/// command code for "Get monitoring data"
+pub const CMS_REQUESTMONI         : u8 = 43;
+/// command code for "Run voltage calibration"
+pub const CMD_VCALIB              : u8 = 51;       
+/// command code for "Run timing calibration"
+pub const CMD_TCALIB              : u8 = 52;      
+/// command code for "Create a new calibration file"
+pub const CMD_CREATECALIBF        : u8 = 53;   
+
+// FIXME - these commands need to be implemented
+/// NEEDTOIMPLEMENT: command code for "Send the whole event cache over the wire"
+pub const CMD_UNSPOOL_EVENT_CACHE : u8 = 44;
+// Specific response codes
+// These are long (4 bytes) but 
+// this allows to convey more information
+// e.g. event id
+
+/// response code for: Command can not be executed on the server side
 pub const RESP_ERR_UNEXECUTABLE              : u32 = 500;
 pub const RESP_ERR_NOTIMPLEMENTED            : u32 = 404; 
+/// response code for: Something did not work quite right, 
+/// however, the problem has either fixed itself or it is 
+/// highly likely that if the command is issued again it 
+/// will succeed.
 pub const RESP_ERR_LEVEL_NOPROBLEM           : u32 = 4000; 
 pub const RESP_ERR_LEVEL_MEDIUM              : u32 = 4010; 
 pub const RESP_ERR_LEVEL_SEVERE              : u32 = 4020; 
-pub const RESP_ERR_LEVEL_CRITICAL            : u32 = 4040; 
+/// response code for: A critical condition. This might need a fix somehow and can 
+/// not be fixed automatically. Probably at least a power-cycle is necessary.
+pub const RESP_ERR_LEVEL_CRITICAL            : u32 = 4030; 
+/// response code for: The severest error condition which can occur. This might
+/// still be fixable, but it is probably a good advice to get help. Currently, 
+/// the mission might be in a bad state.
 pub const RESP_ERR_LEVEL_MISSION_CRITICAL    : u32 = 4040; 
+/// response code for: If you see this, it is probably reasonable to follow that advice..
+/// Something unexplicable, which should never have happened, did happen and there is probably
+/// no way to fix it. Call somebody if you see it, but probably the mission has failed.
 pub const RESP_ERR_LEVEL_RUN_FOOL_RUN        : u32 = 99999; 
+/// response code for: The server has executed the command succesfully. 
+/// THIS DOES NOT GUARANTEE THAT SERVER IS ACTUALLY DOING 
+/// SOMETHING USEFUL, IT JUST ACKNOWLEDGES EXECUTION.
 pub const RESP_SUCC_FINGERS_CROSSED          : u32 = 200;
+/// The command can't be executed since currently data taking is not active
 pub const RESP_ERR_NORUNACTIVE               : u32 = 501;
+/// The command can't be executed since currently data taking is active
 pub const RESP_ERR_RUNACTIVE                 : u32 = 502;
 
+
+/// General command class for ALL commands to the 
+/// tof C&C instance and readout boards
+///
+/// Each command can carry a 32bit field with further
+/// instructionns
+///
 #[derive(Debug, PartialEq)]
 pub enum TofCommand {
   PowerOn(u32),
@@ -90,21 +132,44 @@ pub enum TofCommand {
   SetMtConfig(u32),
   StartValidationRun,
   RequestWaveforms(u32),
+  /// Start a new run, the argument being the number 
+  /// of events.
   DataRunStart(u32), 
   DataRunEnd   ,
   VoltageCalibration,
   TimingCalibration,
   CreateCalibrationFile,
+  /// Request event data for a specific event being sent
+  /// over the data wire. The argument being the event id.
   RequestEvent(u32),
   RequestMoni ,
   Unknown
 }
 
+/// Each `TofCommand` triggers a `TofResponse` in reply
+///
+/// The responses are general classes, which carry a more
+/// specific 32-bit response code.
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub enum TofResponse {
   Success(u32),
+  /// A unknown problem led to a non-execution
+  /// of the command. The error code should tell
+  /// more. A re-issue of the command might 
+  /// solve the problem.
   GeneralFail(u32),
+  /// The requested event is not ready yet. This 
+  /// means, it is still lingering in the caches
+  /// of the readout boards. If this problem 
+  /// occurs many times, it might be helpful to 
+  /// reduce the cache size of the readoutboards 
+  /// to be more responsive.
+  /// The response code is the specific event id
+  /// we initially requested.
   EventNotReady(u32),
+  /// Somehwere, a serialization error happened. 
+  /// It might be worth trying to execute that 
+  /// command again.
   SerializationIssue(u32),
   ZMQProblem(u32),
   Unknown
@@ -212,8 +277,8 @@ impl TofCommand {
       CMD_RBSETUP            => TofCommand::RBSetup              (value) ,         
       CMD_SETTHRESHOLD       => TofCommand::SetThresholds        (value) ,         
       CMD_SETMTCONFIG        => TofCommand::SetMtConfig          (value) ,        
-      CMD_DATARUNSTOP        => TofCommand::DataRunStart         (value) ,  
-      CMD_DATARUNSTART       => TofCommand::DataRunEnd            ,    
+      CMD_DATARUNSTART       => TofCommand::DataRunStart         (value) ,  
+      CMD_DATARUNSTOP        => TofCommand::DataRunEnd            ,    
       CMD_STARTVALIDATIONRUN => TofCommand::StartValidationRun    ,         
       CMD_GETFULLWAVEFORMS   => TofCommand::RequestWaveforms     (value) ,      
       CMD_REQEUESTEVENT      => TofCommand::RequestEvent         (value) , 
@@ -271,6 +336,7 @@ impl TofCommand {
 impl From<(u8, u32)> for TofCommand {
   fn from(pair : (u8, u32)) -> TofCommand {
     let (input, value) = pair;
+    trace!("Got in input {:?}", pair);
     match input {
       CMD_POFF               => TofCommand::PowerOff             (value) ,        
       CMD_PON                => TofCommand::PowerOn              (value) ,       
@@ -278,8 +344,8 @@ impl From<(u8, u32)> for TofCommand {
       CMD_RBSETUP            => TofCommand::RBSetup              (value) ,         
       CMD_SETTHRESHOLD       => TofCommand::SetThresholds        (value) ,         
       CMD_SETMTCONFIG        => TofCommand::SetMtConfig          (value) ,        
-      CMD_DATARUNSTOP        => TofCommand::DataRunStart         (value) ,  
-      CMD_DATARUNSTART       => TofCommand::DataRunEnd            ,    
+      CMD_DATARUNSTOP        => TofCommand::DataRunEnd            ,  
+      CMD_DATARUNSTART       => TofCommand::DataRunStart         (value) ,    
       CMD_STARTVALIDATIONRUN => TofCommand::StartValidationRun    ,         
       CMD_GETFULLWAVEFORMS   => TofCommand::RequestWaveforms     (value) ,      
       CMD_REQEUESTEVENT      => TofCommand::RequestEvent         (value) , 

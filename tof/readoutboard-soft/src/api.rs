@@ -36,10 +36,10 @@ fn debug_and_ok() -> Result<(), RegisterError> {
   Ok(())
 }
 
-///! Send out a signal periodically
-///  to all the threads. 
-///  If they don't answer in timely 
-///  manner, call a doctor.
+/// Send out a signal periodically
+/// to all the threads. 
+/// If they don't answer in timely 
+/// manner, call a doctor.
 fn heartbeat() {
   let mut now = time::Instant::now();
   loop {
@@ -52,10 +52,10 @@ fn heartbeat() {
 }
 
 
-///! Somehow, it is not always successful to reset 
-///  the DMA and the data buffers. Let's try an 
-///  aggressive scheme and do it several times.
-///  If we fail, something is wrong and we panic
+/// Somehow, it is not always successful to reset 
+/// the DMA and the data buffers. Let's try an 
+/// aggressive scheme and do it several times.
+/// If we fail, something is wrong and we panic
 fn reset_data_memory_aggressively() {
   let one_milli = time::Duration::from_millis(1);
   let five_milli = time::Duration::from_millis(5);
@@ -229,6 +229,8 @@ fn kill_run(will_panic : &mut u8) {
 ///                  number of errors
 ///  * kill_signal : End run when this line is at bool 
 ///                  1
+///  * prog_op_ev  : An option for a progress bar which
+///                  is helpful for debugging
 ///
 pub fn runner(max_events  : Option<u64>,
               max_seconds : Option<u64>,
@@ -244,6 +246,21 @@ pub fn runner(max_events  : Option<u64>,
   let mut delta_events : u64 = 0;
   let mut n_events     : u64 = 0;
   let mut n_errors     : u64 = 0;
+
+  match prog_op_ev {
+    None => (),
+    Some(ref bar) => {
+      bar.reset();
+      match max_events {
+        None    => (),
+        Some(n) => {
+          bar.set_length(n);
+        }
+      }
+    }
+  }
+
+
   let now = time::Instant::now();
 
   let mut terminate = false;
@@ -604,7 +621,7 @@ pub fn buff_handler(which       : &BlobBuffer,
   let has_tripped = buff_size >= buff_trip;
 
   if has_tripped {
-    debug!("Buff {which:?} tripped");  
+    debug!("Buff {which:?} tripped at a size of {buff_size}");  
     debug!("Buff size {buff_size}");
     // reset the buffers
     if switch_buff {

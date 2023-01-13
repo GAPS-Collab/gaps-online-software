@@ -109,6 +109,19 @@ uint32_t decode_uint32_rev(const std::vector<unsigned char>& bytestream,
 
 /***********************************************/
 
+u32 u32_from_le_bytes(const vec_u8 &bytestream,
+                      u64 start_pos)
+{
+  u32 value = (u32)(
+         ((bytestream[start_pos+3] & 0xFF) << 24)
+      |  ((bytestream[start_pos+2] & 0xFF) << 16)
+      |  ((bytestream[start_pos+1] & 0xFF) << 8)
+      |   (bytestream[start_pos+0]));
+  return value;
+}
+
+/***********************************************/
+
 void u32_to_le_bytes(u32 value,
                      vec_u8 &bytestream,
                      u8 start_pos) {
