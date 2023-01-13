@@ -1,6 +1,6 @@
-///! Wrap commands to be send over the wire
-///
-///
+//! Wrap commands to be send over the wire
+//
+//
 
 use crate::serialization::Serialization;
 use crate::errors::SerializationError;

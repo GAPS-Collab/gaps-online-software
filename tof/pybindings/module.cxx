@@ -11,6 +11,7 @@
 #include "packets/TofPacket.h"
 #include "packets/CommandPacket.h"
 #include "packets/RBEnvPacket.h"
+#include "packets/RBMoniPacket.h"
 
 #include "serialization.h"
 #include "blobroutines.h"
@@ -458,7 +459,19 @@ PYBIND11_MODULE(gaps_tof, m) {
         .value("B", PADDLE_END::B)
         .value("UNKNOWN", PADDLE_END::UNKNOWN)
         .export_values();
-    
+
+    py::class_<RBMoniPacket>(m, "RBMoniPacket",
+            "Packet with monitoring data from the individual readout boards.")
+        .def(py::init())
+        .def("from_bytestream",   &RBMoniPacket::from_bytestream)
+        .def("to_bytestream",     &RBMoniPacket::to_bytestream)
+        .def_readonly("rate",     &RBMoniPacket::rate)
+        .def("__repr__",          [](const RBMoniPacket &pk) {
+                                  return "<RBMoniPacket : rate : "
+                                    + std::to_string(pk.rate) + ">";
+                                  }) 
+    ;
+
     py::class_<REventPacket>(m, "REventPacket")
         .def(py::init())
         .def("serialize",         &REventPacket::serialize)

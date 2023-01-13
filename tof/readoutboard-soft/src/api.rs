@@ -287,6 +287,7 @@ pub fn runner(max_events  : Option<u64>,
         }
         if evt_cnt == last_evt_cnt {
           thread::sleep(one_sec);
+          info!("We didn't get an updated event count!");
           continue;
         }
       }
@@ -301,15 +302,19 @@ pub fn runner(max_events  : Option<u64>,
         bar.inc(delta_events);   
       }
     }
+    info!("Checking for kill signal");
     // terminate if one of the 
     // criteria is fullfilled
     match kill_signal {
       Some(ks) => {
         match ks.recv() {
           Ok(signal) => {
+            warn!("Have received kill signal!");
             terminate = signal;
           },
-          Err(_) => ()
+          Err(_) => {
+            info!("Did not get kill signal!");
+          }
         }
       },
       None => ()
@@ -401,18 +406,18 @@ pub fn event_cache(recv_ev_pl : Receiver<RBEventPayload>,
     // store incoming events in the cache  
     match recv_ev_pl.recv() {
       Err(err) => {
-        debug!("No event payload! {err}");
+        trace!("No event payload! {err}");
         continue;
       } // end err
       Ok(event)  => {
-        println!("Received next RBEvent!");
+        trace!("Received next RBEvent!");
         if oldest_event_id == 0 {
           oldest_event_id = event.event_id;
         } //endif
         // store the event in the cache
         event_cache.insert(event.event_id, event);   
         // keep track of the oldest event_id
-        println!("We have a cache size of {}", event_cache.len());
+        info!("We have a cache size of {}", event_cache.len());
         if event_cache.len() > cache_size {
           event_cache.remove(&oldest_event_id);
           oldest_event_id += 1;
