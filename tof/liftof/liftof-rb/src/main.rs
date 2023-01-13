@@ -14,6 +14,7 @@ use crossbeam_channel::{unbounded,
 //           sync::mpsc::channel};
 //
 
+use std::borrow::BorrowMut;
 use std::net::IpAddr;
 
 use indicatif::{MultiProgress,
@@ -38,6 +39,7 @@ use tof_dataclasses::events::blob::RBEventPayload;
 use tof_dataclasses::commands::{TofCommand,
                                 TofResponse};
 use tof_dataclasses::commands as cmd;
+use tof_dataclasses::monitoring as moni;
 use tof_dataclasses::serialization::Serialization;
 extern crate clap;
 use clap::{arg,
@@ -254,7 +256,7 @@ const CMDPORT_START  : u32 = 40000;
 
 ///! A monitoring thread, which communicates with the 
 ///  server program
-fn monitoring(send_bs : Sender<Vec<u8>>) {
+fn monitoring(ch : &Sender<Vec<u8>>) {
   //let mut now        = time::Instant::now();
   let heartbeat      = time::Duration::from_secs(HEARTBEAT);
   let mut rate: u32  = 0; 
@@ -269,13 +271,15 @@ fn monitoring(send_bs : Sender<Vec<u8>>) {
    match rate_query {
      Ok(rate) => {
        debug!("Monitoring thread -> Rate: {rate}Hz ");
-       bytestream = Vec::<u8>::new();
-       bytestream.extend_from_slice(&rate.to_le_bytes());
-       packet.update_payload(bytestream);
-       let payload = packet.to_bytestream();
-       match send_bs.send(payload) {
-         Err(err) => {debug!("Issue sending payload {:?}", err)},
-         Ok(_)    => {debug!("Send payload successfully!")}
+       let mut moni_dt = moni::RBMoniData::new();
+       moni_dt.rate = rate;
+       //bytestream = Vec::<u8>::new();
+       //bytestream.extend_from_slice(&rate.to_le_bytes());
+       //packet.update_payload(bytestream);
+       let payload = moni_dt.to_bytestream();
+       match ch.try_send(payload) {
+         Err(err) => {debug!("Issue sending RBMoniData {:?}", err)},
+         Ok(_)    => {debug!("Send RBMoniData successfully!")}
        }
      }
 
@@ -436,7 +440,7 @@ fn main() {
   
   let (kill_run, run_gets_killed)    : (Sender<bool>, Receiver<bool>)       = unbounded();
   let (bs_send, bs_recv)             : (Sender<Vec<u8>>, Receiver<Vec<u8>>) = unbounded(); 
-  let (moni_send, moni_recv)         : (Sender<Vec<u8>>, Receiver<Vec<u8>>) = unbounded(); 
+  let (moni_to_main, data_fr_moni)   : (Sender<Vec<u8>>, Receiver<Vec<u8>>) = unbounded(); 
   let (ev_pl_to_cache, ev_pl_from_builder) : 
       (Sender<RBEventPayload>, Receiver<RBEventPayload>)                    = unbounded();
   let (ev_pl_to_cmdr,  ev_pl_from_cache)   : 
@@ -551,10 +555,6 @@ fn main() {
   // in meaningfull order
   // - higher level threads first, then 
   // the more gnarly ones.
-  let moni_sender = moni_send.clone();
-  workforce.execute(move || {
-      monitoring(moni_sender);
-  });
   workforce.execute(move || {
                     event_cache(ev_pl_from_builder,
                                 ev_pl_to_cmdr,
@@ -619,6 +619,12 @@ fn main() {
   let data_socket = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
   data_socket.bind(&data_address);
   info!("0MQ SUB socket bound to address {data_address}");
+  
+  // Now setup thread which require the 
+  // data socket.
+  workforce.execute(move || {
+      monitoring(&moni_to_main);
+  });
 
   //info!("Starting daq!");
   //match start_drs4_daq() {
@@ -633,17 +639,54 @@ fn main() {
   //info!("Current trigger rate: {rate}Hz");
   //let mut command  : cmd::TofCommand;
   let mut resp     : cmd::TofResponse;
-  let executor = Commander::new(data_socket,
+  let executor = Commander::new(&data_socket,
                                 evid_to_cache,
                                 ev_pl_from_cache);
   let mut run_active = false;
   loop {
-    // query the command socket
-    // this can block. The actual 
-    // work is done by other stuff
+
+    // step 1 - check the individual 
+    // channels and send everything 
+    // down the global sink
+    // (non-blocking hence try_recv)
+    match data_fr_moni.try_recv() { 
+      Err(_) => (),
+      Ok(payload)  => {
+        match data_socket.send(payload,zmq::DONTWAIT) {
+          Ok(_)  => debug!("Send payload over 0MQ PUB socket!"),
+          Err(_) => warn!("Not able to send over 0MQ PUB socket!"),
+        }
+      }  
+    }
+    // if we are not listening to any
+    // c&c, we can skip the next step
     if dont_listen {
       continue;
     }
+
+    // step 2 - deal with commands
+    // this can not block, so we want 
+    // to poll first.
+    // The second parameter is the 
+    // timeout, which probably needs
+    // to be adjusted.
+    match cmd_socket.poll(zmq::POLLIN, 1) {
+      Err(err) => {
+        warn!("Polling the 0MQ command socket failed!");
+        thread::sleep(one_milli);
+        continue;
+      }
+      Ok(has_data) => {
+        // if there is no command,
+        // then let's go back to 
+        // the beginning and 
+        // work on sending stuff.
+        if has_data == 0 {
+          continue;
+        }
+      }
+    }
+    debug!("We received something over the command channel!");
     let incoming = cmd_socket.recv_bytes(0);
     match incoming {
       Err(err) => {
@@ -727,6 +770,8 @@ fn main() {
         } // end match
       }
     }
+  
+
   } // end loop
 } // end main
 

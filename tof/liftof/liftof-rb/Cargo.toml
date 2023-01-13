@@ -1,6 +1,6 @@
 [package]
-name = "rb-soft"
-version = "0.2.0"
+name = "liftoff-rb"
+version = "0.1.0"
 edition = "2021"
 
 
@@ -9,7 +9,7 @@ edition = "2021"
 #path = "src/bin/watch_buffer_fill.rs"
 
 [[bin]]
-name = "rb-soft"
+name = "liftof-rb"
 path = "src/main.rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -22,7 +22,7 @@ memmap = "0.7"
 #crossbeam = "0.8"
 crossbeam-channel = "0.5"
 
-tof-dataclasses = { path = "../dataclasses/rust/tof-dataclasses" , features = ["random"]} 
+tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["random"]} 
 
 zmq = "0.10.0"
 

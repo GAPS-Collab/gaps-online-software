@@ -1,11 +1,11 @@
 [package]
-name        = "crusty-kraken" # the name of the package
-version     = "0.2.0"    # the current version, obeying semver
+name        = "liftof-cc" # the name of the package
+version     = "0.1.0"    # the current version, obeying semver
 authors     = ["J.A. Stoessl <stoessl@hawaii.edu>", "Jeff Zweerink <zweering@astro.ucla.edu>"]
 description = "A programm for the GAPS science instrument. Read out the time-of-flight detectors and process their data."
 
 [[bin]]
-name  = "crusty-kraken"
+name  = "liftof-cc"
 #test  = false
 #bench = false
 
@@ -25,7 +25,7 @@ random =[]
 
 [dependencies]
 
-tof-dataclasses = { path = "../dataclasses/rust/tof-dataclasses" , features = ["random"], verison = "0.2"} 
+tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["random"], verison = "0.2"} 
 
 zmq = "0.10.0"
 # this is technically optional

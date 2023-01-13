@@ -432,16 +432,16 @@ pub fn event_cache(recv_ev_pl : Receiver<RBEventPayload>,
 ///
 ///
 ///
-pub struct Commander {
+pub struct Commander<'a> {
 
   pub evid_send      : Sender<u32>,
   pub rb_evt_recv    : Receiver<Option<RBEventPayload>>,
-  pub zmq_pub_socket : zmq::Socket,
+  pub zmq_pub_socket : &'a zmq::Socket,
 }
 
-impl Commander {
+impl Commander<'_> {
 
-  pub fn new (socket     : zmq::Socket,
+  pub fn new (socket     : &zmq::Socket,
               send_ev    : Sender<u32>,
               recv_ev    : Receiver<Option<RBEventPayload>>)
     -> Commander {
