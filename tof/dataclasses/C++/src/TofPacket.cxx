@@ -37,12 +37,13 @@ u16 TofPacket::from_bytestream(vec_u8 &bytestream,
     head = value;
     pos += 2; // position in bytestream, 2 since we 
     packet_type = bytestream[pos]; pos+=1;
-    //std::cout << "found packet type : " << packet_type << std::endl;
-    payload_size = decode_uint64_rev(bytestream, pos); pos+=8;
-    //std::cout << "found payload size " << payload_size << std::endl;
+    std::cout << "found packet type : " << packet_type << std::endl;
+    //payload_size = decode_uint64_rev(bytestream, pos); pos+=8;
+    payload_size = u64_from_le_bytes(bytestream, pos); pos +=8;
+    std::cout << "found payload size " << payload_size << std::endl;
     //size_t payload_end = pos + bytestream.size() - 2;
     usize payload_end = pos + payload_size;
-    //std::cout << " found payload end " << payload_end << std::endl;
+    std::cout << " found payload end " << payload_end << std::endl;
     vec_u8 packet_bytestream(bytestream.begin()+ pos,
                              bytestream.begin()+ payload_end)  ;
     payload = packet_bytestream;

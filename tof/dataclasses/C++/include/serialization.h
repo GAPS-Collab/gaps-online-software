@@ -92,8 +92,12 @@ uint64_t decode_uint64(payload_t& bytestream,
 
 /***********************************************/
 
+[[deprecated("The assumed byteorder in this function is unclear/confusing")]]
 uint64_t decode_uint64_rev(const std::vector<unsigned char>& bytestream,
                            unsigned int start_pos=0);
+
+u64 u64_from_le_bytes(const vec_u8 &bytestream,
+		      usize start_pos=0);
 
 /***********************************************/
 
