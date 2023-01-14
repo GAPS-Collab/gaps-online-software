@@ -41,6 +41,8 @@ use tof_dataclasses::commands::{TofCommand,
 use tof_dataclasses::commands as cmd;
 use tof_dataclasses::monitoring as moni;
 use tof_dataclasses::serialization::Serialization;
+use liftof_lib::misc::*;
+
 extern crate clap;
 use clap::{arg,
            command,
@@ -355,13 +357,15 @@ fn main() {
   let kraken                = vec![240, 159, 144, 153];
   let fish                  = vec![240, 159, 144, 159];
   let sparkles              = vec![226, 156, 168];
-
+  let rocket                = vec![240, 159, 154, 128];
+  let balloon               = vec![243, 190, 148, 150];
   // We know these bytes are valid, so we'll use `unwrap()`.
   let sparkle_heart    = String::from_utf8(sparkle_heart).unwrap();
   let kraken           = String::from_utf8(kraken).unwrap();
   let fish             = String::from_utf8(fish).unwrap();
   let sparkles         = String::from_utf8(sparkles).unwrap();
-
+  let balloon          = String::from_utf8(balloon).unwrap();
+  let rocket           = String::from_utf8(rocket).unwrap();
 
   // General parameters, readout board id,, 
   // ip to tof computer
@@ -397,8 +401,8 @@ fn main() {
 
   // welcome banner!
   println!("-----------------------------------------------");
-  println!(" ** Welcome to tof-kraken {} *****", kraken);
-  println!(" .. TOF C&C and data acquistion suite");
+  println!(" ** Welcome to liftof-rb {}{} *****", rocket, balloon);
+  println!(" .. TOF daten-kraken {} style C&C server/client and data acquistion suite", kraken);
   println!(" .. for the GAPS experiment {}", sparkle_heart);
   println!("-----------------------------------------------");
   println!(" => Running client for RB {}", rb_id);

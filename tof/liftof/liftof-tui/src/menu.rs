@@ -5,7 +5,8 @@ pub enum MenuItem {
   Status,
   Alerts,
   Commands,
-  Dashboard
+  Dashboard,
+  Logs
 }
 
 
@@ -16,7 +17,8 @@ impl From<MenuItem> for usize {
       MenuItem::Status    => 1,
       MenuItem::Alerts    => 2,
       MenuItem::Commands  => 3,
-      MenuItem::Dashboard => 4
+      MenuItem::Dashboard => 4,
+      MenuItem::Logs      => 5
     }
   }
 }

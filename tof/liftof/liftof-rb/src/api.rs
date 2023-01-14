@@ -6,8 +6,6 @@ use std::collections::HashMap;
 use std::{thread, time};
 use crossbeam_channel::{Sender,
                         Receiver};
-//use std::sync::mpsc::{Sender,
-//                      Receiver};
 
 // just for fun
 use indicatif::{ProgressBar,
@@ -493,6 +491,14 @@ impl Commander<'_> {
         return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
       },
       TofCommand::RequestWaveforms (eventid) => {
+        warn!("Not implemented");
+        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
+      },
+      TofCommand::UnspoolEventCache (_) => {
+        warn!("Not implemented");
+        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
+      },
+      TofCommand::StreamAnyEvent (_) => {
         warn!("Not implemented");
         return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
       },

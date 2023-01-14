@@ -1,7 +1,7 @@
 [workspace]
 
 members = [
-  #"liftof-lib",
+  "liftof-lib",
   "liftof-rb",
   "liftof-cc", 
   "liftof-tui"  
@@ -9,3 +9,5 @@ members = [
 
 [profile.release]
 opt-level = 3
+
+

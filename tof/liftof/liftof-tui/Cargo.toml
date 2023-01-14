@@ -5,10 +5,31 @@ edition = "2021"
 
 
 [dependencies]
+
 crossterm = { version = "0.19", features = [ "serde" ] }
 serde = {version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 chrono = { version = "0.4", features = ["serde"] }
 rand = { version = "0.7.3", default-features = false, features = ["std"] }
-tui = { version = "0.14", default-features = false, features = ['crossterm', 'serde'] }
+tui = { version = "0.19", default-features = false, features = ['crossterm', 'serde'] }
 thiserror = "1.0"
+
+tui-logger = "0.8.1"
+
+# multi-producer/multi-consumer channels
+#crossbeam = "0.8"
+crossbeam-channel = "0.5"
+
+tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["random"]}
+
+zmq = "0.10.0"
+
+log = "0.4"
+pretty_env_logger = "0.4"
+
+local-ip-address = "0.5"
+clap = { version = "4.0", features = ["derive"] }
+
+
+#[target.armv7-unknown-linux-gnueabi]
+

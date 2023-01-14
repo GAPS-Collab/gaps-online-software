@@ -1,10 +1,10 @@
-///! Convenience functions to read/write
-///  the various control registers
-///
-///  
-///  For the mapping of registers/addresses, 
-///  see `registers.rs`
-///
+//! Convenience functions to read/write
+//  the various control registers
+//
+//  
+//  For the mapping of registers/addresses, 
+//  see `registers.rs`
+//
 
 use crate::registers::*;
 use crate::memory::*;
@@ -17,23 +17,28 @@ pub fn start_drs4_daq() -> Result<(), RegisterError> {
 }
 
 
-///! Put the daq in idle state, that is stop data taking
+/// Put the daq in idle state, that is stop data taking
 pub fn idle_drs4_daq() -> Result<(), RegisterError> {
   trace!("SET DRS4 IDLE");
   write_control_reg(DRS_REINIT, 1)?;
   Ok(())
 }
 
-///! Get the blob buffer occupancy for one of the two buffers
+/// Get the blob buffer occupancy for one of the two buffers
 ///  
-///  This is a bit tricky. This will continuously change, as 
-///  the DRS4 is writing into the memory. At some point, it 
-///  will be full, not changing it's value anymore. At that 
-///  point, if set, the firmware has switched automatically 
-///  to the other buffer. 
+/// This is a bit tricky. This will continuously change, as 
+/// the DRS4 is writing into the memory. At some point, it 
+/// will be full, not changing it's value anymore. At that 
+/// point, if set, the firmware has switched automatically 
+/// to the other buffer. 
 ///
-///  Also, it will only read something like zero if the 
-///  DMA has completly been reset (calling dma_reset).
+/// Also, it will only read something like zero if the 
+/// DMA has completly been reset (calling dma_reset).
+/// 
+/// # Arguments
+///
+/// * which : select the blob buffer to query
+///
 ///
 pub fn get_blob_buffer_occ(which : &BlobBuffer) -> Result<u32, RegisterError> {
   let address = match which {
@@ -46,13 +51,13 @@ pub fn get_blob_buffer_occ(which : &BlobBuffer) -> Result<u32, RegisterError> {
 }
 
 
-///! FIXME
+/// FIXME
 pub fn get_dma_pointer() -> Result<u32, RegisterError> {
   let value = read_control_reg(DMA_POINTER)?;
   Ok(value)
 }
 
-///! Reset the DMA memory (blob data) and write 0s
+/// Reset the DMA memory (blob data) and write 0s
 pub fn clear_dma_memory() -> Result<(), RegisterError> {
   trace!("SET DMA CLEAR");
   write_control_reg(DMA_CLEAR, 1)?;  
@@ -60,11 +65,11 @@ pub fn clear_dma_memory() -> Result<(), RegisterError> {
 }
 
 
-///! Reset means, the memory can be used again, but it does not mean it 
-///  clears the memory.
+/// Reset means, the memory can be used again, but it does not mean it 
+/// clears the memory.
 ///
-///  The writing into the memory thus can start anywhere in memory (does 
-///  not have to be from 0)
+/// The writing into the memory thus can start anywhere in memory (does 
+/// not have to be from 0)
 pub fn blob_buffer_reset(which : &BlobBuffer) -> Result<(), RegisterError> {
   match which { 
     BlobBuffer::A => write_control_reg(RAM_A_OCC_RST, 0x1)?,
