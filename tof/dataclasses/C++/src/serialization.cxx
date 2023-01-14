@@ -509,8 +509,8 @@ std::vector<uint32_t> get_2byte_markers_indices(const std::vector<uint8_t> &byte
 
 /***********************************************/
 
-std::vector<BlobEvt_t> get_events_from_stream(const vec_u8 &bytestream, u64 start_pos)
-{
+std::vector<BlobEvt_t> get_events_from_stream(const vec_u8 &bytestream,
+	       				      u64 start_pos) {
   u64 nevents_in_stream = (float)bytestream.size()/BLOBEVENTSIZE;
   std::cout << "[INFO] There might be at max " << nevents_in_stream<< " events in the stream" << std::endl;
   std::vector<BlobEvt_t> events; 
@@ -532,30 +532,30 @@ std::vector<BlobEvt_t> get_events_from_stream(const vec_u8 &bytestream, u64 star
   usize nblobs = 0;
   usize ncorrupt_blobs = 0;
   bool header_found_start= false;
-  while (true) {
-    if (pos + BLOBEVENTSIZE > bytestream.size()) {
-      std::cout << "[INFO] Stream not long enough! size: " << bytestream.size() << std::endl;
+  while (true) { 
+    // FIXME - this needs care. If there is only one event in the stream
+    // this can't fail. To bypass this, we omit this if a header has been 
+    // found. Not sure if that is good.
+    if ((pos + BLOBEVENTSIZE > bytestream.size()) && !(header_found_start)) {
       break;
     }
     auto byte = bytestream[pos];
-
     if (!header_found_start) {
       if (byte == 0xaa) {
         header_found_start = true;
-      }   
+      }  
       pos++;
       continue;
     }   
-
     if (header_found_start) {
       pos++;
       if (byte == 0xaa) {
         header_found_start = false;
-
         event = decode_blobevent(bytestream,
                                  pos -2,
                                  pos -2 + BLOBEVENTSIZE + 10);
         nblobs++;
+	std::cout << "NBLOBS" << nblobs << std::endl;
         //std::cout << event.head << std::endl;
         //std::cout << event.event_ctr << std::endl;
         //std::cout << event.timestamp << std::endl;
