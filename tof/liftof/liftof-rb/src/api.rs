@@ -19,9 +19,11 @@ use tof_dataclasses::events::blob::{BlobData,
                                     RBEventPayload};
 use tof_dataclasses::serialization::search_for_u16;
 use tof_dataclasses::commands::{TofCommand,
-                                TofResponse};
+                                TofResponse,
+                                TofOperationMode};
 use tof_dataclasses::threading::ThreadPool;
- 
+
+use time::Duration;
  
 pub const HEARTBEAT : u64 = 5; // heartbeat in s
 
@@ -375,37 +377,36 @@ pub fn runner(max_events  : Option<u64>,
 ///
 /// # Arguments
 ///
+/// * control_ch : Receive operation mode instructions
 ///
-pub fn event_cache(recv_ev_pl : Receiver<RBEventPayload>,
-                   send_ev_pl : Sender<Option<RBEventPayload>>,
-                   recv_evid  : Receiver<u32>,
-                   cache_size : usize) {
+pub fn event_cache_worker(recv_ev_pl  : Receiver<RBEventPayload>,
+                          send_ev_pl  : Sender<Option<RBEventPayload>>,
+                          get_op_mode : Receiver<TofOperationMode>, 
+                          recv_evid   : Receiver<u32>,
+                          cache_size  : usize) {
+  let mut n_send_errors = 0;
+    
+  let mut op_mode_stream = false;
+
   let mut oldest_event_id : u32 = 0;
   let mut event_cache : HashMap::<u32, RBEventPayload> = HashMap::new();
-  'main : loop {
-    match recv_evid.recv() {
-      Err(err) => {
-        trace!("Issue receiving event id! Err: {err}");
-        continue;
-      },
-      Ok(event_id) => {
-        let has_it = event_cache.contains_key(&event_id);
-        if !has_it {
-          send_ev_pl.send(None);
-          // hamwanich
-          debug!("We don't have {event_id}!");
-        } else {
-          let event = event_cache.remove(&event_id).unwrap();
-          send_ev_pl.send(Some(event));
+  loop {
+    // check changes in operation mode
+    match get_op_mode.try_recv() {
+      Err(err) => trace!("No op mode change detected!"),
+      Ok(mode) => {
+        warn!("Will change operation mode to {:?}!", mode);
+        match mode {
+          TofOperationMode::TofModeRequestReply => {op_mode_stream = false;},
+          TofOperationMode::TofModeStreamAny    => {op_mode_stream = true;},
         }
-      },
-    } // end match
-
+      }
+    }
     // store incoming events in the cache  
-    match recv_ev_pl.recv() {
+    match recv_ev_pl.try_recv() {
       Err(err) => {
         trace!("No event payload! {err}");
-        continue;
+        //continue;
       } // end err
       Ok(event)  => {
         trace!("Received next RBEvent!");
@@ -422,7 +423,40 @@ pub fn event_cache(recv_ev_pl : Receiver<RBEventPayload>,
         } //endif
       }// end Ok
     } // end match
-  } // end 'main loop
+  
+    // if we are in "stream_any" mode, we don't need to take care
+    // of any fo the response/request.
+    if (op_mode_stream) {
+      //event_cache.as_ref().into_iter().map(|(evid, payload)| {send_ev_pl.try_send(Some(payload))});
+      //let evids = event_cache.keys();
+      for payload in event_cache.values() {
+        // FIXME - this is bad! Too much allocation
+        send_ev_pl.try_send(Some(payload.clone())); 
+      }
+      event_cache.clear();
+      //for n in evids { 
+      //  let payload = event_cache.remove(n).unwrap();
+      //  send_ev_pl.try_send(Some(payload)); 
+      //}
+      continue;
+    }
+    match recv_evid.try_recv() {
+      Err(err) => {
+        trace!("Issue receiving event id! Err: {err}");
+      },
+      Ok(event_id) => {
+        let has_it = event_cache.contains_key(&event_id);
+        if !has_it {
+          send_ev_pl.try_send(None);
+          // hamwanich
+          debug!("We don't have {event_id}!");
+        } else {
+          let event = event_cache.remove(&event_id).unwrap();
+          send_ev_pl.try_send(Some(event));
+        }
+      },
+    } // end match
+  } // end loop
 }
 
 /// Deal with incoming commands
@@ -433,20 +467,23 @@ pub fn event_cache(recv_ev_pl : Receiver<RBEventPayload>,
 pub struct Commander<'a> {
 
   pub evid_send      : Sender<u32>,
+  pub change_op_mode : Sender<TofOperationMode>, 
   pub rb_evt_recv    : Receiver<Option<RBEventPayload>>,
   pub zmq_pub_socket : &'a zmq::Socket,
 }
 
 impl Commander<'_> {
 
-  pub fn new (socket     : &zmq::Socket,
-              send_ev    : Sender<u32>,
-              recv_ev    : Receiver<Option<RBEventPayload>>)
+  pub fn new (socket          : &zmq::Socket,
+              send_ev         : Sender<u32>,
+              evpl_from_cache : Receiver<Option<RBEventPayload>>,
+              change_op_mode  : Sender<TofOperationMode>)
     -> Commander {
 
     Commander {
       evid_send      : send_ev,
-      rb_evt_recv    : recv_ev,
+      change_op_mode : change_op_mode,
+      rb_evt_recv    : evpl_from_cache,
       zmq_pub_socket : socket,
     }
   }
@@ -462,7 +499,10 @@ impl Commander<'_> {
   ///
   /// # Arguments
   ///
-  ///
+  /// * command : A TofCommand instructing the 
+  ///             commander what to do
+  ///             Will generate a TofResponse 
+  ///             
   pub fn command (&self, cmd : &TofCommand)
     -> Result<TofResponse, FIXME> {
     match cmd {
@@ -499,8 +539,9 @@ impl Commander<'_> {
         return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
       },
       TofCommand::StreamAnyEvent (_) => {
-        warn!("Not implemented");
-        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
+        let op_mode = TofOperationMode::TofModeStreamAny;
+        self.change_op_mode.try_send(op_mode);
+        return Ok(TofResponse::Success(RESP_SUCC_FINGERS_CROSSED));
       },
       //TofCommand::DataRunStart (max_event) => {
       //  // let's start a run. The value of the TofCommnad shall be 
@@ -620,6 +661,7 @@ pub fn buff_handler(which       : &BlobBuffer,
                     bs_sender   : Option<&Sender<Vec<u8>>>,
                     prog_bar    : &Option<Box<ProgressBar>>,
                     switch_buff : bool) {
+  let sleep_after_reg_write = Duration::from_millis(SLEEP_AFTER_REG_WRITE as u64);
   let buff_size : u32;
   match get_buff_size(&which) {
     Ok(bf)   => { 
@@ -658,7 +700,7 @@ pub fn buff_handler(which       : &BlobBuffer,
       Some(bar) => bar.set_position(0),
       None      => () 
     }
-    thread::sleep_ms(SLEEP_AFTER_REG_WRITE);
+    thread::sleep(sleep_after_reg_write);
   } else { // endf has tripped
     match prog_bar {
       Some(bar) => bar.set_position(buff_size as u64),
@@ -700,10 +742,10 @@ pub fn buff_handler(which       : &BlobBuffer,
 ///
 ///  #Arguments
 /// 
-///  * bs_recv : A receiver for bytestreams. The 
-///              bytestream comes directly from 
-///              the data buffers.
-///
+///  * bs_recv   : A receiver for bytestreams. The 
+///                bytestream comes directly from 
+///                the data buffers.
+///  * ev_sender : Send the the payload to the event cache
 pub fn event_payload_worker(bs_recv   : &Receiver<Vec<u8>>,
                             ev_sender : Sender<RBEventPayload>) {
   let mut n_events : u32;

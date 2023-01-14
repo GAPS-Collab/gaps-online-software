@@ -28,14 +28,14 @@ vec_u8 TofPacket::to_bytestream() const
 
 /**************************************************/
 
-u16 TofPacket::from_bytestream(vec_u8& bytestream,
+u16 TofPacket::from_bytestream(vec_u8 &bytestream,
                                usize   start_pos)
-{
+{   usize pos = start_pos;
     u16 value = decode_ushort(bytestream, start_pos);
     if (!(value == head))
         {std::cerr << "[ERROR] no header found!" << std::endl;}
     head = value;
-    u16 pos = 2 + start_pos; // position in bytestream, 2 since we 
+    pos += 2; // position in bytestream, 2 since we 
     packet_type = bytestream[pos]; pos+=1;
     //std::cout << "found packet type : " << packet_type << std::endl;
     payload_size = decode_uint64_rev(bytestream, pos); pos+=8;

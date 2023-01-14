@@ -119,6 +119,19 @@ pub const RESP_ERR_NORUNACTIVE               : u32 = 501;
 pub const RESP_ERR_RUNACTIVE                 : u32 = 502;
 
 
+
+/// How to operate the readout Default mode is to request
+/// events from the MasterTrigger. However, we can also stream
+/// all the waveforms.
+/// CAVEAT: For the whole tof, this will cap the rate at 
+/// 112 Hz, because of the capacity of the switches.
+#[derive(Debug, PartialEq)]
+pub enum TofOperationMode {
+  TofModeRequestReply,
+  TofModeStreamAny
+}
+
+
 /// General command class for ALL commands to the 
 /// tof C&C instance and readout boards
 ///

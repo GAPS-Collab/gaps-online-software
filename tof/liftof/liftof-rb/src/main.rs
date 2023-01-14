@@ -33,11 +33,13 @@ use crate::memory::{BlobBuffer,
                     UIO1_MIN_OCCUPANCY,
                     UIO2_MIN_OCCUPANCY};
 use tof_dataclasses::threading::ThreadPool;
-use tof_dataclasses::packets::TofPacket;
+use tof_dataclasses::packets::{TofPacket,
+                               PacketType};
 use tof_dataclasses::packets::generic_packet::GenericPacket;
 use tof_dataclasses::events::blob::RBEventPayload;
 use tof_dataclasses::commands::{TofCommand,
-                                TofResponse};
+                                TofResponse,
+                                TofOperationMode};
 use tof_dataclasses::commands as cmd;
 use tof_dataclasses::monitoring as moni;
 use tof_dataclasses::serialization::Serialization;
@@ -441,7 +443,9 @@ fn main() {
   // + main thread, which does not need a 
   //   separate thread
   let mut n_threads = 5;
-  
+ 
+  let (set_op_mode, get_op_mode)     : 
+      (Sender<TofOperationMode>, Receiver<TofOperationMode>)                = unbounded();
   let (kill_run, run_gets_killed)    : (Sender<bool>, Receiver<bool>)       = unbounded();
   let (bs_send, bs_recv)             : (Sender<Vec<u8>>, Receiver<Vec<u8>>) = unbounded(); 
   let (moni_to_main, data_fr_moni)   : (Sender<Vec<u8>>, Receiver<Vec<u8>>) = unbounded(); 
@@ -560,10 +564,11 @@ fn main() {
   // - higher level threads first, then 
   // the more gnarly ones.
   workforce.execute(move || {
-                    event_cache(ev_pl_from_builder,
-                                ev_pl_to_cmdr,
-                                evid_from_cmdr,
-                                cache_size)
+                    event_cache_worker(ev_pl_from_builder,
+                                       ev_pl_to_cmdr,
+                                       get_op_mode, 
+                                       evid_from_cmdr,
+                                       cache_size)
   });
   workforce.execute(move || {
                     event_payload_worker(&bs_recv, ev_pl_to_cache);
@@ -643,9 +648,11 @@ fn main() {
   //info!("Current trigger rate: {rate}Hz");
   //let mut command  : cmd::TofCommand;
   let mut resp     : cmd::TofResponse;
+  let r_clone  = ev_pl_from_cache.clone();
   let executor = Commander::new(&data_socket,
                                 evid_to_cache,
-                                ev_pl_from_cache);
+                                r_clone,
+                                set_op_mode);
   let mut run_active = false;
   loop {
 
@@ -656,10 +663,38 @@ fn main() {
     match data_fr_moni.try_recv() { 
       Err(_) => (),
       Ok(payload)  => {
-        match data_socket.send(payload,zmq::DONTWAIT) {
+        // FIXME  - it should receive a moni
+        // packet, not the bytestream ?
+        let mut tp = TofPacket::new();
+        tp.packet_type  = PacketType::Monitor;
+        tp.payload      = payload;
+        let tp_payload  = tp.to_bytestream();
+    
+        // wrap the payload into the 
+        match data_socket.send(tp_payload,zmq::DONTWAIT) {
           Ok(_)  => debug!("Send payload over 0MQ PUB socket!"),
           Err(_) => warn!("Not able to send over 0MQ PUB socket!"),
         }
+      }  
+    }
+
+    // Send events if they are ready.
+    match ev_pl_from_cache.try_recv() {
+      Err(_) => (),
+      Ok(rbevent_op) => {
+        match (rbevent_op) {
+          None     => (),
+          Some(ev) =>{
+            let mut tp = TofPacket::new();
+            tp.packet_type  = PacketType::RBEvent;
+            tp.payload      = ev.payload;
+            let tp_payload  = tp.to_bytestream();
+            match data_socket.send(tp_payload,zmq::DONTWAIT) {
+              Ok(_)  => debug!("Send payload over 0MQ PUB socket!"),
+              Err(_) => warn!("Not able to send over 0MQ PUB socket!"),
+            }
+          }
+        }  
       }  
     }
     // if we are not listening to any

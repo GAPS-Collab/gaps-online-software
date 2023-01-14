@@ -30,6 +30,13 @@ use crate::errors::SerializationError;
 //use nom::number::complete::*;
 //use nom::bytes::complete::{tag, take, take_until};
 
+pub const PACKET_TYPE_UNKNOWN   : u8 =  0;
+pub const PACKET_TYPE_COMMAND   : u8 = 10;
+pub const PACKET_TYPE_RBEVENT   : u8 = 20;
+pub const PACKET_TYPE_MONITOR   : u8 = 30;
+pub const PACKET_TYPE_HEARTBEAT : u8 = 40;
+pub const PACKET_TYPE_SCALAR    : u8 = 50;
+
 #[derive(Debug, PartialEq)]
 //#[repr(u8)]
 pub enum PacketType {
@@ -44,12 +51,12 @@ pub enum PacketType {
 impl PacketType {
   pub fn as_u8(packet_type : &PacketType)   -> u8 {
     match packet_type {
-      PacketType::Unknown   => 0,
-      PacketType::Command   => 10,
-      PacketType::RBEvent   => 20,
-      PacketType::Monitor   => 30,
-      PacketType::HeartBeat => 40,
-      PacketType::Scalar    => 50
+      PacketType::Unknown   => PACKET_TYPE_UNKNOWN,
+      PacketType::Command   => PACKET_TYPE_COMMAND,
+      PacketType::RBEvent   => PACKET_TYPE_RBEVENT,
+      PacketType::Monitor   => PACKET_TYPE_MONITOR,
+      PacketType::HeartBeat => PACKET_TYPE_HEARTBEAT,
+      PacketType::Scalar    => PACKET_TYPE_SCALAR
     }
 
   }
@@ -109,7 +116,7 @@ impl TofPacket {
     bytestream.push(p_type);
     let payload_len = self.payload.len() as u64;
     let foo = &payload_len.to_le_bytes();
-    println!("{foo:?}");
+    debug!("TofPacket binary payload: {foo:?}");
     bytestream.extend_from_slice(&payload_len.to_le_bytes());
     bytestream.extend_from_slice(self.payload.as_slice());
     bytestream.extend_from_slice(&TofPacket::TAIL.to_le_bytes());
