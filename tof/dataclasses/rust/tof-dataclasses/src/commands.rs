@@ -77,9 +77,12 @@ pub const CMD_TCALIB              : u8 = 52;
 /// command code for "Create a new calibration file"
 pub const CMD_CREATECALIBF        : u8 = 53;   
 
-// FIXME - these commands need to be implemented
-/// NEEDTOIMPLEMENT: command code for "Send the whole event cache over the wire"
+/// command code for "Send the whole event cache over the wire"
 pub const CMD_UNSPOOL_EVENT_CACHE : u8 = 44;
+
+/// command code for "Operate in a mode, where we stream any event 
+/// (not only those which are requested)"
+pub const CMD_STREAM_ANY_EVENT    : u8 = 45;
 // Specific response codes
 // These are long (4 bytes) but 
 // this allows to convey more information
@@ -132,6 +135,8 @@ pub enum TofCommand {
   SetMtConfig(u32),
   StartValidationRun,
   RequestWaveforms(u32),
+  UnspoolEventCache(u32),
+  StreamAnyEvent(u32),
   /// Start a new run, the argument being the number 
   /// of events.
   DataRunStart(u32), 
@@ -271,22 +276,24 @@ impl TofCommand {
   
   pub fn from_command_code(cc : u8, value : u32) -> TofCommand {
     match cc {
-      CMD_POFF               => TofCommand::PowerOff             (value) ,        
-      CMD_PON                => TofCommand::PowerOn              (value) ,       
-      CMD_PCYCLE             => TofCommand::PowerCycle           (value) ,        
-      CMD_RBSETUP            => TofCommand::RBSetup              (value) ,         
-      CMD_SETTHRESHOLD       => TofCommand::SetThresholds        (value) ,         
-      CMD_SETMTCONFIG        => TofCommand::SetMtConfig          (value) ,        
-      CMD_DATARUNSTART       => TofCommand::DataRunStart         (value) ,  
-      CMD_DATARUNSTOP        => TofCommand::DataRunEnd            ,    
-      CMD_STARTVALIDATIONRUN => TofCommand::StartValidationRun    ,         
-      CMD_GETFULLWAVEFORMS   => TofCommand::RequestWaveforms     (value) ,      
-      CMD_REQEUESTEVENT      => TofCommand::RequestEvent         (value) , 
-      CMS_REQUESTMONI        => TofCommand::RequestMoni           ,
-      CMD_VCALIB             => TofCommand::VoltageCalibration    ,       
-      CMD_TCALIB             => TofCommand::TimingCalibration     ,      
-      CMD_CREATECALIBF       => TofCommand::CreateCalibrationFile ,   
-      _                      => TofCommand::Unknown               , 
+      CMD_POFF                => TofCommand::PowerOff             (value) ,        
+      CMD_PON                 => TofCommand::PowerOn              (value) ,       
+      CMD_PCYCLE              => TofCommand::PowerCycle           (value) ,        
+      CMD_RBSETUP             => TofCommand::RBSetup              (value) ,         
+      CMD_SETTHRESHOLD        => TofCommand::SetThresholds        (value) ,         
+      CMD_SETMTCONFIG         => TofCommand::SetMtConfig          (value) ,        
+      CMD_DATARUNSTART        => TofCommand::DataRunStart         (value) ,  
+      CMD_DATARUNSTOP         => TofCommand::DataRunEnd            ,    
+      CMD_STARTVALIDATIONRUN  => TofCommand::StartValidationRun    ,         
+      CMD_GETFULLWAVEFORMS    => TofCommand::RequestWaveforms     (value) ,      
+      CMD_REQEUESTEVENT       => TofCommand::RequestEvent         (value) , 
+      CMS_REQUESTMONI         => TofCommand::RequestMoni           ,
+      CMD_VCALIB              => TofCommand::VoltageCalibration    ,       
+      CMD_TCALIB              => TofCommand::TimingCalibration     ,      
+      CMD_CREATECALIBF        => TofCommand::CreateCalibrationFile ,   
+      CMD_UNSPOOL_EVENT_CACHE => TofCommand::UnspoolEventCache    (value) ,
+      CMD_STREAM_ANY_EVENT    => TofCommand::StreamAnyEvent       (value) ,
+      _                       => TofCommand::Unknown               , 
     }
   }
     
@@ -306,7 +313,9 @@ impl TofCommand {
       TofCommand::RequestMoni              => Some(CMS_REQUESTMONI       ), 
       TofCommand::VoltageCalibration       => Some(CMD_VCALIB            ),       
       TofCommand::TimingCalibration        => Some(CMD_TCALIB            ),      
-      TofCommand::CreateCalibrationFile    => Some(CMD_CREATECALIBF      ),   
+      TofCommand::CreateCalibrationFile    => Some(CMD_CREATECALIBF      ),
+      TofCommand::UnspoolEventCache (_)    => Some(CMD_UNSPOOL_EVENT_CACHE) ,
+      TofCommand::StreamAnyEvent    (_)    => Some(CMD_STREAM_ANY_EVENT) ,
       TofCommand::Unknown                  => None                  , 
     }
   }
@@ -338,22 +347,24 @@ impl From<(u8, u32)> for TofCommand {
     let (input, value) = pair;
     trace!("Got in input {:?}", pair);
     match input {
-      CMD_POFF               => TofCommand::PowerOff             (value) ,        
-      CMD_PON                => TofCommand::PowerOn              (value) ,       
-      CMD_PCYCLE             => TofCommand::PowerCycle           (value) ,        
-      CMD_RBSETUP            => TofCommand::RBSetup              (value) ,         
-      CMD_SETTHRESHOLD       => TofCommand::SetThresholds        (value) ,         
-      CMD_SETMTCONFIG        => TofCommand::SetMtConfig          (value) ,        
-      CMD_DATARUNSTOP        => TofCommand::DataRunEnd            ,  
-      CMD_DATARUNSTART       => TofCommand::DataRunStart         (value) ,    
-      CMD_STARTVALIDATIONRUN => TofCommand::StartValidationRun    ,         
-      CMD_GETFULLWAVEFORMS   => TofCommand::RequestWaveforms     (value) ,      
-      CMD_REQEUESTEVENT      => TofCommand::RequestEvent         (value) , 
-      CMS_REQUESTMONI        => TofCommand::RequestMoni           ,
-      CMD_VCALIB             => TofCommand::VoltageCalibration    ,       
-      CMD_TCALIB             => TofCommand::TimingCalibration     ,      
-      CMD_CREATECALIBF       => TofCommand::CreateCalibrationFile ,   
-      _                      => TofCommand::Unknown               , 
+      CMD_POFF                => TofCommand::PowerOff             (value) ,        
+      CMD_PON                 => TofCommand::PowerOn              (value) ,       
+      CMD_PCYCLE              => TofCommand::PowerCycle           (value) ,        
+      CMD_RBSETUP             => TofCommand::RBSetup              (value) ,         
+      CMD_SETTHRESHOLD        => TofCommand::SetThresholds        (value) ,         
+      CMD_SETMTCONFIG         => TofCommand::SetMtConfig          (value) ,        
+      CMD_DATARUNSTOP         => TofCommand::DataRunEnd            ,  
+      CMD_DATARUNSTART        => TofCommand::DataRunStart         (value) ,    
+      CMD_STARTVALIDATIONRUN  => TofCommand::StartValidationRun    ,         
+      CMD_GETFULLWAVEFORMS    => TofCommand::RequestWaveforms     (value) ,      
+      CMD_REQEUESTEVENT       => TofCommand::RequestEvent         (value) , 
+      CMS_REQUESTMONI         => TofCommand::RequestMoni           ,
+      CMD_VCALIB              => TofCommand::VoltageCalibration    ,       
+      CMD_TCALIB              => TofCommand::TimingCalibration     ,      
+      CMD_CREATECALIBF        => TofCommand::CreateCalibrationFile ,   
+      CMD_UNSPOOL_EVENT_CACHE => TofCommand::UnspoolEventCache   (value) ,
+      CMD_STREAM_ANY_EVENT    => TofCommand::StreamAnyEvent      (value) ,
+      _                       => TofCommand::Unknown               , 
     }
   }
 }

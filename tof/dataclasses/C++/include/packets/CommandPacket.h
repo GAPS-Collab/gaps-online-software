@@ -10,6 +10,10 @@
  * individual RB.
  *
  * We set individual command codes
+ * 
+ * THE COMMAND CODES MUST BE THE 
+ * "OFFICAL" COMMAND CODES!
+ * Please see the documentation!
  *
  */
 enum class TofCommand {
@@ -29,6 +33,8 @@ enum class TofCommand {
   RequestWaveforms      = 41,
   RequestEvent          = 42,
   RequestMoni           = 43,
+  UnspoolEventCache     = 44,
+  StreamAnyEvent        = 45, 
   // calibration class 5
   VoltageCalibration    = 51,
   TimingCalibration     = 52,

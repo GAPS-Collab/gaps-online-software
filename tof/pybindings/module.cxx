@@ -100,6 +100,8 @@ std::string tof_command_to_str(const TofCommand &cmd) {
    case TofCommand::CreateCalibrationFile : {return "CreateCalibrationFile";}
    case TofCommand::RequestEvent          : {return "RequestEvent"         ;}
    case TofCommand::RequestMoni           : {return "RequestMoni"          ;}
+   case TofCommand::UnspoolEventCache     : {return "UnspoolEventCahce"    ;}
+   case TofCommand::StreamAnyEvent        : {return "StreamAnyEvent"       ;} 
    case TofCommand::Unknown               : {return "Unknown"              ;}
  } // end case   
  return "Unknown";
@@ -401,7 +403,9 @@ PYBIND11_MODULE(gaps_tof, m) {
       .value("TimingCalibration"    ,TofCommand::TimingCalibration)
       .value("CreateCalibrationFile",TofCommand::CreateCalibrationFile) 
       .value("RequestEvent"         ,TofCommand::RequestEvent) 
-      .value("RequestMoni"          ,TofCommand::RequestMoni) 
+      .value("RequestMoni"          ,TofCommand::RequestMoni)
+      .value("UnspoolEventCache"    ,TofCommand::UnspoolEventCache)
+      .value("StreamAnyEvent"       ,TofCommand::StreamAnyEvent) 
       .value("Unknown"              ,TofCommand::Unknown) 
       .export_values();
 
