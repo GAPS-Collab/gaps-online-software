@@ -14,7 +14,7 @@ use crossbeam_channel::{unbounded,
 //           sync::mpsc::channel};
 //
 
-use std::borrow::BorrowMut;
+//use std::borrow::BorrowMut;
 use std::net::IpAddr;
 
 use indicatif::{MultiProgress,
@@ -23,7 +23,7 @@ use indicatif::{MultiProgress,
 
 use local_ip_address::local_ip;
 
-use std::collections::HashMap;
+//use std::collections::HashMap;
 
 use crate::api::*;
 use crate::control::*;
@@ -43,7 +43,7 @@ use tof_dataclasses::commands::{TofCommand,
 use tof_dataclasses::commands as cmd;
 use tof_dataclasses::monitoring as moni;
 use tof_dataclasses::serialization::Serialization;
-use liftof_lib::misc::*;
+//use liftof_lib::misc::*;
 
 extern crate clap;
 use clap::{arg,
@@ -682,7 +682,7 @@ fn main() {
     match ev_pl_from_cache.try_recv() {
       Err(_) => (),
       Ok(rbevent_op) => {
-        match (rbevent_op) {
+        match rbevent_op {
           None     => (),
           Some(ev) =>{
             let mut tp = TofPacket::new();
@@ -778,7 +778,7 @@ fn main() {
               cmd_socket.send(result.unwrap().to_bytestream(),0);
             }
           },
-          TofCommand::DataRunEnd   => {
+          TofCommand::DataRunEnd (_)  => {
             if !run_active {
               warn!("Can not kill run, since there is currently none in progress!");
               result = Ok(TofResponse::GeneralFail(cmd::RESP_ERR_NORUNACTIVE));

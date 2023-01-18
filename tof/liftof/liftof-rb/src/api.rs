@@ -8,8 +8,8 @@ use crossbeam_channel::{Sender,
                         Receiver};
 
 // just for fun
-use indicatif::{ProgressBar,
-                ProgressStyle};
+use indicatif::ProgressBar;
+//use indicatif::ProgressStyle;
 
 use crate::control::*;
 use crate::memory::*;
@@ -21,7 +21,7 @@ use tof_dataclasses::serialization::search_for_u16;
 use tof_dataclasses::commands::{TofCommand,
                                 TofResponse,
                                 TofOperationMode};
-use tof_dataclasses::threading::ThreadPool;
+//use tof_dataclasses::threading::ThreadPool;
 
 use time::Duration;
  
@@ -426,7 +426,7 @@ pub fn event_cache_worker(recv_ev_pl  : Receiver<RBEventPayload>,
   
     // if we are in "stream_any" mode, we don't need to take care
     // of any fo the response/request.
-    if (op_mode_stream) {
+    if op_mode_stream {
       //event_cache.as_ref().into_iter().map(|(evid, payload)| {send_ev_pl.try_send(Some(payload))});
       //let evids = event_cache.keys();
       for payload in event_cache.values() {
@@ -526,7 +526,7 @@ impl Commander<'_> {
         warn!("Not implemented");
         return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
       },
-      TofCommand::StartValidationRun => {
+      TofCommand::StartValidationRun  (_) => {
         warn!("Not implemented");
         return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
       },
@@ -534,11 +534,16 @@ impl Commander<'_> {
         warn!("Not implemented");
         return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
       },
-      TofCommand::UnspoolEventCache (_) => {
+      TofCommand::UnspoolEventCache   (_) => {
         warn!("Not implemented");
         return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
       },
-      TofCommand::StreamAnyEvent (_) => {
+      TofCommand::StreamOnlyRequested (_) => {
+        let op_mode = TofOperationMode::TofModeRequestReply;
+        self.change_op_mode.try_send(op_mode);
+        return Ok(TofResponse::Success(RESP_SUCC_FINGERS_CROSSED));
+      },
+      TofCommand::StreamAnyEvent      (_) => {
         let op_mode = TofOperationMode::TofModeStreamAny;
         self.change_op_mode.try_send(op_mode);
         return Ok(TofResponse::Success(RESP_SUCC_FINGERS_CROSSED));
@@ -563,15 +568,15 @@ impl Commander<'_> {
       //  self.kill_chn.send(true);
       //  return Ok(TofResponse::Success(RESP_SUCC_FINGERS_CROSSED));
       //},
-      TofCommand::VoltageCalibration => {
+      TofCommand::VoltageCalibration (_) => {
         warn!("Not implemented");
         return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
       },
-      TofCommand::TimingCalibration => {
+      TofCommand::TimingCalibration  (_) => {
         warn!("Not implemented");
         return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
       },
-      TofCommand::CreateCalibrationFile => {
+      TofCommand::CreateCalibrationFile (_) => {
         warn!("Not implemented");
         return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
       },
@@ -608,9 +613,9 @@ impl Commander<'_> {
           }
         }
       },
-      TofCommand::RequestMoni => {
+      TofCommand::RequestMoni (_) => {
       },
-      TofCommand::Unknown => {
+      TofCommand::Unknown (_) => {
       }
       _ => {
       }
