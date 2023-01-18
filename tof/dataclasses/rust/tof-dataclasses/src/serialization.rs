@@ -16,6 +16,15 @@ pub trait Serialization {
     -> Result<Self, SerializationError>
     where Self : Sized;
 
+  fn from_slice(slice     : &[u8],
+                start_pos : usize)
+    -> Result<Self, SerializationError>
+    where Self : Sized {
+    println!("There can't be a default implementation for this trait!");
+    todo!();
+    }
+ 
+  
   //pub fn to_bytestream(&self, &
 
   /////! Add the payload of the serializable to the pre allocated bytestream

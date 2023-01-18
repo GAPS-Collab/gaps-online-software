@@ -106,14 +106,14 @@ impl PacketType {
 /// A type and a payload. This wraps
 /// all other packets.
 ///
+/// Format when in bytestream
+/// HEAD : u16
+/// TYPE : u8
+/// PAYLOAD_SIZE : u64
+/// PYALOAD : [u8;PAYLOAD_SIZE]
+/// TAIL : u16
 ///
-///  HEAD : u16
-///  TYPE : u8
-///  PAYLOAD_SIZE : u64
-///  PYALOAD : [u8;PAYLOAD_SIZE]
-///  TAIL : u16
-///
-///  => Fixed size is 13
+/// => Fixed size is 13
 ///
 #[derive(Debug, PartialEq, Clone)]
 pub struct TofPacket {
@@ -121,7 +121,15 @@ pub struct TofPacket {
   pub payload     : Vec<u8>
 }
 
-//fn nom_deserialize_tp(
+
+impl Default for TofPacket {
+  fn default() -> TofPacket {
+    TofPacket {
+      packet_type : PacketType::Unknown,
+      payload     : Vec::<u8>::new(),
+    }
+  }
+}
 
 impl TofPacket {
 
@@ -159,8 +167,6 @@ impl TofPacket {
 
 }
 
-//impl Default for TofPacket {
-//}
 
 impl Serialization for TofPacket {
   fn from_bytestream(stream : &Vec<u8>, start_pos : usize)
@@ -190,11 +196,11 @@ impl Serialization for TofPacket {
                        stream[pos+5],
                        stream[pos+6],
                        stream[pos+7]];
-    println!("{eight_bytes:?}");
+    //println!("{eight_bytes:?}");
     let payload_size = u64::from_le_bytes(eight_bytes);
-    println!("{payload_size}");
+    //println!("{payload_size}");
     pos += 8;
-    println!("{pos}");
+    //println!("{pos}");
     two_bytes = [stream[pos + payload_size as usize], stream[pos + 1 + payload_size as usize]];
     if TofPacket::TAIL != u16::from_le_bytes(two_bytes) {
       warn!("Packet does not end with TAIL signature");
@@ -202,7 +208,8 @@ impl Serialization for TofPacket {
     }
     let mut payload = Vec::<u8>::with_capacity(payload_size as usize);
     payload.extend_from_slice(&stream[pos..pos+payload_size as usize]);
-    println!("PAYLOAD: {payload:?}");
+    //println!("PAYLOAD: {payload:?}");
+    //trace!("TofPacket with Payload {payload:?}"
     Ok(TofPacket {
       packet_type,
       payload

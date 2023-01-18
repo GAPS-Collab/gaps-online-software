@@ -29,26 +29,27 @@ vec_u8 TofPacket::to_bytestream() const
 /**************************************************/
 
 u16 TofPacket::from_bytestream(vec_u8 &bytestream,
-                               usize   start_pos)
-{   usize pos = start_pos;
-    u16 value = decode_ushort(bytestream, start_pos);
-    if (!(value == head))
-        {std::cerr << "[ERROR] no header found!" << std::endl;}
-    head = value;
-    pos += 2; // position in bytestream, 2 since we 
-    packet_type = bytestream[pos]; pos+=1;
-    std::cout << "found packet type : " << packet_type << std::endl;
-    //payload_size = decode_uint64_rev(bytestream, pos); pos+=8;
-    payload_size = u64_from_le_bytes(bytestream, pos); pos +=8;
-    std::cout << "found payload size " << payload_size << std::endl;
-    //size_t payload_end = pos + bytestream.size() - 2;
-    usize payload_end = pos + payload_size;
-    std::cout << " found payload end " << payload_end << std::endl;
-    vec_u8 packet_bytestream(bytestream.begin()+ pos,
-                             bytestream.begin()+ payload_end)  ;
-    payload = packet_bytestream;
-    tail = decode_ushort(bytestream, pos); pos +=2;
-    return pos;
+                               usize   start_pos){ 
+  usize pos = start_pos;
+  u16 value = decode_ushort(bytestream, start_pos);
+  if (!(value == head))
+      {std::cerr << "[ERROR] no header found!" << std::endl;}
+  head = value;
+  pos += 2; // position in bytestream, 2 since we 
+  packet_type = bytestream[pos]; pos+=1;
+  //std::cout << "found packet type : " << packet_type << std::endl;
+  payload_size = decode_uint64_rev(bytestream, pos); pos+=8;
+  //std::cout << "found payload size " << payload_size << std::endl;
+  //size_t payload_end = pos + bytestream.size() - 2;
+  usize payload_end = pos + payload_size;
+  //std::cout << " found payload end " << payload_end << std::endl;
+  vec_u8 packet_bytestream(bytestream.begin()+ pos,
+                           bytestream.begin()+ payload_end)  ;
+  payload = packet_bytestream;
+  tail = decode_ushort(bytestream, pos); pos +=2;
+  if (!(tail != 0x5555))
+    {std::cerr << "[ERROR] Tail wrong!" << std::endl;}
+  return pos;
 }
 
 /**************************************************/

@@ -71,6 +71,18 @@ pub const CMD_UNSPOOL_EVENT_CACHE : u8 = 44;
 pub const CMD_STREAM_ANY_EVENT         : u8 = 45;
 /// command code for "Stream only events which are explicitly requested"
 pub const CMD_STREAM_ONLY_REQUESTED    : u8 = 46;
+/// command code for setting the size of the rb buffers.
+/// technically, this does not change the size, but sets 
+/// a different value for trip
+pub const CMD_SET_RB_DATABUF_SIZE      : u8 = 23;
+/// command code for enable the forced trigger mode
+/// on the RBs
+pub const CMD_EN_TRIGGERMODE_FORCED    : u8 = 24;
+/// command code to disable the forced trigger mode 
+/// on the RBs
+pub const CMD_DIS_TRIGGERMODE_FORCED   : u8 = 25;
+
+
 // Specific response codes
 // These are long (4 bytes) but 
 // this allows to convey more information
@@ -150,25 +162,47 @@ pub enum TofCommand {
   /// over the data wire. The argument being the event id.
   RequestEvent            (u32),
   RequestMoni             (u32),
+  /// Set RB buffer trip value
+  SetRBBuffTrip           (u32),
+  /// Switch forced trigger mode ON (RB)
+  SetRBForcedTrigModeOn   (u32),
+  /// Switch forced trigger mode OFF (RB)
+  SetRBForcedTrigModeOff  (u32),
   Unknown                 (u32),
 }
 
 impl fmt::Display for TofCommand {
-  // This trait requires `fmt` with this exact signature.
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    // Write strictly the first element into the supplied output
-    // stream: `f`. Returns `fmt::Result` which indicates whether the
-    // operation succeeded or failed. Note that `write!` uses syntax which
-    // is very similar to `println!`.
-    write!(f, "TofCommand")
+    let cmd = self.to_str();
+    //let arg = 
+    write!(f, "<TofCommand {}>", cmd)
   }
 }
 
+impl Default for TofCommand {
+  fn default() -> TofCommand {
+    TofCommand::Unknown(0)
+  }
+}
 
 impl TofCommand { 
+  const HEAD : u16 = 0xAAAA;
+  const TAIL : u16 = 0x5555;
+  ///// The size of TofCommand when 
+  ///// in byte representation is 
+  ///// fixed:
+  ///// it is 4 bytes (header/footer)
+  ///// + 1 byte command code
+  ///// + 4 bytes value
+  ///// => 9 bytes
+  //const SIZE : usize = 9; 
 
-  pub fn to_string(&self) -> String {
-    
+
+  /// String representation of the enum
+  ///
+  /// This is basically the enum type as 
+  /// a string.
+  pub fn to_str(&self) -> String { 
     match self {
       TofCommand::PowerOn                 (_) => {return String::from("PowerOn");},
       TofCommand::PowerOff                (_) => {return String::from("PowerOff");},
@@ -188,41 +222,45 @@ impl TofCommand {
       TofCommand::CreateCalibrationFile   (_) => {return String::from("CreateCalibrationFile");},
       TofCommand::RequestEvent            (_) => {return String::from("RequestEvent");},
       TofCommand::RequestMoni             (_) => {return String::from("RequestMoni");},
+      TofCommand::SetRBBuffTrip           (_) => {return String::from("SetRBBuffTrip");},
+      TofCommand::SetRBForcedTrigModeOn   (_) => {return String::from("SetRBForcedTrigModeOn");},
+      TofCommand::SetRBForcedTrigModeOff  (_) => {return String::from("SetRBForcedTrigModeOff");}
       TofCommand::Unknown                 (_) => {return String::from("Unknown");},
       //_                                      => {return String::from("_");}
     }
   }
-} 
+  
 
-impl TofCommand {
-  
-  const HEAD : u16 = 0xAAAA;
-  const TAIL : u16 = 0x5555;
-  
+  /// Generate a TofCommand from the specific bytecode
+  /// representation
   pub fn from_command_code(cc : u8, value : u32) -> TofCommand {
     match cc {
-      CMD_POFF                => TofCommand::PowerOff             (value) ,        
-      CMD_PON                 => TofCommand::PowerOn              (value) ,       
-      CMD_PCYCLE              => TofCommand::PowerCycle           (value) ,        
-      CMD_RBSETUP             => TofCommand::RBSetup              (value) ,         
-      CMD_SETTHRESHOLD        => TofCommand::SetThresholds        (value) ,         
-      CMD_SETMTCONFIG         => TofCommand::SetMtConfig          (value) ,        
-      CMD_DATARUNSTART        => TofCommand::DataRunStart         (value) ,  
-      CMD_DATARUNSTOP         => TofCommand::DataRunEnd           (value) ,    
-      CMD_STARTVALIDATIONRUN  => TofCommand::StartValidationRun   (value) ,         
-      CMD_GETFULLWAVEFORMS    => TofCommand::RequestWaveforms     (value) ,      
-      CMD_REQEUESTEVENT       => TofCommand::RequestEvent         (value) , 
-      CMS_REQUESTMONI         => TofCommand::RequestMoni          (value) ,
-      CMD_VCALIB              => TofCommand::VoltageCalibration   (value) ,       
-      CMD_TCALIB              => TofCommand::TimingCalibration    (value) ,      
-      CMD_CREATECALIBF        => TofCommand::CreateCalibrationFile(value) ,   
-      CMD_UNSPOOL_EVENT_CACHE => TofCommand::UnspoolEventCache    (value) ,
-      CMD_STREAM_ANY_EVENT    => TofCommand::StreamAnyEvent       (value) ,
-      CMD_STREAM_ONLY_REQUESTED => TofCommand::StreamOnlyRequested(value) ,
-      _                       => TofCommand::Unknown              (value) , 
+      CMD_POFF                   => TofCommand::PowerOff             (value),        
+      CMD_PON                    => TofCommand::PowerOn              (value),       
+      CMD_PCYCLE                 => TofCommand::PowerCycle           (value),        
+      CMD_RBSETUP                => TofCommand::RBSetup              (value),         
+      CMD_SETTHRESHOLD           => TofCommand::SetThresholds        (value),         
+      CMD_SETMTCONFIG            => TofCommand::SetMtConfig          (value),        
+      CMD_DATARUNSTART           => TofCommand::DataRunStart         (value),  
+      CMD_DATARUNSTOP            => TofCommand::DataRunEnd           (value),    
+      CMD_STARTVALIDATIONRUN     => TofCommand::StartValidationRun   (value),         
+      CMD_GETFULLWAVEFORMS       => TofCommand::RequestWaveforms     (value),      
+      CMD_REQEUESTEVENT          => TofCommand::RequestEvent         (value), 
+      CMS_REQUESTMONI            => TofCommand::RequestMoni          (value),
+      CMD_VCALIB                 => TofCommand::VoltageCalibration   (value),       
+      CMD_TCALIB                 => TofCommand::TimingCalibration    (value),      
+      CMD_CREATECALIBF           => TofCommand::CreateCalibrationFile(value),   
+      CMD_UNSPOOL_EVENT_CACHE    => TofCommand::UnspoolEventCache    (value),
+      CMD_STREAM_ANY_EVENT       => TofCommand::StreamAnyEvent       (value),
+      CMD_STREAM_ONLY_REQUESTED  => TofCommand::StreamOnlyRequested  (value),
+      CMD_SET_RB_DATABUF_SIZE    => TofCommand::SetRBBuffTrip        (value),
+      CMD_EN_TRIGGERMODE_FORCED  => TofCommand::SetRBForcedTrigModeOn(value),
+      CMD_DIS_TRIGGERMODE_FORCED => TofCommand::SetRBForcedTrigModeOff(value),
+      _                          => TofCommand::Unknown              (value), 
     }
   }
     
+  /// Translate a TofCommand into its specific byte representation
   pub fn to_command_code(cmd : &TofCommand) -> Option<u8> {
     match cmd {
       TofCommand::PowerOff      (_)        => Some(CMD_POFF              ),        
@@ -232,18 +270,21 @@ impl TofCommand {
       TofCommand::SetThresholds (_)        => Some(CMD_SETTHRESHOLD      ),         
       TofCommand::SetMtConfig   (_)        => Some(CMD_SETMTCONFIG       ),        
       TofCommand::DataRunStart  (_)        => Some(CMD_DATARUNSTART       ),  
-      TofCommand::DataRunEnd    (_)        => Some(CMD_DATARUNSTOP      ),    
+      TofCommand::DataRunEnd    (_)        => Some(CMD_DATARUNSTOP        ),    
       TofCommand::StartValidationRun   (_) => Some(CMD_STARTVALIDATIONRUN),         
       TofCommand::RequestWaveforms (_)     => Some(CMD_GETFULLWAVEFORMS  ),      
       TofCommand::RequestEvent     (_)     => Some(CMD_REQEUESTEVENT     ), 
       TofCommand::RequestMoni      (_)     => Some(CMS_REQUESTMONI       ), 
       TofCommand::VoltageCalibration  (_)  => Some(CMD_VCALIB            ),       
       TofCommand::TimingCalibration   (_)  => Some(CMD_TCALIB            ),      
-      TofCommand::CreateCalibrationFile  (_) => Some(CMD_CREATECALIBF      ),
-      TofCommand::UnspoolEventCache      (_) => Some(CMD_UNSPOOL_EVENT_CACHE) ,
-      TofCommand::StreamAnyEvent         (_) => Some(CMD_STREAM_ANY_EVENT) ,
+      TofCommand::CreateCalibrationFile  (_) => Some(CMD_CREATECALIBF      )    ,
+      TofCommand::UnspoolEventCache      (_) => Some(CMD_UNSPOOL_EVENT_CACHE)   ,
+      TofCommand::StreamAnyEvent         (_) => Some(CMD_STREAM_ANY_EVENT)      ,
       TofCommand::StreamOnlyRequested    (_) => Some(CMD_STREAM_ONLY_REQUESTED) ,
-      TofCommand::Unknown                (_) => None                  , 
+      TofCommand::SetRBBuffTrip          (_) => Some(CMD_SET_RB_DATABUF_SIZE)   ,
+      TofCommand::SetRBForcedTrigModeOn  (_) => Some(CMD_EN_TRIGGERMODE_FORCED) ,
+      TofCommand::SetRBForcedTrigModeOff (_) => Some(CMD_DIS_TRIGGERMODE_FORCED),
+      TofCommand::Unknown                (_) => None                            , 
     }
   }
 
@@ -271,6 +312,11 @@ impl TofCommand {
 } // end impl TofCommand
 
 impl From<(u8, u32)> for TofCommand {
+  
+  /// Generate a TofCommand from a pair of code, value
+  ///
+  /// The first argument must be the command code, the 
+  /// second the specific value of the command.
   fn from(pair : (u8, u32)) -> TofCommand {
     let (input, value) = pair;
     trace!("Got in input {:?}", pair);

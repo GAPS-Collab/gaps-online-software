@@ -39,14 +39,14 @@ pub struct Calibrations
 }
 
 impl Default for Calibrations {
-    fn default() -> Calibrations {
-        Calibrations {
-           v_offsets : [0.0;NWORDS],
-           v_dips    : [0.0;NWORDS],
-           v_inc     : [0.0;NWORDS],
-           tbin      : [0.0;NWORDS]
-        }
+  fn default() -> Calibrations {
+    Calibrations {
+      v_offsets : [0.0;NWORDS],
+      v_dips    : [0.0;NWORDS],
+      v_inc     : [0.0;NWORDS],
+      tbin      : [0.0;NWORDS]
     }
+  }
 }
 
 /***********************************/
