@@ -1,0 +1,649 @@
+//! This follows the example for the pet database.
+//!
+//! The idea is to have a separate, hearbeat style
+//! thread which either processes user input or
+//! triggers the app to move on.
+//!
+//!
+//!
+//!
+//!
+//!
+
+mod tab_commands;
+mod menu;
+
+use chrono::prelude::*;
+use thiserror::Error;
+
+use std::collections::VecDeque;
+
+extern crate pretty_env_logger;
+#[macro_use] extern crate log;
+
+
+use std::sync::mpsc;
+use std::thread;
+
+use std::time::{Duration, Instant};
+
+use tui_logger::TuiLoggerWidget;
+
+use std::io;
+use crossterm::{
+    event::{self, Event as CEvent, KeyCode},
+    terminal::{disable_raw_mode, enable_raw_mode},
+};
+
+extern crate crossbeam_channel;
+use crossbeam_channel::{unbounded,
+                        Sender,
+                        Receiver};
+
+
+use tui::{
+    symbols,
+    backend::CrosstermBackend,
+    layout::{Alignment, Constraint, Direction, Layout, Rect},
+    terminal::Frame,
+    style::{Color, Modifier, Style},
+    text::{Span, Spans, Text},
+    widgets::{
+        Block, Dataset, Axis, GraphType, BorderType, Chart, Borders, Cell, List, ListItem, ListState, Paragraph, Row, Table, Tabs,    },
+    Terminal,
+};
+
+// system inforamtion
+use sysinfo::{NetworkExt, NetworksExt, ProcessExt, System, SystemExt};
+
+
+use tof_dataclasses::commands::TofCommand;
+use tof_dataclasses::packets::{TofPacket, PacketType};
+use tof_dataclasses::serialization::Serialization;
+use tof_dataclasses::threading::ThreadPool;
+
+
+use crate::tab_commands::CommandTab;
+use crate::menu::{MenuItem, Menu};
+
+
+// keep at max this amount of tof packets
+const STREAM_CACHE_MAX_SIZE : usize = 10;
+
+
+enum Event<I> {
+    Input(I),
+    Tick,
+}
+
+//#[derive(Serialize, Deserialize, Clone)]
+#[derive(Debug, Clone)]
+struct ReadoutBoard {
+  pub id: usize,
+  pub name: String,
+  //category: String,
+  //age: usize,
+  //created_at: DateTime<Utc>,
+}
+
+impl ReadoutBoard {
+  fn new() -> ReadoutBoard {
+    ReadoutBoard {
+      id   : 0,
+      name : String::from("ReadoutBoard")
+    }
+  }
+}
+
+
+/// Receive the data stream and forward 
+/// it to a widget
+fn receive_stream(tp_to_main : Sender<TofPacket>) {
+      
+  let ctx = zmq::Context::new();   
+  let mut address_ip = String::from("tcp://127.0.0.1");
+  let data_port : u32 = 40000;
+  let data_address : String = address_ip + ":" + &data_port.to_string();
+  let data_socket = ctx.socket(zmq::SUB).expect("Unable to create 0MQ SUB socket!");
+  data_socket.connect(&data_address);
+  info!("0MQ SUB socket connected to address {data_address}");
+  let topic = b"";
+  data_socket.set_subscribe(topic);
+  let recv_rate = Duration::from_millis(5);
+
+  loop {
+    // reduce the heat and take it easy
+    //thread::sleep(recv_rate);
+    match data_socket.recv_bytes(zmq::DONTWAIT) {
+      Err(err) => trace!("[zmq] Nothing to receive/err {err}"),
+      Ok(msg)  => {
+        info!("[zmq] SUB - got msg of size {}", msg.len());
+        let packet = TofPacket::from_bytestream(&msg, 0);
+        match packet {
+          Err(err) => { 
+            warn!("Can't unpack packet!");
+          },
+          Ok(pk) => {
+            match tp_to_main.try_send(pk) {
+              Err(err) => warn!("Can't send packet!"),
+              Ok(_)    => info!("Done"),
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+
+/// Use the TuiLoggerWidget to display 
+/// the most recent log messages
+///
+///
+fn render_logs<'a>() -> TuiLoggerWidget<'a> {
+  TuiLoggerWidget::default()
+    .style_error(Style::default().fg(Color::Red))
+    .style_debug(Style::default().fg(Color::Green))
+    .style_warn(Style::default().fg(Color::Yellow))
+    .style_trace(Style::default().fg(Color::Gray))
+    .style_info(Style::default().fg(Color::Blue))
+    .block(
+      Block::default()
+        .title("Logs")
+        .border_style(Style::default().fg(Color::White).bg(Color::Black))
+        .borders(Borders::ALL),
+    )   
+    .style(Style::default().fg(Color::White).bg(Color::Black))
+}
+
+
+//fn render_status<'a>(rb_list_state: &ListState) 
+fn render_status<'a>() 
+  -> (List<'a>, Table<'a>, Vec<Chart<'a>>) {
+
+  // prepare stuff
+  //
+  let datasets = vec![
+    Dataset::default()
+      .name("Ch0")
+      .marker(symbols::Marker::Dot)
+      .graph_type(GraphType::Scatter)
+      .style(Style::default().fg(Color::Cyan))
+      .data(&[(0.0, 5.0), (1.0, 6.0), (1.5, 6.434)]),
+    Dataset::default()
+      .name("Ch1")
+      .marker(symbols::Marker::Braille)
+      .graph_type(GraphType::Line)
+      .style(Style::default().fg(Color::Magenta))
+      .data(&[(4.0, 5.0), (5.0, 8.0), (7.66, 13.5)]),
+    Dataset::default()
+      .name("Ch2")
+      .marker(symbols::Marker::Braille)
+      .graph_type(GraphType::Line)
+      .style(Style::default().fg(Color::Magenta))
+      .data(&[(4.0, 5.0), (5.0, 8.0), (7.66, 13.5)]),
+    Dataset::default()
+      .name("Ch3")
+      .marker(symbols::Marker::Braille)
+      .graph_type(GraphType::Line)
+      .style(Style::default().fg(Color::Magenta))
+      .data(&[(4.0, 5.0), (5.0, 8.0), (7.66, 13.5)]),
+    Dataset::default()
+      .name("Ch4")
+      .marker(symbols::Marker::Braille)
+      .graph_type(GraphType::Line)
+      .style(Style::default().fg(Color::Magenta))
+      .data(&[(4.0, 5.0), (5.0, 8.0), (7.66, 13.5)]),
+    Dataset::default()
+      .name("Ch5")
+      .marker(symbols::Marker::Braille)
+      .graph_type(GraphType::Line)
+      .style(Style::default().fg(Color::Magenta))
+      .data(&[(4.0, 5.0), (5.0, 8.0), (7.66, 13.5)]),
+    Dataset::default()
+      .name("Ch6")
+      .marker(symbols::Marker::Braille)
+      .graph_type(GraphType::Line)
+      .style(Style::default().fg(Color::Magenta))
+      .data(&[(4.0, 5.0), (5.0, 8.0), (7.66, 13.5)]),
+    Dataset::default()
+      .name("Ch7")
+      .marker(symbols::Marker::Braille)
+      .graph_type(GraphType::Line)
+      .style(Style::default().fg(Color::Magenta))
+      .data(&[(4.0, 5.0), (5.0, 8.0), (7.66, 13.5)]),
+    Dataset::default()
+      .name("Ch8 ('Ninth')")
+      .marker(symbols::Marker::Braille)
+      .graph_type(GraphType::Line)
+      .style(Style::default().fg(Color::Magenta))
+      .data(&[(4.0, 5.0), (5.0, 8.0), (7.66, 13.5)]),
+  ];
+  let n_ch_size = datasets.len();
+
+  let chart = Chart::new(datasets)
+    .block(Block::default().title("Waveform"))
+    .x_axis(Axis::default()
+      .title(Span::styled("t [ns]", Style::default().fg(Color::Red)))
+      .style(Style::default().fg(Color::White))
+      .bounds([0.0, 10.0])
+      .labels(["0.0", "5.0", "10.0"].iter().cloned().map(Span::from).collect()))
+    .y_axis(Axis::default()
+      .title(Span::styled("mV", Style::default().fg(Color::Red)))
+      .style(Style::default().fg(Color::White))
+      .bounds([0.0, 10.0])
+      .labels(["0.0", "5.0", "10.0"].iter().cloned().map(Span::from).collect()));
+
+  let mut charts = Vec::<Chart>::new();
+  for n in 0..n_ch_size {
+    charts.push(chart.clone());
+  }
+  
+  let rbs = Block::default()
+      .borders(Borders::ALL)
+      .style(Style::default().fg(Color::White))
+      .title("ReadoutBoards")
+      .border_type(BorderType::Plain);
+  let mut rb_list = Vec::<ReadoutBoard>::new();
+  for n in 1..40 {
+    let mut this_rb = ReadoutBoard::new();
+    this_rb.id = n;
+    rb_list.push (this_rb.clone());
+  }
+  //let rb_list = vec!["RB1"];
+  //for n in 2..40 {
+  //  rb_list.push("RB".to_owned() + n.to_string());
+  //}
+  //let rb_list = read_db().expect("can fetch pet list");
+  let items: Vec<_> = rb_list
+    .iter()
+    .map(|rb| {
+      ListItem::new(Spans::from(vec![Span::styled(
+          rb.name.clone(),
+          Style::default(),
+      )]))
+    })
+    .collect();
+
+  let selected_rb = rb_list[0]
+   // .get(
+   //   rb_list_state
+   //     .selected()
+   //     .expect("there is always a selected pet"),
+   // )
+   // .expect("exists")
+    .clone();
+
+  let list = List::new(items).block(rbs).highlight_style(
+    Style::default()
+      .bg(Color::Blue)
+      .fg(Color::Black)
+      .add_modifier(Modifier::BOLD),
+  );
+
+  let rb_detail = Table::new(vec![Row::new(vec![
+    Cell::from(Span::raw(selected_rb.id.to_string())),
+    Cell::from(Span::raw(selected_rb.name)),
+    //Cell::from(Span::raw(selected_.category)),
+    //Cell::from(Span::raw(selected_.age.to_string())),
+    //Cell::from(Span::raw(selected_.created_at.to_string())),
+  ])])
+  .header(Row::new(vec![
+      Cell::from(Span::styled(
+          "ID",
+          Style::default().add_modifier(Modifier::BOLD),
+      )),
+      Cell::from(Span::styled(
+          "Name",
+          Style::default().add_modifier(Modifier::BOLD),
+      )),
+      //Cell::from(Span::styled(
+      //    "Category",
+      //    Style::default().add_modifier(Modifier::BOLD),
+      //)),
+      //Cell::from(Span::styled(
+      //    "Age",
+      //    Style::default().add_modifier(Modifier::BOLD),
+      //)),
+      //Cell::from(Span::styled(
+      //    "Created At",
+      //    Style::default().add_modifier(Modifier::BOLD),
+      //)),
+  ]))
+  .block(
+    Block::default()
+      .borders(Borders::ALL)
+      .style(Style::default().fg(Color::White))
+      .title("Detail")
+      .border_type(BorderType::Plain),
+  )
+  .widths(&[
+      Constraint::Percentage(20),
+      Constraint::Percentage(80),
+      //Constraint::Percentage(20),
+      //Constraint::Percentage(5),
+      //Constraint::Percentage(20),
+  ]);
+  
+  let wf_detail = Table::new(vec![Row::new(vec![
+    Cell::from(Span::raw("Waveform")),
+    //Cell::from(Span::raw(selected_rb.name)),
+    //Cell::from(Span::raw(selected_.category)),
+    //Cell::from(Span::raw(selected_.age.to_string())),
+    //Cell::from(Span::raw(selected_.created_at.to_string())),
+  ])])
+  .header(Row::new(vec![
+      Cell::from(Span::styled(
+          "WF",
+          Style::default().add_modifier(Modifier::BOLD),
+      )),
+      //Cell::from(Span::styled(
+      //    "Name",
+      //    Style::default().add_modifier(Modifier::BOLD),
+      //)),
+      //Cell::from(Span::styled(
+      //    "Category",
+      //    Style::default().add_modifier(Modifier::BOLD),
+      //)),
+      //Cell::from(Span::styled(
+      //    "Age",
+      //    Style::default().add_modifier(Modifier::BOLD),
+      //)),
+      //Cell::from(Span::styled(
+      //    "Created At",
+      //    Style::default().add_modifier(Modifier::BOLD),
+      //)),
+  ]))
+  .block(
+    Block::default()
+      .borders(Borders::ALL)
+      .style(Style::default().fg(Color::White))
+      .title("Waveforms")
+      .border_type(BorderType::Plain),
+  )
+  .widths(&[
+      Constraint::Percentage(5),
+      Constraint::Percentage(20),
+      Constraint::Percentage(20),
+      Constraint::Percentage(5),
+      Constraint::Percentage(20),
+  ]);
+
+  (list, rb_detail, charts) // wf_detail)
+}
+
+
+#[derive(Debug, Clone)]
+struct MasterLayout {
+  
+  pub rect : Vec<Rect>
+
+}
+
+impl MasterLayout {
+
+  fn new(size : Rect) -> MasterLayout {
+    let chunks = Layout::default()
+    .direction(Direction::Vertical)
+    .margin(1)
+    .constraints(
+      [
+        Constraint::Length(3),
+        Constraint::Min(2),
+        Constraint::Length(5),
+      ]
+      .as_ref(),
+    )
+    .split(size);
+    MasterLayout {
+      rect : chunks
+    }
+  }
+}
+
+
+
+fn main () -> Result<(), Box<dyn std::error::Error>>{
+
+
+  // Set max_log_level to Trace
+  match tui_logger::init_logger(log::LevelFilter::Info) {
+    Err(err) => panic!("Something bad just happened {err}"),
+    Ok(_)    => (),
+  }
+  // Set default level for unknown targets to Trace
+  tui_logger::set_default_level(log::LevelFilter::Trace);
+  
+  //pretty_env_logger::init();
+
+  let mut tick_count = 0;
+
+  // first set up comms etc. before 
+  // we go into raw_mode, so we can 
+  // see the log messages during setup
+  let (tp_to_main, tp_from_recv)  : (Sender<TofPacket>, Receiver<TofPacket>)       = unbounded();
+
+  // set up Threads
+  let n_threads = 2;
+  let workforce = ThreadPool::new(n_threads);
+  workforce.execute(move || {
+      receive_stream(tp_to_main);
+  });
+
+  // set up the terminal
+  enable_raw_mode().expect("can run in raw mode");
+  let stdout = io::stdout();
+  let backend = CrosstermBackend::new(stdout);
+  let mut terminal = Terminal::new(backend).unwrap();//?;
+  terminal.clear();//?;
+
+  
+  let (tx, rx) = mpsc::channel();
+
+  // change this to make it more/less 
+  // responsive
+  let tick_rate = Duration::from_millis(100);
+  
+  // heartbeat, keeps it going
+  thread::spawn(move || {
+    let mut last_tick = Instant::now();
+    loop {
+      let timeout = tick_rate
+          .checked_sub(last_tick.elapsed())
+          .unwrap_or_else(|| Duration::from_secs(0));
+
+      if event::poll(timeout).expect("poll works") {
+          if let CEvent::Key(key) = event::read().expect("can read events") {
+              tx.send(Event::Input(key)).expect("can send events");
+          }
+      }
+
+      if last_tick.elapsed() >= tick_rate {
+          if let Ok(_) = tx.send(Event::Tick) {
+              last_tick = Instant::now();
+          }
+      }
+    }
+  }); 
+
+
+  //let menu_titles = vec!["Home", "RBStatus", "Commands", "Alerts", "Dashboard", "Logs" ];
+  //let mut active_menu_item = MenuItem::Home;
+  let mut rb_list_state = ListState::default();
+  rb_list_state.select(Some(0));
+ 
+  // components which are in all tabs
+  let mut ui_menu = Menu::new();
+
+  // a message cache for the stream
+  let mut stream_cache = VecDeque::<TofPacket>::new();
+  let mut packets = VecDeque::<String>::new();
+  loop {
+    terminal.draw(|rect| {
+      let size = rect.size();
+      let mster_lo = MasterLayout::new(size); 
+      let mut cmd_tab = CommandTab::new(mster_lo.rect[1], &packets);
+
+      rect.render_widget(ui_menu.tabs.clone(), mster_lo.rect[0]);
+      let w_logs = render_logs();
+      rect.render_widget(w_logs, mster_lo.rect[2]);
+      match ui_menu.active_menu_item {
+        MenuItem::Commands => {
+          match rx.recv() {
+            Err(err) => trace!("No update"),
+            Ok(event) => {
+              match event {
+                Event::Input(ev) => (),
+                Event::Tick => {
+                  let foo : String = "Tick :".to_owned() + &tick_count.to_string();
+                  
+                  // check the zmq socket
+                  let mut event = TofPacket::new();
+                  match tp_from_recv.try_recv() {
+                    Err(err) => {
+                      trace!("No event!");
+                    }
+                    Ok(pk)  => {
+                      event = pk;
+                      //let mut event = TofPacket::new();
+                      //event.packet_type = PacketType::RBEvent;
+                      // if the cache is too big, remove the oldest events
+                      //let new_tof_events = vec![event];
+                      stream_cache.push_back(event);
+                      if stream_cache.len() > STREAM_CACHE_MAX_SIZE {
+                        stream_cache.pop_front();
+                        packets.pop_front(); 
+                      }
+                      for n in 0..stream_cache.len() {
+                        let foo = CommandTab::<'_>::get_pk_repr(&stream_cache[n]);
+                        packets.push_back(foo);
+                      }
+                      info!("Updating Command tab!");
+                      cmd_tab.update(&packets);
+                    }
+                  }
+                },
+              }
+            }
+          }    
+
+          rect.render_stateful_widget(cmd_tab.list_widget, cmd_tab.list_rect, &mut rb_list_state);
+          rect.render_widget(cmd_tab.tof_resp, cmd_tab.rsp_rect); 
+          rect.render_widget(cmd_tab.stream,   cmd_tab.stream_rect);
+        }
+
+        MenuItem::Status => {
+          let status_chunks = Layout::default()
+            .direction(Direction::Horizontal)
+            .constraints(
+                [Constraint::Percentage(10), Constraint::Percentage(20), Constraint::Percentage(70)].as_ref(),
+            )
+            .split(mster_lo.rect[1]);
+          let ch_chunks = Layout::default()
+            .direction(Direction::Vertical)
+            .constraints(
+                [Constraint::Percentage(11),
+                 Constraint::Percentage(11),
+                 Constraint::Percentage(11),
+                 Constraint::Percentage(11),
+                 Constraint::Percentage(11),
+                 Constraint::Percentage(11),
+                 Constraint::Percentage(11),
+                 Constraint::Percentage(11),
+                 Constraint::Percentage(12)].as_ref(),
+            )
+            .split(status_chunks[2]);
+          //let (left, center, mut right) = render_status(&rb_list_state);
+          let (left, center, mut right) = render_status();
+          rect.render_stateful_widget(left, status_chunks[0], &mut rb_list_state);
+          rect.render_widget(center, status_chunks[1]);
+          for n in 0..ch_chunks.len() - 1 {
+            let ch = right.remove(0);
+            rect.render_widget(ch, ch_chunks[n]);
+          }
+        },
+        _ => (),
+      } 
+
+    }); // end terminal.draw
+
+    match rx.recv()? {
+      Event::Tick => {
+        match ui_menu.active_menu_item {
+          MenuItem::Commands => {
+          },
+          _ => ()
+        }
+      },
+      Event::Input(event) => {
+        match event.code {
+          KeyCode::Char('q') => {
+              disable_raw_mode();//?;
+              terminal.show_cursor();//?;
+              break;
+          },
+          KeyCode::Char('c') => ui_menu.active_menu_item = MenuItem::Commands,
+          KeyCode::Char('s') => ui_menu.active_menu_item = MenuItem::Status,
+          KeyCode::Down => {
+            if let Some(selected) = rb_list_state.selected() {
+                //let amount_pets = read_db().expect("can fetch pet list").len();
+                let max_rb = 40;
+                if selected >= max_rb - 1 {
+                  rb_list_state.select(Some(0));
+                } else {
+                  rb_list_state.select(Some(selected + 1));
+                }
+              }
+            }
+            KeyCode::Up => {
+              if let Some(selected) = rb_list_state.selected() {
+                //let amount_pets = read_db().expect("can fetch pet list").len();
+                let max_rb = 40;
+                if max_rb > 0 {
+                    rb_list_state.select(Some(selected - 1));
+                } else {
+                    rb_list_state.select(Some(max_rb - 1));
+                }
+              }
+            }
+          _ => (),
+        }
+      }
+    }
+  } // end loo;
+  Ok(())
+        //KeyCode::Char('h') => active_menu_item = MenuItem::Home,
+        //KeyCode::Char('p') => active_menu_item = MenuItem::Pets,
+        //KeyCode::Char('a') => {
+        //    add_random_pet_to_db().expect("can add new random pet");
+        //}
+        //KeyCode::Char('d') => {
+        //    remove_pet_at_index(&mut pet_list_state).expect("can remove pet");
+        //}
+        //KeyCode::Down => {
+        //    if let Some(selected) = pet_list_state.selected() {
+        //        let amount_pets = read_db().expect("can fetch pet list").len();
+        //        if selected >= amount_pets - 1 { 
+        //            pet_list_state.select(Some(0));
+        //        } else {
+        //            pet_list_state.select(Some(selected + 1));
+        //        }
+        //    }
+        //}
+        //KeyCode::Up => {
+        //    if let Some(selected) = pet_list_state.selected() {
+        //        let amount_pets = read_db().expect("can fetch pet list").len();
+        //        if selected > 0 { 
+        //            pet_list_state.select(Some(selected - 1));
+        //        } else {
+        //            pet_list_state.select(Some(amount_pets - 1));
+        //        }
+        //    }
+        //}
+        //  _ => (),
+        //} // end match key
+  //    }// end match event/tick
+  //  }; // end terminal.draw
+  //} // end loop
+  //return Ok(()); 
+}
