@@ -6,6 +6,8 @@ use crate::serialization::Serialization;
 use crate::errors::SerializationError;
 use crate::commands::TofCommand;
 
+
+#[deprecated(since = "0.2.0", note = "There is no need for a packet since TofCommand has Serialization trait ")]
 #[derive(Debug, PartialEq)]
 pub struct CommandPacket {
   pub command : TofCommand,
@@ -18,7 +20,7 @@ impl CommandPacket {
 
   pub fn new() -> CommandPacket {
     CommandPacket {
-      command : TofCommand::Unknown,
+      command : TofCommand::Unknown(0),
       value   : 0
     }
   }

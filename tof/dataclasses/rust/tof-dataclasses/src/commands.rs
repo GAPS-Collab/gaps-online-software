@@ -23,27 +23,13 @@
 //! Each command will be answered by a specific response. The responses 
 //! consists of a class, `TofResponse` together with a 32bit response code.
 //!
+
+use std::fmt;
+
 use crate::serialization::{Serialization, SerializationError};
 use crate::packets::{TofPacket,
-                     CommandPacket,
+                     //CommandPacket,
                      PacketType};
-
-
-//pub const CMD_PON                : &'static str = "CMD::PON";       
-//pub const CMD_POFF               : &'static str = "CMD::POFF";        
-//pub const CMD_PCYCLE             : &'static str = "CMD::PCYCLE";        
-//pub const CMD_RBSETUP            : &'static str = "CMD::RBSETUP";         
-//pub const CMD_SETTHRESHOLD       : &'static str = "CMD::SETTHR";         
-//pub const CMD_SETMTCONFIG        : &'static str = "CMD::SETMTCONF";        
-//pub const CMD_STARTVALIDATIONRUN : &'static str = "CMD::STARTVRUN";         
-//pub const CMD_GETFULLWAVEFORMS   : &'static str = "CMD::GETWF";      
-//pub const CMD_DATARUNSTART       : &'static str = "CMD::DATARUNSTART";    
-//pub const CMD_REQEUESTEVENT      : &'static str = "CMD::REQUESTEVENT";      
-//pub const CMD_DATARUNSTOP        : &'static str = "CMD::DATARUNSTOP";  
-//pub const CMD_VCALIB             : &'static str = "CMD::VCALIB";       
-//pub const CMD_TCALIB             : &'static str = "CMD::TCALIB";      
-//pub const CMD_CREATECALIBF       : &'static str = "CMD::CREATECFILE";   
-
 
 
 /// command code for "Power off"
@@ -82,7 +68,9 @@ pub const CMD_UNSPOOL_EVENT_CACHE : u8 = 44;
 
 /// command code for "Operate in a mode, where we stream any event 
 /// (not only those which are requested)"
-pub const CMD_STREAM_ANY_EVENT    : u8 = 45;
+pub const CMD_STREAM_ANY_EVENT         : u8 = 45;
+/// command code for "Stream only events which are explicitly requested"
+pub const CMD_STREAM_ONLY_REQUESTED    : u8 = 46;
 // Specific response codes
 // These are long (4 bytes) but 
 // this allows to convey more information
@@ -138,30 +126,213 @@ pub enum TofOperationMode {
 /// Each command can carry a 32bit field with further
 /// instructionns
 ///
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Copy, Clone)]//, IntoEnumIterator)]
 pub enum TofCommand {
-  PowerOn(u32),
-  PowerOff(u32),
-  PowerCycle(u32),
-  RBSetup(u32), 
-  SetThresholds(u32),
-  SetMtConfig(u32),
-  StartValidationRun,
-  RequestWaveforms(u32),
-  UnspoolEventCache(u32),
-  StreamAnyEvent(u32),
+  PowerOn                 (u32),
+  PowerOff                (u32),
+  PowerCycle              (u32),
+  RBSetup                 (u32), 
+  SetThresholds           (u32),
+  SetMtConfig             (u32),
+  StartValidationRun      (u32),
+  RequestWaveforms        (u32),
+  UnspoolEventCache       (u32),
+  StreamAnyEvent          (u32),
+  StreamOnlyRequested     (u32),
   /// Start a new run, the argument being the number 
   /// of events.
-  DataRunStart(u32), 
-  DataRunEnd   ,
-  VoltageCalibration,
-  TimingCalibration,
-  CreateCalibrationFile,
+  DataRunStart            (u32), 
+  DataRunEnd              (u32),
+  VoltageCalibration      (u32),
+  TimingCalibration       (u32),
+  CreateCalibrationFile   (u32),
   /// Request event data for a specific event being sent
   /// over the data wire. The argument being the event id.
-  RequestEvent(u32),
-  RequestMoni ,
-  Unknown
+  RequestEvent            (u32),
+  RequestMoni             (u32),
+  Unknown                 (u32),
+}
+
+impl fmt::Display for TofCommand {
+  // This trait requires `fmt` with this exact signature.
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    // Write strictly the first element into the supplied output
+    // stream: `f`. Returns `fmt::Result` which indicates whether the
+    // operation succeeded or failed. Note that `write!` uses syntax which
+    // is very similar to `println!`.
+    write!(f, "TofCommand")
+  }
+}
+
+
+impl TofCommand { 
+
+  pub fn to_string(&self) -> String {
+    
+    match self {
+      TofCommand::PowerOn                 (_) => {return String::from("PowerOn");},
+      TofCommand::PowerOff                (_) => {return String::from("PowerOff");},
+      TofCommand::PowerCycle              (_) => {return String::from("PowerCycle");},
+      TofCommand::RBSetup                 (_) => {return String::from("RBSetup");}, 
+      TofCommand::SetThresholds           (_) => {return String::from("SetThresholds");},
+      TofCommand::SetMtConfig             (_) => {return String::from("SetMtConfig");},
+      TofCommand::StartValidationRun      (_) => {return String::from("StartValidationRun");},
+      TofCommand::RequestWaveforms        (_) => {return String::from("RequestWaveforms");},
+      TofCommand::UnspoolEventCache       (_) => {return String::from("UnspoolEventCache");},
+      TofCommand::StreamAnyEvent          (_) => {return String::from("StreamAnyEvent");},
+      TofCommand::StreamOnlyRequested     (_) => {return String::from("StreamOnlyRequested");},
+      TofCommand::DataRunStart            (_) => {return String::from("DataRunStart");}, 
+      TofCommand::DataRunEnd              (_) => {return String::from("DataRunEnd");},
+      TofCommand::VoltageCalibration      (_) => {return String::from("TimingCalibration");}, 
+      TofCommand::TimingCalibration       (_) => {return String::from("TimingCalibration");},
+      TofCommand::CreateCalibrationFile   (_) => {return String::from("CreateCalibrationFile");},
+      TofCommand::RequestEvent            (_) => {return String::from("RequestEvent");},
+      TofCommand::RequestMoni             (_) => {return String::from("RequestMoni");},
+      TofCommand::Unknown                 (_) => {return String::from("Unknown");},
+      //_                                      => {return String::from("_");}
+    }
+  }
+} 
+
+impl TofCommand {
+  
+  const HEAD : u16 = 0xAAAA;
+  const TAIL : u16 = 0x5555;
+  
+  pub fn from_command_code(cc : u8, value : u32) -> TofCommand {
+    match cc {
+      CMD_POFF                => TofCommand::PowerOff             (value) ,        
+      CMD_PON                 => TofCommand::PowerOn              (value) ,       
+      CMD_PCYCLE              => TofCommand::PowerCycle           (value) ,        
+      CMD_RBSETUP             => TofCommand::RBSetup              (value) ,         
+      CMD_SETTHRESHOLD        => TofCommand::SetThresholds        (value) ,         
+      CMD_SETMTCONFIG         => TofCommand::SetMtConfig          (value) ,        
+      CMD_DATARUNSTART        => TofCommand::DataRunStart         (value) ,  
+      CMD_DATARUNSTOP         => TofCommand::DataRunEnd           (value) ,    
+      CMD_STARTVALIDATIONRUN  => TofCommand::StartValidationRun   (value) ,         
+      CMD_GETFULLWAVEFORMS    => TofCommand::RequestWaveforms     (value) ,      
+      CMD_REQEUESTEVENT       => TofCommand::RequestEvent         (value) , 
+      CMS_REQUESTMONI         => TofCommand::RequestMoni          (value) ,
+      CMD_VCALIB              => TofCommand::VoltageCalibration   (value) ,       
+      CMD_TCALIB              => TofCommand::TimingCalibration    (value) ,      
+      CMD_CREATECALIBF        => TofCommand::CreateCalibrationFile(value) ,   
+      CMD_UNSPOOL_EVENT_CACHE => TofCommand::UnspoolEventCache    (value) ,
+      CMD_STREAM_ANY_EVENT    => TofCommand::StreamAnyEvent       (value) ,
+      CMD_STREAM_ONLY_REQUESTED => TofCommand::StreamOnlyRequested(value) ,
+      _                       => TofCommand::Unknown              (value) , 
+    }
+  }
+    
+  pub fn to_command_code(cmd : &TofCommand) -> Option<u8> {
+    match cmd {
+      TofCommand::PowerOff      (_)        => Some(CMD_POFF              ),        
+      TofCommand::PowerOn       (_)        => Some(CMD_PON               ),       
+      TofCommand::PowerCycle    (_)        => Some(CMD_PCYCLE            ),        
+      TofCommand::RBSetup       (_)        => Some(CMD_RBSETUP           ),         
+      TofCommand::SetThresholds (_)        => Some(CMD_SETTHRESHOLD      ),         
+      TofCommand::SetMtConfig   (_)        => Some(CMD_SETMTCONFIG       ),        
+      TofCommand::DataRunStart  (_)        => Some(CMD_DATARUNSTART       ),  
+      TofCommand::DataRunEnd    (_)        => Some(CMD_DATARUNSTOP      ),    
+      TofCommand::StartValidationRun   (_) => Some(CMD_STARTVALIDATIONRUN),         
+      TofCommand::RequestWaveforms (_)     => Some(CMD_GETFULLWAVEFORMS  ),      
+      TofCommand::RequestEvent     (_)     => Some(CMD_REQEUESTEVENT     ), 
+      TofCommand::RequestMoni      (_)     => Some(CMS_REQUESTMONI       ), 
+      TofCommand::VoltageCalibration  (_)  => Some(CMD_VCALIB            ),       
+      TofCommand::TimingCalibration   (_)  => Some(CMD_TCALIB            ),      
+      TofCommand::CreateCalibrationFile  (_) => Some(CMD_CREATECALIBF      ),
+      TofCommand::UnspoolEventCache      (_) => Some(CMD_UNSPOOL_EVENT_CACHE) ,
+      TofCommand::StreamAnyEvent         (_) => Some(CMD_STREAM_ANY_EVENT) ,
+      TofCommand::StreamOnlyRequested    (_) => Some(CMD_STREAM_ONLY_REQUESTED) ,
+      TofCommand::Unknown                (_) => None                  , 
+    }
+  }
+
+  pub fn from_tof_packet(packet : &TofPacket) 
+    -> Option<TofCommand> {
+    match packet.packet_type {
+      PacketType::Command => (),
+      _ => {
+        debug!("Packet has not packet type CMD");
+        return None;
+        }
+    } // end match
+    //let cmd_pk = CommandPacket::from_bytestream(&packet.payload, 0); 
+    let cmd_pk = TofCommand::from_bytestream(&packet.payload, 0);
+    match cmd_pk {
+      Err(err) => {
+        warn!("Could not decode CMD packet, err {:?}", err);
+        return None;
+      }
+      Ok(cmd) => {
+        Some(cmd) 
+      }
+    } // end match
+  }
+} // end impl TofCommand
+
+impl From<(u8, u32)> for TofCommand {
+  fn from(pair : (u8, u32)) -> TofCommand {
+    let (input, value) = pair;
+    trace!("Got in input {:?}", pair);
+    match input {
+      CMD_POFF                => TofCommand::PowerOff             (value) ,        
+      CMD_PON                 => TofCommand::PowerOn              (value) ,       
+      CMD_PCYCLE              => TofCommand::PowerCycle           (value) ,        
+      CMD_RBSETUP             => TofCommand::RBSetup              (value) ,         
+      CMD_SETTHRESHOLD        => TofCommand::SetThresholds        (value) ,         
+      CMD_SETMTCONFIG         => TofCommand::SetMtConfig          (value) ,        
+      CMD_DATARUNSTOP         => TofCommand::DataRunEnd            (value),  
+      CMD_DATARUNSTART        => TofCommand::DataRunStart          (value) ,    
+      CMD_STARTVALIDATIONRUN  => TofCommand::StartValidationRun    (value),         
+      CMD_GETFULLWAVEFORMS    => TofCommand::RequestWaveforms      (value) ,      
+      CMD_REQEUESTEVENT       => TofCommand::RequestEvent          (value) , 
+      CMS_REQUESTMONI         => TofCommand::RequestMoni           (value),
+      CMD_VCALIB              => TofCommand::VoltageCalibration    (value),       
+      CMD_TCALIB              => TofCommand::TimingCalibration     (value),      
+      CMD_CREATECALIBF        => TofCommand::CreateCalibrationFile (value),   
+      CMD_UNSPOOL_EVENT_CACHE => TofCommand::UnspoolEventCache   (value) ,
+      CMD_STREAM_ANY_EVENT    => TofCommand::StreamAnyEvent      (value) ,
+      CMD_STREAM_ONLY_REQUESTED   => TofCommand::StreamOnlyRequested      (value) ,
+      _                       => TofCommand::Unknown              (value) , 
+    }
+  }
+}
+
+impl Serialization for TofCommand {
+
+  fn from_bytestream(stream    : &Vec<u8>, 
+                     start_pos : usize) 
+    -> Result<TofCommand, SerializationError>{
+  
+    let mut pos      = start_pos; 
+    let mut two_bytes : [u8;2];
+    let four_bytes    : [u8;4];
+    two_bytes = [stream[pos],
+                 stream[pos+1]];
+    pos += 2;
+    if TofCommand::HEAD != u16::from_le_bytes(two_bytes) {
+      warn!("Packet does not start with HEAD signature");
+      return Err(SerializationError::HeadInvalid {});
+    }
+   
+    let cc   = stream[pos];
+    pos += 1;
+    four_bytes = [stream[pos],
+                  stream[pos+1],
+                  stream[pos+2],
+                  stream[pos+3]];
+    pos += 4;
+    let value = u32::from_le_bytes(four_bytes);
+    two_bytes = [stream[pos],
+                 stream[pos+1]];
+    let pair    = (cc, value);
+    let command = TofCommand::from(pair);
+    if TofCommand::TAIL != u16::from_le_bytes(two_bytes) {
+      warn!("Packet does not end with TAIL signature");
+      return Err(SerializationError::TailInvalid {});
+    }
+    Ok(command)
+  }
 }
 
 /// Each `TofCommand` triggers a `TofResponse` in reply
@@ -282,140 +453,4 @@ impl From<(u8, u32)> for TofResponse {
   }
 }
 
-impl TofCommand {
-  
-  const HEAD : u16 = 0xAAAA;
-  const TAIL : u16 = 0x5555;
-  
-  pub fn from_command_code(cc : u8, value : u32) -> TofCommand {
-    match cc {
-      CMD_POFF                => TofCommand::PowerOff             (value) ,        
-      CMD_PON                 => TofCommand::PowerOn              (value) ,       
-      CMD_PCYCLE              => TofCommand::PowerCycle           (value) ,        
-      CMD_RBSETUP             => TofCommand::RBSetup              (value) ,         
-      CMD_SETTHRESHOLD        => TofCommand::SetThresholds        (value) ,         
-      CMD_SETMTCONFIG         => TofCommand::SetMtConfig          (value) ,        
-      CMD_DATARUNSTART        => TofCommand::DataRunStart         (value) ,  
-      CMD_DATARUNSTOP         => TofCommand::DataRunEnd            ,    
-      CMD_STARTVALIDATIONRUN  => TofCommand::StartValidationRun    ,         
-      CMD_GETFULLWAVEFORMS    => TofCommand::RequestWaveforms     (value) ,      
-      CMD_REQEUESTEVENT       => TofCommand::RequestEvent         (value) , 
-      CMS_REQUESTMONI         => TofCommand::RequestMoni           ,
-      CMD_VCALIB              => TofCommand::VoltageCalibration    ,       
-      CMD_TCALIB              => TofCommand::TimingCalibration     ,      
-      CMD_CREATECALIBF        => TofCommand::CreateCalibrationFile ,   
-      CMD_UNSPOOL_EVENT_CACHE => TofCommand::UnspoolEventCache    (value) ,
-      CMD_STREAM_ANY_EVENT    => TofCommand::StreamAnyEvent       (value) ,
-      _                       => TofCommand::Unknown               , 
-    }
-  }
-    
-  pub fn to_command_code(cmd : &TofCommand) -> Option<u8> {
-    match cmd {
-      TofCommand::PowerOff      (_)        => Some(CMD_POFF              ),        
-      TofCommand::PowerOn       (_)        => Some(CMD_PON               ),       
-      TofCommand::PowerCycle    (_)        => Some(CMD_PCYCLE            ),        
-      TofCommand::RBSetup       (_)        => Some(CMD_RBSETUP           ),         
-      TofCommand::SetThresholds (_)        => Some(CMD_SETTHRESHOLD      ),         
-      TofCommand::SetMtConfig   (_)        => Some(CMD_SETMTCONFIG       ),        
-      TofCommand::DataRunStart  (_)        => Some(CMD_DATARUNSTART       ),  
-      TofCommand::DataRunEnd               => Some(CMD_DATARUNSTOP      ),    
-      TofCommand::StartValidationRun       => Some(CMD_STARTVALIDATIONRUN),         
-      TofCommand::RequestWaveforms (_)     => Some(CMD_GETFULLWAVEFORMS  ),      
-      TofCommand::RequestEvent     (_)     => Some(CMD_REQEUESTEVENT     ), 
-      TofCommand::RequestMoni              => Some(CMS_REQUESTMONI       ), 
-      TofCommand::VoltageCalibration       => Some(CMD_VCALIB            ),       
-      TofCommand::TimingCalibration        => Some(CMD_TCALIB            ),      
-      TofCommand::CreateCalibrationFile    => Some(CMD_CREATECALIBF      ),
-      TofCommand::UnspoolEventCache (_)    => Some(CMD_UNSPOOL_EVENT_CACHE) ,
-      TofCommand::StreamAnyEvent    (_)    => Some(CMD_STREAM_ANY_EVENT) ,
-      TofCommand::Unknown                  => None                  , 
-    }
-  }
-
-  pub fn from_tof_packet(packet : &TofPacket) 
-    -> Option<TofCommand> {
-    match packet.packet_type {
-      PacketType::Command => (),
-      _ => {
-        debug!("Packet has not packet type CMD");
-        return None;
-        }
-    } // end match
-    let cmd_pk = CommandPacket::from_bytestream(&packet.payload, 0); 
-    match cmd_pk {
-      Err(err) => {
-        debug!("Could not decode CMD packet, err {:?}", err);
-        return None;
-      }
-      Ok(cmd) => {
-        Some(cmd.command) 
-      }
-    } // end match
-  }
-} // end impl TofCommand
-
-impl From<(u8, u32)> for TofCommand {
-  fn from(pair : (u8, u32)) -> TofCommand {
-    let (input, value) = pair;
-    trace!("Got in input {:?}", pair);
-    match input {
-      CMD_POFF                => TofCommand::PowerOff             (value) ,        
-      CMD_PON                 => TofCommand::PowerOn              (value) ,       
-      CMD_PCYCLE              => TofCommand::PowerCycle           (value) ,        
-      CMD_RBSETUP             => TofCommand::RBSetup              (value) ,         
-      CMD_SETTHRESHOLD        => TofCommand::SetThresholds        (value) ,         
-      CMD_SETMTCONFIG         => TofCommand::SetMtConfig          (value) ,        
-      CMD_DATARUNSTOP         => TofCommand::DataRunEnd            ,  
-      CMD_DATARUNSTART        => TofCommand::DataRunStart         (value) ,    
-      CMD_STARTVALIDATIONRUN  => TofCommand::StartValidationRun    ,         
-      CMD_GETFULLWAVEFORMS    => TofCommand::RequestWaveforms     (value) ,      
-      CMD_REQEUESTEVENT       => TofCommand::RequestEvent         (value) , 
-      CMS_REQUESTMONI         => TofCommand::RequestMoni           ,
-      CMD_VCALIB              => TofCommand::VoltageCalibration    ,       
-      CMD_TCALIB              => TofCommand::TimingCalibration     ,      
-      CMD_CREATECALIBF        => TofCommand::CreateCalibrationFile ,   
-      CMD_UNSPOOL_EVENT_CACHE => TofCommand::UnspoolEventCache   (value) ,
-      CMD_STREAM_ANY_EVENT    => TofCommand::StreamAnyEvent      (value) ,
-      _                       => TofCommand::Unknown               , 
-    }
-  }
-}
-
-impl Serialization for TofCommand {
-
-  fn from_bytestream(stream    : &Vec<u8>, 
-                     start_pos : usize) 
-    -> Result<TofCommand, SerializationError>{
-  
-    let mut pos      = start_pos; 
-    let mut two_bytes : [u8;2];
-    let four_bytes    : [u8;4];
-    two_bytes = [stream[pos],
-                 stream[pos+1]];
-    pos += 2;
-    if TofCommand::HEAD != u16::from_le_bytes(two_bytes) {
-      warn!("Packet does not start with HEAD signature");
-      return Err(SerializationError::HeadInvalid {});
-    }
-   
-    let cc   = stream[pos];
-    pos += 1;
-    four_bytes = [stream[pos],
-                  stream[pos+1],
-                  stream[pos+2],
-                  stream[pos+3]];
-    pos += 4;
-    let value = u32::from_le_bytes(four_bytes);
-    two_bytes = [stream[pos],
-                 stream[pos+1]];
-    let pair    = (cc, value);
-    let command = TofCommand::from(pair);
-    if TofCommand::TAIL != u16::from_le_bytes(two_bytes) {
-      warn!("Packet does not end with TAIL signature");
-      return Err(SerializationError::TailInvalid {});
-    }
-    Ok(command)
-  }
-}
 

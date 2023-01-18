@@ -21,7 +21,7 @@ pub mod command_packet;
 
 pub use crate::packets::generic_packet::GenericPacket;
 pub use crate::packets::data_packet::DataPacket;
-pub use crate::packets::command_packet::CommandPacket;
+//pub use crate::packets::command_packet::CommandPacket;
 use crate::serialization::{Serialization};
 use crate::errors::SerializationError;
 
@@ -37,7 +37,34 @@ pub const PACKET_TYPE_MONITOR   : u8 = 30;
 pub const PACKET_TYPE_HEARTBEAT : u8 = 40;
 pub const PACKET_TYPE_SCALAR    : u8 = 50;
 
-#[derive(Debug, PartialEq)]
+//// Each packet is send from somewhere.
+////
+//// Encode the sender in the packet, since
+//// the streaming might be asynchronous.
+////
+//// Have a specific sender id per RB as 
+//// well as one for the TofComputer.
+////#[derive(Debug, Copy, Clone, PartialEq)]
+////pub enum SenderId {
+////  RB1,
+////  RB2,
+////  RB3,
+////  RB4,
+////  RB5,
+////  RB6,
+////  RB7,
+////  RB8,
+////  RB9,
+////  RB10,
+////  RB11,
+////  RB12,
+////  RB13,
+////  RB14,
+////  RB15,
+////  RB1
+
+
+#[derive(Debug, PartialEq, Clone)]
 //#[repr(u8)]
 pub enum PacketType {
   Unknown   , 
@@ -74,10 +101,10 @@ impl PacketType {
   }
 }
 
-///! The most basic of all packets
+/// The most basic of all packets
 ///  
-///  A type and a payload. This wraps
-///  all other packets.
+/// A type and a payload. This wraps
+/// all other packets.
 ///
 ///
 ///  HEAD : u16
@@ -88,7 +115,7 @@ impl PacketType {
 ///
 ///  => Fixed size is 13
 ///
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct TofPacket {
   pub packet_type : PacketType,
   pub payload     : Vec<u8>
