@@ -28,6 +28,8 @@ sysinfo = "0.27"
 crossbeam-channel = "0.5"
 
 tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["random"]}
+liftof-lib = { path = "../liftof-lib" , features = ["random"]}
+
 
 zmq = "0.10.0"
 

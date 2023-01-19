@@ -22,6 +22,8 @@ use std::collections::VecDeque;
 extern crate pretty_env_logger;
 #[macro_use] extern crate log;
 
+use liftof_lib::{get_rb_manifest,
+                 ReadoutBoard};
 
 use std::sync::mpsc;
 use std::thread;
@@ -79,23 +81,23 @@ enum Event<I> {
 }
 
 //#[derive(Serialize, Deserialize, Clone)]
-#[derive(Debug, Clone)]
-struct ReadoutBoard {
-  pub id: usize,
-  pub name: String,
-  //category: String,
-  //age: usize,
-  //created_at: DateTime<Utc>,
-}
+//#[derive(Debug, Clone)]
+//struct ReadoutBoard {
+//  pub id: usize,
+//  pub name: String,
+//  //category: String,
+//  //age: usize,
+//  //created_at: DateTime<Utc>,
+//}
 
-impl ReadoutBoard {
-  fn new() -> ReadoutBoard {
-    ReadoutBoard {
-      id   : 0,
-      name : String::from("ReadoutBoard")
-    }
-  }
-}
+//impl ReadoutBoard {
+//  fn new() -> ReadoutBoard {
+//    ReadoutBoard {
+//      id   : 0,
+//      name : String::from("ReadoutBoard")
+//    }
+//  }
+//}
 
 
 /// Receive the data stream and forward 
@@ -161,7 +163,7 @@ fn render_logs<'a>() -> TuiLoggerWidget<'a> {
 
 //fn render_status<'a>(rb_list_state: &ListState) 
 fn render_status<'a>() 
-  -> (List<'a>, Table<'a>, Vec<Chart<'a>>) {
+  -> (List<'a>, Paragraph<'a>, Vec<Chart<'a>>) {
 
   // prepare stuff
   //
@@ -252,12 +254,13 @@ fn render_status<'a>()
       .style(Style::default().fg(Color::White))
       .title("ReadoutBoards")
       .border_type(BorderType::Plain);
-  let mut rb_list = Vec::<ReadoutBoard>::new();
-  for n in 1..40 {
-    let mut this_rb = ReadoutBoard::new();
-    this_rb.id = n;
-    rb_list.push (this_rb.clone());
-  }
+  let rb_list = get_rb_manifest();
+  //let mut rb_list = Vec::<ReadoutBoard>::new();
+  //for n in 1..40 {
+  //  let mut this_rb = ReadoutBoard::new();
+  //  this_rb.id = Some(n);
+  //  rb_list.push (this_rb.clone());
+  //}
   //let rb_list = vec!["RB1"];
   //for n in 2..40 {
   //  rb_list.push("RB".to_owned() + n.to_string());
@@ -267,7 +270,7 @@ fn render_status<'a>()
     .iter()
     .map(|rb| {
       ListItem::new(Spans::from(vec![Span::styled(
-          rb.name.clone(),
+          rb.id.unwrap().to_string(),
           Style::default(),
       )]))
     })
@@ -289,49 +292,62 @@ fn render_status<'a>()
       .add_modifier(Modifier::BOLD),
   );
 
-  let rb_detail = Table::new(vec![Row::new(vec![
-    Cell::from(Span::raw(selected_rb.id.to_string())),
-    Cell::from(Span::raw(selected_rb.name)),
-    //Cell::from(Span::raw(selected_.category)),
-    //Cell::from(Span::raw(selected_.age.to_string())),
-    //Cell::from(Span::raw(selected_.created_at.to_string())),
-  ])])
-  .header(Row::new(vec![
-      Cell::from(Span::styled(
-          "ID",
-          Style::default().add_modifier(Modifier::BOLD),
-      )),
-      Cell::from(Span::styled(
-          "Name",
-          Style::default().add_modifier(Modifier::BOLD),
-      )),
-      //Cell::from(Span::styled(
-      //    "Category",
-      //    Style::default().add_modifier(Modifier::BOLD),
-      //)),
-      //Cell::from(Span::styled(
-      //    "Age",
-      //    Style::default().add_modifier(Modifier::BOLD),
-      //)),
-      //Cell::from(Span::styled(
-      //    "Created At",
-      //    Style::default().add_modifier(Modifier::BOLD),
-      //)),
-  ]))
-  .block(
-    Block::default()
-      .borders(Borders::ALL)
-      .style(Style::default().fg(Color::White))
-      .title("Detail")
-      .border_type(BorderType::Plain),
-  )
-  .widths(&[
-      Constraint::Percentage(20),
-      Constraint::Percentage(80),
-      //Constraint::Percentage(20),
-      //Constraint::Percentage(5),
-      //Constraint::Percentage(20),
-  ]);
+   let rb_detail =  Paragraph::new("")
+   .style(Style::default().fg(Color::LightCyan))
+   .alignment(Alignment::Left)
+   //.scroll((5, 10))
+   .block(
+     Block::default()
+       .borders(Borders::ALL)
+       .style(Style::default().fg(Color::White))
+       .title("Detail")
+       .border_type(BorderType::Double),
+   );
+
+
+  //let rb_detail = Table::new(vec![Row::new(vec![
+  //  Cell::from(Span::raw(selected_rb.to_string())),
+  //  //Cell::from(Span::raw(selected_rb.name)),
+  //  //Cell::from(Span::raw(selected_.category)),
+  //  //Cell::from(Span::raw(selected_.age.to_string())),
+  //  //Cell::from(Span::raw(selected_.created_at.to_string())),
+  //])])
+  //.header(Row::new(vec![
+  //    Cell::from(Span::styled(
+  //        "ID",
+  //        Style::default().add_modifier(Modifier::BOLD),
+  //    )),
+  //    Cell::from(Span::styled(
+  //        "Name",
+  //        Style::default().add_modifier(Modifier::BOLD),
+  //    )),
+  //    //Cell::from(Span::styled(
+  //    //    "Category",
+  //    //    Style::default().add_modifier(Modifier::BOLD),
+  //    //)),
+  //    //Cell::from(Span::styled(
+  //    //    "Age",
+  //    //    Style::default().add_modifier(Modifier::BOLD),
+  //    //)),
+  //    //Cell::from(Span::styled(
+  //    //    "Created At",
+  //    //    Style::default().add_modifier(Modifier::BOLD),
+  //    //)),
+  //]))
+  //.block(
+  //  Block::default()
+  //    .borders(Borders::ALL)
+  //    .style(Style::default().fg(Color::White))
+  //    .title("Detail")
+  //    .border_type(BorderType::Plain),
+  //)
+  //.widths(&[
+  //    Constraint::Percentage(20),
+  //    Constraint::Percentage(80),
+  //    //Constraint::Percentage(20),
+  //    //Constraint::Percentage(5),
+  //    //Constraint::Percentage(20),
+  //]);
   
   let wf_detail = Table::new(vec![Row::new(vec![
     Cell::from(Span::raw("Waveform")),
