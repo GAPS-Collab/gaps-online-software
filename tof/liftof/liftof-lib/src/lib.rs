@@ -1,4 +1,6 @@
-pub mod misc;
+//pub mod misc;
+
+use port_scanner::scan_ports_range;
 
 use std::error::Error;
 use std::fmt;
@@ -72,10 +74,35 @@ pub fn get_rb_manifest() {
         rb.mac_address = Some(mac);
         let rb_ip = mac_table.get(&mac);
         println!("Found ip address {:?}", rb_ip);
-        //match rb_ip {
-        //  None => println!("Can not resolve RBBoard with MAC address {:?}, it is not in the system's ARP tables", mac),
-        //  Some(ip)   => rb.ip_address = Some(ip[0]),
-        //}
+        match rb_ip {
+          None => println!("Can not resolve RBBoard with MAC address {:?}, it is not in the system's ARP tables", mac),
+          Some(ip)   => match ip[0] {
+            IpAddr::V4(a) => rb.ip_address = Some(a),
+            _ => panic!("IPV6 not suppported!"),
+          }
+        }
+
+        // now we will try and check if the ports are open
+        let open_data_ports = scan_ports_range(30000..39999);
+        let open_cmd_ports  = scan_ports_range(40000..49999);
+        assert!(open_cmd_ports.len() < 2);
+        assert!(open_cmd_ports.len() < 2);
+        if open_cmd_ports.len() == 1 {
+          rb.cmd_port = Some(open_cmd_ports[0]);
+          match rb.ping() {
+            Ok(_)    => println!("... connected!"),
+            Err(err) => println!("Can't connect to RB, err {err}"),
+          }
+        } else {
+          rb.cmd_port = None;
+        }
+        if open_data_ports.len() == 1 {
+          rb.data_port = Some(open_cmd_ports[0]);
+        } else {
+          rb.data_port = None;
+        }
+        // try to see if we can ping the rb
+        
         println!("{}", rb);
       }
     }
@@ -126,8 +153,8 @@ pub struct ReadoutBoard {
   pub id           : Option<u8>,
   pub mac_address  : Option<MacAddr6>,
   pub ip_address   : Option<Ipv4Addr>, 
-  pub data_port    : Option<u32>,
-  pub cmd_port     : Option<u32>,
+  pub data_port    : Option<u16>,
+  pub cmd_port     : Option<u16>,
   pub is_connected : bool,
   pub uptime       : u32,
   first_up         : u32,
@@ -149,11 +176,12 @@ impl ReadoutBoard {
   }
     
   /// Ping it  
-  pub fn ping(&self) -> Result<(), Box<dyn Error>> { 
+  pub fn ping(&mut self) -> Result<(), Box<dyn Error>> { 
     // connect to the command port and send a ping
     // message
     let ctx =  zmq::Context::new();
     if matches!(self.ip_address, None) || matches!(self.cmd_port, None) {
+      self.is_connected = false;
       return Err(Box::new(ReadoutBoardError::NoConnectionInfo));
     }
 
@@ -164,8 +192,10 @@ impl ReadoutBoard {
     socket.send("[PING]", 0)?;
     let data = socket.recv_bytes(0)?;
     if data.len() != 0 {
+      self.is_connected = true;
       return Ok(());
     }
+    self.is_connected = false;
     return Err(Box::new(ReadoutBoardError::NoResponse));
   }
 }
