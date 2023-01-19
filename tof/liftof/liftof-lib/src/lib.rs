@@ -42,8 +42,9 @@ where P: AsRef<Path>, {
     Ok(io::BufReader::new(file).lines())
 }
 
-pub fn get_rb_manifest() {
+pub fn get_rb_manifest() -> Vec<ReadoutBoard> {
   let rb_manifest_path = path!("assets/rb.manifest");
+  let mut connected_boards = Vec::<ReadoutBoard>::new();
   let mac_table = get_mac_to_ip_map();
   if let Ok(lines) = read_lines(rb_manifest_path) {
     // Consumes the iterator, returns an (Optional) String
@@ -94,7 +95,7 @@ pub fn get_rb_manifest() {
               let open_data_ports = scan_ports_addrs(all_data_ports);
               let open_cmd_ports  = scan_ports_addrs(all_cmd_ports);
               assert!(open_cmd_ports.len() < 2);
-              assert!(open_cmd_ports.len() < 2);
+              assert!(open_data_ports.len() < 2);
               if open_cmd_ports.len() == 1 {
                 rb.cmd_port = Some(open_cmd_ports[0].port());
                 match rb.ping() {
@@ -104,20 +105,27 @@ pub fn get_rb_manifest() {
               } else {
                 rb.cmd_port = None;
               }
+              
+
+              println!("Found open data ports {:?}", open_data_ports);
               if open_data_ports.len() == 1 {
                 rb.data_port = Some(open_data_ports[0].port());
               } else {
                 rb.data_port = None;
+              }
+              if rb.is_connected {
+                connected_boards.push(rb);
               }
             }
           }
         }
 
         
-        println!("{}", rb);
+        println!("{:?}", connected_boards);
       }
     }
   }
+  return connected_boards;
 }
 
 // FIXME - get this from file
@@ -195,12 +203,12 @@ impl ReadoutBoard {
       self.is_connected = false;
       return Err(Box::new(ReadoutBoardError::NoConnectionInfo));
     }
-
-    let address = self.ip_address.unwrap().to_string() + &self.cmd_port.unwrap().to_string(); 
+    let address = "tcp://".to_owned() + &self.ip_address.unwrap().to_string() + ":" + &self.cmd_port.unwrap().to_string(); 
     let socket  = ctx.socket(zmq::REQ)?;
     socket.connect(&address)?;
     // if the readoutboard is there, it should send *something* back
-    socket.send("[PING]", 0)?;
+    socket.send(String::from("[PING]").as_bytes(), 0)?;
+    println!("here3");
     let data = socket.recv_bytes(0)?;
     if data.len() != 0 {
       self.is_connected = true;
