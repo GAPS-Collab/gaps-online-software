@@ -181,7 +181,7 @@ pub struct ReadoutBoard {
 
 impl ReadoutBoard {
 
-  fn new() -> ReadoutBoard {
+  pub fn new() -> ReadoutBoard {
     ReadoutBoard {
       id           : None,
       mac_address  : None,
