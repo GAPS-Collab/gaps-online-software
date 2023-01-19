@@ -161,8 +161,8 @@ fn render_logs<'a>() -> TuiLoggerWidget<'a> {
 }
 
 
-//fn render_status<'a>(rb_list_state: &ListState) 
-fn render_status<'a>() 
+fn render_status<'a>(rb_list_state: ListState, rb_list : Vec<ReadoutBoard>) 
+//fn render_status<'a>(rb_list : Vec<ReadoutBoard>) 
   -> (List<'a>, Paragraph<'a>, Vec<Chart<'a>>) {
 
   // prepare stuff
@@ -254,7 +254,7 @@ fn render_status<'a>()
       .style(Style::default().fg(Color::White))
       .title("ReadoutBoards")
       .border_type(BorderType::Plain);
-  let rb_list = get_rb_manifest();
+  //let rb_list = get_rb_manifest();
   //let mut rb_list = Vec::<ReadoutBoard>::new();
   //for n in 1..40 {
   //  let mut this_rb = ReadoutBoard::new();
@@ -276,13 +276,13 @@ fn render_status<'a>()
     })
     .collect();
 
-  let selected_rb = rb_list[0]
-   // .get(
-   //   rb_list_state
-   //     .selected()
-   //     .expect("there is always a selected pet"),
-   // )
-   // .expect("exists")
+  let selected_rb = rb_list
+    .get(
+      rb_list_state
+        .selected()
+        .expect("there is always a selected pet"),
+    )
+    .expect("exists")
     .clone();
 
   let list = List::new(items).block(rbs).highlight_style(
@@ -292,10 +292,11 @@ fn render_status<'a>()
       .add_modifier(Modifier::BOLD),
   );
 
-   let rb_detail =  Paragraph::new("")
+   let rb_detail =  Paragraph::new(selected_rb.to_string())
    .style(Style::default().fg(Color::LightCyan))
    .alignment(Alignment::Left)
    //.scroll((5, 10))
+   //.text(rb_list[0].to_string())
    .block(
      Block::default()
        .borders(Borders::ALL)
@@ -441,6 +442,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   //pretty_env_logger::init();
 
   let mut tick_count = 0;
+  let rb_list = get_rb_manifest();
 
   // first set up comms etc. before 
   // we go into raw_mode, so we can 
@@ -586,8 +588,8 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                  Constraint::Percentage(12)].as_ref(),
             )
             .split(status_chunks[2]);
-          //let (left, center, mut right) = render_status(&rb_list_state);
-          let (left, center, mut right) = render_status();
+          let (left, center, mut right) = render_status(rb_list_state.clone(), rb_list.clone());
+          //let (left, center, mut right) = render_status(rb_list.clone());
           rect.render_stateful_widget(left, status_chunks[0], &mut rb_list_state);
           rect.render_widget(center, status_chunks[1]);
           for n in 0..ch_chunks.len() - 1 {
