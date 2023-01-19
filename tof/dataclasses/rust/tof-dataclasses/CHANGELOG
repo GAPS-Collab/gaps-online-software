@@ -1,10 +1,24 @@
 0.3.0
 
+FEATURES
+
+* classes/functions to interact with MTB over UDP
+* extends TofCommands with new commands:
+  - SetRBBuffTrip : Set the trip value of the RB buffers
+  - Enable/Disable forced trigger mode.
+
 REFACTOR
 
 * starting to implement `Serialization` traits
+* errors have the proper Error traits, including 
+  Display trait
 
-
+DEPRECATED
+* `CommandPacket` is marked as deprecated. 
+  _Comment_ : Instead of having a class + packet, 
+  we prefer to implment `to_/from_bytestream` for 
+  each class, thus a specific "Packet" implementation
+  is superfluos. 
 
 0.2.0 
 

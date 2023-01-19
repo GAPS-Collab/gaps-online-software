@@ -364,7 +364,7 @@ void TOF::BlobFileServer::Serve()
  
   // setup zmq
   std::string ip_addr = "tcp://127.0.0.1";
-  int port = 38830;
+  int port = 30000;
   std::string address;
   std::cout << "[INFO] setting up sockets for " << nboards_ << " boards!" << std::endl;
   sockets_.reserve(nboards_);
@@ -373,19 +373,21 @@ void TOF::BlobFileServer::Serve()
       address = ip_addr + ":" + std::to_string(port);
       std::cout << "[INFO] using socket address " << address << std::endl;
       //std::unique_ptr<zmq::socket_t> sock = std::unique_ptr(new zmq::socket_t(zmq_context_, zmq::socket_type::req));
-      zmq::socket_t sock = zmq::socket_t(zmq_context_, zmq::socket_type::req);
-      sock.connect(address.c_str());
-      std::cout << "[INFO] connected" << std::endl;
+      zmq::socket_t sock = zmq::socket_t(zmq_context_, zmq::socket_type::pub);
+      sock.bind(address.c_str());
+      std::cout << "[INFO] 0MQ PUB socket bound to" << std::endl;
       sockets_.push_back(std::move(sock));
       //zsock_destroy(address.c_str());
       //sockets.push_back(zsock_new_req(address.c_str()));
       port += 1;
-      std::string ping = "RB0" + std::to_string(k);
-      zmq::message_t msg1(ping.c_str(), 4);
-      sockets_[k].send(msg1, zmq::send_flags::none);
-      // Fill a message passed by reference
-      auto res = sockets_[k].recv(msg1, zmq::recv_flags::none);  
-      std::cout << msg1.to_string() << std::endl;
+      
+      // This will be only needed for the cmd line
+      //std::string ping = "RB0" + std::to_string(k);
+      //zmq::message_t msg1(ping.c_str(), 4);
+      //sockets_[k].send(msg1, zmq::send_flags::none);
+      //// Fill a message passed by reference
+      //auto res = sockets_[k].recv(msg1, zmq::recv_flags::none);  
+      //std::cout << msg1.to_string() << std::endl;
     }
   // give time for the sockets to be setup
   sleep(5);
@@ -497,8 +499,9 @@ void TOF::BlobFileServer::Serve()
         try { 
            sockets_[k].send(msg, zmq::send_flags::none);
            //sleep(0.1);
-           auto res = sockets_[k].recv(server_response, zmq::recv_flags::none);  
-           std::cout << server_response.to_string() << std::endl;
+           // only needed for the command wire
+           //auto res = sockets_[k].recv(server_response, zmq::recv_flags::none);  
+           //std::cout << server_response.to_string() << std::endl;
            // rest a bit to simulate a reasonable rate
            sleep(sleep_time);
         } catch (zmq::error_t exception) {
