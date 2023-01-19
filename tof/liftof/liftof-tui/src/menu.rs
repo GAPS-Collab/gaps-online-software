@@ -13,6 +13,7 @@ pub enum MenuItem {
   Alerts,
   Commands,
   Dashboard,
+  MasterTrigger,
   Logs
 }
 
@@ -20,12 +21,13 @@ pub enum MenuItem {
 impl From<MenuItem> for usize {
   fn from(input: MenuItem) -> usize {
     match input {
-      MenuItem::Home      => 0,
-      MenuItem::Status    => 1,
-      MenuItem::Alerts    => 2,
-      MenuItem::Commands  => 3,
-      MenuItem::Dashboard => 4,
-      MenuItem::Logs      => 5
+      MenuItem::Home          => 0,
+      MenuItem::Status        => 1,
+      MenuItem::Alerts        => 2,
+      MenuItem::Commands      => 3,
+      MenuItem::Dashboard     => 4,
+      MenuItem::Logs          => 5,
+      MenuItem::MasterTrigger => 6,
     }   
   }
 }
@@ -42,7 +44,7 @@ pub struct Menu<'a> {
 impl Menu<'_> {
 
   pub fn new<'a>() -> Menu<'a> {
-    let menu_titles = vec!["Home", "RBStatus", "Commands", "Alerts", "Dashboard", "Logs" ];
+    let menu_titles = vec!["Home", "RBStatus", "Commands", "Alerts", "Dashboard", "MasterTrigger" ,  "Logs" ];
     let menu = menu_titles
     .iter()
     .map(|t| {
@@ -72,8 +74,4 @@ impl Menu<'_> {
       tabs 
     }
   }
-
-
-
-
 }

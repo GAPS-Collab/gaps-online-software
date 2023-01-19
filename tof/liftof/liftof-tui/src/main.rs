@@ -11,6 +11,7 @@
 //!
 
 mod tab_commands;
+mod tab_mt;
 mod menu;
 
 use chrono::prelude::*;
@@ -64,6 +65,7 @@ use tof_dataclasses::threading::ThreadPool;
 
 
 use crate::tab_commands::CommandTab;
+use crate::tab_mt::MTTab;
 use crate::menu::{MenuItem, Menu};
 
 
@@ -222,7 +224,13 @@ fn render_status<'a>()
   let n_ch_size = datasets.len();
 
   let chart = Chart::new(datasets)
-    .block(Block::default().title("Waveform"))
+    .block(
+      Block::default()
+        .borders(Borders::ALL)
+        .style(Style::default().fg(Color::White))
+        .title("Ch 0")
+        .border_type(BorderType::Plain),
+    )
     .x_axis(Axis::default()
       .title(Span::styled("t [ns]", Style::default().fg(Color::Red)))
       .style(Style::default().fg(Color::White))
@@ -434,8 +442,8 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   enable_raw_mode().expect("can run in raw mode");
   let stdout = io::stdout();
   let backend = CrosstermBackend::new(stdout);
-  let mut terminal = Terminal::new(backend).unwrap();//?;
-  terminal.clear();//?;
+  let mut terminal = Terminal::new(backend)?;
+  terminal.clear()?;
 
   
   let (tx, rx) = mpsc::channel();
@@ -483,11 +491,20 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
       let size = rect.size();
       let mster_lo = MasterLayout::new(size); 
       let mut cmd_tab = CommandTab::new(mster_lo.rect[1], &packets);
-
+      let mut mt_tab  = MTTab::new(mster_lo.rect[1], &packets);
       rect.render_widget(ui_menu.tabs.clone(), mster_lo.rect[0]);
       let w_logs = render_logs();
       rect.render_widget(w_logs, mster_lo.rect[2]);
       match ui_menu.active_menu_item {
+        MenuItem::MasterTrigger => {
+          rect.render_stateful_widget(mt_tab.list_widget, mt_tab.list_rect, &mut rb_list_state);
+          rect.render_widget(mt_tab.rate,         mt_tab.rate_rect); 
+          rect.render_widget(mt_tab.stream,       mt_tab.stream_rect);
+          rect.render_widget(mt_tab.network_moni, mt_tab.nw_mon_rect); 
+          rect.render_widget(mt_tab.detail,       mt_tab.detail_rect); 
+        
+
+        },
         MenuItem::Commands => {
           match rx.recv() {
             Err(err) => trace!("No update"),
@@ -578,12 +595,15 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
       Event::Input(event) => {
         match event.code {
           KeyCode::Char('q') => {
-              disable_raw_mode();//?;
-              terminal.show_cursor();//?;
+              disable_raw_mode()?;
+              terminal.clear()?;
+              terminal.show_cursor()?;
               break;
           },
+          KeyCode::Char('h') => ui_menu.active_menu_item = MenuItem::Home,
           KeyCode::Char('c') => ui_menu.active_menu_item = MenuItem::Commands,
-          KeyCode::Char('s') => ui_menu.active_menu_item = MenuItem::Status,
+          KeyCode::Char('r') => ui_menu.active_menu_item = MenuItem::Status,
+          KeyCode::Char('m') => ui_menu.active_menu_item = MenuItem::MasterTrigger,
           KeyCode::Down => {
             if let Some(selected) = rb_list_state.selected() {
                 //let amount_pets = read_db().expect("can fetch pet list").len();
