@@ -1,6 +1,6 @@
 //pub mod misc;
 
-use port_scanner::scan_ports_range;
+use port_scanner::scan_ports_addrs;
 
 use std::error::Error;
 use std::fmt;
@@ -77,31 +77,42 @@ pub fn get_rb_manifest() {
         match rb_ip {
           None => println!("Can not resolve RBBoard with MAC address {:?}, it is not in the system's ARP tables", mac),
           Some(ip)   => match ip[0] {
-            IpAddr::V4(a) => rb.ip_address = Some(a),
-            _ => panic!("IPV6 not suppported!"),
+            IpAddr::V6(a) => panic!("IPV6 not suppported!"),
+            IpAddr::V4(a) => {
+              rb.ip_address = Some(a);
+              // now we will try and check if the ports are open
+              let mut all_data_ports = Vec::<String>::new();//scan_ports_range(30000..39999);
+              let mut all_cmd_ports  = Vec::<String>::new();//scan_ports_range(40000..49999);
+              // FIXME - the ranges here are somewhat arbitrary
+              for n in 30000..39999 {
+                all_data_ports.push(rb.ip_address.unwrap().to_string() + ":" + &n.to_string());
+                //scan_ports_addrs(
+              }
+              for n in 40000..49999 {
+                all_cmd_ports.push(rb.ip_address.unwrap().to_string() + ":" + &n.to_string());
+              }
+              let open_data_ports = scan_ports_addrs(all_data_ports);
+              let open_cmd_ports  = scan_ports_addrs(all_cmd_ports);
+              assert!(open_cmd_ports.len() < 2);
+              assert!(open_cmd_ports.len() < 2);
+              if open_cmd_ports.len() == 1 {
+                rb.cmd_port = Some(open_cmd_ports[0].port());
+                match rb.ping() {
+                  Ok(_)    => println!("... connected!"),
+                  Err(err) => println!("Can't connect to RB, err {err}"),
+                }
+              } else {
+                rb.cmd_port = None;
+              }
+              if open_data_ports.len() == 1 {
+                rb.data_port = Some(open_data_ports[0].port());
+              } else {
+                rb.data_port = None;
+              }
+            }
           }
         }
 
-        // now we will try and check if the ports are open
-        let open_data_ports = scan_ports_range(30000..39999);
-        let open_cmd_ports  = scan_ports_range(40000..49999);
-        assert!(open_cmd_ports.len() < 2);
-        assert!(open_cmd_ports.len() < 2);
-        if open_cmd_ports.len() == 1 {
-          rb.cmd_port = Some(open_cmd_ports[0]);
-          match rb.ping() {
-            Ok(_)    => println!("... connected!"),
-            Err(err) => println!("Can't connect to RB, err {err}"),
-          }
-        } else {
-          rb.cmd_port = None;
-        }
-        if open_data_ports.len() == 1 {
-          rb.data_port = Some(open_cmd_ports[0]);
-        } else {
-          rb.data_port = None;
-        }
-        // try to see if we can ping the rb
         
         println!("{}", rb);
       }
@@ -185,7 +196,7 @@ impl ReadoutBoard {
       return Err(Box::new(ReadoutBoardError::NoConnectionInfo));
     }
 
-    let address = self.ip_address.unwrap().to_string() + &self.data_port.unwrap().to_string(); 
+    let address = self.ip_address.unwrap().to_string() + &self.cmd_port.unwrap().to_string(); 
     let socket  = ctx.socket(zmq::REQ)?;
     socket.connect(&address)?;
     // if the readoutboard is there, it should send *something* back
