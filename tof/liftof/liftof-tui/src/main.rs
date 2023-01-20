@@ -65,7 +65,7 @@ use tof_dataclasses::commands::TofCommand;
 use tof_dataclasses::packets::{TofPacket, PacketType};
 use tof_dataclasses::serialization::Serialization;
 use tof_dataclasses::threading::ThreadPool;
-
+use tof_dataclasses::events::blob::BlobData;
 
 use crate::tab_commands::CommandTab;
 use crate::tab_mt::MTTab;
@@ -178,244 +178,6 @@ fn render_logs<'a>() -> TuiLoggerWidget<'a> {
     )   
     .style(Style::default().fg(Color::White).bg(Color::Black))
 }
-
-
-fn render_status<'a>(rb_list_state: ListState, rb_list : Vec<ReadoutBoard>) 
-//fn render_status<'a>(rb_list : Vec<ReadoutBoard>) 
-  -> (List<'a>, Paragraph<'a>, Vec<Chart<'a>>) {
-
-  // prepare stuff
-  //
-  let datasets = vec![
-    Dataset::default()
-      .name("Ch0")
-      .marker(symbols::Marker::Dot)
-      .graph_type(GraphType::Scatter)
-      .style(Style::default().fg(Color::Cyan))
-      .data(&[(0.0, 5.0), (1.0, 6.0), (1.5, 6.434)]),
-    Dataset::default()
-      .name("Ch1")
-      .marker(symbols::Marker::Braille)
-      .graph_type(GraphType::Line)
-      .style(Style::default().fg(Color::Magenta))
-      .data(&[(4.0, 5.0), (5.0, 8.0), (7.66, 13.5)]),
-    Dataset::default()
-      .name("Ch2")
-      .marker(symbols::Marker::Braille)
-      .graph_type(GraphType::Line)
-      .style(Style::default().fg(Color::Magenta))
-      .data(&[(4.0, 5.0), (5.0, 8.0), (7.66, 13.5)]),
-    Dataset::default()
-      .name("Ch3")
-      .marker(symbols::Marker::Braille)
-      .graph_type(GraphType::Line)
-      .style(Style::default().fg(Color::Magenta))
-      .data(&[(4.0, 5.0), (5.0, 8.0), (7.66, 13.5)]),
-    Dataset::default()
-      .name("Ch4")
-      .marker(symbols::Marker::Braille)
-      .graph_type(GraphType::Line)
-      .style(Style::default().fg(Color::Magenta))
-      .data(&[(4.0, 5.0), (5.0, 8.0), (7.66, 13.5)]),
-    Dataset::default()
-      .name("Ch5")
-      .marker(symbols::Marker::Braille)
-      .graph_type(GraphType::Line)
-      .style(Style::default().fg(Color::Magenta))
-      .data(&[(4.0, 5.0), (5.0, 8.0), (7.66, 13.5)]),
-    Dataset::default()
-      .name("Ch6")
-      .marker(symbols::Marker::Braille)
-      .graph_type(GraphType::Line)
-      .style(Style::default().fg(Color::Magenta))
-      .data(&[(4.0, 5.0), (5.0, 8.0), (7.66, 13.5)]),
-    Dataset::default()
-      .name("Ch7")
-      .marker(symbols::Marker::Braille)
-      .graph_type(GraphType::Line)
-      .style(Style::default().fg(Color::Magenta))
-      .data(&[(4.0, 5.0), (5.0, 8.0), (7.66, 13.5)]),
-    Dataset::default()
-      .name("Ch8 ('Ninth')")
-      .marker(symbols::Marker::Braille)
-      .graph_type(GraphType::Line)
-      .style(Style::default().fg(Color::Magenta))
-      .data(&[(4.0, 5.0), (5.0, 8.0), (7.66, 13.5)]),
-  ];
-  let n_ch_size = datasets.len();
-
-  let chart = Chart::new(datasets)
-    .block(
-      Block::default()
-        .borders(Borders::ALL)
-        .style(Style::default().fg(Color::White))
-        .title("Ch 0")
-        .border_type(BorderType::Plain),
-    )
-    .x_axis(Axis::default()
-      .title(Span::styled("t [ns]", Style::default().fg(Color::Red)))
-      .style(Style::default().fg(Color::White))
-      .bounds([0.0, 10.0])
-      .labels(["0.0", "5.0", "10.0"].iter().cloned().map(Span::from).collect()))
-    .y_axis(Axis::default()
-      .title(Span::styled("mV", Style::default().fg(Color::Red)))
-      .style(Style::default().fg(Color::White))
-      .bounds([0.0, 10.0])
-      .labels(["0.0", "5.0", "10.0"].iter().cloned().map(Span::from).collect()));
-
-  let mut charts = Vec::<Chart>::new();
-  for n in 0..n_ch_size {
-    charts.push(chart.clone());
-  }
-  
-  let rbs = Block::default()
-      .borders(Borders::ALL)
-      .style(Style::default().fg(Color::White))
-      .title("ReadoutBoards")
-      .border_type(BorderType::Plain);
-  //let rb_list = get_rb_manifest();
-  //let mut rb_list = Vec::<ReadoutBoard>::new();
-  //for n in 1..40 {
-  //  let mut this_rb = ReadoutBoard::new();
-  //  this_rb.id = Some(n);
-  //  rb_list.push (this_rb.clone());
-  //}
-  //let rb_list = vec!["RB1"];
-  //for n in 2..40 {
-  //  rb_list.push("RB".to_owned() + n.to_string());
-  //}
-  //let rb_list = read_db().expect("can fetch pet list");
-  let items: Vec<_> = rb_list
-    .iter()
-    .map(|rb| {
-      ListItem::new(Spans::from(vec![Span::styled(
-          rb.id.unwrap().to_string(),
-          Style::default(),
-      )]))
-    })
-    .collect();
-
-  let selected_rb = rb_list
-    .get(
-      rb_list_state
-        .selected()
-        .expect("there is always a selected pet"),
-    )
-    .expect("exists")
-    .clone();
-
-  let list = List::new(items).block(rbs).highlight_style(
-    Style::default()
-      .bg(Color::Blue)
-      .fg(Color::Black)
-      .add_modifier(Modifier::BOLD),
-  );
-
-   let rb_detail =  Paragraph::new(selected_rb.to_string())
-   .style(Style::default().fg(Color::LightCyan))
-   .alignment(Alignment::Left)
-   //.scroll((5, 10))
-   //.text(rb_list[0].to_string())
-   .block(
-     Block::default()
-       .borders(Borders::ALL)
-       .style(Style::default().fg(Color::White))
-       .title("Detail")
-       .border_type(BorderType::Double),
-   );
-
-
-  //let rb_detail = Table::new(vec![Row::new(vec![
-  //  Cell::from(Span::raw(selected_rb.to_string())),
-  //  //Cell::from(Span::raw(selected_rb.name)),
-  //  //Cell::from(Span::raw(selected_.category)),
-  //  //Cell::from(Span::raw(selected_.age.to_string())),
-  //  //Cell::from(Span::raw(selected_.created_at.to_string())),
-  //])])
-  //.header(Row::new(vec![
-  //    Cell::from(Span::styled(
-  //        "ID",
-  //        Style::default().add_modifier(Modifier::BOLD),
-  //    )),
-  //    Cell::from(Span::styled(
-  //        "Name",
-  //        Style::default().add_modifier(Modifier::BOLD),
-  //    )),
-  //    //Cell::from(Span::styled(
-  //    //    "Category",
-  //    //    Style::default().add_modifier(Modifier::BOLD),
-  //    //)),
-  //    //Cell::from(Span::styled(
-  //    //    "Age",
-  //    //    Style::default().add_modifier(Modifier::BOLD),
-  //    //)),
-  //    //Cell::from(Span::styled(
-  //    //    "Created At",
-  //    //    Style::default().add_modifier(Modifier::BOLD),
-  //    //)),
-  //]))
-  //.block(
-  //  Block::default()
-  //    .borders(Borders::ALL)
-  //    .style(Style::default().fg(Color::White))
-  //    .title("Detail")
-  //    .border_type(BorderType::Plain),
-  //)
-  //.widths(&[
-  //    Constraint::Percentage(20),
-  //    Constraint::Percentage(80),
-  //    //Constraint::Percentage(20),
-  //    //Constraint::Percentage(5),
-  //    //Constraint::Percentage(20),
-  //]);
-  
-  let wf_detail = Table::new(vec![Row::new(vec![
-    Cell::from(Span::raw("Waveform")),
-    //Cell::from(Span::raw(selected_rb.name)),
-    //Cell::from(Span::raw(selected_.category)),
-    //Cell::from(Span::raw(selected_.age.to_string())),
-    //Cell::from(Span::raw(selected_.created_at.to_string())),
-  ])])
-  .header(Row::new(vec![
-      Cell::from(Span::styled(
-          "WF",
-          Style::default().add_modifier(Modifier::BOLD),
-      )),
-      //Cell::from(Span::styled(
-      //    "Name",
-      //    Style::default().add_modifier(Modifier::BOLD),
-      //)),
-      //Cell::from(Span::styled(
-      //    "Category",
-      //    Style::default().add_modifier(Modifier::BOLD),
-      //)),
-      //Cell::from(Span::styled(
-      //    "Age",
-      //    Style::default().add_modifier(Modifier::BOLD),
-      //)),
-      //Cell::from(Span::styled(
-      //    "Created At",
-      //    Style::default().add_modifier(Modifier::BOLD),
-      //)),
-  ]))
-  .block(
-    Block::default()
-      .borders(Borders::ALL)
-      .style(Style::default().fg(Color::White))
-      .title("Waveforms")
-      .border_type(BorderType::Plain),
-  )
-  .widths(&[
-      Constraint::Percentage(5),
-      Constraint::Percentage(20),
-      Constraint::Percentage(20),
-      Constraint::Percentage(5),
-      Constraint::Percentage(20),
-  ]);
-
-  (list, rb_detail, charts) // wf_detail)
-}
-
 
 #[derive(Debug, Clone)]
 struct MasterLayout {
@@ -595,11 +357,29 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
         }
 
         MenuItem::Status => {
+
+          let empty_data = vec![(0.0,0.0);1024]; 
+          let mut data = vec![empty_data;9];
+
+          match tp_from_recv.recv() {
+            Err(err) => {trace!("Did not receive new data!");},
+            Ok(dt)   => {
+              if dt.packet_type == PacketType::RBEvent {
+                data = Vec::<Vec<(f64,f64)>>::new();
+                let mut event = BlobData::new();
+                event.from_bytestream(&dt.payload, 0, false);
+                for n in 0..9 {
+                  let adc = event.ch_adc[n];
+                  for j in 0..adc.len() {
+                    data[n].push((j as f64, adc[j] as f64));
+                  }
+                }
+              }
+            }
+          }
           let xlabels = vec!["0", "200", "400", "600", "800", "1000"];
           let ylabels = vec!["0","50", "100"];
           //let cdata = data.clone();
-          let empty_data = vec![(0.0,0.0);1024]; 
-          let data = vec![empty_data;9];
 
           let datasets = vec![
             Dataset::default()
