@@ -360,7 +360,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
 
           let empty_data = vec![(0.0,0.0);1024]; 
           let mut data = vec![empty_data;9];
-
+          let mut update_channels = false;
           match tp_from_recv.recv() {
             Err(err) => {trace!("Did not receive new data!");},
             Ok(dt)   => {
@@ -376,6 +376,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                     for j in 0..adc.len() {
                       data[n].push((j as f64, adc[j] as f64));
                     }
+                    update_channels = true;
                   }
                 }
               }
@@ -468,10 +469,11 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
           
           rect.render_stateful_widget(status_tab.list_widget, status_tab.list_rect, &mut rb_list_state);
           rect.render_widget(status_tab.detail, status_tab.detail_rect); 
-          for n in 0..status_tab.ch_rect.len() {
-            rect.render_widget(charts[n].clone(), status_tab.ch_rect[n]);
+          if update_channels { 
+            for n in 0..status_tab.ch_rect.len() {
+              rect.render_widget(charts[n].clone(), status_tab.ch_rect[n]);
+            }
           }
-
 
           //return charts;
           //self.ch_charts = charts;
