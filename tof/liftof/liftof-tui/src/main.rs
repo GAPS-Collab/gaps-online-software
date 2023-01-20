@@ -369,11 +369,13 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                
                 let mut event = BlobData::new();
                 event.from_bytestream(&dt.payload, 0, false);
-                for n in 0..9 {
-                  data.push(Vec::<(f64,f64)>::new());
-                  let adc = event.ch_adc[n];
-                  for j in 0..adc.len() {
-                    data[n].push((j as f64, adc[j] as f64));
+                if event.ch_adc.len() == 9 {
+                  for n in 0..9 {
+                    data.push(Vec::<(f64,f64)>::new());
+                    let adc = event.ch_adc[n];
+                    for j in 0..adc.len() {
+                      data[n].push((j as f64, adc[j] as f64));
+                    }
                   }
                 }
               }
