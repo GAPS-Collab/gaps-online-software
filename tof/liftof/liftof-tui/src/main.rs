@@ -12,6 +12,7 @@
 
 mod tab_commands;
 mod tab_mt;
+mod tab_status;
 mod menu;
 
 use chrono::prelude::*;
@@ -68,6 +69,7 @@ use tof_dataclasses::threading::ThreadPool;
 
 use crate::tab_commands::CommandTab;
 use crate::tab_mt::MTTab;
+use crate::tab_status::StatusTab;
 use crate::menu::{MenuItem, Menu};
 
 
@@ -102,15 +104,31 @@ enum Event<I> {
 
 /// Receive the data stream and forward 
 /// it to a widget
-fn receive_stream(tp_to_main : Sender<TofPacket>) {
+fn receive_stream(tp_to_main : Sender<TofPacket>,
+                  rb_list    : Vec<ReadoutBoard>) {
       
-  let ctx = zmq::Context::new();   
-  let mut address_ip = String::from("tcp://127.0.0.1");
-  let data_port : u32 = 40000;
-  let data_address : String = address_ip + ":" + &data_port.to_string();
+  let ctx = zmq::Context::new();  
   let data_socket = ctx.socket(zmq::SUB).expect("Unable to create 0MQ SUB socket!");
-  data_socket.connect(&data_address);
-  info!("0MQ SUB socket connected to address {data_address}");
+
+  for rb in rb_list.iter() {
+    match rb.ip_address {
+      None => {continue;},
+      Some(ip) => {
+        //let mut address_ip = String::from("tcp://127.0.0.1");
+        //let data_port : u32 = 40000;
+        //let data_address : String = address_ip + ":" + &data_port.to_string();
+        let mut address_ip = "tcp://".to_owned() + &rb.ip_address.unwrap().to_string();
+        match rb.data_port {
+          None => {continue;}
+          Some(port) => {
+            address_ip += &port.to_string();
+            data_socket.connect(&address_ip);
+            info!("0MQ SUB socket connected to address {address_ip}");
+          }
+        }
+      }
+    }
+  }
   let topic = b"";
   data_socket.set_subscribe(topic);
   let recv_rate = Duration::from_millis(5);
@@ -442,18 +460,25 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   //pretty_env_logger::init();
 
   let mut tick_count = 0;
-  let rb_list = get_rb_manifest();
-
+  let mut rb_list = get_rb_manifest();
+  if rb_list.len() == 0 {
+    let mut rb = ReadoutBoard::default();
+    rb.id = Some(0);
+    rb_list = vec![rb];
+  }
+  let rb_list_c = rb_list.clone();
   // first set up comms etc. before 
   // we go into raw_mode, so we can 
   // see the log messages during setup
   let (tp_to_main, tp_from_recv)  : (Sender<TofPacket>, Receiver<TofPacket>)       = unbounded();
 
+  //let ev_to_main, ev_from_thread) : Sender
+
   // set up Threads
   let n_threads = 2;
   let workforce = ThreadPool::new(n_threads);
   workforce.execute(move || {
-      receive_stream(tp_to_main);
+      receive_stream(tp_to_main, rb_list_c);
   });
 
   // set up the terminal
@@ -508,8 +533,9 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
     terminal.draw(|rect| {
       let size = rect.size();
       let mster_lo = MasterLayout::new(size); 
-      let mut cmd_tab = CommandTab::new(mster_lo.rect[1], &packets);
-      let mut mt_tab  = MTTab::new(mster_lo.rect[1], &packets);
+      let mut cmd_tab    = CommandTab::new(mster_lo.rect[1], &packets);
+      let mut mt_tab     = MTTab::new(mster_lo.rect[1], &packets);
+      let mut status_tab = StatusTab::new(mster_lo.rect[1], &rb_list, rb_list_state.clone());
       rect.render_widget(ui_menu.tabs.clone(), mster_lo.rect[0]);
       let w_logs = render_logs();
       rect.render_widget(w_logs, mster_lo.rect[2]);
@@ -568,34 +594,134 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
         }
 
         MenuItem::Status => {
-          let status_chunks = Layout::default()
-            .direction(Direction::Horizontal)
-            .constraints(
-                [Constraint::Percentage(10), Constraint::Percentage(20), Constraint::Percentage(70)].as_ref(),
+          let xlabels = vec!["0", "200", "400", "600", "800", "1000"];
+          let ylabels = vec!["0","50", "100"];
+          //let cdata = data.clone();
+          let empty_data = vec![(0.0,0.0);1024]; 
+          let data = vec![empty_data;9];
+
+          let datasets = vec![
+            Dataset::default()
+              .name("Ch0")
+              .marker(symbols::Marker::Dot)
+              .graph_type(GraphType::Scatter)
+              .style(Style::default().fg(Color::Cyan))
+              .data(&data[0]),
+            Dataset::default()
+              .name("Ch1")
+              .marker(symbols::Marker::Braille)
+              .graph_type(GraphType::Line)
+              .style(Style::default().fg(Color::Magenta))
+              .data(&data[1]),
+            Dataset::default()
+              .name("Ch2")
+              .marker(symbols::Marker::Braille)
+              .graph_type(GraphType::Line)
+              .style(Style::default().fg(Color::Magenta))
+              .data(&data[2]),
+            Dataset::default()
+              .name("Ch3")
+              .marker(symbols::Marker::Braille)
+              .graph_type(GraphType::Line)
+              .style(Style::default().fg(Color::Magenta))
+              .data(&data[3]),
+            Dataset::default()
+              .name("Ch4")
+              .marker(symbols::Marker::Braille)
+              .graph_type(GraphType::Line)
+              .style(Style::default().fg(Color::Magenta))
+              .data(&data[4]),
+            Dataset::default()
+              .name("Ch5")
+              .marker(symbols::Marker::Braille)
+              .graph_type(GraphType::Line)
+              .style(Style::default().fg(Color::Magenta))
+              .data(&data[5]),
+            Dataset::default()
+              .name("Ch6")
+              .marker(symbols::Marker::Braille)
+              .graph_type(GraphType::Line)
+              .style(Style::default().fg(Color::Magenta))
+              .data(&data[6]),
+            Dataset::default()
+              .name("Ch7")
+              .marker(symbols::Marker::Braille)
+              .graph_type(GraphType::Line)
+              .style(Style::default().fg(Color::Magenta))
+              .data(&data[7]),
+            Dataset::default()
+              .name("Ch8 ('Ninth')")
+              .marker(symbols::Marker::Braille)
+              .graph_type(GraphType::Line)
+              .style(Style::default().fg(Color::Magenta))
+              .data(&data[8]),
+          ];
+          
+          let mut charts  = Vec::<Chart>::new();
+          for n in 0..datasets.len() {
+            let this_chart_dataset = vec![datasets[n].clone()];
+            let chart = Chart::new(this_chart_dataset)
+            .block(
+              Block::default()
+                .borders(Borders::ALL)
+                .style(Style::default().fg(Color::White))
+                .title("Ch ".to_owned() + &n.to_string() )
+                .border_type(BorderType::Plain),
             )
-            .split(mster_lo.rect[1]);
-          let ch_chunks = Layout::default()
-            .direction(Direction::Vertical)
-            .constraints(
-                [Constraint::Percentage(11),
-                 Constraint::Percentage(11),
-                 Constraint::Percentage(11),
-                 Constraint::Percentage(11),
-                 Constraint::Percentage(11),
-                 Constraint::Percentage(11),
-                 Constraint::Percentage(11),
-                 Constraint::Percentage(11),
-                 Constraint::Percentage(12)].as_ref(),
-            )
-            .split(status_chunks[2]);
-          let (left, center, mut right) = render_status(rb_list_state.clone(), rb_list.clone());
-          //let (left, center, mut right) = render_status(rb_list.clone());
-          rect.render_stateful_widget(left, status_chunks[0], &mut rb_list_state);
-          rect.render_widget(center, status_chunks[1]);
-          for n in 0..ch_chunks.len() - 1 {
-            let ch = right.remove(0);
-            rect.render_widget(ch, ch_chunks[n]);
+            .x_axis(Axis::default()
+              .title(Span::styled("bin", Style::default().fg(Color::White)))
+              .style(Style::default().fg(Color::White))
+              .bounds([0.0, 1024.0])
+              .labels(xlabels.clone().iter().cloned().map(Span::from).collect()))
+            .y_axis(Axis::default()
+              .title(Span::styled("ADC", Style::default().fg(Color::White)))
+              .style(Style::default().fg(Color::White))
+              .bounds([0.0, 100.0])
+              .labels(ylabels.clone().iter().cloned().map(Span::from).collect()));
+            charts.push(chart);
           }
+          
+          rect.render_stateful_widget(status_tab.list_widget, status_tab.list_rect, &mut rb_list_state);
+          rect.render_widget(status_tab.detail, status_tab.detail_rect); 
+          for n in 0..status_tab.ch_rect.len() {
+            rect.render_widget(charts[n].clone(), status_tab.ch_rect[n]);
+          }
+
+
+          //return charts;
+          //self.ch_charts = charts;
+          //}
+          //for n in 0..status_tab.ch_rect.len() {
+          //  rect.render_widget(status_tab.ch_charts[n].clone(), status_tab.ch_rect[n]);
+          //}
+          //let status_chunks = Layout::default()
+          //  .direction(Direction::Horizontal)
+          //  .constraints(
+          //      [Constraint::Percentage(10), Constraint::Percentage(20), Constraint::Percentage(70)].as_ref(),
+          //  )
+          //  .split(mster_lo.rect[1]);
+          //let ch_chunks = Layout::default()
+          //  .direction(Direction::Vertical)
+          //  .constraints(
+          //      [Constraint::Percentage(11),
+          //       Constraint::Percentage(11),
+          //       Constraint::Percentage(11),
+          //       Constraint::Percentage(11),
+          //       Constraint::Percentage(11),
+          //       Constraint::Percentage(11),
+          //       Constraint::Percentage(11),
+          //       Constraint::Percentage(11),
+          //       Constraint::Percentage(12)].as_ref(),
+          //  )
+          //  .split(status_chunks[2]);
+          //let (left, center, mut right) = render_status(rb_list_state.clone(), rb_list.clone());
+          ////let (left, center, mut right) = render_status(rb_list.clone());
+          //rect.render_stateful_widget(left, status_chunks[0], &mut rb_list_state);
+          //rect.render_widget(center, status_chunks[1]);
+          //for n in 0..ch_chunks.len() - 1 {
+          //  let ch = right.remove(0);
+          //  rect.render_widget(ch, ch_chunks[n]);
+          //}
         },
         _ => (),
       } 
