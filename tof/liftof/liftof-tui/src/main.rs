@@ -121,6 +121,7 @@ fn receive_stream(tp_to_main : Sender<TofPacket>,
         match rb.data_port {
           None => {continue;}
           Some(port) => {
+            address_ip += &":".to_owned();
             address_ip += &port.to_string();
             data_socket.connect(&address_ip);
             info!("0MQ SUB socket connected to address {address_ip}");
