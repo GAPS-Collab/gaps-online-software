@@ -366,9 +366,11 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
             Ok(dt)   => {
               if dt.packet_type == PacketType::RBEvent {
                 data = Vec::<Vec<(f64,f64)>>::new();
+               
                 let mut event = BlobData::new();
                 event.from_bytestream(&dt.payload, 0, false);
                 for n in 0..9 {
+                  data.push(Vec::<(f64,f64)>::new());
                   let adc = event.ch_adc[n];
                   for j in 0..adc.len() {
                     data[n].push((j as f64, adc[j] as f64));
