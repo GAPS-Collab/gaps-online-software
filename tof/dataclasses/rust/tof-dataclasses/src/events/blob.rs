@@ -9,6 +9,8 @@
  *
  ***********************************/
 
+use std::fmt;
+
 use crate::constants::{NWORDS, NCHN, MAX_NUM_PEAKS};
 use crate::errors::{WaveformError, 
                     SerializationError};
@@ -187,7 +189,11 @@ pub struct BlobData
 
 } 
 
-/***********************************/
+impl fmt::Display for BlobData {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    write!(f, "<BlobData: RB {}, event id {}>", self.id, self.event_id)
+  }
+}
 
 impl BlobData {
 
