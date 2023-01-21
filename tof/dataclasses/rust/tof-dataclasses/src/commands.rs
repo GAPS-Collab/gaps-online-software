@@ -195,8 +195,82 @@ impl TofCommand {
   ///// + 1 byte command code
   ///// + 4 bytes value
   ///// => 9 bytes
-  //const SIZE : usize = 9; 
+  const SIZE : usize = 9; 
 
+
+  /// Returns the serialized data stream
+  /// as byte array
+  /// 
+  /// Might be faster thant its sister
+  /// ::to_bytestream(), however is not
+  /// a trait, since the return type 
+  /// depends on the size. 
+  /// FIXME - can we somehow make this 
+  /// a trait? It seems we can not return 
+  /// &[u8] when we have the corresponding
+  /// array allocated in the function
+  pub fn to_bytearray(&self) -> [u8;TofCommand::SIZE] {
+
+    let mut bytes = [0u8;TofCommand::SIZE];
+    bytes[0] = 0xAA;
+    bytes[1] = 0xAA;
+    bytes[2] = TofCommand::to_command_code(&self).expect("This can't fail, since this is implemented on MYSELF and I am a TofCommand!"); 
+    let value_bytes = self.get_value().to_le_bytes();
+   
+    for n in 0..4 {
+      bytes[3+n] = value_bytes[n];
+    }
+    bytes[7] = 0x55;
+    bytes[8] = 0x55;
+    bytes
+  }
+  
+  pub fn to_bytestream(&self) -> Vec<u8> {
+
+    let mut stream = Vec::<u8>::with_capacity(TofCommand::SIZE);
+    stream[0] = 0xAA;
+    stream[1] = 0xAA;
+    stream[2] = TofCommand::to_command_code(&self).expect("This can't fail, since this is implemented on MYSELF and I am a TofCommand!"); 
+    let value_bytes = self.get_value().to_le_bytes();
+   
+    for n in 0..4 {
+      stream[3+n] = value_bytes[n];
+    }
+    stream[7] = 0x55;
+    stream[8] = 0x55;
+    stream
+  }
+
+
+  // this can not fail
+  pub fn get_value(&self) -> u32 {
+    let value : u32;
+    match self {
+      TofCommand::PowerOn                 (data) => { value = *data;}, 
+      TofCommand::PowerOff                (data) => { value = *data;}, 
+      TofCommand::PowerCycle              (data) => { value = *data;}, 
+      TofCommand::RBSetup                 (data) => { value = *data;}, 
+      TofCommand::SetThresholds           (data) => { value = *data;},
+      TofCommand::SetMtConfig             (data) => { value = *data;},
+      TofCommand::StartValidationRun      (data) => { value = *data;},
+      TofCommand::RequestWaveforms        (data) => { value = *data;},
+      TofCommand::UnspoolEventCache       (data) => { value = *data;},
+      TofCommand::StreamAnyEvent          (data) => { value = *data;},
+      TofCommand::StreamOnlyRequested     (data) => { value = *data;},
+      TofCommand::DataRunStart            (data) => { value = *data;},
+      TofCommand::DataRunEnd              (data) => { value = *data;},
+      TofCommand::VoltageCalibration      (data) => { value = *data;},
+      TofCommand::TimingCalibration       (data) => { value = *data;},
+      TofCommand::CreateCalibrationFile   (data) => { value = *data;},
+      TofCommand::RequestEvent            (data) => { value = *data;},
+      TofCommand::RequestMoni             (data) => { value = *data;},
+      TofCommand::SetRBBuffTrip           (data) => { value = *data;},
+      TofCommand::SetRBForcedTrigModeOn   (data) => { value = *data;},
+      TofCommand::SetRBForcedTrigModeOff  (data) => { value = *data;},
+      TofCommand::Unknown                 (data) => { value = *data;}, 
+    }
+    value
+  }
 
   /// String representation of the enum
   ///
@@ -345,6 +419,12 @@ impl From<(u8, u32)> for TofCommand {
 }
 
 impl Serialization for TofCommand {
+
+  ///
+  //fn to_slice(&self) -> &[u8] {
+  //  let mut slice = [0u8;TofCommand::SIZE];
+  //  &slice
+  //}
 
   fn from_bytestream(stream    : &Vec<u8>, 
                      start_pos : usize) 
