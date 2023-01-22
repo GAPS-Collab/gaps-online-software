@@ -490,6 +490,14 @@ pub enum TofResponse {
   Unknown
 }
 
+impl fmt::Display for TofResponse {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let r = self.string_repr();
+    //let arg = 
+    write!(f, "<TofResponse {}>", r)
+  }
+}
+
 impl TofResponse {
   const HEAD : u16 = 0xAAAA;
   const TAIL : u16 = 0x5555;
@@ -511,6 +519,19 @@ impl TofResponse {
     bytestream.extend_from_slice(&value.to_le_bytes());
     bytestream.extend_from_slice(&TofResponse::TAIL.to_le_bytes());
     bytestream
+  }
+
+  pub fn string_repr(&self) -> String {
+    let repr : String;
+    match self {
+      TofResponse::Success           (data) => {repr = "Success(".to_owned()           + &data.to_string() + ")";},
+      TofResponse::GeneralFail       (data) => {repr = "GeneralFail(".to_owned()       + &data.to_string() + ")";},
+      TofResponse::EventNotReady     (data) => {repr = "EventNotReady(".to_owned()     + &data.to_string() + ")";},
+      TofResponse::SerializationIssue(data) => {repr = "SerializationIssue".to_owned() + &data.to_string() + ")";},
+      TofResponse::ZMQProblem        (data) => {repr = "ZMQProblem(".to_owned()        + &data.to_string() + ")";},
+      TofResponse::Unknown                  => {repr = "Unknown".to_owned();}, 
+    }
+  repr
   }
 }
 

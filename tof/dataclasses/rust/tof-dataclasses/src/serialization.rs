@@ -23,7 +23,17 @@ pub trait Serialization {
     println!("There can't be a default implementation for this trait!");
     todo!();
     }
- 
+
+
+  /// Construct byte slice out of self.
+  ///
+  /// Can not fail.
+  fn to_slice(&self) 
+    -> &[u8]
+    where Self : Sized {
+    println!("There can't be a default implementation for this trait!");
+    todo!();
+    }
   
   //pub fn to_bytestream(&self, &
 
