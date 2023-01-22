@@ -16,6 +16,7 @@
 //! -----------------------------------------
 //! | Logs                                  |
 
+use tof_dataclasses::events::blob::BlobData;
 
 use chrono::Utc;
 
@@ -33,7 +34,12 @@ use tui::{
 use std::collections::VecDeque;
 
 use tof_dataclasses::packets::{TofPacket, PacketType};
-use tof_dataclasses::commands::TofCommand;
+use tof_dataclasses::commands::{TofCommand,
+                                TofResponse};
+
+use crossbeam_channel::{unbounded,
+                        Sender,
+                        Receiver};
 
 #[derive(Debug, Clone)]
 pub struct CommandTab<'a> {
@@ -52,7 +58,10 @@ pub struct CommandTab<'a> {
 
 impl CommandTab<'_> {
 
-  pub fn new<'a>(main_window : Rect, packets : &VecDeque<String>) -> CommandTab<'a> {
+  pub fn new<'a>(main_window : Rect,
+                 packets : &VecDeque<String>,
+                 recv_resp     : Receiver<Vec<Option<TofResponse>>>,
+                 send_cmd      : Sender<TofCommand>) -> CommandTab<'a> {
 
      let cmds_chunks = Layout::default()
        .direction(Direction::Horizontal)
@@ -159,7 +168,8 @@ impl CommandTab<'_> {
       stream_rect,
       message_queue : VecDeque::<String>::new()
     };
-    ct.update(packets);
+    let response = Vec::<Option<TofResponse>>::new();
+    ct.update(packets, &response);
     ct
   }
 
@@ -175,7 +185,8 @@ impl CommandTab<'_> {
       PacketType::Command   => {
       },
       PacketType::RBEvent   => {
-        pk_repr = String::from("\u{2728} <") + &now + " - RBEvent >";
+        let eventid = BlobData::decode_event_id(pk.payload.as_slice());
+        pk_repr = String::from("\u{2728} <") + &now + " " + &eventid.to_string() + " - RBEvent >";
       },
       PacketType::Monitor   => {
         pk_repr = String::from("\u{1f4c8} <") + &now + " - RBMoni >";
@@ -218,7 +229,9 @@ impl CommandTab<'_> {
   /// Use in the render loop. Will add current stream 
   /// information as well as the last response
   /// from the tof system.
-  pub fn update(&mut self, packets : &VecDeque<String>) {
+  pub fn update(&mut self,
+                packets : &VecDeque<String>,
+                response : &Vec<Option<TofResponse>>) {
 
     //
     //let foo = packets.pop().unwrap();
@@ -232,7 +245,18 @@ impl CommandTab<'_> {
         );
     }
        
-    self.tof_resp = Paragraph::new("")
+    let mut spans_resp = Vec::<Spans>::new();
+    for n in 0..response.len() {
+        if response[n].is_none() {
+          continue;
+        }
+        spans_resp.push(Spans::from(vec![Span::styled(
+            //String::from("PowerOn"),
+            response[n].unwrap().string_repr().clone(),
+            Style::default())])
+        );
+    }
+    self.tof_resp = Paragraph::new(spans_resp)
     .style(Style::default().fg(Color::LightCyan))
     .alignment(Alignment::Center)
     .block(

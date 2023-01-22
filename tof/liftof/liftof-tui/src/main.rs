@@ -61,7 +61,7 @@ use tui::{
 use sysinfo::{NetworkExt, NetworksExt, ProcessExt, System, SystemExt};
 
 
-use tof_dataclasses::commands::TofCommand;
+use tof_dataclasses::commands::{TofCommand, TofResponse};
 use tof_dataclasses::packets::{TofPacket, PacketType};
 use tof_dataclasses::serialization::Serialization;
 use tof_dataclasses::threading::ThreadPool;
@@ -100,6 +100,62 @@ enum Event<I> {
 //    }
 //  }
 //}
+
+/// Communicate with the readoutboards on the 
+/// CMD channel 
+///
+/// Opens 0MQ socket for the individual RB's
+fn commander(cmd_from_main : Receiver<TofCommand>,
+             rsp_to_main   : Sender<Vec<Option<TofResponse>>>,
+             rb_list       : Vec<ReadoutBoard>) {
+
+  // connect to the rb's 
+  let ctx = zmq::Context::new();  
+  // how zmq works is that one req socket can connect to multiple REP and 
+  // broadcast the messages
+  let cmd_socket = ctx.socket(zmq::REQ).expect("Unable to create 0MQ SUB socket!");
+  let mut connected_rbs : u8 = 0;
+  for rb in rb_list.iter() {
+    if rb.ip_address.is_none() || rb.cmd_port.is_none() {
+      connected_rbs += 1;
+      continue;
+    }
+    let address = "tcp::/".to_owned()
+                  + &rb.ip_address.expect("No IP known for this board!").to_string()
+                  + ":"
+                  +  &rb.cmd_port.expect("No CMD port known for this board!").to_string();
+    cmd_socket.connect(&address);
+  }
+  if connected_rbs == 0 {
+    panic!("I can not connect to any readout boards! Either auto-discovery did not discover them or none are (physically) connected!");
+  }
+  loop {
+    let mut responses = Vec::<Option<TofResponse>>::new();
+    match cmd_from_main.recv() {
+      Err(err) => trace!("Did not get any response, err {err}"),
+      Ok(cmd)  => {
+        // the 0 in the send/recv section means 
+        // it should wait (in contrast to zmq::DONTWAIT)
+        // how this works is that we have to go through 
+        // the connected boards 1 by 1 and do our 
+        // send/recv spiel.
+        // We will get one response per board
+        cmd_socket.send(&cmd.to_bytestream(), 0);
+        let resp = cmd_socket.recv_bytes(0);
+        match resp {
+          Err(err) => debug!("0MQ problem, can not receive response from RB!"),
+          Ok(r)    => {
+            let tof_response = TofResponse::from_bytestream(&r, 0).ok();
+            responses.push(tof_response);
+          }
+        }
+      }
+    }
+  if responses.len() != 0 {
+    rsp_to_main.send(responses);
+  }
+  }// end loop
+}
 
 
 /// Receive the data stream and forward 
@@ -230,16 +286,24 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
     rb_list = vec![rb];
   }
   let rb_list_c = rb_list.clone();
+  let rb_list_c2 = rb_list.clone();
   // first set up comms etc. before 
   // we go into raw_mode, so we can 
   // see the log messages during setup
-  let (tp_to_main, tp_from_recv)  : (Sender<TofPacket>, Receiver<TofPacket>)       = unbounded();
-
+  let (tp_to_main, tp_from_recv)   : (Sender<TofPacket>, Receiver<TofPacket>)       = unbounded();
+  let (cmd_to_cmdr, cmd_from_main) : (Sender<TofCommand>, Receiver<TofCommand>)     = unbounded();
+  let (rsp_to_main, rsp_from_cmdr) :
+    (Sender<Vec<Option<TofResponse>>>, Receiver<Vec<Option<TofResponse>>>) = unbounded();
   //let ev_to_main, ev_from_thread) : Sender
 
   // set up Threads
   let n_threads = 2;
   let workforce = ThreadPool::new(n_threads);
+  workforce.execute(move || {
+      commander(cmd_from_main,
+                rsp_to_main,
+                rb_list_c2);
+  });
   workforce.execute(move || {
       receive_stream(tp_to_main, rb_list_c);
   });
@@ -296,9 +360,14 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
     terminal.draw(|rect| {
       let size = rect.size();
       let mster_lo = MasterLayout::new(size); 
-      let mut cmd_tab    = CommandTab::new(mster_lo.rect[1], &packets);
+      let mut cmd_tab    = CommandTab::new(mster_lo.rect[1],
+                                           &packets,
+                                           rsp_from_cmdr.clone(),
+                                           cmd_to_cmdr.clone());
       let mut mt_tab     = MTTab::new(mster_lo.rect[1], &packets);
-      let mut status_tab = StatusTab::new(mster_lo.rect[1], &rb_list, rb_list_state.clone());
+      let mut status_tab = StatusTab::new(mster_lo.rect[1],
+                                          &rb_list,
+                                          rb_list_state.clone());
       rect.render_widget(ui_menu.tabs.clone(), mster_lo.rect[0]);
       let w_logs = render_logs();
       rect.render_widget(w_logs, mster_lo.rect[2]);
@@ -323,6 +392,14 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                   
                   // check the zmq socket
                   let mut event = TofPacket::new();
+                  let mut last_response = Vec::<Option<TofResponse>>::new();
+
+                  match rsp_from_cmdr.try_recv() {
+                    Err(err)     => trace!("No response!"),
+                    Ok(response) => {
+                      last_response = response;             
+                    }
+                  }
                   match tp_from_recv.try_recv() {
                     Err(err) => {
                       trace!("No event!");
@@ -343,7 +420,8 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                         packets.push_back(foo);
                       }
                       info!("Updating Command tab!");
-                      cmd_tab.update(&packets);
+                      cmd_tab.update(&packets,
+                                     &last_response);
                     }
                   }
                 },
@@ -474,6 +552,35 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
               rect.render_widget(charts[n].clone(), status_tab.ch_rect[n]);
             }
           }
+          // chart for "ch9"
+          let ch9 = vec![ Dataset::default()
+              .name("Ch8 ('Ninth')")
+              .marker(symbols::Marker::Braille)
+              .graph_type(GraphType::Line)
+              .style(Style::default().fg(Color::Magenta))
+              .data(&data[8])
+          ];
+          let ch9_chart = Chart::new(ch9)
+            .block(
+              Block::default()
+                .borders(Borders::ALL)
+                .style(Style::default().fg(Color::White))
+                .title("Ch 9")
+                .border_type(BorderType::Plain),
+            )
+            .x_axis(Axis::default()
+              .title(Span::styled("bin", Style::default().fg(Color::White)))
+              .style(Style::default().fg(Color::White))
+              .bounds([0.0, 1024.0])
+              .labels(xlabels.clone().iter().cloned().map(Span::from).collect()))
+            .y_axis(Axis::default()
+              .title(Span::styled("ADC", Style::default().fg(Color::White)))
+              .style(Style::default().fg(Color::White))
+              .bounds([0.0, 100.0])
+              .labels(ylabels.clone().iter().cloned().map(Span::from).collect()));
+          
+
+
 
           //return charts;
           //self.ch_charts = charts;

@@ -24,10 +24,15 @@ use tui::{
     Terminal,
 };
 
+use crossbeam_channel::{unbounded,
+                        Sender,
+                        Receiver};
+
 use std::collections::VecDeque;
 
 use tof_dataclasses::packets::{TofPacket, PacketType};
-use tof_dataclasses::commands::TofCommand;
+use tof_dataclasses::commands::{TofCommand,
+                                TofResponse};
 
 use liftof_lib::{get_rb_manifest,
                  ReadoutBoard};
@@ -167,7 +172,7 @@ impl StatusTab<'_> {
 
   pub fn new<'a> (main_window   : Rect,
                   rb_list       : &Vec<ReadoutBoard>,
-                  rb_list_state : ListState) 
+                  rb_list_state : ListState)
     -> StatusTab<'a> {
     let empty_data = vec![(0.0,0.0);1024]; 
     let data = vec![empty_data;9];
