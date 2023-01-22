@@ -386,7 +386,26 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
             Err(err) => trace!("No update"),
             Ok(event) => {
               match event {
-                Event::Input(ev) => (),
+                Event::Input(ev) => {
+                  match ev.code {
+                    KeyCode::Enter => {
+                      if matches!(ui_menu.active_menu_item, MenuItem::Commands) {
+                        info!("Enter pressed, will send highlighted tof command!");
+                        warn!("This is not yet implemented!");
+                        if let Some(selected) = rb_list_state.selected() {
+                          // We hope (it *should* be) that the command list vector 
+                          // and the actual command vector are aligned
+                          let this_command = cmd_tab.cmd_list[selected];
+                          match cmd_to_cmdr.send(this_command) {
+                            Err(err) => trace!("There was a problem sending the command!"),
+                            Ok(_)    => trace!("Command sent!")
+                          }
+                        }
+                      }
+                    },
+                    _ => trace!("Some other key pressed!"),
+                  }
+                },
                 Event::Tick => {
                   let foo : String = "Tick :".to_owned() + &tick_count.to_string();
                   
@@ -468,32 +487,32 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
             Dataset::default()
               .name("Ch0")
               .marker(symbols::Marker::Dot)
-              .graph_type(GraphType::Scatter)
-              .style(Style::default().fg(Color::Cyan))
+              .graph_type(GraphType::Line)
+              .style(Style::default().fg(Color::White))
               .data(&data[0]),
             Dataset::default()
               .name("Ch1")
               .marker(symbols::Marker::Braille)
               .graph_type(GraphType::Line)
-              .style(Style::default().fg(Color::Magenta))
+              .style(Style::default().fg(Color::White))
               .data(&data[1]),
             Dataset::default()
               .name("Ch2")
               .marker(symbols::Marker::Braille)
               .graph_type(GraphType::Line)
-              .style(Style::default().fg(Color::Magenta))
+              .style(Style::default().fg(Color::White))
               .data(&data[2]),
             Dataset::default()
               .name("Ch3")
               .marker(symbols::Marker::Braille)
               .graph_type(GraphType::Line)
-              .style(Style::default().fg(Color::Magenta))
+              .style(Style::default().fg(Color::White))
               .data(&data[3]),
             Dataset::default()
               .name("Ch4")
               .marker(symbols::Marker::Braille)
               .graph_type(GraphType::Line)
-              .style(Style::default().fg(Color::Magenta))
+              .style(Style::default().fg(Color::White))
               .data(&data[4]),
             Dataset::default()
               .name("Ch5")
@@ -644,26 +663,26 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
           KeyCode::Char('m') => ui_menu.active_menu_item = MenuItem::MasterTrigger,
           KeyCode::Down => {
             if let Some(selected) = rb_list_state.selected() {
-                //let amount_pets = read_db().expect("can fetch pet list").len();
-                let max_rb = 40;
-                if selected >= max_rb - 1 {
-                  rb_list_state.select(Some(0));
-                } else {
-                  rb_list_state.select(Some(selected + 1));
-                }
+              //let amount_pets = read_db().expect("can fetch pet list").len();
+              let max_rb = 40;
+              if selected >= rb_list.len() {
+                rb_list_state.select(Some(0));
+              } else {
+                rb_list_state.select(Some(selected + 1));
               }
             }
-            KeyCode::Up => {
-              if let Some(selected) = rb_list_state.selected() {
-                //let amount_pets = read_db().expect("can fetch pet list").len();
-                let max_rb = 40;
-                if max_rb > 0 {
-                    rb_list_state.select(Some(selected - 1));
-                } else {
-                    rb_list_state.select(Some(max_rb - 1));
-                }
+          }
+          KeyCode::Up => {
+            if let Some(selected) = rb_list_state.selected() {
+              //let amount_pets = read_db().expect("can fetch pet list").len();
+              let max_rb = 40;
+              if max_rb > 0 {
+                  rb_list_state.select(Some(selected - 1));
+              } else {
+                  rb_list_state.select(Some(rb_list.len() - 1));
               }
             }
+          }
           _ => (),
         }
       }

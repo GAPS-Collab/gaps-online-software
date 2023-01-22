@@ -46,7 +46,7 @@ pub struct CommandTab<'a> {
 
   pub stream      : Paragraph<'a>,
   pub tof_resp    : Paragraph<'a>,
-  cmd_list        : Vec::<TofCommand>,
+  pub cmd_list    : Vec::<TofCommand>,
   pub list_widget : List<'a>,
   pub list_rect   : Rect,
   pub rsp_rect    : Rect,
