@@ -79,6 +79,14 @@ struct Args {
   ///// A json config file with detector information
   //#[arg(short, long)]
   //json_config: Option<std::path::PathBuf>,
+  /// Run without stopping. Control by remote through `TofCommand`
+  #[arg(long, default_value_t = false)]
+  run_forevever: bool,
+  /// Stream any eventy as soon as the software starts.
+  /// Don't wait for command line.
+  /// Behaviour can be controlled through `TofCommand` later
+  #[arg(long, default_value_t = false)]
+  stream_any : bool,
 }
 
 
@@ -258,8 +266,7 @@ const CMDPORT_START  : u32 = 40000;
 //}
 
 
-///! A monitoring thread, which communicates with the 
-///  server program
+/// Gather monitoring data 
 fn monitoring(ch : &Sender<Vec<u8>>) {
   //let mut now        = time::Instant::now();
   let heartbeat      = time::Duration::from_secs(HEARTBEAT);
@@ -400,22 +407,28 @@ fn main() {
   let show_progress = args.show_progress;
   let cache_size    = args.cache_size;
   let dont_listen   = args.dont_listen;
+  let run_forever   = args.run_forevever;
+  let stream_any    = args.stream_any;
 
   // welcome banner!
   println!("-----------------------------------------------");
   println!(" ** Welcome to liftof-rb {}{} *****", rocket, balloon);
-  println!(" .. TOF daten-kraken {} style C&C server/client and data acquistion suite", kraken);
+  println!(" .. liftof if a software suite for the time-of-flight detector ");
   println!(" .. for the GAPS experiment {}", sparkle_heart);
+  println!(" .. this client can be run standalone or connect to liftof-cc" );
+  println!(" .. or liftof-tui for an interactive experience" );
+  println!(" .. see the gitlab repository for documentation and submitting issues at" );
+  println!(" **https://uhhepvcs.phys.hawaii.edu/Achim/gaps-online-software/-/tree/main/tof/liftof**");
   println!("-----------------------------------------------");
   println!(" => Running client for RB {}", rb_id);
-  println!(" => RB had DNA {}", dna);
+  println!(" => ReadoutBoard DNA {}", dna);
   println!(" => Will bind local ZMQ PUB socket for data stream to {}", data_address);
   if !dont_listen { 
     println!(" => Will bind local ZMQ REP socket for control to {}"  , cmd_address);
   } 
   println!("-----------------------------------------------");
   println!("");                             
-                                            
+                            
   let mut uio1_total_size = (UIO1_MAX_OCCUPANCY - UIO1_MIN_OCCUPANCY) as u64;
   let mut uio2_total_size = (UIO2_MAX_OCCUPANCY - UIO2_MIN_OCCUPANCY) as u64;
 

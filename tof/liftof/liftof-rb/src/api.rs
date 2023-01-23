@@ -8,7 +8,9 @@ use crossbeam_channel::{Sender,
                         Receiver};
 
 // just for fun
-use indicatif::ProgressBar;
+use indicatif::{MultiProgress,
+                ProgressBar,
+                ProgressStyle};
 //use indicatif::ProgressStyle;
 
 use crate::control::*;
@@ -24,7 +26,8 @@ use tof_dataclasses::commands::{TofCommand,
 //use tof_dataclasses::threading::ThreadPool;
 
 use time::Duration;
- 
+
+/// Non-register related constants 
 pub const HEARTBEAT : u64 = 5; // heartbeat in s
 
 const SLEEP_AFTER_REG_WRITE : u32 = 1; // sleep time after register write in ms
@@ -32,7 +35,11 @@ const DMA_RESET_TRIES : u8 = 10;   // if we can not reset the DMA after this num
                                    // of retries, we'll panic!
 const SAVE_RESTART_TRIES : u8 = 5; // if we are not successfull, to get it going, 
                                    // panic
-/// Little helper
+
+
+
+
+                                   /// Little helper
 fn debug_and_ok() -> Result<(), RegisterError> {
   debug!("Raised RegisterError!");
   Ok(())
@@ -877,4 +884,87 @@ pub fn setup_drs4() -> Result<(), RegisterError> {
   Ok(())
 }
 
+/// Show progress bars for demonstration
+/// 
+/// The bar is a multibar and has 3 individual
+/// bars - 2 for the buffers and one for 
+/// the number of events seen
+/// Intended to be run in a seperate thread
+///
+pub fn show_progress(max_events      : u64,
+                     uio1_total_size : u64,
+                     uio2_total_size : u64,
+                     update_bar_a    : Receiver<u64>,
+                     update_bar_b    : Receiver<u64>,
+                     update_bar_ev   : Receiver<u64>,
+                     finish_bars     : Receiver<bool>){
+  let template_bar_a   : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.blue/grey} {bytes:>7}/{total_bytes:7} ";
+  let template_bar_b   : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.green/grey} {bytes:>7}/{total_bytes:7} ";
+  let template_bar_env : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.red/grey} {pos:>7}/{len:7}";
+  let floppy    = vec![240, 159, 146, 190];
+  let floppy    = String::from_utf8(floppy).unwrap();
+  let sparkles  = vec![226, 156, 168];
+  let sparkles  = String::from_utf8(sparkles).unwrap();
 
+  let label_a   = String::from("Buff A");
+  let label_b   = String::from("Buff B");
+  let sty_a = ProgressStyle::with_template(template_bar_a)
+  .unwrap();
+  //.progress_chars("##-");
+  let sty_b = ProgressStyle::with_template(template_bar_b)
+  .unwrap();
+  //.progress_chars("##-");
+  let sty_ev = ProgressStyle::with_template(template_bar_env)
+  .unwrap();
+  //.progress_chars("##>");
+  let mut multi_prog = MultiProgress::new();
+
+  let prog_a  = multi_prog
+                .add(ProgressBar::new(uio1_total_size)); 
+  let prog_b  = multi_prog
+                .insert_after(&prog_a, ProgressBar::new(uio2_total_size)); 
+  let prog_ev = multi_prog
+                .insert_after(&prog_b, ProgressBar::new(max_events)); 
+  
+  prog_a.set_message (label_a);
+  prog_a.set_prefix  (floppy.clone());
+  prog_a.set_style   (sty_a);
+  prog_b.set_message (label_b);
+  prog_b.set_prefix  (floppy);
+  prog_b.set_style   (sty_b);
+  prog_ev.set_style  (sty_ev);
+  prog_ev.set_prefix (sparkles);
+  prog_ev.set_message("EVENTS");
+
+  let sleep_time  = time::Duration::from_millis(500);
+
+  loop {
+    match update_bar_a.recv() {
+      Err(err) => trace!("No update, err {err}"),
+      Ok(val)  => {
+        prog_a.inc(val);
+      }
+    }
+    match update_bar_b.recv() {
+      Err(err) => trace!("No update, err {err}"),
+      Ok(val)  => {
+        prog_b.inc(val);
+      }
+    }
+    match update_bar_ev.recv() {
+      Err(err) => trace!("No update, err {err}"),
+      Ok(val)  => {
+        prog_ev.inc(val);
+      }
+    }
+    match finish_bars.recv() {
+      Err(err) => trace!("No update, err {err}"),
+      Ok(val)  => {
+        prog_a.finish();
+        prog_b.finish();
+        prog_ev.finish();
+      }
+    }
+  thread::sleep(sleep_time);
+  }
+}
