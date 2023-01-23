@@ -111,7 +111,7 @@ impl CommandTab<'_> {
     for n in 0..cmd_list.len() {
       items.push(
         ListItem::new(Spans::from(vec![Span::styled(
-          cmd_list[n].to_string().clone(),
+          cmd_list[n].to_string().clone().replace("<TofCommand", "").replace(">",""),
           Style::default())]))
         );
     }

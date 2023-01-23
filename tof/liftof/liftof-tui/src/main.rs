@@ -426,8 +426,8 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                           // and the actual command vector are aligned
                           let this_command = cmd_tab.cmd_list[selected];
                           match cmd_to_cmdr.send(this_command) {
-                            Err(err) => trace!("There was a problem sending the command!"),
-                            Ok(_)    => trace!("Command sent!")
+                            Err(err) => warn!("There was a problem sending the command!"),
+                            Ok(_)    => info!("Command sent!")
                           }
                         }
                       }
