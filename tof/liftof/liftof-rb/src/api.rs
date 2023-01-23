@@ -244,8 +244,8 @@ fn kill_run(will_panic : &mut u8) {
 pub fn runner(max_events  : Option<u64>,
               max_seconds : Option<u64>,
               max_errors  : Option<u64>,
-              kill_signal : Option<&Receiver<bool>>,
-              prog_op_ev  : Option<Box<ProgressBar>>) {
+              kill_signal : Option<&Receiver<bool>>) {
+              //prog_op_ev  : Option<Box<ProgressBar>>) {
   
   let one_milli        = time::Duration::from_millis(1);
   let one_sec          = time::Duration::from_secs(1);
@@ -256,18 +256,18 @@ pub fn runner(max_events  : Option<u64>,
   let mut n_events     : u64 = 0;
   let mut n_errors     : u64 = 0;
 
-  match prog_op_ev {
-    None => (),
-    Some(ref bar) => {
-      bar.reset();
-      match max_events {
-        None    => (),
-        Some(n) => {
-          bar.set_length(n);
-        }
-      }
-    }
-  }
+  //match prog_op_ev {
+  //  None => (),
+  //  Some(ref bar) => {
+  //    bar.reset();
+  //    match max_events {
+  //      None    => (),
+  //      Some(n) => {
+  //        bar.set_length(n);
+  //      }
+  //    }
+  //  }
+  //}
 
 
   let now = time::Instant::now();
@@ -303,12 +303,12 @@ pub fn runner(max_events  : Option<u64>,
     n_events += delta_events;
     last_evt_cnt = evt_cnt;
     
-    match prog_op_ev {
-      None => (),
-      Some(ref bar) => {
-        bar.inc(delta_events);   
-      }
-    }
+    //match prog_op_ev {
+    //  None => (),
+    //  Some(ref bar) => {
+    //    bar.inc(delta_events);   
+    //  }
+    //}
     info!("Checking for kill signal");
     // terminate if one of the 
     // criteria is fullfilled
@@ -354,12 +354,12 @@ pub fn runner(max_events  : Option<u64>,
     }
     // exit loop on n event basis
     if terminate {
-      match prog_op_ev {
-        None => (),
-        Some(ref bar) => {
-          bar.finish();
-        }
-      }
+      //match prog_op_ev {
+      //  None => (),
+      //  Some(ref bar) => {
+      //    bar.finish();
+      //  }
+      //}
       break;
     }
     // save cpu
@@ -671,7 +671,7 @@ pub fn get_buff_size(which : &BlobBuffer) ->Result<u32, RegisterError> {
 pub fn buff_handler(which       : &BlobBuffer,
                     buff_trip   : u32,
                     bs_sender   : Option<&Sender<Vec<u8>>>,
-                    prog_bar    : &Option<Box<ProgressBar>>,
+                    //prog_bar    : &Option<Box<ProgressBar>>,
                     switch_buff : bool) {
   let sleep_after_reg_write = Duration::from_millis(SLEEP_AFTER_REG_WRITE as u64);
   let buff_size : u32;
@@ -708,16 +708,16 @@ pub fn buff_handler(which       : &BlobBuffer,
       Ok(_)  => debug!("Successfully reset the buffer occupancy value"),
       Err(_) => warn!("Unable to reset buffer!")
     }
-    match prog_bar {
-      Some(bar) => bar.set_position(0),
-      None      => () 
-    }
+    //match prog_bar {
+    //  Some(bar) => bar.set_position(0),
+    //  None      => () 
+    //}
     thread::sleep(sleep_after_reg_write);
   } else { // endf has tripped
-    match prog_bar {
-      Some(bar) => bar.set_position(buff_size as u64),
-      None      => () 
-    }
+    //match prog_bar {
+    //  Some(bar) => bar.set_position(buff_size as u64),
+    //  None      => () 
+    //}
   }
 }
 

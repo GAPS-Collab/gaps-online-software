@@ -312,8 +312,8 @@ fn monitoring(ch : &Sender<Vec<u8>>) {
 ///
 fn read_data_buffers(bs_send     : Sender<Vec<u8>>,
                      buff_trip   : u32,
-                     bar_a_op    : Option<Box<ProgressBar>>,
-                     bar_b_op    : Option<Box<ProgressBar>>, 
+                     //bar_a_op    : Option<Box<ProgressBar>>,
+                     //bar_b_op    : Option<Box<ProgressBar>>, 
                      switch_buff : bool) {
   let buf_a = BlobBuffer::A;
   let buf_b = BlobBuffer::B;
@@ -347,12 +347,12 @@ fn read_data_buffers(bs_send     : Sender<Vec<u8>>,
     buff_handler(&buf_a,
                  buff_trip,
                  Some(&bs_send),
-                 &bar_a_op, 
+                 //&bar_a_op, 
                  switch_buff); 
     buff_handler(&buf_b,
                  buff_trip,
                  Some(&bs_send),
-                 &bar_b_op,
+                 //&bar_b_op,
                  switch_buff); 
   }
 }
@@ -469,7 +469,14 @@ fn main() {
   let (evid_to_cache, evid_from_cmdr)   : (Sender<u32>, Receiver<u32>)      = unbounded();
   info!("Will start ThreadPool with {n_threads} threads");
   let workforce = ThreadPool::new(n_threads);
-  
+ 
+  // these are only for the progress bars
+  let (pb_a_up_send, pb_a_up_recv   ) : (Sender<u64>, Receiver<u64>) = unbounded();  
+  let (pb_b_up_send, pb_b_up_recv   ) : (Sender<u64>, Receiver<u64>) = unbounded(); 
+  let (pb_ev_up_send, pb_ev_up_recv ) : (Sender<u64>, Receiver<u64>) = unbounded(); 
+  let (kill_bars, bar_killed        ) : (Sender<bool>, Receiver<bool>) = unbounded();  
+
+
   // wait until we receive the 
   // rsponse from the server
   // This is all done by the runner now!
@@ -506,66 +513,67 @@ fn main() {
   //let mut prog_op_a     : Option<&ProgressBar> = None;
   //let mut prog_op_b     : Option<&ProgressBar> = None;
   //let mut prog_op_ev    : Option<&ProgressBar> = None;
-  let mut prog_op_a     : Option<Box<ProgressBar>>   = None; 
-  let mut prog_op_b     : Option<Box<ProgressBar>>   = None;
-  let mut prog_op_ev    : Option<Box<ProgressBar>>   = None;
-  let mut multi_prog_op : Option<Box<MultiProgress>> = None;
+  
+  //let mut prog_op_a     : Option<Box<ProgressBar>>   = None; 
+  //let mut prog_op_b     : Option<Box<ProgressBar>>   = None;
+  //let mut prog_op_ev    : Option<Box<ProgressBar>>   = None;
+  //let mut multi_prog_op : Option<Box<MultiProgress>> = None;
  
 
-  if show_progress {
-    multi_prog_op = Some(Box::new(MultiProgress::new()));
-    let floppy    = vec![240, 159, 146, 190];
-    let floppy    = String::from_utf8(floppy).unwrap();
-    let label_a   = String::from("Buff A");
-    let label_b   = String::from("Buff B");
-    let sty_a = ProgressStyle::with_template(TEMPLATE_BAR_A)
-    .unwrap();
-    //.progress_chars("##-");
-    let sty_b = ProgressStyle::with_template(TEMPLATE_BAR_B)
-    .unwrap();
-    //.progress_chars("##-");
-    let sty_ev = ProgressStyle::with_template(TEMPLATE_BAR_EV)
-    .unwrap();
-    //.progress_chars("##>");
+  //if show_progress {
+  //  multi_prog_op = Some(Box::new(MultiProgress::new()));
+  //  let floppy    = vec![240, 159, 146, 190];
+  //  let floppy    = String::from_utf8(floppy).unwrap();
+  //  let label_a   = String::from("Buff A");
+  //  let label_b   = String::from("Buff B");
+  //  let sty_a = ProgressStyle::with_template(TEMPLATE_BAR_A)
+  //  .unwrap();
+  //  //.progress_chars("##-");
+  //  let sty_b = ProgressStyle::with_template(TEMPLATE_BAR_B)
+  //  .unwrap();
+  //  //.progress_chars("##-");
+  //  let sty_ev = ProgressStyle::with_template(TEMPLATE_BAR_EV)
+  //  .unwrap();
+  //  //.progress_chars("##>");
 
-    prog_op_a  = Some(Box::new(multi_prog_op
-                               .as_mut()
-                               .unwrap()
-                               .add(ProgressBar::new(uio1_total_size)))); 
-    prog_op_b  = Some(Box::new(multi_prog_op
-                               .as_mut()
-                               .unwrap()
-                               .insert_after(&prog_op_a.as_mut().unwrap(), ProgressBar::new(uio2_total_size)))); 
-    prog_op_ev = Some(Box::new(multi_prog_op
-                               .as_mut()
-                               .unwrap()
-                               .insert_after(&prog_op_b.as_mut().unwrap(), ProgressBar::new(max_event as u64)))); 
+  //  prog_op_a  = Some(Box::new(multi_prog_op
+  //                             .as_mut()
+  //                             .unwrap()
+  //                             .add(ProgressBar::new(uio1_total_size)))); 
+  //  prog_op_b  = Some(Box::new(multi_prog_op
+  //                             .as_mut()
+  //                             .unwrap()
+  //                             .insert_after(&prog_op_a.as_mut().unwrap(), ProgressBar::new(uio2_total_size)))); 
+  //  prog_op_ev = Some(Box::new(multi_prog_op
+  //                             .as_mut()
+  //                             .unwrap()
+  //                             .insert_after(&prog_op_b.as_mut().unwrap(), ProgressBar::new(max_event as u64)))); 
 
-    match prog_op_a {
-      None => (),
-      Some(ref bar) => {
-        bar.set_message(label_a);
-        bar.set_prefix(floppy.clone());
-        bar.set_style(sty_a);
-      }
-    }
-    match prog_op_b {
-      None => (),
-      Some(ref bar) => {
-        bar.set_message(label_b);
-        bar.set_prefix(floppy.clone());
-        bar.set_style(sty_b);
-      }
-    }
-    match prog_op_ev {
-      None => (),
-      Some(ref bar) => {
-        bar.set_style(sty_ev);
-        bar.set_prefix(sparkles.clone());
-        bar.set_message("EVENTS");
-      }
-    }
-  }
+  //  match prog_op_a {
+  //    None => (),
+  //    Some(ref bar) => {
+  //      bar.set_message(label_a);
+  //      bar.set_prefix(floppy.clone());
+  //      bar.set_style(sty_a);
+  //    }
+  //  }
+  //  match prog_op_b {
+  //    None => (),
+  //    Some(ref bar) => {
+  //      bar.set_message(label_b);
+  //      bar.set_prefix(floppy.clone());
+  //      bar.set_style(sty_b);
+  //    }
+  //  }
+  //  match prog_op_ev {
+  //    None => (),
+  //    Some(ref bar) => {
+  //      bar.set_style(sty_ev);
+  //      bar.set_prefix(sparkles.clone());
+  //      bar.set_message("EVENTS");
+  //    }
+  //  }
+  //}
   // this thread deals with the bytestream and 
   // performs analysis or just sneds it over 
   // zmq
@@ -594,8 +602,8 @@ fn main() {
   workforce.execute(move || {
     read_data_buffers(rdb_sender,
                       buff_trip,
-                      prog_op_a,
-                      prog_op_b,
+                      //prog_op_a,
+                      //prog_op_b,
                       switch_buff);
   });
 
@@ -618,7 +626,7 @@ fn main() {
   } else {
     // if we are not listening to a C&C server, we have to kickstart
     // our run ourselves.
-    let bar_clone = prog_op_ev.clone();
+    //Let bar_clone = prog_op_ev.clone();
     //match prog_op_ev {
     //  None => (),
     //  Some(bar) => {
@@ -629,8 +637,8 @@ fn main() {
         runner(Some(max_event),
                None,
                None,
-               None,
-               bar_clone);
+               None);
+               //bar_clone);
     });
   }
 
@@ -776,15 +784,15 @@ fn main() {
               cmd_socket.send(result.unwrap().to_bytestream(),0);
             } else {
               info!("Attempting to launch a new runner with {max_event} events!");
-              let bar_clone = prog_op_ev.clone();
+              //let bar_clone = prog_op_ev.clone();
               let rk = run_gets_killed.clone();
               workforce.execute(move || {
                   runner(Some(max_event as u64),
                          None,
                          None,
                          //FIXME - maybe use crossbeam?
-                         Some(&rk),
-                         bar_clone);
+                         Some(&rk));
+                         //bar_clone);
               }); 
               run_active = true;
               result = Ok(TofResponse::Success(cmd::RESP_SUCC_FINGERS_CROSSED));
