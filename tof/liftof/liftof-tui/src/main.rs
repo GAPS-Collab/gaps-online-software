@@ -396,6 +396,11 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
               match event {
                 Event::Input(ev) => {
                   match ev.code {
+                    // it seems we have to carry thos allong for every tab
+                    KeyCode::Char('h') => ui_menu.active_menu_item = MenuItem::Home,
+                    KeyCode::Char('c') => ui_menu.active_menu_item = MenuItem::Commands,
+                    KeyCode::Char('r') => ui_menu.active_menu_item = MenuItem::Status,
+                    KeyCode::Char('m') => ui_menu.active_menu_item = MenuItem::MasterTrigger,
                     KeyCode::Down => {
                       if let Some(selected) = rb_list_state.selected() {
                         //let amount_pets = read_db().expect("can fetch pet list").len();
