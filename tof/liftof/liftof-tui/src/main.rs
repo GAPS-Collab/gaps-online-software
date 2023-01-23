@@ -18,6 +18,8 @@ mod menu;
 use chrono::prelude::*;
 use thiserror::Error;
 
+use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
+
 use std::collections::VecDeque;
 
 extern crate pretty_env_logger;
@@ -72,10 +74,29 @@ use crate::tab_mt::MTTab;
 use crate::tab_status::StatusTab;
 use crate::menu::{MenuItem, Menu};
 
-
 // keep at max this amount of tof packets
 const STREAM_CACHE_MAX_SIZE : usize = 10;
 
+extern crate clap;
+use clap::{arg,
+           command,
+           //value_parser,
+           //ArgAction,
+           //Command,
+           Parser};
+
+
+#[derive(Parser, Debug)]
+#[command(author = "J.A.Stoessl", version, about, long_about = None)]
+struct Args {
+  /// Don't discover readoutboards, but connect to some 
+  /// local fake instances instead.
+  #[arg(short, long, default_value_t = false)]
+  debug_local: bool,
+  /// Autodiscover connected readoutboards
+  #[arg(short, long, default_value_t = false)]
+  autodiscover_rb: bool,
+}
 
 enum Event<I> {
     Input(I),
@@ -117,6 +138,7 @@ fn commander(cmd_from_main : Receiver<TofCommand>,
   let mut connected_rbs : u8 = 0;
   for rb in rb_list.iter() {
     if rb.ip_address.is_none() || rb.cmd_port.is_none() {
+      warn!("This rb has no connection information");
       continue;
     }
     let address = "tcp::/".to_owned()
@@ -284,16 +306,34 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   // Set default level for unknown targets to Trace
   tui_logger::set_default_level(log::LevelFilter::Trace);
   
+  let args = Args::parse();                   
+  let debug_local       = args.debug_local;         
+  let autodiscover_rb   = args.autodiscover_rb;    
+  
   //pretty_env_logger::init();
 
+  let mut rb_list = Vec::<ReadoutBoard>::new();
   let mut tick_count = 0;
-  let mut rb_list = get_rb_manifest();
-  if rb_list.len() == 0 {
+  if debug_local {
     let mut rb = ReadoutBoard::default();
+    rb.ip_address = Some(Ipv4Addr::new(127, 0, 0, 1));
+    rb.cmd_port   = Some(30000);
+    rb.data_port  = Some(40000);
     rb.id = Some(0);
     rb_list = vec![rb];
+
+    // make sure the rb is connected
+    rb.ping().unwrap();
+  }  
+  if autodiscover_rb {
+    let mut rb_list = get_rb_manifest();
+    if rb_list.len() == 0 {
+      let mut rb = ReadoutBoard::default();
+      rb.id = Some(0);
+      rb_list = vec![rb];
+    }
   }
-  let rb_list_c = rb_list.clone();
+  let rb_list_c  = rb_list.clone();
   let rb_list_c2 = rb_list.clone();
   // first set up comms etc. before 
   // we go into raw_mode, so we can 
