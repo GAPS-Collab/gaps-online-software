@@ -244,6 +244,7 @@ fn kill_run(will_panic : &mut u8) {
 pub fn runner(max_events  : Option<u64>,
               max_seconds : Option<u64>,
               max_errors  : Option<u64>,
+              progress    : Option<Sender<u64>>,
               kill_signal : Option<&Receiver<bool>>) {
               //prog_op_ev  : Option<Box<ProgressBar>>) {
   
@@ -309,7 +310,13 @@ pub fn runner(max_events  : Option<u64>,
     //    bar.inc(delta_events);   
     //  }
     //}
-    info!("Checking for kill signal");
+    match &progress { 
+      None => (),
+      Some(sender) => {
+        sender.try_send(delta_events);
+      }
+    }
+    debug!("Checking for kill signal");
     // terminate if one of the 
     // criteria is fullfilled
     match kill_signal {
@@ -423,7 +430,7 @@ pub fn event_cache_worker(recv_ev_pl  : Receiver<RBEventPayload>,
         // store the event in the cache
         event_cache.insert(event.event_id, event);   
         // keep track of the oldest event_id
-        info!("We have a cache size of {}", event_cache.len());
+        debug!("We have a cache size of {}", event_cache.len());
         if event_cache.len() > cache_size {
           event_cache.remove(&oldest_event_id);
           oldest_event_id += 1;
@@ -671,6 +678,7 @@ pub fn get_buff_size(which : &BlobBuffer) ->Result<u32, RegisterError> {
 pub fn buff_handler(which       : &BlobBuffer,
                     buff_trip   : u32,
                     bs_sender   : Option<&Sender<Vec<u8>>>,
+                    prog_sender : Option<Sender<u64>>,
                     //prog_bar    : &Option<Box<ProgressBar>>,
                     switch_buff : bool) {
   let sleep_after_reg_write = Duration::from_millis(SLEEP_AFTER_REG_WRITE as u64);
@@ -708,12 +716,20 @@ pub fn buff_handler(which       : &BlobBuffer,
       Ok(_)  => debug!("Successfully reset the buffer occupancy value"),
       Err(_) => warn!("Unable to reset buffer!")
     }
+    match &prog_sender {
+      None => (),
+      Some(up) => {up.try_send(0);},
+    }
     //match prog_bar {
     //  Some(bar) => bar.set_position(0),
     //  None      => () 
     //}
     thread::sleep(sleep_after_reg_write);
   } else { // endf has tripped
+    match &prog_sender {
+      None => (),
+      Some(up) => {up.try_send(buff_size as u64);},
+    }
     //match prog_bar {
     //  Some(bar) => bar.set_position(buff_size as u64),
     //  None      => () 
@@ -891,13 +907,13 @@ pub fn setup_drs4() -> Result<(), RegisterError> {
 /// the number of events seen
 /// Intended to be run in a seperate thread
 ///
-pub fn show_progress(max_events      : u64,
-                     uio1_total_size : u64,
-                     uio2_total_size : u64,
-                     update_bar_a    : Receiver<u64>,
-                     update_bar_b    : Receiver<u64>,
-                     update_bar_ev   : Receiver<u64>,
-                     finish_bars     : Receiver<bool>){
+pub fn progress_runner(max_events      : u64,
+                       uio1_total_size : u64,
+                       uio2_total_size : u64,
+                       update_bar_a    : Receiver<u64>,
+                       update_bar_b    : Receiver<u64>,
+                       update_bar_ev   : Receiver<u64>,
+                       finish_bars     : Receiver<bool>){
   let template_bar_a   : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.blue/grey} {bytes:>7}/{total_bytes:7} ";
   let template_bar_b   : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.green/grey} {bytes:>7}/{total_bytes:7} ";
   let template_bar_env : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.red/grey} {pos:>7}/{len:7}";
@@ -936,28 +952,29 @@ pub fn show_progress(max_events      : u64,
   prog_ev.set_prefix (sparkles);
   prog_ev.set_message("EVENTS");
 
-  let sleep_time  = time::Duration::from_millis(500);
+  let sleep_time  = time::Duration::from_millis(1);
 
   loop {
-    match update_bar_a.recv() {
+    match update_bar_a.try_recv() {
       Err(err) => trace!("No update, err {err}"),
       Ok(val)  => {
-        prog_a.inc(val);
+        prog_a.set_position(val);
       }
     }
-    match update_bar_b.recv() {
+    match update_bar_b.try_recv() {
       Err(err) => trace!("No update, err {err}"),
       Ok(val)  => {
-        prog_b.inc(val);
+        prog_b.set_position(val);
+        //prog_b.inc(val);
       }
     }
-    match update_bar_ev.recv() {
+    match update_bar_ev.try_recv() {
       Err(err) => trace!("No update, err {err}"),
       Ok(val)  => {
         prog_ev.inc(val);
       }
     }
-    match finish_bars.recv() {
+    match finish_bars.try_recv() {
       Err(err) => trace!("No update, err {err}"),
       Ok(val)  => {
         prog_a.finish();

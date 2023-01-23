@@ -9,17 +9,8 @@ extern crate crossbeam_channel;
 use crossbeam_channel::{unbounded,
                         Sender,
                         Receiver};
-//use std:: {sync::mpsc::Sender,
-//           sync::mpsc::Receiver,
-//           sync::mpsc::channel};
-//
 
-//use std::borrow::BorrowMut;
 use std::net::IpAddr;
-
-use indicatif::{MultiProgress,
-                ProgressBar,
-                ProgressStyle};
 
 use local_ip_address::local_ip;
 
@@ -93,10 +84,6 @@ struct Args {
 extern crate pretty_env_logger;
 #[macro_use] extern crate log;
 
-/// Non-register related constants
-const TEMPLATE_BAR_A  : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.blue/grey} {bytes:>7}/{total_bytes:7} ";
-const TEMPLATE_BAR_B  : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.green/grey} {bytes:>7}/{total_bytes:7} ";
-const TEMPLATE_BAR_EV : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.red/grey} {pos:>7}/{len:7}";
 
 ///! The 0MQ PUB port is defined as DATAPORT_START + readoutboard_id
 const DATAPORT_START : u32 = 30000;
@@ -122,148 +109,6 @@ const CMDPORT_START  : u32 = 40000;
 // 
 
 
-///// The actual "server" thread. Manage requests 
-/////  from the clients
-/////
-/////  This acts as global sync for all 
-/////  bytestreams.
-/////
-/////  # Arguments
-/////  
-/////  * address   : our server side address
-/////                we are listening on
-/////  * recv_bs   : A channel for receiving
-/////                binary payloads
-/////  
-//pub fn server(socket     : &zmq::Socket,
-//              recv_bs    : Receiver<Vec<u8>>,
-//              recv_ev_pl : Receiver<RBEventPayload>,
-//              cache_size : usize) {
-// 
-//  //let one_milli    = time::Duration::from_millis(1);
-//  //let mut message       = zmq::Message::new();
-//  //let mut response = zmq::Message::new();
-//  // a cache for the events from this specific board
-//  let mut event_cache : HashMap::<u32, RBEventPayload> = HashMap::new();
-//
-//  // keep track of the "oldest" key
-//  let mut oldest_event_id : u32 = 0;
-//
-//  // last moni packet
-//  let mut last_moni : Vec<u8> = Vec::new();
-//  // this works on 3 things in decreasing 
-//  // priority
-//  // 1) check if there is incoming event data
-//  // 3) check if a send request for cached event data
-//  //    has been made
-//  // 2) check if there is incoming monitoring data
-//  //    has been made
-//  let sock_timeout : i64 = 1;
-//  
-//  // How many events shall we receive through 
-//  // the channel before we try polling the 0MQ
-//  // socket?
-//  // FIXME - this might need to be 
-//  // configurable
-//  let recv_ev_per_poll : u8 = 10;
-//  let mut n_iter : u8 = 0;
-//  loop {
-//    let now        = time::Instant::now();
-//    // check for a new connection
-//    trace!("Server loop");
-//    match recv_ev_pl.recv() {
-//      Err(err) => {
-//        debug!("No event payload! {err}");
-//        continue;
-//      } // end err
-//      Ok(event)  => {
-//        if oldest_event_id == 0 {
-//          oldest_event_id = event.event_id;
-//        } //endif
-//        // store the event in the cache
-//        trace!("Adding RBEvent : {} to cache", event.event_id);
-//        event_cache.insert(event.event_id, event);   
-//        // keep track of the oldest event_id
-//        debug!("We have a cache size of {}", event_cache.len());
-//        if event_cache.len() > cache_size {
-//          event_cache.remove(&oldest_event_id);
-//          oldest_event_id += 1;
-//        } //endif
-//        n_iter += 1;
-//        if n_iter < recv_ev_per_poll {
-//          continue;
-//        } else {
-//          n_iter=0;
-//        }
-//      }// end Ok
-//    } // end match
-//
-//    match recv_bs.recv() {
-//      Err(err) => debug!("Can not get bytestream payload, err {err}"),
-//      Ok(payload)  => {
-//        last_moni = payload;
-//      }// end Ok
-//    } // end match
-//    
-//    match socket.poll(zmq::PollEvents::POLLIN, sock_timeout) {
-//      Ok(0) => continue,
-//      Err(err) => warn!("0MQ socket poll failed! err {err}"),
-//      Ok(1) => {
-//        match socket.recv_bytes(zmq::DONTWAIT) {
-//          Err(err)  => {
-//            debug!("Can't receive over 0MQ, error {err}");
-//            continue;
-//          }, // end Err
-//          Ok(bytes) => {
-//            let tp = TofPacket::from_bytestream(&bytes, 0);
-//            match tp {
-//              Err(err) => {
-//                debug!("Got broken package! {:?}", err);
-//                let response = cmd::TofResponse::GeneralFail(0);
-//                socket.send(response.to_bytestream(), zmq::DONTWAIT);
-//                continue;
-//              },
-//              Ok(_) => ()
-//            } // end match
-//            let tp = tp.unwrap();
-//            let cmd_pk = cmd::TofCommand::from_tof_packet(&tp);
-//            match cmd_pk {
-//              None => {
-//                debug!("Don't understand command!");
-//                socket.send("[SRV] don't understand command", zmq::DONTWAIT);
-//                continue;
-//              },
-//              Some(cmd) => {
-//                match cmd {
-//                  TofCommand::RequestEvent(event_id) => {
-//                    debug!("Received request for event: {event_id}");
-//                    if let Some(event) = event_cache.remove(&event_id) {
-//                      socket.send(event.payload, zmq::DONTWAIT);
-//                    } else {
-//                      debug!{"Event {event_id} not found in cache!"};
-//                      let response = cmd::TofResponse::EventNotReady(event_id);
-//                      socket.send(response.to_bytestream(), zmq::DONTWAIT);
-//                      continue;
-//                    }
-//                  },
-//                  TofCommand::RequestMoni => {
-//                  },
-//                  _ => warn!("Currently only RequestEvent is implemented!")
-//                }
-//              }// end Some
-//            } // end match
-//          } // end Ok
-//        } //
-//      }// end ok
-//      Ok(_) => {
-//        warn!("0MQ broke it's contract. Not sure what to do. Continuig..");
-//        continue;
-//      }
-//    } // end poll = 1
-//  let time = now.elapsed().as_millis();
-//  println!("Server loop took {}", time);
-//  } // end loop
-//}
 
 
 /// Gather monitoring data 
@@ -312,8 +157,8 @@ fn monitoring(ch : &Sender<Vec<u8>>) {
 ///
 fn read_data_buffers(bs_send     : Sender<Vec<u8>>,
                      buff_trip   : u32,
-                     //bar_a_op    : Option<Box<ProgressBar>>,
-                     //bar_b_op    : Option<Box<ProgressBar>>, 
+                     bar_a_sender : Option<Sender<u64>>,
+                     bar_b_sender : Option<Sender<u64>>,
                      switch_buff : bool) {
   let buf_a = BlobBuffer::A;
   let buf_b = BlobBuffer::B;
@@ -347,11 +192,13 @@ fn read_data_buffers(bs_send     : Sender<Vec<u8>>,
     buff_handler(&buf_a,
                  buff_trip,
                  Some(&bs_send),
+                 bar_a_sender.clone(),
                  //&bar_a_op, 
                  switch_buff); 
     buff_handler(&buf_b,
                  buff_trip,
                  Some(&bs_send),
+                 bar_b_sender.clone(),
                  //&bar_b_op,
                  switch_buff); 
   }
@@ -456,7 +303,10 @@ fn main() {
   // + main thread, which does not need a 
   //   separate thread
   let mut n_threads = 5;
- 
+  if show_progress {
+    n_threads += 1;
+  }
+
   let (set_op_mode, get_op_mode)     : 
       (Sender<TofOperationMode>, Receiver<TofOperationMode>)                = unbounded();
   let (kill_run, run_gets_killed)    : (Sender<bool>, Receiver<bool>)       = unbounded();
@@ -477,107 +327,15 @@ fn main() {
   let (kill_bars, bar_killed        ) : (Sender<bool>, Receiver<bool>) = unbounded();  
 
 
-  // wait until we receive the 
-  // rsponse from the server
-  // This is all done by the runner now!
-  //info!("Setting daq to idle mode");
-  //match idle_drs4_daq() {
-  //  Ok(_)    => info!("DRS4 set to idle:"),
-  //  Err(_)   => panic!("Can't set DRS4 to idle!!")
-  //}
   //thread::sleep(one_milli);
-  //match setup_drs4() {
-  //  Ok(_)    => info!("DRS4 setup routine complete!"),
-  //  Err(_)   => panic!("Failed to setup DRS4!!")
-  //}
-  //
-  //match reset_dma() {
-  //  Ok(_)    => info!("DMA reset successful"),
-  //  Err(_)   => {
-  //    warn!("Can not reset DMA! Will run more aggressive reset procedure!");
-  //  }
-  //}
-  thread::sleep(one_milli);
   
   if buff_trip != 66520576 {
     uio1_total_size = buff_trip as u64;
     uio2_total_size = buff_trip as u64;
   }
-  
-  // now we are ready to receive data 
-
-  // set up some progress bars, so we 
-  // can see what is going on 
-  // this is optional
-  // FIXME - feature?
-  //let mut prog_op_a     : Option<&ProgressBar> = None;
-  //let mut prog_op_b     : Option<&ProgressBar> = None;
-  //let mut prog_op_ev    : Option<&ProgressBar> = None;
-  
-  //let mut prog_op_a     : Option<Box<ProgressBar>>   = None; 
-  //let mut prog_op_b     : Option<Box<ProgressBar>>   = None;
-  //let mut prog_op_ev    : Option<Box<ProgressBar>>   = None;
-  //let mut multi_prog_op : Option<Box<MultiProgress>> = None;
  
 
-  //if show_progress {
-  //  multi_prog_op = Some(Box::new(MultiProgress::new()));
-  //  let floppy    = vec![240, 159, 146, 190];
-  //  let floppy    = String::from_utf8(floppy).unwrap();
-  //  let label_a   = String::from("Buff A");
-  //  let label_b   = String::from("Buff B");
-  //  let sty_a = ProgressStyle::with_template(TEMPLATE_BAR_A)
-  //  .unwrap();
-  //  //.progress_chars("##-");
-  //  let sty_b = ProgressStyle::with_template(TEMPLATE_BAR_B)
-  //  .unwrap();
-  //  //.progress_chars("##-");
-  //  let sty_ev = ProgressStyle::with_template(TEMPLATE_BAR_EV)
-  //  .unwrap();
-  //  //.progress_chars("##>");
-
-  //  prog_op_a  = Some(Box::new(multi_prog_op
-  //                             .as_mut()
-  //                             .unwrap()
-  //                             .add(ProgressBar::new(uio1_total_size)))); 
-  //  prog_op_b  = Some(Box::new(multi_prog_op
-  //                             .as_mut()
-  //                             .unwrap()
-  //                             .insert_after(&prog_op_a.as_mut().unwrap(), ProgressBar::new(uio2_total_size)))); 
-  //  prog_op_ev = Some(Box::new(multi_prog_op
-  //                             .as_mut()
-  //                             .unwrap()
-  //                             .insert_after(&prog_op_b.as_mut().unwrap(), ProgressBar::new(max_event as u64)))); 
-
-  //  match prog_op_a {
-  //    None => (),
-  //    Some(ref bar) => {
-  //      bar.set_message(label_a);
-  //      bar.set_prefix(floppy.clone());
-  //      bar.set_style(sty_a);
-  //    }
-  //  }
-  //  match prog_op_b {
-  //    None => (),
-  //    Some(ref bar) => {
-  //      bar.set_message(label_b);
-  //      bar.set_prefix(floppy.clone());
-  //      bar.set_style(sty_b);
-  //    }
-  //  }
-  //  match prog_op_ev {
-  //    None => (),
-  //    Some(ref bar) => {
-  //      bar.set_style(sty_ev);
-  //      bar.set_prefix(sparkles.clone());
-  //      bar.set_message("EVENTS");
-  //    }
-  //  }
-  //}
-  // this thread deals with the bytestream and 
-  // performs analysis or just sneds it over 
-  // zmq
-  //let pl_sender = ev_pl_send.clone();
+  // now we are ready to receive data 
 
   // Setup routines 
   // Start the individual worker threads
@@ -598,12 +356,22 @@ fn main() {
   // this thread deals JUST with the data
   // buffers. It reads them and then 
   // passes on the data
-  let rdb_sender = bs_send.clone();
+  let rdb_sender  = bs_send.clone();
+  //let prog_sender = pb_a_up_send;
+  let mut pb_a = None;
+  let mut pb_b = None;
+  if show_progress {
+    pb_a = Some(pb_a_up_send.clone());
+    pb_b = Some(pb_b_up_send.clone());
+
+  }
   workforce.execute(move || {
     read_data_buffers(rdb_sender,
                       buff_trip,
                       //prog_op_a,
-                      //prog_op_b,
+                      //prog_op_b
+                      pb_a,
+                      pb_b,
                       switch_buff);
   });
 
@@ -624,19 +392,16 @@ fn main() {
     let response = String::from("[MAIN] - connected");
     cmd_socket.send(response.as_bytes(), 0);
   } else {
-    // if we are not listening to a C&C server, we have to kickstart
-    // our run ourselves.
-    //Let bar_clone = prog_op_ev.clone();
-    //match prog_op_ev {
-    //  None => (),
-    //  Some(bar) => {
-    //    &bar.suspend(|| { loop {}} );
-    //  }
-    //}
+    let mut p_op : Option<Sender<u64>> = None;
+    if show_progress {
+      let tmp_send = pb_ev_up_send.clone();
+      p_op = Some(tmp_send); 
+    }
     workforce.execute(move || {
         runner(Some(max_event),
                None,
                None,
+               p_op,
                None);
                //bar_clone);
     });
@@ -655,6 +420,18 @@ fn main() {
   workforce.execute(move || {
       monitoring(&moni_to_main);
   });
+  if show_progress {
+    let kill_clone = run_gets_killed.clone();
+    workforce.execute(move || { 
+      progress_runner(max_event,      
+                      uio1_total_size,
+                      uio2_total_size,
+                      pb_a_up_recv ,
+                      pb_b_up_recv ,
+                      pb_ev_up_recv.clone(),
+                      kill_clone  )
+    });
+  }
 
   //info!("Starting daq!");
   //match start_drs4_daq() {
@@ -786,11 +563,18 @@ fn main() {
               info!("Attempting to launch a new runner with {max_event} events!");
               //let bar_clone = prog_op_ev.clone();
               let rk = run_gets_killed.clone();
+              let mut p_op : Option<Sender<u64>> = None;
+              if show_progress {
+                let tmp_send = pb_ev_up_send.clone();
+                p_op = Some(tmp_send); 
+              }
+              
               workforce.execute(move || {
                   runner(Some(max_event as u64),
                          None,
                          None,
                          //FIXME - maybe use crossbeam?
+                         p_op,
                          Some(&rk));
                          //bar_clone);
               }); 
@@ -830,8 +614,6 @@ fn main() {
         } // end match
       }
     }
-  
-
   } // end loop
 } // end main
 

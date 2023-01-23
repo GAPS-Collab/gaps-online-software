@@ -117,7 +117,6 @@ fn commander(cmd_from_main : Receiver<TofCommand>,
   let mut connected_rbs : u8 = 0;
   for rb in rb_list.iter() {
     if rb.ip_address.is_none() || rb.cmd_port.is_none() {
-      connected_rbs += 1;
       continue;
     }
     let address = "tcp::/".to_owned()
@@ -125,6 +124,15 @@ fn commander(cmd_from_main : Receiver<TofCommand>,
                   + ":"
                   +  &rb.cmd_port.expect("No CMD port known for this board!").to_string();
     cmd_socket.connect(&address);
+    // the process is only completed after an intiail back and forth
+    let ping : String = String::from("[PING]");
+    // we use expect here, since these calls have 
+    // to go through, otherwise it just won't work
+    cmd_socket.send(ping.as_bytes(), 0).expect("Can not communicate with RB!");
+    let response = cmd_socket.recv_bytes(0).expect("Can not communicate with RB!");
+    info!("Got response {}", String::from_utf8(response).expect("Did not receive string"));
+    connected_rbs += 1;
+    
   }
   if connected_rbs == 0 {
     panic!("I can not connect to any readout boards! Either auto-discovery did not discover them or none are (physically) connected!");
@@ -388,6 +396,27 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
               match event {
                 Event::Input(ev) => {
                   match ev.code {
+                    KeyCode::Down => {
+                      if let Some(selected) = rb_list_state.selected() {
+                        //let amount_pets = read_db().expect("can fetch pet list").len();
+                        if selected >= cmd_tab.cmd_list.len() {
+                          rb_list_state.select(Some(0));
+                        } else {
+                          rb_list_state.select(Some(selected + 1));
+                        }
+                      }
+                    }
+                    KeyCode::Up => {
+                      if let Some(selected) = rb_list_state.selected() {
+                        //let amount_pets = read_db().expect("can fetch pet list").len();
+                        if selected < 1 {
+                            rb_list_state.select(Some(0));
+                        } else {
+                            rb_list_state.select(Some(selected - 1));
+                        }
+                      }
+                    }
+
                     KeyCode::Enter => {
                       if matches!(ui_menu.active_menu_item, MenuItem::Commands) {
                         info!("Enter pressed, will send highlighted tof command!");
@@ -454,6 +483,43 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
         }
 
         MenuItem::Status => {
+          
+          match rx.recv() {
+            Err(err) => trace!("No update"),
+            Ok(event) => {
+              match event {
+                Event::Input(ev) => {
+                  match ev.code {
+                    KeyCode::Down => {
+                      if let Some(selected) = rb_list_state.selected() {
+                        //let amount_pets = read_db().expect("can fetch pet list").len();
+                        let max_rb = 40;
+                        if selected >= rb_list.len() {
+                          rb_list_state.select(Some(0));
+                        } else {
+                          rb_list_state.select(Some(selected + 1));
+                        }
+                      }
+                    }
+                    KeyCode::Up => {
+                      if let Some(selected) = rb_list_state.selected() {
+                        //let amount_pets = read_db().expect("can fetch pet list").len();
+                        let max_rb = 40;
+                        if max_rb > 0 {
+                            rb_list_state.select(Some(selected - 1));
+                        } else {
+                            rb_list_state.select(Some(rb_list.len() - 1));
+                        }
+                      }
+                    }
+                  _ => trace!("Some other key pressed!"),
+                  }
+                },
+                Event::Tick => (),
+              }
+            }
+          }
+
 
           let empty_data = vec![(0.0,0.0);1024]; 
           let mut data = vec![empty_data;9];
@@ -661,28 +727,28 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
           KeyCode::Char('c') => ui_menu.active_menu_item = MenuItem::Commands,
           KeyCode::Char('r') => ui_menu.active_menu_item = MenuItem::Status,
           KeyCode::Char('m') => ui_menu.active_menu_item = MenuItem::MasterTrigger,
-          KeyCode::Down => {
-            if let Some(selected) = rb_list_state.selected() {
-              //let amount_pets = read_db().expect("can fetch pet list").len();
-              let max_rb = 40;
-              if selected >= rb_list.len() {
-                rb_list_state.select(Some(0));
-              } else {
-                rb_list_state.select(Some(selected + 1));
-              }
-            }
-          }
-          KeyCode::Up => {
-            if let Some(selected) = rb_list_state.selected() {
-              //let amount_pets = read_db().expect("can fetch pet list").len();
-              let max_rb = 40;
-              if max_rb > 0 {
-                  rb_list_state.select(Some(selected - 1));
-              } else {
-                  rb_list_state.select(Some(rb_list.len() - 1));
-              }
-            }
-          }
+          //KeyCode::Down => {
+          //  if let Some(selected) = rb_list_state.selected() {
+          //    //let amount_pets = read_db().expect("can fetch pet list").len();
+          //    let max_rb = 40;
+          //    if selected >= rb_list.len() {
+          //      rb_list_state.select(Some(0));
+          //    } else {
+          //      rb_list_state.select(Some(selected + 1));
+          //    }
+          //  }
+          //}
+          //KeyCode::Up => {
+          //  if let Some(selected) = rb_list_state.selected() {
+          //    //let amount_pets = read_db().expect("can fetch pet list").len();
+          //    let max_rb = 40;
+          //    if max_rb > 0 {
+          //        rb_list_state.select(Some(selected - 1));
+          //    } else {
+          //        rb_list_state.select(Some(rb_list.len() - 1));
+          //    }
+          //  }
+          //}
           _ => (),
         }
       }
