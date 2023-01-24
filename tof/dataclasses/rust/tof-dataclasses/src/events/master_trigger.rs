@@ -23,8 +23,6 @@
 //! in this case it is legimate (and adviced) to panic.
 //! In the case, wher no data was received, this might need some thinking.
 
-use std::time::{Duration, Instant};
-use std::thread;
 use std::net::UdpSocket;
 
 use std::error::Error;

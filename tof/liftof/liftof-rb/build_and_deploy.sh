@@ -5,4 +5,4 @@
 rm -rf ../target/armv7-unknown*
 CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" cross build --bin liftof-rb --target=armv7-unknown-linux-musleabi --release && scp ../target/armv7-unknown-linux-musleabi/release/liftof-rb ucla-rb51: 
 #CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" cross build --bin watch-buffer-fill --target=armv7-unknown-linux-gnueabi && scp target/armv7-unknown-linux-gnueabi/debug/watch-buffer-fill ucla-rb51: 
-#scp ../target/armv7-unknown-linux-musleabi/release/liftof-rb ucla-rb52:
+scp ../target/armv7-unknown-linux-musleabi/release/liftof-rb ucla-rb52:

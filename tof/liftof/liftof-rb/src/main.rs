@@ -118,8 +118,6 @@ fn monitoring(ch : &Sender<Vec<u8>>) {
   let mut rate: u32  = 0; 
   let mut bytestream = Vec::<u8>::new();
   bytestream.extend_from_slice(&rate.to_le_bytes());
-  let mut packet         = GenericPacket::new(String::from("rate"),
-                                              bytestream);
   loop {
    //if now.elapsed().as_secs() >= HEARTBEAT {
    //}
@@ -324,7 +322,7 @@ fn main() {
   let (pb_a_up_send, pb_a_up_recv   ) : (Sender<u64>, Receiver<u64>) = unbounded();  
   let (pb_b_up_send, pb_b_up_recv   ) : (Sender<u64>, Receiver<u64>) = unbounded(); 
   let (pb_ev_up_send, pb_ev_up_recv ) : (Sender<u64>, Receiver<u64>) = unbounded(); 
-  let (kill_bars, bar_killed        ) : (Sender<bool>, Receiver<bool>) = unbounded();  
+  //let (kill_bars, bar_killed        ) : (Sender<bool>, Receiver<bool>) = unbounded();  
 
 
   //thread::sleep(one_milli);
@@ -381,7 +379,7 @@ fn main() {
 
   if !dont_listen {  
     info!("Will set up 0MQ REP socket at address {cmd_address}");
-    cmd_socket.bind(&cmd_address);
+    cmd_socket.bind(&cmd_address).expect("Unable to bind to command socket at {cmd_address}!");
     
     info!("0MQ REP socket listening at {cmd_address}");
     println!("Waiting for client to connect...");
@@ -390,7 +388,10 @@ fn main() {
     let resp =  String::from_utf8(client_response).expect("Got garbage response from client. If we start like this, I panic right away...");
     println!("Client connected! Response {resp}");
     let response = String::from("[MAIN] - connected");
-    cmd_socket.send(response.as_bytes(), 0);
+    match cmd_socket.send(response.as_bytes(), 0) {
+      Err(err) => warn!("Unable to send ping response! Err {err}"),
+      Ok(_)    => info!("Responded to ping!")
+    }
   } else {
     let mut p_op : Option<Sender<u64>> = None;
     if show_progress {
@@ -412,7 +413,7 @@ fn main() {
   // (Nobody is forced to listen to it, and it will just drop its data 
   // if it does not have any subscribers)
   let data_socket = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
-  data_socket.bind(&data_address);
+  data_socket.bind(&data_address).expect("Unable to bind to data (PUB) socket {data_adress}");
   info!("0MQ SUB socket bound to address {data_address}");
   
   // Now setup thread which require the 
@@ -445,6 +446,13 @@ fn main() {
   //let rate = get_trigger_rate().unwrap();
   //info!("Current trigger rate: {rate}Hz");
   //let mut command  : cmd::TofCommand;
+  if stream_any {
+    match set_op_mode.send(TofOperationMode::TofModeStreamAny) {
+      Err(err) => warn!("Can not set TofOperationMode to StreamAny! Err {err}"),
+      Ok(_)    => ()
+    }
+  }
+
   let mut resp     : cmd::TofResponse;
   let r_clone  = ev_pl_from_cache.clone();
   let executor = Commander::new(&data_socket,
@@ -452,6 +460,7 @@ fn main() {
                                 r_clone,
                                 set_op_mode);
   let mut run_active = false;
+  
   loop {
 
     // step 1 - check the individual 
@@ -509,7 +518,7 @@ fn main() {
     // to be adjusted.
     match cmd_socket.poll(zmq::POLLIN, 1) {
       Err(err) => {
-        warn!("Polling the 0MQ command socket failed!");
+        warn!("Polling the 0MQ command socket failed! Err: {err}");
         thread::sleep(one_milli);
         continue;
       }
@@ -540,12 +549,15 @@ fn main() {
       Err(err) => {
         warn!("Can not decode Command! Err {:?}", err);
         warn!("Received {:?} ", raw_command);
-        let resp = cmd::TofResponse::SerializationIssue(cmd::RESP_ERR_LEVEL_MEDIUM);
-        cmd_socket.send(resp.to_bytestream(),0);
+        let resp = cmd::TofResponse::SerializationIssue(cmd::RESP_ERR_LEVEL_MEDIUM); 
+        match cmd_socket.send(resp.to_bytestream(),0) {
+          Err(err) => warn!("Can not send responses, error {err}"),
+          Ok(_)    => trace!("Command sent successfully!")
+        }
         continue;
       },
       Ok(c) => {
-        let mut result = Ok(TofResponse::Unknown);
+        let result;// : Result<TofResponse>;
 
         // at this point, we have a valid command!
         info!("Received command {:?}", c);
@@ -558,7 +570,10 @@ fn main() {
             if run_active {
               warn!("Can not start a new run, stop the current first!");  
               result = Ok(TofResponse::GeneralFail(cmd::RESP_ERR_RUNACTIVE));
-              cmd_socket.send(result.unwrap().to_bytestream(),0);
+              match cmd_socket.send(result.unwrap().to_bytestream(),0) {
+                Err(err) => warn!("Unable to send response! Err {err}"),
+                Ok(_)    => ()
+              }
             } else {
               info!("Attempting to launch a new runner with {max_event} events!");
               //let bar_clone = prog_op_ev.clone();
@@ -580,20 +595,32 @@ fn main() {
               }); 
               run_active = true;
               result = Ok(TofResponse::Success(cmd::RESP_SUCC_FINGERS_CROSSED));
-              cmd_socket.send(result.unwrap().to_bytestream(),0);
+              match cmd_socket.send(result.unwrap().to_bytestream(),0) {
+                Err(err) => warn!("Unable to send response! Err {err}"),
+                Ok(_)    => trace!("Sent response successfully!")
+              }
             }
           },
           TofCommand::DataRunEnd (_)  => {
             if !run_active {
               warn!("Can not kill run, since there is currently none in progress!");
               result = Ok(TofResponse::GeneralFail(cmd::RESP_ERR_NORUNACTIVE));
-              cmd_socket.send(result.unwrap().to_bytestream(),0);
+              match cmd_socket.send(result.unwrap().to_bytestream(),0) {
+                Err(err) => warn!("Unable to send response! Err {err}"),
+                Ok(_)    => trace!("Response sent successfully")
+              }
             } else {
               warn!("Attempting to kill current run!");
-              kill_run.send(true);
+              match kill_run.send(true) {
+                Err(err) => warn!("Can not send kill command to runner! Unable to stop run! Err {err}"),
+                Ok(_)    => info!("Send kill command successful!")
+              }
               run_active = false;
               result = Ok(TofResponse::Success(cmd::RESP_SUCC_FINGERS_CROSSED));
-              cmd_socket.send(result.unwrap().to_bytestream(),0);
+              match cmd_socket.send(result.unwrap().to_bytestream(),0) {
+                Err(err) => warn!("Can not send result! Err {err}"),
+                Ok(_)    => trace!("Sent command successfully")
+              }
             }
           },
           _ => {
@@ -604,10 +631,16 @@ fn main() {
                 warn!("Command Failed! Err {:?}", err);
                 // FIXME - work on error codes
                 resp = cmd::TofResponse::GeneralFail(cmd::RESP_ERR_UNEXECUTABLE);
-                cmd_socket.send(resp.to_bytestream(),0);
+                match cmd_socket.send(resp.to_bytestream(),0) {
+                  Err(err) => warn!("Error! Can not send responses! {err}"),
+                  Ok(_)    => trace!("Send response successfully!")
+                } 
               }
               Ok(r) =>  {
-                cmd_socket.send(r.to_bytestream(),0);
+                match cmd_socket.send(r.to_bytestream(),0) {
+                  Err(err) => warn!("Error! Can not send responses! {err}"),
+                  Ok(_)    => trace!("Send response successfully!")
+                }
               }
             }
           } // end all other commands

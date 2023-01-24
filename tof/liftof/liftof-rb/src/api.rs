@@ -33,32 +33,28 @@ pub const HEARTBEAT : u64 = 5; // heartbeat in s
 const SLEEP_AFTER_REG_WRITE : u32 = 1; // sleep time after register write in ms
 const DMA_RESET_TRIES : u8 = 10;   // if we can not reset the DMA after this number
                                    // of retries, we'll panic!
-const SAVE_RESTART_TRIES : u8 = 5; // if we are not successfull, to get it going, 
+const RESTART_TRIES : u8 = 5; // if we are not successfull, to get it going, 
                                    // panic
 
 
 
 
                                    /// Little helper
-fn debug_and_ok() -> Result<(), RegisterError> {
-  debug!("Raised RegisterError!");
-  Ok(())
-}
 
-/// Send out a signal periodically
-/// to all the threads. 
-/// If they don't answer in timely 
-/// manner, call a doctor.
-fn heartbeat() {
-  let mut now = time::Instant::now();
-  loop {
-    if now.elapsed().as_secs() >= HEARTBEAT {
-      //FIXME
-      println!("BEAT");
-      now = time::Instant::now();
-    }
-  }
-}
+///// Send out a signal periodically
+///// to all the threads. 
+///// If they don't answer in timely 
+///// manner, call a doctor.
+//fn heartbeat() {
+//  let mut now = time::Instant::now();
+//  loop {
+//    if now.elapsed().as_secs() >= HEARTBEAT {
+//      //FIXME
+//      println!("BEAT");
+//      now = time::Instant::now();
+//    }
+//  }
+//}
 
 
 /// Somehow, it is not always successful to reset 
@@ -100,7 +96,10 @@ fn reset_data_memory_aggressively() {
   }
   thread::sleep(one_milli);
   while buf_a_occ != UIO1_MIN_OCCUPANCY {
-    blob_buffer_reset(&buf_a).or_else(|_| debug_and_ok() ); 
+    match blob_buffer_reset(&buf_a) {
+      Err(err) => warn!("Problem resetting buffer /dev/uio1 {:?}", err),
+      Ok(_)    => () 
+    }
     thread::sleep(five_milli);
     match get_blob_buffer_occ(&buf_a) {
       Err(_) => debug!("Error reseting blob buffer A"),
@@ -117,9 +116,12 @@ fn reset_data_memory_aggressively() {
   }
   n_tries = 0;
   while buf_b_occ != UIO2_MIN_OCCUPANCY {
-    blob_buffer_reset(&buf_b).or_else(|_| debug_and_ok());
+    match blob_buffer_reset(&buf_b) {
+      Err(err) => warn!("Problem resetting buffer /dev/uio2 {:?}", err),
+      Ok(_)    => () 
+    }
     match get_blob_buffer_occ(&buf_b) {
-      Err(_) => debug!("Error reseting blob buffer B"),
+      Err(_) => warn!("Error getting occupancey for buffer B! (/dev/uio2)"),
       Ok(val)  => {
         buf_b_occ = val;
         thread::sleep(five_milli);
@@ -145,7 +147,7 @@ fn reset_data_memory_aggressively() {
 ///                 will panic after this many calls to itself
 ///
 fn make_sure_it_runs(will_panic : &mut u8) {
-  let when_panic : u8 = 5;
+  let when_panic : u8 = RESTART_TRIES;
   *will_panic += 1;
   if *will_panic == when_panic {
     // it is hopeless. Let's give up.
@@ -203,7 +205,7 @@ pub struct FIXME {
 ///                panic.
 ///
 fn kill_run(will_panic : &mut u8) {
-  let when_panic : u8 = 5;
+  let when_panic : u8 = RESTART_TRIES;
   *will_panic += 1;
   if when_panic == *will_panic {
     panic!("We can not kill the run! I'll kill myself!");
@@ -257,20 +259,6 @@ pub fn runner(max_events  : Option<u64>,
   let mut n_events     : u64 = 0;
   let mut n_errors     : u64 = 0;
 
-  //match prog_op_ev {
-  //  None => (),
-  //  Some(ref bar) => {
-  //    bar.reset();
-  //    match max_events {
-  //      None    => (),
-  //      Some(n) => {
-  //        bar.set_length(n);
-  //      }
-  //    }
-  //  }
-  //}
-
-
   let now = time::Instant::now();
 
   let mut terminate = false;
@@ -304,16 +292,13 @@ pub fn runner(max_events  : Option<u64>,
     n_events += delta_events;
     last_evt_cnt = evt_cnt;
     
-    //match prog_op_ev {
-    //  None => (),
-    //  Some(ref bar) => {
-    //    bar.inc(delta_events);   
-    //  }
-    //}
     match &progress { 
       None => (),
       Some(sender) => {
-        sender.try_send(delta_events);
+        match sender.try_send(delta_events) {
+          Err(err) => trace!("Error sending {err}"),
+          Ok(_)    => ()
+        }
       }
     }
     debug!("Checking for kill signal");
@@ -445,7 +430,13 @@ pub fn event_cache_worker(recv_ev_pl  : Receiver<RBEventPayload>,
       //let evids = event_cache.keys();
       for payload in event_cache.values() {
         // FIXME - this is bad! Too much allocation
-        send_ev_pl.try_send(Some(payload.clone())); 
+        match send_ev_pl.try_send(Some(payload.clone())) {
+          Err(err) => {
+            trace!("Error sending! {err}");
+            n_send_errors += 1;
+          }
+          Ok(_)    => ()
+        }
       }
       event_cache.clear();
       //for n in evids { 
@@ -461,12 +452,18 @@ pub fn event_cache_worker(recv_ev_pl  : Receiver<RBEventPayload>,
       Ok(event_id) => {
         let has_it = event_cache.contains_key(&event_id);
         if !has_it {
-          send_ev_pl.try_send(None);
+          match send_ev_pl.try_send(None) {
+            Err(err) => trace!("Error sending! {err}"),
+            Ok(_)    => ()
+          }
           // hamwanich
           debug!("We don't have {event_id}!");
         } else {
           let event = event_cache.remove(&event_id).unwrap();
-          send_ev_pl.try_send(Some(event));
+          match send_ev_pl.try_send(Some(event)) {
+            Err(err) => trace!("Error sending! {err}"),
+            Ok(_)    => ()
+          }
         }
       },
     } // end match
@@ -554,12 +551,19 @@ impl Commander<'_> {
       },
       TofCommand::StreamOnlyRequested (_) => {
         let op_mode = TofOperationMode::TofModeRequestReply;
-        self.change_op_mode.try_send(op_mode);
+        
+        match self.change_op_mode.try_send(op_mode) {
+          Err(err) => trace!("Error sending! {err}"),
+          Ok(_)    => ()
+        }
         return Ok(TofResponse::Success(RESP_SUCC_FINGERS_CROSSED));
       },
       TofCommand::StreamAnyEvent      (_) => {
         let op_mode = TofOperationMode::TofModeStreamAny;
-        self.change_op_mode.try_send(op_mode);
+        match self.change_op_mode.try_send(op_mode) {
+          Err(err) => trace!("Error sending! {err}"),
+          Ok(_)    => ()
+        }
         return Ok(TofResponse::Success(RESP_SUCC_FINGERS_CROSSED));
       },
       //TofCommand::DataRunStart (max_event) => {
@@ -707,10 +711,16 @@ pub fn buff_handler(which       : &BlobBuffer,
     }
     //thread::sleep_ms(SLEEP_AFTER_REG_WRITE);
     let bytestream = read_data_buffer(&which, buff_size as usize).unwrap();
-    match bs_sender {
-      Some(snd) => snd.send(bytestream),
-      None      => Ok(()),
-    };
+    if bs_sender.is_some() {
+      match bs_sender.unwrap().send(bytestream) {
+        Err(err) => trace!("error sending {err}"),
+        Ok(_)    => ()
+      }
+    }
+    //match bs_sender {
+    //  Some(snd) => snd.send(bytestream),
+    //  None      => Ok(()),
+    //};
     
     match blob_buffer_reset(&which) {
       Ok(_)  => debug!("Successfully reset the buffer occupancy value"),
@@ -718,7 +728,12 @@ pub fn buff_handler(which       : &BlobBuffer,
     }
     match &prog_sender {
       None => (),
-      Some(up) => {up.try_send(0);},
+      Some(up) => {
+        match up.try_send(0) {
+          Err(err) => trace!("Can not send!"),
+          Ok(_) => ()
+        }
+      }
     }
     //match prog_bar {
     //  Some(bar) => bar.set_position(0),
@@ -728,7 +743,12 @@ pub fn buff_handler(which       : &BlobBuffer,
   } else { // endf has tripped
     match &prog_sender {
       None => (),
-      Some(up) => {up.try_send(buff_size as u64);},
+      Some(up) => {
+        match up.try_send(buff_size as u64) {
+          Err(err) => trace!("Sending faile with error {err}"),
+          Ok(_)    => ()
+        }
+      }
     }
     //match prog_bar {
     //  Some(bar) => bar.set_position(buff_size as u64),
@@ -933,7 +953,7 @@ pub fn progress_runner(max_events      : u64,
   let sty_ev = ProgressStyle::with_template(template_bar_env)
   .unwrap();
   //.progress_chars("##>");
-  let mut multi_prog = MultiProgress::new();
+  let multi_prog = MultiProgress::new();
 
   let prog_a  = multi_prog
                 .add(ProgressBar::new(uio1_total_size)); 

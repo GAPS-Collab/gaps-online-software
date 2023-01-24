@@ -17,7 +17,7 @@
 pub mod paddle_packet;
 pub mod generic_packet;
 pub mod data_packet;
-pub mod command_packet;
+//pub mod command_packet;
 
 pub use crate::packets::generic_packet::GenericPacket;
 pub use crate::packets::data_packet::DataPacket;
