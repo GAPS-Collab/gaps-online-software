@@ -31,7 +31,8 @@ use crate::packets::{TofPacket,
                      //CommandPacket,
                      PacketType};
 
-
+/// en empty command
+pub const CMD_PING                : u8 = 1;
 /// command code for "Power off"
 pub const CMD_POFF                : u8 = 10;        
 /// command code for "Power on"
@@ -117,6 +118,8 @@ pub const RESP_SUCC_FINGERS_CROSSED          : u32 = 200;
 pub const RESP_ERR_NORUNACTIVE               : u32 = 501;
 /// The command can't be executed since currently data taking is active
 pub const RESP_ERR_RUNACTIVE                 : u32 = 502;
+/// The command got stuck somewhere and did not make it to the intended receiver
+pub const RESP_ERR_CMD_STUCK                 : u32 = 503;
 
 
 
@@ -140,6 +143,7 @@ pub enum TofOperationMode {
 ///
 #[derive(Debug, PartialEq, Copy, Clone)]//, IntoEnumIterator)]
 pub enum TofCommand {
+  Ping                    (u32),
   PowerOn                 (u32),
   PowerOff                (u32),
   PowerCycle              (u32),
@@ -246,6 +250,7 @@ impl TofCommand {
   pub fn get_value(&self) -> u32 {
     let value : u32;
     match self {
+      TofCommand::Ping                    (data) => { value = *data;},
       TofCommand::PowerOn                 (data) => { value = *data;}, 
       TofCommand::PowerOff                (data) => { value = *data;}, 
       TofCommand::PowerCycle              (data) => { value = *data;}, 
@@ -278,6 +283,7 @@ impl TofCommand {
   /// a string.
   pub fn to_str(&self) -> String { 
     match self {
+      TofCommand::Ping                    (_) => {return String::from("Ping");},
       TofCommand::PowerOn                 (_) => {return String::from("PowerOn");},
       TofCommand::PowerOff                (_) => {return String::from("PowerOff");},
       TofCommand::PowerCycle              (_) => {return String::from("PowerCycle");},
@@ -309,6 +315,7 @@ impl TofCommand {
   /// representation
   pub fn from_command_code(cc : u8, value : u32) -> TofCommand {
     match cc {
+      CMD_PING                   => TofCommand::Ping                 (value),
       CMD_POFF                   => TofCommand::PowerOff             (value),        
       CMD_PON                    => TofCommand::PowerOn              (value),       
       CMD_PCYCLE                 => TofCommand::PowerCycle           (value),        
@@ -337,6 +344,7 @@ impl TofCommand {
   /// Translate a TofCommand into its specific byte representation
   pub fn to_command_code(cmd : &TofCommand) -> Option<u8> {
     match cmd {
+      TofCommand::Ping          (_)        => Some(CMD_PING              ),
       TofCommand::PowerOff      (_)        => Some(CMD_POFF              ),        
       TofCommand::PowerOn       (_)        => Some(CMD_PON               ),       
       TofCommand::PowerCycle    (_)        => Some(CMD_PCYCLE            ),        
@@ -395,6 +403,7 @@ impl From<(u8, u32)> for TofCommand {
     let (input, value) = pair;
     trace!("Got in input {:?}", pair);
     match input {
+      CMD_PING                => TofCommand::Ping                 (value) ,
       CMD_POFF                => TofCommand::PowerOff             (value) ,        
       CMD_PON                 => TofCommand::PowerOn              (value) ,       
       CMD_PCYCLE              => TofCommand::PowerCycle           (value) ,        

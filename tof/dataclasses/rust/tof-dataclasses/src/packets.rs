@@ -21,10 +21,11 @@ pub mod data_packet;
 
 pub use crate::packets::generic_packet::GenericPacket;
 pub use crate::packets::data_packet::DataPacket;
+pub use crate::monitoring::RBMoniData;
 //pub use crate::packets::command_packet::CommandPacket;
 use crate::serialization::{Serialization};
 use crate::errors::SerializationError;
-
+use crate::events::RBEventPayload;
 //use nom::IResult;
 //use nom::{error::ErrorKind, Err};
 //use nom::number::complete::*;
@@ -165,6 +166,24 @@ impl TofPacket {
 
   //  }
 
+}
+
+impl From<&RBMoniData> for TofPacket {
+  fn from(moni : &RBMoniData) -> TofPacket {
+    let mut tp = TofPacket::new();
+    tp.packet_type = PacketType::Monitor;
+    tp.payload = moni.to_bytestream();
+    tp
+  }
+}
+
+impl From<&RBEventPayload> for TofPacket {
+  fn from(ev_payload : &RBEventPayload) -> TofPacket {
+    let mut tp = TofPacket::new();
+    tp.packet_type = PacketType::RBEvent;
+    tp.payload = ev_payload.payload.clone();
+    tp
+  }
 }
 
 
