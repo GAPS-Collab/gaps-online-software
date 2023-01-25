@@ -16,6 +16,9 @@ use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
 
+extern crate pretty_env_logger;
+#[macro_use] extern crate log;
+
 #[macro_use] extern crate manifest_dir_macros;
 
 //extern crate libarp;
@@ -57,7 +60,7 @@ pub fn get_rb_manifest() -> Vec<ReadoutBoard> {
           continue;
         }
         let identifier: Vec<&str> = ip.split(";").collect();
-        println!("{:?}", identifier);
+        debug!("{:?}", identifier);
         let mut rb = ReadoutBoard::new();
         let mc_address = identifier[1].replace(" ","");
         let mc_address : Vec<&str> = mc_address.split(":").collect();
@@ -128,8 +131,6 @@ pub fn get_rb_manifest() -> Vec<ReadoutBoard> {
   return connected_boards;
 }
 
-// FIXME - get this from file
-const RB51 : (u8, &[u8;6]) = (51, &[0x20,0xb0,0xf7,0x05,0x52,0xf2]);
 
 
 #[derive(Debug)]
@@ -206,9 +207,10 @@ impl ReadoutBoard {
     let address = "tcp://".to_owned() + &self.ip_address.unwrap().to_string() + ":" + &self.cmd_port.unwrap().to_string(); 
     let socket  = ctx.socket(zmq::REQ)?;
     socket.connect(&address)?;
+    info!("Have connected to adress {address}");
     // if the readoutboard is there, it should send *something* back
     socket.send(String::from("[PING]").as_bytes(), 0)?;
-    println!("here3");
+    info!("Send ping signal, waiting for response!");
     let data = socket.recv_bytes(0)?;
     if data.len() != 0 {
       self.is_connected = true;
