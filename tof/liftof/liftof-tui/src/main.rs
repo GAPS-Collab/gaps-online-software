@@ -147,12 +147,12 @@ fn commander(cmd_from_main : Receiver<TofCommand>,
                   +  &rb.cmd_port.expect("No CMD port known for this board!").to_string();
     cmd_socket.connect(&address);
     // the process is only completed after an intiail back and forth
-    let ping : String = String::from("[PING]");
-    // we use expect here, since these calls have 
-    // to go through, otherwise it just won't work
-    cmd_socket.send(ping.as_bytes(), 0).expect("Can not communicate with RB!");
-    let response = cmd_socket.recv_bytes(0).expect("Can not communicate with RB!");
-    info!("Got response {}", String::from_utf8(response).expect("Did not receive string"));
+    //let ping : String = String::from("[PING]");
+    //// we use expect here, since these calls have 
+    //// to go through, otherwise it just won't work
+    //cmd_socket.send(ping.as_bytes(), 0).expect("Can not communicate with RB!");
+    //let response = cmd_socket.recv_bytes(0).expect("Can not communicate with RB!");
+    //info!("Got response {}", String::from_utf8(response).expect("Did not receive string"));
     connected_rbs += 1;
     
   }
@@ -326,8 +326,9 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
     rb.ping().unwrap();
   }  
   if autodiscover_rb {
-    let mut rb_list = get_rb_manifest();
+    rb_list = get_rb_manifest();
     if rb_list.len() == 0 {
+      println!("Could not discover boards, inserting dummy");
       let mut rb = ReadoutBoard::default();
       rb.id = Some(0);
       rb_list = vec![rb];
@@ -343,7 +344,11 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let (rsp_to_main, rsp_from_cmdr) :
     (Sender<Vec<Option<TofResponse>>>, Receiver<Vec<Option<TofResponse>>>) = unbounded();
   //let ev_to_main, ev_from_thread) : Sender
-
+  println!("We have the following ReadoutBoards");
+  for n in 0..rb_list_c2.len() {
+    println!("{}",rb_list_c2[n]);
+  }
+  println!("Starting threads");
   // set up Threads
   let n_threads = 2;
   let workforce = ThreadPool::new(n_threads);
@@ -355,6 +360,8 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   workforce.execute(move || {
       receive_stream(tp_to_main, rb_list_c);
   });
+
+  //panic!("Until here");
 
   // set up the terminal
   enable_raw_mode().expect("can run in raw mode");

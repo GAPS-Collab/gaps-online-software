@@ -231,7 +231,8 @@ impl TofCommand {
   
   pub fn to_bytestream(&self) -> Vec<u8> {
 
-    let mut stream = Vec::<u8>::with_capacity(TofCommand::SIZE);
+    //let mut stream = Vec::<u8>::with_capacity(TofCommand::SIZE);
+    let mut stream : Vec::<u8> = vec![0,0,0,0,0,0,0,0,0];
     stream[0] = 0xAA;
     stream[1] = 0xAA;
     stream[2] = TofCommand::to_command_code(&self).expect("This can't fail, since this is implemented on MYSELF and I am a TofCommand!"); 
