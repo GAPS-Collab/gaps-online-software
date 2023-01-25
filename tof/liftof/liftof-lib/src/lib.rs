@@ -16,6 +16,8 @@ use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
 
+use tof_dataclasses::commands::{TofCommand, TofResponse};
+
 extern crate pretty_env_logger;
 #[macro_use] extern crate log;
 
@@ -209,8 +211,10 @@ impl ReadoutBoard {
     socket.connect(&address)?;
     info!("Have connected to adress {address}");
     // if the readoutboard is there, it should send *something* back
-    socket.send(String::from("[PING]").as_bytes(), 0)?;
-    info!("Send ping signal, waiting for response!");
+    let p = TofCommand::Ping(1);
+
+    socket.send(p.to_bytestream(), 0)?;
+    info!("Sent ping signal, waiting for response!");
     let data = socket.recv_bytes(0)?;
     if data.len() != 0 {
       self.is_connected = true;
