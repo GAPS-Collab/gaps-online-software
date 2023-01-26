@@ -9,6 +9,11 @@ tof/crusty_kraken/*.hdf
 
 tof/dataclasses/rust/tof_dataclasses/target/*
 
+tof/liftof/liftof-rb/target/*
+tof/liftof/liftof-cc/target/*
+tof/liftof/liftof-tui/target/*
+tof/liftof/liftof-lib/target/*
+
 # files created by google protocol buffers
 dataclasses/*pb.h
 dataclasses/*pb.cc

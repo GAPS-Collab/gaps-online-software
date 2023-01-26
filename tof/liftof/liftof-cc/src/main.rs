@@ -7,7 +7,7 @@ mod commands;
 mod master_trigger;
 mod event_builder;
 mod paddle_packet_cache;
-
+mod flight_comms;
 // this is a list of tests
 // FIXME - this should follow
 // the "official" structure
@@ -24,8 +24,17 @@ extern crate hdf5;
 #[cfg(feature = "diagnostics")]
 extern crate ndarray;
 
+extern crate local_ip_address;
+
+extern crate liftof_lib;
+use liftof_lib::{ReadoutBoard, 
+                 rb_manifest_from_json,
+                 get_rb_manifest};
+
 #[cfg(feature="random")]
 extern crate rand;
+
+extern crate zmq;
 
 extern crate tof_dataclasses;
 
@@ -43,16 +52,27 @@ use clap::{arg,
            //Command,
            Parser};
 
+extern crate crossbeam_channel;
+//use crossbeam_channel::{unbounded,
+//                        Sender,
+//                        Receiver};
+use crossbeam_channel as cbc; 
+
 use crate::readoutboard_comm::readoutboard_communicator;
 use crate::master_trigger::{master_trigger,
                             MasterTriggerEvent};
 use crate::event_builder::{event_builder,
-                           event_builder_no_master};
+                           TofEventBuilderSettings};
+                           //event_builder_no_master};
+
+use crate::flight_comms::global_data_sink;
+
 use tof_dataclasses::threading::ThreadPool;
 //use crate::reduced_tofevent::PaddlePacket;
 
 use tof_dataclasses::packets::paddle_packet::PaddlePacket;
 use crate::paddle_packet_cache::paddle_packet_cache;
+use tof_dataclasses::packets::TofPacket;
 
 /*************************************/
 
@@ -206,7 +226,13 @@ fn main() {
   let mut rb_id          : usize;
 
   // prepare channels for inter thread communications
-  
+ 
+  let (tp_to_sink, tp_from_client) : (cbc::Sender<TofPacket>, cbc::Receiver<TofPacket>) = cbc::unbounded();
+
+  // set the parameters for the event builder
+  let (ebs_to_eb, ebs_from_cmdr)   : (cbc::Sender<TofEventBuilderSettings>,cbc::Receiver<TofEventBuilderSettings>) = cbc::unbounded();
+
+
   // master thread -> event builder ocmmuncations
   let (master_ev_send, master_ev_rec): (Sender<MasterTriggerEvent>, Receiver<MasterTriggerEvent>) = channel(); 
   // event builder  <-> paddle cache communications
@@ -238,6 +264,10 @@ fn main() {
                                              &rb_rec,
                                              &pp_send);
   });
+  
+  worker_threads.execute(move || {
+                         global_data_sink(&tp_from_client);
+  });
 
   // open a zmq context
   println!("==> Seting up zmq context and opening socket for event builder!");
@@ -261,7 +291,9 @@ fn main() {
                            event_builder(&master_ev_rec,
                                          &id_send,
                                          &pp_rec,
-                                         &evb_comm_socket);
+                                         &ebs_from_cmdr,
+                                         &tp_to_sink);
+                                         //&evb_comm_socket);
     });
     // master trigger
     worker_threads.execute(move || {
@@ -272,11 +304,11 @@ fn main() {
   } else {
     // we start the event builder without 
     // depending on the master trigger
-    worker_threads.execute(move || {
-                           event_builder_no_master(&id_send,
-                                                   &pp_rec,
-                                                   &evb_comm_socket);
-    });
+    //worker_threads.execute(move || {
+    //                       event_builder_no_master(&id_send,
+    //                                               &pp_rec,
+    //                                               &evb_comm_socket);
+    //});
   }
   println!("==> Will now start rb threads..");
 
@@ -301,21 +333,19 @@ fn main() {
         Err(err) => panic!("Can not communicate with rb at address {}. Maybe you want to check your .json configuration file?, error {}",address, err)
     }
     let this_rb_pp_sender = rb_send.clone();
+    //let ctx_ref = &ctx.clone();
     worker_threads.execute(move || {
-      readoutboard_communicator(&rb_comm_socket,
+      readoutboard_communicator(//&rb_comm_socket,
+                                //ctx_ref,
                                 this_rb_pp_sender,
-                                rb_id,
+                                //rb_id,
                                 write_blob,
+                                &ReadoutBoard::new(),
                                 &cali_file_name); 
     });
   } // end for loop over nboards
   let one_minute = time::Duration::from_millis(60000);
   let one_second = time::Duration::from_millis(1000);
-  
-  // now as we have the readoutboard threads started, 
-  // give them some time to fire up and then let the 
-  // event builder and finally the master trigger 
-  // thread start
   
   //println!("==> Sleeping a bit to give the rb's a chance to fire up..");
   //thread::sleep(10*one_second);

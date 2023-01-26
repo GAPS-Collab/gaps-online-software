@@ -9,6 +9,8 @@ use std::net::{IpAddr, Ipv4Addr};
 //use mac_address::MacAddress;
 use zmq;
 
+extern crate json;
+
 use macaddr::MacAddr6;
 use netneighbours::get_mac_to_ip_map;
 
@@ -45,6 +47,38 @@ fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
 where P: AsRef<Path>, {
     let file = File::open(filename)?;
     Ok(io::BufReader::new(file).lines())
+}
+
+
+
+/// Get a list of ReadoutBoards from a json file
+pub fn rb_manifest_from_json(config : json::JsonValue) -> Vec<ReadoutBoard> {
+  let mut boards = Vec::<ReadoutBoard>::new();
+
+  let nboards = config["readout_boards"].len();
+  info!("Found configuration for {} readout boards!", nboards);
+  for n in 0..nboards {
+    let board_config   = &config["readout_boards"][n];
+    let mut address_ip = String::from("tcp://");
+    //let rb_comm_socket = ctx.socket(zmq::REP).unwrap();
+    let rb_id = board_config["id"].as_usize().unwrap();
+    address_ip += board_config["ip_address"].as_str().unwrap();
+    let port        = board_config["port"].as_usize().unwrap();
+    let address = address_ip.to_owned() + ":" + &port.to_string();
+    let mut rb = ReadoutBoard::new();
+    rb.id = Some(rb_id as u8);//           : Option<u8>,
+    //mac_address  : Option<MacAddr6>,
+    //rb.ip_address = Some(  : Option<Ipv4Addr>, 
+    //rb.ip_address = Some(Ipv4Addr::from_str(address_ip).expect("Wrong format for ip!"));
+    rb.data_port  = Some(port as u16);
+    //cmd_port     : Option<u16>,
+    //is_connected : bool,
+    //uptime       : u32,
+    boards.push (rb);
+
+  }
+  todo!();
+  boards
 }
 
 pub fn get_rb_manifest() -> Vec<ReadoutBoard> {

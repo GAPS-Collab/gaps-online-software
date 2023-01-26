@@ -33,6 +33,8 @@ clap = { version = "4.0", features = ["derive"] }
 # this is just for fun
 indicatif = "0.17"
 
+json = "0.12"
+
 # for connection to rb's at arbitrary ports
 port_scanner = "0.1"
 #arp-toolkit = { verion = "0.3", features = ["sync"] }

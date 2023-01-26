@@ -1,11 +1,7 @@
-///! Assemble tof packets to full events
-///
-///
-///
-///
-///
-///
-///
+//! Assemble paddle packets to full events
+//!
+//!
+//!
 
 
 use std::sync::mpsc::{Sender,
@@ -19,18 +15,11 @@ use std::time::{Duration,
 use crate::reduced_tofevent::TofEvent;
 use crate::master_trigger::MasterTriggerEvent;
 use crate::constants::EVENT_BUILDER_EVID_CACHE_SIZE;
+use tof_dataclasses::packets::TofPacket;
+
+use crossbeam_channel as cbc;
 
 use tof_dataclasses::packets::paddle_packet::PaddlePacket;
-///! Serialize a tof event and send it 
-///  over th provided zmq socket
-///
-///  # Arguments:
-///
-///  * event (TofEvent) : the fully assembled event
-///
-fn pack_and_send(event : &TofEvent) {
-  println!("Packing event {}", event.event_id);
-}
 
 ///! Walk over the event cache and check for each event
 ///  if new paddles can be added.
@@ -46,7 +35,8 @@ fn build_events_in_cache(event_cache   : &mut VecDeque<TofEvent>,
                          pp_recv       : &Receiver<Option<PaddlePacket>>,
                          clean_up      : bool,
                          use_timeout   : bool, 
-                         socket        : &zmq::Socket) {
+                         data_sink     : &cbc::Sender<TofPacket>) { 
+                         //socket        : &zmq::Socket) {
 
   for ev in event_cache.iter_mut() {
     let start   = Instant::now();
@@ -74,7 +64,8 @@ fn build_events_in_cache(event_cache   : &mut VecDeque<TofEvent>,
       if ev.is_ready_to_send(use_timeout) {
         (*ev).valid = false;
         let bytestream = ev.to_bytestream();
-        match socket.send(&bytestream.as_slice(), 0) {
+        let pack = TofPacket::new();
+        match data_sink.send(pack) {
           Err(err) => warn!("Packet sending failed! Err {}", err),
           Ok(_)    => trace!("Event {} sent!", ev.event_id) 
         }
@@ -137,82 +128,100 @@ fn build_events_in_cache(event_cache   : &mut VecDeque<TofEvent>,
 ///                cache to send the packets for a certain
 ///                event id it has in store
 ///
-pub fn event_builder_no_master(evid_query : &Sender<Option<u32>>,
-                               pp_recv    : &Receiver<Option<PaddlePacket>>,
-                               socket     : &zmq::Socket) {
+//pub fn event_builder_no_master(evid_query : &Sender<Option<u32>>,
+//                               pp_recv    : &Receiver<Option<PaddlePacket>>,
+//                               socket     : &zmq::Socket) {
+//
+//  info!("Initializing event builder without master trigger support!");
+//  let clock = Instant::now();
+//
+//  let mut event_cache = VecDeque::<TofEvent>::with_capacity(EVENT_BUILDER_EVID_CACHE_SIZE);
+//  let timeout_micro : u64 = 2000;
+//
+//  let mut n_packets = 0usize;
+//  let max_packets   : usize  = 10;
+//  let mut n_iter = 0; // don't worry, it'll simply get wrapped around
+//
+//  //// how many new events per 
+//  //// iteration do we want to allow?
+//  //let max_new_events : usize = 100;
+//  //let evid_seen = [0
+//
+//  loop {
+//    let mut event = TofEvent::new(0,0);
+//    // we set the number of expected paddles to 
+//    // unrealistic high number (max u8)
+//    event.n_paddles_expected = 255; 
+//    match evid_query.send(None) {
+//      Err(_) => {continue;},
+//      Ok(_) => {
+//        match pp_recv.recv() {
+//          Err(err) => {
+//            error!("Connection error or nothing in channel!");
+//            continue;
+//          },
+//          Ok(pp_option) => {
+//            match pp_option {
+//              None => {
+//                continue;
+//              },
+//              Some(pp) => {
+//                event.event_id = pp.event_id;
+//                event.add_paddle(pp);
+//                trace!("Have event with event id {}", event.event_id);
+//                n_packets += 1;
+//              }
+//            } // end inner match
+//          } // end ok
+//        }// end match
+//      } // end outer ok
+//    } // end match
+//    //if n_packets == max_packets {
+//    //  break;
+//    //}
+//    event_cache.push_back(event);
+//    if n_iter % 100 == 0 {
+//      build_events_in_cache(&mut event_cache,
+//                            timeout_micro,
+//                            evid_query,
+//                            pp_recv,
+//                            true,
+//                            true,
+//                            &socket);
+//    } else {
+//      build_events_in_cache(&mut event_cache,
+//                            timeout_micro,
+//                            evid_query,
+//                            pp_recv,
+//                            false,
+//                            true,
+//                            &socket);
+//    }
+//    n_iter += 1;
+//  } // end loop
+//  //  event.event_id = pp.event_id;
+//  //  event.paddle_packets.push(pp);
+//  //  event.timeout = clock.elapsed().as_micros();
+//}
 
-  info!("Initializing event builder without master trigger support!");
-  let clock = Instant::now();
 
-  let mut event_cache = VecDeque::<TofEvent>::with_capacity(EVENT_BUILDER_EVID_CACHE_SIZE);
-  let timeout_micro : u64 = 2000;
+/// Settings to change the configuration of the TOF Eventbuilder on the fly
 
-  let mut n_packets = 0usize;
-  let max_packets   : usize  = 10;
-  let mut n_iter = 0; // don't worry, it'll simply get wrapped around
-
-  //// how many new events per 
-  //// iteration do we want to allow?
-  //let max_new_events : usize = 100;
-  //let evid_seen = [0
-
-  loop {
-    let mut event = TofEvent::new(0,0);
-    // we set the number of expected paddles to 
-    // unrealistic high number (max u8)
-    event.n_paddles_expected = 255; 
-    match evid_query.send(None) {
-      Err(_) => {continue;},
-      Ok(_) => {
-        match pp_recv.recv() {
-          Err(err) => {
-            error!("Connection error or nothing in channel!");
-            continue;
-          },
-          Ok(pp_option) => {
-            match pp_option {
-              None => {
-                continue;
-              },
-              Some(pp) => {
-                event.event_id = pp.event_id;
-                event.add_paddle(pp);
-                trace!("Have event with event id {}", event.event_id);
-                n_packets += 1;
-              }
-            } // end inner match
-          } // end ok
-        }// end match
-      } // end outer ok
-    } // end match
-    //if n_packets == max_packets {
-    //  break;
-    //}
-    event_cache.push_back(event);
-    if n_iter % 100 == 0 {
-      build_events_in_cache(&mut event_cache,
-                            timeout_micro,
-                            evid_query,
-                            pp_recv,
-                            true,
-                            true,
-                            &socket);
-    } else {
-      build_events_in_cache(&mut event_cache,
-                            timeout_micro,
-                            evid_query,
-                            pp_recv,
-                            false,
-                            true,
-                            &socket);
-    }
-    n_iter += 1;
-  } // end loop
-  //  event.event_id = pp.event_id;
-  //  event.paddle_packets.push(pp);
-  //  event.timeout = clock.elapsed().as_micros();
+pub struct TofEventBuilderSettings {
+  pub cachesize         : usize,
+  pub build_interval    : usize,
+  pub use_mastertrigger : bool
 }
 
+impl TofEventBuilderSettings {
+  pub fn new() -> TofEventBuilderSettings {
+    TofEventBuilderSettings {
+      cachesize         : 100000,
+      build_interval    : 1000,
+      use_mastertrigger : true
+    }
+  }
+}
 
 /// The event builder, assembling events from an id given by the 
 /// master trigger
@@ -230,14 +239,17 @@ pub fn event_builder_no_master(evid_query : &Sender<Option<u32>>,
 ///               channel. The event will be either build 
 ///               immediatly, or cached. 
 ///
-/// * pp_query       : Send request to a paddle_packet cache
+/// * pp_query       : Send request to a paddle_packet cache to send
+///                    Paddle packets with the given event id
 /// * paddle_packets : Receive paddle_packets from a paddle_packet
 ///                    cache
 ///
 pub fn event_builder (master_id      : &Receiver<MasterTriggerEvent>,
                       pp_query       : &Sender<Option<u32>>,
                       pp_recv        : &Receiver<Option<PaddlePacket>>,
-                      socket         : &zmq::Socket) {
+                      settings       : &cbc::Receiver<TofEventBuilderSettings>,
+                      data_sink      : &cbc::Sender<TofPacket>) {
+                      //socket         : &zmq::Socket) {
 
   let mut event_cache = VecDeque::<TofEvent>::with_capacity(EVENT_BUILDER_EVID_CACHE_SIZE);
 
@@ -332,7 +344,8 @@ pub fn event_builder (master_id      : &Receiver<MasterTriggerEvent>,
                             pp_recv,
                             true,
                             false,
-                            &socket);
+                            &data_sink);
+                            //&socket);
     }
     n_iter += 1;
   } // end loop

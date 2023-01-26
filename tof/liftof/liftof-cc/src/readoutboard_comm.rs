@@ -17,6 +17,8 @@ use hdf5;
 #[cfg(feature = "diagnostics")]
 use ndarray::{arr1};
 
+use liftof_lib::ReadoutBoard;
+
 use tof_dataclasses::packets::paddle_packet::PaddlePacket;
 use crate::errors::BlobError;
 //use crate::reduced_tofevent::PaddlePacket;
@@ -30,6 +32,8 @@ use tof_dataclasses::events::blob::{BlobData,
 use tof_dataclasses::constants::{NCHN,
                        NWORDS};
 use crate::waveform::CalibratedWaveform;
+
+extern crate json;
 
 /*************************************/
 
@@ -363,19 +367,22 @@ fn identifiy_readoutboard(msg : &zmq::Message) -> bool
 /// and perform specified tasks
 ///
 ///
-pub fn readoutboard_communicator(socket           : &zmq::Socket,
+pub fn readoutboard_communicator(//socket           : &zmq::Socket,
+                                 //zmq_ctx          : &zmq::Context,
                                  pp_pusher        : Sender<PaddlePacket>,
-                                 board_id         : usize,
+                                 //board_id         : usize,
                                  write_blob       : bool,
+                                 rb               : &ReadoutBoard,
                                  calibration_file : &str)
 {
+  let zmq_ctx = zmq::Context::new();
+  let board_id = rb.id.unwrap();
   info!("initializing RB thread for board {}!", board_id);
   let mut msg             = zmq::Message::new();
   let mut n_errors        = 0usize;
   let mut lost_blob_files = 0usize;
   // how many chunks ("buffers") we dealt with
   let mut n_chunk  = 0usize;
-
   // in case we want to do calibratoins
   let mut calibrations = [Calibrations {..Default::default()};NCHN];
   let do_calibration = true;
@@ -384,7 +391,16 @@ pub fn readoutboard_communicator(socket           : &zmq::Socket,
     let cal_file_path = Path::new(&calibration_file);
     calibrations = read_calibration_file(cal_file_path); 
   }
-
+  let address = "tcp::/".to_owned() 
+              + &rb.ip_address.expect("No IP known for this board!").to_string()
+              + ":"
+              +  &rb.data_port.expect("No CMD port known for this board!").to_string();
+  let socket = zmq_ctx.socket(zmq::SUB).expect("Unable to create socket!");
+  socket.connect(&address);
+  // FIXME - do not subscribe to all, only this 
+  // specific RB
+  let topic = b"";
+  socket.set_subscribe(topic);
   loop {
 
     // check if we got new data
@@ -418,7 +434,7 @@ pub fn readoutboard_communicator(socket           : &zmq::Socket,
           match analyze_blobs(&buffer,
                               &pp_pusher,
                               true,
-                              board_id,
+                              board_id as usize,
                               false,
                               true,
                               &calibrations,
