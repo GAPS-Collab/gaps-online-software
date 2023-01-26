@@ -581,7 +581,6 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
             Ok(dt)   => {
               if dt.packet_type == PacketType::RBEvent {
                 data = Vec::<Vec<(f64,f64)>>::new();
-               
                 let mut event = BlobData::new();
                 event.from_bytestream(&dt.payload, 0, false);
                 if event.ch_adc.len() == 9 {
@@ -601,10 +600,11 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
           let ylabels = vec!["0","50", "100"];
           //let cdata = data.clone();
 
+
           let datasets = vec![
             Dataset::default()
               .name("Ch0")
-              .marker(symbols::Marker::Dot)
+              .marker(symbols::Marker::Braille)
               .graph_type(GraphType::Line)
               .style(Style::default().fg(Color::White))
               .data(&data[0]),
@@ -677,7 +677,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
             .y_axis(Axis::default()
               .title(Span::styled("ADC", Style::default().fg(Color::White)))
               .style(Style::default().fg(Color::White))
-              .bounds([0.0, 100.0])
+              .bounds([0.0, 17000.0])
               .labels(ylabels.clone().iter().cloned().map(Span::from).collect()));
             charts.push(chart);
           }
@@ -713,7 +713,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
             .y_axis(Axis::default()
               .title(Span::styled("ADC", Style::default().fg(Color::White)))
               .style(Style::default().fg(Color::White))
-              .bounds([0.0, 100.0])
+              .bounds([0.0, 17000.0])
               .labels(ylabels.clone().iter().cloned().map(Span::from).collect()));
           
 
