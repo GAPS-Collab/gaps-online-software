@@ -286,18 +286,18 @@ fn main() {
 
   // open a zmq context
   println!("==> Seting up zmq context and opening socket for event builder!");
-  let ctx = zmq::Context::new();
-  let evb_comm_socket = ctx.socket(zmq::PUB).unwrap();
-  let mut address_ip = String::from("tcp://");
-  address_ip += config["flight_computer"]["ip_address"].as_str().unwrap();
-  port        = config["flight_computer"]["port"].as_usize().unwrap();
-  address = address_ip.to_owned() + ":" + &port.to_string();
-  info!("Will bind to port for flight comp comm at {}", address);
-  let evb_comm_ok = evb_comm_socket.bind(&address);
-  match evb_comm_ok {
-      Ok(_)    => info!("Bound socket to {}", address),
-      Err(err) => panic!("Can not communicate with rb at address {}. Maybe you want to check your .json configuration file?, error {}",address, err)
-  }
+  //let ctx = zmq::Context::new();
+  //let evb_comm_socket = ctx.socket(zmq::PUB).unwrap();
+  //let mut address_ip = String::from("tcp://");
+  //address_ip += config["flight_computer"]["ip_address"].as_str().unwrap();
+  //port        = config["flight_computer"]["port"].as_usize().unwrap();
+  //address = address_ip.to_owned() + ":" + &port.to_string();
+  //info!("Will bind to port for flight comp comm at {}", address);
+  //let evb_comm_ok = evb_comm_socket.bind(&address);
+  //match evb_comm_ok {
+  //    Ok(_)    => info!("Bound socket to {}", address),
+  //    Err(err) => panic!("Can not communicate with rb at address {}. Maybe you want to check your .json configuration file?, error {}",address, err)
+  //}
 
   println!("==> Starting event builder and master trigger threads...");
   if use_master_trigger {
@@ -329,8 +329,8 @@ fn main() {
 
   for n in 0..nboards {
     board_config   = &config["readout_boards"][n];
-    address_ip = String::from("tcp://");
-    let rb_comm_socket = ctx.socket(zmq::REP).unwrap();
+    let mut address_ip = String::from("tcp://");
+    //let rb_comm_socket = ctx.socket(zmq::REP).unwrap();
     rb_id = board_config["id"].as_usize().unwrap();
     address_ip += board_config["ip_address"].as_str().unwrap();
     port        = board_config["port"].as_usize().unwrap();
@@ -342,11 +342,11 @@ fn main() {
       panic!("The desired configuration file {} does not exist!", cali_file_name);
     }
 
-    let result = rb_comm_socket.bind(&address);
-    match result {
-        Ok(_)    => info!("Bound socket to {}", address),
-        Err(err) => panic!("Can not communicate with rb at address {}. Maybe you want to check your .json configuration file?, error {}",address, err)
-    }
+    //let result = rb_comm_socket.bind(&address);
+    //match result {
+    //    Ok(_)    => info!("Bound socket to {}", address),
+    //    Err(err) => panic!("Can not communicate with rb at address {}. Maybe you want to check your .json configuration file?, error {}",address, err)
+    //}
     let this_rb_pp_sender = rb_send.clone();
     //let ctx_ref = &ctx.clone();
     let this_rb = rb_list[n].clone();
