@@ -34,11 +34,13 @@ struct TofPacket {
   
   u16 head = 0xAAAA;
   u16 tail = 0x5555;
-  u8  p_size_fixed = 13;
+
+  // head (2) + tail (2) + type (1) + payload size (4)
+  u8  p_size_fixed = 9;
   u8  packet_type; 
   // just the size of the payload, 
   // not including type, header or tail
-  u64 payload_size;
+  u32 payload_size;
 
   vec_u8 payload;
 

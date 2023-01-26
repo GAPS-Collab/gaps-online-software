@@ -96,7 +96,7 @@ uint32_t decode_uint32(const std::vector<unsigned char>& bytestream,
 
 /***********************************************/
 
-uint32_t decode_uint32_rev(const std::vector<unsigned char>& bytestream,
+uint32_t decode_uint32_rev(const vec_u8 &bytestream,
                            unsigned int start_pos)
 {
   uint32_t value = (uint32_t)(

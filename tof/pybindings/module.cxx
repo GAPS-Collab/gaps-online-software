@@ -42,6 +42,15 @@ bytestream wrap_encode_ushort_rev(u16 value, size_t start_pos) {
 
 /***********************************************/
 
+bytestream wrap_u32_to_le_bytes(u32 value) {
+  bytestream stream;
+  for (size_t foo=0; foo<4; foo++) stream.push_back(0);
+  u32_to_le_bytes(value, stream, 0);
+  return stream;
+}
+
+/***********************************************/
+
 bytestream wrap_encode_uint32(u32 value, size_t start_pos) {
   bytestream stream;
   for (size_t foo=0; foo<4; foo++) stream.push_back(0);
@@ -677,6 +686,8 @@ PYBIND11_MODULE(gaps_tof, m) {
    m.def("encode_u16",         &wrap_encode_ushort);
    m.def("encode_ushort_rev",     &wrap_encode_ushort_rev);
    
+   m.def("u32_from_le_bytes",  &u32_from_le_bytes);
+   m.def("u32_to_le_bytes",    &wrap_u32_to_le_bytes);
    m.def("decode_u32",         &decode_uint32);
    m.def("encode_u32",         &wrap_encode_uint32);
    m.def("encode_u32_rev",     &wrap_encode_uint32_rev);

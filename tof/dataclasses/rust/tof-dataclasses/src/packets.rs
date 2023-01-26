@@ -150,7 +150,11 @@ impl TofPacket {
     bytestream.extend_from_slice(&TofPacket::HEAD.to_le_bytes());
     let p_type = PacketType::as_u8(&self.packet_type);
     bytestream.push(p_type);
-    let payload_len = self.payload.len() as u64;
+    // payload size of 32 bit accomodates up to 4 GB packet
+    // a 16 bit size would only hold 65k, which might be not
+    // good enough if we sent multiple events in a batch in 
+    // the same TofPacket (in case we do that)
+    let payload_len = self.payload.len() as u32;
     let foo = &payload_len.to_le_bytes();
     debug!("TofPacket binary payload: {foo:?}");
     bytestream.extend_from_slice(&payload_len.to_le_bytes());
@@ -207,18 +211,24 @@ impl Serialization for TofPacket {
       Some(pt) => packet_type = pt,
       None => {return Err(SerializationError::UnknownPayload);}
     }
-    let eight_bytes = [stream[pos],
-                       stream[pos+1],
-                       stream[pos+2],
-                       stream[pos+3],
-                       stream[pos+4],
-                       stream[pos+5],
-                       stream[pos+6],
-                       stream[pos+7]];
+    //let eight_bytes = [stream[pos],
+    //                   stream[pos+1],
+    //                   stream[pos+2],
+    //                   stream[pos+3],
+    //                   stream[pos+4],
+    //                   stream[pos+5],
+    //                   stream[pos+6],
+    //                   stream[pos+7]];
+    let four_bytes = [stream[pos],
+                      stream[pos + 1],
+                      stream[pos + 2],
+                      stream[pos + 3]];
+
     //println!("{eight_bytes:?}");
-    let payload_size = u64::from_le_bytes(eight_bytes);
+    //let payload_size = u64::from_le_bytes(eight_bytes);
+    let payload_size = u32::from_le_bytes(four_bytes);
     //println!("{payload_size}");
-    pos += 8;
+    pos += 4;
     //println!("{pos}");
     two_bytes = [stream[pos + payload_size as usize], stream[pos + 1 + payload_size as usize]];
     if TofPacket::TAIL != u16::from_le_bytes(two_bytes) {
