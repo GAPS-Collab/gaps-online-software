@@ -33,7 +33,7 @@ use std::collections::VecDeque;
 
 use tof_dataclasses::packets::{TofPacket, PacketType};
 use tof_dataclasses::commands::TofCommand;
-
+use tof_dataclasses::events::MasterTriggerEvent;
 /// Master trigger tab
 /// 
 /// Show information about the master trigger.
@@ -206,4 +206,39 @@ impl MTTab<'_> {
     //mt.update(packets);
     mt
   }
+
+  /// Update the tab 
+  ///
+  /// Use in the render loop. Will add current stream 
+  /// information as well as the last response
+  /// from the tof system.
+  pub fn update(&mut self,
+                mt_events : &VecDeque<MasterTriggerEvent>) {
+
+    //
+    //let foo = packets.pop().unwrap();
+    //let foo = CommandTab::<'_>::get_pk_repr(&foo);
+    let mut spans = Vec::<Spans>::new();
+    for n in 0..mt_events.len() {
+        spans.push(Spans::from(vec![Span::styled(
+            mt_events[n].to_string().clone(),
+            Style::default())])
+        );
+    }
+       
+
+    self.stream =  Paragraph::new(spans)
+    .style(Style::default().fg(Color::LightCyan))
+    .alignment(Alignment::Left)
+    //.scroll((5,10))
+    .block(
+      Block::default()
+        .borders(Borders::ALL)
+        .style(Style::default().fg(Color::White))
+        .title("Stream")
+        .border_type(BorderType::Plain),
+    );
+  }
+
+
 }

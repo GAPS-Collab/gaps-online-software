@@ -24,6 +24,7 @@
 //! In the case, wher no data was received, this might need some thinking.
 
 use std::net::UdpSocket;
+use std::fmt;
 
 use std::error::Error;
 use crate::errors::IPBusError;
@@ -122,6 +123,13 @@ impl Default for MasterTriggerEvent {
     MasterTriggerEvent::new(0,0)
   }
 }
+
+impl fmt::Display for MasterTriggerEvent {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    write!(f, "<MasterTriggerEvent {} >", self.event_id)
+  }
+}
+
 
 #[derive(Debug, Copy, Clone)]
 pub struct IPBusPacket {

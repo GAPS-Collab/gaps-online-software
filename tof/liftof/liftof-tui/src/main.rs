@@ -18,7 +18,7 @@ mod menu;
 use chrono::prelude::*;
 use thiserror::Error;
 
-use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
+use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, UdpSocket};
 
 use std::collections::VecDeque;
 
@@ -68,6 +68,8 @@ use tof_dataclasses::packets::{TofPacket, PacketType};
 use tof_dataclasses::serialization::Serialization;
 use tof_dataclasses::threading::ThreadPool;
 use tof_dataclasses::events::blob::BlobData;
+use tof_dataclasses::events::MasterTriggerEvent;
+use tof_dataclasses::events::master_trigger::read_daq;
 
 use crate::tab_commands::CommandTab;
 use crate::tab_mt::MTTab;
@@ -244,6 +246,36 @@ fn receive_stream(tp_to_main : Sender<TofPacket>,
   }
 }
 
+fn master_trigger(mt_to_main : &Sender<MasterTriggerEvent>) {
+  let mt_address = "10.0.1.10:50001";
+  //let mt_address = mt_ip.to_owned() + ":" + &mt_port.to_string();
+  let mut socket : UdpSocket;
+  // FIXME - proper error checking
+  let local_port = "0.0.0.0:50100";
+  let local_socket = UdpSocket::bind(local_port);
+  let mut socket : UdpSocket;
+  match local_socket {
+    Err(err)   => panic!("Can not create local UDP port for master trigger connection at {}!, err {}", local_port, err),
+    Ok(value)  => {
+      info!("Successfully bound UDP socket for master trigger
+      communcations to {}", local_port);
+      socket = value;
+    }   
+  } // end match
+    //
+  let mut event_cnt;
+  let mut n_paddles_expected;
+  let mut buffer : [u8;512] = [0;512];
+  loop {
+    (event_cnt, n_paddles_expected) = read_daq(&socket, &mt_address, &mut buffer).unwrap();
+    let mt_event = MasterTriggerEvent::new(event_cnt, n_paddles_expected as u8);
+    match mt_to_main.try_send(mt_event) {
+      Err(err) => trace!("Can't send"),
+      Ok(_)    => ()
+    }
+  }
+}
+
 
 /// Use the TuiLoggerWidget to display 
 /// the most recent log messages
@@ -339,6 +371,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   // first set up comms etc. before 
   // we go into raw_mode, so we can 
   // see the log messages during setup
+  let (mt_to_main, mt_from_mt)     : (Sender<MasterTriggerEvent>, Receiver<MasterTriggerEvent>) = unbounded();
   let (tp_to_main, tp_from_recv)   : (Sender<TofPacket>, Receiver<TofPacket>)       = unbounded();
   let (cmd_to_cmdr, cmd_from_main) : (Sender<TofCommand>, Receiver<TofCommand>)     = unbounded();
   let (rsp_to_main, rsp_from_cmdr) :
@@ -350,7 +383,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   }
   println!("Starting threads");
   // set up Threads
-  let n_threads = 2;
+  let n_threads = 20;
   let workforce = ThreadPool::new(n_threads);
   workforce.execute(move || {
       commander(cmd_from_main,
@@ -359,6 +392,10 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   });
   workforce.execute(move || {
       receive_stream(tp_to_main, rb_list_c);
+  });
+
+  workforce.execute(move || {
+    master_trigger(&mt_to_main);
   });
 
   //panic!("Until here");
@@ -409,8 +446,9 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let mut ui_menu = Menu::new();
 
   // a message cache for the stream
-  let mut stream_cache = VecDeque::<TofPacket>::new();
-  let mut packets = VecDeque::<String>::new();
+  let mut stream_cache    = VecDeque::<TofPacket>::new();
+  let mut mt_stream_cache = VecDeque::<MasterTriggerEvent>::new();
+  let mut packets         = VecDeque::<String>::new();
   loop {
     terminal.draw(|rect| {
       let size = rect.size();
@@ -428,11 +466,59 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
       rect.render_widget(w_logs, mster_lo.rect[2]);
       match ui_menu.active_menu_item {
         MenuItem::MasterTrigger => {
+          match rx.recv() {
+            Err(err) => trace!("No update"),
+            Ok(event) => {
+              match event {
+                Event::Input(ev) => {
+                  match ev.code {
+                    // it seems we have to carry thos allong for every tab
+                    KeyCode::Char('h') => ui_menu.active_menu_item = MenuItem::Home,
+                    KeyCode::Char('c') => ui_menu.active_menu_item = MenuItem::Commands,
+                    KeyCode::Char('r') => ui_menu.active_menu_item = MenuItem::Status,
+                    KeyCode::Char('m') => ui_menu.active_menu_item = MenuItem::MasterTrigger,
+                    _ => trace!("Some other key pressed!"),
+                  }
+                },
+                Event::Tick => {
+                  
+                  // check the zmq socket
+                  let mut event = MasterTriggerEvent::new(0,0);
+                  match mt_from_mt.try_recv() {
+                    Err(err) => {
+                      trace!("No event!");
+                    }
+                    Ok(pk)  => {
+                      event = pk;
+                      //let mut event = TofPacket::new();
+                      //event.packet_type = PacketType::RBEvent;
+                      // if the cache is too big, remove the oldest events
+                      //let new_tof_events = vec![event];
+                      mt_stream_cache.push_back(event);
+                      if mt_stream_cache.len() > STREAM_CACHE_MAX_SIZE {
+                        mt_stream_cache.pop_front();
+                      }
+                      //for n in 0..mt_stream_cache.len() {
+                      //  let pretty = CommandTab::<'_>::get_pk_repr(&stream_cache[n]);
+                      //  packets.push_back(pretty);
+                      //}
+                    }
+                  }
+                },
+              }
+            }
+          }    
+          mt_tab.update(&mt_stream_cache);
+
           rect.render_stateful_widget(mt_tab.list_widget, mt_tab.list_rect, &mut rb_list_state);
           rect.render_widget(mt_tab.rate,         mt_tab.rate_rect); 
           rect.render_widget(mt_tab.stream,       mt_tab.stream_rect);
           rect.render_widget(mt_tab.network_moni, mt_tab.nw_mon_rect); 
           rect.render_widget(mt_tab.detail,       mt_tab.detail_rect); 
+          info!("Updating MasterTrigger tab!");
+          
+
+
         
 
         },
