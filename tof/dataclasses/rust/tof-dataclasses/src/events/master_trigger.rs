@@ -289,8 +289,12 @@ fn read_register(socket      : &UdpSocket,
   socket.send_to(message.as_slice(), target_addr)?;
   let (number_of_bytes, _) = socket.recv_from(buffer)?;
   trace!("Received {} bytes from master trigger", number_of_bytes);
-  let data = decode_ipbus(buffer, false)?[0];
-  Ok(data)
+  // this one can actually succeed, but return an emtpy vector
+  let data = decode_ipbus(buffer, false)?;
+  if data.len() == 0 
+    { return Err(Box::new(IPBusError::DecodingFailed));}
+  
+  Ok(data[0])
 }
 
 /// Write a register on the MTB over UDP
