@@ -86,6 +86,8 @@ struct Args {
   write_blob: bool,
   #[arg(short, long, default_value_t = false)]
   use_master_trigger: bool,
+  #[arg(long, default_value_t = false)]
+  autodiscover_rbs: bool,
   /// A json config file with detector information
   #[arg(short, long)]
   json_config: Option<std::path::PathBuf>,
@@ -120,7 +122,9 @@ fn main() {
 
   // deal with command line arguments
   let args = Args::parse();
-  
+ 
+  let autodiscover_rbs = args.autodiscover_rbs;
+
   let write_blob = args.write_blob;
   if write_blob {
     info!("Will write blob data to file!");
@@ -129,12 +133,14 @@ fn main() {
   let json_content  : String;
   let config        : json::JsonValue;
   
-  let nboards       : usize;
+  let mut nboards       : usize;
 
   let use_master_trigger      = args.use_master_trigger;
   let mut master_trigger_ip   = String::from("");
   let mut master_trigger_port = 0usize;
 
+  // Have all the readoutboard related information in this list
+  let mut rb_list = Vec::<ReadoutBoard>::new();
   match args.json_config {
     None => panic!("No .json config file provided! Please provide a config file with --json-config or -j flag!"),
     Some(_) => {
@@ -152,7 +158,16 @@ fn main() {
       //   println!(" {}", config["readout_boards"][n].pretty(2));
     } // end Some
   } // end match
-  
+ 
+  if autodiscover_rbs {
+    println!("==> Autodiscovering ReadoutBoards!...");
+    rb_list = get_rb_manifest();
+    nboards = rb_list.len();
+  }
+  for rb in rb_list.iter() {
+    println!("{}", rb);
+  }
+
   if use_master_trigger {
    master_trigger_ip   = config["master_trigger"]["ip"].as_str().unwrap().to_owned();
    master_trigger_port = config["master_trigger"]["port"].as_usize().unwrap();
@@ -334,13 +349,15 @@ fn main() {
     }
     let this_rb_pp_sender = rb_send.clone();
     //let ctx_ref = &ctx.clone();
+    let this_rb = rb_list[n].clone();
     worker_threads.execute(move || {
       readoutboard_communicator(//&rb_comm_socket,
                                 //ctx_ref,
                                 this_rb_pp_sender,
                                 //rb_id,
                                 write_blob,
-                                &ReadoutBoard::new(),
+                                //&ReadoutBoard::new(),
+                                &this_rb,
                                 &cali_file_name); 
     });
   } // end for loop over nboards
