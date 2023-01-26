@@ -394,7 +394,7 @@ pub fn readoutboard_communicator(//socket           : &zmq::Socket,
   let address = "tcp::/".to_owned() 
               + &rb.ip_address.expect("No IP known for this board!").to_string()
               + ":"
-              +  &rb.data_port.expect("No CMD port known for this board!").to_string();
+              +  &rb.data_port.expect("No DATA port known for this board!").to_string();
   let socket = zmq_ctx.socket(zmq::SUB).expect("Unable to create socket!");
   socket.connect(&address);
   // FIXME - do not subscribe to all, only this 
@@ -405,71 +405,71 @@ pub fn readoutboard_communicator(//socket           : &zmq::Socket,
 
     // check if we got new data
     // this is blocking the thread
-    match socket.recv(&mut msg, 0) {
-      Ok(_) => {
-          trace!("Working...");
-          // check for rb ping signal
-          let rb_ping = identifiy_readoutboard(&msg);
-          if rb_ping {
-            //let result = socket.send_str("[SVR]: R'cvd RBping", 0);
-            let result = socket.send("[SVR]: R'cvd RBping", 0);
-            match result {
-              Ok(_)    => debug!("RB {} handshake complete!", board_id),
-              Err(err) => error!("Not able to send back reply when negotiating RB comms, handshake possibly failed..")
-            }
-            continue;
-          }
-          let size = msg.len();
-          if size == 0 {continue;}
-          let mut buffer = tvec![u8;msg.len()];
-          buffer = msg.to_vec();
-          debug!("received message with len : {}", size);
-          //let result = socket.send_str("[SVR]: Received data",0);
-          let result = socket.send("[SVR]: Received data",0);
-          match result {
-              Ok(_)    => debug!("Received data of len {} and acknowledged!", size),
-              Err(err) => error!("Not able to send back reply to acknowleded received data!")
-          }
-          // do the work
-          match analyze_blobs(&buffer,
-                              &pp_pusher,
-                              true,
-                              board_id as usize,
-                              false,
-                              true,
-                              &calibrations,
-                              n_chunk) {
-            Ok(nblobs)   => debug!("Read {} blobs from buffer", nblobs),
-            Err(err)     => error!("Was not able to read blobs! {}", err )
-          }
-          // write blob to disk if desired
-          if write_blob {
-            let blobfile_name = "blob_".to_owned() 
-                                 + &n_chunk.to_string() 
-                                 + "_"
-                                 + &board_id.to_string()
-                                 + ".blob";
-            info!("Writing blobs to {}", blobfile_name );
-            let blobfile_path = Path::new(&blobfile_name);
-            match write_stream_to_file(blobfile_path, &buffer) {
-              Ok(size)  => debug!("Writing blob file successful! {} bytes written", size),
-              Err(err)  => {
-                error!("Unable to write blob to disk! {}", err );
-                lost_blob_files += 1;
-              }
-            } // end match
-          } // end if write_blob
-          //thread::sleep(Duration::from_millis(1500));
-          n_chunk += 1;
-
-          // currently, for debugging just stop after one 
-          // chunk
-          //panic!("You shall not pass!");
-          
-      }
+    match socket.recv_bytes(0) {
       Err(err) => {
-          n_errors += 1;
-          error!("Receiving from socket raised error {}", err);
+        n_errors += 1;
+        error!("Receiving from socket raised error {}", err);
+      }
+      Ok(buffer) => {
+        //trace!("Working...");
+        //// check for rb ping signal
+        //let rb_ping = identifiy_readoutboard(&msg);
+        //if rb_ping {
+        //  //let result = socket.send_str("[SVR]: R'cvd RBping", 0);
+        //  let result = socket.send("[SVR]: R'cvd RBping", 0);
+        //  match result {
+        //    Ok(_)    => debug!("RB {} handshake complete!", board_id),
+        //    Err(err) => error!("Not able to send back reply when negotiating RB comms, handshake possibly failed..")
+        //  }
+        //  continue;
+        //}
+        //let size = msg.len();
+        //if size == 0 {continue;}
+        //let mut buffer = tvec![u8;msg.len()];
+        //buffer = msg.to_vec();
+        //debug!("received message with len : {}", size);
+        ////let result = socket.send_str("[SVR]: Received data",0);
+        //let result = socket.send("[SVR]: Received data",0);
+        //match result {
+        //    Ok(_)    => debug!("Received data of len {} and acknowledged!", size),
+        //    Err(err) => error!("Not able to send back reply to acknowleded received data!")
+        //}
+        // do the work
+        match analyze_blobs(&buffer,
+                            &pp_pusher,
+                            true,
+                            board_id as usize,
+                            false,
+                            true,
+                            &calibrations,
+                            n_chunk) {
+          Ok(nblobs)   => debug!("Read {} blobs from buffer", nblobs),
+          Err(err)     => error!("Was not able to read blobs! {}", err )
+        }
+        // write blob to disk if desired
+        if write_blob {
+          let blobfile_name = "blob_".to_owned() 
+                               + &n_chunk.to_string() 
+                               + "_"
+                               + &board_id.to_string()
+                               + ".blob";
+          info!("Writing blobs to {}", blobfile_name );
+          let blobfile_path = Path::new(&blobfile_name);
+          match write_stream_to_file(blobfile_path, &buffer) {
+            Ok(size)  => debug!("Writing blob file successful! {} bytes written", size),
+            Err(err)  => {
+              error!("Unable to write blob to disk! {}", err );
+              lost_blob_files += 1;
+            }
+          } // end match
+        } // end if write_blob
+        //thread::sleep(Duration::from_millis(1500));
+        n_chunk += 1;
+
+        // currently, for debugging just stop after one 
+        // chunk
+        //panic!("You shall not pass!");
+        
       }
     }
   }
