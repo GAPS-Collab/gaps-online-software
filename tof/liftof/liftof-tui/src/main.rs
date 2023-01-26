@@ -545,7 +545,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                     KeyCode::Down => {
                       if let Some(selected) = rb_list_state.selected() {
                         //let amount_pets = read_db().expect("can fetch pet list").len();
-                        let max_rb = 40;
+                        //let max_rb = 40;
                         if selected >= rb_list.len() {
                           rb_list_state.select(Some(0));
                         } else {
@@ -556,8 +556,8 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                     KeyCode::Up => {
                       if let Some(selected) = rb_list_state.selected() {
                         //let amount_pets = read_db().expect("can fetch pet list").len();
-                        let max_rb = 40;
-                        if max_rb > 0 {
+                        //let max_rb = 40;
+                        if selected > rb_list.len() {
                             rb_list_state.select(Some(selected - 1));
                         } else {
                             rb_list_state.select(Some(rb_list.len() - 1));
