@@ -31,6 +31,9 @@ use tof_dataclasses::events::blob::{BlobData,
                                     get_constant_blobeventsize};
 use tof_dataclasses::constants::{NCHN,
                        NWORDS};
+
+use tof_dataclasses::packets::TofPacket;
+use tof_dataclasses::serialization::Serialization;
 use crate::waveform::CalibratedWaveform;
 
 extern crate json;
@@ -117,14 +120,25 @@ fn analyze_blobs(buffer               : &Vec<u8>,
   let mut channels_over_threshold = [false;NCHN];
   let mut paddles_over_threshold  = [false;NPADDLES];
 
+  // the stream might have a certain number of events, 
+  // but then there might be a number of extra bytes.
+
   loop {
     #[cfg(feature = "diagnostics")]
     let mut diagnostics_wf : Vec<CalibratedWaveform> = Vec::new();
     
     // if the following is true, we scanned throught the whole stream  
-    if pos + get_constant_blobeventsize() >= (blobdata_size -1) {break;}
+    //println!("{pos} {blobdata_size}");
+    //let foo = get_constant_blobeventsize();
+    //println!("{foo}");
+    // this is of constant annoyance!
+    //if pos + get_constant_blobeventsize() >= (blobdata_size -1) {break;}
+    //if pos + get_constant_blobeventsize() > (blobdata_size ) {break;}
+    if pos > buffer.len() - 1 {
+      trace!("too big");
+      break;
+    }
     byte = buffer[pos];
-
     if !header_found_start {
       if byte == 0xaa {
         header_found_start = true;
@@ -132,14 +146,18 @@ fn analyze_blobs(buffer               : &Vec<u8>,
       pos +=1;
       continue;
     }
-
     if header_found_start {
       pos += 1;
       if byte == 0xaa {
         header_found_start = false;
         // we have found our 0xaaaa marker!
         // include it in the stream to deserialize
+        // if there is not enough bytes for another blob, 
+        // lets break the loop
+        if (pos -2 + get_constant_blobeventsize() > buffer.len())
+          {break;}
         blob_data.reset();
+        //if (pos-2 > buffer.len() -1) {break;}
         blob_data.from_bytestream(&buffer, pos-2, false);
         nblobs += 1;
         
@@ -391,12 +409,13 @@ pub fn readoutboard_communicator(//socket           : &zmq::Socket,
     let cal_file_path = Path::new(&calibration_file);
     calibrations = read_calibration_file(cal_file_path); 
   }
-  let address = "tcp::/".to_owned() 
+  let address = "tcp://".to_owned() 
               + &rb.ip_address.expect("No IP known for this board!").to_string()
               + ":"
               +  &rb.data_port.expect("No DATA port known for this board!").to_string();
   let socket = zmq_ctx.socket(zmq::SUB).expect("Unable to create socket!");
   socket.connect(&address);
+  info!("Connected to {address}");
   // FIXME - do not subscribe to all, only this 
   // specific RB
   let topic = b"";
@@ -411,6 +430,7 @@ pub fn readoutboard_communicator(//socket           : &zmq::Socket,
         error!("Receiving from socket raised error {}", err);
       }
       Ok(buffer) => {
+        info!("We got data of size {}", buffer.len());
         //trace!("Working...");
         //// check for rb ping signal
         //let rb_ping = identifiy_readoutboard(&msg);
@@ -435,7 +455,26 @@ pub fn readoutboard_communicator(//socket           : &zmq::Socket,
         //    Err(err) => error!("Not able to send back reply to acknowleded received data!")
         //}
         // do the work
-        match analyze_blobs(&buffer,
+        let tp_ok = TofPacket::from_bytestream(&buffer, 0);
+        match tp_ok {
+          Err(err) => {
+            trace!("This is not a TofPacket I guess...{:?}", err);
+            continue;
+          }
+          Ok(_)    => ()
+        };
+        let tp = tp_ok.unwrap();
+        //println!("{:?}", tp.payload);
+        //for n in 0..5 {
+        //  println!("{}", tp.payload[n]);
+        //}
+        //println!("...");
+        //for n in 0..5 {
+        //  println!("{}", tp.payload[tp.payload.len() - 1 - n]);
+        //}
+
+
+        match analyze_blobs(&tp.payload,
                             &pp_pusher,
                             true,
                             board_id as usize,
