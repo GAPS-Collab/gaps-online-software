@@ -175,7 +175,7 @@ pub fn paddle_packet_cache (evid_rec    : &Receiver<Option<u32>>,
       } // end Err
     } // end match
 
-    trace!("Size of paddle_cache   {}", pp_cache.len());
+    debug!("Size of paddle_cache   {}", pp_cache.len());
     
     // after we recieved the paddles,
     // let's try to answer event id requests.
@@ -203,6 +203,7 @@ pub fn paddle_packet_cache (evid_rec    : &Receiver<Option<u32>>,
             continue;
           }, // end None
         Some(evid) => {
+          info!("Received {evid} event id");
           let mut n_paddles_sent = 0;
           for pp in pp_cache.iter_mut() {
             if pp.event_id == evid {

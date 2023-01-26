@@ -195,7 +195,7 @@ fn write_register(socket      : &UdpSocket,
                                &send_data);
   socket.send_to(message.as_slice(), target_addr);
   let (number_of_bytes, src_addr) = socket.recv_from(buffer).expect("No data!");
-  trace!("Received {} bytes from master trigger", number_of_bytes);
+  //let number_of_bytes = socket.recv(buffer).expect("No data!");
   //let data = decode_ipbus(buffer, false)[0];
 //def wReg(address, data, verify=False):
 //    s.sendto(encode_ipbus(addr=address, packet_type=WRITE, data=[data]), target_ad    dress)
@@ -225,6 +225,7 @@ fn reset_daq(socket : &UdpSocket,
              target_address : &str) {
   debug!("Resetting DAQ!");
   let mut buffer = [0u8;MT_MAX_PACKSIZE];
+  info!("Will write register");
   write_register(socket, target_address, 0x10, 1,&mut buffer);
 }
 
@@ -335,16 +336,18 @@ pub fn master_trigger(mt_ip   : &str,
     Ok(_)    => info!("Successfully connected to the master trigger at {}", mt_address)
   }
   // reset the master trigger before acquisiton
+  info!("Resetting master trigger");
   reset_daq(&socket, &mt_address);  
   // the event counter has to be reset before 
   // we connect to the readoutboards
   //reset_event_cnt(&socket, &mt_address); 
- 
+  (last_event_cnt, _) = read_daq(&socket, &mt_address, &mut buffer);
   loop {
+    //info!("Next iter...");
     // limit the max polling rate
     let milli_sleep = Duration::from_millis((1000.0/max_rate) as u64);
     thread::sleep(milli_sleep);
-  
+    //info!("Done sleeping..."); 
     //match socket.connect(&mt_address) {
     //  Err(err) => panic!("Can not connect to master trigger at {}, err {}", mt_address, err),
     //  Ok(_)    => info!("Successfully connected to the master trigger at {}", mt_address)
@@ -377,11 +380,25 @@ pub fn master_trigger(mt_ip   : &str,
       continue;
     }
 
+    // sometimes, the counter will just read 0
+    // throw these away. 
+    // FIXME - there is actually an event with ctr 0
+    // but not sure how to address that yet
+    if event_cnt == 0 {
+      trace!("event 0 encountered! Continuing...");
+      continue;
+    }
+
     // we have a new event
     //println!("** ** evid: {}",event_cnt);
+    
+    // if I am correct, there won't be a counter
+    // overflow for a 32bit counter in 99 days 
+    // for a rate of 500Hz
     if event_cnt < last_event_cnt {
-      error!("Event counter id overflow!!");
-      last_event_cnt = 0;
+      error!("Event counter id overflow! this cntr: {event_cnt} last cntr: {last_event_cnt}!");
+      continue;
+      //last_event_cnt = 0;
     }
     
     if event_cnt - last_event_cnt > 1 {
@@ -401,6 +418,7 @@ pub fn master_trigger(mt_ip   : &str,
     // new event
     // send it down the pip
     let mt_event = MasterTriggerEvent::new(event_cnt, n_paddles_expected as u8);
+    info!("Got new event id from master trigger {event_cnt}");
     evid_sender.send(mt_event);
     last_event_cnt = event_cnt;
     n_events += 1;

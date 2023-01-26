@@ -321,7 +321,7 @@ fn analyze_blobs(buffer               : &Vec<u8>,
     hdf_dataset.write(&arr1(&diagnostics_wf))?;
     hdf_file.close()?;
   }
-  info!("==> Deserialized {} blobs! {} blobs were corrupt", nblobs, ncorrupt_blobs);
+  debug!("==> Deserialized {} blobs! {} blobs were corrupt", nblobs, ncorrupt_blobs);
   Ok(nblobs)
 }
 
@@ -430,7 +430,7 @@ pub fn readoutboard_communicator(//socket           : &zmq::Socket,
         error!("Receiving from socket raised error {}", err);
       }
       Ok(buffer) => {
-        info!("We got data of size {}", buffer.len());
+        debug!("We got data of size {}", buffer.len());
         //trace!("Working...");
         //// check for rb ping signal
         //let rb_ping = identifiy_readoutboard(&msg);

@@ -2,7 +2,7 @@
   "meta" : "",
   "unix_time" : "",
   "master_trigger" : {
-    "ip"   : "10.97.108.15", 
+    "ip"   : "10.0.1.10", 
     "port" : 50001
   },
   "flight_computer" : {
