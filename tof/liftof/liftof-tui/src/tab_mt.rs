@@ -18,6 +18,8 @@
 
 use chrono::Utc;
 
+use std::time::{Duration, Instant};
+
 use tui::{
     symbols,
     backend::CrosstermBackend,
@@ -46,6 +48,9 @@ pub struct MTTab<'a> {
   pub detail       : Paragraph<'a>,
   cmd_list         : Vec::<TofCommand>,
   pub list_widget  : List<'a>,
+  /// keep track of the passed time in seconds,
+  /// to update only specific parts of the display
+  pub last_time    : Instant,
   pub list_rect    : Rect,
   pub stream_rect  : Rect,
   pub detail_rect  : Rect,
@@ -196,6 +201,7 @@ impl MTTab<'_> {
       detail      ,
       cmd_list    ,
       list_widget ,
+      last_time : Instant::now(), 
       list_rect   , 
       stream_rect ,
       detail_rect ,
@@ -221,35 +227,38 @@ impl MTTab<'_> {
     let mut spans = Vec::<Spans>::new();
     for n in 0..mt_events.len() {
         spans.push(Spans::from(vec![Span::styled(
-            mt_events[n].to_string().clone(),
+            //mt_events[n].to_string().clone(),
+            "<\u{2728}MTE : event id ".to_owned() + &mt_events[n].event_id.to_string() + " >",
             Style::default())])
         );
     }
     let last_event = mt_events.back();
-    if last_event.is_some() {
-      self.detail =  Paragraph::new(last_event.unwrap().to_string())
-      .style(Style::default().fg(Color::LightCyan))
-      .alignment(Alignment::Left)
-      //.scroll((5, 10))
-      .block(
-        Block::default()
-          .borders(Borders::ALL)
-          .style(Style::default().fg(Color::White))
-          .title("Event Detail")
-          .border_type(BorderType::Rounded),
-      );
-    }       
-
+    if self.last_time.elapsed().as_secs() > 10 {
+      if last_event.is_some() {
+        self.detail =  Paragraph::new(last_event.unwrap().to_string())
+        .style(Style::default().fg(Color::LightCyan))
+        .alignment(Alignment::Left)
+        //.scroll((5, 10))
+        .block(
+          Block::default()
+            .borders(Borders::ALL)
+            .style(Style::default().fg(Color::White))
+            .title("Event Detail")
+            .border_type(BorderType::Rounded),
+        );
+      }       
+      self.last_time = Instant::now();
+    }
     self.stream =  Paragraph::new(spans)
     .style(Style::default().fg(Color::LightCyan))
     .alignment(Alignment::Left)
     //.scroll((5,10))
     .block(
       Block::default()
-        .borders(Borders::ALL)
-        .style(Style::default().fg(Color::White))
-        .title("Stream")
-        .border_type(BorderType::Plain),
+          .borders(Borders::ALL)
+          .style(Style::default().fg(Color::White))
+          .title("Stream")
+          .border_type(BorderType::Plain),
     );
   }
 

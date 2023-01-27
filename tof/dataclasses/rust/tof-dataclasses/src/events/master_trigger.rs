@@ -139,7 +139,8 @@ impl Default for MasterTriggerEvent {
 
 impl fmt::Display for MasterTriggerEvent {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(f, "<MasterTriggerEvent {} >", self.event_id)
+    write!(f, "<MasterTriggerEvent\n event id\t {}\n timestamp\t {}\n tiu_timestamp\t {}\n tiu_gps_32\t {}\n tiu_gps_16\t {}\n n paddles\t {}\n board mask\t {}  >",
+           self.event_id, self.timestamp, self.tiu_timestamp, self.tiu_gps_32, self.tiu_gps_16, self.n_paddles, self.board_mask)
   }
 }
 
