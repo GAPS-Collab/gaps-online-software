@@ -1,17 +1,17 @@
-///! Packets are a way to send data over the network.
-///
-///  Data gets serialized to a bytestream and then 
-///  header and tail bytes are added to the front and
-///  end of the stream.
-///
-///  A Packet has the following layout
-///  HEAD    : u16 = 0xAAAA
-///  TYPE    : u8  = PacketType
-///  SIZE    : u64
-///  PAYLOAD : [u8;6-SIZE]
-///  TAIL    : u16 = 0x5555 
-///
-///  The total packet size is thus 13 + SIZE
+//! Packets are a way to send data over the network.
+//!
+//! Data gets serialized to a bytestream and then 
+//! header and tail bytes are added to the front and
+//! end of the stream.
+//!
+//! A TofPacket has the following layout
+//! HEAD    : u16 = 0xAAAA
+//! TYPE    : u8  = PacketType
+//! SIZE    : u32
+//! PAYLOAD : [u8;6-SIZE]
+//! TAIL    : u16 = 0x5555 
+//!
+//! The total packet size is thus 13 + SIZE
 
 
 pub mod paddle_packet;
@@ -19,6 +19,8 @@ pub mod generic_packet;
 pub mod data_packet;
 //pub mod command_packet;
 
+
+use std::fmt;
 pub use crate::packets::generic_packet::GenericPacket;
 pub use crate::packets::data_packet::DataPacket;
 pub use crate::monitoring::RBMoniData;
@@ -122,6 +124,19 @@ pub struct TofPacket {
   pub payload     : Vec<u8>
 }
 
+
+impl fmt::Display for TofPacket {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let p_len = self.payload.len();
+    if p_len < 4 {
+      write!(f, "<TofPacket: type {:?}, payload size {}>", self.packet_type, p_len)
+    } else {
+      write!(f, "<TofPacket: type {:?} payload [ {} {} {} {} .. {} {} {} {}] of size {} >",
+             self.packet_type, self.payload[0], self.payload[1], self.payload[2], self.payload[3],
+             self.payload[p_len-4], self.payload[p_len-3], self.payload[p_len - 2], self.payload[p_len-1], p_len ) 
+    }
+  }
+}
 
 impl Default for TofPacket {
   fn default() -> TofPacket {
