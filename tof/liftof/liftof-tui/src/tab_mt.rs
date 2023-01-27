@@ -50,7 +50,6 @@ pub struct MTTab<'a> {
   pub list_widget  : List<'a>,
   /// keep track of the passed time in seconds,
   /// to update only specific parts of the display
-  pub last_time    : Instant,
   pub list_rect    : Rect,
   pub stream_rect  : Rect,
   pub detail_rect  : Rect,
@@ -201,7 +200,6 @@ impl MTTab<'_> {
       detail      ,
       cmd_list    ,
       list_widget ,
-      last_time : Instant::now(), 
       list_rect   , 
       stream_rect ,
       detail_rect ,
@@ -219,7 +217,8 @@ impl MTTab<'_> {
   /// information as well as the last response
   /// from the tof system.
   pub fn update(&mut self,
-                mt_events : &VecDeque<MasterTriggerEvent>) {
+                mt_events : &VecDeque<MasterTriggerEvent>,
+                update_detail : bool) {
 
     //
     //let foo = packets.pop().unwrap();
@@ -233,7 +232,7 @@ impl MTTab<'_> {
         );
     }
     let last_event = mt_events.back();
-    if self.last_time.elapsed().as_secs() > 10 {
+    if update_detail {
       if last_event.is_some() {
         self.detail =  Paragraph::new(last_event.unwrap().to_string())
         .style(Style::default().fg(Color::LightCyan))
@@ -247,7 +246,6 @@ impl MTTab<'_> {
             .border_type(BorderType::Rounded),
         );
       }       
-      self.last_time = Instant::now();
     }
     self.stream =  Paragraph::new(spans)
     .style(Style::default().fg(Color::LightCyan))

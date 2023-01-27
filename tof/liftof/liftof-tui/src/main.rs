@@ -343,7 +343,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let autodiscover_rb   = args.autodiscover_rb;    
   
   //pretty_env_logger::init();
-
+  let mut ten_second_update = Instant::now();
   let mut rb_list = Vec::<ReadoutBoard>::new();
   let mut tick_count = 0;
   if debug_local {
@@ -508,7 +508,10 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
               }
             }
           }    
-          mt_tab.update(&mt_stream_cache);
+          let update_detail = ten_second_update.elapsed().as_secs() > 10;
+          ten_second_update = Instant::now();
+
+          mt_tab.update(&mt_stream_cache, update_detail);
 
           rect.render_stateful_widget(mt_tab.list_widget, mt_tab.list_rect, &mut rb_list_state);
           rect.render_widget(mt_tab.rate,         mt_tab.rate_rect); 
