@@ -90,9 +90,16 @@ impl From<IPBusPacketType> for u8 {
 /// FIXME : implementation of absolute time
 #[derive(Debug, Copy, Clone)]
 pub struct MasterTriggerEvent {
-  pub event_id  : u32,
-  pub n_paddles : u8, 
-  pub hit_mask  : u32,
+  pub event_id      : u32,
+  pub timestamp     : u32,
+  pub tiu_timestamp : u32,
+  pub tiu_gps_32    : u32,
+  pub tiu_gps_16    : u32,
+  pub n_paddles     : u8, 
+  pub board_mask    : u32,
+  // one 16 bit value per LTB
+  pub hits          : [u16; 20],
+
   /// valid is an internal flag
   /// used by code working with MTEs.
   /// Set it to false will mark the 
@@ -106,9 +113,15 @@ impl MasterTriggerEvent {
   pub fn new(event_id  : u32, 
              n_paddles : u8) -> MasterTriggerEvent {
     MasterTriggerEvent {
-      event_id  : event_id,
-      n_paddles : n_paddles,
-      hit_mask  : 0,
+      event_id      : event_id,
+      timestamp     : 0,
+      tiu_timestamp : 0,
+      tiu_gps_32    : 0,
+      tiu_gps_16    : 0,
+      n_paddles     : n_paddles, 
+      board_mask    : 0,
+      //ne 16 bit value per LTB
+      hits          : [0; 20],
       valid     : true
     }   
   }
@@ -366,13 +379,17 @@ pub fn reset_daq(socket : &UdpSocket,
 
 /// Read the IPBus packets from the MTB DAQ
 ///
+
+
+
 /// # Arguments:
 /// 
+/// * socket         : An open Udp socket on the host side
 /// * target_address : The IP address of the MTB
-///
+/// * buffer         : allocated memory for the MTB response
 pub fn read_daq(socket : &UdpSocket,
-            target_address : &str,
-            buffer : &mut [u8;MT_MAX_PACKSIZE])
+                target_address : &str,
+                buffer : &mut [u8;MT_MAX_PACKSIZE])
   -> Result<(u32, u32), Box<dyn Error>> {
   // check if the queue is full
   let mut event_ctr  = 0u32;
@@ -383,14 +400,18 @@ pub fn read_daq(socket : &UdpSocket,
   //let mut hits     :  0u32;
   let crc        : u32;
   let trailer    : u32;
-
-  let word = read_register(socket, target_address, 0x11, buffer)?;
   let mut hit_paddles = 0u32;
+  let mut paddles_rxd     = 1u32;
+  let mut hits = Vec::<u32>::with_capacity(24);
+
+  // How this works is the following. We read the data register
+  // until we get the header word. Then we have a new event 
+  // and we fill the values of our MasterTriggerEvent by 
+  // subsequently reading out the same register again
+  let word = read_register(socket, target_address, 0x11, buffer)?;
   // this will eventually determin, 
   // how often we will read the 
   // hit register
-  let mut paddles_rxd     = 1u32;
-  let mut hits = Vec::<u32>::with_capacity(24);
   if word == 0xAAAAAAAA {
     // we start a new daq package
     event_ctr   = read_register(socket, target_address, 0x11, buffer)?;

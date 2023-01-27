@@ -179,7 +179,7 @@ impl MTTab<'_> {
       Block::default()
         .borders(Borders::ALL)
         .style(Style::default().fg(Color::White))
-        .title("Detail")
+        .title("Event Detail")
         .border_type(BorderType::Rounded),
     );
 
@@ -225,7 +225,20 @@ impl MTTab<'_> {
             Style::default())])
         );
     }
-       
+    let last_event = mt_events.back();
+    if last_event.is_some() {
+      self.detail =  Paragraph::new(last_event.unwrap().to_string())
+      .style(Style::default().fg(Color::LightCyan))
+      .alignment(Alignment::Left)
+      //.scroll((5, 10))
+      .block(
+        Block::default()
+          .borders(Borders::ALL)
+          .style(Style::default().fg(Color::White))
+          .title("Event Detail")
+          .border_type(BorderType::Rounded),
+      );
+    }       
 
     self.stream =  Paragraph::new(spans)
     .style(Style::default().fg(Color::LightCyan))
