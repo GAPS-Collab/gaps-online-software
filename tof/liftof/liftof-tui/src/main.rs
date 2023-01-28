@@ -528,6 +528,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
           if rates.len() > MAX_LEN_RATE {
             rates.pop_front();
           }
+          info!("Rate chart with {} entries", rates.len());
           let mut x_labels = Vec::<String>::new();
           let mut y_labels = Vec::<String>::new();
           let r_min : i64 = 0;
@@ -537,8 +538,8 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
           if rates.len() > 0 {
             //let max_rate = rates.iter().max_by(|x,y| x.1.cmp(y.1)).unwrap();
             let r_only : Vec::<i64> = rates.iter().map(|z| z.1.round() as i64).collect();
-            let r_max = r_only.iter().max().unwrap();
-            let r_min = r_only.iter().min().unwrap();
+            let r_max = r_only.iter().max().unwrap() + 10;
+            let r_min = r_only.iter().min().unwrap() - 10;
             let y_spacing = (r_max - r_min)/5;
             y_labels = vec![r_min.to_string(),
                            (r_min + y_spacing).to_string(),
@@ -559,7 +560,6 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
 
             //let ylabels = vec!["0","100", "200", "300"];
             //let cdata = data.clone();
-            let mut data = vec![(0.0,0.0);1024]; 
             //let mut data = vec![empty_data;9];
           }
           
