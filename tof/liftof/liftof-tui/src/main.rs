@@ -249,21 +249,37 @@ fn master_trigger(mt_to_main : &Sender<MasterTriggerEvent>,
     }   
   } // end match
     //
-  let mut event_cnt;
-  let mut n_paddles_expected;
+  let half_a_milli = Duration::from_micros(500);
+  //let mut event_cnt;
+  //let mut n_paddles_expected;
   let mut buffer : [u8;512] = [0;512];
   loop {
     // FIXME - remove these unwraps!
-    (event_cnt, n_paddles_expected) = read_daq(&socket, &mt_address, &mut buffer).unwrap();
-    let mt_event = MasterTriggerEvent::new(event_cnt, n_paddles_expected as u8);
-    let rate     = read_rate(&socket, &mt_address, &mut buffer).unwrap();
-    match mt_to_main.try_send(mt_event) {
-      Err(err) => trace!("Can't send master trigger event"),
-      Ok(_)    => ()
-    }
-    match mt_rate_to_main.try_send(rate) {
-      Err(err) => trace!("Can't send rate"),
-      Ok(_)    => ()
+    match read_daq(&socket, &mt_address, &mut buffer) {
+      Err(err) => {
+        trace!("Error getting next mtb event!");
+        thread::sleep(half_a_milli);
+        continue;
+      }
+      Ok(data) => {
+        let mt_event = MasterTriggerEvent::new(data.0, data.1 as u8);
+        match mt_to_main.try_send(mt_event) {
+          Err(err) => trace!("Can't send master trigger event"),
+          Ok(_)    => ()
+        }
+        match read_rate(&socket, &mt_address, &mut buffer) {
+          Err(err) => {
+            trace!("Did not get rate information!");
+            continue;
+          }
+          Ok(rate) => {
+            match mt_rate_to_main.try_send(rate) {
+              Err(err) => trace!("Can't send rate"),
+              Ok(_)    => ()
+            }
+          }
+        }
+      }
     }
   }
 }
