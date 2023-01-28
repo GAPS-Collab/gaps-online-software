@@ -61,7 +61,8 @@ pub struct MTTab<'a> {
 impl MTTab<'_> {
 
   pub fn new<'a>(main_window : Rect,
-                 packets : &VecDeque<String>) -> MTTab<'a> {
+                 packets : &VecDeque<String>,
+                 detail_string : Option<String>) -> MTTab<'a> {
 
     let message_queue = VecDeque::<String>::new();
     let main_chunks = Layout::default()
@@ -175,7 +176,11 @@ impl MTTab<'_> {
     //    .border_type(BorderType::Thick),
     //);
 
-    let detail =  Paragraph::new("")
+    let mut content = String::from("");
+    if detail_string.is_some() {
+      content = detail_string.unwrap();
+    }
+    let detail =  Paragraph::new(content)
     .style(Style::default().fg(Color::LightCyan))
     .alignment(Alignment::Left)
     //.scroll((5, 10))
@@ -218,11 +223,13 @@ impl MTTab<'_> {
   /// from the tof system.
   pub fn update(&mut self,
                 mt_events : &VecDeque<MasterTriggerEvent>,
-                update_detail : bool) {
+                update_detail : bool) -> Option<String> {
 
     //
     //let foo = packets.pop().unwrap();
     //let foo = CommandTab::<'_>::get_pk_repr(&foo);
+    //
+    let mut detail_string : Option<String> = None;
     let mut spans = Vec::<Spans>::new();
     for n in 0..mt_events.len() {
         spans.push(Spans::from(vec![Span::styled(
@@ -234,8 +241,9 @@ impl MTTab<'_> {
     let last_event = mt_events.back();
     if update_detail {
       info!("Updating detail field");
+      detail_string = Some(last_event.unwrap().to_string());
       if last_event.is_some() {
-        self.detail =  Paragraph::new(last_event.unwrap().to_string())
+        self.detail = Paragraph::new(last_event.unwrap().to_string())
         .style(Style::default().fg(Color::LightCyan))
         .alignment(Alignment::Left)
         //.scroll((5, 10))
@@ -259,6 +267,7 @@ impl MTTab<'_> {
           .title("Stream")
           .border_type(BorderType::Plain),
     );
+    detail_string
   }
 
 

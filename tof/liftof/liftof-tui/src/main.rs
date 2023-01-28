@@ -253,6 +253,8 @@ fn master_trigger(mt_to_main : &Sender<MasterTriggerEvent>,
   //let mut event_cnt;
   //let mut n_paddles_expected;
   let mut buffer : [u8;512] = [0;512];
+  let rate_query_rate = Duration::from_secs(5);
+  let mut timer = Instant::now();
   loop {
     // FIXME - remove these unwraps!
     match read_daq(&socket, &mt_address, &mut buffer) {
@@ -267,17 +269,22 @@ fn master_trigger(mt_to_main : &Sender<MasterTriggerEvent>,
           Err(err) => trace!("Can't send master trigger event"),
           Ok(_)    => ()
         }
-        match read_rate(&socket, &mt_address, &mut buffer) {
-          Err(err) => {
-            trace!("Did not get rate information!");
-            continue;
-          }
-          Ok(rate) => {
-            match mt_rate_to_main.try_send(rate) {
-              Err(err) => trace!("Can't send rate"),
-              Ok(_)    => ()
-            }
-          }
+      }
+    }
+    if timer.elapsed().as_secs() < rate_query_rate.as_secs() {
+      continue;
+    }
+    timer  = Instant::now();
+    match read_rate(&socket, &mt_address, &mut buffer) {
+      Err(err) => {
+        warn!("Unable to obtain MT rate information!");
+        continue;
+      }
+      Ok(rate) => {
+        info!("Got rate from MTB {rate}");
+        match mt_rate_to_main.try_send(rate) {
+          Err(err) => trace!("Can't send rate"),
+          Ok(_)    => ()
         }
       }
     }
@@ -461,6 +468,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let mut mt_stream_cache = VecDeque::<MasterTriggerEvent>::new();
   let mut packets         = VecDeque::<String>::new();
   let mut rates           = VecDeque::<(f64,f64)>::new();
+  let mut detail_string   : Option<String> = None;
   loop {
     terminal.draw(|rect| {
       let size = rect.size();
@@ -469,7 +477,8 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                                            &packets,
                                            rsp_from_cmdr.clone(),
                                            cmd_to_cmdr.clone());
-      let mut mt_tab     = MTTab::new(mster_lo.rect[1], &packets);
+      let mut mt_tab     = MTTab::new(mster_lo.rect[1], &packets,
+                                      detail_string.clone());
       let mut status_tab = StatusTab::new(mster_lo.rect[1],
                                           &rb_list,
                                           rb_list_state.clone());
@@ -523,23 +532,30 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
           let update_detail = ten_second_update.elapsed().as_secs() > 10;
           match mt_rate_from_mt.try_recv() {
             Err(err) => trace!("Did not receive new rate!"),
-            Ok(rate) => {rates.push_back((mission_elapsed_time.elapsed().as_secs() as f64, rate as f64));} 
+            Ok(rate) => {
+              info!("Got rate for mt rate chart {rate}");
+              rates.push_back((mission_elapsed_time.elapsed().as_secs() as f64, rate as f64));} 
           }
+      
+          if update_detail {
+              warn!("Ten seconds have passed!");
+          }
+
           if rates.len() > MAX_LEN_RATE {
             rates.pop_front();
           }
           info!("Rate chart with {} entries", rates.len());
           let mut x_labels = Vec::<String>::new();
           let mut y_labels = Vec::<String>::new();
-          let r_min : i64 = 0;
-          let r_max : i64 = 0;
-          let t_min : i64 = 0;
-          let t_max : i64 = 0;
+          let mut r_min : i64 = 0;
+          let mut r_max : i64 = 0;
+          let mut t_min : i64 = 0;
+          let mut t_max : i64 = 0;
           if rates.len() > 0 {
             //let max_rate = rates.iter().max_by(|x,y| x.1.cmp(y.1)).unwrap();
             let r_only : Vec::<i64> = rates.iter().map(|z| z.1.round() as i64).collect();
-            let r_max = r_only.iter().max().unwrap() + 10;
-            let r_min = r_only.iter().min().unwrap() - 10;
+            r_max = *r_only.iter().max().unwrap() + 5;
+            r_min = *r_only.iter().min().unwrap() - 5;
             let y_spacing = (r_max - r_min)/5;
             y_labels = vec![r_min.to_string(),
                            (r_min + y_spacing).to_string(),
@@ -548,21 +564,18 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                            (r_min + 4*y_spacing).to_string(),
                            (r_min + 5*y_spacing).to_string()];
             let t_only : Vec::<i64> = rates.iter().map(|z| z.0.round() as i64).collect();
-            let t_max = t_only.iter().max().unwrap();
-            let t_min = t_only.iter().min().unwrap();
-            let x_spacing = (r_max - r_min)/5;
-            x_labels = vec![r_min.to_string(),
-                           (r_min + y_spacing).to_string(),
-                           (r_min + 2*y_spacing).to_string(),
-                           (r_min + 3*y_spacing).to_string(),
-                           (r_min + 4*y_spacing).to_string(),
-                           (r_min + 5*y_spacing).to_string()];
+            t_max = *t_only.iter().max().unwrap();
+            t_min = *t_only.iter().min().unwrap();
+            let x_spacing = (t_max - t_min)/5;
+            x_labels = vec![t_min.to_string(),
+                           (t_min + x_spacing).to_string(),
+                           (t_min + 2*x_spacing).to_string(),
+                           (t_min + 3*x_spacing).to_string(),
+                           (t_min + 4*x_spacing).to_string(),
+                           (t_min + 5*x_spacing).to_string()];
 
-            //let ylabels = vec!["0","100", "200", "300"];
-            //let cdata = data.clone();
-            //let mut data = vec![empty_data;9];
           }
-          
+          //println!("{:?}", rates.make_contiguous()); 
           let rate_dataset = vec![Dataset::default()
               .name("MTB Rate")
               .marker(symbols::Marker::Braille)
@@ -581,22 +594,29 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
               .title(Span::styled("MET [s]", Style::default().fg(Color::White)))
               .style(Style::default().fg(Color::White))
               .bounds([t_min as f64, t_max as f64])
+              //.bounds([0.0, 1000.0])
               .labels(x_labels.clone().iter().cloned().map(Span::from).collect()))
             .y_axis(Axis::default()
               .title(Span::styled("Hz", Style::default().fg(Color::White)))
               .style(Style::default().fg(Color::White))
               .bounds([r_min as f64, r_max as f64])
+              //.bounds([0.0,1000.0])
               .labels(y_labels.clone().iter().cloned().map(Span::from).collect()));
           
-
-          mt_tab.update(&mt_stream_cache, update_detail);
+          //print!("{} {} {} {}", t_min, t_max, r_min, r_max);
+          match mt_tab.update(&mt_stream_cache, update_detail) {
+            None => (),
+            Some(val) => detail_string = Some(val)
+          }
 
           rect.render_stateful_widget(mt_tab.list_widget, mt_tab.list_rect, &mut rb_list_state);
           rect.render_widget(rate_chart,         mt_tab.rate_rect); 
           rect.render_widget(mt_tab.stream,       mt_tab.stream_rect);
           rect.render_widget(mt_tab.network_moni, mt_tab.nw_mon_rect); 
           rect.render_widget(mt_tab.detail,       mt_tab.detail_rect); 
-          ten_second_update = Instant::now();
+          if update_detail {
+            ten_second_update = Instant::now();
+          }
           info!("Updating MasterTrigger tab!");
         },
         MenuItem::Commands => {

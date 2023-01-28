@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
 import socket
+import sys
 import random
+import select
+import time
 from enum import Enum
 
 PACKET_ID = 0
-IPADDR = "192.168.36.121"
-IPADDR = "10.97.108.15"
+#IPADDR = "192.168.36.121"
 IPADDR = "10.0.1.10"
 PORT = 50001
 
 # Create a UDP socket and bind the socket to the port
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-#target_address = ("", 0)
-target_address = (IPADDR, PORT)
+target_address = ("", 0)
 
 READ = 0
 WRITE = 1
@@ -93,15 +94,28 @@ def encode_ipbus(addr, packet_type, data):
 
 def wReg(address, data, verify=False):
     s.sendto(encode_ipbus(addr=address, packet_type=WRITE, data=[data]), target_address)
-    s.recvfrom(4096)
-    rdback = rReg(address)
-    if (verify and rdback != data):
-        print("Error!")
+    ready = select.select([s], [], [], 1)
+    if ready[0]:
+        data = s.recvfrom(4096)
+        if verify:
+            rdback = rReg(address)
+            if rdback != data:
+                print("Readback error in wReg!")
+            return rdback
+        return data
+    else:
+        print("timeout in wreg 0x%08X" % data)
+        return wReg(address, data, verify)
 
 def rReg(address):
     s.sendto(encode_ipbus(addr=address, packet_type=READ, data=[0x0]), target_address)
-    data, address = s.recvfrom(4096)
-    return decode_ipbus(data,False)[0]
+    ready = select.select([s], [], [], 1)
+    if ready[0]:
+        data, address = s.recvfrom(4096)
+        return decode_ipbus(data,False)[0]
+    else:
+        print("timeout in rreg")
+        return rReg(address)
 
 c_addr = 0x1004
 div_addr = 0x1005
@@ -161,8 +175,11 @@ def read_adc(adc, ch, shift=2):
 def reset_event_cnt():
     wReg(0xc,1,verify=False)
 
-def read_event_cnt():
-    return rReg(0xd)
+def read_event_cnt(output=False):
+    cnt = rReg(0xd)
+    if output:
+        print("Event counter = %d" % cnt)
+    return cnt
 
 def read_adcs():
 
@@ -234,30 +251,64 @@ def read_adcs():
 
     return([headers]+table)
 
-def set_ucla_trigger(val):
-    bit = 1
-    if val:
-        val = bit
-    rd = rReg(0xb)
-    wr = (rd & (0xffffffff ^ bit)) | val
-    wReg(0xb, wr, verify=True)
+def check_clocks():
 
-def set_ssl_trigger(val):
-    bit = 2
-    if val:
-        val = bit
-    rd = rReg(0xb)
-    wr = (rd & (0xffffffff ^ bit)) | val
-    wReg(0xb, wr, verify=True)
+    def check_clock(freq, desc, spec):
+        if (spec < freq*1.01 and spec > freq*0.99):
+            stat = "OK"
+        else:
+            stat = "BAD"
+        print ("%s: % 10d Hz (%s)" % (desc, freq, stat))
 
-def set_any_trigger(val):
-    bit = 4
-    if val:
-        val = bit
-    rd = rReg(0xb)
-    wr = (rd & (0xffffffff ^ bit)) | val
-    wReg(0xb, wr, verify=True)
+    for desc, adr, spec in (["MTB  CLK", 0x1, 100000000],
+                            ["DSI0 CLK", 0x2, 20000000],
+                            ["DSI2 CLK", 0x3, 20000000],
+                            ["DSI2 CLK", 0x4, 20000000],
+                            ["DSI2 CLK", 0x5, 20000000],
+                            ["DSI2 CLK", 0x6, 20000000]):
+        check_clock(rReg(adr), desc, spec)
 
+def force_trigger():
+    wReg(0x8, 1)
+
+def en_ucla_trigger():
+    set_trig("a", 0x000000f0)
+    set_trig("b", 0x0000000f)
+
+def en_ssl_trigger():
+    set_trig("a", 0x3f3f0000)
+    set_trig("b", 0x00003f3f)
+
+def en_any_trigger():
+    set_trig("a", 0xffffffff)
+    set_trig("b", 0xffffffff)
+
+def trig_stop():
+    set_trig("a", 0x00000000)
+    set_trig("b", 0x00000000)
+
+def set_trig(which, val):
+
+    adr = {"a":0x15, "b":0x16}[which]
+
+    if (isinstance(val, str)):
+        val = int(val, 16)
+
+    wReg(adr, val)
+
+def set_trig_generate(val):
+    wReg(0x9, val)
+
+def set_trig_hz(rate):
+    # rate = f_trig / 1E8 * 0xffffffff
+    set_trig_generate(int((rate*0xffffffff)/1E8))
+
+def read_rates():
+    rate = rReg(0x17)
+    lost = rReg(0x18)
+    print("Trigger rate      = %d Hz" % rate)
+    print("Lost trigger rate = %d Hz" % lost)
+    return rate,lost
 
 def read_daq():
 
@@ -298,10 +349,12 @@ def read_daq():
         elif (state=="Event cnt"):
             state="Timestamp"
         elif (state=="Timestamp"):
-            state="Timecode 32 bits"
-        elif (state=="Timecode 32 bits"):
-            state="Timecode 16 bits"
-        elif (state=="Timecode 16 bits"):
+            state="TIU Timestamp"
+        elif (state=="TIU Timestamp"):
+            state="GPS 32 bits"
+        elif (state=="GPS 32 bits"):
+            state="GPS 16 bits"
+        elif (state=="GPS 16 bits"):
             state="Mask"
         elif (state=="Mask"):
             state="Hits"
@@ -313,14 +366,14 @@ def read_daq():
             state="Idle"
 
 
-def loopback(nreads=10000):
+def loopback(nreads=100000):
     print(" > Running loopback test")
     from tqdm import tqdm
     for i in tqdm(range(nreads), colour='green'):
         write = random.randint(0, 0xffffffff)
         wReg(0,write)
         read = rReg(0)
-        assert write==read
+        assert write==read, print("wr=0x%08X  rd=0x%08X" % (write, read))
         # if (i % 100 == 0):
         #     print(f"{i} reads, %f Mb" % ((i*32.0)/1000000.0))
 
@@ -330,34 +383,31 @@ def fw_info():
     print(" > FW_VER  = %08X" % rReg(0x202))
     print(" > FW_SHA  =  %07X" % rReg(0x203))
 
-def monitor_event_id():
-    last_event_id = 0
-    while True:
-        event_id = read_event_cnt()
-        if event_id != last_event_id:
-            print (f"EVID: {event_id}")
-        last_event_id = event_id
-
 if __name__ == '__main__':
 
     import argparse
 
     argParser = argparse.ArgumentParser(description = "Argument parser")
 
-    argParser.add_argument('--ip',              action='store',      default=False, help="IP Address")
+    argParser.add_argument('--ip',              action='store',      default=False, help="Set the IP Address of the target MTB.")
+    argParser.add_argument('--status',          action='store_true', default=False, help="Print out hte status of the TMB.")
     argParser.add_argument('--ucla_trig_en',    action='store_true', default=False, help="Enable UCLA trigger")
     argParser.add_argument('--ssl_trig_en',     action='store_true', default=False, help="Enable SSL trigger")
     argParser.add_argument('--any_trig_en',     action='store_true', default=False, help="Enable ANY trigger")
-    argParser.add_argument('--ucla_trig_dis',   action='store_true', default=False, help="Disable UCLA trigger")
-    argParser.add_argument('--ssl_trig_dis',    action='store_true', default=False, help="Disable SSL trigger")
-    argParser.add_argument('--any_trig_dis',    action='store_true', default=False, help="Disable ANY trigger")
+    argParser.add_argument('--trig_rates',      action='store_true', default=False, help="Read the trigger rates")
+    argParser.add_argument('--trig_stop',       action='store_true', default=False, help="Stop all triggers.")
+    argParser.add_argument('--trig_a',          action='store',                     help="Set trigger mask A")
+    argParser.add_argument('--trig_b',          action='store',                     help="Set trigger mask B")
+    argParser.add_argument('--trig_set_hz',     action='store',                     help="Set the poisson trigger generator rate in Hz")
+    argParser.add_argument('--trig_generate',   action='store',                     help="Set the poisson trigger generator rate (f_trig = 1E8 * rate / 0xffffffff)")
     argParser.add_argument('--read_adc',        action='store_true', default=False, help="Read ADCs")
-    argParser.add_argument('--loopback',        action='store_true', default=False, help="Ethernet Loopback")
-    argParser.add_argument('--fw_info',         action='store_true', default=False, help="Firmware Info")
-    argParser.add_argument('--reset_event_cnt', action='store_true', default=False, help="Reset Event Counter")
-    argParser.add_argument('--read_event_cnt',  action='store_true', default=False, help="Read Event Counter")
-    argParser.add_argument('--read_daq',        action='store_true', default=False, help="Read DAQ")
-    argParser.add_argument('--monitor_evid',    action='store_true', default=False, help="Show incoming event ids")
+    argParser.add_argument('--loopback',        action='store_true', default=False, help="Ethernet Loopback Test")
+    argParser.add_argument('--fw_info',         action='store_true', default=False, help="Print firmware version info")
+    argParser.add_argument('--reset_event_cnt', action='store_true', default=False, help="Reset the Event Counter")
+    argParser.add_argument('--read_event_cnt',  action='store_true', default=False, help="Read the Event Counter")
+    argParser.add_argument('--read_daq',        action='store_true', default=False, help="Stream the DAQ data to the screen")
+    argParser.add_argument('--force_trig',      action='store_true', default=False, help="Force an MTB Trigger")
+    argParser.add_argument('--check_clocks',    action='store_true', default=False, help="Check DSI loopback clock frequencies")
 
     args = argParser.parse_args()
 
@@ -366,24 +416,44 @@ if __name__ == '__main__':
 
     target_address = (IPADDR, PORT)
 
+    if args.check_clocks:
+        check_clocks()
     if args.ucla_trig_en:
-        set_ucla_trigger(1)
+        en_ucla_trigger()
+    if args.trig_rates:
+        read_rates()
+    if args.force_trig:
+        force_trigger()
     if args.ssl_trig_en:
-        set_ssl_trigger(1)
+        en_ssl_trigger()
+    if args.status:
+        fw_info()
+        print("")
+        check_clocks()
+        print("")
+        read_rates()
+        print("")
+        read_adcs()
+        print("")
+        read_event_cnt(output=True)
     if args.any_trig_en:
-        set_any_trigger(1)
-    if args.ucla_trig_dis:
-        set_ucla_trigger(0)
-    if args.ssl_trig_dis:
-        set_ssl_trigger(0)
-    if args.any_trig_dis:
-        set_any_trigger(0)
+        en_any_trigger()
+    if args.trig_stop:
+        trig_stop()
     if args.read_adc:
         read_adcs()
+    if args.trig_generate:
+        set_trig_generate(int(args.trig_generate))
+    if args.trig_set_hz:
+        set_trig_hz(int(args.trig_set_hz))
+    if args.trig_a:
+        set_trig("a", args.trig_a)
+    if args.trig_b:
+        set_trig("b", args.trig_b)
     if args.reset_event_cnt:
         reset_event_cnt()
     if args.read_event_cnt:
-        print(read_event_cnt())
+        read_event_cnt(output=True)
     if args.fw_info:
         fw_info()
     if args.loopback:
@@ -391,5 +461,5 @@ if __name__ == '__main__':
     if args.read_daq:
         read_daq()
 
-    if args.monitor_evid:
-        monitor_event_id()
+    if len(sys.argv) == 1:
+        argParser.print_help()
