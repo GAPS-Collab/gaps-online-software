@@ -59,6 +59,15 @@ pub enum BlobBuffer {
 }
 
 
+/// Get a size which accomodates nevents
+///
+/// This means if the given size is too small
+/// make sure that at least the whole next
+/// event "fits in"
+pub fn size_in_events(size : usize) {
+  
+
+}
 
 /// Allow READ access to the memory registers at /dev/uio**
 ///
@@ -184,12 +193,13 @@ where
     });
 }
 
-///! Read one of the data buffers and return a bytestream 
+///  Read one of the data buffers and return a bytestream 
 ///  from the given address with the length in events.
 ///  
 ///  # Arguments
 ///
-///  size : in bytes
+///  * which : Select data buffer to read 
+///  * size  : in bytes
 ///
 pub fn read_data_buffer(which : &BlobBuffer, 
                         size  : usize)
@@ -209,12 +219,12 @@ pub fn read_data_buffer(which : &BlobBuffer,
   let mut bytestream = Vec::<u8>::with_capacity(size);
   let m = match map_physical_mem_read(addr_space, 0x0, size) {
   //let mut m = match map_physical_mem_write(addr_space, 0x0, size) {
-      Ok(m) => m,
-      Err(err) => {
-          let error = RegisterError {};
-          warn!("Failed to mmap: Err={:?}", err);
-          return Err(error);
-      }
+    Ok(m) => m,
+    Err(err) => {
+      let error = RegisterError {};
+      warn!("Failed to mmap: Err={:?}", err);
+      return Err(error);
+    }
   };
  
   //ptr::slice_from_raw_parts(raw_pointer, 3) 

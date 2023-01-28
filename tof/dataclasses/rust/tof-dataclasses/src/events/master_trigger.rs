@@ -181,8 +181,8 @@ fn count_ones(input :u32) -> u32 {
 ///               register.
 ///
 pub fn encode_ipbus(addr        : u32,
-                packet_type : IPBusPacketType,
-                data        : &Vec<u32>) -> Vec<u8> {
+                    packet_type : IPBusPacketType,
+                    data        : &Vec<u32>) -> Vec<u8> {
   // this will silently overflow, but 
   // if the message is that long, then 
   // most likely there will be a 

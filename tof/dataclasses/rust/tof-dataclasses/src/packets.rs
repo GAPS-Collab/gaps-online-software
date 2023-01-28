@@ -36,6 +36,7 @@ use crate::events::RBEventPayload;
 pub const PACKET_TYPE_UNKNOWN   : u8 =  0;
 pub const PACKET_TYPE_COMMAND   : u8 = 10;
 pub const PACKET_TYPE_RBEVENT   : u8 = 20;
+pub const PACKET_TYPE_TOFEVENT  : u8 = 21;
 pub const PACKET_TYPE_MONITOR   : u8 = 30;
 pub const PACKET_TYPE_HEARTBEAT : u8 = 40;
 pub const PACKET_TYPE_SCALAR    : u8 = 50;
@@ -73,6 +74,7 @@ pub enum PacketType {
   Unknown   , 
   Command   ,
   RBEvent   ,
+  TofEvent  ,
   Monitor   ,
   HeartBeat ,
   Scalar    ,
@@ -84,6 +86,7 @@ impl PacketType {
       PacketType::Unknown   => PACKET_TYPE_UNKNOWN,
       PacketType::Command   => PACKET_TYPE_COMMAND,
       PacketType::RBEvent   => PACKET_TYPE_RBEVENT,
+      PacketType::TofEvent  => PACKET_TYPE_TOFEVENT,
       PacketType::Monitor   => PACKET_TYPE_MONITOR,
       PacketType::HeartBeat => PACKET_TYPE_HEARTBEAT,
       PacketType::Scalar    => PACKET_TYPE_SCALAR
@@ -96,6 +99,7 @@ impl PacketType {
       0   => Some(PacketType::Unknown),  
       10  => Some(PacketType::Command), 
       20  => Some(PacketType::RBEvent), 
+      21  => Some(PacketType::TofEvent),
       30  => Some(PacketType::Monitor), 
       40  => Some(PacketType::HeartBeat),
       50  => Some(PacketType::Scalar),
@@ -170,8 +174,8 @@ impl TofPacket {
     // good enough if we sent multiple events in a batch in 
     // the same TofPacket (in case we do that)
     let payload_len = self.payload.len() as u32;
-    let foo = &payload_len.to_le_bytes();
-    debug!("TofPacket binary payload: {foo:?}");
+    //let foo = &payload_len.to_le_bytes();
+    //debug!("TofPacket binary payload: {foo:?}");
     bytestream.extend_from_slice(&payload_len.to_le_bytes());
     bytestream.extend_from_slice(self.payload.as_slice());
     bytestream.extend_from_slice(&TofPacket::TAIL.to_le_bytes());

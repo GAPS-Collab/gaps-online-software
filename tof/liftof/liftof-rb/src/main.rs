@@ -85,6 +85,9 @@ struct Args {
 extern crate pretty_env_logger;
 #[macro_use] extern crate log;
 
+use log::{info, LevelFilter};
+use std::io::Write;
+
 /// The 0MQ PUB port is defined as DATAPORT_START + readoutboard_id
 const DATAPORT_START : u32 = 30000;
 
@@ -114,6 +117,21 @@ const CMDPORT_START  : u32 = 40000;
 /// END IMPLEMENTATION OF THREADS
 
 fn main() {
+
+  //env_logger::Builder::new()
+  //    .format(|buf, record| {
+  //     writeln!(
+  //     buf,
+  //     "{}:{} {} [{}] - {}",
+  //     record.file().unwrap_or("unknown"),
+  //      record.line().unwrap_or(0),
+  //     chrono::Local::now().format("%Y-%m-%dT%H:%M:%S"),
+  //          record.level(),
+  //       record.args()
+  //     )
+  //                                })
+  //.filter(Some("logger_example"), LevelFilter::Debug)
+  //                        .init();
   pretty_env_logger::init();
 
   let sparkle_heart         = vec![240, 159, 146, 150];

@@ -15,13 +15,14 @@ use std::time::{Duration,
 use crate::reduced_tofevent::TofEvent;
 use crate::master_trigger::MasterTriggerEvent;
 use crate::constants::EVENT_BUILDER_EVID_CACHE_SIZE;
-use tof_dataclasses::packets::TofPacket;
+use tof_dataclasses::packets::{PacketType,
+                               TofPacket};
 
 use crossbeam_channel as cbc;
 
 use tof_dataclasses::packets::paddle_packet::PaddlePacket;
 
-///! Walk over the event cache and check for each event
+///  Walk over the event cache and check for each event
 ///  if new paddles can be added.
 ///
 ///  # Arguments:
@@ -64,7 +65,10 @@ fn build_events_in_cache(event_cache   : &mut VecDeque<TofEvent>,
       if ev.is_ready_to_send(use_timeout) {
         (*ev).valid = false;
         let bytestream = ev.to_bytestream();
-        let pack = TofPacket::new();
+        let mut pack = TofPacket::new();
+        pack.packet_type = PacketType::TofEvent;
+        pack.payload = bytestream;
+
         match data_sink.send(pack) {
           Err(err) => warn!("Packet sending failed! Err {}", err),
           Ok(_)    => trace!("Event {} sent!", ev.event_id) 
