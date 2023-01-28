@@ -69,7 +69,9 @@ use tof_dataclasses::serialization::Serialization;
 use tof_dataclasses::threading::ThreadPool;
 use tof_dataclasses::events::blob::BlobData;
 use tof_dataclasses::events::MasterTriggerEvent;
-use tof_dataclasses::events::master_trigger::read_daq;
+use tof_dataclasses::events::master_trigger::{read_daq,
+                                              read_rate,
+                                              read_lost_rate};
 
 use crate::tab_commands::CommandTab;
 use crate::tab_mt::MTTab;
@@ -105,24 +107,7 @@ enum Event<I> {
     Tick,
 }
 
-//#[derive(Serialize, Deserialize, Clone)]
-//#[derive(Debug, Clone)]
-//struct ReadoutBoard {
-//  pub id: usize,
-//  pub name: String,
-//  //category: String,
-//  //age: usize,
-//  //created_at: DateTime<Utc>,
-//}
-
-//impl ReadoutBoard {
-//  fn new() -> ReadoutBoard {
-//    ReadoutBoard {
-//      id   : 0,
-//      name : String::from("ReadoutBoard")
-//    }
-//  }
-//}
+const MAX_LEN_RATE : usize = 1000;
 
 /// Communicate with the readoutboards on the 
 /// CMD channel 
@@ -246,7 +231,8 @@ fn receive_stream(tp_to_main : Sender<TofPacket>,
   }
 }
 
-fn master_trigger(mt_to_main : &Sender<MasterTriggerEvent>) {
+fn master_trigger(mt_to_main : &Sender<MasterTriggerEvent>,
+                  mt_rate_to_main : &Sender<u32>) {
   let mt_address = "10.0.1.10:50001";
   //let mt_address = mt_ip.to_owned() + ":" + &mt_port.to_string();
   let mut socket : UdpSocket;
@@ -267,10 +253,16 @@ fn master_trigger(mt_to_main : &Sender<MasterTriggerEvent>) {
   let mut n_paddles_expected;
   let mut buffer : [u8;512] = [0;512];
   loop {
+    // FIXME - remove these unwraps!
     (event_cnt, n_paddles_expected) = read_daq(&socket, &mt_address, &mut buffer).unwrap();
     let mt_event = MasterTriggerEvent::new(event_cnt, n_paddles_expected as u8);
+    let rate     = read_rate(&socket, &mt_address, &mut buffer).unwrap();
     match mt_to_main.try_send(mt_event) {
-      Err(err) => trace!("Can't send"),
+      Err(err) => trace!("Can't send master trigger event"),
+      Ok(_)    => ()
+    }
+    match mt_rate_to_main.try_send(rate) {
+      Err(err) => trace!("Can't send rate"),
       Ok(_)    => ()
     }
   }
@@ -344,6 +336,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   
   //pretty_env_logger::init();
   let mut ten_second_update = Instant::now();
+  let mission_elapsed_time  = Instant::now();
   let mut rb_list = Vec::<ReadoutBoard>::new();
   let mut tick_count = 0;
   if debug_local {
@@ -372,6 +365,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   // we go into raw_mode, so we can 
   // see the log messages during setup
   let (mt_to_main, mt_from_mt)     : (Sender<MasterTriggerEvent>, Receiver<MasterTriggerEvent>) = unbounded();
+  let (mt_rate_to_main, mt_rate_from_mt)     : (Sender<u32>, Receiver<u32>) = unbounded();
   let (tp_to_main, tp_from_recv)   : (Sender<TofPacket>, Receiver<TofPacket>)       = unbounded();
   let (cmd_to_cmdr, cmd_from_main) : (Sender<TofCommand>, Receiver<TofCommand>)     = unbounded();
   let (rsp_to_main, rsp_from_cmdr) :
@@ -395,7 +389,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   });
 
   workforce.execute(move || {
-    master_trigger(&mt_to_main);
+    master_trigger(&mt_to_main, &mt_rate_to_main);
   });
 
   //panic!("Until here");
@@ -445,10 +439,12 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   // components which are in all tabs
   let mut ui_menu = Menu::new();
 
-  // a message cache for the stream
+  //  containers for the auto-updating data which will be shown 
+  //  in the different widgets
   let mut stream_cache    = VecDeque::<TofPacket>::new();
   let mut mt_stream_cache = VecDeque::<MasterTriggerEvent>::new();
   let mut packets         = VecDeque::<String>::new();
+  let mut rates           = VecDeque::<(f64,f64)>::new();
   loop {
     terminal.draw(|rect| {
       let size = rect.size();
@@ -509,21 +505,83 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
             }
           }    
           let update_detail = ten_second_update.elapsed().as_secs() > 10;
-          ten_second_update = Instant::now();
+          match mt_rate_from_mt.try_recv() {
+            Err(err) => trace!("Did not receive new rate!"),
+            Ok(rate) => {rates.push_back((mission_elapsed_time.elapsed().as_secs() as f64, rate as f64));} 
+          }
+          if rates.len() > MAX_LEN_RATE {
+            rates.pop_front();
+          }
+          let mut x_labels = Vec::<String>::new();
+          let mut y_labels = Vec::<String>::new();
+          let r_min : i64 = 0;
+          let r_max : i64 = 0;
+          let t_min : i64 = 0;
+          let t_max : i64 = 0;
+          if rates.len() > 0 {
+            //let max_rate = rates.iter().max_by(|x,y| x.1.cmp(y.1)).unwrap();
+            let r_only : Vec::<i64> = rates.iter().map(|z| z.1.round() as i64).collect();
+            let r_max = r_only.iter().max().unwrap();
+            let r_min = r_only.iter().min().unwrap();
+            let y_spacing = (r_max - r_min)/5;
+            y_labels = vec![r_min.to_string(),
+                           (r_min + y_spacing).to_string(),
+                           (r_min + 2*y_spacing).to_string(),
+                           (r_min + 3*y_spacing).to_string(),
+                           (r_min + 4*y_spacing).to_string(),
+                           (r_min + 5*y_spacing).to_string()];
+            let t_only : Vec::<i64> = rates.iter().map(|z| z.0.round() as i64).collect();
+            let t_max = t_only.iter().max().unwrap();
+            let t_min = t_only.iter().min().unwrap();
+            let x_spacing = (r_max - r_min)/5;
+            x_labels = vec![r_min.to_string(),
+                           (r_min + y_spacing).to_string(),
+                           (r_min + 2*y_spacing).to_string(),
+                           (r_min + 3*y_spacing).to_string(),
+                           (r_min + 4*y_spacing).to_string(),
+                           (r_min + 5*y_spacing).to_string()];
+
+            //let ylabels = vec!["0","100", "200", "300"];
+            //let cdata = data.clone();
+            let mut data = vec![(0.0,0.0);1024]; 
+            //let mut data = vec![empty_data;9];
+          }
+          
+          let rate_dataset = vec![Dataset::default()
+              .name("MTB Rate")
+              .marker(symbols::Marker::Braille)
+              .graph_type(GraphType::Line)
+              .style(Style::default().fg(Color::White))
+              .data(rates.make_contiguous())];
+          let rate_chart = Chart::new(rate_dataset)
+            .block(
+              Block::default()
+                .borders(Borders::ALL)
+                .style(Style::default().fg(Color::White))
+                .title("MT rate ".to_owned() )
+                .border_type(BorderType::Double),
+            )
+            .x_axis(Axis::default()
+              .title(Span::styled("MET [s]", Style::default().fg(Color::White)))
+              .style(Style::default().fg(Color::White))
+              .bounds([t_min as f64, t_max as f64])
+              .labels(x_labels.clone().iter().cloned().map(Span::from).collect()))
+            .y_axis(Axis::default()
+              .title(Span::styled("Hz", Style::default().fg(Color::White)))
+              .style(Style::default().fg(Color::White))
+              .bounds([r_min as f64, r_max as f64])
+              .labels(y_labels.clone().iter().cloned().map(Span::from).collect()));
+          
 
           mt_tab.update(&mt_stream_cache, update_detail);
 
           rect.render_stateful_widget(mt_tab.list_widget, mt_tab.list_rect, &mut rb_list_state);
-          rect.render_widget(mt_tab.rate,         mt_tab.rate_rect); 
+          rect.render_widget(rate_chart,         mt_tab.rate_rect); 
           rect.render_widget(mt_tab.stream,       mt_tab.stream_rect);
           rect.render_widget(mt_tab.network_moni, mt_tab.nw_mon_rect); 
           rect.render_widget(mt_tab.detail,       mt_tab.detail_rect); 
+          ten_second_update = Instant::now();
           info!("Updating MasterTrigger tab!");
-          
-
-
-        
-
         },
         MenuItem::Commands => {
           match rx.recv() {

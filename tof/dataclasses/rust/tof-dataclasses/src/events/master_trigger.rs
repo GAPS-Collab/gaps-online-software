@@ -358,6 +358,24 @@ pub fn read_event_cnt(socket : &UdpSocket,
   Ok(event_count)
 }
 
+pub fn read_rate(socket : &UdpSocket,
+                 target_address : &str,
+                 buffer : &mut [u8;MT_MAX_PACKSIZE])
+  -> Result<u32, Box<dyn Error>> {
+  let rate = read_register(socket, target_address, 0x17, buffer)?;
+  trace!("Got MT rate! {} ", rate);
+  Ok(rate)
+}
+
+pub fn read_lost_rate(socket : &UdpSocket,
+                      target_address : &str,
+                      buffer : &mut [u8;MT_MAX_PACKSIZE])
+  -> Result<u32, Box<dyn Error>> {
+  let lost_rate = read_register(socket, target_address, 0x18, buffer)?;
+  trace!("Got MT lost rate! {} ", lost_rate);
+  Ok(lost_rate)
+}
+
 /// Reset event counter on MTB
 pub fn reset_event_cnt(socket : &UdpSocket,
                        target_address : &str) 

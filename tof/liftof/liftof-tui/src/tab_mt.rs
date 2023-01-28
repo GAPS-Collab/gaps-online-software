@@ -233,6 +233,7 @@ impl MTTab<'_> {
     }
     let last_event = mt_events.back();
     if update_detail {
+      info!("Updating detail field");
       if last_event.is_some() {
         self.detail =  Paragraph::new(last_event.unwrap().to_string())
         .style(Style::default().fg(Color::LightCyan))

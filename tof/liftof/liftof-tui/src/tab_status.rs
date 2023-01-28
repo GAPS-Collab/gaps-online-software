@@ -64,111 +64,6 @@ pub struct StatusTab<'a> {
 
 impl StatusTab<'_> {
 
-  //pub fn update(&mut self, list_state : ListState) {
-  //  self.rb_list_state = list_state;
-  //}
-
-  //pub fn update_datasets<'a>(&mut self,
-  //                           ch_times : [
-  //                           ch0_data : [(f64,f64)],
-  //                           ch1_data : [(f64,f64)],
-  //                           ch2_data : [(f64,f64)],
-  //                           ch3_data : [(f64,f64)],
-  //                           ch4_data : [(f64,f64)],
-  //                           ch5_data : [(f64,f64)],
-  //                           ch6_data : [(f64,f64)],
-  //                           ch7_data : [(f64,f64)],
-  //                           ch8_data : [(f64,f64)]) {
-
-  //                           //data : &'a Vec<Vec<(f64, f64)>>) {
-  //  
-  //  let xlabels = vec!["0", "200", "400", "600", "800", "1000"];
-  //  let ylabels = vec!["0","50", "100"];
-  //  //let cdata = data.clone();
-
-  //  let datasets = vec![
-  //    Dataset::default()
-  //      .name("Ch0")
-  //      .marker(symbols::Marker::Dot)
-  //      .graph_type(GraphType::Scatter)
-  //      .style(Style::default().fg(Color::Cyan))
-  //      .data(ch0_data),
-  //    Dataset::default()
-  //      .name("Ch1")
-  //      .marker(symbols::Marker::Braille)
-  //      .graph_type(GraphType::Line)
-  //      .style(Style::default().fg(Color::Magenta))
-  //      .data(ch1_data),
-  //    Dataset::default()
-  //      .name("Ch2")
-  //      .marker(symbols::Marker::Braille)
-  //      .graph_type(GraphType::Line)
-  //      .style(Style::default().fg(Color::Magenta))
-  //      .data(ch2_data),
-  //    Dataset::default()
-  //      .name("Ch3")
-  //      .marker(symbols::Marker::Braille)
-  //      .graph_type(GraphType::Line)
-  //      .style(Style::default().fg(Color::Magenta))
-  //      .data(ch3_data),
-  //    Dataset::default()
-  //      .name("Ch4")
-  //      .marker(symbols::Marker::Braille)
-  //      .graph_type(GraphType::Line)
-  //      .style(Style::default().fg(Color::Magenta))
-  //      .data(ch4_data),
-  //    Dataset::default()
-  //      .name("Ch5")
-  //      .marker(symbols::Marker::Braille)
-  //      .graph_type(GraphType::Line)
-  //      .style(Style::default().fg(Color::Magenta))
-  //      .data(ch5_data),
-  //    Dataset::default()
-  //      .name("Ch6")
-  //      .marker(symbols::Marker::Braille)
-  //      .graph_type(GraphType::Line)
-  //      .style(Style::default().fg(Color::Magenta))
-  //      .data(ch6_data),
-  //    Dataset::default()
-  //      .name("Ch7")
-  //      .marker(symbols::Marker::Braille)
-  //      .graph_type(GraphType::Line)
-  //      .style(Style::default().fg(Color::Magenta))
-  //      .data(ch7_data),
-  //    Dataset::default()
-  //      .name("Ch8 ('Ninth')")
-  //      .marker(symbols::Marker::Braille)
-  //      .graph_type(GraphType::Line)
-  //      .style(Style::default().fg(Color::Magenta))
-  //      .data(ch8_data),
-  //  ];
-  //  
-  //  let mut charts  = Vec::<Chart>::new();
-  //  for n in 0..datasets.len() {
-  //    let this_chart_dataset = vec![datasets[n].clone()];
-  //    let chart = Chart::new(this_chart_dataset)
-  //    .block(
-  //      Block::default()
-  //        .borders(Borders::ALL)
-  //        .style(Style::default().fg(Color::White))
-  //        .title("Ch ".to_owned() + &n.to_string() )
-  //        .border_type(BorderType::Plain),
-  //    )
-  //    .x_axis(Axis::default()
-  //      .title(Span::styled("bin", Style::default().fg(Color::White)))
-  //      .style(Style::default().fg(Color::White))
-  //      .bounds([0.0, 1024.0])
-  //      .labels(xlabels.clone().iter().cloned().map(Span::from).collect()))
-  //    .y_axis(Axis::default()
-  //      .title(Span::styled("ADC", Style::default().fg(Color::White)))
-  //      .style(Style::default().fg(Color::White))
-  //      .bounds([0.0, 100.0])
-  //      .labels(ylabels.clone().iter().cloned().map(Span::from).collect()));
-  //    charts.push(chart);
-  //  }
-  //  //return charts;
-  //  self.ch_charts = charts;
-  //}
 
   pub fn new<'a> (main_window   : Rect,
                   rb_list       : &Vec<ReadoutBoard>,
@@ -178,25 +73,6 @@ impl StatusTab<'_> {
     let data = vec![empty_data;9];
     //let data     = Vec::<Vec<(f64,f64)>>::new();
     let charts = Vec::<Chart>::new();
-    //let data0 = data[0].clone();
-    //let data1 = data[1].clone();
-    //let data2 = data[2].clone();
-    //let data3 = data[3].clone();
-    //let data4 = data[4].clone();
-    //let data5 = data[5].clone();
-    //let data6 = data[6].clone();
-    //let data7 = data[7].clone();
-    //let data8 = data[8].clone();
-    //let ch0_data = clone_into_array(data0);//.as_slice().clone();
-    //let ch1_data = clone_into_array(data1);//.as_slice().clone();
-    //let ch2_data = clone_into_array(data2);//.as_slice().clone();
-    //let ch3_data = clone_into_array(data3);//.as_slice().clone();
-    //let ch4_data = clone_into_array(data4);//.as_slice().clone();
-    //let ch5_data = clone_into_array(data5);//.as_slice().clone();
-    //let ch6_data = clone_into_array(data6);//.as_slice().clone();
-    //let ch7_data = clone_into_array(data7);//.as_slice().clone();
-    //let ch8_data = clone_into_array(data8);//.as_slice().clone();
-    //let charts = StatusTab::update_datasets(&data);
     let chart_list = charts.clone();
 
     // set up general layout
@@ -284,17 +160,6 @@ impl StatusTab<'_> {
       ch_rect          : ch_chunks,
       //ch_charts        : chart_list,
     };
-    //st.update_datasets(
-    //  ch0_data,
-    //  ch1_data,
-    //  ch2_data,
-    //  ch3_data,
-    //  ch0_data,
-    //  ch5_data,
-    //  ch6_data,
-    //  ch7_data,
-    //  ch8_data,
-    //);
     st
     
   } // end new
