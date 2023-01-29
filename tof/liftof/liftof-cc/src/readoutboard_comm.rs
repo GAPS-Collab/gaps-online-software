@@ -8,6 +8,9 @@
 
 use std::{fs, fs::File, path::Path};
 use std::io::Read;
+use std::io::Write;
+use std::fs::OpenOptions;
+
 use std::sync::mpsc::{Sender, channel};
 
 #[cfg(feature = "diagnostics")]
@@ -420,6 +423,19 @@ pub fn readoutboard_communicator(//socket           : &zmq::Socket,
   // specific RB
   let topic = b"";
   socket.set_subscribe(topic);
+  let blobfile_name = "blob_".to_owned() 
+                       + &board_id.to_string()
+                       + ".blob";
+  info!("Writing blobs to {}", blobfile_name );
+  let blobfile_path = Path::new(&blobfile_name);
+
+
+  let mut file_on_disc : Option<File> = None;//let mut output = File::create(path)?;
+  if write_blob {
+    file_on_disc = OpenOptions::new().append(true).open(blobfile_path).ok()
+      //let f = File::create(&blobfile_path);
+    //file_on_disc = Some(f.unwrap());
+  }
   loop {
 
     // check if we got new data
@@ -486,22 +502,42 @@ pub fn readoutboard_communicator(//socket           : &zmq::Socket,
           Err(err)     => error!("Was not able to read blobs! {}", err )
         }
         // write blob to disk if desired
-        if write_blob {
-          let blobfile_name = "blob_".to_owned() 
-                               + &n_chunk.to_string() 
-                               + "_"
-                               + &board_id.to_string()
-                               + ".blob";
-          info!("Writing blobs to {}", blobfile_name );
-          let blobfile_path = Path::new(&blobfile_name);
-          match write_stream_to_file(blobfile_path, &buffer) {
-            Ok(size)  => debug!("Writing blob file successful! {} bytes written", size),
-            Err(err)  => {
-              error!("Unable to write blob to disk! {}", err );
-              lost_blob_files += 1;
-            }
-          } // end match
-        } // end if write_blob
+        match &mut file_on_disc {
+          None => (),
+          Some(f) => {
+            f.write_all(buffer.as_slice());
+
+            //match write_stream_to_file(f, &buffer) {
+            //  Ok(size)  => debug!("Writing blob file successful! {} bytes written", size),
+            //  Err(err)  => {
+            //    error!("Unable to write blob to disk! {}", err );
+            //    //lost_blob_files += 1;
+            //  }
+            //} // end match
+            //match write!(f, &buffer) {
+            //  Err(err) => warn!("Writing to file failed!"),
+            //  Ok(_)    => ()
+            //}
+
+          }
+        }
+
+        //if write_blob {
+        //  let blobfile_name = "blob_".to_owned() 
+        //                       + &n_chunk.to_string() 
+        //                       + "_"
+        //                       + &board_id.to_string()
+        //                       + ".blob";
+        //  info!("Writing blobs to {}", blobfile_name );
+        //  let blobfile_path = Path::new(&blobfile_name);
+        //  match write_stream_to_file(blobfile_path, &buffer) {
+        //    Ok(size)  => debug!("Writing blob file successful! {} bytes written", size),
+        //    Err(err)  => {
+        //      error!("Unable to write blob to disk! {}", err );
+        //      lost_blob_files += 1;
+        //    }
+        //  } // end match
+        //} // end if write_blob
         //thread::sleep(Duration::from_millis(1500));
         n_chunk += 1;
 
