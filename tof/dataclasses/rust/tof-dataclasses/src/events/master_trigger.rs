@@ -82,6 +82,15 @@ impl From<IPBusPacketType> for u8 {
   }
 }
 
+
+/// Representation of the hit mask received from the MasterTrigger
+#[derive(Debug, Copy, Clone)]
+pub struct HitMask {
+  pub n_ltbs    : u8,
+  pub n_paddles : u8,
+
+}
+
 /// An event as observed by the MTB
 ///
 /// This is condensed to the most 
@@ -96,9 +105,13 @@ pub struct MasterTriggerEvent {
   pub tiu_gps_32    : u32,
   pub tiu_gps_16    : u32,
   pub n_paddles     : u8, 
-  pub board_mask    : u32,
+  // indicates which LTBs have 
+  // triggered
+  pub board_mask    : [bool; 32],
   // one 16 bit value per LTB
-  pub hits          : [u16; 20],
+  // the sorting is the same as
+  // in board_mask
+  pub hits          : [[bool;32]; 32],
 
   /// valid is an internal flag
   /// used by code working with MTEs.
@@ -119,9 +132,9 @@ impl MasterTriggerEvent {
       tiu_gps_32    : 0,
       tiu_gps_16    : 0,
       n_paddles     : n_paddles, 
-      board_mask    : 0,
+      board_mask    : [false;32],
       //ne 16 bit value per LTB
-      hits          : [0; 20],
+      hits          : [[false;32]; 32],
       valid     : true
     }   
   }
@@ -139,8 +152,8 @@ impl Default for MasterTriggerEvent {
 
 impl fmt::Display for MasterTriggerEvent {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(f, "<MasterTriggerEvent\n event id\t {}\n timestamp\t {}\n tiu_timestamp\t {}\n tiu_gps_32\t {}\n tiu_gps_16\t {}\n n paddles\t {}\n board mask\t {}  >",
-           self.event_id, self.timestamp, self.tiu_timestamp, self.tiu_gps_32, self.tiu_gps_16, self.n_paddles, self.board_mask)
+    write!(f, "<MasterTriggerEvent\n event id\t {}\n timestamp\t {}\n tiu_timestamp\t {}\n tiu_gps_32\t {}\n tiu_gps_16\t {}\n n paddles\t {}  >",
+           self.event_id, self.timestamp, self.tiu_timestamp, self.tiu_gps_32, self.tiu_gps_16, self.n_paddles)
   }
 }
 
@@ -159,16 +172,16 @@ impl IPBusPacket {
 
 
 
-/// Little helper to count the ones in a bit mask
-fn count_ones(input :u32) -> u32 {
-  let mut count = 0u32;
-  let mut value = input;
-  while value > 0 {
-    count += value & 1;
-    value >>= 1;
-  }
-  count
-}
+////// Little helper to count the ones in a bit mask
+///fn count_ones(input :u32) -> u32 {
+///  let mut count = 0u32;
+///  let mut value = input;
+///  while value > 0 {
+///    count += value & 1;
+///    value >>= 1;
+///  }
+///  count
+///}
 
 
 /// Encode register addresses and values in IPBus packet
@@ -388,7 +401,7 @@ pub fn reset_event_cnt(socket : &UdpSocket,
 
 /// Reset the state of the MTB DAQ
 pub fn reset_daq(socket : &UdpSocket,
-             target_address : &str) 
+                 target_address : &str) 
   -> Result<(), Box<dyn Error>> {
   debug!("Resetting DAQ!");
   let mut buffer = [0u8;MT_MAX_PACKSIZE];
@@ -396,11 +409,37 @@ pub fn reset_daq(socket : &UdpSocket,
   Ok(())
 }
 
+
+/// Check if the MTB DAQ has new information 
+pub fn daq_buffer_full(socket : &UdpSocket,
+                       target_address : &str,
+                       buffer : &mut [u8;MT_MAX_PACKSIZE]) 
+    -> Result<bool, Box<dyn Error>> {
+    //if 0 == (read_register(socket, target_address, 0x12) & 0x2):
+    let full = read_register(socket, target_address, 0x12, buffer)?;
+    let empty = full & 0x2;
+    Ok(empty == 0)
+}
+
+/// Helper to get the number of the triggered LTB from the bitmask
+pub fn decode_board_mask(board_mask : u32) -> [bool;32] {
+  let mut decoded_mask = [false;32];
+  for n in 0..32 {
+    let mask = 1 << n;
+    let bit_is_set = (mask & board_mask) > 0;
+    decoded_mask[n] = bit_is_set;
+  }
+  decoded_mask
+}
+
+
 /// Read the IPBus packets from the MTB DAQ
 ///
-
-
-
+/// FIXME This will only work if there is a 
+/// DAQ packet ready, so it has to work 
+/// together with a check that the daq queue
+/// is full
+///
 /// # Arguments:
 /// 
 /// * socket         : An open Udp socket on the host side
@@ -409,20 +448,25 @@ pub fn reset_daq(socket : &UdpSocket,
 pub fn read_daq(socket : &UdpSocket,
                 target_address : &str,
                 buffer : &mut [u8;MT_MAX_PACKSIZE])
-  -> Result<(u32, u32), Box<dyn Error>> {
+  -> Result<MasterTriggerEvent, Box<dyn Error>> {
   // check if the queue is full
   let mut event_ctr  = 0u32;
-  let timestamp  : u32;
-  let timecode32 : u32;
-  let timecode16 : u32;
-  let mask       : u32;
-  //let mut hits     :  0u32;
-  let crc        : u32;
-  let trailer    : u32;
-  let mut hit_paddles = 0u32;
-  let mut paddles_rxd     = 1u32;
-  let mut hits = Vec::<u32>::with_capacity(24);
+  let mut timestamp        = 0u32;
+  let mut tiu_timestamp    = 0u32;
+  let mut gps_timestamp_32 = 0u32;
+  let mut gps_timestamp_16 = 0u32;
+  let mut board_mask           = 0u32;
+  let mut decoded_board_mask = [false;32];
+  let mut hits         = [[false;32];32];
 
+  //let mut hits       :  0u32;
+  let mut crc              = 0u32;
+  let mut trailer          = 0u32;
+  //let mut hit_ltbs = 0u32;
+  //let mut paddles_rxd     = 1u32;
+  let mut n_paddles = 0u8;
+  //let mut hits = Vec::<u32>::with_capacity(24);
+  //let mut hits = [0u16;24];
   // How this works is the following. We read the data register
   // until we get the header word. Then we have a new event 
   // and we fill the values of our MasterTriggerEvent by 
@@ -433,25 +477,35 @@ pub fn read_daq(socket : &UdpSocket,
   // hit register
   if word == 0xAAAAAAAA {
     // we start a new daq package
-    event_ctr   = read_register(socket, target_address, 0x11, buffer)?;
-    timestamp   = read_register(socket, target_address, 0x11, buffer)?;
-    timecode32  = read_register(socket, target_address, 0x11, buffer)?;
-    timecode16  = read_register(socket, target_address, 0x11, buffer)?;
-    mask        = read_register(socket, target_address, 0x11, buffer)?;
-    hit_paddles = count_ones(mask);
-    hits.push     (read_register(socket, target_address, 0x11, buffer)?);
-    //allhits.push(hits);  
-    while paddles_rxd < hit_paddles {
-      hits.push(read_register(socket, target_address, 0x11, buffer)?);
-      paddles_rxd += 1;
+    event_ctr         = read_register(socket, target_address, 0x11, buffer)?;
+    timestamp         = read_register(socket, target_address, 0x11, buffer)?;
+    tiu_timestamp     = read_register(socket, target_address, 0x11, buffer)?;
+    gps_timestamp_32  = read_register(socket, target_address, 0x11, buffer)?;
+    gps_timestamp_16  = read_register(socket, target_address, 0x11, buffer)?;
+    board_mask        = read_register(socket, target_address, 0x11, buffer)?;
+    decoded_board_mask = decode_board_mask(board_mask);
+    //hit_ltbs          = count_ones(board_mask);
+    //hit_ltbs          = board_mask.count_ones();
+    for n in 0..32 {
+      if decoded_board_mask[n] {
+        let hitmask = read_register(socket, target_address, 0x11, buffer)?;
+        n_paddles += hitmask.count_ones() as u8;
+        hits[n] = decode_board_mask(hitmask);
+      }
     }
+    //hits.push     (read_register(socket, target_address, 0x11, buffer)?);
+    ////allhits.push(hits);  
+    //while paddles_rxd < hit_ltbs {
+    //  hit_ltbs.push(read_register(socket, target_address, 0x11, buffer)?);
+    //  paddles_rxd += 1;
+    //}
     crc         = read_register(socket, target_address, 0x11, buffer)?;
     trailer     = read_register(socket, target_address, 0x11, buffer)?;
 
-    debug!("event_ctr {}, ts {} , tc32 {}, tc16 {}, mask {}, crc {}, trailer {}", event_ctr, timestamp, timecode32, timecode16, hit_paddles, crc, trailer);
-    for n in 0..hits.len() {
-      debug!(" -- -- hit {}", hits[n]);
-    }
+    //debug!("event_ctr {}, ts {} , tc32 {}, tc16 {}, mask {}, crc {}, trailer {}", event_ctr, timestamp, timecode32, timecode16, hit_paddles, crc, trailer);
+    //for n in 0..hits.len() {
+    //  debug!(" -- -- hit {}", hits[n]);
+    //}
   } // end header found
     //AAAAAAAA (Header)
     //0286A387 (Event cnt)
@@ -462,7 +516,23 @@ pub fn read_daq(socket : &UdpSocket,
     //00000003 (Hits)
     //97041A48 (CRC)
     //55555555 (Trailer)
-  Ok((event_ctr, hit_paddles))
+  //for n in 0..32 {
+  //  for m in 0..32 {
+  //    if hits[n][m] { n_paddles += 1;}
+  //  }
+  //}
+  let mut event = MasterTriggerEvent::new(event_ctr, n_paddles);
+  event.timestamp     = timestamp; 
+  event.tiu_timestamp = tiu_timestamp; 
+  event.tiu_gps_32    = gps_timestamp_32; 
+  event.tiu_gps_16    = gps_timestamp_16; 
+  event.n_paddles     = n_paddles; 
+  event.board_mask    = decoded_board_mask; 
+  event.hits          = hits;
+  // one 16 bit value per LTB
+  //pub hits          : [u16; 20],
+  
+  Ok(event)
 }
 
 
