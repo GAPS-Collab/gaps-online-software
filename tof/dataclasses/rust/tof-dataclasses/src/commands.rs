@@ -82,7 +82,10 @@ pub const CMD_EN_TRIGGERMODE_FORCED    : u8 = 24;
 /// command code to disable the forced trigger mode 
 /// on the RBs
 pub const CMD_DIS_TRIGGERMODE_FORCED   : u8 = 25;
-
+/// Set forced trigger mode on MTB
+pub const CMD_EN_TRIGGERMODE_FORCED_MTB : u8 = 26;
+// Disable forced trigger mode on MTB
+pub const CMD_DIS_TRIGGERMODE_FORCED_MTB : u8 = 27;
 
 // Specific response codes
 // These are long (4 bytes) but 
@@ -172,12 +175,15 @@ pub enum TofCommand {
   SetRBForcedTrigModeOn   (u32),
   /// Switch forced trigger mode OFF (RB)
   SetRBForcedTrigModeOff  (u32),
+  SetMTBForcedTrigModeOn  (u32),
+  /// Switch forced trigger mode OFF (RB)
+  SetMTBForcedTrigModeOff (u32),
   Unknown                 (u32),
 }
 
 impl fmt::Display for TofCommand {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let cmd = self.to_str();
+    let cmd = self.string_repr();
     //let arg = 
     write!(f, "<TofCommand {}>", cmd)
   }
@@ -273,6 +279,8 @@ impl TofCommand {
       TofCommand::SetRBBuffTrip           (data) => { value = *data;},
       TofCommand::SetRBForcedTrigModeOn   (data) => { value = *data;},
       TofCommand::SetRBForcedTrigModeOff  (data) => { value = *data;},
+      TofCommand::SetMTBForcedTrigModeOn  (data) => { value = *data;},
+      TofCommand::SetMTBForcedTrigModeOff (data) => { value = *data;},
       TofCommand::Unknown                 (data) => { value = *data;}, 
     }
     value
@@ -282,7 +290,7 @@ impl TofCommand {
   ///
   /// This is basically the enum type as 
   /// a string.
-  pub fn to_str(&self) -> String { 
+  pub fn string_repr(&self) -> String { 
     match self {
       TofCommand::Ping                    (_) => {return String::from("Ping");},
       TofCommand::PowerOn                 (_) => {return String::from("PowerOn");},
@@ -306,6 +314,8 @@ impl TofCommand {
       TofCommand::SetRBBuffTrip           (_) => {return String::from("SetRBBuffTrip");},
       TofCommand::SetRBForcedTrigModeOn   (_) => {return String::from("SetRBForcedTrigModeOn");},
       TofCommand::SetRBForcedTrigModeOff  (_) => {return String::from("SetRBForcedTrigModeOff");}
+      TofCommand::SetMTBForcedTrigModeOn  (_) => {return String::from("SetMTBForcedTrigModeOn");},
+      TofCommand::SetMTBForcedTrigModeOff (_) => {return String::from("SetMTBForcedTrigModeOff");}
       TofCommand::Unknown                 (_) => {return String::from("Unknown");},
       //_                                      => {return String::from("_");}
     }
@@ -338,7 +348,9 @@ impl TofCommand {
       CMD_SET_RB_DATABUF_SIZE    => TofCommand::SetRBBuffTrip        (value),
       CMD_EN_TRIGGERMODE_FORCED  => TofCommand::SetRBForcedTrigModeOn(value),
       CMD_DIS_TRIGGERMODE_FORCED => TofCommand::SetRBForcedTrigModeOff(value),
-      _                          => TofCommand::Unknown              (value), 
+      CMD_EN_TRIGGERMODE_FORCED_MTB  => TofCommand::SetMTBForcedTrigModeOn(value),
+      CMD_DIS_TRIGGERMODE_FORCED_MTB  => TofCommand::SetMTBForcedTrigModeOff(value),
+      _                               => TofCommand::Unknown              (value), 
     }
   }
     
@@ -367,6 +379,8 @@ impl TofCommand {
       TofCommand::SetRBBuffTrip          (_) => Some(CMD_SET_RB_DATABUF_SIZE)   ,
       TofCommand::SetRBForcedTrigModeOn  (_) => Some(CMD_EN_TRIGGERMODE_FORCED) ,
       TofCommand::SetRBForcedTrigModeOff (_) => Some(CMD_DIS_TRIGGERMODE_FORCED),
+      TofCommand::SetMTBForcedTrigModeOn  (_) => Some(CMD_EN_TRIGGERMODE_FORCED_MTB) ,
+      TofCommand::SetMTBForcedTrigModeOff (_) => Some(CMD_DIS_TRIGGERMODE_FORCED_MTB),
       TofCommand::Unknown                (_) => None                            , 
     }
   }
@@ -403,28 +417,29 @@ impl From<(u8, u32)> for TofCommand {
   fn from(pair : (u8, u32)) -> TofCommand {
     let (input, value) = pair;
     trace!("Got in input {:?}", pair);
-    match input {
-      CMD_PING                => TofCommand::Ping                 (value) ,
-      CMD_POFF                => TofCommand::PowerOff             (value) ,        
-      CMD_PON                 => TofCommand::PowerOn              (value) ,       
-      CMD_PCYCLE              => TofCommand::PowerCycle           (value) ,        
-      CMD_RBSETUP             => TofCommand::RBSetup              (value) ,         
-      CMD_SETTHRESHOLD        => TofCommand::SetThresholds        (value) ,         
-      CMD_SETMTCONFIG         => TofCommand::SetMtConfig          (value) ,        
-      CMD_DATARUNSTOP         => TofCommand::DataRunEnd            (value),  
-      CMD_DATARUNSTART        => TofCommand::DataRunStart          (value) ,    
-      CMD_STARTVALIDATIONRUN  => TofCommand::StartValidationRun    (value),         
-      CMD_GETFULLWAVEFORMS    => TofCommand::RequestWaveforms      (value) ,      
-      CMD_REQEUESTEVENT       => TofCommand::RequestEvent          (value) , 
-      CMS_REQUESTMONI         => TofCommand::RequestMoni           (value),
-      CMD_VCALIB              => TofCommand::VoltageCalibration    (value),       
-      CMD_TCALIB              => TofCommand::TimingCalibration     (value),      
-      CMD_CREATECALIBF        => TofCommand::CreateCalibrationFile (value),   
-      CMD_UNSPOOL_EVENT_CACHE => TofCommand::UnspoolEventCache   (value) ,
-      CMD_STREAM_ANY_EVENT    => TofCommand::StreamAnyEvent      (value) ,
-      CMD_STREAM_ONLY_REQUESTED   => TofCommand::StreamOnlyRequested      (value) ,
-      _                       => TofCommand::Unknown              (value) , 
-    }
+    return TofCommand::from_command_code(input, value); 
+    //match input {
+    //  CMD_PING                => TofCommand::Ping                 (value) ,
+    //  CMD_POFF                => TofCommand::PowerOff             (value) ,        
+    //  CMD_PON                 => TofCommand::PowerOn              (value) ,       
+    //  CMD_PCYCLE              => TofCommand::PowerCycle           (value) ,        
+    //  CMD_RBSETUP             => TofCommand::RBSetup              (value) ,         
+    //  CMD_SETTHRESHOLD        => TofCommand::SetThresholds        (value) ,         
+    //  CMD_SETMTCONFIG         => TofCommand::SetMtConfig          (value) ,        
+    //  CMD_DATARUNSTOP         => TofCommand::DataRunEnd            (value),  
+    //  CMD_DATARUNSTART        => TofCommand::DataRunStart          (value) ,    
+    //  CMD_STARTVALIDATIONRUN  => TofCommand::StartValidationRun    (value),         
+    //  CMD_GETFULLWAVEFORMS    => TofCommand::RequestWaveforms      (value) ,      
+    //  CMD_REQEUESTEVENT       => TofCommand::RequestEvent          (value) , 
+    //  CMS_REQUESTMONI         => TofCommand::RequestMoni           (value),
+    //  CMD_VCALIB              => TofCommand::VoltageCalibration    (value),       
+    //  CMD_TCALIB              => TofCommand::TimingCalibration     (value),      
+    //  CMD_CREATECALIBF        => TofCommand::CreateCalibrationFile (value),   
+    //  CMD_UNSPOOL_EVENT_CACHE => TofCommand::UnspoolEventCache   (value) ,
+    //  CMD_STREAM_ANY_EVENT    => TofCommand::StreamAnyEvent      (value) ,
+    //  CMD_STREAM_ONLY_REQUESTED   => TofCommand::StreamOnlyRequested      (value) ,
+    //  _                       => TofCommand::Unknown              (value) , 
+    //}
   }
 }
 
