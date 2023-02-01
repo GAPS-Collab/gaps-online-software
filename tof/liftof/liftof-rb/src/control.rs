@@ -78,23 +78,23 @@ pub fn blob_buffer_reset(which : &BlobBuffer) -> Result<(), RegisterError> {
   Ok(())
 }
 
-///! Get the recorded triggers by the DRS4
+/// Get the recorded triggers by the DRS4
 pub fn get_trigger_rate() -> Result<u32, RegisterError> {
   let value = read_control_reg(TRIGGER_RATE)?;
   Ok(value)
 }
 
-///! Get the rate of the lost triggers by the DRS4
+/// Get the rate of the lost triggers by the DRS4
 pub fn get_lost_trigger_rate() -> Result<u32, RegisterError> {
   let value = read_control_reg(LOST_TRIGGER_RATE)?;
   Ok(value)
 }
 
-///! Get the event counter from the DRS4
+/// Get the event counter from the DRS4
 ///
-///  The event counter is NOT the event id comming from 
-///  the master trigger. It is simply the number of 
-///  events observed since the last reset.
+/// The event counter is NOT the event id comming from 
+/// the master trigger. It is simply the number of 
+/// events observed since the last reset.
 ///
 pub fn get_event_count() -> Result<u32, RegisterError> {
   let value = read_control_reg(CNT_EVENT)?;
@@ -102,24 +102,33 @@ pub fn get_event_count() -> Result<u32, RegisterError> {
 }
 
 
-///! Get the lost events event counter from the DRS4
+/// Get the lost events event counter from the DRS4
 pub fn get_lost_event_count() -> Result<u32, RegisterError> {
   let value = read_control_reg(CNT_LOST_EVENT)?;
   Ok(value)
 }
 
-///! This simply sets the configure bit.
+/// This simply sets the configure bit.
 ///
-///  Unclear what it actually does.
-///  FIXME
+/// Unclear what it actually does.
+/// FIXME
 pub fn set_drs4_configure() -> Result<(), RegisterError> {
   trace!("SET DRS4 CONFIGURE");
   write_control_reg(DRS_CONFIGURE, 1)?;
   Ok(())
 }
 
+/// Force a trigger
+///
+/// _If I understand it correctly, this is a single trigger_
+///
+pub fn trigger() -> Result<(), RegisterError> {
+  //warn!("Setting force trigger mode!");
+  write_control_reg(FORCE_TRIG, 1)?;
+  Ok(())
+}
 
-///! Reset of the internal event counter
+/// Reset of the internal event counter
 ///
 ///  This is NOT the event id.
 pub fn reset_drs_event_ctr() -> Result<(), RegisterError> {
@@ -161,7 +170,7 @@ pub fn get_device_dna() -> Result<u64, RegisterError> {
 }
 
 
-///! Enable the readout of all channels + the 9th channel
+/// Enable the readout of all channels + the 9th channel
 pub fn set_readout_all_channels_and_ch9() -> Result<(), RegisterError> {
   let all_channels : u32 = 511;
   let ch_9         : u32 = 512;
@@ -171,9 +180,18 @@ pub fn set_readout_all_channels_and_ch9() -> Result<(), RegisterError> {
   Ok(())
 }
 
+
+/// Enable the master trigger mode
 pub fn set_master_trigger_mode() -> Result<(), RegisterError> {
   trace!("SET DRS4 MT MODE");
   write_control_reg(MT_TRIGGER_MODE, 1)?;
+  Ok(())
+}
+
+/// Disable the master trigger
+pub fn disable_master_trigger_mode() -> Result<(), RegisterError> {
+  warn!("Disabeling master trigger mode");
+  write_control_reg(MT_TRIGGER_MODE, 0)?;
   Ok(())
 }
 

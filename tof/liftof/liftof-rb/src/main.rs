@@ -75,6 +75,9 @@ struct Args {
   /// Run without stopping. Control by remote through `TofCommand`
   #[arg(long, default_value_t = false)]
   run_forevever: bool,
+  /// Activate the forced trigger. The value is the desired rate 
+  #[arg(long, default_value_t = 0)]
+  force_trigger: u32,
   /// Stream any eventy as soon as the software starts.
   /// Don't wait for command line.
   /// Behaviour can be controlled through `TofCommand` later
@@ -93,26 +96,6 @@ const DATAPORT_START : u32 = 30000;
 
 /// The 0MP REP port is defined as CMDPORT_START + readoutboard_id
 const CMDPORT_START  : u32 = 40000;
-
-// Keep track of send/receive state of 0MQ socket
-
-//  Threads:
-// 
-//  - server          : comms with tof computer
-//  - monitoring      : read out environmental
-//                      data
-//  - buffer handling : check the fill level of
-//                      the buffers and switch
-//                      if necessary
-//  - data handling   : Identify event id, 
-//                      (Analyze data),
-//                      pack data
-// 
-// 
-
-
-
-
 
 /// END IMPLEMENTATION OF THREADS
 
@@ -181,6 +164,7 @@ fn main() {
   let dont_listen   = args.dont_listen;
   let run_forever   = args.run_forevever;
   let stream_any    = args.stream_any;
+  let force_trigger = args.force_trigger;
 
   // welcome banner!
   println!("-----------------------------------------------");
@@ -364,7 +348,8 @@ fn main() {
                None,
                p_op,
                &run_params_from_cmdr_c,
-               None);
+               None,
+               force_trigger);
                //bar_clone);
     });
     // we start the run by creating new RunParams
@@ -462,7 +447,8 @@ fn main() {
                        //p_op,
                        None,
                        &run_params_from_cmdr_c,
-                       None);
+                       None,
+                       force_trigger);
                        //Some(&rk));
                        //bar_clone);
             });

@@ -36,6 +36,7 @@ pub const ADC_LATENCY      : u32 =   0x40;    //[9:4] rw  0x9 Latency from first
 pub const SAMPLE_COUNT     : u32 =   0x40;    //[21:12]   rw  0x3FF   Number of samples to read out (0 to 1023)
 pub const EN_SPIKE_REMOVAL : u32 =   0x40;    //22    rw  0x1 set 1 to enable spike removal
 
+pub const FORCE_TRIG       : u32 =   0x100;   // Write 1 to set forced trigger mode
 
 pub const DRS_CONFIGURE    : u32 = 0x50;    // Write 1 to configure the DRS. Should be done before data taking
 pub const DRS_START        : u32 = 0x48; // Write 1 to take the state machine out of idle mode

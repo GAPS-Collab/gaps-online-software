@@ -8,6 +8,8 @@ use tof_dataclasses::serialization::Serialization;
 use std::collections::HashMap;
 use std::net::IpAddr;
 
+use std::time::{Duration,
+                Instant};
 use std::{thread, time};
 use crossbeam_channel::{Sender,
                         Receiver};
@@ -33,7 +35,6 @@ use tof_dataclasses::packets::{TofPacket,
 //use tof_dataclasses::threading::ThreadPool;
 use tof_dataclasses::monitoring as moni;
 
-use time::Duration;
 
 /// Non-register related constants 
 pub const HEARTBEAT : u64 = 5; // heartbeat in s
@@ -570,10 +571,13 @@ fn reset_data_memory_aggressively() {
 ///
 ///  # Arguments 
 ///
-///  * will_panic : The function calls itself recursively and 
-///                 will panic after this many calls to itself
+///  * will_panic    : The function calls itself recursively and 
+///                    will panic after this many calls to itself
 ///
-fn make_sure_it_runs(will_panic : &mut u8) {
+///  * force_trigger : Run in force trigger mode
+///
+fn make_sure_it_runs(will_panic : &mut u8,
+                     force_trigger : bool) {
   let when_panic : u8 = RESTART_TRIES;
   *will_panic += 1;
   if *will_panic == when_panic {
@@ -593,6 +597,10 @@ fn make_sure_it_runs(will_panic : &mut u8) {
   thread::sleep(five_milli);
   reset_data_memory_aggressively();
   thread::sleep(five_milli);
+  if force_trigger {
+    disable_master_trigger_mode();
+  }
+
   match start_drs4_daq() {
     Err(err) => {
       debug!("Got err {:?} when trying to start the drs4 DAQ!", err);
@@ -610,7 +618,7 @@ fn make_sure_it_runs(will_panic : &mut u8) {
   if get_buff_size(&buf_a).unwrap_or(0) == buf_size_a &&  
       get_buff_size(&buf_b).unwrap_or(0) == buf_size_b {
     warn!("Buffers are not filling! Running setup again!");
-    make_sure_it_runs(will_panic);
+    make_sure_it_runs(will_panic, force_trigger);
   } 
 }
 
@@ -661,21 +669,23 @@ fn kill_run(will_panic : &mut u8) {
 ///
 ///  # Arguments
 ///
-///  * max_events  : Acqyire this number of events
-///  * max_seconds : Let go for the specific runtime
-///  * max_errors  : End myself when I see a certain
-///                  number of errors
-///  * kill_signal : End run when this line is at bool 
-///                  1
-///  * prog_op_ev  : An option for a progress bar which
-///                  is helpful for debugging
+///  * max_events     : Acqyire this number of events
+///  * max_seconds    : Let go for the specific runtime
+///  * max_errors     : End myself when I see a certain
+///                     number of errors
+///  * kill_signal    : End run when this line is at bool 
+///                     1
+///  * prog_op_ev     : An option for a progress bar which
+///                     is helpful for debugging
+///  * force_trigger  : Run in forced trigger mode
 ///
-pub fn runner(max_events  : Option<u64>,
-              max_seconds : Option<u64>,
-              max_errors  : Option<u64>,
-              progress    : Option<Sender<u64>>,
-              run_params  : &Receiver<RunParams>,
-              kill_signal : Option<&Receiver<bool>>) {
+pub fn runner(max_events          : Option<u64>,
+              max_seconds         : Option<u64>,
+              max_errors          : Option<u64>,
+              progress            : Option<Sender<u64>>,
+              run_params          : &Receiver<RunParams>,
+              kill_signal         : Option<&Receiver<bool>>,
+              force_trigger_rate  : u32) {
               //prog_op_ev  : Option<Box<ProgressBar>>) {
   
   let one_milli        = time::Duration::from_millis(1);
@@ -687,12 +697,19 @@ pub fn runner(max_events  : Option<u64>,
   let mut n_events     : u64 = 0;
   let mut n_errors     : u64 = 0;
 
+  let mut timer        = Instant::now();
+  let force_trigger    = force_trigger_rate > 0;
+  let mut time_between_events : Option<f32> = None;
+  if force_trigger {
+    time_between_events = Some(1.0/(force_trigger_rate as f32));
+  }
+
   let now = time::Instant::now();
 
   let mut terminate = false;
   // the runner will specifically set up the DRS4
   let mut will_panic : u8 = 0;
-  make_sure_it_runs(&mut will_panic);
+  make_sure_it_runs(&mut will_panic, force_trigger);
   info!("Begin Run!");
   'cmd: loop {
     let mut pars : RunParams;
@@ -712,6 +729,13 @@ pub fn runner(max_events  : Option<u64>,
       info!("Will stop a current run!")
     }
     'run: loop {
+      if force_trigger {
+        if timer.elapsed().as_secs_f32() > time_between_events.unwrap() {
+          timer = Instant::now(); 
+          trigger();
+        }
+      }
+
       match get_event_count() {
         Err (err) => {
           debug!("Can not obtain event count! Err {:?}", err);
@@ -861,6 +885,7 @@ pub fn event_cache_worker(recv_ev_pl    : Receiver<RBEventPayload>,
           oldest_event_id = event.event_id;
         } //endif
         // store the event in the cache
+        trace!("Received payload with event id {}" ,event.event_id);
         event_cache.insert(event.event_id, event);   
         // keep track of the oldest event_id
         debug!("We have a cache size of {}", event_cache.len());
@@ -879,6 +904,7 @@ pub fn event_cache_worker(recv_ev_pl    : Receiver<RBEventPayload>,
       for payload in event_cache.values() {
         // FIXME - this is bad! Too much allocation
         let tp = TofPacket::from(payload);
+        //info!("{}", tp);
         match tp_to_pub.try_send(tp) {
           Err(err) => {
             trace!("Error sending! {err}");
@@ -1193,10 +1219,6 @@ pub fn buff_handler(which       : &BlobBuffer,
         }
       }
     }
-    //match prog_bar {
-    //  Some(bar) => bar.set_position(0),
-    //  None      => () 
-    //}
     thread::sleep(sleep_after_reg_write);
   } else { // endf has tripped
     match &prog_sender {
@@ -1259,6 +1281,7 @@ pub fn event_payload_worker(bs_recv   : &Receiver<Vec<u8>>,
   'main : loop {
     let mut start_pos : usize = 0;
     n_events = 0;
+    let mut debug_evids = Vec::<u32>::new();
     match bs_recv.recv() {
       Ok(bytestream) => {
         'bytestream : loop {
@@ -1267,14 +1290,18 @@ pub fn event_payload_worker(bs_recv   : &Receiver<Vec<u8>>,
               let tail_pos   = head_pos + BlobData::SERIALIZED_SIZE;
               if tail_pos > bytestream.len() - 1 {
                 // we are finished here
-                debug!("Work on current blob complete. Extracted {n_events} events. Got last event_id! {event_id}");
+                trace!("Work on current blob complete. Extracted {n_events} events. Got last event_id! {event_id}");
+                //trace!("{:?}", debug_evids);
                 break 'bytestream;
               }
               event_id   = BlobData::decode_event_id(&bytestream[head_pos..tail_pos]);
+              debug_evids.push(event_id);
+              info!("Got event_id {event_id}");
               n_events += 1;
               start_pos = tail_pos;
               let mut payload = Vec::<u8>::new();
               payload.extend_from_slice(&bytestream[head_pos..tail_pos]);
+              trace!("Got payload size {}", &payload.len());
               let rb_payload = RBEventPayload::new(event_id, payload); 
               match ev_sender.send(rb_payload) {
                 Ok(_) => (),
