@@ -79,11 +79,13 @@ use tof_dataclasses::packets::TofPacket;
 #[derive(Parser, Debug)]
 #[command(author = "J.A.Stoessl", version, about, long_about = None)]
 struct Args {
-  /// Increase output for debugging
-  #[arg(short, long, default_value_t = false)]
-  debug: bool,
+  /// Write the raw data from the readoutboards,
+  /// one file per readoutboard
   #[arg(short, long, default_value_t = false)]
   write_blob: bool,
+  /// Dump the entire TofPacket Stream to a file
+  #[arg(long, default_value_t = false)]
+  write_stream: bool,
   #[arg(short, long, default_value_t = false)]
   use_master_trigger: bool,
   #[arg(long, default_value_t = false)]
@@ -114,11 +116,13 @@ fn main() {
   // welcome banner!
   //
   println!("-----------------------------------------------");
-  println!(" ** Welcome to crusty_kraken {} *****", kraken);
-  println!(" .. TOF C&C and data acquistion suite");
+  println!(" ** Welcome to liftof-cc \u{1F680} \u{1F388} *****");
+  println!(" .. liftof if a software suite for the time-of-flight detector ");
   println!(" .. for the GAPS experiment {}", sparkle_heart);
-  println!("-----------------------------------------------");
-  println!("");
+  println!(" .. This is the Command&Control server which connects to the MasterTriggerBoard and the ReadoutBoards");
+  println!(" .. see the gitlab repository for documentation and submitting issues at" );
+  println!(" **https://uhhepvcs.phys.hawaii.edu/Achim/gaps-online-software/-/tree/main/tof/liftof**");
+
 
   // deal with command line arguments
   let args = Args::parse();
@@ -129,7 +133,11 @@ fn main() {
   if write_blob {
     info!("Will write blob data to file!");
   }
-  
+ 
+  let write_stream = args.write_stream;
+  if write_stream {
+    info!("Will write the entire stream to files");
+  }
   let json_content  : String;
   let config        : json::JsonValue;
   
@@ -282,7 +290,8 @@ fn main() {
   });
   
   worker_threads.execute(move || {
-                         global_data_sink(&tp_from_client);
+                         global_data_sink(&tp_from_client,
+                                          write_stream);
   });
 
   // open a zmq context

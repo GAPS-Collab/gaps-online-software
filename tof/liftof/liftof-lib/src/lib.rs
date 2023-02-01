@@ -5,6 +5,8 @@ use port_scanner::scan_ports_addrs;
 use std::error::Error;
 use std::fmt;
 use std::net::{IpAddr, Ipv4Addr};
+use std::io::Write;
+
 // FIXME - remove this crate
 //use mac_address::MacAddress;
 use zmq;
@@ -15,10 +17,13 @@ use macaddr::MacAddr6;
 use netneighbours::get_mac_to_ip_map;
 
 use std::fs::File;
+use std::fs::OpenOptions;
+
 use std::io::{self, BufRead};
 use std::path::Path;
 
 use tof_dataclasses::commands::{TofCommand, TofResponse};
+use tof_dataclasses::packets::TofPacket;
 
 extern crate pretty_env_logger;
 #[macro_use] extern crate log;
@@ -49,7 +54,62 @@ where P: AsRef<Path>, {
     Ok(io::BufReader::new(file).lines())
 }
 
+/// Open a new file and write TofPackets
+/// in binary representation
+///
+/// One packet per line
+///
+pub struct TofPacketWriter {
 
+  //pub filename : String,
+  pub file        : File,
+  pub file_prefix : String,
+  pkts_per_file   : usize,
+  file_id         : usize,
+  n_packets       : usize,
+}
+
+impl TofPacketWriter {
+
+  /// Instantiate a new PacketWriter 
+  ///
+  /// # Arguments
+  ///
+  /// * file_prefix : Prefix file with this string. A continuous number will get 
+  ///                 appended to control the file size.
+  pub fn new(file_prefix : String) -> TofPacketWriter {
+    let filename = file_prefix.clone() + "_0.tof.gaps";
+    let path = Path::new(&filename); 
+    let file = OpenOptions::new().append(true).open(path).expect("Unable to open file {filename}");
+    TofPacketWriter {
+      file,
+      file_prefix   : file_prefix,
+      pkts_per_file : 10000,
+      file_id : 0,
+      n_packets : 0,
+    }
+  }
+
+  pub fn add_tof_packet(&mut self, packet : &TofPacket) {
+    let buffer = packet.to_bytestream();
+    self.file.write_all(buffer.as_slice()); 
+    self.n_packets += 1;
+    if self.n_packets == self.pkts_per_file {
+      //drop(self.file);
+      let filename = self.file_prefix.clone() + "_" + &self.file_id.to_string() + ".tof.gaps";
+      let path  = Path::new(&filename);
+      self.file = OpenOptions::new().append(true).open(path).expect("Unable to open file {filename}");
+      self.n_packets = 0;
+    }
+  }
+}
+
+impl Default for TofPacketWriter {
+  fn default() -> TofPacketWriter {
+    TofPacketWriter::new(String::from(""))
+  }
+
+}
 
 /// Get a list of ReadoutBoards from a json file
 pub fn rb_manifest_from_json(config : json::JsonValue) -> Vec<ReadoutBoard> {

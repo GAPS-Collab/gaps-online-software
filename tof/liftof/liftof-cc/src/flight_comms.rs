@@ -13,12 +13,15 @@ use crossbeam_channel as cbc;
 
 use tof_dataclasses::packets::TofPacket;
 
+use liftof_lib::TofPacketWriter;
+
 /// Manages "outgoing" 0MQ PUB socket
 ///
 /// Everything should send to here, and 
 /// then it gets passed on over the 
 /// connection to the flight computer
-pub fn global_data_sink(incoming : &cbc::Receiver<TofPacket>) {
+pub fn global_data_sink(incoming : &cbc::Receiver<TofPacket>,
+                        write_stream : bool) {
 
   let ctx = zmq::Context::new();
   let mut address_ip = String::from("tcp://");
@@ -36,10 +39,17 @@ pub fn global_data_sink(incoming : &cbc::Receiver<TofPacket>) {
   data_socket.bind(&data_address);
   info!("ZMQ PUB Socket for globa data sink bound at {data_address}");
 
+  let mut writer : Option<TofPacketWriter> = None;
+  if write_stream {
+    writer = Some(TofPacketWriter::new(String::from("stream")));
+  }
   loop {
     match incoming.recv() {
       Err(err) => trace!("No new packet, err {err}"),
       Ok(pack) => {
+        if writer.is_some() {
+          writer.as_mut().unwrap().add_tof_packet(&pack);
+        }
         match data_socket.send(pack.to_bytestream(),0) {
           Err(err) => warn!("Not able to send packet over 0MQ PUB"),
           Ok(_)    => trace!("TofPacket sent")
