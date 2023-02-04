@@ -122,13 +122,11 @@ fn main() {
   let fish                  = vec![240, 159, 144, 159];
   let sparkles              = vec![226, 156, 168];
   let rocket                = vec![240, 159, 154, 128];
-  let balloon               = vec![243, 190, 148, 150];
   // We know these bytes are valid, so we'll use `unwrap()`.
   let sparkle_heart    = String::from_utf8(sparkle_heart).unwrap();
   let kraken           = String::from_utf8(kraken).unwrap();
   let fish             = String::from_utf8(fish).unwrap();
   let sparkles         = String::from_utf8(sparkles).unwrap();
-  let balloon          = String::from_utf8(balloon).unwrap();
   let rocket           = String::from_utf8(rocket).unwrap();
 
   // General parameters, readout board id,, 
@@ -316,26 +314,9 @@ fn main() {
                       switch_buff);
   });
 
-  // create 0MQ sockedts
-  //let ctx = zmq::Context::new();
-  //let cmd_socket = ctx.socket(zmq::REP).expect("Unable to create 0MQ REP socket!");
-
-  if !dont_listen {  
-    //info!("Will set up 0MQ REP socket at address {cmd_address}");
-    //cmd_socket.bind(&cmd_address).expect("Unable to bind to command socket at {cmd_address}!");
-    //
-    //info!("0MQ REP socket listening at {cmd_address}");
-    //println!("Waiting for client to connect...");
-    //// block until we get a client
-    //let client_response = cmd_socket.recv_bytes(0).expect("Communication to client failed!");
-    //let resp =  String::from_utf8(client_response).expect("Got garbage response from client. If we start like this, I panic right away...");
-    //println!("Client connected! Response {resp}");
-    //let response = String::from("[MAIN] - connected");
-    //match cmd_socket.send(response.as_bytes(), 0) {
-    //  Err(err) => warn!("Unable to send ping response! Err {err}"),
-    //  Ok(_)    => info!("Responded to ping!")
-    //}
-  } else {
+  // if we are not listening to the C&C server,
+  // we have to start the run thread here
+  if dont_listen {  
     let mut p_op : Option<Sender<u64>> = None;
     if show_progress {
       let tmp_send = pb_ev_up_send.clone();
@@ -359,7 +340,7 @@ fn main() {
       is_active : true,
     };
     match run_params_to_main.send(run_pars) {
-      Err(err) => warn!("Could not initialzie Run!"),
+      Err(err) => warn!("Could not initialzie Run! Err {err}"),
       Ok(_)    => info!("Run initialized!")
     }
   }
@@ -421,10 +402,14 @@ fn main() {
   let mut run_active = false;
   
   loop {
-
     // what we are here listening to, are commands which 
     // impact threads. E.g. StartRun will start a new data run
     // which is it's own thread
+    if dont_listen {
+      thread::sleep(10*one_sec);
+      continue;
+    }
+
     match run_params_from_cmdr.recv() {
       Err(err) => trace!("Did not receive a new set of run pars {err}"),
       Ok(run)    => {
@@ -434,7 +419,7 @@ fn main() {
           if run_active {
             let resp = TofResponse::GeneralFail(RESP_ERR_RUNACTIVE);
             match rsp_to_sink.send(resp) {
-              Err(err) => trace!("Unable to send response!"),
+              Err(err) => warn!("Unable to send response! Err {err}"),
               Ok(_)    => ()
             }
           } else {
@@ -454,196 +439,8 @@ fn main() {
             });
           }
         }
-
       }
     }
-    // step 1 - check the individual 
-    // channels and send everything 
-    // down the global sink
-    // (non-blocking hence try_recv)
-    //match data_fr_moni.try_recv() { 
-    //  Err(_) => (),
-    //  Ok(payload)  => {
-    //    // FIXME  - it should receive a moni
-    //    // packet, not the bytestream ?
-    //    let mut tp = TofPacket::new();
-    //    tp.packet_type  = PacketType::Monitor;
-    //    tp.payload      = payload;
-    //    let tp_payload  = tp.to_bytestream();
-    //
-    //    // wrap the payload into the 
-    //    match data_socket.send(tp_payload,zmq::DONTWAIT) {
-    //      Ok(_)  => debug!("Send payload over 0MQ PUB socket!"),
-    //      Err(_) => warn!("Not able to send over 0MQ PUB socket!"),
-    //    }
-    //  }  
-    //}
-
-    // Send events if they are ready.
-    //match ev_pl_from_cache.try_recv() {
-    //  Err(_) => (),
-    //  Ok(rbevent_op) => {
-    //    match rbevent_op {
-    //      None     => (),
-    //      Some(ev) =>{
-    //        let mut tp = TofPacket::new();
-    //        tp.packet_type  = PacketType::RBEvent;
-    //        tp.payload      = ev.payload;
-    //        let tp_payload  = tp.to_bytestream();
-    //        match data_socket.send(tp_payload,zmq::DONTWAIT) {
-    //          Ok(_)  => debug!("Send payload over 0MQ PUB socket!"),
-    //          Err(_) => warn!("Not able to send over 0MQ PUB socket!"),
-    //        }
-    //      }
-    //    }  
-    //  }  
-    //}
-    //// if we are not listening to any
-    //// c&c, we can skip the next step
-    //if dont_listen {
-    //  continue;
-    //}
-
-    // step 2 - deal with commands
-    // this can not block, so we want 
-    // to poll first.
-    // The second parameter is the 
-    // timeout, which probably needs
-    // to be adjusted.
-    //match cmd_socket.poll(zmq::POLLIN, 1) {
-    //  Err(err) => {
-    //    warn!("Polling the 0MQ command socket failed! Err: {err}");
-    //    thread::sleep(one_milli);
-    //    continue;
-    //  }
-    //  Ok(has_data) => {
-    //    // if there is no command,
-    //    // then let's go back to 
-    //    // the beginning and 
-    //    // work on sending stuff.
-    //    if has_data == 0 {
-    //      continue;
-    //    }
-    //  }
-    //}
-
-    //// at this point, we have a new command from most likely 
-    //// the tof computer
-    //debug!("We received something over the command channel!");
-    //let incoming = cmd_socket.recv_bytes(0);
-    //match incoming {
-    //  Err(err) => {
-    //    warn!("CMD socket error {err}");
-    //    // sleep for a bit and see if it recovers
-    //    thread::sleep(one_sec);
-    //    continue;
-    //  },
-    //  Ok(_) => (),
-    //}
-    //let raw_command = incoming.unwrap();
-    //debug!("Raw command bytes : {:?}", raw_command);
-    //match TofCommand::from_bytestream(&raw_command,0) {
-    //  Err(err) => {
-    //    warn!("Can not decode Command! Err {:?}", err);
-    //    warn!("Received {:?} ", raw_command);
-    //    let resp = cmd::TofResponse::SerializationIssue(cmd::RESP_ERR_LEVEL_MEDIUM); 
-    //    match cmd_socket.send(resp.to_bytestream(),0) {
-    //      Err(err) => warn!("Can not send responses, error {err}"),
-    //      Ok(_)    => trace!("Command sent successfully!")
-    //    }
-    //    continue;
-    //  },
-    //  Ok(c) => {
-    //    //let result;// : Result<TofResponse>;
-
-    //    // at this point, we have a valid command!
-    //    info!("Received command {:?}", c);
-    //    // intercept commands which require to spawn/kill 
-    //    // threads
-    //    //match c {
-    //    //  TofCommand::DataRunStart (max_event) => {
-    //    //    // let's start a run. The value of the TofCommnad shall be 
-    //    //    // nevents
-    //    //    if run_active {
-    //    //      warn!("Can not start a new run, stop the current first!");  
-    //    //      result = Ok(TofResponse::GeneralFail(cmd::RESP_ERR_RUNACTIVE));
-    //    //      match cmd_socket.send(result.unwrap().to_bytestream(),0) {
-    //    //        Err(err) => warn!("Unable to send response! Err {err}"),
-    //    //        Ok(_)    => ()
-    //    //      }
-    //    //    } else {
-    //    //      info!("Attempting to launch a new runner with {max_event} events!");
-    //    //      //let bar_clone = prog_op_ev.clone();
-    //    //      let rk = run_gets_killed.clone();
-    //    //      let mut p_op : Option<Sender<u64>> = None;
-    //    //      if show_progress {
-    //    //        let tmp_send = pb_ev_up_send.clone();
-    //    //        p_op = Some(tmp_send); 
-    //    //      }
-    //    //      
-    //    //      workforce.execute(move || {
-    //    //          runner(Some(max_event as u64),
-    //    //                 None,
-    //    //                 None,
-    //    //                 //FIXME - maybe use crossbeam?
-    //    //                 p_op,
-    //    //                 Some(&rk));
-    //    //                 //bar_clone);
-    //    //      }); 
-    //    //      run_active = true;
-    //    //      result = Ok(TofResponse::Success(cmd::RESP_SUCC_FINGERS_CROSSED));
-    //    //      match cmd_socket.send(result.unwrap().to_bytestream(),0) {
-    //    //        Err(err) => warn!("Unable to send response! Err {err}"),
-    //    //        Ok(_)    => trace!("Sent response successfully!")
-    //    //      }
-    //    //    }
-    //    //  },
-    //    //  TofCommand::DataRunEnd (_)  => {
-    //    //    if !run_active {
-    //    //      warn!("Can not kill run, since there is currently none in progress!");
-    //    //      result = Ok(TofResponse::GeneralFail(cmd::RESP_ERR_NORUNACTIVE));
-    //    //      match cmd_socket.send(result.unwrap().to_bytestream(),0) {
-    //    //        Err(err) => warn!("Unable to send response! Err {err}"),
-    //    //        Ok(_)    => trace!("Response sent successfully")
-    //    //      }
-    //    //    } else {
-    //    //      warn!("Attempting to kill current run!");
-    //    //      match kill_run.send(true) {
-    //    //        Err(err) => warn!("Can not send kill command to runner! Unable to stop run! Err {err}"),
-    //    //        Ok(_)    => info!("Send kill command successful!")
-    //    //      }
-    //    //      run_active = false;
-    //    //      result = Ok(TofResponse::Success(cmd::RESP_SUCC_FINGERS_CROSSED));
-    //    //      match cmd_socket.send(result.unwrap().to_bytestream(),0) {
-    //    //        Err(err) => warn!("Can not send result! Err {err}"),
-    //    //        Ok(_)    => trace!("Sent command successfully")
-    //    //      }
-    //    //    }
-    //    //  },
-    //    //  _ => {
-    //    //    // forward the rest to the executor
-    //    //    //result = executor.command(&c);
-    //    //    //match result {
-    //    //    //  Err(err) => {
-    //    //    //    warn!("Command Failed! Err {:?}", err);
-    //    //    //    // FIXME - work on error codes
-    //    //    //    resp = cmd::TofResponse::GeneralFail(cmd::RESP_ERR_UNEXECUTABLE);
-    //    //    //    match cmd_socket.send(resp.to_bytestream(),0) {
-    //    //    //      Err(err) => warn!("Error! Can not send responses! {err}"),
-    //    //    //      Ok(_)    => trace!("Send response successfully!")
-    //    //    //    } 
-    //    //    //  }
-    //    //    //  Ok(r) =>  {
-    //    //    //    match cmd_socket.send(r.to_bytestream(),0) {
-    //    //    //      Err(err) => warn!("Error! Can not send responses! {err}"),
-    //    //    //      Ok(_)    => trace!("Send response successfully!")
-    //    //    //    }
-    //    //    //  }
-    //    //    //}
-    //    //  } // end all other commands
-    //    //} // end match
-    //  }
-    //}
   } // end loop
 } // end main
 

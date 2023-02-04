@@ -13,7 +13,8 @@ use std::time::{Duration,
                 Instant};
 
 use crate::reduced_tofevent::TofEvent;
-use crate::master_trigger::MasterTriggerEvent;
+//use crate::master_trigger::MasterTriggerEvent;
+use tof_dataclasses::events::MasterTriggerEvent;
 use crate::constants::EVENT_BUILDER_EVID_CACHE_SIZE;
 use tof_dataclasses::packets::{PacketType,
                                TofPacket};

@@ -40,6 +40,7 @@ pub const PACKET_TYPE_TOFEVENT  : u8 = 21;
 pub const PACKET_TYPE_MONITOR   : u8 = 30;
 pub const PACKET_TYPE_HEARTBEAT : u8 = 40;
 pub const PACKET_TYPE_SCALAR    : u8 = 50;
+pub const PACKET_TYPE_MT        : u8 = 60;
 
 //// Each packet is send from somewhere.
 ////
@@ -71,38 +72,41 @@ pub const PACKET_TYPE_SCALAR    : u8 = 50;
 #[derive(Debug, PartialEq, Clone)]
 //#[repr(u8)]
 pub enum PacketType {
-  Unknown   , 
-  Command   ,
-  RBEvent   ,
-  TofEvent  ,
-  Monitor   ,
-  HeartBeat ,
-  Scalar    ,
+  Unknown       , 
+  Command       ,
+  RBEvent       ,
+  TofEvent      ,
+  Monitor       ,
+  MasterTrigger , 
+  HeartBeat     ,
+  Scalar        ,
 }
 
 impl PacketType {
   pub fn as_u8(packet_type : &PacketType)   -> u8 {
     match packet_type {
-      PacketType::Unknown   => PACKET_TYPE_UNKNOWN,
-      PacketType::Command   => PACKET_TYPE_COMMAND,
-      PacketType::RBEvent   => PACKET_TYPE_RBEVENT,
-      PacketType::TofEvent  => PACKET_TYPE_TOFEVENT,
-      PacketType::Monitor   => PACKET_TYPE_MONITOR,
-      PacketType::HeartBeat => PACKET_TYPE_HEARTBEAT,
-      PacketType::Scalar    => PACKET_TYPE_SCALAR
+      PacketType::Unknown       => PACKET_TYPE_UNKNOWN,
+      PacketType::Command       => PACKET_TYPE_COMMAND,
+      PacketType::RBEvent       => PACKET_TYPE_RBEVENT,
+      PacketType::TofEvent      => PACKET_TYPE_TOFEVENT,
+      PacketType::Monitor       => PACKET_TYPE_MONITOR,
+      PacketType::HeartBeat     => PACKET_TYPE_HEARTBEAT,
+      PacketType::MasterTrigger => PACKET_TYPE_MT,
+      PacketType::Scalar        => PACKET_TYPE_SCALAR
     }
 
   }
 
   pub fn from_u8(value : u8) -> Option<PacketType> {
     match value {
-      0   => Some(PacketType::Unknown),  
-      10  => Some(PacketType::Command), 
-      20  => Some(PacketType::RBEvent), 
-      21  => Some(PacketType::TofEvent),
-      30  => Some(PacketType::Monitor), 
-      40  => Some(PacketType::HeartBeat),
-      50  => Some(PacketType::Scalar),
+      PACKET_TYPE_UNKNOWN   => Some(PacketType::Unknown),  
+      PACKET_TYPE_COMMAND   => Some(PacketType::Command), 
+      PACKET_TYPE_RBEVENT   => Some(PacketType::RBEvent), 
+      PACKET_TYPE_TOFEVENT  => Some(PacketType::TofEvent),
+      PACKET_TYPE_MONITOR   => Some(PacketType::Monitor), 
+      PACKET_TYPE_HEARTBEAT => Some(PacketType::HeartBeat),
+      PACKET_TYPE_MT        => Some(PacketType::MasterTrigger),
+      PACKET_TYPE_SCALAR    => Some(PacketType::Scalar),
       _   => None,
     }
   }

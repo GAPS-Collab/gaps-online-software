@@ -29,6 +29,9 @@ use std::fmt;
 use std::error::Error;
 use crate::errors::IPBusError;
 
+use crate::serialization::{Serialization,
+                           SerializationError};
+
 //const MT_MAX_PACKSIZE   : usize = 4096;
 /// Maximum packet size of packets we can 
 /// receive over UDP via the IPBus protocoll
@@ -123,6 +126,14 @@ pub struct MasterTriggerEvent {
 }
 
 impl MasterTriggerEvent {
+  // 21 + 4 byte board mask + 4*4 bytes hit mask
+  // => 25 + 16 = 41 
+  // + head + tail
+  // 45
+  const SIZE : usize = 45;
+  const TAIL : u16 = 0x555;
+  const HEAD : u16 = 0xAAAA;
+
   pub fn new(event_id  : u32, 
              n_paddles : u8) -> MasterTriggerEvent {
     MasterTriggerEvent {
@@ -135,13 +146,70 @@ impl MasterTriggerEvent {
       board_mask    : [false;32],
       //ne 16 bit value per LTB
       hits          : [[false;32]; 32],
+      // valid does not get serialized
       valid     : true
     }   
   }
-  
+
+  pub fn to_bytestream(&self) -> Vec::<u8> {
+    let mut bs = Vec::<u8>::with_capacity(MasterTriggerEvent::SIZE);
+    bs.extend_from_slice(&MasterTriggerEvent::HEAD.to_le_bytes());
+    bs.extend_from_slice(&self.event_id.to_le_bytes()); 
+    bs.extend_from_slice(&self.timestamp.to_le_bytes());
+    bs.extend_from_slice(&self.tiu_timestamp.to_le_bytes());
+    bs.extend_from_slice(&self.tiu_gps_32.to_le_bytes());
+    bs.extend_from_slice(&self.tiu_gps_16.to_le_bytes());
+    bs.extend_from_slice(&self.n_paddles.to_le_bytes());
+    let mut board_mask : u32 = 0;
+    for n in 0..32 {
+      if self.board_mask[n] {
+        board_mask += 2_u32.pow(n as u32);
+      }
+    }
+    bs.extend_from_slice(&board_mask.to_le_bytes());
+    for n in 0..32 {
+      let mut hit_mask : u32 = 0;
+      for j in 0..32 {
+        if self.hits[n][j] {
+          hit_mask += 2_u32.pow(j as u32);
+        }
+      }
+      bs.extend_from_slice(&hit_mask.to_le_bytes());
+    }
+    bs.extend_from_slice(&MasterTriggerEvent::TAIL.to_le_bytes());
+    bs
+  }
+
+
+
   pub fn invalidate(&mut self) {
     self.valid = false;
   }
+}
+
+impl Serialization for MasterTriggerEvent {
+
+  fn from_bytestream(bytestream : &Vec<u8>,
+                     start_pos  : usize)
+    -> Result<Self, SerializationError> {
+    let bs = bytestream;
+    let mut pos = start_pos;
+    let mt = MasterTriggerEvent::new(0,0);
+    let header = u16::from_le_bytes([bs[pos],bs[pos + 1]]); 
+    if header != MasterTriggerEvent::HEAD {
+      return Err(SerializationError::HeadInvalid);
+    }
+    //bs.extend_from_slice(&MasterTriggerEvent::HEAD.to_le_bytes());
+    //bs.extend_from_slice(&self.event_id.to_le_bytes()); 
+    //bs.extend_from_slice(&self.timestamp.to_le_bytes());
+    //bs.extend_from_slice(&self.tiu_timestamp.to_le_bytes());
+    //bs.extend_from_slice(&self.tiu_gps_32.to_le_bytes());
+    //bs.extend_from_slice(&self.tiu_gps_16.to_le_bytes());
+    //bs.extend_from_slice(&self.n_paddles.to_le_bytes());
+
+    Ok(mt)
+  }
+
 }
 
 impl Default for MasterTriggerEvent {
@@ -168,21 +236,6 @@ impl IPBusPacket {
     IPBusPacket {}
   }
 }
-
-
-
-
-////// Little helper to count the ones in a bit mask
-///fn count_ones(input :u32) -> u32 {
-///  let mut count = 0u32;
-///  let mut value = input;
-///  while value > 0 {
-///    count += value & 1;
-///    value >>= 1;
-///  }
-///  count
-///}
-
 
 /// Encode register addresses and values in IPBus packet
 ///

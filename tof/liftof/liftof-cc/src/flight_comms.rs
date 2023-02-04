@@ -36,7 +36,10 @@ pub fn global_data_sink(incoming : &cbc::Receiver<TofPacket>,
   // FIXME - should we just move to another socket if that one is not working?
   let data_socket = ctx.socket(zmq::PUB).expect("Can not create socket!");
 
-  data_socket.bind(&data_address);
+  match data_socket.bind(&data_address) {
+    Err(err) => panic!("Can not bind to address {}, Err {}", data_address, err),
+    Ok(_)    => ()
+  }
   info!("ZMQ PUB Socket for globa data sink bound at {data_address}");
 
   let mut writer : Option<TofPacketWriter> = None;

@@ -2,7 +2,7 @@ extern crate memmap;
 
 use std::error::Error;
 use std::fs::File;
-
+use std::fmt;
 
 use memmap::{Mmap,
              MmapMut};
@@ -46,6 +46,12 @@ pub const SIZEOF_U32 : usize = 4;
 pub struct RegisterError {
 }
 
+impl fmt::Display for RegisterError {
+
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    write!(f, "{}", "<RegisterError>")
+  }
+}
 
 ///! There are 2 data buffers, commonly 
 ///  denoted as "A" and "B".

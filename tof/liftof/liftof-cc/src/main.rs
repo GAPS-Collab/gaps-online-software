@@ -59,8 +59,9 @@ extern crate crossbeam_channel;
 use crossbeam_channel as cbc; 
 
 use crate::readoutboard_comm::readoutboard_communicator;
-use crate::master_trigger::{master_trigger,
-                            MasterTriggerEvent};
+use crate::master_trigger::{master_trigger};
+use tof_dataclasses::events::MasterTriggerEvent;
+//                            MasterTriggerEvent};
 use crate::event_builder::{event_builder,
                            TofEventBuilderSettings};
                            //event_builder_no_master};
@@ -310,6 +311,7 @@ fn main() {
   //}
 
   println!("==> Starting event builder and master trigger threads...");
+  let tp_to_sink_c = tp_to_sink.clone();
   if use_master_trigger {
     // start the event builder thread
     worker_threads.execute(move || {
@@ -324,6 +326,7 @@ fn main() {
     worker_threads.execute(move || {
                            master_trigger(&master_trigger_ip, 
                                           master_trigger_port,
+                                          &tp_to_sink_c,
                                           &master_ev_send);
     });
   } else {

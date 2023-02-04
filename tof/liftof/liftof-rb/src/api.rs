@@ -57,7 +57,16 @@ pub struct RunParams {
   pub is_active : bool,
 }
 
+impl RunParams {
 
+  pub fn new() -> RunParams {
+    RunParams {
+      forever   : false,
+      nevents   : 0,
+      is_active : false
+    }
+  }
+}
 
 /// Centrailized command management
 /// 
@@ -232,14 +241,6 @@ pub fn cmd_responder(rsp_receiver     : &Receiver<TofResponse>,
                       Err(err) => warn!("Problem initializing run!"),
                       Ok(_)    => ()
                     }
-                    //self.workforce.execute(move || {
-                    //    runner(Some(*max_event as u64),
-                    //           None,
-                    //           None,
-                    //           self.get_killed_chn,
-                    //           None);
-                    //}); 
-                    //return Ok(TofResponse::Success(RESP_SUCC_FINGERS_CROSSED));
                   }, 
                   TofCommand::DataRunEnd(_)   => {
                     let run_p = RunParams {
@@ -384,8 +385,8 @@ pub fn data_publisher(data : &Receiver<TofPacket>) {
         // FIXME - retries?
         let tp_payload = packet.to_bytestream();
         match data_socket.send(tp_payload,zmq::DONTWAIT) {
-          Ok(_)  => debug!("Send payload over 0MQ PUB socket!"),
-          Err(_) => warn!("Not able to send over 0MQ PUB socket!"),
+          Ok(_)  => trace!("0MQ PUB socket.send() SUCCESS!"),
+          Err(err) => warn!("Not able to send over 0MQ PUB socket! Err {err}"),
         }
       }
     }
@@ -591,9 +592,15 @@ fn make_sure_it_runs(will_panic : &mut u8,
   let five_milli = time::Duration::from_millis(5); 
   let two_secs   = time::Duration::from_secs(2);
   let five_secs  = time::Duration::from_secs(5);
-  idle_drs4_daq().unwrap_or(());
+  match idle_drs4_daq() {
+    Err(err) => warn!("Issue setting DAQ to idle mode! {}", err),
+    Ok(_)    => ()
+  }
   thread::sleep(five_milli);
-  setup_drs4().unwrap_or(());
+  match setup_drs4() { 
+    Err(err) => warn!("Issue running DRS4 setup routine {}", err),
+    Ok(_)    => ()
+  }
   thread::sleep(five_milli);
   reset_data_memory_aggressively();
   thread::sleep(five_milli);
@@ -686,13 +693,12 @@ pub fn runner(max_events          : Option<u64>,
               run_params          : &Receiver<RunParams>,
               kill_signal         : Option<&Receiver<bool>>,
               force_trigger_rate  : u32) {
-              //prog_op_ev  : Option<Box<ProgressBar>>) {
   
   let one_milli        = time::Duration::from_millis(1);
   let one_sec          = time::Duration::from_secs(1);
   let mut first_iter   = true; 
   let mut last_evt_cnt : u32 = 0;
-  let mut evt_cnt      : u32 = 0;
+  let mut evt_cnt      : u32;
   let mut delta_events : u64 = 0;
   let mut n_events     : u64 = 0;
   let mut n_errors     : u64 = 0;
@@ -701,7 +707,9 @@ pub fn runner(max_events          : Option<u64>,
   let force_trigger    = force_trigger_rate > 0;
   let mut time_between_events : Option<f32> = None;
   if force_trigger {
+    warn!("Will run in forced trigger mode with a rate of {force_trigger_rate} Hz!");
     time_between_events = Some(1.0/(force_trigger_rate as f32));
+    warn!(".. this means one trigger every {} seconds...", time_between_events.unwrap());
   }
 
   let now = time::Instant::now();
@@ -709,30 +717,42 @@ pub fn runner(max_events          : Option<u64>,
   let mut terminate = false;
   // the runner will specifically set up the DRS4
   let mut will_panic : u8 = 0;
-  make_sure_it_runs(&mut will_panic, force_trigger);
-  info!("Begin Run!");
+  let mut is_running = false;
+  let mut pars = RunParams::new();
   'cmd: loop {
-    let mut pars : RunParams;
-    match run_params.recv() {
-      Err(err) => {
-        trace!("Did not receive new RunParams!");
-        thread::sleep(one_milli);
-        continue;
+    if !is_running {
+      match run_params.try_recv() {
+        Err(err) => {
+          info!("Did not receive new RunParams! Err {err}");
+          thread::sleep(one_sec);
+          continue;
+        }
+        Ok(p) => {
+          info!("Received a new set of RunParams!");
+          pars = p;
+        }
       }
-      Ok(p) => {
-        pars = p;
+      // FIXME - the is_active switch is useless
+      if pars.is_active {
+        info!("Will start a new run!");
+        make_sure_it_runs(&mut will_panic, force_trigger);
+        info!("Begin Run!");
+        is_running = true;
+      } else {
+        info!("Got new run params, but they don't have the active flag set. Not doing anythign!")
       }
-    }
-    if pars.is_active {
-      info!("Will start a new run!");
-    } else {
-      info!("Will stop a current run!")
+    // as long as we did not see new 
+    // run params, wait for them
+    continue;
     }
     'run: loop {
       if force_trigger {
-        if timer.elapsed().as_secs_f32() > time_between_events.unwrap() {
+        let elapsed = timer.elapsed().as_secs_f32();
+        if elapsed > time_between_events.unwrap() {
           timer = Instant::now(); 
           trigger();
+        } else {
+          continue;
         }
       }
 
@@ -756,6 +776,7 @@ pub fn runner(max_events          : Option<u64>,
           }
         }
       } // end match
+
       delta_events = (evt_cnt - last_evt_cnt) as u64;
       n_events += delta_events;
       last_evt_cnt = evt_cnt;
@@ -786,44 +807,41 @@ pub fn runner(max_events          : Option<u64>,
         },
         None => ()
       }
-      match max_events {
-        None => (),
-        Some(max_e) => {
-          if n_events > max_e {
-            terminate = true;
-          }
-        }
-      }
       
-      match max_seconds {
-        None => (),
-        Some(max_t) => {
-          if now.elapsed().as_secs() > max_t {
-            terminate = true;
+      if !pars.forever {
+        match max_events {
+          None => (),
+          Some(max_e) => {
+            if n_events > max_e {
+              terminate = true;
+            }
           }
         }
-      }
+        
+        match max_seconds {
+          None => (),
+          Some(max_t) => {
+            if now.elapsed().as_secs() > max_t {
+              terminate = true;
+            }
+          }
+        }
 
-      match max_errors {
-        None => (),
-        Some(max_e) => {
-          if n_errors > max_e {
-            terminate = true;
+        match max_errors {
+          None => (),
+          Some(max_e) => {
+            if n_errors > max_e {
+              terminate = true;
+            }
           }
         }
       }
       // exit loop on n event basis
       if terminate {
-        //match prog_op_ev {
-        //  None => (),
-        //  Some(ref bar) => {
-        //    bar.finish();
-        //  }
-        //}
-        break;
+        break 'run;
       }
       // save cpu
-      thread::sleep(one_sec);
+      //thread::sleep(one_sec);
     } // end 'run loop 
   } // end 'cmd loop
   // if the end condition is met, we stop the run
@@ -864,7 +882,7 @@ pub fn event_cache_worker(recv_ev_pl    : Receiver<RBEventPayload>,
   loop {
     // check changes in operation mode
     match get_op_mode.try_recv() {
-      Err(err) => trace!("No op mode change detected!"),
+      Err(err) => trace!("No op mode change detected! Err {err}"),
       Ok(mode) => {
         warn!("Will change operation mode to {:?}!", mode);
         match mode {
@@ -1281,7 +1299,7 @@ pub fn event_payload_worker(bs_recv   : &Receiver<Vec<u8>>,
   'main : loop {
     let mut start_pos : usize = 0;
     n_events = 0;
-    let mut debug_evids = Vec::<u32>::new();
+    //let mut debug_evids = Vec::<u32>::new();
     match bs_recv.recv() {
       Ok(bytestream) => {
         'bytestream : loop {
@@ -1295,8 +1313,8 @@ pub fn event_payload_worker(bs_recv   : &Receiver<Vec<u8>>,
                 break 'bytestream;
               }
               event_id   = BlobData::decode_event_id(&bytestream[head_pos..tail_pos]);
-              debug_evids.push(event_id);
-              info!("Got event_id {event_id}");
+              //debug_evids.push(event_id);
+              //info!("Got event_id {event_id}");
               n_events += 1;
               start_pos = tail_pos;
               let mut payload = Vec::<u8>::new();
@@ -1305,7 +1323,7 @@ pub fn event_payload_worker(bs_recv   : &Receiver<Vec<u8>>,
               let rb_payload = RBEventPayload::new(event_id, payload); 
               match ev_sender.send(rb_payload) {
                 Ok(_) => (),
-                Err(err) => debug!("Problem sending RBEventPayload over channel!"),
+                Err(err) => debug!("Problem sending RBEventPayload over channel! Err {err}"),
               }
               continue 'bytestream;
             },

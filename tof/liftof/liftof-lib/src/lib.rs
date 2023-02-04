@@ -92,7 +92,10 @@ impl TofPacketWriter {
 
   pub fn add_tof_packet(&mut self, packet : &TofPacket) {
     let buffer = packet.to_bytestream();
-    self.file.write_all(buffer.as_slice()); 
+    match self.file.write_all(buffer.as_slice()) {
+      Err(err) => warn!("Writing to file with prefix {} failed. Err {}", self.file_prefix, err),
+      Ok(_)     => ()
+    }
     self.n_packets += 1;
     if self.n_packets == self.pkts_per_file {
       //drop(self.file);
@@ -177,7 +180,7 @@ pub fn get_rb_manifest() -> Vec<ReadoutBoard> {
         match rb_ip {
           None => println!("Can not resolve RBBoard with MAC address {:?}, it is not in the system's ARP tables", mac),
           Some(ip)   => match ip[0] {
-            IpAddr::V6(a) => panic!("IPV6 not suppported!"),
+            IpAddr::V6(a) => panic!("IPV6 {a} not suppported!"),
             IpAddr::V4(a) => {
               rb.ip_address = Some(a);
               // now we will try and check if the ports are open

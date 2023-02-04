@@ -1,15 +1,15 @@
-///! Event strucutures for data reconrded by the tof
-///
-///  These are used internally, and will get
-///  serialized and send over the wire to the
-///  flight computer. 
-///
-///  Find the corresponding C++ dataclasses
-///  in this project
-///
-///
-///
-///
+//! Event strucutures for data reconrded by the tof
+//!
+//!  These are used internally, and will get
+//!  serialized and send over the wire to the
+//!  flight computer. 
+//!
+//!  Find the corresponding C++ dataclasses
+//!  in this project
+//!
+//!
+//!
+//!
 
 use crate::errors::SerializationError;
 use crate::serialization::search_for_u16;
@@ -20,15 +20,15 @@ extern crate rand;
 use rand::Rng;
 
 
-///! Representation of analyzed data from a paddle
+/// Representation of analyzed data from a paddle
 ///
-///  Holds the results of waveform analysis for a 
-///  paddle, that is the reustl for 2 individual 
-///  waveforms from each end of the paddle.
+/// Holds the results of waveform analysis for a 
+/// paddle, that is the reustl for 2 individual 
+/// waveforms from each end of the paddle.
 ///
-///  Thus it is having methods like `get_time_a`
-///  where a and be refere to different 
-///  paddle ends.
+/// Thus it is having methods like `get_time_a`
+/// where a and be refere to different 
+/// paddle ends.
 ///
 ///
 #[derive(Debug,Copy,Clone, PartialEq)]
@@ -162,12 +162,12 @@ impl PaddlePacket {
   }
 
 
-  ///! Deserialization
+  /// Deserialization
   ///
   ///
-  ///  # Arguments:
+  /// # Arguments:
   ///
-  ///  * bytestream : 
+  /// * bytestream : 
   pub fn from_bytestream(bytestream : &Vec<u8>, start_pos : usize) 
     -> Result<PaddlePacket, SerializationError> {
     let mut pp  = PaddlePacket::new();

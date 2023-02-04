@@ -10,6 +10,11 @@ use std::time::{Duration, Instant};
 use std::thread;
 use std::net::UdpSocket;
 use std::sync::mpsc::Sender;
+use crossbeam_channel as cbc; 
+
+use tof_dataclasses::packets::TofPacket;
+use tof_dataclasses::events::master_trigger::read_daq;
+use tof_dataclasses::events::MasterTriggerEvent;
 
 //const MT_MAX_PACKSIZE   : usize = 4096;
 const MT_MAX_PACKSIZE   : usize = 512;
@@ -24,33 +29,33 @@ enum PACKET_TYPE {
   RMW            = 4
 }
 
-#[derive(Debug, Copy, Clone)]
-pub struct MasterTriggerEvent {
-  pub event_id  : u32,
-  pub n_paddles : u8, 
-  pub valid     : bool
-}
+//#[derive(Debug, Copy, Clone)]
+//pub struct MasterTriggerEvent {
+//  pub event_id  : u32,
+//  pub n_paddles : u8, 
+//  pub valid     : bool
+//}
 
 #[derive(Debug, Copy, Clone)]
 struct IPbusPackage {
 }
 
 
-impl MasterTriggerEvent {
-  pub fn new(event_id  : u32, 
-             n_paddles : u8) -> MasterTriggerEvent {
-    MasterTriggerEvent {
-      event_id  : event_id,
-      n_paddles : n_paddles,
-      valid     : true
-
-    }   
-  }
-  
-  pub fn invalidate(&mut self) {
-    self.valid = false;
-  }
-}
+//impl MasterTriggerEvent {
+//  pub fn new(event_id  : u32, 
+//             n_paddles : u8) -> MasterTriggerEvent {
+//    MasterTriggerEvent {
+//      event_id  : event_id,
+//      n_paddles : n_paddles,
+//      valid     : true
+//
+//    }   
+//  }
+//  
+//  pub fn invalidate(&mut self) {
+//    self.valid = false;
+//  }
+//}
 
 
 
@@ -229,59 +234,59 @@ fn reset_daq(socket : &UdpSocket,
   write_register(socket, target_address, 0x10, 1,&mut buffer);
 }
 
-fn read_daq(socket : &UdpSocket,
-            target_address : &str,
-            buffer : &mut [u8;MT_MAX_PACKSIZE]) -> (u32, u32) {
-  // check if the queue is full
-  let mut event_ctr  = 0u32;
-  let mut timestamp  = 0u32;
-  let mut timecode32 = 0u32;
-  let mut timecode16 = 0u32;
-  let mut mask       = 0u32;
-  //let mut hits       = 0u32;
-  let mut crc        = 0u32;
-  let mut trailer    = 0u32;
-
-  let word = read_register(socket, target_address, 0x11, buffer);
-  let mut hit_paddles = 0u32;
-  // this will eventually determin, 
-  // how often we will read the 
-  // hit register
-  let mut paddles_rxd     = 1u32;
-  let mut hits = Vec::<u32>::with_capacity(24);
-  if word == 0xAAAAAAAA {
-    // we start a new daq package
-    event_ctr   = read_register(socket, target_address, 0x11, buffer);
-    timestamp   = read_register(socket, target_address, 0x11, buffer);
-    timecode32  = read_register(socket, target_address, 0x11, buffer);
-    timecode16  = read_register(socket, target_address, 0x11, buffer);
-    mask        = read_register(socket, target_address, 0x11, buffer);
-    hit_paddles = count_ones(mask);
-    hits.push     (read_register(socket, target_address, 0x11, buffer));
-    //allhits.push(hits);  
-    while paddles_rxd < hit_paddles {
-      hits.push(read_register(socket, target_address, 0x11, buffer));
-      paddles_rxd += 1;
-    }
-    crc         = read_register(socket, target_address, 0x11, buffer);
-    trailer     = read_register(socket, target_address, 0x11, buffer);
-
-    debug!("event_ctr {}, ts {} , tc32 {}, tc16 {}, mask {}, crc {}, trailer {}", event_ctr, timestamp, timecode32, timecode16, hit_paddles, crc, trailer);
-    for n in 0..hits.len() {
-      debug!(" -- -- hit {}", hits[n]);
-    }
-  } // end header found
-    //AAAAAAAA (Header)
-    //0286A387 (Event cnt)
-    //00000000 (Timestamp)
-    //00000000 (Timecode 32 bits)
-    //00000000 (Timecode 16 bits)
-    //00000001 (Mask)
-    //00000003 (Hits)
-    //97041A48 (CRC)
-    //55555555 (Trailer)
-  (event_ctr, hit_paddles)
-}
+//fn read_daq(socket : &UdpSocket,
+//            target_address : &str,
+//            buffer : &mut [u8;MT_MAX_PACKSIZE]) -> (u32, u32) {
+//  // check if the queue is full
+//  let mut event_ctr  = 0u32;
+//  let mut timestamp  = 0u32;
+//  let mut timecode32 = 0u32;
+//  let mut timecode16 = 0u32;
+//  let mut mask       = 0u32;
+//  //let mut hits       = 0u32;
+//  let mut crc        = 0u32;
+//  let mut trailer    = 0u32;
+//
+//  let word = read_register(socket, target_address, 0x11, buffer);
+//  let mut hit_paddles = 0u32;
+//  // this will eventually determin, 
+//  // how often we will read the 
+//  // hit register
+//  let mut paddles_rxd     = 1u32;
+//  let mut hits = Vec::<u32>::with_capacity(24);
+//  if word == 0xAAAAAAAA {
+//    // we start a new daq package
+//    event_ctr   = read_register(socket, target_address, 0x11, buffer);
+//    timestamp   = read_register(socket, target_address, 0x11, buffer);
+//    timecode32  = read_register(socket, target_address, 0x11, buffer);
+//    timecode16  = read_register(socket, target_address, 0x11, buffer);
+//    mask        = read_register(socket, target_address, 0x11, buffer);
+//    hit_paddles = count_ones(mask);
+//    hits.push     (read_register(socket, target_address, 0x11, buffer));
+//    //allhits.push(hits);  
+//    while paddles_rxd < hit_paddles {
+//      hits.push(read_register(socket, target_address, 0x11, buffer));
+//      paddles_rxd += 1;
+//    }
+//    crc         = read_register(socket, target_address, 0x11, buffer);
+//    trailer     = read_register(socket, target_address, 0x11, buffer);
+//
+//    debug!("event_ctr {}, ts {} , tc32 {}, tc16 {}, mask {}, crc {}, trailer {}", event_ctr, timestamp, timecode32, timecode16, hit_paddles, crc, trailer);
+//    for n in 0..hits.len() {
+//      debug!(" -- -- hit {}", hits[n]);
+//    }
+//  } // end header found
+//    //AAAAAAAA (Header)
+//    //0286A387 (Event cnt)
+//    //00000000 (Timestamp)
+//    //00000000 (Timecode 32 bits)
+//    //00000000 (Timecode 16 bits)
+//    //00000001 (Mask)
+//    //00000003 (Hits)
+//    //97041A48 (CRC)
+//    //55555555 (Trailer)
+//  (event_ctr, hit_paddles)
+//}
 
 ///
 /// Communications with the master trigger
@@ -289,6 +294,7 @@ fn read_daq(socket : &UdpSocket,
 ///
 pub fn master_trigger(mt_ip   : &str, 
                       mt_port : usize,
+                      glob_data_sink : &cbc::Sender<TofPacket>,
                       evid_sender : &Sender<MasterTriggerEvent>) {
 
   let mt_address = mt_ip.to_owned() + ":" + &mt_port.to_string();
@@ -341,7 +347,7 @@ pub fn master_trigger(mt_ip   : &str,
   // the event counter has to be reset before 
   // we connect to the readoutboards
   //reset_event_cnt(&socket, &mt_address); 
-  (last_event_cnt, _) = read_daq(&socket, &mt_address, &mut buffer);
+  let mut mt_event = read_daq(&socket, &mt_address, &mut buffer).unwrap();
   loop {
     //info!("Next iter...");
     // limit the max polling rate
@@ -374,8 +380,15 @@ pub fn master_trigger(mt_ip   : &str,
     }
     
     //event_cnt = read_event_cnt(&socket, &mt_address, &mut buffer);
-    (event_cnt, n_paddles_expected) = read_daq(&socket, &mt_address, &mut buffer);
-    if event_cnt == last_event_cnt {
+    mt_event = read_daq(&socket, &mt_address, &mut buffer).unwrap();
+    //match mt_event {
+    //  Err(err) => {
+    //    trace!("Did not get new event, Err {err}");
+    //    continue;
+    //  }
+    //  Ok(_)    => ()
+    //}
+    if mt_event.event_id == last_event_cnt {
       trace!("Same event!");
       continue;
     }
@@ -384,7 +397,7 @@ pub fn master_trigger(mt_ip   : &str,
     // throw these away. 
     // FIXME - there is actually an event with ctr 0
     // but not sure how to address that yet
-    if event_cnt == 0 {
+    if mt_event.event_id == 0 {
       trace!("event 0 encountered! Continuing...");
       continue;
     }
@@ -395,13 +408,13 @@ pub fn master_trigger(mt_ip   : &str,
     // if I am correct, there won't be a counter
     // overflow for a 32bit counter in 99 days 
     // for a rate of 500Hz
-    if event_cnt < last_event_cnt {
+    if mt_event.event_id < last_event_cnt {
       error!("Event counter id overflow! this cntr: {event_cnt} last cntr: {last_event_cnt}!");
       continue;
       //last_event_cnt = 0;
     }
     
-    if event_cnt - last_event_cnt > 1 {
+    if mt_event.event_id - last_event_cnt > 1 {
       let mut missing = event_cnt - last_event_cnt;
       
       // FIXME
@@ -417,12 +430,17 @@ pub fn master_trigger(mt_ip   : &str,
     
     // new event
     // send it down the pip
-    let mt_event = MasterTriggerEvent::new(event_cnt, n_paddles_expected as u8);
+    //let mt_event = MasterTriggerEvent::new(event_cnt, n_paddles_expected as u8);
     info!("Got new event id from master trigger {event_cnt}");
     evid_sender.send(mt_event);
     last_event_cnt = event_cnt;
     n_events += 1;
     n_events_expected = n_events + missing_evids;
+
+    if n_events % 1000 == 0 {
+      let pk = TofPacket::new();
+      
+    }
 
     let elapsed = start.elapsed().as_secs();
     // measure rate every 100 events

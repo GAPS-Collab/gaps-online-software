@@ -16,7 +16,6 @@ use std::collections::VecDeque;
 //use crate::reduced_tofevent::{PaddlePacket,
 //                              TofEvent};
 use crate::reduced_tofevent::TofEvent;
-use crate::master_trigger::MasterTriggerEvent;
 use crate::constants::{PADDLE_PACKET_CACHE_SIZE,
                        EVENT_CACHE_SIZE,
                        EXP_N_PADDLES_PER_EVENT};
