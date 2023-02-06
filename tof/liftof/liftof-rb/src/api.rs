@@ -121,6 +121,7 @@ pub fn cmd_responder(rsp_receiver     : &Receiver<TofResponse>,
         match cmd_socket.recv_bytes(0) {
           Err(err) => warn!("Problem receiving command over 9MQ !"),
           Ok(cmd_bytes)  => {
+            info!("Received bytes {}", cmd_bytes.len());
             match TofCommand::from_bytestream(&cmd_bytes,0) {
               Err(err) => warn!("Problem decoding command {}", err),
               Ok(cmd)  => {
@@ -232,6 +233,7 @@ pub fn cmd_responder(rsp_receiver     : &Receiver<TofResponse>,
                   TofCommand::DataRunStart (max_event) => {
                     // let's start a run. The value of the TofCommnad shall be 
                     // nevents
+                    info!("Will initialize new run!");
                     let run_p = RunParams {
                       forever   : false,
                       nevents   : max_event,

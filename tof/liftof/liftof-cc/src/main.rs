@@ -3,7 +3,7 @@ mod reduced_tofevent;
 mod constants;
 mod waveform;
 mod errors;
-mod commands;
+mod api;
 mod master_trigger;
 mod event_builder;
 mod paddle_packet_cache;
@@ -65,6 +65,7 @@ use tof_dataclasses::events::MasterTriggerEvent;
 use crate::event_builder::{event_builder,
                            TofEventBuilderSettings};
                            //event_builder_no_master};
+use crate::api::commander;
 
 use crate::flight_comms::global_data_sink;
 
@@ -374,8 +375,16 @@ fn main() {
                                 &cali_file_name); 
     });
   } // end for loop over nboards
-  let one_minute = time::Duration::from_millis(60000);
+  // lastly start the commander thread 
+  // wait a bit before, so the boards have
+  // time to come up
   let one_second = time::Duration::from_millis(1000);
+  thread::sleep(20*one_second);
+  worker_threads.execute(move || {
+    commander(&rb_list);
+  });
+  info!("All threads started!");
+  let one_minute = time::Duration::from_millis(60000);
   
   //println!("==> Sleeping a bit to give the rb's a chance to fire up..");
   //thread::sleep(10*one_second);

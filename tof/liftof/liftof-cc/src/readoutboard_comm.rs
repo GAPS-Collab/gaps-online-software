@@ -432,7 +432,7 @@ pub fn readoutboard_communicator(//socket           : &zmq::Socket,
 
   let mut file_on_disc : Option<File> = None;//let mut output = File::create(path)?;
   if write_blob {
-    file_on_disc = OpenOptions::new().append(true).open(blobfile_path).ok()
+    file_on_disc = OpenOptions::new().append(true).create(true).open(blobfile_path).ok()
     //let f = File::create(&blobfile_path);
     //file_on_disc = Some(f.unwrap());
   }

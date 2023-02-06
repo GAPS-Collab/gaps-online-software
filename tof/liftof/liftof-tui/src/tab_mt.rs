@@ -241,8 +241,8 @@ impl MTTab<'_> {
     let last_event = mt_events.back();
     if update_detail {
       info!("Updating detail field");
-      detail_string = Some(last_event.unwrap().to_string());
       if last_event.is_some() {
+        detail_string = Some(last_event.unwrap().to_string());
         self.detail = Paragraph::new(last_event.unwrap().to_string())
         .style(Style::default().fg(Color::LightCyan))
         .alignment(Alignment::Left)

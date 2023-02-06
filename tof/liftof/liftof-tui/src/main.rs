@@ -233,7 +233,7 @@ fn receive_stream(tp_to_main : Sender<TofPacket>,
 
 fn master_trigger(mt_to_main : &Sender<MasterTriggerEvent>,
                   mt_rate_to_main : &Sender<u32>) {
-  let mt_address = "10.0.1.10:50001";
+  let mt_address = "192.168.36.121:50001";
   //let mt_address = mt_ip.to_owned() + ":" + &mt_port.to_string();
   let mut socket : UdpSocket;
   // FIXME - proper error checking
