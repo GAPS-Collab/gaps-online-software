@@ -43,8 +43,7 @@ fn build_events_in_cache(event_cache   : &mut VecDeque<TofEvent>,
 
   for ev in event_cache.iter_mut() {
     let start   = Instant::now();
-    let timeout = Duration::from_micros(timeout_micro)
-                  .as_micros();
+    let timeout = Duration::from_micros(timeout_micro);
     if !ev.valid {
       continue;
     }
@@ -74,7 +73,7 @@ fn build_events_in_cache(event_cache   : &mut VecDeque<TofEvent>,
       continue;
     }
     evid_query.send(Some(ev.event_id));
-    while start.elapsed().as_micros() < timeout {
+    while start.elapsed() < timeout {
       match pp_recv.try_recv() { 
         Err(_) => {}
         Ok(pp_option) => {
@@ -86,11 +85,11 @@ fn build_events_in_cache(event_cache   : &mut VecDeque<TofEvent>,
               if pp.event_id == ev.event_id {
                 ev.add_paddle(pp);
               } else {
-                if paddle_cache.contains_key(&ev.event_id) {
-                  paddle_cache.get_mut(&ev.event_id).unwrap().push(pp);
+                if paddle_cache.contains_key(&pp.event_id) {
+                  paddle_cache.get_mut(&pp.event_id).unwrap().push(pp);
                 } else {
                   let ev_paddles = vec![pp];
-                  paddle_cache.insert(ev.event_id, ev_paddles);
+                  paddle_cache.insert(pp.event_id, ev_paddles);
                 }
               }
             }
@@ -100,7 +99,9 @@ fn build_events_in_cache(event_cache   : &mut VecDeque<TofEvent>,
 
       if ev.is_ready_to_send(use_timeout) {
         (*ev).valid = false;
+        warn!("Event ready to send, we have {}", ev.n_paddles);
         let bytestream = ev.to_bytestream();
+        warn!("We have a bytestream len of {}", bytestream.len());
         let mut pack = TofPacket::new();
         pack.packet_type = PacketType::TofEvent;
         pack.payload = bytestream;

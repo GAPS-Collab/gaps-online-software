@@ -111,8 +111,12 @@ std::vector<unsigned char> REventPacket::serialize() const
 
 /*******************************************/
 
-unsigned int REventPacket::deserialize(std::vector<unsigned char>& bytestream,
-                                       unsigned int start_pos)
+
+//! FIXME - deserialize all fields.
+//  currently decode only paddle packets 
+//  (the reconstructed primary is not available anyway)
+u32 REventPacket::deserialize(vec_u8 &bytestream,
+                              u32 start_pos)
 {
   reset ();
  
@@ -165,6 +169,14 @@ unsigned int REventPacket::deserialize(std::vector<unsigned char>& bytestream,
   */
  
   // FIXME checks - packetlength, checksum ?
+  paddle_info.reserve(n_paddles);
+  RPaddlePacket p;
+  for (size_t k=0;k<n_paddles;k++)
+    {  
+     p.deserialize(bytestream, pos);
+     paddle_info.push_back(p);
+     pos += p.calculate_length();
+    }
   unsigned short payload_tail = decode_ushort(bytestream, pos); pos+=2;
   //std::cout << "[DEBUG] expected packet size = " << expected_packet_size << " received " << pos << " bytes!" << std::endl; 
   if (payload_tail != tail) //|| (expected_packet_size != pos))
@@ -185,7 +197,7 @@ std::string REventPacket::to_string(bool summarize_paddle_packets) const
   std::string output;
    output += "### REVENTPACKET-----------------------\n";
    output += "\tHEAD \t"                + std::to_string(head) +  "\n";
-   output += "\tN PADDLESH \t"          + std::to_string(n_paddles) + "\n";
+   output += "\tN PADDLES \t"           + std::to_string(n_paddles) + "\n";
    output += "\tEVENT CTR \t"           + std::to_string(event_ctr)         + "\n";
    output += "\tUTC TS \t"              + std::to_string(utc_timestamp)     + "\n";
    output += "\tPRIMARY BETA \t"        + std::to_string(primary_beta)     + "\n";

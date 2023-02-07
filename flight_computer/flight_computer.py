@@ -22,7 +22,14 @@ while True:
     if packet.packet_type == gt.PacketType.TofEvent:
         print ("Got tof packet")
         event = gt.REventPacket()
-        event.from_bytestream([k for k in packet.payload],0)
-        print (event)
+        data = [k for k in packet.payload]
+        event.from_bytestream(data,0)
+        print (f".. event {event.event_id}, .. no paddle packets")
+        if len(data) > 9:
+            print (event)
+            for k in event.paddle_packets:
+                print (k)
+        #print (len([k for k in packet.payload]))
+        #print (event)
         #print (len(data))
         #print_event(event)

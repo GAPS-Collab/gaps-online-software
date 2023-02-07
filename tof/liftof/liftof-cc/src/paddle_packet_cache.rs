@@ -203,7 +203,7 @@ pub fn paddle_packet_cache (evid_rec    : &Receiver<Option<u32>>,
             continue;
           }, // end None
         Some(evid) => {
-          warn!("Received {evid} event id");
+          trace!("Received {evid} event id");
           let mut n_paddles_sent = 0;
           for pp in pp_cache.iter_mut() {
             if pp.event_id == evid {

@@ -390,6 +390,8 @@ double calculate_pedestal_helper(vec_f64 wave,
   return waveform.GetPedestal();
 }
 
+/********************/
+
 
 /********************/
 
@@ -509,7 +511,8 @@ PYBIND11_MODULE(gaps_tof, m) {
         .def_readwrite("primary_inner_tof_x",&REventPacket::primary_inner_tof_x)
         .def_readwrite("primary_inner_tof_y",&REventPacket::primary_inner_tof_y)
         .def_readwrite("primary_inner_tof_z",&REventPacket::primary_inner_tof_z)
-        .def("__repr__",          [](const REventPacket &ev) {
+	.def_readonly("paddle_packets",      &REventPacket::paddle_info)
+	.def("__repr__",          [](const REventPacket &ev) {
                                   return "<REventPacket : " + ev.to_string(true) + "'>";
                                   }) 
 
