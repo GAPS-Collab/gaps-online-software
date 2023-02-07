@@ -7,13 +7,30 @@
 #include "TofTypeDefs.h"
 
 
+static const u8 PACKET_TYPE_UNKNOWN    =  0;
+static const u8 PACKET_TYPE_COMMAND    = 10;
+static const u8 PACKET_TYPE_RBEVENT    = 20;
+static const u8 PACKET_TYPE_TOFEVENT   = 21;
+static const u8 PACKET_TYPE_MONITOR    = 30;
+static const u8 PACKET_TYPE_HEARTBEAT  = 40;
+static const u8 PACKET_TYPE_SCALAR     = 50;
+static const u8 PACKET_TYPE_MT         = 60;
+
+
 enum PacketType : u8 {
-  Unknown   =  0,
-  Command   = 10,
-  RBEvent   = 20,
-  Monitor   = 30,
-  HeartBeat = 40 
+  Unknown   = PACKET_TYPE_UNKNOWN,
+  Command   = PACKET_TYPE_COMMAND,
+  RBEvent   = PACKET_TYPE_RBEVENT,
+  TofEvent  = PACKET_TYPE_TOFEVENT,
+  Monitor   = PACKET_TYPE_MONITOR,
+  HeartBeat = PACKET_TYPE_HEARTBEAT,
+  Scalar    = PACKET_TYPE_SCALAR,
+  MasterTrigger = PACKET_TYPE_MT,
+   
 };
+
+std::string packet_type_to_string(PacketType pt);
+
 
 /*********************************************************
  * The most basic of all packets

@@ -7,7 +7,7 @@
 use std::sync::mpsc::{Sender,
                       Receiver};
 use std::collections::VecDeque;
-//use std::collections::HashMap;
+use std::collections::HashMap;
 
 use std::time::{Duration, 
                 Instant};
@@ -36,7 +36,8 @@ fn build_events_in_cache(event_cache   : &mut VecDeque<TofEvent>,
                          evid_query    : &Sender<Option<u32>>,
                          pp_recv       : &Receiver<Option<PaddlePacket>>,
                          clean_up      : bool,
-                         use_timeout   : bool, 
+                         use_timeout   : bool,
+                         paddle_cache  : &mut HashMap::<u32,Vec::<PaddlePacket>>,
                          data_sink     : &cbc::Sender<TofPacket>) { 
                          //socket        : &zmq::Socket) {
 
@@ -45,6 +46,31 @@ fn build_events_in_cache(event_cache   : &mut VecDeque<TofEvent>,
     let timeout = Duration::from_micros(timeout_micro)
                   .as_micros();
     if !ev.valid {
+      continue;
+    }
+    // first check, if we have pps in the paddle_cache
+    if paddle_cache.contains_key(&ev.event_id) {
+      let pps = paddle_cache.get_mut(&ev.event_id).unwrap();
+      //for pp in pps.iter_mut() {
+      for k in 0..pps.len() {
+        if !pps[k].valid
+          {continue;}
+        ev.add_paddle(pps[k]);
+        pps[k].invalidate();
+      }
+    }
+
+    if ev.is_ready_to_send(use_timeout) {
+      (*ev).valid = false;
+      let bytestream = ev.to_bytestream();
+      let mut pack = TofPacket::new();
+      pack.packet_type = PacketType::TofEvent;
+      pack.payload = bytestream;
+
+      match data_sink.send(pack) {
+        Err(err) => warn!("Packet sending failed! Err {}", err),
+        Ok(_)    => trace!("Event {} sent!", ev.event_id) 
+      }
       continue;
     }
     evid_query.send(Some(ev.event_id));
@@ -57,7 +83,16 @@ fn build_events_in_cache(event_cache   : &mut VecDeque<TofEvent>,
               continue;
             },
             Some(pp) => {
-              ev.add_paddle(pp);
+              if pp.event_id == ev.event_id {
+                ev.add_paddle(pp);
+              } else {
+                if paddle_cache.contains_key(&ev.event_id) {
+                  paddle_cache.get_mut(&ev.event_id).unwrap().push(pp);
+                } else {
+                  let ev_paddles = vec![pp];
+                  paddle_cache.insert(ev.event_id, ev_paddles);
+                }
+              }
             }
           }
         }
@@ -83,6 +118,7 @@ fn build_events_in_cache(event_cache   : &mut VecDeque<TofEvent>,
   if clean_up {
     let size_b4 = event_cache.len();
     event_cache.retain(|ev| ev.valid);
+    //paddle_cache.retain(|pp| pp.valid);
     let size_af = event_cache.len();
     info!("Size of event cache before {} and after clean up {}", size_b4, size_af);
   }
@@ -257,6 +293,7 @@ pub fn event_builder (master_id      : &Receiver<MasterTriggerEvent>,
                       //socket         : &zmq::Socket) {
 
   let mut event_cache = VecDeque::<TofEvent>::with_capacity(EVENT_BUILDER_EVID_CACHE_SIZE);
+  let mut paddle_cache : HashMap<u32,Vec::<PaddlePacket>> = HashMap::with_capacity(100); 
 
   // timeout in microsecnds
   let timeout_micro = 100;
@@ -308,31 +345,31 @@ pub fn event_builder (master_id      : &Receiver<MasterTriggerEvent>,
        let mut event = TofEvent::new(mt.event_id, mt.n_paddles);
        // let's query the paddle packet cache for a certain time
        // and then move on and try later again      
-       let start = Instant::now();
-       let timeout = Duration::from_micros(timeout_micro)
-                     .as_micros();
-       pp_query.send(Some(mt.event_id));
-       while start.elapsed().as_micros() < timeout {
-         let mut n_pad = 0;
-         match pp_recv.try_recv() { 
-           Err(_) => {}
-           Ok(pp_or_none) => {
-             match pp_or_none {
-               Some(pp) => {
-                 event.add_paddle(pp);
-                 n_pad += 1
-               }
-               None => {
-                 break;
-               }
-             } 
-           }
-         } // end match
-         if event.is_complete() {
-           trace!("Event {} building complete!", mt.event_id);
-           break;
-         }
-       } // end while not timeout
+       //let start = Instant::now();
+       //let timeout = Duration::from_micros(timeout_micro);
+       
+       //pp_query.send(Some(mt.event_id));
+       //while start.elapsed() < timeout {
+       //  let mut n_pad = 0;
+       //  match pp_recv.try_recv() { 
+       //    Err(err) => trace!("Did not receive a paddle packet, Err {err}"),
+       //    Ok(pp_or_none) => {
+       //      match pp_or_none {
+       //        Some(pp) => {
+       //          event.add_paddle(pp);
+       //          n_pad += 1
+       //        }
+       //        None => {
+       //          break;
+       //        }
+       //      } 
+       //    }
+       //  } // end match
+       //  if event.is_complete() {
+       //    trace!("Event {} building complete!", mt.event_id);
+       //    break;
+       //  }
+       //} // end while not timeout
        event_cache.push_back(event);
        //if event.paddle_packets.len() == mt.n_paddles as usize {
        //  trace!("Event {} building complete!", mt.event_id);
@@ -343,12 +380,13 @@ pub fn event_builder (master_id      : &Receiver<MasterTriggerEvent>,
        //}
      }
     } // end match Ok(mt)
-    if n_iter % 1000 == 0 {
+    if n_iter % 100 == 0 {
       build_events_in_cache(&mut event_cache, timeout_micro,
                             pp_query,
                             pp_recv,
                             true,
                             false,
+                            &mut paddle_cache, 
                             &data_sink);
                             //&socket);
     }

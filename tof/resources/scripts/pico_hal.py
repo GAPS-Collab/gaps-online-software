@@ -7,8 +7,8 @@ import time
 from enum import Enum
 
 PACKET_ID = 0
-#IPADDR = "192.168.36.121"
-IPADDR = "10.0.1.10"
+IPADDR = "192.168.36.121"
+#IPADDR = "10.0.1.10"
 PORT = 50001
 
 # Create a UDP socket and bind the socket to the port

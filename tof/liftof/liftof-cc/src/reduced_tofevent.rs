@@ -11,6 +11,7 @@ use std::time::SystemTime;
 
 use crate::constants::EVENT_TIMEOUT;
 //use crate::errors::SerializationError;
+use crate::errors::EventError;
 
 use tof_dataclasses::packets::paddle_packet::PaddlePacket;
 use tof_dataclasses::serialization::search_for_u16;
@@ -410,16 +411,18 @@ impl TofEvent {
 
   }
 
-  ///! Add a paddle packet 
+  /// Add a paddle packet 
   ///  
-  ///  This makes sure the internal counter for 
-  ///  paddles is also incremented.
-  pub fn add_paddle(&mut self, paddle : PaddlePacket) {
+  /// This makes sure the internal counter for 
+  /// paddles is also incremented.
+  pub fn add_paddle(&mut self, paddle : PaddlePacket) -> Result<(), EventError> {
     if self.event_id != paddle.event_id {
-      panic!("Tried to add paddle for event {} to event{}", self.event_id, paddle.event_id);
+      error!("Tried to add paddle for event {} to event{}", self.event_id, paddle.event_id);
+      return Err(EventError::EventIdMismatch);
     }
     self.n_paddles += 1;
     self.paddle_packets.push(paddle);
+    Ok(())
   }
 
 

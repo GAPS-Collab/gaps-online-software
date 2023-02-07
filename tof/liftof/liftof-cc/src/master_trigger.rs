@@ -13,7 +13,7 @@ use std::sync::mpsc::Sender;
 use crossbeam_channel as cbc; 
 
 use tof_dataclasses::packets::TofPacket;
-use tof_dataclasses::events::master_trigger::read_daq;
+use tof_dataclasses::events::master_trigger::{read_daq, reset_daq};
 use tof_dataclasses::events::MasterTriggerEvent;
 
 //const MT_MAX_PACKSIZE   : usize = 4096;
@@ -211,28 +211,28 @@ fn write_register(socket      : &UdpSocket,
 //
 }
 
-fn read_event_cnt(socket : &UdpSocket,
-                  target_address : &str,
-                  buffer : &mut [u8;MT_MAX_PACKSIZE]) -> u32 {
-  let event_count = read_register(socket, target_address, 0xd, buffer);
-  trace!("Got event count! {} ", event_count);
-  event_count
-}
-
-pub fn reset_event_cnt(socket : &UdpSocket,
-                       target_address : &str) {
-  debug!("Resetting event counter!");
-  let mut buffer = [0u8;MT_MAX_PACKSIZE];
-  write_register(socket, target_address, 0xc,1,&mut buffer);
-}
-
-fn reset_daq(socket : &UdpSocket,
-             target_address : &str) {
-  debug!("Resetting DAQ!");
-  let mut buffer = [0u8;MT_MAX_PACKSIZE];
-  info!("Will write register");
-  write_register(socket, target_address, 0x10, 1,&mut buffer);
-}
+//fn read_event_cnt(socket : &UdpSocket,
+//                  target_address : &str,
+//                  buffer : &mut [u8;MT_MAX_PACKSIZE]) -> u32 {
+//  let event_count = read_register(socket, target_address, 0xd, buffer);
+//  trace!("Got event count! {} ", event_count);
+//  event_count
+//}
+//
+//pub fn reset_event_cnt(socket : &UdpSocket,
+//                       target_address : &str) {
+//  debug!("Resetting event counter!");
+//  let mut buffer = [0u8;MT_MAX_PACKSIZE];
+//  write_register(socket, target_address, 0xc,1,&mut buffer);
+//}
+//
+//fn reset_daq(socket : &UdpSocket,
+//             target_address : &str) {
+//  debug!("Resetting DAQ!");
+//  let mut buffer = [0u8;MT_MAX_PACKSIZE];
+//  info!("Will write register");
+//  write_register(socket, target_address, 0x10, 1,&mut buffer);
+//}
 
 //fn read_daq(socket : &UdpSocket,
 //            target_address : &str,
@@ -318,7 +318,7 @@ pub fn master_trigger(mt_ip   : &str,
   // and reuse it for all operations
   let mut buffer = [0u8;MT_MAX_PACKSIZE];  
   
-  let mut event_cnt      = 0u32;
+  //let mut event_cnt      = 0u32;
   let mut last_event_cnt = 0u32;
   let mut missing_evids  = 0usize;
   let mut event_missing  = false;
@@ -347,7 +347,8 @@ pub fn master_trigger(mt_ip   : &str,
   // the event counter has to be reset before 
   // we connect to the readoutboards
   //reset_event_cnt(&socket, &mt_address); 
-  let mut mt_event = read_daq(&socket, &mt_address, &mut buffer).unwrap();
+  //let mut mt_event = MasterTriggerEvent::new(0,0);
+  let mut mt_event = read_daq(&socket, &mt_address, &mut buffer);
   loop {
     //info!("Next iter...");
     // limit the max polling rate
@@ -373,22 +374,23 @@ pub fn master_trigger(mt_ip   : &str,
     // 1 - something
     // 2 - empty
     //if 0 != (read_register(&socket, &mt_address, 0x12, &mut buffer) & 0x2) {
-    if read_register(&socket, &mt_address, 0x12, &mut buffer) == 2 {
-      trace!("No new information from DAQ");
-      //reset_daq(&socket, &mt_address);  
-      continue;
-    }
+    //if read_register(&socket, &mt_address, 0x12, &mut buffer) == 2 {
+    //  trace!("No new information from DAQ");
+    //  //reset_daq(&socket, &mt_address);  
+    //  continue;
+    //}
     
     //event_cnt = read_event_cnt(&socket, &mt_address, &mut buffer);
-    mt_event = read_daq(&socket, &mt_address, &mut buffer).unwrap();
-    //match mt_event {
-    //  Err(err) => {
-    //    trace!("Did not get new event, Err {err}");
-    //    continue;
-    //  }
-    //  Ok(_)    => ()
-    //}
-    if mt_event.event_id == last_event_cnt {
+    mt_event = read_daq(&socket, &mt_address, &mut buffer);
+    match mt_event {
+      Err(err) => {
+        trace!("Did not get new event, Err {err}");
+        continue;
+      }
+      Ok(_)    => ()
+    }
+    let ev = mt_event.unwrap();
+    if ev.event_id == last_event_cnt {
       trace!("Same event!");
       continue;
     }
@@ -397,8 +399,14 @@ pub fn master_trigger(mt_ip   : &str,
     // throw these away. 
     // FIXME - there is actually an event with ctr 0
     // but not sure how to address that yet
-    if mt_event.event_id == 0 {
+    if ev.event_id == 0 {
       trace!("event 0 encountered! Continuing...");
+      continue;
+    }
+
+    // FIXME
+    if ev.event_id == 2863311530 {
+      warn!("Magic event number! continuing! 2863311530");
       continue;
     }
 
@@ -408,14 +416,14 @@ pub fn master_trigger(mt_ip   : &str,
     // if I am correct, there won't be a counter
     // overflow for a 32bit counter in 99 days 
     // for a rate of 500Hz
-    if mt_event.event_id < last_event_cnt {
-      error!("Event counter id overflow! this cntr: {event_cnt} last cntr: {last_event_cnt}!");
+    if ev.event_id < last_event_cnt {
+      error!("Event counter id overflow! this cntr: {} last cntr: {last_event_cnt}!", ev.event_id);
+      last_event_cnt = 0;
       continue;
-      //last_event_cnt = 0;
     }
     
-    if mt_event.event_id - last_event_cnt > 1 {
-      let mut missing = event_cnt - last_event_cnt;
+    if ev.event_id - last_event_cnt > 1 {
+      let mut missing = ev.event_id - last_event_cnt;
       
       // FIXME
       if missing < 200 {
@@ -431,9 +439,9 @@ pub fn master_trigger(mt_ip   : &str,
     // new event
     // send it down the pip
     //let mt_event = MasterTriggerEvent::new(event_cnt, n_paddles_expected as u8);
-    info!("Got new event id from master trigger {event_cnt}");
-    evid_sender.send(mt_event);
-    last_event_cnt = event_cnt;
+    info!("Got new event id from master trigger {}",ev.event_id);
+    evid_sender.send(ev);
+    last_event_cnt = ev.event_id;
     n_events += 1;
     n_events_expected = n_events + missing_evids;
 

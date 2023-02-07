@@ -1,4 +1,4 @@
-#! /usr/bin/env python 
+#! /usr/bin/env python3 
 
 
 import zmq
@@ -10,12 +10,19 @@ def print_event(event):
 
 ctx = zmq.Context()
 sock = ctx.socket(zmq.SUB)
-sock.connect("tcp://127.0.0.1:30000")
+#sock.connect("tcp://127.0.0.1:30000")
+sock.connect("tcp://192.168.36.20:40000")
 sock.subscribe("")
 while True:
     data  = sock.recv()
-    event = gt.REventPacket()
+    packet = gt.TofPacket()
     data = [k for k in data]
-    event.deserialize(data, 0)
-    print (len(data))
-    print_event(event)
+    packet.from_bytestream(data, 0)
+    #print (packet)
+    if packet.packet_type == gt.PacketType.TofEvent:
+        print ("Got tof packet")
+        event = gt.REventPacket()
+        event.from_bytestream([k for k in packet.payload],0)
+        print (event)
+        #print (len(data))
+        #print_event(event)

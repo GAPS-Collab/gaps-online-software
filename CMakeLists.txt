@@ -7,7 +7,7 @@
 #
 #==========================================
 
-cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
 project(GAPS_WAVEFORM VERSION 0.0.1 LANGUAGES C CXX)
 message(STATUS "Running cmake for ${CMAKE_PROJECT_NAME} softwere version ${GAPS_ONLINE_SOFTWARE_VERSION}")
 message(STATUS "Running cmake for GAPS softwere version ${GAPS_WAVEFORM_VERSION}")

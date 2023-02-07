@@ -1,6 +1,49 @@
 #include "packets/TofPacket.h"
 #include "serialization.h"
 
+
+//enum PacketType : u8 {
+//  Unknown   = PACKET_TYPE_UNKNOWN,
+//  Command   = PACKET_TYPE_COMMAND,
+//  RBEvent   = PACKET_TYPE_RBEVENT,
+//  TofEvent  = PACKET_TYPE_TOFEVENT,
+//  Monitor   = PACKET_TYPE_MONITOR,
+//  HeartBeat = PACKET_TYPE_HEARTBEAT,
+//  Scalar    = PACKET_TYPE_SCALAR,
+//  MasterTrigger = PACKET_TYPE_MT,
+//   
+//};
+
+std::string packet_type_to_string(PacketType pt) {
+  switch (pt) { 
+    case PACKET_TYPE_UNKNOWN : {
+      return "Unknown";
+    }
+    case PACKET_TYPE_COMMAND : {
+      return "Command";
+    }      
+    case PACKET_TYPE_RBEVENT : {
+      return "RBEvent";
+    }      
+    case PACKET_TYPE_TOFEVENT : {
+      return "TofEvent";
+    }      
+    case PACKET_TYPE_MONITOR : {
+      return "Monitor";
+    }      
+    case PACKET_TYPE_HEARTBEAT : {
+      return "Heartbeat";
+    }      
+    case PACKET_TYPE_SCALAR : {
+      return "Scalar";
+    }      
+    case PACKET_TYPE_MT : {
+      return "MasterTriggerEvent";
+    }      
+  }
+  return "Unknown";
+}
+
 /**************************************************/
 
 vec_u8 TofPacket::to_bytestream() const
@@ -60,7 +103,7 @@ u16 TofPacket::from_bytestream(vec_u8 &bytestream,
 std::string TofPacket::to_string() const
 {
    std::string repr = "TOFPACKET - type : ";
-   repr += std::to_string (packet_type) + " - payload size " + std::to_string(payload_size);
+   repr += packet_type_to_string(static_cast<PacketType>(packet_type)) + " - payload size " + std::to_string(payload_size);
    return repr;
 
 }

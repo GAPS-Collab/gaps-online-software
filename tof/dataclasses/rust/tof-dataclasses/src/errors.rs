@@ -58,6 +58,27 @@ impl fmt::Display for DecodingError {
 impl Error for DecodingError {
 }
 
+
+#[derive(Debug)]
+pub enum MasterTriggerError {
+  QueueEmpty,
+  MaskTooLarge
+}
+
+impl fmt::Display for MasterTriggerError {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let disp : String;
+    match self {
+      MasterTriggerError::QueueEmpty => {disp = String::from("QueueEmpty");},
+      MasterTriggerError::MaskTooLarge => {disp = String::from("MaskTooLarge");},
+    }
+    write!(f, "<MasterTriggerError : {}>", disp)
+  }
+}
+
+impl Error for MasterTriggerError {
+}
+
 #[derive(Debug)]
 pub enum WaveformError {
   TimeIndexOutOfBounds,

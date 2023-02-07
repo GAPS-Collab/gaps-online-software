@@ -3,7 +3,9 @@
 
 #include <vector>
 
+#include "TofTypeDefs.h"
 #include "RPaddlePacket.h"
+
 
 // no JOKE!
 #define REVENTPACKETSIZEFIXED 42 
@@ -20,35 +22,33 @@
  *    for that and just rename it. 
  */
 struct REventPacket {
-  unsigned short head = 0xAAAA;
+  u16 head = 0xAAAA;
 
-  unsigned short n_paddles;
-  uint32_t event_ctr;
-  uint64_t utc_timestamp;
-
-  
+  u16 n_paddles;
+  u32 event_ctr;
+  u64 utc_timestamp;
 
   // reconstructed quantities
-  uint16_t primary_beta;
-  uint16_t primary_beta_unc;
-  uint16_t primary_charge;
-  uint16_t primary_charge_unc;
-  uint16_t primary_outer_tof_x;
-  uint16_t primary_outer_tof_y;
-  uint16_t primary_outer_tof_z;
-  uint16_t primary_inner_tof_x;
-  uint16_t primary_inner_tof_y;
-  uint16_t primary_inner_tof_z;
+  u16 primary_beta;
+  u16 primary_beta_unc;
+  u16 primary_charge;
+  u16 primary_charge_unc;
+  u16 primary_outer_tof_x;
+  u16 primary_outer_tof_y;
+  u16 primary_outer_tof_z;
+  u16 primary_inner_tof_x;
+  u16 primary_inner_tof_y;
+  u16 primary_inner_tof_z;
 
-  unsigned char nhit_outer_tof;
+  u8 nhit_outer_tof;
   // no need to save this, can be 
   // rereated from paddle_info.size() - nhit_outer_tof
-  unsigned char nhit_inner_tof;
+  u8 nhit_inner_tof;
 
-  unsigned char trigger_info;
-  unsigned char ctr_etx;
+  u8 trigger_info;
+  u8 ctr_etx;
 
-  unsigned short tail = 0x5555;
+  u16 tail = 0x5555;
 
   
   // payload
@@ -83,7 +83,7 @@ struct REventPacket {
    *
    *
    */
-  std::vector<unsigned char>serialize() const;
+  vec_u8 serialize() const;
 
   /**
    * Transcode from bytestream

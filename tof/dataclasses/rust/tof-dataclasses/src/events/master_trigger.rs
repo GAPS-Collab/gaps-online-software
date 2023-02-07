@@ -27,7 +27,7 @@ use std::net::UdpSocket;
 use std::fmt;
 
 use std::error::Error;
-use crate::errors::IPBusError;
+use crate::errors::{IPBusError, MasterTriggerError};
 
 use crate::serialization::{Serialization,
                            SerializationError};
@@ -469,9 +469,9 @@ pub fn daq_buffer_full(socket : &UdpSocket,
                        buffer : &mut [u8;MT_MAX_PACKSIZE]) 
     -> Result<bool, Box<dyn Error>> {
     //if 0 == (read_register(socket, target_address, 0x12) & 0x2):
-    let full = read_register(socket, target_address, 0x12, buffer)?;
-    let empty = full & 0x2;
-    Ok(empty == 0)
+    let queue = read_register(socket, target_address, 0x12, buffer)?;
+    let not_empty = queue & 0x2;
+    Ok(not_empty == 0)
 }
 
 /// Helper to get the number of the triggered LTB from the bitmask
@@ -503,6 +503,13 @@ pub fn read_daq(socket : &UdpSocket,
                 buffer : &mut [u8;MT_MAX_PACKSIZE])
   -> Result<MasterTriggerEvent, Box<dyn Error>> {
   // check if the queue is full
+  let has_data = daq_buffer_full(socket, target_address, buffer)?;
+  if !has_data{
+    return Err(Box::new(MasterTriggerError::QueueEmpty));
+  }
+
+
+
   let mut event_ctr  = 0u32;
   let mut timestamp        = 0u32;
   let mut tiu_timestamp    = 0u32;
@@ -542,6 +549,9 @@ pub fn read_daq(socket : &UdpSocket,
     for n in 0..32 {
       if decoded_board_mask[n] {
         let hitmask = read_register(socket, target_address, 0x11, buffer)?;
+        if hitmask.count_ones() > 255 {
+          return Err(Box::new(MasterTriggerError::MaskTooLarge));
+        }
         n_paddles += hitmask.count_ones() as u8;
         hits[n] = decode_board_mask(hitmask);
       }

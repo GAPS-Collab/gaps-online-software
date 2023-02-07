@@ -1,13 +1,16 @@
 //! Convenience functions to read/write
-//  the various control registers
-//
-//  
-//  For the mapping of registers/addresses, 
-//  see `registers.rs`
-//
+//!  the various control registers
+//!
+//!  
+//!  For the mapping of registers/addresses, 
+//!  see `registers.rs`
+//!
 
 use crate::registers::*;
 use crate::memory::*;
+
+use std::time::Duration;
+use std::thread;
 
 /// Start DRS4 data acquistion
 pub fn start_drs4_daq() -> Result<(), RegisterError> {
@@ -61,6 +64,9 @@ pub fn get_dma_pointer() -> Result<u32, RegisterError> {
 pub fn clear_dma_memory() -> Result<(), RegisterError> {
   trace!("SET DMA CLEAR");
   write_control_reg(DMA_CLEAR, 1)?;  
+  // the reset takes 8 clock cycles at 33 MHz (about 3.4 micro)
+  let eight_cycles = time::Duration::from_micros(4);
+  thread::sleep(eight_cycles);
   Ok(())
 }
 
@@ -75,6 +81,9 @@ pub fn blob_buffer_reset(which : &BlobBuffer) -> Result<(), RegisterError> {
     BlobBuffer::A => write_control_reg(RAM_A_OCC_RST, 0x1)?,
     BlobBuffer::B => write_control_reg(RAM_B_OCC_RST, 0x1)?
   };
+  // the reset takes 8 clock cycles at 33 MHz (about 3.4 micro)
+  let eight_cycles = time::Duration::from_micros(4);
+  thread::sleep(eight_cycles);
   Ok(())
 }
 
@@ -148,6 +157,9 @@ pub fn reset_daq() -> Result<(), RegisterError> {
 pub fn reset_dma() -> Result<(), RegisterError> {
   trace!("SET DMA RESET");
   write_control_reg(DMA_RESET, 1)?;
+  // the reset takes 8 clock cycles at 33 MHz (about 3.4 micro)
+  let eight_cycles = time::Duration::from_micros(4);
+  thread::sleep(eight_cycles);
   Ok(())
 }
 
