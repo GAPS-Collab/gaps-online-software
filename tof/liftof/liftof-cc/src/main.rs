@@ -1,5 +1,5 @@
 mod readoutboard_comm;
-mod reduced_tofevent;
+//mod reduced_tofevent;
 mod constants;
 mod waveform;
 mod errors;
@@ -70,7 +70,6 @@ use crate::api::commander;
 use crate::flight_comms::global_data_sink;
 
 use tof_dataclasses::threading::ThreadPool;
-//use crate::reduced_tofevent::PaddlePacket;
 
 use tof_dataclasses::packets::paddle_packet::PaddlePacket;
 use crate::paddle_packet_cache::paddle_packet_cache;

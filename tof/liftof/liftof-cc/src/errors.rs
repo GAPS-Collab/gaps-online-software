@@ -15,20 +15,20 @@ use hdf5;
 /*************************************/
 
 
-#[derive(Debug, Copy, Clone)]
-pub enum EventError {
-    EventIdMismatch
-}
-
-impl fmt::Display for EventError {
-  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(f,"<EventError>")
-  }
-}
-
-
-impl Error for EventError {
-}
+//#[derive(Debug, Copy, Clone)]
+//pub enum EventError {
+//    EventIdMismatch
+//}
+//
+//impl fmt::Display for EventError {
+//  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+//    write!(f,"<EventError>")
+//  }
+//}
+//
+//
+//impl Error for EventError {
+//}
 
 #[derive(Debug)]
 pub enum SerializationError {

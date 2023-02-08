@@ -13,8 +13,8 @@ use crossbeam_channel as cbc;
 
 use tof_dataclasses::packets::{TofPacket,
                                PacketType};
+use tof_dataclasses::events::TofEvent;
 
-use crate::reduced_tofevent::TofEvent;
 use liftof_lib::TofPacketWriter;
 
 /// Manages "outgoing" 0MQ PUB socket

@@ -139,6 +139,7 @@ u32 REventPacket::deserialize(vec_u8 &bytestream,
   //std::cout << "[INFO] Expecting " << expected_paddle_packets << " paddle info objects" << std::endl; 
  
   event_ctr           = decode_uint32_rev(bytestream, pos); pos+=4;
+  //event_ctr           = u32_from_le_bytes(bytestream, pos); pos+=4;
   n_paddles           = bytestream[pos]; pos += 1;
   /*
   utc_timestamp       = decode_uint64(bytestream, pos); pos+=8;

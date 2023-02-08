@@ -101,7 +101,7 @@ pub fn cmd_responder(rsp_receiver     : &Receiver<TofResponse>,
   //println!("Waiting for client to connect...");
   // block until we get a client
   //let client_response = cmd_socket.recv_bytes(0).expect("Communication to client failed!");
-  println!("Client connected");
+  //println!("Client connected");
   //let resp = TofResponse::Success(0);
   //cmd_socket.send(resp.to_bytestream(), 0);
   // whatever client we got, we don't care. It just triggers the call response paatern.
@@ -513,14 +513,16 @@ fn reset_data_memory_aggressively() {
   let mut buf_a_occ = UIO1_MAX_OCCUPANCY;
   let mut buf_b_occ = UIO2_MAX_OCCUPANCY;
   match get_blob_buffer_occ(&buf_a) {
-    Err(_) => debug!("Error reseting blob buffer A"),
+    Err(err) => debug!("Error getting blob buffer A occupnacy {err}"),
     Ok(val)  => {
       buf_a_occ = val;
     }
   }
   thread::sleep(one_milli);
   match get_blob_buffer_occ(&buf_b) {
-    Err(_) => debug!("Error reseting blob buffer B"),
+    Err(err) => {
+      warn!("Error getting blob buffer B occupancy {err}");
+    }
     Ok(val)  => {
       buf_b_occ = val;
     }
@@ -533,15 +535,17 @@ fn reset_data_memory_aggressively() {
     }
     thread::sleep(five_milli);
     match get_blob_buffer_occ(&buf_a) {
-      Err(_) => debug!("Error reseting blob buffer A"),
-      Ok(val)  => {
-        buf_a_occ = val;
+      Err(_) => {
+        warn!("Error reseting blob buffer A");
         thread::sleep(five_milli);
         n_tries += 1;
         if n_tries == DMA_RESET_TRIES {
           panic!("We were unable to reset DMA and the data buffers!");
         }
         continue;
+      }
+      Ok(val)  => {
+        buf_a_occ = val;
       }
     }
   }
@@ -552,15 +556,17 @@ fn reset_data_memory_aggressively() {
       Ok(_)    => () 
     }
     match get_blob_buffer_occ(&buf_b) {
-      Err(_) => warn!("Error getting occupancey for buffer B! (/dev/uio2)"),
-      Ok(val)  => {
-        buf_b_occ = val;
+      Err(_) => {
+        warn!("Error getting occupancey for buffer B! (/dev/uio2)");
         thread::sleep(five_milli);
         n_tries += 1;
         if n_tries == DMA_RESET_TRIES {
           panic!("We were unable to reset DMA and the data buffers!");
         }
         continue;
+      }
+      Ok(val)  => {
+        buf_b_occ = val;
       }
     }
   }
@@ -607,7 +613,10 @@ fn make_sure_it_runs(will_panic : &mut u8,
   reset_data_memory_aggressively();
   thread::sleep(five_milli);
   if force_trigger {
-    disable_master_trigger_mode();
+    match disable_master_trigger_mode() {
+      Err(err) => error!("Can not disable master trigger mode, Err {err}"),
+      Ok(_)    => info!("Master trigger mode didsabled!")
+    }
   }
 
   match start_drs4_daq() {
@@ -752,7 +761,10 @@ pub fn runner(max_events          : Option<u64>,
         let elapsed = timer.elapsed().as_secs_f32();
         if elapsed > time_between_events.unwrap() {
           timer = Instant::now(); 
-          trigger();
+          match trigger() {
+            Err(err) => trace!("Error when triggering! {err}"),
+            Ok(_)    => ()
+          }
         } else {
           continue;
         }
@@ -906,6 +918,10 @@ pub fn event_cache_worker(recv_ev_pl    : Receiver<RBEventPayload>,
         } //endif
         // store the event in the cache
         trace!("Received payload with event id {}" ,event.event_id);
+        // FIXME - this should not be necessary, but for now check if 
+        // the event is already in the event_cache
+
+
         event_cache.insert(event.event_id, event);   
         // keep track of the oldest event_id
         debug!("We have a cache size of {}", event_cache.len());
