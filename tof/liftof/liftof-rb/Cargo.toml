@@ -1,5 +1,5 @@
 [package]
-name = "liftoff-rb"
+name = "liftof-rb"
 version = "0.1.0"
 edition = "2021"
 
@@ -11,6 +11,14 @@ edition = "2021"
 [[bin]]
 name = "liftof-rb"
 path = "src/main.rs"
+
+[[bin]]
+name = "watch-buffer-fill"
+path = "src/bin/watch_buffer_fill.rs"
+
+[[bin]]
+name = "debug-registers"
+path = "src/bin/debug_registers.rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

@@ -314,6 +314,11 @@ pub fn cmd_responder(rsp_receiver     : &Receiver<TofResponse>,
                     continue;
                   }
                   _ => {
+                  match cmd_socket.send(resp_not_implemented.to_bytestream(),0) {
+                    Err(err) => warn!("Can not send response!"),
+                    Ok(_)    => trace!("Resp sent!")
+                  }
+                  continue;
                   }
                 } 
              
@@ -918,11 +923,9 @@ pub fn event_cache_worker(recv_ev_pl    : Receiver<RBEventPayload>,
         } //endif
         // store the event in the cache
         trace!("Received payload with event id {}" ,event.event_id);
-        // FIXME - this should not be necessary, but for now check if 
-        // the event is already in the event_cache
-
-
-        event_cache.insert(event.event_id, event);   
+        if !event_cache.contains_key(&event.event_id) {
+          event_cache.insert(event.event_id, event);
+        }
         // keep track of the oldest event_id
         debug!("We have a cache size of {}", event_cache.len());
         if event_cache.len() > cache_size {
