@@ -157,7 +157,7 @@ fn analyze_blobs(buffer               : &Vec<u8>,
         // include it in the stream to deserialize
         // if there is not enough bytes for another blob, 
         // lets break the loop
-        if (pos -2 + get_constant_blobeventsize() > buffer.len())
+        if pos -2 + get_constant_blobeventsize() > buffer.len()
           {break;}
         blob_data.reset();
         //if (pos-2 > buffer.len() -1) {break;}

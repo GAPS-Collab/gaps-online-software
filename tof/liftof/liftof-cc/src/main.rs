@@ -388,7 +388,9 @@ fn main() {
   
   //println!("==> Sleeping a bit to give the rb's a chance to fire up..");
   //thread::sleep(10*one_second);
-
-  thread::sleep(10*one_minute);
-  println!("Program terminating after specified runtime! So long and thanks for all the {}", fish); 
+  loop{
+    thread::sleep(1*one_minute);
+    println!("...");
+  }
+  //println!("Program terminating after specified runtime! So long and thanks for all the {}", fish); 
 }

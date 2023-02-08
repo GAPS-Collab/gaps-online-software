@@ -264,7 +264,6 @@ fn master_trigger(mt_to_main : &Sender<MasterTriggerEvent>,
         continue;
       }
       Ok(mt_event) => {
-        //let mt_event = MasterTriggerEvent::new(data.0, data.1 as u8);
         match mt_to_main.try_send(mt_event) {
           Err(err) => trace!("Can't send master trigger event"),
           Ok(_)    => ()

@@ -25,6 +25,7 @@
 
 use std::net::UdpSocket;
 use std::fmt;
+use std::time::Duration;
 
 use std::error::Error;
 use crate::errors::{IPBusError, MasterTriggerError};
@@ -115,13 +116,13 @@ pub struct MasterTriggerEvent {
   // the sorting is the same as
   // in board_mask
   pub hits          : [[bool;32]; 32],
-
-  /// valid is an internal flag
-  /// used by code working with MTEs.
-  /// Set it to false will mark the 
-  /// package for deletion.
-  /// Once invalidated, an event 
-  /// never shall be valid again.
+  pub crc           : u32,
+  // valid is an internal flag
+  // used by code working with MTEs.
+  // Set it to false will mark the 
+  // package for deletion.
+  // Once invalidated, an event 
+  // never shall be valid again.
   valid     : bool
 }
 
@@ -146,6 +147,7 @@ impl MasterTriggerEvent {
       board_mask    : [false;32],
       //ne 16 bit value per LTB
       hits          : [[false;32]; 32],
+      crc           : 0,
       // valid does not get serialized
       valid     : true
     }   
@@ -176,6 +178,7 @@ impl MasterTriggerEvent {
       }
       bs.extend_from_slice(&hit_mask.to_le_bytes());
     }
+    bs.extend_from_slice(&self.crc.to_le_bytes());
     bs.extend_from_slice(&MasterTriggerEvent::TAIL.to_le_bytes());
     bs
   }
@@ -373,7 +376,7 @@ fn read_register(socket      : &UdpSocket,
   let data = decode_ipbus(buffer, false)?;
   if data.len() == 0 
     { return Err(Box::new(IPBusError::DecodingFailed));}
-  
+  let ro = socket.set_read_timeout(Some(Duration::from_secs(1)));
   Ok(data[0])
 }
 
@@ -464,9 +467,9 @@ pub fn reset_daq(socket : &UdpSocket,
 
 
 /// Check if the MTB DAQ has new information 
-pub fn daq_buffer_full(socket : &UdpSocket,
-                       target_address : &str,
-                       buffer : &mut [u8;MT_MAX_PACKSIZE]) 
+pub fn daq_word_available(socket : &UdpSocket,
+                          target_address : &str,
+                          buffer : &mut [u8;MT_MAX_PACKSIZE]) 
     -> Result<bool, Box<dyn Error>> {
     //if 0 == (read_register(socket, target_address, 0x12) & 0x2):
     let queue = read_register(socket, target_address, 0x12, buffer)?;
@@ -483,6 +486,30 @@ pub fn decode_board_mask(board_mask : u32) -> [bool;32] {
     decoded_mask[n] = bit_is_set;
   }
   decoded_mask
+}
+
+/// Read a word from the DAQ package, making sure 
+/// the queue is non-empty
+///
+pub fn read_daq_word(socket : &UdpSocket,
+                     target_address : &str,
+                     buffer : &mut [u8;MT_MAX_PACKSIZE])
+  -> Result<u32, Box<dyn Error>> {
+  let ntries = 100;
+  for n in 0..ntries {
+    match daq_word_available(socket, target_address, buffer) {
+      Err(err) => continue,
+      Ok(has_data) => {
+        if has_data {
+          let word = read_register(socket, target_address, 0x11, buffer)?;
+          return Ok(word)
+        } else {
+          continue;
+        }
+      }
+    }
+  }
+  return Err(Box::new(MasterTriggerError::DAQNotAvailable));
 }
 
 
@@ -502,15 +529,8 @@ pub fn read_daq(socket : &UdpSocket,
                 target_address : &str,
                 buffer : &mut [u8;MT_MAX_PACKSIZE])
   -> Result<MasterTriggerEvent, Box<dyn Error>> {
-  // check if the queue is full
-  let has_data = daq_buffer_full(socket, target_address, buffer)?;
-  if !has_data{
-    return Err(Box::new(MasterTriggerError::QueueEmpty));
-  }
 
-
-
-  let mut event_ctr  = 0u32;
+  let mut event_ctr        = 0u32;
   let mut timestamp        = 0u32;
   let mut tiu_timestamp    = 0u32;
   let mut gps_timestamp_32 = 0u32;
@@ -519,83 +539,77 @@ pub fn read_daq(socket : &UdpSocket,
   let mut decoded_board_mask = [false;32];
   let mut hits         = [[false;32];32];
 
-  //let mut hits       :  0u32;
   let mut crc              = 0u32;
   let mut trailer          = 0u32;
-  //let mut hit_ltbs = 0u32;
-  //let mut paddles_rxd     = 1u32;
   let mut n_paddles = 0u8;
-  //let mut hits = Vec::<u32>::with_capacity(24);
-  //let mut hits = [0u16;24];
+  
   // How this works is the following. We read the data register
   // until we get the header word. Then we have a new event 
   // and we fill the values of our MasterTriggerEvent by 
   // subsequently reading out the same register again
-  let word = read_register(socket, target_address, 0x11, buffer)?;
   // this will eventually determin, 
   // how often we will read the 
   // hit register
-  if word == 0xAAAAAAAA {
-    // we start a new daq package
-    event_ctr         = read_register(socket, target_address, 0x11, buffer)?;
-    timestamp         = read_register(socket, target_address, 0x11, buffer)?;
-    tiu_timestamp     = read_register(socket, target_address, 0x11, buffer)?;
-    gps_timestamp_32  = read_register(socket, target_address, 0x11, buffer)?;
-    gps_timestamp_16  = read_register(socket, target_address, 0x11, buffer)?;
-    board_mask        = read_register(socket, target_address, 0x11, buffer)?;
-    decoded_board_mask = decode_board_mask(board_mask);
-    //hit_ltbs          = count_ones(board_mask);
-    //hit_ltbs          = board_mask.count_ones();
-    for n in 0..32 {
-      if decoded_board_mask[n] {
-        let hitmask = read_register(socket, target_address, 0x11, buffer)?;
-        if hitmask.count_ones() > 255 {
-          return Err(Box::new(MasterTriggerError::MaskTooLarge));
-        }
-        n_paddles += hitmask.count_ones() as u8;
-        hits[n] = decode_board_mask(hitmask);
+  let ntries = 100;
+  let mut event = MasterTriggerEvent::new(event_ctr, n_paddles);
+  for n in 0..ntries {
+    let word = read_daq_word(socket, target_address, buffer)?; 
+
+    if word == 0xAAAAAAAA {
+      // we start a new daq package
+      event.event_id        = read_register(socket, target_address, 0x11, buffer)?;
+      if event.event_id == 0 {
+        return Err(Box::new(MasterTriggerError::DAQNotAvailable));
       }
-    }
-    //hits.push     (read_register(socket, target_address, 0x11, buffer)?);
-    ////allhits.push(hits);  
-    //while paddles_rxd < hit_ltbs {
-    //  hit_ltbs.push(read_register(socket, target_address, 0x11, buffer)?);
-    //  paddles_rxd += 1;
-    //}
+      event.timestamp         = read_register(socket, target_address, 0x11, buffer)?;
+      event.tiu_timestamp     = read_register(socket, target_address, 0x11, buffer)?;
+      event.tiu_gps_32  = read_register(socket, target_address, 0x11, buffer)?;
+      event.tiu_gps_16  = read_register(socket, target_address, 0x11, buffer)?;
+      board_mask        = read_register(socket, target_address, 0x11, buffer)?;
+      decoded_board_mask = decode_board_mask(board_mask);
+      //println!(" decoded mask {decoded_board_mask:?}");
+      event.board_mask = decoded_board_mask;
+      for n in 0..32 {
+        if decoded_board_mask[n] {
+          let hitmask = read_register(socket, target_address, 0x11, buffer)?;
+          
+          if hitmask.count_ones() > 255 {
+            return Err(Box::new(MasterTriggerError::MaskTooLarge));
+          }
+          /// FIXME : too many checks!
+          if n_paddles as u32 + hitmask.count_ones() > 255 {
+            return Err(Box::new(MasterTriggerError::MaskTooLarge));
+          }
+          n_paddles += hitmask.count_ones() as u8;
+          hits[n] = decode_board_mask(hitmask);
+        }
+      } // end for loop
     crc         = read_register(socket, target_address, 0x11, buffer)?;
     trailer     = read_register(socket, target_address, 0x11, buffer)?;
-
+    //if trailer != 0x55555555 {
+    //  error!("Broken package");
+    //  return Err(Box::new(MasterTriggerError::BrokenPackage));
+    //}
     //debug!("event_ctr {}, ts {} , tc32 {}, tc16 {}, mask {}, crc {}, trailer {}", event_ctr, timestamp, timecode32, timecode16, hit_paddles, crc, trailer);
     //for n in 0..hits.len() {
     //  debug!(" -- -- hit {}", hits[n]);
     //}
-  } // end header found
-    //AAAAAAAA (Header)
-    //0286A387 (Event cnt)
-    //00000000 (Timestamp)
-    //00000000 (Timecode 32 bits)
-    //00000000 (Timecode 16 bits)
-    //00000001 (Mask)
-    //00000003 (Hits)
-    //97041A48 (CRC)
-    //55555555 (Trailer)
-  //for n in 0..32 {
-  //  for m in 0..32 {
-  //    if hits[n][m] { n_paddles += 1;}
+    event.timestamp     = timestamp; 
+    event.tiu_timestamp = tiu_timestamp; 
+    event.tiu_gps_32    = gps_timestamp_32; 
+    event.tiu_gps_16    = gps_timestamp_16; 
+    event.n_paddles     = n_paddles; 
+    event.board_mask    = decoded_board_mask; 
+    event.hits          = hits;
+    // one 16 bit value per LTB
+    //pub hits          : [u16; 20],
+    //println!("FOund {}" , event.event_id); 
+    return Ok(event);
+    }
+  } // end loop over n-tries
+  return Err(Box::new(MasterTriggerError::DAQNotAvailable));
   //  }
-  //}
-  let mut event = MasterTriggerEvent::new(event_ctr, n_paddles);
-  event.timestamp     = timestamp; 
-  event.tiu_timestamp = tiu_timestamp; 
-  event.tiu_gps_32    = gps_timestamp_32; 
-  event.tiu_gps_16    = gps_timestamp_16; 
-  event.n_paddles     = n_paddles; 
-  event.board_mask    = decoded_board_mask; 
-  event.hits          = hits;
-  // one 16 bit value per LTB
-  //pub hits          : [u16; 20],
-  
-  Ok(event)
+
 }
 
 

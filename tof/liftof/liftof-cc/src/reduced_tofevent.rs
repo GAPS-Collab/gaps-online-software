@@ -94,6 +94,23 @@ impl TofEvent {
     }
   }
 
+
+  /// Decode only the event id. 
+  ///
+  /// The bytestream must be sane, cannot fail
+  pub fn get_evid_from_bytestream(bytestream : &Vec<u8>, start_pos : usize) 
+    -> Result<u32, SerializationError> {
+    if bytestream.len() < 6 {
+      // something is utterly broken
+      return Err(SerializationError::StreamTooShort);
+    }
+    let evid = u32::from_le_bytes([bytestream[start_pos + 2],
+                                   bytestream[start_pos + 3],
+                                   bytestream[start_pos + 4],
+                                   bytestream[start_pos + 5]]);
+    Ok(evid)
+  }
+
   pub fn from_bytestream(bytestream : &Vec<u8>, start_pos : usize)
      -> Result<TofEvent, SerializationError> {
     let mut event = TofEvent::new(9,0);
@@ -144,9 +161,7 @@ impl TofEvent {
 
     }
     bytestream.extend_from_slice(&TofEvent::Tail        .to_le_bytes()); 
-
     bytestream
-
   }
 
   /// Add a paddle packet 

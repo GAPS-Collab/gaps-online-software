@@ -11,8 +11,10 @@ use std::net::IpAddr;
 use std::sync::mpsc::Receiver;
 use crossbeam_channel as cbc; 
 
-use tof_dataclasses::packets::TofPacket;
+use tof_dataclasses::packets::{TofPacket,
+                               PacketType};
 
+use crate::reduced_tofevent::TofEvent;
 use liftof_lib::TofPacketWriter;
 
 /// Manages "outgoing" 0MQ PUB socket
@@ -46,6 +48,8 @@ pub fn global_data_sink(incoming : &cbc::Receiver<TofPacket>,
   if write_stream {
     writer = Some(TofPacketWriter::new(String::from("stream")));
   }
+  let mut event_cache = Vec::<TofPacket>::with_capacity(100); 
+
   loop {
     match incoming.recv() {
       Err(err) => trace!("No new packet, err {err}"),
@@ -53,9 +57,31 @@ pub fn global_data_sink(incoming : &cbc::Receiver<TofPacket>,
         if writer.is_some() {
           writer.as_mut().unwrap().add_tof_packet(&pack);
         }
-        match data_socket.send(pack.to_bytestream(),0) {
-          Err(err) => warn!("Not able to send packet over 0MQ PUB"),
-          Ok(_)    => info!("TofPacket sent")
+        if pack.packet_type == PacketType::TofEvent {
+          if event_cache.len() != 100 {
+            event_cache.push(pack);
+            continue;
+          } else {
+            // sort the cache
+            // FIXME - at this step, we should have checked if the 
+            // packets are broken.
+            event_cache.sort_by(| a, b| TofEvent::get_evid_from_bytestream(&a.payload,0).unwrap().cmp(
+                                        &TofEvent::get_evid_from_bytestream(&b.payload,0).unwrap()));
+           
+            for ev in event_cache.iter() {
+              match data_socket.send(&ev.to_bytestream(),0) {
+                Err(err) => warn!("Not able to send packet over 0MQ PUB"),
+                Ok(_)    => info!("TofPacket sent")
+              }
+            }
+            event_cache.clear();
+          }
+
+        } else {
+          match data_socket.send(pack.to_bytestream(),0) {
+            Err(err) => warn!("Not able to send packet over 0MQ PUB"),
+            Ok(_)    => info!("TofPacket sent")
+          }
         }
       }
     }

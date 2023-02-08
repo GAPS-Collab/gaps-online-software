@@ -62,15 +62,19 @@ impl Error for DecodingError {
 #[derive(Debug)]
 pub enum MasterTriggerError {
   QueueEmpty,
-  MaskTooLarge
+  MaskTooLarge,
+  BrokenPackage,
+  DAQNotAvailable
 }
 
 impl fmt::Display for MasterTriggerError {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let disp : String;
     match self {
-      MasterTriggerError::QueueEmpty => {disp = String::from("QueueEmpty");},
-      MasterTriggerError::MaskTooLarge => {disp = String::from("MaskTooLarge");},
+      MasterTriggerError::QueueEmpty      => {disp = String::from("QueueEmpty");},
+      MasterTriggerError::MaskTooLarge    => {disp = String::from("MaskTooLarge");},
+      MasterTriggerError::BrokenPackage   => {disp = String::from("BrokenPackage");}
+      MasterTriggerError::DAQNotAvailable => {disp = String::from("DAQNotAvaiable");}
     }
     write!(f, "<MasterTriggerError : {}>", disp)
   }
