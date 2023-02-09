@@ -9,9 +9,9 @@ name  = "liftof-cc"
 #test  = false
 #bench = false
 
-#[[bin]]
-#name = "mt-readout"
-#path = "src/bin/mt_readout.rs"
+[[bin]]
+name = "mt-readout"
+path = "src/bin/mt_readout.rs"
 
 [features]
 # diagnostics flag switch 

@@ -17,6 +17,11 @@ name = "watch-buffer-fill"
 path = "src/bin/watch_buffer_fill.rs"
 
 [[bin]]
+name = "debug-idle"
+path = "src/bin/debug_idle.rs"
+
+
+[[bin]]
 name = "debug-registers"
 path = "src/bin/debug_registers.rs"
 

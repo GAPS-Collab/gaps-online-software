@@ -46,7 +46,7 @@ const RESTART_TRIES : u8 = 5; // if we are not successfull, to get it going,
                                    // panic
 /// The 0MQ PUB port is defined as DATAPORT_START + readoutboard_id
 const DATAPORT_START : u32 = 30000;
-
+//
 /// The 0MP REP port is defined as CMDPORT_START + readoutboard_id
 const CMDPORT_START  : u32 = 40000;
 
@@ -119,7 +119,7 @@ pub fn cmd_responder(rsp_receiver     : &Receiver<TofResponse>,
             continue;
         }
         match cmd_socket.recv_bytes(0) {
-          Err(err) => warn!("Problem receiving command over 9MQ !"),
+          Err(err) => warn!("Problem receiving command over 0MQ ! Err {err}"),
           Ok(cmd_bytes)  => {
             info!("Received bytes {}", cmd_bytes.len());
             match TofCommand::from_bytestream(&cmd_bytes,0) {
@@ -133,7 +133,7 @@ pub fn cmd_responder(rsp_receiver     : &Receiver<TofResponse>,
                     info!("Received ping signal");
                     let r = TofResponse::Success(0);
                     match cmd_socket.send(r.to_bytestream(),0) {
-                      Err(err) => warn!("Can not send response!"),
+                      Err(err) => warn!("Can not send response!, Err {err}"),
                       Ok(_)    => info!("Responded to Ping!")
                     }
                     continue;
@@ -142,7 +142,7 @@ pub fn cmd_responder(rsp_receiver     : &Receiver<TofResponse>,
                   TofCommand::PowerOn   (mask) => {
                     warn!("Not implemented");
                     match cmd_socket.send(resp_not_implemented.to_bytestream(),0) {
-                      Err(err) => warn!("Can not send response!"),
+                      Err(err) => warn!("Can not send response! Err {err}"),
                       Ok(_)    => trace!("Resp sent!")
                     }
                     continue;
@@ -150,7 +150,7 @@ pub fn cmd_responder(rsp_receiver     : &Receiver<TofResponse>,
                   TofCommand::PowerOff  (mask) => {
                     warn!("Not implemented");
                     match cmd_socket.send(resp_not_implemented.to_bytestream(),0) {
-                      Err(err) => warn!("Can not send response!"),
+                      Err(err) => warn!("Can not send response! {err}"),
                       Ok(_)    => trace!("Resp sent!")
                     }
                     continue;
@@ -158,7 +158,7 @@ pub fn cmd_responder(rsp_receiver     : &Receiver<TofResponse>,
                   TofCommand::PowerCycle(mask) => {
                     warn!("Not implemented");
                     match cmd_socket.send(resp_not_implemented.to_bytestream(),0) {
-                      Err(err) => warn!("Can not send response!"),
+                      Err(err) => warn!("Can not send response! {err}"),
                       Ok(_)    => trace!("Resp sent!")
                     }
                     continue;
@@ -166,7 +166,7 @@ pub fn cmd_responder(rsp_receiver     : &Receiver<TofResponse>,
                   TofCommand::RBSetup   (mask) => {
                     warn!("Not implemented");
                     match cmd_socket.send(resp_not_implemented.to_bytestream(),0) {
-                      Err(err) => warn!("Can not send response!"),
+                      Err(err) => warn!("Can not send response! Err {err}"),
                       Ok(_)    => trace!("Resp sent!")
                     }
                     continue;
@@ -174,7 +174,7 @@ pub fn cmd_responder(rsp_receiver     : &Receiver<TofResponse>,
                   TofCommand::SetThresholds   (thresholds) =>  {
                     warn!("Not implemented");
                     match cmd_socket.send(resp_not_implemented.to_bytestream(),0) {
-                      Err(err) => warn!("Can not send response!"),
+                      Err(err) => warn!("Can not send response! Err {err}"),
                       Ok(_)    => trace!("Resp sent!")
                     }
                     continue;

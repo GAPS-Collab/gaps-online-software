@@ -285,7 +285,7 @@ impl TofEventBuilderSettings {
 /// * paddle_packets : Receive paddle_packets from a paddle_packet
 ///                    cache
 ///
-pub fn event_builder (master_id      : &Receiver<MasterTriggerEvent>,
+pub fn event_builder (master_id      : &cbc::Receiver<MasterTriggerEvent>,
                       pp_query       : &Sender<Option<u32>>,
                       pp_recv        : &Receiver<Option<PaddlePacket>>,
                       settings       : &cbc::Receiver<TofEventBuilderSettings>,

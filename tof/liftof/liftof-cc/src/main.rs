@@ -1,18 +1,3 @@
-mod readoutboard_comm;
-//mod reduced_tofevent;
-mod constants;
-mod waveform;
-mod errors;
-mod api;
-mod master_trigger;
-mod event_builder;
-mod paddle_packet_cache;
-mod flight_comms;
-// this is a list of tests
-// FIXME - this should follow
-// the "official" structure
-// for now, let's just keep it here
-mod test_blobdata;
 
 extern crate pretty_env_logger;
 #[macro_use] extern crate log;
@@ -57,23 +42,23 @@ extern crate crossbeam_channel;
 //                        Sender,
 //                        Receiver};
 use crossbeam_channel as cbc; 
-
-use crate::readoutboard_comm::readoutboard_communicator;
-use crate::master_trigger::{master_trigger};
 use tof_dataclasses::events::MasterTriggerEvent;
 //                            MasterTriggerEvent};
-use crate::event_builder::{event_builder,
+use tof_dataclasses::threading::ThreadPool;
+use tof_dataclasses::packets::paddle_packet::PaddlePacket;
+use tof_dataclasses::packets::TofPacket;
+
+extern crate liftof_cc;
+
+use liftof_cc::readoutboard_comm::readoutboard_communicator;
+use liftof_cc::master_trigger::{master_trigger};
+use liftof_cc::event_builder::{event_builder,
                            TofEventBuilderSettings};
                            //event_builder_no_master};
-use crate::api::commander;
+use liftof_cc::api::commander;
+use liftof_cc::paddle_packet_cache::paddle_packet_cache;
+use liftof_cc::flight_comms::global_data_sink;
 
-use crate::flight_comms::global_data_sink;
-
-use tof_dataclasses::threading::ThreadPool;
-
-use tof_dataclasses::packets::paddle_packet::PaddlePacket;
-use crate::paddle_packet_cache::paddle_packet_cache;
-use tof_dataclasses::packets::TofPacket;
 
 /*************************************/
 
@@ -258,7 +243,7 @@ fn main() {
 
 
   // master thread -> event builder ocmmuncations
-  let (master_ev_send, master_ev_rec): (Sender<MasterTriggerEvent>, Receiver<MasterTriggerEvent>) = channel(); 
+  let (master_ev_send, master_ev_rec): (cbc::Sender<MasterTriggerEvent>, cbc::Receiver<MasterTriggerEvent>) = cbc::unbounded(); 
   // event builder  <-> paddle cache communications
   let (pp_send, pp_rec) : (Sender<Option<PaddlePacket>>, Receiver<Option<PaddlePacket>>) = channel(); 
   // readout boards <-> paddle cache communications 

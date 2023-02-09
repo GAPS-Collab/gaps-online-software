@@ -60,7 +60,7 @@ pub fn connect_to_mtb(mt_ip   : &str,
 pub fn master_trigger(mt_ip   : &str, 
                       mt_port : usize,
                       glob_data_sink : &cbc::Sender<TofPacket>,
-                      evid_sender : &Sender<MasterTriggerEvent>) {
+                      evid_sender : &cbc::Sender<MasterTriggerEvent>) {
 
   let mt_address = mt_ip.to_owned() + ":" + &mt_port.to_string();
  
