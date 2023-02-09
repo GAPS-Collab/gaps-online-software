@@ -10,14 +10,52 @@ use std::{thread, time};
 use indicatif::{MultiProgress,
                 ProgressBar, 
                 ProgressStyle};
-
+use tof_dataclasses::events::blob::BlobData;
+use tof_dataclasses::serialization::search_for_u16;
 
 use liftof_rb::api::*;
 use liftof_rb::control::*;
 use liftof_rb::memory::BlobBuffer;
+use liftof_rb::memory::RegisterError;
+use liftof_rb::memory::map_physical_mem_read;
 
-pub const UIO1_TRIP : u32 = 66520576;
-pub const UIO2_TRIP : u32 = 66520576;
+
+const UIO1_TRIP : u32 = 66520576;
+const UIO2_TRIP : u32 = 66520576;
+const UIO0 : &'static str = "/dev/uio0";
+const UIO1 : &'static str = "/dev/uio1";
+const UIO2 : &'static str = "/dev/uio2";
+const SLEEP_AFTER_REG_WRITE : u32 = 1; // sleep time after register write in ms
+
+///! Return the bytes located at the memory
+pub fn get_bytestream(addr_space : &str, 
+                  addr : u32,
+                  len  : usize) -> Result<Vec::<u8>, RegisterError> {
+
+  let blobsize = BlobData::SERIALIZED_SIZE;
+  let vec_size = blobsize*len;
+  // FIXME - allocate the vector elsewhere and 
+  // pass it by reference
+  let mut bytestream = Vec::<u8>::with_capacity(vec_size);
+
+  let sz = std::mem::size_of::<u8>();
+  let m = match map_physical_mem_read(addr_space, addr, vec_size * sz) {
+    Ok(m) => m,
+    Err(err) => {
+      let error = RegisterError {};
+      println!("Failed to mmap: Err={:?}", err);
+      return Err(error);
+    }
+  };
+  let p = m.as_ptr() as *const u8;
+  (0..vec_size).for_each(|x| unsafe {
+    let value = std::ptr::read_volatile(p.offset(x as isize));
+    bytestream.push(value); // push is free, since we 
+                            // allocated the vector in the 
+                            // beginning
+  });
+  Ok(bytestream)
+}
 
 
 extern crate pretty_env_logger;
@@ -27,6 +65,37 @@ extern crate pretty_env_logger;
 const TEMPLATE_BAR_A  : &str = "[{elapsed_precise}] {bar:60.blue/white} {pos:>7}/{len:7} {msg}";
 const TEMPLATE_BAR_B  : &str = "[{elapsed_precise}] {bar:60.orange/white} {pos:>7}/{len:7} {msg}";
 const TEMPLATE_BAR_EV : &str = "[{elapsed_precise}] {bar:60.red/white} {pos:>7}/{len:7} {msg}";
+
+
+
+///! Get the blob buffer size from occupancy register
+///
+///  Read out the occupancy register and compare to 
+///  a previously recoreded value. 
+///  Everything is u32 (the register can't hold more)
+///
+///  The size of the buffer can only be defined compared
+///  to a start value. If the value rools over, the 
+///  size then does not make no longer sense and needs
+///  to be updated.
+///
+///  #Arguments: 
+///
+fn get_buff_size(which : &BlobBuffer, buff_start : &mut u32) ->Result<u32, RegisterError> {
+  let mut size : u32;
+  let occ = get_blob_buffer_occ(&which)?;
+  if *buff_start > occ {
+    debug!("The occupancy counter has rolled over!");
+    debug!("It reads {occ}");
+    //size = occ;
+    //*buff_start = occ;
+    return Err(RegisterError {});
+  } else {
+    size  = occ - *buff_start;
+  }
+  Ok(size)
+}
+
 
 
 
