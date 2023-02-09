@@ -401,11 +401,11 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   // set up Threads
   let n_threads = 20;
   let workforce = ThreadPool::new(n_threads);
-  workforce.execute(move || {
-      commander(cmd_from_main,
-                rsp_to_main,
-                rb_list_c2);
-  });
+  //workforce.execute(move || {
+  //    commander(cmd_from_main,
+  //              rsp_to_main,
+  //              rb_list_c2);
+  //});
   workforce.execute(move || {
       receive_stream(tp_to_main, rb_list_c);
   });

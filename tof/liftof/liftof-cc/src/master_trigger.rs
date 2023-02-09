@@ -113,7 +113,7 @@ pub fn master_trigger(mt_ip   : &str,
     } else if elapsed % 10 != 0 {
       next_beat = true;
     }
-    if timeout.elapsed().as_secs() > 5 {
+    if timeout.elapsed().as_secs() > 10 {
       drop(socket);
       socket = connect_to_mtb(&mt_ip, &mt_port).expect("Can not create local UDP socket for MTB connection!"); 
       timeout = Instant::now();
@@ -212,9 +212,6 @@ pub fn master_trigger(mt_ip   : &str,
       event_missing = true;
     }
     
-    // new event
-    // send it down the pip
-    //let mt_event = MasterTriggerEvent::new(event_cnt, n_paddles_expected as u8);
     info!("Got new event id from master trigger {}",ev.event_id);
     match evid_sender.send(ev) {
       Err(err) => trace!("Can not send event, err {err}"),

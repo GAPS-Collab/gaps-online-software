@@ -50,7 +50,15 @@ pub fn global_data_sink(incoming : &cbc::Receiver<TofPacket>,
   }
   let mut event_cache = Vec::<TofPacket>::with_capacity(100); 
 
+  let mut n_pack_sent = 0;
+  let mut last_evid   = 0u32;
   loop {
+    if n_pack_sent % 100 == 0 && n_pack_sent != 0 {
+      println!("=> Sending debugging... ===");
+      println!("=> Sent {n_pack_sent} packets!");
+      println!("=> Last evid {last_evid} !");
+      println!("=> {} event inwaiting in chan", incoming.len());
+    }
     match incoming.recv() {
       Err(err) => trace!("No new packet, err {err}"),
       Ok(pack) => {
@@ -69,9 +77,13 @@ pub fn global_data_sink(incoming : &cbc::Receiver<TofPacket>,
                                         &TofEvent::get_evid_from_bytestream(&b.payload,0).unwrap()));
            
             for ev in event_cache.iter() {
+              last_evid = TofEvent::get_evid_from_bytestream(&ev.payload,0).unwrap();
               match data_socket.send(&ev.to_bytestream(),0) {
                 Err(err) => warn!("Not able to send packet over 0MQ PUB"),
-                Ok(_)    => info!("TofPacket sent")
+                Ok(_)    => { 
+                  info!("TofPacket sent");
+                  n_pack_sent += 1;
+                }
               }
             }
             event_cache.clear();
@@ -80,11 +92,14 @@ pub fn global_data_sink(incoming : &cbc::Receiver<TofPacket>,
         } else {
           match data_socket.send(pack.to_bytestream(),0) {
             Err(err) => warn!("Not able to send packet over 0MQ PUB"),
-            Ok(_)    => info!("TofPacket sent")
-          }
-        }
-      }
-    }
+            Ok(_)    => {
+              trace!("TofPacket sent");
+              n_pack_sent += 1;
+            }
+          } // end match
+        } // end else
+      } // end if pk == event packet
+    } // end incoming.recv 
   }
 
 }
