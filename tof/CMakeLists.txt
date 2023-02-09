@@ -181,6 +181,7 @@ add_library(${GAPSTOF_LIBRARY_SHARED}
     dataclasses/C++/src/WaveGAPS.cpp
     dataclasses/C++/src/CommandPacket.cxx
     dataclasses/C++/src/RBMoniPacket.cxx
+    dataclasses/C++/src/MasterTriggerPacket.cxx
 )
 
 target_compile_options(${GAPSTOF_LIBRARY_SHARED} PRIVATE -Wall -Wextra -Wpedantic)# -Werror)
