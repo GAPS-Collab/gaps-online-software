@@ -16,6 +16,7 @@ before_script:
 test:
   stage: test
   script:
+    - cd tof/liftof
     - rustc --version
     - cargo --version
     - cargo test --verbose
@@ -23,6 +24,7 @@ test:
 pages:
   stage: doc
   script:
+    - cd tof/liftof
     - cargo doc 
     - mv target/doc public
     - echo '<meta http-equiv="refresh" content="0; url={{ LIBRARY NAME }}">' > public/index.html
