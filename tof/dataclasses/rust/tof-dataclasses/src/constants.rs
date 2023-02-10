@@ -42,7 +42,7 @@ pub const MAX_NUM_PEAKS : usize = 50;
 pub const MAX_TRIGGER_RATE : usize = 200;
 
 /// How long to wait for paddles packets for each event 
-/// in microseconds. This does highly depend on the 
+/// in seconds. This does highly depend on the 
 /// frequency with which the readoutboards are emitting
 /// For now, lets use 30s. 
 ///
@@ -52,8 +52,8 @@ pub const MAX_TRIGGER_RATE : usize = 200;
 /// This might NOT be relevant when we run 
 /// with the master trigger.
 ///
-pub const EVENT_TIMEOUT : u128 = 30000000;
-
+//pub const EVENT_TIMEOUT : u128 = 30000000;
+pub const EVENT_TIMEOUT : u64 = 10;
 
 /// Limit the size of the internal paddle packet cache
 /// - all packets abvoe this value will be dropped

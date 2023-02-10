@@ -59,8 +59,12 @@ struct RPaddlePacket  {
   std::string version = RPADDLEPACKETVERSION; // packet version
 
 
+
+  //! If the paddle is broken, it is utter trash. Most likely, nothing can be salvaged.
+  bool is_broken();
+
   // PaddlePacket legth is fixed
-  static unsigned short calculate_length();
+  static u16 calculate_length();
   void reset();
 
   vec_u8 serialize() const; 
@@ -69,6 +73,10 @@ struct RPaddlePacket  {
  
   // easier print out
   std::string to_string() const;
+  
+  private:
+    // don't serialize
+    bool broken;
 };
 
 std::ostream& operator<<(std::ostream& os, const RPaddlePacket& pad);

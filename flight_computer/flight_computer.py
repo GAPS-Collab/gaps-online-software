@@ -43,7 +43,10 @@ while True:
 
     if npackets % 100 == 0:
         print (f'=======')
-        print (f' last event {event.event_id}')
+        print (f' last event {event.event_id} {event.n_paddles}')
+        if event.n_paddles > 0:
+            print(event)
+            print(event.paddle_packets[0])
         print (f"received {npackets} packets, delta t {time.time() - now}")
         now = time.time()
 

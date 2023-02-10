@@ -24,7 +24,7 @@ void RPaddlePacket::reset()
   //  the REventstream
   ctr_etx = 0x00;
   tail = 0xF0F;
-
+  broken = true;
 }
 
 /*******************************************/
@@ -129,12 +129,12 @@ std::vector<unsigned char> RPaddlePacket::serialize() const
 
 /*******************************************/
 
-unsigned int RPaddlePacket::deserialize(std::vector<unsigned char>& bytestream,
-                                        unsigned int start_pos)
+unsigned int RPaddlePacket::deserialize(vec_u8 &bytestream,
+                                        u32 start_pos)
 {
  // start from position in bytestream
- unsigned short value; 
- unsigned int end_pos = start_pos;
+ u16 value; 
+ u32 end_pos = start_pos;
 
  // find start marker in bytestream
  for (size_t k=start_pos;k<bytestream.size();k++)
@@ -149,8 +149,8 @@ unsigned int RPaddlePacket::deserialize(std::vector<unsigned char>& bytestream,
     }
  }
 
- unsigned int pos = end_pos; // position in bytestream
- unsigned short expected_packet_size = decode_ushort(bytestream, pos);pos+=2; 
+ u32 pos = end_pos; // position in bytestream
+ u16 expected_packet_size = decode_ushort(bytestream, pos);pos+=2; 
 
  //event_ctr = decode_uint32(bytestream, pos); pos+=4;
 
@@ -167,7 +167,10 @@ unsigned int RPaddlePacket::deserialize(std::vector<unsigned char>& bytestream,
 
  ctr_etx = bytestream[pos]; pos+=1;
  // FIXME checks - packetlength, checksum ?
-
+ tail = decode_ushort(bytestream, pos); pos+=2;
+ if (tail != 0xF0F) {
+   broken = true;
+ }
  return pos; 
 }
 
@@ -194,6 +197,14 @@ std::string RPaddlePacket::to_string() const
   repr += "TAIL "          + std::to_string(tail              ) + "\n"; 
   return repr;
 }
+
+/*******************************************/
+
+bool RPaddlePacket::is_broken() {
+  return broken;
+}
+
+
 
 /*******************************************/
 

@@ -6,7 +6,8 @@
 //!
 //!
 
-use std::time::SystemTime;
+use std::time::{SystemTime,
+                Instant};
 
 use crate::constants::EVENT_TIMEOUT;
 //use crate::errors::SerializationError;
@@ -15,6 +16,8 @@ use crate::errors::EventError;
 use crate::packets::paddle_packet::PaddlePacket;
 use crate::serialization::search_for_u16;
 use crate::errors::SerializationError;
+
+use crate::events::MasterTriggerEvent;
 
 #[cfg(feature="random")]
 use rand::Rng;
@@ -59,7 +62,8 @@ pub struct TofEvent  {
   // after timeout microseconds
   // thus we are saving the time, this isntance has 
   // been created.
-  pub creation_time      : u128,
+  //pub creation_time      : u128,
+  pub creation_time      : Instant,
 
   pub valid              : bool,
 }
@@ -75,9 +79,10 @@ impl TofEvent {
 
   pub fn new(event_id : u32,
              n_paddles_expected : u8) -> TofEvent {
-    let creation_time  = SystemTime::now()
-                         .duration_since(SystemTime::UNIX_EPOCH)
-                         .unwrap().as_micros();
+    //let creation_time  = SystemTime::now()
+    //                     .duration_since(SystemTime::UNIX_EPOCH)
+    //                     .unwrap().as_micros();
+    let creation_time = Instant::now();
 
     TofEvent { 
       event_id       : event_id,
@@ -155,7 +160,7 @@ impl TofEvent {
              evid[2]];
     bytestream.extend_from_slice(&evid);
     bytestream.push(self.n_paddles);
-    for n in 0..self.n_paddles as usize {
+    for n in 0..self.paddle_packets.len() as usize {
       let pp = self.paddle_packets[n];
       bytestream.extend_from_slice(&pp.to_bytestream());
 
@@ -184,7 +189,12 @@ impl TofEvent {
   ///
   ///
   pub fn has_timed_out(&self) -> bool {
-    return elapsed_since_epoch() - self.creation_time > EVENT_TIMEOUT;
+    //return elapsed_since_epoch() - self.creation_time > EVENT_TIMEOUT;
+    return self.age() > EVENT_TIMEOUT;
+  }
+
+  pub fn age(&self) -> u64 {
+    self.creation_time.elapsed().as_secs()
   }
 
   pub fn is_complete(&self) -> bool {
@@ -202,6 +212,22 @@ impl TofEvent {
     return self.is_complete() || (self.has_timed_out() && use_timeout);
   }
 }
+
+impl Default for TofEvent {
+  fn default() -> TofEvent {
+    TofEvent::new(0,0)
+  }
+}
+
+impl From<&MasterTriggerEvent> for TofEvent {
+  fn from(mte : &MasterTriggerEvent) -> TofEvent {
+    let mut te : TofEvent = Default::default();
+    te.event_id = mte.event_id;
+    te.n_paddles = mte.get_hit_paddles();
+    te
+  }
+}
+
 
 
 ///

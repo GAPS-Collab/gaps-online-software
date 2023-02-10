@@ -538,6 +538,7 @@ PYBIND11_MODULE(gaps_tof, m) {
         .def("deserialize",       &RPaddlePacket::deserialize)
         .def("calculate_length",  &static_helper)
         .def("reset",             &RPaddlePacket::reset)
+	.def("is_broken",         &RPaddlePacket::is_broken)
         .def("get_paddle_id",     &RPaddlePacket::get_paddle_id) 
         .def("get_time_a",        &RPaddlePacket::get_time_a) 
         .def("get_time_b",        &RPaddlePacket::get_time_b) 

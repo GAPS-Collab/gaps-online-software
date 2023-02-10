@@ -81,7 +81,7 @@ pub fn global_data_sink(incoming : &cbc::Receiver<TofPacket>,
               match data_socket.send(&ev.to_bytestream(),0) {
                 Err(err) => warn!("Not able to send packet over 0MQ PUB"),
                 Ok(_)    => { 
-                  info!("TofPacket sent");
+                  trace!("TofPacket sent");
                   n_pack_sent += 1;
                 }
               }
@@ -100,6 +100,9 @@ pub fn global_data_sink(incoming : &cbc::Receiver<TofPacket>,
         } // end else
       } // end if pk == event packet
     } // end incoming.recv 
+    if n_pack_sent % 1000 == 0 {
+      info!("Sent {n_pack_sent} TofPacket!");
+    }
   }
 
 }

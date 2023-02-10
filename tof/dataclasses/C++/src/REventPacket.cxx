@@ -172,19 +172,32 @@ u32 REventPacket::deserialize(vec_u8 &bytestream,
   // FIXME checks - packetlength, checksum ?
   paddle_info.reserve(n_paddles);
   RPaddlePacket p;
-  for (size_t k=0;k<n_paddles;k++)
-    {  
-     p.deserialize(bytestream, pos);
-     paddle_info.push_back(p);
-     pos += p.calculate_length();
+  u8 paddles_found = 0;
+  while (paddles_found <= n_paddles) {
+    p.deserialize(bytestream, pos);
+    if (!p.is_broken()) {
+      paddle_info.push_back(p);
+      pos += p.calculate_length();
+      paddles_found += 1;
+    } else {
+      paddle_info.push_back(p);
+      // we stop at the first broken package
+      break;
     }
+  }
+  //for (size_t k=0;k<n_paddles;k++)
+  //  {  
+  //   p.deserialize(bytestream, pos);
+  //   paddle_info.push_back(p);
+  //   pos += p.calculate_length();
+  //  }
   unsigned short payload_tail = decode_ushort(bytestream, pos); pos+=2;
   //std::cout << "[DEBUG] expected packet size = " << expected_packet_size << " received " << pos << " bytes!" << std::endl; 
   if (payload_tail != tail) //|| (expected_packet_size != pos))
      {
-         std::cerr << "[ERROR] broken package! Tail flag "<< payload_tail 
-             //<< " expected size " << expected_packet_size 
-             << " received " << pos << " bytes!" << std::endl;
+         //std::cerr << "[ERROR] broken package! Tail flag "<< payload_tail 
+         //    //<< " expected size " << expected_packet_size 
+         //    << " received " << pos << " bytes!" << std::endl;
          broken = true;
      }
   // checks for debugging

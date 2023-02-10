@@ -671,7 +671,7 @@ pub fn read_daq(socket : &UdpSocket,
       for n in (0..18).step_by(2) {
         if decoded_board_mask[n+1] || decoded_board_mask[n] {
           let hitmask = read_daq_word(socket, target_address, buffer)?;
-          error!("Got hitmask {hitmask}");
+          trace!("Got hitmask {hitmask}");
           (hits_a, hits_b) = decode_hit_mask(hitmask);
           event.hits[n+1] = hits_a;
           event.hits[n] = hits_b;

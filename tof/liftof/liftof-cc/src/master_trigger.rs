@@ -217,7 +217,7 @@ pub fn master_trigger(mt_ip   : &str,
       event_missing = true;
     }
     
-    info!("Got new event id from master trigger {}",ev.event_id);
+    debug!("Got new event id from master trigger {}",ev.event_id);
     match evid_sender.send(ev) {
       Err(err) => trace!("Can not send event, err {err}"),
       Ok(_)    => ()

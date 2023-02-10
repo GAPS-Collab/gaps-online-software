@@ -41,6 +41,7 @@ fn build_events_in_cache(event_cache   : &mut VecDeque<TofEvent>,
                          //socket        : &zmq::Socket) {
 
   for ev in event_cache.iter_mut() {
+    trace!("Event {} is {} sec old", ev.event_id, ev.age());
     let start   = Instant::now();
     let timeout = Duration::from_micros(timeout_micro);
     if !ev.valid {
@@ -67,7 +68,7 @@ fn build_events_in_cache(event_cache   : &mut VecDeque<TofEvent>,
 
       match data_sink.send(pack) {
         Err(err) => warn!("Packet sending failed! Err {}", err),
-        Ok(_)    => trace!("Event {} sent!", ev.event_id) 
+        Ok(_)    => info!("Event {} with {} paddles sent and {} paddles were expected!", ev.event_id, ev.paddle_packets.len(),ev.n_paddles) 
       }
       continue;
     }
@@ -297,98 +298,35 @@ pub fn event_builder (master_id      : &cbc::Receiver<MasterTriggerEvent>,
 
   // timeout in microsecnds
   let timeout_micro = 100;
+  let use_timeout   = true;
   let mut n_iter = 0; // don't worry it'll be simply wrapped around
   // we try to receive eventids from the master trigger
   loop {
-   //// let's work on our backlog and check if we can complete 
-   //// events
-   //for ev in event_cache.iter_mut() {
-   //  let start = Instant::now();
-   //  let timeout = Duration::from_micros(timeout_micro)
-   //                .as_micros();
-   //  pp_query.send(Some(ev.event_id));
-   //  while start.elapsed().as_micros() < timeout {
-   //    let mut n_pad = 0;
-   //    match paddle_packets.try_recv() { 
-   //      Err(_) => {}
-   //      Ok(pp_or_none) => {
-   //        match pp_or_none {
-   //          Some(pp) => {
-   //            ev.paddle_packets.push(pp);
-   //            n_pad += 1
-   //          },
-   //          None => {
-   //            break;
-   //          }
-   //        }
-   //      }
-   //    } // end match
-   //    if ev.is_complete() {
-   //      trace!("Event {} building complete!", ev.event_id);
-   //      break; // on to the next event in cache
-   //    }
-   //  } // end while not timeout
-   //}
-   //// clean the cache - remove all completed events
-   //event_cache.retain(|ev| !ev.is_complete());
 
-   // every iteration, we welcome a new master event
-   match master_id.try_recv() {
-     Err(_) => {
-       trace!("No new event ready yet!");
-       continue;
-     }   
-     Ok(mt) => {
-       trace!("Got trigger for event {} with {} expected hit paddles"
-              , mt.event_id
-              , mt.n_paddles);
-       let mut event = TofEvent::new(mt.event_id, mt.n_paddles);
-       // let's query the paddle packet cache for a certain time
-       // and then move on and try later again      
-       //let start = Instant::now();
-       //let timeout = Duration::from_micros(timeout_micro);
-       
-       //pp_query.send(Some(mt.event_id));
-       //while start.elapsed() < timeout {
-       //  let mut n_pad = 0;
-       //  match pp_recv.try_recv() { 
-       //    Err(err) => trace!("Did not receive a paddle packet, Err {err}"),
-       //    Ok(pp_or_none) => {
-       //      match pp_or_none {
-       //        Some(pp) => {
-       //          event.add_paddle(pp);
-       //          n_pad += 1
-       //        }
-       //        None => {
-       //          break;
-       //        }
-       //      } 
-       //    }
-       //  } // end match
-       //  if event.is_complete() {
-       //    trace!("Event {} building complete!", mt.event_id);
-       //    break;
-       //  }
-       //} // end while not timeout
-       event_cache.push_back(event);
-       //if event.paddle_packets.len() == mt.n_paddles as usize {
-       //  trace!("Event {} building complete!", mt.event_id);
-       //  continue; // on to the next mt event
-       //} else {
-       //  // we have to put the event on the stack and try
-       //  // again later
-       //}
-     }
+    // every iteration, we welcome a new master event
+    match master_id.try_recv() {
+      Err(_) => {
+        trace!("No new event ready yet!");
+        continue;
+      }   
+      Ok(mt) => {
+        trace!("Got trigger for event {} with {} expected hit paddles"
+               , mt.event_id
+               , mt.n_paddles);
+        let mut event =  TofEvent::from(&mt);
+        event_cache.push_back(event);
+      }
     } // end match Ok(mt)
-    if n_iter % 100 == 0 {
+    if n_iter  == 100 {
       build_events_in_cache(&mut event_cache, timeout_micro,
                             pp_query,
                             pp_recv,
                             true,
-                            false,
+                            use_timeout,
                             &mut paddle_cache, 
                             &data_sink);
                             //&socket);
+      n_iter = 0;
     }
     n_iter += 1;
   } // end loop
