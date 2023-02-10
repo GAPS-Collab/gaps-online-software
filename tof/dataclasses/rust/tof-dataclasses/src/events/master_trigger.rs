@@ -39,6 +39,10 @@ use crate::serialization::{Serialization,
 /// (arbitrary number)
 const MT_MAX_PACKSIZE   : usize = 512;
 
+
+const N_LTBS : usize = 20;
+const N_CHN_PER_LTB : usize = 16;
+
 /// The IPBus standard encodes several packet types.
 ///
 /// The packet type then will 
@@ -86,15 +90,6 @@ impl From<IPBusPacketType> for u8 {
   }
 }
 
-
-/// Representation of the hit mask received from the MasterTrigger
-#[derive(Debug, Copy, Clone)]
-pub struct HitMask {
-  pub n_ltbs    : u8,
-  pub n_paddles : u8,
-
-}
-
 /// An event as observed by the MTB
 ///
 /// This is condensed to the most 
@@ -111,11 +106,11 @@ pub struct MasterTriggerEvent {
   pub n_paddles     : u8, 
   // indicates which LTBs have 
   // triggered
-  pub board_mask    : [bool; 32],
+  pub board_mask    : [bool; N_LTBS],
   // one 16 bit value per LTB
   // the sorting is the same as
   // in board_mask
-  pub hits          : [[bool;32]; 32],
+  pub hits          : [[bool;N_CHN_PER_LTB]; N_LTBS],
   pub crc           : u32,
   // valid is an internal flag
   // used by code working with MTEs.
@@ -144,9 +139,9 @@ impl MasterTriggerEvent {
       tiu_gps_32    : 0,
       tiu_gps_16    : 0,
       n_paddles     : n_paddles, 
-      board_mask    : [false;32],
+      board_mask    : [false;N_LTBS],
       //ne 16 bit value per LTB
-      hits          : [[false;32]; 32],
+      hits          : [[false;N_CHN_PER_LTB]; N_LTBS],
       crc           : 0,
       // valid does not get serialized
       valid     : true
@@ -163,15 +158,15 @@ impl MasterTriggerEvent {
     bs.extend_from_slice(&self.tiu_gps_16.to_le_bytes());
     bs.extend_from_slice(&self.n_paddles.to_le_bytes());
     let mut board_mask : u32 = 0;
-    for n in 0..32 {
+    for n in 0..N_LTBS {
       if self.board_mask[n] {
         board_mask += 2_u32.pow(n as u32);
       }
     }
     bs.extend_from_slice(&board_mask.to_le_bytes());
-    for n in 0..32 {
+    for n in 0..N_LTBS {
       let mut hit_mask : u32 = 0;
-      for j in 0..32 {
+      for j in 0..N_CHN_PER_LTB {
         if self.hits[n][j] {
           hit_mask += 2_u32.pow(j as u32);
         }
@@ -183,7 +178,59 @@ impl MasterTriggerEvent {
     bs
   }
 
+  fn bitmask_to_str(mask : &[bool]) -> String {
+    let mut m_str = String::from("");
+    for n in mask {
+      if *n {
+        m_str += "1";
+      } else {
+        m_str += "0";
+      }
+    }
+    m_str
+  }
 
+  pub fn boardmask_to_str(&self) -> String {
+    let bm_str = MasterTriggerEvent::bitmask_to_str(&self.board_mask);
+    bm_str
+  }
+
+  pub fn hits_to_str(&self) -> String {
+    let mut hits_str = String::from("");
+    for j in 0..self.hits.len() {
+      hits_str += &(j.to_string() + ": [" + &MasterTriggerEvent::bitmask_to_str(&self.hits[j]) + "]\n");
+    }
+    hits_str
+  }
+
+  /// Get the number of hit paddles from 
+  /// the hitmask.
+  ///
+  /// Now the question is 
+  /// what do we consider a hit. 
+  /// Currently we have for the LTB threshold
+  /// 0 = no hit 
+  /// 01 = thr1
+  /// 10 = thr2
+  /// 11 = thr3
+  ///
+  /// For now, we just say everything larger 
+  /// than 01 is a hit
+  pub fn get_hit_paddles(&self) -> u8 {
+    let mut n_paddles = 0u8;
+    // somehow it is messed up how we iterate over
+    // the array (I think this must be reversed.
+    // At least for the number of paddles it does 
+    // not matter.
+    for n in 0..N_LTBS { 
+      for ch in (0..N_CHN_PER_LTB -1).step_by(2) {
+        if self.hits[n][ch] || self.hits[n][ch+1] {
+          n_paddles += 1;
+        }
+      }
+    }
+    n_paddles
+  }
 
   pub fn invalidate(&mut self) {
     self.valid = false;
@@ -223,8 +270,10 @@ impl Default for MasterTriggerEvent {
 
 impl fmt::Display for MasterTriggerEvent {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(f, "<MasterTriggerEvent\n event id\t {}\n timestamp\t {}\n tiu_timestamp\t {}\n tiu_gps_32\t {}\n tiu_gps_16\t {}\n n paddles\t {}  >",
-           self.event_id, self.timestamp, self.tiu_timestamp, self.tiu_gps_32, self.tiu_gps_16, self.n_paddles)
+    write!(f, "<MasterTriggerEvent\n event id\t {}\n timestamp\t {}\n tiu_timestamp\t {}\n tiu_gps_32\t {}\n tiu_gps_16\t {}\n n paddles\t {}\n boardmask\t {}\n hits {}\n crc\t {} >",
+           self.event_id, self.timestamp, self.tiu_timestamp,
+           self.tiu_gps_32, self.tiu_gps_16, self.get_hit_paddles(),
+           self.boardmask_to_str(), self.hits_to_str(), self.crc)
   }
 }
 
@@ -479,15 +528,50 @@ pub fn daq_word_available(socket : &UdpSocket,
 }
 
 /// Helper to get the number of the triggered LTB from the bitmask
-pub fn decode_board_mask(board_mask : u32) -> [bool;32] {
-  let mut decoded_mask = [false;32];
-  for n in 0..32 {
+pub fn decode_board_mask(board_mask : u32) -> [bool;N_LTBS] {
+  let mut decoded_mask = [false;N_LTBS];
+  // FIXME this implicitly asserts that the fields for non available LTBs 
+  // will be 0 and all the fields will be in order 
+  let mut index = N_LTBS - 1;
+  for n in 0..N_LTBS {
     let mask = 1 << n;
     let bit_is_set = (mask & board_mask) > 0;
-    decoded_mask[n] = bit_is_set;
+    decoded_mask[index] = bit_is_set;
+    if index != 0 {
+        index -= 1;
+    }
   }
   decoded_mask
 }
+
+/// Helper to get the number of the triggered LTB from the bitmask
+pub fn decode_hit_mask(hit_mask : u32) -> ([bool;N_CHN_PER_LTB],[bool;N_CHN_PER_LTB]) {
+  let mut decoded_mask_0 = [false;N_CHN_PER_LTB];
+  let mut decoded_mask_1 = [false;N_CHN_PER_LTB];
+  // FIXME this implicitly asserts that the fields for non available LTBs 
+  // will be 0 and all the fields will be in order
+  let mut index = N_CHN_PER_LTB - 1;
+  for n in 0..N_CHN_PER_LTB {
+    let mask = 1 << n;
+    let bit_is_set = (mask & hit_mask) > 0;
+    let foo = mask & hit_mask;
+    decoded_mask_0[index] = bit_is_set;
+    if index != 0 {
+      index -= 1;
+    }
+  }
+  index = N_CHN_PER_LTB -1;
+  for n in N_CHN_PER_LTB..2*N_CHN_PER_LTB {
+    let mask = 1 << n;
+    let bit_is_set = (mask & hit_mask) > 0;
+    decoded_mask_1[index] = bit_is_set;
+    if index != 0 {
+      index -= 1;
+    }
+  }
+  (decoded_mask_0, decoded_mask_1)
+}
+
 
 /// Read a word from the DAQ package, making sure 
 /// the queue is non-empty
@@ -537,8 +621,12 @@ pub fn read_daq(socket : &UdpSocket,
   let mut gps_timestamp_32 = 0u32;
   let mut gps_timestamp_16 = 0u32;
   let mut board_mask           = 0u32;
-  let mut decoded_board_mask = [false;32];
-  let mut hits         = [[false;32];32];
+  // board means ltb here. Hits are hits 
+  // on ltbs. ltbs have 16 channels!
+  let mut decoded_board_mask = [false;N_LTBS];
+  let mut hits         = [[false;N_CHN_PER_LTB];N_LTBS];
+  let mut hits_a       = [false;N_CHN_PER_LTB];
+  let mut hits_b       = [false;N_CHN_PER_LTB];
 
   let mut n_ltbs       = 0;
 
@@ -558,6 +646,7 @@ pub fn read_daq(socket : &UdpSocket,
   let mut head_found = false;
   for n in 0..ntries {
     //let word = read_daq_word(socket, target_address, buffer)?; 
+    let mut n_daq_words_read = 0;
     if head_found {
       // let mut paddles_rxd = 1;
       // we start a new daq package
@@ -569,34 +658,48 @@ pub fn read_daq(socket : &UdpSocket,
       event.tiu_timestamp     = read_daq_word(socket, target_address, buffer)?;
       event.tiu_gps_32        = read_daq_word(socket, target_address, buffer)?;
       event.tiu_gps_16        = read_daq_word(socket, target_address, buffer)?;
-      //let reserved            = read_daq_word(socket, target_address, buffer)?;
       board_mask              = read_daq_word(socket, target_address, buffer)?;
       decoded_board_mask      = decode_board_mask(board_mask);
       //println!(" decoded mask {decoded_board_mask:?}");
       event.board_mask = decoded_board_mask;
       n_ltbs = board_mask.count_ones();
       let mut n_masks = 0;
-      for n in 0..32 {
-        if decoded_board_mask[n] {
+      // each ltb has 2 rbs, so each 32 bit word stands for 2 rbs. 
+      // this means we only need to read once if it is 11 etc..
+      //
+      let mut board = 0;
+      for n in (0..18).step_by(2) {
+        if decoded_board_mask[n+1] || decoded_board_mask[n] {
           let hitmask = read_daq_word(socket, target_address, buffer)?;
-          
-          if hitmask.count_ones() > 255 {
-            error!("Too ltb count insane {}", hitmask.count_ones());
-            return Err(Box::new(MasterTriggerError::MaskTooLarge));
-          }
-          /// FIXME : too many checks!
-          if n_paddles as u32 + hitmask.count_ones() > 255 {
-            error!("Too many paddles {}!", n_paddles);
-            return Err(Box::new(MasterTriggerError::MaskTooLarge));
-          }
-          n_paddles += hitmask.count_ones() as u8;
-          hits[n] = decode_board_mask(hitmask);
-          n_masks += 1;
+          error!("Got hitmask {hitmask}");
+          (hits_a, hits_b) = decode_hit_mask(hitmask);
+          event.hits[n+1] = hits_a;
+          event.hits[n] = hits_b;
         }
-      } // end for loop
-    while n_masks < n_ltbs {
-      let padd = read_daq_word(socket, target_address, buffer)?;
-    }  
+      }
+      //board += 1;
+      //for n in (0..18).step_by(2) {
+      //  if decoded_board_mask[n] || decoded_board_mask[n+1]  {
+      //    let hitmask = read_daq_word(socket, target_address, buffer)?;
+      //    
+      //    if hitmask.count_ones() > 255 {
+      //      error!("Too ltb count insane {}", hitmask.count_ones());
+      //      return Err(Box::new(MasterTriggerError::MaskTooLarge));
+      //    }
+      //    /// FIXME : too many checks!
+      //    if n_paddles as u32 + hitmask.count_ones() > 255 {
+      //      error!("Too many paddles {}!", n_paddles);
+      //      return Err(Box::new(MasterTriggerError::MaskTooLarge));
+      //    }
+      //    n_paddles += hitmask.count_ones() as u8;
+      //    hits[board] = decode_hit_mask(hitmask);
+      //    n_masks += 1;
+      //    board += 1;
+      //  }
+      //} // end for loop
+    //while n_masks < n_ltbs {
+    //  let padd = read_daq_word(socket, target_address, buffer)?;
+    //}  
     //event.n_paddles   = n_paddles; 
     //event.hits        = hits;
     //if n_ltbs % 2 == 1 {

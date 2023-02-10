@@ -208,14 +208,20 @@ pub fn paddle_packet_cache (evid_rec    : &Receiver<Option<u32>>,
           for pp in pp_cache.iter_mut() {
             if pp.event_id == evid {
               if pp.valid {
-                pp_send.send(Some(*pp));
+                match pp_send.send(Some(*pp)) {
+                  Err(err) => trace!("Unable to send the paddle package! Err {err}"),
+                  Ok(_)     => ()
+                }
                 pp.invalidate();
                 n_paddles_sent += 1;
               }
             } 
           } // end for
           // if we did not find it, send None
-          pp_send.send(None);
+          match pp_send.send(None) {
+            Err(err) => trace!("We can not send that paddle packet! Err {err}"),
+            Ok(_) => ()
+          }
           trace!("We received a request from the eventbuilder to send pp for evid {} and have send {} packets", evid, n_paddles_sent);
           //if (n_paddles_sent == event.n_paddles) {
           //  // the event is complete!

@@ -8,7 +8,7 @@
 // to measure the rate
 use std::time::{Duration, Instant};
 use std::thread;
-use std::net::UdpSocket;
+use std::net::{UdpSocket, SocketAddr};
 use std::sync::mpsc::Sender;
 use crossbeam_channel as cbc; 
 
@@ -28,7 +28,12 @@ pub fn connect_to_mtb(mt_ip   : &str,
   ->io::Result<UdpSocket> {
   let mt_address = mt_ip.to_owned() + ":" + &mt_port.to_string();
   let local_port = "0.0.0.0:50100";
-  let local_socket = UdpSocket::bind(local_port);
+  let local_addrs = [
+    SocketAddr::from(([0, 0, 0, 0], 50100)),
+    SocketAddr::from(([0, 0, 0, 0], 50101)),
+  ];
+  //let local_socket = UdpSocket::bind(local_port);
+  let local_socket = UdpSocket::bind(&local_addrs[..]);
   let mut socket : UdpSocket;
   match local_socket {
     Err(err)   => {
@@ -97,7 +102,7 @@ pub fn master_trigger(mt_ip   : &str,
   let mut mt_event = read_daq(&socket, &mt_address, &mut buffer);
   let mut timeout = Instant::now();
   //let timeout = Duration::from_secs(5);
-
+  info!("Starting MT event loop at {:?}", timeout);
 
   loop {
     // a heartbeat every 10 s

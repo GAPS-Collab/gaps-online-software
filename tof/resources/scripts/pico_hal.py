@@ -342,7 +342,10 @@ def read_daq():
         if (state=="Hits"):
             paddles_rxd += 1
 
-        print("%08X (%s)" % (rd, state))
+        if state == "Hits" or state == "Mask":
+            print (f'{bin(rd)}, {rd} , {state}')
+        else:
+            print("%08X (%s)" % (rd, state))
 
         if (state=="Header"):
             state="Event cnt"
@@ -363,6 +366,8 @@ def read_daq():
         elif (state=="CRC"):
             state="Trailer"
         elif (state=="Trailer"):
+            print (f'rxd {paddles_rxd}, hit {hit_paddles}')
+            print ('-------')
             state="Idle"
 
 
