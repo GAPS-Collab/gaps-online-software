@@ -60,6 +60,10 @@ fn build_events_in_cache(event_cache   : &mut VecDeque<TofEvent>,
     }
 
     if ev.is_ready_to_send(use_timeout) {
+      if !ev.valid {
+        continue;
+      }
+
       (*ev).valid = false;
       let bytestream = ev.to_bytestream();
       let mut pack = TofPacket::new();
