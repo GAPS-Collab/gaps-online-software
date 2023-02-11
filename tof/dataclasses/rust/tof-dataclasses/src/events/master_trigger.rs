@@ -118,8 +118,8 @@ pub struct MasterTriggerEvent {
   // package for deletion.
   // Once invalidated, an event 
   // never shall be valid again.
-  valid     : bool
-  brloken   : bool
+  valid     : bool,
+  pub broken   : bool
 }
 
 impl MasterTriggerEvent {
@@ -144,7 +144,7 @@ impl MasterTriggerEvent {
       //ne 16 bit value per LTB
       hits          : [[false;N_CHN_PER_LTB]; N_LTBS],
       crc           : 0,
-      pub broken    : false
+      broken    : false,
       // valid does not get serialized
       valid     : true,
     }   
@@ -721,9 +721,10 @@ pub fn read_daq(socket : &UdpSocket,
       if trailer == 0xAAAAAAAA {
         error!("New header found while we were not done with the old event!");
       }
-
+      event.broken = true;
       error!("Broken package for event id {}, trailer corrupt {}", event.event_id, trailer);
-      return Err(Box::new(MasterTriggerError::BrokenPackage));
+      return Ok(event);
+      //return Err(Box::new(MasterTriggerError::BrokenPackage));
     }
     //debug!("event_ctr {}, ts {} , tc32 {}, tc16 {}, mask {}, crc {}, trailer {}", event_ctr, timestamp, timecode32, timecode16, hit_paddles, crc, trailer);
     //for n in 0..hits.len() {

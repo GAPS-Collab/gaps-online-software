@@ -45,6 +45,9 @@ pub fn connect_to_mtb(mt_ip   : &str,
       socket = value;
       // this is not strrictly necessary, but 
       // it is nice to limit communications
+      
+      let ro = socket.set_read_timeout(Some(Duration::from_millis(1)));
+
       match socket.connect(&mt_address) {
         Err(err) => {
           error!("Can not connect to master trigger at {}, err {}", mt_address, err);
@@ -182,13 +185,13 @@ pub fn master_trigger(mt_ip   : &str,
     // but not sure how to address that yet
     if ev.event_id == 0 {
       trace!("event 0 encountered! Continuing...");
-      continue;
+      //continue;
     }
 
     // FIXME
     if ev.event_id == 2863311530 {
       warn!("Magic event number! continuing! 2863311530");
-      continue;
+      //continue;
     }
 
     // we have a new event

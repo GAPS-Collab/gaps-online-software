@@ -3,7 +3,7 @@
 
 import zmq
 import time
-
+import numpy as np
 import gaps_tof as gt
 
 def print_event(event):
@@ -35,7 +35,7 @@ while True:
         #    print (event)
         #    for k in event.paddle_packets:
         #        print (k)
-        all_events.append(event)
+        all_events.append(event.event_id)
         #if len(all_events) % 100 == 0:
         #    print ([k.event_id for k in all_events])
         npackets += 1
@@ -49,7 +49,11 @@ while True:
             print(event.paddle_packets[0])
         print (f"received {npackets} packets, delta t {time.time() - now}")
         now = time.time()
-
+        all_events = np.array(all_events)
+        missing = all_events[1:] - all_events[:-1]
+        print (missing)
+        print (f'missing : {missing.sum() - 100}')
+        all_events = []
         #print (len([k for k in packet.payload]))
         #print (event)
         #print (len(data))

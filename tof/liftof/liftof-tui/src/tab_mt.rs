@@ -27,7 +27,7 @@ use tui::{
     style::{Color, Modifier, Style},
     text::{Span, Spans, Text},
     widgets::{
-        Block, Dataset, Sparkline, Axis, GraphType, BorderType, Chart, Borders, Cell, List, ListItem, ListState, Paragraph, Row, Table, Tabs,    },
+        Block, Dataset, Sparkline, Axis, GraphType, BorderType, Chart, BarChart, Borders, Cell, List, ListItem, ListState, Paragraph, Row, Table, Tabs,    },
     Terminal,
 };
 
@@ -42,20 +42,21 @@ use tof_dataclasses::events::MasterTriggerEvent;
 #[derive(Debug, Clone)]
 pub struct MTTab<'a> {
 
-  pub stream       : Paragraph<'a>,
-  pub rate         : Sparkline<'a>,
-  pub network_moni : Sparkline<'a>,
-  pub detail       : Paragraph<'a>,
-  cmd_list         : Vec::<TofCommand>,
-  pub list_widget  : List<'a>,
+  pub stream        : Paragraph<'a>,
+  pub rate          : Sparkline<'a>,
+  pub network_moni  : Sparkline<'a>,
+  pub n_paddle_dist : BarChart<'a>, 
+  pub detail        : Paragraph<'a>,
+  cmd_list          : Vec::<TofCommand>,
+  pub list_widget   : List<'a>,
   /// keep track of the passed time in seconds,
   /// to update only specific parts of the display
-  pub list_rect    : Rect,
-  pub stream_rect  : Rect,
-  pub detail_rect  : Rect,
-  pub nw_mon_rect  : Rect,
-  pub rate_rect    : Rect,
-  message_queue    : VecDeque<String> 
+  pub list_rect     : Rect,
+  pub stream_rect   : Rect,
+  pub detail_rect   : Rect,
+  pub nw_mon_rect   : Rect,
+  pub rate_rect     : Rect,
+  message_queue     : VecDeque<String> 
 }
 
 impl MTTab<'_> {
@@ -151,6 +152,30 @@ impl MTTab<'_> {
     .max(5)
     .style(Style::default().fg(Color::Blue).bg(Color::Black));
 
+    let n_paddle_data = vec![ 
+                        ( "0", 0),
+                        ( "1", 0),
+                        ( "2", 0),
+                        ( "3", 0),
+                        ( "4", 0),
+                        ( "5", 0),
+                        ( "6", 0),
+                        ( "7", 0),
+                        ];
+
+    let n_paddle = BarChart::default()
+        .block(Block::default().title("N Paddle").borders(Borders::ALL))
+        .data(&[("0", 0)])
+        .bar_width(5)
+        .bar_gap(3)
+        .bar_style(Style::default().fg(Color::Green))
+        .value_style(
+            Style::default()
+                .bg(Color::Green)
+                .add_modifier(Modifier::BOLD),
+        );
+
+
     let network = Sparkline::default()
     .block(
       Block::default()
@@ -164,17 +189,6 @@ impl MTTab<'_> {
     .max(5)
     .style(Style::default().fg(Color::Blue).bg(Color::Black));
     
-    //let network =  Paragraph::new("")
-    //.style(Style::default().fg(Color::LightCyan))
-    //.alignment(Alignment::Left)
-    ////.scroll((5, 10))
-    //.block(
-    //  Block::default()
-    //    .borders(Borders::ALL)
-    //    .style(Style::default().fg(Color::White))
-    //    .title("Network")
-    //    .border_type(BorderType::Thick),
-    //);
 
     let mut content = String::from("");
     if detail_string.is_some() {
@@ -201,6 +215,7 @@ impl MTTab<'_> {
     let mut mt = MTTab {
       stream  ,
       rate    ,
+      n_paddle_dist : n_paddle ,
       network_moni : network ,
       detail      ,
       cmd_list    ,
@@ -232,10 +247,14 @@ impl MTTab<'_> {
     let mut detail_string : Option<String> = None;
     let mut spans = Vec::<Spans>::new();
     for n in 0..mt_events.len() {
+        let mut color = Color::White;
+        if mt_events[n].is_broken() {
+          color = Color::Red;
+        }
         spans.push(Spans::from(vec![Span::styled(
             //mt_events[n].to_string().clone(),
             "<\u{2728}MTE : event id ".to_owned() + &mt_events[n].event_id.to_string() + " >",
-            Style::default())])
+            Style::default().fg(color))])
         );
     }
     let last_event = mt_events.back();
