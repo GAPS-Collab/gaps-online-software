@@ -119,6 +119,7 @@ pub struct MasterTriggerEvent {
   // Once invalidated, an event 
   // never shall be valid again.
   valid     : bool
+  brloken   : bool
 }
 
 impl MasterTriggerEvent {
@@ -143,9 +144,14 @@ impl MasterTriggerEvent {
       //ne 16 bit value per LTB
       hits          : [[false;N_CHN_PER_LTB]; N_LTBS],
       crc           : 0,
+      pub broken    : false
       // valid does not get serialized
-      valid     : true
+      valid     : true,
     }   
+  }
+
+  pub fn is_broken(&self) -> bool {
+    self.broken
   }
 
   pub fn to_bytestream(&self) -> Vec::<u8> {
@@ -707,6 +713,7 @@ pub fn read_daq(socket : &UdpSocket,
     event.crc         = read_daq_word(socket, target_address, buffer)?;
     if event.crc == 0x55555555 {
       error!("CRC field corrupt, but we carry on!");
+      event.broken = true;
       return Ok(event);
     }
     trailer     = read_daq_word(socket, target_address, buffer)?;
