@@ -47,6 +47,10 @@ pub struct PaddlePacket  {
   pub t_average    : u16,
   pub ctr_etx      : u8,
 
+  // this might be not needed, 
+  // unsure
+  pub timestamp    : u32,
+
   // fields which won't get 
   // serialized
   pub event_id     : u32,
@@ -55,8 +59,10 @@ pub struct PaddlePacket  {
 
 impl PaddlePacket {
 
-  pub const PACKETSIZE    : usize = 24;
-  pub const VERSION       : &'static str = "1.1";
+  //pub const PACKETSIZE    : usize = 24;
+  // update Feb 2023 - add 4 byte timestamp
+  pub const PACKETSIZE    : usize = 28;
+  pub const VERSION       : &'static str = "1.2";
   pub const HEAD          : u16  = 61680; //0xF0F0)
   pub const TAIL          : u16  = 3855;
 
@@ -73,6 +79,7 @@ impl PaddlePacket {
                   pos_across   : 0,
                   t_average    : 0,
                   ctr_etx      : 0,
+                  timestamp    : 0,
                   // non-serialize fields
                   event_id     : 0,
                   valid        : true
@@ -145,6 +152,7 @@ impl PaddlePacket {
     self.pos_across   =  0;
     self.t_average    =  0;
     self.ctr_etx      =  0;
+    self.timestamp    =  0;
     self.event_id     =  0;
     self.valid        =  true;
   }
@@ -153,17 +161,18 @@ impl PaddlePacket {
   pub fn print(&self)
   {
     println!("***** paddle packet *****");
-    println!("==> VALID        {}", self.valid);
-    println!("=> time_a        {}", self.time_a);
-    println!("=> time_b        {}", self.time_b);
-    println!("=> peak_a        {}", self.peak_a);
-    println!("=> peak_b        {}", self.peak_b);
-    println!("=> charge_a      {}", self.charge_a);
-    println!("=> charge_b      {}", self.charge_b);
-    println!("=> charge_min_i  {}", self.charge_min_i);
-    println!("=> pos_across    {}", self.pos_across);
-    println!("=> t_average     {}", self.t_average);
-    println!("=> ctr_etx       {}", self.ctr_etx);
+    println!("==> VALID       \t {}", self.valid);
+    println!("=> time_a       \t {}", self.time_a);
+    println!("=> time_b       \t {}", self.time_b);
+    println!("=> peak_a       \t {}", self.peak_a);
+    println!("=> peak_b       \t {}", self.peak_b);
+    println!("=> charge_a     \t {}", self.charge_a);
+    println!("=> charge_b     \t {}", self.charge_b);
+    println!("=> charge_min_i \t {}", self.charge_min_i);
+    println!("=> pos_across   \t {}", self.pos_across);
+    println!("=> t_average    \t {}", self.t_average);
+    println!("=> ctr_etx      \t {}", self.ctr_etx);
+    println!("=> timestamp    \t {}", self.timestamp);
     println!("*****");
   }
 
@@ -189,6 +198,7 @@ impl PaddlePacket {
     bytestream.extend_from_slice(&self.pos_across  .to_le_bytes()); 
     bytestream.extend_from_slice(&self.t_average   .to_le_bytes()); 
     bytestream.push(self.ctr_etx); 
+    bytestream.extend_from_slice(&self.timestamp   .to_le_bytes());
     bytestream.extend_from_slice(&PaddlePacket::TAIL        .to_le_bytes()); 
 
     bytestream
@@ -206,7 +216,6 @@ impl PaddlePacket {
     let mut pp  = PaddlePacket::new();
     let mut pos = start_pos;
     let mut two_bytes : [u8;2];
-
     pos = search_for_u16(PaddlePacket::HEAD, &bytestream, pos)?;
 
     pp.paddle_id = bytestream[pos];
@@ -251,6 +260,12 @@ impl PaddlePacket {
     pp.ctr_etx      =  bytestream[pos];
     pos += 1;
 
+    pp.timestamp    = u32::from_le_bytes([bytestream[pos], 
+                                          bytestream[pos + 1], 
+                                          bytestream[pos + 2],
+                                          bytestream[pos + 3]]);           
+    pos += 4;
+
     // at this postiion, there must be the footer
     two_bytes = [bytestream[pos], bytestream[pos + 1]];
     if (u16::from_le_bytes(two_bytes)) != PaddlePacket::TAIL {
@@ -279,7 +294,7 @@ impl PaddlePacket {
     pp.pos_across   = rng.gen::<u16>();
     pp.t_average    = rng.gen::<u16>();
     pp.ctr_etx      = rng.gen::<u8>();
-
+    pp.timestamp    = rng.gen::<u32>();
     pp
   }
 
