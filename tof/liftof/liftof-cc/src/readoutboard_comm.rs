@@ -217,7 +217,7 @@ fn analyze_blobs(buffer               : &Vec<u8>,
                 channels_over_threshold[ch] = true;
                 
                 blob_data.set_cfds_fraction(0.20, ch);
-                blob_data.integrate(270.0, 70.0, ch);
+                let charge = blob_data.integrate(270.0, 70.0, ch).unwrap_or(0.0);
                 blob_data.find_peaks(270.0,70.0, ch);
                 // analysis
                 let cfd_time = blob_data.find_cfd_simple(0, ch);
@@ -231,34 +231,43 @@ fn analyze_blobs(buffer               : &Vec<u8>,
                   0 => {
                     paddles_over_threshold[0] = true;
                     pp_this_event[0].set_time_a(cfd_time);
+                    pp_this_event[0].set_charge_a(charge);
                   },
                   1 => {
                     paddles_over_threshold[0] = true;
                     pp_this_event[0].set_time_b(cfd_time);
+                    pp_this_event[0].set_charge_a(charge);
+
                   },
                   2 => {
                     paddles_over_threshold[1] = true;
                     pp_this_event[1].set_time_a(cfd_time);
+                    pp_this_event[1].set_charge_a(charge);
                   },
                   3 => {
                     paddles_over_threshold[1] = true;
                     pp_this_event[1].set_time_b(cfd_time);
+                    pp_this_event[1].set_charge_b(charge);
                   },
                   4 => {
                     paddles_over_threshold[2] = true;
                     pp_this_event[2].set_time_a(cfd_time);
+                    pp_this_event[2].set_charge_a(charge);
                   },
                   5 => {
                     paddles_over_threshold[2] = true;
                     pp_this_event[2].set_time_b(cfd_time);
+                    pp_this_event[2].set_charge_b(charge);
                   },
                   6 => {
                     paddles_over_threshold[3] = true;
                     pp_this_event[3].set_time_a(cfd_time);
+                    pp_this_event[3].set_charge_b(charge);
                   },
                   7 => {
                     paddles_over_threshold[3] = true;
                     pp_this_event[3].set_time_b(cfd_time);
+                    pp_this_event[3].set_charge_b(charge);
                   },
                   _ => {
                     trace!("Won't do anything for ch {}",ch);

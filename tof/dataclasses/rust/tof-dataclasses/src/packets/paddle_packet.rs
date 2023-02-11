@@ -83,6 +83,22 @@ impl PaddlePacket {
   pub fn invalidate(&mut self) {
     self.valid = false;
   }
+  
+  pub fn set_peak_a(&mut self, peak : f64 ) {
+    let prec : f64 = 0.004;
+    self.peak_a = (peak as f64/prec) as u16;
+  }
+
+  pub fn set_peak_b(&mut self, peak : f64 ) {
+    let prec : f64 = 0.004;
+    self.peak_b = (peak as f64/prec) as u16;
+  }
+  
+  pub fn set_peak(&mut self, peak : f64, side : usize ) {
+    assert!(side == 0 || side == 1);
+    if side == 0 {self.set_peak_a(peak);}
+    if side == 1 {self.set_peak_b(peak);}
+  }
 
   pub fn set_time_a(&mut self, time : f64 ) {
     let prec : f64 = 0.004;
@@ -99,6 +115,23 @@ impl PaddlePacket {
     if side == 0 {self.set_time_a(time);}
     if side == 1 {self.set_time_b(time);}
   }
+
+  pub fn set_charge_a(&mut self, charge : f64 ) {
+    let prec : f64 = 0.004;
+    self.charge_a = (charge as f64/prec) as u16;
+  }
+
+  pub fn set_charge_b(&mut self, charge : f64 ) {
+    let prec : f64 = 0.004;
+    self.charge_b = (charge as f64/prec) as u16;
+  }
+  
+  pub fn set_charge(&mut self, charge : f64, side : usize ) {
+    assert!(side == 0 || side == 1);
+    if side == 0 {self.set_charge_a(charge);}
+    if side == 1 {self.set_charge_b(charge);}
+  }
+
 
   pub fn reset(&mut self) {
     self.paddle_id    =  0;

@@ -53,7 +53,7 @@ pub fn global_data_sink(incoming : &cbc::Receiver<TofPacket>,
   let mut n_pack_sent = 0;
   let mut last_evid   = 0u32;
   loop {
-    if n_pack_sent % 100 == 0 && n_pack_sent != 0 {
+    if n_pack_sent % 1000 == 0 && n_pack_sent != 0 {
       println!("=> Sending debugging... ===");
       println!("=> Sent {n_pack_sent} packets!");
       println!("=> Last evid {last_evid} !");

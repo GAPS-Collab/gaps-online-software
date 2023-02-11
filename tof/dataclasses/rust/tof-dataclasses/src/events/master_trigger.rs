@@ -426,7 +426,6 @@ fn read_register(socket      : &UdpSocket,
   if data.len() == 0 
     { return Err(Box::new(IPBusError::DecodingFailed));}
   // this supports up to 100 Hz
-  let ro = socket.set_read_timeout(Some(Duration::from_millis(10)));
   Ok(data[0])
 }
 
