@@ -34,6 +34,8 @@ fn elapsed_since_epoch() -> u128 {
 pub struct TofEvent  {
   
   pub event_id     : u32,
+  // the timestamp sahll be comging from the master trigger
+  pub timestamp    : u32,
 
   // this field can be debated
   // the reason we have it is 
@@ -72,7 +74,7 @@ pub struct TofEvent  {
 impl TofEvent {
   
   pub const PacketSizeFixed    : usize = 24;
-  pub const Version            : &'static str = "1.0";
+  pub const Version            : &'static str = "1.1";
   pub const Head               : u16  = 43690; //0xAAAA
   pub const Tail               : u16  = 21845; //0x5555
   
@@ -86,6 +88,7 @@ impl TofEvent {
 
     TofEvent { 
       event_id       : event_id,
+      timestamp      : 0,
       n_paddles      : 0,  
       paddle_packets : Vec::<PaddlePacket>::with_capacity(20),
 
@@ -129,7 +132,11 @@ impl TofEvent {
                             bytestream[pos + 2]];
     pos   += 4; 
     event.event_id = u32::from_be_bytes(raw_bytes_4); 
-
+    raw_bytes_4  = [bytestream[pos ],
+                    bytestream[pos + 1],
+                    bytestream[pos + 2],
+                    bytestream[pos + 3]];
+    event.timestamp = u32::from_le_bytes(raw_bytes_4);
     event.n_paddles      = bytestream[pos];
     pos += 1; 
    
@@ -159,6 +166,8 @@ impl TofEvent {
              evid[3],
              evid[2]];
     bytestream.extend_from_slice(&evid);
+    let timestamp = self.timestamp.to_le_bytes();
+    bytestream.extend_from_slice(&timestamp);
     bytestream.push(self.n_paddles);
     for n in 0..self.paddle_packets.len() as usize {
       let pp = self.paddle_packets[n];
@@ -223,6 +232,7 @@ impl From<&MasterTriggerEvent> for TofEvent {
   fn from(mte : &MasterTriggerEvent) -> TofEvent {
     let mut te : TofEvent = Default::default();
     te.event_id = mte.event_id;
+    te.timestamp = mte.timestamp;
     te.n_paddles = mte.get_hit_paddles();
     te
   }

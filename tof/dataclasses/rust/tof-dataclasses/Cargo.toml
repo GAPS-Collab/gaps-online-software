@@ -17,10 +17,12 @@ pretty_env_logger = "0.4"
 # used for the random number generation
 rand = "0.8"
 
-
+# nom for cominatoric parsers
+nom = "7.1"
 # strum to enhance enum 
 # with messages, iterators
 strum = "0.24"
 strum_macros = "0.24"
+
 
 #nom = "7.1"
