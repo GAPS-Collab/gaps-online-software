@@ -7,8 +7,9 @@
 
 #include "TofTypeDefs.h"
 
-#define RPADDLEPACKETSIZE 24
-#define RPADDLEPACKETVERSION "1.1"
+// adds 6 bytes for timestamps
+#define RPADDLEPACKETSIZE 30
+#define RPADDLEPACKETVERSION "1.2"
 
 /***********************************************************
  * The "reduced paddle packet" holds analyzed waveform 
@@ -29,6 +30,10 @@ struct RPaddlePacket  {
   u16 charge_min_i;
   u16 x_pos;
   u16 t_average;
+
+  u32 timestamp_32;
+  u16 timestamp_16;
+
 
   u8 ctr_etx;
   u16 tail = 0xF0F; 

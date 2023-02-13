@@ -150,7 +150,8 @@ pub struct BlobData
   pub event_id       : u32,
   pub dtap0           : u16,
   pub dtap1           : u16,
-  pub timestamp       : u64,
+  pub timestamp_32    : u32,
+  pub timestamp_16    : u16,
   pub ch_head         : [u16; NCHN],
   pub ch_adc          : [[i16; NWORDS];NCHN], 
   pub ch_trail        : [u32; NCHN],
@@ -219,7 +220,8 @@ impl BlobData {
       event_id       : 0,
       dtap0           : 0,
       dtap1           : 0,
-      timestamp       : 0,
+      timestamp_32    : 0,
+      timestamp_16    : 0,
       ch_head         : [0; NCHN],
       ch_adc          : [[0; NWORDS]; NCHN],
       ch_trail        : [0; NCHN],
@@ -349,16 +351,28 @@ impl BlobData {
     pos   += 2;
     self.dtap1   = u16::from_le_bytes(raw_bytes_2); 
     
-    raw_bytes_8  = [bytestream[pos    ],
-                    bytestream[pos + 1],
-                    bytestream[pos + 2],
-                    bytestream[pos + 3],
-                    bytestream[pos + 4],
-                    bytestream[pos + 5],
-                    bytestream[pos + 6],
-                    bytestream[pos + 7]];
-    pos += 8;
-    self.timestamp  = u64::from_le_bytes(raw_bytes_8); 
+    //raw_bytes_8  = [bytestream[pos    ],
+    //                bytestream[pos + 1],
+    //                bytestream[pos + 2],
+    //                bytestream[pos + 3],
+    //                bytestream[pos + 4],
+    //                bytestream[pos + 5],
+    //                bytestream[pos + 6],
+    //                bytestream[pos + 7]];
+    //pos += 8;
+    //self.timestamp  = u64::from_le_bytes(raw_bytes_8); 
+    raw_bytes_4 = [bytestream[pos],
+                   bytestream[pos + 1],
+                   bytestream[pos + 2],
+                   bytestream[pos + 3]];
+    self.timestamp_32 = u32::from_le_bytes(raw_bytes_4);
+    pos += 4;
+    raw_bytes_2 = [bytestream[pos],
+                   bytestream[pos + 1]];
+    self.timestamp_16 = u16::from_le_bytes(raw_bytes_2);
+    pos += 2;
+
+
     for n in 0..NCHN {
       raw_bytes_2  = [bytestream[pos],bytestream[pos + 1]];
       self.ch_head[n] = u16::from_le_bytes(raw_bytes_2);
@@ -485,14 +499,24 @@ impl BlobData {
     pos   += 2;
     self.dtap1   = u16::from_le_bytes(raw_bytes_2); 
     
-    raw_bytes_8  = [0,0,bytestream[pos+1],
-                        bytestream[pos    ],
-                        bytestream[pos + 3],
-                        bytestream[pos + 2],
-                        bytestream[pos + 5],
-                        bytestream[pos + 4]];
-    pos += 6;
-    self.timestamp  = u64::from_be_bytes(raw_bytes_8); 
+    //raw_bytes_8  = [0,0,bytestream[pos+1],
+    //                    bytestream[pos    ],
+    //                    bytestream[pos + 3],
+    //                    bytestream[pos + 2],
+    //                    bytestream[pos + 5],
+    //                    bytestream[pos + 4]];
+    //pos += 6;
+    //self.timestamp  = u64::from_be_bytes(raw_bytes_8); 
+    raw_bytes_4 =  [bytestream[pos],
+                    bytestream[pos + 1],
+                    bytestream[pos + 2],
+                    bytestream[pos + 3]];
+    self.timestamp_32 = u32::from_le_bytes(raw_bytes_4);
+    pos += 4;
+    raw_bytes_2 =  [bytestream[pos],
+                    bytestream[pos + 1]];
+    self.timestamp_16 = u16::from_le_bytes(raw_bytes_2);
+    pos += 2;
     for n in 0..NCHN {
       raw_bytes_2  = [bytestream[pos],bytestream[pos + 1]];
       self.ch_head[n] = u16::from_le_bytes(raw_bytes_2);
@@ -583,15 +607,21 @@ impl BlobData {
 
     two_bytes = self.dtap1.to_le_bytes();
     bytestream.extend_from_slice(&two_bytes);
-    
-    eight_bytes          = self.timestamp.to_be_bytes();
-    let six_bytes_shuffle    = [eight_bytes[1 + 2],
-                                eight_bytes[    2],
-                                eight_bytes[3 + 2],
-                                eight_bytes[2 + 2],
-                                eight_bytes[5 + 2],
-                                eight_bytes[4 + 2]];
-    bytestream.extend_from_slice(&six_bytes_shuffle);
+   
+    four_bytes = self.timestamp_32.to_le_bytes();
+    bytestream.extend_from_slice(&four_bytes);
+
+    two_bytes = self.timestamp_16.to_le_bytes();
+    bytestream.extend_from_slice(&two_bytes);
+
+    //eight_bytes          = self.timestamp.to_be_bytes();
+    //let six_bytes_shuffle    = [eight_bytes[1 + 2],
+    //                            eight_bytes[    2],
+    //                            eight_bytes[3 + 2],
+    //                            eight_bytes[2 + 2],
+    //                            eight_bytes[5 + 2],
+    //                            eight_bytes[4 + 2]];
+    //bytestream.extend_from_slice(&six_bytes_shuffle);
     
     for n in 0..NCHN {
       two_bytes = self.ch_head[n].to_le_bytes();
@@ -1101,7 +1131,8 @@ impl BlobData {
     self.event_id       =  0;
     self.dtap0           =  0;
     self.dtap1           =  0;
-    self.timestamp       =  0;
+    self.timestamp_32    =  0;
+    self.timestamp_16    =  0;
     self.ch_head         =  [0; NCHN];
     self.ch_adc          =  [[0; NWORDS]; NCHN];
     self.ch_trail        =  [0; NCHN];
@@ -1145,7 +1176,8 @@ impl BlobData {
     println!("==> EVT_CTR    {} ", self.event_id);
     println!("==> DTAP0      {} ", self.dtap0);
     println!("==> DTAP1      {} ", self.dtap1);
-    println!("==> TIMESTAMP  {} ", self.timestamp);
+    println!("==> TIMESTAMP32{} ", self.timestamp_32);
+    println!("==> TIMESTAMP16{} ", self.timestamp_16);
     println!("==> STOP_CELL  {} ", self.stop_cell);
     println!("==> CRC32      {} ", self.crc32);
     println!("==> TAIL       {} ", self.tail);

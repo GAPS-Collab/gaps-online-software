@@ -177,6 +177,7 @@ add_library(${GAPSTOF_LIBRARY_SHARED}
     dataclasses/C++/src/RPaddlePacket.cxx
     dataclasses/C++/src/WfPaddlePacket.cxx
     dataclasses/C++/src/serialization.cxx
+    dataclasses/C++/src/parsers.cxx
     dataclasses/C++/src/CraneLogging.cc
     dataclasses/C++/src/WaveGAPS.cpp
     dataclasses/C++/src/CommandPacket.cxx

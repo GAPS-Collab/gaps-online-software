@@ -500,7 +500,8 @@ PYBIND11_MODULE(gaps_tof, m) {
         .def("add_paddle_packet"            ,&REventPacket::add_paddle_packet)
         .def_readwrite("event_id"           ,&REventPacket::event_ctr)
         .def_readwrite("n_paddles"          ,&REventPacket::n_paddles)
-        .def_readwrite("utc_timestamp"      ,&REventPacket::utc_timestamp)
+        .def_readwrite("timestamp_32"       ,&REventPacket::timestamp_32)
+        .def_readwrite("timestamp_16"       ,&REventPacket::timestamp_16)
         .def_readwrite("primary_beta"       ,&REventPacket::primary_beta)
         .def_readwrite("primary_beta_unc"   ,&REventPacket::primary_beta_unc)
         .def_readwrite("primary_charge"     ,&REventPacket::primary_charge)
@@ -562,6 +563,8 @@ PYBIND11_MODULE(gaps_tof, m) {
 
         // atributes
         .def_readwrite("paddle_id" ,    &RPaddlePacket::paddle_id)
+        .def_readwrite("timestamp_32" ,    &RPaddlePacket::timestamp_32)
+        .def_readwrite("timestamp_16" ,    &RPaddlePacket::timestamp_16)
         //.def_readwrite("time_a" ,       &RPaddlePacket::time_a)
         //.def_readwrite("time_b" ,       &RPaddlePacket::time_b)
         //.def_readwrite("charge_a" ,     &RPaddlePacket::charge_a)
@@ -612,6 +615,8 @@ PYBIND11_MODULE(gaps_tof, m) {
        .def_readwrite("dtap0"                   ,&BlobEvt_t::dtap0 )
        .def_readwrite("dtap1"                   ,&BlobEvt_t::dtap1 )
        .def_readwrite("timestamp"               ,&BlobEvt_t::timestamp )
+       //.def_readwrite("timestamp_32"            ,&BlobEvt_t::timestamp_32 )
+       //.def_readwrite("timestamp_16"            ,&BlobEvt_t::timestamp_16 )
        //.def_property("ch_head"      , &ch_head_getter , &nullsetter<std::vector<unsigned short>  )
        .def("get_ch_head"                       ,&ch_head_getter)
        .def("get_ch_adc"                        ,&ch_getter )

@@ -20,13 +20,21 @@
  *    is used to calculate the total length
  *    of the packet. We use the p_length field
  *    for that and just rename it. 
+ *
+ * Version 1.2
+ * -> removes 64bit timestamp and replaces 
+ *    it with 32bit  + 16bit. 
+ *    Since the timestamps is only 48 bit 
+ *    anyway.
  */
 struct REventPacket {
   u16 head = 0xAAAA;
 
   u16 n_paddles;
   u32 event_ctr;
-  u64 utc_timestamp;
+  u32 timestamp_32;
+  u16 timestamp_16;
+
 
   // reconstructed quantities
   u16 primary_beta;
@@ -93,8 +101,8 @@ struct REventPacket {
    *    (tail position +=1, so that bytestream can be iterated
    *    over easily)
    */
-  unsigned int deserialize(std::vector<unsigned char>& payload,
-                           unsigned int start_pos=0);
+  unsigned int deserialize(vec_u8 &payload,
+                           u64 start_pos=0);
 
 
   /**

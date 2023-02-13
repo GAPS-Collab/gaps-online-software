@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <cstring>
 
+#include "parsers.h"
 #include "serialization.h"
 #include "packets/REventPacket.h"
 
@@ -14,7 +15,8 @@ void REventPacket::reset()
    p_length_fixed = REVENTPACKETSIZEFIXED;
    n_paddles      = 0;
    event_ctr      = 0;
-   utc_timestamp  = 0;
+   timestamp_32   = 0;
+   timestamp_16   = 0;
 
    primary_beta        = 0;
    primary_beta_unc    = 0;
@@ -71,7 +73,9 @@ std::vector<unsigned char> REventPacket::serialize() const
   encode_ushort(head, buffer, pos); pos+=2;
   encode_ushort(n_paddles, buffer, pos); pos+=2;
   encode_uint32(event_ctr, buffer, pos); pos+=4;
-  encode_uint64(utc_timestamp, buffer, pos); pos+=8;
+  //encode_uint64(utc_timestamp, buffer, pos); pos+=8;
+  u32_to_le_bytes(timestamp_32, buffer, pos);
+  encode_ushort(timestamp_16, buffer, pos); pos+=2;
 
   encode_ushort(primary_beta,       buffer,  pos);pos+=2;  
   encode_ushort(primary_beta_unc,   buffer,  pos);pos+=2;  
@@ -116,7 +120,7 @@ std::vector<unsigned char> REventPacket::serialize() const
 //  currently decode only paddle packets 
 //  (the reconstructed primary is not available anyway)
 u32 REventPacket::deserialize(vec_u8 &bytestream,
-                              u32 start_pos)
+                              u64 start_pos)
 {
   reset ();
  
@@ -124,10 +128,10 @@ u32 REventPacket::deserialize(vec_u8 &bytestream,
   //unsigned short value; 
   //unsigned int end_pos = start_pos;
   // check if we find the header at start_pos
-  uint16_t value = decode_ushort(bytestream, start_pos);
+  uint16_t value = Gaps::u16_from_le_bytes(bytestream, start_pos);
   if (!(value == head))
     {std::cerr << "[ERROR] no header found!" << std::endl;}
-  uint16_t pos = 2 + start_pos; // position in bytestream, 2 since we 
+  u64 pos = 2 + start_pos; // position in bytestream, 2 since we 
                     // just decoded the header
  
   //unsigned short expected_packet_size = decode_ushort(bytestream, pos);pos+=2;  
@@ -138,7 +142,9 @@ u32 REventPacket::deserialize(vec_u8 &bytestream,
   //unsigned short expected_paddle_packets = 
   //std::cout << "[INFO] Expecting " << expected_paddle_packets << " paddle info objects" << std::endl; 
  
-  event_ctr           = decode_uint32_rev(bytestream, pos); pos+=4;
+  event_ctr           = Gaps::u32_from_le_bytes(bytestream, pos);
+  timestamp_32        = Gaps::u32_from_le_bytes(bytestream, pos);
+  timestamp_16        = Gaps::u16_from_le_bytes(bytestream, pos);
   //event_ctr           = u32_from_le_bytes(bytestream, pos); pos+=4;
   n_paddles           = bytestream[pos]; pos += 1;
   /*
@@ -191,7 +197,7 @@ u32 REventPacket::deserialize(vec_u8 &bytestream,
   //   paddle_info.push_back(p);
   //   pos += p.calculate_length();
   //  }
-  unsigned short payload_tail = decode_ushort(bytestream, pos); pos+=2;
+  unsigned short payload_tail = Gaps::u32_from_le_bytes(bytestream, pos);
   //std::cout << "[DEBUG] expected packet size = " << expected_packet_size << " received " << pos << " bytes!" << std::endl; 
   if (payload_tail != tail) //|| (expected_packet_size != pos))
      {
@@ -213,7 +219,8 @@ std::string REventPacket::to_string(bool summarize_paddle_packets) const
    output += "\tHEAD \t"                + std::to_string(head) +  "\n";
    output += "\tN PADDLES \t"           + std::to_string(n_paddles) + "\n";
    output += "\tEVENT CTR \t"           + std::to_string(event_ctr)         + "\n";
-   output += "\tUTC TS \t"              + std::to_string(utc_timestamp)     + "\n";
+   output += "\tTIMESTAMP 32 \t"        + std::to_string(timestamp_32)     + "\n";
+   output += "\tTIMESTAMP 16 \t"        + std::to_string(timestamp_16)     + "\n";
    output += "\tPRIMARY BETA \t"        + std::to_string(primary_beta)     + "\n";
    output += "\tPRIMARY BETA UNC \t"    + std::to_string(primary_beta_unc) + "\n";
    output += "\tPRIMARY CHARGE \t"      + std::to_string(primary_charge)   + "\n";

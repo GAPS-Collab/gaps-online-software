@@ -49,7 +49,8 @@ pub struct PaddlePacket  {
 
   // this might be not needed, 
   // unsure
-  pub timestamp    : u32,
+  pub timestamp_32    : u32,
+  pub timestamp_16    : u16,
 
   // fields which won't get 
   // serialized
@@ -79,7 +80,8 @@ impl PaddlePacket {
                   pos_across   : 0,
                   t_average    : 0,
                   ctr_etx      : 0,
-                  timestamp    : 0,
+                  timestamp_32 : 0,
+                  timestamp_16 : 0,
                   // non-serialize fields
                   event_id     : 0,
                   valid        : true
@@ -152,7 +154,8 @@ impl PaddlePacket {
     self.pos_across   =  0;
     self.t_average    =  0;
     self.ctr_etx      =  0;
-    self.timestamp    =  0;
+    self.timestamp_32 =  0;
+    self.timestamp_16 =  0;
     self.event_id     =  0;
     self.valid        =  true;
   }
@@ -172,7 +175,8 @@ impl PaddlePacket {
     println!("=> pos_across   \t {}", self.pos_across);
     println!("=> t_average    \t {}", self.t_average);
     println!("=> ctr_etx      \t {}", self.ctr_etx);
-    println!("=> timestamp    \t {}", self.timestamp);
+    println!("=> timestamp_32 \t {}", self.timestamp_32);
+    println!("=> timestamp_16 \t {}", self.timestamp_16);
     println!("*****");
   }
 
@@ -198,7 +202,8 @@ impl PaddlePacket {
     bytestream.extend_from_slice(&self.pos_across  .to_le_bytes()); 
     bytestream.extend_from_slice(&self.t_average   .to_le_bytes()); 
     bytestream.push(self.ctr_etx); 
-    bytestream.extend_from_slice(&self.timestamp   .to_le_bytes());
+    bytestream.extend_from_slice(&self.timestamp_32   .to_le_bytes());
+    bytestream.extend_from_slice(&self.timestamp_16   .to_le_bytes());
     bytestream.extend_from_slice(&PaddlePacket::TAIL        .to_le_bytes()); 
 
     bytestream
@@ -260,11 +265,14 @@ impl PaddlePacket {
     pp.ctr_etx      =  bytestream[pos];
     pos += 1;
 
-    pp.timestamp    = u32::from_le_bytes([bytestream[pos], 
-                                          bytestream[pos + 1], 
-                                          bytestream[pos + 2],
-                                          bytestream[pos + 3]]);           
+    pp.timestamp_32    = u32::from_le_bytes([bytestream[pos], 
+                                            bytestream[pos + 1], 
+                                            bytestream[pos + 2],
+                                            bytestream[pos + 3]]);           
     pos += 4;
+    pp.timestamp_16    = u16::from_le_bytes([bytestream[pos], 
+                                             bytestream[pos + 1]]); 
+    pos += 2;
 
     // at this postiion, there must be the footer
     two_bytes = [bytestream[pos], bytestream[pos + 1]];
@@ -294,7 +302,8 @@ impl PaddlePacket {
     pp.pos_across   = rng.gen::<u16>();
     pp.t_average    = rng.gen::<u16>();
     pp.ctr_etx      = rng.gen::<u8>();
-    pp.timestamp    = rng.gen::<u32>();
+    pp.timestamp_32    = rng.gen::<u32>();
+    pp.timestamp_16    = rng.gen::<u16>();
     pp
   }
 

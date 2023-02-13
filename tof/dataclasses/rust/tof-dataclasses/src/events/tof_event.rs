@@ -23,11 +23,6 @@ use crate::events::MasterTriggerEvent;
 use rand::Rng;
 
 
-/// Microseconds since epock
-fn elapsed_since_epoch() -> u128 {
-  SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_micros()
-}
-
 
 /// The main event structure
 #[derive(Debug, Clone, PartialEq)]
@@ -35,7 +30,8 @@ pub struct TofEvent  {
   
   pub event_id     : u32,
   // the timestamp sahll be comging from the master trigger
-  pub timestamp    : u32,
+  pub timestamp_32 : u32,
+  pub timestamp_16 : u16,
 
   // this field can be debated
   // the reason we have it is 
@@ -88,7 +84,8 @@ impl TofEvent {
 
     TofEvent { 
       event_id       : event_id,
-      timestamp      : 0,
+      timestamp_32   : 0,
+      timestamp_16   : 0,
       n_paddles      : 0,  
       paddle_packets : Vec::<PaddlePacket>::with_capacity(20),
 
@@ -136,7 +133,11 @@ impl TofEvent {
                     bytestream[pos + 1],
                     bytestream[pos + 2],
                     bytestream[pos + 3]];
-    event.timestamp = u32::from_le_bytes(raw_bytes_4);
+    event.timestamp_32 = u32::from_le_bytes(raw_bytes_4);
+    let raw_bytes_2 = [bytestream[pos],
+                       bytestream[pos + 1]];
+    event.timestamp_16 = u16::from_le_bytes(raw_bytes_2);
+    pos += 2;
     event.n_paddles      = bytestream[pos];
     pos += 1; 
    
@@ -166,8 +167,8 @@ impl TofEvent {
              evid[3],
              evid[2]];
     bytestream.extend_from_slice(&evid);
-    let timestamp = self.timestamp.to_le_bytes();
-    bytestream.extend_from_slice(&timestamp);
+    bytestream.extend_from_slice(&self.timestamp_32.to_le_bytes());
+    bytestream.extend_from_slice(&self.timestamp_16.to_le_bytes());
     bytestream.push(self.n_paddles);
     for n in 0..self.paddle_packets.len() as usize {
       let pp = self.paddle_packets[n];
@@ -198,7 +199,6 @@ impl TofEvent {
   ///
   ///
   pub fn has_timed_out(&self) -> bool {
-    //return elapsed_since_epoch() - self.creation_time > EVENT_TIMEOUT;
     return self.age() > EVENT_TIMEOUT;
   }
 
@@ -231,9 +231,9 @@ impl Default for TofEvent {
 impl From<&MasterTriggerEvent> for TofEvent {
   fn from(mte : &MasterTriggerEvent) -> TofEvent {
     let mut te : TofEvent = Default::default();
-    te.event_id = mte.event_id;
-    te.timestamp = mte.timestamp;
-    te.n_paddles = mte.get_hit_paddles();
+    te.event_id     = mte.event_id;
+    te.timestamp_32 = mte.timestamp;
+    te.n_paddles    = mte.get_hit_paddles();
     te
   }
 }

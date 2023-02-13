@@ -1,6 +1,6 @@
 #include "packets/RPaddlePacket.h"
 #include "serialization.h"
-
+#include "parsers.h"
 void RPaddlePacket::reset()
 {
   //head = 0xAAAA;
@@ -23,6 +23,11 @@ void RPaddlePacket::reset()
   //  so we can find the packet in 
   //  the REventstream
   ctr_etx = 0x00;
+
+   
+  timestamp_32  = 0;
+  timestamp_16  = 0;
+
   tail = 0xF0F;
   broken = true;
 }
@@ -105,25 +110,27 @@ float RPaddlePacket::get_t_avg() const
 std::vector<unsigned char> RPaddlePacket::serialize() const
 {
   std::vector<unsigned char> buffer(RPADDLEPACKETSIZE);
-  unsigned short pos = 0; // position in bytestream
+  usize pos = 0; // position in bytestream
 
-  encode_ushort(head, buffer, pos); pos+=2;
+  Gaps::u16_to_le_bytes(head, buffer, pos);
   buffer[pos] = paddle_id; pos+=1;
 
   //encode_ushort(paddle_id, buffer, pos); pos+=2;
-  encode_ushort(time_a, buffer, pos); pos +=2;
-  encode_ushort(time_b, buffer, pos); pos +=2;
-  encode_ushort(peak_a, buffer, pos); pos +=2;
-  encode_ushort(peak_b, buffer, pos); pos +=2;
-  encode_ushort(charge_a, buffer, pos); pos+=2;
-  encode_ushort(charge_b, buffer, pos); pos+=2;
-  encode_ushort(charge_min_i, buffer, pos); pos+=2;
-  encode_ushort(x_pos, buffer, pos); pos+=2;
-  encode_ushort(t_average, buffer, pos); pos+=2;
+  Gaps::u16_to_le_bytes(time_a, buffer, pos); 
+  Gaps::u16_to_le_bytes(time_b, buffer, pos); 
+  Gaps::u16_to_le_bytes(peak_a, buffer, pos); 
+  Gaps::u16_to_le_bytes(peak_b, buffer, pos); 
+  Gaps::u16_to_le_bytes(charge_a, buffer, pos); 
+  Gaps::u16_to_le_bytes(charge_b, buffer, pos); 
+  Gaps::u16_to_le_bytes(charge_min_i, buffer, pos); 
+  Gaps::u16_to_le_bytes(x_pos, buffer, pos); 
+  Gaps::u16_to_le_bytes(t_average, buffer, pos); 
 
   buffer[pos] = ctr_etx;        pos+=1;
 
-  encode_ushort(tail, buffer, pos); pos+=2;  // done
+  Gaps::u32_to_le_bytes(timestamp_32, buffer, pos);
+  Gaps::u16_to_le_bytes(timestamp_16, buffer, pos);
+  Gaps::u16_to_le_bytes(tail, buffer, pos);  // done
   return buffer; 
 }
 
@@ -149,25 +156,29 @@ unsigned int RPaddlePacket::deserialize(vec_u8 &bytestream,
     }
  }
 
- u32 pos = end_pos; // position in bytestream
- u16 expected_packet_size = decode_ushort(bytestream, pos);pos+=2; 
+ u64 pos = end_pos; // position in bytestream
+ u16 expected_packet_size = Gaps::u16_from_le_bytes(bytestream, pos);
 
  //event_ctr = decode_uint32(bytestream, pos); pos+=4;
 
- paddle_id = bytestream[pos]; pos+=1;
- time_a = decode_ushort(bytestream, pos); pos+=2;
- time_b = decode_ushort(bytestream, pos); pos+=2;
- peak_a = decode_ushort(bytestream, pos); pos+=2;
- peak_b = decode_ushort(bytestream, pos); pos+=2;
- charge_a = decode_ushort(bytestream, pos); pos+=2;
- charge_b = decode_ushort(bytestream, pos); pos+=2;
- charge_min_i= decode_ushort(bytestream, pos); pos+=2;
- x_pos = decode_ushort(bytestream, pos);pos+=2;
- t_average = decode_ushort(bytestream, pos);pos+=2;
+ paddle_id     = bytestream[pos]; pos+=1;
+ time_a        = Gaps::u16_from_le_bytes(bytestream, pos); 
+ time_b        = Gaps::u16_from_le_bytes(bytestream, pos); 
+ peak_a        = Gaps::u16_from_le_bytes(bytestream, pos); 
+ peak_b        = Gaps::u16_from_le_bytes(bytestream, pos); 
+ charge_a      = Gaps::u16_from_le_bytes(bytestream, pos); 
+ charge_b      = Gaps::u16_from_le_bytes(bytestream, pos); 
+ charge_min_i  = Gaps::u16_from_le_bytes(bytestream, pos); 
+ x_pos         = Gaps::u16_from_le_bytes(bytestream, pos); 
+ t_average     = Gaps::u16_from_le_bytes(bytestream, pos); 
 
  ctr_etx = bytestream[pos]; pos+=1;
+
+ timestamp_32 = Gaps::u32_from_le_bytes(bytestream, pos);
+ timestamp_16 = Gaps::u16_from_le_bytes(bytestream, pos);
+
  // FIXME checks - packetlength, checksum ?
- tail = decode_ushort(bytestream, pos); pos+=2;
+ tail = Gaps::u32_from_le_bytes(bytestream, pos);
  if (tail != 0xF0F) {
    broken = true;
  }

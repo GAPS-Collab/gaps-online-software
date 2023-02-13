@@ -280,6 +280,9 @@ fn analyze_blobs(buffer               : &Vec<u8>,
                   // FIXME
                   pp_this_event[n].paddle_id = n as u8;
                   pp_this_event[n].event_id = blob_data.event_id;
+                  pp_this_event[n].timestamp_32 = blob_data.timestamp_32;
+                  pp_this_event[n].timestamp_16 = blob_data.timestamp_16;
+
                   if paddles_over_threshold[n] {
                     pp_this_event[n].event_id = blob_data.event_id;
                   }
