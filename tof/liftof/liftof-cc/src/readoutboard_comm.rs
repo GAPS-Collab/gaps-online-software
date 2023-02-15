@@ -80,10 +80,21 @@ fn write_stream_to_file(filename: &Path, bytestream: &Vec<u8>) -> Result<usize, 
 /// set to write the waveforms to hdf
 /// PaddlePacket queue : I don't think is needed for anything
 /// since we are sending the packets right away
+///
+/// # Arguments
+///
+/// * paddle_ids     :  A sorted list of paddle ids connected 
+///                     to this readoutboard. 
+///                     The is sorted like (0,1) -> pid1
+///                                        (2,3) -> pid2
+///                                        (4,5) -> pid3
+///                                        (6,7) -> pid4
+///
+///
 fn analyze_blobs(buffer               : &Vec<u8>,
                  pp_sender            : &Sender<PaddlePacket>,
                  send_packets         : bool,
-                 rb_id                : usize,
+                 readoutboard         : &ReadoutBoard,
                  print_events         : bool,
                  do_calibration       : bool,
                  calibrations         : &[Calibrations; NCHN],
@@ -276,10 +287,10 @@ fn analyze_blobs(buffer               : &Vec<u8>,
 
                 // now set general properties on the 
                 // paddles
-                for n in 0..NPADDLES {
+                for n in 0..readoutboard.sorted_pids.len() {
                   // FIXME
-                  pp_this_event[n].paddle_id = n as u8;
-                  pp_this_event[n].event_id = blob_data.event_id;
+                  pp_this_event[n].paddle_id    = readoutboard.sorted_pids[n];
+                  pp_this_event[n].event_id     = blob_data.event_id;
                   pp_this_event[n].timestamp_32 = blob_data.timestamp_32;
                   pp_this_event[n].timestamp_16 = blob_data.timestamp_16;
 
@@ -325,7 +336,7 @@ fn analyze_blobs(buffer               : &Vec<u8>,
     let hdf_diagnostics_file =  "waveforms_".to_owned()
                                 + &n_chunk.to_string()
                                 + "_"
-                                + &rb_id.to_string()
+                                + &readoutboard.id.to_string()
                                 + ".hdf";
     let hdf_file    = hdf5::File::create(hdf_diagnostics_file).unwrap(); // open for writing
     hdf_file.create_group("waveforms");
@@ -349,10 +360,15 @@ fn get_blobs_from_file (rb_id : usize) {
   let calibrations = [Calibrations {..Default::default()};NCHN];
   //let sender = Sender::<PaddlePacket>();
   let (sender, receiver) = channel();
+  todo!("Fix the paddle ids. This function needs to be given the Readoutboard!");
+  let paddle_ids : [u8;4] = [0,0,0,0];
+  let mut rb = ReadoutBoard::new();
+  rb.id = Some(rb_id as u8);
+  rb.sorted_pids = paddle_ids;
   match analyze_blobs(&blobs,
                       &sender,
                       false,
-                      rb_id,
+                      &rb,
                       false,
                       false,
                       &calibrations,
@@ -405,8 +421,8 @@ pub fn readoutboard_communicator(//socket           : &zmq::Socket,
                                  pp_pusher        : Sender<PaddlePacket>,
                                  //board_id         : usize,
                                  write_blob       : bool,
-                                 rb               : &ReadoutBoard,
-                                 calibration_file : &str)
+                                 rb               : &ReadoutBoard)
+                                 //calibration_file : &str)
 {
   let zmq_ctx = zmq::Context::new();
   let board_id = rb.id.unwrap();
@@ -420,8 +436,8 @@ pub fn readoutboard_communicator(//socket           : &zmq::Socket,
   let mut calibrations = [Calibrations {..Default::default()};NCHN];
   let do_calibration = true;
   if do_calibration {
-    info!("Reading calibrations from file {}", calibration_file);
-    let cal_file_path = Path::new(&calibration_file);
+    info!("Reading calibrations from file {}", &rb.calib_file);
+    let cal_file_path = Path::new(&rb.calib_file);//calibration_file);
     calibrations = read_calibration_file(cal_file_path); 
   }
   let address = "tcp://".to_owned() 
@@ -500,12 +516,10 @@ pub fn readoutboard_communicator(//socket           : &zmq::Socket,
         //for n in 0..5 {
         //  println!("{}", tp.payload[tp.payload.len() - 1 - n]);
         //}
-
-
         match analyze_blobs(&tp.payload,
                             &pp_pusher,
                             true,
-                            board_id as usize,
+                            &rb,
                             false,
                             true,
                             &calibrations,

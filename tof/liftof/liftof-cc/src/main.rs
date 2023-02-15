@@ -12,9 +12,11 @@ extern crate ndarray;
 extern crate local_ip_address;
 
 extern crate liftof_lib;
-use liftof_lib::{ReadoutBoard, 
-                 rb_manifest_from_json,
-                 get_rb_manifest};
+use liftof_lib::{LocalTriggerBoard,
+                 ReadoutBoard,
+                 get_tof_manifest};
+                 //rb_manifest_from_json,
+                 //get_rb_manifest};
 
 #[cfg(feature="random")]
 extern crate rand;
@@ -135,32 +137,40 @@ fn main() {
 
   // Have all the readoutboard related information in this list
   let mut rb_list = Vec::<ReadoutBoard>::new();
+  let mut manifest = (Vec::<LocalTriggerBoard>::new(), Vec::<ReadoutBoard>::new());
   match args.json_config {
     None => panic!("No .json config file provided! Please provide a config file with --json-config or -j flag!"),
     Some(_) => {
-      if !args.json_config.as_ref().unwrap().exists() {
-          panic!("The file {} does not exist!", args.json_config.as_ref().unwrap().display());
-      }
-      info!("Found config file {}", args.json_config.as_ref().unwrap().display());
+      //if !args.json_config.as_ref().unwrap().exists() {
+      //    panic!("The file {} does not exist!", args.json_config.as_ref().unwrap().display());
+      //}
+      //info!("Found config file {}", args.json_config.as_ref().unwrap().display());
       json_content = std::fs::read_to_string(args.json_config.as_ref().unwrap()).unwrap();
       config = json::parse(&json_content).unwrap();
+      manifest = get_tof_manifest(args.json_config.unwrap());
+      println!("==> Tof Manifest following:");
+      println!("{:?}", manifest);
+      println!("***************************");
+      rb_list = manifest.1;
+      nboards = rb_list.len();
+      //panic!("That's it");
       //println!(" .. .. using config:");
       //println!("  {}", config.pretty(2));
-      nboards = config["readout_boards"].len();
-      info!("Found configuration for {} readout boards!", nboards);
+      //nboards = config["readout_boards"].len();
+      //info!("Found configuration for {} readout boards!", nboards);
       //for n in 0..config["readout_boards"].len() {
       //   println!(" {}", config["readout_boards"][n].pretty(2));
     } // end Some
   } // end match
  
-  if autodiscover_rbs {
-    println!("==> Autodiscovering ReadoutBoards!...");
-    rb_list = get_rb_manifest();
-    nboards = rb_list.len();
-  }
-  for rb in rb_list.iter() {
-    println!("{}", rb);
-  }
+  //if autodiscover_rbs {
+  //  println!("==> Autodiscovering ReadoutBoards!...");
+  //  rb_list = get_rb_manifest();
+  //  nboards = rb_list.len();
+  //}
+  //for rb in rb_list.iter() {
+  //  println!("{}", rb);
+  //}
 
   if use_master_trigger {
    master_trigger_ip   = config["master_trigger"]["ip"].as_str().unwrap().to_owned();
@@ -349,14 +359,9 @@ fn main() {
     //let ctx_ref = &ctx.clone();
     let this_rb = rb_list[n].clone();
     worker_threads.execute(move || {
-      readoutboard_communicator(//&rb_comm_socket,
-                                //ctx_ref,
-                                this_rb_pp_sender,
-                                //rb_id,
+      readoutboard_communicator(this_rb_pp_sender,
                                 write_blob,
-                                //&ReadoutBoard::new(),
-                                &this_rb,
-                                &cali_file_name); 
+                                &this_rb);
     });
   } // end for loop over nboards
   // lastly start the commander thread 

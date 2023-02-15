@@ -71,8 +71,8 @@ fn build_events_in_cache(event_cache   : &mut VecDeque<TofEvent>,
       pack.payload = bytestream;
 
       match data_sink.send(pack) {
-        Err(err) => warn!("Packet sending failed! Err {}", err),
-        Ok(_)    => info!("Event {} with {} paddles sent and {} paddles were expected!", ev.event_id, ev.paddle_packets.len(),ev.n_paddles) 
+        Err(err) => error!("Packet sending failed! Err {}", err),
+        Ok(_)    => debug!("Event {} with {} paddles sent and {} paddles were expected!", ev.event_id, ev.paddle_packets.len(),ev.n_paddles) 
       }
       continue;
     }
