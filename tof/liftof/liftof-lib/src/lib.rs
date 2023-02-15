@@ -4,8 +4,10 @@ use port_scanner::scan_ports_addrs;
 
 use std::error::Error;
 use std::fmt;
+use std::path::PathBuf;
 use std::net::{IpAddr, Ipv4Addr};
 use std::io::Write;
+use std::collections::HashMap;
 
 // FIXME - remove this crate
 //use mac_address::MacAddress;
@@ -30,24 +32,9 @@ extern crate pretty_env_logger;
 
 #[macro_use] extern crate manifest_dir_macros;
 
-//extern crate libarp;
 
-//use libarp::{arp::ArpMessage, client::ArpClient, interfaces::Interface, interfaces::MacAddr};
-
-
-///// Stolen from the arp-toolkit example
-//fn resolve_simple(mac_addr: MacAddress, ip_addr: Ipv4Addr) {
-//    let mut client = ArpClient::new().unwrap();
-//
-//
-//    println!("Simple: IP for MAC {} is {}", mac_addr, result.unwrap());
-//
-//    let result = client.ip_to_mac(ip_addr, None);
-//    println!("Simple: MAC for IP {} is {}", ip_addr, result.unwrap());
-//}
-
-// The output is wrapped in a Result to allow matching on errors
-// Returns an Iterator to the Reader of the lines of the file.
+/// The output is wrapped in a Result to allow matching on errors
+/// Returns an Iterator to the Reader of the lines of the file.
 fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
 where P: AsRef<Path>, {
     let file = File::open(filename)?;
@@ -143,6 +130,33 @@ pub fn rb_manifest_from_json(config : json::JsonValue) -> Vec<ReadoutBoard> {
   todo!();
   boards
 }
+
+/// Get the tof channel/paddle mapping and involved components
+///
+/// This reads the configuration from a json file and panics 
+/// if there are any problems.
+///
+pub fn get_tof_manifest(json_config : std::path::PathBuf) -> (Vec::<LocalTriggerBoard>, Vec::<ReadoutBoard>) {
+  let mut ltbs = Vec::<LocalTriggerBoard>::new();
+  let mut rbs  = Vec::<ReadoutBoard>::new();
+  let js_file = json_config.as_path();
+   if !js_file.exists() {
+     panic!("The file {} does not exist!", js_file.display());
+   }
+   info!("Found config file {}", js_file.display());
+   let json_content = std::fs::read_to_string(js_file).expect("Unable to read file!");
+   let config = json::parse(&json_content).expect("Unable to parse json!");
+   for n in 0..config["ltbs"].len() {
+     ltbs.push(LocalTriggerBoard::from(&config["ltbs"][n]));
+   }
+   for n in 0..config["rbs"].len() {
+     rbs.push(ReadoutBoard::from(&config["rbs"][n]));
+   }
+
+
+  (ltbs, rbs)
+}
+
 
 pub fn get_rb_manifest() -> Vec<ReadoutBoard> {
   let rb_manifest_path = path!("assets/rb.manifest");
@@ -257,17 +271,85 @@ impl Error for ReadoutBoardError {
 ///
 ///
 ///
-pub fn discover_boards() -> Vec<ReadoutBoard> {
-  let board_list = Vec::<ReadoutBoard>::new();
-  board_list
+//pub fn discover_boards() -> Vec<ReadoutBoard> {
+//  let board_list = Vec::<ReadoutBoard>::new();
+//  board_list
+//}
+
+
+/// A generic representation of a LocalTriggerBoard
+///
+/// This is important to make the mapping between 
+/// trigger information and readoutboard.
+#[derive(Debug, Clone)]
+pub struct LocalTriggerBoard {
+  pub id : u8,
+  /// The LTB has 16 channels, 
+  /// which are connected to the RBs
+  /// Each channel corresponds to a 
+  /// specific RB channel, represented
+  /// by the tuple (RBID, CHANNELID)
+  pub ch_to_rb : [(u8,u8);16],
+  /// the MTB bit in the MTEvent this 
+  /// LTB should reply to
+  pub mt_bitmask : u32,
 }
 
+impl LocalTriggerBoard {
+  pub fn new() -> LocalTriggerBoard {
+    LocalTriggerBoard {
+      id : 0,
+      ch_to_rb : [(0,0);16],
+      mt_bitmask : 0
+    }
+  }
+
+  /// Calculate the position in the bitmask from the connectors
+  pub fn get_mask_from_dsi_and_j(dsi : u8, j : u8) -> u32 {
+    let mut mask : u32 = 1;
+    mask = mask << (dsi*5 + j -1) ;
+    mask
+  }
+}
+
+impl fmt::Display for LocalTriggerBoard {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    write!(f, "<LTB: \n ID \t\t: {} \n bitmask \t\t: {} \n channels \t: {:?} >", 
+            self.id.to_string() ,
+            self.mt_bitmask.to_string(),
+            self.ch_to_rb
+    )
+  }
+}
+
+impl From<&json::JsonValue> for LocalTriggerBoard {
+  fn from(json : &json::JsonValue) -> Self {
+    let id  = json["id"].as_u8().expect("id value json problem");
+    let dsi = json["DSI"].as_u8().expect("DSI value json problem");
+    let j   = json["J"].as_u8().expect("J value json problem");
+    let mask = LocalTriggerBoard::get_mask_from_dsi_and_j(dsi, j);
+    let channels = &json["ch_to_rb"];//.members();
+    let mut rb_channels = [(0, 0);16];
+    for ch in 0..channels.len() {
+      if channels.has_key(&ch.to_string()) {
+        rb_channels[ch] = (channels[&ch.to_string()][0].as_u8().unwrap(),
+                           channels[&ch.to_string()][1].as_u8().unwrap());  
+      }
+    }
+    let bitmask = LocalTriggerBoard::get_mask_from_dsi_and_j(dsi, j);
+    LocalTriggerBoard {
+      id : id,
+      ch_to_rb : rb_channels,
+      mt_bitmask : bitmask
+    }
+  }
+}
 
 /// A generic representation of a Readout board
 ///
 ///
 ///
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Clone)]
 pub struct ReadoutBoard {
   pub id           : Option<u8>,
   pub mac_address  : Option<MacAddr6>,
@@ -276,6 +358,9 @@ pub struct ReadoutBoard {
   pub cmd_port     : Option<u16>,
   pub is_connected : bool,
   pub uptime       : u32,
+  pub ch_to_pid    : [u8;8],
+  pub sorted_pids  : [u8;4],
+  pub calib_file   : String,
   first_up         : u32,
 }
 
@@ -290,7 +375,27 @@ impl ReadoutBoard {
       cmd_port     : None,
       is_connected : false,
       uptime       : 0,
+      ch_to_pid    : [0;8],
+      sorted_pids  : [0;4], 
+      calib_file   : String::from(""),
       first_up     : 0
+    }
+  }
+
+  /// Get the readoutboard ip address from 
+  /// the ARP tables
+  fn get_ip(&mut self) {
+    let mac_table = get_mac_to_ip_map();
+    let rb_ip = mac_table.get(&self.mac_address.unwrap());
+    info!("Found ip address {:?} for RB {}", rb_ip, self.id.unwrap_or(0));
+    match rb_ip {
+      None => panic!("Can not resolve RBBoard with MAC address {:?}, it is not in the system's ARP tables", &self.mac_address),
+      Some(ip)   => match ip[0] {
+        IpAddr::V6(a) => panic!("IPV6 {a} not suppported!"),
+        IpAddr::V4(a) => {
+          self.ip_address = Some(a); 
+        }
+      }
     }
   }
     
@@ -326,13 +431,15 @@ impl fmt::Display for ReadoutBoard {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let default_ip  = Ipv4Addr::new(0,0,0,0);
     let default_mac = MacAddr6::default();
-    write!(f, "<ReadoutBoard: \n ID \t\t: {} \n MAC addr \t: {} \n IP addr \t: {} \n 0MQ PUB \t: {} \n 0MQ REP \t: {} \n connected \t: {} \n uptime \t: {} >", 
+    write!(f, "<ReadoutBoard: \n ID \t\t: {} \n MAC addr \t: {} \n IP addr \t: {} \n 0MQ PUB \t: {} \n 0MQ REP \t: {} \n connected \t: {}\n calib file \t: {} \n uptime \t: {} >", 
             self.id.unwrap_or(0).to_string()           ,      
             self.mac_address.unwrap_or(default_mac).to_string()  ,
             self.ip_address.unwrap_or(default_ip).to_string()   ,
             self.data_port.unwrap_or(0).to_string()    ,
-            self.cmd_port.unwrap_or(0).to_string()     , 
+            self.cmd_port.unwrap_or(0)     , 
             self.is_connected.to_string() , 
+            "?",
+            //&self.calib_file.unwrap_or(String::from("")),
             self.uptime.to_string()       ,
     )
   }
@@ -341,6 +448,52 @@ impl fmt::Display for ReadoutBoard {
 impl Default for ReadoutBoard {
   fn default() -> ReadoutBoard {
     ReadoutBoard::new()
+  }
+}
+
+impl From<&json::JsonValue> for ReadoutBoard {
+  fn from(json : &json::JsonValue) -> Self {
+  //pub mac_address  : Option<MacAddr6>,
+  //pub ip_address   : Option<Ipv4Addr>, 
+  //pub data_port    : Option<u16>,
+  //pub cmd_port     : Option<u16>,
+  //pub is_connected : bool,
+  //pub uptime       : u32,
+  //pub ch_to_pid    : [u8;8],
+  //first_up         : u32,
+    let mut board =  ReadoutBoard::new();
+    board.id = Some(json["id"].as_u8().unwrap());
+    //let identifier: Vec<&str> = ip.split(";").collect();
+    let identifier = json["mac_address"].as_str().unwrap();
+    let mc_address = identifier.replace(" ","");
+    let mc_address : Vec<&str> = mc_address.split(":").collect();
+    println!("{:?}", mc_address);
+    let mc_address : Vec<u8>   = mc_address.iter().map(|&x| {u8::from_str_radix(x,16).unwrap()} ).collect();
+    assert!(mc_address.len() == 6);
+    let mac = MacAddr6::new(mc_address[0],
+                            mc_address[1],
+                            mc_address[2],
+                            mc_address[3],
+                            mc_address[4],
+                            mc_address[5]);
+    let data_port = Some(json["port"].as_u16().unwrap());
+    let calib_file = json["calibration_file"].as_str().unwrap();
+    board.mac_address = Some(mac);
+    board.data_port   = data_port;
+    board.calib_file  = calib_file.to_string();
+    board.get_ip();
+    let ch_to_pid = &json["ch_to_pid"];
+    for ch in 0..ch_to_pid.len() {
+      board.ch_to_pid[ch] = json["ch_to_pid"][&ch.to_string()].as_u8().unwrap();
+    }
+    let mut paddle_ids : [u8;4] = [0,0,0,0];
+    let mut counter = 0;
+    for ch in board.ch_to_pid.iter().step_by(2) {
+      paddle_ids[counter] = *ch;
+      counter += 1;
+    }
+    board.sorted_pids = paddle_ids;
+    board
   }
 }
 
