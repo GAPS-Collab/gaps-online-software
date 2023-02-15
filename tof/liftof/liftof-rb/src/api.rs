@@ -8,6 +8,13 @@ use tof_dataclasses::serialization::Serialization;
 use std::collections::HashMap;
 use std::net::IpAddr;
 
+
+use std::{fs, fs::File, path::Path};
+
+use std::io::Write;
+use std::fs::OpenOptions;
+
+
 use std::time::{Duration,
                 Instant};
 use std::{thread, time};
@@ -34,6 +41,8 @@ use tof_dataclasses::packets::{TofPacket,
                                PacketType};
 //use tof_dataclasses::threading::ThreadPool;
 use tof_dataclasses::monitoring as moni;
+
+use liftof_lib::TofPacketWriter;
 
 
 /// Non-register related constants 
@@ -363,7 +372,8 @@ pub fn cmd_responder(rsp_receiver     : &Receiver<TofResponse>,
 /// Manage the 0MQ PUB socket and send everything 
 /// which comes in over the wire as a byte 
 /// payload
-pub fn data_publisher(data : &Receiver<TofPacket>) {
+pub fn data_publisher(data : &Receiver<TofPacket>,
+                      write_blob : bool) {
   let mut address_ip = String::from("tcp://");
   let this_board_ip = local_ip().unwrap();
   let data_port    = DATAPORT_START + get_board_id().unwrap();
@@ -383,6 +393,21 @@ pub fn data_publisher(data : &Receiver<TofPacket>) {
   data_socket.bind(&data_address).expect("Unable to bind to data (PUB) socket {data_adress}");
   info!("0MQ SUB socket bound to address {data_address}");
 
+
+  let blobfile_name = "testdata_".to_owned()
+                       //+ &board_id.to_string()
+                       + ".blob";
+
+  let blobfile_path = Path::new(&blobfile_name);
+  
+
+  let mut file_on_disc : Option<File> = None;//let mut output = File::create(path)?;
+  if write_blob {
+    info!("Writing blobs to {}", blobfile_name );
+    file_on_disc = OpenOptions::new().append(true).create(true).open(blobfile_path).ok()
+  }
+
+
   loop {
     match data.recv() {
       Err(err) => trace!("Error receiving TofPacket {err}"),
@@ -390,6 +415,16 @@ pub fn data_publisher(data : &Receiver<TofPacket>) {
         // pass on the packet downstream
         // wrap the payload INTO THE 
         // FIXME - retries?
+        if write_blob {
+          if packet.packet_type == PacketType::RBEvent {
+            match &mut file_on_disc {
+              None => error!("We want to write data, however the file is invalid!"),
+              Some(f) => {
+                f.write_all(packet.payload.as_slice());
+              }
+            }
+          }
+        }
         let tp_payload = packet.to_bytestream();
         match data_socket.send(tp_payload,zmq::DONTWAIT) {
           Ok(_)  => trace!("0MQ PUB socket.send() SUCCESS!"),
@@ -598,11 +633,13 @@ fn make_sure_it_runs(will_panic : &mut u8,
     // it is hopeless. Let's give up.
     // Let's try to stop the DRS4 before
     // we're killing ourselves
+    disable_trigger();
     idle_drs4_daq().unwrap_or(());
     // FIXME - send out Alert
     panic!("I can not get this run to start. I'll kill myself!");
   }
   let five_milli = time::Duration::from_millis(5); 
+  let one_sec    = time::Duration::from_secs(1);
   let two_secs   = time::Duration::from_secs(2);
   let five_secs  = time::Duration::from_secs(5);
   match idle_drs4_daq() {
@@ -632,6 +669,10 @@ fn make_sure_it_runs(will_panic : &mut u8,
       trace!("Starting DRS4..");
     }
   }
+  match enable_trigger() {
+    Err(err) => error!("Can not enable triggers! Err {err}"),
+    Ok(_)    => trace!("Triggers enabled")
+  }
   // check that the data buffers are filling
   let buf_a = BlobBuffer::A;
   let buf_b = BlobBuffer::B;
@@ -640,7 +681,7 @@ fn make_sure_it_runs(will_panic : &mut u8,
   thread::sleep(five_secs);
   if get_buff_size(&buf_a).unwrap_or(0) == buf_size_a &&  
       get_buff_size(&buf_b).unwrap_or(0) == buf_size_b {
-    warn!("Buffers are not filling! Running setup again!");
+    error!("Buffers are not filling! Running setup again!");
     make_sure_it_runs(will_panic, force_trigger);
   } 
 }

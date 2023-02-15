@@ -90,6 +90,12 @@ struct Args {
   /// Behaviour can be controlled through `TofCommand` later
   #[arg(long, default_value_t = false)]
   stream_any : bool,
+  /// Readoutboard testing with internal trigger
+  #[arg(long, default_value_t = false)]
+  rb_test_ext : bool,
+  /// Readoutboard testing with softare trigger
+  #[arg(long, default_value_t = false)]
+  rb_test_sw : bool,
 }
 
 
@@ -150,15 +156,26 @@ fn main() {
   let data_address : String = address_ip + ":" + &data_port.to_string();
   
   let args = Args::parse();                   
-  let buff_trip     = args.buff_trip;         
-  let switch_buff   = args.switch_buffers;    
-  let max_event     = args.nevents;
-  let show_progress = args.show_progress;
-  let cache_size    = args.cache_size;
-  let dont_listen   = args.dont_listen;
-  let run_forever   = args.run_forevever;
-  let stream_any    = args.stream_any;
-  let force_trigger = args.force_trigger;
+  let buff_trip         = args.buff_trip;         
+  let switch_buff       = args.switch_buffers;    
+  let mut max_event     = args.nevents;
+  let mut show_progress = args.show_progress;
+  let cache_size        = args.cache_size;
+  let mut dont_listen   = args.dont_listen;
+  let run_forever       = args.run_forevever;
+  let stream_any        = args.stream_any;
+  let mut force_trigger = args.force_trigger;
+  let rb_test           = args.rb_test_ext || args.rb_test_sw;
+  
+  if rb_test {
+    dont_listen = true;
+    show_progress = true;
+    max_event = 880;
+    if args.rb_test_sw {
+      force_trigger = 2000;
+    }
+  }  
+
 
   // welcome banner!
   println!("-----------------------------------------------");
@@ -178,7 +195,15 @@ fn main() {
   } 
   println!("-----------------------------------------------");
   println!("");                             
-                            
+  if rb_test {
+    println!("Will run in rb testing mode!");
+    warn!("RB testing mode!");
+    println!("-----------------------------------------------"); 
+  } 
+  
+
+
+
   let mut uio1_total_size = (UIO1_MAX_OCCUPANCY - UIO1_MIN_OCCUPANCY) as u64;
   let mut uio2_total_size = (UIO2_MAX_OCCUPANCY - UIO2_MIN_OCCUPANCY) as u64;
 
@@ -350,7 +375,7 @@ fn main() {
   //info!("0MQ SUB socket bound to address {data_address}");
  
   workforce.execute(move || {
-    data_publisher(&tp_from_client); 
+    data_publisher(&tp_from_client, rb_test); 
   });
   // Now setup thread which require the 
   // data socket.

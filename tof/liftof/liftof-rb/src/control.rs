@@ -12,6 +12,20 @@ use crate::memory::*;
 use std::time::Duration;
 use std::thread;
 
+/// enable triggering
+pub fn enable_trigger() -> Result<(), RegisterError> {
+  trace!("Enable triggers!");
+  write_control_reg(TRIGGER_ENABLE, 1)?;
+  Ok(())
+}
+
+/// stop all triggers
+pub fn disable_trigger() -> Result<(), RegisterError> {
+  trace!("Enable triggers!");
+  write_control_reg(TRIGGER_ENABLE, 0)?;
+  Ok(())
+}
+
 /// Start DRS4 data acquistion
 pub fn start_drs4_daq() -> Result<(), RegisterError> {
   trace!("SET DRS4 START");

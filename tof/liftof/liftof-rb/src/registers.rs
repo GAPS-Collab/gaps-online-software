@@ -52,6 +52,8 @@ pub const DMA_RESET : u32 = 0x5c; // Write 1 to completely reset the DMA state m
 pub const READOUT_MASK : u32 = 0x44; // [8:0] 8 bit mask, set a bit to 1 to enable readout of that channel.
                                  // 9th is auto-read if any channel is enabled and AUTO_9TH_CHANNEL set to 1
 
+pub const TRIGGER_ENABLE : u32 = 0x47;  // Write 0 to stop all triggers, 1 to enable triggering
+
 //=================DMA==================================
 // (direct memory access)
 //======================================================
