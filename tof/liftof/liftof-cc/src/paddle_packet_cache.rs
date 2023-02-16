@@ -154,6 +154,7 @@ pub fn paddle_packet_cache (evid_rec    : &Receiver<Option<u32>>,
 
   let mut n_iter = 0usize;
   loop {
+    n_iter += 1;
     
     // every iteration, we welcome new paddle packets
     // and keep them. Let's try to receive a certain 
@@ -242,6 +243,5 @@ pub fn paddle_packet_cache (evid_rec    : &Receiver<Option<u32>>,
     let size_af = pp_cache.len();
     info!("Size of paddle_cache {} before and {} after clean up", size_b4, size_af);
   }
-  n_iter += 1;
   } // end loop
 }

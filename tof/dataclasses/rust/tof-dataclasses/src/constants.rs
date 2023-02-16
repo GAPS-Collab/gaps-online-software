@@ -53,7 +53,7 @@ pub const MAX_TRIGGER_RATE : usize = 200;
 /// with the master trigger.
 ///
 //pub const EVENT_TIMEOUT : u128 = 30000000;
-pub const EVENT_TIMEOUT : u64 = 10;
+pub const EVENT_TIMEOUT : u64 = 30;
 
 /// Limit the size of the internal paddle packet cache
 /// - all packets abvoe this value will be dropped

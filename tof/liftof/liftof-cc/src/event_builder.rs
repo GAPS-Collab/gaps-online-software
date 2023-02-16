@@ -69,7 +69,10 @@ fn build_events_in_cache(event_cache   : &mut VecDeque<TofEvent>,
       let mut pack = TofPacket::new();
       pack.packet_type = PacketType::TofEvent;
       pack.payload = bytestream;
-
+      if ev.n_paddles > 0 {
+        trace!("{:?}", ev);
+        trace!("{:?}", ev.paddle_packets);
+      }
       match data_sink.send(pack) {
         Err(err) => error!("Packet sending failed! Err {}", err),
         Ok(_)    => debug!("Event {} with {} paddles sent and {} paddles were expected!", ev.event_id, ev.paddle_packets.len(),ev.n_paddles) 
@@ -94,6 +97,8 @@ fn build_events_in_cache(event_cache   : &mut VecDeque<TofEvent>,
                 } else {
                   let ev_paddles = vec![pp];
                   paddle_cache.insert(pp.event_id, ev_paddles);
+                  //println!("{:?}", paddle_cache[&pp.event_id].len());
+                  //println!("{:?}", paddle_cache);
                 }
               }
             }

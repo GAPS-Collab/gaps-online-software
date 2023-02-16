@@ -110,8 +110,10 @@ fn analyze_blobs(buffer               : &Vec<u8>,
 
   // allocate some memory we are using in 
   // every iteration of the loop
-  const NPADDLES : usize = (NCHN - 1)/2; // assuming one channel 
-                                           // is the channel 9
+  //const NPADDLES : usize = (NCHN - 1)/2; // assuming one channel 
+  //                                         // is the channel 9
+  const NPADDLES : usize = 4;
+
 
   // each event has NPADDLES per readout board
   // this holds all for a single event
@@ -224,7 +226,7 @@ fn analyze_blobs(buffer               : &Vec<u8>,
                 // then we set the threshold and check
                 // if the wf went over threashold
                 let is_ot = blob_data.set_threshold(10.0, ch);
-                if !is_ot {continue;}
+                //if !is_ot {continue;}
                 channels_over_threshold[ch] = true;
                 
                 blob_data.set_cfds_fraction(0.20, ch);
@@ -247,7 +249,7 @@ fn analyze_blobs(buffer               : &Vec<u8>,
                   1 => {
                     paddles_over_threshold[0] = true;
                     pp_this_event[0].set_time_b(cfd_time);
-                    pp_this_event[0].set_charge_a(charge);
+                    pp_this_event[0].set_charge_b(charge);
 
                   },
                   2 => {
@@ -273,7 +275,7 @@ fn analyze_blobs(buffer               : &Vec<u8>,
                   6 => {
                     paddles_over_threshold[3] = true;
                     pp_this_event[3].set_time_a(cfd_time);
-                    pp_this_event[3].set_charge_b(charge);
+                    pp_this_event[3].set_charge_a(charge);
                   },
                   7 => {
                     paddles_over_threshold[3] = true;
@@ -313,6 +315,7 @@ fn analyze_blobs(buffer               : &Vec<u8>,
               //if paddles_over_threshold[n] {
               if true {
                 trace!("Sending pp to cache for evid {}", pp_this_event[n].event_id);
+                println!("Sending {:?}", pp_this_event[n]);
                 pp_sender.send(pp_this_event[n]);
               }
             }

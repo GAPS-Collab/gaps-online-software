@@ -40,17 +40,29 @@ while True:
         #    print ([k.event_id for k in all_events])
         npackets += 1
         #print (f"received {npackets} packets, delta t {time.time() - now}")
+    #if len(data) > 15:
+    #    print (f'=======')
+    #    print (f' last event {event.event_id} {event.n_paddles}')
+    #    #print (data)
+    #    print (event)
+    #    for k in event.paddle_packets:
+    #        print (k)
+    #    #raise
 
     if npackets % 100 == 0:
         print (f'=======')
         print (f' last event {event.event_id} {event.n_paddles}')
-        print (data)
-        print (event)
-        for k in event.paddle_packets:
-            print (k)
+        #print (data)
+        #print (event)
+        #for k in event.paddle_packets:
+        #    print (k)
         if event.n_paddles > 0:
             print(event)
-            print(event.paddle_packets[0])
+            for k in event.paddle_packets:
+                print (k)
+            #if not event.is_broken():
+            #     print(event.paddle_packets[0])
+            #raise
         print (f"received {npackets} packets, delta t {time.time() - now}")
         now = time.time()
         all_events = np.array(all_events)
