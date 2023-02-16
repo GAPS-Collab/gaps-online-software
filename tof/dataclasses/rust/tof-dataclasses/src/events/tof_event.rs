@@ -69,10 +69,10 @@ pub struct TofEvent  {
 
 impl TofEvent {
   
-  pub const PacketSizeFixed    : usize = 24;
-  pub const Version            : &'static str = "1.1";
-  pub const Head               : u16  = 43690; //0xAAAA
-  pub const Tail               : u16  = 21845; //0x5555
+  pub const PACKETSIZEFIXED    : usize = 24;
+  pub const VERSION            : &'static str = "1.1";
+  pub const HEAD               : u16  = 43690; //0xAAAA
+  pub const TAIL               : u16  = 21845; //0x5555
   
 
   pub fn new(event_id : u32,
@@ -109,10 +109,14 @@ impl TofEvent {
       // something is utterly broken
       return Err(SerializationError::StreamTooShort);
     }
-    let evid = u32::from_le_bytes([bytestream[start_pos + 2],
-                                   bytestream[start_pos + 3],
-                                   bytestream[start_pos + 4],
-                                   bytestream[start_pos + 5]]);
+    let evid = u32::from_le_bytes([bytestream[start_pos],
+                                   bytestream[start_pos + 1],
+                                   bytestream[start_pos + 2],
+                                   bytestream[start_pos + 3]]);
+    //let evid = u32::from_le_bytes([bytestream[start_pos + 2],
+    //                               bytestream[start_pos + 3],
+    //                               bytestream[start_pos + 4],
+    //                               bytestream[start_pos + 5]]);
     Ok(evid)
   }
 
@@ -121,23 +125,24 @@ impl TofEvent {
     let mut event = TofEvent::new(9,0);
     let mut pos = start_pos;
 
-    pos = search_for_u16(TofEvent::Head, &bytestream, pos)?;
+    pos = search_for_u16(TofEvent::HEAD, &bytestream, pos)?;
    
-    let mut raw_bytes_4  = [bytestream[pos + 1],
-                            bytestream[pos + 0],
-                            bytestream[pos + 3],
-                            bytestream[pos + 2]];
+    let mut raw_bytes_4  = [bytestream[pos ],
+                            bytestream[pos + 1],
+                            bytestream[pos + 2],
+                            bytestream[pos + 3]];
     pos   += 4; 
-    event.event_id = u32::from_be_bytes(raw_bytes_4); 
+    event.event_id = u32::from_le_bytes(raw_bytes_4); 
     raw_bytes_4  = [bytestream[pos ],
                     bytestream[pos + 1],
                     bytestream[pos + 2],
                     bytestream[pos + 3]];
+    pos   += 4; 
     event.timestamp_32 = u32::from_le_bytes(raw_bytes_4);
     let raw_bytes_2 = [bytestream[pos],
                        bytestream[pos + 1]];
-    event.timestamp_16 = u16::from_le_bytes(raw_bytes_2);
     pos += 2;
+    event.timestamp_16 = u16::from_le_bytes(raw_bytes_2);
     event.n_paddles      = bytestream[pos];
     pos += 1; 
    
@@ -157,16 +162,18 @@ impl TofEvent {
   
   pub fn to_bytestream(&self) -> Vec<u8> {
 
-    let mut bytestream = Vec::<u8>::with_capacity(TofEvent::PacketSizeFixed + (self.n_paddles as usize)*PaddlePacket::PACKETSIZE as usize);
+    let mut bytestream = Vec::<u8>::with_capacity(TofEvent::PACKETSIZEFIXED + (self.n_paddles as usize)*PaddlePacket::PACKETSIZE as usize);
 
-    bytestream.extend_from_slice(&TofEvent::Head.to_le_bytes());
-    let mut evid = self.event_id.to_be_bytes();
+    bytestream.extend_from_slice(&TofEvent::HEAD.to_le_bytes());
+    //let mut evid = self.event_id.to_be_bytes();
 
-    evid  = [evid[1],
-             evid[0],
-             evid[3],
-             evid[2]];
-    bytestream.extend_from_slice(&evid);
+    //evid  = [evid[1],
+    //         evid[0],
+    //         evid[3],
+    //         evid[2]];
+    
+    //bytestream.extend_from_slice(&evid);
+    bytestream.extend_from_slice(&self.event_id.to_le_bytes());
     bytestream.extend_from_slice(&self.timestamp_32.to_le_bytes());
     bytestream.extend_from_slice(&self.timestamp_16.to_le_bytes());
     bytestream.push(self.n_paddles);
@@ -175,7 +182,7 @@ impl TofEvent {
       bytestream.extend_from_slice(&pp.to_bytestream());
 
     }
-    bytestream.extend_from_slice(&TofEvent::Tail        .to_le_bytes()); 
+    bytestream.extend_from_slice(&TofEvent::TAIL        .to_le_bytes()); 
     bytestream
   }
 
@@ -271,11 +278,12 @@ fn serialize_deserialize_pp_roundabout() {
 #[test]
 fn serialize_deserialize_tofevent_roundabout() {
   let mut event = TofEvent::new(0,0);
-
+  event.timestamp_32 = 1234;
+  event.timestamp_16 = 56;
   // let's add 10 random paddles
   for n in 0..10 {
     let pp = PaddlePacket::from_random();
-    event.paddle_packets.push(pp);
+    event.add_paddle(pp);
   }
   assert!(event.valid);
 
@@ -286,7 +294,8 @@ fn serialize_deserialize_tofevent_roundabout() {
       error!("Got deserialization error! {:?}", err);
     },
     Ok(new_event)   => {
-      assert_eq!(new_event, event);
+      event.creation_time = new_event.creation_time;
+      assert_eq!(event, new_event);
     }
   }
 }
