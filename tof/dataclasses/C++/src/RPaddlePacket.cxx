@@ -9,16 +9,16 @@ void RPaddlePacket::reset()
   //event_ctr = 0;
   //for (size_t k=0;k<8;k++) utc_timestamp[k] = 0x00;
 
-  paddle_id = 0x00;
-  time_a = 0;
-  time_b = 0;
-  peak_a = 0;
-  peak_b = 0;
-  charge_a = 0;
-  charge_b = 0;
+  paddle_id    = 0x00;
+  time_a       = 0;
+  time_b       = 0;
+  peak_a       = 0;
+  peak_b       = 0;
+  charge_a     = 0;
+  charge_b     = 0;
   charge_min_i = 0;
-  x_pos = 0;
-  t_average = 0;
+  x_pos        = 0;
+  t_average    = 0;
   /// also different tail here, 
   //  so we can find the packet in 
   //  the REventstream
@@ -157,7 +157,7 @@ unsigned int RPaddlePacket::deserialize(vec_u8 &bytestream,
  }
 
  u64 pos = end_pos; // position in bytestream
- u16 expected_packet_size = Gaps::u16_from_le_bytes(bytestream, pos);
+ //u16 expected_packet_size = Gaps::u16_from_le_bytes(bytestream, pos);
 
  //event_ctr = decode_uint32(bytestream, pos); pos+=4;
 
