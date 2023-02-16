@@ -110,8 +110,10 @@ impl PaddlePacket {
   }
 
   pub fn set_time_a(&mut self, time : f64 ) {
+    //println!("time {time}");
     let prec : f64 = 0.004;
     self.time_a = (time as f64/prec) as u16;
+    //println!("time_a {}", self.time_a);
   }
 
   pub fn set_time_b(&mut self, time : f64 ) {

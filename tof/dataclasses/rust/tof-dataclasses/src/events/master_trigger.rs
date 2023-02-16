@@ -673,43 +673,51 @@ pub fn read_daq(socket : &UdpSocket,
       // this means we only need to read once if it is 11 etc..
       //
       let mut board = 0;
-      for n in (0..18).step_by(2) {
+      let mut nhit_query = 0;
+      let mut queries_needed = 0;
+      let mut queried_boards = Vec::<u8>::new();
+      for n in (0..20).step_by(2) {
         if decoded_board_mask[n+1] || decoded_board_mask[n] {
-          let hitmask = read_daq_word(socket, target_address, buffer)?;
-          trace!("Got hitmask {hitmask}");
-          (hits_a, hits_b) = decode_hit_mask(hitmask);
-          event.hits[n+1] = hits_a;
-          event.hits[n] = hits_b;
+          queries_needed += 1;
+          queried_boards.push(n as u8);
         }
       }
-      //board += 1;
-      //for n in (0..18).step_by(2) {
-      //  if decoded_board_mask[n] || decoded_board_mask[n+1]  {
+      if queries_needed % 2 == 0 {
+          queries_needed = queries_needed /2;
+      } else {
+          queries_needed = queries_needed /2 + 1;
+      }
+      trace!("We need {queries_needed} queries for the hitmask");
+      while nhit_query < queries_needed { 
+        let hitmask = read_daq_word(socket, target_address, buffer)?;
+        if hitmask == 0x55555555 {
+          error!("We should se a hitmask, but we saw the end of the event");
+        }
+        trace!("Got hitmask {hitmask}");
+        (hits_a, hits_b) = decode_hit_mask(hitmask);
+        let n = queried_boards[nhit_query] as usize;
+        event.hits[n+1] = hits_a;
+        event.hits[n] = hits_b;
+        nhit_query += 1; 
+      }
+      //for n in (0..20).step_by(2) {
+      //  println!("{n}");
+      //  if decoded_board_mask[n+1] || decoded_board_mask[n] {
       //    let hitmask = read_daq_word(socket, target_address, buffer)?;
-      //    
-      //    if hitmask.count_ones() > 255 {
-      //      error!("Too ltb count insane {}", hitmask.count_ones());
-      //      return Err(Box::new(MasterTriggerError::MaskTooLarge));
+      //    if hitmask == 0x55555555 {
+      //      error!("We should se a hitmask, but we saw the end of the event");
       //    }
-      //    /// FIXME : too many checks!
-      //    if n_paddles as u32 + hitmask.count_ones() > 255 {
-      //      error!("Too many paddles {}!", n_paddles);
-      //      return Err(Box::new(MasterTriggerError::MaskTooLarge));
-      //    }
-      //    n_paddles += hitmask.count_ones() as u8;
-      //    hits[board] = decode_hit_mask(hitmask);
-      //    n_masks += 1;
-      //    board += 1;
+      //    trace!("Got hitmask {hitmask}");
+      //    (hits_a, hits_b) = decode_hit_mask(hitmask);
+      //    event.hits[n+1] = hits_a;
+      //    event.hits[n] = hits_b;
+      //    nhit_query += 1; 
       //  }
+      //}
       //} // end for loop
-    //while n_masks < n_ltbs {
-    //  let padd = read_daq_word(socket, target_address, buffer)?;
-    //}  
-    //event.n_paddles   = n_paddles; 
-    //event.hits        = hits;
-    //if n_ltbs % 2 == 1 {
-    //  let pad  = read_daq_word(socket, target_address, buffer)?;
-    //}
+    trace!("{:?}", decoded_board_mask);
+
+    trace!("n queries {nhit_query}");
     event.crc         = read_daq_word(socket, target_address, buffer)?;
     if event.crc == 0x55555555 {
       error!("CRC field corrupt, but we carry on!");
@@ -722,14 +730,21 @@ pub fn read_daq(socket : &UdpSocket,
         error!("New header found while we were not done with the old event!");
       }
       event.broken = true;
-      error!("Broken package for event id {}, trailer corrupt {}", event.event_id, trailer);
+      //error!("Broken package for event id {}, trailer corrupt {}", event.event_id, trailer);
+      trailer     = read_daq_word(socket, target_address, buffer)?;
+      if trailer == 0x55555555 {
+        //println!("{:?}", decoded_board_mask);
+        //for n in queried_boards.iter() {
+        //    println!("{:?}", event.hits[*n as usize]);
+        ////println!("{:?}", event.hits[n+1]);
+        //}  
+        //println!("{queries_needed}");
+        //println!("{nhit_query}");
+        //error!("Checking again, we found the trailer!");
+      }
       return Ok(event);
       //return Err(Box::new(MasterTriggerError::BrokenPackage));
     }
-    //debug!("event_ctr {}, ts {} , tc32 {}, tc16 {}, mask {}, crc {}, trailer {}", event_ctr, timestamp, timecode32, timecode16, hit_paddles, crc, trailer);
-    //for n in 0..hits.len() {
-    //  debug!(" -- -- hit {}", hits[n]);
-    //}
     head_found = false;
     return Ok(event);
     }

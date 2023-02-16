@@ -66,6 +66,9 @@ fn build_events_in_cache(event_cache   : &mut VecDeque<TofEvent>,
 
       (*ev).valid = false;
       let bytestream = ev.to_bytestream();
+      //error!("Event ready to send, we have {} {} {} {}", ev.n_paddles, ev.n_paddles_expected, ev.age(), ev.paddle_packets.len());
+      //println!("{:?}", ev.paddle_packets);
+      //error!("We have a bytestream len of {}", bytestream.len());
       let mut pack = TofPacket::new();
       pack.packet_type = PacketType::TofEvent;
       pack.payload = bytestream;
@@ -80,6 +83,9 @@ fn build_events_in_cache(event_cache   : &mut VecDeque<TofEvent>,
       continue;
     }
     evid_query.send(Some(ev.event_id));
+    let mut n_received = 0;
+    let mut n_new      = 0;
+    let mut n_seen    = 0;
     while start.elapsed() < timeout {
       match pp_recv.try_recv() { 
         Err(_) => {}
@@ -90,39 +96,44 @@ fn build_events_in_cache(event_cache   : &mut VecDeque<TofEvent>,
             },
             Some(pp) => {
               if pp.event_id == ev.event_id {
+                n_received += 1;
                 ev.add_paddle(pp);
               } else {
                 if paddle_cache.contains_key(&pp.event_id) {
                   paddle_cache.get_mut(&pp.event_id).unwrap().push(pp);
+                  //println!("{:?} inserting pp with", pp);
+                  n_new += 1;
                 } else {
                   let ev_paddles = vec![pp];
                   paddle_cache.insert(pp.event_id, ev_paddles);
+                  //println!("{:?} inserting pp with", pp);
                   //println!("{:?}", paddle_cache[&pp.event_id].len());
                   //println!("{:?}", paddle_cache);
+                  n_seen += 1;
                 }
               }
             }
           }
-        }
-      } // end match
-
-      if ev.is_ready_to_send(use_timeout) {
-        (*ev).valid = false;
-        warn!("Event ready to send, we have {}", ev.n_paddles);
-        let bytestream = ev.to_bytestream();
-        warn!("We have a bytestream len of {}", bytestream.len());
-        let mut pack = TofPacket::new();
-        pack.packet_type = PacketType::TofEvent;
-        pack.payload = bytestream;
-
-        match data_sink.send(pack) {
-          Err(err) => warn!("Packet sending failed! Err {}", err),
-          Ok(_)    => trace!("Event {} sent!", ev.event_id) 
-        }
-      }
-      //error!("Not implemented!! We have to do something with the event, but we don!");
-      //break;
+        } 
+      } // end while
     } // end while not timeout
+    //println!("=> Received {n_received} paddles for {}, {n_new} new paddles and {n_seen} where I saw the evid already", ev.event_id);
+    //if ev.is_ready_to_send(use_timeout) {
+    //  (*ev).valid = false;
+    //  error!("Event ready to send, we have {}", ev.n_paddles);
+    //  let bytestream = ev.to_bytestream();
+    //  error!("We have a bytestream len of {}", bytestream.len());
+    //  let mut pack = TofPacket::new();
+    //  pack.packet_type = PacketType::TofEvent;
+    //  pack.payload = bytestream;
+
+    //  match data_sink.send(pack) {
+    //    Err(err) => warn!("Packet sending failed! Err {}", err),
+    //    Ok(_)    => trace!("Event {} sent!", ev.event_id) 
+    //  }
+    //}
+    //error!("Not implemented!! We have to do something with the event, but we don!");
+    //break;
   } // end iter over cache
   // clean the cache - remove all completed events
   if clean_up {
@@ -130,7 +141,7 @@ fn build_events_in_cache(event_cache   : &mut VecDeque<TofEvent>,
     event_cache.retain(|ev| ev.valid);
     //paddle_cache.retain(|pp| pp.valid);
     let size_af = event_cache.len();
-    info!("Size of event cache before {} and after clean up {}", size_b4, size_af);
+    println!("==> [EVTBLD::CACHE] Size of event cache before {} and after clean up {}", size_b4, size_af);
   }
 }
 

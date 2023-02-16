@@ -191,7 +191,7 @@ u32 REventPacket::deserialize(vec_u8 &bytestream,
   paddle_info.reserve(n_paddles);
   RPaddlePacket p;
   u8 paddles_found = 0;
-  while (paddles_found <= n_paddles) {
+  while (paddles_found < n_paddles) {
     p.deserialize(bytestream, pos);
     if (!p.is_broken()) {
       paddle_info.push_back(p);
@@ -199,6 +199,8 @@ u32 REventPacket::deserialize(vec_u8 &bytestream,
       paddles_found += 1;
     } else {
       paddle_info.push_back(p);
+      paddles_found += 1;
+      //std::cout << "BROKEN " << p << std::endl;
       // we stop at the first broken package
       break;
     }

@@ -56,10 +56,17 @@ while True:
         #print (event)
         #for k in event.paddle_packets:
         #    print (k)
+        if len(event.paddle_packets) > 4:
+            print(event)
+            for k in event.paddle_packets:
+                print (k)
+            raise
         if event.n_paddles > 0:
             print(event)
             for k in event.paddle_packets:
                 print (k)
+            #if len(event.paddle_packets) > 1:
+            #    raise
             #if not event.is_broken():
             #     print(event.paddle_packets[0])
             #raise

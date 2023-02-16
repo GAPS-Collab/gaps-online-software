@@ -5,7 +5,8 @@
 ///
 ///
 
-use std::time::SystemTime;
+use std::time::{Instant,
+                Duration};
 use std::sync::mpsc::{Sender,
                       Receiver};
 
@@ -152,6 +153,10 @@ pub fn paddle_packet_cache (evid_rec    : &Receiver<Option<u32>>,
   ////let mut m_evid_cache = VecDeque::<MasterTriggerEvent>::with_capacity(EVENT_BUILDER_EVID_CACHE_SIZE); 
   let n_tries = 20;
 
+  let mut start = Instant::now();
+  let timeout_micro = Duration::from_micros(100);
+
+
   let mut n_iter = 0usize;
   loop {
     n_iter += 1;
@@ -160,21 +165,24 @@ pub fn paddle_packet_cache (evid_rec    : &Receiver<Option<u32>>,
     // and keep them. Let's try to receive a certain 
     // number of paddles, and then move on
     let mut try = 0;
-    match pp_rec.try_recv() {
-      Ok(pp) => {
-        trace!("Got paddle packet for event {}", pp.event_id);
-        pp_cache.push_back(pp);
-      }
-      Err(err) => {
-        //error!("Can not receive paddle packet!, err {}", err);
-        try += 1;
-        if try == n_tries {
-          try = 0;
-          continue;
+    start = Instant::now();
+    while start.elapsed() < timeout_micro {
+      match pp_rec.try_recv() {
+        Ok(pp) => {
+          trace!("Got paddle packet for event {}", pp.event_id);
+          pp_cache.push_back(pp);
         }
-      } // end Err
-    } // end match
-
+        Err(err) => {
+          continue;
+          //error!("Can not receive paddle packet!, err {}", err);
+          //try += 1;
+          //if try == n_tries {
+          //  try = 0;
+          //  continue;
+          //}
+        } // end Err
+      } // end match
+    }
     trace!("Size of paddle_cache   {}", pp_cache.len());
     
     // after we received the paddles,
@@ -210,19 +218,23 @@ pub fn paddle_packet_cache (evid_rec    : &Receiver<Option<u32>>,
             if pp.event_id == evid {
               if pp.valid {
                 match pp_send.send(Some(*pp)) {
-                  Err(err) => trace!("Unable to send the paddle package! Err {err}"),
-                  Ok(_)     => ()
+                  Err(err) => {
+                    error!("Unable to send the paddle package! Err {err}");
+                  }
+                  Ok(_)     => {
+                    trace!("Send pp with evid {}", evid);
+                    pp.invalidate();
+                    n_paddles_sent += 1;
+                  }
                 }
-                pp.invalidate();
-                n_paddles_sent += 1;
               }
             } 
           } // end for
           // if we did not find it, send None
-          match pp_send.send(None) {
-            Err(err) => trace!("We can not send that paddle packet! Err {err}"),
-            Ok(_) => ()
-          }
+          //match pp_send.send(None) {
+          //  Err(err) => trace!("We can not send that paddle packet! Err {err}"),
+          //  Ok(_) => ()
+          //}
           trace!("We received a request from the eventbuilder to send pp for evid {} and have send {} packets", evid, n_paddles_sent);
           //if (n_paddles_sent == event.n_paddles) {
           //  // the event is complete!
@@ -241,7 +253,7 @@ pub fn paddle_packet_cache (evid_rec    : &Receiver<Option<u32>>,
     // I saw comments that retain might be very slow
     pp_cache.retain(|&x| x.valid);
     let size_af = pp_cache.len();
-    info!("Size of paddle_cache {} before and {} after clean up", size_b4, size_af);
+    println!("==> [PADDLECACHE] Size of paddle_cache {} before and {} after clean up", size_b4, size_af);
   }
   } // end loop
 }

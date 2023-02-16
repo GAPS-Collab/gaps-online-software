@@ -229,6 +229,9 @@ impl TofEvent {
   ///
   pub fn is_ready_to_send(&self, use_timeout : bool)
     -> bool {
+    //if self.n_paddles > 0 {
+    //  println!("ready? {} {} {} {}", self.event_id, self.n_paddles, self.n_paddles_expected, self.age());
+    //}
     return self.is_complete() || (self.has_timed_out() && use_timeout);
   }
 }

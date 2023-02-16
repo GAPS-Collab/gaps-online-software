@@ -336,27 +336,7 @@ fn main() {
   println!("==> Will now start rb threads..");
 
   for n in 0..nboards {
-    //board_config   = &config["readout_boards"][n];
-    //let mut address_ip = String::from("tcp://");
-    ////let rb_comm_socket = ctx.socket(zmq::REP).unwrap();
-    //rb_id = board_config["id"].as_usize().unwrap();
-    //address_ip += board_config["ip_address"].as_str().unwrap();
-    //port        = board_config["port"].as_usize().unwrap();
-    //address = address_ip.to_owned() + ":" + &port.to_string();
-    //info!("Will bind to port for rb comm at {}", address);
-    //cali_file_name = "".to_owned() + board_config["calibration_file"].as_str().unwrap();
-    //cali_file_path = Path::new(&cali_file_name);
-    //if !cali_file_path.exists() {
-    //  panic!("The desired configuration file {} does not exist!", cali_file_name);
-    //}
-
-    ////let result = rb_comm_socket.bind(&address);
-    ////match result {
-    ////    Ok(_)    => info!("Bound socket to {}", address),
-    ////    Err(err) => panic!("Can not communicate with rb at address {}. Maybe you want to check your .json configuration file?, error {}",address, err)
-    ////}
     let this_rb_pp_sender = rb_send.clone();
-    //let ctx_ref = &ctx.clone();
     let this_rb = rb_list[n].clone();
     worker_threads.execute(move || {
       readoutboard_communicator(this_rb_pp_sender,

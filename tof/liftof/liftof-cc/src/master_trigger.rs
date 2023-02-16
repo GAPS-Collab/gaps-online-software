@@ -236,9 +236,9 @@ pub fn master_trigger(mt_ip   : &str,
 
     let elapsed = start.elapsed().as_secs();
     // measure rate every 100 events
-    if n_events % 10 == 0 {
+    if n_events % 1000 == 0 {
       rate = n_events as f64 / elapsed as f64;
-      println!("==> {} events recorded, trigger rate: {:.3} Hz", n_events, rate);
+      println!("==> [MASTERTRIGGER] {} events recorded, trigger rate: {:.3} Hz", n_events, rate);
       rate = n_events_expected as f64 / elapsed as f64;
       println!("==> -- expected rate {:.3} Hz", rate);   
     } 

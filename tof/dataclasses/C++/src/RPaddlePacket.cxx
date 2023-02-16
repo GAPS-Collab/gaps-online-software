@@ -29,7 +29,7 @@ void RPaddlePacket::reset()
   timestamp_16  = 0;
 
   tail = 0xF0F;
-  broken = true;
+  broken = false;
 }
 
 /*******************************************/
@@ -139,7 +139,8 @@ std::vector<unsigned char> RPaddlePacket::serialize() const
 unsigned int RPaddlePacket::deserialize(vec_u8 &bytestream,
                                         u32 start_pos)
 {
- // start from position in bytestream
+ reset();
+     	// start from position in bytestream
  u16 value; 
  u32 end_pos = start_pos;
 
@@ -164,6 +165,7 @@ unsigned int RPaddlePacket::deserialize(vec_u8 &bytestream,
  paddle_id     = bytestream[pos]; pos+=1;
  time_a        = Gaps::u16_from_le_bytes(bytestream, pos); 
  time_b        = Gaps::u16_from_le_bytes(bytestream, pos); 
+ //std::cout << " " << time_a << " " << time_b << " " << charge_a << " " << charge_b << std::endl;
  peak_a        = Gaps::u16_from_le_bytes(bytestream, pos); 
  peak_b        = Gaps::u16_from_le_bytes(bytestream, pos); 
  charge_a      = Gaps::u16_from_le_bytes(bytestream, pos); 
@@ -192,6 +194,7 @@ std::string RPaddlePacket::to_string() const
   std::string repr = "";
   repr += "RPADDLEPACKET-----------------------\n";
   repr += "HEAD "          + std::to_string(head              ) + "\n";
+  repr += "-- BROKEN "     + std::to_string(broken            ) + "\n";
   //repr += "EVENT CTR "     + std::to_string(event_ctr         ) + "\n";
   //repr += "UTC TS "        + std::to_string(utc_timestamp     ) + "\n";
   repr += "PADDLE ID "     + std::to_string(get_paddle_id()   ) + "\n";

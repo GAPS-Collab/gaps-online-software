@@ -135,6 +135,11 @@ fn analyze_blobs(buffer               : &Vec<u8>,
   // over threshold
   let mut channels_over_threshold = [false;NCHN];
   let mut paddles_over_threshold  = [false;NPADDLES];
+  // reset paddle packets for this event
+  for n in 0..NPADDLES {
+    pp_this_event[n].reset();
+    paddles_over_threshold[n] = false;
+  }
 
   // the stream might have a certain number of events, 
   // but then there might be a number of extra bytes.
@@ -208,11 +213,6 @@ fn analyze_blobs(buffer               : &Vec<u8>,
                 // reset our channels_over_threshold
                 channels_over_threshold[ch] = false;
 
-                // reset paddle packets for this event
-                for n in 0..NPADDLES {
-                  pp_this_event[n].reset();
-                  paddles_over_threshold[n] = false;
-                }
 
                 // analysis part
                 //let mut waveform = CalibratedWaveform::new(all_channel_waveforms[n],
@@ -230,7 +230,7 @@ fn analyze_blobs(buffer               : &Vec<u8>,
                 channels_over_threshold[ch] = true;
                 
                 blob_data.set_cfds_fraction(0.20, ch);
-                let charge = blob_data.integrate(270.0, 70.0, ch).unwrap_or(0.0);
+                let charge = blob_data.integrate(270.0, 70.0, ch).unwrap_or(42.0);
                 blob_data.find_peaks(270.0,70.0, ch);
                 // analysis
                 let cfd_time = blob_data.find_cfd_simple(0, ch);
@@ -295,7 +295,7 @@ fn analyze_blobs(buffer               : &Vec<u8>,
                   pp_this_event[n].event_id     = blob_data.event_id;
                   pp_this_event[n].timestamp_32 = blob_data.timestamp_32;
                   pp_this_event[n].timestamp_16 = blob_data.timestamp_16;
-
+                  //pp_this_event[n].print();
                   if paddles_over_threshold[n] {
                     pp_this_event[n].event_id = blob_data.event_id;
                   }
@@ -315,7 +315,7 @@ fn analyze_blobs(buffer               : &Vec<u8>,
               //if paddles_over_threshold[n] {
               if true {
                 trace!("Sending pp to cache for evid {}", pp_this_event[n].event_id);
-                println!("Sending {:?}", pp_this_event[n]);
+                trace!("==> [RBCOM]  Sending {:?}", pp_this_event[n]);
                 pp_sender.send(pp_this_event[n]);
               }
             }

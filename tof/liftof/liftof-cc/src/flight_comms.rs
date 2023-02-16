@@ -54,10 +54,7 @@ pub fn global_data_sink(incoming : &cbc::Receiver<TofPacket>,
   let mut last_evid   = 0u32;
   loop {
     if n_pack_sent % 1000 == 0 && n_pack_sent != 0 {
-      println!("=> Sending debugging... ===");
-      println!("=> Sent {n_pack_sent} packets!");
-      println!("=> Last evid {last_evid} !");
-      println!("=> {} event inwaiting in chan", incoming.len());
+      println!("=> [SINK] Sent {n_pack_sent}, last evid {last_evid} ===");
     }
     match incoming.recv() {
       Err(err) => trace!("No new packet, err {err}"),
@@ -79,7 +76,7 @@ pub fn global_data_sink(incoming : &cbc::Receiver<TofPacket>,
             for ev in event_cache.iter() {
               last_evid = TofEvent::get_evid_from_bytestream(&ev.payload,0).unwrap();
               match data_socket.send(&ev.to_bytestream(),0) {
-                Err(err) => warn!("Not able to send packet over 0MQ PUB"),
+                Err(err) => error!("Not able to send packet over 0MQ PUB"),
                 Ok(_)    => { 
                   trace!("TofPacket sent");
                   n_pack_sent += 1;
