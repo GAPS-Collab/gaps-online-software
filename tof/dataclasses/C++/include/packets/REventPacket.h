@@ -30,10 +30,10 @@
 struct REventPacket {
   u16 head = 0xAAAA;
 
-  u16 n_paddles;
   u32 event_ctr;
   u32 timestamp_32;
   u16 timestamp_16;
+  u16 n_paddles;
 
 
   // reconstructed quantities

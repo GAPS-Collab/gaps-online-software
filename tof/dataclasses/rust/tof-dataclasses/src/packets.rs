@@ -33,6 +33,16 @@ use crate::events::RBEventPayload;
 //use nom::number::complete::*;
 //use nom::bytes::complete::{tag, take, take_until};
 
+enum PacketQuality {
+  Perfect,
+  Good,
+  NotSoGood,
+  Bad,
+  Rubbish, 
+  UtterRubish
+}
+
+
 pub const PACKET_TYPE_UNKNOWN   : u8 =  0;
 pub const PACKET_TYPE_COMMAND   : u8 = 10;
 pub const PACKET_TYPE_RBEVENT   : u8 = 20;

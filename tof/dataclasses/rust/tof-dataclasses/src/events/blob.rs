@@ -1213,7 +1213,7 @@ mod test_readoutboard_blob {
     blob.event_id = 9800001;
     blob.dtap0 = 10000;
     blob.dtap1 = 11000;
-    blob.timestamp = 1123456;
+    blob.timestamp_32 = 1123456;
     blob.stop_cell = 4;
     blob.crc32  = 88888;
     blob.tail   = 0x5555;

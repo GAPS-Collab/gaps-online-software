@@ -56,7 +56,8 @@ unsigned short REventPacket::calculate_length() const
 
 void REventPacket::add_paddle_packet(RPaddlePacket const &pkt)
 {
-   paddle_info.push_back(pkt);
+  paddle_info.push_back(pkt);
+  n_paddles += 1;
 }
 
 /*******************************************/
@@ -206,6 +207,10 @@ u32 REventPacket::deserialize(vec_u8 &bytestream,
          //    << " received " << pos << " bytes!" << std::endl;
          broken = true;
      }
+
+  if (paddle_info.size() != n_paddles) {
+    broken = true;
+  }
   // checks for debugging
   //assert (payload_tail == tail);
   //assert (expected_packet_size == pos);
@@ -217,10 +222,10 @@ std::string REventPacket::to_string(bool summarize_paddle_packets) const
   std::string output;
    output += "### REVENTPACKET-----------------------\n";
    output += "\tHEAD \t"                + std::to_string(head) +  "\n";
-   output += "\tN PADDLES \t"           + std::to_string(n_paddles) + "\n";
    output += "\tEVENT CTR \t"           + std::to_string(event_ctr)         + "\n";
    output += "\tTIMESTAMP 32 \t"        + std::to_string(timestamp_32)     + "\n";
    output += "\tTIMESTAMP 16 \t"        + std::to_string(timestamp_16)     + "\n";
+   output += "\tN PADDLES \t"           + std::to_string(n_paddles) + "\n";
    output += "\tPRIMARY BETA \t"        + std::to_string(primary_beta)     + "\n";
    output += "\tPRIMARY BETA UNC \t"    + std::to_string(primary_beta_unc) + "\n";
    output += "\tPRIMARY CHARGE \t"      + std::to_string(primary_charge)   + "\n";
