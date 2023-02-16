@@ -195,6 +195,8 @@ std::string RPaddlePacket::to_string() const
   //repr += "EVENT CTR "     + std::to_string(event_ctr         ) + "\n";
   //repr += "UTC TS "        + std::to_string(utc_timestamp     ) + "\n";
   repr += "PADDLE ID "     + std::to_string(get_paddle_id()   ) + "\n";
+  repr += "TIMESTAMP 32 "  + std::to_string(timestamp_32      ) + "\n";
+  repr += "TIMESTAMP 16 "  + std::to_string(timestamp_16      ) + "\n";
   repr += "PTIME_A "       + std::to_string(get_time_a()      ) + "\n";
   repr += "PTIME_B "       + std::to_string(get_time_b()      ) + "\n";
   repr += "PEAK_A "        + std::to_string(get_peak_a()      ) + "\n";
