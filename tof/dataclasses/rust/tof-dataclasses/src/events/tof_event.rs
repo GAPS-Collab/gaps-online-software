@@ -51,6 +51,10 @@ pub struct TofEvent  {
 
   // fields which won't get 
   // serialized
+  //
+
+  /// Comes from the master trigger. Number of paddles which 
+  /// are over the threshold
   pub n_paddles_expected : u8,
 
   // for the event builder. 
@@ -238,9 +242,9 @@ impl Default for TofEvent {
 impl From<&MasterTriggerEvent> for TofEvent {
   fn from(mte : &MasterTriggerEvent) -> TofEvent {
     let mut te : TofEvent = Default::default();
-    te.event_id     = mte.event_id;
-    te.timestamp_32 = mte.timestamp;
-    te.n_paddles    = mte.get_hit_paddles();
+    te.event_id              = mte.event_id;
+    te.timestamp_32          = mte.timestamp;
+    te.n_paddles_expected    = mte.get_hit_paddles();
     te
   }
 }
