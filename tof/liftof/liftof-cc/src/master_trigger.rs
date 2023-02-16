@@ -111,7 +111,7 @@ pub fn master_trigger(mt_ip   : &str,
     // a heartbeat every 10 s
     let elapsed = start.elapsed().as_secs();
     if (elapsed % 10 == 0) && next_beat {
-      println!("== == == == == == == == HEARTBEAT! {} seconds passed!", elapsed);
+      println!("== == == == == == == == MT HEARTBEAT! {} seconds passed!", elapsed);
       rate = n_events as f64 / elapsed as f64;
       println!("==> {} events recorded, trigger rate: {:.3} Hz", n_events, rate);
       rate = n_events_expected as f64 / elapsed as f64;
@@ -208,7 +208,7 @@ pub fn master_trigger(mt_ip   : &str,
     
     if ev.event_id - last_event_cnt > 1 {
       let mut missing = ev.event_id - last_event_cnt;
-      
+      error!("We missed {missing} eventids"); 
       // FIXME
       if missing < 200 {
         missing_evids += missing as usize;
