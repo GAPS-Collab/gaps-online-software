@@ -166,8 +166,8 @@ impl MTTab<'_> {
     let n_paddle = BarChart::default()
         .block(Block::default().title("N Paddle").borders(Borders::ALL))
         .data(&[("0", 0)])
-        .bar_width(5)
-        .bar_gap(3)
+        .bar_width(1)
+        .bar_gap(1)
         .bar_style(Style::default().fg(Color::Green))
         .value_style(
             Style::default()

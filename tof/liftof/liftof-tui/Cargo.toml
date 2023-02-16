@@ -31,6 +31,9 @@ tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features =
 liftof-lib = { path = "../liftof-lib" , features = ["random"]}
 
 
+histo = "0.1.0"
+# histogram = "0.7" 
+# hdrhistogram = "7"
 zmq = "0.10.0"
 
 log = "0.4"

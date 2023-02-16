@@ -25,6 +25,10 @@ use std::collections::VecDeque;
 extern crate pretty_env_logger;
 #[macro_use] extern crate log;
 
+
+extern crate histo;
+use histo::Histogram;
+
 use liftof_lib::{get_rb_manifest,
                  ReadoutBoard};
 
@@ -55,7 +59,7 @@ use tui::{
     style::{Color, Modifier, Style},
     text::{Span, Spans, Text},
     widgets::{
-        Block, Dataset, Axis, GraphType, BorderType, Chart, Borders, Cell, List, ListItem, ListState, Paragraph, Row, Table, Tabs,    },
+        Block, Dataset, Axis, GraphType, BorderType, BarChart, Chart, Borders, Cell, List, ListItem, ListState, Paragraph, Row, Table, Tabs,    },
     Terminal,
 };
 
@@ -276,13 +280,13 @@ fn master_trigger(mt_to_main : &Sender<MasterTriggerEvent>,
     timer  = Instant::now();
     match read_rate(&socket, &mt_address, &mut buffer) {
       Err(err) => {
-        warn!("Unable to obtain MT rate information!");
+        error!("Unable to obtain MT rate information!");
         continue;
       }
       Ok(rate) => {
         info!("Got rate from MTB {rate}");
         match mt_rate_to_main.try_send(rate) {
-          Err(err) => trace!("Can't send rate"),
+          Err(err) => error!("Can't send rate"),
           Ok(_)    => ()
         }
       }
@@ -343,6 +347,9 @@ impl MasterLayout {
 
 fn main () -> Result<(), Box<dyn std::error::Error>>{
 
+  let hist_labels = vec!["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14",
+                         "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25",
+                         "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37"];
 
   // Set max_log_level to Trace
   match tui_logger::init_logger(log::LevelFilter::Info) {
@@ -467,6 +474,11 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let mut mt_stream_cache = VecDeque::<MasterTriggerEvent>::new();
   let mut packets         = VecDeque::<String>::new();
   let mut rates           = VecDeque::<(f64,f64)>::new();
+  let mut n_paddle_data   = VecDeque::<u8>::new();
+  //let mut n_paddle_hist   = Histogram::<u64>::new_with_bounds(1, 160,1).unwrap();
+  let mut n_paddle_hist   = Histogram::with_buckets(160);
+
+
   let mut detail_string   : Option<String> = None;
   loop {
     terminal.draw(|rect| {
@@ -515,6 +527,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                       // if the cache is too big, remove the oldest events
                       //let new_tof_events = vec![event];
                       mt_stream_cache.push_back(event);
+                      n_paddle_hist.add(event.get_hit_paddles().into());
                       if mt_stream_cache.len() > STREAM_CACHE_MAX_SIZE {
                         mt_stream_cache.pop_front();
                       }
@@ -607,11 +620,46 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
             None => (),
             Some(val) => detail_string = Some(val)
           }
+          let mut max_pop_bin = 0;
+          let mut vec_index   = 0;
+          let mut bins = Vec::<(u64, u64)>::new();
+          for bucket in n_paddle_hist.buckets() {
+            bins.push((vec_index, bucket.count()));
+            if bucket.count() > 0 {
+              max_pop_bin = vec_index;
+            }
+            vec_index += 1;
+            //do_stuff(bucket.start(), bucket.end(), bucket.count());
+          }
+          bins.retain(|&(x,y)| x <= max_pop_bin);
+          let mut bins_for_bc = Vec::<(&str, u64)>::new();
+          //let mut label;
+          let mut labels = Vec::<&str>::with_capacity(160);
+          let mut n_iter = 0;
+          debug!("bins: {:?}", bins);
+          for n in bins.iter() {
+            bins_for_bc.push((hist_labels[n_iter], n.1));
+            //bins_for_bc.push((foo, n.1));
+            n_iter += 1;
+          }
+
+          let n_paddle_dist = BarChart::default()
+              .block(Block::default().title("N Paddle").borders(Borders::ALL))
+              .data(bins_for_bc.as_slice())
+              .bar_width(1)
+              .bar_gap(1)
+              .bar_style(Style::default().fg(Color::Blue))
+              .value_style(
+                  Style::default()
+                      .bg(Color::Blue)
+                      .add_modifier(Modifier::BOLD),
+              );
 
           rect.render_stateful_widget(mt_tab.list_widget, mt_tab.list_rect, &mut rb_list_state);
           rect.render_widget(rate_chart,         mt_tab.rate_rect); 
           rect.render_widget(mt_tab.stream,       mt_tab.stream_rect);
-          rect.render_widget(mt_tab.network_moni, mt_tab.nw_mon_rect); 
+          //rect.render_widget(mt_tab.network_moni, mt_tab.nw_mon_rect); 
+          rect.render_widget(n_paddle_dist, mt_tab.nw_mon_rect);
           rect.render_widget(mt_tab.detail,       mt_tab.detail_rect); 
           if update_detail {
             ten_second_update = Instant::now();
