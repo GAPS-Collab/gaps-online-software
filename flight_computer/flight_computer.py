@@ -44,6 +44,10 @@ while True:
     if npackets % 100 == 0:
         print (f'=======')
         print (f' last event {event.event_id} {event.n_paddles}')
+        print (data)
+        print (event)
+        for k in event.paddle_packets:
+            print (k)
         if event.n_paddles > 0:
             print(event)
             print(event.paddle_packets[0])

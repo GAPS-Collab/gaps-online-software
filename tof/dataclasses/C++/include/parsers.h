@@ -8,7 +8,7 @@ namespace Gaps {
 
 
 u16 u16_from_le_bytes(const vec_u8 &bytestream,
-                      u64 pos);
+                      u64 &pos);
 
 void u16_to_le_bytes(const u16 value, 
                      vec_u8 &bytestream,

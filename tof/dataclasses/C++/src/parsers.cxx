@@ -1,7 +1,7 @@
 #include "parsers.h"
 
 u16 Gaps::u16_from_le_bytes(const vec_u8 &bytestream,
-                            u64 pos) {
+                            u64 &pos) {
   u16 value = (u16)(
         ((bytestream[pos+1] & 0xFF) << 8)
       |  (bytestream[pos]));

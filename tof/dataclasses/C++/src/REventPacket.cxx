@@ -132,9 +132,9 @@ u32 REventPacket::deserialize(vec_u8 &bytestream,
   uint16_t value = Gaps::u16_from_le_bytes(bytestream, start_pos);
   if (!(value == head))
     {std::cerr << "[ERROR] no header found!" << std::endl;}
-  u64 pos = 2 + start_pos; // position in bytestream, 2 since we 
+  //u64 pos = 2 + start_pos; // position in bytestream, 2 since we 
                     // just decoded the header
- 
+   u64 pos = start_pos;
   //unsigned short expected_packet_size = decode_ushort(bytestream, pos);pos+=2;  
   //p_length = expected_packet_size;
   // in the expected packet size, we can see how many 
@@ -146,7 +146,6 @@ u32 REventPacket::deserialize(vec_u8 &bytestream,
   event_ctr           = Gaps::u32_from_le_bytes(bytestream, pos);
   timestamp_32        = Gaps::u32_from_le_bytes(bytestream, pos);
   timestamp_16        = Gaps::u16_from_le_bytes(bytestream, pos);
-  //event_ctr           = u32_from_le_bytes(bytestream, pos); pos+=4;
   n_paddles           = bytestream[pos]; pos += 1;
   /*
   utc_timestamp       = decode_uint64(bytestream, pos); pos+=8;
