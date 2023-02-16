@@ -12,7 +12,9 @@ void REventPacket::reset()
 {
    head = 0xAAAA;
 
-   p_length_fixed = REVENTPACKETSIZEFIXED;
+   // eventualy, maybe
+   //p_length_fixed = REVENTPACKETSIZEFIXED;
+   p_length_fixed = 15; // currently no primary information in stream
    n_paddles      = 0;
    event_ctr      = 0;
    timestamp_32   = 0;
@@ -176,6 +178,14 @@ u32 REventPacket::deserialize(vec_u8 &bytestream,
   */
  
   // FIXME checks - packetlength, checksum ?
+  // check if the trailer is right after the header, 
+  int debug_trailer        = Gaps::u16_from_le_bytes(bytestream, pos);
+  if (debug_trailer == tail) {
+    broken = true;
+    return pos;
+  }
+  pos -= 2; // do not advance, that was just a check
+
   paddle_info.reserve(n_paddles);
   RPaddlePacket p;
   u8 paddles_found = 0;
