@@ -181,7 +181,9 @@ u32 REventPacket::deserialize(vec_u8 &bytestream,
   // check if the trailer is right after the header, 
   int debug_trailer        = Gaps::u16_from_le_bytes(bytestream, pos);
   if (debug_trailer == tail) {
-    broken = true;
+    if (n_paddles > 0) {
+      broken = true;
+    }
     return pos;
   }
   pos -= 2; // do not advance, that was just a check
