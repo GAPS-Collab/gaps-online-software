@@ -374,10 +374,10 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
     rb.cmd_port   = Some(30000);
     rb.data_port  = Some(40000);
     rb.id = Some(0);
+    rb.ping().unwrap();
     rb_list = vec![rb];
 
     // make sure the rb is connected
-    rb.ping().unwrap();
   }  
   if autodiscover_rb {
     rb_list = get_rb_manifest();

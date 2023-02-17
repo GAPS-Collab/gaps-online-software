@@ -6,8 +6,7 @@
 //!
 //!
 
-use std::time::{SystemTime,
-                Instant};
+use std::time::Instant;
 
 use crate::constants::EVENT_TIMEOUT;
 //use crate::errors::SerializationError;
@@ -150,9 +149,10 @@ impl TofEvent {
     event.n_paddles      = bytestream[pos];
     pos += 1; 
    
-    for n in 0..event.n_paddles {
+    for _ in 0..event.n_paddles {
       match PaddlePacket::from_bytestream(&bytestream, pos) {
         Err(err) => {
+          error!("{err}");
           return Err(err);
         }
         Ok(pp)   => {

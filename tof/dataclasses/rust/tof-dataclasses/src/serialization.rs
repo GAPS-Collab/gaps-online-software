@@ -12,11 +12,11 @@ pub use crate::errors::SerializationError;
 ///
 /// * bs
 /// * pos 
-pub fn u32_from_bs(bs : &Vec::<u8>, mut pos : usize) -> u32 {
-  let value = u32::from_le_bytes([bs[pos], bs[pos+1], bs[pos+2], bs[pos+3]]);
-  pos += 4;
-  value
-}
+//pub fn u32_from_bs(bs : &Vec::<u8>, mut pos : usize) -> u32 {
+//  let value = u32::from_le_bytes([bs[pos], bs[pos+1], bs[pos+2], bs[pos+3]]);
+//  pos += 4;
+//  value
+//}
 
 
 /// En/Decode to a bytestream, that is `Vec<u8>`

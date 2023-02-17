@@ -249,7 +249,7 @@ impl Serialization for MasterTriggerEvent {
                      start_pos  : usize)
     -> Result<Self, SerializationError> {
     let bs = bytestream;
-    let mut pos = start_pos;
+    let pos = start_pos;
     let mt = MasterTriggerEvent::new(0,0);
     let header = u16::from_le_bytes([bs[pos],bs[pos + 1]]); 
     if header != MasterTriggerEvent::HEAD {
@@ -559,7 +559,6 @@ pub fn decode_hit_mask(hit_mask : u32) -> ([bool;N_CHN_PER_LTB],[bool;N_CHN_PER_
   for n in 0..N_CHN_PER_LTB {
     let mask = 1 << n;
     let bit_is_set = (mask & hit_mask) > 0;
-    let foo = mask & hit_mask;
     decoded_mask_0[index] = bit_is_set;
     if index != 0 {
       index -= 1;
@@ -586,9 +585,12 @@ pub fn read_daq_word(socket : &UdpSocket,
                      buffer : &mut [u8;MT_MAX_PACKSIZE])
   -> Result<u32, Box<dyn Error>> {
   let ntries = 100;
-  for n in 0..ntries {
+  for _ in 0..ntries {
     match daq_word_available(socket, target_address, buffer) {
-      Err(err) => continue,
+      Err(err) => {
+        trace!("No DAQ word available, error {err}");
+        continue;
+      }
       Ok(has_data) => {
         if has_data {
           let word = read_register(socket, target_address, 0x11, buffer)?;
@@ -620,24 +622,16 @@ pub fn read_daq(socket : &UdpSocket,
                 buffer : &mut [u8;MT_MAX_PACKSIZE])
   -> Result<MasterTriggerEvent, Box<dyn Error>> {
 
-  let mut event_ctr        = 0u32;
-  let mut timestamp        = 0u32;
-  let mut tiu_timestamp    = 0u32;
-  let mut gps_timestamp_32 = 0u32;
-  let mut gps_timestamp_16 = 0u32;
-  let mut board_mask           = 0u32;
+  let board_mask           : u32;
   // board means ltb here. Hits are hits 
   // on ltbs. ltbs have 16 channels!
-  let mut decoded_board_mask = [false;N_LTBS];
-  let mut hits         = [[false;N_CHN_PER_LTB];N_LTBS];
-  let mut hits_a       = [false;N_CHN_PER_LTB];
-  let mut hits_b       = [false;N_CHN_PER_LTB];
+  let decoded_board_mask : [bool;N_LTBS];
+  //let hits         = [[false;N_CHN_PER_LTB];N_LTBS];
+  let mut hits_a       : [bool;N_CHN_PER_LTB];
+  let mut hits_b       : [bool;N_CHN_PER_LTB];
 
-  let mut n_ltbs       = 0;
-
-  let mut crc              = 0u32;
-  let mut trailer          = 0u32;
-  let mut n_paddles = 0u8;
+  let n_ltbs        : u32;
+  let mut trailer   : u32;
   
   // How this works is the following. We read the data register
   // until we get the header word. Then we have a new event 
@@ -649,9 +643,7 @@ pub fn read_daq(socket : &UdpSocket,
   let ntries = 100;
   let mut event = MasterTriggerEvent::new(0, 0);
   let mut head_found = false;
-  for n in 0..ntries {
-    //let word = read_daq_word(socket, target_address, buffer)?; 
-    let mut n_daq_words_read = 0;
+  for _ in 0..ntries {
     if head_found {
       // let mut paddles_rxd = 1;
       // we start a new daq package
@@ -668,11 +660,10 @@ pub fn read_daq(socket : &UdpSocket,
       //println!(" decoded mask {decoded_board_mask:?}");
       event.board_mask = decoded_board_mask;
       n_ltbs = board_mask.count_ones();
-      let mut n_masks = 0;
+      trace!("{n_ltbs} LTBs participated in this event");
       // each ltb has 2 rbs, so each 32 bit word stands for 2 rbs. 
       // this means we only need to read once if it is 11 etc..
       //
-      let mut board = 0;
       let mut nhit_query = 0;
       let mut queries_needed = 0;
       let mut queried_boards = Vec::<u8>::new();
@@ -745,7 +736,6 @@ pub fn read_daq(socket : &UdpSocket,
       return Ok(event);
       //return Err(Box::new(MasterTriggerError::BrokenPackage));
     }
-    head_found = false;
     return Ok(event);
     }
     

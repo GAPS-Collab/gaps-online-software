@@ -312,7 +312,7 @@ impl BlobData {
     pos   += 2;
     self.roi     = u16::from_le_bytes(raw_bytes_2); 
 
-    let mut raw_bytes_8  = [bytestream[pos    ],
+    let raw_bytes_8  = [bytestream[pos    ],
                             bytestream[pos + 1],
                             bytestream[pos + 2],
                             bytestream[pos + 3],
@@ -449,14 +449,14 @@ impl BlobData {
     self.roi     = u16::from_le_bytes(raw_bytes_2); 
 
     // these two should ultimatly be the same
-    let mut raw_bytes_8  = [bytestream[pos + 6],
-                            bytestream[pos + 7],
-                            bytestream[pos + 4],
-                            bytestream[pos + 5],
-                            bytestream[pos + 2],
-                            bytestream[pos + 3],
-                            bytestream[pos    ],
-                            bytestream[pos + 1]];
+    let raw_bytes_8  = [bytestream[pos + 6],
+                        bytestream[pos + 7],
+                        bytestream[pos + 4],
+                        bytestream[pos + 5],
+                        bytestream[pos + 2],
+                        bytestream[pos + 3],
+                        bytestream[pos    ],
+                        bytestream[pos + 1]];
     pos   += 8;
     self.dna     = u64::from_le_bytes(raw_bytes_8);
     
@@ -560,7 +560,7 @@ impl BlobData {
     let mut two_bytes           : [u8;2];
     let mut four_bytes          : [u8;4];
     let mut four_bytes_shuffle  : [u8;4]; 
-    let mut eight_bytes         : [u8;8];
+    let eight_bytes         : [u8;8];
     
     // begin serialization
     two_bytes = self.head.to_le_bytes();
