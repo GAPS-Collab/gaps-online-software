@@ -9,10 +9,32 @@
 
 cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
 project(GAPS_WAVEFORM VERSION 0.0.1 LANGUAGES C CXX)
+
+
 message(STATUS "Running cmake for ${CMAKE_PROJECT_NAME} softwere version ${GAPS_ONLINE_SOFTWARE_VERSION}")
 message(STATUS "Running cmake for GAPS softwere version ${GAPS_WAVEFORM_VERSION}")
 message(STATUS "Using build directory: ${PROJECT_BINARY_DIR}")
 set(CMAKE_WARN_DEPRECATED ON)
+
+include(FetchContent)
+
+FetchContent_Declare(
+  spdlog
+  GIT_REPOSITORY https://github.com/gabime/spdlog.git 
+  GIT_TAG        ad0e89cbfb4d0c1ce4d097e134eb7be67baebb36 # release-1.10.0
+)
+FetchContent_MakeAvailable(spdlog)
+FetchContent_GetProperties(spdlog)
+if(NOT spdlog_POPULATED)
+  # Fetch the content using previously declared details
+  FetchContent_Populate(spdlog)
+
+  # Set custom variables, policies, etc.
+  # ...
+
+  # Bring the populated content into the build
+  add_subdirectory(${spdlog_SOURCE_DIR} ${spdlog_BINARY_DIR})
+endif()
 
 # -- pybindings with pybind11
 option(BUILD_PYBINDINGS "build pybindings with pybind11" OFF)

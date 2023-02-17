@@ -7,6 +7,9 @@
 #include "parsers.h"
 #include "serialization.h"
 #include "packets/REventPacket.h"
+#include <spdlog/spdlog.h>
+
+#include "TofTypeDefs.h"
 
 void REventPacket::reset()
 {
@@ -14,11 +17,11 @@ void REventPacket::reset()
 
    // eventualy, maybe
    //p_length_fixed = REVENTPACKETSIZEFIXED;
-   p_length_fixed = 15; // currently no primary information in stream
-   n_paddles      = 0;
-   event_ctr      = 0;
-   timestamp_32   = 0;
-   timestamp_16   = 0;
+   p_length_fixed      = 15; // currently no primary information in stream
+   n_paddles           = 0;
+   event_ctr           = 0;
+   timestamp_32        = 0;
+   timestamp_16        = 0;
 
    primary_beta        = 0;
    primary_beta_unc    = 0;
@@ -44,7 +47,7 @@ void REventPacket::reset()
 
 /*******************************************/
 
-unsigned short REventPacket::calculate_length() const
+u16 REventPacket::calculate_length() const
 {
 
   // currently we have a fixed length + the size of 
@@ -64,15 +67,15 @@ void REventPacket::add_paddle_packet(RPaddlePacket const &pkt)
 
 /*******************************************/
 
-std::vector<unsigned char> REventPacket::serialize() const
+vec_u8 REventPacket::serialize() const
 {
   // this takes into acount variable sized part
   //unsigned short packet_length = calculate_length();
   //std::cout << "Got packet length : " << packet_length << std::endl;
-  std::vector<unsigned char> buffer(p_length_fixed);
+  vec_u8 buffer(p_length_fixed);
   //std::cout << "Allocated buffer of size " << buffer.size() << std::endl;  
 
-  unsigned short pos = 0; // position in bytestream
+  u8 pos = 0; // position in bytestream
   encode_ushort(head, buffer, pos); pos+=2;
   encode_ushort(n_paddles, buffer, pos); pos+=2;
   encode_uint32(event_ctr, buffer, pos); pos+=4;
@@ -96,10 +99,7 @@ std::vector<unsigned char> REventPacket::serialize() const
   buffer[pos] = trigger_info;   pos+=1;
   buffer[pos] = ctr_etx;        pos+=1;
 
-  // payload following
-  // FIXME
-  std::vector<unsigned char> paddle_payload;
-  unsigned short npaddles = paddle_info.size();
+  vec_u8 paddle_payload;
   for (const auto& pinfo : paddle_info)
     {
         paddle_payload = pinfo.serialize();
@@ -108,7 +108,6 @@ std::vector<unsigned char> REventPacket::serialize() const
         //              << " bytes to buffer" << std::endl;
         pos += paddle_payload.size();
     } 
-  unsigned short payload_tail;
   encode_ushort(tail, buffer, pos); pos+=2;  // done
 
   //std::cout << "[INFO]<serialize> buffer size : " << buffer.size() << std::endl;
@@ -131,12 +130,12 @@ u32 REventPacket::deserialize(vec_u8 &bytestream,
   //unsigned short value; 
   //unsigned int end_pos = start_pos;
   // check if we find the header at start_pos
-  uint16_t value = Gaps::u16_from_le_bytes(bytestream, start_pos);
+  u16 value = Gaps::u16_from_le_bytes(bytestream, start_pos);
   if (!(value == head))
-    {std::cerr << "[ERROR] no header found!" << std::endl;}
+    {spdlog::error("No header found!");}
   //u64 pos = 2 + start_pos; // position in bytestream, 2 since we 
                     // just decoded the header
-   u64 pos = start_pos;
+  u64 pos = start_pos;
   //unsigned short expected_packet_size = decode_ushort(bytestream, pos);pos+=2;  
   //p_length = expected_packet_size;
   // in the expected packet size, we can see how many 
@@ -233,34 +232,34 @@ u32 REventPacket::deserialize(vec_u8 &bytestream,
 std::string REventPacket::to_string(bool summarize_paddle_packets) const
 {
   std::string output;
-   output += "### REVENTPACKET-----------------------\n";
-   output += "\tHEAD \t"                + std::to_string(head) +  "\n";
-   output += "\tEVENT CTR \t"           + std::to_string(event_ctr)         + "\n";
-   output += "\tTIMESTAMP 32 \t"        + std::to_string(timestamp_32)     + "\n";
-   output += "\tTIMESTAMP 16 \t"        + std::to_string(timestamp_16)     + "\n";
-   output += "\tN PADDLES \t"           + std::to_string(n_paddles) + "\n";
-   output += "\tPRIMARY BETA \t"        + std::to_string(primary_beta)     + "\n";
-   output += "\tPRIMARY BETA UNC \t"    + std::to_string(primary_beta_unc) + "\n";
-   output += "\tPRIMARY CHARGE \t"      + std::to_string(primary_charge)   + "\n";
-   output += "\tPRIMARY CHARGE UNC \t"  + std::to_string(primary_charge_unc)  + "\n";
-   output += "\tPRIMARY OUTER TOF X \t" + std::to_string(primary_outer_tof_x) + "\n";
-   output += "\tPRIMARY OUTER TOF Y \t" + std::to_string(primary_outer_tof_y) + "\n";
-   output += "\tPRIMARY OUTER TOR Z \t" + std::to_string(primary_outer_tof_z) + "\n";
-   output += "\tPRIMARY INNER TOF X \t" + std::to_string(primary_inner_tof_x) + "\n";
-   output += "\tPRIMARY INNER TOF Y \t" + std::to_string(primary_inner_tof_y) + "\n";
-   output += "\tPRIMARY INNER TOF Z \t" + std::to_string(primary_inner_tof_z) + "\n";
-   output += "\tNHIT OUTER \t"          + std::to_string(nhit_outer_tof) + "\n";
-   output += "\tNHIT INNER \t"          + std::to_string(nhit_inner_tof) + "\n";
-   output += "\tTRG INFO \t"            + std::to_string(trigger_info) + "\n";
-   output += "\tCTR ETX \t"             + std::to_string(ctr_etx) + "\n";
-   output += "\tNPADDLE PACKETS \t"     + std::to_string(paddle_info.size()) + "\n";
-   if (summarize_paddle_packets) 
-    { output += "\t[ " + std::to_string(paddle_info.size()) + " PADDLE PACKETS ... ]\n";} 
-   else {
-    for (auto p : paddle_info) 
-      { output +=  p.to_string() + "\n";}
-   }
-   output += "\tTAIL \t" + std::to_string(tail) + "\n";
+  output += "### REVENTPACKET-----------------------\n";
+  output += "\tHEAD \t"                + std::to_string(head) +  "\n";
+  output += "\tEVENT CTR \t"           + std::to_string(event_ctr)         + "\n";
+  output += "\tTIMESTAMP 32 \t"        + std::to_string(timestamp_32)     + "\n";
+  output += "\tTIMESTAMP 16 \t"        + std::to_string(timestamp_16)     + "\n";
+  output += "\tN PADDLES \t"           + std::to_string(n_paddles) + "\n";
+  output += "\tPRIMARY BETA \t"        + std::to_string(primary_beta)     + "\n";
+  output += "\tPRIMARY BETA UNC \t"    + std::to_string(primary_beta_unc) + "\n";
+  output += "\tPRIMARY CHARGE \t"      + std::to_string(primary_charge)   + "\n";
+  output += "\tPRIMARY CHARGE UNC \t"  + std::to_string(primary_charge_unc)  + "\n";
+  output += "\tPRIMARY OUTER TOF X \t" + std::to_string(primary_outer_tof_x) + "\n";
+  output += "\tPRIMARY OUTER TOF Y \t" + std::to_string(primary_outer_tof_y) + "\n";
+  output += "\tPRIMARY OUTER TOR Z \t" + std::to_string(primary_outer_tof_z) + "\n";
+  output += "\tPRIMARY INNER TOF X \t" + std::to_string(primary_inner_tof_x) + "\n";
+  output += "\tPRIMARY INNER TOF Y \t" + std::to_string(primary_inner_tof_y) + "\n";
+  output += "\tPRIMARY INNER TOF Z \t" + std::to_string(primary_inner_tof_z) + "\n";
+  output += "\tNHIT OUTER \t"          + std::to_string(nhit_outer_tof) + "\n";
+  output += "\tNHIT INNER \t"          + std::to_string(nhit_inner_tof) + "\n";
+  output += "\tTRG INFO \t"            + std::to_string(trigger_info) + "\n";
+  output += "\tCTR ETX \t"             + std::to_string(ctr_etx) + "\n";
+  output += "\tNPADDLE PACKETS \t"     + std::to_string(paddle_info.size()) + "\n";
+  if (summarize_paddle_packets) 
+   { output += "\t[ " + std::to_string(paddle_info.size()) + " PADDLE PACKETS ... ]\n";} 
+  else {
+   for (auto p : paddle_info) 
+     { output +=  p.to_string() + "\n";}
+  }
+  output += "\tTAIL \t" + std::to_string(tail) + "\n";
   return output;
 }
 

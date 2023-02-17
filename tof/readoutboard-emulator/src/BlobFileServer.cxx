@@ -10,18 +10,16 @@
 #include "serialization.h"
 #include "blobroutines.h"
 
-#include "CraneLogging.hh"
-
 // BlobEvt_t
 #include "TOFCommon.h"
-
+#include <spdlog/spdlog.h>
 #include "zmq.hpp"
 
 //#define NCHAN 8
 TOF::BlobFileServer::BlobFileServer(std::vector<std::string> blobfilenames)
 {
   blob_filenames_ = blobfilenames;
-  std::cout << "[INFO] - got input blobfiles..." << std::endl;
+  spdlog::info("Got input blobfiles...");
   for (auto fname : blob_filenames_) std::cout << "-- " << fname << std::endl;
   // keep track of how many events we processed
   nevents_processed_ = 0;

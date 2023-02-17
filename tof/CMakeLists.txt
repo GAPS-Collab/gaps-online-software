@@ -19,7 +19,6 @@ option(BUILD_CRUSTYKRAKEN "build the rust tof-server code" OFF)
 option(BUILD_RBEMULATOR "build the readoutboard emulator for debugging purposes" OFF)
 set(RBEMULATOR_DIR ${CMAKE_CURRENT_SOURCE_DIR}/readoutboard-emulator)
 
-option(USE_BOOST_LOG "use boost logging library" OFF)
 
 ## ================================================================
 ## cmake build type
@@ -77,26 +76,6 @@ if(BUILD_ROOTCOMPONENTS)
 endif(BUILD_ROOTCOMPONENTS)
 
 # boost
-message(STATUS "Searching for BOOST libraries....")
-find_package(Boost 1.53 COMPONENTS thread log log_setup)
-
-# see comment about boost log and ROOT above
-if (USE_BOOST_LOG)
-  if (${Boost_LOG_FOUND})
-    set(USE_BOOST_ANY ON) 
-    message(WARNING "**You are building the TOF server software with USE_BOOST_LOG=ON. While the advanced logging system is very helpful, be aware that due to a bug in current ROOT versions, ROOT will NOT BUILD ITS DICTIONARIES. This means that the ROOT cppyy generated PYBINDINGS MOST LIKELY WONT WORK!! If you want to use these features, please use the simplified logging system and set USE_BOOST_LOG=OFF**")
-  else()
-    message(WARNING "Could not find Boost_log. Will disable it for now.")
-    set(USE_BOOST_LOG OFF)
-  endif()
-else()
-  message(WARNING "-- -- USE_BOOST_LOG is set to OFF, building without boost log!")
-endif(USE_BOOST_LOG)
-
-if(USE_BOOST_LOG)
-  add_definitions( -DUSE_BOOST_LOG)
-  add_definitions( -DBOOST_LOG_DYN_LINK)
-endif()
 
 ## environmental system
 #
@@ -136,17 +115,14 @@ if (BUILD_RBEMULATOR)
                   )
     target_include_directories(${RBEMULATOR_BIN}
                                 PUBLIC
+                                ${spdlog_SOURCE_DIR}/include
                                 ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
                                 ${RBEMULATOR_DIR}/include
                               )
     target_link_libraries(${RBEMULATOR_BIN}
                          PUBLIC
                             $<$<BOOL:${BUILD_ROOTCOMPONENTS}>:${ROOT_LIBRARY_SHARED}>
-                            #$<$<BOOL:${USE_BOOST_LOG}>:Boost::log_setup>
-                            #$<$<BOOL:${USE_GOOGLEPERFTOOLS}>:${GOOGLEPERFTOOLS_LIB}>
-                            #$<$<BOOL:${USE_BOOST_LOG}>:Boost::log>
                             ${GAPSTOF_LIBRARY_SHARED}
-                            #${Boost_THREAD_LIBRARY_RELEASE}
                             "libczmq.so"
                             "libzmq.so"
                         )
@@ -178,7 +154,6 @@ add_library(${GAPSTOF_LIBRARY_SHARED}
     dataclasses/C++/src/WfPaddlePacket.cxx
     dataclasses/C++/src/serialization.cxx
     dataclasses/C++/src/parsers.cxx
-    dataclasses/C++/src/CraneLogging.cc
     dataclasses/C++/src/WaveGAPS.cpp
     dataclasses/C++/src/CommandPacket.cxx
     dataclasses/C++/src/RBMoniPacket.cxx
@@ -188,6 +163,7 @@ add_library(${GAPSTOF_LIBRARY_SHARED}
 target_compile_options(${GAPSTOF_LIBRARY_SHARED} PRIVATE -Wall -Wextra -Wpedantic)# -Werror)
 target_include_directories(${GAPSTOF_LIBRARY_SHARED}
                             PUBLIC
+                            ${spdlog_SOURCE_DIR}/include
                             ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
                               $<$<BOOL:${BUILD_ROOTCOMPONENTS}>:${ROOT_INCLUDE_DIRS}>
                               ${Boost_INCLUDE_DIR}
@@ -195,9 +171,7 @@ target_include_directories(${GAPSTOF_LIBRARY_SHARED}
 target_link_libraries(${GAPSTOF_LIBRARY_SHARED}
                       PUBLIC
                          $<$<BOOL:${BUILD_ROOTCOMPONENTS}>:${ROOT_LIBRARY_SHARED}>
-                         $<$<BOOL:${USE_BOOST_LOG}>:Boost::log_setup>
                          #$<$<BOOL:${USE_GOOGLEPERFTOOLS}>:${GOOGLEPERFTOOLS_LIB}>
-                         $<$<BOOL:${USE_BOOST_LOG}>:Boost::log>
                     )
 #
 ## GAPSSERVER binary

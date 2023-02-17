@@ -24,7 +24,8 @@ void RPaddlePacket::reset()
   //  the REventstream
   ctr_etx = 0x00;
 
-   
+  //  timestamps for debugging - they 
+  //  most likely will go away   
   timestamp_32  = 0;
   timestamp_16  = 0;
 
@@ -44,72 +45,72 @@ unsigned short RPaddlePacket::calculate_length()
 /*******************************************/
 
 // getters
-unsigned short RPaddlePacket::get_paddle_id() const
+u16 RPaddlePacket::get_paddle_id() const
 {
    return (unsigned short)paddle_id;
 }
 
-float RPaddlePacket::get_time_a() const
+f32 RPaddlePacket::get_time_a() const
 {
-   float prec = 0.004;
+   f32 prec = 0.004;
    return prec*time_a;
 }
 
-float RPaddlePacket::get_time_b() const
+f32 RPaddlePacket::get_time_b() const
 {
-  float prec = 0.004;//ns
+  f32 prec = 0.004;//ns
   return prec*time_b;
 }
 
-float RPaddlePacket::get_peak_a() const
+f32 RPaddlePacket::get_peak_a() const
 {
-  float prec = 0.2;
+  f32 prec = 0.2;
   return prec*peak_a;
 }
 
-float RPaddlePacket::get_peak_b() const
+f32 RPaddlePacket::get_peak_b() const
 {
-  float prec = 0.2;
+  f32 prec = 0.2;
   return prec*peak_b;
 }
 
-float RPaddlePacket::get_charge_a() const
+f32 RPaddlePacket::get_charge_a() const
 {
-  float prec = 0.01; //pC
+  f32 prec = 0.01; //pC
   return prec*charge_a - 50;
 }
 
-float RPaddlePacket::get_charge_b() const
+f32 RPaddlePacket::get_charge_b() const
 {
-  float prec = 0.01;
+  f32 prec = 0.01;
   return prec*charge_b - 50;
 }
 
-float RPaddlePacket::get_charge_min_i() const
+f32 RPaddlePacket::get_charge_min_i() const
 {
-  float prec = 0.002;// minI
+  f32 prec = 0.002;// minI
   return prec*charge_min_i - 10;
 }
 
-float RPaddlePacket::get_x_pos() const
+f32 RPaddlePacket::get_x_pos() const
 {
   // FIXME - check if it is really in the middle
-  float prec = 0.005; //cm
+  f32 prec = 0.005; //cm
   return prec*x_pos - 163.8;
 }
 
-float RPaddlePacket::get_t_avg() const
+f32 RPaddlePacket::get_t_avg() const
 {
-  float prec = 0.004;//ps
+  f32 prec = 0.004;//ps
   return prec*t_average;
 }
 
 
 /*******************************************/
 
-std::vector<unsigned char> RPaddlePacket::serialize() const
+vec_u8 RPaddlePacket::serialize() const
 {
-  std::vector<unsigned char> buffer(RPADDLEPACKETSIZE);
+  vec_u8 buffer(RPADDLEPACKETSIZE);
   usize pos = 0; // position in bytestream
 
   Gaps::u16_to_le_bytes(head, buffer, pos);
@@ -136,8 +137,8 @@ std::vector<unsigned char> RPaddlePacket::serialize() const
 
 /*******************************************/
 
-unsigned int RPaddlePacket::deserialize(vec_u8 &bytestream,
-                                        u32 start_pos)
+u32 RPaddlePacket::deserialize(vec_u8 &bytestream,
+                               u32 start_pos)
 {
  reset();
      	// start from position in bytestream
@@ -220,8 +221,6 @@ bool RPaddlePacket::is_broken() {
   return broken;
 }
 
-
-
 /*******************************************/
 
 std::ostream& operator<<(std::ostream& os, const RPaddlePacket& pad)
@@ -232,33 +231,33 @@ std::ostream& operator<<(std::ostream& os, const RPaddlePacket& pad)
 
 void RPaddlePacket::set_time_a(double time)
 {
-  float prec = 0.004;
+  f32 prec = 0.004;
   time_a = (uint16_t) (time/prec);
 }
 void RPaddlePacket::set_time_b(double time)
 {
-  float prec = 0.004;
+  f32 prec = 0.004;
   time_b = (uint16_t) (time/prec);
 }
 void RPaddlePacket::set_peak_a(double peak)
 {
-  float prec = 0.2;
+  f32 prec = 0.2;
   peak_a = (uint16_t) (peak/prec);
 }
 void RPaddlePacket::set_peak_b(double peak)
 {
-  float prec = 0.2;
+  f32 prec = 0.2;
   peak_b = (uint16_t) (peak/prec);
 }
 void RPaddlePacket::set_charge_a(double charge)
 {
-  float prec = 0.01; //pC
+  f32 prec = 0.01; //pC
   charge_a = (uint16_t)(charge/prec - 50);
 
 }
 void RPaddlePacket::set_charge_b(double charge)
 {
-  float prec = 0.01; //pC
+  f32 prec = 0.01; //pC
   charge_b = (uint16_t)(charge/prec - 50);
 }
 void RPaddlePacket::set_charge_min_i(double charge)
@@ -267,7 +266,7 @@ void RPaddlePacket::set_charge_min_i(double charge)
 }
 void RPaddlePacket::set_x_pos(double pos)
 {
-  float prec = 0.005; //cm
+  f32 prec = 0.005; //cm
   x_pos = (uint16_t)(pos/prec - 163.8);
 
 }
