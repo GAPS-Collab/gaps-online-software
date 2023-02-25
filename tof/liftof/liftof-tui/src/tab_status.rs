@@ -80,7 +80,7 @@ impl StatusTab<'_> {
     let status_chunks = Layout::default()
       .direction(Direction::Horizontal)
       .constraints(
-          [Constraint::Percentage(10), Constraint::Percentage(20), Constraint::Percentage(70)].as_ref(),
+          [Constraint::Percentage(30), Constraint::Percentage(70)].as_ref(),
       )
       .split(main_window);
     let detail_and_ch9_chunks = Layout::default()
@@ -89,14 +89,21 @@ impl StatusTab<'_> {
           [Constraint::Percentage(50),
            Constraint::Percentage(50)].as_ref(),
       )
-      .split(status_chunks[1]);
+      .split(status_chunks[0]);
+    let list_and_detail_chunks = Layout::default()
+      .direction(Direction::Horizontal)
+      .constraints(
+          [Constraint::Percentage(50),
+           Constraint::Percentage(50)].as_ref(),
+      )
+      .split(detail_and_ch9_chunks[0]);
     let wf_chunks = Layout::default()
       .direction(Direction::Horizontal)
       .constraints(
           [Constraint::Percentage(50),
            Constraint::Percentage(50)].as_ref(),
       )
-      .split(status_chunks[2]);
+      .split(status_chunks[1]);
     let mut ch_chunks = Layout::default()
       .direction(Direction::Vertical)
       .constraints(
@@ -163,9 +170,8 @@ impl StatusTab<'_> {
       detail           : rb_detail,
       rb_list          : rb_list.clone(),
       list_widget      : list,
-      list_rect        : status_chunks[0],
-      //detail_rect      : status_chunks[1],
-      detail_rect      : detail_and_ch9_chunks[0],
+      list_rect        : list_and_detail_chunks[0],
+      detail_rect      : list_and_detail_chunks[1],
       ch_rect          : ch_chunks,
       ch9_rect         : detail_and_ch9_chunks[1]
       //ch_charts        : chart_list,
