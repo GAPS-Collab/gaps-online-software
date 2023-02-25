@@ -37,15 +37,15 @@ use tof_dataclasses::commands::{TofCommand,
 use liftof_lib::{get_rb_manifest,
                  ReadoutBoard};
 
-fn clone_into_array<A, T>(slice: &[T]) -> A
-where
-    A: Default + AsMut<[T]>,
-    T: Clone,
-{
-    let mut a = A::default();
-    <A as AsMut<[T]>>::as_mut(&mut a).clone_from_slice(slice);
-    a
-}
+//fn clone_into_array<A, T>(slice: &[T]) -> A
+//where
+//    A: Default + AsMut<[T]>,
+//    T: Clone,
+//{
+//    let mut a = A::default();
+//    <A as AsMut<[T]>>::as_mut(&mut a).clone_from_slice(slice);
+//    a
+//}
 
 #[derive(Debug, Clone)]
 pub struct StatusTab<'a> {
@@ -56,6 +56,7 @@ pub struct StatusTab<'a> {
   pub list_rect    : Rect,
   pub detail_rect  : Rect,
   pub ch_rect      : Vec<Rect>,
+  pub ch9_rect     : Rect,
   //message_queue    : VecDeque<String>, 
   //rb_list_state    : ListState,
   //pub ch_datasets  : Vec<Dataset<'a>>,
@@ -82,6 +83,13 @@ impl StatusTab<'_> {
           [Constraint::Percentage(10), Constraint::Percentage(20), Constraint::Percentage(70)].as_ref(),
       )
       .split(main_window);
+    let detail_and_ch9_chunks = Layout::default()
+      .direction(Direction::Vertical)
+      .constraints(
+          [Constraint::Percentage(50),
+           Constraint::Percentage(50)].as_ref(),
+      )
+      .split(status_chunks[1]);
     let wf_chunks = Layout::default()
       .direction(Direction::Horizontal)
       .constraints(
@@ -156,8 +164,10 @@ impl StatusTab<'_> {
       rb_list          : rb_list.clone(),
       list_widget      : list,
       list_rect        : status_chunks[0],
-      detail_rect      : status_chunks[1],
+      //detail_rect      : status_chunks[1],
+      detail_rect      : detail_and_ch9_chunks[0],
       ch_rect          : ch_chunks,
+      ch9_rect         : detail_and_ch9_chunks[1]
       //ch_charts        : chart_list,
     };
     st

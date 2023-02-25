@@ -1,14 +1,10 @@
-//! This follows the example for the pet database.
-//!
-//! The idea is to have a separate, hearbeat style
-//! thread which either processes user input or
-//! triggers the app to move on.
+//! Interactive display for the tof system for the 
+//! GAPS experiment
 //!
 //!
 //!
 //!
-//!
-//!
+
 
 mod tab_commands;
 mod tab_mt;
@@ -65,7 +61,6 @@ use tui::{
 
 // system inforamtion
 use sysinfo::{NetworkExt, NetworksExt, ProcessExt, System, SystemExt};
-
 
 use tof_dataclasses::commands::{TofCommand, TofResponse};
 use tof_dataclasses::packets::{TofPacket, PacketType};
@@ -421,15 +416,12 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
     master_trigger(&mt_to_main, &mt_rate_to_main);
   });
 
-  //panic!("Until here");
-
   // set up the terminal
   enable_raw_mode().expect("can run in raw mode");
   let stdout = io::stdout();
   let backend = CrosstermBackend::new(stdout);
   let mut terminal = Terminal::new(backend)?;
   terminal.clear()?;
-
   
   let (tx, rx) = mpsc::channel();
 
@@ -945,6 +937,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
               .style(Style::default().fg(Color::White))
               .bounds([0.0, 17000.0])
               .labels(ylabels.clone().iter().cloned().map(Span::from).collect()));
+          rect.render_widget(ch9_chart.clone(), status_tab.ch9_rect);
           
 
 
