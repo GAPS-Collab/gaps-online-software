@@ -232,7 +232,12 @@ impl TofEvent {
     //if self.n_paddles > 0 {
     //  println!("ready? {} {} {} {}", self.event_id, self.n_paddles, self.n_paddles_expected, self.age());
     //}
-    return self.is_complete() || (self.has_timed_out() && use_timeout);
+    // doing it like this will ensure that the events are ordered.
+    // Otherwise, complete events will bypass
+    if use_timeout {
+      return self.has_timed_out();
+    }
+    self.is_complete() 
   }
 }
 

@@ -181,6 +181,7 @@ pub fn event_builder (master_id      : &cbc::Receiver<MasterTriggerEvent>,
   let use_timeout   = true;
   let mut n_iter = 0; // don't worry it'll be simply wrapped around
   // we try to receive eventids from the master trigger
+  let mut last_evid = 0;
   loop {
 
     // every iteration, we welcome a new master event
@@ -194,6 +195,11 @@ pub fn event_builder (master_id      : &cbc::Receiver<MasterTriggerEvent>,
                , mt.event_id
                , mt.n_paddles);
         let mut event =  TofEvent::from(&mt);
+        if (event.event_id != last_evid + 1) {
+          let delta_id = event.event_id - last_evid;
+          error!("We skipped event ids {}", delta_id );
+        }
+        last_evid = event.event_id;
         event_cache.push_back(event);
       }
     } // end match Ok(mt)

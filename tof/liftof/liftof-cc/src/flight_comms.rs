@@ -53,9 +53,6 @@ pub fn global_data_sink(incoming : &cbc::Receiver<TofPacket>,
   let mut n_pack_sent = 0;
   let mut last_evid   = 0u32;
   loop {
-    if n_pack_sent % 1000 == 0 && n_pack_sent != 0 {
-      println!("=> [SINK] Sent {n_pack_sent}, last evid {last_evid} ===");
-    }
     match incoming.recv() {
       Err(err) => trace!("No new packet, err {err}"),
       Ok(pack) => {
@@ -67,6 +64,9 @@ pub fn global_data_sink(incoming : &cbc::Receiver<TofPacket>,
             event_cache.push(pack);
             continue;
           } else {
+            if n_pack_sent % 1000 == 0 && n_pack_sent != 0 {
+              println!("=> [SINK] Sent {n_pack_sent}, last evid {last_evid} ===");
+            }
             // sort the cache
             // FIXME - at this step, we should have checked if the 
             // packets are broken.
