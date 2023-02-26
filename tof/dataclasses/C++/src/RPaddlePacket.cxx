@@ -1,13 +1,10 @@
 #include "packets/RPaddlePacket.h"
-#include "serialization.h"
 #include "parsers.h"
+#include <spdlog/spdlog.h>
+
 void RPaddlePacket::reset()
 {
-  //head = 0xAAAA;
-  // define a different header
-  head = 0xF0F0;
-  //event_ctr = 0;
-  //for (size_t k=0;k<8;k++) utc_timestamp[k] = 0x00;
+  head = 0xF0F0; 
 
   paddle_id    = 0x00;
   time_a       = 0;
@@ -142,27 +139,31 @@ u32 RPaddlePacket::deserialize(vec_u8 &bytestream,
 {
  reset();
      	// start from position in bytestream
- u16 value; 
- u32 end_pos = start_pos;
+ //u16 value; 
+ //u32 end_pos = start_pos;
 
- // find start marker in bytestream
- for (size_t k=start_pos;k<bytestream.size();k++)
- {
-   value = decode_ushort(bytestream, start_pos=k);
-   if (head == value)
-    {
-     // end pos should point to the start
-     // of the next new value
-     end_pos = k+2;
-     break;
-    }
- }
+ //// find start marker in bytestream
+ //for (size_t k=start_pos;k<bytestream.size();k++)
+ //{
+ //  value = decode_ushort(bytestream, start_pos=k);
+ //  if (head == value)
+ //   {
+ //    // end pos should point to the start
+ //    // of the next new value
+ //    end_pos = k+2;
+ //    break;
+ //   }
+ //}
 
- u64 pos = end_pos; // position in bytestream
+ //u64 pos = end_pos; // position in bytestream
  //u16 expected_packet_size = Gaps::u16_from_le_bytes(bytestream, pos);
 
  //event_ctr = decode_uint32(bytestream, pos); pos+=4;
-
+ u64 pos = start_pos;
+ u16 maybe_header = Gaps::u16_from_le_bytes(bytestream, pos);
+ if (maybe_header != head) {
+   spdlog::error("Can not find HEADER at presumed position. Maybe give a different value for start_pos?");
+ }
  paddle_id     = bytestream[pos]; pos+=1;
  time_a        = Gaps::u16_from_le_bytes(bytestream, pos); 
  time_b        = Gaps::u16_from_le_bytes(bytestream, pos); 

@@ -1,30 +1,17 @@
-///! Registers of the DRS4 are accessed through
-///  the sytem ram (Addr8). It is a 32bit system, 
-///  so the address format is u32.
-///  _ a note here _ : Each register is 32bit. This means for 
-///  the Addr8 (8 refers to bits) a register occupies 4 bytes, 
-///  so a new register will be the previous register + 4.
-///  If the register is the same as another, then the register
-///  holds different fields for the different bits in the register.
-///
-///  Please refere to 
-///  https://gitlab.com/ucla-gaps-tof/firmware/-/blob/develop/regmap/rb_address_table.org
-///  DRS4 readout
+//! Registers of the DRS4 are accessed through
+//! the sytem ram (Addr8). It is a 32bit system, 
+//! so the address format is u32.
+//! _ a note here _ : Each register is 32bit. This means for 
+//! the Addr8 (8 refers to bits) a register occupies 4 bytes, 
+//! so a new register will be the previous register + 4.
+//! If the register is the same as another, then the register
+//! holds different fields for the different bits in the register.
+//!
+//! Please refere to 
+//! https://gitlab.com/ucla-gaps-tof/firmware/-/blob/develop/regmap/rb_address_table.org
+//! DRS4 readout
 
 
-/// The buffersize for the blob buffers
-//const UI1_BUFFSIZE : usize = ;
-//pub const UIO1_TRIP : u32 = 66520576;
-//pub const UIO2_TRIP : u32 = 66520576;
-//const UIO1_TRIP : u32 = 48000000;
-//const UIO2_TRIP : u32 = 48000000;
-// This is the SOFTWARE from the original script
-// const UIO1_TRIP : u32 = 16188928;
-// const UIO2_TRIP : u32 = 16188928;
-
-// blobs full
-//pub const UIO1_FULL : u32 = 68157440;
-//pub const UIO2_FULL : u32 = 135266304;
 
 //========== DRS4 Registers =============
 //
@@ -44,7 +31,8 @@ pub const DRS_REINIT       : u32 = 0x4c; // Write 1 to reinitialize DRS state ma
 
 pub const DMA_CLEAR : u32 = 0x6c; // [0] Write 1 to clear the DMA memory (write zeroes)
 
-pub const DAQ_RESET : u32 = 0x58; // Write 1 to completely reset the DRS state machine logic
+pub const DRS_RESET : u32 = 0x54; // WRite 1 to completely reset the DRS state machine logic
+pub const DAQ_RESET : u32 = 0x58; // Write 1 to completely reset the DAQ state machine logic
 pub const DMA_RESET : u32 = 0x5c; // Write 1 to completely reset the DMA state machine logic
 
 // channel mask is 8 bit, the register contains also 
@@ -52,7 +40,9 @@ pub const DMA_RESET : u32 = 0x5c; // Write 1 to completely reset the DMA state m
 pub const READOUT_MASK : u32 = 0x44; // [8:0] 8 bit mask, set a bit to 1 to enable readout of that channel.
                                  // 9th is auto-read if any channel is enabled and AUTO_9TH_CHANNEL set to 1
 
-pub const TRIGGER_ENABLE : u32 = 0x47;  // Write 0 to stop all triggers, 1 to enable triggering
+pub const TRIGGER_ENABLE : u32 = 0x11c;  // Write 0 to stop all triggers, 1 to enable triggering
+
+pub const WRITE_EVENTFRAGMENT : u32 = 0xc4;
 
 //=================DMA==================================
 // (direct memory access)

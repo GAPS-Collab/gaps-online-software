@@ -23,19 +23,16 @@ pub const UIO2 : &'static str = "/dev/uio2";
 /// a single buffer but with 2 halves.
 /// 
 /// Interestingly, there is a discrepancy 
-/// between the dma_reset when it writes 
+/// between the dma_reset when it writes
+/// 68176064
+pub const DATABUF_TOTAL_SIZE : usize = 66524928;
+pub const EVENT_SIZE         : usize = 18530; 
+//pub const UIO1_MIN_OCCUPANCY : u32 = 68176064;
 pub const UIO1_MIN_OCCUPANCY : u32 = 68157440;
-pub const UIO1_MAX_OCCUPANCY : u32 = 134693952;
-
 pub const UIO2_MIN_OCCUPANCY : u32 = 135266304;
+
+pub const UIO1_MAX_OCCUPANCY : u32 = 117089408;
 pub const UIO2_MAX_OCCUPANCY : u32 = 201788800;
-//                                     134675072
-//                  New MAX size for A 134693952
-//                  New MIN size for A 68157504
-//                  New MIN size for A 68157504
-//                  New MIN size for A 68157504
-//                  New MIN size for B 135266304
-//                  New MAX size for B 201788800 
 
 /// The size of a 32bit unsigned int in byte
 /// (all words in registers are u32)
@@ -70,9 +67,8 @@ pub enum BlobBuffer {
 /// This means if the given size is too small
 /// make sure that at least the whole next
 /// event "fits in"
-pub fn size_in_events(size : usize) {
-  
-
+pub fn size_in_events(size : usize) -> usize {
+  size/EVENT_SIZE
 }
 
 /// Allow READ access to the memory registers at /dev/uio**

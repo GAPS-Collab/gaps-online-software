@@ -27,7 +27,7 @@ const UIO1 : &'static str = "/dev/uio1";
 const UIO2 : &'static str = "/dev/uio2";
 const SLEEP_AFTER_REG_WRITE : u32 = 1; // sleep time after register write in ms
 
-///! Return the bytes located at the memory
+/// Return the bytes located at the memory
 pub fn get_bytestream(addr_space : &str, 
                   addr : u32,
                   len  : usize) -> Result<Vec::<u8>, RegisterError> {
@@ -253,6 +253,12 @@ fn main() {
   let bar_a  = multi_bar.add(setup_progress_bar(String::from("buff A"), UIO1_TRIP as u64, String::from(TEMPLATE_BAR_A)));  
   let bar_b  = multi_bar.insert_after(&bar_a,setup_progress_bar(String::from("buff B"), UIO2_TRIP as u64, String::from(TEMPLATE_BAR_B))); 
   let mut bar_ev = multi_bar.insert_after(&bar_b,setup_progress_bar(String::from("events"), max_event, String::from(TEMPLATE_BAR_EV)));         
+
+  match enable_trigger() {
+    Ok(_) => (),
+    Err(err) => error!("Can not enable triggers, Error {err}")
+  }
+
   loop {
     evt_cnt = get_event_count().unwrap();
     if first_iter {

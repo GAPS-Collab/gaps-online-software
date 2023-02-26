@@ -12,6 +12,20 @@ use crate::memory::*;
 use std::time::Duration;
 use std::thread;
 
+/// write header only packets when the drs is busyu
+pub fn enable_evt_fragments() -> Result<(), RegisterError> {
+  trace!("Enable event fragment writing!");
+  write_control_reg(WRITE_EVENTFRAGMENT, 1)?;
+  Ok(())
+}
+
+/// do not write header only packets when the drs is busyu
+pub fn disable_evt_fragments() -> Result<(), RegisterError> {
+  trace!("Disable event fragment writing!");
+  write_control_reg(WRITE_EVENTFRAGMENT, 0)?;
+  Ok(())
+}
+
 /// enable triggering
 pub fn enable_trigger() -> Result<(), RegisterError> {
   trace!("Enable triggers!");
@@ -166,6 +180,11 @@ pub fn reset_daq() -> Result<(), RegisterError> {
   Ok(())
 }
 
+pub fn reset_drs() -> Result<(), RegisterError> {
+  trace!("SET DRS RESET");
+  write_control_reg(DRS_REINIT, 1)?;
+  Ok(())
+}
 
 ///! Resets the DMA state machine.
 pub fn reset_dma() -> Result<(), RegisterError> {

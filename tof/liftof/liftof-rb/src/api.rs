@@ -7,16 +7,14 @@ use tof_dataclasses::serialization::Serialization;
 
 use std::collections::HashMap;
 use std::net::IpAddr;
-
-
 use std::{fs, fs::File, path::Path};
 
 use std::io::Write;
 use std::fs::OpenOptions;
 
-
 use std::time::{Duration,
                 Instant};
+
 use std::{thread, time};
 use crossbeam_channel::{Sender,
                         Receiver};
@@ -53,11 +51,20 @@ const DMA_RESET_TRIES : u8 = 10;   // if we can not reset the DMA after this num
                                    // of retries, we'll panic!
 const RESTART_TRIES : u8 = 5; // if we are not successfull, to get it going, 
                                    // panic
-/// The 0MQ PUB port is defined as DATAPORT_START + readoutboard_id
-const DATAPORT_START : u32 = 30000;
-//
-/// The 0MP REP port is defined as CMDPORT_START + readoutboard_id
-const CMDPORT_START  : u32 = 40000;
+
+
+// Using the same approach as the flight computer, we use
+// two ports for communication/data
+// 1) PUB for the data
+// 2) SUB for the commands.
+// - _A comment here_ while we usually would prefer REP?REQ for 
+// comms, this will avoid deadlocks in any case and makes it in 
+// general much easier for command servers to connect to the boards.
+
+/// Dataport is 0MQ PUB for publishing waveform/event data
+pub const DATAPORT : u32 = 42000;
+/// Commandport is 0MQ SUB for receiving commands from a C&C server
+pub const CMDPORT  : u32 = 32000;
 
 /// Meta information for a data run
 pub struct RunParams {
@@ -81,289 +88,279 @@ impl RunParams {
 /// 
 /// Maintain 0MQ command connection and faciliate 
 /// forwarding of commands and responses
-pub fn cmd_responder(rsp_receiver     : &Receiver<TofResponse>,
-                     op_mode          : &Sender<TofOperationMode>,
-                     run_pars         : &Sender<RunParams>,
-                     evid_to_cache    : &Sender<u32>) {
+///
+/// # Arguments
+///
+/// cmd_server_ip             : The IP addresss of the C&C server we are listening to.
+/// heartbeat_timeout_seconds : If we don't hear from the C&C server in this amount of 
+///                             seconds, we try to reconnect.
+pub fn cmd_responder(cmd_server_ip             : String,
+                     heartbeat_timeout_seconds : u32,
+                     rsp_receiver              : &Receiver<TofResponse>,
+                     op_mode                   : &Sender<TofOperationMode>,
+                     run_pars                  : &Sender<RunParams>,
+                     evid_to_cache             : &Sender<u32>) {
                      //cmd_sender   : &Sender<TofCommand>) {
   // create 0MQ sockedts
   let one_milli   = time::Duration::from_millis(1);
-  let mut address_ip = String::from("tcp://");
-  let this_board_ip = local_ip().unwrap();
-  let cmd_port    = CMDPORT_START + get_board_id().unwrap();
-
-
-  match this_board_ip {
-    IpAddr::V4(ip) => address_ip += &ip.to_string(),
-    IpAddr::V6(_) => panic!("Currently, we do not support IPV6!")
-  }
-  let cmd_address : String = address_ip + ":" + &cmd_port.to_string();
+  let mut cmd_address = String::from("tcp://") + &cmd_server_ip + ":" + &DATAPORT.to_string() ;
   let ctx = zmq::Context::new();
-  let cmd_socket = ctx.socket(zmq::REP).expect("Unable to create 0MQ REP socket!");
-  info!("Will set up 0MQ REP socket at address {cmd_address}");
-  cmd_socket.bind(&cmd_address).expect("Unable to bind to command socket at {cmd_address}!");
-  
-  info!("0MQ REP socket listening at {cmd_address}");
- 
-  // first conenection is a ping
-  // is that necesary? 
-  //println!("Waiting for client to connect...");
-  // block until we get a client
-  //let client_response = cmd_socket.recv_bytes(0).expect("Communication to client failed!");
-  //println!("Client connected");
-  //let resp = TofResponse::Success(0);
-  //cmd_socket.send(resp.to_bytestream(), 0);
-  // whatever client we got, we don't care. It just triggers the call response paatern.
+  let cmd_socket = ctx.socket(zmq::SUB).expect("Unable to create 0MQ SUB socket!");
+  info!("Will set up 0MQ SUB socket to listen for commands at address {cmd_address}");
+  cmd_socket.connect(&cmd_address).expect("Unable to bind to command socket at {cmd_address}!");
+  let my_topic = String::from("");
+  //.as_bytes();
+  cmd_socket.set_subscribe(&my_topic.as_bytes());
+  let mut heartbeat = Instant::now();
+
+  error!("TODO: Heartbeat feature not yet implemented on C&C side");
+  let heartbeat_received = false;
   loop {
-
-    match cmd_socket.poll(zmq::POLLIN, 1) {
-      Err(err) => {
-        warn!("Polling the 0MQ command socket failed! Err: {err}");
-        thread::sleep(one_milli);
-        continue;
+    if !heartbeat_received {
+      if heartbeat.elapsed().as_secs() > heartbeat_timeout_seconds as u64 {
+        warn!("No heartbeat received since {heartbeat_timeout_seconds}. Attempting to reconnect!");
+        cmd_socket.connect(&cmd_address).expect("Unable to bind to command socket at {cmd_address}!");
+        cmd_socket.set_subscribe(&my_topic.as_bytes());
+        heartbeat = Instant::now();
       }
-      Ok(in_waiting) => {
-        trace!("poll successful!");
-        if in_waiting == 0 {
-            continue;
-        }
-        match cmd_socket.recv_bytes(0) {
-          Err(err) => warn!("Problem receiving command over 0MQ ! Err {err}"),
-          Ok(cmd_bytes)  => {
-            info!("Received bytes {}", cmd_bytes.len());
-            match TofCommand::from_bytestream(&cmd_bytes,0) {
-              Err(err) => warn!("Problem decoding command {}", err),
-              Ok(cmd)  => {
-                // we got a valid tof command, forward it and wait for the 
-                // response
-                let resp_not_implemented = TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED);
-                match cmd {
-                  TofCommand::Ping (_) => {
-                    info!("Received ping signal");
-                    let r = TofResponse::Success(0);
-                    match cmd_socket.send(r.to_bytestream(),0) {
-                      Err(err) => warn!("Can not send response!, Err {err}"),
-                      Ok(_)    => info!("Responded to Ping!")
-                    }
-                    continue;
-                  
-                  }
-                  TofCommand::PowerOn   (mask) => {
-                    warn!("Not implemented");
-                    match cmd_socket.send(resp_not_implemented.to_bytestream(),0) {
-                      Err(err) => warn!("Can not send response! Err {err}"),
-                      Ok(_)    => trace!("Resp sent!")
-                    }
-                    continue;
-                  },
-                  TofCommand::PowerOff  (mask) => {
-                    warn!("Not implemented");
-                    match cmd_socket.send(resp_not_implemented.to_bytestream(),0) {
-                      Err(err) => warn!("Can not send response! {err}"),
-                      Ok(_)    => trace!("Resp sent!")
-                    }
-                    continue;
-                  },
-                  TofCommand::PowerCycle(mask) => {
-                    warn!("Not implemented");
-                    match cmd_socket.send(resp_not_implemented.to_bytestream(),0) {
-                      Err(err) => warn!("Can not send response! {err}"),
-                      Ok(_)    => trace!("Resp sent!")
-                    }
-                    continue;
-                  },
-                  TofCommand::RBSetup   (mask) => {
-                    warn!("Not implemented");
-                    match cmd_socket.send(resp_not_implemented.to_bytestream(),0) {
-                      Err(err) => warn!("Can not send response! Err {err}"),
-                      Ok(_)    => trace!("Resp sent!")
-                    }
-                    continue;
-                  }, 
-                  TofCommand::SetThresholds   (thresholds) =>  {
-                    warn!("Not implemented");
-                    match cmd_socket.send(resp_not_implemented.to_bytestream(),0) {
-                      Err(err) => warn!("Can not send response! Err {err}"),
-                      Ok(_)    => trace!("Resp sent!")
-                    }
-                    continue;
-                  },
-                  TofCommand::StartValidationRun  (_) => {
-                    warn!("Not implemented");
-                    match cmd_socket.send(resp_not_implemented.to_bytestream(),0) {
-                      Err(err) => warn!("Can not send response!"),
-                      Ok(_)    => trace!("Resp sent!")
-                    }
-                    continue;
-                  },
-                  TofCommand::RequestWaveforms (eventid) => {
-                    warn!("Not implemented");
-                    match cmd_socket.send(resp_not_implemented.to_bytestream(),0) {
-                      Err(err) => warn!("Can not send response!"),
-                      Ok(_)    => trace!("Resp sent!")
-                    }
-                    continue;
-                  },
-                  TofCommand::UnspoolEventCache   (_) => {
-                    warn!("Not implemented");
-                    match cmd_socket.send(resp_not_implemented.to_bytestream(),0) {
-                      Err(err) => warn!("Can not send response!"),
-                      Ok(_)    => trace!("Resp sent!")
-                    }
-                    continue;
-                  },
-                  TofCommand::StreamOnlyRequested (_) => {
-                    let mode = TofOperationMode::TofModeRequestReply;
-                    
-                    match op_mode.try_send(mode) {
-                      Err(err) => trace!("Error sending! {err}"),
-                      Ok(_)    => ()
-                    }
-                    let resp_good = TofResponse::Success(RESP_SUCC_FINGERS_CROSSED);
-                    match cmd_socket.send(resp_good.to_bytestream(),0) {
-                      Err(err) => warn!("Can not send response!"),
-                      Ok(_)    => trace!("Resp sent!")
-                    }
-                    continue;
-                  },
-                  TofCommand::StreamAnyEvent      (_) => {
-                    let mode = TofOperationMode::TofModeStreamAny;
-                    match op_mode.try_send(mode) {
-                      Err(err) => trace!("Error sending! {err}"),
-                      Ok(_)    => ()
-                    }
-                    let resp_good = TofResponse::Success(RESP_SUCC_FINGERS_CROSSED);
-                    match cmd_socket.send(resp_good.to_bytestream(),0) {
-                      Err(err) => warn!("Can not send response!"),
-                      Ok(_)    => trace!("Resp sent!")
-                    }
-                    continue;
-                  },
-                  TofCommand::DataRunStart (max_event) => {
-                    // let's start a run. The value of the TofCommnad shall be 
-                    // nevents
-                    info!("Will initialize new run!");
-                    let run_p = RunParams {
-                      forever   : false,
-                      nevents   : max_event,
-                      is_active : true,
-                    };
-                    match run_pars.send(run_p) {
-                      Err(err) => warn!("Problem initializing run!"),
-                      Ok(_)    => ()
-                    }
-                  }, 
-                  TofCommand::DataRunEnd(_)   => {
-                    let run_p = RunParams {
-                      forever   : false,
-                      nevents   : 0,
-                      is_active : false,
-                    };
-                    match run_pars.send(run_p) {
-                      Err(err) => warn!("Problem ending run!"),
-                      Ok(_)    => ()
-                    }
-                    // send response later 
+    }
 
-                  //  if !self.run_active {
-                  //    return Ok(TofResponse::GeneralFail(RESP_ERR_NORUNACTIVE));
-                  //  }
-                  //  warn!("Will kill current run!");
-                  //  self.kill_chn.send(true);
-                  //  return Ok(TofResponse::Success(RESP_SUCC_FINGERS_CROSSED));
-                  },
-                  TofCommand::VoltageCalibration (_) => {
-                    warn!("Not implemented");
-                    match cmd_socket.send(resp_not_implemented.to_bytestream(),0) {
-                      Err(err) => warn!("Can not send response!"),
-                      Ok(_)    => trace!("Resp sent!")
-                    }
-                    continue;
-                  },
-                  TofCommand::TimingCalibration  (_) => {
-                    warn!("Not implemented");
-                    match cmd_socket.send(resp_not_implemented.to_bytestream(),0) {
-                      Err(err) => warn!("Can not send response!"),
-                      Ok(_)    => trace!("Resp sent!")
-                    }
-                    continue;
-                  },
-                  TofCommand::CreateCalibrationFile (_) => {
-                    warn!("Not implemented");
-                    match cmd_socket.send(resp_not_implemented.to_bytestream(),0) {
-                      Err(err) => warn!("Can not send response!"),
-                      Ok(_)    => trace!("Resp sent!")
-                    }
-                    continue;
-                  },
-                  TofCommand::RequestEvent(eventid) => {
-                    match evid_to_cache.send(eventid) {
-                      Err(err) => {
-                        debug!("Problem sending event id to cache! Err {err}");
-                        //return Ok(TofResponse::GeneralFail(*eventid));
-                      },
-                      Ok(event) => (),
-                    }
-                    //continue;
-                  },
-                  TofCommand::RequestMoni (_) => {
-                    warn!("Not implemented");
-                    match cmd_socket.send(resp_not_implemented.to_bytestream(),0) {
-                      Err(err) => warn!("Can not send response!"),
-                      Ok(_)    => trace!("Resp sent!")
-                    }
-                    continue;
-                  },
-                  TofCommand::Unknown (_) => {
-                    warn!("Not implemented");
-                    match cmd_socket.send(resp_not_implemented.to_bytestream(),0) {
-                      Err(err) => warn!("Can not send response!"),
-                      Ok(_)    => trace!("Resp sent!")
-                    }
-                    continue;
-                  }
-                  _ => {
-                  match cmd_socket.send(resp_not_implemented.to_bytestream(),0) {
-                    Err(err) => warn!("Can not send response!"),
-                    Ok(_)    => trace!("Resp sent!")
-                  }
-                  continue;
-                  }
-                } 
-             
-                // now get the response from the clients
-                match rsp_receiver.recv() {
+    //match cmd_socket.poll(zmq::POLLIN, 1) {
+    //  Err(err) => {
+    //    warn!("Polling the 0MQ command socket failed! Err: {err}");
+    //    thread::sleep(one_milli);
+    //    continue;
+    //  }
+    //  Ok(in_waiting) => {
+    //    trace!("poll successful!");
+    //    if in_waiting == 0 {
+    //        continue;
+    //    }
+    match cmd_socket.recv_bytes(0) {
+      Err(err) => warn!("Problem receiving command over 0MQ ! Err {err}"),
+      Ok(cmd_bytes)  => {
+        info!("Received bytes {}", cmd_bytes.len());
+        match TofCommand::from_bytestream(&cmd_bytes,0) {
+          Err(err) => warn!("Problem decoding command {}", err),
+          Ok(cmd)  => {
+            // we got a valid tof command, forward it and wait for the 
+            // response
+            let resp_not_implemented = TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED);
+            match cmd {
+              TofCommand::Ping (_) => {
+                info!("Received ping signal");
+                let r = TofResponse::Success(0);
+                match cmd_socket.send(r.to_bytestream(),0) {
+                  Err(err) => warn!("Can not send response!, Err {err}"),
+                  Ok(_)    => info!("Responded to Ping!")
+                }
+                continue;
+              
+              }
+              TofCommand::PowerOn   (mask) => {
+                warn!("Not implemented");
+                match cmd_socket.send(resp_not_implemented.to_bytestream(),0) {
+                  Err(err) => warn!("Can not send response! Err {err}"),
+                  Ok(_)    => trace!("Resp sent!")
+                }
+                continue;
+              },
+              TofCommand::PowerOff  (mask) => {
+                warn!("Not implemented");
+                match cmd_socket.send(resp_not_implemented.to_bytestream(),0) {
+                  Err(err) => warn!("Can not send response! {err}"),
+                  Ok(_)    => trace!("Resp sent!")
+                }
+                continue;
+              },
+              TofCommand::PowerCycle(mask) => {
+                warn!("Not implemented");
+                match cmd_socket.send(resp_not_implemented.to_bytestream(),0) {
+                  Err(err) => warn!("Can not send response! {err}"),
+                  Ok(_)    => trace!("Resp sent!")
+                }
+                continue;
+              },
+              TofCommand::RBSetup   (mask) => {
+                warn!("Not implemented");
+                match cmd_socket.send(resp_not_implemented.to_bytestream(),0) {
+                  Err(err) => warn!("Can not send response! Err {err}"),
+                  Ok(_)    => trace!("Resp sent!")
+                }
+                continue;
+              }, 
+              TofCommand::SetThresholds   (thresholds) =>  {
+                warn!("Not implemented");
+                match cmd_socket.send(resp_not_implemented.to_bytestream(),0) {
+                  Err(err) => warn!("Can not send response! Err {err}"),
+                  Ok(_)    => trace!("Resp sent!")
+                }
+                continue;
+              },
+              TofCommand::StartValidationRun  (_) => {
+                warn!("Not implemented");
+                match cmd_socket.send(resp_not_implemented.to_bytestream(),0) {
+                  Err(err) => warn!("Can not send response!"),
+                  Ok(_)    => trace!("Resp sent!")
+                }
+                continue;
+              },
+              TofCommand::RequestWaveforms (eventid) => {
+                warn!("Not implemented");
+                match cmd_socket.send(resp_not_implemented.to_bytestream(),0) {
+                  Err(err) => warn!("Can not send response!"),
+                  Ok(_)    => trace!("Resp sent!")
+                }
+                continue;
+              },
+              TofCommand::UnspoolEventCache   (_) => {
+                warn!("Not implemented");
+                match cmd_socket.send(resp_not_implemented.to_bytestream(),0) {
+                  Err(err) => warn!("Can not send response!"),
+                  Ok(_)    => trace!("Resp sent!")
+                }
+                continue;
+              },
+              TofCommand::StreamOnlyRequested (_) => {
+                let mode = TofOperationMode::TofModeRequestReply;
+                
+                match op_mode.try_send(mode) {
+                  Err(err) => trace!("Error sending! {err}"),
+                  Ok(_)    => ()
+                }
+                let resp_good = TofResponse::Success(RESP_SUCC_FINGERS_CROSSED);
+                match cmd_socket.send(resp_good.to_bytestream(),0) {
+                  Err(err) => warn!("Can not send response!"),
+                  Ok(_)    => trace!("Resp sent!")
+                }
+                continue;
+              },
+              TofCommand::StreamAnyEvent      (_) => {
+                let mode = TofOperationMode::TofModeStreamAny;
+                match op_mode.try_send(mode) {
+                  Err(err) => trace!("Error sending! {err}"),
+                  Ok(_)    => ()
+                }
+                let resp_good = TofResponse::Success(RESP_SUCC_FINGERS_CROSSED);
+                match cmd_socket.send(resp_good.to_bytestream(),0) {
+                  Err(err) => warn!("Can not send response!"),
+                  Ok(_)    => trace!("Resp sent!")
+                }
+                continue;
+              },
+              TofCommand::DataRunStart (max_event) => {
+                // let's start a run. The value of the TofCommnad shall be 
+                // nevents
+                info!("Will initialize new run!");
+                let run_p = RunParams {
+                  forever   : false,
+                  nevents   : max_event,
+                  is_active : true,
+                };
+                match run_pars.send(run_p) {
+                  Err(err) => warn!("Problem initializing run!"),
+                  Ok(_)    => ()
+                }
+              }, 
+              TofCommand::DataRunEnd(_)   => {
+                let run_p = RunParams {
+                  forever   : false,
+                  nevents   : 0,
+                  is_active : false,
+                };
+                match run_pars.send(run_p) {
+                  Err(err) => warn!("Problem ending run!"),
+                  Ok(_)    => ()
+                }
+                // send response later 
+
+              //  if !self.run_active {
+              //    return Ok(TofResponse::GeneralFail(RESP_ERR_NORUNACTIVE));
+              //  }
+              //  warn!("Will kill current run!");
+              //  self.kill_chn.send(true);
+              //  return Ok(TofResponse::Success(RESP_SUCC_FINGERS_CROSSED));
+              },
+              TofCommand::VoltageCalibration (_) => {
+                warn!("Not implemented");
+                match cmd_socket.send(resp_not_implemented.to_bytestream(),0) {
+                  Err(err) => warn!("Can not send response!"),
+                  Ok(_)    => trace!("Resp sent!")
+                }
+                continue;
+              },
+              TofCommand::TimingCalibration  (_) => {
+                warn!("Not implemented");
+                match cmd_socket.send(resp_not_implemented.to_bytestream(),0) {
+                  Err(err) => warn!("Can not send response!"),
+                  Ok(_)    => trace!("Resp sent!")
+                }
+                continue;
+              },
+              TofCommand::CreateCalibrationFile (_) => {
+                warn!("Not implemented");
+                match cmd_socket.send(resp_not_implemented.to_bytestream(),0) {
+                  Err(err) => warn!("Can not send response!"),
+                  Ok(_)    => trace!("Resp sent!")
+                }
+                continue;
+              },
+              TofCommand::RequestEvent(eventid) => {
+                match evid_to_cache.send(eventid) {
                   Err(err) => {
-                    trace!("Did not recv response!");
-                    warn!("Intended command receiver did not reply! Responding with Failure");
-                    let resp = TofResponse::GeneralFail(RESP_ERR_CMD_STUCK);
-                    match cmd_socket.send(resp.to_bytestream(), 0) {
-                      Err(err) => warn!("The command likely failed and we could not send a response. This is bad!"),
-                      Ok(_)    => trace!("The command likely failed, but we did not lose connection"),
-                    }
+                    debug!("Problem sending event id to cache! Err {err}");
+                    //return Ok(TofResponse::GeneralFail(*eventid));
                   },
-                  Ok(resp) => {
-                    match cmd_socket.send(resp.to_bytestream(), 0) {
-                      Err(err) => warn!("The command likely went through, but we could not send a response. This is bad!"),
-                      Ok(_)    => trace!("The command likely went through, but we did not lose connection"),
-                    }
-                  }
+                  Ok(event) => (),
+                }
+                //continue;
+              },
+              TofCommand::RequestMoni (_) => {
+                warn!("Not implemented");
+                match cmd_socket.send(resp_not_implemented.to_bytestream(),0) {
+                  Err(err) => warn!("Can not send response!"),
+                  Ok(_)    => trace!("Resp sent!")
+                }
+                continue;
+              },
+              TofCommand::Unknown (_) => {
+                warn!("Not implemented");
+                match cmd_socket.send(resp_not_implemented.to_bytestream(),0) {
+                  Err(err) => warn!("Can not send response!"),
+                  Ok(_)    => trace!("Resp sent!")
+                }
+                continue;
+              }
+              _ => {
+              match cmd_socket.send(resp_not_implemented.to_bytestream(),0) {
+                Err(err) => warn!("Can not send response!"),
+                Ok(_)    => trace!("Resp sent!")
+              }
+              continue;
+              }
+            } 
+         
+            // now get the response from the clients
+            match rsp_receiver.recv() {
+              Err(err) => {
+                trace!("Did not recv response!");
+                warn!("Intended command receiver did not reply! Responding with Failure");
+                let resp = TofResponse::GeneralFail(RESP_ERR_CMD_STUCK);
+                match cmd_socket.send(resp.to_bytestream(), 0) {
+                  Err(err) => warn!("The command likely failed and we could not send a response. This is bad!"),
+                  Ok(_)    => trace!("The command likely failed, but we did not lose connection"),
+                }
+              },
+              Ok(resp) => {
+                match cmd_socket.send(resp.to_bytestream(), 0) {
+                  Err(err) => warn!("The command likely went through, but we could not send a response. This is bad!"),
+                  Ok(_)    => trace!("The command likely went through, but we did not lose connection"),
                 }
               }
-            }  
+            }
           }
-        }
-
-        //match cmd_receiver.recv() {
-        //  Err(err) => {
-        //    trace!("Issue receiving command!");
-        //    continue;
-        //  }
-        //  Ok(_)    => {
-        //  //match cmd_
-        //  }  
-        //}
-      } 
+        }  
+      }
     }
   }
 }
@@ -375,9 +372,8 @@ pub fn cmd_responder(rsp_receiver     : &Receiver<TofResponse>,
 pub fn data_publisher(data : &Receiver<TofPacket>,
                       write_blob : bool) {
   let mut address_ip = String::from("tcp://");
-  let this_board_ip = local_ip().unwrap();
-  let data_port    = DATAPORT_START + get_board_id().unwrap();
-
+  let this_board_ip = local_ip().expect("Unable to obtainl local board IP. Something is messed up!");
+  let data_port    = DATAPORT;
 
   match this_board_ip {
     IpAddr::V4(ip) => address_ip += &ip.to_string(),
@@ -386,12 +382,9 @@ pub fn data_publisher(data : &Receiver<TofPacket>,
   let data_address : String = address_ip + ":" + &data_port.to_string();
   let ctx = zmq::Context::new();
   
-  // Set up 2 ports for 0MQ communications
-  // 1) control flow REP 
-  // 2) data flow PUB
   let data_socket = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
   data_socket.bind(&data_address).expect("Unable to bind to data (PUB) socket {data_adress}");
-  info!("0MQ SUB socket bound to address {data_address}");
+  info!("0MQ PUB socket bound to address {data_address}");
 
 
   let blobfile_name = "testdata_".to_owned()
@@ -416,14 +409,18 @@ pub fn data_publisher(data : &Receiver<TofPacket>,
         // wrap the payload INTO THE 
         // FIXME - retries?
         if write_blob {
-          if packet.packet_type == PacketType::RBEvent {
+          println!("Writing");
+          println!("{:?}", packet.packet_type);
+         // if packet.packet_type == PacketType::RBEvent {
+            println!("is rb event");
             match &mut file_on_disc {
               None => error!("We want to write data, however the file is invalid!"),
               Some(f) => {
+                println!("write to file");
                 f.write_all(packet.payload.as_slice());
               }
             }
-          }
+          //}
         }
         let tp_payload = packet.to_bytestream();
         match data_socket.send(tp_payload,zmq::DONTWAIT) {
@@ -479,39 +476,39 @@ pub fn monitoring(ch : &Sender<TofPacket>) {
 /// # Arguments
 ///
 ///
-pub fn read_data_buffers(bs_send     : Sender<Vec<u8>>,
-                         buff_trip   : u32,
+pub fn read_data_buffers(bs_send      : Sender<Vec<u8>>,
+                         buff_trip    : usize,
                          bar_a_sender : Option<Sender<u64>>,
                          bar_b_sender : Option<Sender<u64>>,
-                         switch_buff : bool) {
+                         switch_buff  : bool) {
   let buf_a = BlobBuffer::A;
   let buf_b = BlobBuffer::B;
   let sleeptime = time::Duration::from_millis(1000);
 
-  //let mut max_buf_a : u64 = 0;
-  //let mut max_buf_b : u64 = 0;
-  //let mut min_buf_a : u64 = 4294967295;
-  //let mut min_buf_b : u64 = 4294967295;
+  let mut max_buf_a : u64 = 0;
+  let mut max_buf_b : u64 = 0;
+  let mut min_buf_a : u64 = 4294967295;
+  let mut min_buf_b : u64 = 4294967295;
   // let's do some work
   loop {
-    //let a_occ = get_blob_buffer_occ(&buf_a).unwrap() as u64;
-    //let b_occ = get_blob_buffer_occ(&buf_b).unwrap() as u64;
-    //if a_occ > max_buf_a {
-    //  max_buf_a = a_occ;
-    //  println!("New MAX size for A {max_buf_a}");
-    //}
-    //if b_occ > max_buf_b  {
-    //  max_buf_b = b_occ;
-    //  println!("New MAX size for B {max_buf_b}");
-    //}
-    //if a_occ < min_buf_a {
-    //  min_buf_a = a_occ;
-    //  println!("New MIN size for A {min_buf_a}");
-    //}
-    //if b_occ < min_buf_b  {
-    //  min_buf_b = b_occ;
-    //  println!("New MIN size for B {min_buf_b}");
-    //}
+    let a_occ = get_blob_buffer_occ(&buf_a).unwrap() as u64;
+    let b_occ = get_blob_buffer_occ(&buf_b).unwrap() as u64;
+    if a_occ > max_buf_a {
+      max_buf_a = a_occ;
+      println!("New MAX size for A {max_buf_a}");
+    }
+    if b_occ > max_buf_b  {
+      max_buf_b = b_occ;
+      println!("New MAX size for B {max_buf_b}");
+    }
+    if a_occ < min_buf_a {
+      min_buf_a = a_occ;
+      println!("New MIN size for A {min_buf_a}");
+    }
+    if b_occ < min_buf_b  {
+      min_buf_b = b_occ;
+      println!("New MIN size for B {min_buf_b}");
+    }
     thread::sleep(sleeptime);
     buff_handler(&buf_a,
                  buff_trip,
@@ -532,7 +529,7 @@ pub fn read_data_buffers(bs_send     : Sender<Vec<u8>>,
 /// the DMA and the data buffers. Let's try an 
 /// aggressive scheme and do it several times.
 /// If we fail, something is wrong and we panic
-fn reset_data_memory_aggressively() {
+pub fn reset_data_memory_aggressively() {
   let one_milli = time::Duration::from_millis(1);
   let five_milli = time::Duration::from_millis(5);
   let buf_a = BlobBuffer::A;
@@ -541,7 +538,7 @@ fn reset_data_memory_aggressively() {
   
   for _ in 0..DMA_RESET_TRIES {
     match reset_dma() {
-      Ok(_)    => (),
+      Ok(_)    => break,
       Err(err) => {
         debug!("Resetting dma failed, err {:?}", err);
         thread::sleep(five_milli);
@@ -552,9 +549,18 @@ fn reset_data_memory_aggressively() {
   }
   let mut buf_a_occ = UIO1_MAX_OCCUPANCY;
   let mut buf_b_occ = UIO2_MAX_OCCUPANCY;
+  match blob_buffer_reset(&buf_a) {
+    Err(err) => warn!("Problem resetting buffer /dev/uio1 {:?}", err),
+    Ok(_)    => () 
+  }
+  match blob_buffer_reset(&buf_b) {
+    Err(err) => warn!("Problem resetting buffer /dev/uio1 {:?}", err),
+    Ok(_)    => () 
+  }
   match get_blob_buffer_occ(&buf_a) {
     Err(err) => debug!("Error getting blob buffer A occupnacy {err}"),
     Ok(val)  => {
+      println!("Got a value for the buffer A of {val}");
       buf_a_occ = val;
     }
   }
@@ -564,52 +570,52 @@ fn reset_data_memory_aggressively() {
       warn!("Error getting blob buffer B occupancy {err}");
     }
     Ok(val)  => {
+      println!("Got a value for the buffer B of {val}");
       buf_b_occ = val;
     }
+
   }
   thread::sleep(one_milli);
-  while buf_a_occ != UIO1_MIN_OCCUPANCY {
-    match blob_buffer_reset(&buf_a) {
-      Err(err) => warn!("Problem resetting buffer /dev/uio1 {:?}", err),
-      Ok(_)    => () 
-    }
-    thread::sleep(five_milli);
-    match get_blob_buffer_occ(&buf_a) {
-      Err(_) => {
-        warn!("Error reseting blob buffer A");
-        thread::sleep(five_milli);
-        n_tries += 1;
-        if n_tries == DMA_RESET_TRIES {
-          panic!("We were unable to reset DMA and the data buffers!");
-        }
-        continue;
-      }
-      Ok(val)  => {
-        buf_a_occ = val;
-      }
-    }
-  }
-  n_tries = 0;
-  while buf_b_occ != UIO2_MIN_OCCUPANCY {
-    match blob_buffer_reset(&buf_b) {
-      Err(err) => warn!("Problem resetting buffer /dev/uio2 {:?}", err),
-      Ok(_)    => () 
-    }
-    match get_blob_buffer_occ(&buf_b) {
-      Err(_) => {
-        warn!("Error getting occupancey for buffer B! (/dev/uio2)");
-        thread::sleep(five_milli);
-        n_tries += 1;
-        if n_tries == DMA_RESET_TRIES {
-          panic!("We were unable to reset DMA and the data buffers!");
-        }
-        continue;
-      }
-      Ok(val)  => {
-        buf_b_occ = val;
-      }
-    }
-  }
+  //while buf_a_occ != UIO1_MIN_OCCUPANCY {
+
+  //  match blob_buffer_reset(&buf_a) {
+  //    Err(err) => warn!("Problem resetting buffer /dev/uio1 {:?}", err),
+  //    Ok(_)    => () 
+  //  }
+  //  thread::sleep(five_milli);
+  //  match get_blob_buffer_occ(&buf_a) {
+  //    Err(_) => {
+  //      warn!("Error reseting blob buffer A");
+  //      thread::sleep(five_milli);
+  //      }
+  //      continue;
+  //    }
+  //    Ok(val)  => {
+  //      buf_a_occ = val;
+  //    }
+  //  }
+  //}
+  //n_tries = 0;
+  //while buf_b_occ != UIO2_MIN_OCCUPANCY {
+  //  match blob_buffer_reset(&buf_b) {
+  //    Err(err) => warn!("Problem resetting buffer /dev/uio2 {:?}", err),
+  //    Ok(_)    => () 
+  //  }
+  //  match get_blob_buffer_occ(&buf_b) {
+  //    Err(_) => {
+  //      warn!("Error getting occupancey for buffer B! (/dev/uio2)");
+  //      thread::sleep(five_milli);
+  //      n_tries += 1;
+  //      if n_tries == DMA_RESET_TRIES {
+  //        panic!("We were unable to reset DMA and the data buffers!");
+  //      }
+  //      continue;
+  //    }
+  //    Ok(val)  => {
+  //      buf_b_occ = val;
+  //    }
+  //  }
+  //}
 }
 
 ///  Ensure the buffers are filled and everything is prepared for data
@@ -634,25 +640,35 @@ fn make_sure_it_runs(will_panic : &mut u8,
     // Let's try to stop the DRS4 before
     // we're killing ourselves
     disable_trigger();
-    idle_drs4_daq().unwrap_or(());
+    //idle_drs4_daq().unwrap_or(());
     // FIXME - send out Alert
     panic!("I can not get this run to start. I'll kill myself!");
   }
+
+  match disable_trigger() {
+    Err(err) => error!("Can not disable triggers! Err {err}"),
+    Ok(_)    => trace!("Triggers enabled")
+  }
+  println!("Triggers stopped!");
+
   let five_milli = time::Duration::from_millis(5); 
   let one_sec    = time::Duration::from_secs(1);
   let two_secs   = time::Duration::from_secs(2);
   let five_secs  = time::Duration::from_secs(5);
-  match idle_drs4_daq() {
-    Err(err) => warn!("Issue setting DAQ to idle mode! {}", err),
-    Ok(_)    => ()
-  }
+  //match idle_drs4_daq() {
+  //  Err(err) => warn!("Issue setting DAQ to idle mode! {}", err),
+  //  Ok(_)    => ()
+  //}
   thread::sleep(five_milli);
-  match setup_drs4() { 
-    Err(err) => warn!("Issue running DRS4 setup routine {}", err),
-    Ok(_)    => ()
-  }
-  thread::sleep(five_milli);
-  reset_data_memory_aggressively();
+  //println!("Setup drs4");
+  //match setup_drs4() { 
+  //  Err(err) => warn!("Issue running DRS4 setup routine {}", err),
+  //  Ok(_)    => ()
+  //}
+  //println!("done");
+  //thread::sleep(five_milli);
+  //reset_data_memory_aggressively();
+  //println!("memory reset");
   thread::sleep(five_milli);
   if force_trigger {
     match disable_master_trigger_mode() {
@@ -661,18 +677,19 @@ fn make_sure_it_runs(will_panic : &mut u8,
     }
   }
 
-  match start_drs4_daq() {
-    Err(err) => {
-      debug!("Got err {:?} when trying to start the drs4 DAQ!", err);
-    }
-    Ok(_)  => {
-      trace!("Starting DRS4..");
-    }
-  }
+  //match start_drs4_daq() {
+  //  Err(err) => {
+  //    debug!("Got err {:?} when trying to start the drs4 DAQ!", err);
+  //  }
+  //  Ok(_)  => {
+  //    trace!("Starting DRS4..");
+  //  }
+  //}
   match enable_trigger() {
     Err(err) => error!("Can not enable triggers! Err {err}"),
     Ok(_)    => trace!("Triggers enabled")
   }
+  //println!("triggers enabled");
   // check that the data buffers are filling
   let buf_a = BlobBuffer::A;
   let buf_b = BlobBuffer::B;
@@ -689,6 +706,35 @@ fn make_sure_it_runs(will_panic : &mut u8,
 // palceholder
 #[derive(Debug)]
 pub struct FIXME {
+}
+
+/// Check if the buffers are actually filling
+/// 
+///  - if not, panic. We can't go on like that
+pub fn run_check() {
+  let buf_a = BlobBuffer::A;
+  let buf_b = BlobBuffer::B;
+
+  let interval = Duration::from_secs(5);
+  let mut n_iter = 0;
+  
+  let mut last_occ_a = get_blob_buffer_occ(&buf_a).unwrap();
+  let mut last_occ_b = get_blob_buffer_occ(&buf_b).unwrap();
+  enable_trigger();
+  loop {
+    n_iter += 1;
+    thread::sleep(interval);
+    let occ_a = get_blob_buffer_occ(&buf_a).unwrap();
+    let occ_b = get_blob_buffer_occ(&buf_b).unwrap();
+    if occ_a - last_occ_a == 0 && occ_b - last_occ_b == 0 {
+      panic!("We did not observe a change in occupancy for either one of the buffers!");
+    }
+    println!("-- buff size A {}", occ_a - last_occ_a);
+    println!("-- buff size B {}", occ_b - last_occ_b);
+    println!("---> Iter {n_iter}");
+    last_occ_a = occ_a;
+    last_occ_b = occ_b;
+  }
 }
 
 
@@ -710,14 +756,18 @@ fn kill_run(will_panic : &mut u8) {
     panic!("We can not kill the run! I'll kill myself!");
   }
   let one_milli        = time::Duration::from_millis(1);
-  match idle_drs4_daq() {
-    Ok(_)  => (),
-    Err(_) => {
-      warn!("Can not end run!");
-      thread::sleep(one_milli);
-      kill_run(will_panic)
-    }
+  match disable_trigger() {
+    Err(err) => error!("Can not disable triggers, error {err}"),
+    Ok(_)    => ()
   }
+  //match idle_drs4_daq() {
+  //  Ok(_)  => (),
+  //  Err(_) => {
+  //    warn!("Can not end run!");
+  //    thread::sleep(one_milli);
+  //    kill_run(will_panic)
+  //  }
+  //}
 }
 
 ///  A simple routine which runs until 
@@ -780,7 +830,7 @@ pub fn runner(max_events          : Option<u64>,
     if !is_running {
       match run_params.try_recv() {
         Err(err) => {
-          info!("Did not receive new RunParams! Err {err}");
+          trace!("Did not receive new RunParams! Err {err}");
           thread::sleep(one_sec);
           continue;
         }
@@ -792,7 +842,9 @@ pub fn runner(max_events          : Option<u64>,
       // FIXME - the is_active switch is useless
       if pars.is_active {
         info!("Will start a new run!");
+        println!("Initializing board, starting up...");
         make_sure_it_runs(&mut will_panic, force_trigger);
+        //println!("..done");
         info!("Begin Run!");
         is_running = true;
       } else {
@@ -816,13 +868,15 @@ pub fn runner(max_events          : Option<u64>,
         }
       }
 
+      //println!("here");
       match get_event_count() {
         Err (err) => {
-          debug!("Can not obtain event count! Err {:?}", err);
+          error!("Can not obtain event count! Err {:?}", err);
           thread::sleep(one_sec);    
           continue;
         }
         Ok (cnt) => {
+          //println!("Ok {cnt}");
           evt_cnt = cnt;
           if first_iter {
             last_evt_cnt = evt_cnt;
@@ -830,8 +884,9 @@ pub fn runner(max_events          : Option<u64>,
             continue;
           }
           if evt_cnt == last_evt_cnt {
-            thread::sleep(one_sec);
-            info!("We didn't get an updated event count!");
+            thread::sleep(one_milli);
+            trace!("We didn't get an updated event count!");
+            //println!("{evt_cnt}");
             continue;
           }
         }
@@ -840,7 +895,7 @@ pub fn runner(max_events          : Option<u64>,
       delta_events = (evt_cnt - last_evt_cnt) as u64;
       n_events += delta_events;
       last_evt_cnt = evt_cnt;
-      
+      //println!("Last event ctr {last_evt_cnt}"); 
       match &progress { 
         None => (),
         Some(sender) => {
@@ -850,7 +905,7 @@ pub fn runner(max_events          : Option<u64>,
           }
         }
       }
-      debug!("Checking for kill signal");
+      trace!("Checking for kill signal");
       // terminate if one of the 
       // criteria is fullfilled
       match kill_signal {
@@ -968,7 +1023,7 @@ pub fn event_cache_worker(recv_ev_pl    : Receiver<RBEventPayload>,
           event_cache.insert(event.event_id, event);
         }
         // keep track of the oldest event_id
-        debug!("We have a cache size of {}", event_cache.len());
+        trace!("We have a cache size of {}", event_cache.len());
         if event_cache.len() > cache_size {
           event_cache.remove(&oldest_event_id);
           oldest_event_id += 1;
@@ -1221,7 +1276,7 @@ impl Commander<'_> {
 ///
 ///  #Arguments: 
 ///
-pub fn get_buff_size(which : &BlobBuffer) ->Result<u32, RegisterError> {
+pub fn get_buff_size(which : &BlobBuffer) ->Result<usize, RegisterError> {
   let size : u32;
   let occ = get_blob_buffer_occ(&which)?;
   trace!("Got occupancy of {occ} for buff {which:?}");
@@ -1231,7 +1286,8 @@ pub fn get_buff_size(which : &BlobBuffer) ->Result<u32, RegisterError> {
     BlobBuffer::A => {size = occ - UIO1_MIN_OCCUPANCY;},
     BlobBuffer::B => {size = occ - UIO2_MIN_OCCUPANCY;}
   }
-  Ok(size)
+  let result = size as usize;
+  Ok(result)
 }
 
 ///  Deal with the raw data buffers.
@@ -1244,13 +1300,13 @@ pub fn get_buff_size(which : &BlobBuffer) ->Result<u32, RegisterError> {
 ///
 ///  * buff_trip : size which triggers buffer readout.
 pub fn buff_handler(which       : &BlobBuffer,
-                    buff_trip   : u32,
+                    buff_trip   : usize,
                     bs_sender   : Option<&Sender<Vec<u8>>>,
                     prog_sender : Option<Sender<u64>>,
                     //prog_bar    : &Option<Box<ProgressBar>>,
                     switch_buff : bool) {
   let sleep_after_reg_write = Duration::from_millis(SLEEP_AFTER_REG_WRITE as u64);
-  let buff_size : u32;
+  let buff_size : usize;
   match get_buff_size(&which) {
     Ok(bf)   => { 
       buff_size = bf;
@@ -1437,20 +1493,21 @@ pub fn setup_drs4() -> Result<(), RegisterError> {
 
   // before we do anything, set the DRS in idle mode 
   // and set the configure bit
-  idle_drs4_daq()?;
-  thread::sleep(one_milli);
-  set_drs4_configure()?;
-  thread::sleep(one_milli);
+  //idle_drs4_daq()?;
+  //thread::sleep(one_milli);
+  //set_drs4_configure()?;
+  //thread::sleep(one_milli);
 
   // Sanity checking
   //let max_samples     : u32 = 65000;
   //let max_duration    : u32 = 1440; // Minutes in 1 day
 
-  reset_daq()?;
-  thread::sleep(one_milli);
-  
-  reset_dma()?;
-  thread::sleep(one_milli);
+  //reset_daq()?;
+  //thread::sleep(one_milli);
+  //reset_drs()?;
+  //thread::sleep(one_milli);
+  //reset_dma()?;
+  //thread::sleep(one_milli);
   clear_dma_memory()?;
   thread::sleep(one_milli);
   
@@ -1493,8 +1550,8 @@ pub fn setup_drs4() -> Result<(), RegisterError> {
 /// Intended to be run in a seperate thread
 ///
 pub fn progress_runner(max_events      : u64,
-                       uio1_total_size : u64,
-                       uio2_total_size : u64,
+                       uio1_total_size : usize,
+                       uio2_total_size : usize,
                        update_bar_a    : Receiver<u64>,
                        update_bar_b    : Receiver<u64>,
                        update_bar_ev   : Receiver<u64>,
@@ -1521,9 +1578,9 @@ pub fn progress_runner(max_events      : u64,
   let multi_prog = MultiProgress::new();
 
   let prog_a  = multi_prog
-                .add(ProgressBar::new(uio1_total_size)); 
+                .add(ProgressBar::new(uio1_total_size as u64)); 
   let prog_b  = multi_prog
-                .insert_after(&prog_a, ProgressBar::new(uio2_total_size)); 
+                .insert_after(&prog_a, ProgressBar::new(uio2_total_size as u64)); 
   let prog_ev = multi_prog
                 .insert_after(&prog_b, ProgressBar::new(max_events)); 
   

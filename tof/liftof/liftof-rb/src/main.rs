@@ -1,4 +1,11 @@
-
+//! # Radoutboard software for the GAPS experiment, TOF system
+//! 
+//! This software shall help with data acquisition and commandeering 
+//! of the readoutboards (RB) used in the tof system of the GAPS 
+//! science experiment.
+//!
+//!
+//!
 use std::{thread, time};
 
 extern crate crossbeam_channel;
@@ -15,6 +22,8 @@ use local_ip_address::local_ip;
 use liftof_rb::api::*;
 use liftof_rb::control::*;
 use liftof_rb::memory::{BlobBuffer,
+                    EVENT_SIZE,
+                    DATABUF_TOTAL_SIZE,
                     UIO1_MAX_OCCUPANCY,
                     UIO2_MAX_OCCUPANCY,
                     UIO1_MIN_OCCUPANCY,
@@ -36,14 +45,9 @@ use tof_dataclasses::serialization::Serialization;
 extern crate pretty_env_logger;
 #[macro_use] extern crate log;
 
-use log::{info, LevelFilter};
+//use log::{info, LevelFilter};
 use std::io::Write;
 
-/// The 0MQ PUB port is defined as DATAPORT_START + readoutboard_id
-const DATAPORT_START : u32 = 30000;
-
-/// The 0MP REP port is defined as CMDPORT_START + readoutboard_id
-const CMDPORT_START  : u32 = 40000;
 
 extern crate clap;
 use clap::{arg,
@@ -56,32 +60,33 @@ use clap::{arg,
 #[derive(Parser, Debug)]
 #[command(author = "J.A.Stoessl", version, about, long_about = None)]
 struct Args {
-  /// Value for wich the buffers are forced to 
-  /// be read out!
-  #[arg(short, long, default_value_t = 66520576)]
-  buff_trip: u32,
-  /// Listen to the server at the tof computer
-  #[arg(short, long, default_value_t = false)]
-  dont_listen: bool,
-  /// Allow the software to switch buffers manually.
-  /// This might be needed for custom values of buff-trip
-  #[arg(short, long, default_value_t = false)]
-  switch_buffers: bool,
+  /// Size of the internal eventbuffers which are mapped to /dev/uio1 
+  /// and /dev/uio2. These buffers are maximum of about 64 MBytes.
+  /// Depending on the event rate, this means that the events might
+  /// sit quit a while in the buffers (~10s of seconds)
+  /// To mitigate that waiting time, we can choose a smaller buffer
+  /// The size of the buffer here is in <number_of_events_in_buffer>
+  /// [! The default value is in bytes, since per default the buffers 
+  /// don't hold an integer number of events]
+  #[arg(short, long, default_value_t = 66524928)]
+  buff_trip: usize,
   /// Show progress bars to indicate buffer fill values and number of acquired events
   #[arg(long, default_value_t = false)]
   show_progress: bool,
-  /// Acquire this many events
-  #[arg(short, long, default_value_t = 10000)]
+  /// Acquire this many events.
+  /// If either --nevents or --run-forever options are given
+  /// the board will not wait for a remote command, but start datataking as soon as 
+  /// possible
+  #[arg(short, long, default_value_t = 0)]
   nevents: u64,
   /// Cache size of the internal event cache in events
   #[arg(short, long, default_value_t = 10000)]
   cache_size: usize,
-  ///// A json config file with detector information
-  //#[arg(short, long)]
-  //json_config: Option<std::path::PathBuf>,
-  /// Run without stopping. Control by remote through `TofCommand`
+  /// If either --nevents or --run-forever options are given
+  /// the board will not wait for a remote command, but start datataking as soon as 
+  /// possible
   #[arg(long, default_value_t = false)]
-  run_forevever: bool,
+  run_forever: bool,
   /// Activate the forced trigger. The value is the desired rate 
   #[arg(long, default_value_t = 0)]
   force_trigger: u32,
@@ -96,10 +101,10 @@ struct Args {
   /// Readoutboard testing with softare trigger
   #[arg(long, default_value_t = false)]
   rb_test_sw : bool,
+  ///// CnC server IP we should be listening to
+  //#[arg(long, default_value_t = "10.0.1.1")]
+  //cmd_server_ip : &'static str,
 }
-
-
-/// END IMPLEMENTATION OF THREADS
 
 fn main() {
 
@@ -119,69 +124,51 @@ fn main() {
   //                        .init();
   pretty_env_logger::init();
 
-  let sparkle_heart         = vec![240, 159, 146, 150];
   let kraken                = vec![240, 159, 144, 153];
   let fish                  = vec![240, 159, 144, 159];
   let sparkles              = vec![226, 156, 168];
-  let rocket                = vec![240, 159, 154, 128];
   // We know these bytes are valid, so we'll use `unwrap()`.
-  let sparkle_heart    = String::from_utf8(sparkle_heart).unwrap();
   let kraken           = String::from_utf8(kraken).unwrap();
   let fish             = String::from_utf8(fish).unwrap();
   let sparkles         = String::from_utf8(sparkles).unwrap();
-  let rocket           = String::from_utf8(rocket).unwrap();
 
   // General parameters, readout board id,, 
   // ip to tof computer
 
   let rb_id = get_board_id().expect("Unable to obtain board ID!");
   let dna   = get_device_dna().expect("Unable to obtain device DNA!"); 
-  // this is currently not needed, since 
-  // we are using the server/client setup wher
-  // this is the client
-  let mut address_ip = String::from("tcp://");
-  let this_board_ip = local_ip().unwrap();
-  match this_board_ip {
-    IpAddr::V4(ip) => address_ip += &ip.to_string(),
-    IpAddr::V6(_) => panic!("Currently, we do not support IPV6!")
-  }
   
-  // Set up 2 ports for 0MQ communications
-  // 1) control flow REP 
-  // 2) data flow PUB
-  let cmd_port    = CMDPORT_START + get_board_id().unwrap();
-  let cmd_address : String = address_ip.clone() + ":" + &cmd_port.to_string();
-  
-  let data_port    = DATAPORT_START + get_board_id().unwrap();
-  let data_address : String = address_ip + ":" + &data_port.to_string();
+  let mut switch_buff   = false;
   
   let args = Args::parse();                   
   let buff_trip         = args.buff_trip;         
-  let switch_buff       = args.switch_buffers;    
-  let mut max_event     = args.nevents;
+  let mut n_events_run  = args.nevents;
   let mut show_progress = args.show_progress;
   let cache_size        = args.cache_size;
-  let mut dont_listen   = args.dont_listen;
-  let run_forever       = args.run_forevever;
+  let run_forever       = args.run_forever;
   let stream_any        = args.stream_any;
   let mut force_trigger = args.force_trigger;
   let rb_test           = args.rb_test_ext || args.rb_test_sw;
   
+  //FIMXE - this needs to become part of clap
+  let cmd_server_ip = String::from("10.0.1.1");
+  //let cmd_server_ip     = args.cmd_server_ip;  
   if rb_test {
-    dont_listen = true;
     show_progress = true;
-    max_event = 880;
+    n_events_run = 880;
     if args.rb_test_sw {
       force_trigger = 2000;
     }
   }  
 
+  let this_board_ip = local_ip().expect("Unable to obtainl local board IP. Something is messed up!");
+  let rate = get_trigger_rate().expect("I can not read from the get trigger rate register, this is bad!");
 
   // welcome banner!
   println!("-----------------------------------------------");
-  println!(" ** Welcome to liftof-rb {} \u{1F388} *****", rocket);
+  println!(" ** Welcome to liftof-rb \u{1F680} \u{1F388} *****");
   println!(" .. liftof if a software suite for the time-of-flight detector ");
-  println!(" .. for the GAPS experiment {}", sparkle_heart);
+  println!(" .. for the GAPS experiment \u{1F496}");
   println!(" .. this client can be run standalone or connect to liftof-cc" );
   println!(" .. or liftof-tui for an interactive experience" );
   println!(" .. see the gitlab repository for documentation and submitting issues at" );
@@ -189,31 +176,28 @@ fn main() {
   println!("-----------------------------------------------");
   println!(" => Running client for RB {}", rb_id);
   println!(" => ReadoutBoard DNA {}", dna);
-  println!(" => Will bind local ZMQ PUB socket for data stream to {}", data_address);
-  if !dont_listen { 
-    println!(" => Will bind local ZMQ REP socket for control to {}"  , cmd_address);
-  } 
+  println!(" => Currently the board sees triggers at {rate} Hz");
+  println!(" => We will BIND this port to the local ip address at {}", this_board_ip);
+  println!(" => -- -- PORT {} (0MQ PUB) to publish our data", DATAPORT);
+  println!(" => We will CONNECT to the following port on the C&C server at address: {}", cmd_server_ip);
+  println!(" => -- -- PORT {} (0MQ SUB) where we will be listening for commands", DATAPORT);
   println!("-----------------------------------------------");
-  println!("");                             
   if rb_test {
-    println!("Will run in rb testing mode!");
-    warn!("RB testing mode!");
+    println!("=> We will run in rb testing mode!");
     println!("-----------------------------------------------"); 
   } 
-  
+  reset_data_memory_aggressively();
+  reset_data_memory_aggressively();
+  reset_data_memory_aggressively();
+  let mut uio1_total_size = DATABUF_TOTAL_SIZE;
+  let mut uio2_total_size = DATABUF_TOTAL_SIZE;
 
-
-
-  let mut uio1_total_size = (UIO1_MAX_OCCUPANCY - UIO1_MIN_OCCUPANCY) as u64;
-  let mut uio2_total_size = (UIO2_MAX_OCCUPANCY - UIO2_MIN_OCCUPANCY) as u64;
-
-  if (buff_trip > uio1_total_size as u32 ) || (buff_trip > uio2_total_size as u32) {
-    println!("Invalid value for --buff-trip. Panicking!");
-    panic!("Tripsize of {buff_trip} exceeds buffer sizes of A : {uio1_total_size} or B : {uio2_total_size}");
+  if (buff_trip*EVENT_SIZE > uio1_total_size) || (buff_trip*EVENT_SIZE > uio2_total_size) {
+    error!("Invalid value for --buff-trip. Panicking!");
+    panic!("Tripsize of {buff_trip}*EVENT_SIZE exceeds buffer sizes of A : {uio1_total_size} or B : {uio2_total_size}. The EVENT_SIZE is {EVENT_SIZE}");
   }
 
-  info!("Will set buffer trip size to {buff_trip}");
-
+  info!("Will set buffer trip size to an equivalent of {buff_trip} events");
 
   // some pre-defined time units for 
   // sleeping
@@ -265,17 +249,22 @@ fn main() {
   let (pb_a_up_send, pb_a_up_recv   ) : (Sender<u64>, Receiver<u64>) = unbounded();  
   let (pb_b_up_send, pb_b_up_recv   ) : (Sender<u64>, Receiver<u64>) = unbounded(); 
   let (pb_ev_up_send, pb_ev_up_recv ) : (Sender<u64>, Receiver<u64>) = unbounded(); 
-  //let (kill_bars, bar_killed        ) : (Sender<bool>, Receiver<bool>) = unbounded();  
 
-
-  //thread::sleep(one_milli);
-  
-  if buff_trip != 66520576 {
-    uio1_total_size = buff_trip as u64;
-    uio2_total_size = buff_trip as u64;
+  if buff_trip != DATABUF_TOTAL_SIZE {
+    uio1_total_size = EVENT_SIZE*buff_trip;
+    uio2_total_size = EVENT_SIZE*buff_trip;
+    // if we change the buff size, we HAVE to manually swith 
+    // the buffers since the fw does not know about this change, 
+    // it is software only
+    switch_buff     = true;
   }
  
-
+  // write a few registers - this might go to 
+  // the init script
+  match disable_evt_fragments() {
+    Err(err) => error!("Can not disable writing of event fragments!"),
+    Ok(_)    => ()
+  }
   // now we are ready to receive data 
 
   // Setup routines 
@@ -301,18 +290,20 @@ fn main() {
   });
   
 
-  if !dont_listen {
-    let set_op_mode_c = set_op_mode.clone();
-    let run_params_to_main_c = run_params_to_main.clone();
-    workforce.execute(move || {
-                      cmd_responder(&rsp_from_client,  
-                                    &set_op_mode_c,
-                                    &run_params_to_main_c,
-                                    &evid_to_cache )
-                                    //&cmd_to_client   )  
-    
-    });
-  }
+  /// Respond to commands from the C&C server
+  let set_op_mode_c        = set_op_mode.clone();
+  let run_params_to_main_c = run_params_to_main.clone();
+  let heartbeat_timeout_seconds : u32 = 10;
+  workforce.execute(move || {
+                    cmd_responder(cmd_server_ip,
+                                  heartbeat_timeout_seconds,
+                                  &rsp_from_client,  
+                                  &set_op_mode_c,
+                                  &run_params_to_main_c,
+                                  &evid_to_cache )
+                                  //&cmd_to_client   )  
+  
+  });
   // this thread deals JUST with the data
   // buffers. It reads them and then 
   // passes on the data
@@ -337,7 +328,7 @@ fn main() {
 
   // if we are not listening to the C&C server,
   // we have to start the run thread here
-  if dont_listen {  
+  if n_events_run > 0 || run_forever {  
     let mut p_op : Option<Sender<u64>> = None;
     if show_progress {
       let tmp_send = pb_ev_up_send.clone();
@@ -345,7 +336,7 @@ fn main() {
     }
     let run_params_from_cmdr_c = run_params_from_cmdr.clone();
     workforce.execute(move || {
-        runner(Some(max_event),
+        runner(Some(n_events_run),
                None,
                None,
                p_op,
@@ -357,22 +348,14 @@ fn main() {
     // we start the run by creating new RunParams
     let run_pars = RunParams {
       forever   : run_forever,
-      nevents   : max_event as u32,
+      nevents   : n_events_run as u32,
       is_active : true,
     };
     match run_params_to_main.send(run_pars) {
-      Err(err) => warn!("Could not initialzie Run! Err {err}"),
-      Ok(_)    => info!("Run initialized!")
+      Err(err) => error!("Could not initialzie Run! Err {err}"),
+      Ok(_)    => println!("Run initialized! Attempting to start!")
     }
   }
-
-  // Now set up PUB socket 
-  // The pub socket is always present, even in don't listen configuration
-  // (Nobody is forced to listen to it, and it will just drop its data 
-  // if it does not have any subscribers)
-  //let data_socket = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
-  //data_socket.bind(&data_address).expect("Unable to bind to data (PUB) socket {data_adress}");
-  //info!("0MQ SUB socket bound to address {data_address}");
  
   workforce.execute(move || {
     data_publisher(&tp_from_client, rb_test); 
@@ -385,7 +368,7 @@ fn main() {
   if show_progress {
     let kill_clone = run_gets_killed.clone();
     workforce.execute(move || { 
-      progress_runner(max_event,      
+      progress_runner(n_events_run,      
                       uio1_total_size,
                       uio2_total_size,
                       pb_a_up_recv ,
@@ -404,13 +387,12 @@ fn main() {
   // let go for a few seconds to get a 
   // rate estimate
   //thread::sleep(two_seconds);
-  //let rate = get_trigger_rate().unwrap();
   //info!("Current trigger rate: {rate}Hz");
   //let mut command  : cmd::TofCommand;
   if stream_any {
     match set_op_mode.send(TofOperationMode::TofModeStreamAny) {
-      Err(err) => warn!("Can not set TofOperationMode to StreamAny! Err {err}"),
-      Ok(_)    => ()
+      Err(err) => error!("Can not set TofOperationMode to StreamAny! Err {err}"),
+      Ok(_)    => info!("Using RBMode STREAM_ANY")
     }
   }
 
@@ -426,7 +408,7 @@ fn main() {
     // what we are here listening to, are commands which 
     // impact threads. E.g. StartRun will start a new data run
     // which is it's own thread
-    if dont_listen {
+    if n_events_run > 0 || run_forever {
       thread::sleep(10*one_sec);
       continue;
     }

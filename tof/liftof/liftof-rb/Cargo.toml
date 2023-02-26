@@ -1,6 +1,6 @@
 [package]
 name = "liftof-rb"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 
 
@@ -15,6 +15,10 @@ path = "src/main.rs"
 [[bin]]
 name = "watch-buffer-fill"
 path = "src/bin/watch_buffer_fill.rs"
+
+[[bin]]
+name = "scan-uio-buffers"
+path = "src/bin/scan_uio_buffers.rs"
 
 [[bin]]
 name = "debug-idle"

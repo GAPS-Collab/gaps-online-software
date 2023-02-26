@@ -1,18 +1,19 @@
 #include "serialization.h"
 
 #include "TOFCommon.h"
+#include "TofTypeDefs.h"
 
-unsigned short decode_ushort(const std::vector<unsigned char>& bytestream,
-                             unsigned int start_pos)
+u16 decode_ushort(const vec_u8& bytestream,
+                             u32 start_pos)
 {
-  unsigned short value= (unsigned short)(((bytestream[start_pos+0] & 0xFF) << 8) | bytestream[start_pos+1]);
+  u16 value= (u16)(((bytestream[start_pos+0] & 0xFF) << 8) | bytestream[start_pos+1]);
   return value;
 }
 
 /***********************************************/
 
-short decode_short(const std::vector<unsigned char>& bytestream,
-                   unsigned int start_pos)
+short decode_short(const vec_u8& bytestream,
+                   u32 start_pos)
 {
   //short value = (short)(((bytestream[start_pos+0] & 0xFF) << 8) | bytestream[start_pos+1]);
   short value = (short)(((bytestream[start_pos+0]) << 8) | bytestream[start_pos+1]);
@@ -22,8 +23,8 @@ short decode_short(const std::vector<unsigned char>& bytestream,
 
 /***********************************************/
 
-short decode_short_rev(const std::vector<unsigned char>& bytestream,
-                   unsigned int start_pos)
+short decode_short_rev(const vec_u8& bytestream,
+                   u32 start_pos)
 {
   short value= (short)(((bytestream[start_pos+1] & 0xFF) << 8) | bytestream[start_pos+0]);
   return value;
@@ -31,28 +32,28 @@ short decode_short_rev(const std::vector<unsigned char>& bytestream,
 
 /***********************************************/
 
-unsigned short decode_ushort_rev(const std::vector<unsigned char>& bytestream,
-                             unsigned int start_pos)
+u16 decode_ushort_rev(const vec_u8& bytestream,
+                             u32 start_pos)
 {
-  unsigned short value= (unsigned short)(((bytestream[start_pos+1] & 0xFF) << 8) | bytestream[start_pos+0]);
+  u16 value= (u16)(((bytestream[start_pos+1] & 0xFF) << 8) | bytestream[start_pos+0]);
   return value;
 }
 
 /***********************************************/
 
-void encode_ushort(unsigned short value,
-                   std::vector<unsigned char>& bytestream,
-                   unsigned int start_pos)
+void encode_ushort(u16 value,
+                   vec_u8& bytestream,
+                   u32 start_pos)
 {
-  //std::vector<unsigned char> buffer(2);
+  //vec_u8 buffer(2);
   bytestream[start_pos + 0] = (value >> 8) & 0xFF;
   bytestream[start_pos + 1] = value & 0xFF;
 }
 
 /***********************************************/
 
-int16_t decode_14bit(const std::vector<unsigned char>& bytestream,
-                     unsigned int start_pos)
+int16_t decode_14bit(const vec_u8& bytestream,
+                     u32 start_pos)
 {
    int16_t value =  decode_short_rev(bytestream, start_pos);
    return  value & 0x3FFF;
@@ -61,11 +62,11 @@ int16_t decode_14bit(const std::vector<unsigned char>& bytestream,
 
 /***********************************************/
 
-void encode_ushort_rev(unsigned short value,
-                   std::vector<unsigned char>& bytestream,
-                   unsigned int start_pos)
+void encode_ushort_rev(u16 value,
+                   vec_u8& bytestream,
+                   u32 start_pos)
 {
-  //std::vector<unsigned char> buffer(2);
+  //vec_u8 buffer(2);
   bytestream[start_pos + 1] = (value >> 8) & 0xFF;
   bytestream[start_pos + 0] = value & 0xFF;
 }
@@ -73,20 +74,20 @@ void encode_ushort_rev(unsigned short value,
 /***********************************************/
 
 void encode_short_rev(short value,
-                      std::vector<unsigned char>& bytestream,
-                      unsigned int start_pos)
+                      vec_u8& bytestream,
+                      u32 start_pos)
 {
-  //std::vector<unsigned char> buffer(2);
+  //vec_u8 buffer(2);
   bytestream[start_pos + 1] = (value >> 8) & 0xFF;
   bytestream[start_pos + 0] = value & 0xFF;
 }
 
 /***********************************************/
 
-uint32_t decode_uint32(const std::vector<unsigned char>& bytestream,
-                       unsigned int start_pos)
+u32 decode_uint32(const vec_u8& bytestream,
+                       u32 start_pos)
 {
-  uint32_t value = (uint32_t)(
+  u32 value = (u32)(
          ((bytestream[start_pos+0] & 0xFF) << 24)
       |  ((bytestream[start_pos+1] & 0xFF) << 16)
       |  ((bytestream[start_pos+2] & 0xFF) << 8)
@@ -96,10 +97,10 @@ uint32_t decode_uint32(const std::vector<unsigned char>& bytestream,
 
 /***********************************************/
 
-uint32_t decode_uint32_rev(const vec_u8 &bytestream,
-                           unsigned int start_pos)
+u32 decode_uint32_rev(const vec_u8 &bytestream,
+                           u32 start_pos)
 {
-  uint32_t value = (uint32_t)(
+  u32 value = (u32)(
          ((bytestream[start_pos+1] & 0xFF) << 24)
       |  ((bytestream[start_pos+0] & 0xFF) << 16)
       |  ((bytestream[start_pos+3] & 0xFF) << 8)
@@ -133,9 +134,9 @@ void u32_to_le_bytes(u32 value,
 
 /***********************************************/
 
-void encode_uint32(uint32_t value, 
-                   std::vector<unsigned char>& bytestream, 
-                   unsigned int start_pos)
+void encode_uint32(u32 value, 
+                   vec_u8& bytestream, 
+                   u32 start_pos)
 {
   bytestream[start_pos + 0] = (value >> 24) & 0xFF;
   bytestream[start_pos + 1] = (value >> 16) & 0xFF;
@@ -145,9 +146,9 @@ void encode_uint32(uint32_t value,
 
 /***********************************************/
 
-void encode_uint32_rev(uint32_t value,
-                       std::vector<unsigned char>& bytestream,
-                       unsigned int start_pos)
+void encode_uint32_rev(u32 value,
+                       vec_u8& bytestream,
+                       u32 start_pos)
 {
 
   bytestream[start_pos + 1] = (value >> 24) & 0xFF;
@@ -180,8 +181,8 @@ u64 u64_from_le_bytes(const vec_u8 &bytestream,
   return buffer;
 }
 
-uint64_t decode_uint64(const std::vector<unsigned char>& bytestream,
-                       unsigned int start_pos)
+uint64_t decode_uint64(const vec_u8& bytestream,
+                       u32 start_pos)
 {
   uint64_t buffer64 = 0x0000000000000000;
 
@@ -201,8 +202,8 @@ uint64_t decode_uint64(const std::vector<unsigned char>& bytestream,
 
 /***********************************************/
 
-uint64_t decode_uint64_rev(const std::vector<unsigned char>& bytestream,
-                           unsigned int start_pos)
+uint64_t decode_uint64_rev(const vec_u8& bytestream,
+                           u32 start_pos)
 {
   uint64_t buffer64 = 0x0000000000000000;
 
@@ -239,8 +240,8 @@ void u64_to_le_bytes(u64 value,
 /***********************************************/
 
 void encode_uint64(uint64_t value, 
-                   std::vector<unsigned char>& bytestream, 
-                   unsigned int start_pos)
+                   vec_u8& bytestream, 
+                   u32 start_pos)
 {
   bytestream[start_pos + 0] = (value >> 56) & 0xFF;
   bytestream[start_pos + 1] = (value >> 48) & 0xFF;
@@ -255,8 +256,8 @@ void encode_uint64(uint64_t value,
 /***********************************************/
 
 void encode_uint64_rev(uint64_t value,
-                       std::vector<unsigned char>& bytestream,
-                       unsigned int start_pos)
+                       vec_u8& bytestream,
+                       u32 start_pos)
 {
   bytestream[start_pos + 1] = (value >> 56) & 0xFF;
   bytestream[start_pos + 0] = (value >> 48) & 0xFF;
@@ -279,8 +280,8 @@ void encode_uint64_rev(uint64_t value,
 /***********************************************/
 
 void encode_timestamp(uint64_t value,
-                       std::vector<unsigned char>& bytestream,
-                       unsigned int start_pos)
+                       vec_u8& bytestream,
+                       u32 start_pos)
 {
   //bytestream[start_pos + 1] = (value >> 56) & 0xFF;
   //bytestream[start_pos + 0] = (value >> 48) & 0xFF;
@@ -294,8 +295,8 @@ void encode_timestamp(uint64_t value,
 
 /***********************************************/
 
-uint64_t decode_timestamp(const std::vector<unsigned char>& bytestream,
-                          unsigned int start_pos)
+uint64_t decode_timestamp(const vec_u8& bytestream,
+                          u32 start_pos)
 {
   uint64_t buffer64 = 0x0000000000000000;
 
@@ -315,8 +316,8 @@ uint64_t decode_timestamp(const std::vector<unsigned char>& bytestream,
 /***********************************************/
 
 void encode_48(uint64_t value, 
-               std::vector<unsigned char>& bytestream, 
-               unsigned int start_pos)
+               vec_u8& bytestream, 
+               u32 start_pos)
 {
   bytestream[start_pos + 0] = (value >> 40) & 0xFF;
   bytestream[start_pos + 1] = (value >> 32) & 0xFF;
@@ -329,8 +330,8 @@ void encode_48(uint64_t value,
 /***********************************************/
 
 void encode_48_rev(uint64_t value, 
-                   std::vector<unsigned char>& bytestream,
-                   unsigned int start_pos)
+                   vec_u8& bytestream,
+                   u32 start_pos)
 {
   bytestream[start_pos + 5] = (value >> 40) & 0xFF;
   bytestream[start_pos + 4] = (value >> 32) & 0xFF;
@@ -401,9 +402,9 @@ float decode_12bitsensor(uint16_t value, float minrange, float maxrange)
 ///***********************************************/
 //
 
-void encode_blobevent(const BlobEvt_t* evt, std::vector<uint8_t> &bytestream, unsigned int start_pos)
+void encode_blobevent(const BlobEvt_t* evt, std::vector<uint8_t> &bytestream, u32 start_pos)
 {
-  unsigned int enc_pos = start_pos;
+  u32 enc_pos = start_pos;
   encode_ushort_rev(evt->head,        bytestream, enc_pos); enc_pos += 2;
   encode_ushort_rev(evt->status,      bytestream, enc_pos); enc_pos += 2;
   encode_ushort_rev(evt->len,         bytestream, enc_pos); enc_pos += 2;
@@ -438,11 +439,11 @@ void encode_blobevent(const BlobEvt_t* evt, std::vector<uint8_t> &bytestream, un
 /***********************************************/
 
 BlobEvt_t decode_blobevent(const std::vector<uint8_t> &bytestream,
-                           unsigned int start_pos,
-                           unsigned int end_pos)
+                           u32 start_pos,
+                           u32 end_pos)
 {
   BlobEvt_t event;
-  unsigned int dec_pos = start_pos;
+  u32 dec_pos = start_pos;
   event.head      = decode_ushort_rev( bytestream, 0); dec_pos += 2;
   event.status    = decode_ushort_rev( bytestream, dec_pos); dec_pos += 2;
   event.len       = decode_ushort_rev( bytestream, dec_pos); dec_pos += 2;
@@ -475,16 +476,16 @@ BlobEvt_t decode_blobevent(const std::vector<uint8_t> &bytestream,
 
 /***********************************************/
 
-long unsigned int search_for_2byte_marker(const std::vector<uint8_t> &bytestream,
+u64 search_for_2byte_marker(const std::vector<uint8_t> &bytestream,
                             uint8_t marker,
                             bool &has_ended,
-                            int32_t start_pos,
-                            int32_t end_pos)
+                            i32 start_pos,
+                            i32 end_pos)
 {
   has_ended = false;
   if ((end_pos == bytestream.size()) || (end_pos == -1)) 
     { end_pos = bytestream.size() - 1;} 
-  for (long unsigned int k=start_pos; k<end_pos; k++)
+  for (u64 k=start_pos; k<end_pos; k++)
     { 
       if ((bytestream[k] == marker) && (bytestream[k+1] == marker)) 
         { return k;}
@@ -495,9 +496,9 @@ long unsigned int search_for_2byte_marker(const std::vector<uint8_t> &bytestream
 
 /***********************************************/
 
-std::vector<uint32_t> get_2byte_markers_indices(const std::vector<uint8_t> &bytestream, uint8_t marker)
+std::vector<u32> get_2byte_markers_indices(const std::vector<uint8_t> &bytestream, uint8_t marker)
 {
-  std::vector<uint32_t> indices;
+  std::vector<u32> indices;
   for (size_t k=0; k<bytestream.size() -1; k++)
     { 
       if ((bytestream[k] == marker) && (bytestream[k+1] == marker)) 
@@ -522,8 +523,8 @@ std::vector<BlobEvt_t> get_events_from_stream(const vec_u8 &bytestream,
   i64 event_size; // can be negative if things go wrong
 
   size_t n_events_found = 0;
-  uint32_t n_iter_debug = 0;
-  uint32_t n_iter_stuck_debug = 0;
+  u32 n_iter_debug = 0;
+  u32 n_iter_stuck_debug = 0;
   bool has_ended = false;
   //unsigned long head_start = 0;
   uint nheaders = 0;

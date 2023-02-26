@@ -1,13 +1,11 @@
-/***********************************
- * Readoutboard data, calibration and 
- * waveform analysis.
- *
- * Basically a translation of the 
- * tof library written by 
- * J. Zweerink
- *
- *
- ***********************************/
+//! Readoutboard data, calibration and 
+//! waveform analysis.
+//!
+//! Basically a translation of the 
+//! tof library written by 
+//! J. Zweerink
+//!
+//!
 
 use std::fmt;
 

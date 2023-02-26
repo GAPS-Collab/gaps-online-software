@@ -1,9 +1,3 @@
-#include <string>
-#include <sstream>
-#include <iostream>
-#include <cstddef>
-#include <cstring>
-
 #include "parsers.h"
 #include "serialization.h"
 #include "packets/REventPacket.h"
@@ -109,9 +103,6 @@ vec_u8 REventPacket::serialize() const
         pos += paddle_payload.size();
     } 
   encode_ushort(tail, buffer, pos); pos+=2;  // done
-
-  //std::cout << "[INFO]<serialize> buffer size : " << buffer.size() << std::endl;
-  
   return buffer; 
 }
 
@@ -131,7 +122,7 @@ u32 REventPacket::deserialize(vec_u8 &bytestream,
   //unsigned int end_pos = start_pos;
   // check if we find the header at start_pos
   u16 value = Gaps::u16_from_le_bytes(bytestream, start_pos);
-  if (!(value == head))
+  if (value != head)
     {spdlog::error("No header found!");}
   //u64 pos = 2 + start_pos; // position in bytestream, 2 since we 
                     // just decoded the header
@@ -204,28 +195,19 @@ u32 REventPacket::deserialize(vec_u8 &bytestream,
       break;
     }
   }
-  //for (size_t k=0;k<n_paddles;k++)
-  //  {  
-  //   p.deserialize(bytestream, pos);
-  //   paddle_info.push_back(p);
-  //   pos += p.calculate_length();
-  //  }
-  unsigned short payload_tail = Gaps::u32_from_le_bytes(bytestream, pos);
-  //std::cout << "[DEBUG] expected packet size = " << expected_packet_size << " received " << pos << " bytes!" << std::endl; 
+  u16 payload_tail = Gaps::u32_from_le_bytes(bytestream, pos);
   if (payload_tail != tail) //|| (expected_packet_size != pos))
      {
-         //std::cerr << "[ERROR] broken package! Tail flag "<< payload_tail 
-         //    //<< " expected size " << expected_packet_size 
-         //    << " received " << pos << " bytes!" << std::endl;
-         broken = true;
+        spdlog::error("Broken package! Tail flag is not correct!");
+        //std::cerr << "[ERROR] broken package! Tail flag "<< payload_tail 
+        //    //<< " expected size " << expected_packet_size 
+        //    << " received " << pos << " bytes!" << std::endl;
+        broken = true;
      }
 
   if (paddle_info.size() != n_paddles) {
     broken = true;
   }
-  // checks for debugging
-  //assert (payload_tail == tail);
-  //assert (expected_packet_size == pos);
   return pos; 
 }
 
