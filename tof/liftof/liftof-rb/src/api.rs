@@ -39,6 +39,7 @@ use tof_dataclasses::packets::{TofPacket,
                                PacketType};
 //use tof_dataclasses::threading::ThreadPool;
 use tof_dataclasses::monitoring as moni;
+use tof_dataclasses::errors::SerializationError;
 
 use liftof_lib::TofPacketWriter;
 
@@ -84,6 +85,35 @@ impl RunParams {
   }
 }
 
+/// add the board id to the bytestream in front of the 
+/// tof response
+pub fn resp_to_bytes(resp : &TofResponse) -> Vec<u8> {
+  // FIUXME - this should not panic
+  let board_id = get_board_id()//
+                 .unwrap_or(0);
+                               //.expect("Need to be able to obtain board id!");
+  let mut bytestream = Vec::<u8>::new();
+  let mut board : String;
+  if board_id < 10 {
+    board = String::from("RB0") + &board_id.to_string();
+  } else {
+    board = String::from("RB")  + &board_id.to_string();
+  }
+  //let mut response = 
+  bytestream = board.as_bytes().to_vec();
+  bytestream.append(&mut resp.to_bytestream());
+  bytestream
+}
+
+
+/// strip of the first 4 bytes of the incoming vector 
+pub fn cmd_from_bytestream(bytestream : &mut Vec<u8>) ->Result<TofCommand, SerializationError>{
+  //let bytestream = cmd.drain(0..4);
+  // FIXME - remove expect call
+  TofCommand::from_bytestream(&bytestream, 4)
+  //tof_command
+}
+
 /// Centrailized command management
 /// 
 /// Maintain 0MQ command connection and faciliate 
@@ -102,15 +132,22 @@ pub fn cmd_responder(cmd_server_ip             : String,
                      evid_to_cache             : &Sender<u32>) {
                      //cmd_sender   : &Sender<TofCommand>) {
   // create 0MQ sockedts
-  let one_milli   = time::Duration::from_millis(1);
+  let one_milli       = time::Duration::from_millis(1);
   let mut cmd_address = String::from("tcp://") + &cmd_server_ip + ":" + &DATAPORT.to_string() ;
+  // we will subscribe to two types of messages, BDCT and RB + 2 digits 
+  // of board id
+  let topic_board = get_board_id().expect("Can not get board id!")
+                    .to_string();
+  let topic_broadcast = String::from("BRCT");
   let ctx = zmq::Context::new();
   let cmd_socket = ctx.socket(zmq::SUB).expect("Unable to create 0MQ SUB socket!");
   info!("Will set up 0MQ SUB socket to listen for commands at address {cmd_address}");
   cmd_socket.connect(&cmd_address).expect("Unable to bind to command socket at {cmd_address}!");
-  let my_topic = String::from("");
+  //let my_topic = String::from("");
   //.as_bytes();
-  cmd_socket.set_subscribe(&my_topic.as_bytes());
+  //cmd_socket.set_subscribe(&my_topic.as_bytes());
+  cmd_socket.set_subscribe(&topic_broadcast.as_bytes());
+  cmd_socket.set_subscribe(&topic_board.as_bytes());
   let mut heartbeat = Instant::now();
 
   error!("TODO: Heartbeat feature not yet implemented on C&C side");
@@ -120,7 +157,9 @@ pub fn cmd_responder(cmd_server_ip             : String,
       if heartbeat.elapsed().as_secs() > heartbeat_timeout_seconds as u64 {
         warn!("No heartbeat received since {heartbeat_timeout_seconds}. Attempting to reconnect!");
         cmd_socket.connect(&cmd_address).expect("Unable to bind to command socket at {cmd_address}!");
-        cmd_socket.set_subscribe(&my_topic.as_bytes());
+        //cmd_socket.set_subscribe(&my_topic.as_bytes());
+        cmd_socket.set_subscribe(&topic_broadcast.as_bytes());
+        cmd_socket.set_subscribe(&topic_board.as_bytes());
         heartbeat = Instant::now();
       }
     }
@@ -137,15 +176,17 @@ pub fn cmd_responder(cmd_server_ip             : String,
     //        continue;
     //    }
     match cmd_socket.recv_bytes(0) {
-      Err(err) => warn!("Problem receiving command over 0MQ ! Err {err}"),
+      Err(err) => error!("Problem receiving command over 0MQ ! Err {err}"),
       Ok(cmd_bytes)  => {
         info!("Received bytes {}", cmd_bytes.len());
-        match TofCommand::from_bytestream(&cmd_bytes,0) {
-          Err(err) => warn!("Problem decoding command {}", err),
+        match TofCommand::from_bytestream(&cmd_bytes,4) {
+          Err(err) => error!("Problem decoding command {}", err),
           Ok(cmd)  => {
             // we got a valid tof command, forward it and wait for the 
             // response
-            let resp_not_implemented = TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED);
+            let tof_resp  = TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED);
+            let resp_not_implemented = resp_to_bytes(&tof_resp);
+            //let resp_not_implemented = TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED);
             match cmd {
               TofCommand::Ping (_) => {
                 info!("Received ping signal");
@@ -159,7 +200,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
               }
               TofCommand::PowerOn   (mask) => {
                 warn!("Not implemented");
-                match cmd_socket.send(resp_not_implemented.to_bytestream(),0) {
+                match cmd_socket.send(resp_not_implemented,0) {
                   Err(err) => warn!("Can not send response! Err {err}"),
                   Ok(_)    => trace!("Resp sent!")
                 }
@@ -167,7 +208,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
               },
               TofCommand::PowerOff  (mask) => {
                 warn!("Not implemented");
-                match cmd_socket.send(resp_not_implemented.to_bytestream(),0) {
+                match cmd_socket.send(resp_not_implemented,0) {
                   Err(err) => warn!("Can not send response! {err}"),
                   Ok(_)    => trace!("Resp sent!")
                 }
@@ -175,7 +216,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
               },
               TofCommand::PowerCycle(mask) => {
                 warn!("Not implemented");
-                match cmd_socket.send(resp_not_implemented.to_bytestream(),0) {
+                match cmd_socket.send(resp_not_implemented,0) {
                   Err(err) => warn!("Can not send response! {err}"),
                   Ok(_)    => trace!("Resp sent!")
                 }
@@ -183,7 +224,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
               },
               TofCommand::RBSetup   (mask) => {
                 warn!("Not implemented");
-                match cmd_socket.send(resp_not_implemented.to_bytestream(),0) {
+                match cmd_socket.send(resp_not_implemented,0) {
                   Err(err) => warn!("Can not send response! Err {err}"),
                   Ok(_)    => trace!("Resp sent!")
                 }
@@ -191,7 +232,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
               }, 
               TofCommand::SetThresholds   (thresholds) =>  {
                 warn!("Not implemented");
-                match cmd_socket.send(resp_not_implemented.to_bytestream(),0) {
+                match cmd_socket.send(resp_not_implemented,0) {
                   Err(err) => warn!("Can not send response! Err {err}"),
                   Ok(_)    => trace!("Resp sent!")
                 }
@@ -199,7 +240,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
               },
               TofCommand::StartValidationRun  (_) => {
                 warn!("Not implemented");
-                match cmd_socket.send(resp_not_implemented.to_bytestream(),0) {
+                match cmd_socket.send(resp_not_implemented,0) {
                   Err(err) => warn!("Can not send response!"),
                   Ok(_)    => trace!("Resp sent!")
                 }
@@ -207,7 +248,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
               },
               TofCommand::RequestWaveforms (eventid) => {
                 warn!("Not implemented");
-                match cmd_socket.send(resp_not_implemented.to_bytestream(),0) {
+                match cmd_socket.send(resp_not_implemented,0) {
                   Err(err) => warn!("Can not send response!"),
                   Ok(_)    => trace!("Resp sent!")
                 }
@@ -215,7 +256,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
               },
               TofCommand::UnspoolEventCache   (_) => {
                 warn!("Not implemented");
-                match cmd_socket.send(resp_not_implemented.to_bytestream(),0) {
+                match cmd_socket.send(resp_not_implemented,0) {
                   Err(err) => warn!("Can not send response!"),
                   Ok(_)    => trace!("Resp sent!")
                 }
@@ -283,7 +324,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
               },
               TofCommand::VoltageCalibration (_) => {
                 warn!("Not implemented");
-                match cmd_socket.send(resp_not_implemented.to_bytestream(),0) {
+                match cmd_socket.send(resp_not_implemented,0) {
                   Err(err) => warn!("Can not send response!"),
                   Ok(_)    => trace!("Resp sent!")
                 }
@@ -291,7 +332,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
               },
               TofCommand::TimingCalibration  (_) => {
                 warn!("Not implemented");
-                match cmd_socket.send(resp_not_implemented.to_bytestream(),0) {
+                match cmd_socket.send(resp_not_implemented,0) {
                   Err(err) => warn!("Can not send response!"),
                   Ok(_)    => trace!("Resp sent!")
                 }
@@ -299,7 +340,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
               },
               TofCommand::CreateCalibrationFile (_) => {
                 warn!("Not implemented");
-                match cmd_socket.send(resp_not_implemented.to_bytestream(),0) {
+                match cmd_socket.send(resp_not_implemented,0) {
                   Err(err) => warn!("Can not send response!"),
                   Ok(_)    => trace!("Resp sent!")
                 }
@@ -317,7 +358,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
               },
               TofCommand::RequestMoni (_) => {
                 warn!("Not implemented");
-                match cmd_socket.send(resp_not_implemented.to_bytestream(),0) {
+                match cmd_socket.send(resp_not_implemented,0) {
                   Err(err) => warn!("Can not send response!"),
                   Ok(_)    => trace!("Resp sent!")
                 }
@@ -325,14 +366,14 @@ pub fn cmd_responder(cmd_server_ip             : String,
               },
               TofCommand::Unknown (_) => {
                 warn!("Not implemented");
-                match cmd_socket.send(resp_not_implemented.to_bytestream(),0) {
+                match cmd_socket.send(resp_not_implemented,0) {
                   Err(err) => warn!("Can not send response!"),
                   Ok(_)    => trace!("Resp sent!")
                 }
                 continue;
               }
               _ => {
-              match cmd_socket.send(resp_not_implemented.to_bytestream(),0) {
+              match cmd_socket.send(resp_not_implemented,0) {
                 Err(err) => warn!("Can not send response!"),
                 Ok(_)    => trace!("Resp sent!")
               }
@@ -340,24 +381,24 @@ pub fn cmd_responder(cmd_server_ip             : String,
               }
             } 
          
-            // now get the response from the clients
-            match rsp_receiver.recv() {
-              Err(err) => {
-                trace!("Did not recv response!");
-                warn!("Intended command receiver did not reply! Responding with Failure");
-                let resp = TofResponse::GeneralFail(RESP_ERR_CMD_STUCK);
-                match cmd_socket.send(resp.to_bytestream(), 0) {
-                  Err(err) => warn!("The command likely failed and we could not send a response. This is bad!"),
-                  Ok(_)    => trace!("The command likely failed, but we did not lose connection"),
-                }
-              },
-              Ok(resp) => {
-                match cmd_socket.send(resp.to_bytestream(), 0) {
-                  Err(err) => warn!("The command likely went through, but we could not send a response. This is bad!"),
-                  Ok(_)    => trace!("The command likely went through, but we did not lose connection"),
-                }
-              }
-            }
+            //// now get the response from the clients
+            //match rsp_receiver.recv() {
+            //  Err(err) => {
+            //    trace!("Did not recv response!");
+            //    warn!("Intended command receiver did not reply! Responding with Failure");
+            //    let resp = TofResponse::GeneralFail(RESP_ERR_CMD_STUCK);
+            //    match cmd_socket.send(resp.to_bytestream(), 0) {
+            //      Err(err) => warn!("The command likely failed and we could not send a response. This is bad!"),
+            //      Ok(_)    => trace!("The command likely failed, but we did not lose connection"),
+            //    }
+            //  },
+            //  Ok(resp) => {
+            //    match cmd_socket.send(resp.to_bytestream(), 0) {
+            //      Err(err) => warn!("The command likely went through, but we could not send a response. This is bad!"),
+            //      Ok(_)    => trace!("The command likely went through, but we did not lose connection"),
+            //    }
+            //  }
+            //}
           }
         }  
       }
