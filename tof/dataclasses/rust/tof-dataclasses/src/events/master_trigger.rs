@@ -209,6 +209,16 @@ impl MasterTriggerEvent {
     hits_str
   }
 
+  pub fn n_ltbs(&self) -> u32 {
+    let mut nboards = 0;
+    for n in self.board_mask { 
+      if n {
+        nboards += 1;
+      }
+    }
+    nboards
+  }
+
   /// Get the number of hit paddles from 
   /// the hitmask.
   ///
@@ -276,10 +286,10 @@ impl Default for MasterTriggerEvent {
 
 impl fmt::Display for MasterTriggerEvent {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(f, "<MasterTriggerEvent\n event id\t {}\n timestamp\t {}\n tiu_timestamp\t {}\n tiu_gps_32\t {}\n tiu_gps_16\t {}\n n paddles\t {}\n boardmask\t {}\n hits {}\n crc\t {} >",
-           self.event_id, self.timestamp, self.tiu_timestamp,
-           self.tiu_gps_32, self.tiu_gps_16, self.get_hit_paddles(),
-           self.boardmask_to_str(), self.hits_to_str(), self.crc)
+    write!(f, "<MasterTriggerEvent\n event id\t {}\n n boards\t {}\n n paddles\t {}\n hits\t {}\n timestamp\t {}\n tiu_timestamp\t {}\n tiu_gps_32\t {}\n tiu_gps_16\t {}\n boardmask\t {}\n crc\t {} >",
+           self.event_id, self.n_ltbs(), self.get_hit_paddles(), self.hits_to_str(),  self.timestamp, self.tiu_timestamp,
+           self.tiu_gps_32, self.tiu_gps_16, 
+           self.boardmask_to_str(), self.crc)
   }
 }
 
@@ -673,19 +683,6 @@ pub fn read_daq(socket : &UdpSocket,
       } else {
         queries_needed = n_ltbs as usize/2 + 1;
       }
-      //let mut queries_needed = 0;
-      //let mut queried_boards = Vec::<u8>::new();
-      //for n in (0..20).step_by(2) {
-      //  if decoded_board_mask[n+1] || decoded_board_mask[n] {
-      //    queries_needed += 1;
-      //    queried_boards.push(n as u8);
-      //  }
-      //}
-      //if queries_needed % 2 == 0 {
-      //    queries_needed = queries_needed /2;
-      //} else {
-      //    queries_needed = queries_needed /2 + 1;
-      //}
       trace!("We need {queries_needed} queries for the hitmask");
       let mut hitmasks = Vec::<[bool;N_CHN_PER_LTB]>::new();
       while nhit_query < queries_needed { 
@@ -701,35 +698,7 @@ pub fn read_daq(socket : &UdpSocket,
           event.hits[k] = thishits;
         }
       }
-      //while nhit_query < queries_needed { 
-      //  let hitmask = read_daq_word(socket, target_address, buffer)?;
-      //  if hitmask == 0x55555555 {
-      //    error!("We should se a hitmask, but we saw the end of the event");
-      //  }
-      //  trace!("Got hitmask {hitmask}");
-      //  (hits_a, hits_b) = decode_hit_mask(hitmask);
-      //  let n = queried_boards[nhit_query] as usize;
-      //  event.hits[n+1] = hits_a;
-      //  event.hits[n] = hits_b;
-      //  nhit_query += 1; 
-      //}
-      //for n in (0..20).step_by(2) {
-      //  println!("{n}");
-      //  if decoded_board_mask[n+1] || decoded_board_mask[n] {
-      //    let hitmask = read_daq_word(socket, target_address, buffer)?;
-      //    if hitmask == 0x55555555 {
-      //      error!("We should se a hitmask, but we saw the end of the event");
-      //    }
-      //    trace!("Got hitmask {hitmask}");
-      //    (hits_a, hits_b) = decode_hit_mask(hitmask);
-      //    event.hits[n+1] = hits_a;
-      //    event.hits[n] = hits_b;
-      //    nhit_query += 1; 
-      //  }
-      //}
-      //} // end for loop
     trace!("{:?}", decoded_board_mask);
-
     trace!("n queries {nhit_query}");
     event.crc         = read_daq_word(socket, target_address, buffer)?;
     if event.crc == 0x55555555 {
