@@ -661,23 +661,32 @@ pub fn read_daq(socket : &UdpSocket,
       event.board_mask = decoded_board_mask;
       n_ltbs = board_mask.count_ones();
       trace!("{n_ltbs} LTBs participated in this event");
-      // each ltb has 2 rbs, so each 32 bit word stands for 2 rbs. 
-      // this means we only need to read once if it is 11 etc..
-      //
-      let mut nhit_query = 0;
-      let mut queries_needed = 0;
+      // to get the hits, we need to read the hit field.
+      // Two boards can fit into a single hit field, that 
+      // needs we have to read out the hit filed boards/2
+      // times or boards/2 + 1 in case boards is odd.
+      let mut queries_needed = n_ltbs as usize;
       let mut queried_boards = Vec::<u8>::new();
-      for n in (0..20).step_by(2) {
-        if decoded_board_mask[n+1] || decoded_board_mask[n] {
-          queries_needed += 1;
-          queried_boards.push(n as u8);
-        }
-      }
-      if queries_needed % 2 == 0 {
-          queries_needed = queries_needed /2;
+      let mut nhit_query = 0usize;
+      if n_ltbs % 2 == 0 {
+        queries_needed = n_ltbs as usize/2;
       } else {
-          queries_needed = queries_needed /2 + 1;
+        queries_needed = n_ltbs as usize/2 + 1;
       }
+      //let mut queries_needed = 0;
+      //let mut queried_boards = Vec::<u8>::new();
+      //for n in (0..20).step_by(2) {
+      //  if decoded_board_mask[n+1] || decoded_board_mask[n] {
+      //    queries_needed += 1;
+      //    queried_boards.push(n as u8);
+      //  }
+      //}
+      //if queries_needed % 2 == 0 {
+      //    queries_needed = queries_needed /2;
+      //} else {
+      //    queries_needed = queries_needed /2 + 1;
+      //}
+
       trace!("We need {queries_needed} queries for the hitmask");
       while nhit_query < queries_needed { 
         let hitmask = read_daq_word(socket, target_address, buffer)?;
