@@ -686,20 +686,33 @@ pub fn read_daq(socket : &UdpSocket,
       //} else {
       //    queries_needed = queries_needed /2 + 1;
       //}
-
       trace!("We need {queries_needed} queries for the hitmask");
+      let mut hitmasks = Vec::<[bool;N_CHN_PER_LTB]>::new();
       while nhit_query < queries_needed { 
         let hitmask = read_daq_word(socket, target_address, buffer)?;
-        if hitmask == 0x55555555 {
-          error!("We should se a hitmask, but we saw the end of the event");
-        }
-        trace!("Got hitmask {hitmask}");
         (hits_a, hits_b) = decode_hit_mask(hitmask);
-        let n = queried_boards[nhit_query] as usize;
-        event.hits[n+1] = hits_a;
-        event.hits[n] = hits_b;
-        nhit_query += 1; 
+        hitmasks.push(hits_a);
+        hitmasks.push(hits_b);
+        nhit_query += 1;
       }
+      for k in 0..event.board_mask.len() {
+        if event.board_mask[k] {
+          let thishits = hitmasks.pop().unwrap();
+          event.hits[k] = thishits;
+        }
+      }
+      //while nhit_query < queries_needed { 
+      //  let hitmask = read_daq_word(socket, target_address, buffer)?;
+      //  if hitmask == 0x55555555 {
+      //    error!("We should se a hitmask, but we saw the end of the event");
+      //  }
+      //  trace!("Got hitmask {hitmask}");
+      //  (hits_a, hits_b) = decode_hit_mask(hitmask);
+      //  let n = queried_boards[nhit_query] as usize;
+      //  event.hits[n+1] = hits_a;
+      //  event.hits[n] = hits_b;
+      //  nhit_query += 1; 
+      //}
       //for n in (0..20).step_by(2) {
       //  println!("{n}");
       //  if decoded_board_mask[n+1] || decoded_board_mask[n] {
