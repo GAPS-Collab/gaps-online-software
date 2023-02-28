@@ -26,6 +26,7 @@ extern crate histo;
 use histo::Histogram;
 
 use liftof_lib::{get_rb_manifest,
+                 master_trigger,
                  ReadoutBoard};
 
 use std::sync::mpsc;
@@ -230,64 +231,64 @@ fn receive_stream(tp_to_main : Sender<TofPacket>,
   }
 }
 
-fn master_trigger(mt_to_main : &Sender<MasterTriggerEvent>,
-                  mt_rate_to_main : &Sender<u32>) {
-  let mt_address = "192.168.36.121:50001";
-  //let mt_address = mt_ip.to_owned() + ":" + &mt_port.to_string();
-  let mut socket : UdpSocket;
-  // FIXME - proper error checking
-  let local_port = "0.0.0.0:50100";
-  let local_socket = UdpSocket::bind(local_port);
-  let mut socket : UdpSocket;
-  match local_socket {
-    Err(err)   => panic!("Can not create local UDP port for master trigger connection at {}!, err {}", local_port, err),
-    Ok(value)  => {
-      info!("Successfully bound UDP socket for master trigger
-      communcations to {}", local_port);
-      socket = value;
-    }   
-  } // end match
-    //
-  let half_a_milli = Duration::from_micros(500);
-  //let mut event_cnt;
-  //let mut n_paddles_expected;
-  let mut buffer : [u8;512] = [0;512];
-  let rate_query_rate = Duration::from_secs(5);
-  let mut timer = Instant::now();
-  loop {
-    // FIXME - remove these unwraps!
-    match read_daq(&socket, &mt_address, &mut buffer) {
-      Err(err) => {
-        trace!("Error getting next mtb event!");
-        thread::sleep(half_a_milli);
-        continue;
-      }
-      Ok(mt_event) => {
-        match mt_to_main.try_send(mt_event) {
-          Err(err) => trace!("Can't send master trigger event"),
-          Ok(_)    => ()
-        }
-      }
-    }
-    if timer.elapsed().as_secs() < rate_query_rate.as_secs() {
-      continue;
-    }
-    timer  = Instant::now();
-    match read_rate(&socket, &mt_address, &mut buffer) {
-      Err(err) => {
-        error!("Unable to obtain MT rate information!");
-        continue;
-      }
-      Ok(rate) => {
-        info!("Got rate from MTB {rate}");
-        match mt_rate_to_main.try_send(rate) {
-          Err(err) => error!("Can't send rate"),
-          Ok(_)    => ()
-        }
-      }
-    }
-  }
-}
+//fn master_trigger(mt_to_main : &Sender<MasterTriggerEvent>,
+//                  mt_rate_to_main : &Sender<u32>) {
+//  let mt_address = "192.168.36.121:50001";
+//  //let mt_address = mt_ip.to_owned() + ":" + &mt_port.to_string();
+//  let mut socket : UdpSocket;
+//  // FIXME - proper error checking
+//  let local_port = "0.0.0.0:50100";
+//  let local_socket = UdpSocket::bind(local_port);
+//  let mut socket : UdpSocket;
+//  match local_socket {
+//    Err(err)   => panic!("Can not create local UDP port for master trigger connection at {}!, err {}", local_port, err),
+//    Ok(value)  => {
+//      info!("Successfully bound UDP socket for master trigger
+//      communcations to {}", local_port);
+//      socket = value;
+//    }   
+//  } // end match
+//    //
+//  let half_a_milli = Duration::from_micros(500);
+//  //let mut event_cnt;
+//  //let mut n_paddles_expected;
+//  let mut buffer : [u8;512] = [0;512];
+//  let rate_query_rate = Duration::from_secs(5);
+//  let mut timer = Instant::now();
+//  loop {
+//    // FIXME - remove these unwraps!
+//    match read_daq(&socket, &mt_address, &mut buffer) {
+//      Err(err) => {
+//        trace!("Error getting next mtb event!");
+//        thread::sleep(half_a_milli);
+//        continue;
+//      }
+//      Ok(mt_event) => {
+//        match mt_to_main.try_send(mt_event) {
+//          Err(err) => trace!("Can't send master trigger event"),
+//          Ok(_)    => ()
+//        }
+//      }
+//    }
+//    if timer.elapsed().as_secs() < rate_query_rate.as_secs() {
+//      continue;
+//    }
+//    timer  = Instant::now();
+//    match read_rate(&socket, &mt_address, &mut buffer) {
+//      Err(err) => {
+//        error!("Unable to obtain MT rate information!");
+//        continue;
+//      }
+//      Ok(rate) => {
+//        info!("Got rate from MTB {rate}");
+//        match mt_rate_to_main.try_send(rate) {
+//          Err(err) => error!("Can't send rate"),
+//          Ok(_)    => ()
+//        }
+//      }
+//    }
+//  }
+//}
 
 
 /// Use the TuiLoggerWidget to display 
@@ -408,12 +409,21 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   //              rsp_to_main,
   //              rb_list_c2);
   //});
+  let tp_to_main_c = tp_to_main.clone();
   workforce.execute(move || {
       receive_stream(tp_to_main, rb_list_c);
   });
 
+  let master_trigger_ip = String::from("10.0.1.10");
+  let master_trigger_port : usize = 50001;
+
   workforce.execute(move || {
-    master_trigger(&mt_to_main, &mt_rate_to_main);
+    master_trigger(&master_trigger_ip,
+                   master_trigger_port,
+                   &tp_to_main_c,
+                   &mt_rate_to_main,
+                   &mt_to_main, 
+                   false);
   });
 
   // set up the terminal
