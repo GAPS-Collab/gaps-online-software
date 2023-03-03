@@ -687,11 +687,11 @@ fn make_sure_it_runs(will_panic : &mut u8,
     panic!("I can not get this run to start. I'll kill myself!");
   }
 
-  match disable_trigger() {
-    Err(err) => error!("Can not disable triggers! Err {err}"),
-    Ok(_)    => trace!("Triggers enabled")
-  }
-  println!("Triggers stopped!");
+  ///match disable_trigger() {
+  ///  Err(err) => error!("Can not disable triggers! Err {err}"),
+  ///  Ok(_)    => trace!("Triggers enabled")
+  ///}
+  ///println!("Triggers stopped!");
 
   let five_milli = time::Duration::from_millis(5); 
   let one_sec    = time::Duration::from_secs(1);

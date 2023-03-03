@@ -8,9 +8,9 @@ compile_and_deploy_target() {
 rm -rf ../target/armv7-unknown*
 
 compile_and_deploy_target liftof-rb ucla-rb149
-#for rb in ucla-rb01 ucla-rb02 ucla-rb03 ucla-rb04 ucla-rb07 ucla-rb08 ucla-rb09 ucla-rb10;
-#do compile_and_deploy_target liftof-rb $rb;
-#done
+for rb in ucla-rb00 ucla-rb01 ucla-rb02 ucla-rb03 ucla-rb04 ucla-rb07 ucla-rb08 ucla-rb09 ucla-rb10;
+do compile_and_deploy_target liftof-rb $rb;
+done
 
 #compile_and_deploy_target debug-idle
 #compile_and_deploy_target watch-buffer-fill
