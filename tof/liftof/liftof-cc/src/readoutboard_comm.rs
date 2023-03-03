@@ -452,8 +452,14 @@ pub fn readoutboard_communicator(//socket           : &zmq::Socket,
   info!("Connected to {address}");
   // FIXME - do not subscribe to all, only this 
   // specific RB
-  let topic = b"";
-  socket.set_subscribe(topic);
+  let mut topic = b"";
+  let mut topic : String;
+  if rb.id.unwrap() < 10 {
+    topic = String::from("RB0") + &rb.id.unwrap().to_string();
+  } else {
+    topic = String::from("RB") + &rb.id.unwrap().to_string();
+  }
+  socket.set_subscribe(topic.as_bytes());
   let blobfile_name = "blob_".to_owned() 
                        + &board_id.to_string()
                        + ".blob";
@@ -502,7 +508,9 @@ pub fn readoutboard_communicator(//socket           : &zmq::Socket,
         //    Err(err) => error!("Not able to send back reply to acknowleded received data!")
         //}
         // do the work
-        let tp_ok = TofPacket::from_bytestream(&buffer, 0);
+        // strip the first 4 vytes, since they contain the 
+        // board id
+        let tp_ok = TofPacket::from_bytestream(&buffer, 4);
         match tp_ok {
           Err(err) => {
             trace!("This is not a TofPacket I guess...{:?}", err);

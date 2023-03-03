@@ -87,7 +87,7 @@ impl RunParams {
 
 /// add the board id to the bytestream in front of the 
 /// tof response
-pub fn resp_to_bytes(resp : &TofResponse) -> Vec<u8> {
+pub fn prefix_board_id(input : &mut Vec<u8>) -> Vec<u8> {
   // FIUXME - this should not panic
   let board_id = get_board_id()//
                  .unwrap_or(0);
@@ -101,7 +101,8 @@ pub fn resp_to_bytes(resp : &TofResponse) -> Vec<u8> {
   }
   //let mut response = 
   bytestream = board.as_bytes().to_vec();
-  bytestream.append(&mut resp.to_bytestream());
+  //bytestream.append(&mut resp.to_bytestream());
+  bytestream.append(input);
   bytestream
 }
 
@@ -185,7 +186,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
             // we got a valid tof command, forward it and wait for the 
             // response
             let tof_resp  = TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED);
-            let resp_not_implemented = resp_to_bytes(&tof_resp);
+            let resp_not_implemented = prefix_board_id(&mut tof_resp.to_bytestream());
             //let resp_not_implemented = TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED);
             match cmd {
               TofCommand::Ping (_) => {
@@ -450,10 +451,10 @@ pub fn data_publisher(data : &Receiver<TofPacket>,
         // wrap the payload INTO THE 
         // FIXME - retries?
         if write_blob {
-          println!("Writing");
-          println!("{:?}", packet.packet_type);
-         // if packet.packet_type == PacketType::RBEvent {
-            println!("is rb event");
+          //println!("Writing");
+          //println!("{:?}", packet.packet_type);
+          if packet.packet_type == PacketType::RBEvent {
+            //println!("is rb event");
             match &mut file_on_disc {
               None => error!("We want to write data, however the file is invalid!"),
               Some(f) => {
@@ -461,12 +462,12 @@ pub fn data_publisher(data : &Receiver<TofPacket>,
                 f.write_all(packet.payload.as_slice());
               }
             }
-          //}
+          }
         }
-        let tp_payload = packet.to_bytestream();
+        let tp_payload = prefix_board_id(&mut packet.to_bytestream());
         match data_socket.send(tp_payload,zmq::DONTWAIT) {
-          Ok(_)  => trace!("0MQ PUB socket.send() SUCCESS!"),
-          Err(err) => warn!("Not able to send over 0MQ PUB socket! Err {err}"),
+          Ok(_)    => trace!("0MQ PUB socket.send() SUCCESS!"),
+          Err(err) => error!("Not able to send over 0MQ PUB socket! Err {err}"),
         }
       }
     }

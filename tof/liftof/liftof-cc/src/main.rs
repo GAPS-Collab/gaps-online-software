@@ -14,6 +14,7 @@ extern crate local_ip_address;
 extern crate liftof_lib;
 use liftof_lib::{LocalTriggerBoard,
                  ReadoutBoard,
+                 master_trigger,
                  get_tof_manifest};
                  //rb_manifest_from_json,
                  //get_rb_manifest};
@@ -53,7 +54,6 @@ use tof_dataclasses::packets::TofPacket;
 extern crate liftof_cc;
 
 use liftof_cc::readoutboard_comm::readoutboard_communicator;
-use liftof_cc::master_trigger::{master_trigger};
 use liftof_cc::event_builder::{event_builder,
                            TofEventBuilderSettings};
                            //event_builder_no_master};
@@ -251,7 +251,8 @@ fn main() {
   // set the parameters for the event builder
   let (ebs_to_eb, ebs_from_cmdr)   : (cbc::Sender<TofEventBuilderSettings>,cbc::Receiver<TofEventBuilderSettings>) = cbc::unbounded();
 
-
+  // send the rate from the master trigger to the main thread
+  let (rate_to_main, rate_from_mt) : (cbc::Sender<u32>, cbc::Receiver<u32>) = cbc::unbounded();
   // master thread -> event builder ocmmuncations
   let (master_ev_send, master_ev_rec): (cbc::Sender<MasterTriggerEvent>, cbc::Receiver<MasterTriggerEvent>) = cbc::unbounded(); 
   // event builder  <-> paddle cache communications
@@ -322,7 +323,9 @@ fn main() {
                            master_trigger(&master_trigger_ip, 
                                           master_trigger_port,
                                           &tp_to_sink_c,
-                                          &master_ev_send);
+                                          &rate_to_main,
+                                          &master_ev_send,
+                                          true);
     });
   } else {
     // we start the event builder without 
