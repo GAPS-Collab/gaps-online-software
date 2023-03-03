@@ -453,41 +453,43 @@ pub fn get_rb_manifest() -> Vec<ReadoutBoard> {
             IpAddr::V6(a) => panic!("IPV6 {a} not suppported!"),
             IpAddr::V4(a) => {
               rb.ip_address = Some(a);
+              rb.data_port  = Some(42000);
+              connected_boards.push(rb);
               // now we will try and check if the ports are open
-              let mut all_data_ports = Vec::<String>::new();//scan_ports_range(30000..39999);
-              let mut all_cmd_ports  = Vec::<String>::new();//scan_ports_range(40000..49999);
-              // FIXME - the ranges here are somewhat arbitrary
-              for n in 30000..39999 {
-                all_data_ports.push(rb.ip_address.unwrap().to_string() + ":" + &n.to_string());
-                //scan_ports_addrs(
-              }
-              for n in 40000..49999 {
-                all_cmd_ports.push(rb.ip_address.unwrap().to_string() + ":" + &n.to_string());
-              }
-              let open_data_ports = scan_ports_addrs(all_data_ports);
-              let open_cmd_ports  = scan_ports_addrs(all_cmd_ports);
-              assert!(open_cmd_ports.len() < 2);
-              assert!(open_data_ports.len() < 2);
-              if open_cmd_ports.len() == 1 {
-                rb.cmd_port = Some(open_cmd_ports[0].port());
-                match rb.ping() {
-                  Ok(_)    => println!("... connected!"),
-                  Err(err) => println!("Can't connect to RB, err {err}"),
-                }
-              } else {
-                rb.cmd_port = None;
-              }
-              
+              //let mut all_data_ports = Vec::<String>::new();//scan_ports_range(30000..39999);
+              //let mut all_cmd_ports  = Vec::<String>::new();//scan_ports_range(40000..49999);
+              //// FIXME - the ranges here are somewhat arbitrary
+              //for n in 30000..39999 {
+              //  all_data_ports.push(rb.ip_address.unwrap().to_string() + ":" + &n.to_string());
+              //  //scan_ports_addrs(
+              //}
+              //for n in 40000..49999 {
+              //  all_cmd_ports.push(rb.ip_address.unwrap().to_string() + ":" + &n.to_string());
+              //}
+              //let open_data_ports = scan_ports_addrs(all_data_ports);
+              //let open_cmd_ports  = scan_ports_addrs(all_cmd_ports);
+              //assert!(open_cmd_ports.len() < 2);
+              //assert!(open_data_ports.len() < 2);
+              //if open_cmd_ports.len() == 1 {
+              //  rb.cmd_port = Some(open_cmd_ports[0].port());
+              //  match rb.ping() {
+              //    Ok(_)    => println!("... connected!"),
+              //    Err(err) => println!("Can't connect to RB, err {err}"),
+              //  }
+              //} else {
+              //  rb.cmd_port = None;
+              //}
+              //
 
-              println!("Found open data ports {:?}", open_data_ports);
-              if open_data_ports.len() == 1 {
-                rb.data_port = Some(open_data_ports[0].port());
-              } else {
-                rb.data_port = None;
-              }
-              if rb.is_connected {
-                connected_boards.push(rb);
-              }
+              //println!("Found open data ports {:?}", open_data_ports);
+              //if open_data_ports.len() == 1 {
+              //  rb.data_port = Some(open_data_ports[0].port());
+              //} else {
+              //  rb.data_port = None;
+              //}
+              //if rb.is_connected {
+              //  connected_boards.push(rb);
+              //}
             }
           }
         }

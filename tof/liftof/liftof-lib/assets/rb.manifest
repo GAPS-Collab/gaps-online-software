@@ -1,5 +1,7 @@
 # manifest file for all possible readout boards
 # format : ID, MAC ADDRESS
-
-51; 20:b0:f7:05:52:f2
-52; 20:b0:f7:05:3b:1a
+1;20:b0:f7:05:39:a6
+2;20:b0:f7:05:39:98
+3;20:b0:f7:05:39:58
+4;20:b0:f7:05:39:a8
+49;20:b0:f7:05:52:f2

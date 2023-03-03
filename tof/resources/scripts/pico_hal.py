@@ -7,8 +7,8 @@ import time
 from enum import Enum
 
 PACKET_ID = 0
-IPADDR = "192.168.36.121"
-#IPADDR = "10.0.1.10"
+#IPADDR = "192.168.36.121"
+IPADDR = "10.0.1.10"
 PORT = 50001
 
 # Create a UDP socket and bind the socket to the port
@@ -333,6 +333,7 @@ def read_daq():
 
         if (state=="Idle" and rd==0xAAAAAAAA):
             state = "Header"
+            found = False
             hit_paddles = 0
             paddles_rxd = 1
 
@@ -344,6 +345,9 @@ def read_daq():
 
         if state == "Hits" or state == "Mask":
             print (f'{bin(rd)}, {rd} , {state}')
+            if state == "Mask":
+                if rd > 3:
+                    found = True
         else:
             print("%08X (%s)" % (rd, state))
 
@@ -368,6 +372,8 @@ def read_daq():
         elif (state=="Trailer"):
             print (f'rxd {paddles_rxd}, hit {hit_paddles}')
             print ('-------')
+            if found:
+                raise
             state="Idle"
 
 
