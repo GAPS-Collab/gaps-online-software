@@ -1,6 +1,7 @@
 {
   "meta" : "",
   "unix_time" : "",
+  "raw_storage_savepath" : "/tpool/tofdata",
   "master_trigger" : {
     "ip"   : "10.0.1.1", 
     "port" : 50001

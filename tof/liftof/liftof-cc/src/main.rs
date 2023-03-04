@@ -177,7 +177,8 @@ fn main() {
    master_trigger_port = config["master_trigger"]["port"].as_usize().unwrap();
    info!("Will connect to the master trigger board at {}:{}", master_trigger_ip, master_trigger_port);
   }
-  
+
+   let storage_savepath = config["raw_storage_savepath"].as_str().unwrap().to_owned();
 
   //let matches = command!() // requires `cargo` feature
   //     //.arg(arg!([name] "Optional name to operate on"))
@@ -341,9 +342,11 @@ fn main() {
   for n in 0..nboards {
     let this_rb_pp_sender = rb_send.clone();
     let this_rb = rb_list[n].clone();
+    let this_path = storage_savepath.clone();
     worker_threads.execute(move || {
       readoutboard_communicator(this_rb_pp_sender,
                                 write_blob,
+                                &this_path,
                                 &this_rb);
     });
   } // end for loop over nboards

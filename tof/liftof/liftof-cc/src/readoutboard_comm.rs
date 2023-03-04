@@ -414,18 +414,14 @@ fn identifiy_readoutboard(msg : &zmq::Message) -> bool
 /*************************************/
 
 
-///
 /// Receive binary blobs from readout boards,
 /// and perform specified tasks
 ///
 ///
-pub fn readoutboard_communicator(//socket           : &zmq::Socket,
-                                 //zmq_ctx          : &zmq::Context,
-                                 pp_pusher        : Sender<PaddlePacket>,
-                                 //board_id         : usize,
+pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
                                  write_blob       : bool,
+                                 storage_savepath : &String,
                                  rb               : &ReadoutBoard)
-                                 //calibration_file : &str)
 {
   let zmq_ctx = zmq::Context::new();
   let board_id = rb.id.unwrap();
@@ -460,7 +456,7 @@ pub fn readoutboard_communicator(//socket           : &zmq::Socket,
     topic = String::from("RB") + &rb.id.unwrap().to_string();
   }
   socket.set_subscribe(topic.as_bytes());
-  let blobfile_name = "blob_".to_owned() 
+  let blobfile_name = storage_savepath.to_owned() + "blob_" 
                        + &board_id.to_string()
                        + ".blob";
   info!("Writing blobs to {}", blobfile_name );
