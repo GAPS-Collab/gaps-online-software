@@ -2,6 +2,7 @@
   "meta" : "",
   "unix_time" : "",
   "raw_storage_savepath" : "/tpool/tofdata",
+  "events_per_file" : 1000000;
   "master_trigger" : {
     "ip"   : "10.0.1.1", 
     "port" : 50001

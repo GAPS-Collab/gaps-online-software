@@ -5,13 +5,14 @@
 ///
 
 
-
+use std::time::{SystemTime, UNIX_EPOCH};
 use std::{fs, fs::File, path::Path};
 use std::io::Read;
 use std::io::Write;
 use std::fs::OpenOptions;
-
-use std::sync::mpsc::{Sender, channel};
+//use crossbeam_channel as cbc; 
+use crossbeam_channel::{Sender, unbounded};
+//use std::sync::mpsc::{Sender, channel};
 
 #[cfg(feature = "diagnostics")]
 //use waveform::CalibratedWaveformForDiagnostics;
@@ -33,7 +34,7 @@ use tof_dataclasses::calibrations::{Calibrations,
 use tof_dataclasses::events::blob::{BlobData,
                                     get_constant_blobeventsize};
 use tof_dataclasses::constants::{NCHN,
-                       NWORDS};
+                                 NWORDS};
 
 use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::serialization::Serialization;
@@ -362,7 +363,7 @@ fn get_blobs_from_file (rb_id : usize) {
   // FIXME - this must be thre real calibrations
   let calibrations = [Calibrations {..Default::default()};NCHN];
   //let sender = Sender::<PaddlePacket>();
-  let (sender, receiver) = channel();
+  let (sender, receiver) = unbounded();
   todo!("Fix the paddle ids. This function needs to be given the Readoutboard!");
   let paddle_ids : [u8;4] = [0,0,0,0];
   let mut rb = ReadoutBoard::new();
@@ -421,6 +422,7 @@ fn identifiy_readoutboard(msg : &zmq::Message) -> bool
 pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
                                  write_blob       : bool,
                                  storage_savepath : &String,
+                                 events_per_file  : &usize,
                                  rb               : &ReadoutBoard)
 {
   let zmq_ctx = zmq::Context::new();
@@ -456,19 +458,20 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
     topic = String::from("RB") + &rb.id.unwrap().to_string();
   }
   socket.set_subscribe(topic.as_bytes());
-  let blobfile_name = storage_savepath.to_owned() + "blob_" 
-                       + &board_id.to_string()
+  let mut secs_since_epoch = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
+  let mut blobfile_name = storage_savepath.to_owned() + "RB" 
+                       + &board_id.to_string() + " _ " 
+                       + &secs_since_epoch.to_string()
                        + ".blob";
   info!("Writing blobs to {}", blobfile_name );
-  let blobfile_path = Path::new(&blobfile_name);
-
-
+  let mut blobfile_path = Path::new(&blobfile_name);
   let mut file_on_disc : Option<File> = None;//let mut output = File::create(path)?;
   if write_blob {
     file_on_disc = OpenOptions::new().append(true).create(true).open(blobfile_path).ok()
     //let f = File::create(&blobfile_path);
     //file_on_disc = Some(f.unwrap());
   }
+  let mut n_events = 0usize;
   loop {
 
     // check if we got new data
@@ -504,12 +507,12 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
         //    Err(err) => error!("Not able to send back reply to acknowleded received data!")
         //}
         // do the work
-        // strip the first 4 vytes, since they contain the 
+        // strip the first 4 bytes, since they contain the 
         // board id
         let tp_ok = TofPacket::from_bytestream(&buffer, 4);
         match tp_ok {
           Err(err) => {
-            trace!("This is not a TofPacket I guess...{:?}", err);
+            error!("Unknown packet...{:?}", err);
             continue;
           }
           Ok(_)    => ()
@@ -539,22 +542,21 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
           None => (),
           Some(f) => {
             f.write_all(buffer.as_slice());
-
-            //match write_stream_to_file(f, &buffer) {
-            //  Ok(size)  => debug!("Writing blob file successful! {} bytes written", size),
-            //  Err(err)  => {
-            //    error!("Unable to write blob to disk! {}", err );
-            //    //lost_blob_files += 1;
-            //  }
-            //} // end match
-            //match write!(f, &buffer) {
-            //  Err(err) => warn!("Writing to file failed!"),
-            //  Ok(_)    => ()
-            //}
-
           }
         }
+        n_events += 1;
+        if (n_events >= *events_per_file) && write_blob {
+          // start a new file
+          secs_since_epoch = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
+          blobfile_name = storage_savepath.to_owned() + "RB" 
+                         + &board_id.to_string() + " _ " 
+                         + &secs_since_epoch.to_string()
+                         + ".blob";
 
+          info!("Writing blobs to {}", blobfile_name );
+          blobfile_path = Path::new(&blobfile_name);
+          file_on_disc = OpenOptions::new().append(true).create(true).open(blobfile_path).ok()
+        }
         //if write_blob {
         //  let blobfile_name = "blob_".to_owned() 
         //                       + &n_chunk.to_string() 

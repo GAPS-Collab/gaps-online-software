@@ -7,9 +7,10 @@
 
 use std::time::{Instant,
                 Duration};
-use std::sync::mpsc::{Sender,
-                      Receiver};
-
+//use std::sync::mpsc::{Sender,
+//                      Receiver};
+use crossbeam_channel::{Sender,
+                        Receiver};
 use std::collections::HashMap;
 
 use std::collections::VecDeque;
@@ -204,10 +205,16 @@ pub fn paddle_packet_cache (evid_rec    : &Receiver<Option<u32>>,
 
             let mut pp = pp_cache.pop_front().unwrap();
             if pp.valid { 
-              pp_send.send(Some(pp));
+              match pp_send.send(Some(pp)) {
+                Err(err) => error!("Could not send paddle package, error {err}"),
+                Ok(_)    => ()
+              }
               pp.invalidate();
             } else {
-              pp_send.send(None);
+              match pp_send.send(None) {
+                Err(err) => error!("Could not send NONE value, err {err}"),
+                Ok(_)    => ()
+              }
             }
             continue;
           }, // end None

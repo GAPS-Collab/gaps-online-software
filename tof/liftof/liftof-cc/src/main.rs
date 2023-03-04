@@ -76,8 +76,6 @@ struct Args {
   write_stream: bool,
   #[arg(short, long, default_value_t = false)]
   use_master_trigger: bool,
-  #[arg(long, default_value_t = false)]
-  autodiscover_rbs: bool,
   /// A json config file with detector information
   #[arg(short, long)]
   json_config: Option<std::path::PathBuf>,
@@ -115,7 +113,6 @@ fn main() {
   // deal with command line arguments
   let args = Args::parse();
  
-  let autodiscover_rbs = args.autodiscover_rbs;
 
   let write_blob = args.write_blob;
   if write_blob {
@@ -129,7 +126,7 @@ fn main() {
   let json_content  : String;
   let config        : json::JsonValue;
   
-  let mut nboards       : usize;
+  let nboards       : usize;
 
   let use_master_trigger      = args.use_master_trigger;
   let mut master_trigger_ip   = String::from("");
@@ -178,8 +175,8 @@ fn main() {
    info!("Will connect to the master trigger board at {}:{}", master_trigger_ip, master_trigger_port);
   }
 
-   let storage_savepath = config["raw_storage_savepath"].as_str().unwrap().to_owned();
-
+  let storage_savepath = config["raw_storage_savepath"].as_str().unwrap().to_owned();
+  let events_per_file  = config["events_per_file"].as_usize().unwrap(); 
   //let matches = command!() // requires `cargo` feature
   //     //.arg(arg!([name] "Optional name to operate on"))
   //     .arg(
@@ -235,15 +232,6 @@ fn main() {
 
   println!(" .. .. .. .. .. .. .. ..");
   
-  // FIXME - port and address need to be 
-  // configurable
-  let mut port       : usize;
-  
-  let mut address : String;
-  let mut cali_file_name : String;
-  let mut cali_file_path : &Path;
-  let mut board_config   : &json::JsonValue;
-  let mut rb_id          : usize;
 
   // prepare channels for inter thread communications
  
@@ -257,11 +245,11 @@ fn main() {
   // master thread -> event builder ocmmuncations
   let (master_ev_send, master_ev_rec): (cbc::Sender<MasterTriggerEvent>, cbc::Receiver<MasterTriggerEvent>) = cbc::unbounded(); 
   // event builder  <-> paddle cache communications
-  let (pp_send, pp_rec) : (Sender<Option<PaddlePacket>>, Receiver<Option<PaddlePacket>>) = channel(); 
+  let (pp_send, pp_rec) : (cbc::Sender<Option<PaddlePacket>>, cbc::Receiver<Option<PaddlePacket>>) = cbc::unbounded(); 
   // readout boards <-> paddle cache communications 
-  let (rb_send, rb_rec) : (Sender<PaddlePacket>, Receiver<PaddlePacket>) = channel();
+  let (rb_send, rb_rec) : (cbc::Sender<PaddlePacket>, cbc::Receiver<PaddlePacket>) = cbc::unbounded();
   // paddle cache <-> event builder communications
-  let (id_send, id_rec) : (Sender<Option<u32>>, Receiver<Option<u32>>) = channel();
+  let (id_send, id_rec) : (cbc::Sender<Option<u32>>, cbc::Receiver<Option<u32>>) = cbc::unbounded();
   // prepare a thread pool. Currently we have
   // 1 thread per rb, 1 master trigger thread
   // and 1 event builder thread.
@@ -347,6 +335,7 @@ fn main() {
       readoutboard_communicator(this_rb_pp_sender,
                                 write_blob,
                                 &this_path,
+                                &events_per_file,
                                 &this_rb);
     });
   } // end for loop over nboards

@@ -4,8 +4,11 @@
 //!
 
 
-use std::sync::mpsc::{Sender,
-                      Receiver};
+//use std::sync::mpsc::{Sender,
+//                      Receiver};
+use crossbeam_channel::{Sender,
+                        Receiver};
+
 use std::collections::VecDeque;
 use std::collections::HashMap;
 
