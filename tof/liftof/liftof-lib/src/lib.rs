@@ -120,7 +120,7 @@ pub fn connect_to_mtb(mt_ip   : &str,
   ];
   //let local_socket = UdpSocket::bind(local_port);
   let local_socket = UdpSocket::bind(&local_addrs[..]);
-  let mut socket : UdpSocket;
+  let socket : UdpSocket;
   match local_socket {
     Err(err)   => {
       error!("Can not create local UDP port for master trigger connection at {}!, err {}", local_port, err);
@@ -362,6 +362,7 @@ pub fn master_trigger(mt_ip          : &str,
 
 
 /// Get a list of ReadoutBoards from a json file
+#[deprecated(since="0.1.0", note="please use `get_tof_manifest` instead")]
 pub fn rb_manifest_from_json(config : json::JsonValue) -> Vec<ReadoutBoard> {
   let mut boards = Vec::<ReadoutBoard>::new();
 
@@ -412,12 +413,11 @@ pub fn get_tof_manifest(json_config : std::path::PathBuf) -> (Vec::<LocalTrigger
    for n in 0..config["rbs"].len() {
      rbs.push(ReadoutBoard::from(&config["rbs"][n]));
    }
-
-
   (ltbs, rbs)
 }
 
 
+#[deprecated(since="0.1.0", note="please use `get_tof_manifest` instead")]
 pub fn get_rb_manifest() -> Vec<ReadoutBoard> {
   let rb_manifest_path = path!("assets/rb.manifest");
   let mut connected_boards = Vec::<ReadoutBoard>::new();
@@ -623,30 +623,53 @@ pub struct ReadoutBoard {
   pub ch_to_pid    : [u8;8],
   pub sorted_pids  : [u8;4],
   pub calib_file   : String,
-  first_up         : u32,
+  pub configured   : bool,
 }
 
 impl ReadoutBoard {
 
   pub fn new() -> ReadoutBoard {
     ReadoutBoard {
-      id           : None,
-      mac_address  : None,
-      ip_address   : None,
-      data_port    : None,
-      cmd_port     : None,
-      is_connected : false,
-      uptime       : 0,
-      ch_to_pid    : [0;8],
-      sorted_pids  : [0;4], 
-      calib_file   : String::from(""),
-      first_up     : 0
+      id            : None,
+      mac_address   : None,
+      ip_address    : None,
+      data_port     : None,
+      cmd_port      : None,
+      is_connected  : false,
+      uptime        : 0,
+      ch_to_pid     : [0;8],
+      sorted_pids   : [0;4], 
+      calib_file    : String::from(""),
+      configured    : false
     }
+  }
+
+  pub fn get_connection_string(&mut self) -> String {
+    if !self.configured {
+      panic!("Can not get connection string. This board has not been configured. Get the information from corresponding json tof manifest");
+    }
+
+    self.get_ip();
+    let mut address_ip = String::from("tcp://");
+    match self.ip_address {
+      None => panic!("This board does not have an ip address. Unable to obtain connection information"),
+      Some(ip) => {
+        address_ip = address_ip + &ip.to_string();
+      }
+    }
+    match self.data_port {
+      None => panic!("This board does not have a known data port. Typically, this should be 42000. Please check your tof-manifest.jsdon"),
+      Some(port) => {
+        address_ip += &":".to_owned();
+        address_ip += &port.to_string();
+      }
+    }
+    address_ip
   }
 
   /// Get the readoutboard ip address from 
   /// the ARP tables
-  fn get_ip(&mut self) {
+  pub fn get_ip(&mut self) {
     let mac_table = get_mac_to_ip_map();
     let rb_ip = mac_table.get(&self.mac_address.unwrap());
     info!("Found ip address {:?} for RB {}", rb_ip, self.id.unwrap_or(0));
@@ -715,14 +738,6 @@ impl Default for ReadoutBoard {
 
 impl From<&json::JsonValue> for ReadoutBoard {
   fn from(json : &json::JsonValue) -> Self {
-  //pub mac_address  : Option<MacAddr6>,
-  //pub ip_address   : Option<Ipv4Addr>, 
-  //pub data_port    : Option<u16>,
-  //pub cmd_port     : Option<u16>,
-  //pub is_connected : bool,
-  //pub uptime       : u32,
-  //pub ch_to_pid    : [u8;8],
-  //first_up         : u32,
     let mut board =  ReadoutBoard::new();
     board.id = Some(json["id"].as_u8().unwrap());
     //let identifier: Vec<&str> = ip.split(";").collect();
@@ -755,6 +770,7 @@ impl From<&json::JsonValue> for ReadoutBoard {
       counter += 1;
     }
     board.sorted_pids = paddle_ids;
+    board.configured  = true;
     board
   }
 }
