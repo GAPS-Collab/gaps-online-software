@@ -232,7 +232,7 @@ impl Serialization for TofPacket {
     two_bytes = [stream[start_pos],
                  stream[start_pos+1]];
         
-    pos += start_pos + 2;
+    pos += 2;
     if TofPacket::HEAD != u16::from_le_bytes(two_bytes) {
       warn!("Packet does not start with HEAD signature");
       return Err(SerializationError::HeadInvalid {});
