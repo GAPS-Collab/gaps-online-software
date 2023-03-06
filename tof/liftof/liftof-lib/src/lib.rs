@@ -221,13 +221,13 @@ pub fn master_trigger(mt_ip          : &str,
     if timer.elapsed().as_secs() > 10 {
       match read_rate(&socket, &mt_address, &mut buffer) {
         Err(err) => {
-          error!("Unable to obtain MT rate information!");
+          error!("Unable to obtain MT rate information! error {err}");
           continue;
         }
         Ok(rate) => {
           info!("Got rate from MTB {rate}");
           match sender_rate.try_send(rate) {
-            Err(err) => error!("Can't send rate"),
+            Err(err) => error!("Can't send rate, error {err}"),
             Ok(_)    => ()
           }
         }
@@ -345,9 +345,13 @@ pub fn master_trigger(mt_ip          : &str,
     // measure rate every 100 events
     if n_events % 1000 == 0 {
       rate = n_events as f64 / elapsed as f64;
-      println!("==> [MASTERTRIGGER] {} events recorded, trigger rate: {:.3} Hz", n_events, rate);
+      if verbose {
+        println!("==> [MASTERTRIGGER] {} events recorded, trigger rate: {:.3} Hz", n_events, rate);
+      }
       rate = n_events_expected as f64 / elapsed as f64;
-      println!("==> -- expected rate {:.3} Hz", rate);   
+      if verbose {
+        println!("==> -- expected rate {:.3} Hz", rate);   
+      }
     } 
     // end new event
   } // end loop
