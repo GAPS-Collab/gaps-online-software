@@ -34,7 +34,7 @@ zmq = "0.10.0"
 cmake = "0.1.49"
 
 # used only for diagnostics
-hdf5    = "0.8.1"
+#hdf5    = "0.8.1"
 ndarray = "0.15"
 
 # used for the random number generation

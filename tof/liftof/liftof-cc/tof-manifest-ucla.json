@@ -1,10 +1,10 @@
 {
   "meta" : "",
   "unix_time" : "",
-  "raw_storage_savepath" : "/tpool/tofdata",
-  "events_per_file" : 1000000;
+  "events_per_file" : 100000,
+  "raw_storage_savepath" : "/tpool/tofdata/",
   "master_trigger" : {
-    "ip"   : "10.0.1.1", 
+    "ip"   : "10.0.1.10", 
     "port" : 50001
   },
   "flight_computer" : {
@@ -50,32 +50,12 @@
 
   "rbs" : [
     {
-      "id"               : 0,
-      "dna"              : 42,
-      "n_data_channels"  : 8,
-      "nwords"           : 1024,
-      "port"             : 42000,
-      "calibration_file" : "/home/gaps/astoessl/gaps-online-software/tof/resources/calibrations/rb1_cal.txt",
-      "mac_address"      : "20:b0:f7:05:52:f4",
-      "dead_channel_mask": 0,
-      "ch_to_pid"        : {
-                              "4" :  2,
-                              "5" :  2,
-                              "2" :  4,
-                              "3" :  4,
-                              "0" :  6,
-                              "1" :  6,
-                              "6" : 25,
-                              "7" : 25
-                           }
-    },
-    {
       "id"               : 1,
       "dna"              : 42,
       "n_data_channels"  : 8,
       "nwords"           : 1024,
       "port"             : 42000,
-      "calibration_file" : "/home/gaps/astoessl/gaps-online-software/tof/resources/calibrations/rb1_cal.txt",
+      "calibration_file" : "/home/gaps//gaps-online-software/tof/resources/calibrations/rb1_cal.txt",
       "mac_address"      : "20:b0:f7:05:39:a6",
       "dead_channel_mask": 0,
       "ch_to_pid"        : {
@@ -95,7 +75,7 @@
       "n_data_channels"  : 8,
       "nwords"           : 1024,
       "port"             : 42000,
-      "calibration_file" : "/home/gaps/astoessl/gaps-online-software/tof/resources/calibrations/rb1_cal.txt",
+      "calibration_file" : "/home/gaps//gaps-online-software/tof/resources/calibrations/rb1_cal.txt",
       "mac_address"      : "20:b0:f7:05:39:98",
       "dead_channel_mask": 0,
       "ch_to_pid"        : {
@@ -115,7 +95,7 @@
       "n_data_channels"  : 8,
       "nwords"           : 1024,
       "port"             : 42000,
-      "calibration_file" : "/home/gaps/astoessl/gaps-online-software/tof/resources/calibrations/rb1_cal.txt",
+      "calibration_file" : "/home/gaps//gaps-online-software/tof/resources/calibrations/rb1_cal.txt",
       "mac_address"      : "20:b0:f7:05:39:58",
       "dead_channel_mask": 0,
       "ch_to_pid"        : {
@@ -135,7 +115,7 @@
       "n_data_channels"  : 8,
       "nwords"           : 1024,
       "port"             : 42000,
-      "calibration_file" : "/home/gaps/astoessl/gaps-online-software/tof/resources/calibrations/rb1_cal.txt",
+      "calibration_file" : "/home/gaps//gaps-online-software/tof/resources/calibrations/rb1_cal.txt",
       "mac_address"      : "20:b0:f7:05:39:a8",
       "dead_channel_mask": 0,
       "ch_to_pid"        : {
@@ -155,7 +135,7 @@
       "n_data_channels"  : 8,
       "nwords"           : 1024,
       "port"             : 42000,
-      "calibration_file" : "/home/gaps/astoessl/gaps-online-software/tof/resources/calibrations/rb1_cal.txt",
+      "calibration_file" : "/home/gaps//gaps-online-software/tof/resources/calibrations/rb1_cal.txt",
       "mac_address"      : "20:b0:f7:05:39:54",
       "dead_channel_mask": 0,
       "ch_to_pid"        : {
@@ -175,7 +155,7 @@
       "n_data_channels"  : 8,
       "nwords"           : 1024,
       "port"             : 42000,
-      "calibration_file" : "/home/gaps/astoessl/gaps-online-software/tof/resources/calibrations/rb1_cal.txt",
+      "calibration_file" : "/home/gaps//gaps-online-software/tof/resources/calibrations/rb1_cal.txt",
       "mac_address"      : "20:b0:f7:05:ab:f8",
       "dead_channel_mask": 0,
       "ch_to_pid"        : {
@@ -195,8 +175,8 @@
       "n_data_channels"  : 8,
       "nwords"           : 1024,
       "port"             : 42000,
-      "calibration_file" : "/home/gaps/astoessl/gaps-online-software/tof/resources/calibrations/rb1_cal.txt",
-      "mac_address"      : "20:b0:f7:05:ad:10",
+      "calibration_file" : "/home/gaps//gaps-online-software/tof/resources/calibrations/rb1_cal.txt",
+      "mac_address"      : "20:b0:f7:05:ac:10",
       "dead_channel_mask": 0,
       "ch_to_pid"        : {
                               "4" :  2,
@@ -215,7 +195,7 @@
       "n_data_channels"  : 8,
       "nwords"           : 1024,
       "port"             : 42000,
-      "calibration_file" : "/home/gaps/astoessl/gaps-online-software/tof/resources/calibrations/rb1_cal.txt",
+      "calibration_file" : "/home/gaps//gaps-online-software/tof/resources/calibrations/rb1_cal.txt",
       "mac_address"      : "20:b0:f7:05:ab:f2",
       "dead_channel_mask": 0,
       "ch_to_pid"        : {

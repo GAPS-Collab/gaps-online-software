@@ -437,17 +437,35 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
   // FIXME - do not subscribe to all, only this 
   // specific RB
   let mut topic = b"";
-  let mut topic : String;
-  if rb.id.unwrap() < 10 {
-    topic = String::from("RB0") + &rb.id.unwrap().to_string();
-  } else {
-    topic = String::from("RB") + &rb.id.unwrap().to_string();
-  }
-  socket.set_subscribe(topic.as_bytes());
+  //let mut topic : String;
+  //if rb.id.unwrap() < 10 {
+  //  topic = String::from("RB0") + &rb.id.unwrap().to_string();
+  //} else {
+  //  topic = String::from("RB") + &rb.id.unwrap().to_string();
+  //}
+  socket.set_subscribe(topic);
+  //socket.set_subscribe(topic.as_bytes());
   let mut secs_since_epoch = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
   let mut blobfile_name = storage_savepath.to_owned() + "RB" 
-                       + &board_id.to_string() + " _ " 
+                       + &board_id.to_string() + "_" 
                        + &secs_since_epoch.to_string()
+  //let mut topic : String;
+  //if rb.id.unwrap() < 10 {
+  //  topic = String::from("RB0") + &rb.id.unwrap().to_string();
+  //} else {
+  //  topic = String::from("RB") + &rb.id.unwrap().to_string();
+  //}
+  //socket.set_subscribe(topic.as_bytes());
+  //socket.set_subscribe(topic);
+  //let blobfile_name = storage_savepath.to_owned() + "blob_" 
+  //let mut topic : String;
+  //if rb.id.unwrap() < 10 {
+  //  topic = String::from("RB0") + &rb.id.unwrap().to_string();
+  //} else {
+  //  topic = String::from("RB") + &rb.id.unwrap().to_string();
+  //}
+  //socket.set_subscribe(topic.as_bytes());
+  //                     + &board_id.to_string()
                        + ".blob";
   info!("Writing blobs to {}", blobfile_name );
   let mut blobfile_path = Path::new(&blobfile_name);
@@ -468,7 +486,7 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
         error!("Receiving from socket raised error {}", err);
       }
       Ok(buffer) => {
-        debug!("We got data of size {}", buffer.len());
+        trace!("We got data of size {}", buffer.len());
         //trace!("Working...");
         //// check for rb ping signal
         //let rb_ping = identifiy_readoutboard(&msg);
@@ -541,13 +559,13 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
           // start a new file
           secs_since_epoch = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
           blobfile_name = storage_savepath.to_owned() + "RB" 
-                         + &board_id.to_string() + " _ " 
+                         + &board_id.to_string() + "_" 
                          + &secs_since_epoch.to_string()
                          + ".blob";
-
           info!("Writing blobs to {}", blobfile_name );
           blobfile_path = Path::new(&blobfile_name);
-          file_on_disc = OpenOptions::new().append(true).create(true).open(blobfile_path).ok()
+          file_on_disc = OpenOptions::new().append(true).create(true).open(blobfile_path).ok();
+          n_events = 0;
         }
         //if write_blob {
         //  let blobfile_name = "blob_".to_owned() 
