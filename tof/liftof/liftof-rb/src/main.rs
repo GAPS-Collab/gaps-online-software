@@ -196,9 +196,13 @@ fn main() {
     error!("Invalid value for --buff-trip. Panicking!");
     panic!("Tripsize of {buff_trip}*EVENT_SIZE exceeds buffer sizes of A : {uio1_total_size} or B : {uio2_total_size}. The EVENT_SIZE is {EVENT_SIZE}");
   }
-
-  info!("Will set buffer trip size to an equivalent of {buff_trip} events");
-
+  let mut buff_trip_in_bytes : bool = false;
+  if buff_trip == EVENT_SIZE {
+    buff_trip_in_bytes = true;
+    info!("Will set buffer trip size to an equivalent of {} events", buff_trip/EVENT_SIZE);
+  } else {
+    info!("Will set buffer trip size to an equivalent of {buff_trip} events");
+  }
   // some pre-defined time units for 
   // sleeping
   let two_seconds = time::Duration::from_millis(2000);
@@ -362,13 +366,15 @@ fn main() {
     monitoring(&tp_to_pub);
   });
   if show_progress {
+    let run_params_from_cmdr_cc = run_params_from_cmdr.clone();
     workforce.execute(move || { 
       progress_runner(n_events_run,      
                       uio1_total_size,
                       uio2_total_size,
                       pb_a_up_recv ,
                       pb_b_up_recv ,
-                      pb_ev_up_recv.clone())
+                      pb_ev_up_recv.clone(),
+                      run_params_from_cmdr_cc)
     });
   }
 

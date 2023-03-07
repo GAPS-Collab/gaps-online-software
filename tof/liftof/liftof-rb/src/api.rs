@@ -466,7 +466,7 @@ pub fn data_publisher(data : &Receiver<TofPacket>,
             match &mut file_on_disc {
               None => error!("We want to write data, however the file is invalid!"),
               Some(f) => {
-                println!("write to file");
+                //println!("write to file");
                 f.write_all(packet.payload.as_slice());
               }
             }
@@ -608,7 +608,7 @@ pub fn reset_data_memory_aggressively() {
   match get_blob_buffer_occ(&buf_a) {
     Err(err) => debug!("Error getting blob buffer A occupnacy {err}"),
     Ok(val)  => {
-      println!("Got a value for the buffer A of {val}");
+      debug!("Got a value for the buffer A of {val}");
       buf_a_occ = val;
     }
   }
@@ -618,7 +618,7 @@ pub fn reset_data_memory_aggressively() {
       warn!("Error getting blob buffer B occupancy {err}");
     }
     Ok(val)  => {
-      println!("Got a value for the buffer B of {val}");
+      debug!("Got a value for the buffer B of {val}");
       buf_b_occ = val;
     }
 
@@ -1012,7 +1012,7 @@ pub fn event_cache_worker(recv_ev_pl    : Receiver<RBEventPayload>,
         //info!("{}", tp);
         match tp_to_pub.try_send(tp) {
           Err(err) => {
-            trace!("Error sending! {err}");
+            error!("Error sending! {err}");
             n_send_errors += 1;
           }
           Ok(_)    => ()
@@ -1395,8 +1395,8 @@ pub fn event_payload_worker(bs_recv   : &Receiver<Vec<u8>>,
               continue 'bytestream;
             },
             Err(err) => {
-              println!("Send {n_events} events. Got last event_id! {event_id}");
-              warn!("Got bytestream, but can not find HEAD bytes, err {err:?}");
+              debug!("Send {n_events} events. Got last event_id! {event_id}");
+              debug!("Got bytestream, but can not find HEAD bytes, err {err:?}");
               break 'bytestream;}
           } // end loop
         } // end ok
@@ -1503,11 +1503,25 @@ pub fn progress_runner(max_events      : u64,
                        uio2_total_size : usize,
                        update_bar_a    : Receiver<u64>,
                        update_bar_b    : Receiver<u64>,
-                       update_bar_ev   : Receiver<u64>) {
+                       update_bar_ev   : Receiver<u64>,
+                       run_params      : Receiver<RunParams>) {
                        //finish_bars     : Receiver<bool>){
+  let mut template_bar_env : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.red/grey} {pos:>7}/{len:7}";
+  let mut sty_ev = ProgressStyle::with_template(template_bar_env)
+  .unwrap();
+  //.progress_chars("##>");
+  let mut multi_prog = MultiProgress::new();
+
+  let mut prog_a  = multi_prog
+                .add(ProgressBar::new(uio1_total_size as u64)); 
+  let mut prog_b  = multi_prog
+                .insert_after(&prog_a, ProgressBar::new(uio2_total_size as u64)); 
+  let mut prog_ev = multi_prog
+                .insert_after(&prog_b, ProgressBar::new(max_events)); 
+
+  let sleep_time  = time::Duration::from_millis(50);
   let template_bar_a   : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.blue/grey} {bytes:>7}/{total_bytes:7} ";
   let template_bar_b   : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.green/grey} {bytes:>7}/{total_bytes:7} ";
-  let template_bar_env : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.red/grey} {pos:>7}/{len:7}";
   let floppy    = vec![240, 159, 146, 190];
   let floppy    = String::from_utf8(floppy).unwrap();
   let sparkles  = vec![226, 156, 168];
@@ -1521,58 +1535,74 @@ pub fn progress_runner(max_events      : u64,
   let sty_b = ProgressStyle::with_template(template_bar_b)
   .unwrap();
   //.progress_chars("##-");
-  let sty_ev = ProgressStyle::with_template(template_bar_env)
-  .unwrap();
-  //.progress_chars("##>");
-  let multi_prog = MultiProgress::new();
-
-  let prog_a  = multi_prog
-                .add(ProgressBar::new(uio1_total_size as u64)); 
-  let prog_b  = multi_prog
-                .insert_after(&prog_a, ProgressBar::new(uio2_total_size as u64)); 
-  let prog_ev = multi_prog
-                .insert_after(&prog_b, ProgressBar::new(max_events)); 
-  
-  prog_a.set_message (label_a);
-  prog_a.set_prefix  (floppy.clone());
-  prog_a.set_style   (sty_a);
-  prog_b.set_message (label_b);
-  prog_b.set_prefix  (floppy);
-  prog_b.set_style   (sty_b);
-  prog_ev.set_style  (sty_ev);
-  prog_ev.set_prefix (sparkles);
+  prog_a.set_message (label_a.clone());
+  prog_a.set_prefix  ("\u{1F4BE}");
+  prog_a.set_style   (sty_a.clone());
+  prog_b.set_message (label_b.clone());
+  prog_b.set_prefix  ("\u{1F4BE}");
+  prog_b.set_style   (sty_b.clone());
+  prog_ev.set_style  (sty_ev.clone());
+  prog_ev.set_prefix ("\u{2728}");
   prog_ev.set_message("EVENTS");
 
-  let sleep_time  = time::Duration::from_millis(1);
 
   loop {
-    match update_bar_a.try_recv() {
-      Err(err) => trace!("No update, err {err}"),
-      Ok(val)  => {
-        prog_a.set_position(val);
+    match run_params.try_recv() {
+      Ok(new_pars) => {
+        if !new_pars.is_active {
+          prog_a.finish();
+          prog_b.finish();
+          prog_ev.finish();
+        }
+        // these will change if we get a new run params
+        if new_pars.forever {
+          template_bar_env = "[{elapsed_precise}] {prefix} {msg} {spinner} ";
+        } else {
+          template_bar_env = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.red/grey} {pos:>7}/{len:7}";
+        }
+        sty_ev = ProgressStyle::with_template(template_bar_env)
+        .unwrap();
+        multi_prog = MultiProgress::new();
+
+        prog_a  = multi_prog
+                  .add(ProgressBar::new(uio1_total_size as u64)); 
+        prog_b  = multi_prog
+                  .insert_after(&prog_a, ProgressBar::new(uio2_total_size as u64)); 
+        prog_ev = multi_prog
+                      .insert_after(&prog_b, ProgressBar::new(new_pars.nevents as u64)); 
+        prog_a.set_message (label_a.clone());
+        prog_a.set_prefix  ("\u{1F4BE}");
+        prog_a.set_style   (sty_a.clone());
+        prog_b.set_message (label_b.clone());
+        prog_b.set_prefix  ("\u{1F4BE}");
+        prog_b.set_style   (sty_b.clone());
+        prog_ev.set_style  (sty_ev.clone());
+        prog_ev.set_prefix ("\u{2728}");
+        prog_ev.set_message("EVENTS");
+      },
+      Err(err) => {
+        trace!("Did not receive new run pars, doing nothing!");
+        match update_bar_a.try_recv() {
+          Err(err) => trace!("No update, err {err}"),
+          Ok(val)  => {
+            prog_a.set_position(val);
+          }
+        }
+        match update_bar_b.try_recv() {
+          Err(err) => trace!("No update, err {err}"),
+          Ok(val)  => {
+            prog_b.set_position(val);
+            //prog_b.inc(val);
+          }
+        }
+        match update_bar_ev.try_recv() {
+          Err(err) => trace!("No update, err {err}"),
+          Ok(val)  => {
+            prog_ev.inc(val);
+          }
+        }
+        thread::sleep(sleep_time);
       }
-    }
-    match update_bar_b.try_recv() {
-      Err(err) => trace!("No update, err {err}"),
-      Ok(val)  => {
-        prog_b.set_position(val);
-        //prog_b.inc(val);
-      }
-    }
-    match update_bar_ev.try_recv() {
-      Err(err) => trace!("No update, err {err}"),
-      Ok(val)  => {
-        prog_ev.inc(val);
-      }
-    }
-    //match finish_bars.try_recv() {
-    //  Err(err) => trace!("No update, err {err}"),
-    //  Ok(val)  => {
-    //    prog_a.finish();
-    //    prog_b.finish();
-    //    prog_ev.finish();
-    //  }
-    //}
-  thread::sleep(sleep_time);
-  }
+    } // end match
+  } // end loop
 }
