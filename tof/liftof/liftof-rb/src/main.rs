@@ -187,8 +187,8 @@ fn main() {
     println!("-----------------------------------------------"); 
   } 
   reset_data_memory_aggressively();
-  reset_data_memory_aggressively();
-  reset_data_memory_aggressively();
+  //reset_data_memory_aggressively();
+  //reset_data_memory_aggressively();
   let mut uio1_total_size = DATABUF_TOTAL_SIZE;
   let mut uio2_total_size = DATABUF_TOTAL_SIZE;
 
@@ -221,7 +221,7 @@ fn main() {
   }
  
 
-  let (run_params_to_main, run_params_from_cmdr)      : 
+  let (run_params_to_runner, run_params_from_cmdr)      : 
       (Sender<RunParams>, Receiver<RunParams>)                = unbounded();
   let (cmd_to_client, cmd_from_zmq)      : 
       (Sender<TofCommand>, Receiver<TofCommand>)              = unbounded();
@@ -234,7 +234,6 @@ fn main() {
 
   let (set_op_mode, get_op_mode)     : 
       (Sender<TofOperationMode>, Receiver<TofOperationMode>)                = unbounded();
-  let (kill_run, run_gets_killed)    : (Sender<bool>, Receiver<bool>)       = unbounded();
   let (bs_send, bs_recv)             : (Sender<Vec<u8>>, Receiver<Vec<u8>>) = unbounded(); 
   let (moni_to_main, data_fr_moni)   : (Sender<Vec<u8>>, Receiver<Vec<u8>>) = unbounded(); 
   let (ev_pl_to_cache, ev_pl_from_builder) : 
@@ -261,10 +260,10 @@ fn main() {
  
   // write a few registers - this might go to 
   // the init script
-  match disable_evt_fragments() {
-    Err(err) => error!("Can not disable writing of event fragments!"),
-    Ok(_)    => ()
-  }
+  //match disable_evt_fragments() {
+  //  Err(err) => error!("Can not disable writing of event fragments!"),
+  //  Ok(_)    => ()
+  //}
   // now we are ready to receive data 
 
   // Setup routines 
@@ -272,7 +271,7 @@ fn main() {
   // in meaningfull order
   // - higher level threads first, then 
   // the more gnarly ones.
-  let tp_to_pub_c = tp_to_pub.clone();
+  let tp_to_pub_c    = tp_to_pub.clone();
   let rsp_to_sink_c = rsp_to_sink.clone();
   workforce.execute(move || {
                     event_cache_worker(ev_pl_from_builder,
@@ -292,14 +291,14 @@ fn main() {
 
   /// Respond to commands from the C&C server
   let set_op_mode_c        = set_op_mode.clone();
-  let run_params_to_main_c = run_params_to_main.clone();
+  let run_params_to_runner_c = run_params_to_runner.clone();
   let heartbeat_timeout_seconds : u32 = 10;
   workforce.execute(move || {
                     cmd_responder(cmd_server_ip,
                                   heartbeat_timeout_seconds,
                                   &rsp_from_client,  
                                   &set_op_mode_c,
-                                  &run_params_to_main_c,
+                                  &run_params_to_runner_c,
                                   &evid_to_cache )
                                   //&cmd_to_client   )  
   
@@ -328,32 +327,29 @@ fn main() {
 
   // if we are not listening to the C&C server,
   // we have to start the run thread here
+  let mut p_op : Option<Sender<u64>> = None;
   if n_events_run > 0 || run_forever {  
-    let mut p_op : Option<Sender<u64>> = None;
     if show_progress {
       let tmp_send = pb_ev_up_send.clone();
       p_op = Some(tmp_send); 
     }
+    
     let run_params_from_cmdr_c = run_params_from_cmdr.clone();
-    workforce.execute(move || {
-        runner(Some(n_events_run),
-               None,
-               None,
-               p_op,
-               &run_params_from_cmdr_c,
-               None,
-               force_trigger);
-               //bar_clone);
-    });
     // we start the run by creating new RunParams
-    let run_pars = RunParams {
+    let mut run_pars = RunParams {
       forever   : run_forever,
       nevents   : n_events_run as u32,
-      is_active : true,
+      is_active : false,
+      nseconds  : 0
     };
-    match run_params_to_main.send(run_pars) {
-      Err(err) => error!("Could not initialzie Run! Err {err}"),
-      Ok(_)    => println!("Run initialized! Attempting to start!")
+    if run_forever || n_events_run > 0 {
+      run_pars.is_active = true;
+      match run_params_to_runner.send(run_pars) {
+        Err(err) => error!("Could not initialzie Run! Err {err}"),
+        Ok(_)    => {
+          println!("Run initialized! Attempting to start!");
+        }
+      }
     }
   }
  
@@ -366,29 +362,16 @@ fn main() {
     monitoring(&tp_to_pub);
   });
   if show_progress {
-    let kill_clone = run_gets_killed.clone();
     workforce.execute(move || { 
       progress_runner(n_events_run,      
                       uio1_total_size,
                       uio2_total_size,
                       pb_a_up_recv ,
                       pb_b_up_recv ,
-                      pb_ev_up_recv.clone(),
-                      kill_clone  )
+                      pb_ev_up_recv.clone())
     });
   }
 
-  //info!("Starting daq!");
-  //match start_drs4_daq() {
-  //  Ok(_)    => info!(".. successful!"),
-  //  Err(_)   => panic!("DRS4 start failed!")
-  //}
-
-  // let go for a few seconds to get a 
-  // rate estimate
-  //thread::sleep(two_seconds);
-  //info!("Current trigger rate: {rate}Hz");
-  //let mut command  : cmd::TofCommand;
   if stream_any {
     match set_op_mode.send(TofOperationMode::TofModeStreamAny) {
       Err(err) => error!("Can not set TofOperationMode to StreamAny! Err {err}"),
@@ -402,8 +385,14 @@ fn main() {
   //                              &hasit_from_cache,
   //                              r_clone,
   //                              set_op_mode);
-  let mut run_active = false;
   
+  let run_params_from_cmdr_c = run_params_from_cmdr.clone();
+  workforce.execute(move || {
+      runner(&run_params_from_cmdr_c,
+             None, 
+             p_op,
+             force_trigger);
+  });
   loop {
     // what we are here listening to, are commands which 
     // impact threads. E.g. StartRun will start a new data run
@@ -413,37 +402,30 @@ fn main() {
       continue;
     }
 
-    match run_params_from_cmdr.recv() {
-      Err(err) => trace!("Did not receive a new set of run pars {err}"),
-      Ok(run)    => {
-        if run.is_active { 
-          // start a new run. 
-          // is there one active?
-          if run_active {
-            let resp = TofResponse::GeneralFail(RESP_ERR_RUNACTIVE);
-            match rsp_to_sink.send(resp) {
-              Err(err) => warn!("Unable to send response! Err {err}"),
-              Ok(_)    => ()
-            }
-          } else {
-            let run_params_from_cmdr_c = run_params_from_cmdr.clone();
-            workforce.execute(move || {
-                runner(Some(run.nevents as u64),
-                       None,
-                       None,
-                       //FIXME - maybe use crossbeam?
-                       //p_op,
-                       None,
-                       &run_params_from_cmdr_c,
-                       None,
-                       force_trigger);
-                       //Some(&rk));
-                       //bar_clone);
-            });
-          }
-        }
-      }
-    }
+    //match run_params_from_cmdr.recv() {
+    //  Err(err) => trace!("Did not receive a new set of run pars {err}"),
+    //  Ok(run)    => {
+    //    if run.is_active { 
+    //      // start a new run. 
+    //      // is there one active?
+    //      if run_pars.is_active {
+    //        let resp = TofResponse::GeneralFail(RESP_ERR_RUNACTIVE);
+    //        match rsp_to_sink.send(resp) {
+    //          Err(err) => warn!("Unable to send response! Err {err}"),
+    //          Ok(_)    => ()
+    //        }
+    //      } else {
+    //        let run_params_from_cmdr_c = run_params_from_cmdr.clone();
+    //        workforce.execute(move || {
+    //            runner(&run_params_from_cmdr_c,
+    //                   None, 
+    //                   p_op,
+    //                   force_trigger);
+    //        });
+    //      }
+    //    }
+    //  }
+    //}
   } // end loop
 } // end main
 

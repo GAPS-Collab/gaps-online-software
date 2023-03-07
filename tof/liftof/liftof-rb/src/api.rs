@@ -68,10 +68,12 @@ pub const DATAPORT : u32 = 42000;
 pub const CMDPORT  : u32 = 32000;
 
 /// Meta information for a data run
+#[derive(Debug, Copy, Clone)]
 pub struct RunParams {
   pub forever   : bool,
   pub nevents   : u32,
   pub is_active : bool,
+  pub nseconds  : u32,
 }
 
 impl RunParams {
@@ -80,7 +82,8 @@ impl RunParams {
     RunParams {
       forever   : false,
       nevents   : 0,
-      is_active : false
+      is_active : false,
+      nseconds  : 0,
     }
   }
 }
@@ -149,7 +152,8 @@ pub fn cmd_responder(cmd_server_ip             : String,
   //cmd_socket.set_subscribe(&my_topic.as_bytes());
   cmd_socket.set_subscribe(&topic_broadcast.as_bytes());
   cmd_socket.set_subscribe(&topic_board.as_bytes());
-  let mut heartbeat = Instant::now();
+  let mut heartbeat     = Instant::now();
+  let mut last_run_pars = RunParams::new();
 
   error!("TODO: Heartbeat feature not yet implemented on C&C side");
   let heartbeat_received = false;
@@ -295,10 +299,12 @@ pub fn cmd_responder(cmd_server_ip             : String,
                 // nevents
                 info!("Will initialize new run!");
                 let run_p = RunParams {
-                  forever   : false,
-                  nevents   : max_event,
+                  forever   : true,
+                  nevents   : 0,
                   is_active : true,
+                  nseconds  : 0,
                 };
+                last_run_pars = run_p;
                 match run_pars.send(run_p) {
                   Err(err) => warn!("Problem initializing run!"),
                   Ok(_)    => ()
@@ -309,7 +315,9 @@ pub fn cmd_responder(cmd_server_ip             : String,
                   forever   : false,
                   nevents   : 0,
                   is_active : false,
+                  nseconds : 0,
                 };
+                last_run_pars = run_p;
                 match run_pars.send(run_p) {
                   Err(err) => warn!("Problem ending run!"),
                   Ok(_)    => ()
@@ -525,44 +533,42 @@ pub fn read_data_buffers(bs_send      : Sender<Vec<u8>>,
                          switch_buff  : bool) {
   let buf_a = BlobBuffer::A;
   let buf_b = BlobBuffer::B;
-  let sleeptime = time::Duration::from_millis(1000);
+  let sleeptime = time::Duration::from_millis(100);
 
-  let mut max_buf_a : u64 = 0;
-  let mut max_buf_b : u64 = 0;
-  let mut min_buf_a : u64 = 4294967295;
-  let mut min_buf_b : u64 = 4294967295;
+  //let mut max_buf_a : u64 = 0;
+  //let mut max_buf_b : u64 = 0;
+  //let mut min_buf_a : u64 = 4294967295;
+  //let mut min_buf_b : u64 = 4294967295;
   // let's do some work
   loop {
-    let a_occ = get_blob_buffer_occ(&buf_a).unwrap() as u64;
-    let b_occ = get_blob_buffer_occ(&buf_b).unwrap() as u64;
-    if a_occ > max_buf_a {
-      max_buf_a = a_occ;
-      println!("New MAX size for A {max_buf_a}");
-    }
-    if b_occ > max_buf_b  {
-      max_buf_b = b_occ;
-      println!("New MAX size for B {max_buf_b}");
-    }
-    if a_occ < min_buf_a {
-      min_buf_a = a_occ;
-      println!("New MIN size for A {min_buf_a}");
-    }
-    if b_occ < min_buf_b  {
-      min_buf_b = b_occ;
-      println!("New MIN size for B {min_buf_b}");
-    }
+    //let a_occ = get_blob_buffer_occ(&buf_a).unwrap() as u64;
+    //let b_occ = get_blob_buffer_occ(&buf_b).unwrap() as u64;
+    //if a_occ > max_buf_a {
+    //  max_buf_a = a_occ;
+    //  println!("New MAX size for A {max_buf_a}");
+    //}
+    //if b_occ > max_buf_b  {
+    //  max_buf_b = b_occ;
+    //  println!("New MAX size for B {max_buf_b}");
+    //}
+    //if a_occ < min_buf_a {
+    //  min_buf_a = a_occ;
+    //  println!("New MIN size for A {min_buf_a}");
+    //}
+    //if b_occ < min_buf_b  {
+    //  min_buf_b = b_occ;
+    //  println!("New MIN size for B {min_buf_b}");
+    //}
     thread::sleep(sleeptime);
     buff_handler(&buf_a,
                  buff_trip,
                  Some(&bs_send),
                  bar_a_sender.clone(),
-                 //&bar_a_op, 
                  switch_buff); 
     buff_handler(&buf_b,
                  buff_trip,
                  Some(&bs_send),
                  bar_b_sender.clone(),
-                 //&bar_b_op,
                  switch_buff); 
   }
 }
@@ -687,30 +693,11 @@ fn make_sure_it_runs(will_panic : &mut u8,
     panic!("I can not get this run to start. I'll kill myself!");
   }
 
-  ///match disable_trigger() {
-  ///  Err(err) => error!("Can not disable triggers! Err {err}"),
-  ///  Ok(_)    => trace!("Triggers enabled")
-  ///}
-  ///println!("Triggers stopped!");
 
   let five_milli = time::Duration::from_millis(5); 
   let one_sec    = time::Duration::from_secs(1);
   let two_secs   = time::Duration::from_secs(2);
   let five_secs  = time::Duration::from_secs(5);
-  //match idle_drs4_daq() {
-  //  Err(err) => warn!("Issue setting DAQ to idle mode! {}", err),
-  //  Ok(_)    => ()
-  //}
-  thread::sleep(five_milli);
-  //println!("Setup drs4");
-  //match setup_drs4() { 
-  //  Err(err) => warn!("Issue running DRS4 setup routine {}", err),
-  //  Ok(_)    => ()
-  //}
-  //println!("done");
-  //thread::sleep(five_milli);
-  //reset_data_memory_aggressively();
-  //println!("memory reset");
   thread::sleep(five_milli);
   if force_trigger {
     match disable_master_trigger_mode() {
@@ -719,14 +706,6 @@ fn make_sure_it_runs(will_panic : &mut u8,
     }
   }
 
-  //match start_drs4_daq() {
-  //  Err(err) => {
-  //    debug!("Got err {:?} when trying to start the drs4 DAQ!", err);
-  //  }
-  //  Ok(_)  => {
-  //    trace!("Starting DRS4..");
-  //  }
-  //}
   match enable_trigger() {
     Err(err) => error!("Can not enable triggers! Err {err}"),
     Ok(_)    => trace!("Triggers enabled")
@@ -780,37 +759,6 @@ pub fn run_check() {
 }
 
 
-/// Make sure a run stops
-///
-/// This will recursively call 
-/// drs4_idle to stop data taking
-///
-/// # Arguments:
-///
-/// * will_panic : After this many calls to 
-///                itself, kill_run will 
-///                panic.
-///
-fn kill_run(will_panic : &mut u8) {
-  let when_panic : u8 = RESTART_TRIES;
-  *will_panic += 1;
-  if when_panic == *will_panic {
-    panic!("We can not kill the run! I'll kill myself!");
-  }
-  let one_milli        = time::Duration::from_millis(1);
-  match disable_trigger() {
-    Err(err) => error!("Can not disable triggers, error {err}"),
-    Ok(_)    => ()
-  }
-  //match idle_drs4_daq() {
-  //  Ok(_)  => (),
-  //  Err(_) => {
-  //    warn!("Can not end run!");
-  //    thread::sleep(one_milli);
-  //    kill_run(will_panic)
-  //  }
-  //}
-}
 
 ///  A simple routine which runs until 
 ///  a certain amoutn of events are 
@@ -825,22 +773,15 @@ fn kill_run(will_panic : &mut u8) {
 ///
 ///  # Arguments
 ///
-///  * max_events     : Acqyire this number of events
-///  * max_seconds    : Let go for the specific runtime
 ///  * max_errors     : End myself when I see a certain
 ///                     number of errors
-///  * kill_signal    : End run when this line is at bool 
-///                     1
 ///  * prog_op_ev     : An option for a progress bar which
 ///                     is helpful for debugging
 ///  * force_trigger  : Run in forced trigger mode
 ///
-pub fn runner(max_events          : Option<u64>,
-              max_seconds         : Option<u64>,
+pub fn runner(run_params          : &Receiver<RunParams>,
               max_errors          : Option<u64>,
               progress            : Option<Sender<u64>>,
-              run_params          : &Receiver<RunParams>,
-              kill_signal         : Option<&Receiver<bool>>,
               force_trigger_rate  : u32) {
   
   let one_milli        = time::Duration::from_millis(1);
@@ -851,6 +792,7 @@ pub fn runner(max_events          : Option<u64>,
   let mut delta_events : u64 = 0;
   let mut n_events     : u64 = 0;
   let mut n_errors     : u64 = 0;
+  let mut will_panic   : u8 = 0;
 
   let mut timer        = Instant::now();
   let force_trigger    = force_trigger_rate > 0;
@@ -868,7 +810,7 @@ pub fn runner(max_events          : Option<u64>,
   let mut will_panic : u8 = 0;
   let mut is_running = false;
   let mut pars = RunParams::new();
-  'cmd: loop {
+  loop {
     if !is_running {
       match run_params.try_recv() {
         Err(err) => {
@@ -877,133 +819,119 @@ pub fn runner(max_events          : Option<u64>,
           continue;
         }
         Ok(p) => {
-          info!("Received a new set of RunParams!");
+          info!("Received a new set of RunParams! {:?}", p);
           pars = p;
-        }
-      }
-      // FIXME - the is_active switch is useless
-      if pars.is_active {
-        info!("Will start a new run!");
-        println!("Initializing board, starting up...");
-        make_sure_it_runs(&mut will_panic, force_trigger);
-        //println!("..done");
-        info!("Begin Run!");
-        is_running = true;
-      } else {
-        info!("Got new run params, but they don't have the active flag set. Not doing anythign!")
-      }
-    // as long as we did not see new 
-    // run params, wait for them
-    continue;
-    }
-    'run: loop {
-      if force_trigger {
-        let elapsed = timer.elapsed().as_secs_f32();
-        if elapsed > time_between_events.unwrap() {
-          timer = Instant::now(); 
-          match trigger() {
-            Err(err) => trace!("Error when triggering! {err}"),
-            Ok(_)    => ()
-          }
-        } else {
-          continue;
-        }
-      }
-
-      //println!("here");
-      match get_event_count() {
-        Err (err) => {
-          error!("Can not obtain event count! Err {:?}", err);
-          thread::sleep(one_sec);    
-          continue;
-        }
-        Ok (cnt) => {
-          //println!("Ok {cnt}");
-          evt_cnt = cnt;
-          if first_iter {
-            last_evt_cnt = evt_cnt;
-            first_iter = false;
-            continue;
-          }
-          if evt_cnt == last_evt_cnt {
-            thread::sleep(one_milli);
-            trace!("We didn't get an updated event count!");
-            //println!("{evt_cnt}");
-            continue;
-          }
-        }
-      } // end match
-
-      delta_events = (evt_cnt - last_evt_cnt) as u64;
-      n_events += delta_events;
-      last_evt_cnt = evt_cnt;
-      //println!("Last event ctr {last_evt_cnt}"); 
-      match &progress { 
-        None => (),
-        Some(sender) => {
-          match sender.try_send(delta_events) {
-            Err(err) => trace!("Error sending {err}"),
-            Ok(_)    => ()
-          }
-        }
-      }
-      trace!("Checking for kill signal");
-      // terminate if one of the 
-      // criteria is fullfilled
-      match kill_signal {
-        Some(ks) => {
-          match ks.recv() {
-            Ok(signal) => {
-              warn!("Have received kill signal!");
-              terminate = signal;
-            },
-            Err(_) => {
-              info!("Did not get kill signal!");
+          if pars.is_active {
+            info!("Will start a new run!");
+            info!("Initializing board, starting up...");
+            make_sure_it_runs(&mut will_panic, force_trigger);
+            //println!("..done");
+            info!("Begin Run!");
+            is_running = true;
+            continue; // start loop again
+          } else {
+            info!("Got signal to end stop run");
+            is_running = false;
+            match disable_trigger() {
+              Err(err) => error!("Can not disable triggers, error {err}"),
+              Ok(_)    => ()
             }
           }
-        },
-        None => ()
+        }
+      }
+    } // this is the !is_running branch
+
+    if force_trigger {
+      let elapsed = timer.elapsed().as_secs_f32();
+      if elapsed > time_between_events.unwrap() {
+        timer = Instant::now(); 
+        match trigger() {
+          Err(err) => trace!("Error when triggering! {err}"),
+          Ok(_)    => ()
+        }
+      } 
+    }    
+    if pars.forever && progress.is_none() {
+      // we can just continue, and take of the heat of the 
+      // cpu a little bit
+      if !force_trigger {
+        thread::sleep(one_sec);
+      } else {
+        thread::sleep(time::Duration::from_secs(time_between_events.unwrap() as u64));
+      }
+      continue;
+    }
+
+    // calculate current event count
+    match get_event_count() {
+      Err (err) => {
+        error!("Can not obtain event count! Err {:?}", err);
+        continue;
+      }
+      Ok (cnt) => {
+        //println!("Ok {cnt}");
+        evt_cnt = cnt;
+        if first_iter {
+          last_evt_cnt = evt_cnt;
+          first_iter = false;
+          continue;
+
+        }
+        if evt_cnt == last_evt_cnt {
+          thread::sleep(one_milli);
+          trace!("We didn't get an updated event count!");
+          continue;
+        }
+      }
+    } // end match
+
+    delta_events = (evt_cnt - last_evt_cnt) as u64;
+    n_events    += delta_events;
+    last_evt_cnt = evt_cnt;
+    
+    // if we have the progress indicator, we need to 
+    // calculate how many events we have seen
+    match &progress { 
+      None => (),
+      Some(sender) => {
+        match sender.try_send(delta_events) {
+          Err(err) => trace!("Error sending {err}"),
+          Ok(_)    => ()
+        }
+      }
+    }
+
+    if !pars.forever {
+      if pars.nevents != 0 {
+        if n_events > pars.nevents as u64{
+          terminate = true;
+        }
       }
       
-      if !pars.forever {
-        match max_events {
-          None => (),
-          Some(max_e) => {
-            if n_events > max_e {
-              terminate = true;
-            }
-          }
-        }
-        
-        match max_seconds {
-          None => (),
-          Some(max_t) => {
-            if now.elapsed().as_secs() > max_t {
-              terminate = true;
-            }
+      if pars.nseconds > 0 {
+          if now.elapsed().as_secs() > pars.nseconds  as u64{
+            terminate = true;
           }
         }
 
-        match max_errors {
-          None => (),
-          Some(max_e) => {
-            if n_errors > max_e {
-              terminate = true;
-            }
+      match max_errors {
+        None => (),
+        Some(max_e) => {
+          if n_errors > max_e {
+            terminate = true;
           }
         }
       }
       // exit loop on n event basis
       if terminate {
-        break 'run;
+        match disable_trigger() {
+          Err(err) => error!("Can not disable triggers, error {err}"),
+          Ok(_)    => ()
+        }
+        is_running = false;
       }
-      // save cpu
-      //thread::sleep(one_sec);
-    } // end 'run loop 
-  } // end 'cmd loop
-  // if the end condition is met, we stop the run
-  let mut will_panic : u8 = 0;
-  kill_run(&mut will_panic);
+    }
+  } // end loop
 }
 
 
@@ -1345,7 +1273,6 @@ pub fn buff_handler(which       : &BlobBuffer,
                     buff_trip   : usize,
                     bs_sender   : Option<&Sender<Vec<u8>>>,
                     prog_sender : Option<Sender<u64>>,
-                    //prog_bar    : &Option<Box<ProgressBar>>,
                     switch_buff : bool) {
   let sleep_after_reg_write = Duration::from_millis(SLEEP_AFTER_REG_WRITE as u64);
   let buff_size : usize;
@@ -1354,7 +1281,7 @@ pub fn buff_handler(which       : &BlobBuffer,
       buff_size = bf;
     },
     Err(err) => { 
-      debug!("Error getting buff size! {:?}", err);
+      error!("Error getting buff size! {:?}", err);
       buff_size = 0;
     }
   }
@@ -1368,14 +1295,18 @@ pub fn buff_handler(which       : &BlobBuffer,
     if switch_buff {
       match switch_ram_buffer() {
         Ok(_)  => debug!("Ram buffer switched!"),
-        Err(_) => warn!("Unable to switch RAM buffers!") 
+        Err(_) => error!("Unable to switch RAM buffers!") 
       }
     }
     //thread::sleep_ms(SLEEP_AFTER_REG_WRITE);
-    let bytestream = read_data_buffer(&which, buff_size as usize).unwrap();
+    let mut bytestream = Vec::<u8>::new(); 
+    match read_data_buffer(&which, buff_size as usize) {
+      Err(err) => error!("Can not read data buffer {err}"),
+      Ok(bs)    => bytestream = bs,
+    }
     if bs_sender.is_some() {
       match bs_sender.unwrap().send(bytestream) {
-        Err(err) => trace!("error sending {err}"),
+        Err(err) => error!("error sending {err}"),
         Ok(_)    => ()
       }
     }
@@ -1386,13 +1317,13 @@ pub fn buff_handler(which       : &BlobBuffer,
     
     match blob_buffer_reset(&which) {
       Ok(_)  => debug!("Successfully reset the buffer occupancy value"),
-      Err(_) => warn!("Unable to reset buffer!")
+      Err(_) => error!("Unable to reset buffer!")
     }
     match &prog_sender {
       None => (),
       Some(up) => {
         match up.try_send(0) {
-          Err(err) => trace!("Can not send!"),
+          Err(err) => error!("Can not send!"),
           Ok(_) => ()
         }
       }
@@ -1403,7 +1334,7 @@ pub fn buff_handler(which       : &BlobBuffer,
       None => (),
       Some(up) => {
         match up.try_send(buff_size as u64) {
-          Err(err) => trace!("Sending faile with error {err}"),
+          Err(err) => error!("Sending faile with error {err}"),
           Ok(_)    => ()
         }
       }
@@ -1415,30 +1346,6 @@ pub fn buff_handler(which       : &BlobBuffer,
   }
 }
 
-/////! FIXME - should become a feature
-//pub fn setup_progress_bar(msg : String, size : u64, format_string : String) -> ProgressBar {
-//  let mut bar = ProgressBar::new(size).with_style(
-//    //ProgressStyle::with_template("[{elapsed_precise}] {bar:40.cyan/blue} {pos:>7}/{len:7} {msg}")
-//    ProgressStyle::with_template(&format_string)
-//    .unwrap()
-//    .progress_chars("##-"));
-//  //);
-//  bar.set_message(msg);
-//  //bar.finish_and_clear();
-//  ////let mut style_found = false;
-//  //let style_ok = ProgressStyle::with_template("[{elapsed_precise}] {bar:40.cyan/blue} {pos:>7}/{len:7} {msg}");
-//  //match style_ok {
-//  //  Ok(_) => { 
-//  //    style_found = true;
-//  //  },
-//  //  Err(ref err)  => { warn!("Can not go with chosen style! Not using any! Err {err}"); }
-//  //}  
-//  //if style_found { 
-//  //  bar.set_style(style_ok.unwrap()
-//  //                .progress_chars("##-"));
-//  //}
-//  bar
-//}
 
 
 ///  Transforms raw bytestream to RBEventPayload
@@ -1596,8 +1503,8 @@ pub fn progress_runner(max_events      : u64,
                        uio2_total_size : usize,
                        update_bar_a    : Receiver<u64>,
                        update_bar_b    : Receiver<u64>,
-                       update_bar_ev   : Receiver<u64>,
-                       finish_bars     : Receiver<bool>){
+                       update_bar_ev   : Receiver<u64>) {
+                       //finish_bars     : Receiver<bool>){
   let template_bar_a   : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.blue/grey} {bytes:>7}/{total_bytes:7} ";
   let template_bar_b   : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.green/grey} {bytes:>7}/{total_bytes:7} ";
   let template_bar_env : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.red/grey} {pos:>7}/{len:7}";
@@ -1658,14 +1565,14 @@ pub fn progress_runner(max_events      : u64,
         prog_ev.inc(val);
       }
     }
-    match finish_bars.try_recv() {
-      Err(err) => trace!("No update, err {err}"),
-      Ok(val)  => {
-        prog_a.finish();
-        prog_b.finish();
-        prog_ev.finish();
-      }
-    }
+    //match finish_bars.try_recv() {
+    //  Err(err) => trace!("No update, err {err}"),
+    //  Ok(val)  => {
+    //    prog_a.finish();
+    //    prog_b.finish();
+    //    prog_ev.finish();
+    //  }
+    //}
   thread::sleep(sleep_time);
   }
 }
