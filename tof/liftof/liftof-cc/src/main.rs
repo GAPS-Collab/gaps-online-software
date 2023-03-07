@@ -133,7 +133,7 @@ fn main() {
   let mut master_trigger_port = 0usize;
 
   // Have all the readoutboard related information in this list
-  let mut rb_list = Vec::<ReadoutBoard>::new();
+  let mut rb_list : Vec::<ReadoutBoard>;
   let mut manifest = (Vec::<LocalTriggerBoard>::new(), Vec::<ReadoutBoard>::new());
   match args.json_config {
     None => panic!("No .json config file provided! Please provide a config file with --json-config or -j flag!"),

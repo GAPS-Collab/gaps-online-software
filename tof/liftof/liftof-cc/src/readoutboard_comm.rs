@@ -23,9 +23,9 @@ use ndarray::{arr1};
 
 use liftof_lib::ReadoutBoard;
 
+use tof_dataclasses::packets::PacketType;
 use tof_dataclasses::packets::paddle_packet::PaddlePacket;
 use crate::errors::BlobError;
-//use crate::reduced_tofevent::PaddlePacket;
 use tof_dataclasses::calibrations::{Calibrations,
                                     read_calibration_file};
                                     //remove_spikes,
@@ -40,7 +40,6 @@ use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::serialization::Serialization;
 use crate::waveform::CalibratedWaveform;
 
-extern crate json;
 
 /*************************************/
 
@@ -384,11 +383,9 @@ fn get_blobs_from_file (rb_id : usize) {
 
 /*************************************/
 
-///
 /// Check an incoming message for readout board 
 /// handshake/ping signal
-///
-///
+#[deprecated(since="0.2.0", note="This will no longer work")]
 fn identifiy_readoutboard(msg : &zmq::Message) -> bool
 {
   let size     = msg.len();
@@ -518,6 +515,12 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
           Ok(_)    => ()
         };
         let tp = tp_ok.unwrap();
+
+        match tp.packet_type {
+          PacketType::Monitor => {continue;},
+          _ => ()
+        }
+
         //println!("{:?}", tp.payload);
         //for n in 0..5 {
         //  println!("{}", tp.payload[n]);
