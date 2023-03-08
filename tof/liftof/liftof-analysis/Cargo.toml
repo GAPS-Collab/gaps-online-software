@@ -1,0 +1,29 @@
+[package]
+name = "liftof-analysis"
+version = "0.1.0"
+edition = "2021"
+
+
+
+[[bin]]
+name = "liftof-analysis"
+path = "src/main.rs"
+
+
+[dependencies]
+liftof-lib = { path = "../liftof-lib"} 
+
+
+tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["random"]} 
+
+
+log = "0.4"
+pretty_env_logger = "0.4"
+
+clap = { version = "4.0", features = ["derive"] }
+
+# this is just for fun
+indicatif = "0.17"
+
+#[target.armv7-unknown-linux-gnueabi]
+#linker = "/usr/bin/arm-none-eabi-gcc"
