@@ -791,20 +791,25 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                       trace!("No event!");
                     }
                     Ok(pk)  => {
-                      event = pk;
+                      //event = pk;
                       //let mut event = TofPacket::new();
                       //event.packet_type = PacketType::RBEvent;
                       // if the cache is too big, remove the oldest events
                       //let new_tof_events = vec![event];
-                      stream_cache.push_back(event);
-                      if stream_cache.len() > STREAM_CACHE_MAX_SIZE {
-                        stream_cache.pop_front();
-                        packets.pop_front(); 
+                      //stream_cache.push_back(event);
+                      //if stream_cache.len() > STREAM_CACHE_MAX_SIZE {
+                      //  stream_cache.pop_front();
+                      //  packets.pop_front(); 
+                      //}
+                      let string_repr = CommandTab::<'_>::get_pk_repr(&pk);
+                      packets.push_back(string_repr);
+                      if packets.len() > STREAM_CACHE_MAX_SIZE {
+                        packets.pop_front();
                       }
-                      for n in 0..stream_cache.len() {
-                        let foo = CommandTab::<'_>::get_pk_repr(&stream_cache[n]);
-                        packets.push_back(foo);
-                      }
+                      //for n in 0..stream_cache.len() {
+                      //  let foo = CommandTab::<'_>::get_pk_repr(&stream_cache[n]);
+                      //  packets.push_back(foo);
+                      //}
                       info!("Updating Command tab!");
                       cmd_tab.update(&packets,
                                      &last_response);
