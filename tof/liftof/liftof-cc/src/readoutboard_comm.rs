@@ -7,7 +7,7 @@
 
 use std::time::{SystemTime, UNIX_EPOCH};
 use std::{fs, fs::File, path::Path};
-use std::io::Read;
+//use std::io::Read;
 use std::io::Write;
 use std::fs::OpenOptions;
 //use crossbeam_channel as cbc; 
@@ -21,7 +21,8 @@ use hdf5;
 #[cfg(feature = "diagnostics")]
 use ndarray::{arr1};
 
-use liftof_lib::ReadoutBoard;
+use liftof_lib::{ReadoutBoard,
+                 get_file_as_byte_vec};
 
 use tof_dataclasses::packets::PacketType;
 use tof_dataclasses::packets::paddle_packet::PaddlePacket;
@@ -49,24 +50,12 @@ macro_rules! tvec [
 
 /*************************************/
 
-
-fn get_file_as_byte_vec(filename: &String) -> Vec<u8> {
-    let mut f = File::open(&filename).expect("no file found");
-    let metadata = fs::metadata(&filename).expect("unable to read metadata");
-    let mut buffer = vec![0; metadata.len() as usize];
-    f.read(&mut buffer).expect("buffer overflow");
-    return buffer;
-}
-
-/*************************************/
-
-
-/// write a bytestream to a file on disk
-fn write_stream_to_file(filename: &Path, bytestream: &Vec<u8>) -> Result<usize, std::io::Error>{
-    fs::write(filename, bytestream)?;
-    debug!("{} bytes written to {}", bytestream.len(), filename.display());
-    Ok(bytestream.len())
-}
+///// write a bytestream to a file on disk
+//fn write_stream_to_file(filename: &Path, bytestream: &Vec<u8>) -> Result<usize, std::io::Error>{
+//    fs::write(filename, bytestream)?;
+//    debug!("{} bytes written to {}", bytestream.len(), filename.display());
+//    Ok(bytestream.len())
+//}
 
 /*************************************/
 

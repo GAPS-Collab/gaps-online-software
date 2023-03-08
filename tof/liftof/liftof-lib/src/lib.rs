@@ -3,9 +3,13 @@
 use std::error::Error;
 use std::time::{Duration, Instant};
 use std::fmt;
+use std::{fs, fs::File, path::Path};
+use std::fs::OpenOptions;
+use std::io::{self, BufRead};
 use std::path::PathBuf;
 use std::net::{IpAddr, Ipv4Addr};
-use std::io::Write;
+use std::io::{Read,
+              Write};
 //use std::collections::HashMap;
 use std::net::{UdpSocket, SocketAddr};
 
@@ -19,11 +23,6 @@ use macaddr::MacAddr6;
 use netneighbours::get_mac_to_ip_map;
 use crossbeam_channel as cbc; 
 
-use std::fs::File;
-use std::fs::OpenOptions;
-
-use std::io::{self, BufRead};
-use std::path::Path;
 
 use tof_dataclasses::commands::{TofCommand};//, TofResponse};
 use tof_dataclasses::packets::TofPacket;
@@ -36,12 +35,34 @@ extern crate pretty_env_logger;
 
 const MT_MAX_PACKSIZE   : usize = 512;
 
+//*************************************************
+// I/O - read/write (general purpose) files
+//
+//
+
+
 /// The output is wrapped in a Result to allow matching on errors
 /// Returns an Iterator to the Reader of the lines of the file.
 fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
 where P: AsRef<Path>, {
     let file = File::open(filename)?;
     Ok(io::BufReader::new(file).lines())
+}
+
+/// Read a file as a vector of bytes
+///
+/// This reads the entire file in a 
+/// single vector of chars.
+///
+/// # Arguments 
+///
+/// * fliename (String) : Name of the file to read in 
+pub fn get_file_as_byte_vec(filename: &String) -> Vec<u8> {
+    let mut f = File::open(&filename).expect("no file found");
+    let metadata = fs::metadata(&filename).expect("unable to read metadata");
+    let mut buffer = vec![0; metadata.len() as usize];
+    f.read(&mut buffer).expect("buffer overflow");
+    return buffer;
 }
 
 /// Open a new file and write TofPackets
@@ -103,6 +124,12 @@ impl Default for TofPacketWriter {
   }
 
 }
+
+//**********************************************
+//
+// Subsystem communication
+//
+
 
 /// Connect to MTB Utp socket
 pub fn connect_to_mtb(mt_ip   : &str, 
@@ -376,40 +403,6 @@ pub fn master_trigger(mt_ip          : &str,
   } // end loop
 }
 
-
-
-
-
-///// Get a list of ReadoutBoards from a json file
-//#[deprecated(since="0.1.0", note="please use `get_tof_manifest` instead")]
-//pub fn rb_manifest_from_json(config : json::JsonValue) -> Vec<ReadoutBoard> {
-//  let mut boards = Vec::<ReadoutBoard>::new();
-//
-//  let nboards = config["readout_boards"].len();
-//  info!("Found configuration for {} readout boards!", nboards);
-//  for n in 0..nboards {
-//    let board_config   = &config["readout_boards"][n];
-//    let mut address_ip = String::from("tcp://");
-//    //let rb_comm_socket = ctx.socket(zmq::REP).unwrap();
-//    let rb_id = board_config["id"].as_usize().unwrap();
-//    address_ip += board_config["ip_address"].as_str().unwrap();
-//    let port        = board_config["port"].as_usize().unwrap();
-//    //let address = address_ip.to_owned() + ":" + &port.to_string();
-//    let mut rb = ReadoutBoard::new();
-//    rb.id = Some(rb_id as u8);//           : Option<u8>,
-//    //mac_address  : Option<MacAddr6>,
-//    //rb.ip_address = Some(  : Option<Ipv4Addr>, 
-//    //rb.ip_address = Some(Ipv4Addr::from_str(address_ip).expect("Wrong format for ip!"));
-//    rb.data_port  = Some(port as u16);
-//    //cmd_port     : Option<u16>,
-//    //is_connected : bool,
-//    //uptime       : u32,
-//    boards.push (rb);
-//
-//  }
-//  todo!();
-//  boards
-//}
 
 /// Get the tof channel/paddle mapping and involved components
 ///
