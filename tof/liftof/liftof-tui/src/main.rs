@@ -16,17 +16,19 @@ use thiserror::Error;
 
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, UdpSocket};
 
-use std::collections::VecDeque;
+use std::collections::{VecDeque, HashMap};
 
 extern crate pretty_env_logger;
 #[macro_use] extern crate log;
 
+extern crate json;
 
 extern crate histo;
 use histo::Histogram;
 
-use liftof_lib::{get_rb_manifest,
+use liftof_lib::{get_tof_manifest,
                  master_trigger,
+                 LocalTriggerBoard,
                  ReadoutBoard};
 
 use std::sync::mpsc;
@@ -100,6 +102,9 @@ struct Args {
   /// Autodiscover connected readoutboards
   #[arg(short, long, default_value_t = false)]
   autodiscover_rb: bool,
+  /// A json config file with detector information
+  #[arg(short, long)]
+  json_config: Option<std::path::PathBuf>,
 }
 
 enum Event<I> {
@@ -177,51 +182,79 @@ fn commander(cmd_from_main : Receiver<TofCommand>,
 
 /// Receive the data stream and forward 
 /// it to a widget
-fn receive_stream(tp_to_main : Sender<TofPacket>,
-                  rb_list    : Vec<ReadoutBoard>) {
+///
+/// # Arguments
+fn receive_stream(tp_to_main  : Sender<TofPacket>,
+                  mut rb_list : Vec<ReadoutBoard>,
+                  rb_id       : Receiver<u8>) {
       
   let ctx = zmq::Context::new();  
   let data_socket = ctx.socket(zmq::SUB).expect("Unable to create 0MQ SUB socket!");
-
-  for rb in rb_list.iter() {
-    match rb.ip_address {
-      None => {continue;},
-      Some(ip) => {
-        //let mut address_ip = String::from("tcp://127.0.0.1");
-        //let data_port : u32 = 40000;
-        //let data_address : String = address_ip + ":" + &data_port.to_string();
-        let mut address_ip = "tcp://".to_owned() + &rb.ip_address.unwrap().to_string();
-        match rb.data_port {
-          None => {continue;}
-          Some(port) => {
-            address_ip += &":".to_owned();
-            address_ip += &port.to_string();
-            data_socket.connect(&address_ip);
-            info!("0MQ SUB socket connected to address {address_ip}");
-          }
-        }
-      }
-    }
+  let mut previous_endpoint = rb_list[0].get_connection_string(); 
+  let mut previous_topic    = String::from("");
+  data_socket.connect(&previous_endpoint);
+  data_socket.set_subscribe(previous_topic.as_bytes());
+  let mut rb_map = HashMap::<u8, String>::new();
+  for rb in rb_list.iter_mut() {
+    let conn = rb.get_connection_string().clone();
+    rb_map.insert(rb.id.unwrap(), conn);
+    //match rb.ip_address {
+    //  None => {continue;},
+    //  Some(ip) => {
+    //    //let mut address_ip = String::from("tcp://127.0.0.1");
+    //    //let data_port : u32 = 40000;
+    //    //let data_address : String = address_ip + ":" + &data_port.to_string();
+    //    let mut address_ip = "tcp://".to_owned() + &rb.ip_address.unwrap().to_string();
+    //    match rb.data_port {
+    //      None => {continue;}
+    //      Some(port) => {
+    //        address_ip += &":".to_owned();
+    //        address_ip += &port.to_string();
+    //        data_socket.connect(&address_ip);
+    //        info!("0MQ SUB socket connected to address {address_ip}");
+    //      }
+    //    }
+    //  }
+    //}
   }
-  let topic = b"";
-  data_socket.set_subscribe(topic);
   let recv_rate = Duration::from_millis(5);
 
   loop {
     // reduce the heat and take it easy
     //thread::sleep(recv_rate);
+    match rb_id.try_recv() {
+      Err(err) => trace!("Can not receive RB id, err {err}"),
+      Ok(id)   => {
+        let new_topic : String;
+        if id < 10 {
+          new_topic = String::from("RB0") + &id.to_string();
+        }  else {
+          new_topic = String::from("RB") + &id.to_string();
+        }
+        data_socket.set_unsubscribe(previous_topic.as_bytes());
+        data_socket.disconnect(&previous_endpoint);
+        previous_topic = new_topic;
+        previous_endpoint = rb_map[&id].clone();
+        println!("previous endpoint {}", previous_endpoint);
+        data_socket.connect(&previous_endpoint);
+        //data_socket.set_subscribe(previous_topic.as_bytes());
+        data_socket.set_subscribe(b"");
+      }
+
+    }
+    //println!("Previous endpoint {}", previous_endpoint);
     match data_socket.recv_bytes(zmq::DONTWAIT) {
       Err(err) => trace!("[zmq] Nothing to receive/err {err}"),
       Ok(msg)  => {
         info!("[zmq] SUB - got msg of size {}", msg.len());
-        let packet = TofPacket::from_bytestream(&msg, 0);
+        let packet = TofPacket::from_bytestream(&msg, 4);
         match packet {
           Err(err) => { 
-            warn!("Can't unpack packet!");
+            error!("Can't unpack packet! {err}");
           },
           Ok(pk) => {
             match tp_to_main.try_send(pk) {
-              Err(err) => warn!("Can't send packet!"),
+              Err(err) => error!("Can't send packet! {err}"),
               Ok(_)    => info!("Done"),
             }
           }
@@ -375,15 +408,36 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
 
     // make sure the rb is connected
   }  
-  if autodiscover_rb {
-    rb_list = get_rb_manifest();
-    if rb_list.len() == 0 {
-      println!("Could not discover boards, inserting dummy");
-      let mut rb = ReadoutBoard::default();
-      rb.id = Some(0);
-      rb_list = vec![rb];
-    }
-  }
+  let mut manifest = (Vec::<LocalTriggerBoard>::new(), Vec::<ReadoutBoard>::new());
+  let json_content  : String;
+  let config        : json::JsonValue;
+
+
+  match args.json_config {
+    None => panic!("No .json config file provided! Please provide a config file with --json-config or -j flag!"),
+    Some(_) => {
+      json_content = std::fs::read_to_string(args.json_config.as_ref().unwrap()).unwrap();
+      config = json::parse(&json_content).unwrap();
+      manifest = get_tof_manifest(args.json_config.unwrap());
+      println!("==> Tof Manifest following:");
+      println!("{:?}", manifest);
+      println!("***************************");
+      rb_list = manifest.1;
+    } // end Some
+  } // end match
+
+
+
+
+  //if autodiscover_rb {
+  //  rb_list = get_rb_manifest();
+  //  if rb_list.len() == 0 {
+  //    println!("Could not discover boards, inserting dummy");
+  //    let mut rb = ReadoutBoard::default();
+  //    rb.id = Some(0);
+  //    rb_list = vec![rb];
+  //  }
+  //}
   let rb_list_c  = rb_list.clone();
   let rb_list_c2 = rb_list.clone();
   // first set up comms etc. before 
@@ -396,6 +450,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let (rsp_to_main, rsp_from_cmdr) :
     (Sender<Vec<Option<TofResponse>>>, Receiver<Vec<Option<TofResponse>>>) = unbounded();
   //let ev_to_main, ev_from_thread) : Sender
+  let (rb_id_to_receiver, rb_id_from_main) : (Sender<u8>, Receiver<u8>) = unbounded();
   println!("We have the following ReadoutBoards");
   for n in 0..rb_list_c2.len() {
     println!("{}",rb_list_c2[n]);
@@ -411,10 +466,11 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   //});
   let tp_to_main_c = tp_to_main.clone();
   workforce.execute(move || {
-      receive_stream(tp_to_main, rb_list_c);
+      receive_stream(tp_to_main, rb_list_c, rb_id_from_main);
   });
 
-  let master_trigger_ip = String::from("10.0.1.10");
+  //let master_trigger_ip = String::from("10.0.1.10");
+  let master_trigger_ip = String::from("192.168.36.121");
   let master_trigger_port : usize = 50001;
 
   workforce.execute(move || {
@@ -462,8 +518,6 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   }); 
 
 
-  //let menu_titles = vec!["Home", "RBStatus", "Commands", "Alerts", "Dashboard", "Logs" ];
-  //let mut active_menu_item = MenuItem::Home;
   let mut rb_list_state = ListState::default();
   rb_list_state.select(Some(0));
  
@@ -776,24 +830,27 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                   match ev.code {
                     KeyCode::Down => {
                       if let Some(selected) = rb_list_state.selected() {
-                        //let amount_pets = read_db().expect("can fetch pet list").len();
-                        //let max_rb = 40;
+                        let mut select_board = selected;
                         if selected >= rb_list.len() {
                           rb_list_state.select(Some(0));
+                          select_board = 0;
                         } else {
                           rb_list_state.select(Some(selected + 1));
                         }
+                      rb_id_to_receiver.send(rb_list[selected].id.unwrap());
                       }
                     }
                     KeyCode::Up => {
                       if let Some(selected) = rb_list_state.selected() {
-                        //let amount_pets = read_db().expect("can fetch pet list").len();
-                        //let max_rb = 40;
+                        let mut select_board = selected;
                         if selected > rb_list.len() {
                             rb_list_state.select(Some(selected - 1));
+                            select_board = 0;
                         } else {
                             rb_list_state.select(Some(rb_list.len() - 1));
                         }
+                        rb_id_to_receiver.send(rb_list[selected -1].id.unwrap());
+
                       }
                     }
                   _ => trace!("Some other key pressed!"),
@@ -804,11 +861,10 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
             }
           }
 
-
           let empty_data = vec![(0.0,0.0);1024]; 
           let mut data = vec![empty_data;9];
           let mut update_channels = false;
-          match tp_from_recv.recv() {
+          match tp_from_recv.try_recv() {
             Err(err) => {trace!("Did not receive new data!");},
             Ok(dt)   => {
               if dt.packet_type == PacketType::RBEvent {
@@ -835,58 +891,58 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
 
           let datasets = vec![
             Dataset::default()
-              .name("Ch0")
+              .name("Ch1")
               .marker(symbols::Marker::Braille)
               .graph_type(GraphType::Line)
               .style(Style::default().fg(Color::White))
               .data(&data[0]),
             Dataset::default()
-              .name("Ch1")
+              .name("Ch2")
               .marker(symbols::Marker::Braille)
               .graph_type(GraphType::Line)
               .style(Style::default().fg(Color::White))
               .data(&data[1]),
             Dataset::default()
-              .name("Ch2")
+              .name("Ch3")
               .marker(symbols::Marker::Braille)
               .graph_type(GraphType::Line)
               .style(Style::default().fg(Color::White))
               .data(&data[2]),
             Dataset::default()
-              .name("Ch3")
+              .name("Ch4")
               .marker(symbols::Marker::Braille)
               .graph_type(GraphType::Line)
               .style(Style::default().fg(Color::White))
               .data(&data[3]),
             Dataset::default()
-              .name("Ch4")
+              .name("Ch5")
               .marker(symbols::Marker::Braille)
               .graph_type(GraphType::Line)
               .style(Style::default().fg(Color::White))
               .data(&data[4]),
             Dataset::default()
-              .name("Ch5")
-              .marker(symbols::Marker::Braille)
-              .graph_type(GraphType::Line)
-              .style(Style::default().fg(Color::Magenta))
-              .data(&data[5]),
-            Dataset::default()
               .name("Ch6")
               .marker(symbols::Marker::Braille)
               .graph_type(GraphType::Line)
-              .style(Style::default().fg(Color::Magenta))
-              .data(&data[6]),
+              .style(Style::default().fg(Color::White))
+              .data(&data[5]),
             Dataset::default()
               .name("Ch7")
               .marker(symbols::Marker::Braille)
               .graph_type(GraphType::Line)
-              .style(Style::default().fg(Color::Magenta))
-              .data(&data[7]),
+              .style(Style::default().fg(Color::White))
+              .data(&data[6]),
             Dataset::default()
-              .name("Ch8 ('Ninth')")
+              .name("Ch8")
               .marker(symbols::Marker::Braille)
               .graph_type(GraphType::Line)
-              .style(Style::default().fg(Color::Magenta))
+              .style(Style::default().fg(Color::White))
+              .data(&data[7]),
+            Dataset::default()
+              .name("Ch9")
+              .marker(symbols::Marker::Braille)
+              .graph_type(GraphType::Line)
+              .style(Style::default().fg(Color::White))
               .data(&data[8]),
           ];
           

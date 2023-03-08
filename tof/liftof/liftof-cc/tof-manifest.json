@@ -14,7 +14,7 @@
         "id"         : 8,
         "DSI"        : 0,
         "J"          : 1,
-      "dead_channel_mask": 0,
+       "dead_channel_mask": 0,
         "ch_to_rb"   : { 
                          "8" : [16,5],
                          "9": [16,6],
@@ -43,6 +43,7 @@
        "J"          : 4
      }
   ],
+
   "rbs" : [
     {
       "id"               : 16,
@@ -52,6 +53,46 @@
       "port"             : 42000,
       "calibration_file" : "/home/gaps/astoessl/gaps-online-software/tof/resources/calibrations/rb1_cal.txt",
       "mac_address"      : "20:b0:f7:05:3b:1a",
+      "dead_channel_mask": 0,
+      "ch_to_pid"        : {
+                              "4" :  2,
+                              "5" :  2,
+                              "2" :  4,
+                              "3" :  4,
+                              "0" :  6,
+                              "1" :  6,
+                              "6" : 25,
+                              "7" : 25
+                           }
+    },
+    {
+      "id"               : 5,
+      "dna"              : 42,
+      "n_data_channels"  : 8,
+      "nwords"           : 1024,
+      "port"             : 42000,
+      "calibration_file" : "/home/gaps/astoessl/gaps-online-software/tof/resources/calibrations/rb1_cal.txt",
+      "mac_address"      : "20:b0:f7:05:39:ae",
+      "dead_channel_mask": 0,
+      "ch_to_pid"        : {
+                              "4" :  2,
+                              "5" :  2,
+                              "2" :  4,
+                              "3" :  4,
+                              "0" :  6,
+                              "1" :  6,
+                              "6" : 25,
+                              "7" : 25
+                           }
+    },
+    {
+      "id"               : 6,
+      "dna"              : 42,
+      "n_data_channels"  : 8,
+      "nwords"           : 1024,
+      "port"             : 42000,
+      "calibration_file" : "/home/gaps/astoessl/gaps-online-software/tof/resources/calibrations/rb1_cal.txt",
+      "mac_address"      : "20:b0:f7:05:39:4e",
       "dead_channel_mask": 0,
       "ch_to_pid"        : {
                               "4" :  2,
