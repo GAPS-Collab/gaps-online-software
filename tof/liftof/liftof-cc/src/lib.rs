@@ -27,7 +27,7 @@ extern crate local_ip_address;
 
 extern crate liftof_lib;
 use liftof_lib::{ReadoutBoard, 
-                 rb_manifest_from_json,
+                 //rb_manifest_from_json,
                  get_rb_manifest};
 
 #[cfg(feature="random")]

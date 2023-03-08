@@ -1,20 +1,16 @@
 //pub mod misc;
 
-use port_scanner::scan_ports_addrs;
-
 use std::error::Error;
 use std::time::{Duration, Instant};
 use std::fmt;
 use std::path::PathBuf;
 use std::net::{IpAddr, Ipv4Addr};
 use std::io::Write;
-use std::collections::HashMap;
+//use std::collections::HashMap;
 use std::net::{UdpSocket, SocketAddr};
 
 use tof_dataclasses::events::master_trigger::{read_daq, read_rate, reset_daq};
 
-// FIXME - remove this crate
-//use mac_address::MacAddress;
 use zmq;
 
 extern crate json;
@@ -29,7 +25,7 @@ use std::fs::OpenOptions;
 use std::io::{self, BufRead};
 use std::path::Path;
 
-use tof_dataclasses::commands::{TofCommand, TofResponse};
+use tof_dataclasses::commands::{TofCommand};//, TofResponse};
 use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::events::MasterTriggerEvent;
 
@@ -131,9 +127,10 @@ pub fn connect_to_mtb(mt_ip   : &str,
       socket = value;
       // this is not strrictly necessary, but 
       // it is nice to limit communications
-      
-      let ro = socket.set_read_timeout(Some(Duration::from_millis(1)));
-
+      match socket.set_read_timeout(Some(Duration::from_millis(1))) {
+        Err(err) => error!("Can not set read timeout for Udp socket! Error {err}"),
+        Ok(_)    => ()
+      }
       match socket.connect(&mt_address) {
         Err(err) => {
           error!("Can not connect to master trigger at {}, err {}", mt_address, err);
@@ -146,8 +143,26 @@ pub fn connect_to_mtb(mt_ip   : &str,
   } // end match
 }  
 
-/// Communications with the master trigger
+/// Communications with the master trigger over Udp
 ///
+/// The master trigger can send packets over the network.
+/// These packets contain timestamps as well as the 
+/// eventid and a hitmaks to identify which LTBs have
+/// participated in the trigger.
+/// The packet format is described
+/// [here](https://gitlab.com/ucla-gaps-tof/firmware/-/tree/develop/)
+///
+/// # Arguments
+///
+/// * mt_ip       : ip address of the master trigger, most likely 
+///                 something like 10.0.1.10
+/// * mt_port     : 
+///
+/// * sender_rate : 
+/// 
+/// * 
+///
+/// * verbose     : Print "heartbeat" output 
 ///
 pub fn master_trigger(mt_ip          : &str, 
                       mt_port        : usize,
@@ -168,32 +183,35 @@ pub fn master_trigger(mt_ip          : &str,
   //let mut event_cnt      = 0u32;
   let mut last_event_cnt = 0u32;
   let mut missing_evids  = 0usize;
-  let mut event_missing  = false;
+  //let mut event_missing  = false;
   let mut n_events       = 0usize;
   // these are the number of expected events
   // (missing included)
   let mut n_events_expected = 0usize;
   let mut n_paddles_expected : u32;
-  let mut rate = 0f64;
+  let mut rate : f64;
   // for rate measurement
   let start = Instant::now();
 
   let mut next_beat = true;
+  
+  // FIXME - this is a good idea
   // limit polling rate to a maximum
-  let max_rate = 200.0; // hz
+  //let max_rate = 200.0; // hz
     
   // reset the master trigger before acquisiton
   info!("Resetting master trigger");
-  reset_daq(&socket, &mt_address);  
+  match reset_daq(&socket, &mt_address) {
+    Err(err) => error!("Can not reset DAQ, error {err}"),
+    Ok(_)    => ()
+  }
   // the event counter has to be reset before 
   // we connect to the readoutboards
   //reset_event_cnt(&socket, &mt_address); 
-  let mut mt_event = read_daq(&socket, &mt_address, &mut buffer);
+  let mut ev : MasterTriggerEvent;// = read_daq(&socket, &mt_address, &mut buffer);
   let mut timeout = Instant::now();
   //let timeout = Duration::from_secs(5);
   info!("Starting MT event loop at {:?}", timeout);
-
-  let rate_query_rate = Duration::from_secs(5);
   let mut timer = Instant::now();
 
 
@@ -271,16 +289,17 @@ pub fn master_trigger(mt_ip          : &str,
     
     //event_cnt = read_event_cnt(&socket, &mt_address, &mut buffer);
     //println!("Will read daq");
-    mt_event = read_daq(&socket, &mt_address, &mut buffer);
+    //mt_event = read_daq(&socket, &mt_address, &mut buffer);
     //println!("Got event");
-    match mt_event {
+    match read_daq(&socket, &mt_address, &mut buffer) {
       Err(err) => {
         trace!("Did not get new event, Err {err}");
         continue;
       }
-      Ok(_)    => ()
+      Ok(new_event) => {
+        ev = new_event; 
+      }
     }
-    let ev = mt_event.unwrap();
     if ev.event_id == last_event_cnt {
       trace!("Same event!");
       continue;
@@ -321,10 +340,10 @@ pub fn master_trigger(mt_ip          : &str,
         missing_evids += missing as usize;
       } else {
         warn!("We missed too many event ids from the master trigger!");
-        missing = 0;
+        //missing = 0;
       }
       //error!("We missed {} events!", missing);
-      event_missing = true;
+      //event_missing = true;
     }
     
     trace!("Got new event id from master trigger {}",ev.event_id);
@@ -337,8 +356,8 @@ pub fn master_trigger(mt_ip          : &str,
     n_events_expected = n_events + missing_evids;
 
     if n_events % 1000 == 0 {
-      let pk = TofPacket::new();
-      
+      //let pk = TofPacket::new();
+      error!("Sending of mastertrigger packets down the global data sink not supported yet!");
     }
 
     let elapsed = start.elapsed().as_secs();
@@ -361,43 +380,43 @@ pub fn master_trigger(mt_ip          : &str,
 
 
 
-/// Get a list of ReadoutBoards from a json file
-#[deprecated(since="0.1.0", note="please use `get_tof_manifest` instead")]
-pub fn rb_manifest_from_json(config : json::JsonValue) -> Vec<ReadoutBoard> {
-  let mut boards = Vec::<ReadoutBoard>::new();
-
-  let nboards = config["readout_boards"].len();
-  info!("Found configuration for {} readout boards!", nboards);
-  for n in 0..nboards {
-    let board_config   = &config["readout_boards"][n];
-    let mut address_ip = String::from("tcp://");
-    //let rb_comm_socket = ctx.socket(zmq::REP).unwrap();
-    let rb_id = board_config["id"].as_usize().unwrap();
-    address_ip += board_config["ip_address"].as_str().unwrap();
-    let port        = board_config["port"].as_usize().unwrap();
-    let address = address_ip.to_owned() + ":" + &port.to_string();
-    let mut rb = ReadoutBoard::new();
-    rb.id = Some(rb_id as u8);//           : Option<u8>,
-    //mac_address  : Option<MacAddr6>,
-    //rb.ip_address = Some(  : Option<Ipv4Addr>, 
-    //rb.ip_address = Some(Ipv4Addr::from_str(address_ip).expect("Wrong format for ip!"));
-    rb.data_port  = Some(port as u16);
-    //cmd_port     : Option<u16>,
-    //is_connected : bool,
-    //uptime       : u32,
-    boards.push (rb);
-
-  }
-  todo!();
-  boards
-}
+///// Get a list of ReadoutBoards from a json file
+//#[deprecated(since="0.1.0", note="please use `get_tof_manifest` instead")]
+//pub fn rb_manifest_from_json(config : json::JsonValue) -> Vec<ReadoutBoard> {
+//  let mut boards = Vec::<ReadoutBoard>::new();
+//
+//  let nboards = config["readout_boards"].len();
+//  info!("Found configuration for {} readout boards!", nboards);
+//  for n in 0..nboards {
+//    let board_config   = &config["readout_boards"][n];
+//    let mut address_ip = String::from("tcp://");
+//    //let rb_comm_socket = ctx.socket(zmq::REP).unwrap();
+//    let rb_id = board_config["id"].as_usize().unwrap();
+//    address_ip += board_config["ip_address"].as_str().unwrap();
+//    let port        = board_config["port"].as_usize().unwrap();
+//    //let address = address_ip.to_owned() + ":" + &port.to_string();
+//    let mut rb = ReadoutBoard::new();
+//    rb.id = Some(rb_id as u8);//           : Option<u8>,
+//    //mac_address  : Option<MacAddr6>,
+//    //rb.ip_address = Some(  : Option<Ipv4Addr>, 
+//    //rb.ip_address = Some(Ipv4Addr::from_str(address_ip).expect("Wrong format for ip!"));
+//    rb.data_port  = Some(port as u16);
+//    //cmd_port     : Option<u16>,
+//    //is_connected : bool,
+//    //uptime       : u32,
+//    boards.push (rb);
+//
+//  }
+//  todo!();
+//  boards
+//}
 
 /// Get the tof channel/paddle mapping and involved components
 ///
 /// This reads the configuration from a json file and panics 
 /// if there are any problems.
 ///
-pub fn get_tof_manifest(json_config : std::path::PathBuf) -> (Vec::<LocalTriggerBoard>, Vec::<ReadoutBoard>) {
+pub fn get_tof_manifest(json_config : PathBuf) -> (Vec::<LocalTriggerBoard>, Vec::<ReadoutBoard>) {
   let mut ltbs = Vec::<LocalTriggerBoard>::new();
   let mut rbs  = Vec::<ReadoutBoard>::new();
   let js_file = json_config.as_path();
@@ -589,7 +608,7 @@ impl From<&json::JsonValue> for LocalTriggerBoard {
     let id  = json["id"].as_u8().expect("id value json problem");
     let dsi = json["DSI"].as_u8().expect("DSI value json problem");
     let j   = json["J"].as_u8().expect("J value json problem");
-    let mask = LocalTriggerBoard::get_mask_from_dsi_and_j(dsi, j);
+    //let mask = LocalTriggerBoard::get_mask_from_dsi_and_j(dsi, j);
     let channels = &json["ch_to_rb"];//.members();
     let mut rb_channels = [(0, 0);16];
     for ch in 0..channels.len() {
