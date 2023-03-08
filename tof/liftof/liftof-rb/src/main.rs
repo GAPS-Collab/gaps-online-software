@@ -12,9 +12,6 @@ extern crate crossbeam_channel;
 use crossbeam_channel::{unbounded,
                         Sender,
                         Receiver};
-
-use std::net::IpAddr;
-
 use local_ip_address::local_ip;
 
 //use std::collections::HashMap;
@@ -23,30 +20,23 @@ use liftof_rb::api::*;
 use liftof_rb::control::*;
 use liftof_rb::memory::{BlobBuffer,
                     EVENT_SIZE,
-                    DATABUF_TOTAL_SIZE,
-                    UIO1_MAX_OCCUPANCY,
-                    UIO2_MAX_OCCUPANCY,
-                    UIO1_MIN_OCCUPANCY,
-                    UIO2_MIN_OCCUPANCY};
-use tof_dataclasses::commands::*;
+                    DATABUF_TOTAL_SIZE};
 
 use tof_dataclasses::threading::ThreadPool;
 use tof_dataclasses::packets::{TofPacket,
                                PacketType};
-use tof_dataclasses::packets::generic_packet::GenericPacket;
 use tof_dataclasses::events::blob::RBEventPayload;
 use tof_dataclasses::commands::{TofCommand,
                                 TofResponse,
                                 TofOperationMode};
 use tof_dataclasses::commands as cmd;
 use tof_dataclasses::monitoring as moni;
-use tof_dataclasses::serialization::Serialization;
 //use liftof_lib::misc::*;
 extern crate pretty_env_logger;
 #[macro_use] extern crate log;
 
 //use log::{info, LevelFilter};
-use std::io::Write;
+//use std::io::Write;
 
 
 extern crate clap;
@@ -126,11 +116,9 @@ fn main() {
 
   let kraken                = vec![240, 159, 144, 153];
   let fish                  = vec![240, 159, 144, 159];
-  let sparkles              = vec![226, 156, 168];
   // We know these bytes are valid, so we'll use `unwrap()`.
   let kraken           = String::from_utf8(kraken).unwrap();
   let fish             = String::from_utf8(fish).unwrap();
-  let sparkles         = String::from_utf8(sparkles).unwrap();
 
   // General parameters, readout board id,, 
   // ip to tof computer
@@ -141,7 +129,7 @@ fn main() {
   let mut switch_buff   = false;
   
   let args = Args::parse();                   
-  let buff_trip         = args.buff_trip;         
+  let mut buff_trip     = args.buff_trip;         
   let mut n_events_run  = args.nevents;
   let mut show_progress = args.show_progress;
   let cache_size        = args.cache_size;
@@ -187,6 +175,8 @@ fn main() {
     println!("-----------------------------------------------"); 
   } 
   reset_data_memory_aggressively();
+  reset_data_memory_aggressively();
+  reset_data_memory_aggressively();
   //reset_data_memory_aggressively();
   //reset_data_memory_aggressively();
   let mut uio1_total_size = DATABUF_TOTAL_SIZE;
@@ -196,17 +186,13 @@ fn main() {
     error!("Invalid value for --buff-trip. Panicking!");
     panic!("Tripsize of {buff_trip}*EVENT_SIZE exceeds buffer sizes of A : {uio1_total_size} or B : {uio2_total_size}. The EVENT_SIZE is {EVENT_SIZE}");
   }
-  let mut buff_trip_in_bytes : bool = false;
-  if buff_trip == EVENT_SIZE {
-    buff_trip_in_bytes = true;
+  if buff_trip == DATABUF_TOTAL_SIZE {
     info!("Will set buffer trip size to an equivalent of {} events", buff_trip/EVENT_SIZE);
   } else {
     info!("Will set buffer trip size to an equivalent of {buff_trip} events");
   }
   // some pre-defined time units for 
   // sleeping
-  let two_seconds = time::Duration::from_millis(2000);
-  let one_milli   = time::Duration::from_millis(1);
   let one_sec     = time::Duration::from_secs(1);  
 
   // threads and inter-thread communications
@@ -219,7 +205,7 @@ fn main() {
   // + main thread, which does not need a 
   //   separate thread
   //FIXME - restrict to actual number of threads
-  let mut n_threads = 20;
+  let mut n_threads = 12;
   if show_progress {
     n_threads += 1;
   }
@@ -227,19 +213,19 @@ fn main() {
 
   let (run_params_to_runner, run_params_from_cmdr)      : 
       (Sender<RunParams>, Receiver<RunParams>)                = unbounded();
-  let (cmd_to_client, cmd_from_zmq)      : 
-      (Sender<TofCommand>, Receiver<TofCommand>)              = unbounded();
+  //let (cmd_to_client, cmd_from_zmq)      : 
+  //    (Sender<TofCommand>, Receiver<TofCommand>)              = unbounded();
   let (rsp_to_sink, rsp_from_client)     : 
       (Sender<TofResponse>, Receiver<TofResponse>)            = unbounded();
   let (tp_to_pub, tp_from_client)        : 
       (Sender<TofPacket>, Receiver<TofPacket>)                = unbounded();
-  let (hasit_to_cmd, hasit_from_cache)   : 
-      (Sender<bool>, Receiver<bool>)                          = unbounded();
+  //let (hasit_to_cmd, hasit_from_cache)   : 
+  //    (Sender<bool>, Receiver<bool>)                          = unbounded();
 
   let (set_op_mode, get_op_mode)     : 
       (Sender<TofOperationMode>, Receiver<TofOperationMode>)                = unbounded();
   let (bs_send, bs_recv)             : (Sender<Vec<u8>>, Receiver<Vec<u8>>) = unbounded(); 
-  let (moni_to_main, data_fr_moni)   : (Sender<Vec<u8>>, Receiver<Vec<u8>>) = unbounded(); 
+  //let (moni_to_main, data_fr_moni)   : (Sender<Vec<u8>>, Receiver<Vec<u8>>) = unbounded(); 
   let (ev_pl_to_cache, ev_pl_from_builder) : 
       (Sender<RBEventPayload>, Receiver<RBEventPayload>)                    = unbounded();
   let (ev_pl_to_cmdr,  ev_pl_from_cache)   : 
@@ -256,10 +242,13 @@ fn main() {
   if buff_trip != DATABUF_TOTAL_SIZE {
     uio1_total_size = EVENT_SIZE*buff_trip;
     uio2_total_size = EVENT_SIZE*buff_trip;
+    buff_trip = EVENT_SIZE*buff_trip;
     // if we change the buff size, we HAVE to manually swith 
     // the buffers since the fw does not know about this change, 
     // it is software only
     switch_buff     = true;
+    info!("We set a value for buff_trip of {buff_trip}");
+    info!("We are switching the buffers manually!");
   }
  
   // write a few registers - this might go to 
@@ -270,12 +259,63 @@ fn main() {
   //}
   // now we are ready to receive data 
 
-  // Setup routines 
-  // Start the individual worker threads
-  // in meaningfull order
-  // - higher level threads first, then 
-  // the more gnarly ones.
-  let tp_to_pub_c    = tp_to_pub.clone();
+  // Setup routine. Start the threads in inverse order of 
+  // how far they are away from the buffers.
+  
+  // first, the progress bars (if desired)
+  let mut pb_a = None;
+  let mut pb_b = None;
+  let mut p_op : Option<Sender<u64>> = None;
+  //if n_events_run > 0 || run_forever {  
+  //  if show_progress {
+  //  }
+  //}
+  if show_progress {
+    let tmp_send = pb_ev_up_send.clone();
+    p_op = Some(tmp_send); 
+
+    pb_a = Some(pb_a_up_send.clone());
+    pb_b = Some(pb_b_up_send.clone());
+    let run_params_from_cmdr_cc = run_params_from_cmdr.clone();
+    workforce.execute(move || { 
+      progress_runner(n_events_run,      
+                      uio1_total_size,
+                      uio2_total_size,
+                      pb_a_up_recv ,
+                      pb_b_up_recv ,
+                      pb_ev_up_recv.clone(),
+                      run_params_from_cmdr_cc)
+    });
+  }
+  let rdb_sender_a  = bs_send.clone();
+  let rdb_sender_b  = bs_send.clone();
+  workforce.execute(move || {
+    read_data_buffers(rdb_sender_a,
+                      buff_trip,
+                      pb_a,
+                      pb_b,
+                      switch_buff);
+  });
+  
+
+  workforce.execute(move || {
+    data_publisher(&tp_from_client, rb_test); 
+  });
+  let tp_to_pub_c   = tp_to_pub.clone();
+  workforce.execute(move || {
+    monitoring(&tp_to_pub);
+  });
+
+  // then the runner. It does nothing, until we send a set
+  // of RunParams
+  let run_params_from_cmdr_c = run_params_from_cmdr.clone();
+  workforce.execute(move || {
+      runner(&run_params_from_cmdr_c,
+             None, 
+             p_op,
+             force_trigger);
+  });
+
   let rsp_to_sink_c = rsp_to_sink.clone();
   workforce.execute(move || {
                     event_cache_worker(ev_pl_from_builder,
@@ -293,7 +333,7 @@ fn main() {
   });
   
 
-  /// Respond to commands from the C&C server
+  // Respond to commands from the C&C server
   let set_op_mode_c        = set_op_mode.clone();
   let run_params_to_runner_c = run_params_to_runner.clone();
   let heartbeat_timeout_seconds : u32 = 10;
@@ -310,103 +350,72 @@ fn main() {
   // this thread deals JUST with the data
   // buffers. It reads them and then 
   // passes on the data
-  let rdb_sender  = bs_send.clone();
-  //let prog_sender = pb_a_up_send;
-  let mut pb_a = None;
-  let mut pb_b = None;
-  if show_progress {
-    pb_a = Some(pb_a_up_send.clone());
-    pb_b = Some(pb_b_up_send.clone());
+  // one thread per each buffer
+  //let buf_a = BlobBuffer::A;
+  //let buf_b = BlobBuffer::B;
+  //workforce.execute(move || {
+  //  buff_handler(&buf_a,
+  //               buff_trip,
+  //               Some(&rdb_sender_a),
+  //               pb_a,
+  //               switch_buff); 
+  //});
+  //workforce.execute(move || {
+  //  buff_handler(&buf_b,
+  //               buff_trip,
+  //               Some(&rdb_sender_b),
+  //               pb_b,
+  //               switch_buff); 
+  //});
 
-  }
-  workforce.execute(move || {
-    read_data_buffers(rdb_sender,
-                      buff_trip,
-                      //prog_op_a,
-                      //prog_op_b
-                      pb_a,
-                      pb_b,
-                      switch_buff);
-  });
 
   // if we are not listening to the C&C server,
   // we have to start the run thread here
-  let mut p_op : Option<Sender<u64>> = None;
-  if n_events_run > 0 || run_forever {  
-    if show_progress {
-      let tmp_send = pb_ev_up_send.clone();
-      p_op = Some(tmp_send); 
-    }
-    
-    let run_params_from_cmdr_c = run_params_from_cmdr.clone();
-    // we start the run by creating new RunParams
-    let mut run_pars = RunParams {
-      forever   : run_forever,
-      nevents   : n_events_run as u32,
-      is_active : false,
-      nseconds  : 0
-    };
-    if run_forever || n_events_run > 0 {
-      run_pars.is_active = true;
-      match run_params_to_runner.send(run_pars) {
-        Err(err) => error!("Could not initialzie Run! Err {err}"),
-        Ok(_)    => {
-          println!("Run initialized! Attempting to start!");
-        }
-      }
-    }
-  }
- 
-  workforce.execute(move || {
-    data_publisher(&tp_from_client, rb_test); 
-  });
-  // Now setup thread which require the 
-  // data socket.
-  workforce.execute(move || {
-    monitoring(&tp_to_pub);
-  });
-  if show_progress {
-    let run_params_from_cmdr_cc = run_params_from_cmdr.clone();
-    workforce.execute(move || { 
-      progress_runner(n_events_run,      
-                      uio1_total_size,
-                      uio2_total_size,
-                      pb_a_up_recv ,
-                      pb_b_up_recv ,
-                      pb_ev_up_recv.clone(),
-                      run_params_from_cmdr_cc)
-    });
-  }
-
   if stream_any {
     match set_op_mode.send(TofOperationMode::TofModeStreamAny) {
       Err(err) => error!("Can not set TofOperationMode to StreamAny! Err {err}"),
       Ok(_)    => info!("Using RBMode STREAM_ANY")
     }
   }
+    
+  //let run_params_from_cmdr_c = run_params_from_cmdr.clone();
+  // we start the run by creating new RunParams
+  if run_forever || n_events_run > 0 {
+    let run_pars = RunParams {
+      forever   : run_forever,
+      nevents   : n_events_run as u32,
+      is_active : true,
+      nseconds  : 0
+    };
+    println!("Waiting for threads to start..");
+    thread::sleep(time::Duration::from_secs(5));
+    println!("..done");
+    match run_params_to_runner.send(run_pars) {
+      Err(err) => error!("Could not initialzie Run! Err {err}"),
+      Ok(_)    => {
+        println!("Run initialized! Attempting to start!");
+      }
+    }
+  }
+ 
 
-  let mut resp     : cmd::TofResponse;
-  let r_clone  = ev_pl_from_cache.clone();
+
+  //let mut resp     : cmd::TofResponse;
+  //let r_clone  = ev_pl_from_cache.clone();
   //let executor = Commander::new(evid_to_cache,
   //                              &hasit_from_cache,
   //                              r_clone,
   //                              set_op_mode);
   
-  let run_params_from_cmdr_c = run_params_from_cmdr.clone();
-  workforce.execute(move || {
-      runner(&run_params_from_cmdr_c,
-             None, 
-             p_op,
-             force_trigger);
-  });
   loop {
+    thread::sleep(10*one_sec);
     // what we are here listening to, are commands which 
     // impact threads. E.g. StartRun will start a new data run
     // which is it's own thread
-    if n_events_run > 0 || run_forever {
-      thread::sleep(10*one_sec);
-      continue;
-    }
+    //if n_events_run > 0 || run_forever {
+    //  thread::sleep(10*one_sec);
+    //  continue;
+    
 
     //match run_params_from_cmdr.recv() {
     //  Err(err) => trace!("Did not receive a new set of run pars {err}"),

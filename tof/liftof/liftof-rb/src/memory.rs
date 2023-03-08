@@ -61,6 +61,14 @@ pub enum BlobBuffer {
   //Both
 }
 
+impl BlobBuffer {
+  pub fn invert(&self) -> BlobBuffer {
+    match self {
+      BlobBuffer::A => {return BlobBuffer::B},
+      BlobBuffer::B => {return BlobBuffer::A}
+    }
+  }
+}
 
 /// Get a size which accomodates nevents
 ///

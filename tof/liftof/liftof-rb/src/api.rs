@@ -150,8 +150,14 @@ pub fn cmd_responder(cmd_server_ip             : String,
   //let my_topic = String::from("");
   //.as_bytes();
   //cmd_socket.set_subscribe(&my_topic.as_bytes());
-  cmd_socket.set_subscribe(&topic_broadcast.as_bytes());
-  cmd_socket.set_subscribe(&topic_board.as_bytes());
+  match cmd_socket.set_subscribe(&topic_broadcast.as_bytes()) {
+    Err(err) => error!("Unable to subscribe to {topic_broadcast}, error {err}"),
+    Ok(_) => ()
+  }
+  match cmd_socket.set_subscribe(&topic_board.as_bytes()) {
+    Err(err) => error!("Unable to subscribe to {topic_board}, error {err}"),
+    Ok(_) => ()
+  }
   let mut heartbeat     = Instant::now();
   let mut last_run_pars = RunParams::new();
 
@@ -163,8 +169,14 @@ pub fn cmd_responder(cmd_server_ip             : String,
         warn!("No heartbeat received since {heartbeat_timeout_seconds}. Attempting to reconnect!");
         cmd_socket.connect(&cmd_address).expect("Unable to bind to command socket at {cmd_address}!");
         //cmd_socket.set_subscribe(&my_topic.as_bytes());
-        cmd_socket.set_subscribe(&topic_broadcast.as_bytes());
-        cmd_socket.set_subscribe(&topic_board.as_bytes());
+        match cmd_socket.set_subscribe(&topic_broadcast.as_bytes()) {
+          Err(err) => error!("Can not subscribe to {topic_broadcast}, err {err}"),
+          Ok(_)    => ()
+        }
+        match cmd_socket.set_subscribe(&topic_board.as_bytes()) {
+          Err(err) => error!("Can not subscribe to {topic_board}, err {err}"),
+          Ok(_)    => ()
+        }
         heartbeat = Instant::now();
       }
     }
@@ -368,7 +380,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
               TofCommand::RequestMoni (_) => {
                 warn!("Not implemented");
                 match cmd_socket.send(resp_not_implemented,0) {
-                  Err(err) => warn!("Can not send response!"),
+                  Err(err) => error!("Can not send response! Err {err}"),
                   Ok(_)    => trace!("Resp sent!")
                 }
                 continue;
@@ -376,14 +388,14 @@ pub fn cmd_responder(cmd_server_ip             : String,
               TofCommand::Unknown (_) => {
                 warn!("Not implemented");
                 match cmd_socket.send(resp_not_implemented,0) {
-                  Err(err) => warn!("Can not send response!"),
+                  Err(err) => error!("Can not send response! Error {err}"),
                   Ok(_)    => trace!("Resp sent!")
                 }
                 continue;
               }
               _ => {
               match cmd_socket.send(resp_not_implemented,0) {
-                Err(err) => warn!("Can not send response!"),
+                Err(err) => warn!("Can not send response! Error {err}"),
                 Ok(_)    => trace!("Resp sent!")
               }
               continue;
@@ -533,13 +545,18 @@ pub fn read_data_buffers(bs_send      : Sender<Vec<u8>>,
                          switch_buff  : bool) {
   let buf_a = BlobBuffer::A;
   let buf_b = BlobBuffer::B;
+  // can be B, but we have to start somehwer
+  let mut active_buffer = BlobBuffer::A;
+  let mut read_buffer = BlobBuffer::A;
   let sleeptime = time::Duration::from_millis(100);
-
+  info!("read data buffers swtich buff {switch_buff}");
   //let mut max_buf_a : u64 = 0;
   //let mut max_buf_b : u64 = 0;
   //let mut min_buf_a : u64 = 4294967295;
   //let mut min_buf_b : u64 = 4294967295;
   // let's do some work
+  reset_data_memory_aggressively();
+  thread::sleep(sleeptime);
   loop {
     //let a_occ = get_blob_buffer_occ(&buf_a).unwrap() as u64;
     //let b_occ = get_blob_buffer_occ(&buf_b).unwrap() as u64;
@@ -560,16 +577,24 @@ pub fn read_data_buffers(bs_send      : Sender<Vec<u8>>,
     //  println!("New MIN size for B {min_buf_b}");
     //}
     thread::sleep(sleeptime);
-    buff_handler(&buf_a,
-                 buff_trip,
-                 Some(&bs_send),
-                 bar_a_sender.clone(),
-                 switch_buff); 
-    buff_handler(&buf_b,
-                 buff_trip,
-                 Some(&bs_send),
-                 bar_b_sender.clone(),
-                 switch_buff); 
+    data_buffer_worker(buff_trip,
+                       &bs_send,
+                       &bar_a_sender, 
+                       &bar_b_sender);
+    
+
+    //buff_handler(&buf_a,
+    //             &mut active_buffer,
+    //             buff_trip,
+    //             Some(&bs_send),
+    //             bar_a_sender.clone(),
+    //             switch_buff); 
+    //buff_handler(&buf_b,
+    //             &mut active_buffer,
+    //             buff_trip,
+    //             Some(&bs_send),
+    //             bar_b_sender.clone(),
+    //             switch_buff); 
   }
 }
 
@@ -593,7 +618,6 @@ pub fn reset_data_memory_aggressively() {
         continue;
       }
     }
-    thread::sleep(one_milli);
   }
   let mut buf_a_occ = UIO1_MAX_OCCUPANCY;
   let mut buf_b_occ = UIO2_MAX_OCCUPANCY;
@@ -716,7 +740,7 @@ fn make_sure_it_runs(will_panic : &mut u8,
   let buf_b = BlobBuffer::B;
   let buf_size_a = get_buff_size(&buf_a).unwrap_or(0);
   let buf_size_b = get_buff_size(&buf_b).unwrap_or(0); 
-  thread::sleep(five_secs);
+  thread::sleep(one_sec);
   if get_buff_size(&buf_a).unwrap_or(0) == buf_size_a &&  
       get_buff_size(&buf_b).unwrap_or(0) == buf_size_b {
     error!("Buffers are not filling! Running setup again!");
@@ -894,7 +918,7 @@ pub fn runner(run_params          : &Receiver<RunParams>,
     match &progress { 
       None => (),
       Some(sender) => {
-        match sender.try_send(delta_events) {
+        match sender.try_send(n_events) {
           Err(err) => trace!("Error sending {err}"),
           Ok(_)    => ()
         }
@@ -929,6 +953,11 @@ pub fn runner(run_params          : &Receiver<RunParams>,
           Ok(_)    => ()
         }
         is_running = false;
+        info!("Run stopped! We have seen {n_events}");
+      } else {
+        if !force_trigger { 
+          thread::sleep(100*one_milli);
+        }
       }
     }
   } // end loop
@@ -1196,7 +1225,7 @@ impl Commander<'_> {
           Ok(event) => (),
         }
         match self.hasit_from_cache.recv() {
-          Err(err) => {
+          Err(_) => {
             return Ok(TofResponse::EventNotReady(*eventid));
           }
           Ok(hasit) => {
@@ -1260,6 +1289,7 @@ pub fn get_buff_size(which : &BlobBuffer) ->Result<usize, RegisterError> {
   Ok(result)
 }
 
+
 ///  Deal with the raw data buffers.
 ///
 ///  Read out when they exceed the 
@@ -1269,13 +1299,112 @@ pub fn get_buff_size(which : &BlobBuffer) ->Result<usize, RegisterError> {
 ///  # Arguments:
 ///
 ///  * buff_trip : size which triggers buffer readout.
-pub fn buff_handler(which       : &BlobBuffer,
-                    buff_trip   : usize,
-                    bs_sender   : Option<&Sender<Vec<u8>>>,
-                    prog_sender : Option<Sender<u64>>,
-                    switch_buff : bool) {
+pub fn data_buffer_worker(buff_trip     : usize,
+                          bs_sender     : &Sender<Vec<u8>>,
+                          prog_sender_a : &Option<Sender<u64>>,
+                          prog_sender_b : &Option<Sender<u64>>) {
+  let mut switch_buff = false;
+  let buf_a = BlobBuffer::A;
+  if buff_trip > DATABUF_TOTAL_SIZE { 
+    panic!("Buffer trip value is too large {buff_trip} > {DATABUF_TOTAL_SIZE}");
+  }
+  if buff_trip < DATABUF_TOTAL_SIZE {
+    switch_buff = true;
+  }
+  let mut which = buf_a;
+  let one_sec   = Duration::from_secs(1);
+  let ten_milli = Duration::from_millis(10);
+  let start     = Instant::now();
+  let mut buff_size      : usize = 0;
+  let mut last_buff_size : usize = 0;
+  loop {
+    match get_buff_size(&which) {
+      Ok(bf)   => { 
+        buff_size = bf;
+      },
+      Err(err) => { 
+        error!("Error getting buff size! {:?}", err);
+        buff_size = 0;
+      }
+    }
+    if last_buff_size == buff_size {
+      if start.elapsed() > one_sec {
+         which = which.invert();
+      } 
+      thread::sleep(ten_milli);
+      continue;
+    }
+
+    last_buff_size = buff_size;
+    match which {
+      BlobBuffer::A => {
+        if prog_sender_a.is_some() {
+          match prog_sender_a.as_ref().unwrap().try_send(buff_size as u64) {
+            Err(err) => error!("Sending failed {err}"),
+            Ok(_)    => ()
+          }
+        }
+      },
+      BlobBuffer::B => {
+        if prog_sender_b.is_some() {
+          match prog_sender_b.as_ref().unwrap().try_send(buff_size as u64) {
+            Err(err) => error!("Sending failed {err}"),
+            Ok(_)    => ()
+          }
+        }
+      }
+    }
+
+    if buff_size >= buff_trip {
+      info!("Buff {which:?} tripped at a size of {buff_size}");  
+      info!("Buff handler switch buffers {switch_buff}");
+      // reset the buffers
+      if switch_buff {
+        match switch_ram_buffer() {
+          Ok(_)  => {
+            info!("Ram buffer switched!");
+          },
+          Err(_) => error!("Unable to switch RAM buffers!") 
+        }
+      }
+      //thread::sleep_ms(SLEEP_AFTER_REG_WRITE);
+      let mut bytestream = Vec::<u8>::new(); 
+      match read_data_buffer(&which, buff_size as usize) {
+        Err(err) => error!("Can not read data buffer {err}"),
+        Ok(bs)    => bytestream = bs,
+      }
+      match bs_sender.send(bytestream) {
+        Err(err) => error!("error sending {err}"),
+        Ok(_)    => ()
+      }
+    
+      match blob_buffer_reset(&which) {
+        Ok(_)  => debug!("Successfully reset the buffer occupancy value"),
+        Err(_) => error!("Unable to reset buffer!")
+      }
+      which     = which.invert();
+      buff_size = 0;
+    }
+  }
+}
+
+///  Deal with the raw data buffers.
+///
+///  Read out when they exceed the 
+///  tripping threshold and pass 
+///  on the result.
+///
+///  # Arguments:
+///
+///  * buff_trip : size which triggers buffer readout.
+pub fn buff_handler(which         : &BlobBuffer,
+                    active_buffer : &mut BlobBuffer,
+                    buff_trip     : usize,
+                    bs_sender     : Option<&Sender<Vec<u8>>>,
+                    prog_sender   : Option<Sender<u64>>,
+                    switch_buff   : bool) {
   let sleep_after_reg_write = Duration::from_millis(SLEEP_AFTER_REG_WRITE as u64);
-  let buff_size : usize;
+  let mut buff_size : usize;
   match get_buff_size(&which) {
     Ok(bf)   => { 
       buff_size = bf;
@@ -1283,18 +1412,23 @@ pub fn buff_handler(which       : &BlobBuffer,
     Err(err) => { 
       error!("Error getting buff size! {:?}", err);
       buff_size = 0;
+      //continue;
     }
   }
 
   let has_tripped = buff_size >= buff_trip;
-
+  
+  debug!("Buff size {} and trip value {}", buff_size, buff_trip);
   if has_tripped {
-    debug!("Buff {which:?} tripped at a size of {buff_size}");  
-    debug!("Buff size {buff_size}");
+    info!("Buff {which:?} tripped at a size of {buff_size}");  
+    info!("Buff handler switch buffers {switch_buff}");
     // reset the buffers
     if switch_buff {
       match switch_ram_buffer() {
-        Ok(_)  => debug!("Ram buffer switched!"),
+        Ok(_)  => {
+          info!("Ram buffer switched!");
+          *active_buffer = which.invert();
+        },
         Err(_) => error!("Unable to switch RAM buffers!") 
       }
     }
@@ -1310,10 +1444,6 @@ pub fn buff_handler(which       : &BlobBuffer,
         Ok(_)    => ()
       }
     }
-    //match bs_sender {
-    //  Some(snd) => snd.send(bytestream),
-    //  None      => Ok(()),
-    //};
     
     match blob_buffer_reset(&which) {
       Ok(_)  => debug!("Successfully reset the buffer occupancy value"),
@@ -1330,19 +1460,16 @@ pub fn buff_handler(which       : &BlobBuffer,
     }
     thread::sleep(sleep_after_reg_write);
   } else { // endf has tripped
+    *active_buffer = which.clone();
     match &prog_sender {
       None => (),
       Some(up) => {
         match up.try_send(buff_size as u64) {
-          Err(err) => error!("Sending faile with error {err}"),
-          Ok(_)    => ()
+          Err(err) => error!("Sending failed with error {err}"),
+          Ok(_)    => trace!("We sent {buff_size}"),
         }
       }
     }
-    //match prog_bar {
-    //  Some(bar) => bar.set_position(buff_size as u64),
-    //  None      => () 
-    //}
   }
 }
 
@@ -1505,7 +1632,6 @@ pub fn progress_runner(max_events      : u64,
                        update_bar_b    : Receiver<u64>,
                        update_bar_ev   : Receiver<u64>,
                        run_params      : Receiver<RunParams>) {
-                       //finish_bars     : Receiver<bool>){
   let mut template_bar_env : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.red/grey} {pos:>7}/{len:7}";
   let mut sty_ev = ProgressStyle::with_template(template_bar_env)
   .unwrap();
@@ -1519,13 +1645,9 @@ pub fn progress_runner(max_events      : u64,
   let mut prog_ev = multi_prog
                 .insert_after(&prog_b, ProgressBar::new(max_events)); 
 
-  let sleep_time  = time::Duration::from_millis(50);
+  let sleep_time       = time::Duration::from_millis(200);
   let template_bar_a   : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.blue/grey} {bytes:>7}/{total_bytes:7} ";
   let template_bar_b   : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.green/grey} {bytes:>7}/{total_bytes:7} ";
-  let floppy    = vec![240, 159, 146, 190];
-  let floppy    = String::from_utf8(floppy).unwrap();
-  let sparkles  = vec![226, 156, 168];
-  let sparkles  = String::from_utf8(sparkles).unwrap();
 
   let label_a   = String::from("Buff A");
   let label_b   = String::from("Buff B");
@@ -1581,7 +1703,7 @@ pub fn progress_runner(max_events      : u64,
         prog_ev.set_message("EVENTS");
       },
       Err(err) => {
-        trace!("Did not receive new run pars, doing nothing!");
+        trace!("Did not receive new run pars! {err}");
         match update_bar_a.try_recv() {
           Err(err) => trace!("No update, err {err}"),
           Ok(val)  => {
@@ -1598,7 +1720,7 @@ pub fn progress_runner(max_events      : u64,
         match update_bar_ev.try_recv() {
           Err(err) => trace!("No update, err {err}"),
           Ok(val)  => {
-            prog_ev.inc(val);
+            prog_ev.set_position(val);
           }
         }
         thread::sleep(sleep_time);
