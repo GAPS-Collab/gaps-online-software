@@ -246,12 +246,6 @@ pub fn read_data_buffer(which : &BlobBuffer,
     //bytestream  = Vec::<u8>::from_raw_parts(p, size, size);
     bytestream.extend_from_slice(&*slice); 
   }
-  //(0..size).for_each(|x| unsafe {
-  //  let value = std::ptr::read_volatile(p.offset(x as isize));
-  //  bytestream.push(value); // push is free, since we 
-  //                          // allocated the vector in the 
-  //                          // beginning
-  //});
   Ok(bytestream)
 }
 

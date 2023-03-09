@@ -30,6 +30,16 @@ _Comments_
 
 ### Connectivity
 
+The commiunication with a central C&C server (either `liftof-cc`, `liftof-tui` or technically a python script) is done
+through 0MQ. We are offering:
+
+* A 0MQ PUB socket at <local-ip>:42000. All data (raw data, monitoring), but also `TofResponse` will be published there
+  Subscribers should subscribe to `RBXX` where XX is the readoutboard id.
+
+* Listening to a 0MQ SUB socket at <cnc-server-ip>:42000. We are subscribing to any messages starting with the bytes 
+  `BRCT` for "Broadcast" or `RBXX` where XX is the 2 digit readoutboard id.
+
+
 ### Design philosopy
 
 ### Threaded model

@@ -8,6 +8,8 @@
 //!
 use std::{thread, time};
 
+extern crate ctrlc;
+
 extern crate crossbeam_channel;
 use crossbeam_channel::{unbounded,
                         Sender,
@@ -289,13 +291,13 @@ fn main() {
   }
   let rdb_sender_a  = bs_send.clone();
   let rdb_sender_b  = bs_send.clone();
-  workforce.execute(move || {
-    read_data_buffers(rdb_sender_a,
-                      buff_trip,
-                      pb_a,
-                      pb_b,
-                      switch_buff);
-  });
+  //workforce.execute(move || {
+  //  read_data_buffers(rdb_sender_a,
+  //                    buff_trip,
+  //                    pb_a,
+  //                    pb_b,
+  //                    switch_buff);
+  //});
   
 
   workforce.execute(move || {
@@ -311,8 +313,12 @@ fn main() {
   let run_params_from_cmdr_c = run_params_from_cmdr.clone();
   workforce.execute(move || {
       runner(&run_params_from_cmdr_c,
+             buff_trip,
              None, 
              p_op,
+             &rdb_sender_a,
+             &pb_a,
+             &pb_b,
              force_trigger);
   });
 
@@ -397,16 +403,26 @@ fn main() {
       }
     }
   }
- 
-
-
   //let mut resp     : cmd::TofResponse;
   //let r_clone  = ev_pl_from_cache.clone();
   //let executor = Commander::new(evid_to_cache,
   //                              &hasit_from_cache,
   //                              r_clone,
   //                              set_op_mode);
-  
+
+  ctrlc::set_handler(move || {
+    println!("received Ctrl+C! We will stop triggers and end the run!");
+    println!("So long and thanks for all the {}", fish);
+   
+    match disable_trigger() {
+      Err(err) => error!("Can not disable triggers, error {err}"),
+      Ok(_)    => ()
+    }
+    break;
+  })
+  .expect("Error setting Ctrl-C handler");
+
+
   loop {
     thread::sleep(10*one_sec);
     // what we are here listening to, are commands which 

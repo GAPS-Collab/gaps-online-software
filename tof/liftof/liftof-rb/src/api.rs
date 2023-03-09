@@ -88,6 +88,24 @@ impl RunParams {
   }
 }
 
+// FIXME
+type RamBuffer = BlobBuffer;
+
+/// Get the active half of the RAM buffer
+/// 
+/// This uses the know regions of the RAM 
+/// buffers together with the dma pointer
+/// to get the correct half.
+///
+pub fn get_active_buffer() -> Result<RamBuffer, RegisterError> {
+  let dma_ptr = get_dma_pointer()?;
+  if dma_ptr >= UIO1_MAX_OCCUPANCY {
+    return Ok(RamBuffer::B);
+  }
+  Ok(RamBuffer::A)
+}
+
+
 /// add the board id to the bytestream in front of the 
 /// tof response
 pub fn prefix_board_id(input : &mut Vec<u8>) -> Vec<u8> {
@@ -538,6 +556,7 @@ pub fn monitoring(ch : &Sender<TofPacket>) {
 /// # Arguments
 ///
 ///
+#[deprecated(since = "0.3.0", note = "Use ram_buffer_handler instead")]
 pub fn read_data_buffers(bs_send      : Sender<Vec<u8>>,
                          buff_trip    : usize,
                          bar_a_sender : Option<Sender<u64>>,
@@ -621,11 +640,11 @@ pub fn reset_data_memory_aggressively() {
   }
   let mut buf_a_occ = UIO1_MAX_OCCUPANCY;
   let mut buf_b_occ = UIO2_MAX_OCCUPANCY;
-  match blob_buffer_reset(&buf_a) {
+  match reset_ram_buffer_occ(&buf_a) {
     Err(err) => warn!("Problem resetting buffer /dev/uio1 {:?}", err),
     Ok(_)    => () 
   }
-  match blob_buffer_reset(&buf_b) {
+  match reset_ram_buffer_occ(&buf_b) {
     Err(err) => warn!("Problem resetting buffer /dev/uio1 {:?}", err),
     Ok(_)    => () 
   }
@@ -650,7 +669,7 @@ pub fn reset_data_memory_aggressively() {
   thread::sleep(one_milli);
   //while buf_a_occ != UIO1_MIN_OCCUPANCY {
 
-  //  match blob_buffer_reset(&buf_a) {
+  //  match reset_ram_buffer_occ(&buf_a) {
   //    Err(err) => warn!("Problem resetting buffer /dev/uio1 {:?}", err),
   //    Ok(_)    => () 
   //  }
@@ -669,7 +688,7 @@ pub fn reset_data_memory_aggressively() {
   //}
   //n_tries = 0;
   //while buf_b_occ != UIO2_MIN_OCCUPANCY {
-  //  match blob_buffer_reset(&buf_b) {
+  //  match reset_ram_buffer_occ(&buf_b) {
   //    Err(err) => warn!("Problem resetting buffer /dev/uio2 {:?}", err),
   //    Ok(_)    => () 
   //  }
@@ -803,9 +822,14 @@ pub fn run_check() {
 ///                     is helpful for debugging
 ///  * force_trigger  : Run in forced trigger mode
 ///
+///
 pub fn runner(run_params          : &Receiver<RunParams>,
+              buffer_trip         : usize,
               max_errors          : Option<u64>,
               progress            : Option<Sender<u64>>,
+              bs_sender           : &Sender<Vec<u8>>,
+              prog_sender_a       : &Option<Sender<u64>>,
+              prog_sender_b       : &Option<Sender<u64>>,
               force_trigger_rate  : u32) {
   
   let one_milli        = time::Duration::from_millis(1);
@@ -816,7 +840,7 @@ pub fn runner(run_params          : &Receiver<RunParams>,
   let mut delta_events : u64 = 0;
   let mut n_events     : u64 = 0;
   let mut n_errors     : u64 = 0;
-  let mut will_panic   : u8 = 0;
+  let mut will_panic   : u8  = 0;
 
   let mut timer        = Instant::now();
   let force_trigger    = force_trigger_rate > 0;
@@ -908,6 +932,13 @@ pub fn runner(run_params          : &Receiver<RunParams>,
         }
       }
     } // end match
+
+    // AT THIS POINT WE KNOW WE HAVE SEEN SOMETHING!!!
+    // THIS IS IMPORTANT
+    ram_buffer_handler(buffer_trip   , 
+                       &bs_sender    , 
+                       &prog_sender_a, 
+                       &prog_sender_b);
 
     delta_events = (evt_cnt - last_evt_cnt) as u64;
     n_events    += delta_events;
@@ -1289,6 +1320,85 @@ pub fn get_buff_size(which : &BlobBuffer) ->Result<usize, RegisterError> {
   Ok(result)
 }
 
+/// Manage the RAM buffers for event data
+///
+/// This will make a decision based on the 
+/// buff_trip value if a buffer is "full", 
+/// and in that case, read it out, send 
+/// the data over the channel elsewhere 
+/// and switch to the other half of the 
+/// buffer.
+/// If buff_trip == DATABUF_TOTAL_SIZE, the 
+/// buffer will be switched by the firmware.
+///
+/// # Arguments:
+///
+/// * buff_trip : size which triggers buffer readout.
+pub fn ram_buffer_handler(buff_trip     : usize,
+                          bs_sender     : &Sender<Vec<u8>>,
+                          prog_sender_a : &Option<Sender<u64>>,
+                          prog_sender_b : &Option<Sender<u64>>) 
+    -> Result<(), RegisterError> {
+  let mut switch_buff = false;
+  if buff_trip < DATABUF_TOTAL_SIZE {
+    switch_buff = true;
+  }
+
+  let which          = get_active_buffer()?;
+  let mut buff_size  = get_buff_size(&which)?;
+  if buff_size >= buff_trip {
+    info!("Buff {which:?} tripped at a size of {buff_size}");  
+    info!("Buff handler switch buffers {switch_buff}");
+    // 1) switch buffer
+    // 2) read out
+    // 3) reset
+    if switch_buff {
+      match switch_ram_buffer() {
+        Ok(_)  => {
+          info!("Ram buffer switched!");
+        },
+        Err(_) => error!("Unable to switch RAM buffers!") 
+      }
+    }
+    let mut bytestream = Vec::<u8>::new(); 
+    match read_data_buffer(&which, buff_size as usize) {
+      Err(err) => error!("Can not read data buffer {err}"),
+      Ok(bs)    => bytestream = bs,
+    }
+    let bs_len = bytestream.len();
+    match bs_sender.send(bytestream) {
+      Err(err) => error!("error sending {err}"),
+      Ok(_)    => {
+        info!("We are sending {} bytes", bs_len);
+      }
+    }
+    match reset_ram_buffer_occ(&which) {
+      Ok(_)  => debug!("Successfully reset the buffer occupancy value"),
+      Err(_) => error!("Unable to reset buffer!")
+    }
+    buff_size = 0;
+  }
+  match which {
+    BlobBuffer::A => {
+      if prog_sender_a.is_some() {
+        match prog_sender_a.as_ref().unwrap().try_send(buff_size as u64) {
+          Err(err) => error!("Sending failed {err}"),
+          Ok(_)    => ()
+        }
+      }
+    },
+    BlobBuffer::B => {
+      if prog_sender_b.is_some() {
+        match prog_sender_b.as_ref().unwrap().try_send(buff_size as u64) {
+          Err(err) => error!("Sending failed {err}"),
+          Ok(_)    => ()
+        }
+      }
+    }
+  }
+  Ok(())
+}
+
 
 ///  Deal with the raw data buffers.
 ///
@@ -1299,6 +1409,7 @@ pub fn get_buff_size(which : &BlobBuffer) ->Result<usize, RegisterError> {
 ///  # Arguments:
 ///
 ///  * buff_trip : size which triggers buffer readout.
+#[deprecated(since = "0.3.0", note = "Use ram_buffer_handler instead")]
 pub fn data_buffer_worker(buff_trip     : usize,
                           bs_sender     : &Sender<Vec<u8>>,
                           prog_sender_a : &Option<Sender<u64>>,
@@ -1314,10 +1425,12 @@ pub fn data_buffer_worker(buff_trip     : usize,
   let mut which = buf_a;
   let one_sec   = Duration::from_secs(1);
   let ten_milli = Duration::from_millis(10);
+  let one_milli = Duration::from_millis(10);
   let start     = Instant::now();
   let mut buff_size      : usize = 0;
   let mut last_buff_size : usize = 0;
   loop {
+    thread::sleep(ten_milli);
     match get_buff_size(&which) {
       Ok(bf)   => { 
         buff_size = bf;
@@ -1331,7 +1444,6 @@ pub fn data_buffer_worker(buff_trip     : usize,
       if start.elapsed() > one_sec {
          which = which.invert();
       } 
-      thread::sleep(ten_milli);
       continue;
     }
 
@@ -1367,18 +1479,20 @@ pub fn data_buffer_worker(buff_trip     : usize,
           Err(_) => error!("Unable to switch RAM buffers!") 
         }
       }
-      //thread::sleep_ms(SLEEP_AFTER_REG_WRITE);
       let mut bytestream = Vec::<u8>::new(); 
       match read_data_buffer(&which, buff_size as usize) {
         Err(err) => error!("Can not read data buffer {err}"),
         Ok(bs)    => bytestream = bs,
       }
+      let bs_len = bytestream.len();
       match bs_sender.send(bytestream) {
         Err(err) => error!("error sending {err}"),
-        Ok(_)    => ()
+        Ok(_)    => {
+          println!("We are sending {} bytes", bs_len);
+        }
       }
     
-      match blob_buffer_reset(&which) {
+      match reset_ram_buffer_occ(&which) {
         Ok(_)  => debug!("Successfully reset the buffer occupancy value"),
         Err(_) => error!("Unable to reset buffer!")
       }
@@ -1397,6 +1511,7 @@ pub fn data_buffer_worker(buff_trip     : usize,
 ///  # Arguments:
 ///
 ///  * buff_trip : size which triggers buffer readout.
+#[deprecated(since = "0.3.0", note = "Use ram_buffer_handler instead")]
 pub fn buff_handler(which         : &BlobBuffer,
                     active_buffer : &mut BlobBuffer,
                     buff_trip     : usize,
@@ -1445,7 +1560,7 @@ pub fn buff_handler(which         : &BlobBuffer,
       }
     }
     
-    match blob_buffer_reset(&which) {
+    match reset_ram_buffer_occ(&which) {
       Ok(_)  => debug!("Successfully reset the buffer occupancy value"),
       Err(_) => error!("Unable to reset buffer!")
     }
@@ -1594,9 +1709,9 @@ pub fn setup_drs4() -> Result<(), RegisterError> {
   // few times
   info!("Resetting blob buffers..");
   for _ in 0..5 {
-    blob_buffer_reset(&buf_a)?;
+    reset_ram_buffer_occ(&buf_a)?;
     thread::sleep(one_milli);
-    blob_buffer_reset(&buf_b)?;
+    reset_ram_buffer_occ(&buf_b)?;
     thread::sleep(one_milli);
   }
 
@@ -1645,7 +1760,7 @@ pub fn progress_runner(max_events      : u64,
   let mut prog_ev = multi_prog
                 .insert_after(&prog_b, ProgressBar::new(max_events)); 
 
-  let sleep_time       = time::Duration::from_millis(200);
+  let sleep_time       = time::Duration::from_millis(10);
   let template_bar_a   : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.blue/grey} {bytes:>7}/{total_bytes:7} ";
   let template_bar_b   : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.green/grey} {bytes:>7}/{total_bytes:7} ";
 

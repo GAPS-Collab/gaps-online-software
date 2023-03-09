@@ -1,6 +1,6 @@
 [package]
 name = "liftof-rb"
-version = "0.2.3"
+version = "0.3.0"
 edition = "2021"
 
 
@@ -54,5 +54,6 @@ clap = { version = "4.0", features = ["derive"] }
 # this is just for fun
 indicatif = "0.17"
 
+ctrlc = "3.2"
 #[target.armv7-unknown-linux-gnueabi]
 #linker = "/usr/bin/arm-none-eabi-gcc"

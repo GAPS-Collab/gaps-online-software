@@ -104,7 +104,7 @@ pub fn clear_dma_memory() -> Result<(), RegisterError> {
 ///
 /// The writing into the memory thus can start anywhere in memory (does 
 /// not have to be from 0)
-pub fn blob_buffer_reset(which : &BlobBuffer) -> Result<(), RegisterError> {
+pub fn reset_ram_buffer_occ(which : &BlobBuffer) -> Result<(), RegisterError> {
   match which { 
     BlobBuffer::A => write_control_reg(RAM_A_OCC_RST, 0x1)?,
     BlobBuffer::B => write_control_reg(RAM_B_OCC_RST, 0x1)?

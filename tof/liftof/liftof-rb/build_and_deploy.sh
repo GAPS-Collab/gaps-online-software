@@ -12,9 +12,10 @@ rm -rf ../target/armv7-unknown*
 #for rb in tof-rb05 tof-rb06
 #do compile_and_deploy_target liftof-rb $rb;
 #done
-compile_and_deploy_target liftof-rb tof-rb52
-#compile_and_deploy_target liftof-rb tof-rb01
-
+#compile_and_deploy_target liftof-rb tof-rb52
+compile_and_deploy_target liftof-rb tof-rb01
+compile_and_deploy_target liftof-rb tof-rb02
+#compile_and_deploy_target scan-uio-buffers tof-rb05
 #compile_and_deploy_target debug-idle
 #compile_and_deploy_target watch-buffer-fill
 
