@@ -25,7 +25,7 @@
 
 use std::net::UdpSocket;
 use std::fmt;
-use std::time::Duration;
+//use std::time::Duration;
 
 use std::error::Error;
 use crate::errors::{IPBusError, MasterTriggerError};
@@ -675,8 +675,8 @@ pub fn read_daq(socket : &UdpSocket,
       // Two boards can fit into a single hit field, that 
       // needs we have to read out the hit filed boards/2
       // times or boards/2 + 1 in case boards is odd.
-      let mut queries_needed = n_ltbs as usize;
-      let mut queried_boards = Vec::<u8>::new();
+      let queries_needed : usize;//= n_ltbs as usize;
+      //let queried_boards = Vec::<u8>::new();
       let mut nhit_query = 0usize;
       if n_ltbs % 2 == 0 {
         queries_needed = n_ltbs as usize/2;

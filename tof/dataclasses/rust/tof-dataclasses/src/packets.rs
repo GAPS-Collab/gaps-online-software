@@ -33,7 +33,7 @@ use crate::events::RBEventPayload;
 //use nom::number::complete::*;
 //use nom::bytes::complete::{tag, take, take_until};
 
-enum PacketQuality {
+pub enum PacketQuality {
   Perfect,
   Good,
   NotSoGood,

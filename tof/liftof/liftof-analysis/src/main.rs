@@ -135,6 +135,7 @@ fn main() {
   let mut n_events_decoded = 0usize;
   let mut event = BlobData::new();
   let mut n_errors = 0usize;
+  let mut decoded_evids = Vec::<u32>::new();
   while pos + BlobData::SERIALIZED_SIZE < bytestream.len() {
     //match event.from_bytestream(&bytestream, pos, false) {
     //  Err(_) => {
@@ -146,10 +147,12 @@ fn main() {
     //}
     pos = event.from_bytestream(&bytestream, pos, true);
     n_events_decoded += 1;
-    println!("{}",event.event_id);
-    println!("{pos}");
+    decoded_evids.push(event.event_id);
+    //println!("{}",event.event_id);
+    //println!("{pos}");
     //pos += BlobData::SERIALIZED_SIZE;
   }
+  println!("{:?} decoded event ids");
   println!("We decoded {n_events_decoded} and had {n_errors} corrupt events!");
 } // end main
 

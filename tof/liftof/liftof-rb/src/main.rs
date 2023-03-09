@@ -17,23 +17,20 @@ use crossbeam_channel::{unbounded,
 use local_ip_address::local_ip;
 
 //use std::collections::HashMap;
-
+use std::process::exit;
 use liftof_rb::api::*;
 use liftof_rb::control::*;
-use liftof_rb::memory::{BlobBuffer,
+use liftof_rb::memory::{
                     EVENT_SIZE,
                     DATABUF_TOTAL_SIZE};
 
 use tof_dataclasses::threading::ThreadPool;
-use tof_dataclasses::packets::{TofPacket,
-                               PacketType};
+use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::events::blob::RBEventPayload;
-use tof_dataclasses::commands::{TofCommand,
+use tof_dataclasses::commands::{//TofCommand,
                                 TofResponse,
                                 TofOperationMode};
-use tof_dataclasses::commands as cmd;
-use tof_dataclasses::monitoring as moni;
-//use liftof_lib::misc::*;
+
 extern crate pretty_env_logger;
 #[macro_use] extern crate log;
 
@@ -116,11 +113,9 @@ fn main() {
   //                        .init();
   pretty_env_logger::init();
 
-  let kraken                = vec![240, 159, 144, 153];
-  let fish                  = vec![240, 159, 144, 159];
+  //let kraken                = vec![240, 159, 144, 153];
   // We know these bytes are valid, so we'll use `unwrap()`.
-  let kraken           = String::from_utf8(kraken).unwrap();
-  let fish             = String::from_utf8(fish).unwrap();
+  //let kraken           = String::from_utf8(kraken).unwrap();
 
   // General parameters, readout board id,, 
   // ip to tof computer
@@ -128,7 +123,6 @@ fn main() {
   let rb_id = get_board_id().expect("Unable to obtain board ID!");
   let dna   = get_device_dna().expect("Unable to obtain device DNA!"); 
   
-  let mut switch_buff   = false;
   
   let args = Args::parse();                   
   let mut buff_trip     = args.buff_trip;         
@@ -211,7 +205,9 @@ fn main() {
   if show_progress {
     n_threads += 1;
   }
- 
+
+
+  // FIXME - MESSAGES GET CONSUMED!!
 
   let (run_params_to_runner, run_params_from_cmdr)      : 
       (Sender<RunParams>, Receiver<RunParams>)                = unbounded();
@@ -230,16 +226,12 @@ fn main() {
   //let (moni_to_main, data_fr_moni)   : (Sender<Vec<u8>>, Receiver<Vec<u8>>) = unbounded(); 
   let (ev_pl_to_cache, ev_pl_from_builder) : 
       (Sender<RBEventPayload>, Receiver<RBEventPayload>)                    = unbounded();
-  let (ev_pl_to_cmdr,  ev_pl_from_cache)   : 
-    (Sender<Option<RBEventPayload>>, Receiver<Option<RBEventPayload>>)      = unbounded();
+  //let (ev_pl_to_cmdr,  ev_pl_from_cache)   : 
+  //  (Sender<Option<RBEventPayload>>, Receiver<Option<RBEventPayload>>)      = unbounded();
   let (evid_to_cache, evid_from_cmdr)   : (Sender<u32>, Receiver<u32>)      = unbounded();
   info!("Will start ThreadPool with {n_threads} threads");
   let workforce = ThreadPool::new(n_threads);
  
-  // these are only for the progress bars
-  let (pb_a_up_send, pb_a_up_recv   ) : (Sender<u64>, Receiver<u64>) = unbounded();  
-  let (pb_b_up_send, pb_b_up_recv   ) : (Sender<u64>, Receiver<u64>) = unbounded(); 
-  let (pb_ev_up_send, pb_ev_up_recv ) : (Sender<u64>, Receiver<u64>) = unbounded(); 
 
   if buff_trip != DATABUF_TOTAL_SIZE {
     uio1_total_size = EVENT_SIZE*buff_trip;
@@ -248,9 +240,7 @@ fn main() {
     // if we change the buff size, we HAVE to manually swith 
     // the buffers since the fw does not know about this change, 
     // it is software only
-    switch_buff     = true;
     info!("We set a value for buff_trip of {buff_trip}");
-    info!("We are switching the buffers manually!");
   }
  
   // write a few registers - this might go to 
@@ -264,42 +254,10 @@ fn main() {
   // Setup routine. Start the threads in inverse order of 
   // how far they are away from the buffers.
   
-  // first, the progress bars (if desired)
-  let mut pb_a = None;
-  let mut pb_b = None;
-  let mut p_op : Option<Sender<u64>> = None;
-  //if n_events_run > 0 || run_forever {  
-  //  if show_progress {
-  //  }
-  //}
-  if show_progress {
-    let tmp_send = pb_ev_up_send.clone();
-    p_op = Some(tmp_send); 
-
-    pb_a = Some(pb_a_up_send.clone());
-    pb_b = Some(pb_b_up_send.clone());
-    let run_params_from_cmdr_cc = run_params_from_cmdr.clone();
-    workforce.execute(move || { 
-      progress_runner(n_events_run,      
-                      uio1_total_size,
-                      uio2_total_size,
-                      pb_a_up_recv ,
-                      pb_b_up_recv ,
-                      pb_ev_up_recv.clone(),
-                      run_params_from_cmdr_cc)
-    });
-  }
-  let rdb_sender_a  = bs_send.clone();
-  let rdb_sender_b  = bs_send.clone();
-  //workforce.execute(move || {
-  //  read_data_buffers(rdb_sender_a,
-  //                    buff_trip,
-  //                    pb_a,
-  //                    pb_b,
-  //                    switch_buff);
-  //});
   
-
+  let run_params_from_cmdr_c = run_params_from_cmdr.clone();
+  let rdb_sender_a  = bs_send.clone();
+  
   workforce.execute(move || {
     data_publisher(&tp_from_client, rb_test); 
   });
@@ -310,15 +268,14 @@ fn main() {
 
   // then the runner. It does nothing, until we send a set
   // of RunParams
-  let run_params_from_cmdr_c = run_params_from_cmdr.clone();
   workforce.execute(move || {
       runner(&run_params_from_cmdr_c,
              buff_trip,
              None, 
-             p_op,
              &rdb_sender_a,
-             &pb_a,
-             &pb_b,
+             uio1_total_size,
+             uio2_total_size,
+             show_progress,
              force_trigger);
   });
 
@@ -353,27 +310,6 @@ fn main() {
                                   //&cmd_to_client   )  
   
   });
-  // this thread deals JUST with the data
-  // buffers. It reads them and then 
-  // passes on the data
-  // one thread per each buffer
-  //let buf_a = BlobBuffer::A;
-  //let buf_b = BlobBuffer::B;
-  //workforce.execute(move || {
-  //  buff_handler(&buf_a,
-  //               buff_trip,
-  //               Some(&rdb_sender_a),
-  //               pb_a,
-  //               switch_buff); 
-  //});
-  //workforce.execute(move || {
-  //  buff_handler(&buf_b,
-  //               buff_trip,
-  //               Some(&rdb_sender_b),
-  //               pb_b,
-  //               switch_buff); 
-  //});
-
 
   // if we are not listening to the C&C server,
   // we have to start the run thread here
@@ -412,51 +348,19 @@ fn main() {
 
   ctrlc::set_handler(move || {
     println!("received Ctrl+C! We will stop triggers and end the run!");
-    println!("So long and thanks for all the {}", fish);
+    println!("So long and thanks for all the \u{1F41F}");
    
     match disable_trigger() {
       Err(err) => error!("Can not disable triggers, error {err}"),
       Ok(_)    => ()
     }
-    break;
+    exit(0);
   })
   .expect("Error setting Ctrl-C handler");
 
 
   loop {
     thread::sleep(10*one_sec);
-    // what we are here listening to, are commands which 
-    // impact threads. E.g. StartRun will start a new data run
-    // which is it's own thread
-    //if n_events_run > 0 || run_forever {
-    //  thread::sleep(10*one_sec);
-    //  continue;
-    
-
-    //match run_params_from_cmdr.recv() {
-    //  Err(err) => trace!("Did not receive a new set of run pars {err}"),
-    //  Ok(run)    => {
-    //    if run.is_active { 
-    //      // start a new run. 
-    //      // is there one active?
-    //      if run_pars.is_active {
-    //        let resp = TofResponse::GeneralFail(RESP_ERR_RUNACTIVE);
-    //        match rsp_to_sink.send(resp) {
-    //          Err(err) => warn!("Unable to send response! Err {err}"),
-    //          Ok(_)    => ()
-    //        }
-    //      } else {
-    //        let run_params_from_cmdr_c = run_params_from_cmdr.clone();
-    //        workforce.execute(move || {
-    //            runner(&run_params_from_cmdr_c,
-    //                   None, 
-    //                   p_op,
-    //                   force_trigger);
-    //        });
-    //      }
-    //    }
-    //  }
-    //}
   } // end loop
 } // end main
 

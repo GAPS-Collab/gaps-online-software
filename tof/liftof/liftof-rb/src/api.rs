@@ -7,7 +7,8 @@ use tof_dataclasses::serialization::Serialization;
 
 use std::collections::HashMap;
 use std::net::IpAddr;
-use std::{fs, fs::File, path::Path};
+use std::fs::File;
+use std::path::Path;
 
 use std::io::Write;
 use std::fs::OpenOptions;
@@ -41,7 +42,6 @@ use tof_dataclasses::packets::{TofPacket,
 use tof_dataclasses::monitoring as moni;
 use tof_dataclasses::errors::SerializationError;
 
-use liftof_lib::TofPacketWriter;
 
 
 /// Non-register related constants 
@@ -113,7 +113,7 @@ pub fn prefix_board_id(input : &mut Vec<u8>) -> Vec<u8> {
   let board_id = get_board_id()//
                  .unwrap_or(0);
                                //.expect("Need to be able to obtain board id!");
-  let mut bytestream = Vec::<u8>::new();
+  let mut bytestream : Vec::<u8>;
   let mut board : String;
   if board_id < 10 {
     board = String::from("RB0") + &board_id.to_string();
@@ -154,7 +154,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
                      evid_to_cache             : &Sender<u32>) {
                      //cmd_sender   : &Sender<TofCommand>) {
   // create 0MQ sockedts
-  let one_milli       = time::Duration::from_millis(1);
+  //let one_milli       = time::Duration::from_millis(1);
   let mut cmd_address = String::from("tcp://") + &cmd_server_ip + ":" + &DATAPORT.to_string() ;
   // we will subscribe to two types of messages, BDCT and RB + 2 digits 
   // of board id
@@ -549,73 +549,6 @@ pub fn monitoring(ch : &Sender<TofPacket>) {
   }
 }
 
-/// Read the data buffers when they are full and 
-/// then send the stream over the channel to 
-/// the thread dealing with it
-///
-/// # Arguments
-///
-///
-#[deprecated(since = "0.3.0", note = "Use ram_buffer_handler instead")]
-pub fn read_data_buffers(bs_send      : Sender<Vec<u8>>,
-                         buff_trip    : usize,
-                         bar_a_sender : Option<Sender<u64>>,
-                         bar_b_sender : Option<Sender<u64>>,
-                         switch_buff  : bool) {
-  let buf_a = BlobBuffer::A;
-  let buf_b = BlobBuffer::B;
-  // can be B, but we have to start somehwer
-  let mut active_buffer = BlobBuffer::A;
-  let mut read_buffer = BlobBuffer::A;
-  let sleeptime = time::Duration::from_millis(100);
-  info!("read data buffers swtich buff {switch_buff}");
-  //let mut max_buf_a : u64 = 0;
-  //let mut max_buf_b : u64 = 0;
-  //let mut min_buf_a : u64 = 4294967295;
-  //let mut min_buf_b : u64 = 4294967295;
-  // let's do some work
-  reset_data_memory_aggressively();
-  thread::sleep(sleeptime);
-  loop {
-    //let a_occ = get_blob_buffer_occ(&buf_a).unwrap() as u64;
-    //let b_occ = get_blob_buffer_occ(&buf_b).unwrap() as u64;
-    //if a_occ > max_buf_a {
-    //  max_buf_a = a_occ;
-    //  println!("New MAX size for A {max_buf_a}");
-    //}
-    //if b_occ > max_buf_b  {
-    //  max_buf_b = b_occ;
-    //  println!("New MAX size for B {max_buf_b}");
-    //}
-    //if a_occ < min_buf_a {
-    //  min_buf_a = a_occ;
-    //  println!("New MIN size for A {min_buf_a}");
-    //}
-    //if b_occ < min_buf_b  {
-    //  min_buf_b = b_occ;
-    //  println!("New MIN size for B {min_buf_b}");
-    //}
-    thread::sleep(sleeptime);
-    data_buffer_worker(buff_trip,
-                       &bs_send,
-                       &bar_a_sender, 
-                       &bar_b_sender);
-    
-
-    //buff_handler(&buf_a,
-    //             &mut active_buffer,
-    //             buff_trip,
-    //             Some(&bs_send),
-    //             bar_a_sender.clone(),
-    //             switch_buff); 
-    //buff_handler(&buf_b,
-    //             &mut active_buffer,
-    //             buff_trip,
-    //             Some(&bs_send),
-    //             bar_b_sender.clone(),
-    //             switch_buff); 
-  }
-}
 
 /// Somehow, it is not always successful to reset 
 /// the DMA and the data buffers. Let's try an 
@@ -826,10 +759,10 @@ pub fn run_check() {
 pub fn runner(run_params          : &Receiver<RunParams>,
               buffer_trip         : usize,
               max_errors          : Option<u64>,
-              progress            : Option<Sender<u64>>,
               bs_sender           : &Sender<Vec<u8>>,
-              prog_sender_a       : &Option<Sender<u64>>,
-              prog_sender_b       : &Option<Sender<u64>>,
+              uio1_total_size     : usize,
+              uio2_total_size     : usize,
+              show_progress       : bool,
               force_trigger_rate  : u32) {
   
   let one_milli        = time::Duration::from_millis(1);
@@ -858,6 +791,29 @@ pub fn runner(run_params          : &Receiver<RunParams>,
   let mut will_panic : u8 = 0;
   let mut is_running = false;
   let mut pars = RunParams::new();
+
+  // this is the progress bars
+  let mut template_bar_env : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.red/grey} {pos:>7}/{len:7}";
+  let mut sty_ev = ProgressStyle::with_template(template_bar_env)
+  .unwrap();
+  let mut multi_prog : MultiProgress;
+
+  let mut prog_a  = ProgressBar::hidden();
+  let mut prog_b  = ProgressBar::hidden();
+  let mut prog_ev = ProgressBar::hidden();
+  let sleep_time       = time::Duration::from_millis(10);
+  let template_bar_a   : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.blue/grey} {bytes:>7}/{total_bytes:7} ";
+  let template_bar_b   : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.green/grey} {bytes:>7}/{total_bytes:7} ";
+
+  let label_a   = String::from("Buff A");
+  let label_b   = String::from("Buff B");
+  let sty_a = ProgressStyle::with_template(template_bar_a)
+  .unwrap();
+  let sty_b = ProgressStyle::with_template(template_bar_b)
+  .unwrap();
+
+  let mut which_buff = RamBuffer::A;
+  let mut buff_size  = 0usize;
   loop {
     if !is_running {
       match run_params.try_recv() {
@@ -876,6 +832,31 @@ pub fn runner(run_params          : &Receiver<RunParams>,
             //println!("..done");
             info!("Begin Run!");
             is_running = true;
+            if show_progress {
+              if pars.forever {
+                template_bar_env = "[{elapsed_precise}] {prefix} {msg} {spinner} ";
+              } else {
+                template_bar_env = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.red/grey} {pos:>7}/{len:7}";
+              }
+              sty_ev = ProgressStyle::with_template(template_bar_env)
+              .unwrap();
+              multi_prog = MultiProgress::new();
+              prog_a  = multi_prog
+                        .add(ProgressBar::new(uio1_total_size as u64)); 
+              prog_b  = multi_prog
+                        .insert_after(&prog_a, ProgressBar::new(uio2_total_size as u64)); 
+              prog_ev = multi_prog
+                            .insert_after(&prog_b, ProgressBar::new(pars.nevents as u64)); 
+              prog_a.set_message (label_a.clone());
+              prog_a.set_prefix  ("\u{1F4BE}");
+              prog_a.set_style   (sty_a.clone());
+              prog_b.set_message (label_b.clone());
+              prog_b.set_prefix  ("\u{1F4BE}");
+              prog_b.set_style   (sty_b.clone());
+              prog_ev.set_style  (sty_ev.clone());
+              prog_ev.set_prefix ("\u{2728}");
+              prog_ev.set_message("EVENTS");
+            }
             continue; // start loop again
           } else {
             info!("Got signal to end stop run");
@@ -883,6 +864,11 @@ pub fn runner(run_params          : &Receiver<RunParams>,
             match disable_trigger() {
               Err(err) => error!("Can not disable triggers, error {err}"),
               Ok(_)    => ()
+            }
+            if show_progress {
+              prog_ev.finish();
+              prog_a.finish();
+              prog_b.finish();
             }
           }
         }
@@ -899,7 +885,7 @@ pub fn runner(run_params          : &Receiver<RunParams>,
         }
       } 
     }    
-    if pars.forever && progress.is_none() {
+    if pars.forever && !show_progress {
       // we can just continue, and take of the heat of the 
       // cpu a little bit
       if !force_trigger {
@@ -935,25 +921,28 @@ pub fn runner(run_params          : &Receiver<RunParams>,
 
     // AT THIS POINT WE KNOW WE HAVE SEEN SOMETHING!!!
     // THIS IS IMPORTANT
-    ram_buffer_handler(buffer_trip   , 
-                       &bs_sender    , 
-                       &prog_sender_a, 
-                       &prog_sender_b);
 
+    match ram_buffer_handler(buffer_trip,
+                             &bs_sender) { 
+      Err(err)   => {
+        error!("Can not deal with RAM buffers {err}");
+        continue;
+      }
+      Ok(result) => {
+        which_buff = result.0;
+        buff_size  = result.1;
+      }
+    }
     delta_events = (evt_cnt - last_evt_cnt) as u64;
     n_events    += delta_events;
     last_evt_cnt = evt_cnt;
     
-    // if we have the progress indicator, we need to 
-    // calculate how many events we have seen
-    match &progress { 
-      None => (),
-      Some(sender) => {
-        match sender.try_send(n_events) {
-          Err(err) => trace!("Error sending {err}"),
-          Ok(_)    => ()
-        }
+    if show_progress {
+      match which_buff {
+        RamBuffer::A => prog_a.set_position(buff_size as u64),
+        RamBuffer::B => prog_b.set_position(buff_size as u64),
       }
+      prog_ev.set_position(n_events);
     }
 
     if !pars.forever {
@@ -982,6 +971,11 @@ pub fn runner(run_params          : &Receiver<RunParams>,
         match disable_trigger() {
           Err(err) => error!("Can not disable triggers, error {err}"),
           Ok(_)    => ()
+        }
+        if show_progress {
+          prog_ev.finish();
+          prog_a.finish();
+          prog_b.finish();
         }
         is_running = false;
         info!("Run stopped! We have seen {n_events}");
@@ -1335,10 +1329,8 @@ pub fn get_buff_size(which : &BlobBuffer) ->Result<usize, RegisterError> {
 ///
 /// * buff_trip : size which triggers buffer readout.
 pub fn ram_buffer_handler(buff_trip     : usize,
-                          bs_sender     : &Sender<Vec<u8>>,
-                          prog_sender_a : &Option<Sender<u64>>,
-                          prog_sender_b : &Option<Sender<u64>>) 
-    -> Result<(), RegisterError> {
+                          bs_sender     : &Sender<Vec<u8>>)
+    -> Result<(RamBuffer, usize), RegisterError> {
   let mut switch_buff = false;
   if buff_trip < DATABUF_TOTAL_SIZE {
     switch_buff = true;
@@ -1378,215 +1370,10 @@ pub fn ram_buffer_handler(buff_trip     : usize,
     }
     buff_size = 0;
   }
-  match which {
-    BlobBuffer::A => {
-      if prog_sender_a.is_some() {
-        match prog_sender_a.as_ref().unwrap().try_send(buff_size as u64) {
-          Err(err) => error!("Sending failed {err}"),
-          Ok(_)    => ()
-        }
-      }
-    },
-    BlobBuffer::B => {
-      if prog_sender_b.is_some() {
-        match prog_sender_b.as_ref().unwrap().try_send(buff_size as u64) {
-          Err(err) => error!("Sending failed {err}"),
-          Ok(_)    => ()
-        }
-      }
-    }
-  }
-  Ok(())
+  Ok((which, buff_size))
 }
 
 
-///  Deal with the raw data buffers.
-///
-///  Read out when they exceed the 
-///  tripping threshold and pass 
-///  on the result.
-///
-///  # Arguments:
-///
-///  * buff_trip : size which triggers buffer readout.
-#[deprecated(since = "0.3.0", note = "Use ram_buffer_handler instead")]
-pub fn data_buffer_worker(buff_trip     : usize,
-                          bs_sender     : &Sender<Vec<u8>>,
-                          prog_sender_a : &Option<Sender<u64>>,
-                          prog_sender_b : &Option<Sender<u64>>) {
-  let mut switch_buff = false;
-  let buf_a = BlobBuffer::A;
-  if buff_trip > DATABUF_TOTAL_SIZE { 
-    panic!("Buffer trip value is too large {buff_trip} > {DATABUF_TOTAL_SIZE}");
-  }
-  if buff_trip < DATABUF_TOTAL_SIZE {
-    switch_buff = true;
-  }
-  let mut which = buf_a;
-  let one_sec   = Duration::from_secs(1);
-  let ten_milli = Duration::from_millis(10);
-  let one_milli = Duration::from_millis(10);
-  let start     = Instant::now();
-  let mut buff_size      : usize = 0;
-  let mut last_buff_size : usize = 0;
-  loop {
-    thread::sleep(ten_milli);
-    match get_buff_size(&which) {
-      Ok(bf)   => { 
-        buff_size = bf;
-      },
-      Err(err) => { 
-        error!("Error getting buff size! {:?}", err);
-        buff_size = 0;
-      }
-    }
-    if last_buff_size == buff_size {
-      if start.elapsed() > one_sec {
-         which = which.invert();
-      } 
-      continue;
-    }
-
-    last_buff_size = buff_size;
-    match which {
-      BlobBuffer::A => {
-        if prog_sender_a.is_some() {
-          match prog_sender_a.as_ref().unwrap().try_send(buff_size as u64) {
-            Err(err) => error!("Sending failed {err}"),
-            Ok(_)    => ()
-          }
-        }
-      },
-      BlobBuffer::B => {
-        if prog_sender_b.is_some() {
-          match prog_sender_b.as_ref().unwrap().try_send(buff_size as u64) {
-            Err(err) => error!("Sending failed {err}"),
-            Ok(_)    => ()
-          }
-        }
-      }
-    }
-
-    if buff_size >= buff_trip {
-      info!("Buff {which:?} tripped at a size of {buff_size}");  
-      info!("Buff handler switch buffers {switch_buff}");
-      // reset the buffers
-      if switch_buff {
-        match switch_ram_buffer() {
-          Ok(_)  => {
-            info!("Ram buffer switched!");
-          },
-          Err(_) => error!("Unable to switch RAM buffers!") 
-        }
-      }
-      let mut bytestream = Vec::<u8>::new(); 
-      match read_data_buffer(&which, buff_size as usize) {
-        Err(err) => error!("Can not read data buffer {err}"),
-        Ok(bs)    => bytestream = bs,
-      }
-      let bs_len = bytestream.len();
-      match bs_sender.send(bytestream) {
-        Err(err) => error!("error sending {err}"),
-        Ok(_)    => {
-          println!("We are sending {} bytes", bs_len);
-        }
-      }
-    
-      match reset_ram_buffer_occ(&which) {
-        Ok(_)  => debug!("Successfully reset the buffer occupancy value"),
-        Err(_) => error!("Unable to reset buffer!")
-      }
-      which     = which.invert();
-      buff_size = 0;
-    }
-  }
-}
-
-///  Deal with the raw data buffers.
-///
-///  Read out when they exceed the 
-///  tripping threshold and pass 
-///  on the result.
-///
-///  # Arguments:
-///
-///  * buff_trip : size which triggers buffer readout.
-#[deprecated(since = "0.3.0", note = "Use ram_buffer_handler instead")]
-pub fn buff_handler(which         : &BlobBuffer,
-                    active_buffer : &mut BlobBuffer,
-                    buff_trip     : usize,
-                    bs_sender     : Option<&Sender<Vec<u8>>>,
-                    prog_sender   : Option<Sender<u64>>,
-                    switch_buff   : bool) {
-  let sleep_after_reg_write = Duration::from_millis(SLEEP_AFTER_REG_WRITE as u64);
-  let mut buff_size : usize;
-  match get_buff_size(&which) {
-    Ok(bf)   => { 
-      buff_size = bf;
-    },
-    Err(err) => { 
-      error!("Error getting buff size! {:?}", err);
-      buff_size = 0;
-      //continue;
-    }
-  }
-
-  let has_tripped = buff_size >= buff_trip;
-  
-  debug!("Buff size {} and trip value {}", buff_size, buff_trip);
-  if has_tripped {
-    info!("Buff {which:?} tripped at a size of {buff_size}");  
-    info!("Buff handler switch buffers {switch_buff}");
-    // reset the buffers
-    if switch_buff {
-      match switch_ram_buffer() {
-        Ok(_)  => {
-          info!("Ram buffer switched!");
-          *active_buffer = which.invert();
-        },
-        Err(_) => error!("Unable to switch RAM buffers!") 
-      }
-    }
-    //thread::sleep_ms(SLEEP_AFTER_REG_WRITE);
-    let mut bytestream = Vec::<u8>::new(); 
-    match read_data_buffer(&which, buff_size as usize) {
-      Err(err) => error!("Can not read data buffer {err}"),
-      Ok(bs)    => bytestream = bs,
-    }
-    if bs_sender.is_some() {
-      match bs_sender.unwrap().send(bytestream) {
-        Err(err) => error!("error sending {err}"),
-        Ok(_)    => ()
-      }
-    }
-    
-    match reset_ram_buffer_occ(&which) {
-      Ok(_)  => debug!("Successfully reset the buffer occupancy value"),
-      Err(_) => error!("Unable to reset buffer!")
-    }
-    match &prog_sender {
-      None => (),
-      Some(up) => {
-        match up.try_send(0) {
-          Err(err) => error!("Can not send!"),
-          Ok(_) => ()
-        }
-      }
-    }
-    thread::sleep(sleep_after_reg_write);
-  } else { // endf has tripped
-    *active_buffer = which.clone();
-    match &prog_sender {
-      None => (),
-      Some(up) => {
-        match up.try_send(buff_size as u64) {
-          Err(err) => error!("Sending failed with error {err}"),
-          Ok(_)    => trace!("We sent {buff_size}"),
-        }
-      }
-    }
-  }
-}
 
 
 
@@ -1733,113 +1520,3 @@ pub fn setup_drs4() -> Result<(), RegisterError> {
   Ok(())
 }
 
-/// Show progress bars for demonstration
-/// 
-/// The bar is a multibar and has 3 individual
-/// bars - 2 for the buffers and one for 
-/// the number of events seen
-/// Intended to be run in a seperate thread
-///
-pub fn progress_runner(max_events      : u64,
-                       uio1_total_size : usize,
-                       uio2_total_size : usize,
-                       update_bar_a    : Receiver<u64>,
-                       update_bar_b    : Receiver<u64>,
-                       update_bar_ev   : Receiver<u64>,
-                       run_params      : Receiver<RunParams>) {
-  let mut template_bar_env : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.red/grey} {pos:>7}/{len:7}";
-  let mut sty_ev = ProgressStyle::with_template(template_bar_env)
-  .unwrap();
-  //.progress_chars("##>");
-  let mut multi_prog = MultiProgress::new();
-
-  let mut prog_a  = multi_prog
-                .add(ProgressBar::new(uio1_total_size as u64)); 
-  let mut prog_b  = multi_prog
-                .insert_after(&prog_a, ProgressBar::new(uio2_total_size as u64)); 
-  let mut prog_ev = multi_prog
-                .insert_after(&prog_b, ProgressBar::new(max_events)); 
-
-  let sleep_time       = time::Duration::from_millis(10);
-  let template_bar_a   : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.blue/grey} {bytes:>7}/{total_bytes:7} ";
-  let template_bar_b   : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.green/grey} {bytes:>7}/{total_bytes:7} ";
-
-  let label_a   = String::from("Buff A");
-  let label_b   = String::from("Buff B");
-  let sty_a = ProgressStyle::with_template(template_bar_a)
-  .unwrap();
-  //.progress_chars("##-");
-  let sty_b = ProgressStyle::with_template(template_bar_b)
-  .unwrap();
-  //.progress_chars("##-");
-  prog_a.set_message (label_a.clone());
-  prog_a.set_prefix  ("\u{1F4BE}");
-  prog_a.set_style   (sty_a.clone());
-  prog_b.set_message (label_b.clone());
-  prog_b.set_prefix  ("\u{1F4BE}");
-  prog_b.set_style   (sty_b.clone());
-  prog_ev.set_style  (sty_ev.clone());
-  prog_ev.set_prefix ("\u{2728}");
-  prog_ev.set_message("EVENTS");
-
-
-  loop {
-    match run_params.try_recv() {
-      Ok(new_pars) => {
-        if !new_pars.is_active {
-          prog_a.finish();
-          prog_b.finish();
-          prog_ev.finish();
-        }
-        // these will change if we get a new run params
-        if new_pars.forever {
-          template_bar_env = "[{elapsed_precise}] {prefix} {msg} {spinner} ";
-        } else {
-          template_bar_env = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.red/grey} {pos:>7}/{len:7}";
-        }
-        sty_ev = ProgressStyle::with_template(template_bar_env)
-        .unwrap();
-        multi_prog = MultiProgress::new();
-
-        prog_a  = multi_prog
-                  .add(ProgressBar::new(uio1_total_size as u64)); 
-        prog_b  = multi_prog
-                  .insert_after(&prog_a, ProgressBar::new(uio2_total_size as u64)); 
-        prog_ev = multi_prog
-                      .insert_after(&prog_b, ProgressBar::new(new_pars.nevents as u64)); 
-        prog_a.set_message (label_a.clone());
-        prog_a.set_prefix  ("\u{1F4BE}");
-        prog_a.set_style   (sty_a.clone());
-        prog_b.set_message (label_b.clone());
-        prog_b.set_prefix  ("\u{1F4BE}");
-        prog_b.set_style   (sty_b.clone());
-        prog_ev.set_style  (sty_ev.clone());
-        prog_ev.set_prefix ("\u{2728}");
-        prog_ev.set_message("EVENTS");
-      },
-      Err(err) => {
-        trace!("Did not receive new run pars! {err}");
-        match update_bar_a.try_recv() {
-          Err(err) => trace!("No update, err {err}"),
-          Ok(val)  => {
-            prog_a.set_position(val);
-          }
-        }
-        match update_bar_b.try_recv() {
-          Err(err) => trace!("No update, err {err}"),
-          Ok(val)  => {
-            prog_b.set_position(val);
-            //prog_b.inc(val);
-          }
-        }
-        match update_bar_ev.try_recv() {
-          Err(err) => trace!("No update, err {err}"),
-          Ok(val)  => {
-            prog_ev.set_position(val);
-          }
-        }
-        thread::sleep(sleep_time);
-      }
-    } // end match
-  } // end loop
-}

@@ -9,12 +9,15 @@ rm -rf ../target/armv7-unknown*
 
 #compile_and_deploy_target liftof-rb ucla-rb149
 #for rb in ucla-rb00 ucla-rb01 ucla-rb02 ucla-rb03 ucla-rb04 ucla-rb07 ucla-rb08 ucla-rb09 ucla-rb10;
-#for rb in tof-rb05 tof-rb06
-#do compile_and_deploy_target liftof-rb $rb;
-#done
+#for rb in tof-rb05 tof-rb06 tof-rb07 tof-rb08 tof-rb09 tof-rb10
+for rb in tof-rb03 tof-rb04
+do compile_and_deploy_target liftof-rb $rb;
+done
 #compile_and_deploy_target liftof-rb tof-rb52
-compile_and_deploy_target liftof-rb tof-rb01
-compile_and_deploy_target liftof-rb tof-rb02
+#compile_and_deploy_target liftof-rb tof-rb05
+#compile_and_deploy_target liftof-rb tof-rb06
+#compile_and_deploy_target liftof-rb tof-rb01
+#compile_and_deploy_target liftof-rb tof-rb02
 #compile_and_deploy_target scan-uio-buffers tof-rb05
 #compile_and_deploy_target debug-idle
 #compile_and_deploy_target watch-buffer-fill
