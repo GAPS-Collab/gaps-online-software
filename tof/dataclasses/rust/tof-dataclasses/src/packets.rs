@@ -27,7 +27,8 @@ pub use crate::monitoring::RBMoniData;
 //pub use crate::packets::command_packet::CommandPacket;
 use crate::serialization::{Serialization};
 use crate::errors::SerializationError;
-use crate::events::RBEventPayload;
+use crate::events::{RBEventPayload,
+                    MasterTriggerEvent};
 //use nom::IResult;
 //use nom::{error::ErrorKind, Err};
 //use nom::number::complete::*;
@@ -204,6 +205,16 @@ impl TofPacket {
   //  }
 
 }
+
+impl From<&MasterTriggerEvent> for TofPacket {
+  fn from(mt : &MasterTriggerEvent) -> TofPacket {
+    let mut tp     = TofPacket::new();
+    tp.packet_type = PacketType::MasterTrigger;
+    tp.payload     = mt.to_bytestream();
+    tp
+  }
+}
+
 
 impl From<&RBMoniData> for TofPacket {
   fn from(moni : &RBMoniData) -> TofPacket {
