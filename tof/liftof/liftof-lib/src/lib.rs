@@ -65,6 +65,36 @@ pub fn get_file_as_byte_vec(filename: &String) -> Vec<u8> {
     return buffer;
 }
 
+/// Open a raw file with ReadoutBoard data ("blob") and run decoding and analysis
+/// FIXME - this won't work!
+pub fn get_blobs_from_file (rb_id : usize) {
+//  let filepath = String::from("/data0/gfp-data-aug/Aug/run4a/d20220809_195753_4.dat");
+//  let blobs = get_file_as_byte_vec(&filepath);
+//  // FIXME - this must be thre real calibrations
+//  let calibrations = [Calibrations {..Default::default()};NCHN];
+//  //let sender = Sender::<PaddlePacket>();
+//  let (sender, receiver) = unbounded();
+//  todo!("Fix the paddle ids. This function needs to be given the Readoutboard!");
+//  let paddle_ids : [u8;4] = [0,0,0,0];
+//  let mut rb = ReadoutBoard::new();
+//  rb.id = Some(rb_id as u8);
+//  rb.sorted_pids = paddle_ids;
+//  match analyze_blobs(&blobs,
+//                      &sender,
+//                      false,
+//                      &rb,
+//                      false,
+//                      false,
+//                      &calibrations,
+//                      0) {
+//      Ok(nblobs)   => info!("Read {} blobs from file", nblobs), 
+//      Err(err)     => panic!("Was not able to read blobs! Err {}", err)
+//  }
+}
+
+
+
+
 /// Open a new file and write TofPackets
 /// in binary representation
 ///

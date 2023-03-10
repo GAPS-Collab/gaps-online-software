@@ -21,8 +21,7 @@ use hdf5;
 #[cfg(feature = "diagnostics")]
 use ndarray::{arr1};
 
-use liftof_lib::{ReadoutBoard,
-                 get_file_as_byte_vec};
+use liftof_lib::ReadoutBoard;
 
 use tof_dataclasses::packets::PacketType;
 use tof_dataclasses::packets::paddle_packet::PaddlePacket;
@@ -344,62 +343,6 @@ fn analyze_blobs(buffer               : &Vec<u8>,
 }
 
 /*************************************/
-
-fn get_blobs_from_file (rb_id : usize) {
-  let filepath = String::from("/data0/gfp-data-aug/Aug/run4a/d20220809_195753_4.dat");
-  let blobs = get_file_as_byte_vec(&filepath);
-  // FIXME - this must be thre real calibrations
-  let calibrations = [Calibrations {..Default::default()};NCHN];
-  //let sender = Sender::<PaddlePacket>();
-  let (sender, receiver) = unbounded();
-  todo!("Fix the paddle ids. This function needs to be given the Readoutboard!");
-  let paddle_ids : [u8;4] = [0,0,0,0];
-  let mut rb = ReadoutBoard::new();
-  rb.id = Some(rb_id as u8);
-  rb.sorted_pids = paddle_ids;
-  match analyze_blobs(&blobs,
-                      &sender,
-                      false,
-                      &rb,
-                      false,
-                      false,
-                      &calibrations,
-                      0) {
-      Ok(nblobs)   => info!("Read {} blobs from file", nblobs), 
-      Err(err)     => panic!("Was not able to read blobs! Err {}", err)
-  }
-}
-
-/*************************************/
-
-/// Check an incoming message for readout board 
-/// handshake/ping signal
-#[deprecated(since="0.2.0", note="This will no longer work")]
-fn identifiy_readoutboard(msg : &zmq::Message) -> bool
-{
-  let size     = msg.len();
-  if size == 0 {
-      return false;
-    }
-  let result = msg.as_str();
-  if !result.is_some() {
-      return false;
-  }
-  // the signature for RB's is "RBXX"
-  if size < 5 {
-    // FIXME - pattern recognition, 
-    // extract rb id
-    let rb_ping = msg.as_str().unwrap();
-    debug!("Received RB ping signal {}", rb_ping);
-    return true;
-  } else {
-    println!("Received RB {}", msg.as_str().unwrap());
-  }
-  return false;
-}
-
-/*************************************/
-
 
 /// Receive binary blobs from readout boards,
 /// and perform specified tasks

@@ -199,7 +199,10 @@ pub fn paddle_packet_cache (evid_rec    : &Receiver<Option<u32>>,
             warn!("Did not get an event id!");
             // just send the first entry from the cach
             if pp_cache.len() == 0 {
-              pp_send.send(None);
+              match pp_send.send(None) {
+                Err(err) => error!("Can not send None value err {err}"),
+                Ok(_)    => () 
+              }
               continue;
             }
 

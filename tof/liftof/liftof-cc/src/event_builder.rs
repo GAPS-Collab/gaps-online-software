@@ -98,7 +98,10 @@ fn build_events_in_cache(event_cache   : &mut VecDeque<TofEvent>,
             Some(pp) => {
               if pp.event_id == ev.event_id {
                 n_received += 1;
-                ev.add_paddle(pp);
+                match ev.add_paddle(pp) {
+                  Err(err) => error!("Can not add paddle to event {}, Error {err}", ev.event_id),
+                  Ok(_)    => ()
+                }
               } else {
                 if paddle_cache.contains_key(&pp.event_id) {
                   paddle_cache.get_mut(&pp.event_id).unwrap().push(pp);
@@ -204,6 +207,9 @@ pub fn event_builder (master_id      : &cbc::Receiver<MasterTriggerEvent>,
         }
         last_evid = event.event_id;
         event_cache.push_back(event);
+        // we will push the MasterTriggerEvent down the sink
+        let tp = TofPacket::from(&mt);
+        data_sink.try_send(tp);
       }
     } // end match Ok(mt)
     if n_iter  == 100 {

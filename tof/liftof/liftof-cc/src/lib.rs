@@ -4,7 +4,6 @@ pub mod constants;
 pub mod waveform;
 pub mod errors;
 pub mod api;
-pub mod master_trigger;
 pub mod event_builder;
 pub mod paddle_packet_cache;
 pub mod flight_comms;

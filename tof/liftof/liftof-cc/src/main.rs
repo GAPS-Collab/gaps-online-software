@@ -22,16 +22,14 @@ use liftof_lib::{LocalTriggerBoard,
 #[cfg(feature="random")]
 extern crate rand;
 
+extern crate ctrlc;
+
 extern crate zmq;
 
 extern crate tof_dataclasses;
 
 use std::{thread,
-          time,
-          path::Path,
-          sync::mpsc::Sender,
-          sync::mpsc::Receiver,
-          sync::mpsc::channel};
+          time};
 
 use clap::{arg,
            command,
@@ -62,6 +60,10 @@ use liftof_cc::paddle_packet_cache::paddle_packet_cache;
 use liftof_cc::flight_comms::global_data_sink;
 
 
+use std::process::exit;
+
+
+
 /*************************************/
 
 #[derive(Parser, Debug)]
@@ -90,15 +92,13 @@ fn main() {
 
   // some bytes, in a vector
   let sparkle_heart         = vec![240, 159, 146, 150];
-  let kraken                = vec![240, 159, 144, 153];
+  //let kraken                = vec![240, 159, 144, 153];
   //let satelite_antenna      = vec![240, 159, 147, 161];
-  let fish                  = vec![240, 159, 144, 159];
 
   // We know these bytes are valid, so we'll use `unwrap()`.
   let sparkle_heart    = String::from_utf8(sparkle_heart).unwrap();
-  let kraken           = String::from_utf8(kraken).unwrap();
+  //let kraken           = String::from_utf8(kraken).unwrap();
   //let satelite_antenna = String::from_utf8(satelite_antenna).unwrap();
-  let fish             = String::from_utf8(fish).unwrap();
   // welcome banner!
   //
   println!("-----------------------------------------------");
@@ -108,6 +108,14 @@ fn main() {
   println!(" .. This is the Command&Control server which connects to the MasterTriggerBoard and the ReadoutBoards");
   println!(" .. see the gitlab repository for documentation and submitting issues at" );
   println!(" **https://uhhepvcs.phys.hawaii.edu/Achim/gaps-online-software/-/tree/main/tof/liftof**");
+
+  ctrlc::set_handler(move || {
+    println!("received Ctrl+C! We will stop triggers and end the run!");
+    println!("So long and thanks for all the \u{1F41F}"); 
+    exit(0);
+  })
+  .expect("Error setting Ctrl-C handler");
+
 
 
   // deal with command line arguments
@@ -133,8 +141,8 @@ fn main() {
   let mut master_trigger_port = 0usize;
 
   // Have all the readoutboard related information in this list
-  let mut rb_list : Vec::<ReadoutBoard>;
-  let mut manifest = (Vec::<LocalTriggerBoard>::new(), Vec::<ReadoutBoard>::new());
+  let rb_list      : Vec::<ReadoutBoard>;
+  let manifest : (Vec::<LocalTriggerBoard>, Vec::<ReadoutBoard>);
   match args.json_config {
     None => panic!("No .json config file provided! Please provide a config file with --json-config or -j flag!"),
     Some(_) => {
