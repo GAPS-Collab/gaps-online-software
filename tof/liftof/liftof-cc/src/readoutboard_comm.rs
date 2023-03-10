@@ -38,6 +38,7 @@ use tof_dataclasses::constants::{NCHN,
 
 use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::serialization::Serialization;
+use tof_dataclasses::serialization::search_for_u16;
 use crate::waveform::CalibratedWaveform;
 
 
@@ -352,8 +353,7 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
                                  write_blob       : bool,
                                  storage_savepath : &String,
                                  events_per_file  : &usize,
-                                 rb               : &ReadoutBoard)
-{
+                                 rb               : &ReadoutBoard) {
   let zmq_ctx = zmq::Context::new();
   let board_id = rb.id.unwrap();
   info!("initializing RB thread for board {}!", board_id);
@@ -415,8 +415,6 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
   let mut file_on_disc : Option<File> = None;//let mut output = File::create(path)?;
   if write_blob {
     file_on_disc = OpenOptions::new().append(true).create(true).open(blobfile_path).ok()
-    //let f = File::create(&blobfile_path);
-    //file_on_disc = Some(f.unwrap());
   }
   let mut n_events = 0usize;
   loop {
@@ -494,7 +492,20 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
         match &mut file_on_disc {
           None => (),
           Some(f) => {
-            f.write_all(buffer.as_slice());
+            // if the readoutboard prefixes it's payload with 
+            // "RBXX", we have to get rid of that first
+            match search_for_u16(0xaa, &buffer, 0) {
+              Err(err) => {
+                error!("Can not find header in this payload! {err}");
+              }
+              Ok(_)    => {
+                trace!("writing {} bytes", buffer.len());
+                match f.write_all(&buffer[4..]) {
+                  Err(err) => error!("Can not write to file, err {err}"),
+                  Ok(_)    => ()
+                }
+              }
+            }
           }
         }
         n_events += 1;
@@ -510,31 +521,9 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
           file_on_disc = OpenOptions::new().append(true).create(true).open(blobfile_path).ok();
           n_events = 0;
         }
-        //if write_blob {
-        //  let blobfile_name = "blob_".to_owned() 
-        //                       + &n_chunk.to_string() 
-        //                       + "_"
-        //                       + &board_id.to_string()
-        //                       + ".blob";
-        //  info!("Writing blobs to {}", blobfile_name );
-        //  let blobfile_path = Path::new(&blobfile_name);
-        //  match write_stream_to_file(blobfile_path, &buffer) {
-        //    Ok(size)  => debug!("Writing blob file successful! {} bytes written", size),
-        //    Err(err)  => {
-        //      error!("Unable to write blob to disk! {}", err );
-        //      lost_blob_files += 1;
-        //    }
-        //  } // end match
-        //} // end if write_blob
-        //thread::sleep(Duration::from_millis(1500));
         n_chunk += 1;
-
-        // currently, for debugging just stop after one 
-        // chunk
-        //panic!("You shall not pass!");
-        
-      }
-    }
-  }
-}
+      } // end ok
+    } // end match 
+  } // end loop
+} // end fun
 
