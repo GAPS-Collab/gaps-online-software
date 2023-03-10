@@ -1,4 +1,4 @@
-//! Higher level functions, to deal with events/binary reprentation of it, 
+u/! Higher level functions, to deal with events/binary reprentation of it, 
 //!  configure the drs4, etc.
 
 use local_ip_address::local_ip;
@@ -885,16 +885,6 @@ pub fn runner(run_params          : &Receiver<RunParams>,
         }
       } 
     }    
-    if pars.forever && !show_progress {
-      // we can just continue, and take of the heat of the 
-      // cpu a little bit
-      if !force_trigger {
-        thread::sleep(one_sec);
-      } else {
-        thread::sleep(time::Duration::from_secs(time_between_events.unwrap() as u64));
-      }
-      continue;
-    }
 
     // calculate current event count
     match get_event_count() {
