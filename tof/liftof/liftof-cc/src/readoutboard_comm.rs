@@ -500,7 +500,7 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
               }
               Ok(_)    => {
                 trace!("writing {} bytes", buffer.len());
-                match f.write_all(buffer.as_slice()) {
+                match f.write_all(&buffer[4..]) {
                   Err(err) => error!("Can not write to file, err {err}"),
                   Ok(_)    => ()
                 }
