@@ -1,12 +1,13 @@
 extern crate tof_dataclasses;
 extern crate liftof_cc;
+extern crate liftof_lib;
 extern crate crossbeam_channel;
 extern crate pretty_env_logger;
 
 use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::threading::ThreadPool;
 use tof_dataclasses::events::MasterTriggerEvent; 
-use liftof_cc::master_trigger::master_trigger;
+use liftof_lib::master_trigger;
 use crossbeam_channel as cbc;
 
 fn main() {
