@@ -12,7 +12,10 @@ use std::fmt;
 use crate::constants::{NWORDS, NCHN, MAX_NUM_PEAKS};
 use crate::errors::{WaveformError, 
                     SerializationError};
-use crate::serialization::search_for_u16;
+use crate::serialization::{search_for_u16,
+                           parse_u16,
+                           parse_u32,
+                           Serialization};
 use crate::calibrations::Calibrations;
 
 pub fn get_constant_blobeventsize() -> usize {
@@ -28,6 +31,93 @@ use hdf5::filters::blosc_set_nthreads;
 #[cfg(feature = "diagnostics")]
 use hdf5;
 
+/// This contains all information of a raw readout board event which is not channel data
+/// 
+/// The description of this can be found 
+/// [here](https://gitlab.com/ucla-gaps-tof/firmware/-/tree/develop/)
+pub struct RBEventHeader {
+  pub status          : u16,
+  pub len             : u16,
+  pub roi             : u16,
+  pub dna             : u16, 
+  pub fw_hash         : u16,
+  pub id              : u8,   
+  pub ch_mask         : u8,
+  pub event_id        : u32,
+  pub dtap0           : u16,
+  pub drstemp         : u16,
+  pub timestamp_32    : u32,
+  pub timestamp_16    : u16,
+  pub stop_cell       : u16,
+  pub crc32           : u32,
+}
+
+impl Serialization for RBEventHeader {
+  fn from_bytestream(bytestream : &Vec<u8>,
+                     start_pos  : usize) 
+    -> Result<RBEventHeader, SerializationError> {
+    let head_pos = search_for_u16(RBEventHeader::HEAD, bytestream, start_pos)?; 
+    let mut pos = head_pos;
+    let head = parse_u16(&bytestream, &mut pos);
+    if head != RBEventHeader::HEAD {
+      return Err(SerializationError::HeadInvalid);
+    }
+    let mut event_header = RBEventHeader::new();
+    let mut pos = head_pos + 2;
+    event_header.status  = parse_u16(&bytestream, &mut pos); 
+    event_header.len     = parse_u16(&bytestream, &mut pos);
+    event_header.roi     = parse_u16(&bytestream, &mut pos);
+    println!("<status {}, len {}, roi {}", event_header.status, event_header.len, event_header.roi);
+    //raw_bytes_2  = [bytestream[pos],bytestream[pos + 1]];
+    //pos   += 2;
+    //event_header.len     = u16::from_le_bytes(raw_bytes_2); 
+    //
+    //raw_bytes_2  = [bytestream[pos],bytestream[pos + 1]];
+    //pos   += 2;
+    //event_header.roi     = u16::from_le_bytes(raw_bytes_2); 
+
+
+    let tail_pos = head_pos + RBEventHeader::SIZE;
+    let tail =  u16::from_le_bytes([bytestream[tail_pos],
+                                    bytestream[tail_pos+1]]);
+    if tail != RBEventHeader::TAIL {
+      return Err(SerializationError::WrongByteSize);
+    }
+    Ok(event_header)
+  }
+}
+
+
+impl RBEventHeader {
+  const SIZE : usize = 32;
+  const HEAD : u16   = 0xaaaa;
+  const TAIL : u16   = 0x5555;
+
+  pub fn new() -> RBEventHeader {
+    RBEventHeader {
+      status          : 0,
+      len             : 0,
+      roi             : 0,
+      dna             : 0, 
+      fw_hash         : 0,
+      id              : 0,   
+      ch_mask         : 0,
+      event_id        : 0,
+      dtap0           : 0,
+      drstemp         : 0,
+      timestamp_32    : 0,
+      timestamp_16    : 0,
+      stop_cell       : 0,
+      crc32           : 0,
+    }
+  }
+}
+
+/// A wrapper class for raw binary RB data exposing the event id
+///
+/// This is useful when we need the event id, but don't want to 
+/// spend the CPU resources to decode the whole event.
+///
 #[derive(Debug, Clone)]
 pub struct RBEventPayload {
   pub event_id : u32,
@@ -93,42 +183,42 @@ impl RBEventPayload {
 
 /***********************************/
 
-#[derive(Debug, Clone)]
-pub struct ReducedRBEvent {
-  pub len             : u16,
-  pub roi             : u16,
-  pub event_id        : u32,
-  pub timestamp       : u64,
-
-  // these are NOT in the official blob format
-  // these will NOT be able to be deserialized from
-  // a standard readoutboard blob file
-  pub voltages           : [[f64;NWORDS];NCHN],
-  pub nanoseconds        : [[f64;NWORDS];NCHN],
-  
-  // these values are for baseline 
-  // subtraction, cfd calculation etc.
-  pub threshold      : [f64;NCHN],
-  pub cfds_fraction  : [f64;NCHN],
-  pub ped_begin_bin  : [usize;NCHN],
-  pub ped_bin_range  : [usize;NCHN],    
-  pub pedestal       : [f64;NCHN],
-  pub pedestal_sigma : [f64;NCHN],
-
-  // fields used for internal calculations
-  pub peaks      : [[usize;MAX_NUM_PEAKS];NCHN],
-  pub tdcs       : [[f64;MAX_NUM_PEAKS];NCHN],
-  pub charge     : [[f64;MAX_NUM_PEAKS];NCHN],
-  pub width      : [[f64;MAX_NUM_PEAKS];NCHN], 
-  pub height     : [[f64;MAX_NUM_PEAKS];NCHN],    
-  pub num_peaks  : [usize;NCHN],
-  //pub stop_cell  : [u16;NCHN],
-  pub begin_peak : [[usize;MAX_NUM_PEAKS];NCHN],
-  pub end_peak   : [[usize;MAX_NUM_PEAKS];NCHN],
-  pub spikes     : [[usize;MAX_NUM_PEAKS];NCHN],
-  
-  pub impedance  : f64,
-}
+//#[derive(Debug, Clone)]
+//pub struct ReducedRBEvent {
+//  pub len             : u16,
+//  pub roi             : u16,
+//  pub event_id        : u32,
+//  pub timestamp       : u64,
+//
+//  // these are NOT in the official blob format
+//  // these will NOT be able to be deserialized from
+//  // a standard readoutboard blob file
+//  pub voltages           : [[f64;NWORDS];NCHN],
+//  pub nanoseconds        : [[f64;NWORDS];NCHN],
+//  
+//  // these values are for baseline 
+//  // subtraction, cfd calculation etc.
+//  pub threshold      : [f64;NCHN],
+//  pub cfds_fraction  : [f64;NCHN],
+//  pub ped_begin_bin  : [usize;NCHN],
+//  pub ped_bin_range  : [usize;NCHN],    
+//  pub pedestal       : [f64;NCHN],
+//  pub pedestal_sigma : [f64;NCHN],
+//
+//  // fields used for internal calculations
+//  pub peaks      : [[usize;MAX_NUM_PEAKS];NCHN],
+//  pub tdcs       : [[f64;MAX_NUM_PEAKS];NCHN],
+//  pub charge     : [[f64;MAX_NUM_PEAKS];NCHN],
+//  pub width      : [[f64;MAX_NUM_PEAKS];NCHN], 
+//  pub height     : [[f64;MAX_NUM_PEAKS];NCHN],    
+//  pub num_peaks  : [usize;NCHN],
+//  //pub stop_cell  : [u16;NCHN],
+//  pub begin_peak : [[usize;MAX_NUM_PEAKS];NCHN],
+//  pub end_peak   : [[usize;MAX_NUM_PEAKS];NCHN],
+//  pub spikes     : [[usize;MAX_NUM_PEAKS];NCHN],
+//  
+//  pub impedance  : f64,
+//}
 
 /***********************************/
 
@@ -251,10 +341,10 @@ impl BlobData {
     }
   }
 
-  ///! Only decode the event id from a bytestream
-  ///  
-  ///  The bytestream has to be starting with 
-  ///  HEAD
+  /// Only decode the event id from a bytestream
+  /// 
+  /// The bytestream has to be starting with 
+  /// HEAD
   pub fn decode_event_id(bytestream : &[u8]) -> u32 {
     let evid_pos = 22; // the eventid is 22 bytes from the 
                        // start including HEAD
@@ -404,17 +494,17 @@ impl BlobData {
     pos
   }
 
-  ///! Initialize the blob from a bytestream. 
+  /// Initialize the blob from a bytestream. 
   ///
-  ///  This is a member here, so this can be done
-  ///  repeatedly without re-allocation of the 
-  ///  blob arrays
+  /// This is a member here, so this can be done
+  /// repeatedly without re-allocation of the 
+  /// blob arrays
   ///
-  ///  # Arguments
+  /// # Arguments
   ///
-  ///  * search_start : automatically look ahead 
-  ///                   from start_pos unitl HEAD
-  ///                   is found
+  /// * search_start : automatically look ahead 
+  ///                  from start_pos unitl HEAD
+  ///                  is found
   ///
   ///FIXME - this should return Result!                   
   pub fn from_bytestream(&mut self,
@@ -684,329 +774,329 @@ impl BlobData {
   pub fn remove_spikes (&mut self,
                         spikes : &mut [i32;10]) {
 
-  //let mut spikes  : [i32;10] = [0;10];
-  let mut filter  : f64;
-  let mut dfilter : f64;
-  //let mut n_symmetric : usize;
-  let mut n_neighbor  : usize;
+    //let mut spikes  : [i32;10] = [0;10];
+    let mut filter  : f64;
+    let mut dfilter : f64;
+    //let mut n_symmetric : usize;
+    let mut n_neighbor  : usize;
 
-  let mut n_rsp      = 0usize;
+    let mut n_rsp      = 0usize;
 
-  let mut rsp : [i32;10]    = [-1;10];
-  //let mut spikes : [i32;10] = [-1;10
-  // to me, this seems that should be u32
-  // the 10 is for a maximum of 10 spikes (Jeff)
-  let mut sp   : [[usize;10];NCHN] = [[0;10];NCHN];
-  let mut n_sp : [usize;10]      = [0;10];
+    let mut rsp : [i32;10]    = [-1;10];
+    //let mut spikes : [i32;10] = [-1;10
+    // to me, this seems that should be u32
+    // the 10 is for a maximum of 10 spikes (Jeff)
+    let mut sp   : [[usize;10];NCHN] = [[0;10];NCHN];
+    let mut n_sp : [usize;10]      = [0;10];
 
-  for j in 0..NWORDS as usize {
-    for i in 0..NCHN as usize {
-      filter = -self.voltages[i][j] + self.voltages[i][(j + 1) % NWORDS] + self.voltages[i][(j + 2) % NWORDS] - self.voltages[i][(j + 3) % NWORDS];
-      dfilter = filter + 2.0 * self.voltages[i][(j + 3) % NWORDS] + self.voltages[i][(j + 4) % NWORDS] - self.voltages[i][(j + 5) % NWORDS];
-      if filter > 20.0  && filter < 100.0 {
-        if n_sp[i] < 10 {   // record maximum of 10 spikes
-          sp[i][n_sp[i] as usize] = (j + 1) % NWORDS ;
-          n_sp[i] += 1;
-        // FIXME - error checking
-        } else {return;}            // too many spikes -> something wrong
-      }// end of if
-      else if dfilter > 40.0 && dfilter < 100.0 && filter > 10.0 {
-        if n_sp[i] < 9 {  // record maximum of 10 spikes
-          sp[i][n_sp[i] as usize] = (j + 1) % NWORDS ;
-          sp[i][(n_sp[i] + 1) as usize] = (j + 3) % NWORDS ;
-          n_sp[i] += 2;
-        } else { return;} // too many spikes -> something wrong
-      } // end of else if
+    for j in 0..NWORDS as usize {
+      for i in 0..NCHN as usize {
+        filter = -self.voltages[i][j] + self.voltages[i][(j + 1) % NWORDS] + self.voltages[i][(j + 2) % NWORDS] - self.voltages[i][(j + 3) % NWORDS];
+        dfilter = filter + 2.0 * self.voltages[i][(j + 3) % NWORDS] + self.voltages[i][(j + 4) % NWORDS] - self.voltages[i][(j + 5) % NWORDS];
+        if filter > 20.0  && filter < 100.0 {
+          if n_sp[i] < 10 {   // record maximum of 10 spikes
+            sp[i][n_sp[i] as usize] = (j + 1) % NWORDS ;
+            n_sp[i] += 1;
+          // FIXME - error checking
+          } else {return;}            // too many spikes -> something wrong
+        }// end of if
+        else if dfilter > 40.0 && dfilter < 100.0 && filter > 10.0 {
+          if n_sp[i] < 9 {  // record maximum of 10 spikes
+            sp[i][n_sp[i] as usize] = (j + 1) % NWORDS ;
+            sp[i][(n_sp[i] + 1) as usize] = (j + 3) % NWORDS ;
+            n_sp[i] += 2;
+          } else { return;} // too many spikes -> something wrong
+        } // end of else if
 
-    }// end loop over NCHN
-  } // end loop over NWORDS
+      }// end loop over NCHN
+    } // end loop over NWORDS
 
-  // go through all spikes and look for neighbors */
-  for i in 0..NCHN {
-    for j in 0..n_sp[i] as usize {
-      //n_symmetric = 0;
-      n_neighbor = 0;
-      for k in 0..NCHN {
-        for l in 0..n_sp[k] as usize {
-        //check if this spike has a symmetric partner in any channel
-          if (sp[i][j] as i32 + sp[k][l] as i32 - 2 * self.stop_cell as i32) as i32 % NWORDS as i32 == 1022 {
-            //n_symmetric += 1;
-            break;
-          }
-        }
-      } // end loop over k
-      // check if this spike has same spike is in any other channels */
-      //for (k = 0; k < nChn; k++) {
-      for k in 0..NCHN {
-        if i != k {
-          for l in 0..n_sp[k] {
-            if sp[i][j] == sp[k][l] {
-            n_neighbor += 1;
-            break;
-            }
-          } // end loop over l   
-        } // end if
-      } // end loop over k
-
-      if n_neighbor >= 2 {
-        for k in 0..n_rsp {
-          if rsp[k] == sp[i][j] as i32 {break;} // ignore repeats
-          if n_rsp < 10 && k == n_rsp {
-            rsp[n_rsp] = sp[i][j] as i32;
-            n_rsp += 1;
-          }
-        }  
-      }
-
-    } // end loop over j
-  } // end loop over i
-
-  // recognize spikes if at least one channel has it */
-  //for (k = 0; k < n_rsp; k++)
-  let magic_value : f64 = 14.8;
-  let mut x : f64;
-  let mut y : f64;
-
-  let mut skip_next : bool = false;
-  for k in 0..n_rsp {
-    if skip_next {
-      skip_next = false;
-      continue;
-    }
-    spikes[k] = rsp[k];
-    //for (i = 0; i < nChn; i++)
+    // go through all spikes and look for neighbors */
     for i in 0..NCHN {
-      if k < n_rsp && i32::abs(rsp[k] as i32 - rsp[k + 1] as i32 % NWORDS as i32) == 2
-      {
-        // remove double spike 
-        let j = if rsp[k] > rsp[k + 1] {rsp[k + 1] as usize}  else {rsp[k] as usize};
-        x = self.voltages[i][(j - 1) % NWORDS];
-        y = self.voltages[i][(j + 4) % NWORDS];
-        if f64::abs(x - y) < 15.0
+      for j in 0..n_sp[i] as usize {
+        //n_symmetric = 0;
+        n_neighbor = 0;
+        for k in 0..NCHN {
+          for l in 0..n_sp[k] as usize {
+          //check if this spike has a symmetric partner in any channel
+            if (sp[i][j] as i32 + sp[k][l] as i32 - 2 * self.stop_cell as i32) as i32 % NWORDS as i32 == 1022 {
+              //n_symmetric += 1;
+              break;
+            }
+          }
+        } // end loop over k
+        // check if this spike has same spike is in any other channels */
+        //for (k = 0; k < nChn; k++) {
+        for k in 0..NCHN {
+          if i != k {
+            for l in 0..n_sp[k] {
+              if sp[i][j] == sp[k][l] {
+              n_neighbor += 1;
+              break;
+              }
+            } // end loop over l   
+          } // end if
+        } // end loop over k
+
+        if n_neighbor >= 2 {
+          for k in 0..n_rsp {
+            if rsp[k] == sp[i][j] as i32 {break;} // ignore repeats
+            if n_rsp < 10 && k == n_rsp {
+              rsp[n_rsp] = sp[i][j] as i32;
+              n_rsp += 1;
+            }
+          }  
+        }
+
+      } // end loop over j
+    } // end loop over i
+
+    // recognize spikes if at least one channel has it */
+    //for (k = 0; k < n_rsp; k++)
+    let magic_value : f64 = 14.8;
+    let mut x : f64;
+    let mut y : f64;
+
+    let mut skip_next : bool = false;
+    for k in 0..n_rsp {
+      if skip_next {
+        skip_next = false;
+        continue;
+      }
+      spikes[k] = rsp[k];
+      //for (i = 0; i < nChn; i++)
+      for i in 0..NCHN {
+        if k < n_rsp && i32::abs(rsp[k] as i32 - rsp[k + 1] as i32 % NWORDS as i32) == 2
         {
-          self.voltages[i][j % NWORDS] = x + 1.0 * (y - x) / 5.0;
-          self.voltages[i][(j + 1) % NWORDS] = x + 2.0 * (y - x) / 5.0;
-          self.voltages[i][(j + 2) % NWORDS] = x + 3.0 * (y - x) / 5.0;
-          self.voltages[i][(j + 3) % NWORDS] = x + 4.0 * (y - x) / 5.0;
+          // remove double spike 
+          let j = if rsp[k] > rsp[k + 1] {rsp[k + 1] as usize}  else {rsp[k] as usize};
+          x = self.voltages[i][(j - 1) % NWORDS];
+          y = self.voltages[i][(j + 4) % NWORDS];
+          if f64::abs(x - y) < 15.0
+          {
+            self.voltages[i][j % NWORDS] = x + 1.0 * (y - x) / 5.0;
+            self.voltages[i][(j + 1) % NWORDS] = x + 2.0 * (y - x) / 5.0;
+            self.voltages[i][(j + 2) % NWORDS] = x + 3.0 * (y - x) / 5.0;
+            self.voltages[i][(j + 3) % NWORDS] = x + 4.0 * (y - x) / 5.0;
+          }
+          else
+          {
+            self.voltages[i][j % NWORDS] -= magic_value;
+            self.voltages[i][(j + 1) % NWORDS] -= magic_value;
+            self.voltages[i][(j + 2) % NWORDS] -= magic_value;
+            self.voltages[i][(j + 3) % NWORDS] -= magic_value;
+          }
         }
         else
         {
-          self.voltages[i][j % NWORDS] -= magic_value;
-          self.voltages[i][(j + 1) % NWORDS] -= magic_value;
-          self.voltages[i][(j + 2) % NWORDS] -= magic_value;
-          self.voltages[i][(j + 3) % NWORDS] -= magic_value;
-        }
-      }
-      else
-      {
-        // remove single spike 
-        x = self.voltages[i][((rsp[k] - 1) % NWORDS as i32) as usize];
-        y = self.voltages[i][(rsp[k] + 2) as usize % NWORDS];
-        if f64::abs(x - y) < 15.0 {
-          self.voltages[i][rsp[k] as usize] = x + 1.0 * (y - x) / 3.0;
-          self.voltages[i][(rsp[k] + 1) as usize % NWORDS] = x + 2.0 * (y - x) / 3.0;
-        }
-        else
-        {
-          self.voltages[i][rsp[k] as usize] -= magic_value;
-          self.voltages[i][(rsp[k] + 1) as usize % NWORDS] -= magic_value;
-        }
-      } // end loop over nchn
-    } // end loop over n_rsp
-    if k < n_rsp && i32::abs(rsp[k] - rsp[k + 1] % NWORDS as i32) == 2
-      {skip_next = true;} // skip second half of double spike
-    } // end loop over k
-  }
-  
-  ///! Set the threshold and check if the waveform got over threahshold
-  pub fn set_threshold(&mut self, thr : f64, ch : usize) -> bool {
-    self.threshold[ch] = thr;
-    for n in 0..NWORDS {
-      if self.voltages[ch][n] > thr {
-        return true;
-      }
-    }
-    false
-  }
-
-  pub fn set_cfds_fraction(&mut self, fraction : f64, ch : usize) {
-      self.cfds_fraction[ch] = fraction;
-  }
-  
-  pub fn set_ped_begin(&mut self, time : f64, ch : usize) {
-      match self.time_2_bin(time, ch) {
-          Err(err) => println!("Can not find bin for time {}, ch {}, err {:?}", time, ch, err),
-          Ok(begin) => {self.ped_begin_bin[ch] = begin;}
-      }
-  }
-
-  pub fn set_ped_range(&mut self, range : f64, ch : usize) {
-    // This is a little convoluted, but we must convert the range (in
-    // ns) into bins
-    match self.time_2_bin(self.nanoseconds[ch][self.ped_begin_bin[ch]] + range, ch) {
-        Err(err)      => println!("Can not set pedestal range for range {} for ch {}, err {:?}", range, ch, err),
-        Ok(bin_range) => {self.ped_bin_range[ch] = bin_range;}
-    }
-  }
-
-  pub fn subtract_pedestal(&mut self, ch : usize) {
-    for n in 0..NWORDS {
-      self.voltages[ch][n] -= self.pedestal[ch];
-    }
-  }
-
-  pub fn calc_ped_range(&mut self, ch : usize) {
-    let mut sum  = 0f64;
-    let mut sum2 = 0f64;
-
-    for n in self.ped_begin_bin[ch]..self.ped_begin_bin[ch] + self.ped_bin_range[ch] {
-      if f64::abs(self.voltages[ch][n]) < 10.0 {
-        sum  += self.voltages[ch][n];
-        sum2 += self.voltages[ch][n]*self.voltages[ch][n];
-      }
-    }
-    let average = sum/(self.ped_bin_range[ch] as f64);
-    self.pedestal[ch] = average;
-    self.pedestal_sigma[ch] = f64::sqrt(sum2/(self.ped_bin_range[ch] as f64 - (average*average)))
-
-  }
-
-  fn time_2_bin(&self, t_ns : f64, ch : usize) -> Result<usize, WaveformError> {
-    // Given a time in ns, find the bin most closely corresponding to that time
-    for n in 0..NWORDS {
-      if self.nanoseconds[ch][n] > t_ns {
-        return Ok(n-1);
-      }
-    }
-    println!("Did not find a bin corresponding to the given time {} for ch {}", t_ns, ch);
-    return Err(WaveformError::TimesTooSmall);
-  }
-
-
-  // 
-  // Return the bin with the maximum DC value
-  //
-  fn get_max_bin(&self,
-                 lower_bound : usize,
-                 window : usize,
-                 ch : usize ) -> Result<usize, WaveformError> {
-    if lower_bound + window > NWORDS {
-      return Err(WaveformError::OutOfRangeUpperBound);
-    }
-    let mut maxval = self.voltages[ch][lower_bound];
-    let mut maxbin = lower_bound;
-    for n in lower_bound..lower_bound + window {
-      if self.voltages[ch][n] > maxval {
-        maxval  = self.voltages[ch][n];
-        maxbin  = n;
-      }
-    } // end for
-    trace!("Got maxbin {} with a value of {}", maxbin, maxval);
-    Ok(maxbin)
-  } // end fn
-
-  pub fn find_cfd_simple(&mut self, peak_num : usize, ch : usize) -> f64 {
-    if self.num_peaks[ch] == 0 {
-      trace!("No peaks for ch {}!", ch);
-      return 0.0;
-    }
-    if peak_num > self.num_peaks[ch] {
-      warn!("Requested peak {} is larger than detected peaks (={})", peak_num, self.num_peaks[ch]); 
-      return self.nanoseconds[ch][NWORDS];
-    }
-    // FIXME
-    // FIXME - this needs some serious error checking
-    if self.end_peak[ch][peak_num] < self.begin_peak[ch][peak_num] {
-        debug!("cfd simple method failed!! Peak begin {}, peak end {}", self.begin_peak[ch][peak_num], self.end_peak[ch][peak_num]);
-        return 0.0;
-    }
-    let mut idx : usize;
-    match self.get_max_bin(self.begin_peak[ch][peak_num],
-                           self.end_peak[ch][peak_num]-self.begin_peak[ch][peak_num],
-                           ch) {
-      Err(err) => {warn!("Can not find cfd due to err {:?}",err);
-                   return 0.0;
-      }
-      Ok(maxbin)  => {trace!("Got bin {} for max val", maxbin);
-                      idx = maxbin;
-      }
-
-    }
-    trace!("Got max bin {} for peak {} .. {}", idx, self.begin_peak[ch][peak_num], self.end_peak[ch][peak_num]);
-    trace!("Voltage at max {}", self.voltages[ch][idx]);
-    if idx < 1 {idx = 1;}
-    let mut sum : f64 = 0.0;
-    for n in idx-1..idx+1 {sum += self.voltages[ch][n];}
-    let cfds_frac  : f64 = 0.2;
-    let tmp_thresh : f64 = f64::abs(cfds_frac * (sum / 3.0));
-    trace!("Calculated tmp threshold of {}", tmp_thresh);
-    // Now scan through the waveform around the peak to find the bin
-    // crossing the calculated threshold. Bin idx is the peak so it is
-    // definitely above threshold. So let's walk backwards through the
-    // trace until we find a bin value less than the threshold.
-    let mut lo_bin : usize = NWORDS;
-    let mut n = idx;
-    assert!(idx >= self.begin_peak[ch][peak_num]);
-    if self.begin_peak[ch][peak_num] >= 10 {
-      while n > self.begin_peak[ch][peak_num] - 10 {
-      //for n in (idx..self.begin_peak[peak_num] - 10).rev() {
-        if f64::abs(self.voltages[ch][n]) < tmp_thresh {
-          lo_bin = n;
-          break;
-        }
-        n -= 1;
-      }  
-    }
-    trace!("Lo bin {} , begin peak {}", lo_bin, self.begin_peak[ch][peak_num]);
-    let cfd_time : f64;
-    if lo_bin < NWORDS -1 {
-      cfd_time = self.find_interpolated_time(tmp_thresh, lo_bin, 1, ch).unwrap();  
-    }
-    else {cfd_time = self.nanoseconds[ch][NWORDS - 1];} 
-
-    // save it in member variable
-    self.tdcs[ch][peak_num] = cfd_time;
-    return cfd_time;
-  }
-
-  pub fn find_interpolated_time (&self,
-                                 //adc       : [f64;NWORDS],
-                                 //times     : [f64;NWORDS], 
-                                 mut threshold : f64,
-                                 mut idx       : usize,
-                                 size          : usize, 
-                                 ch            : usize) -> Result<f64, WaveformError> {
-    if idx + 1 > NWORDS {
-      return Err(WaveformError::OutOfRangeUpperBound);
+          // remove single spike 
+          x = self.voltages[i][((rsp[k] - 1) % NWORDS as i32) as usize];
+          y = self.voltages[i][(rsp[k] + 2) as usize % NWORDS];
+          if f64::abs(x - y) < 15.0 {
+            self.voltages[i][rsp[k] as usize] = x + 1.0 * (y - x) / 3.0;
+            self.voltages[i][(rsp[k] + 1) as usize % NWORDS] = x + 2.0 * (y - x) / 3.0;
+          }
+          else
+          {
+            self.voltages[i][rsp[k] as usize] -= magic_value;
+            self.voltages[i][(rsp[k] + 1) as usize % NWORDS] -= magic_value;
+          }
+        } // end loop over nchn
+      } // end loop over n_rsp
+      if k < n_rsp && i32::abs(rsp[k] - rsp[k + 1] % NWORDS as i32) == 2
+        {skip_next = true;} // skip second half of double spike
+      } // end loop over k
     }
     
-    threshold = threshold.abs();
-    let mut lval  = (self.voltages[ch][idx]).abs();
-    let mut hval : f64 = 0.0; 
-    if size == 1 {
-      hval = (self.voltages[ch][idx+1]).abs();
-    } else {
-    for n in idx+1..idx+size {
-      hval = self.voltages[ch][n].abs();
-      if (hval>=threshold) && (threshold<=lval) { // Threshold crossing?
-        idx = n-1; // Reset idx to point before crossing
-        break;
+    ///! Set the threshold and check if the waveform got over threahshold
+    pub fn set_threshold(&mut self, thr : f64, ch : usize) -> bool {
+      self.threshold[ch] = thr;
+      for n in 0..NWORDS {
+        if self.voltages[ch][n] > thr {
+          return true;
         }
-      lval = hval;
+      }
+      false
+    }
+
+    pub fn set_cfds_fraction(&mut self, fraction : f64, ch : usize) {
+        self.cfds_fraction[ch] = fraction;
+    }
+    
+    pub fn set_ped_begin(&mut self, time : f64, ch : usize) {
+        match self.time_2_bin(time, ch) {
+            Err(err) => println!("Can not find bin for time {}, ch {}, err {:?}", time, ch, err),
+            Ok(begin) => {self.ped_begin_bin[ch] = begin;}
+        }
+    }
+
+    pub fn set_ped_range(&mut self, range : f64, ch : usize) {
+      // This is a little convoluted, but we must convert the range (in
+      // ns) into bins
+      match self.time_2_bin(self.nanoseconds[ch][self.ped_begin_bin[ch]] + range, ch) {
+          Err(err)      => println!("Can not set pedestal range for range {} for ch {}, err {:?}", range, ch, err),
+          Ok(bin_range) => {self.ped_bin_range[ch] = bin_range;}
       }
     }
-    if ( lval > threshold) && (size != 1) {
-      return Ok(self.nanoseconds[ch][idx]);
-    } else if lval == hval {
-      return Ok(self.nanoseconds[ch][idx]);
-    } else {
-      return Ok(self.nanoseconds[ch][idx] 
-            + (threshold-lval)/(hval-lval) * (self.nanoseconds[ch][idx+1]
-            - self.nanoseconds[ch][idx]));
-  //float time = WaveTime[idx] +  
-  //  (thresh-lval)/(hval-lval) * (WaveTime[idx+1]-WaveTime[idx]) ;
+
+    pub fn subtract_pedestal(&mut self, ch : usize) {
+      for n in 0..NWORDS {
+        self.voltages[ch][n] -= self.pedestal[ch];
+      }
     }
-  }
+
+    pub fn calc_ped_range(&mut self, ch : usize) {
+      let mut sum  = 0f64;
+      let mut sum2 = 0f64;
+
+      for n in self.ped_begin_bin[ch]..self.ped_begin_bin[ch] + self.ped_bin_range[ch] {
+        if f64::abs(self.voltages[ch][n]) < 10.0 {
+          sum  += self.voltages[ch][n];
+          sum2 += self.voltages[ch][n]*self.voltages[ch][n];
+        }
+      }
+      let average = sum/(self.ped_bin_range[ch] as f64);
+      self.pedestal[ch] = average;
+      self.pedestal_sigma[ch] = f64::sqrt(sum2/(self.ped_bin_range[ch] as f64 - (average*average)))
+
+    }
+
+    fn time_2_bin(&self, t_ns : f64, ch : usize) -> Result<usize, WaveformError> {
+      // Given a time in ns, find the bin most closely corresponding to that time
+      for n in 0..NWORDS {
+        if self.nanoseconds[ch][n] > t_ns {
+          return Ok(n-1);
+        }
+      }
+      println!("Did not find a bin corresponding to the given time {} for ch {}", t_ns, ch);
+      return Err(WaveformError::TimesTooSmall);
+    }
+
+
+    // 
+    // Return the bin with the maximum DC value
+    //
+    fn get_max_bin(&self,
+                   lower_bound : usize,
+                   window : usize,
+                   ch : usize ) -> Result<usize, WaveformError> {
+      if lower_bound + window > NWORDS {
+        return Err(WaveformError::OutOfRangeUpperBound);
+      }
+      let mut maxval = self.voltages[ch][lower_bound];
+      let mut maxbin = lower_bound;
+      for n in lower_bound..lower_bound + window {
+        if self.voltages[ch][n] > maxval {
+          maxval  = self.voltages[ch][n];
+          maxbin  = n;
+        }
+      } // end for
+      trace!("Got maxbin {} with a value of {}", maxbin, maxval);
+      Ok(maxbin)
+    } // end fn
+
+    pub fn find_cfd_simple(&mut self, peak_num : usize, ch : usize) -> f64 {
+      if self.num_peaks[ch] == 0 {
+        trace!("No peaks for ch {}!", ch);
+        return 0.0;
+      }
+      if peak_num > self.num_peaks[ch] {
+        warn!("Requested peak {} is larger than detected peaks (={})", peak_num, self.num_peaks[ch]); 
+        return self.nanoseconds[ch][NWORDS];
+      }
+      // FIXME
+      // FIXME - this needs some serious error checking
+      if self.end_peak[ch][peak_num] < self.begin_peak[ch][peak_num] {
+          debug!("cfd simple method failed!! Peak begin {}, peak end {}", self.begin_peak[ch][peak_num], self.end_peak[ch][peak_num]);
+          return 0.0;
+      }
+      let mut idx : usize;
+      match self.get_max_bin(self.begin_peak[ch][peak_num],
+                             self.end_peak[ch][peak_num]-self.begin_peak[ch][peak_num],
+                             ch) {
+        Err(err) => {warn!("Can not find cfd due to err {:?}",err);
+                     return 0.0;
+        }
+        Ok(maxbin)  => {trace!("Got bin {} for max val", maxbin);
+                        idx = maxbin;
+        }
+
+      }
+      trace!("Got max bin {} for peak {} .. {}", idx, self.begin_peak[ch][peak_num], self.end_peak[ch][peak_num]);
+      trace!("Voltage at max {}", self.voltages[ch][idx]);
+      if idx < 1 {idx = 1;}
+      let mut sum : f64 = 0.0;
+      for n in idx-1..idx+1 {sum += self.voltages[ch][n];}
+      let cfds_frac  : f64 = 0.2;
+      let tmp_thresh : f64 = f64::abs(cfds_frac * (sum / 3.0));
+      trace!("Calculated tmp threshold of {}", tmp_thresh);
+      // Now scan through the waveform around the peak to find the bin
+      // crossing the calculated threshold. Bin idx is the peak so it is
+      // definitely above threshold. So let's walk backwards through the
+      // trace until we find a bin value less than the threshold.
+      let mut lo_bin : usize = NWORDS;
+      let mut n = idx;
+      assert!(idx >= self.begin_peak[ch][peak_num]);
+      if self.begin_peak[ch][peak_num] >= 10 {
+        while n > self.begin_peak[ch][peak_num] - 10 {
+        //for n in (idx..self.begin_peak[peak_num] - 10).rev() {
+          if f64::abs(self.voltages[ch][n]) < tmp_thresh {
+            lo_bin = n;
+            break;
+          }
+          n -= 1;
+        }  
+      }
+      trace!("Lo bin {} , begin peak {}", lo_bin, self.begin_peak[ch][peak_num]);
+      let cfd_time : f64;
+      if lo_bin < NWORDS -1 {
+        cfd_time = self.find_interpolated_time(tmp_thresh, lo_bin, 1, ch).unwrap();  
+      }
+      else {cfd_time = self.nanoseconds[ch][NWORDS - 1];} 
+
+      // save it in member variable
+      self.tdcs[ch][peak_num] = cfd_time;
+      return cfd_time;
+    }
+
+    pub fn find_interpolated_time (&self,
+                                   //adc       : [f64;NWORDS],
+                                   //times     : [f64;NWORDS], 
+                                   mut threshold : f64,
+                                   mut idx       : usize,
+                                   size          : usize, 
+                                   ch            : usize) -> Result<f64, WaveformError> {
+      if idx + 1 > NWORDS {
+        return Err(WaveformError::OutOfRangeUpperBound);
+      }
+      
+      threshold = threshold.abs();
+      let mut lval  = (self.voltages[ch][idx]).abs();
+      let mut hval : f64 = 0.0; 
+      if size == 1 {
+        hval = (self.voltages[ch][idx+1]).abs();
+      } else {
+      for n in idx+1..idx+size {
+        hval = self.voltages[ch][n].abs();
+        if (hval>=threshold) && (threshold<=lval) { // Threshold crossing?
+          idx = n-1; // Reset idx to point before crossing
+          break;
+          }
+        lval = hval;
+        }
+      }
+      if ( lval > threshold) && (size != 1) {
+        return Ok(self.nanoseconds[ch][idx]);
+      } else if lval == hval {
+        return Ok(self.nanoseconds[ch][idx]);
+      } else {
+        return Ok(self.nanoseconds[ch][idx] 
+              + (threshold-lval)/(hval-lval) * (self.nanoseconds[ch][idx+1]
+              - self.nanoseconds[ch][idx]));
+    //float time = WaveTime[idx] +  
+    //  (thresh-lval)/(hval-lval) * (WaveTime[idx+1]-WaveTime[idx]) ;
+      }
+    }
 
 
   ///
