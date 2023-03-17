@@ -12,6 +12,7 @@
 #include "packets/CommandPacket.h"
 #include "packets/RBEnvPacket.h"
 #include "packets/RBMoniPacket.h"
+#include "packets/MasterTriggerPacket.h"
 
 #include "serialization.h"
 #include "blobroutines.h"
@@ -392,6 +393,24 @@ double calculate_pedestal_helper(vec_f64 wave,
 
 /********************/
 
+std::vector<TofPacket> get_tofpackets_from_stream(vec_u8 bytestream, u64 start_pos) {
+  std::vector<TofPacket> packets;
+  u64 pos  = start_pos;
+  // just make sure in the beginning they
+  // are not the same
+  u64 last_pos = start_pos += 1;
+  TofPacket packet;
+  while (true) {
+    last_pos = pos;
+    pos = packet.from_bytestream(bytestream, pos);
+    if (pos != last_pos) {
+      packets.push_back(packet);
+    } else {
+      break;
+    }
+  }
+  return packets;
+}
 
 /********************/
 
@@ -419,6 +438,19 @@ PYBIND11_MODULE(gaps_tof, m) {
       .value("StreamAnyEvent"       ,TofCommand::StreamAnyEvent) 
       .value("Unknown"              ,TofCommand::Unknown) 
       .export_values();
+
+    py::class_<MasterTriggerPacket>(m, "MasterTriggerPacket")
+      .def(py::init())
+      .def("to_bytestream",   &MasterTriggerPacket::to_bytestream, "Serialize to a list of bytes")
+      .def("from_bytestream", &MasterTriggerPacket::from_bytestream, "Deserialize from a list of bytes")
+      .def_readwrite("event_id"        , &MasterTriggerPacket::event_id        ) 
+      .def_readwrite("timestamp"       , &MasterTriggerPacket::timestamp       )
+      .def_readwrite("tiu_timestamp"   , &MasterTriggerPacket::tiu_timestamp   )
+      .def_readwrite("gps_timestamp_32", &MasterTriggerPacket::gps_timestamp_32)
+      .def_readwrite("gps_timestamp_16", &MasterTriggerPacket::gps_timestamp_16)
+      .def_readwrite("board_mask"      , &MasterTriggerPacket::board_mask      )
+      .def_readwrite("n_paddles"       , &MasterTriggerPacket::n_paddles       ) 
+    ;
 
     py::class_<CommandPacket>(m, "CommandPacket") 
       .def(py::init<TofCommand const&, u32 const>())  
@@ -702,7 +734,7 @@ PYBIND11_MODULE(gaps_tof, m) {
    py::class_<Calibrations_t>(m, "Calibrations")
        .def(py::init())
    ;
-
+   m.def("get_tofpackets_from_stream", &get_tofpackets_from_stream);
    // serialization functions
    m.def("decode_u16",         &decode_ushort);
    m.def("encode_u16",         &wrap_encode_ushort);
