@@ -1,8 +1,8 @@
 {
   "meta" : "",
   "unix_time" : "",
-  "events_per_file" : 100000,
-  "raw_storage_savepath" : "/home/astoessl/tofdata/",
+  "events_per_file" : 25000,
+  "raw_storage_savepath" : "/home/gaps/astoessl/tofdata/",
   "master_trigger" : {
     "ip"   : "192.168.36.121", 
     "port" : 50001
