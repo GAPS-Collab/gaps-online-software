@@ -67,7 +67,7 @@ impl Serialization for RBEventHeader {
     event_header.status  = parse_u16(&bytestream, &mut pos); 
     event_header.len     = parse_u16(&bytestream, &mut pos);
     event_header.roi     = parse_u16(&bytestream, &mut pos);
-    println!("<status {}, len {}, roi {}", event_header.status, event_header.len, event_header.roi);
+    println!("<head {}, status {}, len {}, roi {}",head, event_header.status, event_header.len, event_header.roi);
     //raw_bytes_2  = [bytestream[pos],bytestream[pos + 1]];
     //pos   += 2;
     //event_header.len     = u16::from_le_bytes(raw_bytes_2); 
@@ -80,9 +80,9 @@ impl Serialization for RBEventHeader {
     let tail_pos = head_pos + RBEventHeader::SIZE;
     let tail =  u16::from_le_bytes([bytestream[tail_pos],
                                     bytestream[tail_pos+1]]);
-    if tail != RBEventHeader::TAIL {
-      return Err(SerializationError::WrongByteSize);
-    }
+    //if tail != RBEventHeader::TAIL {
+    //  return Err(SerializationError::WrongByteSize);
+    //}
     Ok(event_header)
   }
 }
