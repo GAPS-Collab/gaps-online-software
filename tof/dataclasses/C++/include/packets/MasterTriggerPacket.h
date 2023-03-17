@@ -9,8 +9,11 @@
  ***********************/
 
 #include "TofTypeDefs.h"
+static const usize N_LTBS = 20;
+static const usize N_CHN_PER_LTB = 16;
 
 struct MasterTriggerPacket {
+  const u64 SIZE = 45;
   u16 head = 0xAAAA;
   u16 tail = 0x5555;
   u32 event_id        ; 
@@ -19,11 +22,9 @@ struct MasterTriggerPacket {
   u32 gps_timestamp_32; 
   u32 gps_timestamp_16; 
   u32 board_mask      ;
-  //idecoded_board_mask = [false;32];
-  //hits         = [[false;32];32];
-
-  u32 crc;
-  //n_paddles = 0u8;
+  u8  n_paddles       ;
+  vec_u32 hits        ;
+  u32 crc             ;
  
   /**
    * String representation
@@ -64,6 +65,12 @@ struct MasterTriggerPacket {
   u64 from_bytestream(vec_u8 &payload, 
                       u64 start_pos=0);
 
+
+  //! The hit board ids
+  vec_u8 get_hit_board_ids() const;
+
+  //! The hit board ids 
+  vec_u8 get_hit_paddle_ids() const;
 
 };
 
