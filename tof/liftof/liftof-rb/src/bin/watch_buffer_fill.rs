@@ -113,7 +113,7 @@ fn buff_handler(which      : &BlobBuffer,
       // the buffer is actually full and needs to be reset
       //switch_ram_buffer();
       //thread::sleep_ms(SLEEP_AFTER_REG_WRITE);
-      blob_buffer_reset(&which);
+      reset_ram_buffer_occ(&which);
       thread::sleep_ms(SLEEP_AFTER_REG_WRITE);
       let bytestream = get_bytestream(UIO1, buff_start_temp, 10).unwrap();
       let blob_size  = BlobData::SERIALIZED_SIZE;
@@ -134,7 +134,7 @@ fn buff_handler(which      : &BlobBuffer,
     // reset the buffers
     //switch_ram_buffer();
     //thread::sleep_ms(SLEEP_AFTER_REG_WRITE);
-    blob_buffer_reset(&which);
+    reset_ram_buffer_occ(&which);
     thread::sleep_ms(SLEEP_AFTER_REG_WRITE);
     // get the new size after reset
     match get_buff_size(&which, &mut buff_start_temp) {
@@ -363,8 +363,8 @@ fn main() {
 //  //  buf_a_occ      = get_blob_buffer_occ(&buf_a).unwrap();
 //  //  buf_b_occ      = get_blob_buffer_occ(&buf_b).unwrap();
 //  //  let mut dma_ptr        = get_dma_pointer().unwrap();
-//  //  blob_buffer_reset(&buf_a);
-//  //  blob_buffer_reset(&buf_b);
+//  //  reset_ram_buffer_occ(&buf_a);
+//  //  reset_ram_buffer_occ(&buf_b);
 //  //  buf_a_occ      = get_blob_buffer_occ(&buf_a).unwrap();
 //  //  buf_b_occ      = get_blob_buffer_occ(&buf_b).unwrap();
 //  //  dma_ptr        = get_dma_pointer().unwrap();
@@ -409,8 +409,8 @@ fn main() {
 //  //let now = time::Instant::now();
 //
 //  let mut last_event : u32 = get_event_count().unwrap();
-//  //blob_buffer_reset(&buf_a);
-//  //blob_buffer_reset(&buf_b);
+//  //reset_ram_buffer_occ(&buf_a);
+//  //reset_ram_buffer_occ(&buf_b);
 // 
 //  let approximate_blob_size :f32 = 18000.0;
 //  let maxevent : u32 = 10000;
@@ -449,7 +449,7 @@ fn main() {
 //      println! ("Size of blob buffer A is {buf_a_size:.4}");
 //      println! ("Size of blob buffer B is {buf_b_size:.4}");
 //      switch_ram_buffer();
-//      blob_buffer_reset(&buf_a);
+//      reset_ram_buffer_occ(&buf_a);
 //      buf_a_start = get_blob_buffer_occ(&buf_a).unwrap();
 //      bar_a.finish();
 //      bar_a = ProgressBar::new(UIO1_TRIP as u64);
@@ -466,7 +466,7 @@ fn main() {
 //      println! ("Size of blob buffer A is {buf_a_size:.4}");
 //      println! ("Size of blob buffer B is {buf_b_size:.4}");
 //      switch_ram_buffer();
-//      blob_buffer_reset(&buf_b);
+//      reset_ram_buffer_occ(&buf_b);
 //      buf_b_start = get_blob_buffer_occ(&buf_b).unwrap();
 //      bar_b.finish();
 //      bar_b = ProgressBar::new(UIO2_TRIP as u64);

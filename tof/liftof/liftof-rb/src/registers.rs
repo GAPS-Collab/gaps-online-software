@@ -43,6 +43,7 @@ pub const READOUT_MASK : u32 = 0x44; // [8:0] 8 bit mask, set a bit to 1 to enab
 pub const TRIGGER_ENABLE : u32 = 0x11c;  // Write 0 to stop all triggers, 1 to enable triggering
 
 pub const WRITE_EVENTFRAGMENT : u32 = 0xc4;
+pub const TRIG_GEN_RATE       : u32 = 0x164;
 
 //=================DMA==================================
 // (direct memory access)

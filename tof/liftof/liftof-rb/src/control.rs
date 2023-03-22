@@ -19,6 +19,13 @@ pub fn enable_evt_fragments() -> Result<(), RegisterError> {
   Ok(())
 }
 
+/// use the random self trigger
+pub fn set_self_trig_rate(rate : u32) -> Result<(), RegisterError> {
+  warn!("Setting self trigger rate, writing register {}", TRIG_GEN_RATE);
+  write_control_reg(TRIG_GEN_RATE, rate)?;
+  Ok(())
+}
+
 /// do not write header only packets when the drs is busyu
 pub fn disable_evt_fragments() -> Result<(), RegisterError> {
   trace!("Disable event fragment writing!");
