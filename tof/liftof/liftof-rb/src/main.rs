@@ -273,7 +273,7 @@ fn main() {
   let rdb_sender_a  = bs_send.clone();
   
   workforce.execute(move || {
-    data_publisher(&tp_from_client, rb_test); 
+    data_publisher(&tp_from_client, rb_test || force_random_trig > 0); 
   });
   let tp_to_pub_c   = tp_to_pub.clone();
   workforce.execute(move || {
