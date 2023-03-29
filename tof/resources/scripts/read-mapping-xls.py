@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 """
 Read a paddle mapping xls file from Sydney and change 
@@ -182,11 +182,15 @@ if __name__ == '__main__':
         # first RB, then LTB
         
         if rb[0] in rbs:
-            rbs[rb[0]].ch_to_pid[str(rb[1])] =  paddle_end.id
+            rbs[rb[0]].ch_to_pid[str(rb[1])] =  int(paddle_end.id)
         else:
             new_rb = RB()
             new_rb.id = rb[0]
-            new_rb.ch_to_pid[str(rb[1])] = paddle_end.id
+            new_rb.ch_to_pid[str(rb[1])] = int(paddle_end.id)
+            new_rb.guess_ip()
+            mac = get_mac_for_ip(new_rb.ip_address)
+            new_rb.mac_address = mac
+
             rbs[rb[0]] = new_rb
             print (new_rb.guess_ip())
         
@@ -210,11 +214,15 @@ if __name__ == '__main__':
                 rbs[rb['id']].update(rb)
             except KeyError:
                 print (f'RB {rb["id"]} not found, adding this board...')
+                #print (rb)
+                if not 'ip_address' in rb:
+                    rb['ip_address'] = f'10.0.1.1' + str(rb['id']).zfill(2)
                 rbs[rb['id']] = rb
+                
             # checks
             checks = False
             mac = get_mac_for_ip(rb['ip_address'])
-            rb['mac_address'] = mac
+            rbs[rb['id']].mac_address = mac
             if checks:
               mac = rb['mac_address']
               ip  = rb['ip_address']

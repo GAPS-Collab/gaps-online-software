@@ -121,7 +121,8 @@ impl TofPacketWriter {
   pub fn new(file_prefix : String) -> TofPacketWriter {
     let filename = file_prefix.clone() + "_0.tof.gaps";
     let path = Path::new(&filename); 
-    let file = OpenOptions::new().append(true).open(path).expect("Unable to open file {filename}");
+    println!("Writing to file {filename}");
+    let file = OpenOptions::new().create(true).append(true).open(path).expect("Unable to open file {filename}");
     TofPacketWriter {
       file,
       file_prefix   : file_prefix,
@@ -610,6 +611,10 @@ impl LocalTriggerBoard {
 
   /// Calculate the position in the bitmask from the connectors
   pub fn get_mask_from_dsi_and_j(dsi : u8, j : u8) -> u32 {
+    if dsi == 0 || j == 0 {
+      warn!("Invalid dsi/J connection!");
+      return 0;
+    }
     let mut mask : u32 = 1;
     mask = mask << (dsi*5 + j -1) ;
     mask
@@ -802,8 +807,19 @@ impl From<&json::JsonValue> for ReadoutBoard {
     board.calib_file  = calib_file.to_string();
     board.get_ip();
     let ch_to_pid = &json["ch_to_pid"];
+    let mut ch_true : usize = 1;
     for ch in 0..ch_to_pid.len() {
-      board.ch_to_pid[ch] = json["ch_to_pid"][&ch.to_string()].as_u8().unwrap();
+      ch_true = ch + 1;
+      //println!("{ch}");
+      //println!("{:?}", json["ch_to_pid"]);
+      match json["ch_to_pid"][&ch_true.to_string()].as_u8() {
+        Some(foo) => {board.ch_to_pid[ch] = foo;}
+        None => {
+          error!("Can not get data for ch {ch}");
+          board.ch_to_pid[ch] = 0;
+        }
+      }
+      //board.ch_to_pid[ch] = json["ch_to_pid"][&ch_true.to_string()].as_u8().unwrap();
     }
     let mut paddle_ids : [u8;4] = [0,0,0,0];
     let mut counter = 0;
