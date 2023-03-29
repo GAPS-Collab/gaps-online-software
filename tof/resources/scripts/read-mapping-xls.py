@@ -65,7 +65,7 @@ class RB:
         self.id        = 0
         self.ch_to_pid = dict()
         self.dna       = 0
-        self.port      = 0
+        self.port      = 42000
         self.calibration_file = ""
         self.mac_address = ""
         self.ip_address = ""
@@ -167,7 +167,7 @@ if __name__ == '__main__':
         tof_manifest = json.load(open(args.update_existing))
         print (tof_manifest)
         print (type(tof_manifest))
-    mapping = pandas.read_excel(args.input, sheet_name="Paddle Ends")
+    mapping = pandas.read_excel(args.input, sheet_name="Paddle End Master Spreadsheet")
     rbs  = dict()
     ltbs = dict()
     for k in range(1,len(mapping.index)):
@@ -206,9 +206,15 @@ if __name__ == '__main__':
 
     if args.update_existing:
         for rb in tof_manifest['rbs']:
-            rbs[rb['id']].update(rb)
+            try:
+                rbs[rb['id']].update(rb)
+            except KeyError:
+                print (f'RB {rb["id"]} not found, adding this board...')
+                rbs[rb['id']] = rb
             # checks
             checks = False
+            mac = get_mac_for_ip(rb['ip_address'])
+            rb['mac_address'] = mac
             if checks:
               mac = rb['mac_address']
               ip  = rb['ip_address']
@@ -223,7 +229,13 @@ if __name__ == '__main__':
                       print (f'Have set mac to {mac}')
                   else:
                       print ('..skipping..')
-            tof_manifest['rbs'] = [k.to_dict() for k in rbs.values()]
+            def to_dict(obj):
+                if isinstance(obj, dict):
+                    return obj
+                else:
+                    return obj.to_dict()
+                    
+            tof_manifest['rbs'] = [to_dict(k) for k in rbs.values()]
 
         for ltb in tof_manifest['ltbs']:
             ltbs[ltb['id']].update(ltb)
