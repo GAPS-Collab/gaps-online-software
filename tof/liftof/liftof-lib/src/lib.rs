@@ -135,8 +135,12 @@ impl TofPacketWriter {
   pub fn add_tof_packet(&mut self, packet : &TofPacket) {
     let buffer = packet.to_bytestream();
     match self.file.write_all(buffer.as_slice()) {
-      Err(err) => warn!("Writing to file with prefix {} failed. Err {}", self.file_prefix, err),
-      Ok(_)     => ()
+      Err(err) => error!("Writing to file with prefix {} failed. Err {}", self.file_prefix, err),
+      Ok(_)    => ()
+    }
+    match self.file.sync_all() {
+      Err(err) => error!("File syncing failed!"),
+      Ok(_)    => ()
     }
     self.n_packets += 1;
     if self.n_packets == self.pkts_per_file {
