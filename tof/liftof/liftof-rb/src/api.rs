@@ -753,6 +753,7 @@ pub fn runner(run_params          : &Receiver<RunParams>,
               bs_sender           : &Sender<Vec<u8>>,
               uio1_total_size     : usize,
               uio2_total_size     : usize,
+              mut latch_to_mtb    : bool,
               show_progress       : bool,
               force_trigger_rate  : u32) {
   
@@ -764,6 +765,10 @@ pub fn runner(run_params          : &Receiver<RunParams>,
   let mut delta_events : u64 = 0;
   let mut n_events     : u64 = 0;
   let mut n_errors     : u64 = 0;
+  // per default, latch to the mtb trigger.
+  // for testting/calibration that gets switched off
+  // below
+  //latch_to_mtb = true;
 
   let mut timer        = Instant::now();
   let force_trigger    = force_trigger_rate > 0;
@@ -772,6 +777,7 @@ pub fn runner(run_params          : &Receiver<RunParams>,
     warn!("Will run in forced trigger mode with a rate of {force_trigger_rate} Hz!");
     time_between_events = Some(1.0/(force_trigger_rate as f32));
     warn!(".. this means one trigger every {} seconds...", time_between_events.unwrap());
+    latch_to_mtb = false;
   }
 
   let now = time::Instant::now();
@@ -817,20 +823,23 @@ pub fn runner(run_params          : &Receiver<RunParams>,
           if pars.is_active {
             info!("Will start a new run!");
             info!("Initializing board, starting up...");
-            if force_trigger {
+            if latch_to_mtb {
+              match set_master_trigger_mode() {
+                Err(err) => error!("Can not initialize master trigger mode, Err {err}"),
+                Ok(_)    => info!("Latching to MasterTrigger")
+              }
+            } else {
               match disable_master_trigger_mode() {
                 Err(err) => error!("Can not disable master trigger mode, Err {err}"),
                 Ok(_)    => info!("Master trigger mode didsabled!")
               }
+            }
+            if force_trigger {
               match enable_trigger() {
                 Err(err) => error!("Can not enable triggers! Err {err}"),
                 Ok(_)    => info!("Triggers enabled - Run start!")
               }
             } else {
-              match set_master_trigger_mode() {
-                Err(err) => error!("Can not initialize master trigger mode, Err {err}"),
-                Ok(_)    => info!("Latching to MasterTrigger")
-              }
               match enable_trigger() {
                 Err(err) => error!("Can not enable triggers! Err {err}"),
                 Ok(_)    => info!("Triggers enabled - Run start!")
@@ -979,7 +988,7 @@ pub fn runner(run_params          : &Receiver<RunParams>,
       if terminate {
         match disable_trigger() {
           Err(err) => error!("Can not disable triggers, error {err}"),
-          Ok(_)    => ()
+          Ok(_)    => info!("Triggers disabled!")
         }
         if show_progress {
           prog_ev.finish();
@@ -987,7 +996,7 @@ pub fn runner(run_params          : &Receiver<RunParams>,
           prog_b.finish();
         }
         is_running = false;
-        info!("Run stopped! We have seen {n_events}");
+        println!("Run stopped! We have seen {n_events}. If this process has been started manually, you can kill it with CTRL+C");
       } else {
         if !force_trigger { 
           thread::sleep(100*one_milli);

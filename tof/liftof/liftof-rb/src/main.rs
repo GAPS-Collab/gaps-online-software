@@ -280,6 +280,12 @@ fn main() {
     monitoring(&tp_to_pub);
   });
 
+  // if we don't set a rate for force_random_trig, 
+  // latch to the MTB. For the other force trigger
+  // modes, the runner will decide 
+  // FIXME: decide everything here
+  let latch_to_mtb : bool = force_random_trig == 0;
+
   // then the runner. It does nothing, until we send a set
   // of RunParams
   workforce.execute(move || {
@@ -289,6 +295,7 @@ fn main() {
              &rdb_sender_a,
              uio1_total_size,
              uio2_total_size,
+             latch_to_mtb,
              show_progress,
              force_trigger);
   });
@@ -363,7 +370,17 @@ fn main() {
   // if we arrive at this point and we want the random trigger, 
   // we are now ready to start it
   if force_random_trig > 0 {
-    match set_self_trig_rate(force_random_trig) {
+
+    // we have to calculate the actual rate with Andrew's formulat
+    //let clk_period : f64 = 1.0/33e6;
+    let rate : f32 = force_random_trig as f32;
+    let max_val  : f32 = 4294967295.0;
+    
+    //let f_trig = (33e6 * (rate/max_val)) as u32;
+    //let reg_val = 1/rate = 33e6/max_val*1/f_trig
+    let reg_val = (rate/(33e6/max_val)) as u32;
+    info!("Will use random self trigger with rate {reg_val} value for register, corresponding to {rate} Hz");
+    match set_self_trig_rate(reg_val) {
       Err(err) => {
         warn!("Setting self trigger failed! Er {err}");
         panic!("Abort!");
