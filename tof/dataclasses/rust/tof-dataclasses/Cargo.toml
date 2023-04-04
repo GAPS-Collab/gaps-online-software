@@ -24,5 +24,6 @@ nom = "7.1"
 strum = "0.24"
 strum_macros = "0.24"
 
+sqlite = "0.30"
 
 #nom = "7.1"

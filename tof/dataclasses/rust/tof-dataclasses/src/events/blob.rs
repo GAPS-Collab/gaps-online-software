@@ -1215,14 +1215,14 @@ mod test_readoutboard_blob {
     blob.stop_cell = 4;
     blob.crc32  = 88888;
     blob.tail   = 0x5555;
-    blob.print();
+    //blob.print();
     let bytestream = blob.to_bytestream();
     //for _n in 0..get_constant_blobeventsize() {
     //    bytestream.push(0);
     //}
     blob.from_bytestream(&bytestream, 0, true);
     let read_back_bytes = blob.to_bytestream();
-    blob.print();
+    //blob.print();
 
     assert_eq!(bytestream,read_back_bytes);
   }
