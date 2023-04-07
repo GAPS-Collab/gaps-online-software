@@ -13,12 +13,14 @@
 
 use crate::errors::SerializationError;
 use crate::serialization::search_for_u16;
+use std::time::Instant;
 
 #[cfg(feature="random")]
 extern crate rand;
 #[cfg(feature="random")]
 use rand::Rng;
 
+const PADDLE_TIMEOUT : u64 = 30;
 
 /// Representation of analyzed data from a paddle
 ///
@@ -55,7 +57,9 @@ pub struct PaddlePacket  {
   // fields which won't get 
   // serialized
   pub event_id     : u32,
-  pub valid        : bool
+  pub valid        : bool,
+
+  pub creation_time      : Instant,
 }
 
 impl PaddlePacket {
@@ -68,6 +72,7 @@ impl PaddlePacket {
   pub const TAIL          : u16  = 3855;
 
   pub fn new() -> PaddlePacket {
+    let creation_time = Instant::now(); 
     PaddlePacket{
                   paddle_id    : 0,
                   time_a       : 0,
@@ -84,7 +89,8 @@ impl PaddlePacket {
                   timestamp_16 : 0,
                   // non-serialize fields
                   event_id     : 0,
-                  valid        : true
+                  valid        : true,
+                  creation_time : creation_time
                 }
 
   }
@@ -93,6 +99,18 @@ impl PaddlePacket {
     self.valid = false;
   }
   
+  pub fn has_timed_out(&self) -> bool {
+    return self.age() > PADDLE_TIMEOUT;
+  }
+ 
+  pub fn is_valid(&self, use_timeout : bool) -> bool {
+    if use_timeout {
+      return self.valid && !self.has_timed_out();
+    } else {
+      return self.valid;
+    }
+  }
+
   pub fn set_peak_a(&mut self, peak : f64 ) {
     let prec : f64 = 0.004;
     self.peak_a = (peak as f64/prec) as u16;
@@ -143,6 +161,9 @@ impl PaddlePacket {
     if side == 1 {self.set_charge_b(charge);}
   }
 
+  pub fn age(&self) -> u64 {
+    self.creation_time.elapsed().as_secs()
+  }
 
   pub fn reset(&mut self) {
     self.paddle_id    =  0;
@@ -308,6 +329,5 @@ impl PaddlePacket {
     pp.timestamp_16    = rng.gen::<u16>();
     pp
   }
-
 }
 
