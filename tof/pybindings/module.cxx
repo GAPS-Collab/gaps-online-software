@@ -5,6 +5,7 @@
 #include <pybind11/complex.h>
 #include <pybind11/functional.h>
 #include <pybind11/chrono.h>
+#include <pybind11/numpy.h>
 
 #include "packets/REventPacket.h"
 #include "packets/RPaddlePacket.h"
@@ -18,10 +19,15 @@
 #include "blobroutines.h"
 #include "WaveGAPS.h"
 #include "TOFCommon.h"
+#include "events.h"
 
 #include "TofTypeDefs.h"
 
 using namespace GAPS;
+using namespace pybind11::literals;
+namespace py = pybind11;
+
+bytestream get_bytestream_from_file(const std::string &filename);
 
 /***********************************************/
 
@@ -232,6 +238,51 @@ BlobEvt_t read_event_helper(std::string filename, i32 n)
 
 /********************/
 
+/*****************
+ * Dismantle a readoutboard file and return the individual
+ * fields as arrays in a python dictionary
+ *
+ */
+py::dict splice_readoutboard_datafile(const std::string filename) {
+  bytestream stream             = get_bytestream_from_file(filename);
+  std::vector<BlobEvt_t> events = get_events_from_stream(stream, 0);
+  vec_u32 event_ids  = vec_u32(); 
+  vec_u16 stop_cells = vec_u16(); 
+  // channels, times
+  vec_vec_u16 t_1     = vec_vec_u16();
+  vec_vec_u16 t_2     = vec_vec_u16();
+  vec_vec_u16 t_3     = vec_vec_u16();
+  vec_vec_u16 t_4     = vec_vec_u16();
+  vec_vec_u16 t_5     = vec_vec_u16();
+  vec_vec_u16 t_6     = vec_vec_u16();
+  vec_vec_u16 t_7     = vec_vec_u16();
+  vec_vec_u16 t_8     = vec_vec_u16();
+  vec_vec_u16 t_9     = vec_vec_u16();
+ 
+  py::array_t<short> adc = py::array_t<short>();
+  for (auto ev : events) {
+     event_ids.push_back(ev.event_ctr);
+     stop_cells.push_back(ev.stop_cell);
+     adc = py::array_t<short>(std::vector<ptrdiff_t>{9, 1024}, &ev.ch_adc[0][0]); 
+  }
+  std::cout << "init dict" << std::endl;
+  py::dict data(
+                "event_id"_a=py::array_t<u32>(event_ids.size(), event_ids.data()),\
+                "stop_cell"_a=py::array_t<u16>(stop_cells.size(), stop_cells.data()),\
+                "t_1"_a=42,\
+                "t_2"_a=42,\
+                "t_3"_a=42,\
+                "t_4"_a=42,\
+                "t_5"_a=42,\
+                "t_6"_a=42,\
+                "t_7"_a=42,\
+                "t_8"_a=42,\
+                "t_9"_a=42,\
+                "adc"_a=adc);
+  return data;
+}
+
+
 int get_nevents_from_file(std::string filename){
   FILE* f = fopen(filename.c_str(), "rb");
   BlobEvt_t event;
@@ -414,7 +465,38 @@ std::vector<TofPacket> get_tofpackets_from_stream(vec_u8 bytestream, u64 start_p
 
 /********************/
 
-namespace py = pybind11;
+bytestream get_bytestream_from_file(const std::string &filename) {
+  // bytestream stream;
+  // Not going to explicitly check these.
+  // // The use of gcount() below will compensate for a failure here.
+  std::ifstream is(filename, std::ios::binary);
+
+  is.seekg (0, is.end);
+  int length = is.tellg();
+  //std::cout << "Found file with length " << length << std::endl;
+  is.seekg (0, is.beg);
+
+  // is.seekg(offset);
+  //
+  // Bytes data(length);
+  bytestream stream = bytestream(length);
+  is.read(reinterpret_cast<char*>(stream.data()), length);
+  //
+  // // We have to check that reading from the stream actually worked.
+  // // If any of the stream operation above failed then `gcount()`
+  // // will return zero indicating that zero data was read from the
+  // // stream.
+  // data.resize(is.gcount());
+  //
+  // // Simply return the vector to allow move semantics take over.
+  // return data;
+
+  return stream;
+}
+
+/********************/
+
+
 PYBIND11_MODULE(gaps_tof, m) {
     m.doc() = "GAPS Tof dataclasses and utility tools";
    
@@ -734,7 +816,9 @@ PYBIND11_MODULE(gaps_tof, m) {
    py::class_<Calibrations_t>(m, "Calibrations")
        .def(py::init())
    ;
-   m.def("get_tofpackets_from_stream", &get_tofpackets_from_stream);
+   m.def("get_tofpackets_from_stream",   &get_tofpackets_from_stream);
+   m.def("get_event_ids_from_raw_stream", &get_event_ids_from_raw_stream);
+   m.def("get_bytestream_from_file",     &get_bytestream_from_file);
    // serialization functions
    m.def("decode_u16",         &decode_ushort);
    m.def("encode_u16",         &wrap_encode_ushort);
@@ -760,6 +844,7 @@ PYBIND11_MODULE(gaps_tof, m) {
    // functions to read and parse blob files
    m.def("search_for_2byte_marker",  &search_for_2byte_marker);
    m.def("get_2byte_marker_indices", &get_2byte_markers_indices);
+   m.def("splice_readoutboard_datafile",   &splice_readoutboard_datafile);
    m.def("get_events_from_stream",   &get_events_from_stream);
    m.def("get_nevents_from_file",    &get_nevents_from_file);
    m.def("ReadEvent",                &read_event_helper);

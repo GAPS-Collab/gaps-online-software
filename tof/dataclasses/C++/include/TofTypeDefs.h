@@ -34,5 +34,6 @@ typedef std::vector<u64> vec_u64;
 typedef std::vector<f64> vec_f64;
 typedef std::vector<std::vector<f64>> vec_vec_f64;
 typedef std::vector<std::vector<i16>> vec_vec_i16;
+typedef std::vector<std::vector<u16>> vec_vec_u16;
 
 #endif
