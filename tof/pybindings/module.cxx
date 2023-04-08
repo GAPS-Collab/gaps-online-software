@@ -248,6 +248,8 @@ py::dict splice_readoutboard_datafile(const std::string filename) {
   std::vector<BlobEvt_t> events = get_events_from_stream(stream, 0);
   vec_u32 event_ids  = vec_u32(); 
   vec_u16 stop_cells = vec_u16(); 
+  vec_u64 timestamps = vec_u64();
+  
   // channels, times
   vec_vec_u16 t_1     = vec_vec_u16();
   vec_vec_u16 t_2     = vec_vec_u16();
@@ -258,27 +260,44 @@ py::dict splice_readoutboard_datafile(const std::string filename) {
   vec_vec_u16 t_7     = vec_vec_u16();
   vec_vec_u16 t_8     = vec_vec_u16();
   vec_vec_u16 t_9     = vec_vec_u16();
+  
+  vec_vec_i16 adc_1     = vec_vec_i16();
+  vec_vec_i16 adc_2     = vec_vec_i16();
+  vec_vec_i16 adc_3     = vec_vec_i16();
+  vec_vec_i16 adc_4     = vec_vec_i16();
+  vec_vec_i16 adc_5     = vec_vec_i16();
+  vec_vec_i16 adc_6     = vec_vec_i16();
+  vec_vec_i16 adc_7     = vec_vec_i16();
+  vec_vec_i16 adc_8     = vec_vec_i16();
+  vec_vec_i16 adc_9     = vec_vec_i16();
  
-  py::array_t<short> adc = py::array_t<short>();
   for (auto ev : events) {
-     event_ids.push_back(ev.event_ctr);
+     event_ids .push_back(ev.event_ctr);
      stop_cells.push_back(ev.stop_cell);
-     adc = py::array_t<short>(std::vector<ptrdiff_t>{9, 1024}, &ev.ch_adc[0][0]); 
+     timestamps.push_back(ev.timestamp);
+     adc_1       .push_back(std::vector<short>(ev.ch_adc[0], std::end(ev.ch_adc[0])));
+     adc_2       .push_back(std::vector<short>(ev.ch_adc[1], std::end(ev.ch_adc[1])));
+     adc_3       .push_back(std::vector<short>(ev.ch_adc[2], std::end(ev.ch_adc[2])));
+     adc_4       .push_back(std::vector<short>(ev.ch_adc[3], std::end(ev.ch_adc[3])));
+     adc_5       .push_back(std::vector<short>(ev.ch_adc[4], std::end(ev.ch_adc[4])));
+     adc_6       .push_back(std::vector<short>(ev.ch_adc[5], std::end(ev.ch_adc[5])));
+     adc_7       .push_back(std::vector<short>(ev.ch_adc[6], std::end(ev.ch_adc[6])));
+     adc_8       .push_back(std::vector<short>(ev.ch_adc[7], std::end(ev.ch_adc[7])));
+     adc_9       .push_back(std::vector<short>(ev.ch_adc[8], std::end(ev.ch_adc[8])));
   }
-  std::cout << "init dict" << std::endl;
   py::dict data(
-                "event_id"_a=py::array_t<u32>(event_ids.size(), event_ids.data()),\
-                "stop_cell"_a=py::array_t<u16>(stop_cells.size(), stop_cells.data()),\
-                "t_1"_a=42,\
-                "t_2"_a=42,\
-                "t_3"_a=42,\
-                "t_4"_a=42,\
-                "t_5"_a=42,\
-                "t_6"_a=42,\
-                "t_7"_a=42,\
-                "t_8"_a=42,\
-                "t_9"_a=42,\
-                "adc"_a=adc);
+                "event_id"_a  =py::array_t<u32>(event_ids.size(),  event_ids.data()),\
+                "stop_cell"_a =py::array_t<u16>(stop_cells.size(), stop_cells.data()),\
+                "timestamps"_a=py::array_t<u64>(timestamps.size(), timestamps.data()),\
+                "adc_ch1"_a=adc_1,\
+                "adc_ch2"_a=adc_2,\
+                "adc_ch3"_a=adc_3,\
+                "adc_ch4"_a=adc_4,\
+                "adc_ch5"_a=adc_5,\
+                "adc_ch6"_a=adc_6,\
+                "adc_ch7"_a=adc_7,\
+                "adc_ch8"_a=adc_8,\
+                "adc_ch9"_a=adc_9);
   return data;
 }
 

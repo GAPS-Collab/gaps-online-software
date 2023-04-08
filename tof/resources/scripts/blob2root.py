@@ -8,12 +8,9 @@ import pathlib as pl
 import sys
 import uproot as up
 
-import ROOT
 import gaps_tof as gt
 
 from rich import console
-
-from collections import defaultdict
 
 def get_rb_id_from_file(infile):
     rb = infile.split('_')
@@ -49,19 +46,13 @@ if __name__ == '__main__':
     rb  = get_rb_id_from_file(infile.name)
     console.print(f'==> RB ID: {rb}')
     console.print(f'==> Reading file...')
+    
     data = gt.splice_readoutboard_datafile(str(infile))
-    print (data.keys())
-    print (data['event_id'])
-    print (data['adc'][0])
-    #stream  = gt.get_bytestream_from_file(str(infile))
-    #console.print(f'==> Parsing events...')
-    #events  = gt.get_events_from_stream(stream,0)
+    console.print(f'==> Extracted the following fields:')
+    for k in data.keys():
+        console.print(f'-- -- {k} : {len(data[k])} events')
 
-
-    # write a new root file
-    #root_file = up.reacreate('test.root')
-    #root_file['rec'] = up.newtree({'event_id' : int})
-
-    #root_file['rec'].extend({'event_id' : 42})
-
-    #event_size = gt.get_current_blobevent_size()
+    console.print(f'==> Creating ROOT file...')
+    f = up.recreate('test.root')
+    f['rec'] = data
+    f.close()
