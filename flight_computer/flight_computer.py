@@ -25,6 +25,9 @@ while True:
     data = [k for k in data]
     packet.from_bytestream(data, 0)
     #print (packet)
+    if packet.packet_type != gt.PacketType.TofEvent:
+        #print (packet.packet_type)
+        continue
     if packet.packet_type == gt.PacketType.TofEvent:
         #print ("Got tof packet")
         event = gt.REventPacket()
@@ -60,7 +63,7 @@ while True:
             print(event)
             for k in event.paddle_packets:
                 print (k)
-            raise
+            #raise
         if event.n_paddles > 0:
             print(event)
             for k in event.paddle_packets:
