@@ -5,7 +5,7 @@
 #include <vector>
 #include <string>
 
-#include "TofTypeDefs.h"
+#include "tof_typedefs.h"
 
 // adds 6 bytes for timestamps
 #define RPADDLEPACKETSIZE 30

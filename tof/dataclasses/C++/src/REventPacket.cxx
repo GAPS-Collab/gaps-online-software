@@ -3,7 +3,7 @@
 #include "packets/REventPacket.h"
 #include <spdlog/spdlog.h>
 
-#include "TofTypeDefs.h"
+#include "tof_typedefs.h"
 
 void REventPacket::reset()
 {

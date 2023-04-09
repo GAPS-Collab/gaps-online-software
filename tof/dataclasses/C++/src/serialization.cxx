@@ -1,7 +1,7 @@
 #include "serialization.h"
 
 #include "TOFCommon.h"
-#include "TofTypeDefs.h"
+#include "tof_typedefs.h"
 
 u16 decode_ushort(const vec_u8& bytestream,
                              u32 start_pos)

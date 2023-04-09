@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <vector>
 
-#include "TofTypeDefs.h"
+#include "tof_typedefs.h"
 
 
 static const u8 PACKET_TYPE_UNKNOWN    =  0;
