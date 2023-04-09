@@ -21,7 +21,7 @@
 #include "TOFCommon.h"
 #include "events.h"
 
-#include "TofTypeDefs.h"
+#include "tof_typedefs.h"
 
 using namespace GAPS;
 using namespace pybind11::literals;

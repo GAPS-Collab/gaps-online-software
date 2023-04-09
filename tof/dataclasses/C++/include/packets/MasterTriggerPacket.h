@@ -8,7 +8,7 @@
  * 
  ***********************/
 
-#include "TofTypeDefs.h"
+#include "tof_typedefs.h"
 static const usize N_LTBS = 20;
 static const usize N_CHN_PER_LTB = 16;
 

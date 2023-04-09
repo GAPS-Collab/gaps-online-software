@@ -16,7 +16,7 @@
 #include <assert.h>
 
 #include "TOFCommon.h"
-#include "TofTypeDefs.h"
+#include "tof_typedefs.h"
 
 // this is the current size of a blobevent 
 // in the serial representation
