@@ -139,13 +139,13 @@ fn serialize_deserialize_roundabout() {
   let vp = GenericPacket::new(label, payload);
   assert_eq!(vp.payload_size,8); // for 8 bytes for u64
 
-  println!("{vp:?}");
+  //println!("{vp:?}");
 
   let bytestream = vp.to_bytestream();
-  for k in 0..8 {
-    println!("{}", bytestream[k]);
-  }
-  println!("{bytestream:?}");
+  //for k in 0..8 {
+  //  println!("{}", bytestream[k]);
+  //}
+  //println!("{bytestream:?}");
   let vp_verify  = GenericPacket::from_bytestream(&bytestream, 0).unwrap();
   assert_eq!(vp, vp_verify);
 }

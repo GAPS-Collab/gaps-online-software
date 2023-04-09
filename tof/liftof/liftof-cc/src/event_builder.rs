@@ -25,6 +25,9 @@ use crossbeam_channel as cbc;
 
 use tof_dataclasses::packets::paddle_packet::PaddlePacket;
 
+
+
+
 ///  Walk over the event cache and check for each event
 ///  if new paddles can be added.
 ///
@@ -212,7 +215,7 @@ pub fn event_builder (master_id      : &cbc::Receiver<MasterTriggerEvent>,
         data_sink.try_send(tp);
       }
     } // end match Ok(mt)
-    if n_iter  == 100 {
+    if n_iter  == 500 {
       build_events_in_cache(&mut event_cache, timeout_micro,
                             pp_query,
                             pp_recv,

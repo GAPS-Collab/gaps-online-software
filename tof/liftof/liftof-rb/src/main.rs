@@ -79,6 +79,9 @@ struct Args {
   /// Activate the forced trigger. The value is the desired rate 
   #[arg(long, default_value_t = 0)]
   force_trigger: u32,
+  /// Activate the forced random trigger. The value is the desired rate
+  #[arg(long, default_value_t = 0)]
+  force_random_trigger: u32,
   /// Stream any eventy as soon as the software starts.
   /// Don't wait for command line.
   /// Behaviour can be controlled through `TofCommand` later
@@ -130,8 +133,9 @@ fn main() {
   let mut show_progress = args.show_progress;
   let cache_size        = args.cache_size;
   let run_forever       = args.run_forever;
-  let stream_any        = args.stream_any;
+  let mut stream_any    = args.stream_any;
   let mut force_trigger = args.force_trigger;
+  let force_random_trig = args.force_random_trigger;
   let rb_test           = args.rb_test_ext || args.rb_test_sw;
   
   //FIMXE - this needs to become part of clap
@@ -139,14 +143,25 @@ fn main() {
   //let cmd_server_ip     = args.cmd_server_ip;  
   if rb_test {
     show_progress = true;
-    n_events_run = 880;
+    n_events_run  = 1000;
+    buff_trip     = 200;
+    stream_any    = true;
     if args.rb_test_sw {
-      force_trigger = 2000;
+      force_trigger = 100;
     }
   }  
 
+  if force_trigger > 0 && force_random_trig > 0 {
+    panic!("Can not use force trigger (equally spaced in time) together with random self trigger!");
+  }
+
+  if force_random_trig > 0 {
+      stream_any = true;
+      buff_trip  = 2000;
+      n_events_run = 5000;
+  }
+
   let this_board_ip = local_ip().expect("Unable to obtainl local board IP. Something is messed up!");
-  let rate = get_trigger_rate().expect("I can not read from the get trigger rate register, this is bad!");
 
   // welcome banner!
   println!("-----------------------------------------------");
@@ -160,7 +175,6 @@ fn main() {
   println!("-----------------------------------------------");
   println!(" => Running client for RB {}", rb_id);
   println!(" => ReadoutBoard DNA {}", dna);
-  println!(" => Currently the board sees triggers at {rate} Hz");
   println!(" => We will BIND this port to the local ip address at {}", this_board_ip);
   println!(" => -- -- PORT {} (0MQ PUB) to publish our data", DATAPORT);
   println!(" => We will CONNECT to the following port on the C&C server at address: {}", cmd_server_ip);
@@ -259,12 +273,18 @@ fn main() {
   let rdb_sender_a  = bs_send.clone();
   
   workforce.execute(move || {
-    data_publisher(&tp_from_client, rb_test); 
+    data_publisher(&tp_from_client, rb_test || force_random_trig > 0); 
   });
   let tp_to_pub_c   = tp_to_pub.clone();
   workforce.execute(move || {
     monitoring(&tp_to_pub);
   });
+
+  // if we don't set a rate for force_random_trig, 
+  // latch to the MTB. For the other force trigger
+  // modes, the runner will decide 
+  // FIXME: decide everything here
+  let latch_to_mtb : bool = force_random_trig == 0;
 
   // then the runner. It does nothing, until we send a set
   // of RunParams
@@ -275,6 +295,7 @@ fn main() {
              &rdb_sender_a,
              uio1_total_size,
              uio2_total_size,
+             latch_to_mtb,
              show_progress,
              force_trigger);
   });
@@ -346,6 +367,28 @@ fn main() {
   //                              r_clone,
   //                              set_op_mode);
 
+  // if we arrive at this point and we want the random trigger, 
+  // we are now ready to start it
+  if force_random_trig > 0 {
+
+    // we have to calculate the actual rate with Andrew's formulat
+    //let clk_period : f64 = 1.0/33e6;
+    let rate : f32 = force_random_trig as f32;
+    let max_val  : f32 = 4294967295.0;
+    
+    //let f_trig = (33e6 * (rate/max_val)) as u32;
+    //let reg_val = 1/rate = 33e6/max_val*1/f_trig
+    let reg_val = (rate/(33e6/max_val)) as u32;
+    info!("Will use random self trigger with rate {reg_val} value for register, corresponding to {rate} Hz");
+    match set_self_trig_rate(reg_val) {
+      Err(err) => {
+        warn!("Setting self trigger failed! Er {err}");
+        panic!("Abort!");
+      }
+      Ok(_)    => ()
+    }
+  }
+
   ctrlc::set_handler(move || {
     println!("received Ctrl+C! We will stop triggers and end the run!");
     println!("So long and thanks for all the \u{1F41F}");
@@ -353,6 +396,14 @@ fn main() {
     match disable_trigger() {
       Err(err) => error!("Can not disable triggers, error {err}"),
       Ok(_)    => ()
+    }
+    if force_random_trig > 0 {
+      match set_self_trig_rate(0) {
+        Err(err) => {
+          panic!("Could not disable random self trigger! Err {err}");
+        }
+        Ok(_)    => ()
+      }
     }
     exit(0);
   })

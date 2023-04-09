@@ -1,3 +1,15 @@
+# CMAKE 
+CMakeCache.txt
+
+# Cargo lock files
+tof/dataclasses/rust/tof-dataclasses/Cargo.lock
+tof/liftof/Cargo.lock
+
+# build products
+tof/dataclasses/rust/tof-dataclasses/target/*
+tof/liftof/target/*
+build/*
+
 # vim fragments
 *.swp
 

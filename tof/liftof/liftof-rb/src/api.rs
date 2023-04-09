@@ -1,4 +1,4 @@
-u/! Higher level functions, to deal with events/binary reprentation of it, 
+//! Higher level functions, to deal with events/binary reprentation of it, 
 //!  configure the drs4, etc.
 
 use local_ip_address::local_ip;
@@ -47,11 +47,8 @@ use tof_dataclasses::errors::SerializationError;
 /// Non-register related constants 
 pub const HEARTBEAT : u64 = 5; // heartbeat in s
 
-const SLEEP_AFTER_REG_WRITE : u32 = 1; // sleep time after register write in ms
 const DMA_RESET_TRIES : u8 = 10;   // if we can not reset the DMA after this number
                                    // of retries, we'll panic!
-const RESTART_TRIES : u8 = 5; // if we are not successfull, to get it going, 
-                                   // panic
 
 
 // Using the same approach as the flight computer, we use
@@ -177,7 +174,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
     Ok(_) => ()
   }
   let mut heartbeat     = Instant::now();
-  let mut last_run_pars = RunParams::new();
+  let mut last_run_pars : RunParams;
 
   error!("TODO: Heartbeat feature not yet implemented on C&C side");
   let heartbeat_received = false;
@@ -459,17 +456,17 @@ pub fn data_publisher(data : &Receiver<TofPacket>,
     IpAddr::V4(ip) => address_ip += &ip.to_string(),
     IpAddr::V6(_) => panic!("Currently, we do not support IPV6!")
   }
-  let data_address : String = address_ip + ":" + &data_port.to_string();
+  let data_address : String = address_ip.clone() + ":" + &data_port.to_string();
   let ctx = zmq::Context::new();
   
   let data_socket = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
   data_socket.bind(&data_address).expect("Unable to bind to data (PUB) socket {data_adress}");
   info!("0MQ PUB socket bound to address {data_address}");
 
-
-  let blobfile_name = "testdata_".to_owned()
-                       //+ &board_id.to_string()
-                       + ".blob";
+  let board_id = address_ip.split_off(address_ip.len() -2);
+  let blobfile_name = "tof-rb".to_owned()
+                       + &board_id.to_string()
+                       + "_test.blob";
 
   let blobfile_path = Path::new(&blobfile_name);
   
@@ -489,7 +486,6 @@ pub fn data_publisher(data : &Receiver<TofPacket>,
         // wrap the payload INTO THE 
         // FIXME - retries?
         if write_blob {
-          //println!("Writing");
           //println!("{:?}", packet.packet_type);
           if packet.packet_type == PacketType::RBEvent {
             //println!("is rb event");
@@ -497,7 +493,10 @@ pub fn data_publisher(data : &Receiver<TofPacket>,
               None => error!("We want to write data, however the file is invalid!"),
               Some(f) => {
                 //println!("write to file");
-                f.write_all(packet.payload.as_slice());
+                match f.write_all(packet.payload.as_slice()) {
+                  Err(err) => error!("Writing file to disk failed! Err {err}"),
+                  Ok(()) => ()
+                }
               }
             }
           }
@@ -516,12 +515,8 @@ pub fn data_publisher(data : &Receiver<TofPacket>,
 /// Gather monitoring data and pass it on
 pub fn monitoring(ch : &Sender<TofPacket>) {
   let heartbeat      = time::Duration::from_secs(HEARTBEAT);
-  let mut rate: u32  = 0; 
-  let mut bytestream = Vec::<u8>::new();
-  bytestream.extend_from_slice(&rate.to_le_bytes());
   loop {
-   //if now.elapsed().as_secs() >= HEARTBEAT {
-   //}
+
    let mut moni_dt = moni::RBMoniData::new();
    
    let rate_query = get_trigger_rate();
@@ -529,9 +524,6 @@ pub fn monitoring(ch : &Sender<TofPacket>) {
      Ok(rate) => {
        debug!("Monitoring thread -> Rate: {rate}Hz ");
        moni_dt.rate = rate;
-       //bytestream = Vec::<u8>::new();
-       //bytestream.extend_from_slice(&rate.to_le_bytes());
-       //packet.update_payload(bytestream);
      },
      Err(_)   => {
        warn!("Can not send rate monitoring packet, register problem");
@@ -539,7 +531,6 @@ pub fn monitoring(ch : &Sender<TofPacket>) {
    }
    
    let tp = TofPacket::from(&moni_dt);
-   //let payload = moni_dt.to_bytestream();
    match ch.try_send(tp) {
      Err(err) => {debug!("Issue sending RBMoniData {:?}", err)},
      Ok(_)    => {debug!("Send RBMoniData successfully!")}
@@ -642,63 +633,63 @@ pub fn reset_data_memory_aggressively() {
   //}
 }
 
-///  Ensure the buffers are filled and everything is prepared for data
-///  taking
-///
-///  The whole procedure takes several seconds. We have to find out
-///  how much we can sacrifice from our run time.
-///
-///  # Arguments 
-///
-///  * will_panic    : The function calls itself recursively and 
-///                    will panic after this many calls to itself
-///
-///  * force_trigger : Run in force trigger mode
-///
-fn make_sure_it_runs(will_panic : &mut u8,
-                     force_trigger : bool) {
-  let when_panic : u8 = RESTART_TRIES;
-  *will_panic += 1;
-  if *will_panic == when_panic {
-    // it is hopeless. Let's give up.
-    // Let's try to stop the DRS4 before
-    // we're killing ourselves
-    disable_trigger();
-    //idle_drs4_daq().unwrap_or(());
-    // FIXME - send out Alert
-    panic!("I can not get this run to start. I'll kill myself!");
-  }
-
-
-  let five_milli = time::Duration::from_millis(5); 
-  let one_sec    = time::Duration::from_secs(1);
-  let two_secs   = time::Duration::from_secs(2);
-  let five_secs  = time::Duration::from_secs(5);
-  thread::sleep(five_milli);
-  if force_trigger {
-    match disable_master_trigger_mode() {
-      Err(err) => error!("Can not disable master trigger mode, Err {err}"),
-      Ok(_)    => info!("Master trigger mode didsabled!")
-    }
-  }
-
-  match enable_trigger() {
-    Err(err) => error!("Can not enable triggers! Err {err}"),
-    Ok(_)    => trace!("Triggers enabled")
-  }
-  //println!("triggers enabled");
-  // check that the data buffers are filling
-  let buf_a = BlobBuffer::A;
-  let buf_b = BlobBuffer::B;
-  let buf_size_a = get_buff_size(&buf_a).unwrap_or(0);
-  let buf_size_b = get_buff_size(&buf_b).unwrap_or(0); 
-  thread::sleep(one_sec);
-  if get_buff_size(&buf_a).unwrap_or(0) == buf_size_a &&  
-      get_buff_size(&buf_b).unwrap_or(0) == buf_size_b {
-    error!("Buffers are not filling! Running setup again!");
-    make_sure_it_runs(will_panic, force_trigger);
-  } 
-}
+/////  Ensure the buffers are filled and everything is prepared for data
+/////  taking
+/////
+/////  The whole procedure takes several seconds. We have to find out
+/////  how much we can sacrifice from our run time.
+/////
+/////  # Arguments 
+/////
+/////  * will_panic    : The function calls itself recursively and 
+/////                    will panic after this many calls to itself
+/////
+/////  * force_trigger : Run in force trigger mode
+/////
+//fn make_sure_it_runs(will_panic : &mut u8,
+//                     force_trigger : bool) {
+//  let when_panic : u8 = RESTART_TRIES;
+//  *will_panic += 1;
+//  if *will_panic == when_panic {
+//    // it is hopeless. Let's give up.
+//    // Let's try to stop the DRS4 before
+//    // we're killing ourselves
+//    disable_trigger();
+//    //idle_drs4_daq().unwrap_or(());
+//    // FIXME - send out Alert
+//    panic!("I can not get this run to start. I'll kill myself!");
+//  }
+//
+//
+//  let five_milli = time::Duration::from_millis(5); 
+//  let one_sec    = time::Duration::from_secs(1);
+//  let two_secs   = time::Duration::from_secs(2);
+//  let five_secs  = time::Duration::from_secs(5);
+//  thread::sleep(five_milli);
+//  if force_trigger {
+//    match disable_master_trigger_mode() {
+//      Err(err) => error!("Can not disable master trigger mode, Err {err}"),
+//      Ok(_)    => info!("Master trigger mode didsabled!")
+//    }
+//  }
+//
+//  match enable_trigger() {
+//    Err(err) => error!("Can not enable triggers! Err {err}"),
+//    Ok(_)    => trace!("Triggers enabled")
+//  }
+//  //println!("triggers enabled");
+//  // check that the data buffers are filling
+//  let buf_a = BlobBuffer::A;
+//  let buf_b = BlobBuffer::B;
+//  let buf_size_a = get_buff_size(&buf_a).unwrap_or(0);
+//  let buf_size_b = get_buff_size(&buf_b).unwrap_or(0); 
+//  thread::sleep(one_sec);
+//  if get_buff_size(&buf_a).unwrap_or(0) == buf_size_a &&  
+//      get_buff_size(&buf_b).unwrap_or(0) == buf_size_b {
+//    error!("Buffers are not filling! Running setup again!");
+//    make_sure_it_runs(will_panic, force_trigger);
+//  } 
+//}
 
 // palceholder
 #[derive(Debug)]
@@ -762,6 +753,7 @@ pub fn runner(run_params          : &Receiver<RunParams>,
               bs_sender           : &Sender<Vec<u8>>,
               uio1_total_size     : usize,
               uio2_total_size     : usize,
+              mut latch_to_mtb    : bool,
               show_progress       : bool,
               force_trigger_rate  : u32) {
   
@@ -769,11 +761,14 @@ pub fn runner(run_params          : &Receiver<RunParams>,
   let one_sec          = time::Duration::from_secs(1);
   let mut first_iter   = true; 
   let mut last_evt_cnt : u32 = 0;
-  let mut evt_cnt      : u32;
+  let mut evt_cnt      = 0u32;
   let mut delta_events : u64 = 0;
   let mut n_events     : u64 = 0;
   let mut n_errors     : u64 = 0;
-  let mut will_panic   : u8  = 0;
+  // per default, latch to the mtb trigger.
+  // for testting/calibration that gets switched off
+  // below
+  //latch_to_mtb = true;
 
   let mut timer        = Instant::now();
   let force_trigger    = force_trigger_rate > 0;
@@ -782,13 +777,13 @@ pub fn runner(run_params          : &Receiver<RunParams>,
     warn!("Will run in forced trigger mode with a rate of {force_trigger_rate} Hz!");
     time_between_events = Some(1.0/(force_trigger_rate as f32));
     warn!(".. this means one trigger every {} seconds...", time_between_events.unwrap());
+    latch_to_mtb = false;
   }
 
   let now = time::Instant::now();
 
   let mut terminate = false;
   // the runner will specifically set up the DRS4
-  let mut will_panic : u8 = 0;
   let mut is_running = false;
   let mut pars = RunParams::new();
 
@@ -828,9 +823,33 @@ pub fn runner(run_params          : &Receiver<RunParams>,
           if pars.is_active {
             info!("Will start a new run!");
             info!("Initializing board, starting up...");
-            make_sure_it_runs(&mut will_panic, force_trigger);
-            //println!("..done");
-            info!("Begin Run!");
+            if latch_to_mtb {
+              match set_master_trigger_mode() {
+                Err(err) => error!("Can not initialize master trigger mode, Err {err}"),
+                Ok(_)    => info!("Latching to MasterTrigger")
+              }
+            } else {
+              match disable_master_trigger_mode() {
+                Err(err) => error!("Can not disable master trigger mode, Err {err}"),
+                Ok(_)    => info!("Master trigger mode didsabled!")
+              }
+            }
+            if force_trigger {
+              match enable_trigger() {
+                Err(err) => error!("Can not enable triggers! Err {err}"),
+                Ok(_)    => info!("Triggers enabled - Run start!")
+              }
+            } else {
+              match enable_trigger() {
+                Err(err) => error!("Can not enable triggers! Err {err}"),
+                Ok(_)    => info!("Triggers enabled - Run start!")
+              }
+              thread::sleep(one_sec);
+              match get_trigger_rate() {
+                Err(err) => error!("Unable to obtain trigger rate! Err {err}"),
+                Ok(rate) => info!("Seing MTB trigger rate of {rate} Hz")
+              }
+            }
             is_running = true;
             if show_progress {
               if pars.forever {
@@ -876,38 +895,44 @@ pub fn runner(run_params          : &Receiver<RunParams>,
     } // this is the !is_running branch
 
     if force_trigger {
+      //println!("Forcing trigger!");
+      //println!("Time between events {}", time_between_events.unwrap());
       let elapsed = timer.elapsed().as_secs_f32();
+      //println!("Elapsed {}", elapsed);
       if elapsed > time_between_events.unwrap() {
         timer = Instant::now(); 
         match trigger() {
-          Err(err) => trace!("Error when triggering! {err}"),
-          Ok(_)    => ()
+          Err(err) => error!("Error when triggering! {err}"),
+          Ok(_)    => ()//println!("Firing trigger!")
         }
-      } 
+      } else {
+        // FIXME - we could sleep here for a bit!
+        continue;
+      }
     }    
 
     // calculate current event count
-    match get_event_count() {
-      Err (err) => {
-        error!("Can not obtain event count! Err {:?}", err);
-        continue;
-      }
-      Ok (cnt) => {
-        //println!("Ok {cnt}");
-        evt_cnt = cnt;
-        if first_iter {
-          last_evt_cnt = evt_cnt;
-          first_iter = false;
-          continue;
-
-        }
-        if evt_cnt == last_evt_cnt {
-          thread::sleep(one_milli);
-          trace!("We didn't get an updated event count!");
+    if !force_trigger {
+      match get_event_count() {
+        Err (err) => {
+          error!("Can not obtain event count! Err {:?}", err);
           continue;
         }
-      }
-    } // end match
+        Ok (cnt) => {
+          evt_cnt = cnt;
+          if first_iter {
+            last_evt_cnt = evt_cnt;
+            first_iter = false;
+            continue;
+          }
+          if evt_cnt == last_evt_cnt {
+            thread::sleep(one_milli);
+            trace!("We didn't get an updated event count!");
+            continue;
+          }
+        } // end ok
+      } // end match
+    } // end force trigger
 
     // AT THIS POINT WE KNOW WE HAVE SEEN SOMETHING!!!
     // THIS IS IMPORTANT
@@ -923,10 +948,13 @@ pub fn runner(run_params          : &Receiver<RunParams>,
         buff_size  = result.1;
       }
     }
-    delta_events = (evt_cnt - last_evt_cnt) as u64;
-    n_events    += delta_events;
-    last_evt_cnt = evt_cnt;
-    
+    if force_trigger {
+        n_events += 1;
+    } else {
+      delta_events = (evt_cnt - last_evt_cnt) as u64;
+      n_events    += delta_events;
+      last_evt_cnt = evt_cnt;
+    }
     if show_progress {
       match which_buff {
         RamBuffer::A => prog_a.set_position(buff_size as u64),
@@ -960,7 +988,7 @@ pub fn runner(run_params          : &Receiver<RunParams>,
       if terminate {
         match disable_trigger() {
           Err(err) => error!("Can not disable triggers, error {err}"),
-          Ok(_)    => ()
+          Ok(_)    => info!("Triggers disabled!")
         }
         if show_progress {
           prog_ev.finish();
@@ -968,7 +996,7 @@ pub fn runner(run_params          : &Receiver<RunParams>,
           prog_b.finish();
         }
         is_running = false;
-        info!("Run stopped! We have seen {n_events}");
+        println!("Run stopped! We have seen {n_events}. If this process has been started manually, you can kill it with CTRL+C");
       } else {
         if !force_trigger { 
           thread::sleep(100*one_milli);
@@ -1032,7 +1060,7 @@ pub fn event_cache_worker(recv_ev_pl    : Receiver<RBEventPayload>,
           oldest_event_id = event.event_id;
         } //endif
         // store the event in the cache
-        trace!("Received payload with event id {}" ,event.event_id);
+        //println!("Received payload with event id {}" ,event.event_id);
         if !event_cache.contains_key(&event.event_id) {
           event_cache.insert(event.event_id, event);
         }
@@ -1382,6 +1410,7 @@ pub fn event_payload_worker(bs_recv   : &Receiver<Vec<u8>>,
                             ev_sender : Sender<RBEventPayload>) {
   let mut n_events : u32;
   let mut event_id : u32 = 0;
+  //println!("[EVENT PAYLOAD WORKER] Start..");
   'main : loop {
     let mut start_pos : usize = 0;
     n_events = 0;
@@ -1389,6 +1418,7 @@ pub fn event_payload_worker(bs_recv   : &Receiver<Vec<u8>>,
     match bs_recv.recv() {
       Ok(bytestream) => {
         'bytestream : loop {
+          //println!("Received bytestream");
           match search_for_u16(BlobData::HEAD, &bytestream, start_pos) {
             Ok(head_pos) => {
               let tail_pos   = head_pos + BlobData::SERIALIZED_SIZE;
@@ -1409,7 +1439,7 @@ pub fn event_payload_worker(bs_recv   : &Receiver<Vec<u8>>,
               let rb_payload = RBEventPayload::new(event_id, payload); 
               match ev_sender.send(rb_payload) {
                 Ok(_) => (),
-                Err(err) => debug!("Problem sending RBEventPayload over channel! Err {err}"),
+                Err(err) => error!("Problem sending RBEventPayload over channel! Err {err}"),
               }
               continue 'bytestream;
             },
@@ -1421,7 +1451,7 @@ pub fn event_payload_worker(bs_recv   : &Receiver<Vec<u8>>,
         } // end ok
       }, // end Ok(bytestream)
       Err(err) => {
-        warn!("Received Garbage! Err {err}");
+        error!("Received Garbage! Err {err}");
         continue 'main;
       }
     }// end match 

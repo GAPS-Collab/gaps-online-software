@@ -5,8 +5,8 @@
 //!
 
 use std::path::PathBuf;
-
-
+use tof_dataclasses::events::blob::RBEventHeader;
+use tof_dataclasses::serialization::Serialization;
 
 //use std::{thread, time};
 //
@@ -136,6 +136,7 @@ fn main() {
   let mut event = BlobData::new();
   let mut n_errors = 0usize;
   let mut decoded_evids = Vec::<u32>::new();
+  let mut header = RBEventHeader::new();
   while pos + BlobData::SERIALIZED_SIZE < bytestream.len() {
     //match event.from_bytestream(&bytestream, pos, false) {
     //  Err(_) => {
@@ -145,6 +146,7 @@ fn main() {
     //  },
     //  Ok(_)  => ()
     //}
+    header = RBEventHeader::from_bytestream(&bytestream, pos).unwrap();
     pos = event.from_bytestream(&bytestream, pos, true);
     n_events_decoded += 1;
     decoded_evids.push(event.event_id);
@@ -152,7 +154,7 @@ fn main() {
     //println!("{pos}");
     //pos += BlobData::SERIALIZED_SIZE;
   }
-  println!("{:?} decoded event ids");
+  //println!("{:?} decoded event ids", decoded_evids);
   println!("We decoded {n_events_decoded} and had {n_errors} corrupt events!");
 } // end main
 

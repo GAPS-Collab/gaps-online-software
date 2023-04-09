@@ -476,14 +476,14 @@ BlobEvt_t decode_blobevent(const std::vector<uint8_t> &bytestream,
 
 /***********************************************/
 
-u64 search_for_2byte_marker(const std::vector<uint8_t> &bytestream,
-                            uint8_t marker,
+u64 search_for_2byte_marker(const vec_u8 &bytestream,
+                            u8 marker,
                             bool &has_ended,
-                            i32 start_pos,
-                            i32 end_pos)
+                            u64 start_pos,
+                            u64 end_pos)
 {
   has_ended = false;
-  if ((end_pos == bytestream.size()) || (end_pos == -1)) 
+  if ((end_pos == bytestream.size()) || (end_pos == 0)) 
     { end_pos = bytestream.size() - 1;} 
   for (u64 k=start_pos; k<end_pos; k++)
     { 
@@ -511,7 +511,7 @@ std::vector<u32> get_2byte_markers_indices(const std::vector<uint8_t> &bytestrea
 /***********************************************/
 
 std::vector<BlobEvt_t> get_events_from_stream(const vec_u8 &bytestream,
-	       				      u64 start_pos) {
+	       			                 	      u64 start_pos) {
   u64 nevents_in_stream = (float)bytestream.size()/BLOBEVENTSIZE;
   std::cout << "[INFO] There might be at max " << nevents_in_stream<< " events in the stream" << std::endl;
   std::vector<BlobEvt_t> events; 
@@ -556,7 +556,7 @@ std::vector<BlobEvt_t> get_events_from_stream(const vec_u8 &bytestream,
                                  pos -2,
                                  pos -2 + BLOBEVENTSIZE + 10);
         nblobs++;
-	std::cout << "NBLOBS" << nblobs << std::endl;
+	    //std::cout << "NBLOBS" << nblobs << std::endl;
         //std::cout << event.head << std::endl;
         //std::cout << event.event_ctr << std::endl;
         //std::cout << event.timestamp << std::endl;

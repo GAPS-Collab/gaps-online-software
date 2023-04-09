@@ -33,6 +33,8 @@ use crate::errors::{IPBusError, MasterTriggerError};
 use crate::serialization::{Serialization,
                            SerializationError};
 
+use crate::manifest::{LocalTriggerBoard,
+                      ReadoutBoard};
 //const MT_MAX_PACKSIZE   : usize = 4096;
 /// Maximum packet size of packets we can 
 /// receive over UDP via the IPBus protocoll
@@ -88,6 +90,101 @@ impl From<IPBusPacketType> for u8 {
     }
     result
   }
+}
+
+/// MasterTrigger related mapping
+///
+/// Caches ltb/rb relevant information 
+/// and can generate rb/ltb id lists
+#[derive(Debug, Clone)]
+pub struct MasterTriggerMapping {
+  pub ltb_list : Vec<LocalTriggerBoard>,
+  pub rb_list  : Vec<ReadoutBoard>,
+
+  /// Holds RB id at the position where 
+  /// it is supposed to be in the MTB 
+  /// trigger mask
+  ltb_mapping  : [LocalTriggerBoard;N_LTBS]
+
+  // 
+  //ltb_rb_mapping : HashMap<u8;ReadoutBoard>;
+}
+
+impl MasterTriggerMapping {
+
+  pub fn new(ltb_list : Vec<LocalTriggerBoard>, rb_list : Vec<ReadoutBoard>) 
+    -> MasterTriggerMapping {
+    let mtm = MasterTriggerMapping {
+      ltb_list,
+      rb_list,
+      ltb_mapping : [LocalTriggerBoard::new();N_LTBS]
+    };
+    mtm
+  }
+
+  pub fn construct_ltb_mapping(&mut self) {
+    for ltb in &self.ltb_list {
+      let index = (ltb.ltb_dsi - 1 * 5) + (ltb.ltb_j - 1);
+      self.ltb_mapping[index as usize] = *ltb;
+    }
+  }
+
+  /// Mapping trigger LTB board mask - LTB ids
+  ///
+  /// # Arguments:
+  ///
+  /// * board_mask : The board mask as it comes from the 
+  ///                MasterTriggerEvent. Each entry corresponds
+  ///                to one LocalTriggerBoard. They are sorted
+  ///                by DSI and J, e.g
+  ///                [.., DSI_{ltb_1} +J_{ltb_1}]
+  pub fn get_ltb_ids(&self, board_mask : &[bool; N_LTBS] ) 
+    -> Vec<u8> {
+    let mut ltbs = Vec::<u8>::new();
+    for k in 0..N_LTBS {
+      if self.ltb_mapping[k].ltb_id > 0 {
+        ltbs.push(self.ltb_mapping[k].ltb_id)
+      }
+    }
+    ltbs
+  }
+
+
+  /// Return the ids of the readoutboards which are connected to the LTBs which participated in the
+  /// trigger.
+  pub fn get_rb_ids(&self, ltb_mask : &[bool; N_LTBS],
+                    hit_mask : [[bool; N_CHN_PER_LTB]; N_LTBS])
+    -> Vec<u8> {
+    let mut rb_ids = Vec::<u8>::new();
+    let mut ltb_hit_index : usize = 0;
+    for k in 0..ltb_mask.len() {
+      if ltb_mask[k] {
+        let hits = hit_mask[ltb_hit_index];
+        for j in 0..hits.len() {
+          if hits[j] {
+            let rb_id = self.ltb_mapping[k].get_rb_id(j as u8 +1);
+            if rb_ids.contains(&rb_id) {
+              continue;
+            }
+          }
+        }
+        ltb_hit_index += 1;
+      }
+    }
+    //  if self.ltb_mapping[k] > 0  {
+    //     
+    //  }
+    //}
+    //let mut ltb_ids = self.get_ltb_ids(ltb_mask);
+    //for k in 0..ltb_ids.len() {
+    //  let ltb_id = ltb_ids[k];
+    //  let ltb_channels = Vec::<u8>::new();
+    //  for hit in hit_mask[k].iter() {
+    //    //ltb_channels 
+    //  }
+    //}
+    rb_ids
+  } 
 }
 
 /// An event as observed by the MTB
@@ -149,6 +246,18 @@ impl MasterTriggerEvent {
       valid     : true,
     }   
   }
+
+  pub fn get_triggered_ltb_ids(&self) -> Vec<u8> {
+    let mut ltbs = Vec::<u8>::new();
+    todo!();
+    ltbs
+    //for k in 0..N_LTBS {
+    //  if board_mask[k] {
+    //    ltbs.push(2
+    //  }
+    //}
+  }
+
 
   pub fn is_broken(&self) -> bool {
     self.broken

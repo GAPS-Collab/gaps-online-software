@@ -7,8 +7,8 @@ import time
 from enum import Enum
 
 PACKET_ID = 0
-#IPADDR = "192.168.36.121"
-IPADDR = "10.0.1.10"
+IPADDR = "192.168.36.121"
+#IPADDR = "10.0.1.10"
 PORT = 50001
 
 # Create a UDP socket and bind the socket to the port
@@ -271,6 +271,12 @@ def check_clocks():
 def force_trigger():
     wReg(0x8, 1)
 
+def enable_tiu_emulation_mode():
+    wReg(0xe, 1)
+
+def disable_tiu_emulation_mode():
+    wReg(0xe, 0)
+
 def en_ucla_trigger():
     set_trig("a", 0x000000f0)
     set_trig("b", 0x0000000f)
@@ -416,6 +422,8 @@ if __name__ == '__main__':
     argParser.add_argument('--fw_info',         action='store_true', default=False, help="Print firmware version info")
     argParser.add_argument('--reset_event_cnt', action='store_true', default=False, help="Reset the Event Counter")
     argParser.add_argument('--read_event_cnt',  action='store_true', default=False, help="Read the Event Counter")
+    argParser.add_argument('--enable_tiu_emulation_mode',  action='store_true', default=False, help="Write 1 to TIU_EMULATION_MODE register")
+    argParser.add_argument('--disable_tiu_emulation_mode',  action='store_true', default=False, help="Write 0 to TIU_EMULATION_MODE register")
     argParser.add_argument('--read_daq',        action='store_true', default=False, help="Stream the DAQ data to the screen")
     argParser.add_argument('--force_trig',      action='store_true', default=False, help="Force an MTB Trigger")
     argParser.add_argument('--check_clocks',    action='store_true', default=False, help="Check DSI loopback clock frequencies")
@@ -426,6 +434,11 @@ if __name__ == '__main__':
         IPADDR = args.ip
 
     target_address = (IPADDR, PORT)
+    if args.enable_tiu_emulation_mode:
+        enable_tiu_emulation_mode()
+    if args.disable_tiu_emulation_mode:
+        disable_tiu_emulation_mode()
+
 
     if args.check_clocks:
         check_clocks()

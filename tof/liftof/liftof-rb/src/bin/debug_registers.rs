@@ -45,9 +45,9 @@ fn main () {
   }
   println!("=> Clearing buffer occupancy register for Buff A");
   for _ in 0..10 {
-    success = blob_buffer_reset(&buff_a);
+    success = reset_ram_buffer_occ(&buff_a);
     println!("=> Resetting blob buffer A successful {success:?}");
-    success = blob_buffer_reset(&buff_b);
+    success = reset_ram_buffer_occ(&buff_b);
     println!("=> Resetting blob buffer B successful {success:?}");
     let buff_a_occ = get_blob_buffer_occ(&buff_a);
     let buff_b_occ = get_blob_buffer_occ(&buff_b);
@@ -61,9 +61,9 @@ fn main () {
 
   println!("=> Clearing buffer occupancy register for Buff A");
   for _ in 0..10 {
-    success = blob_buffer_reset(&buff_a);
+    success = reset_ram_buffer_occ(&buff_a);
     println!("=> Resetting blob buffer A successful {success:?}");
-    success = blob_buffer_reset(&buff_b);
+    success = reset_ram_buffer_occ(&buff_b);
     println!("=> Resetting blob buffer B successful {success:?}");
     let buff_a_occ = get_blob_buffer_occ(&buff_a);
     let buff_b_occ = get_blob_buffer_occ(&buff_b);

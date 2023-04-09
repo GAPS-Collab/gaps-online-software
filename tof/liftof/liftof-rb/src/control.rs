@@ -19,6 +19,13 @@ pub fn enable_evt_fragments() -> Result<(), RegisterError> {
   Ok(())
 }
 
+/// use the random self trigger
+pub fn set_self_trig_rate(rate : u32) -> Result<(), RegisterError> {
+  warn!("Setting self trigger rate, writing register {}", TRIG_GEN_RATE);
+  write_control_reg(TRIG_GEN_RATE, rate)?;
+  Ok(())
+}
+
 /// do not write header only packets when the drs is busyu
 pub fn disable_evt_fragments() -> Result<(), RegisterError> {
   trace!("Disable event fragment writing!");
@@ -230,6 +237,7 @@ pub fn set_readout_all_channels_and_ch9() -> Result<(), RegisterError> {
 pub fn set_master_trigger_mode() -> Result<(), RegisterError> {
   trace!("SET DRS4 MT MODE");
   write_control_reg(MT_TRIGGER_MODE, 1)?;
+  let eight_cycles = Duration::from_micros(4);
   Ok(())
 }
 
@@ -237,6 +245,7 @@ pub fn set_master_trigger_mode() -> Result<(), RegisterError> {
 pub fn disable_master_trigger_mode() -> Result<(), RegisterError> {
   warn!("Disabeling master trigger mode");
   write_control_reg(MT_TRIGGER_MODE, 0)?;
+  let eight_cycles = Duration::from_micros(4);
   Ok(())
 }
 
