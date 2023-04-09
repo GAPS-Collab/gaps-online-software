@@ -12,8 +12,8 @@ extern crate ndarray;
 extern crate local_ip_address;
 
 extern crate liftof_lib;
-use liftof_lib::{LocalTriggerBoard,
-                 ReadoutBoard,
+use liftof_lib::{//LocalTriggerBoard,
+                 //ReadoutBoard,
                  master_trigger,
                  get_tof_manifest};
                  //rb_manifest_from_json,
@@ -48,7 +48,10 @@ use tof_dataclasses::events::MasterTriggerEvent;
 use tof_dataclasses::threading::ThreadPool;
 use tof_dataclasses::packets::paddle_packet::PaddlePacket;
 use tof_dataclasses::packets::TofPacket;
-
+use tof_dataclasses::manifest::{LocalTriggerBoard,
+                                ReadoutBoard,
+                                get_ltbs_from_sqlite,
+                                get_rbs_from_sqlite};
 extern crate liftof_cc;
 
 use liftof_cc::readoutboard_comm::readoutboard_communicator;
@@ -59,10 +62,7 @@ use liftof_cc::api::commander;
 use liftof_cc::paddle_packet_cache::paddle_packet_cache;
 use liftof_cc::flight_comms::global_data_sink;
 
-
 use std::process::exit;
-
-
 
 /*************************************/
 
@@ -90,21 +90,11 @@ struct Args {
 fn main() {
   pretty_env_logger::init();
 
-  // some bytes, in a vector
-  let sparkle_heart         = vec![240, 159, 146, 150];
-  //let kraken                = vec![240, 159, 144, 153];
-  //let satelite_antenna      = vec![240, 159, 147, 161];
-
-  // We know these bytes are valid, so we'll use `unwrap()`.
-  let sparkle_heart    = String::from_utf8(sparkle_heart).unwrap();
-  //let kraken           = String::from_utf8(kraken).unwrap();
-  //let satelite_antenna = String::from_utf8(satelite_antenna).unwrap();
   // welcome banner!
-  //
   println!("-----------------------------------------------");
   println!(" ** Welcome to liftof-cc \u{1F680} \u{1F388} *****");
   println!(" .. liftof if a software suite for the time-of-flight detector ");
-  println!(" .. for the GAPS experiment {}", sparkle_heart);
+  println!(" .. for the GAPS experiment \u{1F496}");
   println!(" .. This is the Command&Control server which connects to the MasterTriggerBoard and the ReadoutBoards");
   println!(" .. see the gitlab repository for documentation and submitting issues at" );
   println!(" **https://uhhepvcs.phys.hawaii.edu/Achim/gaps-online-software/-/tree/main/tof/liftof**");
@@ -116,11 +106,8 @@ fn main() {
   })
   .expect("Error setting Ctrl-C handler");
 
-
-
   // deal with command line arguments
   let args = Args::parse();
- 
 
   let write_blob = args.write_blob;
   if write_blob {
@@ -142,7 +129,8 @@ fn main() {
 
   // Have all the readoutboard related information in this list
   let rb_list      : Vec::<ReadoutBoard>;
-  let manifest : (Vec::<LocalTriggerBoard>, Vec::<ReadoutBoard>);
+  let mut manifest = (Vec::<LocalTriggerBoard>::new(), Vec::<ReadoutBoard>::new());
+  let ltb_list = get_ltbs_from_sqlite();
   match args.json_config {
     None => panic!("No .json config file provided! Please provide a config file with --json-config or -j flag!"),
     Some(_) => {
@@ -152,7 +140,7 @@ fn main() {
       //info!("Found config file {}", args.json_config.as_ref().unwrap().display());
       json_content = std::fs::read_to_string(args.json_config.as_ref().unwrap()).unwrap();
       config = json::parse(&json_content).unwrap();
-      manifest = get_tof_manifest(args.json_config.unwrap());
+      //manifest = get_tof_manifest(args.json_config.unwrap());
       println!("==> Tof Manifest following:");
       println!("{:?}", manifest);
       println!("***************************");

@@ -3,7 +3,8 @@
 //!
 
 //use crossbeam_channel::Sender;
-use liftof_lib::ReadoutBoard;
+//use liftof_lib::ReadoutBoard;
+use tof_dataclasses::manifest::ReadoutBoard;
 use zmq;
 use tof_dataclasses::commands::TofCommand;
 
