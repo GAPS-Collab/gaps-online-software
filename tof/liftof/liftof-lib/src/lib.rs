@@ -12,6 +12,19 @@ use std::io::{Read,
               Write};
 use std::collections::HashMap;
 use std::net::{UdpSocket, SocketAddr};
+use crossbeam_channel::{Sender, unbounded};
+use zmq;
+
+extern crate json;
+
+use macaddr::MacAddr6;
+use netneighbours::get_mac_to_ip_map;
+use crossbeam_channel as cbc; 
+
+extern crate pretty_env_logger;
+#[macro_use] extern crate log;
+
+#[macro_use] extern crate manifest_dir_macros;
 
 //use tof_dataclasses::manifest::LocalTriggerBoard;
 use tof_dataclasses::manifest as mf;
@@ -24,26 +37,11 @@ use tof_dataclasses::events::blob::{BlobData,
                                     get_constant_blobeventsize};
 use tof_dataclasses::packets::PacketType;
 use tof_dataclasses::packets::paddle_packet::PaddlePacket;
-use tof_dataclasses::errors::BlobError;
-use crossbeam_channel::{Sender, unbounded};
-
-use zmq;
-
-extern crate json;
-
-use macaddr::MacAddr6;
-use netneighbours::get_mac_to_ip_map;
-use crossbeam_channel as cbc; 
-
-
+use tof_dataclasses::errors::{BlobError, SerializationError};
 use tof_dataclasses::commands::{TofCommand};//, TofResponse};
 use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::events::MasterTriggerEvent;
-
-extern crate pretty_env_logger;
-#[macro_use] extern crate log;
-
-#[macro_use] extern crate manifest_dir_macros;
+use tof_dataclasses::serialization::Serialization;
 
 const MT_MAX_PACKSIZE   : usize = 512;
 
@@ -183,6 +181,11 @@ pub struct RunParams {
 
 impl RunParams {
 
+  pub const PACKETSIZEFIXED    : usize = 10; // bytes
+  pub const VERSION            : &'static str = "1.0";
+  pub const HEAD               : u16  = 43690; //0xAAAA
+  pub const TAIL               : u16  = 21845; //0x5555
+
   pub fn new() -> RunParams {
     RunParams {
       forever   : false,
@@ -190,6 +193,27 @@ impl RunParams {
       is_active : false,
       nseconds  : 0,
     }
+  }
+}
+
+impl Serialization for RunParams {
+  fn from_bytestream(bytestream : &Vec<u8>,
+                     start_pos  : usize)
+    -> Result<Self, SerializationError> {
+    let pars = RunParams::new();
+    Ok(pars)
+  }
+}
+
+impl Default for RunParams {
+  fn default() -> RunParams {
+    RunParams::new()
+  }
+}
+
+impl fmt::Display for RunParams {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    write!(f, "<RunParams : active {}>", self.is_active)
   }
 }
 
