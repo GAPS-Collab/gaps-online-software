@@ -41,7 +41,9 @@ use tof_dataclasses::errors::{BlobError, SerializationError};
 use tof_dataclasses::commands::{TofCommand};//, TofResponse};
 use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::events::MasterTriggerEvent;
-use tof_dataclasses::serialization::Serialization;
+use tof_dataclasses::serialization::{Serialization,
+                                     parse_u16,
+                                     parse_u32};
 
 const MT_MAX_PACKSIZE   : usize = 512;
 
@@ -181,7 +183,7 @@ pub struct RunParams {
 
 impl RunParams {
 
-  pub const PACKETSIZEFIXED    : usize = 10; // bytes
+  pub const SIZE               : usize = 14; // bytes
   pub const VERSION            : &'static str = "1.0";
   pub const HEAD               : u16  = 43690; //0xAAAA
   pub const TAIL               : u16  = 21845; //0x5555
@@ -194,13 +196,47 @@ impl RunParams {
       nseconds  : 0,
     }
   }
+
+  pub fn to_bytestream(&self) -> Vec<u8> {
+    let mut stream = Vec::<u8>::with_capacity(RunParams::SIZE);
+    stream.extend_from_slice(&RunParams::HEAD.to_le_bytes());
+    let mut forever = 0u8;
+    if self.forever {
+      forever = 1;
+    }
+    stream.extend_from_slice(&forever.to_le_bytes());
+    stream.extend_from_slice(&self.nevents.to_le_bytes());
+    let mut is_active = 0u8;
+    if self.is_active {
+      is_active = 1;
+    }
+    stream.extend_from_slice(&is_active.to_le_bytes());
+    stream.extend_from_slice(&self.nseconds.to_le_bytes());
+    stream
+  }
 }
 
 impl Serialization for RunParams {
+  
   fn from_bytestream(bytestream : &Vec<u8>,
                      start_pos  : usize)
     -> Result<Self, SerializationError> {
-    let pars = RunParams::new();
+    let mut pars = RunParams::new();
+    let mut pos  = start_pos;
+    if parse_u16(bytestream, &mut pos) != RunParams::HEAD {
+      return Err(SerializationError::HeadInvalid {});
+    }
+    let forever   = bytestream[pos];
+    pos += 1;
+    pars.nevents  = parse_u32(bytestream, &mut pos);
+    let is_active = bytestream[pos];
+    pos += 1;
+    pars.nseconds = parse_u32(bytestream, &mut pos);
+    if parse_u16(bytestream, &mut pos) != RunParams::TAIL {
+      return Err(SerializationError::TailInvalid {} );
+    }
+    pars.is_active = is_active > 0;
+    pars.forever   = forever > 0;
     Ok(pars)
   }
 }

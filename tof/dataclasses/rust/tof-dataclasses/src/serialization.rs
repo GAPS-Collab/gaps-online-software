@@ -18,6 +18,18 @@ pub use crate::errors::SerializationError;
 //  value
 //}
 
+pub fn parse_u32(bs : &Vec::<u8>, pos : &mut usize) -> u32 {
+  let value = u32::from_le_bytes([bs[*pos], bs[*pos+1], bs[*pos+2], bs[*pos+3]]);
+  *pos += 4;
+  value
+}
+
+pub fn parse_u16(bs : &Vec::<u8>, pos : &mut usize) -> u16 {
+  let value = u16::from_le_bytes([bs[*pos], bs[*pos+1]]);
+  *pos += 2;
+  value
+}
+
 
 /// En/Decode to a bytestream, that is `Vec<u8>`
 pub trait Serialization {

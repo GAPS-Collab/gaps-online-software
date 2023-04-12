@@ -77,6 +77,10 @@ struct Args {
   /// possible
   #[arg(long, default_value_t = false)]
   run_forever: bool,
+  /// Analyze the waveforms directly on the board. We will not send
+  /// waveoform data, but paddle packets instead.
+  #[arg(long, default_value_t = false)]
+  waveform_analysis: bool,
   /// Activate the forced trigger. The value is the desired rate 
   #[arg(long, default_value_t = 0)]
   force_trigger: u32,
@@ -117,16 +121,10 @@ fn main() {
   //                        .init();
   pretty_env_logger::init();
 
-  //let kraken                = vec![240, 159, 144, 153];
-  // We know these bytes are valid, so we'll use `unwrap()`.
-  //let kraken           = String::from_utf8(kraken).unwrap();
-
   // General parameters, readout board id,, 
   // ip to tof computer
-
   let rb_id = get_board_id().expect("Unable to obtain board ID!");
   let dna   = get_device_dna().expect("Unable to obtain device DNA!"); 
-  
   
   let args = Args::parse();                   
   let mut buff_trip     = args.buff_trip;         
@@ -137,8 +135,10 @@ fn main() {
   let mut stream_any    = args.stream_any;
   let mut force_trigger = args.force_trigger;
   let force_random_trig = args.force_random_trigger;
+  let wf_analysis       = args.waveform_analysis;
   let rb_test           = args.rb_test_ext || args.rb_test_sw;
-  
+ 
+
   //FIMXE - this needs to become part of clap
   let cmd_server_ip = String::from("10.0.1.1");
   //let cmd_server_ip     = args.cmd_server_ip;  
@@ -185,11 +185,10 @@ fn main() {
     println!("=> We will run in rb testing mode!");
     println!("-----------------------------------------------"); 
   } 
-  reset_data_memory_aggressively();
-  reset_data_memory_aggressively();
-  reset_data_memory_aggressively();
-  //reset_data_memory_aggressively();
-  //reset_data_memory_aggressively();
+ 
+  // this resets the data buffer /dev/uio1,2 occupancy
+  reset_dma_and_buffers();
+
   let mut uio1_total_size = DATABUF_TOTAL_SIZE;
   let mut uio2_total_size = DATABUF_TOTAL_SIZE;
 
@@ -258,18 +257,8 @@ fn main() {
     info!("We set a value for buff_trip of {buff_trip}");
   }
  
-  // write a few registers - this might go to 
-  // the init script
-  //match disable_evt_fragments() {
-  //  Err(err) => error!("Can not disable writing of event fragments!"),
-  //  Ok(_)    => ()
-  //}
-  // now we are ready to receive data 
-
   // Setup routine. Start the threads in inverse order of 
   // how far they are away from the buffers.
-  
-  
   let run_params_from_cmdr_c = run_params_from_cmdr.clone();
   let rdb_sender_a  = bs_send.clone();
   

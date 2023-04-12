@@ -237,7 +237,6 @@ pub fn set_readout_all_channels_and_ch9() -> Result<(), RegisterError> {
 pub fn set_master_trigger_mode() -> Result<(), RegisterError> {
   trace!("SET DRS4 MT MODE");
   write_control_reg(MT_TRIGGER_MODE, 1)?;
-  let eight_cycles = Duration::from_micros(4);
   Ok(())
 }
 
@@ -245,7 +244,6 @@ pub fn set_master_trigger_mode() -> Result<(), RegisterError> {
 pub fn disable_master_trigger_mode() -> Result<(), RegisterError> {
   warn!("Disabeling master trigger mode");
   write_control_reg(MT_TRIGGER_MODE, 0)?;
-  let eight_cycles = Duration::from_micros(4);
   Ok(())
 }
 

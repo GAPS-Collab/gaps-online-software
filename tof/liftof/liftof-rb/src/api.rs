@@ -91,7 +91,7 @@ pub fn prefix_board_id(input : &mut Vec<u8>) -> Vec<u8> {
                  .unwrap_or(0);
                                //.expect("Need to be able to obtain board id!");
   let mut bytestream : Vec::<u8>;
-  let mut board : String;
+  let board : String;
   if board_id < 10 {
     board = String::from("RB0") + &board_id.to_string();
   } else {
@@ -132,7 +132,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
                      //cmd_sender   : &Sender<TofCommand>) {
   // create 0MQ sockedts
   //let one_milli       = time::Duration::from_millis(1);
-  let mut cmd_address = String::from("tcp://") + &cmd_server_ip + ":" + &DATAPORT.to_string() ;
+  let cmd_address = String::from("tcp://") + &cmd_server_ip + ":" + &DATAPORT.to_string() ;
   // we will subscribe to two types of messages, BDCT and RB + 2 digits 
   // of board id
   let topic_board = get_board_id().expect("Can not get board id!")
@@ -154,7 +154,6 @@ pub fn cmd_responder(cmd_server_ip             : String,
     Ok(_) => ()
   }
   let mut heartbeat     = Instant::now();
-  let mut last_run_pars : RunParams;
 
   error!("TODO: Heartbeat feature not yet implemented on C&C side");
   let heartbeat_received = false;
@@ -259,7 +258,8 @@ pub fn cmd_responder(cmd_server_ip             : String,
                 continue;
               },
               TofCommand::RequestWaveforms (eventid) => {
-                warn!("Not implemented");
+                trace!("Requesting waveforms for event {eventid}");
+                error!("Not implemented");
                 match cmd_socket.send(resp_not_implemented,0) {
                   Err(err) => warn!("Can not send response!"),
                   Ok(_)    => trace!("Resp sent!")
@@ -311,7 +311,6 @@ pub fn cmd_responder(cmd_server_ip             : String,
                   is_active : true,
                   nseconds  : 0,
                 };
-                last_run_pars = run_p;
                 match run_pars.send(run_p) {
                   Err(err) => warn!("Problem initializing run!"),
                   Ok(_)    => ()
@@ -324,7 +323,6 @@ pub fn cmd_responder(cmd_server_ip             : String,
                   is_active : false,
                   nseconds : 0,
                 };
-                last_run_pars = run_p;
                 match run_pars.send(run_p) {
                   Err(err) => warn!("Problem ending run!"),
                   Ok(_)    => ()
@@ -357,7 +355,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
               TofCommand::CreateCalibrationFile (_) => {
                 warn!("Not implemented");
                 match cmd_socket.send(resp_not_implemented,0) {
-                  Err(err) => warn!("Can not send response!"),
+                  Err(err) => error!("Can not send response! Err {err}"),
                   Ok(_)    => trace!("Resp sent!")
                 }
                 continue;
@@ -520,98 +518,143 @@ pub fn monitoring(ch : &Sender<TofPacket>) {
   }
 }
 
-
-/// Somehow, it is not always successful to reset 
-/// the DMA and the data buffers. Let's try an 
-/// aggressive scheme and do it several times.
-/// If we fail, something is wrong and we panic
-pub fn reset_data_memory_aggressively() {
-  let one_milli = time::Duration::from_millis(1);
-  let five_milli = time::Duration::from_millis(5);
+/// Reset DMA pointer and buffer occupancy registers
+///
+/// If there are any errors, we will wait for a short
+/// time and then try again
+pub fn reset_dma_and_buffers() {
+  // register writing is on the order of microseconds 
+  // (MHz clock) so one_milli is plenty
+  let one_milli   = time::Duration::from_millis(1);
   let buf_a = BlobBuffer::A;
   let buf_b = BlobBuffer::B;
-  let mut n_tries : u8 = 0;
-  
-  for _ in 0..DMA_RESET_TRIES {
-    match reset_dma() {
-      Ok(_)    => break,
-      Err(err) => {
-        debug!("Resetting dma failed, err {:?}", err);
-        thread::sleep(five_milli);
-        continue;
+  let mut n_tries = 0u8;
+  let mut failed  = true;
+  loop {
+    if failed && n_tries < DMA_RESET_TRIES {
+      match reset_dma() {
+        Ok(_)    => (),
+        Err(err) => {
+          error!("Resetting dma failed, err {:?}", err);
+          n_tries += 1;
+          thread::sleep(one_milli);
+          continue;
+        }
+      } 
+      match reset_ram_buffer_occ(&buf_a) {
+        Ok(_)    => (), 
+        Err(err) => {
+          error!("Problem resetting buffer /dev/uio1 {:?}", err);
+          n_tries += 1;
+          thread::sleep(one_milli);
+          continue;
+        }
+      }
+      match reset_ram_buffer_occ(&buf_b) {
+        Ok(_)    => (), 
+        Err(err) => {
+          error!("Problem resetting buffer /dev/uio2 {:?}", err);
+          n_tries += 1;
+          thread::sleep(one_milli);
+          continue;
+        }
       }
     }
+    failed = false;
   }
-  let mut buf_a_occ = UIO1_MAX_OCCUPANCY;
-  let mut buf_b_occ = UIO2_MAX_OCCUPANCY;
-  match reset_ram_buffer_occ(&buf_a) {
-    Err(err) => warn!("Problem resetting buffer /dev/uio1 {:?}", err),
-    Ok(_)    => () 
-  }
-  match reset_ram_buffer_occ(&buf_b) {
-    Err(err) => warn!("Problem resetting buffer /dev/uio1 {:?}", err),
-    Ok(_)    => () 
-  }
-  match get_blob_buffer_occ(&buf_a) {
-    Err(err) => debug!("Error getting blob buffer A occupnacy {err}"),
-    Ok(val)  => {
-      debug!("Got a value for the buffer A of {val}");
-      buf_a_occ = val;
-    }
-  }
-  thread::sleep(one_milli);
-  match get_blob_buffer_occ(&buf_b) {
-    Err(err) => {
-      warn!("Error getting blob buffer B occupancy {err}");
-    }
-    Ok(val)  => {
-      debug!("Got a value for the buffer B of {val}");
-      buf_b_occ = val;
-    }
-
-  }
-  thread::sleep(one_milli);
-  //while buf_a_occ != UIO1_MIN_OCCUPANCY {
-
-  //  match reset_ram_buffer_occ(&buf_a) {
-  //    Err(err) => warn!("Problem resetting buffer /dev/uio1 {:?}", err),
-  //    Ok(_)    => () 
-  //  }
-  //  thread::sleep(five_milli);
-  //  match get_blob_buffer_occ(&buf_a) {
-  //    Err(_) => {
-  //      warn!("Error reseting blob buffer A");
-  //      thread::sleep(five_milli);
-  //      }
-  //      continue;
-  //    }
-  //    Ok(val)  => {
-  //      buf_a_occ = val;
-  //    }
-  //  }
-  //}
-  //n_tries = 0;
-  //while buf_b_occ != UIO2_MIN_OCCUPANCY {
-  //  match reset_ram_buffer_occ(&buf_b) {
-  //    Err(err) => warn!("Problem resetting buffer /dev/uio2 {:?}", err),
-  //    Ok(_)    => () 
-  //  }
-  //  match get_blob_buffer_occ(&buf_b) {
-  //    Err(_) => {
-  //      warn!("Error getting occupancey for buffer B! (/dev/uio2)");
-  //      thread::sleep(five_milli);
-  //      n_tries += 1;
-  //      if n_tries == DMA_RESET_TRIES {
-  //        panic!("We were unable to reset DMA and the data buffers!");
-  //      }
-  //      continue;
-  //    }
-  //    Ok(val)  => {
-  //      buf_b_occ = val;
-  //    }
-  //  }
-  //}
 }
+
+///// Somehow, it is not always successful to reset 
+///// the DMA and the data buffers. Let's try an 
+///// aggressive scheme and do it several times.
+///// If we fail, something is wrong and we panic
+//pub fn reset_data_memory_aggressively() {
+//  //let one_milli = time::Duration::from_millis(1);
+//  let five_milli = time::Duration::from_millis(5);
+//  let buf_a = BlobBuffer::A;
+//  let buf_b = BlobBuffer::B;
+//  let n_tries : u8 = 0;
+//  
+//  for _ in 0..DMA_RESET_TRIES {
+//    match reset_dma() {
+//      Ok(_)    => break,
+//      Err(err) => {
+//        debug!("Resetting dma failed, err {:?}", err);
+//        thread::sleep(five_milli);
+//        continue;
+//      }
+//    }
+//  }
+//  //let mut buf_a_occ = UIO1_MAX_OCCUPANCY;
+//  //let mut buf_b_occ = UIO2_MAX_OCCUPANCY;
+//  match reset_ram_buffer_occ(&buf_a) {
+//    Err(err) => warn!("Problem resetting buffer /dev/uio1 {:?}", err),
+//    Ok(_)    => () 
+//  }
+//  match reset_ram_buffer_occ(&buf_b) {
+//    Err(err) => warn!("Problem resetting buffer /dev/uio1 {:?}", err),
+//    Ok(_)    => () 
+//  }
+//  //match get_blob_buffer_occ(&buf_a) {
+//  //  Err(err) => debug!("Error getting blob buffer A occupnacy {err}"),
+//  //  Ok(val)  => {
+//  //    debug!("Got a value for the buffer A of {val}");
+//  //    buf_a_occ = val;
+//  //  }
+//  //}
+//  //thread::sleep(one_milli);
+//  //match get_blob_buffer_occ(&buf_b) {
+//  //  Err(err) => {
+//  //    warn!("Error getting blob buffer B occupancy {err}");
+//  //  }
+//  //  Ok(val)  => {
+//  //    debug!("Got a value for the buffer B of {val}");
+//  //    buf_b_occ = val;
+//  //  }
+//
+//  //}
+//  //thread::sleep(one_milli);
+//  //while buf_a_occ != UIO1_MIN_OCCUPANCY {
+//
+//  //  match reset_ram_buffer_occ(&buf_a) {
+//  //    Err(err) => warn!("Problem resetting buffer /dev/uio1 {:?}", err),
+//  //    Ok(_)    => () 
+//  //  }
+//  //  thread::sleep(five_milli);
+//  //  match get_blob_buffer_occ(&buf_a) {
+//  //    Err(_) => {
+//  //      warn!("Error reseting blob buffer A");
+//  //      thread::sleep(five_milli);
+//  //      }
+//  //      continue;
+//  //    }
+//  //    Ok(val)  => {
+//  //      buf_a_occ = val;
+//  //    }
+//  //  }
+//  //}
+//  //n_tries = 0;
+//  //while buf_b_occ != UIO2_MIN_OCCUPANCY {
+//  //  match reset_ram_buffer_occ(&buf_b) {
+//  //    Err(err) => warn!("Problem resetting buffer /dev/uio2 {:?}", err),
+//  //    Ok(_)    => () 
+//  //  }
+//  //  match get_blob_buffer_occ(&buf_b) {
+//  //    Err(_) => {
+//  //      warn!("Error getting occupancey for buffer B! (/dev/uio2)");
+//  //      thread::sleep(five_milli);
+//  //      n_tries += 1;
+//  //      if n_tries == DMA_RESET_TRIES {
+//  //        panic!("We were unable to reset DMA and the data buffers!");
+//  //      }
+//  //      continue;
+//  //    }
+//  //    Ok(val)  => {
+//  //      buf_b_occ = val;
+//  //    }
+//  //  }
+//  //}
+//}
 
 /////  Ensure the buffers are filled and everything is prepared for data
 /////  taking
@@ -688,7 +731,10 @@ pub fn run_check() {
   
   let mut last_occ_a = get_blob_buffer_occ(&buf_a).unwrap();
   let mut last_occ_b = get_blob_buffer_occ(&buf_b).unwrap();
-  enable_trigger();
+  match enable_trigger() {
+    Err(err) => error!("Unable to enable trigger! Err {err}"),
+    Ok(_)    => info!("Triggers enabled")
+  }
   loop {
     n_iter += 1;
     thread::sleep(interval);
@@ -742,9 +788,9 @@ pub fn runner(run_params          : &Receiver<RunParams>,
   let mut first_iter   = true; 
   let mut last_evt_cnt : u32 = 0;
   let mut evt_cnt      = 0u32;
-  let mut delta_events : u64 = 0;
+  let mut delta_events : u64;
   let mut n_events     : u64 = 0;
-  let mut n_errors     : u64 = 0;
+  let     n_errors     : u64 = 0;
   // per default, latch to the mtb trigger.
   // for testting/calibration that gets switched off
   // below
@@ -768,15 +814,16 @@ pub fn runner(run_params          : &Receiver<RunParams>,
   let mut pars = RunParams::new();
 
   // this is the progress bars
-  let mut template_bar_env : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.red/grey} {pos:>7}/{len:7}";
-  let mut sty_ev = ProgressStyle::with_template(template_bar_env)
-  .unwrap();
+  //let mut template_bar_env : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.red/grey} {pos:>7}/{len:7}";
+  //let sty_ev = ProgressStyle::with_template(template_bar_env)
+  //.unwrap();
+  let mut template_bar_env : &str;
+  let mut sty_ev : ProgressStyle;
   let mut multi_prog : MultiProgress;
 
   let mut prog_a  = ProgressBar::hidden();
   let mut prog_b  = ProgressBar::hidden();
   let mut prog_ev = ProgressBar::hidden();
-  let sleep_time       = time::Duration::from_millis(10);
   let template_bar_a   : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.blue/grey} {bytes:>7}/{total_bytes:7} ";
   let template_bar_b   : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.green/grey} {bytes:>7}/{total_bytes:7} ";
 
@@ -787,8 +834,8 @@ pub fn runner(run_params          : &Receiver<RunParams>,
   let sty_b = ProgressStyle::with_template(template_bar_b)
   .unwrap();
 
-  let mut which_buff = RamBuffer::A;
-  let mut buff_size  = 0usize;
+  let mut which_buff : RamBuffer;
+  let mut buff_size  : usize;
   loop {
     if !is_running {
       match run_params.try_recv() {
@@ -1011,7 +1058,7 @@ pub fn event_cache_worker(recv_ev_pl    : Receiver<RBEventPayload>,
                           recv_evid    : Receiver<u32>,
                           cache_size   : usize) {
 
-  let mut n_send_errors = 0;   
+  let mut n_send_errors  = 0u64;   
   let mut op_mode_stream = false;
 
   let mut oldest_event_id : u32 = 0;
@@ -1111,179 +1158,179 @@ pub fn event_cache_worker(recv_ev_pl    : Receiver<RBEventPayload>,
   } // end loop
 }
 
-/// Deal with incoming commands
-///
-///
-///
-///
-pub struct Commander<'a> {
-
-  pub evid_send        : Sender<u32>,
-  pub change_op_mode   : Sender<TofOperationMode>, 
-  pub rb_evt_recv      : Receiver<Option<RBEventPayload>>,
-  pub hasit_from_cache : &'a Receiver<bool>,
-}
-
-impl Commander<'_> {
-
-  pub fn new<'a> (send_ev          : Sender<u32>,
-                  hasit_from_cache : &'a Receiver<bool>,
-                  evpl_from_cache  : Receiver<Option<RBEventPayload>>,
-                  change_op_mode   : Sender<TofOperationMode>)
-    -> Commander<'a> {
-
-    Commander {
-      evid_send        : send_ev,
-      change_op_mode   : change_op_mode,
-      rb_evt_recv      : evpl_from_cache,
-      hasit_from_cache : hasit_from_cache,
-    }
-  }
-
-
-  /// Interpret an incoming command 
-  ///
-  /// The command comes most likely somehow over 
-  /// the wir from the tof computer
-  ///
-  /// Match with a list of known commands and 
-  /// take action.
-  ///
-  /// # Arguments
-  ///
-  /// * command : A TofCommand instructing the 
-  ///             commander what to do
-  ///             Will generate a TofResponse 
-  ///             
-  pub fn command (&self, cmd : &TofCommand)
-    -> Result<TofResponse, FIXME> {
-    match cmd {
-      TofCommand::PowerOn   (mask) => {
-        warn!("Not implemented");
-        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
-      },
-      TofCommand::PowerOff  (mask) => {
-        warn!("Not implemented");
-        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
-      },
-      TofCommand::PowerCycle(mask) => {
-        warn!("Not implemented");
-        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
-      },
-      TofCommand::RBSetup   (mask) => {
-        warn!("Not implemented");
-        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
-      }, 
-      TofCommand::SetThresholds   (thresholds) =>  {
-        warn!("Not implemented");
-        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
-      },
-      TofCommand::StartValidationRun  (_) => {
-        warn!("Not implemented");
-        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
-      },
-      TofCommand::RequestWaveforms (eventid) => {
-        warn!("Not implemented");
-        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
-      },
-      TofCommand::UnspoolEventCache   (_) => {
-        warn!("Not implemented");
-        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
-      },
-      TofCommand::StreamOnlyRequested (_) => {
-        let op_mode = TofOperationMode::TofModeRequestReply;
-        
-        match self.change_op_mode.try_send(op_mode) {
-          Err(err) => trace!("Error sending! {err}"),
-          Ok(_)    => ()
-        }
-        return Ok(TofResponse::Success(RESP_SUCC_FINGERS_CROSSED));
-      },
-      TofCommand::StreamAnyEvent      (_) => {
-        let op_mode = TofOperationMode::TofModeStreamAny;
-        match self.change_op_mode.try_send(op_mode) {
-          Err(err) => trace!("Error sending! {err}"),
-          Ok(_)    => ()
-        }
-        return Ok(TofResponse::Success(RESP_SUCC_FINGERS_CROSSED));
-      },
-      //TofCommand::DataRunStart (max_event) => {
-      //  // let's start a run. The value of the TofCommnad shall be 
-      //  // nevents
-      //  self.workforce.execute(move || {
-      //      runner(Some(*max_event as u64),
-      //             None,
-      //             None,
-      //             self.get_killed_chn,
-      //             None);
-      //  }); 
-      //  return Ok(TofResponse::Success(RESP_SUCC_FINGERS_CROSSED));
-      //}, 
-      //TofCommand::DataRunEnd   => {
-      //  if !self.run_active {
-      //    return Ok(TofResponse::GeneralFail(RESP_ERR_NORUNACTIVE));
-      //  }
-      //  warn!("Will kill current run!");
-      //  self.kill_chn.send(true);
-      //  return Ok(TofResponse::Success(RESP_SUCC_FINGERS_CROSSED));
-      //},
-      TofCommand::VoltageCalibration (_) => {
-        warn!("Not implemented");
-        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
-      },
-      TofCommand::TimingCalibration  (_) => {
-        warn!("Not implemented");
-        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
-      },
-      TofCommand::CreateCalibrationFile (_) => {
-        warn!("Not implemented");
-        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
-      },
-      TofCommand::RequestEvent(eventid) => {
-        match self.evid_send.send(*eventid) {
-          Err(err) => {
-            debug!("Problem sending event id to cache! Err {err}");
-            return Ok(TofResponse::GeneralFail(*eventid));
-          },
-          Ok(event) => (),
-        }
-        match self.hasit_from_cache.recv() {
-          Err(_) => {
-            return Ok(TofResponse::EventNotReady(*eventid));
-          }
-          Ok(hasit) => {
-            // FIXME - prefix topic
-            if hasit {
-              return Ok(TofResponse::Success(*eventid));
-            } else {
-              return Ok(TofResponse::EventNotReady(*eventid));
-            }
-            //Some(event) => {
-            //  match self.zmq_pub_socket.send(event.payload, zmq::DONTWAIT) {
-            //    Ok(_)  => {
-            //      return Ok(TofResponse::Success(*eventid));
-            //    }
-            //    Err(err) => {
-            //      debug!("Problem with PUB socket! Err {err}"); 
-            //      return Ok(TofResponse::ZMQProblem(*eventid));
-            //    }
-            //  }
-            //}
-            //}
-          }
-        }
-      },
-      TofCommand::RequestMoni (_) => {
-      },
-      TofCommand::Unknown (_) => {
-      }
-      _ => {
-      }
-    } 
-    let response = TofResponse::Success(1);
-    Ok(response)
-  }
-}
+///// Deal with incoming commands
+/////
+/////
+/////
+/////
+//pub struct Commander<'a> {
+//
+//  pub evid_send        : Sender<u32>,
+//  pub change_op_mode   : Sender<TofOperationMode>, 
+//  pub rb_evt_recv      : Receiver<Option<RBEventPayload>>,
+//  pub hasit_from_cache : &'a Receiver<bool>,
+//}
+//
+//impl Commander<'_> {
+//
+//  pub fn new<'a> (send_ev          : Sender<u32>,
+//                  hasit_from_cache : &'a Receiver<bool>,
+//                  evpl_from_cache  : Receiver<Option<RBEventPayload>>,
+//                  change_op_mode   : Sender<TofOperationMode>)
+//    -> Commander<'a> {
+//
+//    Commander {
+//      evid_send        : send_ev,
+//      change_op_mode   : change_op_mode,
+//      rb_evt_recv      : evpl_from_cache,
+//      hasit_from_cache : hasit_from_cache,
+//    }
+//  }
+//
+//
+//  /// Interpret an incoming command 
+//  ///
+//  /// The command comes most likely somehow over 
+//  /// the wir from the tof computer
+//  ///
+//  /// Match with a list of known commands and 
+//  /// take action.
+//  ///
+//  /// # Arguments
+//  ///
+//  /// * command : A TofCommand instructing the 
+//  ///             commander what to do
+//  ///             Will generate a TofResponse 
+//  ///             
+//  pub fn command (&self, cmd : &TofCommand)
+//    -> Result<TofResponse, FIXME> {
+//    match cmd {
+//      TofCommand::PowerOn   (mask) => {
+//        warn!("Not implemented");
+//        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
+//      },
+//      TofCommand::PowerOff  (mask) => {
+//        warn!("Not implemented");
+//        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
+//      },
+//      TofCommand::PowerCycle(mask) => {
+//        warn!("Not implemented");
+//        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
+//      },
+//      TofCommand::RBSetup   (mask) => {
+//        warn!("Not implemented");
+//        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
+//      }, 
+//      TofCommand::SetThresholds   (thresholds) =>  {
+//        warn!("Not implemented");
+//        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
+//      },
+//      TofCommand::StartValidationRun  (_) => {
+//        warn!("Not implemented");
+//        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
+//      },
+//      TofCommand::RequestWaveforms (eventid) => {
+//        warn!("Not implemented");
+//        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
+//      },
+//      TofCommand::UnspoolEventCache   (_) => {
+//        warn!("Not implemented");
+//        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
+//      },
+//      TofCommand::StreamOnlyRequested (_) => {
+//        let op_mode = TofOperationMode::TofModeRequestReply;
+//        
+//        match self.change_op_mode.try_send(op_mode) {
+//          Err(err) => trace!("Error sending! {err}"),
+//          Ok(_)    => ()
+//        }
+//        return Ok(TofResponse::Success(RESP_SUCC_FINGERS_CROSSED));
+//      },
+//      TofCommand::StreamAnyEvent      (_) => {
+//        let op_mode = TofOperationMode::TofModeStreamAny;
+//        match self.change_op_mode.try_send(op_mode) {
+//          Err(err) => trace!("Error sending! {err}"),
+//          Ok(_)    => ()
+//        }
+//        return Ok(TofResponse::Success(RESP_SUCC_FINGERS_CROSSED));
+//      },
+//      //TofCommand::DataRunStart (max_event) => {
+//      //  // let's start a run. The value of the TofCommnad shall be 
+//      //  // nevents
+//      //  self.workforce.execute(move || {
+//      //      runner(Some(*max_event as u64),
+//      //             None,
+//      //             None,
+//      //             self.get_killed_chn,
+//      //             None);
+//      //  }); 
+//      //  return Ok(TofResponse::Success(RESP_SUCC_FINGERS_CROSSED));
+//      //}, 
+//      //TofCommand::DataRunEnd   => {
+//      //  if !self.run_active {
+//      //    return Ok(TofResponse::GeneralFail(RESP_ERR_NORUNACTIVE));
+//      //  }
+//      //  warn!("Will kill current run!");
+//      //  self.kill_chn.send(true);
+//      //  return Ok(TofResponse::Success(RESP_SUCC_FINGERS_CROSSED));
+//      //},
+//      TofCommand::VoltageCalibration (_) => {
+//        warn!("Not implemented");
+//        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
+//      },
+//      TofCommand::TimingCalibration  (_) => {
+//        warn!("Not implemented");
+//        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
+//      },
+//      TofCommand::CreateCalibrationFile (_) => {
+//        warn!("Not implemented");
+//        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
+//      },
+//      TofCommand::RequestEvent(eventid) => {
+//        match self.evid_send.send(*eventid) {
+//          Err(err) => {
+//            debug!("Problem sending event id to cache! Err {err}");
+//            return Ok(TofResponse::GeneralFail(*eventid));
+//          },
+//          Ok(_) => (),
+//        }
+//        match self.hasit_from_cache.recv() {
+//          Err(_) => {
+//            return Ok(TofResponse::EventNotReady(*eventid));
+//          }
+//          Ok(hasit) => {
+//            // FIXME - prefix topic
+//            if hasit {
+//              return Ok(TofResponse::Success(*eventid));
+//            } else {
+//              return Ok(TofResponse::EventNotReady(*eventid));
+//            }
+//            //Some(event) => {
+//            //  match self.zmq_pub_socket.send(event.payload, zmq::DONTWAIT) {
+//            //    Ok(_)  => {
+//            //      return Ok(TofResponse::Success(*eventid));
+//            //    }
+//            //    Err(err) => {
+//            //      debug!("Problem with PUB socket! Err {err}"); 
+//            //      return Ok(TofResponse::ZMQProblem(*eventid));
+//            //    }
+//            //  }
+//            //}
+//            //}
+//          }
+//        }
+//      },
+//      TofCommand::RequestMoni (_) => {
+//      },
+//      TofCommand::Unknown (_) => {
+//      }
+//      _ => {
+//      }
+//    } 
+//    let response = TofResponse::Success(1);
+//    Ok(response)
+//  }
+//}
 
 ///  Get the blob buffer size from occupancy register
 ///

@@ -181,7 +181,7 @@ pub fn write_control_reg(addr       : u32,
 /// For debugging. This just prints the 
 /// memory at a certain address
 #[deprecated(since = "0.1.0", note = "This just prints out bare memory and is only useful for debugging in the very early dev")]
-fn dump_mem<T>(addr_space : &str, addr: u32, len: usize)
+pub fn dump_mem<T>(addr_space : &str, addr: u32, len: usize)
 where
     T: std::fmt::LowerHex,
 {
