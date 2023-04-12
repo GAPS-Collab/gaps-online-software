@@ -30,6 +30,7 @@ use tof_dataclasses::events::blob::RBEventPayload;
 use tof_dataclasses::commands::{//TofCommand,
                                 TofResponse,
                                 TofOperationMode};
+use liftof_lib::RunParams;
 
 extern crate pretty_env_logger;
 #[macro_use] extern crate log;

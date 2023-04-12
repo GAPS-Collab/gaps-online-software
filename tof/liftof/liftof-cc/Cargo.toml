@@ -1,6 +1,6 @@
 [package]
 name        = "liftof-cc" # the name of the package
-version     = "0.2.0"    # the current version, obeying semver
+version     = "0.4.0"    # the current version, obeying semver
 authors     = ["J.A. Stoessl <stoessl@hawaii.edu>", "Jeff Zweerink <zweering@astro.ucla.edu>"]
 description = "A programm for the GAPS science instrument. Read out the time-of-flight detectors and process their data."
 

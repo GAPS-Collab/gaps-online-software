@@ -41,7 +41,7 @@ use tof_dataclasses::packets::{TofPacket,
 //use tof_dataclasses::threading::ThreadPool;
 use tof_dataclasses::monitoring as moni;
 use tof_dataclasses::errors::SerializationError;
-
+use liftof_lib::RunParams;
 
 
 /// Non-register related constants 
@@ -64,26 +64,6 @@ pub const DATAPORT : u32 = 42000;
 /// Commandport is 0MQ SUB for receiving commands from a C&C server
 pub const CMDPORT  : u32 = 32000;
 
-/// Meta information for a data run
-#[derive(Debug, Copy, Clone)]
-pub struct RunParams {
-  pub forever   : bool,
-  pub nevents   : u32,
-  pub is_active : bool,
-  pub nseconds  : u32,
-}
-
-impl RunParams {
-
-  pub fn new() -> RunParams {
-    RunParams {
-      forever   : false,
-      nevents   : 0,
-      is_active : false,
-      nseconds  : 0,
-    }
-  }
-}
 
 // FIXME
 type RamBuffer = BlobBuffer;
