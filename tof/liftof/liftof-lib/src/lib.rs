@@ -172,6 +172,27 @@ impl Default for TofPacketWriter {
 
 }
 
+/// Meta information for a data run
+#[derive(Debug, Copy, Clone)]
+pub struct RunParams {
+  pub forever   : bool,
+  pub nevents   : u32,
+  pub is_active : bool,
+  pub nseconds  : u32,
+}
+
+impl RunParams {
+
+  pub fn new() -> RunParams {
+    RunParams {
+      forever   : false,
+      nevents   : 0,
+      is_active : false,
+      nseconds  : 0,
+    }
+  }
+}
+
 //**********************************************
 //
 // Analysis
