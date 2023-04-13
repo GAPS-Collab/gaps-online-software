@@ -25,6 +25,10 @@ if __name__ == '__main__':
     parser.add_argument('input', metavar='input',\
                         type=str,\
                         help='Input .blob files')
+    parser.add_argument('--output-dir',\
+                        metavar='output_dir',\
+                        default="",\
+                        type=str, help='Directory to store the resulting root files')
     parser.add_argument('--calibration-file',\
                         metavar='cal_file',\
                         default="",\
@@ -52,7 +56,8 @@ if __name__ == '__main__':
     for k in data.keys():
         console.print(f'-- -- {k} : {len(data[k])} events')
 
+    output_path = pl.Path(args.output_dir) / infile.name.replace(".blob", ".root")
     console.print(f'==> Creating ROOT file...')
-    f = up.recreate('test.root')
+    f = up.recreate(output_path)
     f['rec'] = data
     f.close()
