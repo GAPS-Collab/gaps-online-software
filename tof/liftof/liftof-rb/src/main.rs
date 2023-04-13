@@ -8,9 +8,13 @@
 //!
 use std::{thread, time};
 
-extern crate ctrlc;
-
+//extern crate ctrlc;
+extern crate libc;
 extern crate crossbeam_channel;
+extern crate signal_hook;
+
+use signal_hook::iterator::Signals;
+use signal_hook::consts::signal::{SIGTERM, SIGINT};
 use crossbeam_channel::{unbounded,
                         Sender,
                         Receiver};
@@ -155,14 +159,17 @@ fn main() {
   if ( vcal && tcal ) || ( vcal && noi ) || ( tcal && noi ) {
     panic!("Can only support either of the flags --vcal --tcal --noi")
   }
-  
+
+  let mut end_after_run = false;
   if noi {
     file_suffix = String::from(".noi");
     rb_test     = true;
+    end_after_run = true;
   }
   if vcal {
     file_suffix = String::from(".vcal");
     rb_test     = true;
+    end_after_run = true;
   }
 
   if tcal {
@@ -170,6 +177,7 @@ fn main() {
     force_random_trig = 100;
     show_progress     = true;
     n_events_run      = 1000;
+    end_after_run = true;
   }
 
   //FIMXE - this needs to become part of clap
@@ -414,29 +422,57 @@ fn main() {
     }
   }
 
-  ctrlc::set_handler(move || {
-    println!("received Ctrl+C! We will stop triggers and end the run!");
-    println!("So long and thanks for all the \u{1F41F}");
-   
-    match disable_trigger() {
-      Err(err) => error!("Can not disable triggers, error {err}"),
-      Ok(_)    => ()
-    }
-    if force_random_trig > 0 {
-      match set_self_trig_rate(0) {
-        Err(err) => {
-          panic!("Could not disable random self trigger! Err {err}");
+  let mut signals = Signals::new(&[SIGTERM, SIGINT]).expect("Unknown signals");
+  let mut end = false;
+  
+  // Wait until all threads are set up
+  thread::sleep(5*one_sec);
+  loop {
+    thread::sleep(1*one_sec);
+    for signal in signals.pending() {
+      match signal as libc::c_int {
+        SIGTERM => {
+          println!("SIGTERM received");
+          end = true;
         }
-        Ok(_)    => ()
+        SIGINT  => {
+          println!("SIGINT received");
+          end = true;
+        }
+        _       => ()
       }
     }
-    exit(0);
-  })
-  .expect("Error setting Ctrl-C handler");
 
+    match get_triggers_enabled() {
+      Err(err) => error!("Can not read trigger enabled register!"),
+      Ok(enabled) => {
+        if !enabled && end_after_run {
+          end = true;
+        }
+      }
 
-  loop {
-    thread::sleep(10*one_sec);
+    }
+
+    if end {
+      println!("=> Finish program!");
+      println!("=> Stopping triggers!");
+      println!("So long and thanks for all the \u{1F41F}");
+   
+      match disable_trigger() {
+        Err(err) => error!("Can not disable triggers, error {err}"),
+        Ok(_)    => ()
+      }
+      if force_random_trig > 0 {
+        match set_self_trig_rate(0) {
+          Err(err) => {
+            panic!("Could not disable random self trigger! Err {err}");
+          }
+          Ok(_)    => ()
+        }
+      }
+      exit(0);
+    }
+
   } // end loop
 } // end main
 

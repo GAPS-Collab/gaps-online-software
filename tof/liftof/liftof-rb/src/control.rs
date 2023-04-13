@@ -88,6 +88,11 @@ pub fn get_blob_buffer_occ(which : &BlobBuffer) -> Result<u32, RegisterError> {
   Ok(value)
 }
 
+/// Check if teh TRIGGER_ENABLE register is set
+pub fn get_triggers_enabled() -> Result<bool, RegisterError> {
+  let value = read_control_reg(TRIGGER_ENABLE)?;
+  Ok(value > 0)
+}
 
 /// FIXME
 pub fn get_dma_pointer() -> Result<u32, RegisterError> {
