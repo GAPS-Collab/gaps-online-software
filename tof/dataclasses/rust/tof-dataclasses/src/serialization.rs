@@ -30,12 +30,21 @@ pub fn parse_u16(bs : &Vec::<u8>, pos : &mut usize) -> u16 {
   value
 }
 
+pub fn parse_f64(bs : &Vec::<u8>, pos : &mut usize) -> f64 {
+  let value = f64::from_le_bytes([bs[*pos],   bs[*pos+1],  
+                                  bs[*pos+2], bs[*pos+3],
+                                  bs[*pos+4], bs[*pos+5],
+                                  bs[*pos+6], bs[*pos+7]]);
+  *pos += 8;
+  value
+}
+
 
 /// En/Decode to a bytestream, that is `Vec<u8>`
 pub trait Serialization {
 
 
-  ///! Decode a serializable from a bytestream  
+  /// Decode a serializable from a bytestream  
   fn from_bytestream(bytestream : &Vec<u8>, 
                      start_pos  : usize)
     -> Result<Self, SerializationError>
