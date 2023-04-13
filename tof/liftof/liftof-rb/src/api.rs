@@ -425,7 +425,8 @@ pub fn cmd_responder(cmd_server_ip             : String,
 /// which comes in over the wire as a byte 
 /// payload
 pub fn data_publisher(data : &Receiver<TofPacket>,
-                      write_blob : bool) {
+                      write_blob  : bool,
+                      file_suffix : Option<&str> ) {
   let mut address_ip = String::from("tcp://");
   let this_board_ip = local_ip().expect("Unable to obtainl local board IP. Something is messed up!");
   let data_port    = DATAPORT;
@@ -444,7 +445,7 @@ pub fn data_publisher(data : &Receiver<TofPacket>,
   let board_id = address_ip.split_off(address_ip.len() -2);
   let blobfile_name = "tof-rb".to_owned()
                        + &board_id.to_string()
-                       + "_test.blob";
+                       + file_suffix.unwrap_or(".blob");
 
   let blobfile_path = Path::new(&blobfile_name);
   
@@ -561,6 +562,8 @@ pub fn reset_dma_and_buffers() {
       }
     }
     failed = false;
+  } else {
+    break;
   }
 }
 
