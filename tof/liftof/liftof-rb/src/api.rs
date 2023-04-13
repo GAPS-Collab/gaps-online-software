@@ -560,10 +560,10 @@ pub fn reset_dma_and_buffers() {
           continue;
         }
       }
+    failed = false;      
+    } else {
+      break;
     }
-    failed = false;
-  } else {
-    break;
   }
 }
 

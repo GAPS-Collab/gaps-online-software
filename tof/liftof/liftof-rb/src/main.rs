@@ -92,12 +92,21 @@ struct Args {
   /// Behaviour can be controlled through `TofCommand` later
   #[arg(long, default_value_t = false)]
   stream_any : bool,
-  /// Readoutboard testing with internal trigger
+  /// Readoutboard testing with external trigger
   #[arg(long, default_value_t = false)]
   rb_test_ext : bool,
-  /// Readoutboard testing with softare trigger
+  /// Readoutboard testing with softare trigger, equally spaced in time
   #[arg(long, default_value_t = false)]
   rb_test_sw : bool,
+  /// Take data for voltage calibration
+  #[arg(long, default_value_t = false)]
+  vcal : bool,
+  /// Take data for timing calibration
+  #[arg(long, default_value_t = false)]
+  tcal : bool,
+  /// Take data with no inputs [NOT IMPLEMENTED YET]
+  #[arg(long, default_value_t = false)]
+  noi : bool,
   ///// CnC server IP we should be listening to
   //#[arg(long, default_value_t = "10.0.1.1")]
   //cmd_server_ip : &'static str,
@@ -127,17 +136,41 @@ fn main() {
   let dna   = get_device_dna().expect("Unable to obtain device DNA!"); 
   
   let args = Args::parse();                   
-  let mut buff_trip     = args.buff_trip;         
-  let mut n_events_run  = args.nevents;
-  let mut show_progress = args.show_progress;
-  let cache_size        = args.cache_size;
-  let run_forever       = args.run_forever;
-  let mut stream_any    = args.stream_any;
-  let mut force_trigger = args.force_trigger;
-  let force_random_trig = args.force_random_trigger;
-  let wf_analysis       = args.waveform_analysis;
-  let rb_test           = args.rb_test_ext || args.rb_test_sw;
- 
+  let mut buff_trip         = args.buff_trip;         
+  let mut n_events_run      = args.nevents;
+  let mut show_progress     = args.show_progress;
+  let cache_size            = args.cache_size;
+  let run_forever           = args.run_forever;
+  let mut stream_any        = args.stream_any;
+  let mut force_trigger     = args.force_trigger;
+  let mut force_random_trig = args.force_random_trigger;
+  let wf_analysis           = args.waveform_analysis;
+  let mut rb_test           = args.rb_test_ext || args.rb_test_sw;
+  let vcal                  = args.vcal;
+  let tcal                  = args.tcal;
+  let noi                   = args.noi;
+
+  let mut file_suffix   = String::from(".robin");
+
+  if ( vcal && tcal ) || ( vcal && noi ) || ( tcal && noi ) {
+    panic!("Can only support either of the flags --vcal --tcal --noi")
+  }
+  
+  if noi {
+    file_suffix = String::from(".noi");
+    rb_test     = true;
+  }
+  if vcal {
+    file_suffix = String::from(".vcal");
+    rb_test     = true;
+  }
+
+  if tcal {
+    file_suffix = String::from(".tcal");
+    force_random_trig = 100;
+    show_progress     = true;
+    n_events_run      = 1000;
+  }
 
   //FIMXE - this needs to become part of clap
   let cmd_server_ip = String::from("10.0.1.1");
@@ -145,7 +178,7 @@ fn main() {
   if rb_test {
     show_progress = true;
     n_events_run  = 1000;
-    buff_trip     = 200;
+    buff_trip     = 500;
     stream_any    = true;
     if args.rb_test_sw {
       force_trigger = 100;
@@ -263,7 +296,9 @@ fn main() {
   let rdb_sender_a  = bs_send.clone();
   
   workforce.execute(move || {
-    data_publisher(&tp_from_client, rb_test || force_random_trig > 0); 
+    data_publisher(&tp_from_client,
+                   rb_test || force_random_trig > 0,
+                   Some(&file_suffix)); 
   });
   let tp_to_pub_c   = tp_to_pub.clone();
   workforce.execute(move || {

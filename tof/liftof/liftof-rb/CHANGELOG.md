@@ -1,6 +1,7 @@
 v0.4.0
 * Waveform analysis possible directly on the board
   A new `--analyze` flag will take that into account
+* Simplified --vcal, --tcal, --noi flags for calibration
 
 v0.3.4
 * New feature, random self trigger mode with 

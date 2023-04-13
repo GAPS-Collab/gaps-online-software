@@ -10,10 +10,13 @@ rm -rf ../target/armv7-unknown*
 # RBs at SSL
 SSL_RB="tof-rb01 tof-rb02 tof-rb03 tof-rb04 tof-rb07 tof-rb08 tof-rb09 tof-rb11 tof-rb12 tof-rb13 tof-rb14 tof-rb15 tof-rb17 tof-rb18 tof-rb19 tof-rb20"
 
-for rb in `echo $SSL_RB`; 
-  do echo $rb;
-  scp liftof.service $rb:bin/;
-done
+#for rb in `echo $SSL_RB`; 
+#  do echo $rb;
+#  scp liftof.service $rb:bin/;
+#done
+
+compile_and_deploy_target liftof-rb tof-rb01
+
 #compile_and_deploy_target liftof-rb ucla-rb149
 #for rb in ucla-rb00 ucla-rb01 ucla-rb02 ucla-rb03 ucla-rb04 ucla-rb07 ucla-rb08 ucla-rb09 ucla-rb10;
 #for rb in tof-rb05 tof-rb06 tof-rb07 tof-rb08 tof-rb09 tof-rb10
