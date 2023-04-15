@@ -21,7 +21,7 @@ use crate::constants::{NWORDS, NCHN};
 
 use crate::serialization::{Serialization,
                            parse_u16,
-                           parse_f64,
+                           parse_f32,
                            SerializationError};
 
 /***********************************/
@@ -37,10 +37,10 @@ where P: AsRef<Path>, {
 
 #[derive(Copy, Clone, Debug)]
 pub struct ReadoutBoardCalibrations {
-  pub v_offsets : [[f64;NWORDS];NCHN], // voltage offset
-  pub v_dips    : [[f64;NWORDS];NCHN], // voltage "dip" (time-dependent correction)
-  pub v_inc     : [[f64;NWORDS];NCHN], // voltage increment (mV/ADC unit)
-  pub tbin      : [[f64;NWORDS];NCHN], // cell width (ns)
+  pub v_offsets : [[f32;NWORDS];NCHN], // voltage offset
+  pub v_dips    : [[f32;NWORDS];NCHN], // voltage "dip" (time-dependent correction)
+  pub v_inc     : [[f32;NWORDS];NCHN], // voltage increment (mV/ADC unit)
+  pub tbin      : [[f32;NWORDS];NCHN], // cell width (ns)
   pub rb_id     : u8
 }
 
@@ -49,6 +49,65 @@ impl ReadoutBoardCalibrations {
   pub const SIZE            : usize = NCHN*NWORDS*4*8 + 4 + 1; 
   pub const HEAD            : u16   = 0xAAAA; // 43690 
   pub const TAIL            : u16   = 0x5555; // 21845 
+
+  /// Apply the voltage calibration to a single channel 
+  ///
+  /// # Arguments
+  ///
+  /// * channel   : Channel id 1-9
+  /// * stop_cell : This channels stop cell 
+  /// * adc       : Uncalibrated channel data
+  /// * waveform  : Pre-allocated array to hold 
+  ///               calibrated waveform data.
+  pub fn apply_vcal_ch(&self,
+                       channel   : usize,
+                       stop_cell : usize,
+                       adc       : &[u16;NWORDS],
+                       waveform  : &mut [f32;NWORDS]) {
+    if channel > 9 || channel == 0 {
+      error!("There is no channel larger than 9 and no channel 0! Channel {channel} was requested. Can not perform voltage calibration!");
+      return;
+    }
+
+    let mut value : f32; 
+    for k in 0..NWORDS {
+      value  = adc[k] as f32;
+      value -= self.v_offsets[channel -1][(k + (stop_cell)) %NWORDS];
+      value -= self.v_dips   [channel -1][k];
+      value *= self.v_inc    [channel -1][(k + (stop_cell)) %NWORDS];
+      waveform[k] = value;
+    }
+  }
+  
+  /// Apply the timing calibration to a single channel 
+  /// 
+  /// This will allocate the array for the waveform 
+  /// time bins (unit is ns)
+  ///
+  /// # Arguments
+  ///
+  /// * channel   : Channel id 1-9
+  /// * stop_cell : This channels stop cell 
+  pub fn apply_tcal_ch(&self,
+                       channel   : usize,
+                       stop_cell : usize)
+    -> [f32;NWORDS] {
+    
+    // allocate the timing array
+    let mut times : [f32;NWORDS] = [0.0;NWORDS];
+    
+    if channel > 9 || channel == 0 {
+      error!("There is no channel larger than 9 and no channel 0! Channel {channel} was requested. Can not perform voltage calibration!");
+      return times;
+    }
+    
+
+    for k in 1..NWORDS { 
+      times[k] = times[k-1] + self.tbin[channel -1][(k-1+(stop_cell))%NWORDS];
+    }
+
+    times
+  }
 
   pub fn new(rb_id : u8) -> ReadoutBoardCalibrations {
     ReadoutBoardCalibrations {
@@ -109,13 +168,13 @@ impl Serialization for ReadoutBoardCalibrations {
     rb_cal.rb_id = board_id;
     for ch in 0..NCHN {
       for k in 0..NWORDS {
-        let mut value = parse_f64(bytestream, &mut pos);
+        let mut value = parse_f32(bytestream, &mut pos);
         rb_cal.v_offsets[ch][k] = value;
-        value = parse_f64(bytestream, &mut pos);
+        value         = parse_f32(bytestream, &mut pos);
         rb_cal.v_dips[ch][k]    = value;
-        value = parse_f64(bytestream, &mut pos);
+        value         = parse_f32(bytestream, &mut pos);
         rb_cal.v_inc[ch][k]     = value;
-        value = parse_f64(bytestream, &mut pos);
+        value         = parse_f32(bytestream, &mut pos);
         rb_cal.tbin[ch][k]      = value;
       }
     }
@@ -139,6 +198,8 @@ impl fmt::Display for ReadoutBoardCalibrations {
 }
 
 impl From<&Path> for ReadoutBoardCalibrations {
+  
+  /// Read an asci text file with calibration constants.
   fn from(path : &Path) -> ReadoutBoardCalibrations {
     let mut rb_cal = ReadoutBoardCalibrations::new(0);
     rb_cal.get_id_from_filename(&path);
@@ -164,7 +225,7 @@ impl From<&Path> for ReadoutBoardCalibrations {
                 for n in 0..NWORDS {
                   // this will throw an error if calibration data 
                   // is not following conventioss
-                  let data : f64 = values[n].parse::<f64>().unwrap();
+                  let data : f32 = values[n].parse::<f32>().unwrap();
                   rb_cal.v_offsets[cnt][n] = data;
                   //cals[cnt].v_offsets[n] = data;
                 }
@@ -175,7 +236,7 @@ impl From<&Path> for ReadoutBoardCalibrations {
                 for n in 0..NWORDS {
                   // this will throw an error if calibration data 
                   // is not following conventioss
-                  let data : f64 = values[n].parse::<f64>().unwrap();
+                  let data : f32 = values[n].parse::<f32>().unwrap();
                   rb_cal.v_dips[cnt][n] = data;
                   //cals[cnt].v_dips[n] = data;
                 }
@@ -186,7 +247,7 @@ impl From<&Path> for ReadoutBoardCalibrations {
                 for n in 0..NWORDS {
                   // this will throw an error if calibration data 
                   // is not following conventioss
-                  let data : f64 = values[n].parse::<f64>().unwrap();
+                  let data : f32 = values[n].parse::<f32>().unwrap();
                   rb_cal.v_inc[cnt][n] = data;
                   //cals[cnt].v_inc[n] = data;
                 }
@@ -197,7 +258,7 @@ impl From<&Path> for ReadoutBoardCalibrations {
                 for n in 0..NWORDS {
                   // this will throw an error if calibration data 
                   // is not following conventioss
-                  let data : f64 = values[n].parse::<f64>().unwrap();
+                  let data : f32 = values[n].parse::<f32>().unwrap();
                   rb_cal.tbin[cnt][n] = data;
                   //cals[cnt].tbin[n] = data;
                   // reset vals & cnts

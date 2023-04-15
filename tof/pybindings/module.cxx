@@ -16,6 +16,7 @@
 #include "packets/MasterTriggerPacket.h"
 
 #include "serialization.h"
+#include "calibration.h"
 #include "blobroutines.h"
 #include "WaveGAPS.h"
 #include "TOFCommon.h"
@@ -390,8 +391,32 @@ vec_vec_f64 tbin_getter(const std::vector<Calibrations_t> cal)
     return tbins;
 }
 
+vec_f32 apply_tcal_helper(const u16 stop_cell,
+                          Calibrations_t cal) {
+  f32 times[NWORDS] = {0};
+  vec_f32 result;
+  apply_tcal(stop_cell, cal, times);
+  int n = sizeof(times) / sizeof(times[0]);
+  result = vec_f32(times, times+n);
+  return result;
+}
+
+vec_f32 apply_vcal_helper(const u16 stop_cell,
+                          Calibrations_t cal,
+                          std::vector<i16> adc) {
+  f32 waveform[NWORDS] = {0};
+
+  apply_vcal(stop_cell,
+             adc.data(),
+             cal,
+             waveform);
+  int n = sizeof(waveform) / sizeof(waveform[0]);
+  vec_f32 result = vec_f32(waveform, waveform + n);
+  return result; 
+}
+
 vec_vec_f64 voltage_calibration_helper(const BlobEvt_t &evt,
-                                                         std::vector<Calibrations_t> cal)
+                                       std::vector<Calibrations_t> cal)
 {
   vec_vec_f64 result;
   for (size_t k=0; k<NCHN; k++) {
@@ -868,6 +893,8 @@ PYBIND11_MODULE(gaps_tof, m) {
    m.def("get_nevents_from_file",    &get_nevents_from_file);
    m.def("ReadEvent",                &read_event_helper);
 
+   m.def("apply_vcal",               &apply_vcal_helper);
+   m.def("apply_tcal",               &apply_tcal_helper);
    m.def("voltage_calibration",      &voltage_calibration_helper);
    m.def("timing_calibration",       &timing_calibration_helper);
    m.def("remove_spikes",            &remove_spikes_helper);

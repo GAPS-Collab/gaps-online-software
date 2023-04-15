@@ -439,11 +439,10 @@ void encode_blobevent(const BlobEvt_t* evt, std::vector<uint8_t> &bytestream, u3
 /***********************************************/
 
 BlobEvt_t decode_blobevent(const std::vector<uint8_t> &bytestream,
-                           u32 start_pos,
-                           u32 end_pos)
+                           u32 start_pos)
 {
   BlobEvt_t event;
-  u32 dec_pos = start_pos;
+  u32 dec_pos     = start_pos;
   event.head      = decode_ushort_rev( bytestream, 0); dec_pos += 2;
   event.status    = decode_ushort_rev( bytestream, dec_pos); dec_pos += 2;
   event.len       = decode_ushort_rev( bytestream, dec_pos); dec_pos += 2;
@@ -553,8 +552,7 @@ std::vector<BlobEvt_t> get_events_from_stream(const vec_u8 &bytestream,
       if (byte == 0xaa) {
         header_found_start = false;
         event = decode_blobevent(bytestream,
-                                 pos -2,
-                                 pos -2 + BLOBEVENTSIZE + 10);
+                                 pos -2);
         nblobs++;
 	    //std::cout << "NBLOBS" << nblobs << std::endl;
         //std::cout << event.head << std::endl;
