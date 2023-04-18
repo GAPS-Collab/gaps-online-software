@@ -391,27 +391,65 @@ vec_vec_f64 tbin_getter(const std::vector<Calibrations_t> cal)
     return tbins;
 }
 
-vec_f32 apply_tcal_helper(const u16 stop_cell,
-                          Calibrations_t cal) {
+vec_vec_f32 apply_vcal_allchan_helper(u16 stop_cell,
+                                      Vec<Calibrations_t> cals,
+                                      Vec<Vec<i16>> adc) {
+  Vec<Vec<f32>> waveforms;
+  f32 waveform[NWORDS] = {0};
+  for (usize ch=0; ch<NCHN; ch++) {
+    apply_vcal(stop_cell,
+               adc[ch].data(),
+               cals[ch],
+               waveform);
+    i32 n = sizeof(waveform) / sizeof(waveform[0]);
+    waveforms.push_back(Vec<f32>(waveform, waveform + n));
+  }
+  return waveforms;
+}
+
+
+vec_vec_f32 apply_tcal_allchan_helper(u16 stop_cell,
+                                      Vec<Calibrations_t> cals){
+  vec_vec_f32 all_chan_tcal;
   f32 times[NWORDS] = {0};
-  vec_f32 result;
-  apply_tcal(stop_cell, cal, times);
-  int n = sizeof(times) / sizeof(times[0]);
-  result = vec_f32(times, times+n);
+  for (usize ch=0; ch<NCHN; ch++) {
+    apply_tcal(stop_cell, cals[ch], times);
+    i32 n = sizeof(times) / sizeof(times[0]);
+    all_chan_tcal.push_back(vec_f32(times, times+n));
+  }
+  return all_chan_tcal;
+}
+
+
+Vec<Vec<f32>> apply_tcal_helper(Vec<u16> stop_cells,
+                                Calibrations_t cal) {
+  f32 times[NWORDS] = {0};
+  Vec<Vec<f32>> result;
+  for (auto const &stop_cell : stop_cells) {  
+    apply_tcal(stop_cell, cal, times);
+    i32 n = sizeof(times) / sizeof(times[0]);
+    result.push_back(Vec<f32>(times, times+n));
+  }
   return result;
 }
 
-vec_f32 apply_vcal_helper(const u16 stop_cell,
-                          Calibrations_t cal,
-                          std::vector<i16> adc) {
-  f32 waveform[NWORDS] = {0};
 
-  apply_vcal(stop_cell,
-             adc.data(),
-             cal,
-             waveform);
-  int n = sizeof(waveform) / sizeof(waveform[0]);
-  vec_f32 result = vec_f32(waveform, waveform + n);
+
+Vec<Vec<f32>> apply_vcal_helper(Vec<u16> stop_cell,
+                                Calibrations_t cal,
+                                Vec<Vec<i16>> adc) {
+  f32 waveform[NWORDS] = {0};
+  Vec<Vec<f32>> result;
+  for (usize k=0; k<adc.size();k++) {
+    apply_vcal(stop_cell[k],
+               adc[k].data(),
+               cal,
+               waveform);
+    int n = sizeof(waveform) / sizeof(waveform[0]);
+    result.push_back(Vec<f32>(waveform, waveform + n));
+  }
+    //vec_f32 result = vec_f32(waveform, waveform + n);
+  
   return result; 
 }
 
@@ -448,26 +486,25 @@ vec_vec_f64 timing_calibration_helper(const BlobEvt_t &evt,
 
 /********************/
 
-vec_vec_f64 remove_spikes_helper(vec_vec_f64 waveforms, 
-                                 const BlobEvt_t &ev)
-{  
-   f64 wf [NCHN][NWORDS];
-   i32 spikes[NWORDS];
-   vec_vec_f64 unspiked;
-   for (size_t ch=0; ch<NCHN; ch++) {
-     unspiked.push_back({});
-     for (size_t n=0; n<NWORDS; n++) {
-       wf[ch][n] = waveforms[ch][n];
-     }
+vec_vec_f64 remove_spikes_helper(u16 stop_cell,
+                                 vec_vec_f64 waveforms) {
+ f64 wf [NCHN][NWORDS];
+ i32 spikes[NWORDS];
+ vec_vec_f64 unspiked;
+ for (size_t ch=0; ch<NCHN; ch++) {
+   unspiked.push_back({});
+   for (size_t n=0; n<NWORDS; n++) {
+     wf[ch][n] = waveforms[ch][n];
+   }
 
-   }
-   RemoveSpikes(wf, ev.stop_cell, spikes);
-   for (size_t ch=0; ch<NCHN; ch++) {
-     for (size_t n=0; n<NWORDS; n++) {
-       unspiked[ch].push_back(wf[ch][n]);
-     } 
-   }
-   return unspiked;
+ }
+ RemoveSpikes(wf, stop_cell, spikes);
+ for (size_t ch=0; ch<NCHN; ch++) {
+   for (size_t n=0; n<NWORDS; n++) {
+     unspiked[ch].push_back(wf[ch][n]);
+   } 
+ }
+ return unspiked;
 }
 
 /********************/
@@ -893,7 +930,9 @@ PYBIND11_MODULE(gaps_tof, m) {
    m.def("get_nevents_from_file",    &get_nevents_from_file);
    m.def("ReadEvent",                &read_event_helper);
 
+   m.def("apply_vcal_allchan",       &apply_vcal_allchan_helper);
    m.def("apply_vcal",               &apply_vcal_helper);
+   m.def("apply_tcal_allchan",       &apply_tcal_allchan_helper);
    m.def("apply_tcal",               &apply_tcal_helper);
    m.def("voltage_calibration",      &voltage_calibration_helper);
    m.def("timing_calibration",       &timing_calibration_helper);

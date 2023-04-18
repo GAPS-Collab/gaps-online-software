@@ -25,6 +25,9 @@ typedef float    f32;
 typedef double   f64;
 typedef std::string String;
 
+template <typename T>
+using Vec = std::vector<T>;
+
 // vectors
 typedef std::vector<u8>  vec_u8; // this is used for (de)serialization
 typedef vec_u8 bytestream;
