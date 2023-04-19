@@ -26,7 +26,7 @@ pub fn commander(rbs : &Vec<ReadoutBoard>,
                  cmd : Receiver<TofCommand>){
                  //rp_to_main : &Sender<RunParams>) {
              
-
+  info!("Initialiized");
   let ctx = zmq::Context::new();
   //let mut sockets = Vec::<zmq::Socket>::new();
 
@@ -42,25 +42,28 @@ pub fn commander(rbs : &Vec<ReadoutBoard>,
   let data_address : String = address_ip.clone() + ":" + &data_port.to_string();
   let data_socket = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
   data_socket.bind(&data_address).expect("Unable to bind to data (PUB) socket {data_adress}");
-  info!("0MQ PUB socket bound to address {data_address}");
+  println!("0MQ PUB socket bound to address {data_address}");
   //let init_run = TofCommand::DataRunStart(100000);
   //let mut payload_cmd  = init_run.to_bytestream();
   //let mut payload  = String::from("BRCT").into_bytes();
   //payload.append(&mut payload_cmd);
 
-
+  println!("Starting cmd receiver loop!");
   loop {
     // check if we get a command from the main 
     // thread
     match cmd.try_recv() {
       Err(err) => trace!("Did not receive a new command, error {err}"),
-      Ok(new_command) => { 
+      Ok(new_command) => {
+        println!("DEBUG: Received new command!");
+        info!("Received new command!");
         let mut payload  = String::from("BRCT").into_bytes();
         let mut payload_cmd = new_command.to_bytestream();
         payload.append(&mut payload_cmd);
+        println!("{:?}", payload);
         match data_socket.send(&payload,0) {
           Err(err) => error!("Can not start run! Error {err}"),
-          Ok(_)    => ()
+          Ok(_)    => println!("Start command sent!")
         }
       }
     }
