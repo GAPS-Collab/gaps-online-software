@@ -428,7 +428,20 @@ pub fn read_calibration_file(filename : &Path) -> [Calibrations; NCHN ]
 
   //let mut cal =  Calibrations {..Default::default()};
   //first we count the lines to see if the file is sane
-  let file = BufReader::new(File::open(filename).expect("Unable to open file {}"));
+  //let mut file = BufReader::new(File::new());
+  let mut file_res = File::open(filename);
+  match file_res {
+    Err(err) => {
+      error!("Can not open {}, error {err}", filename.display());
+      return cals;
+    }
+    Ok(_)    => ()
+  }
+  //let file = file_res.expect("Can not open {filename.display()}");
+  let file = BufReader::new(file_res.unwrap());
+  
+
+  //let file = BufReader::new(File::open(filename).expect("Unable to open file {}"));
   let mut cnt  = 0;
 
   for _ in file.lines() {
