@@ -23,9 +23,7 @@ use liftof_lib::{//LocalTriggerBoard,
 extern crate rand;
 
 extern crate ctrlc;
-
 extern crate zmq;
-
 extern crate tof_dataclasses;
 
 use std::{thread,
@@ -52,6 +50,7 @@ use tof_dataclasses::manifest::{LocalTriggerBoard,
                                 ReadoutBoard,
                                 get_ltbs_from_sqlite,
                                 get_rbs_from_sqlite};
+use tof_dataclasses::commands::TofCommand;
 extern crate liftof_cc;
 
 use liftof_cc::readoutboard_comm::readoutboard_communicator;
@@ -246,6 +245,7 @@ fn main() {
   let (rb_send, rb_rec) : (cbc::Sender<PaddlePacket>, cbc::Receiver<PaddlePacket>) = cbc::unbounded();
   // paddle cache <-> event builder communications
   let (id_send, id_rec) : (cbc::Sender<Option<u32>>, cbc::Receiver<Option<u32>>) = cbc::unbounded();
+  let (cmd_sender, cmd_receiver) : (cbc::Sender<TofCommand>, cbc::Receiver<TofCommand>) = cbc::unbounded();
   // prepare a thread pool. Currently we have
   // 1 thread per rb, 1 master trigger thread
   // and 1 event builder thread.
@@ -340,15 +340,23 @@ fn main() {
   // time to come up
   let one_second = time::Duration::from_millis(1000);
   thread::sleep(20*one_second);
+
   worker_threads.execute(move || {
-    commander(&rb_list);
+    commander(&rb_list,
+              cmd_receiver);
   });
   info!("All threads started!");
   let one_minute = time::Duration::from_millis(60000);
   
   //println!("==> Sleeping a bit to give the rb's a chance to fire up..");
   //thread::sleep(10*one_second);
+  
+  // start a new data run 
+  let start_run = TofCommand::DataRunStart(1000);
+  cmd_sender.send(start_run);
+  
   loop{
+
     thread::sleep(1*one_minute);
     println!("...");
   }

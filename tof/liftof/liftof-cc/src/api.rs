@@ -10,6 +10,7 @@ use local_ip_address::local_ip;
 
 use tof_dataclasses::manifest::ReadoutBoard;
 use tof_dataclasses::commands::TofCommand;
+use crossbeam_channel::Receiver;
 
 pub const DATAPORT : u32 = 42000;
 
@@ -21,7 +22,8 @@ pub const DATAPORT : u32 = 42000;
 ///
 /// * rbs 
 /// * rp_to_main
-pub fn commander(rbs : &Vec<ReadoutBoard>){
+pub fn commander(rbs : &Vec<ReadoutBoard>,
+                 cmd : Receiver<TofCommand>){
                  //rp_to_main : &Sender<RunParams>) {
              
 
@@ -41,14 +43,27 @@ pub fn commander(rbs : &Vec<ReadoutBoard>){
   let data_socket = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
   data_socket.bind(&data_address).expect("Unable to bind to data (PUB) socket {data_adress}");
   info!("0MQ PUB socket bound to address {data_address}");
-  let init_run = TofCommand::DataRunStart(100000);
-  let mut payload_cmd  = init_run.to_bytestream();
-  let mut payload  = String::from("BRCT").into_bytes();
-  payload.append(&mut payload_cmd);
+  //let init_run = TofCommand::DataRunStart(100000);
+  //let mut payload_cmd  = init_run.to_bytestream();
+  //let mut payload  = String::from("BRCT").into_bytes();
+  //payload.append(&mut payload_cmd);
 
-  match data_socket.send(&payload,0) {
-    Err(err) => error!("Can not start run! Error {err}"),
-    Ok(_)    => ()
+
+  loop {
+    // check if we get a command from the main 
+    // thread
+    match cmd.try_recv() {
+      Err(err) => trace!("Did not receive a new command, error {err}"),
+      Ok(new_command) => { 
+        let mut payload  = String::from("BRCT").into_bytes();
+        let mut payload_cmd = new_command.to_bytestream();
+        payload.append(&mut payload_cmd);
+        match data_socket.send(&payload,0) {
+          Err(err) => error!("Can not start run! Error {err}"),
+          Ok(_)    => ()
+        }
+      }
+    }
   }
   //for rb in rbs.iter() {
   //  let sock = ctx.socket(zmq::REQ).expect("Unable to create socket!");

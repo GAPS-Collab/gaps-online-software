@@ -190,6 +190,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
       Err(err) => error!("Problem receiving command over 0MQ ! Err {err}"),
       Ok(cmd_bytes)  => {
         info!("Received bytes {}", cmd_bytes.len());
+        // we have to strip off the topic
         match TofCommand::from_bytestream(&cmd_bytes,4) {
           Err(err) => error!("Problem decoding command {}", err),
           Ok(cmd)  => {
@@ -210,25 +211,25 @@ pub fn cmd_responder(cmd_server_ip             : String,
               
               }
               TofCommand::PowerOn   (mask) => {
-                warn!("Not implemented");
+                error!("Not implemented");
                 match cmd_socket.send(resp_not_implemented,0) {
-                  Err(err) => warn!("Can not send response! Err {err}"),
+                  Err(err) => error!("Can not send response! Err {err}"),
                   Ok(_)    => trace!("Resp sent!")
                 }
                 continue;
               },
               TofCommand::PowerOff  (mask) => {
-                warn!("Not implemented");
+                error!("Not implemented");
                 match cmd_socket.send(resp_not_implemented,0) {
-                  Err(err) => warn!("Can not send response! {err}"),
+                  Err(err) => error!("Can not send response! {err}"),
                   Ok(_)    => trace!("Resp sent!")
                 }
                 continue;
               },
               TofCommand::PowerCycle(mask) => {
-                warn!("Not implemented");
+                error!("Not implemented");
                 match cmd_socket.send(resp_not_implemented,0) {
-                  Err(err) => warn!("Can not send response! {err}"),
+                  Err(err) => error!("Can not send response! {err}"),
                   Ok(_)    => trace!("Resp sent!")
                 }
                 continue;
@@ -312,7 +313,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
                   nseconds  : 0,
                 };
                 match run_pars.send(run_p) {
-                  Err(err) => warn!("Problem initializing run!"),
+                  Err(err) => error!("Error initializing run! {er}"),
                   Ok(_)    => ()
                 }
               }, 
@@ -324,7 +325,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
                   nseconds : 0,
                 };
                 match run_pars.send(run_p) {
-                  Err(err) => warn!("Problem ending run!"),
+                  Err(err) => error!("Error stopping run! {err}"),
                   Ok(_)    => ()
                 }
                 // send response later 
