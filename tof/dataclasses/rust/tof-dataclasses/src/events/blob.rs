@@ -835,7 +835,7 @@ impl BlobData {
   
   pub fn set_ped_begin(&mut self, time : f64, ch : usize) {
       match self.time_2_bin(time, ch) {
-          Err(err) => println!("Can not find bin for time {}, ch {}, err {:?}", time, ch, err),
+          Err(err)  => error!("Can not find bin for time {}, ch {}, err {:?}", time, ch, err),
           Ok(begin) => {self.ped_begin_bin[ch] = begin;}
       }
   }
@@ -844,7 +844,7 @@ impl BlobData {
     // This is a little convoluted, but we must convert the range (in
     // ns) into bins
     match self.time_2_bin(self.nanoseconds[ch][self.ped_begin_bin[ch]] + range, ch) {
-        Err(err)      => println!("Can not set pedestal range for range {} for ch {}, err {:?}", range, ch, err),
+        Err(err)      => error!("Can not set pedestal range for range {} for ch {}, err {:?}", range, ch, err),
         Ok(bin_range) => {self.ped_bin_range[ch] = bin_range;}
     }
   }
@@ -878,7 +878,7 @@ impl BlobData {
         return Ok(n-1);
       }
     }
-    println!("Did not find a bin corresponding to the given time {} for ch {}", t_ns, ch);
+    error!("Did not find a bin corresponding to the given time {} for ch {}", t_ns, ch);
     return Err(WaveformError::TimesTooSmall);
   }
 
@@ -1020,10 +1020,10 @@ impl BlobData {
   pub fn find_peaks(&mut self,
                     start_time  : f64,
                     window_size : f64,
-                    ch          : usize) {
+                    ch          : usize) -> Result<(), WaveformError> {
     // FIXME - replace unwrap calls
-    let start_bin  = self.time_2_bin(start_time, ch).unwrap();
-    let window_bin = self.time_2_bin(start_time + window_size, ch).unwrap() - start_bin;
+    let start_bin  = self.time_2_bin(start_time, ch)?;
+    let window_bin = self.time_2_bin(start_time + window_size, ch)? - start_bin;
     // minimum number of bins a peak must have
     // over threshold so that we consider it 
     // a peak
@@ -1090,6 +1090,7 @@ impl BlobData {
           trace!("Reset the last peak (={}) to  {}..{}", peak_ctr, self.begin_peak[ch][peak_ctr], self.end_peak[ch][peak_ctr] );
     }
     //peaks_found = 1;
+    Ok(())
   }
 
   pub fn integrate(&mut self, lower_bound : f64, size : f64, channel : usize) ->Result<f64, WaveformError>  {
