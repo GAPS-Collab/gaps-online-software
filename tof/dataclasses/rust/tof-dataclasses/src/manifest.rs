@@ -618,6 +618,10 @@ impl ReadoutBoard {
 
 
   pub fn get_paddle_end_id_for_rb_channel(&self,channel : usize) -> u16 {
+    if channel > 9 || channel == 0 {
+      error!("Got invalid channel value! Returning rubbish");
+      return 0;
+    } 
     return self.channel_to_paddle_end_id[channel -1]
   }
 }
