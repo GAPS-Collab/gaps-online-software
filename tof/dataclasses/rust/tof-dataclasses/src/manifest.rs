@@ -540,6 +540,11 @@ impl ReadoutBoard {
     }
   }
 
+  pub fn infer_ip_address(&mut self) {
+    let address = 100 + self.rb_id;
+    self.ip_address = Ipv4Addr::new(10,0,1,address);
+  }
+
   pub fn get_triggered_pids(&self) -> Vec<u8> {
     let mut pids = Vec::<u8>::new();
     for k in 0..8 {
