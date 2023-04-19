@@ -321,7 +321,7 @@ fn main() {
   for n in 0..nboards {
     let this_rb_pp_sender = rb_send.clone();
     let mut this_rb = rb_list[n].clone();
-    this_rb.infer_ip();
+    this_rb.infer_ip_address();
     println!("==> Starting RB thread for {:?}", this_rb);
     let resp_sender_c = resp_sender.clone();
     let this_path = storage_savepath.clone();
