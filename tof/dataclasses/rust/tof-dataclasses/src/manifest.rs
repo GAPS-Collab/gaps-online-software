@@ -591,6 +591,10 @@ impl ReadoutBoard {
   ///
   /// * channel 1-8
   pub fn get_pid_for_ch(&self, channel : usize) -> u8 {
+    if channel > 9 || channel == 0 {
+      error!("Got invalid channel value! Returning rubbish");
+      return 0;
+    }
     let p_end_id = self.channel_to_paddle_end_id[channel -1];
     if p_end_id % 2000 > 0 {
       return (p_end_id - 2000) as u8;
