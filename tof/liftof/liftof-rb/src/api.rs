@@ -141,38 +141,74 @@ pub fn cmd_responder(cmd_server_ip             : String,
   let ctx = zmq::Context::new();
   let cmd_socket = ctx.socket(zmq::SUB).expect("Unable to create 0MQ SUB socket!");
   info!("Will set up 0MQ SUB socket to listen for commands at address {cmd_address}");
-  cmd_socket.connect(&cmd_address).expect("Unable to bind to command socket at {cmd_address}!");
+  let mut is_connected = false;
+  match cmd_socket.connect(&cmd_address) {
+    Err(err) => warn!("Not able to connect to {}, Error {err}", cmd_address),
+    Ok(_)    => {
+      info!("Connected to CnC server at {}", cmd_address);
+      is_connected = true;
+    }
+  }
+  if is_connected {
+    //cmd_socket.set_subscribe(&my_topic.as_bytes());
+    match cmd_socket.set_subscribe(&topic_broadcast.as_bytes()) {
+      Err(err) => error!("Can not subscribe to {topic_broadcast}, err {err}"),
+      Ok(_)    => ()
+    }
+    match cmd_socket.set_subscribe(&topic_board.as_bytes()) {
+      Err(err) => error!("Can not subscribe to {topic_board}, err {err}"),
+      Ok(_)    => ()
+    }
+  }
+  
   //let my_topic = String::from("");
   //.as_bytes();
   //cmd_socket.set_subscribe(&my_topic.as_bytes());
-  match cmd_socket.set_subscribe(&topic_broadcast.as_bytes()) {
-    Err(err) => error!("Unable to subscribe to {topic_broadcast}, error {err}"),
-    Ok(_) => ()
-  }
-  match cmd_socket.set_subscribe(&topic_board.as_bytes()) {
-    Err(err) => error!("Unable to subscribe to {topic_board}, error {err}"),
-    Ok(_) => ()
-  }
+  
+  //match cmd_socket.set_subscribe(&topic_broadcast.as_bytes()) {
+  //  Err(err) => error!("Unable to subscribe to {topic_broadcast}, error {err}"),
+  //  Ok(_) => ()
+  //}
+  //match cmd_socket.set_subscribe(&topic_board.as_bytes()) {
+  //  Err(err) => error!("Unable to subscribe to {topic_board}, error {err}"),
+  //  Ok(_) => ()
+  //}
   let mut heartbeat     = Instant::now();
 
   error!("TODO: Heartbeat feature not yet implemented on C&C side");
   let heartbeat_received = false;
   loop {
     if !heartbeat_received {
+      trace!("No heartbeat since {}", heartbeat.elapsed().as_secs());
       if heartbeat.elapsed().as_secs() > heartbeat_timeout_seconds as u64 {
         warn!("No heartbeat received since {heartbeat_timeout_seconds}. Attempting to reconnect!");
-        cmd_socket.connect(&cmd_address).expect("Unable to bind to command socket at {cmd_address}!");
-        //cmd_socket.set_subscribe(&my_topic.as_bytes());
-        match cmd_socket.set_subscribe(&topic_broadcast.as_bytes()) {
-          Err(err) => error!("Can not subscribe to {topic_broadcast}, err {err}"),
-          Ok(_)    => ()
+        match cmd_socket.connect(&cmd_address) {
+          Err(err) => {
+            warn!("Not able to connect to {}, Error {err}", cmd_address);
+            is_connected = false;
+          }
+          Ok(_)    => {
+            info!("Connected to CnC server at {}", cmd_address);
+            is_connected = true;
+          }
         }
-        match cmd_socket.set_subscribe(&topic_board.as_bytes()) {
-          Err(err) => error!("Can not subscribe to {topic_board}, err {err}"),
-          Ok(_)    => ()
+        if is_connected {
+          //cmd_socket.set_subscribe(&my_topic.as_bytes());
+          match cmd_socket.set_subscribe(&topic_broadcast.as_bytes()) {
+            Err(err) => error!("Can not subscribe to {topic_broadcast}, err {err}"),
+            Ok(_)    => ()
+          }
+          match cmd_socket.set_subscribe(&topic_board.as_bytes()) {
+            Err(err) => error!("Can not subscribe to {topic_board}, err {err}"),
+            Ok(_)    => ()
+          }
         }
         heartbeat = Instant::now();
       }
+    }
+
+    if !is_connected {
+      continue;
     }
 
     //match cmd_socket.poll(zmq::POLLIN, 1) {
@@ -186,8 +222,8 @@ pub fn cmd_responder(cmd_server_ip             : String,
     //    if in_waiting == 0 {
     //        continue;
     //    }
-    match cmd_socket.recv_bytes(0) {
-      Err(err) => error!("Problem receiving command over 0MQ ! Err {err}"),
+    match cmd_socket.recv_bytes(zmq::DONTWAIT) {
+      Err(err) => trace!("Problem receiving command over 0MQ ! Err {err}"),
       Ok(cmd_bytes)  => {
         info!("Received bytes {}", cmd_bytes.len());
         // we have to strip off the topic
@@ -313,11 +349,17 @@ pub fn cmd_responder(cmd_server_ip             : String,
                   nseconds  : 0,
                 };
                 match run_pars.send(run_p) {
-                  Err(err) => error!("Error initializing run! {er}"),
+                  Err(err) => error!("Error initializing run! {err}"),
                   Ok(_)    => ()
+                };
+                let resp_good = TofResponse::Success(RESP_SUCC_FINGERS_CROSSED);
+                match cmd_socket.send(resp_good.to_bytestream(),0) {
+                  Err(err) => warn!("Can not send response!"),
+                  Ok(_)    => trace!("Resp sent!")
                 }
-              }, 
+              },
               TofCommand::DataRunEnd(_)   => {
+                println!("Received command to end run!");
                 let run_p = RunParams {
                   forever   : false,
                   nevents   : 0,
@@ -841,159 +883,159 @@ pub fn runner(run_params          : &Receiver<RunParams>,
   let mut which_buff : RamBuffer;
   let mut buff_size  : usize;
   loop {
-    if !is_running {
-      match run_params.try_recv() {
-        Err(err) => {
-          trace!("Did not receive new RunParams! Err {err}");
-          thread::sleep(one_sec);
-          continue;
-        }
-        Ok(p) => {
-          info!("Received a new set of RunParams! {:?}", p);
-          pars = p;
-          if pars.is_active {
-            info!("Will start a new run!");
-            info!("Initializing board, starting up...");
-            if latch_to_mtb {
-              match set_master_trigger_mode() {
-                Err(err) => error!("Can not initialize master trigger mode, Err {err}"),
-                Ok(_)    => info!("Latching to MasterTrigger")
-              }
-            } else {
-              match disable_master_trigger_mode() {
-                Err(err) => error!("Can not disable master trigger mode, Err {err}"),
-                Ok(_)    => info!("Master trigger mode didsabled!")
-              }
+    match run_params.try_recv() {
+      Err(err) => {
+        trace!("Did not receive new RunParams! Err {err}");
+        thread::sleep(one_sec);
+        //continue;
+      }
+      Ok(p) => {
+        info!("Received a new set of RunParams! {:?}", p);
+        pars = p;
+        if pars.is_active {
+          info!("Will start a new run!");
+          info!("Initializing board, starting up...");
+          if latch_to_mtb {
+            match set_master_trigger_mode() {
+              Err(err) => error!("Can not initialize master trigger mode, Err {err}"),
+              Ok(_)    => info!("Latching to MasterTrigger")
             }
-            if force_trigger {
-              match enable_trigger() {
-                Err(err) => error!("Can not enable triggers! Err {err}"),
-                Ok(_)    => info!("Triggers enabled - Run start!")
-              }
-            } else {
-              match enable_trigger() {
-                Err(err) => error!("Can not enable triggers! Err {err}"),
-                Ok(_)    => info!("Triggers enabled - Run start!")
-              }
-              thread::sleep(one_sec);
-              match get_trigger_rate() {
-                Err(err) => error!("Unable to obtain trigger rate! Err {err}"),
-                Ok(rate) => info!("Seing MTB trigger rate of {rate} Hz")
-              }
-            }
-            is_running = true;
-            if show_progress {
-              if pars.forever {
-                template_bar_env = "[{elapsed_precise}] {prefix} {msg} {spinner} ";
-              } else {
-                template_bar_env = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.red/grey} {pos:>7}/{len:7}";
-              }
-              sty_ev = ProgressStyle::with_template(template_bar_env)
-              .unwrap();
-              multi_prog = MultiProgress::new();
-              prog_a  = multi_prog
-                        .add(ProgressBar::new(uio1_total_size as u64)); 
-              prog_b  = multi_prog
-                        .insert_after(&prog_a, ProgressBar::new(uio2_total_size as u64)); 
-              prog_ev = multi_prog
-                            .insert_after(&prog_b, ProgressBar::new(pars.nevents as u64)); 
-              prog_a.set_message (label_a.clone());
-              prog_a.set_prefix  ("\u{1F4BE}");
-              prog_a.set_style   (sty_a.clone());
-              prog_b.set_message (label_b.clone());
-              prog_b.set_prefix  ("\u{1F4BE}");
-              prog_b.set_style   (sty_b.clone());
-              prog_ev.set_style  (sty_ev.clone());
-              prog_ev.set_prefix ("\u{2728}");
-              prog_ev.set_message("EVENTS");
-            }
-            continue; // start loop again
           } else {
-            info!("Got signal to end stop run");
-            is_running = false;
-            match disable_trigger() {
-              Err(err) => error!("Can not disable triggers, error {err}"),
-              Ok(_)    => ()
+            match disable_master_trigger_mode() {
+              Err(err) => error!("Can not disable master trigger mode, Err {err}"),
+              Ok(_)    => info!("Master trigger mode didsabled!")
             }
-            if show_progress {
-              prog_ev.finish();
-              prog_a.finish();
-              prog_b.finish();
+          }
+          if force_trigger {
+            match enable_trigger() {
+              Err(err) => error!("Can not enable triggers! Err {err}"),
+              Ok(_)    => info!("Triggers enabled - Run start!")
             }
+          } else {
+            match enable_trigger() {
+              Err(err) => error!("Can not enable triggers! Err {err}"),
+              Ok(_)    => info!("Triggers enabled - Run start!")
+            }
+            thread::sleep(one_sec);
+            match get_trigger_rate() {
+              Err(err) => error!("Unable to obtain trigger rate! Err {err}"),
+              Ok(rate) => info!("Seing MTB trigger rate of {rate} Hz")
+            }
+          }
+          is_running = true;
+          if show_progress {
+            if pars.forever {
+              template_bar_env = "[{elapsed_precise}] {prefix} {msg} {spinner} ";
+            } else {
+              template_bar_env = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.red/grey} {pos:>7}/{len:7}";
+            }
+            sty_ev = ProgressStyle::with_template(template_bar_env)
+            .unwrap();
+            multi_prog = MultiProgress::new();
+            prog_a  = multi_prog
+                      .add(ProgressBar::new(uio1_total_size as u64)); 
+            prog_b  = multi_prog
+                      .insert_after(&prog_a, ProgressBar::new(uio2_total_size as u64)); 
+            prog_ev = multi_prog
+                          .insert_after(&prog_b, ProgressBar::new(pars.nevents as u64)); 
+            prog_a.set_message (label_a.clone());
+            prog_a.set_prefix  ("\u{1F4BE}");
+            prog_a.set_style   (sty_a.clone());
+            prog_b.set_message (label_b.clone());
+            prog_b.set_prefix  ("\u{1F4BE}");
+            prog_b.set_style   (sty_b.clone());
+            prog_ev.set_style  (sty_ev.clone());
+            prog_ev.set_prefix ("\u{2728}");
+            prog_ev.set_message("EVENTS");
+          }
+          continue; // start loop again
+        } else {
+          info!("Got signal to stop run");
+          is_running = false;
+          match disable_trigger() {
+            Err(err) => error!("Can not disable triggers, error {err}"),
+            Ok(_)    => ()
+          }
+          if show_progress {
+            prog_ev.finish();
+            prog_a.finish();
+            prog_b.finish();
           }
         }
       }
-    } // this is the !is_running branch
+    } // end run_params.try_recv()
 
-    if force_trigger {
-      //println!("Forcing trigger!");
-      //println!("Time between events {}", time_between_events.unwrap());
-      let elapsed = timer.elapsed().as_secs_f32();
-      //println!("Elapsed {}", elapsed);
-      if elapsed > time_between_events.unwrap() {
-        timer = Instant::now(); 
-        match trigger() {
-          Err(err) => error!("Error when triggering! {err}"),
-          Ok(_)    => ()//println!("Firing trigger!")
-        }
-      } else {
-        // FIXME - we could sleep here for a bit!
-        continue;
-      }
-    }    
-
-    // calculate current event count
-    if !force_trigger {
-      match get_event_count() {
-        Err (err) => {
-          error!("Can not obtain event count! Err {:?}", err);
+    if is_running {
+      if force_trigger {
+        //println!("Forcing trigger!");
+        //println!("Time between events {}", time_between_events.unwrap());
+        let elapsed = timer.elapsed().as_secs_f32();
+        //println!("Elapsed {}", elapsed);
+        if elapsed > time_between_events.unwrap() {
+          timer = Instant::now(); 
+          match trigger() {
+            Err(err) => error!("Error when triggering! {err}"),
+            Ok(_)    => ()//println!("Firing trigger!")
+          }
+        } else {
+          // FIXME - we could sleep here for a bit!
           continue;
         }
-        Ok (cnt) => {
-          evt_cnt = cnt;
-          if first_iter {
-            last_evt_cnt = evt_cnt;
-            first_iter = false;
+      }    
+
+      // calculate current event count
+      if !force_trigger {
+        match get_event_count() {
+          Err (err) => {
+            error!("Can not obtain event count! Err {:?}", err);
             continue;
           }
-          if evt_cnt == last_evt_cnt {
-            thread::sleep(one_milli);
-            trace!("We didn't get an updated event count!");
-            continue;
-          }
-        } // end ok
-      } // end match
-    } // end force trigger
+          Ok (cnt) => {
+            evt_cnt = cnt;
+            if first_iter {
+              last_evt_cnt = evt_cnt;
+              first_iter = false;
+              continue;
+            }
+            if evt_cnt == last_evt_cnt {
+              thread::sleep(one_milli);
+              trace!("We didn't get an updated event count!");
+              continue;
+            }
+          } // end ok
+        } // end match
+      } // end force trigger
 
-    // AT THIS POINT WE KNOW WE HAVE SEEN SOMETHING!!!
-    // THIS IS IMPORTANT
+      // AT THIS POINT WE KNOW WE HAVE SEEN SOMETHING!!!
+      // THIS IS IMPORTANT
 
-    match ram_buffer_handler(buffer_trip,
-                             &bs_sender) { 
-      Err(err)   => {
-        error!("Can not deal with RAM buffers {err}");
-        continue;
+      match ram_buffer_handler(buffer_trip,
+                               &bs_sender) { 
+        Err(err)   => {
+          error!("Can not deal with RAM buffers {err}");
+          continue;
+        }
+        Ok(result) => {
+          which_buff = result.0;
+          buff_size  = result.1;
+        }
       }
-      Ok(result) => {
-        which_buff = result.0;
-        buff_size  = result.1;
+      if force_trigger {
+          n_events += 1;
+      } else {
+        delta_events = (evt_cnt - last_evt_cnt) as u64;
+        n_events    += delta_events;
+        last_evt_cnt = evt_cnt;
       }
-    }
-    if force_trigger {
-        n_events += 1;
-    } else {
-      delta_events = (evt_cnt - last_evt_cnt) as u64;
-      n_events    += delta_events;
-      last_evt_cnt = evt_cnt;
-    }
-    if show_progress {
-      match which_buff {
-        RamBuffer::A => prog_a.set_position(buff_size as u64),
-        RamBuffer::B => prog_b.set_position(buff_size as u64),
+      if show_progress {
+        match which_buff {
+          RamBuffer::A => prog_a.set_position(buff_size as u64),
+          RamBuffer::B => prog_b.set_position(buff_size as u64),
+        }
+        prog_ev.set_position(n_events);
       }
-      prog_ev.set_position(n_events);
-    }
 
+    } // end is_running
     if !pars.forever {
       if pars.nevents != 0 {
         if n_events > pars.nevents as u64{
