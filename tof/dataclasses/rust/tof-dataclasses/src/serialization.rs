@@ -46,6 +46,13 @@ pub fn parse_f64(bs : &Vec::<u8>, pos : &mut usize) -> f64 {
   value
 }
 
+pub fn parse_bool(bs : &Vec::<u8>, pos : &mut usize) -> bool {
+  let value = u8::from_le_bytes([bs[*pos]]); 
+  *pos += 1;
+  value > 0
+}
+
+
 
 /// En/Decode to a bytestream, that is `Vec<u8>`
 pub trait Serialization {

@@ -173,6 +173,7 @@ impl Default for TofPacketWriter {
 }
 
 /// Meta information for a data run
+#[deprecated(since="0.2.0", note="please use `tof_dataclasses::RunConfig` instead")]
 #[derive(Debug, Copy, Clone)]
 pub struct RunParams {
   pub forever   : bool,
