@@ -7,7 +7,7 @@
 use std::fmt;
 use std::str::FromStr;
 use std::net::Ipv4Addr;
-
+use std::path::Path;
 
 extern crate sqlite;
 
@@ -73,8 +73,8 @@ impl fmt::Display for LocalTriggerBoard {
   }
 }
 
-pub fn get_rbs_from_sqlite() -> Vec<ReadoutBoard> {
-  let connection = sqlite::open("/srv/gaps/gaps-online-software/gaps-db/gaps_db/db.sqlite3").unwrap();
+pub fn get_rbs_from_sqlite(filename : &Path) -> Vec<ReadoutBoard> {
+  let connection = sqlite::open(filename).unwrap();
   let query = "SELECT * FROM tof_db_rb";
   let mut rbs  = Vec::<ReadoutBoard>::new();
   connection
@@ -113,8 +113,8 @@ pub fn get_rbs_from_sqlite() -> Vec<ReadoutBoard> {
 
 
 
-pub fn get_ltbs_from_sqlite() -> Vec<LocalTriggerBoard> {
-  let connection = sqlite::open("/srv/gaps/gaps-online-software/gaps-db/gaps_db/db.sqlite3").unwrap();
+pub fn get_ltbs_from_sqlite(filename : &Path) -> Vec<LocalTriggerBoard> {
+  let connection = sqlite::open(filename).unwrap();
   let query = "SELECT * FROM tof_db_ltb";
   let mut ltbs  = Vec::<LocalTriggerBoard>::new();
   connection

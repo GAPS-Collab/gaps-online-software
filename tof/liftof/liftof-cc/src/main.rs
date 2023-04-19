@@ -16,8 +16,6 @@ use liftof_lib::{//LocalTriggerBoard,
                  //ReadoutBoard,
                  master_trigger,
                  get_tof_manifest};
-                 //rb_manifest_from_json,
-                 //get_rb_manifest};
 
 #[cfg(feature="random")]
 extern crate rand;
@@ -28,6 +26,8 @@ extern crate tof_dataclasses;
 
 use std::{thread,
           time};
+
+use std::path::Path;
 
 use clap::{arg,
            command,
@@ -129,7 +129,7 @@ fn main() {
   // Have all the readoutboard related information in this list
   let rb_list      : Vec::<ReadoutBoard>;
   let mut manifest = (Vec::<LocalTriggerBoard>::new(), Vec::<ReadoutBoard>::new());
-  let ltb_list = get_ltbs_from_sqlite();
+
   match args.json_config {
     None => panic!("No .json config file provided! Please provide a config file with --json-config or -j flag!"),
     Some(_) => {
@@ -155,14 +155,6 @@ fn main() {
     } // end Some
   } // end match
  
-  //if autodiscover_rbs {
-  //  println!("==> Autodiscovering ReadoutBoards!...");
-  //  rb_list = get_rb_manifest();
-  //  nboards = rb_list.len();
-  //}
-  //for rb in rb_list.iter() {
-  //  println!("{}", rb);
-  //}
 
   if use_master_trigger {
    master_trigger_ip   = config["master_trigger"]["ip"].as_str().unwrap().to_owned();
@@ -172,6 +164,8 @@ fn main() {
 
   let storage_savepath = config["raw_storage_savepath"].as_str().unwrap().to_owned();
   let events_per_file  = config["events_per_file"].as_usize().unwrap(); 
+  let db_path          = Path::new(config["db_path"].as_str().unwrap());
+  let ltb_list = get_ltbs_from_sqlite(db_path);
   //let matches = command!() // requires `cargo` feature
   //     //.arg(arg!([name] "Optional name to operate on"))
   //     .arg(
