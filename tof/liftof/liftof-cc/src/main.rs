@@ -269,7 +269,7 @@ fn main() {
   // runtime, but it should be possible to 
   // respawn them
   //let mut nthreads = nboards + 2; // 
-  let mut nthreads = 20;
+  let mut nthreads = 40;
   if use_master_trigger { 
     nthreads += 1;
   }

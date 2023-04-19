@@ -495,7 +495,7 @@ pub fn get_rb_manifest() -> Vec<ReadoutBoard> {
         let rb_ip = mac_table.get(&mac);
         println!("Found ip address {:?}", rb_ip);
         match rb_ip {
-          None => println!("Can not resolve RBBoard with MAC address {:?}, it is not in the system's ARP tables", mac),
+          None => println!("Can not resolve RBBoard with MAC address {:?}, supposedly at ip {rb_ip:?}, it is not in the system's ARP tables", mac),
           Some(ip)   => match ip[0] {
             IpAddr::V6(a) => panic!("IPV6 {a} not suppported!"),
             IpAddr::V4(a) => {
@@ -721,7 +721,7 @@ impl ReadoutBoard {
     let rb_ip = mac_table.get(&self.mac_address.unwrap());
     info!("Found ip address {:?} for RB {}", rb_ip, self.id.unwrap_or(0));
     match rb_ip {
-      None => panic!("Can not resolve RBBoard with MAC address {:?}, it is not in the system's ARP tables", &self.mac_address),
+      None => panic!("Can not resolve RBBoard with MAC address {:?}, supposedly at {rb_ip:?} it is not in the system's ARP tables", &self.mac_address),
       Some(ip)   => match ip[0] {
         IpAddr::V6(a) => panic!("IPV6 {a} not suppported!"),
         IpAddr::V4(a) => {
