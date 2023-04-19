@@ -323,7 +323,7 @@ fn main() {
     let this_rb_pp_sender = rb_send.clone();
     let mut this_rb = rb_list[n].clone();
     this_rb.infer_ip_address();
-    this_rb.calib_file = calib_file_path.clone() + "/" + "RB";
+    this_rb.calib_file = calib_file_path.clone() + "/" + "rb";
     if this_rb.rb_id < 10 {
       this_rb.calib_file += "0";
     }

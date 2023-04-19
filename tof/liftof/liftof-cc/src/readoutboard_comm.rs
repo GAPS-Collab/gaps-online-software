@@ -137,7 +137,6 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
         error!("Receiving from socket raised error {}", err);
       }
       Ok(buffer) => {
-        println!("We got data of size {}", buffer.len());
         //trace!("Working...");
         //// check for rb ping signal
         //let rb_ping = identifiy_readoutboard(&msg);
