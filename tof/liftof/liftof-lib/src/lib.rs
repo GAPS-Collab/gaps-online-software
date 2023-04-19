@@ -307,7 +307,7 @@ pub fn analyze_blobs(buffer               : &Vec<u8>,
   
   // either all or only the triggered paddle ids
   let mut all_pids = readoutboard.get_all_pids();
-  all_pids         = readoutboard.get_triggered_pids();
+  //all_pids         = readoutboard.get_triggered_pids();
   let mut paddles = HashMap::<u8, PaddlePacket>::new();
   for k in all_pids.iter() {
     match paddles.insert(*k, PaddlePacket::new()) {
@@ -414,7 +414,7 @@ pub fn analyze_blobs(buffer               : &Vec<u8>,
               let mut spikes : [i32;10] = [0;10];
               blob_data.calibrate(calibrations);
               blob_data.remove_spikes(&mut spikes);
-              for ch in 0..NCHN {
+              for ch in 0..8 {
 
                 // reset our channels_over_threshold
                 channels_over_threshold[ch] = false;
@@ -440,8 +440,8 @@ pub fn analyze_blobs(buffer               : &Vec<u8>,
                 // analysis
                 let cfd_time = blob_data.find_cfd_simple(0, ch);
                 let charge = blob_data.integrate(270.0, 70.0, ch).unwrap_or(42.0);
-                let pid = readoutboard.get_pid_for_ch(ch );
-                let end = readoutboard.get_paddle_end(ch);
+                let pid = readoutboard.get_pid_for_ch(ch + 1 );
+                let end = readoutboard.get_paddle_end(ch + 1 );
                 match end {
                   // unwraps can't fail due to construction of paddles
                   mf::PaddleEndIdentifier::A => {
