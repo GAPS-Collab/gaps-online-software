@@ -160,6 +160,7 @@ fn main() {
 
   let storage_savepath = config["raw_storage_savepath"].as_str().unwrap().to_owned();
   let events_per_file  = config["events_per_file"].as_usize().unwrap(); 
+  let calib_file_path  = config["calibration_file_path"].as_str().unwrap().to_owned();
   let db_path          = Path::new(config["db_path"].as_str().unwrap());
   let db_path_c        = db_path.clone();
   let ltb_list = get_ltbs_from_sqlite(db_path);
@@ -322,6 +323,12 @@ fn main() {
     let this_rb_pp_sender = rb_send.clone();
     let mut this_rb = rb_list[n].clone();
     this_rb.infer_ip_address();
+    this_rb.calib_file = calib_file_path.clone() + "/" + "RB";
+    if this_rb.rb_id < 10 {
+      this_rb.calib_file += "0";
+    }
+    this_rb.calib_file += &(this_rb.rb_id).to_string();
+    this_rb.calib_file += "_cal.txt";
     println!("==> Starting RB thread for {:?}", this_rb);
     let resp_sender_c = resp_sender.clone();
     let this_path = storage_savepath.clone();
