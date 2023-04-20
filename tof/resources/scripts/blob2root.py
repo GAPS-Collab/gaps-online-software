@@ -8,6 +8,7 @@ import pathlib as pl
 import sys
 import uproot as up
 import tqdm
+import numpy as np
 from collections import defaultdict
 
 from copy import deepcopy as copy
@@ -121,13 +122,21 @@ if __name__ == '__main__':
     #foo = gt.apply_vcal(1, cal[0], data['adc_ch1'])
     #del vcal
     #del tcal
-    for k in data:
-        print (k, len(data[k]))
+    #for k in data:
+    #    print (k, len(data[k]))
 
     console.print(f'==> Extracted the following fields:')
     for k in data.keys():
         console.print(f'-- -- {k} : {len(data[k])} events')
+        if k.startswith('v') or k.startswith('t'):
+            dtype = np.float32
+        else:
+            dtype = np.int16
 
+        data[k] = np.array(data[k], dtype=dtype)
+    del vcal, tcal, unspiked
+
+    console.print("==> Reading file and calibration complete!")
     if args.plot_average_waveforms:
         import pylab as p
         import hepbasestack.layout as lo
