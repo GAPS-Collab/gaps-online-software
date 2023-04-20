@@ -124,7 +124,11 @@ impl MasterTriggerMapping {
 
   pub fn construct_ltb_mapping(&mut self) {
     for ltb in &self.ltb_list {
-      let index = (ltb.ltb_dsi - 1 * 5) + (ltb.ltb_j - 1);
+      if ltb.ltb_dsi == 0 && ltb.ltb_j == 0 {
+        error!("Found ltb with invalid connection information! {:?}", ltb);
+        continue;
+      }
+      let index = ((ltb.ltb_dsi - 1) * 5) + (ltb.ltb_j - 1);
       self.ltb_mapping[index as usize] = *ltb;
     }
   }
@@ -159,14 +163,21 @@ impl MasterTriggerMapping {
     -> Vec<u8> {
     let mut rb_ids = Vec::<u8>::new();
     let mut ltb_hit_index : usize = 0;
+    //println!("MTEV BRD MASK {:?}", mt_ev.board_mask);
     for k in 0..mt_ev.board_mask.len() {
       if mt_ev.board_mask[k] {
-        let hits = mt_ev.hits[ltb_hit_index];
+        let hits = mt_ev.hits[k];//ltb_hit_index];
+        //println!("MTEV HITS {:?}", hits);
         for j in 0..hits.len() {
           if hits[j] {
+            //println!("Found hit at {j}");
+            println!("LTB REGISTERED FOR THIS HIT {:?}", self.ltb_mapping[k]);
             let rb_id = self.ltb_mapping[k].get_rb_id(j as u8 +1);
+            
             if rb_ids.contains(&rb_id) {
               continue;
+            } else {
+              rb_ids.push(rb_id);
             }
           }
         }
@@ -679,6 +690,7 @@ pub fn decode_hit_mask(hit_mask : u32) -> ([bool;N_CHN_PER_LTB],[bool;N_CHN_PER_
   let mut index = N_CHN_PER_LTB - 1;
   for n in 0..N_CHN_PER_LTB {
     let mask = 1 << n;
+    //println!("MASK {:?}", mask);
     let bit_is_set = (mask & hit_mask) > 0;
     decoded_mask_0[index] = bit_is_set;
     if index != 0 {
@@ -781,6 +793,7 @@ pub fn read_daq(socket : &UdpSocket,
       //println!(" decoded mask {decoded_board_mask:?}");
       event.board_mask = decoded_board_mask;
       n_ltbs = board_mask.count_ones();
+      //println!("{:?}", event.board_mask);
       trace!("{n_ltbs} LTBs participated in this event");
       // to get the hits, we need to read the hit field.
       // Two boards can fit into a single hit field, that 
@@ -796,19 +809,28 @@ pub fn read_daq(socket : &UdpSocket,
       }
       trace!("We need {queries_needed} queries for the hitmask");
       let mut hitmasks = Vec::<[bool;N_CHN_PER_LTB]>::new();
+      println!("NEW HITS");
       while nhit_query < queries_needed { 
         let hitmask = read_daq_word(socket, target_address, buffer)?;
+        //println!("HITMASK {:?}", hitmask);
+
         (hits_a, hits_b) = decode_hit_mask(hitmask);
+        
         hitmasks.push(hits_a);
         hitmasks.push(hits_b);
+        println!("HITMASKS_VEC {:?}", hitmasks);
         nhit_query += 1;
       }
       for k in 0..event.board_mask.len() {
         if event.board_mask[k] {
           let thishits = hitmasks.pop().unwrap();
+          //println!("Will assign {:?} for {k}", thishits);
           event.hits[k] = thishits;
+          //println!("EVENT HAS HITS ASSIGNED : {:?}", event.hits[k]);
+      
         }
       }
+    //println!("EVENT HAS HITS ASSIGNED : {:?}", event.hits);
     trace!("{:?}", decoded_board_mask);
     trace!("n queries {nhit_query}");
     event.crc         = read_daq_word(socket, target_address, buffer)?;

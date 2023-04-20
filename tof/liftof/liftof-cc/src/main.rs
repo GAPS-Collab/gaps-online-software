@@ -164,6 +164,8 @@ fn main() {
   let db_path          = Path::new(config["db_path"].as_str().unwrap());
   let db_path_c        = db_path.clone();
   let ltb_list = get_ltbs_from_sqlite(db_path);
+  println!("{:?}", ltb_list);
+  exit(0);
   let rb_list  = get_rbs_from_sqlite(db_path_c);
   //let matches = command!() // requires `cargo` feature
   //     //.arg(arg!([name] "Optional name to operate on"))
