@@ -1,7 +1,8 @@
-#include "serialization.h"
-
 #include "TOFCommon.h"
 #include "tof_typedefs.h"
+#include "parsers.h"
+
+#include "serialization.h"
 
 u16 decode_ushort(const vec_u8& bytestream,
                              u32 start_pos)
@@ -438,7 +439,7 @@ void encode_blobevent(const BlobEvt_t* evt, std::vector<uint8_t> &bytestream, u3
 
 /***********************************************/
 
-BlobEvt_t decode_blobevent(const std::vector<uint8_t> &bytestream,
+BlobEvt_t decode_blobevent(const Vec<u8> &bytestream,
                            u32 start_pos)
 {
   BlobEvt_t event;
@@ -449,7 +450,9 @@ BlobEvt_t decode_blobevent(const std::vector<uint8_t> &bytestream,
   event.roi       = decode_ushort_rev( bytestream, dec_pos); dec_pos += 2;
   event.dna       = decode_uint64_rev( bytestream, dec_pos); dec_pos += 8;
   event.fw_hash   = decode_ushort_rev( bytestream, dec_pos); dec_pos += 2;
-  event.id        = decode_ushort_rev( bytestream, dec_pos); dec_pos += 2;
+  // the first byte of the event id short is RESERVED
+  event.id        = bytestream[dec_pos + 1]; dec_pos += 2;
+  //event.id        = decode_ushort_rev( bytestream, dec_pos); dec_pos += 2;
   event.ch_mask   = decode_ushort_rev( bytestream, dec_pos); dec_pos += 2;
   event.event_ctr = decode_uint32_rev( bytestream, dec_pos); dec_pos += 4;
   event.dtap0     = decode_ushort_rev( bytestream, dec_pos); dec_pos += 2;
