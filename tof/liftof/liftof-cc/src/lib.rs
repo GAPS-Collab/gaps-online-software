@@ -36,19 +36,6 @@ extern crate zmq;
 
 extern crate tof_dataclasses;
 
-use std::{thread,
-          time,
-          path::Path,
-          sync::mpsc::Sender,
-          sync::mpsc::Receiver,
-          sync::mpsc::channel};
-
-use clap::{arg,
-           command,
-           //value_parser,
-           //ArgAction,
-           //Command,
-           Parser};
 
 extern crate crossbeam_channel;
 //use crossbeam_channel::{unbounded,

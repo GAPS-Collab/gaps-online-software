@@ -55,15 +55,14 @@ pub fn commander(rbs : &Vec<ReadoutBoard>,
     match cmd.try_recv() {
       Err(err) => trace!("Did not receive a new command, error {err}"),
       Ok(new_command) => {
-        println!("DEBUG: Received new command!");
         info!("Received new command!");
         let mut payload  = String::from("BRCT").into_bytes();
         let mut payload_cmd = new_command.to_bytestream();
         payload.append(&mut payload_cmd);
         println!("{:?}", payload);
         match data_socket.send(&payload,0) {
-          Err(err) => error!("Can not start run! Error {err}"),
-          Ok(_)    => println!("Start command sent!")
+          Err(err) => error!("Can send command! Error {err}"),
+          Ok(_)    => info!("BRCT command sent!")
         }
       }
     }

@@ -4,8 +4,6 @@
 //!
 
 
-//use std::sync::mpsc::{Sender,
-//                      Receiver};
 use crossbeam_channel::{Sender,
                         Receiver};
 
@@ -16,6 +14,7 @@ use std::time::{Duration,
                 Instant};
 
 use tof_dataclasses::events::{MasterTriggerEvent,
+                              MasterTriggerMapping,
                               TofEvent};
 use crate::constants::EVENT_BUILDER_EVID_CACHE_SIZE;
 use tof_dataclasses::packets::{PacketType,
@@ -24,7 +23,7 @@ use tof_dataclasses::packets::{PacketType,
 use crossbeam_channel as cbc;
 
 use tof_dataclasses::packets::paddle_packet::PaddlePacket;
-
+use tof_dataclasses::commands::TofCommand;
 
 
 
@@ -166,20 +165,24 @@ impl TofEventBuilderSettings {
 ///
 /// # Arguments
 ///
-/// * master_id : Receive a `MasterTriggerEvent` over this 
-///               channel. The event will be either build 
-///               immediatly, or cached. 
+/// * m_trig_ev      : Receive a `MasterTriggerEvent` over this 
+///                    channel. The event will be either build 
+///                    immediatly, or cached. 
 ///
 /// * pp_query       : Send request to a paddle_packet cache to send
 ///                    Paddle packets with the given event id
 /// * paddle_packets : Receive paddle_packets from a paddle_packet
 ///                    cache
-///
-pub fn event_builder (master_id      : &cbc::Receiver<MasterTriggerEvent>,
+/// * cmd_sender     : Sending tof commands to comander thread. This 
+///                    is needed so that the event builder can request
+///                    paddles from readout boards.
+pub fn event_builder (m_trig_ev      : &cbc::Receiver<MasterTriggerEvent>,
+                      mt_mapping     : MasterTriggerMapping,
                       pp_query       : &Sender<Option<u32>>,
                       pp_recv        : &Receiver<Option<PaddlePacket>>,
                       settings       : &cbc::Receiver<TofEventBuilderSettings>,
-                      data_sink      : &cbc::Sender<TofPacket>) {
+                      data_sink      : &cbc::Sender<TofPacket>,
+                      cmd_sender     : &cbc::Sender<TofCommand>) {
                       //socket         : &zmq::Socket) {
 
   let mut event_cache = VecDeque::<TofEvent>::with_capacity(EVENT_BUILDER_EVID_CACHE_SIZE);
@@ -194,16 +197,19 @@ pub fn event_builder (master_id      : &cbc::Receiver<MasterTriggerEvent>,
   loop {
 
     // every iteration, we welcome a new master event
-    match master_id.try_recv() {
+    match m_trig_ev.try_recv() {
       Err(_) => {
         trace!("No new event ready yet!");
         continue;
       }   
       Ok(mt) => {
-        trace!("Got trigger for event {} with {} expected hit paddles"
+        trace!("Got master trigger for event {} with {} expected hit paddles"
                , mt.event_id
                , mt.n_paddles);
-        let mut event =  TofEvent::from(&mt);
+        // construct RB requests
+        let rbs_in_ev = mt_mapping.get_rb_ids(&mt);
+        println!("[EVT-BLDR] Get the following RBs in this event {:?}", rbs_in_ev);
+        let mut event = TofEvent::from(&mt);
         if (event.event_id != last_evid + 1) {
           let delta_id = event.event_id - last_evid;
           error!("We skipped event ids {}", delta_id );

@@ -41,8 +41,8 @@ extern crate crossbeam_channel;
 //                        Sender,
 //                        Receiver};
 use crossbeam_channel as cbc; 
-use tof_dataclasses::events::MasterTriggerEvent;
-//                            MasterTriggerEvent};
+use tof_dataclasses::events::{MasterTriggerEvent,
+                              MasterTriggerMapping};
 use tof_dataclasses::threading::ThreadPool;
 use tof_dataclasses::packets::paddle_packet::PaddlePacket;
 use tof_dataclasses::packets::TofPacket;
@@ -288,35 +288,6 @@ fn main() {
   //}
 
   println!("==> Starting event builder and master trigger threads...");
-  let tp_to_sink_c = tp_to_sink.clone();
-  if use_master_trigger {
-    // start the event builder thread
-    worker_threads.execute(move || {
-                           event_builder(&master_ev_rec,
-                                         &id_send,
-                                         &pp_rec,
-                                         &ebs_from_cmdr,
-                                         &tp_to_sink);
-                                         //&evb_comm_socket);
-    });
-    // master trigger
-    worker_threads.execute(move || {
-                           master_trigger(&master_trigger_ip, 
-                                          master_trigger_port,
-                                          &tp_to_sink_c,
-                                          &rate_to_main,
-                                          &master_ev_send,
-                                          true);
-    });
-  } else {
-    // we start the event builder without 
-    // depending on the master trigger
-    //worker_threads.execute(move || {
-    //                       event_builder_no_master(&id_send,
-    //                                               &pp_rec,
-    //                                               &evb_comm_socket);
-    //});
-  }
   println!("==> Will now start rb threads..");
 
   for n in 0..nboards {
@@ -344,11 +315,38 @@ fn main() {
   } // end for loop over nboards
   
   let one_second = time::Duration::from_millis(1000);
-
+  let rb_list_cc = rb_list.clone();
   worker_threads.execute(move || {
-    commander(&rb_list,
+    commander(&rb_list_cc,
               cmd_receiver);
   });
+  if use_master_trigger {
+    // start the event builder thread
+    let cmd_sender_c = cmd_sender.clone();
+    let rb_list_c    = rb_list.clone();
+    let ltb_list_c   = ltb_list.clone();
+    let mut mapping = MasterTriggerMapping::new(ltb_list_c, rb_list_c);
+    mapping.construct_ltb_mapping();
+    worker_threads.execute(move || {
+                           event_builder(&master_ev_rec,
+                                         mapping,
+                                         &id_send,
+                                         &pp_rec,
+                                         &ebs_from_cmdr,
+                                         &tp_to_sink,
+                                         &cmd_sender_c);
+                                         //&evb_comm_socket);
+    });
+    // master trigger
+    worker_threads.execute(move || {
+                           master_trigger(&master_trigger_ip, 
+                                          master_trigger_port,
+                                          &rate_to_main,
+                                          &master_ev_send,
+                                          true);
+    });
+  } 
+
   info!("All threads started!");
   let one_minute = time::Duration::from_millis(60000);
   
