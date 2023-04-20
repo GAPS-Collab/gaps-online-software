@@ -8,9 +8,13 @@
 //!
 use std::{thread, time};
 
-extern crate ctrlc;
-
+//extern crate ctrlc;
+extern crate libc;
 extern crate crossbeam_channel;
+extern crate signal_hook;
+
+use signal_hook::iterator::Signals;
+use signal_hook::consts::signal::{SIGTERM, SIGINT};
 use crossbeam_channel::{unbounded,
                         Sender,
                         Receiver};
@@ -77,6 +81,10 @@ struct Args {
   /// possible
   #[arg(long, default_value_t = false)]
   run_forever: bool,
+  /// Analyze the waveforms directly on the board. We will not send
+  /// waveoform data, but paddle packets instead.
+  #[arg(long, default_value_t = false)]
+  waveform_analysis: bool,
   /// Activate the forced trigger. The value is the desired rate 
   #[arg(long, default_value_t = 0)]
   force_trigger: u32,
@@ -88,12 +96,21 @@ struct Args {
   /// Behaviour can be controlled through `TofCommand` later
   #[arg(long, default_value_t = false)]
   stream_any : bool,
-  /// Readoutboard testing with internal trigger
+  /// Readoutboard testing with external trigger
   #[arg(long, default_value_t = false)]
   rb_test_ext : bool,
-  /// Readoutboard testing with softare trigger
+  /// Readoutboard testing with softare trigger, equally spaced in time
   #[arg(long, default_value_t = false)]
   rb_test_sw : bool,
+  /// Take data for voltage calibration
+  #[arg(long, default_value_t = false)]
+  vcal : bool,
+  /// Take data for timing calibration
+  #[arg(long, default_value_t = false)]
+  tcal : bool,
+  /// Take data with no inputs [NOT IMPLEMENTED YET]
+  #[arg(long, default_value_t = false)]
+  noi : bool,
   ///// CnC server IP we should be listening to
   //#[arg(long, default_value_t = "10.0.1.1")]
   //cmd_server_ip : &'static str,
@@ -117,35 +134,59 @@ fn main() {
   //                        .init();
   pretty_env_logger::init();
 
-  //let kraken                = vec![240, 159, 144, 153];
-  // We know these bytes are valid, so we'll use `unwrap()`.
-  //let kraken           = String::from_utf8(kraken).unwrap();
-
   // General parameters, readout board id,, 
   // ip to tof computer
-
   let rb_id = get_board_id().expect("Unable to obtain board ID!");
   let dna   = get_device_dna().expect("Unable to obtain device DNA!"); 
   
-  
   let args = Args::parse();                   
-  let mut buff_trip     = args.buff_trip;         
-  let mut n_events_run  = args.nevents;
-  let mut show_progress = args.show_progress;
-  let cache_size        = args.cache_size;
-  let run_forever       = args.run_forever;
-  let mut stream_any    = args.stream_any;
-  let mut force_trigger = args.force_trigger;
-  let force_random_trig = args.force_random_trigger;
-  let rb_test           = args.rb_test_ext || args.rb_test_sw;
-  
+  let mut buff_trip         = args.buff_trip;         
+  let mut n_events_run      = args.nevents;
+  let mut show_progress     = args.show_progress;
+  let cache_size            = args.cache_size;
+  let run_forever           = args.run_forever;
+  let mut stream_any        = args.stream_any;
+  let mut force_trigger     = args.force_trigger;
+  let mut force_random_trig = args.force_random_trigger;
+  let wf_analysis           = args.waveform_analysis;
+  let mut rb_test           = args.rb_test_ext || args.rb_test_sw;
+  let vcal                  = args.vcal;
+  let tcal                  = args.tcal;
+  let noi                   = args.noi;
+
+  let mut file_suffix   = String::from(".robin");
+
+  if ( vcal && tcal ) || ( vcal && noi ) || ( tcal && noi ) {
+    panic!("Can only support either of the flags --vcal --tcal --noi")
+  }
+
+  let mut end_after_run = false;
+  if noi {
+    file_suffix = String::from(".noi");
+    rb_test     = true;
+    end_after_run = true;
+  }
+  if vcal {
+    file_suffix = String::from(".vcal");
+    rb_test     = true;
+    end_after_run = true;
+  }
+
+  if tcal {
+    file_suffix = String::from(".tcal");
+    force_random_trig = 100;
+    show_progress     = true;
+    n_events_run      = 1000;
+    end_after_run = true;
+  }
+
   //FIMXE - this needs to become part of clap
   let cmd_server_ip = String::from("10.0.1.1");
   //let cmd_server_ip     = args.cmd_server_ip;  
   if rb_test {
     show_progress = true;
     n_events_run  = 1000;
-    buff_trip     = 200;
+    buff_trip     = 500;
     stream_any    = true;
     if args.rb_test_sw {
       force_trigger = 100;
@@ -185,11 +226,10 @@ fn main() {
     println!("=> We will run in rb testing mode!");
     println!("-----------------------------------------------"); 
   } 
-  reset_data_memory_aggressively();
-  reset_data_memory_aggressively();
-  reset_data_memory_aggressively();
-  //reset_data_memory_aggressively();
-  //reset_data_memory_aggressively();
+ 
+  // this resets the data buffer /dev/uio1,2 occupancy
+  reset_dma_and_buffers();
+
   let mut uio1_total_size = DATABUF_TOTAL_SIZE;
   let mut uio2_total_size = DATABUF_TOTAL_SIZE;
 
@@ -258,23 +298,15 @@ fn main() {
     info!("We set a value for buff_trip of {buff_trip}");
   }
  
-  // write a few registers - this might go to 
-  // the init script
-  //match disable_evt_fragments() {
-  //  Err(err) => error!("Can not disable writing of event fragments!"),
-  //  Ok(_)    => ()
-  //}
-  // now we are ready to receive data 
-
   // Setup routine. Start the threads in inverse order of 
   // how far they are away from the buffers.
-  
-  
   let run_params_from_cmdr_c = run_params_from_cmdr.clone();
   let rdb_sender_a  = bs_send.clone();
   
   workforce.execute(move || {
-    data_publisher(&tp_from_client, rb_test || force_random_trig > 0); 
+    data_publisher(&tp_from_client,
+                   rb_test || force_random_trig > 0,
+                   Some(&file_suffix)); 
   });
   let tp_to_pub_c   = tp_to_pub.clone();
   workforce.execute(move || {
@@ -390,29 +422,57 @@ fn main() {
     }
   }
 
-  ctrlc::set_handler(move || {
-    println!("received Ctrl+C! We will stop triggers and end the run!");
-    println!("So long and thanks for all the \u{1F41F}");
-   
-    match disable_trigger() {
-      Err(err) => error!("Can not disable triggers, error {err}"),
-      Ok(_)    => ()
-    }
-    if force_random_trig > 0 {
-      match set_self_trig_rate(0) {
-        Err(err) => {
-          panic!("Could not disable random self trigger! Err {err}");
+  let mut signals = Signals::new(&[SIGTERM, SIGINT]).expect("Unknown signals");
+  let mut end = false;
+  
+  // Wait until all threads are set up
+  thread::sleep(5*one_sec);
+  loop {
+    thread::sleep(1*one_sec);
+    for signal in signals.pending() {
+      match signal as libc::c_int {
+        SIGTERM => {
+          println!("SIGTERM received");
+          end = true;
         }
-        Ok(_)    => ()
+        SIGINT  => {
+          println!("SIGINT received");
+          end = true;
+        }
+        _       => ()
       }
     }
-    exit(0);
-  })
-  .expect("Error setting Ctrl-C handler");
 
+    match get_triggers_enabled() {
+      Err(err) => error!("Can not read trigger enabled register!"),
+      Ok(enabled) => {
+        if !enabled && end_after_run {
+          end = true;
+        }
+      }
 
-  loop {
-    thread::sleep(10*one_sec);
+    }
+
+    if end {
+      println!("=> Finish program!");
+      println!("=> Stopping triggers!");
+      println!("So long and thanks for all the \u{1F41F}");
+   
+      match disable_trigger() {
+        Err(err) => error!("Can not disable triggers, error {err}"),
+        Ok(_)    => ()
+      }
+      if force_random_trig > 0 {
+        match set_self_trig_rate(0) {
+          Err(err) => {
+            panic!("Could not disable random self trigger! Err {err}");
+          }
+          Ok(_)    => ()
+        }
+      }
+      exit(0);
+    }
+
   } // end loop
 } // end main
 

@@ -439,11 +439,10 @@ void encode_blobevent(const BlobEvt_t* evt, std::vector<uint8_t> &bytestream, u3
 /***********************************************/
 
 BlobEvt_t decode_blobevent(const std::vector<uint8_t> &bytestream,
-                           u32 start_pos,
-                           u32 end_pos)
+                           u32 start_pos)
 {
   BlobEvt_t event;
-  u32 dec_pos = start_pos;
+  u32 dec_pos     = start_pos;
   event.head      = decode_ushort_rev( bytestream, 0); dec_pos += 2;
   event.status    = decode_ushort_rev( bytestream, dec_pos); dec_pos += 2;
   event.len       = decode_ushort_rev( bytestream, dec_pos); dec_pos += 2;
@@ -485,10 +484,17 @@ u64 search_for_2byte_marker(const vec_u8 &bytestream,
   has_ended = false;
   if ((end_pos == bytestream.size()) || (end_pos == 0)) 
     { end_pos = bytestream.size() - 1;} 
+  if (start_pos >= end_pos) {
+    has_ended = true;
+    return 0;
+  }
   for (u64 k=start_pos; k<end_pos; k++)
     { 
-      if ((bytestream[k] == marker) && (bytestream[k+1] == marker)) 
-        { return k;}
+      if ((bytestream[k] == marker) && (bytestream[k+1] == marker))  {
+        //std::cout << "endpos " << end_pos << std::endl;
+        //std::cout << "Found marker at pos " << k << " " << bytestream[k] << std::endl;
+        return k;
+      }
     }
   has_ended = true;
   return 0;
@@ -514,139 +520,39 @@ std::vector<BlobEvt_t> get_events_from_stream(const vec_u8 &bytestream,
 	       			                 	      u64 start_pos) {
   u64 nevents_in_stream = (float)bytestream.size()/BLOBEVENTSIZE;
   std::cout << "[INFO] There might be at max " << nevents_in_stream<< " events in the stream" << std::endl;
-  std::vector<BlobEvt_t> events; 
+
+  Vec<BlobEvt_t> events; 
   BlobEvt_t event;
-
-  bool finished = false;
-  u64 head_index, tail_index;
-  usize current_index = 0;
-  i64 event_size; // can be negative if things go wrong
-
-  size_t n_events_found = 0;
-  u32 n_iter_debug = 0;
-  u32 n_iter_stuck_debug = 0;
-  bool has_ended = false;
-  //unsigned long head_start = 0;
-  uint nheaders = 0;
-  uint ntails   = 0;
-  usize pos = 0;
-  usize nblobs = 0;
-  usize ncorrupt_blobs = 0;
-  bool header_found_start= false;
-  while (true) { 
-    // FIXME - this needs care. If there is only one event in the stream
-    // this can't fail. To bypass this, we omit this if a header has been 
-    // found. Not sure if that is good.
-    if ((pos + BLOBEVENTSIZE > bytestream.size()) && !(header_found_start)) {
+  usize pos              = start_pos;
+  bool has_ended         = false;
+  usize n_events_decoded = 0;
+  usize corrupt_events   = 0;
+  while (n_events_decoded < nevents_in_stream + 1) { 
+    // where are assuming that there is 
+    // less than one event of garbaget
+    // at the beginning of the stream
+    pos = search_for_2byte_marker(bytestream,
+                                  0xaa,
+                                  has_ended,
+                                  pos,
+                                  pos+BLOBEVENTSIZE);
+    if ((has_ended) || (pos + BLOBEVENTSIZE > bytestream.size())) {
       break;
-    }
-    auto byte = bytestream[pos];
-    if (!header_found_start) {
-      if (byte == 0xaa) {
-        header_found_start = true;
-      }  
-      pos++;
+    } 
+    event = decode_blobevent(bytestream,
+                             pos);
+    if (event.tail != 0x5555) {
+      corrupt_events++;
+      pos += 2; // skip header
       continue;
-    }   
-    if (header_found_start) {
-      pos++;
-      if (byte == 0xaa) {
-        header_found_start = false;
-        event = decode_blobevent(bytestream,
-                                 pos -2,
-                                 pos -2 + BLOBEVENTSIZE + 10);
-        nblobs++;
-	    //std::cout << "NBLOBS" << nblobs << std::endl;
-        //std::cout << event.head << std::endl;
-        //std::cout << event.event_ctr << std::endl;
-        //std::cout << event.timestamp << std::endl;
-        //std::cout << event.stop_cell << std::endl;
-        //std::cout << event.crc32 << std::endl;
-        //std::cout << event.tail << std::endl;
-        //std::cout << NCHN << std::endl;
-        if (event.tail == 0x5555) {
-            pos += BLOBEVENTSIZE - 2;  
-            events.push_back(event);
-        } else {
-            // the event is corrupt
-            //println!("{}", blob_data.head);
-            ncorrupt_blobs += 1;
-        }
-      } else {
-          // it wasn't an actual header
-          header_found_start = false;
-      }   
-    }   
-  }// end loop
-  std::cout << "==> Deserialized " <<  nblobs << " blobs! " << ncorrupt_blobs << " blobs were corrupt" << std::endl;
-  
-
-
-  //while (!has_ended)
-  //  { n_iter_debug++;
-  //    //std::cout << "current_index " << current_index << std::endl;
-  //    //if (current_index > 20) {
-  //    //    head_start -= 20;
-  //    //} else {
-  //    //    head_start = current_index;
-  //    //}
-  //    head_index = search_for_2byte_marker(bytestream, 0xaa,
-  //                                         has_ended,
-  //                                         current_index,
-  //                                         bytestream.size());
-  //    // there is 94 padding bytes
-  //    if ( has_ended) break;
-  //    tail_index = search_for_2byte_marker(bytestream, 0x55,
-  //                                         has_ended,
-  //                                         head_index,
-  //                                         bytestream.size()  );
-  //    // the tail might still be somewhere in the waveform
-  //    // let's check if the event is too small if we can find a better one
-  //    event_size = tail_index - head_index + 2;
-  //    std::cout << "event size " << event_size << std::endl;
-  //    current_index = tail_index + 2;
-  //    while (event_size < BLOBEVENTSIZE)
-  //    { 
-  //      tail_index = search_for_2byte_marker(bytestream, 0x55,
-  //                                           has_ended,
-  //                                           current_index,
-  //                                           bytestream.size()  );
-  //      event_size = tail_index - head_index + 2;
-  //      current_index++;
-  //      std::cout << current_index << " " << event_size << std::endl;
-  //      if (event_size == BLOBEVENTSIZE) break; 
-  //      if (has_ended) break;
-  //    }
-
-  //    std::cout << head_index << " " << tail_index << std::endl;
-  //    if (has_ended) break;
-  //    //if (n_iter_debug > 10 ) break;
-  //    
-  //    // this includes negative event sizes
-  //    if (event_size != BLOBEVENTSIZE)
-  //      {
-  //        if (event_size > BLOBEVENTSIZE) {std::cout << "event is "  << event_size - BLOBEVENTSIZE << " bytes too big "  << std::endl;}
-  //        else {std::cout << " event is " << BLOBEVENTSIZE - event_size << " bytes too small " << std::endl;}
-  //        current_index++;
-  //        n_iter_stuck_debug += 1;
-  //        continue;
-  //      }
-  //    //head_index = current_index + head_index;
-  //    //tail_index = current_index + tail_index;
-  //    events[n_events_found] = decode_blobevent(bytestream,
-  //                                              head_index,
-  //                                              tail_index);
-  //    //events.push_back(decode_blobevent(bytestream, head_index, tail_index));
-  //    //current_index += BLOBEVENTSIZE;
-  //    current_index = tail_index;
-  //    n_events_found++;
-  //    //std::cout << "-----------" << std::endl;
-  //  }
-  //if (events.size() > n_events_found)
-  //   {events.resize(n_events_found);}
-  //events.shrink_to_fit();
-  std::cout << "We ran through " << n_iter_debug << " iterations" << std::endl;
-  std::cout << "We ran through " << n_iter_stuck_debug << " continues" << std::endl;
+    }
+    //std::cout << event << std::endl;
+    events.push_back(event);
+    n_events_decoded++;
+    pos += BLOBEVENTSIZE + 2;
+  }
+  std::cout << "==> Retrieved " << n_events_decoded << " events from stream!" << std::endl;
+  std::cout << "==> " << corrupt_events << " times a header with no corresponding footer was found. This does not necessarily mean there is a problem, instead it could also be padding bytes introduced due to wrapper packages. " << std::endl;
   return events;
 }
 

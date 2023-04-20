@@ -462,7 +462,7 @@ impl Serialization for TofCommand {
                  stream[pos+1]];
     pos += 2;
     if TofCommand::HEAD != u16::from_le_bytes(two_bytes) {
-      warn!("Packet does not start with HEAD signature");
+      error!("Packet does not start with HEAD signature");
       return Err(SerializationError::HeadInvalid {});
     }
    
@@ -479,7 +479,7 @@ impl Serialization for TofCommand {
     let pair    = (cc, value);
     let command = TofCommand::from(pair);
     if TofCommand::TAIL != u16::from_le_bytes(two_bytes) {
-      warn!("Packet does not end with TAIL signature");
+      error!("Packet does not end with TAIL signature");
       return Err(SerializationError::TailInvalid {});
     }
     Ok(command)

@@ -91,7 +91,7 @@ pub fn prefix_board_id(input : &mut Vec<u8>) -> Vec<u8> {
                  .unwrap_or(0);
                                //.expect("Need to be able to obtain board id!");
   let mut bytestream : Vec::<u8>;
-  let mut board : String;
+  let board : String;
   if board_id < 10 {
     board = String::from("RB0") + &board_id.to_string();
   } else {
@@ -132,7 +132,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
                      //cmd_sender   : &Sender<TofCommand>) {
   // create 0MQ sockedts
   //let one_milli       = time::Duration::from_millis(1);
-  let mut cmd_address = String::from("tcp://") + &cmd_server_ip + ":" + &DATAPORT.to_string() ;
+  let cmd_address = String::from("tcp://") + &cmd_server_ip + ":" + &DATAPORT.to_string() ;
   // we will subscribe to two types of messages, BDCT and RB + 2 digits 
   // of board id
   let topic_board = get_board_id().expect("Can not get board id!")
@@ -141,39 +141,74 @@ pub fn cmd_responder(cmd_server_ip             : String,
   let ctx = zmq::Context::new();
   let cmd_socket = ctx.socket(zmq::SUB).expect("Unable to create 0MQ SUB socket!");
   info!("Will set up 0MQ SUB socket to listen for commands at address {cmd_address}");
-  cmd_socket.connect(&cmd_address).expect("Unable to bind to command socket at {cmd_address}!");
+  let mut is_connected = false;
+  match cmd_socket.connect(&cmd_address) {
+    Err(err) => warn!("Not able to connect to {}, Error {err}", cmd_address),
+    Ok(_)    => {
+      info!("Connected to CnC server at {}", cmd_address);
+      is_connected = true;
+    }
+  }
+  if is_connected {
+    //cmd_socket.set_subscribe(&my_topic.as_bytes());
+    match cmd_socket.set_subscribe(&topic_broadcast.as_bytes()) {
+      Err(err) => error!("Can not subscribe to {topic_broadcast}, err {err}"),
+      Ok(_)    => ()
+    }
+    match cmd_socket.set_subscribe(&topic_board.as_bytes()) {
+      Err(err) => error!("Can not subscribe to {topic_board}, err {err}"),
+      Ok(_)    => ()
+    }
+  }
+  
   //let my_topic = String::from("");
   //.as_bytes();
   //cmd_socket.set_subscribe(&my_topic.as_bytes());
-  match cmd_socket.set_subscribe(&topic_broadcast.as_bytes()) {
-    Err(err) => error!("Unable to subscribe to {topic_broadcast}, error {err}"),
-    Ok(_) => ()
-  }
-  match cmd_socket.set_subscribe(&topic_board.as_bytes()) {
-    Err(err) => error!("Unable to subscribe to {topic_board}, error {err}"),
-    Ok(_) => ()
-  }
+  
+  //match cmd_socket.set_subscribe(&topic_broadcast.as_bytes()) {
+  //  Err(err) => error!("Unable to subscribe to {topic_broadcast}, error {err}"),
+  //  Ok(_) => ()
+  //}
+  //match cmd_socket.set_subscribe(&topic_board.as_bytes()) {
+  //  Err(err) => error!("Unable to subscribe to {topic_board}, error {err}"),
+  //  Ok(_) => ()
+  //}
   let mut heartbeat     = Instant::now();
-  let mut last_run_pars : RunParams;
 
   error!("TODO: Heartbeat feature not yet implemented on C&C side");
   let heartbeat_received = false;
   loop {
     if !heartbeat_received {
+      trace!("No heartbeat since {}", heartbeat.elapsed().as_secs());
       if heartbeat.elapsed().as_secs() > heartbeat_timeout_seconds as u64 {
         warn!("No heartbeat received since {heartbeat_timeout_seconds}. Attempting to reconnect!");
-        cmd_socket.connect(&cmd_address).expect("Unable to bind to command socket at {cmd_address}!");
-        //cmd_socket.set_subscribe(&my_topic.as_bytes());
-        match cmd_socket.set_subscribe(&topic_broadcast.as_bytes()) {
-          Err(err) => error!("Can not subscribe to {topic_broadcast}, err {err}"),
-          Ok(_)    => ()
+        match cmd_socket.connect(&cmd_address) {
+          Err(err) => {
+            warn!("Not able to connect to {}, Error {err}", cmd_address);
+            is_connected = false;
+          }
+          Ok(_)    => {
+            info!("Connected to CnC server at {}", cmd_address);
+            is_connected = true;
+          }
         }
-        match cmd_socket.set_subscribe(&topic_board.as_bytes()) {
-          Err(err) => error!("Can not subscribe to {topic_board}, err {err}"),
-          Ok(_)    => ()
+        if is_connected {
+          //cmd_socket.set_subscribe(&my_topic.as_bytes());
+          match cmd_socket.set_subscribe(&topic_broadcast.as_bytes()) {
+            Err(err) => error!("Can not subscribe to {topic_broadcast}, err {err}"),
+            Ok(_)    => ()
+          }
+          match cmd_socket.set_subscribe(&topic_board.as_bytes()) {
+            Err(err) => error!("Can not subscribe to {topic_board}, err {err}"),
+            Ok(_)    => ()
+          }
         }
         heartbeat = Instant::now();
       }
+    }
+
+    if !is_connected {
+      continue;
     }
 
     //match cmd_socket.poll(zmq::POLLIN, 1) {
@@ -187,10 +222,11 @@ pub fn cmd_responder(cmd_server_ip             : String,
     //    if in_waiting == 0 {
     //        continue;
     //    }
-    match cmd_socket.recv_bytes(0) {
-      Err(err) => error!("Problem receiving command over 0MQ ! Err {err}"),
+    match cmd_socket.recv_bytes(zmq::DONTWAIT) {
+      Err(err) => trace!("Problem receiving command over 0MQ ! Err {err}"),
       Ok(cmd_bytes)  => {
         info!("Received bytes {}", cmd_bytes.len());
+        // we have to strip off the topic
         match TofCommand::from_bytestream(&cmd_bytes,4) {
           Err(err) => error!("Problem decoding command {}", err),
           Ok(cmd)  => {
@@ -211,25 +247,25 @@ pub fn cmd_responder(cmd_server_ip             : String,
               
               }
               TofCommand::PowerOn   (mask) => {
-                warn!("Not implemented");
+                error!("Not implemented");
                 match cmd_socket.send(resp_not_implemented,0) {
-                  Err(err) => warn!("Can not send response! Err {err}"),
+                  Err(err) => error!("Can not send response! Err {err}"),
                   Ok(_)    => trace!("Resp sent!")
                 }
                 continue;
               },
               TofCommand::PowerOff  (mask) => {
-                warn!("Not implemented");
+                error!("Not implemented");
                 match cmd_socket.send(resp_not_implemented,0) {
-                  Err(err) => warn!("Can not send response! {err}"),
+                  Err(err) => error!("Can not send response! {err}"),
                   Ok(_)    => trace!("Resp sent!")
                 }
                 continue;
               },
               TofCommand::PowerCycle(mask) => {
-                warn!("Not implemented");
+                error!("Not implemented");
                 match cmd_socket.send(resp_not_implemented,0) {
-                  Err(err) => warn!("Can not send response! {err}"),
+                  Err(err) => error!("Can not send response! {err}"),
                   Ok(_)    => trace!("Resp sent!")
                 }
                 continue;
@@ -259,7 +295,8 @@ pub fn cmd_responder(cmd_server_ip             : String,
                 continue;
               },
               TofCommand::RequestWaveforms (eventid) => {
-                warn!("Not implemented");
+                trace!("Requesting waveforms for event {eventid}");
+                error!("Not implemented");
                 match cmd_socket.send(resp_not_implemented,0) {
                   Err(err) => warn!("Can not send response!"),
                   Ok(_)    => trace!("Resp sent!")
@@ -311,22 +348,26 @@ pub fn cmd_responder(cmd_server_ip             : String,
                   is_active : true,
                   nseconds  : 0,
                 };
-                last_run_pars = run_p;
                 match run_pars.send(run_p) {
-                  Err(err) => warn!("Problem initializing run!"),
+                  Err(err) => error!("Error initializing run! {err}"),
                   Ok(_)    => ()
+                };
+                let resp_good = TofResponse::Success(RESP_SUCC_FINGERS_CROSSED);
+                match cmd_socket.send(resp_good.to_bytestream(),0) {
+                  Err(err) => warn!("Can not send response!"),
+                  Ok(_)    => trace!("Resp sent!")
                 }
-              }, 
+              },
               TofCommand::DataRunEnd(_)   => {
+                println!("Received command to end run!");
                 let run_p = RunParams {
                   forever   : false,
                   nevents   : 0,
                   is_active : false,
                   nseconds : 0,
                 };
-                last_run_pars = run_p;
                 match run_pars.send(run_p) {
-                  Err(err) => warn!("Problem ending run!"),
+                  Err(err) => error!("Error stopping run! {err}"),
                   Ok(_)    => ()
                 }
                 // send response later 
@@ -357,7 +398,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
               TofCommand::CreateCalibrationFile (_) => {
                 warn!("Not implemented");
                 match cmd_socket.send(resp_not_implemented,0) {
-                  Err(err) => warn!("Can not send response!"),
+                  Err(err) => error!("Can not send response! Err {err}"),
                   Ok(_)    => trace!("Resp sent!")
                 }
                 continue;
@@ -427,7 +468,8 @@ pub fn cmd_responder(cmd_server_ip             : String,
 /// which comes in over the wire as a byte 
 /// payload
 pub fn data_publisher(data : &Receiver<TofPacket>,
-                      write_blob : bool) {
+                      write_blob  : bool,
+                      file_suffix : Option<&str> ) {
   let mut address_ip = String::from("tcp://");
   let this_board_ip = local_ip().expect("Unable to obtainl local board IP. Something is messed up!");
   let data_port    = DATAPORT;
@@ -446,7 +488,7 @@ pub fn data_publisher(data : &Receiver<TofPacket>,
   let board_id = address_ip.split_off(address_ip.len() -2);
   let blobfile_name = "tof-rb".to_owned()
                        + &board_id.to_string()
-                       + "_test.blob";
+                       + file_suffix.unwrap_or(".blob");
 
   let blobfile_path = Path::new(&blobfile_name);
   
@@ -520,98 +562,145 @@ pub fn monitoring(ch : &Sender<TofPacket>) {
   }
 }
 
-
-/// Somehow, it is not always successful to reset 
-/// the DMA and the data buffers. Let's try an 
-/// aggressive scheme and do it several times.
-/// If we fail, something is wrong and we panic
-pub fn reset_data_memory_aggressively() {
-  let one_milli = time::Duration::from_millis(1);
-  let five_milli = time::Duration::from_millis(5);
+/// Reset DMA pointer and buffer occupancy registers
+///
+/// If there are any errors, we will wait for a short
+/// time and then try again
+pub fn reset_dma_and_buffers() {
+  // register writing is on the order of microseconds 
+  // (MHz clock) so one_milli is plenty
+  let one_milli   = time::Duration::from_millis(1);
   let buf_a = BlobBuffer::A;
   let buf_b = BlobBuffer::B;
-  let mut n_tries : u8 = 0;
-  
-  for _ in 0..DMA_RESET_TRIES {
-    match reset_dma() {
-      Ok(_)    => break,
-      Err(err) => {
-        debug!("Resetting dma failed, err {:?}", err);
-        thread::sleep(five_milli);
-        continue;
+  let mut n_tries = 0u8;
+  let mut failed  = true;
+  loop {
+    if failed && n_tries < DMA_RESET_TRIES {
+      match reset_dma() {
+        Ok(_)    => (),
+        Err(err) => {
+          error!("Resetting dma failed, err {:?}", err);
+          n_tries += 1;
+          thread::sleep(one_milli);
+          continue;
+        }
+      } 
+      match reset_ram_buffer_occ(&buf_a) {
+        Ok(_)    => (), 
+        Err(err) => {
+          error!("Problem resetting buffer /dev/uio1 {:?}", err);
+          n_tries += 1;
+          thread::sleep(one_milli);
+          continue;
+        }
       }
+      match reset_ram_buffer_occ(&buf_b) {
+        Ok(_)    => (), 
+        Err(err) => {
+          error!("Problem resetting buffer /dev/uio2 {:?}", err);
+          n_tries += 1;
+          thread::sleep(one_milli);
+          continue;
+        }
+      }
+    failed = false;      
+    } else {
+      break;
     }
   }
-  let mut buf_a_occ = UIO1_MAX_OCCUPANCY;
-  let mut buf_b_occ = UIO2_MAX_OCCUPANCY;
-  match reset_ram_buffer_occ(&buf_a) {
-    Err(err) => warn!("Problem resetting buffer /dev/uio1 {:?}", err),
-    Ok(_)    => () 
-  }
-  match reset_ram_buffer_occ(&buf_b) {
-    Err(err) => warn!("Problem resetting buffer /dev/uio1 {:?}", err),
-    Ok(_)    => () 
-  }
-  match get_blob_buffer_occ(&buf_a) {
-    Err(err) => debug!("Error getting blob buffer A occupnacy {err}"),
-    Ok(val)  => {
-      debug!("Got a value for the buffer A of {val}");
-      buf_a_occ = val;
-    }
-  }
-  thread::sleep(one_milli);
-  match get_blob_buffer_occ(&buf_b) {
-    Err(err) => {
-      warn!("Error getting blob buffer B occupancy {err}");
-    }
-    Ok(val)  => {
-      debug!("Got a value for the buffer B of {val}");
-      buf_b_occ = val;
-    }
-
-  }
-  thread::sleep(one_milli);
-  //while buf_a_occ != UIO1_MIN_OCCUPANCY {
-
-  //  match reset_ram_buffer_occ(&buf_a) {
-  //    Err(err) => warn!("Problem resetting buffer /dev/uio1 {:?}", err),
-  //    Ok(_)    => () 
-  //  }
-  //  thread::sleep(five_milli);
-  //  match get_blob_buffer_occ(&buf_a) {
-  //    Err(_) => {
-  //      warn!("Error reseting blob buffer A");
-  //      thread::sleep(five_milli);
-  //      }
-  //      continue;
-  //    }
-  //    Ok(val)  => {
-  //      buf_a_occ = val;
-  //    }
-  //  }
-  //}
-  //n_tries = 0;
-  //while buf_b_occ != UIO2_MIN_OCCUPANCY {
-  //  match reset_ram_buffer_occ(&buf_b) {
-  //    Err(err) => warn!("Problem resetting buffer /dev/uio2 {:?}", err),
-  //    Ok(_)    => () 
-  //  }
-  //  match get_blob_buffer_occ(&buf_b) {
-  //    Err(_) => {
-  //      warn!("Error getting occupancey for buffer B! (/dev/uio2)");
-  //      thread::sleep(five_milli);
-  //      n_tries += 1;
-  //      if n_tries == DMA_RESET_TRIES {
-  //        panic!("We were unable to reset DMA and the data buffers!");
-  //      }
-  //      continue;
-  //    }
-  //    Ok(val)  => {
-  //      buf_b_occ = val;
-  //    }
-  //  }
-  //}
 }
+
+///// Somehow, it is not always successful to reset 
+///// the DMA and the data buffers. Let's try an 
+///// aggressive scheme and do it several times.
+///// If we fail, something is wrong and we panic
+//pub fn reset_data_memory_aggressively() {
+//  //let one_milli = time::Duration::from_millis(1);
+//  let five_milli = time::Duration::from_millis(5);
+//  let buf_a = BlobBuffer::A;
+//  let buf_b = BlobBuffer::B;
+//  let n_tries : u8 = 0;
+//  
+//  for _ in 0..DMA_RESET_TRIES {
+//    match reset_dma() {
+//      Ok(_)    => break,
+//      Err(err) => {
+//        debug!("Resetting dma failed, err {:?}", err);
+//        thread::sleep(five_milli);
+//        continue;
+//      }
+//    }
+//  }
+//  //let mut buf_a_occ = UIO1_MAX_OCCUPANCY;
+//  //let mut buf_b_occ = UIO2_MAX_OCCUPANCY;
+//  match reset_ram_buffer_occ(&buf_a) {
+//    Err(err) => warn!("Problem resetting buffer /dev/uio1 {:?}", err),
+//    Ok(_)    => () 
+//  }
+//  match reset_ram_buffer_occ(&buf_b) {
+//    Err(err) => warn!("Problem resetting buffer /dev/uio1 {:?}", err),
+//    Ok(_)    => () 
+//  }
+//  //match get_blob_buffer_occ(&buf_a) {
+//  //  Err(err) => debug!("Error getting blob buffer A occupnacy {err}"),
+//  //  Ok(val)  => {
+//  //    debug!("Got a value for the buffer A of {val}");
+//  //    buf_a_occ = val;
+//  //  }
+//  //}
+//  //thread::sleep(one_milli);
+//  //match get_blob_buffer_occ(&buf_b) {
+//  //  Err(err) => {
+//  //    warn!("Error getting blob buffer B occupancy {err}");
+//  //  }
+//  //  Ok(val)  => {
+//  //    debug!("Got a value for the buffer B of {val}");
+//  //    buf_b_occ = val;
+//  //  }
+//
+//  //}
+//  //thread::sleep(one_milli);
+//  //while buf_a_occ != UIO1_MIN_OCCUPANCY {
+//
+//  //  match reset_ram_buffer_occ(&buf_a) {
+//  //    Err(err) => warn!("Problem resetting buffer /dev/uio1 {:?}", err),
+//  //    Ok(_)    => () 
+//  //  }
+//  //  thread::sleep(five_milli);
+//  //  match get_blob_buffer_occ(&buf_a) {
+//  //    Err(_) => {
+//  //      warn!("Error reseting blob buffer A");
+//  //      thread::sleep(five_milli);
+//  //      }
+//  //      continue;
+//  //    }
+//  //    Ok(val)  => {
+//  //      buf_a_occ = val;
+//  //    }
+//  //  }
+//  //}
+//  //n_tries = 0;
+//  //while buf_b_occ != UIO2_MIN_OCCUPANCY {
+//  //  match reset_ram_buffer_occ(&buf_b) {
+//  //    Err(err) => warn!("Problem resetting buffer /dev/uio2 {:?}", err),
+//  //    Ok(_)    => () 
+//  //  }
+//  //  match get_blob_buffer_occ(&buf_b) {
+//  //    Err(_) => {
+//  //      warn!("Error getting occupancey for buffer B! (/dev/uio2)");
+//  //      thread::sleep(five_milli);
+//  //      n_tries += 1;
+//  //      if n_tries == DMA_RESET_TRIES {
+//  //        panic!("We were unable to reset DMA and the data buffers!");
+//  //      }
+//  //      continue;
+//  //    }
+//  //    Ok(val)  => {
+//  //      buf_b_occ = val;
+//  //    }
+//  //  }
+//  //}
+//}
 
 /////  Ensure the buffers are filled and everything is prepared for data
 /////  taking
@@ -688,7 +777,10 @@ pub fn run_check() {
   
   let mut last_occ_a = get_blob_buffer_occ(&buf_a).unwrap();
   let mut last_occ_b = get_blob_buffer_occ(&buf_b).unwrap();
-  enable_trigger();
+  match enable_trigger() {
+    Err(err) => error!("Unable to enable trigger! Err {err}"),
+    Ok(_)    => info!("Triggers enabled")
+  }
   loop {
     n_iter += 1;
     thread::sleep(interval);
@@ -742,9 +834,9 @@ pub fn runner(run_params          : &Receiver<RunParams>,
   let mut first_iter   = true; 
   let mut last_evt_cnt : u32 = 0;
   let mut evt_cnt      = 0u32;
-  let mut delta_events : u64 = 0;
+  let mut delta_events : u64;
   let mut n_events     : u64 = 0;
-  let mut n_errors     : u64 = 0;
+  let     n_errors     : u64 = 0;
   // per default, latch to the mtb trigger.
   // for testting/calibration that gets switched off
   // below
@@ -768,15 +860,16 @@ pub fn runner(run_params          : &Receiver<RunParams>,
   let mut pars = RunParams::new();
 
   // this is the progress bars
-  let mut template_bar_env : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.red/grey} {pos:>7}/{len:7}";
-  let mut sty_ev = ProgressStyle::with_template(template_bar_env)
-  .unwrap();
+  //let mut template_bar_env : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.red/grey} {pos:>7}/{len:7}";
+  //let sty_ev = ProgressStyle::with_template(template_bar_env)
+  //.unwrap();
+  let mut template_bar_env : &str;
+  let mut sty_ev : ProgressStyle;
   let mut multi_prog : MultiProgress;
 
   let mut prog_a  = ProgressBar::hidden();
   let mut prog_b  = ProgressBar::hidden();
   let mut prog_ev = ProgressBar::hidden();
-  let sleep_time       = time::Duration::from_millis(10);
   let template_bar_a   : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.blue/grey} {bytes:>7}/{total_bytes:7} ";
   let template_bar_b   : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.green/grey} {bytes:>7}/{total_bytes:7} ";
 
@@ -787,162 +880,162 @@ pub fn runner(run_params          : &Receiver<RunParams>,
   let sty_b = ProgressStyle::with_template(template_bar_b)
   .unwrap();
 
-  let mut which_buff = RamBuffer::A;
-  let mut buff_size  = 0usize;
+  let mut which_buff : RamBuffer;
+  let mut buff_size  : usize;
   loop {
-    if !is_running {
-      match run_params.try_recv() {
-        Err(err) => {
-          trace!("Did not receive new RunParams! Err {err}");
-          thread::sleep(one_sec);
-          continue;
-        }
-        Ok(p) => {
-          info!("Received a new set of RunParams! {:?}", p);
-          pars = p;
-          if pars.is_active {
-            info!("Will start a new run!");
-            info!("Initializing board, starting up...");
-            if latch_to_mtb {
-              match set_master_trigger_mode() {
-                Err(err) => error!("Can not initialize master trigger mode, Err {err}"),
-                Ok(_)    => info!("Latching to MasterTrigger")
-              }
-            } else {
-              match disable_master_trigger_mode() {
-                Err(err) => error!("Can not disable master trigger mode, Err {err}"),
-                Ok(_)    => info!("Master trigger mode didsabled!")
-              }
+    match run_params.try_recv() {
+      Err(err) => {
+        trace!("Did not receive new RunParams! Err {err}");
+        thread::sleep(one_sec);
+        //continue;
+      }
+      Ok(p) => {
+        info!("Received a new set of RunParams! {:?}", p);
+        pars = p;
+        if pars.is_active {
+          info!("Will start a new run!");
+          info!("Initializing board, starting up...");
+          if latch_to_mtb {
+            match set_master_trigger_mode() {
+              Err(err) => error!("Can not initialize master trigger mode, Err {err}"),
+              Ok(_)    => info!("Latching to MasterTrigger")
             }
-            if force_trigger {
-              match enable_trigger() {
-                Err(err) => error!("Can not enable triggers! Err {err}"),
-                Ok(_)    => info!("Triggers enabled - Run start!")
-              }
-            } else {
-              match enable_trigger() {
-                Err(err) => error!("Can not enable triggers! Err {err}"),
-                Ok(_)    => info!("Triggers enabled - Run start!")
-              }
-              thread::sleep(one_sec);
-              match get_trigger_rate() {
-                Err(err) => error!("Unable to obtain trigger rate! Err {err}"),
-                Ok(rate) => info!("Seing MTB trigger rate of {rate} Hz")
-              }
-            }
-            is_running = true;
-            if show_progress {
-              if pars.forever {
-                template_bar_env = "[{elapsed_precise}] {prefix} {msg} {spinner} ";
-              } else {
-                template_bar_env = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.red/grey} {pos:>7}/{len:7}";
-              }
-              sty_ev = ProgressStyle::with_template(template_bar_env)
-              .unwrap();
-              multi_prog = MultiProgress::new();
-              prog_a  = multi_prog
-                        .add(ProgressBar::new(uio1_total_size as u64)); 
-              prog_b  = multi_prog
-                        .insert_after(&prog_a, ProgressBar::new(uio2_total_size as u64)); 
-              prog_ev = multi_prog
-                            .insert_after(&prog_b, ProgressBar::new(pars.nevents as u64)); 
-              prog_a.set_message (label_a.clone());
-              prog_a.set_prefix  ("\u{1F4BE}");
-              prog_a.set_style   (sty_a.clone());
-              prog_b.set_message (label_b.clone());
-              prog_b.set_prefix  ("\u{1F4BE}");
-              prog_b.set_style   (sty_b.clone());
-              prog_ev.set_style  (sty_ev.clone());
-              prog_ev.set_prefix ("\u{2728}");
-              prog_ev.set_message("EVENTS");
-            }
-            continue; // start loop again
           } else {
-            info!("Got signal to end stop run");
-            is_running = false;
-            match disable_trigger() {
-              Err(err) => error!("Can not disable triggers, error {err}"),
-              Ok(_)    => ()
+            match disable_master_trigger_mode() {
+              Err(err) => error!("Can not disable master trigger mode, Err {err}"),
+              Ok(_)    => info!("Master trigger mode didsabled!")
             }
-            if show_progress {
-              prog_ev.finish();
-              prog_a.finish();
-              prog_b.finish();
+          }
+          if force_trigger {
+            match enable_trigger() {
+              Err(err) => error!("Can not enable triggers! Err {err}"),
+              Ok(_)    => info!("Triggers enabled - Run start!")
             }
+          } else {
+            match enable_trigger() {
+              Err(err) => error!("Can not enable triggers! Err {err}"),
+              Ok(_)    => info!("Triggers enabled - Run start!")
+            }
+            thread::sleep(one_sec);
+            match get_trigger_rate() {
+              Err(err) => error!("Unable to obtain trigger rate! Err {err}"),
+              Ok(rate) => info!("Seing MTB trigger rate of {rate} Hz")
+            }
+          }
+          is_running = true;
+          if show_progress {
+            if pars.forever {
+              template_bar_env = "[{elapsed_precise}] {prefix} {msg} {spinner} ";
+            } else {
+              template_bar_env = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.red/grey} {pos:>7}/{len:7}";
+            }
+            sty_ev = ProgressStyle::with_template(template_bar_env)
+            .unwrap();
+            multi_prog = MultiProgress::new();
+            prog_a  = multi_prog
+                      .add(ProgressBar::new(uio1_total_size as u64)); 
+            prog_b  = multi_prog
+                      .insert_after(&prog_a, ProgressBar::new(uio2_total_size as u64)); 
+            prog_ev = multi_prog
+                          .insert_after(&prog_b, ProgressBar::new(pars.nevents as u64)); 
+            prog_a.set_message (label_a.clone());
+            prog_a.set_prefix  ("\u{1F4BE}");
+            prog_a.set_style   (sty_a.clone());
+            prog_b.set_message (label_b.clone());
+            prog_b.set_prefix  ("\u{1F4BE}");
+            prog_b.set_style   (sty_b.clone());
+            prog_ev.set_style  (sty_ev.clone());
+            prog_ev.set_prefix ("\u{2728}");
+            prog_ev.set_message("EVENTS");
+          }
+          continue; // start loop again
+        } else {
+          info!("Got signal to stop run");
+          is_running = false;
+          match disable_trigger() {
+            Err(err) => error!("Can not disable triggers, error {err}"),
+            Ok(_)    => ()
+          }
+          if show_progress {
+            prog_ev.finish();
+            prog_a.finish();
+            prog_b.finish();
           }
         }
       }
-    } // this is the !is_running branch
+    } // end run_params.try_recv()
 
-    if force_trigger {
-      //println!("Forcing trigger!");
-      //println!("Time between events {}", time_between_events.unwrap());
-      let elapsed = timer.elapsed().as_secs_f32();
-      //println!("Elapsed {}", elapsed);
-      if elapsed > time_between_events.unwrap() {
-        timer = Instant::now(); 
-        match trigger() {
-          Err(err) => error!("Error when triggering! {err}"),
-          Ok(_)    => ()//println!("Firing trigger!")
-        }
-      } else {
-        // FIXME - we could sleep here for a bit!
-        continue;
-      }
-    }    
-
-    // calculate current event count
-    if !force_trigger {
-      match get_event_count() {
-        Err (err) => {
-          error!("Can not obtain event count! Err {:?}", err);
+    if is_running {
+      if force_trigger {
+        //println!("Forcing trigger!");
+        //println!("Time between events {}", time_between_events.unwrap());
+        let elapsed = timer.elapsed().as_secs_f32();
+        //println!("Elapsed {}", elapsed);
+        if elapsed > time_between_events.unwrap() {
+          timer = Instant::now(); 
+          match trigger() {
+            Err(err) => error!("Error when triggering! {err}"),
+            Ok(_)    => ()//println!("Firing trigger!")
+          }
+        } else {
+          // FIXME - we could sleep here for a bit!
           continue;
         }
-        Ok (cnt) => {
-          evt_cnt = cnt;
-          if first_iter {
-            last_evt_cnt = evt_cnt;
-            first_iter = false;
+      }    
+
+      // calculate current event count
+      if !force_trigger {
+        match get_event_count() {
+          Err (err) => {
+            error!("Can not obtain event count! Err {:?}", err);
             continue;
           }
-          if evt_cnt == last_evt_cnt {
-            thread::sleep(one_milli);
-            trace!("We didn't get an updated event count!");
-            continue;
-          }
-        } // end ok
-      } // end match
-    } // end force trigger
+          Ok (cnt) => {
+            evt_cnt = cnt;
+            if first_iter {
+              last_evt_cnt = evt_cnt;
+              first_iter = false;
+              continue;
+            }
+            if evt_cnt == last_evt_cnt {
+              thread::sleep(one_milli);
+              trace!("We didn't get an updated event count!");
+              continue;
+            }
+          } // end ok
+        } // end match
+      } // end force trigger
 
-    // AT THIS POINT WE KNOW WE HAVE SEEN SOMETHING!!!
-    // THIS IS IMPORTANT
+      // AT THIS POINT WE KNOW WE HAVE SEEN SOMETHING!!!
+      // THIS IS IMPORTANT
 
-    match ram_buffer_handler(buffer_trip,
-                             &bs_sender) { 
-      Err(err)   => {
-        error!("Can not deal with RAM buffers {err}");
-        continue;
+      match ram_buffer_handler(buffer_trip,
+                               &bs_sender) { 
+        Err(err)   => {
+          error!("Can not deal with RAM buffers {err}");
+          continue;
+        }
+        Ok(result) => {
+          which_buff = result.0;
+          buff_size  = result.1;
+        }
       }
-      Ok(result) => {
-        which_buff = result.0;
-        buff_size  = result.1;
+      if force_trigger {
+          n_events += 1;
+      } else {
+        delta_events = (evt_cnt - last_evt_cnt) as u64;
+        n_events    += delta_events;
+        last_evt_cnt = evt_cnt;
       }
-    }
-    if force_trigger {
-        n_events += 1;
-    } else {
-      delta_events = (evt_cnt - last_evt_cnt) as u64;
-      n_events    += delta_events;
-      last_evt_cnt = evt_cnt;
-    }
-    if show_progress {
-      match which_buff {
-        RamBuffer::A => prog_a.set_position(buff_size as u64),
-        RamBuffer::B => prog_b.set_position(buff_size as u64),
+      if show_progress {
+        match which_buff {
+          RamBuffer::A => prog_a.set_position(buff_size as u64),
+          RamBuffer::B => prog_b.set_position(buff_size as u64),
+        }
+        prog_ev.set_position(n_events);
       }
-      prog_ev.set_position(n_events);
-    }
 
+    } // end is_running
     if !pars.forever {
       if pars.nevents != 0 {
         if n_events > pars.nevents as u64{
@@ -1011,7 +1104,7 @@ pub fn event_cache_worker(recv_ev_pl    : Receiver<RBEventPayload>,
                           recv_evid    : Receiver<u32>,
                           cache_size   : usize) {
 
-  let mut n_send_errors = 0;   
+  let mut n_send_errors  = 0u64;   
   let mut op_mode_stream = false;
 
   let mut oldest_event_id : u32 = 0;
@@ -1111,179 +1204,179 @@ pub fn event_cache_worker(recv_ev_pl    : Receiver<RBEventPayload>,
   } // end loop
 }
 
-/// Deal with incoming commands
-///
-///
-///
-///
-pub struct Commander<'a> {
-
-  pub evid_send        : Sender<u32>,
-  pub change_op_mode   : Sender<TofOperationMode>, 
-  pub rb_evt_recv      : Receiver<Option<RBEventPayload>>,
-  pub hasit_from_cache : &'a Receiver<bool>,
-}
-
-impl Commander<'_> {
-
-  pub fn new<'a> (send_ev          : Sender<u32>,
-                  hasit_from_cache : &'a Receiver<bool>,
-                  evpl_from_cache  : Receiver<Option<RBEventPayload>>,
-                  change_op_mode   : Sender<TofOperationMode>)
-    -> Commander<'a> {
-
-    Commander {
-      evid_send        : send_ev,
-      change_op_mode   : change_op_mode,
-      rb_evt_recv      : evpl_from_cache,
-      hasit_from_cache : hasit_from_cache,
-    }
-  }
-
-
-  /// Interpret an incoming command 
-  ///
-  /// The command comes most likely somehow over 
-  /// the wir from the tof computer
-  ///
-  /// Match with a list of known commands and 
-  /// take action.
-  ///
-  /// # Arguments
-  ///
-  /// * command : A TofCommand instructing the 
-  ///             commander what to do
-  ///             Will generate a TofResponse 
-  ///             
-  pub fn command (&self, cmd : &TofCommand)
-    -> Result<TofResponse, FIXME> {
-    match cmd {
-      TofCommand::PowerOn   (mask) => {
-        warn!("Not implemented");
-        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
-      },
-      TofCommand::PowerOff  (mask) => {
-        warn!("Not implemented");
-        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
-      },
-      TofCommand::PowerCycle(mask) => {
-        warn!("Not implemented");
-        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
-      },
-      TofCommand::RBSetup   (mask) => {
-        warn!("Not implemented");
-        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
-      }, 
-      TofCommand::SetThresholds   (thresholds) =>  {
-        warn!("Not implemented");
-        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
-      },
-      TofCommand::StartValidationRun  (_) => {
-        warn!("Not implemented");
-        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
-      },
-      TofCommand::RequestWaveforms (eventid) => {
-        warn!("Not implemented");
-        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
-      },
-      TofCommand::UnspoolEventCache   (_) => {
-        warn!("Not implemented");
-        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
-      },
-      TofCommand::StreamOnlyRequested (_) => {
-        let op_mode = TofOperationMode::TofModeRequestReply;
-        
-        match self.change_op_mode.try_send(op_mode) {
-          Err(err) => trace!("Error sending! {err}"),
-          Ok(_)    => ()
-        }
-        return Ok(TofResponse::Success(RESP_SUCC_FINGERS_CROSSED));
-      },
-      TofCommand::StreamAnyEvent      (_) => {
-        let op_mode = TofOperationMode::TofModeStreamAny;
-        match self.change_op_mode.try_send(op_mode) {
-          Err(err) => trace!("Error sending! {err}"),
-          Ok(_)    => ()
-        }
-        return Ok(TofResponse::Success(RESP_SUCC_FINGERS_CROSSED));
-      },
-      //TofCommand::DataRunStart (max_event) => {
-      //  // let's start a run. The value of the TofCommnad shall be 
-      //  // nevents
-      //  self.workforce.execute(move || {
-      //      runner(Some(*max_event as u64),
-      //             None,
-      //             None,
-      //             self.get_killed_chn,
-      //             None);
-      //  }); 
-      //  return Ok(TofResponse::Success(RESP_SUCC_FINGERS_CROSSED));
-      //}, 
-      //TofCommand::DataRunEnd   => {
-      //  if !self.run_active {
-      //    return Ok(TofResponse::GeneralFail(RESP_ERR_NORUNACTIVE));
-      //  }
-      //  warn!("Will kill current run!");
-      //  self.kill_chn.send(true);
-      //  return Ok(TofResponse::Success(RESP_SUCC_FINGERS_CROSSED));
-      //},
-      TofCommand::VoltageCalibration (_) => {
-        warn!("Not implemented");
-        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
-      },
-      TofCommand::TimingCalibration  (_) => {
-        warn!("Not implemented");
-        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
-      },
-      TofCommand::CreateCalibrationFile (_) => {
-        warn!("Not implemented");
-        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
-      },
-      TofCommand::RequestEvent(eventid) => {
-        match self.evid_send.send(*eventid) {
-          Err(err) => {
-            debug!("Problem sending event id to cache! Err {err}");
-            return Ok(TofResponse::GeneralFail(*eventid));
-          },
-          Ok(event) => (),
-        }
-        match self.hasit_from_cache.recv() {
-          Err(_) => {
-            return Ok(TofResponse::EventNotReady(*eventid));
-          }
-          Ok(hasit) => {
-            // FIXME - prefix topic
-            if hasit {
-              return Ok(TofResponse::Success(*eventid));
-            } else {
-              return Ok(TofResponse::EventNotReady(*eventid));
-            }
-            //Some(event) => {
-            //  match self.zmq_pub_socket.send(event.payload, zmq::DONTWAIT) {
-            //    Ok(_)  => {
-            //      return Ok(TofResponse::Success(*eventid));
-            //    }
-            //    Err(err) => {
-            //      debug!("Problem with PUB socket! Err {err}"); 
-            //      return Ok(TofResponse::ZMQProblem(*eventid));
-            //    }
-            //  }
-            //}
-            //}
-          }
-        }
-      },
-      TofCommand::RequestMoni (_) => {
-      },
-      TofCommand::Unknown (_) => {
-      }
-      _ => {
-      }
-    } 
-    let response = TofResponse::Success(1);
-    Ok(response)
-  }
-}
+///// Deal with incoming commands
+/////
+/////
+/////
+/////
+//pub struct Commander<'a> {
+//
+//  pub evid_send        : Sender<u32>,
+//  pub change_op_mode   : Sender<TofOperationMode>, 
+//  pub rb_evt_recv      : Receiver<Option<RBEventPayload>>,
+//  pub hasit_from_cache : &'a Receiver<bool>,
+//}
+//
+//impl Commander<'_> {
+//
+//  pub fn new<'a> (send_ev          : Sender<u32>,
+//                  hasit_from_cache : &'a Receiver<bool>,
+//                  evpl_from_cache  : Receiver<Option<RBEventPayload>>,
+//                  change_op_mode   : Sender<TofOperationMode>)
+//    -> Commander<'a> {
+//
+//    Commander {
+//      evid_send        : send_ev,
+//      change_op_mode   : change_op_mode,
+//      rb_evt_recv      : evpl_from_cache,
+//      hasit_from_cache : hasit_from_cache,
+//    }
+//  }
+//
+//
+//  /// Interpret an incoming command 
+//  ///
+//  /// The command comes most likely somehow over 
+//  /// the wir from the tof computer
+//  ///
+//  /// Match with a list of known commands and 
+//  /// take action.
+//  ///
+//  /// # Arguments
+//  ///
+//  /// * command : A TofCommand instructing the 
+//  ///             commander what to do
+//  ///             Will generate a TofResponse 
+//  ///             
+//  pub fn command (&self, cmd : &TofCommand)
+//    -> Result<TofResponse, FIXME> {
+//    match cmd {
+//      TofCommand::PowerOn   (mask) => {
+//        warn!("Not implemented");
+//        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
+//      },
+//      TofCommand::PowerOff  (mask) => {
+//        warn!("Not implemented");
+//        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
+//      },
+//      TofCommand::PowerCycle(mask) => {
+//        warn!("Not implemented");
+//        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
+//      },
+//      TofCommand::RBSetup   (mask) => {
+//        warn!("Not implemented");
+//        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
+//      }, 
+//      TofCommand::SetThresholds   (thresholds) =>  {
+//        warn!("Not implemented");
+//        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
+//      },
+//      TofCommand::StartValidationRun  (_) => {
+//        warn!("Not implemented");
+//        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
+//      },
+//      TofCommand::RequestWaveforms (eventid) => {
+//        warn!("Not implemented");
+//        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
+//      },
+//      TofCommand::UnspoolEventCache   (_) => {
+//        warn!("Not implemented");
+//        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
+//      },
+//      TofCommand::StreamOnlyRequested (_) => {
+//        let op_mode = TofOperationMode::TofModeRequestReply;
+//        
+//        match self.change_op_mode.try_send(op_mode) {
+//          Err(err) => trace!("Error sending! {err}"),
+//          Ok(_)    => ()
+//        }
+//        return Ok(TofResponse::Success(RESP_SUCC_FINGERS_CROSSED));
+//      },
+//      TofCommand::StreamAnyEvent      (_) => {
+//        let op_mode = TofOperationMode::TofModeStreamAny;
+//        match self.change_op_mode.try_send(op_mode) {
+//          Err(err) => trace!("Error sending! {err}"),
+//          Ok(_)    => ()
+//        }
+//        return Ok(TofResponse::Success(RESP_SUCC_FINGERS_CROSSED));
+//      },
+//      //TofCommand::DataRunStart (max_event) => {
+//      //  // let's start a run. The value of the TofCommnad shall be 
+//      //  // nevents
+//      //  self.workforce.execute(move || {
+//      //      runner(Some(*max_event as u64),
+//      //             None,
+//      //             None,
+//      //             self.get_killed_chn,
+//      //             None);
+//      //  }); 
+//      //  return Ok(TofResponse::Success(RESP_SUCC_FINGERS_CROSSED));
+//      //}, 
+//      //TofCommand::DataRunEnd   => {
+//      //  if !self.run_active {
+//      //    return Ok(TofResponse::GeneralFail(RESP_ERR_NORUNACTIVE));
+//      //  }
+//      //  warn!("Will kill current run!");
+//      //  self.kill_chn.send(true);
+//      //  return Ok(TofResponse::Success(RESP_SUCC_FINGERS_CROSSED));
+//      //},
+//      TofCommand::VoltageCalibration (_) => {
+//        warn!("Not implemented");
+//        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
+//      },
+//      TofCommand::TimingCalibration  (_) => {
+//        warn!("Not implemented");
+//        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
+//      },
+//      TofCommand::CreateCalibrationFile (_) => {
+//        warn!("Not implemented");
+//        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
+//      },
+//      TofCommand::RequestEvent(eventid) => {
+//        match self.evid_send.send(*eventid) {
+//          Err(err) => {
+//            debug!("Problem sending event id to cache! Err {err}");
+//            return Ok(TofResponse::GeneralFail(*eventid));
+//          },
+//          Ok(_) => (),
+//        }
+//        match self.hasit_from_cache.recv() {
+//          Err(_) => {
+//            return Ok(TofResponse::EventNotReady(*eventid));
+//          }
+//          Ok(hasit) => {
+//            // FIXME - prefix topic
+//            if hasit {
+//              return Ok(TofResponse::Success(*eventid));
+//            } else {
+//              return Ok(TofResponse::EventNotReady(*eventid));
+//            }
+//            //Some(event) => {
+//            //  match self.zmq_pub_socket.send(event.payload, zmq::DONTWAIT) {
+//            //    Ok(_)  => {
+//            //      return Ok(TofResponse::Success(*eventid));
+//            //    }
+//            //    Err(err) => {
+//            //      debug!("Problem with PUB socket! Err {err}"); 
+//            //      return Ok(TofResponse::ZMQProblem(*eventid));
+//            //    }
+//            //  }
+//            //}
+//            //}
+//          }
+//        }
+//      },
+//      TofCommand::RequestMoni (_) => {
+//      },
+//      TofCommand::Unknown (_) => {
+//      }
+//      _ => {
+//      }
+//    } 
+//    let response = TofResponse::Success(1);
+//    Ok(response)
+//  }
+//}
 
 ///  Get the blob buffer size from occupancy register
 ///

@@ -7,7 +7,7 @@
 use std::fmt;
 use std::str::FromStr;
 use std::net::Ipv4Addr;
-
+use std::path::Path;
 
 extern crate sqlite;
 
@@ -73,8 +73,8 @@ impl fmt::Display for LocalTriggerBoard {
   }
 }
 
-pub fn get_rbs_from_sqlite() -> Vec<ReadoutBoard> {
-  let connection = sqlite::open("/srv/gaps/gaps-online-software/gaps-db/gaps_db/db.sqlite3").unwrap();
+pub fn get_rbs_from_sqlite(filename : &Path) -> Vec<ReadoutBoard> {
+  let connection = sqlite::open(filename).unwrap();
   let query = "SELECT * FROM tof_db_rb";
   let mut rbs  = Vec::<ReadoutBoard>::new();
   connection
@@ -113,8 +113,8 @@ pub fn get_rbs_from_sqlite() -> Vec<ReadoutBoard> {
 
 
 
-pub fn get_ltbs_from_sqlite() -> Vec<LocalTriggerBoard> {
-  let connection = sqlite::open("/srv/gaps/gaps-online-software/gaps-db/gaps_db/db.sqlite3").unwrap();
+pub fn get_ltbs_from_sqlite(filename : &Path) -> Vec<LocalTriggerBoard> {
+  let connection = sqlite::open(filename).unwrap();
   let query = "SELECT * FROM tof_db_ltb";
   let mut ltbs  = Vec::<LocalTriggerBoard>::new();
   connection
@@ -540,6 +540,11 @@ impl ReadoutBoard {
     }
   }
 
+  pub fn infer_ip_address(&mut self) {
+    let address = 100 + self.rb_id;
+    self.ip_address = Ipv4Addr::new(10,0,1,address);
+  }
+
   pub fn get_triggered_pids(&self) -> Vec<u8> {
     let mut pids = Vec::<u8>::new();
     for k in 0..8 {
@@ -586,6 +591,10 @@ impl ReadoutBoard {
   ///
   /// * channel 1-8
   pub fn get_pid_for_ch(&self, channel : usize) -> u8 {
+    if channel > 9 || channel == 0 {
+      error!("Got invalid channel value! Returning rubbish");
+      return 0;
+    }
     let p_end_id = self.channel_to_paddle_end_id[channel -1];
     if p_end_id % 2000 > 0 {
       return (p_end_id - 2000) as u8;
@@ -609,6 +618,10 @@ impl ReadoutBoard {
 
 
   pub fn get_paddle_end_id_for_rb_channel(&self,channel : usize) -> u16 {
+    if channel > 9 || channel == 0 {
+      error!("Got invalid channel value! Returning rubbish");
+      return 0;
+    } 
     return self.channel_to_paddle_end_id[channel -1]
   }
 }

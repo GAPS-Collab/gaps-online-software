@@ -905,199 +905,198 @@ impl BlobData {
       } // end loop over n_rsp
       if k < n_rsp && i32::abs(rsp[k] - rsp[k + 1] % NWORDS as i32) == 2
         {skip_next = true;} // skip second half of double spike
-      } // end loop over k
-    }
-    
-    ///! Set the threshold and check if the waveform got over threahshold
-    pub fn set_threshold(&mut self, thr : f64, ch : usize) -> bool {
-      self.threshold[ch] = thr;
-      for n in 0..NWORDS {
-        if self.voltages[ch][n] > thr {
-          return true;
-        }
-      }
-      false
-    }
-
-    pub fn set_cfds_fraction(&mut self, fraction : f64, ch : usize) {
-        self.cfds_fraction[ch] = fraction;
-    }
-    
-    pub fn set_ped_begin(&mut self, time : f64, ch : usize) {
-        match self.time_2_bin(time, ch) {
-            Err(err) => println!("Can not find bin for time {}, ch {}, err {:?}", time, ch, err),
-            Ok(begin) => {self.ped_begin_bin[ch] = begin;}
-        }
-    }
-
-    pub fn set_ped_range(&mut self, range : f64, ch : usize) {
-      // This is a little convoluted, but we must convert the range (in
-      // ns) into bins
-      match self.time_2_bin(self.nanoseconds[ch][self.ped_begin_bin[ch]] + range, ch) {
-          Err(err)      => println!("Can not set pedestal range for range {} for ch {}, err {:?}", range, ch, err),
-          Ok(bin_range) => {self.ped_bin_range[ch] = bin_range;}
+    } // end loop over k
+  }
+  
+  ///! Set the threshold and check if the waveform got over threahshold
+  pub fn set_threshold(&mut self, thr : f64, ch : usize) -> bool {
+    self.threshold[ch] = thr;
+    for n in 0..NWORDS {
+      if self.voltages[ch][n] > thr {
+        return true;
       }
     }
+    false
+  }
 
-    pub fn subtract_pedestal(&mut self, ch : usize) {
-      for n in 0..NWORDS {
-        self.voltages[ch][n] -= self.pedestal[ch];
+  pub fn set_cfds_fraction(&mut self, fraction : f64, ch : usize) {
+      self.cfds_fraction[ch] = fraction;
+  }
+  
+  pub fn set_ped_begin(&mut self, time : f64, ch : usize) {
+      match self.time_2_bin(time, ch) {
+          Err(err)  => error!("Can not find bin for time {}, ch {}, err {:?}", time, ch, err),
+          Ok(begin) => {self.ped_begin_bin[ch] = begin;}
+      }
+  }
+
+  pub fn set_ped_range(&mut self, range : f64, ch : usize) {
+    // This is a little convoluted, but we must convert the range (in
+    // ns) into bins
+    match self.time_2_bin(self.nanoseconds[ch][self.ped_begin_bin[ch]] + range, ch) {
+        Err(err)      => error!("Can not set pedestal range for range {} for ch {}, err {:?}", range, ch, err),
+        Ok(bin_range) => {self.ped_bin_range[ch] = bin_range;}
+    }
+  }
+
+  pub fn subtract_pedestal(&mut self, ch : usize) {
+    for n in 0..NWORDS {
+      self.voltages[ch][n] -= self.pedestal[ch];
+    }
+  }
+
+  pub fn calc_ped_range(&mut self, ch : usize) {
+    let mut sum  = 0f64;
+    let mut sum2 = 0f64;
+
+    for n in self.ped_begin_bin[ch]..self.ped_begin_bin[ch] + self.ped_bin_range[ch] {
+      if f64::abs(self.voltages[ch][n]) < 10.0 {
+        sum  += self.voltages[ch][n];
+        sum2 += self.voltages[ch][n]*self.voltages[ch][n];
       }
     }
+    let average = sum/(self.ped_bin_range[ch] as f64);
+    self.pedestal[ch] = average;
+    self.pedestal_sigma[ch] = f64::sqrt(sum2/(self.ped_bin_range[ch] as f64 - (average*average)))
 
-    pub fn calc_ped_range(&mut self, ch : usize) {
-      let mut sum  = 0f64;
-      let mut sum2 = 0f64;
+  }
 
-      for n in self.ped_begin_bin[ch]..self.ped_begin_bin[ch] + self.ped_bin_range[ch] {
-        if f64::abs(self.voltages[ch][n]) < 10.0 {
-          sum  += self.voltages[ch][n];
-          sum2 += self.voltages[ch][n]*self.voltages[ch][n];
-        }
+  fn time_2_bin(&self, t_ns : f64, ch : usize) -> Result<usize, WaveformError> {
+    // Given a time in ns, find the bin most closely corresponding to that time
+    for n in 0..NWORDS {
+      if self.nanoseconds[ch][n] > t_ns {
+        return Ok(n-1);
       }
-      let average = sum/(self.ped_bin_range[ch] as f64);
-      self.pedestal[ch] = average;
-      self.pedestal_sigma[ch] = f64::sqrt(sum2/(self.ped_bin_range[ch] as f64 - (average*average)))
-
     }
+    error!("Did not find a bin corresponding to the given time {} for ch {}", t_ns, ch);
+    return Err(WaveformError::TimesTooSmall);
+  }
 
-    fn time_2_bin(&self, t_ns : f64, ch : usize) -> Result<usize, WaveformError> {
-      // Given a time in ns, find the bin most closely corresponding to that time
-      for n in 0..NWORDS {
-        if self.nanoseconds[ch][n] > t_ns {
-          return Ok(n-1);
-        }
-      }
-      println!("Did not find a bin corresponding to the given time {} for ch {}", t_ns, ch);
-      return Err(WaveformError::TimesTooSmall);
+
+  // 
+  // Return the bin with the maximum DC value
+  //
+  fn get_max_bin(&self,
+                 lower_bound : usize,
+                 window : usize,
+                 ch : usize ) -> Result<usize, WaveformError> {
+    if lower_bound + window > NWORDS {
+      return Err(WaveformError::OutOfRangeUpperBound);
     }
-
-
-    // 
-    // Return the bin with the maximum DC value
-    //
-    fn get_max_bin(&self,
-                   lower_bound : usize,
-                   window : usize,
-                   ch : usize ) -> Result<usize, WaveformError> {
-      if lower_bound + window > NWORDS {
-        return Err(WaveformError::OutOfRangeUpperBound);
+    let mut maxval = self.voltages[ch][lower_bound];
+    let mut maxbin = lower_bound;
+    for n in lower_bound..lower_bound + window {
+      if self.voltages[ch][n] > maxval {
+        maxval  = self.voltages[ch][n];
+        maxbin  = n;
       }
-      let mut maxval = self.voltages[ch][lower_bound];
-      let mut maxbin = lower_bound;
-      for n in lower_bound..lower_bound + window {
-        if self.voltages[ch][n] > maxval {
-          maxval  = self.voltages[ch][n];
-          maxbin  = n;
-        }
-      } // end for
-      trace!("Got maxbin {} with a value of {}", maxbin, maxval);
-      Ok(maxbin)
-    } // end fn
+    } // end for
+    trace!("Got maxbin {} with a value of {}", maxbin, maxval);
+    Ok(maxbin)
+  } // end fn
 
-    pub fn find_cfd_simple(&mut self, peak_num : usize, ch : usize) -> f64 {
-      if self.num_peaks[ch] == 0 {
-        trace!("No peaks for ch {}!", ch);
+  pub fn find_cfd_simple(&mut self, peak_num : usize, ch : usize) -> f64 {
+    if self.num_peaks[ch] == 0 {
+      trace!("No peaks for ch {}!", ch);
+      return 0.0;
+    }
+    if peak_num > self.num_peaks[ch] {
+      warn!("Requested peak {} is larger than detected peaks (={})", peak_num, self.num_peaks[ch]); 
+      return self.nanoseconds[ch][NWORDS];
+    }
+    // FIXME
+    // FIXME - this needs some serious error checking
+    if self.end_peak[ch][peak_num] < self.begin_peak[ch][peak_num] {
+        debug!("cfd simple method failed!! Peak begin {}, peak end {}", self.begin_peak[ch][peak_num], self.end_peak[ch][peak_num]);
         return 0.0;
-      }
-      if peak_num > self.num_peaks[ch] {
-        warn!("Requested peak {} is larger than detected peaks (={})", peak_num, self.num_peaks[ch]); 
-        return self.nanoseconds[ch][NWORDS];
-      }
-      // FIXME
-      // FIXME - this needs some serious error checking
-      if self.end_peak[ch][peak_num] < self.begin_peak[ch][peak_num] {
-          debug!("cfd simple method failed!! Peak begin {}, peak end {}", self.begin_peak[ch][peak_num], self.end_peak[ch][peak_num]);
-          return 0.0;
-      }
-      let mut idx : usize;
-      match self.get_max_bin(self.begin_peak[ch][peak_num],
-                             self.end_peak[ch][peak_num]-self.begin_peak[ch][peak_num],
-                             ch) {
-        Err(err) => {warn!("Can not find cfd due to err {:?}",err);
-                     return 0.0;
-        }
-        Ok(maxbin)  => {trace!("Got bin {} for max val", maxbin);
-                        idx = maxbin;
-        }
-
-      }
-      trace!("Got max bin {} for peak {} .. {}", idx, self.begin_peak[ch][peak_num], self.end_peak[ch][peak_num]);
-      trace!("Voltage at max {}", self.voltages[ch][idx]);
-      if idx < 1 {idx = 1;}
-      let mut sum : f64 = 0.0;
-      for n in idx-1..idx+1 {sum += self.voltages[ch][n];}
-      let cfds_frac  : f64 = 0.2;
-      let tmp_thresh : f64 = f64::abs(cfds_frac * (sum / 3.0));
-      trace!("Calculated tmp threshold of {}", tmp_thresh);
-      // Now scan through the waveform around the peak to find the bin
-      // crossing the calculated threshold. Bin idx is the peak so it is
-      // definitely above threshold. So let's walk backwards through the
-      // trace until we find a bin value less than the threshold.
-      let mut lo_bin : usize = NWORDS;
-      let mut n = idx;
-      assert!(idx >= self.begin_peak[ch][peak_num]);
-      if self.begin_peak[ch][peak_num] >= 10 {
-        while n > self.begin_peak[ch][peak_num] - 10 {
-        //for n in (idx..self.begin_peak[peak_num] - 10).rev() {
-          if f64::abs(self.voltages[ch][n]) < tmp_thresh {
-            lo_bin = n;
-            break;
-          }
-          n -= 1;
-        }  
-      }
-      trace!("Lo bin {} , begin peak {}", lo_bin, self.begin_peak[ch][peak_num]);
-      let cfd_time : f64;
-      if lo_bin < NWORDS -1 {
-        cfd_time = self.find_interpolated_time(tmp_thresh, lo_bin, 1, ch).unwrap();  
-      }
-      else {cfd_time = self.nanoseconds[ch][NWORDS - 1];} 
-
-      // save it in member variable
-      self.tdcs[ch][peak_num] = cfd_time;
-      return cfd_time;
     }
+    let mut idx : usize;
+    match self.get_max_bin(self.begin_peak[ch][peak_num],
+                           self.end_peak[ch][peak_num]-self.begin_peak[ch][peak_num],
+                           ch) {
+      Err(err) => {warn!("Can not find cfd due to err {:?}",err);
+                   return 0.0;
+      }
+      Ok(maxbin)  => {trace!("Got bin {} for max val", maxbin);
+                      idx = maxbin;
+      }
 
-    pub fn find_interpolated_time (&self,
-                                   //adc       : [f64;NWORDS],
-                                   //times     : [f64;NWORDS], 
-                                   mut threshold : f64,
-                                   mut idx       : usize,
-                                   size          : usize, 
-                                   ch            : usize) -> Result<f64, WaveformError> {
-      if idx + 1 > NWORDS {
-        return Err(WaveformError::OutOfRangeUpperBound);
-      }
-      
-      threshold = threshold.abs();
-      let mut lval  = (self.voltages[ch][idx]).abs();
-      let mut hval : f64 = 0.0; 
-      if size == 1 {
-        hval = (self.voltages[ch][idx+1]).abs();
-      } else {
-      for n in idx+1..idx+size {
-        hval = self.voltages[ch][n].abs();
-        if (hval>=threshold) && (threshold<=lval) { // Threshold crossing?
-          idx = n-1; // Reset idx to point before crossing
+    }
+    trace!("Got max bin {} for peak {} .. {}", idx, self.begin_peak[ch][peak_num], self.end_peak[ch][peak_num]);
+    trace!("Voltage at max {}", self.voltages[ch][idx]);
+    if idx < 1 {idx = 1;}
+    let mut sum : f64 = 0.0;
+    for n in idx-1..idx+1 {sum += self.voltages[ch][n];}
+    let cfds_frac  : f64 = 0.2;
+    let tmp_thresh : f64 = f64::abs(cfds_frac * (sum / 3.0));
+    trace!("Calculated tmp threshold of {}", tmp_thresh);
+    // Now scan through the waveform around the peak to find the bin
+    // crossing the calculated threshold. Bin idx is the peak so it is
+    // definitely above threshold. So let's walk backwards through the
+    // trace until we find a bin value less than the threshold.
+    let mut lo_bin : usize = NWORDS;
+    let mut n = idx;
+    assert!(idx >= self.begin_peak[ch][peak_num]);
+    if self.begin_peak[ch][peak_num] >= 10 {
+      while n > self.begin_peak[ch][peak_num] - 10 {
+      //for n in (idx..self.begin_peak[peak_num] - 10).rev() {
+        if f64::abs(self.voltages[ch][n]) < tmp_thresh {
+          lo_bin = n;
           break;
-          }
-        lval = hval;
         }
+        n -= 1;
+      }  
+    }
+    trace!("Lo bin {} , begin peak {}", lo_bin, self.begin_peak[ch][peak_num]);
+    let cfd_time : f64;
+    if lo_bin < NWORDS -1 {
+      cfd_time = self.find_interpolated_time(tmp_thresh, lo_bin, 1, ch).unwrap();  
+    }
+    else {cfd_time = self.nanoseconds[ch][NWORDS - 1];} 
+
+    // save it in member variable
+    self.tdcs[ch][peak_num] = cfd_time;
+    return cfd_time;
+  }
+
+  pub fn find_interpolated_time (&self,
+                                 //adc       : [f64;NWORDS],
+                                 //times     : [f64;NWORDS], 
+                                 mut threshold : f64,
+                                 mut idx       : usize,
+                                 size          : usize, 
+                                 ch            : usize) -> Result<f64, WaveformError> {
+    if idx + 1 > NWORDS {
+      return Err(WaveformError::OutOfRangeUpperBound);
+    }
+    
+    threshold = threshold.abs();
+    let mut lval  = (self.voltages[ch][idx]).abs();
+    let mut hval : f64 = 0.0; 
+    if size == 1 {
+      hval = (self.voltages[ch][idx+1]).abs();
+    } else {
+    for n in idx+1..idx+size {
+      hval = self.voltages[ch][n].abs();
+      if (hval>=threshold) && (threshold<=lval) { // Threshold crossing?
+        idx = n-1; // Reset idx to point before crossing
+        break;
+        }
+      lval = hval;
       }
-      if ( lval > threshold) && (size != 1) {
-        return Ok(self.nanoseconds[ch][idx]);
-      } else if lval == hval {
-        return Ok(self.nanoseconds[ch][idx]);
-      } else {
-        return Ok(self.nanoseconds[ch][idx] 
-              + (threshold-lval)/(hval-lval) * (self.nanoseconds[ch][idx+1]
-              - self.nanoseconds[ch][idx]));
+    }
+    if ( lval > threshold) && (size != 1) {
+      return Ok(self.nanoseconds[ch][idx]);
+    } else if lval == hval {
+      return Ok(self.nanoseconds[ch][idx]);
+    } else {
+      return Ok(self.nanoseconds[ch][idx] 
+            + (threshold-lval)/(hval-lval) * (self.nanoseconds[ch][idx+1]
+            - self.nanoseconds[ch][idx]));
     //float time = WaveTime[idx] +  
     //  (thresh-lval)/(hval-lval) * (WaveTime[idx+1]-WaveTime[idx]) ;
-      }
     }
-
+  }
 
   ///
   /// Find peaks in a given time window (in ns) by 
@@ -1110,10 +1109,10 @@ impl BlobData {
   pub fn find_peaks(&mut self,
                     start_time  : f64,
                     window_size : f64,
-                    ch          : usize) {
+                    ch          : usize) -> Result<(), WaveformError> {
     // FIXME - replace unwrap calls
-    let start_bin  = self.time_2_bin(start_time, ch).unwrap();
-    let window_bin = self.time_2_bin(start_time + window_size, ch).unwrap() - start_bin;
+    let start_bin  = self.time_2_bin(start_time, ch)?;
+    let window_bin = self.time_2_bin(start_time + window_size, ch)? - start_bin;
     // minimum number of bins a peak must have
     // over threshold so that we consider it 
     // a peak
@@ -1180,6 +1179,7 @@ impl BlobData {
           trace!("Reset the last peak (={}) to  {}..{}", peak_ctr, self.begin_peak[ch][peak_ctr], self.end_peak[ch][peak_ctr] );
     }
     //peaks_found = 1;
+    Ok(())
   }
 
   pub fn integrate(&mut self, lower_bound : f64, size : f64, channel : usize) ->Result<f64, WaveformError>  {

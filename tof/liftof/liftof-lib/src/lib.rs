@@ -41,7 +41,9 @@ use tof_dataclasses::errors::{BlobError, SerializationError};
 use tof_dataclasses::commands::{TofCommand};//, TofResponse};
 use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::events::MasterTriggerEvent;
-use tof_dataclasses::serialization::Serialization;
+use tof_dataclasses::serialization::{Serialization,
+                                     parse_u16,
+                                     parse_u32};
 
 const MT_MAX_PACKSIZE   : usize = 512;
 
@@ -171,6 +173,7 @@ impl Default for TofPacketWriter {
 }
 
 /// Meta information for a data run
+#[deprecated(since="0.2.0", note="please use `tof_dataclasses::RunConfig` instead")]
 #[derive(Debug, Copy, Clone)]
 pub struct RunParams {
   pub forever   : bool,
@@ -181,7 +184,7 @@ pub struct RunParams {
 
 impl RunParams {
 
-  pub const PACKETSIZEFIXED    : usize = 10; // bytes
+  pub const SIZE               : usize = 14; // bytes
   pub const VERSION            : &'static str = "1.0";
   pub const HEAD               : u16  = 43690; //0xAAAA
   pub const TAIL               : u16  = 21845; //0x5555
@@ -194,13 +197,47 @@ impl RunParams {
       nseconds  : 0,
     }
   }
+
+  pub fn to_bytestream(&self) -> Vec<u8> {
+    let mut stream = Vec::<u8>::with_capacity(RunParams::SIZE);
+    stream.extend_from_slice(&RunParams::HEAD.to_le_bytes());
+    let mut forever = 0u8;
+    if self.forever {
+      forever = 1;
+    }
+    stream.extend_from_slice(&forever.to_le_bytes());
+    stream.extend_from_slice(&self.nevents.to_le_bytes());
+    let mut is_active = 0u8;
+    if self.is_active {
+      is_active = 1;
+    }
+    stream.extend_from_slice(&is_active.to_le_bytes());
+    stream.extend_from_slice(&self.nseconds.to_le_bytes());
+    stream
+  }
 }
 
 impl Serialization for RunParams {
+  
   fn from_bytestream(bytestream : &Vec<u8>,
                      start_pos  : usize)
     -> Result<Self, SerializationError> {
-    let pars = RunParams::new();
+    let mut pars = RunParams::new();
+    let mut pos  = start_pos;
+    if parse_u16(bytestream, &mut pos) != RunParams::HEAD {
+      return Err(SerializationError::HeadInvalid {});
+    }
+    let forever   = bytestream[pos];
+    pos += 1;
+    pars.nevents  = parse_u32(bytestream, &mut pos);
+    let is_active = bytestream[pos];
+    pos += 1;
+    pars.nseconds = parse_u32(bytestream, &mut pos);
+    if parse_u16(bytestream, &mut pos) != RunParams::TAIL {
+      return Err(SerializationError::TailInvalid {} );
+    }
+    pars.is_active = is_active > 0;
+    pars.forever   = forever > 0;
     Ok(pars)
   }
 }
@@ -270,7 +307,7 @@ pub fn analyze_blobs(buffer               : &Vec<u8>,
   
   // either all or only the triggered paddle ids
   let mut all_pids = readoutboard.get_all_pids();
-  all_pids         = readoutboard.get_triggered_pids();
+  //all_pids         = readoutboard.get_triggered_pids();
   let mut paddles = HashMap::<u8, PaddlePacket>::new();
   for k in all_pids.iter() {
     match paddles.insert(*k, PaddlePacket::new()) {
@@ -377,7 +414,7 @@ pub fn analyze_blobs(buffer               : &Vec<u8>,
               let mut spikes : [i32;10] = [0;10];
               blob_data.calibrate(calibrations);
               blob_data.remove_spikes(&mut spikes);
-              for ch in 0..NCHN {
+              for ch in 0..8 {
 
                 // reset our channels_over_threshold
                 channels_over_threshold[ch] = false;
@@ -403,8 +440,8 @@ pub fn analyze_blobs(buffer               : &Vec<u8>,
                 // analysis
                 let cfd_time = blob_data.find_cfd_simple(0, ch);
                 let charge = blob_data.integrate(270.0, 70.0, ch).unwrap_or(42.0);
-                let pid = readoutboard.get_pid_for_ch(ch );
-                let end = readoutboard.get_paddle_end(ch);
+                let pid = readoutboard.get_pid_for_ch(ch + 1 );
+                let end = readoutboard.get_paddle_end(ch + 1 );
                 match end {
                   // unwraps can't fail due to construction of paddles
                   mf::PaddleEndIdentifier::A => {
@@ -623,7 +660,6 @@ pub fn connect_to_mtb(mt_ip   : &str,
 ///
 pub fn master_trigger(mt_ip          : &str, 
                       mt_port        : usize,
-                      glob_data_sink : &cbc::Sender<TofPacket>,
                       sender_rate    : &cbc::Sender<u32>,
                       evid_sender    : &cbc::Sender<MasterTriggerEvent>,
                       verbose        : bool) {

@@ -1,9 +1,4 @@
-///
-///
-///
-///
-///
-
+//! Routines for RB commiunication and data reception 
 
 use std::time::{SystemTime, UNIX_EPOCH};
 use std::{fs, fs::File, path::Path};
@@ -12,7 +7,6 @@ use std::io::Write;
 use std::fs::OpenOptions;
 //use crossbeam_channel as cbc; 
 use crossbeam_channel::{Sender, unbounded};
-//use std::sync::mpsc::{Sender, channel};
 
 #[cfg(feature = "diagnostics")]
 //use waveform::CalibratedWaveformForDiagnostics;
@@ -28,14 +22,12 @@ use tof_dataclasses::packets::PacketType;
 use tof_dataclasses::packets::paddle_packet::PaddlePacket;
 use tof_dataclasses::calibrations::{Calibrations,
                                     read_calibration_file};
-                                    //remove_spikes,
-                                    //voltage_calibration, 
-                                    //timing_calibration};
 use tof_dataclasses::events::blob::{BlobData,
                                     get_constant_blobeventsize};
 use tof_dataclasses::constants::{NCHN,
                                  NWORDS};
 
+use tof_dataclasses::commands::TofResponse;
 use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::serialization::Serialization;
 use tof_dataclasses::serialization::search_for_u16;
@@ -67,6 +59,7 @@ macro_rules! tvec [
 ///
 ///
 pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
+                                 resp_to_main     : Sender<TofResponse>,
                                  write_blob       : bool,
                                  storage_savepath : &String,
                                  events_per_file  : &usize,
@@ -109,6 +102,7 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
   let mut blobfile_name = storage_savepath.to_owned() + "RB" 
                        + &board_id.to_string() + "_" 
                        + &secs_since_epoch.to_string()
+                       + ".blob";
   //let mut topic : String;
   //if rb.id.unwrap() < 10 {
   //  topic = String::from("RB0") + &rb.id.unwrap().to_string();
@@ -126,7 +120,6 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
   //}
   //socket.set_subscribe(topic.as_bytes());
   //                     + &board_id.to_string()
-                       + ".blob";
   info!("Writing blobs to {}", blobfile_name );
   let mut blobfile_path = Path::new(&blobfile_name);
   let mut file_on_disc : Option<File> = None;//let mut output = File::create(path)?;
@@ -144,7 +137,6 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
         error!("Receiving from socket raised error {}", err);
       }
       Ok(buffer) => {
-        trace!("We got data of size {}", buffer.len());
         //trace!("Working...");
         //// check for rb ping signal
         //let rb_ping = identifiy_readoutboard(&msg);
