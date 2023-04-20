@@ -24,17 +24,6 @@ pub fn parse_u16(bs : &Vec::<u8>, pos : &mut usize) -> u16 {
   value
 }
 
-pub fn parse_u32(bs : &Vec::<u8>, pos : &mut usize) -> u32 {
-  let value = u32::from_le_bytes([bs[*pos], bs[*pos+1], bs[*pos+2], bs[*pos+3]]);
-  *pos += 4;
-  value
-}
-
-pub fn parse_u16(bs : &Vec::<u8>, pos : &mut usize) -> u16 {
-  let value = u16::from_le_bytes([bs[*pos], bs[*pos+1]]);
-  *pos += 2;
-  value
-}
 
 pub fn parse_f32(bs : &Vec::<u8>, pos : &mut usize) -> f32 {
   let value = f32::from_le_bytes([bs[*pos],   bs[*pos+1],  
