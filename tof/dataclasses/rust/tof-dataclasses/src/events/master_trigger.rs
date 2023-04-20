@@ -152,14 +152,16 @@ impl MasterTriggerMapping {
 
   /// Return the ids of the readoutboards which are connected to the LTBs which participated in the
   /// trigger.
-  pub fn get_rb_ids(&self, ltb_mask : &[bool; N_LTBS],
-                    hit_mask : [[bool; N_CHN_PER_LTB]; N_LTBS])
+  pub fn get_rb_ids(&self,
+                    mt_ev    : &MasterTriggerEvent)
+                    //ltb_mask : &[bool; N_LTBS],
+                    //hit_mask : [[bool; N_CHN_PER_LTB]; N_LTBS])
     -> Vec<u8> {
     let mut rb_ids = Vec::<u8>::new();
     let mut ltb_hit_index : usize = 0;
-    for k in 0..ltb_mask.len() {
-      if ltb_mask[k] {
-        let hits = hit_mask[ltb_hit_index];
+    for k in 0..mt_ev.board_mask.len() {
+      if mt_ev.board_mask[k] {
+        let hits = mt_ev.hits[ltb_hit_index];
         for j in 0..hits.len() {
           if hits[j] {
             let rb_id = self.ltb_mapping[k].get_rb_id(j as u8 +1);

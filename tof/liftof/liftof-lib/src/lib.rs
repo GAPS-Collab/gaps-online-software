@@ -660,7 +660,6 @@ pub fn connect_to_mtb(mt_ip   : &str,
 ///
 pub fn master_trigger(mt_ip          : &str, 
                       mt_port        : usize,
-                      glob_data_sink : &cbc::Sender<TofPacket>,
                       sender_rate    : &cbc::Sender<u32>,
                       evid_sender    : &cbc::Sender<MasterTriggerEvent>,
                       verbose        : bool) {
