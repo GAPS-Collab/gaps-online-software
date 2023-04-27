@@ -57,6 +57,7 @@ impl Error for SerializationError {
 #[derive(Debug)]
 pub enum DecodingError {
   //HeaderNotFound,
+  ChannelOutOfBounds,
   UnknownType
 }
 
@@ -65,6 +66,7 @@ impl fmt::Display for DecodingError {
     let disp : String;
     match self {
       DecodingError::UnknownType  => {disp = String::from("UnknownType");},
+      DecodingError::ChannelOutOfBounds => {disp = String::from("Remember channels start from 1, not 0");},
     }
     write!(f, "<DecodingError Error : {}>", disp)
   }

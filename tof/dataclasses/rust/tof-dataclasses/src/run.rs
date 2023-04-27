@@ -5,21 +5,27 @@ use crate::serialization::{parse_u16,
                            Serialization,
                            SerializationError};
 
+use crate::errors::DecodingError;
 
-/// Parameters for tof runs
+/// A collection of parameters for tof runs
 ///
+/// * active_channel_mask : 16bit mask
+///                         for active channels 
+///                         channel in ascending order with 
+///                         increasing bit significance.
 ///
 #[derive(Debug, Copy, Clone)]
 pub struct RunConfig {
-  pub nevents    : u32,
-  pub is_active  : bool,
-  pub nseconds   : u32,
-  pub stream_any : bool,
+  pub nevents                 : u32,
+  pub is_active               : bool,
+  pub nseconds                : u32,
+  pub stream_any              : bool,
   pub forced_trigger_poisson  : u32,
   pub forced_trigger_periodic : u32,
-  pub vcal       : bool,
-  pub tcal       : bool,
-  pub noi        : bool
+  pub vcal                    : bool,
+  pub tcal                    : bool,
+  pub noi                     : bool,
+  pub active_channel_mask     : u16,
 }
 
 impl RunConfig {
@@ -31,15 +37,16 @@ impl RunConfig {
 
   pub fn new() -> RunConfig {
     RunConfig {
-      nevents    : 0,
-      is_active  : false,
-      nseconds   : 0,
-      stream_any : false,
+      nevents                 : 0,
+      is_active               : false,
+      nseconds                : 0,
+      stream_any              : false,
       forced_trigger_poisson  : 0,
       forced_trigger_periodic : 0,
-      vcal       : false,
-      tcal       : false,
-      noi        : false
+      vcal                    : false,
+      tcal                    : false,
+      noi                     : false,
+      active_channel_mask     : u16::MAX,
     }
   }
 
@@ -51,6 +58,36 @@ impl RunConfig {
     self.nevents == 0 
   }
 
+  /// Mark a channel as active
+  ///
+  /// # Arguments
+  ///
+  /// ch : 1-9 
+  pub fn activate_channel(&mut self, ch : u16) -> Result<(), DecodingError> {
+    if ch < 1 || ch > 9 {
+      error!("Channel id {ch} is invalid!");
+      return Err(DecodingError::ChannelOutOfBounds);
+    }
+    self.active_channel_mask = self.active_channel_mask | u16::pow(ch -1 ,2);
+    Ok(())
+  }
+  
+  pub fn deactivate_channel(&mut self, ch : u16) -> Result<(), DecodingError> {
+    if ch < 1 || ch > 9 {
+      error!("Channel id {ch} is invalid!");
+      return Err(DecodingError::ChannelOutOfBounds);
+    }
+    self.active_channel_mask = self.active_channel_mask & !u16::pow(ch -1,2);
+    Ok(())
+  }
+
+  pub fn is_active_channel(&self, ch : u16) -> Result<bool, DecodingError> {
+    if ch < 1 || ch > 9 {
+      error!("Channel id {ch} is invalid!");
+      return Err(DecodingError::ChannelOutOfBounds);
+    }
+    Ok(self.active_channel_mask & u16::pow(ch - 1,2) > 0) 
+  }
 }
 
 impl Serialization for RunConfig {
