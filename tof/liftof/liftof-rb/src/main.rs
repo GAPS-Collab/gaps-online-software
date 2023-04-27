@@ -235,10 +235,8 @@ fn main() {
   
   // General parameters, readout board id,, 
   // ip to tof computer
- // let rb_id = get_board_id().expect("Unable to obtain board ID!");
- // let dna   = get_device_dna().expect("Unable to obtain device DNA!"); 
-  let rb_id = 0;
-  let dna   = 0;
+  let rb_id = get_board_id().expect("Unable to obtain board ID!");
+  let dna   = get_device_dna().expect("Unable to obtain device DNA!"); 
 
   // welcome banner!
   println!("-----------------------------------------------");
