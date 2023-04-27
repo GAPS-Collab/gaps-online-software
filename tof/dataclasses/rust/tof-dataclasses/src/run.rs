@@ -43,21 +43,14 @@ impl RunConfig {
     }
   }
 
-  pub fn to_bytestream(&self) -> Vec<u8> {
-    let mut stream = Vec::<u8>::with_capacity(RunConfig::SIZE);
-    stream.extend_from_slice(&RunConfig::HEAD.to_le_bytes());
-    stream.extend_from_slice(&self.  nevents.to_le_bytes());    
-    stream.extend_from_slice(&u8::from(self.  is_active).to_le_bytes());
-    stream.extend_from_slice(&self.  nseconds.to_le_bytes());
-    stream.extend_from_slice(&u8::from(self.  stream_any).to_le_bytes());
-    stream.extend_from_slice(&self.forced_trigger_poisson.to_le_bytes());
-    stream.extend_from_slice(&self.forced_trigger_periodic.to_le_bytes());
-    stream.extend_from_slice(&u8::from(self.  vcal).to_le_bytes());
-    stream.extend_from_slice(&u8::from(self.  tcal).to_le_bytes());
-    stream.extend_from_slice(&u8::from(self.  noi).to_le_bytes());
-    stream.extend_from_slice(&RunConfig::TAIL.to_le_bytes());
-    stream
+  pub fn set_forever(&mut self) {
+    self.nevents = 0;
   }
+
+  pub fn runs_forever(&self) -> bool {
+    self.nevents == 0 
+  }
+
 }
 
 impl Serialization for RunConfig {
@@ -80,6 +73,22 @@ impl Serialization for RunConfig {
     pars.tcal       = parse_bool(bytestream, &mut pos); 
     pars.noi        = parse_bool(bytestream, &mut pos); 
     Ok(pars)
+  }
+  
+  fn to_bytestream(&self) -> Vec<u8> {
+    let mut stream = Vec::<u8>::with_capacity(RunConfig::SIZE);
+    stream.extend_from_slice(&RunConfig::HEAD.to_le_bytes());
+    stream.extend_from_slice(&self.  nevents.to_le_bytes());    
+    stream.extend_from_slice(&u8::from(self.  is_active).to_le_bytes());
+    stream.extend_from_slice(&self.  nseconds.to_le_bytes());
+    stream.extend_from_slice(&u8::from(self.  stream_any).to_le_bytes());
+    stream.extend_from_slice(&self.forced_trigger_poisson.to_le_bytes());
+    stream.extend_from_slice(&self.forced_trigger_periodic.to_le_bytes());
+    stream.extend_from_slice(&u8::from(self.  vcal).to_le_bytes());
+    stream.extend_from_slice(&u8::from(self.  tcal).to_le_bytes());
+    stream.extend_from_slice(&u8::from(self.  noi).to_le_bytes());
+    stream.extend_from_slice(&RunConfig::TAIL.to_le_bytes());
+    stream
   }
 }
 
