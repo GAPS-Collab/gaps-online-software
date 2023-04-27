@@ -1,7 +1,9 @@
 #ifndef TOFCOMMON
 #define TOFCOMMON
 
+#include <stdint.h>
 #include <vector>
+#include <tof_typedefs.h>
 
 // This include file defines anything that is needed by multiple threads. 
 
@@ -27,7 +29,7 @@ static const std::vector<uint8_t> READOUTBOARDIDS = std::vector<uint8_t> {1,2,3}
 
 namespace GAPS {
 
-  enum class PADDLE_END : std::uint16_t {
+  enum class PADDLE_END : u16 {
       A = 10,
       B = 20,
       UNKNOWN = 30
