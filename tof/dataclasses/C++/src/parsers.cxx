@@ -29,7 +29,6 @@ u32 Gaps::u32_from_le_bytes(const vec_u8 &bytestream,
   return value;
 }
 
-//! FIXME the position should be usize
 void Gaps::u32_to_le_bytes(const u32 value, 
                            vec_u8 &bytestream,
                            usize &pos) {
