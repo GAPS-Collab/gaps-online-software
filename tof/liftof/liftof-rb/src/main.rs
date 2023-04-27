@@ -35,8 +35,8 @@ use tof_dataclasses::commands::{//TofCommand,
                                 TofResponse,
                                 TofOperationMode};
 use tof_dataclasses::run::RunConfig;
-//use liftof_lib::RunParams;
-
+use tof_dataclasses::serialization::get_json_from_file;
+use tof_dataclasses::serialization::Serialization;
 extern crate pretty_env_logger;
 #[macro_use] extern crate log;
 
@@ -115,6 +115,9 @@ struct Args {
   ///// CnC server IP we should be listening to
   //#[arg(long, default_value_t = "10.0.1.1")]
   //cmd_server_ip : &'static str,
+  /// A json run config file with a RunConfiguration
+  #[arg(short, long)]
+  run_config: Option<std::path::PathBuf>,
 }
 
 fn main() {
@@ -135,17 +138,13 @@ fn main() {
   //                        .init();
   pretty_env_logger::init();
 
-  // General parameters, readout board id,, 
-  // ip to tof computer
-  let rb_id = get_board_id().expect("Unable to obtain board ID!");
-  let dna   = get_device_dna().expect("Unable to obtain device DNA!"); 
   
   let args = Args::parse();                   
   let mut buff_trip         = args.buff_trip;         
   let mut n_events_run      = args.nevents;
   let mut show_progress     = args.show_progress;
   let cache_size            = args.cache_size;
-  let run_forever           = args.run_forever;
+  let mut run_forever       = args.run_forever;
   let mut stream_any        = args.stream_any;
   let mut force_trigger     = args.force_trigger;
   let mut force_random_trig = args.force_random_trigger;
@@ -154,6 +153,34 @@ fn main() {
   let vcal                  = args.vcal;
   let tcal                  = args.tcal;
   let noi                   = args.noi;
+  let run_config            = args.run_config;
+
+  // active channels
+  let mut ch_mask : u8 = u8::MAX;
+
+  match run_config {
+    None     => (),
+    Some(rcfile) => {
+      match get_json_from_file(&rcfile) {
+        Err(err) => panic!("Unable to read the configuration file! Error {err}"),
+        Ok(rc_from_file) => {
+          println!("Found configuration file {}!", rcfile.display());
+          println!("[WARN] - Currently, only the active channel mask will be parsed from the config file!");
+          println!("[WARN/TODO] - This is WORK-IN-PROGRESS!");
+          match RunConfig::from_json(&rc_from_file) {
+            Err(err) => panic!("Can not read json from configuration file. Error {err}"),
+            Ok(rc_json) => {
+              //n_events_run = rc_json.nevents as u64;
+              //stream_any   = rc_json.stream_any;
+              //run_forever  = rc_json.runs_forever();
+              ch_mask      = rc_json.active_channel_mask;
+
+            }
+          }
+        }
+      }
+    }
+  }
 
   let mut file_suffix   = String::from(".robin");
 
@@ -205,6 +232,13 @@ fn main() {
   }
 
   let this_board_ip = local_ip().expect("Unable to obtainl local board IP. Something is messed up!");
+  
+  // General parameters, readout board id,, 
+  // ip to tof computer
+ // let rb_id = get_board_id().expect("Unable to obtain board ID!");
+ // let dna   = get_device_dna().expect("Unable to obtain device DNA!"); 
+  let rb_id = 0;
+  let dna   = 0;
 
   // welcome banner!
   println!("-----------------------------------------------");
@@ -228,6 +262,19 @@ fn main() {
     println!("-----------------------------------------------"); 
   } 
  
+  // set channel mask (if different from 255)
+  if ch_mask != 255 {
+    println!("Found a non 255 channel mask! Will deactivate channels!");
+    warn!("Will deactivate channels, found channel mask {}", ch_mask);
+    match set_active_channel_mask(ch_mask) {
+      Ok(_) => (),
+      Err(err) => {
+        error!("Setting activve channel mask failed for mask {}, error {}", ch_mask, err);
+      }
+    }
+  }
+
+
   // this resets the data buffer /dev/uio1,2 occupancy
   reset_dma_and_buffers();
 
