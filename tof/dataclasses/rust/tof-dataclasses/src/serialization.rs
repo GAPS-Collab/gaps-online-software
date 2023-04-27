@@ -89,7 +89,7 @@ pub trait Serialization {
     todo!();
     }
 
-  fn from_json(config : JsonValue)
+  fn from_json(config : &JsonValue)
     -> Result<Self, Box<dyn Error>>
     where Self : Sized {
     println!("There can't be a default implementation for this trait!"); 
