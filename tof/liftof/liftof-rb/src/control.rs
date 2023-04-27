@@ -237,6 +237,13 @@ pub fn set_readout_all_channels_and_ch9() -> Result<(), RegisterError> {
   Ok(())
 }
 
+/// Enable active channels
+pub fn set_active_channel_mask(ch_mask : u8) -> Result<(), RegisterError> {
+  let mut value = read_control_reg(READOUT_MASK)?;
+  value = value | (ch_mask) as u32;
+  write_control_reg(READOUT_MASK, value)?;
+  Ok(())
+}
 
 /// Enable the master trigger mode
 pub fn set_master_trigger_mode() -> Result<(), RegisterError> {
