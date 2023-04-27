@@ -156,29 +156,28 @@ impl ReadoutBoardCalibrations {
 impl Serialization for ReadoutBoardCalibrations {
   /// Decode a serializable from a bytestream  
   fn from_bytestream(bytestream : &Vec<u8>, 
-                     start_pos  : usize)
+                     pos        : &mut usize)
     -> Result<ReadoutBoardCalibrations, SerializationError> { 
     let mut rb_cal = ReadoutBoardCalibrations::new(0);
-    let mut pos  = start_pos;
-    if parse_u16(bytestream, &mut pos) != ReadoutBoardCalibrations::HEAD {
+    if parse_u16(bytestream, pos) != ReadoutBoardCalibrations::HEAD {
       return Err(SerializationError::HeadInvalid {});
     }
-    let board_id = u8::from_le_bytes([bytestream[pos]]);
-    pos += 1;
+    let board_id = u8::from_le_bytes([bytestream[*pos]]);
+    *pos += 1;
     rb_cal.rb_id = board_id;
     for ch in 0..NCHN {
       for k in 0..NWORDS {
-        let mut value = parse_f32(bytestream, &mut pos);
+        let mut value = parse_f32(bytestream, pos);
         rb_cal.v_offsets[ch][k] = value;
-        value         = parse_f32(bytestream, &mut pos);
+        value         = parse_f32(bytestream, pos);
         rb_cal.v_dips[ch][k]    = value;
-        value         = parse_f32(bytestream, &mut pos);
+        value         = parse_f32(bytestream, pos);
         rb_cal.v_inc[ch][k]     = value;
-        value         = parse_f32(bytestream, &mut pos);
+        value         = parse_f32(bytestream, pos);
         rb_cal.tbin[ch][k]      = value;
       }
     }
-    if parse_u16(bytestream, &mut pos) != ReadoutBoardCalibrations::TAIL {
+    if parse_u16(bytestream, pos) != ReadoutBoardCalibrations::TAIL {
       return Err(SerializationError::TailInvalid {});
     }
     Ok(rb_cal)

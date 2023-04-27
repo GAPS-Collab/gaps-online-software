@@ -53,20 +53,21 @@ pub struct RBEventHeader {
 }
 
 impl Serialization for RBEventHeader {
+  
   fn from_bytestream(bytestream : &Vec<u8>,
-                     start_pos  : usize) 
+                     pos        : &mut usize) 
     -> Result<RBEventHeader, SerializationError> {
-    let head_pos = search_for_u16(RBEventHeader::HEAD, bytestream, start_pos)?; 
-    let mut pos = head_pos;
-    let head = parse_u16(&bytestream, &mut pos);
+    let head_pos = search_for_u16(RBEventHeader::HEAD, bytestream, *pos)?; 
+    *pos = head_pos;
+    let head = parse_u16(&bytestream, pos);
     if head != RBEventHeader::HEAD {
       return Err(SerializationError::HeadInvalid);
     }
     let mut event_header = RBEventHeader::new();
-    let mut pos = head_pos + 2;
-    event_header.status  = parse_u16(&bytestream, &mut pos); 
-    event_header.len     = parse_u16(&bytestream, &mut pos);
-    event_header.roi     = parse_u16(&bytestream, &mut pos);
+    *pos = head_pos + 2;
+    event_header.status  = parse_u16(&bytestream, pos); 
+    event_header.len     = parse_u16(&bytestream, pos);
+    event_header.roi     = parse_u16(&bytestream, pos);
     println!("<head {}, status {}, len {}, roi {}",head, event_header.status, event_header.len, event_header.roi);
     //raw_bytes_2  = [bytestream[pos],bytestream[pos + 1]];
     //pos   += 2;

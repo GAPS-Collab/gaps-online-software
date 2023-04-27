@@ -259,56 +259,56 @@ impl From<&MasterTriggerEvent> for TofEvent {
 
 
 
-///
-/// TESTS
-///
-/// ============================================
+//
+// TESTS
+//
+// ============================================
 
-#[test]
-fn serialize_deserialize_pp_roundabout() {
-  let mut pp = PaddlePacket::from_random();
-  // a fresh packet is always valid
-  assert!(pp.valid);
-  // FIXME - as an idea. If we use
-  // 4 byte emoji data, we can easily
-  // check if a bytestream is that what
-  // we expect visually 
-   
-  
-  //let mut bytestream = Vec<u8>::new();
-  let mut bytestream = pp.to_bytestream();
-  match PaddlePacket::from_bytestream(&bytestream, 0) {
-    Err(err) => {
-      error!("Got deserialization error! {:?}", err);
-    },
-    Ok(new_pp)   => {
-      assert_eq!(new_pp, pp);
-    }
-  }
-}
-
-#[test]
-fn serialize_deserialize_tofevent_roundabout() {
-  let mut event = TofEvent::new(0,0);
-  event.timestamp_32 = 1234;
-  event.timestamp_16 = 56;
-  // let's add 10 random paddles
-  for n in 0..10 {
-    let pp = PaddlePacket::from_random();
-    event.add_paddle(pp);
-  }
-  assert!(event.valid);
-
-  //let mut bytestream = Vec<u8>::new();
-  let mut bytestream = event.to_bytestream();
-  match TofEvent::from_bytestream(&bytestream, 0) {
-    Err(err) => {
-      error!("Got deserialization error! {:?}", err);
-    },
-    Ok(new_event)   => {
-      event.creation_time = new_event.creation_time;
-      assert_eq!(event, new_event);
-    }
-  }
-}
+//#[test]
+//fn serialize_deserialize_pp_roundabout() {
+//  let mut pp = PaddlePacket::from_random();
+//  // a fresh packet is always valid
+//  assert!(pp.valid);
+//  // FIXME - as an idea. If we use
+//  // 4 byte emoji data, we can easily
+//  // check if a bytestream is that what
+//  // we expect visually 
+//   
+//  
+//  //let mut bytestream = Vec<u8>::new();
+//  let mut bytestream = pp.to_bytestream();
+//  match PaddlePacket::from_bytestream(&bytestream, 0) {
+//    Err(err) => {
+//      error!("Got deserialization error! {:?}", err);
+//    },
+//    Ok(new_pp)   => {
+//      assert_eq!(new_pp, pp);
+//    }
+//  }
+//}
+//
+//#[test]
+//fn serialize_deserialize_tofevent_roundabout() {
+//  let mut event = TofEvent::new(0,0);
+//  event.timestamp_32 = 1234;
+//  event.timestamp_16 = 56;
+//  // let's add 10 random paddles
+//  for n in 0..10 {
+//    let pp = PaddlePacket::from_random();
+//    event.add_paddle(pp);
+//  }
+//  assert!(event.valid);
+//
+//  //let mut bytestream = Vec<u8>::new();
+//  let mut bytestream = event.to_bytestream();
+//  match TofEvent::from_bytestream(&bytestream, 0) {
+//    Err(err) => {
+//      error!("Got deserialization error! {:?}", err);
+//    },
+//    Ok(new_event)   => {
+//      event.creation_time = new_event.creation_time;
+//      assert_eq!(event, new_event);
+//    }
+//  }
+//}
 

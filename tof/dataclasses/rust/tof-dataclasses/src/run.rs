@@ -63,22 +63,21 @@ impl RunConfig {
 impl Serialization for RunConfig {
   
   fn from_bytestream(bytestream : &Vec<u8>,
-                     start_pos  : usize)
+                     pos        : &mut usize)
     -> Result<Self, SerializationError> {
     let mut pars = RunConfig::new();
-    let mut pos  = start_pos;
-    if parse_u16(bytestream, &mut pos) != RunConfig::HEAD {
+    if parse_u16(bytestream, pos) != RunConfig::HEAD {
       return Err(SerializationError::HeadInvalid {});
     }
-    pars.nevents    = parse_u32 (bytestream, &mut pos);
-    pars.is_active  = parse_bool(bytestream, &mut pos);
-    pars.nseconds   = parse_u32 (bytestream, &mut pos);
-    pars.stream_any = parse_bool(bytestream, &mut pos);
-    pars.forced_trigger_poisson  = parse_u32(bytestream, &mut pos);
-    pars.forced_trigger_periodic = parse_u32(bytestream, &mut pos);
-    pars.vcal       = parse_bool(bytestream, &mut pos);
-    pars.tcal       = parse_bool(bytestream, &mut pos); 
-    pars.noi        = parse_bool(bytestream, &mut pos); 
+    pars.nevents    = parse_u32 (bytestream, pos);
+    pars.is_active  = parse_bool(bytestream, pos);
+    pars.nseconds   = parse_u32 (bytestream, pos);
+    pars.stream_any = parse_bool(bytestream, pos);
+    pars.forced_trigger_poisson  = parse_u32(bytestream, pos);
+    pars.forced_trigger_periodic = parse_u32(bytestream, pos);
+    pars.vcal       = parse_bool(bytestream, pos);
+    pars.tcal       = parse_bool(bytestream, pos); 
+    pars.noi        = parse_bool(bytestream, pos); 
     Ok(pars)
   }
 }

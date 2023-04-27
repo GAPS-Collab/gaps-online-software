@@ -18,6 +18,13 @@ pub fn parse_u32(bs : &Vec::<u8>, pos : &mut usize) -> u32 {
   value
 }
 
+pub fn parse_u64(bs : &Vec::<u8>, pos : &mut usize) -> u64 {
+  let value = u64::from_le_bytes([bs[*pos],   bs[*pos+1], bs[*pos+2], bs[*pos+3],
+                                  bs[*pos+4], bs[*pos+5], bs[*pos+6], bs[*pos+7]]);
+  *pos += 8;
+  value
+}
+
 pub fn parse_u16(bs : &Vec::<u8>, pos : &mut usize) -> u16 {
   let value = u16::from_le_bytes([bs[*pos], bs[*pos+1]]);
   *pos += 2;
@@ -55,7 +62,7 @@ pub trait Serialization {
 
   /// Decode a serializable from a bytestream  
   fn from_bytestream(bytestream : &Vec<u8>, 
-                     start_pos  : usize)
+                     pos        : &mut usize)
     -> Result<Self, SerializationError>
     where Self : Sized;
 
@@ -78,7 +85,10 @@ pub trait Serialization {
     todo!();
     }
   
-  //pub fn to_bytestream(&self, &
+  fn to_bytestream(&self) -> Vec<u8> {
+    let stream = Vec::<u8>::new();
+    stream
+  }
 
   /////! Add the payload of the serializable to the pre allocated bytestream
   //fn into_bytestream(bytestream : &mut Vec<u8>,
