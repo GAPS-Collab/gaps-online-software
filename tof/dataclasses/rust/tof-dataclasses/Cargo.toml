@@ -10,8 +10,10 @@ random=[]
 
 [dependencies]
 # logging
-log = "0.4"
+log  = "0.4"
 pretty_env_logger = "0.4"
+json = "0.12" 
+
 
 # for testing
 # used for the random number generation

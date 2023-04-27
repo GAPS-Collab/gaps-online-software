@@ -2,9 +2,15 @@
 //!
 //!
 
-
+// re-exports
 pub use crate::errors::SerializationError;
 
+use std::error::Error;
+use std::path::Path;
+use std::fs::read_to_string;
+
+extern crate json;
+use json::JsonValue;
 
 /// Get u32 from a bytestream and move on the position marker
 ///
@@ -52,7 +58,12 @@ pub fn parse_bool(bs : &Vec::<u8>, pos : &mut usize) -> bool {
   value > 0
 }
 
-
+pub fn get_json_from_file(filename : &Path)
+    -> Result<JsonValue, Box<dyn Error>> {
+  let file_content = std::fs::read_to_string(filename)?;
+  let config = json::parse(&file_content)?;
+  Ok(config)
+}
 
 /// En/Decode to a bytestream, that is `Vec<u8>`
 pub trait Serialization {
@@ -78,6 +89,12 @@ pub trait Serialization {
     todo!();
     }
 
+  fn from_json(config : JsonValue)
+    -> Result<Self, Box<dyn Error>>
+    where Self : Sized {
+    println!("There can't be a default implementation for this trait!"); 
+    todo!();
+  }
 
   /// Construct byte slice out of self.
   ///

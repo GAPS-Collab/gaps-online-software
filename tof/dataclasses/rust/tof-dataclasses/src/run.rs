@@ -1,3 +1,4 @@
+use std::error::Error;
 use std::fmt;
 use crate::serialization::{parse_u16,
                            parse_u32,
@@ -6,6 +7,9 @@ use crate::serialization::{parse_u16,
                            SerializationError};
 
 use crate::errors::DecodingError;
+
+extern crate json;
+use json::JsonValue;
 
 /// A collection of parameters for tof runs
 ///
@@ -127,6 +131,25 @@ impl Serialization for RunConfig {
     stream.extend_from_slice(&RunConfig::TAIL.to_le_bytes());
     stream
   }
+
+  fn from_json(config : JsonValue)
+    -> Result<RunConfig, Box<dyn Error>> {
+    let mut rc = RunConfig::new();
+    rc.nevents                 = config["nevents"]                .as_u32 ().ok_or(SerializationError::JsonDecodingError)?; 
+    rc.is_active               = config["is_active"]              .as_bool().ok_or(SerializationError::JsonDecodingError)?;
+    rc.nseconds                = config["nseconds"]               .as_u32 ().ok_or(SerializationError::JsonDecodingError)?; 
+    rc.stream_any              = config["stream_any"]             .as_bool().ok_or(SerializationError::JsonDecodingError)?;
+    rc.forced_trigger_poisson  = config["forced_trigger_poisson"] .as_u32 ().ok_or(SerializationError::JsonDecodingError)?; 
+    rc.forced_trigger_periodic = config["forced_trigger_periodic"].as_u32 ().ok_or(SerializationError::JsonDecodingError)?; 
+    rc.vcal                    = config["vcal"]                   .as_bool().ok_or(SerializationError::JsonDecodingError)?;
+    rc.tcal                    = config["tcal"]                   .as_bool().ok_or(SerializationError::JsonDecodingError)?;
+    rc.noi                     = config["noi"]                    .as_bool().ok_or(SerializationError::JsonDecodingError)?;
+    rc.active_channel_mask     = config["active_channel_mask"]    .as_u16 ().ok_or(SerializationError::JsonDecodingError)?; 
+    
+    Ok(rc)
+  }
+
+
 }
 
 impl Default for RunConfig {
