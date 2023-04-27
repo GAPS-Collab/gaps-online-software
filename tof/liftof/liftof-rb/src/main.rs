@@ -34,7 +34,8 @@ use tof_dataclasses::events::blob::RBEventPayload;
 use tof_dataclasses::commands::{//TofCommand,
                                 TofResponse,
                                 TofOperationMode};
-use liftof_lib::RunParams;
+use tof_dataclasses::run::RunConfig;
+//use liftof_lib::RunParams;
 
 extern crate pretty_env_logger;
 #[macro_use] extern crate log;
@@ -264,8 +265,8 @@ fn main() {
 
   // FIXME - MESSAGES GET CONSUMED!!
 
-  let (run_params_to_runner, run_params_from_cmdr)      : 
-      (Sender<RunParams>, Receiver<RunParams>)                = unbounded();
+  let (rc_to_runner, rc_from_cmdr)      : 
+      (Sender<RunConfig>, Receiver<RunConfig>)                = unbounded();
   //let (cmd_to_client, cmd_from_zmq)      : 
   //    (Sender<TofCommand>, Receiver<TofCommand>)              = unbounded();
   let (rsp_to_sink, rsp_from_client)     : 
@@ -300,7 +301,7 @@ fn main() {
  
   // Setup routine. Start the threads in inverse order of 
   // how far they are away from the buffers.
-  let run_params_from_cmdr_c = run_params_from_cmdr.clone();
+  let rc_from_cmdr_c = rc_from_cmdr.clone();
   let rdb_sender_a  = bs_send.clone();
   
   workforce.execute(move || {
@@ -322,7 +323,7 @@ fn main() {
   // then the runner. It does nothing, until we send a set
   // of RunParams
   workforce.execute(move || {
-      runner(&run_params_from_cmdr_c,
+      runner(&rc_from_cmdr_c,
              buff_trip,
              None, 
              &rdb_sender_a,
@@ -352,14 +353,14 @@ fn main() {
 
   // Respond to commands from the C&C server
   let set_op_mode_c        = set_op_mode.clone();
-  let run_params_to_runner_c = run_params_to_runner.clone();
+  let rc_to_runner_c = rc_to_runner.clone();
   let heartbeat_timeout_seconds : u32 = 10;
   workforce.execute(move || {
                     cmd_responder(cmd_server_ip,
                                   heartbeat_timeout_seconds,
                                   &rsp_from_client,  
                                   &set_op_mode_c,
-                                  &run_params_to_runner_c,
+                                  &rc_to_runner_c,
                                   &evid_to_cache )
                                   //&cmd_to_client   )  
   
@@ -374,19 +375,19 @@ fn main() {
     }
   }
     
-  //let run_params_from_cmdr_c = run_params_from_cmdr.clone();
   // we start the run by creating new RunParams
   if run_forever || n_events_run > 0 {
-    let run_pars = RunParams {
-      forever   : run_forever,
-      nevents   : n_events_run as u32,
-      is_active : true,
-      nseconds  : 0
-    };
+    let mut rc = RunConfig::new();
+    if run_forever {
+      rc.nevents = 0;
+    } else {
+      rc.nevents = n_events_run as u32
+    }
+    rc.is_active = true;
     println!("Waiting for threads to start..");
     thread::sleep(time::Duration::from_secs(5));
     println!("..done");
-    match run_params_to_runner.send(run_pars) {
+    match rc_to_runner.send(rc) {
       Err(err) => error!("Could not initialzie Run! Err {err}"),
       Ok(_)    => {
         println!("Run initialized! Attempting to start!");
@@ -444,7 +445,7 @@ fn main() {
     }
 
     match get_triggers_enabled() {
-      Err(err) => error!("Can not read trigger enabled register!"),
+      Err(err) => error!("Can not read trigger enabled register! Error {err}"),
       Ok(enabled) => {
         if !enabled && end_after_run {
           end = true;
