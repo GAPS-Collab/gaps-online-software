@@ -63,6 +63,12 @@ pub trait Serialization {
                      start_pos  : usize)
     -> Result<Self, SerializationError>
     where Self : Sized;
+  
+  /// Encode a serializable to a bytestream  
+  fn to_bytestream(&self) -> Vec<u8> {
+    println!("There can't be a default implementation for this trait!");
+    todo!();
+  }
 
   fn from_slice(slice     : &[u8],
                 start_pos : usize)
