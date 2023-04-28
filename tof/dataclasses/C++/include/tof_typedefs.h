@@ -28,6 +28,8 @@ typedef std::string String;
 template <typename T>
 using Vec = std::vector<T>;
 
+typedef Vec<u8> bytestream;
+
 // vectors
 typedef std::vector<u8>  vec_u8; // this is used for (de)serialization
 typedef vec_u8 bytestream;

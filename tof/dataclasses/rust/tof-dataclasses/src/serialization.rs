@@ -23,6 +23,11 @@ use json::JsonValue;
 //  pos += 4;
 //  value
 //}
+pub fn parse_u16(bs : &Vec::<u8>, pos : &mut usize) -> u16 {
+  let value = u16::from_le_bytes([bs[*pos], bs[*pos+1]]);
+  *pos += 2;
+  value
+}
 
 pub fn parse_u32(bs : &Vec::<u8>, pos : &mut usize) -> u32 {
   let value = u32::from_le_bytes([bs[*pos], bs[*pos+1], bs[*pos+2], bs[*pos+3]]);
@@ -30,11 +35,23 @@ pub fn parse_u32(bs : &Vec::<u8>, pos : &mut usize) -> u32 {
   value
 }
 
-pub fn parse_u16(bs : &Vec::<u8>, pos : &mut usize) -> u16 {
-  let value = u16::from_le_bytes([bs[*pos], bs[*pos+1]]);
-  *pos += 2;
-  value
+/// Get an u32 from a bytestream 
+///
+/// This assumes an underlying representation of 
+/// an atomic unit of 16bit instead of 8.
+/// This is realized for the raw data stream
+/// from the readoutboards.
+pub fn parse_u32_for_16bit_words(bs  : &Vec::<u8>,
+                                 pos : &mut usize) -> u32 {
+  
+  let mut raw_bytes_4  = [bs[pos + 2],
+                          bs[pos + 3],
+                          bs[pos    ],
+                          bs[pos + 1]];
+  pos += 4;
+  u32::from_le_bytes(raw_bytes_4)
 }
+
 
 pub fn parse_f32(bs : &Vec::<u8>, pos : &mut usize) -> f32 {
   let value = f32::from_le_bytes([bs[*pos],   bs[*pos+1],  

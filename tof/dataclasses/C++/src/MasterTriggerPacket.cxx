@@ -31,7 +31,7 @@ u64 MasterTriggerPacket::from_bytestream(vec_u8 &payload,
                                          u64 start_pos) {
   u64 pos          = start_pos; 
   u16 header       = Gaps::u16_from_le_bytes(payload, pos);
-  if (header != head)  {
+  if (header != head) {
     spdlog::error("No header signature found!");  
   }
   event_id         = Gaps::u32_from_le_bytes(payload, pos); 

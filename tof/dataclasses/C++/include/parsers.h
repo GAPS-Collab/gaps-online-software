@@ -34,6 +34,15 @@ void u16_to_le_bytes(const u16 value,
 u32 u32_from_le_bytes(const vec_u8 &bytestream,
                       usize &pos);
 
+u32 u32_from_be_bytes(const Vec<u8> &bytestream,
+                      usize &pos);
+
+u32 parse_u32_for_16bit_words(const Vec<u8> &bytestream,
+                              usize &pos);
+
+u64 parse_u48_for_16bit_words(const Vec<u8> &bytestream,
+                              usize &pos);
+
 
 void u32_to_le_bytes(const u32 value, 
                      vec_u8 &bytestream,
