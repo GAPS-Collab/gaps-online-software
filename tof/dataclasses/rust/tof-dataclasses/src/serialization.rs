@@ -44,11 +44,11 @@ pub fn parse_u32(bs : &Vec::<u8>, pos : &mut usize) -> u32 {
 pub fn parse_u32_for_16bit_words(bs  : &Vec::<u8>,
                                  pos : &mut usize) -> u32 {
   
-  let mut raw_bytes_4  = [bs[pos + 2],
-                          bs[pos + 3],
-                          bs[pos    ],
-                          bs[pos + 1]];
-  pos += 4;
+  let mut raw_bytes_4  = [bs[*pos + 2],
+                          bs[*pos + 3],
+                          bs[*pos    ],
+                          bs[*pos + 1]];
+  *pos += 4;
   u32::from_le_bytes(raw_bytes_4)
 }
 
