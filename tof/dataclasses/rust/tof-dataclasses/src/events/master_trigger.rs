@@ -104,7 +104,7 @@ pub struct MasterTriggerMapping {
   /// Holds RB id at the position where 
   /// it is supposed to be in the MTB 
   /// trigger mask
-  ltb_mapping  : [LocalTriggerBoard;N_LTBS]
+  pub ltb_mapping  : [LocalTriggerBoard;N_LTBS]
 
   // 
   //ltb_rb_mapping : HashMap<u8;ReadoutBoard>;
@@ -114,11 +114,12 @@ impl MasterTriggerMapping {
 
   pub fn new(ltb_list : Vec<LocalTriggerBoard>, rb_list : Vec<ReadoutBoard>) 
     -> MasterTriggerMapping {
-    let mtm = MasterTriggerMapping {
+    let mut mtm = MasterTriggerMapping {
       ltb_list,
       rb_list,
       ltb_mapping : [LocalTriggerBoard::new();N_LTBS]
     };
+    mtm.construct_ltb_mapping();
     mtm
   }
 
@@ -171,7 +172,7 @@ impl MasterTriggerMapping {
         for j in 0..hits.len() {
           if hits[j] {
             //println!("Found hit at {j}");
-            println!("LTB REGISTERED FOR THIS HIT {:?}", self.ltb_mapping[k]);
+            println!("LTB REGISTERED FOR THIS HIT {k} {:?} with id {}", self.ltb_mapping[k], self.ltb_mapping[k].ltb_id);
             let rb_id = self.ltb_mapping[k].get_rb_id(j as u8 +1);
             
             if rb_ids.contains(&rb_id) {

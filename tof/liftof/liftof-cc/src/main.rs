@@ -165,7 +165,7 @@ fn main() {
   let db_path_c        = db_path.clone();
   let ltb_list = get_ltbs_from_sqlite(db_path);
   println!("{:?}", ltb_list);
-  exit(0);
+  //exit(0);
   let rb_list  = get_rbs_from_sqlite(db_path_c);
   //let matches = command!() // requires `cargo` feature
   //     //.arg(arg!([name] "Optional name to operate on"))
@@ -328,7 +328,8 @@ fn main() {
     let rb_list_c    = rb_list.clone();
     let ltb_list_c   = ltb_list.clone();
     let mut mapping = MasterTriggerMapping::new(ltb_list_c, rb_list_c);
-    mapping.construct_ltb_mapping();
+    println!("{:?}", mapping.ltb_mapping);
+    exit(0);
     worker_threads.execute(move || {
                            event_builder(&master_ev_rec,
                                          mapping,
