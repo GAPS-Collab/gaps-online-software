@@ -1,6 +1,7 @@
 use std::error::Error;
 use std::fmt;
-use crate::serialization::{parse_u16,
+use crate::serialization::{parse_u8,
+                           parse_u16,
                            parse_u32,
                            parse_bool, 
                            Serialization,
@@ -30,12 +31,14 @@ pub struct RunConfig {
   pub tcal                    : bool,
   pub noi                     : bool,
   pub active_channel_mask     : u8,
+  pub data_format             : u8,
+  pub rb_buff_size            : u16
 }
 
 impl RunConfig {
 
-  pub const SIZE               : usize = 15; // bytes
-  pub const VERSION            : &'static str = "1.0";
+  pub const SIZE               : usize = 18; // bytes
+  pub const VERSION            : &'static str = "1.1";
   pub const HEAD               : u16  = 43690; //0xAAAA
   pub const TAIL               : u16  = 21845; //0x5555
 
@@ -51,6 +54,8 @@ impl RunConfig {
       tcal                    : false,
       noi                     : false,
       active_channel_mask     : u8::MAX,
+      data_format             : 0,
+      rb_buff_size            : 0,
     }
   }
 
@@ -112,7 +117,9 @@ impl Serialization for RunConfig {
     pars.vcal       = parse_bool(bytestream, pos);
     pars.tcal       = parse_bool(bytestream, pos); 
     pars.noi        = parse_bool(bytestream, pos); 
-    pars.active_channel_mask = bytestream[*pos];
+    pars.active_channel_mask = parse_u8(bytestream, pos);
+    pars.data_format = parse_u8(bytestream, pos);
+    pars.rb_buff_size = parse_u16(bytestream, pos);
     Ok(pars)
   }
   
@@ -129,6 +136,8 @@ impl Serialization for RunConfig {
     stream.extend_from_slice(&u8::from(self.  tcal).to_le_bytes());
     stream.extend_from_slice(&u8::from(self.  noi).to_le_bytes());
     stream.push(self.active_channel_mask);
+    stream.extend_from_slice(&self.data_format.to_le_bytes());
+    stream.extend_from_slice(&self.rb_buff_size.to_le_bytes());
     stream.extend_from_slice(&RunConfig::TAIL.to_le_bytes());
     stream
   }
@@ -146,7 +155,8 @@ impl Serialization for RunConfig {
     rc.tcal                    = config["tcal"]                   .as_bool().ok_or(SerializationError::JsonDecodingError)?;
     rc.noi                     = config["noi"]                    .as_bool().ok_or(SerializationError::JsonDecodingError)?;
     rc.active_channel_mask     = config["active_channel_mask"]    .as_u8  ().ok_or(SerializationError::JsonDecodingError)?; 
-    
+    rc.data_format             = config["data_format"]            .as_u8  ().ok_or(SerializationError::JsonDecodingError)?;
+    rc.rb_buff_size            = config["rb_buff_size"]           .as_u16 ().ok_or(SerializationError::JsonDecodingError)?;
     Ok(rc)
   }
 }

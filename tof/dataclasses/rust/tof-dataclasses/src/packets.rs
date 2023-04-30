@@ -15,24 +15,14 @@
 
 
 pub mod paddle_packet;
-//pub mod generic_packet;
-//pub mod data_packet;
-//pub mod command_packet;
-
 
 use std::fmt;
-//pub use crate::packets::generic_packet::GenericPacket;
-//pub use crate::packets::data_packet::DataPacket;
 pub use crate::monitoring::RBMoniData;
-//pub use crate::packets::command_packet::CommandPacket;
 use crate::serialization::{Serialization};
 use crate::errors::SerializationError;
 use crate::events::{RBEventPayload,
+                    RBEventHeader,
                     MasterTriggerEvent};
-//use nom::IResult;
-//use nom::{error::ErrorKind, Err};
-//use nom::number::complete::*;
-//use nom::bytes::complete::{tag, take, take_until};
 
 pub enum PacketQuality {
   Perfect,
@@ -52,6 +42,7 @@ pub const PACKET_TYPE_MONITOR   : u8 = 30;
 pub const PACKET_TYPE_HEARTBEAT : u8 = 40;
 pub const PACKET_TYPE_SCALAR    : u8 = 50;
 pub const PACKET_TYPE_MT        : u8 = 60;
+pub const PACKET_TYPE_RBHEADER  : u8 = 70;
 
 //// Each packet is send from somewhere.
 ////
@@ -91,6 +82,7 @@ pub enum PacketType {
   MasterTrigger , 
   HeartBeat     ,
   Scalar        ,
+  RBHeader      ,
 }
 
 impl PacketType {
@@ -103,9 +95,9 @@ impl PacketType {
       PacketType::Monitor       => PACKET_TYPE_MONITOR,
       PacketType::HeartBeat     => PACKET_TYPE_HEARTBEAT,
       PacketType::MasterTrigger => PACKET_TYPE_MT,
-      PacketType::Scalar        => PACKET_TYPE_SCALAR
+      PacketType::Scalar        => PACKET_TYPE_SCALAR,
+      PacketType::RBHeader      => PACKET_TYPE_RBHEADER
     }
-
   }
 
   pub fn from_u8(value : u8) -> Option<PacketType> {
@@ -118,6 +110,7 @@ impl PacketType {
       PACKET_TYPE_HEARTBEAT => Some(PacketType::HeartBeat),
       PACKET_TYPE_MT        => Some(PacketType::MasterTrigger),
       PACKET_TYPE_SCALAR    => Some(PacketType::Scalar),
+      PACKET_TYPE_RBHEADER  => Some(PacketType::RBHeader),
       _   => None,
     }
   }
