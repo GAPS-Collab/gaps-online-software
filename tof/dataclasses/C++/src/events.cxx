@@ -33,7 +33,7 @@ vec_u32 get_event_ids_from_raw_stream(const vec_u8 &bytestream, u64 &pos) {
   return event_ids; 
 }
 
-Vec<RBEventHeader> get_headers(const String &filename) {
+Vec<RBEventHeader> get_headers(const String &filename, bool is_headers) {
   spdlog::cfg::load_env_levels();
   u64 n_good = 0;  
   u64 n_bad  = 0; 
@@ -42,9 +42,14 @@ Vec<RBEventHeader> get_headers(const String &filename) {
   bool has_ended = false;
   auto pos = search_for_2byte_marker(stream,0xAA, has_ended );
   spdlog::info("Read {} bytes from {}", stream.size(), filename);
-  spdlog::info("For 8+1 channels, this mean a max number of events of {}", stream.size()/18530.0);
+  spdlog::info("For 8+1 channels and RB compression level 0, this mean a max number of events of {}", stream.size()/18530.0);
   while (!has_ended) {
-    auto header = RBEventHeader::from_bytestream(stream, pos);
+    RBEventHeader header;
+    if (is_headers) {
+      header = RBEventHeader::from_bytestream(stream, pos);
+    } else {
+      header = RBEventHeader::extract_from_rbbinarydump(stream, pos);
+    }
     header.broken ? n_bad++ : n_good++ ;
     headers.push_back(header);
     pos -= 2;
@@ -73,6 +78,34 @@ RBEventHeader::RBEventHeader() {
   timestamp_48       = 0; 
   broken             = true;
 }
+
+RBEventHeader RBEventHeader::from_bytestream(const Vec<u8> &stream,
+                                             u64 &pos){
+
+  RBEventHeader header;
+  pos += 2;
+  header.channel_mask        = Gaps::parse_u8(stream  , pos);   
+  header.stop_cell           = Gaps::parse_u16(stream , pos);  
+  header.crc32               = Gaps::parse_u32(stream , pos);  
+  header.dtap0               = Gaps::parse_u16(stream , pos);  
+  header.drs4_temp           = Gaps::parse_u16(stream , pos);  
+  header.is_locked           = Gaps::parse_bool(stream, pos);
+  header.is_locked_last_sec  = Gaps::parse_bool(stream, pos);
+  header.lost_trigger        = Gaps::parse_bool(stream, pos);
+  header.fpga_temp           = Gaps::parse_u16(stream , pos);  
+  header.event_id            = Gaps::parse_u32(stream , pos);  
+  header.rb_id               = Gaps::parse_u8(stream  , pos);  
+  header.timestamp_48        = Gaps::parse_u64(stream , pos);  
+  header.broken              = Gaps::parse_bool(stream, pos);  
+  return header; 
+  
+  
+  
+  return header;
+
+}
+
+
 
 f32 RBEventHeader::get_fpga_temp() const {
   f32 temp = (fpga_temp * 503.975/4096) - 273.15;
@@ -112,8 +145,8 @@ f32 RBEventHeader::drs_adc_to_celsius(u16 adc) const {
 }                                             
 
 
-RBEventHeader RBEventHeader::from_bytestream(const Vec<u8> bs,
-                                             u64 &pos) {
+RBEventHeader RBEventHeader::extract_from_rbbinarydump(const Vec<u8> &bs,
+                                                       u64 &pos) {
   RBEventHeader header = RBEventHeader();
   u64 start = pos;
   spdlog::debug("Start decoding at pos {}", pos);

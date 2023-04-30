@@ -17,7 +17,7 @@ vec_u32 get_event_ids_from_raw_stream(const vec_u8 &bytestream, u64 &start_pos);
  * Read event headers from a RB binary file
  *
  */
-Vec<RBEventHeader> get_headers(const String &filename);
+Vec<RBEventHeader> get_headers(const String &filename, bool is_header=false);
 
 /**
  * RB binary data header information
@@ -44,18 +44,20 @@ struct RBEventHeader {
   //u32  timestamp_32          ;
   //u16  timestamp_16          ;
   u64  timestamp_48          ;
-  bool broken                ;
-  
+  bool broken                ;  
   
   RBEventHeader();
-  
+ 
+  static RBEventHeader from_bytestream(const Vec<u8> &bytestream,
+                                       u64 &pos);
+
   /**
    * Take a "regular" ("blob") data stream from the RB and 
    * process only the header part.
    *
    */
-  static RBEventHeader from_bytestream(const Vec<u8> bytestream,
-                                       u64 &pos);
+  static RBEventHeader extract_from_rbbinarydump(const Vec<u8> &bytestream,
+                                                 u64 &pos);
   Vec<u8> get_active_data_channels() const;
   u64 get_clock_cycles_48bit() const;
   u8  get_n_datachan() const;
