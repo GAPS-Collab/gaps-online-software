@@ -1,3 +1,6 @@
+#include <fstream>
+
+
 #include "TOFCommon.h"
 #include "tof_typedefs.h"
 #include "parsers.h"
@@ -105,7 +108,7 @@ u32 decode_uint32_rev(const vec_u8 &bytestream,
          ((bytestream[start_pos+1] & 0xFF) << 24)
       |  ((bytestream[start_pos+0] & 0xFF) << 16)
       |  ((bytestream[start_pos+3] & 0xFF) << 8)
-      |  (bytestream[start_pos+2]));
+      |  ( bytestream[start_pos+2]));
   return value;
 }
 
@@ -363,6 +366,26 @@ float decode_12bitsensor(uint16_t value, float minrange, float maxrange)
    float decoded = minrange + ((float)value*increment);
    return decoded;
 }
+
+// file i/o
+
+bytestream get_bytestream_from_file(const String &filename) {
+  // bytestream stream;
+  // Not going to explicitly check these.
+  // // The use of gcount() below will compensate for a failure here.
+  std::ifstream is(filename, std::ios::binary);
+
+  is.seekg (0, is.end);
+  int length = is.tellg();
+  //std::cout << "Found file with length " << length << std::endl;
+  is.seekg (0, is.beg);
+  // Bytes data(length);
+  bytestream stream = bytestream(length);
+  is.read(reinterpret_cast<char*>(stream.data()), length);
+  return stream;
+}
+
+
 
 /***********************************************/
 //

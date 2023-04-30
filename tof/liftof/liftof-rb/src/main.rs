@@ -24,6 +24,7 @@ use local_ip_address::local_ip;
 use std::process::exit;
 use liftof_rb::api::*;
 use liftof_rb::control::*;
+use liftof_rb::memory::read_control_reg;
 use liftof_rb::memory::{
                     EVENT_SIZE,
                     DATABUF_TOTAL_SIZE};
@@ -34,8 +35,9 @@ use tof_dataclasses::events::blob::RBEventPayload;
 use tof_dataclasses::commands::{//TofCommand,
                                 TofResponse,
                                 TofOperationMode};
-use liftof_lib::RunParams;
-
+use tof_dataclasses::run::RunConfig;
+use tof_dataclasses::serialization::get_json_from_file;
+use tof_dataclasses::serialization::Serialization;
 extern crate pretty_env_logger;
 #[macro_use] extern crate log;
 
@@ -114,6 +116,9 @@ struct Args {
   ///// CnC server IP we should be listening to
   //#[arg(long, default_value_t = "10.0.1.1")]
   //cmd_server_ip : &'static str,
+  /// A json run config file with a RunConfiguration
+  #[arg(short, long)]
+  run_config: Option<std::path::PathBuf>,
 }
 
 fn main() {
@@ -134,17 +139,13 @@ fn main() {
   //                        .init();
   pretty_env_logger::init();
 
-  // General parameters, readout board id,, 
-  // ip to tof computer
-  let rb_id = get_board_id().expect("Unable to obtain board ID!");
-  let dna   = get_device_dna().expect("Unable to obtain device DNA!"); 
   
   let args = Args::parse();                   
   let mut buff_trip         = args.buff_trip;         
   let mut n_events_run      = args.nevents;
   let mut show_progress     = args.show_progress;
   let cache_size            = args.cache_size;
-  let run_forever           = args.run_forever;
+  let mut run_forever       = args.run_forever;
   let mut stream_any        = args.stream_any;
   let mut force_trigger     = args.force_trigger;
   let mut force_random_trig = args.force_random_trigger;
@@ -153,6 +154,34 @@ fn main() {
   let vcal                  = args.vcal;
   let tcal                  = args.tcal;
   let noi                   = args.noi;
+  let run_config            = args.run_config;
+
+  // active channels
+  let mut ch_mask : u8 = u8::MAX;
+
+  match run_config {
+    None     => (),
+    Some(rcfile) => {
+      match get_json_from_file(&rcfile) {
+        Err(err) => panic!("Unable to read the configuration file! Error {err}"),
+        Ok(rc_from_file) => {
+          println!("Found configuration file {}!", rcfile.display());
+          println!("[WARN] - Currently, only the active channel mask will be parsed from the config file!");
+          println!("[WARN/TODO] - This is WORK-IN-PROGRESS!");
+          match RunConfig::from_json(&rc_from_file) {
+            Err(err) => panic!("Can not read json from configuration file. Error {err}"),
+            Ok(rc_json) => {
+              //n_events_run = rc_json.nevents as u64;
+              //stream_any   = rc_json.stream_any;
+              //run_forever  = rc_json.runs_forever();
+              ch_mask      = rc_json.active_channel_mask;
+
+            }
+          }
+        }
+      }
+    }
+  }
 
   let mut file_suffix   = String::from(".robin");
 
@@ -204,6 +233,11 @@ fn main() {
   }
 
   let this_board_ip = local_ip().expect("Unable to obtainl local board IP. Something is messed up!");
+  
+  // General parameters, readout board id,, 
+  // ip to tof computer
+  let rb_id = get_board_id().expect("Unable to obtain board ID!");
+  let dna   = get_device_dna().expect("Unable to obtain device DNA!"); 
 
   // welcome banner!
   println!("-----------------------------------------------");
@@ -227,6 +261,19 @@ fn main() {
     println!("-----------------------------------------------"); 
   } 
  
+  // set channel mask (if different from 255)
+  match set_active_channel_mask(ch_mask) {
+    Ok(_) => (),
+    Err(err) => {
+      error!("Setting activve channel mask failed for mask {}, error {}", ch_mask, err);
+    }
+  }
+  let current_mask = read_control_reg(0x44).unwrap();
+  println!("CURRENT MASK = {}", current_mask);
+  //exit(0);
+  
+
+
   // this resets the data buffer /dev/uio1,2 occupancy
   reset_dma_and_buffers();
 
@@ -264,8 +311,8 @@ fn main() {
 
   // FIXME - MESSAGES GET CONSUMED!!
 
-  let (run_params_to_runner, run_params_from_cmdr)      : 
-      (Sender<RunParams>, Receiver<RunParams>)                = unbounded();
+  let (rc_to_runner, rc_from_cmdr)      : 
+      (Sender<RunConfig>, Receiver<RunConfig>)                = unbounded();
   //let (cmd_to_client, cmd_from_zmq)      : 
   //    (Sender<TofCommand>, Receiver<TofCommand>)              = unbounded();
   let (rsp_to_sink, rsp_from_client)     : 
@@ -300,7 +347,7 @@ fn main() {
  
   // Setup routine. Start the threads in inverse order of 
   // how far they are away from the buffers.
-  let run_params_from_cmdr_c = run_params_from_cmdr.clone();
+  let rc_from_cmdr_c = rc_from_cmdr.clone();
   let rdb_sender_a  = bs_send.clone();
   
   workforce.execute(move || {
@@ -322,7 +369,7 @@ fn main() {
   // then the runner. It does nothing, until we send a set
   // of RunParams
   workforce.execute(move || {
-      runner(&run_params_from_cmdr_c,
+      runner(&rc_from_cmdr_c,
              buff_trip,
              None, 
              &rdb_sender_a,
@@ -352,14 +399,14 @@ fn main() {
 
   // Respond to commands from the C&C server
   let set_op_mode_c        = set_op_mode.clone();
-  let run_params_to_runner_c = run_params_to_runner.clone();
+  let rc_to_runner_c = rc_to_runner.clone();
   let heartbeat_timeout_seconds : u32 = 10;
   workforce.execute(move || {
                     cmd_responder(cmd_server_ip,
                                   heartbeat_timeout_seconds,
                                   &rsp_from_client,  
                                   &set_op_mode_c,
-                                  &run_params_to_runner_c,
+                                  &rc_to_runner_c,
                                   &evid_to_cache )
                                   //&cmd_to_client   )  
   
@@ -374,19 +421,19 @@ fn main() {
     }
   }
     
-  //let run_params_from_cmdr_c = run_params_from_cmdr.clone();
   // we start the run by creating new RunParams
   if run_forever || n_events_run > 0 {
-    let run_pars = RunParams {
-      forever   : run_forever,
-      nevents   : n_events_run as u32,
-      is_active : true,
-      nseconds  : 0
-    };
+    let mut rc = RunConfig::new();
+    if run_forever {
+      rc.nevents = 0;
+    } else {
+      rc.nevents = n_events_run as u32
+    }
+    rc.is_active = true;
     println!("Waiting for threads to start..");
     thread::sleep(time::Duration::from_secs(5));
     println!("..done");
-    match run_params_to_runner.send(run_pars) {
+    match rc_to_runner.send(rc) {
       Err(err) => error!("Could not initialzie Run! Err {err}"),
       Ok(_)    => {
         println!("Run initialized! Attempting to start!");
@@ -444,7 +491,7 @@ fn main() {
     }
 
     match get_triggers_enabled() {
-      Err(err) => error!("Can not read trigger enabled register!"),
+      Err(err) => error!("Can not read trigger enabled register! Error {err}"),
       Ok(enabled) => {
         if !enabled && end_after_run {
           end = true;

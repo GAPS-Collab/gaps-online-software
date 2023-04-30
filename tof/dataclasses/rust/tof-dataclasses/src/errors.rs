@@ -31,7 +31,8 @@ pub enum SerializationError {
   ValueNotFound,
   EventFragment,
   UnknownPayload,
-  WrongByteSize
+  WrongByteSize,
+  JsonDecodingError
 }
 
 impl fmt::Display for SerializationError {
@@ -46,6 +47,7 @@ impl fmt::Display for SerializationError {
       SerializationError::EventFragment   => {disp = String::from("EventFragment");},
       SerializationError::UnknownPayload  => {disp = String::from("UnknownPayload");},
       SerializationError::WrongByteSize   => {disp = String::from("WrongByteSize");},
+      SerializationError::JsonDecodingError   => {disp = String::from("JsonDecodingError");},
     }
     write!(f, "<Serialization Error : {}>", disp)
   }
@@ -57,6 +59,7 @@ impl Error for SerializationError {
 #[derive(Debug)]
 pub enum DecodingError {
   //HeaderNotFound,
+  ChannelOutOfBounds,
   UnknownType
 }
 
@@ -65,6 +68,7 @@ impl fmt::Display for DecodingError {
     let disp : String;
     match self {
       DecodingError::UnknownType  => {disp = String::from("UnknownType");},
+      DecodingError::ChannelOutOfBounds => {disp = String::from("Remember channels start from 1, not 0");},
     }
     write!(f, "<DecodingError Error : {}>", disp)
   }

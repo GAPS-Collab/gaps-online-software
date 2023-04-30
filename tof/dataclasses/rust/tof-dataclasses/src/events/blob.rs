@@ -576,9 +576,26 @@ impl BlobData {
                             bytestream[pos    ],
                             bytestream[pos + 3],
                             bytestream[pos + 2]];
-    pos   += 4; 
-    self.event_id = u32::from_be_bytes(raw_bytes_4); 
+    let mut raw_bytes_4  = [bytestream[pos + 2],
+                            bytestream[pos + 3],
+                            bytestream[pos + 0],
+                            bytestream[pos + 1]];
+    let mut raw_bytes_le = [bytestream[pos],
+                            bytestream[pos + 1],
+                            bytestream[pos + 2],
+                            bytestream[pos + 3]];
+    let mut raw_bytes_be = [bytestream[pos + 3],
+                            bytestream[pos + 2],
+                            bytestream[pos + 1],
+                            bytestream[pos + 0]];
+    
 
+    pos   += 4; 
+    self.event_id = u32::from_le_bytes(raw_bytes_4);
+    //self.event_id = u32::from_le_bytes(raw_bytes_be);
+    //println!("The bytes {:?}", &raw_bytes_4);
+    //println!("The bytes le {:?}", &raw_bytes_le);
+    //println!("The bytes be {:?}", &raw_bytes_be);
 
     raw_bytes_2  = [bytestream[pos],bytestream[pos + 1]];
     pos   += 2;

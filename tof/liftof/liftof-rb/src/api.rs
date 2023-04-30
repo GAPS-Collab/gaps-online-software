@@ -41,8 +41,8 @@ use tof_dataclasses::packets::{TofPacket,
 //use tof_dataclasses::threading::ThreadPool;
 use tof_dataclasses::monitoring as moni;
 use tof_dataclasses::errors::SerializationError;
-use liftof_lib::RunParams;
-
+//use liftof_lib::RunParams;
+use tof_dataclasses::run::RunConfig;
 
 /// Non-register related constants 
 pub const HEARTBEAT : u64 = 5; // heartbeat in s
@@ -127,7 +127,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
                      heartbeat_timeout_seconds : u32,
                      rsp_receiver              : &Receiver<TofResponse>,
                      op_mode                   : &Sender<TofOperationMode>,
-                     run_pars                  : &Sender<RunParams>,
+                     run_config                : &Sender<RunConfig>,
                      evid_to_cache             : &Sender<u32>) {
                      //cmd_sender   : &Sender<TofCommand>) {
   // create 0MQ sockedts
@@ -342,13 +342,10 @@ pub fn cmd_responder(cmd_server_ip             : String,
                 // let's start a run. The value of the TofCommnad shall be 
                 // nevents
                 info!("Will initialize new run!");
-                let run_p = RunParams {
-                  forever   : true,
-                  nevents   : 0,
-                  is_active : true,
-                  nseconds  : 0,
-                };
-                match run_pars.send(run_p) {
+                let mut rc = RunConfig::new();
+                rc.set_forever();
+                rc.is_active = true;
+                match run_config.send(rc) {
                   Err(err) => error!("Error initializing run! {err}"),
                   Ok(_)    => ()
                 };
@@ -360,13 +357,59 @@ pub fn cmd_responder(cmd_server_ip             : String,
               },
               TofCommand::DataRunEnd(_)   => {
                 println!("Received command to end run!");
-                let run_p = RunParams {
-                  forever   : false,
-                  nevents   : 0,
-                  is_active : false,
-                  nseconds : 0,
-                };
-                match run_pars.send(run_p) {
+                // default is not active for run config
+
+//  let n_events = 100000;
+//
+//  let switch_buff = true;
+//  let mut uio1_total_size = 66520576;
+//  let mut uio2_total_size = 66520576;
+//  let buff_trip = 66520576;
+//  if buff_trip != 66520576 {
+//    uio1_total_size = buff_trip as usize;
+//    uio2_total_size = buff_trip as usize;
+//  }
+//
+//  println!("=> Will run {n_events} events!");
+//  let (pb_ev_up_send, pb_ev_up_recv ) : (Sender<u64>, Receiver<u64>) = unbounded(); 
+//  let (run_params_to_main, run_params_from_cmdr)      : 
+//      (Sender<RunParams>, Receiver<RunParams>)                = unbounded();
+//  let (pb_a_up_send, pb_a_up_recv   ) : (Sender<u64>, Receiver<u64>) = unbounded();  
+//  let (pb_b_up_send, pb_b_up_recv   ) : (Sender<u64>, Receiver<u64>) = unbounded(); 
+//  let (_kill_run, run_gets_killed)    : (Sender<bool>, Receiver<bool>)       = unbounded();
+//  let (bs_send, _bs_recv)             : (Sender<Vec<u8>>, Receiver<Vec<u8>>) = unbounded(); 
+//  
+//
+//  let p_op = Some(pb_ev_up_send);
+//  let workforce = ThreadPool::new(2);
+//
+//  workforce.execute(move || {
+//      runner(Some(n_events as u64),
+//             None,
+//             None,
+//             p_op,
+//             &run_params_from_cmdr,
+//             None,
+//             0);
+//             //bar_clone);
+//  });
+//  workforce.execute(move || { 
+//    progress_runner(n_events as u64,      
+//                    uio1_total_size,
+//                    uio2_total_size,
+//                    pb_a_up_recv ,
+//                    pb_b_up_recv ,
+//                    pb_ev_up_recv,
+//                    run_gets_killed)
+//  });
+//  workforce.execute(move || {
+//    read_data_buffers(bs_send,
+//                      buff_trip,
+//                      Some(pb_a_up_send),
+//                      Some(pb_b_up_send),
+//                      switch_buff);
+                let  rc = RunConfig::new();
+                match run_config.send(rc) {
                   Err(err) => error!("Error stopping run! {err}"),
                   Ok(_)    => ()
                 }
@@ -819,7 +862,7 @@ pub fn run_check() {
 ///  * force_trigger  : Run in forced trigger mode
 ///
 ///
-pub fn runner(run_params          : &Receiver<RunParams>,
+pub fn runner(run_config          : &Receiver<RunConfig>,
               buffer_trip         : usize,
               max_errors          : Option<u64>,
               bs_sender           : &Sender<Vec<u8>>,
@@ -857,7 +900,7 @@ pub fn runner(run_params          : &Receiver<RunParams>,
   let mut terminate = false;
   // the runner will specifically set up the DRS4
   let mut is_running = false;
-  let mut pars = RunParams::new();
+  let mut rc = RunConfig::new();
 
   // this is the progress bars
   //let mut template_bar_env : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.red/grey} {pos:>7}/{len:7}";
@@ -883,16 +926,16 @@ pub fn runner(run_params          : &Receiver<RunParams>,
   let mut which_buff : RamBuffer;
   let mut buff_size  : usize;
   loop {
-    match run_params.try_recv() {
+    match run_config.try_recv() {
       Err(err) => {
-        trace!("Did not receive new RunParams! Err {err}");
+        trace!("Did not receive a new RunConfig! Err {err}");
         thread::sleep(one_sec);
         //continue;
       }
-      Ok(p) => {
-        info!("Received a new set of RunParams! {:?}", p);
-        pars = p;
-        if pars.is_active {
+      Ok(new_config) => {
+        info!("Received a new set of RunConfig! {:?}", new_config);
+        rc = new_config;
+        if rc.is_active {
           info!("Will start a new run!");
           info!("Initializing board, starting up...");
           if latch_to_mtb {
@@ -924,7 +967,7 @@ pub fn runner(run_params          : &Receiver<RunParams>,
           }
           is_running = true;
           if show_progress {
-            if pars.forever {
+            if rc.runs_forever() {
               template_bar_env = "[{elapsed_precise}] {prefix} {msg} {spinner} ";
             } else {
               template_bar_env = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.red/grey} {pos:>7}/{len:7}";
@@ -937,7 +980,7 @@ pub fn runner(run_params          : &Receiver<RunParams>,
             prog_b  = multi_prog
                       .insert_after(&prog_a, ProgressBar::new(uio2_total_size as u64)); 
             prog_ev = multi_prog
-                          .insert_after(&prog_b, ProgressBar::new(pars.nevents as u64)); 
+                          .insert_after(&prog_b, ProgressBar::new(rc.nevents as u64)); 
             prog_a.set_message (label_a.clone());
             prog_a.set_prefix  ("\u{1F4BE}");
             prog_a.set_style   (sty_a.clone());
@@ -1036,15 +1079,15 @@ pub fn runner(run_params          : &Receiver<RunParams>,
       }
 
     } // end is_running
-    if !pars.forever {
-      if pars.nevents != 0 {
-        if n_events > pars.nevents as u64{
+    if !rc.runs_forever() {
+      if rc.nevents != 0 {
+        if n_events > rc.nevents as u64{
           terminate = true;
         }
       }
       
-      if pars.nseconds > 0 {
-          if now.elapsed().as_secs() > pars.nseconds  as u64{
+      if rc.nseconds > 0 {
+          if now.elapsed().as_secs() > rc.nseconds  as u64{
             terminate = true;
           }
         }

@@ -172,4 +172,9 @@ u64 search_for_2byte_marker(
 
 std::vector<uint32_t> get_2byte_markers_indices(const std::vector<uint8_t> &bytestream, uint8_t marker);
 
+// file i/o
+/***********************************************/
+bytestream get_bytestream_from_file(const std::string &filename);
+
+
 #endif
