@@ -12,6 +12,15 @@ use std::fs::read_to_string;
 extern crate json;
 use json::JsonValue;
 
+
+pub fn parse_u8(bs : &Vec::<u8>, pos : &mut usize) -> u8 {
+  let value = u8::from_le_bytes([bs[*pos]]);
+  *pos += 1;
+  value
+}
+
+
+
 /// Get u32 from a bytestream and move on the position marker
 ///
 /// # Arguments 
@@ -144,8 +153,9 @@ pub trait Serialization {
 /// Search for a certain number of type `u16` in a bytestream
 pub fn search_for_u16(number : u16, bytestream : &Vec<u8>, start_pos : usize) 
   -> Result<usize, SerializationError> {
-
-  if start_pos > bytestream.len() - 1 {
+ 
+  // -2 bc later on we are looking for 2 bytes!
+  if start_pos  > bytestream.len() - 2 {
     return Err(SerializationError::StreamTooShort);
   }
 

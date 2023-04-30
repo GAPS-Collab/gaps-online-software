@@ -56,8 +56,7 @@ struct RBEventHeader {
    */
   static RBEventHeader from_bytestream(const Vec<u8> bytestream,
                                        u64 &pos);
-  Vec<u8> get_active_data_channels()const;
-  //u64 get_timestamp_16_corrected();
+  Vec<u8> get_active_data_channels() const;
   u64 get_clock_cycles_48bit() const;
   u8  get_n_datachan() const;
   f32 get_fpga_temp() const;

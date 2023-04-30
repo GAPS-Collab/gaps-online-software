@@ -4,7 +4,7 @@ pub mod tests {
   extern crate rand;
   use rand::Rng;
   use std::path::Path;
-  use tof_dataclasses::events::RBBinaryDump;
+  use tof_dataclasses::events::{RBBinaryDump, RBEventHeader};
   use tof_dataclasses::constants::{NWORDS, NCHN, MAX_NUM_PEAKS};
   use tof_dataclasses::serialization::Serialization;
   use tof_dataclasses::FromRandom;
@@ -50,8 +50,15 @@ pub mod tests {
   }
 
   #[test]
-  fn it_works() {
-    assert_eq!(2 + 2, 4);
+  fn serialization_circle_test_for_rbeventheader() {
+    // try this 100 times
+    for n in 0..100 {
+      let header       = RBEventHeader::from_random();
+      let header_ser   = header.to_bytestream();
+      let mut pos = 0usize;
+      let header_deser = RBEventHeader::from_bytestream(&header_ser, &mut pos);
+      assert_eq!(header_deser.unwrap(), header);
+    }
   }
 }
 

@@ -25,7 +25,11 @@ use crate::constants::{NWORDS, NCHN, MAX_NUM_PEAKS};
 use crate::serialization::Serialization;
 use crate::serialization::SerializationError;
 use crate::serialization::search_for_u16;
-use crate::serialization::{parse_u16, parse_u32, parse_u64};
+use crate::serialization::{parse_bool,
+                           parse_u8,
+                           parse_u16,
+                           parse_u32,
+                           parse_u64};
 #[cfg(feature = "random")]
 use crate::FromRandom;
 #[cfg(feature = "random")]
@@ -272,36 +276,71 @@ impl RBEventBody {
 
 pub struct RBEvent {}
 
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub struct RBEventHeader {
-  pub nchannel     : u8,
-  pub stop_cell    : u16,
-  pub drs4_temp    : u16,
-  pub is_locked    : bool,
-  pub event_id     : u32,
-  pub rb_id        : u8,
-  pub timestamp_32 : u32,
-  pub timestamp_16 : u16,
+  pub channel_mask         : u8   , 
+  pub stop_cell            : u16  , 
+  pub crc32                : u32  , 
+  pub dtap0                : u16  , 
+  pub drs4_temp            : u16  , 
+  pub is_locked            : bool , 
+  pub is_locked_last_sec   : bool , 
+  pub lost_trigger         : bool , 
+  pub fpga_temp            : u16  , 
+  pub event_id             : u32  , 
+  pub rb_id                : u8   , 
+  pub timestamp_48         : u64  , 
+  pub broken               : bool , 
 }
 
 impl RBEventHeader {
+  const HEAD : u16 = 0xAAAA;
+  const TAIL : u16 = 0x5555;
+  const SIZE : usize = 34; // size in bytes with HEAD and TAIL
 
   pub fn new() -> RBEventHeader {
     RBEventHeader {
-      nchannel     : 0,
-      stop_cell    : 0,
-      drs4_temp    : 0,
-      is_locked    : false,
-      event_id     : 0,
-      rb_id        : 0,
-      timestamp_32 : 0,
-      timestamp_16 : 0,
+      channel_mask        : 0 ,  
+      stop_cell           : 0 ,  
+      crc32               : 0 ,  
+      dtap0               : 0 ,  
+      drs4_temp           : 0 ,  
+      is_locked           : false,  
+      is_locked_last_sec  : false,  
+      lost_trigger        : false,  
+      fpga_temp           : 0,  
+      event_id            : 0,  
+      rb_id               : 0,  
+      timestamp_48        : 0,  
+      broken              : false,  
     }
   }
 
-  pub fn get_timestamp48(&self) -> u64 {
-    let mut ts_48 = 0u64;
-    todo!();
-    ts_48
+  pub fn get_active_data_channels(&self) -> Vec<u8> {
+    let active_channels = Vec::<u8>::with_capacity(8);
+    active_channels
+  }
+  
+  pub fn get_clock_cycles_48bit(&self) -> u64 {
+    self.timestamp_48
+  }
+  
+  pub fn get_n_datachan(&self) -> u8 {
+    self.get_active_data_channels().len() as u8
+  }
+  
+  pub fn get_fpga_temp(&self) -> f32 {
+    self.drs_adc_to_celsius(self.fpga_temp)
+  }
+  
+  pub fn get_drs_temp(&self) -> f32 {
+    let drs_temp : f32 = 0.0;
+    drs_temp
+  }
+  
+  fn drs_adc_to_celsius(&self,adc : u16) -> f32 {
+    let temp : f32 = 0.0;
+    temp
   }
 }
 
@@ -325,14 +364,104 @@ impl fmt::Display for RBEventHeader {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     write!(f, "<RBEventHeader:\n
            \t RB {},\n
-           \t nchan {}, \n
-           \t drs4 T {}, \n
-           \t stop cell {}, \n
-           \t locked {}, \n
+           \t ch mask {}, \n
            \t event id {}, \n
-           \t timestamp (48bit) {}, \n",
-           self.rb_id, self.nchannel, self.drs4_temp, self.stop_cell,
+           \t timestamp (48bit) {}, \n,
+           \t locked {}, \n
+           \t locked last sec. {}, \n
+           \t drs4 Temp [C] {}, \n
+           \t FPGA Temp [C] {}, \n
+           \t stop cell {}, \n,
+           \t dtap0 {},\n,
+           \t crc32 {},\n,
+           \t broken {}>",
+           self.rb_id,
+           self.channel_mask,
+           self.event_id,
+           self.timestamp_48,
            self.is_locked,
-           self.event_id, self.get_timestamp48())
+           self.is_locked_last_sec,
+           self.drs4_temp,
+           self.fpga_temp,
+           self.stop_cell,
+           self.dtap0,
+           self.crc32,
+           self.broken)
   }
 }
+
+impl Serialization for RBEventHeader {
+
+  fn from_bytestream(stream : &Vec<u8>, pos : &mut usize)
+    -> Result<RBEventHeader, SerializationError> {
+    let mut header = RBEventHeader::new();
+    let head_pos   = search_for_u16(RBBinaryDump::HEAD, stream, *pos)?; 
+    let tail_pos   = search_for_u16(RBBinaryDump::TAIL, stream, head_pos + RBBinaryDump::SIZE-2)?;
+    // At this state, this can be a header or a full event. Check here and
+    // proceed depending on the options
+    if tail_pos + 2 - head_pos != RBEventHeader::SIZE {
+      return Err(SerializationError::EventFragment);
+    }
+    *pos = head_pos + 2;  
+    header.channel_mask        = parse_u8(stream  , pos);   
+    header.stop_cell           = parse_u16(stream , pos);  
+    header.crc32               = parse_u32(stream , pos);  
+    header.dtap0               = parse_u16(stream , pos);  
+    header.drs4_temp           = parse_u16(stream , pos);  
+    header.is_locked           = parse_bool(stream, pos);
+    header.is_locked_last_sec  = parse_bool(stream, pos);
+    header.lost_trigger        = parse_bool(stream, pos);
+    header.fpga_temp           = parse_u16(stream , pos);  
+    header.event_id            = parse_u32(stream , pos);  
+    header.rb_id               = parse_u8(stream  , pos);  
+    header.timestamp_48        = parse_u64(stream , pos);  
+    header.broken              = parse_bool(stream, pos);  
+    Ok(header) 
+  }
+
+  fn to_bytestream(&self) -> Vec<u8> {
+    let mut stream = Vec::<u8>::with_capacity(RBEventHeader::SIZE);
+    stream.extend_from_slice(&RBEventHeader::HEAD.to_le_bytes());
+    stream.extend_from_slice(&self.channel_mask      .to_le_bytes());
+    stream.extend_from_slice(&self.stop_cell         .to_le_bytes());
+    stream.extend_from_slice(&self.crc32             .to_le_bytes());
+    stream.extend_from_slice(&self.dtap0             .to_le_bytes());
+    stream.extend_from_slice(&self.drs4_temp         .to_le_bytes());
+    stream.extend_from_slice(&(u8::from(self.is_locked)  .to_le_bytes()));
+    stream.extend_from_slice(&(u8::from(self.is_locked_last_sec).to_le_bytes()));
+    stream.extend_from_slice(&(u8::from(self.lost_trigger)      .to_le_bytes()));
+    stream.extend_from_slice(&self.fpga_temp         .to_le_bytes());
+    stream.extend_from_slice(&self.event_id          .to_le_bytes());
+    stream.extend_from_slice(&self.rb_id             .to_le_bytes());
+    stream.extend_from_slice(&self.timestamp_48      .to_le_bytes());
+    stream.extend_from_slice(&(u8::from(self.broken)      .to_le_bytes()));
+    stream.extend_from_slice(&RBEventHeader::TAIL.to_le_bytes());
+    stream
+  }
+
+}
+
+#[cfg(feature = "random")]
+impl FromRandom for RBEventHeader {
+    
+  fn from_random() -> RBEventHeader {
+    let mut header = RBEventHeader::new();
+    let mut rng = rand::thread_rng();
+
+    header.channel_mask         = rng.gen::<u8>();    
+    header.stop_cell            = rng.gen::<u16>();   
+    header.crc32                = rng.gen::<u32>();   
+    header.dtap0                = rng.gen::<u16>();   
+    header.drs4_temp            = rng.gen::<u16>();   
+    header.is_locked            = rng.gen::<bool>();  
+    header.is_locked_last_sec   = rng.gen::<bool>();  
+    header.lost_trigger         = rng.gen::<bool>();  
+    header.fpga_temp            = rng.gen::<u16>();   
+    header.event_id             = rng.gen::<u32>();   
+    header.rb_id                = rng.gen::<u8>();    
+    header.timestamp_48         = rng.gen::<u64>();   
+    header.broken               = rng.gen::<bool>();  
+    header
+  }
+}
+
