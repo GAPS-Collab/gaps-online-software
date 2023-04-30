@@ -146,6 +146,8 @@ RBEventHeader RBEventHeader::from_bytestream(const Vec<u8> bs,
   // 3) trail -> 4bytes
   // if no channel is active, ch9 won't be active,
   // otherwise ch9 is ALWAYS active
+  
+  // THe header up to this point consists of 36 bytes
   u32 skip_bytes = 0;
   if ( nchan != 0) {
     skip_bytes = (nchan + 1) * (NWORDS * 2 + 6);

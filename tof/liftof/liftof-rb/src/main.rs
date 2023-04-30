@@ -24,6 +24,7 @@ use local_ip_address::local_ip;
 use std::process::exit;
 use liftof_rb::api::*;
 use liftof_rb::control::*;
+use liftof_rb::memory::read_control_reg;
 use liftof_rb::memory::{
                     EVENT_SIZE,
                     DATABUF_TOTAL_SIZE};
@@ -261,16 +262,16 @@ fn main() {
   } 
  
   // set channel mask (if different from 255)
-  if ch_mask != 255 {
-    println!("Found a non 255 channel mask! Will deactivate channels!");
-    warn!("Will deactivate channels, found channel mask {}", ch_mask);
-    match set_active_channel_mask(ch_mask) {
-      Ok(_) => (),
-      Err(err) => {
-        error!("Setting activve channel mask failed for mask {}, error {}", ch_mask, err);
-      }
+  match set_active_channel_mask(ch_mask) {
+    Ok(_) => (),
+    Err(err) => {
+      error!("Setting activve channel mask failed for mask {}, error {}", ch_mask, err);
     }
   }
+  let current_mask = read_control_reg(0x44).unwrap();
+  println!("CURRENT MASK = {}", current_mask);
+  //exit(0);
+  
 
 
   // this resets the data buffer /dev/uio1,2 occupancy

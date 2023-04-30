@@ -239,8 +239,13 @@ pub fn set_readout_all_channels_and_ch9() -> Result<(), RegisterError> {
 
 /// Enable active channels
 pub fn set_active_channel_mask(ch_mask : u8) -> Result<(), RegisterError> {
-  let mut value = read_control_reg(READOUT_MASK)?;
-  value = value | (ch_mask) as u32;
+  let mut value   = read_control_reg(READOUT_MASK)?;
+  //let mut ch_part = value >> 8;
+  //ch_part         = ch_part << 8;
+  //ch_part         = ch_part | (ch_mask) as u32;
+  value           = value >> 8;
+  value           = value << 8;
+  value           = value | (ch_mask as u32);
   write_control_reg(READOUT_MASK, value)?;
   Ok(())
 }
