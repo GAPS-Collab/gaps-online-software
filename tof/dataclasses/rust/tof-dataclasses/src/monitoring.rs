@@ -51,26 +51,25 @@ impl Default for RBMoniData {
 
 impl Serialization for RBMoniData {
   fn from_bytestream(stream    : &Vec<u8>, 
-                     start_pos : usize) 
+                     pos       : &mut usize) 
     -> Result<RBMoniData, SerializationError>{
 
-    let mut pos      = start_pos; 
     let mut two_bytes : [u8;2];
     let four_bytes    : [u8;4];
-    two_bytes = [stream[pos],
-                 stream[pos+1]];
-    pos += 2;
+    two_bytes = [stream[*pos],
+                 stream[*pos+1]];
+    *pos += 2;
     if RBMoniData::HEAD != u16::from_le_bytes(two_bytes) {
       warn!("Packet does not start with HEAD signature");
       return Err(SerializationError::HeadInvalid {});
     }
-    four_bytes = [stream[pos],
-                  stream[pos+1],
-                  stream[pos+2],
-                  stream[pos+3]];
-    pos += 4;
-    two_bytes = [stream[pos],
-                 stream[pos+1]];
+    four_bytes = [stream[*pos],
+                  stream[*pos+1],
+                  stream[*pos+2],
+                  stream[*pos+3]];
+    *pos += 4;
+    two_bytes = [stream[*pos],
+                 stream[*pos+1]];
     let mut moni_data  = RBMoniData::new();
     moni_data.rate = u32::from_le_bytes(four_bytes);  
     if RBMoniData::TAIL != u16::from_le_bytes(two_bytes) {

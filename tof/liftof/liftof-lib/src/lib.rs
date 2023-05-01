@@ -69,6 +69,7 @@ where P: AsRef<Path>, {
 /// # Arguments 
 ///
 /// * fliename (String) : Name of the file to read in 
+#[deprecated(since="0.4.0", note="please use `tof_dataclasses::io::read_file` instead")]
 pub fn get_file_as_byte_vec(filename: &String) -> Vec<u8> {
     let mut f = File::open(&filename).expect("no file found");
     let metadata = fs::metadata(&filename).expect("unable to read metadata");
@@ -220,20 +221,19 @@ impl RunParams {
 impl Serialization for RunParams {
   
   fn from_bytestream(bytestream : &Vec<u8>,
-                     start_pos  : usize)
+                     pos        : &mut usize)
     -> Result<Self, SerializationError> {
     let mut pars = RunParams::new();
-    let mut pos  = start_pos;
-    if parse_u16(bytestream, &mut pos) != RunParams::HEAD {
+    if parse_u16(bytestream, pos) != RunParams::HEAD {
       return Err(SerializationError::HeadInvalid {});
     }
-    let forever   = bytestream[pos];
-    pos += 1;
-    pars.nevents  = parse_u32(bytestream, &mut pos);
-    let is_active = bytestream[pos];
-    pos += 1;
-    pars.nseconds = parse_u32(bytestream, &mut pos);
-    if parse_u16(bytestream, &mut pos) != RunParams::TAIL {
+    let forever   = bytestream[*pos];
+    *pos += 1;
+    pars.nevents  = parse_u32(bytestream, pos);
+    let is_active = bytestream[*pos];
+    *pos += 1;
+    pars.nseconds = parse_u32(bytestream, pos);
+    if parse_u16(bytestream, pos) != RunParams::TAIL {
       return Err(SerializationError::TailInvalid {} );
     }
     pars.is_active = is_active > 0;

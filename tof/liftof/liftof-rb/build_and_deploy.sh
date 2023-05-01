@@ -12,10 +12,12 @@ SSL_RB="tof-rb01 tof-rb02 tof-rb03 tof-rb04 tof-rb07 tof-rb08 tof-rb09 tof-rb11 
 
 #for rb in `echo $SSL_RB`; 
 #  do echo $rb;
-#  scp liftof.service $rb:bin/;
+##  scp liftof.service $rb:bin/;
+#  scp runconfig.forever $rb:config/;
 #done
 
-compile_and_deploy_target liftof-rb tof-rb16
+
+compile_and_deploy_target liftof-rb tof-rb01
 
 #compile_and_deploy_target liftof-rb ssl-tof-computer
 #compile_and_deploy_target liftof-rb tof-rb01

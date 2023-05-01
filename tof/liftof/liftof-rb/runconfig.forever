@@ -1,0 +1,13 @@
+{
+    "nevents"                 : 0,
+    "is_active"               : true,
+    "nseconds"                : 0,
+    "stream_any"              : true,
+    "forced_trigger_poisson"  : 0,
+    "forced_trigger_periodic" : 0,
+    "vcal"                    : false,
+    "tcal"                    : false,
+    "noi"                     : false,
+    "active_channel_mask"     : 255,
+    "data_format"             : 2
+}
