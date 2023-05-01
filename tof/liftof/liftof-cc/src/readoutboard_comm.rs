@@ -172,7 +172,7 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
           Ok(_)    => ()
         };
         let tp = tp_ok.unwrap();
-
+        //println!("{:?} PACKET TYPE", tp.packet_type); 
         match tp.packet_type {
           PacketType::Monitor  => {continue;},
           PacketType::RBHeader => {
@@ -181,19 +181,10 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
             match &mut file_on_disc {
               None => (),
               Some(f) => {
-                // if the readoutboard prefixes it's payload with 
-                // "RBXX", we have to get rid of that first
-                match search_for_u16(0xaa, &buffer, 0) {
-                  Err(err) => {
-                    error!("Can not find header in this payload! {err}");
-                  },
-                  Ok(_)    => {
-                    trace!("writing {} bytes", buffer.len());
-                    match f.write_all(&tp.payload) {
-                      Err(err) => error!("Can not write to file, err {err}"),
-                      Ok(_)    => ()
-                    }
-                  }
+                trace!("writing {} bytes", buffer.len());
+                match f.write_all(&tp.payload) {
+                  Err(err) => error!("Can not write to file, err {err}"),
+                  Ok(_)    => ()
                 }
               }
             }
@@ -227,18 +218,18 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
           Some(f) => {
             // if the readoutboard prefixes it's payload with 
             // "RBXX", we have to get rid of that first
-            match search_for_u16(0xaa, &buffer, 0) {
-              Err(err) => {
-                error!("Can not find header in this payload! {err}");
-              }
-              Ok(_)    => {
+            //match search_for_u16(0xaa, &buffer, 0) {
+            //  Err(err) => {
+            //    error!("Can not find header in this payload! {err}");
+            //  }
+            //  Ok(_)    => {
                 trace!("writing {} bytes", &tp.payload.len());
                 match f.write_all(&tp.payload) {
                   Err(err) => error!("Can not write to file, err {err}"),
                   Ok(_)    => ()
                 }
-              }
-            }
+            //  }
+            //}
           }
         }
         n_events += 1;
