@@ -2,8 +2,23 @@
 //!
 //!
 
-
+// re-exports
 pub use crate::errors::SerializationError;
+
+use std::error::Error;
+use std::path::Path;
+use std::fs::read_to_string;
+
+extern crate json;
+use json::JsonValue;
+
+
+pub fn parse_u8(bs : &Vec::<u8>, pos : &mut usize) -> u8 {
+  let value = u8::from_le_bytes([bs[*pos]]);
+  *pos += 1;
+  value
+}
+
 
 
 /// Get u32 from a bytestream and move on the position marker
@@ -17,6 +32,11 @@ pub use crate::errors::SerializationError;
 //  pos += 4;
 //  value
 //}
+pub fn parse_u16(bs : &Vec::<u8>, pos : &mut usize) -> u16 {
+  let value = u16::from_le_bytes([bs[*pos], bs[*pos+1]]);
+  *pos += 2;
+  value
+}
 
 pub fn parse_u32(bs : &Vec::<u8>, pos : &mut usize) -> u32 {
   let value = u32::from_le_bytes([bs[*pos], bs[*pos+1], bs[*pos+2], bs[*pos+3]]);
@@ -24,11 +44,51 @@ pub fn parse_u32(bs : &Vec::<u8>, pos : &mut usize) -> u32 {
   value
 }
 
-pub fn parse_u16(bs : &Vec::<u8>, pos : &mut usize) -> u16 {
-  let value = u16::from_le_bytes([bs[*pos], bs[*pos+1]]);
-  *pos += 2;
+pub fn parse_u64(bs : &Vec::<u8>, pos : &mut usize) -> u64 {
+  let value = u64::from_le_bytes([bs[*pos],   bs[*pos+1], bs[*pos+2], bs[*pos+3],
+                                  bs[*pos+4], bs[*pos+5], bs[*pos+6], bs[*pos+7]]);
+  *pos += 8;
   value
 }
+
+/// Get an u32 from a bytestream 
+///
+/// This assumes an underlying representation of 
+/// an atomic unit of 16bit instead of 8.
+/// This is realized for the raw data stream
+/// from the readoutboards.
+pub fn parse_u32_for_16bit_words(bs  : &Vec::<u8>,
+                                 pos : &mut usize) -> u32 {
+  
+  let mut raw_bytes_4  = [bs[*pos + 2],
+                          bs[*pos + 3],
+                          bs[*pos    ],
+                          bs[*pos + 1]];
+  *pos += 4;
+  u32::from_le_bytes(raw_bytes_4)
+}
+
+/// Get an 48bit number from a bytestream 
+///
+/// This assumes an underlying representation of 
+/// an atomic unit of 16bit instead of 8.
+/// This is realized for the raw data stream
+/// from the readoutboards.
+pub fn parse_u48_for_16bit_words(bs  : &Vec::<u8>,
+                                 pos : &mut usize) -> u64 {
+  
+  let mut raw_bytes_8  = [0u8,
+                          0u8,
+                          bs[*pos + 4],
+                          bs[*pos + 5],
+                          bs[*pos + 2],
+                          bs[*pos + 3],
+                          bs[*pos    ],
+                          bs[*pos + 1]];
+  *pos += 6;
+  u64::from_le_bytes(raw_bytes_8)
+}
+
 
 pub fn parse_f32(bs : &Vec::<u8>, pos : &mut usize) -> f32 {
   let value = f32::from_le_bytes([bs[*pos],   bs[*pos+1],  
@@ -52,7 +112,12 @@ pub fn parse_bool(bs : &Vec::<u8>, pos : &mut usize) -> bool {
   value > 0
 }
 
-
+pub fn get_json_from_file(filename : &Path)
+    -> Result<JsonValue, Box<dyn Error>> {
+  let file_content = std::fs::read_to_string(filename)?;
+  let config = json::parse(&file_content)?;
+  Ok(config)
+}
 
 /// En/Decode to a bytestream, that is `Vec<u8>`
 pub trait Serialization {
@@ -60,9 +125,15 @@ pub trait Serialization {
 
   /// Decode a serializable from a bytestream  
   fn from_bytestream(bytestream : &Vec<u8>, 
-                     start_pos  : usize)
+                     pos        : &mut usize)
     -> Result<Self, SerializationError>
     where Self : Sized;
+  
+  /// Encode a serializable to a bytestream  
+  fn to_bytestream(&self) -> Vec<u8> {
+    println!("There can't be a default implementation for this trait!");
+    todo!();
+  }
 
   fn from_slice(slice     : &[u8],
                 start_pos : usize)
@@ -72,6 +143,12 @@ pub trait Serialization {
     todo!();
     }
 
+  fn from_json(config : &JsonValue)
+    -> Result<Self, Box<dyn Error>>
+    where Self : Sized {
+    println!("There can't be a default implementation for this trait!"); 
+    todo!();
+  }
 
   /// Construct byte slice out of self.
   ///
@@ -83,7 +160,6 @@ pub trait Serialization {
     todo!();
     }
   
-  //pub fn to_bytestream(&self, &
 
   /////! Add the payload of the serializable to the pre allocated bytestream
   //fn into_bytestream(bytestream : &mut Vec<u8>,
@@ -98,8 +174,9 @@ pub trait Serialization {
 /// Search for a certain number of type `u16` in a bytestream
 pub fn search_for_u16(number : u16, bytestream : &Vec<u8>, start_pos : usize) 
   -> Result<usize, SerializationError> {
-
-  if start_pos > bytestream.len() - 1 {
+ 
+  // -2 bc later on we are looking for 2 bytes!
+  if start_pos  > bytestream.len() - 2 {
     return Err(SerializationError::StreamTooShort);
   }
 
@@ -116,17 +193,18 @@ pub fn search_for_u16(number : u16, bytestream : &Vec<u8>, start_pos : usize)
   // the stream
   pos += 2;
   let mut found = false;
-  if u16::from_be_bytes(two_bytes) != number {
+  if u16::from_le_bytes(two_bytes) != number {
     // we search for the next packet
     for n in pos..bytestream.len() - 1 {
       two_bytes = [bytestream[n], bytestream[n + 1]];
-      if (u16::from_be_bytes(two_bytes)) == number {
+      if (u16::from_le_bytes(two_bytes)) == number {
         pos = n;
         found = true;
         break;
       }
     }
     if !found {
+      error!("Can not find {} ", number);
       return Err(SerializationError::ValueNotFound);
     }
   }

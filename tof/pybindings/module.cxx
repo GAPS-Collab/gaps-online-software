@@ -28,8 +28,6 @@ using namespace GAPS;
 using namespace pybind11::literals;
 namespace py = pybind11;
 
-bytestream get_bytestream_from_file(const std::string &filename);
-
 /***********************************************/
 
 bytestream wrap_encode_ushort(u16 value, u32 start_pos) {
@@ -47,6 +45,7 @@ bytestream wrap_encode_ushort_rev(u16 value, size_t start_pos) {
   encode_ushort_rev(value, stream, start_pos);
   return stream;
 }
+
 
 /***********************************************/
 
@@ -546,37 +545,6 @@ std::vector<TofPacket> get_tofpackets_from_stream(vec_u8 bytestream, u64 start_p
 
 /********************/
 
-bytestream get_bytestream_from_file(const std::string &filename) {
-  // bytestream stream;
-  // Not going to explicitly check these.
-  // // The use of gcount() below will compensate for a failure here.
-  std::ifstream is(filename, std::ios::binary);
-
-  is.seekg (0, is.end);
-  int length = is.tellg();
-  //std::cout << "Found file with length " << length << std::endl;
-  is.seekg (0, is.beg);
-
-  // is.seekg(offset);
-  //
-  // Bytes data(length);
-  bytestream stream = bytestream(length);
-  is.read(reinterpret_cast<char*>(stream.data()), length);
-  //
-  // // We have to check that reading from the stream actually worked.
-  // // If any of the stream operation above failed then `gcount()`
-  // // will return zero indicating that zero data was read from the
-  // // stream.
-  // data.resize(is.gcount());
-  //
-  // // Simply return the vector to allow move semantics take over.
-  // return data;
-
-  return stream;
-}
-
-/********************/
-
 
 PYBIND11_MODULE(gaps_tof, m) {
     m.doc() = "GAPS Tof dataclasses and utility tools";
@@ -602,6 +570,50 @@ PYBIND11_MODULE(gaps_tof, m) {
       .value("Unknown"              ,TofCommand::Unknown) 
       .export_values();
 
+    py::class_<RBEventHeader>(m, "RBEventHeader")
+      .def(py::init())
+      .def("from_bytestream", &RBEventHeader::from_bytestream, "Deserialize from a list of bytes")
+      .def("extract_from_rbbinarydump", &RBEventHeader::extract_from_rbbinarydump, "Get header from full rbevent binary stream ('blob')")
+      .def("get_active_data_channels", &RBEventHeader::get_active_data_channels, "Get a list of active channels, excluding ch9. Channel9 will (usually) always be on, as long as a single data channel is switched on as well.")
+      .def("get_fpga_temp", &RBEventHeader::get_fpga_temp, "The FPGA temperature in C")
+      .def("get_drs_temp",  &RBEventHeader::get_drs_temp, "The DRS4 temperature in C, read out by software")
+      .def("get_clock_cycles_48bit", &RBEventHeader::get_clock_cycles_48bit, "The complete 48bit timestamp, derived from the RB clock (usually 33MHz)")
+      .def("get_n_datachan", &RBEventHeader::get_n_datachan)
+      //.def("get_timestamp_16_corrected",   &RBEventHeader::get_timestamp_16_corrected)
+      .def_readonly("channel_mask"       , &RBEventHeader::channel_mask)   
+      .def_readonly("stop_cell"          , &RBEventHeader::stop_cell   )   
+      .def_readonly("crc32"              , &RBEventHeader::crc32       )   
+      .def_readonly("dtap0"              , &RBEventHeader::dtap0       )   
+      .def_readonly("drs4_temp"          , &RBEventHeader::drs4_temp   )   
+      .def_readonly("is_locked"          , &RBEventHeader::is_locked   )   
+      .def_readonly("is_locked_last_sec" , &RBEventHeader::is_locked_last_sec)   
+      .def_readonly("lost_trigger"       , &RBEventHeader::lost_trigger)   
+      .def_readonly("fpga_temp"          , &RBEventHeader::fpga_temp   )   
+      .def_readonly("event_id"           , &RBEventHeader::event_id    )   
+      .def_readonly("rb_id"              , &RBEventHeader::rb_id       )   
+      //.def_readonly("timestamp_32"       , &RBEventHeader::timestamp_32)   
+      //.def_readonly("timestamp_16"       , &RBEventHeader::timestamp_16)   
+      .def_readonly("broken"             , &RBEventHeader::broken      )   
+      .def("__repr__",        [](const RBEventHeader &h) {
+                                  return "<RBEventHeader : \n"
+                                  + String(" rb id ")     + std::to_string(h.rb_id)
+                                  + "\n event id "        + std::to_string(h.event_id)
+                                  + "\n is locked "       + std::to_string(h.is_locked)
+                                  + "\n is locked (1s) "  + std::to_string(h.is_locked_last_sec)
+                                  + "\n lost trigger "    + std::to_string(h.lost_trigger)
+                                  + "\n channel mask "    + std::to_string(h.channel_mask)
+                                  + "\n stop cell "       + std::to_string(h.stop_cell)
+                                  + "\n crc32 "           + std::to_string(h.crc32)
+                                  + "\n dtap0 "           + std::to_string(h.dtap0)
+                                  + "\n timestamp (48bit) " + std::to_string(h.timestamp_48)
+                                  + "\n FPGA temp [C] " + std::to_string(h.get_fpga_temp())
+                                  + "\n DRS4 temp [C] " + std::to_string(h.get_drs_temp())
+                                  + ">";
+                                  })
+    
+      
+    ;
+  
     py::class_<MasterTriggerPacket>(m, "MasterTriggerPacket")
       .def(py::init())
       .def("to_bytestream",   &MasterTriggerPacket::to_bytestream, "Serialize to a list of bytes")
@@ -942,7 +954,7 @@ PYBIND11_MODULE(gaps_tof, m) {
    m.def("get_vincs",                &increment_getter);
    m.def("get_vdips",                &dip_getter);
    m.def("get_tbins",                &tbin_getter);
-   
+   m.def("get_headers",              &get_headers); 
    // waveform stuff
    m.def("calculate_pedestal",       &calculate_pedestal_helper);
 }

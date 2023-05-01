@@ -379,12 +379,11 @@ impl MasterTriggerEvent {
 impl Serialization for MasterTriggerEvent {
 
   fn from_bytestream(bytestream : &Vec<u8>,
-                     start_pos  : usize)
+                     pos        : &mut usize)
     -> Result<Self, SerializationError> {
     let bs = bytestream;
-    let pos = start_pos;
     let mt = MasterTriggerEvent::new(0,0);
-    let header = u16::from_le_bytes([bs[pos],bs[pos + 1]]); 
+    let header = u16::from_le_bytes([bs[*pos],bs[*pos + 1]]); 
     if header != MasterTriggerEvent::HEAD {
       return Err(SerializationError::HeadInvalid);
     }

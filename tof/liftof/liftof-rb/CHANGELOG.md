@@ -1,7 +1,16 @@
+# MOA series
+
+v0.4.2
+* Switch from depreacted RunParams to RunConfig struct
+* Includes the possibility to use a json config file
+* New feature - use only a subset of channels
+
 v0.4.0
 * Waveform analysis possible directly on the board
   A new `--analyze` flag will take that into account
 * Simplified --vcal, --tcal, --noi flags for calibration
+
+# MANINI series
 
 v0.3.4
 * New feature, random self trigger mode with 

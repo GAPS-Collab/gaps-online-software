@@ -15,24 +15,14 @@
 
 
 pub mod paddle_packet;
-pub mod generic_packet;
-pub mod data_packet;
-//pub mod command_packet;
-
 
 use std::fmt;
-pub use crate::packets::generic_packet::GenericPacket;
-pub use crate::packets::data_packet::DataPacket;
 pub use crate::monitoring::RBMoniData;
-//pub use crate::packets::command_packet::CommandPacket;
 use crate::serialization::{Serialization};
 use crate::errors::SerializationError;
 use crate::events::{RBEventPayload,
+                    RBEventHeader,
                     MasterTriggerEvent};
-//use nom::IResult;
-//use nom::{error::ErrorKind, Err};
-//use nom::number::complete::*;
-//use nom::bytes::complete::{tag, take, take_until};
 
 pub enum PacketQuality {
   Perfect,
@@ -52,6 +42,7 @@ pub const PACKET_TYPE_MONITOR   : u8 = 30;
 pub const PACKET_TYPE_HEARTBEAT : u8 = 40;
 pub const PACKET_TYPE_SCALAR    : u8 = 50;
 pub const PACKET_TYPE_MT        : u8 = 60;
+pub const PACKET_TYPE_RBHEADER  : u8 = 70;
 
 //// Each packet is send from somewhere.
 ////
@@ -91,6 +82,7 @@ pub enum PacketType {
   MasterTrigger , 
   HeartBeat     ,
   Scalar        ,
+  RBHeader      ,
 }
 
 impl PacketType {
@@ -103,9 +95,9 @@ impl PacketType {
       PacketType::Monitor       => PACKET_TYPE_MONITOR,
       PacketType::HeartBeat     => PACKET_TYPE_HEARTBEAT,
       PacketType::MasterTrigger => PACKET_TYPE_MT,
-      PacketType::Scalar        => PACKET_TYPE_SCALAR
+      PacketType::Scalar        => PACKET_TYPE_SCALAR,
+      PacketType::RBHeader      => PACKET_TYPE_RBHEADER
     }
-
   }
 
   pub fn from_u8(value : u8) -> Option<PacketType> {
@@ -118,6 +110,7 @@ impl PacketType {
       PACKET_TYPE_HEARTBEAT => Some(PacketType::HeartBeat),
       PACKET_TYPE_MT        => Some(PacketType::MasterTrigger),
       PACKET_TYPE_SCALAR    => Some(PacketType::Scalar),
+      PACKET_TYPE_RBHEADER  => Some(PacketType::RBHeader),
       _   => None,
     }
   }
@@ -234,23 +227,29 @@ impl From<&RBEventPayload> for TofPacket {
   }
 }
 
-
+impl From<&RBEventHeader> for TofPacket {
+  fn from(ev_header : &RBEventHeader) -> TofPacket {
+    let mut tp     = TofPacket::new();
+    tp.packet_type = PacketType::RBHeader;
+    tp.payload     = ev_header.to_bytestream();
+    tp
+  }
+}
 impl Serialization for TofPacket {
-  fn from_bytestream(stream : &Vec<u8>, start_pos : usize)
+  fn from_bytestream(stream : &Vec<u8>, pos : &mut usize)
   -> Result<TofPacket, SerializationError> {
-    let mut pos = start_pos;
     let mut two_bytes : [u8;2];
-    two_bytes = [stream[start_pos],
-                 stream[start_pos+1]];
+    two_bytes = [stream[*pos],
+                 stream[*pos+1]];
         
-    pos += 2;
+    *pos += 2;
     if TofPacket::HEAD != u16::from_le_bytes(two_bytes) {
       warn!("Packet does not start with HEAD signature");
       return Err(SerializationError::HeadInvalid {});
     }
-    let packet_type_enc = stream[pos];
+    let packet_type_enc = stream[*pos];
     let packet_type : PacketType;
-    pos += 1;
+    *pos += 1;
     match PacketType::from_u8(packet_type_enc) {
       Some(pt) => packet_type = pt,
       None => {return Err(SerializationError::UnknownPayload);}
@@ -263,24 +262,24 @@ impl Serialization for TofPacket {
     //                   stream[pos+5],
     //                   stream[pos+6],
     //                   stream[pos+7]];
-    let four_bytes = [stream[pos],
-                      stream[pos + 1],
-                      stream[pos + 2],
-                      stream[pos + 3]];
+    let four_bytes = [stream[*pos],
+                      stream[*pos + 1],
+                      stream[*pos + 2],
+                      stream[*pos + 3]];
 
     //println!("{eight_bytes:?}");
     //let payload_size = u64::from_le_bytes(eight_bytes);
     let payload_size = u32::from_le_bytes(four_bytes);
     //println!("{payload_size}");
-    pos += 4;
+    *pos += 4;
     //println!("{pos}");
-    two_bytes = [stream[pos + payload_size as usize], stream[pos + 1 + payload_size as usize]];
+    two_bytes = [stream[*pos + payload_size as usize], stream[*pos + 1 + payload_size as usize]];
     if TofPacket::TAIL != u16::from_le_bytes(two_bytes) {
       warn!("Packet does not end with TAIL signature");
       return Err(SerializationError::TailInvalid {});
     }
     let mut payload = Vec::<u8>::with_capacity(payload_size as usize);
-    payload.extend_from_slice(&stream[pos..pos+payload_size as usize]);
+    payload.extend_from_slice(&stream[*pos..*pos+payload_size as usize]);
     //println!("PAYLOAD: {payload:?}");
     //trace!("TofPacket with Payload {payload:?}"
     Ok(TofPacket {
@@ -302,7 +301,8 @@ fn test_tof_packet_serialize_roundabout() ->Result<(), SerializationError> {
   //pk.payload     = vec![1,2,3,4];
   let bs = pk.to_bytestream();
   println!("{bs:?}");
-  let pk2 = TofPacket::from_bytestream(&bs, 0)?;
+  let mut pos = 0usize;
+  let pk2 = TofPacket::from_bytestream(&bs, &mut pos)?;
   
   assert_eq!(pk, pk2);
   Ok(())

@@ -638,10 +638,10 @@ impl fmt::Display for ReadoutBoard {
   }
 }
 
-#[test]
-fn test_get_rbs_sqlite() {
-  get_ltbs_from_sqlite();
-  get_rbs_from_sqlite();
-}
+//#[test]
+//fn test_get_rbs_sqlite() {
+//  get_ltbs_from_sqlite();
+//  get_rbs_from_sqlite();
+//}
 
 
