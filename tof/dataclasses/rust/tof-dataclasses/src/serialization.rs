@@ -68,6 +68,27 @@ pub fn parse_u32_for_16bit_words(bs  : &Vec::<u8>,
   u32::from_le_bytes(raw_bytes_4)
 }
 
+/// Get an 48bit number from a bytestream 
+///
+/// This assumes an underlying representation of 
+/// an atomic unit of 16bit instead of 8.
+/// This is realized for the raw data stream
+/// from the readoutboards.
+pub fn parse_u48_for_16bit_words(bs  : &Vec::<u8>,
+                                 pos : &mut usize) -> u64 {
+  
+  let mut raw_bytes_8  = [0u8,
+                          0u8,
+                          bs[*pos + 4],
+                          bs[*pos + 5],
+                          bs[*pos + 2],
+                          bs[*pos + 3],
+                          bs[*pos    ],
+                          bs[*pos + 1]];
+  *pos += 6;
+  u64::from_le_bytes(raw_bytes_8)
+}
+
 
 pub fn parse_f32(bs : &Vec::<u8>, pos : &mut usize) -> f32 {
   let value = f32::from_le_bytes([bs[*pos],   bs[*pos+1],  
@@ -172,17 +193,18 @@ pub fn search_for_u16(number : u16, bytestream : &Vec<u8>, start_pos : usize)
   // the stream
   pos += 2;
   let mut found = false;
-  if u16::from_be_bytes(two_bytes) != number {
+  if u16::from_le_bytes(two_bytes) != number {
     // we search for the next packet
     for n in pos..bytestream.len() - 1 {
       two_bytes = [bytestream[n], bytestream[n + 1]];
-      if (u16::from_be_bytes(two_bytes)) == number {
+      if (u16::from_le_bytes(two_bytes)) == number {
         pos = n;
         found = true;
         break;
       }
     }
     if !found {
+      error!("Can not find {} ", number);
       return Err(SerializationError::ValueNotFound);
     }
   }

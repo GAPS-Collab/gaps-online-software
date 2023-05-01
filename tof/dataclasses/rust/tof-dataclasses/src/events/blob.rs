@@ -157,8 +157,7 @@ impl RBEventPayload {
     let ev_payload     = RBEventPayload::new(event_id, payload.clone());
     Ok(ev_payload)
   }
-  
- 
+   
   ///!  
   ///
   ///

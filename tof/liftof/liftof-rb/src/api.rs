@@ -24,7 +24,6 @@ use crossbeam_channel::{Sender,
 use indicatif::{MultiProgress,
                 ProgressBar,
                 ProgressStyle};
-//use indicatif::ProgressStyle;
 
 use crate::control::*;
 use crate::memory::*;
@@ -32,6 +31,7 @@ use tof_dataclasses::commands::*;
 
 use tof_dataclasses::events::blob::{BlobData,
                                     RBEventPayload};
+use tof_dataclasses::events::RBEventHeader;
 use tof_dataclasses::serialization::search_for_u16;
 use tof_dataclasses::commands::{TofCommand,
                                 TofResponse,
@@ -109,7 +109,7 @@ pub fn prefix_board_id(input : &mut Vec<u8>) -> Vec<u8> {
 pub fn cmd_from_bytestream(bytestream : &mut Vec<u8>) ->Result<TofCommand, SerializationError>{
   //let bytestream = cmd.drain(0..4);
   // FIXME - remove expect call
-  TofCommand::from_bytestream(&bytestream, 4)
+  TofCommand::from_bytestream(&bytestream, &mut 4)
   //tof_command
 }
 
@@ -227,7 +227,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
       Ok(cmd_bytes)  => {
         info!("Received bytes {}", cmd_bytes.len());
         // we have to strip off the topic
-        match TofCommand::from_bytestream(&cmd_bytes,4) {
+        match TofCommand::from_bytestream(&cmd_bytes, &mut 4) {
           Err(err) => error!("Problem decoding command {}", err),
           Ok(cmd)  => {
             // we got a valid tof command, forward it and wait for the 
@@ -542,7 +542,6 @@ pub fn data_publisher(data : &Receiver<TofPacket>,
     file_on_disc = OpenOptions::new().append(true).create(true).open(blobfile_path).ok()
   }
 
-
   loop {
     match data.recv() {
       Err(err) => trace!("Error receiving TofPacket {err}"),
@@ -552,7 +551,8 @@ pub fn data_publisher(data : &Receiver<TofPacket>,
         // FIXME - retries?
         if write_blob {
           //println!("{:?}", packet.packet_type);
-          if packet.packet_type == PacketType::RBEvent {
+          if packet.packet_type == PacketType::RBEvent || 
+             packet.packet_type == PacketType::RBHeader {
             //println!("is rb event");
             match &mut file_on_disc {
               None => error!("We want to write data, however the file is invalid!"),
@@ -1137,21 +1137,20 @@ pub fn runner(run_config          : &Receiver<RunConfig>,
 ///
 /// * control_ch : Receive operation mode instructions
 ///
-pub fn event_cache_worker(recv_ev_pl    : Receiver<RBEventPayload>,
-                          //cmd_from_cmdr : &Receiver<TofCommand>,
-                          //send_ev_pl  : Sender<Option<RBEventPayload>>,
-                          tp_to_pub    : &Sender<TofPacket>,
-                          //hasit_to_cmd : &Sender<bool>,
-                          resp_to_cmd  : &Sender<TofResponse>,
-                          get_op_mode  : Receiver<TofOperationMode>, 
-                          recv_evid    : Receiver<u32>,
-                          cache_size   : usize) {
+pub fn event_cache(recv_ev_pl   : Receiver<RBEventPayload>,
+                   tp_recv      : Receiver<TofPacket>,
+                   tp_to_pub    : &Sender<TofPacket>,
+                   resp_to_cmd  : &Sender<TofResponse>,
+                   get_op_mode  : Receiver<TofOperationMode>, 
+                   recv_evid    : Receiver<u32>,
+                   cache_size   : usize) {
 
   let mut n_send_errors  = 0u64;   
   let mut op_mode_stream = false;
 
   let mut oldest_event_id : u32 = 0;
-  let mut event_cache : HashMap::<u32, RBEventPayload> = HashMap::new();
+  //let mut event_cache : HashMap::<u32, RBEventPayload> = HashMap::new();
+  let mut event_cache : HashMap::<u32, TofPacket> = HashMap::new();
   loop {
     // check changes in operation mode
     match get_op_mode.try_recv() {
@@ -1164,41 +1163,68 @@ pub fn event_cache_worker(recv_ev_pl    : Receiver<RBEventPayload>,
         }
       }
     }
-    // store incoming events in the cache  
-    match recv_ev_pl.try_recv() {
-      Err(err) => {
+    match tp_recv.try_recv() {
+      Err(err) =>   {
         trace!("No event payload! {err}");
-        //continue;
-      } // end err
-      Ok(event)  => {
-        trace!("Received next RBEvent!");
+      }
+      Ok(packet) => {
+        // FIXME - there need to be checks what the 
+        // packet type is
+        let packet_evid = RBEventHeader::extract_eventid_from_rbheader(&packet.payload); 
         if oldest_event_id == 0 {
-          oldest_event_id = event.event_id;
+          oldest_event_id = packet_evid;
         } //endif
-        // store the event in the cache
-        //println!("Received payload with event id {}" ,event.event_id);
-        if !event_cache.contains_key(&event.event_id) {
-          event_cache.insert(event.event_id, event);
+        //// store the event in the cache
+        ////println!("Received payload with event id {}" ,event.event_id);
+        if !event_cache.contains_key(&packet_evid) {
+          event_cache.insert(packet_evid, packet);
         }
-        // keep track of the oldest event_id
-        trace!("We have a cache size of {}", event_cache.len());
+        //// keep track of the oldest event_id
+        //trace!("We have a cache size of {}", event_cache.len());
         if event_cache.len() > cache_size {
           event_cache.remove(&oldest_event_id);
           oldest_event_id += 1;
         } //endif
-      }// end Ok
-    } // end match
+      }
+    }
+
+
+    //// store incoming events in the cache  
+    //match recv_ev_pl.try_recv() {
+    //  Err(err) => {
+    //    trace!("No event payload! {err}");
+    //    //continue;
+    //  } // end err
+    //  Ok(event)  => {
+    //    trace!("Received next RBEvent!");
+    //    if oldest_event_id == 0 {
+    //      oldest_event_id = event.event_id;
+    //    } //endif
+    //    // store the event in the cache
+    //    //println!("Received payload with event id {}" ,event.event_id);
+    //    if !event_cache.contains_key(&event.event_id) {
+    //      event_cache.insert(event.event_id, event);
+    //    }
+    //    // keep track of the oldest event_id
+    //    trace!("We have a cache size of {}", event_cache.len());
+    //    if event_cache.len() > cache_size {
+    //      event_cache.remove(&oldest_event_id);
+    //      oldest_event_id += 1;
+    //    } //endif
+    //  }// end Ok
+    //} // end match
   
     // if we are in "stream_any" mode, we don't need to take care
     // of any fo the response/request.
     if op_mode_stream {
       //event_cache.as_ref().into_iter().map(|(evid, payload)| {send_ev_pl.try_send(Some(payload))});
       //let evids = event_cache.keys();
-      for payload in event_cache.values() {
+      for tp in event_cache.values() {
         // FIXME - this is bad! Too much allocation
-        let tp = TofPacket::from(payload);
+        //let tp = TofPacket::from(payload);
+        //let tp = TofPacket::from_bytestream(payload, &mut 0).unwrap();
         //info!("{}", tp);
-        match tp_to_pub.try_send(tp) {
+        match tp_to_pub.try_send(tp.clone()) {
           Err(err) => {
             error!("Error sending! {err}");
             n_send_errors += 1;
@@ -1229,14 +1255,15 @@ pub fn event_cache_worker(recv_ev_pl    : Receiver<RBEventPayload>,
           // hamwanich
           debug!("We don't have {event_id}!");
         } else {
-          let event = event_cache.remove(&event_id).unwrap();
+          //let event = event_cache.remove(&event_id).unwrap();
+          let tp = event_cache.remove(&event_id).unwrap();
           let resp =  TofResponse::Success(event_id);
           match resp_to_cmd.try_send(resp) {
             Err(err) => trace!("Error informing the commander that we do have {event_id}! Err {err}"),
             Ok(_)    => ()
           }
-          let tp = TofPacket::from(&event);
-          //match send_ev_pl.try_send(Some(event)) {
+          //let tp = TofPacket::from(&event);
+          //let tp = TofPacket::from_bytestream(&event, &mut 0).unwrap();
           match tp_to_pub.try_send(tp) {
             Err(err) => trace!("Error sending! {err}"),
             Ok(_)    => ()
@@ -1518,14 +1545,19 @@ pub fn ram_buffer_handler(buff_trip     : usize,
 ///
 ///  #Arguments
 /// 
-///  * bs_recv   : A receiver for bytestreams. The 
-///                bytestream comes directly from 
-///                the data buffers.
-///  * ev_sender : Send the the payload to the event cache
-pub fn event_payload_worker(bs_recv   : &Receiver<Vec<u8>>,
-                            ev_sender : Sender<RBEventPayload>) {
+///  * bs_recv     : A receiver for bytestreams. The 
+///                  bytestream comes directly from 
+///                  the data buffers.
+///  * tp_sender   : Send the resulting data product to 
+///                  get processed further
+///  * data_format : If different from 0, do some processing
+///                  on the data read from memory
+pub fn event_processing(bs_recv     : &Receiver<Vec<u8>>,
+                        tp_sender   : Sender<TofPacket>,
+                        data_format : u8) {
   let mut n_events : u32;
   let mut event_id : u32 = 0;
+  let mut events_not_sent : u64 = 0;
   //println!("[EVENT PAYLOAD WORKER] Start..");
   'main : loop {
     let mut start_pos : usize = 0;
@@ -1544,19 +1576,49 @@ pub fn event_payload_worker(bs_recv   : &Receiver<Vec<u8>>,
                 //trace!("{:?}", debug_evids);
                 break 'bytestream;
               }
-              event_id   = BlobData::decode_event_id(&bytestream[head_pos..tail_pos]);
               //debug_evids.push(event_id);
               //info!("Got event_id {event_id}");
               n_events += 1;
               start_pos = tail_pos;
-              let mut payload = Vec::<u8>::new();
-              payload.extend_from_slice(&bytestream[head_pos..tail_pos]);
-              trace!("Got payload size {}", &payload.len());
-              let rb_payload = RBEventPayload::new(event_id, payload); 
-              match ev_sender.send(rb_payload) {
-                Ok(_) => (),
-                Err(err) => error!("Problem sending RBEventPayload over channel! Err {err}"),
-              }
+              match data_format {
+                0 => {
+                  event_id   = BlobData::decode_event_id(&bytestream[head_pos..tail_pos]);
+                  let mut payload = Vec::<u8>::new();
+                  payload.extend_from_slice(&bytestream[head_pos..tail_pos + 2]);
+                  trace!("Got payload size {}", &payload.len());
+                  let rb_payload = RBEventPayload::new(event_id, payload); 
+                  let mut tp = TofPacket::from(&rb_payload);
+                  match tp_sender.send(tp) {
+                    Ok(_) => (),
+                    Err(err) => error!("Problem sending TofPacket over channel! Err {err}"),
+                  }
+                }
+                2 => {
+                  //let mut payload = Vec::<u8>::new();
+                  //payload.extend_from_slice(&bytestream[head_pos..tail_pos+2]);
+                  let mut this_event_start_pos = head_pos;
+                  match RBEventHeader::extract_from_rbbinarydump(&bytestream, &mut this_event_start_pos) {
+                    Err(err) => {
+                      //let mut foo = BlobData::new();
+                      //foo.from_bytestream(&bytestream, head_pos, false);
+                      //error!("{:?}", foo);
+                      error!("Broken RBBinaryDump data in memory! Err {}", err);
+                      error!("-- we tried to process {} bytes!", tail_pos - head_pos);
+                      error!("{:?}", &bytestream[head_pos..head_pos + 100]);
+                      error!("{:?}", &bytestream[tail_pos - 10..tail_pos + 130]);
+                      events_not_sent += 1;
+                    }
+                    Ok(event_header)    => {
+                      let mut tp = TofPacket::from(&event_header);
+                      match tp_sender.send(tp) {
+                        Ok(_) => (),
+                        Err(err) => error!("Problem sending TofPacket over channel! Err {err}"),
+                      }
+                    }
+                  }
+                }
+                _ => {todo!("Dataformat != 0 or 2 is not supported!");}
+              }  
               continue 'bytestream;
             },
             Err(err) => {

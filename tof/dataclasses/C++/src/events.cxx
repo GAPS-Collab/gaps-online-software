@@ -54,14 +54,43 @@ Vec<RBEventHeader> get_headers(const String &filename, bool is_headers) {
     headers.push_back(header);
     pos -= 2;
     pos = search_for_2byte_marker(stream, 0xAA, has_ended, pos);
-    if (header.broken) {
-      std::cout << pos << std::endl;
-      std::cout << (u32)header.channel_mask << std::endl;
-    }
+    //if (header.broken) {
+    //  std::cout << pos << std::endl;
+    //  std::cout << (u32)header.channel_mask << std::endl;
+    //}
   }
-  spdlog::info("Retrieved {} headers, {} of which we had to set the `broken` flag", n_good, n_bad);
+  spdlog::info("Retrieved {} good headers, but {} of which we had to set the `broken` flag", n_good, n_bad);
   return headers;
 }
+
+//Vec<RBBinaryDump> get_level0_events(const String &filename) {
+//  spdlog::cfg::load_env_levels();
+//  Vec<RBBinaryDump> events;
+//  u64 n_good = 0;  
+//  u64 n_bad  = 0; 
+//  bytestream stream = get_bytestream_from_file(filename); 
+//  bool has_ended = false;
+//  auto pos = search_for_2byte_marker(stream,0xAA, has_ended );
+//  spdlog::info("Read {} bytes from {}", stream.size(), filename);
+//  spdlog::info("For 8+1 channels and RB compression level 0, this mean a max number of events of {}", stream.size()/18530.0);
+//  while (!has_ended) {
+//    //RBBinaryDump data = RBBinaryDump::from_bytestrea(stream, pos);
+//    //header.broken ? n_bad++ : n_good++ ;
+//    BlobEvt_t event;
+//    event
+//    events.push_back(data);
+//    pos -= 2;
+//    pos = search_for_2byte_marker(stream, 0xAA, has_ended, pos);
+//    //if (header.broken) {
+//    //  std::cout << pos << std::endl;
+//    //  std::cout << (u32)header.channel_mask << std::endl;
+//    //}
+//  }
+//  spdlog::info("Retrieved {} good events, but {} of which we had to set the `broken` flag", n_good, n_bad);
+//  return events;
+//}
+
+
 
 RBEventHeader::RBEventHeader() {
   channel_mask       = 0; 
@@ -97,12 +126,8 @@ RBEventHeader RBEventHeader::from_bytestream(const Vec<u8> &stream,
   header.rb_id               = Gaps::parse_u8(stream  , pos);  
   header.timestamp_48        = Gaps::parse_u64(stream , pos);  
   header.broken              = Gaps::parse_bool(stream, pos);  
+  pos += 2; //FIXME TAIL & HEADER check
   return header; 
-  
-  
-  
-  return header;
-
 }
 
 

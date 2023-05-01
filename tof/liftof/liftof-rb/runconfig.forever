@@ -8,5 +8,6 @@
     "vcal"                    : false,
     "tcal"                    : false,
     "noi"                     : false,
-    "active_channel_mask"     : 255
+    "active_channel_mask"     : 255,
+    "data_format"             : 2
 }

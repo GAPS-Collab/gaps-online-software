@@ -227,7 +227,14 @@ impl From<&RBEventPayload> for TofPacket {
   }
 }
 
-
+impl From<&RBEventHeader> for TofPacket {
+  fn from(ev_header : &RBEventHeader) -> TofPacket {
+    let mut tp     = TofPacket::new();
+    tp.packet_type = PacketType::RBHeader;
+    tp.payload     = ev_header.to_bytestream();
+    tp
+  }
+}
 impl Serialization for TofPacket {
   fn from_bytestream(stream : &Vec<u8>, pos : &mut usize)
   -> Result<TofPacket, SerializationError> {

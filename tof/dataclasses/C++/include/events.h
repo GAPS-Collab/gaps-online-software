@@ -19,6 +19,9 @@ vec_u32 get_event_ids_from_raw_stream(const vec_u8 &bytestream, u64 &start_pos);
  */
 Vec<RBEventHeader> get_headers(const String &filename, bool is_header=false);
 
+//Vec<RBBinaryDump> get_level0_events(const String &filename);
+
+
 /**
  * RB binary data header information
  *

@@ -572,7 +572,7 @@ PYBIND11_MODULE(gaps_tof, m) {
 
     py::class_<RBEventHeader>(m, "RBEventHeader")
       .def(py::init())
-      //.def("from_bytestream", &RBEventHeader::from_bytestream, "Deserialize from a list of bytes")
+      .def("from_bytestream", &RBEventHeader::from_bytestream, "Deserialize from a list of bytes")
       .def("extract_from_rbbinarydump", &RBEventHeader::extract_from_rbbinarydump, "Get header from full rbevent binary stream ('blob')")
       .def("get_active_data_channels", &RBEventHeader::get_active_data_channels, "Get a list of active channels, excluding ch9. Channel9 will (usually) always be on, as long as a single data channel is switched on as well.")
       .def("get_fpga_temp", &RBEventHeader::get_fpga_temp, "The FPGA temperature in C")

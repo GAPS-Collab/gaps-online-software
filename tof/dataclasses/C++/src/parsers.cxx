@@ -103,7 +103,7 @@ u64 Gaps::parse_u48_for_16bit_words(const Vec<u8> &bytestream,
 u64 Gaps::u64_from_le_bytes(const vec_u8 &bytestream,
                             usize &pos) {
 
-  u32 value = (u32)(
+  u64 value = (u64)(
          ((bytestream[pos+7] & 0xFF) << 56)
       |  ((bytestream[pos+6] & 0xFF) << 48)
       |  ((bytestream[pos+5] & 0xFF) << 40)
@@ -112,7 +112,7 @@ u64 Gaps::u64_from_le_bytes(const vec_u8 &bytestream,
       |  ((bytestream[pos+2] & 0xFF) << 16)
       |  ((bytestream[pos+1] & 0xFF) << 8)
       |   (bytestream[pos+0]));
-  pos += 4;
+  pos += 8;
   return value;
 }
 

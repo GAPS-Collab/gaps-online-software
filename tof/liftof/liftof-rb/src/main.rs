@@ -155,7 +155,7 @@ fn main() {
   let tcal                  = args.tcal;
   let noi                   = args.noi;
   let run_config            = args.run_config;
-
+  let mut data_format       = 0u8;
   // active channels
   let mut ch_mask : u8 = u8::MAX;
 
@@ -175,7 +175,7 @@ fn main() {
               //stream_any   = rc_json.stream_any;
               //run_forever  = rc_json.runs_forever();
               ch_mask      = rc_json.active_channel_mask;
-
+              data_format  = rc_json.data_format;
             }
           }
         }
@@ -321,15 +321,19 @@ fn main() {
       (Sender<TofPacket>, Receiver<TofPacket>)                = unbounded();
   //let (hasit_to_cmd, hasit_from_cache)   : 
   //    (Sender<bool>, Receiver<bool>)                          = unbounded();
+  let (tp_to_cache, tp_from_builder) : 
+      (Sender<TofPacket>, Receiver<TofPacket>)                = unbounded();
+
 
   let (set_op_mode, get_op_mode)     : 
       (Sender<TofOperationMode>, Receiver<TofOperationMode>)                = unbounded();
   let (bs_send, bs_recv)             : (Sender<Vec<u8>>, Receiver<Vec<u8>>) = unbounded(); 
   //let (moni_to_main, data_fr_moni)   : (Sender<Vec<u8>>, Receiver<Vec<u8>>) = unbounded(); 
-  let (ev_pl_to_cache, ev_pl_from_builder) : 
+  let (ev_pl_to_cache, ev_pl_from_worker) : 
       (Sender<RBEventPayload>, Receiver<RBEventPayload>)                    = unbounded();
   //let (ev_pl_to_cmdr,  ev_pl_from_cache)   : 
   //  (Sender<Option<RBEventPayload>>, Receiver<Option<RBEventPayload>>)      = unbounded();
+
   let (evid_to_cache, evid_from_cmdr)   : (Sender<u32>, Receiver<u32>)      = unbounded();
   info!("Will start ThreadPool with {n_threads} threads");
   let workforce = ThreadPool::new(n_threads);
@@ -348,7 +352,7 @@ fn main() {
   // Setup routine. Start the threads in inverse order of 
   // how far they are away from the buffers.
   let rc_from_cmdr_c = rc_from_cmdr.clone();
-  let rdb_sender_a  = bs_send.clone();
+  let bs_send_c      = bs_send.clone();
   
   workforce.execute(move || {
     data_publisher(&tp_from_client,
@@ -372,7 +376,7 @@ fn main() {
       runner(&rc_from_cmdr_c,
              buff_trip,
              None, 
-             &rdb_sender_a,
+             &bs_send_c,
              uio1_total_size,
              uio2_total_size,
              latch_to_mtb,
@@ -382,18 +386,18 @@ fn main() {
 
   let rsp_to_sink_c = rsp_to_sink.clone();
   workforce.execute(move || {
-                    event_cache_worker(ev_pl_from_builder,
-                                       //&cmd_from_zmq,
-                                       //ev_pl_to_cmdr,
-                                       &tp_to_pub_c,
-                                       //&hasit_to_cmd,
-                                       &rsp_to_sink_c,
-                                       get_op_mode, 
-                                       evid_from_cmdr,
-                                       cache_size)
+                    event_cache(ev_pl_from_worker,
+                                tp_from_builder,
+                                &tp_to_pub_c,
+                                &rsp_to_sink_c,
+                                get_op_mode, 
+                                evid_from_cmdr,
+                                cache_size)
   });
   workforce.execute(move || {
-                    event_payload_worker(&bs_recv, ev_pl_to_cache);
+                    event_processing(&bs_recv,
+                                     tp_to_cache,
+                                     data_format);
   });
   
 

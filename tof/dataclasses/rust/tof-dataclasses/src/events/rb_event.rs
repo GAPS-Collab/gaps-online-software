@@ -29,6 +29,8 @@ use crate::serialization::{parse_bool,
                            parse_u8,
                            parse_u16,
                            parse_u32,
+                           parse_u32_for_16bit_words,
+                           parse_u48_for_16bit_words,
                            parse_u64};
 #[cfg(feature = "random")]
 use crate::FromRandom;
@@ -50,6 +52,10 @@ where P: AsRef<Path>, {
 /// channels at compile time, optimized for speed by 
 /// using fixed (at compile time) sizes for channels 
 /// and sample size
+///
+/// FIXME - the channel mask is only one byte, 
+///         and we can get rid of 3 bytes for 
+///         the DNA
 #[derive(Debug, Clone, PartialEq)]
 pub struct RBBinaryDump {
   pub head            : u16, // Head of event marker
@@ -103,6 +109,23 @@ impl RBBinaryDump {
       tail            : 0, // End of event marker
     }
   }
+
+  pub fn get_active_data_channels(&self) -> Vec<u8> {
+    let mut active_channels = Vec::<u8>::with_capacity(8);
+    for ch in 1..9 {
+      if ((self.ch_mask as u8 & (ch as u8 -1).pow(2)) == (ch as u8 -1).pow(2)) {
+        active_channels.push(ch);
+      }
+    }
+    active_channels
+  }
+
+  
+  pub fn get_n_datachan(&self) -> u8 {
+    self.get_active_data_channels().len() as u8
+  }
+
+
 }
 
 impl Default for RBBinaryDump {
@@ -145,7 +168,15 @@ impl Serialization for RBBinaryDump {
     stream.extend_from_slice(&self.fw_hash .to_le_bytes());
     stream.extend_from_slice(&self.id      .to_le_bytes());  
     stream.extend_from_slice(&self.ch_mask .to_le_bytes());
-    stream.extend_from_slice(&self.event_id.to_le_bytes());
+    let mut four_bytes = self.event_id.to_be_bytes();
+    let mut four_bytes_shuffle = [four_bytes[1],
+                              four_bytes[0],
+                              four_bytes[3],
+                              four_bytes[2]];
+    stream.extend_from_slice(&four_bytes_shuffle); 
+    
+
+    //stream.extend_from_slice(&self.event_id.to_le_bytes());
     stream.extend_from_slice(&self.dtap0   .to_le_bytes());
     stream.extend_from_slice(&self.dtap1   .to_le_bytes());
     stream.extend_from_slice(&self.timestamp_32.to_le_bytes());
@@ -159,6 +190,12 @@ impl Serialization for RBBinaryDump {
     }
 
     stream.extend_from_slice(&self.stop_cell.to_le_bytes());
+   // four_bytes = self.crc32.to_be_bytes();
+   // four_bytes_shuffle = [four_bytes[1],
+   //                       four_bytes[0],
+   //                       four_bytes[3],
+   //                       four_bytes[2]];
+   // stream.extend_from_slice(&four_bytes_shuffle); 
     stream.extend_from_slice(&self.crc32.to_le_bytes());
     stream.extend_from_slice(&RBBinaryDump::TAIL.to_le_bytes());
     stream
@@ -172,6 +209,9 @@ impl Serialization for RBBinaryDump {
     // At this state, this can be a header or a full event. Check here and
     // proceed depending on the options
     if tail_pos + 2 - head_pos != RBBinaryDump::SIZE {
+      error!("Event seems incomplete. Seing {} bytes, but expecting {}", tail_pos + 2 - head_pos, RBBinaryDump::SIZE);
+      //error!("{:?}", &stream[head_pos + 18526..head_pos + 18540]);
+      *pos = head_pos + 2; //start_pos += RBBinaryDump::SIZE;
       return Err(SerializationError::EventFragment);
     }
     *pos = head_pos + 2; 
@@ -181,13 +221,15 @@ impl Serialization for RBBinaryDump {
     bin_data.dna            = parse_u64(&stream, pos); 
     bin_data.fw_hash        = parse_u16(&stream, pos);
     bin_data.id             = parse_u16(&stream, pos);   
-    bin_data.ch_mask        = parse_u16(&stream, pos);
-    bin_data.event_id       = parse_u32(&stream, pos);
+    bin_data.ch_mask        = parse_u8 (&stream, pos) as u16;
+    *pos += 1;
+    bin_data.event_id       = parse_u32_for_16bit_words(&stream, pos);
     bin_data.dtap0          = parse_u16(&stream, pos);
     bin_data.dtap1          = parse_u16(&stream, pos);
     bin_data.timestamp_32   = parse_u32(&stream, pos);
     bin_data.timestamp_16   = parse_u16(&stream, pos);
-    for n in 0..NCHN {
+    //let nch = bin_data.get_n_datachan();
+    for n in 0..NCHN as usize {
       bin_data.ch_head[n]   = parse_u16(&stream, pos);
       for k in 0..NWORDS {
         bin_data.ch_adc[n][k] = 0x3FFF & parse_u16(&stream, pos);  
@@ -199,6 +241,8 @@ impl Serialization for RBBinaryDump {
     bin_data.crc32          =  parse_u32(&stream, pos);
     bin_data.head           =  RBBinaryDump::HEAD;
     bin_data.tail           =  RBBinaryDump::TAIL;
+    *pos += 2; // since we deserialized the tail earlier and 
+              // didn't account for it
     Ok(bin_data)
   }
 }
@@ -215,14 +259,17 @@ impl FromRandom for RBBinaryDump {
     bin_data.roi            =  rng.gen::<u16>();
     bin_data.dna            =  rng.gen::<u64>(); 
     bin_data.fw_hash        =  rng.gen::<u16>();
-    bin_data.id             =  rng.gen::<u16>();   
-    bin_data.ch_mask        =  rng.gen::<u16>();
+    let rb_id               =  rng.gen::<u8>() as u16;   
+    bin_data.id             = rb_id;
+    bin_data.id             =  rb_id << 8;   
+    bin_data.ch_mask        =  rng.gen::<u8>() as u16;
     bin_data.event_id       =  rng.gen::<u32>();
     bin_data.dtap0          =  rng.gen::<u16>();
     bin_data.dtap1          =  rng.gen::<u16>();
     bin_data.timestamp_32   =  rng.gen::<u32>();
     bin_data.timestamp_16   =  rng.gen::<u16>();
-    for n in 0..NCHN {
+    //let nch = bin_data.get_n_datachan();
+    for n in 0..NCHN as usize {
       bin_data.ch_head[n]   =  rng.gen::<u16>();
       bin_data.ch_trail[n]  =  rng.gen::<u32>();
       for k in 0..NWORDS {
@@ -316,8 +363,81 @@ impl RBEventHeader {
     }
   }
 
+  pub fn extract_eventid_from_rbheader(stream :&Vec<u8>) -> u32 {
+    // event id is 18 bytes in (including HEAD bytes)
+    let event_id = parse_u32(stream, &mut 18);
+    event_id
+  }
+
+  pub fn extract_from_rbbinarydump(stream : &Vec<u8>, pos : &mut usize) 
+    -> Result<RBEventHeader, SerializationError> {
+    let start = *pos;
+    let mut header = RBEventHeader::new();
+    let head_pos   = search_for_u16(RBBinaryDump::HEAD, stream, *pos)?; 
+    let tail_pos   = search_for_u16(RBBinaryDump::TAIL, stream, head_pos + RBBinaryDump::SIZE -2)?;
+    // At this state, this can be a header or a full event. Check here and
+    // proceed depending on the options
+    *pos = head_pos + 2;    
+    let status          = parse_u16(stream, pos);
+    let event_fragment  = (status & 1) == 1;
+    header.lost_trigger = (status & 2) == 2;
+    header.is_locked    = (status & 4) == 4;
+    header.is_locked_last_sec = (status & 8) == 8;
+    header.fpga_temp    = (status >> 4);
+    if !header.lost_trigger {
+      // in case there is no trigger, that means the DRS was busy so 
+      // we won't get channel data or a stop cell
+      if tail_pos + 2 - head_pos != RBBinaryDump::SIZE {
+        error!("Size of {} not expected for RBBinaryDump!", tail_pos + 2 - head_pos);
+        //error!("LOST {} FRAGMENT {}" , header.lost_trigger, event_fragment);
+        //let event_len = parse_u16(stream, pos);
+        //error!("LEN IN WORDS {}", event_len);
+        return Err(SerializationError::EventFragment);
+      }
+    }  
+    //let event_len = parse_u16(stream, pos);
+    //pos -= 2;
+    //println!("Got LEN {}", event_len);
+    *pos += 2 + 2 + 8 + 2 + 1; // skip len, roi, dna, fw hash and reserved part of rb_id
+    header.rb_id        = stream[*pos];
+    *pos += 1;
+    header.channel_mask = stream[*pos];
+    *pos += 2;
+    header.event_id  = parse_u32_for_16bit_words(stream, pos);
+    header.dtap0     = parse_u16(stream, pos);
+    header.drs4_temp = parse_u16(stream, pos); 
+    header.timestamp_48 = parse_u48_for_16bit_words(stream,pos);
+    //let nchan = header.get_n_datachan();
+    //let nchan = NCHN - 1;
+    let nchan = 8;
+    let mut skip_bytes = 0usize;
+    if (nchan != 0) && !header.lost_trigger {
+      skip_bytes = (nchan as usize + 1) * (NWORDS * 2 + 6);
+    }
+    *pos += skip_bytes;
+    //println!("SKIP BYTES {} NCHAN {}", skip_bytes, nchan);
+    if !header.lost_trigger {
+      header.stop_cell = parse_u16(stream, pos);
+    } else {
+      error!("LOST TRIGGER FOUND [DRS WAS BUSY] - Event ID {}", header.event_id); 
+    }
+    header.crc32     = parse_u32_for_16bit_words(stream, pos);
+    let tail         = parse_u16(stream, pos);
+    if tail != RBEventHeader::TAIL {
+      error!("No tail signature found {} bytes from the start! Found {} instead", *pos - start - 2, tail );  
+    } else {
+      header.broken = false;
+    }
+    Ok(header)
+  }
+
   pub fn get_active_data_channels(&self) -> Vec<u8> {
-    let active_channels = Vec::<u8>::with_capacity(8);
+    let mut active_channels = Vec::<u8>::with_capacity(8);
+    for ch in 1..9 {
+      if ((self.channel_mask & (ch as u8 -1).pow(2)) == (ch as u8 -1).pow(2)) {
+        active_channels.push(ch);
+      }
+    }
     active_channels
   }
   
@@ -394,9 +514,9 @@ impl Serialization for RBEventHeader {
 
   fn from_bytestream(stream : &Vec<u8>, pos : &mut usize)
     -> Result<RBEventHeader, SerializationError> {
-    let mut header = RBEventHeader::new();
-    let head_pos   = search_for_u16(RBBinaryDump::HEAD, stream, *pos)?; 
-    let tail_pos   = search_for_u16(RBBinaryDump::TAIL, stream, head_pos + RBBinaryDump::SIZE-2)?;
+    let mut header  = RBEventHeader::new();
+    let head_pos    = search_for_u16(RBBinaryDump::HEAD, stream, *pos)?; 
+    let tail_pos    = search_for_u16(RBBinaryDump::TAIL, stream, head_pos + RBEventHeader::SIZE-2)?;
     // At this state, this can be a header or a full event. Check here and
     // proceed depending on the options
     if tail_pos + 2 - head_pos != RBEventHeader::SIZE {
