@@ -172,7 +172,7 @@ impl MasterTriggerMapping {
         for j in 0..hits.len() {
           if hits[j] {
             //println!("Found hit at {j}");
-            println!("LTB REGISTERED FOR THIS HIT {k} {:?} with id {}", self.ltb_mapping[k], self.ltb_mapping[k].ltb_id);
+            //println!("LTB REGISTERED FOR THIS HIT {k} {:?} with id {}", self.ltb_mapping[k], self.ltb_mapping[k].ltb_id);
             let rb_id = self.ltb_mapping[k].get_rb_id(j as u8 +1);
             
             if rb_ids.contains(&rb_id) {
@@ -810,7 +810,7 @@ pub fn read_daq(socket : &UdpSocket,
       }
       trace!("We need {queries_needed} queries for the hitmask");
       let mut hitmasks = Vec::<[bool;N_CHN_PER_LTB]>::new();
-      println!("NEW HITS");
+      //println!("NEW HITS");
       while nhit_query < queries_needed { 
         let hitmask = read_daq_word(socket, target_address, buffer)?;
         //println!("HITMASK {:?}", hitmask);
@@ -819,7 +819,7 @@ pub fn read_daq(socket : &UdpSocket,
         
         hitmasks.push(hits_a);
         hitmasks.push(hits_b);
-        println!("HITMASKS_VEC {:?}", hitmasks);
+        //println!("HITMASKS_VEC {:?}", hitmasks);
         nhit_query += 1;
       }
       for k in 0..event.board_mask.len() {

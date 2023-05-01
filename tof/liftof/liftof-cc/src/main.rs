@@ -329,7 +329,7 @@ fn main() {
     let ltb_list_c   = ltb_list.clone();
     let mut mapping = MasterTriggerMapping::new(ltb_list_c, rb_list_c);
     println!("{:?}", mapping.ltb_mapping);
-    exit(0);
+    //exit(0);
     worker_threads.execute(move || {
                            event_builder(&master_ev_rec,
                                          mapping,

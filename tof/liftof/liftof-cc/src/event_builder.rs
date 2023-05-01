@@ -210,7 +210,7 @@ pub fn event_builder (m_trig_ev      : &cbc::Receiver<MasterTriggerEvent>,
         //println!("{:?}", mt.board_mask);
         let rbs_in_ev = mt_mapping.get_rb_ids(&mt);
         //println!("{:?}", mt);
-        println!("[EVT-BLDR] Get the following RBs in this event {:?}", rbs_in_ev);
+       // println!("[EVT-BLDR] Get the following RBs in this event {:?}", rbs_in_ev);
         let mut event = TofEvent::from(&mt);
         if (event.event_id != last_evid + 1) {
           let delta_id = event.event_id - last_evid;
