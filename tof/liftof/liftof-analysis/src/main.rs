@@ -147,11 +147,25 @@ fn main() {
     //  Ok(_)  => ()
     //}
     //header = RBEventHeader::from_bytestream(&bytestream, pos).unwrap();
+    event.reset();
     pos = event.from_bytestream(&bytestream, pos, true);
     n_events_decoded += 1;
+
     decoded_evids.push(event.event_id);
     //println!("{}",event.event_id);
     //println!("{pos}");
+
+    //println!("{}",event);
+    //println!("{}",event.head);
+    //println!("{}",event.status);
+    //println!("{}",event.len);
+    //println!("{}",event.roi);
+    //println!("{}",event.dna);
+    //println!("{}",event.fw_hash);
+    //println!("{}",event.id);
+    //println!("{}",event.ch_mask);
+    //println!("{}",event.dna);
+    //println!("{pos} : pos");
     //pos += BlobData::SERIALIZED_SIZE;
   }
   println!("{:?} decoded event ids", decoded_evids);

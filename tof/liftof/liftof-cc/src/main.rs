@@ -133,7 +133,7 @@ fn main() {
       //    panic!("The file {} does not exist!", args.json_config.as_ref().unwrap().display());
       //}
       //info!("Found config file {}", args.json_config.as_ref().unwrap().display());
-      json_content = std::fs::read_to_string(args.json_config.as_ref().unwrap()).unwrap();
+      json_content = std::fs::read_to_string(args.json_config.as_ref().unwrap()).expect("Can not open json file");
       config = json::parse(&json_content).unwrap();
       json_manifest = get_tof_manifest(args.json_config.unwrap());
       println!("==> Tof Manifest following:");
