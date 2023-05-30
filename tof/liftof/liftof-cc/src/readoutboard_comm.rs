@@ -181,7 +181,7 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
             match &mut file_on_disc {
               None => (),
               Some(f) => {
-                trace!("writing {} bytes", buffer.len());
+                trace!("writing {} bytes", tp.payload.len());
                 match f.write_all(&tp.payload) {
                   Err(err) => error!("Can not write to file, err {err}"),
                   Ok(_)    => ()

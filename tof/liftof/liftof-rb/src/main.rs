@@ -36,7 +36,6 @@ use tof_dataclasses::commands::{//TofCommand,
                                 TofResponse,
                                 TofOperationMode};
 use tof_dataclasses::run::RunConfig;
-use tof_dataclasses::serialization::get_json_from_file;
 use tof_dataclasses::serialization::Serialization;
 extern crate pretty_env_logger;
 #[macro_use] extern crate log;
@@ -56,16 +55,6 @@ use clap::{arg,
 #[derive(Parser, Debug)]
 #[command(author = "J.A.Stoessl", version, about, long_about = None)]
 struct Args {
-  /// Size of the internal eventbuffers which are mapped to /dev/uio1 
-  /// and /dev/uio2. These buffers are maximum of about 64 MBytes.
-  /// Depending on the event rate, this means that the events might
-  /// sit quit a while in the buffers (~10s of seconds)
-  /// To mitigate that waiting time, we can choose a smaller buffer
-  /// The size of the buffer here is in <number_of_events_in_buffer>
-  /// [! The default value is in bytes, since per default the buffers 
-  /// don't hold an integer number of events]
-  #[arg(short, long, default_value_t = 66524928)]
-  buff_trip: usize,
   /// Show progress bars to indicate buffer fill values and number of acquired events
   #[arg(long, default_value_t = false)]
   show_progress: bool,
@@ -138,10 +127,8 @@ fn main() {
   //.filter(Some("logger_example"), LevelFilter::Debug)
   //                        .init();
   pretty_env_logger::init();
-
-  
+ 
   let args = Args::parse();                   
-  let mut buff_trip         = args.buff_trip;         
   let mut n_events_run      = args.nevents;
   let mut show_progress     = args.show_progress;
   let cache_size            = args.cache_size;
@@ -159,27 +146,15 @@ fn main() {
   // active channels
   let mut ch_mask : u8 = u8::MAX;
 
+  let mut rc_config = RunConfig::new();
+  let mut rc_file_path  = std::path::PathBuf::new();
   match run_config {
     None     => (),
     Some(rcfile) => {
-      match get_json_from_file(&rcfile) {
-        Err(err) => panic!("Unable to read the configuration file! Error {err}"),
-        Ok(rc_from_file) => {
-          println!("Found configuration file {}!", rcfile.display());
-          println!("[WARN] - Currently, only the active channel mask will be parsed from the config file!");
-          println!("[WARN/TODO] - This is WORK-IN-PROGRESS!");
-          match RunConfig::from_json(&rc_from_file) {
-            Err(err) => panic!("Can not read json from configuration file. Error {err}"),
-            Ok(rc_json) => {
-              //n_events_run = rc_json.nevents as u64;
-              //stream_any   = rc_json.stream_any;
-              //run_forever  = rc_json.runs_forever();
-              ch_mask      = rc_json.active_channel_mask;
-              data_format  = rc_json.data_format;
-            }
-          }
-        }
-      }
+      rc_file_path = rcfile.clone();
+      rc_config    = get_runconfig(&rcfile);
+      ch_mask      = rc_config.active_channel_mask;
+      data_format  = rc_config.data_format;
     }
   }
 
@@ -191,13 +166,13 @@ fn main() {
 
   let mut end_after_run = false;
   if noi {
-    file_suffix = String::from(".noi");
-    rb_test     = true;
+    file_suffix   = String::from(".noi");
+    rb_test       = true;
     end_after_run = true;
   }
   if vcal {
-    file_suffix = String::from(".vcal");
-    rb_test     = true;
+    file_suffix   = String::from(".vcal");
+    rb_test       = true;
     end_after_run = true;
   }
 
@@ -215,11 +190,11 @@ fn main() {
   if rb_test {
     show_progress = true;
     n_events_run  = 1000;
-    buff_trip     = 500;
     stream_any    = true;
-    if args.rb_test_sw {
+    if args.rb_test_sw || vcal {
       force_trigger = 100;
     }
+    end_after_run = true;
   }  
 
   if force_trigger > 0 && force_random_trig > 0 {
@@ -228,7 +203,6 @@ fn main() {
 
   if force_random_trig > 0 {
       stream_any = true;
-      buff_trip  = 2000;
       n_events_run = 5000;
   }
 
@@ -271,24 +245,10 @@ fn main() {
   let current_mask = read_control_reg(0x44).unwrap();
   println!("CURRENT MASK = {}", current_mask);
   //exit(0);
-  
-
 
   // this resets the data buffer /dev/uio1,2 occupancy
   reset_dma_and_buffers();
 
-  let mut uio1_total_size = DATABUF_TOTAL_SIZE;
-  let mut uio2_total_size = DATABUF_TOTAL_SIZE;
-
-  if (buff_trip*EVENT_SIZE > uio1_total_size) || (buff_trip*EVENT_SIZE > uio2_total_size) {
-    error!("Invalid value for --buff-trip. Panicking!");
-    panic!("Tripsize of {buff_trip}*EVENT_SIZE exceeds buffer sizes of A : {uio1_total_size} or B : {uio2_total_size}. The EVENT_SIZE is {EVENT_SIZE}");
-  }
-  if buff_trip == DATABUF_TOTAL_SIZE {
-    info!("Will set buffer trip size to an equivalent of {} events", buff_trip/EVENT_SIZE);
-  } else {
-    info!("Will set buffer trip size to an equivalent of {buff_trip} events");
-  }
   // some pre-defined time units for 
   // sleeping
   let one_sec     = time::Duration::from_secs(1);  
@@ -339,16 +299,6 @@ fn main() {
   let workforce = ThreadPool::new(n_threads);
  
 
-  if buff_trip != DATABUF_TOTAL_SIZE {
-    uio1_total_size = EVENT_SIZE*buff_trip;
-    uio2_total_size = EVENT_SIZE*buff_trip;
-    buff_trip = EVENT_SIZE*buff_trip;
-    // if we change the buff size, we HAVE to manually swith 
-    // the buffers since the fw does not know about this change, 
-    // it is software only
-    info!("We set a value for buff_trip of {buff_trip}");
-  }
- 
   // Setup routine. Start the threads in inverse order of 
   // how far they are away from the buffers.
   let rc_from_cmdr_c = rc_from_cmdr.clone();
@@ -374,11 +324,8 @@ fn main() {
   // of RunParams
   workforce.execute(move || {
       runner(&rc_from_cmdr_c,
-             buff_trip,
              None, 
              &bs_send_c,
-             uio1_total_size,
-             uio2_total_size,
              latch_to_mtb,
              show_progress,
              force_trigger);
@@ -410,6 +357,7 @@ fn main() {
                                   heartbeat_timeout_seconds,
                                   &rsp_from_client,  
                                   &set_op_mode_c,
+                                  &rc_file_path,
                                   &rc_to_runner_c,
                                   &evid_to_cache )
                                   //&cmd_to_client   )  
@@ -424,33 +372,41 @@ fn main() {
       Ok(_)    => info!("Using RBMode STREAM_ANY")
     }
   }
-    
-  // we start the run by creating new RunParams
-  if run_forever || n_events_run > 0 {
-    let mut rc = RunConfig::new();
-    if run_forever {
-      rc.nevents = 0;
-    } else {
-      rc.nevents = n_events_run as u32
-    }
-    rc.is_active = true;
-    println!("Waiting for threads to start..");
-    thread::sleep(time::Duration::from_secs(5));
-    println!("..done");
-    match rc_to_runner.send(rc) {
-      Err(err) => error!("Could not initialzie Run! Err {err}"),
-      Ok(_)    => {
-        println!("Run initialized! Attempting to start!");
+ 
+  // We can only start a run here, if this is not
+  // run through systemd
+  if !is_systemd_process() {
+    // if we are not as systemd, 
+    // always end when we are done
+    println!("We are not run by systemd, sow we will stop the program when it is done");
+    // we start the run by creating new RunParams
+    // this is only if we give 
+    if run_forever || n_events_run > 0 {
+      //let mut rc = RunConfig::new();
+      if run_forever {
+        rc_config.nevents = 0;
+      } else {
+        if rc_config.nevents == 0 && n_events_run != 0 {
+          rc_config.nevents = n_events_run as u32;
+        }
+      }
+      if rc_config.nevents > 0 {
+        end_after_run = true;
+      }
+      rc_config.is_active = true;
+      //rc.rb_buff_size = 2000;
+      println!("Waiting for threads to start..");
+      thread::sleep(time::Duration::from_secs(5));
+      println!("..done");
+      match rc_to_runner.send(rc_config) {
+        Err(err) => error!("Could not initialzie Run! Err {err}"),
+        Ok(_)    => {
+          println!("Run initialized! Attempting to start!");
+        }
       }
     }
   }
-  //let mut resp     : cmd::TofResponse;
-  //let r_clone  = ev_pl_from_cache.clone();
-  //let executor = Commander::new(evid_to_cache,
-  //                              &hasit_from_cache,
-  //                              r_clone,
-  //                              set_op_mode);
-
+  
   // if we arrive at this point and we want the random trigger, 
   // we are now ready to start it
   if force_random_trig > 0 {
@@ -497,6 +453,7 @@ fn main() {
     match get_triggers_enabled() {
       Err(err) => error!("Can not read trigger enabled register! Error {err}"),
       Ok(enabled) => {
+        //println!("Current trigger enabled status {}. WIll end after a run {}", enabled, end_after_run);
         if !enabled && end_after_run {
           end = true;
         }

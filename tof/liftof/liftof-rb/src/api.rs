@@ -1,15 +1,13 @@
 //! Higher level functions, to deal with events/binary reprentation of it, 
-//!  configure the drs4, etc.
+//! configure the drs4, etc.
 
 use local_ip_address::local_ip;
-
 use tof_dataclasses::serialization::Serialization;
 
 use std::collections::HashMap;
 use std::net::IpAddr;
 use std::fs::File;
 use std::path::Path;
-
 use std::io::Write;
 use std::fs::OpenOptions;
 
@@ -17,6 +15,7 @@ use std::time::{Duration,
                 Instant};
 
 use std::{thread, time};
+use std::env;
 use crossbeam_channel::{Sender,
                         Receiver};
 
@@ -27,6 +26,9 @@ use indicatif::{MultiProgress,
 
 use crate::control::*;
 use crate::memory::*;
+
+
+
 use tof_dataclasses::commands::*;
 
 use tof_dataclasses::events::blob::{BlobData,
@@ -38,11 +40,11 @@ use tof_dataclasses::commands::{TofCommand,
                                 TofOperationMode};
 use tof_dataclasses::packets::{TofPacket,
                                PacketType};
-//use tof_dataclasses::threading::ThreadPool;
 use tof_dataclasses::monitoring as moni;
 use tof_dataclasses::errors::SerializationError;
-//use liftof_lib::RunParams;
 use tof_dataclasses::run::RunConfig;
+use tof_dataclasses::serialization::get_json_from_file;
+
 
 /// Non-register related constants 
 pub const HEARTBEAT : u64 = 5; // heartbeat in s
@@ -61,12 +63,47 @@ const DMA_RESET_TRIES : u8 = 10;   // if we can not reset the DMA after this num
 
 /// Dataport is 0MQ PUB for publishing waveform/event data
 pub const DATAPORT : u32 = 42000;
-/// Commandport is 0MQ SUB for receiving commands from a C&C server
-pub const CMDPORT  : u32 = 32000;
-
 
 // FIXME
 type RamBuffer = BlobBuffer;
+
+
+pub fn is_systemd_process() -> bool {
+  let mut is_systemd = false;
+  if let Some(listen_pid) = env::var_os("LISTEN_PID") {
+    if let Ok(pid_str) = listen_pid.into_string() {
+      if let Ok(pid) = pid_str.parse::<u32>() {
+        if pid == std::process::id() {
+          info!("This program is being executed through systemd.");
+          is_systemd = true;
+        }
+      }
+    }
+  }
+  is_systemd
+}
+
+/// Get a runconfig from a file. 
+///
+/// FIXME - panics...
+pub fn get_runconfig(rcfile : &Path) -> RunConfig {
+  match get_json_from_file(rcfile) {
+    Err(err) => {
+      panic!("Unable to read the configuration file! Error {err}");
+    }
+    Ok(rc_from_file) => {
+      println!("Found configuration file {}!", rcfile.display());
+      println!("[WARN] - Currently, only the active channel mask will be parsed from the config file!");
+      println!("[WARN/TODO] - This is WORK-IN-PROGRESS!");
+      match RunConfig::from_json(&rc_from_file) {
+        Err(err) => panic!("Can not read json from configuration file. Error {err}"),
+        Ok(rc_json) => {
+          rc_json
+        }
+      }
+    }
+  }
+}
 
 /// Get the active half of the RAM buffer
 /// 
@@ -127,6 +164,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
                      heartbeat_timeout_seconds : u32,
                      rsp_receiver              : &Receiver<TofResponse>,
                      op_mode                   : &Sender<TofOperationMode>,
+                     run_config_file           : &Path,
                      run_config                : &Sender<RunConfig>,
                      evid_to_cache             : &Sender<u32>) {
                      //cmd_sender   : &Sender<TofCommand>) {
@@ -341,10 +379,14 @@ pub fn cmd_responder(cmd_server_ip             : String,
               TofCommand::DataRunStart (max_event) => {
                 // let's start a run. The value of the TofCommnad shall be 
                 // nevents
-                info!("Will initialize new run!");
-                let mut rc = RunConfig::new();
-                rc.set_forever();
-                rc.is_active = true;
+                println!("Will initialize new run!");
+                let rc    = get_runconfig(&run_config_file);
+                if rc.stream_any {
+                  match op_mode.send(TofOperationMode::TofModeStreamAny) {
+                    Err(err) => error!("Can not set TofOperationMode to StreamAny! Err {err}"),
+                    Ok(_)    => info!("Using RBMode STREAM_ANY")
+                  }
+                }
                 match run_config.send(rc) {
                   Err(err) => error!("Error initializing run! {err}"),
                   Ok(_)    => ()
@@ -359,55 +401,6 @@ pub fn cmd_responder(cmd_server_ip             : String,
                 println!("Received command to end run!");
                 // default is not active for run config
 
-//  let n_events = 100000;
-//
-//  let switch_buff = true;
-//  let mut uio1_total_size = 66520576;
-//  let mut uio2_total_size = 66520576;
-//  let buff_trip = 66520576;
-//  if buff_trip != 66520576 {
-//    uio1_total_size = buff_trip as usize;
-//    uio2_total_size = buff_trip as usize;
-//  }
-//
-//  println!("=> Will run {n_events} events!");
-//  let (pb_ev_up_send, pb_ev_up_recv ) : (Sender<u64>, Receiver<u64>) = unbounded(); 
-//  let (run_params_to_main, run_params_from_cmdr)      : 
-//      (Sender<RunParams>, Receiver<RunParams>)                = unbounded();
-//  let (pb_a_up_send, pb_a_up_recv   ) : (Sender<u64>, Receiver<u64>) = unbounded();  
-//  let (pb_b_up_send, pb_b_up_recv   ) : (Sender<u64>, Receiver<u64>) = unbounded(); 
-//  let (_kill_run, run_gets_killed)    : (Sender<bool>, Receiver<bool>)       = unbounded();
-//  let (bs_send, _bs_recv)             : (Sender<Vec<u8>>, Receiver<Vec<u8>>) = unbounded(); 
-//  
-//
-//  let p_op = Some(pb_ev_up_send);
-//  let workforce = ThreadPool::new(2);
-//
-//  workforce.execute(move || {
-//      runner(Some(n_events as u64),
-//             None,
-//             None,
-//             p_op,
-//             &run_params_from_cmdr,
-//             None,
-//             0);
-//             //bar_clone);
-//  });
-//  workforce.execute(move || { 
-//    progress_runner(n_events as u64,      
-//                    uio1_total_size,
-//                    uio2_total_size,
-//                    pb_a_up_recv ,
-//                    pb_b_up_recv ,
-//                    pb_ev_up_recv,
-//                    run_gets_killed)
-//  });
-//  workforce.execute(move || {
-//    read_data_buffers(bs_send,
-//                      buff_trip,
-//                      Some(pb_a_up_send),
-//                      Some(pb_b_up_send),
-//                      switch_buff);
                 let  rc = RunConfig::new();
                 match run_config.send(rc) {
                   Err(err) => error!("Error stopping run! {err}"),
@@ -574,7 +567,6 @@ pub fn data_publisher(data : &Receiver<TofPacket>,
       }
     }
   }
-
 }
 
 /// Gather monitoring data and pass it on
@@ -653,155 +645,6 @@ pub fn reset_dma_and_buffers() {
   }
 }
 
-///// Somehow, it is not always successful to reset 
-///// the DMA and the data buffers. Let's try an 
-///// aggressive scheme and do it several times.
-///// If we fail, something is wrong and we panic
-//pub fn reset_data_memory_aggressively() {
-//  //let one_milli = time::Duration::from_millis(1);
-//  let five_milli = time::Duration::from_millis(5);
-//  let buf_a = BlobBuffer::A;
-//  let buf_b = BlobBuffer::B;
-//  let n_tries : u8 = 0;
-//  
-//  for _ in 0..DMA_RESET_TRIES {
-//    match reset_dma() {
-//      Ok(_)    => break,
-//      Err(err) => {
-//        debug!("Resetting dma failed, err {:?}", err);
-//        thread::sleep(five_milli);
-//        continue;
-//      }
-//    }
-//  }
-//  //let mut buf_a_occ = UIO1_MAX_OCCUPANCY;
-//  //let mut buf_b_occ = UIO2_MAX_OCCUPANCY;
-//  match reset_ram_buffer_occ(&buf_a) {
-//    Err(err) => warn!("Problem resetting buffer /dev/uio1 {:?}", err),
-//    Ok(_)    => () 
-//  }
-//  match reset_ram_buffer_occ(&buf_b) {
-//    Err(err) => warn!("Problem resetting buffer /dev/uio1 {:?}", err),
-//    Ok(_)    => () 
-//  }
-//  //match get_blob_buffer_occ(&buf_a) {
-//  //  Err(err) => debug!("Error getting blob buffer A occupnacy {err}"),
-//  //  Ok(val)  => {
-//  //    debug!("Got a value for the buffer A of {val}");
-//  //    buf_a_occ = val;
-//  //  }
-//  //}
-//  //thread::sleep(one_milli);
-//  //match get_blob_buffer_occ(&buf_b) {
-//  //  Err(err) => {
-//  //    warn!("Error getting blob buffer B occupancy {err}");
-//  //  }
-//  //  Ok(val)  => {
-//  //    debug!("Got a value for the buffer B of {val}");
-//  //    buf_b_occ = val;
-//  //  }
-//
-//  //}
-//  //thread::sleep(one_milli);
-//  //while buf_a_occ != UIO1_MIN_OCCUPANCY {
-//
-//  //  match reset_ram_buffer_occ(&buf_a) {
-//  //    Err(err) => warn!("Problem resetting buffer /dev/uio1 {:?}", err),
-//  //    Ok(_)    => () 
-//  //  }
-//  //  thread::sleep(five_milli);
-//  //  match get_blob_buffer_occ(&buf_a) {
-//  //    Err(_) => {
-//  //      warn!("Error reseting blob buffer A");
-//  //      thread::sleep(five_milli);
-//  //      }
-//  //      continue;
-//  //    }
-//  //    Ok(val)  => {
-//  //      buf_a_occ = val;
-//  //    }
-//  //  }
-//  //}
-//  //n_tries = 0;
-//  //while buf_b_occ != UIO2_MIN_OCCUPANCY {
-//  //  match reset_ram_buffer_occ(&buf_b) {
-//  //    Err(err) => warn!("Problem resetting buffer /dev/uio2 {:?}", err),
-//  //    Ok(_)    => () 
-//  //  }
-//  //  match get_blob_buffer_occ(&buf_b) {
-//  //    Err(_) => {
-//  //      warn!("Error getting occupancey for buffer B! (/dev/uio2)");
-//  //      thread::sleep(five_milli);
-//  //      n_tries += 1;
-//  //      if n_tries == DMA_RESET_TRIES {
-//  //        panic!("We were unable to reset DMA and the data buffers!");
-//  //      }
-//  //      continue;
-//  //    }
-//  //    Ok(val)  => {
-//  //      buf_b_occ = val;
-//  //    }
-//  //  }
-//  //}
-//}
-
-/////  Ensure the buffers are filled and everything is prepared for data
-/////  taking
-/////
-/////  The whole procedure takes several seconds. We have to find out
-/////  how much we can sacrifice from our run time.
-/////
-/////  # Arguments 
-/////
-/////  * will_panic    : The function calls itself recursively and 
-/////                    will panic after this many calls to itself
-/////
-/////  * force_trigger : Run in force trigger mode
-/////
-//fn make_sure_it_runs(will_panic : &mut u8,
-//                     force_trigger : bool) {
-//  let when_panic : u8 = RESTART_TRIES;
-//  *will_panic += 1;
-//  if *will_panic == when_panic {
-//    // it is hopeless. Let's give up.
-//    // Let's try to stop the DRS4 before
-//    // we're killing ourselves
-//    disable_trigger();
-//    //idle_drs4_daq().unwrap_or(());
-//    // FIXME - send out Alert
-//    panic!("I can not get this run to start. I'll kill myself!");
-//  }
-//
-//
-//  let five_milli = time::Duration::from_millis(5); 
-//  let one_sec    = time::Duration::from_secs(1);
-//  let two_secs   = time::Duration::from_secs(2);
-//  let five_secs  = time::Duration::from_secs(5);
-//  thread::sleep(five_milli);
-//  if force_trigger {
-//    match disable_master_trigger_mode() {
-//      Err(err) => error!("Can not disable master trigger mode, Err {err}"),
-//      Ok(_)    => info!("Master trigger mode didsabled!")
-//    }
-//  }
-//
-//  match enable_trigger() {
-//    Err(err) => error!("Can not enable triggers! Err {err}"),
-//    Ok(_)    => trace!("Triggers enabled")
-//  }
-//  //println!("triggers enabled");
-//  // check that the data buffers are filling
-//  let buf_a = BlobBuffer::A;
-//  let buf_b = BlobBuffer::B;
-//  let buf_size_a = get_buff_size(&buf_a).unwrap_or(0);
-//  let buf_size_b = get_buff_size(&buf_b).unwrap_or(0); 
-//  thread::sleep(one_sec);
-//  if get_buff_size(&buf_a).unwrap_or(0) == buf_size_a &&  
-//      get_buff_size(&buf_b).unwrap_or(0) == buf_size_b {
-//    error!("Buffers are not filling! Running setup again!");
-//    make_sure_it_runs(will_panic, force_trigger);
-//  } 
-//}
 
 // palceholder
 #[derive(Debug)]
@@ -840,8 +683,6 @@ pub fn run_check() {
   }
 }
 
-
-
 ///  A simple routine which runs until 
 ///  a certain amoutn of events are 
 ///  acquired
@@ -863,11 +704,8 @@ pub fn run_check() {
 ///
 ///
 pub fn runner(run_config          : &Receiver<RunConfig>,
-              buffer_trip         : usize,
               max_errors          : Option<u64>,
               bs_sender           : &Sender<Vec<u8>>,
-              uio1_total_size     : usize,
-              uio2_total_size     : usize,
               mut latch_to_mtb    : bool,
               show_progress       : bool,
               force_trigger_rate  : u32) {
@@ -923,18 +761,42 @@ pub fn runner(run_config          : &Receiver<RunConfig>,
   let sty_b = ProgressStyle::with_template(template_bar_b)
   .unwrap();
 
-  let mut which_buff : RamBuffer;
-  let mut buff_size  : usize;
+  let mut which_buff  : RamBuffer;
+  let mut buff_size   : usize;
+  // set a default of 2000 events in the cache, 
+  // but this will be defined in the run params
+  let mut buffer_trip : usize = 2000*EVENT_SIZE;
+  let mut uio1_total_size = DATABUF_TOTAL_SIZE;
+  let mut uio2_total_size = DATABUF_TOTAL_SIZE;
   loop {
     match run_config.try_recv() {
       Err(err) => {
         trace!("Did not receive a new RunConfig! Err {err}");
-        thread::sleep(one_sec);
+        //thread::sleep(one_sec);
         //continue;
       }
       Ok(new_config) => {
         info!("Received a new set of RunConfig! {:?}", new_config);
-        rc = new_config;
+        rc          = new_config;
+        buffer_trip = (rc.rb_buff_size as usize)*EVENT_SIZE; 
+        if (buffer_trip > uio1_total_size) 
+        || (buffer_trip > uio2_total_size) {
+          error!("Tripsize of {buffer_trip} exceeds buffer sizes of A : {uio1_total_size} or B : {uio2_total_size}. The EVENT_SIZE is {EVENT_SIZE}");
+          warn!("Will set buffer_trip to {DATABUF_TOTAL_SIZE}");
+          buffer_trip = DATABUF_TOTAL_SIZE;
+        } else {
+          uio1_total_size = buffer_trip;
+          uio2_total_size = buffer_trip;
+        }
+        // set channel mask (if different from 255)
+        match set_active_channel_mask(rc.active_channel_mask) {
+          Ok(_) => (),
+          Err(err) => {
+            error!("Setting active channel mask failed for mask {}, error {}", rc.active_channel_mask, err);
+          }
+        }
+
+
         if rc.is_active {
           info!("Will start a new run!");
           info!("Initializing board, starting up...");
@@ -952,7 +814,7 @@ pub fn runner(run_config          : &Receiver<RunConfig>,
           if force_trigger {
             match enable_trigger() {
               Err(err) => error!("Can not enable triggers! Err {err}"),
-              Ok(_)    => info!("Triggers enabled - Run start!")
+              Ok(_)    => info!("(Forced) Triggers enabled - Run start!")
             }
           } else {
             match enable_trigger() {
@@ -1014,6 +876,7 @@ pub fn runner(run_config          : &Receiver<RunConfig>,
         //println!("Time between events {}", time_between_events.unwrap());
         let elapsed = timer.elapsed().as_secs_f32();
         //println!("Elapsed {}", elapsed);
+        debug!("Elapsed {}", elapsed);
         if elapsed > time_between_events.unwrap() {
           timer = Instant::now(); 
           match trigger() {
@@ -1051,7 +914,6 @@ pub fn runner(run_config          : &Receiver<RunConfig>,
 
       // AT THIS POINT WE KNOW WE HAVE SEEN SOMETHING!!!
       // THIS IS IMPORTANT
-
       match ram_buffer_handler(buffer_trip,
                                &bs_sender) { 
         Err(err)   => {

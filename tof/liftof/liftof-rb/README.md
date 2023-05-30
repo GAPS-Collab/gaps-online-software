@@ -28,6 +28,33 @@ _Comments_
 * `musleabi` - The resulting binary needs to be statically linked. For some reasons, I could only get this to work 
   completely for `musleabi`. (Naturally, one would choose `gnuabi`)
 
+## Systemd integration
+
+The liftof-rb software will be integrated in systemd. See `liftof.service`
+When activated, it will listen for run start/stop commands issued by the C&C server.
+The service can be controlled on the RB's by
+`sudo systemctl <start/stop/restart> liftof`
+
+## Configuration
+
+There is (at least) a configuration file at `/home/gaps/config`, which has to be given 
+as a start parameter with the `-r` (for `--run-configuration`) paramater.
+
+### Configuration parameters
+
+* `rb_buff_size` : Size of the internal eventbuffers which are mapped to /dev/uio1 
+                   and /dev/uio2. These buffers are maximum of about 64 MBytes.
+                   Depending on the event rate, this means that the events might
+                   sit quit a while in the buffers (~10s of seconds)
+                   To mitigate that waiting time, we can choose a smaller buffer
+                   The size of the buffer here is in <number_of_events_in_buffer>
+                   [! The default value is in bytes, since per default the buffers 
+                   don't hold an integer number of events]
+
+### Calibration 
+
+
+
 ### Connectivity
 
 The commiunication with a central C&C server (either `liftof-cc`, `liftof-tui` or technically a python script) is done
