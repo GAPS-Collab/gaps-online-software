@@ -134,7 +134,7 @@ fn main() {
       //}
       //info!("Found config file {}", args.json_config.as_ref().unwrap().display());
       json_content = std::fs::read_to_string(args.json_config.as_ref().unwrap()).expect("Can not open json file");
-      config = json::parse(&json_content).unwrap();
+      config = json::parse(&json_content).expect("Unable to parse json file");
       json_manifest = get_tof_manifest(args.json_config.unwrap());
       println!("==> Tof Manifest following:");
       println!("{:?}", json_manifest);
@@ -164,9 +164,20 @@ fn main() {
   let db_path          = Path::new(config["db_path"].as_str().unwrap());
   let db_path_c        = db_path.clone();
   let ltb_list = get_ltbs_from_sqlite(db_path);
+
+  let rb_blacklist =  &config["rb_blacklist"];//.as_array();
+      //.and_then(|n| n.as_array());
+      //.map(|arr| arr.iter().filter_map(|n| n.as_i32()).collect())
+      //.expect("Failed to parse 'rb_blacklist'!");
   println!("{:?}", ltb_list);
   //exit(0);
-  let rb_list  = get_rbs_from_sqlite(db_path_c);
+  let mut rb_list  = get_rbs_from_sqlite(db_path_c);
+  for k in 0..rb_blacklist.len() {
+    println!("BLACKLISTING RB {}", rb_blacklist[k]);
+    let bad_rb = rb_blacklist[k].as_u8().unwrap();
+    rb_list.retain(|x| x.rb_id != bad_rb);
+  }
+  println!("{:?}", rb_list);
   //let matches = command!() // requires `cargo` feature
   //     //.arg(arg!([name] "Optional name to operate on"))
   //     .arg(
