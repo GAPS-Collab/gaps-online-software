@@ -61,6 +61,14 @@ pub enum BlobBuffer {
   //Both
 }
 
+impl BlobBuffer {
+  pub fn invert(&self) -> BlobBuffer {
+    match self {
+      BlobBuffer::A => {return BlobBuffer::B},
+      BlobBuffer::B => {return BlobBuffer::A}
+    }
+  }
+}
 
 /// Get a size which accomodates nevents
 ///
@@ -173,7 +181,7 @@ pub fn write_control_reg(addr       : u32,
 /// For debugging. This just prints the 
 /// memory at a certain address
 #[deprecated(since = "0.1.0", note = "This just prints out bare memory and is only useful for debugging in the very early dev")]
-fn dump_mem<T>(addr_space : &str, addr: u32, len: usize)
+pub fn dump_mem<T>(addr_space : &str, addr: u32, len: usize)
 where
     T: std::fmt::LowerHex,
 {
@@ -238,12 +246,6 @@ pub fn read_data_buffer(which : &BlobBuffer,
     //bytestream  = Vec::<u8>::from_raw_parts(p, size, size);
     bytestream.extend_from_slice(&*slice); 
   }
-  //(0..size).for_each(|x| unsafe {
-  //  let value = std::ptr::read_volatile(p.offset(x as isize));
-  //  bytestream.push(value); // push is free, since we 
-  //                          // allocated the vector in the 
-  //                          // beginning
-  //});
   Ok(bytestream)
 }
 

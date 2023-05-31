@@ -1,18 +1,12 @@
-///
-///
-///
-///
-///
-
+//! Routines for RB commiunication and data reception 
 
 use std::time::{SystemTime, UNIX_EPOCH};
 use std::{fs, fs::File, path::Path};
-use std::io::Read;
+//use std::io::Read;
 use std::io::Write;
 use std::fs::OpenOptions;
 //use crossbeam_channel as cbc; 
 use crossbeam_channel::{Sender, unbounded};
-//use std::sync::mpsc::{Sender, channel};
 
 #[cfg(feature = "diagnostics")]
 //use waveform::CalibratedWaveformForDiagnostics;
@@ -21,26 +15,24 @@ use hdf5;
 #[cfg(feature = "diagnostics")]
 use ndarray::{arr1};
 
-use liftof_lib::ReadoutBoard;
+use liftof_lib::analyze_blobs;
 
+use tof_dataclasses::manifest::ReadoutBoard;
+use tof_dataclasses::packets::PacketType;
 use tof_dataclasses::packets::paddle_packet::PaddlePacket;
-use crate::errors::BlobError;
-//use crate::reduced_tofevent::PaddlePacket;
 use tof_dataclasses::calibrations::{Calibrations,
                                     read_calibration_file};
-                                    //remove_spikes,
-                                    //voltage_calibration, 
-                                    //timing_calibration};
 use tof_dataclasses::events::blob::{BlobData,
                                     get_constant_blobeventsize};
 use tof_dataclasses::constants::{NCHN,
                                  NWORDS};
 
+use tof_dataclasses::commands::TofResponse;
 use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::serialization::Serialization;
+use tof_dataclasses::serialization::search_for_u16;
 use crate::waveform::CalibratedWaveform;
 
-extern crate json;
 
 /*************************************/
 
@@ -50,383 +42,30 @@ macro_rules! tvec [
 
 /*************************************/
 
-
-fn get_file_as_byte_vec(filename: &String) -> Vec<u8> {
-    let mut f = File::open(&filename).expect("no file found");
-    let metadata = fs::metadata(&filename).expect("unable to read metadata");
-    let mut buffer = vec![0; metadata.len() as usize];
-    f.read(&mut buffer).expect("buffer overflow");
-    return buffer;
-}
+///// write a bytestream to a file on disk
+//fn write_stream_to_file(filename: &Path, bytestream: &Vec<u8>) -> Result<usize, std::io::Error>{
+//    fs::write(filename, bytestream)?;
+//    debug!("{} bytes written to {}", bytestream.len(), filename.display());
+//    Ok(bytestream.len())
+//}
 
 /*************************************/
 
 
-/// write a bytestream to a file on disk
-fn write_stream_to_file(filename: &Path, bytestream: &Vec<u8>) -> Result<usize, std::io::Error>{
-    fs::write(filename, bytestream)?;
-    debug!("{} bytes written to {}", bytestream.len(), filename.display());
-    Ok(bytestream.len())
-}
-
 /*************************************/
-
-///
-///
-///
-///
-/// FIXME - we have to think again, which queues are really 
-/// needed. I think:
-/// BlobData queue : only needed when diagnostics feature is
-/// set to write the waveforms to hdf
-/// PaddlePacket queue : I don't think is needed for anything
-/// since we are sending the packets right away
-///
-/// # Arguments
-///
-/// * paddle_ids     :  A sorted list of paddle ids connected 
-///                     to this readoutboard. 
-///                     The is sorted like (0,1) -> pid1
-///                                        (2,3) -> pid2
-///                                        (4,5) -> pid3
-///                                        (6,7) -> pid4
-///
-///
-fn analyze_blobs(buffer               : &Vec<u8>,
-                 pp_sender            : &Sender<PaddlePacket>,
-                 send_packets         : bool,
-                 readoutboard         : &ReadoutBoard,
-                 print_events         : bool,
-                 do_calibration       : bool,
-                 calibrations         : &[Calibrations; NCHN],
-                 n_chunk              : usize)
--> Result<usize, BlobError> {
-  let mut blob_data              = BlobData {..Default::default()};
-  let mut header_found_start     = false;
-  let mut nblobs                 = 0usize;
-  let mut ncorrupt_blobs         = 0usize;
-  let mut pos                    = 0usize;
-  let blobdata_size              = buffer.len();
-  let mut byte                   : u8;
-
-  // allocate some memory we are using in 
-  // every iteration of the loop
-  //const NPADDLES : usize = (NCHN - 1)/2; // assuming one channel 
-  //                                         // is the channel 9
-  const NPADDLES : usize = 4;
-
-
-  // each event has NPADDLES per readout board
-  // this holds all for a single event
-  // (needs to be reset each event)
-  let mut pp_this_event = [PaddlePacket::new(); NPADDLES];        
-
-
-  // binary switch - false for side a and
-  // true for side b
-  let mut is_bside : bool = false;
-  let mut trace_out : [f64;NWORDS] = [0.0;NWORDS];
-  let mut times     : [f64;NWORDS] = [0.0;NWORDS];
-
-  // remove_spikes requires two dimensional array
-  let mut all_channel_waveforms : [[f64;NWORDS];NCHN] = [[0.0;NWORDS];NCHN];
-  let mut all_channel_times     : [[f64;NWORDS];NCHN] = [[0.0;NWORDS];NCHN];
-
-  // bitmask to keep track which channels/paddles are
-  // over threshold
-  let mut channels_over_threshold = [false;NCHN];
-  let mut paddles_over_threshold  = [false;NPADDLES];
-  // reset paddle packets for this event
-  for n in 0..NPADDLES {
-    pp_this_event[n].reset();
-    paddles_over_threshold[n] = false;
-  }
-
-  // the stream might have a certain number of events, 
-  // but then there might be a number of extra bytes.
-
-  loop {
-    #[cfg(feature = "diagnostics")]
-    let mut diagnostics_wf : Vec<CalibratedWaveform> = Vec::new();
-    
-    // if the following is true, we scanned throught the whole stream  
-    //println!("{pos} {blobdata_size}");
-    //let foo = get_constant_blobeventsize();
-    //println!("{foo}");
-    // this is of constant annoyance!
-    //if pos + get_constant_blobeventsize() >= (blobdata_size -1) {break;}
-    //if pos + get_constant_blobeventsize() > (blobdata_size ) {break;}
-    if pos > buffer.len() - 1 {
-      trace!("too big");
-      break;
-    }
-    byte = buffer[pos];
-    if !header_found_start {
-      if byte == 0xaa {
-        header_found_start = true;
-      }
-      pos +=1;
-      continue;
-    }
-    if header_found_start {
-      pos += 1;
-      if byte == 0xaa {
-        header_found_start = false;
-        // we have found our 0xaaaa marker!
-        // include it in the stream to deserialize
-        // if there is not enough bytes for another blob, 
-        // lets break the loop
-        if pos -2 + get_constant_blobeventsize() > buffer.len()
-          {break;}
-        blob_data.reset();
-        //if (pos-2 > buffer.len() -1) {break;}
-        blob_data.from_bytestream(&buffer, pos-2, false);
-        nblobs += 1;
-        
-        if blob_data.tail == 0x5555 {
-            if print_events {blob_data.print();}
-            pos += get_constant_blobeventsize() - 2; 
-            if do_calibration {
-              
-              // the order of tasks should be something 
-              // like this
-              // 1) read-out
-              // 2) calibration
-              // 3) paak-finding
-              // 4) cfd algorithm
-              // 5) paddle packaging
-              // the paddle mapping is HARDCODED here
-              // FIXME: We make the assumption that nchanel -> paddle side
-              //                                    0 -> Paddle0/A Side
-              //                                    1 -> Paddle0/B Side
-              //                                    2 -> Paddle1/A Side
-              //                                    3 -> Paddle1/B Side
-              //                                    4 -> Paddle2/A Side
-              //                                    5 -> Paddle2/B Side
-              //                                    6 -> Paddle3/A Side
-              //                                    7 -> Paddle3/B Side
-
-              let mut spikes : [i32;10] = [0;10];
-              blob_data.calibrate(calibrations);
-              blob_data.remove_spikes(&mut spikes);
-              for ch in 0..NCHN {
-
-                // reset our channels_over_threshold
-                channels_over_threshold[ch] = false;
-
-
-                // analysis part
-                //let mut waveform = CalibratedWaveform::new(all_channel_waveforms[n],
-                //                                           all_channel_times[n]);
-                // first, subtract the pedestal
-                blob_data.set_ped_begin(10.0, ch);// 10-100                               
-                blob_data.set_ped_range(50.0, ch);
-                blob_data.calc_ped_range(ch);
-                blob_data.subtract_pedestal(ch);
-                
-                // then we set the threshold and check
-                // if the wf went over threashold
-                let is_ot = blob_data.set_threshold(10.0, ch);
-                //if !is_ot {continue;}
-                channels_over_threshold[ch] = true;
-                
-                blob_data.set_cfds_fraction(0.20, ch);
-                let charge = blob_data.integrate(270.0, 70.0, ch).unwrap_or(42.0);
-                blob_data.find_peaks(270.0,70.0, ch);
-                // analysis
-                let cfd_time = blob_data.find_cfd_simple(0, ch);
-                //waveform.print();
-                // packing part
-                
-                // FIXME - this is not independent
-                // of the number of channels for the 
-                // readout board
-                match ch {
-                  0 => {
-                    paddles_over_threshold[0] = true;
-                    pp_this_event[0].set_time_a(cfd_time);
-                    pp_this_event[0].set_charge_a(charge);
-                  },
-                  1 => {
-                    paddles_over_threshold[0] = true;
-                    pp_this_event[0].set_time_b(cfd_time);
-                    pp_this_event[0].set_charge_b(charge);
-
-                  },
-                  2 => {
-                    paddles_over_threshold[1] = true;
-                    pp_this_event[1].set_time_a(cfd_time);
-                    pp_this_event[1].set_charge_a(charge);
-                  },
-                  3 => {
-                    paddles_over_threshold[1] = true;
-                    pp_this_event[1].set_time_b(cfd_time);
-                    pp_this_event[1].set_charge_b(charge);
-                  },
-                  4 => {
-                    paddles_over_threshold[2] = true;
-                    pp_this_event[2].set_time_a(cfd_time);
-                    pp_this_event[2].set_charge_a(charge);
-                  },
-                  5 => {
-                    paddles_over_threshold[2] = true;
-                    pp_this_event[2].set_time_b(cfd_time);
-                    pp_this_event[2].set_charge_b(charge);
-                  },
-                  6 => {
-                    paddles_over_threshold[3] = true;
-                    pp_this_event[3].set_time_a(cfd_time);
-                    pp_this_event[3].set_charge_a(charge);
-                  },
-                  7 => {
-                    paddles_over_threshold[3] = true;
-                    pp_this_event[3].set_time_b(cfd_time);
-                    pp_this_event[3].set_charge_b(charge);
-                  },
-                  _ => {
-                    trace!("Won't do anything for ch {}",ch);
-                  }
-                } // end match
-
-                // now set general properties on the 
-                // paddles
-                for n in 0..readoutboard.sorted_pids.len() {
-                  // FIXME
-                  pp_this_event[n].paddle_id    = readoutboard.sorted_pids[n];
-                  pp_this_event[n].event_id     = blob_data.event_id;
-                  pp_this_event[n].timestamp_32 = blob_data.timestamp_32;
-                  pp_this_event[n].timestamp_16 = blob_data.timestamp_16;
-                  //pp_this_event[n].print();
-                  if paddles_over_threshold[n] {
-                    pp_this_event[n].event_id = blob_data.event_id;
-                  }
-                }
-                
-                #[cfg(feature = "diagnostics")]
-                {  
-                  let diag_wf = CalibratedWaveform::new(&blob_data, ch);
-                  diagnostics_wf.push (diag_wf);
-                }
-              } // end loop over readout board channels
-            }
-
-            // put the finished paddle packets in 
-            // our container
-            for n in 0..NPADDLES {
-              //if paddles_over_threshold[n] {
-              if true {
-                trace!("Sending pp to cache for evid {}", pp_this_event[n].event_id);
-                trace!("==> [RBCOM]  Sending {:?}", pp_this_event[n]);
-                pp_sender.send(pp_this_event[n]);
-              }
-            }
-        } else {
-          // the event is corrupt
-          //println!("{}", blob_data.head);
-          ncorrupt_blobs += 1;
-        }
-      } else {
-          // it wasn't an actual header
-          header_found_start = false;
-      }
-    } // endif header_found_start
-  }// end loop
-
-  // in case of diagnostics, we 
-  // write an hdf file with calibrated 
-  // waveforms for later analysis.
-  #[cfg(feature = "diagnostics")]
-  {
-    let hdf_diagnostics_file =  "waveforms_".to_owned()
-                                + &n_chunk.to_string()
-                                + "_"
-                                + &readoutboard.id.to_string()
-                                + ".hdf";
-    let hdf_file    = hdf5::File::create(hdf_diagnostics_file).unwrap(); // open for writing
-    hdf_file.create_group("waveforms");
-    let hdf_group = hdf_file.group("waveforms").unwrap();
-    let hdf_dataset = hdf_group.new_dataset::<CalibratedWaveform>().shape(diagnostics_wf.len()).create("wf").unwrap();
-    //let hdf_dataset = hdf_group.new_dataset::<BlobData>().shape(events.len()).create("wf").unwrap();
-    //hdf_dataset.write(&arr1(&diagnostics_wf))?;
-    hdf_dataset.write(&arr1(&diagnostics_wf))?;
-    hdf_file.close()?;
-  }
-  debug!("==> Deserialized {} blobs! {} blobs were corrupt", nblobs, ncorrupt_blobs);
-  Ok(nblobs)
-}
-
-/*************************************/
-
-fn get_blobs_from_file (rb_id : usize) {
-  let filepath = String::from("/data0/gfp-data-aug/Aug/run4a/d20220809_195753_4.dat");
-  let blobs = get_file_as_byte_vec(&filepath);
-  // FIXME - this must be thre real calibrations
-  let calibrations = [Calibrations {..Default::default()};NCHN];
-  //let sender = Sender::<PaddlePacket>();
-  let (sender, receiver) = unbounded();
-  todo!("Fix the paddle ids. This function needs to be given the Readoutboard!");
-  let paddle_ids : [u8;4] = [0,0,0,0];
-  let mut rb = ReadoutBoard::new();
-  rb.id = Some(rb_id as u8);
-  rb.sorted_pids = paddle_ids;
-  match analyze_blobs(&blobs,
-                      &sender,
-                      false,
-                      &rb,
-                      false,
-                      false,
-                      &calibrations,
-                      0) {
-      Ok(nblobs)   => info!("Read {} blobs from file", nblobs), 
-      Err(err)     => panic!("Was not able to read blobs! Err {}", err)
-  }
-}
-
-/*************************************/
-
-///
-/// Check an incoming message for readout board 
-/// handshake/ping signal
-///
-///
-fn identifiy_readoutboard(msg : &zmq::Message) -> bool
-{
-  let size     = msg.len();
-  if size == 0 {
-      return false;
-    }
-  let result = msg.as_str();
-  if !result.is_some() {
-      return false;
-  }
-  // the signature for RB's is "RBXX"
-  if size < 5 {
-    // FIXME - pattern recognition, 
-    // extract rb id
-    let rb_ping = msg.as_str().unwrap();
-    debug!("Received RB ping signal {}", rb_ping);
-    return true;
-  } else {
-    println!("Received RB {}", msg.as_str().unwrap());
-  }
-  return false;
-}
-
-/*************************************/
-
 
 /// Receive binary blobs from readout boards,
 /// and perform specified tasks
 ///
 ///
 pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
+                                 resp_to_main     : Sender<TofResponse>,
                                  write_blob       : bool,
                                  storage_savepath : &String,
                                  events_per_file  : &usize,
-                                 rb               : &ReadoutBoard)
-{
+                                 rb               : &ReadoutBoard) {
   let zmq_ctx = zmq::Context::new();
-  let board_id = rb.id.unwrap();
+  let board_id = rb.rb_id; //rb.id.unwrap();
   info!("initializing RB thread for board {}!", board_id);
   let mut msg             = zmq::Message::new();
   let mut n_errors        = 0usize;
@@ -442,34 +81,50 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
     calibrations = read_calibration_file(cal_file_path); 
   }
   let address = "tcp://".to_owned() 
-              + &rb.ip_address.expect("No IP known for this board!").to_string()
+              + &rb.ip_address.to_string()
               + ":"
-              +  &rb.data_port.expect("No DATA port known for this board!").to_string();
+              +  &rb.port.to_string();
   let socket = zmq_ctx.socket(zmq::SUB).expect("Unable to create socket!");
   socket.connect(&address);
   info!("Connected to {address}");
   // FIXME - do not subscribe to all, only this 
   // specific RB
   let mut topic = b"";
-  let mut topic : String;
-  if rb.id.unwrap() < 10 {
-    topic = String::from("RB0") + &rb.id.unwrap().to_string();
-  } else {
-    topic = String::from("RB") + &rb.id.unwrap().to_string();
-  }
-  socket.set_subscribe(topic.as_bytes());
+  //let mut topic : String;
+  //if rb.id.unwrap() < 10 {
+  //  topic = String::from("RB0") + &rb.id.unwrap().to_string();
+  //} else {
+  //  topic = String::from("RB") + &rb.id.unwrap().to_string();
+  //}
+  socket.set_subscribe(topic);
+  //socket.set_subscribe(topic.as_bytes());
   let mut secs_since_epoch = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
   let mut blobfile_name = storage_savepath.to_owned() + "RB" 
-                       + &board_id.to_string() + " _ " 
+                       + &board_id.to_string() + "_" 
                        + &secs_since_epoch.to_string()
                        + ".blob";
+  //let mut topic : String;
+  //if rb.id.unwrap() < 10 {
+  //  topic = String::from("RB0") + &rb.id.unwrap().to_string();
+  //} else {
+  //  topic = String::from("RB") + &rb.id.unwrap().to_string();
+  //}
+  //socket.set_subscribe(topic.as_bytes());
+  //socket.set_subscribe(topic);
+  //let blobfile_name = storage_savepath.to_owned() + "blob_" 
+  //let mut topic : String;
+  //if rb.id.unwrap() < 10 {
+  //  topic = String::from("RB0") + &rb.id.unwrap().to_string();
+  //} else {
+  //  topic = String::from("RB") + &rb.id.unwrap().to_string();
+  //}
+  //socket.set_subscribe(topic.as_bytes());
+  //                     + &board_id.to_string()
   info!("Writing blobs to {}", blobfile_name );
   let mut blobfile_path = Path::new(&blobfile_name);
   let mut file_on_disc : Option<File> = None;//let mut output = File::create(path)?;
   if write_blob {
     file_on_disc = OpenOptions::new().append(true).create(true).open(blobfile_path).ok()
-    //let f = File::create(&blobfile_path);
-    //file_on_disc = Some(f.unwrap());
   }
   let mut n_events = 0usize;
   loop {
@@ -482,7 +137,6 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
         error!("Receiving from socket raised error {}", err);
       }
       Ok(buffer) => {
-        debug!("We got data of size {}", buffer.len());
         //trace!("Working...");
         //// check for rb ping signal
         //let rb_ping = identifiy_readoutboard(&msg);
@@ -509,7 +163,7 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
         // do the work
         // strip the first 4 bytes, since they contain the 
         // board id
-        let tp_ok = TofPacket::from_bytestream(&buffer, 4);
+        let tp_ok = TofPacket::from_bytestream(&buffer, &mut 4);
         match tp_ok {
           Err(err) => {
             error!("Unknown packet...{:?}", err);
@@ -518,6 +172,27 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
           Ok(_)    => ()
         };
         let tp = tp_ok.unwrap();
+        //println!("{:?} PACKET TYPE", tp.packet_type); 
+        match tp.packet_type {
+          PacketType::Monitor  => {continue;},
+          PacketType::RBHeader => {
+            // in that case, just write the header to 
+            // the file and continue
+            match &mut file_on_disc {
+              None => (),
+              Some(f) => {
+                trace!("writing {} bytes", tp.payload.len());
+                match f.write_all(&tp.payload) {
+                  Err(err) => error!("Can not write to file, err {err}"),
+                  Ok(_)    => ()
+                }
+              }
+            }
+          continue;
+          },
+          _ => (),
+        }
+
         //println!("{:?}", tp.payload);
         //for n in 0..5 {
         //  println!("{}", tp.payload[n]);
@@ -541,7 +216,20 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
         match &mut file_on_disc {
           None => (),
           Some(f) => {
-            f.write_all(buffer.as_slice());
+            // if the readoutboard prefixes it's payload with 
+            // "RBXX", we have to get rid of that first
+            //match search_for_u16(0xaa, &buffer, 0) {
+            //  Err(err) => {
+            //    error!("Can not find header in this payload! {err}");
+            //  }
+            //  Ok(_)    => {
+                trace!("writing {} bytes", &tp.payload.len());
+                match f.write_all(&tp.payload) {
+                  Err(err) => error!("Can not write to file, err {err}"),
+                  Ok(_)    => ()
+                }
+            //  }
+            //}
           }
         }
         n_events += 1;
@@ -549,39 +237,17 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
           // start a new file
           secs_since_epoch = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
           blobfile_name = storage_savepath.to_owned() + "RB" 
-                         + &board_id.to_string() + " _ " 
+                         + &board_id.to_string() + "_" 
                          + &secs_since_epoch.to_string()
                          + ".blob";
-
           info!("Writing blobs to {}", blobfile_name );
           blobfile_path = Path::new(&blobfile_name);
-          file_on_disc = OpenOptions::new().append(true).create(true).open(blobfile_path).ok()
+          file_on_disc = OpenOptions::new().append(true).create(true).open(blobfile_path).ok();
+          n_events = 0;
         }
-        //if write_blob {
-        //  let blobfile_name = "blob_".to_owned() 
-        //                       + &n_chunk.to_string() 
-        //                       + "_"
-        //                       + &board_id.to_string()
-        //                       + ".blob";
-        //  info!("Writing blobs to {}", blobfile_name );
-        //  let blobfile_path = Path::new(&blobfile_name);
-        //  match write_stream_to_file(blobfile_path, &buffer) {
-        //    Ok(size)  => debug!("Writing blob file successful! {} bytes written", size),
-        //    Err(err)  => {
-        //      error!("Unable to write blob to disk! {}", err );
-        //      lost_blob_files += 1;
-        //    }
-        //  } // end match
-        //} // end if write_blob
-        //thread::sleep(Duration::from_millis(1500));
         n_chunk += 1;
-
-        // currently, for debugging just stop after one 
-        // chunk
-        //panic!("You shall not pass!");
-        
-      }
-    }
-  }
-}
+      } // end ok
+    } // end match 
+  } // end loop
+} // end fun
 

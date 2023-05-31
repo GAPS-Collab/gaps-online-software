@@ -7,11 +7,17 @@ compile_and_deploy_target() {
 # first delete everything, since there might be remains of a previously issued cargo check
 rm -rf ../target/armv7-unknown*
 
-compile_and_deploy_target liftof-rb tof-rb149
-for rb in tof-rb00 tof-rb01 tof-rb02 tof-rb03 tof-rb04 tof-rb07 tof-rb08 tof-rb09 tof-rb10;
-do compile_and_deploy_target liftof-rb $rb;
-done
+# RBs at SSL
+SSL_RB="tof-rb01 tof-rb02 tof-rb03 tof-rb04 tof-rb07 tof-rb08 tof-rb09 tof-rb11 tof-rb12 tof-rb13 tof-rb14 tof-rb15 tof-rb16 tof-rb17 tof-rb18 tof-rb19 tof-rb20 tof-rb22 tof-rb24 tof-rb25 tof-rb26 tof-rb27"
 
-#compile_and_deploy_target debug-idle
-#compile_and_deploy_target watch-buffer-fill
+#for rb in `echo $SSL_RB`; 
+#  do echo $rb;
+#  scp liftof.service $rb:bin/;
+#  scp -r configs $rb:config;
+#done
+
+#compile_and_deploy_target liftof-rb tof-rb01
+compile_and_deploy_target liftof-rb ssl-tof-computer
+
+#compile_and_deploy_target liftof-rb tof-rb01
 

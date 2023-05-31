@@ -19,6 +19,13 @@ pub fn enable_evt_fragments() -> Result<(), RegisterError> {
   Ok(())
 }
 
+/// use the random self trigger
+pub fn set_self_trig_rate(rate : u32) -> Result<(), RegisterError> {
+  warn!("Setting self trigger rate, writing register {}", TRIG_GEN_RATE);
+  write_control_reg(TRIG_GEN_RATE, rate)?;
+  Ok(())
+}
+
 /// do not write header only packets when the drs is busyu
 pub fn disable_evt_fragments() -> Result<(), RegisterError> {
   trace!("Disable event fragment writing!");
@@ -81,6 +88,11 @@ pub fn get_blob_buffer_occ(which : &BlobBuffer) -> Result<u32, RegisterError> {
   Ok(value)
 }
 
+/// Check if teh TRIGGER_ENABLE register is set
+pub fn get_triggers_enabled() -> Result<bool, RegisterError> {
+  let value = read_control_reg(TRIGGER_ENABLE)?;
+  Ok(value > 0)
+}
 
 /// FIXME
 pub fn get_dma_pointer() -> Result<u32, RegisterError> {
@@ -104,7 +116,7 @@ pub fn clear_dma_memory() -> Result<(), RegisterError> {
 ///
 /// The writing into the memory thus can start anywhere in memory (does 
 /// not have to be from 0)
-pub fn blob_buffer_reset(which : &BlobBuffer) -> Result<(), RegisterError> {
+pub fn reset_ram_buffer_occ(which : &BlobBuffer) -> Result<(), RegisterError> {
   match which { 
     BlobBuffer::A => write_control_reg(RAM_A_OCC_RST, 0x1)?,
     BlobBuffer::B => write_control_reg(RAM_B_OCC_RST, 0x1)?
@@ -225,6 +237,18 @@ pub fn set_readout_all_channels_and_ch9() -> Result<(), RegisterError> {
   Ok(())
 }
 
+/// Enable active channels
+pub fn set_active_channel_mask(ch_mask : u8) -> Result<(), RegisterError> {
+  let mut value   = read_control_reg(READOUT_MASK)?;
+  //let mut ch_part = value >> 8;
+  //ch_part         = ch_part << 8;
+  //ch_part         = ch_part | (ch_mask) as u32;
+  value           = value >> 8;
+  value           = value << 8;
+  value           = value | (ch_mask as u32);
+  write_control_reg(READOUT_MASK, value)?;
+  Ok(())
+}
 
 /// Enable the master trigger mode
 pub fn set_master_trigger_mode() -> Result<(), RegisterError> {

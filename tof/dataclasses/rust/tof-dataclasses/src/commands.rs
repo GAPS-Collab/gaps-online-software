@@ -395,7 +395,7 @@ impl TofCommand {
         }
     } // end match
     //let cmd_pk = CommandPacket::from_bytestream(&packet.payload, 0); 
-    let cmd_pk = TofCommand::from_bytestream(&packet.payload, 0);
+    let cmd_pk = TofCommand::from_bytestream(&packet.payload, &mut 0);
     match cmd_pk {
       Err(err) => {
         warn!("Could not decode CMD packet, err {:?}", err);
@@ -452,34 +452,34 @@ impl Serialization for TofCommand {
   //}
 
   fn from_bytestream(stream    : &Vec<u8>, 
-                     start_pos : usize) 
+                     pos       : &mut usize) 
     -> Result<TofCommand, SerializationError>{
   
-    let mut pos      = start_pos; 
+    //let mut pos      = start_pos; 
     let mut two_bytes : [u8;2];
     let four_bytes    : [u8;4];
-    two_bytes = [stream[pos],
-                 stream[pos+1]];
-    pos += 2;
+    two_bytes = [stream[*pos],
+                 stream[*pos+1]];
+    *pos += 2;
     if TofCommand::HEAD != u16::from_le_bytes(two_bytes) {
-      warn!("Packet does not start with HEAD signature");
+      error!("Packet does not start with HEAD signature");
       return Err(SerializationError::HeadInvalid {});
     }
    
-    let cc   = stream[pos];
-    pos += 1;
-    four_bytes = [stream[pos],
-                  stream[pos+1],
-                  stream[pos+2],
-                  stream[pos+3]];
-    pos += 4;
+    let cc   = stream[*pos];
+    *pos += 1;
+    four_bytes = [stream[*pos],
+                  stream[*pos+1],
+                  stream[*pos+2],
+                  stream[*pos+3]];
+    *pos += 4;
     let value = u32::from_le_bytes(four_bytes);
-    two_bytes = [stream[pos],
-                 stream[pos+1]];
+    two_bytes = [stream[*pos],
+                 stream[*pos+1]];
     let pair    = (cc, value);
     let command = TofCommand::from(pair);
     if TofCommand::TAIL != u16::from_le_bytes(two_bytes) {
-      warn!("Packet does not end with TAIL signature");
+      error!("Packet does not end with TAIL signature");
       return Err(SerializationError::TailInvalid {});
     }
     Ok(command)
@@ -563,30 +563,29 @@ impl TofResponse {
 impl Serialization for TofResponse {
 
   fn from_bytestream(stream    : &Vec<u8>, 
-                     start_pos : usize) 
+                     pos       : &mut usize) 
     -> Result<TofResponse, SerializationError>{
   
-    let mut pos      = start_pos; 
     let mut two_bytes : [u8;2];
     let four_bytes    : [u8;4];
-    two_bytes = [stream[pos],
-                 stream[pos+1]];
-    pos += 2;
+    two_bytes = [stream[*pos],
+                 stream[*pos+1]];
+    *pos += 2;
     if TofResponse::HEAD != u16::from_le_bytes(two_bytes) {
       warn!("Packet does not start with HEAD signature");
       return Err(SerializationError::HeadInvalid {});
     }
    
-    let cc   = stream[pos];
-    pos += 1;
-    four_bytes = [stream[pos],
-                  stream[pos+1],
-                  stream[pos+2],
-                  stream[pos+3]];
-    pos += 4;
+    let cc   = stream[*pos];
+    *pos += 1;
+    four_bytes = [stream[*pos],
+                  stream[*pos+1],
+                  stream[*pos+2],
+                  stream[*pos+3]];
+    *pos += 4;
     let value = u32::from_le_bytes(four_bytes);
-    two_bytes = [stream[pos],
-                 stream[pos+1]];
+    two_bytes = [stream[*pos],
+                 stream[*pos+1]];
     let pair = (cc, value);
     let response = TofResponse::from(pair);
     if TofResponse::TAIL != u16::from_le_bytes(two_bytes) {

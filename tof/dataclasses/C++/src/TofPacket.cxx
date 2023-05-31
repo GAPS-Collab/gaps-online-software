@@ -1,6 +1,6 @@
 #include "packets/TofPacket.h"
 #include "serialization.h"
-
+#include "spdlog/spdlog.h"
 
 //enum PacketType : u8 {
 //  Unknown   = PACKET_TYPE_UNKNOWN,
@@ -75,8 +75,10 @@ u16 TofPacket::from_bytestream(vec_u8 &bytestream,
                                usize   start_pos){ 
   usize pos = start_pos;
   u16 value = decode_ushort(bytestream, start_pos);
-  if (!(value == head))
-      {std::cerr << "[ERROR] no header found!" << std::endl;}
+  if (!(value == head)) {
+    spdlog::error("No header found!");
+    return start_pos;
+  }
   head = value;
   pos += 2; // position in bytestream, 2 since we 
   packet_type = bytestream[pos]; pos+=1;
@@ -92,9 +94,7 @@ u16 TofPacket::from_bytestream(vec_u8 &bytestream,
   pos += payload_size;
   tail = decode_ushort(bytestream, pos); pos +=2;
   if (tail != 0x5555)
-    {std::cerr << "[ERROR] Tail wrong! " << tail 
-     << " " << bytestream[pos-2] 
-     << " " << bytestream[pos-1] << std::endl;}
+    {spdlog::error("Tail wrong! ");}
   return pos;
 }
 

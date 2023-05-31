@@ -36,6 +36,24 @@ if(NOT spdlog_POPULATED)
   add_subdirectory(${spdlog_SOURCE_DIR} ${spdlog_BINARY_DIR})
 endif()
 
+FetchContent_Declare(
+  bfsw
+  GIT_REPOSITORY https://git.ssl.berkeley.edu/bfsw/bfsw.git 
+  GIT_TAG origin/main
+)
+FetchContent_MakeAvailable(bfsw)
+FetchContent_GetProperties(bfsw)
+if(NOT bfsw_POPULATED)
+  # Fetch the content using previously declared details
+  FetchContent_Populate(bfsw)
+
+  # Set custom variables, policies, etc.
+  # ...
+
+  # Bring the populated content into the build
+  add_subdirectory(${bfsw_SOURCE_DIR} ${bfsw_BINARY_DIR})
+endif()
+
 # -- pybindings with pybind11
 option(BUILD_PYBINDINGS "build pybindings with pybind11" OFF)
 if (BUILD_PYBINDINGS)

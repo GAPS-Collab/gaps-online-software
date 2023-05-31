@@ -25,7 +25,7 @@
 
 use std::net::UdpSocket;
 use std::fmt;
-use std::time::Duration;
+//use std::time::Duration;
 
 use std::error::Error;
 use crate::errors::{IPBusError, MasterTriggerError};
@@ -33,6 +33,8 @@ use crate::errors::{IPBusError, MasterTriggerError};
 use crate::serialization::{Serialization,
                            SerializationError};
 
+use crate::manifest::{LocalTriggerBoard,
+                      ReadoutBoard};
 //const MT_MAX_PACKSIZE   : usize = 4096;
 /// Maximum packet size of packets we can 
 /// receive over UDP via the IPBus protocoll
@@ -88,6 +90,115 @@ impl From<IPBusPacketType> for u8 {
     }
     result
   }
+}
+
+/// MasterTrigger related mapping
+///
+/// Caches ltb/rb relevant information 
+/// and can generate rb/ltb id lists
+#[derive(Debug, Clone)]
+pub struct MasterTriggerMapping {
+  pub ltb_list : Vec<LocalTriggerBoard>,
+  pub rb_list  : Vec<ReadoutBoard>,
+
+  /// Holds RB id at the position where 
+  /// it is supposed to be in the MTB 
+  /// trigger mask
+  pub ltb_mapping  : [LocalTriggerBoard;N_LTBS]
+
+  // 
+  //ltb_rb_mapping : HashMap<u8;ReadoutBoard>;
+}
+
+impl MasterTriggerMapping {
+
+  pub fn new(ltb_list : Vec<LocalTriggerBoard>, rb_list : Vec<ReadoutBoard>) 
+    -> MasterTriggerMapping {
+    let mut mtm = MasterTriggerMapping {
+      ltb_list,
+      rb_list,
+      ltb_mapping : [LocalTriggerBoard::new();N_LTBS]
+    };
+    mtm.construct_ltb_mapping();
+    mtm
+  }
+
+  pub fn construct_ltb_mapping(&mut self) {
+    for ltb in &self.ltb_list {
+      if ltb.ltb_dsi == 0 && ltb.ltb_j == 0 {
+        error!("Found ltb with invalid connection information! {:?}", ltb);
+        continue;
+      }
+      let index = ((ltb.ltb_dsi - 1) * 5) + (ltb.ltb_j - 1);
+      self.ltb_mapping[index as usize] = *ltb;
+    }
+  }
+
+  /// Mapping trigger LTB board mask - LTB ids
+  ///
+  /// # Arguments:
+  ///
+  /// * board_mask : The board mask as it comes from the 
+  ///                MasterTriggerEvent. Each entry corresponds
+  ///                to one LocalTriggerBoard. They are sorted
+  ///                by DSI and J, e.g
+  ///                [.., DSI_{ltb_1} +J_{ltb_1}]
+  pub fn get_ltb_ids(&self, board_mask : &[bool; N_LTBS] ) 
+    -> Vec<u8> {
+    let mut ltbs = Vec::<u8>::new();
+    for k in 0..N_LTBS {
+      if self.ltb_mapping[k].ltb_id > 0 {
+        ltbs.push(self.ltb_mapping[k].ltb_id)
+      }
+    }
+    ltbs
+  }
+
+
+  /// Return the ids of the readoutboards which are connected to the LTBs which participated in the
+  /// trigger.
+  pub fn get_rb_ids(&self,
+                    mt_ev    : &MasterTriggerEvent)
+                    //ltb_mask : &[bool; N_LTBS],
+                    //hit_mask : [[bool; N_CHN_PER_LTB]; N_LTBS])
+    -> Vec<u8> {
+    let mut rb_ids = Vec::<u8>::new();
+    let mut ltb_hit_index : usize = 0;
+    //println!("MTEV BRD MASK {:?}", mt_ev.board_mask);
+    for k in 0..mt_ev.board_mask.len() {
+      if mt_ev.board_mask[k] {
+        let hits = mt_ev.hits[k];//ltb_hit_index];
+        //println!("MTEV HITS {:?}", hits);
+        for j in 0..hits.len() {
+          if hits[j] {
+            //println!("Found hit at {j}");
+            //println!("LTB REGISTERED FOR THIS HIT {k} {:?} with id {}", self.ltb_mapping[k], self.ltb_mapping[k].ltb_id);
+            let rb_id = self.ltb_mapping[k].get_rb_id(j as u8 +1);
+            
+            if rb_ids.contains(&rb_id) {
+              continue;
+            } else {
+              rb_ids.push(rb_id);
+            }
+          }
+        }
+        ltb_hit_index += 1;
+      }
+    }
+    //  if self.ltb_mapping[k] > 0  {
+    //     
+    //  }
+    //}
+    //let mut ltb_ids = self.get_ltb_ids(ltb_mask);
+    //for k in 0..ltb_ids.len() {
+    //  let ltb_id = ltb_ids[k];
+    //  let ltb_channels = Vec::<u8>::new();
+    //  for hit in hit_mask[k].iter() {
+    //    //ltb_channels 
+    //  }
+    //}
+    rb_ids
+  } 
 }
 
 /// An event as observed by the MTB
@@ -149,6 +260,18 @@ impl MasterTriggerEvent {
       valid     : true,
     }   
   }
+
+  pub fn get_triggered_ltb_ids(&self) -> Vec<u8> {
+    let mut ltbs = Vec::<u8>::new();
+    todo!();
+    ltbs
+    //for k in 0..N_LTBS {
+    //  if board_mask[k] {
+    //    ltbs.push(2
+    //  }
+    //}
+  }
+
 
   pub fn is_broken(&self) -> bool {
     self.broken
@@ -256,12 +379,11 @@ impl MasterTriggerEvent {
 impl Serialization for MasterTriggerEvent {
 
   fn from_bytestream(bytestream : &Vec<u8>,
-                     start_pos  : usize)
+                     pos        : &mut usize)
     -> Result<Self, SerializationError> {
     let bs = bytestream;
-    let pos = start_pos;
     let mt = MasterTriggerEvent::new(0,0);
-    let header = u16::from_le_bytes([bs[pos],bs[pos + 1]]); 
+    let header = u16::from_le_bytes([bs[*pos],bs[*pos + 1]]); 
     if header != MasterTriggerEvent::HEAD {
       return Err(SerializationError::HeadInvalid);
     }
@@ -568,6 +690,7 @@ pub fn decode_hit_mask(hit_mask : u32) -> ([bool;N_CHN_PER_LTB],[bool;N_CHN_PER_
   let mut index = N_CHN_PER_LTB - 1;
   for n in 0..N_CHN_PER_LTB {
     let mask = 1 << n;
+    //println!("MASK {:?}", mask);
     let bit_is_set = (mask & hit_mask) > 0;
     decoded_mask_0[index] = bit_is_set;
     if index != 0 {
@@ -670,13 +793,14 @@ pub fn read_daq(socket : &UdpSocket,
       //println!(" decoded mask {decoded_board_mask:?}");
       event.board_mask = decoded_board_mask;
       n_ltbs = board_mask.count_ones();
+      //println!("{:?}", event.board_mask);
       trace!("{n_ltbs} LTBs participated in this event");
       // to get the hits, we need to read the hit field.
       // Two boards can fit into a single hit field, that 
       // needs we have to read out the hit filed boards/2
       // times or boards/2 + 1 in case boards is odd.
-      let mut queries_needed = n_ltbs as usize;
-      let mut queried_boards = Vec::<u8>::new();
+      let queries_needed : usize;//= n_ltbs as usize;
+      //let queried_boards = Vec::<u8>::new();
       let mut nhit_query = 0usize;
       if n_ltbs % 2 == 0 {
         queries_needed = n_ltbs as usize/2;
@@ -685,19 +809,28 @@ pub fn read_daq(socket : &UdpSocket,
       }
       trace!("We need {queries_needed} queries for the hitmask");
       let mut hitmasks = Vec::<[bool;N_CHN_PER_LTB]>::new();
+      //println!("NEW HITS");
       while nhit_query < queries_needed { 
         let hitmask = read_daq_word(socket, target_address, buffer)?;
+        //println!("HITMASK {:?}", hitmask);
+
         (hits_a, hits_b) = decode_hit_mask(hitmask);
+        
         hitmasks.push(hits_a);
         hitmasks.push(hits_b);
+        //println!("HITMASKS_VEC {:?}", hitmasks);
         nhit_query += 1;
       }
       for k in 0..event.board_mask.len() {
         if event.board_mask[k] {
           let thishits = hitmasks.pop().unwrap();
+          //println!("Will assign {:?} for {k}", thishits);
           event.hits[k] = thishits;
+          //println!("EVENT HAS HITS ASSIGNED : {:?}", event.hits[k]);
+      
         }
       }
+    //println!("EVENT HAS HITS ASSIGNED : {:?}", event.hits);
     trace!("{:?}", decoded_board_mask);
     trace!("n queries {nhit_query}");
     event.crc         = read_daq_word(socket, target_address, buffer)?;

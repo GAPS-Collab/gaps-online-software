@@ -152,8 +152,10 @@ add_library(${GAPSTOF_LIBRARY_SHARED}
     dataclasses/C++/src/RBEnvPacket.cxx
     dataclasses/C++/src/RPaddlePacket.cxx
     dataclasses/C++/src/WfPaddlePacket.cxx
+    dataclasses/C++/src/calibration.cxx
     dataclasses/C++/src/serialization.cxx
     dataclasses/C++/src/parsers.cxx
+    dataclasses/C++/src/events.cxx
     dataclasses/C++/src/WaveGAPS.cpp
     dataclasses/C++/src/CommandPacket.cxx
     dataclasses/C++/src/RBMoniPacket.cxx

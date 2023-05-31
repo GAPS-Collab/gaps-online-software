@@ -1,7 +1,7 @@
 #ifndef RBMONIPACKET_H_INCLUDED
 #define RBMONIPACKET_H_INCLUDED
 
-#include "TofTypeDefs.h"
+#include "tof_typedefs.h"
 
 /****************************************
  * Housekeeping data for the individual 

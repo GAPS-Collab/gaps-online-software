@@ -1,4 +1,13 @@
-0.3.0
+#0.4.0
+FEATURES
+
+* LTB/RB/Paddle/PaddleEndClasses
+* Get these classes from a sqlite database
+* MasterTriggerMapping provides translation of MTB triggermask
+  to LTB/RB
+
+
+#0.3.0
 
 FEATURES
 

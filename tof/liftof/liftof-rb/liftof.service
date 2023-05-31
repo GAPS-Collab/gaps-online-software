@@ -1,0 +1,20 @@
+[Unit]
+Description=Liftof GAPS RB software
+After=network.target
+After=rb-initialization.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+EnvironmentFile=/etc/default/gaps
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=gaps
+User=gaps
+WorkingDirectory=/home/gaps/bin
+ExecStart=/home/gaps/bin/liftof-rb -r /home/gaps/config/runconfig.phys --stream-any
+
+[Install]
+WantedBy=multi-user.target

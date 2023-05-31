@@ -1,7 +1,7 @@
 #ifndef COMMANDPACKET_H_INCLUDED
 #define COMMANDPACKET_H_INCLUDED
 
-#include "TofTypeDefs.h"
+#include "tof_typedefs.h"
 
 
 /*******************************************

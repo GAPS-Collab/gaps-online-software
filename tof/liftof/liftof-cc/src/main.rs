@@ -12,26 +12,22 @@ extern crate ndarray;
 extern crate local_ip_address;
 
 extern crate liftof_lib;
-use liftof_lib::{LocalTriggerBoard,
-                 ReadoutBoard,
+use liftof_lib::{//LocalTriggerBoard,
+                 //ReadoutBoard,
                  master_trigger,
                  get_tof_manifest};
-                 //rb_manifest_from_json,
-                 //get_rb_manifest};
 
 #[cfg(feature="random")]
 extern crate rand;
 
+extern crate ctrlc;
 extern crate zmq;
-
 extern crate tof_dataclasses;
 
 use std::{thread,
-          time,
-          path::Path,
-          sync::mpsc::Sender,
-          sync::mpsc::Receiver,
-          sync::mpsc::channel};
+          time};
+
+use std::path::Path;
 
 use clap::{arg,
            command,
@@ -45,12 +41,16 @@ extern crate crossbeam_channel;
 //                        Sender,
 //                        Receiver};
 use crossbeam_channel as cbc; 
-use tof_dataclasses::events::MasterTriggerEvent;
-//                            MasterTriggerEvent};
+use tof_dataclasses::events::{MasterTriggerEvent,
+                              MasterTriggerMapping};
 use tof_dataclasses::threading::ThreadPool;
 use tof_dataclasses::packets::paddle_packet::PaddlePacket;
 use tof_dataclasses::packets::TofPacket;
-
+use tof_dataclasses::manifest::{LocalTriggerBoard,
+                                ReadoutBoard,
+                                get_ltbs_from_sqlite,
+                                get_rbs_from_sqlite};
+use tof_dataclasses::commands::{TofCommand, TofResponse};
 extern crate liftof_cc;
 
 use liftof_cc::readoutboard_comm::readoutboard_communicator;
@@ -61,6 +61,7 @@ use liftof_cc::api::commander;
 use liftof_cc::paddle_packet_cache::paddle_packet_cache;
 use liftof_cc::flight_comms::global_data_sink;
 
+use std::process::exit;
 
 /*************************************/
 
@@ -88,23 +89,11 @@ struct Args {
 fn main() {
   pretty_env_logger::init();
 
-  // some bytes, in a vector
-  let sparkle_heart         = vec![240, 159, 146, 150];
-  let kraken                = vec![240, 159, 144, 153];
-  //let satelite_antenna      = vec![240, 159, 147, 161];
-  let fish                  = vec![240, 159, 144, 159];
-
-  // We know these bytes are valid, so we'll use `unwrap()`.
-  let sparkle_heart    = String::from_utf8(sparkle_heart).unwrap();
-  let kraken           = String::from_utf8(kraken).unwrap();
-  //let satelite_antenna = String::from_utf8(satelite_antenna).unwrap();
-  let fish             = String::from_utf8(fish).unwrap();
   // welcome banner!
-  //
   println!("-----------------------------------------------");
   println!(" ** Welcome to liftof-cc \u{1F680} \u{1F388} *****");
   println!(" .. liftof if a software suite for the time-of-flight detector ");
-  println!(" .. for the GAPS experiment {}", sparkle_heart);
+  println!(" .. for the GAPS experiment \u{1F496}");
   println!(" .. This is the Command&Control server which connects to the MasterTriggerBoard and the ReadoutBoards");
   println!(" .. see the gitlab repository for documentation and submitting issues at" );
   println!(" **https://uhhepvcs.phys.hawaii.edu/Achim/gaps-online-software/-/tree/main/tof/liftof**");
@@ -112,7 +101,6 @@ fn main() {
 
   // deal with command line arguments
   let args = Args::parse();
- 
 
   let write_blob = args.write_blob;
   if write_blob {
@@ -133,8 +121,11 @@ fn main() {
   let mut master_trigger_port = 0usize;
 
   // Have all the readoutboard related information in this list
-  let mut rb_list = Vec::<ReadoutBoard>::new();
+  let mut rb_list      : Vec::<ReadoutBoard>;
+  let rb_list_depr : Vec::<liftof_lib::ReadoutBoard>;
   let mut manifest = (Vec::<LocalTriggerBoard>::new(), Vec::<ReadoutBoard>::new());
+  let mut json_manifest = (Vec::<liftof_lib::LocalTriggerBoard>::new(), Vec::<liftof_lib::ReadoutBoard>::new());
+
   match args.json_config {
     None => panic!("No .json config file provided! Please provide a config file with --json-config or -j flag!"),
     Some(_) => {
@@ -142,14 +133,14 @@ fn main() {
       //    panic!("The file {} does not exist!", args.json_config.as_ref().unwrap().display());
       //}
       //info!("Found config file {}", args.json_config.as_ref().unwrap().display());
-      json_content = std::fs::read_to_string(args.json_config.as_ref().unwrap()).unwrap();
+      json_content = std::fs::read_to_string(args.json_config.as_ref().unwrap()).expect("Can not open json file");
       config = json::parse(&json_content).unwrap();
-      manifest = get_tof_manifest(args.json_config.unwrap());
+      json_manifest = get_tof_manifest(args.json_config.unwrap());
       println!("==> Tof Manifest following:");
-      println!("{:?}", manifest);
+      println!("{:?}", json_manifest);
       println!("***************************");
-      rb_list = manifest.1;
-      nboards = rb_list.len();
+      rb_list_depr = json_manifest.1;
+      nboards = rb_list_depr.len();
       //panic!("That's it");
       //println!(" .. .. using config:");
       //println!("  {}", config.pretty(2));
@@ -160,23 +151,22 @@ fn main() {
     } // end Some
   } // end match
  
-  //if autodiscover_rbs {
-  //  println!("==> Autodiscovering ReadoutBoards!...");
-  //  rb_list = get_rb_manifest();
-  //  nboards = rb_list.len();
-  //}
-  //for rb in rb_list.iter() {
-  //  println!("{}", rb);
-  //}
 
   if use_master_trigger {
-   master_trigger_ip   = config["master_trigger"]["ip"].as_str().unwrap().to_owned();
-   master_trigger_port = config["master_trigger"]["port"].as_usize().unwrap();
-   info!("Will connect to the master trigger board at {}:{}", master_trigger_ip, master_trigger_port);
+    master_trigger_ip   = config["master_trigger"]["ip"].as_str().unwrap().to_owned();
+    master_trigger_port = config["master_trigger"]["port"].as_usize().unwrap();
+    info!("Will connect to the master trigger board at {}:{}", master_trigger_ip, master_trigger_port);
   }
 
   let storage_savepath = config["raw_storage_savepath"].as_str().unwrap().to_owned();
   let events_per_file  = config["events_per_file"].as_usize().unwrap(); 
+  let calib_file_path  = config["calibration_file_path"].as_str().unwrap().to_owned();
+  let db_path          = Path::new(config["db_path"].as_str().unwrap());
+  let db_path_c        = db_path.clone();
+  let ltb_list = get_ltbs_from_sqlite(db_path);
+  println!("{:?}", ltb_list);
+  //exit(0);
+  let rb_list  = get_rbs_from_sqlite(db_path_c);
   //let matches = command!() // requires `cargo` feature
   //     //.arg(arg!([name] "Optional name to operate on"))
   //     .arg(
@@ -250,6 +240,10 @@ fn main() {
   let (rb_send, rb_rec) : (cbc::Sender<PaddlePacket>, cbc::Receiver<PaddlePacket>) = cbc::unbounded();
   // paddle cache <-> event builder communications
   let (id_send, id_rec) : (cbc::Sender<Option<u32>>, cbc::Receiver<Option<u32>>) = cbc::unbounded();
+  let (cmd_sender, cmd_receiver) : (cbc::Sender<TofCommand>, cbc::Receiver<TofCommand>) = cbc::unbounded();
+
+  let (resp_sender, resp_receiver) : (cbc::Sender<TofResponse>, cbc::Receiver<TofResponse>) = cbc::unbounded();
+
   // prepare a thread pool. Currently we have
   // 1 thread per rb, 1 master trigger thread
   // and 1 event builder thread.
@@ -261,7 +255,7 @@ fn main() {
   // runtime, but it should be possible to 
   // respawn them
   //let mut nthreads = nboards + 2; // 
-  let mut nthreads = 20;
+  let mut nthreads = 60;
   if use_master_trigger { 
     nthreads += 1;
   }
@@ -296,63 +290,95 @@ fn main() {
   //}
 
   println!("==> Starting event builder and master trigger threads...");
-  let tp_to_sink_c = tp_to_sink.clone();
+  println!("==> Will now start rb threads..");
+
+  for n in 0..nboards {
+    let this_rb_pp_sender = rb_send.clone();
+    let mut this_rb = rb_list[n].clone();
+    this_rb.infer_ip_address();
+    this_rb.calib_file = calib_file_path.clone() + "/" + "rb";
+    if this_rb.rb_id < 10 {
+      this_rb.calib_file += "0";
+    }
+    this_rb.calib_file += &(this_rb.rb_id).to_string();
+    this_rb.calib_file += "_cal.txt";
+    println!("==> Starting RB thread for {:?}", this_rb);
+    let resp_sender_c = resp_sender.clone();
+    let this_path = storage_savepath.clone();
+    worker_threads.execute(move || {
+      readoutboard_communicator(this_rb_pp_sender,
+                                resp_sender_c,
+                                write_blob,
+                                &this_path,
+                                &events_per_file,
+                                &this_rb);
+    });
+    println!("==> Started RB thread");
+  } // end for loop over nboards
+  
+  let one_second = time::Duration::from_millis(1000);
+  let rb_list_cc = rb_list.clone();
+  worker_threads.execute(move || {
+    commander(&rb_list_cc,
+              cmd_receiver);
+  });
   if use_master_trigger {
     // start the event builder thread
+    let cmd_sender_c = cmd_sender.clone();
+    let rb_list_c    = rb_list.clone();
+    let ltb_list_c   = ltb_list.clone();
+    let mut mapping = MasterTriggerMapping::new(ltb_list_c, rb_list_c);
+    println!("{:?}", mapping.ltb_mapping);
+    //exit(0);
     worker_threads.execute(move || {
                            event_builder(&master_ev_rec,
+                                         mapping,
                                          &id_send,
                                          &pp_rec,
                                          &ebs_from_cmdr,
-                                         &tp_to_sink);
+                                         &tp_to_sink,
+                                         &cmd_sender_c);
                                          //&evb_comm_socket);
     });
     // master trigger
     worker_threads.execute(move || {
                            master_trigger(&master_trigger_ip, 
                                           master_trigger_port,
-                                          &tp_to_sink_c,
                                           &rate_to_main,
                                           &master_ev_send,
                                           true);
     });
-  } else {
-    // we start the event builder without 
-    // depending on the master trigger
-    //worker_threads.execute(move || {
-    //                       event_builder_no_master(&id_send,
-    //                                               &pp_rec,
-    //                                               &evb_comm_socket);
-    //});
-  }
-  println!("==> Will now start rb threads..");
+  } 
 
-  for n in 0..nboards {
-    let this_rb_pp_sender = rb_send.clone();
-    let this_rb = rb_list[n].clone();
-    let this_path = storage_savepath.clone();
-    worker_threads.execute(move || {
-      readoutboard_communicator(this_rb_pp_sender,
-                                write_blob,
-                                &this_path,
-                                &events_per_file,
-                                &this_rb);
-    });
-  } // end for loop over nboards
-  // lastly start the commander thread 
-  // wait a bit before, so the boards have
-  // time to come up
-  let one_second = time::Duration::from_millis(1000);
-  thread::sleep(20*one_second);
-  worker_threads.execute(move || {
-    commander(&rb_list);
-  });
   info!("All threads started!");
   let one_minute = time::Duration::from_millis(60000);
   
   //println!("==> Sleeping a bit to give the rb's a chance to fire up..");
-  //thread::sleep(10*one_second);
+  thread::sleep(10*one_second);
+  
+  // set the handler for SIGINT
+  let cmd_sender_c = cmd_sender.clone();
+  ctrlc::set_handler(move || {
+    println!("received Ctrl+C! We will stop triggers and end the run!");
+    let end_run = TofCommand::DataRunEnd(42);
+    cmd_sender_c.send(end_run);
+    thread::sleep(one_second);
+    println!("So long and thanks for all the \u{1F41F}"); 
+    exit(0);
+  })
+  .expect("Error setting Ctrl-C handler");
+  
+  // start a new data run 
+  let start_run = TofCommand::DataRunStart(1000);
+  cmd_sender.send(start_run);
+
+  println!("All threads initialized!");
   loop{
+     // first we issue start commands until we receive
+     // at least 1 positive
+     //cmd_sender.send(start_run);
+     thread::sleep(1*one_second);
+    
     thread::sleep(1*one_minute);
     println!("...");
   }

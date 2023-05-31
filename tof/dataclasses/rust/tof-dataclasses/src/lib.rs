@@ -23,11 +23,20 @@ pub mod calibrations;
 pub mod threading;
 pub mod commands;
 pub mod monitoring;
+pub mod manifest;
+pub mod run;
+pub mod io;
 
 extern crate pretty_env_logger;
 #[macro_use] extern crate log;
 
-//pretty_env_logger::init();
+/// Create structures filled with random 
+/// number to be used for testing and 
+/// benchmarking
+#[cfg(feature = "random")]
+pub trait FromRandom {
+  fn from_random() -> Self;
+}
 
 
 

@@ -1,6 +1,8 @@
 {
   "meta" : "",
   "unix_time" : "",
+  "events_per_file" : 25000,
+  "raw_storage_savepath" : "/home/gaps/astoessl/tofdata/",
   "master_trigger" : {
     "ip"   : "192.168.36.121", 
     "port" : 50001
@@ -9,15 +11,18 @@
     "ip_address"   : "127.0.0.1", 
     "port" : 50001
   },
+  "tof_computer" : {
+    "port" : 42000 
+  },
   "ltbs" : [
       {
         "id"         : 8,
         "DSI"        : 0,
         "J"          : 1,
-      "dead_channel_mask": 0,
+       "dead_channel_mask": 0,
         "ch_to_rb"   : { 
                          "8" : [16,5],
-                         "9": [16,6],
+                         "9" : [16,6],
                          "4" : [16,3],
                          "5" : [16,4],
                          "0" : [16,1],
@@ -43,6 +48,7 @@
        "J"          : 4
      }
   ],
+
   "rbs" : [
     {
       "id"               : 16,
@@ -54,15 +60,577 @@
       "mac_address"      : "20:b0:f7:05:3b:1a",
       "dead_channel_mask": 0,
       "ch_to_pid"        : {
-                              "4" :  2,
-                              "5" :  2,
-                              "2" :  4,
-                              "3" :  4,
                               "0" :  6,
                               "1" :  6,
+                              "2" :  4,
+                              "3" :  4,
+                              "4" :  2,
+                              "5" :  2,
                               "6" : 25,
                               "7" : 25
                            }
+    },
+    {
+      "id"               : 5,
+      "dna"              : 42,
+      "n_data_channels"  : 8,
+      "nwords"           : 1024,
+      "port"             : 42000,
+      "calibration_file" : "/home/gaps/astoessl/gaps-online-software/tof/resources/calibrations/rb1_cal.txt",
+      "mac_address"      : "20:b0:f7:05:39:ae",
+      "dead_channel_mask": 0,
+      "ch_to_pid"        : {
+                              "0" :  75,
+                              "1" :  75,
+                              "2" :  77,
+                              "3" :  77,
+                              "4" : 107,
+                              "5" : 107,
+                              "6" : 105,
+                              "7" : 105
+                           }
+    },
+    {
+      "id"               : 6,
+      "dna"              : 42,
+      "n_data_channels"  : 8,
+      "nwords"           : 1024,
+      "port"             : 42000,
+      "calibration_file" : "/home/gaps/astoessl/gaps-online-software/tof/resources/calibrations/rb1_cal.txt",
+      "mac_address"      : "20:b0:f7:05:39:4e",
+      "dead_channel_mask": 0,
+      "ch_to_pid"        : {
+                              "0" :  76,
+                              "1" :  76,
+                              "2" :  78,
+                              "3" :  78,
+                              "4" : 108,
+                              "5" : 108,
+                              "6" : 106,
+                              "7" : 106
+                           }
+    }
+  ],
+  "panels"  : [
+    { 
+        "id"             : 1,
+        "desc"           : "cube top",
+        "normal"         : "z",
+        "asc-pid-order"  : "-x",
+        "min-pid"        : 1,
+        "type"           : "12PP",
+        "unit"           : "mm",
+        "paddle-height"  : 6.35,
+        "paddle-width"   : 160,
+        "paddle-length"  : 1800,
+        "dw-paddle"      : 150,
+        "dh-paddle"      : 8,
+        "lowest-pid-pos" : {"y": 0, "x":  820.0, "z": 1286}
+    }, 
+    { 
+        "id"             : 2,
+        "desc"           : "cube bottom",
+        "normal"         : "z",
+        "min-pid"        : 13,
+        "asc-pid-order"  : "-x",
+        "type"           : "12PP",
+        "unit"           : "mm",
+        "dw-paddle"      : 150,
+        "dh-paddle"      : 8,
+        "paddle-height"  : 6.35,
+        "paddle-width"   : 160,
+        "paddle-length"  : 1800,
+        "lowest-pid-pos" : {"y": 0.0, "x": 820.0, "z": 46}
+    }, 
+    { 
+        "id"   : 3,
+        "desc" : "cube +x (radiator)",
+        "type"          : "8PP",
+        "asc-pid-order" : "-z",
+        "min-pid"       : 25,
+        "normal"        : "y",
+        "dw-paddle"     : 150,
+        "dh-paddle"     : 8,
+        "paddle-height" : 6.35,
+        "paddle-width"  : 160,
+        "paddle-length" : 1560,
+        "lowest-pid-pos" : {"y": 0.0, "x": 838, "z" : 1128 }
+    }, 
+    { 
+        "id"            : 4,
+        "desc"          : "cube +y",
+        "asc-pid-order" : "-z",
+        "min-pid"       : 33,
+        "type"          : "8PP",
+        "normal"        : "x",
+        "dw-paddle"     : 150,
+        "dh-paddle"     : 8,
+        "paddle-height" : 6.35,
+        "paddle-width"  : 160,
+        "paddle-length" : 1560,
+        "lowest-pid-pos" : {"x": 0.0, "y": 838, "z": 1128}
+    }, 
+    { 
+        "id"            : 5,
+        "desc"          : "cube -x",
+        "min-pid"       : 41,
+        "normal"        : "y",
+        "dw-paddle"     : 150,
+        "dh-paddle"     : 8,
+        "paddle-height" : 6.35,
+        "paddle-width"  : 160,
+        "paddle-length" : 1560,
+        "lowest-pid-pos" : {"y": 0, "x": -838, "z": 1128}
+    }, 
+    { 
+        "id"   : 6,
+        "desc" : "cube -y (antenna)",
+        "normal"        : "x",
+        "dw-paddle"     : 150,
+        "min-pid"       : 49,
+        "dh-paddle"     : 8,
+        "paddle-height" : 6.35,
+        "paddle-width"  : 160,
+        "paddle-length" : 1560,
+        "lowest-pid-pos" : {"x": 0, "y": -838, "z": 1128}
+    }, 
+    { 
+        "id"   : 7,
+        "desc" : "umbrella center"
+    }, 
+    { 
+        "id"   : 8,
+        "desc" : "umbrella +x +y"
+    }, 
+    { 
+        "id"   : 9,
+        "desc" : "umbrella +y"
+    }, 
+    { 
+        "id"   : 10,
+        "desc" : "umbrella -x +y"
+    }, 
+    { 
+        "id"   : 11,
+        "desc" : "umbrella -x -y"
+    }, 
+    { 
+        "id"   : 12,
+        "desc" : "umbrella -y"
+    }, 
+    { 
+        "id"   : 13,
+        "desc" : "umbrella +x -y"
+    } 
+  ], 
+  "paddles" : [
+    {
+      "pid"      : 1,
+      "vid"      : 110000000,
+      "pos"      : {"y": 0.0, "x":  820.0, "z": 1286},
+      "panel-id" : 1,
+      "height"   : 0.635,
+      "width"    : 16,
+      "length"   : 180
+    }, 
+    {
+      "pid"    : 2,
+      "vid"    : 110000100,
+      "pos"    : {"y": 0.0, "x":  670.9, "z": 1294},
+      "panel-id" : 1,
+      "height" : 0.635,
+      "width"  : 16,
+      "length" : 180
+    }, 
+    {
+      "pid"    : 3,
+      "vid"    : 110000200,
+      "pos"    : {"y": 0.0, "x":  521.8, "z": 1286},
+      "panel-id" : 1,
+      "height" : 0.635,
+      "width"  : 16,
+      "length" : 180
+    }, 
+    {
+      "pid"    : 4,
+      "vid"    : 110000300,
+      "pos"    : {"y": 0.0, "x":  372.7, "z": 1294},
+      "panel-id" : 1,
+      "height" : 0.635,
+      "width"  : 16,
+      "length" : 180
+    }, 
+    {
+      "pid"    : 5,
+      "vid"    : 110000400,
+      "pos"    : {"y": 0.0, "x":  223.6, "z": 1286},
+      "panel-id" : 1,
+      "height" : 0.635,
+      "width"  : 16,
+      "length" : 180
+    }, 
+    {
+      "pid"    : 6,
+      "vid"    : 110000500,
+      "pos"    : {"y": 0.0, "x":   74.5, "z": 1294},
+      "panel-id" : 1,
+      "height" : 0.635,
+      "width"  : 16,
+      "length" : 180
+    }, 
+    {
+      "pid"    : 7,
+      "vid"    : 110000600,
+      "pos"    : {"y": 0.0, "x":  -74.5, "z": 1286},
+      "panel-id" : 1,
+      "height" : 0.635,
+      "width"  : 16,
+      "length" : 180
+    }, 
+    {
+      "pid"    : 8,
+      "vid"    : 110000700,
+      "pos"    : {"y": 0.0, "x": -223.6, "z": 1294},
+      "panel-id" : 1,
+      "height" : 0.635,
+      "width"  : 16,
+      "length" : 180
+    }, 
+    {
+      "pid"    : 9,
+      "vid"    : 110000800,
+      "pos"    : {"y": 0.0, "x": -372.7, "z": 1286},
+      "panel-id" : 1,
+      "height" : 0.635,
+      "width"  : 16,
+      "length" : 180
+    }, 
+    {
+      "pid"    : 10,
+      "vid"    : 110000900,
+      "pos"    : {"y": 0.0, "x": -521.8, "z": 1294},
+      "panel-id" : 1,
+      "height" : 0.635,
+      "width"  : 16,
+      "length" : 180
+    }, 
+    {
+      "pid"    : 11,
+      "vid"    : 110001000,
+      "pos"    : {"y": 0.0, "x": -670.9, "z": 1286},
+      "panel-id" : 1,
+      "height" : 0.635,
+      "width"  : 16,
+      "length" : 180
+    }, 
+    {
+      "pid"    : 12,
+      "vid"    : 110001100,
+      "pos"    : {"y": 0.0, "x": -820.0, "z": 1294},
+      "panel-id" : 1,
+      "height" : 0.635,
+      "width"  : 16,
+      "length" : 180
+    }, 
+    {
+      "pid"    : 13,
+      "vid"    : 11100000,
+      "pos"    : {"y": 0.0, "x": 820.0, "z": 46},
+      "panel-id" : 2,
+      "height" : 0.635,
+      "width"  : 16,
+      "length" : 180
+    }, 
+    {
+      "pid"    : 14,
+      "vid"    : 1110000100,
+      "pos"    : {"y": 0.0, "x": 670.9, "z": 53},
+      "panel-id" : 2,
+      "height" : 0.635,
+      "width"  : 16,
+      "length" : 180
+    }, 
+    {
+      "pid"    : 15,
+      "vid"    : 110000200,
+      "pos"    : {"y": 0.0, "x": 521.8, "z": 46},
+      "panel-id" : 2,
+      "height" : 0.635,
+      "width"  : 16,
+      "length" : 180
+    }, 
+    {
+      "pid"    : 16,
+      "vid"    : 111000300,
+      "pos"    : {"y": 0.0, "x": 372.7, "z": 53},
+      "panel-id" : 2,
+      "height" : 0.635,
+      "width"  : 16,
+      "length" : 180
+    }, 
+    {
+      "pid"    : 17,
+      "vid"    : 111000400,
+      "pos"    : {"y": 0.0, "x": 223.6, "z": 46},
+      "panel-id" : 2,
+      "height" : 0.635,
+      "width"  : 16,
+      "length" : 180
+    }, 
+    {
+      "pid"    : 18,
+      "vid"    : 111000500,
+      "pos"    : {"y": 0.0, "x":  74.5, "z": 53},
+      "panel-id" : 2,
+      "height" : 0.635,
+      "width"  : 16,
+      "length" : 180
+    }, 
+    {
+      "pid"    : 19,
+      "vid"    : 111000600,
+      "pos"    : {"y": 0.0, "x": -74.5, "z": 46},
+      "panel-id" : 2,
+      "height" : 0.635,
+      "width"  : 16,
+      "length" : 180
+    }, 
+    {
+      "pid"    : 20,
+      "vid"    : 111000700,
+      "pos"    : {"y": 0.0, "x":-223.6, "z": 53},
+      "panel-id" : 2,
+      "height" : 0.635,
+      "width"  : 16,
+      "length" : 180
+    }, 
+    {
+      "pid"    : 21,
+      "vid"    : 111000800,
+      "pos"    : {"y": 0.0, "x":-372.7, "z": 46},
+      "panel-id" : 2,
+      "height" : 0.635,
+      "width"  : 16,
+      "length" : 180
+    }, 
+    {
+      "pid"    : 22,
+      "vid"    : 111000900,
+      "pos"    : {"y": 0.0, "x":-521.8, "z": 53},
+      "panel-id" : 2,
+      "height" : 0.635,
+      "width"  : 16,
+      "length" : 180
+    }, 
+    {
+      "pid"    : 23,
+      "vid"    : 111001000,
+      "pos"    : {"y": 0.0, "x":-670.9, "z": 46},
+      "panel-id" : 2,
+      "height" : 0.635,
+      "width"  : 16,
+      "length" : 180
+    }, 
+    {
+      "pid"    : 24,
+      "vid"    : 111001100,
+      "pos"    : {"y": 0.0, "x":-820.0, "z": 53},
+      "panel-id" : 2,
+      "height" : 0.635,
+      "width"  : 16,
+      "length" : 180
+    },
+    {
+      "pid"    : 25,
+      "vid"    : 0,
+      "pos"    : {"y": 0.0, "x": 838, "z" : 1128 },
+      "panel-id" : 3
+    },
+    {
+      "pid"    : 26,
+      "vid"    : 0,
+      "pos"    : {"y": 0.0, "x": 831, "z": 998 },
+      "panel-id" : 3
+    },
+    {
+      "pid"    : 27,
+      "vid"    : 0,
+      "pos"    : {"y": 0.0, "x": 838, "z": 869 },
+      "panel-id" : 3
+    },
+    {
+      "pid"    : 28,
+      "vid"    : 0,
+      "pos"    : {"y": 0.0, "x": 831, "z": 739},
+      "panel-id" : 3
+    },
+    {
+      "pid"    : 29,
+      "vid"    : 0,
+      "pos"    : {"y": 0.0, "x": 838, "z": 610 },
+      "panel-id" : 3
+    },
+    {
+      "pid"    : 30,
+      "vid"    : 0,
+      "pos"    : {"y": 0.0, "x": 831, "z": 480},
+      "panel-id" : 3
+    },
+    {
+      "pid"    : 31,
+      "vid"    : 0,
+      "pos"    : {"y": 0.0, "x": 838, "z": 351},
+      "panel-id" : 3
+    },
+    {
+      "pid"    : 32,
+      "vid"    : 0,
+      "pos"    : {"y": 0.0, "x": 831, "z": 221},
+      "panel-id" : 3
+    },
+    {
+      "pid"    : 33,
+      "vid"    : 0,
+      "pos"    : {"y": 838, "x": 0, "z": 1128},
+      "panel-id" : 4
+    },
+    {
+      "pid"    : 34,
+      "vid"    : 0,
+      "pos"    : {"y": 831, "x": 0, "z": 998},
+      "panel-id" : 4
+    },
+    {
+      "pid"    : 35,
+      "vid"    : 0,
+      "pos"    : {"y": 838, "x": 0, "z": 869},
+      "panel-id" : 4
+    },
+    {
+      "pid"    : 36,
+      "vid"    : 0,
+      "pos"    : {"y": 831, "x": 0, "z": 739},
+      "panel-id" : 4
+    },
+    {
+      "pid"    : 37,
+      "vid"    : 0,
+      "pos"    : {"y": 838, "x": 0, "z": 610},
+      "panel-id" : 4
+    },
+    {
+      "pid"    : 38,
+      "vid"    : 0,
+      "pos"    : {"y": 831, "x": 0, "z": 480},
+      "panel-id" : 4
+    },
+    {
+      "pid"    : 39,
+      "vid"    : 0,
+      "pos"    : {"y": 838, "x": 0, "z": 351},
+      "panel-id" : 4
+    },
+    {
+      "pid"    : 40,
+      "vid"    : 0,
+      "pos"    : {"y": 831, "x": 0, "z": 221},
+      "panel-id" : 4
+    },
+    {
+      "pid"    : 41,
+      "vid"    : 0,
+      "pos"    : {"x": -838, "y": 0, "z": 1128},
+      "panel-id" : 5
+    },
+    {
+      "pid"    : 42,
+      "vid"    : 0,
+      "pos"    : {"x": -831, "y": 0, "z": 998},
+      "panel-id" : 5
+    },
+    {
+      "pid"    : 43,
+      "vid"    : 0,
+      "pos"    : {"x": -838, "y": 0, "z": 869},
+      "panel-id" : 5
+    },
+    {
+      "pid"    : 44,
+      "vid"    : 0,
+      "pos"    : {"x": -831, "y": 0, "z": 739},
+      "panel-id" : 5
+    },
+    {
+      "pid"    : 45,
+      "vid"    : 0,
+      "pos"    : {"x": -838, "y": 0, "z": 610},
+      "panel-id" : 5
+    },
+    {
+      "pid"    : 46,
+      "vid"    : 0,
+      "pos"    : {"x": -831, "y": 0, "z": 480},
+      "panel-id" : 5
+    },
+    {
+      "pid"    : 47,
+      "vid"    : 0,
+      "pos"    : {"x": -838, "y": 0, "z": 351},
+      "panel-id" : 5
+    },
+    {
+      "pid"    : 48,
+      "vid"    : 0,
+      "pos"    : {"x": -831, "y": 0, "z": 221},
+      "panel-id" : 5
+    },
+    {
+      "pid"    : 49,
+      "vid"    : 0,
+      "pos"    : {"y": -838, "x": 0, "z": 1128},
+      "panel-id" : 6
+    },
+    {
+      "pid"    : 50,
+      "vid"    : 0,
+      "pos"    : {"y": -831, "x": 0, "z": 998},
+      "panel-id" : 6
+    },
+    {
+      "pid"    : 51,
+      "vid"    : 0,
+      "pos"    : {"y": -838, "x": 0, "z": 869},
+      "panel-id" : 6
+    },
+    {
+      "pid"    : 52,
+      "vid"    : 0,
+      "pos"    : {"y": -831, "x": 0, "z": 739},
+      "panel-id" : 6
+    },
+    {
+      "pid"    : 53,
+      "vid"    : 0,
+      "pos"    : {"y": -838, "x": 0, "z": 610},
+      "panel-id" : 6
+    },
+    {
+      "pid"    : 54,
+      "vid"    : 0,
+      "pos"    : {"y": -831, "x": 0, "z": 480},
+      "panel-id" : 6
+    },
+    {
+      "pid"    : 55,
+      "vid"    : 0,
+      "pos"    : {"y": -838, "x": 0, "z": 351},
+      "panel-id" : 6
+    },
+    {
+      "pid"    : 56,
+      "vid"    : 0,
+      "pos"    : {"y": -831, "x": 0, "z": 221},
+      "panel-id" : 6
     }
   ]
 }

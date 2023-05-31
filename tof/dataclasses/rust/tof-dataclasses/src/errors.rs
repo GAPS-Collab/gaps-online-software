@@ -31,7 +31,8 @@ pub enum SerializationError {
   ValueNotFound,
   EventFragment,
   UnknownPayload,
-  WrongByteSize
+  WrongByteSize,
+  JsonDecodingError
 }
 
 impl fmt::Display for SerializationError {
@@ -46,6 +47,7 @@ impl fmt::Display for SerializationError {
       SerializationError::EventFragment   => {disp = String::from("EventFragment");},
       SerializationError::UnknownPayload  => {disp = String::from("UnknownPayload");},
       SerializationError::WrongByteSize   => {disp = String::from("WrongByteSize");},
+      SerializationError::JsonDecodingError   => {disp = String::from("JsonDecodingError");},
     }
     write!(f, "<Serialization Error : {}>", disp)
   }
@@ -57,6 +59,7 @@ impl Error for SerializationError {
 #[derive(Debug)]
 pub enum DecodingError {
   //HeaderNotFound,
+  ChannelOutOfBounds,
   UnknownType
 }
 
@@ -65,6 +68,7 @@ impl fmt::Display for DecodingError {
     let disp : String;
     match self {
       DecodingError::UnknownType  => {disp = String::from("UnknownType");},
+      DecodingError::ChannelOutOfBounds => {disp = String::from("Remember channels start from 1, not 0");},
     }
     write!(f, "<DecodingError Error : {}>", disp)
   }
@@ -139,3 +143,33 @@ impl fmt::Display for IPBusError {
 
 impl Error for IPBusError {
 }
+
+#[derive(Debug)]
+pub struct BlobError {
+    //DeserializationError,
+    //SerializationError,
+    //GenericError
+    details : String
+}
+
+impl BlobError {
+    fn new(msg: &str) -> BlobError {
+        BlobError{details: msg.to_string()}
+    }
+}
+
+impl fmt::Display for BlobError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f,"{}",self.details)
+    }
+}
+
+
+#[cfg(feature = "diagnostics")]
+impl From<hdf5::Error> for BlobError {
+    fn from(err: hdf5::Error) -> Self {
+        BlobError::new(&err.to_string())
+    }
+}
+
+

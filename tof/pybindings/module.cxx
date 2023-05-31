@@ -5,6 +5,7 @@
 #include <pybind11/complex.h>
 #include <pybind11/functional.h>
 #include <pybind11/chrono.h>
+#include <pybind11/numpy.h>
 
 #include "packets/REventPacket.h"
 #include "packets/RPaddlePacket.h"
@@ -12,15 +13,20 @@
 #include "packets/CommandPacket.h"
 #include "packets/RBEnvPacket.h"
 #include "packets/RBMoniPacket.h"
+#include "packets/MasterTriggerPacket.h"
 
 #include "serialization.h"
+#include "calibration.h"
 #include "blobroutines.h"
 #include "WaveGAPS.h"
 #include "TOFCommon.h"
+#include "events.h"
 
-#include "TofTypeDefs.h"
+#include "tof_typedefs.h"
 
 using namespace GAPS;
+using namespace pybind11::literals;
+namespace py = pybind11;
 
 /***********************************************/
 
@@ -39,6 +45,7 @@ bytestream wrap_encode_ushort_rev(u16 value, size_t start_pos) {
   encode_ushort_rev(value, stream, start_pos);
   return stream;
 }
+
 
 /***********************************************/
 
@@ -231,6 +238,70 @@ BlobEvt_t read_event_helper(std::string filename, i32 n)
 
 /********************/
 
+/*****************
+ * Dismantle a readoutboard file and return the individual
+ * fields as arrays in a python dictionary
+ *
+ */
+py::dict splice_readoutboard_datafile(const std::string filename) {
+  bytestream stream             = get_bytestream_from_file(filename);
+  std::vector<BlobEvt_t> events = get_events_from_stream(stream, 0);
+  vec_u32 event_ids  = vec_u32(); 
+  vec_u16 stop_cells = vec_u16(); 
+  vec_u64 timestamps = vec_u64();
+  
+  // channels, times
+  vec_vec_u16 t_1     = vec_vec_u16();
+  vec_vec_u16 t_2     = vec_vec_u16();
+  vec_vec_u16 t_3     = vec_vec_u16();
+  vec_vec_u16 t_4     = vec_vec_u16();
+  vec_vec_u16 t_5     = vec_vec_u16();
+  vec_vec_u16 t_6     = vec_vec_u16();
+  vec_vec_u16 t_7     = vec_vec_u16();
+  vec_vec_u16 t_8     = vec_vec_u16();
+  vec_vec_u16 t_9     = vec_vec_u16();
+  
+  vec_vec_i16 adc_1     = vec_vec_i16();
+  vec_vec_i16 adc_2     = vec_vec_i16();
+  vec_vec_i16 adc_3     = vec_vec_i16();
+  vec_vec_i16 adc_4     = vec_vec_i16();
+  vec_vec_i16 adc_5     = vec_vec_i16();
+  vec_vec_i16 adc_6     = vec_vec_i16();
+  vec_vec_i16 adc_7     = vec_vec_i16();
+  vec_vec_i16 adc_8     = vec_vec_i16();
+  vec_vec_i16 adc_9     = vec_vec_i16();
+ 
+  for (auto ev : events) {
+     event_ids .push_back(ev.event_ctr);
+     stop_cells.push_back(ev.stop_cell);
+     timestamps.push_back(ev.timestamp);
+     adc_1       .push_back(std::vector<short>(ev.ch_adc[0], std::end(ev.ch_adc[0])));
+     adc_2       .push_back(std::vector<short>(ev.ch_adc[1], std::end(ev.ch_adc[1])));
+     adc_3       .push_back(std::vector<short>(ev.ch_adc[2], std::end(ev.ch_adc[2])));
+     adc_4       .push_back(std::vector<short>(ev.ch_adc[3], std::end(ev.ch_adc[3])));
+     adc_5       .push_back(std::vector<short>(ev.ch_adc[4], std::end(ev.ch_adc[4])));
+     adc_6       .push_back(std::vector<short>(ev.ch_adc[5], std::end(ev.ch_adc[5])));
+     adc_7       .push_back(std::vector<short>(ev.ch_adc[6], std::end(ev.ch_adc[6])));
+     adc_8       .push_back(std::vector<short>(ev.ch_adc[7], std::end(ev.ch_adc[7])));
+     adc_9       .push_back(std::vector<short>(ev.ch_adc[8], std::end(ev.ch_adc[8])));
+  }
+  py::dict data(
+                "event_id"_a  =py::array_t<u32>(event_ids.size(),  event_ids.data()),\
+                "stop_cell"_a =py::array_t<u16>(stop_cells.size(), stop_cells.data()),\
+                "timestamps"_a=py::array_t<u64>(timestamps.size(), timestamps.data()),\
+                "adc_ch1"_a=adc_1,\
+                "adc_ch2"_a=adc_2,\
+                "adc_ch3"_a=adc_3,\
+                "adc_ch4"_a=adc_4,\
+                "adc_ch5"_a=adc_5,\
+                "adc_ch6"_a=adc_6,\
+                "adc_ch7"_a=adc_7,\
+                "adc_ch8"_a=adc_8,\
+                "adc_ch9"_a=adc_9);
+  return data;
+}
+
+
 int get_nevents_from_file(std::string filename){
   FILE* f = fopen(filename.c_str(), "rb");
   BlobEvt_t event;
@@ -319,8 +390,70 @@ vec_vec_f64 tbin_getter(const std::vector<Calibrations_t> cal)
     return tbins;
 }
 
+vec_vec_f32 apply_vcal_allchan_helper(u16 stop_cell,
+                                      Vec<Calibrations_t> cals,
+                                      Vec<Vec<i16>> adc) {
+  Vec<Vec<f32>> waveforms;
+  f32 waveform[NWORDS] = {0};
+  for (usize ch=0; ch<NCHN; ch++) {
+    apply_vcal(stop_cell,
+               adc[ch].data(),
+               cals[ch],
+               waveform);
+    i32 n = sizeof(waveform) / sizeof(waveform[0]);
+    waveforms.push_back(Vec<f32>(waveform, waveform + n));
+  }
+  return waveforms;
+}
+
+
+vec_vec_f32 apply_tcal_allchan_helper(u16 stop_cell,
+                                      Vec<Calibrations_t> cals){
+  vec_vec_f32 all_chan_tcal;
+  f32 times[NWORDS] = {0};
+  for (usize ch=0; ch<NCHN; ch++) {
+    apply_tcal(stop_cell, cals[ch], times);
+    i32 n = sizeof(times) / sizeof(times[0]);
+    all_chan_tcal.push_back(vec_f32(times, times+n));
+  }
+  return all_chan_tcal;
+}
+
+
+Vec<Vec<f32>> apply_tcal_helper(Vec<u16> stop_cells,
+                                Calibrations_t cal) {
+  f32 times[NWORDS] = {0};
+  Vec<Vec<f32>> result;
+  for (auto const &stop_cell : stop_cells) {  
+    apply_tcal(stop_cell, cal, times);
+    i32 n = sizeof(times) / sizeof(times[0]);
+    result.push_back(Vec<f32>(times, times+n));
+  }
+  return result;
+}
+
+
+
+Vec<Vec<f32>> apply_vcal_helper(Vec<u16> stop_cell,
+                                Calibrations_t cal,
+                                Vec<Vec<i16>> adc) {
+  f32 waveform[NWORDS] = {0};
+  Vec<Vec<f32>> result;
+  for (usize k=0; k<adc.size();k++) {
+    apply_vcal(stop_cell[k],
+               adc[k].data(),
+               cal,
+               waveform);
+    int n = sizeof(waveform) / sizeof(waveform[0]);
+    result.push_back(Vec<f32>(waveform, waveform + n));
+  }
+    //vec_f32 result = vec_f32(waveform, waveform + n);
+  
+  return result; 
+}
+
 vec_vec_f64 voltage_calibration_helper(const BlobEvt_t &evt,
-                                                         std::vector<Calibrations_t> cal)
+                                       std::vector<Calibrations_t> cal)
 {
   vec_vec_f64 result;
   for (size_t k=0; k<NCHN; k++) {
@@ -352,26 +485,25 @@ vec_vec_f64 timing_calibration_helper(const BlobEvt_t &evt,
 
 /********************/
 
-vec_vec_f64 remove_spikes_helper(vec_vec_f64 waveforms, 
-                                 const BlobEvt_t &ev)
-{  
-   f64 wf [NCHN][NWORDS];
-   i32 spikes[NWORDS];
-   vec_vec_f64 unspiked;
-   for (size_t ch=0; ch<NCHN; ch++) {
-     unspiked.push_back({});
-     for (size_t n=0; n<NWORDS; n++) {
-       wf[ch][n] = waveforms[ch][n];
-     }
+vec_vec_f64 remove_spikes_helper(u16 stop_cell,
+                                 vec_vec_f64 waveforms) {
+ f64 wf [NCHN][NWORDS];
+ i32 spikes[NWORDS];
+ vec_vec_f64 unspiked;
+ for (size_t ch=0; ch<NCHN; ch++) {
+   unspiked.push_back({});
+   for (size_t n=0; n<NWORDS; n++) {
+     wf[ch][n] = waveforms[ch][n];
+   }
 
-   }
-   RemoveSpikes(wf, ev.stop_cell, spikes);
-   for (size_t ch=0; ch<NCHN; ch++) {
-     for (size_t n=0; n<NWORDS; n++) {
-       unspiked[ch].push_back(wf[ch][n]);
-     } 
-   }
-   return unspiked;
+ }
+ RemoveSpikes(wf, stop_cell, spikes);
+ for (size_t ch=0; ch<NCHN; ch++) {
+   for (size_t n=0; n<NWORDS; n++) {
+     unspiked[ch].push_back(wf[ch][n]);
+   } 
+ }
+ return unspiked;
 }
 
 /********************/
@@ -392,10 +524,28 @@ double calculate_pedestal_helper(vec_f64 wave,
 
 /********************/
 
+std::vector<TofPacket> get_tofpackets_from_stream(vec_u8 bytestream, u64 start_pos) {
+  std::vector<TofPacket> packets;
+  u64 pos  = start_pos;
+  // just make sure in the beginning they
+  // are not the same
+  u64 last_pos = start_pos += 1;
+  TofPacket packet;
+  while (true) {
+    last_pos = pos;
+    pos = packet.from_bytestream(bytestream, pos);
+    if (pos != last_pos) {
+      packets.push_back(packet);
+    } else {
+      break;
+    }
+  }
+  return packets;
+}
 
 /********************/
 
-namespace py = pybind11;
+
 PYBIND11_MODULE(gaps_tof, m) {
     m.doc() = "GAPS Tof dataclasses and utility tools";
    
@@ -419,6 +569,63 @@ PYBIND11_MODULE(gaps_tof, m) {
       .value("StreamAnyEvent"       ,TofCommand::StreamAnyEvent) 
       .value("Unknown"              ,TofCommand::Unknown) 
       .export_values();
+
+    py::class_<RBEventHeader>(m, "RBEventHeader")
+      .def(py::init())
+      .def("from_bytestream", &RBEventHeader::from_bytestream, "Deserialize from a list of bytes")
+      .def("extract_from_rbbinarydump", &RBEventHeader::extract_from_rbbinarydump, "Get header from full rbevent binary stream ('blob')")
+      .def("get_active_data_channels", &RBEventHeader::get_active_data_channels, "Get a list of active channels, excluding ch9. Channel9 will (usually) always be on, as long as a single data channel is switched on as well.")
+      .def("get_fpga_temp", &RBEventHeader::get_fpga_temp, "The FPGA temperature in C")
+      .def("get_drs_temp",  &RBEventHeader::get_drs_temp, "The DRS4 temperature in C, read out by software")
+      .def("get_clock_cycles_48bit", &RBEventHeader::get_clock_cycles_48bit, "The complete 48bit timestamp, derived from the RB clock (usually 33MHz)")
+      .def("get_n_datachan", &RBEventHeader::get_n_datachan)
+      //.def("get_timestamp_16_corrected",   &RBEventHeader::get_timestamp_16_corrected)
+      .def_readonly("channel_mask"       , &RBEventHeader::channel_mask)   
+      .def_readonly("stop_cell"          , &RBEventHeader::stop_cell   )   
+      .def_readonly("crc32"              , &RBEventHeader::crc32       )   
+      .def_readonly("dtap0"              , &RBEventHeader::dtap0       )   
+      .def_readonly("drs4_temp"          , &RBEventHeader::drs4_temp   )   
+      .def_readonly("is_locked"          , &RBEventHeader::is_locked   )   
+      .def_readonly("is_locked_last_sec" , &RBEventHeader::is_locked_last_sec)   
+      .def_readonly("lost_trigger"       , &RBEventHeader::lost_trigger)   
+      .def_readonly("fpga_temp"          , &RBEventHeader::fpga_temp   )   
+      .def_readonly("event_id"           , &RBEventHeader::event_id    )   
+      .def_readonly("rb_id"              , &RBEventHeader::rb_id       )   
+      //.def_readonly("timestamp_32"       , &RBEventHeader::timestamp_32)   
+      //.def_readonly("timestamp_16"       , &RBEventHeader::timestamp_16)   
+      .def_readonly("broken"             , &RBEventHeader::broken      )   
+      .def("__repr__",        [](const RBEventHeader &h) {
+                                  return "<RBEventHeader : \n"
+                                  + String(" rb id ")     + std::to_string(h.rb_id)
+                                  + "\n event id "        + std::to_string(h.event_id)
+                                  + "\n is locked "       + std::to_string(h.is_locked)
+                                  + "\n is locked (1s) "  + std::to_string(h.is_locked_last_sec)
+                                  + "\n lost trigger "    + std::to_string(h.lost_trigger)
+                                  + "\n channel mask "    + std::to_string(h.channel_mask)
+                                  + "\n stop cell "       + std::to_string(h.stop_cell)
+                                  + "\n crc32 "           + std::to_string(h.crc32)
+                                  + "\n dtap0 "           + std::to_string(h.dtap0)
+                                  + "\n timestamp (48bit) " + std::to_string(h.timestamp_48)
+                                  + "\n FPGA temp [C] " + std::to_string(h.get_fpga_temp())
+                                  + "\n DRS4 temp [C] " + std::to_string(h.get_drs_temp())
+                                  + ">";
+                                  })
+    
+      
+    ;
+  
+    py::class_<MasterTriggerPacket>(m, "MasterTriggerPacket")
+      .def(py::init())
+      .def("to_bytestream",   &MasterTriggerPacket::to_bytestream, "Serialize to a list of bytes")
+      .def("from_bytestream", &MasterTriggerPacket::from_bytestream, "Deserialize from a list of bytes")
+      .def_readwrite("event_id"        , &MasterTriggerPacket::event_id        ) 
+      .def_readwrite("timestamp"       , &MasterTriggerPacket::timestamp       )
+      .def_readwrite("tiu_timestamp"   , &MasterTriggerPacket::tiu_timestamp   )
+      .def_readwrite("gps_timestamp_32", &MasterTriggerPacket::gps_timestamp_32)
+      .def_readwrite("gps_timestamp_16", &MasterTriggerPacket::gps_timestamp_16)
+      .def_readwrite("board_mask"      , &MasterTriggerPacket::board_mask      )
+      .def_readwrite("n_paddles"       , &MasterTriggerPacket::n_paddles       ) 
+    ;
 
     py::class_<CommandPacket>(m, "CommandPacket") 
       .def(py::init<TofCommand const&, u32 const>())  
@@ -702,7 +909,9 @@ PYBIND11_MODULE(gaps_tof, m) {
    py::class_<Calibrations_t>(m, "Calibrations")
        .def(py::init())
    ;
-
+   m.def("get_tofpackets_from_stream",   &get_tofpackets_from_stream);
+   m.def("get_event_ids_from_raw_stream", &get_event_ids_from_raw_stream);
+   m.def("get_bytestream_from_file",     &get_bytestream_from_file);
    // serialization functions
    m.def("decode_u16",         &decode_ushort);
    m.def("encode_u16",         &wrap_encode_ushort);
@@ -728,10 +937,15 @@ PYBIND11_MODULE(gaps_tof, m) {
    // functions to read and parse blob files
    m.def("search_for_2byte_marker",  &search_for_2byte_marker);
    m.def("get_2byte_marker_indices", &get_2byte_markers_indices);
+   m.def("splice_readoutboard_datafile",   &splice_readoutboard_datafile);
    m.def("get_events_from_stream",   &get_events_from_stream);
    m.def("get_nevents_from_file",    &get_nevents_from_file);
    m.def("ReadEvent",                &read_event_helper);
 
+   m.def("apply_vcal_allchan",       &apply_vcal_allchan_helper);
+   m.def("apply_vcal",               &apply_vcal_helper);
+   m.def("apply_tcal_allchan",       &apply_tcal_allchan_helper);
+   m.def("apply_tcal",               &apply_tcal_helper);
    m.def("voltage_calibration",      &voltage_calibration_helper);
    m.def("timing_calibration",       &timing_calibration_helper);
    m.def("remove_spikes",            &remove_spikes_helper);
@@ -740,7 +954,7 @@ PYBIND11_MODULE(gaps_tof, m) {
    m.def("get_vincs",                &increment_getter);
    m.def("get_vdips",                &dip_getter);
    m.def("get_tbins",                &tbin_getter);
-   
+   m.def("get_headers",              &get_headers); 
    // waveform stuff
    m.def("calculate_pedestal",       &calculate_pedestal_helper);
 }
