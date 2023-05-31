@@ -1,6 +1,6 @@
 [package]
 name        = "liftof-cc" # the name of the package
-version     = "0.4.0"    # the current version, obeying semver
+version     = "0.5.0"    # the current version, obeying semver
 authors     = ["J.A. Stoessl <stoessl@hawaii.edu>", "Jeff Zweerink <zweering@astro.ucla.edu>"]
 description = "A programm for the GAPS science instrument. Read out the time-of-flight detectors and process their data."
 
@@ -25,7 +25,8 @@ random =[]
 
 [dependencies]
 
-tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["random"], verison = "0.2"} 
+tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["random"], version = "0.5"} 
+liftof-lib = { path = "../liftof-lib" , features = ["random"], version="0.5"}
 
 zmq = "0.10.0"
 # this is technically optional
@@ -55,7 +56,6 @@ crossbeam-channel = "0.5"
 ctrlc = "3.2"
 
 
-liftof-lib = { path = "../liftof-lib" , features = ["random"]}
 
 # logging
 log = "0.4"

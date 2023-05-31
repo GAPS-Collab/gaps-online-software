@@ -1,3 +1,13 @@
+# UHU series
+
+## v0.5.0 - in development
+* transition to sqlite db usage for paddle mapping
+* instead of marking which rbs to use, blacklist them   
+  in the json parameter file
+* environmental parameter capture and addition to the data
+  stream
+
+
 # 0.2.0 
 
 * change to new PUB/SUB scheme, where the RBs prefix their stream with "RBXX"

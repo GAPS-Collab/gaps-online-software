@@ -1,9 +1,17 @@
+# UHU series
+
+v0.5.0 - TODO
+* remotely change RunParams
+
+
+
 # MOA series
 
 v0.4.2
 * Switch from depreacted RunParams to RunConfig struct
 * Includes the possibility to use a json config file
 * New feature - use only a subset of channels
+* Send only header information
 
 v0.4.0
 * Waveform analysis possible directly on the board
