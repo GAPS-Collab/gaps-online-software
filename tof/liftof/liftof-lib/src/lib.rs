@@ -160,7 +160,6 @@ pub fn master_trigger(mt_ip          : &str,
  
   let mut socket = connect_to_mtb(&mt_ip, &mt_port).expect("Can not create local UDP socket for MTB connection!"); 
   //socket.set_nonblocking(true).unwrap();
-  
   // we only allocate the buffer once
   // and reuse it for all operations
   let mut buffer = [0u8;MT_MAX_PACKSIZE];  
@@ -221,7 +220,7 @@ pub fn master_trigger(mt_ip          : &str,
     if timer.elapsed().as_secs() > 10 {
       match read_rate(&socket, &mt_address, &mut buffer) {
         Err(err) => {
-          error!("Unable to obtain MT rate information!");
+          error!("Unable to obtain MT rate information! {err}");
           continue;
         }
         Ok(rate) => {
@@ -234,7 +233,6 @@ pub fn master_trigger(mt_ip          : &str,
       }
       timer = Instant::now();
     }
-
 
     //info!("Next iter...");
     // limit the max polling rate
@@ -272,7 +270,7 @@ pub fn master_trigger(mt_ip          : &str,
     //event_cnt = read_event_cnt(&socket, &mt_address, &mut buffer);
     //println!("Will read daq");
     mt_event = read_daq(&socket, &mt_address, &mut buffer);
-    //println!("Got event");
+    //panic!("Got event");
     match mt_event {
       Err(err) => {
         trace!("Did not get new event, Err {err}");
@@ -345,9 +343,13 @@ pub fn master_trigger(mt_ip          : &str,
     // measure rate every 100 events
     if n_events % 1000 == 0 {
       rate = n_events as f64 / elapsed as f64;
-      println!("==> [MASTERTRIGGER] {} events recorded, trigger rate: {:.3} Hz", n_events, rate);
+      if verbose {
+        println!("==> [MASTERTRIGGER] {} events recorded, trigger rate: {:.3} Hz", n_events, rate);
+      }
       rate = n_events_expected as f64 / elapsed as f64;
-      println!("==> -- expected rate {:.3} Hz", rate);   
+      if verbose { 
+        println!("==> -- expected rate {:.3} Hz", rate);   
+      }
     } 
     // end new event
   } // end loop

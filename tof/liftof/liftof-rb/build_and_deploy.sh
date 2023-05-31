@@ -7,8 +7,8 @@ compile_and_deploy_target() {
 # first delete everything, since there might be remains of a previously issued cargo check
 rm -rf ../target/armv7-unknown*
 
-compile_and_deploy_target liftof-rb ucla-rb149
-for rb in ucla-rb00 ucla-rb01 ucla-rb02 ucla-rb03 ucla-rb04 ucla-rb07 ucla-rb08 ucla-rb09 ucla-rb10;
+compile_and_deploy_target liftof-rb tof-rb149
+for rb in tof-rb00 tof-rb01 tof-rb02 tof-rb03 tof-rb04 tof-rb07 tof-rb08 tof-rb09 tof-rb10;
 do compile_and_deploy_target liftof-rb $rb;
 done
 
