@@ -6,10 +6,10 @@
 //use liftof_lib::ReadoutBoard;
 use std::net::{IpAddr, Ipv4Addr};
 use zmq;
-use local_ip_address::local_ip;
 
 use tof_dataclasses::manifest::ReadoutBoard;
 use tof_dataclasses::commands::TofCommand;
+extern crate crossbeam_channel;
 use crossbeam_channel::Receiver;
 
 pub const DATAPORT : u32 = 42000;

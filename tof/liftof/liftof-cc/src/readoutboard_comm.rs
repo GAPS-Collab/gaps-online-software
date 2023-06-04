@@ -1,12 +1,11 @@
 //! Routines for RB commiunication and data reception 
 
 use std::time::{SystemTime, UNIX_EPOCH};
-use std::{fs, fs::File, path::Path};
+use std::{fs::File, path::Path};
 //use std::io::Read;
 use std::io::Write;
 use std::fs::OpenOptions;
-//use crossbeam_channel as cbc; 
-use crossbeam_channel::{Sender, unbounded};
+use crossbeam_channel::Sender;
 
 #[cfg(feature = "diagnostics")]
 //use waveform::CalibratedWaveformForDiagnostics;
@@ -22,16 +21,11 @@ use tof_dataclasses::packets::PacketType;
 use tof_dataclasses::packets::paddle_packet::PaddlePacket;
 use tof_dataclasses::calibrations::{Calibrations,
                                     read_calibration_file};
-use tof_dataclasses::events::blob::{BlobData,
-                                    get_constant_blobeventsize};
-use tof_dataclasses::constants::{NCHN,
-                                 NWORDS};
+use tof_dataclasses::constants::NCHN;
 
 use tof_dataclasses::commands::TofResponse;
 use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::serialization::Serialization;
-use tof_dataclasses::serialization::search_for_u16;
-use crate::waveform::CalibratedWaveform;
 
 
 /*************************************/
@@ -67,9 +61,7 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
   let zmq_ctx = zmq::Context::new();
   let board_id = rb.rb_id; //rb.id.unwrap();
   info!("initializing RB thread for board {}!", board_id);
-  let mut msg             = zmq::Message::new();
   let mut n_errors        = 0usize;
-  let mut lost_blob_files = 0usize;
   // how many chunks ("buffers") we dealt with
   let mut n_chunk  = 0usize;
   // in case we want to do calibratoins
@@ -85,18 +77,24 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
               + ":"
               +  &rb.port.to_string();
   let socket = zmq_ctx.socket(zmq::SUB).expect("Unable to create socket!");
-  socket.connect(&address);
-  info!("Connected to {address}");
+  match socket.connect(&address) {
+    Err(err) => error!("Can not connect to socket {}, {}", address, err),
+    Ok(_)    => info!("Connected to {address}")
+  }
   // FIXME - do not subscribe to all, only this 
   // specific RB
-  let mut topic = b"";
+  let topic = b"";
   //let mut topic : String;
   //if rb.id.unwrap() < 10 {
   //  topic = String::from("RB0") + &rb.id.unwrap().to_string();
   //} else {
   //  topic = String::from("RB") + &rb.id.unwrap().to_string();
   //}
-  socket.set_subscribe(topic);
+  match socket.set_subscribe(topic) {
+   Err(err) => error!("Unable to subscribe to topic! {err}"),
+   Ok(_) => ()
+
+  }
   //socket.set_subscribe(topic.as_bytes());
   let mut secs_since_epoch = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
   let mut blobfile_name = storage_savepath.to_owned() + "RB" 

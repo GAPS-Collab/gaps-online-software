@@ -23,7 +23,7 @@ extern crate hdf5;
 extern crate ndarray;
 
 extern crate local_ip_address;
-
+extern crate crossbeam_channel;
 extern crate liftof_lib;
 use liftof_lib::{ReadoutBoard, 
                  //rb_manifest_from_json,
@@ -37,14 +37,4 @@ extern crate zmq;
 extern crate tof_dataclasses;
 
 
-extern crate crossbeam_channel;
-//use crossbeam_channel::{unbounded,
-//                        Sender,
-//                        Receiver};
-use crossbeam_channel as cbc; 
-use tof_dataclasses::events::MasterTriggerEvent;
-//                            MasterTriggerEvent};
-use tof_dataclasses::threading::ThreadPool;
-use tof_dataclasses::packets::paddle_packet::PaddlePacket;
-use tof_dataclasses::packets::TofPacket;
 

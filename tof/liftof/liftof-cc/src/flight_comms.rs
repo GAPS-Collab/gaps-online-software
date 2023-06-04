@@ -9,6 +9,7 @@ use local_ip_address::local_ip;
 use std::net::IpAddr;
 
 use std::sync::mpsc::Receiver;
+extern crate crossbeam_channel;
 use crossbeam_channel as cbc; 
 
 use tof_dataclasses::packets::{TofPacket,
@@ -76,7 +77,7 @@ pub fn global_data_sink(incoming : &cbc::Receiver<TofPacket>,
             for ev in event_cache.iter() {
               last_evid = TofEvent::get_evid_from_bytestream(&ev.payload,0).unwrap();
               match data_socket.send(&ev.to_bytestream(),0) {
-                Err(err) => error!("Not able to send packet over 0MQ PUB"),
+                Err(err) => error!("Not able to send packet over 0MQ PUB, {err}"),
                 Ok(_)    => { 
                   trace!("TofPacket sent");
                   n_pack_sent += 1;
@@ -88,7 +89,7 @@ pub fn global_data_sink(incoming : &cbc::Receiver<TofPacket>,
 
         } else {
           match data_socket.send(pack.to_bytestream(),0) {
-            Err(err) => warn!("Not able to send packet over 0MQ PUB"),
+            Err(err) => error !("Not able to send packet over 0MQ PUBi {err}"),
             Ok(_)    => {
               trace!("TofPacket sent");
               n_pack_sent += 1;

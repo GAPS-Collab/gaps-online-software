@@ -3,7 +3,6 @@
 //!
 //!
 
-
 use crossbeam_channel::{Sender,
                         Receiver};
 
@@ -61,7 +60,10 @@ fn build_events_in_cache(event_cache   : &mut VecDeque<TofEvent>,
       for k in 0..pps.len() {
         if !pps[k].valid
           {continue;}
-        ev.add_paddle(pps[k]);
+        match ev.add_paddle(pps[k]) {
+         Err(err) => error!("Unable to add paddle! {err}"),
+         Ok(_)    => ()
+        }
         pps[k].invalidate();
       }
     }
@@ -85,7 +87,10 @@ fn build_events_in_cache(event_cache   : &mut VecDeque<TofEvent>,
       }
       continue;
     } // end ready to send
-    evid_query.send(Some(ev.event_id));
+    match evid_query.send(Some(ev.event_id)) {
+      Err(err) => error!("Can not send even query for event {}, {}", ev.event_id, err),
+      Ok(_)    =>()
+    }
     let mut n_received = 0;
     let mut n_new      = 0;
     let mut n_seen    = 0;
@@ -211,8 +216,8 @@ pub fn event_builder (m_trig_ev      : &cbc::Receiver<MasterTriggerEvent>,
         let rbs_in_ev = mt_mapping.get_rb_ids(&mt);
         //println!("{:?}", mt);
         //println!("[EVT-BLDR] Get the following RBs in this event {:?}", rbs_in_ev);
-        let mut event = TofEvent::from(&mt);
-        if (event.event_id != last_evid + 1) {
+        let event = TofEvent::from(&mt);
+        if event.event_id != last_evid + 1 {
           let delta_id = event.event_id - last_evid;
           error!("We skipped event ids {}", delta_id );
         }
@@ -220,7 +225,10 @@ pub fn event_builder (m_trig_ev      : &cbc::Receiver<MasterTriggerEvent>,
         event_cache.push_back(event);
         // we will push the MasterTriggerEvent down the sink
         let tp = TofPacket::from(&mt);
-        data_sink.try_send(tp);
+        match data_sink.try_send(tp) {
+          Err(err) => error!("Unable to send tof packet to data sink! {err}"),
+          Ok(_)    => ()
+        }
       }
     } // end match Ok(mt)
     if n_iter  == 500 {

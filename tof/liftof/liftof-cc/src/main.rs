@@ -121,9 +121,7 @@ fn main() {
   let mut master_trigger_port = 0usize;
 
   // Have all the readoutboard related information in this list
-  let mut rb_list      : Vec::<ReadoutBoard>;
   let rb_list_depr : Vec::<liftof_lib::ReadoutBoard>;
-  let mut manifest = (Vec::<LocalTriggerBoard>::new(), Vec::<ReadoutBoard>::new());
   let mut json_manifest = (Vec::<liftof_lib::LocalTriggerBoard>::new(), Vec::<liftof_lib::ReadoutBoard>::new());
 
   match args.json_config {
@@ -338,7 +336,7 @@ fn main() {
     let cmd_sender_c = cmd_sender.clone();
     let rb_list_c    = rb_list.clone();
     let ltb_list_c   = ltb_list.clone();
-    let mut mapping = MasterTriggerMapping::new(ltb_list_c, rb_list_c);
+    let mapping = MasterTriggerMapping::new(ltb_list_c, rb_list_c);
     println!("{:?}", mapping.ltb_mapping);
     //exit(0);
     worker_threads.execute(move || {
@@ -372,7 +370,10 @@ fn main() {
   ctrlc::set_handler(move || {
     println!("received Ctrl+C! We will stop triggers and end the run!");
     let end_run = TofCommand::DataRunEnd(42);
-    cmd_sender_c.send(end_run);
+    match cmd_sender_c.send(end_run) {
+     Err(err) => error!("Can not send end run command! {err}"),
+     Ok(_)    => ()
+    }
     thread::sleep(one_second);
     println!("So long and thanks for all the \u{1F41F}"); 
     exit(0);
@@ -381,7 +382,10 @@ fn main() {
   
   // start a new data run 
   let start_run = TofCommand::DataRunStart(1000);
-  cmd_sender.send(start_run);
+  match cmd_sender.send(start_run) {
+    Err(err) => error!("Unable to send command, error{err}"),
+    Ok(_)    => ()
+  }
 
   println!("All threads initialized!");
   loop{

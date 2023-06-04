@@ -7,20 +7,12 @@
 
 use std::time::{Instant,
                 Duration};
-//use std::sync::mpsc::{Sender,
-//                      Receiver};
 use crossbeam_channel::{Sender,
                         Receiver};
-use std::collections::HashMap;
 
 use std::collections::VecDeque;
 
-//use crate::reduced_tofevent::{PaddlePacket,
-//                              TofEvent};
-use tof_dataclasses::events::TofEvent;
-use crate::constants::{PADDLE_PACKET_CACHE_SIZE,
-                       EVENT_CACHE_SIZE,
-                       EXP_N_PADDLES_PER_EVENT};
+use crate::constants::PADDLE_PACKET_CACHE_SIZE;
 
 use tof_dataclasses::packets::paddle_packet::PaddlePacket;
 
@@ -152,9 +144,8 @@ pub fn paddle_packet_cache (evid_rec    : &Receiver<Option<u32>>,
   //// received event ids from the eventbuilder, 
   //// which have to be worked on
   ////let mut m_evid_cache = VecDeque::<MasterTriggerEvent>::with_capacity(EVENT_BUILDER_EVID_CACHE_SIZE); 
-  let n_tries = 20;
 
-  let mut start = Instant::now();
+  let mut start : Instant;
   let timeout_micro = Duration::from_micros(100);
 
 
@@ -165,7 +156,6 @@ pub fn paddle_packet_cache (evid_rec    : &Receiver<Option<u32>>,
     // every iteration, we welcome new paddle packets
     // and keep them. Let's try to receive a certain 
     // number of paddles, and then move on
-    let mut try = 0;
     start = Instant::now();
     while start.elapsed() < timeout_micro {
       match pp_rec.try_recv() {
@@ -173,7 +163,7 @@ pub fn paddle_packet_cache (evid_rec    : &Receiver<Option<u32>>,
           trace!("Got paddle packet for event {}", pp.event_id);
           pp_cache.push_back(pp);
         }
-        Err(err) => {
+        Err(_err) => {
           continue;
           //error!("Can not receive paddle packet!, err {}", err);
           //try += 1;
@@ -189,7 +179,7 @@ pub fn paddle_packet_cache (evid_rec    : &Receiver<Option<u32>>,
     // after we received the paddles,
     // let's try to answer event id requests.
     match evid_rec.try_recv() {
-      Err(err)          => {
+      Err(_err)          => {
         //error!("Can not receive event id! {}", err);
         continue;
       },
