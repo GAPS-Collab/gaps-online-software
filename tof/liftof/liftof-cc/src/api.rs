@@ -68,9 +68,8 @@ pub fn tofcmp_and_mtb_moni(tp_to_sink    : &Sender<TofPacket>,
         }
       }
       if let Ok(cpu_temp) = read_cpu_temperature() {
-        let mut tofcmp_moni = TofCmpMoniData::new();
         tofcmp_moni.cpu_temp = cpu_temp;
-        info!("Got Tof computer CPU temp of {cpu_temp} C");
+        println!("Got Tof computer CPU temp of {cpu_temp} C");
       } else {
         error!("Unable to obtain CPU temperature of the Tof main computer!");
       }
