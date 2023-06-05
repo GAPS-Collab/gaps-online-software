@@ -3,12 +3,15 @@
 //! This is 
 //! a) Monitoring the RBs
 //! b) Monitoring the tof-computer/main C&C instance
-//!
+//! c) Monitoring the MTB
 //!
 //!
 
+use std::fmt;
 use crate::serialization::{Serialization,
-                           SerializationError};
+                           SerializationError,
+                           search_for_u16,
+                           parse_f32};
 
 /// A collection of monitoring data
 /// from the readoutboards
@@ -77,6 +80,130 @@ impl Serialization for RBMoniData {
       return Err(SerializationError::TailInvalid {});
     }
     Ok(moni_data) 
+  }
+}
+
+/// Monitoring the main tof computer
+pub struct TofCmpMoniData {
+  pub cpu_temp : f32,
+}
+
+impl TofCmpMoniData {
+  const SIZE : usize = 8;
+  const HEAD : u16   = 0xAAAA;
+  const TAIL : u16   = 0x5555;
+  
+  pub fn new() -> TofCmpMoniData {
+    TofCmpMoniData {
+      cpu_temp : -4242.42,
+    }
+  }
+}
+
+impl Default for TofCmpMoniData {
+  fn default() -> TofCmpMoniData {
+    TofCmpMoniData::new()
+  }
+}
+
+impl fmt::Display for TofCmpMoniData {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    write!(f, "<TofCmpMoniData:\n
+           \t CPU TMP [C] {}>",
+           self.cpu_temp)
+  }
+}
+
+impl Serialization for TofCmpMoniData {
+
+  fn to_bytestream(&self) -> Vec<u8> {
+    let mut stream = Vec::<u8>::with_capacity(TofCmpMoniData::SIZE);
+    stream.extend_from_slice(&TofCmpMoniData::HEAD.to_le_bytes());
+    stream.extend_from_slice(&self.cpu_temp  .to_le_bytes());
+    stream.extend_from_slice(&TofCmpMoniData::TAIL.to_le_bytes());
+    stream
+  }
+
+  fn from_bytestream(stream : &Vec<u8>, pos : &mut usize)
+    -> Result<TofCmpMoniData, SerializationError> {
+    let mut moni_data = TofCmpMoniData::new();
+    let head_pos = search_for_u16(TofCmpMoniData::HEAD, stream, *pos)?; 
+    let tail_pos = search_for_u16(TofCmpMoniData::TAIL, stream, head_pos + TofCmpMoniData::SIZE-2)?;
+    // At this state, this can be a header or a full event. Check here and
+    // proceed depending on the options
+    if tail_pos + 2 - head_pos != TofCmpMoniData::SIZE {
+      error!("TofCmpMoniData incomplete. Seing {} bytes, but expecting {}", tail_pos + 2 - head_pos, TofCmpMoniData::SIZE);
+      //error!("{:?}", &stream[head_pos + 18526..head_pos + 18540]);
+      *pos = head_pos + 2; //start_pos += RBBinaryDump::SIZE;
+      return Err(SerializationError::WrongByteSize);
+    }
+    *pos = head_pos + 2; 
+    moni_data.cpu_temp  = parse_f32(&stream, pos);
+    *pos += 2; // since we deserialized the tail earlier and 
+              // didn't account for it
+    Ok(moni_data)
+  }
+}
+
+/// Monitoring the MTB
+pub struct MtbMoniData {
+  pub cpu_temp : f32,
+}
+
+impl MtbMoniData {
+  const SIZE : usize = 8;
+  const HEAD : u16   = 0xAAAA;
+  const TAIL : u16   = 0x5555;
+  
+  pub fn new() -> MtbMoniData {
+    MtbMoniData {
+      cpu_temp : -4242.42,
+    }
+  }
+}
+
+impl Default for MtbMoniData {
+  fn default() -> MtbMoniData {
+    MtbMoniData::new()
+  }
+}
+
+impl fmt::Display for MtbMoniData {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    write!(f, "<MtbMoniData:\n
+           \t CPU TMP [C] {}>",
+           self.cpu_temp)
+  }
+}
+
+impl Serialization for MtbMoniData {
+
+  fn to_bytestream(&self) -> Vec<u8> {
+    let mut stream = Vec::<u8>::with_capacity(MtbMoniData::SIZE);
+    stream.extend_from_slice(&MtbMoniData::HEAD.to_le_bytes());
+    stream.extend_from_slice(&self.cpu_temp  .to_le_bytes());
+    stream.extend_from_slice(&MtbMoniData::TAIL.to_le_bytes());
+    stream
+  }
+
+  fn from_bytestream(stream : &Vec<u8>, pos : &mut usize)
+    -> Result<MtbMoniData, SerializationError> {
+    let mut moni_data = MtbMoniData::new();
+    let head_pos = search_for_u16(MtbMoniData::HEAD, stream, *pos)?; 
+    let tail_pos = search_for_u16(MtbMoniData::TAIL, stream, head_pos + MtbMoniData::SIZE-2)?;
+    // At this state, this can be a header or a full event. Check here and
+    // proceed depending on the options
+    if tail_pos + 2 - head_pos != MtbMoniData::SIZE {
+      error!("MtbMoniData incomplete. Seing {} bytes, but expecting {}", tail_pos + 2 - head_pos, TofCmpMoniData::SIZE);
+      //error!("{:?}", &stream[head_pos + 18526..head_pos + 18540]);
+      *pos = head_pos + 2; //start_pos += RBBinaryDump::SIZE;
+      return Err(SerializationError::WrongByteSize);
+    }
+    *pos = head_pos + 2; 
+    moni_data.cpu_temp  = parse_f32(&stream, pos);
+    *pos += 2; // since we deserialized the tail earlier and 
+              // didn't account for it
+    Ok(moni_data)
   }
 }
 

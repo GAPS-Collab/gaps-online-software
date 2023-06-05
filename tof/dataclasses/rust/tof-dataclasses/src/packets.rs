@@ -17,7 +17,9 @@
 pub mod paddle_packet;
 
 use std::fmt;
-pub use crate::monitoring::RBMoniData;
+pub use crate::monitoring::{RBMoniData,
+                            TofCmpMoniData,
+                            MtbMoniData};
 use crate::serialization::{Serialization};
 use crate::errors::SerializationError;
 use crate::events::{RBEventPayload,
@@ -34,15 +36,22 @@ pub enum PacketQuality {
 }
 
 
-pub const PACKET_TYPE_UNKNOWN   : u8 =  0;
-pub const PACKET_TYPE_COMMAND   : u8 = 10;
-pub const PACKET_TYPE_RBEVENT   : u8 = 20;
-pub const PACKET_TYPE_TOFEVENT  : u8 = 21;
-pub const PACKET_TYPE_MONITOR   : u8 = 30;
-pub const PACKET_TYPE_HEARTBEAT : u8 = 40;
-pub const PACKET_TYPE_SCALAR    : u8 = 50;
-pub const PACKET_TYPE_MT        : u8 = 60;
-pub const PACKET_TYPE_RBHEADER  : u8 = 70;
+pub const PACKET_TYPE_UNKNOWN        : u8 =  0;
+pub const PACKET_TYPE_COMMAND        : u8 = 10;
+pub const PACKET_TYPE_RBEVENT        : u8 = 20;
+pub const PACKET_TYPE_TOFEVENT       : u8 = 21;
+// not specific enough, deprecated. Use the packet
+// types for monitor packets below
+pub const PACKET_TYPE_MONITOR     : u8 = 30;
+pub const PACKET_TYPE_HEARTBEAT   : u8 = 40;
+pub const PACKET_TYPE_SCALAR      : u8 = 50;
+pub const PACKET_TYPE_MT          : u8 = 60;
+pub const PACKET_TYPE_RBHEADER    : u8 = 70;
+// monitoring packets
+pub const PACKET_TYPE_TOFCMP_MONI : u8 = 80;
+pub const PACKET_TYPE_MTB_MONI    : u8 = 90;
+pub const PACKET_TYPE_RB_MONI     : u8 = 100;
+
 
 //// Each packet is send from somewhere.
 ////
@@ -83,34 +92,43 @@ pub enum PacketType {
   HeartBeat     ,
   Scalar        ,
   RBHeader      ,
+  MonitorRb     ,
+  MonitorTofCmp ,
+  MonitorMtb    ,
 }
 
 impl PacketType {
   pub fn as_u8(packet_type : &PacketType)   -> u8 {
     match packet_type {
-      PacketType::Unknown       => PACKET_TYPE_UNKNOWN,
-      PacketType::Command       => PACKET_TYPE_COMMAND,
-      PacketType::RBEvent       => PACKET_TYPE_RBEVENT,
-      PacketType::TofEvent      => PACKET_TYPE_TOFEVENT,
-      PacketType::Monitor       => PACKET_TYPE_MONITOR,
-      PacketType::HeartBeat     => PACKET_TYPE_HEARTBEAT,
-      PacketType::MasterTrigger => PACKET_TYPE_MT,
-      PacketType::Scalar        => PACKET_TYPE_SCALAR,
-      PacketType::RBHeader      => PACKET_TYPE_RBHEADER
+      PacketType::Unknown        => PACKET_TYPE_UNKNOWN,
+      PacketType::Command        => PACKET_TYPE_COMMAND,
+      PacketType::RBEvent        => PACKET_TYPE_RBEVENT,
+      PacketType::TofEvent       => PACKET_TYPE_TOFEVENT,
+      PacketType::Monitor        => PACKET_TYPE_MONITOR,
+      PacketType::HeartBeat      => PACKET_TYPE_HEARTBEAT,
+      PacketType::MasterTrigger  => PACKET_TYPE_MT,
+      PacketType::Scalar         => PACKET_TYPE_SCALAR,
+      PacketType::RBHeader       => PACKET_TYPE_RBHEADER,
+      PacketType::MonitorRb      => PACKET_TYPE_RB_MONI,
+      PacketType::MonitorTofCmp => PACKET_TYPE_TOFCMP_MONI,
+      PacketType::MonitorMtb     => PACKET_TYPE_MTB_MONI
     }
   }
 
   pub fn from_u8(value : u8) -> Option<PacketType> {
     match value {
-      PACKET_TYPE_UNKNOWN   => Some(PacketType::Unknown),  
-      PACKET_TYPE_COMMAND   => Some(PacketType::Command), 
-      PACKET_TYPE_RBEVENT   => Some(PacketType::RBEvent), 
-      PACKET_TYPE_TOFEVENT  => Some(PacketType::TofEvent),
-      PACKET_TYPE_MONITOR   => Some(PacketType::Monitor), 
-      PACKET_TYPE_HEARTBEAT => Some(PacketType::HeartBeat),
-      PACKET_TYPE_MT        => Some(PacketType::MasterTrigger),
-      PACKET_TYPE_SCALAR    => Some(PacketType::Scalar),
-      PACKET_TYPE_RBHEADER  => Some(PacketType::RBHeader),
+      PACKET_TYPE_UNKNOWN     => Some(PacketType::Unknown),  
+      PACKET_TYPE_COMMAND     => Some(PacketType::Command), 
+      PACKET_TYPE_RBEVENT     => Some(PacketType::RBEvent), 
+      PACKET_TYPE_TOFEVENT    => Some(PacketType::TofEvent),
+      PACKET_TYPE_MONITOR     => Some(PacketType::Monitor), 
+      PACKET_TYPE_HEARTBEAT   => Some(PacketType::HeartBeat),
+      PACKET_TYPE_MT          => Some(PacketType::MasterTrigger),
+      PACKET_TYPE_SCALAR      => Some(PacketType::Scalar),
+      PACKET_TYPE_RBHEADER    => Some(PacketType::RBHeader),
+      PACKET_TYPE_RB_MONI     => Some(PacketType::MonitorRb),
+      PACKET_TYPE_MTB_MONI    => Some(PacketType::MonitorMtb),
+      PACKET_TYPE_TOFCMP_MONI => Some(PacketType::MonitorTofCmp),
       _   => None,
     }
   }
@@ -212,7 +230,25 @@ impl From<&MasterTriggerEvent> for TofPacket {
 impl From<&RBMoniData> for TofPacket {
   fn from(moni : &RBMoniData) -> TofPacket {
     let mut tp = TofPacket::new();
-    tp.packet_type = PacketType::Monitor;
+    tp.packet_type = PacketType::MonitorRb;
+    tp.payload = moni.to_bytestream();
+    tp
+  }
+}
+
+impl From<&MtbMoniData> for TofPacket {
+  fn from(moni : &MtbMoniData) -> TofPacket {
+    let mut tp = TofPacket::new();
+    tp.packet_type = PacketType::MonitorMtb;
+    tp.payload = moni.to_bytestream();
+    tp
+  }
+}
+
+impl From<&TofCmpMoniData> for TofPacket {
+  fn from(moni : &TofCmpMoniData) -> TofPacket {
+    let mut tp = TofPacket::new();
+    tp.packet_type = PacketType::MonitorTofCmp;
     tp.payload = moni.to_bytestream();
     tp
   }

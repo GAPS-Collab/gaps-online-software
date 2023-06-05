@@ -1,7 +1,10 @@
 #UHU series
 
 ##v0.5.0
-TODO
+* adds new monitoring classes 
+  - TofCompMoni
+  - MtbMoni
+  to monitor MTB as well as the tof computer itself
 
 #0.4.0
 FEATURES
