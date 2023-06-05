@@ -57,7 +57,8 @@ use liftof_cc::readoutboard_comm::readoutboard_communicator;
 use liftof_cc::event_builder::{event_builder,
                            TofEventBuilderSettings};
                            //event_builder_no_master};
-use liftof_cc::api::commander;
+use liftof_cc::api::{commander,
+                     tofcmp_and_mtb_moni};
 use liftof_cc::paddle_packet_cache::paddle_packet_cache;
 use liftof_cc::flight_comms::global_data_sink;
 
@@ -77,6 +78,9 @@ struct Args {
   write_stream: bool,
   #[arg(short, long, default_value_t = false)]
   use_master_trigger: bool,
+  /// Disable monitoring features
+  #[arg(short, long, default_value_t = false)]
+  no_monitoring: bool,
   /// A json config file with detector information
   #[arg(short, long)]
   json_config: Option<std::path::PathBuf>,
@@ -111,14 +115,25 @@ fn main() {
   if write_stream {
     info!("Will write the entire stream to files");
   }
+  let no_monitoring = args.no_monitoring;
+  if no_monitoring {
+    warn!("All monitoring features disabled!");
+  }
+
   let json_content  : String;
   let config        : json::JsonValue;
   
   let nboards       : usize;
 
-  let use_master_trigger      = args.use_master_trigger;
-  let mut master_trigger_ip   = String::from("");
-  let mut master_trigger_port = 0usize;
+  let use_master_trigger        = args.use_master_trigger;
+  let mut master_trigger_ip     = String::from("");
+  let mut master_trigger_port   = 0usize;
+  // create copies, since we need this information
+  // for 2 threads at least (moni and event)
+  let mut master_trigger_ip_c   = String::from("");
+  let mut master_trigger_port_c = 0usize;
+  
+
 
   // Have all the readoutboard related information in this list
   let rb_list_depr : Vec::<liftof_lib::ReadoutBoard>;
@@ -153,7 +168,11 @@ fn main() {
   if use_master_trigger {
     master_trigger_ip   = config["master_trigger"]["ip"].as_str().unwrap().to_owned();
     master_trigger_port = config["master_trigger"]["port"].as_usize().unwrap();
+    master_trigger_ip_c = master_trigger_ip.clone();
+    master_trigger_port_c = master_trigger_port.clone();
     info!("Will connect to the master trigger board at {}:{}", master_trigger_ip, master_trigger_port);
+  } else {
+    warn!("Not connecting to the master trigger board!");
   }
 
   let storage_savepath = config["raw_storage_savepath"].as_str().unwrap().to_owned();
@@ -270,8 +289,20 @@ fn main() {
   }
 
   let worker_threads = ThreadPool::new(nthreads);
- 
-  println!("==> Starting paddle cache trhead...");
+
+  if !no_monitoring {
+    println!("==> Starting main monitoring thread...");
+    let tp_to_sink_c = tp_to_sink.clone();
+    let moni_interval = 10u64; // in seconds
+    worker_threads.execute(move || {
+                           tofcmp_and_mtb_moni(&tp_to_sink_c,
+                                               &master_trigger_ip_c,
+                                               master_trigger_port_c,
+                                               moni_interval);
+    });
+  }
+
+  println!("==> Starting paddle cache thread...");
   worker_threads.execute(move || {
                          paddle_packet_cache(&id_rec,
                                              &rb_rec,

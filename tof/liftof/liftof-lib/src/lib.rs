@@ -15,6 +15,9 @@ use std::net::{UdpSocket, SocketAddr};
 use crossbeam_channel::{Sender, unbounded};
 use zmq;
 
+// read out CPU temp
+use systemstat::{Platform, System};
+
 extern crate json;
 
 use macaddr::MacAddr6;
@@ -45,7 +48,7 @@ use tof_dataclasses::serialization::{Serialization,
                                      parse_u16,
                                      parse_u32};
 
-const MT_MAX_PACKSIZE   : usize = 512;
+pub const MT_MAX_PACKSIZE   : usize = 512;
 
 //*************************************************
 // I/O - read/write (general purpose) files
@@ -577,7 +580,16 @@ pub fn analyze_blobs(buffer               : &Vec<u8>,
   Ok(nblobs)
 }
 
-
+//**********************************************
+//
+// Monitoring
+pub fn read_cpu_temperature() -> Result<f32, Box<dyn std::error::Error>> {
+  let sys = System::new();
+  match sys.cpu_temp() {
+     Ok(cpu_temp) => Ok(cpu_temp),
+     Err(error) => Err(Box::new(error)),
+  }
+}
 
 //**********************************************
 //
@@ -599,14 +611,22 @@ pub fn construct_event_request(rb_id : u8) -> String {
 
 
 /// Connect to MTB Utp socket
-pub fn connect_to_mtb(mt_ip   : &str, 
-                      mt_port : &usize) 
+///
+/// This will try a number of options to bind 
+/// to the local port.
+/// 
+/// # Arguments 
+///
+/// * mtb_ip    : IP Adress of the MTB
+/// * mtb_port  : Port of the MTB
+///
+pub fn connect_to_mtb(mt_address : &String) 
   ->io::Result<UdpSocket> {
-  let mt_address = mt_ip.to_owned() + ":" + &mt_port.to_string();
   let local_port = "0.0.0.0:50100";
   let local_addrs = [
     SocketAddr::from(([0, 0, 0, 0], 50100)),
     SocketAddr::from(([0, 0, 0, 0], 50101)),
+    SocketAddr::from(([0, 0, 0, 0], 50102)),
   ];
   //let local_socket = UdpSocket::bind(local_port);
   let local_socket = UdpSocket::bind(&local_addrs[..]);
@@ -666,7 +686,7 @@ pub fn master_trigger(mt_ip          : &str,
 
   let mt_address = mt_ip.to_owned() + ":" + &mt_port.to_string();
  
-  let mut socket = connect_to_mtb(&mt_ip, &mt_port).expect("Can not create local UDP socket for MTB connection!"); 
+  let mut socket = connect_to_mtb(&mt_address).expect("Can not create local UDP socket for MTB connection!"); 
   //socket.set_nonblocking(true).unwrap();
   // we only allocate the buffer once
   // and reuse it for all operations
@@ -725,7 +745,7 @@ pub fn master_trigger(mt_ip          : &str,
     }
     if timeout.elapsed().as_secs() > 10 {
       drop(socket);
-      socket = connect_to_mtb(&mt_ip, &mt_port).expect("Can not create local UDP socket for MTB connection!"); 
+      socket = connect_to_mtb(&mt_address).expect("Can not create local UDP socket for MTB connection!"); 
       timeout = Instant::now();
     }
     if timer.elapsed().as_secs() > 10 {

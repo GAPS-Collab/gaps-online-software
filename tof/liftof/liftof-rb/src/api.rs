@@ -722,16 +722,9 @@ pub fn runner(run_config          : &Receiver<RunConfig>,
   // for testting/calibration that gets switched off
   // below
   //latch_to_mtb = true;
-
   let mut timer        = Instant::now();
   let force_trigger    = force_trigger_rate > 0;
   let mut time_between_events : Option<f32> = None;
-  if force_trigger {
-    warn!("Will run in forced trigger mode with a rate of {force_trigger_rate} Hz!");
-    time_between_events = Some(1.0/(force_trigger_rate as f32));
-    warn!(".. this means one trigger every {} seconds...", time_between_events.unwrap());
-    latch_to_mtb = false;
-  }
 
   let now = time::Instant::now();
 
@@ -778,6 +771,16 @@ pub fn runner(run_config          : &Receiver<RunConfig>,
       Ok(new_config) => {
         info!("Received a new set of RunConfig! {:?}", new_config);
         rc          = new_config;
+        if rc.forced_trigger_periodic>0 {
+          force_trigger = true;
+          force_trigger_rate = rc.forced_trigger_periodic;
+        }
+        if force_trigger {
+          warn!("Will run in forced trigger mode with a rate of {force_trigger_rate} Hz!");
+          time_between_events = Some(1.0/(force_trigger_rate as f32));
+          warn!(".. this means one trigger every {} seconds...", time_between_events.unwrap());
+          latch_to_mtb = false;
+        }
         buffer_trip = (rc.rb_buff_size as usize)*EVENT_SIZE; 
         if (buffer_trip > uio1_total_size) 
         || (buffer_trip > uio2_total_size) {

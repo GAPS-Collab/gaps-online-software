@@ -8,14 +8,12 @@
 use local_ip_address::local_ip;
 use std::net::IpAddr;
 
-use std::sync::mpsc::Receiver;
 extern crate crossbeam_channel;
 use crossbeam_channel as cbc; 
 
 use tof_dataclasses::packets::{TofPacket,
                                PacketType};
 use tof_dataclasses::events::TofEvent;
-
 use liftof_lib::TofPacketWriter;
 
 /// Manages "outgoing" 0MQ PUB socket
