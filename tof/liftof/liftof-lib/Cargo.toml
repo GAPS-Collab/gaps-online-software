@@ -44,7 +44,7 @@ netneighbours = "0.1"
 macaddr = "1.0"
 
 # read out CPU temperatures
-systemstat = "0.2.3"
+sensors = "0.2"
 
 #[target.armv7-unknown-linux-gnueabi]
 #linker = "/usr/bin/arm-none-eabi-gcc"

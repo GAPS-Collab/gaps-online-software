@@ -16,7 +16,7 @@ use crossbeam_channel::{Sender, unbounded};
 use zmq;
 
 // read out CPU temp
-use systemstat::{Platform, System};
+use sensors::Sensors;
 
 extern crate json;
 
@@ -583,12 +583,22 @@ pub fn analyze_blobs(buffer               : &Vec<u8>,
 //**********************************************
 //
 // Monitoring
-pub fn read_cpu_temperature() -> Result<f32, Box<dyn std::error::Error>> {
-  let sys = System::new();
-  match sys.cpu_temp() {
-     Ok(cpu_temp) => Ok(cpu_temp),
-     Err(error) => Err(Box::new(error)),
+pub fn read_cpu_temperature() -> Option<f32> {
+  let sensors = Sensors::new();
+  for chip in sensors {
+    println!( "{} (on {})",
+       chip.get_name().unwrap(),
+       chip.bus().get_adapter_name().unwrap()
+    );
+    for feature in chip {
+      println!("  - {}", feature.get_label().unwrap());
+      for subfeature in feature {
+        println!( "    - {} = {}", subfeature.name(), subfeature.get_value().unwrap()
+        );
+      }
+    }
   }
+  Some(42.0)
 }
 
 //**********************************************
@@ -1291,6 +1301,19 @@ fn test_display() {
   let rb = ReadoutBoard::default();
   println!("Readout board {}", rb);
   assert_eq!(1,1);
+}
+
+#[test]
+fn test_read_cpu_temperature() {
+  // Call the function to get the CPU temperature
+  let temperature = read_cpu_temperature();
+  
+  // Perform assertions on the temperature
+  assert!(temperature.is_some(), "CPU temperature should be available");
+  
+  let cpu_temp = temperature.unwrap();
+  assert!(cpu_temp >= 0.0, "CPU temperature should be non-negative");
+  assert!(cpu_temp <= 100.0, "CPU temperature should be within a reasonable range");
 }
 
 #[test]
