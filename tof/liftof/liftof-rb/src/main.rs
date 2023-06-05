@@ -378,7 +378,7 @@ fn main() {
   if !is_systemd_process() {
     // if we are not as systemd, 
     // always end when we are done
-    println!("We are not run by systemd, sow we will stop the program when it is done");
+    println!("=> We are not run by systemd, so we will stop the program when it is done");
     // we start the run by creating new RunParams
     // this is only if we give 
     if run_forever || n_events_run > 0 {
