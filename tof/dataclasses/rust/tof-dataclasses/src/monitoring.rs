@@ -11,6 +11,7 @@ use std::fmt;
 use crate::serialization::{Serialization,
                            SerializationError,
                            search_for_u16,
+                           parse_u32,
                            parse_f32};
 
 /// A collection of monitoring data
@@ -148,6 +149,7 @@ impl Serialization for TofCmpMoniData {
 /// Monitoring the MTB
 pub struct MtbMoniData {
   pub cpu_temp : f32,
+  pub rate     : u32,
 }
 
 impl MtbMoniData {
@@ -158,6 +160,7 @@ impl MtbMoniData {
   pub fn new() -> MtbMoniData {
     MtbMoniData {
       cpu_temp : -4242.42,
+      rate     : 0,
     }
   }
 }
@@ -171,7 +174,9 @@ impl Default for MtbMoniData {
 impl fmt::Display for MtbMoniData {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     write!(f, "<MtbMoniData:\n
+           \t MTB EVT RATE {}\n
            \t CPU TMP [C] {}>",
+           self.rate,
            self.cpu_temp)
   }
 }
@@ -182,6 +187,7 @@ impl Serialization for MtbMoniData {
     let mut stream = Vec::<u8>::with_capacity(MtbMoniData::SIZE);
     stream.extend_from_slice(&MtbMoniData::HEAD.to_le_bytes());
     stream.extend_from_slice(&self.cpu_temp  .to_le_bytes());
+    stream.extend_from_slice(&self.rate  .to_le_bytes());
     stream.extend_from_slice(&MtbMoniData::TAIL.to_le_bytes());
     stream
   }
@@ -201,6 +207,7 @@ impl Serialization for MtbMoniData {
     }
     *pos = head_pos + 2; 
     moni_data.cpu_temp  = parse_f32(&stream, pos);
+    moni_data.rate      = parse_u32(&stream, pos);
     *pos += 2; // since we deserialized the tail earlier and 
               // didn't account for it
     Ok(moni_data)
