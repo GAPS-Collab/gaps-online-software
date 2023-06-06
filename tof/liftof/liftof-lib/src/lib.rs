@@ -2,6 +2,7 @@
 
 use std::error::Error;
 use std::time::{Duration, Instant};
+use std::thread;
 use std::fmt;
 use std::{fs, fs::File, path::Path};
 use std::fs::OpenOptions;
@@ -602,28 +603,81 @@ pub fn analyze_blobs(buffer               : &Vec<u8>,
 ///
 /// Can't fail. Will return (0,0) when broken.
 /// FIXME
-pub fn read_cpu_temperature() -> (u8,u8) {
-  let mut core1_temp = read_value_from_file("/sys/class/hwmon/hwmon4/temp1_input").unwrap_or(0);
-  let mut core2_temp = read_value_from_file("/sys/class/hwmon/hwmon4/temp2_input").unwrap_or(0);
-  core1_temp = core1_temp/10000;
-  core2_temp = core2_temp/10000;
+pub fn read_cpu_temperature() -> (f64,f64,f64) {
+  let mut av_temp1 = 0f32;
+  let mut av_temp2 = 0f32;
+  let n_meas       = 0u8;
+  let sleeptime    = Duration::from_millis(100);
+  let mut core1_temp   = 0u32;
+  let mut core2_temp   = 0u32;
+  for k in 0..10 {
+    core1_temp = read_value_from_file("/sys/class/hwmon/hwmon4/temp1_input").unwrap_or(0);
+    core2_temp = read_value_from_file("/sys/class/hwmon/hwmon4/temp2_input").unwrap_or(0);
+    core1_temp = core1_temp/1000;
+    core2_temp = core2_temp/1000;
+    av_temp1 += core1_temp as f32;
+    av_temp2 += core2_temp as f32;
+    thread::sleep(sleeptime);
+  }
+  av_temp1 /= 10.0;
+  av_temp2 /= 10.0;
 
+  println!("{}", core1_temp);
+  println!("{}", core2_temp);
+  println!("{}", av_temp1);
+  println!("{}", av_temp2);
+  core1_temp = core1_temp/1000;
+  core2_temp = core2_temp/1000;
+
+  let mut c1_t = 0f64;
+  let mut c2_t = 0f64;
+  let mut pch_t = 0f64;
   let temps : (u8,u8) = (core1_temp as u8, core2_temp as u8);
-  //let sensors = Sensors::new();
-  //for chip in sensors {
-  //  println!( "{} (on {})",
-  //     chip.get_name().unwrap(),
-  //     chip.bus().get_adapter_name().unwrap()
-  //  );
-  //  for feature in chip {
-  //    println!("  - {}", feature.get_label().unwrap());
-  //    for subfeature in feature {
-  //      println!( "    - {} = {}", subfeature.name(), subfeature.get_value().unwrap()
-  //      );
-  //    }
-  //  }
-  //}
-  temps
+  let sensors = Sensors::new();
+  let sensors_c = Sensors::new();
+  for chip_c in sensors {
+    if chip_c.get_name().unwrap() == "pch_skylake-virtual-0" {
+      for feature in chip_c {
+        for subfeature in feature {
+          if subfeature.name() == "temp1_input" {
+            pch_t = subfeature.get_value().unwrap();
+          }
+        }
+      }
+    }
+  }
+  for chip in sensors_c {
+    if chip.get_name().unwrap() == "coretemp-isa-0000" {
+      for feature in chip {
+        for subfeature in feature {
+          println!("{}", subfeature.name());
+          if subfeature.name() == "temp2_input" {
+            c1_t = subfeature.get_value().unwrap();
+          }
+          if subfeature.name() == "temp3_input" {
+            c2_t = subfeature.get_value().unwrap();
+          }
+          println!( "    - {} = {}", subfeature.name(), subfeature.get_value().unwrap());
+        }
+      }
+    }
+    //println!( "{} (on {})",
+    //   chip.get_name().unwrap(),
+    //   chip.bus().get_adapter_name().unwrap()
+    //);
+    //for feature in chip {
+    //  println!("  - {}", feature.get_label().unwrap());
+    //  for subfeature in feature {
+    //    println!( "    - {} = {}", subfeature.name(), subfeature.get_value().unwrap()
+    //    );
+    //  }
+    //}
+  }
+  println!("{}c", c1_t);
+  println!("{}c", c2_t);
+  println!("{}c", pch_t);
+  (c1_t, c2_t, pch_t)
+  //temps
 }
 
 //**********************************************
@@ -1332,11 +1386,10 @@ fn test_display() {
 fn test_read_cpu_temperature() {
   // Call the function to get the CPU temperature
   let cpu_temp = read_cpu_temperature();
-  println!("Got cpu temp of {}", cpu_temp);
-  assert!(cpu_temp.0 >= 0.0, "CPU temperature should be non-negative");
+  println!("Got cpu temp of {:?}", cpu_temp);
   assert!(cpu_temp.0 <= 100.0, "CPU temperature should be within a reasonable range");
-  assert!(cpu_temp.1 >= 0.0, "CPU temperature should be non-negative");
   assert!(cpu_temp.1 <= 100.0, "CPU temperature should be within a reasonable range");
+  assert!(cpu_temp.2 <= 100.0, "CPU temperature should be within a reasonable range");
 }
 
 #[test]
