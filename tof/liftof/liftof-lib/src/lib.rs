@@ -56,6 +56,17 @@ pub const MT_MAX_PACKSIZE   : usize = 512;
 //
 
 
+
+fn read_value_from_file(file_path: &str) -> io::Result<u32> {
+  let mut file = File::open(file_path)?;
+  let mut contents = String::new();
+  file.read_to_string(&mut contents)?;
+  let value: u32 = contents.trim().parse().map_err(|err| {
+    io::Error::new(io::ErrorKind::InvalidData, err)
+  })?;
+  Ok(value)
+}
+
 /// The output is wrapped in a Result to allow matching on errors
 /// Returns an Iterator to the Reader of the lines of the file.
 fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
@@ -583,22 +594,36 @@ pub fn analyze_blobs(buffer               : &Vec<u8>,
 //**********************************************
 //
 // Monitoring
-pub fn read_cpu_temperature() -> Option<f32> {
-  let sensors = Sensors::new();
-  for chip in sensors {
-    println!( "{} (on {})",
-       chip.get_name().unwrap(),
-       chip.bus().get_adapter_name().unwrap()
-    );
-    for feature in chip {
-      println!("  - {}", feature.get_label().unwrap());
-      for subfeature in feature {
-        println!( "    - {} = {}", subfeature.name(), subfeature.get_value().unwrap()
-        );
-      }
-    }
-  }
-  Some(42.0)
+//
+
+/// Temperature monitoring for the tof computer. 
+/// This works only on that machine. Unfortunatly, nothing smart seems
+/// to work.
+///
+/// Can't fail. Will return (0,0) when broken.
+/// FIXME
+pub fn read_cpu_temperature() -> (u8,u8) {
+  let mut core1_temp = read_value_from_file("/sys/class/hwmon/hwmon4/temp1_input").unwrap_or(0);
+  let mut core2_temp = read_value_from_file("/sys/class/hwmon/hwmon4/temp2_input").unwrap_or(0);
+  core1_temp = core1_temp/10000;
+  core2_temp = core2_temp/10000;
+
+  let temps : (u8,u8) = (core1_temp as u8, core2_temp as u8);
+  //let sensors = Sensors::new();
+  //for chip in sensors {
+  //  println!( "{} (on {})",
+  //     chip.get_name().unwrap(),
+  //     chip.bus().get_adapter_name().unwrap()
+  //  );
+  //  for feature in chip {
+  //    println!("  - {}", feature.get_label().unwrap());
+  //    for subfeature in feature {
+  //      println!( "    - {} = {}", subfeature.name(), subfeature.get_value().unwrap()
+  //      );
+  //    }
+  //  }
+  //}
+  temps
 }
 
 //**********************************************
@@ -1306,14 +1331,12 @@ fn test_display() {
 #[test]
 fn test_read_cpu_temperature() {
   // Call the function to get the CPU temperature
-  let temperature = read_cpu_temperature();
-  
-  // Perform assertions on the temperature
-  assert!(temperature.is_some(), "CPU temperature should be available");
-  
-  let cpu_temp = temperature.unwrap();
-  assert!(cpu_temp >= 0.0, "CPU temperature should be non-negative");
-  assert!(cpu_temp <= 100.0, "CPU temperature should be within a reasonable range");
+  let cpu_temp = read_cpu_temperature();
+  println!("Got cpu temp of {}", cpu_temp);
+  assert!(cpu_temp.0 >= 0.0, "CPU temperature should be non-negative");
+  assert!(cpu_temp.0 <= 100.0, "CPU temperature should be within a reasonable range");
+  assert!(cpu_temp.1 >= 0.0, "CPU temperature should be non-negative");
+  assert!(cpu_temp.1 <= 100.0, "CPU temperature should be within a reasonable range");
 }
 
 #[test]
