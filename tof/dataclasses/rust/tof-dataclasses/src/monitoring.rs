@@ -11,6 +11,7 @@ use std::fmt;
 use crate::serialization::{Serialization,
                            SerializationError,
                            search_for_u16,
+                           parse_u8,
                            parse_u32,
                            parse_f32};
 
@@ -86,17 +87,21 @@ impl Serialization for RBMoniData {
 
 /// Monitoring the main tof computer
 pub struct TofCmpMoniData {
-  pub cpu_temp : f32,
+  pub core1_tmp : u8,
+  pub core2_tmp : u8,
+  pub pch_tmp   : u8
 }
 
 impl TofCmpMoniData {
-  const SIZE : usize = 8;
+  const SIZE : usize = 7;
   const HEAD : u16   = 0xAAAA;
   const TAIL : u16   = 0x5555;
   
   pub fn new() -> TofCmpMoniData {
     TofCmpMoniData {
-      cpu_temp : -4242.42,
+      core1_tmp : 0,
+      core2_tmp : 0,
+      pch_tmp   : 0
     }
   }
 }
@@ -110,8 +115,10 @@ impl Default for TofCmpMoniData {
 impl fmt::Display for TofCmpMoniData {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     write!(f, "<TofCmpMoniData:\n
-           \t CPU TMP [C] {}>",
-           self.cpu_temp)
+           \t CORE1 TMP [C] {}\n
+           \t CORE2 TMP [C] {}\n
+           \t PCH TMP [C] {}>",
+           self.core1_tmp, self.core2_tmp, self.pch_tmp)
   }
 }
 
@@ -120,7 +127,9 @@ impl Serialization for TofCmpMoniData {
   fn to_bytestream(&self) -> Vec<u8> {
     let mut stream = Vec::<u8>::with_capacity(TofCmpMoniData::SIZE);
     stream.extend_from_slice(&TofCmpMoniData::HEAD.to_le_bytes());
-    stream.extend_from_slice(&self.cpu_temp  .to_le_bytes());
+    stream.extend_from_slice(&self.core1_tmp  .to_le_bytes());
+    stream.extend_from_slice(&self.core2_tmp  .to_le_bytes());
+    stream.extend_from_slice(&self.pch_tmp    .to_le_bytes());
     stream.extend_from_slice(&TofCmpMoniData::TAIL.to_le_bytes());
     stream
   }
@@ -139,7 +148,9 @@ impl Serialization for TofCmpMoniData {
       return Err(SerializationError::WrongByteSize);
     }
     *pos = head_pos + 2; 
-    moni_data.cpu_temp  = parse_f32(&stream, pos);
+    moni_data.core1_tmp  = parse_u8(&stream, pos);
+    moni_data.core2_tmp  = parse_u8(&stream, pos);
+    moni_data.pch_tmp    = parse_u8(&stream, pos);
     *pos += 2; // since we deserialized the tail earlier and 
               // didn't account for it
     Ok(moni_data)

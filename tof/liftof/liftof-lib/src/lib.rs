@@ -603,36 +603,15 @@ pub fn analyze_blobs(buffer               : &Vec<u8>,
 ///
 /// Can't fail. Will return (0,0) when broken.
 /// FIXME
+/// # Returns
+///
+/// (CORE 1 TEMP, CORE 2 TEMP, PCH TEMP)
+///
 pub fn read_cpu_temperature() -> (f64,f64,f64) {
-  let mut av_temp1 = 0f32;
-  let mut av_temp2 = 0f32;
-  let n_meas       = 0u8;
-  let sleeptime    = Duration::from_millis(100);
-  let mut core1_temp   = 0u32;
-  let mut core2_temp   = 0u32;
-  for k in 0..10 {
-    core1_temp = read_value_from_file("/sys/class/hwmon/hwmon4/temp1_input").unwrap_or(0);
-    core2_temp = read_value_from_file("/sys/class/hwmon/hwmon4/temp2_input").unwrap_or(0);
-    core1_temp = core1_temp/1000;
-    core2_temp = core2_temp/1000;
-    av_temp1 += core1_temp as f32;
-    av_temp2 += core2_temp as f32;
-    thread::sleep(sleeptime);
-  }
-  av_temp1 /= 10.0;
-  av_temp2 /= 10.0;
 
-  println!("{}", core1_temp);
-  println!("{}", core2_temp);
-  println!("{}", av_temp1);
-  println!("{}", av_temp2);
-  core1_temp = core1_temp/1000;
-  core2_temp = core2_temp/1000;
-
-  let mut c1_t = 0f64;
-  let mut c2_t = 0f64;
+  let mut c1_t  = 0f64;
+  let mut c2_t  = 0f64;
   let mut pch_t = 0f64;
-  let temps : (u8,u8) = (core1_temp as u8, core2_temp as u8);
   let sensors = Sensors::new();
   let sensors_c = Sensors::new();
   for chip_c in sensors {
@@ -673,11 +652,8 @@ pub fn read_cpu_temperature() -> (f64,f64,f64) {
     //  }
     //}
   }
-  println!("{}c", c1_t);
-  println!("{}c", c2_t);
-  println!("{}c", pch_t);
+  println!("Tof computer CPU Temps - Core 1 [C] {}, Core 2 [C] {}, PCH [C] {}", c1_t, c2_t, pch_t);
   (c1_t, c2_t, pch_t)
-  //temps
 }
 
 //**********************************************

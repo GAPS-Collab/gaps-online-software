@@ -67,12 +67,10 @@ pub fn tofcmp_and_mtb_moni(tp_to_sink    : &Sender<TofPacket>,
           error!("Can not connect to MTB at {}", mtb_address);
         }
       }
-      if let Ok(cpu_temp) = read_cpu_temperature() {
-        tofcmp_moni.cpu_temp = cpu_temp;
-        println!("Got Tof computer CPU temp of {cpu_temp} C");
-      } else {
-        error!("Unable to obtain CPU temperature of the Tof main computer!");
-      }
+      let (c1, c2, pch) = read_cpu_temperature();
+      tofcmp_moni.core1_tmp = c1 as u8;
+      tofcmp_moni.core2_tmp = c2 as u8;
+      tofcmp_moni.pch_tmp   = pch as u8;
       timer = Instant::now();
     }
     tp = TofPacket::from(&tofcmp_moni);
