@@ -636,7 +636,7 @@ pub fn read_cpu_temperature() -> (f64,f64,f64) {
           if subfeature.name() == "temp3_input" {
             c2_t = subfeature.get_value().unwrap();
           }
-          println!( "    - {} = {}", subfeature.name(), subfeature.get_value().unwrap());
+          //println!( "    - {} = {}", subfeature.name(), subfeature.get_value().unwrap());
         }
       }
     }

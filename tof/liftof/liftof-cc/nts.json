@@ -1,10 +1,10 @@
 {
   "meta"      : "",
   "unix_time" : "",
-  "raw_storage_savepath" : "/srv/gaps/gaps-online-software/",
-  "db_path"   : "/srv/gaps/gaps-online-software/gaps-db/gaps_db/db.sqlite3", 
+  "raw_storage_savepath" : "/home/gaps/gaps-online-software/",
+  "db_path"   : "/home/gaps/gaps-online-software/gaps-db/gaps_db/db.sqlite3", 
   "events_per_file" : 100000,
-  "calibration_file_path" : "/srv/gaps/gaps-online-software/",
+  "calibration_file_path" : "/gaps/gaps/gaps-online-software/",
   "master_trigger" : {
     "ip"   : "192.168.36.121", 
     "port" : 50001
@@ -13,6 +13,6 @@
     "ip_address"   : "127.0.0.1", 
     "port" : 50001
   },
-  "rb_blacklist" : [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,17,18,19,20,21,22,23,26,28,29,30,31,32,33,34,35,36,37,38,39,40]
+  "rb_blacklist" : [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,17,18,19,20,21,22,23,26,28,29,30,31,32,33,34,35,36,37,38,39,40, 24, 25, 27]
 }
 

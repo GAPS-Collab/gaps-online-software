@@ -31,16 +31,19 @@ pub const DATAPORT : u32 = 42000;
 ///
 /// # Arguments
 ///
-/// * tp_to_sink : The moni data will be wrapped in tof packets
-///                Send them to the global data sink for 
-///                further distribution/saving on disk
-/// * mtb_ip     : if the MTB is used, this is the supposed ip 
-///                of the MTB
-/// * mtb_port   : if the MTB is used, listen to this port.
+/// * tp_to_sink    : The moni data will be wrapped in tof packets
+///                   Send them to the global data sink for 
+///                   further distribution/saving on disk
+/// * mtb_ip        : if the MTB is used, this is the supposed ip 
+///                   of the MTB
+/// * mtb_port      : if the MTB is used, listen to this port.
+/// * moni_interval : in seconds - read new moni data
+/// * verbose       : print moni information to console
 pub fn tofcmp_and_mtb_moni(tp_to_sink    : &Sender<TofPacket>,
                            mtb_ip        : &str,
                            mtb_port      : usize,
-                           moni_interval : u64) {
+                           moni_interval : u64,
+                           verbose       : bool) {
   let use_mtb = mtb_ip != "";
   let mut mtb_address = String::from("");
   let mut timer   = Instant::now();
@@ -93,17 +96,25 @@ pub fn tofcmp_and_mtb_moni(tp_to_sink    : &Sender<TofPacket>,
       tofcmp_moni.core1_tmp = c1 as u8;
       tofcmp_moni.core2_tmp = c2 as u8;
       tofcmp_moni.pch_tmp   = pch as u8;
+      if verbose {
+        println!("{}", tofcmp_moni);
+        if use_mtb {
+          println!("{}", mtb_moni);
+        }
+      }
+      tp = TofPacket::from(&tofcmp_moni);
+      match tp_to_sink.send(tp) {
+        Err(err) => error!("Tof computer moni data packet sending failed! Err {}", err),
+        Ok(_)    => ()
+      }
+      if use_mtb {
+        tp = TofPacket::from(&mtb_moni);
+        match tp_to_sink.send(tp) {
+          Err(err) => error!("MTB moni data packet sending failed! Err {}", err),
+          Ok(_)    => () 
+        }
+      }
       timer = Instant::now();
-    }
-    tp = TofPacket::from(&tofcmp_moni);
-    match tp_to_sink.send(tp) {
-      Err(err) => error!("Tof computer moni data packet sending failed! Err {}", err),
-      Ok(_)    => ()
-    }
-    tp = TofPacket::from(&mtb_moni);
-    match tp_to_sink.send(tp) {
-      Err(err) => error!("MTB moni data packet sending failed! Err {}", err),
-      Ok(_)    => () 
     }
   }
 }

@@ -81,6 +81,9 @@ struct Args {
   /// Disable monitoring features
   #[arg(short, long, default_value_t = false)]
   no_monitoring: bool,
+  /// Enhance output to console
+  #[arg(short, long, default_value_t = false)]
+  verbose: bool,
   /// A json config file with detector information
   #[arg(short, long)]
   json_config: Option<std::path::PathBuf>,
@@ -105,6 +108,8 @@ fn main() {
 
   // deal with command line arguments
   let args = Args::parse();
+
+  let verbose = args.verbose;
 
   let write_blob = args.write_blob;
   if write_blob {
@@ -298,7 +303,8 @@ fn main() {
                            tofcmp_and_mtb_moni(&tp_to_sink_c,
                                                &master_trigger_ip_c,
                                                master_trigger_port_c,
-                                               moni_interval);
+                                               moni_interval,
+                                               verbose);
     });
   }
 
