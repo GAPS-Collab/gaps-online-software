@@ -15,7 +15,10 @@ use tof_dataclasses::commands::TofCommand;
 use tof_dataclasses::monitoring::{TofCmpMoniData,
                                   MtbMoniData};
 use tof_dataclasses::packets::TofPacket;
-use tof_dataclasses::events::master_trigger::read_rate;
+use tof_dataclasses::events::master_trigger::{read_rate,
+                                              read_lost_rate,
+                                              read_adc_temp_and_vccint,
+                                              read_adc_vccaux_and_vccbram};
 
 use liftof_lib::{read_cpu_temperature,
                  connect_to_mtb, 
@@ -60,9 +63,28 @@ pub fn tofcmp_and_mtb_moni(tp_to_sink    : &Sender<TofPacket>,
             }
             Ok(rate) => {
               info!("Got MTB rate of {rate}");
-              mtb_moni.rate = rate;
+              mtb_moni.rate = rate as u16;
             }
           } // end match
+          match read_adc_vccaux_and_vccbram(&sock, &mtb_address, &mut buffer) {
+            Err(err) => {
+              error!("Unable to obtain MT VCCAUX and VCCBRAM! error {err}");
+            }
+            Ok(values) => {
+              mtb_moni.fpga_vccaux  = values.0;
+              mtb_moni.fpga_vccbram = values.1; 
+            }
+          }
+          match read_adc_temp_and_vccint(&sock, &mtb_address, &mut buffer) {
+            Err(err) => {
+              error!("Unable to obtain MT VCCAUX and VCCBRAM! error {err}");
+            }
+            Ok(values) => {
+              mtb_moni.fpga_temp    = values.0;
+              mtb_moni.fpga_vccint  = values.1; 
+            }
+          }
+
         } else {
           error!("Can not connect to MTB at {}", mtb_address);
         }

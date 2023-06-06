@@ -12,6 +12,7 @@ use crate::serialization::{Serialization,
                            SerializationError,
                            search_for_u16,
                            parse_u8,
+                           parse_u16,
                            parse_u32,
                            parse_f32};
 
@@ -159,19 +160,27 @@ impl Serialization for TofCmpMoniData {
 
 /// Monitoring the MTB
 pub struct MtbMoniData {
-  pub cpu_temp : f32,
-  pub rate     : u32,
+  pub fpga_temp    : f32,
+  pub fpga_vccint  : f32,
+  pub fpga_vccaux  : f32,
+  pub fpga_vccbram : f32,
+  pub rate         : u16,
+  pub lost_rate    : u16
 }
 
 impl MtbMoniData {
-  const SIZE : usize = 8;
+  const SIZE : usize = 24;
   const HEAD : u16   = 0xAAAA;
   const TAIL : u16   = 0x5555;
   
   pub fn new() -> MtbMoniData {
     MtbMoniData {
-      cpu_temp : -4242.42,
-      rate     : 0,
+      fpga_temp    : -4242.42,
+      fpga_vccint  : -4242.42,
+      fpga_vccaux  : -4242.42,
+      fpga_vccbram : -4242.42,
+      rate         : u16::MAX,
+      lost_rate    : u16::MAX
     }
   }
 }
@@ -185,10 +194,18 @@ impl Default for MtbMoniData {
 impl fmt::Display for MtbMoniData {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     write!(f, "<MtbMoniData:\n
-           \t MTB EVT RATE {}\n
-           \t CPU TMP [C] {}>",
+           \t MTB  EVT RATE {}\n
+           \t LOST EVT RATE {}\n
+           \t FPGA TMP     [C] {}\n
+           \t FPGA VCCINT  [V] {}\n
+           \t FPGA VCCAUX  [V] {}\n
+           \t FPGA VCCBRAM [V] {}\n>",
            self.rate,
-           self.cpu_temp)
+           self.lost_rate,
+           self.fpga_vccint,
+           self.fpga_vccaux,
+           self.fpga_vccbram,
+           self.fpga_temp)
   }
 }
 
@@ -197,8 +214,12 @@ impl Serialization for MtbMoniData {
   fn to_bytestream(&self) -> Vec<u8> {
     let mut stream = Vec::<u8>::with_capacity(MtbMoniData::SIZE);
     stream.extend_from_slice(&MtbMoniData::HEAD.to_le_bytes());
-    stream.extend_from_slice(&self.cpu_temp  .to_le_bytes());
-    stream.extend_from_slice(&self.rate  .to_le_bytes());
+    stream.extend_from_slice(&self.fpga_temp   .to_le_bytes());
+    stream.extend_from_slice(&self.fpga_vccint .to_le_bytes());
+    stream.extend_from_slice(&self.fpga_vccaux .to_le_bytes());
+    stream.extend_from_slice(&self.fpga_vccbram.to_le_bytes());
+    stream.extend_from_slice(&self.rate        .to_le_bytes());
+    stream.extend_from_slice(&self.lost_rate   .to_le_bytes());
     stream.extend_from_slice(&MtbMoniData::TAIL.to_le_bytes());
     stream
   }
@@ -217,8 +238,12 @@ impl Serialization for MtbMoniData {
       return Err(SerializationError::WrongByteSize);
     }
     *pos = head_pos + 2; 
-    moni_data.cpu_temp  = parse_f32(&stream, pos);
-    moni_data.rate      = parse_u32(&stream, pos);
+    moni_data.fpga_temp    = parse_f32(&stream, pos);
+    moni_data.fpga_vccint  = parse_f32(&stream, pos);
+    moni_data.fpga_vccaux  = parse_f32(&stream, pos);
+    moni_data.fpga_vccbram = parse_f32(&stream, pos);
+    moni_data.rate         = parse_u16(&stream, pos);
+    moni_data.lost_rate    = parse_u16(&stream, pos);
     *pos += 2; // since we deserialized the tail earlier and 
               // didn't account for it
     Ok(moni_data)

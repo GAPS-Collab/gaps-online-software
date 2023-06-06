@@ -496,7 +496,7 @@ pub fn encode_ipbus(addr        : u32,
 /// FIXME - currently this is always successful.
 /// Should we check for garbage?
 pub fn decode_ipbus( message : &[u8;MT_MAX_PACKSIZE],
-                 verbose : bool)
+                     verbose : bool)
     -> Result<Vec<u32>, IPBusError> {
 
     // Response
@@ -536,6 +536,14 @@ pub fn decode_ipbus( message : &[u8;MT_MAX_PACKSIZE],
     }
     Ok(data)
 }
+
+/// Helper function to separate a u32 into two u15
+fn extract_values_from_32bit(number: u32) -> (u16, u16) {
+  let lower_bits = number as u16;
+  let upper_bits = (number >> 16) as u16;
+  (lower_bits, upper_bits)
+}
+
 
 /// Remotely read out a specif register of the MTB over UDP
 ///
@@ -614,6 +622,8 @@ pub fn read_event_cnt(socket : &UdpSocket,
   Ok(event_count)
 }
 
+
+/// Read the MTB rate counter
 pub fn read_rate(socket : &UdpSocket,
                  target_address : &str,
                  buffer : &mut [u8;MT_MAX_PACKSIZE])
@@ -622,6 +632,49 @@ pub fn read_rate(socket : &UdpSocket,
   trace!("Got MT rate! {} ", rate);
   Ok(rate)
 }
+
+
+/// Convert ADC temp from adc values to Celsius
+fn convert_adc_temp(data : u16) -> f32 {
+  data as f32 * 503.975 / 4096.0 - 273.15
+}
+
+// Convert ADC VCCINT from adc values to Voltage
+fn convert_adc_vccint(data : u16) -> f32 {
+  3.0 * data as f32 / (2_u32.pow(12-1)) as f32
+}
+
+/// Read the ADC temp
+pub fn read_adc_temp_and_vccint(socket : &UdpSocket,
+                                target_address : &str,
+                                buffer : &mut [u8;MT_MAX_PACKSIZE])
+  -> Result<(f32, f32), Box<dyn Error>> {
+  let value = read_register(socket, target_address, 0x122, buffer)?;
+  let (mut adc_temp, vccint) = extract_values_from_32bit(value); 
+  // only 12 bit temp
+  adc_temp &= 0x0fff;
+  let temp_c   = convert_adc_temp(adc_temp);
+  let vccint_v = convert_adc_vccint(vccint);
+  //let value_bytes = value.to_le_bytes(); 
+  trace!("Got ADC temp! {} ", temp_c);
+  trace!("Got VCCINT    {} ", vccint_v);
+  Ok((temp_c, vccint_v))
+}
+
+pub fn read_adc_vccaux_and_vccbram(socket : &UdpSocket,
+                                   target_address : &str,
+                                   buffer : &mut [u8;MT_MAX_PACKSIZE])
+  -> Result<(f32, f32), Box<dyn Error>> {
+  let value = read_register(socket, target_address, 0x123, buffer)?;
+  let (vccaux, vccbram) = extract_values_from_32bit(value); 
+  let vccaux_v  = convert_adc_vccint(vccaux);
+  let vccbram_v = convert_adc_vccint(vccbram);
+  //let value_bytes = value.to_le_bytes(); 
+  trace!("Got VCCAUX  [V]  {} ", vccaux_v);
+  trace!("Got VCCBRAM [V]  {} ", vccbram_v);
+  Ok((vccaux_v, vccbram_v))
+}
+
 
 pub fn read_lost_rate(socket : &UdpSocket,
                       target_address : &str,

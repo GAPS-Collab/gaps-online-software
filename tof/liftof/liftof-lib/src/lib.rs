@@ -629,7 +629,7 @@ pub fn read_cpu_temperature() -> (f64,f64,f64) {
     if chip.get_name().unwrap() == "coretemp-isa-0000" {
       for feature in chip {
         for subfeature in feature {
-          println!("{}", subfeature.name());
+          //println!("{}", subfeature.name());
           if subfeature.name() == "temp2_input" {
             c1_t = subfeature.get_value().unwrap();
           }
@@ -652,7 +652,7 @@ pub fn read_cpu_temperature() -> (f64,f64,f64) {
     //  }
     //}
   }
-  println!("Tof computer CPU Temps - Core 1 [C] {}, Core 2 [C] {}, PCH [C] {}", c1_t, c2_t, pch_t);
+  info!("=> Tof computer CPU Temps - Core 1 [C] {}, Core 2 [C] {}, PCH [C] {}", c1_t, c2_t, pch_t);
   (c1_t, c2_t, pch_t)
 }
 
