@@ -30,13 +30,15 @@ pretty_env_logger = "0.4"
 rand = {version = "0.8", optional = true}
 json = "0.12" 
 
+# Takeru's tof-control
+tof-control = {path = "../../../extern/tof-control" }
 
 # nom for cominatoric parsers
 #nom = "7.1"
 # strum to enhance enum 
 # with messages, iterators
-strum = "0.24"
-strum_macros = "0.24"
+#strum = "0.24"
+#strum_macros = "0.24"
 
 sqlite = "0.30"
 

@@ -8,6 +8,13 @@
 //!
 
 use std::fmt;
+
+// Takeru's tof-control code
+use tof_control::rb_control::rb_temp::RBtemp;
+use tof_control::rb_control::rb_mag::RBmag;
+use tof_control::rb_control::rb_vcp::RBvcp;
+use tof_control::rb_control::rb_ph::RBph;
+
 use crate::serialization::{Serialization,
                            SerializationError,
                            search_for_u16,
@@ -24,7 +31,8 @@ pub struct RBMoniData {
 
   pub board_id           : u8,
   pub rate               : u16,
-  pub tmp_drc            : f32,
+  // temp - 12 fields 
+  pub tmp_drs            : f32,
   pub tmp_clk            : f32,
   pub tmp_adc            : f32,
   pub tmp_zynq           : f32,
@@ -36,33 +44,30 @@ pub struct RBMoniData {
   pub mag_y              : f32,
   pub mag_z              : f32,
   pub mag_tot            : f32,
-  // voltages
-  pub pow_zynq_v         : f32,
-  pub pow_3_3_v          : f32,
-  pub pow_3_5_v          : f32,
-  pub pow_neg_5_v        : f32,
-  pub pow_drs4_dig_2_5_v : f32,
-  pub pow_drs4_an_2_5_v  : f32,
-  pub pow_adc_dig_2_5_v  : f32,
-  pub pow_adc_an_3_0_v   : f32,
-  // current
-  pub pow_zynq_a         : f32,
-  pub pow_3_3_a          : f32,
-  pub pow_3_5_a          : f32,
-  pub pow_neg_5_a        : f32,
-  pub pow_drs4_dig_2_5_a : f32,
-  pub pow_drs4_an_2_5_a  : f32,
-  pub pow_adc_dig_2_5_a  : f32,
-  pub pow_adc_an_3_0_a   : f32,
-  // power
-  pub pow_zynq_p         : f32,
-  pub pow_3_3_p          : f32,
-  pub pow_3_5_p          : f32,
-  pub pow_neg_5_p        : f32,
-  pub pow_drs4_dig_2_5_p : f32,
-  pub pow_drs4_an_2_5_p  : f32,
-  pub pow_adc_dig_2_5_p  : f32,
-  pub pow_adc_an_3_0_p   : f32,
+  pub drs_dvdd_voltage   : f32, 
+  pub drs_dvdd_current   : f32,
+  pub drs_dvdd_power     : f32,
+  pub p3v3_voltage       : f32,
+  pub p3v3_current       : f32,
+  pub p3v3_power         : f32,
+  pub zynq_voltage       : f32,
+  pub zynq_current       : f32,
+  pub zynq_power         : f32,
+  pub p3v5_voltage       : f32, 
+  pub p3v5_current       : f32,
+  pub p3v5_power         : f32,
+  pub adc_dvdd_voltage   : f32,
+  pub adc_dvdd_current   : f32,
+  pub adc_dvdd_power     : f32,
+  pub adc_avdd_voltage   : f32,
+  pub adc_avdd_current   : f32,
+  pub adc_avdd_power     : f32,
+  pub drs_avdd_voltage   : f32, 
+  pub drs_avdd_current   : f32,
+  pub drs_avdd_power     : f32,
+  pub n1v5_voltage       : f32,
+  pub n1v5_current       : f32,
+  pub n1v5_power         : f32,
 }
 
 impl RBMoniData {
@@ -73,13 +78,61 @@ impl RBMoniData {
   /// This needs to be updated when we change the 
   /// packet layout, e.g. add new members.
   /// HEAD + TAIL + sum(sizeof(m) for m in _all_members_))
-  pub const SIZE : usize  = 6;
+  pub const SIZE : usize  = 7 + (36*4) ;
+
+  pub fn add_rbtemp(&mut self, rb_temp : &RBtemp) {
+    self.tmp_drs         = rb_temp.drs_temp      ; 
+    self.tmp_clk         = rb_temp.clk_temp      ; 
+    self.tmp_adc         = rb_temp.adc_temp      ; 
+    self.tmp_zynq        = rb_temp.zynq_temp     ; 
+    self.tmp_lis3mdltr   = rb_temp.lis3mdltr_temp; 
+    self.tmp_bm280       = rb_temp.bme280_temp   ; 
+  }
+  
+  pub fn add_rbmag(&mut self, rb_mag   : &RBmag) {
+    self.mag_x   = rb_mag.magnetic_x;
+    self.mag_y   = rb_mag.magnetic_y;
+    self.mag_z   = rb_mag.magnetic_z;
+    self.mag_tot = rb_mag.magnetic_t;
+  }
+  
+  pub fn add_rbvcp(&mut self, rb_vcp   : &RBvcp) {
+    self.drs_dvdd_voltage = rb_vcp.drs_dvdd_voltage ;
+    self.drs_dvdd_current = rb_vcp.drs_dvdd_current ;
+    self.drs_dvdd_power   = rb_vcp.drs_dvdd_power   ;
+    self.p3v3_voltage     = rb_vcp.p3v3_voltage     ;
+    self.p3v3_current     = rb_vcp.p3v3_current     ;
+    self.p3v3_power       = rb_vcp.p3v3_power       ;
+    self.zynq_voltage     = rb_vcp.zynq_voltage     ;
+    self.zynq_current     = rb_vcp.zynq_current     ;
+    self.zynq_power       = rb_vcp.zynq_power       ;
+    self.p3v5_voltage     = rb_vcp.p3v5_voltage     ;
+    self.p3v5_current     = rb_vcp.p3v5_current     ;
+    self.p3v5_power       = rb_vcp.p3v5_power       ;
+    self.adc_dvdd_voltage = rb_vcp.adc_dvdd_voltage ;
+    self.adc_dvdd_current = rb_vcp.adc_dvdd_current ;
+    self.adc_dvdd_power   = rb_vcp.adc_dvdd_power   ;
+    self.adc_avdd_voltage = rb_vcp.adc_avdd_voltage ;
+    self.adc_avdd_current = rb_vcp.adc_avdd_current ;
+    self.adc_avdd_power   = rb_vcp.adc_avdd_power   ;
+    self.drs_avdd_voltage = rb_vcp.drs_avdd_voltage ;
+    self.drs_avdd_current = rb_vcp.drs_avdd_current ;
+    self.drs_avdd_power   = rb_vcp.drs_avdd_power   ;
+    self.n1v5_voltage     = rb_vcp.n1v5_voltage     ;
+    self.n1v5_current     = rb_vcp.n1v5_current     ;
+    self.n1v5_power       = rb_vcp.n1v5_power       ;
+  }
+  
+  pub fn add_rbph(&mut self, rb_ph   : &RBph) {
+    self.pressure = rb_ph.pressure;
+    self.humidity = rb_ph.humidity;
+  }
 
   pub fn new() -> Self {
     Self {
       board_id           : 0, 
       rate               : 0,
-      tmp_drc            : 0.0,
+      tmp_drs            : 0.0,
       tmp_clk            : 0.0,
       tmp_adc            : 0.0,
       tmp_zynq           : 0.0,
@@ -91,33 +144,30 @@ impl RBMoniData {
       mag_y              : 0.0,
       mag_z              : 0.0,
       mag_tot            : 0.0,
-      // voltages
-      pow_zynq_v         : 0.0,
-      pow_3_3_v          : 0.0,
-      pow_3_5_v          : 0.0,
-      pow_neg_5_v        : 0.0,
-      pow_drs4_dig_2_5_v : 0.0,
-      pow_drs4_an_2_5_v  : 0.0,
-      pow_adc_dig_2_5_v  : 0.0,
-      pow_adc_an_3_0_v   : 0.0,
-      // current
-      pow_zynq_a         : 0.0,
-      pow_3_3_a          : 0.0,
-      pow_3_5_a          : 0.0,
-      pow_neg_5_a        : 0.0,
-      pow_drs4_dig_2_5_a : 0.0,
-      pow_drs4_an_2_5_a  : 0.0,
-      pow_adc_dig_2_5_a  : 0.0,
-      pow_adc_an_3_0_a   : 0.0,
-      // power
-      pow_zynq_p         : 0.0,
-      pow_3_3_p          : 0.0,
-      pow_3_5_p          : 0.0,
-      pow_neg_5_p        : 0.0,
-      pow_drs4_dig_2_5_p : 0.0,
-      pow_drs4_an_2_5_p  : 0.0,
-      pow_adc_dig_2_5_p  : 0.0,
-      pow_adc_an_3_0_p   : 0.0,
+      drs_dvdd_voltage   : 0.0, 
+      drs_dvdd_current   : 0.0,
+      drs_dvdd_power     : 0.0,
+      p3v3_voltage       : 0.0,
+      p3v3_current       : 0.0,
+      p3v3_power         : 0.0,
+      zynq_voltage       : 0.0,
+      zynq_current       : 0.0,
+      zynq_power         : 0.0,
+      p3v5_voltage       : 0.0, 
+      p3v5_current       : 0.0,
+      p3v5_power         : 0.0,
+      adc_dvdd_voltage   : 0.0,
+      adc_dvdd_current   : 0.0,
+      adc_dvdd_power     : 0.0,
+      adc_avdd_voltage   : 0.0,
+      adc_avdd_current   : 0.0,
+      adc_avdd_power     : 0.0,
+      drs_avdd_voltage   : 0.0, 
+      drs_avdd_current   : 0.0,
+      drs_avdd_power     : 0.0,
+      n1v5_voltage       : 0.0,
+      n1v5_current       : 0.0,
+      n1v5_power         : 0.0,
     }
   }
 }
@@ -135,7 +185,7 @@ impl Serialization for RBMoniData {
     stream.extend_from_slice(&RBMoniData::HEAD.to_le_bytes());
     stream.extend_from_slice(&self.board_id          .to_le_bytes()); 
     stream.extend_from_slice(&self.rate              .to_le_bytes()); 
-    stream.extend_from_slice(&self.tmp_drc           .to_le_bytes()); 
+    stream.extend_from_slice(&self.tmp_drs           .to_le_bytes()); 
     stream.extend_from_slice(&self.tmp_clk           .to_le_bytes()); 
     stream.extend_from_slice(&self.tmp_adc           .to_le_bytes()); 
     stream.extend_from_slice(&self.tmp_zynq          .to_le_bytes()); 
@@ -147,30 +197,21 @@ impl Serialization for RBMoniData {
     stream.extend_from_slice(&self.mag_y             .to_le_bytes()); 
     stream.extend_from_slice(&self.mag_z             .to_le_bytes()); 
     stream.extend_from_slice(&self.mag_tot           .to_le_bytes()); 
-    stream.extend_from_slice(&self.pow_zynq_v        .to_le_bytes()); 
-    stream.extend_from_slice(&self.pow_3_3_v         .to_le_bytes()); 
-    stream.extend_from_slice(&self.pow_3_5_v         .to_le_bytes()); 
-    stream.extend_from_slice(&self.pow_neg_5_v       .to_le_bytes()); 
-    stream.extend_from_slice(&self.pow_drs4_dig_2_5_v.to_le_bytes()); 
-    stream.extend_from_slice(&self.pow_drs4_an_2_5_v .to_le_bytes()); 
-    stream.extend_from_slice(&self.pow_adc_dig_2_5_v .to_le_bytes()); 
-    stream.extend_from_slice(&self.pow_adc_an_3_0_v  .to_le_bytes()); 
-    stream.extend_from_slice(&self.pow_zynq_a        .to_le_bytes()); 
-    stream.extend_from_slice(&self.pow_3_3_a         .to_le_bytes()); 
-    stream.extend_from_slice(&self.pow_3_5_a         .to_le_bytes()); 
-    stream.extend_from_slice(&self.pow_neg_5_a       .to_le_bytes()); 
-    stream.extend_from_slice(&self.pow_drs4_dig_2_5_a.to_le_bytes()); 
-    stream.extend_from_slice(&self.pow_drs4_an_2_5_a .to_le_bytes()); 
-    stream.extend_from_slice(&self.pow_adc_dig_2_5_a .to_le_bytes()); 
-    stream.extend_from_slice(&self.pow_adc_an_3_0_a  .to_le_bytes()); 
-    stream.extend_from_slice(&self.pow_zynq_p        .to_le_bytes()); 
-    stream.extend_from_slice(&self.pow_3_3_p         .to_le_bytes()); 
-    stream.extend_from_slice(&self.pow_3_5_p         .to_le_bytes()); 
-    stream.extend_from_slice(&self.pow_neg_5_p       .to_le_bytes()); 
-    stream.extend_from_slice(&self.pow_drs4_dig_2_5_p.to_le_bytes()); 
-    stream.extend_from_slice(&self.pow_drs4_an_2_5_p .to_le_bytes()); 
-    stream.extend_from_slice(&self.pow_adc_dig_2_5_p .to_le_bytes()); 
-    stream.extend_from_slice(&self.pow_adc_an_3_0_p  .to_le_bytes()); 
+    stream.extend_from_slice(&self.p3v5_voltage       .to_le_bytes()); 
+    stream.extend_from_slice(&self.p3v5_current       .to_le_bytes()); 
+    stream.extend_from_slice(&self.p3v5_power         .to_le_bytes()); 
+    stream.extend_from_slice(&self.adc_dvdd_voltage   .to_le_bytes()); 
+    stream.extend_from_slice(&self.adc_dvdd_current   .to_le_bytes()); 
+    stream.extend_from_slice(&self.adc_dvdd_power     .to_le_bytes()); 
+    stream.extend_from_slice(&self.adc_avdd_voltage   .to_le_bytes()); 
+    stream.extend_from_slice(&self.adc_avdd_current   .to_le_bytes()); 
+    stream.extend_from_slice(&self.adc_avdd_power     .to_le_bytes()); 
+    stream.extend_from_slice(&self.drs_avdd_voltage   .to_le_bytes()); 
+    stream.extend_from_slice(&self.drs_avdd_current   .to_le_bytes()); 
+    stream.extend_from_slice(&self.drs_avdd_power     .to_le_bytes()); 
+    stream.extend_from_slice(&self.n1v5_voltage       .to_le_bytes()); 
+    stream.extend_from_slice(&self.n1v5_current       .to_le_bytes()); 
+    stream.extend_from_slice(&self.n1v5_power         .to_le_bytes()); 
     stream.extend_from_slice(&RBMoniData::TAIL.to_le_bytes());
     stream
   }
@@ -191,7 +232,7 @@ impl Serialization for RBMoniData {
 
     moni_data.board_id           = parse_u8(&stream, pos); 
     moni_data.rate               = parse_u16(&stream, pos); 
-    moni_data.tmp_drc            = parse_f32(&stream, pos); 
+    moni_data.tmp_drs            = parse_f32(&stream, pos); 
     moni_data.tmp_clk            = parse_f32(&stream, pos); 
     moni_data.tmp_adc            = parse_f32(&stream, pos); 
     moni_data.tmp_zynq           = parse_f32(&stream, pos); 
@@ -203,30 +244,30 @@ impl Serialization for RBMoniData {
     moni_data.mag_y              = parse_f32(&stream, pos); 
     moni_data.mag_z              = parse_f32(&stream, pos); 
     moni_data.mag_tot            = parse_f32(&stream, pos); 
-    moni_data.pow_zynq_v         = parse_f32(&stream, pos); 
-    moni_data.pow_3_3_v          = parse_f32(&stream, pos); 
-    moni_data.pow_3_5_v          = parse_f32(&stream, pos); 
-    moni_data.pow_neg_5_v        = parse_f32(&stream, pos); 
-    moni_data.pow_drs4_dig_2_5_v = parse_f32(&stream, pos); 
-    moni_data.pow_drs4_an_2_5_v  = parse_f32(&stream, pos); 
-    moni_data.pow_adc_dig_2_5_v  = parse_f32(&stream, pos); 
-    moni_data.pow_adc_an_3_0_v   = parse_f32(&stream, pos); 
-    moni_data.pow_zynq_a         = parse_f32(&stream, pos); 
-    moni_data.pow_3_3_a          = parse_f32(&stream, pos); 
-    moni_data.pow_3_5_a          = parse_f32(&stream, pos); 
-    moni_data.pow_neg_5_a        = parse_f32(&stream, pos); 
-    moni_data.pow_drs4_dig_2_5_a = parse_f32(&stream, pos); 
-    moni_data.pow_drs4_an_2_5_a  = parse_f32(&stream, pos); 
-    moni_data.pow_adc_dig_2_5_a  = parse_f32(&stream, pos); 
-    moni_data.pow_adc_an_3_0_a   = parse_f32(&stream, pos); 
-    moni_data.pow_zynq_p         = parse_f32(&stream, pos); 
-    moni_data.pow_3_3_p          = parse_f32(&stream, pos); 
-    moni_data.pow_3_5_p          = parse_f32(&stream, pos); 
-    moni_data.pow_neg_5_p        = parse_f32(&stream, pos); 
-    moni_data.pow_drs4_dig_2_5_p = parse_f32(&stream, pos); 
-    moni_data.pow_drs4_an_2_5_p  = parse_f32(&stream, pos); 
-    moni_data.pow_adc_dig_2_5_p  = parse_f32(&stream, pos); 
-    moni_data.pow_adc_an_3_0_p   = parse_f32(&stream, pos); 
+    moni_data.drs_dvdd_voltage   = parse_f32(&stream, pos); 
+    moni_data.drs_dvdd_current   = parse_f32(&stream, pos); 
+    moni_data.drs_dvdd_power     = parse_f32(&stream, pos); 
+    moni_data.p3v3_voltage       = parse_f32(&stream, pos); 
+    moni_data.p3v3_current       = parse_f32(&stream, pos); 
+    moni_data.p3v3_power         = parse_f32(&stream, pos); 
+    moni_data.zynq_voltage       = parse_f32(&stream, pos); 
+    moni_data.zynq_current       = parse_f32(&stream, pos); 
+    moni_data.zynq_power         = parse_f32(&stream, pos); 
+    moni_data.p3v5_voltage       = parse_f32(&stream, pos); 
+    moni_data.p3v5_current       = parse_f32(&stream, pos); 
+    moni_data.p3v5_power         = parse_f32(&stream, pos); 
+    moni_data.adc_dvdd_voltage   = parse_f32(&stream, pos); 
+    moni_data.adc_dvdd_current   = parse_f32(&stream, pos); 
+    moni_data.adc_dvdd_power     = parse_f32(&stream, pos); 
+    moni_data.adc_avdd_voltage   = parse_f32(&stream, pos); 
+    moni_data.adc_avdd_current   = parse_f32(&stream, pos); 
+    moni_data.adc_avdd_power     = parse_f32(&stream, pos); 
+    moni_data.drs_avdd_voltage   = parse_f32(&stream, pos); 
+    moni_data.drs_avdd_current   = parse_f32(&stream, pos); 
+    moni_data.drs_avdd_power     = parse_f32(&stream, pos); 
+    moni_data.n1v5_voltage       = parse_f32(&stream, pos); 
+    moni_data.n1v5_current       = parse_f32(&stream, pos); 
+    moni_data.n1v5_power         = parse_f32(&stream, pos); 
     *pos += 2;
     Ok(moni_data) 
   }
