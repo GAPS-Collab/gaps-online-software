@@ -45,9 +45,13 @@ use tof_dataclasses::run::RunConfig;
 use tof_dataclasses::serialization::get_json_from_file;
 
 // Takeru's tof-control
+#[cfg(feature="monitoring")]
 use tof_control::rb_control::rb_temp::RBtemp;
+#[cfg(feature="monitoring")]
 use tof_control::rb_control::rb_mag::RBmag;
+#[cfg(feature="monitoring")]
 use tof_control::rb_control::rb_vcp::RBvcp;
+#[cfg(feature="monitoring")]
 use tof_control::rb_control::rb_ph::RBph;
 
 
@@ -585,15 +589,24 @@ pub fn monitoring(ch : &Sender<TofPacket>) {
 
    // get tof-control data
    let mut moni_dt = RBMoniData::new();
+   
+   #[cfg(feature="monitoring")]
    let rb_temp = RBtemp::new();
+   #[cfg(feature="monitoring")]
    let rb_mag  = RBmag::new();
+   #[cfg(feature="monitoring")]
    let rb_vcp  = RBvcp::new();
+   #[cfg(feature="monitoring")]
    let rb_ph   = RBph::new();
+   #[cfg(feature="monitoring")]
    moni_dt.add_rbtemp(&rb_temp);
+   #[cfg(feature="monitoring")]
    moni_dt.add_rbmag(&rb_mag);
+   #[cfg(feature="monitoring")]
    moni_dt.add_rbvcp(&rb_vcp);
+   #[cfg(feature="monitoring")]
    moni_dt.add_rbph(&rb_ph);
-
+   
    let rate_query = get_trigger_rate();
    match rate_query {
      Ok(rate) => {

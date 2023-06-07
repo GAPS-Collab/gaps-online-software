@@ -28,6 +28,8 @@ path = "src/bin/debug_registers.rs"
 
 #[net]
 #git-fetch-with-cli = true
+[features]
+monitoring = ["tof-control"]
 
 [dependencies]
 liftof-lib = { path = "../liftof-lib"} 
@@ -40,7 +42,7 @@ crossbeam-channel = "0.5"
 
 tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["random", "tofcontrol"]} 
 #tof-control = {git = "ssh://gaps@ucla-tof-computer:/home/gaps/takeruhayashi/tof-control" }
-tof-control = {path = "../../extern/tof-control" }
+tof-control = {path = "../../extern/tof-control", optional = true }
 zmq = "0.10.0"
 
 log = "0.4"
