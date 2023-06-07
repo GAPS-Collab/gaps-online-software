@@ -14,7 +14,7 @@ pub mod flight_comms;
 mod test_blobdata;
 extern crate pretty_env_logger;
 #[macro_use] extern crate log;
-
+#[macro_use] extern crate sensors;
 extern crate clap;
 extern crate json;
 #[cfg(feature = "diagnostics")]

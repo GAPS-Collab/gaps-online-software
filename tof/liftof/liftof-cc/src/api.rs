@@ -7,7 +7,10 @@ use std::net::{UdpSocket, SocketAddr};
 use std::io;
 use std::time::{Duration, Instant};
 use zmq;
+
 extern crate crossbeam_channel;
+use sensors::Sensors;
+
 use crossbeam_channel::{Receiver, Sender};
 
 use tof_dataclasses::manifest::ReadoutBoard;
@@ -247,5 +250,15 @@ pub fn commander(rbs : &Vec<ReadoutBoard>,
   //    Ok(_)    => info!("Initialized run!")
   //  }
   //}
+}
+
+#[test]
+fn test_read_cpu_temperature() {
+  // Call the function to get the CPU temperature
+  let cpu_temp = read_cpu_temperature();
+  println!("Got cpu temp of {:?}", cpu_temp);
+  assert!(cpu_temp.0 <= 100.0, "CPU temperature should be within a reasonable range");
+  assert!(cpu_temp.1 <= 100.0, "CPU temperature should be within a reasonable range");
+  assert!(cpu_temp.2 <= 100.0, "CPU temperature should be within a reasonable range");
 }
 
