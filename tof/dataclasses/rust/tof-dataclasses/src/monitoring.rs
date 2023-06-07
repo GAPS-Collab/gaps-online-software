@@ -186,6 +186,71 @@ impl Default for RBMoniData {
   }
 }
 
+impl fmt::Display for RBMoniData {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    write!(f, "<RBMoniData:
+           \t BOARD ID {}
+           \t RATE     {} [Hz] 
+           \t DRS TMP  {:.3} [C]
+           \t CLK TMP  {:.3} [C]
+           \t ADC TMP  {:.3} [C]
+           \t ZYNQ TMP {:.3} [C]
+           \t LIS3MDLTR TMP {:.3} [C]  
+           \t BM280 TMP     {:.3} [C]
+           \t PRESSURE      {:.3} [C]
+           \t HUMIDITY      {:.3} [C]
+           \t MAG_X {:.3} [G] | MAG_Y {:.3} [G] | MAG_Z {:.3} [G] | MAG_TOT {:.3} [G]
+           \t ZYNQ 3.3V Power: {:.3} [V] | {:.3} [A] | {:.3} [W]
+           \t 3.3V      Power: {:.3} [V] | {:.3} [A] | {:.3} [W]
+           \t 3.5V      Power: {:.3} [V] | {:.3} [A] | {:.3} [W]
+           \t -1.5V     Power: {:.3} [V] | {:.3} [A] | {:.3} [W]
+           \t DRS4 Digital 2.5V Power:  {:.3} [V] | {:.3} [A] | {:.3} [W]
+           \t DRS4 Analog 2.5V  Power:  {:.3} [V] | {:.3} [A] | {:.3} [W]
+           \t ADC Digital 2.5V  Power:  {:.3} [V] | {:.3} [A] | {:.3} [W]
+           \t ADC Analog 3.0V   Power:  {:.3} [V] | {:.3} [A] | {:.3} [W]>",
+           self.board_id        , 
+           self.rate            ,
+           self.tmp_drs         ,
+           self.tmp_clk         ,
+           self.tmp_adc         ,
+           self.tmp_zynq        ,
+           self.tmp_lis3mdltr   ,
+           self.tmp_bm280       ,
+           self.pressure        ,
+           self.humidity        ,
+           self.mag_x           ,
+           self.mag_y           ,
+           self.mag_z           ,
+           self.mag_tot         ,
+           self.zynq_voltage    ,
+           self.zynq_current    ,
+           self.zynq_power      ,
+           self.p3v3_voltage    ,
+           self.p3v3_current    ,
+           self.p3v3_power      ,
+           self.p3v5_voltage    , 
+           self.p3v5_current    ,
+           self.p3v5_power      ,
+           self.n1v5_voltage    ,
+           self.n1v5_current    ,
+           self.n1v5_power      ,
+           self.drs_dvdd_voltage, 
+           self.drs_dvdd_current,
+           self.drs_dvdd_power  ,
+           self.drs_avdd_voltage, 
+           self.drs_avdd_current,
+           self.drs_avdd_power  ,
+           self.adc_dvdd_voltage,
+           self.adc_dvdd_current,
+           self.adc_dvdd_power  ,
+           self.adc_avdd_voltage,
+           self.adc_avdd_current,
+           self.adc_avdd_power  )
+  }
+}
+
+
+
 impl Serialization for RBMoniData {
   
   fn to_bytestream(&self) -> Vec<u8> {
