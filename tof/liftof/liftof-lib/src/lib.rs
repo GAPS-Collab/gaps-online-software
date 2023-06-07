@@ -14,10 +14,7 @@ use std::io::{Read,
 use std::collections::HashMap;
 use std::net::{UdpSocket, SocketAddr};
 use crossbeam_channel::{Sender, unbounded};
-use zmq;
-
-// read out CPU temp
-use sensors::Sensors;
+//use zmq;
 
 extern crate json;
 
@@ -1185,32 +1182,32 @@ impl ReadoutBoard {
     }
   }
     
-  /// Ping it  
-  pub fn ping(&mut self) -> Result<(), Box<dyn Error>> { 
-    // connect to the command port and send a ping
-    // message
-    let ctx =  zmq::Context::new();
-    if matches!(self.ip_address, None) || matches!(self.cmd_port, None) {
-      self.is_connected = false;
-      return Err(Box::new(ReadoutBoardError::NoConnectionInfo));
-    }
-    let address = "tcp://".to_owned() + &self.ip_address.unwrap().to_string() + ":" + &self.cmd_port.unwrap().to_string(); 
-    let socket  = ctx.socket(zmq::REQ)?;
-    socket.connect(&address)?;
-    info!("Have connected to adress {address}");
-    // if the readoutboard is there, it should send *something* back
-    let p = TofCommand::Ping(1);
+  ///// Ping it  
+  //pub fn ping(&mut self) -> Result<(), Box<dyn Error>> { 
+  //  // connect to the command port and send a ping
+  //  // message
+  //  let ctx =  zmq::Context::new();
+  //  if matches!(self.ip_address, None) || matches!(self.cmd_port, None) {
+  //    self.is_connected = false;
+  //    return Err(Box::new(ReadoutBoardError::NoConnectionInfo));
+  //  }
+  //  let address = "tcp://".to_owned() + &self.ip_address.unwrap().to_string() + ":" + &self.cmd_port.unwrap().to_string(); 
+  //  let socket  = ctx.socket(zmq::REQ)?;
+  //  socket.connect(&address)?;
+  //  info!("Have connected to adress {address}");
+  //  // if the readoutboard is there, it should send *something* back
+  //  let p = TofCommand::Ping(1);
 
-    socket.send(p.to_bytestream(), 0)?;
-    info!("Sent ping signal, waiting for response!");
-    let data = socket.recv_bytes(0)?;
-    if data.len() != 0 {
-      self.is_connected = true;
-      return Ok(());
-    }
-    self.is_connected = false;
-    return Err(Box::new(ReadoutBoardError::NoResponse));
-  }
+  //  socket.send(p.to_bytestream(), 0)?;
+  //  info!("Sent ping signal, waiting for response!");
+  //  let data = socket.recv_bytes(0)?;
+  //  if data.len() != 0 {
+  //    self.is_connected = true;
+  //    return Ok(());
+  //  }
+  //  self.is_connected = false;
+  //  return Err(Box::new(ReadoutBoardError::NoResponse));
+  //}
 }
 
 impl fmt::Display for ReadoutBoard {
@@ -1294,15 +1291,6 @@ fn test_display() {
   assert_eq!(1,1);
 }
 
-#[test]
-fn test_read_cpu_temperature() {
-  // Call the function to get the CPU temperature
-  let cpu_temp = read_cpu_temperature();
-  println!("Got cpu temp of {:?}", cpu_temp);
-  assert!(cpu_temp.0 <= 100.0, "CPU temperature should be within a reasonable range");
-  assert!(cpu_temp.1 <= 100.0, "CPU temperature should be within a reasonable range");
-  assert!(cpu_temp.2 <= 100.0, "CPU temperature should be within a reasonable range");
-}
 
 #[test]
 fn show_manifest() {
