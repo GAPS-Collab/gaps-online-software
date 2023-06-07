@@ -30,7 +30,6 @@ use crate::memory::*;
 
 
 use tof_dataclasses::commands::*;
-
 use tof_dataclasses::events::blob::{BlobData,
                                     RBEventPayload};
 use tof_dataclasses::events::RBEventHeader;
@@ -40,10 +39,16 @@ use tof_dataclasses::commands::{TofCommand,
                                 TofOperationMode};
 use tof_dataclasses::packets::{TofPacket,
                                PacketType};
-use tof_dataclasses::monitoring as moni;
+use tof_dataclasses::monitoring::RBMoniData;
 use tof_dataclasses::errors::SerializationError;
 use tof_dataclasses::run::RunConfig;
 use tof_dataclasses::serialization::get_json_from_file;
+
+// Takeru's tof-control
+use tof_control::rb_control::rb_temp::RBtemp;
+use tof_control::rb_control::rb_mag::RBmag;
+use tof_control::rb_control::rb_vcp::RBvcp;
+use tof_control::rb_control::rb_ph::RBph;
 
 
 /// Non-register related constants 
@@ -574,13 +579,22 @@ pub fn monitoring(ch : &Sender<TofPacket>) {
   let heartbeat      = time::Duration::from_secs(HEARTBEAT);
   loop {
 
-   let mut moni_dt = moni::RBMoniData::new();
-   
+   // get tof-control data
+   let mut moni_dt = RBMoniData::new();
+   let rb_temp = RBtemp::new();
+   let rb_mag  = RBmag::new();
+   let rb_vcp  = RBvcp::new();
+   let rb_ph   = RBph::new();
+   moni_dt.add_rbtemp(&rb_temp);
+   moni_dt.add_rbmag(&rb_mag);
+   moni_dt.add_rbvcp(&rb_vcp);
+   moni_dt.add_rbph(&rb_ph);
+
    let rate_query = get_trigger_rate();
    match rate_query {
      Ok(rate) => {
        debug!("Monitoring thread -> Rate: {rate}Hz ");
-       moni_dt.rate = rate;
+       moni_dt.rate = rate as u16;
      },
      Err(_)   => {
        warn!("Can not send rate monitoring packet, register problem");
@@ -708,7 +722,7 @@ pub fn runner(run_config          : &Receiver<RunConfig>,
               bs_sender           : &Sender<Vec<u8>>,
               mut latch_to_mtb    : bool,
               show_progress       : bool,
-              force_trigger_rate  : u32) {
+              mut force_trigger_rate  : u32) {
   
   let one_milli        = time::Duration::from_millis(1);
   let one_sec          = time::Duration::from_secs(1);
@@ -723,7 +737,7 @@ pub fn runner(run_config          : &Receiver<RunConfig>,
   // below
   //latch_to_mtb = true;
   let mut timer        = Instant::now();
-  let force_trigger    = force_trigger_rate > 0;
+  let mut force_trigger    = force_trigger_rate > 0;
   let mut time_between_events : Option<f32> = None;
 
   let now = time::Instant::now();

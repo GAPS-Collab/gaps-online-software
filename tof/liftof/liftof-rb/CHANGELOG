@@ -1,9 +1,10 @@
 # UHU series
 
-v0.5.0 - TODO
-* remotely change RunParams
+v0.5.0
 
-
+* includes readoutboard monitoring data
+* -> This now makes the code depending on tof-control
+* TODO: remotely change RunParams
 
 # MOA series
 
@@ -14,7 +15,7 @@ v0.4.2
 * Send only header information
 
 v0.4.0
-* Waveform analysis possible directly on the board
+* FUTURE/FEATURE not yet available: Waveform analysis possible directly on the board
   A new `--analyze` flag will take that into account
 * Simplified --vcal, --tcal, --noi flags for calibration
 

@@ -15,7 +15,7 @@ required-features = ["random"]
 
 [features]
 random=["rand"]
-
+database=["sqlite"]
 
 [dev-dependencies]
 # for testing
@@ -40,5 +40,5 @@ tof-control = {path = "../../../extern/tof-control" }
 #strum = "0.24"
 #strum_macros = "0.24"
 
-sqlite = "0.30"
+sqlite = {version = "0.30", optional = true}
 

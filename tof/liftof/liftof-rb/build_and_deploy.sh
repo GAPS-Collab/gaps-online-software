@@ -17,7 +17,7 @@ SSL_RB="tof-rb01 tof-rb02 tof-rb03 tof-rb04 tof-rb07 tof-rb08 tof-rb09 tof-rb11 
 #done
 
 #compile_and_deploy_target liftof-rb tof-rb01
-compile_and_deploy_target liftof-rb ssl-tof-computer
+compile_and_deploy_target liftof-rb ucla-true-tof-computer
 
 #compile_and_deploy_target liftof-rb tof-rb01
 

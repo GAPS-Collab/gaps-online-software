@@ -1,12 +1,7 @@
 [package]
 name = "liftof-rb"
-version = "0.4.3"
+version = "0.5.0"
 edition = "2021"
-
-
-#[[bin]]
-#name = "watch-buffer-fill"
-#path = "src/bin/watch_buffer_fill.rs"
 
 [[bin]]
 name = "liftof-rb"
@@ -31,6 +26,9 @@ path = "src/bin/debug_registers.rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+#[net]
+#git-fetch-with-cli = true
+
 [dependencies]
 liftof-lib = { path = "../liftof-lib"} 
 
@@ -41,7 +39,8 @@ memmap = "0.7"
 crossbeam-channel = "0.5"
 
 tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["random"]} 
-
+#tof-control = {git = "ssh://gaps@ucla-tof-computer:/home/gaps/takeruhayashi/tof-control" }
+tof-control = {path = "../../extern/tof-control" }
 zmq = "0.10.0"
 
 log = "0.4"
@@ -52,7 +51,8 @@ clap = { version = "4.0", features = ["derive"] }
 
 indicatif = ">=0.17.3"
 
-libc = "0.2"
+#libc = "0.2"
+libc = "0.2.140"
 signal-hook = "0.3"
 
 #[target.armv7-unknown-linux-gnueabi]
