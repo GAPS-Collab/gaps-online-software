@@ -13,16 +13,22 @@ use crossbeam_channel as cbc;
 
 use tof_dataclasses::packets::{TofPacket,
                                PacketType};
-use tof_dataclasses::events::TofEvent;
-use liftof_lib::TofPacketWriter;
 
+use tof_dataclasses::monitoring::{RBMoniData,
+                                  MtbMoniData,
+                                  TofCmpMoniData};
+
+use tof_dataclasses::events::TofEvent;
+use tof_dataclasses::serialization::Serialization;
+use liftof_lib::TofPacketWriter;
 /// Manages "outgoing" 0MQ PUB socket
 ///
 /// Everything should send to here, and 
 /// then it gets passed on over the 
 /// connection to the flight computer
 pub fn global_data_sink(incoming : &cbc::Receiver<TofPacket>,
-                        write_stream : bool) {
+                        write_stream : bool,
+                        print_moni_packets : bool) {
 
   let ctx = zmq::Context::new();
   let mut address_ip = String::from("tcp://");
@@ -57,6 +63,31 @@ pub fn global_data_sink(incoming : &cbc::Receiver<TofPacket>,
       Ok(pack) => {
         if writer.is_some() {
           writer.as_mut().unwrap().add_tof_packet(&pack);
+        }
+        if print_moni_packets {
+          let mut pos = 0;
+          // some output to the console
+          match pack.packet_type {
+            PacketType::MonitorRb => {
+              let moni = RBMoniData::from_bytestream(&pack.payload, &mut pos);
+              if let Ok(data) = moni {
+                println!("{}", data);
+              }
+            }
+            PacketType::MonitorTofCmp => {
+              let moni = RBMoniData::from_bytestream(&pack.payload, &mut pos);
+              if let Ok(data) = moni {
+                println!("{}", data);
+              }
+            }
+            PacketType::MonitorMtb => {
+              let moni = RBMoniData::from_bytestream(&pack.payload, &mut pos);
+              if let Ok(data) = moni {
+                println!("{}", data);
+              }
+            }
+            _ => ()
+          }
         }
         if pack.packet_type == PacketType::TofEvent {
           if event_cache.len() != 100 {

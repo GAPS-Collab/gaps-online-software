@@ -304,7 +304,7 @@ fn main() {
                                                &master_trigger_ip_c,
                                                master_trigger_port_c,
                                                moni_interval,
-                                               verbose);
+                                               false);
     });
   }
 
@@ -317,7 +317,8 @@ fn main() {
   
   worker_threads.execute(move || {
                          global_data_sink(&tp_from_client,
-                                          write_stream);
+                                          write_stream,
+                                          verbose);
   });
 
   // open a zmq context
