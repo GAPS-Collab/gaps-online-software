@@ -72,20 +72,24 @@ pub const DATAPORT : u32 = 42000;
 // FIXME
 type RamBuffer = BlobBuffer;
 
-
+/// Check for the environmental 
+/// variable LIFTOF_IS_SYSTEMD
+/// which is set in the liftof.service file
+/// to determine wether liftof is executed 
+/// through systemd.
+///
+/// WARN - this is not elegant, but all other
+/// approaches did not work!
 pub fn is_systemd_process() -> bool {
-  let mut is_systemd = false;
-  if let Some(listen_pid) = env::var_os("LISTEN_PID") {
-    if let Ok(pid_str) = listen_pid.into_string() {
-      if let Ok(pid) = pid_str.parse::<u32>() {
-        if pid == std::process::id() {
-          info!("This program is being executed through systemd.");
-          is_systemd = true;
-        }
-      }
-    }
+  // this custom variable must be set in the 
+  // liftof.service file!!
+  if env::var("LIFTOF_IS_SYSTEMD").is_ok() {
+    info!("Running under systemd");
+    true
+  } else {
+    info!("Not running under systemd");
+    false
   }
-  is_systemd
 }
 
 /// Get a runconfig from a file. 

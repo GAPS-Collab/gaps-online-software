@@ -5,6 +5,7 @@ v0.5.0
 * includes readoutboard monitoring data
 * -> This now makes the code depending on tof-control
 * TODO: remotely change RunParams
+* CRITICAL FIX - systemd recongnition routine
 
 # MOA series
 

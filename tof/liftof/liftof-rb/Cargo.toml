@@ -38,7 +38,7 @@ memmap = "0.7"
 # multi-producer/multi-consumer channels
 crossbeam-channel = "0.5"
 
-tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["random"]} 
+tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["random", "tofcontrol"]} 
 #tof-control = {git = "ssh://gaps@ucla-tof-computer:/home/gaps/takeruhayashi/tof-control" }
 tof-control = {path = "../../extern/tof-control" }
 zmq = "0.10.0"
@@ -52,7 +52,7 @@ clap = { version = "4.0", features = ["derive"] }
 indicatif = ">=0.17.3"
 
 #libc = "0.2"
-libc = "0.2.140"
+libc = "0.2"
 signal-hook = "0.3"
 
 #[target.armv7-unknown-linux-gnueabi]
