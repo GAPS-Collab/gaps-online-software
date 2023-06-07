@@ -16,6 +16,7 @@ required-features = ["random"]
 [features]
 random=["rand"]
 database=["sqlite"]
+tofcontrol=["tof-control"]
 
 [dev-dependencies]
 # for testing
@@ -31,7 +32,7 @@ rand = {version = "0.8", optional = true}
 json = "0.12" 
 
 # Takeru's tof-control
-tof-control = {path = "../../../extern/tof-control" }
+tof-control = {path = "../../../extern/tof-control", optional = true }
 
 # nom for cominatoric parsers
 #nom = "7.1"

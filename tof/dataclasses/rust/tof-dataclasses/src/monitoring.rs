@@ -10,9 +10,13 @@
 use std::fmt;
 
 // Takeru's tof-control code
+#[cfg(feature = "tof-control")]
 use tof_control::rb_control::rb_temp::RBtemp;
+#[cfg(feature = "tof-control")]
 use tof_control::rb_control::rb_mag::RBmag;
+#[cfg(feature = "tof-control")]
 use tof_control::rb_control::rb_vcp::RBvcp;
+#[cfg(feature = "tof-control")]
 use tof_control::rb_control::rb_ph::RBph;
 
 use crate::serialization::{Serialization,
@@ -80,6 +84,7 @@ impl RBMoniData {
   /// HEAD + TAIL + sum(sizeof(m) for m in _all_members_))
   pub const SIZE : usize  = 7 + (36*4) ;
 
+  #[cfg(feature = "tof-control")]
   pub fn add_rbtemp(&mut self, rb_temp : &RBtemp) {
     self.tmp_drs         = rb_temp.drs_temp      ; 
     self.tmp_clk         = rb_temp.clk_temp      ; 
@@ -88,7 +93,8 @@ impl RBMoniData {
     self.tmp_lis3mdltr   = rb_temp.lis3mdltr_temp; 
     self.tmp_bm280       = rb_temp.bme280_temp   ; 
   }
-  
+
+  #[cfg(feature = "tof-control")] 
   pub fn add_rbmag(&mut self, rb_mag   : &RBmag) {
     self.mag_x   = rb_mag.magnetic_x;
     self.mag_y   = rb_mag.magnetic_y;
@@ -96,6 +102,7 @@ impl RBMoniData {
     self.mag_tot = rb_mag.magnetic_t;
   }
   
+  #[cfg(feature = "tof-control")]
   pub fn add_rbvcp(&mut self, rb_vcp   : &RBvcp) {
     self.drs_dvdd_voltage = rb_vcp.drs_dvdd_voltage ;
     self.drs_dvdd_current = rb_vcp.drs_dvdd_current ;
@@ -123,6 +130,7 @@ impl RBMoniData {
     self.n1v5_power       = rb_vcp.n1v5_power       ;
   }
   
+  #[cfg(feature = "tof-control")] 
   pub fn add_rbph(&mut self, rb_ph   : &RBph) {
     self.pressure = rb_ph.pressure;
     self.humidity = rb_ph.humidity;

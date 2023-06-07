@@ -9,7 +9,7 @@ use std::str::FromStr;
 use std::net::Ipv4Addr;
 use std::path::Path;
 
-#[cfg(feature = "random")]
+#[cfg(feature = "database")]
 extern crate sqlite;
 
 #[derive(Copy, Clone, Debug)]
@@ -74,7 +74,7 @@ impl fmt::Display for LocalTriggerBoard {
   }
 }
 
-#[cfg(feature = "random")]
+#[cfg(feature = "database")]
 pub fn get_rbs_from_sqlite(filename : &Path) -> Vec<ReadoutBoard> {
   let connection = sqlite::open(filename).unwrap();
   let query = "SELECT * FROM tof_db_rb";
@@ -114,7 +114,7 @@ pub fn get_rbs_from_sqlite(filename : &Path) -> Vec<ReadoutBoard> {
 }
 
 
-#[cfg(feature = "random")]
+#[cfg(feature = "database")]
 pub fn get_ltbs_from_sqlite(filename : &Path) -> Vec<LocalTriggerBoard> {
   let connection = sqlite::open(filename).unwrap();
   let query = "SELECT * FROM tof_db_ltb";
