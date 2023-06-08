@@ -1,3 +1,9 @@
+//! LIFTOF-CC - Main C&C (command and control) server application for 
+//! tof datataking and control.
+//!
+//!
+//!
+//!
 
 extern crate pretty_env_logger;
 #[macro_use] extern crate log;
@@ -8,22 +14,21 @@ extern crate json;
 extern crate hdf5;
 #[cfg(feature = "diagnostics")]
 extern crate ndarray;
-
-extern crate local_ip_address;
-
-extern crate liftof_lib;
-use liftof_lib::master_trigger;
-
-//#[cfg(feature="random")]
-//extern crate rand;
-
 extern crate ctrlc;
 extern crate zmq;
 extern crate tof_dataclasses;
+extern crate local_ip_address;
+extern crate crossbeam_channel;
 
-#[macro_use] extern crate colored;
+extern crate colored;
+extern crate liftof_lib;
+extern crate liftof_cc;
+
+use log::LevelFilter;
+use pretty_env_logger::formatted_builder;
 use colored::Colorize;
 
+use std::io::Write;
 use std::{thread,
           time};
 
@@ -36,7 +41,6 @@ use clap::{arg,
            //Command,
            Parser};
 
-extern crate crossbeam_channel;
 //use crossbeam_channel::{unbounded,
 //                        Sender,
 //                        Receiver};
@@ -51,7 +55,7 @@ use tof_dataclasses::manifest::{LocalTriggerBoard,
                                 get_ltbs_from_sqlite,
                                 get_rbs_from_sqlite};
 use tof_dataclasses::commands::{TofCommand, TofResponse};
-extern crate liftof_cc;
+use liftof_lib::master_trigger;
 
 use liftof_cc::readoutboard_comm::readoutboard_communicator;
 use liftof_cc::event_builder::{event_builder,
@@ -94,7 +98,16 @@ struct Args {
 /*************************************/
 
 fn main() {
-  pretty_env_logger::init();
+  formatted_builder()
+    .format(|buf, record| {
+    writeln!( buf, "[{level}][{module_path}:{line}] {args}",
+      level = record.level(),
+      module_path = record.module_path().unwrap_or("<unknown>"),
+      line = record.line().unwrap_or(0),
+      args = record.args()
+      )
+    }).filter(None, LevelFilter::Info).init();
+  //pretty_env_logger::init();
 
   // welcome banner!
   println!("-----------------------------------------------");
@@ -300,29 +313,14 @@ fn main() {
                                              &rb_rec,
                                              &pp_send);
   });
-  
+  println!("==> paddle cache thread started!");
+  println!("==> Starting data sink thread!");
   worker_threads.execute(move || {
                          global_data_sink(&tp_from_client,
                                           write_stream,
                                           verbose);
   });
-
-  // open a zmq context
-  println!("==> Seting up zmq context and opening socket for event builder!");
-  //let ctx = zmq::Context::new();
-  //let evb_comm_socket = ctx.socket(zmq::PUB).unwrap();
-  //let mut address_ip = String::from("tcp://");
-  //address_ip += config["flight_computer"]["ip_address"].as_str().unwrap();
-  //port        = config["flight_computer"]["port"].as_usize().unwrap();
-  //address = address_ip.to_owned() + ":" + &port.to_string();
-  //info!("Will bind to port for flight comp comm at {}", address);
-  //let evb_comm_ok = evb_comm_socket.bind(&address);
-  //match evb_comm_ok {
-  //    Ok(_)    => info!("Bound socket to {}", address),
-  //    Err(err) => panic!("Can not communicate with rb at address {}. Maybe you want to check your .json configuration file?, error {}",address, err)
-  //}
-
-  println!("==> Starting event builder and master trigger threads...");
+  println!("==> data sink thread started!");
   println!("==> Will now start rb threads..");
 
   for n in 0..nboards {
@@ -360,6 +358,7 @@ fn main() {
   });
   if use_master_trigger {
     // start the event builder thread
+    println!("==> Starting event builder and master trigger threads...");
     let cmd_sender_c = cmd_sender.clone();
     let rb_list_c    = rb_list.clone();
     let ltb_list_c   = ltb_list.clone();
