@@ -5,9 +5,9 @@
 //!
 //!
 
-extern crate pretty_env_logger;
+//extern crate pretty_env_logger;
 #[macro_use] extern crate log;
-
+extern crate env_logger;
 extern crate clap;
 extern crate json;
 #[cfg(feature = "diagnostics")]
@@ -25,7 +25,8 @@ extern crate liftof_lib;
 extern crate liftof_cc;
 
 use log::{LevelFilter, Level};
-use pretty_env_logger::formatted_builder;
+use env_logger::Builder;
+//use pretty_env_logger::formatted_builder;
 use colored::{Colorize, ColoredString};
 use std::io::Write;
 use std::{thread,
@@ -96,59 +97,27 @@ struct Args {
 
 fn color_log(level : &Level) -> ColoredString {
   match level {
-    Error    => String::from("ERROR!").red(),
-    Warn     => String::from("WARN").yellow(),
-    Info     => String::from("Info").green(),
-    Debug    => String::from("debug").blue(),
-    Trace    => String::from("trace").cyan(),
+    Level::Error    => String::from(" ERROR!").red(),
+    Level::Warn     => String::from(" WARN  ").yellow(),
+    Level::Info     => String::from(" Info  ").green(),
+    Level::Debug    => String::from(" debug ").blue(),
+    Level::Trace    => String::from(" trace ").cyan(),
   }
 }
 
 /*************************************/
 
 fn main() {
-  //formatted_builder()
-  //  .format(|buf, record| {
-  //  writeln!( buf, "[{level}][{module_path}:{line}] {args}",
-  //    level = color_log(&record.level()),
-  //    module_path = record.module_path().unwrap_or("<unknown>"),
-  //    line = record.line().unwrap_or(0),
-  //    args = record.args()
-  //    )
-  //  }).filter(None, LevelFilter::Error)
-  //  .format(|buf, record| {
-  //  writeln!( buf, "[{level}][{module_path}:{line}] {args}",
-  //    level = color_log(&record.level()),
-  //    module_path = record.module_path().unwrap_or("<unknown>"),
-  //    line = record.line().unwrap_or(0),
-  //    args = record.args()
-  //    )
-  //  }).filter(None, LevelFilter::Warn)
-  //  .format(|buf, record| {
-  //  writeln!( buf, "[{level}][{module_path}:{line}] {args}",
-  //    level = color_log(&record.level()),
-  //    module_path = record.module_path().unwrap_or("<unknown>"),
-  //    line = record.line().unwrap_or(0),
-  //    args = record.args()
-  //    )
-  //  }).filter(None, LevelFilter::Info)
-  //  .format(|buf, record| {
-  //  writeln!( buf, "[{level}][{module_path}:{line}] {args}",
-  //    level = color_log(&record.level()),
-  //    module_path = record.module_path().unwrap_or("<unknown>"),
-  //    line = record.line().unwrap_or(0),
-  //    args = record.args()
-  //    )
-  //  }).filter(None, LevelFilter::Debug)
-  //  .format(|buf, record| {
-  //  writeln!( buf, "[{level}][{module_path}:{line}] {args}",
-  //    level = color_log(&record.level()),
-  //    module_path = record.module_path().unwrap_or("<unknown>"),
-  //    line = record.line().unwrap_or(0),
-  //    args = record.args()
-  //    )
-  //  }).filter(None, LevelFilter::Trace).init();
-  pretty_env_logger::init();
+  env_logger::builder()
+    .format(|buf, record| {
+    writeln!( buf, "[{level}][{module_path}:{line}] {args}",
+      //level = color_log(&record.level()),
+      level = color_log(&record.level()),
+      module_path = record.module_path().unwrap_or("<unknown>"),
+      line = record.line().unwrap_or(0),
+      args = record.args()
+      )
+    }).init();
 
   // welcome banner!
   println!("-----------------------------------------------");
@@ -165,6 +134,11 @@ fn main() {
 
   let verbose = args.verbose;
 
+  //error!("error");
+  //warn!("warn");
+  //info!("info");
+  //debug!("debug");
+  //trace!("trace");
   let write_blob = args.write_blob;
   if write_blob {
     info!("Will write blob data to file!");

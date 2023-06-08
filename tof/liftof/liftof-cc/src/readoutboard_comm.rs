@@ -240,7 +240,7 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
                 // directly to the data sink
                 match tp_to_sink.send(tp) {
                   Err(err) => error!("Can not send tof packet to data sink! Err {err}"),
-                  Ok(_)    => ()
+                  Ok(_)    => info!("Packet sent"),
                 }
               }
             } // end match packet type

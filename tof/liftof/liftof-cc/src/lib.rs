@@ -12,7 +12,7 @@ pub mod flight_comms;
 // the "official" structure
 // for now, let's just keep it here
 mod test_blobdata;
-extern crate pretty_env_logger;
+//extern crate pretty_env_logger;
 #[macro_use] extern crate log;
 #[macro_use] extern crate sensors;
 extern crate clap;

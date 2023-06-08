@@ -51,6 +51,7 @@ pub fn global_data_sink(incoming : &cbc::Receiver<TofPacket>,
 
   let mut writer : Option<TofPacketWriter> = None;
   if write_stream {
+    info!("Will write stream to dedicated file!");
     writer = Some(TofPacketWriter::new(String::from("stream")));
   }
   let mut event_cache = Vec::<TofPacket>::with_capacity(100); 
@@ -61,6 +62,7 @@ pub fn global_data_sink(incoming : &cbc::Receiver<TofPacket>,
     match incoming.recv() {
       Err(err) => trace!("No new packet, err {err}"),
       Ok(pack) => {
+        info!("Got new tof packet {}", pack.packet_type);
         if writer.is_some() {
           writer.as_mut().unwrap().add_tof_packet(&pack);
         }
