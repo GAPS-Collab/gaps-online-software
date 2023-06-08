@@ -81,7 +81,7 @@ pub fn get_rbs_from_sqlite(filename : &Path) -> Vec<ReadoutBoard> {
   let mut rbs  = Vec::<ReadoutBoard>::new();
   connection
     .iterate(query, |pairs| {
-    println!("New rb, has following values...");
+    debug!("New rb, has following values...");
     //let mut ltb = LocalTriggerBoard::new();
     let mut rb = ReadoutBoard::new();
     for &(name, value) in pairs.iter() {
@@ -101,7 +101,7 @@ pub fn get_rbs_from_sqlite(filename : &Path) -> Vec<ReadoutBoard> {
             "ch6_paddle_id" => {rb.set_paddle_end_id_for_rb_channel(6, u16::from_str(v).unwrap_or(0));},
             "ch7_paddle_id" => {rb.set_paddle_end_id_for_rb_channel(7, u16::from_str(v).unwrap_or(0));},
             "ch8_paddle_id" => {rb.set_paddle_end_id_for_rb_channel(8, u16::from_str(v).unwrap_or(0));},
-            _ => {println!("Found name {}", name);}                         
+            _ => {debug!("Found name {}", name);}                         
           }
         }
       }
@@ -109,7 +109,7 @@ pub fn get_rbs_from_sqlite(filename : &Path) -> Vec<ReadoutBoard> {
     rbs.push(rb);
     true
   });
-  println!("We found {} rbs", rbs.len()); 
+  info!("We found {} rbs in the database", rbs.len()); 
   rbs
 }
 
@@ -121,7 +121,7 @@ pub fn get_ltbs_from_sqlite(filename : &Path) -> Vec<LocalTriggerBoard> {
   let mut ltbs  = Vec::<LocalTriggerBoard>::new();
   connection
     .iterate(query, |pairs| {
-    println!("New ltb, has following values...");
+    //println!("New ltb, has following values...");
     let mut ltb = LocalTriggerBoard::new();
     for &(name, value) in pairs.iter() {
       match value {
@@ -260,16 +260,16 @@ pub fn get_ltbs_from_sqlite(filename : &Path) -> Vec<LocalTriggerBoard> {
               let rb_ch = u8::from_str(v).unwrap_or(0);
               ltb.set_rb_ch(16, rb_ch);
             },
-            _ => {println!("FOund name {}", name);}                         
+            _ => {debug!("Found name {}", name);}                         
           }
         }
       }
     } // end loop over ltbs
-    println!("{}", ltb);
+    //println!("{}", ltb);
     ltbs.push(ltb);
     true
   });
-  println!("We found {} ltbs", ltbs.len()); 
+  info!("We found {} ltbs in the database!", ltbs.len()); 
   ltbs
 }
 

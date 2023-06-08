@@ -190,24 +190,24 @@ impl fmt::Display for RBMoniData {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     write!(f, "<RBMoniData:
            \t BOARD ID {}
-           \t RATE     {} [Hz] 
+           \t RATE     {}    [Hz] 
            \t DRS TMP  {:.3} [C]
            \t CLK TMP  {:.3} [C]
            \t ADC TMP  {:.3} [C]
            \t ZYNQ TMP {:.3} [C]
-           \t LIS3MDLTR TMP {:.3} [C]  
-           \t BM280 TMP     {:.3} [C]
-           \t PRESSURE      {:.3} [C]
-           \t HUMIDITY      {:.3} [C]
-           \t MAG_X {:.3} [G] | MAG_Y {:.3} [G] | MAG_Z {:.3} [G] | MAG_TOT {:.3} [G]
-           \t ZYNQ 3.3V Power: {:.3} [V] | {:.3} [A] | {:.3} [W]
-           \t 3.3V      Power: {:.3} [V] | {:.3} [A] | {:.3} [W]
-           \t 3.5V      Power: {:.3} [V] | {:.3} [A] | {:.3} [W]
-           \t -1.5V     Power: {:.3} [V] | {:.3} [A] | {:.3} [W]
-           \t DRS4 Digital 2.5V Power:  {:.3} [V] | {:.3} [A] | {:.3} [W]
-           \t DRS4 Analog 2.5V  Power:  {:.3} [V] | {:.3} [A] | {:.3} [W]
-           \t ADC Digital 2.5V  Power:  {:.3} [V] | {:.3} [A] | {:.3} [W]
-           \t ADC Analog 3.0V   Power:  {:.3} [V] | {:.3} [A] | {:.3} [W]>",
+           \t LIS3MDLTR TMP  {:.3} [C]  
+           \t BM280 TMP      {:.3} [C]
+           \t PRESSURE      {:.3} [hPa]
+           \t HUMIDITY       {:.3} [%]
+           \t MAG_X , MAG_Y, MAG_Z, MAG_TOT: {:.3} [G] | {:.3} [G] | {:.3} [G] | {:.3} [G]
+           \t ZYNQ 3.3V         Power:  {:.3}  [V] | {:.3} [A] | {:.3} [W]
+           \t 3.3V              Power:  {:.3}  [V] | {:.3} [A] | {:.3} [W]
+           \t 3.5V              Power:  {:.3}  [V] | {:.3} [A] | {:.3} [W]
+           \t -1.5V             Power: {:.3}  [V] | {:.3} [A] | {:.3} [W]
+           \t DRS4 Digital 2.5V Power:  {:.3}  [V] | {:.3} [A] | {:.3} [W]
+           \t DRS4 Analog 2.5V  Power:  {:.3}  [V] | {:.3} [A] | {:.3} [W]
+           \t ADC Digital 2.5V  Power:  {:.3}  [V] | {:.3} [A] | {:.3} [W]
+           \t ADC Analog 3.0V   Power:  {:.3}  [V] | {:.3} [A] | {:.3} [W]>",
            self.board_id        , 
            self.rate            ,
            self.tmp_drs         ,
@@ -376,9 +376,9 @@ impl Default for TofCmpMoniData {
 impl fmt::Display for TofCmpMoniData {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     write!(f, "<TofCmpMoniData:
-           \t CORE1 TMP [C] {}
-           \t CORE2 TMP [C] {}
-           \t PCH TMP   [C] {}>",
+           \t CORE1 TMP {}: [C]
+           \t CORE2 TMP {}: [C]
+           \t PCH   TMP {}: [C]>",
            self.core1_tmp, self.core2_tmp, self.pch_tmp)
   }
 }

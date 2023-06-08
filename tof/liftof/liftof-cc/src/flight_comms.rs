@@ -47,7 +47,7 @@ pub fn global_data_sink(incoming : &cbc::Receiver<TofPacket>,
     Err(err) => panic!("Can not bind to address {}, Err {}", data_address, err),
     Ok(_)    => ()
   }
-  info!("ZMQ PUB Socket for global data sink bound at {data_address}");
+  info!("ZMQ PUB Socket for global data sink bound to {data_address}");
 
   let mut writer : Option<TofPacketWriter> = None;
   if write_stream {

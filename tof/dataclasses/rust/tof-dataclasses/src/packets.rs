@@ -134,6 +134,28 @@ impl PacketType {
   }
 }
 
+impl fmt::Display for PacketType {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    
+    let repr : String;
+    match self {
+      PacketType::Unknown        => { repr = String::from("UNKNOWN")     },
+      PacketType::Command        => { repr = String::from("COMMAND")     },
+      PacketType::RBEvent        => { repr = String::from("RBEVENT")     },
+      PacketType::TofEvent       => { repr = String::from("TOFEVENT")    },
+      PacketType::Monitor        => { repr = String::from("MONITOR")     },
+      PacketType::HeartBeat      => { repr = String::from("HEARTBEAT")   },
+      PacketType::MasterTrigger  => { repr = String::from("MT")          },
+      PacketType::Scalar         => { repr = String::from("SCALAR")      },
+      PacketType::RBHeader       => { repr = String::from("RBHEADER")    },
+      PacketType::MonitorRb      => { repr = String::from("RB_MONI")     },
+      PacketType::MonitorTofCmp  => { repr = String::from("TOFCMP_MONI") },
+      PacketType::MonitorMtb     => { repr = String::from("MTB_MONI")    },
+    }
+    write!(f, "<PacketType {}>", repr)
+  }
+}
+
 /// The most basic of all packets
 ///  
 /// A type and a payload. This wraps

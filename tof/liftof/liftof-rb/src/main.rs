@@ -93,6 +93,9 @@ struct Args {
   /// Readoutboard testing with softare trigger, equally spaced in time
   #[arg(long, default_value_t = false)]
   rb_test_sw : bool,
+  /// show moni data 
+  #[arg(long, default_value_t = false)]
+  verbose : bool,
   /// Take data for voltage calibration
   #[arg(long, default_value_t = false)]
   vcal : bool,
@@ -129,6 +132,7 @@ fn main() {
   pretty_env_logger::init();
  
   let args = Args::parse();                   
+  let verbose               = args.verbose;
   let mut n_events_run      = args.nevents;
   let mut show_progress     = args.show_progress;
   let cache_size            = args.cache_size;
@@ -243,7 +247,7 @@ fn main() {
     }
   }
   let current_mask = read_control_reg(0x44).unwrap();
-  println!("CURRENT MASK = {}", current_mask);
+  info!("THe latest reading of the active channel mask regsiter reads {}", current_mask);
   //exit(0);
 
   // this resets the data buffer /dev/uio1,2 occupancy
@@ -307,11 +311,13 @@ fn main() {
   workforce.execute(move || {
     data_publisher(&tp_from_client,
                    rb_test || force_random_trig > 0,
-                   Some(&file_suffix)); 
+                   Some(&file_suffix),
+                   verbose); 
   });
   let tp_to_pub_c   = tp_to_pub.clone();
   workforce.execute(move || {
-    monitoring(&tp_to_pub);
+    monitoring(&tp_to_pub,
+               verbose);
   });
 
   // if we don't set a rate for force_random_trig, 
@@ -397,13 +403,13 @@ fn main() {
       }
       rc_config.is_active = true;
       //rc.rb_buff_size = 2000;
-      println!("Waiting for threads to start..");
+      println!("=> Waiting for threads to start..");
       thread::sleep(time::Duration::from_secs(5));
-      println!("..done");
+      println!("=> ..done");
       match rc_to_runner.send(rc_config) {
         Err(err) => error!("Could not initialzie Run! Err {err}"),
         Ok(_)    => {
-          println!("Run initialized! Attempting to start!");
+          println!("=> Run initialized! Attempting to start!");
         }
       }
     }

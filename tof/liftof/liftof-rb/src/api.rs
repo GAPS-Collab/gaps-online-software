@@ -235,7 +235,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
         warn!("No heartbeat received since {heartbeat_timeout_seconds}. Attempting to reconnect!");
         match cmd_socket.connect(&cmd_address) {
           Err(err) => {
-            warn!("Not able to connect to {}, Error {err}", cmd_address);
+            error!("Not able to connect to {}, Error {err}", cmd_address);
             is_connected = false;
           }
           Ok(_)    => {
@@ -516,9 +516,14 @@ pub fn cmd_responder(cmd_server_ip             : String,
 /// Manage the 0MQ PUB socket and send everything 
 /// which comes in over the wire as a byte 
 /// payload
+///
+/// # Arguments 
+///
+/// * print_packets : Print outgoing packets to terminal
 pub fn data_publisher(data : &Receiver<TofPacket>,
-                      write_blob  : bool,
-                      file_suffix : Option<&str> ) {
+                      write_blob     : bool,
+                      file_suffix    : Option<&str> ,
+                      print_packets  : bool) {
   let mut address_ip = String::from("tcp://");
   let this_board_ip = local_ip().expect("Unable to obtainl local board IP. Something is messed up!");
   let data_port    = DATAPORT;
@@ -573,6 +578,9 @@ pub fn data_publisher(data : &Receiver<TofPacket>,
           }
         }
         let tp_payload = prefix_board_id(&mut packet.to_bytestream());
+        if print_packets {
+          println!("=> Sending Tof packet type: {} with {} bytes!", packet.packet_type, packet.payload.len());
+        }
         match data_socket.send(tp_payload,zmq::DONTWAIT) {
           Ok(_)    => trace!("0MQ PUB socket.send() SUCCESS!"),
           Err(err) => error!("Not able to send over 0MQ PUB socket! Err {err}"),
@@ -583,13 +591,15 @@ pub fn data_publisher(data : &Receiver<TofPacket>,
 }
 
 /// Gather monitoring data and pass it on
-pub fn monitoring(ch : &Sender<TofPacket>) {
+pub fn monitoring(ch : &Sender<TofPacket>,
+                  verbose : bool) {
   let heartbeat      = time::Duration::from_secs(HEARTBEAT);
+  let board_id = get_board_id().unwrap_or(0); 
   loop {
 
    // get tof-control data
    let mut moni_dt = RBMoniData::new();
-   
+   moni_dt.board_id = board_id as u8; 
    #[cfg(feature="monitoring")]
    let rb_temp = RBtemp::new();
    #[cfg(feature="monitoring")]
@@ -617,10 +627,13 @@ pub fn monitoring(ch : &Sender<TofPacket>) {
        warn!("Can not send rate monitoring packet, register problem");
      }
    }
-   
+  
+   if verbose {
+     println!("{}", moni_dt);
+   }
    let tp = TofPacket::from(&moni_dt);
    match ch.try_send(tp) {
-     Err(err) => {debug!("Issue sending RBMoniData {:?}", err)},
+     Err(err) => {error!("Issue sending RBMoniData {:?}", err)},
      Ok(_)    => {debug!("Send RBMoniData successfully!")}
    }
 
@@ -910,12 +923,12 @@ pub fn runner(run_config          : &Receiver<RunConfig>,
         //println!("Time between events {}", time_between_events.unwrap());
         let elapsed = timer.elapsed().as_secs_f32();
         //println!("Elapsed {}", elapsed);
-        debug!("Elapsed {}", elapsed);
+        trace!("Forced trigger mode, {} seconds since last trigger", elapsed);
         if elapsed > time_between_events.unwrap() {
           timer = Instant::now(); 
           match trigger() {
             Err(err) => error!("Error when triggering! {err}"),
-            Ok(_)    => ()//println!("Firing trigger!")
+            Ok(_)    => trace!("Firing trigger!")
           }
         } else {
           // FIXME - we could sleep here for a bit!
