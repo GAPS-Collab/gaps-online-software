@@ -121,69 +121,69 @@ uint8_t RBEnvPacket::get_rb_id()
   return rb_id;
 }
 
-float RBEnvPacket::get_temperature()
+i32 RBEnvPacket::get_temperature()
 {
-  float value = decode_12bitsensor(temperature, TEMPSENSMIN, TEMPSENSMAX);
+  i32 value = decode_12bitsensor(temperature, TEMPSENSMIN, TEMPSENSMAX);
   return value;
 }
 
-float RBEnvPacket::get_voltage()
+i32 RBEnvPacket::get_voltage()
 {
-  float value = decode_12bitsensor(voltage, VOLTSENSMIN, VOLTSENSMAX);
+  i32 value = decode_12bitsensor(voltage, VOLTSENSMIN, VOLTSENSMAX);
   return value;
 }
 
-float RBEnvPacket::get_current()
+i32 RBEnvPacket::get_current()
 {
-  float value = decode_12bitsensor(current, CURRENTSENSMIN, CURRENTSENSMAX);
+  i32 value = decode_12bitsensor(current, CURRENTSENSMIN, CURRENTSENSMAX);
   return value;
 }
 
-float RBEnvPacket::get_power()
+i32 RBEnvPacket::get_power()
 {
-  float value = decode_12bitsensor(power, POWERSENSMIN, POWERSENSMAX);
+  i32 value = decode_12bitsensor(power, POWERSENSMIN, POWERSENSMAX);
   return value;
 }
 
-float RBEnvPacket::get_preamp_temp()
+i32 RBEnvPacket::get_preamp_temp()
 {
-  float value = decode_12bitsensor(preamp_temp, PREAMPTEMPSENSMIN, PREAMPTEMPSENSMAX);
+  i32 value = decode_12bitsensor(preamp_temp, PREAMPTEMPSENSMIN, PREAMPTEMPSENSMAX);
   return value;
 }
 
-float RBEnvPacket::get_preamp_bias()
+i32 RBEnvPacket::get_preamp_bias()
 {
-  float value = decode_12bitsensor(preamp_bias, PREAMPBIASSENSMIN, PREAMPBIASSENSMAX);
+  i32 value = decode_12bitsensor(preamp_bias, PREAMPBIASSENSMIN, PREAMPBIASSENSMAX);
   return value;
 }
 
-float RBEnvPacket::get_temperature_rb()
+i32 RBEnvPacket::get_temperature_rb()
 {
-  float value = decode_12bitsensor(temperature_rb, TEMPRBSENSMIN, TEMPRBSENSMAX);
+  i32 value = decode_12bitsensor(temperature_rb, TEMPRBSENSMIN, TEMPRBSENSMAX);
   return value;
 }
 
-float RBEnvPacket::get_voltage_rb()
+i32 RBEnvPacket::get_voltage_rb()
 {
-  float value = decode_12bitsensor(voltage_rb, VOLTRBSENSMIN, VOLTRBSENSMAX);
+  i32 value = decode_12bitsensor(voltage_rb, VOLTRBSENSMIN, VOLTRBSENSMAX);
   return value;
 }
 
-float RBEnvPacket::get_current_rb()
+i32 RBEnvPacket::get_current_rb()
 {
-  float value = decode_12bitsensor(current_rb, CURRENTRBSENSMIN, CURRENTRBSENSMAX);
+  i32 value = decode_12bitsensor(current_rb, CURRENTRBSENSMIN, CURRENTRBSENSMAX);
   return value;
 }
 
-float RBEnvPacket::get_power_rb()
+i32 RBEnvPacket::get_power_rb()
 {
-  float value = decode_12bitsensor(power_rb, POWERRBSENSMIN, POWERRBSENSMAX);
+  i32 value = decode_12bitsensor(power_rb, POWERRBSENSMIN, POWERRBSENSMAX);
   return value;
 }
 
-float RBEnvPacket::get_lol_status()
+i32 RBEnvPacket::get_lol_status()
 {
-  float value = decode_12bitsensor(lol_status, TEMPSENSMIN, TEMPSENSMAX);
+  i32 value = decode_12bitsensor(lol_status, TEMPSENSMIN, TEMPSENSMAX);
   return value;
 }
 
@@ -193,57 +193,57 @@ void RBEnvPacket::set_rb_id         (uint8_t readoutboard_id)
   rb_id = readoutboard_id;
 }
 
-void RBEnvPacket::set_temperature   (float value)
+void RBEnvPacket::set_temperature   (i32 value)
 {
   temperature = encode_12bitsensor(value, TEMPSENSMIN, TEMPSENSMAX );
 }
 
-void RBEnvPacket::set_voltage       (float value)
+void RBEnvPacket::set_voltage       (i32 value)
 {
   voltage = encode_12bitsensor(value, VOLTSENSMIN, VOLTSENSMAX);
 }
 
-void RBEnvPacket::set_current       (float value)
+void RBEnvPacket::set_current       (i32 value)
 {
   current = encode_12bitsensor(value, CURRENTSENSMIN, CURRENTSENSMAX);
 }
 
-void RBEnvPacket::set_power         (float value)
+void RBEnvPacket::set_power         (i32 value)
 {
   power = encode_12bitsensor(value, POWERSENSMIN, POWERSENSMAX );
 }
 
-void RBEnvPacket::set_preamp_temp   (float value)
+void RBEnvPacket::set_preamp_temp   (i32 value)
 {
   preamp_temp = encode_12bitsensor(value, PREAMPTEMPSENSMIN, PREAMPTEMPSENSMAX);
 }
 
-void RBEnvPacket::set_preamp_bias   (float value)
+void RBEnvPacket::set_preamp_bias   (i32 value)
 {
   preamp_bias = encode_12bitsensor(value, PREAMPBIASSENSMIN, PREAMPBIASSENSMAX);
 }
 
-void RBEnvPacket::set_temperature_rb(float value)
+void RBEnvPacket::set_temperature_rb(i32 value)
 {
   temperature_rb = encode_12bitsensor(value, TEMPRBSENSMIN, TEMPRBSENSMAX);
 }
 
-void RBEnvPacket::set_voltage_rb    (float value)
+void RBEnvPacket::set_voltage_rb    (i32 value)
 {
   voltage_rb = encode_12bitsensor(value, VOLTRBSENSMIN, VOLTRBSENSMAX );
 }
 
-void RBEnvPacket::set_current_rb    (float value)
+void RBEnvPacket::set_current_rb    (i32 value)
 {
   current_rb = encode_12bitsensor(value, CURRENTRBSENSMIN, CURRENTRBSENSMAX );
 }
 
-void RBEnvPacket::set_power_rb      (float value)
+void RBEnvPacket::set_power_rb      (i32 value)
 {
   power_rb = encode_12bitsensor(value, POWERRBSENSMIN, POWERRBSENSMAX );
 }
 
-void RBEnvPacket::set_lol_status    (float value)
+void RBEnvPacket::set_lol_status    (i32 value)
 {
   // FIXME
   lol_status = encode_12bitsensor(value, TEMPSENSMIN, TEMPSENSMAX );

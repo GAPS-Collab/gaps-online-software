@@ -4,6 +4,7 @@
 #include <vector>
 #include <cstddef>
 #include <string>
+#include <cstdint>
 
 /******************************************
  * Basic typedefs to be used with all tof
