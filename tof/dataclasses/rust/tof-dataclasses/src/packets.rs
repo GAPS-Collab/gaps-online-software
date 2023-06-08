@@ -79,7 +79,8 @@ pub const PACKET_TYPE_RB_MONI     : u8 = 100;
 ////  RB15,
 ////  RB1
 
-
+/// Types of serializable data structures used
+/// throughout the tof system
 #[derive(Debug, PartialEq, Clone)]
 //#[repr(u8)]
 pub enum PacketType {
@@ -172,8 +173,11 @@ impl fmt::Display for PacketType {
 ///
 #[derive(Debug, PartialEq, Clone)]
 pub struct TofPacket {
-  pub packet_type : PacketType,
-  pub payload     : Vec<u8>
+  pub packet_type     : PacketType,
+  pub payload         : Vec<u8>,
+  // FUTURE EXTENSION: Be able to send
+  // packets which contain multiple of the same packets
+  pub is_multi_packet : bool,
 }
 
 
@@ -183,8 +187,10 @@ impl fmt::Display for TofPacket {
     if p_len < 4 {
       write!(f, "<TofPacket: type {:?}, payload size {}>", self.packet_type, p_len)
     } else {
-      write!(f, "<TofPacket: type {:?} payload [ {} {} {} {} .. {} {} {} {}] of size {} >",
-             self.packet_type, self.payload[0], self.payload[1], self.payload[2], self.payload[3],
+      write!(f, "<TofPacket: type {:?}, multi {}, payload [ {} {} {} {} .. {} {} {} {}] of size {} >",
+             self.packet_type,
+             self.is_multi_packet,
+             self.payload[0], self.payload[1], self.payload[2], self.payload[3],
              self.payload[p_len-4], self.payload[p_len-3], self.payload[p_len - 2], self.payload[p_len-1], p_len ) 
     }
   }
@@ -193,8 +199,9 @@ impl fmt::Display for TofPacket {
 impl Default for TofPacket {
   fn default() -> TofPacket {
     TofPacket {
-      packet_type : PacketType::Unknown,
-      payload     : Vec::<u8>::new(),
+      packet_type     : PacketType::Unknown,
+      payload         : Vec::<u8>::new(),
+      is_multi_packet : false
     }
   }
 }
@@ -204,15 +211,27 @@ impl TofPacket {
   const HEAD : u16 = 0xaaaa;
   const TAIL : u16 = 0x5555;
 
-  pub fn new() -> TofPacket {
-    TofPacket {
-      packet_type : PacketType::Unknown,
-      payload     : Vec::<u8>::new()
+  pub fn new() -> Self {
+    Self {
+      packet_type     : PacketType::Unknown,
+      payload         : Vec::<u8>::new(),
+      is_multi_packet : false
     }
   }
-  
+ 
+  pub fn get_n_packets(&self) -> u32 {
+    if !self.is_multi_packet {
+      return 1; 
+    }
+    todo!("Can not deal with multipackets right now!");
+    return 1;
+  }
+
   pub fn to_bytestream(&self) 
     -> Vec<u8> {
+    if self.is_multi_packet {
+      todo!("Can not deal with multipackets right now!");
+    }
     let mut bytestream = Vec::<u8>::with_capacity(6 + self.payload.len());
     bytestream.extend_from_slice(&TofPacket::HEAD.to_le_bytes());
     let p_type = PacketType::as_u8(&self.packet_type);
@@ -340,10 +359,10 @@ impl Serialization for TofPacket {
     payload.extend_from_slice(&stream[*pos..*pos+payload_size as usize]);
     //println!("PAYLOAD: {payload:?}");
     //trace!("TofPacket with Payload {payload:?}"
-    Ok(TofPacket {
-      packet_type,
-      payload
-    })
+    let mut tp = TofPacket::new();
+    tp.packet_type = packet_type;
+    tp.payload = payload;
+    Ok(tp) 
   }
 }
 
