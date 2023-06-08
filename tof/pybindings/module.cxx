@@ -11,9 +11,8 @@
 #include "packets/RPaddlePacket.h"
 #include "packets/TofPacket.h"
 #include "packets/CommandPacket.h"
-#include "packets/RBEnvPacket.h"
-#include "packets/RBMoniPacket.h"
 #include "packets/MasterTriggerPacket.h"
+#include "packets/monitoring.h"
 
 #include "serialization.h"
 #include "calibration.h"
@@ -685,14 +684,13 @@ PYBIND11_MODULE(gaps_tof, m) {
         .value("UNKNOWN", PADDLE_END::UNKNOWN)
         .export_values();
 
-    py::class_<RBMoniPacket>(m, "RBMoniPacket",
+    py::class_<RBMoniData>(m, "RBMoniData",
             "Packet with monitoring data from the individual readout boards.")
         .def(py::init())
-        .def("from_bytestream",   &RBMoniPacket::from_bytestream)
-        .def("to_bytestream",     &RBMoniPacket::to_bytestream)
-        .def_readonly("rate",     &RBMoniPacket::rate)
-        .def("__repr__",          [](const RBMoniPacket &pk) {
-                                  return "<RBMoniPacket : rate : "
+        .def("from_bytestream",   &RBMoniData::from_bytestream)
+        .def_readonly("rate",     &RBMoniData::rate)
+        .def("__repr__",          [](const RBMoniData &pk) {
+                                  return "<RBMoniData : rate : [Hz]"
                                     + std::to_string(pk.rate) + ">";
                                   }) 
     ;
@@ -797,26 +795,6 @@ PYBIND11_MODULE(gaps_tof, m) {
     ;
 
 
-    py::class_<RBEnvPacket>(m, "RBEnvPacket")
-        .def(py::init())
-        .def("serialize",          &RBEnvPacket::serialize)
-        .def("deserialize",        &RBEnvPacket::deserialize)
-        .def("reset",              &RBEnvPacket::reset)
-        .def("get_temperature",    &RBEnvPacket::get_temperature) 
-        .def("get_voltage",        &RBEnvPacket::get_voltage) 
-        .def("get_current",        &RBEnvPacket::get_current) 
-        .def("get_power",          &RBEnvPacket::get_power) 
-        .def("get_preamp_temp",    &RBEnvPacket::get_preamp_temp) 
-        .def("get_preamp_bias",    &RBEnvPacket::get_preamp_bias) 
-        .def("get_temperature_rb", &RBEnvPacket::get_temperature_rb) 
-        .def("get_voltage_rb",     &RBEnvPacket::get_voltage_rb) 
-        .def("get_current_rb",     &RBEnvPacket::get_current_rb) 
-        .def("get_power_rb",       &RBEnvPacket::get_power_rb) 
-        .def("get_lol_status",     &RBEnvPacket::get_lol_status) 
-        .def("__repr__",          [](const RBEnvPacket &pp) {
-                                  return "<RBEnvPacket : " + pp.to_string() + "'>";
-                                  }) 
-    ;
 
     py::class_<BlobEvt_t>(m, "BlobEvt")
        .def(py::init())

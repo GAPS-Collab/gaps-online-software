@@ -1,3 +1,4 @@
+#include <cstring>
 #include "parsers.h"
 
 bool Gaps::parse_bool(const Vec<u8> &bytestream,
@@ -30,8 +31,24 @@ u64 Gaps::parse_u64(const Vec<u8> &bytestream,
   return Gaps::u64_from_le_bytes(bytestream, pos);
 }
 
+i32 Gaps::parse_i32(const Vec<u8> &bytestream,
+                    usize &pos) {
+  i32 result = 0;
+  // Assuming little-endian byte order (LSB first)
+  for (int i = 0; i < 4; ++i) {
+    result |= (static_cast<int32_t>(bytestream[i]) << (i * 8));
+  }  
+  return result;
+}
 
-
+f32 Gaps::parse_f32(const Vec<u8> &bytestream,
+                    usize &pos) {
+  f32 result;
+  Vec<u8> bytes = Gaps::slice(bytestream,0,4); 
+  // Copy the bytes into a float variable using type punning
+  std::memcpy(&result, bytes.data(), sizeof(float));
+  return result;
+}
 
 u16 Gaps::u16_from_le_bytes(const vec_u8 &bytestream,
                             u64 &pos) {

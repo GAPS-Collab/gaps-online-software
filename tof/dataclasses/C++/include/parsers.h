@@ -1,10 +1,20 @@
 #ifndef GAPSPARSERS_H_INCLUDED
 #define GAPSPARSERS_H_INCLUDED
 
+
 #include "tof_typedefs.h"
 
 
 namespace Gaps {
+
+template<typename T>
+Vec<T> slice(const Vec<T>& vec, usize start, usize end) {
+  if (start >= vec.size()) {
+    return Vec<T>();  // Return an empty vector if start is out of range
+  }
+  end = std::min(end, vec.size());  // Clamp the end index to the vector size
+  return Vec<T>(vec.begin() + start, vec.begin() + end);
+}
 
 
 u16 u16_from_le_bytes(const vec_u8 &bytestream,
@@ -44,6 +54,12 @@ u32 parse_u32(const Vec<u8> &bytestream,
               usize &pos);
 
 u64 parse_u64(const Vec<u8> &bytestream,
+              usize &pos);
+
+i32 parse_i32(const Vec<u8> &bytestream,
+              usize &pos);
+
+f32 parse_f32(const Vec<u8> &bytestream,
               usize &pos);
 
 u32 u32_from_le_bytes(const vec_u8 &bytestream,

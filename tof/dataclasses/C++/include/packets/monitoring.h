@@ -6,7 +6,7 @@
 /// Radoutbaord sensors, covering the RB electronics 
 /// as well as the preamps.
 /// 
-class RBMoniData {
+struct RBMoniData {
   static const u16 HEAD = 0xAAAA;
   static const u16 TAIL = 0x5555;
   static const u8  SIZE = 6;
@@ -60,7 +60,7 @@ class RBMoniData {
 
 
 /// MasterTriggerBoard internal sensors
-class MtbMoniData {
+struct MtbMoniData {
   static const u16 HEAD = 0xAAAA;
   static const u16 TAIL = 0x5555;
   static const u8  SIZE = 6;
@@ -81,7 +81,7 @@ class MtbMoniData {
 
 /// System performance and temperature data 
 /// of the central tof computer
-class TofCmpMoniData {
+struct TofCmpMoniData {
   static const u16 HEAD = 0xAAAA;
   static const u16 TAIL = 0x5555;
   static const u8  SIZE = 6;
