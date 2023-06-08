@@ -24,10 +24,9 @@ extern crate colored;
 extern crate liftof_lib;
 extern crate liftof_cc;
 
-use log::LevelFilter;
+use log::{LevelFilter, Level};
 use pretty_env_logger::formatted_builder;
-use colored::Colorize;
-
+use colored::{Colorize, ColoredString};
 use std::io::Write;
 use std::{thread,
           time};
@@ -93,21 +92,63 @@ struct Args {
   json_config: Option<std::path::PathBuf>,
 }
 
+/*************************************/
 
+fn color_log(level : &Level) -> ColoredString {
+  match level {
+    Error    => String::from("ERROR!").red(),
+    Warn     => String::from("WARN").yellow(),
+    Info     => String::from("Info").green(),
+    Debug    => String::from("debug").blue(),
+    Trace    => String::from("trace").cyan(),
+  }
+}
 
 /*************************************/
 
 fn main() {
-  formatted_builder()
-    .format(|buf, record| {
-    writeln!( buf, "[{level}][{module_path}:{line}] {args}",
-      level = record.level(),
-      module_path = record.module_path().unwrap_or("<unknown>"),
-      line = record.line().unwrap_or(0),
-      args = record.args()
-      )
-    }).filter(None, LevelFilter::Info).init();
-  //pretty_env_logger::init();
+  //formatted_builder()
+  //  .format(|buf, record| {
+  //  writeln!( buf, "[{level}][{module_path}:{line}] {args}",
+  //    level = color_log(&record.level()),
+  //    module_path = record.module_path().unwrap_or("<unknown>"),
+  //    line = record.line().unwrap_or(0),
+  //    args = record.args()
+  //    )
+  //  }).filter(None, LevelFilter::Error)
+  //  .format(|buf, record| {
+  //  writeln!( buf, "[{level}][{module_path}:{line}] {args}",
+  //    level = color_log(&record.level()),
+  //    module_path = record.module_path().unwrap_or("<unknown>"),
+  //    line = record.line().unwrap_or(0),
+  //    args = record.args()
+  //    )
+  //  }).filter(None, LevelFilter::Warn)
+  //  .format(|buf, record| {
+  //  writeln!( buf, "[{level}][{module_path}:{line}] {args}",
+  //    level = color_log(&record.level()),
+  //    module_path = record.module_path().unwrap_or("<unknown>"),
+  //    line = record.line().unwrap_or(0),
+  //    args = record.args()
+  //    )
+  //  }).filter(None, LevelFilter::Info)
+  //  .format(|buf, record| {
+  //  writeln!( buf, "[{level}][{module_path}:{line}] {args}",
+  //    level = color_log(&record.level()),
+  //    module_path = record.module_path().unwrap_or("<unknown>"),
+  //    line = record.line().unwrap_or(0),
+  //    args = record.args()
+  //    )
+  //  }).filter(None, LevelFilter::Debug)
+  //  .format(|buf, record| {
+  //  writeln!( buf, "[{level}][{module_path}:{line}] {args}",
+  //    level = color_log(&record.level()),
+  //    module_path = record.module_path().unwrap_or("<unknown>"),
+  //    line = record.line().unwrap_or(0),
+  //    args = record.args()
+  //    )
+  //  }).filter(None, LevelFilter::Trace).init();
+  pretty_env_logger::init();
 
   // welcome banner!
   println!("-----------------------------------------------");

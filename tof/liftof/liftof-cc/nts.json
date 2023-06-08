@@ -4,7 +4,7 @@
   "raw_storage_savepath" : "/home/gaps/gaps-online-software/",
   "db_path"   : "/home/gaps/gaps-online-software/gaps-db/gaps_db/db.sqlite3", 
   "events_per_file" : 100000,
-  "calibration_file_path" : "/gaps/gaps/gaps-online-software/",
+  "calibration_file_path" : "/home/gaps/gaps-online-software/tof/resources/calibrations",
   "master_trigger" : {
     "ip"   : "192.168.36.121", 
     "port" : 50001
