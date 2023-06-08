@@ -177,6 +177,7 @@ pub fn search_for_u16(number : u16, bytestream : &Vec<u8>, start_pos : usize)
  
   // -2 bc later on we are looking for 2 bytes!
   if start_pos  > bytestream.len() - 2 {
+    error!("Start position {} beyond stream capacity {}!", start_pos, bytestream.len() -2);
     return Err(SerializationError::StreamTooShort);
   }
 
@@ -186,7 +187,7 @@ pub fn search_for_u16(number : u16, bytestream : &Vec<u8>, start_pos : usize)
   // will find the next header
   two_bytes = [bytestream[pos], bytestream[pos + 1]];
   // FIXME - this should be little endian?
-  if u16::from_be_bytes(two_bytes) == number {
+  if u16::from_le_bytes(two_bytes) == number {
     return Ok(pos);
   }
   // if it is not at start pos, then traverse 

@@ -19,6 +19,14 @@ use tof_control::rb_control::rb_vcp::RBvcp;
 #[cfg(feature = "tof-control")]
 use tof_control::rb_control::rb_ph::RBph;
 
+#[cfg(feature = "random")]
+use crate::FromRandom;
+#[cfg(feature = "random")]
+extern crate rand;
+#[cfg(feature = "random")]
+use rand::Rng;
+
+
 use crate::serialization::{Serialization,
                            SerializationError,
                            search_for_u16,
@@ -31,11 +39,11 @@ use crate::serialization::{Serialization,
 /// from the readoutboards. This includes
 /// temperatures, power data, pressure, humidity
 /// as well as the magnetic sensors
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub struct RBMoniData {
 
   pub board_id           : u8,
   pub rate               : u16,
-  // temp - 12 fields 
   pub tmp_drs            : f32,
   pub tmp_clk            : f32,
   pub tmp_adc            : f32,
@@ -249,6 +257,53 @@ impl fmt::Display for RBMoniData {
   }
 }
 
+#[cfg(feature = "random")]
+impl FromRandom for RBMoniData {
+    
+  fn from_random() -> RBMoniData {
+    let mut moni = RBMoniData::new();
+    let mut rng = rand::thread_rng();
+    moni.board_id           = rng.gen::<u8>(); 
+    moni.rate               = rng.gen::<u16>();
+    moni.tmp_drs            = rng.gen::<f32>();
+    moni.tmp_clk            = rng.gen::<f32>();
+    moni.tmp_adc            = rng.gen::<f32>();
+    moni.tmp_zynq           = rng.gen::<f32>();
+    moni.tmp_lis3mdltr      = rng.gen::<f32>();
+    moni.tmp_bm280          = rng.gen::<f32>();
+    moni.pressure           = rng.gen::<f32>();
+    moni.humidity           = rng.gen::<f32>();
+    moni.mag_x              = rng.gen::<f32>();
+    moni.mag_y              = rng.gen::<f32>();
+    moni.mag_z              = rng.gen::<f32>();
+    moni.mag_tot            = rng.gen::<f32>();
+    moni.drs_dvdd_voltage   = rng.gen::<f32>(); 
+    moni.drs_dvdd_current   = rng.gen::<f32>();
+    moni.drs_dvdd_power     = rng.gen::<f32>();
+    moni.p3v3_voltage       = rng.gen::<f32>();
+    moni.p3v3_current       = rng.gen::<f32>();
+    moni.p3v3_power         = rng.gen::<f32>();
+    moni.zynq_voltage       = rng.gen::<f32>();
+    moni.zynq_current       = rng.gen::<f32>();
+    moni.zynq_power         = rng.gen::<f32>();
+    moni.p3v5_voltage       = rng.gen::<f32>(); 
+    moni.p3v5_current       = rng.gen::<f32>();
+    moni.p3v5_power         = rng.gen::<f32>();
+    moni.adc_dvdd_voltage   = rng.gen::<f32>();
+    moni.adc_dvdd_current   = rng.gen::<f32>();
+    moni.adc_dvdd_power     = rng.gen::<f32>();
+    moni.adc_avdd_voltage   = rng.gen::<f32>();
+    moni.adc_avdd_current   = rng.gen::<f32>();
+    moni.adc_avdd_power     = rng.gen::<f32>();
+    moni.drs_avdd_voltage   = rng.gen::<f32>(); 
+    moni.drs_avdd_current   = rng.gen::<f32>();
+    moni.drs_avdd_power     = rng.gen::<f32>();
+    moni.n1v5_voltage       = rng.gen::<f32>();
+    moni.n1v5_current       = rng.gen::<f32>();
+    moni.n1v5_power         = rng.gen::<f32>();
+    moni
+  }
+}
 
 
 impl Serialization for RBMoniData {
@@ -270,6 +325,15 @@ impl Serialization for RBMoniData {
     stream.extend_from_slice(&self.mag_y             .to_le_bytes()); 
     stream.extend_from_slice(&self.mag_z             .to_le_bytes()); 
     stream.extend_from_slice(&self.mag_tot           .to_le_bytes()); 
+    stream.extend_from_slice(&self.drs_dvdd_voltage   .to_le_bytes()); 
+    stream.extend_from_slice(&self.drs_dvdd_current   .to_le_bytes()); 
+    stream.extend_from_slice(&self.drs_dvdd_power     .to_le_bytes()); 
+    stream.extend_from_slice(&self.p3v3_voltage       .to_le_bytes()); 
+    stream.extend_from_slice(&self.p3v3_current       .to_le_bytes()); 
+    stream.extend_from_slice(&self.p3v3_power         .to_le_bytes()); 
+    stream.extend_from_slice(&self.zynq_voltage       .to_le_bytes()); 
+    stream.extend_from_slice(&self.zynq_current       .to_le_bytes()); 
+    stream.extend_from_slice(&self.zynq_power         .to_le_bytes()); 
     stream.extend_from_slice(&self.p3v5_voltage       .to_le_bytes()); 
     stream.extend_from_slice(&self.p3v5_current       .to_le_bytes()); 
     stream.extend_from_slice(&self.p3v5_power         .to_le_bytes()); 
@@ -293,6 +357,7 @@ impl Serialization for RBMoniData {
                      pos       : &mut usize) 
     -> Result<RBMoniData, SerializationError>{
     let mut moni_data = RBMoniData::new();
+    println!("{:?}", stream);
     let head_pos = search_for_u16(RBMoniData::HEAD, stream, *pos)?; 
     let tail_pos = search_for_u16(RBMoniData::TAIL, stream, head_pos + RBMoniData::SIZE-2)?;
     // At this state, this can be a header or a full event. Check here and
@@ -302,7 +367,7 @@ impl Serialization for RBMoniData {
       *pos = head_pos + 2; 
       return Err(SerializationError::WrongByteSize);
     }
-
+    *pos = head_pos + 2;
     moni_data.board_id           = parse_u8(&stream, pos); 
     moni_data.rate               = parse_u16(&stream, pos); 
     moni_data.tmp_drs            = parse_f32(&stream, pos); 
@@ -347,6 +412,7 @@ impl Serialization for RBMoniData {
 }
 
 /// Monitoring the main tof computer
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub struct TofCmpMoniData {
   pub core1_tmp : u8,
   pub core2_tmp : u8,
@@ -419,6 +485,7 @@ impl Serialization for TofCmpMoniData {
 }
 
 /// Monitoring the MTB
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub struct MtbMoniData {
   pub fpga_temp    : f32,
   pub fpga_vccint  : f32,
