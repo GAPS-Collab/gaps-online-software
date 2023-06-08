@@ -70,7 +70,8 @@ impl Default for LocalTriggerBoard {
 
 impl fmt::Display for LocalTriggerBoard {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(f, "<LocalTriggerBoard:
+    write!(f, 
+"<LocalTriggerBoard:
       ID  : {}
       DSI : {}
       J   : {}
@@ -646,7 +647,8 @@ impl Default for ReadoutBoard {
 
 impl fmt::Display for ReadoutBoard {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { 
-    write!(f, "<ReadoutBoard:
+    write!(f,
+"<ReadoutBoard:
       ID                :  {}
       DNA               :  {} 
       PORT              :  {} 

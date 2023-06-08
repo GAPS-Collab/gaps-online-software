@@ -175,11 +175,11 @@ fn main() {
   }
   nboards = rb_list.len();
   println!("=> We will use the following tof manifest:");
-  println!("== ==> LTBs:");
+  println!("== ==> LTBs [{}]:", ltb_list.len());
   for ltb in &ltb_list {
     println!("\t {}", ltb);
   }
-  println!("== ==> RBs:");
+  println!("== ==> RBs [{}]:", rb_list.len());
   for rb in &rb_list {
     println!("\t {}", rb);
   }
@@ -332,7 +332,7 @@ fn main() {
     }
     this_rb.calib_file += &(this_rb.rb_id).to_string();
     this_rb.calib_file += "_cal.txt";
-    println!("==> Starting RB thread for {:?}", this_rb);
+    println!("==> Starting RB thread for {}", this_rb);
     let resp_sender_c = resp_sender.clone();
     let this_path = storage_savepath.clone();
     worker_threads.execute(move || {
@@ -341,7 +341,8 @@ fn main() {
                                 write_blob,
                                 &this_path,
                                 &events_per_file,
-                                &this_rb);
+                                &this_rb,
+                                verbose);
     });
     println!("==> Started RB thread");
   } // end for loop over nboards

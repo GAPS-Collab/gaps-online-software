@@ -36,18 +36,6 @@ macro_rules! tvec [
 
 /*************************************/
 
-///// write a bytestream to a file on disk
-//fn write_stream_to_file(filename: &Path, bytestream: &Vec<u8>) -> Result<usize, std::io::Error>{
-//    fs::write(filename, bytestream)?;
-//    debug!("{} bytes written to {}", bytestream.len(), filename.display());
-//    Ok(bytestream.len())
-//}
-
-/*************************************/
-
-
-/*************************************/
-
 /// Receive binary blobs from readout boards,
 /// and perform specified tasks
 ///
@@ -57,7 +45,8 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
                                  write_blob       : bool,
                                  storage_savepath : &String,
                                  events_per_file  : &usize,
-                                 rb               : &ReadoutBoard) {
+                                 rb               : &ReadoutBoard,
+                                 print_packets    : bool) {
   let zmq_ctx = zmq::Context::new();
   let board_id = rb.rb_id; //rb.id.unwrap();
   info!("initializing RB thread for board {}!", board_id);
@@ -118,10 +107,10 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
   //}
   //socket.set_subscribe(topic.as_bytes());
   //                     + &board_id.to_string()
-  info!("Writing blobs to {}", blobfile_name );
   let mut blobfile_path = Path::new(&blobfile_name);
   let mut file_on_disc : Option<File> = None;//let mut output = File::create(path)?;
   if write_blob {
+    info!("Writing blobs to {}", blobfile_name );
     file_on_disc = OpenOptions::new().append(true).create(true).open(blobfile_path).ok()
   }
   let mut n_events = 0usize;
@@ -170,7 +159,9 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
           Ok(_)    => ()
         };
         let tp = tp_ok.unwrap();
-        //println!("{:?} PACKET TYPE", tp.packet_type); 
+        if print_packets {
+          println!("==> Got {} for RB {}", tp.packet_type, rb.rb_id); 
+        }
         match tp.packet_type {
           PacketType::Monitor  => {continue;},
           PacketType::RBHeader => {
