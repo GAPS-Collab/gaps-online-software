@@ -360,7 +360,7 @@ fn main() {
                                 &this_path,
                                 &events_per_file,
                                 &this_rb,
-                                verbose);
+                                false);
     });
   } // end for loop over nboards
   println!("==> All RB threads started!");

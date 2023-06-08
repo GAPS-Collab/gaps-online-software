@@ -72,24 +72,24 @@ pub fn global_data_sink(incoming : &cbc::Receiver<TofPacket>,
           match pack.packet_type {
             PacketType::MonitorRb => {
               let moni = RBMoniData::from_bytestream(&pack.payload, &mut pos);
-              if let Ok(data) = moni {
-                println!("{}", data);
-              }
-            }
+              match moni {
+                Ok(data) => {println!("{}", data);},
+                Err(err) => error!("Can not unpack RBMoniData! {err}")}
+              }, 
             PacketType::MonitorTofCmp => {
-              let moni = RBMoniData::from_bytestream(&pack.payload, &mut pos);
-              if let Ok(data) = moni {
-                println!("{}", data);
-              }
-            }
+              let moni = TofCmpMoniData::from_bytestream(&pack.payload, &mut pos);
+              match moni {
+                Ok(data) => {println!("{}", data);},
+                Err(err) => error!("Can not unpack TofCmpData! {err}")}
+              },
             PacketType::MonitorMtb => {
-              let moni = RBMoniData::from_bytestream(&pack.payload, &mut pos);
-              if let Ok(data) = moni {
-                println!("{}", data);
-              }
-            }
+              let moni = MtbMoniData::from_bytestream(&pack.payload, &mut pos);
+              match moni {
+                Ok(data) => {println!("{}", data);},
+                Err(err) => error!("Can not unpack MtbMoniData! {err}")}
+              }, 
             _ => ()
-          }
+          } // end match 
         }
         if pack.packet_type == PacketType::TofEvent {
           if event_cache.len() != 100 {
