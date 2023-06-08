@@ -6,7 +6,8 @@
   in the json parameter file
 * environmental parameter capture and addition to the data
   stream
-
+* CRITICAL FIX - readoutboard_comm will forward packets which 
+  are of non-event type
 
 # 0.2.0 
 

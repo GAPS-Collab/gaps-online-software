@@ -36,12 +36,28 @@ macro_rules! tvec [
 
 /*************************************/
 
-/// Receive binary blobs from readout boards,
-/// and perform specified tasks
+/// Receive data from a readoutboard
 ///
+/// In case of binary event data ("blob") this can be analyzed here
+/// It is also possible to save the data directly.
 ///
+/// In case of monitoring/other tof packets, those will be forwarded
+///
+/// # Arguments:
+///
+/// * pp_pusher        :
+/// * reso_to_main     :
+/// * tp_to_sink       : Channel which should be connect to a (global) data sink.
+///                      Packets which are of not event type (e.g. header/full binary data)
+///                      will be forwarded to the sink.
+/// * write_blob       :
+/// * storage_savepath :
+/// * events_per_file  :
+/// * rb               : 
+/// * print_packets    : 
 pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
                                  resp_to_main     : Sender<TofResponse>,
+                                 tp_to_sink       : Sender<TofPacket>,
                                  write_blob       : bool,
                                  storage_savepath : &String,
                                  events_per_file  : &usize,
@@ -150,38 +166,86 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
         // do the work
         // strip the first 4 bytes, since they contain the 
         // board id
-        let tp_ok = TofPacket::from_bytestream(&buffer, &mut 4);
-        match tp_ok {
+        match TofPacket::from_bytestream(&buffer, &mut 4) { 
           Err(err) => {
             error!("Unknown packet...{:?}", err);
-            continue;
-          }
-          Ok(_)    => ()
-        };
-        let tp = tp_ok.unwrap();
-        if print_packets {
-          println!("==> Got {} for RB {}", tp.packet_type, rb.rb_id); 
-        }
-        match tp.packet_type {
-          PacketType::Monitor  => {continue;},
-          PacketType::RBHeader => {
-            // in that case, just write the header to 
-            // the file and continue
-            match &mut file_on_disc {
-              None => (),
-              Some(f) => {
-                trace!("writing {} bytes", tp.payload.len());
-                match f.write_all(&tp.payload) {
-                  Err(err) => error!("Can not write to file, err {err}"),
+            continue;  
+          },
+          Ok(tp) => {
+            if print_packets {
+              println!("==> Got {} for RB {}", tp.packet_type, rb.rb_id); 
+            }
+            match tp.packet_type {
+              PacketType::RBHeader => {
+                // in that case, just write the header to 
+                // the file and continue
+                match &mut file_on_disc {
+                  None => (),
+                  Some(f) => {
+                    trace!("writing {} bytes", tp.payload.len());
+                    match f.write_all(&tp.payload) {
+                      Err(err) => error!("Can not write to file, err {err}"),
+                      Ok(_)    => ()
+                    }
+                  }
+                }
+              },
+              PacketType::RBEvent => {
+                match analyze_blobs(&tp.payload,
+                                    &pp_pusher,
+                                    true,
+                                    &rb,
+                                    false,
+                                    true,
+                                    &calibrations,
+                                    n_chunk) {
+                  Ok(nblobs)   => debug!("Read {} blobs from buffer", nblobs),
+                  Err(err)     => error!("Was not able to read blobs! {}", err )
+                }
+                // write blob to disk if desired
+                match &mut file_on_disc {
+                  None => (),
+                  Some(f) => {
+                    // if the readoutboard prefixes it's payload with 
+                    // "RBXX", we have to get rid of that first
+                    //match search_for_u16(0xaa, &buffer, 0) {
+                    //  Err(err) => {
+                    //    error!("Can not find header in this payload! {err}");
+                    //  }
+                    //  Ok(_)    => {
+                        trace!("writing {} bytes", &tp.payload.len());
+                        match f.write_all(&tp.payload) {
+                          Err(err) => error!("Can not write to file, err {err}"),
+                          Ok(_)    => ()
+                        }
+                  }
+                } // end match file_on_disk
+                n_events += 1;
+                if (n_events >= *events_per_file) && write_blob {
+                  // start a new file
+                  secs_since_epoch = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
+                  blobfile_name = storage_savepath.to_owned() + "RB" 
+                                 + &board_id.to_string() + "_" 
+                                 + &secs_since_epoch.to_string()
+                                 + ".blob";
+                  info!("Writing blobs to {}", blobfile_name );
+                  blobfile_path = Path::new(&blobfile_name);
+                  file_on_disc = OpenOptions::new().append(true).create(true).open(blobfile_path).ok();
+                  n_events = 0;
+                } //end if
+                n_chunk += 1;
+              }, 
+              _ => {
+                // Currently, we will just forward all other packets
+                // directly to the data sink
+                match tp_to_sink.send(tp) {
+                  Err(err) => error!("Can not send tof packet to data sink! Err {err}"),
                   Ok(_)    => ()
                 }
               }
-            }
-          continue;
-          },
-          _ => (),
-        }
-
+            } // end match packet type
+          } // end OK
+        } // end match from_bytestream
         //println!("{:?}", tp.payload);
         //for n in 0..5 {
         //  println!("{}", tp.payload[n]);
@@ -190,52 +254,7 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
         //for n in 0..5 {
         //  println!("{}", tp.payload[tp.payload.len() - 1 - n]);
         //}
-        match analyze_blobs(&tp.payload,
-                            &pp_pusher,
-                            true,
-                            &rb,
-                            false,
-                            true,
-                            &calibrations,
-                            n_chunk) {
-          Ok(nblobs)   => debug!("Read {} blobs from buffer", nblobs),
-          Err(err)     => error!("Was not able to read blobs! {}", err )
-        }
-        // write blob to disk if desired
-        match &mut file_on_disc {
-          None => (),
-          Some(f) => {
-            // if the readoutboard prefixes it's payload with 
-            // "RBXX", we have to get rid of that first
-            //match search_for_u16(0xaa, &buffer, 0) {
-            //  Err(err) => {
-            //    error!("Can not find header in this payload! {err}");
-            //  }
-            //  Ok(_)    => {
-                trace!("writing {} bytes", &tp.payload.len());
-                match f.write_all(&tp.payload) {
-                  Err(err) => error!("Can not write to file, err {err}"),
-                  Ok(_)    => ()
-                }
-            //  }
-            //}
-          }
-        }
-        n_events += 1;
-        if (n_events >= *events_per_file) && write_blob {
-          // start a new file
-          secs_since_epoch = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
-          blobfile_name = storage_savepath.to_owned() + "RB" 
-                         + &board_id.to_string() + "_" 
-                         + &secs_since_epoch.to_string()
-                         + ".blob";
-          info!("Writing blobs to {}", blobfile_name );
-          blobfile_path = Path::new(&blobfile_name);
-          file_on_disc = OpenOptions::new().append(true).create(true).open(blobfile_path).ok();
-          n_events = 0;
-        }
-        n_chunk += 1;
-      } // end ok
+      } // end ok buffer 
     } // end match 
   } // end loop
 } // end fun

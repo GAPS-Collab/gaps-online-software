@@ -14,12 +14,15 @@ extern crate local_ip_address;
 extern crate liftof_lib;
 use liftof_lib::master_trigger;
 
-#[cfg(feature="random")]
-extern crate rand;
+//#[cfg(feature="random")]
+//extern crate rand;
 
 extern crate ctrlc;
 extern crate zmq;
 extern crate tof_dataclasses;
+
+#[macro_use] extern crate colored;
+use colored::Colorize;
 
 use std::{thread,
           time};
@@ -155,7 +158,7 @@ fn main() {
     master_trigger_port_c = master_trigger_port.clone();
     info!("Will connect to the master trigger board at {}:{}", master_trigger_ip, master_trigger_port);
   } else {
-    warn!("Not connecting to the master trigger board!");
+    println!("==> Will NOT connect to the MTB, since -u has not been provided in the commandlline!");
   }
 
   let storage_savepath = config["raw_storage_savepath"].as_str().unwrap().to_owned();
@@ -325,6 +328,7 @@ fn main() {
   for n in 0..nboards {
     let this_rb_pp_sender = rb_send.clone();
     let mut this_rb = rb_list[n].clone();
+    let this_tp_to_sink_clone = tp_to_sink.clone();
     this_rb.infer_ip_address();
     this_rb.calib_file = calib_file_path.clone() + "/" + "rb";
     if this_rb.rb_id < 10 {
@@ -338,14 +342,15 @@ fn main() {
     worker_threads.execute(move || {
       readoutboard_communicator(this_rb_pp_sender,
                                 resp_sender_c,
+                                this_tp_to_sink_clone,
                                 write_blob,
                                 &this_path,
                                 &events_per_file,
                                 &this_rb,
                                 verbose);
     });
-    println!("==> Started RB thread");
   } // end for loop over nboards
+  println!("==> All RB threads started!");
   
   let one_second = time::Duration::from_millis(1000);
   let rb_list_cc = rb_list.clone();
@@ -379,18 +384,21 @@ fn main() {
                                           &master_ev_send,
                                           true);
     });
-  } 
+  } else {
+    println!("=> {}", "NOT using the MTB! This means that currently we can only save the blobfiles directly and NO EVENT data will be passed on to the flight computer!".red().bold());
+    println!("=> {}", "This mode is still useful for calibration runs or to save RBBinary data locally!".italic());
+  }
 
-  info!("All threads started!");
   let one_minute = time::Duration::from_millis(60000);
   
-  //println!("==> Sleeping a bit to give the rb's a chance to fire up..");
+  println!("==> Sleeping 10 seconds to give the rb's a chance to fire up..");
   thread::sleep(10*one_second);
-  
+  println!("==> Sleeping done!");
+
   // set the handler for SIGINT
   let cmd_sender_c = cmd_sender.clone();
   ctrlc::set_handler(move || {
-    println!("received Ctrl+C! We will stop triggers and end the run!");
+    println!("==> \u{1F6D1} received Ctrl+C! We will stop triggers and end the run!");
     let end_run = TofCommand::DataRunEnd(42);
     match cmd_sender_c.send(end_run) {
      Err(err) => error!("Can not send end run command! {err}"),
@@ -409,13 +417,12 @@ fn main() {
     Ok(_)    => ()
   }
 
-  println!("All threads initialized!");
+  println!("==> All threads initialized!");
   loop{
-     // first we issue start commands until we receive
-     // at least 1 positive
-     //cmd_sender.send(start_run);
-     thread::sleep(1*one_second);
-    
+    // first we issue start commands until we receive
+    // at least 1 positive
+    //cmd_sender.send(start_run);
+    thread::sleep(1*one_second); 
     thread::sleep(1*one_minute);
     println!("...");
   }

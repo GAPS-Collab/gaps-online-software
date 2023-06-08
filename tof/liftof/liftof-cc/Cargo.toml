@@ -32,7 +32,7 @@ zmq = "0.10.0"
 # this is technically optional
 # it is just used to integrate
 # with the general cmake
-cmake = "0.1.49"
+#cmake = "0.1.49"
 
 # used only for diagnostics
 #hdf5    = "0.8.1"
@@ -58,5 +58,6 @@ sensors = "0.2"
 
 
 # logging
+colored = "2.0"
 log = "0.4"
 pretty_env_logger = "0.4"
