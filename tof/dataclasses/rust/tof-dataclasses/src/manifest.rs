@@ -70,7 +70,17 @@ impl Default for LocalTriggerBoard {
 
 impl fmt::Display for LocalTriggerBoard {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(f, "<LocalTriggerBoard: ID {}; DSI {}; J {}>", self.ltb_id, self.ltb_dsi, self.ltb_j)
+    write!(f, "<LocalTriggerBoard:
+      ID  : {}
+      DSI : {}
+      J   : {}
+      CH/RBID MAP {:?}
+      CH/RBCH_MAP {:?}>",
+      self.ltb_id,
+      self.ltb_dsi,
+      self.ltb_j,
+      self.ltb_ch_rb_id,
+      self.ltb_ch_rb_ch)
   }
 }
 
@@ -88,7 +98,7 @@ pub fn get_rbs_from_sqlite(filename : &Path) -> Vec<ReadoutBoard> {
       match value {
         None    => {continue;},
         Some(v) => {
-          println!("{} = {}", name, v);
+          debug!("{} = {}", name, v);
           match name {
             "rb_id"      => {rb.rb_id  = u8::from_str(v).unwrap_or(0);},
             "port"       => {rb.port   = u16::from_str(v).unwrap_or(0);},
@@ -121,14 +131,14 @@ pub fn get_ltbs_from_sqlite(filename : &Path) -> Vec<LocalTriggerBoard> {
   let mut ltbs  = Vec::<LocalTriggerBoard>::new();
   connection
     .iterate(query, |pairs| {
-    //println!("New ltb, has following values...");
+    debug!("New ltb, has following values...");
     let mut ltb = LocalTriggerBoard::new();
     for &(name, value) in pairs.iter() {
+      debug!("{} = {}", name, value.unwrap_or(""));
       match value {
         None    => {continue;},
         Some(v) => {
           match name {
-            //println!("{} = {}", name, v);
             "ltb_id"      => {ltb.ltb_id       = u8::from_str(v).unwrap_or(0);},
             "ltb_dsi"     => {ltb.ltb_dsi      = u8::from_str(v).unwrap_or(0);},
             "ltb_j"       => {ltb.ltb_j        = u8::from_str(v).unwrap_or(0);},
@@ -636,7 +646,21 @@ impl Default for ReadoutBoard {
 
 impl fmt::Display for ReadoutBoard {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { 
-    write!(f, "<ReadoutBoard: ID {}>", self.rb_id)
+    write!(f, "<ReadoutBoard:
+      ID                :  {}
+      DNA               :  {} 
+      PORT              :  {} 
+      IP                :  {}
+      CALIBRATION FILE  :  {}
+      CHANNEL/PADDLE END:  {:?}
+      TRIG_CH_MASK      :  {:?}>",
+      self.rb_id,
+      self.dna,
+      self.port,
+      self.ip_address,
+      self.calib_file,
+      self.channel_to_paddle_end_id,
+      self.trig_ch_mask)
   }
 }
 

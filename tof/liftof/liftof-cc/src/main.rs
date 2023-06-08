@@ -169,7 +169,7 @@ fn main() {
   //exit(0);
   let mut rb_list  = get_rbs_from_sqlite(db_path_c);
   for k in 0..rb_ignorelist.len() {
-    println!("=> We will remove {} due to it being marked as IGNORE in the config file!", rb_ignorelist[k]);
+    println!("=> We will remove RB {} due to it being marked as IGNORE in the config file!", rb_ignorelist[k]);
     let bad_rb = rb_ignorelist[k].as_u8().unwrap();
     rb_list.retain(|x| x.rb_id != bad_rb);
   }
