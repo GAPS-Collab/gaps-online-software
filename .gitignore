@@ -1,30 +1,41 @@
 # CMAKE 
 CMakeCache.txt
+CMakeFiles/*
+
+# project files
+.idea/*
 
 # Cargo lock files
 tof/dataclasses/rust/tof-dataclasses/Cargo.lock
 tof/liftof/Cargo.lock
+tof/liftof/liftof-tui/Cargo.lock
+
+# pycache
+gaps-db/gaps_db/gaps_db/__pycache__/
+gaps-db/gaps_db/tof_db/__pycache__/
 
 # build products
 tof/dataclasses/rust/tof-dataclasses/target/*
 tof/liftof/target/*
-build/*
-
-# vim fragments
-*.swp
-
-# this file gets configured by cmake
-tof/readoutboard-emulator/bin/RBEmulator.cxx
-
-tof/crusty_kraken/target/*
-tof/crusty_kraken/*.hdf
-
+tof/dataclasses/test/target/*
 tof/dataclasses/rust/tof_dataclasses/target/*
-
 tof/liftof/liftof-rb/target/*
 tof/liftof/liftof-cc/target/*
 tof/liftof/liftof-tui/target/*
 tof/liftof/liftof-lib/target/*
+build/*
+
+
+
+# vim fragments
+*.swp
+
+# these files get configured by cmake
+tof/readoutboard-emulator/bin/RBEmulator.cxx
+tof/dataclasses/C++/include/TOFCommon.h
+
+# django created files
+gaps-db/gaps_db/tof_db/migrations/*
 
 # files created by google protocol buffers
 dataclasses/*pb.h

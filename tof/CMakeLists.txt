@@ -204,7 +204,7 @@ target_link_libraries(${GAPSTOF_LIBRARY_SHARED}
 if (BUILD_PYBINDINGS)
   set(pybindings "gaps_tof")
 
-  pybind11_add_module(${pybindings} MODULE pybindings/module.cxx)
+  pybind11_add_module(${pybindings} MODULE pybindings/module.cxx pybindings/helpers.cxx)
   target_include_directories(${pybindings}
                             PUBLIC
                             ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
