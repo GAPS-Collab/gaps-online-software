@@ -558,6 +558,15 @@ impl ReadoutBoard {
     self.ip_address = Ipv4Addr::new(10,0,1,address);
   }
 
+  pub fn get_connection_string(&self) -> String {
+
+    let mut address_ip = String::from("tcp://");
+    address_ip = address_ip + &self.ip_address.to_string();
+    address_ip += &":".to_owned();
+    address_ip += &self.port.to_string();
+    address_ip
+  }
+
   pub fn get_triggered_pids(&self) -> Vec<u8> {
     let mut pids = Vec::<u8>::new();
     for k in 0..8 {
