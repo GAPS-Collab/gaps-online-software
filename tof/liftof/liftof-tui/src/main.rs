@@ -15,7 +15,11 @@ use chrono::prelude::*;
 use thiserror::Error;
 
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, UdpSocket};
-
+use std::sync::mpsc;
+use std::thread;
+use std::time::{Duration, Instant};
+use std::io;
+use std::path::{Path, PathBuf};
 use std::collections::{VecDeque, HashMap};
 
 extern crate pretty_env_logger;
@@ -27,18 +31,14 @@ extern crate histo;
 use histo::Histogram;
 
 use liftof_lib::{get_tof_manifest,
-                 master_trigger,
-                 LocalTriggerBoard,
-                 ReadoutBoard};
+                 master_trigger};
+                 //LocalTriggerBoard,
+                 //ReadoutBoard};
 
-use std::sync::mpsc;
-use std::thread;
 
-use std::time::{Duration, Instant};
 
 use tui_logger::TuiLoggerWidget;
 
-use std::io;
 use crossterm::{
     event::{self, Event as CEvent, KeyCode},
     terminal::{disable_raw_mode, enable_raw_mode},
@@ -74,6 +74,11 @@ use tof_dataclasses::events::MasterTriggerEvent;
 use tof_dataclasses::events::master_trigger::{read_daq,
                                               read_rate,
                                               read_lost_rate};
+
+use tof_dataclasses::manifest::{LocalTriggerBoard,
+                                ReadoutBoard,
+                                get_ltbs_from_sqlite,
+                                get_rbs_from_sqlite};
 
 use crate::tab_commands::CommandTab;
 use crate::tab_mt::MTTab;
@@ -114,70 +119,6 @@ enum Event<I> {
 
 const MAX_LEN_RATE : usize = 1000;
 
-/// Communicate with the readoutboards on the 
-/// CMD channel 
-///
-/// Opens 0MQ socket for the individual RB's
-fn commander(cmd_from_main : Receiver<TofCommand>,
-             rsp_to_main   : Sender<Vec<Option<TofResponse>>>,
-             rb_list       : Vec<ReadoutBoard>) {
-
-  // connect to the rb's 
-  let ctx = zmq::Context::new();  
-  // how zmq works is that one req socket can connect to multiple REP and 
-  // broadcast the messages
-  let cmd_socket = ctx.socket(zmq::REQ).expect("Unable to create 0MQ SUB socket!");
-  let mut connected_rbs : u8 = 0;
-  for rb in rb_list.iter() {
-    if rb.ip_address.is_none() || rb.cmd_port.is_none() {
-      warn!("This rb has no connection information");
-      continue;
-    }
-    let address = "tcp::/".to_owned()
-                  + &rb.ip_address.expect("No IP known for this board!").to_string()
-                  + ":"
-                  +  &rb.cmd_port.expect("No CMD port known for this board!").to_string();
-    cmd_socket.connect(&address);
-    // the process is only completed after an intiail back and forth
-    //let ping : String = String::from("[PING]");
-    //// we use expect here, since these calls have 
-    //// to go through, otherwise it just won't work
-    //cmd_socket.send(ping.as_bytes(), 0).expect("Can not communicate with RB!");
-    //let response = cmd_socket.recv_bytes(0).expect("Can not communicate with RB!");
-    //info!("Got response {}", String::from_utf8(response).expect("Did not receive string"));
-    connected_rbs += 1;
-    
-  }
-  if connected_rbs == 0 {
-    panic!("I can not connect to any readout boards! Either auto-discovery did not discover them or none are (physically) connected!");
-  }
-  loop {
-    let mut responses = Vec::<Option<TofResponse>>::new();
-    match cmd_from_main.recv() {
-      Err(err) => trace!("Did not get any response, err {err}"),
-      Ok(cmd)  => {
-        // the 0 in the send/recv section means 
-        // it should wait (in contrast to zmq::DONTWAIT)
-        // how this works is that we have to go through 
-        // the connected boards 1 by 1 and do our 
-        // send/recv spiel.
-        // We will get one response per board
-        cmd_socket.send(&cmd.to_bytestream(), 0);
-        let resp = cmd_socket.recv_bytes(0);
-        match resp {
-          Err(err) => debug!("0MQ problem, can not receive response from RB!"),
-          Ok(r)    => {
-            let tof_response = TofResponse::from_bytestream(&r, &mut 0).ok();
-            responses.push(tof_response);
-          }
-        }
-      }
-    }
-  if responses.len() != 0 {
-    rsp_to_main.send(responses);
-  }
-  }// end loop
-}
 
 
 /// Receive the data stream and forward 
@@ -197,7 +138,7 @@ fn receive_stream(tp_to_main  : Sender<TofPacket>,
   let mut rb_map = HashMap::<u8, String>::new();
   for rb in rb_list.iter_mut() {
     let conn = rb.get_connection_string().clone();
-    rb_map.insert(rb.id.unwrap(), conn);
+    rb_map.insert(rb.rb_id, conn);
     //match rb.ip_address {
     //  None => {continue;},
     //  Some(ip) => {
@@ -337,49 +278,44 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   //pretty_env_logger::init();
   let mut ten_second_update = Instant::now();
   let mission_elapsed_time  = Instant::now();
+ 
   let mut rb_list = Vec::<ReadoutBoard>::new();
   let mut tick_count = 0;
-  if debug_local {
-    let mut rb = ReadoutBoard::default();
-    rb.ip_address = Some(Ipv4Addr::new(127, 0, 0, 1));
-    rb.cmd_port   = Some(30000);
-    rb.data_port  = Some(40000);
-    rb.id = Some(0);
-    //rb.ping().unwrap();
-    rb_list = vec![rb];
-
-    // make sure the rb is connected
-  }  
-  let mut manifest = (Vec::<LocalTriggerBoard>::new(), Vec::<ReadoutBoard>::new());
   let json_content  : String;
   let config        : json::JsonValue;
-
 
   match args.json_config {
     None => panic!("No .json config file provided! Please provide a config file with --json-config or -j flag!"),
     Some(_) => {
-      json_content = std::fs::read_to_string(args.json_config.as_ref().unwrap()).unwrap();
-      config = json::parse(&json_content).unwrap();
-      manifest = get_tof_manifest(args.json_config.unwrap());
-      println!("==> Tof Manifest following:");
-      println!("{:?}", manifest);
-      println!("***************************");
-      rb_list = manifest.1;
+      json_content = std::fs::read_to_string(args.json_config.as_ref().unwrap()).expect("Can not open json file");
+      config = json::parse(&json_content).expect("Unable to parse json file");
     } // end Some
   } // end match
+  let calib_file_path  = config["calibration_file_path"].as_str().unwrap().to_owned();
+  let db_path          = Path::new(config["db_path"].as_str().unwrap());
+  let db_path_c        = db_path.clone();
+  let ltb_list         = get_ltbs_from_sqlite(db_path);
+
+  let rb_ignorelist =  &config["rb_ignorelist"];
+  //exit(0);
+  let mut rb_list       = get_rbs_from_sqlite(db_path_c);
+  for k in 0..rb_ignorelist.len() {
+    println!("=> We will remove RB {} due to it being marked as IGNORE in the config file!", rb_ignorelist[k]);
+    let bad_rb = rb_ignorelist[k].as_u8().unwrap();
+    rb_list.retain(|x| x.rb_id != bad_rb);
+  }
+  println!("=> We will use the following tof manifest:");
+  println!("== ==> LTBs [{}]:", ltb_list.len());
+  for ltb in &ltb_list {
+    println!("\t {}", ltb);
+  }
+  println!("== ==> RBs [{}]:", rb_list.len());
+  for rb in &rb_list {
+    println!("\t {}", rb);
+  }
 
 
 
-
-  //if autodiscover_rb {
-  //  rb_list = get_rb_manifest();
-  //  if rb_list.len() == 0 {
-  //    println!("Could not discover boards, inserting dummy");
-  //    let mut rb = ReadoutBoard::default();
-  //    rb.id = Some(0);
-  //    rb_list = vec![rb];
-  //  }
-  //}
   let rb_list_c  = rb_list.clone();
   let rb_list_c2 = rb_list.clone();
   // first set up comms etc. before 
@@ -393,10 +329,6 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
     (Sender<Vec<Option<TofResponse>>>, Receiver<Vec<Option<TofResponse>>>) = unbounded();
   //let ev_to_main, ev_from_thread) : Sender
   let (rb_id_to_receiver, rb_id_from_main) : (Sender<u8>, Receiver<u8>) = unbounded();
-  println!("We have the following ReadoutBoards");
-  for n in 0..rb_list_c2.len() {
-    println!("{}",rb_list_c2[n]);
-  }
   println!("Starting threads");
   // set up Threads
   let n_threads = 20;
@@ -783,7 +715,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                         } else {
                           rb_list_state.select(Some(selected + 1));
                         }
-                      rb_id_to_receiver.send(rb_list[selected].id.unwrap());
+                      rb_id_to_receiver.send(rb_list[selected].rb_id);
                       }
                     }
                     KeyCode::Up => {
@@ -795,7 +727,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                         } else {
                             rb_list_state.select(Some(rb_list.len() - 1));
                         }
-                        rb_id_to_receiver.send(rb_list[selected -1].id.unwrap());
+                        rb_id_to_receiver.send(rb_list[selected -1].rb_id);
 
                       }
                     }

@@ -33,9 +33,7 @@ use std::collections::VecDeque;
 use tof_dataclasses::packets::{TofPacket, PacketType};
 use tof_dataclasses::commands::{TofCommand,
                                 TofResponse};
-
-use liftof_lib::{get_rb_manifest,
-                 ReadoutBoard};
+use tof_dataclasses::manifest::ReadoutBoard;
 
 //fn clone_into_array<A, T>(slice: &[T]) -> A
 //where
@@ -127,7 +125,7 @@ impl StatusTab<'_> {
       .iter()
       .map(|rb| {
         ListItem::new(Spans::from(vec![Span::styled(
-          "RB ".to_owned() + &rb.id.unwrap().to_string(),
+          "RB ".to_owned() + &rb.rb_id.to_string(),
           Style::default(),
         )]))
       })
