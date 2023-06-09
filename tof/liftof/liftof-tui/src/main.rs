@@ -167,7 +167,7 @@ fn commander(cmd_from_main : Receiver<TofCommand>,
         match resp {
           Err(err) => debug!("0MQ problem, can not receive response from RB!"),
           Ok(r)    => {
-            let tof_response = TofResponse::from_bytestream(&r, 0).ok();
+            let tof_response = TofResponse::from_bytestream(&r, &mut 0).ok();
             responses.push(tof_response);
           }
         }
@@ -247,7 +247,7 @@ fn receive_stream(tp_to_main  : Sender<TofPacket>,
       Err(err) => trace!("[zmq] Nothing to receive/err {err}"),
       Ok(msg)  => {
         info!("[zmq] SUB - got msg of size {}", msg.len());
-        let packet = TofPacket::from_bytestream(&msg, 4);
+        let packet = TofPacket::from_bytestream(&msg, &mut 4);
         match packet {
           Err(err) => { 
             error!("Can't unpack packet! {err}");
@@ -345,7 +345,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
     rb.cmd_port   = Some(30000);
     rb.data_port  = Some(40000);
     rb.id = Some(0);
-    rb.ping().unwrap();
+    //rb.ping().unwrap();
     rb_list = vec![rb];
 
     // make sure the rb is connected
@@ -418,7 +418,6 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   workforce.execute(move || {
     master_trigger(&master_trigger_ip,
                    master_trigger_port,
-                   &tp_to_main_c,
                    &mt_rate_to_main,
                    &mt_to_main, 
                    false);
