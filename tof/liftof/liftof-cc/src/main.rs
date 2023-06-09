@@ -55,14 +55,14 @@ use tof_dataclasses::manifest::{LocalTriggerBoard,
                                 get_ltbs_from_sqlite,
                                 get_rbs_from_sqlite};
 use tof_dataclasses::commands::{TofCommand, TofResponse};
-use liftof_lib::master_trigger;
+use liftof_lib::{master_trigger,
+                 readoutboard_commander};
 
 use liftof_cc::readoutboard_comm::readoutboard_communicator;
 use liftof_cc::event_builder::{event_builder,
                            TofEventBuilderSettings};
                            //event_builder_no_master};
-use liftof_cc::api::{commander,
-                     tofcmp_and_mtb_moni};
+use liftof_cc::api::tofcmp_and_mtb_moni;
 use liftof_cc::paddle_packet_cache::paddle_packet_cache;
 use liftof_cc::flight_comms::global_data_sink;
 
@@ -169,15 +169,10 @@ fn main() {
   match args.json_config {
     None => panic!("No .json config file provided! Please provide a config file with --json-config or -j flag!"),
     Some(_) => {
-      //if !args.json_config.as_ref().unwrap().exists() {
-      //    panic!("The file {} does not exist!", args.json_config.as_ref().unwrap().display());
-      //}
-      //info!("Found config file {}", args.json_config.as_ref().unwrap().display());
       json_content = std::fs::read_to_string(args.json_config.as_ref().unwrap()).expect("Can not open json file");
       config = json::parse(&json_content).expect("Unable to parse json file");
     } // end Some
   } // end match
- 
 
   if use_master_trigger {
     master_trigger_ip   = config["master_trigger"]["ip"].as_str().unwrap().to_owned();
@@ -366,10 +361,8 @@ fn main() {
   println!("==> All RB threads started!");
   
   let one_second = time::Duration::from_millis(1000);
-  let rb_list_cc = rb_list.clone();
   worker_threads.execute(move || {
-    commander(&rb_list_cc,
-              cmd_receiver);
+    readoutboard_commander(cmd_receiver);
   });
   if use_master_trigger {
     // start the event builder thread

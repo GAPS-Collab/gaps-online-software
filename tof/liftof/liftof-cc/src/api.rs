@@ -26,7 +26,6 @@ use tof_dataclasses::events::master_trigger::{read_rate,
 use liftof_lib::{connect_to_mtb, 
                  MT_MAX_PACKSIZE};
 
-pub const DATAPORT : u32 = 42000;
 
 /// Temperature monitoring for the tof computer. 
 /// This works only on that machine. Unfortunatly, nothing smart seems
@@ -181,76 +180,6 @@ pub fn tofcmp_and_mtb_moni(tp_to_sink    : &Sender<TofPacket>,
 }
 
 
-/// This is listening to commands from the flight computer 
-/// and relays them to the RadoutBoards
-/// 
-/// # Arguments 
-///
-/// * rbs 
-/// * rp_to_main
-pub fn commander(rbs : &Vec<ReadoutBoard>,
-                 cmd : Receiver<TofCommand>){
-                 //rp_to_main : &Sender<RunParams>) {
-             
-  info!("Initialiized");
-  let ctx = zmq::Context::new();
-  //let mut sockets = Vec::<zmq::Socket>::new();
-
-  let mut address_ip = String::from("tcp://");
-  //let this_board_ip = local_ip().expect("Unable to obtainl local board IP. Something is messed up!");
-  let data_port    = DATAPORT;
-  let this_board_ip = IpAddr::V4(Ipv4Addr::new(10, 0, 1, 1));
-
-  match this_board_ip {
-    IpAddr::V4(ip) => address_ip += &ip.to_string(),
-    IpAddr::V6(_) => panic!("Currently, we do not support IPV6!")
-  }
-  let data_address : String = address_ip.clone() + ":" + &data_port.to_string();
-  let data_socket = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
-  data_socket.bind(&data_address).expect("Unable to bind to data (PUB) socket {data_adress}");
-  println!("0MQ PUB socket bound to address {data_address}");
-  //let init_run = TofCommand::DataRunStart(100000);
-  //let mut payload_cmd  = init_run.to_bytestream();
-  //let mut payload  = String::from("BRCT").into_bytes();
-  //payload.append(&mut payload_cmd);
-
-  println!("Starting cmd receiver loop!");
-  loop {
-    // check if we get a command from the main 
-    // thread
-    match cmd.try_recv() {
-      Err(err) => trace!("Did not receive a new command, error {err}"),
-      Ok(new_command) => {
-        info!("Received new command!");
-        let mut payload  = String::from("BRCT").into_bytes();
-        let mut payload_cmd = new_command.to_bytestream();
-        payload.append(&mut payload_cmd);
-        println!("{:?}", payload);
-        match data_socket.send(&payload,0) {
-          Err(err) => error!("Can send command! Error {err}"),
-          Ok(_)    => info!("BRCT command sent!")
-        }
-      }
-    }
-  }
-  //for rb in rbs.iter() {
-  //  let sock = ctx.socket(zmq::REQ).expect("Unable to create socket!");
-  //  let address = "tcp://".to_owned()
-  //            + &rb.ip_address.expect("No IP known for this board!").to_string()
-  //            + ":"
-  //            +  &rb.cmd_port.expect("No CMD port known for this board!").to_string();
-  //  sock.connect(&address);
-  //  sockets.push(sock);
-  //}
-  //let init_run = TofCommand::DataRunStart(100000);
-  ////let init_run = RunParams::new();
-  //for s in sockets.iter() {
-  //  match s.send(init_run.to_bytestream(), 0) {
-  //    Err(err) => warn!("Could not initalize run, err {err}"),
-  //    Ok(_)    => info!("Initialized run!")
-  //  }
-  //}
-}
 
 #[test]
 fn test_read_cpu_temperature() {

@@ -22,7 +22,7 @@ crossbeam-channel = "0.5"
 
 tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["random"]} 
 
-#zmq = "0.10.0"
+zmq = "0.10.0"
 
 log = "0.4"
 pretty_env_logger = "0.4"
