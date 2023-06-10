@@ -183,12 +183,13 @@ fn main() {
   } else {
     println!("==> Will NOT connect to the MTB, since -u has not been provided in the commandlline!");
   }
-
-  let storage_savepath = config["raw_storage_savepath"].as_str().unwrap().to_owned();
-  let events_per_file  = config["events_per_file"].as_usize().unwrap(); 
-  let calib_file_path  = config["calibration_file_path"].as_str().unwrap().to_owned();
-  let db_path          = Path::new(config["db_path"].as_str().unwrap());
-  let db_path_c        = db_path.clone();
+  
+  let write_stream_path = config["stream_savepath"].as_str().unwrap().to_owned();
+  let storage_savepath  = config["raw_storage_savepath"].as_str().unwrap().to_owned();
+  let events_per_file   = config["events_per_file"].as_usize().unwrap(); 
+  let calib_file_path   = config["calibration_file_path"].as_str().unwrap().to_owned();
+  let db_path           = Path::new(config["db_path"].as_str().unwrap());
+  let db_path_c         = db_path.clone();
   let ltb_list = get_ltbs_from_sqlite(db_path);
 
   let rb_ignorelist =  &config["rb_ignorelist"];
@@ -325,9 +326,11 @@ fn main() {
   });
   println!("==> paddle cache thread started!");
   println!("==> Starting data sink thread!");
+
   worker_threads.execute(move || {
                          global_data_sink(&tp_from_client,
                                           write_stream,
+                                          write_stream_path,
                                           verbose);
   });
   println!("==> data sink thread started!");

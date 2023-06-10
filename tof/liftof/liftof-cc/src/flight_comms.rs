@@ -28,6 +28,7 @@ use liftof_lib::TofPacketWriter;
 /// connection to the flight computer
 pub fn global_data_sink(incoming : &cbc::Receiver<TofPacket>,
                         write_stream : bool,
+                        write_stream_path  : String,
                         print_moni_packets : bool) {
 
   let ctx = zmq::Context::new();
@@ -52,7 +53,8 @@ pub fn global_data_sink(incoming : &cbc::Receiver<TofPacket>,
   let mut writer : Option<TofPacketWriter> = None;
   if write_stream {
     info!("Will write stream to dedicated file!");
-    writer = Some(TofPacketWriter::new(String::from("stream")));
+    let streamfile_name = write_stream_path + "/stream";
+    writer = Some(TofPacketWriter::new(streamfile_name));
   }
   let mut event_cache = Vec::<TofPacket>::with_capacity(100); 
 
