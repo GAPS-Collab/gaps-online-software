@@ -57,7 +57,7 @@ if __name__ == '__main__':
         try:
             sheet = pandas.read_excel(args.input, sheet_name=SPREADSHEET_MTB)
         except Exception as e:
-            print (f'Can not read spreadsheet with name {SPREADSHEET_NTB}. Exception {e} thrown. Abort!')
+            print (f'Can not read spreadsheet with name {SPREADSHEET_MTB}. Exception {e} thrown. Abort!')
             sys.exit(1)
         for row in range(1,len(sheet.index)):
             row_data = sheet.loc[row,:]
