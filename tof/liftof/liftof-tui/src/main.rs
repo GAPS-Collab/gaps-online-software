@@ -67,14 +67,13 @@ use tof_dataclasses::serialization::Serialization;
 use tof_dataclasses::threading::ThreadPool;
 use tof_dataclasses::events::blob::BlobData;
 use tof_dataclasses::events::MasterTriggerEvent;
-use tof_dataclasses::events::master_trigger::{read_daq,
-                                              read_rate,
-                                              read_lost_rate};
 
 use tof_dataclasses::manifest::{LocalTriggerBoard,
                                 ReadoutBoard,
                                 get_ltbs_from_sqlite,
                                 get_rbs_from_sqlite};
+
+use liftof_lib::monitor_mtb;
 
 use crate::tab_commands::CommandTab;
 use crate::tab_mt::MTTab;
@@ -578,7 +577,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                       .add_modifier(Modifier::BOLD),
               );
 
-          rect.render_stateful_widget(mt_tab.list_widget, mt_tab.list_rect, &mut rb_list_state);
+          //rect.render_stateful_widget(mt_tab.list_widget, mt_tab.list_rect, &mut rb_list_state);
           rect.render_widget(rate_chart,         mt_tab.rate_rect); 
           rect.render_widget(mt_tab.stream,       mt_tab.stream_rect);
           //rect.render_widget(mt_tab.network_moni, mt_tab.nw_mon_rect); 

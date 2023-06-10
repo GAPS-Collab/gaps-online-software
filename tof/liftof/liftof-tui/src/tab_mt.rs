@@ -3,17 +3,6 @@
 //! Show current data from the master trigger
 //! The layout is somewhat like this
 //!
-//! -----------------------------------------
-//! | Menu  | .. | .. |                     |
-//! -----------------------------------------
-//! | Rate           | Event Strean         |
-//! | =====          |                      |
-//! | Network        | <EVID 0>             |
-//! | =====          | <EVID 1>             |
-//! | Detail         | <EVID 2>             |
-//! | =====          | <EVID 3>             |
-//! | Commands       | <EVID 4>             |
-//! -----------------------------------------
 //! | Logs                                  |
 
 use chrono::Utc;
@@ -47,11 +36,11 @@ pub struct MTTab<'a> {
   pub network_moni  : Sparkline<'a>,
   pub n_paddle_dist : BarChart<'a>, 
   pub detail        : Paragraph<'a>,
-  cmd_list          : Vec::<TofCommand>,
-  pub list_widget   : List<'a>,
+  //cmd_list          : Vec::<TofCommand>,
+  //pub list_widget   : List<'a>,
   /// keep track of the passed time in seconds,
   /// to update only specific parts of the display
-  pub list_rect     : Rect,
+  //pub list_rect     : Rect,
   pub stream_rect   : Rect,
   pub detail_rect   : Rect,
   pub nw_mon_rect   : Rect,
@@ -93,40 +82,40 @@ impl MTTab<'_> {
       .split(main_chunks[0]);
    
 
-    let cmd_block = Block::default()
-    .borders(Borders::ALL)
-    .style(Style::default().fg(Color::White))
-    .title("Commands")
-    .border_type(BorderType::Plain);
+    //let cmd_block = Block::default()
+    //.borders(Borders::ALL)
+    //.style(Style::default().fg(Color::White))
+    //.title("Commands")
+    //.border_type(BorderType::Plain);
 
-    let mut cmd_list = Vec::<TofCommand>::new();
-    cmd_list.push(  TofCommand::DataRunStart          (0));    
-    cmd_list.push(  TofCommand::DataRunEnd            (0));       
-    //];
+    //let mut cmd_list = Vec::<TofCommand>::new();
+    //cmd_list.push(  TofCommand::DataRunStart          (0));    
+    //cmd_list.push(  TofCommand::DataRunEnd            (0));       
+    ////];
 
-    let mut items = Vec::<ListItem>::new();
-    for n in 0..cmd_list.len() {
-      items.push(
-        ListItem::new(Spans::from(vec![Span::styled(
-          cmd_list[n].to_string().clone(),
-          Style::default())]))
-        );
-    }
-    let selected_cmd = cmd_list[0]
+    //let mut items = Vec::<ListItem>::new();
+    //for n in 0..cmd_list.len() {
+    //  items.push(
+    //    ListItem::new(Spans::from(vec![Span::styled(
+    //      cmd_list[n].to_string().clone(),
+    //      Style::default())]))
+    //    );
+    //}
+    //let selected_cmd = cmd_list[0]
      // .get(
      //   rb_list_state
      //     .selected()
      //     .expect("there is always a selected pet"),
      // )
      // .expect("exists")
-     .clone();
+     //.clone();
 
-    let list_widget = List::new(items).block(cmd_block).highlight_style(
-      Style::default()
-        .bg(Color::Blue)
-        .fg(Color::Black)
-        .add_modifier(Modifier::BOLD),
-    );
+    //let list_widget = List::new(items).block(cmd_block).highlight_style(
+    //  Style::default()
+    //    .bg(Color::Blue)
+    //    .fg(Color::Black)
+    //    .add_modifier(Modifier::BOLD),
+    //);
     
     let stream =  Paragraph::new("")
     .style(Style::default().fg(Color::LightCyan))
@@ -208,7 +197,7 @@ impl MTTab<'_> {
 
     let rate_rect    = info_chunks[0];
     let nw_mon_rect  = info_chunks[1]; 
-    let list_rect    = info_chunks[2]; 
+    //let list_rect    = info_chunks[2]; 
     let stream_rect  = detail_chunks[0];
     let detail_rect  = detail_chunks[1];
 
@@ -218,9 +207,9 @@ impl MTTab<'_> {
       n_paddle_dist : n_paddle ,
       network_moni : network ,
       detail      ,
-      cmd_list    ,
-      list_widget ,
-      list_rect   , 
+      //cmd_list    ,
+      //list_widget ,
+      //list_rect   , 
       stream_rect ,
       detail_rect ,
       nw_mon_rect ,
@@ -288,6 +277,4 @@ impl MTTab<'_> {
     );
     detail_string
   }
-
-
 }
