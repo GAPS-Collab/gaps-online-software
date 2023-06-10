@@ -135,8 +135,8 @@ fn receive_stream(tp_to_main  : Sender<TofPacket>,
   data_socket.set_subscribe(previous_topic.as_bytes());
   let mut rb_map = HashMap::<u8, String>::new();
   for rb in rb_list.iter_mut() {
-    let conn = rb.get_connection_string().clone();
     rb.infer_ip_address();
+    let conn = rb.get_connection_string().clone();
     rb_map.insert(rb.rb_id, conn);
     //match rb.ip_address {
     //  None => {continue;},
