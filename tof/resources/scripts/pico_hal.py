@@ -1,14 +1,20 @@
 #!/usr/bin/env python3
+
 import socket
 import sys
 import random
 import select
 import time
+import json
+import math
+
 from enum import Enum
 
+regs = None
+
 PACKET_ID = 0
-IPADDR = "192.168.36.121"
-#IPADDR = "10.0.1.10"
+#IPADDR = "192.168.36.121"
+IPADDR = "10.0.1.10"
 PORT = 50001
 
 # Create a UDP socket and bind the socket to the port
@@ -28,6 +34,9 @@ typedef = {
     WRITE_NON_INCR: "WRITE (non incremental)",
     RMW: "Read Modify Write",
 }
+
+def get_lsb(n):
+    return int(math.log2(n & -n))
 
 # Recieve
 def decode_ipbus(message, verbose=False):
@@ -92,30 +101,50 @@ def encode_ipbus(addr, packet_type, data):
 
     return bytes(udp_data)
 
-def wReg(address, data, verify=False):
+def wReg(reg, data, verify=False):
+    node = regs[reg]
+    adr = node["adr"]
+    mask = node["mask"]
+    shift = get_lsb(mask)
+    r = (0xffffffff ^ mask) & rAdr(adr)
+    r |= data << shift
+    wAdr(adr, r)
+
+def rReg(reg, verify=False):
+    node = regs[reg]
+    adr = node["adr"]
+    mask = node["mask"]
+    shift = get_lsb(mask)
+    return (rAdr(adr) & mask) >> shift
+
+def wAdr(address, data, verify=False):
     s.sendto(encode_ipbus(addr=address, packet_type=WRITE, data=[data]), target_address)
     ready = select.select([s], [], [], 1)
     if ready[0]:
         data = s.recvfrom(4096)
         if verify:
-            rdback = rReg(address)
+            rdback = rAdr(address)
             if rdback != data:
-                print("Readback error in wReg!")
+                print("Readback error in wAdr!")
             return rdback
         return data
     else:
         print("timeout in wreg 0x%08X" % data)
-        return wReg(address, data, verify)
+        return wAdr(address, data, verify)
 
-def rReg(address):
+def rAdr(address):
     s.sendto(encode_ipbus(addr=address, packet_type=READ, data=[0x0]), target_address)
     ready = select.select([s], [], [], 1)
     if ready[0]:
-        data, address = s.recvfrom(4096)
-        return decode_ipbus(data,False)[0]
+        data, adr = s.recvfrom(4096)
+        dec = decode_ipbus(data,False)
+        if (len(dec) > 0):
+            return dec[0]
+        else:
+            return rAdr(address)
     else:
         print("timeout in rreg")
-        return rReg(address)
+        return rAdr(address)
 
 c_addr = 0x1004
 div_addr = 0x1005
@@ -123,14 +152,14 @@ ss_addr = 0x1006
 d_addr = (0x1000, 0x1001, 0x1002, 0x1003)
 
 def wSpiSS(ss):
-    wReg(ss_addr, ss)
+    wAdr(ss_addr, ss)
 
 def wSpiWord(word):
-    wReg(d_addr[0], word, verify=False)
+    wAdr(d_addr[0], word, verify=False)
 
 def wSpiCtrl(char_len=None, go=None, rx_neg=None, tx_neg=None, lsb=None, ie=None, ass=None):
 
-    reg = rReg(c_addr)
+    reg = rAdr(c_addr)
 
     if (char_len is not None):
         reg &= (0xffffffff ^ 0x7f)
@@ -154,10 +183,10 @@ def wSpiCtrl(char_len=None, go=None, rx_neg=None, tx_neg=None, lsb=None, ie=None
         reg &= (0xffffffff ^ 0x2000)
         reg |= (0x1 & ass) << 13
 
-    wReg(c_addr, reg, verify=False)
+    wAdr(c_addr, reg, verify=False)
 
 def rSpi(channel=0, adc=0):
-    wReg(div_addr, 127, verify=False)
+    wAdr(div_addr, 127, verify=False)
     # 0x18 start bit + for single ended
     wSpiWord((0x18 | (0x7 & channel)) << 16)
     wSpiCtrl(go=0)
@@ -165,7 +194,13 @@ def rSpi(channel=0, adc=0):
     wSpiCtrl(go=1)
     wSpiCtrl(go=0)
     wSpiSS(0x1 << adc)
-    return rReg(d_addr[0])
+    return rAdr(d_addr[0])
+
+def enable_tiu_emulation_mode():
+    wReg("MT.TIU_EMULATION_MODE", 1)
+
+def disable_tiu_emulation_mode():
+    wReg("MT.TIU_EMULATION_MODE", 0)
 
 def read_adc(adc, ch, shift=2):
     data = rSpi(ch, adc)
@@ -173,13 +208,24 @@ def read_adc(adc, ch, shift=2):
     return data
 
 def reset_event_cnt():
-    wReg(0xc,1,verify=False)
+    wReg("MT.EVENT_CNT_RESET", 1, verify=False)
 
 def read_event_cnt(output=False):
-    cnt = rReg(0xd)
+    cnt = rReg("MT.EVENT_CNT")
     if output:
         print("Event counter = %d" % cnt)
+
     return cnt
+
+def reset_hit_cnt(output=False):
+    wReg("MT.HIT_COUNTERS.RESET", 1)
+
+def read_hit_cnt():
+    wReg("MT.HIT_COUNTERS.SNAP", 1) # snap
+    base_address = regs["MT.HIT_COUNTERS.LT0"]["adr"]
+    for i in range (20):
+        print("LTB%2d hit counts = %d" % (i, rAdr(base_address+i)))
+    wReg("MT.HIT_COUNTERS.SNAP", 0) # unsnap
 
 def read_adcs():
 
@@ -219,22 +265,14 @@ def read_adcs():
                         ])
 
     channels = [
-        {"function": "FPGA TEMP"    , "conversion": 1,   "unit": "C", "address": 0x122, "mask": 0x0000fff},
-        {"function": "FPGA VCCINT"  , "conversion": 3,   "unit": "V", "address": 0x122, "mask": 0xfff0000},
-        {"function": "FPGA VCCAUX"  , "conversion": 3,   "unit": "V", "address": 0x123, "mask": 0x0000fff},
-        {"function": "FPGA VCCBRAM" , "conversion": 3,   "unit": "V", "address": 0x123, "mask": 0xfff0000},
-        ]
+        {"function": "FPGA TEMP"    , "conversion": 1,   "unit": "C", "reg": "MT.XADC.TEMP"},
+        {"function": "FPGA VCCINT"  , "conversion": 3,   "unit": "V", "reg": "MT.XADC.VCCINT"},
+        {"function": "FPGA VCCAUX"  , "conversion": 3,   "unit": "V", "reg": "MT.XADC.VCCAUX"},
+        {"function": "FPGA VCCBRAM" , "conversion": 3,   "unit": "V", "reg": "MT.XADC.VCCBRAM"}]
 
     for (ichn,channel) in enumerate(channels):
-        data = rReg(channel["address"])
-        mask = channel["mask"]
 
-        data = data & mask
-
-        while mask & 1 == 0:
-            mask = mask >> 1
-            data = data >> 1
-
+        data = rReg(channel["reg"])
 
         if (channel["function"] == "FPGA TEMP"):
             value = data * 503.975 / 4096 - 273.15
@@ -244,8 +282,7 @@ def read_adcs():
         table.append([ichn,
                     "0x%03X" % int(data),
                     "%4.2f %s" % (value, channels[ichn]["unit"]),
-                    channels[ichn]["function"],
-                    ])
+                    channels[ichn]["function"]])
 
     print(tabulate(table, headers=headers,  tablefmt="simple_outline"))
 
@@ -258,60 +295,69 @@ def check_clocks():
             stat = "OK"
         else:
             stat = "BAD"
-        print ("%s: % 10d Hz (%s)" % (desc, freq, stat))
+        print ("%19s: % 10d Hz (%s)" % (desc, freq, stat))
 
-    for desc, adr, spec in (["MTB  CLK", 0x1, 100000000],
-                            ["DSI0 CLK", 0x2, 20000000],
-                            ["DSI2 CLK", 0x3, 20000000],
-                            ["DSI2 CLK", 0x4, 20000000],
-                            ["DSI2 CLK", 0x5, 20000000],
-                            ["DSI2 CLK", 0x6, 20000000]):
-        check_clock(rReg(adr), desc, spec)
+    for reg, spec in (["MT.CLOCK_RATE",      100000000],
+                      ["MT.FB_CLOCK_RATE_0", 20000000],
+                      ["MT.FB_CLOCK_RATE_1", 20000000],
+                      ["MT.FB_CLOCK_RATE_2", 20000000],
+                      ["MT.FB_CLOCK_RATE_3", 20000000],
+                      ["MT.FB_CLOCK_RATE_4", 20000000]):
+        check_clock(rReg(reg), reg, spec)
 
 def force_trigger():
-    wReg(0x8, 1)
-
-def enable_tiu_emulation_mode():
-    wReg(0xe, 1)
-
-def disable_tiu_emulation_mode():
-    wReg(0xe, 0)
+    wReg("MT.FORCE_TRIGGER", 1)
 
 def en_ucla_trigger():
-    set_trig("a", 0x000000f0)
-    set_trig("b", 0x0000000f)
+    set_trig("MT.TRIG_MASK_A", 0x000000f0)
+    set_trig("MT.TRIG_MASK_B", 0x0000000f)
 
 def en_ssl_trigger():
-    set_trig("a", 0x3f3f0000)
-    set_trig("b", 0x00003f3f)
+    set_trig("MT.TRIG_MASK_A", 0xfc3f0000)
+    set_trig("MT.TRIG_MASK_B", 0x0000fc3f)
 
-def en_any_trigger():
-    set_trig("a", 0xffffffff)
-    set_trig("b", 0xffffffff)
+def set_any_trigger(val):
+    wReg("MT.ANY_TRIG_EN", val)
+    rd = rReg("MT.ANY_TRIG_EN")
+    print("Any trigger mode set to %d" % rd)
+
+def set_ssl_trig(trg, val):
+    wReg("MT.SSL_TRIG_%s_EN" % trg, val)
 
 def trig_stop():
-    set_trig("a", 0x00000000)
-    set_trig("b", 0x00000000)
+    set_trig("MT.TRIG_MASK_A", 0x00000000)
+    set_trig("MT.TRIG_MASK_B", 0x00000000)
 
-def set_trig(which, val):
+def set_trig(reg, val):
 
-    adr = {"a":0x15, "b":0x16}[which]
+    if not (reg == "MT.TRIG_MASK_A" or reg == "MT.TRIG_MASK_B"):
+        raise Exception("invalid Trigger mask register!")
 
     if (isinstance(val, str)):
         val = int(val, 16)
 
-    wReg(adr, val)
+    wReg(reg, val)
 
 def set_trig_generate(val):
-    wReg(0x9, val)
+    wReg("MT.TRIG_GEN_RATE", val)
 
 def set_trig_hz(rate):
     # rate = f_trig / 1E8 * 0xffffffff
     set_trig_generate(int((rate*0xffffffff)/1E8))
 
+def read_ltb_link_status():
+    for dsi in range(5):
+        reg = f"MT.LT_LINK_READY{dsi}"
+        ok_mask = rReg(reg)
+        for ltb in range(5):
+            link0  = 1 ^ (0x1 & (ok_mask >> (ltb*2 + 0)))
+            link1  = 1 ^ (0x1 & (ok_mask >> (ltb*2 + 1)))
+            status = "(BAD)" if link0 or link1 else "(maybe ok)"
+            print(f"DSI {dsi} LTB {ltb} {link0=} {link1=} {status}")
+
 def read_rates():
-    rate = rReg(0x17)
-    lost = rReg(0x18)
+    rate = rAdr(0x17)
+    lost = rAdr(0x18)
     print("Trigger rate      = %d Hz" % rate)
     print("Lost trigger rate = %d Hz" % lost)
     return rate,lost
@@ -320,8 +366,8 @@ def read_daq():
 
     def read_daq_word():
         while (True):
-            if 0 == (rReg(0x12) & 0x2):
-                return rReg(0x11)
+            if 0 == (rReg("MT.EVENT_QUEUE.EMPTY")):
+                return rReg("MT.EVENT_QUEUE.DATA")
 
     def count_ones(n):
         count = 0
@@ -331,15 +377,16 @@ def read_daq():
         return count
 
     state = "Idle"
+    paddles_rxd = 0
+    hit_paddles = -1
 
-    wReg(0x10, 1)
+    wReg("MT.EVENT_QUEUE.RESET", 1)
+
     while (True):
         rd = read_daq_word()
-        note = ""
 
         if (state=="Idle" and rd==0xAAAAAAAA):
             state = "Header"
-            found = False
             hit_paddles = 0
             paddles_rxd = 1
 
@@ -349,13 +396,7 @@ def read_daq():
         if (state=="Hits"):
             paddles_rxd += 1
 
-        if state == "Hits" or state == "Mask":
-            print (f'{bin(rd)}, {rd} , {state}')
-            if state == "Mask":
-                if rd > 3:
-                    found = True
-        else:
-            print("%08X (%s)" % (rd, state))
+        print("%08X (%s)" % (rd, state))
 
         if (state=="Header"):
             state="Event cnt"
@@ -376,10 +417,6 @@ def read_daq():
         elif (state=="CRC"):
             state="Trailer"
         elif (state=="Trailer"):
-            print (f'rxd {paddles_rxd}, hit {hit_paddles}')
-            print ('-------')
-            if found:
-                raise
             state="Idle"
 
 
@@ -388,17 +425,33 @@ def loopback(nreads=100000):
     from tqdm import tqdm
     for i in tqdm(range(nreads), colour='green'):
         write = random.randint(0, 0xffffffff)
-        wReg(0,write)
-        read = rReg(0)
+        wAdr(0,write)
+        read = rAdr(0)
         assert write==read, print("wr=0x%08X  rd=0x%08X" % (write, read))
         # if (i % 100 == 0):
         #     print(f"{i} reads, %f Mb" % ((i*32.0)/1000000.0))
 
 def fw_info():
-    print(" > FW_DATE = %08X" % rReg(0x200))
-    print(" > FW_TIME = %08X" % rReg(0x201))
-    print(" > FW_VER  = %08X" % rReg(0x202))
-    print(" > FW_SHA  =  %07X" % rReg(0x203))
+
+    fwdate = rReg("MT.HOG.GLOBAL_DATE")
+    fwtime = rReg("MT.HOG.GLOBAL_TIME")
+    fwver  = rReg("MT.HOG.GLOBAL_VER")
+    fwsha  = rReg("MT.HOG.GLOBAL_SHA")
+
+    if fwver == 0:
+        fwver = "Local build."
+    else:
+        fwver  = "v%d.%d.%d" % (int("%04X" % ((fwver >> 24) & 0xff)),
+                                int("%04X" % ((fwver >> 16) & 0xff)),
+                                int("%04X" % ((fwver >>  0) & 0xffff)))
+
+    fwdate = "%04x/%02x/%02x" % (fwdate & 0xffff, (fwdate>>16) & 0xff, (fwdate>>24) & 0xff)
+    fwtime = "%02x:%02x:%02x" % ((fwtime >> 16) & 0xff, (fwtime>>8) & 0xff, (fwtime>>0) & 0xff)
+
+    print("FW_DATE = %s" % fwdate)
+    print("FW_TIME = %s" % fwtime)
+    print("FW_VER  = %s" % fwver)
+    print("FW_SHA  = %7X" % fwsha)
 
 if __name__ == '__main__':
 
@@ -406,27 +459,39 @@ if __name__ == '__main__':
 
     argParser = argparse.ArgumentParser(description = "Argument parser")
 
-    argParser.add_argument('--ip',              action='store',      default=False, help="Set the IP Address of the target MTB.")
-    argParser.add_argument('--status',          action='store_true', default=False, help="Print out hte status of the TMB.")
-    argParser.add_argument('--ucla_trig_en',    action='store_true', default=False, help="Enable UCLA trigger")
-    argParser.add_argument('--ssl_trig_en',     action='store_true', default=False, help="Enable SSL trigger")
-    argParser.add_argument('--any_trig_en',     action='store_true', default=False, help="Enable ANY trigger")
-    argParser.add_argument('--trig_rates',      action='store_true', default=False, help="Read the trigger rates")
-    argParser.add_argument('--trig_stop',       action='store_true', default=False, help="Stop all triggers.")
-    argParser.add_argument('--trig_a',          action='store',                     help="Set trigger mask A")
-    argParser.add_argument('--trig_b',          action='store',                     help="Set trigger mask B")
-    argParser.add_argument('--trig_set_hz',     action='store',                     help="Set the poisson trigger generator rate in Hz")
-    argParser.add_argument('--trig_generate',   action='store',                     help="Set the poisson trigger generator rate (f_trig = 1E8 * rate / 0xffffffff)")
-    argParser.add_argument('--read_adc',        action='store_true', default=False, help="Read ADCs")
-    argParser.add_argument('--loopback',        action='store_true', default=False, help="Ethernet Loopback Test")
-    argParser.add_argument('--fw_info',         action='store_true', default=False, help="Print firmware version info")
-    argParser.add_argument('--reset_event_cnt', action='store_true', default=False, help="Reset the Event Counter")
-    argParser.add_argument('--read_event_cnt',  action='store_true', default=False, help="Read the Event Counter")
+    argParser.add_argument('--ip',                    action='store',      default=False, help="Set the IP Address of the target MTB.")
+    argParser.add_argument('--status',                action='store_true', default=False, help="Print out hte status of the TMB.")
+    argParser.add_argument('--ucla_trig_en',          action='store_true', default=False, help="Enable UCLA trigger")
+    argParser.add_argument('--ssl_trig_en',           action='store_true', default=False, help="Enable SSL trigger")
+    argParser.add_argument('--any_trig_en',           action='store_true', default=False, help="Enable ANY trigger")
+    argParser.add_argument('--any_trig_dis',          action='store_true', default=False, help="Disable ANY trigger")
+    argParser.add_argument('--ssl_top_bot_en',        action='store_true', default=False, help="Enable SSL trigger")
+    argParser.add_argument('--ssl_top_bot_dis',       action='store_true', default=False, help="Disable SSL trigger")
+    argParser.add_argument('--ssl_topedge_bot_en',    action='store_true', default=False, help="Enable SSL trigger")
+    argParser.add_argument('--ssl_topedge_bot_dis',   action='store_true', default=False, help="Disable SSL trigger")
+    argParser.add_argument('--ssl_top_botedge_en',    action='store_true', default=False, help="Enable SSL trigger")
+    argParser.add_argument('--ssl_top_botedge_dis',   action='store_true', default=False, help="Disable SSL trigger")
+    argParser.add_argument('--ssl_topmid_botmid_en',  action='store_true', default=False, help="Enable SSL trigger")
+    argParser.add_argument('--ssl_topmid_botmid_dis', action='store_true', default=False, help="Disable SSL trigger")
+    argParser.add_argument('--trig_rates',            action='store_true', default=False, help="Read the trigger rates")
+    argParser.add_argument('--ltb_status',            action='store_true', default=False, help="Read LTB link status")
+    argParser.add_argument('--trig_stop',             action='store_true', default=False, help="Stop all triggers.")
+    argParser.add_argument('--trig_a',                action='store',                     help="Set trigger mask A")
+    argParser.add_argument('--trig_b',                action='store',                     help="Set trigger mask B")
+    argParser.add_argument('--trig_set_hz',           action='store',                     help="Set the poisson trigger generator rate in Hz")
+    argParser.add_argument('--trig_generate',         action='store',                     help="Set the poisson trigger generator rate (f_trig = 1E8 * rate / 0xffffffff)")
+    argParser.add_argument('--read_adc',              action='store_true', default=False, help="Read ADCs")
+    argParser.add_argument('--loopback',              action='store_true', default=False, help="Ethernet Loopback Test")
+    argParser.add_argument('--fw_info',               action='store_true', default=False, help="Print firmware version info")
+    argParser.add_argument('--reset_event_cnt',       action='store_true', default=False, help="Reset the Event Counter")
+    argParser.add_argument('--read_event_cnt',        action='store_true', default=False, help="Read the Event Counter")
+    argParser.add_argument('--read_hit_cnt',          action='store_true', default=False, help="Read the LTB Hit Counters")
+    argParser.add_argument('--reset_hit_cnt',         action='store_true', default=False, help="Reset the LTB Hit Counters")
+    argParser.add_argument('--read_daq',              action='store_true', default=False, help="Stream the DAQ data to the screen")
+    argParser.add_argument('--force_trig',            action='store_true', default=False, help="Force an MTB Trigger")
+    argParser.add_argument('--check_clocks',          action='store_true', default=False, help="Check DSI loopback clock frequencies")
     argParser.add_argument('--enable_tiu_emulation_mode',  action='store_true', default=False, help="Write 1 to TIU_EMULATION_MODE register")
     argParser.add_argument('--disable_tiu_emulation_mode',  action='store_true', default=False, help="Write 0 to TIU_EMULATION_MODE register")
-    argParser.add_argument('--read_daq',        action='store_true', default=False, help="Stream the DAQ data to the screen")
-    argParser.add_argument('--force_trig',      action='store_true', default=False, help="Force an MTB Trigger")
-    argParser.add_argument('--check_clocks',    action='store_true', default=False, help="Check DSI loopback clock frequencies")
 
     args = argParser.parse_args()
 
@@ -434,18 +499,22 @@ if __name__ == '__main__':
         IPADDR = args.ip
 
     target_address = (IPADDR, PORT)
+
+    with open('mt_addresses.json', 'r') as f:
+        regs = json.load(f)
+
     if args.enable_tiu_emulation_mode:
         enable_tiu_emulation_mode()
     if args.disable_tiu_emulation_mode:
         disable_tiu_emulation_mode()
-
-
     if args.check_clocks:
         check_clocks()
     if args.ucla_trig_en:
         en_ucla_trigger()
     if args.trig_rates:
         read_rates()
+    if args.ltb_status:
+        read_ltb_link_status()
     if args.force_trig:
         force_trigger()
     if args.ssl_trig_en:
@@ -460,8 +529,33 @@ if __name__ == '__main__':
         read_adcs()
         print("")
         read_event_cnt(output=True)
+        print("")
+        read_hit_cnt()
+        print("")
+        read_ltb_link_status()
+
     if args.any_trig_en:
-        en_any_trigger()
+        set_any_trigger(1)
+    if args.any_trig_dis:
+        set_any_trigger(0)
+
+    if args.ssl_top_bot_en:
+        set_ssl_trig("TOP_BOT", 1)
+    if args.ssl_top_bot_dis:
+        set_ssl_trig("TOP_BOT", 0)
+    if args.ssl_topedge_bot_en:
+        set_ssl_trig("TOPEDGE_BOT", 1)
+    if args.ssl_topedge_bot_dis:
+        set_ssl_trig("TOPEDGE_BOT", 0)
+    if args.ssl_top_botedge_en:
+        set_ssl_trig("TOP_BOTEDGE", 1)
+    if args.ssl_top_botedge_dis:
+        set_ssl_trig("TOP_BOTEDGE", 0)
+    if args.ssl_topmid_botmid_en:
+        set_ssl_trig("TOPMID_BOTMID", 1)
+    if args.ssl_topmid_botmid_dis:
+        set_ssl_trig("TOPMID_BOTMID", 0)
+
     if args.trig_stop:
         trig_stop()
     if args.read_adc:
@@ -471,13 +565,17 @@ if __name__ == '__main__':
     if args.trig_set_hz:
         set_trig_hz(int(args.trig_set_hz))
     if args.trig_a:
-        set_trig("a", args.trig_a)
+        set_trig("MT.TRIG_MASK_A", args.trig_a)
     if args.trig_b:
-        set_trig("b", args.trig_b)
+        set_trig("MT.TRIG_MASK_B", args.trig_b)
     if args.reset_event_cnt:
         reset_event_cnt()
     if args.read_event_cnt:
         read_event_cnt(output=True)
+    if args.read_hit_cnt:
+        read_hit_cnt()
+    if args.reset_hit_cnt:
+        reset_hit_cnt()
     if args.fw_info:
         fw_info()
     if args.loopback:
@@ -487,3 +585,5 @@ if __name__ == '__main__':
 
     if len(sys.argv) == 1:
         argParser.print_help()
+
+    # print(regs)
