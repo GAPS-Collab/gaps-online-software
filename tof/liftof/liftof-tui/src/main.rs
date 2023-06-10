@@ -136,6 +136,7 @@ fn receive_stream(tp_to_main  : Sender<TofPacket>,
   let mut rb_map = HashMap::<u8, String>::new();
   for rb in rb_list.iter_mut() {
     let conn = rb.get_connection_string().clone();
+    rb.infer_ip_address();
     rb_map.insert(rb.rb_id, conn);
     //match rb.ip_address {
     //  None => {continue;},
@@ -174,7 +175,7 @@ fn receive_stream(tp_to_main  : Sender<TofPacket>,
         data_socket.disconnect(&previous_endpoint);
         previous_topic = new_topic;
         previous_endpoint = rb_map[&id].clone();
-        println!("previous endpoint {}", previous_endpoint);
+        println!("RB ID changed! Will connect to endpoint {}", previous_endpoint);
         data_socket.connect(&previous_endpoint);
         //data_socket.set_subscribe(previous_topic.as_bytes());
         data_socket.set_subscribe(b"");
