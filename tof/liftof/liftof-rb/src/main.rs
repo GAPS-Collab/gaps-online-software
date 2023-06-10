@@ -152,6 +152,8 @@ fn main() {
 
   let mut rc_config = RunConfig::new();
   let mut rc_file_path  = std::path::PathBuf::new();
+
+  // FIXME run_config overrides stream_any
   match run_config {
     None     => (),
     Some(rcfile) => {
@@ -159,6 +161,7 @@ fn main() {
       rc_config    = get_runconfig(&rcfile);
       ch_mask      = rc_config.active_channel_mask;
       data_format  = rc_config.data_format;
+      stream_any   = rc_config.stream_any;
     }
   }
 

@@ -1431,7 +1431,7 @@ pub fn ram_buffer_handler(buff_trip     : usize,
     match bs_sender.send(bytestream) {
       Err(err) => error!("error sending {err}"),
       Ok(_)    => {
-        info!("We are sending {} bytes", bs_len);
+        info!("We are sending {} event bytes for further processing!", bs_len);
       }
     }
     match reset_ram_buffer_occ(&which) {
@@ -1494,7 +1494,7 @@ pub fn event_processing(bs_recv     : &Receiver<Vec<u8>>,
                   event_id   = BlobData::decode_event_id(&bytestream[head_pos..tail_pos]);
                   let mut payload = Vec::<u8>::new();
                   payload.extend_from_slice(&bytestream[head_pos..tail_pos + 2]);
-                  trace!("Got payload size {}", &payload.len());
+                  debug!("Prepared TofPacket for event {} with a payload size of {}", event_id, &payload.len());
                   let rb_payload = RBEventPayload::new(event_id, payload); 
                   let mut tp = TofPacket::from(&rb_payload);
                   match tp_sender.send(tp) {
