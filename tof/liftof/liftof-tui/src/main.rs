@@ -32,10 +32,6 @@ use histo::Histogram;
 
 use liftof_lib::{get_tof_manifest,
                  master_trigger};
-                 //LocalTriggerBoard,
-                 //ReadoutBoard};
-
-
 
 use tui_logger::TuiLoggerWidget;
 
@@ -314,7 +310,8 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
     println!("\t {}", rb);
   }
 
-
+  let  master_trigger_ip      = config["master_trigger"]["ip"].as_str().unwrap().to_owned();
+  let  master_trigger_port    = config["master_trigger"]["port"].as_usize().unwrap();
 
   let rb_list_c  = rb_list.clone();
   let rb_list_c2 = rb_list.clone();
@@ -343,9 +340,6 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
       receive_stream(tp_to_main, rb_list_c, rb_id_from_main);
   });
 
-  //let master_trigger_ip = String::from("10.0.1.10");
-  let master_trigger_ip = String::from("192.168.36.121");
-  let master_trigger_port : usize = 50001;
 
   workforce.execute(move || {
     master_trigger(&master_trigger_ip,

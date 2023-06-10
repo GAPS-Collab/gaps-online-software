@@ -6,7 +6,7 @@
   "events_per_file" : 100000,
   "calibration_file_path" : "/home/gaps/gaps-online-software/tof/resources/calibrations",
   "master_trigger" : {
-    "ip"   : "192.168.36.121", 
+    "ip"   : "10.0.1.10", 
     "port" : 50001
   },
   "flight_computer" : {

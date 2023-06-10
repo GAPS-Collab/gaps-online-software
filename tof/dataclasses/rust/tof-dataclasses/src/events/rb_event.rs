@@ -38,13 +38,6 @@ use crate::FromRandom;
 extern crate rand;
 #[cfg(feature = "random")]
 use rand::Rng;
-// helper
-fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
-where P: AsRef<Path>, {
-  let file = File::open(filename)?;
-    Ok(io::BufReader::new(file).lines())
-  }
-
 
 
 /// RBBinaryDump is the closest representation of actual 
@@ -113,7 +106,7 @@ impl RBBinaryDump {
   pub fn get_active_data_channels(&self) -> Vec<u8> {
     let mut active_channels = Vec::<u8>::with_capacity(8);
     for ch in 1..9 {
-      if ((self.ch_mask as u8 & (ch as u8 -1).pow(2)) == (ch as u8 -1).pow(2)) {
+      if self.ch_mask as u8 & (ch as u8 -1).pow(2) == (ch as u8 -1).pow(2) {
         active_channels.push(ch);
       }
     }
@@ -169,7 +162,7 @@ impl Serialization for RBBinaryDump {
     stream.extend_from_slice(&self.id      .to_le_bytes());  
     stream.extend_from_slice(&self.ch_mask .to_le_bytes());
     let mut four_bytes = self.event_id.to_be_bytes();
-    let mut four_bytes_shuffle = [four_bytes[1],
+    let four_bytes_shuffle = [four_bytes[1],
                               four_bytes[0],
                               four_bytes[3],
                               four_bytes[2]];
@@ -383,7 +376,7 @@ impl RBEventHeader {
     header.lost_trigger = (status & 2) == 2;
     header.is_locked    = (status & 4) == 4;
     header.is_locked_last_sec = (status & 8) == 8;
-    header.fpga_temp    = (status >> 4);
+    header.fpga_temp    = status >> 4;
     if !header.lost_trigger {
       // in case there is no trigger, that means the DRS was busy so 
       // we won't get channel data or a stop cell
@@ -434,7 +427,7 @@ impl RBEventHeader {
   pub fn get_active_data_channels(&self) -> Vec<u8> {
     let mut active_channels = Vec::<u8>::with_capacity(8);
     for ch in 1..9 {
-      if ((self.channel_mask & (ch as u8 -1).pow(2)) == (ch as u8 -1).pow(2)) {
+      if (self.channel_mask & (ch as u8 -1).pow(2) == (ch as u8 -1).pow(2)) {
         active_channels.push(ch);
       }
     }
@@ -474,8 +467,8 @@ impl Default for RBEventHeader {
 impl From<&Path> for RBEventHeader {
   fn from(path : &Path) -> RBEventHeader {
     let mut header =  RBEventHeader::new();
-    let file = BufReader::new(File::open(path).expect("Unable to open file {}"));
-    
+    let file = BufReader::new(File::open(path).expect("Unable to open file {}"));    
+    todo!("This is not implemented yet!");
     header
   }
 }
@@ -515,8 +508,8 @@ impl Serialization for RBEventHeader {
   fn from_bytestream(stream : &Vec<u8>, pos : &mut usize)
     -> Result<RBEventHeader, SerializationError> {
     let mut header  = RBEventHeader::new();
-    let head_pos    = search_for_u16(RBBinaryDump::HEAD, stream, *pos)?; 
-    let tail_pos    = search_for_u16(RBBinaryDump::TAIL, stream, head_pos + RBEventHeader::SIZE-2)?;
+    let head_pos    = search_for_u16(RBEventHeader::HEAD, stream, *pos)?; 
+    let tail_pos    = search_for_u16(RBEventHeader::TAIL, stream, head_pos + RBEventHeader::SIZE-2)?;
     // At this state, this can be a header or a full event. Check here and
     // proceed depending on the options
     if tail_pos + 2 - head_pos != RBEventHeader::SIZE {
@@ -558,7 +551,6 @@ impl Serialization for RBEventHeader {
     stream.extend_from_slice(&RBEventHeader::TAIL.to_le_bytes());
     stream
   }
-
 }
 
 #[cfg(feature = "random")]

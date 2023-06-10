@@ -225,11 +225,11 @@ mod test_serialization {
     let mut pos = search_for_u16(0xAAAA, &bytestream, 0).unwrap();
     assert_eq!(pos, 3);
     
-    bytestream = vec![1,2,3,244, 16, 32, 0xff, 0xAA, 5, 7];
+    bytestream = vec![1,2,3,244, 16, 32, 0xaa, 0xff, 5, 7];
     pos = search_for_u16(65450, &bytestream, 1).unwrap();
     assert_eq!(pos, 6);
     
-    bytestream = vec![0xaa,0xaa,3,244, 16, 32, 0xff, 0xAA, 5, 7];
+    bytestream = vec![0xaa,0xaa,3,244, 16, 32, 0xAA, 0xFF, 5, 7];
     pos = search_for_u16(0xaaaa, &bytestream, 0).unwrap();
     assert_eq!(pos, 0);
   }
