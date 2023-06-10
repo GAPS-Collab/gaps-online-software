@@ -477,17 +477,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
           monitor_mtb(&mtb_address, &mut mtb_moni);
           rates.push_back((mission_elapsed_time.elapsed().as_secs() as f64, mtb_moni.rate as f64));
           fpga_temps.push_back((mission_elapsed_time.elapsed().as_secs() as f64, mtb_moni.fpga_temp as f64));
-          //match mt_rate_from_mt.try_recv() {
-          //  Err(err) => {
-          //    //rates.push_back((mission_elapsed_time.elapsed().as_secs() as f64, 42.0));
-          //    trace!("Did not receive new rate!");
-          //  },
-          //  Ok(rate) => {
-          //    info!("Got rate for mt rate chart {rate}");
-          //    rates.push_back((mission_elapsed_time.elapsed().as_secs() as f64, rate as f64));
-          //  } 
-          //}
-      
+          info!("Received MtbMoniData {}", mtb_moni); 
           if update_detail {
               warn!("Ten seconds have passed!");
           }
@@ -597,9 +587,9 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
               //.bounds([0.0, 1000.0])
               .labels(x_labels.clone().iter().cloned().map(Span::from).collect()))
             .y_axis(Axis::default()
-              .title(Span::styled("T [\u{00B0}C]", Style::default().fg(Color::White)))
+              //.title(Span::styled("T [\u{00B0}C]", Style::default().fg(Color::White)))
               .style(Style::default().fg(Color::White))
-              .bounds([r_min as f64, r_max as f64])
+              .bounds([fpga_t_min as f64, fpga_t_max as f64])
               //.bounds([0.0,1000.0])
               .labels(y_labels.clone().iter().cloned().map(Span::from).collect()));
           
