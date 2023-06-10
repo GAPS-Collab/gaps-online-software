@@ -175,7 +175,7 @@ fn receive_stream(tp_to_main  : Sender<TofPacket>,
         data_socket.disconnect(&previous_endpoint);
         previous_topic = new_topic;
         previous_endpoint = rb_map[&id].clone();
-        println!("RB ID changed! Will connect to endpoint {}", previous_endpoint);
+        info!("RB ID changed! Will connect to endpoint {}", previous_endpoint);
         data_socket.connect(&previous_endpoint);
         //data_socket.set_subscribe(previous_topic.as_bytes());
         data_socket.set_subscribe(b"");
@@ -660,8 +660,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                     KeyCode::Char('m') => ui_menu.active_menu_item = MenuItem::MasterTrigger,
                     KeyCode::Down => {
                       if let Some(selected) = rb_list_state.selected() {
-                        //let amount_pets = read_db().expect("can fetch pet list").len();
-                        if selected >= cmd_tab.cmd_list.len() {
+                        if selected >= cmd_tab.cmd_list.len() -1 {
                           rb_list_state.select(Some(0));
                         } else {
                           rb_list_state.select(Some(selected + 1));
@@ -670,7 +669,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                     }
                     KeyCode::Up => {
                       if let Some(selected) = rb_list_state.selected() {
-                        //let amount_pets = read_db().expect("can fetch pet list").len();
+                        info!("Attempting to select item {selected}");
                         if selected < 1 {
                             rb_list_state.select(Some(0));
                         } else {

@@ -17,7 +17,6 @@
 //! | Logs                                  |
 
 use tof_dataclasses::events::blob::BlobData;
-
 use chrono::Utc;
 
 use tui::{
@@ -188,8 +187,8 @@ impl CommandTab<'_> {
         let eventid = BlobData::decode_event_id(pk.payload.as_slice());
         pk_repr = String::from("\u{2728} <") + &now + " " + &eventid.to_string() + " - RBEvent >";
       },
-      PacketType::Monitor   => {
-        pk_repr = String::from("\u{1f4c8} <") + &now + " - RBMoni >";
+      PacketType::MonitorRb   => {
+        pk_repr = String::from("\u{1f4c8} <") + &now + " - RBMoniData >";
       },
       PacketType::HeartBeat => {
       },
