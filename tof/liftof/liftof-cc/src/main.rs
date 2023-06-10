@@ -175,9 +175,9 @@ fn main() {
   } // end match
 
   if use_master_trigger {
-    master_trigger_ip   = config["master_trigger"]["ip"].as_str().unwrap().to_owned();
-    master_trigger_port = config["master_trigger"]["port"].as_usize().unwrap();
-    master_trigger_ip_c = master_trigger_ip.clone();
+    master_trigger_ip     = config["master_trigger"]["ip"].as_str().unwrap().to_owned();
+    master_trigger_port   = config["master_trigger"]["port"].as_usize().unwrap();
+    master_trigger_ip_c   = master_trigger_ip.clone();
     master_trigger_port_c = master_trigger_port.clone();
     info!("Will connect to the master trigger board at {}:{}", master_trigger_ip, master_trigger_port);
   } else {

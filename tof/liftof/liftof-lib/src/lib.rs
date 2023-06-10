@@ -27,7 +27,6 @@ extern crate pretty_env_logger;
 
 //use tof_dataclasses::manifest::LocalTriggerBoard;
 use tof_dataclasses::manifest as mf;
-use tof_dataclasses::events::master_trigger::{read_daq, read_rate, reset_daq};
 use tof_dataclasses::constants::{NCHN,
                                  NWORDS};
 use tof_dataclasses::calibrations::{Calibrations,
@@ -40,9 +39,16 @@ use tof_dataclasses::errors::{BlobError, SerializationError};
 use tof_dataclasses::commands::{TofCommand};//, TofResponse};
 use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::events::MasterTriggerEvent;
+use tof_dataclasses::monitoring::MtbMoniData;
 use tof_dataclasses::serialization::{Serialization,
                                      parse_u16,
                                      parse_u32};
+use tof_dataclasses::events::master_trigger::{reset_daq,
+                                              read_daq,
+                                              read_rate,
+                                              read_lost_rate,
+                                              read_adc_temp_and_vccint,
+                                              read_adc_vccaux_and_vccbram};
 
 pub const MT_MAX_PACKSIZE   : usize = 512;
 pub const DATAPORT : u32 = 42000;
@@ -943,12 +949,58 @@ pub fn master_trigger(mt_ip          : &str,
   } // end loop
 }
 
+/// Obtain monitoring data from the MTB.
+///
+/// # Arguments"
+///
+/// * mtb_address   : ip + port of the master trigger
+/// * moni          : preallocated struct to hold monitoring 
+///                   data
+pub fn monitor_mtb(mtb_address : &String,
+                   mtb_moni    : &mut MtbMoniData) {
+  let socket = connect_to_mtb(&mtb_address); 
+  let mut buffer = [0u8;MT_MAX_PACKSIZE];  
+  match socket {
+    Err(err) => {error!("Can not connect to MTB, error {err}")},
+    Ok(sock) => {
+      match read_rate(&sock, &mtb_address, &mut buffer) {
+        Err(err) => {
+          error!("Unable to obtain MT rate information! error {err}");
+        }
+        Ok(rate) => {
+          info!("Got MTB rate of {rate}");
+          mtb_moni.rate = rate as u16;
+        }
+      } // end match
+      match read_adc_vccaux_and_vccbram(&sock, &mtb_address, &mut buffer) {
+        Err(err) => {
+          error!("Unable to obtain MT VCCAUX and VCCBRAM! error {err}");
+        }
+        Ok(values) => {
+          mtb_moni.fpga_vccaux  = values.0;
+          mtb_moni.fpga_vccbram = values.1; 
+        }
+      }
+      match read_adc_temp_and_vccint(&sock, &mtb_address, &mut buffer) {
+        Err(err) => {
+          error!("Unable to obtain MT VCCAUX and VCCBRAM! error {err}");
+        }
+        Ok(values) => {
+          mtb_moni.fpga_temp    = values.0;
+          mtb_moni.fpga_vccint  = values.1; 
+        }
+      }
+    } // end OK
+  } // end match
+}
+
 
 /// Get the tof channel/paddle mapping and involved components
 ///
 /// This reads the configuration from a json file and panics 
 /// if there are any problems.
 ///
+#[deprecated(since="0.4.0", note="please use the database methods from tof_dataclasses instead")]
 pub fn get_tof_manifest(json_config : PathBuf) -> (Vec::<LocalTriggerBoard>, Vec::<ReadoutBoard>) {
   let mut ltbs = Vec::<LocalTriggerBoard>::new();
   let mut rbs  = Vec::<ReadoutBoard>::new();

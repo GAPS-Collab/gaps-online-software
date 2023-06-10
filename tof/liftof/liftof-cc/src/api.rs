@@ -18,14 +18,8 @@ use tof_dataclasses::commands::TofCommand;
 use tof_dataclasses::monitoring::{TofCmpMoniData,
                                   MtbMoniData};
 use tof_dataclasses::packets::TofPacket;
-use tof_dataclasses::events::master_trigger::{read_rate,
-                                              read_lost_rate,
-                                              read_adc_temp_and_vccint,
-                                              read_adc_vccaux_and_vccbram};
-
-use liftof_lib::{connect_to_mtb, 
-                 MT_MAX_PACKSIZE};
-
+use liftof_lib::{connect_to_mtb,
+                 monitor_mtb};
 
 /// Temperature monitoring for the tof computer. 
 /// This works only on that machine. Unfortunatly, nothing smart seems
@@ -86,6 +80,8 @@ pub fn read_cpu_temperature() -> (f64,f64,f64) {
   (c1_t, c2_t, pch_t)
 }
 
+
+
 /// Do "global" monitoring tasks, that is monitor cpu temp
 /// and usage of the tof computer itself and the MTB
 ///
@@ -105,53 +101,19 @@ pub fn tofcmp_and_mtb_moni(tp_to_sink    : &Sender<TofPacket>,
                            moni_interval : u64,
                            verbose       : bool) {
   let use_mtb = mtb_ip != "";
-  let mut mtb_address = String::from("");
   let mut timer   = Instant::now();
   let mut socket  : io::Result::<UdpSocket>; 
-  let mut buffer = [0u8;MT_MAX_PACKSIZE];  
   let mut mtb_moni    = MtbMoniData::new();
   let mut tofcmp_moni = TofCmpMoniData::new();
   let mut tp = TofPacket::new();
+  let mtb_address = mtb_ip.to_owned() + ":" + &mtb_port.to_string();
   loop {
     // reconnect to MTB
     if timer.elapsed().as_secs() > moni_interval {
       if use_mtb {
-        // connect to the mtb and get the rate
-        mtb_address = mtb_ip.to_owned() + ":" + &mtb_port.to_string();
-        socket = connect_to_mtb(&mtb_address); 
-        if let Ok(sock) = socket {
-          match read_rate(&sock, &mtb_address, &mut buffer) {
-            Err(err) => {
-              error!("Unable to obtain MT rate information! error {err}");
-            }
-            Ok(rate) => {
-              info!("Got MTB rate of {rate}");
-              mtb_moni.rate = rate as u16;
-            }
-          } // end match
-          match read_adc_vccaux_and_vccbram(&sock, &mtb_address, &mut buffer) {
-            Err(err) => {
-              error!("Unable to obtain MT VCCAUX and VCCBRAM! error {err}");
-            }
-            Ok(values) => {
-              mtb_moni.fpga_vccaux  = values.0;
-              mtb_moni.fpga_vccbram = values.1; 
-            }
-          }
-          match read_adc_temp_and_vccint(&sock, &mtb_address, &mut buffer) {
-            Err(err) => {
-              error!("Unable to obtain MT VCCAUX and VCCBRAM! error {err}");
-            }
-            Ok(values) => {
-              mtb_moni.fpga_temp    = values.0;
-              mtb_moni.fpga_vccint  = values.1; 
-            }
-          }
-
-        } else {
-          error!("Can not connect to MTB at {}", mtb_address);
-        }
+        monitor_mtb(&mtb_address, &mut mtb_moni);
       }
+
       let (c1, c2, pch) = read_cpu_temperature();
       tofcmp_moni.core1_tmp = c1 as u8;
       tofcmp_moni.core2_tmp = c2 as u8;
