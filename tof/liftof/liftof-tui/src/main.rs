@@ -31,7 +31,8 @@ extern crate histo;
 use histo::Histogram;
 
 use liftof_lib::{get_tof_manifest,
-                 master_trigger};
+                 master_trigger,
+                 monitor_mtb};
 
 use tui_logger::TuiLoggerWidget;
 
@@ -67,13 +68,12 @@ use tof_dataclasses::serialization::Serialization;
 use tof_dataclasses::threading::ThreadPool;
 use tof_dataclasses::events::blob::BlobData;
 use tof_dataclasses::events::MasterTriggerEvent;
-
+use tof_dataclasses::monitoring::MtbMoniData;
 use tof_dataclasses::manifest::{LocalTriggerBoard,
                                 ReadoutBoard,
                                 get_ltbs_from_sqlite,
                                 get_rbs_from_sqlite};
 
-use liftof_lib::monitor_mtb;
 
 use crate::tab_commands::CommandTab;
 use crate::tab_mt::MTTab;
@@ -112,7 +112,10 @@ enum Event<I> {
     Tick,
 }
 
-const MAX_LEN_RATE : usize = 1000;
+
+// maximum range of charts
+const MAX_LEN_RATE         : usize = 1000;
+const MAX_LEN_MT_FPGA_TEMP : usize = 1000;
 
 
 
@@ -309,8 +312,9 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
     println!("\t {}", rb);
   }
 
-  let  master_trigger_ip      = config["master_trigger"]["ip"].as_str().unwrap().to_owned();
-  let  master_trigger_port    = config["master_trigger"]["port"].as_usize().unwrap();
+  let master_trigger_ip      = config["master_trigger"]["ip"].as_str().unwrap().to_owned();
+  let master_trigger_port    = config["master_trigger"]["port"].as_usize().unwrap();
+  let mtb_address = master_trigger_ip.clone() + ":" + &master_trigger_port.to_string();
 
   let rb_list_c  = rb_list.clone();
   let rb_list_c2 = rb_list.clone();
@@ -395,7 +399,13 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let mut stream_cache    = VecDeque::<TofPacket>::new();
   let mut mt_stream_cache = VecDeque::<MasterTriggerEvent>::new();
   let mut packets         = VecDeque::<String>::new();
+  
+  // containers for the values monitoring the MTB
   let mut rates           = VecDeque::<(f64,f64)>::new();
+  let mut fpga_temps      = VecDeque::<(f64,f64)>::new();
+  let mut mtb_moni        = MtbMoniData::new();
+
+
   let mut n_paddle_data   = VecDeque::<u8>::new();
   //let mut n_paddle_hist   = Histogram::<u64>::new_with_bounds(1, 160,1).unwrap();
   let mut n_paddle_hist   = Histogram::with_buckets(160);
@@ -436,7 +446,6 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                 },
                 Event::Tick => {
                   
-                  // check the zmq socket
                   let mut event = MasterTriggerEvent::new(0,0);
                   match mt_from_mt.try_recv() {
                     Err(err) => {
@@ -464,12 +473,20 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
             }
           }    
           let update_detail = ten_second_update.elapsed().as_secs() > 10;
-          match mt_rate_from_mt.try_recv() {
-            Err(err) => trace!("Did not receive new rate!"),
-            Ok(rate) => {
-              info!("Got rate for mt rate chart {rate}");
-              rates.push_back((mission_elapsed_time.elapsed().as_secs() as f64, rate as f64));} 
-          }
+          
+          monitor_mtb(&mtb_address, &mut mtb_moni);
+          rates.push_back((mission_elapsed_time.elapsed().as_secs() as f64, mtb_moni.rate as f64));
+          fpga_temps.push_back((mission_elapsed_time.elapsed().as_secs() as f64, mtb_moni.fpga_temp as f64));
+          //match mt_rate_from_mt.try_recv() {
+          //  Err(err) => {
+          //    //rates.push_back((mission_elapsed_time.elapsed().as_secs() as f64, 42.0));
+          //    trace!("Did not receive new rate!");
+          //  },
+          //  Ok(rate) => {
+          //    info!("Got rate for mt rate chart {rate}");
+          //    rates.push_back((mission_elapsed_time.elapsed().as_secs() as f64, rate as f64));
+          //  } 
+          //}
       
           if update_detail {
               warn!("Ten seconds have passed!");
@@ -478,6 +495,11 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
           if rates.len() > MAX_LEN_RATE {
             rates.pop_front();
           }
+
+          if fpga_temps.len() > MAX_LEN_MT_FPGA_TEMP {
+            fpga_temps.pop_front();
+          }
+
           info!("Rate chart with {} entries", rates.len());
           let mut x_labels = Vec::<String>::new();
           let mut y_labels = Vec::<String>::new();
@@ -537,6 +559,50 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
               //.bounds([0.0,1000.0])
               .labels(y_labels.clone().iter().cloned().map(Span::from).collect()));
           
+          info!("MT FPGA T chart with {} entries", fpga_temps.len());
+          let mut fpga_y_labels = Vec::<String>::new();
+          let mut fpga_t_min : i64 = 0;
+          let mut fpga_t_max : i64 = 0;
+          if fpga_temps.len() > 0 {
+            //let max_rate = rates.iter().max_by(|x,y| x.1.cmp(y.1)).unwrap();
+            let fpga_only : Vec::<i64> = fpga_temps.iter().map(|z| z.1.round() as i64).collect();
+            fpga_t_max = *fpga_only.iter().max().unwrap() + 5;
+            fpga_t_min = *fpga_only.iter().min().unwrap() - 5;
+            let y_spacing = (fpga_t_max - fpga_t_min)/5;
+            y_labels = vec![fpga_t_min.to_string(),
+                           (fpga_t_min + y_spacing).to_string(),
+                           (fpga_t_min + 2*y_spacing).to_string(),
+                           (fpga_t_min + 3*y_spacing).to_string(),
+                           (fpga_t_min + 4*y_spacing).to_string(),
+                           (fpga_t_min + 5*y_spacing).to_string()];
+          }
+          let fpga_temp_dataset = vec![Dataset::default()
+              .name("FPGA T")
+              .marker(symbols::Marker::Braille)
+              .graph_type(GraphType::Line)
+              .style(Style::default().fg(Color::White))
+              .data(fpga_temps.make_contiguous())];
+          let fpga_temp_chart = Chart::new(fpga_temp_dataset)
+            .block(
+              Block::default()
+                .borders(Borders::ALL)
+                .style(Style::default().fg(Color::White))
+                .title("FPGA T [\u{00B0}C] ".to_owned() )
+                .border_type(BorderType::Double),
+            )
+            .x_axis(Axis::default()
+              .title(Span::styled("MET [s]", Style::default().fg(Color::White)))
+              .style(Style::default().fg(Color::White))
+              .bounds([t_min as f64, t_max as f64])
+              //.bounds([0.0, 1000.0])
+              .labels(x_labels.clone().iter().cloned().map(Span::from).collect()))
+            .y_axis(Axis::default()
+              .title(Span::styled("T [\u{00B0}C]", Style::default().fg(Color::White)))
+              .style(Style::default().fg(Color::White))
+              .bounds([r_min as f64, r_max as f64])
+              //.bounds([0.0,1000.0])
+              .labels(y_labels.clone().iter().cloned().map(Span::from).collect()));
+          
           //print!("{} {} {} {}", t_min, t_max, r_min, r_max);
           match mt_tab.update(&mt_stream_cache, update_detail) {
             None => (),
@@ -578,11 +644,12 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
               );
 
           //rect.render_stateful_widget(mt_tab.list_widget, mt_tab.list_rect, &mut rb_list_state);
-          rect.render_widget(rate_chart,         mt_tab.rate_rect); 
-          rect.render_widget(mt_tab.stream,       mt_tab.stream_rect);
-          //rect.render_widget(mt_tab.network_moni, mt_tab.nw_mon_rect); 
-          rect.render_widget(n_paddle_dist, mt_tab.nw_mon_rect);
-          rect.render_widget(mt_tab.detail,       mt_tab.detail_rect); 
+          rect.render_widget(rate_chart,    mt_tab.rate_rect); 
+          rect.render_widget(fpga_temp_chart,    mt_tab.fpga_t_rect); 
+          rect.render_widget(mt_tab.stream, mt_tab.stream_rect);
+         // rect.render_widget(mt_tab.network_moni, mt_tab.paddle_dist_rect); 
+          rect.render_widget(n_paddle_dist, mt_tab.paddle_dist_rect);
+          rect.render_widget(mt_tab.detail, mt_tab.detail_rect); 
           if update_detail {
             ten_second_update = Instant::now();
           }

@@ -31,21 +31,18 @@ use tof_dataclasses::events::MasterTriggerEvent;
 #[derive(Debug, Clone)]
 pub struct MTTab<'a> {
 
-  pub stream        : Paragraph<'a>,
-  pub rate          : Sparkline<'a>,
-  pub network_moni  : Sparkline<'a>,
-  pub n_paddle_dist : BarChart<'a>, 
-  pub detail        : Paragraph<'a>,
-  //cmd_list          : Vec::<TofCommand>,
-  //pub list_widget   : List<'a>,
-  /// keep track of the passed time in seconds,
-  /// to update only specific parts of the display
-  //pub list_rect     : Rect,
-  pub stream_rect   : Rect,
-  pub detail_rect   : Rect,
-  pub nw_mon_rect   : Rect,
-  pub rate_rect     : Rect,
-  message_queue     : VecDeque<String> 
+  pub stream             : Paragraph<'a>,
+  pub rate               : Sparkline<'a>,
+  pub fpga_temp          : Sparkline<'a>,
+  pub network_moni       : Sparkline<'a>,
+  pub n_paddle_dist      : BarChart<'a>, 
+  pub detail             : Paragraph<'a>,
+  pub stream_rect        : Rect,
+  pub detail_rect        : Rect,
+  pub paddle_dist_rect   : Rect,
+  pub rate_rect          : Rect,
+  pub fpga_t_rect        : Rect,
+  message_queue          : VecDeque<String> 
 }
 
 impl MTTab<'_> {
@@ -65,9 +62,9 @@ impl MTTab<'_> {
     let info_chunks = Layout::default()
       .direction(Direction::Vertical)
       .constraints(
-          [Constraint::Percentage(40),
-           Constraint::Percentage(40),
-           Constraint::Percentage(20)
+          [Constraint::Percentage(32),
+           Constraint::Percentage(32),
+           Constraint::Percentage(32),
           ].as_ref(),
       )
       .split(main_chunks[1]);
@@ -80,42 +77,6 @@ impl MTTab<'_> {
           ].as_ref(),
       )
       .split(main_chunks[0]);
-   
-
-    //let cmd_block = Block::default()
-    //.borders(Borders::ALL)
-    //.style(Style::default().fg(Color::White))
-    //.title("Commands")
-    //.border_type(BorderType::Plain);
-
-    //let mut cmd_list = Vec::<TofCommand>::new();
-    //cmd_list.push(  TofCommand::DataRunStart          (0));    
-    //cmd_list.push(  TofCommand::DataRunEnd            (0));       
-    ////];
-
-    //let mut items = Vec::<ListItem>::new();
-    //for n in 0..cmd_list.len() {
-    //  items.push(
-    //    ListItem::new(Spans::from(vec![Span::styled(
-    //      cmd_list[n].to_string().clone(),
-    //      Style::default())]))
-    //    );
-    //}
-    //let selected_cmd = cmd_list[0]
-     // .get(
-     //   rb_list_state
-     //     .selected()
-     //     .expect("there is always a selected pet"),
-     // )
-     // .expect("exists")
-     //.clone();
-
-    //let list_widget = List::new(items).block(cmd_block).highlight_style(
-    //  Style::default()
-    //    .bg(Color::Blue)
-    //    .fg(Color::Black)
-    //    .add_modifier(Modifier::BOLD),
-    //);
     
     let stream =  Paragraph::new("")
     .style(Style::default().fg(Color::LightCyan))
@@ -140,6 +101,19 @@ impl MTTab<'_> {
     .data(&[0, 2, 3, 4, 1, 4, 10])
     .max(5)
     .style(Style::default().fg(Color::Blue).bg(Color::Black));
+    
+    let fpga_temp = Sparkline::default()
+    .block(
+      Block::default()
+        .borders(Borders::ALL)
+        .style(Style::default().fg(Color::White))
+        .title("Rate")
+        .border_type(BorderType::Double),
+    ) // or THREE_LEVELS
+    .bar_set(tui::symbols::bar::NINE_LEVELS)
+    .data(&[0, 2, 3, 4, 1, 4, 10])
+    .max(5)
+    .style(Style::default().fg(Color::Red).bg(Color::Black));
 
     let n_paddle_data = vec![ 
                         ( "0", 0),
@@ -195,25 +169,25 @@ impl MTTab<'_> {
         .border_type(BorderType::Rounded),
     );
 
-    let rate_rect    = info_chunks[0];
-    let nw_mon_rect  = info_chunks[1]; 
-    //let list_rect    = info_chunks[2]; 
-    let stream_rect  = detail_chunks[0];
-    let detail_rect  = detail_chunks[1];
-
+    let rate_rect         = info_chunks[0];
+    let paddle_dist_rect  = info_chunks[1]; 
+    let fpga_t_rect       = info_chunks[2];
+    //let list_rect       = info_chunks[2]; 
+    let stream_rect       = detail_chunks[0];
+    let detail_rect       = detail_chunks[1];
+ 
     let mut mt = MTTab {
-      stream  ,
-      rate    ,
+      stream        ,
+      rate          ,
+      fpga_temp,
       n_paddle_dist : n_paddle ,
-      network_moni : network ,
+      network_moni  : network ,
       detail      ,
-      //cmd_list    ,
-      //list_widget ,
-      //list_rect   , 
       stream_rect ,
       detail_rect ,
-      nw_mon_rect ,
+      paddle_dist_rect ,
       rate_rect   ,
+      fpga_t_rect   ,
       message_queue    : VecDeque::<String>::new() 
     };
     //mt.update(packets);
