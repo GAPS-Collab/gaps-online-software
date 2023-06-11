@@ -198,7 +198,7 @@ fn main() {
     show_progress = true;
     n_events_run  = 1000;
     stream_any    = true;
-    if args.rb_test_sw || vcal {
+    if args.rb_test_sw || vcal || noi {
       force_trigger = 100;
     }
     end_after_run = true;
