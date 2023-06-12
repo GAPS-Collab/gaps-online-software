@@ -154,9 +154,9 @@ impl RBBinaryDump {
 
   // the size is fixed, assuming fixed
   // nchannel and sample size
-  const SIZE : usize = 18530;
-  const HEAD : u16   = 0xAAAA;
-  const TAIL : u16   = 0x5555;
+  pub const SIZE : usize = 18530;
+  pub const HEAD : u16   = 0xAAAA;
+  pub const TAIL : u16   = 0x5555;
   pub fn new() -> RBBinaryDump {
     RBBinaryDump {
       head            : 0, // Head of event marker

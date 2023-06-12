@@ -31,7 +31,7 @@ use liftof_rb::memory::{
 
 use tof_dataclasses::threading::ThreadPool;
 use tof_dataclasses::packets::TofPacket;
-use tof_dataclasses::events::blob::RBEventPayload;
+use tof_dataclasses::events::RBEventPayload;
 use tof_dataclasses::commands::{//TofCommand,
                                 TofResponse,
                                 TofOperationMode};

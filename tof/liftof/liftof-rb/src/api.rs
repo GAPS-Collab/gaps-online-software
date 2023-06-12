@@ -30,9 +30,9 @@ use crate::memory::*;
 
 
 use tof_dataclasses::commands::*;
-use tof_dataclasses::events::blob::{BlobData,
-                                    RBEventPayload};
-use tof_dataclasses::events::RBEventHeader;
+use tof_dataclasses::events::{RBEventPayload,
+                              RBEventHeader, 
+                              RBBinaryDump};
 use tof_dataclasses::serialization::search_for_u16;
 use tof_dataclasses::commands::{TofCommand,
                                 TofResponse,
@@ -1476,9 +1476,9 @@ pub fn event_processing(bs_recv     : &Receiver<Vec<u8>>,
       Ok(bytestream) => {
         'bytestream : loop {
           //println!("Received bytestream");
-          match search_for_u16(BlobData::HEAD, &bytestream, start_pos) {
+          match search_for_u16(RBBinaryDump::HEAD, &bytestream, start_pos) {
             Ok(head_pos) => {
-              let tail_pos   = head_pos + BlobData::SERIALIZED_SIZE;
+              let tail_pos   = head_pos + RBBinaryDump::SIZE;
               if tail_pos > bytestream.len() - 1 {
                 // we are finished here
                 trace!("Work on current blob complete. Extracted {n_events} events. Got last event_id! {event_id}");
@@ -1491,7 +1491,7 @@ pub fn event_processing(bs_recv     : &Receiver<Vec<u8>>,
               start_pos = tail_pos;
               match data_format {
                 0 => {
-                  event_id        =  BlobData::decode_event_id(&bytestream[head_pos..tail_pos]);
+                  event_id        =  RBEventPayload::decode_event_id(&bytestream[head_pos..tail_pos]);
                   let mut payload = Vec::<u8>::new();
                   payload.extend_from_slice(&bytestream[head_pos..tail_pos + 2]);
                   debug!("Prepared TofPacket for event {} with a payload size of {}", event_id, &payload.len());
@@ -1508,7 +1508,7 @@ pub fn event_processing(bs_recv     : &Receiver<Vec<u8>>,
                   let mut this_event_start_pos = head_pos;
                   match RBEventHeader::extract_from_rbbinarydump(&bytestream, &mut this_event_start_pos) {
                     Err(err) => {
-                      //let mut foo = BlobData::new();
+                      //let mut foo = RBBinaryDump::new();
                       //foo.from_bytestream(&bytestream, head_pos, false);
                       //error!("{:?}", foo);
                       error!("Broken RBBinaryDump data in memory! Err {}", err);
