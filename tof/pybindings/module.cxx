@@ -20,6 +20,7 @@
 #include "WaveGAPS.h"
 #include "TOFCommon.h"
 #include "events.h"
+#include "tofpacket_reader.hpp"
 
 #include "tof_typedefs.h"
 
@@ -497,6 +498,15 @@ std::vector<TofPacket> get_tofpackets_from_stream(vec_u8 bytestream, u64 start_p
 
 PYBIND11_MODULE(gaps_tof, m) {
     m.doc() = "GAPS Tof dataclasses and utility tools";
+    
+    py::class_<Gaps::TofPacketReader>(m, "TofPacketReader") 
+      .def(py::init<String>())  
+      .def("get_next_packet", &Gaps::TofPacketReader::get_next_packet)
+      .def("__repr__",        [](const Gaps::TofPacketReader &reader) {
+                                  return "<TofPacketReader : "
+                                  + reader.get_filename() + ">";
+                                  }) 
+    ;
    
     py::enum_<TofCommand>(m, "TofCommand")
       .value("PowerOn"              ,TofCommand::PowerOn) 

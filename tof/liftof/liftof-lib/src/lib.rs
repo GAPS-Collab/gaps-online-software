@@ -928,10 +928,10 @@ pub fn master_trigger(mt_ip          : &str,
     n_events += 1;
     n_events_expected = n_events + missing_evids;
 
-    if n_events % 1000 == 0 {
+    //if n_events % 1000 == 0 {
       //let pk = TofPacket::new();
-      error!("Sending of mastertrigger packets down the global data sink not supported yet!");
-    }
+      //error!("Sending of mastertrigger packets down the global data sink not supported yet!");
+    //}
 
     let elapsed = start.elapsed().as_secs();
     // measure rate every 100 events

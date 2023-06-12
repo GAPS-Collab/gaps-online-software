@@ -162,7 +162,7 @@ std::vector<BlobEvt_t> get_events_from_stream(const vec_u8 &bytestream, u64 star
  *                    in the bytestream                   
  */
 u64 search_for_2byte_marker(
-           const vec_u8 &bytestream,
+           const Vec<u8> &bytestream,
            u8 marker,
            bool &has_ended,
            u64 start_pos=0,
