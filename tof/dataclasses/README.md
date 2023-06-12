@@ -1,5 +1,7 @@
 # dataclasses project for GAPS tof
 
+_verions 0.6 (KIHIKIHI)_
+
 The dataclasses should provide a cross-language/cross-systm interace to data
 obtained by the GAPS time-of-flight system.
 
