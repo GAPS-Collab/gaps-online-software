@@ -30,18 +30,6 @@ using namespace GAPS;
 using namespace pybind11::literals;
 namespace py = pybind11;
 
-/***********************************************/
-
-
-/***********************************************/
-
-bytestream wrap_encode_uint64(u64 value, size_t start_pos) {
-  bytestream stream;
-  for (size_t foo=0; foo<8; foo++) stream.push_back(0);
-  encode_uint64(value, stream, start_pos);
-  return stream;
-}
-
 /********************/
 // helpers
 

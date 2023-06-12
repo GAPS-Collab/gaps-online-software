@@ -54,3 +54,14 @@ bytestream wrap_encode_uint64_rev(u64 value, size_t start_pos) {
   return stream;
 }
 
+/***********************************************/
+
+bytestream wrap_encode_uint64(u64 value, size_t start_pos) {
+  bytestream stream;
+  for (size_t foo=0; foo<8; foo++) stream.push_back(0);
+  encode_uint64(value, stream, start_pos);
+  return stream;
+}
+
+
+

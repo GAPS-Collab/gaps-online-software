@@ -12,3 +12,6 @@ bytestream wrap_encode_uint32(u32 value, size_t start_pos);
 bytestream wrap_encode_uint32_rev(u32 value, size_t start_pos);
 
 bytestream wrap_encode_uint64_rev(u64 value, size_t start_pos);
+
+bytestream wrap_encode_uint64(u64 value, size_t start_pos);
+
