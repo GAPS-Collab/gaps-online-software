@@ -1,24 +1,6 @@
-#cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
-
-#project(GAPS_ONLINE_SOFTWARE VERSION 0.0.1 LANGUAGES C CXX)
-#message(STATUS "Running cmake for ${CMAKE_PROJECT_NAME} softwere version ${GAPS_ONLINE_SOFTWARE__VERSION}")
-#message(STATUS "Using build directory: ${PROJECT_BINARY_DIR}")
-#set(CMAKE_WARN_DEPRECATED ON)
-#set(CMAKE_CXX_STANDARD 17 CACHE STRING "C++ standard has to be >= 17")
-
-# rust part
-#set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/corrosion/cmake/)
-#find_package(Corrosion REQUIRED)
-
-#set(CMAKE_Rust_COMPILER "/usr/bin/rustc" CACHE STRING "The location of the rust compiler")
-#enable_language(Rust)
-#include(CMakeCargo)
-
-#### Build options
-option(BUILD_CRUSTYKRAKEN "build the rust tof-server code" OFF)
+## Build options
 option(BUILD_RBEMULATOR "build the readoutboard emulator for debugging purposes" OFF)
 set(RBEMULATOR_DIR ${CMAKE_CURRENT_SOURCE_DIR}/readoutboard-emulator)
-
 
 ## ================================================================
 ## cmake build type
@@ -26,7 +8,6 @@ set(RBEMULATOR_DIR ${CMAKE_CURRENT_SOURCE_DIR}/readoutboard-emulator)
 
 ## in case of Release build, we set the NDEBUG preprocessor directive
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG=1")
-
 
 
 ################
@@ -52,9 +33,6 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include/TOFCommon.h.i
 #configure_file(${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/threads/TOFParam.cpp.in ${CMAKE_CURRENT_SOURCE_DIR}/threads/TOFParam.cpp @ONLY)
 configure_file(${RBEMULATOR_DIR}/bin/RBEmulator.cxx.in ${RBEMULATOR_DIR}/bin/RBEmulator.cxx @ONLY)
 
-
-
-
 # ROOT part is still needed for the blobroutines!
 # Locate the ROOT package and defines a number of variables (e.g. ROOT_INCLUDE_DIRS)
 option(BUILD_ROOTCOMPONENTS "build components of the software which require CERN ROOT" ON)
@@ -74,35 +52,6 @@ if(BUILD_ROOTCOMPONENTS)
       set(BUILD_ROOTCOMPONENTS OFF)
   endif(ROOT_FOUND)
 endif(BUILD_ROOTCOMPONENTS)
-
-# boost
-
-## environmental system
-#
-## invoke the go compiler to create a c++ style shared library
-## we set the working directory to the include dir, so 
-## the header gets created in the right place
-## the shared library can live in our build directory
-#set(DBQUERY_LIBRARY libDBQuery)
-#add_custom_target(${DBQUERY_LIBRARY} DEPENDS ${DBQUERY_LIBRARY}.so )
-#add_custom_command(OUTPUT ${DBQUERY_LIBRARY}.so 
-#    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include
-#	COMMAND env CGO_CFLAGS="-I${CMAKE_CURRENT_SOURCE_DIR}/include" GOPATH=${GOPATH} go build -buildmode=c-shared -o ${CMAKE_CURRENT_BINARY_DIR}/libDBQuery.so  ${CMAKE_GO_FLAGS} ${CMAKE_CURRENT_SOURCE_DIR}/library/go/libDBQuery.go && mv ${CMAKE_CURRENT_BINARY_DIR}/libDBQuery.h ${CMAKE_CURRENT_SOURCE_DIR}/include
-#    COMMENT "Building C/CXX shared object libDBQuery.so from go source. ")
-##FIXME - this is currently just to test
-## if the cgo environment is working as it should
-## this can go away in the future
-#add_executable(QueryEnvData test/QueryEnvData.cxx)
-#add_dependencies(QueryEnvData ${DBQUERY_LIBRARY})
-#target_include_directories(QueryEnvData
-#                            PUBLIC
-#                              ${CMAKE_CURRENT_SOURCE_DIR}/include
-#                          )
-#target_link_libraries(QueryEnvData
-#                      PUBLIC
-#		                ${CMAKE_CURRENT_BINARY_DIR}/${DBQUERY_LIBRARY}.so
-#		                #${DBQUERY_LIBRARY}
-#                      )
 
 # tests/reeadoutboard emulator
 if (BUILD_RBEMULATOR)
@@ -128,14 +77,10 @@ if (BUILD_RBEMULATOR)
                         )
 endif(BUILD_RBEMULATOR)
 
-
-
 # -- the readoutboard emulator is something which 
 # -- can distribute "old" blob data for 5 readoutboards
 # -- through the ports which they would usually use 
 # -- so this can be used for debugging the server program
-
-
 
 ###############################
 # Server shared libary 
@@ -175,33 +120,7 @@ target_link_libraries(${GAPSTOF_LIBRARY_SHARED}
                          $<$<BOOL:${BUILD_ROOTCOMPONENTS}>:${ROOT_LIBRARY_SHARED}>
                          #$<$<BOOL:${USE_GOOGLEPERFTOOLS}>:${GOOGLEPERFTOOLS_LIB}>
                     )
-#
-## GAPSSERVER binary
-##set(SERVER_BIN GAPS_server)
-#set(SERVER_BIN DevGfpServer) 
-#add_executable(${SERVER_BIN} bin/GAPS_server.cpp
-#                threads/AnalyzeEvts.cpp
-#                threads/RBCommunication.cpp
-#                threads/SendToFlight.cpp
-#                threads/DataManage.cpp
-#                threads/TOFParam.cpp
-#              )
-#target_include_directories(${SERVER_BIN}
-#                            PUBLIC
-#                              ${CMAKE_CURRENT_SOURCE_DIR}/include
-#                              ${Boost_INCLUDE_DIR}
-#                              #${ROOT_INCLUDE_DIRS}
-#                          )
-#target_link_libraries(${SERVER_BIN}
-#                     PUBLIC
-#                        ${GAPSSERVER_LIBRARY_SHARED}
-#                        ${CMAKE_CURRENT_BINARY_DIR}/${DBQUERY_LIBRARY}.so
-#                        ${Boost_THREAD_LIBRARY_RELEASE}
-#                        "libczmq.so"
-#                        "libzmq.so"
-#                    )
-#
-#
+
 if (BUILD_PYBINDINGS)
   set(pybindings "gaps_tof")
 
@@ -228,4 +147,3 @@ if (BUILD_PYBINDINGS)
                         ${GAPSTOF_LIBRARY_SHARED})
 
 endif(BUILD_PYBINDINGS)
-#

@@ -1,3 +1,23 @@
+# Release KIHIKIHI - 0.6
+_Kihikihi is the Hawaiian name for the Moorish Idol (they are everywhere!)_
+
+## Features
+
+* implements a new compression level, 1 where the readoutboard itself only
+  sends data of active channels.
+
+# Release UHU - 0.5
+_Uhu is the Hawaiian name for parrot fis_
+
+## Features
+
+* introduces run numbers (WIP)
+* Moves over from allowlists to ignorelists for rb/ltb in json file for [liftof-cc]
+
+## Bubfixes
+
+* [liftof-rb] - fix for noi data 
+
 # Release MOA - 0.4
 _Moa is the Hawaiian name for the female spotted boxfish, Ostracion meleagris_
 

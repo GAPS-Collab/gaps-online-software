@@ -1,10 +1,12 @@
-#UHU series
+#0.6.x - KIHIKIHI series
 
-##v0.5.0
+
+#0.5.x - UHU series
 * adds new monitoring classes 
   - TofCompMoni
   - MtbMoni
   to monitor MTB as well as the tof computer itself
+* reworks RB monitoring, adds new class RBMoni
 
 #0.4.0
 FEATURES

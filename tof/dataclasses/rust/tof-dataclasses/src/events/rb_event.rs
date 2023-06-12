@@ -39,6 +39,84 @@ extern crate rand;
 #[cfg(feature = "random")]
 use rand::Rng;
 
+/// A wrapper class for raw binary RB data exposing the event id
+///
+/// This is useful when we need the event id, but don't want to 
+/// spend the CPU resources to decode the whole event.
+///
+#[derive(Debug, Clone)]
+pub struct RBEventPayload {
+  pub event_id : u32,
+  pub payload  : Vec<u8>
+}
+
+impl RBEventPayload {
+
+  pub fn new(event_id : u32, payload : Vec<u8>) -> RBEventPayload {
+    RBEventPayload {
+      event_id,
+      payload
+    }
+  }
+  
+  /// Only decode the event id from a bytestream
+  /// 
+  /// The bytestream has to be starting with 
+  /// HEAD
+  pub fn decode_event_id(bytestream : &[u8]) -> u32 {
+    let mut evid_pos = 22; // the eventid is 22 bytes from the 
+                       // start including HEAD
+    parse_u32_for_16bit_words(&bytestream.to_vec(), &mut evid_pos) 
+  }
+
+  pub fn from_bytestream(bytestream  : &Vec<u8>,
+                         start_pos   : usize,
+                         no_fragment : bool)
+      -> Result<RBEventPayload, SerializationError> {
+    let head_pos = search_for_u16(RBBinaryDump::HEAD, bytestream, start_pos)?; 
+    let tail_pos = search_for_u16(RBBinaryDump::TAIL, bytestream, head_pos)?;
+    // At this state, this can be a header or a full event. Check here and
+    // proceed depending on the options
+    if head_pos - tail_pos != RBBinaryDump::SIZE
+        && no_fragment { 
+      return Err(SerializationError::EventFragment);
+    }
+
+    // we have to find and decode the event id.
+    // FIXME - if we do this smarter, we can 
+    //         most likely save a clone operation
+    let slice          = &bytestream[head_pos..=tail_pos+2];
+    let event_id       = RBEventPayload::decode_event_id(slice); 
+    let mut payload    = Vec::<u8>::with_capacity(RBBinaryDump::SIZE);
+    payload.extend_from_slice(slice);
+    let ev_payload     = RBEventPayload::new(event_id, payload.clone());
+    Ok(ev_payload)
+  }
+   
+  ///!  
+  ///
+  ///
+  pub fn from_slice(slice       : &[u8],
+                    do_checks   : bool)
+      -> Result<RBEventPayload, SerializationError> {
+    let payload        = Vec::<u8>::with_capacity(RBBinaryDump::SIZE);
+    if do_checks {
+      let head_pos = search_for_u16(RBBinaryDump::HEAD, &payload, 000000000)?; 
+      let tail_pos = search_for_u16(RBBinaryDump::TAIL, &payload, head_pos)?;
+      // At this state, this can be a header or a full event. Check here and
+      // proceed depending on the options
+      if head_pos - tail_pos != RBBinaryDump::SIZE { 
+        return Err(SerializationError::EventFragment);
+      }
+    }
+    //payload.extend_from_slice(slice);
+    let event_id       = RBEventPayload::decode_event_id(slice);
+    let ev_payload     = RBEventPayload::new(event_id, payload.clone()); 
+    Ok(ev_payload)
+  }
+}
+
+
 
 /// RBBinaryDump is the closest representation of actual 
 /// RB binary data in memory, with a fixed number of 
@@ -366,8 +444,8 @@ impl RBEventHeader {
     -> Result<RBEventHeader, SerializationError> {
     let start = *pos;
     let mut header = RBEventHeader::new();
-    let head_pos   = search_for_u16(RBBinaryDump::HEAD, stream, *pos)?; 
-    let tail_pos   = search_for_u16(RBBinaryDump::TAIL, stream, head_pos + RBBinaryDump::SIZE -2)?;
+    let head_pos   = search_for_u16(RBEventHeader::HEAD, stream, *pos)?; 
+    let tail_pos   = search_for_u16(RBEventHeader::TAIL, stream, head_pos + RBBinaryDump::SIZE -2)?;
     // At this state, this can be a header or a full event. Check here and
     // proceed depending on the options
     *pos = head_pos + 2;    
@@ -381,7 +459,7 @@ impl RBEventHeader {
       // in case there is no trigger, that means the DRS was busy so 
       // we won't get channel data or a stop cell
       if tail_pos + 2 - head_pos != RBBinaryDump::SIZE {
-        error!("Size of {} not expected for RBBinaryDump!", tail_pos + 2 - head_pos);
+        error!("Size of {} not expected for RBEvenHeader!", tail_pos + 2 - head_pos);
         //error!("LOST {} FRAGMENT {}" , header.lost_trigger, event_fragment);
         //let event_len = parse_u16(stream, pos);
         //error!("LEN IN WORDS {}", event_len);
@@ -392,10 +470,9 @@ impl RBEventHeader {
     //pos -= 2;
     //println!("Got LEN {}", event_len);
     *pos += 2 + 2 + 8 + 2 + 1; // skip len, roi, dna, fw hash and reserved part of rb_id
-    header.rb_id        = stream[*pos];
+    header.rb_id        = parse_u8(stream, pos);
+    header.channel_mask = parse_u8(stream, pos);
     *pos += 1;
-    header.channel_mask = stream[*pos];
-    *pos += 2;
     header.event_id  = parse_u32_for_16bit_words(stream, pos);
     header.dtap0     = parse_u16(stream, pos);
     header.drs4_temp = parse_u16(stream, pos); 
