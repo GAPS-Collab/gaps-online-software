@@ -405,7 +405,6 @@ fn main() {
         end_after_run = true;
       }
       rc_config.is_active = true;
-      //rc.rb_buff_size = 2000;
       println!("=> Waiting for threads to start..");
       thread::sleep(time::Duration::from_secs(5));
       println!("=> ..done");

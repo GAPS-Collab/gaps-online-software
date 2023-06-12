@@ -105,9 +105,9 @@ pub fn get_runconfig(rcfile : &Path) -> RunConfig {
       panic!("Unable to read the configuration file! Error {err}");
     }
     Ok(rc_from_file) => {
-      println!("Found configuration file {}!", rcfile.display());
-      println!("[WARN] - Currently, only the active channel mask will be parsed from the config file!");
-      println!("[WARN/TODO] - This is WORK-IN-PROGRESS!");
+      println!("==> Found configuration file {}!", rcfile.display());
+      println!("==> [WARN] - Currently, only the active channel mask will be parsed from the config file!");
+      println!("==> [WARN/TODO] - This is WORK-IN-PROGRESS!");
       match RunConfig::from_json(&rc_from_file) {
         Err(err) => panic!("Can not read json from configuration file. Error {err}"),
         Ok(rc_json) => {
@@ -1491,11 +1491,11 @@ pub fn event_processing(bs_recv     : &Receiver<Vec<u8>>,
               start_pos = tail_pos;
               match data_format {
                 0 => {
-                  event_id   = BlobData::decode_event_id(&bytestream[head_pos..tail_pos]);
+                  event_id        =  BlobData::decode_event_id(&bytestream[head_pos..tail_pos]);
                   let mut payload = Vec::<u8>::new();
                   payload.extend_from_slice(&bytestream[head_pos..tail_pos + 2]);
                   debug!("Prepared TofPacket for event {} with a payload size of {}", event_id, &payload.len());
-                  let rb_payload = RBEventPayload::new(event_id, payload); 
+                  let rb_payload  = RBEventPayload::new(event_id, payload); 
                   let mut tp = TofPacket::from(&rb_payload);
                   match tp_sender.send(tp) {
                     Ok(_) => (),
