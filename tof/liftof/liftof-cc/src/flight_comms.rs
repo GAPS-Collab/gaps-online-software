@@ -29,6 +29,7 @@ use liftof_lib::TofPacketWriter;
 pub fn global_data_sink(incoming : &cbc::Receiver<TofPacket>,
                         write_stream : bool,
                         write_stream_path  : String,
+                        runid              : usize,
                         print_moni_packets : bool) {
 
   let ctx = zmq::Context::new();
@@ -52,8 +53,9 @@ pub fn global_data_sink(incoming : &cbc::Receiver<TofPacket>,
 
   let mut writer : Option<TofPacketWriter> = None;
   if write_stream {
-    info!("Will write stream to dedicated file!");
-    let streamfile_name = write_stream_path + "/stream";
+    let mut streamfile_name = write_stream_path + "/stream";
+    streamfile_name += &runid.to_string();
+    println!("==> Writing stream to file with prefix {}!", streamfile_name);
     writer = Some(TofPacketWriter::new(streamfile_name));
   }
   let mut event_cache = Vec::<TofPacket>::with_capacity(100); 

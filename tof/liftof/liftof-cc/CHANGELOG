@@ -1,6 +1,12 @@
 # UHU series
 
-## v0.5.0 - in development
+# v0.5.1
+* introduction of a run number, paths for raw data as 
+  well as stream data will append the run number automatically,
+  directories will be created automatically as well, if they 
+  exist, user will be asked.
+
+# v0.5.0 
 * transition to sqlite db usage for paddle mapping
 * instead of marking which rbs to use, blacklist them   
   in the json parameter file

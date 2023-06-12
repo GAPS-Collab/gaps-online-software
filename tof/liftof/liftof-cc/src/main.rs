@@ -31,8 +31,9 @@ use colored::{Colorize, ColoredString};
 use std::io::Write;
 use std::{thread,
           time};
-
-use std::path::Path;
+use std::fs;
+use std::io;
+use std::path::{Path, PathBuf};
 
 use clap::{arg,
            command,
@@ -90,7 +91,7 @@ struct Args {
   verbose: bool,
   /// A json config file with detector information
   #[arg(short, long)]
-  json_config: Option<std::path::PathBuf>,
+  json_config: Option<PathBuf>,
 }
 
 /*************************************/
@@ -183,22 +184,29 @@ fn main() {
   } else {
     println!("==> Will NOT connect to the MTB, since -u has not been provided in the commandlline!");
   }
-  
-  let write_stream_path = config["stream_savepath"].as_str().unwrap().to_owned();
-  let storage_savepath  = config["raw_storage_savepath"].as_str().unwrap().to_owned();
-  let events_per_file   = config["events_per_file"].as_usize().unwrap(); 
-  let calib_file_path   = config["calibration_file_path"].as_str().unwrap().to_owned();
-  let db_path           = Path::new(config["db_path"].as_str().unwrap());
-  let db_path_c         = db_path.clone();
-  let ltb_list = get_ltbs_from_sqlite(db_path);
+ 
+  let runid                 = config["run_id"].as_usize().unwrap(); 
+  let mut write_stream_path = config["stream_savepath"].as_str().unwrap().to_owned();
+  let storage_savepath      = config["raw_storage_savepath"].as_str().unwrap().to_owned();
+  let events_per_file       = config["events_per_file"].as_usize().unwrap(); 
+  let calib_file_path       = config["calibration_file_path"].as_str().unwrap().to_owned();
+  let db_path               = Path::new(config["db_path"].as_str().unwrap());
+  let db_path_c             = db_path.clone();
+  let mut ltb_list          = get_ltbs_from_sqlite(db_path);
+  let mut rb_list           = get_rbs_from_sqlite(db_path_c);
 
-  let rb_ignorelist =  &config["rb_ignorelist"];
+  let ltb_ignorelist = &config["ltb_ignorelist"];
+  let rb_ignorelist  = &config["rb_ignorelist"];
   //exit(0);
-  let mut rb_list  = get_rbs_from_sqlite(db_path_c);
   for k in 0..rb_ignorelist.len() {
     println!("=> We will remove RB {} due to it being marked as IGNORE in the config file!", rb_ignorelist[k]);
     let bad_rb = rb_ignorelist[k].as_u8().unwrap();
     rb_list.retain(|x| x.rb_id != bad_rb);
+  }
+  for k in 0..ltb_ignorelist.len() {
+    println!("=> We will remove LTB {} due to it being marked as IGNORE in the config file!", ltb_ignorelist[k]);
+    let bad_ltb = ltb_ignorelist[k].as_u8().unwrap();
+    ltb_list.retain(|x| x.ltb_id != bad_ltb);
   }
   nboards = rb_list.len();
   println!("=> We will use the following tof manifest:");
@@ -209,6 +217,72 @@ fn main() {
   println!("== ==> RBs [{}]:", rb_list.len());
   for rb in &rb_list {
     println!("\t {}", rb);
+  }
+
+  // Prepare outputfiles
+  let mut raw_files_path = PathBuf::from(storage_savepath);
+  if write_blob { 
+    raw_files_path.push(runid.to_string().as_str());
+    // Create directory if it does not exist
+    // Check if the directory exists
+    if let Ok(metadata) = fs::metadata(&raw_files_path) {
+      if metadata.is_dir() {
+        println!("=> Directory {} exists.", raw_files_path.display());
+        // FILXME - in flight, we can not have interactivity.
+        // But the whole system with the run ids might change 
+        // anyway
+        print!("=> You are risking overwriting files in that directory. You might have used rununmber {} before. Are you sure you want to continue? (YES/<any>): ", runid);
+        io::stdout().flush().unwrap(); // Ensure the prompt is displayed
+        // Read user input
+        let mut input = String::new();
+        io::stdin().read_line(&mut input).unwrap();
+        // Trim leading/trailing whitespaces and convert to lowercase
+        let input = input.trim().to_lowercase();
+        // Check user input and end the program if desired
+        if input == "YES" {
+          println!("==> Continuing on request of user...");
+        } else {
+          println!("==> Abort program!");
+        }
+      } 
+    } else {
+      match fs::create_dir(&raw_files_path) {
+        Ok(())   => println!("=> Created {} to save raw (blob) data", raw_files_path.display()),
+        Err(err) => panic!("Failed to create directory: {}", raw_files_path.display()),
+      }
+    }
+  }
+  let mut stream_files_path = PathBuf::from(write_stream_path);
+  if write_stream {
+    stream_files_path.push(runid.to_string().as_str());
+    // Create directory if it does not exist
+    // Check if the directory exists
+    if let Ok(metadata) = fs::metadata(&stream_files_path) {
+      if metadata.is_dir() {
+        println!("=> Directory {} exists.", stream_files_path.display());
+        // FILXME - in flight, we can not have interactivity.
+        // But the whole system with the run ids might change 
+        // anyway
+        print!("=> You are risking overwriting files in that directory. You might have used rununmber {} before. Are you sure you want to continue? (YES/<any>): ", runid);
+        io::stdout().flush().unwrap(); // Ensure the prompt is displayed
+        // Read user input
+        let mut input = String::new();
+        io::stdin().read_line(&mut input).unwrap();
+        // Trim leading/trailing whitespaces and convert to lowercase
+        let input = input.trim().to_lowercase();
+        // Check user input and end the program if desired
+        if input == "YES" {
+          println!("==> Continuing on request of user...");
+        } else {
+          println!("==> Abort program!");
+        }
+      } 
+    } else {
+      match fs::create_dir(&stream_files_path) {
+        Ok(())   => println!("=> Created {} to save stream data", stream_files_path.display()),
+        Err(err) => panic!("Failed to create directory: {}", stream_files_path.display()),
+      }
+    }
   }
   //let matches = command!() // requires `cargo` feature
   //     //.arg(arg!([name] "Optional name to operate on"))
@@ -327,14 +401,19 @@ fn main() {
   println!("==> paddle cache thread started!");
   println!("==> Starting data sink thread!");
 
+  write_stream_path = String::from(stream_files_path.into_os_string().into_string().expect("Somehow the paths are messed up very badly! So I can't help it and I quit!"));
+
   worker_threads.execute(move || {
                          global_data_sink(&tp_from_client,
                                           write_stream,
                                           write_stream_path,
+                                          runid,
                                           verbose);
   });
   println!("==> data sink thread started!");
   println!("==> Will now start rb threads..");
+    
+  let raw_files_path_string = String::from(raw_files_path.into_os_string().into_string().expect("Somehow the paths are messed up very badly! So I can't help it and I quit!"));
 
   for n in 0..nboards {
     let this_rb_pp_sender = rb_send.clone();
@@ -349,7 +428,7 @@ fn main() {
     this_rb.calib_file += "_cal.txt";
     println!("==> Starting RB thread for {}", this_rb);
     let resp_sender_c = resp_sender.clone();
-    let this_path = storage_savepath.clone();
+    let this_path = raw_files_path_string.clone();
     worker_threads.execute(move || {
       readoutboard_communicator(this_rb_pp_sender,
                                 resp_sender_c,
@@ -358,6 +437,7 @@ fn main() {
                                 &this_path,
                                 &events_per_file,
                                 &this_rb,
+                                runid,
                                 false);
     });
   } // end for loop over nboards

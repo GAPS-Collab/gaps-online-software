@@ -50,18 +50,21 @@ macro_rules! tvec [
 /// * tp_to_sink       : Channel which should be connect to a (global) data sink.
 ///                      Packets which are of not event type (e.g. header/full binary data)
 ///                      will be forwarded to the sink.
-/// * write_blob       :
+/// * write_rb_raw     : Should readoutboard raw data be written to disk?
 /// * storage_savepath :
 /// * events_per_file  :
 /// * rb               : 
+/// * runid            : Current assigned runid. Will be used in the filenames of saved 
+///                      readoutboard raw data.
 /// * print_packets    : 
 pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
                                  resp_to_main     : Sender<TofResponse>,
                                  tp_to_sink       : Sender<TofPacket>,
-                                 write_blob       : bool,
+                                 write_rb_raw     : bool,
                                  storage_savepath : &String,
                                  events_per_file  : &usize,
                                  rb               : &ReadoutBoard,
+                                 runid            : usize,
                                  print_packets    : bool) {
   let zmq_ctx = zmq::Context::new();
   let board_id = rb.rb_id; //rb.id.unwrap();
@@ -125,8 +128,8 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
   //                     + &board_id.to_string()
   let mut blobfile_path = Path::new(&blobfile_name);
   let mut file_on_disc : Option<File> = None;//let mut output = File::create(path)?;
-  if write_blob {
-    info!("Writing blobs to {}", blobfile_name );
+  if write_rb_raw {
+    info!("Writing readoutboard raw data to {}", blobfile_name );
     file_on_disc = OpenOptions::new().append(true).create(true).open(blobfile_path).ok()
   }
   let mut n_events = 0usize;
@@ -221,11 +224,12 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
                   }
                 } // end match file_on_disk
                 n_events += 1;
-                if (n_events >= *events_per_file) && write_blob {
+                if (n_events >= *events_per_file) && write_rb_raw {
                   // start a new file
                   secs_since_epoch = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
                   blobfile_name = storage_savepath.to_owned() + "RB" 
                                  + &board_id.to_string() + "_" 
+                                 + &runid.to_string() + "_"
                                  + &secs_since_epoch.to_string()
                                  + ".blob";
                   info!("Writing blobs to {}", blobfile_name );

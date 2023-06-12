@@ -190,86 +190,86 @@ impl Default for TofPacketWriter {
 
 }
 
-/// Meta information for a data run
-#[deprecated(since="0.2.0", note="please use `tof_dataclasses::RunConfig` instead")]
-#[derive(Debug, Copy, Clone)]
-pub struct RunParams {
-  pub forever   : bool,
-  pub nevents   : u32,
-  pub is_active : bool,
-  pub nseconds  : u32,
-}
-
-impl RunParams {
-
-  pub const SIZE               : usize = 14; // bytes
-  pub const VERSION            : &'static str = "1.0";
-  pub const HEAD               : u16  = 43690; //0xAAAA
-  pub const TAIL               : u16  = 21845; //0x5555
-
-  pub fn new() -> RunParams {
-    RunParams {
-      forever   : false,
-      nevents   : 0,
-      is_active : false,
-      nseconds  : 0,
-    }
-  }
-
-  pub fn to_bytestream(&self) -> Vec<u8> {
-    let mut stream = Vec::<u8>::with_capacity(RunParams::SIZE);
-    stream.extend_from_slice(&RunParams::HEAD.to_le_bytes());
-    let mut forever = 0u8;
-    if self.forever {
-      forever = 1;
-    }
-    stream.extend_from_slice(&forever.to_le_bytes());
-    stream.extend_from_slice(&self.nevents.to_le_bytes());
-    let mut is_active = 0u8;
-    if self.is_active {
-      is_active = 1;
-    }
-    stream.extend_from_slice(&is_active.to_le_bytes());
-    stream.extend_from_slice(&self.nseconds.to_le_bytes());
-    stream
-  }
-}
-
-impl Serialization for RunParams {
-  
-  fn from_bytestream(bytestream : &Vec<u8>,
-                     pos        : &mut usize)
-    -> Result<Self, SerializationError> {
-    let mut pars = RunParams::new();
-    if parse_u16(bytestream, pos) != RunParams::HEAD {
-      return Err(SerializationError::HeadInvalid {});
-    }
-    let forever   = bytestream[*pos];
-    *pos += 1;
-    pars.nevents  = parse_u32(bytestream, pos);
-    let is_active = bytestream[*pos];
-    *pos += 1;
-    pars.nseconds = parse_u32(bytestream, pos);
-    if parse_u16(bytestream, pos) != RunParams::TAIL {
-      return Err(SerializationError::TailInvalid {} );
-    }
-    pars.is_active = is_active > 0;
-    pars.forever   = forever > 0;
-    Ok(pars)
-  }
-}
-
-impl Default for RunParams {
-  fn default() -> RunParams {
-    RunParams::new()
-  }
-}
-
-impl fmt::Display for RunParams {
-  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(f, "<RunParams : active {}>", self.is_active)
-  }
-}
+///// Meta information for a data run
+//#[deprecated(since="0.2.0", note="please use `tof_dataclasses::RunConfig` instead")]
+//#[derive(Debug, Copy, Clone)]
+//pub struct RunParams {
+//  pub forever   : bool,
+//  pub nevents   : u32,
+//  pub is_active : bool,
+//  pub nseconds  : u32,
+//}
+//
+//impl RunParams {
+//
+//  pub const SIZE               : usize = 14; // bytes
+//  pub const VERSION            : &'static str = "1.0";
+//  pub const HEAD               : u16  = 43690; //0xAAAA
+//  pub const TAIL               : u16  = 21845; //0x5555
+//
+//  pub fn new() -> RunParams {
+//    RunParams {
+//      forever   : false,
+//      nevents   : 0,
+//      is_active : false,
+//      nseconds  : 0,
+//    }
+//  }
+//
+//  pub fn to_bytestream(&self) -> Vec<u8> {
+//    let mut stream = Vec::<u8>::with_capacity(RunParams::SIZE);
+//    stream.extend_from_slice(&RunParams::HEAD.to_le_bytes());
+//    let mut forever = 0u8;
+//    if self.forever {
+//      forever = 1;
+//    }
+//    stream.extend_from_slice(&forever.to_le_bytes());
+//    stream.extend_from_slice(&self.nevents.to_le_bytes());
+//    let mut is_active = 0u8;
+//    if self.is_active {
+//      is_active = 1;
+//    }
+//    stream.extend_from_slice(&is_active.to_le_bytes());
+//    stream.extend_from_slice(&self.nseconds.to_le_bytes());
+//    stream
+//  }
+//}
+//
+//impl Serialization for RunParams {
+//  
+//  fn from_bytestream(bytestream : &Vec<u8>,
+//                     pos        : &mut usize)
+//    -> Result<Self, SerializationError> {
+//    let mut pars = RunParams::new();
+//    if parse_u16(bytestream, pos) != RunParams::HEAD {
+//      return Err(SerializationError::HeadInvalid {});
+//    }
+//    let forever   = bytestream[*pos];
+//    *pos += 1;
+//    pars.nevents  = parse_u32(bytestream, pos);
+//    let is_active = bytestream[*pos];
+//    *pos += 1;
+//    pars.nseconds = parse_u32(bytestream, pos);
+//    if parse_u16(bytestream, pos) != RunParams::TAIL {
+//      return Err(SerializationError::TailInvalid {} );
+//    }
+//    pars.is_active = is_active > 0;
+//    pars.forever   = forever > 0;
+//    Ok(pars)
+//  }
+//}
+//
+//impl Default for RunParams {
+//  fn default() -> RunParams {
+//    RunParams::new()
+//  }
+//}
+//
+//impl fmt::Display for RunParams {
+//  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+//    write!(f, "<RunParams : active {}>", self.is_active)
+//  }
+//}
 
 /// Broadcast commands over the tof-computer network
 /// socket via zmq::PUB to the rb network.
