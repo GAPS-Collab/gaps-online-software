@@ -6,7 +6,6 @@
 
 #include "tof_typedefs.h"
 
-
 static const u8 PACKET_TYPE_UNKNOWN    =  0;
 static const u8 PACKET_TYPE_COMMAND    = 10;
 static const u8 PACKET_TYPE_RBEVENT    = 20;
@@ -15,18 +14,24 @@ static const u8 PACKET_TYPE_MONITOR    = 30;
 static const u8 PACKET_TYPE_HEARTBEAT  = 40;
 static const u8 PACKET_TYPE_SCALAR     = 50;
 static const u8 PACKET_TYPE_MT         = 60;
-
+static const u8 PACKET_TYPE_RBHEADER      = 70;
+static const u8 PACKET_TYPE_TOFCMP_MONI   = 80;
+static const u8 PACKET_TYPE_MTB_MONI      = 90;
+static const u8 PACKET_TYPE_RB_MONI       = 100;
 
 enum PacketType : u8 {
-  Unknown   = PACKET_TYPE_UNKNOWN,
-  Command   = PACKET_TYPE_COMMAND,
-  RBEvent   = PACKET_TYPE_RBEVENT,
-  TofEvent  = PACKET_TYPE_TOFEVENT,
-  Monitor   = PACKET_TYPE_MONITOR,
-  HeartBeat = PACKET_TYPE_HEARTBEAT,
-  Scalar    = PACKET_TYPE_SCALAR,
+  Unknown       = PACKET_TYPE_UNKNOWN,
+  Command       = PACKET_TYPE_COMMAND,
+  RBEvent       = PACKET_TYPE_RBEVENT,
+  TofEvent      = PACKET_TYPE_TOFEVENT,
+  Monitor       = PACKET_TYPE_MONITOR,
+  HeartBeat     = PACKET_TYPE_HEARTBEAT,
+  Scalar        = PACKET_TYPE_SCALAR,
   MasterTrigger = PACKET_TYPE_MT,
-   
+  RBHeader      = PACKET_TYPE_RBHEADER,
+  MonitorRb     = PACKET_TYPE_RB_MONI,
+  MonitorTofCmp = PACKET_TYPE_TOFCMP_MONI,
+  MonitorMtb    = PACKET_TYPE_MTB_MONI 
 };
 
 std::string packet_type_to_string(PacketType pt);

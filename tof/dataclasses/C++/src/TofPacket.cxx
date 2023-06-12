@@ -1,18 +1,8 @@
-#include "packets/TofPacket.h"
-#include "serialization.h"
 #include "spdlog/spdlog.h"
 
-//enum PacketType : u8 {
-//  Unknown   = PACKET_TYPE_UNKNOWN,
-//  Command   = PACKET_TYPE_COMMAND,
-//  RBEvent   = PACKET_TYPE_RBEVENT,
-//  TofEvent  = PACKET_TYPE_TOFEVENT,
-//  Monitor   = PACKET_TYPE_MONITOR,
-//  HeartBeat = PACKET_TYPE_HEARTBEAT,
-//  Scalar    = PACKET_TYPE_SCALAR,
-//  MasterTrigger = PACKET_TYPE_MT,
-//   
-//};
+#include "packets/TofPacket.h"
+#include "serialization.h"
+
 
 std::string packet_type_to_string(PacketType pt) {
   switch (pt) { 
@@ -40,6 +30,18 @@ std::string packet_type_to_string(PacketType pt) {
     case PACKET_TYPE_MT : {
       return "MasterTriggerEvent";
     }      
+    case PACKET_TYPE_RBHEADER : {
+      return "RBEventHeader";
+    }
+    case PACKET_TYPE_TOFCMP_MONI : {
+      return "TofCmpMoni";
+    }
+    case PACKET_TYPE_MTB_MONI : {
+      return "MtbMoni";
+    }
+    case PACKET_TYPE_RB_MONI : {
+      return "RBMoni";
+    }
   }
   return "Unknown";
 }
@@ -57,15 +59,15 @@ vec_u8 TofPacket::to_bytestream() const
   usize pos = 0; // position in bytestream
   encode_ushort(head, buffer, pos); pos+=2;
   buffer[pos] = packet_type; pos += 1;
-  //buffer.push_back(packet_type);    pos+=1;
   u32_to_le_bytes(payload_size, buffer, pos);  pos+=4;
 
-  std::cout << "buffer size " << buffer.size() << std::endl;
-  std::cout << "payload size " << payload.size() << std::endl;
+  //std::cout << "buffer size " << buffer.size() << std::endl;
+  //std::cout << "payload size " << payload.size() << std::endl;
   buffer.insert(buffer.begin() + 7, payload.begin(), payload.end()); pos += payload.size();
-  std::cout << "buffer size " << buffer.size() << std::endl;
+  //std::cout << "buffer size " << buffer.size() << std::endl;
   encode_ushort(tail, buffer, pos); pos+=2;
-  std::cout << "buffer size " << buffer.size() << std::endl;
+  //std::cout << "buffer size " << buffer.size() << std::endl;
+  spdlog::info("TofPacket of size {}", buffer.size());
   return buffer;
 }
 
