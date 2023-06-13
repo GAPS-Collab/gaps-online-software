@@ -1,11 +1,13 @@
 {
   "meta"      : "",
   "unix_time" : "",
-  "raw_storage_savepath" : "/tpool/tofdata/nts/test/raw/",
-  "stream_savepath" : "/tpool/tofdata/nts/test/stream/", 
+  "raw_storage_savepath" : "/tpool/tofdata/nts/test/raw/18/",
+  "stream_savepath" : "/tpool/tofdata/nts/test/stream/18/", 
   "db_path"   : "/home/gaps/gaps-online-software/gaps-db/gaps_db/db-nts.sqlite3", 
-  "events_per_file" : 100000,
-  "calibration_file_path" : "/home/gaps/gaps-online-software/tof/resources/calibrations",
+  "events_per_file"    : 100000,
+  "packets_per_stream" : 1000000,
+  "run_id"             : 3, 
+  "calibration_file_path" : "/tpool/tofdata/nts/calibrations/2/txt-files/",
   "master_trigger" : {
     "ip"   : "10.0.1.10", 
     "port" : 50001
@@ -14,6 +16,7 @@
     "ip_address"   : "127.0.0.1", 
     "port" : 50001
   },
-  "rb_ignorelist" : [5,6,9,10,13,14,16,18,19,21,23,25,28,29,30,31,32,33,34,35,36,37,38,39,40]
+  "rb_ignorelist" : [5,6,9,10,13,14,16,18,21,23,25,28,29,30,31,32,33,34,35,36,37,38,39,40],
+  "ltb_ignorelist" : []
 }
 
