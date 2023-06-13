@@ -52,6 +52,14 @@ use clap::{arg,
            //Command,
            Parser};
 
+//enum RBOperationMode {
+//    FromRunConfig,
+//    Noi,
+//    Tcal,
+//    Vcal,
+//    Unknown
+//}
+
 #[derive(Parser, Debug)]
 #[command(author = "J.A.Stoessl", version, about, long_about = None)]
 struct Args {
@@ -87,15 +95,12 @@ struct Args {
   /// Behaviour can be controlled through `TofCommand` later
   #[arg(long, default_value_t = false)]
   stream_any : bool,
-  /// Readoutboard testing with external trigger
-  #[arg(long, default_value_t = false)]
-  rb_test_ext : bool,
-  /// Readoutboard testing with softare trigger, equally spaced in time
-  #[arg(long, default_value_t = false)]
-  rb_test_sw : bool,
   /// show moni data 
   #[arg(long, default_value_t = false)]
   verbose : bool,
+  /// Write the readoutboard binary data to the board itself
+  #[arg(long, default_value_t = false)]
+  write_blob : bool,
   /// Take data for voltage calibration
   #[arg(long, default_value_t = false)]
   vcal : bool,
@@ -141,22 +146,34 @@ fn main() {
   let mut force_trigger     = args.force_trigger;
   let mut force_random_trig = args.force_random_trigger;
   let wf_analysis           = args.waveform_analysis;
-  let mut rb_test           = args.rb_test_ext || args.rb_test_sw;
   let vcal                  = args.vcal;
   let tcal                  = args.tcal;
   let noi                   = args.noi;
+  let mut write_robin       = args.write_blob;
   let run_config            = args.run_config;
   let mut data_format       = 0u8;
+  
+  // check already if incompatible arguments are given
+  if ( vcal && tcal ) || ( vcal && noi ) || ( tcal && noi ) {
+    panic!("Can only support either of the flags --vcal --tcal --noi")
+  }
+
   // active channels
   let mut ch_mask : u8 = u8::MAX;
 
-  let mut rc_config = RunConfig::new();
+  let mut rc_config     = RunConfig::new();
   let mut rc_file_path  = std::path::PathBuf::new();
+  let mut end_after_run = false;
 
+  //let mut rb_op_mode = RBOperationMode::Unknown; 
   // FIXME run_config overrides stream_any
   match run_config {
     None     => (),
     Some(rcfile) => {
+      if vcal || tcal || noi {
+        error!("Currently, the configuration of the calibration modes through a runconfig file is not supported. This feature might be available in versions > 0.6");
+        panic!("Unsupported command line arguments!");
+      }
       rc_file_path = rcfile.clone();
       rc_config    = get_runconfig(&rcfile);
       ch_mask      = rc_config.active_channel_mask;
@@ -167,50 +184,36 @@ fn main() {
 
   let mut file_suffix   = String::from(".robin");
 
-  if ( vcal && tcal ) || ( vcal && noi ) || ( tcal && noi ) {
-    panic!("Can only support either of the flags --vcal --tcal --noi")
-  }
-
-  let mut end_after_run = false;
   if noi {
     file_suffix   = String::from(".noi");
-    rb_test       = true;
     end_after_run = true;
+    n_events_run  = 1000;
+    stream_any    = true;
+    force_trigger = 100;
+    write_robin   = true;
   }
   if vcal {
     file_suffix   = String::from(".vcal");
-    rb_test       = true;
     end_after_run = true;
+    n_events_run  = 1000;
+    stream_any    = true;
+    force_trigger = 100;
+    write_robin   = true;
   }
 
   if tcal {
-    file_suffix = String::from(".tcal");
+    file_suffix       = String::from(".tcal");
     force_random_trig = 100;
-    show_progress     = true;
-    n_events_run      = 1000;
-    end_after_run = true;
+    n_events_run      = 5000;
+    end_after_run     = true;
+    write_robin       = true;
   }
 
   //FIMXE - this needs to become part of clap
   let cmd_server_ip = String::from("10.0.1.1");
   //let cmd_server_ip     = args.cmd_server_ip;  
-  if rb_test {
-    show_progress = true;
-    n_events_run  = 1000;
-    stream_any    = true;
-    if args.rb_test_sw || vcal || noi {
-      force_trigger = 100;
-    }
-    end_after_run = true;
-  }  
-
   if force_trigger > 0 && force_random_trig > 0 {
     panic!("Can not use force trigger (equally spaced in time) together with random self trigger!");
-  }
-
-  if force_random_trig > 0 {
-      stream_any = true;
-      n_events_run = 5000;
   }
 
   let this_board_ip = local_ip().expect("Unable to obtainl local board IP. Something is messed up!");
@@ -237,11 +240,15 @@ fn main() {
   println!(" => We will CONNECT to the following port on the C&C server at address: {}", cmd_server_ip);
   println!(" => -- -- PORT {} (0MQ SUB) where we will be listening for commands", DATAPORT);
   println!("-----------------------------------------------");
-  if rb_test {
-    println!("=> We will run in rb testing mode!");
-    println!("-----------------------------------------------"); 
-  } 
- 
+  if vcal { 
+    println!("=> Will be run with settings for vcal data");
+  }
+  if tcal {
+    println!("=> Will be run with settings for tcal data");
+  }
+  if noi {
+    println!("=> Will be run with settings for no-input data");
+  }
   // set channel mask (if different from 255)
   match set_active_channel_mask(ch_mask) {
     Ok(_) => (),
@@ -251,7 +258,6 @@ fn main() {
   }
   let current_mask = read_control_reg(0x44).unwrap();
   info!("THe latest reading of the active channel mask regsiter reads {}", current_mask);
-  //exit(0);
 
   // this resets the data buffer /dev/uio1,2 occupancy
   reset_dma_and_buffers();
@@ -313,7 +319,7 @@ fn main() {
   
   workforce.execute(move || {
     data_publisher(&tp_from_client,
-                   rb_test || force_random_trig > 0,
+                   write_robin,
                    Some(&file_suffix),
                    verbose); 
   });
