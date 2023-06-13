@@ -74,7 +74,7 @@ if(NOT CMAKE_BUILD_TYPE)
       FORCE)
 endif(NOT CMAKE_BUILD_TYPE)
 
-add_subdirectory(dataclasses)
+#add_subdirectory(dataclasses)
 add_subdirectory(tof)
 
 
