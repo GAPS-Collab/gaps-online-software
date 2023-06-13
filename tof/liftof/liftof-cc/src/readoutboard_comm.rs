@@ -194,6 +194,9 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
                 }
               },
               PacketType::RBEvent => {
+                error!("RBEvent is an advanced feature which is not ready yet!");
+              },
+              PacketType::RBEventPayload => {
                 match analyze_blobs(&tp.payload,
                                     &pp_pusher,
                                     true,
