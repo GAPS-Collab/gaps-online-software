@@ -105,7 +105,7 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
   }
   //socket.set_subscribe(topic.as_bytes());
   let mut secs_since_epoch = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
-  let mut blobfile_name = storage_savepath.to_owned() + "RB" 
+  let mut blobfile_name = storage_savepath.to_owned() + "/RB" 
                        + &board_id.to_string() + "_" 
                        + &secs_since_epoch.to_string()
                        + ".blob";
