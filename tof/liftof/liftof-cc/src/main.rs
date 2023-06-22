@@ -5,7 +5,6 @@
 //!
 //!
 
-//extern crate pretty_env_logger;
 #[macro_use] extern crate log;
 extern crate env_logger;
 extern crate clap;
@@ -19,20 +18,18 @@ extern crate zmq;
 extern crate tof_dataclasses;
 extern crate local_ip_address;
 extern crate crossbeam_channel;
-
 extern crate colored;
+
 extern crate liftof_lib;
 extern crate liftof_cc;
 
-use log::{LevelFilter, Level};
 use env_logger::Builder;
-//use pretty_env_logger::formatted_builder;
-use colored::{Colorize, ColoredString};
-use std::io::Write;
-use std::{thread,
-          time};
-use std::fs;
 use std::io;
+use std::io::Write;
+use std::process::exit;
+use std::{fs,
+          thread,
+          time};
 use std::path::{Path, PathBuf};
 
 use clap::{arg,
@@ -46,6 +43,8 @@ use clap::{arg,
 //                        Sender,
 //                        Receiver};
 use crossbeam_channel as cbc; 
+use colored::Colorize;
+
 use tof_dataclasses::events::{MasterTriggerEvent,
                               MasterTriggerMapping};
 use tof_dataclasses::threading::ThreadPool;
@@ -66,8 +65,7 @@ use liftof_cc::event_builder::{event_builder,
 use liftof_cc::api::tofcmp_and_mtb_moni;
 use liftof_cc::paddle_packet_cache::paddle_packet_cache;
 use liftof_cc::flight_comms::global_data_sink;
-
-use std::process::exit;
+use liftof_cc::color_log;
 
 /*************************************/
 
@@ -89,21 +87,18 @@ struct Args {
   /// Enhance output to console
   #[arg(short, long, default_value_t = false)]
   verbose: bool,
+  /// Remotely trigger the readoutboards to run the calibration routines (tcal, vcal)
+  #[arg(long, default_value_t = false)]
+  calibration: bool,
+  /// Replay RB binary data (level 0) from a certain directory
+  #[arg(long)]
+  replay: Option<PathBuf>,
+  /// Together with --replay, set the rate for replaying data (in Hz)
+  #[arg(long, default_value_t = 100)]
+  replay_rate: u32,
   /// A json config file with detector information
   #[arg(short, long)]
   json_config: Option<PathBuf>,
-}
-
-/*************************************/
-
-fn color_log(level : &Level) -> ColoredString {
-  match level {
-    Level::Error    => String::from(" ERROR!").red(),
-    Level::Warn     => String::from(" WARN  ").yellow(),
-    Level::Info     => String::from(" Info  ").green(),
-    Level::Debug    => String::from(" debug ").blue(),
-    Level::Trace    => String::from(" trace ").cyan(),
-  }
 }
 
 /*************************************/
@@ -112,7 +107,6 @@ fn main() {
   env_logger::builder()
     .format(|buf, record| {
     writeln!( buf, "[{level}][{module_path}:{line}] {args}",
-      //level = color_log(&record.level()),
       level = color_log(&record.level()),
       module_path = record.module_path().unwrap_or("<unknown>"),
       line = record.line().unwrap_or(0),
@@ -132,6 +126,14 @@ fn main() {
 
   // deal with command line arguments
   let args = Args::parse();
+
+  // deal with arguments we have not implemented yet
+  if args.replay.is_some() {
+    todo!("Feature not yet implemented!");
+  }
+  if args.calibration {
+    todo!("Feature not yet implemented!");
+  }
 
   let verbose = args.verbose;
 
