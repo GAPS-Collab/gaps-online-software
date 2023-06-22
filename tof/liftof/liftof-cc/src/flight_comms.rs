@@ -44,7 +44,8 @@ pub fn global_data_sink(incoming : &cbc::Receiver<TofPacket>,
 
   // FIXME - should we just move to another socket if that one is not working?
   let data_socket = ctx.socket(zmq::PUB).expect("Can not create socket!");
-
+  let unlim : i32 = 1000000;
+  data_socket.set_sndhwm(unlim).unwrap();
   match data_socket.bind(&data_address) {
     Err(err) => panic!("Can not bind to address {}, Err {}", data_address, err),
     Ok(_)    => ()

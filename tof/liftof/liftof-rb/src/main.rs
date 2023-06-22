@@ -84,10 +84,10 @@ struct Args {
   /// waveoform data, but paddle packets instead.
   #[arg(long, default_value_t = false)]
   waveform_analysis: bool,
-  /// Activate the forced trigger. The value is the desired rate 
+  /// Activate the forced trigger. The value is the desired rate [Hz] 
   #[arg(long, default_value_t = 0)]
   force_trigger: u32,
-  /// Activate the forced random trigger. The value is the desired rate
+  /// Activate the forced random trigger. The value is the desired rate [Hz]
   #[arg(long, default_value_t = 0)]
   force_random_trigger: u32,
   /// Stream any eventy as soon as the software starts.
@@ -167,6 +167,8 @@ fn main() {
 
   //let mut rb_op_mode = RBOperationMode::Unknown; 
   // FIXME run_config overrides stream_any
+  
+  let mut from_runconfig = false;
   match run_config {
     None     => (),
     Some(rcfile) => {
@@ -179,12 +181,13 @@ fn main() {
       ch_mask      = rc_config.active_channel_mask;
       data_format  = rc_config.data_format;
       stream_any   = rc_config.stream_any;
+      from_runconfig = true;
     }
   }
 
   let mut file_suffix   = String::from(".robin");
 
-  if noi {
+  if noi || rc_config.noi {
     file_suffix   = String::from(".noi");
     end_after_run = true;
     n_events_run  = 1000;
@@ -192,7 +195,7 @@ fn main() {
     force_trigger = 100;
     write_robin   = true;
   }
-  if vcal {
+  if vcal || rc_config.vcal {
     file_suffix   = String::from(".vcal");
     end_after_run = true;
     n_events_run  = 1000;
@@ -201,7 +204,7 @@ fn main() {
     write_robin   = true;
   }
 
-  if tcal {
+  if tcal || rc_config.tcal {
     file_suffix       = String::from(".tcal");
     force_random_trig = 100;
     n_events_run      = 5000;
@@ -398,27 +401,49 @@ fn main() {
     println!("=> We are not run by systemd, so we will stop the program when it is done");
     // we start the run by creating new RunParams
     // this is only if we give 
-    if run_forever || n_events_run > 0 {
-      //let mut rc = RunConfig::new();
+    //let mut rc = RunConfig::new();
+    if !from_runconfig {
       if run_forever {
         rc_config.nevents = 0;
       } else {
-        if rc_config.nevents == 0 && n_events_run != 0 {
-          rc_config.nevents = n_events_run as u32;
-        }
+        rc_config.nevents = n_events_run as u32;
       }
+      rc_config.stream_any = stream_any;
+      rc_config.forced_trigger_poisson  = force_trigger;
+      rc_config.forced_trigger_periodic = force_random_trig;
+        
+      rc_config.vcal = vcal             ; 
+      rc_config.tcal = tcal             ; 
+      rc_config.noi  = noi              ;
+      // FIXME - currently no other values supported
+      rc_config.active_channel_mask = 255; 
+      rc_config.data_format  = 0         ; 
+      let mut buff_trip = 2000;
       if rc_config.nevents > 0 {
-        end_after_run = true;
-      }
-      rc_config.is_active = true;
-      println!("=> Waiting for threads to start..");
-      thread::sleep(time::Duration::from_secs(5));
-      println!("=> ..done");
-      match rc_to_runner.send(rc_config) {
-        Err(err) => error!("Could not initialzie Run! Err {err}"),
-        Ok(_)    => {
-          println!("=> Run initialized! Attempting to start!");
+        if rc_config.nevents <= 2000 {
+          buff_trip = 500;
         }
+      }
+      rc_config.rb_buff_size = buff_trip ; 
+      rc_config.is_active = true;
+    }
+    // in the else case, we have a runconfig, 
+    // but we did load that earlier already.
+    if rc_config.nevents != 0 {
+      println!("Got a number of events to be run > 0. Will stop the run after they are done. If you want to run continuously and listen for new runconfigs from the C&C server, set nevents to 0");
+      end_after_run = true
+    }
+
+    if !rc_config.is_active {
+      println!("=> The provided runconfig does not have the is_active field set to true. Won't start a run if that is what you were waiting for.");
+    }
+    println!("=> Waiting for threads to start..");
+    thread::sleep(time::Duration::from_secs(5));
+    println!("=> ..done");
+    match rc_to_runner.send(rc_config) {
+      Err(err) => error!("Could not initialzie Run! Err {err}"),
+      Ok(_)    => {
+        println!("=> Run initialized! Attempting to start!");
       }
     }
   }
@@ -480,7 +505,6 @@ fn main() {
     if end {
       println!("=> Finish program!");
       println!("=> Stopping triggers!");
-      println!("So long and thanks for all the \u{1F41F}");
    
       match disable_trigger() {
         Err(err) => error!("Can not disable triggers, error {err}"),
@@ -494,6 +518,8 @@ fn main() {
           Ok(_)    => ()
         }
       }
+      thread::sleep(one_sec);
+      println!("So long and thanks for all the \u{1F41F}");
       exit(0);
     }
 

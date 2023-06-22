@@ -3,7 +3,7 @@
 import struct
 
 import numpy as np
-import libscrc
+#import libscrc
 
 __all__ = ['GBF', 'load']
 
@@ -257,9 +257,9 @@ class GBF(object):
 		# JLR TODO: check this is actually what SPQ firmware does
 		crc_index = -self.footer_bytes['tail'] - self.footer_bytes['crc32']
 		packet_crc32 = self._unpack_32(pkt[crc_index:crc_index+self.footer_bytes['crc32']])
-		packet_crc32_calc = libscrc.crc32(pkt[:crc_index])
-		if packet_crc32_calc != packet_crc32: # print if mismatch
-			print('WARNING: packet CRC32 mismatch')
+		#packet_crc32_calc = libscrc.crc32(pkt[:crc_index])
+		#if packet_crc32_calc != packet_crc32: # print if mismatch
+		#	print('WARNING: packet CRC32 mismatch')
 		# set up trace + cell # arrays
 		tracelen = header['roi'] + 1
 		tracelen_bytes = 2 * tracelen # convert to bytes
@@ -281,9 +281,9 @@ class GBF(object):
 			index += tracelen_bytes
 			# cyclic redundancy check for channel
 			channel_crc32 = self._unpack_32(pkt[index:index+self.trace_bytes['crc32']])
-			channel_crc32_calc = libscrc.crc32(traceblob)
-			if channel_crc32_calc != channel_crc32: # print if mismatch
-				print(f'WARNING: channel {i} CRC32 mismatch')
+			#channel_crc32_calc = libscrc.crc32(traceblob)
+			#if channel_crc32_calc != channel_crc32: # print if mismatch
+			#	print(f'WARNING: channel {i} CRC32 mismatch')
 			# and move to next trace
 			index += self.trace_bytes['crc32']
 		return header, stopcell, traces

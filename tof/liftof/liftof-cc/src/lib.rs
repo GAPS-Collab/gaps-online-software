@@ -21,6 +21,7 @@ extern crate json;
 extern crate hdf5;
 #[cfg(feature = "diagnostics")]
 extern crate ndarray;
+extern crate colored;
 
 extern crate local_ip_address;
 extern crate crossbeam_channel;
@@ -36,5 +37,18 @@ extern crate zmq;
 
 extern crate tof_dataclasses;
 
+use colored::{Colorize, ColoredString};
+use log::{LevelFilter, Level};
+
+/// Make sure that the loglevel is in color, even though not using pretty_env logger
+pub fn color_log(level : &Level) -> ColoredString {
+  match level {
+    Level::Error    => String::from(" ERROR!").red(),
+    Level::Warn     => String::from(" WARN  ").yellow(),
+    Level::Info     => String::from(" Info  ").green(),
+    Level::Debug    => String::from(" debug ").blue(),
+    Level::Trace    => String::from(" trace ").cyan(),
+  }
+}
 
 

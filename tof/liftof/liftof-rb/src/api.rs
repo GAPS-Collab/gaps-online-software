@@ -918,6 +918,27 @@ pub fn runner(run_config          : &Receiver<RunConfig>,
     } // end run_params.try_recv()
 
     if is_running {
+      if terminate {
+        match disable_trigger() {
+          Err(err) => error!("Can not disable triggers, error {err}"),
+          Ok(_)    => info!("Triggers disabled!")
+        }
+        if show_progress {
+          prog_ev.finish();
+          prog_a.finish();
+          prog_b.finish();
+        }
+        is_running = false;
+        // flush the buffers
+        match ram_buffer_handler(1,
+                                 &bs_sender) { 
+          Err(err)   => {
+            error!("Can not deal with RAM buffers {err}");
+          },
+          Ok(_) => ()
+        }
+        println!("Run stopped! We have seen {n_events}. If this process has been started manually, you can kill it with CTRL+C");
+      } // end if terminate
       if force_trigger {
         //println!("Forcing trigger!");
         //println!("Time between events {}", time_between_events.unwrap());
@@ -1009,20 +1030,8 @@ pub fn runner(run_config          : &Receiver<RunConfig>,
           }
         }
       }
-      // exit loop on n event basis
-      if terminate {
-        match disable_trigger() {
-          Err(err) => error!("Can not disable triggers, error {err}"),
-          Ok(_)    => info!("Triggers disabled!")
-        }
-        if show_progress {
-          prog_ev.finish();
-          prog_a.finish();
-          prog_b.finish();
-        }
-        is_running = false;
-        println!("Run stopped! We have seen {n_events}. If this process has been started manually, you can kill it with CTRL+C");
-      } else {
+      // reduce cpu load
+      if !terminate {
         if !force_trigger { 
           thread::sleep(100*one_milli);
         }
