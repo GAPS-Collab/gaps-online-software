@@ -31,7 +31,7 @@ use liftof_rb::memory::{
 
 use tof_dataclasses::threading::ThreadPool;
 use tof_dataclasses::packets::TofPacket;
-use tof_dataclasses::events::blob::RBEventPayload;
+use tof_dataclasses::events::RBEventPayload;
 use tof_dataclasses::commands::{//TofCommand,
                                 TofResponse,
                                 TofOperationMode};
@@ -51,6 +51,14 @@ use clap::{arg,
            //ArgAction,
            //Command,
            Parser};
+
+//enum RBOperationMode {
+//    FromRunConfig,
+//    Noi,
+//    Tcal,
+//    Vcal,
+//    Unknown
+//}
 
 #[derive(Parser, Debug)]
 #[command(author = "J.A.Stoessl", version, about, long_about = None)]
@@ -76,10 +84,10 @@ struct Args {
   /// waveoform data, but paddle packets instead.
   #[arg(long, default_value_t = false)]
   waveform_analysis: bool,
-  /// Activate the forced trigger. The value is the desired rate 
+  /// Activate the forced trigger. The value is the desired rate [Hz] 
   #[arg(long, default_value_t = 0)]
   force_trigger: u32,
-  /// Activate the forced random trigger. The value is the desired rate
+  /// Activate the forced random trigger. The value is the desired rate [Hz]
   #[arg(long, default_value_t = 0)]
   force_random_trigger: u32,
   /// Stream any eventy as soon as the software starts.
@@ -87,15 +95,12 @@ struct Args {
   /// Behaviour can be controlled through `TofCommand` later
   #[arg(long, default_value_t = false)]
   stream_any : bool,
-  /// Readoutboard testing with external trigger
-  #[arg(long, default_value_t = false)]
-  rb_test_ext : bool,
-  /// Readoutboard testing with softare trigger, equally spaced in time
-  #[arg(long, default_value_t = false)]
-  rb_test_sw : bool,
   /// show moni data 
   #[arg(long, default_value_t = false)]
   verbose : bool,
+  /// Write the readoutboard binary data to the board itself
+  #[arg(long, default_value_t = false)]
+  write_blob : bool,
   /// Take data for voltage calibration
   #[arg(long, default_value_t = false)]
   vcal : bool,
@@ -141,76 +146,77 @@ fn main() {
   let mut force_trigger     = args.force_trigger;
   let mut force_random_trig = args.force_random_trigger;
   let wf_analysis           = args.waveform_analysis;
-  let mut rb_test           = args.rb_test_ext || args.rb_test_sw;
   let vcal                  = args.vcal;
   let tcal                  = args.tcal;
   let noi                   = args.noi;
+  let mut write_robin       = args.write_blob;
   let run_config            = args.run_config;
   let mut data_format       = 0u8;
+  
+  // check already if incompatible arguments are given
+  if ( vcal && tcal ) || ( vcal && noi ) || ( tcal && noi ) {
+    panic!("Can only support either of the flags --vcal --tcal --noi")
+  }
+
   // active channels
   let mut ch_mask : u8 = u8::MAX;
 
-  let mut rc_config = RunConfig::new();
+  let mut rc_config     = RunConfig::new();
   let mut rc_file_path  = std::path::PathBuf::new();
+  let mut end_after_run = false;
 
+  //let mut rb_op_mode = RBOperationMode::Unknown; 
   // FIXME run_config overrides stream_any
+  
+  let mut from_runconfig = false;
   match run_config {
     None     => (),
     Some(rcfile) => {
+      if vcal || tcal || noi {
+        error!("Currently, the configuration of the calibration modes through a runconfig file is not supported. This feature might be available in versions > 0.6");
+        panic!("Unsupported command line arguments!");
+      }
       rc_file_path = rcfile.clone();
       rc_config    = get_runconfig(&rcfile);
       ch_mask      = rc_config.active_channel_mask;
       data_format  = rc_config.data_format;
       stream_any   = rc_config.stream_any;
+      from_runconfig = true;
     }
   }
 
   let mut file_suffix   = String::from(".robin");
 
-  if ( vcal && tcal ) || ( vcal && noi ) || ( tcal && noi ) {
-    panic!("Can only support either of the flags --vcal --tcal --noi")
-  }
-
-  let mut end_after_run = false;
-  if noi {
+  if noi || rc_config.noi {
     file_suffix   = String::from(".noi");
-    rb_test       = true;
     end_after_run = true;
+    n_events_run  = 1000;
+    stream_any    = true;
+    force_trigger = 100;
+    write_robin   = true;
   }
-  if vcal {
+  if vcal || rc_config.vcal {
     file_suffix   = String::from(".vcal");
-    rb_test       = true;
     end_after_run = true;
+    n_events_run  = 1000;
+    stream_any    = true;
+    force_trigger = 100;
+    write_robin   = true;
   }
 
-  if tcal {
-    file_suffix = String::from(".tcal");
+  if tcal || rc_config.tcal {
+    file_suffix       = String::from(".tcal");
     force_random_trig = 100;
-    show_progress     = true;
-    n_events_run      = 1000;
-    end_after_run = true;
+    n_events_run      = 5000;
+    end_after_run     = true;
+    write_robin       = true;
   }
 
   //FIMXE - this needs to become part of clap
   let cmd_server_ip = String::from("10.0.1.1");
   //let cmd_server_ip     = args.cmd_server_ip;  
-  if rb_test {
-    show_progress = true;
-    n_events_run  = 1000;
-    stream_any    = true;
-    if args.rb_test_sw || vcal || noi {
-      force_trigger = 100;
-    }
-    end_after_run = true;
-  }  
-
   if force_trigger > 0 && force_random_trig > 0 {
     panic!("Can not use force trigger (equally spaced in time) together with random self trigger!");
-  }
-
-  if force_random_trig > 0 {
-      stream_any = true;
-      n_events_run = 5000;
   }
 
   let this_board_ip = local_ip().expect("Unable to obtainl local board IP. Something is messed up!");
@@ -237,11 +243,15 @@ fn main() {
   println!(" => We will CONNECT to the following port on the C&C server at address: {}", cmd_server_ip);
   println!(" => -- -- PORT {} (0MQ SUB) where we will be listening for commands", DATAPORT);
   println!("-----------------------------------------------");
-  if rb_test {
-    println!("=> We will run in rb testing mode!");
-    println!("-----------------------------------------------"); 
-  } 
- 
+  if vcal { 
+    println!("=> Will be run with settings for vcal data");
+  }
+  if tcal {
+    println!("=> Will be run with settings for tcal data");
+  }
+  if noi {
+    println!("=> Will be run with settings for no-input data");
+  }
   // set channel mask (if different from 255)
   match set_active_channel_mask(ch_mask) {
     Ok(_) => (),
@@ -251,7 +261,6 @@ fn main() {
   }
   let current_mask = read_control_reg(0x44).unwrap();
   info!("THe latest reading of the active channel mask regsiter reads {}", current_mask);
-  //exit(0);
 
   // this resets the data buffer /dev/uio1,2 occupancy
   reset_dma_and_buffers();
@@ -313,7 +322,7 @@ fn main() {
   
   workforce.execute(move || {
     data_publisher(&tp_from_client,
-                   rb_test || force_random_trig > 0,
+                   write_robin,
                    Some(&file_suffix),
                    verbose); 
   });
@@ -392,27 +401,49 @@ fn main() {
     println!("=> We are not run by systemd, so we will stop the program when it is done");
     // we start the run by creating new RunParams
     // this is only if we give 
-    if run_forever || n_events_run > 0 {
-      //let mut rc = RunConfig::new();
+    //let mut rc = RunConfig::new();
+    if !from_runconfig {
       if run_forever {
         rc_config.nevents = 0;
       } else {
-        if rc_config.nevents == 0 && n_events_run != 0 {
-          rc_config.nevents = n_events_run as u32;
-        }
+        rc_config.nevents = n_events_run as u32;
       }
+      rc_config.stream_any = stream_any;
+      rc_config.forced_trigger_poisson  = force_trigger;
+      rc_config.forced_trigger_periodic = force_random_trig;
+        
+      rc_config.vcal = vcal             ; 
+      rc_config.tcal = tcal             ; 
+      rc_config.noi  = noi              ;
+      // FIXME - currently no other values supported
+      rc_config.active_channel_mask = 255; 
+      rc_config.data_format  = 0         ; 
+      let mut buff_trip = 2000;
       if rc_config.nevents > 0 {
-        end_after_run = true;
-      }
-      rc_config.is_active = true;
-      println!("=> Waiting for threads to start..");
-      thread::sleep(time::Duration::from_secs(5));
-      println!("=> ..done");
-      match rc_to_runner.send(rc_config) {
-        Err(err) => error!("Could not initialzie Run! Err {err}"),
-        Ok(_)    => {
-          println!("=> Run initialized! Attempting to start!");
+        if rc_config.nevents <= 2000 {
+          buff_trip = 500;
         }
+      }
+      rc_config.rb_buff_size = buff_trip ; 
+      rc_config.is_active = true;
+    }
+    // in the else case, we have a runconfig, 
+    // but we did load that earlier already.
+    if rc_config.nevents != 0 {
+      println!("Got a number of events to be run > 0. Will stop the run after they are done. If you want to run continuously and listen for new runconfigs from the C&C server, set nevents to 0");
+      end_after_run = true
+    }
+
+    if !rc_config.is_active {
+      println!("=> The provided runconfig does not have the is_active field set to true. Won't start a run if that is what you were waiting for.");
+    }
+    println!("=> Waiting for threads to start..");
+    thread::sleep(time::Duration::from_secs(5));
+    println!("=> ..done");
+    match rc_to_runner.send(rc_config) {
+      Err(err) => error!("Could not initialzie Run! Err {err}"),
+      Ok(_)    => {
+        println!("=> Run initialized! Attempting to start!");
       }
     }
   }
@@ -474,7 +505,6 @@ fn main() {
     if end {
       println!("=> Finish program!");
       println!("=> Stopping triggers!");
-      println!("So long and thanks for all the \u{1F41F}");
    
       match disable_trigger() {
         Err(err) => error!("Can not disable triggers, error {err}"),
@@ -488,6 +518,8 @@ fn main() {
           Ok(_)    => ()
         }
       }
+      thread::sleep(one_sec);
+      println!("So long and thanks for all the \u{1F41F}");
       exit(0);
     }
 
