@@ -10,18 +10,15 @@
 //!                   Each RBEvent has a header and a body
 //!
 //! - RBEventHeader - timestamp, status, len of event
-//! - RBEventBody   - the raw channel adc data
 //!
 //!
 
 use std::fmt;
 use std::path::Path;
-use std::io;
-use std::io::BufRead;
 use std::io::BufReader;
 use std::fs::File;
 
-use crate::constants::{NWORDS, NCHN, MAX_NUM_PEAKS};
+use crate::constants::{NWORDS, NCHN};
 use crate::serialization::Serialization;
 use crate::serialization::SerializationError;
 use crate::serialization::search_for_u16;
@@ -239,7 +236,7 @@ impl Serialization for RBBinaryDump {
     stream.extend_from_slice(&self.fw_hash .to_le_bytes());
     stream.extend_from_slice(&self.id      .to_le_bytes());  
     stream.extend_from_slice(&self.ch_mask .to_le_bytes());
-    let mut four_bytes = self.event_id.to_be_bytes();
+    let four_bytes = self.event_id.to_be_bytes();
     let four_bytes_shuffle = [four_bytes[1],
                               four_bytes[0],
                               four_bytes[3],
@@ -374,25 +371,61 @@ impl RBChannelData {
     }
     adc
   }
-
 }
 
-#[derive(Debug,Clone)]
-pub struct RBEventBody {
-  pub nwords   : u16,
-  pub nchannel : u8,
-  pub data     : Vec<u8>,
+
+/// Readoutboard binary data with flexible number of channels
+///
+///
+#[derive(Debug, Clone)]
+pub struct RBEvent {
+
+  pub header   : RBEventHeader,
+  pub adc      : Vec<Vec<u16>>,
 }
 
-impl RBEventBody {
+impl RBEvent {
 
-  pub fn get_channel(&self, id : u8) {
-    //usize pos = 0 ;
+  pub fn new() -> Self {
+    let mut adc = Vec::<Vec<u16>>::with_capacity(8);
+    for k in 0..7 {
+      adc.push(Vec::<u16>::new());
+    }
+    RBEvent {
+      header : RBEventHeader::new(),
+      adc    : adc,
+    }
+  }
 
+  pub fn extract_from_rbbinarydump(stream : &Vec<u8>,
+                                   pos    : &mut usize) 
+    -> Result<RBEvent, SerializationError> {
+  
+    let header     = RBEventHeader::extract_from_rbbinarydump(stream, pos)?;
+    let mut event  = RBEvent::new();
+    event.header   = header;
+    let active_channels = header.get_active_data_channels();
+    // we ignore the channel header field (which is just 
+    // the channel id itself) and the trailer field which 
+    // is a crc32 checksum
+    // FIXME - in the future, allow for an option to calculate
+    // these checksums!
+    // channel data is always there, however, it 
+    // actually might not be part of the trigger.
+    for n in 1..(NCHN) +1 {
+      // two bytes for the header
+      *pos += 2;
+      if active_channels.contains(&(n as u8)) {
+        event.adc[n -1].push(parse_u16(stream, pos));  
+      } else {
+        // skip ahead a full channel
+        *pos += 1024*2;
+      }
+      *pos += 4;
+    } // end nchn loop
+    Ok(event)
   }
 }
-
-pub struct RBEvent {}
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct RBEventHeader {
@@ -473,9 +506,9 @@ impl RBEventHeader {
     header.rb_id        = parse_u8(stream, pos);
     header.channel_mask = parse_u8(stream, pos);
     *pos += 1;
-    header.event_id  = parse_u32_for_16bit_words(stream, pos);
-    header.dtap0     = parse_u16(stream, pos);
-    header.drs4_temp = parse_u16(stream, pos); 
+    header.event_id     = parse_u32_for_16bit_words(stream, pos);
+    header.dtap0        = parse_u16(stream, pos);
+    header.drs4_temp    = parse_u16(stream, pos); 
     header.timestamp_48 = parse_u48_for_16bit_words(stream,pos);
     //let nchan = header.get_n_datachan();
     //let nchan = NCHN - 1;
@@ -504,7 +537,7 @@ impl RBEventHeader {
   pub fn get_active_data_channels(&self) -> Vec<u8> {
     let mut active_channels = Vec::<u8>::with_capacity(8);
     for ch in 1..9 {
-      if (self.channel_mask & (ch as u8 -1).pow(2) == (ch as u8 -1).pow(2)) {
+      if self.channel_mask & (ch as u8 -1).pow(2) == (ch as u8 -1).pow(2) {
         active_channels.push(ch);
       }
     }
@@ -543,7 +576,7 @@ impl Default for RBEventHeader {
 
 impl From<&Path> for RBEventHeader {
   fn from(path : &Path) -> RBEventHeader {
-    let mut header =  RBEventHeader::new();
+    let header =  RBEventHeader::new();
     let file = BufReader::new(File::open(path).expect("Unable to open file {}"));    
     todo!("This is not implemented yet!");
     header

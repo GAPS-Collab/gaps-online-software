@@ -394,7 +394,11 @@ impl BlobData {
     self.timestamp_16 = u16::from_le_bytes(raw_bytes_2);
     pos += 2;
 
-
+    // we ignore the channel header field (which is just 
+    // the channel id itself) and the trailer field which 
+    // is a crc32 checksum
+    // FIXME - in the future, allow for an option to calculate
+    // these checksums!
     for n in 0..NCHN {
       raw_bytes_2  = [bytestream[pos],bytestream[pos + 1]];
       self.ch_head[n] = u16::from_le_bytes(raw_bytes_2);

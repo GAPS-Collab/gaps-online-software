@@ -16,11 +16,16 @@
 
 pub mod paddle_packet;
 
+// re-imports
+pub use paddle_packet::PaddlePacket;
+
 use std::fmt;
 pub use crate::monitoring::{RBMoniData,
                             TofCmpMoniData,
                             MtbMoniData};
-use crate::serialization::{Serialization};
+use crate::serialization::{Serialization, 
+                           parse_u8,
+                           parse_u32};
 use crate::errors::SerializationError;
 use crate::events::{RBEventPayload,
                     RBEventHeader,
@@ -316,6 +321,7 @@ impl From<&RBEventHeader> for TofPacket {
     tp
   }
 }
+
 impl Serialization for TofPacket {
   fn from_bytestream(stream : &Vec<u8>, pos : &mut usize)
   -> Result<TofPacket, SerializationError> {
@@ -335,25 +341,7 @@ impl Serialization for TofPacket {
       Some(pt) => packet_type = pt,
       None => {return Err(SerializationError::UnknownPayload);}
     }
-    //let eight_bytes = [stream[pos],
-    //                   stream[pos+1],
-    //                   stream[pos+2],
-    //                   stream[pos+3],
-    //                   stream[pos+4],
-    //                   stream[pos+5],
-    //                   stream[pos+6],
-    //                   stream[pos+7]];
-    let four_bytes = [stream[*pos],
-                      stream[*pos + 1],
-                      stream[*pos + 2],
-                      stream[*pos + 3]];
-
-    //println!("{eight_bytes:?}");
-    //let payload_size = u64::from_le_bytes(eight_bytes);
-    let payload_size = u32::from_le_bytes(four_bytes);
-    //println!("{payload_size}");
-    *pos += 4;
-    //println!("{pos}");
+    let payload_size = parse_u32(stream, pos);
     two_bytes = [stream[*pos + payload_size as usize], stream[*pos + 1 + payload_size as usize]];
     if TofPacket::TAIL != u16::from_le_bytes(two_bytes) {
       warn!("Packet does not end with TAIL signature");

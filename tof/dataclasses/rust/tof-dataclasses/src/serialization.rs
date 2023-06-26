@@ -60,10 +60,10 @@ pub fn parse_u64(bs : &Vec::<u8>, pos : &mut usize) -> u64 {
 pub fn parse_u32_for_16bit_words(bs  : &Vec::<u8>,
                                  pos : &mut usize) -> u32 {
   
-  let mut raw_bytes_4  = [bs[*pos + 2],
-                          bs[*pos + 3],
-                          bs[*pos    ],
-                          bs[*pos + 1]];
+  let raw_bytes_4  = [bs[*pos + 2],
+                      bs[*pos + 3],
+                      bs[*pos    ],
+                      bs[*pos + 1]];
   *pos += 4;
   u32::from_le_bytes(raw_bytes_4)
 }
@@ -77,14 +77,14 @@ pub fn parse_u32_for_16bit_words(bs  : &Vec::<u8>,
 pub fn parse_u48_for_16bit_words(bs  : &Vec::<u8>,
                                  pos : &mut usize) -> u64 {
   
-  let mut raw_bytes_8  = [0u8,
-                          0u8,
-                          bs[*pos + 4],
-                          bs[*pos + 5],
-                          bs[*pos + 2],
-                          bs[*pos + 3],
-                          bs[*pos    ],
-                          bs[*pos + 1]];
+  let raw_bytes_8  = [0u8,
+                      0u8,
+                      bs[*pos + 4],
+                      bs[*pos + 5],
+                      bs[*pos + 2],
+                      bs[*pos + 3],
+                      bs[*pos    ],
+                      bs[*pos + 1]];
   *pos += 6;
   u64::from_le_bytes(raw_bytes_8)
 }
@@ -135,15 +135,15 @@ pub trait Serialization {
     todo!();
   }
 
-  fn from_slice(slice     : &[u8],
-                start_pos : usize)
+  fn from_slice(_slice     : &[u8],
+                _start_pos : usize)
     -> Result<Self, SerializationError>
     where Self : Sized {
     println!("There can't be a default implementation for this trait!");
     todo!();
     }
 
-  fn from_json(config : &JsonValue)
+  fn from_json(_config : &JsonValue)
     -> Result<Self, Box<dyn Error>>
     where Self : Sized {
     println!("There can't be a default implementation for this trait!"); 
