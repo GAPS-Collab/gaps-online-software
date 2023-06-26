@@ -4,7 +4,7 @@ use std::thread;
 use std::fmt;
 use std::{fs, fs::File, path::Path};
 use std::fs::OpenOptions;
-use std::io::{self, BufRead};
+use std::io::{self, BufRead, BufReader};
 use std::path::PathBuf;
 use std::net::{IpAddr, Ipv4Addr};
 use std::io::{Read,
@@ -33,16 +33,15 @@ use tof_dataclasses::calibrations::{Calibrations,
                                     read_calibration_file};
 use tof_dataclasses::events::blob::{BlobData,
                                     get_constant_blobeventsize};
-use tof_dataclasses::packets::PacketType;
-use tof_dataclasses::packets::paddle_packet::PaddlePacket;
+use tof_dataclasses::packets::{TofPacket,
+                               PacketType,
+                               PaddlePacket};
 use tof_dataclasses::errors::{BlobError, SerializationError};
+use tof_dataclasses::serialization::Serialization;
 use tof_dataclasses::commands::{TofCommand};//, TofResponse};
-use tof_dataclasses::packets::TofPacket;
-use tof_dataclasses::events::MasterTriggerEvent;
+use tof_dataclasses::events::{MasterTriggerEvent,
+                              RBBinaryDump};
 use tof_dataclasses::monitoring::MtbMoniData;
-use tof_dataclasses::serialization::{Serialization,
-                                     parse_u16,
-                                     parse_u32};
 use tof_dataclasses::events::master_trigger::{reset_daq,
                                               read_daq,
                                               read_rate,
@@ -72,10 +71,10 @@ fn read_value_from_file(file_path: &str) -> io::Result<u32> {
 
 /// The output is wrapped in a Result to allow matching on errors
 /// Returns an Iterator to the Reader of the lines of the file.
-fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
+fn read_lines<P>(filename: P) -> io::Result<io::Lines<BufReader<File>>>
 where P: AsRef<Path>, {
     let file = File::open(filename)?;
-    Ok(io::BufReader::new(file).lines())
+    Ok(BufReader::new(file).lines())
 }
 
 /// Read a file as a vector of bytes
@@ -169,7 +168,7 @@ impl TofPacketWriter {
       Ok(_)    => ()
     }
     match self.file.sync_all() {
-      Err(err) => error!("File syncing failed!"),
+      Err(err) => error!("File syncing failed! error {err}"),
       Ok(_)    => ()
     }
     self.n_packets += 1;
@@ -187,89 +186,165 @@ impl Default for TofPacketWriter {
   fn default() -> TofPacketWriter {
     TofPacketWriter::new(String::from(""))
   }
-
 }
 
-///// Meta information for a data run
-//#[deprecated(since="0.2.0", note="please use `tof_dataclasses::RunConfig` instead")]
-//#[derive(Debug, Copy, Clone)]
-//pub struct RunParams {
-//  pub forever   : bool,
-//  pub nevents   : u32,
-//  pub is_active : bool,
-//  pub nseconds  : u32,
-//}
-//
-//impl RunParams {
-//
-//  pub const SIZE               : usize = 14; // bytes
-//  pub const VERSION            : &'static str = "1.0";
-//  pub const HEAD               : u16  = 43690; //0xAAAA
-//  pub const TAIL               : u16  = 21845; //0x5555
-//
-//  pub fn new() -> RunParams {
-//    RunParams {
-//      forever   : false,
-//      nevents   : 0,
-//      is_active : false,
-//      nseconds  : 0,
-//    }
-//  }
-//
-//  pub fn to_bytestream(&self) -> Vec<u8> {
-//    let mut stream = Vec::<u8>::with_capacity(RunParams::SIZE);
-//    stream.extend_from_slice(&RunParams::HEAD.to_le_bytes());
-//    let mut forever = 0u8;
-//    if self.forever {
-//      forever = 1;
-//    }
-//    stream.extend_from_slice(&forever.to_le_bytes());
-//    stream.extend_from_slice(&self.nevents.to_le_bytes());
-//    let mut is_active = 0u8;
-//    if self.is_active {
-//      is_active = 1;
-//    }
-//    stream.extend_from_slice(&is_active.to_le_bytes());
-//    stream.extend_from_slice(&self.nseconds.to_le_bytes());
-//    stream
-//  }
-//}
-//
-//impl Serialization for RunParams {
-//  
-//  fn from_bytestream(bytestream : &Vec<u8>,
-//                     pos        : &mut usize)
-//    -> Result<Self, SerializationError> {
-//    let mut pars = RunParams::new();
-//    if parse_u16(bytestream, pos) != RunParams::HEAD {
-//      return Err(SerializationError::HeadInvalid {});
-//    }
-//    let forever   = bytestream[*pos];
-//    *pos += 1;
-//    pars.nevents  = parse_u32(bytestream, pos);
-//    let is_active = bytestream[*pos];
-//    *pos += 1;
-//    pars.nseconds = parse_u32(bytestream, pos);
-//    if parse_u16(bytestream, pos) != RunParams::TAIL {
-//      return Err(SerializationError::TailInvalid {} );
-//    }
-//    pars.is_active = is_active > 0;
-//    pars.forever   = forever > 0;
-//    Ok(pars)
-//  }
-//}
-//
-//impl Default for RunParams {
-//  fn default() -> RunParams {
-//    RunParams::new()
-//  }
-//}
-//
-//impl fmt::Display for RunParams {
-//  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-//    write!(f, "<RunParams : active {}>", self.is_active)
-//  }
-//}
+/**************************************************/
+
+/// Read serialized TofPackets from an existing file
+///
+/// This is mainly to read stream files previously
+/// written by TofPacketWriter
+#[derive(Debug)]
+pub struct TofPacketReader {
+
+  pub filename : String,
+  file_reader  : Option<BufReader<File>>,
+}
+
+impl TofPacketReader {
+
+  pub fn new(filename : String) -> TofPacketReader {
+    let filename_c = filename.clone();
+    let mut packet_reader = TofPacketReader { 
+      filename    : filename,
+      file_reader : None,
+    };
+    packet_reader.open(filename_c);
+    packet_reader
+  }
+
+  pub fn open(&mut self, filename : String) {
+    if self.filename != "" {
+      warn!("Overiding previously set filename {}", self.filename);
+    }
+    let self_filename = filename.clone();
+    self.filename     = self_filename;
+    let path = Path::new(&filename); 
+    info!("Reading from {}", &self.filename);
+    let file = OpenOptions::new().create(false).append(false).open(path).expect("Unable to open file {filename}");
+    self.file_reader = Some(BufReader::new(file));
+  }
+}
+
+impl Default for TofPacketReader {
+  fn default() -> Self {
+    TofPacketReader::new(String::from(""))
+  }
+}
+
+impl Iterator for TofPacketReader {
+  type Item = TofPacket;
+  //type Item = io::Result<TofPacket>;
+
+  fn next(&mut self) -> Option<Self::Item> {
+    let mut line   = Vec::<u8>::new();
+    let mut packet = TofPacket::new();
+    match self.file_reader.as_mut().expect("No file available!").read_until(b'\n', &mut line) {
+      Ok(bytes_read) => {
+        if bytes_read > 0 {
+          trace!("Read {} bytes", bytes_read);
+          match TofPacket::from_bytestream(&line, &mut 0) {
+            Ok(pack) => {
+              packet = pack;
+              return Some(packet);
+            }
+            Err(err) => { 
+              error!("Error getting packet from file {err}");
+              return None;
+            }
+          }
+        } else {
+          warn!("End of file reached!");
+          return None;
+        }
+      },
+      Err(err) => {
+        error!("Error reading from file {} error: {}", self.filename, err);
+      }
+    }
+  None
+  }
+}
+
+
+/**************************************************/
+
+/// Read RB binary (robin) files. These are also 
+/// known as "blob" files
+/// FIXME - this is similar to TofPacketReader, make it 
+///         a template
+#[derive(Debug)]
+struct RobinReader {
+  pub filename : String,
+  file_reader  : Option<BufReader<File>>,
+}
+
+impl RobinReader {
+
+  pub fn new(filename : String) -> Self {
+    let filename_c = filename.clone();
+    let mut robin_reader = RobinReader { 
+      filename    : filename,
+      file_reader : None,
+    };
+    robin_reader.open(filename_c);
+    robin_reader
+  }
+  
+  pub fn open(&mut self, filename : String) {
+    if self.filename != "" {
+      warn!("Overiding previously set filename {}", self.filename);
+    }
+    let self_filename = filename.clone();
+    self.filename     = self_filename;
+    let path = Path::new(&filename); 
+    info!("Reading from {}", &self.filename);
+    let file = OpenOptions::new().create(false).append(false).open(path).expect("Unable to open file {filename}");
+    self.file_reader = Some(BufReader::new(file));
+  }
+}
+
+impl Default for RobinReader {
+
+  fn default() -> Self {
+    RobinReader::new(String::from(""))
+  }
+}
+
+impl Iterator for RobinReader {
+  type Item = RBBinaryDump;
+
+  fn next(&mut self) -> Option<Self::Item> {
+    let mut line   = Vec::<u8>::new();
+    let mut packet = RBBinaryDump::new();
+    match self.file_reader.as_mut().expect("No file available!").read_until(b'\n', &mut line) {
+      Ok(bytes_read) => {
+        if bytes_read > 0 {
+          trace!("Read {} bytes", bytes_read);
+          match RBBinaryDump::from_bytestream(&line, &mut 0) {
+            Ok(pack) => {
+              packet = pack;
+              return Some(packet);
+            }
+            Err(err) => { 
+              error!("Error getting packet from file {err}");
+              return None;
+            }
+          }
+        } else {
+          warn!("End of file reached!");
+          return None;
+        }
+      },
+      Err(err) => {
+        error!("Error reading from file {} error: {}", self.filename, err);
+      }
+    }
+  None
+  }
+}
+
+/**************************************************/
 
 /// Broadcast commands over the tof-computer network
 /// socket via zmq::PUB to the rb network.
@@ -399,7 +474,7 @@ pub fn analyze_blobs(buffer               : &Vec<u8>,
 
   // remove_spikes requires two dimensional array
   let mut all_channel_waveforms : [[f64;NWORDS];NCHN] = [[0.0;NWORDS];NCHN];
-  let mut all_channel_times     : [[f64;NWORDS];NCHN] = [[0.0;NWORDS];NCHN];
+  let all_channel_times         : [[f64;NWORDS];NCHN] = [[0.0;NWORDS];NCHN];
 
   // bitmask to keep track which channels/paddles are
   // over threshold
@@ -906,7 +981,7 @@ pub fn master_trigger(mt_ip          : &str,
     }
     
     if ev.event_id - last_event_cnt > 1 {
-      let mut missing = ev.event_id - last_event_cnt;
+      let missing = ev.event_id - last_event_cnt;
       error!("We missed {missing} eventids"); 
       // FIXME
       if missing < 200 {
