@@ -1,15 +1,21 @@
 //! Readoutboard binary event formats, former denoted as BLOB (binary large object)
 //! 
 //! The structure is the following
+//! FIXME - come up with more descriptive names, e.g. RoBinDataL0
 //!
-//! - RBBinaryDump  - the raw "orignal" blob, written to the memory of the 
-//!   RB's
+//! - RBBinaryDump   - the raw "orignal" blob, written to the memory of the 
+//!                    RB's. This corresponds to compression level 0.
 //!
-//! - RBEvent       - still "raw" event, however, with modified fields 
-//!                   (removed superflous ones, changed meaning of some others)
-//!                   Each RBEvent has a header and a body
+//! - RBEventPayload - the raw "original" data, but the event id is extracted
+//!                    and available as a separate field.
 //!
-//! - RBEventHeader - timestamp, status, len of event
+//! - RBEvent        - still "raw" event, however, with modified fields 
+//!                    (removed superflous ones, changed meaning of some others)
+//!                    Each RBEvent has a header and a body which is the channel 
+//!                    data. Data in this form represents compression level 1
+//!
+//! - RBEventHeader  - timestamp, status, len of event, but no channel data. This
+//!                    represents compression level 2
 //!
 //!
 
@@ -388,7 +394,7 @@ impl RBEvent {
 
   pub fn new() -> Self {
     let mut adc = Vec::<Vec<u16>>::with_capacity(8);
-    for k in 0..7 {
+    for k in 0..NCHN {
       adc.push(Vec::<u16>::new());
     }
     RBEvent {
@@ -397,13 +403,24 @@ impl RBEvent {
     }
   }
 
-  pub fn extract_from_rbbinarydump(stream : &Vec<u8>,
-                                   pos    : &mut usize) 
+  pub fn extract_from_memorydump(stream : &Vec<u8>,
+                                 pos    : &mut usize) 
     -> Result<RBEvent, SerializationError> {
   
     let header     = RBEventHeader::extract_from_rbbinarydump(stream, pos)?;
+    *pos -= 2;
+    let mut skip_bytes = 0usize;
+    let nchan = 8;
+
+    if (nchan != 0) && !header.lost_trigger {
+      skip_bytes = (nchan as usize + 1) * (NWORDS * 2 + 6);
+    }
+    *pos -= skip_bytes;
     let mut event  = RBEvent::new();
     event.header   = header;
+    if header.lost_trigger || header.broken {
+      return Ok(event);
+    }
     let active_channels = header.get_active_data_channels();
     // we ignore the channel header field (which is just 
     // the channel id itself) and the trailer field which 
@@ -412,11 +429,14 @@ impl RBEvent {
     // these checksums!
     // channel data is always there, however, it 
     // actually might not be part of the trigger.
-    for n in 1..(NCHN) +1 {
+    for n in 1..(NCHN +1) {
       // two bytes for the header
       *pos += 2;
+      //println!("channel {n}");
       if active_channels.contains(&(n as u8)) {
-        event.adc[n -1].push(parse_u16(stream, pos));  
+        for k in 0..NWORDS/2 {  
+          event.adc[n -1].push(parse_u16(stream, pos));  
+        }
       } else {
         // skip ahead a full channel
         *pos += 1024*2;
@@ -426,6 +446,23 @@ impl RBEvent {
     Ok(event)
   }
 }
+
+impl Default for RBEvent {
+
+  fn default () -> Self {
+    RBEvent::new()
+  }
+}
+
+
+
+impl fmt::Display for RBEvent {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let active_channels = self.header.get_active_data_channels();
+    write!(f, "<RBEvent\n {}, \n channels {:?}>", self.header, active_channels)
+  }
+}
+
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct RBEventHeader {
@@ -585,18 +622,18 @@ impl From<&Path> for RBEventHeader {
 
 impl fmt::Display for RBEventHeader {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(f, "<RBEventHeader:\n
-           \t RB {},\n
-           \t ch mask {}, \n
-           \t event id {}, \n
-           \t timestamp (48bit) {}, \n,
-           \t locked {}, \n
-           \t locked last sec. {}, \n
-           \t drs4 Temp [C] {}, \n
-           \t FPGA Temp [C] {}, \n
-           \t stop cell {}, \n,
-           \t dtap0 {},\n,
-           \t crc32 {},\n,
+    write!(f, "<RBEventHeader:
+           \t RB {},
+           \t ch mask {}, 
+           \t event id {}, 
+           \t timestamp (48bit) {},
+           \t locked {}, 
+           \t locked last sec. {}, 
+           \t drs4 Temp [C] {}, 
+           \t FPGA Temp [C] {}, 
+           \t stop cell {}, 
+           \t dtap0 {},
+           \t crc32 {},
            \t broken {}>",
            self.rb_id,
            self.channel_mask,
@@ -605,7 +642,7 @@ impl fmt::Display for RBEventHeader {
            self.is_locked,
            self.is_locked_last_sec,
            self.drs4_temp,
-           self.fpga_temp,
+           self.get_fpga_temp(),
            self.stop_cell,
            self.dtap0,
            self.crc32,
