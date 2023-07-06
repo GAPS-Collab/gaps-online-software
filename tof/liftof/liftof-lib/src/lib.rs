@@ -8,7 +8,9 @@ use std::io::{self, BufRead, BufReader};
 use std::path::PathBuf;
 use std::net::{IpAddr, Ipv4Addr};
 use std::io::{Read,
-              Write};
+              Write,
+              Seek,
+              SeekFrom};
 use std::collections::HashMap;
 use std::net::{UdpSocket, SocketAddr};
 use crossbeam_channel::{Sender, Receiver};
@@ -37,10 +39,13 @@ use tof_dataclasses::packets::{TofPacket,
                                PacketType,
                                PaddlePacket};
 use tof_dataclasses::errors::{BlobError, SerializationError};
-use tof_dataclasses::serialization::Serialization;
+use tof_dataclasses::serialization::{search_for_u16,
+                                     parse_u8,
+                                     parse_u32,
+                                     Serialization};
 use tof_dataclasses::commands::{TofCommand};//, TofResponse};
 use tof_dataclasses::events::{MasterTriggerEvent,
-                              RBBinaryDump};
+                              RBEvent};
 use tof_dataclasses::monitoring::MtbMoniData;
 use tof_dataclasses::events::master_trigger::{reset_daq,
                                               read_daq,
@@ -122,6 +127,12 @@ pub fn get_blobs_from_file (rb_id : usize) {
 }
 
 
+//FIXME : this needs to become a trait
+fn read_n_bytes(file: &mut BufReader<File>, n: usize) -> io::Result<Vec<u8>> {
+  let mut buffer = vec![0u8; n];
+  file.read_exact(&mut buffer)?;
+  Ok(buffer)
+}
 
 
 /// Open a new file and write TofPackets
@@ -197,8 +208,9 @@ impl Default for TofPacketWriter {
 #[derive(Debug)]
 pub struct TofPacketReader {
 
-  pub filename : String,
-  file_reader  : Option<BufReader<File>>,
+  pub filename    : String,
+  file_reader     : Option<BufReader<File>>,
+  cursor          : usize
 }
 
 impl TofPacketReader {
@@ -206,11 +218,23 @@ impl TofPacketReader {
   pub fn new(filename : String) -> TofPacketReader {
     let filename_c = filename.clone();
     let mut packet_reader = TofPacketReader { 
-      filename    : filename,
-      file_reader : None,
+      filename       : filename,
+      file_reader    : None,
+      cursor : 0,
     };
     packet_reader.open(filename_c);
     packet_reader
+  }
+ 
+  pub fn get_next_packet_size(&self, stream : &Vec<u8>) -> u32 {
+    // cursor needs at HEAD position and then we have to 
+    // add one byte for the packet type
+    let mut pos = self.cursor + 2;
+    let ptype_int  = parse_u8(stream, &mut pos);
+    let next_psize = parse_u32(stream, &mut pos);
+    let ptype = PacketType::from_u8(ptype_int);
+    debug!("We anticpate a TofPacket of type {:?} and size {} (bytes)",ptype, next_psize);
+    next_psize
   }
 
   pub fn open(&mut self, filename : String) {
@@ -219,11 +243,70 @@ impl TofPacketReader {
     }
     let self_filename = filename.clone();
     self.filename     = self_filename;
-    let path = Path::new(&filename); 
-    info!("Reading from {}", &self.filename);
-    let file = OpenOptions::new().create(false).append(false).open(path).expect("Unable to open file {filename}");
-    self.file_reader = Some(BufReader::new(file));
+    if filename != "" {
+      let path = Path::new(&filename); 
+      info!("Reading from {}", &self.filename);
+      let file = OpenOptions::new().create(false).append(false).read(true).open(path).expect("Unable to open file {filename}");
+      self.file_reader    = Some(BufReader::new(file));
+      self.cursor = self.search_start().unwrap(); 
+    }
   }
+
+  pub fn search_start(&mut self) -> Result<usize, SerializationError> {
+    let mut pos       = 0u64;
+    let mut start_pos = 0usize; 
+    //let mut stream  = Vec::<u8>::new();
+    let max_bytes   = self.get_file_nbytes();
+    info!("Using file with {max_bytes} bytes!");
+    let chunk       = 10usize;
+    while pos < max_bytes {
+      match read_n_bytes(self.file_reader.as_mut().unwrap(), chunk) {
+        Err(err) => {
+          error!("Can not read from file, error {err}");
+          error!("Most likely, the file/stream is too short!");
+          return Err(SerializationError::StreamTooShort);
+        }
+        Ok(stream) => {
+          debug!("Got stream {:?}", stream);
+          match search_for_u16(TofPacket::HEAD, &stream, 0) {
+            Err(_) => {
+              continue;
+            }
+            Ok(result) => {
+              start_pos = result + pos as usize;           
+              // make sure the current chunk is accounted 
+              // for before the break
+              pos += chunk as u64;
+              break;
+            }
+          }
+        } // end Ok
+      } // end match 
+      pos += chunk as u64;
+    } // end while
+    let mut rewind : i64 = pos.try_into().unwrap();
+    rewind = -1*rewind + start_pos as i64;
+    debug!("Rewinding {rewind} bytes");
+    match self.file_reader.as_mut().unwrap().seek(SeekFrom::Current(rewind)) {
+      Err(err) => {
+        error!("Can not rewind file buffer! Error {err}");
+      }
+      Ok(_) => ()
+    }
+    Ok(start_pos)
+  }
+  
+  fn get_file_nbytes(&self) -> u64 {
+    let metadata  = self.file_reader.as_ref().unwrap().get_ref().metadata().unwrap();
+    let file_size = metadata.len();
+    file_size
+  }
+
+  pub fn count_packets(&mut self) -> usize {
+    debug!("Counting packets...");
+    0
+  }
+
 }
 
 impl Default for TofPacketReader {
@@ -239,28 +322,43 @@ impl Iterator for TofPacketReader {
   fn next(&mut self) -> Option<Self::Item> {
     let mut line   = Vec::<u8>::new();
     let mut packet = TofPacket::new();
-    match self.file_reader.as_mut().expect("No file available!").read_until(b'\n', &mut line) {
-      Ok(bytes_read) => {
-        if bytes_read > 0 {
-          trace!("Read {} bytes", bytes_read);
-          match TofPacket::from_bytestream(&line, &mut 0) {
-            Ok(pack) => {
-              packet = pack;
-              return Some(packet);
-            }
-            Err(err) => { 
-              error!("Error getting packet from file {err}");
-              return None;
-            }
-          }
-        } else {
-          warn!("End of file reached!");
-          return None;
-        }
-      },
+    match read_n_bytes(self.file_reader.as_mut().unwrap(), 7) { 
+    //match self.file_reader.as_mut().expect("No file available!").read_until(b'\n', &mut line) {
       Err(err) => {
         error!("Error reading from file {} error: {}", self.filename, err);
-      }
+      },
+      Ok(chunk) => {
+        if chunk.len() < 7 {
+          error!("The stream is too short!");
+          return None;
+        }
+        else {
+          trace!("Read {} bytes", chunk.len());
+          let expected_payload_size = self.get_next_packet_size(&chunk) as usize; 
+          match read_n_bytes(self.file_reader.as_mut().unwrap(), expected_payload_size + 2) {
+            Err(err) => {
+              error!("Unable to read {} requested bytes to decode tof packet!", expected_payload_size - 7 );
+              return None;
+            },
+            Ok(data) => {
+              let mut stream = Vec::<u8>::with_capacity(expected_payload_size + 9);
+              stream.extend_from_slice(&chunk);
+              stream.extend_from_slice(&data);
+              //println!("{:?}", stream);
+              match TofPacket::from_bytestream(&stream, &mut 0) {
+                Ok(pack) => {
+                  packet = pack;
+                  return Some(packet);
+                }
+                Err(err) => { 
+                  error!("Error getting packet from file {err}");
+                  return None;
+                }
+              }
+            }
+          }
+        }
+      }, // end outer OK
     }
   None
   }
@@ -274,17 +372,19 @@ impl Iterator for TofPacketReader {
 /// FIXME - this is similar to TofPacketReader, make it 
 ///         a template
 #[derive(Debug)]
-struct RobinReader {
+pub struct RobinReader {
   pub filename : String,
   file_reader  : Option<BufReader<File>>,
 }
 
 impl RobinReader {
 
+  const EVENT_SIZE : usize = 18530;
+
   pub fn new(filename : String) -> Self {
     let filename_c = filename.clone();
     let mut robin_reader = RobinReader { 
-      filename    : filename,
+      filename    : String::from(""),
       file_reader : None,
     };
     robin_reader.open(filename_c);
@@ -297,10 +397,21 @@ impl RobinReader {
     }
     let self_filename = filename.clone();
     self.filename     = self_filename;
-    let path = Path::new(&filename); 
-    info!("Reading from {}", &self.filename);
-    let file = OpenOptions::new().create(false).append(false).open(path).expect("Unable to open file {filename}");
-    self.file_reader = Some(BufReader::new(file));
+    if filename != "" {
+      let path = Path::new(&filename); 
+      info!("Reading from {}", &self.filename);
+      let file = OpenOptions::new().create(false).append(false).read(true).open(path).expect("Unable to open file {filename}");
+      self.file_reader = Some(BufReader::new(file));
+    }
+  }
+
+  
+  pub fn count_packets(&self) -> u64 {
+    let metadata  = self.file_reader.as_ref().unwrap().get_ref().metadata().unwrap();
+    let file_size = metadata.len();
+    let n_packets =  file_size/RobinReader::EVENT_SIZE as u64; 
+    info!("The file contains likely ~{} event packets!", n_packets);
+    n_packets
   }
 }
 
@@ -312,23 +423,29 @@ impl Default for RobinReader {
 }
 
 impl Iterator for RobinReader {
-  type Item = RBBinaryDump;
+  type Item = RBEvent;
 
   fn next(&mut self) -> Option<Self::Item> {
-    let mut line   = Vec::<u8>::new();
-    let mut packet = RBBinaryDump::new();
-    match self.file_reader.as_mut().expect("No file available!").read_until(b'\n', &mut line) {
-      Ok(bytes_read) => {
-        if bytes_read > 0 {
-          trace!("Read {} bytes", bytes_read);
-          match RBBinaryDump::from_bytestream(&line, &mut 0) {
-            Ok(pack) => {
-              packet = pack;
-              return Some(packet);
-            }
-            Err(err) => { 
-              error!("Error getting packet from file {err}");
-              return None;
+    let event_size = 18532usize;
+    let chunk      = 1;
+    let mut packet = RBEvent::new();
+    let mut file_buffer = Vec::<u8>::with_capacity(event_size);
+    match read_n_bytes(self.file_reader.as_mut().unwrap(), event_size*chunk) { 
+    //match self.file_reader.as_mut().expect("No file available!").read_until(b'\n', &mut line) {
+      Ok(buffer) => {
+        if buffer.len() > 0 {
+          trace!("Read {} bytes", buffer.len());
+          for n in 0..chunk {
+            match RBEvent::extract_from_memorydump(&buffer, &mut 0) {
+              Ok(pack) => {
+                packet = pack;
+                return Some(packet);
+              }
+              Err(err) => { 
+                error!("Error getting packet from file {err}");
+                //return None;
+                continue;
+              }
             }
           }
         } else {
