@@ -174,7 +174,7 @@ impl fmt::Display for PacketType {
 /// Format when in bytestream
 /// HEAD : u16
 /// TYPE : u8
-/// PAYLOAD_SIZE : u64
+/// PAYLOAD_SIZE : u32
 /// PYALOAD : [u8;PAYLOAD_SIZE]
 /// TAIL : u16
 ///
@@ -217,8 +217,9 @@ impl Default for TofPacket {
 
 impl TofPacket {
 
-  const HEAD : u16 = 0xaaaa;
-  const TAIL : u16 = 0x5555;
+  pub const HEAD : u16 = 0xaaaa;
+  pub const TAIL : u16 = 0x5555;
+  pub const PRELUDE_SIZE : usize = 7; 
 
   pub fn new() -> Self {
     Self {

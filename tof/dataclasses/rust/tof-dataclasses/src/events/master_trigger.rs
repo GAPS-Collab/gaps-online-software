@@ -31,7 +31,10 @@ use std::error::Error;
 use crate::errors::{IPBusError, MasterTriggerError};
 
 use crate::serialization::{Serialization,
-                           SerializationError};
+                           SerializationError,
+                           parse_u8,
+                           parse_u16,
+                           parse_u32};
 
 use crate::manifest::{LocalTriggerBoard,
                       ReadoutBoard};
@@ -239,7 +242,7 @@ impl MasterTriggerEvent {
   // + head + tail
   // 45
   const SIZE : usize = 45;
-  const TAIL : u16 = 0x555;
+  const TAIL : u16 = 0x5555;
   const HEAD : u16 = 0xAAAA;
 
   pub fn new(event_id  : u32, 
@@ -271,41 +274,23 @@ impl MasterTriggerEvent {
     //  }
     //}
   }
+  
+  pub fn decode_board_mask(&mut self, mask : u32) {
+    for i in 0..N_LTBS {
+      self.board_mask[i] = (mask & (1 << i)) != 0;
+    }
+  }
 
+  pub fn decode_hit_mask(&mut self, ltb_idx : usize, mask : u32) {
+    for i in 0..N_CHN_PER_LTB {
+      self.hits[ltb_idx][i] = (mask & (1 << i)) != 0;
+    }
+  }
 
   pub fn is_broken(&self) -> bool {
     self.broken
   }
 
-  pub fn to_bytestream(&self) -> Vec::<u8> {
-    let mut bs = Vec::<u8>::with_capacity(MasterTriggerEvent::SIZE);
-    bs.extend_from_slice(&MasterTriggerEvent::HEAD.to_le_bytes());
-    bs.extend_from_slice(&self.event_id.to_le_bytes()); 
-    bs.extend_from_slice(&self.timestamp.to_le_bytes());
-    bs.extend_from_slice(&self.tiu_timestamp.to_le_bytes());
-    bs.extend_from_slice(&self.tiu_gps_32.to_le_bytes());
-    bs.extend_from_slice(&self.tiu_gps_16.to_le_bytes());
-    bs.extend_from_slice(&self.n_paddles.to_le_bytes());
-    let mut board_mask : u32 = 0;
-    for n in 0..N_LTBS {
-      if self.board_mask[n] {
-        board_mask += 2_u32.pow(n as u32);
-      }
-    }
-    bs.extend_from_slice(&board_mask.to_le_bytes());
-    for n in 0..N_LTBS {
-      let mut hit_mask : u32 = 0;
-      for j in 0..N_CHN_PER_LTB {
-        if self.hits[n][j] {
-          hit_mask += 2_u32.pow(j as u32);
-        }
-      }
-      bs.extend_from_slice(&hit_mask.to_le_bytes());
-    }
-    bs.extend_from_slice(&self.crc.to_le_bytes());
-    bs.extend_from_slice(&MasterTriggerEvent::TAIL.to_le_bytes());
-    bs
-  }
 
   fn bitmask_to_str(mask : &[bool]) -> String {
     let mut m_str = String::from("");
@@ -371,6 +356,14 @@ impl MasterTriggerEvent {
     n_paddles
   }
 
+  pub fn check(&self) -> bool {
+    let good = self.n_paddles == self.get_hit_paddles();
+    if !good {
+      error!("Missmatch in expected and registered hit paddles! Expected : {}, seen {}", self.n_paddles, self.get_hit_paddles());
+    }
+    good
+  }
+
   pub fn invalidate(&mut self) {
     self.valid = false;
   }
@@ -378,21 +371,77 @@ impl MasterTriggerEvent {
 
 impl Serialization for MasterTriggerEvent {
 
+  fn to_bytestream(&self) -> Vec::<u8> {
+    let mut bs = Vec::<u8>::with_capacity(MasterTriggerEvent::SIZE);
+    bs.extend_from_slice(&MasterTriggerEvent::HEAD.to_le_bytes());
+    bs.extend_from_slice(&self.event_id.to_le_bytes()); 
+    bs.extend_from_slice(&self.timestamp.to_le_bytes());
+    bs.extend_from_slice(&self.tiu_timestamp.to_le_bytes());
+    bs.extend_from_slice(&self.tiu_gps_32.to_le_bytes());
+    bs.extend_from_slice(&self.tiu_gps_16.to_le_bytes());
+    bs.extend_from_slice(&self.n_paddles.to_le_bytes());
+    let mut board_mask : u32 = 0;
+    for n in 0..N_LTBS {
+      if self.board_mask[n] {
+        board_mask += 2_u32.pow(n as u32);
+      }
+    }
+    bs.extend_from_slice(&board_mask.to_le_bytes());
+    for n in 0..N_LTBS {
+      let mut hit_mask : u32 = 0;
+      for j in 0..N_CHN_PER_LTB {
+        if self.hits[n][j] {
+          hit_mask += 2_u32.pow(j as u32);
+        }
+      }
+      bs.extend_from_slice(&hit_mask.to_le_bytes());
+    }
+    bs.extend_from_slice(&self.crc.to_le_bytes());
+    bs.extend_from_slice(&MasterTriggerEvent::TAIL.to_le_bytes());
+    bs
+  }
+
+
   fn from_bytestream(bytestream : &Vec<u8>,
                      pos        : &mut usize)
     -> Result<Self, SerializationError> {
-    let bs = bytestream;
-    let mt = MasterTriggerEvent::new(0,0);
-    let header = u16::from_le_bytes([bs[*pos],bs[*pos + 1]]); 
+    let bs     = bytestream;
+    let mut mt = MasterTriggerEvent::new(0,0);
+    let header = parse_u16(bs, pos); 
     if header != MasterTriggerEvent::HEAD {
       return Err(SerializationError::HeadInvalid);
     }
-    //bs.extend_from_slice(&MasterTriggerEvent::HEAD.to_le_bytes());
-    //bs.extend_from_slice(&self.event_id.to_le_bytes()); 
-    //bs.extend_from_slice(&self.timestamp.to_le_bytes());
-    //bs.extend_from_slice(&self.tiu_timestamp.to_le_bytes());
-    //bs.extend_from_slice(&self.tiu_gps_32.to_le_bytes());
-    //bs.extend_from_slice(&self.tiu_gps_16.to_le_bytes());
+    mt.event_id           = parse_u32(bs, pos);
+    mt.timestamp          = parse_u32(bs, pos);
+    mt.tiu_timestamp      = parse_u32(bs, pos);
+    mt.tiu_gps_32         = parse_u32(bs, pos);
+    mt.tiu_gps_16         = parse_u32(bs, pos);
+    mt.n_paddles          = parse_u8(bs, pos);
+    let board_mask        = parse_u32(bs, pos);
+    mt.decode_board_mask(board_mask);
+    let mut hit_mask : u32;
+    for n in 0..N_LTBS {
+      hit_mask = parse_u32(bs, pos);
+      mt.decode_hit_mask(n, hit_mask);
+    }
+    mt.crc                = parse_u32(bs, pos);
+    warn!("This is specific to data written with <= 0.6.0 KIHIKIHI! This is a BUG! It needs to be fixed in future versions! Version 0.6.1 should already fix ::to_bytestream, but leaves a modded ::from_bytestream for current analysis.");
+    let tail_a              = parse_u8(bs, pos);
+    let tail_b              = parse_u8(bs, pos);
+    if tail_a == 85 && tail_b == 5 {
+    } else {
+      error!("Tail is messed up. See comment for version 0.6.0/0.6.1 in CHANGELOG! We got {} {} but were expecting 85 5", tail_a, tail_b);
+      //error!("Got {} for MTE tail signature! Expecting {}", tail, MasterTriggerEvent::TAIL);
+      return Err(SerializationError::TailInvalid);
+    }
+    //let tail              = parse_u16(bs, pos);
+    //if tail != MasterTriggerEvent::TAIL {
+    //  error!("Got {} for MTE tail signature! Expecting {}", tail, MasterTriggerEvent::TAIL);
+    //  return Err(SerializationError::TailInvalid);
+    //}
+    //let hit_mask          = 
+
+    //mt.n_paddles          = parse_u8(bs, pos);
     //bs.extend_from_slice(&self.n_paddles.to_le_bytes());
 
     Ok(mt)

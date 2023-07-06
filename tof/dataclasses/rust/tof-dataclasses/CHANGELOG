@@ -1,5 +1,13 @@
 #0.6.x - KIHIKIHI series
 
+##0.6.1 
+* introduces MasterTriggerEvent::from_bytestream
+* moves MasterTriggerEvent::to_bytestream to Serialization trait
+* WARNING! MasterTriggerEvent::from_bytestream will check for 
+  0.6.0 tail signature (0x555) and issue a warning!
+
+##0.6.0
+* Bug in MasterTriggerEvent::TAIL which is 0x555 instead of 0x5555.
 
 #0.5.x - UHU series
 * adds new monitoring classes 
