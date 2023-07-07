@@ -14,5 +14,6 @@ pub use tof_event::TofEvent;
 pub use rb_event::{RBEventPayload,
                    RBBinaryDump,
                    RBEventHeader,
-                   RBEvent};
+                   RBEvent,
+                   RBMissingHit};
 

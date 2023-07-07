@@ -5,6 +5,8 @@
 * moves MasterTriggerEvent::to_bytestream to Serialization trait
 * WARNING! MasterTriggerEvent::from_bytestream will check for 
   0.6.0 tail signature (0x555) and issue a warning!
+* ISSUES/CHANGE request: Do not decode MasterTrigger board/hit masks just yet.
+* RBMissingHit - debug information for MTB/RB/LTB mismatch
 
 ##0.6.0
 * Bug in MasterTriggerEvent::TAIL which is 0x555 instead of 0x5555.

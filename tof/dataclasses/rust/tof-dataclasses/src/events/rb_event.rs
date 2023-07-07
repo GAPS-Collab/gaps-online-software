@@ -17,7 +17,8 @@
 //! - RBEventHeader  - timestamp, status, len of event, but no channel data. This
 //!                    represents compression level 2
 //!
-//!
+//! - RBMissingHit   - a placeholder for debugging. If the MTB claims there is a hit,
+//!                    but we do not see it, RBMissingHit accounts for the fact
 
 use std::fmt;
 use std::path::Path;
@@ -41,6 +42,69 @@ use crate::FromRandom;
 extern crate rand;
 #[cfg(feature = "random")]
 use rand::Rng;
+
+/// Debug information for missing hits. 
+///
+/// These hits have been seen by the MTB, but we are unable to determine where 
+/// they are coming from, why they are there or we simply have lost the RB 
+/// information for these hits.
+
+#[derive(Debug, Copy, Clone)]
+pub struct RBMissingHit {
+  pub event_id      : u32,
+  pub ltb_hit_index : u8,
+  pub ltb_id        : u8,
+  pub ltb_dsi       : u8,
+  pub ltb_j         : u8,
+  pub ltb_ch        : u8,
+  pub rb_id         : u8,
+  pub rb_ch         : u8,
+}
+
+impl RBMissingHit {
+
+  pub fn new() -> Self {
+    RBMissingHit {
+      event_id      : 0,
+      ltb_hit_index : 0,
+      ltb_id        : 0,
+      ltb_dsi       : 0,
+      ltb_j         : 0,
+      ltb_ch        : 0,
+      rb_id         : 0,
+      rb_ch         : 0,
+    }
+  }
+}
+
+impl fmt::Display for RBMissingHit {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    write!(f, "<RBMissingHit:
+           \t event ID    {},
+           \t LTB hit idx {}, 
+           \t LTB ID      {}, 
+           \t LTB DSI     {}, 
+           \t LTB J       {}, 
+           \t LTB CHN     {},   
+           \t RB ID       {}, 
+           \t RB CH {}>", 
+           self.event_id      ,
+           self.ltb_hit_index ,
+           self.ltb_id        ,
+           self.ltb_dsi       ,
+           self.ltb_j         ,
+           self.ltb_ch        ,
+           self.rb_id         ,
+           self.rb_ch         )
+  }
+}
+
+impl Default for RBMissingHit {
+
+  fn default() -> Self {
+    RBMissingHit::new()
+  }
+}
 
 /// A wrapper class for raw binary RB data exposing the event id
 ///
@@ -371,7 +435,7 @@ impl RBChannelData {
   pub fn get_adc(&self) -> Vec<i16> {
     let mut adc = Vec::<i16>::with_capacity(self.nwords as usize);
     let mut pos = 0;
-    for n in 0..self.nwords {
+    for _ in 0..self.nwords {
       adc.push( 0x3FFF & i16::from_le_bytes([self.data[pos],self.data[pos+1]]));
       pos += 2;
     }
