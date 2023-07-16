@@ -217,8 +217,6 @@ impl Default for TofPacket {
 
 impl TofPacket {
 
-  pub const HEAD : u16 = 0xaaaa;
-  pub const TAIL : u16 = 0x5555;
   pub const PRELUDE_SIZE : usize = 7; 
 
   pub fn new() -> Self {
@@ -324,14 +322,17 @@ impl From<&RBEventHeader> for TofPacket {
 }
 
 impl Serialization for TofPacket {
+  const HEAD : u16 = 0xaaaa;
+  const TAIL : u16 = 0x5555;
+  const SIZE : usize = 0; // FIXME - size/prelude_size 
   fn from_bytestream(stream : &Vec<u8>, pos : &mut usize)
-  -> Result<TofPacket, SerializationError> {
+  -> Result<Self, SerializationError> {
     let mut two_bytes : [u8;2];
     two_bytes = [stream[*pos],
                  stream[*pos+1]];
         
     *pos += 2;
-    if TofPacket::HEAD != u16::from_le_bytes(two_bytes) {
+    if Self::HEAD != u16::from_le_bytes(two_bytes) {
       warn!("Packet does not start with HEAD signature");
       return Err(SerializationError::HeadInvalid {});
     }
@@ -344,7 +345,7 @@ impl Serialization for TofPacket {
     }
     let payload_size = parse_u32(stream, pos);
     two_bytes = [stream[*pos + payload_size as usize], stream[*pos + 1 + payload_size as usize]];
-    if TofPacket::TAIL != u16::from_le_bytes(two_bytes) {
+    if Self::TAIL != u16::from_le_bytes(two_bytes) {
       warn!("Packet does not end with TAIL signature");
       return Err(SerializationError::TailInvalid {});
     }
@@ -360,7 +361,7 @@ impl Serialization for TofPacket {
 }
 
 #[test]
-fn test_tof_packet_serialize_roundabout() ->Result<(), SerializationError> {
+fn test_serialize_tofpacket() ->Result<(), SerializationError> {
   let mut pk     = TofPacket::new();
   pk.packet_type = PacketType::Command;
   let mut pl     = Vec::<u8>::new();
@@ -370,7 +371,7 @@ fn test_tof_packet_serialize_roundabout() ->Result<(), SerializationError> {
   pk.payload = pl;
   //pk.payload     = vec![1,2,3,4];
   let bs = pk.to_bytestream();
-  println!("{bs:?}");
+  //println!("{bs:?}");
   let mut pos = 0usize;
   let pk2 = TofPacket::from_bytestream(&bs, &mut pos)?;
   

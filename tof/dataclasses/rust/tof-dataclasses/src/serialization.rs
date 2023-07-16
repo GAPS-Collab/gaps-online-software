@@ -8,10 +8,23 @@ pub use crate::errors::SerializationError;
 use std::error::Error;
 use std::path::Path;
 use std::fs::read_to_string;
+use std::fmt::Display;
 
 extern crate json;
 use json::JsonValue;
 
+
+pub fn u16_to_u8(vec_u16: &[u16]) -> Vec<u8> {
+    vec_u16.iter()
+        .flat_map(|&n| n.to_le_bytes().to_vec())
+        .collect()
+}
+
+pub fn u8_to_u16(vec_u8: &[u8]) -> Vec<u16> {
+    vec_u8.chunks_exact(2)
+        .map(|chunk| u16::from_le_bytes([chunk[0], chunk[1]]))
+        .collect()
+}
 
 pub fn parse_u8(bs : &Vec::<u8>, pos : &mut usize) -> u8 {
   let value = u8::from_le_bytes([bs[*pos]]);
@@ -119,9 +132,41 @@ pub fn get_json_from_file(filename : &Path)
   Ok(config)
 }
 
-/// En/Decode to a bytestream, that is `Vec<u8>`
+/// Encode/decode structs to Vec::<u8> to write to a file or
+/// send over the network
+///
 pub trait Serialization {
 
+  const HEAD: u16;
+  const TAIL: u16;
+  /// The SIZE is the size of the serialized 
+  /// bytestream INCLUDING 4 bytes for head
+  /// and tail bytes. In case the struct does 
+  /// NOT HAVE a fixed size, SIZE will be 0
+  /// (so default value of the trait
+  const SIZE: usize = 0;
+
+  /// Verify that the serialized representation of the struct has the 
+  /// correct size, including header + footer.
+  ///
+  /// Will panic for variable sized structs.
+  fn verify_fixed(stream : &Vec<u8>, 
+                  pos    : &mut usize) -> Result<(), SerializationError> {
+    if !Self::SIZE == 0 {
+      panic!("Self::verify_fixed can be only used for structs with a fixed size! In case you are convinced, that your struct has indeed a fixed size, please implement trait Serialization::SIZE with the serialized size in bytes including 4 bytes for header and footer!");
+    }
+    let head_pos = search_for_u16(Self::HEAD, stream, *pos)?; 
+    let tail_pos = search_for_u16(Self::TAIL, stream, head_pos + Self::SIZE-2)?;
+    // At this state, this can be a header or a full event. Check here and
+    // proceed depending on the options
+    if tail_pos + 2 - head_pos != Self::SIZE {
+      error!("Seing {} bytes, but expecting {}", tail_pos + 2 - head_pos, Self::SIZE);
+      *pos = head_pos + 2; 
+      return Err(SerializationError::WrongByteSize);
+    }
+    *pos = head_pos + 2;
+    Ok(())
+  } 
 
   /// Decode a serializable from a bytestream  
   fn from_bytestream(bytestream : &Vec<u8>, 

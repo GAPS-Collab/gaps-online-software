@@ -19,17 +19,22 @@
 //!
 //! - RBMissingHit   - a placeholder for debugging. If the MTB claims there is a hit,
 //!                    but we do not see it, RBMissingHit accounts for the fact
-
+//! 
+//! * features: "random" - provides "::from_random" for all structs allowing to 
+//!   populate them with random data for tests.
+//!
 use std::fmt;
 use std::path::Path;
 use std::io::BufReader;
 use std::fs::File;
 
 use crate::constants::{NWORDS, NCHN};
-use crate::serialization::Serialization;
-use crate::serialization::SerializationError;
-use crate::serialization::search_for_u16;
-use crate::serialization::{parse_bool,
+use crate::serialization::{u16_to_u8,
+                           u8_to_u16,
+                           search_for_u16,
+                           Serialization,
+                           SerializationError,
+                           parse_bool,
                            parse_u8,
                            parse_u16,
                            parse_u32,
@@ -48,8 +53,7 @@ use rand::Rng;
 /// These hits have been seen by the MTB, but we are unable to determine where 
 /// they are coming from, why they are there or we simply have lost the RB 
 /// information for these hits.
-
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub struct RBMissingHit {
   pub event_id      : u32,
   pub ltb_hit_index : u8,
@@ -59,6 +63,44 @@ pub struct RBMissingHit {
   pub ltb_ch        : u8,
   pub rb_id         : u8,
   pub rb_ch         : u8,
+}
+
+impl Serialization for RBMissingHit {
+  const HEAD               : u16    = 43690; //0xAAAA
+  const TAIL               : u16    = 21845; //0x5555
+  const SIZE               : usize  = 15; // bytes
+  
+  fn from_bytestream(stream : &Vec<u8>, pos : &mut usize)
+    -> Result<Self, SerializationError> {
+    Self::verify_fixed(stream, pos)?;
+    // verify_fixed already advances pos by 2
+    let mut miss = RBMissingHit::new();
+    miss.event_id      = parse_u32(stream, pos);
+    miss.ltb_hit_index = parse_u8(stream, pos);
+    miss.ltb_id        = parse_u8(stream, pos);
+    miss.ltb_dsi       = parse_u8(stream, pos);
+    miss.ltb_j         = parse_u8(stream, pos);
+    miss.ltb_ch        = parse_u8(stream, pos);
+    miss.rb_id         = parse_u8(stream, pos);
+    miss.rb_ch         = parse_u8(stream, pos);
+    *pos += 2; // account for header in verify_fixed
+    Ok(miss)
+  }
+
+  fn to_bytestream(&self) -> Vec<u8> {
+    let mut stream = Vec::<u8>::with_capacity(Self::SIZE);
+    stream.extend_from_slice(&Self::HEAD.to_le_bytes());
+    stream.extend_from_slice(&self.event_id.to_le_bytes());
+    stream.extend_from_slice(&self.ltb_hit_index.to_le_bytes());
+    stream.extend_from_slice(&self.ltb_id.to_le_bytes());
+    stream.extend_from_slice(&self.ltb_dsi.to_le_bytes());
+    stream.extend_from_slice(&self.ltb_j.to_le_bytes());
+    stream.extend_from_slice(&self.ltb_ch.to_le_bytes());
+    stream.extend_from_slice(&self.rb_id.to_le_bytes());
+    stream.extend_from_slice(&self.rb_ch.to_le_bytes());
+    stream.extend_from_slice(&Self::TAIL.to_le_bytes());
+    stream
+  }
 }
 
 impl RBMissingHit {
@@ -102,7 +144,25 @@ impl fmt::Display for RBMissingHit {
 impl Default for RBMissingHit {
 
   fn default() -> Self {
-    RBMissingHit::new()
+    Self::new()
+  }
+}
+
+#[cfg(feature = "random")]
+impl FromRandom for RBMissingHit {
+    
+  fn from_random() -> Self {
+    let mut miss = Self::new();
+    let mut rng = rand::thread_rng();
+    miss.event_id      = rng.gen::<u32>();
+    miss.ltb_hit_index = rng.gen::<u8>();
+    miss.ltb_id        = rng.gen::<u8>();
+    miss.ltb_dsi       = rng.gen::<u8>();
+    miss.ltb_j         = rng.gen::<u8>();
+    miss.ltb_ch        = rng.gen::<u8>();
+    miss.rb_id         = rng.gen::<u8>();
+    miss.rb_ch         = rng.gen::<u8>();
+    miss
   }
 }
 
@@ -119,8 +179,8 @@ pub struct RBEventPayload {
 
 impl RBEventPayload {
 
-  pub fn new(event_id : u32, payload : Vec<u8>) -> RBEventPayload {
-    RBEventPayload {
+  pub fn new(event_id : u32, payload : Vec<u8>) -> Self {
+    Self {
       event_id,
       payload
     }
@@ -139,7 +199,7 @@ impl RBEventPayload {
   pub fn from_bytestream(bytestream  : &Vec<u8>,
                          start_pos   : usize,
                          no_fragment : bool)
-      -> Result<RBEventPayload, SerializationError> {
+      -> Result<Self, SerializationError> {
     let head_pos = search_for_u16(RBBinaryDump::HEAD, bytestream, start_pos)?; 
     let tail_pos = search_for_u16(RBBinaryDump::TAIL, bytestream, head_pos)?;
     // At this state, this can be a header or a full event. Check here and
@@ -221,11 +281,9 @@ impl RBBinaryDump {
 
   // the size is fixed, assuming fixed
   // nchannel and sample size
-  pub const SIZE : usize = 18530;
-  pub const HEAD : u16   = 0xAAAA;
-  pub const TAIL : u16   = 0x5555;
-  pub fn new() -> RBBinaryDump {
-    RBBinaryDump {
+  
+  pub fn new() -> Self {
+    Self {
       head            : 0, // Head of event marker
       status          : 0,
       len             : 0,
@@ -267,8 +325,8 @@ impl RBBinaryDump {
 }
 
 impl Default for RBBinaryDump {
-  fn default() -> RBBinaryDump {
-    RBBinaryDump::new()
+  fn default() -> Self {
+    Self::new()
   }
 }
 
@@ -295,10 +353,13 @@ impl fmt::Display for RBBinaryDump {
 }
 
 impl Serialization for RBBinaryDump {
+  const SIZE : usize = 18530;
+  const HEAD : u16   = 0xAAAA;
+  const TAIL : u16   = 0x5555;
 
   fn to_bytestream(&self) -> Vec<u8> {
-    let mut stream = Vec::<u8>::with_capacity(RBBinaryDump::SIZE);
-    stream.extend_from_slice(&RBBinaryDump::HEAD.to_le_bytes());
+    let mut stream = Vec::<u8>::with_capacity(Self::SIZE);
+    stream.extend_from_slice(&Self::HEAD.to_le_bytes());
     stream.extend_from_slice(&self.status  .to_le_bytes());
     stream.extend_from_slice(&self.len     .to_le_bytes());
     stream.extend_from_slice(&self.roi     .to_le_bytes());
@@ -335,18 +396,18 @@ impl Serialization for RBBinaryDump {
    //                       four_bytes[2]];
    // stream.extend_from_slice(&four_bytes_shuffle); 
     stream.extend_from_slice(&self.crc32.to_le_bytes());
-    stream.extend_from_slice(&RBBinaryDump::TAIL.to_le_bytes());
+    stream.extend_from_slice(&Self::TAIL.to_le_bytes());
     stream
   }
 
   fn from_bytestream(stream : &Vec<u8>, pos : &mut usize)
-    -> Result<RBBinaryDump, SerializationError> {
-    let mut bin_data = RBBinaryDump::new();
-    let head_pos = search_for_u16(RBBinaryDump::HEAD, stream, *pos)?; 
-    let tail_pos = search_for_u16(RBBinaryDump::TAIL, stream, head_pos + RBBinaryDump::SIZE-2)?;
+    -> Result<Self, SerializationError> {
+    let mut bin_data = Self::new();
+    let head_pos = search_for_u16(Self::HEAD, stream, *pos)?; 
+    let tail_pos = search_for_u16(Self::TAIL, stream, head_pos + Self::SIZE-2)?;
     // At this state, this can be a header or a full event. Check here and
     // proceed depending on the options
-    if tail_pos + 2 - head_pos != RBBinaryDump::SIZE {
+    if tail_pos + 2 - head_pos != Self::SIZE {
       error!("Event seems incomplete. Seing {} bytes, but expecting {}", tail_pos + 2 - head_pos, RBBinaryDump::SIZE);
       //error!("{:?}", &stream[head_pos + 18526..head_pos + 18540]);
       *pos = head_pos + 2; //start_pos += RBBinaryDump::SIZE;
@@ -377,8 +438,8 @@ impl Serialization for RBBinaryDump {
 
     bin_data.stop_cell      =  parse_u16(&stream, pos);
     bin_data.crc32          =  parse_u32(&stream, pos);
-    bin_data.head           =  RBBinaryDump::HEAD;
-    bin_data.tail           =  RBBinaryDump::TAIL;
+    bin_data.head           =  Self::HEAD;
+    bin_data.tail           =  Self::TAIL;
     *pos += 2; // since we deserialized the tail earlier and 
               // didn't account for it
     Ok(bin_data)
@@ -388,8 +449,8 @@ impl Serialization for RBBinaryDump {
 #[cfg(feature = "random")]
 impl FromRandom for RBBinaryDump {
     
-  fn from_random() -> RBBinaryDump {
-    let mut bin_data = RBBinaryDump::new();
+  fn from_random() -> Self {
+    let mut bin_data = Self::new();
     let mut rng = rand::thread_rng();
     bin_data.head           =  0xAAAA; // Head of event marker
     bin_data.status         =  rng.gen::<u16>();
@@ -447,7 +508,7 @@ impl RBChannelData {
 /// Readoutboard binary data with flexible number of channels
 ///
 ///
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct RBEvent {
 
   pub header   : RBEventHeader,
@@ -465,6 +526,25 @@ impl RBEvent {
       header : RBEventHeader::new(),
       adc    : adc,
     }
+  }
+ 
+  pub fn is_over_adc_threshold(&self, ch : u8, threshold : u16) -> bool {
+    match self.get_adc_ch(ch).iter().max() {
+      None => {
+        return false;
+      }
+      Some(max) => {
+        return max > &threshold
+      }
+    }
+  }
+
+  pub fn get_adc_ch(&self, ch : u8) -> Vec::<u16> {
+    if ch < 1 {
+      panic!("Remember, channels go from 1-9!");
+    }
+    let channel : usize = ch as usize - 1;
+    self.adc[ch as usize].clone()
   }
 
   pub fn extract_from_memorydump(stream : &Vec<u8>,
@@ -486,6 +566,7 @@ impl RBEvent {
       return Ok(event);
     }
     let active_channels = header.get_active_data_channels();
+    //println!("{:?}", active_channels);
     // we ignore the channel header field (which is just 
     // the channel id itself) and the trailer field which 
     // is a crc32 checksum
@@ -496,14 +577,13 @@ impl RBEvent {
     for n in 1..(NCHN +1) {
       // two bytes for the header
       *pos += 2;
-      //println!("channel {n}");
       if active_channels.contains(&(n as u8)) {
-        for k in 0..NWORDS/2 {  
-          event.adc[n -1].push(parse_u16(stream, pos));  
+        for k in 0..NWORDS {  
+          event.adc[n -1].push(0x3FFF & parse_u16(stream, pos));  
         }
       } else {
         // skip ahead a full channel
-        *pos += 1024*2;
+        *pos += NWORDS*2;
       }
       *pos += 4;
     } // end nchn loop
@@ -511,14 +591,56 @@ impl RBEvent {
   }
 }
 
-impl Default for RBEvent {
-
-  fn default () -> Self {
-    RBEvent::new()
+impl Serialization for RBEvent {
+  const HEAD : u16 = 0xAAAA;
+  const TAIL : u16 = 0x5555;
+  
+  fn from_bytestream(stream : &Vec<u8>, pos : &mut usize)
+    -> Result<Self, SerializationError> {
+    let mut event = Self::new();
+    if parse_u16(stream, pos) != Self::HEAD {
+      error!("The given position {} does not point to a valid header signature of {}", pos, Self::HEAD);
+      return Err(SerializationError::HeadInvalid {});
+    }
+    event.header = RBEventHeader::from_bytestream(stream, pos)?;
+    let ch_ids   = event.header.get_active_data_channels();
+    for k in ch_ids.iter() {
+      debug!("Found active data channel {}!", k);
+      // 2*NWORDS because stream is Vec::<u8> and it is 16 bit words.
+      let data = &stream[*pos..*pos+2*NWORDS];
+      // remember, that ch ids are 1..8
+      event.adc[(k-1) as usize] = u8_to_u16(data);
+      *pos += 2*NWORDS;
+    }
+    let tail = parse_u16(stream, pos);
+    //println!("{:?}", &stream[*pos-10..*pos+2]);
+    //println!("{} {}", pos, stream.len());
+    if tail != Self::TAIL {
+      error!("After parsing the event, we found an invalid tail signature {}", tail);
+      return Err(SerializationError::TailInvalid);
+    }
+    Ok(event)
+  }
+  
+  fn to_bytestream(&self) -> Vec<u8> {
+    let mut stream = Vec::<u8>::new();
+    stream.extend_from_slice(&Self::HEAD.to_le_bytes());
+    stream.extend_from_slice(&self.header.to_bytestream());
+    // for an empty channel, we will add an empty vector
+    for k in 0..self.adc.len() {
+      stream.extend_from_slice(&u16_to_u8(&self.adc[k])); 
+    }
+    stream.extend_from_slice(&Self::TAIL.to_le_bytes());
+    stream
   }
 }
 
+impl Default for RBEvent {
 
+  fn default () -> Self {
+    Self::new()
+  }
+}
 
 impl fmt::Display for RBEvent {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -527,6 +649,23 @@ impl fmt::Display for RBEvent {
   }
 }
 
+#[cfg(feature = "random")]
+impl FromRandom for RBEvent {
+    
+  fn from_random() -> Self {
+    let mut event   = RBEvent::new();
+    let header      = RBEventHeader::from_random();
+    let mut rng     = rand::thread_rng();
+    event.header    = header;
+    let ch_ids      = event.header.get_active_data_channels();
+    for k in ch_ids.iter() {
+      debug!("Found active data channel {}!", k);
+      let random_numbers: Vec<u16> = (0..NWORDS).map(|_| rng.gen()).collect();
+      event.adc[(k-1) as usize] = random_numbers;
+    }
+    event
+  }
+}
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct RBEventHeader {
@@ -546,12 +685,9 @@ pub struct RBEventHeader {
 }
 
 impl RBEventHeader {
-  const HEAD : u16 = 0xAAAA;
-  const TAIL : u16 = 0x5555;
-  const SIZE : usize = 34; // size in bytes with HEAD and TAIL
 
-  pub fn new() -> RBEventHeader {
-    RBEventHeader {
+  pub fn new() -> Self {
+    Self {
       channel_mask        : 0 ,  
       stop_cell           : 0 ,  
       crc32               : 0 ,  
@@ -575,11 +711,12 @@ impl RBEventHeader {
   }
 
   pub fn extract_from_rbbinarydump(stream : &Vec<u8>, pos : &mut usize) 
-    -> Result<RBEventHeader, SerializationError> {
+    -> Result<Self, SerializationError> {
     let start = *pos;
     let mut header = RBEventHeader::new();
-    let head_pos   = search_for_u16(RBEventHeader::HEAD, stream, *pos)?; 
-    let tail_pos   = search_for_u16(RBEventHeader::TAIL, stream, head_pos + RBBinaryDump::SIZE -2)?;
+    // we look for headers/tails from RBBinaryDump, not header!
+    let head_pos   = search_for_u16(RBBinaryDump::HEAD, stream, *pos)?; 
+    let tail_pos   = search_for_u16(RBBinaryDump::TAIL, stream, head_pos + RBBinaryDump::SIZE -2)?;
     // At this state, this can be a header or a full event. Check here and
     // proceed depending on the options
     *pos = head_pos + 2;    
@@ -670,14 +807,14 @@ impl RBEventHeader {
 
 impl Default for RBEventHeader {
 
-  fn default() -> RBEventHeader {
-    RBEventHeader::new()
+  fn default() -> Self {
+    Self::new()
   }
 }
 
 impl From<&Path> for RBEventHeader {
-  fn from(path : &Path) -> RBEventHeader {
-    let header =  RBEventHeader::new();
+  fn from(path : &Path) -> Self {
+    let header =  Self::new();
     let file = BufReader::new(File::open(path).expect("Unable to open file {}"));    
     todo!("This is not implemented yet!");
     header
@@ -715,18 +852,15 @@ impl fmt::Display for RBEventHeader {
 }
 
 impl Serialization for RBEventHeader {
+  
+  const HEAD : u16 = 0xAAAA;
+  const TAIL : u16 = 0x5555;
+  const SIZE : usize = 34; // size in bytes with HEAD and TAIL
 
   fn from_bytestream(stream : &Vec<u8>, pos : &mut usize)
-    -> Result<RBEventHeader, SerializationError> {
-    let mut header  = RBEventHeader::new();
-    let head_pos    = search_for_u16(RBEventHeader::HEAD, stream, *pos)?; 
-    let tail_pos    = search_for_u16(RBEventHeader::TAIL, stream, head_pos + RBEventHeader::SIZE-2)?;
-    // At this state, this can be a header or a full event. Check here and
-    // proceed depending on the options
-    if tail_pos + 2 - head_pos != RBEventHeader::SIZE {
-      return Err(SerializationError::EventFragment);
-    }
-    *pos = head_pos + 2;  
+    -> Result<Self, SerializationError> {
+    let mut header  = Self::new();
+    Self::verify_fixed(stream, pos)?;
     header.channel_mask        = parse_u8(stream  , pos);   
     header.stop_cell           = parse_u16(stream , pos);  
     header.crc32               = parse_u32(stream , pos);  
@@ -740,12 +874,13 @@ impl Serialization for RBEventHeader {
     header.rb_id               = parse_u8(stream  , pos);  
     header.timestamp_48        = parse_u64(stream , pos);  
     header.broken              = parse_bool(stream, pos);  
+    *pos += 2; // account for tail earlier 
     Ok(header) 
   }
 
   fn to_bytestream(&self) -> Vec<u8> {
-    let mut stream = Vec::<u8>::with_capacity(RBEventHeader::SIZE);
-    stream.extend_from_slice(&RBEventHeader::HEAD.to_le_bytes());
+    let mut stream = Vec::<u8>::with_capacity(Self::SIZE);
+    stream.extend_from_slice(&Self::HEAD.to_le_bytes());
     stream.extend_from_slice(&self.channel_mask      .to_le_bytes());
     stream.extend_from_slice(&self.stop_cell         .to_le_bytes());
     stream.extend_from_slice(&self.crc32             .to_le_bytes());
@@ -767,7 +902,7 @@ impl Serialization for RBEventHeader {
 #[cfg(feature = "random")]
 impl FromRandom for RBEventHeader {
     
-  fn from_random() -> RBEventHeader {
+  fn from_random() -> Self {
     let mut header = RBEventHeader::new();
     let mut rng = rand::thread_rng();
 
@@ -788,3 +923,39 @@ impl FromRandom for RBEventHeader {
   }
 }
 
+#[cfg(test)]
+mod test_rbevents {
+  use crate::serialization::Serialization;
+  use crate::FromRandom;
+  use crate::events::{RBEvent,
+                      RBMissingHit,
+                      RBBinaryDump,
+                      RBEventHeader};
+  #[test]
+  fn serialization_rbeventheader() {
+    let head = RBEventHeader::from_random();
+    let test = RBEventHeader::from_bytestream(&head.to_bytestream(), &mut 0).unwrap();
+    assert_eq!(head, test);
+  }
+  
+  #[test]
+  fn serialization_rbevent() {
+    let head = RBEvent::from_random();
+    let test = RBEvent::from_bytestream(&head.to_bytestream(), &mut 0).unwrap();
+    assert_eq!(head, test);
+  }
+  
+  #[test]
+  fn serialization_rbmissinghit() {
+    let head = RBMissingHit::from_random();
+    let test = RBMissingHit::from_bytestream(&head.to_bytestream(), &mut 0).unwrap();
+    assert_eq!(head, test);
+  }
+  
+  #[test]
+  fn serialization_rbbinarydump() {
+    let head = RBBinaryDump::from_random();
+    let test = RBBinaryDump::from_bytestream(&head.to_bytestream(), &mut 0).unwrap();
+    assert_eq!(head, test);
+  }
+}

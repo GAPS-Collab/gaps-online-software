@@ -18,7 +18,8 @@ over the network or writing to disk.
 There are two types of test, _unit tests_ and _integration tests_. The former
 are supposed to test the basic units of the code (e.g. functions..) and the 
 latter are supposed to test the interoperability between different parts of the 
-code. Both needs to be run successfully
+code. Both needs to be run successfully.
+To see output of potential `println!` commands, add `-- --nocapture` as an arguemnt.
 
 ## Unit tests
 

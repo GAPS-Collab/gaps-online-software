@@ -84,14 +84,6 @@ pub struct RBMoniData {
 
 impl RBMoniData {
 
-  pub const HEAD : u16 = 0xAAAA;
-  pub const TAIL : u16 = 0x5555;
-  /// The data size when serialized to a bytestream
-  /// This needs to be updated when we change the 
-  /// packet layout, e.g. add new members.
-  /// HEAD + TAIL + sum(sizeof(m) for m in _all_members_))
-  pub const SIZE : usize  = 7 + (36*4) ;
-
   #[cfg(feature = "tof-control")]
   pub fn add_rbtemp(&mut self, rb_temp : &RBtemp) {
     self.tmp_drs         = rb_temp.drs_temp      ; 
@@ -190,7 +182,7 @@ impl RBMoniData {
 
 impl Default for RBMoniData {
   fn default() -> Self {
-    RBMoniData::new()
+    Self::new()
   }
 }
 
@@ -308,6 +300,14 @@ impl FromRandom for RBMoniData {
 
 impl Serialization for RBMoniData {
   
+  const HEAD : u16 = 0xAAAA;
+  const TAIL : u16 = 0x5555;
+  /// The data size when serialized to a bytestream
+  /// This needs to be updated when we change the 
+  /// packet layout, e.g. add new members.
+  /// HEAD + TAIL + sum(sizeof(m) for m in _all_members_))
+  const SIZE : usize  = 7 + (36*4) ;
+  
   fn to_bytestream(&self) -> Vec<u8> {
     let mut stream = Vec::<u8>::with_capacity(RBMoniData::SIZE);
     stream.extend_from_slice(&RBMoniData::HEAD.to_le_bytes());
@@ -356,14 +356,14 @@ impl Serialization for RBMoniData {
   fn from_bytestream(stream    : &Vec<u8>, 
                      pos       : &mut usize) 
     -> Result<RBMoniData, SerializationError>{
-    let mut moni_data = RBMoniData::new();
-    println!("{:?}", stream);
-    let head_pos = search_for_u16(RBMoniData::HEAD, stream, *pos)?; 
-    let tail_pos = search_for_u16(RBMoniData::TAIL, stream, head_pos + RBMoniData::SIZE-2)?;
+    let mut moni_data = Self::new();
+    //println!("{:?}", stream);
+    let head_pos = search_for_u16(Self::HEAD, stream, *pos)?; 
+    let tail_pos = search_for_u16(Self::TAIL, stream, head_pos + RBMoniData::SIZE-2)?;
     // At this state, this can be a header or a full event. Check here and
     // proceed depending on the options
-    if tail_pos + 2 - head_pos != RBMoniData::SIZE {
-      error!("RBMoniData. Seing {} bytes, but expecting {}", tail_pos + 2 - head_pos, RBMoniData::SIZE);
+    if tail_pos + 2 - head_pos != Self::SIZE {
+      error!("RBMoniData. Seing {} bytes, but expecting {}", tail_pos + 2 - head_pos, Self::SIZE);
       *pos = head_pos + 2; 
       return Err(SerializationError::WrongByteSize);
     }
@@ -420,9 +420,6 @@ pub struct TofCmpMoniData {
 }
 
 impl TofCmpMoniData {
-  const SIZE : usize = 7;
-  const HEAD : u16   = 0xAAAA;
-  const TAIL : u16   = 0x5555;
   
   pub fn new() -> TofCmpMoniData {
     TofCmpMoniData {
@@ -450,6 +447,10 @@ impl fmt::Display for TofCmpMoniData {
 }
 
 impl Serialization for TofCmpMoniData {
+  
+  const SIZE : usize = 7;
+  const HEAD : u16   = 0xAAAA;
+  const TAIL : u16   = 0x5555;
 
   fn to_bytestream(&self) -> Vec<u8> {
     let mut stream = Vec::<u8>::with_capacity(TofCmpMoniData::SIZE);
@@ -496,9 +497,6 @@ pub struct MtbMoniData {
 }
 
 impl MtbMoniData {
-  const SIZE : usize = 24;
-  const HEAD : u16   = 0xAAAA;
-  const TAIL : u16   = 0x5555;
   
   pub fn new() -> MtbMoniData {
     MtbMoniData {
@@ -537,28 +535,32 @@ impl fmt::Display for MtbMoniData {
 }
 
 impl Serialization for MtbMoniData {
+  
+  const SIZE : usize = 24;
+  const HEAD : u16   = 0xAAAA;
+  const TAIL : u16   = 0x5555;
 
   fn to_bytestream(&self) -> Vec<u8> {
-    let mut stream = Vec::<u8>::with_capacity(MtbMoniData::SIZE);
-    stream.extend_from_slice(&MtbMoniData::HEAD.to_le_bytes());
+    let mut stream = Vec::<u8>::with_capacity(Self::SIZE);
+    stream.extend_from_slice(&Self::HEAD.to_le_bytes());
     stream.extend_from_slice(&self.fpga_temp   .to_le_bytes());
     stream.extend_from_slice(&self.fpga_vccint .to_le_bytes());
     stream.extend_from_slice(&self.fpga_vccaux .to_le_bytes());
     stream.extend_from_slice(&self.fpga_vccbram.to_le_bytes());
     stream.extend_from_slice(&self.rate        .to_le_bytes());
     stream.extend_from_slice(&self.lost_rate   .to_le_bytes());
-    stream.extend_from_slice(&MtbMoniData::TAIL.to_le_bytes());
+    stream.extend_from_slice(&Self::TAIL.to_le_bytes());
     stream
   }
 
   fn from_bytestream(stream : &Vec<u8>, pos : &mut usize)
     -> Result<MtbMoniData, SerializationError> {
     let mut moni_data = MtbMoniData::new();
-    let head_pos = search_for_u16(MtbMoniData::HEAD, stream, *pos)?; 
-    let tail_pos = search_for_u16(MtbMoniData::TAIL, stream, head_pos + MtbMoniData::SIZE-2)?;
+    let head_pos = search_for_u16(Self::HEAD, stream, *pos)?; 
+    let tail_pos = search_for_u16(Self::TAIL, stream, head_pos + MtbMoniData::SIZE-2)?;
     // At this state, this can be a header or a full event. Check here and
     // proceed depending on the options
-    if tail_pos + 2 - head_pos != MtbMoniData::SIZE {
+    if tail_pos + 2 - head_pos != Self::SIZE {
       error!("MtbMoniData incomplete. Seing {} bytes, but expecting {}", tail_pos + 2 - head_pos, TofCmpMoniData::SIZE);
       //error!("{:?}", &stream[head_pos + 18526..head_pos + 18540]);
       *pos = head_pos + 2; //start_pos += RBBinaryDump::SIZE;
@@ -574,6 +576,21 @@ impl Serialization for MtbMoniData {
     *pos += 2; // since we deserialized the tail earlier and 
               // didn't account for it
     Ok(moni_data)
+  }
+}
+
+#[cfg(test)]
+mod test_monitoring {
+  use crate::serialization::Serialization;
+  use crate::FromRandom;
+  use crate::monitoring::{RBMoniData,
+                          MtbMoniData};
+  
+  #[test]
+  fn serialization_rbmonidata() {
+    let data = RBMoniData::from_random();
+    let test = RBMoniData::from_bytestream(&data.to_bytestream(), &mut 0).unwrap();
+    assert_eq!(data, test);
   }
 }
 

@@ -22,6 +22,10 @@
 //! _Comment_ There is not much error handling for UDP. Most of it is that the IPAddress is wrong, 
 //! in this case it is legimate (and adviced) to panic.
 //! In the case, wher no data was received, this might need some thinking.
+#[cfg(feature="random")]
+use crate::FromRandom;
+#[cfg(feature = "random")]
+use rand::Rng;
 
 use std::net::UdpSocket;
 use std::fmt;
@@ -35,6 +39,8 @@ use crate::serialization::{Serialization,
                            parse_u8,
                            parse_u16,
                            parse_u32};
+
+use crate::events::RBMissingHit;
 
 use crate::manifest::{LocalTriggerBoard,
                       ReadoutBoard};
@@ -126,7 +132,14 @@ impl MasterTriggerMapping {
     mtm
   }
 
+
+
+  /// Map LTBs to the internal mask to identify which 
+  /// LTB has been hit 
+  ///
+  /// LTB id = RAT id
   pub fn construct_ltb_mapping(&mut self) {
+    info!("Construction LTB mapping for {} LTBs", self.ltb_list.len());
     for ltb in &self.ltb_list {
       if ltb.ltb_dsi == 0 && ltb.ltb_j == 0 {
         error!("Found ltb with invalid connection information! {:?}", ltb);
@@ -135,6 +148,10 @@ impl MasterTriggerMapping {
       let index = ((ltb.ltb_dsi - 1) * 5) + (ltb.ltb_j - 1);
       self.ltb_mapping[index as usize] = *ltb;
     }
+    for k in 0..N_LTBS {
+      debug! ("{k} -> {}", self.ltb_mapping[k]);
+    }
+    //panic!("Uff");
   }
 
   /// Mapping trigger LTB board mask - LTB ids
@@ -158,48 +175,114 @@ impl MasterTriggerMapping {
   }
 
 
+  /// Get the rb ids for the hits in the MasterTrigger Event
+  ///
+  /// This is the same as ::get_rb_ids, however, with additional
+  /// debug information.
+  /// It will also emit missing hits.
+  ///
+  /// FIXME - in the future, include a "debug" feature.
+  pub fn get_rb_ids_debug(&self, 
+                          mt_ev   : &MasterTriggerEvent,
+                          verbose : bool)
+    -> (Vec::<(u8,u8)>,Vec::<RBMissingHit>) {
+    let mut missing_hits = Vec::<RBMissingHit>::new();
+    let mut rb_ids       = Vec::<(u8,u8)>::new();
+    if verbose {
+      println!("-- DEBUG - get_rb_ids_debug --");
+      println!("--> MTEV BRD MASK {:?}", mt_ev.board_mask);
+    }
+    let mut board_has_hits : bool;
+    for k in 0..mt_ev.board_mask.len() {
+      board_has_hits = false;
+      if mt_ev.board_mask[k] {
+        let hits = mt_ev.hits[k];//ltb_hit_index];
+        if verbose {
+          println!("--> MTEV HITS {:?}", hits);
+        }
+        // search for corresponding hits in the hit mask
+        for ltb_ch in 0..hits.len() {
+          if hits[ltb_ch] {
+            board_has_hits = true;
+            if verbose {
+              println!("--> Found hit at {ltb_ch} [+1] [LTB CH]");
+              println!("--> LTB REGISTERED FOR THIS HIT {k} {:?} with id {}", self.ltb_mapping[k], self.ltb_mapping[k].ltb_id);
+            }
+            let rb_id = self.ltb_mapping[k].get_rb_id(ltb_ch as u8 +1);
+            if rb_id == 0 {
+              let mut missing       = RBMissingHit::new();
+              missing.event_id      = mt_ev.event_id;
+              missing.ltb_hit_index = k as u8;
+              missing.ltb_id        = self.ltb_mapping[k].ltb_id;
+              missing.ltb_dsi       = self.ltb_mapping[k].ltb_dsi;
+              missing.ltb_j         = self.ltb_mapping[k].ltb_j;
+              missing_hits.push(missing);
+              error!("Got invalid rb_id 0, LTB {} at index {k}", self.ltb_mapping[k]);
+              continue;
+            }
+            let rb_ch = self.ltb_mapping[k].get_rb_ch(ltb_ch as u8 +1);
+            let id_ch = (rb_id, rb_ch);
+            if rb_ids.contains(&id_ch) {
+              continue;
+            } else {
+              rb_ids.push(id_ch);
+            }
+          }
+        }
+        if !board_has_hits {
+          if verbose {
+            println!("--> {}", mt_ev);
+          }
+          let mut missing       = RBMissingHit::new();
+          missing.event_id      = mt_ev.event_id;
+          missing.ltb_hit_index = k as u8;
+          missing.ltb_id        = self.ltb_mapping[k].ltb_id;
+          missing.ltb_dsi       = self.ltb_mapping[k].ltb_dsi;
+          missing.ltb_j         = self.ltb_mapping[k].ltb_j;
+          missing_hits.push(missing);
+          error!("We were expecting hits for LTB {}, but we did not see any!", self.ltb_mapping[k]);
+        }
+      }
+    }
+    (rb_ids,missing_hits)
+  }
+
   /// Return the ids of the readoutboards which are connected to the LTBs which participated in the
   /// trigger.
   pub fn get_rb_ids(&self,
                     mt_ev    : &MasterTriggerEvent)
                     //ltb_mask : &[bool; N_LTBS],
                     //hit_mask : [[bool; N_CHN_PER_LTB]; N_LTBS])
-    -> Vec<u8> {
-    let mut rb_ids = Vec::<u8>::new();
-    let mut ltb_hit_index : usize = 0;
-    //println!("MTEV BRD MASK {:?}", mt_ev.board_mask);
+    -> Vec<(u8, u8)> {
+    let mut rb_ids = Vec::<(u8,u8)>::new();
+    let mut board_has_hits : bool;
     for k in 0..mt_ev.board_mask.len() {
+      board_has_hits = false;
       if mt_ev.board_mask[k] {
         let hits = mt_ev.hits[k];//ltb_hit_index];
-        //println!("MTEV HITS {:?}", hits);
-        for j in 0..hits.len() {
-          if hits[j] {
-            //println!("Found hit at {j}");
-            //println!("LTB REGISTERED FOR THIS HIT {k} {:?} with id {}", self.ltb_mapping[k], self.ltb_mapping[k].ltb_id);
-            let rb_id = self.ltb_mapping[k].get_rb_id(j as u8 +1);
-            
-            if rb_ids.contains(&rb_id) {
+        // search for corresponding hits in the hit mask
+        for ltb_ch in 0..hits.len() {
+          if hits[ltb_ch] {
+            board_has_hits = true;
+            let rb_id = self.ltb_mapping[k].get_rb_id(ltb_ch as u8 +1);
+            if rb_id == 0 {
+              error!("Got invalid rb_id 0, LTB {} at index {k}", self.ltb_mapping[k]);
+              continue;
+            }
+            let rb_ch = self.ltb_mapping[k].get_rb_ch(ltb_ch as u8 +1);
+            let id_ch = (rb_id, rb_ch);
+            if rb_ids.contains(&id_ch) {
               continue;
             } else {
-              rb_ids.push(rb_id);
+              rb_ids.push(id_ch);
             }
           }
         }
-        ltb_hit_index += 1;
+        if !board_has_hits {
+          error!("We were expecting hits for LTB {}, but we did not see any!", self.ltb_mapping[k]);
+        }
       }
     }
-    //  if self.ltb_mapping[k] > 0  {
-    //     
-    //  }
-    //}
-    //let mut ltb_ids = self.get_ltb_ids(ltb_mask);
-    //for k in 0..ltb_ids.len() {
-    //  let ltb_id = ltb_ids[k];
-    //  let ltb_channels = Vec::<u8>::new();
-    //  for hit in hit_mask[k].iter() {
-    //    //ltb_channels 
-    //  }
-    //}
     rb_ids
   } 
 }
@@ -210,7 +293,7 @@ impl MasterTriggerMapping {
 /// crucial information 
 ///
 /// FIXME : implementation of absolute time
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub struct MasterTriggerEvent {
   pub event_id      : u32,
   pub timestamp     : u32,
@@ -246,8 +329,8 @@ impl MasterTriggerEvent {
   const HEAD : u16 = 0xAAAA;
 
   pub fn new(event_id  : u32, 
-             n_paddles : u8) -> MasterTriggerEvent {
-    MasterTriggerEvent {
+             n_paddles : u8) -> Self {
+    Self {
       event_id      : event_id,
       timestamp     : 0,
       tiu_timestamp : 0,
@@ -276,6 +359,9 @@ impl MasterTriggerEvent {
   }
   
   pub fn decode_board_mask(&mut self, mask : u32) {
+    // FIXME -> This basically inverses the order of the LTBs
+    // so bit 0 (rightmost in the mask is the leftmost in the 
+    // array
     for i in 0..N_LTBS {
       self.board_mask[i] = (mask & (1 << i)) != 0;
     }
@@ -370,6 +456,14 @@ impl MasterTriggerEvent {
 }
 
 impl Serialization for MasterTriggerEvent {
+  
+  // 21 + 4 byte board mask + 4*4 bytes hit mask
+  // => 25 + 16 = 41 
+  // + head + tail
+  // 45
+  const SIZE : usize = 45;
+  const TAIL : u16 = 0x5555;
+  const HEAD : u16 = 0xAAAA;
 
   fn to_bytestream(&self) -> Vec::<u8> {
     let mut bs = Vec::<u8>::with_capacity(MasterTriggerEvent::SIZE);
@@ -406,9 +500,9 @@ impl Serialization for MasterTriggerEvent {
                      pos        : &mut usize)
     -> Result<Self, SerializationError> {
     let bs     = bytestream;
-    let mut mt = MasterTriggerEvent::new(0,0);
+    let mut mt = Self::new(0,0);
     let header = parse_u16(bs, pos); 
-    if header != MasterTriggerEvent::HEAD {
+    if header != Self::HEAD {
       return Err(SerializationError::HeadInvalid);
     }
     mt.event_id           = parse_u32(bs, pos);
@@ -428,7 +522,11 @@ impl Serialization for MasterTriggerEvent {
     warn!("This is specific to data written with <= 0.6.0 KIHIKIHI! This is a BUG! It needs to be fixed in future versions! Version 0.6.1 should already fix ::to_bytestream, but leaves a modded ::from_bytestream for current analysis.");
     let tail_a              = parse_u8(bs, pos);
     let tail_b              = parse_u8(bs, pos);
-    if tail_a == 85 && tail_b == 5 {
+    if tail_a == 85 && tail_b == 85 {
+      debug!("Correct tail found!");
+    }
+    else if tail_a == 85 && tail_b == 5 {
+      debug!("Tail for version 0.6.0/0.6.1 found");  
     } else {
       error!("Tail is messed up. See comment for version 0.6.0/0.6.1 in CHANGELOG! We got {} {} but were expecting 85 5", tail_a, tail_b);
       //error!("Got {} for MTE tail signature! Expecting {}", tail, MasterTriggerEvent::TAIL);
@@ -446,12 +544,11 @@ impl Serialization for MasterTriggerEvent {
 
     Ok(mt)
   }
-
 }
 
 impl Default for MasterTriggerEvent {
-  fn default() -> MasterTriggerEvent {
-    MasterTriggerEvent::new(0,0)
+  fn default() -> Self {
+    Self::new(0,0)
   }
 }
 
@@ -464,17 +561,40 @@ impl fmt::Display for MasterTriggerEvent {
   }
 }
 
+#[cfg(feature="random")]
+impl FromRandom for MasterTriggerEvent {
 
-#[derive(Debug, Copy, Clone)]
-pub struct IPBusPacket {
-}
-
-impl IPBusPacket {
-  pub fn new() -> IPBusPacket {
-    todo!();
-    IPBusPacket {}
+  fn from_random() -> Self {
+    let mut event   = Self::new(0,0);
+    let mut rng = rand::thread_rng();
+    event.event_id      = rng.gen::<u32>();
+    event.timestamp     = rng.gen::<u32>();
+    event.tiu_timestamp = rng.gen::<u32>();
+    event.tiu_gps_32    = rng.gen::<u32>();
+    event.tiu_gps_16    = rng.gen::<u32>();
+    event.n_paddles     = rng.gen::<u8>(); 
+    // broken will not get serializad, so this won't
+    // be set randomly here
+    for k in 0..N_LTBS {
+      event.board_mask[k] = rng.gen::<bool>();
+      for j in 0..N_CHN_PER_LTB {
+        event.hits[k][j]  = rng.gen::<bool>();
+      }
+    }
+    event
   }
 }
+
+//#[derive(Debug, Copy, Clone)]
+//pub struct IPBusPacket {
+//}
+//
+//impl IPBusPacket {
+//  pub fn new() -> IPBusPacket {
+//    todo!();
+//    IPBusPacket {}
+//  }
+//}
 
 /// Encode register addresses and values in IPBus packet
 ///
@@ -811,7 +931,6 @@ pub fn decode_hit_mask(hit_mask : u32) -> ([bool;N_CHN_PER_LTB],[bool;N_CHN_PER_
   (decoded_mask_0, decoded_mask_1)
 }
 
-
 /// Read a word from the DAQ package, making sure 
 /// the queue is non-empty
 ///
@@ -917,7 +1036,7 @@ pub fn read_daq(socket : &UdpSocket,
         //println!("HITMASK {:?}", hitmask);
 
         (hits_a, hits_b) = decode_hit_mask(hitmask);
-        
+        // hit mask in reverse order than in the encoded word.    
         hitmasks.push(hits_a);
         hitmasks.push(hits_b);
         //println!("HITMASKS_VEC {:?}", hitmasks);
@@ -974,4 +1093,17 @@ pub fn read_daq(socket : &UdpSocket,
   return Err(Box::new(MasterTriggerError::DAQNotAvailable));
 }
 
+#[cfg(test)]
+mod test_mastertriggerevent {
+  use crate::serialization::Serialization;
+  use crate::FromRandom;
+  use crate::events::MasterTriggerEvent;
+  
+  #[test]
+  fn serialization_mastertriggerevent() {
+    let data = MasterTriggerEvent::from_random();
+    let test = MasterTriggerEvent::from_bytestream(&data.to_bytestream(), &mut 0).unwrap();
+    assert_eq!(data, test);
+  }
+}
 

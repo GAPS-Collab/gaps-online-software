@@ -46,9 +46,6 @@ pub struct ReadoutBoardCalibrations {
 
 impl ReadoutBoardCalibrations {
   //NCHAN*NWORDS*4 + 1 
-  pub const SIZE            : usize = NCHN*NWORDS*4*8 + 4 + 1; 
-  pub const HEAD            : u16   = 0xAAAA; // 43690 
-  pub const TAIL            : u16   = 0x5555; // 21845 
 
   /// Apply the voltage calibration to a single channel 
   ///
@@ -119,6 +116,10 @@ impl ReadoutBoardCalibrations {
     }
   }
 
+  /// Infer the readoutboard id from the filename
+  ///
+  /// Assuming a certain naming scheme for the filename "rbXX_cal.txt"
+  /// we extract the readoutboard id
   pub fn get_id_from_filename(&mut self, filename : &Path) -> u8 {
     let mut rb_id = 0u8;
     match filename.file_name() {
@@ -131,8 +132,10 @@ impl ReadoutBoardCalibrations {
         let fname = name.to_os_string().into_string().unwrap();
         let id    = &fname[2..4];
         rb_id     = id.parse::<u8>().unwrap();
+        debug!("Extracted RB ID {} from filename {}", rb_id, fname);
       }
     }
+  self.rb_id = rb_id;
   rb_id
   }
 
@@ -154,12 +157,16 @@ impl ReadoutBoardCalibrations {
 }
 
 impl Serialization for ReadoutBoardCalibrations {
+  const SIZE            : usize = NCHN*NWORDS*4*8 + 4 + 1; 
+  const HEAD            : u16   = 0xAAAA; // 43690 
+  const TAIL            : u16   = 0x5555; // 21845 
+  
   /// Decode a serializable from a bytestream  
   fn from_bytestream(bytestream : &Vec<u8>, 
                      pos        : &mut usize)
-    -> Result<ReadoutBoardCalibrations, SerializationError> { 
-    let mut rb_cal = ReadoutBoardCalibrations::new(0);
-    if parse_u16(bytestream, pos) != ReadoutBoardCalibrations::HEAD {
+    -> Result<Self, SerializationError> { 
+    let mut rb_cal = Self::new(0);
+    if parse_u16(bytestream, pos) != Self::HEAD {
       return Err(SerializationError::HeadInvalid {});
     }
     let board_id = u8::from_le_bytes([bytestream[*pos]]);
@@ -202,7 +209,7 @@ impl From<&Path> for ReadoutBoardCalibrations {
   fn from(path : &Path) -> ReadoutBoardCalibrations {
     let mut rb_cal = ReadoutBoardCalibrations::new(0);
     rb_cal.get_id_from_filename(&path);
-    info!("Attempting to open file {}", path.display());
+    debug!("Attempting to open file {}", path.display());
     let file = BufReader::new(File::open(path).expect("Unable to open file {}"));
     // count lines and check if we have 4 lines per channel
     let mut cnt  = 0;

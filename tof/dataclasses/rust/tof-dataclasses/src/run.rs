@@ -37,10 +37,7 @@ pub struct RunConfig {
 
 impl RunConfig {
 
-  pub const SIZE               : usize = 18; // bytes
   pub const VERSION            : &'static str = "1.1";
-  pub const HEAD               : u16  = 43690; //0xAAAA
-  pub const TAIL               : u16  = 21845; //0x5555
 
   pub fn new() -> RunConfig {
     RunConfig {
@@ -100,14 +97,15 @@ impl RunConfig {
 }
 
 impl Serialization for RunConfig {
+  const HEAD               : u16  = 43690; //0xAAAA
+  const TAIL               : u16  = 21845; //0x5555
+  const SIZE               : usize = 18; // bytes
   
   fn from_bytestream(bytestream : &Vec<u8>,
                      pos        : &mut usize)
     -> Result<Self, SerializationError> {
-    let mut pars = RunConfig::new();
-    if parse_u16(bytestream, pos) != RunConfig::HEAD {
-      return Err(SerializationError::HeadInvalid {});
-    }
+    let mut pars = Self::new();
+    Self::verify_fixed(bytestream, pos)?;
     pars.nevents    = parse_u32 (bytestream, pos);
     pars.is_active  = parse_bool(bytestream, pos);
     pars.nseconds   = parse_u32 (bytestream, pos);
@@ -120,12 +118,14 @@ impl Serialization for RunConfig {
     pars.active_channel_mask = parse_u8(bytestream, pos);
     pars.data_format = parse_u8(bytestream, pos);
     pars.rb_buff_size = parse_u16(bytestream, pos);
+    *pos += 2; // for the tail 
+    //_ = parse_u16(bytestream, pos);
     Ok(pars)
   }
   
   fn to_bytestream(&self) -> Vec<u8> {
-    let mut stream = Vec::<u8>::with_capacity(RunConfig::SIZE);
-    stream.extend_from_slice(&RunConfig::HEAD.to_le_bytes());
+    let mut stream = Vec::<u8>::with_capacity(Self::SIZE);
+    stream.extend_from_slice(&Self::HEAD.to_le_bytes());
     stream.extend_from_slice(&self.  nevents.to_le_bytes());    
     stream.extend_from_slice(&u8::from(self.  is_active).to_le_bytes());
     stream.extend_from_slice(&self.  nseconds.to_le_bytes());
@@ -138,7 +138,7 @@ impl Serialization for RunConfig {
     stream.push(self.active_channel_mask);
     stream.extend_from_slice(&self.data_format.to_le_bytes());
     stream.extend_from_slice(&self.rb_buff_size.to_le_bytes());
-    stream.extend_from_slice(&RunConfig::TAIL.to_le_bytes());
+    stream.extend_from_slice(&Self::TAIL.to_le_bytes());
     stream
   }
 
@@ -162,8 +162,8 @@ impl Serialization for RunConfig {
 }
 
 impl Default for RunConfig {
-  fn default() -> RunConfig {
-    RunConfig::new()
+  fn default() -> Self {
+    Self::new()
   }
 }
 

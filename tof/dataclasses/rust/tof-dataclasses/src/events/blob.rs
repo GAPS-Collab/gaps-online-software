@@ -31,127 +31,87 @@ use hdf5::filters::blosc_set_nthreads;
 #[cfg(feature = "diagnostics")]
 use hdf5;
 
-/// This contains all information of a raw readout board event which is not channel data
-/// 
-/// The description of this can be found 
-/// [here](https://gitlab.com/ucla-gaps-tof/firmware/-/tree/develop/)
-pub struct RBEventHeader {
-  pub status          : u16,
-  pub len             : u16,
-  pub roi             : u16,
-  pub dna             : u16, 
-  pub fw_hash         : u16,
-  pub id              : u8,   
-  pub ch_mask         : u8,
-  pub event_id        : u32,
-  pub dtap0           : u16,
-  pub drstemp         : u16,
-  pub timestamp_32    : u32,
-  pub timestamp_16    : u16,
-  pub stop_cell       : u16,
-  pub crc32           : u32,
-}
-
-impl Serialization for RBEventHeader {
-  
-  fn from_bytestream(bytestream : &Vec<u8>,
-                     pos        : &mut usize) 
-    -> Result<RBEventHeader, SerializationError> {
-    let head_pos = search_for_u16(RBEventHeader::HEAD, bytestream, *pos)?; 
-    *pos = head_pos;
-    let head = parse_u16(&bytestream, pos);
-    if head != RBEventHeader::HEAD {
-      return Err(SerializationError::HeadInvalid);
-    }
-    let mut event_header = RBEventHeader::new();
-    *pos = head_pos + 2;
-    event_header.status  = parse_u16(&bytestream, pos); 
-    event_header.len     = parse_u16(&bytestream, pos);
-    event_header.roi     = parse_u16(&bytestream, pos);
-    println!("<head {}, status {}, len {}, roi {}",head, event_header.status, event_header.len, event_header.roi);
-    //raw_bytes_2  = [bytestream[pos],bytestream[pos + 1]];
-    //pos   += 2;
-    //event_header.len     = u16::from_le_bytes(raw_bytes_2); 
-    //
-    //raw_bytes_2  = [bytestream[pos],bytestream[pos + 1]];
-    //pos   += 2;
-    //event_header.roi     = u16::from_le_bytes(raw_bytes_2); 
-
-
-    let tail_pos = head_pos + RBEventHeader::SIZE;
-    let tail =  u16::from_le_bytes([bytestream[tail_pos],
-                                    bytestream[tail_pos+1]]);
-    //if tail != RBEventHeader::TAIL {
-    //  return Err(SerializationError::WrongByteSize);
-    //}
-    Ok(event_header)
-  }
-}
-
-
-impl RBEventHeader {
-  const SIZE : usize = 32;
-  const HEAD : u16   = 0xaaaa;
-  const TAIL : u16   = 0x5555;
-
-  pub fn new() -> RBEventHeader {
-    RBEventHeader {
-      status          : 0,
-      len             : 0,
-      roi             : 0,
-      dna             : 0, 
-      fw_hash         : 0,
-      id              : 0,   
-      ch_mask         : 0,
-      event_id        : 0,
-      dtap0           : 0,
-      drstemp         : 0,
-      timestamp_32    : 0,
-      timestamp_16    : 0,
-      stop_cell       : 0,
-      crc32           : 0,
-    }
-  }
-}
-
-
-/***********************************/
-
-//#[derive(Debug, Clone)]
-//pub struct ReducedRBEvent {
+///// This contains all information of a raw readout board event which is not channel data
+///// 
+///// The description of this can be found 
+///// [here](https://gitlab.com/ucla-gaps-tof/firmware/-/tree/develop/)
+//pub struct RBEventHeader {
+//  pub status          : u16,
 //  pub len             : u16,
 //  pub roi             : u16,
+//  pub dna             : u16, 
+//  pub fw_hash         : u16,
+//  pub id              : u8,   
+//  pub ch_mask         : u8,
 //  pub event_id        : u32,
-//  pub timestamp       : u64,
+//  pub dtap0           : u16,
+//  pub drstemp         : u16,
+//  pub timestamp_32    : u32,
+//  pub timestamp_16    : u16,
+//  pub stop_cell       : u16,
+//  pub crc32           : u32,
+//}
 //
-//  // these are NOT in the official blob format
-//  // these will NOT be able to be deserialized from
-//  // a standard readoutboard blob file
-//  pub voltages           : [[f64;NWORDS];NCHN],
-//  pub nanoseconds        : [[f64;NWORDS];NCHN],
+//impl Serialization for RBEventHeader {
 //  
-//  // these values are for baseline 
-//  // subtraction, cfd calculation etc.
-//  pub threshold      : [f64;NCHN],
-//  pub cfds_fraction  : [f64;NCHN],
-//  pub ped_begin_bin  : [usize;NCHN],
-//  pub ped_bin_range  : [usize;NCHN],    
-//  pub pedestal       : [f64;NCHN],
-//  pub pedestal_sigma : [f64;NCHN],
+//  fn from_bytestream(bytestream : &Vec<u8>,
+//                     pos        : &mut usize) 
+//    -> Result<RBEventHeader, SerializationError> {
+//    let head_pos = search_for_u16(RBEventHeader::HEAD, bytestream, *pos)?; 
+//    *pos = head_pos;
+//    let head = parse_u16(&bytestream, pos);
+//    if head != RBEventHeader::HEAD {
+//      return Err(SerializationError::HeadInvalid);
+//    }
+//    let mut event_header = RBEventHeader::new();
+//    *pos = head_pos + 2;
+//    event_header.status  = parse_u16(&bytestream, pos); 
+//    event_header.len     = parse_u16(&bytestream, pos);
+//    event_header.roi     = parse_u16(&bytestream, pos);
+//    println!("<head {}, status {}, len {}, roi {}",head, event_header.status, event_header.len, event_header.roi);
+//    //raw_bytes_2  = [bytestream[pos],bytestream[pos + 1]];
+//    //pos   += 2;
+//    //event_header.len     = u16::from_le_bytes(raw_bytes_2); 
+//    //
+//    //raw_bytes_2  = [bytestream[pos],bytestream[pos + 1]];
+//    //pos   += 2;
+//    //event_header.roi     = u16::from_le_bytes(raw_bytes_2); 
 //
-//  // fields used for internal calculations
-//  pub peaks      : [[usize;MAX_NUM_PEAKS];NCHN],
-//  pub tdcs       : [[f64;MAX_NUM_PEAKS];NCHN],
-//  pub charge     : [[f64;MAX_NUM_PEAKS];NCHN],
-//  pub width      : [[f64;MAX_NUM_PEAKS];NCHN], 
-//  pub height     : [[f64;MAX_NUM_PEAKS];NCHN],    
-//  pub num_peaks  : [usize;NCHN],
-//  //pub stop_cell  : [u16;NCHN],
-//  pub begin_peak : [[usize;MAX_NUM_PEAKS];NCHN],
-//  pub end_peak   : [[usize;MAX_NUM_PEAKS];NCHN],
-//  pub spikes     : [[usize;MAX_NUM_PEAKS];NCHN],
-//  
-//  pub impedance  : f64,
+//
+//    let tail_pos = head_pos + RBEventHeader::SIZE;
+//    let tail =  u16::from_le_bytes([bytestream[tail_pos],
+//                                    bytestream[tail_pos+1]]);
+//    //if tail != RBEventHeader::TAIL {
+//    //  return Err(SerializationError::WrongByteSize);
+//    //}
+//    Ok(event_header)
+//  }
+//}
+//
+//
+//impl RBEventHeader {
+//  const SIZE : usize = 32;
+//  const HEAD : u16   = 0xaaaa;
+//  const TAIL : u16   = 0x5555;
+//
+//  pub fn new() -> RBEventHeader {
+//    RBEventHeader {
+//      status          : 0,
+//      len             : 0,
+//      roi             : 0,
+//      dna             : 0, 
+//      fw_hash         : 0,
+//      id              : 0,   
+//      ch_mask         : 0,
+//      event_id        : 0,
+//      dtap0           : 0,
+//      drstemp         : 0,
+//      timestamp_32    : 0,
+//      timestamp_16    : 0,
+//      stop_cell       : 0,
+//      crc32           : 0,
+//    }
+//  }
 //}
 
 /***********************************/
@@ -1272,7 +1232,4 @@ mod test_readoutboard_blob {
     assert_eq!(bytestream,read_back_bytes);
   }
 }
-
-
-
 

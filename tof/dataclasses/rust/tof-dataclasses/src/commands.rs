@@ -444,16 +444,21 @@ impl From<(u8, u32)> for TofCommand {
 }
 
 impl Serialization for TofCommand {
-
-  ///
-  //fn to_slice(&self) -> &[u8] {
-  //  let mut slice = [0u8;TofCommand::SIZE];
-  //  &slice
-  //}
+  
+  const HEAD : u16 = 0xAAAA;
+  const TAIL : u16 = 0x5555;
+  ///// The size of TofCommand when 
+  ///// in byte representation is 
+  ///// fixed:
+  ///// it is 4 bytes (header/footer)
+  ///// + 1 byte command code
+  ///// + 4 bytes value
+  ///// => 9 bytes
+  const SIZE : usize = 9; 
 
   fn from_bytestream(stream    : &Vec<u8>, 
                      pos       : &mut usize) 
-    -> Result<TofCommand, SerializationError>{
+    -> Result<Self, SerializationError>{
   
     //let mut pos      = start_pos; 
     let mut two_bytes : [u8;2];
@@ -461,7 +466,7 @@ impl Serialization for TofCommand {
     two_bytes = [stream[*pos],
                  stream[*pos+1]];
     *pos += 2;
-    if TofCommand::HEAD != u16::from_le_bytes(two_bytes) {
+    if Self::HEAD != u16::from_le_bytes(two_bytes) {
       error!("Packet does not start with HEAD signature");
       return Err(SerializationError::HeadInvalid {});
     }
@@ -477,8 +482,8 @@ impl Serialization for TofCommand {
     two_bytes = [stream[*pos],
                  stream[*pos+1]];
     let pair    = (cc, value);
-    let command = TofCommand::from(pair);
-    if TofCommand::TAIL != u16::from_le_bytes(two_bytes) {
+    let command = Self::from(pair);
+    if Self::TAIL != u16::from_le_bytes(two_bytes) {
       error!("Packet does not end with TAIL signature");
       return Err(SerializationError::TailInvalid {});
     }
@@ -561,6 +566,9 @@ impl TofResponse {
 }
 
 impl Serialization for TofResponse {
+  const HEAD : u16 = 0xAAAA;
+  const TAIL : u16 = 0x5555;
+  const SIZE : usize = 0; //FIXME
 
   fn from_bytestream(stream    : &Vec<u8>, 
                      pos       : &mut usize) 
