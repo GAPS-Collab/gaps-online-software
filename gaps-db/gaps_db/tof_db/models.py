@@ -86,6 +86,11 @@ class LTB(models.Model):
 
         return ch_to_rb
 
+    def is_populated(self):
+        if self.ltb_dsi is None:
+            return False
+        return True
+
     def set_channels_to_rb(self, data):
         """
         Set a mapping for each ltb channel.
@@ -94,7 +99,7 @@ class LTB(models.Model):
             data (dict) : Mapping {LTB CHANNEL -> [RB, RB_CHAN]}
         """
         for ltb_ch in data:
-            setattr(eelf,f'ltb_ch{ltb_ch}_rb', data[ltb_ch][0])
+            setattr(self,f'ltb_ch{ltb_ch}_rb', data[ltb_ch][0])
             setattr(self,f'ltb_ch{ltb_ch}_rb_ch', data[ltb_ch][1])
 
     def __str__(self):
@@ -298,7 +303,21 @@ class DSICard(models.Model):
     j3_rat_id       = models.PositiveSmallIntegerField(null=True)
     j4_rat_id       = models.PositiveSmallIntegerField(null=True)
     j5_rat_id       = models.PositiveSmallIntegerField(null=True)
-   
+  
+    def add_rat_id_for_j(self, j, rat):
+        if j == 1:
+            self.j1_rat_id = rat
+        elif j == 2:
+            self.j2_rat_id = rat
+        elif j == 3:
+            self.j3_rat_id = rat
+        elif j == 4:
+            self.j4_rat_id = rat
+        elif j == 5:
+            self.j5_rat_id = rat
+        else:
+            raise ValueError(f'Do not have J connector with id {j}')
+
     def add_from_spreadsheet(self, data, card_id):
         """
         Fill the values from a spreadsheet. There is a caveat. Due to the dataformat in the 
@@ -358,7 +377,13 @@ class RAT(models.Model):
         self.pb_id                     = int(data['PB'])
         self.rb1_id                    = int(data['RB1'])
         self.rb2_id                    = int(data['RB2'])
-        self.ltb_id                    = int(data['LTB'])
+        #self.ltb_id                    = int(data['LTB'])
+        # The actual ltb_id is not used!
+        # This is a weird quirk, see my conversation with Sydney:
+        # Achim: No worries! Thanks for you answer (also I was busy with meetings this morning). That sounds good, however, I am still confused, sorry for being a bit slow with this. I was wondering about LTB 8. The reason why I am asking is that in the RAT table, it says RAT 8 has RB1 and 11 (as you also said) but then it says LTB 1, but in the "Paddle End Master Spreadsheet" column "I" it says "RAT number = LTB number", so should the LTB in RAT 8 be 1 or 8?  The reason why I need to know is because I get the trigger mask from the MTB, but it is a descriptor of LTBs which have triggered, so I need to make the connection LTB id - >LTB channel -> RB id -> RB channel. I do have this relation implemented, but something is not consistent, so I am currently hunting this bug, so I am just double checking everything. Thanks a lot for your help!
+        #  4:02 PM
+        # Sydney:  oh, I see where your confusion is!in the RAT table, I list all the board ID numbers for the PB, RBs, and LTB inside each RAT. for the RBs and PBs, these board IDs are significant (for the RBs, it distinguishes which ip address the data will come out on. for the PBs, we will implement unique lookup tables that associate ADC values with actual measured voltages).However, for our LTBs, the board ID number listed in the RAT table is just so that I can keep track of each of the 22 LTBs that we have. the LTB board ID doesn't matter at all for data taking and control; each board behaves exactly the same way, uses the same firmware, is controlled identically.what does matter is the location of the LTB, and in particular which RAT the LTB is inside of (because this determines which paddles are connected and triggering). that is why in the paddle master spreadsheet, the LTB channel is just listed with the associated RAT.so, in conclusion, you should be able to completely ignore the LTB column of the RAT table
+        self.ltb_id                    = self.rat_id
         self.ltb_harting_cable_length  = int(data['LTB Harting cable length'].split(' ')[0])
 
     def __str__(self):
