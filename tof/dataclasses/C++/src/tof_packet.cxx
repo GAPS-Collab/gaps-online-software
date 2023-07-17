@@ -1,6 +1,6 @@
 #include "spdlog/spdlog.h"
 
-#include "packets/TofPacket.h"
+#include "packets/tof_packet.h"
 #include "serialization.h"
 
 

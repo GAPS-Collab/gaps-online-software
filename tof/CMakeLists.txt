@@ -92,7 +92,7 @@ endif(BUILD_RBEMULATOR)
 set(GAPSTOF_LIBRARY_SHARED GapsTof CACHE INTERNAL "GapsTof shared library" FORCE)
 add_library(${GAPSTOF_LIBRARY_SHARED}
     SHARED dataclasses/C++/src/blobroutines.cpp 
-    dataclasses/C++/src/TofPacket.cxx
+    dataclasses/C++/src/tof_packet.cxx
     dataclasses/C++/src/REventPacket.cxx
     dataclasses/C++/src/RPaddlePacket.cxx
     dataclasses/C++/src/WfPaddlePacket.cxx

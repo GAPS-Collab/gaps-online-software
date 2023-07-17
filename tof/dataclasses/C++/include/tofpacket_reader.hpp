@@ -4,7 +4,7 @@
 #include <fstream>
 
 #include "tof_typedefs.h"
-#include "packets/TofPacket.h"
+#include "packets/tof_packet.h"
 
 namespace Gaps {
 

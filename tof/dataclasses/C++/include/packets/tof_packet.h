@@ -6,18 +6,18 @@
 
 #include "tof_typedefs.h"
 
-static const u8 PACKET_TYPE_UNKNOWN    =  0;
-static const u8 PACKET_TYPE_COMMAND    = 10;
-static const u8 PACKET_TYPE_RBEVENT    = 20;
-static const u8 PACKET_TYPE_TOFEVENT   = 21;
-static const u8 PACKET_TYPE_MONITOR    = 30;
-static const u8 PACKET_TYPE_HEARTBEAT  = 40;
-static const u8 PACKET_TYPE_SCALAR     = 50;
-static const u8 PACKET_TYPE_MT         = 60;
-static const u8 PACKET_TYPE_RBHEADER      = 70;
-static const u8 PACKET_TYPE_TOFCMP_MONI   = 80;
-static const u8 PACKET_TYPE_MTB_MONI      = 90;
-static const u8 PACKET_TYPE_RB_MONI       = 100;
+static const u8 PACKET_TYPE_UNKNOWN     =  0;
+static const u8 PACKET_TYPE_COMMAND     = 10;
+static const u8 PACKET_TYPE_RBEVENT     = 20;
+static const u8 PACKET_TYPE_TOFEVENT    = 21;
+static const u8 PACKET_TYPE_MONITOR     = 30;
+static const u8 PACKET_TYPE_HEARTBEAT   = 40;
+static const u8 PACKET_TYPE_SCALAR      = 50;
+static const u8 PACKET_TYPE_MT          = 60;
+static const u8 PACKET_TYPE_RBHEADER    = 70;
+static const u8 PACKET_TYPE_TOFCMP_MONI = 80;
+static const u8 PACKET_TYPE_MTB_MONI    = 90;
+static const u8 PACKET_TYPE_RB_MONI     = 100;
 
 enum PacketType : u8 {
   Unknown       = PACKET_TYPE_UNKNOWN,
@@ -64,9 +64,9 @@ struct TofPacket {
   // not including type, header or tail
   u32 payload_size;
 
-  vec_u8 payload;
+  Vec<u8> payload;
 
-  vec_u8 to_bytestream() const;
+  Vec<u8> to_bytestream() const;
 
   /**
    * Transcode from bytestream

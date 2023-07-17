@@ -9,7 +9,7 @@
 
 #include "packets/REventPacket.h"
 #include "packets/RPaddlePacket.h"
-#include "packets/TofPacket.h"
+#include "packets/tof_packet.h"
 #include "packets/CommandPacket.h"
 #include "packets/MasterTriggerPacket.h"
 #include "packets/monitoring.h"
@@ -462,7 +462,7 @@ double calculate_pedestal_helper(vec_f64 wave,
 
 /********************/
 
-std::vector<TofPacket> get_tofpackets_from_stream(vec_u8 bytestream, u64 start_pos) {
+Vec<TofPacket> get_tofpackets_from_stream(Vec<u8> bytestream, u64 start_pos) {
   std::vector<TofPacket> packets;
   u64 pos  = start_pos;
   // just make sure in the beginning they

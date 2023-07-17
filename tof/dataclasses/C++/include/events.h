@@ -2,8 +2,10 @@
 #define TOFEVENTS_H_INCLUDED
 
 #include "tof_typedefs.h"
+#include "packets/monitoring.h"
 
-class RBEventHeader;
+struct RBEventHeader;
+struct RBEvent;
 
 /**
  * Extract only event ids from a bytestream with raw readoutboard binary data
@@ -70,5 +72,81 @@ struct RBEventHeader {
   private:
     f32 drs_adc_to_celsius(u16 adc) const; 
 };
+
+/**
+ * A complete event for a single readout board 
+ * with header and channel data
+ *
+ *
+ */ 
+struct RBEvent {
+  static const u16 HEAD = 0xAAAA;
+  static const u16 TAIL = 0x5555;
+  
+  RBEventHeader header;
+  Vec<Vec<u16>> adc; 
+  
+  static RBEvent from_bytestream(const Vec<u8> &bytestream,
+                                 u64 &pos);
+};
+
+struct RBMissingHit {
+  
+  static const u16 HEAD = 0xAAAA;
+  static const u16 TAIL = 0x5555;
+  static const usize SIZE = 15; // bytes
+  
+  u32 event_id     ;  
+  u8  ltb_hit_index;  
+  u8  ltb_id       ;  
+  u8  ltb_dsi      ;  
+  u8  ltb_j        ;  
+  u8  ltb_ch       ;  
+  u8  rb_id        ;  
+  u8  rb_ch        ;  
+
+  static RBMissingHit from_bytestream(const Vec<u8> &bytestream,
+                                      u64 &pos);
+};
+
+static const u8 EVENT_QUALITY_UNKNOWN         =  0;
+static const u8 EVENT_QUALITY_SILVER          =  10;
+static const u8 EVENT_QUALITY_GOLD            =  20;
+static const u8 EVENT_QUALITY_DIAMOND         =  30;
+static const u8 EVENT_QUALITY_FOURLEAFCLOVER  =  40;
+
+enum class EventQuality : u8 {
+  Unknown        = EVENT_QUALITY_UNKNOWN,
+  Silver         = EVENT_QUALITY_SILVER,
+  Gold           = EVENT_QUALITY_GOLD,
+  Diamond        = EVENT_QUALITY_DIAMOND,
+  FourLeafClover = EVENT_QUALITY_FOURLEAFCLOVER
+};
+
+std::ostream& operator<<(std::ostream& os, const EventQuality& qual);
+
+static const u8 COMPRESSION_LEVEL_UNKNOWN         =  0;
+static const u8 COMPRESSION_LEVEL_NONE            =  10;
+
+enum class CompressionLevel : u8 {
+  Unknown        = COMPRESSION_LEVEL_UNKNOWN,
+  None           = COMPRESSION_LEVEL_NONE,
+};
+
+std::ostream& operator<<(std::ostream& os, const CompressionLevel& level);
+
+struct TofEvent {
+  static const u16 HEAD = 0xAAAA;
+  static const u16 TAIL = 0x5555;
+
+  //MasterTriggerEvent
+  //Vec<RBEvent>      rb_events;
+  Vec<RBMissingHit> missing_hits;
+  Vec<RBMoniData>   rb_moni_data;
+
+  static TofEvent from_bytestream(const Vec<u8> &bytestream,
+                                  u64 &pos);
+};
+
 
 #endif 
