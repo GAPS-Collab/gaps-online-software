@@ -34,7 +34,7 @@ pub mod tests {
           n_good += 1;
         },
         Err(err)  => {
-          println!("error decoding RBBinaryDump, err {err}");
+          //println!("error decoding RBBinaryDump, err {err}");
           n_broken += 1;
           pos += 1;
           //break;

@@ -23,7 +23,7 @@ struct MasterTriggerPacket {
   u32 gps_timestamp_16; 
   u32 board_mask      ;
   u8  n_paddles       ;
-  vec_u32 hits        ;
+  Vec<u32> hits       ;
   u32 crc             ;
  
   /**
