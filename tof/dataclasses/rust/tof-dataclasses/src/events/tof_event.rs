@@ -192,8 +192,6 @@ impl EventQuality {
     }
     repr
   }
-
-
 }
 
 #[derive(Debug, Clone, PartialEq)]

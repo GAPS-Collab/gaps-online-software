@@ -29,7 +29,8 @@ use crate::serialization::{Serialization,
 use crate::errors::SerializationError;
 use crate::events::{RBEventPayload,
                     RBEventHeader,
-                    MasterTriggerEvent};
+                    MasterTriggerEvent,
+                    MasterTofEvent};
 
 pub enum PacketQuality {
   Perfect,
@@ -264,6 +265,15 @@ impl TofPacket {
 
   //  }
 
+}
+
+impl From<&MasterTofEvent> for TofPacket {
+  fn from(event : &MasterTofEvent) -> Self {
+    let mut tp = Self::new();
+    tp.packet_type = PacketType::TofEvent;
+    tp.payload = event.to_bytestream();
+    tp
+  }
 }
 
 impl From<&MasterTriggerEvent> for TofPacket {

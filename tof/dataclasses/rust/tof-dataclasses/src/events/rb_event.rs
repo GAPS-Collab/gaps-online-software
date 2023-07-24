@@ -510,7 +510,6 @@ impl RBChannelData {
 ///
 #[derive(Debug, Clone, PartialEq)]
 pub struct RBEvent {
-
   pub header   : RBEventHeader,
   pub adc      : Vec<Vec<u16>>,
 }
