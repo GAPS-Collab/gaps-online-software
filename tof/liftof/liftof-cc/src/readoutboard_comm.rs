@@ -17,14 +17,15 @@ use ndarray::{arr1};
 use liftof_lib::analyze_blobs;
 
 use tof_dataclasses::manifest::ReadoutBoard;
-use tof_dataclasses::packets::PacketType;
-use tof_dataclasses::packets::paddle_packet::PaddlePacket;
+use tof_dataclasses::packets::{TofPacket,
+                               PacketType,
+                               PaddlePacket};
 use tof_dataclasses::calibrations::{Calibrations,
+                                    ReadoutBoardCalibrations,
                                     read_calibration_file};
 use tof_dataclasses::constants::NCHN;
 
 use tof_dataclasses::commands::TofResponse;
-use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::serialization::Serialization;
 
 
@@ -74,11 +75,13 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
   let mut n_chunk  = 0usize;
   // in case we want to do calibratoins
   let mut calibrations = [Calibrations {..Default::default()};NCHN];
+  let mut _calibrations = ReadoutBoardCalibrations::new(&rb.rb_id);
   let do_calibration = true;
   if do_calibration {
     info!("Reading calibrations from file {}", &rb.calib_file);
     let cal_file_path = Path::new(&rb.calib_file);//calibration_file);
     calibrations = read_calibration_file(cal_file_path); 
+    _calibrations = ReadoutBoardCalibrations::from(cal_file_path);
   }
   let address = "tcp://".to_owned() 
               + &rb.ip_address.to_string()

@@ -1,8 +1,20 @@
 # KIHIKIHI series
 
 # v0.6.0
+* --calibration command line flag triggers
+  remote calibration of boards
+* --replay <Path> allows to replay previously
+  recorded rb binary data
+* compression level 1 : RBs will only send the 
+  channels they have been informed on by the 
+  MTB to be active.
 
 # UHU series
+
+# v0.5.2
+* fixes a critical bug in [liftof-rb] which mingled the 
+  vcal,tcal and noi settings, which lead to unpredictable
+  file size.
 
 # v0.5.1
 * introduction of a run number, paths for raw data as 

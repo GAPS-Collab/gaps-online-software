@@ -250,7 +250,7 @@ fn main() {
     } else {
       match fs::create_dir(&raw_files_path) {
         Ok(())   => println!("=> Created {} to save raw (blob) data", raw_files_path.display()),
-        Err(err) => panic!("Failed to create directory: {}", raw_files_path.display()),
+        Err(err) => panic!("Failed to create directory: {}, err {}", raw_files_path.display(), err),
       }
     }
   }
