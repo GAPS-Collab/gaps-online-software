@@ -14,6 +14,7 @@
 #include "packets/MasterTriggerPacket.h"
 #include "packets/monitoring.h"
 
+#include "io.hpp"
 #include "serialization.h"
 #include "calibration.h"
 #include "blobroutines.h"
@@ -462,27 +463,6 @@ double calculate_pedestal_helper(vec_f64 wave,
 
 /********************/
 
-Vec<TofPacket> get_tofpackets_from_stream(Vec<u8> bytestream, u64 start_pos) {
-  std::vector<TofPacket> packets;
-  u64 pos  = start_pos;
-  // just make sure in the beginning they
-  // are not the same
-  u64 last_pos = start_pos += 1;
-  TofPacket packet;
-  while (true) {
-    last_pos = pos;
-    pos = packet.from_bytestream(bytestream, pos);
-    if (pos != last_pos) {
-      packets.push_back(packet);
-    } else {
-      break;
-    }
-  }
-  return packets;
-}
-
-/********************/
-
 
 PYBIND11_MODULE(gaps_tof, m) {
     m.doc() = "GAPS Tof dataclasses and utility tools";
@@ -635,11 +615,47 @@ PYBIND11_MODULE(gaps_tof, m) {
     py::class_<RBMoniData>(m, "RBMoniData",
             "Packet with monitoring data from the individual readout boards.")
         .def(py::init())
-        .def("from_bytestream",   &RBMoniData::from_bytestream)
-        .def_readonly("rate",     &RBMoniData::rate)
-        .def("__repr__",          [](const RBMoniData &pk) {
-                                  return "<RBMoniData : rate : [Hz]"
-                                    + std::to_string(pk.rate) + ">";
+        .def("from_bytestream",          &RBMoniData::from_bytestream)
+        .def_readonly("rate",            &RBMoniData::rate)
+        .def_readonly("board_id",        &RBMoniData::board_id)           
+        .def_readonly("tmp_drs",         &RBMoniData::tmp_drs)           
+        .def_readonly("tmp_clk",         &RBMoniData::tmp_clk)           
+        .def_readonly("tmp_adc",         &RBMoniData::tmp_adc)           
+        .def_readonly("tmp_zynq",        &RBMoniData::tmp_zynq)           
+        .def_readonly("tmp_lis3mdltr",   &RBMoniData::tmp_lis3mdltr)           
+        .def_readonly("tmp_bm280",       &RBMoniData::tmp_bm280)           
+        .def_readonly("pressure",        &RBMoniData::pressure)           
+        .def_readonly("humidity",        &RBMoniData::humidity)           
+        .def_readonly("mag_x",           &RBMoniData::mag_x)           
+        .def_readonly("mag_y",           &RBMoniData::mag_y)           
+        .def_readonly("mag_z",           &RBMoniData::mag_z)           
+        .def_readonly("mag_tot",         &RBMoniData::mag_tot)           
+        .def_readonly("drs_dvdd_voltage",&RBMoniData::drs_dvdd_voltage)           
+        .def_readonly("drs_dvdd_current",&RBMoniData::drs_dvdd_current)           
+        .def_readonly("drs_dvdd_power",  &RBMoniData::drs_dvdd_power)           
+        .def_readonly("p3v3_voltage",    &RBMoniData::p3v3_voltage)           
+        .def_readonly("p3v3_current",    &RBMoniData::p3v3_current)           
+        .def_readonly("p3v3_power",      &RBMoniData::p3v3_power)           
+        .def_readonly("zynq_voltage",    &RBMoniData::zynq_voltage)           
+        .def_readonly("zynq_current",    &RBMoniData::zynq_current)           
+        .def_readonly("zynq_power",      &RBMoniData::zynq_power)           
+        .def_readonly("p3v5_voltage",    &RBMoniData::p3v5_voltage)           
+        .def_readonly("p3v5_current",    &RBMoniData::p3v5_current)           
+        .def_readonly("p3v5_power",      &RBMoniData::p3v5_power)           
+        .def_readonly("adc_dvdd_voltage",&RBMoniData::adc_dvdd_voltage)           
+        .def_readonly("adc_dvdd_current",&RBMoniData::adc_dvdd_current)           
+        .def_readonly("adc_dvdd_power",  &RBMoniData::adc_dvdd_power)           
+        .def_readonly("adc_avdd_voltage",&RBMoniData::adc_avdd_voltage)           
+        .def_readonly("adc_avdd_current",&RBMoniData::adc_avdd_current)           
+        .def_readonly("adc_avdd_power",  &RBMoniData::adc_avdd_power)           
+        .def_readonly("drs_avdd_voltage",&RBMoniData::adc_avdd_power)           
+        .def_readonly("drs_avdd_current",&RBMoniData::drs_avdd_current)           
+        .def_readonly("drs_avdd_power",  &RBMoniData::drs_avdd_power)           
+        .def_readonly("n1v5_voltage",    &RBMoniData::n1v5_voltage)                 
+        .def_readonly("n1v5_current",    &RBMoniData::n1v5_current)                 
+        .def_readonly("n1v5_power",      &RBMoniData::n1v5_power)                     
+        .def("__repr__",          [](const RBMoniData &moni) {
+                                  return rbmoni_to_string(moni);
                                   }) 
     ;
 
@@ -651,8 +667,8 @@ PYBIND11_MODULE(gaps_tof, m) {
         .def("is_broken"                    ,&REventPacket::is_broken)
         .def("reset"                        ,&REventPacket::reset)
         .def("add_paddle_packet"            ,&REventPacket::add_paddle_packet)
-    .def("is_broken"                    ,&REventPacket::is_broken)
-    .def_readwrite("event_id"           ,&REventPacket::event_ctr)
+        .def("is_broken"                    ,&REventPacket::is_broken)
+        .def_readwrite("event_id"           ,&REventPacket::event_ctr)
         .def_readwrite("n_paddles"          ,&REventPacket::n_paddles)
         .def_readwrite("timestamp_32"       ,&REventPacket::timestamp_32)
         .def_readwrite("timestamp_16"       ,&REventPacket::timestamp_16)
@@ -835,39 +851,46 @@ PYBIND11_MODULE(gaps_tof, m) {
    py::class_<Calibrations_t>(m, "Calibrations")
        .def(py::init())
    ;
-   m.def("get_tofpackets_from_stream",   &get_tofpackets_from_stream);
+   
+   // I/O functions
+   m.def("get_tofpackets", &wrap_get_tofpacket_from_stream, "Get TofPackets from list of bytes");
+   m.def("get_tofpackets", &wrap_get_tofpacket_from_file, "Get TofPackets from a file on disk");
    m.def("get_event_ids_from_raw_stream", &get_event_ids_from_raw_stream);
    m.def("get_bytestream_from_file",     &get_bytestream_from_file);
-   // serialization functions
-   m.def("decode_u16",         &decode_ushort);
-   m.def("encode_u16",         &wrap_encode_ushort);
-   m.def("encode_ushort_rev",     &wrap_encode_ushort_rev);
+   m.def("get_events_from_stream",   &get_events_from_stream);
+   m.def("get_nevents_from_file",    &get_nevents_from_file);
+   m.def("ReadEvent",                &read_event_helper);
+   m.def("get_headers",              &get_headers); 
    
-   m.def("u32_from_le_bytes",  &u32_from_le_bytes);
-   m.def("u32_to_le_bytes",    &wrap_u32_to_le_bytes);
-   m.def("decode_u32",         &decode_uint32);
-   m.def("encode_u32",         &wrap_encode_uint32);
-   m.def("encode_u32_rev",     &wrap_encode_uint32_rev);
+   //
+   // serialization functions
+   //m.def("decode_u16",         &decode_ushort);
+   //m.def("encode_u16",         &wrap_encode_ushort);
+   //m.def("encode_ushort_rev",     &wrap_encode_ushort_rev);
+   //
+   //m.def("u32_from_le_bytes",  &u32_from_le_bytes);
+   //m.def("u32_to_le_bytes",    &wrap_u32_to_le_bytes);
+   //m.def("decode_u32",         &decode_uint32);
+   //m.def("encode_u32",         &wrap_encode_uint32);
+   //m.def("encode_u32_rev",     &wrap_encode_uint32_rev);
 
-   m.def("encode_48",             &encode_48);
-   m.def("encode_48_rev",         &encode_48_rev);
+   //m.def("encode_48",             &encode_48);
+   //m.def("encode_48_rev",         &encode_48_rev);
 
-   m.def("decode_u64",         &decode_uint64);
-   m.def("encode_u64",         &wrap_encode_uint64);
-   m.def("encode_uint64_rev",     &wrap_encode_uint64_rev);
+   //m.def("decode_u64",         &decode_uint64);
+   //m.def("encode_u64",         &wrap_encode_uint64);
+   //m.def("encode_uint64_rev",     &wrap_encode_uint64_rev);
 
    m.def("encode_blobevent",      &blobevent_encoder);
    m.def("decode_blobevent",      &blobevent_decoder);   
    m.def("get_current_blobevent_size", &get_current_blobevent_size);
 
    // functions to read and parse blob files
-   m.def("search_for_2byte_marker",  &search_for_2byte_marker);
-   m.def("get_2byte_marker_indices", &get_2byte_markers_indices);
+   //m.def("search_for_2byte_marker",  &search_for_2byte_marker);
+   //m.def("get_2byte_marker_indices", &get_2byte_markers_indices);
    m.def("splice_readoutboard_datafile",   &splice_readoutboard_datafile);
-   m.def("get_events_from_stream",   &get_events_from_stream);
-   m.def("get_nevents_from_file",    &get_nevents_from_file);
-   m.def("ReadEvent",                &read_event_helper);
 
+   // Calibration functions
    m.def("apply_vcal_allchan",       &apply_vcal_allchan_helper);
    m.def("apply_vcal",               &apply_vcal_helper);
    m.def("apply_tcal_allchan",       &apply_tcal_allchan_helper);
@@ -880,7 +903,6 @@ PYBIND11_MODULE(gaps_tof, m) {
    m.def("get_vincs",                &increment_getter);
    m.def("get_vdips",                &dip_getter);
    m.def("get_tbins",                &tbin_getter);
-   m.def("get_headers",              &get_headers); 
    // waveform stuff
    m.def("calculate_pedestal",       &calculate_pedestal_helper);
 }

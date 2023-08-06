@@ -76,7 +76,7 @@ struct TofPacket {
    *    (tail position +=1, so that bytestream can be iterated
    *    over easily)
    */
-  u16 from_bytestream(vec_u8& payload,
+  u16 from_bytestream(const Vec<u8> &payload,
                       usize start_pos=0);
 
 

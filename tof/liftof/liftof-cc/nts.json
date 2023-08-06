@@ -3,7 +3,7 @@
   "unix_time" : "",
   "raw_storage_savepath" : "/tpool/tofdata/nts/raw/",
   "stream_savepath" : "/tpool/tofdata/nts/stream/", 
-  "db_path"   : "/home/gaps/gaps-online-software/gaps-db/gaps_db/db-nts.sqlite3", 
+  "db_path"   : "/data0/gaps/nts/db-nts.sqlite3", 
   "events_per_file"    : 10000,
   "packets_per_stream" : 1000000,
   "run_id"             : 48, 

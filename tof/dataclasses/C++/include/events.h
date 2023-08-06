@@ -7,21 +7,6 @@
 struct RBEventHeader;
 struct RBEvent;
 
-/**
- * Extract only event ids from a bytestream with raw readoutboard binary data
- *
- * @param bytestream : Readoutboard binary (.robin) data.
- * @param start_pos  : Byte position to start searching from in bytestream
- */
-vec_u32 get_event_ids_from_raw_stream(const vec_u8 &bytestream, u64 &start_pos);
-
-/**
- * Read event headers from a RB binary file
- *
- */
-Vec<RBEventHeader> get_headers(const String &filename, bool is_header=false);
-
-//Vec<RBBinaryDump> get_level0_events(const String &filename);
 
 
 /**

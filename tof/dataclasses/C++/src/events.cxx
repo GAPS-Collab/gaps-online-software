@@ -22,63 +22,7 @@ Vec<u16> u8_to_u16(const Vec<u8> &vec_u8) {
 }
 
 
-/*****
- * Get the event id from the first event following an offset in a bytestream
- *
- * Will set the pos variable to the location of the next possible 
- * event
- *
- * @param bytestream : A vector or bytes representing one or more 
- *                     raw readoutboard events ("blob")
- * @param pos        : The position from which to start searching 
- *                     for the next event in the bytestream                    
- */ 
-vec_u32 get_event_ids_from_raw_stream(const vec_u8 &bytestream, u64 &pos) {
-  vec_u32 event_ids;
 
-  u32 event_id = 0;
-  // first, we need to find the first header in the 
-  // stream starting from the given position
-  bool has_ended = false;
-  while (!has_ended) { 
-    pos = search_for_2byte_marker(bytestream, 0xAA, has_ended, pos);  
-    pos += 22;
-    event_id = Gaps::u32_from_le_bytes(bytestream, pos);
-    event_ids.push_back(event_id);
-    pos += 18530 - 22 - 4;
-  }
-  return event_ids; 
-}
-
-Vec<RBEventHeader> get_headers(const String &filename, bool is_headers) {
-  spdlog::cfg::load_env_levels();
-  u64 n_good = 0;  
-  u64 n_bad  = 0; 
-  Vec<RBEventHeader> headers;
-  bytestream stream = get_bytestream_from_file(filename); 
-  bool has_ended = false;
-  auto pos = search_for_2byte_marker(stream,0xAA, has_ended );
-  spdlog::info("Read {} bytes from {}", stream.size(), filename);
-  spdlog::info("For 8+1 channels and RB compression level 0, this mean a max number of events of {}", stream.size()/18530.0);
-  while (!has_ended) {
-    RBEventHeader header;
-    if (is_headers) {
-      header = RBEventHeader::from_bytestream(stream, pos);
-    } else {
-      header = RBEventHeader::extract_from_rbbinarydump(stream, pos);
-    }
-    header.broken ? n_bad++ : n_good++ ;
-    headers.push_back(header);
-    pos -= 2;
-    pos = search_for_2byte_marker(stream, 0xAA, has_ended, pos);
-    //if (header.broken) {
-    //  std::cout << pos << std::endl;
-    //  std::cout << (u32)header.channel_mask << std::endl;
-    //}
-  }
-  spdlog::info("Retrieved {} good headers, but {} of which we had to set the `broken` flag", n_good, n_bad);
-  return headers;
-}
 
 //Vec<RBBinaryDump> get_level0_events(const String &filename) {
 //  spdlog::cfg::load_env_levels();

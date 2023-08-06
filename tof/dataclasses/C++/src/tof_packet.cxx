@@ -2,7 +2,7 @@
 
 #include "packets/tof_packet.h"
 #include "serialization.h"
-
+#include "parsers.h"
 
 std::string packet_type_to_string(PacketType pt) {
   switch (pt) { 
@@ -73,28 +73,29 @@ vec_u8 TofPacket::to_bytestream() const
 
 /**************************************************/
 
-u16 TofPacket::from_bytestream(vec_u8 &bytestream,
-                               usize   start_pos){ 
+u16 TofPacket::from_bytestream(const Vec<u8> &bytestream,
+                               usize          start_pos){ 
   usize pos = start_pos;
-  u16 value = decode_ushort(bytestream, start_pos);
+  u16 value = Gaps::parse_u16(bytestream, pos);
   if (!(value == head)) {
     spdlog::error("No header found!");
     return start_pos;
   }
   head = value;
-  pos += 2; // position in bytestream, 2 since we 
+  //pos += 2; // position in bytestream, 2 since we 
   packet_type = bytestream[pos]; pos+=1;
   //std::cout << "found packet type : " << packet_type << std::endl;
-  payload_size = u32_from_le_bytes(bytestream, pos); pos+=4;
+  //payload_size = u32_from_le_bytes(bytestream, pos); pos+=4;
+  payload_size = Gaps::parse_u32(bytestream, pos);
   //std::cout << "found payload size " << payload_size << std::endl;
   //size_t payload_end = pos + bytestream.size() - 2;
   usize payload_end = pos + payload_size;
   //std::cout << " found payload end " << payload_end << std::endl;
-  vec_u8 packet_bytestream(bytestream.begin()+ pos,
-                           bytestream.begin()+ payload_end)  ;
+  Vec<u8> packet_bytestream(bytestream.begin()+ pos,
+                            bytestream.begin()+ payload_end)  ;
   payload = packet_bytestream;
   pos += payload_size;
-  tail = decode_ushort(bytestream, pos); pos +=2;
+  tail = Gaps::parse_u16(bytestream, pos);
   if (tail != 0x5555)
     {spdlog::error("Tail wrong! ");}
   return pos;
