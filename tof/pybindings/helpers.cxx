@@ -66,24 +66,24 @@ bytestream wrap_encode_uint64(u64 value, size_t start_pos) {
 
 /***********************************************/
 
-Vec<TofPacket> wrap_get_tofpacket_from_file(const String filename) {
+Vec<TofPacket> wrap_get_tofpackets_from_file(const String filename) {
   return get_tofpackets(filename);
 }
 
-Vec<TofPacket> wrap_get_tofpacket_from_stream(const Vec<u8> &stream, u64 pos) {
+Vec<TofPacket> wrap_get_tofpackets_from_stream(const Vec<u8> &stream, u64 pos) {
   return get_tofpackets(stream, pos);
 }
 
 /***********************************************/
 
-Vec<RBEventMemoryView> wrap_get_rbeventmemoryview_from_file(const String filename) {
-  return get_rbeventmemoryview(filename);
+Vec<RBEventMemoryView> wrap_get_rbeventmemoryviews_from_file(const String filename, bool omit_duplicates) {
+  return get_rbeventmemoryviews(filename, omit_duplicates);
 }
 
 /***********************************************/
 
-Vec<RBEventMemoryView> wrap_get_rbeventmemoryview_from_stream(const Vec<u8> &stream, u64 pos) {
-  return get_rbeventmemoryview(stream, pos);
+Vec<RBEventMemoryView> wrap_get_rbeventmemoryviews_from_stream(const Vec<u8> &stream, u64 pos, bool omit_duplicates) {
+  return get_rbeventmemoryviews(stream, pos, omit_duplicates);
 }
 
 /***********************************************/

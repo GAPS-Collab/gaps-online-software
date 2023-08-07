@@ -25,7 +25,7 @@ Vec<BlobEvt_t> get_events_from_stream(const Vec<u8> &bytestream, u64 start_pos);
  * 
  * @param filename : Full path to file with RB binary data
  */
-Vec<RBEventMemoryView> get_rbeventmemoryview(const String &filename);
+Vec<RBEventMemoryView> get_rbeventmemoryviews(const String &filename, bool omit_duplicates = false);
 
 
 /**
@@ -34,14 +34,14 @@ Vec<RBEventMemoryView> get_rbeventmemoryview(const String &filename);
  * @param stream : 
  * @param pos    : 
  */
-Vec<RBEventMemoryView> get_rbeventmemoryview(const Vec<u8> &stream, u64 start_pos);
+Vec<RBEventMemoryView> get_rbeventmemoryviews(const Vec<u8> &stream, u64 start_pos, bool omit_duplicates = false);
 
 
 /**
  * Read event headers from a RB binary file
  *
  */
-Vec<RBEventHeader> get_headers(const String &filename, bool is_header=false);
+Vec<RBEventHeader> get_rbeventheaders(const String &filename, bool is_header=false);
 
 /**
  * Extract only event ids from a bytestream with raw readoutboard binary data

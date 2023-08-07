@@ -8,7 +8,7 @@
 
 /***************************************************/
 
-Vec<RBEventHeader> get_headers(const String &filename, bool is_headers) {
+Vec<RBEventHeader> get_rbeventheaders(const String &filename, bool is_headers) {
   spdlog::cfg::load_env_levels();
   u64 n_good = 0;  
   u64 n_bad  = 0; 
@@ -90,21 +90,27 @@ Vec<TofPacket> get_tofpackets(const String filename) {
 
 /***************************************************/
 
-Vec<RBEventMemoryView> get_rbeventmemoryview(const String &filename ) {
+Vec<RBEventMemoryView> get_rbeventmemoryviews(const String &filename, bool omit_duplicates ) {
   spdlog::cfg::load_env_levels();
   auto stream = get_bytestream_from_file(filename); 
   bool has_ended = false;
   auto pos = search_for_2byte_marker(stream,0xAA, has_ended );
   spdlog::info("Read {} bytes from {}", stream.size(), filename);
-  return get_rbeventmemoryview(stream, pos);
+  return get_rbeventmemoryviews(stream, pos, omit_duplicates);
 }
 
 /***************************************************/
 
-Vec<RBEventMemoryView> get_rbeventmemoryview(const Vec<u8> &bytestream,
-                                             u64 start_pos) {
+Vec<RBEventMemoryView> get_rbeventmemoryviews(const Vec<u8> &bytestream,
+                                              u64 start_pos,
+                                              bool omit_duplicates) {
   u64 nevents_in_stream = (float)bytestream.size()/RBEventMemoryView::SIZE;
   spdlog::info("There might be at max {} events in the stream", nevents_in_stream);
+  if (omit_duplicates) {
+    spdlog::warn("Will try to elimiinate duplicate events. This might come at a performance cost!");
+  }
+  Vec<u32> eventid_registry = Vec<u32>();
+  usize n_duplicates        = 0;
 
   Vec<RBEventMemoryView> events; 
   RBEventMemoryView event;
@@ -132,11 +138,26 @@ Vec<RBEventMemoryView> get_rbeventmemoryview(const Vec<u8> &bytestream,
       continue;
     }
     //std::cout << event << std::endl;
+    if (omit_duplicates) {
+      auto it = std::find(eventid_registry.begin(),
+                          eventid_registry.end(),
+                          event.event_ctr);
+      if (it != eventid_registry.end()) {
+        // we have seen this before
+        n_duplicates += 1;
+        continue;
+      } else {
+        eventid_registry.push_back(event.event_ctr);
+      }
+    }
     events.push_back(event);
     n_events_decoded++;
     pos += RBEventMemoryView::SIZE + 2;
   }
   spdlog::info("Retrieved {} events from stream!", n_events_decoded);
+  if (n_duplicates > 0) {
+    spdlog::warn("We have seen {} duplicate events!", n_duplicates);
+  }
   spdlog::info("{} times a header with no corresponding footer was found. This does not necessarily mean there is a problem, instead it could also be padding bytes introduced due to wrapper packages.", corrupt_events);
   return events;
   //u64 pos  = start_pos;

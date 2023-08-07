@@ -18,13 +18,13 @@ bytestream wrap_encode_uint64_rev(u64 value, size_t start_pos);
 
 bytestream wrap_encode_uint64(u64 value, size_t start_pos);
 
-Vec<TofPacket> wrap_get_tofpacket_from_file(const String filename);
+Vec<TofPacket> wrap_get_tofpackets_from_file(const String filename);
 
-Vec<TofPacket> wrap_get_tofpacket_from_stream(const Vec<u8> &stream, u64 pos);
+Vec<TofPacket> wrap_get_tofpackets_from_stream(const Vec<u8> &stream, u64 pos);
 
-Vec<RBEventMemoryView> wrap_get_rbeventmemoryview_from_file(const String filename);
+Vec<RBEventMemoryView> wrap_get_rbeventmemoryviews_from_file(const String filename, bool omit_duplicates = false);
 
-Vec<RBEventMemoryView> wrap_get_rbeventmemoryview_from_stream(const Vec<u8> &stream, u64 pos);
+Vec<RBEventMemoryView> wrap_get_rbeventmemoryviews_from_stream(const Vec<u8> &stream, u64 pos, bool omit_duplicates = false);
 
 String rbmoni_to_string(const RBMoniData &moni);
 

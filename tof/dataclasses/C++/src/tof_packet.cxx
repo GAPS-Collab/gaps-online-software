@@ -53,7 +53,7 @@ Vec<u8> TofPacket::to_bytestream() const
 
   // first we need to hold only 5 bytes, then 
   // the payload will grow the vector with "insert"
-  vec<u8> buffer(p_size_fixed);
+  Vec<u8> buffer(p_size_fixed);
   //buffer.reserve(p_size_fixed + payload.size());
   std::cout << "PAYLOAD SIZE " << payload.size() << std::endl;
   usize pos = 0; // position in bytestream

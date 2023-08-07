@@ -905,16 +905,20 @@ PYBIND11_MODULE(gaps_tof, m) {
    ;
    
    // I/O functions
-   m.def("get_tofpackets", &wrap_get_tofpacket_from_stream, "Get TofPackets from list of bytes");
-   m.def("get_tofpackets", &wrap_get_tofpacket_from_file, "Get TofPackets from a file on disk");
-   m.def("get_rbeventsmemoryview", &wrap_get_rbeventmemoryview_from_stream, "Get RBEventMemoryViews from list of bytes");
-   m.def("get_rbeventsmemoryview", &wrap_get_rbeventmemoryview_from_file, "Get RBEventMemoryViews from a file on disk");
+   m.def("get_tofpackets", &wrap_get_tofpackets_from_stream, "Get TofPackets from list of bytes");
+   m.def("get_tofpackets", &wrap_get_tofpackets_from_file, "Get TofPackets from a file on disk");
+   m.def("get_rbeventsmemoryviews",       &wrap_get_rbeventmemoryviews_from_stream,
+                                          "Get RBEventMemoryViews from list of bytes.\nArgs:\n * bytestream [list of char]\n * pos - start at position in stream\n * omit_duplicates [optional, bool] - reduced duplicate events (costs performance)",
+                                          py::arg("bytestream"), py::arg("pos"), py::arg("omit_duplicates") = false);
+   m.def("get_rbeventsmemoryviews",       &wrap_get_rbeventmemoryviews_from_file,
+                                          "Get RBEventMemoryViews from a file on disk.\nArgs:\n * filename - full path to file on disk as written by the readoutboards/liftof.\n              This file can only contain RBEventMemoryViews ('Blobs') without any other wrapper packets.\n * omit_duplicates - set this flag if you want to eeliminate duplicate events in the file. (Costs performance).",
+                                          py::arg("filename"), py::arg("omit_duplicates") = false);
    m.def("get_event_ids_from_raw_stream", &get_event_ids_from_raw_stream);
-   m.def("get_bytestream_from_file",     &get_bytestream_from_file);
-   m.def("get_events_from_stream",   &get_events_from_stream);
-   m.def("get_nevents_from_file",    &get_nevents_from_file);
-   m.def("ReadEvent",                &read_event_helper);
-   m.def("get_headers",              &get_headers); 
+   m.def("get_bytestream_from_file",      &get_bytestream_from_file);
+   m.def("get_events_from_stream",        &get_events_from_stream);
+   m.def("get_nevents_from_file",         &get_nevents_from_file);
+   m.def("ReadEvent",                     &read_event_helper);
+   m.def("get_rbeventheaders",            &get_rbeventheaders); 
    
    //
    // serialization functions
