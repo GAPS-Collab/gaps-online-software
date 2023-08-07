@@ -22,5 +22,15 @@ Vec<TofPacket> wrap_get_tofpacket_from_file(const String filename);
 
 Vec<TofPacket> wrap_get_tofpacket_from_stream(const Vec<u8> &stream, u64 pos);
 
+Vec<RBEventMemoryView> wrap_get_rbeventmemoryview_from_file(const String filename);
+
+Vec<RBEventMemoryView> wrap_get_rbeventmemoryview_from_stream(const Vec<u8> &stream, u64 pos);
+
 String rbmoni_to_string(const RBMoniData &moni);
+
+String rbeventmemoryview_to_string(const RBEventMemoryView &event);
+
+String tofevent_to_string(const TofEvent &event);
+
+String mastertriggerevent_to_string(const MasterTriggerEvent &event);
 

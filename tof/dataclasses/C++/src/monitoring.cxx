@@ -45,56 +45,57 @@ RBMoniData::RBMoniData() {
   n1v5_power        = 0;  
 }
 
-usize RBMoniData::from_bytestream(Vec<u8> &payload,
-                                  usize start_pos) {
-  usize pos = start_pos; 
+RBMoniData RBMoniData::from_bytestream(const Vec<u8> &payload,
+                                       usize &pos) {
+  //usize pos = start_pos; 
+  RBMoniData moni = RBMoniData();
   u16 head          = Gaps::parse_u16(payload, pos);
   if (head != RBMoniData::HEAD) {
     spdlog::error("No header signature (0xAAAA) found for decoding of RBMoniData!");   
   }
-  board_id          = Gaps::parse_u8(payload, pos);  
-  rate              = Gaps::parse_u16(payload, pos);  
-  tmp_drs           = Gaps::parse_f32(payload, pos);  
-  tmp_clk           = Gaps::parse_f32(payload, pos);  
-  tmp_adc           = Gaps::parse_f32(payload, pos);  
-  tmp_zynq          = Gaps::parse_f32(payload, pos);  
-  tmp_lis3mdltr     = Gaps::parse_f32(payload, pos);  
-  tmp_bm280         = Gaps::parse_f32(payload, pos);  
-  pressure          = Gaps::parse_f32(payload, pos);  
-  humidity          = Gaps::parse_f32(payload, pos);  
-  mag_x             = Gaps::parse_f32(payload, pos);  
-  mag_y             = Gaps::parse_f32(payload, pos);  
-  mag_z             = Gaps::parse_f32(payload, pos);  
-  mag_tot           = Gaps::parse_f32(payload, pos);  
-  drs_dvdd_voltage  = Gaps::parse_f32(payload, pos);  
-  drs_dvdd_current  = Gaps::parse_f32(payload, pos);  
-  drs_dvdd_power    = Gaps::parse_f32(payload, pos);  
-  p3v3_voltage      = Gaps::parse_f32(payload, pos);  
-  p3v3_current      = Gaps::parse_f32(payload, pos);  
-  p3v3_power        = Gaps::parse_f32(payload, pos);  
-  zynq_voltage      = Gaps::parse_f32(payload, pos);  
-  zynq_current      = Gaps::parse_f32(payload, pos);  
-  zynq_power        = Gaps::parse_f32(payload, pos);  
-  p3v5_voltage      = Gaps::parse_f32(payload, pos);  
-  p3v5_current      = Gaps::parse_f32(payload, pos);  
-  p3v5_power        = Gaps::parse_f32(payload, pos);  
-  adc_dvdd_voltage  = Gaps::parse_f32(payload, pos);  
-  adc_dvdd_current  = Gaps::parse_f32(payload, pos);  
-  adc_dvdd_power    = Gaps::parse_f32(payload, pos);  
-  adc_avdd_voltage  = Gaps::parse_f32(payload, pos);  
-  adc_avdd_current  = Gaps::parse_f32(payload, pos);  
-  adc_avdd_power    = Gaps::parse_f32(payload, pos);  
-  drs_avdd_voltage  = Gaps::parse_f32(payload, pos);  
-  drs_avdd_current  = Gaps::parse_f32(payload, pos);  
-  drs_avdd_power    = Gaps::parse_f32(payload, pos);  
-  n1v5_voltage      = Gaps::parse_f32(payload, pos);  
-  n1v5_current      = Gaps::parse_f32(payload, pos);  
-  n1v5_power        = Gaps::parse_f32(payload, pos);  
+  moni.board_id          = Gaps::parse_u8(payload, pos);  
+  moni.rate              = Gaps::parse_u16(payload, pos);  
+  moni.tmp_drs           = Gaps::parse_f32(payload, pos);  
+  moni.tmp_clk           = Gaps::parse_f32(payload, pos);  
+  moni.tmp_adc           = Gaps::parse_f32(payload, pos);  
+  moni.tmp_zynq          = Gaps::parse_f32(payload, pos);  
+  moni.tmp_lis3mdltr     = Gaps::parse_f32(payload, pos);  
+  moni.tmp_bm280         = Gaps::parse_f32(payload, pos);  
+  moni.pressure          = Gaps::parse_f32(payload, pos);  
+  moni.humidity          = Gaps::parse_f32(payload, pos);  
+  moni.mag_x             = Gaps::parse_f32(payload, pos);  
+  moni.mag_y             = Gaps::parse_f32(payload, pos);  
+  moni.mag_z             = Gaps::parse_f32(payload, pos);  
+  moni.mag_tot           = Gaps::parse_f32(payload, pos);  
+  moni.drs_dvdd_voltage  = Gaps::parse_f32(payload, pos);  
+  moni.drs_dvdd_current  = Gaps::parse_f32(payload, pos);  
+  moni.drs_dvdd_power    = Gaps::parse_f32(payload, pos);  
+  moni.p3v3_voltage      = Gaps::parse_f32(payload, pos);  
+  moni.p3v3_current      = Gaps::parse_f32(payload, pos);  
+  moni.p3v3_power        = Gaps::parse_f32(payload, pos);  
+  moni.zynq_voltage      = Gaps::parse_f32(payload, pos);  
+  moni.zynq_current      = Gaps::parse_f32(payload, pos);  
+  moni.zynq_power        = Gaps::parse_f32(payload, pos);  
+  moni.p3v5_voltage      = Gaps::parse_f32(payload, pos);  
+  moni.p3v5_current      = Gaps::parse_f32(payload, pos);  
+  moni.p3v5_power        = Gaps::parse_f32(payload, pos);  
+  moni.adc_dvdd_voltage  = Gaps::parse_f32(payload, pos);  
+  moni.adc_dvdd_current  = Gaps::parse_f32(payload, pos);  
+  moni.adc_dvdd_power    = Gaps::parse_f32(payload, pos);  
+  moni.adc_avdd_voltage  = Gaps::parse_f32(payload, pos);  
+  moni.adc_avdd_current  = Gaps::parse_f32(payload, pos);  
+  moni.adc_avdd_power    = Gaps::parse_f32(payload, pos);  
+  moni.drs_avdd_voltage  = Gaps::parse_f32(payload, pos);  
+  moni.drs_avdd_current  = Gaps::parse_f32(payload, pos);  
+  moni.drs_avdd_power    = Gaps::parse_f32(payload, pos);  
+  moni.n1v5_voltage      = Gaps::parse_f32(payload, pos);  
+  moni.n1v5_current      = Gaps::parse_f32(payload, pos);  
+  moni.n1v5_power        = Gaps::parse_f32(payload, pos);  
   u16 tail          = Gaps::parse_u16(payload, pos);
   if (tail != RBMoniData::TAIL) {
     spdlog::error("No tail signature (0x5555) found for decoding of RBMoniData!");   
   }
-  return pos;
+  return moni;
 }
 
 MtbMoniData::MtbMoniData() {

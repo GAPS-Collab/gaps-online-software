@@ -21,37 +21,82 @@ Vec<u16> u8_to_u16(const Vec<u8> &vec_u8) {
   return vec_u16;
 }
 
+/*************************************/
 
+RBEventMemoryView::RBEventMemoryView() {
+  status   = 0;
+  len      = 0;
+  roi      = 0;
+  dna      = 0;
+  fw_hash  = 0;
+  id       = 0;
+  ch_mask  = 0;
+  event_ctr = 0;
+  dtap0     = 0;
+  dtap1     = 0;
+  timestamp = 0 ;
+  for (usize k=0; k<NCHN; k++) {
+    ch_head[k]  = 0;
+    ch_trail[k] = 0;
+    for (usize n=0; n<NWORDS;n++) {
+      ch_adc[k][n] = 0;
+    }
+  }
+  stop_cell  = 0;
+  crc32      = 0;
+}
 
+/*************************************/
 
-//Vec<RBBinaryDump> get_level0_events(const String &filename) {
-//  spdlog::cfg::load_env_levels();
-//  Vec<RBBinaryDump> events;
-//  u64 n_good = 0;  
-//  u64 n_bad  = 0; 
-//  bytestream stream = get_bytestream_from_file(filename); 
-//  bool has_ended = false;
-//  auto pos = search_for_2byte_marker(stream,0xAA, has_ended );
-//  spdlog::info("Read {} bytes from {}", stream.size(), filename);
-//  spdlog::info("For 8+1 channels and RB compression level 0, this mean a max number of events of {}", stream.size()/18530.0);
-//  while (!has_ended) {
-//    //RBBinaryDump data = RBBinaryDump::from_bytestrea(stream, pos);
-//    //header.broken ? n_bad++ : n_good++ ;
-//    BlobEvt_t event;
-//    event
-//    events.push_back(data);
-//    pos -= 2;
-//    pos = search_for_2byte_marker(stream, 0xAA, has_ended, pos);
-//    //if (header.broken) {
-//    //  std::cout << pos << std::endl;
-//    //  std::cout << (u32)header.channel_mask << std::endl;
-//    //}
-//  }
-//  spdlog::info("Retrieved {} good events, but {} of which we had to set the `broken` flag", n_good, n_bad);
-//  return events;
-//}
+Vec<u16> RBEventMemoryView::get_channel_adc(u8 channel) {
+  Vec<u16> adc;
+  if (channel == 0) {
+    spdlog::error("Please remembmer channel ids are ranged from 1-9! Ch0 does not exist");
+    return adc;
+  }
+  if (channel > 9) {
+    spdlog::error("Please remembmer channel ids are ranged from 1-9! Ch {} does not exist", channel);
+    return adc;
+  }
+  adc = Vec<u16>(std::begin(ch_adc[channel-1]), std::end(ch_adc[channel-1]));
+  return adc;
+}
 
+/*************************************/
 
+RBEventMemoryView RBEventMemoryView::from_bytestream(const Vec<u8> &stream,
+                                                     u64 &pos) {
+  RBEventMemoryView event;
+  event.head      = Gaps::parse_u16( stream, pos); 
+  event.status    = Gaps::parse_u16( stream, pos); 
+  event.len       = Gaps::parse_u16( stream, pos); 
+  event.roi       = Gaps::parse_u16( stream, pos); 
+  event.dna       = decode_uint64_rev( stream, pos); pos += 8;
+  event.fw_hash   = Gaps::parse_u16( stream, pos);
+  // the first byte of the event id short is RESERVED
+  event.id        = stream[pos + 1]; pos += 2;
+  event.ch_mask   = Gaps::parse_u16( stream, pos);
+  event.event_ctr = Gaps::parse_u32_for_16bit_words( stream, pos);
+  event.dtap0     = Gaps::parse_u16( stream, pos); 
+  event.dtap1     = Gaps::parse_u16( stream, pos); 
+  event.timestamp = Gaps::parse_u48_for_16bit_words( stream, pos);
+  for (int i=0; i<NCHN; i++) {
+    event.ch_head[i] = Gaps::parse_u16(stream, pos);
+    // Read the channel data
+    for (int j=0; j<NWORDS; j++) {
+      //event.ch_adc[i][j] = decode_14bit(bytestream, dec_pos); dec_pos += 2;
+      event.ch_adc[i][j] = Gaps::parse_u16(stream, pos) & 0x3FFF; 
+    }
+    event.ch_trail[i] = Gaps::parse_u32_for_16bit_words(stream, pos); 
+  }    
+  
+  event.stop_cell = Gaps::parse_u16(stream, pos); 
+  event.crc32     = Gaps::parse_u32_for_16bit_words(stream, pos);
+  event.tail      = Gaps::parse_u16(stream, pos);
+  return event;
+}
+
+/*************************************/
 
 RBEventHeader::RBEventHeader() {
   channel_mask       = 0; 
@@ -68,6 +113,8 @@ RBEventHeader::RBEventHeader() {
   timestamp_48       = 0; 
   broken             = true;
 }
+
+/*************************************/
 
 RBEventHeader RBEventHeader::from_bytestream(const Vec<u8> &stream,
                                              u64 &pos){
@@ -91,16 +138,20 @@ RBEventHeader RBEventHeader::from_bytestream(const Vec<u8> &stream,
   return header; 
 }
 
-
+/*************************************/
 
 f32 RBEventHeader::get_fpga_temp() const {
   f32 temp = (fpga_temp * 503.975/4096) - 273.15;
   return temp;
 }
 
+/*************************************/
+
 u64 RBEventHeader::get_clock_cycles_48bit() const {
   return timestamp_48;
 }
+
+/*************************************/
 
 Vec<u8> RBEventHeader::get_active_data_channels() const {
   Vec<u8> active_channels;
@@ -111,15 +162,21 @@ Vec<u8> RBEventHeader::get_active_data_channels() const {
   return active_channels;
 }
 
+/*************************************/
+
 u8 RBEventHeader::get_n_datachan() const {
   Vec<u8> active_channels = get_active_data_channels();
   return (u8)active_channels.size();
 }
 
+/*************************************/
+
 f32 RBEventHeader::get_drs_temp() const {
   f32 temp = drs_adc_to_celsius(drs4_temp);
   return temp;
 }
+
+/*************************************/
 
 f32 RBEventHeader::drs_adc_to_celsius(u16 adc) const {
   f32 sign = 1.0;
@@ -130,6 +187,7 @@ f32 RBEventHeader::drs_adc_to_celsius(u16 adc) const {
   return sign * (f32)adc * 0.0625;
 }                                             
 
+/*************************************/
 
 RBEventHeader RBEventHeader::extract_from_rbbinarydump(const Vec<u8> &bs,
                                                        u64 &pos) {
@@ -184,6 +242,14 @@ RBEventHeader RBEventHeader::extract_from_rbbinarydump(const Vec<u8> &bs,
   }
   return header;
 } 
+
+/**********************************************************/
+
+RBEvent::RBEvent() {
+  
+  header = RBEventHeader();
+  adc    = Vec<Vec<u16>>(); 
+}
 
 /**********************************************************/
 
@@ -285,6 +351,30 @@ std::ostream& operator<<(std::ostream& os, const CompressionLevel& level) {
 }
 
 /**********************************************************/
+
+u32 TofEvent::get_n_rbmissinghits(u32 mask){
+  return ((mask & 0xFF00)     >> 8);
+}
+
+/**********************************************************/
+
+u32 TofEvent::get_n_rbevents(u32 mask){
+  return (mask & 0xFF);
+}
+
+/**********************************************************/
+
+u32 TofEvent::get_n_paddlepackets(u32 mask) {
+  return ((mask & 0xFF0000)   >> 16);
+}
+
+/**********************************************************/
+
+u32 TofEvent::get_n_rbmonis(u32 mask) {
+  return ((mask & 0xFF000000) >> 24);
+}
+
+/**********************************************************/
   
 TofEvent TofEvent::from_bytestream(const Vec<u8> &stream,
                                    u64 &pos) {
@@ -294,6 +384,30 @@ TofEvent TofEvent::from_bytestream(const Vec<u8> &stream,
     spdlog::error("No header signature found!");  
   }
   TofEvent event = TofEvent();
+  // for now split quality and compression level
+  pos += 2;
+  event.mt_event = MasterTriggerEvent::from_bytestream(stream, pos);
+  //pos += 45; // for now skip master trigger event
+  u32 mask          = Gaps::parse_u32(stream, pos);
+  u32 n_rbevents    = get_n_rbevents(mask);
+  u32 n_rbmonis     = get_n_rbmonis(mask);
+  u32 n_missing     = get_n_rbmissinghits(mask);
+  u32 n_paddlepacks = get_n_paddlepackets(mask);
+  for (u32 k=0; k< n_rbevents; k++) {
+    RBEvent rb_event = RBEvent::from_bytestream(stream, pos);
+  }
+  for (u32 k=0; k< n_missing; k++) {
+    RBMissingHit missy = RBMissingHit::from_bytestream(stream, pos);
+    event.missing_hits.push_back(missy);
+  }
+  for (u32 k=0; k< n_paddlepacks; k++) {
+    // we do not have this yet
+  }
+  for (u32 k=0; k< n_rbmonis; k++) {
+    RBMoniData moni = RBMoniData::from_bytestream(stream, pos);
+    event.rb_moni_data.push_back(moni);
+  }
+  
   //  event.compression_level = CompressionLevel::from_u8(&parse_u8(stream, pos));
   //  event.quality           = EventQuality::from_u8(&parse_u8(stream, pos));
   //  event.mt_event          = MasterTriggerEvent::from_bytestream(stream, pos)?;
@@ -333,6 +447,136 @@ TofEvent TofEvent::from_bytestream(const Vec<u8> &stream,
   //  }
   //  Ok(event)
   //}
+  return event;
+}
+  
+/**********************************************************/
+
+MasterTriggerEvent::MasterTriggerEvent() {
+  event_id      = 0; 
+  timestamp     = 0; 
+  tiu_timestamp = 0; 
+  tiu_gps_32    = 0; 
+  tiu_gps_16    = 0; 
+  n_paddles     = 0; 
+  std::fill(board_mask, board_mask + N_LTBS, 0);
+  for (usize k=0;k<N_LTBS;k++) {
+    std::fill(hits[k], hits[k] + N_CHN_PER_LTB, 0);
+  }
+  crc = 0;
+  broken = true;
+  valid  = false;
+}  
+
+/**********************************************************/
+
+/// Helper to get the number of the triggered LTB from the bitmask
+void MasterTriggerEvent::decode_board_mask(u32 mask_number, bool (&decoded_mask)[N_LTBS]) {
+  //bool decoded_mask[N_LTBS];
+  std::fill(decoded_mask, decoded_mask + N_LTBS, false);
+  //std::fill(board_mask, board_mask + N_LTBS, false);
+  // FIXME this implicitly asserts that the fields for non available LTBs 
+  // will be 0 and all the fields will be in order 
+  usize index = N_LTBS - 1;
+  //for n in 0..N_LTBS {
+  for (usize n=0;n<N_LTBS; n++) {
+    u32 mask = 1 << n;
+    bool bit_is_set = (mask & mask_number) > 0;
+    //decoded_mask[index] = bit_is_set;
+    decoded_mask[index] = bit_is_set;
+    if (index != 0) {
+      index -= 1;
+    }
+  }
+  //board_mask = decoded_mask;
+}
+
+/*************************************/
+
+void MasterTriggerEvent::decode_hit_mask(u32 mask_number, bool (&hitmask_1)[N_CHN_PER_LTB], bool (&hitmask_2)[N_CHN_PER_LTB]) {
+  //let mut decoded_mask_0 = [false;N_CHN_PER_LTB];
+  //let mut decoded_mask_1 = [false;N_CHN_PER_LTB];
+  // FIXME this implicitly asserts that the fields for non available LTBs 
+  // will be 0 and all the fields will be in order
+  u32 index = N_CHN_PER_LTB - 1;
+  //for n in 0..N_CHN_PER_LTB {
+  for (usize n=0; n<N_CHN_PER_LTB; n++) {
+    u32 mask = 1 << n;
+    //println!("MASK {:?}", mask);
+    bool bit_is_set = (mask & mask_number) > 0;
+    hitmask_1[index] = bit_is_set;
+    if (index != 0) {
+      index -= 1;
+    }
+  }
+  index = N_CHN_PER_LTB -1;
+  for (usize n=N_CHN_PER_LTB; n<2*N_CHN_PER_LTB; n++) {
+  //for n in N_CHN_PER_LTB..2*N_CHN_PER_LTB {
+    u32 mask = 1 << n;
+    bool bit_is_set = (mask & mask_number) > 0;
+    hitmask_2[index] = bit_is_set;
+    if (index != 0) {
+      index -= 1;
+    }
+  }
+}
+
+/*************************************/
+  
+void MasterTriggerEvent::set_board_mask(u32 mask) {
+  // FIXME -> This basically inverses the order of the LTBs
+  // so bit 0 (rightmost in the mask is the leftmost in the 
+  // array 
+  for (usize i=0;i<N_LTBS;i++) {
+     board_mask[i] = (mask & (1 << i)) != 0;
+  } 
+}   
+
+/*************************************/
+        
+void MasterTriggerEvent::set_hit_mask(usize ltb_idx, u32 mask) {
+  for (usize i=0;i<N_CHN_PER_LTB;i++) {
+    hits[ltb_idx][i] = (mask & (1 << i)) != 0;
+  } 
+}
+
+/*************************************/
+
+MasterTriggerEvent MasterTriggerEvent::from_bytestream(const Vec<u8> &bytestream,
+                                                       u64 &pos) {
+
+  MasterTriggerEvent event;
+  u16 header = Gaps::parse_u16(bytestream, pos);
+  if (header != MasterTriggerEvent::HEAD) {
+    spdlog::error("Wrong header signature!");
+    return event;
+  }
+  event.event_id           = Gaps::parse_u32(bytestream, pos);
+  event.timestamp          = Gaps::parse_u32(bytestream, pos);
+  event.tiu_timestamp      = Gaps::parse_u32(bytestream, pos);
+  event.tiu_gps_32         = Gaps::parse_u32(bytestream, pos);
+  event.tiu_gps_16         = Gaps::parse_u32(bytestream, pos);
+  event.n_paddles          = Gaps::parse_u8 (bytestream, pos);
+
+  event.set_board_mask(Gaps::parse_u32(bytestream, pos));
+  //decode_board_mask(Gaps::parse_u32(bytestream, pos), event.board_mask);
+
+  // FIXME
+  for (usize k=0;k<N_LTBS;k++) {
+    u32 hitmask = Gaps::parse_u32(bytestream, pos);
+    event.set_hit_mask(k, hitmask);
+  }
+  event.crc = Gaps::parse_u32(bytestream, pos);
+  u8 tail_a = Gaps::parse_u8 (bytestream, pos);
+  u8 tail_b = Gaps::parse_u8 (bytestream, pos);
+  if (tail_a == 85 && tail_b == 85) {
+    spdlog::debug("Correct tail found!");
+  }
+  else if (tail_a == 85 && tail_b == 5) {
+     spdlog::warn("Tail for version 0.6.0/0.6.1 found");
+  } else {
+    spdlog::error("Tail is messed up. See comment for version 0.6.0/0.6.1 in CHANGELOG! We got {} {} but were expecting 85 5", tail_a, tail_b);
+  }
   return event;
 }
 

@@ -88,3 +88,129 @@ Vec<TofPacket> get_tofpackets(const String filename) {
   return get_tofpackets(stream, pos);
 }
 
+/***************************************************/
+
+Vec<RBEventMemoryView> get_rbeventmemoryview(const String &filename ) {
+  spdlog::cfg::load_env_levels();
+  auto stream = get_bytestream_from_file(filename); 
+  bool has_ended = false;
+  auto pos = search_for_2byte_marker(stream,0xAA, has_ended );
+  spdlog::info("Read {} bytes from {}", stream.size(), filename);
+  return get_rbeventmemoryview(stream, pos);
+}
+
+/***************************************************/
+
+Vec<RBEventMemoryView> get_rbeventmemoryview(const Vec<u8> &bytestream,
+                                             u64 start_pos) {
+  u64 nevents_in_stream = (float)bytestream.size()/RBEventMemoryView::SIZE;
+  spdlog::info("There might be at max {} events in the stream", nevents_in_stream);
+
+  Vec<RBEventMemoryView> events; 
+  RBEventMemoryView event;
+  usize pos              = start_pos;
+  bool has_ended         = false;
+  usize n_events_decoded = 0;
+  usize corrupt_events   = 0;
+  while (n_events_decoded < nevents_in_stream + 1) { 
+    // where are assuming that there is 
+    // less than one event of garbaget
+    // at the beginning of the stream
+    pos = search_for_2byte_marker(bytestream,
+                                  0xaa,
+                                  has_ended,
+                                  pos,
+                                  pos+RBEventMemoryView::SIZE);
+    if ((has_ended) || (pos + RBEventMemoryView::SIZE > bytestream.size())) {
+      break;
+    } 
+    event = RBEventMemoryView::from_bytestream(bytestream,
+                                               pos);
+    if (event.tail != 0x5555) {
+      corrupt_events++;
+      pos += 2; // skip header
+      continue;
+    }
+    //std::cout << event << std::endl;
+    events.push_back(event);
+    n_events_decoded++;
+    pos += RBEventMemoryView::SIZE + 2;
+  }
+  spdlog::info("Retrieved {} events from stream!", n_events_decoded);
+  spdlog::info("{} times a header with no corresponding footer was found. This does not necessarily mean there is a problem, instead it could also be padding bytes introduced due to wrapper packages.", corrupt_events);
+  return events;
+  //u64 pos  = start_pos;
+  //Vec<RBEventMemoryView> events;
+  //// just make sure in the beginning they
+  //// are not the same
+  //u64 last_pos = start_pos += 1;
+  //RBEventMemoryView event;
+  //usize nevents = 0;
+  //usize nbytes_read = 0;
+  //if (stream.size() < RBEventMemoryView::SIZE) {
+  //  spdlog::error("Stream of {} bytes is shorter than a single event ({} bytes)!", 
+  //                 stream.size(), RBEventMemoryView::SIZE);
+  //  return events;
+  //}
+  //while (true) {
+  //  //if (nevents == 100) break;
+  //  if (nbytes_read + RBEventMemoryView::SIZE > stream.size()) {
+  //    break;
+  //  }
+  //  last_pos = pos;
+  //  event = event.from_bytestream(stream, pos);
+  //  nevents += 1;
+  //  nbytes_read += RBEventMemoryView::SIZE;
+  //  if (pos != last_pos) {
+  //    events.push_back(event);
+  //  } else {
+  //    break;
+  //  }
+  //}
+  //spdlog::info("Retried {} RBEventMemoryViews from file!", nevents);
+  //return events;
+}
+
+/***************************************************/
+
+Vec<BlobEvt_t> get_events_from_stream(const Vec<u8> &bytestream,
+	       			                  u64 start_pos) {
+  u64 nevents_in_stream = (float)bytestream.size()/BLOBEVENTSIZE;
+  spdlog::info("There might be at max {} events in the stream", nevents_in_stream);
+
+  Vec<BlobEvt_t> events; 
+  BlobEvt_t event;
+  usize pos              = start_pos;
+  bool has_ended         = false;
+  usize n_events_decoded = 0;
+  usize corrupt_events   = 0;
+  while (n_events_decoded < nevents_in_stream + 1) { 
+    // where are assuming that there is 
+    // less than one event of garbaget
+    // at the beginning of the stream
+    pos = search_for_2byte_marker(bytestream,
+                                  0xaa,
+                                  has_ended,
+                                  pos,
+                                  pos+BLOBEVENTSIZE);
+    if ((has_ended) || (pos + BLOBEVENTSIZE > bytestream.size())) {
+      break;
+    } 
+    event = decode_blobevent(bytestream,
+                             pos);
+    if (event.tail != 0x5555) {
+      corrupt_events++;
+      pos += 2; // skip header
+      continue;
+    }
+    //std::cout << event << std::endl;
+    events.push_back(event);
+    n_events_decoded++;
+    pos += BLOBEVENTSIZE + 2;
+  }
+  spdlog::info("Retrieved {} events from stream!", n_events_decoded);
+  spdlog::info("{} times a header with no corresponding footer was found. This does not necessarily mean there is a problem, instead it could also be padding bytes introduced due to wrapper packages.", corrupt_events);
+  return events;
+}
+
+

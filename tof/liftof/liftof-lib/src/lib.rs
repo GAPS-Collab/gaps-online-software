@@ -417,7 +417,7 @@ impl RobinReader {
 
   pub fn new(filename : String) -> Self {
     let filename_c = filename.clone();
-    let mut robin_reader = RobinReader { 
+    let mut robin_reader = Self { 
       filename      : String::from(""),
       file_reader   : None,
       board_id      : 0,
@@ -532,8 +532,11 @@ impl RobinReader {
     let mut missing_keys = 0;
     let mut sorted_keys: Vec<&usize> = reverse_index.keys().collect();
     sorted_keys.sort();
+    //let mut n = 0u32;
     for k in sorted_keys {
       println!("{k} -> {}", reverse_index[&k]);
+      //n += 1;
+      //if n == 8000 {break;}
     }
   }
 

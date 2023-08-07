@@ -136,12 +136,9 @@ void encode_blobevent(const BlobEvt_t* evt, std::vector<uint8_t> &bytestream, un
 
 /***********************************************/
 
-BlobEvt_t decode_blobevent(const vec_u8 &bytestream,
-                           unsigned int start_pos);
-
-/***********************************************/
-
-std::vector<BlobEvt_t> get_events_from_stream(const vec_u8 &bytestream, u64 start_pos);
+[[deprecated("Use RBEventMemoryView::from_bytestream instead!")]]
+BlobEvt_t decode_blobevent(const Vec<u8> &bytestream,
+                           u32 start_pos);
 
 /***********************************************/
 

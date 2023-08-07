@@ -23,6 +23,8 @@ use std::fs::File;
 use std::collections::HashMap;
 use std::convert::TryInto;
 
+use std::process::exit;
+
 use tof_dataclasses::packets::{PacketType,
                                TofPacket};
 use tof_dataclasses::events::{MasterTofEvent,
@@ -201,20 +203,27 @@ fn main() {
             master_tof_event.mt_event = mtp;
 
             println!("MTE: rbids {:?}", rb_ids_debug);
+            println!("available_rbs {:?}", available_rbs);
             //println!("MTE: ltbids {:?}", mapping.get_ltb_ids(&mtp));
             for k in rb_ids_debug.0 {
               let this_ev_rbid = k.0;
               let this_ev_rbch = k.1;
               if !available_rbs.contains(&this_ev_rbid) {
                 if this_ev_rbid != 0 {
-                  panic!("Requesting to read from RB {}, but we don't have data for that!", this_ev_rbid);
+                  println!("Requesting to read from RB {}, but we don't have data for that!", this_ev_rbid);
+                  //panic!("Requesting to read from RB {}, but we don't have data for that!", this_ev_rbid);
+                  continue;
                 }
               }
+              println!("Getting RB {}", this_ev_rbid);
               let mut reader = robin_readers.get_mut(&this_ev_rbid).unwrap();
               //panic!("{}", reader.get_cache_size());
               match reader.get_from_cache(&mtp.event_id) {
                 None     => {
-                  error!("We do not have that event!");
+                  //reader.print_index();
+                  //println!("Events: {:?}", reader.event_ids_in_cache());
+                  //println!("Reader has {} events", reader.event_ids_in_cache().len());
+                  error!("We do not have that event {}!", mtp.event_id);
                   continue;
                 }
                 Some(rbevent) => {
@@ -296,8 +305,13 @@ fn main() {
             //    },
             //  }
             //}
+            //let bss = master_tof_event.to_bytestream();
+            println!("{}", master_tof_event);
+            //panic!("Size {}", bss.len());
+            
             let tof_packet = TofPacket::from(&master_tof_event);
             writer.add_tof_packet(&tof_packet);
+            exit(0);
           } else {
             error!("Error decoding MasterTriggerPacket!");
           }

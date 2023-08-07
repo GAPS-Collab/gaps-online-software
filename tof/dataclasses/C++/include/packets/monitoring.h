@@ -52,9 +52,11 @@ struct RBMoniData {
 
   RBMoniData();
 
+  static RBMoniData from_bytestream(const Vec<u8> &stream,
+                                    usize &pos);
   /// extract moni data from payload
-  usize from_bytestream(vec_u8& payload,
-                        usize start_pos=0);
+  //usize from_bytestream(vec_u8& payload,
+  //                      usize start_pos=0);
 
 };
 

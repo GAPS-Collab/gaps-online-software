@@ -2,6 +2,7 @@
 #define GAPSTOFTYPEDEFS_H_INCLUDED
 
 #include <vector>
+#include <map>
 #include <cstddef>
 #include <string>
 #include <cstdint>
@@ -28,6 +29,9 @@ typedef std::string String;
 
 template <typename T>
 using Vec = std::vector<T>;
+
+template <typename T, typename U>
+using HashMap = std::map<T,U>;
 
 typedef Vec<u8> bytestream;
 

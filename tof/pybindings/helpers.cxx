@@ -76,6 +76,18 @@ Vec<TofPacket> wrap_get_tofpacket_from_stream(const Vec<u8> &stream, u64 pos) {
 
 /***********************************************/
 
+Vec<RBEventMemoryView> wrap_get_rbeventmemoryview_from_file(const String filename) {
+  return get_rbeventmemoryview(filename);
+}
+
+/***********************************************/
+
+Vec<RBEventMemoryView> wrap_get_rbeventmemoryview_from_stream(const Vec<u8> &stream, u64 pos) {
+  return get_rbeventmemoryview(stream, pos);
+}
+
+/***********************************************/
+
 String rbmoni_to_string(const RBMoniData &moni) {
   String repr = "<RBMoniData: \n";
   repr += "\t board_id           " + std::to_string(moni.board_id)         + "\n"; 
@@ -119,4 +131,101 @@ String rbmoni_to_string(const RBMoniData &moni) {
   repr += " >";
   return repr;
 }
+
+/***********************************************/
+
+String rbeventmemoryview_to_string(const RBEventMemoryView &event) {
+  String repr = "<RBEventMemoryView\n";
+  //repr += "\thead "      + std::to_string(event.head )      + "\n" ;
+  repr += "\tstatus "    + std::to_string(event.status )    + "\n" ;
+  repr += "\tlen "       + std::to_string(event.len )       + "\n" ;
+  repr += "\troi "       + std::to_string(event.roi )       + "\n" ;
+  repr += "\tdna "       + std::to_string(event.dna )       + "\n" ;
+  repr += "\tfw_hash "   + std::to_string(event.fw_hash )   + "\n" ;
+  repr += "\tid "        + std::to_string(event.id )        + "\n" ;
+  repr += "\tch_mask "   + std::to_string(event.ch_mask )   + "\n" ;
+  repr += "\tevent_ctr " + std::to_string(event.event_ctr ) + "\n" ;
+  repr += "\tdtap0 "     + std::to_string(event.dtap0 )     + "\n" ;
+  repr += "\tdtap1 "     + std::to_string(event.dtap1 )     + "\n" ;
+  repr += "\ttimestamp " + std::to_string(event.timestamp ) + "\n" ;
+  repr += "\tstop_cell " + std::to_string(event.stop_cell ) + "\n" ;
+  repr += "\tcrc32 "     + std::to_string(event.crc32 )      ;
+  //repr += "\ttail "      + std::to_string(event.tail)       ;
+  repr += ">";
+  return repr;
+}
+
+/***********************************************/
+
+String tofevent_to_string(const TofEvent &event) {
+  String repr = "<TofEvent\n";
+  //repr += "\thead "      + std::to_string(event.head )      + "\n" ;
+  repr += "\tn missing hits: "    + std::to_string(event.missing_hits.size() )    + "\n" ;
+  repr += "\tn RB Events: "       + std::to_string(event.rb_events.size() )       + "\n" ;
+  repr += "\tn RB Monis "         + std::to_string(event.rb_moni_data.size() )       + "\n" ;
+  //repr += "\tn PaddlePackets "    + std::to_string(event.dna )       + "\n" ;
+  //repr += "\ttail "      + std::to_string(event.tail)       ;
+  repr += ">";
+  return repr;
+}
+
+/***********************************************/
+
+String mastertriggerevent_to_string(const MasterTriggerEvent &event) {
+  String repr = "<MasterTriggerEvent\n";
+  repr += "\t event_id      :" + std::to_string(event.event_id     ) + "\n" ; 
+  repr += "\t timestamp     :" + std::to_string(event.timestamp    ) + "\n" ; 
+  repr += "\t tiu_timestamp :" + std::to_string(event.tiu_timestamp) + "\n" ; 
+  repr += "\t tiu_gps_32    :" + std::to_string(event.tiu_gps_32   ) + "\n" ; 
+  repr += "\t tiu_gps_16    :" + std::to_string(event.tiu_gps_16   ) + "\n" ; 
+  repr += "\t n_paddles     :" + std::to_string(event.n_paddles    ) + "\n" ; 
+  repr += "\t [DSI/J] 1/1 - 1/2 - 1/3 - 1/4 - 1/5 - 2/1 - 2/2 - 2/3 - 2/4 - 2/5 - 3/1 - 3/2 - 3/3 - 3/4 - 3/5 - 4/1 - 4/2 - 4/3 - 4/4 - 4/5 \n";
+  Vec<u8> hit_boards = Vec<u8>();
+  HashMap<u8, String> dsi_j = HashMap<u8, String>();
+  dsi_j[0] = "1/1";
+  dsi_j[1] = "1/2";
+  dsi_j[2] = "1/3";
+  dsi_j[3] = "1/4";
+  dsi_j[4] = "1/5";
+  dsi_j[5] = "2/1";
+  dsi_j[6] = "2/2";
+  dsi_j[7] = "2/3";
+  dsi_j[8] = "2/4";
+  dsi_j[9] = "2/5";
+  dsi_j[10] = "3/1";
+  dsi_j[11] = "3/2";
+  dsi_j[12] = "3/3";
+  dsi_j[13] = "3/4";
+  dsi_j[14] = "3/5";
+  dsi_j[15] = "4/1";
+  dsi_j[16] = "4/2";
+  dsi_j[16] = "4/3";
+  dsi_j[17] = "4/4";
+  dsi_j[19] = "4/5";
+  repr += "\t         ";
+  for (usize k=0;k<N_LTBS;k++) {
+    if (event.board_mask[k]) {
+      repr += "-X-   ";
+      hit_boards.push_back(k);
+    } else {
+      repr += "-0-   ";
+    }
+  }
+  repr += "\n\t == == HITS [CH] == ==\n";
+  for (auto k : hit_boards) {
+    repr += "\t DSI/J " + dsi_j[k] + "\t=> ";
+    for (usize j=0;j<N_CHN_PER_LTB;j++) {
+      if (event.hits[k][j]) {
+        repr += " " + std::to_string(j + 1) + " ";
+      } else {
+        continue;
+        //repr += " N.A. ";
+      } 
+    }
+    repr += "\n";
+  }  
+  repr += ">";
+  return repr;
+}
+
 

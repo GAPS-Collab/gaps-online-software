@@ -6,40 +6,40 @@
 
 std::string packet_type_to_string(PacketType pt) {
   switch (pt) { 
-    case PACKET_TYPE_UNKNOWN : {
+      case PacketType::Unknown : {
       return "Unknown";
     }
-    case PACKET_TYPE_COMMAND : {
+      case PacketType::Command : {
       return "Command";
     }      
-    case PACKET_TYPE_RBEVENT : {
+      case PacketType::RBEvent : {
       return "RBEvent";
     }      
-    case PACKET_TYPE_TOFEVENT : {
+      case PacketType::TofEvent : {
       return "TofEvent";
     }      
-    case PACKET_TYPE_MONITOR : {
+      case PacketType::Monitor : {
       return "Monitor";
     }      
-    case PACKET_TYPE_HEARTBEAT : {
+      case PacketType::HeartBeat : {
       return "Heartbeat";
     }      
-    case PACKET_TYPE_SCALAR : {
+      case PacketType::Scalar : {
       return "Scalar";
     }      
-    case PACKET_TYPE_MT : {
+      case PacketType::MasterTrigger : {
       return "MasterTriggerEvent";
     }      
-    case PACKET_TYPE_RBHEADER : {
+      case PacketType::RBHeader : {
       return "RBEventHeader";
     }
-    case PACKET_TYPE_TOFCMP_MONI : {
+      case PacketType::MonitorTofCmp : {
       return "TofCmpMoni";
     }
-    case PACKET_TYPE_MTB_MONI : {
+      case PacketType::MonitorMtb : {
       return "MtbMoni";
     }
-    case PACKET_TYPE_RB_MONI : {
+      case PacketType::MonitorRb : {
       return "RBMoni";
     }
   }
@@ -48,12 +48,12 @@ std::string packet_type_to_string(PacketType pt) {
 
 /**************************************************/
 
-vec_u8 TofPacket::to_bytestream() const
+Vec<u8> TofPacket::to_bytestream() const
 {
 
   // first we need to hold only 5 bytes, then 
   // the payload will grow the vector with "insert"
-  vec_u8 buffer(p_size_fixed);
+  vec<u8> buffer(p_size_fixed);
   //buffer.reserve(p_size_fixed + payload.size());
   std::cout << "PAYLOAD SIZE " << payload.size() << std::endl;
   usize pos = 0; // position in bytestream
@@ -87,6 +87,7 @@ u16 TofPacket::from_bytestream(const Vec<u8> &bytestream,
   //std::cout << "found packet type : " << packet_type << std::endl;
   //payload_size = u32_from_le_bytes(bytestream, pos); pos+=4;
   payload_size = Gaps::parse_u32(bytestream, pos);
+  spdlog::info("Found TofPacket with {} bytes payload!", payload_size);
   //std::cout << "found payload size " << payload_size << std::endl;
   //size_t payload_end = pos + bytestream.size() - 2;
   usize payload_end = pos + payload_size;

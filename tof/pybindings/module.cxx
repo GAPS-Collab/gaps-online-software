@@ -150,17 +150,15 @@ void nullsetter(T foo)
 }
 
 void set_payload_helper(TofPacket &packet,
-                        const vec_u8 payload)
-{
-    packet.payload = payload;
-    packet.payload_size = payload.size();
+                        const vec_u8 payload) {
+  packet.payload = payload;
+  packet.payload_size = payload.size();
 }
 
-void set_ptype_helper(TofPacket &packet,
-                      const PacketType &ptype)
-{
-    packet.packet_type = ptype;
-}
+//void set_ptype_helper(TofPacket &packet,
+//                      const PacketType &ptype) {
+//  packet.packet_type = ptype;
+//}
 
 /********************/
 
@@ -540,6 +538,20 @@ PYBIND11_MODULE(gaps_tof, m) {
     
       
     ;
+    py::class_<MasterTriggerEvent>(m, "MasterTriggerEvent", "The MasterTriggerEvent contains the information from the MTB.")
+      .def(py::init())
+      .def("from_bytestream", &MasterTriggerEvent::from_bytestream, "Deserialize from a list of bytes")
+      .def_readonly("event_id"        , &MasterTriggerEvent::event_id, "MTB event id" ) 
+      .def_readonly("timestamp"       , &MasterTriggerEvent::timestamp                )
+      .def_readonly("tiu_timestamp"   , &MasterTriggerEvent::tiu_timestamp            )
+      .def_readonly("gps_timestamp_16", &MasterTriggerEvent::tiu_gps_16               )
+      .def_readonly("gps_timestamp_32", &MasterTriggerEvent::tiu_gps_32               )
+      .def_readonly("board_mask"      , &MasterTriggerEvent::board_mask               )
+      .def_readonly("n_paddles"       , &MasterTriggerEvent::n_paddles                ) 
+      .def("__repr__",        [](const MasterTriggerEvent &ev) {
+                                   return mastertriggerevent_to_string(ev); 
+                                 }) 
+    ;
   
     py::class_<MasterTriggerPacket>(m, "MasterTriggerPacket")
       .def(py::init())
@@ -599,7 +611,7 @@ PYBIND11_MODULE(gaps_tof, m) {
       .value("Unknown",   PacketType::Unknown   )
       .value("Command",   PacketType::Command   )
       .value("RBEvent",   PacketType::RBEvent   )
-      .value("TofEvent",  PacketType::TofEvent  )
+      .value("PT_TofEvent",  PacketType::TofEvent  )
       .value("Monitor",   PacketType::Monitor   )
       .value("Scalar",    PacketType::Scalar    )
       .value("HeartBeat", PacketType::HeartBeat )
@@ -658,6 +670,19 @@ PYBIND11_MODULE(gaps_tof, m) {
                                   return rbmoni_to_string(moni);
                                   }) 
     ;
+    
+    py::class_<TofEvent>(m, "TofEvent")
+        .def(py::init())
+        .def_readonly("mt_event"            ,&TofEvent::mt_event)
+        .def_readonly("missing_hits"        ,&TofEvent::missing_hits)
+        .def_readonly("rbmoni"              ,&TofEvent::rb_moni_data)
+        .def_readonly("rbevents"            ,&TofEvent::rb_events)
+        .def("from_bytestream"              ,&TofEvent::from_bytestream)
+    .def("__repr__",          [](const TofEvent &ev) {
+                                 return tofevent_to_string(ev); 
+                              }) 
+
+    ;
 
     py::class_<REventPacket>(m, "REventPacket")
         .def(py::init())
@@ -693,7 +718,7 @@ PYBIND11_MODULE(gaps_tof, m) {
         .def("to_bytestream",         &TofPacket::to_bytestream)
         .def("from_bytestream",       &TofPacket::from_bytestream)
         .def("set_payload",           &set_payload_helper)
-        .def("set_packet_type",       &set_ptype_helper) 
+        //.def("set_packet_type",       &set_ptype_helper) 
         .def_readonly("head",         &TofPacket::head)
         .def_readonly("tail",         &TofPacket::tail)
         .def_readonly("payload",      &TofPacket::payload)
@@ -758,6 +783,33 @@ PYBIND11_MODULE(gaps_tof, m) {
 
     ;
 
+    py::class_<RBEventMemoryView>(m, "RBEventMemoryView",
+            "The RBEventMemoryView (formerly 'BlobEvent') is the direct representation of an event as read out by the readoutboard and layout in its RAM memory.")
+       .def(py::init())
+       .def_readonly("status"                  ,&RBEventMemoryView::status )
+       .def_readonly("len"                     ,&RBEventMemoryView::len )
+       .def_readonly("roi"                     ,&RBEventMemoryView::roi )
+       .def_readonly("dna"                     ,&RBEventMemoryView::dna )
+       .def_readonly("fw_hash"                 ,&RBEventMemoryView::fw_hash )
+       .def_readonly("id"                      ,&RBEventMemoryView::id )
+       .def_readonly("ch_mask"                 ,&RBEventMemoryView::ch_mask )
+       .def_readonly("event_ctr"               ,&RBEventMemoryView::event_ctr )
+       .def_readonly("dtap0"                   ,&RBEventMemoryView::dtap0 )
+       .def_readonly("dtap1"                   ,&RBEventMemoryView::dtap1 )
+       .def_readonly("timestamp"               ,&RBEventMemoryView::timestamp )
+       //.def_readwrite("timestamp_32"            ,&BlobEvt_t::timestamp_32 )
+       //.def_readwrite("timestamp_16"            ,&BlobEvt_t::timestamp_16 )
+       //.def_property("ch_head"      , &ch_head_getter , &nullsetter<std::vector<unsigned short>  )
+       //.def("get_ch_head"                       ,&ch_head_getter)
+       //.def("get_ch_adc"                        ,&ch_getter )
+       //.def("get_ch_trail"                      ,&ch_trail_getter )
+       .def("get_channel_adc"                  ,&RBEventMemoryView::get_channel_adc)
+       .def_readonly("stop_cell"               ,&RBEventMemoryView::stop_cell )
+       .def_readonly("crc32"                   ,&RBEventMemoryView::crc32 )
+       .def("__repr__",  [] (const RBEventMemoryView &event) { 
+         return rbeventmemoryview_to_string(event);
+       })
+   ;
 
 
     py::class_<BlobEvt_t>(m, "BlobEvt")
@@ -855,6 +907,8 @@ PYBIND11_MODULE(gaps_tof, m) {
    // I/O functions
    m.def("get_tofpackets", &wrap_get_tofpacket_from_stream, "Get TofPackets from list of bytes");
    m.def("get_tofpackets", &wrap_get_tofpacket_from_file, "Get TofPackets from a file on disk");
+   m.def("get_rbeventsmemoryview", &wrap_get_rbeventmemoryview_from_stream, "Get RBEventMemoryViews from list of bytes");
+   m.def("get_rbeventsmemoryview", &wrap_get_rbeventmemoryview_from_file, "Get RBEventMemoryViews from a file on disk");
    m.def("get_event_ids_from_raw_stream", &get_event_ids_from_raw_stream);
    m.def("get_bytestream_from_file",     &get_bytestream_from_file);
    m.def("get_events_from_stream",   &get_events_from_stream);

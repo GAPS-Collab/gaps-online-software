@@ -3,10 +3,39 @@
 
 #include "events.h"
 #include "packets/tof_packet.h"
+#include "TOFCommon.h"
 
 /**
  * Extract tof dataclasses from files
  */
+
+/**
+ * Extract "BlobEvents" from a bytestream
+ *
+ */
+[[deprecated("Use RBEventMemoryView instead of BlobEvt_t!")]]
+Vec<BlobEvt_t> get_events_from_stream(const Vec<u8> &bytestream, u64 start_pos);
+
+/**
+ * Get RBEventMemoryViews from a raw data ("*.robin") file
+ *
+ * This file must have the raw memory data from the readoutboards 
+ * directly written to the file, without it being packed in 
+ * TofPackets
+ * 
+ * @param filename : Full path to file with RB binary data
+ */
+Vec<RBEventMemoryView> get_rbeventmemoryview(const String &filename);
+
+
+/**
+ * Get RBEventMemoryViews from a vector of bytes
+ *
+ * @param stream : 
+ * @param pos    : 
+ */
+Vec<RBEventMemoryView> get_rbeventmemoryview(const Vec<u8> &stream, u64 start_pos);
+
 
 /**
  * Read event headers from a RB binary file
@@ -37,5 +66,21 @@ Vec<TofPacket> get_tofpackets(const Vec<u8> &bytestream, u64 start_pos);
  * @param start_pos  : Byte position to start searching from in bytestream
  */
 Vec<TofPacket> get_tofpackets(const String filename);
+
+///**
+// * Extract TofEvents from a stream of binary data 
+// *
+// * @param bytestream : Binary TofEvent data.
+// * @param start_pos  : Byte position to start searching from in bytestream
+// */
+//Vec<TofPacket> get_tofpackets(const Vec<u8> &bytestream, u64 start_pos);
+//
+///**
+// * Extract TofEvents from a file on disk
+// *
+// * @param filename : Full path to binary file with TofEvents.
+// */
+//Vec<TofPacket> get_tofpackets(const String filename);
+
 
 #endif

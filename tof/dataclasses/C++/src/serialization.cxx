@@ -542,43 +542,4 @@ std::vector<u32> get_2byte_markers_indices(const std::vector<uint8_t> &bytestrea
 
 /***********************************************/
 
-std::vector<BlobEvt_t> get_events_from_stream(const vec_u8 &bytestream,
-	       			                 	      u64 start_pos) {
-  u64 nevents_in_stream = (float)bytestream.size()/BLOBEVENTSIZE;
-  std::cout << "[INFO] There might be at max " << nevents_in_stream<< " events in the stream" << std::endl;
-
-  Vec<BlobEvt_t> events; 
-  BlobEvt_t event;
-  usize pos              = start_pos;
-  bool has_ended         = false;
-  usize n_events_decoded = 0;
-  usize corrupt_events   = 0;
-  while (n_events_decoded < nevents_in_stream + 1) { 
-    // where are assuming that there is 
-    // less than one event of garbaget
-    // at the beginning of the stream
-    pos = search_for_2byte_marker(bytestream,
-                                  0xaa,
-                                  has_ended,
-                                  pos,
-                                  pos+BLOBEVENTSIZE);
-    if ((has_ended) || (pos + BLOBEVENTSIZE > bytestream.size())) {
-      break;
-    } 
-    event = decode_blobevent(bytestream,
-                             pos);
-    if (event.tail != 0x5555) {
-      corrupt_events++;
-      pos += 2; // skip header
-      continue;
-    }
-    //std::cout << event << std::endl;
-    events.push_back(event);
-    n_events_decoded++;
-    pos += BLOBEVENTSIZE + 2;
-  }
-  std::cout << "==> Retrieved " << n_events_decoded << " events from stream!" << std::endl;
-  std::cout << "==> " << corrupt_events << " times a header with no corresponding footer was found. This does not necessarily mean there is a problem, instead it could also be padding bytes introduced due to wrapper packages. " << std::endl;
-  return events;
-}
 

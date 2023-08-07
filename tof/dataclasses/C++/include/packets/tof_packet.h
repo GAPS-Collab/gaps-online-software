@@ -19,7 +19,7 @@ static const u8 PACKET_TYPE_TOFCMP_MONI = 80;
 static const u8 PACKET_TYPE_MTB_MONI    = 90;
 static const u8 PACKET_TYPE_RB_MONI     = 100;
 
-enum PacketType : u8 {
+enum class PacketType : u8 {
   Unknown       = PACKET_TYPE_UNKNOWN,
   Command       = PACKET_TYPE_COMMAND,
   RBEvent       = PACKET_TYPE_RBEVENT,
@@ -66,6 +66,7 @@ struct TofPacket {
 
   Vec<u8> payload;
 
+  [[deprecated("It should not be possible to transcode TofPackets to bytestream from the C++ API!")]]
   Vec<u8> to_bytestream() const;
 
   /**
