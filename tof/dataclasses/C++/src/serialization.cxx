@@ -1,4 +1,6 @@
 #include <fstream>
+#include "spdlog/spdlog.h"
+
 
 
 #include "TOFCommon.h"
@@ -376,10 +378,9 @@ bytestream get_bytestream_from_file(const String &filename) {
   std::ifstream is(filename, std::ios::binary);
 
   is.seekg (0, is.end);
-  int length = is.tellg();
-  //std::cout << "Found file with length " << length << std::endl;
+  u64 length = is.tellg();
   is.seekg (0, is.beg);
-  // Bytes data(length);
+  spdlog::debug("Read {} bytes from file!", length);
   bytestream stream = bytestream(length);
   is.read(reinterpret_cast<char*>(stream.data()), length);
   return stream;
