@@ -273,3 +273,42 @@ Vec<f32> wrap_rbcalibration_nanoseconds_rbeventmemoryview(const RBCalibration& c
   return calib.nanoseconds(event, channel);
 }
 
+Vec<Vec<f32>> wrap_rbcalibration_voltages_allchan_rbevent(const RBCalibration& calib, const RBEvent& event, bool spike_cleaning) {
+  if (event.header.rb_id != calib.rb_id) {
+    String message = "This is calibration for board " + std::to_string(calib.rb_id) + " but the event is from board " + std::to_string(event.header.rb_id);
+    PyErr_SetString(PyExc_ValueError, message.c_str());
+    throw py::error_already_set();
+  }
+  return calib.voltages(event, spike_cleaning);
+}
+
+Vec<Vec<f32>> wrap_rbcalibration_voltages_allchan_rbeventmemoryview(const RBCalibration& calib, const RBEventMemoryView& event, bool spike_cleaning) {
+  if (event.id != calib.rb_id) {
+    spdlog::error("This is the wrong calibration!");
+    String message = "This is calibration for board " + std::to_string(calib.rb_id) + " but the event is from board " + std::to_string(event.id);
+    PyErr_SetString(PyExc_ValueError, message.c_str());
+    throw py::error_already_set();
+  }
+  return calib.voltages(event, spike_cleaning);
+}
+
+Vec<Vec<f32>> wrap_rbcalibration_nanoseconds_allchan_rbevent(const RBCalibration& calib, const RBEvent& event) {
+  if (event.header.rb_id != calib.rb_id) {
+    String message = "This is calibration for board " + std::to_string(calib.rb_id) + " but the event is from board " + std::to_string(event.header.rb_id);
+    PyErr_SetString(PyExc_ValueError, message.c_str());
+    throw py::error_already_set();
+  }
+  return calib.nanoseconds(event);
+}
+
+Vec<Vec<f32>> wrap_rbcalibration_nanoseconds_allchan_rbeventmemoryview(const RBCalibration& calib, const RBEventMemoryView& event) {
+  if (event.id != calib.rb_id) {
+    spdlog::error("This is the wrong calibration!");
+    String message = "This is calibration for board " + std::to_string(calib.rb_id) + " but the event is from board " + std::to_string(event.id);
+    PyErr_SetString(PyExc_ValueError, message.c_str());
+    throw py::error_already_set();
+  }
+  return calib.nanoseconds(event);
+}
+
+

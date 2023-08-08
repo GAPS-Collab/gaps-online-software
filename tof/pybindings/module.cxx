@@ -918,14 +918,28 @@ PYBIND11_MODULE(gaps_tof, m) {
        //.def("nanoseconds"(const RBEventMemoryView &event, const u8 channel) const;
        //.def("voltages"   (const RBEvent &event, const u8 channel) const;
        //.def("nanoseconds",      static_cast<Vec<f32>(RBCalibration::*)(const RBEvent&, const u8)>(&RBCalibration::nanoseconds));
+       .def("nanoseconds",         wrap_rbcalibration_nanoseconds_allchan_rbevent,
+            "Apply timing calibration to adc values of all channels")
+       .def("nanoseconds",         wrap_rbcalibration_nanoseconds_allchan_rbeventmemoryview,
+            "Apply timing calibration to adc values of all channels")
+       .def("voltages",         wrap_rbcalibration_voltages_allchan_rbevent,
+            "Apply voltage calibration to adc values of all channels. Allows for spike cleaning (optional)",
+            py::arg("event"), py::arg("spike_cleaning") = false)
+       .def("voltages",         wrap_rbcalibration_voltages_allchan_rbeventmemoryview,
+            "Apply voltage calibration to adc values of all channels. Allows for spike cleaning (optional)",
+            py::arg("event"), py::arg("spike_cleaning") = false)
        .def("nanoseconds",         wrap_rbcalibration_nanoseconds_rbevent,
-            "Apply timing calibration to adc values of a specific channel")
+            "Apply timing calibration to adc values of a specific channel",
+            py::arg("event"), py::arg("channel"))
        .def("nanoseconds",         wrap_rbcalibration_nanoseconds_rbeventmemoryview,
-            "Apply timing calibration to adc values of a specific channel")
+            "Apply timing calibration to adc values of a specific channel",
+            py::arg("event"), py::arg("channel"))
        .def("voltages",         wrap_rbcalibration_voltages_rbevent,
-            "Apply voltage calibration to adc values of a specific channel")
+            "Apply voltage calibration to adc values of a specific channel",
+            py::arg("event"), py::arg("channel"))
        .def("voltages",         wrap_rbcalibration_voltages_rbeventmemoryview,
-            "Apply voltage calibration to adc values of a specific channel")
+            "Apply voltage calibration to adc values of a specific channel",
+            py::arg("event"), py::arg("channel"))
        .def("from_bytestream",  &RBCalibration::from_bytestream, 
             "Deserialize a RBCalibration object from a Vec<u8>")
        .def("from_txtfile" ,    &RBCalibration::from_txtfile,

@@ -43,4 +43,11 @@ Vec<f32> wrap_rbcalibration_nanoseconds_rbevent(const RBCalibration& calib, cons
 
 Vec<f32> wrap_rbcalibration_nanoseconds_rbeventmemoryview(const RBCalibration& calib, const RBEventMemoryView& event, const u8 channel);
 
+Vec<Vec<f32>> wrap_rbcalibration_voltages_allchan_rbevent(const RBCalibration& calib, const RBEvent& event, bool spike_cleaning = false);
+
+Vec<Vec<f32>> wrap_rbcalibration_voltages_allchan_rbeventmemoryview(const RBCalibration& calib, const RBEventMemoryView& event, bool spike_cleaning = false);
+
+Vec<Vec<f32>> wrap_rbcalibration_nanoseconds_allchan_rbevent(const RBCalibration& calib, const RBEvent& event);
+
+Vec<Vec<f32>> wrap_rbcalibration_nanoseconds_allchan_rbeventmemoryview(const RBCalibration& calib, const RBEventMemoryView& event);
 

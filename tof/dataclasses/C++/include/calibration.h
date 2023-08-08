@@ -47,6 +47,12 @@ struct RBCalibration {
 
   RBCalibration();
 
+  Vec<Vec<f32>> voltages    (const RBEventMemoryView &event, bool spike_cleaning = false) const;
+  Vec<Vec<f32>> voltages    (const RBEvent &event, bool spike_cleaning = false) const;
+  Vec<Vec<f32>> nanoseconds (const RBEventMemoryView &event) const;
+  Vec<Vec<f32>> nanoseconds (const RBEvent &event) const;
+  
+
   Vec<f32> voltages   (const RBEventMemoryView &event, const u8 channel) const;
   Vec<f32> nanoseconds(const RBEventMemoryView &event, const u8 channel) const;
   Vec<f32> voltages   (const RBEvent &event, const u8 channel) const;
