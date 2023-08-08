@@ -9,7 +9,6 @@
 #include <vector>
 #include <string>
 
-#include "TOFCommon.h"
 
 /**
  * Read a text file with calibration constants.
@@ -20,9 +19,53 @@
 #include <vector>
 #include <string>
 
+#include "tof_typedefs.h"
 #include "TOFCommon.h"
 #include "blobroutines.h"
-#include "tof_typedefs.h"
+#include "events.h"
+
+
+/**
+ * The original "RemoveSpikes" from J. Zweerink
+ *
+ */
+void spike_cleaning_jeff(Vec<f32> &voltages);
+
+
+
+/** 
+ * A set of calibration constants for a single readoutboard
+ *
+ */ 
+struct RBCalibration {
+
+  u8 rb_id;
+  Vec<Vec<f32>> v_offsets;
+  Vec<Vec<f32>> v_dips;
+  Vec<Vec<f32>> v_incs;
+  Vec<Vec<f32>> t_bin;
+
+  RBCalibration();
+
+  Vec<f32> voltages   (const RBEventMemoryView &event, const u8 channel) const;
+  Vec<f32> nanoseconds(const RBEventMemoryView &event, const u8 channel) const;
+  Vec<f32> voltages   (const RBEvent &event, const u8 channel) const;
+  Vec<f32> nanoseconds(const RBEvent &event, const u8 channel) const;
+
+  static RBCalibration from_bytestream(const Vec<u8> &bytestream,
+                                       u64 &pos);
+
+  static RBCalibration from_txtfile(const String &filename);
+
+  private:
+
+    /**
+     * Check if the channel follows the convention 1-9
+     *
+     */
+    bool channel_check(u8 channel) const;
+};
+
 
 /**
  * Read a file with calibration constants.

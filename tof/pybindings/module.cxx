@@ -797,6 +797,7 @@ PYBIND11_MODULE(gaps_tof, m) {
        .def_readonly("dtap0"                   ,&RBEventMemoryView::dtap0 )
        .def_readonly("dtap1"                   ,&RBEventMemoryView::dtap1 )
        .def_readonly("timestamp"               ,&RBEventMemoryView::timestamp )
+       //.def_readonly("adc"                     ,&RBEventMemoryView::ch_adc)
        //.def_readwrite("timestamp_32"            ,&BlobEvt_t::timestamp_32 )
        //.def_readwrite("timestamp_16"            ,&BlobEvt_t::timestamp_16 )
        //.def_property("ch_head"      , &ch_head_getter , &nullsetter<std::vector<unsigned short>  )
@@ -903,7 +904,34 @@ PYBIND11_MODULE(gaps_tof, m) {
    py::class_<Calibrations_t>(m, "Calibrations")
        .def(py::init())
    ;
-   
+  
+   py::class_<RBCalibration>(m, "RBCalibration", 
+      "RBCalibration holds th calibration constants (one per bin) per each channel for a single RB. This needs to be used in order to convert ADC to voltages/nanoseconds!")
+       .def(py::init())
+       .def_readonly("rb_id",      &RBCalibration::rb_id)
+       .def_readonly("v_offsets",  &RBCalibration::v_offsets)
+       .def_readonly("v_incs",     &RBCalibration::v_incs)
+       .def_readonly("v_dips",     &RBCalibration::v_dips)
+       .def_readonly("t_bin",      &RBCalibration::t_bin)
+
+       //.def("voltages"   (const RBEventMemoryView &event, const u8 channel) const;
+       //.def("nanoseconds"(const RBEventMemoryView &event, const u8 channel) const;
+       //.def("voltages"   (const RBEvent &event, const u8 channel) const;
+       //.def("nanoseconds",      static_cast<Vec<f32>(RBCalibration::*)(const RBEvent&, const u8)>(&RBCalibration::nanoseconds));
+       .def("nanoseconds",         wrap_rbcalibration_nanoseconds_rbevent,
+            "Apply timing calibration to adc values of a specific channel")
+       .def("nanoseconds",         wrap_rbcalibration_nanoseconds_rbeventmemoryview,
+            "Apply timing calibration to adc values of a specific channel")
+       .def("voltages",         wrap_rbcalibration_voltages_rbevent,
+            "Apply voltage calibration to adc values of a specific channel")
+       .def("voltages",         wrap_rbcalibration_voltages_rbeventmemoryview,
+            "Apply voltage calibration to adc values of a specific channel")
+       .def("from_bytestream",  &RBCalibration::from_bytestream, 
+            "Deserialize a RBCalibration object from a Vec<u8>")
+       .def("from_txtfile" ,    &RBCalibration::from_txtfile,
+            "Initialize the RBCalibration from an ASCII file with the calibration constants (one per bin per channel)")
+   ;
+
    // I/O functions
    m.def("get_tofpackets", &wrap_get_tofpackets_from_stream, "Get TofPackets from list of bytes");
    m.def("get_tofpackets", &wrap_get_tofpackets_from_file, "Get TofPackets from a file on disk");

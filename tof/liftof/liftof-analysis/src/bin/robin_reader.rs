@@ -12,6 +12,9 @@ extern crate textplots;
 use glob::glob;
 use regex::Regex;
 use textplots::{Chart, Plot, Shape};
+use indicatif::{ProgressBar,
+                ProgressStyle};
+
 
 use clap::Parser;
 use std::io::BufReader;
@@ -319,6 +322,48 @@ fn main() {
         _ => ()
       }
     }
+  } else {
+    println!("=> Will merge events without master trigger information!");
+    let mut alleventids = Vec::<u32>::new();
+    //let mut tofevents   = Vec::<MasterTofEvent>::new();
+    for rb in &available_rbs {
+      //println!("RB {}", rb);
+      alleventids.extend(robin_readers.get(&rb).expect("We do not have a file for RB").event_ids_in_cache());
+    }
+    alleventids.sort();
+    alleventids.dedup();
+    let template_bar   : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.blue/grey} {human_pos:>7}/{human_len:7} ";
+    let label_bar             = String::from("Events");
+    let bar                   = ProgressBar::new(alleventids.len() as u64);
+    let sty_bar               = ProgressStyle::with_template(template_bar).unwrap();
+    bar.set_message("Merging events...");
+    bar.set_prefix("");
+    bar.set_style(sty_bar);
+    let mut n_processed = 0u64;
+    let mut n_tofpackets = 0u64;
+    for ev in alleventids {
+      let mut t_event   = MasterTofEvent::new();
+      let mut mt_event  = MasterTriggerEvent::default();
+      mt_event.event_id = ev;
+      t_event.mt_event = mt_event;
+      for rb in &available_rbs {
+        match robin_readers.get_mut(&rb).expect("We do not have a file for this RB").get_event_by_id(&ev) {
+          None => (),
+          Some(rbevent) => {
+            t_event.rb_events.push(rbevent);
+          }
+        }
+      }
+      n_processed += 1;
+      bar.set_position(n_processed);
+      //tofevents.push(t_event);  
+
+      let tof_packet = TofPacket::from(&t_event);
+      writer.add_tof_packet(&tof_packet);
+      n_tofpackets += 1;
+    }
+    println!("=> We have written {} TofPackets!", n_tofpackets);
+    bar.finish();
   }
   println!("=> In total, we saw {} events recorded by the MTB", mtp_events_tot);
   println!("=> Extracted {} events where we have corresponding MTB information", r_events.len());

@@ -65,11 +65,15 @@ Vec<TofPacket> get_tofpackets(const Vec<u8> &bytestream, u64 start_pos) {
   // are not the same
   u64 last_pos = start_pos += 1;
   TofPacket packet;
+  //u64 n_packets = 0;
   while (true) {
     last_pos = pos;
     pos = packet.from_bytestream(bytestream, pos);
+    //if (n_packets == 100) {break;}
     if (pos != last_pos) {
       packets.push_back(packet);
+      //n_packets += 1;
+      //spdlog::info("Have {} packets!", n_packets);
     } else {
       break;
     }

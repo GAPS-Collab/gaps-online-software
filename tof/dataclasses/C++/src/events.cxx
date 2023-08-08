@@ -48,8 +48,8 @@ RBEventMemoryView::RBEventMemoryView() {
 
 /*************************************/
 
-Vec<u16> RBEventMemoryView::get_channel_adc(u8 channel) {
-  Vec<u16> adc;
+Vec<u16> RBEventMemoryView::get_channel_adc(u8 channel) const {
+  Vec<u16> adc = Vec<u16>(NWORDS, 0);
   if (channel == 0) {
     spdlog::error("Please remembmer channel ids are ranged from 1-9! Ch0 does not exist");
     return adc;
@@ -58,7 +58,10 @@ Vec<u16> RBEventMemoryView::get_channel_adc(u8 channel) {
     spdlog::error("Please remembmer channel ids are ranged from 1-9! Ch {} does not exist", channel);
     return adc;
   }
+  //for (usize k=0;k<NWORDS;k++) { 
   adc = Vec<u16>(std::begin(ch_adc[channel-1]), std::end(ch_adc[channel-1]));
+  //  adc[k] = ch_adc[channel -1][k];
+  //}
   return adc;
 }
 
@@ -245,10 +248,35 @@ RBEventHeader RBEventHeader::extract_from_rbbinarydump(const Vec<u8> &bs,
 
 /**********************************************************/
 
-RBEvent::RBEvent() {
-  
+RBEvent::RBEvent() {  
   header = RBEventHeader();
   adc    = Vec<Vec<u16>>(); 
+  for (usize k=0; k<NCHN; k++) {
+    adc.push_back(Vec<u16>(NWORDS/2,0));
+  }
+}
+
+/**********************************************************/
+
+bool RBEvent::channel_check(u8 channel) const {
+  if (channel == 0) {
+    spdlog::error("Remember, channels start at 1. 0 does not exist!");
+    return false;
+  }
+  if (channel > 9) {
+    spdlog::error("Thera are no channels > 9!");
+    return false;
+  }
+  return true;
+}
+
+/**********************************************************/
+  
+const Vec<u16>& RBEvent::get_channel_adc(u8 channel) const {
+  if (!(channel_check(channel))) {
+    return Vec<u16>();
+  }
+  return adc[channel -1]; 
 }
 
 /**********************************************************/
@@ -262,6 +290,7 @@ RBEvent RBEvent::from_bytestream(const Vec<u8> &stream,
     spdlog::error("No header signature found!");  
   }
   event.header   = RBEventHeader::from_bytestream(stream, pos);
+  spdlog::debug("Decoded RBEventHeader!");
   Vec<u8> ch_ids = event.header.get_active_data_channels();
   for (auto k : ch_ids) {
     spdlog::debug("Found active data channel {}!", k);
@@ -393,8 +422,12 @@ TofEvent TofEvent::from_bytestream(const Vec<u8> &stream,
   u32 n_rbmonis     = get_n_rbmonis(mask);
   u32 n_missing     = get_n_rbmissinghits(mask);
   u32 n_paddlepacks = get_n_paddlepackets(mask);
+  spdlog::info("Expecting {} RBEvents, {} RBMonis, {} RBMissingHits and {} PaddlePackets",
+                n_rbevents, n_rbmonis, n_missing, n_paddlepacks);
+
   for (u32 k=0; k< n_rbevents; k++) {
     RBEvent rb_event = RBEvent::from_bytestream(stream, pos);
+    spdlog::info("Extracted RBEvent!");
   }
   for (u32 k=0; k< n_missing; k++) {
     RBMissingHit missy = RBMissingHit::from_bytestream(stream, pos);

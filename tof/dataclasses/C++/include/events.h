@@ -71,7 +71,7 @@ struct RBEventMemoryView {
    *
    * @param channel : Channel ID 1-9, channel 9 has calibration sinus data.
    */
-  Vec<u16> get_channel_adc(u8 channel);
+  Vec<u16> get_channel_adc(u8 channel) const;
 
 };
 
@@ -141,8 +141,17 @@ struct RBEvent {
  
   RBEvent();
 
+  const Vec<u16>& get_channel_adc(u8 channel) const; 
+
   static RBEvent from_bytestream(const Vec<u8> &bytestream,
                                  u64 &pos);
+  private:
+
+    /**
+     * Check if the channel follows the convention 1-9
+     *
+     */
+    bool channel_check(u8 channel) const;
 
 };
 

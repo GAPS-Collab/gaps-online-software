@@ -1,6 +1,12 @@
 #include "tof_typedefs.h"
 #include "serialization.h"
 #include "io.hpp"
+#include "helpers.hpp"
+
+#include "spdlog/spdlog.h"
+#include <pybind11/pybind11.h>
+
+namespace py = pybind11;
 
 bytestream wrap_encode_ushort(u16 value, u32 start_pos) {
   bytestream stream;
@@ -228,4 +234,42 @@ String mastertriggerevent_to_string(const MasterTriggerEvent &event) {
   return repr;
 }
 
+Vec<f32> wrap_rbcalibration_voltages_rbevent(const RBCalibration& calib, const RBEvent& event, const u8 channel) {
+  if (event.header.rb_id != calib.rb_id) {
+    String message = "This is calibration for board " + std::to_string(calib.rb_id) + " but the event is from board " + std::to_string(event.header.rb_id);
+    PyErr_SetString(PyExc_ValueError, message.c_str());
+    throw py::error_already_set();
+  }
+
+  return calib.voltages(event, channel);
+}
+
+Vec<f32> wrap_rbcalibration_voltages_rbeventmemoryview(const RBCalibration& calib, const RBEventMemoryView& event, const u8 channel) {
+  if (event.id != calib.rb_id) {
+    spdlog::error("This is the wrong calibration!");
+    String message = "This is calibration for board " + std::to_string(calib.rb_id) + " but the event is from board " + std::to_string(event.id);
+    PyErr_SetString(PyExc_ValueError, message.c_str());
+    throw py::error_already_set();
+  }
+  return calib.voltages(event, channel);
+}
+
+Vec<f32> wrap_rbcalibration_nanoseconds_rbevent(const RBCalibration& calib, const RBEvent& event, const u8 channel) {
+  if (event.header.rb_id != calib.rb_id) {
+    String message = "This is calibration for board " + std::to_string(calib.rb_id) + " but the event is from board " + std::to_string(event.header.rb_id);
+    PyErr_SetString(PyExc_ValueError, message.c_str());
+    throw py::error_already_set();
+  }
+  return calib.nanoseconds(event, channel);
+}
+
+Vec<f32> wrap_rbcalibration_nanoseconds_rbeventmemoryview(const RBCalibration& calib, const RBEventMemoryView& event, const u8 channel) {
+  if (event.id != calib.rb_id) {
+    spdlog::error("This is the wrong calibration!");
+    String message = "This is calibration for board " + std::to_string(calib.rb_id) + " but the event is from board " + std::to_string(event.id);
+    PyErr_SetString(PyExc_ValueError, message.c_str());
+    throw py::error_already_set();
+  }
+  return calib.nanoseconds(event, channel);
+}
 

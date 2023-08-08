@@ -71,7 +71,7 @@ Builds with `cmake`. The only noteworthy dependency is pybind11
 
 Please look for the latest version branch, e.g.
 
-_verions 0.6 (KIHIKIHI)_
+_0.6 (KIHIKIHI)_
 
 Main will only be updated as soon as the development on the latest version 
 branch is finished, thus typically it will point to an older version.
@@ -92,6 +92,11 @@ std::vector<T> -> Vec<T>
 ```
 
 as well as the introduction of the rust primitive types, u8, u16, etc.
+
+## logging
+
+To set the loglevel for the rust API, set `RUST_LOG=<loglevel>` and for C++ set `SPDLOG_LEVEL=<loglevel>`
+environment variables.
 
 ## Available structures:
 

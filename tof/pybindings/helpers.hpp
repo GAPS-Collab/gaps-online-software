@@ -1,6 +1,7 @@
 #include "tof_typedefs.h"
 #include "serialization.h"
 #include "io.hpp"
+#include "calibration.h"
 
 #include "packets/monitoring.h"
 
@@ -33,4 +34,13 @@ String rbeventmemoryview_to_string(const RBEventMemoryView &event);
 String tofevent_to_string(const TofEvent &event);
 
 String mastertriggerevent_to_string(const MasterTriggerEvent &event);
+  
+Vec<f32> wrap_rbcalibration_voltages_rbevent(const RBCalibration& calib, const RBEvent& event, const u8 channel);
+
+Vec<f32> wrap_rbcalibration_voltages_rbeventmemoryview(const RBCalibration& calib, const RBEventMemoryView& event, const u8 channel);
+
+Vec<f32> wrap_rbcalibration_nanoseconds_rbevent(const RBCalibration& calib, const RBEvent& event, const u8 channel);
+
+Vec<f32> wrap_rbcalibration_nanoseconds_rbeventmemoryview(const RBCalibration& calib, const RBEventMemoryView& event, const u8 channel);
+
 
