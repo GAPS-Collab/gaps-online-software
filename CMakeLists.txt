@@ -135,6 +135,12 @@ if(DOXYGEN_FOUND)
   install(DIRECTORY ${CMAKE_BINARY_DIR}/doc/html DESTINATION ${CMAKE_INSTALL_PREFIX}/doc/C++API/)
 endif()
 
+if (BUILD_LIFTOF)
+  add_dependencies(doc liftof-doc)
+  install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tof/liftof/target/doc/ DESTINATION ${CMAKE_INSTALL_PREFIX}/doc/RustAPI/)
+endif()
+
+
 
 ###################################
 # Write setup-env.sh shell script

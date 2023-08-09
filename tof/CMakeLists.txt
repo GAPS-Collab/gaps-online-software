@@ -175,7 +175,11 @@ if (BUILD_LIFTOF)
   
   # Define the command to build your Rust project
   set(RUST_BUILD_COMMAND cargo build --release)
-  
+  add_custom_target(
+    liftof-doc
+      COMMAND cargo doc
+      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tof/liftof
+  )
   add_custom_target(
     liftof-cc
       ALL
