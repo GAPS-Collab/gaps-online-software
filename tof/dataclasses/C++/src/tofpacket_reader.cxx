@@ -58,7 +58,7 @@ void Gaps::TofPacketReader::process_chunk() {
   u64 head_pos = search_for_2byte_marker(stream, 0xAA, has_ended);
   if (!(has_ended)) {
     stream = read_chunk(filename_, head_pos);
-    last_packet_.from_bytestream(stream, 0);  
+    last_packet_ = TofPacket::from_bytestream(stream, head_pos);  
   } else {
     last_packet_ = TofPacket();
   }

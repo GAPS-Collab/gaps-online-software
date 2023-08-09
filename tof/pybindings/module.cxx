@@ -538,6 +538,23 @@ PYBIND11_MODULE(gaps_tof, m) {
     
       
     ;
+
+    py::class_<RBEvent>(m, "RBEvent", "RBEvent contains an event header for this specific board as well as a (flexible) number of adc channels")
+        .def(py::init())
+        .def_readonly("header"              ,&RBEvent::header)
+        .def("get_channel_adc"              ,&RBEvent::get_channel_adc,
+                                             "Get the ADC values for a specific channel. Channel ids go from 1-9",
+                                             py::arg("channel"),
+                                             pybind11::return_value_policy::reference_internal)
+        .def("from_bytestream"              ,&RBEvent::from_bytestream)
+    .def("__repr__",          [](const RBEvent &ev) {
+                                 return rbevent_to_string(ev); 
+                              }) 
+
+    ;
+
+
+
     py::class_<MasterTriggerEvent>(m, "MasterTriggerEvent", "The MasterTriggerEvent contains the information from the MTB.")
       .def(py::init())
       .def("from_bytestream", &MasterTriggerEvent::from_bytestream, "Deserialize from a list of bytes")
@@ -610,7 +627,7 @@ PYBIND11_MODULE(gaps_tof, m) {
     py::enum_<PacketType>(m, "PacketType")
       .value("Unknown",   PacketType::Unknown   )
       .value("Command",   PacketType::Command   )
-      .value("RBEvent",   PacketType::RBEvent   )
+      .value("PT_RBEvent",   PacketType::RBEvent   )
       .value("PT_TofEvent",  PacketType::TofEvent  )
       .value("Monitor",   PacketType::Monitor   )
       .value("Scalar",    PacketType::Scalar    )

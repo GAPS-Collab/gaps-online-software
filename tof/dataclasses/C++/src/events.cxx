@@ -427,6 +427,7 @@ TofEvent TofEvent::from_bytestream(const Vec<u8> &stream,
 
   for (u32 k=0; k< n_rbevents; k++) {
     RBEvent rb_event = RBEvent::from_bytestream(stream, pos);
+    event.rb_events.push_back(rb_event);
     spdlog::info("Extracted RBEvent!");
   }
   for (u32 k=0; k< n_missing; k++) {

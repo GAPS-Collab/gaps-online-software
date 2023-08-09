@@ -361,6 +361,7 @@ fn main() {
       let tof_packet = TofPacket::from(&t_event);
       writer.add_tof_packet(&tof_packet);
       n_tofpackets += 1;
+      //if n_tofpackets == 4 {break;}
     }
     println!("=> We have written {} TofPackets!", n_tofpackets);
     bar.finish();

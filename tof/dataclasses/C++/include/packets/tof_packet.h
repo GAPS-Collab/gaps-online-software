@@ -53,6 +53,8 @@ std::string packet_type_to_string(PacketType pt);
  * => The packet has a size of 9 + PAYLOAD.size()
  */
 struct TofPacket {
+  static const u16 HEAD = 0xAAAA;
+  static const u16 TAIL = 0x5555;
   
   u16 head = 0xAAAA;
   u16 tail = 0x5555;
@@ -69,17 +71,17 @@ struct TofPacket {
   [[deprecated("It should not be possible to transcode TofPackets to bytestream from the C++ API!")]]
   Vec<u8> to_bytestream() const;
 
+  //[[deprecated("Use static from_bytestream instead!")]]
+  //u64 from_bytestream(const Vec<u8> &payload,
+  //                    usize start_pos=0);
+
+
   /**
    * Transcode from bytestream
    *
-   * Returns:
-   *    position where the event is found in the bytestream
-   *    (tail position +=1, so that bytestream can be iterated
-   *    over easily)
    */
-  u16 from_bytestream(const Vec<u8> &payload,
-                      usize start_pos=0);
-
+  static TofPacket from_bytestream(const Vec<u8> &bytestream,
+                                   u64 &pos);
 
   //! Just to be used for debugging - NO SERIALIZATION. 
   std::string to_string() const;

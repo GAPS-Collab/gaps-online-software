@@ -191,7 +191,7 @@ void spike_cleaning_drs4(Vec<Vec<f32>> &wf, u16 tCell, i32 spikes[]) {
     if (k < n_rsp && fabs(rsp[k] - rsp[k + 1] % 1024) == 2)
       k++; // skip second half of double spike
   }
-  spdlog::error("This is not implemented yet and does NUTHIN!");
+  //spdlog::error("This is not implemented yet and does NUTHIN!");
 //  //let mut spikes  : [i32;10] = [0;10];
 //  f32 filter;
 //  f32 dfilter;

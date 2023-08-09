@@ -177,6 +177,20 @@ String tofevent_to_string(const TofEvent &event) {
 
 /***********************************************/
 
+String rbevent_to_string(const RBEvent &event) {
+  String repr = "<RBEvent\n";
+  //repr += "\thead "      + std::to_string(event.head )      + "\n" ;
+  //repr += "\tn missing hits: "    + std::to_string(event.missing_hits.size() )    + "\n" ;
+  //repr += "\tn RB Events: "       + std::to_string(event.rb_events.size() )       + "\n" ;
+  //repr += "\tn RB Monis "         + std::to_string(event.rb_moni_data.size() )       + "\n" ;
+  //repr += "\tn PaddlePackets "    + std::to_string(event.dna )       + "\n" ;
+  //repr += "\ttail "      + std::to_string(event.tail)       ;
+  repr += ">";
+  return repr;
+}
+
+/***********************************************/
+
 String mastertriggerevent_to_string(const MasterTriggerEvent &event) {
   String repr = "<MasterTriggerEvent\n";
   repr += "\t event_id      :" + std::to_string(event.event_id     ) + "\n" ; 

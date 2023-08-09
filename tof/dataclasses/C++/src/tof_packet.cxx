@@ -73,33 +73,84 @@ Vec<u8> TofPacket::to_bytestream() const
 
 /**************************************************/
 
-u16 TofPacket::from_bytestream(const Vec<u8> &bytestream,
-                               usize          start_pos){ 
-  usize pos = start_pos;
+//u64 TofPacket::from_bytestream(const Vec<u8> &bytestream,
+//                               usize          start_pos){ 
+//  usize pos = start_pos;
+//  u16 value = Gaps::parse_u16(bytestream, pos);
+//  if (!(value == head)) {
+//    spdlog::error("No header found!");
+//    /// print out the next/pre 5 bytes
+//    spdlog::error("Byte! {}",bytestream[pos -5]);
+//    spdlog::error("Byte! {}",bytestream[pos -4]);
+//    spdlog::error("Byte! {}",bytestream[pos -3]);
+//    spdlog::error("Byte! {}",bytestream[pos -2]);
+//    spdlog::error("Byte! {}",bytestream[pos -1]);
+//    spdlog::error("Byte! {}",bytestream[pos ]);
+//    spdlog::error("Byte! {}",bytestream[pos +1]);
+//    spdlog::error("Byte! {}",bytestream[pos +2]);
+//    spdlog::error("Byte! {}",bytestream[pos +3]);
+//    spdlog::error("Byte! {}",bytestream[pos +4]);
+//
+//    
+//    return start_pos;
+//  }
+//  head = value;
+//  //pos += 2; // position in bytestream, 2 since we 
+//  packet_type = bytestream[pos]; pos+=1;
+//  //std::cout << "found packet type : " << packet_type << std::endl;
+//  //payload_size = u32_from_le_bytes(bytestream, pos); pos+=4;
+//  payload_size = Gaps::parse_u32(bytestream, pos);
+//  spdlog::info("Found TofPacket with {} bytes payload!", payload_size);
+//  //std::cout << "found payload size " << payload_size << std::endl;
+//  //size_t payload_end = pos + bytestream.size() - 2;
+//  usize payload_end = pos + payload_size;
+//  //std::cout << " found payload end " << payload_end << std::endl;
+//  Vec<u8> packet_bytestream(bytestream.begin()+ pos,
+//                            bytestream.begin()+ payload_end)  ;
+//  payload = packet_bytestream;
+//  pos += payload_size;
+//  tail = Gaps::parse_u16(bytestream, pos);
+//  if (tail != 0x5555)
+//    {spdlog::error("Tail wrong! ");}
+//  return pos;
+//}
+
+/**************************************************/
+
+TofPacket TofPacket::from_bytestream(const Vec<u8> &bytestream,
+                                      u64           &pos){ 
+  TofPacket packet = TofPacket();
   u16 value = Gaps::parse_u16(bytestream, pos);
-  if (!(value == head)) {
+  if (value != TofPacket::HEAD) {
     spdlog::error("No header found!");
-    return start_pos;
+    /// print out the next/pre 5 bytes
+    //spdlog::error("Byte! {}",bytestream[pos -5]);
+    //spdlog::error("Byte! {}",bytestream[pos -4]);
+    //spdlog::error("Byte! {}",bytestream[pos -3]);
+    //spdlog::error("Byte! {}",bytestream[pos -2]);
+    //spdlog::error("Byte! {}",bytestream[pos -1]);
+    //spdlog::error("Byte! {}",bytestream[pos ]);
+    //spdlog::error("Byte! {}",bytestream[pos +1]);
+    //spdlog::error("Byte! {}",bytestream[pos +2]);
+    //spdlog::error("Byte! {}",bytestream[pos +3]);
+    //spdlog::error("Byte! {}",bytestream[pos +4]);
+    pos -= 2; // rewind position so that client knows we did not 
+              // parse anything
+    return packet;
   }
-  head = value;
-  //pos += 2; // position in bytestream, 2 since we 
-  packet_type = bytestream[pos]; pos+=1;
-  //std::cout << "found packet type : " << packet_type << std::endl;
-  //payload_size = u32_from_le_bytes(bytestream, pos); pos+=4;
-  payload_size = Gaps::parse_u32(bytestream, pos);
-  spdlog::info("Found TofPacket with {} bytes payload!", payload_size);
-  //std::cout << "found payload size " << payload_size << std::endl;
-  //size_t payload_end = pos + bytestream.size() - 2;
-  usize payload_end = pos + payload_size;
-  //std::cout << " found payload end " << payload_end << std::endl;
+  packet.head = value;
+  packet.packet_type = bytestream[pos]; pos+=1;
+  packet.payload_size = Gaps::parse_u32(bytestream, pos);
+  spdlog::info("Found TofPacket with {} bytes payload!", packet.payload_size);
+  usize payload_end = pos + packet.payload_size;
   Vec<u8> packet_bytestream(bytestream.begin()+ pos,
                             bytestream.begin()+ payload_end)  ;
-  payload = packet_bytestream;
-  pos += payload_size;
-  tail = Gaps::parse_u16(bytestream, pos);
-  if (tail != 0x5555)
+  packet.payload = packet_bytestream;
+  pos += packet.payload_size;
+  u16 tail = Gaps::parse_u16(bytestream, pos);
+  if (tail != TofPacket::TAIL)
     {spdlog::error("Tail wrong! ");}
-  return pos;
+  return packet;
 }
 
 /**************************************************/

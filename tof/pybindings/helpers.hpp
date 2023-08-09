@@ -1,9 +1,13 @@
+#include <pybind11/numpy.h>
+
 #include "tof_typedefs.h"
 #include "serialization.h"
 #include "io.hpp"
 #include "calibration.h"
 
 #include "packets/monitoring.h"
+
+namespace py = pybind11;
 
 bytestream wrap_encode_ushort(u16 value, u32 start_pos);
 
@@ -33,6 +37,8 @@ String rbeventmemoryview_to_string(const RBEventMemoryView &event);
 
 String tofevent_to_string(const TofEvent &event);
 
+String rbevent_to_string(const RBEvent &event);
+
 String mastertriggerevent_to_string(const MasterTriggerEvent &event);
   
 Vec<f32> wrap_rbcalibration_voltages_rbevent(const RBCalibration& calib, const RBEvent& event, const u8 channel);
@@ -50,4 +56,11 @@ Vec<Vec<f32>> wrap_rbcalibration_voltages_allchan_rbeventmemoryview(const RBCali
 Vec<Vec<f32>> wrap_rbcalibration_nanoseconds_allchan_rbevent(const RBCalibration& calib, const RBEvent& event);
 
 Vec<Vec<f32>> wrap_rbcalibration_nanoseconds_allchan_rbeventmemoryview(const RBCalibration& calib, const RBEventMemoryView& event);
+
+template <typename T>
+py::array_t<T> get_vector(const Vec<T> vec) {
+  // Create a NumPy array from the C++ vector
+  py::array_t<T> numpy_array(vec.size(), vec.data());
+  return numpy_array;
+}
 
