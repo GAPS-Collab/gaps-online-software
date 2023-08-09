@@ -148,3 +148,34 @@ if (BUILD_PYBINDINGS)
                         ${GAPSTOF_LIBRARY_SHARED})
 
 endif(BUILD_PYBINDINGS)
+
+# installation
+set(INSTALL_EXAMPLES_DIR "${CMAKE_INSTALL_PREFIX}/examples" CACHE PATH "installation directory for exanokes" FORCE)
+
+# Make relative paths absolute (needed later on)
+foreach(p EXAMPLES)
+  set(var INSTALL_${p}_DIR)
+  if(NOT IS_ABSOLUTE "${${var}}")
+    set(${var} "${CMAKE_INSTALL_PREFIX}/${${var}}")
+  endif()
+endforeach()
+
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples
+    DESTINATION ${CMAKE_INSTALL_PREFIX}
+)
+
+# install the library in the lib directory
+install(TARGETS ${GAPSTOF_LIBRARY_SHARED}
+    EXPORT GAPSTargets         
+    LIBRARY DESTINATION ${INSTALL_LIBRARY_DIR}
+    PUBLIC_HEADER DESTINATION ${INSTALL_INCLUDE_DIR}
+    #INCLUDES DESTINATION "${GAPS_HEADER_OUTPUT_DIRECTORY}/lib/include"
+)
+
+install(TARGETS ${pybindings}
+    EXPORT GAPSTargets         
+    LIBRARY DESTINATION ${INSTALL_PYTHON_DIR}
+    #PUBLIC_HEADER DESTINATION ${INSTALL_INCLUDE_DIR}
+    #INCLUDES DESTINATION "${GAPS_HEADER_OUTPUT_DIRECTORY}/lib/include"
+)
+

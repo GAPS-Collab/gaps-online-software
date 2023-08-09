@@ -1,7 +1,7 @@
 ##=========================================
+# GAPS ONLINE SOFTWARE
+# CMAKE BUILD SYSTEM
 #
-# GAPS - GFP analysis metapacakge
-# 
 #  - dataclasses
 #  - UCLA waveform tools
 #
@@ -12,9 +12,11 @@ project(GAPS_ONLINE_SOFTWARE VERSION 0.6.0 LANGUAGES C CXX)
 
 message(STATUS "Running cmake for ${CMAKE_PROJECT_NAME} softwere version ${GAPS_ONLINE_SOFTWARE_VERSION}")
 message(STATUS "-- Current release KIHIKIHI (Moorish idol)")
-message(STATUS "Running cmake for GAPS softwere version ${GAPS_WAVEFORM_VERSION}")
 message(STATUS "Using build directory: ${PROJECT_BINARY_DIR}")
 set(CMAKE_WARN_DEPRECATED ON)
+
+# suppress the Up-to-date output when installing
+set(CMAKE_INSTALL_MESSAGE LAZY)
 
 set(CMAKE_CXX_STANDARD 17 CACHE STRING "C++ standard has to be >= 17")
 
@@ -74,6 +76,7 @@ find_package(pybind11 )
   endif()
 endif(BUILD_PYBINDINGS)
 
+
 ## do a release build by default
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Release" CACHE STRING
@@ -81,5 +84,57 @@ if(NOT CMAKE_BUILD_TYPE)
       FORCE)
 endif(NOT CMAKE_BUILD_TYPE)
 
+## in case of Release build, we set the NDEBUG preprocessor directive
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG=1")
+
 add_subdirectory(tof)
+
+
+if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+    set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/install/gaps-online-sw-v${GAPS_ONLINE_SOFTWARE_VERSION}" CACHE PATH "default install path" FORCE)
+endif()
+
+message(STATUS "Installing into ${CMAKE_INSTALL_PREFIX}")
+
+set(INSTALL_LIBRARY_DIR  "${CMAKE_INSTALL_PREFIX}/lib" CACHE PATH      "installation directory for libraries" FORCE)
+set(INSTALL_INCLUDE_DIR  "${CMAKE_INSTALL_PREFIX}/include" CACHE PATH  "installation directory for header files" FORCE)
+set(INSTALL_BINARY_DIR   "${CMAKE_INSTALL_PREFIX}/bin" CACHE PATH      "installation directory for executables" FORCE)
+set(INSTALL_PYTHON_DIR   "${CMAKE_INSTALL_PREFIX}/python" CACHE PATH   "installation directory for python code" FORCE)
+
+# Make relative paths absolute (needed later on)
+foreach(p LIBRARY BINARY INCLUDE PYTHON EXAMPLES)
+  set(var INSTALL_${p}_DIR)
+  if(NOT IS_ABSOLUTE "${${var}}")
+    set(${var} "${CMAKE_INSTALL_PREFIX}/${${var}}")
+  endif()
+endforeach()
+
+# install README
+install(FILES
+  "${CMAKE_CURRENT_SOURCE_DIR}/README.md"
+  DESTINATION "${CMAKE_INSTALL_PREFIX}"
+)
+
+# write setup shell
+
+file(WRITE  ${CMAKE_INSTALL_PREFIX}/setup-env.sh "#! /bin/sh\n")
+file(APPEND ${CMAKE_INSTALL_PREFIX}/setup-env.sh "export PATH=$PATH:${CMAKE_INSTALL_PREFIX}/bin\n")
+file(APPEND ${CMAKE_INSTALL_PREFIX}/setup-env.sh "export PYTHONPATH=$PYTHONPATH:${CMAKE_INSTALL_PREFIX}/python\n")
+file(APPEND ${CMAKE_INSTALL_PREFIX}/setup-env.sh "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${CMAKE_INSTALL_PREFIX}/lib\n")
+file(APPEND ${CMAKE_INSTALL_PREFIX}/setup-env.sh "echo -e \t  \"********************************************\"\n")
+file(APPEND ${CMAKE_INSTALL_PREFIX}/setup-env.sh "echo -e \t  \"* WELCOME TO GAPS-ONLINE-SOFTWARE          *\"\n")
+file(APPEND ${CMAKE_INSTALL_PREFIX}/setup-env.sh "echo -e \t  \"********************************************\"\n")
+file(APPEND ${CMAKE_INSTALL_PREFIX}/setup-env.sh "echo -e \t  \" -- We have set the following variables:\"\n")
+file(APPEND ${CMAKE_INSTALL_PREFIX}/setup-env.sh "echo -e \t  \" -- PYTHONPATH=$PYTHONPATH\"\n")
+file(APPEND ${CMAKE_INSTALL_PREFIX}/setup-env.sh "echo -e \t  \" -- PATH=$PATH\"\n")
+file(APPEND ${CMAKE_INSTALL_PREFIX}/setup-env.sh "echo -e \t  \" -- LD_LIBRARY_PATH=$LD_LIBRARY_PATH\"\n")
+file(APPEND ${CMAKE_INSTALL_PREFIX}/setup-env.sh "echo -e \t  \"********************************************\"\n")
+file(APPEND ${CMAKE_INSTALL_PREFIX}/setup-env.sh "echo -e \t  \" => software repositories:\"\n")
+file(APPEND ${CMAKE_INSTALL_PREFIX}/setup-env.sh "echo -e \t  \"    - https://uhhepvcs.phys.hawaii.edu/Achim/gaps-online-software\"\n")
+file(APPEND ${CMAKE_INSTALL_PREFIX}/setup-env.sh "echo -e \t  \"    - https://github.com/GAPS-Collab/gaps-online-software\"\n")
+file(APPEND ${CMAKE_INSTALL_PREFIX}/setup-env.sh "echo -e \t  \" => Where to get help?:\"\n")
+file(APPEND ${CMAKE_INSTALL_PREFIX}/setup-env.sh "echo -e \t  \"    - README.md\"\n")
+file(APPEND ${CMAKE_INSTALL_PREFIX}/setup-env.sh "echo -e \t  \" => Maintainer?:\"\n")
+file(APPEND ${CMAKE_INSTALL_PREFIX}/setup-env.sh "echo -e \t  \"    - stoessl@hawaii.edu\"\n")
+
 
