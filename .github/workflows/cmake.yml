@@ -1,7 +1,7 @@
 name: CMake
 
 on:
-  workflow_dispatch
+  workflow_dispatch:
   push:
     branches: [ "KIHIKIHI-0.6", "main" ]
   pull_request:
