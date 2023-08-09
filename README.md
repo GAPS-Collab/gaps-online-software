@@ -14,6 +14,14 @@ one has to switch to the branch with the highest version number
 available, e.g. KIHIKIHI-0.6. 
 The branches/releases are named after fish in Hawaii. A fish 
 identification card can be found [here](https://www.honolulu.gov/rep/site/dpr/dpr_docs/hbep_fish_id_card.pdf).
+You can switch branches with `git checkout <branch>`. To get updates, use `git pull`
+
+### software repositories
+
+There are two repositories, which are both (hopefully) kept in sync, so they are interchangeable
+
+* [gitlab (UH)](https://uhhepvcs.phys.hawaii.edu/Achim/gaps-online-software)
+* [github](https://github.com/GAPS-Collab/gaps-online-software)
 
 ## installation
 
