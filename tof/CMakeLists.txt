@@ -149,7 +149,66 @@ if (BUILD_PYBINDINGS)
 
 endif(BUILD_PYBINDINGS)
 
+########################################
+# LIFTOF - GAPS TOF flight software
+########################################
+
+# rust part. Check if cargo is available
+option(BUILD_LIFTOF "build liftof tof flight software suite" OFF)
+execute_process(
+  COMMAND cargo --version
+  RESULT_VARIABLE CARGO_RESULT
+  OUTPUT_QUIET
+)
+
+if (BUILD_LIFTOF)
+  if(CARGO_RESULT EQUAL 0)
+    message(STATUS "-- found `cargo` - will be able to build liftof!")
+  else()
+    message(WARNING "-- `cargo` NOT found! Unable to build liftof.")
+    message(STATUS "Please install a rust toolchain including cargo if you want to build liftof, and make sure cargo is in your $PATH!")
+    option (BUILD_LIFTOF OFF)
+  endif()
+endif()
+
+if (BUILD_LIFTOF)
+  
+  # Define the command to build your Rust project
+  set(RUST_BUILD_COMMAND cargo build --release)
+  
+  add_custom_target(
+    liftof-cc
+      ALL
+      COMMAND ${RUST_BUILD_COMMAND}
+      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tof/liftof/liftof-cc
+  )
+  add_custom_target(
+    liftof-analysis
+      ALL
+      COMMAND cargo build --release --bin=liftof-robin-reader
+      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tof/liftof/liftof-analysis
+  )
+  add_custom_target(
+    liftof-tui
+      ALL
+      COMMAND ${RUST_BUILD_COMMAND}
+      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tof/liftof/liftof-tui
+  )
+  install(PROGRAMS ${CMAKE_SOURCE_DIR}/tof/liftof/target/release/liftof-cc
+      DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
+  )
+  install(PROGRAMS ${CMAKE_SOURCE_DIR}/tof/liftof/target/release/liftof-robin-reader
+      DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
+  )
+  install(PROGRAMS ${CMAKE_SOURCE_DIR}/tof/liftof/target/release/liftof-tui
+      DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
+  )
+
+endif(BUILD_LIFTOF)
+
+#################################################
 # installation
+#################################################
 set(INSTALL_EXAMPLES_DIR "${CMAKE_INSTALL_PREFIX}/examples" CACHE PATH "installation directory for exanokes" FORCE)
 
 # Make relative paths absolute (needed later on)

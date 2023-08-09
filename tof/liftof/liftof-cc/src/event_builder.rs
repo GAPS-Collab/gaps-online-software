@@ -23,7 +23,7 @@ use crossbeam_channel as cbc;
 
 use tof_dataclasses::packets::paddle_packet::PaddlePacket;
 use tof_dataclasses::commands::TofCommand;
-
+use tof_dataclasses::serialization::Serialization;
 
 
 ///  Walk over the event cache and check for each event

@@ -75,7 +75,7 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
   let mut n_chunk  = 0usize;
   // in case we want to do calibratoins
   let mut calibrations = [Calibrations {..Default::default()};NCHN];
-  let mut _calibrations = ReadoutBoardCalibrations::new(&rb.rb_id);
+  let mut _calibrations = ReadoutBoardCalibrations::new(rb.rb_id);
   let do_calibration = true;
   if do_calibration {
     info!("Reading calibrations from file {}", &rb.calib_file);

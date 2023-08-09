@@ -115,26 +115,38 @@ install(FILES
   DESTINATION "${CMAKE_INSTALL_PREFIX}"
 )
 
-# write setup shell
+#################################3
+# C++ documentation with DOXYGEN
+###################################
 
-file(WRITE  ${CMAKE_INSTALL_PREFIX}/setup-env.sh "#! /bin/sh\n")
-file(APPEND ${CMAKE_INSTALL_PREFIX}/setup-env.sh "export PATH=$PATH:${CMAKE_INSTALL_PREFIX}/bin\n")
-file(APPEND ${CMAKE_INSTALL_PREFIX}/setup-env.sh "export PYTHONPATH=$PYTHONPATH:${CMAKE_INSTALL_PREFIX}/python\n")
-file(APPEND ${CMAKE_INSTALL_PREFIX}/setup-env.sh "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${CMAKE_INSTALL_PREFIX}/lib\n")
-file(APPEND ${CMAKE_INSTALL_PREFIX}/setup-env.sh "echo -e \t  \"********************************************\"\n")
-file(APPEND ${CMAKE_INSTALL_PREFIX}/setup-env.sh "echo -e \t  \"* WELCOME TO GAPS-ONLINE-SOFTWARE          *\"\n")
-file(APPEND ${CMAKE_INSTALL_PREFIX}/setup-env.sh "echo -e \t  \"********************************************\"\n")
-file(APPEND ${CMAKE_INSTALL_PREFIX}/setup-env.sh "echo -e \t  \" -- We have set the following variables:\"\n")
-file(APPEND ${CMAKE_INSTALL_PREFIX}/setup-env.sh "echo -e \t  \" -- PYTHONPATH=$PYTHONPATH\"\n")
-file(APPEND ${CMAKE_INSTALL_PREFIX}/setup-env.sh "echo -e \t  \" -- PATH=$PATH\"\n")
-file(APPEND ${CMAKE_INSTALL_PREFIX}/setup-env.sh "echo -e \t  \" -- LD_LIBRARY_PATH=$LD_LIBRARY_PATH\"\n")
-file(APPEND ${CMAKE_INSTALL_PREFIX}/setup-env.sh "echo -e \t  \"********************************************\"\n")
-file(APPEND ${CMAKE_INSTALL_PREFIX}/setup-env.sh "echo -e \t  \" => software repositories:\"\n")
-file(APPEND ${CMAKE_INSTALL_PREFIX}/setup-env.sh "echo -e \t  \"    - https://uhhepvcs.phys.hawaii.edu/Achim/gaps-online-software\"\n")
-file(APPEND ${CMAKE_INSTALL_PREFIX}/setup-env.sh "echo -e \t  \"    - https://github.com/GAPS-Collab/gaps-online-software\"\n")
-file(APPEND ${CMAKE_INSTALL_PREFIX}/setup-env.sh "echo -e \t  \" => Where to get help?:\"\n")
-file(APPEND ${CMAKE_INSTALL_PREFIX}/setup-env.sh "echo -e \t  \"    - README.md\"\n")
-file(APPEND ${CMAKE_INSTALL_PREFIX}/setup-env.sh "echo -e \t  \" => Maintainer?:\"\n")
-file(APPEND ${CMAKE_INSTALL_PREFIX}/setup-env.sh "echo -e \t  \"    - stoessl@hawaii.edu\"\n")
+find_package(Doxygen)
+if(DOXYGEN_FOUND)
+  set(DOXYGEN_INPUT "${CMAKE_SOURCE_DIR}/tof/dataclasses/C++/include")
+  set(DOXYGEN_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/doc")
+  set(DOXYGEN_GENERATE_HTML YES)
+  set(DOXYGEN_GENERATE_MAN NO) # You can enable this if you want man pages
+  configure_file(${CMAKE_SOURCE_DIR}/Doxyfile.in ${CMAKE_BINARY_DIR}/Doxyfile @ONLY)
+  add_custom_target(doc
+    COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_BINARY_DIR}/Doxyfile
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    COMMENT "Generating C++ API documentation with Doxygen"
+    VERBATIM
+  )
+  install(DIRECTORY ${CMAKE_BINARY_DIR}/doc/html DESTINATION ${CMAKE_INSTALL_PREFIX}/doc/C++API/)
+endif()
 
+
+###################################
+# Write setup-env.sh shell script
+####################################
+
+## Define the paths
+set(SETUP_SCRIPT_SOURCE ${CMAKE_SOURCE_DIR}/setup-env.sh.in)
+set(SETUP_SCRIPT_DEST ${CMAKE_BINARY_DIR}/setup-env.sh)
+
+# Configure the setup script during configuration
+configure_file(${SETUP_SCRIPT_SOURCE} ${SETUP_SCRIPT_DEST} @ONLY)
+#
+## Install the generated setup script during installation
+install(FILES ${SETUP_SCRIPT_DEST} DESTINATION ${CMAKE_INSTALL_PREFIX})
 
