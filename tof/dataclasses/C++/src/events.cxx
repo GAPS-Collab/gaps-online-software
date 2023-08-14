@@ -274,7 +274,7 @@ bool RBEvent::channel_check(u8 channel) const {
   
 const Vec<u16>& RBEvent::get_channel_adc(u8 channel) const {
   if (!(channel_check(channel))) {
-    return Vec<u16>();
+    return _empty_channel;
   }
   return adc[channel -1]; 
 }
@@ -422,13 +422,12 @@ TofEvent TofEvent::from_bytestream(const Vec<u8> &stream,
   u32 n_rbmonis     = get_n_rbmonis(mask);
   u32 n_missing     = get_n_rbmissinghits(mask);
   u32 n_paddlepacks = get_n_paddlepackets(mask);
-  spdlog::info("Expecting {} RBEvents, {} RBMonis, {} RBMissingHits and {} PaddlePackets",
+  spdlog::debug("Expecting {} RBEvents, {} RBMonis, {} RBMissingHits and {} PaddlePackets",
                 n_rbevents, n_rbmonis, n_missing, n_paddlepacks);
 
   for (u32 k=0; k< n_rbevents; k++) {
     RBEvent rb_event = RBEvent::from_bytestream(stream, pos);
     event.rb_events.push_back(rb_event);
-    spdlog::info("Extracted RBEvent!");
   }
   for (u32 k=0; k< n_missing; k++) {
     RBMissingHit missy = RBMissingHit::from_bytestream(stream, pos);
@@ -485,6 +484,46 @@ TofEvent TofEvent::from_bytestream(const Vec<u8> &stream,
 }
   
 /**********************************************************/
+
+TofEvent TofEvent::from_tofpacket(const TofPacket &packet) {
+  TofEvent event;
+  if (packet.packet_type != PacketType::TofEvent) {
+    spdlog::error("Wrong packet type! {}", packet_type_to_string(packet.packet_type));
+    return event;
+  } 
+  u64 _pos = 0;
+  event = TofEvent::from_bytestream(packet.payload, _pos);
+  return event;
+}
+
+/**********************************************************/
+  
+const RBEvent& TofEvent::get_rbevent(u8 board_id) const {
+  for (const auto &ev : rb_events) {
+    if (ev.header.rb_id == board_id) {
+      return ev;
+    }
+  }
+  spdlog::error("No RBEvent for board {}", board_id);
+  return _empty_event;
+}
+
+/**********************************************************/
+  
+Vec<u8> TofEvent::get_rbids() const {
+  Vec<u8> rb_ids = Vec<u8>();
+  for (const auto &ev : rb_events) {
+    rb_ids.push_back(ev.header.rb_id);
+  }
+  return rb_ids;
+}
+
+/**********************************************************/
+    
+bool TofEvent::passed_consistency_check() {
+  spdlog::error("This is not implmented yet!");
+  return false;
+}
 
 MasterTriggerEvent::MasterTriggerEvent() {
   event_id      = 0; 

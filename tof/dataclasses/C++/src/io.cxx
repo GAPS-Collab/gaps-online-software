@@ -239,4 +239,52 @@ Vec<BlobEvt_t> get_events_from_stream(const Vec<u8> &bytestream,
   return events;
 }
 
+/***************************************************/
+
+Vec<TofEvent> unpack_tofevents_from_tofpackets(const Vec<u8> &bytestream, u64 start_pos) {
+  Vec<TofEvent> events = Vec<TofEvent>();
+  u64 pos  = start_pos;
+  // just make sure in the beginning they
+  // are not the same
+  u64 last_pos = start_pos += 1;
+  TofPacket packet;
+  TofEvent event;
+  u64 n_packets = 0;
+  while (true) {
+    last_pos = pos;
+    packet = TofPacket::from_bytestream(bytestream, pos);
+    //if (n_packets == 100) {break;}
+    if (pos != last_pos) {
+      if (packet.packet_type == PacketType::TofEvent) {
+        //spdlog::info("Got packet with payload {}", packet.payload.size());  
+        event = TofEvent::from_tofpacket(packet);
+        events.push_back(event);
+      }
+      //spdlog::info("pos: {}", pos);
+      //packets.push_back(packet);
+      //n_packets += 1;
+    } else {
+      break;
+    }
+  }
+  spdlog::info("Read {} TofEvents!", events.size());
+  return events;
+}
+
+/***************************************************/
+
+Vec<TofEvent> unpack_tofevents_from_tofpackets(const String filename) {
+  Vec<TofEvent> events = Vec<TofEvent>();
+  auto stream = get_bytestream_from_file(filename); 
+  spdlog::debug("Read {} bytes from {}", stream.size(), filename);
+  bool has_ended = false;
+  auto pos = search_for_2byte_marker(stream, 0xAA, has_ended );
+  if (has_ended) {
+    spdlog::error("Opened file {}, but no start marker {} could be found indicating that this file is no good!",filename, TofPacket::HEAD);
+    return events;
+  }
+  return unpack_tofevents_from_tofpackets(stream, pos);
+}
+
+
 

@@ -2,6 +2,8 @@
 export PATH=$PATH:@CMAKE_INSTALL_PREFIX@/bin
 export PYTHONPATH=$PYTHONPATH:@CMAKE_INSTALL_PREFIX@/python
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:@CMAKE_INSTALL_PREFIX@/lib
+export DJANGO_SETTINGS_MODULE=gaps_db.settings
+
 echo -e "********************************************"
 echo -e "* WELCOME TO GAPS-ONLINE-SOFTWARE          *"
 echo -e "********************************************"

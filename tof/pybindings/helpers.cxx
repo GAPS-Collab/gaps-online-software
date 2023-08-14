@@ -94,6 +94,18 @@ Vec<RBEventMemoryView> wrap_get_rbeventmemoryviews_from_stream(const Vec<u8> &st
 
 /***********************************************/
 
+Vec<TofEvent> wrap_unpack_tofevents_from_tofpackets_from_file(const String filename) {
+  return unpack_tofevents_from_tofpackets(filename);
+}
+
+/***********************************************/
+
+Vec<TofEvent> wrap_unpack_tofevents_from_tofpackets_from_stream(const Vec<u8> &stream, u64 pos) {
+  return unpack_tofevents_from_tofpackets(stream, pos);
+}
+
+/***********************************************/
+
 String rbmoni_to_string(const RBMoniData &moni) {
   String repr = "<RBMoniData: \n";
   repr += "\t board_id           " + std::to_string(moni.board_id)         + "\n"; 
@@ -248,81 +260,104 @@ String mastertriggerevent_to_string(const MasterTriggerEvent &event) {
   return repr;
 }
 
-Vec<f32> wrap_rbcalibration_voltages_rbevent(const RBCalibration& calib, const RBEvent& event, const u8 channel) {
+py::array_t<f32> wrap_rbcalibration_voltages_rbevent(const RBCalibration& calib, const RBEvent& event, const u8 channel) {
   if (event.header.rb_id != calib.rb_id) {
     String message = "This is calibration for board " + std::to_string(calib.rb_id) + " but the event is from board " + std::to_string(event.header.rb_id);
     PyErr_SetString(PyExc_ValueError, message.c_str());
     throw py::error_already_set();
   }
-
-  return calib.voltages(event, channel);
+  Vec<f32> volts = calib.voltages(event, channel);
+  return to_nparray(volts);
 }
 
-Vec<f32> wrap_rbcalibration_voltages_rbeventmemoryview(const RBCalibration& calib, const RBEventMemoryView& event, const u8 channel) {
+py::array_t<f32> wrap_rbcalibration_voltages_rbeventmemoryview(const RBCalibration& calib, const RBEventMemoryView& event, const u8 channel) {
   if (event.id != calib.rb_id) {
     spdlog::error("This is the wrong calibration!");
     String message = "This is calibration for board " + std::to_string(calib.rb_id) + " but the event is from board " + std::to_string(event.id);
     PyErr_SetString(PyExc_ValueError, message.c_str());
     throw py::error_already_set();
   }
-  return calib.voltages(event, channel);
+  Vec<f32> volts = calib.voltages(event, channel);
+  return to_nparray(volts);
 }
 
-Vec<f32> wrap_rbcalibration_nanoseconds_rbevent(const RBCalibration& calib, const RBEvent& event, const u8 channel) {
+py::array_t<f32> wrap_rbcalibration_nanoseconds_rbevent(const RBCalibration& calib, const RBEvent& event, const u8 channel) {
   if (event.header.rb_id != calib.rb_id) {
     String message = "This is calibration for board " + std::to_string(calib.rb_id) + " but the event is from board " + std::to_string(event.header.rb_id);
     PyErr_SetString(PyExc_ValueError, message.c_str());
     throw py::error_already_set();
   }
-  return calib.nanoseconds(event, channel);
+  Vec<f32> nanos = calib.nanoseconds(event, channel);
+  return to_nparray(nanos);
 }
 
-Vec<f32> wrap_rbcalibration_nanoseconds_rbeventmemoryview(const RBCalibration& calib, const RBEventMemoryView& event, const u8 channel) {
+py::array_t<f32> wrap_rbcalibration_nanoseconds_rbeventmemoryview(const RBCalibration& calib, const RBEventMemoryView& event, const u8 channel) {
   if (event.id != calib.rb_id) {
     spdlog::error("This is the wrong calibration!");
     String message = "This is calibration for board " + std::to_string(calib.rb_id) + " but the event is from board " + std::to_string(event.id);
     PyErr_SetString(PyExc_ValueError, message.c_str());
     throw py::error_already_set();
   }
-  return calib.nanoseconds(event, channel);
+  Vec<f32> nanos = calib.nanoseconds(event, channel);
+  return to_nparray(nanos);
 }
 
-Vec<Vec<f32>> wrap_rbcalibration_voltages_allchan_rbevent(const RBCalibration& calib, const RBEvent& event, bool spike_cleaning) {
+Vec<py::array_t<f32>> wrap_rbcalibration_voltages_allchan_rbevent(const RBCalibration& calib, const RBEvent& event, bool spike_cleaning) {
   if (event.header.rb_id != calib.rb_id) {
     String message = "This is calibration for board " + std::to_string(calib.rb_id) + " but the event is from board " + std::to_string(event.header.rb_id);
     PyErr_SetString(PyExc_ValueError, message.c_str());
     throw py::error_already_set();
   }
-  return calib.voltages(event, spike_cleaning);
+  Vec<Vec<f32>> volts = calib.voltages(event, spike_cleaning);
+  Vec<py::array_t<f32>> arr;
+  for (const auto &ch : volts) {
+    arr.push_back(to_nparray(ch));
+  }
+  return arr;
 }
 
-Vec<Vec<f32>> wrap_rbcalibration_voltages_allchan_rbeventmemoryview(const RBCalibration& calib, const RBEventMemoryView& event, bool spike_cleaning) {
+Vec<py::array_t<f32>> wrap_rbcalibration_voltages_allchan_rbeventmemoryview(const RBCalibration& calib, const RBEventMemoryView& event, bool spike_cleaning) {
   if (event.id != calib.rb_id) {
     spdlog::error("This is the wrong calibration!");
     String message = "This is calibration for board " + std::to_string(calib.rb_id) + " but the event is from board " + std::to_string(event.id);
     PyErr_SetString(PyExc_ValueError, message.c_str());
     throw py::error_already_set();
   }
-  return calib.voltages(event, spike_cleaning);
+  Vec<Vec<f32>> volts = calib.voltages(event, spike_cleaning);
+  Vec<py::array_t<f32>> arr;
+  for (const auto &ch : volts) {
+    arr.push_back(to_nparray(ch));
+  }
+  return arr;
 }
 
-Vec<Vec<f32>> wrap_rbcalibration_nanoseconds_allchan_rbevent(const RBCalibration& calib, const RBEvent& event) {
+Vec<py::array_t<f32>> wrap_rbcalibration_nanoseconds_allchan_rbevent(const RBCalibration& calib, const RBEvent& event) {
   if (event.header.rb_id != calib.rb_id) {
     String message = "This is calibration for board " + std::to_string(calib.rb_id) + " but the event is from board " + std::to_string(event.header.rb_id);
     PyErr_SetString(PyExc_ValueError, message.c_str());
     throw py::error_already_set();
   }
-  return calib.nanoseconds(event);
+  Vec<Vec<f32>> nanos = calib.nanoseconds(event);
+  Vec<py::array_t<f32>> arr;
+  for (const auto &ch : nanos) {
+    arr.push_back(to_nparray(ch));
+  }
+  return arr;
 }
 
-Vec<Vec<f32>> wrap_rbcalibration_nanoseconds_allchan_rbeventmemoryview(const RBCalibration& calib, const RBEventMemoryView& event) {
+Vec<py::array_t<f32>> wrap_rbcalibration_nanoseconds_allchan_rbeventmemoryview(const RBCalibration& calib, const RBEventMemoryView& event) {
   if (event.id != calib.rb_id) {
     spdlog::error("This is the wrong calibration!");
     String message = "This is calibration for board " + std::to_string(calib.rb_id) + " but the event is from board " + std::to_string(event.id);
     PyErr_SetString(PyExc_ValueError, message.c_str());
     throw py::error_already_set();
   }
-  return calib.nanoseconds(event);
+  Vec<Vec<f32>> nanos = calib.nanoseconds(event);
+  Vec<py::array_t<f32>> arr;
+  for (const auto &ch : nanos) {
+    arr.push_back(to_nparray(ch));
+  }
+  return arr;
 }
 
 

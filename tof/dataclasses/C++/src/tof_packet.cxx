@@ -4,7 +4,7 @@
 #include "serialization.h"
 #include "parsers.h"
 
-std::string packet_type_to_string(PacketType pt) {
+std::string packet_type_to_string(const PacketType pt) {
   switch (pt) { 
       case PacketType::Unknown : {
       return "Unknown";
@@ -48,6 +48,14 @@ std::string packet_type_to_string(PacketType pt) {
 
 /**************************************************/
 
+std::ostream& operator<<(std::ostream& os, const PacketType& pck)
+{
+  os << packet_type_to_string(pck) << "\n";
+  return os;
+}
+
+/**************************************************/
+
 Vec<u8> TofPacket::to_bytestream() const
 {
 
@@ -55,10 +63,10 @@ Vec<u8> TofPacket::to_bytestream() const
   // the payload will grow the vector with "insert"
   Vec<u8> buffer(p_size_fixed);
   //buffer.reserve(p_size_fixed + payload.size());
-  std::cout << "PAYLOAD SIZE " << payload.size() << std::endl;
+  spdlog::debug("Will add payload of size {}", payload.size());
   usize pos = 0; // position in bytestream
   encode_ushort(head, buffer, pos); pos+=2;
-  buffer[pos] = packet_type; pos += 1;
+  buffer[pos] = static_cast<u8>(packet_type); pos += 1;
   u32_to_le_bytes(payload_size, buffer, pos);  pos+=4;
 
   //std::cout << "buffer size " << buffer.size() << std::endl;
@@ -139,9 +147,9 @@ TofPacket TofPacket::from_bytestream(const Vec<u8> &bytestream,
     return packet;
   }
   packet.head = value;
-  packet.packet_type = bytestream[pos]; pos+=1;
+  packet.packet_type  = static_cast<PacketType>(bytestream[pos]); pos+=1;
   packet.payload_size = Gaps::parse_u32(bytestream, pos);
-  spdlog::info("Found TofPacket with {} bytes payload!", packet.payload_size);
+  spdlog::debug("Found TofPacket of type {} with {} bytes payload!", packet_type_to_string(packet.packet_type), packet.payload_size);
   usize payload_end = pos + packet.payload_size;
   Vec<u8> packet_bytestream(bytestream.begin()+ pos,
                             bytestream.begin()+ payload_end)  ;

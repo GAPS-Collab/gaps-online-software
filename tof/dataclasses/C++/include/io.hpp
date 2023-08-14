@@ -67,6 +67,23 @@ Vec<TofPacket> get_tofpackets(const Vec<u8> &bytestream, u64 start_pos);
  */
 Vec<TofPacket> get_tofpackets(const String filename);
 
+/**
+ * Directly gets TofEvents from a stream with tofpackets, assuming all
+ * packets are actually TofEvents. Other packets will be discarded.
+ *
+ * @param bytestream : Binary TofPacket data.
+ * @param start_pos  : Byte position to start searching from in bytestream
+ */
+Vec<TofEvent> unpack_tofevents_from_tofpackets(const Vec<u8> &bytestream, u64 start_pos);
+
+/**
+ * Directly gets TofEvents from a stream with tofpackets, assuming all
+ * packets are actually TofEvents. Other packets will be discarded
+ *
+ * @param filename : Binary file with TofPacket data.
+ */
+Vec<TofEvent> unpack_tofevents_from_tofpackets(const String filename);
+
 ///**
 // * Extract TofEvents from a stream of binary data 
 // *

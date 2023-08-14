@@ -17,6 +17,7 @@
 
 #include "tof_typedefs.h"
 #include "packets/monitoring.h"
+#include "packets/tof_packet.h"
 
 #define NCHN 9
 #define NWORDS 1024
@@ -152,7 +153,7 @@ struct RBEvent {
      *
      */
     bool channel_check(u8 channel) const;
-
+    Vec<u16> _empty_channel = Vec<u16>();
 };
 
 /**
@@ -277,10 +278,33 @@ struct TofEvent {
   static TofEvent from_bytestream(const Vec<u8> &bytestream,
                                   u64 &pos);
 
+  static TofEvent from_tofpacket(const TofPacket &packet);
+
   static u32 get_n_rbmissinghits(u32 mask);
   static u32 get_n_rbevents(u32 mask);
   static u32 get_n_paddlepackets(u32 mask);
   static u32 get_n_rbmonis(u32 mask);
+
+  /**
+   * Get the rb event for a specific board id.
+   */
+  const RBEvent& get_rbevent(u8 board_id) const; 
+
+  /**
+   * Get the rb event for a specific board id.
+   */
+  Vec<u8> get_rbids() const;
+
+  private:
+    /**
+     * Check if there are more than one RBEvent per board
+     * and if the eventids are matching up.
+     */
+    bool passed_consistency_check();
+
+    // an empty event, which can be returned 
+    // in case of a null result.
+    RBEvent _empty_event = RBEvent();
 };
 
 

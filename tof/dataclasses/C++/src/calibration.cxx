@@ -11,12 +11,8 @@ u8 extract_rbid(const String& filename) {
   std::regex pattern("rb(\\d+)_cal"); // Match "RB" followed by digits, an underscore, and more digits
   std::smatch match;
   if (std::regex_search(filename, match, pattern)) {
-    spdlog::info("Found {} for RB id in filename!", match[1].str());
-    //spdlog::info("{}", match[2].str());
-
+    spdlog::debug("Filename matches pattern for RB ID {}!", match[1].str());
     u32 number1 = std::stoi(match[1].str());
-    //u32 number2 = std::stoi(match[2].str());
-    //u32 two_digit_number = (number1 % 100) * 100 + (number2 % 100);
     return number1;
   } else {
     return 0; // Return an invalid pair if no match is found
@@ -491,6 +487,7 @@ RBCalibration RBCalibration::from_txtfile(const String &filename) {
     for (size_t j=0; j<NWORDS; j++)
       calfile >> calibration.t_bin[i][j];
   }
+  spdlog::info("Loaded calibration for RB {}!", rb_id);
   return calibration;
 }
 

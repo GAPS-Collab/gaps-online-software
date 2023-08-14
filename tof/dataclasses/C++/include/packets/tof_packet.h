@@ -34,7 +34,14 @@ enum class PacketType : u8 {
   MonitorMtb    = PACKET_TYPE_MTB_MONI 
 };
 
+
+/**
+ * String representation of enum "PacketType"
+ *
+ */ 
 std::string packet_type_to_string(PacketType pt);
+
+std::ostream& operator<<(std::ostream& os, const PacketType& pck);
 
 
 /*********************************************************
@@ -61,14 +68,13 @@ struct TofPacket {
 
   // head (2) + tail (2) + type (1) + payload size (4)
   u8  p_size_fixed = 9;
-  u8  packet_type; 
+  PacketType  packet_type; 
   // just the size of the payload, 
   // not including type, header or tail
   u32 payload_size;
 
   Vec<u8> payload;
 
-  [[deprecated("It should not be possible to transcode TofPackets to bytestream from the C++ API!")]]
   Vec<u8> to_bytestream() const;
 
   //[[deprecated("Use static from_bytestream instead!")]]

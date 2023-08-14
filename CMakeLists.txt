@@ -140,7 +140,7 @@ if (BUILD_LIFTOF)
   install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tof/liftof/target/doc/ DESTINATION ${CMAKE_INSTALL_PREFIX}/doc/RustAPI/)
 endif()
 
-
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/gaps-db/gaps_db/ DESTINATION ${INSTALL_PYTHON_DIR})
 
 ###################################
 # Write setup-env.sh shell script

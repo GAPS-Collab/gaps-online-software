@@ -694,10 +694,17 @@ PYBIND11_MODULE(gaps_tof, m) {
         .def_readonly("missing_hits"        ,&TofEvent::missing_hits)
         .def_readonly("rbmoni"              ,&TofEvent::rb_moni_data)
         .def_readonly("rbevents"            ,&TofEvent::rb_events)
+        .def("get_rbids"                    ,&TofEvent::get_rbids,
+                                             "Get a list of all RB ids contributing to this event."
+                                             )
+        .def("get_rbevent"                  ,&TofEvent::get_rbevent,
+                                             "Return a the event for this specif RB id",
+                                             py::arg("rb_id"))
         .def("from_bytestream"              ,&TofEvent::from_bytestream)
-    .def("__repr__",          [](const TofEvent &ev) {
-                                 return tofevent_to_string(ev); 
-                              }) 
+        .def("from_tofpacket"               ,&TofEvent::from_tofpacket)
+        .def("__repr__",           [](const TofEvent &ev) {
+                                   return tofevent_to_string(ev); 
+                                   }) 
 
     ;
 
@@ -966,12 +973,18 @@ PYBIND11_MODULE(gaps_tof, m) {
    // I/O functions
    m.def("get_tofpackets", &wrap_get_tofpackets_from_stream, "Get TofPackets from list of bytes");
    m.def("get_tofpackets", &wrap_get_tofpackets_from_file, "Get TofPackets from a file on disk");
-   m.def("get_rbeventsmemoryviews",       &wrap_get_rbeventmemoryviews_from_stream,
+   m.def("get_rbeventmemoryviews",       &wrap_get_rbeventmemoryviews_from_stream,
                                           "Get RBEventMemoryViews from list of bytes.\nArgs:\n * bytestream [list of char]\n * pos - start at position in stream\n * omit_duplicates [optional, bool] - reduced duplicate events (costs performance)",
                                           py::arg("bytestream"), py::arg("pos"), py::arg("omit_duplicates") = false);
-   m.def("get_rbeventsmemoryviews",       &wrap_get_rbeventmemoryviews_from_file,
+   m.def("get_rbeventmemoryviews",        &wrap_get_rbeventmemoryviews_from_file,
                                           "Get RBEventMemoryViews from a file on disk.\nArgs:\n * filename - full path to file on disk as written by the readoutboards/liftof.\n              This file can only contain RBEventMemoryViews ('Blobs') without any other wrapper packets.\n * omit_duplicates - set this flag if you want to eeliminate duplicate events in the file. (Costs performance).",
                                           py::arg("filename"), py::arg("omit_duplicates") = false);
+   m.def("unpack_tofevents",              &wrap_unpack_tofevents_from_tofpackets_from_stream,
+                                          "Get TofEvents directly from list of bytes but the bytes are encoded TofPackets..\nArgs:\n * bytestream [list of char]\n * pos - start at position in stream\n",
+                                          py::arg("bytestream"), py::arg("pos"));
+   m.def("unpack_tofevents",              &wrap_unpack_tofevents_from_tofpackets_from_file,
+                                          "Get TofEvents from a file on disk containing TofPackets. In case the packets contain RBEvents, they will be unpacked automatically.\nArgs:\n * filename - full path to file on disk containing serialized TofPackets.",
+                                          py::arg("filename"));
    m.def("get_event_ids_from_raw_stream", &get_event_ids_from_raw_stream);
    m.def("get_bytestream_from_file",      &get_bytestream_from_file);
    m.def("get_events_from_stream",        &get_events_from_stream);

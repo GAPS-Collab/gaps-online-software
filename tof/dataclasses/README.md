@@ -51,21 +51,25 @@ C++ (to make it easier for current analysis) with a thin wrapper
 provided by pybind11 on top, so the C++ classes get exposed to 
 python.
 
-The C++ are meant for analysis only, and thus the exposed python
-API is read-only. While the rust dataclasses offer methods 
-`::to_bytestream` and `::from_bytestream`, on the C++ side there 
-are only the decodeders `::from_bytestream` available, to 
-follow this philosophy. 
+### Serialziation
 
-The transition between rust and C++ is done through serialization. 
-On the rust side, `::to_bytestream` will serialize the class, 
-and on the C++ side `::from_bytestream` then can deserialize it.
+The dataclasses can be serialized to bytestreams, which are 
+`Vec<u8>` via methods `to_bytestream` and `from_bytestream`.
+In this way, they can be (ultimatly) written to disk or 
+transmitted over the network. Since the purpose of the 
+rust, C++ and python APIs are different, not all APIs feature
+`to_bytestream` methods. 
+The C++ are meant mostly for analysis but also should allow the 
+flight computer to relay back information to the TOF computer.
+This means, the C++ API is mostly read-only, with a few exceptions, 
+such as TofPackets and CommandPackets, for which the `to_bytestream`
+methods are implemented.
+The exposed python API is read-only, since it is meant only for 
+analysis.
 
-Transition in the other direction is not possible.
-
-## installation
-
-Builds with `cmake`. The only noteworthy dependency is pybind11
+The serialization interface also facilitates the transition between
+rust and C++/python. A class can be "transcribed" from rust to C++ 
+by going through the (de)serialization cycle: `to_bytestream[Rust] -> from_bytestream[C++]`
 
 ## versions/branches:
 
