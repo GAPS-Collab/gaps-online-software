@@ -49,8 +49,6 @@ use crate::manifest::{LocalTriggerBoard,
 /// receive over UDP via the IPBus protocoll
 /// (arbitrary number)
 const MT_MAX_PACKSIZE   : usize = 512;
-
-
 const N_LTBS : usize = 20;
 const N_CHN_PER_LTB : usize = 16;
 
@@ -155,15 +153,7 @@ impl MasterTriggerMapping {
   }
 
   /// Mapping trigger LTB board mask - LTB ids
-  ///
-  /// # Arguments:
-  ///
-  /// * board_mask : The board mask as it comes from the 
-  ///                MasterTriggerEvent. Each entry corresponds
-  ///                to one LocalTriggerBoard. They are sorted
-  ///                by DSI and J, e.g
-  ///                [.., DSI_{ltb_1} +J_{ltb_1}]
-  pub fn get_ltb_ids(&self, board_mask : &[bool; N_LTBS] ) 
+  pub fn get_ltb_ids(&self) 
     -> Vec<u8> {
     let mut ltbs = Vec::<u8>::new();
     for k in 0..N_LTBS {
@@ -348,9 +338,11 @@ impl MasterTriggerEvent {
   }
 
   pub fn get_triggered_ltb_ids(&self) -> Vec<u8> {
-    let mut ltbs = Vec::<u8>::new();
     todo!();
-    ltbs
+    #[allow(unreachable_code)] {
+      let mut ltbs = Vec::<u8>::new();
+      ltbs
+    }
     //for k in 0..N_LTBS {
     //  if board_mask[k] {
     //    ltbs.push(2

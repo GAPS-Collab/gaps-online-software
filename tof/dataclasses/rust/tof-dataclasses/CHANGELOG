@@ -1,8 +1,13 @@
 # OMILU series
 
 ## 0.7.0 
-
-
+* Renames RBBinaryDump to RBMemoryView, to align it 
+  with development in C++ version of dataclasses
+* Removes warnings
+* A bug in get_ch_adc fixed, which would return 
+  the wrong channel (ch - 1) instead of ch.
+  _FIXME_ these kinds of bugs are expected due to 
+  channel naming scheme. Should we change this internally?
 #0.6.x - KIHIKIHI series
 
 ##0.6.1 

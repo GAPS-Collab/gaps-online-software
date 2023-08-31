@@ -1,3 +1,8 @@
+/// This is basically the thread 
+/// implementation from the 
+/// Rust book example
+
+
 use std::thread;
 use std::sync::mpsc;
 use std::sync::Arc;

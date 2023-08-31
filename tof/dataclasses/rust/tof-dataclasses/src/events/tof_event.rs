@@ -51,7 +51,7 @@ impl CompressionLevel {
   pub const NONE    : u8 = 10;
 
   pub fn to_u8(&self) -> u8 {
-    let mut result = 0;
+    let result : u8;
     match self {
       CompressionLevel::Unknown => {
         result = CompressionLevel::UNKNOWN;
@@ -84,7 +84,7 @@ impl CompressionLevel {
   /// This is basically the enum type as 
   /// a string.
   pub fn string_repr(&self) -> String { 
-    let mut repr = String::from("");
+    let repr : String;
     match self {
       CompressionLevel::Unknown => { 
         repr = String::from("Unknown");
@@ -122,7 +122,7 @@ impl EventQuality {
   pub const FOURLEAFCLOVER : u8 = 40;
   
   pub fn to_u8(&self) -> u8 {
-    let mut result = 0;
+    let result : u8;
     match self {
       EventQuality::Unknown => {
         result = EventQuality::UNKNOWN;
@@ -169,7 +169,7 @@ impl EventQuality {
   }
 
   pub fn string_repr(&self) -> String { 
-    let mut repr = String::from("");
+    let repr : String;
     match self {
       EventQuality::Unknown => { 
         repr = String::from("Unknown");
@@ -185,9 +185,6 @@ impl EventQuality {
       }
       EventQuality::FourLeafClover => {
         repr = String::from("FourLeafClover");
-      }
-      EventQuality::Silver => {
-        repr = String::from("None");
       }
     }
     repr
@@ -298,7 +295,7 @@ impl Serialization for MasterTofEvent {
     for k in 0..self.missing_hits.len() {
       stream.extend_from_slice(&self.missing_hits[k].to_bytestream());
     }
-    for k in 0..self.paddle_packets.len() {
+    for _k in 0..self.paddle_packets.len() {
       //stream.extend_from_slice(&self.paddle_packets[k].to_bytestream());
     }
     for k in 0..self.rb_moni.len() {
@@ -334,7 +331,7 @@ impl Serialization for MasterTofEvent {
         }
       }
     }
-    for k in 0..v_sizes.2 {
+    for _ in 0..v_sizes.2 {
       //match PaddlePacket::from_bytestream(stream, pos) {
       //  Err(err) => error!("Expected PaddlePacket {} of {}, but got serialization error {}!", k,  v_sizes.2, err),
       //  Ok(pp) => {
@@ -363,15 +360,15 @@ impl FromRandom for MasterTofEvent {
     event.mt_event  = MasterTriggerEvent::from_random();
     let mut rng     = rand::thread_rng();
     let n_boards    = rng.gen::<u8>() as usize;
-    let n_paddles   = rng.gen::<u8>() as usize;
+    //let n_paddles   = rng.gen::<u8>() as usize;
     let n_missing   = rng.gen::<u8>() as usize;
-    for k in 0..n_boards {
+    for _ in 0..n_boards {
       event.rb_events.push(RBEvent::from_random());
     }
-    for k in 0..n_missing {
+    for _ in 0..n_missing {
       event.missing_hits.push(RBMissingHit::from_random());
     }
-    for k in 0..n_boards {
+    for _ in 0..n_boards {
       event.rb_moni.push(RBMoniData::from_random());
     }
     // for now, we do not randomize CompressionLevel and qualtiy
@@ -655,52 +652,4 @@ mod test_tofevents {
     //println!("{}", data);
   }
 }
-
-//#[test]
-//fn serialize_deserialize_pp_roundabout() {
-//  let mut pp = PaddlePacket::from_random();
-//  // a fresh packet is always valid
-//  assert!(pp.valid);
-//  // FIXME - as an idea. If we use
-//  // 4 byte emoji data, we can easily
-//  // check if a bytestream is that what
-//  // we expect visually 
-//   
-//  
-//  //let mut bytestream = Vec<u8>::new();
-//  let mut bytestream = pp.to_bytestream();
-//  match PaddlePacket::from_bytestream(&bytestream, 0) {
-//    Err(err) => {
-//      error!("Got deserialization error! {:?}", err);
-//    },
-//    Ok(new_pp)   => {
-//      assert_eq!(new_pp, pp);
-//    }
-//  }
-//}
-//
-//#[test]
-//fn serialize_deserialize_tofevent_roundabout() {
-//  let mut event = TofEvent::new(0,0);
-//  event.timestamp_32 = 1234;
-//  event.timestamp_16 = 56;
-//  // let's add 10 random paddles
-//  for n in 0..10 {
-//    let pp = PaddlePacket::from_random();
-//    event.add_paddle(pp);
-//  }
-//  assert!(event.valid);
-//
-//  //let mut bytestream = Vec<u8>::new();
-//  let mut bytestream = event.to_bytestream();
-//  match TofEvent::from_bytestream(&bytestream, 0) {
-//    Err(err) => {
-//      error!("Got deserialization error! {:?}", err);
-//    },
-//    Ok(new_event)   => {
-//      event.creation_time = new_event.creation_time;
-//      assert_eq!(event, new_event);
-//    }
-//  }
-//}
 

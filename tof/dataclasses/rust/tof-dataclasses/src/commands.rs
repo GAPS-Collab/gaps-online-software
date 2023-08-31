@@ -28,7 +28,6 @@ use std::fmt;
 
 use crate::serialization::{Serialization, SerializationError};
 use crate::packets::{TofPacket,
-                     //CommandPacket,
                      PacketType};
 
 /// en empty command

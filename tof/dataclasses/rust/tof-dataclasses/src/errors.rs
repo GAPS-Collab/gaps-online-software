@@ -6,6 +6,8 @@
 use std::error::Error;
 use std::fmt;
 
+////////////////////////////////////////
+
 #[derive(Debug, Copy, Clone)]
 pub enum EventError {
     EventIdMismatch
@@ -17,11 +19,15 @@ impl fmt::Display for EventError {
   }
 }
 
-
 impl Error for EventError {
 }
 
-#[derive(Debug)]
+////////////////////////////////////////
+
+/// This error shall be thrown whenver there
+/// is an issue in the de(serialization),
+/// e.g. the from_bytestream methods.
+#[derive(Debug, Copy, Clone)]
 pub enum SerializationError {
   //HeaderNotFound,
   TailInvalid,
@@ -56,7 +62,9 @@ impl fmt::Display for SerializationError {
 impl Error for SerializationError {
 }
 
-#[derive(Debug)]
+////////////////////////////////////////
+
+#[derive(Debug, Copy, Clone)]
 pub enum DecodingError {
   //HeaderNotFound,
   ChannelOutOfBounds,
@@ -77,8 +85,11 @@ impl fmt::Display for DecodingError {
 impl Error for DecodingError {
 }
 
+////////////////////////////////////////
 
-#[derive(Debug)]
+/// Error to be used for issues with 
+/// the communication to the MTB.
+#[derive(Debug,Copy,Clone)]
 pub enum MasterTriggerError {
   QueueEmpty,
   MaskTooLarge,
@@ -102,7 +113,11 @@ impl fmt::Display for MasterTriggerError {
 impl Error for MasterTriggerError {
 }
 
-#[derive(Debug)]
+////////////////////////////////////////
+
+
+/// Problems in waveform analysis
+#[derive(Debug,Copy,Clone)]
 pub enum WaveformError {
   TimeIndexOutOfBounds,
   TimesTooSmall,
@@ -126,7 +141,14 @@ impl fmt::Display for WaveformError {
 impl Error for WaveformError {
 }
 
-#[derive(Debug)]
+////////////////////////////////////////
+
+
+/// IPBus provides a package format for
+/// sending UDP packets with a header.
+/// This is used by the MTB to send its
+/// packets over UDP
+#[derive(Debug,Copy,Clone)]
 pub enum IPBusError {
   DecodingFailed,
 }
@@ -144,32 +166,35 @@ impl fmt::Display for IPBusError {
 impl Error for IPBusError {
 }
 
-#[derive(Debug)]
-pub struct BlobError {
-    //DeserializationError,
-    //SerializationError,
-    //GenericError
-    details : String
-}
-
-impl BlobError {
-    fn new(msg: &str) -> BlobError {
-        BlobError{details: msg.to_string()}
-    }
-}
-
-impl fmt::Display for BlobError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f,"{}",self.details)
-    }
-}
+////////////////////////////////////////
 
 
-#[cfg(feature = "diagnostics")]
-impl From<hdf5::Error> for BlobError {
-    fn from(err: hdf5::Error) -> Self {
-        BlobError::new(&err.to_string())
-    }
-}
+//#[derive(Debug)]
+//pub struct BlobError {
+//    //DeserializationError,
+//    //SerializationError,
+//    //GenericError
+//    details : String
+//}
+//
+//impl BlobError {
+//    fn new(msg: &str) -> BlobError {
+//        BlobError{details: msg.to_string()}
+//    }
+//}
+//
+//impl fmt::Display for BlobError {
+//    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+//        write!(f,"{}",self.details)
+//    }
+//}
+//
+//
+//#[cfg(feature = "diagnostics")]
+//impl From<hdf5::Error> for BlobError {
+//    fn from(err: hdf5::Error) -> Self {
+//        BlobError::new(&err.to_string())
+//    }
+//}
 
 

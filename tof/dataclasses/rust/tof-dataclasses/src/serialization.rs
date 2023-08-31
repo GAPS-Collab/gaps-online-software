@@ -7,24 +7,33 @@ pub use crate::errors::SerializationError;
 
 use std::error::Error;
 use std::path::Path;
-use std::fs::read_to_string;
-use std::fmt::Display;
 
 extern crate json;
 use json::JsonValue;
 
-
+/// Convert a vector of u16 into a vector of u8
+///
+/// The resulting vector has twice the number
+/// of entries of the original vector.
+/// This is useful, when serializing data 
+/// represented as u16, e.g. the waveforms.
 pub fn u16_to_u8(vec_u16: &[u16]) -> Vec<u8> {
     vec_u16.iter()
         .flat_map(|&n| n.to_le_bytes().to_vec())
         .collect()
 }
 
+
+/// Restore a vector of u16 from a vector of u8
+///
+/// This interpretes two following u8 as an u16
+/// Useful for deserialization of waveforms.
 pub fn u8_to_u16(vec_u8: &[u8]) -> Vec<u16> {
     vec_u8.chunks_exact(2)
         .map(|chunk| u16::from_le_bytes([chunk[0], chunk[1]]))
         .collect()
 }
+
 
 pub fn parse_u8(bs : &Vec::<u8>, pos : &mut usize) -> u8 {
   let value = u8::from_le_bytes([bs[*pos]]);
@@ -32,19 +41,12 @@ pub fn parse_u8(bs : &Vec::<u8>, pos : &mut usize) -> u8 {
   value
 }
 
-
-
 /// Get u32 from a bytestream and move on the position marker
 ///
 /// # Arguments 
 ///
 /// * bs
 /// * pos 
-//pub fn u32_from_bs(bs : &Vec::<u8>, mut pos : usize) -> u32 {
-//  let value = u32::from_le_bytes([bs[pos], bs[pos+1], bs[pos+2], bs[pos+3]]);
-//  pos += 4;
-//  value
-//}
 pub fn parse_u16(bs : &Vec::<u8>, pos : &mut usize) -> u16 {
   let value = u16::from_le_bytes([bs[*pos], bs[*pos+1]]);
   *pos += 2;
@@ -203,18 +205,8 @@ pub trait Serialization {
     where Self : Sized {
     println!("There can't be a default implementation for this trait!");
     todo!();
-    }
-  
-
-  /////! Add the payload of the serializable to the pre allocated bytestream
-  //fn into_bytestream(bytestream : &mut Vec<u8>,
-  //                   start_pos  : usize)
-  //  -> Result<Self, SerializationError>
-  //  where Self : Sized;
+  }
 }
-
-
-
 
 /// Search for a certain number of type `u16` in a bytestream
 pub fn search_for_u16(number : u16, bytestream : &Vec<u8>, start_pos : usize) 

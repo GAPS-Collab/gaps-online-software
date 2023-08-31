@@ -32,7 +32,6 @@ use crate::serialization::{Serialization,
                            search_for_u16,
                            parse_u8,
                            parse_u16,
-                           parse_u32,
                            parse_f32};
 
 /// A collection of monitoring data

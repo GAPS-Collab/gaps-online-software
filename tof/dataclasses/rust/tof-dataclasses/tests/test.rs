@@ -1,10 +1,8 @@
 #[cfg(test)]
 pub mod tests {
 
-  extern crate rand;
-  use rand::Rng;
   use std::path::Path;
-  use tof_dataclasses::events::{RBBinaryDump, RBEventHeader};
+  use tof_dataclasses::events::{RBEventMemoryView, RBEventHeader};
   use tof_dataclasses::monitoring::RBMoniData;
   use tof_dataclasses::constants::{NWORDS, NCHN, MAX_NUM_PEAKS};
   use tof_dataclasses::serialization::Serialization;
@@ -17,9 +15,9 @@ pub mod tests {
     let stream = read_file(&Path::new("test-data/tof-rb01.robin")).unwrap();
     let size = stream.len();
     let mut pos = 0usize;
-    let mut events = Vec::<RBBinaryDump>::new(); 
+    let mut events = Vec::<RBEventMemoryView>::new(); 
     //let mut n_events = (size / 15830) as usize;
-    let mut event  = RBBinaryDump::new();
+    let mut event  = RBEventMemoryView::new();
     let mut n_broken = 0;
     let mut n_good   = 0;
     let mut block_size = 0;
@@ -28,13 +26,13 @@ pub mod tests {
       block_size = pos - block_size;
       //println!("SIZE {block_size}");
       //println!("POS {pos}");
-      match RBBinaryDump::from_bytestream(&stream,&mut pos) {
+      match RBEventMemoryView::from_bytestream(&stream,&mut pos) {
         Ok(event) => {
           events.push(event);
           n_good += 1;
         },
         Err(err)  => {
-          //println!("error decoding RBBinaryDump, err {err}");
+          //println!("error decoding RBEventMemoryView, err {err}");
           n_broken += 1;
           pos += 1;
           //break;
@@ -49,12 +47,12 @@ pub mod tests {
   fn serialization_circle_test_for_rbbinarydump() {
     // try this 100 times
     for _n in 0..100 {
-      let rb_bin       = RBBinaryDump::from_random();
-      //println!("RBBinaryDump {}", rb_bin);
+      let rb_bin       = RBEventMemoryView::from_random();
+      //println!("RBEventMemoryView {}", rb_bin);
       let rb_bin_ser   = rb_bin.to_bytestream();
       //println!("Found stream len {}", rb_bin_ser.len());
       let mut pos = 0usize;
-      let rb_bin_deser = RBBinaryDump::from_bytestream(&rb_bin_ser, &mut pos);
+      let rb_bin_deser = RBEventMemoryView::from_bytestream(&rb_bin_ser, &mut pos);
       //println!("After ser/deser {}", rb_bin_deser.as_ref().unwrap());
       let result = rb_bin_deser.unwrap();
       assert_eq!(result.head, rb_bin.head);
@@ -156,9 +154,9 @@ pub mod tests {
   #[test]
   fn extract_rbheader_from_rbbinarydump() {
     for _n in 0..100 {
-      let data   = RBBinaryDump::from_random();
+      let data   = RBEventMemoryView::from_random();
       let stream = data.to_bytestream();
-      let header = RBEventHeader::extract_from_rbbinarydump(&stream, &mut 0).unwrap();
+      let header = RBEventHeader::extract_from_rbeventmemoryview(&stream, &mut 0).unwrap();
       //assert_eq!(header.rb_id as u16, data.id);
       assert_eq!(header.channel_mask as u16, data.ch_mask);
       assert_eq!(header.event_id, data.event_id);

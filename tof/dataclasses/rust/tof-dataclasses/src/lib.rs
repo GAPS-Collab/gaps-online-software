@@ -38,8 +38,6 @@ pub trait FromRandom {
   fn from_random() -> Self;
 }
 
-
-
 /// Representation of 32 bit mask 
 pub struct BitMask32 {
 }

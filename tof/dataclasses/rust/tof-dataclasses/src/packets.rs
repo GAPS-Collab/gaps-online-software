@@ -24,7 +24,6 @@ pub use crate::monitoring::{RBMoniData,
                             TofCmpMoniData,
                             MtbMoniData};
 use crate::serialization::{Serialization, 
-                           parse_u8,
                            parse_u32};
 use crate::errors::SerializationError;
 use crate::events::{RBEventPayload,
@@ -233,7 +232,9 @@ impl TofPacket {
       return 1; 
     }
     todo!("Can not deal with multipackets right now!");
-    return 1;
+    #[allow(unreachable_code)] {
+      return 1;
+    }
   }
 
   pub fn to_bytestream(&self) 

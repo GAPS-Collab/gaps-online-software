@@ -7,6 +7,7 @@
 use std::fmt;
 use std::str::FromStr;
 use std::net::Ipv4Addr;
+#[cfg(feature = "database")]
 use std::path::Path;
 
 #[cfg(feature = "database")]
@@ -90,8 +91,7 @@ pub fn get_rbs_from_sqlite(filename : &Path) -> Vec<ReadoutBoard> {
   let connection = sqlite::open(filename).unwrap();
   let query = "SELECT * FROM tof_db_rb";
   let mut rbs  = Vec::<ReadoutBoard>::new();
-  connection
-    .iterate(query, |pairs| {
+  match connection.iterate(query, |pairs| {
     debug!("New rb, has following values...");
     //let mut ltb = LocalTriggerBoard::new();
     let mut rb = ReadoutBoard::new();
@@ -119,7 +119,14 @@ pub fn get_rbs_from_sqlite(filename : &Path) -> Vec<ReadoutBoard> {
     } // end loop over rbs
     rbs.push(rb);
     true
-  });
+  }) {
+    Err(err) => {
+      error!("Unable to query DB! Error {err}");
+    },
+    Ok(_) => {
+      debug!("DB query successful!");
+    }
+  }
   info!("We found {} rbs in the database", rbs.len()); 
   rbs
 }
@@ -130,8 +137,7 @@ pub fn get_ltbs_from_sqlite(filename : &Path) -> Vec<LocalTriggerBoard> {
   let connection = sqlite::open(filename).unwrap();
   let query = "SELECT * FROM tof_db_ltb";
   let mut ltbs  = Vec::<LocalTriggerBoard>::new();
-  connection
-    .iterate(query, |pairs| {
+  match connection.iterate(query, |pairs| {
     debug!("New ltb, has following values...");
     let mut ltb = LocalTriggerBoard::new();
     for &(name, value) in pairs.iter() {
@@ -279,7 +285,14 @@ pub fn get_ltbs_from_sqlite(filename : &Path) -> Vec<LocalTriggerBoard> {
     //println!("{}", ltb);
     ltbs.push(ltb);
     true
-  });
+  }) {
+    Err(err) => {
+      error!("Unable to query DB! Error {err}");
+    },
+    Ok(_)    => {
+      debug!("DB query successful!");
+    }
+  }
   info!("We found {} ltbs in the database!", ltbs.len()); 
   ltbs
 }
@@ -287,6 +300,8 @@ pub fn get_ltbs_from_sqlite(filename : &Path) -> Vec<LocalTriggerBoard> {
 
 //---------------------------------------------------------
 
+/// This represents an entire TOF panel
+/// (an assembly of paddles)
 pub struct Panel {
     panel_id                : u8, 
     smallest_paddle_id      : u8, 
@@ -317,6 +332,7 @@ impl fmt::Display for Panel {
 
 //---------------------------------------------------------
 
+/// A represnetation of a TOF paddle
 pub struct Paddle {
   pub paddle_id    : u8 ,
   pub volume_id    : u32,

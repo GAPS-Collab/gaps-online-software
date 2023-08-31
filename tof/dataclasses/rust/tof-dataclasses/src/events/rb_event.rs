@@ -3,7 +3,7 @@
 //! The structure is the following
 //! FIXME - come up with more descriptive names, e.g. RoBinDataL0
 //!
-//! - RBBinaryDump   - the raw "orignal" blob, written to the memory of the 
+//! - RBEventMemoryView   - the raw "orignal" blob, written to the memory of the 
 //!                    RB's. This corresponds to compression level 0.
 //!
 //! - RBEventPayload - the raw "original" data, but the event id is extracted
@@ -25,8 +25,6 @@
 //!
 use std::fmt;
 use std::path::Path;
-use std::io::BufReader;
-use std::fs::File;
 
 use crate::constants::{NWORDS, NCHN};
 use crate::serialization::{u16_to_u8,
@@ -200,11 +198,11 @@ impl RBEventPayload {
                          start_pos   : usize,
                          no_fragment : bool)
       -> Result<Self, SerializationError> {
-    let head_pos = search_for_u16(RBBinaryDump::HEAD, bytestream, start_pos)?; 
-    let tail_pos = search_for_u16(RBBinaryDump::TAIL, bytestream, head_pos)?;
+    let head_pos = search_for_u16(RBEventMemoryView::HEAD, bytestream, start_pos)?; 
+    let tail_pos = search_for_u16(RBEventMemoryView::TAIL, bytestream, head_pos)?;
     // At this state, this can be a header or a full event. Check here and
     // proceed depending on the options
-    if head_pos - tail_pos != RBBinaryDump::SIZE
+    if head_pos - tail_pos != RBEventMemoryView::SIZE
         && no_fragment { 
       return Err(SerializationError::EventFragment);
     }
@@ -214,7 +212,7 @@ impl RBEventPayload {
     //         most likely save a clone operation
     let slice          = &bytestream[head_pos..=tail_pos+2];
     let event_id       = RBEventPayload::decode_event_id(slice); 
-    let mut payload    = Vec::<u8>::with_capacity(RBBinaryDump::SIZE);
+    let mut payload    = Vec::<u8>::with_capacity(RBEventMemoryView::SIZE);
     payload.extend_from_slice(slice);
     let ev_payload     = RBEventPayload::new(event_id, payload.clone());
     Ok(ev_payload)
@@ -226,13 +224,13 @@ impl RBEventPayload {
   pub fn from_slice(slice       : &[u8],
                     do_checks   : bool)
       -> Result<RBEventPayload, SerializationError> {
-    let payload        = Vec::<u8>::with_capacity(RBBinaryDump::SIZE);
+    let payload        = Vec::<u8>::with_capacity(RBEventMemoryView::SIZE);
     if do_checks {
-      let head_pos = search_for_u16(RBBinaryDump::HEAD, &payload, 000000000)?; 
-      let tail_pos = search_for_u16(RBBinaryDump::TAIL, &payload, head_pos)?;
+      let head_pos = search_for_u16(RBEventMemoryView::HEAD, &payload, 000000000)?; 
+      let tail_pos = search_for_u16(RBEventMemoryView::TAIL, &payload, head_pos)?;
       // At this state, this can be a header or a full event. Check here and
       // proceed depending on the options
-      if head_pos - tail_pos != RBBinaryDump::SIZE { 
+      if head_pos - tail_pos != RBEventMemoryView::SIZE { 
         return Err(SerializationError::EventFragment);
       }
     }
@@ -245,7 +243,7 @@ impl RBEventPayload {
 
 
 
-/// RBBinaryDump is the closest representation of actual 
+/// RBEventMemoryView is the closest representation of actual 
 /// RB binary data in memory, with a fixed number of 
 /// channels at compile time, optimized for speed by 
 /// using fixed (at compile time) sizes for channels 
@@ -255,7 +253,7 @@ impl RBEventPayload {
 ///         and we can get rid of 3 bytes for 
 ///         the DNA
 #[derive(Debug, Clone, PartialEq)]
-pub struct RBBinaryDump {
+pub struct RBEventMemoryView {
   pub head            : u16, // Head of event marker
   pub status          : u16,
   pub len             : u16,
@@ -277,7 +275,7 @@ pub struct RBBinaryDump {
   pub tail            : u16, // End of event marker
 }
 
-impl RBBinaryDump {
+impl RBEventMemoryView {
 
   // the size is fixed, assuming fixed
   // nchannel and sample size
@@ -324,16 +322,16 @@ impl RBBinaryDump {
 
 }
 
-impl Default for RBBinaryDump {
+impl Default for RBEventMemoryView {
   fn default() -> Self {
     Self::new()
   }
 }
 
 
-impl fmt::Display for RBBinaryDump {
+impl fmt::Display for RBEventMemoryView {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(f, "<RBBinaryDump:\n
+    write!(f, "<RBEventMemoryView:\n
            \t RB {},\n
            \t len {}, \n
            \t roi {}, \n
@@ -352,7 +350,7 @@ impl fmt::Display for RBBinaryDump {
   }
 }
 
-impl Serialization for RBBinaryDump {
+impl Serialization for RBEventMemoryView {
   const SIZE : usize = 18530;
   const HEAD : u16   = 0xAAAA;
   const TAIL : u16   = 0x5555;
@@ -408,9 +406,9 @@ impl Serialization for RBBinaryDump {
     // At this state, this can be a header or a full event. Check here and
     // proceed depending on the options
     if tail_pos + 2 - head_pos != Self::SIZE {
-      error!("Event seems incomplete. Seing {} bytes, but expecting {}", tail_pos + 2 - head_pos, RBBinaryDump::SIZE);
+      error!("Event seems incomplete. Seing {} bytes, but expecting {}", tail_pos + 2 - head_pos, RBEventMemoryView::SIZE);
       //error!("{:?}", &stream[head_pos + 18526..head_pos + 18540]);
-      *pos = head_pos + 2; //start_pos += RBBinaryDump::SIZE;
+      *pos = head_pos + 2; //start_pos += RBEventMemoryView::SIZE;
       return Err(SerializationError::EventFragment);
     }
     *pos = head_pos + 2; 
@@ -447,7 +445,7 @@ impl Serialization for RBBinaryDump {
 }
 
 #[cfg(feature = "random")]
-impl FromRandom for RBBinaryDump {
+impl FromRandom for RBEventMemoryView {
     
   fn from_random() -> Self {
     let mut bin_data = Self::new();
@@ -518,7 +516,7 @@ impl RBEvent {
 
   pub fn new() -> Self {
     let mut adc = Vec::<Vec<u16>>::with_capacity(8);
-    for k in 0..NCHN {
+    for _ in 0..NCHN {
       adc.push(Vec::<u16>::new());
     }
     RBEvent {
@@ -538,19 +536,20 @@ impl RBEvent {
     }
   }
 
+  /// Channels are always from 1-9
   pub fn get_adc_ch(&self, ch : u8) -> Vec::<u16> {
     if ch < 1 {
       panic!("Remember, channels go from 1-9!");
     }
     let channel : usize = ch as usize - 1;
-    self.adc[ch as usize].clone()
+    self.adc[channel as usize].clone()
   }
 
-  pub fn extract_from_memorydump(stream : &Vec<u8>,
+  pub fn extract_from_rbeventmemoryview(stream : &Vec<u8>,
                                  pos    : &mut usize) 
     -> Result<RBEvent, SerializationError> {
   
-    let header     = RBEventHeader::extract_from_rbbinarydump(stream, pos)?;
+    let header     = RBEventHeader::extract_from_rbeventmemoryview(stream, pos)?;
     *pos -= 2;
     let mut skip_bytes = 0usize;
     let nchan = 8;
@@ -577,7 +576,7 @@ impl RBEvent {
       // two bytes for the header
       *pos += 2;
       if active_channels.contains(&(n as u8)) {
-        for k in 0..NWORDS {  
+        for _ in 0..NWORDS {  
           event.adc[n -1].push(0x3FFF & parse_u16(stream, pos));  
         }
       } else {
@@ -666,6 +665,10 @@ impl FromRandom for RBEvent {
   }
 }
 
+/// The RBEvent header gets generated once per event
+/// per RB. 
+/// Contains information about event id, timestamps,
+/// etc.
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct RBEventHeader {
   pub channel_mask         : u8   , 
@@ -676,6 +679,7 @@ pub struct RBEventHeader {
   pub is_locked            : bool , 
   pub is_locked_last_sec   : bool , 
   pub lost_trigger         : bool , 
+  pub event_fragment       : bool ,
   pub fpga_temp            : u16  , 
   pub event_id             : u32  , 
   pub rb_id                : u8   , 
@@ -695,6 +699,7 @@ impl RBEventHeader {
       is_locked           : false,  
       is_locked_last_sec  : false,  
       lost_trigger        : false,  
+      event_fragment      : false,
       fpga_temp           : 0,  
       event_id            : 0,  
       rb_id               : 0,  
@@ -703,32 +708,35 @@ impl RBEventHeader {
     }
   }
 
+  /// Only get the eventid from a binary stream
   pub fn extract_eventid_from_rbheader(stream :&Vec<u8>) -> u32 {
     // event id is 18 bytes in (including HEAD bytes)
-    let event_id = parse_u32(stream, &mut 18);
+    let event_id = parse_u32(stream, &mut 19);
     event_id
   }
 
-  pub fn extract_from_rbbinarydump(stream : &Vec<u8>, pos : &mut usize) 
+  /// Get the entire header from a full binary representation of
+  /// the raw RBEventMemoryView encoded in a binary stream
+  pub fn extract_from_rbeventmemoryview(stream : &Vec<u8>, pos : &mut usize) 
     -> Result<Self, SerializationError> {
     let start = *pos;
     let mut header = RBEventHeader::new();
-    // we look for headers/tails from RBBinaryDump, not header!
-    let head_pos   = search_for_u16(RBBinaryDump::HEAD, stream, *pos)?; 
-    let tail_pos   = search_for_u16(RBBinaryDump::TAIL, stream, head_pos + RBBinaryDump::SIZE -2)?;
+    // we look for headers/tails from RBEventMemoryView, not header!
+    let head_pos   = search_for_u16(RBEventMemoryView::HEAD, stream, *pos)?; 
+    let tail_pos   = search_for_u16(RBEventMemoryView::TAIL, stream, head_pos + RBEventMemoryView::SIZE -2)?;
     // At this state, this can be a header or a full event. Check here and
     // proceed depending on the options
     *pos = head_pos + 2;    
-    let status          = parse_u16(stream, pos);
-    let event_fragment  = (status & 1) == 1;
-    header.lost_trigger = (status & 2) == 2;
-    header.is_locked    = (status & 4) == 4;
+    let status                = parse_u16(stream, pos);
+    header.event_fragment     = (status & 1) == 1;
+    header.lost_trigger       = (status & 2) == 2;
+    header.is_locked          = (status & 4) == 4;
     header.is_locked_last_sec = (status & 8) == 8;
     header.fpga_temp    = status >> 4;
     if !header.lost_trigger {
       // in case there is no trigger, that means the DRS was busy so 
       // we won't get channel data or a stop cell
-      if tail_pos + 2 - head_pos != RBBinaryDump::SIZE {
+      if tail_pos + 2 - head_pos != RBEventMemoryView::SIZE {
         error!("Size of {} not expected for RBEvenHeader!", tail_pos + 2 - head_pos);
         //error!("LOST {} FRAGMENT {}" , header.lost_trigger, event_fragment);
         //let event_len = parse_u16(stream, pos);
@@ -789,19 +797,15 @@ impl RBEventHeader {
     self.get_active_data_channels().len() as u8
   }
   
+  /// Returns the fpga temperature in Celsius
   pub fn get_fpga_temp(&self) -> f32 {
-    self.drs_adc_to_celsius(self.fpga_temp)
-  }
-  
-  pub fn get_drs_temp(&self) -> f32 {
-    let drs_temp : f32 = 0.0;
-    drs_temp
-  }
-  
-  fn drs_adc_to_celsius(&self,adc : u16) -> f32 {
-    let temp : f32 = 0.0;
-    temp
-  }
+    todo!("Needs adc to celsius conversion!");
+    #[allow(unreachable_code)]{
+      let conversion : f32 = 1.0;
+      let temp = conversion * self.drs4_temp as f32;
+      temp
+    }
+  }  
 }
 
 impl Default for RBEventHeader {
@@ -813,10 +817,13 @@ impl Default for RBEventHeader {
 
 impl From<&Path> for RBEventHeader {
   fn from(path : &Path) -> Self {
-    let header =  Self::new();
-    let file = BufReader::new(File::open(path).expect("Unable to open file {}"));    
+    info!("Will read {}", path.display());
     todo!("This is not implemented yet!");
-    header
+    #[allow(unreachable_code)]{
+      //let file   = std::io::BufReader::new(std::fs::File::open(path).expect("Unable to open file {}"));    
+      let header = Self::new();
+      header
+    }
   }
 }
 
@@ -829,6 +836,7 @@ impl fmt::Display for RBEventHeader {
            \t timestamp (48bit) {},
            \t locked {}, 
            \t locked last sec. {}, 
+           \t is event fragment. {}, 
            \t drs4 Temp [C] {}, 
            \t FPGA Temp [C] {}, 
            \t stop cell {}, 
@@ -841,6 +849,7 @@ impl fmt::Display for RBEventHeader {
            self.timestamp_48,
            self.is_locked,
            self.is_locked_last_sec,
+           self.event_fragment,
            self.drs4_temp,
            self.get_fpga_temp(),
            self.stop_cell,
@@ -854,7 +863,7 @@ impl Serialization for RBEventHeader {
   
   const HEAD : u16 = 0xAAAA;
   const TAIL : u16 = 0x5555;
-  const SIZE : usize = 34; // size in bytes with HEAD and TAIL
+  const SIZE : usize = 35; // size in bytes with HEAD and TAIL
 
   fn from_bytestream(stream : &Vec<u8>, pos : &mut usize)
     -> Result<Self, SerializationError> {
@@ -865,9 +874,11 @@ impl Serialization for RBEventHeader {
     header.crc32               = parse_u32(stream , pos);  
     header.dtap0               = parse_u16(stream , pos);  
     header.drs4_temp           = parse_u16(stream , pos);  
+    // FIX - we should pack these 4 bits in a byte!
     header.is_locked           = parse_bool(stream, pos);
     header.is_locked_last_sec  = parse_bool(stream, pos);
     header.lost_trigger        = parse_bool(stream, pos);
+    header.event_fragment      = parse_bool(stream, pos);
     header.fpga_temp           = parse_u16(stream , pos);  
     header.event_id            = parse_u32(stream , pos);  
     header.rb_id               = parse_u8(stream  , pos);  
@@ -888,6 +899,7 @@ impl Serialization for RBEventHeader {
     stream.extend_from_slice(&(u8::from(self.is_locked)  .to_le_bytes()));
     stream.extend_from_slice(&(u8::from(self.is_locked_last_sec).to_le_bytes()));
     stream.extend_from_slice(&(u8::from(self.lost_trigger)      .to_le_bytes()));
+    stream.extend_from_slice(&(u8::from(self.event_fragment)    .to_le_bytes()));
     stream.extend_from_slice(&self.fpga_temp         .to_le_bytes());
     stream.extend_from_slice(&self.event_id          .to_le_bytes());
     stream.extend_from_slice(&self.rb_id             .to_le_bytes());
@@ -913,6 +925,7 @@ impl FromRandom for RBEventHeader {
     header.is_locked            = rng.gen::<bool>();  
     header.is_locked_last_sec   = rng.gen::<bool>();  
     header.lost_trigger         = rng.gen::<bool>();  
+    header.event_fragment       = rng.gen::<bool>();  
     header.fpga_temp            = rng.gen::<u16>();   
     header.event_id             = rng.gen::<u32>();   
     header.rb_id                = rng.gen::<u8>();    
@@ -928,7 +941,7 @@ mod test_rbevents {
   use crate::FromRandom;
   use crate::events::{RBEvent,
                       RBMissingHit,
-                      RBBinaryDump,
+                      RBEventMemoryView,
                       RBEventHeader};
   #[test]
   fn serialization_rbeventheader() {
@@ -952,9 +965,9 @@ mod test_rbevents {
   }
   
   #[test]
-  fn serialization_rbbinarydump() {
-    let head = RBBinaryDump::from_random();
-    let test = RBBinaryDump::from_bytestream(&head.to_bytestream(), &mut 0).unwrap();
+  fn serialization_rbmemoryview() {
+    let head = RBEventMemoryView::from_random();
+    let test = RBEventMemoryView::from_bytestream(&head.to_bytestream(), &mut 0).unwrap();
     assert_eq!(head, test);
   }
 }
