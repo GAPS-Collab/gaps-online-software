@@ -2,4 +2,4 @@
 
 ## liftof-robin-reader
 
-Read and display readout board binary files 
+Read and display readout board binary files. 

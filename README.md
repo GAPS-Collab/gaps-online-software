@@ -1,5 +1,10 @@
 # gaps-online-software
 
+This is branch OMILU-0.7. The omilu is a bluefin trevali.
+This branch is not necessarily connected to a measurement 
+campaign, but to a series of tests at UCLA, eg to investigate
+[issue 6](https://github.com/GAPS-Collab/gaps-online-software/issues/6). 
+
 ## prerequisites
 
 `cmake` and `pybind11` are needed in case pybindings should be compiled.

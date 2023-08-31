@@ -1,13 +1,12 @@
+# OMILU series
+
+# v0.7.0
+* cleanup - removes all deprecated code
+
 # KIHIKIHI series
 
 # v0.6.0
-* --calibration command line flag triggers
-  remote calibration of boards
-* --replay <Path> allows to replay previously
-  recorded rb binary data
-* compression level 1 : RBs will only send the 
-  channels they have been informed on by the 
-  MTB to be active.
+* used for NTS data taking
 
 # UHU series
 

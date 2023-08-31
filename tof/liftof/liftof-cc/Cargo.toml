@@ -1,6 +1,6 @@
 [package]
 name        = "liftof-cc" # the name of the package
-version     = "0.6.0"    # the current version, obeying semver
+version     = "0.7.0"    # the current version, obeying semver
 authors     = ["J.A. Stoessl <stoessl@hawaii.edu>", "Jeff Zweerink <zweering@astro.ucla.edu>"]
 description = "A programm for the GAPS science instrument. Read out the time-of-flight detectors and process their data."
 
@@ -25,8 +25,8 @@ random =[]
 
 [dependencies]
 
-tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["random","database"], version = "0.6"} 
-liftof-lib = { path = "../liftof-lib" , features = ["random"], version="0.6"}
+tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["random","database"], version = "0.7"} 
+liftof-lib = { path = "../liftof-lib" , features = ["random"], version="0.7"}
 
 zmq = "0.10.0"
 # this is technically optional
