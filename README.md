@@ -11,7 +11,9 @@ it is written in rust.
 The main branch is set to the latest release, a release is a frozen 
 version at the end of a development cycle. To get the newest code, 
 one has to switch to the branch with the highest version number 
-available, e.g. KIHIKIHI-0.6. 
+available, e.g. KIHIKIHI-0.6. Releases are typically related to specific
+test campaigns, e.g. NTS. The develop branch is intended for forward and 
+far-future development and might contain experimental features. 
 The branches/releases are named after fish in Hawaii. A fish 
 identification card can be found [here](https://www.honolulu.gov/rep/site/dpr/dpr_docs/hbep_fish_id_card.pdf).
 You can switch branches with `git checkout <branch>`. To get updates, use `git pull`
