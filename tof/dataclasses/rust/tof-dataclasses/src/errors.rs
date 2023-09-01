@@ -168,33 +168,26 @@ impl Error for IPBusError {
 
 ////////////////////////////////////////
 
+/// Errors when converting events to PaddlePackets
+/// or more general, when doing any kind of analysis
+///
+#[derive(Debug,Copy,Clone)]
+pub enum AnalysisError {
+  MissingChannel,
+  InputBroken,
+}
 
-//#[derive(Debug)]
-//pub struct BlobError {
-//    //DeserializationError,
-//    //SerializationError,
-//    //GenericError
-//    details : String
-//}
-//
-//impl BlobError {
-//    fn new(msg: &str) -> BlobError {
-//        BlobError{details: msg.to_string()}
-//    }
-//}
-//
-//impl fmt::Display for BlobError {
-//    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-//        write!(f,"{}",self.details)
-//    }
-//}
-//
-//
-//#[cfg(feature = "diagnostics")]
-//impl From<hdf5::Error> for BlobError {
-//    fn from(err: hdf5::Error) -> Self {
-//        BlobError::new(&err.to_string())
-//    }
-//}
+impl fmt::Display for AnalysisError {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let disp : String;
+    match self {
+      AnalysisError::MissingChannel => {disp = String::from("MissingChannel");},
+      AnalysisError::InputBroken    => {disp = String::from("InputBroken");},
+    }
+    write!(f, "<AnalysisError : {}>", disp)
+  }
+}
 
+impl Error for AnalysisError {
+}
 
