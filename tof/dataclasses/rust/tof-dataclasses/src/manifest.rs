@@ -5,7 +5,6 @@
 //! well as to serialize them locally.
 
 use std::fmt;
-use std::str::FromStr;
 use std::net::Ipv4Addr;
 #[cfg(feature = "database")]
 use std::path::Path;
