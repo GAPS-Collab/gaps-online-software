@@ -122,19 +122,32 @@ pub enum WaveformError {
   TimeIndexOutOfBounds,
   TimesTooSmall,
   NegativeLowerBound,
-  OutOfRangeUpperBound
+  OutOfRangeUpperBound,
+  OutOfRangeLowerBound,
+  DidNotCrossThreshold,
+  TooSpiky,
 }
 
-impl fmt::Display for WaveformError {
-  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+impl WaveformError {
+  pub fn to_string(&self) -> String {
     let disp : String;
     match self {
       WaveformError::TimeIndexOutOfBounds => {disp = String::from("TimeIndexOutOfBounds");},
       WaveformError::TimesTooSmall        => {disp = String::from("TimesTooSmall");},
       WaveformError::NegativeLowerBound   => {disp = String::from("NegativeLowerBound");},
       WaveformError::OutOfRangeUpperBound => {disp = String::from("OutOfRangeUpperBound");},
+      WaveformError::OutOfRangeLowerBound => {disp = String::from("OutOfRangeLowerBound");},
+      WaveformError::DidNotCrossThreshold => {disp = String::from("DidNotCrossThreshold");},
+      WaveformError::TooSpiky             => {disp = String::from("TooSpiky");},
     }
-    write!(f, "<WaveformError Error : {}>", disp)
+    disp
+  }
+}
+
+impl fmt::Display for WaveformError {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let disp = self.to_string();
+    write!(f, "<WaveformError: {}>", disp)
   }
 }
 
