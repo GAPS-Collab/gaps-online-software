@@ -18,7 +18,7 @@ use std::path::Path;
 use std::fmt;
 
 use crate::constants::{NWORDS, NCHN};
-
+use crate::errors::WaveformError;
 use crate::serialization::{Serialization,
                            parse_u16,
                            parse_f32,
@@ -47,137 +47,135 @@ pub struct ReadoutBoardCalibrations {
 impl ReadoutBoardCalibrations {
 
   /// Apply the spike cleaning to all channels
-  pub fn spike_cleaning(_adcs : &mut Vec<Vec<f32>> ) {
+  pub fn spike_cleaning(voltages  : &mut Vec<Vec<f32>>,
+                        stop_cell : u16) 
+    -> Result<(), WaveformError> {
 
-  ////let mut spikes  : [i32;10] = [0;10];
-  //let mut filter      : f64;
-  //let mut dfilter     : f64;
-  //let mut n_neighbor  : usize;
-  //let mut n_rsp      = 0usize;
-  //let mut rsp : [i32;10]    = [-1;10];
-  ////let mut spikes : [i32;10] = [-1;10
-  //// to me, this seems that should be u32
-  //// the 10 is for a maximum of 10 spikes (Jeff)
-  //let mut sp   : [[usize;10];NCHN] = [[0;10];NCHN];
-  //let mut n_sp : [usize;10]        = [0;10];
+    let mut spikes      : [i32;10] = [0;10];
+    let mut filter      : f32;
+    let mut dfilter     : f32;
+    let mut n_neighbor  : usize;
+    let mut n_rsp       = 0usize;
+    let mut rsp : [i32;10]    = [-1;10];
+    // to me, this seems that should be u32
+    // the 10 is for a maximum of 10 spikes (Jeff)
+    let mut sp   : [[usize;10];NCHN] = [[0;10];NCHN];
+    let mut n_sp : [usize;10]        = [0;10];
 
-  //for j in 0..NWORDS as usize {
-  //  for i in 0..NCHN as usize {
-  //    filter = -self.voltages[i][j] + self.voltages[i][(j + 1) % NWORDS] + self.voltages[i][(j + 2) % NWORDS] - self.voltages[i][(j + 3) % NWORDS];
-  //    dfilter = filter + 2.0 * self.voltages[i][(j + 3) % NWORDS] + self.voltages[i][(j + 4) % NWORDS] - self.voltages[i][(j + 5) % NWORDS];
-  //    if filter > 20.0  && filter < 100.0 {
-  //      if n_sp[i] < 10 {   // record maximum of 10 spikes
-  //        sp[i][n_sp[i] as usize] = (j + 1) % NWORDS ;
-  //        n_sp[i] += 1;
-  //      // FIXME - error checking
-  //      } else {return;}            // too many spikes -> something wrong
-  //    }// end of if
-  //    else if dfilter > 40.0 && dfilter < 100.0 && filter > 10.0 {
-  //      if n_sp[i] < 9 {  // record maximum of 10 spikes
-  //        sp[i][n_sp[i] as usize] = (j + 1) % NWORDS ;
-  //        sp[i][(n_sp[i] + 1) as usize] = (j + 3) % NWORDS ;
-  //        n_sp[i] += 2;
-  //      } else { return;} // too many spikes -> something wrong
-  //    } // end of else if
+    for j in 0..NWORDS as usize {
+      for i in 0..NCHN as usize {
+        filter = -voltages[i][j] + voltages[i][(j + 1) % NWORDS] + voltages[i][(j + 2) % NWORDS] - voltages[i][(j + 3) % NWORDS];
+        dfilter = filter + 2.0 * voltages[i][(j + 3) % NWORDS] + voltages[i][(j + 4) % NWORDS] - voltages[i][(j + 5) % NWORDS];
+        if filter > 20.0  && filter < 100.0 {
+          if n_sp[i] < 10 {   // record maximum of 10 spikes
+            sp[i][n_sp[i] as usize] = (j + 1) % NWORDS ;
+            n_sp[i] += 1;
+          } else {
+            return Err(WaveformError::TooSpiky);
+          }            // too many spikes -> something wrong
+        }// end of if
+        else if dfilter > 40.0 && dfilter < 100.0 && filter > 10.0 {
+          if n_sp[i] < 9 {  // record maximum of 10 spikes
+            sp[i][n_sp[i] as usize] = (j + 1) % NWORDS ;
+            sp[i][(n_sp[i] + 1) as usize] = (j + 3) % NWORDS ;
+            n_sp[i] += 2;
+          } else {
+            return Err(WaveformError::TooSpiky);
+          } // too many spikes -> something wrong
+        } // end of else if
 
-  //  }// end loop over NCHN
-  //} // end loop over NWORDS
+      }// end loop over NCHN
+    } // end loop over NWORDS
 
-  //// go through all spikes and look for neighbors */
-  //for i in 0..NCHN {
-  //  for j in 0..n_sp[i] as usize {
-  //    //n_symmetric = 0;
-  //    n_neighbor = 0;
-  //    for k in 0..NCHN {
-  //      for l in 0..n_sp[k] as usize {
-  //      //check if this spike has a symmetric partner in any channel
-  //        if (sp[i][j] as i32 + sp[k][l] as i32 - 2 * self.stop_cell as i32) as i32 % NWORDS as i32 == 1022 {
-  //          //n_symmetric += 1;
-  //          break;
-  //        }
-  //      }
-  //    } // end loop over k
-  //    // check if this spike has same spike is in any other channels */
-  //    //for (k = 0; k < nChn; k++) {
-  //    for k in 0..NCHN {
-  //      if i != k {
-  //        for l in 0..n_sp[k] {
-  //          if sp[i][j] == sp[k][l] {
-  //          n_neighbor += 1;
-  //          break;
-  //          }
-  //        } // end loop over l   
-  //      } // end if
-  //    } // end loop over k
+    // go through all spikes and look for neighbors */
+    for i in 0..NCHN {
+      for j in 0..n_sp[i] as usize {
+        //n_symmetric = 0;
+        n_neighbor = 0;
+        for k in 0..NCHN {
+          for l in 0..n_sp[k] as usize {
+          //check if this spike has a symmetric partner in any channel
+            if (sp[i][j] as i32 + sp[k][l] as i32 - 2 * stop_cell as i32) as i32 % NWORDS as i32 == 1022 {
+              //n_symmetric += 1;
+              break;
+            }
+          }
+        } // end loop over k
+        // check if this spike has same spike is in any other channels */
+        //for (k = 0; k < nChn; k++) {
+        for k in 0..NCHN {
+          if i != k {
+            for l in 0..n_sp[k] {
+              if sp[i][j] == sp[k][l] {
+              n_neighbor += 1;
+              break;
+              }
+            } // end loop over l   
+          } // end if
+        } // end loop over k
 
-  //    if n_neighbor >= 2 {
-  //      for k in 0..n_rsp {
-  //        if rsp[k] == sp[i][j] as i32 {break;} // ignore repeats
-  //        if n_rsp < 10 && k == n_rsp {
-  //          rsp[n_rsp] = sp[i][j] as i32;
-  //          n_rsp += 1;
-  //        }
-  //      }  
-  //    }
+        if n_neighbor >= 2 {
+          for k in 0..n_rsp {
+            if rsp[k] == sp[i][j] as i32 {break;} // ignore repeats
+            if n_rsp < 10 && k == n_rsp {
+              rsp[n_rsp] = sp[i][j] as i32;
+              n_rsp += 1;
+            }
+          }  
+        }
 
-  //  } // end loop over j
-  //} // end loop over i
+      } // end loop over j
+    } // end loop over i
 
-  //// recognize spikes if at least one channel has it */
-  ////for (k = 0; k < n_rsp; k++)
-  //let magic_value : f64 = 14.8;
-  //let mut x : f64;
-  //let mut y : f64;
+    // recognize spikes if at least one channel has it */
+    //for (k = 0; k < n_rsp; k++)
+    let magic_value : f32 = 14.8;
+    let mut x       : f32;
+    let mut y       : f32;
 
-  //let mut skip_next : bool = false;
-  //for k in 0..n_rsp {
-  //  if skip_next {
-  //    skip_next = false;
-  //    continue;
-  //  }
-  //  spikes[k] = rsp[k];
-  //  //for (i = 0; i < nChn; i++)
-  //  for i in 0..NCHN {
-  //    if k < n_rsp && i32::abs(rsp[k] as i32 - rsp[k + 1] as i32 % NWORDS as i32) == 2
-  //    {
-  //      // remove double spike 
-  //      let j = if rsp[k] > rsp[k + 1] {rsp[k + 1] as usize}  else {rsp[k] as usize};
-  //      x = self.voltages[i][(j - 1) % NWORDS];
-  //      y = self.voltages[i][(j + 4) % NWORDS];
-  //      if f64::abs(x - y) < 15.0
-  //      {
-  //        self.voltages[i][j % NWORDS] = x + 1.0 * (y - x) / 5.0;
-  //        self.voltages[i][(j + 1) % NWORDS] = x + 2.0 * (y - x) / 5.0;
-  //        self.voltages[i][(j + 2) % NWORDS] = x + 3.0 * (y - x) / 5.0;
-  //        self.voltages[i][(j + 3) % NWORDS] = x + 4.0 * (y - x) / 5.0;
-  //      }
-  //      else
-  //      {
-  //        self.voltages[i][j % NWORDS] -= magic_value;
-  //        self.voltages[i][(j + 1) % NWORDS] -= magic_value;
-  //        self.voltages[i][(j + 2) % NWORDS] -= magic_value;
-  //        self.voltages[i][(j + 3) % NWORDS] -= magic_value;
-  //      }
-  //    }
-  //    else
-  //    {
-  //      // remove single spike 
-  //      x = self.voltages[i][((rsp[k] - 1) % NWORDS as i32) as usize];
-  //      y = self.voltages[i][(rsp[k] + 2) as usize % NWORDS];
-  //      if f64::abs(x - y) < 15.0 {
-  //        self.voltages[i][rsp[k] as usize] = x + 1.0 * (y - x) / 3.0;
-  //        self.voltages[i][(rsp[k] + 1) as usize % NWORDS] = x + 2.0 * (y - x) / 3.0;
-  //      }
-  //      else
-  //      {
-  //        self.voltages[i][rsp[k] as usize] -= magic_value;
-  //        self.voltages[i][(rsp[k] + 1) as usize % NWORDS] -= magic_value;
-  //      }
-  //    } // end loop over nchn
-  //  } // end loop over n_rsp
-  //  if k < n_rsp && i32::abs(rsp[k] - rsp[k + 1] % NWORDS as i32) == 2
-  //    {skip_next = true;} // skip second half of double spike
-  //} // end loop over k
+    let mut skip_next : bool = false;
+    for k in 0..n_rsp {
+      if skip_next {
+        skip_next = false;
+        continue;
+      }
+      spikes[k] = rsp[k];
+      //for (i = 0; i < nChn; i++)
+      for i in 0..NCHN {
+        if k < n_rsp && i32::abs(rsp[k] as i32 - rsp[k + 1] as i32 % NWORDS as i32) == 2
+        {
+          // remove double spike 
+          let j = if rsp[k] > rsp[k + 1] {rsp[k + 1] as usize}  else {rsp[k] as usize};
+          x = voltages[i][(j - 1) % NWORDS];
+          y = voltages[i][(j + 4) % NWORDS];
+          if f32::abs(x - y) < 15.0 {
+            voltages[i][j % NWORDS] = x + 1.0 * (y - x) / 5.0;
+            voltages[i][(j + 1) % NWORDS] = x + 2.0 * (y - x) / 5.0;
+            voltages[i][(j + 2) % NWORDS] = x + 3.0 * (y - x) / 5.0;
+            voltages[i][(j + 3) % NWORDS] = x + 4.0 * (y - x) / 5.0;
+          } else {
+            voltages[i][j % NWORDS] -= magic_value;
+            voltages[i][(j + 1) % NWORDS] -= magic_value;
+            voltages[i][(j + 2) % NWORDS] -= magic_value;
+            voltages[i][(j + 3) % NWORDS] -= magic_value;
+          }
+        } else {
+          // remove single spike 
+          x = voltages[i][((rsp[k] - 1) % NWORDS as i32) as usize];
+          y = voltages[i][(rsp[k] + 2) as usize % NWORDS];
+          if f32::abs(x - y) < 15.0 {
+            voltages[i][rsp[k] as usize] = x + 1.0 * (y - x) / 3.0;
+            voltages[i][(rsp[k] + 1) as usize % NWORDS] = x + 2.0 * (y - x) / 3.0;
+          } else {
+            voltages[i][rsp[k] as usize] -= magic_value;
+            voltages[i][(rsp[k] + 1) as usize % NWORDS] -= magic_value;
+          }
+        } // end loop over nchn
+      } // end loop over n_rsp
+      if k < n_rsp && i32::abs(rsp[k] - rsp[k + 1] % NWORDS as i32) == 2
+        {skip_next = true;} // skip second half of double spike
+    } // end loop over k
+  Ok(())
   }
 
   /// Apply the voltage calibration to a single channel 
