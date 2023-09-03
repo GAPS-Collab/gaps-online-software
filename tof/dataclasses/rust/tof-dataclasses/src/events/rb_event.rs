@@ -481,6 +481,21 @@ impl FromRandom for RBEventMemoryView {
   }
 }
 
+impl From<&RBEventPayload> for RBEventMemoryView {
+  fn from(event : &RBEventPayload) -> Self {
+    match RBEventMemoryView::from_bytestream(&event.payload, &mut 0) {
+      Ok(event) => {
+        return event;
+      }
+      Err(err) => { 
+        error!("Can not get RBEventMemoryView from RBEventPayload! Error {err}!");
+        error!("Returning empty event!");
+        return RBEventMemoryView::new();
+      }
+    }
+  }
+}
+
 #[derive(Debug, Clone)]
 pub struct RBChannelData {
   pub header : u16, // that should be the channel id
@@ -664,6 +679,22 @@ impl FromRandom for RBEvent {
     event
   }
 }
+
+impl From<&RBEventPayload> for RBEvent {
+  fn from(event : &RBEventPayload) -> Self {
+    match RBEvent::from_bytestream(&event.payload, &mut 0) {
+      Ok(event) => {
+        return event;
+      }
+      Err(err) => { 
+        error!("Can not get RBEventMemoryView from RBEventPayload! Error {err}!");
+        error!("Returning empty event!");
+        return RBEvent::new();
+      }
+    }
+  }
+}
+
 
 /// The RBEvent header gets generated once per event
 /// per RB. 

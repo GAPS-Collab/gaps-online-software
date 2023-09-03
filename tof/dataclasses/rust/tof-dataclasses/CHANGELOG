@@ -8,6 +8,9 @@
   the wrong channel (ch - 1) instead of ch.
   _FIXME_ these kinds of bugs are expected due to 
   channel naming scheme. Should we change this internally?
+* Adds more From trait methods to readoutboard events
+
+
 #0.6.x - KIHIKIHI series
 
 ##0.6.1 
