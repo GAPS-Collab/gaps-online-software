@@ -26,6 +26,7 @@ pub mod monitoring;
 pub mod manifest;
 pub mod run;
 pub mod io;
+pub mod analysis;
 
 extern crate pretty_env_logger;
 #[macro_use] extern crate log;

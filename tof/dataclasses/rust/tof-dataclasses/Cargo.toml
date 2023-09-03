@@ -17,6 +17,7 @@ required-features = ["random"]
 random=["rand"]
 database=["sqlite"]
 tofcontrol=["tof-control"]
+advanced-algorithms=["smoothed_z_score"]
 
 [dev-dependencies]
 # for testing
@@ -33,6 +34,8 @@ json = "0.12"
 
 # Takeru's tof-control
 tof-control = {path = "../../../extern/tof-control", optional = true }
+smoothed_z_score = {version = "0.1", optional = true}
+sqlite = {version = "0.30", optional = true}
 
 # nom for cominatoric parsers
 #nom = "7.1"
@@ -41,5 +44,4 @@ tof-control = {path = "../../../extern/tof-control", optional = true }
 #strum = "0.24"
 #strum_macros = "0.24"
 
-sqlite = {version = "0.30", optional = true}
 
