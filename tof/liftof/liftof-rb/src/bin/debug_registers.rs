@@ -13,7 +13,7 @@ fn main () {
   
   let one_sec = Duration::from_secs(1);
   println!("=> Idling DAQ...");
-  let mut success = idle_drs4_daq();
+  let success = idle_drs4_daq();
   println!("=> DAQ Idle successfull {success:?}");
   println!("=> Resetting DAQ...");
   let mut success = reset_daq();

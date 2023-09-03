@@ -3,12 +3,8 @@
 //! This software shall help with data acquisition and commandeering 
 //! of the readoutboards (RB) used in the tof system of the GAPS 
 //! science experiment.
-//!
-//!
-//!
 use std::{thread, time};
 
-//extern crate ctrlc;
 extern crate libc;
 extern crate crossbeam_channel;
 extern crate signal_hook;
@@ -25,24 +21,18 @@ use std::process::exit;
 use liftof_rb::api::*;
 use liftof_rb::control::*;
 use liftof_rb::memory::read_control_reg;
-use liftof_rb::memory::{
-                    EVENT_SIZE,
-                    DATABUF_TOTAL_SIZE};
 
 use tof_dataclasses::threading::ThreadPool;
 use tof_dataclasses::packets::TofPacket;
-use tof_dataclasses::events::RBEventPayload;
 use tof_dataclasses::commands::{//TofCommand,
                                 TofResponse,
                                 TofOperationMode};
 use tof_dataclasses::run::RunConfig;
-use tof_dataclasses::serialization::Serialization;
 extern crate pretty_env_logger;
 #[macro_use] extern crate log;
 
 //use log::{info, LevelFilter};
 //use std::io::Write;
-
 
 extern crate clap;
 use clap::{arg,
@@ -139,9 +129,9 @@ fn main() {
   let args = Args::parse();                   
   let verbose               = args.verbose;
   let mut n_events_run      = args.nevents;
-  let mut show_progress     = args.show_progress;
+  let show_progress         = args.show_progress;
   let cache_size            = args.cache_size;
-  let mut run_forever       = args.run_forever;
+  let run_forever           = args.run_forever;
   let mut stream_any        = args.stream_any;
   let mut force_trigger     = args.force_trigger;
   let mut force_random_trig = args.force_random_trigger;
@@ -152,7 +142,10 @@ fn main() {
   let mut write_robin       = args.write_blob;
   let run_config            = args.run_config;
   let mut data_format       = 0u8;
-  
+ 
+  if wf_analysis {
+    todo!("--waveform-analysis is currently not implemented!");
+  }
   // check already if incompatible arguments are given
   if ( vcal && tcal ) || ( vcal && noi ) || ( tcal && noi ) {
     panic!("Can only support either of the flags --vcal --tcal --noi")
@@ -289,32 +282,21 @@ fn main() {
 
   let (rc_to_runner, rc_from_cmdr)      : 
       (Sender<RunConfig>, Receiver<RunConfig>)                = unbounded();
-  //let (cmd_to_client, cmd_from_zmq)      : 
-  //    (Sender<TofCommand>, Receiver<TofCommand>)              = unbounded();
-  let (rsp_to_sink, rsp_from_client)     : 
+  let (rsp_to_sink, _rsp_from_client)     : 
       (Sender<TofResponse>, Receiver<TofResponse>)            = unbounded();
   let (tp_to_pub, tp_from_client)        : 
       (Sender<TofPacket>, Receiver<TofPacket>)                = unbounded();
-  //let (hasit_to_cmd, hasit_from_cache)   : 
-  //    (Sender<bool>, Receiver<bool>)                          = unbounded();
   let (tp_to_cache, tp_from_builder) : 
       (Sender<TofPacket>, Receiver<TofPacket>)                = unbounded();
-
 
   let (set_op_mode, get_op_mode)     : 
       (Sender<TofOperationMode>, Receiver<TofOperationMode>)                = unbounded();
   let (bs_send, bs_recv)             : (Sender<Vec<u8>>, Receiver<Vec<u8>>) = unbounded(); 
-  //let (moni_to_main, data_fr_moni)   : (Sender<Vec<u8>>, Receiver<Vec<u8>>) = unbounded(); 
-  let (ev_pl_to_cache, ev_pl_from_worker) : 
-      (Sender<RBEventPayload>, Receiver<RBEventPayload>)                    = unbounded();
-  //let (ev_pl_to_cmdr,  ev_pl_from_cache)   : 
-  //  (Sender<Option<RBEventPayload>>, Receiver<Option<RBEventPayload>>)      = unbounded();
 
   let (evid_to_cache, evid_from_cmdr)   : (Sender<u32>, Receiver<u32>)      = unbounded();
   info!("Will start ThreadPool with {n_threads} threads");
   let workforce = ThreadPool::new(n_threads);
  
-
   // Setup routine. Start the threads in inverse order of 
   // how far they are away from the buffers.
   let rc_from_cmdr_c = rc_from_cmdr.clone();
@@ -349,12 +331,10 @@ fn main() {
              force_trigger);
   });
 
-  let rsp_to_sink_c = rsp_to_sink.clone();
   workforce.execute(move || {
-                    event_cache(ev_pl_from_worker,
-                                tp_from_builder,
+                    event_cache(tp_from_builder,
                                 &tp_to_pub_c,
-                                &rsp_to_sink_c,
+                                &rsp_to_sink,
                                 get_op_mode, 
                                 evid_from_cmdr,
                                 cache_size)
@@ -373,7 +353,7 @@ fn main() {
   workforce.execute(move || {
                     cmd_responder(cmd_server_ip,
                                   heartbeat_timeout_seconds,
-                                  &rsp_from_client,  
+                                  //&rsp_from_client,  
                                   &set_op_mode_c,
                                   &rc_file_path,
                                   &rc_to_runner_c,

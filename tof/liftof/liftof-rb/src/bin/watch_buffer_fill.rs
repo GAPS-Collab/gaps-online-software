@@ -10,8 +10,10 @@ use std::{thread, time};
 use indicatif::{MultiProgress,
                 ProgressBar, 
                 ProgressStyle};
-use tof_dataclasses::events::blob::BlobData;
+
+use tof_dataclasses::events::RBEventMemoryView;
 use tof_dataclasses::serialization::search_for_u16;
+use tof_dataclasses::serialization::Serialization;
 
 use liftof_rb::api::*;
 use liftof_rb::control::*;
@@ -32,7 +34,7 @@ pub fn get_bytestream(addr_space : &str,
                   addr : u32,
                   len  : usize) -> Result<Vec::<u8>, RegisterError> {
 
-  let blobsize = BlobData::SERIALIZED_SIZE;
+  let blobsize = RBEventMemoryView::SIZE;
   let vec_size = blobsize*len;
   // FIXME - allocate the vector elsewhere and 
   // pass it by reference
@@ -116,11 +118,17 @@ fn buff_handler(which      : &BlobBuffer,
       reset_ram_buffer_occ(&which);
       thread::sleep_ms(SLEEP_AFTER_REG_WRITE);
       let bytestream = get_bytestream(UIO1, buff_start_temp, 10).unwrap();
-      let blob_size  = BlobData::SERIALIZED_SIZE;
-      let mut a_blob = BlobData::new();
-      let mut start_pos  = search_for_u16(BlobData::HEAD, &bytestream, blob_size*5).unwrap();
-      a_blob.from_bytestream_experimental(&bytestream, start_pos, true);
-      a_blob.print();
+      let blob_size  = RBEventMemoryView::SIZE;
+      let mut a_blob = RBEventMemoryView::new();
+      let mut start_pos  = search_for_u16(RBEventMemoryView::HEAD, &bytestream, blob_size*5).unwrap();
+      match RBEventMemoryView::from_bytestream(&bytestream, &mut start_pos) {
+        Err(err) => {
+          error!("Unable to decode RBEventMemoryView! Err {err}");
+        }
+        Ok(ev) => {
+          a_blob = ev;
+        }
+      }
       match get_buff_size(&which, &mut buff_start_temp) {
         Ok(sz) => buff_size = sz,
         Err(_) => buff_size = 0
@@ -376,11 +384,11 @@ fn main() {
 //  //  let event_cnt      = get_event_count().unwrap();
 //  //  let lost_event_cnt = get_lost_event_count().unwrap();
 //  //  let device_dna     = get_device_dna().unwrap();
-//  //  let blob_size      = BlobData::SERIALIZED_SIZE;
+//  //  let blob_size      = RBEventMemoryView::SERIALIZED_SIZE;
 //  //  // let's get the bytes for the first 100 blobs
 //  //  let bytestream     = get_bytestream(UIO1, 0x0, 100).unwrap();
-//  //  let mut a_blob = BlobData::new();
-//  //  //let mut start_pos  = search_for_u16(BlobData::HEAD, &bytestream, blob_size*500).unwrap();
+//  //  let mut a_blob = RBEventMemoryView::new();
+//  //  //let mut start_pos  = search_for_u16(RBEventMemoryView::HEAD, &bytestream, blob_size*500).unwrap();
 //  //  //a_blob.from_bytestream_experimental(&bytestream, start_pos, true);
 //  //  //a_blob.print();
 //  //  //for n in (blob_size - 200)..(blob_size + 200) {
@@ -392,7 +400,7 @@ fn main() {
 //  //  //for n in 0..10 {
 //  //  //  println!("Blob {n}");
 //  //  //  a_blob.from_bytestream_experimental(&bytestream, pos, true);
-//  //  //  let end_pos = search_for_u16(BlobData::TAIL, &bytestream, pos + blob_size -10).unwrap();
+//  //  //  let end_pos = search_for_u16(RBEventMemoryView::TAIL, &bytestream, pos + blob_size -10).unwrap();
 //  //  //  let size = end_pos - pos;
 //  //  //  println!("Found blob of size {size}");
 //  //  //  a_blob.print();

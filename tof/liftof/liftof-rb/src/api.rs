@@ -32,7 +32,7 @@ use crate::memory::*;
 use tof_dataclasses::commands::*;
 use tof_dataclasses::events::{RBEventPayload,
                               RBEventHeader, 
-                              RBBinaryDump};
+                              RBEventMemoryView};
 use tof_dataclasses::serialization::search_for_u16;
 use tof_dataclasses::commands::{TofCommand,
                                 TofResponse,
@@ -175,7 +175,7 @@ pub fn cmd_from_bytestream(bytestream : &mut Vec<u8>) ->Result<TofCommand, Seria
 ///                             seconds, we try to reconnect.
 pub fn cmd_responder(cmd_server_ip             : String,
                      heartbeat_timeout_seconds : u32,
-                     rsp_receiver              : &Receiver<TofResponse>,
+                     //rsp_receiver              : &Receiver<TofResponse>,
                      op_mode                   : &Sender<TofOperationMode>,
                      run_config_file           : &Path,
                      run_config                : &Sender<RunConfig>,
@@ -297,7 +297,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
                 continue;
               
               }
-              TofCommand::PowerOn   (mask) => {
+              TofCommand::PowerOn   (_mask) => {
                 error!("Not implemented");
                 match cmd_socket.send(resp_not_implemented,0) {
                   Err(err) => error!("Can not send response! Err {err}"),
@@ -305,7 +305,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
                 }
                 continue;
               },
-              TofCommand::PowerOff  (mask) => {
+              TofCommand::PowerOff  (_mask) => {
                 error!("Not implemented");
                 match cmd_socket.send(resp_not_implemented,0) {
                   Err(err) => error!("Can not send response! {err}"),
@@ -313,7 +313,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
                 }
                 continue;
               },
-              TofCommand::PowerCycle(mask) => {
+              TofCommand::PowerCycle(_mask) => {
                 error!("Not implemented");
                 match cmd_socket.send(resp_not_implemented,0) {
                   Err(err) => error!("Can not send response! {err}"),
@@ -321,7 +321,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
                 }
                 continue;
               },
-              TofCommand::RBSetup   (mask) => {
+              TofCommand::RBSetup   (_mask) => {
                 warn!("Not implemented");
                 match cmd_socket.send(resp_not_implemented,0) {
                   Err(err) => warn!("Can not send response! Err {err}"),
@@ -329,7 +329,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
                 }
                 continue;
               }, 
-              TofCommand::SetThresholds   (thresholds) =>  {
+              TofCommand::SetThresholds   (_thresholds) =>  {
                 warn!("Not implemented");
                 match cmd_socket.send(resp_not_implemented,0) {
                   Err(err) => warn!("Can not send response! Err {err}"),
@@ -340,7 +340,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
               TofCommand::StartValidationRun  (_) => {
                 warn!("Not implemented");
                 match cmd_socket.send(resp_not_implemented,0) {
-                  Err(err) => warn!("Can not send response!"),
+                  Err(err) => warn!("Can not send response! Err {err}"),
                   Ok(_)    => trace!("Resp sent!")
                 }
                 continue;
@@ -349,7 +349,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
                 trace!("Requesting waveforms for event {eventid}");
                 error!("Not implemented");
                 match cmd_socket.send(resp_not_implemented,0) {
-                  Err(err) => warn!("Can not send response!"),
+                  Err(err) => warn!("Can not send response! Err {err}"),
                   Ok(_)    => trace!("Resp sent!")
                 }
                 continue;
@@ -357,7 +357,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
               TofCommand::UnspoolEventCache   (_) => {
                 warn!("Not implemented");
                 match cmd_socket.send(resp_not_implemented,0) {
-                  Err(err) => warn!("Can not send response!"),
+                  Err(err) => warn!("Can not send response! Err {err}"),
                   Ok(_)    => trace!("Resp sent!")
                 }
                 continue;
@@ -371,7 +371,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
                 }
                 let resp_good = TofResponse::Success(RESP_SUCC_FINGERS_CROSSED);
                 match cmd_socket.send(resp_good.to_bytestream(),0) {
-                  Err(err) => warn!("Can not send response!"),
+                  Err(err) => warn!("Can not send response! Err {err}"),
                   Ok(_)    => trace!("Resp sent!")
                 }
                 continue;
@@ -384,12 +384,12 @@ pub fn cmd_responder(cmd_server_ip             : String,
                 }
                 let resp_good = TofResponse::Success(RESP_SUCC_FINGERS_CROSSED);
                 match cmd_socket.send(resp_good.to_bytestream(),0) {
-                  Err(err) => warn!("Can not send response!"),
+                  Err(err) => warn!("Can not send response! Err {err}"),
                   Ok(_)    => trace!("Resp sent!")
                 }
                 continue;
               },
-              TofCommand::DataRunStart (max_event) => {
+              TofCommand::DataRunStart (_max_event) => {
                 // let's start a run. The value of the TofCommnad shall be 
                 // nevents
                 println!("Will initialize new run!");
@@ -406,7 +406,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
                 };
                 let resp_good = TofResponse::Success(RESP_SUCC_FINGERS_CROSSED);
                 match cmd_socket.send(resp_good.to_bytestream(),0) {
-                  Err(err) => warn!("Can not send response!"),
+                  Err(err) => warn!("Can not send response! Err {err}"),
                   Ok(_)    => trace!("Resp sent!")
                 }
               },
@@ -431,7 +431,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
               TofCommand::VoltageCalibration (_) => {
                 warn!("Not implemented");
                 match cmd_socket.send(resp_not_implemented,0) {
-                  Err(err) => warn!("Can not send response!"),
+                  Err(err) => warn!("Can not send response! Err {err}"),
                   Ok(_)    => trace!("Resp sent!")
                 }
                 continue;
@@ -439,7 +439,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
               TofCommand::TimingCalibration  (_) => {
                 warn!("Not implemented");
                 match cmd_socket.send(resp_not_implemented,0) {
-                  Err(err) => warn!("Can not send response!"),
+                  Err(err) => warn!("Can not send response! Err {err}"),
                   Ok(_)    => trace!("Resp sent!")
                 }
                 continue;
@@ -455,10 +455,12 @@ pub fn cmd_responder(cmd_server_ip             : String,
               TofCommand::RequestEvent(eventid) => {
                 match evid_to_cache.send(eventid) {
                   Err(err) => {
-                    debug!("Problem sending event id to cache! Err {err}");
+                    error!("Problem sending event id to cache! Err {err}");
                     //return Ok(TofResponse::GeneralFail(*eventid));
                   },
-                  Ok(event) => (),
+                  Ok(event) => {
+                    error!("Noting implemented yet. Have found event {:?} though", event);
+                  }
                 }
                 //continue;
               },
@@ -1055,8 +1057,7 @@ pub fn runner(run_config          : &Receiver<RunConfig>,
 ///
 /// * control_ch : Receive operation mode instructions
 ///
-pub fn event_cache(recv_ev_pl   : Receiver<RBEventPayload>,
-                   tp_recv      : Receiver<TofPacket>,
+pub fn event_cache(tp_recv      : Receiver<TofPacket>,
                    tp_to_pub    : &Sender<TofPacket>,
                    resp_to_cmd  : &Sender<TofResponse>,
                    get_op_mode  : Receiver<TofOperationMode>, 
@@ -1189,6 +1190,9 @@ pub fn event_cache(recv_ev_pl   : Receiver<RBEventPayload>,
         }
       }
     } // end match
+    if n_send_errors > 0 {
+      warn!("There were {n_send_errors} errors during sending!");
+    }
   } // end loop
 }
 
@@ -1485,9 +1489,9 @@ pub fn event_processing(bs_recv     : &Receiver<Vec<u8>>,
       Ok(bytestream) => {
         'bytestream : loop {
           //println!("Received bytestream");
-          match search_for_u16(RBBinaryDump::HEAD, &bytestream, start_pos) {
+          match search_for_u16(RBEventMemoryView::HEAD, &bytestream, start_pos) {
             Ok(head_pos) => {
-              let tail_pos   = head_pos + RBBinaryDump::SIZE;
+              let tail_pos   = head_pos + RBEventMemoryView::SIZE;
               if tail_pos > bytestream.len() - 1 {
                 // we are finished here
                 trace!("Work on current blob complete. Extracted {n_events} events. Got last event_id! {event_id}");
@@ -1505,7 +1509,7 @@ pub fn event_processing(bs_recv     : &Receiver<Vec<u8>>,
                   payload.extend_from_slice(&bytestream[head_pos..tail_pos + 2]);
                   debug!("Prepared TofPacket for event {} with a payload size of {}", event_id, &payload.len());
                   let rb_payload  = RBEventPayload::new(event_id, payload); 
-                  let mut tp = TofPacket::from(&rb_payload);
+                  let tp = TofPacket::from(&rb_payload);
                   match tp_sender.send(tp) {
                     Ok(_) => (),
                     Err(err) => error!("Problem sending TofPacket over channel! Err {err}"),
@@ -1515,19 +1519,19 @@ pub fn event_processing(bs_recv     : &Receiver<Vec<u8>>,
                   //let mut payload = Vec::<u8>::new();
                   //payload.extend_from_slice(&bytestream[head_pos..tail_pos+2]);
                   let mut this_event_start_pos = head_pos;
-                  match RBEventHeader::extract_from_rbbinarydump(&bytestream, &mut this_event_start_pos) {
+                  match RBEventHeader::extract_from_rbeventmemoryview(&bytestream, &mut this_event_start_pos) {
                     Err(err) => {
-                      //let mut foo = RBBinaryDump::new();
+                      //let mut foo = RBEventMemoryView::new();
                       //foo.from_bytestream(&bytestream, head_pos, false);
                       //error!("{:?}", foo);
-                      error!("Broken RBBinaryDump data in memory! Err {}", err);
+                      error!("Broken RBEventMemoryView data in memory! Err {}", err);
                       error!("-- we tried to process {} bytes!", tail_pos - head_pos);
                       error!("{:?}", &bytestream[head_pos..head_pos + 100]);
                       error!("{:?}", &bytestream[tail_pos - 10..tail_pos + 130]);
                       events_not_sent += 1;
                     }
                     Ok(event_header)    => {
-                      let mut tp = TofPacket::from(&event_header);
+                      let tp = TofPacket::from(&event_header);
                       match tp_sender.send(tp) {
                         Ok(_) => (),
                         Err(err) => error!("Problem sending TofPacket over channel! Err {err}"),
@@ -1551,6 +1555,9 @@ pub fn event_processing(bs_recv     : &Receiver<Vec<u8>>,
         continue 'main;
       }
     }// end match 
+    if events_not_sent > 0 {
+      warn!("There were {events_not_sent} unsent events!");
+    }
   } // end outer loop
 }
 
