@@ -8,6 +8,8 @@ use std::fmt;
 use std::net::Ipv4Addr;
 #[cfg(feature = "database")]
 use std::path::Path;
+#[cfg(feature = "database")]
+use std::str::FromStr;
 
 #[cfg(feature = "database")]
 extern crate sqlite;
