@@ -1,6 +1,6 @@
 use std::error::Error;
 use std::time::{Duration, Instant};
-use std::thread;
+//use std::thread;
 use std::fmt;
 use std::{fs, fs::File, path::Path};
 use std::fs::OpenOptions;
@@ -13,7 +13,7 @@ use std::io::{Read,
               SeekFrom};
 use std::collections::HashMap;
 use std::net::{UdpSocket, SocketAddr};
-use crossbeam_channel::{Sender, Receiver};
+use crossbeam_channel::Receiver;
 use zmq;
 
 extern crate json;
@@ -30,34 +30,33 @@ extern crate pretty_env_logger;
 
 #[macro_use] extern crate manifest_dir_macros;
 
-//use tof_dataclasses::manifest::LocalTriggerBoard;
 use tof_dataclasses::manifest as mf;
-use tof_dataclasses::constants::{NCHN,
-                                 NWORDS};
-use tof_dataclasses::calibrations::{ReadoutBoardCalibrations,
-                                    Calibrations,
-                                    read_calibration_file};
-use tof_dataclasses::events::blob::{BlobData,
-                                    get_constant_blobeventsize};
+use tof_dataclasses::constants::NWORDS;
+use tof_dataclasses::calibrations::ReadoutBoardCalibrations;
 use tof_dataclasses::packets::{TofPacket,
                                PacketType,
                                PaddlePacket};
-use tof_dataclasses::errors::{BlobError, SerializationError};
+use tof_dataclasses::errors::{SerializationError,
+                              AnalysisError};
 use tof_dataclasses::serialization::{search_for_u16,
                                      parse_u8,
                                      parse_u32,
                                      Serialization};
 use tof_dataclasses::commands::{TofCommand};//, TofResponse};
 use tof_dataclasses::events::{MasterTriggerEvent,
-                              RBEventPayload,
                               RBEvent};
 use tof_dataclasses::monitoring::MtbMoniData;
 use tof_dataclasses::events::master_trigger::{reset_daq,
                                               read_daq,
                                               read_rate,
-                                              read_lost_rate,
+                                              //read_lost_rate,
                                               read_adc_temp_and_vccint,
                                               read_adc_vccaux_and_vccbram};
+
+use tof_dataclasses::analysis::{calculate_pedestal,
+                                integrate,
+                                cfd_simple,
+                                find_peaks};
 
 pub const MT_MAX_PACKSIZE   : usize = 512;
 pub const DATAPORT : u32 = 42000;
@@ -66,10 +65,7 @@ pub const DATAPORT : u32 = 42000;
 // I/O - read/write (general purpose) files
 //
 //
-
-
-
-fn read_value_from_file(file_path: &str) -> io::Result<u32> {
+pub fn read_value_from_file(file_path: &str) -> io::Result<u32> {
   let mut file = File::open(file_path)?;
   let mut contents = String::new();
   file.read_to_string(&mut contents)?;
@@ -103,34 +99,6 @@ pub fn get_file_as_byte_vec(filename: &String) -> Vec<u8> {
     f.read(&mut buffer).expect("buffer overflow");
     return buffer;
 }
-
-/// Open a raw file with ReadoutBoard data ("blob") and run decoding and analysis
-/// FIXME - this won't work!
-pub fn get_blobs_from_file (rb_id : usize) {
-//  let filepath = String::from("/data0/gfp-data-aug/Aug/run4a/d20220809_195753_4.dat");
-//  let blobs = get_file_as_byte_vec(&filepath);
-//  // FIXME - this must be thre real calibrations
-//  let calibrations = [Calibrations {..Default::default()};NCHN];
-//  //let sender = Sender::<PaddlePacket>();
-//  let (sender, receiver) = unbounded();
-//  todo!("Fix the paddle ids. This function needs to be given the Readoutboard!");
-//  let paddle_ids : [u8;4] = [0,0,0,0];
-//  let mut rb = ReadoutBoard::new();
-//  rb.id = Some(rb_id as u8);
-//  rb.sorted_pids = paddle_ids;
-//  match analyze_blobs(&blobs,
-//                      &sender,
-//                      false,
-//                      &rb,
-//                      false,
-//                      false,
-//                      &calibrations,
-//                      0) {
-//      Ok(nblobs)   => info!("Read {} blobs from file", nblobs), 
-//      Err(err)     => panic!("Was not able to read blobs! Err {}", err)
-//  }
-}
-
 
 //FIXME : this needs to become a trait
 fn read_n_bytes(file: &mut BufReader<File>, n: usize) -> io::Result<Vec<u8>> {
@@ -299,6 +267,7 @@ impl TofPacketReader {
           debug!("Got stream {:?}", stream);
           match search_for_u16(TofPacket::HEAD, &stream, 0) {
             Err(_) => {
+              pos += chunk as u64;
               continue;
             }
             Ok(result) => {
@@ -311,7 +280,6 @@ impl TofPacketReader {
           }
         } // end Ok
       } // end match 
-      pos += chunk as u64;
     } // end while
     let mut rewind : i64 = pos.try_into().unwrap();
     rewind = -1*rewind + start_pos as i64;
@@ -343,8 +311,7 @@ impl Iterator for TofPacketReader {
   //type Item = io::Result<TofPacket>;
 
   fn next(&mut self) -> Option<Self::Item> {
-    let mut line   = Vec::<u8>::new();
-    let mut packet = TofPacket::new();
+    let packet : TofPacket;
     match read_n_bytes(self.file_reader.as_mut().unwrap(), 7) { 
     //match self.file_reader.as_mut().expect("No file available!").read_until(b'\n', &mut line) {
       Err(err) => {
@@ -360,7 +327,7 @@ impl Iterator for TofPacketReader {
           let expected_payload_size = self.get_next_packet_size(&chunk) as usize; 
           match read_n_bytes(self.file_reader.as_mut().unwrap(), expected_payload_size + 2) {
             Err(err) => {
-              error!("Unable to read {} requested bytes to decode tof packet!", expected_payload_size - 7 );
+              error!("Unable to read {} requested bytes to decode tof packet! Err {err}", expected_payload_size - 7 );
               return None;
             },
             Ok(data) => {
@@ -529,7 +496,6 @@ impl RobinReader {
     println!("\t pos -> event id");
     //println!("{:?}", reverse_index);
     println!("{:?}", self.index);
-    let mut missing_keys = 0;
     let mut sorted_keys: Vec<&usize> = reverse_index.keys().collect();
     sorted_keys.sort();
     //let mut n = 0u32;
@@ -560,7 +526,7 @@ impl RobinReader {
     } else {
       let delta = event_idx - self.n_events_read;
       let mut n_read = 0usize;
-      let mut ev = RBEvent::new();
+      //let mut ev = RBEvent::new();
       loop {
         match self.next() {
           Some(ev) => {
@@ -616,7 +582,7 @@ impl RobinReader {
     if self.eof_reached {
       return;
     }
-    for n in 0..n_events {
+    for _ in 0..n_events {
       let event = self.next();
       n_ev += 1;
       if let Some(ev) = event {
@@ -682,16 +648,15 @@ impl Iterator for RobinReader {
   fn next(&mut self) -> Option<Self::Item> {
     let event_size = 18532usize;
     let chunk      = 1;
-    let mut packet = RBEvent::new();
-    let mut file_buffer = Vec::<u8>::with_capacity(event_size);
+    let packet : RBEvent;
     match read_n_bytes(self.file_reader.as_mut().unwrap(), event_size*chunk) { 
     //match self.file_reader.as_mut().expect("No file available!").read_until(b'\n', &mut line) {
       Ok(buffer) => {
         if buffer.len() > 0 {
           trace!("Read {} bytes", buffer.len());
           self.n_bytes_read += buffer.len();
-          for n in 0..chunk {
-            match RBEvent::extract_from_memorydump(&buffer, &mut 0) {
+          for _ in 0..chunk {
+            match RBEvent::extract_from_rbeventmemoryview(&buffer, &mut 0) {
               Ok(pack) => {
                 packet = pack;
                 self.n_events_read += 1;     
@@ -785,323 +750,157 @@ pub fn readoutboard_commander(cmd : Receiver<TofCommand>){
 // Analysis
 //
 
-/// FIXME - we have to think again, which queues are really 
-/// needed. I think:
-/// BlobData queue : only needed when diagnostics feature is
-/// set to write the waveforms to hdf
-/// PaddlePacket queue : I don't think is needed for anything
-/// since we are sending the packets right away
-///
-/// # Arguments
-///
-/// * paddle_ids     :  A sorted list of paddle ids connected 
-///                     to this readoutboard. 
-///                     The is sorted like (0,1) -> pid1
-///                                        (2,3) -> pid2
-///                                        (4,5) -> pid3
-///                                        (6,7) -> pid4
-///
-///
-pub fn analyze_blobs(buffer               : &Vec<u8>,
-                     pp_sender            : &Sender<PaddlePacket>,
-                     send_packets         : bool,
-                     readoutboard         : &mf::ReadoutBoard,
-                     print_events         : bool,
-                     do_calibration       : bool,
-                     //calibrations         : &ReadoutBoardCalibrationsi,
-                     calibrations         : &[Calibrations; NCHN],
-                     n_chunk              : usize)
--> Result<usize, BlobError> {
-  let mut blob_data              = BlobData {..Default::default()};
-  let mut header_found_start     = false;
-  let mut nblobs                 = 0usize;
-  let mut ncorrupt_blobs         = 0usize;
-  let mut pos                    = 0usize;
-  let blobdata_size              = buffer.len();
-  let mut byte                   : u8;
 
-  // allocate some memory we are using in 
-  // every iteration of the loop
-  //const NPADDLES : usize = (NCHN - 1)/2; // assuming one channel 
-  //                                         // is the channel 9
-  const NPADDLES : usize = 4;
-
-
-  // each event has NPADDLES per readout board
-  // this holds all for a single event
-  // (needs to be reset each event)
-  let mut pp_this_event = [PaddlePacket::new(); NPADDLES];        
-  
-  // either all or only the triggered paddle ids
-  let mut all_pids = readoutboard.get_all_pids();
-  //all_pids         = readoutboard.get_triggered_pids();
+/// Basically Rene's analysis engine. This creates 
+/// the PaddlePackets with reduced waveform 
+/// information from a version of the ReadoutBoard
+/// event. 
+///
+/// ISSUES:
+/// In the future, we might want to refactor this 
+/// a little bit and it might operate on a 
+/// RBEvent instaad and fill it paddle packet 
+/// members
+///
+/// FIXME - I think this should take a HashMap with 
+/// calibration options, which we can load from a 
+/// json file
+pub fn waveform_analysis(event         : &RBEvent,
+                         readoutboard  : &mf::ReadoutBoard,
+                         calibration   : &ReadoutBoardCalibrations)
+                         // settiungs will be future extension
+                         //settings      : &HashMap<String, f32>) 
+-> Result<Vec<PaddlePacket>, AnalysisError> {
+  if event.header.broken {
+    // just return the analysis error, there 
+    // is probably nothing else we can do?
+    return Err(AnalysisError::InputBroken);
+  }
+  let pids = readoutboard.get_all_pids();
   let mut paddles = HashMap::<u8, PaddlePacket>::new();
-  for k in all_pids.iter() {
-    match paddles.insert(*k, PaddlePacket::new()) {
+  // just paranoid
+  if pids.len() != 4 {
+    error!("RB {} seems to have a strange number of paddles ({}) connected!",
+           readoutboard.rb_id, pids.len());
+  }
+  for k in pids.iter() {
+    // fill the general information of 
+    // the paddles already
+    let mut pp   = PaddlePacket::new();
+    pp.paddle_id = *k;
+    pp.event_id  = event.header.event_id;
+    // FIXME - think better about timestamps!
+    //pp.timestamp_32 = blob_data.timestamp_32;
+    //pp.timestamp_16 = blob_data.timestamp_16;
+    match paddles.insert(*k, pp) {
       None => (),
-      Some(v) => {error!("We have seen paddle id {k} already!");}
+      Some(_) => {
+        error!("We have seen paddle id {k} already!");
+      }
     };
   }
-  // binary switch - false for side a and
-  // true for side b
-  let mut is_bside : bool = false;
-  let mut trace_out : [f64;NWORDS] = [0.0;NWORDS];
-  let mut times     : [f64;NWORDS] = [0.0;NWORDS];
-
-  // remove_spikes requires two dimensional array
-  let mut all_channel_waveforms : [[f64;NWORDS];NCHN] = [[0.0;NWORDS];NCHN];
-  let all_channel_times         : [[f64;NWORDS];NCHN] = [[0.0;NWORDS];NCHN];
-
-  // bitmask to keep track which channels/paddles are
-  // over threshold
-  let mut channels_over_threshold = [false;NCHN];
-  let mut paddles_over_threshold  = [false;NPADDLES];
-  // reset paddle packets for this event
-  for n in 0..NPADDLES {
-    pp_this_event[n].reset();
-    paddles_over_threshold[n] = false;
+  // do the calibration
+  let mut active_channels = event.header.get_active_data_channels();
+  active_channels.push(9); // always do ch9 callibration
+  // allocate memory for voltages
+  // this allocates more memory than needed
+  // (needed is active_channels.len()), however,
+  // in flight operations all channels should
+  // be active anyway.
+  let mut all_voltages = Vec::<Vec::<f32>>::new();
+  let mut all_times    = Vec::<Vec::<f32>>::new();
+  for _ in 0..9 {
+    let ch_voltages : Vec<f32>= vec![0.0; NWORDS];
+    all_voltages.push(ch_voltages);
+    let ch_times : Vec<f32>= vec![0.0; NWORDS];
+    all_times.push(ch_times);
   }
 
-  // the stream might have a certain number of events, 
-  // but then there might be a number of extra bytes.
-
-  loop {
-    #[cfg(feature = "diagnostics")]
-    let mut diagnostics_wf : Vec<CalibratedWaveform> = Vec::new();
-    
-    // if the following is true, we scanned throught the whole stream  
-    //println!("{pos} {blobdata_size}");
-    //let foo = get_constant_blobeventsize();
-    //println!("{foo}");
-    // this is of constant annoyance!
-    //if pos + get_constant_blobeventsize() >= (blobdata_size -1) {break;}
-    //if pos + get_constant_blobeventsize() > (blobdata_size ) {break;}
-    if pos > buffer.len() - 1 {
-      trace!("too big");
-      break;
-    }
-    byte = buffer[pos];
-    if !header_found_start {
-      if byte == 0xaa {
-        header_found_start = true;
-      }
-      pos +=1;
-      continue;
-    }
-    if header_found_start {
-      pos += 1;
-      if byte == 0xaa {
-        header_found_start = false;
-        // we have found our 0xaaaa marker!
-        // include it in the stream to deserialize
-        // if there is not enough bytes for another blob, 
-        // lets break the loop
-        if pos -2 + get_constant_blobeventsize() > buffer.len()
-          {break;}
-        blob_data.reset();
-        //if (pos-2 > buffer.len() -1) {break;}
-        blob_data.from_bytestream(&buffer, pos-2, false);
-        nblobs += 1;
-
-        // reset the paddles for this board
-        for k in all_pids.iter() {
-          paddles.get_mut(k).map(|val| val.reset());
-        }
-
-        if blob_data.tail == 0x5555 {
-            if print_events {blob_data.print();}
-            pos += get_constant_blobeventsize() - 2; 
-            for k in all_pids.iter() {
-              paddles.get_mut(k).unwrap().paddle_id    = *k;
-              paddles.get_mut(k).unwrap().event_id     = blob_data.event_id;
-              paddles.get_mut(k).unwrap().timestamp_32 = blob_data.timestamp_32;
-              paddles.get_mut(k).unwrap().timestamp_16 = blob_data.timestamp_16;
-            }
-
-            if do_calibration {
-              
-              // the order of tasks should be something 
-              // like this
-              // 1) read-out
-              // 2) calibration
-              // 3) paak-finding
-              // 4) cfd algorithm
-              // 5) paddle packaging
-              // the paddle mapping is HARDCODED here
-              // FIXME: We make the assumption that nchanel -> paddle side
-              //                                    0 -> Paddle0/A Side
-              //                                    1 -> Paddle0/B Side
-              //                                    2 -> Paddle1/A Side
-              //                                    3 -> Paddle1/B Side
-              //                                    4 -> Paddle2/A Side
-              //                                    5 -> Paddle2/B Side
-              //                                    6 -> Paddle3/A Side
-              //                                    7 -> Paddle3/B Side
-
-              let mut spikes : [i32;10] = [0;10];
-              blob_data.calibrate(calibrations);
-              blob_data.remove_spikes(&mut spikes);
-              for ch in 0..8 {
-
-                // reset our channels_over_threshold
-                channels_over_threshold[ch] = false;
-
-
-                // analysis part
-                //let mut waveform = CalibratedWaveform::new(all_channel_waveforms[n],
-                //                                           all_channel_times[n]);
-                // first, subtract the pedestal
-                blob_data.set_ped_begin(10.0, ch);// 10-100                               
-                blob_data.set_ped_range(50.0, ch);
-                blob_data.calc_ped_range(ch);
-                blob_data.subtract_pedestal(ch);
-                
-                // then we set the threshold and check
-                // if the wf went over threashold
-                let is_ot = blob_data.set_threshold(10.0, ch);
-                //if !is_ot {continue;}
-                channels_over_threshold[ch] = true;
-                
-                blob_data.set_cfds_fraction(0.20, ch);
-                blob_data.find_peaks(270.0,70.0, ch);
-                // analysis
-                let cfd_time = blob_data.find_cfd_simple(0, ch);
-                let charge = blob_data.integrate(270.0, 70.0, ch).unwrap_or(42.0);
-                let pid = readoutboard.get_pid_for_ch(ch + 1 );
-                let end = readoutboard.get_paddle_end(ch + 1 );
-                match end {
-                  // unwraps can't fail due to construction of paddles
-                  mf::PaddleEndIdentifier::A => {
-                    paddles.get_mut(&pid).unwrap().set_time_a(cfd_time);
-                    paddles.get_mut(&pid).unwrap().set_charge_a(charge);
-                  },
-                  mf::PaddleEndIdentifier::B => {
-                    paddles.get_mut(&pid).unwrap().set_time_a(cfd_time);
-                    paddles.get_mut(&pid).unwrap().set_charge_a(charge);
-                  }
-                }//waveform.print();
-                // packing part
-                
-                //// FIXME - this is not independent
-                //// of the number of channels for the 
-                //// readout board
-                //match ch {
-                //  0 => {
-                //    paddles_over_threshold[0] = true;
-                //    pp_this_event[0].set_time_a(cfd_time);
-                //    pp_this_event[0].set_charge_a(charge);
-                //  },
-                //  1 => {
-                //    paddles_over_threshold[0] = true;
-                //    pp_this_event[0].set_time_b(cfd_time);
-                //    pp_this_event[0].set_charge_b(charge);
-
-                //  },
-                //  2 => {
-                //    paddles_over_threshold[1] = true;
-                //    pp_this_event[1].set_time_a(cfd_time);
-                //    pp_this_event[1].set_charge_a(charge);
-                //  },
-                //  3 => {
-                //    paddles_over_threshold[1] = true;
-                //    pp_this_event[1].set_time_b(cfd_time);
-                //    pp_this_event[1].set_charge_b(charge);
-                //  },
-                //  4 => {
-                //    paddles_over_threshold[2] = true;
-                //    pp_this_event[2].set_time_a(cfd_time);
-                //    pp_this_event[2].set_charge_a(charge);
-                //  },
-                //  5 => {
-                //    paddles_over_threshold[2] = true;
-                //    pp_this_event[2].set_time_b(cfd_time);
-                //    pp_this_event[2].set_charge_b(charge);
-                //  },
-                //  6 => {
-                //    paddles_over_threshold[3] = true;
-                //    pp_this_event[3].set_time_a(cfd_time);
-                //    pp_this_event[3].set_charge_a(charge);
-                //  },
-                //  7 => {
-                //    paddles_over_threshold[3] = true;
-                //    pp_this_event[3].set_time_b(cfd_time);
-                //    pp_this_event[3].set_charge_b(charge);
-                //  },
-                //  _ => {
-                //    trace!("Won't do anything for ch {}",ch);
-                //  }
-                //} // end match
-
-                // now set general properties on the 
-                // paddles
-                //for n in 0..readoutboard.sorted_pids.len() {
-                //  // FIXME
-                //  pp_this_event[n].paddle_id    = readoutboard.sorted_pids[n];
-                //  pp_this_event[n].event_id     = blob_data.event_id;
-                //  pp_this_event[n].timestamp_32 = blob_data.timestamp_32;
-                //  pp_this_event[n].timestamp_16 = blob_data.timestamp_16;
-                //  //pp_this_event[n].print();
-                //  //if paddles_over_threshold[n] {
-                //  //  pp_this_event[n].event_id = blob_data.event_id;
-                //  //}
-                //}
-                
-                #[cfg(feature = "diagnostics")]
-                {  
-                  let diag_wf = CalibratedWaveform::new(&blob_data, ch);
-                  diagnostics_wf.push (diag_wf);
-                }
-              } // end loop over readout board channels
-            }
-
-            // put the finished paddle packets in 
-            // our container
-            //for n in 0..NPADDLES {
-            for pid in all_pids.iter() {
-            //if paddles_over_threshold[n] {
-              //if true {
-                //trace!("Sending pp to cache for evid {}", pp_this_event[n].event_id);
-                //trace!("==> [RBCOM]  Sending {:?}", pp_this_event[n]);
-                //pp_sender.send(pp_this_event[n]);
-                match pp_sender.send(paddles[pid]) {
-                  Err(err) => error!("Can not send padlle packet to cache! Error {err}"),
-                  Ok(_)    => ()
-                }
-              //}
-            }
-        } else {
-          // the event is corrupt
-          //println!("{}", blob_data.head);
-          ncorrupt_blobs += 1;
-        }
-      } else {
-          // it wasn't an actual header
-          header_found_start = false;
-      }
-    } // endif header_found_start
-  }// end loop
-
-  // in case of diagnostics, we 
-  // write an hdf file with calibrated 
-  // waveforms for later analysis.
-  #[cfg(feature = "diagnostics")]
-  {
-    let hdf_diagnostics_file =  "waveforms_".to_owned()
-                                + &n_chunk.to_string()
-                                + "_"
-                                + &readoutboard.id.to_string()
-                                + ".hdf";
-    let hdf_file    = hdf5::File::create(hdf_diagnostics_file).unwrap(); // open for writing
-    hdf_file.create_group("waveforms");
-    let hdf_group = hdf_file.group("waveforms").unwrap();
-    let hdf_dataset = hdf_group.new_dataset::<CalibratedWaveform>().shape(diagnostics_wf.len()).create("wf").unwrap();
-    //let hdf_dataset = hdf_group.new_dataset::<BlobData>().shape(events.len()).create("wf").unwrap();
-    //hdf_dataset.write(&arr1(&diagnostics_wf))?;
-    hdf_dataset.write(&arr1(&diagnostics_wf))?;
-    hdf_file.close()?;
+  for active_ch in &active_channels {
+    let ch = *active_ch as usize;
+    let adc          = event.get_adc_ch(*active_ch);
+    calibration.voltages(ch,
+                         event.header.stop_cell as usize,
+                         adc,
+                         &mut all_voltages[ch]);
+    calibration.nanoseconds(ch,
+                            event.header.stop_cell as usize,
+                            &mut all_times[ch]);
   }
-  debug!("==> Deserialized {} blobs! {} blobs were corrupt", nblobs, ncorrupt_blobs);
-  Ok(nblobs)
+  match ReadoutBoardCalibrations::spike_cleaning(&mut all_voltages,
+                                                 event.header.stop_cell) {
+    Err(err) => {
+      error!("Spike cleaning failed! Err {err}");
+    }
+    Ok(_)    => ()
+  }
+
+  // analysis
+  for active_ch in &active_channels {
+    let ch = *active_ch as usize;
+    let (ped, ped_err) = calculate_pedestal(&all_voltages[ch],
+                                            10.0, 10, 50);
+    debug!("Got pedestal of {} +- {}", ped, ped_err);
+    for n in 0..all_voltages[ch].len() {
+      all_voltages[ch][n] -= ped;
+    }
+    let mut charge : f32 = 0.0;
+    warn!("Check impedance value!");
+    match integrate(&all_voltages[ch],
+                    &all_times[ch],
+                    270.0, 70.0, 50.0) {
+      Err(err) => {
+        error!("Integration failed! Err {err}");
+      }
+      Ok(chrg)   => {
+        charge = chrg;
+      }
+    }
+    let peaks : Vec::<(usize, usize)>;
+    let mut cfd_times = Vec::<f32>::new();
+    match find_peaks(&all_voltages[ch]    ,
+                     &all_times[ch]      ,
+                     270.0, 
+                     70.0 ,
+                     3    ,
+                     10.0 ,
+                     5      ) {
+      Err(err) => {
+        error!("Unable to find peaks for ch {ch}! Ignoring this channel!");
+        error!("We won't be able to calculate timing information for this channel! Err {err}");
+      }
+      Ok(pks)  => {
+        peaks = pks;
+        for pk in peaks.iter() {
+          match cfd_simple(&all_voltages[ch],
+                           &all_times[ch],
+                           0.2,pk.0, pk.1) {
+            Err(err) => {
+              error!("Unable to calculate cfd for peak {} {}! Err {}", pk.0, pk.1, err);
+            }
+            Ok(cfd) => {
+              cfd_times.push(cfd);
+            }
+          }
+        }
+      }
+    }
+
+    let ch_pid = readoutboard.get_pid_for_ch(ch);
+    let end    = readoutboard.get_paddle_end(ch); 
+    match end {
+      mf::PaddleEndIdentifier::A => {
+        paddles.get_mut(&ch_pid).expect("Bad paddlemap!").set_charge_a(charge);
+        paddles.get_mut(&ch_pid).expect("Bad paddlemap!").set_time_a(cfd_times[0]);
+      }
+      mf::PaddleEndIdentifier::B => {
+        paddles.get_mut(&ch_pid).expect("Bad paddlemap!").set_charge_b(charge);
+        paddles.get_mut(&ch_pid).expect("Bad paddlemap!").set_time_b(cfd_times[0]);
+      }
+    }
+  }
+  let result = paddles.into_values().collect();
+  Ok(result)
 }
 
 //**********************************************
@@ -1213,7 +1012,7 @@ pub fn master_trigger(mt_ip          : &str,
   // these are the number of expected events
   // (missing included)
   let mut n_events_expected = 0usize;
-  let mut n_paddles_expected : u32;
+  //let mut n_paddles_expected : u32;
   let mut rate : f64;
   // for rate measurement
   let start = Instant::now();
@@ -1819,7 +1618,7 @@ impl From<&json::JsonValue> for ReadoutBoard {
     board.calib_file  = calib_file.to_string();
     board.get_ip();
     let ch_to_pid = &json["ch_to_pid"];
-    let mut ch_true : usize = 1;
+    let mut ch_true : usize;
     for ch in 0..ch_to_pid.len() {
       ch_true = ch + 1;
       //println!("{ch}");
