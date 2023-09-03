@@ -27,7 +27,6 @@ use indicatif::{ProgressBar, ProgressStyle};
 
 extern crate pretty_env_logger;
 #[macro_use] extern crate log;
-
 #[macro_use] extern crate manifest_dir_macros;
 
 use tof_dataclasses::manifest as mf;
@@ -821,7 +820,7 @@ pub fn waveform_analysis(event         : &RBEvent,
     let adc          = event.get_adc_ch(*active_ch);
     calibration.voltages(ch,
                          event.header.stop_cell as usize,
-                         adc,
+                         &adc,
                          &mut all_voltages[ch]);
     calibration.nanoseconds(ch,
                             event.header.stop_cell as usize,

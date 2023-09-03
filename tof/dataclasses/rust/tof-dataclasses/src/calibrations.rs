@@ -190,7 +190,7 @@ impl ReadoutBoardCalibrations {
   pub fn voltages(&self,
                   channel   : usize,
                   stop_cell : usize,
-                  adc       : Vec<u16>,
+                  adc       : &Vec<u16>,
                   waveform  : &mut Vec<f32>) {
                   //waveform  : &mut [f32;NWORDS]) {
     if channel > 9 || channel == 0 {
