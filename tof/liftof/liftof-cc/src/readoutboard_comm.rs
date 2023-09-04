@@ -7,33 +7,17 @@ use std::io::Write;
 use std::fs::OpenOptions;
 use crossbeam_channel::Sender;
 
-#[cfg(feature = "diagnostics")]
-//use waveform::CalibratedWaveformForDiagnostics;
-#[cfg(feature = "diagnostics")]
-use hdf5;
-#[cfg(feature = "diagnostics")]
-use ndarray::{arr1};
-
-use liftof_lib::analyze_blobs;
+use liftof_lib::waveform_analysis;
 
 use tof_dataclasses::manifest::ReadoutBoard;
+use tof_dataclasses::events::RBEvent;
 use tof_dataclasses::packets::{TofPacket,
                                PacketType,
                                PaddlePacket};
-use tof_dataclasses::calibrations::{Calibrations,
-                                    ReadoutBoardCalibrations,
-                                    read_calibration_file};
-use tof_dataclasses::constants::NCHN;
+use tof_dataclasses::calibrations::ReadoutBoardCalibrations;
 
-use tof_dataclasses::commands::TofResponse;
 use tof_dataclasses::serialization::Serialization;
 
-
-/*************************************/
-
-macro_rules! tvec [
-    ($t:ty; $($e:expr),*) => { vec![$($e as $t),*] as Vec<$t> }
-];
 
 /*************************************/
 
@@ -59,7 +43,7 @@ macro_rules! tvec [
 ///                      readoutboard raw data.
 /// * print_packets    : 
 pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
-                                 resp_to_main     : Sender<TofResponse>,
+                                 //resp_to_main     : Sender<TofResponse>,
                                  tp_to_sink       : Sender<TofPacket>,
                                  write_rb_raw     : bool,
                                  storage_savepath : &String,
@@ -74,14 +58,12 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
   // how many chunks ("buffers") we dealt with
   let mut n_chunk  = 0usize;
   // in case we want to do calibratoins
-  let mut calibrations = [Calibrations {..Default::default()};NCHN];
-  let mut _calibrations = ReadoutBoardCalibrations::new(rb.rb_id);
+  let mut calibrations = ReadoutBoardCalibrations::new(rb.rb_id);
   let do_calibration = true;
   if do_calibration {
     info!("Reading calibrations from file {}", &rb.calib_file);
     let cal_file_path = Path::new(&rb.calib_file);//calibration_file);
-    calibrations = read_calibration_file(cal_file_path); 
-    _calibrations = ReadoutBoardCalibrations::from(cal_file_path);
+    calibrations = ReadoutBoardCalibrations::from(cal_file_path);
   }
   let address = "tcp://".to_owned() 
               + &rb.ip_address.to_string()
@@ -200,16 +182,24 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
                 error!("RBEvent is an advanced feature which is not ready yet!");
               },
               PacketType::RBEventPayload => {
-                match analyze_blobs(&tp.payload,
-                                    &pp_pusher,
-                                    true,
-                                    &rb,
-                                    false,
-                                    true,
-                                    &calibrations,
-                                    n_chunk) {
-                  Ok(nblobs)   => debug!("Read {} blobs from buffer", nblobs),
-                  Err(err)     => error!("Was not able to read blobs! {}", err )
+                let event = RBEvent::from(&tp);
+                match waveform_analysis(&event, 
+                                        &rb,
+                                        &calibrations) {
+                    
+                  Ok(pps) => {
+                    for k in 0..pps.len() {
+                      match pp_pusher.send(pps[k]) {
+                        Ok(_) => (),
+                        Err(err) => {
+                          error!("Unable to send pp! Err {err}");
+                        }
+                      }
+                    }
+                  }
+                  Err(err) => {
+                    error!("Unable to analyze waveforms for this event! Err {err}");
+                  }
                 }
                 // write blob to disk if desired
                 match &mut file_on_disc {
@@ -266,6 +256,8 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
         //}
       } // end ok buffer 
     } // end match 
+    debug!("Digested {n_chunk} chunks!");
+    debug!("Noticed {n_errors} errors!");
   } // end loop
 } // end fun
 

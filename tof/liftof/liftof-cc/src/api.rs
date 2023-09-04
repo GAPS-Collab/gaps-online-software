@@ -2,24 +2,18 @@
 //!
 //!
 
-use std::net::{IpAddr, Ipv4Addr};
-use std::net::{UdpSocket, SocketAddr};
-use std::io;
-use std::time::{Duration, Instant};
-use zmq;
+use std::time::Instant;
+
+extern crate sensors;
+use self::sensors::Sensors;
 
 extern crate crossbeam_channel;
-use sensors::Sensors;
+use crossbeam_channel::Sender;
 
-use crossbeam_channel::{Receiver, Sender};
-
-use tof_dataclasses::manifest::ReadoutBoard;
-use tof_dataclasses::commands::TofCommand;
 use tof_dataclasses::monitoring::{TofCmpMoniData,
                                   MtbMoniData};
 use tof_dataclasses::packets::TofPacket;
-use liftof_lib::{connect_to_mtb,
-                 monitor_mtb};
+use liftof_lib:: monitor_mtb;
 
 /// Temperature monitoring for the tof computer. 
 /// This works only on that machine. Unfortunatly, nothing smart seems
@@ -102,10 +96,10 @@ pub fn tofcmp_and_mtb_moni(tp_to_sink    : &Sender<TofPacket>,
                            verbose       : bool) {
   let use_mtb = mtb_ip != "";
   let mut timer   = Instant::now();
-  let mut socket  : io::Result::<UdpSocket>; 
+  //let mut socket  : io::Result::<UdpSocket>; 
   let mut mtb_moni    = MtbMoniData::new();
   let mut tofcmp_moni = TofCmpMoniData::new();
-  let mut tp = TofPacket::new();
+  let mut tp : TofPacket;
   let mtb_address = mtb_ip.to_owned() + ":" + &mtb_port.to_string();
   loop {
     // reconnect to MTB

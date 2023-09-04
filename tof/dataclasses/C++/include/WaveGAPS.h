@@ -98,7 +98,7 @@ public:
   void    SetCFDEFraction(double fraction) {cfde_frac = fraction;}
   void    SetCFDEOffset(int offset) {cfde_offset = offset;}
   void    FindPeaks(float start, float size);
-  void    FindTdc(int pk_num, int th_type);
+  void    FindTdc(int pk_num, int th_type = CFD_SIMPLE);
   int     GetSpikes(int i);
   double  GetTdcs(int i);
   double  GetCharge(int i);

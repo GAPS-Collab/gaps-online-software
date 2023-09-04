@@ -2,4 +2,10 @@
 
 # v0.7.0 
 
+* replaces analyze_blob with waveform_analysis
+  RATIONALE: this should be easier to deploy to
+  RBs, since it it standalone now
+* removes deprecated functions get_bytestream_from_file
+* removes warnings
+* adapts to upstream changes
 

@@ -13,7 +13,7 @@ use std::time::{Duration,
                 Instant};
 
 use tof_dataclasses::events::{MasterTriggerEvent,
-                              MasterTriggerMapping,
+                              //MasterTriggerMapping,
                               TofEvent};
 use crate::constants::EVENT_BUILDER_EVID_CACHE_SIZE;
 use tof_dataclasses::packets::{PacketType,
@@ -22,7 +22,6 @@ use tof_dataclasses::packets::{PacketType,
 use crossbeam_channel as cbc;
 
 use tof_dataclasses::packets::paddle_packet::PaddlePacket;
-use tof_dataclasses::commands::TofCommand;
 use tof_dataclasses::serialization::Serialization;
 
 
@@ -128,6 +127,7 @@ fn build_events_in_cache(event_cache   : &mut VecDeque<TofEvent>,
         } 
       } // end while
     } // end while not timeout
+    debug!("n_seen {n_seen}, n_new {n_new} n_received {n_received}");
   } // end iter over cache
   // clean the cache - remove all completed events
   if clean_up {
@@ -182,12 +182,12 @@ impl TofEventBuilderSettings {
 ///                    is needed so that the event builder can request
 ///                    paddles from readout boards.
 pub fn event_builder (m_trig_ev      : &cbc::Receiver<MasterTriggerEvent>,
-                      mt_mapping     : MasterTriggerMapping,
+                      //mt_mapping     : MasterTriggerMapping,
                       pp_query       : &Sender<Option<u32>>,
                       pp_recv        : &Receiver<Option<PaddlePacket>>,
-                      settings       : &cbc::Receiver<TofEventBuilderSettings>,
-                      data_sink      : &cbc::Sender<TofPacket>,
-                      cmd_sender     : &cbc::Sender<TofCommand>) {
+                      //settings       : &cbc::Receiver<TofEventBuilderSettings>,
+                      data_sink      : &cbc::Sender<TofPacket>) { 
+                      //cmd_sender     : &cbc::Sender<TofCommand>) {
                       //socket         : &zmq::Socket) {
 
   let mut event_cache = VecDeque::<TofEvent>::with_capacity(EVENT_BUILDER_EVID_CACHE_SIZE);
@@ -213,7 +213,7 @@ pub fn event_builder (m_trig_ev      : &cbc::Receiver<MasterTriggerEvent>,
                , mt.n_paddles);
         // construct RB requests
         //println!("{:?}", mt.board_mask);
-        let rbs_in_ev = mt_mapping.get_rb_ids(&mt);
+        //let rbs_in_ev = mt_mapping.get_rb_ids(&mt);
         //println!("{:?}", mt);
         //println!("[EVT-BLDR] Get the following RBs in this event {:?}", rbs_in_ev);
         let event = TofEvent::from(&mt);

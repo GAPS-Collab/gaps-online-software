@@ -14,10 +14,6 @@ name = "mt-readout"
 path = "src/bin/mt_readout.rs"
 
 [features]
-# diagnostics flag switch 
-# on e.g. write waveforms to 
-# hdf
-diagnostics = []
 
 # allows for the generation 
 # of random data

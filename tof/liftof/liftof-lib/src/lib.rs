@@ -2,7 +2,7 @@ use std::error::Error;
 use std::time::{Duration, Instant};
 //use std::thread;
 use std::fmt;
-use std::{fs, fs::File, path::Path};
+use std::{fs::File, path::Path};
 use std::fs::OpenOptions;
 use std::io::{self, BufRead, BufReader};
 use std::path::PathBuf;
@@ -80,23 +80,6 @@ fn read_lines<P>(filename: P) -> io::Result<io::Lines<BufReader<File>>>
 where P: AsRef<Path>, {
     let file = File::open(filename)?;
     Ok(BufReader::new(file).lines())
-}
-
-/// Read a file as a vector of bytes
-///
-/// This reads the entire file in a 
-/// single vector of chars.
-///
-/// # Arguments 
-///
-/// * fliename (String) : Name of the file to read in 
-#[deprecated(since="0.4.0", note="please use `tof_dataclasses::io::read_file` instead")]
-pub fn get_file_as_byte_vec(filename: &String) -> Vec<u8> {
-    let mut f = File::open(&filename).expect("no file found");
-    let metadata = fs::metadata(&filename).expect("unable to read metadata");
-    let mut buffer = vec![0; metadata.len() as usize];
-    f.read(&mut buffer).expect("buffer overflow");
-    return buffer;
 }
 
 //FIXME : this needs to become a trait
@@ -762,7 +745,7 @@ pub fn readoutboard_commander(cmd : Receiver<TofCommand>){
 /// members
 ///
 /// FIXME - I think this should take a HashMap with 
-/// calibration options, which we can load from a 
+/// algorithm settings, which we can load from a 
 /// json file
 pub fn waveform_analysis(event         : &RBEvent,
                          readoutboard  : &mf::ReadoutBoard,

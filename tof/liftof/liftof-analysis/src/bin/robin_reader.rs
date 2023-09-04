@@ -17,14 +17,9 @@ use indicatif::{ProgressBar,
 
 
 use clap::Parser;
-use std::io::BufReader;
 use std::path::PathBuf;
 use std::path::Path;
-use std::io;
-use std::io::Read;
-use std::fs::File;
 use std::collections::HashMap;
-use std::convert::TryInto;
 
 use std::process::exit;
 
@@ -34,9 +29,7 @@ use tof_dataclasses::events::{MasterTofEvent,
                               RBEvent,
                               MasterTriggerMapping,
                               MasterTriggerEvent};
-use tof_dataclasses::manifest::{LocalTriggerBoard,
-                                ReadoutBoard,
-                                get_ltbs_from_sqlite,
+use tof_dataclasses::manifest::{get_ltbs_from_sqlite,
                                 get_rbs_from_sqlite};
 use tof_dataclasses::serialization::Serialization;
 use tof_dataclasses::calibrations::ReadoutBoardCalibrations;
@@ -75,7 +68,7 @@ fn main() {
   let json_content  : String;
   let config        : json::JsonValue;
 
-  let mut use_calibrations : bool = false;
+  let use_calibrations : bool;
   let mut calibrations = HashMap::<u8, ReadoutBoardCalibrations>::new();
   match args.calibrations {
     None => {
@@ -122,8 +115,8 @@ fn main() {
   } // end match
   let db_path               = Path::new(config["db_path"].as_str().unwrap());
   let db_path_c             = db_path.clone();
-  let mut ltb_list          = get_ltbs_from_sqlite(db_path);
-  let mut rb_list           = get_rbs_from_sqlite(db_path_c);
+  let ltb_list              = get_ltbs_from_sqlite(db_path);
+  let rb_list               = get_rbs_from_sqlite(db_path_c);
   let mapping = MasterTriggerMapping::new(ltb_list, rb_list);
 
   let mut packet_reader = TofPacketReader::default();
@@ -171,9 +164,8 @@ fn main() {
   // everything in memory
   //println!("=> Cached {} events!", reader.get_cache_size());
 
-  let mut is_done = false;
 
-  let mut r_events   = Vec::<RBEvent>::new();
+  let r_events   = Vec::<RBEvent>::new();
   let mut seen_evids = Vec::<u32>::new(); 
   
   let mut ev_with_missing = 0;
@@ -188,7 +180,6 @@ fn main() {
         PacketType::MasterTrigger =>  {
           //println!("{:?}", packet.payload);
           let mt_packet = MasterTriggerEvent::from_bytestream(&packet.payload, &mut 0); 
-          let mut rb_event = RBEvent::new();
           if let Ok(mtp) = mt_packet {
             if seen_evids.contains(&mtp.event_id) {
               continue;
@@ -219,7 +210,7 @@ fn main() {
                 }
               }
               println!("Getting RB {}", this_ev_rbid);
-              let mut reader = robin_readers.get_mut(&this_ev_rbid).unwrap();
+              let reader = robin_readers.get_mut(&this_ev_rbid).unwrap();
               //panic!("{}", reader.get_cache_size());
               match reader.get_from_cache(&mtp.event_id) {
                 None     => {
@@ -235,12 +226,14 @@ fn main() {
                     continue;
                   }
                   if use_calibrations {
-                    let mut channel_data : [f32;1024] = [0.0;1024];
-                    let mut channel_adc  : [u16;1024] = rbevent.get_adc_ch(this_ev_rbch).try_into().expect("Waveform does not have expected len of 1024!");
-                    calibrations[&this_ev_rbid].apply_vcal_ch(this_ev_rbch as usize,
-                                                              rbevent.header.stop_cell as usize,
-                                                              &channel_adc,
-                                                              &mut channel_data);
+                    //let mut channel_data : [f32;1024] = [0.0;1024];
+                    let mut channel_data = vec![0.0f32;1024];
+                    let channel_adc = rbevent.get_adc_ch(this_ev_rbch);
+                    //let mut channel_adc  : [u16;1024] = rbevent.get_adc_ch(this_ev_rbch).try_into().expect("Waveform does not have expected len of 1024!");
+                    calibrations[&this_ev_rbid].voltages(this_ev_rbch as usize,
+                                                         rbevent.header.stop_cell as usize,
+                                                         &channel_adc,
+                                                         &mut channel_data);
                     let mut data = Vec::<(f32, f32)>::with_capacity(1024);
                     for k in 0..800 {
                       data.push((k as f32, channel_data[k]));
@@ -333,7 +326,6 @@ fn main() {
     alleventids.sort();
     alleventids.dedup();
     let template_bar   : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.blue/grey} {human_pos:>7}/{human_len:7} ";
-    let label_bar             = String::from("Events");
     let bar                   = ProgressBar::new(alleventids.len() as u64);
     let sty_bar               = ProgressStyle::with_template(template_bar).unwrap();
     bar.set_message("Merging events...");

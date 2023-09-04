@@ -23,7 +23,6 @@ extern crate colored;
 extern crate liftof_lib;
 extern crate liftof_cc;
 
-use env_logger::Builder;
 use std::io;
 use std::io::Write;
 use std::process::exit;
@@ -50,17 +49,14 @@ use tof_dataclasses::events::{MasterTriggerEvent,
 use tof_dataclasses::threading::ThreadPool;
 use tof_dataclasses::packets::paddle_packet::PaddlePacket;
 use tof_dataclasses::packets::TofPacket;
-use tof_dataclasses::manifest::{LocalTriggerBoard,
-                                ReadoutBoard,
-                                get_ltbs_from_sqlite,
+use tof_dataclasses::manifest::{get_ltbs_from_sqlite,
                                 get_rbs_from_sqlite};
-use tof_dataclasses::commands::{TofCommand, TofResponse};
+use tof_dataclasses::commands::TofCommand;
 use liftof_lib::{master_trigger,
                  readoutboard_commander};
 
 use liftof_cc::readoutboard_comm::readoutboard_communicator;
-use liftof_cc::event_builder::{event_builder,
-                           TofEventBuilderSettings};
+use liftof_cc::event_builder::event_builder;
                            //event_builder_no_master};
 use liftof_cc::api::tofcmp_and_mtb_moni;
 use liftof_cc::paddle_packet_cache::paddle_packet_cache;
@@ -282,7 +278,7 @@ fn main() {
     } else {
       match fs::create_dir(&stream_files_path) {
         Ok(())   => println!("=> Created {} to save stream data", stream_files_path.display()),
-        Err(err) => panic!("Failed to create directory: {}", stream_files_path.display()),
+        Err(err) => panic!("Failed to create directory: {}, Error {}", stream_files_path.display(), err),
       }
     }
   }
@@ -346,11 +342,9 @@ fn main() {
  
   let (tp_to_sink, tp_from_client) : (cbc::Sender<TofPacket>, cbc::Receiver<TofPacket>) = cbc::unbounded();
 
-  // set the parameters for the event builder
-  let (ebs_to_eb, ebs_from_cmdr)   : (cbc::Sender<TofEventBuilderSettings>,cbc::Receiver<TofEventBuilderSettings>) = cbc::unbounded();
-
   // send the rate from the master trigger to the main thread
-  let (rate_to_main, rate_from_mt) : (cbc::Sender<u32>, cbc::Receiver<u32>) = cbc::unbounded();
+  warn!("Endpoint of rate from mt channel currently not connected!");
+  let (rate_to_main, _rate_from_mt) : (cbc::Sender<u32>, cbc::Receiver<u32>) = cbc::unbounded();
   // master thread -> event builder ocmmuncations
   let (master_ev_send, master_ev_rec): (cbc::Sender<MasterTriggerEvent>, cbc::Receiver<MasterTriggerEvent>) = cbc::unbounded(); 
   // event builder  <-> paddle cache communications
@@ -361,7 +355,6 @@ fn main() {
   let (id_send, id_rec) : (cbc::Sender<Option<u32>>, cbc::Receiver<Option<u32>>) = cbc::unbounded();
   let (cmd_sender, cmd_receiver) : (cbc::Sender<TofCommand>, cbc::Receiver<TofCommand>) = cbc::unbounded();
 
-  let (resp_sender, resp_receiver) : (cbc::Sender<TofResponse>, cbc::Receiver<TofResponse>) = cbc::unbounded();
 
   // prepare a thread pool. Currently we have
   // 1 thread per rb, 1 master trigger thread
@@ -429,11 +422,10 @@ fn main() {
     this_rb.calib_file += &(this_rb.rb_id).to_string();
     this_rb.calib_file += "_cal.txt";
     println!("==> Starting RB thread for {}", this_rb);
-    let resp_sender_c = resp_sender.clone();
     let this_path = raw_files_path_string.clone();
     worker_threads.execute(move || {
       readoutboard_communicator(this_rb_pp_sender,
-                                resp_sender_c,
+                                //resp_sender_c,
                                 this_tp_to_sink_clone,
                                 write_blob,
                                 &this_path,
@@ -452,7 +444,6 @@ fn main() {
   if use_master_trigger {
     // start the event builder thread
     println!("==> Starting event builder and master trigger threads...");
-    let cmd_sender_c = cmd_sender.clone();
     let rb_list_c    = rb_list.clone();
     let ltb_list_c   = ltb_list.clone();
     let mapping = MasterTriggerMapping::new(ltb_list_c, rb_list_c);
@@ -460,12 +451,12 @@ fn main() {
     //exit(0);
     worker_threads.execute(move || {
                            event_builder(&master_ev_rec,
-                                         mapping,
+                                         //mapping, // Will be needed later on
                                          &id_send,
                                          &pp_rec,
-                                         &ebs_from_cmdr,
-                                         &tp_to_sink,
-                                         &cmd_sender_c);
+                                         //&ebs_from_cmdr,
+                                         &tp_to_sink);
+                                         //&cmd_sender_c);
                                          //&evb_comm_socket);
     });
     // master trigger

@@ -4,44 +4,11 @@
 //!
 //!
 
-use std::path::PathBuf;
-//use tof_dataclasses::events::blob::RBEventHeader;
 use tof_dataclasses::serialization::Serialization;
+use std::path::{PathBuf};
 
-//use std::{thread, time};
-//
-//extern crate crossbeam_channel;
-//use crossbeam_channel::{unbounded,
-//                        Sender,
-//                        Receiver};
-//use local_ip_address::local_ip;
-//
-////use std::collections::HashMap;
-//
-//use liftof_rb::api::*;
-//use liftof_rb::control::*;
-//use liftof_rb::memory::{BlobBuffer,
-//                    EVENT_SIZE,
-//                    DATABUF_TOTAL_SIZE};
-//
-//use tof_dataclasses::threading::ThreadPool;
-//use tof_dataclasses::packets::{TofPacket,
-//                               PacketType};
-//use tof_dataclasses::events::blob::RBEventPayload;
-//use tof_dataclasses::commands::{TofCommand,
-//                                TofResponse,
-//                                TofOperationMode};
-//use tof_dataclasses::commands as cmd;
-//use tof_dataclasses::monitoring as moni;
-////use liftof_lib::misc::*;
 extern crate pretty_env_logger;
 #[macro_use] extern crate log;
-//
-//use log::{info, LevelFilter};
-////use std::io::Write;
-//
-//
-//extern crate clap;
 use clap::{arg,
            command,
            //value_parser,
@@ -49,14 +16,14 @@ use clap::{arg,
            //Command,
            Parser};
 
-use liftof_lib::get_file_as_byte_vec;
-use tof_dataclasses::events::blob::BlobData;
+use tof_dataclasses::io::read_file;
+use tof_dataclasses::events::RBEventMemoryView;
 
 #[derive(Parser, Default, Debug)]
 #[command(author = "J.A.Stoessl", version, about, long_about = None)]
 struct Args {
   /// input file to analyze (with raw RBEvent dataa)
-  raw_data: String,
+  raw_data: PathBuf,
   /// Show progress bars to indicate buffer fill values and number of acquired events
   #[arg(long, default_value_t = false)]
   show_progress: bool,
@@ -111,11 +78,6 @@ fn main() {
   //                        .init();
   pretty_env_logger::init();
 
-  let kraken                = vec![240, 159, 144, 153];
-  let fish                  = vec![240, 159, 144, 159];
-  // We know these bytes are valid, so we'll use `unwrap()`.
-  let kraken           = String::from_utf8(kraken).unwrap();
-  let fish             = String::from_utf8(fish).unwrap();
 
   // welcome banner!
   println!("-----------------------------------------------");
@@ -129,26 +91,39 @@ fn main() {
 
   // deal with command line arguments
   let args = Args::parse();
-  info!("Got input file {}", args.raw_data);
-  let bytestream = get_file_as_byte_vec(&args.raw_data);
+  //let bytestream = read_file(&args.raw_data);
+  let bytestream : Vec<u8>;
+  if let Ok(bs) = read_file(&args.raw_data) {
+    info!("Got input file {}", args.raw_data.display());
+    bytestream = bs;
+  } else {
+    panic!("Unable to read file {}", args.raw_data.display());
+  }
   let mut pos              = 0usize;
   let mut n_events_decoded = 0usize;
-  let mut event = BlobData::new();
+  let mut event = RBEventMemoryView::new();
   let mut n_errors = 0usize;
   let mut decoded_evids = Vec::<u32>::new();
   //let mut header = RBEventHeader::new();
-  while pos + BlobData::SERIALIZED_SIZE < bytestream.len() {
+  while pos + RBEventMemoryView::SIZE < bytestream.len() {
     //match event.from_bytestream(&bytestream, pos, false) {
     //  Err(_) => {
     //    n_errors += 1;
-    //    pos += BlobData::SERIALIZED_SIZE;
+    //    pos += RBEventMemoryView::SERIALIZED_SIZE;
     //    continue;
     //  },
     //  Ok(_)  => ()
     //}
     //header = RBEventHeader::from_bytestream(&bytestream, pos).unwrap();
-    event.reset();
-    pos = event.from_bytestream(&bytestream, pos, true);
+    match RBEventMemoryView::from_bytestream(&bytestream, &mut pos) {
+      Err(err) => {
+        error!("Unable to decode RBEventMemoryView! Err {err}");
+        n_errors += 1;
+      }
+      Ok(ev) => {
+        event = ev;
+      }
+    }
     n_events_decoded += 1;
 
     decoded_evids.push(event.event_id);
@@ -166,7 +141,7 @@ fn main() {
     //println!("{}",event.ch_mask);
     //println!("{}",event.dna);
     //println!("{pos} : pos");
-    //pos += BlobData::SERIALIZED_SIZE;
+    //pos += RBEventMemoryView::SERIALIZED_SIZE;
   }
   println!("{:?} decoded event ids", decoded_evids);
   println!("We decoded {n_events_decoded} and had {n_errors} corrupt events!");

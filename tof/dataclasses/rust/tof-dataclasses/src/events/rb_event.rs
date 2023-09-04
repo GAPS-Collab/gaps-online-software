@@ -26,6 +26,7 @@
 use std::fmt;
 use std::path::Path;
 
+use crate::packets::{TofPacket, PacketType};
 use crate::constants::{NWORDS, NCHN};
 use crate::serialization::{u16_to_u8,
                            u8_to_u16,
@@ -561,7 +562,7 @@ impl RBEvent {
   }
 
   pub fn extract_from_rbeventmemoryview(stream : &Vec<u8>,
-                                 pos    : &mut usize) 
+                                        pos    : &mut usize) 
     -> Result<RBEvent, SerializationError> {
   
     let header     = RBEventHeader::extract_from_rbeventmemoryview(stream, pos)?;
@@ -692,6 +693,36 @@ impl From<&RBEventPayload> for RBEvent {
         return RBEvent::new();
       }
     }
+  }
+}
+
+impl From<&TofPacket> for RBEvent {
+  fn from(pk : &TofPacket) -> Self {
+    if pk.packet_type == PacketType::RBEventPayload {
+      match RBEvent::extract_from_rbeventmemoryview(&pk.payload, &mut 0) {
+        Ok(event) => {
+          return event;
+        }
+        Err(err) => { 
+          error!("Can not get RBEventMemoryView from RBEventPayload! Error {err}!");
+          error!("Returning empty event!");
+          return RBEvent::new();
+        }
+      }
+    } else {
+      error!("Other packet types than RBEventPayload are not implmented yet!");
+      return RBEvent::new();
+    }
+    //match RBEvent::from_bytestream(&pk.payload, &mut 0) {
+    //  Ok(event) => {
+    //    return event;
+    //  }
+    //  Err(err) => { 
+    //    error!("Can not get RBEventMemoryView from RBEventPayload! Error {err}!");
+    //    error!("Returning empty event!");
+    //    return RBEvent::new();
+    //  }
+    //}
   }
 }
 
