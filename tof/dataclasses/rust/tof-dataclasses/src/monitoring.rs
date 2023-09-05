@@ -582,8 +582,7 @@ impl Serialization for MtbMoniData {
 mod test_monitoring {
   use crate::serialization::Serialization;
   use crate::FromRandom;
-  use crate::monitoring::{RBMoniData,
-                          MtbMoniData};
+  use crate::monitoring::RBMoniData;
   
   #[test]
   fn serialization_rbmonidata() {

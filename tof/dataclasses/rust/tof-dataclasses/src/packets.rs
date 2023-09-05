@@ -47,16 +47,18 @@ pub const PACKET_TYPE_RBEVENT        : u8 = 20;
 pub const PACKET_TYPE_TOFEVENT       : u8 = 21;
 // not specific enough, deprecated. Use the packet
 // types for monitor packets below
-pub const PACKET_TYPE_MONITOR        : u8 = 30;
-pub const PACKET_TYPE_HEARTBEAT      : u8 = 40;
-pub const PACKET_TYPE_SCALAR         : u8 = 50;
-pub const PACKET_TYPE_MT             : u8 = 60;
-pub const PACKET_TYPE_RBHEADER       : u8 = 70;
+pub const PACKET_TYPE_MONITOR           : u8 = 30;
+pub const PACKET_TYPE_HEARTBEAT         : u8 = 40;
+pub const PACKET_TYPE_SCALAR            : u8 = 50;
+pub const PACKET_TYPE_MT                : u8 = 60;
+pub const PACKET_TYPE_RBHEADER          : u8 = 70;
 // monitoring packets
-pub const PACKET_TYPE_TOFCMP_MONI    : u8 = 80;
-pub const PACKET_TYPE_MTB_MONI       : u8 = 90;
-pub const PACKET_TYPE_RB_MONI        : u8 = 100;
-pub const PACKET_TYPE_RBEVENTPAYLOAD : u8 = 110;
+pub const PACKET_TYPE_TOFCMP_MONI       : u8 = 80;
+pub const PACKET_TYPE_MTB_MONI          : u8 = 90;
+pub const PACKET_TYPE_RB_MONI           : u8 = 100;
+pub const PACKET_TYPE_RBEVENTPAYLOAD    : u8 = 110;
+pub const PACKET_TYPE_RBEVENTMEMORYVIEW : u8 = 120;
+pub const PACKET_TYPE_RBCALIBRATION     : u8 = 130;
 
 //// Each packet is send from somewhere.
 ////
@@ -91,7 +93,6 @@ pub const PACKET_TYPE_RBEVENTPAYLOAD : u8 = 110;
 pub enum PacketType {
   Unknown       , 
   Command       ,
-  RBEvent       ,
   TofEvent      ,
   Monitor       ,
   MasterTrigger , 
@@ -99,9 +100,12 @@ pub enum PacketType {
   Scalar        ,
   RBHeader      ,
   RBEventPayload,
+  RBEvent       ,
+  RBEventMemoryView,
   MonitorRb     ,
   MonitorTofCmp ,
   MonitorMtb    ,
+  RBCalibration ,
 }
 
 impl PacketType {
@@ -112,14 +116,16 @@ impl PacketType {
       PacketType::RBEvent        => PACKET_TYPE_RBEVENT,
       PacketType::RBEventPayload => PACKET_TYPE_RBEVENTPAYLOAD, 
       PacketType::RBHeader       => PACKET_TYPE_RBHEADER,
+      PacketType::RBEventMemoryView => PACKET_TYPE_RBEVENTMEMORYVIEW,
       PacketType::TofEvent       => PACKET_TYPE_TOFEVENT,
       PacketType::Monitor        => PACKET_TYPE_MONITOR,
       PacketType::HeartBeat      => PACKET_TYPE_HEARTBEAT,
       PacketType::MasterTrigger  => PACKET_TYPE_MT,
       PacketType::Scalar         => PACKET_TYPE_SCALAR,
       PacketType::MonitorRb      => PACKET_TYPE_RB_MONI,
-      PacketType::MonitorTofCmp => PACKET_TYPE_TOFCMP_MONI,
-      PacketType::MonitorMtb     => PACKET_TYPE_MTB_MONI
+      PacketType::MonitorTofCmp  => PACKET_TYPE_TOFCMP_MONI,
+      PacketType::MonitorMtb     => PACKET_TYPE_MTB_MONI,
+      PacketType::RBCalibration  => PACKET_TYPE_RBCALIBRATION,
     }
   }
 
@@ -135,9 +141,11 @@ impl PacketType {
       PACKET_TYPE_SCALAR         => Some(PacketType::Scalar),
       PACKET_TYPE_RBHEADER       => Some(PacketType::RBHeader),
       PACKET_TYPE_RBEVENTPAYLOAD => Some(PacketType::RBEventPayload),
+      PACKET_TYPE_RBEVENTMEMORYVIEW => Some(PacketType::RBEventMemoryView),
       PACKET_TYPE_RB_MONI        => Some(PacketType::MonitorRb),
       PACKET_TYPE_MTB_MONI       => Some(PacketType::MonitorMtb),
       PACKET_TYPE_TOFCMP_MONI    => Some(PacketType::MonitorTofCmp),
+      PACKET_TYPE_RBCALIBRATION  => Some(PacketType::RBCalibration),
       _   => None,
     }
   }
@@ -152,6 +160,7 @@ impl fmt::Display for PacketType {
       PacketType::Command        => { repr = String::from("COMMAND")     },
       PacketType::RBEvent        => { repr = String::from("RBEVENT")     },
       PacketType::RBEventPayload => { repr = String::from("RBEVENTPAYLOAD") },
+      PacketType::RBEventMemoryView => { repr = String::from("RBEVENTMEMORYVIEW") },
       PacketType::TofEvent       => { repr = String::from("TOFEVENT")    },
       PacketType::Monitor        => { repr = String::from("MONITOR")     },
       PacketType::HeartBeat      => { repr = String::from("HEARTBEAT")   },
@@ -161,6 +170,7 @@ impl fmt::Display for PacketType {
       PacketType::MonitorRb      => { repr = String::from("RB_MONI")     },
       PacketType::MonitorTofCmp  => { repr = String::from("TOFCMP_MONI") },
       PacketType::MonitorMtb     => { repr = String::from("MTB_MONI")    },
+      PacketType::RBCalibration  => { repr = String::from("RBCalibration")},
     }
     write!(f, "<PacketType {}>", repr)
   }
@@ -366,8 +376,31 @@ impl Serialization for TofPacket {
     //trace!("TofPacket with Payload {payload:?}"
     let mut tp = TofPacket::new();
     tp.packet_type = packet_type;
-    tp.payload = payload;
+    tp.payload     = payload;
     Ok(tp) 
+  }
+}
+
+#[test]
+fn test_packet_types() {
+  let mut type_codes = Vec::<u8>::new();
+  type_codes.push(PACKET_TYPE_UNKNOWN          ); 
+  type_codes.push(PACKET_TYPE_COMMAND          ); 
+  type_codes.push(PACKET_TYPE_RBEVENT          ); 
+  type_codes.push(PACKET_TYPE_TOFEVENT         ); 
+  type_codes.push(PACKET_TYPE_MONITOR          ); 
+  type_codes.push(PACKET_TYPE_HEARTBEAT        ); 
+  type_codes.push(PACKET_TYPE_SCALAR           ); 
+  type_codes.push(PACKET_TYPE_MT               ); 
+  type_codes.push(PACKET_TYPE_RBHEADER         ); 
+  type_codes.push(PACKET_TYPE_TOFCMP_MONI      ); 
+  type_codes.push(PACKET_TYPE_MTB_MONI         ); 
+  type_codes.push(PACKET_TYPE_RB_MONI          );
+  type_codes.push(PACKET_TYPE_RBEVENTPAYLOAD   );
+  type_codes.push(PACKET_TYPE_RBEVENTMEMORYVIEW);
+  type_codes.push(PACKET_TYPE_RBCALIBRATION    );
+  for tc in type_codes.iter() {
+    assert_eq!(*tc,PacketType::as_u8(&PacketType::from_u8(*tc).unwrap()));  
   }
 }
 

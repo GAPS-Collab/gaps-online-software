@@ -630,8 +630,7 @@ impl From<&MasterTriggerEvent> for TofEvent {
 mod test_tofevents {
   use crate::serialization::Serialization;
   use crate::FromRandom;
-  use crate::events::{MasterTofEvent,
-                      TofEvent};
+  use crate::events::MasterTofEvent;
 
   #[test]
   fn mastertofevent_sizes_header() {

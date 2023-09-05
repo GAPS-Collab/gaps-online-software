@@ -23,7 +23,7 @@ To see output of potential `println!` commands, add `-- --nocapture` as an argue
 
 ## Unit tests
 
-`cargo test`
+`cargo test --features=random`
 
 ## Integration tests
 

@@ -4,7 +4,6 @@ pub mod tests {
   use std::path::Path;
   use tof_dataclasses::events::{RBEventMemoryView, RBEventHeader};
   use tof_dataclasses::monitoring::RBMoniData;
-  use tof_dataclasses::constants::{NWORDS, NCHN, MAX_NUM_PEAKS};
   use tof_dataclasses::serialization::Serialization;
   use tof_dataclasses::serialization::search_for_u16;
   use tof_dataclasses::FromRandom;
@@ -17,7 +16,6 @@ pub mod tests {
     let mut pos = 0usize;
     let mut events = Vec::<RBEventMemoryView>::new(); 
     //let mut n_events = (size / 15830) as usize;
-    let mut event  = RBEventMemoryView::new();
     let mut n_broken = 0;
     let mut n_good   = 0;
     let mut block_size = 0;
@@ -31,7 +29,7 @@ pub mod tests {
           events.push(event);
           n_good += 1;
         },
-        Err(err)  => {
+        Err(_err)  => {
           //println!("error decoding RBEventMemoryView, err {err}");
           n_broken += 1;
           pos += 1;
@@ -82,7 +80,7 @@ pub mod tests {
       let mut moni_deser = RBMoniData::from_bytestream(&moni_ser, &mut pos);
       //println!("After ser/deser {}", rb_bin_deser.as_ref().unwrap());
       match moni_deser {
-        Ok(result) => (),
+        Ok(_) => (),
         Err(err)   => println!("Can not deserialize RBMoniData! {err}")
       }
       pos = 0;
