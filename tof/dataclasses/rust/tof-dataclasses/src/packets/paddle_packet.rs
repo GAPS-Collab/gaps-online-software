@@ -33,7 +33,7 @@ const PADDLE_TIMEOUT : u64 = 30;
 /// paddle ends.
 ///
 ///
-#[derive(Debug,Copy,Clone, PartialEq)]
+#[derive(Debug,Copy,Clone)]
 pub struct PaddlePacket  {
   
   //unsigned short head = 0xF0F0;
@@ -61,6 +61,26 @@ pub struct PaddlePacket  {
 
   pub creation_time      : Instant,
 }
+
+impl PartialEq for PaddlePacket {
+  fn eq(&self, other: &Self) -> bool {
+    // Compare only selected fields
+    self.paddle_id    == other.paddle_id && 
+    self.time_a       == other.time_a && 
+    self.time_b       == other.time_b && 
+    self.peak_a       == other.peak_a && 
+    self.peak_b       == other.peak_b && 
+    self.charge_a     == other.charge_a && 
+    self.charge_b     == other.charge_b && 
+    self.charge_min_i == other.charge_min_i && 
+    self.pos_across   == other.pos_across && 
+    self.t_average    == other.t_average && 
+    self.ctr_etx      == other.ctr_etx && 
+    self.timestamp_32 == other.timestamp_32 && 
+    self.timestamp_16 == other.timestamp_16 
+  }
+}
+
 
 impl fmt::Display for PaddlePacket {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -96,9 +116,9 @@ impl fmt::Display for PaddlePacket {
 
 impl Serialization for PaddlePacket {
   
-  const HEAD : u16 = 0xAAAA;
-  const TAIL : u16 = 0x5555;
-  const SIZE : usize = 28; // size in bytes with HEAD and TAIL
+  const HEAD          : u16  = 61680; //0xF0F0)
+  const TAIL          : u16  = 3855;
+  const SIZE : usize = 30; // size in bytes with HEAD and TAIL
 
   ///! Serialize the packet
   ///
@@ -162,33 +182,29 @@ impl PaddlePacket {
 
   //pub const PACKETSIZE    : usize = 24;
   // update Feb 2023 - add 4 byte timestamp
-  pub const PACKETSIZE    : usize = 28;
   pub const VERSION       : &'static str = "1.2";
-  pub const HEAD          : u16  = 61680; //0xF0F0)
-  pub const TAIL          : u16  = 3855;
 
-  pub fn new() -> PaddlePacket {
+  pub fn new() -> Self {
     let creation_time = Instant::now(); 
-    PaddlePacket{
-                  paddle_id    : 0,
-                  time_a       : 0,
-                  time_b       : 0,
-                  peak_a       : 0,
-                  peak_b       : 0,
-                  charge_a     : 0,
-                  charge_b     : 0,
-                  charge_min_i : 0,
-                  pos_across   : 0,
-                  t_average    : 0,
-                  ctr_etx      : 0,
-                  timestamp_32 : 0,
-                  timestamp_16 : 0,
-                  // non-serialize fields
-                  event_id     : 0,
-                  valid        : true,
-                  creation_time : creation_time
-                }
-
+    Self{
+         paddle_id    : 0,
+         time_a       : 0,
+         time_b       : 0,
+         peak_a       : 0,
+         peak_b       : 0,
+         charge_a     : 0,
+         charge_b     : 0,
+         charge_min_i : 0,
+         pos_across   : 0,
+         t_average    : 0,
+         ctr_etx      : 0,
+         timestamp_32 : 0,
+         timestamp_16 : 0,
+         // non-serialize fields
+         event_id     : 0,
+         valid        : true,
+         creation_time : creation_time
+    }
   }
 
   pub fn invalidate(&mut self) {
