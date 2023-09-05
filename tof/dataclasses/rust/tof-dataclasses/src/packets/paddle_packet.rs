@@ -8,7 +8,10 @@
 //!  in this project
 
 use crate::errors::SerializationError;
-use crate::serialization::search_for_u16;
+use crate::serialization::{parse_u8,
+                           parse_u16,
+                           parse_u32,
+                           Serialization};
 use std::time::Instant;
 use std::fmt;
 
@@ -88,6 +91,70 @@ impl fmt::Display for PaddlePacket {
             self.ctr_etx,
             self.timestamp_32,
             self.timestamp_16)
+  }
+}
+
+impl Serialization for PaddlePacket {
+  
+  const HEAD : u16 = 0xAAAA;
+  const TAIL : u16 = 0x5555;
+  const SIZE : usize = 28; // size in bytes with HEAD and TAIL
+
+  ///! Serialize the packet
+  ///
+  ///  Not all fields witll get serialized, 
+  ///  only the relevant data for the 
+  ///  flight computer
+  ///
+  fn to_bytestream(&self) -> Vec<u8> {
+
+    let mut bytestream = Vec::<u8>::with_capacity(Self::SIZE);
+    bytestream.extend_from_slice(&Self::HEAD.to_le_bytes());
+    bytestream.push(self.paddle_id); 
+    bytestream.extend_from_slice(&self.time_a      .to_le_bytes()); 
+    bytestream.extend_from_slice(&self.time_b      .to_le_bytes()); 
+    bytestream.extend_from_slice(&self.peak_a      .to_le_bytes()); 
+    bytestream.extend_from_slice(&self.peak_b      .to_le_bytes()); 
+    bytestream.extend_from_slice(&self.charge_a    .to_le_bytes()); 
+    bytestream.extend_from_slice(&self.charge_b    .to_le_bytes()); 
+    bytestream.extend_from_slice(&self.charge_min_i.to_le_bytes()); 
+    bytestream.extend_from_slice(&self.pos_across  .to_le_bytes()); 
+    bytestream.extend_from_slice(&self.t_average   .to_le_bytes()); 
+    bytestream.push(self.ctr_etx); 
+    bytestream.extend_from_slice(&self.timestamp_32   .to_le_bytes());
+    bytestream.extend_from_slice(&self.timestamp_16   .to_le_bytes());
+    bytestream.extend_from_slice(&Self::TAIL        .to_le_bytes()); 
+    bytestream
+  }
+
+
+  /// Deserialization
+  ///
+  ///
+  /// # Arguments:
+  ///
+  /// * bytestream : 
+  fn from_bytestream(stream : &Vec<u8>, pos : &mut usize) 
+    -> Result<Self, SerializationError> {
+    let mut pp  = Self::new();
+    Self::verify_fixed(stream, pos)?;
+    // since we passed the above test, the packet
+    // is valid
+    pp.valid     = true;
+    pp.paddle_id = parse_u8(stream, pos);
+    pp.time_a    = parse_u16(stream, pos);
+    pp.time_b    = parse_u16(stream, pos);
+    pp.peak_a    = parse_u16(stream, pos);
+    pp.peak_b    = parse_u16(stream, pos);
+    pp.charge_a  = parse_u16(stream, pos);
+    pp.charge_b  = parse_u16(stream, pos);
+    pp.charge_min_i  = parse_u16(stream, pos);
+    pp.pos_across    = parse_u16(stream, pos);
+    pp.t_average     = parse_u16(stream, pos);
+    pp.ctr_etx       = parse_u8(stream, pos);
+    pp.timestamp_32  = parse_u32(stream, pos);
+    pp.timestamp_16  = parse_u16(stream, pos);
+    Ok(pp)
   }
 }
 
@@ -212,132 +279,6 @@ impl PaddlePacket {
     self.valid        =  true;
   }
 
-
-  pub fn print(&self)
-  {
-    println!("***** paddle packet *****");
-    println!("==> VALID       \t {}", self.valid);
-    println!("=> time_a       \t {}", self.time_a);
-    println!("=> time_b       \t {}", self.time_b);
-    println!("=> peak_a       \t {}", self.peak_a);
-    println!("=> peak_b       \t {}", self.peak_b);
-    println!("=> charge_a     \t {}", self.charge_a);
-    println!("=> charge_b     \t {}", self.charge_b);
-    println!("=> charge_min_i \t {}", self.charge_min_i);
-    println!("=> pos_across   \t {}", self.pos_across);
-    println!("=> t_average    \t {}", self.t_average);
-    println!("=> ctr_etx      \t {}", self.ctr_etx);
-    println!("=> timestamp_32 \t {}", self.timestamp_32);
-    println!("=> timestamp_16 \t {}", self.timestamp_16);
-    println!("*****");
-  }
-
-
-  ///! Serialize the packet
-  ///
-  ///  Not all fields witll get serialized, 
-  ///  only the relevant data for the 
-  ///  flight computer
-  ///
-  pub fn to_bytestream(&self) -> Vec<u8> {
-
-    let mut bytestream = Vec::<u8>::with_capacity(PaddlePacket::PACKETSIZE);
-
-    bytestream.extend_from_slice(&PaddlePacket::HEAD.to_le_bytes());
-    bytestream.push(self.paddle_id); 
-    bytestream.extend_from_slice(&self.time_a      .to_le_bytes()); 
-    bytestream.extend_from_slice(&self.time_b      .to_le_bytes()); 
-    bytestream.extend_from_slice(&self.peak_a      .to_le_bytes()); 
-    bytestream.extend_from_slice(&self.peak_b      .to_le_bytes()); 
-    bytestream.extend_from_slice(&self.charge_a    .to_le_bytes()); 
-    bytestream.extend_from_slice(&self.charge_b    .to_le_bytes()); 
-    bytestream.extend_from_slice(&self.charge_min_i.to_le_bytes()); 
-    bytestream.extend_from_slice(&self.pos_across  .to_le_bytes()); 
-    bytestream.extend_from_slice(&self.t_average   .to_le_bytes()); 
-    bytestream.push(self.ctr_etx); 
-    bytestream.extend_from_slice(&self.timestamp_32   .to_le_bytes());
-    bytestream.extend_from_slice(&self.timestamp_16   .to_le_bytes());
-    bytestream.extend_from_slice(&PaddlePacket::TAIL        .to_le_bytes()); 
-
-    bytestream
-  }
-
-
-  /// Deserialization
-  ///
-  ///
-  /// # Arguments:
-  ///
-  /// * bytestream : 
-  pub fn from_bytestream(bytestream : &Vec<u8>, start_pos : usize) 
-    -> Result<PaddlePacket, SerializationError> {
-    let mut pp  = PaddlePacket::new();
-    let mut pos = start_pos;
-    let mut two_bytes : [u8;2];
-    pos = search_for_u16(PaddlePacket::HEAD, &bytestream, pos)?;
-
-    pp.paddle_id = bytestream[pos];
-    pos += 1;
-
-    two_bytes = [bytestream[pos], bytestream[pos + 1]];
-    pp.time_a       =  u16::from_le_bytes(two_bytes);
-    pos += 2;
-
-    two_bytes = [bytestream[pos], bytestream[pos + 1]];
-    pp.time_b       =  u16::from_le_bytes(two_bytes);
-    pos += 2;
-    
-    two_bytes = [bytestream[pos], bytestream[pos + 1]];
-    pp.peak_a       =  u16::from_le_bytes(two_bytes);
-    pos += 2;
-    
-    two_bytes = [bytestream[pos], bytestream[pos + 1]];
-    pp.peak_b       =  u16::from_le_bytes(two_bytes);
-    pos += 2;
-
-    two_bytes = [bytestream[pos], bytestream[pos + 1]];
-    pp.charge_a     =  u16::from_le_bytes(two_bytes);
-    pos += 2;
-
-    two_bytes = [bytestream[pos], bytestream[pos + 1]];
-    pp.charge_b     =  u16::from_le_bytes(two_bytes);
-    pos += 2;
-
-    two_bytes = [bytestream[pos], bytestream[pos + 1]];
-    pp.charge_min_i =  u16::from_le_bytes(two_bytes);
-    pos += 2;
-
-    two_bytes = [bytestream[pos], bytestream[pos + 1]];
-    pp.pos_across   =  u16::from_le_bytes(two_bytes);
-    pos += 2;
-
-    two_bytes = [bytestream[pos], bytestream[pos + 1]];
-    pp.t_average    =  u16::from_le_bytes(two_bytes);
-    pos += 2;
-
-    pp.ctr_etx      =  bytestream[pos];
-    pos += 1;
-
-    pp.timestamp_32    = u32::from_le_bytes([bytestream[pos], 
-                                            bytestream[pos + 1], 
-                                            bytestream[pos + 2],
-                                            bytestream[pos + 3]]);           
-    pos += 4;
-    pp.timestamp_16    = u16::from_le_bytes([bytestream[pos], 
-                                             bytestream[pos + 1]]); 
-    pos += 2;
-
-    // at this postiion, there must be the footer
-    two_bytes = [bytestream[pos], bytestream[pos + 1]];
-    if (u16::from_le_bytes(two_bytes)) != PaddlePacket::TAIL {
-      pp.valid = false;
-      return Err(SerializationError::TailInvalid);
-    }
-    pos += 2;
-    assert! ((pos - start_pos) == PaddlePacket::PACKETSIZE);
-    pp.valid        =  true;
-    Ok(pp)
-  }
 
   #[cfg(feature="random")]
   pub fn from_random() -> PaddlePacket {

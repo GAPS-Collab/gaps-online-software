@@ -458,7 +458,7 @@ impl Serialization for TofEvent {
     //pos += 1; 
    
     for _ in 0..event.n_paddles {
-      match PaddlePacket::from_bytestream(&bytestream, *pos) {
+      match PaddlePacket::from_bytestream(&bytestream, pos) {
         Err(err) => {
           error!("Unable to decode PaddlePacket, {err}");
           return Err(err);
