@@ -28,6 +28,7 @@ use crate::serialization::{Serialization,
 use crate::errors::SerializationError;
 use crate::events::{RBEventPayload,
                     RBEventHeader,
+                    RBEvent,
                     MasterTriggerEvent,
                     MasterTofEvent};
 
@@ -282,6 +283,15 @@ impl From<&MasterTofEvent> for TofPacket {
   fn from(event : &MasterTofEvent) -> Self {
     let mut tp = Self::new();
     tp.packet_type = PacketType::TofEvent;
+    tp.payload = event.to_bytestream();
+    tp
+  }
+}
+
+impl From<&RBEvent> for TofPacket {
+  fn from(event : &RBEvent) -> Self {
+    let mut tp = Self::new();
+    tp.packet_type = PacketType::RBEvent;
     tp.payload = event.to_bytestream();
     tp
   }
