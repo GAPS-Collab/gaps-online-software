@@ -167,74 +167,104 @@ impl FromRandom for RBMissingHit {
   }
 }
 
-// I am currently undecided if we need this...
-// Define different event stages/levels
-//
-// Since events go through different steps
-// of processing, keep track of what has
-// been done already with a simple flag
-//#[derive(Debug, Copy, Clone, PartialEq)]
-//pub enum CompressionLevel {
-//  Unknown,
-//  None,
-//}
-//
-//impl fmt::Display for CompressionLevel {
-//  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-//    let r = self.string_repr();
-//    write!(f, "<EventQuality: {}>", r)
-//  }
-//}
-//
-//impl CompressionLevel {
-//  pub const UNKNOWN : u8 = 0;
-//  pub const NONE    : u8 = 10;
-//  pub fn to_u8(&self) -> u8 {
-//    let result : u8;
-//    match self {
-//      CompressionLevel::Unknown => {
-//        result = CompressionLevel::UNKNOWN;
-//      }
-//      CompressionLevel::None => {
-//        result = CompressionLevel::NONE;
-//      }
-//    }
-//    result
-//  }
-//  
-//  pub fn from_u8(code : &u8) -> Self {
-//    let mut result = CompressionLevel::Unknown;
-//    match *code {
-//      CompressionLevel::UNKNOWN => {
-//        result = CompressionLevel::Unknown;
-//      }
-//      CompressionLevel::NONE => {
-//        result = CompressionLevel::None;
-//      }
-//      _ => {
-//        error!("Unknown compression level {}!", code);
-//      }
-//    }
-//    result
-//  }
-//
-//  /// String representation of the enum
-//  ///
-//  /// This is basically the enum type as 
-//  /// a string.
-//  pub fn string_repr(&self) -> String { 
-//    let repr : String;
-//    match self {
-//      CompressionLevel::Unknown => { 
-//        repr = String::from("Unknown");
-//      }
-//      CompressionLevel::None => {
-//        repr = String::from("None");
-//      }
-//    }
-//    repr
-//  }
-//}
+/// Identify the event as being part of physics data
+/// or Calibration
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub enum DataType {
+  VoltageCalibration,
+  TimingCalibration,
+  Noi,
+  Physics,
+  Unknown,
+}
+
+impl fmt::Display for DataType {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let r = self.string_repr();
+    write!(f, "<DataType: {}>", r)
+  }
+}
+
+impl DataType {
+  pub const UNKNOWN               : u8 = 0;
+  pub const VOLTAGECALIBRATION    : u8 = 10;
+  pub const TIMINGCALIBRATION     : u8 = 20;
+  pub const NOI                   : u8 = 30;
+  pub const PHYSICS               : u8 = 40;
+  
+  pub fn to_u8(&self) -> u8 {
+    let result : u8;
+    match self {
+      DataType::Unknown => {
+        result = DataType::UNKNOWN;
+      }
+      DataType::VoltageCalibration => {
+        result = DataType::VOLTAGECALIBRATION;
+      }
+      DataType::TimingCalibration => {
+        result = DataType::TIMINGCALIBRATION;
+      }
+      DataType::Noi => {
+        result = DataType::NOI;
+      }
+      DataType::Physics => {
+        result = DataType::PHYSICS;
+      }
+    }
+    result
+  }
+  
+  pub fn from_u8(code : &u8) -> Self {
+    let mut result = DataType::Unknown;
+    match *code {
+      DataType::UNKNOWN => {
+        result = DataType::Unknown;
+      }
+      DataType::VOLTAGECALIBRATION => {
+        result = DataType::VoltageCalibration;
+      }
+      DataType::TIMINGCALIBRATION => {
+        result = DataType::TimingCalibration;
+      }
+      DataType::NOI => {
+        result = DataType::Noi;
+      }
+      DataType::PHYSICS => {
+        result = DataType::Physics;
+      }
+      _ => {
+        error!("Unknown DataType {}!", code);
+      }
+    }
+    result
+  }
+
+  /// String representation of the DataType
+  ///
+  /// This is basically the enum type as 
+  /// a string.
+  pub fn string_repr(&self) -> String { 
+    let repr : String;
+    match self {
+      DataType::Unknown => {
+        repr = String::from("Unknown");
+      }
+      DataType::VoltageCalibration => {
+        repr = String::from("VoltageCalibration");
+      }
+      DataType::TimingCalibration => {
+        repr = String::from("TimingCalibration");
+      }
+      DataType::Noi => {
+        repr = String::from("Noi");
+      }
+      DataType::Physics => {
+        repr = String::from("Physics");
+      }
+    }
+    repr
+  }
+}
 
 
 
@@ -596,6 +626,7 @@ impl RBChannelData {
 ///
 #[derive(Debug, Clone, PartialEq)]
 pub struct RBEvent {
+  pub data_type : DataType,
   pub header    : RBEventHeader,
   pub adc       : Vec<Vec<u16>>,
   pub n_paddles : u8, // number of entries in paddles vector
@@ -610,6 +641,7 @@ impl RBEvent {
       adc.push(Vec::<u16>::new());
     }
     RBEvent {
+      data_type : DataType::Unknown,
       header    : RBEventHeader::new(),
       adc       : adc,
       n_paddles : 0,
@@ -692,8 +724,9 @@ impl Serialization for RBEvent {
       error!("The given position {} does not point to a valid header signature of {}", pos, Self::HEAD);
       return Err(SerializationError::HeadInvalid {});
     }
-    event.header = RBEventHeader::from_bytestream(stream, pos)?;
-    let ch_ids   = event.header.get_active_data_channels();
+    event.data_type = DataType::from_u8(&parse_u8(stream, pos));
+    event.header    = RBEventHeader::from_bytestream(stream, pos)?;
+    let ch_ids      = event.header.get_active_data_channels();
     for k in ch_ids.iter() {
       debug!("Found active data channel {}!", k);
       // 2*NWORDS because stream is Vec::<u8> and it is 16 bit words.
@@ -731,6 +764,7 @@ impl Serialization for RBEvent {
   fn to_bytestream(&self) -> Vec<u8> {
     let mut stream = Vec::<u8>::new();
     stream.extend_from_slice(&Self::HEAD.to_le_bytes());
+    stream.push(self.data_type.to_u8());
     stream.extend_from_slice(&self.header.to_bytestream());
     // for an empty channel, we will add an empty vector
     for k in 0..self.adc.len() {
@@ -1100,6 +1134,7 @@ mod test_rbevents {
   use crate::serialization::Serialization;
   use crate::FromRandom;
   use crate::events::{RBEvent,
+                      DataType,
                       RBMissingHit,
                       RBEventMemoryView,
                       RBEventHeader};
@@ -1129,5 +1164,18 @@ mod test_rbevents {
     let head = RBEventMemoryView::from_random();
     let test = RBEventMemoryView::from_bytestream(&head.to_bytestream(), &mut 0).unwrap();
     assert_eq!(head, test);
+  }
+
+  #[test]
+  fn test_data_types() {
+    let mut type_codes = Vec::<u8>::new();
+    type_codes.push(DataType::UNKNOWN); 
+    type_codes.push(DataType::VOLTAGECALIBRATION); 
+    type_codes.push(DataType::TIMINGCALIBRATION); 
+    type_codes.push(DataType::NOI); 
+    type_codes.push(DataType::PHYSICS); 
+    for tc in type_codes.iter() {
+      assert_eq!(*tc,DataType::to_u8(&DataType::from_u8(tc)));  
+    }
   }
 }
