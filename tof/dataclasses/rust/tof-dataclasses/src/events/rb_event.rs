@@ -26,7 +26,7 @@
 use std::fmt;
 use std::path::Path;
 
-use crate::packets::{TofPacket, PacketType};
+use crate::packets::{TofPacket, PacketType, PaddlePacket};
 use crate::constants::{NWORDS, NCHN};
 use crate::serialization::{u16_to_u8,
                            u8_to_u16,
@@ -40,7 +40,9 @@ use crate::serialization::{u16_to_u8,
                            parse_u32_for_16bit_words,
                            parse_u48_for_16bit_words,
                            parse_u64};
-#[cfg(feature = "random")]
+
+
+#[cfg(feature = "random")] 
 use crate::FromRandom;
 #[cfg(feature = "random")]
 extern crate rand;
@@ -165,6 +167,77 @@ impl FromRandom for RBMissingHit {
   }
 }
 
+// I am currently undecided if we need this...
+// Define different event stages/levels
+//
+// Since events go through different steps
+// of processing, keep track of what has
+// been done already with a simple flag
+//#[derive(Debug, Copy, Clone, PartialEq)]
+//pub enum CompressionLevel {
+//  Unknown,
+//  None,
+//}
+//
+//impl fmt::Display for CompressionLevel {
+//  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+//    let r = self.string_repr();
+//    write!(f, "<EventQuality: {}>", r)
+//  }
+//}
+//
+//impl CompressionLevel {
+//  pub const UNKNOWN : u8 = 0;
+//  pub const NONE    : u8 = 10;
+//  pub fn to_u8(&self) -> u8 {
+//    let result : u8;
+//    match self {
+//      CompressionLevel::Unknown => {
+//        result = CompressionLevel::UNKNOWN;
+//      }
+//      CompressionLevel::None => {
+//        result = CompressionLevel::NONE;
+//      }
+//    }
+//    result
+//  }
+//  
+//  pub fn from_u8(code : &u8) -> Self {
+//    let mut result = CompressionLevel::Unknown;
+//    match *code {
+//      CompressionLevel::UNKNOWN => {
+//        result = CompressionLevel::Unknown;
+//      }
+//      CompressionLevel::NONE => {
+//        result = CompressionLevel::None;
+//      }
+//      _ => {
+//        error!("Unknown compression level {}!", code);
+//      }
+//    }
+//    result
+//  }
+//
+//  /// String representation of the enum
+//  ///
+//  /// This is basically the enum type as 
+//  /// a string.
+//  pub fn string_repr(&self) -> String { 
+//    let repr : String;
+//    match self {
+//      CompressionLevel::Unknown => { 
+//        repr = String::from("Unknown");
+//      }
+//      CompressionLevel::None => {
+//        repr = String::from("None");
+//      }
+//    }
+//    repr
+//  }
+//}
+
+
+
 /// A wrapper class for raw binary RB data exposing the event id
 ///
 /// This is useful when we need the event id, but don't want to 
@@ -200,7 +273,8 @@ impl RBEventPayload {
                          no_fragment : bool)
       -> Result<Self, SerializationError> {
     let head_pos = search_for_u16(RBEventMemoryView::HEAD, bytestream, start_pos)?; 
-    let tail_pos = search_for_u16(RBEventMemoryView::TAIL, bytestream, head_pos)?;
+    // heuristic guess, jump ahead
+    let tail_pos = search_for_u16(RBEventMemoryView::TAIL, bytestream, head_pos + RBEventMemoryView::SIZE - 4)?;
     // At this state, this can be a header or a full event. Check here and
     // proceed depending on the options
     if head_pos - tail_pos != RBEventMemoryView::SIZE
@@ -319,8 +393,6 @@ impl RBEventMemoryView {
   pub fn get_n_datachan(&self) -> u8 {
     self.get_active_data_channels().len() as u8
   }
-
-
 }
 
 impl Default for RBEventMemoryView {
@@ -524,8 +596,10 @@ impl RBChannelData {
 ///
 #[derive(Debug, Clone, PartialEq)]
 pub struct RBEvent {
-  pub header   : RBEventHeader,
-  pub adc      : Vec<Vec<u16>>,
+  pub header    : RBEventHeader,
+  pub adc       : Vec<Vec<u16>>,
+  pub n_paddles : u8, // number of entries in paddles vector
+  pub paddles   : Vec<PaddlePacket>
 }
 
 impl RBEvent {
@@ -536,8 +610,10 @@ impl RBEvent {
       adc.push(Vec::<u16>::new());
     }
     RBEvent {
-      header : RBEventHeader::new(),
-      adc    : adc,
+      header    : RBEventHeader::new(),
+      adc       : adc,
+      n_paddles : 0,
+      paddles   : Vec::<PaddlePacket>::new(),
     }
   }
  
@@ -626,6 +702,22 @@ impl Serialization for RBEvent {
       event.adc[(k-1) as usize] = u8_to_u16(data);
       *pos += 2*NWORDS;
     }
+    event.n_paddles = parse_u8(stream, pos);
+    if event.n_paddles > 0 {
+      for _ in 0..event.n_paddles {
+        match PaddlePacket::from_bytestream(stream, pos) {
+          Err(err) => {
+            error!("Can't read PaddlePacket! Err {err}");
+            let mut pp = PaddlePacket::new();
+            pp.valid = false;
+            event.paddles.push(pp);
+          },
+          Ok(pp) => {
+            event.paddles.push(pp);
+          }
+        }
+      }
+    }
     let tail = parse_u16(stream, pos);
     //println!("{:?}", &stream[*pos-10..*pos+2]);
     //println!("{} {}", pos, stream.len());
@@ -643,6 +735,12 @@ impl Serialization for RBEvent {
     // for an empty channel, we will add an empty vector
     for k in 0..self.adc.len() {
       stream.extend_from_slice(&u16_to_u8(&self.adc[k])); 
+    }
+    stream.push(self.n_paddles);
+    if self.n_paddles > 0 {
+      for k in 0..self.n_paddles {
+        stream.extend_from_slice(&self.paddles[k as usize].to_bytestream());
+      }
     }
     stream.extend_from_slice(&Self::TAIL.to_le_bytes());
     stream
