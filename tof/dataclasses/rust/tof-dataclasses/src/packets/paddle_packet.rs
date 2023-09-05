@@ -6,14 +6,11 @@
 //!
 //!  Find the corresponding C++ dataclasses
 //!  in this project
-//!
-//!
-//!
-//!
 
 use crate::errors::SerializationError;
 use crate::serialization::search_for_u16;
 use std::time::Instant;
+use std::fmt;
 
 #[cfg(feature="random")]
 extern crate rand;
@@ -60,6 +57,38 @@ pub struct PaddlePacket  {
   pub valid        : bool,
 
   pub creation_time      : Instant,
+}
+
+impl fmt::Display for PaddlePacket {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    write!(f, "<PaddlePacket:
+            \t VALID         {},   
+            \t time_a        {},   
+            \t time_b        {},   
+            \t peak_a        {},   
+            \t peak_b        {},   
+            \t charge_a      {},   
+            \t charge_b      {},   
+            \t charge_min_i  {},   
+            \t pos_across    {},   
+            \t t_average     {},   
+            \t ctr_etx       {},   
+            \t timestamp_32  {},  
+            \t timestamp_16  {}>", 
+            self.valid,
+            self.time_a,
+            self.time_b,
+            self.peak_a,
+            self.peak_b,
+            self.charge_a,
+            self.charge_b,
+            self.charge_min_i,
+            self.pos_across,
+            self.t_average,
+            self.ctr_etx,
+            self.timestamp_32,
+            self.timestamp_16)
+  }
 }
 
 impl PaddlePacket {
@@ -203,6 +232,7 @@ impl PaddlePacket {
     println!("*****");
   }
 
+
   ///! Serialize the packet
   ///
   ///  Not all fields witll get serialized, 
@@ -331,3 +361,9 @@ impl PaddlePacket {
   }
 }
 
+#[test]
+fn serialization_paddle_packet() {
+    let data = PaddlePacket::from_random();
+    let test = PaddlePacket::from_bytestream(&data.to_bytestream(), &mut 0).unwrap();
+    assert_eq!(data, test);
+}
