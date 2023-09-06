@@ -15,5 +15,6 @@ pub use rb_event::{RBEventPayload,
                    RBEventMemoryView,
                    RBEventHeader,
                    RBEvent,
-                   RBMissingHit};
+                   RBMissingHit,
+                   DataType};
 

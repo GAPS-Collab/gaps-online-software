@@ -465,7 +465,7 @@ impl Serialization for TofEvent {
         }
         Ok(pp)   => {
           event.paddle_packets.push(pp);
-          *pos += PaddlePacket::PACKETSIZE;
+          *pos += PaddlePacket::SIZE;
         }
       }
     }
@@ -474,7 +474,7 @@ impl Serialization for TofEvent {
   
   fn to_bytestream(&self) -> Vec<u8> {
 
-    let mut bytestream = Vec::<u8>::with_capacity(Self::PACKETSIZEFIXED + (self.n_paddles as usize)*PaddlePacket::PACKETSIZE as usize);
+    let mut bytestream = Vec::<u8>::with_capacity(Self::PACKETSIZEFIXED + (self.n_paddles as usize)*PaddlePacket::SIZE as usize);
 
     bytestream.extend_from_slice(&Self::HEAD.to_le_bytes());
     //let mut evid = self.event_id.to_be_bytes();
