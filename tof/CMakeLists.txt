@@ -1,7 +1,3 @@
-## Build options
-option(BUILD_RBEMULATOR "build the readoutboard emulator for debugging purposes" OFF)
-set(RBEMULATOR_DIR ${CMAKE_CURRENT_SOURCE_DIR}/readoutboard-emulator)
-
 ## ================================================================
 ## cmake build type
 ## can be either "Release" or "Debug"
@@ -31,7 +27,6 @@ else()
 endif(USE_CHANNEL_9) 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include/TOFCommon.h.in ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include/TOFCommon.h @ONLY)
 #configure_file(${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/threads/TOFParam.cpp.in ${CMAKE_CURRENT_SOURCE_DIR}/threads/TOFParam.cpp @ONLY)
-configure_file(${RBEMULATOR_DIR}/bin/RBEmulator.cxx.in ${RBEMULATOR_DIR}/bin/RBEmulator.cxx @ONLY)
 
 # ROOT part is still needed for the blobroutines!
 # Locate the ROOT package and defines a number of variables (e.g. ROOT_INCLUDE_DIRS)
@@ -52,35 +47,6 @@ if(BUILD_ROOTCOMPONENTS)
       set(BUILD_ROOTCOMPONENTS OFF)
   endif(ROOT_FOUND)
 endif(BUILD_ROOTCOMPONENTS)
-
-# tests/reeadoutboard emulator
-if (BUILD_RBEMULATOR)
-    message(STATUS "Building readoutboard-emulator")
-    message(STATUS "-- found readout-builder code in ${RBEMULATOR_DIR}") 
-    # RBEMULATOR binary
-    set(RBEMULATOR_BIN RBEmulator) 
-    add_executable(${RBEMULATOR_BIN} ${RBEMULATOR_DIR}/bin/RBEmulator.cxx
-                   ${RBEMULATOR_DIR}/src/BlobFileServer.cxx
-                  )
-    target_include_directories(${RBEMULATOR_BIN}
-                                PUBLIC
-                                ${spdlog_SOURCE_DIR}/include
-                                ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
-                                ${RBEMULATOR_DIR}/include
-                              )
-    target_link_libraries(${RBEMULATOR_BIN}
-                         PUBLIC
-                            $<$<BOOL:${BUILD_ROOTCOMPONENTS}>:${ROOT_LIBRARY_SHARED}>
-                            ${GAPSTOF_LIBRARY_SHARED}
-                            "libczmq.so"
-                            "libzmq.so"
-                        )
-endif(BUILD_RBEMULATOR)
-
-# -- the readoutboard emulator is something which 
-# -- can distribute "old" blob data for 5 readoutboards
-# -- through the ports which they would usually use 
-# -- so this can be used for debugging the server program
 
 ###############################
 # Server shared libary 
