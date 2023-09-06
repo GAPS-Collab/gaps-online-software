@@ -2,19 +2,10 @@
 #define CALIBRATION_H_INCLUDED
 
 /********************************
- * Calibration related tasks
- *
+ * ReadoutBoard calibration:
+ * - convert adc, time bins in 
+ *   mV and nanoseconds.
  */
-
-#include <vector>
-#include <string>
-
-
-/**
- * Read a text file with calibration constants.
- *
- *
- */ 
 
 #include <vector>
 #include <string>
@@ -26,10 +17,11 @@
 
 
 /**
- * The original "RemoveSpikes" from J. Zweerink
+ * The original "RemoveSpikes" from the
+ * DRS4 manual
  *
  */
-void spike_cleaning_jeff(Vec<f32> &voltages);
+void spike_cleaning_drs4(Vec<f32> &voltages);
 
 
 
@@ -71,26 +63,5 @@ struct RBCalibration {
      */
     bool channel_check(u8 channel) const;
 };
-
-
-/**
- * Read a file with calibration constants.
- *
- */
-std::vector<Calibrations_t> read_calibration_file (std::string filename);
-
-
-void apply_tcal(const u16 stop_cell,
-                const Calibrations_t &cal,
-                f32 times[NWORDS]);
-
-/**
- * Apply voltage calibration constants to raw adc data
- *
- */ 
-void apply_vcal(const u16 stop_cell,
-                const i16 adc[NWORDS],
-                const Calibrations_t &cal,
-                f32 waveform[NWORDS]);
 
 #endif
