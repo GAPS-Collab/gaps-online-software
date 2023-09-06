@@ -175,6 +175,8 @@ pub enum DataType {
   TimingCalibration,
   Noi,
   Physics,
+  HeaderOnly,
+  MemoryView,
   Unknown,
 }
 
@@ -191,7 +193,9 @@ impl DataType {
   pub const TIMINGCALIBRATION     : u8 = 20;
   pub const NOI                   : u8 = 30;
   pub const PHYSICS               : u8 = 40;
-  
+  pub const HEADERONLY            : u8 = 50;
+  pub const MEMORYVIEW            : u8 = 60;
+
   pub fn to_u8(&self) -> u8 {
     let result : u8;
     match self {
@@ -209,6 +213,12 @@ impl DataType {
       }
       DataType::Physics => {
         result = DataType::PHYSICS;
+      }
+      DataType::HeaderOnly => {
+        result = DataType::HEADERONLY;
+      }
+      DataType::MemoryView => {
+        result = DataType::MEMORYVIEW;
       }
     }
     result
@@ -231,6 +241,12 @@ impl DataType {
       }
       DataType::PHYSICS => {
         result = DataType::Physics;
+      }
+      DataType::HEADERONLY => {
+        result = DataType::HeaderOnly;
+      }
+      DataType::MEMORYVIEW => {
+        result = DataType::MemoryView;
       }
       _ => {
         error!("Unknown DataType {}!", code);
@@ -260,6 +276,12 @@ impl DataType {
       }
       DataType::Physics => {
         repr = String::from("Physics");
+      }
+      DataType::HeaderOnly => {
+        repr = String::from("HeaderOnly");
+      }
+      DataType::MemoryView => {
+        repr = String::from("MemoryView");
       }
     }
     repr
@@ -727,8 +749,17 @@ impl Serialization for RBEvent {
     event.data_type = DataType::from_u8(&parse_u8(stream, pos));
     event.header    = RBEventHeader::from_bytestream(stream, pos)?;
     let ch_ids      = event.header.get_active_data_channels();
+    let stream_len  = stream.len();
+    if event.header.event_fragment {
+      error!("Fragmented event {} found! However, we carry on...", event.header.event_id);
+      return Ok(event);
+    }
     for k in ch_ids.iter() {
       debug!("Found active data channel {}!", k);
+      if *pos + 2*NWORDS >= stream_len {
+        error!("The channel data for ch {} seems corrupt!", k);
+        return Err(SerializationError::WrongByteSize {})
+      }
       // 2*NWORDS because stream is Vec::<u8> and it is 16 bit words.
       let data = &stream[*pos..*pos+2*NWORDS];
       // remember, that ch ids are 1..8
@@ -804,10 +835,12 @@ impl FromRandom for RBEvent {
     let mut rng     = rand::thread_rng();
     event.header    = header;
     let ch_ids      = event.header.get_active_data_channels();
-    for k in ch_ids.iter() {
-      debug!("Found active data channel {}!", k);
-      let random_numbers: Vec<u16> = (0..NWORDS).map(|_| rng.gen()).collect();
-      event.adc[(k-1) as usize] = random_numbers;
+    if !event.header.event_fragment {
+      for k in ch_ids.iter() {
+        debug!("Found active data channel {}!", k);
+        let random_numbers: Vec<u16> = (0..NWORDS).map(|_| rng.gen()).collect();
+        event.adc[(k-1) as usize] = random_numbers;
+      }
     }
     event
   }
@@ -973,6 +1006,11 @@ impl RBEventHeader {
     Ok(header)
   }
 
+  /// Again, remember, channel numbers are in 1-9
+  ///
+  /// FIXME - maybe we should change that, I think 
+  /// we are shooting ourselves in the foot too many
+  /// times now.
   pub fn get_active_data_channels(&self) -> Vec<u8> {
     let mut active_channels = Vec::<u8>::with_capacity(8);
     for ch in 1..9 {
@@ -1149,7 +1187,13 @@ mod test_rbevents {
   fn serialization_rbevent() {
     let head = RBEvent::from_random();
     let test = RBEvent::from_bytestream(&head.to_bytestream(), &mut 0).unwrap();
-    assert_eq!(head, test);
+    assert_eq!(head.header, test.header);
+    assert_eq!(head.header.get_active_data_channels(), test.header.get_active_data_channels());
+    if (head.header.event_fragment == test.header.event_fragment) {
+      println!("Event fragment found, no channel data available!");
+    } else {
+      assert_eq!(head, test);
+    }
   }
   
   #[test]
@@ -1174,6 +1218,8 @@ mod test_rbevents {
     type_codes.push(DataType::TIMINGCALIBRATION); 
     type_codes.push(DataType::NOI); 
     type_codes.push(DataType::PHYSICS); 
+    type_codes.push(DataType::HEADERONLY); 
+    type_codes.push(DataType::MEMORYVIEW); 
     for tc in type_codes.iter() {
       assert_eq!(*tc,DataType::to_u8(&DataType::from_u8(tc)));  
     }
