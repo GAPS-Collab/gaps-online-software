@@ -155,6 +155,8 @@ pub trait Serialization {
   fn verify_fixed(stream : &Vec<u8>, 
                   pos    : &mut usize) -> Result<(), SerializationError> {
     if !Self::SIZE == 0 {
+      // we can panic here, since this is a conceptional logic error. If we
+      // don't panic, monsters will arise downstream.
       panic!("Self::verify_fixed can be only used for structs with a fixed size! In case you are convinced, that your struct has indeed a fixed size, please implement trait Serialization::SIZE with the serialized size in bytes including 4 bytes for header and footer!");
     }
     let head_pos = search_for_u16(Self::HEAD, stream, *pos)?; 
@@ -211,15 +213,12 @@ pub trait Serialization {
 /// Search for a certain number of type `u16` in a bytestream
 pub fn search_for_u16(number : u16, bytestream : &Vec<u8>, start_pos : usize) 
   -> Result<usize, SerializationError> {
- 
   // -2 bc later on we are looking for 2 bytes!
   if start_pos  > bytestream.len() - 2 {
     error!("Start position {} beyond stream capacity {}!", start_pos, bytestream.len() -2);
     return Err(SerializationError::StreamTooShort);
   }
-
   let mut pos = start_pos;
-
   let mut two_bytes : [u8;2]; 
   // will find the next header
   two_bytes = [bytestream[pos], bytestream[pos + 1]];
@@ -231,20 +230,18 @@ pub fn search_for_u16(number : u16, bytestream : &Vec<u8>, start_pos : usize)
   // the stream
   pos += 2;
   let mut found = false;
-  if u16::from_le_bytes(two_bytes) != number {
-    // we search for the next packet
-    for n in pos..bytestream.len() - 1 {
-      two_bytes = [bytestream[n], bytestream[n + 1]];
-      if (u16::from_le_bytes(two_bytes)) == number {
-        pos = n;
-        found = true;
-        break;
-      }
+  // we search for the next packet
+  for n in pos..bytestream.len() - 1 {
+    two_bytes = [bytestream[n], bytestream[n + 1]];
+    if (u16::from_le_bytes(two_bytes)) == number {
+      pos = n;
+      found = true;
+      break;
     }
-    if !found {
-      error!("Can not find {} ", number);
-      return Err(SerializationError::ValueNotFound);
-    }
+  }
+  if !found {
+    error!("Can not find {} in bytestream of len {}!", number, bytestream.len());
+    return Err(SerializationError::ValueNotFound);
   }
   trace!("Found {number} at {pos}");
   Ok(pos)
