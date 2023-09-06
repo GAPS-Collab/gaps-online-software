@@ -7,6 +7,9 @@ use crate::serialization::{parse_u8,
                            Serialization,
                            SerializationError};
 
+use crate::events::DataType;
+
+
 #[cfg(feature = "random")] 
 use crate::FromRandom;
 #[cfg(feature = "random")]
@@ -39,7 +42,7 @@ pub struct RunConfig {
   pub tcal                    : bool,
   pub noi                     : bool,
   pub active_channel_mask     : u8,
-  pub data_format             : u8,
+  pub data_type               : DataType,
   pub rb_buff_size            : u16
 }
 
@@ -59,7 +62,7 @@ impl RunConfig {
       tcal                    : false,
       noi                     : false,
       active_channel_mask     : u8::MAX,
-      data_format             : 0,
+      data_type               : DataType::Unknown, 
       rb_buff_size            : 0,
     }
   }
@@ -124,7 +127,7 @@ impl Serialization for RunConfig {
     pars.tcal       = parse_bool(bytestream, pos); 
     pars.noi        = parse_bool(bytestream, pos); 
     pars.active_channel_mask = parse_u8(bytestream, pos);
-    pars.data_format = parse_u8(bytestream, pos);
+    pars.data_type  = DataType::from_u8(&parse_u8(bytestream, pos));
     pars.rb_buff_size = parse_u16(bytestream, pos);
     *pos += 2; // for the tail 
     //_ = parse_u16(bytestream, pos);
@@ -144,7 +147,7 @@ impl Serialization for RunConfig {
     stream.extend_from_slice(&u8::from(self.  tcal).to_le_bytes());
     stream.extend_from_slice(&u8::from(self.  noi).to_le_bytes());
     stream.push(self.active_channel_mask);
-    stream.extend_from_slice(&self.data_format.to_le_bytes());
+    stream.extend_from_slice(&self.data_type.to_u8().to_le_bytes());
     stream.extend_from_slice(&self.rb_buff_size.to_le_bytes());
     stream.extend_from_slice(&Self::TAIL.to_le_bytes());
     stream
@@ -163,7 +166,8 @@ impl Serialization for RunConfig {
     rc.tcal                    = config["tcal"]                   .as_bool().ok_or(SerializationError::JsonDecodingError)?;
     rc.noi                     = config["noi"]                    .as_bool().ok_or(SerializationError::JsonDecodingError)?;
     rc.active_channel_mask     = config["active_channel_mask"]    .as_u8  ().ok_or(SerializationError::JsonDecodingError)?; 
-    rc.data_format             = config["data_format"]            .as_u8  ().ok_or(SerializationError::JsonDecodingError)?;
+    let data_type              = config["data_type"].as_u8().ok_or(SerializationError::JsonDecodingError)?;
+    rc.data_type               = DataType::from_u8(&data_type);
     rc.rb_buff_size            = config["rb_buff_size"]           .as_u16 ().ok_or(SerializationError::JsonDecodingError)?;
     Ok(rc)
   }
@@ -177,7 +181,20 @@ impl Default for RunConfig {
 
 impl fmt::Display for RunConfig {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(f, "<RunConfig : active {}>", self.is_active)
+    write!(f, "<RunConfig :
+      nevents   : {}
+      active    : {}
+      nseconds  : {}
+      stream any: {}
+      data type : {}
+      ... [incomplete Display method FIXEM] ..
+      buff size : {}>",
+      self.nevents,
+      self.is_active,
+      self.nseconds,
+      self.stream_any,
+      self.data_type.string_repr(),
+      self.rb_buff_size)
   }
 }
 
@@ -197,7 +214,10 @@ impl FromRandom for RunConfig {
     cfg.tcal                    = rng.gen::<bool>();
     cfg.noi                     = rng.gen::<bool>();
     cfg.active_channel_mask     = rng.gen::<u8>();
-    cfg.data_format             = rng.gen::<u8>();
+    // yes, this is not the smartest since it will typically generate
+    // Unknown data types. However, we test DataType seperatly, so 
+    // we might be ok.
+    cfg.data_type               = DataType::from_u8(&rng.gen::<u8>());
     cfg.rb_buff_size            = rng.gen::<u16>();
     cfg
   }
