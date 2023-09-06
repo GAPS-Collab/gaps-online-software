@@ -60,7 +60,6 @@ pub fn get_bytestream(addr_space : &str,
 }
 
 
-extern crate pretty_env_logger;
 #[macro_use] extern crate log;
 
 /// Non-register related constants
@@ -84,7 +83,7 @@ const TEMPLATE_BAR_EV : &str = "[{elapsed_precise}] {bar:60.red/white} {pos:>7}/
 ///  #Arguments: 
 ///
 fn get_buff_size(which : &BlobBuffer, buff_start : &mut u32) ->Result<u32, RegisterError> {
-  let mut size : u32;
+  let size : u32;
   let occ = get_blob_buffer_occ(&which)?;
   if *buff_start > occ {
     debug!("The occupancy counter has rolled over!");
@@ -119,7 +118,7 @@ fn buff_handler(which      : &BlobBuffer,
       thread::sleep_ms(SLEEP_AFTER_REG_WRITE);
       let bytestream = get_bytestream(UIO1, buff_start_temp, 10).unwrap();
       let blob_size  = RBEventMemoryView::SIZE;
-      let mut a_blob = RBEventMemoryView::new();
+      let mut a_blob : RBEventMemoryView;
       let mut start_pos  = search_for_u16(RBEventMemoryView::HEAD, &bytestream, blob_size*5).unwrap();
       match RBEventMemoryView::from_bytestream(&bytestream, &mut start_pos) {
         Err(err) => {
@@ -163,8 +162,7 @@ fn buff_handler(which      : &BlobBuffer,
 
 ///! FIXME - should become a feature
 pub fn setup_progress_bar(msg : String, size : u64, format_string : String) -> ProgressBar {
-  let mut bar = ProgressBar::new(size).with_style(
-    //ProgressStyle::with_template("[{elapsed_precise}] {bar:40.cyan/blue} {pos:>7}/{len:7} {msg}")
+  let bar = ProgressBar::new(size).with_style(
     ProgressStyle::with_template(&format_string)
     .unwrap()
     .progress_chars("##-"));
@@ -190,7 +188,6 @@ pub fn setup_progress_bar(msg : String, size : u64, format_string : String) -> P
 
 
 fn main() {
-  pretty_env_logger::init();
   // some pre-defined time units for 
   // sleeping
   let two_seconds = time::Duration::from_millis(2000);
@@ -199,12 +196,12 @@ fn main() {
   info!("Setting daq to idle mode");
   match idle_drs4_daq() {
     Ok(_)    => info!("DRS4 set to idle:"),
-    Err(err) => panic!("Can't set DRS4 to idle!!")
+    Err(err) => panic!("Can't set DRS4 to idle!! Err {err}")
   }
   thread::sleep(one_milli);
   match setup_drs4() {
     Ok(_)    => info!("DRS4 setup routine complete!"),
-    Err(err) => panic!("Failed to setup DRS4!!")
+    Err(err) => panic!("Failed to setup DRS4!! Err {err}")
   }
 
   
@@ -220,29 +217,29 @@ fn main() {
   info!("Starting daq!");
   match start_drs4_daq() {
     Ok(_)    => info!(".. successful!"),
-    Err(err) => panic!("DRS4 start failed!")
+    Err(err) => panic!("DRS4 start failed! Err {err}")
   }
 
   // let go for a few seconds to get a 
   // rate estimate
   println!("getting rate estimate..");
   thread::sleep(two_seconds);
-  let mut rate = get_trigger_rate().unwrap();
+  let rate = get_trigger_rate().unwrap();
   println!("Running at a trigger rate of {rate} Hz");
   // the trigger rate defines at what intervals 
   // we want to print out stuff
   // let's print out something apprx every 2
   // seconds
-  let n_evts_print : u64 = 2*rate as u64;
+  //let n_evts_print : u64 = 2*rate as u64;
 
   // event loop
-  let mut evt_cnt          : u32 = 0;
+  let mut evt_cnt          : u32;
   let mut last_evt_cnt     : u32 = 0;
 
   let mut n_events         : u64 = 0;
 
   let mut skipped_events   : u64 = 0;
-  let mut delta_events     : u64 = 0;
+  let mut delta_events     : u64;
 
   let mut first_iter       = true;
   
@@ -260,7 +257,7 @@ fn main() {
   let multi_bar = MultiProgress::new();
   let bar_a  = multi_bar.add(setup_progress_bar(String::from("buff A"), UIO1_TRIP as u64, String::from(TEMPLATE_BAR_A)));  
   let bar_b  = multi_bar.insert_after(&bar_a,setup_progress_bar(String::from("buff B"), UIO2_TRIP as u64, String::from(TEMPLATE_BAR_B))); 
-  let mut bar_ev = multi_bar.insert_after(&bar_b,setup_progress_bar(String::from("events"), max_event, String::from(TEMPLATE_BAR_EV)));         
+  let bar_ev = multi_bar.insert_after(&bar_b,setup_progress_bar(String::from("events"), max_event, String::from(TEMPLATE_BAR_EV)));         
 
   match enable_trigger() {
     Ok(_) => (),
