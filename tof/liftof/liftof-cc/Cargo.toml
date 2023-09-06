@@ -54,7 +54,7 @@ sensors = "0.2"
 
 
 # logging
-colored = "2.0"
 log = "0.4"
+colored = "2.0"
 env_logger = "0.10"
 #pretty_env_logger = "0.4"

@@ -25,7 +25,8 @@ tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features =
 zmq = "0.10.0"
 
 log = "0.4"
-pretty_env_logger = "0.4"
+colored = "2.0"
+#env_logger = "0.10"
 
 local-ip-address = "0.5"
 
@@ -38,7 +39,6 @@ json = "0.12"
 #port_scanner = "0.1"
 #arp-toolkit = { verion = "0.3", features = ["sync"] }
 #mac_address = "1.1"
-manifest-dir-macros = "0.1"
 netneighbours = "0.1"
 macaddr = "1.0"
 

@@ -54,6 +54,7 @@ use tof_dataclasses::manifest::{get_ltbs_from_sqlite,
 use tof_dataclasses::commands::TofCommand;
 use liftof_lib::{master_trigger,
                  readoutboard_commander};
+use liftof_lib::color_log;
 
 use liftof_cc::readoutboard_comm::readoutboard_communicator;
 use liftof_cc::event_builder::event_builder;
@@ -61,7 +62,6 @@ use liftof_cc::event_builder::event_builder;
 use liftof_cc::api::tofcmp_and_mtb_moni;
 use liftof_cc::paddle_packet_cache::paddle_packet_cache;
 use liftof_cc::flight_comms::global_data_sink;
-use liftof_cc::color_log;
 
 /*************************************/
 
