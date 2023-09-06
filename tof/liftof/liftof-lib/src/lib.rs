@@ -4,8 +4,7 @@ use std::time::{Duration, Instant};
 use std::fmt;
 use std::{fs::File, path::Path};
 use std::fs::OpenOptions;
-use std::io::{self, BufRead, BufReader};
-use std::path::PathBuf;
+use std::io::{self, BufReader};
 use std::net::{IpAddr, Ipv4Addr};
 use std::io::{Read,
               Write,
@@ -15,9 +14,10 @@ use std::collections::HashMap;
 use std::net::{UdpSocket, SocketAddr};
 use crossbeam_channel::Receiver;
 use zmq;
+use colored::{Colorize, ColoredString};
 
 extern crate json;
-
+use log::Level;
 use macaddr::MacAddr6;
 use netneighbours::get_mac_to_ip_map;
 use crossbeam_channel as cbc; 
@@ -25,9 +25,8 @@ use crossbeam_channel as cbc;
 extern crate indicatif;
 use indicatif::{ProgressBar, ProgressStyle};
 
-extern crate pretty_env_logger;
+//extern crate pretty_env_logger;
 #[macro_use] extern crate log;
-#[macro_use] extern crate manifest_dir_macros;
 
 use tof_dataclasses::manifest as mf;
 use tof_dataclasses::constants::NWORDS;
@@ -41,13 +40,13 @@ use tof_dataclasses::serialization::{search_for_u16,
                                      parse_u8,
                                      parse_u32,
                                      Serialization};
-use tof_dataclasses::commands::{TofCommand};//, TofResponse};
-use tof_dataclasses::events::{MasterTriggerEvent,
-                              RBEvent};
 use tof_dataclasses::monitoring::MtbMoniData;
-use tof_dataclasses::events::master_trigger::{reset_daq,
-                                              read_daq,
+use tof_dataclasses::commands::TofCommand;
+use tof_dataclasses::events::{RBEvent,
+                              MasterTriggerEvent};
+use tof_dataclasses::events::master_trigger::{read_daq,
                                               read_rate,
+                                              reset_daq,
                                               //read_lost_rate,
                                               read_adc_temp_and_vccint,
                                               read_adc_vccaux_and_vccbram};
@@ -59,6 +58,19 @@ use tof_dataclasses::analysis::{calculate_pedestal,
 
 pub const MT_MAX_PACKSIZE   : usize = 512;
 pub const DATAPORT : u32 = 42000;
+
+
+/// Make sure that the loglevel is in color, even though not using pretty_env logger
+pub fn color_log(level : &Level) -> ColoredString {
+  match level {
+    Level::Error    => String::from(" ERROR!").red(),
+    Level::Warn     => String::from(" WARN  ").yellow(),
+    Level::Info     => String::from(" Info  ").green(),
+    Level::Debug    => String::from(" debug ").blue(),
+    Level::Trace    => String::from(" trace ").cyan(),
+  }
+}
+
 
 //*************************************************
 // I/O - read/write (general purpose) files
@@ -74,13 +86,6 @@ pub fn read_value_from_file(file_path: &str) -> io::Result<u32> {
   Ok(value)
 }
 
-/// The output is wrapped in a Result to allow matching on errors
-/// Returns an Iterator to the Reader of the lines of the file.
-fn read_lines<P>(filename: P) -> io::Result<io::Lines<BufReader<File>>>
-where P: AsRef<Path>, {
-    let file = File::open(filename)?;
-    Ok(BufReader::new(file).lines())
-}
 
 //FIXME : this needs to become a trait
 fn read_n_bytes(file: &mut BufReader<File>, n: usize) -> io::Result<Vec<u8>> {
@@ -870,6 +875,7 @@ pub fn waveform_analysis(event         : &RBEvent,
 
     let ch_pid = readoutboard.get_pid_for_ch(ch);
     let end    = readoutboard.get_paddle_end(ch); 
+    //FIXME : is it ok to panic here?
     match end {
       mf::PaddleEndIdentifier::A => {
         paddles.get_mut(&ch_pid).expect("Bad paddlemap!").set_charge_a(charge);
@@ -1227,123 +1233,6 @@ pub fn monitor_mtb(mtb_address : &String,
 }
 
 
-/// Get the tof channel/paddle mapping and involved components
-///
-/// This reads the configuration from a json file and panics 
-/// if there are any problems.
-///
-#[deprecated(since="0.4.0", note="please use the database methods from tof_dataclasses instead")]
-pub fn get_tof_manifest(json_config : PathBuf) -> (Vec::<LocalTriggerBoard>, Vec::<ReadoutBoard>) {
-  let mut ltbs = Vec::<LocalTriggerBoard>::new();
-  let mut rbs  = Vec::<ReadoutBoard>::new();
-  let js_file = json_config.as_path();
-   if !js_file.exists() {
-     panic!("The file {} does not exist!", js_file.display());
-   }
-   info!("Found config file {}", js_file.display());
-   let json_content = std::fs::read_to_string(js_file).expect("Unable to read file!");
-   let config = json::parse(&json_content).expect("Unable to parse json!");
-   for n in 0..config["ltbs"].len() {
-     ltbs.push(LocalTriggerBoard::from(&config["ltbs"][n]));
-   }
-   for n in 0..config["rbs"].len() {
-     rbs.push(ReadoutBoard::from(&config["rbs"][n]));
-   }
-  (ltbs, rbs)
-}
-
-
-#[deprecated(since="0.1.0", note="please use `get_tof_manifest` instead")]
-pub fn get_rb_manifest() -> Vec<ReadoutBoard> {
-  let rb_manifest_path = path!("assets/rb.manifest");
-  let mut connected_boards = Vec::<ReadoutBoard>::new();
-  let mac_table = get_mac_to_ip_map();
-  if let Ok(lines) = read_lines(rb_manifest_path) {
-    // Consumes the iterator, returns an (Optional) String
-    for line in lines {
-      if let Ok(ip) = line {
-        if ip.starts_with("#") {
-          continue;
-        }
-        if ip.len() == 0 {
-          continue;
-        }
-        let identifier: Vec<&str> = ip.split(";").collect();
-        debug!("{:?}", identifier);
-        let mut rb = ReadoutBoard::new();
-        let mc_address = identifier[1].replace(" ","");
-        let mc_address : Vec<&str> = mc_address.split(":").collect();
-        println!("{:?}", mc_address);
-        let mc_address : Vec<u8>   = mc_address.iter().map(|&x| {u8::from_str_radix(x,16).unwrap()} ).collect();
-        assert!(mc_address.len() == 6);
-        let mac = MacAddr6::new(mc_address[0],
-                                mc_address[1],
-                                mc_address[2],
-                                mc_address[3],
-                                mc_address[4],
-                                mc_address[5]);
-
-        rb.id          = Some(identifier[0].parse::<u8>().expect("Invalid RB ID!"));
-        rb.mac_address = Some(mac);
-        let rb_ip = mac_table.get(&mac);
-        println!("Found ip address {:?}", rb_ip);
-        match rb_ip {
-          None => println!("Can not resolve RBBoard with MAC address {:?}, it is not in the system's ARP tables", mac),
-          Some(ip)   => match ip[0] {
-            IpAddr::V6(a) => panic!("IPV6 {a} not suppported!"),
-            IpAddr::V4(a) => {
-              rb.ip_address = Some(a);
-              rb.data_port  = Some(42000);
-              connected_boards.push(rb);
-              // now we will try and check if the ports are open
-              //let mut all_data_ports = Vec::<String>::new();//scan_ports_range(30000..39999);
-              //let mut all_cmd_ports  = Vec::<String>::new();//scan_ports_range(40000..49999);
-              //// FIXME - the ranges here are somewhat arbitrary
-              //for n in 30000..39999 {
-              //  all_data_ports.push(rb.ip_address.unwrap().to_string() + ":" + &n.to_string());
-              //  //scan_ports_addrs(
-              //}
-              //for n in 40000..49999 {
-              //  all_cmd_ports.push(rb.ip_address.unwrap().to_string() + ":" + &n.to_string());
-              //}
-              //let open_data_ports = scan_ports_addrs(all_data_ports);
-              //let open_cmd_ports  = scan_ports_addrs(all_cmd_ports);
-              //assert!(open_cmd_ports.len() < 2);
-              //assert!(open_data_ports.len() < 2);
-              //if open_cmd_ports.len() == 1 {
-              //  rb.cmd_port = Some(open_cmd_ports[0].port());
-              //  match rb.ping() {
-              //    Ok(_)    => println!("... connected!"),
-              //    Err(err) => println!("Can't connect to RB, err {err}"),
-              //  }
-              //} else {
-              //  rb.cmd_port = None;
-              //}
-              //
-
-              //println!("Found open data ports {:?}", open_data_ports);
-              //if open_data_ports.len() == 1 {
-              //  rb.data_port = Some(open_data_ports[0].port());
-              //} else {
-              //  rb.data_port = None;
-              //}
-              //if rb.is_connected {
-              //  connected_boards.push(rb);
-              //}
-            }
-          }
-        }
-
-        
-        println!("{:?}", connected_boards);
-      }
-    }
-  }
-  return connected_boards;
-}
-
-
-
 #[derive(Debug)]
 pub enum ReadoutBoardError {
   NoConnectionInfo,
@@ -1365,14 +1254,6 @@ impl fmt::Display for ReadoutBoardError{
 impl Error for ReadoutBoardError {
 }
 
-/// Find boards in the network
-///
-///
-///
-//pub fn discover_boards() -> Vec<ReadoutBoard> {
-//  let board_list = Vec::<ReadoutBoard>::new();
-//  board_list
-//}
 
 
 /// A generic representation of a LocalTriggerBoard
