@@ -14,7 +14,7 @@ use liftof_lib::master_trigger;
 use crossbeam_channel as cbc;
 use std::io::Write;
 
-use liftof_cc::color_log;
+use liftof_lib::color_log;
 
 fn main() {
 
