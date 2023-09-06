@@ -7,6 +7,14 @@ use crate::serialization::{parse_u8,
                            Serialization,
                            SerializationError};
 
+#[cfg(feature = "random")] 
+use crate::FromRandom;
+#[cfg(feature = "random")]
+extern crate rand;
+#[cfg(feature = "random")]
+use rand::Rng;
+
+
 use crate::errors::DecodingError;
 
 extern crate json;
@@ -19,7 +27,7 @@ use json::JsonValue;
 ///                         channel in ascending order with 
 ///                         increasing bit significance.
 ///
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub struct RunConfig {
   pub nevents                 : u32,
   pub is_active               : bool,
@@ -39,8 +47,8 @@ impl RunConfig {
 
   pub const VERSION            : &'static str = "1.1";
 
-  pub fn new() -> RunConfig {
-    RunConfig {
+  pub fn new() -> Self {
+    Self {
       nevents                 : 0,
       is_active               : false,
       nseconds                : 0,
@@ -97,9 +105,9 @@ impl RunConfig {
 }
 
 impl Serialization for RunConfig {
-  const HEAD               : u16  = 43690; //0xAAAA
-  const TAIL               : u16  = 21845; //0x5555
-  const SIZE               : usize = 18; // bytes
+  const HEAD               : u16   = 43690; //0xAAAA
+  const TAIL               : u16   = 21845; //0x5555
+  const SIZE               : usize = 29; // bytes including HEADER + FOOTER
   
   fn from_bytestream(bytestream : &Vec<u8>,
                      pos        : &mut usize)
@@ -171,5 +179,34 @@ impl fmt::Display for RunConfig {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     write!(f, "<RunConfig : active {}>", self.is_active)
   }
+}
+
+#[cfg(feature = "random")]
+impl FromRandom for RunConfig {
+    
+  fn from_random() -> Self {
+    let mut cfg = Self::new();
+    let mut rng  = rand::thread_rng();
+    cfg.nevents                 = rng.gen::<u32>();
+    cfg.is_active               = rng.gen::<bool>();
+    cfg.nseconds                = rng.gen::<u32>();
+    cfg.stream_any              = rng.gen::<bool>();
+    cfg.forced_trigger_poisson  = rng.gen::<u32>();
+    cfg.forced_trigger_periodic = rng.gen::<u32>();
+    cfg.vcal                    = rng.gen::<bool>();
+    cfg.tcal                    = rng.gen::<bool>();
+    cfg.noi                     = rng.gen::<bool>();
+    cfg.active_channel_mask     = rng.gen::<u8>();
+    cfg.data_format             = rng.gen::<u8>();
+    cfg.rb_buff_size            = rng.gen::<u16>();
+    cfg
+  }
+}
+
+#[test]
+fn serialization_runconfig() {
+  let cfg  = RunConfig::from_random();
+  let test = RunConfig::from_bytestream(&cfg.to_bytestream(), &mut 0).unwrap();
+  assert_eq!(cfg, test);
 }
 
