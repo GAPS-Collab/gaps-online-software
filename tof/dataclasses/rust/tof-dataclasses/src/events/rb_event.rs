@@ -41,6 +41,7 @@ use crate::serialization::{u16_to_u8,
                            parse_u48_for_16bit_words,
                            parse_u64};
 
+use crate::events::DataType;
 
 #[cfg(feature = "random")] 
 use crate::FromRandom;
@@ -166,129 +167,6 @@ impl FromRandom for RBMissingHit {
     miss
   }
 }
-
-/// Identify the event as being part of physics data
-/// or Calibration
-#[derive(Debug, Copy, Clone, PartialEq)]
-pub enum DataType {
-  VoltageCalibration,
-  TimingCalibration,
-  Noi,
-  Physics,
-  HeaderOnly,
-  MemoryView,
-  Unknown,
-}
-
-impl fmt::Display for DataType {
-  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let r = self.string_repr();
-    write!(f, "<DataType: {}>", r)
-  }
-}
-
-impl DataType {
-  pub const UNKNOWN               : u8 = 0;
-  pub const VOLTAGECALIBRATION    : u8 = 10;
-  pub const TIMINGCALIBRATION     : u8 = 20;
-  pub const NOI                   : u8 = 30;
-  pub const PHYSICS               : u8 = 40;
-  pub const HEADERONLY            : u8 = 50;
-  pub const MEMORYVIEW            : u8 = 60;
-
-  pub fn to_u8(&self) -> u8 {
-    let result : u8;
-    match self {
-      DataType::Unknown => {
-        result = DataType::UNKNOWN;
-      }
-      DataType::VoltageCalibration => {
-        result = DataType::VOLTAGECALIBRATION;
-      }
-      DataType::TimingCalibration => {
-        result = DataType::TIMINGCALIBRATION;
-      }
-      DataType::Noi => {
-        result = DataType::NOI;
-      }
-      DataType::Physics => {
-        result = DataType::PHYSICS;
-      }
-      DataType::HeaderOnly => {
-        result = DataType::HEADERONLY;
-      }
-      DataType::MemoryView => {
-        result = DataType::MEMORYVIEW;
-      }
-    }
-    result
-  }
-  
-  pub fn from_u8(code : &u8) -> Self {
-    let mut result = DataType::Unknown;
-    match *code {
-      DataType::UNKNOWN => {
-        result = DataType::Unknown;
-      }
-      DataType::VOLTAGECALIBRATION => {
-        result = DataType::VoltageCalibration;
-      }
-      DataType::TIMINGCALIBRATION => {
-        result = DataType::TimingCalibration;
-      }
-      DataType::NOI => {
-        result = DataType::Noi;
-      }
-      DataType::PHYSICS => {
-        result = DataType::Physics;
-      }
-      DataType::HEADERONLY => {
-        result = DataType::HeaderOnly;
-      }
-      DataType::MEMORYVIEW => {
-        result = DataType::MemoryView;
-      }
-      _ => {
-        error!("Unknown DataType {}!", code);
-      }
-    }
-    result
-  }
-
-  /// String representation of the DataType
-  ///
-  /// This is basically the enum type as 
-  /// a string.
-  pub fn string_repr(&self) -> String { 
-    let repr : String;
-    match self {
-      DataType::Unknown => {
-        repr = String::from("Unknown");
-      }
-      DataType::VoltageCalibration => {
-        repr = String::from("VoltageCalibration");
-      }
-      DataType::TimingCalibration => {
-        repr = String::from("TimingCalibration");
-      }
-      DataType::Noi => {
-        repr = String::from("Noi");
-      }
-      DataType::Physics => {
-        repr = String::from("Physics");
-      }
-      DataType::HeaderOnly => {
-        repr = String::from("HeaderOnly");
-      }
-      DataType::MemoryView => {
-        repr = String::from("MemoryView");
-      }
-    }
-    repr
-  }
-}
-
-
 
 /// A wrapper class for raw binary RB data exposing the event id
 ///
@@ -1172,7 +1050,6 @@ mod test_rbevents {
   use crate::serialization::Serialization;
   use crate::FromRandom;
   use crate::events::{RBEvent,
-                      DataType,
                       RBMissingHit,
                       RBEventMemoryView,
                       RBEventHeader};
@@ -1189,7 +1066,7 @@ mod test_rbevents {
     let test = RBEvent::from_bytestream(&head.to_bytestream(), &mut 0).unwrap();
     assert_eq!(head.header, test.header);
     assert_eq!(head.header.get_active_data_channels(), test.header.get_active_data_channels());
-    if (head.header.event_fragment == test.header.event_fragment) {
+    if head.header.event_fragment == test.header.event_fragment {
       println!("Event fragment found, no channel data available!");
     } else {
       assert_eq!(head, test);
@@ -1208,20 +1085,5 @@ mod test_rbevents {
     let head = RBEventMemoryView::from_random();
     let test = RBEventMemoryView::from_bytestream(&head.to_bytestream(), &mut 0).unwrap();
     assert_eq!(head, test);
-  }
-
-  #[test]
-  fn test_data_types() {
-    let mut type_codes = Vec::<u8>::new();
-    type_codes.push(DataType::UNKNOWN); 
-    type_codes.push(DataType::VOLTAGECALIBRATION); 
-    type_codes.push(DataType::TIMINGCALIBRATION); 
-    type_codes.push(DataType::NOI); 
-    type_codes.push(DataType::PHYSICS); 
-    type_codes.push(DataType::HEADERONLY); 
-    type_codes.push(DataType::MEMORYVIEW); 
-    for tc in type_codes.iter() {
-      assert_eq!(*tc,DataType::to_u8(&DataType::from_u8(tc)));  
-    }
   }
 }
