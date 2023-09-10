@@ -8,7 +8,7 @@ use crate::serialization::{parse_u8,
                            SerializationError};
 
 use crate::events::DataType;
-
+use crate::events::DataFormat;
 
 #[cfg(feature = "random")] 
 use crate::FromRandom;
@@ -38,11 +38,10 @@ pub struct RunConfig {
   pub stream_any              : bool,
   pub forced_trigger_poisson  : u32,
   pub forced_trigger_periodic : u32,
-  pub vcal                    : bool,
-  pub tcal                    : bool,
-  pub noi                     : bool,
+  pub latch_to_mtb            : bool,
   pub active_channel_mask     : u8,
   pub data_type               : DataType,
+  pub data_format             : DataFormat,
   pub rb_buff_size            : u16
 }
 
@@ -58,11 +57,10 @@ impl RunConfig {
       stream_any              : false,
       forced_trigger_poisson  : 0,
       forced_trigger_periodic : 0,
-      vcal                    : false,
-      tcal                    : false,
-      noi                     : false,
+      latch_to_mtb            : false,
       active_channel_mask     : u8::MAX,
       data_type               : DataType::Unknown, 
+      data_format             : DataFormat::Unknown,
       rb_buff_size            : 0,
     }
   }
@@ -110,7 +108,7 @@ impl RunConfig {
 impl Serialization for RunConfig {
   const HEAD               : u16   = 43690; //0xAAAA
   const TAIL               : u16   = 21845; //0x5555
-  const SIZE               : usize = 29; // bytes including HEADER + FOOTER
+  const SIZE               : usize = 28; // bytes including HEADER + FOOTER
   
   fn from_bytestream(bytestream : &Vec<u8>,
                      pos        : &mut usize)
@@ -123,11 +121,10 @@ impl Serialization for RunConfig {
     pars.stream_any = parse_bool(bytestream, pos);
     pars.forced_trigger_poisson  = parse_u32(bytestream, pos);
     pars.forced_trigger_periodic = parse_u32(bytestream, pos);
-    pars.vcal       = parse_bool(bytestream, pos);
-    pars.tcal       = parse_bool(bytestream, pos); 
-    pars.noi        = parse_bool(bytestream, pos); 
+    pars.latch_to_mtb            = parse_bool(bytestream, pos);
     pars.active_channel_mask = parse_u8(bytestream, pos);
-    pars.data_type  = DataType::from_u8(&parse_u8(bytestream, pos));
+    pars.data_type    = DataType::from_u8(&parse_u8(bytestream, pos));
+    pars.data_format  = DataFormat::from_u8(&parse_u8(bytestream, pos));
     pars.rb_buff_size = parse_u16(bytestream, pos);
     *pos += 2; // for the tail 
     //_ = parse_u16(bytestream, pos);
@@ -143,11 +140,10 @@ impl Serialization for RunConfig {
     stream.extend_from_slice(&u8::from(self.  stream_any).to_le_bytes());
     stream.extend_from_slice(&self.forced_trigger_poisson.to_le_bytes());
     stream.extend_from_slice(&self.forced_trigger_periodic.to_le_bytes());
-    stream.extend_from_slice(&u8::from(self.  vcal).to_le_bytes());
-    stream.extend_from_slice(&u8::from(self.  tcal).to_le_bytes());
-    stream.extend_from_slice(&u8::from(self.  noi).to_le_bytes());
+    stream.extend_from_slice(&u8::from(self.latch_to_mtb).to_le_bytes());
     stream.push(self.active_channel_mask);
     stream.extend_from_slice(&self.data_type.to_u8().to_le_bytes());
+    stream.extend_from_slice(&self.data_format.to_u8().to_le_bytes());
     stream.extend_from_slice(&self.rb_buff_size.to_le_bytes());
     stream.extend_from_slice(&Self::TAIL.to_le_bytes());
     stream
@@ -162,12 +158,12 @@ impl Serialization for RunConfig {
     rc.stream_any              = config["stream_any"]             .as_bool().ok_or(SerializationError::JsonDecodingError)?;
     rc.forced_trigger_poisson  = config["forced_trigger_poisson"] .as_u32 ().ok_or(SerializationError::JsonDecodingError)?; 
     rc.forced_trigger_periodic = config["forced_trigger_periodic"].as_u32 ().ok_or(SerializationError::JsonDecodingError)?; 
-    rc.vcal                    = config["vcal"]                   .as_bool().ok_or(SerializationError::JsonDecodingError)?;
-    rc.tcal                    = config["tcal"]                   .as_bool().ok_or(SerializationError::JsonDecodingError)?;
-    rc.noi                     = config["noi"]                    .as_bool().ok_or(SerializationError::JsonDecodingError)?;
+    rc.latch_to_mtb            = config["latch_to_mtb"].as_bool ().ok_or(SerializationError::JsonDecodingError)?; 
     rc.active_channel_mask     = config["active_channel_mask"]    .as_u8  ().ok_or(SerializationError::JsonDecodingError)?; 
     let data_type              = config["data_type"].as_u8().ok_or(SerializationError::JsonDecodingError)?;
     rc.data_type               = DataType::from_u8(&data_type);
+    let data_format            = config["data_format"].as_u8().ok_or(SerializationError::JsonDecodingError)?;
+    rc.data_format             = DataFormat::from_u8(&data_format);
     rc.rb_buff_size            = config["rb_buff_size"]           .as_u16 ().ok_or(SerializationError::JsonDecodingError)?;
     Ok(rc)
   }
@@ -182,11 +178,12 @@ impl Default for RunConfig {
 impl fmt::Display for RunConfig {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     write!(f, "<RunConfig :
-      nevents   : {}
-      active    : {}
-      nseconds  : {}
-      stream any: {}
-      data type : {}
+      nevents     : {}
+      active      : {}
+      nseconds    : {}
+      stream any  : {}
+      data type   : {}
+      data format : {} 
       ... [incomplete Display method FIXEM] ..
       buff size : {}>",
       self.nevents,
@@ -194,6 +191,7 @@ impl fmt::Display for RunConfig {
       self.nseconds,
       self.stream_any,
       self.data_type.string_repr(),
+      self.data_format.string_repr(),
       self.rb_buff_size)
   }
 }
@@ -210,14 +208,13 @@ impl FromRandom for RunConfig {
     cfg.stream_any              = rng.gen::<bool>();
     cfg.forced_trigger_poisson  = rng.gen::<u32>();
     cfg.forced_trigger_periodic = rng.gen::<u32>();
-    cfg.vcal                    = rng.gen::<bool>();
-    cfg.tcal                    = rng.gen::<bool>();
-    cfg.noi                     = rng.gen::<bool>();
+    cfg.latch_to_mtb            = rng.gen::<bool>();
     cfg.active_channel_mask     = rng.gen::<u8>();
     // yes, this is not the smartest since it will typically generate
     // Unknown data types. However, we test DataType seperatly, so 
     // we might be ok.
     cfg.data_type               = DataType::from_u8(&rng.gen::<u8>());
+    cfg.data_format             = DataFormat::from_u8(&rng.gen::<u8>());
     cfg.rb_buff_size            = rng.gen::<u16>();
     cfg
   }
