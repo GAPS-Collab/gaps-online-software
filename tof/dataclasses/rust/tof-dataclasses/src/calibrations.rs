@@ -210,7 +210,7 @@ fn roll<T: Clone>(vec: &mut Vec<T>, shift: isize) {
 /***********************************/
 
 #[derive(Debug, Clone)]
-pub struct ReadoutBoardCalibrations {
+pub struct RBCalibrations {
   pub v_offsets : [[f32;NWORDS];NCHN], // voltage offset
   pub v_dips    : [[f32;NWORDS];NCHN], // voltage "dip" (time-dependent correction)
   pub v_inc     : [[f32;NWORDS];NCHN], // voltage increment (mV/ADC unit)
@@ -227,7 +227,7 @@ pub struct ReadoutBoardCalibrations {
   pub noi_data  : Vec::<RBEvent>,
 }
 
-impl ReadoutBoardCalibrations {
+impl RBCalibrations {
   // skip the first n cells for the 
   // voltage calibration. Historically,
   // this had been 2.
@@ -645,7 +645,7 @@ impl ReadoutBoardCalibrations {
   }
 }
 
-impl Serialization for ReadoutBoardCalibrations {
+impl Serialization for RBCalibrations {
   const SIZE            : usize = NCHN*NWORDS*4*8 + 4 + 1; 
   const HEAD            : u16   = 0xAAAA; // 43690 
   const TAIL            : u16   = 0x5555; // 21845 
@@ -695,19 +695,19 @@ impl Serialization for ReadoutBoardCalibrations {
   }
 }
 
-impl Default for ReadoutBoardCalibrations {
+impl Default for RBCalibrations {
   fn default() -> Self {
     Self::new(0)
   }
 }
 
-impl fmt::Display for ReadoutBoardCalibrations {
+impl fmt::Display for RBCalibrations {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     write!(f, "<ReadoutboardCalibrations: RB {}>", self.rb_id)
   } 
 }
 
-impl From<&Path> for ReadoutBoardCalibrations {
+impl From<&Path> for RBCalibrations {
   
   /// Read an asci text file with calibration constants.
   fn from(path : &Path) -> Self {

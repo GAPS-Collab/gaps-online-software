@@ -30,7 +30,7 @@ use indicatif::{ProgressBar, ProgressStyle};
 
 use tof_dataclasses::manifest as mf;
 use tof_dataclasses::constants::NWORDS;
-use tof_dataclasses::calibrations::ReadoutBoardCalibrations;
+use tof_dataclasses::calibrations::RBCalibrations;
 use tof_dataclasses::packets::{TofPacket,
                                PacketType,
                                PaddlePacket};
@@ -754,7 +754,7 @@ pub fn readoutboard_commander(cmd : Receiver<TofCommand>){
 /// json file
 pub fn waveform_analysis(event         : &RBEvent,
                          readoutboard  : &mf::ReadoutBoard,
-                         calibration   : &ReadoutBoardCalibrations)
+                         calibration   : &RBCalibrations)
                          // settiungs will be future extension
                          //settings      : &HashMap<String, f32>) 
 -> Result<Vec<PaddlePacket>, AnalysisError> {
@@ -814,8 +814,8 @@ pub fn waveform_analysis(event         : &RBEvent,
                             event.header.stop_cell as usize,
                             &mut all_times[ch]);
   }
-  match ReadoutBoardCalibrations::spike_cleaning(&mut all_voltages,
-                                                 event.header.stop_cell) {
+  match RBCalibrations::spike_cleaning(&mut all_voltages,
+                                       event.header.stop_cell) {
     Err(err) => {
       error!("Spike cleaning failed! Err {err}");
     }
