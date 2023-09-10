@@ -26,8 +26,8 @@ pub struct LocalTriggerBoard {
 }
 
 impl LocalTriggerBoard {
-  pub fn new() -> LocalTriggerBoard {
-    LocalTriggerBoard {
+  pub fn new() -> Self {
+    Self {
       ltb_id         : 0,
       ltb_dsi        : 0,
       ltb_j          : 0,
@@ -65,8 +65,8 @@ impl LocalTriggerBoard {
 }
 
 impl Default for LocalTriggerBoard {
-  fn default() -> LocalTriggerBoard {
-      LocalTriggerBoard::new()
+  fn default() -> Self {
+      Self::new()
   }
 }
 
@@ -74,16 +74,16 @@ impl fmt::Display for LocalTriggerBoard {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     write!(f, 
 "<LocalTriggerBoard:
-      ID  : {}
-      DSI : {}
-      J   : {}
-      CH/RBID MAP {:?}
-      CH/RBCH_MAP {:?}>",
-      self.ltb_id,
-      self.ltb_dsi,
-      self.ltb_j,
-      self.ltb_ch_rb_id,
-      self.ltb_ch_rb_ch)
+   ID  : {}
+   DSI : {}
+   J   : {}
+   CH/RBID MAP {:?}
+   CH/RBCH_MAP {:?}>",
+           self.ltb_id,
+           self.ltb_dsi,
+           self.ltb_j,
+           self.ltb_ch_rb_id,
+           self.ltb_ch_rb_ch)
   }
 }
 
@@ -310,8 +310,8 @@ pub struct Panel {
 }
 
 impl Panel {
-  pub fn new() -> Panel {
-    Panel {
+  pub fn new() -> Self {
+    Self {
       panel_id           : 0,
       smallest_paddle_id : 0,
       n_paddles          : 0
@@ -320,8 +320,8 @@ impl Panel {
 }
 
 impl Default for Panel {
-  fn default() -> Panel {
-    Panel::new()
+  fn default() -> Self {
+    Self::new()
   }
 }
 
@@ -347,8 +347,8 @@ pub struct Paddle {
 
 impl Paddle {
 
-  pub fn new() -> Paddle {
-    Paddle {
+  pub fn new() -> Self {
+    Self {
       paddle_id      : 0,
       volume_id      : 0,
       height         : 0.0,
@@ -362,8 +362,8 @@ impl Paddle {
 }
 
 impl Default for Paddle {
-  fn default() -> Paddle {
-    Paddle::new()
+  fn default() -> Self {
+    Self::new()
   }
 }
 
@@ -421,11 +421,10 @@ pub struct PaddleEnd {
 
 impl PaddleEnd {
   pub fn new(paddle_id : u8, end : PaddleEndIdentifier, loc : PaddleEndLocation) 
-    -> PaddleEnd {
-    let mut pe = PaddleEnd {
+    -> Self {
+    let mut pe = Self {
       paddle_id     : paddle_id,
       paddle_end_id : 0,
-
       end           : end, 
       end_location  : loc,
       panel_id      : 0, 
@@ -458,8 +457,8 @@ impl PaddleEnd {
 }
 
 impl Default for PaddleEnd {
-  fn default() -> PaddleEnd {
-    PaddleEnd::new(0,PaddleEndIdentifier::A, PaddleEndLocation::PositiveX)
+  fn default() -> Self {
+    Self::new(0,PaddleEndIdentifier::A, PaddleEndLocation::PositiveX)
   }
 }
 
@@ -518,8 +517,8 @@ pub struct RAT {
 }
 
 impl RAT {
-  pub fn new() -> RAT {
-    RAT {  
+  pub fn new() -> Self {
+    Self {  
       rat_id                    : 0,
       pb_id                     : 0,
       rb1_id                    : 0,
@@ -531,8 +530,8 @@ impl RAT {
 }
 
 impl Default for RAT {
-  fn default() -> RAT {
-    RAT::new()
+  fn default() -> Self {
+    Self::new()
   }
 }
 
@@ -544,10 +543,10 @@ impl fmt::Display for RAT {
 
 #[derive(Clone, Debug)]
 pub struct ReadoutBoard {
-  pub rb_id         : u8,  
-  pub dna           : u64, 
-  pub port          : u16, 
-  pub ip_address    : Ipv4Addr,
+  pub rb_id             : u8,  
+  pub dna               : u64, 
+  pub port              : u16, 
+  pub ip_address        : Ipv4Addr,
   //pub ip_address       = models.GenericIPAddressField(unique=True)
   //pub mac_address      = models.CharField(max_length=11, unique=True, null=True)
   channel_to_paddle_end_id : [u16;8],
@@ -556,14 +555,12 @@ pub struct ReadoutBoard {
 }
 
 impl ReadoutBoard {
-  pub fn new() -> ReadoutBoard {
-    ReadoutBoard {
+  pub fn new() -> Self {
+    Self {
       rb_id         : 0,  
       dna           : 0, 
       port          : 0, 
       ip_address    : Ipv4Addr::new(0,0,0,0),
-      //b ip_address  0  = models.GenericIPAddressField(unique=True)
-      //b mac_address 0  = models.CharField(max_length=11, unique=True, null=True)
       channel_to_paddle_end_id : [0;8],
       calib_file    : String::from(""),
       trig_ch_mask  : [false;8],
@@ -666,8 +663,8 @@ impl ReadoutBoard {
 }
 
 impl Default for ReadoutBoard {
-  fn default() -> ReadoutBoard {
-    ReadoutBoard::new()
+  fn default() -> Self {
+    Self::new()
   }
 }
 
@@ -675,13 +672,13 @@ impl fmt::Display for ReadoutBoard {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { 
     write!(f,
 "<ReadoutBoard:
-      ID                :  {}
-      DNA               :  {} 
-      PORT              :  {} 
-      IP                :  {}
-      CALIBRATION FILE  :  {}
-      CHANNEL/PADDLE END:  {:?}
-      TRIG_CH_MASK      :  {:?}>",
+    ID                :  {}
+    DNA               :  {} 
+    PORT              :  {} 
+    IP                :  {}
+    CALIBRATION FILE  :  {}
+    CHANNEL/PADDLE END:  {:?}
+    TRIG_CH_MASK      :  {:?}>",
       self.rb_id,
       self.dna,
       self.port,
