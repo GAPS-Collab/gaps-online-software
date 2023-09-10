@@ -22,9 +22,9 @@ impl fmt::Display for DataFormat {
 
 impl DataFormat {
   pub const UNKNOWN               : u8 = 0;
-  pub const DEFAULT               : u8 = 40;
-  pub const HEADERONLY            : u8 = 50;
-  pub const MEMORYVIEW            : u8 = 60;
+  pub const DEFAULT               : u8 = 10;
+  pub const HEADERONLY            : u8 = 20;
+  pub const MEMORYVIEW            : u8 = 30;
 
   pub fn to_u8(&self) -> u8 {
     let result : u8;

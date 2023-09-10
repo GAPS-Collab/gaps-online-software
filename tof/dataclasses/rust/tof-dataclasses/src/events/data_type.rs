@@ -10,6 +10,10 @@ pub enum DataType {
   TimingCalibration,
   Noi,
   Physics,
+  RBTriggerPeriodic,
+  RBTriggerPoisson,
+  MTBTriggerPoisson,
+  // future extension for different trigger settings!
   Unknown,
 }
 
@@ -26,6 +30,9 @@ impl DataType {
   pub const TIMINGCALIBRATION     : u8 = 20;
   pub const NOI                   : u8 = 30;
   pub const PHYSICS               : u8 = 40;
+  pub const RBTRIGGERPERIODIC     : u8 = 50;
+  pub const RBTRIGGERPOISSON      : u8 = 60;
+  pub const MTBTRIGGERPOISSON     : u8 = 70;
 
   pub fn to_u8(&self) -> u8 {
     let result : u8;
@@ -44,6 +51,15 @@ impl DataType {
       }
       DataType::Physics => {
         result = DataType::PHYSICS;
+      }
+      DataType::MTBTriggerPoisson => {
+        result = DataType::MTBTRIGGERPOISSON;
+      }
+      DataType::RBTriggerPoisson => {
+        result = DataType::RBTRIGGERPOISSON;
+      }
+      DataType::RBTriggerPeriodic => {
+        result = DataType::RBTRIGGERPERIODIC;
       }
     }
     result
@@ -66,6 +82,15 @@ impl DataType {
       }
       DataType::PHYSICS => {
         result = DataType::Physics;
+      }
+      DataType::MTBTRIGGERPOISSON => {
+        result = DataType::MTBTriggerPoisson;
+      }
+      DataType::RBTRIGGERPOISSON => {
+        result = DataType::RBTriggerPoisson;
+      }
+      DataType::RBTRIGGERPERIODIC => {
+        result = DataType::RBTriggerPeriodic;
       }
       _ => {
         error!("Unknown DataType {}!", code);
@@ -96,6 +121,15 @@ impl DataType {
       DataType::Physics => {
         repr = String::from("Physics");
       }
+      DataType::MTBTriggerPoisson => {
+        repr = String::from("MTBTriggerPoisson");
+      }
+      DataType::RBTriggerPoisson => {
+        repr = String::from("RBTriggerPoisson");
+      }
+      DataType::RBTriggerPeriodic => {
+        repr = String::from("RBTriggerPeriodic");
+      }
     }
     repr
   }
@@ -109,6 +143,9 @@ fn test_data_type() {
   type_codes.push(DataType::TIMINGCALIBRATION); 
   type_codes.push(DataType::NOI); 
   type_codes.push(DataType::PHYSICS); 
+  type_codes.push(DataType::MTBTRIGGERPOISSON); 
+  type_codes.push(DataType::RBTRIGGERPERIODIC); 
+  type_codes.push(DataType::RBTRIGGERPOISSON); 
   for tc in type_codes.iter() {
     assert_eq!(*tc,DataType::to_u8(&DataType::from_u8(tc)));  
   }
