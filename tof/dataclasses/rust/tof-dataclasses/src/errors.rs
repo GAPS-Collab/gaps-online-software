@@ -9,6 +9,26 @@ use std::fmt;
 ////////////////////////////////////////
 
 #[derive(Debug, Copy, Clone)]
+pub enum CalibrationError {
+    EmptyInputData
+}
+
+impl fmt::Display for CalibrationError {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let disp : String;
+    match self {
+      CalibrationError::EmptyInputData     => {disp = String::from("EmptyInputData");},
+    }
+    write!(f, "<CalibrationError : {}>", disp)
+  }
+}
+
+impl Error for CalibrationError {
+}
+
+////////////////////////////////////////
+
+#[derive(Debug, Copy, Clone)]
 pub enum EventError {
     EventIdMismatch
 }

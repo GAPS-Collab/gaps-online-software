@@ -1,50 +1,427 @@
-//! Work with calibration files
+//! The ReadoutBoardCalibration is 
+//! the first stage in a 3 stage 
+//! calibration process for the tof
 //!
-//! Read out calibration files.
-//! 
-//! The `Calibration` class then 
-//! holds the results for a single 
-//! channel
+//! It converts adc/bin data for the 
+//! individual waveforms into mV/ns.
 //!
+//! This has to be done individually 
+//! per board and is an automated 
+//! process.
 //!
-//!
-//!
-//!
-//!
-
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
 use std::path::Path;
 use std::fmt;
 
 use crate::constants::{NWORDS, NCHN};
-use crate::errors::WaveformError;
+use crate::errors::{WaveformError,
+                    CalibrationError};
 use crate::serialization::{Serialization,
                            parse_u16,
                            parse_f32,
                            SerializationError};
+use crate::events::RBEvent;
+
+//extern crate statrs;
+//use statrs::statistics::Median;
+
+// FIXME -fix the test!
+//#[cfg(feature = "random")] 
+//use crate::FromRandom;
+//#[cfg(feature = "random")]
+//extern crate rand;
+//#[cfg(feature = "random")]
+//use rand::Rng;
+
+
+/***********************************/
+
+#[derive(Debug, Copy, Clone)]
+enum Edge {
+  Rising,
+  Falling,
+  Average
+}
+
 
 /***********************************/
 
 // helper
 fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
 where P: AsRef<Path>, {
-    let file = File::open(filename)?;
-    Ok(io::BufReader::new(file).lines())
+  let file = File::open(filename)?;
+  Ok(io::BufReader::new(file).lines())
 }
 
 /***********************************/
 
-#[derive(Copy, Clone, Debug)]
+fn find_zero_crossings(trace: &Vec<f32>) -> Vec<usize> {
+  let mut zero_crossings = Vec::new();
+  for i in 1..trace.len() {
+    if (trace[i - 1] >= 0.0 && trace[i] < 0.0) || (trace[i - 1] < 0.0 && trace[i] >= 0.0) {
+      zero_crossings.push(i);
+    }
+  }
+  zero_crossings
+}
+
+/***********************************/
+
+fn get_periods(trace   : &Vec<f32>,
+               nperiod : usize,
+               edge    : &Edge) -> (Vec<usize>, Vec<f32>) {
+  let mut trace_c = trace.clone();
+  let mut zcs = Vec::<usize>::new();
+  let periods = Vec::<f32>::new();
+  let firstbin : usize = 20;
+  let nskip : f32 = 0.0;
+  let lastbin = firstbin + (nperiod as f32 * 900.0/nperiod as f32).floor() as usize;
+  let median_val = median(&trace_c);
+  for k in 0..trace_c.len() {
+    trace_c[k] -= median_val;
+  }
+  zcs = find_zero_crossings(&trace_c);
+  let mut zcs_nskip = Vec::<usize>::new();
+  for k in 0..zcs.len() {
+    if zcs[k] > nskip as usize {
+      zcs_nskip[k] = zcs[k];
+    }
+    match edge {
+      Edge::Rising => {
+      }
+      Edge::Falling => {
+      }
+      _ => ()
+    }
+  }
+  zcs = zcs_nskip;
+  (zcs, periods)
+}
+
+/***********************************/
+
+fn mean(input: &Vec<f32>) -> f32 {
+  if input.len() == 0 {
+    error!("Vector is empty, can not calculate median!");
+    return f32::NAN;
+  }
+  let n_entries = input.len() as f32;
+  let mut sum : f32 = 0.0;
+  for k in input.iter() {
+    sum += k;
+  }
+  sum / n_entries
+}
+
+/***********************************/
+
+fn median(input: &Vec<f32>) -> f32 {
+  let mut data = input.clone();
+  
+  let len = data.len();
+  if len == 0 {
+    error!("Vector is empty, can not calculate median!");
+    return f32::NAN;
+  }
+  data.sort_by(|a, b| a.partial_cmp(b).unwrap());
+
+  if len % 2 == 0 {
+    // If the vector has an even number of elements, calculate the average of the middle two
+    let mid = len / 2;
+    (data[mid - 1] + data[mid]) / 2.0
+  } else {
+    // If the vector has an odd number of elements, return the middle element
+    let mid = len / 2;
+    data[mid]
+  }
+}
+
+/***********************************/
+
+/// ChatGPT
+fn calculate_column_medians(data: &Vec<Vec<f32>>) -> Vec<f32> {
+  // Get the number of columns (assuming all sub-vectors have the same length)
+  let num_columns = data[0].len();
+
+  // Initialize a Vec to store the column-wise medians
+  let mut column_medians: Vec<f32> = vec![0.0; num_columns];
+
+  // Calculate the median for each column across all sub-vectors, ignoring NaN values
+  for col in 0..num_columns {
+    let column_values: Vec<f32> = data.iter()
+      .map(|row| row[col])
+      .filter(|&value| !value.is_nan())
+      .collect();
+    column_medians[col] = median(&column_values);//.unwrap_or(f32::NAN);
+  }
+  column_medians
+}
+
+/***********************************/
+
+/// ChatGPT
+fn calculate_column_means(data: &Vec<Vec<f32>>) -> Vec<f32> {
+  // Get the number of columns (assuming all sub-vectors have the same length)
+  let num_columns = data[0].len();
+  let mut column_means: Vec<f32> = vec![0.0; num_columns];
+
+  // Calculate the median for each column across all sub-vectors, ignoring NaN values
+  for col in 0..num_columns {
+    let column_values: Vec<f32> = data.iter()
+      .map(|row| row[col])
+      .filter(|&value| !value.is_nan())
+      .collect();
+    column_means[col] = mean(&column_values);//.unwrap_or(f32::NAN);
+  }
+  column_means
+}
+
+/***********************************/
+
+fn roll<T: Clone>(vec: &mut Vec<T>, shift: isize) {
+  let len = vec.len() as isize;
+  
+  // Calculate the effective shift by taking the remainder of the shift
+  // operation with the length of the vector to ensure it's within bounds.
+  let effective_shift = (shift % len + len) % len;
+  
+  // If the shift is zero, there's nothing to do.
+  if effective_shift == 0 {
+    return;
+  }
+  
+  // Clone the vector and clear it.
+  let temp = vec.clone();
+  vec.clear();
+  
+  // Split the vector into two parts and swap them to achieve the roll effect.
+  if effective_shift > 0 {
+    let (left, right) = temp.split_at(temp.len() - effective_shift as usize);
+    vec.extend_from_slice(right);
+    vec.extend_from_slice(left);
+  } else {
+    let (left, right) = temp.split_at(-effective_shift as usize);
+    vec.extend_from_slice(right);
+    vec.extend_from_slice(left);
+  }
+}
+
+/***********************************/
+
+#[derive(Debug, Clone)]
 pub struct ReadoutBoardCalibrations {
   pub v_offsets : [[f32;NWORDS];NCHN], // voltage offset
   pub v_dips    : [[f32;NWORDS];NCHN], // voltage "dip" (time-dependent correction)
   pub v_inc     : [[f32;NWORDS];NCHN], // voltage increment (mV/ADC unit)
   pub tbin      : [[f32;NWORDS];NCHN], // cell width (ns)
-  pub rb_id     : u8
+  pub rb_id     : u8,
+
+  // extension - keep also all the event data 
+  // this calibration was created with
+  pub d_v        : f32, // input voltage difference between 
+                        // vcal_data and noi data
+
+  pub vcal_data : Vec::<RBEvent>,
+  pub tcal_data : Vec::<RBEvent>,
+  pub noi_data  : Vec::<RBEvent>,
 }
 
 impl ReadoutBoardCalibrations {
+  // skip the first n cells for the 
+  // voltage calibration. Historically,
+  // this had been 2.
+  pub const NSKIP  :  usize = 2;
+  pub const SINMAX :  usize = 60; // ~1000 ADC units
+  pub const DVCUT  :  f32   = 15.0; // ns away that should be considered
+  pub const NOMINALFREQ : f32 = 2.0; // nominal sampling frequency,
+                                     // GHz
+  /// Calculate the offset and dips calibration constants 
+  /// for input data. 
+  ///
+  /// # Return:
+  ///
+  /// offsets, dips
+  fn voltage_offset_and_dips(input_vcal_data : &Vec<RBEvent>) 
+  -> Result<(Vec<Vec<f32>>, Vec<Vec<f32>>), CalibrationError> {
+    if input_vcal_data.len() == 0 {
+      return Err(CalibrationError::EmptyInputData);
+    }
+    let mut all_v_offsets = Vec::<Vec::<f32>>::new();
+    let mut all_v_dips = Vec::<Vec::<f32>>::new();
+    for _ in 0..NCHN {
+      let empty_vec_off : Vec<f32> = vec![0.0;NWORDS];
+      all_v_offsets.push(empty_vec_off);  
+      let empty_vec_dip : Vec<f32> = vec![0.0;NWORDS];
+      all_v_dips.push(empty_vec_dip);  
+    }
+
+    // we temporarily get the adc traces
+    // traces are [channel][event][adc_cell]
+    let mut traces = Vec::<Vec::<Vec<f32>>>::with_capacity(9);
+    for ch in 0..NCHN {
+      for (n, ev) in input_vcal_data.iter().enumerate() {
+        let data = ev.get_adc_ch(ch as u8 + 1);
+        // mark the first 2 bins as nan
+        for _ in 0..Self::NSKIP {
+          traces[ch][n].push(f32::NAN);
+        }
+        for val in data.iter().skip(Self::NSKIP) {
+          traces[ch][n].push(*val as f32);
+        }// the traces are filled and the first 2 bins
+        // marked with nan, now need to get "rolled over",
+        // so that they start with the stop cell
+        roll(&mut traces[ch][n],
+             input_vcal_data[n].header.stop_cell as isize); 
+      }// first loop over events done
+      
+      let v_offsets = calculate_column_medians(&traces[ch]);
+      let mut v_offsets_rolled = v_offsets.clone();
+      // fill these in the prepared array structure
+      for k in 0..v_offsets.len() {
+        all_v_offsets[ch][k] = v_offsets[k];
+      }
+      for (n, ev) in input_vcal_data.iter().enumerate() {
+        // now we roll the v_offsets back
+        roll(&mut v_offsets_rolled, -1*ev.header.stop_cell as isize);
+        for k in 0..traces[ch][n].len() {
+          traces[ch][n][k] -= v_offsets[k];
+        }
+      }
+      let v_dips = calculate_column_medians(&traces[ch]);
+      for k in 0..v_dips.len() {
+        if k < Self::NSKIP {
+          all_v_dips[ch][k] = 0.0;
+        } else {
+          all_v_dips[ch][k] = v_dips[k];
+        }
+      }
+    }
+    Ok((all_v_offsets, all_v_dips))
+  }
+  
+
+  fn timing_calibration(input_tcal_data : &Vec<RBEvent>,
+                        edge : &Edge) 
+  -> Result<Vec<Vec<f32>>, CalibrationError> {
+    if input_tcal_data.len() == 0 {
+      error!("Input data for timing calibration is empty!");
+      return Err(CalibrationError::EmptyInputData);
+    }
+    let mut all_tcal = Vec::<Vec::<f32>>::new();
+    for _ in 0..NCHN {
+      let nfreq_vec : Vec<f32> = vec![1.0/Self::NOMINALFREQ;NWORDS];
+      all_tcal.push(nfreq_vec);  
+    }
+
+    // we temporarily get the adc traces
+    // traces are [channel][event][adc_cell]
+    let mut traces  = Vec::<Vec::<Vec<f32>>>::with_capacity(9);
+    let mut dtraces = Vec::<Vec::<Vec<f32>>>::with_capacity(9); 
+    for ch in 0..NCHN {
+      for (n, ev) in input_tcal_data.iter().enumerate() {
+        let data = ev.get_adc_ch(ch as u8 + 1);
+        // mark the first 2 bins as nan
+        for _ in 0..Self::NSKIP {
+          traces[ch][n].push(f32::NAN);
+        }
+        for val in data.iter().skip(Self::NSKIP) {
+          if *val as usize > Self::SINMAX {
+            traces[ch][n].push(f32::NAN);
+          } else {
+            traces[ch][n].push(*val as f32);
+          }
+        }// the traces are filled and the first 2 bins
+        // marked with nan, now need to get "rolled over",
+        // so that they start with the stop cell
+        let mut drolled_traces = traces.clone();
+        roll(&mut drolled_traces[ch][n],
+             input_tcal_data[n].header.stop_cell as isize); 
+        //for ch in 0..NCHN { 
+        //  for ev in 0..traces[ch].len() {
+        for k in 1..traces[ch][n].len() {
+          let mut dval = drolled_traces[ch][n][k] - drolled_traces[ch][n][k-1];      
+          match edge {
+            Edge::Rising | 
+            Edge::Average => {
+              if dval < 0.0 {
+                dval = f32::NAN;
+              }
+            },
+            Edge::Falling => {
+              if dval > 0.0 {
+                dval = f32::NAN;
+              }
+            },
+          }
+          dval = f32::abs(dval);
+          // FIXME: check the 15
+          if f32::abs(dval - 15.0) > Self::DVCUT {
+            dval = f32::NAN;
+          }
+          dtraces[ch][n][k-1] = dval;      
+        } 
+      } // end loop over events
+      let col_means = calculate_column_means(&dtraces[ch]);
+      let ch_mean   = mean(&col_means);
+      for k in 0..all_tcal[ch].len() {
+        all_tcal[ch][k] *= col_means[k]/ch_mean;  
+      }
+    } // end loop over channels
+    Ok(all_tcal)
+  }
+
+  /// Call to the calibration routine, using
+  /// the set input data
+  pub fn calibrate(&mut self) -> Result<(), CalibrationError>{
+    if self.vcal_data.len() == 0
+    || self.tcal_data.len() == 0 
+    || self.noi_data.len() == 0 {
+      return Err(CalibrationError::EmptyInputData);
+    }
+    info!("Starting voltage calibration!");
+    let (v_offsets_high, v_dips_high) 
+        = Self::voltage_offset_and_dips(&self.vcal_data)?;
+    let (_v_offsets_low, v_dips_low) 
+        = Self::voltage_offset_and_dips(&self.noi_data)?;
+    // which of the v_offsets do we actually use?
+    for ch in 0..NCHN {
+      for k in 0..NWORDS {
+        self.v_offsets[ch][k] = v_offsets_high[ch][k];
+        self.v_dips[ch][k]    = v_dips_high[ch][k];
+        self.v_inc[ch][k]     = self.d_v/(v_dips_high[ch][k] - v_dips_low[ch][k]);
+      }
+    }
+    // at this point, the voltage calibration is complete
+    info!("Voltage calibration complete!");
+    let mut edge = Edge::Average;
+    let mut tcal_av = Self::timing_calibration(&self.tcal_data, &edge)?;
+    if matches!(edge, Edge::Average) {
+      edge = Edge::Falling;
+      let tcal_falling = Self::timing_calibration(&self.tcal_data, &edge)?;
+      for ch in 0..NCHN {
+        for k in 0..tcal_av.len() {
+          tcal_av[ch][k] += tcal_falling[ch][k];
+          tcal_av[ch][k] /= 2.0;
+        }
+      }
+      // for further calibration procedure
+      edge = Edge::Rising;
+    }
+    // another set of constants
+    //nevents,nchan,tracelen = gbf.traces.shape
+    let damping       : f32 = 0.1;
+    let corr_limit    : f32 = 0.05;
+    //let n_iter_period : f32 = 1000; //#500 or nevents #
+    for n in 0..self.tcal_data.len() {
+      let stop_cell = self.tcal_data[n].header.stop_cell;
+    } // end loop over n_iter_period
+    //#nIterSlope  = 500
+    //letn_correct = np.zeros(nchan,dtype=int)
+    //nperiod = gbf.nominalFreq/calfreq
+
+    Ok(())
+  }
 
   /// Apply the spike cleaning to all channels
   pub fn spike_cleaning(voltages  : &mut Vec<Vec<f32>>,
@@ -230,13 +607,17 @@ impl ReadoutBoardCalibrations {
     }
   }
 
-  pub fn new(rb_id : u8) -> ReadoutBoardCalibrations {
-    ReadoutBoardCalibrations {
+  pub fn new(rb_id : u8) -> Self {
+    Self {
       v_offsets : [[0.0;NWORDS];NCHN], 
       v_dips    : [[0.0;NWORDS];NCHN], 
       v_inc     : [[0.0;NWORDS];NCHN], 
       tbin      : [[0.0;NWORDS];NCHN],
       rb_id     : rb_id,
+      d_v       : 0.0,
+      vcal_data : Vec::<RBEvent>::new(),
+      tcal_data : Vec::<RBEvent>::new(),
+      noi_data  : Vec::<RBEvent>::new()
     }
   }
 
@@ -292,7 +673,7 @@ impl Serialization for ReadoutBoardCalibrations {
         rb_cal.tbin[ch][k]      = value;
       }
     }
-    if parse_u16(bytestream, pos) != ReadoutBoardCalibrations::TAIL {
+    if parse_u16(bytestream, pos) != Self::TAIL {
       return Err(SerializationError::TailInvalid {});
     }
     Ok(rb_cal)
@@ -315,8 +696,8 @@ impl Serialization for ReadoutBoardCalibrations {
 }
 
 impl Default for ReadoutBoardCalibrations {
-  fn default() -> ReadoutBoardCalibrations {
-    ReadoutBoardCalibrations::new(0)
+  fn default() -> Self {
+    Self::new(0)
   }
 }
 
@@ -329,8 +710,8 @@ impl fmt::Display for ReadoutBoardCalibrations {
 impl From<&Path> for ReadoutBoardCalibrations {
   
   /// Read an asci text file with calibration constants.
-  fn from(path : &Path) -> ReadoutBoardCalibrations {
-    let mut rb_cal = ReadoutBoardCalibrations::new(0);
+  fn from(path : &Path) -> Self {
+    let mut rb_cal = Self::new(0);
     rb_cal.get_id_from_filename(&path);
     debug!("Attempting to open file {}", path.display());
     let file = BufReader::new(File::open(path).expect("Unable to open file {}"));
@@ -408,3 +789,31 @@ impl From<&Path> for ReadoutBoardCalibrations {
 }
 
 
+// This test together with the 
+// roll function comes directly
+// from ChatGPT
+// FIXME - currently it does not 
+// work
+//#[test]
+//fn roll_with_random_vectors() {
+//    const NUM_TESTS: usize = 1000;
+//    const VECTOR_SIZE: usize = 10;
+//
+//    let mut rng = thread_rng();
+//
+//    for _ in 0..NUM_TESTS {
+//        let mut original_vec: Vec<i32> = (0..VECTOR_SIZE).collect();
+//        let shift = rng.gen_range(-VECTOR_SIZE as isize, VECTOR_SIZE as isize);
+//
+//        let mut rolled_vec = original_vec.clone();
+//        roll(&mut rolled_vec, shift);
+//
+//        // Verify that the original and rolled vectors have the same elements
+//        // when considering rotation (modulo VECTOR_SIZE).
+//        for i in 0..VECTOR_SIZE {
+//            let original_idx = (i as isize - shift + VECTOR_SIZE as isize) % VECTOR_SIZE as isize;
+//            let expected_element = original_vec[original_idx as usize];
+//            assert_eq!(rolled_vec[i], expected_element);
+//        }
+//    }
+//}
