@@ -1,6 +1,10 @@
 # OMILU series
 
 ## 0.7.0 
+* DataFormat : enum helper to define shape
+  of RB event data
+* DataType : enum helper to define purpose of 
+  dataset
 * Renames RBBinaryDump to RBMemoryView, to align it 
   with development in C++ version of dataclasses
 * Removes warnings

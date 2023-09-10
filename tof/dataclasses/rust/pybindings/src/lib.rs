@@ -23,6 +23,14 @@ fn convert_pyarray1(arr : &PyArray1<f32>) -> Vec<f32> {
 
 #[pyfunction]
 #[pyo3(name="cfd_simple")]
+/// Find the peak onset time based on a cfd
+/// "Constant fraction discrimination" algorithm
+///
+/// # Arguments
+///
+/// * start_peak : bin
+/// * end_peak   : bin
+/// * cfd_frac   : 0.2 is the typical default
 pub fn wrap_cfd_simple(voltages    : &PyArray1<f32>,
                        nanoseconds : &PyArray1<f32>,
                        cfd_frac    : f32,
@@ -196,5 +204,7 @@ fn rust_dataclasses(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(wrap_find_peaks,m)?)?;
     m.add_function(wrap_pyfunction!(wrap_find_peaks_zscore,m)?)?;
     m.add_function(wrap_pyfunction!(wrap_integrate,m)?)?;
+    m.add_function(wrap_pyfunction!(wrap_interpolate_time,m)?)?;
+    m.add_function(wrap_pyfunction!(wrap_cfd_simple,m)?)?;
     Ok(())
 }
