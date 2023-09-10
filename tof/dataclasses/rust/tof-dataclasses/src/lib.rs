@@ -28,7 +28,6 @@ pub mod run;
 pub mod io;
 pub mod analysis;
 
-extern crate pretty_env_logger;
 #[macro_use] extern crate log;
 
 /// Create structures filled with random 
