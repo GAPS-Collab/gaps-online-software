@@ -32,6 +32,8 @@ use crate::events::{RBEventPayload,
                     MasterTriggerEvent,
                     MasterTofEvent};
 
+use crate::calibrations::RBCalibrations;
+
 pub enum PacketQuality {
   Perfect,
   Good,
@@ -248,27 +250,6 @@ impl TofPacket {
     }
   }
 
-  pub fn to_bytestream(&self) 
-    -> Vec<u8> {
-    if self.is_multi_packet {
-      todo!("Can not deal with multipackets right now!");
-    }
-    let mut bytestream = Vec::<u8>::with_capacity(6 + self.payload.len());
-    bytestream.extend_from_slice(&TofPacket::HEAD.to_le_bytes());
-    let p_type = PacketType::as_u8(&self.packet_type);
-    bytestream.push(p_type);
-    // payload size of 32 bit accomodates up to 4 GB packet
-    // a 16 bit size would only hold 65k, which might be not
-    // good enough if we sent multiple events in a batch in 
-    // the same TofPacket (in case we do that)
-    let payload_len = self.payload.len() as u32;
-    //let foo = &payload_len.to_le_bytes();
-    //debug!("TofPacket binary payload: {foo:?}");
-    bytestream.extend_from_slice(&payload_len.to_le_bytes());
-    bytestream.extend_from_slice(self.payload.as_slice());
-    bytestream.extend_from_slice(&TofPacket::TAIL.to_le_bytes());
-    bytestream
-  }
 
   //impl from_bytes(stream : &[u8], start_pos : usize) {
   //  -> Result<TofPacket, SerializationError> {
@@ -284,6 +265,15 @@ impl From<&MasterTofEvent> for TofPacket {
     let mut tp = Self::new();
     tp.packet_type = PacketType::TofEvent;
     tp.payload = event.to_bytestream();
+    tp
+  }
+}
+
+impl From<&RBCalibrations> for TofPacket {
+  fn from(calib : &RBCalibrations) -> Self {
+    let mut tp = Self::new();
+    tp.packet_type = PacketType::RBCalibration;
+    tp.payload = calib.to_bytestream();
     tp
   }
 }
@@ -388,6 +378,28 @@ impl Serialization for TofPacket {
     tp.packet_type = packet_type;
     tp.payload     = payload;
     Ok(tp) 
+  }
+  
+  fn to_bytestream(&self) 
+    -> Vec<u8> {
+    if self.is_multi_packet {
+      todo!("Can not deal with multipackets right now!");
+    }
+    let mut bytestream = Vec::<u8>::with_capacity(6 + self.payload.len());
+    bytestream.extend_from_slice(&TofPacket::HEAD.to_le_bytes());
+    let p_type = PacketType::as_u8(&self.packet_type);
+    bytestream.push(p_type);
+    // payload size of 32 bit accomodates up to 4 GB packet
+    // a 16 bit size would only hold 65k, which might be not
+    // good enough if we sent multiple events in a batch in 
+    // the same TofPacket (in case we do that)
+    let payload_len = self.payload.len() as u32;
+    //let foo = &payload_len.to_le_bytes();
+    //debug!("TofPacket binary payload: {foo:?}");
+    bytestream.extend_from_slice(&payload_len.to_le_bytes());
+    bytestream.extend_from_slice(self.payload.as_slice());
+    bytestream.extend_from_slice(&TofPacket::TAIL.to_le_bytes());
+    bytestream
   }
 }
 
