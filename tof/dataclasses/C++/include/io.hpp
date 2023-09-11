@@ -1,6 +1,8 @@
 #ifndef TOFIO_H_INCLUDED
 #define TOFIO_H_INCLUDED
 
+#include <fstream>
+
 #include "events.h"
 #include "packets/tof_packet.h"
 #include "TOFCommon.h"
@@ -98,6 +100,26 @@ Vec<TofEvent> unpack_tofevents_from_tofpackets(const String filename);
 // * @param filename : Full path to binary file with TofEvents.
 // */
 //Vec<TofPacket> get_tofpackets(const String filename);
+
+namespace Gaps {
+
+  /// Read serialized TofPackets from 
+  /// a file and emit them as packets
+  class TofPacketReader {
+    public: 
+      TofPacketReader(String filename);
+      void process_chunk();
+      TofPacket get_next_packet();
+      String get_filename() const;
+    private:
+      String filename_;
+      usize  file_size_;
+      usize  nchunks_;
+      usize  current_pos_;
+      TofPacket last_packet_;
+      std::ifstream stream_file_;
+  };
+}
 
 
 #endif
