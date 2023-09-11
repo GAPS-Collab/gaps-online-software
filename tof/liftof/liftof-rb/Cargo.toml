@@ -41,12 +41,11 @@ memmap = "0.7"
 crossbeam-channel = "0.5"
 
 tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["random", "tofcontrol"]} 
-#tof-control = {git = "ssh://gaps@ucla-tof-computer:/home/gaps/takeruhayashi/tof-control" }
 tof-control = {path = "../../extern/tof-control", optional = true }
 zmq = "0.10.0"
 
 log = "0.4"
-pretty_env_logger = "0.4"
+env_logger = "0.10"
 
 local-ip-address = "0.5"
 clap = { version = "4.0", features = ["derive"] }
@@ -54,7 +53,6 @@ clap = { version = "4.0", features = ["derive"] }
 indicatif = ">=0.17.3"
 
 #libc = "0.2"
-libc = "0.2"
 signal-hook = "0.3"
 
 #[target.armv7-unknown-linux-gnueabi]
