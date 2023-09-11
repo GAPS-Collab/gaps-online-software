@@ -8,73 +8,13 @@
 
 namespace py = pybind11;
 
-bytestream wrap_encode_ushort(u16 value, u32 start_pos) {
-  bytestream stream;
-  for (size_t foo=0; foo<2; foo++) stream.push_back(0);
-  encode_ushort(value, stream, start_pos);
-  return stream;
-}
-
-/***********************************************/
-
-bytestream wrap_encode_ushort_rev(u16 value, size_t start_pos) {
-  bytestream stream;
-  for (size_t foo=0; foo<2; foo++) stream.push_back(0);
-  encode_ushort_rev(value, stream, start_pos);
-  return stream;
-}
-
-
-/***********************************************/
-
-bytestream wrap_u32_to_le_bytes(u32 value) {
-  bytestream stream;
-  for (size_t foo=0; foo<4; foo++) stream.push_back(0);
-  u32_to_le_bytes(value, stream, 0);
-  return stream;
-}
-
-/***********************************************/
-
-bytestream wrap_encode_uint32(u32 value, size_t start_pos) {
-  bytestream stream;
-  for (size_t foo=0; foo<4; foo++) stream.push_back(0);
-  encode_uint32(value, stream, start_pos);
-  return stream;
-}
-
-/***********************************************/
-
-bytestream wrap_encode_uint32_rev(u32 value, size_t start_pos) {
-  bytestream stream;
-  for (size_t foo=0; foo<4; foo++) stream.push_back(0);
-  encode_uint32_rev(value, stream, start_pos);
-  return stream;
-}
-
-/***********************************************/
-
-bytestream wrap_encode_uint64_rev(u64 value, size_t start_pos) {
-  bytestream stream;
-  for (size_t foo=0; foo<8; foo++) stream.push_back(0);
-  encode_uint64_rev(value, stream, start_pos);
-  return stream;
-}
-
-/***********************************************/
-
-bytestream wrap_encode_uint64(u64 value, size_t start_pos) {
-  bytestream stream;
-  for (size_t foo=0; foo<8; foo++) stream.push_back(0);
-  encode_uint64(value, stream, start_pos);
-  return stream;
-}
-
 /***********************************************/
 
 Vec<TofPacket> wrap_get_tofpackets_from_file(const String filename) {
   return get_tofpackets(filename);
 }
+
+/***********************************************/
 
 Vec<TofPacket> wrap_get_tofpackets_from_stream(const Vec<u8> &stream, u64 pos) {
   return get_tofpackets(stream, pos);
@@ -281,6 +221,8 @@ py::array_t<f32> wrap_rbcalibration_voltages_rbeventmemoryview(const RBCalibrati
   return to_nparray(volts);
 }
 
+/***********************************************/
+
 py::array_t<f32> wrap_rbcalibration_nanoseconds_rbevent(const RBCalibration& calib, const RBEvent& event, const u8 channel) {
   if (event.header.rb_id != calib.rb_id) {
     String message = "This is calibration for board " + std::to_string(calib.rb_id) + " but the event is from board " + std::to_string(event.header.rb_id);
@@ -290,6 +232,8 @@ py::array_t<f32> wrap_rbcalibration_nanoseconds_rbevent(const RBCalibration& cal
   Vec<f32> nanos = calib.nanoseconds(event, channel);
   return to_nparray(nanos);
 }
+
+/***********************************************/
 
 py::array_t<f32> wrap_rbcalibration_nanoseconds_rbeventmemoryview(const RBCalibration& calib, const RBEventMemoryView& event, const u8 channel) {
   if (event.id != calib.rb_id) {
@@ -301,6 +245,8 @@ py::array_t<f32> wrap_rbcalibration_nanoseconds_rbeventmemoryview(const RBCalibr
   Vec<f32> nanos = calib.nanoseconds(event, channel);
   return to_nparray(nanos);
 }
+
+/***********************************************/
 
 Vec<py::array_t<f32>> wrap_rbcalibration_voltages_allchan_rbevent(const RBCalibration& calib, const RBEvent& event, bool spike_cleaning) {
   if (event.header.rb_id != calib.rb_id) {

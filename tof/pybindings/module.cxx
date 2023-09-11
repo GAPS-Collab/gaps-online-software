@@ -374,7 +374,8 @@ PYBIND11_MODULE(gaps_tof, m) {
     
     py::class_<Gaps::TofPacketReader>(m, "TofPacketReader") 
       .def(py::init<String>())  
-      .def("get_next_packet", &Gaps::TofPacketReader::get_next_packet)
+      .def("get_next_packet", &Gaps::TofPacketReader::get_next_packet,
+                              "iterate over the packets and get the next packet from the file")
       .def("__repr__",        [](const Gaps::TofPacketReader &reader) {
                                   return "<TofPacketReader : "
                                   + reader.get_filename() + ">";
@@ -402,15 +403,15 @@ PYBIND11_MODULE(gaps_tof, m) {
       .value("Unknown"              ,TofCommand::Unknown) 
       .export_values();
 
-    py::class_<RBEventHeader>(m, "RBEventHeader")
+    py::class_<RBEventHeader>(m, "RBEventHeader", "The event header contains the event id, information about active channels, temperatures, trigger stop cells etc. Basically everythin except channel adc data.")
       .def(py::init())
-      .def("from_bytestream", &RBEventHeader::from_bytestream, "Deserialize from a list of bytes")
-      .def("extract_from_rbbinarydump", &RBEventHeader::extract_from_rbbinarydump, "Get header from full rbevent binary stream ('blob')")
-      .def("get_active_data_channels", &RBEventHeader::get_active_data_channels, "Get a list of active channels, excluding ch9. Channel9 will (usually) always be on, as long as a single data channel is switched on as well.")
-      .def("get_fpga_temp", &RBEventHeader::get_fpga_temp, "The FPGA temperature in C")
-      .def("get_drs_temp",  &RBEventHeader::get_drs_temp, "The DRS4 temperature in C, read out by software")
-      .def("get_clock_cycles_48bit", &RBEventHeader::get_clock_cycles_48bit, "The complete 48bit timestamp, derived from the RB clock (usually 33MHz)")
-      .def("get_n_datachan", &RBEventHeader::get_n_datachan)
+      .def("from_bytestream"             , &RBEventHeader::from_bytestream, "Deserialize from a list of bytes")
+      .def("extract_from_rbmemoryview"   , &RBEventHeader::extract_from_rbbinarydump, "Get header from full rbevent binary stream ('blob')")
+      .def("get_active_data_channels"    , &RBEventHeader::get_active_data_channels, "Get a list of active channels, excluding ch9. Channel9 will (usually) always be on, as long as a single data channel is switched on as well.")
+      .def("get_fpga_temp"               , &RBEventHeader::get_fpga_temp, "The FPGA temperature in C")
+      .def("get_drs_temp"                , &RBEventHeader::get_drs_temp, "The DRS4 temperature in C, read out by software")
+      .def("get_clock_cycles_48bit"      , &RBEventHeader::get_clock_cycles_48bit, "The complete 48bit timestamp, derived from the RB clock (usually 33MHz)")
+      .def("get_n_datachan"              , &RBEventHeader::get_n_datachan)
       //.def("get_timestamp_16_corrected",   &RBEventHeader::get_timestamp_16_corrected)
       .def_readonly("channel_mask"       , &RBEventHeader::channel_mask)   
       .def_readonly("stop_cell"          , &RBEventHeader::stop_cell   )   
@@ -453,7 +454,8 @@ PYBIND11_MODULE(gaps_tof, m) {
                                              "Get the ADC values for a specific channel. Channel ids go from 1-9",
                                              py::arg("channel"),
                                              pybind11::return_value_policy::reference_internal)
-        .def("from_bytestream"              ,&RBEvent::from_bytestream)
+        .def("from_bytestream"              ,&RBEvent::from_bytestream,
+                                             "Decode the RBEvent from a list of bytes")
     .def("__repr__",          [](const RBEvent &ev) {
                                  return rbevent_to_string(ev); 
                               }) 
@@ -845,10 +847,6 @@ PYBIND11_MODULE(gaps_tof, m) {
        .def_readonly("v_dips",     &RBCalibration::v_dips)
        .def_readonly("t_bin",      &RBCalibration::t_bin)
 
-       //.def("voltages"   (const RBEventMemoryView &event, const u8 channel) const;
-       //.def("nanoseconds"(const RBEventMemoryView &event, const u8 channel) const;
-       //.def("voltages"   (const RBEvent &event, const u8 channel) const;
-       //.def("nanoseconds",      static_cast<Vec<f32>(RBCalibration::*)(const RBEvent&, const u8)>(&RBCalibration::nanoseconds));
        .def("nanoseconds",         wrap_rbcalibration_nanoseconds_allchan_rbevent,
             "Apply timing calibration to adc values of all channels")
        .def("nanoseconds",         wrap_rbcalibration_nanoseconds_allchan_rbeventmemoryview,
