@@ -188,15 +188,15 @@ py::dict splice_readoutboard_datafile(const std::string filename) {
   vec_u64 timestamps = vec_u64();
   
   // channels, times
-  vec_vec_u16 t_1     = vec_vec_u16();
-  vec_vec_u16 t_2     = vec_vec_u16();
-  vec_vec_u16 t_3     = vec_vec_u16();
-  vec_vec_u16 t_4     = vec_vec_u16();
-  vec_vec_u16 t_5     = vec_vec_u16();
-  vec_vec_u16 t_6     = vec_vec_u16();
-  vec_vec_u16 t_7     = vec_vec_u16();
-  vec_vec_u16 t_8     = vec_vec_u16();
-  vec_vec_u16 t_9     = vec_vec_u16();
+  Vec<Vec<u16>> t_1     = Vec<Vec<u16>>();
+  Vec<Vec<u16>> t_2     = Vec<Vec<u16>>();
+  Vec<Vec<u16>> t_3     = Vec<Vec<u16>>();
+  Vec<Vec<u16>> t_4     = Vec<Vec<u16>>();
+  Vec<Vec<u16>> t_5     = Vec<Vec<u16>>();
+  Vec<Vec<u16>> t_6     = Vec<Vec<u16>>();
+  Vec<Vec<u16>> t_7     = Vec<Vec<u16>>();
+  Vec<Vec<u16>> t_8     = Vec<Vec<u16>>();
+  Vec<Vec<u16>> t_9     = Vec<Vec<u16>>();
   
   vec_vec_i16 adc_1     = vec_vec_i16();
   vec_vec_i16 adc_2     = vec_vec_i16();
@@ -327,98 +327,98 @@ vec_vec_f64 tbin_getter(const std::vector<Calibrations_t> cal)
     return tbins;
 }
 
-vec_vec_f32 apply_vcal_allchan_helper(u16 stop_cell,
-                                      Vec<Calibrations_t> cals,
-                                      Vec<Vec<i16>> adc) {
-  Vec<Vec<f32>> waveforms;
-  f32 waveform[NWORDS] = {0};
-  for (usize ch=0; ch<NCHN; ch++) {
-    apply_vcal(stop_cell,
-               adc[ch].data(),
-               cals[ch],
-               waveform);
-    i32 n = sizeof(waveform) / sizeof(waveform[0]);
-    waveforms.push_back(Vec<f32>(waveform, waveform + n));
-  }
-  return waveforms;
-}
-
-
-vec_vec_f32 apply_tcal_allchan_helper(u16 stop_cell,
-                                      Vec<Calibrations_t> cals){
-  vec_vec_f32 all_chan_tcal;
-  f32 times[NWORDS] = {0};
-  for (usize ch=0; ch<NCHN; ch++) {
-    apply_tcal(stop_cell, cals[ch], times);
-    i32 n = sizeof(times) / sizeof(times[0]);
-    all_chan_tcal.push_back(vec_f32(times, times+n));
-  }
-  return all_chan_tcal;
-}
-
-
-Vec<Vec<f32>> apply_tcal_helper(Vec<u16> stop_cells,
-                                Calibrations_t cal) {
-  f32 times[NWORDS] = {0};
-  Vec<Vec<f32>> result;
-  for (auto const &stop_cell : stop_cells) {  
-    apply_tcal(stop_cell, cal, times);
-    i32 n = sizeof(times) / sizeof(times[0]);
-    result.push_back(Vec<f32>(times, times+n));
-  }
-  return result;
-}
-
-
-
-Vec<Vec<f32>> apply_vcal_helper(Vec<u16> stop_cell,
-                                Calibrations_t cal,
-                                Vec<Vec<i16>> adc) {
-  f32 waveform[NWORDS] = {0};
-  Vec<Vec<f32>> result;
-  for (usize k=0; k<adc.size();k++) {
-    apply_vcal(stop_cell[k],
-               adc[k].data(),
-               cal,
-               waveform);
-    int n = sizeof(waveform) / sizeof(waveform[0]);
-    result.push_back(Vec<f32>(waveform, waveform + n));
-  }
-    //vec_f32 result = vec_f32(waveform, waveform + n);
-  
-  return result; 
-}
-
-vec_vec_f64 voltage_calibration_helper(const BlobEvt_t &evt,
-                                       std::vector<Calibrations_t> cal)
-{
-  vec_vec_f64 result;
-  for (size_t k=0; k<NCHN; k++) {
-    f64 trace_out[NWORDS];
-    u32 n = sizeof(trace_out)/sizeof(trace_out[0]);
-    VoltageCalibration(const_cast<short int*>(evt.ch_adc[k]),
-                       trace_out,
-                       evt.stop_cell,
-                       cal[k]);
-    result.push_back(std::vector<f64>(trace_out, trace_out + n));
-  }
-  return result;
-}
-
-vec_vec_f64 timing_calibration_helper(const BlobEvt_t &evt,
-                                                            std::vector<Calibrations_t> cal)
-{
-  vec_vec_f64 result;
-  for (size_t k=0; k<NCHN; k++) {
-    f64 times[NWORDS];
-    size_t n = sizeof(times)/sizeof(times[0]);
-    TimingCalibration(times,
-                      evt.stop_cell,
-                      cal[k]);
-    result.push_back(std::vector<double>(times, times + n));
-  }
-  return result;
-}
+//vec_vec_f32 apply_vcal_allchan_helper(u16 stop_cell,
+//                                      Vec<Calibrations_t> cals,
+//                                      Vec<Vec<i16>> adc) {
+//  Vec<Vec<f32>> waveforms;
+//  f32 waveform[NWORDS] = {0};
+//  for (usize ch=0; ch<NCHN; ch++) {
+//    apply_vcal(stop_cell,
+//               adc[ch].data(),
+//               cals[ch],
+//               waveform);
+//    i32 n = sizeof(waveform) / sizeof(waveform[0]);
+//    waveforms.push_back(Vec<f32>(waveform, waveform + n));
+//  }
+//  return waveforms;
+//}
+//
+//
+//vec_vec_f32 apply_tcal_allchan_helper(u16 stop_cell,
+//                                      Vec<Calibrations_t> cals){
+//  vec_vec_f32 all_chan_tcal;
+//  f32 times[NWORDS] = {0};
+//  for (usize ch=0; ch<NCHN; ch++) {
+//    apply_tcal(stop_cell, cals[ch], times);
+//    i32 n = sizeof(times) / sizeof(times[0]);
+//    all_chan_tcal.push_back(vec_f32(times, times+n));
+//  }
+//  return all_chan_tcal;
+//}
+//
+//
+//Vec<Vec<f32>> apply_tcal_helper(Vec<u16> stop_cells,
+//                                Calibrations_t cal) {
+//  f32 times[NWORDS] = {0};
+//  Vec<Vec<f32>> result;
+//  for (auto const &stop_cell : stop_cells) {  
+//    apply_tcal(stop_cell, cal, times);
+//    i32 n = sizeof(times) / sizeof(times[0]);
+//    result.push_back(Vec<f32>(times, times+n));
+//  }
+//  return result;
+//}
+//
+//
+//
+//Vec<Vec<f32>> apply_vcal_helper(Vec<u16> stop_cell,
+//                                Calibrations_t cal,
+//                                Vec<Vec<i16>> adc) {
+//  f32 waveform[NWORDS] = {0};
+//  Vec<Vec<f32>> result;
+//  for (usize k=0; k<adc.size();k++) {
+//    apply_vcal(stop_cell[k],
+//               adc[k].data(),
+//               cal,
+//               waveform);
+//    int n = sizeof(waveform) / sizeof(waveform[0]);
+//    result.push_back(Vec<f32>(waveform, waveform + n));
+//  }
+//    //vec_f32 result = vec_f32(waveform, waveform + n);
+//  
+//  return result; 
+//}
+//
+//vec_vec_f64 voltage_calibration_helper(const BlobEvt_t &evt,
+//                                       std::vector<Calibrations_t> cal)
+//{
+//  vec_vec_f64 result;
+//  for (size_t k=0; k<NCHN; k++) {
+//    f64 trace_out[NWORDS];
+//    u32 n = sizeof(trace_out)/sizeof(trace_out[0]);
+//    VoltageCalibration(const_cast<short int*>(evt.ch_adc[k]),
+//                       trace_out,
+//                       evt.stop_cell,
+//                       cal[k]);
+//    result.push_back(std::vector<f64>(trace_out, trace_out + n));
+//  }
+//  return result;
+//}
+//
+//vec_vec_f64 timing_calibration_helper(const BlobEvt_t &evt,
+//                                                            std::vector<Calibrations_t> cal)
+//{
+//  vec_vec_f64 result;
+//  for (size_t k=0; k<NCHN; k++) {
+//    f64 times[NWORDS];
+//    size_t n = sizeof(times)/sizeof(times[0]);
+//    TimingCalibration(times,
+//                      evt.stop_cell,
+//                      cal[k]);
+//    result.push_back(std::vector<double>(times, times + n));
+//  }
+//  return result;
+//}
 
 /********************/
 
@@ -992,41 +992,20 @@ PYBIND11_MODULE(gaps_tof, m) {
    m.def("ReadEvent",                     &read_event_helper);
    m.def("get_rbeventheaders",            &get_rbeventheaders); 
    
-   //
-   // serialization functions
-   //m.def("decode_u16",         &decode_ushort);
-   //m.def("encode_u16",         &wrap_encode_ushort);
-   //m.def("encode_ushort_rev",     &wrap_encode_ushort_rev);
-   //
-   //m.def("u32_from_le_bytes",  &u32_from_le_bytes);
-   //m.def("u32_to_le_bytes",    &wrap_u32_to_le_bytes);
-   //m.def("decode_u32",         &decode_uint32);
-   //m.def("encode_u32",         &wrap_encode_uint32);
-   //m.def("encode_u32_rev",     &wrap_encode_uint32_rev);
-
-   //m.def("encode_48",             &encode_48);
-   //m.def("encode_48_rev",         &encode_48_rev);
-
-   //m.def("decode_u64",         &decode_uint64);
-   //m.def("encode_u64",         &wrap_encode_uint64);
-   //m.def("encode_uint64_rev",     &wrap_encode_uint64_rev);
-
    m.def("encode_blobevent",      &blobevent_encoder);
    m.def("decode_blobevent",      &blobevent_decoder);   
    m.def("get_current_blobevent_size", &get_current_blobevent_size);
 
    // functions to read and parse blob files
-   //m.def("search_for_2byte_marker",  &search_for_2byte_marker);
-   //m.def("get_2byte_marker_indices", &get_2byte_markers_indices);
    m.def("splice_readoutboard_datafile",   &splice_readoutboard_datafile);
 
    // Calibration functions
-   m.def("apply_vcal_allchan",       &apply_vcal_allchan_helper);
-   m.def("apply_vcal",               &apply_vcal_helper);
-   m.def("apply_tcal_allchan",       &apply_tcal_allchan_helper);
-   m.def("apply_tcal",               &apply_tcal_helper);
-   m.def("voltage_calibration",      &voltage_calibration_helper);
-   m.def("timing_calibration",       &timing_calibration_helper);
+   //m.def("apply_vcal_allchan",       &apply_vcal_allchan_helper);
+   //m.def("apply_vcal",               &apply_vcal_helper);
+   //m.def("apply_tcal_allchan",       &apply_tcal_allchan_helper);
+   //m.def("apply_tcal",               &apply_tcal_helper);
+   //m.def("voltage_calibration",      &voltage_calibration_helper);
+   //m.def("timing_calibration",       &timing_calibration_helper);
    m.def("remove_spikes",            &remove_spikes_helper);
    m.def("read_calibration_file",    &read_calibration_file);
    m.def("get_offsets",              &offset_getter);
