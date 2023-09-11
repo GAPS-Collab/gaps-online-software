@@ -130,10 +130,79 @@ pub const RESP_ERR_CMD_STUCK                 : u32 = 503;
 /// all the waveforms.
 /// CAVEAT: For the whole tof, this will cap the rate at 
 /// 112 Hz, because of the capacity of the switches.
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub enum TofOperationMode {
-  TofModeRequestReply,
-  TofModeStreamAny
+  RequestReply,
+  StreamAny,
+  Unknown
+}
+
+impl fmt::Display for TofOperationMode {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let r = self.string_repr();
+    write!(f, "<TofOperationMode: {}>", r)
+  }
+}
+
+impl TofOperationMode {
+  pub const UNKNOWN               : u8 = 0;
+  pub const REQUESTREPLY          : u8 = 10;
+  pub const STREAMANY             : u8 = 20;
+
+  pub fn to_u8(&self) -> u8 {
+    let result : u8;
+    match self {
+      TofOperationMode::Unknown => {
+        result = TofOperationMode::UNKNOWN;
+      }
+      TofOperationMode::RequestReply => {
+        result = TofOperationMode::REQUESTREPLY;
+      }
+      TofOperationMode::StreamAny => {
+        result = TofOperationMode::STREAMANY;
+      }
+    }
+    result
+  }
+  
+  pub fn from_u8(code : &u8) -> Self {
+    let mut result = TofOperationMode::Unknown;
+    match *code {
+      TofOperationMode::UNKNOWN => {
+        result = TofOperationMode::Unknown;
+      }
+      TofOperationMode::REQUESTREPLY => {
+        result = TofOperationMode::RequestReply;
+      }
+      TofOperationMode::STREAMANY => {
+        result = TofOperationMode::StreamAny;
+      }
+      _ => {
+        error!("Unknown TofOperationMode {}!", code);
+      }
+    }
+    result
+  }
+
+  /// String representation of the TofOperationMode
+  ///
+  /// This is basically the enum type as 
+  /// a string.
+  pub fn string_repr(&self) -> String { 
+    let repr : String;
+    match self {
+      TofOperationMode::Unknown => {
+        repr = String::from("Unknown");
+      }
+      TofOperationMode::RequestReply => {
+        repr = String::from("RequestReply");
+      }
+      TofOperationMode::StreamAny => {
+        repr = String::from("StreamAny");
+      }
+    }
+    repr
+  }
 }
 
 
@@ -628,6 +697,18 @@ impl From<(u8, u32)> for TofResponse {
       5 => TofResponse::ZMQProblem(value),
       _ => TofResponse::Unknown
     }
+  }
+}
+
+
+#[test]
+fn test_tofoperationmode() {
+  let mut type_codes = Vec::<u8>::new();
+  type_codes.push(TofOperationMode::UNKNOWN); 
+  type_codes.push(TofOperationMode::STREAMANY); 
+  type_codes.push(TofOperationMode::REQUESTREPLY); 
+  for tc in type_codes.iter() {
+    assert_eq!(*tc,TofOperationMode::to_u8(&TofOperationMode::from_u8(tc)));  
   }
 }
 
