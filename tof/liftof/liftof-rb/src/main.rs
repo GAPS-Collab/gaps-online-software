@@ -3,12 +3,17 @@
 //! This software shall help with data acquisition and commandeering 
 //! of the readoutboards (RB) used in the tof system of the GAPS 
 //! science experiment.
+//!
+//! Standalone, statically linked binary to be either run manually 
+//! or to be managed by systemd
 use std::{thread, time};
+use std::io::Write;
 
-extern crate libc;
 extern crate crossbeam_channel;
 extern crate signal_hook;
+extern crate env_logger;
 
+use std::os::raw::c_int;
 use signal_hook::iterator::Signals;
 use signal_hook::consts::signal::{SIGTERM, SIGINT};
 use crossbeam_channel::{unbounded,
@@ -18,200 +23,128 @@ use local_ip_address::local_ip;
 
 //use std::collections::HashMap;
 use std::process::exit;
+use liftof_lib::color_log;
+
 use liftof_rb::api::*;
 use liftof_rb::control::*;
-use liftof_rb::memory::read_control_reg;
 
 use tof_dataclasses::threading::ThreadPool;
 use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::commands::{//TofCommand,
                                 TofResponse,
                                 TofOperationMode};
+use tof_dataclasses::events::{DataType,
+                              DataFormat};
+use tof_dataclasses::calibrations::RBCalibrations;
 use tof_dataclasses::run::RunConfig;
-extern crate pretty_env_logger;
 #[macro_use] extern crate log;
-
-//use log::{info, LevelFilter};
-//use std::io::Write;
 
 extern crate clap;
 use clap::{arg,
            command,
-           //value_parser,
-           //ArgAction,
-           //Command,
            Parser};
-
-//enum RBOperationMode {
-//    FromRunConfig,
-//    Noi,
-//    Tcal,
-//    Vcal,
-//    Unknown
-//}
 
 #[derive(Parser, Debug)]
 #[command(author = "J.A.Stoessl", version, about, long_about = None)]
 struct Args {
+  /// A json run config file with a RunConfiguration. This option is essential if 
+  /// this program is run manually without systemd and not controlled by a central server. 
+  /// If in this configuration one wants to take data, ONE HAS TO SUPPLY A RUNCONFIG!
+  #[arg(short, long)]
+  run_config: Option<std::path::PathBuf>,
   /// Show progress bars to indicate buffer fill values and number of acquired events
   #[arg(long, default_value_t = false)]
   show_progress: bool,
-  /// Acquire this many events.
-  /// If either --nevents or --run-forever options are given
-  /// the board will not wait for a remote command, but start datataking as soon as 
-  /// possible
+  /// Acquire this many events. This will OVERRIDE the setting from the runconfig. 
+  /// A runconfig is STILL NEEDED! However, for quick debugging, we can change the 
+  /// number here (for convenience)
   #[arg(short, long, default_value_t = 0)]
-  nevents: u64,
+  nevents: u32,
   /// Cache size of the internal event cache in events
   #[arg(short, long, default_value_t = 10000)]
   cache_size: usize,
-  /// If either --nevents or --run-forever options are given
-  /// the board will not wait for a remote command, but start datataking as soon as 
-  /// possible
-  #[arg(long, default_value_t = false)]
-  run_forever: bool,
   /// Analyze the waveforms directly on the board. We will not send
   /// waveoform data, but paddle packets instead.
   #[arg(long, default_value_t = false)]
   waveform_analysis: bool,
-  /// Activate the forced trigger. The value is the desired rate [Hz] 
-  #[arg(long, default_value_t = 0)]
-  force_trigger: u32,
-  /// Activate the forced random trigger. The value is the desired rate [Hz]
-  #[arg(long, default_value_t = 0)]
-  force_random_trigger: u32,
-  /// Stream any eventy as soon as the software starts.
-  /// Don't wait for command line.
-  /// Behaviour can be controlled through `TofCommand` later
-  #[arg(long, default_value_t = false)]
-  stream_any : bool,
   /// show moni data 
   #[arg(long, default_value_t = false)]
   verbose : bool,
-  /// Write the readoutboard binary data to the board itself
+  /// Write the readoutboard binary data ('.robin') to the board itself
   #[arg(long, default_value_t = false)]
-  write_blob : bool,
-  /// Take data for voltage calibration
+  write_robin : bool,
+  /// Take data for calibration. This comprises tcal, vcal and 
+  /// no input data
   #[arg(long, default_value_t = false)]
-  vcal : bool,
-  /// Take data for timing calibration
-  #[arg(long, default_value_t = false)]
-  tcal : bool,
-  /// Take data with no inputs [NOT IMPLEMENTED YET]
-  #[arg(long, default_value_t = false)]
-  noi : bool,
+  calibration : bool,
   ///// CnC server IP we should be listening to
   //#[arg(long, default_value_t = "10.0.1.1")]
   //cmd_server_ip : &'static str,
-  /// A json run config file with a RunConfiguration
-  #[arg(short, long)]
-  run_config: Option<std::path::PathBuf>,
+  /// Take some events with the poisson trigger and 
+  /// check the event ids for duplicates or missing ids
+  #[arg(long, default_value_t = false)]
+  test_eventids: bool,
 }
 
 fn main() {
-
-  //env_logger::Builder::new()
-  //    .format(|buf, record| {
-  //     writeln!(
-  //     buf,
-  //     "{}:{} {} [{}] - {}",
-  //     record.file().unwrap_or("unknown"),
-  //      record.line().unwrap_or(0),
-  //     chrono::Local::now().format("%Y-%m-%dT%H:%M:%S"),
-  //          record.level(),
-  //       record.args()
-  //     )
-  //                                })
-  //.filter(Some("logger_example"), LevelFilter::Debug)
-  //                        .init();
-  pretty_env_logger::init();
+  env_logger::builder()
+    .format(|buf, record| {
+    writeln!( buf, "[{level}][{module_path}:{line}] {args}",
+      level = color_log(&record.level()),
+      module_path = record.module_path().unwrap_or("<unknown>"),
+      line = record.line().unwrap_or(0),
+      args = record.args()
+      )
+    }).init();
  
   let args = Args::parse();                   
-  let verbose               = args.verbose;
-  let mut n_events_run      = args.nevents;
-  let show_progress         = args.show_progress;
-  let cache_size            = args.cache_size;
-  let run_forever           = args.run_forever;
-  let mut stream_any        = args.stream_any;
-  let mut force_trigger     = args.force_trigger;
-  let mut force_random_trig = args.force_random_trigger;
-  let wf_analysis           = args.waveform_analysis;
-  let vcal                  = args.vcal;
-  let tcal                  = args.tcal;
-  let noi                   = args.noi;
-  let mut write_robin       = args.write_blob;
-  let run_config            = args.run_config;
-  let mut data_format       = 0u8;
- 
+  let verbose                  = args.verbose;
+  let n_events_run             = args.nevents;
+  let show_progress            = args.show_progress;
+  let cache_size               = args.cache_size;
+  let wf_analysis              = args.waveform_analysis;
+  let calibration              = args.calibration;
+  let write_robin              = args.write_robin;
+  let run_config               = args.run_config;
+  let test_eventids            = args.test_eventids;
+  
+  if test_eventids {
+    warn!("Testing mode. We will take 10000 events with a 100Hz poisson trigger and check the ventids!");
+  }
   if wf_analysis {
     todo!("--waveform-analysis is currently not implemented!");
   }
-  // check already if incompatible arguments are given
-  if ( vcal && tcal ) || ( vcal && noi ) || ( tcal && noi ) {
-    panic!("Can only support either of the flags --vcal --tcal --noi")
-  }
 
-  // active channels
-  let mut ch_mask : u8 = u8::MAX;
+  // per default the data type should be 
+  // header with all waveform data
+  //let mut data_type = DataType::Physics;
 
   let mut rc_config     = RunConfig::new();
   let mut rc_file_path  = std::path::PathBuf::new();
   let mut end_after_run = false;
 
-  //let mut rb_op_mode = RBOperationMode::Unknown; 
-  // FIXME run_config overrides stream_any
+  if calibration {
+    warn!("Readoutboard calibration! This will override ALL other settings!");
+    end_after_run = true;
+  }
   
-  let mut from_runconfig = false;
+
   match run_config {
-    None     => (),
+    None     => {
+      println!("=> We did not get a runconfig! Currently we are just listening for input on the socket. This is the desired behavior, if run by systemd. If you want to take data in standalone mode, either send a runconfig to the socket or hit CTRL+C and start the program again, this time suppling the -r <RUNCONFIG> flag.");
+    }
     Some(rcfile) => {
-      if vcal || tcal || noi {
-        error!("Currently, the configuration of the calibration modes through a runconfig file is not supported. This feature might be available in versions > 0.6");
-        panic!("Unsupported command line arguments!");
-      }
-      rc_file_path = rcfile.clone();
-      rc_config    = get_runconfig(&rcfile);
-      ch_mask      = rc_config.active_channel_mask;
-      data_format  = rc_config.data_format;
-      stream_any   = rc_config.stream_any;
-      from_runconfig = true;
+      rc_file_path   = rcfile.clone();
+      rc_config      = get_runconfig(&rcfile);
+      end_after_run  = rc_config.nevents > 0 || rc_config.nseconds > 0;
     }
   }
 
-  let mut file_suffix   = String::from(".robin");
-
-  if noi || rc_config.noi {
-    file_suffix   = String::from(".noi");
-    end_after_run = true;
-    n_events_run  = 1000;
-    stream_any    = true;
-    force_trigger = 100;
-    write_robin   = true;
-  }
-  if vcal || rc_config.vcal {
-    file_suffix   = String::from(".vcal");
-    end_after_run = true;
-    n_events_run  = 1000;
-    stream_any    = true;
-    force_trigger = 100;
-    write_robin   = true;
-  }
-
-  if tcal || rc_config.tcal {
-    file_suffix       = String::from(".tcal");
-    force_random_trig = 100;
-    n_events_run      = 5000;
-    end_after_run     = true;
-    write_robin       = true;
-  }
+  let file_suffix   = String::from(".robin");
 
   //FIMXE - this needs to become part of clap
   let cmd_server_ip = String::from("10.0.1.1");
   //let cmd_server_ip     = args.cmd_server_ip;  
-  if force_trigger > 0 && force_random_trig > 0 {
-    panic!("Can not use force trigger (equally spaced in time) together with random self trigger!");
-  }
-
   let this_board_ip = local_ip().expect("Unable to obtainl local board IP. Something is messed up!");
   
   // General parameters, readout board id,, 
@@ -236,28 +169,7 @@ fn main() {
   println!(" => We will CONNECT to the following port on the C&C server at address: {}", cmd_server_ip);
   println!(" => -- -- PORT {} (0MQ SUB) where we will be listening for commands", DATAPORT);
   println!("-----------------------------------------------");
-  if vcal { 
-    println!("=> Will be run with settings for vcal data");
-  }
-  if tcal {
-    println!("=> Will be run with settings for tcal data");
-  }
-  if noi {
-    println!("=> Will be run with settings for no-input data");
-  }
-  // set channel mask (if different from 255)
-  match set_active_channel_mask(ch_mask) {
-    Ok(_) => (),
-    Err(err) => {
-      error!("Setting activve channel mask failed for mask {}, error {}", ch_mask, err);
-    }
-  }
-  let current_mask = read_control_reg(0x44).unwrap();
-  info!("THe latest reading of the active channel mask regsiter reads {}", current_mask);
-
-  // this resets the data buffer /dev/uio1,2 occupancy
-  reset_dma_and_buffers();
-
+  
   // some pre-defined time units for 
   // sleeping
   let one_sec     = time::Duration::from_secs(1);  
@@ -277,9 +189,8 @@ fn main() {
     n_threads += 1;
   }
 
-
   // FIXME - MESSAGES GET CONSUMED!!
-
+  // setting up inter-thread comms
   let (rc_to_runner, rc_from_cmdr)      : 
       (Sender<RunConfig>, Receiver<RunConfig>)                = unbounded();
   let (rsp_to_sink, _rsp_from_client)     : 
@@ -288,89 +199,78 @@ fn main() {
       (Sender<TofPacket>, Receiver<TofPacket>)                = unbounded();
   let (tp_to_cache, tp_from_builder) : 
       (Sender<TofPacket>, Receiver<TofPacket>)                = unbounded();
+  let (dtf_to_evproc, dtf_from_runner) :                
+      (Sender<(DataType, DataFormat)>, Receiver<(DataType, DataFormat)>)    = unbounded();
+  let (rbcalib_to_evproc, rbcalib_from_calib)   : 
+      (Sender<RBCalibrations>, Receiver<RBCalibrations>)                    = unbounded();
 
-  let (set_op_mode, get_op_mode)     : 
+  let (opmode_to_cache, opmode_from_runner)     : 
       (Sender<TofOperationMode>, Receiver<TofOperationMode>)                = unbounded();
   let (bs_send, bs_recv)             : (Sender<Vec<u8>>, Receiver<Vec<u8>>) = unbounded(); 
 
   let (evid_to_cache, evid_from_cmdr)   : (Sender<u32>, Receiver<u32>)      = unbounded();
+
+
   info!("Will start ThreadPool with {n_threads} threads");
   let workforce = ThreadPool::new(n_threads);
  
   // Setup routine. Start the threads in inverse order of 
   // how far they are away from the buffers.
   let rc_from_cmdr_c = rc_from_cmdr.clone();
-  let bs_send_c      = bs_send.clone();
   
   workforce.execute(move || {
     data_publisher(&tp_from_client,
                    write_robin,
                    Some(&file_suffix),
+                   test_eventids,
                    verbose); 
   });
   let tp_to_pub_c   = tp_to_pub.clone();
+  let tp_to_pub_2 = tp_to_pub.clone();
   workforce.execute(move || {
     monitoring(&tp_to_pub,
                verbose);
   });
-
-  // if we don't set a rate for force_random_trig, 
-  // latch to the MTB. For the other force trigger
-  // modes, the runner will decide 
-  // FIXME: decide everything here
-  let latch_to_mtb : bool = force_random_trig == 0;
 
   // then the runner. It does nothing, until we send a set
   // of RunParams
   workforce.execute(move || {
       runner(&rc_from_cmdr_c,
              None, 
-             &bs_send_c,
-             latch_to_mtb,
-             show_progress,
-             force_trigger);
+             &bs_send,
+             &dtf_to_evproc,
+             &opmode_to_cache,
+             show_progress);
   });
 
   workforce.execute(move || {
                     event_cache(tp_from_builder,
                                 &tp_to_pub_c,
                                 &rsp_to_sink,
-                                get_op_mode, 
+                                &opmode_from_runner, 
                                 evid_from_cmdr,
+                                wf_analysis,
                                 cache_size)
   });
   workforce.execute(move || {
                     event_processing(&bs_recv,
-                                     tp_to_cache,
-                                     data_format);
+                                     &tp_to_cache,
+                                     &dtf_from_runner);
   });
   
 
   // Respond to commands from the C&C server
-  let set_op_mode_c        = set_op_mode.clone();
-  let rc_to_runner_c = rc_to_runner.clone();
+  let rc_to_runner_c       = rc_to_runner.clone();
   let heartbeat_timeout_seconds : u32 = 10;
   workforce.execute(move || {
                     cmd_responder(cmd_server_ip,
                                   heartbeat_timeout_seconds,
-                                  //&rsp_from_client,  
-                                  &set_op_mode_c,
                                   &rc_file_path,
                                   &rc_to_runner_c,
                                   &evid_to_cache )
-                                  //&cmd_to_client   )  
   
   });
 
-  // if we are not listening to the C&C server,
-  // we have to start the run thread here
-  if stream_any {
-    match set_op_mode.send(TofOperationMode::TofModeStreamAny) {
-      Err(err) => error!("Can not set TofOperationMode to StreamAny! Err {err}"),
-      Ok(_)    => info!("Using RBMode STREAM_ANY")
-    }
-  }
- 
   // We can only start a run here, if this is not
   // run through systemd
   if is_systemd_process() {
@@ -379,36 +279,19 @@ fn main() {
     // if we are not as systemd, 
     // always end when we are done
     println!("=> We are not run by systemd, so we will stop the program when it is done");
-    // we start the run by creating new RunParams
-    // this is only if we give 
-    //let mut rc = RunConfig::new();
-    if !from_runconfig {
-      if run_forever {
-        rc_config.nevents = 0;
-      } else {
-        rc_config.nevents = n_events_run as u32;
-      }
-      rc_config.stream_any = stream_any;
-      rc_config.forced_trigger_poisson  = force_trigger;
-      rc_config.forced_trigger_periodic = force_random_trig;
-        
-      rc_config.vcal = vcal             ; 
-      rc_config.tcal = tcal             ; 
-      rc_config.noi  = noi              ;
-      // FIXME - currently no other values supported
-      rc_config.active_channel_mask = 255; 
-      rc_config.data_format  = 0         ; 
-      let mut buff_trip = 2000;
-      if rc_config.nevents > 0 {
-        if rc_config.nevents <= 2000 {
-          buff_trip = 500;
-        }
-      }
-      rc_config.rb_buff_size = buff_trip ; 
-      rc_config.is_active = true;
+    if calibration {
+      // we execute this routine first, then we 
+      // can go into our loop listening for input
+      rb_calibration(&rc_to_runner, &tp_to_pub_2);
     }
-    // in the else case, we have a runconfig, 
-    // but we did load that earlier already.
+
+
+
+    if n_events_run > 0 {
+      println!("=> We got a nevents argument from the commandline, requesting to run for {n_events_run}. This will OVERRIDE the setting in the run config file!");
+      rc_config.nevents = n_events_run;
+    }
+
     if rc_config.nevents != 0 {
       println!("Got a number of events to be run > 0. Will stop the run after they are done. If you want to run continuously and listen for new runconfigs from the C&C server, set nevents to 0");
       end_after_run = true
@@ -427,38 +310,23 @@ fn main() {
       }
     }
   }
-  
-  // if we arrive at this point and we want the random trigger, 
-  // we are now ready to start it
-  if force_random_trig > 0 {
 
-    // we have to calculate the actual rate with Andrew's formulat
-    //let clk_period : f64 = 1.0/33e6;
-    let rate : f32 = force_random_trig as f32;
-    let max_val  : f32 = 4294967295.0;
-    
-    //let f_trig = (33e6 * (rate/max_val)) as u32;
-    //let reg_val = 1/rate = 33e6/max_val*1/f_trig
-    let reg_val = (rate/(33e6/max_val)) as u32;
-    info!("Will use random self trigger with rate {reg_val} value for register, corresponding to {rate} Hz");
-    match set_self_trig_rate(reg_val) {
-      Err(err) => {
-        warn!("Setting self trigger failed! Er {err}");
-        panic!("Abort!");
-      }
-      Ok(_)    => ()
-    }
-  }
 
+  // Currently, the main thread just listens for SIGTERM and SIGINT.
+  // We could give it more to do and save one of the other threads.
+  // Probably, the functionality of the control thread would be 
+  // a good choice
   let mut signals = Signals::new(&[SIGTERM, SIGINT]).expect("Unknown signals");
   let mut end = false;
-  
+
+
+
   // Wait until all threads are set up
   thread::sleep(5*one_sec);
   loop {
     thread::sleep(1*one_sec);
     for signal in signals.pending() {
-      match signal as libc::c_int {
+      match signal as c_int {
         SIGTERM => {
           println!("SIGTERM received");
           end = true;
@@ -479,30 +347,26 @@ fn main() {
           end = true;
         }
       }
-
     }
 
     if end {
       println!("=> Finish program!");
       println!("=> Stopping triggers!");
-   
-      match disable_trigger() {
-        Err(err) => error!("Can not disable triggers, error {err}"),
-        Ok(_)    => ()
-      }
-      if force_random_trig > 0 {
-        match set_self_trig_rate(0) {
-          Err(err) => {
-            panic!("Could not disable random self trigger! Err {err}");
-          }
-          Ok(_)    => ()
+      // we simply generate a new run config and let the runner 
+      // finish and clean up everything
+      let mut rc_terminate = RunConfig::new();
+      rc_terminate.is_active = false;
+      match rc_to_runner.send(rc_terminate) {
+        Err(err) => {
+          error!("We were unable to terminate the run! Error {err}. However, we will end leaving the board in an uknown state...");
         }
+        Ok(_) => ()
       }
-      thread::sleep(one_sec);
+      println!(".. .. terminating .. ..");
+      thread::sleep(3*one_sec);
       println!("So long and thanks for all the \u{1F41F}");
       exit(0);
     }
-
   } // end loop
 } // end main
 

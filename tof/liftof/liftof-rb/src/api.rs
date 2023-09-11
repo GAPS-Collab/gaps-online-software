@@ -3,6 +3,8 @@
 
 use local_ip_address::local_ip;
 use tof_dataclasses::serialization::Serialization;
+use tof_dataclasses::errors::CalibrationError;
+use tof_dataclasses::calibrations::RBCalibrations;
 
 use std::collections::HashMap;
 use std::net::IpAddr;
@@ -31,8 +33,11 @@ use crate::memory::*;
 
 use tof_dataclasses::commands::*;
 use tof_dataclasses::events::{RBEventPayload,
-                              RBEventHeader, 
-                              RBEventMemoryView};
+                              RBEventHeader,
+                              RBEvent,
+                              RBEventMemoryView,
+                              DataType,
+                              DataFormat};
 use tof_dataclasses::serialization::search_for_u16;
 use tof_dataclasses::commands::{TofCommand,
                                 TofResponse,
@@ -53,6 +58,300 @@ use tof_control::rb_control::rb_mag::RBmag;
 use tof_control::rb_control::rb_vcp::RBvcp;
 #[cfg(feature="monitoring")]
 use tof_control::rb_control::rb_ph::RBph;
+
+// for calibration
+#[cfg(feature="monitoring")]
+use tof_control::rb_control::rb_mode::{select_noi_mode,
+                                       select_vcal_mode,
+                                       select_tcal_mode,
+                                       select_sma_mode};
+
+
+/// The poisson self trigger mode of the board
+/// triggers automatically, this means we don't 
+/// have to send a forced trigger signal every
+/// 1/rate.
+///
+/// It just sets the respective registers here
+pub fn enable_poisson_self_trigger(rate : f32) {
+  // we have to calculate the actual rate with Andrew's formula
+  //let clk_period : f64 = 1.0/33e6;
+  let max_val  : f32 = 4294967295.0;
+  let reg_val = (rate/(33e6/max_val)) as u32;
+  info!("Will use random self trigger with rate {reg_val} value for register, corresponding to {rate} Hz");
+  match set_self_trig_rate(reg_val) {
+    Err(err) => {
+      error!("Setting self trigger failed! Er {err}");
+      error!("To be clear, we are NOT RUNNING IN POISSON SELF-TRIGGER MODE!");
+    }
+    Ok(_)    => ()
+  }
+}
+
+
+/// Wait as long as a run is active.
+/// This call blocks the current thread 
+/// until no run is active anymore.
+///
+/// Check the trigger enabled register
+/// periodically to find out wether
+/// a run is active or not.
+///
+/// if n_errors is reached, decide the
+/// run to be inactive
+///
+/// # Arguments
+///
+/// * n_errors : Unforgiveable number of errors
+///              when querying the trigger status
+///              register. If reached, break.
+/// * interval : Check the trigger register every
+///              interval
+fn wait_while_run_active(n_errors : u32,
+                         interval : Duration,
+                         socket   : &zmq::Socket) -> Vec<RBEvent> {
+  // check if we are done
+  let mut events = Vec::<RBEvent>::new();
+  let mut errs : u32 = 0;
+  let mut start = Instant::now();
+  loop {
+    // listen to zmq here
+    match socket.recv_bytes(0) {
+      Err(err) => {
+        error!("Unable to recv on socket!");
+      },
+      Ok(bytes) => {
+        // the first 4 bytes are the identifier
+        match TofPacket::from_bytestream(&bytes, &mut 4) {
+          Err(err) => {
+            error!("Can't unpack TofPacket, err {err}");
+          },
+          Ok(tp) => {
+            match RBEvent::from_bytestream(&tp.payload, &mut 0) {
+              Err(err) => {
+                error!("Can't unpack RBEvent, error {err}");
+              },
+              Ok(ev) => {
+                events.push(ev);
+              }
+            }
+          }
+        }
+        
+      }
+    }
+    if start.elapsed() > interval {
+      match get_triggers_enabled() {
+        Err(err) => {
+          error!("Unable to obtain trigger status! Err {err}");
+          errs += 1;
+        },
+        Ok(running) => {
+          if !running {
+            info!("Run has apparently terminated!");
+            return events;
+            //break;
+          } else { 
+          }
+        }
+      }
+      //thread::sleep(interval);
+      if errs == n_errors {
+        info!("Can't wait anymore since we have seen the configured number of errors! {n_errors}");
+        return events;
+      }
+    start = Instant::now();
+    }
+  }
+  events
+}
+
+
+// eventually, we have to rename that feature
+/// A full set of RB calibration
+///
+/// This includes
+/// - take voltage calbration data, 
+///   1000 events, save to disk, but 
+///   keep in memory
+/// - take timing calibration data,
+///   1000 events, save to disk but 
+///   keep in memory
+/// - no input data, 1000 events, save
+///   to disk but keep in memory
+/// - apply calibration script (Jamie)
+///   save result in binary and in textfile,
+///   send downstream
+#[cfg(feature="monitoring")]
+pub fn rb_calibration(rc_to_runner    : &Sender<RunConfig>,
+                      tp_to_publisher : &Sender<TofPacket>)
+-> Result<(), CalibrationError> {
+  warn!("Commencing full RB calibration routine! This will take the board out of datataking for a few minutes!");
+  let five_seconds   = time::Duration::from_millis(5000);
+  let mut run_config = RunConfig {
+    nevents                 : 1000,
+    is_active               : true,
+    nseconds                : 0,
+    stream_any              : true,
+    trigger_poisson_rate    : 0,
+    trigger_fixed_rate      : 100,
+    latch_to_mtb            : false,
+    active_channel_mask     : 255,
+    data_type               : DataType::VoltageCalibration,
+    data_format             : DataFormat::Default,
+    rb_buff_size            : 1200
+  }; 
+  // here is the general idea. We connect to our own 
+  // zmq socket, to gather the events and store them 
+  // here locally. Then we apply the calibration 
+  // and we simply have to send it back to the 
+  // event processing. Event processing should then
+  // set it internally and wrap it into a tof packet
+  // and send it to the publisher again!
+  // "von hinten durch die Brust ins Auge" but in a 
+  // good way. This saves us a mutex!!
+  let mut tcal_data = Vec::<RBEvent>::new();
+  let mut vcal_data = Vec::<RBEvent>::new();
+  let mut noi_data  = Vec::<RBEvent>::new();
+  let mut board_id = 0u8;
+  match get_board_id() {
+    Err(err) => {
+      error!("Unable to obtain board id. Calibration might be orphaned. Err {err}");
+    },
+    Ok(rb_id) => {
+      board_id = rb_id as u8;
+    }
+  }
+  let mut calibration = RBCalibrations::new(board_id);
+
+  // set up zmq socket
+  let mut address_ip = String::from("tcp://");
+  let this_board_ip = local_ip().expect("Unable to obtainl local board IP. Something is messed up!");
+  let data_port    = DATAPORT;
+
+  match this_board_ip {
+    IpAddr::V4(ip) => address_ip += &ip.to_string(),
+    IpAddr::V6(_)  => panic!("Currently, we do not support IPV6!")
+  }
+  let data_port = DATAPORT;
+  let data_address : String = address_ip.clone() + ":" + &data_port.to_string();
+
+  let ctx = zmq::Context::new();
+  let mut socket : zmq::Socket; 
+  match ctx.socket(zmq::SUB) {
+    Err(err) => {
+      error!("Unable to create zmq socket! Err {err}. This is BAD!");
+      return Err(CalibrationError::CanNotConnectToMyOwnZMQSocket);
+    }
+    Ok(sock) => {
+      socket = sock;
+    }
+  }
+  let mut is_connected = false;
+  match socket.connect(&data_address) {
+    Err(err) => {
+      error!("Unable to bind to data (PUB) socket {data_address}, Err {err}");
+      return Err(CalibrationError::CanNotConnectToMyOwnZMQSocket);
+    },
+    Ok(_) => {
+      is_connected = true;
+    }
+  }
+  //info!("0MQ PUB socket bound to address {data_address}");
+  let topic_broadcast = String::from("");
+  if is_connected {
+    //cmd_socket.set_subscribe(&my_topic.as_bytes());
+    match socket.set_subscribe(&topic_broadcast.as_bytes()) {
+      Err(err) => error!("Can not subscribe to {topic_broadcast}, err {err}"),
+      Ok(_)    => ()
+    }
+  }
+  // at this point, the zmq socket should be set up!
+
+  info!("Will set board to vcal mode!");
+  select_vcal_mode();
+  match rc_to_runner.send(run_config) {
+    Err(err) => warn!("Can not send runconfig!, Err {err}"),
+    Ok(_)    => trace!("Success!")
+  }  
+  let mut data = wait_while_run_active(10, five_seconds, &socket);
+  // check heeds optimizion, use filter
+  for ev in data.iter() {
+    if matches!(ev.data_type, DataType::VoltageCalibration) {
+      vcal_data.push(ev.clone());
+    }
+  }
+
+  info!("Will set board to tcal mode!");
+  run_config.trigger_poisson_rate  = 100;
+  run_config.trigger_fixed_rate = 0;
+  run_config.data_type = DataType::TimingCalibration;  
+  select_tcal_mode();
+  match rc_to_runner.send(run_config) {
+    Err(err) => warn!("Can not send runconfig!, Err {err}"),
+    Ok(_)    => trace!("Success!")
+  }
+  data = wait_while_run_active(10, five_seconds, &socket);
+  for ev in data.iter() {
+    if matches!(ev.data_type, DataType::TimingCalibration) {
+      tcal_data.push(ev.clone());
+    }
+  }
+  
+  info!("Will set board to no input mode!");
+  run_config.data_type = DataType::Noi;  
+  run_config.trigger_fixed_rate   = 100;
+  run_config.trigger_poisson_rate = 0;
+  select_noi_mode();
+  match rc_to_runner.send(run_config) {
+    Err(err) => warn!("Can not send runconfig!, Err {err}"),
+    Ok(_)    => trace!("Success!")
+  }
+  data = wait_while_run_active(10, five_seconds, &socket);
+  for ev in data.iter() {
+    if matches!(ev.data_type, DataType::Noi) {
+      noi_data.push(ev.clone());
+    }
+  }
+  
+  info!("Will set board to sma mode!");
+  select_sma_mode();
+  calibration.vcal_data = vcal_data;
+  calibration.tcal_data = tcal_data;
+  calibration.noi_data  = noi_data;
+  calibration.calibrate();
+  // now it just needs to be send to 
+  // the publisher
+  let calib_pack = TofPacket::from(&calibration);
+  match tp_to_publisher.send(calib_pack) {
+    Err(err) => {
+      error!("Unable to send RBCalibration package!");
+    },
+    Ok(_) => ()
+  }
+  info!("Calibration done!");
+  Ok(())
+}
+
+
+// this is just used for the testing case
+fn find_missing_elements(nums: &[u32]) -> Vec<u32> {
+  let mut missing_elements = Vec::new();
+  let mut expected = nums[0];
+
+  for &num in nums {
+      while expected < num {
+          missing_elements.push(expected);
+          expected += 1;
+      }
+
+      if expected == num {
+          expected += 1;
+      }
+  }
+  missing_elements
+}
+
 
 
 /// Non-register related constants 
@@ -176,7 +475,6 @@ pub fn cmd_from_bytestream(bytestream : &mut Vec<u8>) ->Result<TofCommand, Seria
 pub fn cmd_responder(cmd_server_ip             : String,
                      heartbeat_timeout_seconds : u32,
                      //rsp_receiver              : &Receiver<TofResponse>,
-                     op_mode                   : &Sender<TofOperationMode>,
                      run_config_file           : &Path,
                      run_config                : &Sender<RunConfig>,
                      evid_to_cache             : &Sender<u32>) {
@@ -363,30 +661,32 @@ pub fn cmd_responder(cmd_server_ip             : String,
                 continue;
               },
               TofCommand::StreamOnlyRequested (_) => {
-                let mode = TofOperationMode::TofModeRequestReply;
-                
-                match op_mode.try_send(mode) {
-                  Err(err) => trace!("Error sending! {err}"),
-                  Ok(_)    => ()
-                }
-                let resp_good = TofResponse::Success(RESP_SUCC_FINGERS_CROSSED);
-                match cmd_socket.send(resp_good.to_bytestream(),0) {
-                  Err(err) => warn!("Can not send response! Err {err}"),
-                  Ok(_)    => trace!("Resp sent!")
-                }
+                error!("This feature is deprecated in favor of having entire runs in a certain TofOperationMode. This simplifies configuration, while reducing flexibility. These decidsions are not easy, and we might go back to reimplementing this feature again.");
+                //let mode = TofOperationMode::TofModeRequestReply;
+                //
+                //match op_mode.try_send(mode) {
+                //  Err(err) => trace!("Error sending! {err}"),
+                //  Ok(_)    => ()
+                //}
+                //let resp_good = TofResponse::Success(RESP_SUCC_FINGERS_CROSSED);
+                //match cmd_socket.send(resp_good.to_bytestream(),0) {
+                //  Err(err) => warn!("Can not send response! Err {err}"),
+                //  Ok(_)    => trace!("Resp sent!")
+                //}
                 continue;
               },
               TofCommand::StreamAnyEvent      (_) => {
-                let mode = TofOperationMode::TofModeStreamAny;
-                match op_mode.try_send(mode) {
-                  Err(err) => trace!("Error sending! {err}"),
-                  Ok(_)    => ()
-                }
-                let resp_good = TofResponse::Success(RESP_SUCC_FINGERS_CROSSED);
-                match cmd_socket.send(resp_good.to_bytestream(),0) {
-                  Err(err) => warn!("Can not send response! Err {err}"),
-                  Ok(_)    => trace!("Resp sent!")
-                }
+                error!("This feature is deprecated in favor of having entire runs in a certain TofOperationMode. This simplifies configuration, while reducing flexibility. These decidsions are not easy, and we might go back to reimplementing this feature again.");
+                //let mode = TofOperationMode::StreamAny;
+                //match op_mode.try_send(mode) {
+                //  Err(err) => trace!("Error sending! {err}"),
+                //  Ok(_)    => ()
+                //}
+                //let resp_good = TofResponse::Success(RESP_SUCC_FINGERS_CROSSED);
+                //match cmd_socket.send(resp_good.to_bytestream(),0) {
+                //  Err(err) => warn!("Can not send response! Err {err}"),
+                //  Ok(_)    => trace!("Resp sent!")
+                //}
                 continue;
               },
               TofCommand::DataRunStart (_max_event) => {
@@ -394,12 +694,12 @@ pub fn cmd_responder(cmd_server_ip             : String,
                 // nevents
                 println!("Will initialize new run!");
                 let rc    = get_runconfig(&run_config_file);
-                if rc.stream_any {
-                  match op_mode.send(TofOperationMode::TofModeStreamAny) {
-                    Err(err) => error!("Can not set TofOperationMode to StreamAny! Err {err}"),
-                    Ok(_)    => info!("Using RBMode STREAM_ANY")
-                  }
-                }
+                //if rc.stream_any {
+                //  match op_mode.send(TofOperationMode::StreamAny) {
+                //    Err(err) => error!("Can not set TofOperationMode to StreamAny! Err {err}"),
+                //    Ok(_)    => info!("Using RBMode STREAM_ANY")
+                //  }
+                //}
                 match run_config.send(rc) {
                   Err(err) => error!("Error initializing run! {err}"),
                   Ok(_)    => ()
@@ -520,15 +820,21 @@ pub fn cmd_responder(cmd_server_ip             : String,
 /// payload
 ///
 /// # Arguments 
-///
+/// * write_to_disk : Write data to local disk (most likely
+///                   a SD card). This option should be only
+///                   used for diagnostic purposes.
 /// * print_packets : Print outgoing packets to terminal
-pub fn data_publisher(data : &Receiver<TofPacket>,
-                      write_blob     : bool,
+pub fn data_publisher(data           : &Receiver<TofPacket>,
+                      write_to_disk  : bool,
                       file_suffix    : Option<&str> ,
+                      testing        : bool,
                       print_packets  : bool) {
   let mut address_ip = String::from("tcp://");
   let this_board_ip = local_ip().expect("Unable to obtainl local board IP. Something is messed up!");
   let data_port    = DATAPORT;
+  if testing {
+    warn!("Testing mode!");
+  }
 
   match this_board_ip {
     IpAddr::V4(ip) => address_ip += &ip.to_string(),
@@ -549,12 +855,18 @@ pub fn data_publisher(data : &Receiver<TofPacket>,
   let blobfile_path = Path::new(&blobfile_name);
   
 
-  let mut file_on_disc : Option<File> = None;//let mut output = File::create(path)?;
-  if write_blob {
+  let mut file_on_disk : Option<File> = None;//let mut output = File::create(path)?;
+  if write_to_disk {
     info!("Writing blobs to {}", blobfile_name );
-    file_on_disc = OpenOptions::new().append(true).create(true).open(blobfile_path).ok()
+    file_on_disk = OpenOptions::new().append(true).create(true).open(blobfile_path).ok()
   }
-
+ 
+  // these are only required for testing
+  let mut last_10k_evids = Vec::<u32>::new();
+  if testing {
+    last_10k_evids = Vec::<u32>::with_capacity(10000);
+  }
+  let mut n_tested : u32 = 0;
   loop {
     match data.recv() {
       Err(err) => trace!("Error receiving TofPacket {err}"),
@@ -562,12 +874,12 @@ pub fn data_publisher(data : &Receiver<TofPacket>,
         // pass on the packet downstream
         // wrap the payload INTO THE 
         // FIXME - retries?
-        if write_blob {
+        if write_to_disk {
           //println!("{:?}", packet.packet_type);
           if packet.packet_type == PacketType::RBEvent || 
              packet.packet_type == PacketType::RBHeader {
             //println!("is rb event");
-            match &mut file_on_disc {
+            match &mut file_on_disk {
               None => error!("We want to write data, however the file is invalid!"),
               Some(f) => {
                 //println!("write to file");
@@ -583,6 +895,73 @@ pub fn data_publisher(data : &Receiver<TofPacket>,
         if print_packets {
           println!("=> Sending Tof packet type: {} with {} bytes!", packet.packet_type, packet.payload.len());
         }
+        
+        if testing {
+          match packet.packet_type {
+            PacketType::RBEventPayload => {
+              n_tested += 1;
+              match RBEventMemoryView::from_bytestream(&packet.payload, &mut 0) {
+                Ok(event) => {
+                  last_10k_evids.push(event.event_id);
+                },
+                Err(err) => {
+                   warn!("Error occured during testing! {err}");
+                   warn!("We are seing a payload of {} bytes", packet.payload.len());
+                   //warn!("Last few bytes:");
+                   //for k in packet.payload.len() - 20..packet.payload.len() {
+                   //  warn!("-- {}", packet.payload[k]);
+                   //}
+                }
+              }
+            },
+            PacketType::RBEvent => {
+              n_tested += 1;
+              match RBEvent::from_bytestream(&packet.payload, &mut 0) {
+                Ok(event) => {
+                  last_10k_evids.push(event.header.event_id);
+                },
+                Err(err) => {
+                   warn!("Error occured during testing! {err}");
+                   warn!("We are seing a payload of {} bytes", packet.payload.len());
+                   //warn!("Last few bytes:");
+                   //for k in packet.payload.len() - 20..packet.payload.len() {
+                   //  warn!("-- {}", packet.payload[k]);
+                   //}
+                }
+              }
+            },
+            _ => ()
+          }
+          if n_tested == 10000 {
+            println!("Testing batch complete! Will check the last 10000 events!");
+            println!("-- first event id {}",  last_10k_evids[0]);
+            println!("-- last event id {}", last_10k_evids[last_10k_evids.len() - 1]);
+            // this is not efficient, but this is a testing case anyway
+            let mut duplicates = false;
+            for i in 0..last_10k_evids.len() {
+              for j in (i + 1)..last_10k_evids.len() {
+                if last_10k_evids[i] == last_10k_evids[j] {
+                  println!("FAIL : Found eventid {} at positions {} and {}", last_10k_evids[i], i, j);
+                  duplicates = true;
+                }
+              }
+            }
+            if !duplicates {
+              println!("PASS - we did not observe any duplicate entries!");
+            }
+            let missing = find_missing_elements(&last_10k_evids);
+            if missing.is_empty() {
+              println!("PASS - we did not miss any event ids!");
+            } else {
+              println!("FAIL - we missed {} event ids ({}/100)", missing.len(), missing.len() as f32/10000.0);
+              println!("MISSING {:?}", missing);
+            }
+            println!("----");
+            println!("---- last 10k evids {:?}", last_10k_evids);
+            last_10k_evids.clear();
+          }
+        }
+
         match data_socket.send(tp_payload,zmq::DONTWAIT) {
           Ok(_)    => trace!("0MQ PUB socket.send() SUCCESS!"),
           Err(err) => error!("Not able to send over 0MQ PUB socket! Err {err}"),
@@ -647,6 +1026,7 @@ pub fn monitoring(ch : &Sender<TofPacket>,
 ///
 /// If there are any errors, we will wait for a short
 /// time and then try again
+/// FIXME - this should return Result
 pub fn reset_dma_and_buffers() {
   // register writing is on the order of microseconds 
   // (MHz clock) so one_milli is plenty
@@ -689,6 +1069,8 @@ pub fn reset_dma_and_buffers() {
       break;
     }
   }
+  // in any case, relax a bit
+  thread::sleep(10*one_milli);
 }
 
 
@@ -749,12 +1131,12 @@ pub fn run_check() {
 ///  * force_trigger  : Run in forced trigger mode
 ///
 ///
-pub fn runner(run_config          : &Receiver<RunConfig>,
-              max_errors          : Option<u64>,
-              bs_sender           : &Sender<Vec<u8>>,
-              mut latch_to_mtb    : bool,
-              show_progress       : bool,
-              mut force_trigger_rate  : u32) {
+pub fn runner(run_config              : &Receiver<RunConfig>,
+              max_errors              : Option<u64>,
+              bs_sender               : &Sender<Vec<u8>>,
+              dtf_to_evproc           : &Sender<(DataType,DataFormat)>,
+              opmode_to_cache         : &Sender<TofOperationMode>,
+              show_progress           : bool) { // FIXME deprecate this..
   
   let one_milli        = time::Duration::from_millis(1);
   let one_sec          = time::Duration::from_secs(1);
@@ -764,35 +1146,32 @@ pub fn runner(run_config          : &Receiver<RunConfig>,
   let mut delta_events : u64;
   let mut n_events     : u64 = 0;
   let     n_errors     : u64 = 0;
-  // per default, latch to the mtb trigger.
-  // for testting/calibration that gets switched off
-  // below
-  //latch_to_mtb = true;
-  let mut timer        = Instant::now();
-  let mut force_trigger    = force_trigger_rate > 0;
-  let mut time_between_events : Option<f32> = None;
+  
+  // trigger settings. Per default, we latch to the 
+  let mut latch_to_mtb = true;
 
+  let mut timer               = Instant::now();
+  // do we have to manually trigger at the desired 
+  // time inberval? Then we set force_trigger.
+  // The Poisson trigger triggers automatically.
+  let mut force_trigger = false;
+  let mut time_between_events : Option<f32> = None;
   let now = time::Instant::now();
 
+  // run start/stop conditions
   let mut terminate = false;
-  // the runner will specifically set up the DRS4
   let mut is_running = false;
   let mut rc = RunConfig::new();
-
-  // this is the progress bars
-  //let mut template_bar_env : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.red/grey} {pos:>7}/{len:7}";
-  //let sty_ev = ProgressStyle::with_template(template_bar_env)
-  //.unwrap();
+  
+  // this are all settings for the progress bar
   let mut template_bar_env : &str;
   let mut sty_ev : ProgressStyle;
   let mut multi_prog : MultiProgress;
-
   let mut prog_a  = ProgressBar::hidden();
   let mut prog_b  = ProgressBar::hidden();
   let mut prog_ev = ProgressBar::hidden();
   let template_bar_a   : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.blue/grey} {bytes:>7}/{total_bytes:7} ";
   let template_bar_b   : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.green/grey} {bytes:>7}/{total_bytes:7} ";
-
   let label_a   = String::from("Buff A");
   let label_b   = String::from("Buff B");
   let sty_a = ProgressStyle::with_template(template_bar_a)
@@ -817,16 +1196,37 @@ pub fn runner(run_config          : &Receiver<RunConfig>,
       Ok(new_config) => {
         info!("Received a new set of RunConfig! {:?}", new_config);
         rc          = new_config;
-        if rc.forced_trigger_periodic>0 {
-          force_trigger = true;
-          force_trigger_rate = rc.forced_trigger_periodic;
+        
+        // first of all, check if the new run config is active. 
+        // if not, stop all triggers
+        if !rc.is_active {
+          info!("Received runconfig is not active! Stop current run...");
+          // just to be sure we set the self trigger rate to 0 
+          // this is for the poisson trigger)
+          match set_self_trig_rate(0) {
+            Err(err) => error!("Resetting self trigger rate to 0Hz failed! Err {err}"),
+            Ok(_)    => ()
+          }
+          match disable_trigger() {
+            Err(err) => error!("Can not disable triggers, error {err}"),
+            Ok(_)    => info!("Disabling triggers! Stopping current run!")
+          }
+          if show_progress {
+            prog_ev.finish();
+            prog_a.finish();
+            prog_b.finish();
+          }
+          // do nothing else.
+          is_running = false;
+          continue;
         }
-        if force_trigger {
-          warn!("Will run in forced trigger mode with a rate of {force_trigger_rate} Hz!");
-          time_between_events = Some(1.0/(force_trigger_rate as f32));
-          warn!(".. this means one trigger every {} seconds...", time_between_events.unwrap());
-          latch_to_mtb = false;
-        }
+        // from here on, we prepare to start 
+        // a new run with this RunConfig!
+        
+        reset_dma_and_buffers();
+
+        // deal with the individual settings:
+        // first buffer size
         buffer_trip = (rc.rb_buff_size as usize)*EVENT_SIZE; 
         if (buffer_trip > uio1_total_size) 
         || (buffer_trip > uio2_total_size) {
@@ -844,79 +1244,109 @@ pub fn runner(run_config          : &Receiver<RunConfig>,
             error!("Setting active channel mask failed for mask {}, error {}", rc.active_channel_mask, err);
           }
         }
+        let mut tof_op_mode = TofOperationMode::RequestReply;
+        if rc.stream_any {
+          tof_op_mode = TofOperationMode::StreamAny;
+        }
+        match opmode_to_cache.send(tof_op_mode) {
+          Err(err) => {
+            error!("Unable to send TofOperationMode to the event cache! Err {err}");
+          }
+          Ok(_)    => ()
+        }
 
+        // send the data format/type directly to the 
+        let df_c = rc.data_format.clone();
+        let dt_c = rc.data_type.clone();
+        match dtf_to_evproc.send((dt_c, df_c)) {
+          Err(err) => {
+            error!("Unable to send dataformat & type to the event processing subroutine! Err {err}");
+          }
+          Ok(_) => ()
+        }
 
-        if rc.is_active {
-          info!("Will start a new run!");
-          info!("Initializing board, starting up...");
-          if latch_to_mtb {
-            match set_master_trigger_mode() {
-              Err(err) => error!("Can not initialize master trigger mode, Err {err}"),
-              Ok(_)    => info!("Latching to MasterTrigger")
-            }
-          } else {
-            match disable_master_trigger_mode() {
-              Err(err) => error!("Can not disable master trigger mode, Err {err}"),
-              Ok(_)    => info!("Master trigger mode didsabled!")
-            }
+        // data type
+        match rc.data_type {
+          DataType::VoltageCalibration | 
+          DataType::TimingCalibration  | 
+          DataType::Noi                |
+          DataType::RBTriggerPoisson   | 
+          DataType::RBTriggerPeriodic =>  {
+            latch_to_mtb = false;
+          },
+          _ => ()
+        }
+        if rc.trigger_poisson_rate > 0 {
+          latch_to_mtb = false;
+          // we also activate the poisson trigger
+          enable_poisson_self_trigger(rc.trigger_poisson_rate as f32);
+        }
+        if rc.trigger_fixed_rate>0 {
+          force_trigger = true;
+          time_between_events = Some(1.0/(rc.trigger_fixed_rate as f32));
+          warn!("Will run in forced trigger mode with a rate of {} Hz!", rc.trigger_fixed_rate);
+          warn!(".. this means one trigger every {} seconds...", time_between_events.unwrap());
+          latch_to_mtb = false;
+        }
+
+        // preparations done, let's gooo
+        info!("Will start a new run!");
+        info!("Initializing board, starting up...");
+        if latch_to_mtb {
+          match set_master_trigger_mode() {
+            Err(err) => error!("Can not initialize master trigger mode, Err {err}"),
+            Ok(_)    => info!("Latching to MasterTrigger")
           }
-          if force_trigger {
-            match enable_trigger() {
-              Err(err) => error!("Can not enable triggers! Err {err}"),
-              Ok(_)    => info!("(Forced) Triggers enabled - Run start!")
-            }
-          } else {
-            match enable_trigger() {
-              Err(err) => error!("Can not enable triggers! Err {err}"),
-              Ok(_)    => info!("Triggers enabled - Run start!")
-            }
-            thread::sleep(one_sec);
-            match get_trigger_rate() {
-              Err(err) => error!("Unable to obtain trigger rate! Err {err}"),
-              Ok(rate) => info!("Seing MTB trigger rate of {rate} Hz")
-            }
-          }
-          is_running = true;
-          if show_progress {
-            if rc.runs_forever() {
-              template_bar_env = "[{elapsed_precise}] {prefix} {msg} {spinner} ";
-            } else {
-              template_bar_env = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.red/grey} {pos:>7}/{len:7}";
-            }
-            sty_ev = ProgressStyle::with_template(template_bar_env)
-            .unwrap();
-            multi_prog = MultiProgress::new();
-            prog_a  = multi_prog
-                      .add(ProgressBar::new(uio1_total_size as u64)); 
-            prog_b  = multi_prog
-                      .insert_after(&prog_a, ProgressBar::new(uio2_total_size as u64)); 
-            prog_ev = multi_prog
-                          .insert_after(&prog_b, ProgressBar::new(rc.nevents as u64)); 
-            prog_a.set_message (label_a.clone());
-            prog_a.set_prefix  ("\u{1F4BE}");
-            prog_a.set_style   (sty_a.clone());
-            prog_b.set_message (label_b.clone());
-            prog_b.set_prefix  ("\u{1F4BE}");
-            prog_b.set_style   (sty_b.clone());
-            prog_ev.set_style  (sty_ev.clone());
-            prog_ev.set_prefix ("\u{2728}");
-            prog_ev.set_message("EVENTS");
-          }
-          continue; // start loop again
         } else {
-          info!("Got signal to stop run");
-          is_running = false;
-          match disable_trigger() {
-            Err(err) => error!("Can not disable triggers, error {err}"),
-            Ok(_)    => ()
-          }
-          if show_progress {
-            prog_ev.finish();
-            prog_a.finish();
-            prog_b.finish();
+          match disable_master_trigger_mode() {
+            Err(err) => error!("Can not disable master trigger mode, Err {err}"),
+            Ok(_)    => info!("Master trigger mode didsabled!")
           }
         }
-      }
+        // this basically signals "RUNSTART"
+        match enable_trigger() {
+          Err(err) => error!("Can not enable triggers! Err {err}"),
+          Ok(_)    => info!("(Forced) Triggers enabled - Run start!")
+        }
+        // FIXME - only if above call Ok()
+        is_running = true;
+
+        if !force_trigger {
+          // we relax and let the system go 
+          // for a short bit
+          thread::sleep(one_sec);
+          match get_trigger_rate() {
+            Err(err) => error!("Unable to obtain trigger rate! Err {err}"),
+            Ok(rate) => info!("Seing MTB trigger rate of {rate} Hz")
+          }
+        }
+        if show_progress {
+          if rc.runs_forever() {
+            template_bar_env = "[{elapsed_precise}] {prefix} {msg} {spinner} ";
+          } else {
+            template_bar_env = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.red/grey} {pos:>7}/{len:7}";
+          }
+          sty_ev = ProgressStyle::with_template(template_bar_env)
+          .unwrap();
+          multi_prog = MultiProgress::new();
+          prog_a  = multi_prog
+                    .add(ProgressBar::new(uio1_total_size as u64)); 
+          prog_b  = multi_prog
+                    .insert_after(&prog_a, ProgressBar::new(uio2_total_size as u64)); 
+          prog_ev = multi_prog
+                        .insert_after(&prog_b, ProgressBar::new(rc.nevents as u64)); 
+          prog_a.set_message (label_a.clone());
+          prog_a.set_prefix  ("\u{1F4BE}");
+          prog_a.set_style   (sty_a.clone());
+          prog_b.set_message (label_b.clone());
+          prog_b.set_prefix  ("\u{1F4BE}");
+          prog_b.set_style   (sty_b.clone());
+          prog_ev.set_style  (sty_ev.clone());
+          prog_ev.set_prefix ("\u{2728}");
+          prog_ev.set_message("EVENTS");
+        }
+        continue; // start loop again
+      } // end Ok(RunConfig) 
     } // end run_params.try_recv()
 
     if is_running {
@@ -941,19 +1371,23 @@ pub fn runner(run_config          : &Receiver<RunConfig>,
         }
         println!("Run stopped! We have seen {n_events}. If this process has been started manually, you can kill it with CTRL+C");
       } // end if terminate
+      
+      // We did not terminate the run,
+      // that means we are still going!
       if force_trigger {
         //println!("Forcing trigger!");
         //println!("Time between events {}", time_between_events.unwrap());
         let elapsed = timer.elapsed().as_secs_f32();
         //println!("Elapsed {}", elapsed);
         trace!("Forced trigger mode, {} seconds since last trigger", elapsed);
+        // decide if we have to issue the trigger signal NOW!
         if elapsed > time_between_events.unwrap() {
           timer = Instant::now(); 
           match trigger() {
             Err(err) => error!("Error when triggering! {err}"),
             Ok(_)    => trace!("Firing trigger!")
           }
-        } else {
+        } else { // not enough time has yet passed for the next trigger signal
           // FIXME - we could sleep here for a bit!
           continue;
         }
@@ -961,6 +1395,7 @@ pub fn runner(run_config          : &Receiver<RunConfig>,
 
       // calculate current event count
       if !force_trigger {
+        // this checks if we have seen a new event
         match get_event_count() {
           Err (err) => {
             error!("Can not obtain event count! Err {:?}", err);
@@ -976,7 +1411,7 @@ pub fn runner(run_config          : &Receiver<RunConfig>,
             if evt_cnt == last_evt_cnt {
               thread::sleep(one_milli);
               trace!("We didn't get an updated event count!");
-              continue;
+              continue; // only continue after we see a new event!
             }
           } // end ok
         } // end match
@@ -1011,6 +1446,9 @@ pub fn runner(run_config          : &Receiver<RunConfig>,
       }
 
     } // end is_running
+    
+    // from here on, check termination 
+    // conditions
     if !rc.runs_forever() {
       if rc.nevents != 0 {
         if n_events > rc.nevents as u64{
@@ -1057,12 +1495,18 @@ pub fn runner(run_config          : &Receiver<RunConfig>,
 ///
 /// * control_ch : Receive operation mode instructions
 ///
+/// * waveform_analysis : For the events requested, do the waveform processing 
+///                         already
 pub fn event_cache(tp_recv      : Receiver<TofPacket>,
                    tp_to_pub    : &Sender<TofPacket>,
                    resp_to_cmd  : &Sender<TofResponse>,
-                   get_op_mode  : Receiver<TofOperationMode>, 
+                   get_op_mode  : &Receiver<TofOperationMode>, 
                    recv_evid    : Receiver<u32>,
+                   waveform_analysis : bool,
                    cache_size   : usize) {
+  if waveform_analysis {
+    warn!("Waveform analysis is not implemented, won't do it!");
+  }
 
   let mut n_send_errors  = 0u64;   
   let mut op_mode_stream = false;
@@ -1077,8 +1521,9 @@ pub fn event_cache(tp_recv      : Receiver<TofPacket>,
       Ok(mode) => {
         warn!("Will change operation mode to {:?}!", mode);
         match mode {
-          TofOperationMode::TofModeRequestReply => {op_mode_stream = false;},
-          TofOperationMode::TofModeStreamAny    => {op_mode_stream = true;},
+          TofOperationMode::RequestReply => {op_mode_stream = false;},
+          TofOperationMode::StreamAny    => {op_mode_stream = true;},
+          _ => (),
         }
       }
     }
@@ -1472,28 +1917,51 @@ pub fn ram_buffer_handler(buff_trip     : usize,
 ///                  the data buffers.
 ///  * tp_sender   : Send the resulting data product to 
 ///                  get processed further
-///  * data_format : If different from 0, do some processing
+///  * data_type   : If different from 0, do some processing
 ///                  on the data read from memory
-pub fn event_processing(bs_recv     : &Receiver<Vec<u8>>,
-                        tp_sender   : Sender<TofPacket>,
-                        data_format : u8) {
+///
+pub fn event_processing(bs_recv           : &Receiver<Vec<u8>>,
+                        tp_sender         : &Sender<TofPacket>,
+                        dtf_fr_runner     : &Receiver<(DataType,DataFormat)>) {
   let mut n_events : u32;
   let mut event_id : u32 = 0;
+  let mut last_event_id   : u32 = 0; // for checks
   let mut events_not_sent : u64 = 0;
-  //println!("[EVENT PAYLOAD WORKER] Start..");
+  let mut data_type   : DataType   = DataType::Unknown;
+  let mut data_format : DataFormat = DataFormat::Unknown; 
   'main : loop {
     let mut start_pos : usize = 0;
     n_events = 0;
     //let mut debug_evids = Vec::<u32>::new();
+    // have this nonblocking
+    match dtf_fr_runner.try_recv() {
+      Err(err) => {
+        trace!("Did not receive new data type! Err {err}");
+      }
+      Ok(dtf) => {
+        data_type   = dtf.0;
+        data_format = dtf.1; 
+        info!("Will process events for data type {}!", data_type);
+        info!("Set data format to {}!", data_format);
+      }
+    }
+
     match bs_recv.recv() {
       Ok(bytestream) => {
         'bytestream : loop {
           //println!("Received bytestream");
           match search_for_u16(RBEventMemoryView::HEAD, &bytestream, start_pos) {
+            Err(err) => {
+              debug!("Send {n_events} events. Got last event_id! {event_id}");
+              if start_pos == 0 {
+                error!("Got bytestream, but can not find HEAD bytes, err {err:?}");
+              }
+              break 'bytestream;},
             Ok(head_pos) => {
               let tail_pos   = head_pos + RBEventMemoryView::SIZE;
-              if tail_pos > bytestream.len() - 1 {
+              if tail_pos >= bytestream.len() - 1 {
                 // we are finished here
+                warn!("Got a trunctaed event, discarding..");
                 trace!("Work on current blob complete. Extracted {n_events} events. Got last event_id! {event_id}");
                 //trace!("{:?}", debug_evids);
                 break 'bytestream;
@@ -1503,8 +1971,12 @@ pub fn event_processing(bs_recv     : &Receiver<Vec<u8>>,
               n_events += 1;
               start_pos = tail_pos;
               match data_format {
-                0 => {
+                DataFormat::HeaderOnly => {
                   event_id        =  RBEventPayload::decode_event_id(&bytestream[head_pos..tail_pos]);
+                  if event_id != last_event_id + 1 {
+                    error!("Event id not rising continuously! This {}, last {}", event_id, last_event_id);
+                  }
+                  last_event_id = event_id;
                   let mut payload = Vec::<u8>::new();
                   payload.extend_from_slice(&bytestream[head_pos..tail_pos + 2]);
                   debug!("Prepared TofPacket for event {} with a payload size of {}", event_id, &payload.len());
@@ -1515,7 +1987,24 @@ pub fn event_processing(bs_recv     : &Receiver<Vec<u8>>,
                     Err(err) => error!("Problem sending TofPacket over channel! Err {err}"),
                   }
                 }
-                2 => {
+                DataFormat::Default => {
+                  let mut pos_in_stream = head_pos;
+                  match RBEvent::extract_from_rbeventmemoryview(&bytestream, &mut pos_in_stream) {
+                    Err(err)   => {
+                      error!("Unable to extract RBEvent from memory! Error {err}");
+                      events_not_sent += 1;
+                    },
+                    Ok (mut event) => {
+                      event.data_type = data_type;
+                      let tp = TofPacket::from(&event);
+                      match tp_sender.send(tp) {
+                        Ok(_) => (),
+                        Err(err) => error!("Problem sending TofPacket over channel! Err {err}"),
+                      }
+                    }
+                  }
+                },
+                DataFormat::MemoryView => {
                   //let mut payload = Vec::<u8>::new();
                   //payload.extend_from_slice(&bytestream[head_pos..tail_pos+2]);
                   let mut this_event_start_pos = head_pos;
@@ -1539,14 +2028,10 @@ pub fn event_processing(bs_recv     : &Receiver<Vec<u8>>,
                     }
                   }
                 }
-                _ => {todo!("Dataformat != 0 or 2 is not supported!");}
+                _ => {todo!("Dataformat != 0, 1 or 2 is not supported!");}
               }  
               continue 'bytestream;
-            },
-            Err(err) => {
-              debug!("Send {n_events} events. Got last event_id! {event_id}");
-              debug!("Got bytestream, but can not find HEAD bytes, err {err:?}");
-              break 'bytestream;}
+            }
           } // end loop
         } // end ok
       }, // end Ok(bytestream)
