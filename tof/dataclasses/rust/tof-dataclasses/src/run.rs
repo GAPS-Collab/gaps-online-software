@@ -36,8 +36,8 @@ pub struct RunConfig {
   pub is_active               : bool,
   pub nseconds                : u32,
   pub stream_any              : bool,
-  pub forced_trigger_poisson  : u32,
-  pub forced_trigger_periodic : u32,
+  pub trigger_poisson_rate    : u32,
+  pub trigger_fixed_rate      : u32,
   pub latch_to_mtb            : bool,
   pub active_channel_mask     : u8,
   pub data_type               : DataType,
@@ -55,8 +55,8 @@ impl RunConfig {
       is_active               : false,
       nseconds                : 0,
       stream_any              : false,
-      forced_trigger_poisson  : 0,
-      forced_trigger_periodic : 0,
+      trigger_poisson_rate    : 0,
+      trigger_fixed_rate      : 0,
       latch_to_mtb            : false,
       active_channel_mask     : u8::MAX,
       data_type               : DataType::Unknown, 
@@ -119,8 +119,8 @@ impl Serialization for RunConfig {
     pars.is_active  = parse_bool(bytestream, pos);
     pars.nseconds   = parse_u32 (bytestream, pos);
     pars.stream_any = parse_bool(bytestream, pos);
-    pars.forced_trigger_poisson  = parse_u32(bytestream, pos);
-    pars.forced_trigger_periodic = parse_u32(bytestream, pos);
+    pars.trigger_poisson_rate    = parse_u32(bytestream, pos);
+    pars.trigger_fixed_rate      = parse_u32(bytestream, pos);
     pars.latch_to_mtb            = parse_bool(bytestream, pos);
     pars.active_channel_mask = parse_u8(bytestream, pos);
     pars.data_type    = DataType::from_u8(&parse_u8(bytestream, pos));
@@ -138,8 +138,8 @@ impl Serialization for RunConfig {
     stream.extend_from_slice(&u8::from(self.  is_active).to_le_bytes());
     stream.extend_from_slice(&self.  nseconds.to_le_bytes());
     stream.extend_from_slice(&u8::from(self.  stream_any).to_le_bytes());
-    stream.extend_from_slice(&self.forced_trigger_poisson.to_le_bytes());
-    stream.extend_from_slice(&self.forced_trigger_periodic.to_le_bytes());
+    stream.extend_from_slice(&self.trigger_poisson_rate.to_le_bytes());
+    stream.extend_from_slice(&self.trigger_fixed_rate.to_le_bytes());
     stream.extend_from_slice(&u8::from(self.latch_to_mtb).to_le_bytes());
     stream.push(self.active_channel_mask);
     stream.extend_from_slice(&self.data_type.to_u8().to_le_bytes());
@@ -156,8 +156,8 @@ impl Serialization for RunConfig {
     rc.is_active               = config["is_active"]              .as_bool().ok_or(SerializationError::JsonDecodingError)?;
     rc.nseconds                = config["nseconds"]               .as_u32 ().ok_or(SerializationError::JsonDecodingError)?; 
     rc.stream_any              = config["stream_any"]             .as_bool().ok_or(SerializationError::JsonDecodingError)?;
-    rc.forced_trigger_poisson  = config["forced_trigger_poisson"] .as_u32 ().ok_or(SerializationError::JsonDecodingError)?; 
-    rc.forced_trigger_periodic = config["forced_trigger_periodic"].as_u32 ().ok_or(SerializationError::JsonDecodingError)?; 
+    rc.trigger_poisson_rate    = config["trigger_poisson_rate"] .as_u32 ().ok_or(SerializationError::JsonDecodingError)?; 
+    rc.trigger_fixed_rate      = config["trigger_fixed_rate"].as_u32 ().ok_or(SerializationError::JsonDecodingError)?; 
     rc.latch_to_mtb            = config["latch_to_mtb"].as_bool ().ok_or(SerializationError::JsonDecodingError)?; 
     rc.active_channel_mask     = config["active_channel_mask"]    .as_u8  ().ok_or(SerializationError::JsonDecodingError)?; 
     let data_type              = config["data_type"].as_u8().ok_or(SerializationError::JsonDecodingError)?;
@@ -206,8 +206,8 @@ impl FromRandom for RunConfig {
     cfg.is_active               = rng.gen::<bool>();
     cfg.nseconds                = rng.gen::<u32>();
     cfg.stream_any              = rng.gen::<bool>();
-    cfg.forced_trigger_poisson  = rng.gen::<u32>();
-    cfg.forced_trigger_periodic = rng.gen::<u32>();
+    cfg.trigger_poisson_rate    = rng.gen::<u32>();
+    cfg.trigger_fixed_rate      = rng.gen::<u32>();
     cfg.latch_to_mtb            = rng.gen::<bool>();
     cfg.active_channel_mask     = rng.gen::<u8>();
     // yes, this is not the smartest since it will typically generate
