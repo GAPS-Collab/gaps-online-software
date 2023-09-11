@@ -7,12 +7,16 @@ CMakeFiles/*
 
 # Cargo lock files
 tof/dataclasses/rust/tof-dataclasses/Cargo.lock
+tof/dataclasses/rust/pybindings/target/*
+tof/dataclasses/rust/pybindings/Cargo.lock
+tof/dataclasses/rust/pybindings/rust_dataclasses.so
 tof/liftof/Cargo.lock
 tof/liftof/liftof-tui/Cargo.lock
 
 # pycache
 gaps-db/gaps_db/gaps_db/__pycache__/
 gaps-db/gaps_db/tof_db/__pycache__/
+tof/tof-calibration/python_calibration_scripts/tofpy/__pycache__/*
 
 # build products
 tof/dataclasses/rust/tof-dataclasses/target/*
