@@ -55,7 +55,7 @@ struct RBMoniData {
   static RBMoniData from_bytestream(const Vec<u8> &stream,
                                     usize &pos);
   /// extract moni data from payload
-  //usize from_bytestream(vec_u8& payload,
+  //usize from_bytestream(Vec<u8>& payload,
   //                      usize start_pos=0);
 
 };
@@ -77,7 +77,7 @@ struct MtbMoniData {
   MtbMoniData();
 
   /// extract moni data from payload
-  usize from_bytestream(vec_u8& payload,
+  usize from_bytestream(Vec<u8>& payload,
                         usize start_pos=0);
 };
 
@@ -94,7 +94,7 @@ struct TofCmpMoniData {
  
   TofCmpMoniData(); 
   /// extract moni data from payload
-  usize from_bytestream(vec_u8& payload,
+  usize from_bytestream(Vec<u8>& payload,
                         usize start_pos=0);
 };
 

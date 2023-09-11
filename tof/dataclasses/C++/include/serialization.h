@@ -26,8 +26,8 @@ static const size_t BLOBEVENTSIZE=18530;
 
 /* TYPE DEFINITIONS */
 
-typedef const std::vector<unsigned char> payload_t;
-typedef std::vector<unsigned char> mutable_payload_t;
+typedef const Vec<u8> payload_t;
+typedef Vec<u8> mutable_payload_t;
 
 /***********************************************/
 
@@ -67,23 +67,23 @@ uint32_t decode_uint32_rev(payload_t& bytestream,
 
 /***********************************************/
 
-u32 u32_from_le_bytes(const vec_u8 &bytestream,
+u32 u32_from_le_bytes(const Vec<u8> &bytestream,
                       u64 start_pos);
 
 /***********************************************/
 
-void u32_to_le_bytes(u32 value, vec_u8 &bytestream, u8 start_pos);
+void u32_to_le_bytes(u32 value, Vec<u8> &bytestream, u8 start_pos);
 
-void encode_uint32(uint32_t value, std::vector<unsigned char>& bytestream, unsigned int start_pos=0);
-void encode_uint32_rev(uint32_t value, std::vector<unsigned char>& bytestream, unsigned int start_pos=0);
-
-/***********************************************/
-
-void encode_48(uint64_t value, std::vector<unsigned char>& bytestream, unsigned int start_pos=0);
+void encode_uint32(uint32_t value, Vec<u8>& bytestream, unsigned int start_pos=0);
+void encode_uint32_rev(uint32_t value, Vec<u8>& bytestream, unsigned int start_pos=0);
 
 /***********************************************/
 
-void encode_48_rev(uint64_t value, std::vector<unsigned char>& bytestream, unsigned int start_pos=0);
+void encode_48(uint64_t value, Vec<u8>& bytestream, unsigned int start_pos=0);
+
+/***********************************************/
+
+void encode_48_rev(uint64_t value, Vec<u8>& bytestream, unsigned int start_pos=0);
 
 /***********************************************/
 
@@ -93,25 +93,25 @@ uint64_t decode_uint64(payload_t& bytestream,
 /***********************************************/
 
 [[deprecated("The assumed byteorder in this function is unclear/confusing")]]
-uint64_t decode_uint64_rev(const std::vector<unsigned char>& bytestream,
+uint64_t decode_uint64_rev(const Vec<u8>& bytestream,
                            unsigned int start_pos=0);
 
-u64 u64_from_le_bytes(const vec_u8 &bytestream,
+u64 u64_from_le_bytes(const Vec<u8> &bytestream,
 		      usize start_pos=0);
 
 /***********************************************/
 
-void u64_to_le_bytes(u64 value, vec_u8 &bytestream, u64 start_pos=0);
+void u64_to_le_bytes(u64 value, Vec<u8> &bytestream, u64 start_pos=0);
 
-void encode_uint64(uint64_t value, std::vector<unsigned char>& bytestream, unsigned int start_pos=0);
-void encode_uint64_rev(uint64_t value, std::vector<unsigned char>& bytestream, unsigned int start_pos=0);
+void encode_uint64(uint64_t value, Vec<u8>& bytestream, unsigned int start_pos=0);
+void encode_uint64_rev(uint64_t value, Vec<u8>& bytestream, unsigned int start_pos=0);
 
 //! encodes timestamp according to BlobEvent format - 48 bits instead of 64 and adds appropriate padding 
-void encode_timestamp(uint64_t value, std::vector<unsigned char>& bytestream, unsigned int start_pos=0);
+void encode_timestamp(uint64_t value, Vec<u8>& bytestream, unsigned int start_pos=0);
 
 /***********************************************/
 
-uint64_t decode_timestamp(std::vector<unsigned char>& bytestream, unsigned int start_pos=0);
+uint64_t decode_timestamp(Vec<u8>& bytestream, unsigned int start_pos=0);
 
 /***********************************************/
 
@@ -127,7 +127,7 @@ float decode_12bitsensor(uint16_t value, float minrange, float maxrange);
 
 /***********************************************/
 
-int16_t decode_14bit(const std::vector<unsigned char>& bytestream,
+int16_t decode_14bit(const Vec<u8>& bytestream,
                      unsigned int start_pos=0);
 
 /***********************************************/

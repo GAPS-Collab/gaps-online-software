@@ -91,7 +91,7 @@ struct REventPacket {
    *
    *
    */
-  vec_u8 serialize() const;
+  Vec<u8> serialize() const;
 
   /**
    * Transcode from bytestream
@@ -101,7 +101,7 @@ struct REventPacket {
    *    (tail position +=1, so that bytestream can be iterated
    *    over easily)
    */
-  unsigned int deserialize(vec_u8 &payload,
+  unsigned int deserialize(Vec<u8> &payload,
                            u64 start_pos=0);
 
 

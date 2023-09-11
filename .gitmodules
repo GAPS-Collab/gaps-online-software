@@ -1,6 +1,3 @@
-[submodule "resources/extern/corrosion"]
-	path = resources/extern/corrosion
-	url = https://github.com/corrosion-rs/corrosion.git
-[submodule "tof-control"]
+[submodule "tof/extern/tof-control"]
 	path = tof/extern/tof-control
 	url = https://github.com/GAPS-Collab/tof-control.git

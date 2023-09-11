@@ -12,8 +12,8 @@ CommandPacket::CommandPacket(const TofCommand &cmd,
   value   = val;
 }
 
-vec_u8 CommandPacket::to_bytestream() {
-  vec_u8 buffer = std::vector<u8>(p_length_fixed );
+Vec<u8> CommandPacket::to_bytestream() {
+  Vec<u8> buffer = std::vector<u8>(p_length_fixed );
   usize pos    = 0;
   encode_ushort(head, buffer, pos); pos+=2;
   u8 cmd_class = (u8)command; 
@@ -24,7 +24,7 @@ vec_u8 CommandPacket::to_bytestream() {
 }
 
 
-usize CommandPacket::from_bytestream(vec_u8 &payload,
+usize CommandPacket::from_bytestream(Vec<u8> &payload,
                                      usize start_pos) {
 
   auto pos = start_pos;
@@ -54,8 +54,8 @@ ResponsePacket::ResponsePacket(const TofResponse &resp,
   value   = val;
 }
 
-vec_u8 ResponsePacket::to_bytestream() const {
-  vec_u8 buffer = std::vector<u8>(p_length_fixed );
+Vec<u8> ResponsePacket::to_bytestream() const {
+  Vec<u8> buffer = std::vector<u8>(p_length_fixed );
   usize pos    = 0;
   encode_ushort(head, buffer, pos); pos+=2;
   u8 resp_class = (u8)response; 
@@ -82,7 +82,7 @@ std::string ResponsePacket::translate_response_code(u32 code) const {
   return "UNKNOWN RESPONSE CODE " + std::to_string(code);
 }
 
-usize ResponsePacket::from_bytestream(vec_u8 &payload,
+usize ResponsePacket::from_bytestream(Vec<u8> &payload,
                                       usize start_pos) {
 
   auto pos = start_pos;

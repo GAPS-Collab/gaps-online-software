@@ -72,8 +72,8 @@ struct RPaddlePacket  {
   static u16 calculate_length();
   void reset();
 
-  vec_u8 serialize() const; 
-  u32 deserialize(vec_u8 &bytestream, 
+  Vec<u8> serialize() const; 
+  u32 deserialize(Vec<u8> &bytestream, 
                   u32 start_pos);
  
   // easier print out

@@ -9,16 +9,15 @@
 
 #include "serialization.h"
 
-u16 decode_ushort(const vec_u8& bytestream,
-                             u32 start_pos)
-{
+u16 decode_ushort(const Vec<u8>& bytestream,
+                  u32 start_pos) {
   u16 value= (u16)(((bytestream[start_pos+0] & 0xFF) << 8) | bytestream[start_pos+1]);
   return value;
 }
 
 /***********************************************/
 
-short decode_short(const vec_u8& bytestream,
+short decode_short(const Vec<u8>& bytestream,
                    u32 start_pos)
 {
   //short value = (short)(((bytestream[start_pos+0] & 0xFF) << 8) | bytestream[start_pos+1]);
@@ -29,7 +28,7 @@ short decode_short(const vec_u8& bytestream,
 
 /***********************************************/
 
-short decode_short_rev(const vec_u8& bytestream,
+short decode_short_rev(const Vec<u8>& bytestream,
                    u32 start_pos)
 {
   short value= (short)(((bytestream[start_pos+1] & 0xFF) << 8) | bytestream[start_pos+0]);
@@ -38,7 +37,7 @@ short decode_short_rev(const vec_u8& bytestream,
 
 /***********************************************/
 
-u16 decode_ushort_rev(const vec_u8& bytestream,
+u16 decode_ushort_rev(const Vec<u8>& bytestream,
                              u32 start_pos)
 {
   u16 value= (u16)(((bytestream[start_pos+1] & 0xFF) << 8) | bytestream[start_pos+0]);
@@ -48,17 +47,17 @@ u16 decode_ushort_rev(const vec_u8& bytestream,
 /***********************************************/
 
 void encode_ushort(u16 value,
-                   vec_u8& bytestream,
+                   Vec<u8>& bytestream,
                    u32 start_pos)
 {
-  //vec_u8 buffer(2);
+  //Vec<u8> buffer(2);
   bytestream[start_pos + 0] = (value >> 8) & 0xFF;
   bytestream[start_pos + 1] = value & 0xFF;
 }
 
 /***********************************************/
 
-int16_t decode_14bit(const vec_u8& bytestream,
+int16_t decode_14bit(const Vec<u8>& bytestream,
                      u32 start_pos)
 {
    int16_t value =  decode_short_rev(bytestream, start_pos);
@@ -69,10 +68,10 @@ int16_t decode_14bit(const vec_u8& bytestream,
 /***********************************************/
 
 void encode_ushort_rev(u16 value,
-                   vec_u8& bytestream,
+                   Vec<u8>& bytestream,
                    u32 start_pos)
 {
-  //vec_u8 buffer(2);
+  //Vec<u8> buffer(2);
   bytestream[start_pos + 1] = (value >> 8) & 0xFF;
   bytestream[start_pos + 0] = value & 0xFF;
 }
@@ -80,17 +79,17 @@ void encode_ushort_rev(u16 value,
 /***********************************************/
 
 void encode_short_rev(short value,
-                      vec_u8& bytestream,
+                      Vec<u8>& bytestream,
                       u32 start_pos)
 {
-  //vec_u8 buffer(2);
+  //Vec<u8> buffer(2);
   bytestream[start_pos + 1] = (value >> 8) & 0xFF;
   bytestream[start_pos + 0] = value & 0xFF;
 }
 
 /***********************************************/
 
-u32 decode_uint32(const vec_u8& bytestream,
+u32 decode_uint32(const Vec<u8>& bytestream,
                        u32 start_pos)
 {
   u32 value = (u32)(
@@ -103,7 +102,7 @@ u32 decode_uint32(const vec_u8& bytestream,
 
 /***********************************************/
 
-u32 decode_uint32_rev(const vec_u8 &bytestream,
+u32 decode_uint32_rev(const Vec<u8> &bytestream,
                            u32 start_pos)
 {
   u32 value = (u32)(
@@ -116,7 +115,7 @@ u32 decode_uint32_rev(const vec_u8 &bytestream,
 
 /***********************************************/
 
-u32 u32_from_le_bytes(const vec_u8 &bytestream,
+u32 u32_from_le_bytes(const Vec<u8> &bytestream,
                       u64 start_pos)
 {
   u32 value = (u32)(
@@ -130,7 +129,7 @@ u32 u32_from_le_bytes(const vec_u8 &bytestream,
 /***********************************************/
 
 void u32_to_le_bytes(u32 value,
-                     vec_u8 &bytestream,
+                     Vec<u8> &bytestream,
                      u8 start_pos) {
   bytestream[start_pos + 3] = (value >> 24) & 0xFF;
   bytestream[start_pos + 2] = (value >> 16) & 0xFF;
@@ -141,7 +140,7 @@ void u32_to_le_bytes(u32 value,
 /***********************************************/
 
 void encode_uint32(u32 value, 
-                   vec_u8& bytestream, 
+                   Vec<u8>& bytestream, 
                    u32 start_pos)
 {
   bytestream[start_pos + 0] = (value >> 24) & 0xFF;
@@ -153,7 +152,7 @@ void encode_uint32(u32 value,
 /***********************************************/
 
 void encode_uint32_rev(u32 value,
-                       vec_u8& bytestream,
+                       Vec<u8>& bytestream,
                        u32 start_pos)
 {
 
@@ -169,7 +168,7 @@ void encode_uint32_rev(u32 value,
 
 /***********************************************/
 
-u64 u64_from_le_bytes(const vec_u8 &bytestream,
+u64 u64_from_le_bytes(const Vec<u8> &bytestream,
                       usize start_pos) {
   u64 buffer64 = 0x0000000000000000;
 
@@ -187,7 +186,7 @@ u64 u64_from_le_bytes(const vec_u8 &bytestream,
   return buffer;
 }
 
-uint64_t decode_uint64(const vec_u8& bytestream,
+uint64_t decode_uint64(const Vec<u8>& bytestream,
                        u32 start_pos)
 {
   uint64_t buffer64 = 0x0000000000000000;
@@ -208,7 +207,7 @@ uint64_t decode_uint64(const vec_u8& bytestream,
 
 /***********************************************/
 
-uint64_t decode_uint64_rev(const vec_u8& bytestream,
+uint64_t decode_uint64_rev(const Vec<u8>& bytestream,
                            u32 start_pos)
 {
   uint64_t buffer64 = 0x0000000000000000;
@@ -231,7 +230,7 @@ uint64_t decode_uint64_rev(const vec_u8& bytestream,
 /***********************************************/
 
 void u64_to_le_bytes(u64 value,
-                     vec_u8 &bytestream,
+                     Vec<u8> &bytestream,
                      u64 start_pos) {
   bytestream[start_pos + 7] = (value >> 56) & 0xFF;
   bytestream[start_pos + 6] = (value >> 48) & 0xFF;
@@ -246,7 +245,7 @@ void u64_to_le_bytes(u64 value,
 /***********************************************/
 
 void encode_uint64(uint64_t value, 
-                   vec_u8& bytestream, 
+                   Vec<u8>& bytestream, 
                    u32 start_pos)
 {
   bytestream[start_pos + 0] = (value >> 56) & 0xFF;
@@ -262,7 +261,7 @@ void encode_uint64(uint64_t value,
 /***********************************************/
 
 void encode_uint64_rev(uint64_t value,
-                       vec_u8& bytestream,
+                       Vec<u8>& bytestream,
                        u32 start_pos)
 {
   bytestream[start_pos + 1] = (value >> 56) & 0xFF;
@@ -286,7 +285,7 @@ void encode_uint64_rev(uint64_t value,
 /***********************************************/
 
 void encode_timestamp(uint64_t value,
-                       vec_u8& bytestream,
+                       Vec<u8>& bytestream,
                        u32 start_pos)
 {
   //bytestream[start_pos + 1] = (value >> 56) & 0xFF;
@@ -301,7 +300,7 @@ void encode_timestamp(uint64_t value,
 
 /***********************************************/
 
-uint64_t decode_timestamp(const vec_u8& bytestream,
+uint64_t decode_timestamp(const Vec<u8>& bytestream,
                           u32 start_pos)
 {
   uint64_t buffer64 = 0x0000000000000000;
@@ -322,7 +321,7 @@ uint64_t decode_timestamp(const vec_u8& bytestream,
 /***********************************************/
 
 void encode_48(uint64_t value, 
-               vec_u8& bytestream, 
+               Vec<u8>& bytestream, 
                u32 start_pos)
 {
   bytestream[start_pos + 0] = (value >> 40) & 0xFF;
@@ -336,7 +335,7 @@ void encode_48(uint64_t value,
 /***********************************************/
 
 void encode_48_rev(uint64_t value, 
-                   vec_u8& bytestream,
+                   Vec<u8>& bytestream,
                    u32 start_pos)
 {
   bytestream[start_pos + 5] = (value >> 40) & 0xFF;
@@ -427,7 +426,7 @@ bytestream get_bytestream_from_file(const String &filename) {
 ///***********************************************/
 //
 
-void encode_blobevent(const BlobEvt_t* evt, std::vector<uint8_t> &bytestream, u32 start_pos)
+void encode_blobevent(const BlobEvt_t* evt, Vec<u8> &bytestream, u32 start_pos)
 {
   u32 enc_pos = start_pos;
   encode_ushort_rev(evt->head,        bytestream, enc_pos); enc_pos += 2;
@@ -502,7 +501,7 @@ BlobEvt_t decode_blobevent(const Vec<u8> &bytestream,
 
 /***********************************************/
 
-u64 search_for_2byte_marker(const vec_u8 &bytestream,
+u64 search_for_2byte_marker(const Vec<u8> &bytestream,
                             u8 marker,
                             bool &has_ended,
                             u64 start_pos,
@@ -529,16 +528,15 @@ u64 search_for_2byte_marker(const vec_u8 &bytestream,
 
 /***********************************************/
 
-std::vector<u32> get_2byte_markers_indices(const std::vector<uint8_t> &bytestream, uint8_t marker)
+Vec<u32> get_2byte_markers_indices(const Vec<u8> &bytestream, uint8_t marker)
 {
-  std::vector<u32> indices;
+  Vec<u32> indices;
   for (size_t k=0; k<bytestream.size() -1; k++)
     { 
       if ((bytestream[k] == marker) && (bytestream[k+1] == marker)) 
         { indices.push_back(k);}
     }
   return indices;
-   
 }
 
 /***********************************************/

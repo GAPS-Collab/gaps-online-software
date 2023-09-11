@@ -61,12 +61,12 @@ void REventPacket::add_paddle_packet(RPaddlePacket const &pkt)
 
 /*******************************************/
 
-vec_u8 REventPacket::serialize() const
+Vec<u8> REventPacket::serialize() const
 {
   // this takes into acount variable sized part
   //unsigned short packet_length = calculate_length();
   //std::cout << "Got packet length : " << packet_length << std::endl;
-  vec_u8 buffer(p_length_fixed);
+  Vec<u8> buffer(p_length_fixed);
   //std::cout << "Allocated buffer of size " << buffer.size() << std::endl;  
 
   u8 pos = 0; // position in bytestream
@@ -93,7 +93,7 @@ vec_u8 REventPacket::serialize() const
   buffer[pos] = trigger_info;   pos+=1;
   buffer[pos] = ctr_etx;        pos+=1;
 
-  vec_u8 paddle_payload;
+  Vec<u8> paddle_payload;
   for (const auto& pinfo : paddle_info)
     {
         paddle_payload = pinfo.serialize();
@@ -112,7 +112,7 @@ vec_u8 REventPacket::serialize() const
 //! FIXME - deserialize all fields.
 //  currently decode only paddle packets 
 //  (the reconstructed primary is not available anyway)
-u32 REventPacket::deserialize(vec_u8 &bytestream,
+u32 REventPacket::deserialize(Vec<u8> &bytestream,
                               u64 start_pos)
 {
   reset ();

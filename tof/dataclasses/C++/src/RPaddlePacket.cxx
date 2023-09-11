@@ -105,9 +105,9 @@ f32 RPaddlePacket::get_t_avg() const
 
 /*******************************************/
 
-vec_u8 RPaddlePacket::serialize() const
+Vec<u8> RPaddlePacket::serialize() const
 {
-  vec_u8 buffer(RPADDLEPACKETSIZE);
+  Vec<u8> buffer(RPADDLEPACKETSIZE);
   usize pos = 0; // position in bytestream
 
   Gaps::u16_to_le_bytes(head, buffer, pos);
@@ -134,9 +134,8 @@ vec_u8 RPaddlePacket::serialize() const
 
 /*******************************************/
 
-u32 RPaddlePacket::deserialize(vec_u8 &bytestream,
-                               u32 start_pos)
-{
+u32 RPaddlePacket::deserialize(Vec<u8> &bytestream,
+                               u32 start_pos) {
  reset();
      	// start from position in bytestream
  //u16 value; 

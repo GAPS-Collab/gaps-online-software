@@ -15,11 +15,11 @@ Vec<T> slice(const Vec<T>& vec, usize start, usize end) {
 }
 
 
-u16 u16_from_le_bytes(const vec_u8 &bytestream,
+u16 u16_from_le_bytes(const Vec<u8> &bytestream,
                       u64 &pos);
 
 void u16_to_le_bytes(const u16 value, 
-                     vec_u8 &bytestream,
+                     Vec<u8> &bytestream,
                      usize &pos);
 
 
@@ -60,10 +60,10 @@ i32 parse_i32(const Vec<u8> &bytestream,
 f32 parse_f32(const Vec<u8> &bytestream,
               usize &pos);
 
-u32 u32_from_le_bytes(const vec_u8 &bytestream,
+u32 u32_from_le_bytes(const Vec<u8> &bytestream,
                       usize &pos);
 
-u64 u64_from_le_bytes(const vec_u8 &bytestream,
+u64 u64_from_le_bytes(const Vec<u8> &bytestream,
                       usize &pos);
 
 u32 u32_from_be_bytes(const Vec<u8> &bytestream,
@@ -77,7 +77,7 @@ u64 parse_u48_for_16bit_words(const Vec<u8> &bytestream,
 
 
 void u32_to_le_bytes(const u32 value, 
-                     vec_u8 &bytestream,
+                     Vec<u8> &bytestream,
                      usize &pos);
 
 }

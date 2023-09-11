@@ -74,9 +74,9 @@ struct CommandPacket {
   u32 value;
 
   CommandPacket(const TofCommand &cmd, const u32 value);
-  vec_u8 to_bytestream();
+  Vec<u8> to_bytestream();
 
-  usize from_bytestream(vec_u8& payload,
+  usize from_bytestream(Vec<u8>& payload,
                         usize start_pos=0);
 
 };
@@ -114,9 +114,9 @@ struct ResponsePacket {
   u32 value;
 
   ResponsePacket(const TofResponse &resp, const u32 value);
-  vec_u8 to_bytestream() const;
+  Vec<u8> to_bytestream() const;
 
-  usize from_bytestream(vec_u8& payload,
+  usize from_bytestream(Vec<u8>& payload,
                         usize start_pos=0);
 
   //! Get a string represntation of the response codes

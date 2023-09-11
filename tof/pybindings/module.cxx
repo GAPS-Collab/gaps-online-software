@@ -72,25 +72,25 @@ std::string tof_response_to_str(const TofResponse &cmd) {
  return "Unknown";
 }
 
-vec_u16 ch_head_getter(BlobEvt_t evt)
+Vec<u16> ch_head_getter(BlobEvt_t evt)
 {
-    vec_u16 ch_head;
+    Vec<u16> ch_head;
     for (size_t k=0; k<NCHN; k++) 
     {ch_head.push_back(evt.ch_head[k]);}
     return ch_head;
 }
 
-vec_u64 ch_trail_getter(BlobEvt_t evt)
+Vec<u64> ch_trail_getter(BlobEvt_t evt)
 {
-    vec_u64 ch_trail;
+    Vec<u64> ch_trail;
     for (size_t k=0; k<NCHN; k++) 
     {ch_trail.push_back(evt.ch_trail[k]);}
     return ch_trail;
 }
 
-vec_vec_i16 ch_getter(BlobEvt_t evt)
+Vec<Vec<i16>> ch_getter(BlobEvt_t evt)
 {
-    vec_vec_i16 channels;
+    Vec<Vec<i16>> channels;
     for (size_t k=0; k<NCHN; k++) 
       {  channels.push_back({});
          for (size_t l=0; l < NWORDS; l++)
@@ -150,7 +150,7 @@ void nullsetter(T foo)
 }
 
 void set_payload_helper(TofPacket &packet,
-                        const vec_u8 payload) {
+                        const Vec<u8> payload) {
   packet.payload = payload;
   packet.payload_size = payload.size();
 }
@@ -183,9 +183,9 @@ BlobEvt_t read_event_helper(std::string filename, i32 n)
 py::dict splice_readoutboard_datafile(const std::string filename) {
   bytestream stream             = get_bytestream_from_file(filename);
   std::vector<BlobEvt_t> events = get_events_from_stream(stream, 0);
-  vec_u32 event_ids  = vec_u32(); 
-  vec_u16 stop_cells = vec_u16(); 
-  vec_u64 timestamps = vec_u64();
+  Vec<u32> event_ids  = Vec<u32>(); 
+  Vec<u16> stop_cells = Vec<u16>(); 
+  Vec<u64> timestamps = Vec<u64>();
   
   // channels, times
   Vec<Vec<u16>> t_1     = Vec<Vec<u16>>();
@@ -198,29 +198,29 @@ py::dict splice_readoutboard_datafile(const std::string filename) {
   Vec<Vec<u16>> t_8     = Vec<Vec<u16>>();
   Vec<Vec<u16>> t_9     = Vec<Vec<u16>>();
   
-  vec_vec_i16 adc_1     = vec_vec_i16();
-  vec_vec_i16 adc_2     = vec_vec_i16();
-  vec_vec_i16 adc_3     = vec_vec_i16();
-  vec_vec_i16 adc_4     = vec_vec_i16();
-  vec_vec_i16 adc_5     = vec_vec_i16();
-  vec_vec_i16 adc_6     = vec_vec_i16();
-  vec_vec_i16 adc_7     = vec_vec_i16();
-  vec_vec_i16 adc_8     = vec_vec_i16();
-  vec_vec_i16 adc_9     = vec_vec_i16();
+  Vec<Vec<i16>> adc_1     = Vec<Vec<i16>>();
+  Vec<Vec<i16>> adc_2     = Vec<Vec<i16>>();
+  Vec<Vec<i16>> adc_3     = Vec<Vec<i16>>();
+  Vec<Vec<i16>> adc_4     = Vec<Vec<i16>>();
+  Vec<Vec<i16>> adc_5     = Vec<Vec<i16>>();
+  Vec<Vec<i16>> adc_6     = Vec<Vec<i16>>();
+  Vec<Vec<i16>> adc_7     = Vec<Vec<i16>>();
+  Vec<Vec<i16>> adc_8     = Vec<Vec<i16>>();
+  Vec<Vec<i16>> adc_9     = Vec<Vec<i16>>();
  
   for (auto ev : events) {
      event_ids .push_back(ev.event_ctr);
      stop_cells.push_back(ev.stop_cell);
      timestamps.push_back(ev.timestamp);
-     adc_1       .push_back(std::vector<short>(ev.ch_adc[0], std::end(ev.ch_adc[0])));
-     adc_2       .push_back(std::vector<short>(ev.ch_adc[1], std::end(ev.ch_adc[1])));
-     adc_3       .push_back(std::vector<short>(ev.ch_adc[2], std::end(ev.ch_adc[2])));
-     adc_4       .push_back(std::vector<short>(ev.ch_adc[3], std::end(ev.ch_adc[3])));
-     adc_5       .push_back(std::vector<short>(ev.ch_adc[4], std::end(ev.ch_adc[4])));
-     adc_6       .push_back(std::vector<short>(ev.ch_adc[5], std::end(ev.ch_adc[5])));
-     adc_7       .push_back(std::vector<short>(ev.ch_adc[6], std::end(ev.ch_adc[6])));
-     adc_8       .push_back(std::vector<short>(ev.ch_adc[7], std::end(ev.ch_adc[7])));
-     adc_9       .push_back(std::vector<short>(ev.ch_adc[8], std::end(ev.ch_adc[8])));
+     adc_1       .push_back(Vec<i16>(ev.ch_adc[0], std::end(ev.ch_adc[0])));
+     adc_2       .push_back(Vec<i16>(ev.ch_adc[1], std::end(ev.ch_adc[1])));
+     adc_3       .push_back(Vec<i16>(ev.ch_adc[2], std::end(ev.ch_adc[2])));
+     adc_4       .push_back(Vec<i16>(ev.ch_adc[3], std::end(ev.ch_adc[3])));
+     adc_5       .push_back(Vec<i16>(ev.ch_adc[4], std::end(ev.ch_adc[4])));
+     adc_6       .push_back(Vec<i16>(ev.ch_adc[5], std::end(ev.ch_adc[5])));
+     adc_7       .push_back(Vec<i16>(ev.ch_adc[6], std::end(ev.ch_adc[6])));
+     adc_8       .push_back(Vec<i16>(ev.ch_adc[7], std::end(ev.ch_adc[7])));
+     adc_9       .push_back(Vec<i16>(ev.ch_adc[8], std::end(ev.ch_adc[8])));
   }
   py::dict data(
                 "event_id"_a  =py::array_t<u32>(event_ids.size(),  event_ids.data()),\
@@ -275,9 +275,9 @@ std::vector<Calibrations_t> read_calibration_file (std::string filename) {
 
 /********************/
 
-vec_vec_f64 offset_getter(const std::vector<Calibrations_t> &cal)
+Vec<Vec<f64>> offset_getter(const std::vector<Calibrations_t> &cal)
 {
-  vec_vec_f64 offsets;
+  Vec<Vec<f64>> offsets;
   for (size_t k=0; k<NCHN; k++) 
     {  offsets.push_back({});
        for (size_t l=0; l < NWORDS; l++)
@@ -288,9 +288,9 @@ vec_vec_f64 offset_getter(const std::vector<Calibrations_t> &cal)
   return offsets;
 }
 
-vec_vec_f64 dip_getter(const std::vector<Calibrations_t> &cal)
+Vec<Vec<f64>> dip_getter(const std::vector<Calibrations_t> &cal)
 {
-    vec_vec_f64 dips;
+    Vec<Vec<f64>> dips;
     for (size_t k=0; k<NCHN; k++) 
       {  dips.push_back({});
          for (size_t l=0; l < NWORDS; l++)
@@ -301,9 +301,9 @@ vec_vec_f64 dip_getter(const std::vector<Calibrations_t> &cal)
     return dips;
 }
 
-vec_vec_f64 increment_getter(const std::vector<Calibrations_t> &cal)
+Vec<Vec<f64>> increment_getter(const std::vector<Calibrations_t> &cal)
 {
-  vec_vec_f64 incs;
+  Vec<Vec<f64>> incs;
   for (size_t k=0; k<NCHN; k++) 
     {  incs.push_back({});
        for (uint l=0; l < NWORDS; l++)
@@ -314,9 +314,9 @@ vec_vec_f64 increment_getter(const std::vector<Calibrations_t> &cal)
   return incs;
 }
 
-vec_vec_f64 tbin_getter(const std::vector<Calibrations_t> cal)
+Vec<Vec<f64>> tbin_getter(const std::vector<Calibrations_t> cal)
 {
-    vec_vec_f64 tbins;
+    Vec<Vec<f64>> tbins;
     for (size_t k=0; k<NCHN; k++) 
       {  tbins.push_back({});
          for (size_t l=0; l < NWORDS; l++)
@@ -327,106 +327,13 @@ vec_vec_f64 tbin_getter(const std::vector<Calibrations_t> cal)
     return tbins;
 }
 
-//vec_vec_f32 apply_vcal_allchan_helper(u16 stop_cell,
-//                                      Vec<Calibrations_t> cals,
-//                                      Vec<Vec<i16>> adc) {
-//  Vec<Vec<f32>> waveforms;
-//  f32 waveform[NWORDS] = {0};
-//  for (usize ch=0; ch<NCHN; ch++) {
-//    apply_vcal(stop_cell,
-//               adc[ch].data(),
-//               cals[ch],
-//               waveform);
-//    i32 n = sizeof(waveform) / sizeof(waveform[0]);
-//    waveforms.push_back(Vec<f32>(waveform, waveform + n));
-//  }
-//  return waveforms;
-//}
-//
-//
-//vec_vec_f32 apply_tcal_allchan_helper(u16 stop_cell,
-//                                      Vec<Calibrations_t> cals){
-//  vec_vec_f32 all_chan_tcal;
-//  f32 times[NWORDS] = {0};
-//  for (usize ch=0; ch<NCHN; ch++) {
-//    apply_tcal(stop_cell, cals[ch], times);
-//    i32 n = sizeof(times) / sizeof(times[0]);
-//    all_chan_tcal.push_back(vec_f32(times, times+n));
-//  }
-//  return all_chan_tcal;
-//}
-//
-//
-//Vec<Vec<f32>> apply_tcal_helper(Vec<u16> stop_cells,
-//                                Calibrations_t cal) {
-//  f32 times[NWORDS] = {0};
-//  Vec<Vec<f32>> result;
-//  for (auto const &stop_cell : stop_cells) {  
-//    apply_tcal(stop_cell, cal, times);
-//    i32 n = sizeof(times) / sizeof(times[0]);
-//    result.push_back(Vec<f32>(times, times+n));
-//  }
-//  return result;
-//}
-//
-//
-//
-//Vec<Vec<f32>> apply_vcal_helper(Vec<u16> stop_cell,
-//                                Calibrations_t cal,
-//                                Vec<Vec<i16>> adc) {
-//  f32 waveform[NWORDS] = {0};
-//  Vec<Vec<f32>> result;
-//  for (usize k=0; k<adc.size();k++) {
-//    apply_vcal(stop_cell[k],
-//               adc[k].data(),
-//               cal,
-//               waveform);
-//    int n = sizeof(waveform) / sizeof(waveform[0]);
-//    result.push_back(Vec<f32>(waveform, waveform + n));
-//  }
-//    //vec_f32 result = vec_f32(waveform, waveform + n);
-//  
-//  return result; 
-//}
-//
-//vec_vec_f64 voltage_calibration_helper(const BlobEvt_t &evt,
-//                                       std::vector<Calibrations_t> cal)
-//{
-//  vec_vec_f64 result;
-//  for (size_t k=0; k<NCHN; k++) {
-//    f64 trace_out[NWORDS];
-//    u32 n = sizeof(trace_out)/sizeof(trace_out[0]);
-//    VoltageCalibration(const_cast<short int*>(evt.ch_adc[k]),
-//                       trace_out,
-//                       evt.stop_cell,
-//                       cal[k]);
-//    result.push_back(std::vector<f64>(trace_out, trace_out + n));
-//  }
-//  return result;
-//}
-//
-//vec_vec_f64 timing_calibration_helper(const BlobEvt_t &evt,
-//                                                            std::vector<Calibrations_t> cal)
-//{
-//  vec_vec_f64 result;
-//  for (size_t k=0; k<NCHN; k++) {
-//    f64 times[NWORDS];
-//    size_t n = sizeof(times)/sizeof(times[0]);
-//    TimingCalibration(times,
-//                      evt.stop_cell,
-//                      cal[k]);
-//    result.push_back(std::vector<double>(times, times + n));
-//  }
-//  return result;
-//}
-
 /********************/
 
-vec_vec_f64 remove_spikes_helper(u16 stop_cell,
-                                 vec_vec_f64 waveforms) {
+Vec<Vec<f64>> remove_spikes_helper(u16 stop_cell,
+                                 Vec<Vec<f64>> waveforms) {
  f64 wf [NCHN][NWORDS];
  i32 spikes[NWORDS];
- vec_vec_f64 unspiked;
+ Vec<Vec<f64>> unspiked;
  for (size_t ch=0; ch<NCHN; ch++) {
    unspiked.push_back({});
    for (size_t n=0; n<NWORDS; n++) {
@@ -445,8 +352,8 @@ vec_vec_f64 remove_spikes_helper(u16 stop_cell,
 
 /********************/
 
-double calculate_pedestal_helper(vec_f64 wave,
-                                 vec_f64 time,
+double calculate_pedestal_helper(Vec<f64> wave,
+                                 Vec<f64> time,
                                  size_t ch)
 {
   double* wave_arr = wave.data();

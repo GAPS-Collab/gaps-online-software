@@ -44,7 +44,7 @@ struct MasterTriggerPacket {
    *
    */
   [[deprecated("Use ::to_bytestream instead!")]]
-  vec_u8 serialize() const;
+  Vec<u8> serialize() const;
 
   /**
    * Transcode from bytestream
@@ -55,22 +55,22 @@ struct MasterTriggerPacket {
    *    over easily)
    */
   [[deprecated("Use ::from_bytestream instead!")]]
-  u64 deserialize(vec_u8 &payload,
+  u64 deserialize(Vec<u8> &payload,
                   u64 start_pos=0);
 
   //! Byte representation of the packet
-  vec_u8 to_bytestream() const;
+  Vec<u8> to_bytestream() const;
 
   //! Decode packet from byte representation
-  u64 from_bytestream(vec_u8 &payload, 
+  u64 from_bytestream(Vec<u8> &payload, 
                       u64 start_pos=0);
 
 
   //! The hit board ids
-  vec_u8 get_hit_board_ids() const;
+  Vec<u8> get_hit_board_ids() const;
 
   //! The hit board ids 
-  vec_u8 get_hit_paddle_ids() const;
+  Vec<u8> get_hit_paddle_ids() const;
 
 };
 
