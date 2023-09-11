@@ -33,7 +33,7 @@ rand = {version = "0.8", optional = true}
 json = "0.12" 
 #statrs = "0.14"
 # Takeru's tof-control
-tof-control = {path = "../../../extern/tof-control", optional = true }
+tof-control = {path = "../../../extern/tof-control", optional = true, version = "0.2" }
 smoothed_z_score = {version = "0.1", optional = true}
 sqlite = {version = "0.30", optional = true}
 
