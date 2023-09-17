@@ -41,7 +41,8 @@ use crate::events::RBEvent;
 enum Edge {
   Rising,
   Falling,
-  Average
+  Average,
+  None
 }
 
 
@@ -68,32 +69,72 @@ fn find_zero_crossings(trace: &Vec<f32>) -> Vec<usize> {
 
 /***********************************/
 
+
+///
+///
+/// # Arguments:
+///
+/// * dts : some version of tcal data? FIXME
 fn get_periods(trace   : &Vec<f32>,
-               nperiod : usize,
+               dts     : &Vec<f32>,
+               nperiod : f32,
                edge    : &Edge) -> (Vec<usize>, Vec<f32>) {
   let mut trace_c = trace.clone();
-  let mut zcs = Vec::<usize>::new();
-  let periods = Vec::<f32>::new();
+  let mut periods = Vec::<f32>::new();
   let firstbin : usize = 20;
   let nskip : f32 = 0.0;
-  let lastbin = firstbin + (nperiod as f32 * 900.0/nperiod as f32).floor() as usize;
-  let median_val = median(&trace_c);
+  let lastbin = firstbin + (nperiod * (900.0/nperiod).floor()).floor() as usize;
+  let mut vec_for_median = Vec::<f32>::new();
+  for bin in firstbin..lastbin {
+    vec_for_median.push(trace[bin]);
+  }
+  let median_val = median(&vec_for_median);
   for k in 0..trace_c.len() {
     trace_c[k] -= median_val;
   }
-  zcs = find_zero_crossings(&trace_c);
+  let mut zcs = find_zero_crossings(&trace_c);
   let mut zcs_nskip = Vec::<usize>::new();
   for k in 0..zcs.len() {
     if zcs[k] > nskip as usize {
-      zcs_nskip[k] = zcs[k];
-    }
-    match edge {
-      Edge::Rising => {
+      match edge {
+        Edge::Rising => {
+          if trace_c[zcs[k]] < 0.0 {
+            zcs_nskip[k] = zcs[k];
+          }
+        }
+        Edge::Falling => {
+          // What about the equal case?
+          if trace_c[zcs[k]] > 0.0 {
+            zcs_nskip[k] = zcs[k];
+          }
+        },
+        Edge::None => {
+          warn!("Unsure what to do for Edge::None");
+        },
+        Edge::Average => {
+          warn!("Unsure what to do for Edge::Average");
+        }
       }
-      Edge::Falling => {
-      }
-      _ => ()
     }
+    if zcs.len() < 3 {
+      return (zcs, periods);
+    }
+  }
+  for k in 0..zcs_nskip.len() -1 {
+    let zcs_a  = &zcs_nskip[k];
+    let zcs_b  = &zcs_nskip[k+1];
+    let tr_a   = &trace_c[*zcs_a..*zcs_a+2];
+    let tr_b   = &trace_c[*zcs_b..*zcs_b+2];
+    let mut period : f32 = 0.0;
+    for n in zcs_a+1..*zcs_b {
+      period += dts[n];
+    }
+    period += dts[*zcs_a]*f32::abs(tr_a[1]/(tr_a[1] - tr_a[0])); // first semi bin
+    period += dts[*zcs_b]*f32::abs(tr_b[1]/(tr_b[1] - tr_b[0])); // first semi bin
+    if zcs_b - zcs_a - nperiod as usize > 5 {
+      break;
+    }
+    periods.push(period);
   }
   zcs = zcs_nskip;
   (zcs, periods)
@@ -231,11 +272,13 @@ impl RBCalibrations {
   // skip the first n cells for the 
   // voltage calibration. Historically,
   // this had been 2.
-  pub const NSKIP  :  usize = 2;
-  pub const SINMAX :  usize = 60; // ~1000 ADC units
-  pub const DVCUT  :  f32   = 15.0; // ns away that should be considered
-  pub const NOMINALFREQ : f32 = 2.0; // nominal sampling frequency,
-                                     // GHz
+  pub const NSKIP       : usize = 2;
+  pub const SINMAX      : usize = 60; // ~1000 ADC units
+  pub const DVCUT       : f32   = 15.0; // ns away that should be considered
+  pub const NOMINALFREQ : f32   = 2.0; // nominal sampling frequency,
+                                       // GHz
+  pub const CALFREQ     : f32   = 0.025; // calibration sine wave frequency (25MHz)
+                                        
   /// Calculate the offset and dips calibration constants 
   /// for input data. 
   ///
@@ -353,6 +396,7 @@ impl RBCalibrations {
                 dval = f32::NAN;
               }
             },
+            Edge::None => (),
           }
           dval = f32::abs(dval);
           // FIXME: check the 15
@@ -394,7 +438,16 @@ impl RBCalibrations {
     }
     // at this point, the voltage calibration is complete
     info!("Voltage calibration complete!");
-    let mut edge = Edge::Average;
+    info!("Begin timing calibration!");
+    warn!("Calibration only supported for Edge::Average!");
+    // this just suppresses a warning
+    // We have to think if edge will be
+    // a parameter or a constant.
+    let mut edge    = Edge::None;
+    if matches!(edge, Edge::None) {
+      edge = Edge::Average;
+    }
+
     let mut tcal_av = Self::timing_calibration(&self.tcal_data, &edge)?;
     if matches!(edge, Edge::Average) {
       edge = Edge::Falling;
@@ -404,22 +457,71 @@ impl RBCalibrations {
           tcal_av[ch][k] += tcal_falling[ch][k];
           tcal_av[ch][k] /= 2.0;
         }
-      }
+      } 
       // for further calibration procedure
       edge = Edge::Rising;
+    } else {
+      error!("This is not implemented for any other case yet!");
+      todo!();
     }
+    
     // another set of constants
     //nevents,nchan,tracelen = gbf.traces.shape
-    let damping       : f32 = 0.1;
+    let mut damping   : f32 = 0.1;
     let corr_limit    : f32 = 0.05;
     //let n_iter_period : f32 = 1000; //#500 or nevents #
-    for n in 0..self.tcal_data.len() {
-      let stop_cell = self.tcal_data[n].header.stop_cell;
-    } // end loop over n_iter_period
-    //#nIterSlope  = 500
-    //letn_correct = np.zeros(nchan,dtype=int)
-    //nperiod = gbf.nominalFreq/calfreq
 
+    let mut tcal_av_cp = tcal_av.clone();
+    let nperiod = Self::NOMINALFREQ/Self::CALFREQ; 
+    //let mut n_correct = vec![0.0;NWORDS];
+
+    for n in 0..self.tcal_data.len() { // this is the nIterPeriod or nevents loop
+                                       // we choose nevents
+      let stop_cell = self.tcal_data[n].header.stop_cell;
+      for ch in 0..NCHN {
+        roll(&mut tcal_av_cp[ch], -1* (stop_cell as isize));
+        let mut this_ch = ch as u8;
+        this_ch += 1;
+        let tcal_trace = self.tcal_data[n].get_adc_ch(this_ch);
+        let mut tcal_trace_f32 = Vec::<f32>::with_capacity(tcal_trace.len());
+        for j in tcal_trace.iter() {
+          tcal_trace_f32.push(*j as f32);
+        }
+        let tracelen = tcal_trace_f32.len();
+        let (zcs, periods) = get_periods(&tcal_trace_f32,
+                                         &tcal_av_cp[ch],
+                                         nperiod,
+                                         &edge);
+        for (n_p,period) in periods.iter().enumerate() {
+          let zcs_a = zcs[n_p] + stop_cell as usize;
+          let zcs_b = zcs[n_p + 1] + stop_cell as usize;
+          let mut corr = (1.0/Self::CALFREQ)/period;
+          if matches!(edge, Edge::None) {
+            corr *= 0.5;
+          }
+          if f32::abs(corr - 1.0) > corr_limit {
+            continue;
+          }
+          corr = (corr-1.0)*damping + 1.0;
+          let zcs_a_tl = zcs_a%tracelen;
+          let zcs_b_tl = zcs_b%tracelen;
+          if zcs_a < tracelen && zcs_b > tracelen {
+            for m in zcs_a..tcal_av[ch].len() {
+              tcal_av[ch][m] *= corr;
+            }
+            for m in 0..zcs_b_tl {
+              tcal_av[ch][m] *= corr;
+            }
+          } else {
+            for m in zcs_a_tl..zcs_b_tl {
+              tcal_av[ch][m] *= corr;
+            }
+          }
+        }
+        //n_correct[ch] += 1.0;
+      }
+      damping *= 0.99;
+    } // end loop over n_iter_period
     Ok(())
   }
 
