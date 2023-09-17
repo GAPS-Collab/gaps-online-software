@@ -34,6 +34,9 @@ use crate::events::{RBEventPayload,
 
 use crate::calibrations::RBCalibrations;
 
+pub mod packet_type;
+pub use packet_type::PacketType;
+
 pub enum PacketQuality {
   Perfect,
   Good,
@@ -44,140 +47,7 @@ pub enum PacketQuality {
 }
 
 
-pub const PACKET_TYPE_UNKNOWN        : u8 =  0;
-pub const PACKET_TYPE_COMMAND        : u8 = 10;
-pub const PACKET_TYPE_RBEVENT        : u8 = 20;
-pub const PACKET_TYPE_TOFEVENT       : u8 = 21;
-// not specific enough, deprecated. Use the packet
-// types for monitor packets below
-pub const PACKET_TYPE_MONITOR           : u8 = 30;
-pub const PACKET_TYPE_HEARTBEAT         : u8 = 40;
-pub const PACKET_TYPE_SCALAR            : u8 = 50;
-pub const PACKET_TYPE_MT                : u8 = 60;
-pub const PACKET_TYPE_RBHEADER          : u8 = 70;
-// monitoring packets
-pub const PACKET_TYPE_TOFCMP_MONI       : u8 = 80;
-pub const PACKET_TYPE_MTB_MONI          : u8 = 90;
-pub const PACKET_TYPE_RB_MONI           : u8 = 100;
-pub const PACKET_TYPE_RBEVENTPAYLOAD    : u8 = 110;
-pub const PACKET_TYPE_RBEVENTMEMORYVIEW : u8 = 120;
-pub const PACKET_TYPE_RBCALIBRATION     : u8 = 130;
 
-//// Each packet is send from somewhere.
-////
-//// Encode the sender in the packet, since
-//// the streaming might be asynchronous.
-////
-//// Have a specific sender id per RB as 
-//// well as one for the TofComputer.
-////#[derive(Debug, Copy, Clone, PartialEq)]
-////pub enum SenderId {
-////  RB1,
-////  RB2,
-////  RB3,
-////  RB4,
-////  RB5,
-////  RB6,
-////  RB7,
-////  RB8,
-////  RB9,
-////  RB10,
-////  RB11,
-////  RB12,
-////  RB13,
-////  RB14,
-////  RB15,
-////  RB1
-
-/// Types of serializable data structures used
-/// throughout the tof system
-#[derive(Debug, PartialEq, Clone)]
-//#[repr(u8)]
-pub enum PacketType {
-  Unknown       , 
-  Command       ,
-  TofEvent      ,
-  Monitor       ,
-  MasterTrigger , 
-  HeartBeat     ,
-  Scalar        ,
-  RBHeader      ,
-  RBEventPayload,
-  RBEvent       ,
-  RBEventMemoryView,
-  MonitorRb     ,
-  MonitorTofCmp ,
-  MonitorMtb    ,
-  RBCalibration ,
-}
-
-impl PacketType {
-  pub fn as_u8(packet_type : &PacketType)   -> u8 {
-    match packet_type {
-      PacketType::Unknown        => PACKET_TYPE_UNKNOWN,
-      PacketType::Command        => PACKET_TYPE_COMMAND,
-      PacketType::RBEvent        => PACKET_TYPE_RBEVENT,
-      PacketType::RBEventPayload => PACKET_TYPE_RBEVENTPAYLOAD, 
-      PacketType::RBHeader       => PACKET_TYPE_RBHEADER,
-      PacketType::RBEventMemoryView => PACKET_TYPE_RBEVENTMEMORYVIEW,
-      PacketType::TofEvent       => PACKET_TYPE_TOFEVENT,
-      PacketType::Monitor        => PACKET_TYPE_MONITOR,
-      PacketType::HeartBeat      => PACKET_TYPE_HEARTBEAT,
-      PacketType::MasterTrigger  => PACKET_TYPE_MT,
-      PacketType::Scalar         => PACKET_TYPE_SCALAR,
-      PacketType::MonitorRb      => PACKET_TYPE_RB_MONI,
-      PacketType::MonitorTofCmp  => PACKET_TYPE_TOFCMP_MONI,
-      PacketType::MonitorMtb     => PACKET_TYPE_MTB_MONI,
-      PacketType::RBCalibration  => PACKET_TYPE_RBCALIBRATION,
-    }
-  }
-
-  pub fn from_u8(value : u8) -> Option<PacketType> {
-    match value {
-      PACKET_TYPE_UNKNOWN        => Some(PacketType::Unknown),  
-      PACKET_TYPE_COMMAND        => Some(PacketType::Command), 
-      PACKET_TYPE_RBEVENT        => Some(PacketType::RBEvent), 
-      PACKET_TYPE_TOFEVENT       => Some(PacketType::TofEvent),
-      PACKET_TYPE_MONITOR        => Some(PacketType::Monitor), 
-      PACKET_TYPE_HEARTBEAT      => Some(PacketType::HeartBeat),
-      PACKET_TYPE_MT             => Some(PacketType::MasterTrigger),
-      PACKET_TYPE_SCALAR         => Some(PacketType::Scalar),
-      PACKET_TYPE_RBHEADER       => Some(PacketType::RBHeader),
-      PACKET_TYPE_RBEVENTPAYLOAD => Some(PacketType::RBEventPayload),
-      PACKET_TYPE_RBEVENTMEMORYVIEW => Some(PacketType::RBEventMemoryView),
-      PACKET_TYPE_RB_MONI        => Some(PacketType::MonitorRb),
-      PACKET_TYPE_MTB_MONI       => Some(PacketType::MonitorMtb),
-      PACKET_TYPE_TOFCMP_MONI    => Some(PacketType::MonitorTofCmp),
-      PACKET_TYPE_RBCALIBRATION  => Some(PacketType::RBCalibration),
-      _   => None,
-    }
-  }
-}
-
-impl fmt::Display for PacketType {
-  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    
-    let repr : String;
-    match self {
-      PacketType::Unknown        => { repr = String::from("UNKNOWN")     },
-      PacketType::Command        => { repr = String::from("COMMAND")     },
-      PacketType::RBEvent        => { repr = String::from("RBEVENT")     },
-      PacketType::RBEventPayload => { repr = String::from("RBEVENTPAYLOAD") },
-      PacketType::RBEventMemoryView => { repr = String::from("RBEVENTMEMORYVIEW") },
-      PacketType::TofEvent       => { repr = String::from("TOFEVENT")    },
-      PacketType::Monitor        => { repr = String::from("MONITOR")     },
-      PacketType::HeartBeat      => { repr = String::from("HEARTBEAT")   },
-      PacketType::MasterTrigger  => { repr = String::from("MT")          },
-      PacketType::Scalar         => { repr = String::from("SCALAR")      },
-      PacketType::RBHeader       => { repr = String::from("RBHEADER")    },
-      PacketType::MonitorRb      => { repr = String::from("RB_MONI")     },
-      PacketType::MonitorTofCmp  => { repr = String::from("TOFCMP_MONI") },
-      PacketType::MonitorMtb     => { repr = String::from("MTB_MONI")    },
-      PacketType::RBCalibration  => { repr = String::from("RBCalibration")},
-    }
-    write!(f, "<PacketType {}>", repr)
-  }
-}
 
 /// The most basic of all packets
 ///  
@@ -195,11 +65,16 @@ impl fmt::Display for PacketType {
 ///
 #[derive(Debug, PartialEq, Clone)]
 pub struct TofPacket {
-  pub packet_type     : PacketType,
-  pub payload         : Vec<u8>,
+  pub packet_type      : PacketType,
+  pub payload          : Vec<u8>,
   // FUTURE EXTENSION: Be able to send
   // packets which contain multiple of the same packets
-  pub is_multi_packet : bool,
+  pub is_multi_packet  : bool,
+  /// mark a packet as not eligible to be written to disk
+  pub no_write_to_disk : bool,
+  /// mark a packet as not eligible to be sent over network 
+  /// FIXME - future extension
+  pub no_send_over_nw  : bool,
 }
 
 
@@ -219,12 +94,8 @@ impl fmt::Display for TofPacket {
 }
 
 impl Default for TofPacket {
-  fn default() -> TofPacket {
-    TofPacket {
-      packet_type     : PacketType::Unknown,
-      payload         : Vec::<u8>::new(),
-      is_multi_packet : false
-    }
+  fn default() -> Self {
+    Self::new()
   }
 }
 
@@ -234,9 +105,11 @@ impl TofPacket {
 
   pub fn new() -> Self {
     Self {
-      packet_type     : PacketType::Unknown,
-      payload         : Vec::<u8>::new(),
-      is_multi_packet : false
+      packet_type      : PacketType::Unknown,
+      payload          : Vec::<u8>::new(),
+      is_multi_packet  : false,
+      no_write_to_disk : false,
+      no_send_over_nw  : false
     }
   }
  
@@ -300,7 +173,7 @@ impl From<&MasterTriggerEvent> for TofPacket {
 impl From<&RBMoniData> for TofPacket {
   fn from(moni : &RBMoniData) -> TofPacket {
     let mut tp = TofPacket::new();
-    tp.packet_type = PacketType::MonitorRb;
+    tp.packet_type = PacketType::RBMoni;
     tp.payload = moni.to_bytestream();
     tp
   }
@@ -403,28 +276,6 @@ impl Serialization for TofPacket {
   }
 }
 
-#[test]
-fn test_packet_types() {
-  let mut type_codes = Vec::<u8>::new();
-  type_codes.push(PACKET_TYPE_UNKNOWN          ); 
-  type_codes.push(PACKET_TYPE_COMMAND          ); 
-  type_codes.push(PACKET_TYPE_RBEVENT          ); 
-  type_codes.push(PACKET_TYPE_TOFEVENT         ); 
-  type_codes.push(PACKET_TYPE_MONITOR          ); 
-  type_codes.push(PACKET_TYPE_HEARTBEAT        ); 
-  type_codes.push(PACKET_TYPE_SCALAR           ); 
-  type_codes.push(PACKET_TYPE_MT               ); 
-  type_codes.push(PACKET_TYPE_RBHEADER         ); 
-  type_codes.push(PACKET_TYPE_TOFCMP_MONI      ); 
-  type_codes.push(PACKET_TYPE_MTB_MONI         ); 
-  type_codes.push(PACKET_TYPE_RB_MONI          );
-  type_codes.push(PACKET_TYPE_RBEVENTPAYLOAD   );
-  type_codes.push(PACKET_TYPE_RBEVENTMEMORYVIEW);
-  type_codes.push(PACKET_TYPE_RBCALIBRATION    );
-  for tc in type_codes.iter() {
-    assert_eq!(*tc,PacketType::as_u8(&PacketType::from_u8(*tc).unwrap()));  
-  }
-}
 
 #[test]
 fn test_serialize_tofpacket() ->Result<(), SerializationError> {
