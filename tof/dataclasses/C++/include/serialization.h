@@ -56,13 +56,13 @@ void encode_ushort_rev(unsigned short value, mutable_payload_t& bytestream, unsi
 
 /***********************************************/
 
-uint32_t decode_uint32(payload_t& bytestream,
+u32 decode_uint32(payload_t& bytestream,
                        unsigned int start_pos=0);
 
 /***********************************************/
 
 [[deprecated("The assumed byteorder in this function is unclear/confusing")]]
-uint32_t decode_uint32_rev(payload_t& bytestream,
+u32 decode_uint32_rev(payload_t& bytestream,
                            unsigned int start_pos=0);
 
 /***********************************************/
@@ -74,26 +74,26 @@ u32 u32_from_le_bytes(const Vec<u8> &bytestream,
 
 void u32_to_le_bytes(u32 value, Vec<u8> &bytestream, u8 start_pos);
 
-void encode_uint32(uint32_t value, Vec<u8>& bytestream, unsigned int start_pos=0);
-void encode_uint32_rev(uint32_t value, Vec<u8>& bytestream, unsigned int start_pos=0);
+void encode_uint32(u32 value, Vec<u8>& bytestream, unsigned int start_pos=0);
+void encode_uint32_rev(u32 value, Vec<u8>& bytestream, unsigned int start_pos=0);
 
 /***********************************************/
 
-void encode_48(uint64_t value, Vec<u8>& bytestream, unsigned int start_pos=0);
+void encode_48(u64 value, Vec<u8>& bytestream, unsigned int start_pos=0);
 
 /***********************************************/
 
-void encode_48_rev(uint64_t value, Vec<u8>& bytestream, unsigned int start_pos=0);
+void encode_48_rev(u64 value, Vec<u8>& bytestream, unsigned int start_pos=0);
 
 /***********************************************/
 
-uint64_t decode_uint64(payload_t& bytestream,
+u64 decode_uint64(payload_t& bytestream,
                        unsigned int start_pos=0);
 
 /***********************************************/
 
 [[deprecated("The assumed byteorder in this function is unclear/confusing")]]
-uint64_t decode_uint64_rev(const Vec<u8>& bytestream,
+u64 decode_uint64_rev(const Vec<u8>& bytestream,
                            unsigned int start_pos=0);
 
 u64 u64_from_le_bytes(const Vec<u8> &bytestream,
@@ -103,27 +103,27 @@ u64 u64_from_le_bytes(const Vec<u8> &bytestream,
 
 void u64_to_le_bytes(u64 value, Vec<u8> &bytestream, u64 start_pos=0);
 
-void encode_uint64(uint64_t value, Vec<u8>& bytestream, unsigned int start_pos=0);
-void encode_uint64_rev(uint64_t value, Vec<u8>& bytestream, unsigned int start_pos=0);
+void encode_uint64(u64 value, Vec<u8>& bytestream, unsigned int start_pos=0);
+void encode_uint64_rev(u64 value, Vec<u8>& bytestream, unsigned int start_pos=0);
 
 //! encodes timestamp according to BlobEvent format - 48 bits instead of 64 and adds appropriate padding 
-void encode_timestamp(uint64_t value, Vec<u8>& bytestream, unsigned int start_pos=0);
+void encode_timestamp(u64 value, Vec<u8>& bytestream, unsigned int start_pos=0);
 
 /***********************************************/
 
-uint64_t decode_timestamp(Vec<u8>& bytestream, unsigned int start_pos=0);
+u64 decode_timestamp(Vec<u8>& bytestream, unsigned int start_pos=0);
 
 /***********************************************/
 
-uint16_t encode_12bitsensor(float value, float minrannge, float maxrange);
+u16 encode_12bitsensor(f32 value, f32 minrannge, f32 maxrange);
 
 /***********************************************/
 
-float decode_12bitsensor(uint16_t value, float minrange, float maxrange);
+f32 decode_12bitsensor(u16 value, f32 minrange, f32 maxrange);
 
 /***********************************************/
 
-//int16_t encode_14bit(float value, float minrannge, float maxrange);
+//int16_t encode_14bit(f32 value, f32 minrannge, f32 maxrange);
 
 /***********************************************/
 
@@ -132,7 +132,7 @@ int16_t decode_14bit(const Vec<u8>& bytestream,
 
 /***********************************************/
 
-void encode_blobevent(const BlobEvt_t* evt, std::vector<uint8_t> &bytestream, unsigned int start_pos);
+void encode_blobevent(const BlobEvt_t* evt, Vec<u8> &bytestream, unsigned int start_pos);
 
 /***********************************************/
 
@@ -167,7 +167,7 @@ u64 search_for_2byte_marker(
 
 /***********************************************/
 
-std::vector<uint32_t> get_2byte_markers_indices(const std::vector<uint8_t> &bytestream, uint8_t marker);
+Vec<u32> get_2byte_markers_indices(const Vec<u8> &bytestream, u8 marker);
 
 // file i/o
 /***********************************************/

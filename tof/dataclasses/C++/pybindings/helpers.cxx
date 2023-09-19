@@ -306,4 +306,26 @@ Vec<py::array_t<f32>> wrap_rbcalibration_nanoseconds_allchan_rbeventmemoryview(c
   return arr;
 }
 
+/***********************************************/
+
+RBCalibration unpack_tp_to_rbcalibration(const TofPacket& tp) {
+  if (tp.packet_type != PacketType::RBCalibration) {
+    String message = "The TofPacket has the wrong type!" + packet_type_to_string(tp.packet_type);
+    PyErr_SetString(PyExc_ValueError, message.c_str());
+    throw py::error_already_set();
+  }
+  u64 pos = 0; 
+  return RBCalibration::from_bytestream(tp.payload, pos);
+}
+
+// this can be possible, we can cast to py::object
+// with py::cast. However, that might require 
+// allocating on the heap. Let's be careful first
+//py::object unpack(const TofPacket& tp) {
+//  if (tp.packet_type == PacketType::RBCalibration) {
+//    u64 pos = 0; 
+//    return RBCalibration::from_bytestream(tp.payload, pos);
+//  }
+//  return py::int_(42);
+//}
 

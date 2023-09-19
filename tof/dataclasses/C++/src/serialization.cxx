@@ -512,10 +512,10 @@ u64 search_for_2byte_marker(const Vec<u8> &bytestream,
     { end_pos = bytestream.size() - 1;} 
   if (start_pos >= end_pos) {
     has_ended = true;
+    spdlog::warn("Start and end positions are invalid! Start pos {}, end pos {}", start_pos, end_pos);
     return 0;
   }
-  for (u64 k=start_pos; k<end_pos; k++)
-    { 
+  for (u64 k=start_pos; k<end_pos; k++) { 
       if ((bytestream[k] == marker) && (bytestream[k+1] == marker))  {
         //std::cout << "endpos " << end_pos << std::endl;
         //std::cout << "Found marker at pos " << k << " " << bytestream[k] << std::endl;

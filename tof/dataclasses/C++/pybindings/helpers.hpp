@@ -55,3 +55,6 @@ py::array_t<T> to_nparray(const Vec<T> &vec) {
   return numpy_array;
 }
 
+RBCalibration unpack_tp_to_rbcalibration(const TofPacket& tp);
+
+//py::object unpack(const TofPacket& tp);

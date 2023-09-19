@@ -21,7 +21,6 @@
 #include "WaveGAPS.h"
 #include "TOFCommon.h"
 #include "events.h"
-#include "tofpacket_reader.hpp"
 
 #include "tof_typedefs.h"
 
@@ -658,7 +657,7 @@ PYBIND11_MODULE(gaps_tof, m) {
         .def_readonly("payload_size", &TofPacket::payload_size)
         .def_readonly("packet_type",  &TofPacket::packet_type)
         .def("__repr__",          [](const TofPacket &pkg) {
-                                  return "<TofPacket : " + pkg.to_string() + "'>";
+                                  return pkg.to_string();
                                   }); 
 
     py::class_<RPaddlePacket>(m, "RPaddlePacket")
@@ -846,7 +845,8 @@ PYBIND11_MODULE(gaps_tof, m) {
        .def_readonly("v_incs",     &RBCalibration::v_incs)
        .def_readonly("v_dips",     &RBCalibration::v_dips)
        .def_readonly("t_bin",      &RBCalibration::t_bin)
-
+       .def("from_tofpacket",      unpack_tp_to_rbcalibration,
+            "Unpack a RBCalibration from a compatible tofpacket") 
        .def("nanoseconds",         wrap_rbcalibration_nanoseconds_allchan_rbevent,
             "Apply timing calibration to adc values of all channels")
        .def("nanoseconds",         wrap_rbcalibration_nanoseconds_allchan_rbeventmemoryview,

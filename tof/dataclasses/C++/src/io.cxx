@@ -69,16 +69,16 @@ Vec<TofPacket> get_tofpackets(const Vec<u8> &bytestream, u64 start_pos) {
   TofPacket packet;
   u64 n_packets = 0;
   while (true) {
-    last_pos = pos;
     packet = TofPacket::from_bytestream(bytestream, pos);
     //if (n_packets == 100) {break;}
     if (pos != last_pos) {
       //spdlog::info("pos: {}", pos);
       packets.push_back(packet);
-      //n_packets += 1;
+      n_packets += 1;
     } else {
       break;
     }
+    last_pos = pos;
   }
   spdlog::info("Read out {} packets from bytestream!", n_packets);
   return packets;
@@ -91,6 +91,11 @@ Vec<TofPacket> get_tofpackets(const String filename) {
   auto stream = get_bytestream_from_file(filename); 
   bool has_ended = false;
   auto pos = search_for_2byte_marker(stream,0xAA, has_ended );
+  if (has_ended) {
+    spdlog::error("The stream ended before we found any header marker!");
+  } else {
+    spdlog::info("Found the first header at pos {}", pos);
+  }
   spdlog::info("Read {} bytes from {}", stream.size(), filename);
   return get_tofpackets(stream, pos);
 }
