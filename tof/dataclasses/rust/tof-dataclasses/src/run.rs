@@ -177,22 +177,33 @@ impl Default for RunConfig {
 
 impl fmt::Display for RunConfig {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(f, "<RunConfig :
-      nevents     : {}
-      active      : {}
-      nseconds    : {}
-      stream any  : {}
-      data type   : {}
-      data format : {} 
-      ... [incomplete Display method FIXEM] ..
-      buff size : {}>",
+    if !self.is_active {
+      return write!(f, "<RunConfig -- is_active : false>");
+    } else {
+      write!(f, 
+"<RunConfig -- is_active : true
+    nevents     : {}
+    nseconds    : {}
+    stream any  : {}
+    data type   : {}
+    data format : {} 
+    tr_poi_rate : {}
+    tr_fix_rate : {}
+    mtb_latch   : {}
+    active_ch   : {}
+      |--> data channels (ch 9 separate)
+    buff size : {} [ev]>",
       self.nevents,
-      self.is_active,
       self.nseconds,
       self.stream_any,
       self.data_type.string_repr(),
       self.data_format.string_repr(),
+      self.trigger_poisson_rate,
+      self.trigger_fixed_rate,
+      self.latch_to_mtb,
+      self.active_channel_mask,
       self.rb_buff_size)
+    }
   }
 }
 
