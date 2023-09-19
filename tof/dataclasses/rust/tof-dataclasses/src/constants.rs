@@ -5,8 +5,7 @@
 
 
 /// Number of Channels on the readoutboards
-pub const NCHN          : usize = 9; // even though this is well in range of u8, 
-                                     // we need it to be u16 so it can be multiplied
+pub const NCHN          : usize = 9;  
 
 /// Number of entries for each waveform (voltage and timing each)
 pub const NWORDS        : usize = 1024;
