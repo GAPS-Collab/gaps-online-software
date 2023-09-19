@@ -229,6 +229,7 @@ pub fn get_device_dna() -> Result<u64, RegisterError> {
 
 /// Enable the readout of all channels + the 9th channel
 pub fn set_readout_all_channels_and_ch9() -> Result<(), RegisterError> {
+  warn!("This might be buggy!");
   let all_channels : u32 = 511;
   let ch_9         : u32 = 512;
   let value = all_channels | ch_9;
@@ -239,6 +240,7 @@ pub fn set_readout_all_channels_and_ch9() -> Result<(), RegisterError> {
 
 /// Enable active channels
 pub fn set_active_channel_mask(ch_mask : u8) -> Result<(), RegisterError> {
+  warn!("This might be buggy!");
   let mut value   = read_control_reg(READOUT_MASK)?;
   //let mut ch_part = value >> 8;
   //ch_part         = ch_part << 8;
@@ -246,6 +248,13 @@ pub fn set_active_channel_mask(ch_mask : u8) -> Result<(), RegisterError> {
   value           = value >> 8;
   value           = value << 8;
   value           = value | (ch_mask as u32);
+  write_control_reg(READOUT_MASK, value)?;
+  Ok(())
+}
+
+pub fn set_active_channel_mask_with_ch9(ch_mask : u32) -> Result<(), RegisterError> {
+  let ch_9  : u32 = 256;
+  let value = ch_mask | ch_9;
   write_control_reg(READOUT_MASK, value)?;
   Ok(())
 }
