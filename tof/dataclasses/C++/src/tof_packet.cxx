@@ -33,14 +33,23 @@ std::string packet_type_to_string(const PacketType pt) {
       case PacketType::RBHeader : {
       return "RBEventHeader";
     }
-      case PacketType::MonitorTofCmp : {
+      case PacketType::TOFCmpMoni : {
       return "TofCmpMoni";
     }
-      case PacketType::MonitorMtb : {
+      case PacketType::MTBMoni : {
       return "MtbMoni";
     }
-      case PacketType::MonitorRb : {
+      case PacketType::RBMoni : {
       return "RBMoni";
+    }
+      case PacketType::RBCalibration : {
+      return "RBCalibration";
+    }
+      case PacketType::RBEventMemoryView : {
+      return "RBEventMemoryView";
+    }
+      case PacketType::RBEventPayload : {
+      return "RBEventMemoryView";
     }
   }
   return "Unknown";
@@ -126,11 +135,11 @@ Vec<u8> TofPacket::to_bytestream() const
 /**************************************************/
 
 TofPacket TofPacket::from_bytestream(const Vec<u8> &bytestream,
-                                      u64           &pos){ 
+                                     u64           &pos){ 
   TofPacket packet = TofPacket();
   u16 value = Gaps::parse_u16(bytestream, pos);
   if (value != TofPacket::HEAD) {
-    spdlog::error("No header found!");
+    spdlog::error("No header found for position {}! Bytes are {} {}. Decoded to {}.", pos, bytestream[pos], bytestream[pos+1], value);
     /// print out the next/pre 5 bytes
     //spdlog::error("Byte! {}",bytestream[pos -5]);
     //spdlog::error("Byte! {}",bytestream[pos -4]);
@@ -165,8 +174,8 @@ TofPacket TofPacket::from_bytestream(const Vec<u8> &bytestream,
 
 std::string TofPacket::to_string() const
 {
-   std::string repr = "TOFPACKET - type : ";
-   repr += packet_type_to_string(static_cast<PacketType>(packet_type)) + " - payload size " + std::to_string(payload_size);
+   std::string repr = "<TofPacket - type : ";
+   repr += packet_type_to_string(static_cast<PacketType>(packet_type)) + " - payload size : " + std::to_string(payload_size) + ">";
    return repr;
 
 }

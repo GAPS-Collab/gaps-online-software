@@ -6,32 +6,39 @@
 
 #include "tof_typedefs.h"
 
-static const u8 PACKET_TYPE_UNKNOWN     =  0;
-static const u8 PACKET_TYPE_COMMAND     = 10;
-static const u8 PACKET_TYPE_RBEVENT     = 20;
-static const u8 PACKET_TYPE_TOFEVENT    = 21;
-static const u8 PACKET_TYPE_MONITOR     = 30;
-static const u8 PACKET_TYPE_HEARTBEAT   = 40;
-static const u8 PACKET_TYPE_SCALAR      = 50;
-static const u8 PACKET_TYPE_MT          = 60;
-static const u8 PACKET_TYPE_RBHEADER    = 70;
-static const u8 PACKET_TYPE_TOFCMP_MONI = 80;
-static const u8 PACKET_TYPE_MTB_MONI    = 90;
-static const u8 PACKET_TYPE_RB_MONI     = 100;
+static const u8 UNKNOWN            =  0;
+static const u8 COMMAND            = 10;
+static const u8 RBEVENT            = 20;
+static const u8 TOFEVENT           = 21;
+static const u8 MONITOR            = 30;
+static const u8 HEARTBEAT          = 40;
+static const u8 SCALAR             = 50;
+static const u8 MT                 = 60;
+static const u8 RBHEADER           = 70;
+static const u8 TOFCMP_MONI        = 80;
+static const u8 MTB_MONI           = 90;
+static const u8 RB_MONI            = 100;
+static const u8 RBEVENTPAYLOAD     = 110;
+static const u8 RBEVENTMEMORYVIEW  = 120;
+static const u8 RBCALIBRATION      = 130;
+
 
 enum class PacketType : u8 {
-  Unknown       = PACKET_TYPE_UNKNOWN,
-  Command       = PACKET_TYPE_COMMAND,
-  RBEvent       = PACKET_TYPE_RBEVENT,
-  TofEvent      = PACKET_TYPE_TOFEVENT,
-  Monitor       = PACKET_TYPE_MONITOR,
-  HeartBeat     = PACKET_TYPE_HEARTBEAT,
-  Scalar        = PACKET_TYPE_SCALAR,
-  MasterTrigger = PACKET_TYPE_MT,
-  RBHeader      = PACKET_TYPE_RBHEADER,
-  MonitorRb     = PACKET_TYPE_RB_MONI,
-  MonitorTofCmp = PACKET_TYPE_TOFCMP_MONI,
-  MonitorMtb    = PACKET_TYPE_MTB_MONI 
+  Unknown           = UNKNOWN            ,
+  Command           = COMMAND            ,
+  RBEvent           = RBEVENT            ,
+  TofEvent          = TOFEVENT           ,
+  Monitor           = MONITOR            ,
+  HeartBeat         = HEARTBEAT          ,
+  Scalar            = SCALAR             ,
+  MasterTrigger     = MT                 ,
+  RBHeader          = RBHEADER           ,
+  TOFCmpMoni        = TOFCMP_MONI        ,
+  MTBMoni           = MTB_MONI           ,
+  RBMoni            = RB_MONI            ,
+  RBEventPayload    = RBEVENTPAYLOAD     ,
+  RBEventMemoryView = RBEVENTMEMORYVIEW  ,
+  RBCalibration     = RBCALIBRATION      ,
 };
 
 
@@ -91,6 +98,30 @@ struct TofPacket {
 
   //! Just to be used for debugging - NO SERIALIZATION. 
   std::string to_string() const;
+  
+  //! A generic unpacking method - unpack everything which
+  //! is stored within the payload 
+  template <typename T>
+  T unpack() {
+    // Check if T has a 'from_bytestream' method.
+    static_assert(
+        std::is_member_function_pointer<decltype(&T::from_bytestream)>::value,
+        "T must have a 'from_bytestream' method.");
+    return T::from_bytestream(payload, 0);
+  }
+
+
+  
+
+
+  
+
+
+
+  
+
+
+  
 
 }; // end TofPacket
 
