@@ -35,7 +35,7 @@ use tof_dataclasses::commands::{//TofCommand,
                                 TofOperationMode};
 use tof_dataclasses::events::{DataType,
                               DataFormat};
-use tof_dataclasses::calibrations::RBCalibrations;
+//use tof_dataclasses::calibrations::RBCalibrations;
 use tof_dataclasses::run::RunConfig;
 #[macro_use] extern crate log;
 
@@ -72,7 +72,7 @@ struct Args {
   verbose : bool,
   /// Write the readoutboard binary data ('.robin') to the board itself
   #[arg(long, default_value_t = false)]
-  write_robin : bool,
+  to_local_file : bool,
   /// Take data for calibration. This comprises tcal, vcal and 
   /// no input data
   #[arg(long, default_value_t = false)]
@@ -92,6 +92,7 @@ fn main() {
     writeln!( buf, "[{level}][{module_path}:{line}] {args}",
       level = color_log(&record.level()),
       module_path = record.module_path().unwrap_or("<unknown>"),
+      //target = record.target(),
       line = record.line().unwrap_or(0),
       args = record.args()
       )
@@ -104,44 +105,10 @@ fn main() {
   let cache_size               = args.cache_size;
   let wf_analysis              = args.waveform_analysis;
   let calibration              = args.calibration;
-  let write_robin              = args.write_robin;
+  let mut to_local_file        = args.to_local_file;
   let run_config               = args.run_config;
   let test_eventids            = args.test_eventids;
   
-  if test_eventids {
-    warn!("Testing mode. We will take 10000 events with a 100Hz poisson trigger and check the ventids!");
-  }
-  if wf_analysis {
-    todo!("--waveform-analysis is currently not implemented!");
-  }
-
-  // per default the data type should be 
-  // header with all waveform data
-  //let mut data_type = DataType::Physics;
-
-  let mut rc_config     = RunConfig::new();
-  let mut rc_file_path  = std::path::PathBuf::new();
-  let mut end_after_run = false;
-
-  if calibration {
-    warn!("Readoutboard calibration! This will override ALL other settings!");
-    end_after_run = true;
-  }
-  
-
-  match run_config {
-    None     => {
-      println!("=> We did not get a runconfig! Currently we are just listening for input on the socket. This is the desired behavior, if run by systemd. If you want to take data in standalone mode, either send a runconfig to the socket or hit CTRL+C and start the program again, this time suppling the -r <RUNCONFIG> flag.");
-    }
-    Some(rcfile) => {
-      rc_file_path   = rcfile.clone();
-      rc_config      = get_runconfig(&rcfile);
-      end_after_run  = rc_config.nevents > 0 || rc_config.nseconds > 0;
-    }
-  }
-
-  let file_suffix   = String::from(".robin");
-
   //FIMXE - this needs to become part of clap
   let cmd_server_ip = String::from("10.0.1.1");
   //let cmd_server_ip     = args.cmd_server_ip;  
@@ -151,7 +118,7 @@ fn main() {
   // ip to tof computer
   let rb_id = get_board_id().expect("Unable to obtain board ID!");
   let dna   = get_device_dna().expect("Unable to obtain device DNA!"); 
-
+  
   // welcome banner!
   println!("-----------------------------------------------");
   println!(" ** Welcome to liftof-rb \u{1F680} \u{1F388} *****");
@@ -170,6 +137,46 @@ fn main() {
   println!(" => -- -- PORT {} (0MQ SUB) where we will be listening for commands", DATAPORT);
   println!("-----------------------------------------------");
   
+  if test_eventids {
+    warn!("Testing mode! Only for debugging!");
+  }
+  if wf_analysis {
+    todo!("--waveform-analysis is currently not implemented!");
+  }
+
+  // per default the data type should be 
+  // header with all waveform data
+  //let mut data_type = DataType::Physics;
+
+  let mut rc_config     = RunConfig::new();
+  let mut rc_file_path  = std::path::PathBuf::new();
+  let mut end_after_run = false;
+
+  if calibration {
+    warn!("Readoutboard calibration! This will override ALL other settings!");
+    end_after_run = true;
+    to_local_file = true;
+  }
+  
+  let config_from_shell : bool;
+  match run_config {
+    None     => {
+      println!("=> We did not get a runconfig! Currently we are just listening for input on the socket. This is the desired behavior, if run by systemd. If you want to take data in standalone mode, either send a runconfig to the socket or hit CTRL+C and start the program again, this time suppling the -r <RUNCONFIG> flag or in case you want to calibrate the board, use the --calibration flag.");
+      config_from_shell = false;
+    }
+    Some(rcfile) => {
+      rc_file_path   = rcfile.clone();
+      rc_config      = get_runconfig(&rcfile);
+      end_after_run  = rc_config.nevents > 0 || rc_config.nseconds > 0;
+      config_from_shell = true;
+    }
+  }
+  let file_suffix : String;
+  if calibration {
+    file_suffix = String::from("cali.tof.gaps");
+  } else {
+    file_suffix = String::from(".tof.gaps");
+  }
   // some pre-defined time units for 
   // sleeping
   let one_sec     = time::Duration::from_secs(1);  
@@ -201,8 +208,9 @@ fn main() {
       (Sender<TofPacket>, Receiver<TofPacket>)                = unbounded();
   let (dtf_to_evproc, dtf_from_runner) :                
       (Sender<(DataType, DataFormat)>, Receiver<(DataType, DataFormat)>)    = unbounded();
-  let (rbcalib_to_evproc, rbcalib_from_calib)   : 
-      (Sender<RBCalibrations>, Receiver<RBCalibrations>)                    = unbounded();
+  
+  //let (rbcalib_to_evproc, rbcalib_from_calib)   : 
+  //    (Sender<RBCalibrations>, Receiver<RBCalibrations>)                    = unbounded();
 
   let (opmode_to_cache, opmode_from_runner)     : 
       (Sender<TofOperationMode>, Receiver<TofOperationMode>)                = unbounded();
@@ -220,17 +228,14 @@ fn main() {
   
   workforce.execute(move || {
     data_publisher(&tp_from_client,
-                   write_robin,
+                   to_local_file,
                    Some(&file_suffix),
                    test_eventids,
                    verbose); 
   });
-  let tp_to_pub_c   = tp_to_pub.clone();
-  let tp_to_pub_2 = tp_to_pub.clone();
-  workforce.execute(move || {
-    monitoring(&tp_to_pub,
-               verbose);
-  });
+  let tp_to_pub_ev   = tp_to_pub.clone();
+  #[cfg(feature="tofcontrol")]
+  let tp_to_pub_cal  = tp_to_pub.clone();
 
   // then the runner. It does nothing, until we send a set
   // of RunParams
@@ -245,7 +250,7 @@ fn main() {
 
   workforce.execute(move || {
                     event_cache(tp_from_builder,
-                                &tp_to_pub_c,
+                                &tp_to_pub_ev,
                                 &rsp_to_sink,
                                 &opmode_from_runner, 
                                 evid_from_cmdr,
@@ -270,6 +275,9 @@ fn main() {
                                   &evid_to_cache )
   
   });
+  
+  // should this program end after it is done?
+  let mut end = false;
 
   // We can only start a run here, if this is not
   // run through systemd
@@ -277,47 +285,68 @@ fn main() {
     println!("=> Executed by systemd. Waiting for input from C&C server!");
   } else {
     // if we are not as systemd, 
-    // always end when we are done
+    // we are either in calibration mode
+    // or have started manually either with 
+    // a config or not
     println!("=> We are not run by systemd, so we will stop the program when it is done");
     if calibration {
       // we execute this routine first, then we 
       // can go into our loop listening for input
-      rb_calibration(&rc_to_runner, &tp_to_pub_2);
-    }
-
-
-
-    if n_events_run > 0 {
-      println!("=> We got a nevents argument from the commandline, requesting to run for {n_events_run}. This will OVERRIDE the setting in the run config file!");
-      rc_config.nevents = n_events_run;
-    }
-
-    if rc_config.nevents != 0 {
-      println!("Got a number of events to be run > 0. Will stop the run after they are done. If you want to run continuously and listen for new runconfigs from the C&C server, set nevents to 0");
-      end_after_run = true
-    }
-
-    if !rc_config.is_active {
-      println!("=> The provided runconfig does not have the is_active field set to true. Won't start a run if that is what you were waiting for.");
-    }
-    println!("=> Waiting for threads to start..");
-    thread::sleep(time::Duration::from_secs(5));
-    println!("=> ..done");
-    match rc_to_runner.send(rc_config) {
-      Err(err) => error!("Could not initialzie Run! Err {err}"),
-      Ok(_)    => {
-        println!("=> Run initialized! Attempting to start!");
+      #[cfg(feature="tofcontrol")]
+      match rb_calibration(&rc_to_runner, &tp_to_pub_cal) {
+        Ok(_) => (),
+        Err(err) => {
+          error!("Calibration failed! Error {err}!");
+        }
       }
-    }
+      end = true; // in case of we have done the calibration
+                  // from shell. We finish after it is done.
+    } else {
+      // only do monitoring when we don't do a 
+      // calibration
+      workforce.execute(move || {
+        monitoring(&tp_to_pub,
+                   verbose);
+      });
+    } 
+   
+
+    if config_from_shell {
+      if n_events_run > 0 {
+        println!("=> We got a nevents argument from the commandline, requesting to run for {n_events_run}. This will OVERRIDE the setting in the run config file!");
+        rc_config.nevents = n_events_run;
+      }
+
+      if rc_config.nevents != 0 {
+        println!("Got a number of events to be run > 0. Will stop the run after they are done. If you want to run continuously and listen for new runconfigs from the C&C server, set nevents to 0");
+        end_after_run = true
+      }
+
+      if !rc_config.is_active {
+        println!("=> The provided runconfig does not have the is_active field set to true. Won't start a run if that is what you were waiting for.");
+      } else {
+        println!("=> Waiting for threads to start..");
+        thread::sleep(time::Duration::from_secs(5));
+        println!("=> ..done");
+      }
+      match rc_to_runner.send(rc_config) {
+        Err(err) => error!("Could not initialzie Run! Err {err}"),
+        Ok(_)    => {
+          if rc_config.is_active {
+            println!("=> Runner configured! Attempting to start.");
+          } else {
+            println!("=> Stopping run..")
+          }
+        }
+      }
+    } // end if config from shell
   }
-
-
+  
   // Currently, the main thread just listens for SIGTERM and SIGINT.
   // We could give it more to do and save one of the other threads.
   // Probably, the functionality of the control thread would be 
   // a good choice
   let mut signals = Signals::new(&[SIGTERM, SIGINT]).expect("Unknown signals");
-  let mut end = false;
 
 
 
@@ -350,8 +379,7 @@ fn main() {
     }
 
     if end {
-      println!("=> Finish program!");
-      println!("=> Stopping triggers!");
+      println!("=> Terminating program....waiting 10 seconds till the threads are finished.");
       // we simply generate a new run config and let the runner 
       // finish and clean up everything
       let mut rc_terminate = RunConfig::new();
@@ -362,9 +390,8 @@ fn main() {
         }
         Ok(_) => ()
       }
-      println!(".. .. terminating .. ..");
-      thread::sleep(3*one_sec);
-      println!("So long and thanks for all the \u{1F41F}");
+      thread::sleep(10*one_sec);
+      println!("=> Terminated. So long and thanks for all the \u{1F41F}");
       exit(0);
     }
   } // end loop
