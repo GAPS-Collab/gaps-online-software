@@ -1,5 +1,4 @@
 extern crate liftof_rb;
-#[macro use] extern crate env_logger;
 
 use std::{thread, time};
 
@@ -12,7 +11,8 @@ use liftof_rb::control::*;
 use liftof_rb::memory::BlobBuffer;
 use liftof_rb::memory::RegisterError;
 use liftof_rb::memory::map_physical_mem_read;
-
+#[macro_use] extern crate env_logger;
+#[macro_use] extern crate log;
 
 ///! Return the bytes located at the memory
 pub fn get_bytestream(addr_space : &str, 
