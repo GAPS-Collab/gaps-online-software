@@ -1,0 +1,13 @@
+{
+  "nevents"                 : 14000,
+  "is_active"               : true,
+  "nseconds"                : 0,
+  "stream_any"              : true,
+  "trigger_poisson_rate"    : 0,
+  "trigger_fixed_rate"      : 100,
+  "latch_to_mtb"            : false,
+  "active_channel_mask"     : 255,
+  "data_type"               : 40, 
+  "data_format"             : 10,
+  "rb_buff_size"            : 2000
+}
