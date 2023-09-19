@@ -71,7 +71,6 @@ add_library(${GAPSTOF_LIBRARY_SHARED}
     dataclasses/C++/src/WaveGAPS.cpp
     dataclasses/C++/src/CommandPacket.cxx
     dataclasses/C++/src/MasterTriggerPacket.cxx
-    dataclasses/C++/src/tofpacket_reader.cxx
 )
 
 target_compile_options(${GAPSTOF_LIBRARY_SHARED} PRIVATE -Wall -Wextra -Wpedantic)# -Werror)
@@ -91,7 +90,8 @@ target_link_libraries(${GAPSTOF_LIBRARY_SHARED}
 if (BUILD_PYBINDINGS)
   set(pybindings "gaps_tof")
 
-  pybind11_add_module(${pybindings} MODULE pybindings/module.cxx pybindings/helpers.cxx)
+  pybind11_add_module(${pybindings} MODULE dataclasses/C++/pybindings/module.cxx 
+                                           dataclasses/C++/pybindings/helpers.cxx)
   target_include_directories(${pybindings}
                             PUBLIC
                             ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
@@ -101,10 +101,10 @@ if (BUILD_PYBINDINGS)
   message(STATUS "dir='${dir}'")
   endforeach()
   list(REMOVE_ITEM ${the_include_dirs} "/usr/include/python2.7")
-  list(APPEND ${the_include_dirs} "/usr/include/python3.8")
-  string(REPLACE "/usr/include/python2.7" ";;"  new_include_dirs ${the_include_dirs})
-  list(APPEND ${new_include_dirs} "/usr/include/python3.8")
-  set(pybind_include_dirs "/usr/include/python3.8"  "${CMAKE_CURRENT_SOURCE_DIR}/include") 
+  #list(APPEND ${the_include_dirs} "/usr/include/python3.8")
+  #string(REPLACE "/usr/include/python2.7" ";;"  new_include_dirs ${the_include_dirs})
+  #list(APPEND ${new_include_dirs} "/usr/include/python3.8")
+  set(pybind_include_dirs "/usr/include/python3.8"  "${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include") 
   foreach(dir ${pybind_include_dirs})
   message(STATUS "dir='${dir}'")
   endforeach()

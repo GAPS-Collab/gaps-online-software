@@ -11,7 +11,7 @@ cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
 project(GAPS_ONLINE_SOFTWARE VERSION 0.7.0 LANGUAGES C CXX)
 
 message(STATUS "Running cmake for ${CMAKE_PROJECT_NAME} softwere version ${GAPS_ONLINE_SOFTWARE_VERSION}")
-message(STATUS "-- Current release KIHIKIHI (Moorish idol)")
+message(STATUS "-- Current release OMILU (Bluefin Trevali)")
 message(STATUS "Using build directory: ${PROJECT_BINARY_DIR}")
 set(CMAKE_WARN_DEPRECATED ON)
 
