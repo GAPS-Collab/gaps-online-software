@@ -173,6 +173,7 @@ impl FromRandom for RBMissingHit {
 /// This is useful when we need the event id, but don't want to 
 /// spend the CPU resources to decode the whole event.
 ///
+#[deprecated(since="0.7.1", note="There are too many different event types. This is not special enough")]
 #[derive(Debug, Clone)]
 pub struct RBEventPayload {
   pub event_id : u32,
@@ -520,35 +521,130 @@ impl RBChannelData {
   }
 }
 
+///// Get traces in a conscise form from a 
+///// number of RBEvents
+/////
+///// This will create a clone of all the 
+///// traces, so they can be manipulated
+///// without regrets
+//pub fn unpack_traces_u16(events : &Vec<RBEvent>) -> Vec<Vec<Vec<u16>>> {
+//  let nevents    = events.len();
+//  let mut nchan  = 0;
+//  let mut nwords = 0;
+//  if nevents > 0 {
+//    nchan  = events[0].header.get_nchan();
+//    nwords = events[0].adc[0].len();
+//  }
+//  let mut traces: Vec<Vec<Vec<u16>>> = vec![vec![vec![0u16; nwords]; nevents]; nchan];
+//  for ch in 0..nchan {
+//    for ev in 0..nevents { 
+//      for n in 0..nwords {
+//        traces[ch][ev][n] = events[ev].adc[ch][n];
+//      }
+//    }
+//  }
+//  traces
+//}
 
-/// Readoutboard binary data with flexible number of channels
+/// Get traces in a conscise form from a 
+/// number of RBEvents
+///
+/// This will create a clone of all the 
+/// traces, so they can be manipulated
+/// without regrets
+pub fn unpack_traces_f32(events : &Vec<RBEvent>) -> Vec<Vec<Vec<f32>>> {
+  let nevents    = events.len();
+  let mut nchan  = 0usize;
+  let mut nwords = 0usize;
+  // get a sane event
+  for ev in events {
+    if ev.adc[0].len() > 0 {
+      nwords = ev.adc[0].len();   
+    }
+    nchan = ev.nchan as usize;
+  }
+  
+  info!("Will construct traces cube with nchan {}, nevents {}, nwords {}", nchan, nevents, nwords);
+  let mut traces: Vec<Vec<Vec<f32>>> = vec![vec![vec![0.0f32; nwords]; nevents]; nchan];
+  if nevents == 0 {
+    return traces;
+  }
+  let mut nevents_skipped = 0u32;
+  for ch in 0..nchan {
+    for ev in 0..nevents { 
+      if events[ev].adc[ch].len() != nwords {
+        // ignore corrupt events
+        //println!("{}", events[ev]);
+        nevents_skipped += 1;
+        continue;
+      }
+      for n in 0..nwords {
+        //println!("{}", events[ev].adc.len());
+        //println!("{}", events[ev].adc[ch].len());
+        //println!("{}", traces[ch][ev].len());
+        //println!("{}", traces[ch].len());
+        //println!("{}", traces.len());
+
+        traces[ch][ev][n] = events[ev].adc[ch][n] as f32;
+      }
+    }
+  }
+  if nevents_skipped > 0 {
+    warn!("Skipping {nevents_skipped} events due to malformed traces!");
+  }
+  traces
+}
+
+/// Default RB event data. 
+///
+/// This contains a channel adc values
+/// for each active channel as 
+/// well as a general header.
+///
+/// The order of the values in 
+/// the adc vector is defined 
+/// by header.get_active_channels()
 ///
 ///
 #[derive(Debug, Clone, PartialEq)]
 pub struct RBEvent {
   pub data_type : DataType,
+  pub nchan     : u8,
+  pub n_paddles : u8, // number of entries in paddles vector
   pub header    : RBEventHeader,
   pub adc       : Vec<Vec<u16>>,
-  pub n_paddles : u8, // number of entries in paddles vector
   pub paddles   : Vec<PaddlePacket>
 }
 
 impl RBEvent {
 
   pub fn new() -> Self {
-    let mut adc = Vec::<Vec<u16>>::with_capacity(8);
+    let mut adc = Vec::<Vec<u16>>::with_capacity(NCHN);
     for _ in 0..NCHN {
       adc.push(Vec::<u16>::new());
     }
-    RBEvent {
-      data_type : DataType::Unknown,
-      header    : RBEventHeader::new(),
-      adc       : adc,
-      n_paddles : 0,
-      paddles   : Vec::<PaddlePacket>::new(),
+    Self {
+      data_type  : DataType::Unknown,
+      nchan      : 0,
+      n_paddles  : 0,
+      header     : RBEventHeader::new(),
+      adc        : adc,
+      paddles    : Vec::<PaddlePacket>::new(),
     }
   }
- 
+
+  /// Get the datatype from a bytestream when we know
+  /// that it is an RBEvent
+  ///
+  /// The data type is encoded in byte 3
+  pub fn extract_datatype(stream : &Vec<u8>) -> Result<DataType, SerializationError> {
+    if stream.len() < 3 {
+      return Err(SerializationError::StreamTooShort);
+    }
+    Ok(DataType::from_u8(&stream[2]))
+  }
+
+
   pub fn is_over_adc_threshold(&self, ch : u8, threshold : u16) -> bool {
     match self.get_adc_ch(ch).iter().max() {
       None => {
@@ -561,6 +657,11 @@ impl RBEvent {
   }
 
   /// Channels are always from 1-9
+  ///
+  /// This explicitly returns a clone. 
+  /// FIXME - we should also return a constant
+  /// refernece, however I have the feeling the
+  /// public attribute is enough.
   pub fn get_adc_ch(&self, ch : u8) -> Vec::<u16> {
     if ch < 1 {
       panic!("Remember, channels go from 1-9!");
@@ -569,25 +670,45 @@ impl RBEvent {
     self.adc[channel as usize].clone()
   }
 
+  /// If we know that the stream contains an RBEventMemeoryView, 
+  /// we can convert the stream directly to a RBEvent.
   pub fn extract_from_rbeventmemoryview(stream : &Vec<u8>,
                                         pos    : &mut usize) 
     -> Result<RBEvent, SerializationError> {
-  
-    let header     = RBEventHeader::extract_from_rbeventmemoryview(stream, pos)?;
-    *pos -= 2;
-    let mut skip_bytes = 0usize;
-    let nchan = 8;
-
-    if (nchan != 0) && !header.lost_trigger {
-      skip_bytes = (nchan as usize + 1) * (NWORDS * 2 + 6);
-    }
-    *pos -= skip_bytes;
     let mut event  = RBEvent::new();
+    let header     = RBEventHeader::extract_from_rbeventmemoryview(stream, pos)?;
     event.header   = header;
-    if header.lost_trigger || header.broken {
+  
+    if header.lost_trigger || header.broken || header.event_fragment {
+      warn!("Will not extract channel data for event {} because header indicates it is incomplete!", header.event_id);
       return Ok(event);
     }
-    let active_channels = header.get_active_data_channels();
+    let mut active_channels = header.get_active_data_channels();
+    let mut nchan = active_channels.len();
+    // we know the header finishes with stop cell, crc and tail
+    // then there is the crc32 for the channel, then the channel data as well as 
+    // the header for the channel. Let's figure out if there is a channel9
+    let mut skip_bytes = 2 + 4 + 2 + 4 + NWORDS*2 + 2;
+    *pos -= skip_bytes; //here should be the id of the last channel
+    // check if the channel id is ch9 (==8)
+    let ch_id = parse_u16(stream, pos);
+    *pos -= 2;
+    //trace!("Last channel id! {ch_id}");    
+    if ch_id == 8 {
+      nchan += 1;
+      // FIXME - we really should get rid 
+      // of this convention!
+      active_channels.push(8 + 1);
+    }
+    event.nchan = nchan as u8;
+    // we already rewound one channel, so we have 
+    // to subtrackt it here
+    skip_bytes = (nchan - 1) * (NWORDS * 2 + 6);
+    //if (nchan != 0) && !header.lost_trigger {
+    //  skip_bytes = (nchan as usize + 1) * (NWORDS * 2 + 6);
+    //}
+    *pos -= skip_bytes;
+    //let active_channels = header.get_active_data_channels();
     //println!("{:?}", active_channels);
     // we ignore the channel header field (which is just 
     // the channel id itself) and the trailer field which 
@@ -596,19 +717,29 @@ impl RBEvent {
     // these checksums!
     // channel data is always there, however, it 
     // actually might not be part of the trigger.
-    for n in 1..(NCHN +1) {
+    for n in 0..nchan {
       // two bytes for the header
-      *pos += 2;
-      if active_channels.contains(&(n as u8)) {
-        for _ in 0..NWORDS {  
-          event.adc[n -1].push(0x3FFF & parse_u16(stream, pos));  
-        }
-      } else {
-        // skip ahead a full channel
-        *pos += NWORDS*2;
+      let ch_head = parse_u16(stream, pos);
+      //trace!("This is ch {ch_head}");
+      if !active_channels.contains(&(n as u8 + 1)) {
+        continue;
+      }
+      
+      //trace!("This is ch {ch_head}");
+      for _ in 0..NWORDS {  
+        event.adc[n].push(0x3FFF & parse_u16(stream, pos));  
       }
       *pos += 4;
     } // end nchn loop
+    *pos += 6; // skip to the tail position
+    let tail = parse_u16(stream, pos);
+    if tail != Self::TAIL {
+      error!("After parsing the event, we found an invalid tail signature {}", tail);
+      return Err(SerializationError::TailInvalid);
+    }
+    // per definition, an RBEvent coming from a bytestream can't have 
+    // any paddle packets
+    event.n_paddles = 0;
     Ok(event)
   }
 }
@@ -625,15 +756,21 @@ impl Serialization for RBEvent {
       return Err(SerializationError::HeadInvalid {});
     }
     event.data_type = DataType::from_u8(&parse_u8(stream, pos));
+    event.nchan     = parse_u8(stream, pos);
+    event.n_paddles = parse_u8(stream, pos);
     event.header    = RBEventHeader::from_bytestream(stream, pos)?;
     let ch_ids      = event.header.get_active_data_channels();
     let stream_len  = stream.len();
     if event.header.event_fragment {
-      error!("Fragmented event {} found! However, we carry on...", event.header.event_id);
+      error!("Fragmented event {} found! Disregarding channel data..", event.header.event_id);
       return Ok(event);
     }
-    for k in ch_ids.iter() {
-      debug!("Found active data channel {}!", k);
+    if event.header.lost_trigger {
+      error!("Event {} has lost trigger! Disregarding channel data..", event.header.event_id);
+      return Ok(event);
+    }
+    for k in 0..event.nchan {
+      trace!("Found active data channel {}!", k);
       if *pos + 2*NWORDS >= stream_len {
         error!("The channel data for ch {} seems corrupt!", k);
         return Err(SerializationError::WrongByteSize {})
@@ -641,10 +778,9 @@ impl Serialization for RBEvent {
       // 2*NWORDS because stream is Vec::<u8> and it is 16 bit words.
       let data = &stream[*pos..*pos+2*NWORDS];
       // remember, that ch ids are 1..8
-      event.adc[(k-1) as usize] = u8_to_u16(data);
+      event.adc[k as usize] = u8_to_u16(data);
       *pos += 2*NWORDS;
     }
-    event.n_paddles = parse_u8(stream, pos);
     if event.n_paddles > 0 {
       for _ in 0..event.n_paddles {
         match PaddlePacket::from_bytestream(stream, pos) {
@@ -674,12 +810,13 @@ impl Serialization for RBEvent {
     let mut stream = Vec::<u8>::new();
     stream.extend_from_slice(&Self::HEAD.to_le_bytes());
     stream.push(self.data_type.to_u8());
+    stream.push(self.nchan);
+    stream.push(self.n_paddles);
     stream.extend_from_slice(&self.header.to_bytestream());
     // for an empty channel, we will add an empty vector
     for k in 0..self.adc.len() {
       stream.extend_from_slice(&u16_to_u8(&self.adc[k])); 
     }
-    stream.push(self.n_paddles);
     if self.n_paddles > 0 {
       for k in 0..self.n_paddles {
         stream.extend_from_slice(&self.paddles[k as usize].to_bytestream());
@@ -700,7 +837,17 @@ impl Default for RBEvent {
 impl fmt::Display for RBEvent {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let active_channels = self.header.get_active_data_channels();
-    write!(f, "<RBEvent\n {}, \n channels {:?}>", self.header, active_channels)
+    let mut adc = Vec::<usize>::new();
+    for k in 0..self.adc.len() {
+      adc.push(self.adc[k].len());
+    }
+    write!(f, "<RBEvent 
+    header        : {}
+    data channels : {:?},
+    adc nwords    : {:?} >",
+    self.header,
+    active_channels,
+    adc)
   }
 }
 
@@ -898,7 +1045,12 @@ impl RBEventHeader {
     }
     active_channels
   }
-  
+ 
+  /// Get the number of data channels + 1 for ch9
+  pub fn get_nchan(&self) -> usize {
+    self.get_active_data_channels().len() + 1
+  }
+
   pub fn get_clock_cycles_48bit(&self) -> u64 {
     self.timestamp_48
   }
@@ -946,22 +1098,25 @@ impl fmt::Display for RBEventHeader {
            \t timestamp (48bit) {},
            \t locked {}, 
            \t locked last sec. {}, 
+           \t lost trigger. {}, 
            \t is event fragment. {}, 
            \t drs4 Temp [C] {}, 
            \t FPGA Temp [C] {}, 
-           \t stop cell {}, 
-           \t dtap0 {},
-           \t crc32 {},
-           \t broken {}>",
+           \t stop cell     {}, 
+           \t dtap0         {},
+           \t crc32         {},
+           \t broken        {}>",
            self.rb_id,
            self.channel_mask,
            self.event_id,
            self.timestamp_48,
            self.is_locked,
            self.is_locked_last_sec,
+           self.lost_trigger,
            self.event_fragment,
            self.drs4_temp,
-           self.get_fpga_temp(),
+           -99999,
+           //self.get_fpga_temp(),
            self.stop_cell,
            self.dtap0,
            self.crc32,
