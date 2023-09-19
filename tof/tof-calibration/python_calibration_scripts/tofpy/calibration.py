@@ -262,7 +262,6 @@ def timingCalibration(gbf,vcal=None,local=False,calfreq=0.025,edge='average'):
 				# applied!
 				n_correct[ch] += 1
 		damping *= 0.99
-		
 	return tcal
 
 def applyTCal(gbf,tcal):
@@ -288,7 +287,7 @@ def getPeriods(trace,dts,nperiod,nskip=0,edge=''):
 	zcs = zcs[zcs>nskip]
 	# choose +-
 	if edge[:3] == 'ris':
-		zcs = [zc for zc in zcs if trace[zc] > 0]
+		zcs = [zc for zc in zcs if trace[zc] < 0]
 	elif edge[:3] == 'fal':
 		zcs = [zc for zc in zcs if trace[zc] > 0]
 	if len(zcs) < 3:
