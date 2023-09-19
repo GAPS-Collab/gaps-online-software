@@ -5,6 +5,7 @@
 #include "spdlog/spdlog.h"
 #include "spdlog/cfg/env.h"
 
+#include "parsers.h"
 #include "calibration.h"
 
 u8 extract_rbid(const String& filename) {
@@ -44,14 +45,11 @@ void spike_cleaning_drs4(Vec<Vec<f32>> &wf, u16 tCell, i32 spikes[]) {
     rsp[i] = -1;
   }
   /* find spikes with special high-pass filters */
-  for (j = 0; j < 1024; j++)
-  {
-    for (i = 0; i < nChn; i++)
-    {
+  for (j = 0; j < 1024; j++) {
+    for (i = 0; i < nChn; i++) {
       filter = -wf[i][j] + wf[i][(j + 1) % 1024] + wf[i][(j + 2) % 1024] - wf[i][(j + 3) % 1024];
       dfilter = filter + 2 * wf[i][(j + 3) % 1024] + wf[i][(j + 4) % 1024] - wf[i][(j + 5) % 1024];
-      if (filter > 20 && filter < 100)
-      {
+      if (filter > 20 && filter < 100) {
         if (n_sp[i] < 10)   // record maximum of 10 spikes
         {
           sp[i][n_sp[i]] = (j + 1) % 1024;
@@ -320,10 +318,32 @@ Vec<f32> RBCalibration::nanoseconds(const RBEvent &event, const u8 channel) cons
 
 /************************************************/
 
-RBCalibration RBCalibration::from_bytestream(const Vec<u8> &bytestream,
-                              u64 &pos) {
-  spdlog::error("This is not implemented yet!");
+RBCalibration RBCalibration::from_bytestream(const Vec<u8> &stream,
+                                             u64 &pos) {
   RBCalibration calibration = RBCalibration();
+  spdlog::debug("Start decoding at pos {}", pos);
+  u16 head = Gaps::parse_u16(stream, pos);
+  if (head != RBCalibration::HEAD)  {
+    spdlog::error("No header signature found!");  
+  }
+  calibration.rb_id    = stream[pos]; pos += 1; 
+  f32 value;
+  for (usize ch=0; ch<NCHN; ch++) {
+    for (usize k=0; k<NWORDS; k++) {
+      value = Gaps::parse_f32(stream, pos);
+      calibration.v_offsets[ch][k] = value;
+      value = Gaps::parse_f32(stream, pos);
+      calibration.v_dips[ch][k] = value;
+      value = Gaps::parse_f32(stream, pos);
+      calibration.v_incs[ch][k] = value;
+      value = Gaps::parse_f32(stream, pos);
+      calibration.t_bin[ch][k]  = value;
+    }
+  }
+  u16 tail = Gaps::parse_u16(stream, pos);
+  if (tail != RBEvent::TAIL) {
+    spdlog::error("After parsing the event, we found an invalid tail signature {}", tail);
+  }
   return calibration;
 }
 
