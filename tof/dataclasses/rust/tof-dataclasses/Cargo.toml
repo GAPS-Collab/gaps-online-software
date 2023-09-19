@@ -1,6 +1,6 @@
 [package]
 name = "tof-dataclasses"
-version = "0.7.0"
+version = "0.7.1"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -33,7 +33,7 @@ rand = {version = "0.8", optional = true}
 json = "0.12" 
 #statrs = "0.14"
 # Takeru's tof-control
-tof-control = {path = "../../../extern/tof-control", optional = true, version = "0.2" }
+tof-control = {path = "../../../extern/tof-control", optional = true, version = "0.2", features=[] }
 smoothed_z_score = {version = "0.1", optional = true}
 sqlite = {version = "0.30", optional = true}
 

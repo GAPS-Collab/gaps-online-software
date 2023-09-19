@@ -1,5 +1,17 @@
 # Dataclasses project for GAPS tof
 
+### Project structure
+
+Dataclasses are available for 2 APIs, python and rust. 
+Each of them have their own pybindings.
+
+-rust 
+ |__ tof-dataclasses
+ |__ pybindings
+-C++
+ |__ dataclasses
+ |__ pybindings
+
 ## Containers for TOF data
 
 The purpose of the tof dataclasses project is to provide containers for the 

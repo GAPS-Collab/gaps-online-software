@@ -1,5 +1,12 @@
 # OMILU series
 
+## 0.7.1
+* Fixes a critical bug in RBEvent, where the channels where 
+  shifted by one, so that channel 9 was ignored.
+* adds a nchan field to RBEvent, indicating how many channels 
+  we are reading out.
+* Fixes a bunch of bugs in the calibration routine.
+
 ## 0.7.0 
 * DataFormat : enum helper to define shape
   of RB event data
