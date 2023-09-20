@@ -249,6 +249,7 @@ struct MasterTriggerEvent {
   
   void set_hit_mask(usize ltb_index,u32 mask);
 
+  std::string to_string() const;
 };
 
 
@@ -307,5 +308,6 @@ struct TofEvent {
     RBEvent _empty_event = RBEvent();
 };
 
+std::ostream& operator<<(std::ostream& os, const MasterTriggerEvent& mt);
 
 #endif 

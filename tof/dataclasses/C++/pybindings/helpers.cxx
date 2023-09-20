@@ -143,62 +143,6 @@ String rbevent_to_string(const RBEvent &event) {
 
 /***********************************************/
 
-String mastertriggerevent_to_string(const MasterTriggerEvent &event) {
-  String repr = "<MasterTriggerEvent\n";
-  repr += "\t event_id      :" + std::to_string(event.event_id     ) + "\n" ; 
-  repr += "\t timestamp     :" + std::to_string(event.timestamp    ) + "\n" ; 
-  repr += "\t tiu_timestamp :" + std::to_string(event.tiu_timestamp) + "\n" ; 
-  repr += "\t tiu_gps_32    :" + std::to_string(event.tiu_gps_32   ) + "\n" ; 
-  repr += "\t tiu_gps_16    :" + std::to_string(event.tiu_gps_16   ) + "\n" ; 
-  repr += "\t n_paddles     :" + std::to_string(event.n_paddles    ) + "\n" ; 
-  repr += "\t [DSI/J] 1/1 - 1/2 - 1/3 - 1/4 - 1/5 - 2/1 - 2/2 - 2/3 - 2/4 - 2/5 - 3/1 - 3/2 - 3/3 - 3/4 - 3/5 - 4/1 - 4/2 - 4/3 - 4/4 - 4/5 \n";
-  Vec<u8> hit_boards = Vec<u8>();
-  HashMap<u8, String> dsi_j = HashMap<u8, String>();
-  dsi_j[0] = "1/1";
-  dsi_j[1] = "1/2";
-  dsi_j[2] = "1/3";
-  dsi_j[3] = "1/4";
-  dsi_j[4] = "1/5";
-  dsi_j[5] = "2/1";
-  dsi_j[6] = "2/2";
-  dsi_j[7] = "2/3";
-  dsi_j[8] = "2/4";
-  dsi_j[9] = "2/5";
-  dsi_j[10] = "3/1";
-  dsi_j[11] = "3/2";
-  dsi_j[12] = "3/3";
-  dsi_j[13] = "3/4";
-  dsi_j[14] = "3/5";
-  dsi_j[15] = "4/1";
-  dsi_j[16] = "4/2";
-  dsi_j[16] = "4/3";
-  dsi_j[17] = "4/4";
-  dsi_j[19] = "4/5";
-  repr += "\t         ";
-  for (usize k=0;k<N_LTBS;k++) {
-    if (event.board_mask[k]) {
-      repr += "-X-   ";
-      hit_boards.push_back(k);
-    } else {
-      repr += "-0-   ";
-    }
-  }
-  repr += "\n\t == == HITS [CH] == ==\n";
-  for (auto k : hit_boards) {
-    repr += "\t DSI/J " + dsi_j[k] + "\t=> ";
-    for (usize j=0;j<N_CHN_PER_LTB;j++) {
-      if (event.hits[k][j]) {
-        repr += " " + std::to_string(j + 1) + " ";
-      } else {
-        continue;
-        //repr += " N.A. ";
-      } 
-    }
-    repr += "\n";
-  }  
-  repr += ">";
-  return repr;
-}
 
 py::array_t<f32> wrap_rbcalibration_voltages_rbevent(const RBCalibration& calib, const RBEvent& event, const u8 channel) {
   if (event.header.rb_id != calib.rb_id) {

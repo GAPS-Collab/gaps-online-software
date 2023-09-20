@@ -473,7 +473,7 @@ PYBIND11_MODULE(gaps_tof, m) {
       .def_readonly("board_mask"      , &MasterTriggerEvent::board_mask               )
       .def_readonly("n_paddles"       , &MasterTriggerEvent::n_paddles                ) 
       .def("__repr__",        [](const MasterTriggerEvent &ev) {
-                                   return mastertriggerevent_to_string(ev); 
+                                 return ev.to_string(); 
                                  }) 
     ;
   

@@ -30,7 +30,6 @@ String tofevent_to_string(const TofEvent &event);
 
 String rbevent_to_string(const RBEvent &event);
 
-String mastertriggerevent_to_string(const MasterTriggerEvent &event);
   
 py::array_t<f32> wrap_rbcalibration_voltages_rbevent(const RBCalibration& calib, const RBEvent& event, const u8 channel);
 

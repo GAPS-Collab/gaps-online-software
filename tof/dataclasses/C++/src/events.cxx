@@ -653,3 +653,70 @@ MasterTriggerEvent MasterTriggerEvent::from_bytestream(const Vec<u8> &bytestream
   return event;
 }
 
+std::string MasterTriggerEvent::to_string() const {
+  std::string repr = "<MasterTriggerEvent :";
+  repr += "\n\t event_id                    " + std::to_string(event_id                    ); 
+  repr += "\n\t timestamp                   " + std::to_string(timestamp                   ); 
+  repr += "\n\t tiu_timestamp               " + std::to_string(tiu_timestamp               ); 
+  repr += "\n\t tiu_gps_32                  " + std::to_string(tiu_gps_32                  ); 
+  repr += "\n\t tiu_gps_16                  " + std::to_string(tiu_gps_16                  ); 
+  repr += "\n\t n_paddles                   " + std::to_string(n_paddles                   ); 
+  repr += "\n\t crc                         " + std::to_string(crc                         );
+  repr += "\n\t broken                      " + std::to_string(broken                      );
+  repr += "\n\t valid                       " + std::to_string(valid                       );
+  repr += "\n -- hit mask --";
+  repr += "\n [DSI/J]";
+  repr += "\n 1/1 - 1/2 - 1/3 - 1/4 - 1/5 - 2/1 - 2/2 - 2/3 - 2/4 - 2/5 - 3/1 - 3/2 - 3/3 - 3/4 - 3/5 - 4/1 - 4/2 - 4/3 - 4/4 - 4/5 \n";
+  Vec<u8> hit_boards = Vec<u8>();
+  HashMap<u8, String> dsi_j = HashMap<u8, String>();
+  dsi_j[0] = "1/1";
+  dsi_j[1] = "1/2";
+  dsi_j[2] = "1/3";
+  dsi_j[3] = "1/4";
+  dsi_j[4] = "1/5";
+  dsi_j[5] = "2/1";
+  dsi_j[6] = "2/2";
+  dsi_j[7] = "2/3";
+  dsi_j[8] = "2/4";
+  dsi_j[9] = "2/5";
+  dsi_j[10] = "3/1";
+  dsi_j[11] = "3/2";
+  dsi_j[12] = "3/3";
+  dsi_j[13] = "3/4";
+  dsi_j[14] = "3/5";
+  dsi_j[15] = "4/1";
+  dsi_j[16] = "4/2";
+  dsi_j[16] = "4/3";
+  dsi_j[17] = "4/4";
+  dsi_j[19] = "4/5";
+  repr += " ";
+  for (usize k=0;k<N_LTBS;k++) {
+    if (board_mask[k]) {
+      repr += "-X-   ";
+      hit_boards.push_back(k);
+    } else {
+      repr += "-0-   ";
+    }
+  }
+  repr += "\n\t == == LTB HITS [BRD CH] == ==\n";
+  for (auto k : hit_boards) {
+    repr += "\t DSI/J " + dsi_j[k] + "\t=> ";
+    for (usize j=0;j<N_CHN_PER_LTB;j++) {
+      if (hits[k][j]) {
+        repr += " " + std::to_string(j + 1) + " ";
+      } else {
+        continue;
+        //repr += " N.A. ";
+      } 
+    }
+    repr += "\n";
+  }  
+  repr += ">";
+  return repr;
+}
+
+std::ostream& operator<<(std::ostream& os, const MasterTriggerEvent& mt) {
+  os << mt.to_string();
+  return os;
+}
+
