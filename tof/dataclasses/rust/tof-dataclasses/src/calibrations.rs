@@ -18,11 +18,19 @@ use crate::constants::{NWORDS, NCHN};
 use crate::errors::{WaveformError,
                     CalibrationError};
 use crate::serialization::{Serialization,
+                           parse_bool,
                            parse_u16,
                            parse_f32,
                            SerializationError};
 use crate::events::RBEvent;
 use crate::events::rb_event::unpack_traces_f32;
+
+#[cfg(feature = "random")] 
+use crate::FromRandom;
+#[cfg(feature = "random")]
+extern crate rand;
+#[cfg(feature = "random")]
+use rand::Rng;
 
 //extern crate statrs;
 //use statrs::statistics::Median;
@@ -273,19 +281,19 @@ fn roll<T: Clone>(vec: &mut Vec<T>, shift: isize) {
 
 /***********************************/
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct RBCalibrations {
+  pub rb_id      : u8,
+  pub d_v        : f32, // input voltage difference between 
+                        // vcal_data and noi data
+  pub serialize_event_data : bool,
+  // calibration constants
   pub v_offsets : [[f32;NWORDS];NCHN], // voltage offset
   pub v_dips    : [[f32;NWORDS];NCHN], // voltage "dip" (time-dependent correction)
   pub v_inc     : [[f32;NWORDS];NCHN], // voltage increment (mV/ADC unit)
   pub tbin      : [[f32;NWORDS];NCHN], // cell width (ns)
-  pub rb_id     : u8,
 
-  // extension - keep also all the event data 
-  // this calibration was created with
-  pub d_v        : f32, // input voltage difference between 
-                        // vcal_data and noi data
-
+  // calibration data
   pub vcal_data : Vec::<RBEvent>,
   pub tcal_data : Vec::<RBEvent>,
   pub noi_data  : Vec::<RBEvent>,
@@ -750,12 +758,13 @@ impl RBCalibrations {
 
   pub fn new(rb_id : u8) -> Self {
     Self {
+      rb_id     : rb_id,
+      d_v       : 182.0, // FIXME - this needs to be a constant
+      serialize_event_data : false, // per default, don't serialize the data 
       v_offsets : [[0.0;NWORDS];NCHN], 
       v_dips    : [[0.0;NWORDS];NCHN], 
       v_inc     : [[0.0;NWORDS];NCHN], 
       tbin      : [[0.0;NWORDS];NCHN],
-      rb_id     : rb_id,
-      d_v       : 182.0, // FIXME - this needs to be a constant
       vcal_data : Vec::<RBEvent>::new(),
       tcal_data : Vec::<RBEvent>::new(),
       noi_data  : Vec::<RBEvent>::new()
@@ -787,11 +796,10 @@ impl RBCalibrations {
 }
 
 impl Serialization for RBCalibrations {
-  const SIZE            : usize = NCHN*NWORDS*4*8 + 4 + 1; 
+  const SIZE            : usize = NCHN*NWORDS*4*8 + 4 + 1 + 1; 
   const HEAD            : u16   = 0xAAAA; // 43690 
   const TAIL            : u16   = 0x5555; // 21845 
   
-  /// Decode a serializable from a bytestream  
   fn from_bytestream(bytestream : &Vec<u8>, 
                      pos        : &mut usize)
     -> Result<Self, SerializationError> { 
@@ -802,6 +810,8 @@ impl Serialization for RBCalibrations {
     let board_id = u8::from_le_bytes([bytestream[*pos]]);
     *pos += 1;
     rb_cal.rb_id = board_id;
+    rb_cal.d_v   = parse_f32(bytestream, pos);
+    rb_cal.serialize_event_data = parse_bool(bytestream, pos);
     for ch in 0..NCHN {
       for k in 0..NWORDS {
         let mut value = parse_f32(bytestream, pos);
@@ -814,6 +824,39 @@ impl Serialization for RBCalibrations {
         rb_cal.tbin[ch][k]      = value;
       }
     }
+    if rb_cal.serialize_event_data {
+      let mut broken_event = RBEvent::new();
+      broken_event.header.broken = true;
+      let n_noi  = parse_u16(bytestream, pos);
+      println!("Found {n_noi} no input data events!");
+      for _ in 0..n_noi {
+        for k in 0..10 {
+          println!("bytestream {k} {} ", bytestream[*pos+k]);
+        }
+        match RBEvent::from_bytestream(bytestream, pos) {
+          Ok(ev) => {
+            println!("good");
+            rb_cal.noi_data.push(ev);            
+          }
+          Err(err) => {
+            println!("from_bytestream failed!, err {err}");
+            rb_cal.noi_data.push(broken_event.clone());
+            panic!("auf der titanic!");
+          }
+        }
+        // FIXME - broken event won't advance the pos marker
+      }
+      let n_vcal = parse_u16(bytestream, pos); 
+      println!("Found {n_vcal} VCal data events!");
+      for _ in 0..n_vcal {
+        rb_cal.vcal_data.push(RBEvent::from_bytestream(bytestream, pos).unwrap_or(broken_event.clone()));
+      }
+      let n_tcal = parse_u16(bytestream, pos); 
+      println!("Found {n_tcal} TCal data events!");
+      for _ in 0..n_tcal {
+        rb_cal.tcal_data.push(RBEvent::from_bytestream(bytestream, pos).unwrap_or(broken_event.clone()));
+      }
+    }
     if parse_u16(bytestream, pos) != Self::TAIL {
       return Err(SerializationError::TailInvalid {});
     }
@@ -824,6 +867,9 @@ impl Serialization for RBCalibrations {
     let mut bs = Vec::<u8>::with_capacity(Self::SIZE);
     bs.extend_from_slice(&Self::HEAD.to_le_bytes());
     bs.extend_from_slice(&self.rb_id.to_le_bytes());
+    bs.extend_from_slice(&self.d_v.to_le_bytes());
+    let serialize_event_data = self.serialize_event_data as u8;
+    bs.push(serialize_event_data);
     for ch in 0..NCHN {
       for k in 0..NWORDS {
         bs.extend_from_slice(&self.v_offsets[ch][k].to_le_bytes());
@@ -832,6 +878,25 @@ impl Serialization for RBCalibrations {
         bs.extend_from_slice(&self.tbin[ch][k]     .to_le_bytes());
       }
     }
+    if self.serialize_event_data {
+      println!("Serializing calibration event data!");
+      let n_noi  = self.noi_data.len()  as u16;
+      let n_vcal = self.vcal_data.len() as u16;
+      let n_tcal = self.tcal_data.len() as u16;
+      bs.extend_from_slice(&n_noi.to_le_bytes());
+      for ev in &self.noi_data {
+        bs.extend_from_slice(&ev.to_bytestream());
+      }
+      bs.extend_from_slice(&n_vcal.to_le_bytes());
+      for ev in &self.vcal_data {
+        bs.extend_from_slice(&ev.to_bytestream());
+      }
+      bs.extend_from_slice(&n_tcal.to_le_bytes());
+      for ev in &self.tcal_data {
+        bs.extend_from_slice(&ev.to_bytestream());
+      }
+    }
+    bs.extend_from_slice(&Self::TAIL.to_le_bytes());
     bs
   }
 }
@@ -845,7 +910,7 @@ impl Default for RBCalibrations {
 impl fmt::Display for RBCalibrations {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     write!(f, 
-  "<ReadoutboardCalibrations:
+  "<ReadoutboardCalibration:
       RB : {}
       VCalData    : {} (events)
       TCalData    : {} (events)
@@ -867,6 +932,37 @@ impl fmt::Display for RBCalibrations {
       self.tbin[0][98],
       self.tbin[0][99])
   } 
+}
+
+#[cfg(feature = "random")]
+impl FromRandom for RBCalibrations {
+    
+  fn from_random() -> Self {
+    let mut cali   = Self::new(0);
+    let mut rng    = rand::thread_rng();
+    cali.rb_id     = rng.gen::<u8>();
+    cali.d_v       = rng.gen::<f32>(); 
+    cali.serialize_event_data = rng.gen::<bool>();
+    for ch in 0..NCHN {
+      for n in 0..NWORDS { 
+        cali.v_offsets[ch][n] = rng.gen::<f32>();
+        cali.v_dips   [ch][n] = rng.gen::<f32>(); 
+        cali.v_inc    [ch][n] = rng.gen::<f32>(); 
+        cali.tbin     [ch][n] = rng.gen::<f32>();
+      }
+    }
+    if cali.serialize_event_data {
+      for _ in 0..1000 {
+        let mut ev = RBEvent::from_random();
+        cali.vcal_data.push(ev);
+        ev = RBEvent::from_random();
+        cali.noi_data.push(ev);
+        ev = RBEvent::from_random();
+        cali.tcal_data.push(ev);
+      }
+    }
+    cali
+  }
 }
 
 impl From<&Path> for RBCalibrations {
@@ -950,6 +1046,20 @@ impl From<&Path> for RBCalibrations {
   }
 }
 
+#[test]
+fn serialization_rbcalibration() {
+  let mut calis = Vec::<RBCalibrations>::new();
+  for n in 0..100 {
+    let cali = RBCalibrations::from_random();
+    if !cali.serialize_event_data {
+      continue;
+    }
+    calis.push(cali);
+    break;
+  }
+  let test = RBCalibrations::from_bytestream(&calis[0].to_bytestream(), &mut 0).unwrap();
+  assert_eq!(calis[0], test);
+}
 
 // This test together with the 
 // roll function comes directly
