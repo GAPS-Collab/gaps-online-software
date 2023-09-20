@@ -44,9 +44,10 @@ i32 Gaps::parse_i32(const Vec<u8> &bytestream,
 f32 Gaps::parse_f32(const Vec<u8> &bytestream,
                     usize &pos) {
   f32 result;
-  Vec<u8> bytes = Gaps::slice(bytestream,0,4); 
+  Vec<u8> bytes = Gaps::slice(bytestream,pos,pos+4); 
   // Copy the bytes into a float variable using type punning
   std::memcpy(&result, bytes.data(), sizeof(f32));
+  pos += 4;
   return result;
 }
 
