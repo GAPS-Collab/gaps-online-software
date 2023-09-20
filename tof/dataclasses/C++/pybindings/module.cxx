@@ -100,26 +100,25 @@ Vec<Vec<i16>> ch_getter(BlobEvt_t evt)
     return channels;
 }
 
-size_t get_current_blobevent_size()
-{
+usize get_current_blobevent_size() {
   return 36 + (NCHN*2) + (NCHN*NWORDS*2) + (NCHN*4) + 8;
 }
 
-bytestream blobevent_encoder(BlobEvt_t evt, size_t startpos)
-{
-  bytestream buffer;
-  buffer.reserve(get_current_blobevent_size());
-  for (size_t k=0; k<get_current_blobevent_size(); k++)
-  {buffer.push_back(0);}
-  encode_blobevent(&evt, buffer, startpos);
-  return buffer;
-}
-
-BlobEvt_t blobevent_decoder(bytestream buffer, size_t startpos)
-{
-  BlobEvt_t evt = decode_blobevent(buffer, startpos);
-  return evt;
-}
+//bytestream blobevent_encoder(BlobEvt_t evt, size_t startpos)
+//{
+//  bytestream buffer;
+//  buffer.reserve(get_current_blobevent_size());
+//  for (size_t k=0; k<get_current_blobevent_size(); k++)
+//  {buffer.push_back(0);}
+//  encode_blobevent(&evt, buffer, startpos);
+//  return buffer;
+//}
+//
+//BlobEvt_t blobevent_decoder(bytestream buffer, size_t startpos)
+//{
+//  BlobEvt_t evt = decode_blobevent(buffer, startpos);
+//  return evt;
+//}
 
 std::string BlobEvtToString(BlobEvt_t event)
 {
@@ -729,13 +728,6 @@ PYBIND11_MODULE(gaps_tof, m) {
        .def_readonly("dtap0"                   ,&RBEventMemoryView::dtap0 )
        .def_readonly("dtap1"                   ,&RBEventMemoryView::dtap1 )
        .def_readonly("timestamp"               ,&RBEventMemoryView::timestamp )
-       //.def_readonly("adc"                     ,&RBEventMemoryView::ch_adc)
-       //.def_readwrite("timestamp_32"            ,&BlobEvt_t::timestamp_32 )
-       //.def_readwrite("timestamp_16"            ,&BlobEvt_t::timestamp_16 )
-       //.def_property("ch_head"      , &ch_head_getter , &nullsetter<std::vector<unsigned short>  )
-       //.def("get_ch_head"                       ,&ch_head_getter)
-       //.def("get_ch_adc"                        ,&ch_getter )
-       //.def("get_ch_trail"                      ,&ch_trail_getter )
        .def("get_channel_adc"                  ,&RBEventMemoryView::get_channel_adc)
        .def_readonly("stop_cell"               ,&RBEventMemoryView::stop_cell )
        .def_readonly("crc32"                   ,&RBEventMemoryView::crc32 )
@@ -840,7 +832,9 @@ PYBIND11_MODULE(gaps_tof, m) {
    py::class_<RBCalibration>(m, "RBCalibration", 
       "RBCalibration holds th calibration constants (one per bin) per each channel for a single RB. This needs to be used in order to convert ADC to voltages/nanoseconds!")
        .def(py::init())
-       .def_readonly("rb_id",      &RBCalibration::rb_id)
+       .def_readonly("rb_id",                     &RBCalibration::rb_id)
+       .def_readonly("d_v",                       &RBCalibration::d_v)
+       .def_readonly("serialize_event_data",      &RBCalibration::serialize_event_data)
        .def_readonly("v_offsets",  &RBCalibration::v_offsets)
        .def_readonly("v_incs",     &RBCalibration::v_incs)
        .def_readonly("v_dips",     &RBCalibration::v_dips)
@@ -873,6 +867,10 @@ PYBIND11_MODULE(gaps_tof, m) {
             "Deserialize a RBCalibration object from a Vec<u8>")
        .def("from_txtfile" ,    &RBCalibration::from_txtfile,
             "Initialize the RBCalibration from an ASCII file with the calibration constants (one per bin per channel)")
+       .def("__repr__",        [](const RBCalibration &cali) {
+                                  return "<RBCalibration : board id "
+                                  + std::to_string(cali.rb_id) + ">";
+                                  }) 
    ;
 
    // I/O functions
@@ -892,25 +890,18 @@ PYBIND11_MODULE(gaps_tof, m) {
                                           py::arg("filename"));
    m.def("get_event_ids_from_raw_stream", &get_event_ids_from_raw_stream);
    m.def("get_bytestream_from_file",      &get_bytestream_from_file);
-   m.def("get_events_from_stream",        &get_events_from_stream);
    m.def("get_nevents_from_file",         &get_nevents_from_file);
    m.def("ReadEvent",                     &read_event_helper);
    m.def("get_rbeventheaders",            &get_rbeventheaders); 
    
-   m.def("encode_blobevent",      &blobevent_encoder);
-   m.def("decode_blobevent",      &blobevent_decoder);   
+   //m.def("encode_blobevent",      &blobevent_encoder);
+   //m.def("decode_blobevent",      &blobevent_decoder);   
    m.def("get_current_blobevent_size", &get_current_blobevent_size);
 
    // functions to read and parse blob files
    m.def("splice_readoutboard_datafile",   &splice_readoutboard_datafile);
 
    // Calibration functions
-   //m.def("apply_vcal_allchan",       &apply_vcal_allchan_helper);
-   //m.def("apply_vcal",               &apply_vcal_helper);
-   //m.def("apply_tcal_allchan",       &apply_tcal_allchan_helper);
-   //m.def("apply_tcal",               &apply_tcal_helper);
-   //m.def("voltage_calibration",      &voltage_calibration_helper);
-   //m.def("timing_calibration",       &timing_calibration_helper);
    m.def("remove_spikes",            &remove_spikes_helper);
    m.def("read_calibration_file",    &read_calibration_file);
    m.def("get_offsets",              &offset_getter);

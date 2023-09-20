@@ -35,6 +35,8 @@ struct RBCalibration {
   static const u16 TAIL = 0x5555;
 
   u8 rb_id;
+  f32 d_v;
+  bool serialize_event_data;
   Vec<Vec<f32>> v_offsets;
   Vec<Vec<f32>> v_dips;
   Vec<Vec<f32>> v_incs;
