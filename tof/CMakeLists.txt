@@ -222,6 +222,8 @@ if (BUILD_EXAMPLES)
   )
   target_include_directories(${unpack-example} 
                             PUBLIC
+                            ${spdlog_SOURCE_DIR}/include
+                            ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/cxxopts/include
                             ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
                             )
   target_link_libraries(${unpack-example}
