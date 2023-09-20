@@ -249,11 +249,22 @@ pub fn search_for_u16(number : u16, bytestream : &Vec<u8>, start_pos : usize)
 
 #[cfg(test)]
 mod test_serialization {
-  use crate::serialization::search_for_u16;
+  use crate::serialization::{search_for_u16,
+                             u16_to_u8};
 
   #[test]
-  fn test_search_for_2_bytemarker()
-  {
+  fn test_u16_to_u8_size_doubled() {
+    let size = 1000usize;
+    let data = vec![42u16;size];
+    let data_u8 = u16_to_u8(data.as_slice());
+    let data_u8_size = data_u8.len();
+    let double_size  = 2*size;
+    assert_eq!(data_u8_size, double_size);
+    
+  }
+
+  #[test]
+  fn test_search_for_2_bytemarker() {
     // just test it two times - FIXME - use a better method
     let mut bytestream = vec![1,2,3,0xAA, 0xAA, 5, 7];
     let mut pos = search_for_u16(0xAAAA, &bytestream, 0).unwrap();
