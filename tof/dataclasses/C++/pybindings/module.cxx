@@ -477,18 +477,6 @@ PYBIND11_MODULE(gaps_tof, m) {
                                  }) 
     ;
   
-    py::class_<MasterTriggerPacket>(m, "MasterTriggerPacket")
-      .def(py::init())
-      .def("to_bytestream",   &MasterTriggerPacket::to_bytestream, "Serialize to a list of bytes")
-      .def("from_bytestream", &MasterTriggerPacket::from_bytestream, "Deserialize from a list of bytes")
-      .def_readwrite("event_id"        , &MasterTriggerPacket::event_id        ) 
-      .def_readwrite("timestamp"       , &MasterTriggerPacket::timestamp       )
-      .def_readwrite("tiu_timestamp"   , &MasterTriggerPacket::tiu_timestamp   )
-      .def_readwrite("gps_timestamp_32", &MasterTriggerPacket::gps_timestamp_32)
-      .def_readwrite("gps_timestamp_16", &MasterTriggerPacket::gps_timestamp_16)
-      .def_readwrite("board_mask"      , &MasterTriggerPacket::board_mask      )
-      .def_readwrite("n_paddles"       , &MasterTriggerPacket::n_paddles       ) 
-    ;
 
     py::class_<CommandPacket>(m, "CommandPacket") 
       .def(py::init<TofCommand const&, u32 const>())  
@@ -547,6 +535,32 @@ PYBIND11_MODULE(gaps_tof, m) {
         .value("B", PADDLE_END::B)
         .value("UNKNOWN", PADDLE_END::UNKNOWN)
         .export_values();
+    
+    py::class_<MtbMoniData>(m, "MtbMoniData",
+            "Monitoring data from the master trigger board.")
+        .def(py::init())
+        .def("from_bytestream"      , &MtbMoniData::from_bytestream)
+        .def_readonly("fpga_temp"   , &MtbMoniData::fpga_temp   ) 
+        .def_readonly("fpga_vccint" , &MtbMoniData::fpga_vccint ) 
+        .def_readonly("fpga_vccaux" , &MtbMoniData::fpga_vccaux ) 
+        .def_readonly("fpga_vccbram", &MtbMoniData::fpga_vccbram) 
+        .def_readonly("rate"        , &MtbMoniData::rate        ) 
+        .def_readonly("lost_rate"   , &MtbMoniData::lost_rate   ) 
+        .def("__repr__",          [](const MtbMoniData &moni) {
+                                  return moni.to_string();
+                                  }) 
+    ;
+    py::class_<TofCmpMoniData>(m, "TofCmpMoniData",
+            "Monitoring data from the tof flight computer (TOF-CPU)")
+        .def(py::init())
+        .def("from_bytestream"    , &TofCmpMoniData::from_bytestream)
+        .def_readonly("core1_tmp" , &TofCmpMoniData::core1_tmp ) 
+        .def_readonly("core2_tmp" , &TofCmpMoniData::core2_tmp) 
+        .def_readonly("pch_tmp"   , &TofCmpMoniData::pch_tmp  ) 
+        .def("__repr__",          [](const TofCmpMoniData &moni) {
+                                  return moni.to_string();
+                                  }) 
+    ;
 
     py::class_<RBMoniData>(m, "RBMoniData",
             "Packet with monitoring data from the individual readout boards.")

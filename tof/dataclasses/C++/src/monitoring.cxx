@@ -150,25 +150,37 @@ MtbMoniData::MtbMoniData() {
   lost_rate    = 0 ;
 }
 
-usize MtbMoniData::from_bytestream(Vec<u8> &payload,
-                                   usize start_pos) {
-  usize pos = start_pos;
+MtbMoniData MtbMoniData::from_bytestream(const Vec<u8> &payload,
+                                         usize& pos) {
+  auto moni = MtbMoniData();
   u16 head          = Gaps::parse_u16(payload, pos);
   if (head != MtbMoniData::HEAD) {
     spdlog::error("No header signature (0xAAAA) found for decoding of MtbMoniData!");   
   }
-  fpga_temp    = Gaps::parse_f32(payload, pos);
-  fpga_vccint  = Gaps::parse_f32(payload, pos);
-  fpga_vccaux  = Gaps::parse_f32(payload, pos);
-  fpga_vccbram = Gaps::parse_f32(payload, pos);
-  rate         = Gaps::parse_u16(payload, pos);
-  lost_rate    = Gaps::parse_u16(payload, pos);
+  moni.fpga_temp    = Gaps::parse_f32(payload, pos);
+  moni.fpga_vccint  = Gaps::parse_f32(payload, pos);
+  moni.fpga_vccaux  = Gaps::parse_f32(payload, pos);
+  moni.fpga_vccbram = Gaps::parse_f32(payload, pos);
+  moni.rate         = Gaps::parse_u16(payload, pos);
+  moni.lost_rate    = Gaps::parse_u16(payload, pos);
   u16 tail     = Gaps::parse_u16(payload, pos);
   if (tail != MtbMoniData::TAIL) {
     spdlog::error("No tail signature (0x5555) found for decoding of MtbMoniData!");   
   }
-  return pos;
+  return moni;
 }
+
+std::string MtbMoniData::to_string() const {
+  std::string repr = "<MtbMoniData :";
+  repr += "\n\t fpga_temp    :" + std::to_string(fpga_temp     );
+  repr += "\n\t fpga_vccint  :" + std::to_string(fpga_vccint   );
+  repr += "\n\t fpga_vccaux  :" + std::to_string(fpga_vccaux   );
+  repr += "\n\t fpga_vccbram :" + std::to_string(fpga_vccbram  );
+  repr += "\n\t rate         :" + std::to_string(rate          );
+  repr += "\n\t lost_rate    :" + std::to_string(lost_rate     );
+  return repr; 
+}
+
 
 TofCmpMoniData::TofCmpMoniData() {
   core1_tmp = 0; 
@@ -176,21 +188,34 @@ TofCmpMoniData::TofCmpMoniData() {
   pch_tmp   = 0; 
 }
 
-usize TofCmpMoniData::from_bytestream(Vec<u8> &payload,
-                                      usize start_pos) {
-  usize pos = start_pos;
+TofCmpMoniData TofCmpMoniData::from_bytestream(const Vec<u8> &payload,
+                                               usize &pos) {
+  auto moni = TofCmpMoniData();
   u16 head  = Gaps::parse_u16(payload, pos);
   if (head != TofCmpMoniData::HEAD) {
     spdlog::error("No header signature (0xAAAA) found for decoding of TofCmpMoniData!");   
   }
-  core1_tmp = Gaps::parse_u8(payload, pos); 
-  core2_tmp = Gaps::parse_u8(payload, pos); 
-  pch_tmp   = Gaps::parse_u8(payload, pos); 
+  moni.core1_tmp = Gaps::parse_u8(payload, pos); 
+  moni.core2_tmp = Gaps::parse_u8(payload, pos); 
+  moni.pch_tmp   = Gaps::parse_u8(payload, pos); 
   u16 tail  = Gaps::parse_u16(payload, pos);
   if (tail != TofCmpMoniData::TAIL) {
     spdlog::error("No tail signature (0x5555) found for decoding of TofCmpMoniData!");   
   }
-  return pos;
+  return moni;
+}
+
+std::string TofCmpMoniData::to_string() const {
+  std::string repr = "<TofCmpMoniData : ";
+  repr += "\n\t core1_tmp :" + std::to_string(core1_tmp);
+  repr += "\n\t core2_tmp :" + std::to_string(core2_tmp);
+  repr += "\n\t pch_tmp   :" + std::to_string(pch_tmp) + ">";
+  return repr;
+}
+
+std::ostream& operator<<(std::ostream& os, const TofCmpMoniData& moni){
+  os << moni.to_string();
+  return os;
 }
 
 std::ostream& operator<<(std::ostream& os, const RBMoniData& moni){
@@ -198,4 +223,8 @@ std::ostream& operator<<(std::ostream& os, const RBMoniData& moni){
   return os;
 }
 
+std::ostream& operator<<(std::ostream& os, const MtbMoniData& moni){
+  os << moni.to_string();
+  return os;
+}
 

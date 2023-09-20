@@ -78,10 +78,14 @@ struct MtbMoniData {
  
   MtbMoniData();
 
+  std::string to_string() const;
+
   /// extract moni data from payload
-  usize from_bytestream(Vec<u8>& payload,
-                        usize start_pos=0);
+  static MtbMoniData from_bytestream(const Vec<u8>& payload,
+                                     usize& pos);
 };
+
+std::ostream& operator<<(std::ostream& os, const MtbMoniData& moni);
 
 /// System performance and temperature data 
 /// of the central tof computer
@@ -96,8 +100,12 @@ struct TofCmpMoniData {
  
   TofCmpMoniData(); 
   /// extract moni data from payload
-  usize from_bytestream(Vec<u8>& payload,
-                        usize start_pos=0);
+  static TofCmpMoniData from_bytestream(const Vec<u8>& payload,
+                                        usize &pos);
+
+  std::string to_string() const;
 };
+
+std::ostream& operator<<(std::ostream& os, const TofCmpMoniData& moni);
 
 #endif
