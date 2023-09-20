@@ -858,13 +858,17 @@ impl FromRandom for RBEvent {
     let mut event   = RBEvent::new();
     let header      = RBEventHeader::from_random();
     let mut rng     = rand::thread_rng();
+    event.data_type = DataType::Physics; 
+    event.n_paddles = 0;
     event.header    = header;
+    event.nchan     = 0u8; 
     let ch_ids      = event.header.get_active_data_channels();
-    if !event.header.event_fragment {
+    if !event.header.event_fragment && !event.header.lost_trigger {
       for k in ch_ids.iter() {
         debug!("Found active data channel {}!", k);
         let random_numbers: Vec<u16> = (0..NWORDS).map(|_| rng.gen()).collect();
         event.adc[(k-1) as usize] = random_numbers;
+        event.nchan += 1;
       }
     }
     event
@@ -1221,11 +1225,12 @@ mod test_rbevents {
     let test = RBEvent::from_bytestream(&head.to_bytestream(), &mut 0).unwrap();
     assert_eq!(head.header, test.header);
     assert_eq!(head.header.get_active_data_channels(), test.header.get_active_data_channels());
-    if head.header.event_fragment == test.header.event_fragment {
-      println!("Event fragment found, no channel data available!");
-    } else {
-      assert_eq!(head, test);
-    }
+    assert_eq!(head, test);
+    //if head.header.event_fragment == test.header.event_fragment {
+    //  println!("Event fragment found, no channel data available!");
+    //} else {
+    //  assert_eq!(head, test);
+    //}
   }
   
   #[test]
