@@ -323,12 +323,12 @@ RBCalibration RBCalibration::from_bytestream(const Vec<u8> &stream,
   RBCalibration calibration = RBCalibration();
   spdlog::debug("Start decoding at pos {}", pos);
   u16 head = Gaps::parse_u16(stream, pos);
-  calibration.d_v = Gaps::parse_f32(stream, pos);
-  calibration.serialize_event_data = Gaps::parse_bool(stream, pos);  
   if (head != RBCalibration::HEAD)  {
     spdlog::error("No header signature found!");  
   }
-  calibration.rb_id    = stream[pos]; pos += 1; 
+  calibration.rb_id    = stream[pos]; pos += 1;
+  calibration.d_v = Gaps::parse_f32(stream, pos);
+  calibration.serialize_event_data = Gaps::parse_bool(stream, pos);  
   f32 value;
   for (usize ch=0; ch<NCHN; ch++) {
     for (usize k=0; k<NWORDS; k++) {
