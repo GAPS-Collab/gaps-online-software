@@ -58,8 +58,10 @@ struct RBMoniData {
   //usize from_bytestream(Vec<u8>& payload,
   //                      usize start_pos=0);
 
+  std::string to_string() const;
 };
 
+std::ostream& operator<<(std::ostream& os, const RBMoniData& moni);
 
 /// MasterTriggerBoard internal sensors
 struct MtbMoniData {
