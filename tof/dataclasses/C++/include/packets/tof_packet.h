@@ -84,11 +84,6 @@ struct TofPacket {
 
   Vec<u8> to_bytestream() const;
 
-  //[[deprecated("Use static from_bytestream instead!")]]
-  //u64 from_bytestream(const Vec<u8> &payload,
-  //                    usize start_pos=0);
-
-
   /**
    * Transcode from bytestream
    *
@@ -109,20 +104,6 @@ struct TofPacket {
         "T must have a 'from_bytestream' method.");
     return T::from_bytestream(payload, 0);
   }
-
-
-  
-
-
-  
-
-
-
-  
-
-
-  
-
 }; // end TofPacket
 
 std::ostream& operator<<(std::ostream& os, const TofPacket& pck);

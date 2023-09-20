@@ -59,7 +59,7 @@ std::string packet_type_to_string(const PacketType pt) {
 
 std::ostream& operator<<(std::ostream& os, const PacketType& pck)
 {
-  os << packet_type_to_string(pck) << "\n";
+  os << packet_type_to_string(pck);
   return os;
 }
 
@@ -183,9 +183,8 @@ std::string TofPacket::to_string() const
 /**************************************************/
 
 std::ostream& operator<<(std::ostream& os, const TofPacket& pck)
-{
-  os << "--TOFPACKET--\n";
-  os << "-- type " << pck.packet_type << "\n";
+{ 
+  os << pck.to_string();
   return os;
 }
 
