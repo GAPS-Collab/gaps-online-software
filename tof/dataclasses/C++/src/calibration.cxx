@@ -392,4 +392,36 @@ bool RBCalibration::channel_check(u8 channel) const {
 
 /************************************************/
 
+std::string RBCalibration::to_string() const {
+  std::string repr = "<ReadoutboardCalibration:";  
+  repr += "\n\t RB             : " + std::to_string(rb_id);
+  bool has_data = false;
+  if (vcal_data.size() > 0) {
+    repr += "\n\t VCalData       : " + std::to_string(vcal_data.size()) + " (events)";
+    has_data = true;
+  }
+  if (tcal_data.size() > 0) {
+    repr += "\n\t TCalData       : " + std::to_string(tcal_data.size()) + " (events)";
+    has_data = true;
+  }
+  if (noi_data.size() > 0) {
+    repr += "\n\t NoInputData    : " + std::to_string(tcal_data.size()) + " (events)"; 
+    has_data = true;
+  }
+  if (!has_data) {
+    repr += "\n\t .. no calibration data (RBEvents) associated within this package ..";
+  }
+  repr += "\n\t V Offsets [ch0]: .. " + std::to_string(v_offsets[0][98]) + " " + std::to_string(v_offsets[0][99]) + ".."
+          "\n\t V Incrmts [ch0]: .. " + std::to_string(v_incs   [0][98]) + " " + std::to_string(v_incs   [0][99]) + ".."
+          "\n\t V Dips    [ch0]: .. " + std::to_string(v_dips   [0][98]) + " " + std::to_string(v_dips   [0][99]) + ".."
+          "\n\t T Bins    [ch0]: .. " + std::to_string(t_bin    [0][98]) + " " + std::to_string(t_bin    [0][99]) + "..>";
+  return repr;
+}
+
+/************************************************/
+
+std::ostream& operator<<(std::ostream& os, const RBCalibration& cali){ 
+  os << cali.to_string();
+  return os;
+}
 

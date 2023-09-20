@@ -63,11 +63,15 @@ struct RBCalibration {
                                        u64 &pos);
 
   static RBCalibration from_txtfile(const String &filename);
-  
+ 
+  std::string to_string() const;
+
   private:
 
     //! Check if the channel follows the convention 1-9
     bool channel_check(u8 channel) const;
 };
+
+std::ostream& operator<<(std::ostream& os, const RBCalibration& pck);
 
 #endif
