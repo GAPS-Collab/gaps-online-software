@@ -188,8 +188,10 @@ foreach(p EXAMPLES)
   endif()
 endforeach()
 
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples
-    DESTINATION ${CMAKE_INSTALL_PREFIX}
+file(GLOB python_example_scripts "${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/python/*.py")
+install(FILES ${python_example_scripts}
+    DESTINATION ${INSTALL_EXAMPLES_DIR}
+    PERMISSIONS OWNER_EXECUTE
 )
 
 # install the library in the lib directory
@@ -206,4 +208,30 @@ install(TARGETS ${pybindings}
     #PUBLIC_HEADER DESTINATION ${INSTALL_INCLUDE_DIR}
     #INCLUDES DESTINATION "${GAPS_HEADER_OUTPUT_DIRECTORY}/lib/include"
 )
+
+#######################################
+# Examples
+#######################################
+
+option(BUILD_EXAMPLES "build C++ example for data i/o" OFF)
+
+if (BUILD_EXAMPLES)
+  set(unpack-example "unpack-tofpackets")
+  add_executable(${unpack-example}
+      ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/unpack-tofpackets.cxx
+  )
+  target_include_directories(${unpack-example} 
+                            PUBLIC
+                            ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
+                            )
+  target_link_libraries(${unpack-example}
+                        PRIVATE
+                        ${GAPSTOF_LIBRARY_SHARED})
+  install(TARGETS ${unpack-example}
+          DESTINATION ${INSTALL_EXAMPLES_DIR}
+
+  )
+endif()
+
+
 
