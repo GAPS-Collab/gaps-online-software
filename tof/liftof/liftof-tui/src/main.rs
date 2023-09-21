@@ -30,8 +30,7 @@ extern crate json;
 extern crate histo;
 use histo::Histogram;
 
-use liftof_lib::{get_tof_manifest,
-                 master_trigger,
+use liftof_lib::{master_trigger,
                  monitor_mtb};
 
 use tui_logger::TuiLoggerWidget;
@@ -60,17 +59,16 @@ use tui::{
 };
 
 // system inforamtion
-use sysinfo::{NetworkExt, NetworksExt, ProcessExt, System, SystemExt};
+use sysinfo::{NetworkExt, System};
 
 use tof_dataclasses::commands::{TofCommand, TofResponse};
 use tof_dataclasses::packets::{TofPacket, PacketType};
 use tof_dataclasses::serialization::Serialization;
 use tof_dataclasses::threading::ThreadPool;
-use tof_dataclasses::events::blob::BlobData;
-use tof_dataclasses::events::MasterTriggerEvent;
+use tof_dataclasses::events::{MasterTriggerEvent,
+                              RBEventMemoryView};
 use tof_dataclasses::monitoring::MtbMoniData;
-use tof_dataclasses::manifest::{LocalTriggerBoard,
-                                ReadoutBoard,
+use tof_dataclasses::manifest::{ReadoutBoard,
                                 get_ltbs_from_sqlite,
                                 get_rbs_from_sqlite};
 
@@ -797,8 +795,9 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
             Ok(dt)   => {
               if dt.packet_type == PacketType::RBEvent {
                 data = Vec::<Vec<(f64,f64)>>::new();
-                let mut event = BlobData::new();
-                event.from_bytestream(&dt.payload, 0, false);
+                let mut event = RBEventMemoryView::new();
+                let mut pos = 0usize;
+                event = RBEventMemoryView::from_bytestream(&dt.payload, &mut pos).unwrap();
                 if event.ch_adc.len() == 9 {
                   for n in 0..9 {
                     data.push(Vec::<(f64,f64)>::new());

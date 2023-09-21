@@ -16,7 +16,6 @@
 //! -----------------------------------------
 //! | Logs                                  |
 
-use tof_dataclasses::events::blob::BlobData;
 use chrono::Utc;
 
 use tui::{
@@ -35,7 +34,7 @@ use std::collections::VecDeque;
 use tof_dataclasses::packets::{TofPacket, PacketType};
 use tof_dataclasses::commands::{TofCommand,
                                 TofResponse};
-
+use tof_dataclasses::events::RBEventMemoryView;
 use crossbeam_channel::{unbounded,
                         Sender,
                         Receiver};
@@ -184,10 +183,10 @@ impl CommandTab<'_> {
       PacketType::Command   => {
       },
       PacketType::RBEvent   => {
-        let eventid = BlobData::decode_event_id(pk.payload.as_slice());
+        let eventid = RBEventMemoryView::decode_event_id_from_stream(&pk.payload).unwrap();
         pk_repr = String::from("\u{2728} <") + &now + " " + &eventid.to_string() + " - RBEvent >";
       },
-      PacketType::MonitorRb   => {
+      PacketType::RBMoni   => {
         pk_repr = String::from("\u{1f4c8} <") + &now + " - RBMoniData >";
       },
       PacketType::HeartBeat => {
