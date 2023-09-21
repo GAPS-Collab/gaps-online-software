@@ -119,6 +119,26 @@ RBEventHeader::RBEventHeader() {
 
 /*************************************/
 
+std::string RBEventHeader::to_string() const {
+  std::string repr = "<RBEventHeader";
+  repr += "\n\t rb id "           + std::to_string(rb_id)                 ;
+  repr += "\n\t event id "        + std::to_string(event_id)              ;
+  repr += "\n\t is locked "       + std::to_string(is_locked)             ;
+  repr += "\n\t is locked (1s) "  + std::to_string(is_locked_last_sec)    ;
+  repr += "\n\t lost trigger "    + std::to_string(lost_trigger)          ;
+  repr += "\n\t channel mask "    + std::to_string(channel_mask)          ;
+  repr += "\n\t stop cell "       + std::to_string(stop_cell)             ;
+  repr += "\n\t crc32 "           + std::to_string(crc32)                 ;
+  repr += "\n\t dtap0 "           + std::to_string(dtap0)                 ;
+  repr += "\n\t timestamp (48bit) " + std::to_string(timestamp_48)        ;
+  repr += "\n\t FPGA temp [C] "     + std::to_string(get_fpga_temp())     ;
+  repr += "\n\t DRS4 temp [C] "     + std::to_string(get_drs_temp())      ;
+  repr += ">";
+  return repr;
+}
+
+/*************************************/
+
 RBEventHeader RBEventHeader::from_bytestream(const Vec<u8> &stream,
                                              u64 &pos){
 
@@ -255,6 +275,25 @@ RBEvent::RBEvent() {
     adc.push_back(Vec<u16>(NWORDS/2,0));
   }
 }
+
+/**********************************************************/
+
+std::string RBEvent::to_string() const {
+  std::string repr = "<RBEvent\n";
+  repr += header.to_string();
+  repr += "\n";
+  if (adc.size() > 0) {
+    repr += "ADC CHANNELS : " + std::to_string(adc.size());
+    repr += "\n-- --  Ch 0 -- --\n";
+    repr += std::to_string(adc[0][0]);
+    repr += " "; 
+    repr += std::to_string(adc[0][1]);
+    repr += " .. .. \n"; 
+  }
+  repr += ">";
+  return repr;
+}
+
 
 /**********************************************************/
 
@@ -715,8 +754,34 @@ std::string MasterTriggerEvent::to_string() const {
   return repr;
 }
 
+std::string TofEvent::to_string() const {
+  std::string repr = "<TofEvent";
+  repr += "\tn missing hits: " + std::to_string(missing_hits.size() )  ;
+  repr += "\tn RBEvents    : " + std::to_string(rb_events.size() )     ;
+  repr += "\tn RBMonis     : " + std::to_string(rb_moni_data.size() )  ;
+  //repr += "\tn PaddlePackets "    + std::to_string(event.dna )       + "\n" ;
+  //repr += "\ttail "      + std::to_string(event.tail)       ;
+  repr += ">";
+  return repr;
+}
+
 std::ostream& operator<<(std::ostream& os, const MasterTriggerEvent& mt) {
   os << mt.to_string();
+  return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const TofEvent& te) {
+  os << te.to_string();
+  return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const RBEvent& re) {
+  os << re.to_string();
+  return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const RBEventHeader& rh) {
+  os << rh.to_string();
   return os;
 }
 

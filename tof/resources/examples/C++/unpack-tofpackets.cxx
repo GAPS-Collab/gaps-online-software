@@ -56,7 +56,7 @@ int main(int argc, char *argv[]){
   u32 n_tcmoni  = 0;
   u32 n_mtbmoni = 0;
   u32 n_unknown = 0;
-
+  u32 n_tofevents = 0;
   for (auto const &p : packets) {
     // print it
     std::cout << p << std::endl;
@@ -79,6 +79,22 @@ int main(int argc, char *argv[]){
           std::cout << cali << std::endl;
         }
         n_rbcalib++;
+        break;
+      }
+      // this only works for the data I combined
+      // recently, NOT for the "stream" kind of data
+      // THe format will change as well soon.
+      case PacketType::TofEvent : {
+        usize pos = 0;
+        auto ev = TofEvent::from_bytestream(p.payload, pos);
+        if (verbose) {
+          std::cout << ev << std::endl;
+          for (auto const &rbid : ev.get_rbids()) {
+            RBEvent rb_event = ev.get_rbevent(rbid);
+            std::cout << rb_event << std::endl;
+          }
+        }
+        n_tofevents++;
         break;
       }
       case PacketType::RBMoni : {
@@ -132,6 +148,7 @@ int main(int argc, char *argv[]){
   std::cout << "-- -- RBCalibration     : " << n_rbcalib << "\t (packets) " <<  std::endl;
   std::cout << "-- -- RBMoniData        : " << n_rbmoni  << "\t (packets) " <<  std::endl;
   std::cout << "-- -- MasterTriggerEvent: " << n_mte     << "\t (packets) " <<  std::endl;
+  std::cout << "-- -- TofEvent          : " << n_tofevents  << "\t (packets) " <<  std::endl;
   std::cout << "-- -- TofCmpMoniData    : " << n_tcmoni  << "\t (packets) " <<  std::endl;
   std::cout << "-- -- MtbMoniData       : " << n_mtbmoni << "\t (packets) " <<  std::endl;
   std::cout << "-- -- undecoded         : " << n_unknown << "\t (packets) " <<  std::endl;

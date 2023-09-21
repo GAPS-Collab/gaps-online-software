@@ -121,6 +121,8 @@ struct RBEventHeader {
   f32 get_fpga_temp() const;
   f32 get_drs_temp() const;
 
+  std::string to_string() const;
+
   private:
     f32 drs_adc_to_celsius(u16 adc) const; 
 };
@@ -146,6 +148,9 @@ struct RBEvent {
 
   static RBEvent from_bytestream(const Vec<u8> &bytestream,
                                  u64 &pos);
+
+  std::string to_string() const;
+
   private:
 
     /**
@@ -286,6 +291,8 @@ struct TofEvent {
   static u32 get_n_paddlepackets(u32 mask);
   static u32 get_n_rbmonis(u32 mask);
 
+  std::string to_string() const;
+
   /**
    * Get the rb event for a specific board id.
    */
@@ -309,5 +316,12 @@ struct TofEvent {
 };
 
 std::ostream& operator<<(std::ostream& os, const MasterTriggerEvent& mt);
+
+std::ostream& operator<<(std::ostream& os, const TofEvent& et);
+
+std::ostream& operator<<(std::ostream& os, const RBEvent& re);
+
+std::ostream& operator<<(std::ostream& os, const RBEventHeader& rh);
+
 
 #endif 

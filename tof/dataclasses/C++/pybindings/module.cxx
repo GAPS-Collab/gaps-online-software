@@ -426,21 +426,8 @@ PYBIND11_MODULE(gaps_tof, m) {
       //.def_readonly("timestamp_16"       , &RBEventHeader::timestamp_16)   
       .def_readonly("broken"             , &RBEventHeader::broken      )   
       .def("__repr__",        [](const RBEventHeader &h) {
-                                  return "<RBEventHeader : \n"
-                                  + String(" rb id ")     + std::to_string(h.rb_id)
-                                  + "\n event id "        + std::to_string(h.event_id)
-                                  + "\n is locked "       + std::to_string(h.is_locked)
-                                  + "\n is locked (1s) "  + std::to_string(h.is_locked_last_sec)
-                                  + "\n lost trigger "    + std::to_string(h.lost_trigger)
-                                  + "\n channel mask "    + std::to_string(h.channel_mask)
-                                  + "\n stop cell "       + std::to_string(h.stop_cell)
-                                  + "\n crc32 "           + std::to_string(h.crc32)
-                                  + "\n dtap0 "           + std::to_string(h.dtap0)
-                                  + "\n timestamp (48bit) " + std::to_string(h.timestamp_48)
-                                  + "\n FPGA temp [C] " + std::to_string(h.get_fpga_temp())
-                                  + "\n DRS4 temp [C] " + std::to_string(h.get_drs_temp())
-                                  + ">";
-                                  })
+                                   return h.to_string();
+                                 })
     
       
     ;
@@ -623,8 +610,8 @@ PYBIND11_MODULE(gaps_tof, m) {
                                              py::arg("rb_id"))
         .def("from_bytestream"              ,&TofEvent::from_bytestream)
         .def("from_tofpacket"               ,&TofEvent::from_tofpacket)
-        .def("__repr__",           [](const TofEvent &ev) {
-                                   return tofevent_to_string(ev); 
+        .def("__repr__",           [](const TofEvent &te) {
+                                   return te.to_string(); 
                                    }) 
 
     ;
