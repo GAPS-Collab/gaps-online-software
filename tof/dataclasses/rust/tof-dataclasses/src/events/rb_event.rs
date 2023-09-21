@@ -310,6 +310,23 @@ impl RBEventMemoryView {
     }
   }
 
+  pub fn decode_event_id_from_stream(stream : &Vec<u8>) -> Result<u32, SerializationError> {
+    let mut pos = 0usize;
+    let head_pos = search_for_u16(Self::HEAD, stream, pos)?; 
+    let tail_pos = search_for_u16(Self::TAIL, stream, pos + Self::SIZE-2)?;
+    // At this state, this can be a header or a full event. Check here and
+    // proceed depending on the options
+    if tail_pos + 2 - pos != Self::SIZE {
+      error!("Event seems incomplete. Seing {} bytes, but expecting {}", tail_pos + 2 - head_pos, RBEventMemoryView::SIZE);
+      //error!("{:?}", &stream[head_pos + 18526..head_pos + 18540]);
+      pos = pos + 2; //start_pos += RBEventMemoryView::SIZE;
+      return Err(SerializationError::EventFragment);
+    }
+    pos = pos + 2 + 2 + 2 + 2 + 8 + 2 + 2 + 2;
+    let event_id = parse_u32_for_16bit_words(&stream, &mut pos); 
+    Ok(event_id)
+  }
+
   pub fn get_active_data_channels(&self) -> Vec<u8> {
     let mut active_channels = Vec::<u8>::with_capacity(8);
     for ch in 1..9 {
