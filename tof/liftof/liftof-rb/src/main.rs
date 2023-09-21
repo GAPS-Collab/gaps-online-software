@@ -35,7 +35,6 @@ use tof_dataclasses::commands::{//TofCommand,
                                 TofOperationMode};
 use tof_dataclasses::events::{DataType,
                               DataFormat};
-//use tof_dataclasses::calibrations::RBCalibrations;
 use tof_dataclasses::run::RunConfig;
 #[macro_use] extern crate log;
 
@@ -153,7 +152,9 @@ fn main() {
   let mut end_after_run = false;
 
   if calibration {
-    warn!("Readoutboard calibration! This will override ALL other settings!");
+    println!("===================================================================");
+    println!("=> Readoutboard calibration! This will override ALL other settings!");
+    println!("===================================================================");
     end_after_run = true;
     to_local_file = true;
   }
@@ -161,7 +162,9 @@ fn main() {
   let config_from_shell : bool;
   match run_config {
     None     => {
-      println!("=> We did not get a runconfig! Currently we are just listening for input on the socket. This is the desired behavior, if run by systemd. If you want to take data in standalone mode, either send a runconfig to the socket or hit CTRL+C and start the program again, this time suppling the -r <RUNCONFIG> flag or in case you want to calibrate the board, use the --calibration flag.");
+      if !calibration {
+        println!("=> We did not get a runconfig with the -r <RUNCONFIG> commandline switch! Currently we are just listening for input on the socket. This is the desired behavior, if run by systemd. If you want to take data in standalone mode, either send a runconfig to the socket or hit CTRL+C and start the program again, this time suppling the -r <RUNCONFIG> flag or in case you want to calibrate the board, use the --calibration flag.");
+      }
       config_from_shell = false;
     }
     Some(rcfile) => {
@@ -173,7 +176,7 @@ fn main() {
   }
   let file_suffix : String;
   if calibration {
-    file_suffix = String::from("cali.tof.gaps");
+    file_suffix = String::from(".cali.tof.gaps");
   } else {
     file_suffix = String::from(".tof.gaps");
   }

@@ -13,10 +13,10 @@ use std::fs::File;
 use std::path::Path;
 use std::io::Write;
 use std::fs::OpenOptions;
-
+use std::fs;
 use std::time::{Duration,
                 Instant};
-
+use std::ffi::OsString;
 use std::{thread, time};
 use std::env;
 use crossbeam_channel::{Sender,
@@ -876,8 +876,38 @@ pub fn data_publisher(data           : &Receiver<TofPacket>,
 
   let mut file_on_disk : Option<File> = None;//let mut output = File::create(path)?;
   if write_to_disk {
-    info!("Writing packets to {}", blobfile_name );
-    file_on_disk = OpenOptions::new().append(true).create(true).open(blobfile_path).ok()
+    // in case it is a calibration file, delete any old 
+    // calibration and write it to a specific location
+    let home      = env::var_os("HOME").unwrap_or(OsString::from("/home/gaps"));
+    let calib_dir = home.to_string_lossy().to_string() + "/calib"; 
+    if blobfile_name.ends_with("cali.tof.gaps") {
+      match fs::metadata(&calib_dir) {
+        Ok(metadata) => {
+          // Check if the metadata is for a directory
+          if !metadata.is_dir() {
+            error!("The path exists, but it is not a directory.");
+          }
+        }
+        Err(_) => {
+          // An error occurred, which typically means the directory does not exist
+          warn!("No calibration directory found. Will create {}", calib_dir);
+          match fs::create_dir(calib_dir.clone()) {
+            Ok(_) => (),
+            Err(err) => {
+              error!("Can not create {}!", calib_dir)
+            }
+          }
+        }
+      } // end match
+      let mut calib_file = Path::new(&calib_dir);
+      let local_file = calib_file.join(blobfile_name);
+      //calib_file = &calib_file.join(blobfile_name);
+      info!("Writing calibration to {}", local_file.display() );
+      file_on_disk = OpenOptions::new().create(true).write(true).open(local_file).ok()
+    } else {
+      info!("Writing packets to {}", blobfile_name );
+      file_on_disk = OpenOptions::new().append(true).create(true).open(blobfile_path).ok()
+    }
   }
  
   // these are only required for testing
