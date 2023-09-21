@@ -4,6 +4,11 @@
 #include "serialization.h"
 #include "parsers.h"
 
+// this is just stupid imo
+//https://stackoverflow.com/questions/4891067/weird-undefined-symbols-of-static-constants-inside-a-struct-class
+const u16 TofPacket::HEAD;
+const u16 TofPacket::TAIL;
+
 std::string packet_type_to_string(const PacketType pt) {
   switch (pt) { 
       case PacketType::Unknown : {
