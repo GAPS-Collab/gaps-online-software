@@ -32,7 +32,7 @@ use tof_dataclasses::events::{MasterTofEvent,
 use tof_dataclasses::manifest::{get_ltbs_from_sqlite,
                                 get_rbs_from_sqlite};
 use tof_dataclasses::serialization::Serialization;
-use tof_dataclasses::calibrations::ReadoutBoardCalibrations;
+use tof_dataclasses::calibrations::RBCalibrations;
 
 use liftof_lib::{RobinReader,
                  TofPacketWriter,
@@ -69,7 +69,7 @@ fn main() {
   let config        : json::JsonValue;
 
   let use_calibrations : bool;
-  let mut calibrations = HashMap::<u8, ReadoutBoardCalibrations>::new();
+  let mut calibrations = HashMap::<u8, RBCalibrations>::new();
   match args.calibrations {
     None => {
       use_calibrations = false;
@@ -83,7 +83,7 @@ fn main() {
       if let Ok(entries) = glob(calib_dir.to_str().unwrap()) { 
         for entry in entries {
           if let Ok(path) = entry {
-            let rb_calib = ReadoutBoardCalibrations::from(path.as_path());            
+            let rb_calib = RBCalibrations::from(path.as_path());            
             println!("=> Loaded RB calibration: {} from file {:?}", rb_calib, path.display());
             calibrations.insert(rb_calib.rb_id, rb_calib);
             //let filename = path.into_os_string().into_string().unwrap();
