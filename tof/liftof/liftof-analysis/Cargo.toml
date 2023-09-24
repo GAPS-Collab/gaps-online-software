@@ -10,6 +10,9 @@ path = "src/main.rs"
 [[bin]]
 name = "liftof-robin-reader"
 path = "src/bin/robin_reader.rs"
+[[bin]]
+name = "merge-calib"
+path = "src/bin/merge_calib.rs"
 
 [dependencies]
 liftof-lib = { path = "../liftof-lib"} 
