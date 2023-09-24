@@ -131,7 +131,7 @@ impl TofPacketWriter {
   /// * file_prefix : Prefix file with this string. A continuous number will get 
   ///                 appended to control the file size.
   pub fn new(file_prefix : String) -> Self {
-    let filename = file_prefix.clone() + "_0.tof.gaps";
+    let filename = file_prefix.clone() + ".tof.gaps";
     let path = Path::new(&filename); 
     println!("Writing to file {filename}");
     let file = OpenOptions::new().create(true).append(true).open(path).expect("Unable to open file {filename}");
@@ -150,6 +150,7 @@ impl TofPacketWriter {
       Err(err) => error!("Writing to file with prefix {} failed. Err {}", self.file_prefix, err),
       Ok(_)    => ()
     }
+    // FIXME - this must go into the drop method
     match self.file.sync_all() {
       Err(err) => error!("File syncing failed! error {err}"),
       Ok(_)    => ()
@@ -611,6 +612,10 @@ impl RobinReader {
     trace!("We have {} elements in the cache!", keys.len());
     keys.sort();
     keys
+  }
+
+  pub fn get_events(&self) -> Vec<RBEvent> {
+    self.cache.values().cloned().collect()
   }
 
   pub fn count_packets(&self) -> u64 {
