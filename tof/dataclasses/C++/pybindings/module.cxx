@@ -835,11 +835,12 @@ PYBIND11_MODULE(gaps_tof, m) {
        .def(py::init())
        .def_readonly("rb_id",                     &RBCalibration::rb_id)
        .def_readonly("d_v",                       &RBCalibration::d_v)
-       .def_readonly("serialize_event_data",      &RBCalibration::serialize_event_data)
        .def_readonly("v_offsets",  &RBCalibration::v_offsets)
        .def_readonly("v_incs",     &RBCalibration::v_incs)
        .def_readonly("v_dips",     &RBCalibration::v_dips)
        .def_readonly("t_bin",      &RBCalibration::t_bin)
+       .def("disable_eventdata",   &RBCalibration::disable_eventdata,
+            "Don't load event data from a calibration file (if available). Just load the calibration constants. (This only works with binary files.")
        .def("from_tofpacket",      unpack_tp_to_rbcalibration,
             "Unpack a RBCalibration from a compatible tofpacket") 
        .def("nanoseconds",         wrap_rbcalibration_nanoseconds_allchan_rbevent,

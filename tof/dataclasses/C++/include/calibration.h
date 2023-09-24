@@ -66,6 +66,11 @@ struct RBCalibration {
  
   std::string to_string() const;
 
+  //! Should the associated data be loaded 
+  //! in case it is available when 
+  //! from_bytestream is called?
+  void disable_eventdata();
+
   private:
 
     //! Check if the channel follows the convention 1-9

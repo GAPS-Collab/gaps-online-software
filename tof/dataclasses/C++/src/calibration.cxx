@@ -196,6 +196,13 @@ RBCalibration::RBCalibration() {
     v_incs.push_back(Vec<f32>(NWORDS, 0));
     t_bin.push_back(Vec<f32>(NWORDS,0)) ;
   }
+  serialize_event_data = true;
+}
+
+/************************************************/
+
+void RBCalibration::disable_eventdata() {
+  serialize_event_data = false;
 }
 
 /************************************************/
@@ -328,7 +335,9 @@ RBCalibration RBCalibration::from_bytestream(const Vec<u8> &stream,
   }
   calibration.rb_id    = stream[pos]; pos += 1;
   calibration.d_v = Gaps::parse_f32(stream, pos);
-  calibration.serialize_event_data = Gaps::parse_bool(stream, pos);  
+  bool serialize_event_data = Gaps::parse_bool(stream, pos);
+  calibration.serialize_event_data 
+      = serialize_event_data && calibration.serialize_event_data;  
   f32 value;
   for (usize ch=0; ch<NCHN; ch++) {
     for (usize k=0; k<NWORDS; k++) {
@@ -340,6 +349,23 @@ RBCalibration RBCalibration::from_bytestream(const Vec<u8> &stream,
       calibration.v_incs[ch][k] = value;
       value = Gaps::parse_f32(stream, pos);
       calibration.t_bin[ch][k]  = value;
+    }
+  }
+  if (calibration.serialize_event_data) {
+    u16 n_noi = Gaps::parse_u16(stream, pos);
+    for (u16 k=0; k<n_noi; k++) {
+      auto ev = RBEvent::from_bytestream(stream, pos);
+      calibration.noi_data.push_back(ev); 
+    }
+    u16 n_vcal = Gaps::parse_u16(stream, pos);
+    for (u16 k=0; k<n_vcal; k++) {
+      auto ev = RBEvent::from_bytestream(stream, pos);
+      calibration.vcal_data.push_back(ev); 
+    }
+    u16 n_tcal = Gaps::parse_u16(stream, pos);
+    for (u16 k=0; k<n_tcal; k++) {
+      auto ev = RBEvent::from_bytestream(stream, pos);
+      calibration.tcal_data.push_back(ev); 
     }
   }
   u16 tail = Gaps::parse_u16(stream, pos);
