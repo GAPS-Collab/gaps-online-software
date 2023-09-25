@@ -164,7 +164,6 @@ Vec<RBEventMemoryView> get_rbeventmemoryviews(const Vec<u8> &bytestream,
     }
     events.push_back(event);
     n_events_decoded++;
-    pos += RBEventMemoryView::SIZE + 2;
   }
   spdlog::info("Retrieved {} events from stream!", n_events_decoded);
   if (n_duplicates > 0) {
