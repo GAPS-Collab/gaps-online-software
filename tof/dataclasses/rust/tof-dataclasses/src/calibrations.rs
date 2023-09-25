@@ -32,6 +32,8 @@ extern crate rand;
 #[cfg(feature = "random")]
 use rand::Rng;
 
+extern crate statistical;
+
 //extern crate statrs;
 //use statrs::statistics::Median;
 
@@ -90,6 +92,10 @@ fn get_periods(trace   : &Vec<f32>,
                edge    : &Edge) -> (Vec<usize>, Vec<f32>) {
   let mut trace_c = trace.clone();
   let mut periods = Vec::<f32>::new();
+  if trace_c.len() == 0 {
+    let foo = Vec::<usize>::new();
+    return (foo, periods);
+  }
   let firstbin : usize = 20;
   let nskip : f32 = 0.0;
   let lastbin = firstbin + (nperiod * (900.0/nperiod).floor()).floor() as usize;
@@ -155,7 +161,13 @@ fn get_periods(trace   : &Vec<f32>,
     }
     period += dts[*zcs_a]*f32::abs(tr_a[1]/(tr_a[1] - tr_a[0])); // first semi bin
     period += dts[*zcs_b]*f32::abs(tr_b[1]/(tr_b[1] - tr_b[0])); // first semi bin
-    if zcs_b - zcs_a - nperiod as usize > 5 {
+    //println!("zcs_b, zcs_a, nperiod {} {} {}", zcs_b, zcs_a, nperiod);
+    //if f32::abs((zcb-zca)-nperiod as usize) > 5:
+    //         zcs = zcs[:i+1]
+    if f32::abs(*zcs_b as f32 - *zcs_a as f32 - nperiod) > 5.0 {
+      let mut zcs_tmp = Vec::<usize>::new();
+      zcs_tmp.extend_from_slice(&zcs[0..k+1]);
+      zcs = zcs_tmp;
       break;
     }
     periods.push(period);
@@ -206,22 +218,38 @@ fn median(input: &Vec<f32>) -> f32 {
 
 
 /// Calculate the median over axis 1
+/// This is used for a single channel
+/// data is row - columns
 fn calculate_column_medians(data: &Vec<Vec<f32>>) -> Vec<f32> {
   // Get the number of columns (assuming all sub-vectors have the same length)
   let num_columns = data[0].len();
   let num_rows    = data.len();
+  //println!("num rows {}", num_rows);
   // Initialize a Vec to store the column-wise medians
   let mut column_medians: Vec<f32> = vec![0.0; num_columns];
-  info!("Calculating medians for {} columns!", num_columns);
+  debug!("Calculating medians for {} columns!", num_columns);
+  debug!("Calculating medians for {} rows!", num_rows);
   // Calculate the median for each column across all sub-vectors, ignoring NaN values
   for col in 0..num_columns  {
     let mut col_vals = vec![0.0; num_rows];
+    //let mut col_vals = Vec::<f32>::new();
     for k in 0..num_rows {
-      col_vals.push(data[k][col]);
+      col_vals[k] = data[k][col];
     }
+    //println!("{:?}", col_vals);
     col_vals.retain(|x| !x.is_nan());
+    //println!("len col_vals {}", col_vals.len()); 
     //info!("Col {col} has len {}", col_vals.len());
-    column_medians[col] = median(&col_vals);//.unwrap_or(f32::NAN);
+    //column_medians[col] = median(&col_vals);//.unwrap_or(f32::NAN);
+    if col_vals.len() == 0 {
+      column_medians[col] = f32::NAN;
+    } else {
+      column_medians[col] = statistical::median(col_vals.as_slice());//.unwrap_or(f32::NAN);
+    }
+    //if column_medians[col] == 0.0 {
+    //  println!("{:?}", col_vals);
+    //  panic!("boo!");
+    //}
   }
   column_medians
 }
@@ -240,7 +268,7 @@ fn calculate_column_means(data: &Vec<Vec<f32>>) -> Vec<f32> {
   for col in 0..num_columns  {
     let mut col_vals = vec![0.0; num_rows];
     for k in 0..num_rows {
-      col_vals.push(data[k][col]);
+      col_vals[k] = data[k][col];
     }
     col_vals.retain(|x| !x.is_nan());
     //info!("Col {col} has len {}", col_vals.len());
@@ -356,19 +384,19 @@ impl RBCalibrations {
         roll(&mut rolled_traces[ch][n],
              input_vcal_data[n].header.stop_cell as isize); 
       }// first loop over events done
-      
       let v_offsets = calculate_column_medians(&rolled_traces[ch]);
+      //println!("v offsets {:?}", v_offsets);
       info!("We calculated {} voltage offset values for ch {}", v_offsets.len(), ch);
-      let mut v_offsets_rolled = v_offsets.clone();
       // fill these in the prepared array structure
       for k in 0..v_offsets.len() {
         all_v_offsets[ch][k] = v_offsets[k];
       }
       for (n, ev) in input_vcal_data.iter().enumerate() {
         // now we roll the v_offsets back
+        let mut v_offsets_rolled = v_offsets.clone();
         roll(&mut v_offsets_rolled, -1*ev.header.stop_cell as isize);
         for k in 0..traces[ch][n].len() {
-          traces[ch][n][k] -= v_offsets[k];
+          traces[ch][n][k] -= v_offsets_rolled[k];
         }
       }
       let v_dips = calculate_column_medians(&traces[ch]);
@@ -412,7 +440,7 @@ impl RBCalibrations {
           }
           let  trace_val =  traces[ch][n][k];
           let dtrace_val = dtraces[ch][n][k];
-          if trace_val > Self::SINMAX as f32 { 
+          if f32::abs(trace_val) > Self::SINMAX as f32 { 
             traces[ch][n][k]  = f32::NAN;
             dtraces[ch][n][k] = 0.0; 
           }// the traces are filled and the first 2 bins
@@ -467,15 +495,15 @@ impl RBCalibrations {
     info!("Starting voltage calibration!");
     let (v_offsets_high, v_dips_high) 
         = Self::voltage_offset_and_dips(&self.vcal_data)?;
-    let (_v_offsets_low, v_dips_low) 
+    let (v_offsets_low, v_dips_low) 
         = Self::voltage_offset_and_dips(&self.noi_data)?;
     // which of the v_offsets do we actually use?
 
     for ch in 0..NCHN {
       for k in 0..NWORDS {
-        self.v_offsets[ch][k] = v_offsets_high[ch][k];
-        self.v_dips[ch][k]    = v_dips_high[ch][k];
-        self.v_inc[ch][k]     = self.d_v/(v_dips_high[ch][k] - v_dips_low[ch][k]);
+        self.v_offsets[ch][k] = v_offsets_low[ch][k];
+        self.v_dips[ch][k]    = v_dips_low[ch][k];
+        self.v_inc[ch][k]     = self.d_v/(v_offsets_high[ch][k] - v_offsets_low[ch][k]);
       }
     }
     // at this point, the voltage calibration is complete
@@ -771,6 +799,7 @@ impl RBCalibrations {
     }
   }
 
+
   /// Infer the readoutboard id from the filename
   ///
   /// Assuming a certain naming scheme for the filename "rbXX_cal.txt"
@@ -922,7 +951,7 @@ impl fmt::Display for RBCalibrations {
       self.rb_id,
       self.vcal_data.len(),
       self.tcal_data.len(),
-      self.vcal_data.len(),
+      self.noi_data.len(),
       self.v_offsets[0][98],
       self.v_offsets[0][99],
       self.v_inc[0][98],

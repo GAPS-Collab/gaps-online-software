@@ -36,7 +36,7 @@ json = "0.12"
 tof-control = {path = "../../../extern/tof-control", optional = true, version = "0.2", features=[] }
 smoothed_z_score = {version = "0.1", optional = true}
 sqlite = {version = "0.30", optional = true}
-
+statistical = "1.0"
 # nom for cominatoric parsers
 #nom = "7.1"
 # strum to enhance enum 
