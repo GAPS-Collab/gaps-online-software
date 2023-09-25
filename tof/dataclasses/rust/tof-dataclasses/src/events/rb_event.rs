@@ -310,10 +310,12 @@ impl RBEventMemoryView {
     }
   }
 
-  pub fn decode_event_id_from_stream(stream : &Vec<u8>) -> Result<u32, SerializationError> {
+  // FIXME
+  pub fn decode_event_id(bytestream : &[u8]) -> Result<u32, SerializationError> {
+    let stream = bytestream.to_vec();
     let mut pos = 0usize;
-    let head_pos = search_for_u16(Self::HEAD, stream, pos)?; 
-    let tail_pos = search_for_u16(Self::TAIL, stream, pos + Self::SIZE-2)?;
+    let head_pos = search_for_u16(Self::HEAD, &stream, pos)?; 
+    let tail_pos = search_for_u16(Self::TAIL, &stream, pos + Self::SIZE-2)?;
     // At this state, this can be a header or a full event. Check here and
     // proceed depending on the options
     if tail_pos + 2 - pos != Self::SIZE {
