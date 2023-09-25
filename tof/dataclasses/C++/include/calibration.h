@@ -33,10 +33,10 @@ void spike_cleaning_drs4(Vec<f32> &voltages);
 struct RBCalibration {
   static const u16 HEAD = 0xAAAA;
   static const u16 TAIL = 0x5555;
+  static bool serialize_event_data;
 
   u8 rb_id;
   f32 d_v;
-  bool serialize_event_data;
   Vec<Vec<f32>> v_offsets;
   Vec<Vec<f32>> v_dips;
   Vec<Vec<f32>> v_incs;
@@ -69,7 +69,7 @@ struct RBCalibration {
   //! Should the associated data be loaded 
   //! in case it is available when 
   //! from_bytestream is called?
-  void disable_eventdata();
+  static void disable_eventdata();
 
   private:
 

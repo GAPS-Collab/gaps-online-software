@@ -187,8 +187,10 @@ void spike_cleaning_drs4(Vec<Vec<f32>> &wf, u16 tCell, i32 spikes[]) {
 }
 
 /************************************************/
+bool RBCalibration::serialize_event_data;
 
 RBCalibration::RBCalibration() {
+  RBCalibration::serialize_event_data = true;
   rb_id = 0;
   for (usize ch=0;ch<NCHN;ch++) {
     v_offsets.push_back(Vec<f32>(NWORDS, 0));
@@ -196,13 +198,12 @@ RBCalibration::RBCalibration() {
     v_incs.push_back(Vec<f32>(NWORDS, 0));
     t_bin.push_back(Vec<f32>(NWORDS,0)) ;
   }
-  serialize_event_data = true;
 }
 
 /************************************************/
 
 void RBCalibration::disable_eventdata() {
-  serialize_event_data = false;
+  RBCalibration::serialize_event_data = false;
 }
 
 /************************************************/
@@ -336,8 +337,8 @@ RBCalibration RBCalibration::from_bytestream(const Vec<u8> &stream,
   calibration.rb_id    = stream[pos]; pos += 1;
   calibration.d_v = Gaps::parse_f32(stream, pos);
   bool serialize_event_data = Gaps::parse_bool(stream, pos);
-  calibration.serialize_event_data 
-      = serialize_event_data && calibration.serialize_event_data;  
+  serialize_event_data 
+      = serialize_event_data && RBCalibration::serialize_event_data;  
   f32 value;
   for (usize ch=0; ch<NCHN; ch++) {
     for (usize k=0; k<NWORDS; k++) {
@@ -351,7 +352,7 @@ RBCalibration RBCalibration::from_bytestream(const Vec<u8> &stream,
       calibration.t_bin[ch][k]  = value;
     }
   }
-  if (calibration.serialize_event_data) {
+  if (serialize_event_data) {
     u16 n_noi = Gaps::parse_u16(stream, pos);
     for (u16 k=0; k<n_noi; k++) {
       auto ev = RBEvent::from_bytestream(stream, pos);

@@ -239,7 +239,8 @@ RBCalibration unpack_tp_to_rbcalibration(const TofPacket& tp) {
     PyErr_SetString(PyExc_ValueError, message.c_str());
     throw py::error_already_set();
   }
-  u64 pos = 0; 
+  u64 pos = 0;
+  spdlog::debug("Will call RBCalibration::from_bytestream on packet.payload"); 
   return RBCalibration::from_bytestream(tp.payload, pos);
 }
 

@@ -833,13 +833,13 @@ PYBIND11_MODULE(gaps_tof, m) {
    py::class_<RBCalibration>(m, "RBCalibration", 
       "RBCalibration holds th calibration constants (one per bin) per each channel for a single RB. This needs to be used in order to convert ADC to voltages/nanoseconds!")
        .def(py::init())
-       .def_readonly("rb_id",                     &RBCalibration::rb_id)
-       .def_readonly("d_v",                       &RBCalibration::d_v)
+       .def_readonly("rb_id",      &RBCalibration::rb_id)
+       .def_readonly("d_v",        &RBCalibration::d_v)
        .def_readonly("v_offsets",  &RBCalibration::v_offsets)
        .def_readonly("v_incs",     &RBCalibration::v_incs)
        .def_readonly("v_dips",     &RBCalibration::v_dips)
        .def_readonly("t_bin",      &RBCalibration::t_bin)
-       .def("disable_eventdata",   &RBCalibration::disable_eventdata,
+       .def_static("disable_eventdata",   &RBCalibration::disable_eventdata,
             "Don't load event data from a calibration file (if available). Just load the calibration constants. (This only works with binary files.")
        .def("from_tofpacket",      unpack_tp_to_rbcalibration,
             "Unpack a RBCalibration from a compatible tofpacket") 
