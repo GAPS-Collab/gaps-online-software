@@ -49,7 +49,7 @@ extern crate statistical;
 /***********************************/
 
 #[derive(Debug, Copy, Clone)]
-enum Edge {
+pub enum Edge {
   Rising,
   Falling,
   Average,
@@ -71,7 +71,7 @@ where P: AsRef<Path>, {
 fn find_zero_crossings(trace: &Vec<f32>) -> Vec<usize> {
   let mut zero_crossings = Vec::new();
   for i in 1..trace.len() {
-    if (trace[i - 1] >= 0.0 && trace[i] < 0.0) || (trace[i - 1] < 0.0 && trace[i] >= 0.0) {
+    if (trace[i - 1] > 0.0 && trace[i] < 0.0) || (trace[i - 1] < 0.0 && trace[i] > 0.0) {
       zero_crossings.push(i);
     }
   }
@@ -161,6 +161,12 @@ fn get_periods(trace   : &Vec<f32>,
     }
     period += dts[*zcs_a]*f32::abs(tr_a[1]/(tr_a[1] - tr_a[0])); // first semi bin
     period += dts[*zcs_b]*f32::abs(tr_b[1]/(tr_b[1] - tr_b[0])); // first semi bin
+    if period.is_nan() {
+      warn!("NAN in period found!");
+      println!("{} {}", tr_a[1], tr_a[0]);
+      println!("{} {}", tr_b[1], tr_b[0]);
+      continue;
+    }
     //println!("zcs_b, zcs_a, nperiod {} {} {}", zcs_b, zcs_a, nperiod);
     //if f32::abs((zcb-zca)-nperiod as usize) > 5:
     //         zcs = zcs[:i+1]
@@ -248,7 +254,6 @@ fn calculate_column_medians(data: &Vec<Vec<f32>>) -> Vec<f32> {
     }
     //if column_medians[col] == 0.0 {
     //  println!("{:?}", col_vals);
-    //  panic!("boo!");
     //}
   }
   column_medians
@@ -345,6 +350,23 @@ impl RBCalibrations {
     self.noi_data.retain(|x| !x.header.broken & !x.header.lost_trigger & !x.header.event_fragment); 
   }
 
+  // channel is from 0-8
+  pub fn apply_vcal_constants(&self,
+                              adc       : &Vec<f32>,
+                              channel   : usize,  
+                              stop_cell : usize) -> Vec<f32> {
+    let mut waveform = Vec::<f32>::with_capacity(adc.len());
+    let mut value : f32;
+    for k in 0..adc.len() {
+      value  = adc[k] as f32;
+      value -= self.v_offsets[channel][(k + (stop_cell)) %NWORDS];
+      value -= self.v_dips   [channel][k];
+      value *= self.v_inc    [channel][(k + (stop_cell)) %NWORDS];
+      waveform.push(value);
+    } 
+    waveform
+  }
+
   /// Calculate the offset and dips calibration constants 
   /// for input data. 
   ///
@@ -412,10 +434,10 @@ impl RBCalibrations {
   }
   
 
-  fn timing_calibration(input_tcal_data : &Vec<RBEvent>,
+  pub fn timing_calibration(&self,
                         edge : &Edge) 
   -> Result<Vec<Vec<f32>>, CalibrationError> {
-    if input_tcal_data.len() == 0 {
+    if self.tcal_data.len() == 0 {
       error!("Input data for timing calibration is empty!");
       return Err(CalibrationError::EmptyInputData);
     }
@@ -427,32 +449,43 @@ impl RBCalibrations {
 
     // we temporarily get the adc traces
     // traces are [channel][event][adc_cell]
-    let mut traces  = unpack_traces_f32(&input_tcal_data);
+    let adc_traces = unpack_traces_f32(&self.tcal_data);
+    let mut traces  = adc_traces.clone();
     let mut dtraces = traces.clone();
-    let mut drolled_traces = traces.clone();
     let trace_len   = traces[0][0].len();
     for ch in 0..NCHN {
-      for (n, ev) in input_tcal_data.iter().enumerate() {
+      for (n, ev) in self.tcal_data.iter().enumerate() {
+        traces[ch][n] = self.apply_vcal_constants(&adc_traces[ch][n], ch, ev.header.stop_cell as usize);
         for k in 0..trace_len {
           if k < Self::NSKIP {
             traces[ch][n][k]  = f32::NAN;
-            dtraces[ch][n][k] = f32::NAN;
           }
           let  trace_val =  traces[ch][n][k];
-          let dtrace_val = dtraces[ch][n][k];
+          //let dtrace_val = dtraces[ch][n][k];
           if f32::abs(trace_val) > Self::SINMAX as f32 { 
             traces[ch][n][k]  = f32::NAN;
-            dtraces[ch][n][k] = 0.0; 
           }// the traces are filled and the first 2 bins
         }
+      }
+    }
+    let mut drolled_traces = traces.clone();
+    //println!("{:?}", traces[0][0]);
+    for ch in 0..NCHN {
+      for (n, ev) in self.tcal_data.iter().enumerate() {
         // marked with nan, now need to get "rolled over",
         // so that they start with the stop cell
         roll(&mut drolled_traces[ch][n],
-             input_tcal_data[n].header.stop_cell as isize); 
+             self.tcal_data[n].header.stop_cell as isize); 
         //for ch in 0..NCHN { 
         //  for ev in 0..traces[ch].len() {
-        for k in 1..traces[ch][n].len() {
-          let mut dval = drolled_traces[ch][n][k] - drolled_traces[ch][n][k-1];      
+        for k in 0..traces[ch][n].len() {
+          let mut dval : f32;
+          if k == 0 {
+            dval = drolled_traces[ch][n][0] - drolled_traces[ch][n][traces[ch][n].len() -1];
+          } else {
+            dval = drolled_traces[ch][n][k] - drolled_traces[ch][n][k-1];      
+          }
+          //println!("{}", dval);
           match edge {
             Edge::Rising | 
             Edge::Average => {
@@ -472,8 +505,13 @@ impl RBCalibrations {
           if f32::abs(dval - 15.0) > Self::DVCUT {
             dval = f32::NAN;
           }
-          dtraces[ch][n][k-1] = dval;      
+          if k == 0 {
+            dtraces[ch][n][traces[ch][n].len() -1] = dval;
+          } else {
+            dtraces[ch][n][k-1] = dval;      
+          }
         } 
+        //println!("{:?}", dtraces[ch][n]);
       } // end loop over events
       let col_means = calculate_column_means(&dtraces[ch]);
       let ch_mean   = mean(&col_means);
@@ -518,10 +556,10 @@ impl RBCalibrations {
       edge = Edge::Average;
     }
 
-    let mut tcal_av = Self::timing_calibration(&self.tcal_data, &edge)?;
+    let mut tcal_av = self.timing_calibration( &edge)?;
     if matches!(edge, Edge::Average) {
       edge = Edge::Falling;
-      let tcal_falling = Self::timing_calibration(&self.tcal_data, &edge)?;
+      let tcal_falling = self.timing_calibration(&edge)?;
       for ch in 0..NCHN {
         for k in 0..tcal_av.len() {
           tcal_av[ch][k] += tcal_falling[ch][k];
@@ -563,6 +601,12 @@ impl RBCalibrations {
                                          nperiod,
                                          &edge);
         for (n_p,period) in periods.iter().enumerate() {
+          if *period == 0.0 {
+            println!("{:?}", periods);
+          }
+          if period.is_nan() {
+            println!("{:?}", periods);
+          }
           let zcs_a = zcs[n_p] + stop_cell as usize;
           let zcs_b = zcs[n_p + 1] + stop_cell as usize;
           let mut corr = (1.0/Self::CALFREQ)/period;
@@ -589,7 +633,7 @@ impl RBCalibrations {
           }
         }
         //n_correct[ch] += 1.0;
-      }
+      } // end over nchannel
       damping *= 0.99;
     } // end loop over n_iter_period
     for ch in 0..NCHN {
@@ -870,7 +914,6 @@ impl Serialization for RBCalibrations {
           Err(err) => {
             println!("from_bytestream failed!, err {err}");
             rb_cal.noi_data.push(broken_event.clone());
-            panic!("auf der titanic!");
           }
         }
         // FIXME - broken event won't advance the pos marker
@@ -1007,7 +1050,9 @@ impl From<&Path> for RBCalibrations {
     for _ in file.lines() {
       cnt += 1;
     }
-    if cnt != NCHN*4 {panic! ("The calibration file {} does not have the proper format! It has {} lines", path.display(), cnt);}
+    if cnt != NCHN*4 {
+      panic! ("The calibration file {} does not have the proper format! It has {} lines", path.display(), cnt);
+    }
     cnt = 0;
     let mut vals = 0usize;
 
