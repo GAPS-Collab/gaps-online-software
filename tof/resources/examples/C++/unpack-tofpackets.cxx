@@ -24,6 +24,7 @@ int main(int argc, char *argv[]){
   cxxopts::Options options("unpack-tofpackets", "Unpack example for .tof.gaps files with TofPackets.");
   options.add_options()
   ("h,help", "Print help")
+  ("c,calibration", "Calibration file (in txt format)", cxxopts::value<std::string>()->default_value(""))
   ("file", "A file with TofPackets in it", cxxopts::value<std::string>())
   ("v,verbose", "Verbose output", cxxopts::value<bool>()->default_value("false"))
   ;
@@ -41,7 +42,17 @@ int main(int argc, char *argv[]){
   auto fname   = result["file"].as<std::string>();
   bool verbose = result["verbose"].as<bool>();
   // -> Gaps relevant code starts here
-  
+ 
+  auto calname = result["calibration"].as<std::string>();
+  RBCalibration cali;
+  if (calname != "") {
+    // obviously here we have to get all the calibration files, 
+    // but for the sake of the example let's use only one
+    // Ultimatly, they will be stored in the stream.
+    spdlog::info("Will use calibration file {}", calname);
+    cali = RBCalibration::from_txtfile(calname);
+  }
+
   // the reader is something for the future, when the 
   // files get bigger so they might not fit into memory
   // at the same time
@@ -91,6 +102,16 @@ int main(int argc, char *argv[]){
           std::cout << ev << std::endl;
           for (auto const &rbid : ev.get_rbids()) {
             RBEvent rb_event = ev.get_rbevent(rbid);
+            if ((calname != "") && cali.rb_id == rbid ){
+              // Vec<f32> is a typedef for std::vector<float32>
+              Vec<Vec<f32>> volts = cali.voltages(rb_event, true); // second argument is for spike cleaning
+                                                              // (C++ implementation still causes a 
+                                                              // segfault sometimes
+              Vec<Vec<f32>> times = cali.nanoseconds(rb_event);
+              // volts and times are now ch 0-8 with the waveforms
+              // for this event.
+
+            }
             std::cout << rb_event << std::endl;
           }
         }
