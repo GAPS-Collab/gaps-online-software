@@ -14,7 +14,7 @@ use tof_dataclasses::events::RBEvent;
 use tof_dataclasses::packets::{TofPacket,
                                PacketType,
                                PaddlePacket};
-use tof_dataclasses::calibrations::ReadoutBoardCalibrations;
+use tof_dataclasses::calibrations::RBCalibrations;
 
 use tof_dataclasses::serialization::Serialization;
 
@@ -58,12 +58,12 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
   // how many chunks ("buffers") we dealt with
   let mut n_chunk  = 0usize;
   // in case we want to do calibratoins
-  let mut calibrations = ReadoutBoardCalibrations::new(rb.rb_id);
+  let mut calibrations = RBCalibrations::new(rb.rb_id);
   let do_calibration = true;
   if do_calibration {
     info!("Reading calibrations from file {}", &rb.calib_file);
     let cal_file_path = Path::new(&rb.calib_file);//calibration_file);
-    calibrations = ReadoutBoardCalibrations::from(cal_file_path);
+    calibrations = RBCalibrations::from(cal_file_path);
   }
   let address = "tcp://".to_owned() 
               + &rb.ip_address.to_string()
