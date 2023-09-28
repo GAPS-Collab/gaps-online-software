@@ -75,7 +75,7 @@ pub fn global_data_sink(incoming : &cbc::Receiver<TofPacket>,
           let mut pos = 0;
           // some output to the console
           match pack.packet_type {
-            PacketType::MonitorRb => {
+            PacketType::RBMoni => {
               let moni = RBMoniData::from_bytestream(&pack.payload, &mut pos);
               match moni {
                 Ok(data) => {println!("{}", data);},

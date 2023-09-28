@@ -113,7 +113,7 @@ fn main() {
   // welcome banner!
   println!("-----------------------------------------------");
   println!(" ** Welcome to liftof-cc \u{1F680} \u{1F388} *****");
-  println!(" .. liftof if a software suite for the time-of-flight detector ");
+  println!(" .. liftof is a software suite for the time-of-flight detector (TOF) ");
   println!(" .. for the GAPS experiment \u{1F496}");
   println!(" .. This is the Command&Control server which connects to the MasterTriggerBoard and the ReadoutBoards");
   println!(" .. see the gitlab repository for documentation and submitting issues at" );

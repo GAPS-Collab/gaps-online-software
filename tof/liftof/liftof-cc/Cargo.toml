@@ -21,7 +21,7 @@ random =[]
 
 [dependencies]
 
-tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["random","database"], version = "0.7"} 
+tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["random","database","tofcontrol"], version = "0.7"} 
 liftof-lib = { path = "../liftof-lib" , features = ["random"], version="0.7"}
 
 zmq = "0.10.0"
