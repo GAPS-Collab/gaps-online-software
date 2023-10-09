@@ -116,6 +116,7 @@ fn main() {
             }
           }
         }
+        events.dedup();
         cali.vcal_data = events;
         //cali.vcal_data = reader.get_events();
       } else if filename.to_string().ends_with(".tcal") {
@@ -134,6 +135,7 @@ fn main() {
             }
           }
         }
+        events.dedup();
         cali.tcal_data = events;
         //cali.tcal_data = reader.get_events();
       } else if filename.to_string().ends_with(".noi") {
@@ -152,6 +154,7 @@ fn main() {
             }
           }
         }
+        events.dedup();
         cali.noi_data = events;
         //cali.noi_data = reader.get_events();
       } else {
