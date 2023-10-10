@@ -30,7 +30,7 @@ use rand::Rng;
 use std::net::UdpSocket;
 use std::fmt;
 //use std::time::Duration;
-
+use std::collections::HashMap;
 use std::error::Error;
 use crate::errors::{IPBusError, MasterTriggerError};
 
@@ -546,10 +546,84 @@ impl Default for MasterTriggerEvent {
 
 impl fmt::Display for MasterTriggerEvent {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(f, "<MasterTriggerEvent\n event id\t {}\n n boards\t {}\n n paddles\t {}\n hits\t {}\n timestamp\t {}\n tiu_timestamp\t {}\n tiu_gps_32\t {}\n tiu_gps_16\t {}\n boardmask\t {}\n crc\t {} >",
-           self.event_id, self.n_ltbs(), self.get_hit_paddles(), self.hits_to_str(),  self.timestamp, self.tiu_timestamp,
-           self.tiu_gps_32, self.tiu_gps_16, 
-           self.boardmask_to_str(), self.crc)
+    let mut repr = String::from("<MasterTriggerEvent");
+
+    repr += "\n\t event_id                    ";
+    repr += &self.event_id.to_string(); 
+    repr += "\n\t timestamp                   ";
+    repr += &self.timestamp.to_string(); 
+    repr += "\n\t tiu_timestamp               ";
+    repr += &self.tiu_timestamp.to_string(); 
+    repr += "\n\t tiu_gps_32                  ";
+    repr += &self.tiu_gps_32.to_string(); 
+    repr += "\n\t tiu_gps_16                  ";
+    repr += &self.tiu_gps_16.to_string(); 
+    repr += "\n\t n_paddles                   ";
+    repr += &self.n_paddles.to_string(); 
+    repr += "\n\t crc                         ";
+    repr += &self.crc.to_string();
+    repr += "\n\t broken                      ";
+    repr += &self.broken.to_string();
+    repr += "\n\t valid                       ";
+    repr += &self.valid.to_string();
+    repr += "\n -- hit mask --";
+    repr += "\n [DSI/J]";
+    repr += "\n 1/1 - 1/2 - 1/3 - 1/4 - 1/5 - 2/1 - 2/2 - 2/3 - 2/4 - 2/5 - 3/1 - 3/2 - 3/3 - 3/4 - 3/5 - 4/1 - 4/2 - 4/3 - 4/4 - 4/5 \n";
+    let mut hit_boards = Vec::<u8>::with_capacity(20);
+    let mut dsi_j = HashMap::<u8, &str>::new();
+    dsi_j.insert(0  , "1/1");
+    dsi_j.insert(1  , "1/2");
+    dsi_j.insert(2  , "1/3");
+    dsi_j.insert(3  , "1/4");
+    dsi_j.insert(4  , "1/5");
+    dsi_j.insert(5  , "2/1");
+    dsi_j.insert(6  , "2/2");
+    dsi_j.insert(7  , "2/3");
+    dsi_j.insert(8  , "2/4");
+    dsi_j.insert(9  , "2/5");
+    dsi_j.insert(10 , "3/1");
+    dsi_j.insert(11 , "3/2");
+    dsi_j.insert(12 , "3/3");
+    dsi_j.insert(13 , "3/4");
+    dsi_j.insert(14 , "3/5");
+    dsi_j.insert(15 , "4/1");
+    dsi_j.insert(16 , "4/2");
+    dsi_j.insert(16 , "4/3");
+    dsi_j.insert(17 , "4/4");
+    dsi_j.insert(19 , "4/5");
+    repr += " ";
+    for k in 0..N_LTBS {
+      if (self.board_mask[k]) {
+        repr += "-X-   ";
+        hit_boards.push(k as u8);
+      } else {
+        repr += "-0-   ";
+      }
+    }
+    repr += "\n\t == == LTB HITS [BRD CH] == ==\n";
+    for  k in hit_boards.iter() {
+      repr += "\t DSI/J ";
+      repr += dsi_j[k];
+      repr += "\t=> ";
+      for j in 0..N_CHN_PER_LTB {
+        if (self.hits[*k as usize][j]) {
+          repr += " ";
+          repr += &(j + 1).to_string();
+          repr += " ";
+        } else {
+          continue;
+          //repr += " N.A. ";
+        } 
+      }
+      repr += "\n";
+    }  
+    repr += ">";
+    write!(f,"{}", repr)
+
+    //write!(f, "<MasterTriggerEvent\n event id\t {}\n n boards\t {}\n n paddles\t {}\n hits\t {}\n timestamp\t {}\n tiu_timestamp\t {}\n tiu_gps_32\t {}\n tiu_gps_16\t {}\n boardmask\t {}\n crc\t {} >",
+    //       self.event_id, self.n_ltbs(), self.get_hit_paddles(), self.hits_to_str(),  self.timestamp, self.tiu_timestamp,
+    //       self.tiu_gps_32, self.tiu_gps_16, 
+    //       self.boardmask_to_str(), self.crc)
   }
 }
 
@@ -928,7 +1002,8 @@ pub fn decode_hit_mask(hit_mask : u32) -> ([bool;N_CHN_PER_LTB],[bool;N_CHN_PER_
 ///
 pub fn read_daq_word(socket : &UdpSocket,
                      target_address : &str,
-                     buffer : &mut [u8;MT_MAX_PACKSIZE])
+                     buffer : &mut [u8;MT_MAX_PACKSIZE],
+                     nwords : usize)
   -> Result<u32, Box<dyn Error>> {
   let ntries = 100;
   for _ in 0..ntries {
@@ -993,15 +1068,15 @@ pub fn read_daq(socket : &UdpSocket,
     if head_found {
       // let mut paddles_rxd = 1;
       // we start a new daq package
-      event.event_id        = read_daq_word(socket, target_address, buffer)?;
+      event.event_id        = read_daq_word(socket, target_address, buffer, 1)?;
       if event.event_id == 0 {
         return Err(Box::new(MasterTriggerError::DAQNotAvailable));
       }
-      event.timestamp         = read_daq_word(socket, target_address, buffer)?;
-      event.tiu_timestamp     = read_daq_word(socket, target_address, buffer)?;
-      event.tiu_gps_32        = read_daq_word(socket, target_address, buffer)?;
-      event.tiu_gps_16        = read_daq_word(socket, target_address, buffer)?;
-      board_mask              = read_daq_word(socket, target_address, buffer)?;
+      event.timestamp         = read_daq_word(socket, target_address, buffer,1)?;
+      event.tiu_timestamp     = read_daq_word(socket, target_address, buffer, 1)?;
+      event.tiu_gps_32        = read_daq_word(socket, target_address, buffer,1)?;
+      event.tiu_gps_16        = read_daq_word(socket, target_address, buffer,1)?;
+      board_mask              = read_daq_word(socket, target_address, buffer,1)?;
       decoded_board_mask      = decode_board_mask(board_mask);
       //println!(" decoded mask {decoded_board_mask:?}");
       event.board_mask = decoded_board_mask;
@@ -1024,7 +1099,7 @@ pub fn read_daq(socket : &UdpSocket,
       let mut hitmasks = Vec::<[bool;N_CHN_PER_LTB]>::new();
       //println!("NEW HITS");
       while nhit_query < queries_needed { 
-        let hitmask = read_daq_word(socket, target_address, buffer)?;
+        let hitmask = read_daq_word(socket, target_address, buffer,1)?;
         //println!("HITMASK {:?}", hitmask);
 
         (hits_a, hits_b) = decode_hit_mask(hitmask);
@@ -1046,20 +1121,20 @@ pub fn read_daq(socket : &UdpSocket,
     //println!("EVENT HAS HITS ASSIGNED : {:?}", event.hits);
     trace!("{:?}", decoded_board_mask);
     trace!("n queries {nhit_query}");
-    event.crc         = read_daq_word(socket, target_address, buffer)?;
+    event.crc         = read_daq_word(socket, target_address, buffer, 1)?;
     if event.crc == 0x55555555 {
       error!("CRC field corrupt, but we carry on!");
       event.broken = true;
       return Ok(event);
     }
-    trailer     = read_daq_word(socket, target_address, buffer)?;
+    trailer     = read_daq_word(socket, target_address, buffer, 1)?;
     if trailer != 0x55555555 {
       if trailer == 0xAAAAAAAA {
         error!("New header found while we were not done with the old event!");
       }
       event.broken = true;
       //error!("Broken package for event id {}, trailer corrupt {}", event.event_id, trailer);
-      trailer     = read_daq_word(socket, target_address, buffer)?;
+      trailer     = read_daq_word(socket, target_address, buffer, 1)?;
       if trailer == 0x55555555 {
         //println!("{:?}", decoded_board_mask);
         //for n in queried_boards.iter() {
@@ -1076,7 +1151,7 @@ pub fn read_daq(socket : &UdpSocket,
     return Ok(event);
     }
     
-    let word = read_daq_word(socket, target_address, buffer)?; 
+    let word = read_daq_word(socket, target_address, buffer, 1)?; 
     if word == 0xAAAAAAAA {
       head_found = true;
     }

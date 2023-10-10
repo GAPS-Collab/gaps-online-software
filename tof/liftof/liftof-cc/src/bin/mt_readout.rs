@@ -34,7 +34,7 @@ fn main() {
  let master_trigger_ip   = String::from("192.168.36.121");
  let master_trigger_port = 50001usize;
  let worker_threads = ThreadPool::new(2);
- let (rate_to_main, rate_from_mt) : (cbc::Sender<u32>, cbc::Receiver<u32>) = cbc::unbounded();
+ let (rate_to_main, _rate_from_mt) : (cbc::Sender<u32>, cbc::Receiver<u32>) = cbc::unbounded();
 
  worker_threads.execute(move || {
                         master_trigger(&master_trigger_ip, 
