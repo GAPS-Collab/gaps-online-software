@@ -338,6 +338,27 @@ impl MasterTriggerEvent {
     }   
   }
 
+
+  /// Make the connection between the triggered
+  /// boards in the boardmask and convert that
+  /// to DSI/J
+  pub fn get_dsi_j_for_triggered_ltbs(&self) -> Vec<(u8,u8)> {
+    let mut dsi_js = Vec::<(u8,u8)>::new();
+    let mut dsi = 1u8;
+    let mut j   = 1u8;
+    for k in (0..N_LTBS).rev() {
+      if self.board_mask[k] {
+        dsi_js.push((dsi, j));
+      }
+      j += 1;
+      if j > 5 {
+        j == 1;
+        dsi += 1;
+      }
+    }
+    dsi_js
+  }
+
   pub fn get_triggered_ltb_ids(&self) -> Vec<u8> {
     todo!();
     #[allow(unreachable_code)] {
