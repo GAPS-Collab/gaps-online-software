@@ -27,6 +27,7 @@ use crate::FromRandom;
 #[cfg(feature = "random")]
 use rand::Rng;
 
+use std::collections::VecDeque;
 use std::net::UdpSocket;
 use std::fmt;
 //use std::time::Duration;
@@ -1096,7 +1097,7 @@ pub fn read_daq(socket : &UdpSocket,
         queries_needed = n_ltbs as usize/2 + 1;
       }
       trace!("We need {queries_needed} queries for the hitmask");
-      let mut hitmasks = Vec::<[bool;N_CHN_PER_LTB]>::new();
+      let mut hitmasks = VecDeque::<[bool;N_CHN_PER_LTB]>::new();
       //println!("NEW HITS");
       while nhit_query < queries_needed { 
         let hitmask = read_daq_word(socket, target_address, buffer,1)?;
@@ -1104,14 +1105,14 @@ pub fn read_daq(socket : &UdpSocket,
 
         (hits_a, hits_b) = decode_hit_mask(hitmask);
         // hit mask in reverse order than in the encoded word.    
-        hitmasks.push(hits_a);
-        hitmasks.push(hits_b);
+        hitmasks.push_back(hits_a);
+        hitmasks.push_back(hits_b);
         //println!("HITMASKS_VEC {:?}", hitmasks);
         nhit_query += 1;
       }
       for k in 0..event.board_mask.len() {
         if event.board_mask[k] {
-          let thishits = hitmasks.pop().unwrap();
+          let thishits = hitmasks.pop_front().unwrap();
           //println!("Will assign {:?} for {k}", thishits);
           event.hits[k] = thishits;
           //println!("EVENT HAS HITS ASSIGNED : {:?}", event.hits[k]);
