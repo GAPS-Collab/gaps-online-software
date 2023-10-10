@@ -32,6 +32,12 @@ There are two repositories, which are both (hopefully) kept in sync, so they are
 
 ## installation
 
+### Clone the repository wit submodules
+
+We are using git submodules to pull in some of the dependencies.
+To automatically check them out when clone te repository, use
+`git clone --recurse-submodules`
+
 The installation uses `cmake`. Create a build directory and execute
 `cmake <gaps-online-software source directory> --prefix <install_dir>`
 
@@ -58,6 +64,8 @@ To use the pybindings, simply fire up an (i)python shell and type:
 
 Then the bindings should be ready. Example code on how to use them can be found in 
 `<install_dir>/examples/`
+
+[INSTALL.md](More detailed installation instructions can be found in INSTALL.MD)
 
 ## software components
 

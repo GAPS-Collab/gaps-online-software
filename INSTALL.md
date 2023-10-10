@@ -9,12 +9,13 @@ a pybind11 API for te C++ API, a rust API and a pyO3 API for te rust
 API
 
 Everything can be built with cmake, sssuming g++ as well as a rust toolchain
-is installed. BUilding the RB component for liftof also requires docker and 
+is installed. Building the RB component for liftof also requires docker and 
 cross, since we need to cross-compile that for ARM32. _Typically, it will not 
 be necessary to rebuild that_
 
 ## Detailed instructions
 
+* clone the repository with submodules `git clone --recurse-submodules <repository>`
 * create a `build` directory wherever you like, for now we assume `gaps-online-software/build`
 * cd `build` 
 * `cmake ../` (or the path to te `gaps-online-software` src repository ceckout.
