@@ -625,7 +625,7 @@ pub fn unpack_traces_f32(events : &Vec<RBEvent>) -> Vec<Vec<Vec<f32>>> {
 /// by header.get_active_channels()
 ///
 ///
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct RBEvent {
   pub data_type : DataType,
   pub nchan     : u8,
@@ -944,7 +944,7 @@ impl From<&TofPacket> for RBEvent {
 /// per RB. 
 /// Contains information about event id, timestamps,
 /// etc.
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone)]
 pub struct RBEventHeader {
   pub channel_mask         : u8   , 
   pub stop_cell            : u16  , 
@@ -1195,6 +1195,18 @@ impl Serialization for RBEventHeader {
     stream.extend_from_slice(&(u8::from(self.broken)      .to_le_bytes()));
     stream.extend_from_slice(&RBEventHeader::TAIL.to_le_bytes());
     stream
+  }
+}
+
+impl PartialEq for RBEventHeader {
+  fn eq(&self, other: &Self) -> bool {
+      self.event_id == other.event_id
+  }
+}
+
+impl PartialEq for RBEvent {
+  fn eq(&self, other: &Self) -> bool {
+      self.header.event_id == other.header.event_id
   }
 }
 

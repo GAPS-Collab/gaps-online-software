@@ -2090,7 +2090,15 @@ pub fn event_processing(bs_recv           : &Receiver<Vec<u8>>,
               let mut tp = TofPacket::new();
               match data_format {
                 DataFormat::HeaderOnly => {
-                  event_id        =  RBEventPayload::decode_event_id(&bytestream[head_pos..tail_pos]);
+                  match RBEventMemoryView::decode_event_id(&bytestream[head_pos..tail_pos]) {
+                    Err(err) => {
+                      error!("Unable to decode event id!");
+                      event_id = 0;
+                    },
+                    Ok(evid_stream) => {
+                      event_id = evid_stream;
+                    }
+                  }
                   if event_id != last_event_id + 1 {
                     error!("Event id not rising continuously! This {}, last {}", event_id, last_event_id);
                   }
