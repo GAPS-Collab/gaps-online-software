@@ -65,7 +65,7 @@ To use the pybindings, simply fire up an (i)python shell and type:
 Then the bindings should be ready. Example code on how to use them can be found in 
 `<install_dir>/examples/`
 
-[INSTALL.md](More detailed installation instructions can be found in INSTALL.MD)
+[More detailed installation instructions can be found in INSTALL.MD](INSTALL.md)
 
 ## software components
 
