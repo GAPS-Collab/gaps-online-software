@@ -1,4 +1,9 @@
 # OMILU seris
+v0.7.2
+* fixes a bug where te data formats for header only and 
+  memory view where switched
+* removes usage of deprecated RBEventPayload
+
 v0.7.1
 * inclusion of calibration routines into the liftof-rb code!
 * --calibration flag to run both timing and voltage claibrations

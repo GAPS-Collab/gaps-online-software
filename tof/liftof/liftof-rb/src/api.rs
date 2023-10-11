@@ -3,10 +3,10 @@
 
 use local_ip_address::local_ip;
 use tof_dataclasses::serialization::Serialization;
-use tof_dataclasses::errors::CalibrationError;
 #[cfg(feature="tofcontrol")]
 use tof_dataclasses::calibrations::RBCalibrations;
-
+#[cfg(feature="tofcontrol")]
+use tof_dataclasses::errors::CalibrationError;
 use std::collections::HashMap;
 use std::net::IpAddr;
 use std::fs::File;
@@ -33,8 +33,7 @@ use crate::memory::*;
 
 
 use tof_dataclasses::commands::*;
-use tof_dataclasses::events::{RBEventPayload,
-                              RBEventHeader,
+use tof_dataclasses::events::{RBEventHeader,
                               RBEvent,
                               RBEventMemoryView,
                               DataType,
@@ -894,12 +893,12 @@ pub fn data_publisher(data           : &Receiver<TofPacket>,
           match fs::create_dir(calib_dir.clone()) {
             Ok(_) => (),
             Err(err) => {
-              error!("Can not create {}!", calib_dir)
+              error!("Can not create {}! Err {err}", calib_dir)
             }
           }
         }
       } // end match
-      let mut calib_file = Path::new(&calib_dir);
+      let calib_file = Path::new(&calib_dir);
       let local_file = calib_file.join(blobfile_name);
       //calib_file = &calib_file.join(blobfile_name);
       info!("Writing calibration to {}", local_file.display() );
@@ -926,7 +925,7 @@ pub fn data_publisher(data           : &Receiver<TofPacket>,
         if write_to_disk && !packet.no_write_to_disk {
           //println!("{:?}", packet.packet_type);
           if packet.packet_type == PacketType::RBEvent || 
-            packet.packet_type == PacketType::RBHeader || 
+            packet.packet_type == PacketType::RBEventHeader || 
             packet.packet_type == PacketType::RBCalibration {
             // don't write individual calibrations
             //FIXME
@@ -948,7 +947,7 @@ pub fn data_publisher(data           : &Receiver<TofPacket>,
         
         if testing {
           match packet.packet_type {
-            PacketType::RBEventPayload => {
+            PacketType::RBEventMemoryView => {
               n_tested += 1;
               match RBEventMemoryView::from_bytestream(&packet.payload, &mut 0) {
                 Ok(event) => {
@@ -1595,9 +1594,6 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
 /// Recieve the events and hold them in a cache 
 /// until they are requested
 /// 
-/// The function should be wired to a producer
-/// of RBEventPayloads
-///
 /// Requests come in as event ids through `recv_evid`
 /// and will be answered through `send_ev_pl`, if 
 /// they are in the cache, else None
@@ -1623,7 +1619,6 @@ pub fn event_cache(tp_recv      : Receiver<TofPacket>,
   let mut op_mode_stream = false;
 
   let mut oldest_event_id : u32 = 0;
-  //let mut event_cache : HashMap::<u32, RBEventPayload> = HashMap::new();
   let mut event_cache : HashMap::<u32, TofPacket> = HashMap::new();
   loop {
     // check changes in operation mode
@@ -1640,12 +1635,30 @@ pub fn event_cache(tp_recv      : Receiver<TofPacket>,
     }
     match tp_recv.try_recv() {
       Err(err) =>   {
-        trace!("No event payload! {err}");
+        trace!("No new TofPacket received! {err}");
       }
       Ok(packet) => {
         // FIXME - there need to be checks what the 
         // packet type is
-        let packet_evid = RBEventHeader::extract_eventid_from_rbheader(&packet.payload); 
+        let packet_evid : u32;
+        match packet.packet_type {
+          PacketType::RBEvent => {
+            // FIXME - proper matching, however, if implemented
+            // correctly this should never fail since broken 
+            // packets should not end up in te cache
+            packet_evid = RBEvent::extract_eventid(&packet.payload).unwrap_or(0);
+          },
+          PacketType::RBEventHeader => {
+            packet_evid = RBEventHeader::extract_eventid_from_rbheader(&packet.payload); 
+          },
+          PacketType::RBEventMemoryView => {
+            packet_evid = RBEventMemoryView::decode_event_id(packet.payload.as_slice()).unwrap_or(0);
+          },
+          _ => {
+            error!("RB event cache can not deal with packet type {}", packet.packet_type);
+            packet_evid = 0
+          }
+        }
         if oldest_event_id == 0 {
           oldest_event_id = packet_evid;
         } //endif
@@ -2089,10 +2102,10 @@ pub fn event_processing(bs_recv           : &Receiver<Vec<u8>>,
               start_pos = tail_pos;
               let mut tp = TofPacket::new();
               match data_format {
-                DataFormat::HeaderOnly => {
+                DataFormat::MemoryView => {
                   match RBEventMemoryView::decode_event_id(&bytestream[head_pos..tail_pos]) {
                     Err(err) => {
-                      error!("Unable to decode event id!");
+                      error!("Unable to decode event id! Err {err}");
                       event_id = 0;
                     },
                     Ok(evid_stream) => {
@@ -2106,8 +2119,10 @@ pub fn event_processing(bs_recv           : &Receiver<Vec<u8>>,
                   let mut payload = Vec::<u8>::new();
                   payload.extend_from_slice(&bytestream[head_pos..tail_pos + 2]);
                   debug!("Prepared TofPacket for event {} with a payload size of {}", event_id, &payload.len());
-                  let rb_payload  = RBEventPayload::new(event_id, payload); 
-                  tp = TofPacket::from(&rb_payload);
+                  tp.packet_type = PacketType::RBEventMemoryView;
+                  tp.payload = payload;
+                  //let rb_payload  = RBEventPayload::new(event_id, payload); 
+                  //tp = TofPacket::from(&rb_payload);
                 }
                 DataFormat::Default => {
                   let mut pos_in_stream = head_pos;
@@ -2122,15 +2137,10 @@ pub fn event_processing(bs_recv           : &Receiver<Vec<u8>>,
                     }
                   }
                 },
-                DataFormat::MemoryView => {
-                  //let mut payload = Vec::<u8>::new();
-                  //payload.extend_from_slice(&bytestream[head_pos..tail_pos+2]);
+                DataFormat::HeaderOnly => {
                   let mut this_event_start_pos = head_pos;
                   match RBEventHeader::extract_from_rbeventmemoryview(&bytestream, &mut this_event_start_pos) {
                     Err(err) => {
-                      //let mut foo = RBEventMemoryView::new();
-                      //foo.from_bytestream(&bytestream, head_pos, false);
-                      //error!("{:?}", foo);
                       error!("Broken RBEventMemoryView data in memory! Err {}", err);
                       error!("-- we tried to process {} bytes!", tail_pos - head_pos);
                       error!("{:?}", &bytestream[head_pos..head_pos + 100]);
