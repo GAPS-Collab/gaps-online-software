@@ -663,6 +663,15 @@ impl RBEvent {
     Ok(DataType::from_u8(&stream[2]))
   }
 
+  pub fn extract_eventid(stream : &Vec<u8>) -> Result<u32, SerializationError> {
+    if stream.len() < 28 {
+      return Err(SerializationError::StreamTooShort);
+    }
+    // event header starts at position 5
+    // in the header, it is as positon 19
+    let event_id = parse_u32(stream, &mut 24);
+    Ok(event_id)
+  }
 
   pub fn is_over_adc_threshold(&self, ch : u8, threshold : u16) -> bool {
     match self.get_adc_ch(ch).iter().max() {
