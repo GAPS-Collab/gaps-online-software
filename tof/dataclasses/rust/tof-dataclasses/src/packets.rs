@@ -209,7 +209,7 @@ impl From<&RBEventPayload> for TofPacket {
 impl From<&RBEventHeader> for TofPacket {
   fn from(ev_header : &RBEventHeader) -> TofPacket {
     let mut tp     = TofPacket::new();
-    tp.packet_type = PacketType::RBHeader;
+    tp.packet_type = PacketType::RBEventHeader;
     tp.payload     = ev_header.to_bytestream();
     tp
   }

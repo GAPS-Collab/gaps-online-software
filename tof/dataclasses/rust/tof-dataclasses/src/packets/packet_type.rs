@@ -14,7 +14,7 @@ pub enum PacketType {
   MasterTrigger , 
   HeartBeat     ,
   Scalar        ,
-  RBHeader      ,
+  RBEventHeader ,
   RBEventPayload,
   RBEvent       ,
   RBEventMemoryView,
@@ -35,7 +35,7 @@ impl PacketType {
   pub const HEARTBEAT         : u8 = 40;
   pub const SCALAR            : u8 = 50;
   pub const MT                : u8 = 60;
-  pub const RBHEADER          : u8 = 70;
+  pub const RBEVENTHEADER          : u8 = 70;
   // monitoring packets
   pub const TOFCMP_MONI       : u8 = 80;
   pub const MTB_MONI          : u8 = 90;
@@ -50,7 +50,7 @@ impl PacketType {
       PacketType::Command           => Self::COMMAND,
       PacketType::RBEvent           => Self::RBEVENT,
       PacketType::RBEventPayload    => Self::RBEVENTPAYLOAD, 
-      PacketType::RBHeader          => Self::RBHEADER,
+      PacketType::RBEventHeader          => Self::RBEVENTHEADER,
       PacketType::RBEventMemoryView => Self::RBEVENTMEMORYVIEW,
       PacketType::TofEvent          => Self::TOFEVENT,
       PacketType::Monitor           => Self::MONITOR,
@@ -74,7 +74,7 @@ impl PacketType {
       Self::HEARTBEAT         => Some(PacketType::HeartBeat),
       Self::MT                => Some(PacketType::MasterTrigger),
       Self::SCALAR            => Some(PacketType::Scalar),
-      Self::RBHEADER          => Some(PacketType::RBHeader),
+      Self::RBEVENTHEADER          => Some(PacketType::RBEventHeader),
       Self::RBEVENTPAYLOAD    => Some(PacketType::RBEventPayload),
       Self::RBEVENTMEMORYVIEW => Some(PacketType::RBEventMemoryView),
       Self::RB_MONI           => Some(PacketType::RBMoni),
@@ -101,7 +101,7 @@ impl fmt::Display for PacketType {
       PacketType::HeartBeat         => { repr = String::from("HeartBeat")   },
       PacketType::MasterTrigger     => { repr = String::from("MasterTrigger") },
       PacketType::Scalar            => { repr = String::from("Scalar")      },
-      PacketType::RBHeader          => { repr = String::from("RBHeadher")    },
+      PacketType::RBEventHeader          => { repr = String::from("RBEventHeader")    },
       PacketType::RBMoni            => { repr = String::from("RBMoni")     },
       PacketType::MonitorTofCmp     => { repr = String::from("TOFCMPMoni") },
       PacketType::MonitorMtb        => { repr = String::from("MTBMoni")    },
@@ -122,7 +122,7 @@ fn test_packet_types() {
   type_codes.push(PacketType::HEARTBEAT        ); 
   type_codes.push(PacketType::SCALAR           ); 
   type_codes.push(PacketType::MT               ); 
-  type_codes.push(PacketType::RBHEADER         ); 
+  type_codes.push(PacketType::RBEVENTHEADER    ); 
   type_codes.push(PacketType::TOFCMP_MONI      ); 
   type_codes.push(PacketType::MTB_MONI         ); 
   type_codes.push(PacketType::RB_MONI          );
