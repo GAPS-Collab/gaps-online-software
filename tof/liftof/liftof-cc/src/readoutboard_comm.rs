@@ -164,7 +164,7 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
               println!("==> Got {} for RB {}", tp.packet_type, rb.rb_id); 
             }
             match tp.packet_type {
-              PacketType::RBHeader => {
+              PacketType::RBEventHeader => {
                 // in that case, just write the header to 
                 // the file and continue
                 match &mut file_on_disc {
@@ -181,7 +181,7 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
               PacketType::RBEvent => {
                 error!("RBEvent is an advanced feature which is not ready yet!");
               },
-              PacketType::RBEventPayload => {
+              PacketType::RBEventMemoryView => {
                 let event = RBEvent::from(&tp);
                 match waveform_analysis(&event, 
                                         &rb,
