@@ -26,7 +26,7 @@
 
 use std::fmt;
 
-use crate::serialization::{Serialization, SerializationError};
+use crate::serialization::{Serialization, SerializationError, parse_u8, parse_u32};
 use crate::packets::{TofPacket,
                      PacketType};
 
@@ -205,7 +205,75 @@ impl TofOperationMode {
   }
 }
 
+/// Command class to control ReadoutBoards
+struct RBCommand {
+  pub command_code : u8,
+  pub payload      : u32,
+}
 
+impl RBCommand {
+  pub const REQUEST_EVENT : u8 = 10; 
+  pub fn new() -> Self {
+    Self {
+      command_code : 0,
+      payload      : 0,
+    }
+  }
+
+  pub fn command_code_to_string(cc : u8) -> String {
+    match cc {
+      10 => {
+        return String::from("RequestEvent");
+      }
+      _ => {
+        return String::from("Unknown");
+      }
+    }
+  }
+}
+
+impl fmt::Display for RBCommand {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let cc = RBCommand::command_code_to_string(self.command_code);
+    write!(f, "<RBCommand: {} - {}>", cc, self.payload)
+  }
+}
+
+impl Default for RBCommand {
+  fn default() -> Self {
+    RBCommand::new()
+  }
+}
+
+impl Serialization for RBCommand {
+  
+  const HEAD : u16 = 0xAAAA;
+  const TAIL : u16 = 0x5555;
+  const SIZE : usize = 9; 
+
+  fn from_bytestream(stream    : &Vec<u8>, 
+                     pos       : &mut usize) 
+    -> Result<Self, SerializationError>{
+    Self::verify_fixed(stream, pos)?;
+    let mut command = RBCommand::new();
+    if stream.len() < 9 {
+      return Err(SerializationError::StreamTooShort);
+    }
+    command.command_code = parse_u8(stream, pos);
+    command.payload = parse_u32(stream, pos);
+    *pos += 2;
+    Ok(command)
+  }
+
+  fn to_bytestream(&self) -> Vec<u8> {
+    let mut stream = Vec::<u8>::with_capacity(9);
+    stream.extend_from_slice(&RBCommand::HEAD.to_le_bytes());
+    stream.push(self.command_code);
+    stream.extend_from_slice(&self.payload.to_le_bytes());
+    stream.extend_from_slice(&RBCommand::TAIL.to_le_bytes());
+    stream
+  }
+}
 /// General command class for ALL commands to the 
 /// tof C&C instance and readout boards
 ///
@@ -712,4 +780,7 @@ fn test_tofoperationmode() {
   }
 }
 
-
+#[test]
+fn serialization_rbcommand() {
+  todo!("Needs from random implementation!");
+}
