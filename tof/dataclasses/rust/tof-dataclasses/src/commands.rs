@@ -206,7 +206,7 @@ impl TofOperationMode {
 }
 
 /// Command class to control ReadoutBoards
-struct RBCommand {
+pub struct RBCommand {
   pub command_code : u8,
   pub payload      : u32,
 }
