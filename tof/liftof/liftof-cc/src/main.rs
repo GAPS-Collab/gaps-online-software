@@ -9,10 +9,6 @@
 extern crate env_logger;
 extern crate clap;
 extern crate json;
-#[cfg(feature = "diagnostics")]
-extern crate hdf5;
-#[cfg(feature = "diagnostics")]
-extern crate ndarray;
 extern crate ctrlc;
 extern crate zmq;
 extern crate tof_dataclasses;
