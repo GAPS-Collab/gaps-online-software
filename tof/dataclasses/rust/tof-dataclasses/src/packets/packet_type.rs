@@ -15,7 +15,6 @@ pub enum PacketType {
   HeartBeat     ,
   Scalar        ,
   RBEventHeader ,
-  RBEventPayload,
   RBEvent       ,
   RBEventMemoryView,
   RBMoni     ,
@@ -40,7 +39,6 @@ impl PacketType {
   pub const TOFCMP_MONI       : u8 = 80;
   pub const MTB_MONI          : u8 = 90;
   pub const RB_MONI           : u8 = 100;
-  pub const RBEVENTPAYLOAD    : u8 = 110;
   pub const RBEVENTMEMORYVIEW : u8 = 120;
   pub const RBCALIBRATION     : u8 = 130;
 
@@ -49,7 +47,6 @@ impl PacketType {
       PacketType::Unknown           => Self::UNKNOWN,
       PacketType::Command           => Self::COMMAND,
       PacketType::RBEvent           => Self::RBEVENT,
-      PacketType::RBEventPayload    => Self::RBEVENTPAYLOAD, 
       PacketType::RBEventHeader          => Self::RBEVENTHEADER,
       PacketType::RBEventMemoryView => Self::RBEVENTMEMORYVIEW,
       PacketType::TofEvent          => Self::TOFEVENT,
@@ -75,7 +72,6 @@ impl PacketType {
       Self::MT                => Some(PacketType::MasterTrigger),
       Self::SCALAR            => Some(PacketType::Scalar),
       Self::RBEVENTHEADER          => Some(PacketType::RBEventHeader),
-      Self::RBEVENTPAYLOAD    => Some(PacketType::RBEventPayload),
       Self::RBEVENTMEMORYVIEW => Some(PacketType::RBEventMemoryView),
       Self::RB_MONI           => Some(PacketType::RBMoni),
       Self::MTB_MONI          => Some(PacketType::MonitorMtb),
@@ -94,7 +90,6 @@ impl fmt::Display for PacketType {
       PacketType::Unknown           => { repr = String::from("Unknown")     },
       PacketType::Command           => { repr = String::from("Command")     },
       PacketType::RBEvent           => { repr = String::from("RBEvent")     },
-      PacketType::RBEventPayload    => { repr = String::from("RBEventPayload") },
       PacketType::RBEventMemoryView => { repr = String::from("RBEventMemoryView") },
       PacketType::TofEvent          => { repr = String::from("TOFEvent")    },
       PacketType::Monitor           => { repr = String::from("Monitor")     },
@@ -126,7 +121,6 @@ fn test_packet_types() {
   type_codes.push(PacketType::TOFCMP_MONI      ); 
   type_codes.push(PacketType::MTB_MONI         ); 
   type_codes.push(PacketType::RB_MONI          );
-  type_codes.push(PacketType::RBEVENTPAYLOAD   );
   type_codes.push(PacketType::RBEVENTMEMORYVIEW);
   type_codes.push(PacketType::RBCALIBRATION    );
   for tc in type_codes.iter() {

@@ -1,6 +1,6 @@
-///! Events  
-///
-///
+//! Events  
+//
+//
 
 pub mod blob;
 pub mod tof_event;
@@ -15,8 +15,7 @@ pub use tof_event::{MasterTofEvent,
                     TofEvent};
 pub use data_type::DataType;
 pub use data_format::DataFormat;
-pub use rb_event::{RBEventPayload,
-                   RBEventMemoryView,
+pub use rb_event::{RBEventMemoryView,
                    RBEventHeader,
                    RBEvent,
                    RBMissingHit};

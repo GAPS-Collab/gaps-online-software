@@ -6,9 +6,6 @@
 //! - RBEventMemoryView   - the raw "orignal" blob, written to the memory of the 
 //!                    RB's. This corresponds to compression level 0.
 //!
-//! - RBEventPayload - the raw "original" data, but the event id is extracted
-//!                    and available as a separate field.
-//!
 //! - RBEvent        - still "raw" event, however, with modified fields 
 //!                    (removed superflous ones, changed meaning of some others)
 //!                    Each RBEvent has a header and a body which is the channel 
@@ -167,87 +164,6 @@ impl FromRandom for RBMissingHit {
     miss
   }
 }
-
-/// A wrapper class for raw binary RB data exposing the event id
-///
-/// This is useful when we need the event id, but don't want to 
-/// spend the CPU resources to decode the whole event.
-///
-#[deprecated(since="0.7.1", note="There are too many different event types. This is not special enough")]
-#[derive(Debug, Clone)]
-pub struct RBEventPayload {
-  pub event_id : u32,
-  pub payload  : Vec<u8>
-}
-
-impl RBEventPayload {
-
-  pub fn new(event_id : u32, payload : Vec<u8>) -> Self {
-    Self {
-      event_id,
-      payload
-    }
-  }
-  
-  /// Only decode the event id from a bytestream
-  /// 
-  /// The bytestream has to be starting with 
-  /// HEAD
-  pub fn decode_event_id(bytestream : &[u8]) -> u32 {
-    let mut evid_pos = 22; // the eventid is 22 bytes from the 
-                       // start including HEAD
-    parse_u32_for_16bit_words(&bytestream.to_vec(), &mut evid_pos) 
-  }
-
-  pub fn from_bytestream(bytestream  : &Vec<u8>,
-                         start_pos   : usize,
-                         no_fragment : bool)
-      -> Result<Self, SerializationError> {
-    let head_pos = search_for_u16(RBEventMemoryView::HEAD, bytestream, start_pos)?; 
-    // heuristic guess, jump ahead
-    let tail_pos = search_for_u16(RBEventMemoryView::TAIL, bytestream, head_pos + RBEventMemoryView::SIZE - 4)?;
-    // At this state, this can be a header or a full event. Check here and
-    // proceed depending on the options
-    if head_pos - tail_pos != RBEventMemoryView::SIZE
-        && no_fragment { 
-      return Err(SerializationError::EventFragment);
-    }
-
-    // we have to find and decode the event id.
-    // FIXME - if we do this smarter, we can 
-    //         most likely save a clone operation
-    let slice          = &bytestream[head_pos..=tail_pos+2];
-    let event_id       = RBEventPayload::decode_event_id(slice); 
-    let mut payload    = Vec::<u8>::with_capacity(RBEventMemoryView::SIZE);
-    payload.extend_from_slice(slice);
-    let ev_payload     = RBEventPayload::new(event_id, payload.clone());
-    Ok(ev_payload)
-  }
-   
-  ///!  
-  ///
-  ///
-  pub fn from_slice(slice       : &[u8],
-                    do_checks   : bool)
-      -> Result<RBEventPayload, SerializationError> {
-    let payload        = Vec::<u8>::with_capacity(RBEventMemoryView::SIZE);
-    if do_checks {
-      let head_pos = search_for_u16(RBEventMemoryView::HEAD, &payload, 000000000)?; 
-      let tail_pos = search_for_u16(RBEventMemoryView::TAIL, &payload, head_pos)?;
-      // At this state, this can be a header or a full event. Check here and
-      // proceed depending on the options
-      if head_pos - tail_pos != RBEventMemoryView::SIZE { 
-        return Err(SerializationError::EventFragment);
-      }
-    }
-    //payload.extend_from_slice(slice);
-    let event_id       = RBEventPayload::decode_event_id(slice);
-    let ev_payload     = RBEventPayload::new(event_id, payload.clone()); 
-    Ok(ev_payload)
-  }
-}
-
-
 
 /// RBEventMemoryView is the closest representation of actual 
 /// RB binary data in memory, with a fixed number of 
@@ -504,20 +420,6 @@ impl FromRandom for RBEventMemoryView {
   }
 }
 
-impl From<&RBEventPayload> for RBEventMemoryView {
-  fn from(event : &RBEventPayload) -> Self {
-    match RBEventMemoryView::from_bytestream(&event.payload, &mut 0) {
-      Ok(event) => {
-        return event;
-      }
-      Err(err) => { 
-        error!("Can not get RBEventMemoryView from RBEventPayload! Error {err}!");
-        error!("Returning empty event!");
-        return RBEventMemoryView::new();
-      }
-    }
-  }
-}
 
 #[derive(Debug, Clone)]
 pub struct RBChannelData {
@@ -903,36 +805,22 @@ impl FromRandom for RBEvent {
   }
 }
 
-impl From<&RBEventPayload> for RBEvent {
-  fn from(event : &RBEventPayload) -> Self {
-    match RBEvent::from_bytestream(&event.payload, &mut 0) {
-      Ok(event) => {
-        return event;
-      }
-      Err(err) => { 
-        error!("Can not get RBEventMemoryView from RBEventPayload! Error {err}!");
-        error!("Returning empty event!");
-        return RBEvent::new();
-      }
-    }
-  }
-}
 
 impl From<&TofPacket> for RBEvent {
   fn from(pk : &TofPacket) -> Self {
-    if pk.packet_type == PacketType::RBEventPayload {
+    if pk.packet_type == PacketType::RBEventMemoryView {
       match RBEvent::extract_from_rbeventmemoryview(&pk.payload, &mut 0) {
         Ok(event) => {
           return event;
         }
         Err(err) => { 
-          error!("Can not get RBEventMemoryView from RBEventPayload! Error {err}!");
+          error!("Can not get RBEvent from RBEventMemoryView! Error {err}!");
           error!("Returning empty event!");
           return RBEvent::new();
         }
       }
     } else {
-      error!("Other packet types than RBEventPayload are not implmented yet!");
+      error!("Other packet types than RBEventMemoryView are not implmented yet!");
       return RBEvent::new();
     }
     //match RBEvent::from_bytestream(&pk.payload, &mut 0) {

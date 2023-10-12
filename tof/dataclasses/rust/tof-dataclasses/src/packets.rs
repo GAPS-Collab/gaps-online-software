@@ -26,8 +26,7 @@ pub use crate::monitoring::{RBMoniData,
 use crate::serialization::{Serialization, 
                            parse_u32};
 use crate::errors::SerializationError;
-use crate::events::{RBEventPayload,
-                    RBEventHeader,
+use crate::events::{RBEventHeader,
                     RBEvent,
                     MasterTriggerEvent,
                     MasterTofEvent};
@@ -197,14 +196,6 @@ impl From<&TofCmpMoniData> for TofPacket {
   }
 }
 
-impl From<&RBEventPayload> for TofPacket {
-  fn from(ev_payload : &RBEventPayload) -> TofPacket {
-    let mut tp = TofPacket::new();
-    tp.packet_type = PacketType::RBEventPayload;
-    tp.payload = ev_payload.payload.clone();
-    tp
-  }
-}
 
 impl From<&RBEventHeader> for TofPacket {
   fn from(ev_header : &RBEventHeader) -> TofPacket {
