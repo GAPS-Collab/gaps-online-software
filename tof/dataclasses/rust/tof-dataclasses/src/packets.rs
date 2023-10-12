@@ -30,7 +30,8 @@ use crate::events::{RBEventHeader,
                     RBEvent,
                     MasterTriggerEvent,
                     MasterTofEvent};
-
+use crate::commands::{TofCommand,
+                      RBCommand};
 use crate::calibrations::RBCalibrations;
 
 pub mod packet_type;
@@ -137,6 +138,24 @@ impl From<&MasterTofEvent> for TofPacket {
     let mut tp = Self::new();
     tp.packet_type = PacketType::TofEvent;
     tp.payload = event.to_bytestream();
+    tp
+  }
+}
+
+impl From<&TofCommand> for TofPacket {
+  fn from(cmd : &TofCommand) -> Self {
+    let mut tp = Self::new();
+    tp.packet_type = PacketType::TofCommand;
+    tp.payload = cmd.to_bytestream();
+    tp
+  }
+}
+
+impl From<&RBCommand> for TofPacket {
+  fn from(cmd : &RBCommand) -> Self {
+    let mut tp = Self::new();
+    tp.packet_type = PacketType::RBCommand;
+    tp.payload = cmd.to_bytestream();
     tp
   }
 }
