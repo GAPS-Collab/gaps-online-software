@@ -222,7 +222,7 @@ impl RBCommand {
 
   pub fn command_code_to_string(cc : u8) -> String {
     match cc {
-      10 => {
+      Self::REQUEST_EVENT => {
         return String::from("RequestEvent");
       }
       _ => {
@@ -232,6 +232,22 @@ impl RBCommand {
   }
 }
 
+impl From<&TofPacket> for RBCommand {
+  fn from(pk : &TofPacket) -> Self {
+    let mut cmd = RBCommand::new();
+    if pk.packet_type == PacketType::RBCommand {
+      match RBCommand::from_bytestream(&pk.payload, &mut 0) {
+        Ok(_cmd) => {
+          cmd = _cmd;
+        },
+        Err(err) => {
+          error!("Can not get RBCommand from TofPacket, error {err}");
+        }
+      }
+    }
+    cmd
+  }
+}
 impl fmt::Display for RBCommand {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let cc = RBCommand::command_code_to_string(self.command_code);
@@ -524,13 +540,12 @@ impl TofCommand {
   pub fn from_tof_packet(packet : &TofPacket) 
     -> Option<TofCommand> {
     match packet.packet_type {
-      PacketType::Command => (),
+      PacketType::TofCommand => (),
       _ => {
-        debug!("Packet has not packet type CMD");
+        debug!("Packet doesn't have PacketType::TofCommand");
         return None;
         }
     } // end match
-    //let cmd_pk = CommandPacket::from_bytestream(&packet.payload, 0); 
     let cmd_pk = TofCommand::from_bytestream(&packet.payload, &mut 0);
     match cmd_pk {
       Err(err) => {
