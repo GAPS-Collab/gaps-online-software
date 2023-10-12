@@ -3,7 +3,9 @@ use std::time::{Duration, Instant};
 //use std::thread;
 use std::fmt;
 use std::{fs::File, path::Path};
+use std::path::PathBuf;
 use std::fs::OpenOptions;
+use std::fs::read_to_string;
 use std::io::{self, BufReader};
 use std::net::{IpAddr, Ipv4Addr};
 use std::io::{Read,
@@ -15,6 +17,8 @@ use std::net::{UdpSocket, SocketAddr};
 use crossbeam_channel::Receiver;
 use zmq;
 use colored::{Colorize, ColoredString};
+
+use serde_json::Value;
 
 extern crate json;
 use log::Level;
@@ -29,6 +33,7 @@ use indicatif::{ProgressBar, ProgressStyle};
 #[macro_use] extern crate log;
 
 use tof_dataclasses::manifest as mf;
+use tof_dataclasses::DsiLtbRBMapping;
 use tof_dataclasses::constants::NWORDS;
 use tof_dataclasses::calibrations::RBCalibrations;
 use tof_dataclasses::packets::{TofPacket,
@@ -41,13 +46,11 @@ use tof_dataclasses::serialization::{search_for_u16,
                                      parse_u32,
                                      Serialization};
 use tof_dataclasses::monitoring::MtbMoniData;
-use tof_dataclasses::commands::TofCommand;
 use tof_dataclasses::events::{RBEvent,
                               MasterTriggerEvent};
 use tof_dataclasses::events::master_trigger::{read_daq,
                                               read_rate,
                                               reset_daq,
-                                              //read_lost_rate,
                                               read_adc_temp_and_vccint,
                                               read_adc_vccaux_and_vccbram};
 
@@ -429,6 +432,7 @@ impl RobinReader {
           break;
         }
         Some(ev) => {
+          //println!("{}", ev.header.event_id); 
           self.cache.insert(ev.header.event_id, ev);
         }
       }
@@ -534,6 +538,7 @@ impl RobinReader {
   
   /// Rewind the underlying file back to the beginning
   pub fn rewind(&mut self) {
+    warn!("Rewinding {}", self.filename);
     let mut rewind : i64 = self.n_bytes_read.try_into().unwrap();
     rewind = -1*rewind;
     debug!("Attempting to rewind {rewind} bytes");
@@ -641,38 +646,74 @@ impl Iterator for RobinReader {
     let event_size = 18532usize;
     let chunk      = 1;
     let packet : RBEvent;
-    match read_n_bytes(self.file_reader.as_mut().unwrap(), event_size*chunk) { 
-    //match self.file_reader.as_mut().expect("No file available!").read_until(b'\n', &mut line) {
-      Ok(buffer) => {
-        if buffer.len() > 0 {
-          trace!("Read {} bytes", buffer.len());
-          self.n_bytes_read += buffer.len();
-          for _ in 0..chunk {
-            match RBEvent::extract_from_rbeventmemoryview(&buffer, &mut 0) {
-              Ok(pack) => {
-                packet = pack;
-                self.n_events_read += 1;     
-                return Some(packet);
-              }
-              Err(err) => { 
-                error!("Error getting packet from file {err}");
-                //return None;
-                continue;
-              }
+    let mut error_check = false;
+    loop {
+      if error_check {
+        loop {
+          let test_buff = read_n_bytes(self.file_reader.as_mut().unwrap(), 1).unwrap();
+          if test_buff.len() == 0 {
+            break;
+          }
+          if test_buff[0] == 0xa {
+            let test_buff_2 = read_n_bytes(self.file_reader.as_mut().unwrap(), 1).unwrap();
+            if test_buff_2.len() == 0 {
+              break;
+            }
+            if test_buff_2[0] == 0xa {
+              self.file_reader.as_mut().unwrap().seek(SeekFrom::Current(-2)).unwrap();
+              break;
             }
           }
-        } else {
-          warn!("End of file reached!");
+        }
+      }
+      match read_n_bytes(self.file_reader.as_mut().unwrap(), event_size*chunk) { 
+      //match self.file_reader.as_mut().expect("No file available!").read_until(b'\n', &mut line) {
+        Ok(buffer) => {
+          if buffer.len() > 0 {
+            //println!("{} {} {}", buffer[0], buffer[1], buffer[2]);
+            //println!("{} {} {}", buffer[buffer.len() - 3], buffer[buffer.len() -2], buffer[buffer.len() - 1]);
+            //panic!("boo!");
+            trace!("Read {} bytes", buffer.len());
+            self.n_bytes_read += buffer.len();
+            let mut pos_in_chunk = 0usize;
+            for _ in 0..chunk {
+              match RBEvent::extract_from_rbeventmemoryview(&buffer, &mut pos_in_chunk) {
+                Ok(pack) => {
+                  packet = pack;
+                  self.n_events_read += 1;     
+                  //println!("Read {} events!", self.n_events_read);
+                  return Some(packet);
+                }
+                Err(err) => { 
+                  error_check = true;
+                  let mut rewind : i64 = pos_in_chunk.try_into().unwrap();
+                  rewind = -1*rewind;
+                  debug!("Rewinding {rewind} bytes");
+                  match self.file_reader.as_mut().unwrap().seek(SeekFrom::Current(rewind)) {
+                    Err(err) => {
+                      error!("Can not rewind file buffer! Error {err}");
+                    }
+                    Ok(_) => ()
+                  }
+                  error!("Error getting packet from file {err}");
+                  //return None;
+                  break;
+                }
+              }
+            }
+          } else {
+            warn!("End of file reached!");
+            self.eof_reached = true;
+            return None;
+          }
+        },
+        Err(err) => {
           self.eof_reached = true;
+          error!("Error reading from file {} error: {}", self.filename, err);
           return None;
         }
-      },
-      Err(err) => {
-        self.eof_reached = true;
-        error!("Error reading from file {} error: {}", self.filename, err);
       }
     }
-  None
   }
 }
 
@@ -692,12 +733,10 @@ impl Iterator for RobinReader {
 ///
 /// * cmd        : a [crossbeam] receiver, to receive 
 ///                TofCommands.
-pub fn readoutboard_commander(cmd : Receiver<TofCommand>){
+pub fn readoutboard_commander(cmd : &Receiver<TofPacket>){
              
-  info!("Initialiized");
+  debug!(".. started!");
   let ctx = zmq::Context::new();
-  //let mut sockets = Vec::<zmq::Socket>::new();
-
   let mut address_ip = String::from("tcp://");
   //let this_board_ip = local_ip().expect("Unable to obtainl local board IP. Something is messed up!");
   let data_port    = DATAPORT;
@@ -710,28 +749,34 @@ pub fn readoutboard_commander(cmd : Receiver<TofCommand>){
   let data_address : String = address_ip.clone() + ":" + &data_port.to_string();
   let data_socket = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
   data_socket.bind(&data_address).expect("Unable to bind to data (PUB) socket {data_adress}");
-  println!("0MQ PUB socket bound to address {data_address}");
-  //let init_run = TofCommand::DataRunStart(100000);
-  //let mut payload_cmd  = init_run.to_bytestream();
-  //let mut payload  = String::from("BRCT").into_bytes();
-  //payload.append(&mut payload_cmd);
-
-  println!("Starting cmd receiver loop!");
+  info!("0MQ PUB socket bound to address {data_address}");
   loop {
     // check if we get a command from the main 
     // thread
     match cmd.try_recv() {
       Err(err) => trace!("Did not receive a new command, error {err}"),
-      Ok(new_command) => {
-        info!("Received new command!");
-        let mut payload  = String::from("BRCT").into_bytes();
-        let mut payload_cmd = new_command.to_bytestream();
-        payload.append(&mut payload_cmd);
-        println!("{:?}", payload);
-        match data_socket.send(&payload,0) {
-          Err(err) => error!("Can send command! Error {err}"),
-          Ok(_)    => info!("BRCT command sent!")
-        }
+      Ok(mut packet) => {
+        // now we have several options
+        match packet.packet_type {
+          PacketType::TofCommand => {
+            info!("Received TofCommand! Broadcasting to all TOF entities who are listening!");
+            let mut payload  = String::from("BRCT").into_bytes();
+            payload.append(&mut packet.payload);
+            match data_socket.send(&payload,0) {
+              Err(err) => error!("Unable to send command! Error {err}"),
+              Ok(_)    => info!("BRCT command sent!")
+            }
+          },
+          PacketType::MasterTrigger => {
+            todo!("Implement me!");
+          },
+          PacketType::RBCommand => {
+            todo!("Implement me!");
+          },
+          _ => {
+            error!("Received garbage package!");
+          }
+        }// end match
       }
     }
   }
@@ -1512,6 +1557,52 @@ impl From<&json::JsonValue> for ReadoutBoard {
   }
 }
 
+pub fn get_ltb_dsi_j_ch_mapping(mapping_file : PathBuf) -> DsiLtbRBMapping {
+  let mut mapping = HashMap::<u8,HashMap::<u8,HashMap::<u8,(u8,u8)>>>::new();
+  for dsi in 1..6 {
+    mapping.insert(dsi, HashMap::<u8,HashMap::<u8, (u8, u8)>>::new());
+    for j in 1..6 {
+      mapping.get_mut(&dsi).unwrap().insert(j, HashMap::<u8,(u8, u8)>::new());
+      for ch in 1..17 {
+        mapping.get_mut(&dsi).unwrap().get_mut(&j).unwrap().insert(ch, (0,0));
+      }
+    }
+  }
+  let json_content : String;
+  match read_to_string(&mapping_file) {
+    Ok(_json_content) => {
+      json_content = _json_content;
+    },
+    Err(err) => { 
+      error!("Unable to parse json file {}. Error {err}", mapping_file.display());
+      return mapping;
+    }      
+  }
+  let json : Value;
+  match serde_json::from_str(&json_content) {
+    Ok(_json) => {
+      json = _json;
+    },
+    Err(err) => { 
+      error!("Unable to parse json file {}. Error {err}", mapping_file.display());
+      return mapping;
+    }
+  }
+  for dsi in 1..6 { 
+    for j in 1..6 {
+      for ch in 1..17 {
+        let val = mapping.get_mut(&dsi).unwrap().get_mut(&j).unwrap().get_mut(&ch).unwrap();
+        println!("Checking {} {} {}", dsi, j, ch);
+        let tmp_val = &json[dsi.to_string()][j.to_string()][ch.to_string()];
+        *val = (tmp_val[0].to_string().parse::<u8>().unwrap_or(0), tmp_val[1].to_string().parse::<u8>().unwrap_or(0));
+      }
+    }
+  }
+  debug!("Mapping {:?}", mapping);
+  mapping
+}
+
+
 #[test]
 fn test_display() {
   let rb = ReadoutBoard::default();
@@ -1520,8 +1611,3 @@ fn test_display() {
 }
 
 
-#[test]
-fn show_manifest() {
-  get_rb_manifest();
-  assert_eq!(1,1);
-}
