@@ -471,7 +471,8 @@ impl RBCalibrations {
     let mut drolled_traces = traces.clone();
     //println!("{:?}", traces[0][0]);
     for ch in 0..NCHN {
-      for (n, ev) in self.tcal_data.iter().enumerate() {
+      for n in 0..self.tcal_data.len() {
+      //for (n, ev) in self.tcal_data.iter().enumerate() {
         // marked with nan, now need to get "rolled over",
         // so that they start with the stop cell
         roll(&mut drolled_traces[ch][n],
@@ -531,7 +532,7 @@ impl RBCalibrations {
       return Err(CalibrationError::EmptyInputData);
     }
     info!("Starting voltage calibration!");
-    let (v_offsets_high, v_dips_high) 
+    let (v_offsets_high, _v_dips_high) 
         = Self::voltage_offset_and_dips(&self.vcal_data)?;
     let (v_offsets_low, v_dips_low) 
         = Self::voltage_offset_and_dips(&self.noi_data)?;

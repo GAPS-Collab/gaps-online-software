@@ -206,8 +206,10 @@ impl TofOperationMode {
 }
 
 /// Command class to control ReadoutBoards
+#[derive(Debug, Copy, Clone)]
 pub struct RBCommand {
   pub command_code : u8,
+  pub channel_mask : u8,
   pub payload      : u32,
 }
 
@@ -216,6 +218,7 @@ impl RBCommand {
   pub fn new() -> Self {
     Self {
       command_code : 0,
+      channel_mask : 0,
       payload      : 0,
     }
   }
@@ -276,6 +279,7 @@ impl Serialization for RBCommand {
       return Err(SerializationError::StreamTooShort);
     }
     command.command_code = parse_u8(stream, pos);
+    command.channel_mask = parse_u8(stream, pos);
     command.payload = parse_u32(stream, pos);
     *pos += 2;
     Ok(command)
@@ -285,6 +289,7 @@ impl Serialization for RBCommand {
     let mut stream = Vec::<u8>::with_capacity(9);
     stream.extend_from_slice(&RBCommand::HEAD.to_le_bytes());
     stream.push(self.command_code);
+    stream.push(self.channel_mask);
     stream.extend_from_slice(&self.payload.to_le_bytes());
     stream.extend_from_slice(&RBCommand::TAIL.to_le_bytes());
     stream
