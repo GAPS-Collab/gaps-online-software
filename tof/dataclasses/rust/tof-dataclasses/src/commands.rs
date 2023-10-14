@@ -208,6 +208,7 @@ impl TofOperationMode {
 /// Command class to control ReadoutBoards
 #[derive(Debug, Copy, Clone)]
 pub struct RBCommand {
+  pub rb_id        : u8, // receipient
   pub command_code : u8,
   pub channel_mask : u8,
   pub payload      : u32,
@@ -217,6 +218,7 @@ impl RBCommand {
   pub const REQUEST_EVENT : u8 = 10; 
   pub fn new() -> Self {
     Self {
+      rb_id        : 0,
       command_code : 0,
       channel_mask : 0,
       payload      : 0,
@@ -254,7 +256,7 @@ impl From<&TofPacket> for RBCommand {
 impl fmt::Display for RBCommand {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let cc = RBCommand::command_code_to_string(self.command_code);
-    write!(f, "<RBCommand: {} - {}>", cc, self.payload)
+    write!(f, "<RBCommand: {} - {} - {} - {}>", self.rb_id, self.channel_mask,  cc, self.payload)
   }
 }
 
@@ -278,6 +280,7 @@ impl Serialization for RBCommand {
     if stream.len() < 9 {
       return Err(SerializationError::StreamTooShort);
     }
+    command.rb_id        = parse_u8(stream, pos);
     command.command_code = parse_u8(stream, pos);
     command.channel_mask = parse_u8(stream, pos);
     command.payload = parse_u32(stream, pos);
@@ -288,6 +291,7 @@ impl Serialization for RBCommand {
   fn to_bytestream(&self) -> Vec<u8> {
     let mut stream = Vec::<u8>::with_capacity(9);
     stream.extend_from_slice(&RBCommand::HEAD.to_le_bytes());
+    stream.push(self.rb_id);
     stream.push(self.command_code);
     stream.push(self.channel_mask);
     stream.extend_from_slice(&self.payload.to_le_bytes());
