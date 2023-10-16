@@ -16,6 +16,8 @@ random = []
 # addess raw memeory, e.g. /dev/uio0
 memmap = "0.7"
 
+serde_json = "1.0"
+
 # multi-producer/multi-consumer channels
 #crossbeam = "0.8"
 crossbeam-channel = "0.5"

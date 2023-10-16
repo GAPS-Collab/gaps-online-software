@@ -46,6 +46,7 @@ use tof_dataclasses::serialization::{search_for_u16,
                                      parse_u32,
                                      Serialization};
 use tof_dataclasses::monitoring::MtbMoniData;
+use tof_dataclasses::commands::RBCommand;
 use tof_dataclasses::events::{RBEvent,
                               MasterTriggerEvent};
 use tof_dataclasses::events::master_trigger::{read_daq,
@@ -767,14 +768,27 @@ pub fn readoutboard_commander(cmd : &Receiver<TofPacket>){
               Ok(_)    => info!("BRCT command sent!")
             }
           },
-          PacketType::MasterTrigger => {
-            todo!("Implement me!");
-          },
           PacketType::RBCommand => {
-            todo!("Implement me!");
+            let mut payload_str  = String::from("RB");
+            match RBCommand::from_bytestream(&packet.payload, &mut 0) {
+              Ok(rb_cmd) => {
+                if rb_cmd.rb_id < 10 {
+                  payload_str += &String::from("0");
+                }
+                let mut payload = payload_str.into_bytes();
+                payload.append(&mut packet.payload);
+                match data_socket.send(&payload,0) {
+                  Err(err) => error!("Unable to send command! Error {err}"),
+                  Ok(_)    => info!("RBcommand sent to RB {}!", rb_cmd.rb_id)
+                }
+              }
+              Err(err) => {
+                error!("Can not construct RBCommand, error {err}");
+              }
+            }
           },
           _ => {
-            error!("Received garbage package!");
+            error!("Received garbage package! {}", packet);
           }
         }// end match
       }
@@ -802,12 +816,14 @@ pub fn readoutboard_commander(cmd : &Receiver<TofPacket>){
 /// FIXME - I think this should take a HashMap with 
 /// algorithm settings, which we can load from a 
 /// json file
-pub fn waveform_analysis(event         : &RBEvent,
+/// FIXME - add the paddle packets to the RBEvent instead 
+/// of returning 
+pub fn waveform_analysis(event         : &mut RBEvent,
                          readoutboard  : &mf::ReadoutBoard,
                          calibration   : &RBCalibrations)
                          // settiungs will be future extension
                          //settings      : &HashMap<String, f32>) 
--> Result<Vec<PaddlePacket>, AnalysisError> {
+-> Result<(), AnalysisError> {
   if event.header.broken {
     // just return the analysis error, there 
     // is probably nothing else we can do?
@@ -938,7 +954,8 @@ pub fn waveform_analysis(event         : &RBEvent,
     }
   }
   let result = paddles.into_values().collect();
-  Ok(result)
+  event.paddles = result;
+  Ok(())
 }
 
 //**********************************************
@@ -1030,8 +1047,10 @@ pub fn connect_to_mtb(mt_address : &String)
 ///
 pub fn master_trigger(mt_ip          : &str, 
                       mt_port        : usize,
+                      dsi_j_mapping  : &DsiLtbRBMapping,
                       sender_rate    : &cbc::Sender<u32>,
                       evid_sender    : &cbc::Sender<MasterTriggerEvent>,
+                      rb_request_tp  : &cbc::Sender<TofPacket>,
                       verbose        : bool) {
 
   let mt_address = mt_ip.to_owned() + ":" + &mt_port.to_string();
@@ -1208,6 +1227,46 @@ pub fn master_trigger(mt_ip          : &str,
     }
     
     trace!("Got new event id from master trigger {}",ev.event_id);
+    let hits = ev.get_dsi_j_ch_for_triggered_ltbs();
+    let mut rbs_ch = HashMap::<u8, Vec<u8>>::new();
+    for h in hits.iter() {
+      // h is dsi,j, ch
+      if !dsi_j_mapping.contains_key(&h.0) {
+        error!("Don't have RB connection information for {:?}.", h);
+        continue;
+      }
+      if !dsi_j_mapping[&h.0].contains_key(&h.1) {
+        error!("Don't have RB connection information for {:?}.", h);
+        continue;
+      }
+      if !dsi_j_mapping[&h.1].contains_key(&h.2) {
+        error!("Don't have RB connection information for {:?}.", h);
+        continue;
+      }
+      let rb  = dsi_j_mapping[&h.0][&h.1][&h.2];
+      if rbs_ch.contains_key(&rb.0) {
+        // unwrap is fine, bc we just checked if 
+        // the key exists
+        rbs_ch.get_mut(&rb.0).unwrap().push(rb.1);
+      } else {
+        rbs_ch.insert(rb.0, Vec::<u8>::new());
+      }
+    }
+    for k in rbs_ch.keys() { 
+      let mut rb_cmd = RBCommand::new();
+      rb_cmd.payload = ev.event_id;
+      rb_cmd.rb_id   = *k;
+      for ch in rbs_ch[&k].iter() {
+        rb_cmd.channel_mask = rb_cmd.channel_mask | 2u8.pow((ch -1).into());
+      }    
+      let request_pk = TofPacket::from(&rb_cmd);
+      match rb_request_tp.send(request_pk) {
+        Ok(_) => {},
+        Err(err) => {
+          error!("Unable to send request packet to rb {} for event {}! Error {err}", rb_cmd.rb_id, rb_cmd.payload);
+        }
+      }
+    } 
     match evid_sender.send(ev) {
       Err(err) => trace!("Can not send event, err {err}"),
       Ok(_)    => ()
