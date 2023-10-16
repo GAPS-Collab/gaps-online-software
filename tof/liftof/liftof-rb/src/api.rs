@@ -492,7 +492,6 @@ pub fn cmd_from_bytestream(bytestream : &mut Vec<u8>) ->Result<TofCommand, Seria
 ///                             seconds, we try to reconnect.
 pub fn cmd_responder(cmd_server_ip             : String,
                      heartbeat_timeout_seconds : u32,
-                     //rsp_receiver              : &Receiver<TofResponse>,
                      run_config_file           : &Path,
                      run_config                : &Sender<RunConfig>,
                      evid_to_cache             : &Sender<u32>) {
@@ -502,8 +501,17 @@ pub fn cmd_responder(cmd_server_ip             : String,
   let cmd_address = String::from("tcp://") + &cmd_server_ip + ":" + &DATAPORT.to_string() ;
   // we will subscribe to two types of messages, BDCT and RB + 2 digits 
   // of board id
-  let topic_board = get_board_id().expect("Can not get board id!")
-                    .to_string();
+  let mut topic_board = String::from("RB");
+  // FIXME: Unsure what to do. We migt as well fail here, 
+  // since if we don't get the board id, we won't be 
+  // receiving requests.
+  let brd_id = get_board_id().expect("Can not get board id!");
+  //let topic_board = get_board_id().expect("Can not get board id!")
+  //                  .to_string();
+  if brd_id < 10 {
+    topic_board += "0";
+  }
+  topic_board += &brd_id.to_string();
   let topic_broadcast = String::from("BRCT");
   let ctx = zmq::Context::new();
   let cmd_socket = ctx.socket(zmq::SUB).expect("Unable to create 0MQ SUB socket!");
@@ -592,241 +600,261 @@ pub fn cmd_responder(cmd_server_ip             : String,
     match cmd_socket.recv_bytes(zmq::DONTWAIT) {
       Err(err) => trace!("Problem receiving command over 0MQ ! Err {err}"),
       Ok(cmd_bytes)  => {
-        info!("Received bytes {}", cmd_bytes.len());
-        // we have to strip off the topic
-        match TofCommand::from_bytestream(&cmd_bytes, &mut 4) {
-          Err(err) => error!("Problem decoding command {}", err),
-          Ok(cmd)  => {
-            // we got a valid tof command, forward it and wait for the 
-            // response
-            let tof_resp  = TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED);
-            let resp_not_implemented = prefix_board_id(&mut tof_resp.to_bytestream());
-            //let resp_not_implemented = TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED);
-            match cmd {
-              TofCommand::Ping (_) => {
-                info!("Received ping signal");
-                let r = TofResponse::Success(0);
-                match cmd_socket.send(r.to_bytestream(),0) {
-                  Err(err) => warn!("Can not send response!, Err {err}"),
-                  Ok(_)    => info!("Responded to Ping!")
-                }
-                continue;
-              
-              }
-              TofCommand::PowerOn   (_mask) => {
-                error!("Not implemented");
-                match cmd_socket.send(resp_not_implemented,0) {
-                  Err(err) => error!("Can not send response! Err {err}"),
-                  Ok(_)    => trace!("Resp sent!")
-                }
-                continue;
-              },
-              TofCommand::PowerOff  (_mask) => {
-                error!("Not implemented");
-                match cmd_socket.send(resp_not_implemented,0) {
-                  Err(err) => error!("Can not send response! {err}"),
-                  Ok(_)    => trace!("Resp sent!")
-                }
-                continue;
-              },
-              TofCommand::PowerCycle(_mask) => {
-                error!("Not implemented");
-                match cmd_socket.send(resp_not_implemented,0) {
-                  Err(err) => error!("Can not send response! {err}"),
-                  Ok(_)    => trace!("Resp sent!")
-                }
-                continue;
-              },
-              TofCommand::RBSetup   (_mask) => {
-                warn!("Not implemented");
-                match cmd_socket.send(resp_not_implemented,0) {
-                  Err(err) => warn!("Can not send response! Err {err}"),
-                  Ok(_)    => trace!("Resp sent!")
-                }
-                continue;
-              }, 
-              TofCommand::SetThresholds   (_thresholds) =>  {
-                warn!("Not implemented");
-                match cmd_socket.send(resp_not_implemented,0) {
-                  Err(err) => warn!("Can not send response! Err {err}"),
-                  Ok(_)    => trace!("Resp sent!")
-                }
-                continue;
-              },
-              TofCommand::StartValidationRun  (_) => {
-                warn!("Not implemented");
-                match cmd_socket.send(resp_not_implemented,0) {
-                  Err(err) => warn!("Can not send response! Err {err}"),
-                  Ok(_)    => trace!("Resp sent!")
-                }
-                continue;
-              },
-              TofCommand::RequestWaveforms (eventid) => {
-                trace!("Requesting waveforms for event {eventid}");
-                error!("Not implemented");
-                match cmd_socket.send(resp_not_implemented,0) {
-                  Err(err) => warn!("Can not send response! Err {err}"),
-                  Ok(_)    => trace!("Resp sent!")
-                }
-                continue;
-              },
-              TofCommand::UnspoolEventCache   (_) => {
-                warn!("Not implemented");
-                match cmd_socket.send(resp_not_implemented,0) {
-                  Err(err) => warn!("Can not send response! Err {err}"),
-                  Ok(_)    => trace!("Resp sent!")
-                }
-                continue;
-              },
-              TofCommand::StreamOnlyRequested (_) => {
-                error!("This feature is deprecated in favor of having entire runs in a certain TofOperationMode. This simplifies configuration, while reducing flexibility. These decidsions are not easy, and we might go back to reimplementing this feature again.");
-                //let mode = TofOperationMode::TofModeRequestReply;
-                //
-                //match op_mode.try_send(mode) {
-                //  Err(err) => trace!("Error sending! {err}"),
-                //  Ok(_)    => ()
-                //}
-                //let resp_good = TofResponse::Success(RESP_SUCC_FINGERS_CROSSED);
-                //match cmd_socket.send(resp_good.to_bytestream(),0) {
-                //  Err(err) => warn!("Can not send response! Err {err}"),
-                //  Ok(_)    => trace!("Resp sent!")
-                //}
-                continue;
-              },
-              TofCommand::StreamAnyEvent      (_) => {
-                error!("This feature is deprecated in favor of having entire runs in a certain TofOperationMode. This simplifies configuration, while reducing flexibility. These decidsions are not easy, and we might go back to reimplementing this feature again.");
-                //let mode = TofOperationMode::StreamAny;
-                //match op_mode.try_send(mode) {
-                //  Err(err) => trace!("Error sending! {err}"),
-                //  Ok(_)    => ()
-                //}
-                //let resp_good = TofResponse::Success(RESP_SUCC_FINGERS_CROSSED);
-                //match cmd_socket.send(resp_good.to_bytestream(),0) {
-                //  Err(err) => warn!("Can not send response! Err {err}"),
-                //  Ok(_)    => trace!("Resp sent!")
-                //}
-                continue;
-              },
-              TofCommand::DataRunStart (_max_event) => {
-                // let's start a run. The value of the TofCommnad shall be 
-                // nevents
-                println!("Will initialize new run!");
-                let rc    = get_runconfig(&run_config_file);
-                //if rc.stream_any {
-                //  match op_mode.send(TofOperationMode::StreamAny) {
-                //    Err(err) => error!("Can not set TofOperationMode to StreamAny! Err {err}"),
-                //    Ok(_)    => info!("Using RBMode STREAM_ANY")
-                //  }
-                //}
-                match run_config.send(rc) {
-                  Err(err) => error!("Error initializing run! {err}"),
-                  Ok(_)    => ()
-                };
-                let resp_good = TofResponse::Success(RESP_SUCC_FINGERS_CROSSED);
-                match cmd_socket.send(resp_good.to_bytestream(),0) {
-                  Err(err) => warn!("Can not send response! Err {err}"),
-                  Ok(_)    => trace!("Resp sent!")
-                }
-              },
-              TofCommand::DataRunEnd(_)   => {
-                println!("Received command to end run!");
-                // default is not active for run config
+        debug!("Received bytes {}", cmd_bytes.len());
+        // it will always be a tof packet
+        match TofPacket::from_bytestream(&cmd_bytes, &mut 4) {
+          Err(err) => {
+            error!("Can not decode TofPacket! Err {err}");
+          },
+          Ok(tp) => {
+            match tp.packet_type {
+              PacketType::TofCommand => {
+                // we have to strip off the topic
+                match TofCommand::from_bytestream(&cmd_bytes, &mut 4) {
+                  Err(err) => error!("Problem decoding command {}", err),
+                  Ok(cmd)  => {
+                    // we got a valid tof command, forward it and wait for the 
+                    // response
+                    let tof_resp  = TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED);
+                    let resp_not_implemented = prefix_board_id(&mut tof_resp.to_bytestream());
+                    //let resp_not_implemented = TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED);
+                    match cmd {
+                      TofCommand::Ping (_) => {
+                        info!("Received ping signal");
+                        let r = TofResponse::Success(0);
+                        match cmd_socket.send(r.to_bytestream(),0) {
+                          Err(err) => warn!("Can not send response!, Err {err}"),
+                          Ok(_)    => info!("Responded to Ping!")
+                        }
+                        continue;
+                      
+                      }
+                      TofCommand::PowerOn   (_mask) => {
+                        error!("Not implemented");
+                        match cmd_socket.send(resp_not_implemented,0) {
+                          Err(err) => error!("Can not send response! Err {err}"),
+                          Ok(_)    => trace!("Resp sent!")
+                        }
+                        continue;
+                      },
+                      TofCommand::PowerOff  (_mask) => {
+                        error!("Not implemented");
+                        match cmd_socket.send(resp_not_implemented,0) {
+                          Err(err) => error!("Can not send response! {err}"),
+                          Ok(_)    => trace!("Resp sent!")
+                        }
+                        continue;
+                      },
+                      TofCommand::PowerCycle(_mask) => {
+                        error!("Not implemented");
+                        match cmd_socket.send(resp_not_implemented,0) {
+                          Err(err) => error!("Can not send response! {err}"),
+                          Ok(_)    => trace!("Resp sent!")
+                        }
+                        continue;
+                      },
+                      TofCommand::RBSetup   (_mask) => {
+                        warn!("Not implemented");
+                        match cmd_socket.send(resp_not_implemented,0) {
+                          Err(err) => warn!("Can not send response! Err {err}"),
+                          Ok(_)    => trace!("Resp sent!")
+                        }
+                        continue;
+                      }, 
+                      TofCommand::SetThresholds   (_thresholds) =>  {
+                        warn!("Not implemented");
+                        match cmd_socket.send(resp_not_implemented,0) {
+                          Err(err) => warn!("Can not send response! Err {err}"),
+                          Ok(_)    => trace!("Resp sent!")
+                        }
+                        continue;
+                      },
+                      TofCommand::StartValidationRun  (_) => {
+                        warn!("Not implemented");
+                        match cmd_socket.send(resp_not_implemented,0) {
+                          Err(err) => warn!("Can not send response! Err {err}"),
+                          Ok(_)    => trace!("Resp sent!")
+                        }
+                        continue;
+                      },
+                      TofCommand::RequestWaveforms (eventid) => {
+                        trace!("Requesting waveforms for event {eventid}");
+                        error!("Not implemented");
+                        match cmd_socket.send(resp_not_implemented,0) {
+                          Err(err) => warn!("Can not send response! Err {err}"),
+                          Ok(_)    => trace!("Resp sent!")
+                        }
+                        continue;
+                      },
+                      TofCommand::UnspoolEventCache   (_) => {
+                        warn!("Not implemented");
+                        match cmd_socket.send(resp_not_implemented,0) {
+                          Err(err) => warn!("Can not send response! Err {err}"),
+                          Ok(_)    => trace!("Resp sent!")
+                        }
+                        continue;
+                      },
+                      TofCommand::StreamOnlyRequested (_) => {
+                        error!("This feature is deprecated in favor of having entire runs in a certain TofOperationMode. This simplifies configuration, while reducing flexibility. These decidsions are not easy, and we might go back to reimplementing this feature again.");
+                        //let mode = TofOperationMode::TofModeRequestReply;
+                        //
+                        //match op_mode.try_send(mode) {
+                        //  Err(err) => trace!("Error sending! {err}"),
+                        //  Ok(_)    => ()
+                        //}
+                        //let resp_good = TofResponse::Success(RESP_SUCC_FINGERS_CROSSED);
+                        //match cmd_socket.send(resp_good.to_bytestream(),0) {
+                        //  Err(err) => warn!("Can not send response! Err {err}"),
+                        //  Ok(_)    => trace!("Resp sent!")
+                        //}
+                        continue;
+                      },
+                      TofCommand::StreamAnyEvent      (_) => {
+                        error!("This feature is deprecated in favor of having entire runs in a certain TofOperationMode. This simplifies configuration, while reducing flexibility. These decidsions are not easy, and we might go back to reimplementing this feature again.");
+                        //let mode = TofOperationMode::StreamAny;
+                        //match op_mode.try_send(mode) {
+                        //  Err(err) => trace!("Error sending! {err}"),
+                        //  Ok(_)    => ()
+                        //}
+                        //let resp_good = TofResponse::Success(RESP_SUCC_FINGERS_CROSSED);
+                        //match cmd_socket.send(resp_good.to_bytestream(),0) {
+                        //  Err(err) => warn!("Can not send response! Err {err}"),
+                        //  Ok(_)    => trace!("Resp sent!")
+                        //}
+                        continue;
+                      },
+                      TofCommand::DataRunStart (_max_event) => {
+                        // let's start a run. The value of the TofCommnad shall be 
+                        // nevents
+                        println!("Will initialize new run!");
+                        let rc    = get_runconfig(&run_config_file);
+                        //if rc.stream_any {
+                        //  match op_mode.send(TofOperationMode::StreamAny) {
+                        //    Err(err) => error!("Can not set TofOperationMode to StreamAny! Err {err}"),
+                        //    Ok(_)    => info!("Using RBMode STREAM_ANY")
+                        //  }
+                        //}
+                        match run_config.send(rc) {
+                          Err(err) => error!("Error initializing run! {err}"),
+                          Ok(_)    => ()
+                        };
+                        let resp_good = TofResponse::Success(RESP_SUCC_FINGERS_CROSSED);
+                        match cmd_socket.send(resp_good.to_bytestream(),0) {
+                          Err(err) => warn!("Can not send response! Err {err}"),
+                          Ok(_)    => trace!("Resp sent!")
+                        }
+                      },
+                      TofCommand::DataRunEnd(_)   => {
+                        println!("Received command to end run!");
+                        // default is not active for run config
 
-                let  rc = RunConfig::new();
-                match run_config.send(rc) {
-                  Err(err) => error!("Error stopping run! {err}"),
-                  Ok(_)    => ()
-                }
-                // send response later 
+                        let  rc = RunConfig::new();
+                        match run_config.send(rc) {
+                          Err(err) => error!("Error stopping run! {err}"),
+                          Ok(_)    => ()
+                        }
+                        // send response later 
 
-              //  if !self.run_active {
-              //    return Ok(TofResponse::GeneralFail(RESP_ERR_NORUNACTIVE));
-              //  }
-              //  warn!("Will kill current run!");
-              //  self.kill_chn.send(true);
-              //  return Ok(TofResponse::Success(RESP_SUCC_FINGERS_CROSSED));
-              },
-              TofCommand::VoltageCalibration (_) => {
-                warn!("Not implemented");
-                match cmd_socket.send(resp_not_implemented,0) {
-                  Err(err) => warn!("Can not send response! Err {err}"),
-                  Ok(_)    => trace!("Resp sent!")
-                }
-                continue;
-              },
-              TofCommand::TimingCalibration  (_) => {
-                warn!("Not implemented");
-                match cmd_socket.send(resp_not_implemented,0) {
-                  Err(err) => warn!("Can not send response! Err {err}"),
-                  Ok(_)    => trace!("Resp sent!")
-                }
-                continue;
-              },
-              TofCommand::CreateCalibrationFile (_) => {
-                warn!("Not implemented");
-                match cmd_socket.send(resp_not_implemented,0) {
-                  Err(err) => error!("Can not send response! Err {err}"),
-                  Ok(_)    => trace!("Resp sent!")
-                }
-                continue;
-              },
-              TofCommand::RequestEvent(eventid) => {
-                match evid_to_cache.send(eventid) {
-                  Err(err) => {
-                    error!("Problem sending event id to cache! Err {err}");
-                    //return Ok(TofResponse::GeneralFail(*eventid));
-                  },
-                  Ok(event) => {
-                    error!("Noting implemented yet. Have found event {:?} though", event);
+                      //  if !self.run_active {
+                      //    return Ok(TofResponse::GeneralFail(RESP_ERR_NORUNACTIVE));
+                      //  }
+                      //  warn!("Will kill current run!");
+                      //  self.kill_chn.send(true);
+                      //  return Ok(TofResponse::Success(RESP_SUCC_FINGERS_CROSSED));
+                      },
+                      TofCommand::VoltageCalibration (_) => {
+                        warn!("Not implemented");
+                        match cmd_socket.send(resp_not_implemented,0) {
+                          Err(err) => warn!("Can not send response! Err {err}"),
+                          Ok(_)    => trace!("Resp sent!")
+                        }
+                        continue;
+                      },
+                      TofCommand::TimingCalibration  (_) => {
+                        warn!("Not implemented");
+                        match cmd_socket.send(resp_not_implemented,0) {
+                          Err(err) => warn!("Can not send response! Err {err}"),
+                          Ok(_)    => trace!("Resp sent!")
+                        }
+                        continue;
+                      },
+                      TofCommand::CreateCalibrationFile (_) => {
+                        warn!("Not implemented");
+                        match cmd_socket.send(resp_not_implemented,0) {
+                          Err(err) => error!("Can not send response! Err {err}"),
+                          Ok(_)    => trace!("Resp sent!")
+                        }
+                        continue;
+                      },
+                      TofCommand::RequestEvent(eventid) => {
+                        match evid_to_cache.send(eventid) {
+                          Err(err) => {
+                            error!("Problem sending event id to cache! Err {err}");
+                            //return Ok(TofResponse::GeneralFail(*eventid));
+                          },
+                          Ok(event) => {
+                            error!("Noting implemented yet. Have found event {:?} though", event);
+                          }
+                        }
+                        //continue;
+                      },
+                      TofCommand::RequestMoni (_) => {
+                        warn!("Not implemented");
+                        match cmd_socket.send(resp_not_implemented,0) {
+                          Err(err) => error!("Can not send response! Err {err}"),
+                          Ok(_)    => trace!("Resp sent!")
+                        }
+                        continue;
+                      },
+                      TofCommand::Unknown (_) => {
+                        warn!("Not implemented");
+                        match cmd_socket.send(resp_not_implemented,0) {
+                          Err(err) => error!("Can not send response! Error {err}"),
+                          Ok(_)    => trace!("Resp sent!")
+                        }
+                        continue;
+                      }
+                      _ => {
+                      match cmd_socket.send(resp_not_implemented,0) {
+                        Err(err) => warn!("Can not send response! Error {err}"),
+                        Ok(_)    => trace!("Resp sent!")
+                      }
+                      continue;
+                      }
+                    } 
+                 
+                    //// now get the response from the clients
+                    //match rsp_receiver.recv() {
+                    //  Err(err) => {
+                    //    trace!("Did not recv response!");
+                    //    warn!("Intended command receiver did not reply! Responding with Failure");
+                    //    let resp = TofResponse::GeneralFail(RESP_ERR_CMD_STUCK);
+                    //    match cmd_socket.send(resp.to_bytestream(), 0) {
+                    //      Err(err) => warn!("The command likely failed and we could not send a response. This is bad!"),
+                    //      Ok(_)    => trace!("The command likely failed, but we did not lose connection"),
+                    //    }
+                    //  },
+                    //  Ok(resp) => {
+                    //    match cmd_socket.send(resp.to_bytestream(), 0) {
+                    //      Err(err) => warn!("The command likely went through, but we could not send a response. This is bad!"),
+                    //      Ok(_)    => trace!("The command likely went through, but we did not lose connection"),
+                    //    }
+                    //  }
+                    //}
                   }
-                }
-                //continue;
+                }  
+
+
               },
-              TofCommand::RequestMoni (_) => {
-                warn!("Not implemented");
-                match cmd_socket.send(resp_not_implemented,0) {
-                  Err(err) => error!("Can not send response! Err {err}"),
-                  Ok(_)    => trace!("Resp sent!")
-                }
-                continue;
+              PacketType::RBCommand  => {
               },
-              TofCommand::Unknown (_) => {
-                warn!("Not implemented");
-                match cmd_socket.send(resp_not_implemented,0) {
-                  Err(err) => error!("Can not send response! Error {err}"),
-                  Ok(_)    => trace!("Resp sent!")
-                }
-                continue;
-              }
               _ => {
-              match cmd_socket.send(resp_not_implemented,0) {
-                Err(err) => warn!("Can not send response! Error {err}"),
-                Ok(_)    => trace!("Resp sent!")
+                error!("Can not respond to {}", tp);
               }
-              continue;
-              }
-            } 
-         
-            //// now get the response from the clients
-            //match rsp_receiver.recv() {
-            //  Err(err) => {
-            //    trace!("Did not recv response!");
-            //    warn!("Intended command receiver did not reply! Responding with Failure");
-            //    let resp = TofResponse::GeneralFail(RESP_ERR_CMD_STUCK);
-            //    match cmd_socket.send(resp.to_bytestream(), 0) {
-            //      Err(err) => warn!("The command likely failed and we could not send a response. This is bad!"),
-            //      Ok(_)    => trace!("The command likely failed, but we did not lose connection"),
-            //    }
-            //  },
-            //  Ok(resp) => {
-            //    match cmd_socket.send(resp.to_bytestream(), 0) {
-            //      Err(err) => warn!("The command likely went through, but we could not send a response. This is bad!"),
-            //      Ok(_)    => trace!("The command likely went through, but we did not lose connection"),
-            //    }
-            //  }
-            //}
+            }
           }
-        }  
+        }
+
       }
     }
   }
@@ -934,8 +962,6 @@ pub fn data_publisher(data           : &Receiver<TofPacket>,
             match &mut file_on_disk {
               None => error!("We want to write data, however the file is invalid!"),
               Some(f) => {
-                //println!("write to file");
-                //match f.write_all(packet.payload.as_slice()) {
                 match f.write_all(packet.to_bytestream().as_slice()) {
                   Err(err) => error!("Writing file to disk failed! Err {err}"),
                   Ok(()) => ()
@@ -1705,13 +1731,7 @@ pub fn event_cache(tp_recv      : Receiver<TofPacket>,
     // if we are in "stream_any" mode, we don't need to take care
     // of any fo the response/request.
     if op_mode_stream {
-      //event_cache.as_ref().into_iter().map(|(evid, payload)| {send_ev_pl.try_send(Some(payload))});
-      //let evids = event_cache.keys();
       for tp in event_cache.values() {
-        // FIXME - this is bad! Too much allocation
-        //let tp = TofPacket::from(payload);
-        //let tp = TofPacket::from_bytestream(payload, &mut 0).unwrap();
-        //info!("{}", tp);
         match tp_to_pub.try_send(tp.clone()) {
           Err(err) => {
             error!("Error sending! {err}");
@@ -1721,12 +1741,11 @@ pub fn event_cache(tp_recv      : Receiver<TofPacket>,
         }
       }
       event_cache.clear();
-      //for n in evids { 
-      //  let payload = event_cache.remove(n).unwrap();
-      //  send_ev_pl.try_send(Some(payload)); 
-      //}
-      continue;
+      continue; // makes rest of code unreachable
+                // for this case
     }
+    // this is the call/response
+    // case
     match recv_evid.try_recv() {
       Err(err) => {
         trace!("Issue receiving event id! Err: {err}");
@@ -1734,24 +1753,20 @@ pub fn event_cache(tp_recv      : Receiver<TofPacket>,
       Ok(event_id) => {
         let has_it = event_cache.contains_key(&event_id);
         if !has_it {
-          //match send_ev_pl.try_send(None) {
           let resp = TofResponse::EventNotReady(event_id);
           match resp_to_cmd.try_send(resp) {
             Err(err) => trace!("Error informing the commander that we don't have that! Err {err}"),
             Ok(_)    => ()
           }
           // hamwanich
-          debug!("We don't have {event_id}!");
+          warn!("We don't have {event_id}!");
         } else {
-          //let event = event_cache.remove(&event_id).unwrap();
           let tp = event_cache.remove(&event_id).unwrap();
           let resp =  TofResponse::Success(event_id);
           match resp_to_cmd.try_send(resp) {
             Err(err) => trace!("Error informing the commander that we do have {event_id}! Err {err}"),
             Ok(_)    => ()
           }
-          //let tp = TofPacket::from(&event);
-          //let tp = TofPacket::from_bytestream(&event, &mut 0).unwrap();
           match tp_to_pub.try_send(tp) {
             Err(err) => trace!("Error sending! {err}"),
             Ok(_)    => ()

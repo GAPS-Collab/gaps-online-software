@@ -1,4 +1,7 @@
 # OMILU seris
+v0.7.3
+* implements new version of request/reply pattern
+
 v0.7.2
 * fixes a bug where te data formats for header only and 
   memory view where switched
