@@ -30,6 +30,12 @@ pub mod analysis;
 
 #[macro_use] extern crate log;
 
+use std::collections::HashMap;
+
+/// A type for the master trigger mappings
+pub type DsiLtbRBMapping = HashMap<u8,HashMap<u8,HashMap<u8,(u8,u8)>>>;
+
+
 /// Create structures filled with random 
 /// number to be used for testing and 
 /// benchmarking
