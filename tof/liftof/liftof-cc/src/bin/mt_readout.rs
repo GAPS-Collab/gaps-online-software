@@ -7,9 +7,13 @@ extern crate tof_dataclasses;
 extern crate liftof_cc;
 extern crate liftof_lib;
 
-//use tof_dataclasses::packets::TofPacket;
+use std::collections::HashMap;
+
+
+use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::threading::ThreadPool;
 use tof_dataclasses::events::MasterTriggerEvent; 
+use tof_dataclasses::DsiLtbRBMapping;
 use liftof_lib::master_trigger;
 use crossbeam_channel as cbc;
 use std::io::Write;
@@ -29,8 +33,10 @@ fn main() {
     }).init();
  
 
+ let (tp_send, tp_rec): (cbc::Sender<TofPacket>, cbc::Receiver<TofPacket>) = cbc::unbounded(); 
  let (master_ev_send, master_ev_rec): (cbc::Sender<MasterTriggerEvent>, cbc::Receiver<MasterTriggerEvent>) = cbc::unbounded(); 
   
+  let mut ltb_rb_map : DsiLtbRBMapping = HashMap::<u8,HashMap::<u8,HashMap::<u8,(u8,u8)>>>::new();
  let master_trigger_ip   = String::from("192.168.36.121");
  let master_trigger_port = 50001usize;
  let worker_threads = ThreadPool::new(2);
@@ -39,8 +45,10 @@ fn main() {
  worker_threads.execute(move || {
                         master_trigger(&master_trigger_ip, 
                                        master_trigger_port,
+                                       &ltb_rb_map,
                                        &rate_to_main,
                                        &master_ev_send,
+                                       &tp_send,
                                        true);
  });
 

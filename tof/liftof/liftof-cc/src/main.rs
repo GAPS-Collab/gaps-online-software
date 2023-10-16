@@ -19,6 +19,7 @@ extern crate colored;
 extern crate liftof_lib;
 extern crate liftof_cc;
 
+use std::collections::HashMap;
 use std::io;
 use std::io::Write;
 use std::process::exit;
@@ -47,14 +48,14 @@ use tof_dataclasses::packets::paddle_packet::PaddlePacket;
 use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::manifest::{get_ltbs_from_sqlite,
                                 get_rbs_from_sqlite};
+use tof_dataclasses::DsiLtbRBMapping;
 use tof_dataclasses::commands::TofCommand;
 use liftof_lib::{master_trigger,
                  readoutboard_commander};
 use liftof_lib::color_log;
-
+use liftof_lib::get_ltb_dsi_j_ch_mapping;
 use liftof_cc::readoutboard_comm::readoutboard_communicator;
 use liftof_cc::event_builder::event_builder;
-                           //event_builder_no_master};
 use liftof_cc::api::tofcmp_and_mtb_moni;
 use liftof_cc::paddle_packet_cache::paddle_packet_cache;
 use liftof_cc::flight_comms::global_data_sink;
@@ -91,6 +92,9 @@ struct Args {
   /// A json config file with detector information
   #[arg(short, long)]
   json_config: Option<PathBuf>,
+  /// A json file wit the ltb(dsi, j, ch) -> rb_id, rb_ch mapping.
+  #[arg(long)]
+  json_ltb_rb_map : Option<PathBuf>,
 }
 
 /*************************************/
@@ -169,7 +173,17 @@ fn main() {
     } // end Some
   } // end match
 
+  let mut ltb_rb_map : DsiLtbRBMapping = HashMap::<u8,HashMap::<u8,HashMap::<u8,(u8,u8)>>>::new();
   if use_master_trigger {
+    match args.json_ltb_rb_map {
+      None => {
+        panic!("Will need json ltb -> rb mapping when MasterTrigger shall be used")
+      },
+      Some(_json_ltb_rb_map) => {
+        ltb_rb_map = get_ltb_dsi_j_ch_mapping(_json_ltb_rb_map);
+      }
+    }
+
     master_trigger_ip     = config["master_trigger"]["ip"].as_str().unwrap().to_owned();
     master_trigger_port   = config["master_trigger"]["port"].as_usize().unwrap();
     master_trigger_ip_c   = master_trigger_ip.clone();
@@ -349,7 +363,7 @@ fn main() {
   let (rb_send, rb_rec) : (cbc::Sender<PaddlePacket>, cbc::Receiver<PaddlePacket>) = cbc::unbounded();
   // paddle cache <-> event builder communications
   let (id_send, id_rec) : (cbc::Sender<Option<u32>>, cbc::Receiver<Option<u32>>) = cbc::unbounded();
-  let (cmd_sender, cmd_receiver) : (cbc::Sender<TofCommand>, cbc::Receiver<TofCommand>) = cbc::unbounded();
+  let (cmd_sender, cmd_receiver) : (cbc::Sender<TofPacket>, cbc::Receiver<TofPacket>) = cbc::unbounded();
 
 
   // prepare a thread pool. Currently we have
@@ -390,10 +404,10 @@ fn main() {
                                              &pp_send);
   });
   println!("==> paddle cache thread started!");
-  println!("==> Starting data sink thread!");
 
   write_stream_path = String::from(stream_files_path.into_os_string().into_string().expect("Somehow the paths are messed up very badly! So I can't help it and I quit!"));
 
+  println!("==> Starting data sink thread!");
   worker_threads.execute(move || {
                          global_data_sink(&tp_from_client,
                                           write_stream,
@@ -434,8 +448,9 @@ fn main() {
   println!("==> All RB threads started!");
   
   let one_second = time::Duration::from_millis(1000);
+  println!("==> Starting RB commander thread!");
   worker_threads.execute(move || {
-    readoutboard_commander(cmd_receiver);
+    readoutboard_commander(&cmd_receiver);
   });
   if use_master_trigger {
     // start the event builder thread
@@ -445,22 +460,21 @@ fn main() {
     let mapping = MasterTriggerMapping::new(ltb_list_c, rb_list_c);
     println!("{:?}", mapping.ltb_mapping);
     //exit(0);
+    let cmd_sender_2 = cmd_sender.clone();
     worker_threads.execute(move || {
                            event_builder(&master_ev_rec,
-                                         //mapping, // Will be needed later on
                                          &id_send,
                                          &pp_rec,
-                                         //&ebs_from_cmdr,
                                          &tp_to_sink);
-                                         //&cmd_sender_c);
-                                         //&evb_comm_socket);
     });
     // master trigger
     worker_threads.execute(move || {
                            master_trigger(&master_trigger_ip, 
                                           master_trigger_port,
+                                          &ltb_rb_map,
                                           &rate_to_main,
                                           &master_ev_send,
+                                          &cmd_sender_2,
                                           true);
     });
   } else {
@@ -479,7 +493,8 @@ fn main() {
   ctrlc::set_handler(move || {
     println!("==> \u{1F6D1} received Ctrl+C! We will stop triggers and end the run!");
     let end_run = TofCommand::DataRunEnd(42);
-    match cmd_sender_c.send(end_run) {
+    let tp = TofPacket::from(&end_run);
+    match cmd_sender_c.send(tp) {
      Err(err) => error!("Can not send end run command! {err}"),
      Ok(_)    => ()
     }
@@ -491,7 +506,8 @@ fn main() {
   
   // start a new data run 
   let start_run = TofCommand::DataRunStart(1000);
-  match cmd_sender.send(start_run) {
+  let tp = TofPacket::from(&start_run);
+  match cmd_sender.send(tp) {
     Err(err) => error!("Unable to send command, error{err}"),
     Ok(_)    => ()
   }

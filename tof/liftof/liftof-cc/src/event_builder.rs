@@ -18,7 +18,6 @@ use tof_dataclasses::events::{MasterTriggerEvent,
 use crate::constants::EVENT_BUILDER_EVID_CACHE_SIZE;
 use tof_dataclasses::packets::{PacketType,
                                TofPacket};
-
 use crossbeam_channel as cbc;
 
 use tof_dataclasses::packets::paddle_packet::PaddlePacket;
@@ -174,6 +173,8 @@ impl TofEventBuilderSettings {
 ///                    channel. The event will be either build 
 ///                    immediatly, or cached. 
 ///
+/// * dsi_j_mapping  : A HashMap of some Hashmaps which makes the 
+///                    following connection DSI/J/LTB_CH -> RBID, RBCH
 /// * pp_query       : Send request to a paddle_packet cache to send
 ///                    Paddle packets with the given event id
 /// * paddle_packets : Receive paddle_packets from a paddle_packet
@@ -182,13 +183,9 @@ impl TofEventBuilderSettings {
 ///                    is needed so that the event builder can request
 ///                    paddles from readout boards.
 pub fn event_builder (m_trig_ev      : &cbc::Receiver<MasterTriggerEvent>,
-                      //mt_mapping     : MasterTriggerMapping,
                       pp_query       : &Sender<Option<u32>>,
                       pp_recv        : &Receiver<Option<PaddlePacket>>,
-                      //settings       : &cbc::Receiver<TofEventBuilderSettings>,
                       data_sink      : &cbc::Sender<TofPacket>) { 
-                      //cmd_sender     : &cbc::Sender<TofCommand>) {
-                      //socket         : &zmq::Socket) {
 
   let mut event_cache = VecDeque::<TofEvent>::with_capacity(EVENT_BUILDER_EVID_CACHE_SIZE);
   let mut paddle_cache : HashMap<u32,Vec::<PaddlePacket>> = HashMap::with_capacity(100); 
@@ -212,10 +209,7 @@ pub fn event_builder (m_trig_ev      : &cbc::Receiver<MasterTriggerEvent>,
                , mt.event_id
                , mt.n_paddles);
         // construct RB requests
-        //println!("{:?}", mt.board_mask);
-        //let rbs_in_ev = mt_mapping.get_rb_ids(&mt);
-        //println!("{:?}", mt);
-        //println!("[EVT-BLDR] Get the following RBs in this event {:?}", rbs_in_ev);
+
         let event = TofEvent::from(&mt);
         if event.event_id != last_evid + 1 {
           let delta_id = event.event_id - last_evid;
@@ -226,7 +220,9 @@ pub fn event_builder (m_trig_ev      : &cbc::Receiver<MasterTriggerEvent>,
         // we will push the MasterTriggerEvent down the sink
         let tp = TofPacket::from(&mt);
         match data_sink.try_send(tp) {
-          Err(err) => error!("Unable to send tof packet to data sink! {err}"),
+          Err(err) => {
+            error!("Unable to send tof packet to data sink! {err}");
+          },
           Ok(_)    => ()
         }
       }

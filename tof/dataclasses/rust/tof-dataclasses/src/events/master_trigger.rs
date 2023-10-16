@@ -100,6 +100,8 @@ impl From<IPBusPacketType> for u8 {
   }
 }
 
+/////////////////////////////////////////////////
+
 /// MasterTrigger related mapping
 ///
 /// Caches ltb/rb relevant information 
