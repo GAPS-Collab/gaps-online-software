@@ -808,31 +808,36 @@ impl FromRandom for RBEvent {
 
 impl From<&TofPacket> for RBEvent {
   fn from(pk : &TofPacket) -> Self {
-    if pk.packet_type == PacketType::RBEventMemoryView {
-      match RBEvent::extract_from_rbeventmemoryview(&pk.payload, &mut 0) {
-        Ok(event) => {
-          return event;
+    match pk.packet_type {
+      PacketType::RBEventMemoryView => {
+        match RBEvent::extract_from_rbeventmemoryview(&pk.payload, &mut 0) {
+          Ok(event) => {
+            return event;
+          }
+          Err(err) => { 
+            error!("Can not get RBEvent from RBEventMemoryView! Error {err}!");
+            error!("Returning empty event!");
+            return RBEvent::new();
+          }
         }
-        Err(err) => { 
-          error!("Can not get RBEvent from RBEventMemoryView! Error {err}!");
-          error!("Returning empty event!");
-          return RBEvent::new();
+      },
+      PacketType::RBEvent => {
+        match RBEvent::from_bytestream(&pk.payload, &mut 0) {
+          Ok(event) => {
+            return event;
+          }
+          Err(err) => { 
+            error!("Can not decode RBEvent! Error {err}!");
+            error!("Returning empty event!");
+            return RBEvent::new();
+          }
         }
+      },
+      _ => {
+        error!("Can not deal with {}! Returning empty event", pk);
+        return RBEvent::new();
       }
-    } else {
-      error!("Other packet types than RBEventMemoryView are not implmented yet!");
-      return RBEvent::new();
     }
-    //match RBEvent::from_bytestream(&pk.payload, &mut 0) {
-    //  Ok(event) => {
-    //    return event;
-    //  }
-    //  Err(err) => { 
-    //    error!("Can not get RBEventMemoryView from RBEventPayload! Error {err}!");
-    //    error!("Returning empty event!");
-    //    return RBEvent::new();
-    //  }
-    //}
   }
 }
 
