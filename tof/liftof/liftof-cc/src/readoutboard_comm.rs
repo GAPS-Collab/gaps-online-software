@@ -74,43 +74,19 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
     Err(err) => error!("Can not connect to socket {}, {}", address, err),
     Ok(_)    => info!("Connected to {address}")
   }
-  // FIXME - do not subscribe to all, only this 
-  // specific RB
+  // no need to subscribe to a topic, since there 
+  // is one port for each rb
   let topic = b"";
-  //let mut topic : String;
-  //if rb.id.unwrap() < 10 {
-  //  topic = String::from("RB0") + &rb.id.unwrap().to_string();
-  //} else {
-  //  topic = String::from("RB") + &rb.id.unwrap().to_string();
-  //}
   match socket.set_subscribe(topic) {
    Err(err) => error!("Unable to subscribe to topic! {err}"),
    Ok(_) => ()
 
   }
-  //socket.set_subscribe(topic.as_bytes());
   let mut secs_since_epoch = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
   let mut blobfile_name = storage_savepath.to_owned() + "/RB" 
                        + &board_id.to_string() + "_" 
                        + &secs_since_epoch.to_string()
-                       + ".blob";
-  //let mut topic : String;
-  //if rb.id.unwrap() < 10 {
-  //  topic = String::from("RB0") + &rb.id.unwrap().to_string();
-  //} else {
-  //  topic = String::from("RB") + &rb.id.unwrap().to_string();
-  //}
-  //socket.set_subscribe(topic.as_bytes());
-  //socket.set_subscribe(topic);
-  //let blobfile_name = storage_savepath.to_owned() + "blob_" 
-  //let mut topic : String;
-  //if rb.id.unwrap() < 10 {
-  //  topic = String::from("RB0") + &rb.id.unwrap().to_string();
-  //} else {
-  //  topic = String::from("RB") + &rb.id.unwrap().to_string();
-  //}
-  //socket.set_subscribe(topic.as_bytes());
-  //                     + &board_id.to_string()
+                       + ".robin";
   let mut blobfile_path = Path::new(&blobfile_name);
   let mut file_on_disc : Option<File> = None;//let mut output = File::create(path)?;
   if write_rb_raw {
@@ -128,30 +104,6 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
         error!("Receiving from socket raised error {}", err);
       }
       Ok(buffer) => {
-        //trace!("Working...");
-        //// check for rb ping signal
-        //let rb_ping = identifiy_readoutboard(&msg);
-        //if rb_ping {
-        //  //let result = socket.send_str("[SVR]: R'cvd RBping", 0);
-        //  let result = socket.send("[SVR]: R'cvd RBping", 0);
-        //  match result {
-        //    Ok(_)    => debug!("RB {} handshake complete!", board_id),
-        //    Err(err) => error!("Not able to send back reply when negotiating RB comms, handshake possibly failed..")
-        //  }
-        //  continue;
-        //}
-        //let size = msg.len();
-        //if size == 0 {continue;}
-        //let mut buffer = tvec![u8;msg.len()];
-        //buffer = msg.to_vec();
-        //debug!("received message with len : {}", size);
-        ////let result = socket.send_str("[SVR]: Received data",0);
-        //let result = socket.send("[SVR]: Received data",0);
-        //match result {
-        //    Ok(_)    => debug!("Received data of len {} and acknowledged!", size),
-        //    Err(err) => error!("Not able to send back reply to acknowleded received data!")
-        //}
-        // do the work
         // strip the first 4 bytes, since they contain the 
         // board id
         match TofPacket::from_bytestream(&buffer, &mut 4) { 
@@ -178,18 +130,15 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
                   }
                 }
               },
-              PacketType::RBEvent => {
-                error!("RBEvent is an advanced feature which is not ready yet!");
-              },
-              PacketType::RBEventMemoryView => {
-                let event = RBEvent::from(&tp);
-                match waveform_analysis(&event, 
+              PacketType::RBEventMemoryView | PacketType::RBEvent => {
+                let mut event = RBEvent::from(&tp);
+                match waveform_analysis(&mut event, 
                                         &rb,
                                         &calibrations) {
                     
-                  Ok(pps) => {
-                    for k in 0..pps.len() {
-                      match pp_pusher.send(pps[k]) {
+                  Ok(_) => {
+                    for k in 0..event.paddles.len() {
+                      match pp_pusher.send(event.paddles[k]) {
                         Ok(_) => (),
                         Err(err) => {
                           error!("Unable to send pp! Err {err}");
@@ -205,18 +154,11 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
                 match &mut file_on_disc {
                   None => (),
                   Some(f) => {
-                    // if the readoutboard prefixes it's payload with 
-                    // "RBXX", we have to get rid of that first
-                    //match search_for_u16(0xaa, &buffer, 0) {
-                    //  Err(err) => {
-                    //    error!("Can not find header in this payload! {err}");
-                    //  }
-                    //  Ok(_)    => {
-                        trace!("writing {} bytes", &tp.payload.len());
-                        match f.write_all(&tp.payload) {
-                          Err(err) => error!("Can not write to file, err {err}"),
-                          Ok(_)    => ()
-                        }
+                    trace!("writing {} bytes", &tp.payload.len());
+                    match f.write_all(&tp.payload) {
+                      Err(err) => error!("Can not write to file, err {err}"),
+                      Ok(_)    => ()
+                    }
                   }
                 } // end match file_on_disk
                 n_events += 1;
