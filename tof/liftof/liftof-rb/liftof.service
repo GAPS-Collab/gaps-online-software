@@ -5,17 +5,17 @@ After=rb-initialization.target
 StartLimitIntervalSec=0
 
 [Service]
-Environment="LIFTOF_IS_SYSTEMD=1"
 Type=simple
 Restart=always
 RestartSec=1
 EnvironmentFile=/etc/default/gaps
-StandardOutput=syslog
-StandardError=syslog
+StandardOutput=append:/var/log/liftof.log
+StandardError=append:/var/log/liftof.log
 SyslogIdentifier=gaps
 User=gaps
 WorkingDirectory=/home/gaps/bin
-ExecStart=/home/gaps/bin/liftof-rb -r /home/gaps/config/runconfig.phys --stream-any
+Environment="LIFTOF_IS_SYSTEMD=1"
+ExecStart=/home/gaps/bin/liftof-rb -r /home/gaps/config/runconfig.json 
 
 [Install]
 WantedBy=multi-user.target
