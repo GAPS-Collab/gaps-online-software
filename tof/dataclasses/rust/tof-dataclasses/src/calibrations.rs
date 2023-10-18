@@ -24,6 +24,7 @@ use crate::serialization::{Serialization,
                            SerializationError};
 use crate::events::RBEvent;
 use crate::events::rb_event::unpack_traces_f32;
+use crate::io::read_file;
 
 #[cfg(feature = "random")] 
 use crate::FromRandom;
@@ -34,16 +35,7 @@ use rand::Rng;
 
 extern crate statistical;
 
-//extern crate statrs;
-//use statrs::statistics::Median;
-
 // FIXME -fix the test!
-//#[cfg(feature = "random")] 
-//use crate::FromRandom;
-//#[cfg(feature = "random")]
-//extern crate rand;
-//#[cfg(feature = "random")]
-//use rand::Rng;
 
 
 /***********************************/
@@ -844,6 +836,86 @@ impl RBCalibrations {
     }
   }
 
+  ///
+  ///
+  pub fn from_txtfile(filename : &Path) -> Self {
+    let mut rb_cal = Self::new(0);
+    rb_cal.get_id_from_filename(&filename);
+    debug!("Attempting to open file {}", filename.display());
+    let file = BufReader::new(File::open(filename).expect("Unable to open file {}"));
+    // count lines and check if we have 4 lines per channel
+    let mut cnt  = 0;
+    for _ in file.lines() {
+      cnt += 1;
+    }
+    if cnt != NCHN*4 {
+      panic! ("The calibration file {} does not have the proper format! It has {} lines", filename.display(), cnt);
+    }
+    cnt = 0;
+    let mut vals = 0usize;
+
+    if let Ok(lines) = read_lines(filename) {
+      // we have NCHN-1*4 lines (no calibration data for channel 9)
+      for line in lines {
+        if let Ok(data) = line {        
+          let values: Vec<&str> = data.split(' ').collect();
+          match values.len() {
+            NWORDS => {
+              if vals == 0 {
+                for n in 0..NWORDS {
+                  // this will throw an error if calibration data 
+                  // is not following conventioss
+                  let data : f32 = values[n].parse::<f32>().unwrap();
+                  rb_cal.v_offsets[cnt][n] = data;
+                  //cals[cnt].v_offsets[n] = data;
+                }
+                vals += 1;
+                continue;
+              }
+              if vals == 1 {
+                for n in 0..NWORDS {
+                  // this will throw an error if calibration data 
+                  // is not following conventioss
+                  let data : f32 = values[n].parse::<f32>().unwrap();
+                  rb_cal.v_dips[cnt][n] = data;
+                  //cals[cnt].v_dips[n] = data;
+                }
+                vals += 1;
+                continue;
+              }
+              if vals == 2 {
+                for n in 0..NWORDS {
+                  // this will throw an error if calibration data 
+                  // is not following conventioss
+                  let data : f32 = values[n].parse::<f32>().unwrap();
+                  rb_cal.v_inc[cnt][n] = data;
+                  //cals[cnt].v_inc[n] = data;
+                }
+                vals += 1;
+                continue;
+              }
+              if vals == 3 {
+                for n in 0..NWORDS {
+                  // this will throw an error if calibration data 
+                  // is not following conventioss
+                  let data : f32 = values[n].parse::<f32>().unwrap();
+                  rb_cal.tbin[cnt][n] = data;
+                  //cals[cnt].tbin[n] = data;
+                  // reset vals & cnts
+                }
+                vals = 0;
+                cnt += 1;
+                continue;
+              }
+            },
+            _ => panic!("Invalid input line {}", data),
+          }; // end Ok lines
+          vals += 1;
+        }
+      }
+    }
+    rb_cal
+  }
 
   /// Infer the readoutboard id from the filename
   ///
@@ -1042,82 +1114,27 @@ impl From<&Path> for RBCalibrations {
   
   /// Read an asci text file with calibration constants.
   fn from(path : &Path) -> Self {
-    let mut rb_cal = Self::new(0);
-    rb_cal.get_id_from_filename(&path);
-    debug!("Attempting to open file {}", path.display());
-    let file = BufReader::new(File::open(path).expect("Unable to open file {}"));
-    // count lines and check if we have 4 lines per channel
-    let mut cnt  = 0;
-    for _ in file.lines() {
-      cnt += 1;
-    }
-    if cnt != NCHN*4 {
-      panic! ("The calibration file {} does not have the proper format! It has {} lines", path.display(), cnt);
-    }
-    cnt = 0;
-    let mut vals = 0usize;
-
-    if let Ok(lines) = read_lines(path) {
-      // we have NCHN-1*4 lines (no calibration data for channel 9)
-      for line in lines {
-        if let Ok(data) = line {        
-          let values: Vec<&str> = data.split(' ').collect();
-          match values.len() {
-            NWORDS => {
-              if vals == 0 {
-                for n in 0..NWORDS {
-                  // this will throw an error if calibration data 
-                  // is not following conventioss
-                  let data : f32 = values[n].parse::<f32>().unwrap();
-                  rb_cal.v_offsets[cnt][n] = data;
-                  //cals[cnt].v_offsets[n] = data;
-                }
-                vals += 1;
-                continue;
-              }
-              if vals == 1 {
-                for n in 0..NWORDS {
-                  // this will throw an error if calibration data 
-                  // is not following conventioss
-                  let data : f32 = values[n].parse::<f32>().unwrap();
-                  rb_cal.v_dips[cnt][n] = data;
-                  //cals[cnt].v_dips[n] = data;
-                }
-                vals += 1;
-                continue;
-              }
-              if vals == 2 {
-                for n in 0..NWORDS {
-                  // this will throw an error if calibration data 
-                  // is not following conventioss
-                  let data : f32 = values[n].parse::<f32>().unwrap();
-                  rb_cal.v_inc[cnt][n] = data;
-                  //cals[cnt].v_inc[n] = data;
-                }
-                vals += 1;
-                continue;
-              }
-              if vals == 3 {
-                for n in 0..NWORDS {
-                  // this will throw an error if calibration data 
-                  // is not following conventioss
-                  let data : f32 = values[n].parse::<f32>().unwrap();
-                  rb_cal.tbin[cnt][n] = data;
-                  //cals[cnt].tbin[n] = data;
-                  // reset vals & cnts
-                }
-                vals = 0;
-                cnt += 1;
-                continue;
-              }
+    let mut cali = RBCalibrations::new(0);
+    if path.ends_with(".txt") {
+      return RBCalibrations::from_txtfile(path);
+    } else {
+      match read_file(path) {
+        Err(err) => {
+          error!("Can not open {}! Err {err}", path.display());
+        },
+        Ok(stream) => {
+          match RBCalibrations::from_bytestream(&stream, &mut 0) {
+            Err(err) => {
+              error!("Can not read calibration from binary file {}, Error {err}!", path.display());
             },
-            _ => panic!("Invalid input line {}", data),
-          }; // end Ok lines
-          vals += 1;
+            Ok(c) => {
+              cali = c;
+            }
+          }
         }
       }
+      return cali; 
     }
-    rb_cal
   }
 }
 
