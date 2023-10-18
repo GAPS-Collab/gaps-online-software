@@ -42,8 +42,7 @@ use tof_dataclasses::serialization::Serialization;
 /// * runid            : Current assigned runid. Will be used in the filenames of saved 
 ///                      readoutboard raw data.
 /// * print_packets    : 
-pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
-                                 //resp_to_main     : Sender<TofResponse>,
+pub fn readoutboard_communicator(ev_to_builder    : &Sender<RBEvent>,
                                  tp_to_sink       : Sender<TofPacket>,
                                  write_rb_raw     : bool,
                                  storage_savepath : &String,
@@ -69,6 +68,9 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
               + &rb.ip_address.to_string()
               + ":"
               +  &rb.port.to_string();
+
+  // FIXME - this panics, however, if we can't set up the socket, what's 
+  // the point of this thread?
   let socket = zmq_ctx.socket(zmq::SUB).expect("Unable to create socket!");
   match socket.connect(&address) {
     Err(err) => error!("Can not connect to socket {}, {}", address, err),
@@ -132,24 +134,24 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
               },
               PacketType::RBEventMemoryView | PacketType::RBEvent => {
                 let mut event = RBEvent::from(&tp);
-                match waveform_analysis(&mut event, 
-                                        &rb,
-                                        &calibrations) {
-                    
-                  Ok(_) => {
-                    for k in 0..event.paddles.len() {
-                      match pp_pusher.send(event.paddles[k]) {
-                        Ok(_) => (),
-                        Err(err) => {
-                          error!("Unable to send pp! Err {err}");
-                        }
-                      }
+                if event.paddles.len() == 0 {
+                  match waveform_analysis(&mut event, 
+                                          &rb,
+                                          &calibrations) {
+                      
+                    Ok(_) => (),
+                    Err(err) => {
+                      error!("Unable to analyze waveforms for this event! Err {err}");
                     }
                   }
+                };
+                match ev_to_builder.send(event) {
+                  Ok(_) => (),
                   Err(err) => {
-                    error!("Unable to analyze waveforms for this event! Err {err}");
+                    error!("Unable to send event! Err {err}");
                   }
                 }
+
                 // write blob to disk if desired
                 match &mut file_on_disc {
                   None => (),
@@ -169,7 +171,7 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
                                  + &board_id.to_string() + "_" 
                                  + &runid.to_string() + "_"
                                  + &secs_since_epoch.to_string()
-                                 + ".blob";
+                                 + ".robin";
                   info!("Writing blobs to {}", blobfile_name );
                   blobfile_path = Path::new(&blobfile_name);
                   file_on_disc = OpenOptions::new().append(true).create(true).open(blobfile_path).ok();
@@ -188,14 +190,6 @@ pub fn readoutboard_communicator(pp_pusher        : Sender<PaddlePacket>,
             } // end match packet type
           } // end OK
         } // end match from_bytestream
-        //println!("{:?}", tp.payload);
-        //for n in 0..5 {
-        //  println!("{}", tp.payload[n]);
-        //}
-        //println!("...");
-        //for n in 0..5 {
-        //  println!("{}", tp.payload[tp.payload.len() - 1 - n]);
-        //}
       } // end ok buffer 
     } // end match 
     debug!("Digested {n_chunk} chunks!");

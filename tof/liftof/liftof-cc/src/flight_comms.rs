@@ -56,7 +56,7 @@ pub fn global_data_sink(incoming : &cbc::Receiver<TofPacket>,
   if write_stream {
     let mut streamfile_name = write_stream_path + "/stream";
     streamfile_name += &runid.to_string();
-    println!("==> Writing stream to file with prefix {}!", streamfile_name);
+    println!("==> Writing stream to file with prefix {}", streamfile_name);
     writer = Some(TofPacketWriter::new(streamfile_name));
   }
   let mut event_cache = Vec::<TofPacket>::with_capacity(100); 
