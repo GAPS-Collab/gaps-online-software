@@ -137,7 +137,7 @@ impl TofPacketWriter {
   pub fn new(file_prefix : String) -> Self {
     let filename = file_prefix.clone() + ".tof.gaps";
     let path = Path::new(&filename); 
-    println!("Writing to file {filename}");
+    info!("Writing to file {filename}");
     let file = OpenOptions::new().create(true).append(true).open(path).expect("Unable to open file {filename}");
     Self {
       file,
@@ -164,8 +164,10 @@ impl TofPacketWriter {
       //drop(self.file);
       let filename = self.file_prefix.clone() + "_" + &self.file_id.to_string() + ".tof.gaps";
       let path  = Path::new(&filename);
-      self.file = OpenOptions::new().append(true).open(path).expect("Unable to open file {filename}");
+      println!("==> [TOFPACKETWRITER] Will start a new file {}", path.display());
+      self.file = OpenOptions::new().create(true).append(true).open(path).expect("Unable to open file {filename}");
       self.n_packets = 0;
+      self.file_id += 1;
     }
   }
 }
