@@ -1,5 +1,8 @@
 # OMILU series
 
+## 0.7.2
+* Changes in API of MasterTofEvent/TofEvent
+
 ## 0.7.1
 * Fixes a critical bug in RBEvent, where the channels where 
   shifted by one, so that channel 9 was ignored.

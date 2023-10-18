@@ -109,7 +109,6 @@ pub enum EventQuality {
 impl fmt::Display for EventQuality {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let r = self.string_repr();
-    //let arg = 
     write!(f, "<EventQuality: {}>", r)
   }
 }
@@ -200,6 +199,9 @@ pub struct MasterTofEvent {
   pub rb_events         : Vec::<RBEvent>,
   pub missing_hits      : Vec::<RBMissingHit>, 
   pub rb_moni           : Vec::<RBMoniData>,
+  
+  // won't get serialized
+  pub creation_time      : Instant,
 }
 
 impl fmt::Display for MasterTofEvent {
@@ -228,6 +230,7 @@ impl Default for MasterTofEvent {
 impl MasterTofEvent {
 
   pub fn new() -> Self {
+    let creation_time = Instant::now();
     Self {
       compression_level : CompressionLevel::Unknown,
       quality           : EventQuality::Unknown,
@@ -235,7 +238,29 @@ impl MasterTofEvent {
       rb_events         : Vec::<RBEvent>::new(),
       missing_hits      : Vec::<RBMissingHit>::new(), 
       rb_moni           : Vec::<RBMoniData>::new(),
+      creation_time     : creation_time,
     }
+  }
+  
+  /// Event can time out after specified time
+  ///
+  pub fn has_timed_out(&self) -> bool {
+    return self.age() > EVENT_TIMEOUT;
+  }
+
+  pub fn age(&self) -> u64 {
+    self.creation_time.elapsed().as_secs()
+  }
+
+  /// Are all expected RBs participating in this event
+  /// actually part of this event?
+  pub fn is_complete(&self) -> bool {
+    let mt_expected_n_paddle = self.mt_event.get_hit_paddles();
+    let mut actual_paddles = 0u8;
+    for ev in self.rb_events.iter() {
+      actual_paddles += ev.nchan/2;
+    }
+    actual_paddles == mt_expected_n_paddle
   }
 
   /// Encode the sizes of the vectors holding the 
@@ -400,7 +425,6 @@ pub struct TofEvent  {
   // after timeout microseconds
   // thus we are saving the time, this isntance has 
   // been created.
-  //pub creation_time      : u128,
   pub creation_time      : Instant,
 
   pub valid              : bool,
@@ -599,6 +623,13 @@ impl From<&MasterTriggerEvent> for TofEvent {
   }
 }
 
+impl From<&MasterTriggerEvent> for MasterTofEvent {
+  fn from(mte : &MasterTriggerEvent) -> Self {
+    let mut te : MasterTofEvent = Default::default();
+    te.mt_event = *mte;
+    te
+  }
+}
 
 
 //

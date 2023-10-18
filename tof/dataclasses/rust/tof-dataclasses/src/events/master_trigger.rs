@@ -308,7 +308,7 @@ pub struct MasterTriggerEvent {
   // package for deletion.
   // Once invalidated, an event 
   // never shall be valid again.
-  valid     : bool,
+  valid        : bool,
   pub broken   : bool
 }
 
@@ -348,7 +348,7 @@ impl MasterTriggerEvent {
     let mut dsi_js = Vec::<(u8,u8,u8)>::new();
     let mut dsi = 1u8;
     let mut j   = 1u8;
-    let mut ch  = 1u8;
+    let mut ch  : u8;
     for k in (0..N_LTBS).rev() {
       if self.board_mask[k] {
         ch = 1;
@@ -624,7 +624,7 @@ impl fmt::Display for MasterTriggerEvent {
     dsi_j.insert(19 , "4/5");
     repr += " ";
     for k in 0..N_LTBS {
-      if (self.board_mask[k]) {
+      if self.board_mask[k] {
         repr += "-X-   ";
         hit_boards.push(k as u8);
       } else {
@@ -637,7 +637,7 @@ impl fmt::Display for MasterTriggerEvent {
       repr += dsi_j[k];
       repr += "\t=> ";
       for j in 0..N_CHN_PER_LTB {
-        if (self.hits[*k as usize][j]) {
+        if self.hits[*k as usize][j] {
           repr += " ";
           repr += &(j + 1).to_string();
           repr += " ";

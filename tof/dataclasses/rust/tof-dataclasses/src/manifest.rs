@@ -567,7 +567,7 @@ impl ReadoutBoard {
     }
   }
  
-  pub fn guess_calibration_file(&self) -> String {
+  pub fn guess_calibration_filename(&self) -> String {
     let mut cali = String::from("");
     cali += "rb_";
     if self.rb_id < 10 {

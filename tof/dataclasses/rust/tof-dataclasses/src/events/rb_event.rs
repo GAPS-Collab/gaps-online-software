@@ -565,6 +565,10 @@ impl RBEvent {
     Ok(DataType::from_u8(&stream[2]))
   }
 
+  /// Get the event id from a RBEvent represented by bytestream
+  /// without decoding the whole event
+  ///
+  /// This should be faster than decoding the whole event.
   pub fn extract_eventid(stream : &Vec<u8>) -> Result<u32, SerializationError> {
     if stream.len() < 28 {
       return Err(SerializationError::StreamTooShort);
@@ -667,6 +671,7 @@ impl RBEvent {
       error!("After parsing the event, we found an invalid tail signature {}", tail);
       return Err(SerializationError::TailInvalid);
     }
+    // FIXME
     // per definition, an RBEvent coming from a bytestream can't have 
     // any paddle packets
     event.n_paddles = 0;
