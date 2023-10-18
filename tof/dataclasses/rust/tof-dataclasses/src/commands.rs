@@ -270,7 +270,7 @@ impl Serialization for RBCommand {
   
   const HEAD : u16 = 0xAAAA;
   const TAIL : u16 = 0x5555;
-  const SIZE : usize = 9; 
+  const SIZE : usize = 11; 
 
   fn from_bytestream(stream    : &Vec<u8>, 
                      pos       : &mut usize) 
