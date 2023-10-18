@@ -343,7 +343,7 @@ fn main() {
         }
       }
     } // end if config from shell
-  }
+  } // end if not systemd process
   
   // Currently, the main thread just listens for SIGTERM and SIGINT.
   // We could give it more to do and save one of the other threads.

@@ -2147,6 +2147,10 @@ pub fn event_processing(bs_recv           : &Receiver<Vec<u8>>,
                       events_not_sent += 1;
                     },
                     Ok (mut event) => {
+                      if event.header.event_id != last_event_id + 1 {
+                        error!("Event id not rising continuously! This {}, last {}", event_id, last_event_id);
+                      }
+                      last_event_id = event_id;
                       event.data_type = data_type;
                       tp = TofPacket::from(&event);
                     }
