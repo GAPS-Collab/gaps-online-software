@@ -35,14 +35,12 @@ use clap::{arg,
            //Command,
            Parser};
 
-//use crossbeam_channel::{unbounded,
-//                        Sender,
-//                        Receiver};
 use crossbeam_channel as cbc; 
 use colored::Colorize;
 
 use tof_dataclasses::events::{MasterTriggerEvent,
-                              MasterTriggerMapping};
+                              MasterTriggerMapping,
+                              RBEvent};
 use tof_dataclasses::threading::ThreadPool;
 use tof_dataclasses::packets::paddle_packet::PaddlePacket;
 use tof_dataclasses::packets::TofPacket;
@@ -57,7 +55,7 @@ use liftof_lib::get_ltb_dsi_j_ch_mapping;
 use liftof_cc::readoutboard_comm::readoutboard_communicator;
 use liftof_cc::event_builder::event_builder;
 use liftof_cc::api::tofcmp_and_mtb_moni;
-use liftof_cc::paddle_packet_cache::paddle_packet_cache;
+//use liftof_cc::paddle_packet_cache::paddle_packet_cache;
 use liftof_cc::flight_comms::global_data_sink;
 
 /*************************************/
@@ -67,10 +65,10 @@ use liftof_cc::flight_comms::global_data_sink;
 struct Args {
   /// Write the raw data from the readoutboards,
   /// one file per readoutboard
-  #[arg(short, long, default_value_t = false)]
-  write_blob: bool,
-  /// Dump the entire TofPacket Stream to a file
   #[arg(long, default_value_t = false)]
+  write_robin: bool,
+  /// Dump the entire TofPacket Stream to a file
+  #[arg(short, long, default_value_t = false)]
   write_stream: bool,
   #[arg(short, long, default_value_t = false)]
   use_master_trigger: bool,
@@ -138,8 +136,8 @@ fn main() {
   //info!("info");
   //debug!("debug");
   //trace!("trace");
-  let write_blob = args.write_blob;
-  if write_blob {
+  let write_robin = args.write_robin;
+  if write_robin {
     info!("Will write blob data to file!");
   }
  
@@ -229,7 +227,7 @@ fn main() {
 
   // Prepare outputfiles
   let mut raw_files_path = PathBuf::from(storage_savepath);
-  if write_blob { 
+  if write_robin { 
     raw_files_path.push(runid.to_string().as_str());
     // Create directory if it does not exist
     // Check if the directory exists
@@ -357,9 +355,11 @@ fn main() {
   let (rate_to_main, _rate_from_mt) : (cbc::Sender<u32>, cbc::Receiver<u32>) = cbc::unbounded();
   // master thread -> event builder ocmmuncations
   let (master_ev_send, master_ev_rec): (cbc::Sender<MasterTriggerEvent>, cbc::Receiver<MasterTriggerEvent>) = cbc::unbounded(); 
+  let (ev_to_builder, ev_from_rb) : (cbc::Sender<RBEvent>, cbc::Receiver<RBEvent>) = cbc::unbounded(); 
   // event builder  <-> paddle cache communications
   let (pp_send, pp_rec) : (cbc::Sender<Option<PaddlePacket>>, cbc::Receiver<Option<PaddlePacket>>) = cbc::unbounded(); 
   // readout boards <-> paddle cache communications 
+  let (ev_to_builder, ev_from_rb) : (cbc::Sender<RBEvent>, cbc::Receiver<RBEvent>) = cbc::unbounded();
   let (rb_send, rb_rec) : (cbc::Sender<PaddlePacket>, cbc::Receiver<PaddlePacket>) = cbc::unbounded();
   // paddle cache <-> event builder communications
   let (id_send, id_rec) : (cbc::Sender<Option<u32>>, cbc::Receiver<Option<u32>>) = cbc::unbounded();
@@ -397,13 +397,13 @@ fn main() {
     });
   }
 
-  println!("==> Starting paddle cache thread...");
-  worker_threads.execute(move || {
-                         paddle_packet_cache(&id_rec,
-                                             &rb_rec,
-                                             &pp_send);
-  });
-  println!("==> paddle cache thread started!");
+  //println!("==> Starting paddle cache thread...");
+  //worker_threads.execute(move || {
+  //                       paddle_packet_cache(&id_rec,
+  //                                           &rb_rec,
+  //                                           &pp_send);
+  //});
+  //println!("==> paddle cache thread started!");
 
   write_stream_path = String::from(stream_files_path.into_os_string().into_string().expect("Somehow the paths are messed up very badly! So I can't help it and I quit!"));
 
@@ -425,19 +425,21 @@ fn main() {
     let mut this_rb = rb_list[n].clone();
     let this_tp_to_sink_clone = tp_to_sink.clone();
     this_rb.infer_ip_address();
-    this_rb.calib_file = calib_file_path.clone() + "/" + "rb";
-    if this_rb.rb_id < 10 {
-      this_rb.calib_file += "0";
-    }
-    this_rb.calib_file += &(this_rb.rb_id).to_string();
-    this_rb.calib_file += "_cal.txt";
+    let cali_fname = this_rb.guess_calibration_filename();
+    this_rb.calib_file = calib_file_path.clone() + &cali_fname;
+    //this_rb.calib_file = calib_file_path.clone() + "/" + "rb";
+    //if this_rb.rb_id < 10 {
+    //  this_rb.calib_file += "0";
+    //}
+    //this_rb.calib_file += &(this_rb.rb_id).to_string();
+    //this_rb.calib_file += "_cal.txt";
     println!("==> Starting RB thread for {}", this_rb);
     let this_path = raw_files_path_string.clone();
+    let ev_to_builder_c = ev_to_builder.clone();
     worker_threads.execute(move || {
-      readoutboard_communicator(this_rb_pp_sender,
-                                //resp_sender_c,
+      readoutboard_communicator(&ev_to_builder_c,
                                 this_tp_to_sink_clone,
-                                write_blob,
+                                write_robin,
                                 &this_path,
                                 &events_per_file,
                                 &this_rb,
@@ -455,16 +457,16 @@ fn main() {
   if use_master_trigger {
     // start the event builder thread
     println!("==> Starting event builder and master trigger threads...");
-    let rb_list_c    = rb_list.clone();
-    let ltb_list_c   = ltb_list.clone();
-    let mapping = MasterTriggerMapping::new(ltb_list_c, rb_list_c);
-    println!("{:?}", mapping.ltb_mapping);
+    //let rb_list_c    = rb_list.clone();
+    //let ltb_list_c   = ltb_list.clone();
+    //let mapping = MasterTriggerMapping::new(ltb_list_c, rb_list_c);
+    //println!("{:?}", mapping.ltb_mapping);
     //exit(0);
     let cmd_sender_2 = cmd_sender.clone();
     worker_threads.execute(move || {
                            event_builder(&master_ev_rec,
                                          &id_send,
-                                         &pp_rec,
+                                         &ev_from_rb,
                                          &tp_to_sink);
     });
     // master trigger
