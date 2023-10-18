@@ -566,6 +566,18 @@ impl ReadoutBoard {
       trig_ch_mask  : [false;8],
     }
   }
+ 
+  pub fn guess_calibration_file(&self) -> String {
+    let mut cali = String::from("");
+    cali += "rb_";
+    if self.rb_id < 10 {
+      cali += "0";
+    }
+    cali += &self.rb_id.to_string();
+    cali += ".cali.tof.gaps";
+    cali
+  }
+
 
   pub fn infer_ip_address(&mut self) {
     let address = 100 + self.rb_id;
