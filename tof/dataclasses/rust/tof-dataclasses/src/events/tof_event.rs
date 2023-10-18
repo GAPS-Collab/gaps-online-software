@@ -199,7 +199,6 @@ pub struct MasterTofEvent {
   pub mt_event          : MasterTriggerEvent,
   pub rb_events         : Vec::<RBEvent>,
   pub missing_hits      : Vec::<RBMissingHit>, 
-  pub paddle_packets    : Vec::<PaddlePacket>,
   pub rb_moni           : Vec::<RBMoniData>,
 }
 
@@ -210,13 +209,11 @@ impl fmt::Display for MasterTofEvent {
             \t quality   : {}
             \t n_boards  : {}
             \t miss_hits : {}
-            \t n_paddles : {}
             \t n_moni    : {}>"
             ,self.mt_event.event_id,
             self.quality,
             self.rb_events.len(),
             self.missing_hits.len(),
-            self.paddle_packets.len(),
             self.rb_moni.len())
   }
 }
@@ -237,41 +234,36 @@ impl MasterTofEvent {
       mt_event          : MasterTriggerEvent::new(0,0),
       rb_events         : Vec::<RBEvent>::new(),
       missing_hits      : Vec::<RBMissingHit>::new(), 
-      paddle_packets    : Vec::<PaddlePacket>::new(),
       rb_moni           : Vec::<RBMoniData>::new(),
     }
   }
 
   /// Encode the sizes of the vectors holding the 
-  /// rb events and paddle packets into a u32
+  /// into an u32
   ///
   /// We have one byte (256) max length per vector.
   pub fn construct_sizes_header(&self) -> u32 {
      let rb_event_len = self.rb_events.len() as u32;
      let miss_len     = self.missing_hits.len() as u32;
-     let pp_len       = self.paddle_packets.len() as u32;
      let moni_len     = self.rb_moni.len() as u32;
      let mut mask     = 0u32;
      mask = mask | rb_event_len;
      mask = mask | (miss_len << 8);
-     mask = mask | (pp_len   << 16);
-     mask = mask | (moni_len << 24);
+     mask = mask | (moni_len << 16);
      mask
   }
 
   pub fn decode_size_header(mask : &u32) 
-    -> (usize, usize, usize, usize) {
+    -> (usize, usize, usize) {
     let rb_event_len = (mask & 0xFF)        as usize;
     let miss_len     = ((mask & 0xFF00)     >> 8)  as usize;
-    let pp_len       = ((mask & 0xFF0000)   >> 16) as usize;
-    let moni_len     = ((mask & 0xFF000000) >> 24) as usize;
-    (rb_event_len, miss_len, pp_len, moni_len)
+    let moni_len     = ((mask & 0xFF0000)   >> 16) as usize;
+    (rb_event_len, miss_len, moni_len)
   }
   
   pub fn get_combined_vector_sizes(&self) -> usize {
     self.rb_events.len() 
     + self.missing_hits.len() 
-    + self.paddle_packets.len()
     + self.rb_moni.len()
   }
 }
@@ -294,9 +286,6 @@ impl Serialization for MasterTofEvent {
     }
     for k in 0..self.missing_hits.len() {
       stream.extend_from_slice(&self.missing_hits[k].to_bytestream());
-    }
-    for _k in 0..self.paddle_packets.len() {
-      //stream.extend_from_slice(&self.paddle_packets[k].to_bytestream());
     }
     for k in 0..self.rb_moni.len() {
       stream.extend_from_slice(&self.rb_moni[k].to_bytestream());
@@ -331,18 +320,9 @@ impl Serialization for MasterTofEvent {
         }
       }
     }
-    for _ in 0..v_sizes.2 {
-      //match PaddlePacket::from_bytestream(stream, pos) {
-      //  Err(err) => error!("Expected PaddlePacket {} of {}, but got serialization error {}!", k,  v_sizes.2, err),
-      //  Ok(pp) => {
-      //    event.paddle_packets.push(pp);
-      //  }
-      //}
-      //event.paddle_packets(PaddlePacket::from_bytestream(stream, pos));
-    }
-    for k in 0..v_sizes.3 {
+    for k in 0..v_sizes.2 {
       match RBMoniData::from_bytestream(stream, pos) {
-        Err(err) => error!("Expected RBMoniPacket {} of {}, but got serialization error {}!", k,  v_sizes.3, err),
+        Err(err) => error!("Expected RBMoniPacket {} of {}, but got serialization error {}!", k,  v_sizes.2, err),
         Ok(moni) => {
           event.rb_moni.push(moni);
         }
