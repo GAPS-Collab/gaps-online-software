@@ -24,6 +24,8 @@ use crate::serialization::{Serialization,
                            SerializationError};
 use crate::events::RBEvent;
 use crate::events::rb_event::unpack_traces_f32;
+use crate::packets::{PacketType,
+                     TofPacket};
 use crate::io::read_file;
 
 #[cfg(feature = "random")] 
@@ -1123,12 +1125,24 @@ impl From<&Path> for RBCalibrations {
           error!("Can not open {}! Err {err}", path.display());
         },
         Ok(stream) => {
-          match RBCalibrations::from_bytestream(&stream, &mut 0) {
+          // assume this is wrapped in a tof packet
+          match TofPacket::from_bytestream(&stream, &mut 0) {
             Err(err) => {
-              error!("Can not read calibration from binary file {}, Error {err}!", path.display());
-            },
-            Ok(c) => {
-              cali = c;
+              error!("Can not read TofPacket, error {err}");
+            }
+            Ok(pk) => {
+              if pk.packet_type != PacketType::RBCalibration {
+                error!("TofPacket does not contain calibration data! Packet: {}", pk);
+                return cali;
+              }
+              match RBCalibrations::from_bytestream(&pk.payload, &mut 0) {
+                Err(err) => {
+                  error!("Can not read calibration from binary file {}, Error {err}!", path.display());
+                },
+                Ok(c) => {
+                  cali = c;
+                }
+              }
             }
           }
         }
