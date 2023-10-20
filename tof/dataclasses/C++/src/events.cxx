@@ -110,6 +110,7 @@ RBEventHeader::RBEventHeader() {
   is_locked          = false; 
   is_locked_last_sec = false;
   lost_trigger       = false;
+  event_fragment     = false;
   fpga_temp          = 0;
   event_id           = 0; 
   rb_id              = 0; 
@@ -126,6 +127,7 @@ std::string RBEventHeader::to_string() const {
   repr += "\n\t is locked "       + std::to_string(is_locked)             ;
   repr += "\n\t is locked (1s) "  + std::to_string(is_locked_last_sec)    ;
   repr += "\n\t lost trigger "    + std::to_string(lost_trigger)          ;
+  repr += "\n\t event fragment "  + std::to_string(event_fragment)        ;
   repr += "\n\t channel mask "    + std::to_string(channel_mask)          ;
   repr += "\n\t stop cell "       + std::to_string(stop_cell)             ;
   repr += "\n\t crc32 "           + std::to_string(crc32)                 ;
@@ -152,6 +154,7 @@ RBEventHeader RBEventHeader::from_bytestream(const Vec<u8> &stream,
   header.is_locked           = Gaps::parse_bool(stream, pos);
   header.is_locked_last_sec  = Gaps::parse_bool(stream, pos);
   header.lost_trigger        = Gaps::parse_bool(stream, pos);
+  header.event_fragment      = Gaps::parse_bool(stream, pos);
   header.fpga_temp           = Gaps::parse_u16(stream , pos);  
   header.event_id            = Gaps::parse_u32(stream , pos);  
   header.rb_id               = Gaps::parse_u8(stream  , pos);  
@@ -226,6 +229,7 @@ RBEventHeader RBEventHeader::extract_from_rbbinarydump(const Vec<u8> &bs,
   header.lost_trigger = (status & 2 ) == 2;
   header.is_locked    = (status & 4 ) == 4;
   header.is_locked_last_sec = (status & 8) == 8;
+  header.event_fragment = (status & 1 ) == 1;
   header.fpga_temp    = (status >> 4); 
   
   pos += 2 + 2 + 8 + 2 + 1; // skip len, roi, dna, fw hash and reserved part of rb_id
@@ -270,6 +274,9 @@ RBEventHeader RBEventHeader::extract_from_rbbinarydump(const Vec<u8> &bs,
 
 RBEvent::RBEvent() {  
   header = RBEventHeader();
+  data_type = 0;
+  nchan     = 0;
+  npaddles  = 0;
   adc    = Vec<Vec<u16>>(); 
   for (usize k=0; k<NCHN; k++) {
     adc.push_back(Vec<u16>(NWORDS/2,0));
@@ -328,15 +335,17 @@ RBEvent RBEvent::from_bytestream(const Vec<u8> &stream,
   if (head != RBEvent::HEAD)  {
     spdlog::error("No header signature found!");  
   }
-  event.header   = RBEventHeader::from_bytestream(stream, pos);
+  event.data_type = Gaps::parse_u8(stream, pos);
+  event.nchan     = Gaps::parse_u8(stream, pos);
+  event.npaddles  = Gaps::parse_u8(stream, pos); 
+  event.header    = RBEventHeader::from_bytestream(stream, pos);
   spdlog::debug("Decoded RBEventHeader!");
-  Vec<u8> ch_ids = event.header.get_active_data_channels();
-  for (auto k : ch_ids) {
-    spdlog::debug("Found active data channel {}!", k);
+  for (usize ch=0; ch<event.nchan; ch++) {
+    spdlog::debug("Found active data channel {}!", ch);
     Vec<u8>::const_iterator start = stream.begin() + pos;
     Vec<u8>::const_iterator end   = stream.begin() + pos + 2*NWORDS;    // 2*NWORDS because stream is Vec::<u8> and it is 16 bit words.
     Vec<u8> data(start, end);
-    event.adc[(k-1)] = u8_to_u16(data);
+    event.adc[ch] = u8_to_u16(data);
     pos += 2*NWORDS;
   }
   u16 tail = Gaps::parse_u16(stream, pos);

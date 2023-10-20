@@ -115,16 +115,6 @@ String rbeventmemoryview_to_string(const RBEventMemoryView &event) {
 
 /***********************************************/
 
-
-String rbevent_to_string(const RBEvent &event) {
-  String repr = "<RBEvent\n";
-  repr += ">";
-  return repr;
-}
-
-/***********************************************/
-
-
 py::array_t<f32> wrap_rbcalibration_voltages_rbevent(const RBCalibration& calib, const RBEvent& event, const u8 channel) {
   if (event.header.rb_id != calib.rb_id) {
     String message = "This is calibration for board " + std::to_string(calib.rb_id) + " but the event is from board " + std::to_string(event.header.rb_id);

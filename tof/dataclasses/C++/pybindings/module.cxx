@@ -419,6 +419,7 @@ PYBIND11_MODULE(gaps_tof, m) {
       .def_readonly("is_locked"          , &RBEventHeader::is_locked   )   
       .def_readonly("is_locked_last_sec" , &RBEventHeader::is_locked_last_sec)   
       .def_readonly("lost_trigger"       , &RBEventHeader::lost_trigger)   
+      .def_readonly("event_fragment"     , &RBEventHeader::event_fragment)   
       .def_readonly("fpga_temp"          , &RBEventHeader::fpga_temp   )   
       .def_readonly("event_id"           , &RBEventHeader::event_id    )   
       .def_readonly("rb_id"              , &RBEventHeader::rb_id       )   
@@ -435,6 +436,8 @@ PYBIND11_MODULE(gaps_tof, m) {
     py::class_<RBEvent>(m, "RBEvent", "RBEvent contains an event header for this specific board as well as a (flexible) number of adc channels")
         .def(py::init())
         .def_readonly("header"              ,&RBEvent::header)
+        .def_readonly("nchan"               ,&RBEvent::nchan)
+        .def_readonly("npaddles"            ,&RBEvent::npaddles)
         .def("get_channel_adc"              ,&RBEvent::get_channel_adc,
                                              "Get the ADC values for a specific channel. Channel ids go from 1-9",
                                              py::arg("channel"),
@@ -442,7 +445,7 @@ PYBIND11_MODULE(gaps_tof, m) {
         .def("from_bytestream"              ,&RBEvent::from_bytestream,
                                              "Decode the RBEvent from a list of bytes")
     .def("__repr__",          [](const RBEvent &ev) {
-                                 return rbevent_to_string(ev); 
+                                 return ev.to_string(); 
                               }) 
 
     ;

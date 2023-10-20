@@ -95,6 +95,7 @@ struct RBEventHeader {
   bool is_locked             ;
   bool is_locked_last_sec    ;
   bool lost_trigger          ;
+  bool event_fragment        ;
   u16  fpga_temp             ;
   u32  event_id              ;
   u8   rb_id                 ;
@@ -138,9 +139,17 @@ struct RBEventHeader {
 struct RBEvent {
   static const u16 HEAD = 0xAAAA;
   static const u16 TAIL = 0x5555;
- 
+
+  // data type will be an enum
+  u8 data_type;
+  // number of channels in this event
+  u8 nchan;
+  // number of paddle packets in this event
+  u8 npaddles; 
   RBEventHeader header;
   Vec<Vec<u16>> adc; 
+
+  // FIXME - needs paddle packet extension
  
   RBEvent();
 

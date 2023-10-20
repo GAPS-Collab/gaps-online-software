@@ -28,8 +28,6 @@ String rbeventmemoryview_to_string(const RBEventMemoryView &event);
 
 String tofevent_to_string(const TofEvent &event);
 
-String rbevent_to_string(const RBEvent &event);
-
 py::array_t<f32> wrap_rbcalibration_voltages_rbevent(const RBCalibration& calib, const RBEvent& event, const u8 channel);
 
 py::array_t<f32> wrap_rbcalibration_voltages_rbeventmemoryview(const RBCalibration& calib, const RBEventMemoryView& event, const u8 channel);
