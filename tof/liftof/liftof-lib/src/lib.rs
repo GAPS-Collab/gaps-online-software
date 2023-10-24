@@ -764,7 +764,7 @@ pub fn readoutboard_commander(cmd : &Receiver<TofPacket>){
           PacketType::TofCommand => {
             info!("Received TofCommand! Broadcasting to all TOF entities who are listening!");
             let mut payload  = String::from("BRCT").into_bytes();
-            payload.append(&mut packet.payload);
+            payload.append(&mut packet.to_bytestream());
             match data_socket.send(&payload,0) {
               Err(err) => error!("Unable to send command! Error {err}"),
               Ok(_)    => info!("BRCT command sent!")
@@ -780,8 +780,8 @@ pub fn readoutboard_commander(cmd : &Receiver<TofPacket>){
                 let mut payload = payload_str.into_bytes();
                 payload.append(&mut packet.payload);
                 match data_socket.send(&payload,0) {
-                  Err(err) => error!("Unable to send command! Error {err}"),
-                  Ok(_)    => info!("RBcommand sent to RB {}!", rb_cmd.rb_id)
+                  Err(err) => error!("Unable to send command {}! Error {err}", rb_cmd),
+                  Ok(_)    => info!("Making event request! {}", rb_cmd)
                 }
               }
               Err(err) => {
@@ -1256,9 +1256,11 @@ pub fn master_trigger(mt_ip          : &str,
     }
     for k in rbs_ch.keys() { 
       let mut rb_cmd = RBCommand::new();
+      rb_cmd.command_code = RBCommand::REQUEST_EVENT;
       rb_cmd.payload = ev.event_id;
       rb_cmd.rb_id   = *k;
       for ch in rbs_ch[&k].iter() {
+        println!("{}", ch);
         rb_cmd.channel_mask = rb_cmd.channel_mask | 2u8.pow((ch -1).into());
       }    
       let request_pk = TofPacket::from(&rb_cmd);
