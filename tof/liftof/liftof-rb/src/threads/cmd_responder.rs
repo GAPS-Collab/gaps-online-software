@@ -34,17 +34,16 @@ pub fn cmd_responder(cmd_server_ip             : String,
                      heartbeat_timeout_seconds : u32,
                      run_config_file           : &Path,
                      run_config                : &Sender<RunConfig>,
-                     evid_to_cache             : &Sender<u32>) {
-                     //cmd_sender   : &Sender<TofCommand>) {
+                     ev_request_to_cache       : &Sender<TofPacket>) {
   // create 0MQ sockedts
   //let one_milli       = time::Duration::from_millis(1);
   let cmd_address = String::from("tcp://") + &cmd_server_ip + ":" + &DATAPORT.to_string() ;
-  // we will subscribe to two types of messages, BDCT and RB + 2 digits 
+  // we will subscribe to two types of messages, BRCT and RB + 2 digits 
   // of board id
   let mut topic_board = String::from("RB");
   // FIXME: Unsure what to do. We migt as well fail here, 
   // since if we don't get the board id, we won't be 
-  // receiving requests.
+  // receiving requests and basically run rogue.
   let brd_id = get_board_id().expect("Can not get board id!");
   //let topic_board = get_board_id().expect("Can not get board id!")
   //                  .to_string();
@@ -54,6 +53,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
   topic_board += &brd_id.to_string();
   let topic_broadcast = String::from("BRCT");
   let ctx = zmq::Context::new();
+  // I guess expect is fine here, see above
   let cmd_socket = ctx.socket(zmq::SUB).expect("Unable to create 0MQ SUB socket!");
   info!("Will set up 0MQ SUB socket to listen for commands at address {cmd_address}");
   let mut is_connected = false;
@@ -65,7 +65,6 @@ pub fn cmd_responder(cmd_server_ip             : String,
     }
   }
   if is_connected {
-    //cmd_socket.set_subscribe(&my_topic.as_bytes());
     match cmd_socket.set_subscribe(&topic_broadcast.as_bytes()) {
       Err(err) => error!("Can not subscribe to {topic_broadcast}, err {err}"),
       Ok(_)    => ()
@@ -76,21 +75,13 @@ pub fn cmd_responder(cmd_server_ip             : String,
     }
   }
   
-  //let my_topic = String::from("");
-  //.as_bytes();
-  //cmd_socket.set_subscribe(&my_topic.as_bytes());
-  
-  //match cmd_socket.set_subscribe(&topic_broadcast.as_bytes()) {
-  //  Err(err) => error!("Unable to subscribe to {topic_broadcast}, error {err}"),
-  //  Ok(_) => ()
-  //}
-  //match cmd_socket.set_subscribe(&topic_board.as_bytes()) {
-  //  Err(err) => error!("Unable to subscribe to {topic_board}, error {err}"),
-  //  Ok(_) => ()
-  //}
   let mut heartbeat     = Instant::now();
 
-  error!("TODO: Heartbeat feature not yet implemented on C&C side");
+  // I don't know if we need this, maybe the whole block can go away.
+  // Originally I thought the RBs get pinged every x seconds and if we
+  // don't see the ping, we reconnect to the socket. But I don't know
+  // if that scenario actually occurs.
+  warn!("TODO: Heartbeat feature not yet implemented on C&C side");
   let heartbeat_received = false;
   loop {
     if !heartbeat_received {
@@ -108,7 +99,6 @@ pub fn cmd_responder(cmd_server_ip             : String,
           }
         }
         if is_connected {
-          //cmd_socket.set_subscribe(&my_topic.as_bytes());
           match cmd_socket.set_subscribe(&topic_broadcast.as_bytes()) {
             Err(err) => error!("Can not subscribe to {topic_broadcast}, err {err}"),
             Ok(_)    => ()
@@ -126,6 +116,11 @@ pub fn cmd_responder(cmd_server_ip             : String,
       continue;
     }
 
+    // Not sure how to deal with the connection. Poll? Or wait blocking?
+    // Or don't block? Set a timeout? I guess technically since we are not doing
+    // anything else here, we can block until we get something, this saves resources.
+    // (in that case the DONTWAIT can go away)
+    //
     //match cmd_socket.poll(zmq::POLLIN, 1) {
     //  Err(err) => {
     //    warn!("Polling the 0MQ command socket failed! Err: {err}");
@@ -144,8 +139,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
         // it will always be a tof packet
         match TofPacket::from_bytestream(&cmd_bytes, &mut 4) {
           Err(err) => {
-            error!("Can not decode TofPacket! {:?}", cmd_bytes);
-            error!("Can not decode TofPacket! Err {err}");
+            error!("Can not decode TofPacket! bytes {:?}, error {err}", cmd_bytes);
           },
           Ok(tp) => {
             match tp.packet_type {
@@ -220,15 +214,6 @@ pub fn cmd_responder(cmd_server_ip             : String,
                         }
                         continue;
                       },
-                      TofCommand::RequestWaveforms (eventid) => {
-                        trace!("Requesting waveforms for event {eventid}");
-                        error!("Not implemented");
-                        match cmd_socket.send(resp_not_implemented,0) {
-                          Err(err) => warn!("Can not send response! Err {err}"),
-                          Ok(_)    => trace!("Resp sent!")
-                        }
-                        continue;
-                      },
                       TofCommand::UnspoolEventCache   (_) => {
                         warn!("Not implemented");
                         match cmd_socket.send(resp_not_implemented,0) {
@@ -269,14 +254,8 @@ pub fn cmd_responder(cmd_server_ip             : String,
                       TofCommand::DataRunStart (_max_event) => {
                         // let's start a run. The value of the TofCommnad shall be 
                         // nevents
-                        println!("Will initialize new run!");
+                        println!("==> Will initialize new run!");
                         let rc    = get_runconfig(&run_config_file);
-                        //if rc.stream_any {
-                        //  match op_mode.send(TofOperationMode::StreamAny) {
-                        //    Err(err) => error!("Can not set TofOperationMode to StreamAny! Err {err}"),
-                        //    Ok(_)    => info!("Using RBMode STREAM_ANY")
-                        //  }
-                        //}
                         match run_config.send(rc) {
                           Err(err) => error!("Error initializing run! {err}"),
                           Ok(_)    => ()
@@ -305,6 +284,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
                       //  self.kill_chn.send(true);
                       //  return Ok(TofResponse::Success(RESP_SUCC_FINGERS_CROSSED));
                       },
+                      // Voltage and timing calibration is connected now
                       TofCommand::VoltageCalibration (_) => {
                         warn!("Not implemented");
                         match cmd_socket.send(resp_not_implemented,0) {
@@ -329,18 +309,6 @@ pub fn cmd_responder(cmd_server_ip             : String,
                         }
                         continue;
                       },
-                      TofCommand::RequestEvent(eventid) => {
-                        match evid_to_cache.send(eventid) {
-                          Err(err) => {
-                            error!("Problem sending event id to cache! Err {err}");
-                            //return Ok(TofResponse::GeneralFail(*eventid));
-                          },
-                          Ok(event) => {
-                            error!("Noting implemented yet. Have found event {:?} though", event);
-                          }
-                        }
-                        //continue;
-                      },
                       TofCommand::RequestMoni (_) => {
                         warn!("Not implemented");
                         match cmd_socket.send(resp_not_implemented,0) {
@@ -358,11 +326,11 @@ pub fn cmd_responder(cmd_server_ip             : String,
                         continue;
                       }
                       _ => {
-                      match cmd_socket.send(resp_not_implemented,0) {
-                        Err(err) => warn!("Can not send response! Error {err}"),
-                        Ok(_)    => trace!("Resp sent!")
-                      }
-                      continue;
+                        match cmd_socket.send(resp_not_implemented,0) {
+                          Err(err) => warn!("Can not send response! Error {err}"),
+                          Ok(_)    => trace!("Resp sent!")
+                        }
+                        continue;
                       }
                     } 
                  
@@ -386,10 +354,20 @@ pub fn cmd_responder(cmd_server_ip             : String,
                     //}
                   }
                 }  
-
-
               },
               PacketType::RBCommand  => {
+                info!("Received RBCommand!");
+                // just forward the packet now, the cache 
+                // can understand if it is an event request or not
+                ev_request_to_cache.send(tp);
+                // FIXME - notify this about TofOperation mode.
+                // if the TofOperation mode is StreamAny, 
+                // we won't do this.
+                // It might not needed, since if we are in 
+                // StreamAny mode, we should not be sending 
+                // these requests from the C&C server.
+              
+                // FIXME - do we want to acknowledge this?
               },
               _ => {
                 error!("Can not respond to {}", tp);
@@ -397,7 +375,6 @@ pub fn cmd_responder(cmd_server_ip             : String,
             }
           }
         }
-
       }
     }
   }

@@ -411,8 +411,6 @@ pub fn get_runconfig(rcfile : &Path) -> RunConfig {
     }
     Ok(rc_from_file) => {
       println!("==> Found configuration file {}!", rcfile.display());
-      println!("==> [WARN] - Currently, only the active channel mask will be parsed from the config file!");
-      println!("==> [WARN/TODO] - This is WORK-IN-PROGRESS!");
       match RunConfig::from_json(&rc_from_file) {
         Err(err) => panic!("Can not read json from configuration file. Error {err}"),
         Ok(rc_json) => {
@@ -961,16 +959,16 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
           terminate  = true;
           continue;
         }
-        // from here on, we prepare to start 
-        // a new run with this RunConfig!
-        // set the channel mask
-        match set_active_channel_mask(rc.active_channel_mask) { 
-        //match set_active_channel_mask_with_ch9(rc.active_channel_mask as u32) {
-          Ok(_) => (),
-          Err(err) => {
-            error!("Unable to set channel mask! Err {err}");
-          }
-        }
+        //// from here on, we prepare to start 
+        //// a new run with this RunConfig!
+        //// set the channel mask
+        //match set_active_channel_mask(rc.active_channel_mask) { 
+        ////match set_active_channel_mask_with_ch9(rc.active_channel_mask as u32) {
+        //  Ok(_) => (),
+        //  Err(err) => {
+        //    error!("Unable to set channel mask! Err {err}");
+        //  }
+        //}
         reset_dma_and_buffers();
 
         // deal with the individual settings:
@@ -1241,16 +1239,19 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
 /// they are in the cache, else None
 ///
 /// # Arguments
+/// 
+/// * tp_recv           : receive tofpackets from the commander/
+///                       or event processing
+///
 ///
 /// * control_ch : Receive operation mode instructions
 ///
 /// * waveform_analysis : For the events requested, do the waveform processing 
 ///                         already
-pub fn event_cache(tp_recv      : Receiver<TofPacket>,
-                   tp_to_pub    : &Sender<TofPacket>,
-                   resp_to_cmd  : &Sender<TofResponse>,
-                   get_op_mode  : &Receiver<TofOperationMode>, 
-                   recv_evid    : Receiver<u32>,
+pub fn event_cache(tp_recv           : Receiver<TofPacket>,
+                   tp_to_pub         : &Sender<TofPacket>,
+                   resp_to_cmd       : &Sender<TofResponse>,
+                   get_op_mode       : &Receiver<TofOperationMode>, 
                    waveform_analysis : bool,
                    cache_size   : usize) {
   if waveform_analysis {
@@ -1261,7 +1262,8 @@ pub fn event_cache(tp_recv      : Receiver<TofPacket>,
   let mut op_mode_stream = false;
 
   let mut oldest_event_id : u32 = 0;
-  let mut event_cache : HashMap::<u32, TofPacket> = HashMap::new();
+  let mut event_cache   : HashMap::<u32, TofPacket> = HashMap::new();
+  let mut request_cache : HashMap::<u32, u8> = HashMap::new();
   loop {
     // check changes in operation mode
     match get_op_mode.try_recv() {
@@ -1284,10 +1286,31 @@ pub fn event_cache(tp_recv      : Receiver<TofPacket>,
         // packet type is
         let packet_evid : u32;
         match packet.packet_type {
-          PacketType::RBEvent => {
+          PacketType::RBCommand => {
+            // this will be the event requests
+            match RBCommand::from_bytestream(&packet.payload, &mut 0) {
+              Err(err) => {
+                error!("Unable to understand bytestream! Err {err}");
+                continue;
+              }
+              Ok(request) => {
+                // if we can serve the request, we are good, if not we put it in the 
+                // queue
+                if request.command_code != RBCommand::REQUEST_EVENT {
+                  error!("Can't deal with RBCommand {}", request);
+                  continue;
+                }
+                if !request_cache.contains_key(&request.payload) {
+                  request_cache.insert(request.payload, request.channel_mask);
+                }
+                continue;
+              }
+            }
+          },
+          PacketType::RBEvent   => {
             // FIXME - proper matching, however, if implemented
             // correctly this should never fail since broken 
-            // packets should not end up in te cache
+            // packets should not end up in the cache
             packet_evid = RBEvent::extract_eventid(&packet.payload).unwrap_or(0);
           },
           PacketType::RBEventHeader => {
@@ -1362,37 +1385,37 @@ pub fn event_cache(tp_recv      : Receiver<TofPacket>,
     }
     // this is the call/response
     // case
-    match recv_evid.try_recv() {
-      Err(err) => {
-        trace!("Issue receiving event id! Err: {err}");
-      },
-      Ok(event_id) => {
-        let has_it = event_cache.contains_key(&event_id);
-        if !has_it {
-          let resp = TofResponse::EventNotReady(event_id);
-          match resp_to_cmd.try_send(resp) {
-            Err(err) => trace!("Error informing the commander that we don't have that! Err {err}"),
-            Ok(_)    => ()
-          }
-          // hamwanich
-          warn!("We don't have {event_id}!");
-        } else {
-          let tp = event_cache.remove(&event_id).unwrap();
-          let resp =  TofResponse::Success(event_id);
-          match resp_to_cmd.try_send(resp) {
-            Err(err) => trace!("Error informing the commander that we do have {event_id}! Err {err}"),
-            Ok(_)    => ()
-          }
-          match tp_to_pub.try_send(tp) {
-            Err(err) => trace!("Error sending! {err}"),
-            Ok(_)    => ()
-          }
-        }
-      }
-    } // end match
-    if n_send_errors > 0 {
-      warn!("There were {n_send_errors} errors during sending!");
-    }
+    //match recv_evid.try_recv() {
+    //  Err(err) => {
+    //    trace!("Issue receiving event id! Err: {err}");
+    //  },
+    //  Ok(event_id) => {
+    //    let has_it = event_cache.contains_key(&event_id);
+    //    if !has_it {
+    //      let resp = TofResponse::EventNotReady(event_id);
+    //      match resp_to_cmd.try_send(resp) {
+    //        Err(err) => trace!("Error informing the commander that we don't have that! Err {err}"),
+    //        Ok(_)    => ()
+    //      }
+    //      // hamwanich
+    //      warn!("We don't have {event_id}!");
+    //    } else {
+    //      let tp = event_cache.remove(&event_id).unwrap();
+    //      let resp =  TofResponse::Success(event_id);
+    //      match resp_to_cmd.try_send(resp) {
+    //        Err(err) => trace!("Error informing the commander that we do have {event_id}! Err {err}"),
+    //        Ok(_)    => ()
+    //      }
+    //      match tp_to_pub.try_send(tp) {
+    //        Err(err) => trace!("Error sending! {err}"),
+    //        Ok(_)    => ()
+    //      }
+    //    }
+    //  }
+    //} // end match
+    //if n_send_errors > 0 {
+    //  warn!("There were {n_send_errors} errors during sending!");
+    //}
   } // end loop
 }
 
@@ -1839,7 +1862,7 @@ pub fn event_processing(bs_recv           : &Receiver<Vec<u8>>,
             }
           } // end match search_for_u16 
         } // end 'bytestream loop
-        info!("Send {packets_in_stream} packets for this bytestream of len {}", bytestream.len());
+        info!("We have sent {packets_in_stream} packets for this bytestream of len {}", bytestream.len());
       }, // end OK(recv)
       Err(err) => {
         error!("Received Garbage! Err {err}");
@@ -1911,7 +1934,7 @@ pub fn setup_drs4() -> Result<(), RegisterError> {
   // takes a bit until the blob
   // buffers reset. Let's try a 
   // few times
-  info!("Resetting blob buffers..");
+  info!("Resetting event memory buffers..");
   for _ in 0..5 {
     reset_ram_buffer_occ(&buf_a)?;
     thread::sleep(one_milli);
@@ -1929,8 +1952,9 @@ pub fn setup_drs4() -> Result<(), RegisterError> {
     write_control_reg(0x40, value)?;
     thread::sleep(one_milli);
   }
-  
-  set_readout_all_channels_and_ch9()?;
+ 
+  // we don't want to do that anymore
+  //set_readout_all_channels_and_ch9()?;
   thread::sleep(one_milli);
   set_master_trigger_mode()?;
   thread::sleep(one_milli);
