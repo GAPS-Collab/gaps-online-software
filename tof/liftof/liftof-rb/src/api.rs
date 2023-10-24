@@ -604,14 +604,17 @@ pub fn cmd_responder(cmd_server_ip             : String,
         // it will always be a tof packet
         match TofPacket::from_bytestream(&cmd_bytes, &mut 4) {
           Err(err) => {
+            error!("Can not decode TofPacket! {:?}", cmd_bytes);
             error!("Can not decode TofPacket! Err {err}");
           },
           Ok(tp) => {
             match tp.packet_type {
               PacketType::TofCommand => {
                 // we have to strip off the topic
-                match TofCommand::from_bytestream(&cmd_bytes, &mut 4) {
-                  Err(err) => error!("Problem decoding command {}", err),
+                match TofCommand::from_bytestream(&tp.payload, &mut 0) {
+                  Err(err) => {
+                    error!("Problem decoding command {}", err);
+                  }
                   Ok(cmd)  => {
                     // we got a valid tof command, forward it and wait for the 
                     // response
@@ -896,7 +899,7 @@ pub fn data_publisher(data           : &Receiver<TofPacket>,
   let board_id = address_ip.split_off(address_ip.len() -2);
   let blobfile_name = "rb_".to_owned()
                        + &board_id.to_string()
-                       + file_suffix.unwrap_or(".robin");
+                       + file_suffix.unwrap_or(".gaps.tof");
 
   let blobfile_path = Path::new(&blobfile_name);
   
@@ -1239,7 +1242,7 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
               bs_sender               : &Sender<Vec<u8>>,
               dtf_to_evproc           : &Sender<(DataType,DataFormat)>,
               opmode_to_cache         : &Sender<TofOperationMode>,
-              show_progress           : bool) { // FIXME deprecate this..
+              show_progress           : bool) { 
   
   let one_milli        = time::Duration::from_millis(1);
   let one_sec          = time::Duration::from_secs(1);
@@ -1343,7 +1346,8 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
         // from here on, we prepare to start 
         // a new run with this RunConfig!
         // set the channel mask
-        match set_active_channel_mask_with_ch9(rc.active_channel_mask as u32) {
+        match set_active_channel_mask(rc.active_channel_mask) { 
+        //match set_active_channel_mask_with_ch9(rc.active_channel_mask as u32) {
           Ok(_) => (),
           Err(err) => {
             error!("Unable to set channel mask! Err {err}");
@@ -1363,13 +1367,7 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
           uio1_total_size = buffer_trip;
           uio2_total_size = buffer_trip;
         }
-        // set channel mask (if different from 255)
-        //match set_active_channel_mask(rc.active_channel_mask) {
-        //  Ok(_) => (),
-        //  Err(err) => {
-        //    error!("Setting active channel mask failed for mask {}, error {}", rc.active_channel_mask, err);
-        //  }
-        //}
+        
         let mut tof_op_mode = TofOperationMode::RequestReply;
         if rc.stream_any {
           tof_op_mode = TofOperationMode::StreamAny;
@@ -1432,7 +1430,7 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
         // this basically signals "RUNSTART"
         match enable_trigger() {
           Err(err) => error!("Can not enable triggers! Err {err}"),
-          Ok(_)    => info!("(Forced) Triggers enabled - Run start!")
+          Ok(_)    => info!("Triggers enabled - Run start!")
         }
         // FIXME - only if above call Ok()
         is_running = true;
@@ -2061,7 +2059,8 @@ pub fn ram_buffer_handler(buff_trip     : usize,
 ///
 pub fn event_processing(bs_recv           : &Receiver<Vec<u8>>,
                         tp_sender         : &Sender<TofPacket>,
-                        dtf_fr_runner     : &Receiver<(DataType,DataFormat)>) {
+                        dtf_fr_runner     : &Receiver<(DataType,DataFormat)>,
+                        verbose           : bool) {
   let mut n_events : u32;
   let mut event_id : u32 = 0;
   let mut last_event_id   : u32 = 0; // for checks
@@ -2069,6 +2068,7 @@ pub fn event_processing(bs_recv           : &Receiver<Vec<u8>>,
   let mut data_type   : DataType   = DataType::Unknown;
   let mut data_format : DataFormat = DataFormat::Unknown; 
   let one_milli   = time::Duration::from_millis(1);
+  let mut skipped_events : usize = 0;
   'main : loop {
     let mut start_pos : usize = 0;
     n_events = 0;
@@ -2103,16 +2103,20 @@ pub fn event_processing(bs_recv           : &Receiver<Vec<u8>>,
               }
               break 'bytestream;},
             Ok(head_pos) => {
-              let tail_pos   = head_pos + RBEventMemoryView::SIZE;
+              let mut tail_pos = search_for_u16(RBEventMemoryView::TAIL, &bytestream, head_pos).unwrap_or(head_pos);
+              if tail_pos < head_pos {
+                tail_pos = head_pos;
+              }
+              //println!("Event size {}", tail_pos - head_pos);
+              if tail_pos == 0 {
+                tail_pos   = head_pos + RBEventMemoryView::SIZE;
+              }
               if tail_pos >= bytestream.len() - 1 {
                 // we are finished here
                 warn!("Got a trunctaed event, discarding..");
                 trace!("Work on current blob complete. Extracted {n_events} events. Got last event_id! {event_id}");
-                //trace!("{:?}", debug_evids);
                 break 'bytestream;
               }
-              //debug_evids.push(event_id);
-              //info!("Got event_id {event_id}");
               n_events += 1;
               start_pos = tail_pos;
               let mut tp = TofPacket::new();
@@ -2136,11 +2140,23 @@ pub fn event_processing(bs_recv           : &Receiver<Vec<u8>>,
                   debug!("Prepared TofPacket for event {} with a payload size of {}", event_id, &payload.len());
                   tp.packet_type = PacketType::RBEventMemoryView;
                   tp.payload = payload;
-                  //let rb_payload  = RBEventPayload::new(event_id, payload); 
-                  //tp = TofPacket::from(&rb_payload);
                 }
                 DataFormat::Default => {
                   let mut pos_in_stream = head_pos;
+                  match RBEvent::get_channel_packet_len(&bytestream, pos_in_stream) {
+                    Err(err)   => {
+                      error!("Unable to extract RBEvent from memory! Error {err}");
+                      events_not_sent += 1;
+                      warn!("Got a trunctaed event, discarding..");
+                      trace!("Work on current blob complete. Extracted {n_events} events. Got last event_id! {event_id}");
+                      break 'bytestream;
+                    },
+                    Ok(data) => {
+                      let packet_size = data.0;
+                      let ch_ids = data.1;
+                    }
+                  }
+
                   match RBEvent::extract_from_rbeventmemoryview(&bytestream, &mut pos_in_stream) {
                     Err(err)   => {
                       error!("Unable to extract RBEvent from memory! Error {err}");
@@ -2148,9 +2164,18 @@ pub fn event_processing(bs_recv           : &Receiver<Vec<u8>>,
                     },
                     Ok (mut event) => {
                       if event.header.event_id != last_event_id + 1 {
-                        error!("Event id not rising continuously! This {}, last {}", event_id, last_event_id);
+                        skipped_events += event.header.event_id as usize - last_event_id as usize - 1;
+                        if event.header.lost_trigger { 
+                          warn!("Lost trigger!");
+                        } else {
+                          warn!("Event id not rising continuously! This {}, last {}", event.header.event_id, last_event_id);
+                          //println!("{}", event);
+                        }
                       }
-                      last_event_id = event_id;
+                      last_event_id = event.header.event_id;
+                      if verbose {
+                        println!("{}", event);
+                      }
                       event.data_type = data_type;
                       tp = TofPacket::from(&event);
                     }
@@ -2162,8 +2187,8 @@ pub fn event_processing(bs_recv           : &Receiver<Vec<u8>>,
                     Err(err) => {
                       error!("Broken RBEventMemoryView data in memory! Err {}", err);
                       error!("-- we tried to process {} bytes!", tail_pos - head_pos);
-                      error!("{:?}", &bytestream[head_pos..head_pos + 100]);
-                      error!("{:?}", &bytestream[tail_pos - 10..tail_pos + 130]);
+                      //error!("{:?}", &bytestream[head_pos..head_pos + 100]);
+                      //error!("{:?}", &bytestream[tail_pos - 10..tail_pos + 130]);
                       events_not_sent += 1;
                     }
                     Ok(event_header)    => {
@@ -2172,7 +2197,7 @@ pub fn event_processing(bs_recv           : &Receiver<Vec<u8>>,
                   }
                 }
                 _ => {todo!("Dataformat != 0, 1 or 2 is not supported!");}
-              } // end match
+              } // end match data format
               // set flags
               match data_type {
                 DataType::VoltageCalibration |
@@ -2183,12 +2208,15 @@ pub fn event_processing(bs_recv           : &Receiver<Vec<u8>>,
                 _ => ()
               }
               // send the packet
+              //println!("[EVENTPROC] => TofPacket to be send {}",tp);
               match tp_sender.send(tp) {
                 Ok(_) => {
                   packets_in_stream += 1;
                 },
                 Err(err) => error!("Problem sending TofPacket over channel! Err {err}"),
               }
+              //debug_evids.push(event_id);
+              //info!("Got event_id {event_id}");
               //continue 'bytestream;
             }
           } // end match search_for_u16 
@@ -2201,7 +2229,10 @@ pub fn event_processing(bs_recv           : &Receiver<Vec<u8>>,
       }
     }// end match 
     if events_not_sent > 0 {
-      warn!("There were {events_not_sent} unsent events!");
+      error!("There were {events_not_sent} unsent events!");
+    }
+    if skipped_events > 0 {
+      error!("We skipped {} events!", skipped_events);
     }
   } // end outer loop
 }
