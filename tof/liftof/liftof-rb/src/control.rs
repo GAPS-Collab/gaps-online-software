@@ -238,17 +238,15 @@ pub fn set_readout_all_channels_and_ch9() -> Result<(), RegisterError> {
   Ok(())
 }
 
-/// Enable active channels
+/// Enable active channels by not touching the ch9 bits
 pub fn set_active_channel_mask(ch_mask : u8) -> Result<(), RegisterError> {
-  warn!("This might be buggy!");
   let mut value   = read_control_reg(READOUT_MASK)?;
-  //let mut ch_part = value >> 8;
-  //ch_part         = ch_part << 8;
-  //ch_part         = ch_part | (ch_mask) as u32;
-  value           = value >> 8;
-  value           = value << 8;
-  value           = value | (ch_mask as u32);
+  // FIXME - do debug! instead.
+  println!("==> Got current channel mask! {value}");
+  let ch9_part     = value & 0xFF00; // set all ch to 0;
+  value            = ch9_part | ch_mask as u32;
   write_control_reg(READOUT_MASK, value)?;
+  println!("==> Wrote {value} to channel mask register!");
   Ok(())
 }
 
