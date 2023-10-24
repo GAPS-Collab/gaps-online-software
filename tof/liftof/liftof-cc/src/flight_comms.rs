@@ -67,7 +67,7 @@ pub fn global_data_sink(incoming : &cbc::Receiver<TofPacket>,
     match incoming.recv() {
       Err(err) => trace!("No new packet, err {err}"),
       Ok(pack) => {
-        info!("Got new tof packet {}", pack.packet_type);
+        debug!("Got new tof packet {}", pack.packet_type);
         if writer.is_some() {
           writer.as_mut().unwrap().add_tof_packet(&pack);
         }
