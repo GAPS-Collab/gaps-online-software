@@ -42,14 +42,15 @@ use tof_dataclasses::serialization::Serialization;
 /// * runid            : Current assigned runid. Will be used in the filenames of saved 
 ///                      readoutboard raw data.
 /// * print_packets    : 
-pub fn readoutboard_communicator(ev_to_builder    : &Sender<RBEvent>,
-                                 tp_to_sink       : Sender<TofPacket>,
-                                 write_rb_raw     : bool,
-                                 storage_savepath : &String,
-                                 events_per_file  : &usize,
-                                 rb               : &ReadoutBoard,
-                                 runid            : usize,
-                                 print_packets    : bool) {
+pub fn readoutboard_communicator(ev_to_builder       : &Sender<RBEvent>,
+                                 tp_to_sink          : Sender<TofPacket>,
+                                 write_rb_raw        : bool,
+                                 storage_savepath    : &String,
+                                 events_per_file     : &usize,
+                                 rb                  : &ReadoutBoard,
+                                 runid               : usize,
+                                 print_packets       : bool,
+                                 run_analysis_engine : bool) {
   let zmq_ctx = zmq::Context::new();
   let board_id = rb.rb_id; //rb.id.unwrap();
   info!("initializing RB thread for board {}!", board_id);
@@ -135,13 +136,15 @@ pub fn readoutboard_communicator(ev_to_builder    : &Sender<RBEvent>,
               PacketType::RBEventMemoryView | PacketType::RBEvent => {
                 let mut event = RBEvent::from(&tp);
                 if event.paddles.len() == 0 {
-                  match waveform_analysis(&mut event, 
-                                          &rb,
-                                          &calibrations) {
-                      
-                    Ok(_) => (),
-                    Err(err) => {
-                      error!("Unable to analyze waveforms for this event! Err {err}");
+                  if run_analysis_engine {
+                    match waveform_analysis(&mut event, 
+                                            &rb,
+                                            &calibrations) {
+                        
+                      Ok(_) => (),
+                      Err(err) => {
+                        error!("Unable to analyze waveforms for this event! Err {err}");
+                      }
                     }
                   }
                 };

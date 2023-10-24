@@ -444,6 +444,7 @@ fn main() {
                                 &events_per_file,
                                 &this_rb,
                                 runid,
+                                false,
                                 false);
     });
   } // end for loop over nboards
