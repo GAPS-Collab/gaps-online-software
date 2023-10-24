@@ -214,6 +214,10 @@ pub trait Serialization {
 pub fn search_for_u16(number : u16, bytestream : &Vec<u8>, start_pos : usize) 
   -> Result<usize, SerializationError> {
   // -2 bc later on we are looking for 2 bytes!
+  if bytestream.len() == 0 {
+    error!("Stream empty!");
+    return Err(SerializationError::StreamTooShort);
+  }
   if start_pos  > bytestream.len() - 2 {
     error!("Start position {} beyond stream capacity {}!", start_pos, bytestream.len() -2);
     return Err(SerializationError::StreamTooShort);

@@ -74,9 +74,9 @@ pub mod tests {
       let moni       = RBMoniData::from_random();
       let moni_ser   = moni.to_bytestream();
       let mut pos = 0usize;
-      println!("{:?}", moni_ser);
+      //println!("{:?}", moni_ser);
       let foo = search_for_u16(RBMoniData::HEAD, &moni_ser, 0); 
-      println!("{:?}", foo);
+      //println!("{:?}", foo);
       let mut moni_deser = RBMoniData::from_bytestream(&moni_ser, &mut pos);
       //println!("After ser/deser {}", rb_bin_deser.as_ref().unwrap());
       match moni_deser {
@@ -150,7 +150,7 @@ pub mod tests {
   }
 
   #[test]
-  fn extract_rbheader_from_rbbinarydump() {
+  fn extract_rbheader_from_rbeventmemoryview() {
     for _n in 0..100 {
       let data   = RBEventMemoryView::from_random();
       let stream = data.to_bytestream();

@@ -650,8 +650,7 @@ mod test_tofevents {
     let size = MasterTofEvent::decode_size_header(&mask);
     assert_eq!(size.0, data.rb_events.len());
     assert_eq!(size.1, data.missing_hits.len());
-    assert_eq!(size.2, data.paddle_packets.len());
-    assert_eq!(size.3, data.rb_moni.len());
+    assert_eq!(size.2, data.rb_moni.len());
   }
 
   #[test]
