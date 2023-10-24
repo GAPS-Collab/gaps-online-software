@@ -27,7 +27,8 @@ use liftof_lib::color_log;
 
 use liftof_rb::api::*;
 use liftof_rb::control::*;
-
+use liftof_rb::memory::write_control_reg;
+use liftof_rb::memory::read_control_reg;
 use tof_dataclasses::threading::ThreadPool;
 use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::commands::{//TofCommand,
@@ -117,7 +118,14 @@ fn main() {
   // ip to tof computer
   let rb_id = get_board_id().expect("Unable to obtain board ID!");
   let dna   = get_device_dna().expect("Unable to obtain device DNA!"); 
-  
+
+  // deal with bug
+  let mut channel_reg = read_control_reg(0x44).unwrap();
+  println!("READING CHANNEL MASK {channel_reg}");
+  write_control_reg(0x44, 0x3FF).unwrap();
+  channel_reg = read_control_reg(0x44).unwrap();
+  println!("READING CHANNEL MASK {channel_reg}");
+
   // welcome banner!
   println!("-----------------------------------------------");
   println!(" ** Welcome to liftof-rb \u{1F680} \u{1F388} *****");
@@ -168,6 +176,7 @@ fn main() {
       config_from_shell = false;
     }
     Some(rcfile) => {
+      println!("=> Instructed to use runconfig {:?}", rcfile);
       rc_file_path   = rcfile.clone();
       rc_config      = get_runconfig(&rcfile);
       end_after_run  = rc_config.nevents > 0 || rc_config.nseconds > 0;
@@ -193,11 +202,6 @@ fn main() {
   // * run thread
   // + main thread, which does not need a 
   //   separate thread
-  //FIXME - restrict to actual number of threads
-  let mut n_threads = 12;
-  if show_progress {
-    n_threads += 1;
-  }
 
   // FIXME - MESSAGES GET CONSUMED!!
   // setting up inter-thread comms
@@ -221,7 +225,24 @@ fn main() {
 
   let (evid_to_cache, evid_from_cmdr)   : (Sender<u32>, Receiver<u32>)      = unbounded();
 
-
+  
+  // ucla debugging
+  //match setup_drs4() {
+  //  Ok(_)    => (),
+  //  Err(err) => {
+  //    panic!("Setup drs4 failled! Error {err}");
+  //  }
+  //}
+  //match set_active_channel_mask_with_ch9(255) {
+  //  Ok(_) => (),
+  //  Err(err) => {
+  //    panic!("Settint the ch9 register failed!");
+  //  }
+  //}
+  //write_control_reg(0x44,u32::MAX);
+  
+  //FIXME - restrict to actual number of threads
+  let n_threads = 8;
   info!("Will start ThreadPool with {n_threads} threads");
   let workforce = ThreadPool::new(n_threads);
  
@@ -263,7 +284,8 @@ fn main() {
   workforce.execute(move || {
                     event_processing(&bs_recv,
                                      &tp_to_cache,
-                                     &dtf_from_runner);
+                                     &dtf_from_runner,
+                                     args.verbose);
   });
   
 
