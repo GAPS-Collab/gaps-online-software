@@ -25,6 +25,7 @@ use local_ip_address::local_ip;
 use std::process::exit;
 use liftof_lib::color_log;
 
+use liftof_rb::threads::cmd_responder;
 use liftof_rb::api::*;
 use liftof_rb::control::*;
 use liftof_rb::memory::write_control_reg;
