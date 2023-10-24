@@ -245,7 +245,9 @@ impl Serialization for TofPacket {
     *pos += 1;
     match PacketType::from_u8(packet_type_enc) {
       Some(pt) => packet_type = pt,
-      None => {return Err(SerializationError::UnknownPayload);}
+      None => {
+        error!("Can not decode packet with packet type {}", packet_type_enc);
+        return Err(SerializationError::UnknownPayload);}
     }
     let payload_size = parse_u32(stream, pos);
     two_bytes = [stream[*pos + payload_size as usize], stream[*pos + 1 + payload_size as usize]];
@@ -290,7 +292,7 @@ impl Serialization for TofPacket {
 #[test]
 fn test_serialize_tofpacket() ->Result<(), SerializationError> {
   let mut pk     = TofPacket::new();
-  pk.packet_type = PacketType::Command;
+  pk.packet_type = PacketType::TofEvent;
   let mut pl     = Vec::<u8>::new();
   for n in 0..200000 {
     pl.push(n as u8);

@@ -77,7 +77,10 @@ impl PacketType {
       Self::RBCALIBRATION     => Some(PacketType::RBCalibration),
       Self::TOFCOMMAND        => Some(PacketType::TofCommand),
       Self::RBCOMMAND         => Some(PacketType::RBCommand),
-      _   => None,
+      _   => {
+        error!("Can not decode packet type of {}!", value); 
+        None
+      },
     }
   }
 }
@@ -110,7 +113,6 @@ impl fmt::Display for PacketType {
 fn test_packet_types() {
   let mut type_codes = Vec::<u8>::new();
   type_codes.push(PacketType::UNKNOWN          ); 
-  type_codes.push(PacketType::COMMAND          ); 
   type_codes.push(PacketType::RBEVENT          ); 
   type_codes.push(PacketType::TOFEVENT         ); 
   type_codes.push(PacketType::MONITOR          ); 
