@@ -157,8 +157,8 @@ fn get_periods(trace   : &Vec<f32>,
     period += dts[*zcs_b]*f32::abs(tr_b[1]/(tr_b[1] - tr_b[0])); // first semi bin
     if period.is_nan() {
       warn!("NAN in period found!");
-      println!("{} {}", tr_a[1], tr_a[0]);
-      println!("{} {}", tr_b[1], tr_b[0]);
+      //println!("tr_a {} {}", tr_a[1], tr_a[0]);
+      //println!("tr_a {} {}", tr_b[1], tr_b[0]);
       continue;
     }
     //println!("zcs_b, zcs_a, nperiod {} {} {}", zcs_b, zcs_a, nperiod);

@@ -29,6 +29,12 @@ use std::fmt;
 use crate::serialization::{Serialization, SerializationError, parse_u8, parse_u32};
 use crate::packets::{TofPacket,
                      PacketType};
+#[cfg(feature = "random")] 
+use crate::FromRandom;
+#[cfg(feature = "random")]
+extern crate rand;
+#[cfg(feature = "random")]
+use rand::Rng;
 
 /// en empty command
 pub const CMD_PING                : u8 = 1;
@@ -206,7 +212,7 @@ impl TofOperationMode {
 }
 
 /// Command class to control ReadoutBoards
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub struct RBCommand {
   pub rb_id        : u8, // receipient
   pub command_code : u8,
@@ -256,7 +262,7 @@ impl From<&TofPacket> for RBCommand {
 impl fmt::Display for RBCommand {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let cc = RBCommand::command_code_to_string(self.command_code);
-    write!(f, "<RBCommand: {} - {} - {} - {}>", self.rb_id, self.channel_mask,  cc, self.payload)
+    write!(f, "<RBCommand: {}; RB ID {}; CH MASK {}; PAYLOAD {}>", cc, self.rb_id, self.channel_mask, self.payload)
   }
 }
 
@@ -277,9 +283,6 @@ impl Serialization for RBCommand {
     -> Result<Self, SerializationError>{
     Self::verify_fixed(stream, pos)?;
     let mut command = RBCommand::new();
-    if stream.len() < 9 {
-      return Err(SerializationError::StreamTooShort);
-    }
     command.rb_id        = parse_u8(stream, pos);
     command.command_code = parse_u8(stream, pos);
     command.channel_mask = parse_u8(stream, pos);
@@ -299,6 +302,20 @@ impl Serialization for RBCommand {
     stream
   }
 }
+
+#[cfg(feature = "random")]
+impl FromRandom for RBCommand {    
+  fn from_random() -> Self {
+    let mut rng = rand::thread_rng();
+    Self {
+      rb_id        : rng.gen::<u8>(),
+      command_code : rng.gen::<u8>(),
+      channel_mask : rng.gen::<u8>(),
+      payload      : rng.gen::<u32>(),
+    }
+  }
+}
+
 /// General command class for ALL commands to the 
 /// tof C&C instance and readout boards
 ///
@@ -806,5 +823,7 @@ fn test_tofoperationmode() {
 
 #[test]
 fn serialization_rbcommand() {
-  todo!("Needs from random implementation!");
+  let cmd  = RBCommand::from_random();
+  let test = RBCommand::from_bytestream(&cmd.to_bytestream(), &mut 0).unwrap();
+  assert_eq!(cmd, test);
 }
