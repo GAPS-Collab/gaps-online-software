@@ -3,11 +3,6 @@ pub mod api;
 pub mod paddle_packet_cache;
 pub mod flight_comms;
 pub mod threads;
-// this is a list of tests
-// FIXME - this should follow
-// the "official" structure
-// for now, let's just keep it here
-mod test_blobdata;
 #[macro_use] extern crate log;
 extern crate clap;
 extern crate json;
