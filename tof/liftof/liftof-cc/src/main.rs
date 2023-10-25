@@ -39,7 +39,6 @@ use crossbeam_channel as cbc;
 use colored::Colorize;
 
 use tof_dataclasses::events::{MasterTriggerEvent,
-                              MasterTriggerMapping,
                               RBEvent};
 use tof_dataclasses::threading::ThreadPool;
 use tof_dataclasses::packets::paddle_packet::PaddlePacket;
@@ -63,11 +62,7 @@ use liftof_cc::flight_comms::global_data_sink;
 #[derive(Parser, Debug)]
 #[command(author = "J.A.Stoessl", version, about, long_about = None)]
 struct Args {
-  /// Write the raw data from the readoutboards,
-  /// one file per readoutboard
-  #[arg(long, default_value_t = false)]
-  write_robin: bool,
-  /// Dump the entire TofPacket Stream to a file
+  /// Write the entire TofPacket Stream to a file
   #[arg(short, long, default_value_t = false)]
   write_stream: bool,
   #[arg(short, long, default_value_t = false)]
@@ -136,10 +131,6 @@ fn main() {
   //info!("info");
   //debug!("debug");
   //trace!("trace");
-  let write_robin = args.write_robin;
-  if write_robin {
-    info!("Will write blob data to file!");
-  }
  
   let write_stream = args.write_stream;
   if write_stream {
@@ -194,7 +185,6 @@ fn main() {
   let runid                 = config["run_id"].as_usize().unwrap(); 
   let mut write_stream_path = config["stream_savepath"].as_str().unwrap().to_owned();
   let storage_savepath      = config["raw_storage_savepath"].as_str().unwrap().to_owned();
-  let events_per_file       = config["events_per_file"].as_usize().unwrap(); 
   let calib_file_path       = config["calibration_file_path"].as_str().unwrap().to_owned();
   let db_path               = Path::new(config["db_path"].as_str().unwrap());
   let db_path_c             = db_path.clone();
@@ -226,38 +216,6 @@ fn main() {
   }
 
   // Prepare outputfiles
-  let mut raw_files_path = PathBuf::from(storage_savepath);
-  if write_robin { 
-    raw_files_path.push(runid.to_string().as_str());
-    // Create directory if it does not exist
-    // Check if the directory exists
-    if let Ok(metadata) = fs::metadata(&raw_files_path) {
-      if metadata.is_dir() {
-        println!("=> Directory {} exists.", raw_files_path.display());
-        // FILXME - in flight, we can not have interactivity.
-        // But the whole system with the run ids might change 
-        // anyway
-        print!("=> You are risking overwriting files in that directory. You might have used rununmber {} before. Are you sure you want to continue? (YES/<any>): ", runid);
-        io::stdout().flush().unwrap(); // Ensure the prompt is displayed
-        // Read user input
-        let mut input = String::new();
-        io::stdin().read_line(&mut input).unwrap();
-        // Trim leading/trailing whitespaces and convert to lowercase
-        let input = input.trim().to_lowercase();
-        // Check user input and end the program if desired
-        if input == "YES" {
-          println!("==> Continuing on request of user...");
-        } else {
-          println!("==> Abort program!");
-        }
-      } 
-    } else {
-      match fs::create_dir(&raw_files_path) {
-        Ok(())   => println!("=> Created {} to save raw (blob) data", raw_files_path.display()),
-        Err(err) => panic!("Failed to create directory: {}, err {}", raw_files_path.display(), err),
-      }
-    }
-  }
   let mut stream_files_path = PathBuf::from(write_stream_path);
   if write_stream {
     stream_files_path.push(runid.to_string().as_str());
@@ -418,7 +376,6 @@ fn main() {
   println!("==> data sink thread started!");
   println!("==> Will now start rb threads..");
     
-  let raw_files_path_string = String::from(raw_files_path.into_os_string().into_string().expect("Somehow the paths are messed up very badly! So I can't help it and I quit!"));
 
   for n in 0..nboards {
     let this_rb_pp_sender = rb_send.clone();
@@ -434,14 +391,10 @@ fn main() {
     //this_rb.calib_file += &(this_rb.rb_id).to_string();
     //this_rb.calib_file += "_cal.txt";
     println!("==> Starting RB thread for {}", this_rb);
-    let this_path = raw_files_path_string.clone();
     let ev_to_builder_c = ev_to_builder.clone();
     worker_threads.execute(move || {
       readoutboard_communicator(&ev_to_builder_c,
                                 this_tp_to_sink_clone,
-                                write_robin,
-                                &this_path,
-                                &events_per_file,
                                 &this_rb,
                                 runid,
                                 false,
@@ -458,11 +411,6 @@ fn main() {
   if use_master_trigger {
     // start the event builder thread
     println!("==> Starting event builder and master trigger threads...");
-    //let rb_list_c    = rb_list.clone();
-    //let ltb_list_c   = ltb_list.clone();
-    //let mapping = MasterTriggerMapping::new(ltb_list_c, rb_list_c);
-    //println!("{:?}", mapping.ltb_mapping);
-    //exit(0);
     let cmd_sender_2 = cmd_sender.clone();
     worker_threads.execute(move || {
                            event_builder(&master_ev_rec,

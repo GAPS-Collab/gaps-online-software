@@ -44,9 +44,6 @@ use tof_dataclasses::serialization::Serialization;
 /// * print_packets    : 
 pub fn readoutboard_communicator(ev_to_builder       : &Sender<RBEvent>,
                                  tp_to_sink          : Sender<TofPacket>,
-                                 write_rb_raw        : bool,
-                                 storage_savepath    : &String,
-                                 events_per_file     : &usize,
                                  rb                  : &ReadoutBoard,
                                  runid               : usize,
                                  print_packets       : bool,
@@ -86,16 +83,6 @@ pub fn readoutboard_communicator(ev_to_builder       : &Sender<RBEvent>,
 
   }
   let mut secs_since_epoch = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
-  let mut blobfile_name = storage_savepath.to_owned() + "/RB" 
-                       + &board_id.to_string() + "_" 
-                       + &secs_since_epoch.to_string()
-                       + ".robin";
-  let mut blobfile_path = Path::new(&blobfile_name);
-  let mut file_on_disc : Option<File> = None;//let mut output = File::create(path)?;
-  if write_rb_raw {
-    info!("Writing readoutboard raw data to {}", blobfile_name );
-    file_on_disc = OpenOptions::new().append(true).create(true).open(blobfile_path).ok()
-  }
   let mut n_events = 0usize;
   loop {
 
@@ -119,21 +106,7 @@ pub fn readoutboard_communicator(ev_to_builder       : &Sender<RBEvent>,
               println!("==> Got {} for RB {}", tp.packet_type, rb.rb_id); 
             }
             match tp.packet_type {
-              PacketType::RBEventHeader => {
-                // in that case, just write the header to 
-                // the file and continue
-                match &mut file_on_disc {
-                  None => (),
-                  Some(f) => {
-                    trace!("writing {} bytes", tp.payload.len());
-                    match f.write_all(&tp.payload) {
-                      Err(err) => error!("Can not write to file, err {err}"),
-                      Ok(_)    => ()
-                    }
-                  }
-                }
-              },
-              PacketType::RBEventMemoryView | PacketType::RBEvent => {
+              PacketType::RBEvent => {
                 let mut event = RBEvent::from(&tp);
                 if event.paddles.len() == 0 {
                   if run_analysis_engine {
@@ -154,32 +127,7 @@ pub fn readoutboard_communicator(ev_to_builder       : &Sender<RBEvent>,
                     error!("Unable to send event! Err {err}");
                   }
                 }
-
-                // write blob to disk if desired
-                match &mut file_on_disc {
-                  None => (),
-                  Some(f) => {
-                    trace!("writing {} bytes", &tp.payload.len());
-                    match f.write_all(&tp.payload) {
-                      Err(err) => error!("Can not write to file, err {err}"),
-                      Ok(_)    => ()
-                    }
-                  }
-                } // end match file_on_disk
                 n_events += 1;
-                if (n_events >= *events_per_file) && write_rb_raw {
-                  // start a new file
-                  secs_since_epoch = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
-                  blobfile_name = storage_savepath.to_owned() + "/RB" 
-                                 + &board_id.to_string() + "_" 
-                                 + &runid.to_string() + "_"
-                                 + &secs_since_epoch.to_string()
-                                 + ".robin";
-                  info!("Writing blobs to {}", blobfile_name );
-                  blobfile_path = Path::new(&blobfile_name);
-                  file_on_disc = OpenOptions::new().append(true).create(true).open(blobfile_path).ok();
-                  n_events = 0;
-                } //end if
                 n_chunk += 1;
               }, 
               _ => {
