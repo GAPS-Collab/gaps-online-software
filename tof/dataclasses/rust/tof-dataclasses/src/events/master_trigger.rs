@@ -340,6 +340,19 @@ impl MasterTriggerEvent {
     }   
   }
 
+  pub fn get_n_rbs_expected(&self) -> u8 {
+    let mut n_rbs = 0u8;
+    for h in self.hits {
+      let count = h.iter().filter(|&&x| x).count();
+      if count > 1 {
+        n_rbs += 1;
+      } 
+      if count > 8 {
+        n_rbs += 1;
+      }
+    }
+    n_rbs
+  }
 
   /// Make the connection between the triggered
   /// boards in the boardmask and convert that
@@ -366,19 +379,6 @@ impl MasterTriggerEvent {
       }
     }
     dsi_js
-  }
-
-  pub fn get_triggered_ltb_ids(&self) -> Vec<u8> {
-    todo!();
-    #[allow(unreachable_code)] {
-      let mut ltbs = Vec::<u8>::new();
-      ltbs
-    }
-    //for k in 0..N_LTBS {
-    //  if board_mask[k] {
-    //    ltbs.push(2
-    //  }
-    //}
   }
   
   pub fn decode_board_mask(&mut self, mask : u32) {

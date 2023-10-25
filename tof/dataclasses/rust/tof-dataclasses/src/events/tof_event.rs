@@ -252,15 +252,15 @@ impl MasterTofEvent {
     self.creation_time.elapsed().as_secs()
   }
 
-  /// Are all expected RBs participating in this event
-  /// actually part of this event?
+  // Do we have all readoutboards which we are expecting 
+  // in this event?
+  //
+  // This is useful from the perspective of the event builder.
+  // Do we still have to wait for more rbs?
+  // There might still be channels missing, but this is 
+  // nothing the event builder can deal with right now.
   pub fn is_complete(&self) -> bool {
-    let mt_expected_n_paddle = self.mt_event.get_hit_paddles();
-    let mut actual_paddles = 0u8;
-    for ev in self.rb_events.iter() {
-      actual_paddles += ev.nchan/2;
-    }
-    actual_paddles == mt_expected_n_paddle
+    self.mt_event.get_n_rbs_expected() as usize == self.rb_events.len()
   }
 
   /// Encode the sizes of the vectors holding the 
