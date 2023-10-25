@@ -26,7 +26,8 @@ use std::process::exit;
 use liftof_lib::color_log;
 
 use liftof_rb::threads::{cmd_responder,
-                         event_processing};
+                         event_processing,
+                         event_cache};
 use liftof_rb::api::*;
 use liftof_rb::control::*;
 use tof_dataclasses::threading::ThreadPool;
