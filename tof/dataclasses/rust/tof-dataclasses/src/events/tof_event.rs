@@ -384,250 +384,183 @@ impl FromRandom for MasterTofEvent {
   }
 }
 
+impl From<&MasterTriggerEvent> for MasterTofEvent {
+  fn from(mte : &MasterTriggerEvent) -> Self {
+    let mut te : MasterTofEvent = Default::default();
+    te.mt_event = *mte;
+    te
+  }
+}
 
 /// The main event structure
 #[derive(Debug, Clone, PartialEq)]
-pub struct TofEvent  {
-  
+pub struct TofEventHeader  {
+
+  pub run_id       : u32,
   pub event_id     : u32,
-  // the timestamp sahll be comging from the master trigger
+  // the timestamp shall be comging from the master trigger
   pub timestamp_32 : u32,
-  pub timestamp_16 : u16,
+  pub timestamp_16 : u16, // -> 14 byres
+  
+  // reconstructed quantities
+  pub primary_beta        : u16, 
+  pub primary_beta_unc    : u16, 
+  pub primary_charge      : u16, 
+  pub primary_charge_unc  : u16, 
+  pub primary_outer_tof_x : u16, 
+  pub primary_outer_tof_y : u16, 
+  pub primary_outer_tof_z : u16, 
+  pub primary_inner_tof_x : u16, 
+  pub primary_inner_tof_y : u16, 
+  pub primary_inner_tof_z : u16, //-> 20bytes primary 
+
+  pub nhit_outer_tof       : u8,  
+  // no need to save this, can be 
+  // rereated from paddle_info.size() - nhit_outer_tof
+  pub nhit_inner_tof       : u8, 
+
+  pub trigger_info         : u8,
+  pub ctr_etx              : u8,
 
   // this field can be debated
   // the reason we have it is 
   // that for de/serialization, 
   // we need to know the length 
   // of the expected bytestream.
-  pub n_paddles    : u8, // we don't have more than 
-                         // 256 paddles.
-                         // HOWEVER!! For future gaps
-                         // flights, we might...
-                         // This will then overflow 
-                         // and cause problems.
-  
-  // this is private, paddles can only 
-  // be added
-  pub paddle_packets : Vec::<PaddlePacket>,
-
-  // fields which won't get 
-  // serialized
-  //
-
-  /// Comes from the master trigger. Number of paddles which 
-  /// are over the threshold
-  pub n_paddles_expected : u8,
-
-  // for the event builder. 
-  // if not using the master trigger,
-  // we can look at the time the event has first
-  // been seen and then it will be declared complete
-  // after timeout microseconds
-  // thus we are saving the time, this isntance has 
-  // been created.
-  pub creation_time      : Instant,
-
-  pub valid              : bool,
+  pub n_paddles          : u8, // we don't have more than 
+                               // 256 paddles.
 }
 
-impl Serialization for TofEvent {
-  const HEAD               : u16  = 43690; //0xAAAA
-  const TAIL               : u16  = 21845; //0x5555
-  
-  fn from_bytestream(bytestream : &Vec<u8>, pos : &mut usize)
+impl Serialization for TofEventHeader {
+  const HEAD               : u16   = 43690; //0xAAAA
+  const TAIL               : u16   = 21845; //0x5555
+  const SIZE               : usize = 39;    // 14 + 20 + 5
+
+  fn from_bytestream(stream : &Vec<u8>, pos : &mut usize)
      -> Result<Self, SerializationError> {
-    let mut event = Self::new(0,0);
-    //let mut pos = start_pos;
-    *pos = search_for_u16(Self::HEAD, &bytestream, *pos)?;
-   
-    let mut raw_bytes_4  = [bytestream[*pos ],
-                            bytestream[*pos + 1],
-                            bytestream[*pos + 2],
-                            bytestream[*pos + 3]];
-    *pos   += 4; 
-    event.event_id = u32::from_le_bytes(raw_bytes_4); 
-    raw_bytes_4  = [bytestream[*pos ],
-                    bytestream[*pos + 1],
-                    bytestream[*pos + 2],
-                    bytestream[*pos + 3]];
-    *pos   += 4; 
-    event.timestamp_32 = u32::from_le_bytes(raw_bytes_4);
-    //let raw_bytes_2 = [bytestream[*pos],
-    //                   bytestream[*pos + 1]];
-    //pos += 2;
-    event.timestamp_16 = parse_u16(bytestream, pos);
-    event.n_paddles    = parse_u8(bytestream, pos);
-    //event.timestamp_16 = u16::from_le_bytes(raw_bytes_2);
-    //event.n_paddles      = bytestream[pos];
-    //pos += 1; 
-   
-    for _ in 0..event.n_paddles {
-      match PaddlePacket::from_bytestream(&bytestream, pos) {
-        Err(err) => {
-          error!("Unable to decode PaddlePacket, {err}");
-          return Err(err);
-        }
-        Ok(pp)   => {
-          event.paddle_packets.push(pp);
-          *pos += PaddlePacket::SIZE;
-        }
-      }
-    }
+    Self::verify_fixed(stream, pos)?;
+    let mut event = Self::new();
+    event.run_id              = parse_u32(stream, pos);
+    event.event_id            = parse_u32(stream, pos);
+    event.timestamp_32        = parse_u32(stream, pos);
+    event.timestamp_16        = parse_u16(stream, pos);
+    event.primary_beta        = parse_u16(stream, pos);
+    event.primary_beta_unc    = parse_u16(stream, pos);
+    event.primary_charge      = parse_u16(stream, pos);
+    event.primary_charge_unc  = parse_u16(stream, pos);
+    event.primary_outer_tof_x = parse_u16(stream, pos);
+    event.primary_outer_tof_y = parse_u16(stream, pos);
+    event.primary_outer_tof_z = parse_u16(stream, pos);
+    event.primary_inner_tof_x = parse_u16(stream, pos);
+    event.primary_inner_tof_y = parse_u16(stream, pos);
+    event.primary_inner_tof_z = parse_u16(stream, pos); 
+    event.nhit_outer_tof      = parse_u8(stream, pos);
+    event.nhit_inner_tof      = parse_u8(stream, pos);
+    event.trigger_info        = parse_u8(stream, pos);
+    event.ctr_etx             = parse_u8(stream, pos);
+    event.n_paddles           = parse_u8(stream, pos); 
+    *pos += 2; 
     Ok(event) 
   }
   
   fn to_bytestream(&self) -> Vec<u8> {
-
-    let mut bytestream = Vec::<u8>::with_capacity(Self::PACKETSIZEFIXED + (self.n_paddles as usize)*PaddlePacket::SIZE as usize);
-
-    bytestream.extend_from_slice(&Self::HEAD.to_le_bytes());
-    //let mut evid = self.event_id.to_be_bytes();
-
-    //evid  = [evid[1],
-    //         evid[0],
-    //         evid[3],
-    //         evid[2]];
-    
-    //bytestream.extend_from_slice(&evid);
-    bytestream.extend_from_slice(&self.event_id.to_le_bytes());
-    bytestream.extend_from_slice(&self.timestamp_32.to_le_bytes());
-    bytestream.extend_from_slice(&self.timestamp_16.to_le_bytes());
-    bytestream.push(self.n_paddles);
-    for n in 0..self.paddle_packets.len() as usize {
-      let pp = self.paddle_packets[n];
-      bytestream.extend_from_slice(&pp.to_bytestream());
-
-    }
+    let mut bytestream = Vec::<u8>::with_capacity(Self::SIZE);
+    bytestream.extend_from_slice(&Self::HEAD                     .to_le_bytes());
+    bytestream.extend_from_slice(&self.run_id                    .to_le_bytes());
+    bytestream.extend_from_slice(&self.event_id                  .to_le_bytes());
+    bytestream.extend_from_slice(&self.timestamp_32              .to_le_bytes());
+    bytestream.extend_from_slice(&self.timestamp_16              .to_le_bytes());
+    bytestream.extend_from_slice(&self.primary_beta              .to_le_bytes());
+    bytestream.extend_from_slice(&self.primary_beta_unc          .to_le_bytes());
+    bytestream.extend_from_slice(&self.primary_charge            .to_le_bytes());
+    bytestream.extend_from_slice(&self.primary_charge_unc        .to_le_bytes());
+    bytestream.extend_from_slice(&self.primary_outer_tof_x       .to_le_bytes());
+    bytestream.extend_from_slice(&self.primary_outer_tof_y       .to_le_bytes());
+    bytestream.extend_from_slice(&self.primary_outer_tof_z       .to_le_bytes());
+    bytestream.extend_from_slice(&self.primary_inner_tof_x       .to_le_bytes());
+    bytestream.extend_from_slice(&self.primary_inner_tof_y       .to_le_bytes());
+    bytestream.extend_from_slice(&self.primary_inner_tof_z       .to_le_bytes());
+    bytestream.extend_from_slice(&self.nhit_outer_tof            .to_le_bytes());
+    bytestream.extend_from_slice(&self.nhit_inner_tof            .to_le_bytes());
+    bytestream.extend_from_slice(&self.trigger_info              .to_le_bytes());
+    bytestream.extend_from_slice(&self.ctr_etx                   .to_le_bytes());
+    bytestream.extend_from_slice(&self.n_paddles                 .to_le_bytes());
     bytestream.extend_from_slice(&Self::TAIL        .to_le_bytes()); 
     bytestream
   }
 }
 
-impl TofEvent {
+impl TofEventHeader {
   
-  pub const PACKETSIZEFIXED    : usize = 24;
   pub const VERSION            : &'static str = "1.1";
-  //pub const HEAD               : u16  = 43690; //0xAAAA
-  //pub const TAIL               : u16  = 21845; //0x5555
   
-  pub fn new(event_id : u32,
-             n_paddles_expected : u8) -> Self {
-    //let creation_time  = SystemTime::now()
-    //                     .duration_since(SystemTime::UNIX_EPOCH)
-    //                     .unwrap().as_micros();
-    let creation_time = Instant::now();
-
-    TofEvent { 
-      event_id       : event_id,
-      timestamp_32   : 0,
-      timestamp_16   : 0,
-      n_paddles      : 0,  
-      paddle_packets : Vec::<PaddlePacket>::with_capacity(20),
-
-      n_paddles_expected : n_paddles_expected,
-
-      // This is strictly for when working
-      // with event timeouts
-      creation_time  : creation_time,
-
-      valid          : true,
+  pub fn new() -> Self {
+    Self {
+      run_id               : 0,
+      event_id             : 0,
+      timestamp_32         : 0,
+      timestamp_16         : 0,
+      primary_beta         : 0, 
+      primary_beta_unc     : 0, 
+      primary_charge       : 0, 
+      primary_charge_unc   : 0, 
+      primary_outer_tof_x  : 0, 
+      primary_outer_tof_y  : 0, 
+      primary_outer_tof_z  : 0, 
+      primary_inner_tof_x  : 0, 
+      primary_inner_tof_y  : 0, 
+      primary_inner_tof_z  : 0,  
+      nhit_outer_tof       : 0,  
+      nhit_inner_tof       : 0, 
+      trigger_info         : 0,
+      ctr_etx              : 0,
+      n_paddles            : 0  
     }
-  }
-
-
-  /// Decode only the event id. 
-  ///
-  /// The bytestream must be sane, cannot fail
-  pub fn get_evid_from_bytestream(bytestream : &Vec<u8>, start_pos : usize) 
-    -> Result<u32, SerializationError> {
-    if bytestream.len() < 6 {
-      // something is utterly broken
-      return Err(SerializationError::StreamTooShort);
-    }
-    let evid = u32::from_le_bytes([bytestream[start_pos],
-                                   bytestream[start_pos + 1],
-                                   bytestream[start_pos + 2],
-                                   bytestream[start_pos + 3]]);
-    //let evid = u32::from_le_bytes([bytestream[start_pos + 2],
-    //                               bytestream[start_pos + 3],
-    //                               bytestream[start_pos + 4],
-    //                               bytestream[start_pos + 5]]);
-    Ok(evid)
-  }
-
-
-  /// Add a paddle packet 
-  ///  
-  /// This makes sure the internal counter for 
-  /// paddles is also incremented.
-  pub fn add_paddle(&mut self, paddle : PaddlePacket) -> Result<(), EventError> {
-    if self.event_id != paddle.event_id {
-      error!("Tried to add paddle for event {} to event{}", self.event_id, paddle.event_id);
-      return Err(EventError::EventIdMismatch);
-    }
-    self.n_paddles += 1;
-    self.paddle_packets.push(paddle);
-    Ok(())
-  }
-
-
-  /// Check if a certain time span has passed since event's creation
-  ///
-  ///
-  ///
-  pub fn has_timed_out(&self) -> bool {
-    return self.age() > EVENT_TIMEOUT;
-  }
-
-  pub fn age(&self) -> u64 {
-    self.creation_time.elapsed().as_secs()
-  }
-
-  pub fn is_complete(&self) -> bool {
-    self.n_paddles == self.n_paddles_expected
-  }
-
-  /// This means that all analysis is 
-  /// done, and it is fully assembled
-  ///
-  /// Alternatively, the timeout has 
-  /// been passed
-  ///
-  pub fn is_ready_to_send(&self, use_timeout : bool)
-    -> bool {
-    //if self.n_paddles > 0 {
-    //  println!("ready? {} {} {} {}", self.event_id, self.n_paddles, self.n_paddles_expected, self.age());
-    //}
-    // doing it like this will ensure that the events are ordered.
-    // Otherwise, complete events will bypass
-    if use_timeout {
-      return self.has_timed_out();
-    }
-    self.is_complete() 
   }
 }
 
-impl Default for TofEvent {
+impl Default for TofEventHeader {
   fn default() -> Self {
-    TofEvent::new(0,0)
+    Self::new()
   }
 }
 
-impl From<&MasterTriggerEvent> for TofEvent {
+impl From<&MasterTriggerEvent> for TofEventHeader {
   fn from(mte : &MasterTriggerEvent) -> Self {
-    let mut te : TofEvent = Default::default();
+    let mut te               = Self::new();
     te.event_id              = mte.event_id;
     te.timestamp_32          = mte.timestamp;
-    te.n_paddles_expected    = mte.get_hit_paddles();
+    te.n_paddles             = mte.get_hit_paddles();
     te
   }
 }
 
-impl From<&MasterTriggerEvent> for MasterTofEvent {
-  fn from(mte : &MasterTriggerEvent) -> Self {
-    let mut te : MasterTofEvent = Default::default();
-    te.mt_event = *mte;
-    te
+#[cfg(feature="random")]
+impl FromRandom for TofEventHeader {
+
+  fn from_random() -> Self {
+    let mut rng     = rand::thread_rng();
+    Self { 
+      run_id               : rng.gen::<u32>(),
+      event_id             : rng.gen::<u32>(),
+      timestamp_32         : rng.gen::<u32>(),
+      timestamp_16         : rng.gen::<u32>(),
+      primary_beta         : rng.gen::<u16>(), 
+      primary_beta_unc     : rng.gen::<u16>(), 
+      primary_charge       : rng.gen::<u16>(), 
+      primary_charge_unc   : rng.gen::<u16>(), 
+      primary_outer_tof_x  : rng.gen::<u16>(), 
+      primary_outer_tof_y  : rng.gen::<u16>(), 
+      primary_outer_tof_z  : rng.gen::<u16>(), 
+      primary_inner_tof_x  : rng.gen::<u16>(), 
+      primary_inner_tof_y  : rng.gen::<u16>(), 
+      primary_inner_tof_z  : rng.gen::<u16>(),  
+      nhit_outer_tof       : rng.gen::<u8>(),  
+      nhit_inner_tof       : rng.gen::<u8>(), 
+      trigger_info         : rng.gen::<u8>(),
+      ctr_etx              : rng.gen::<u8>(),
+      n_paddles            : rng.gen::<u8>()  
+    }
   }
 }
 
@@ -642,6 +575,13 @@ mod test_tofevents {
   use crate::serialization::Serialization;
   use crate::FromRandom;
   use crate::events::MasterTofEvent;
+
+  #[test]
+  fn serialize_tofeventheader() {
+    let data = TofEventHeader::from_random();
+    let test = TofEventHeader::from_bytestream(&data.to_bytestream(), &mut 0).unwrap();
+    assert_eq!(data, test);
+  }
 
   #[test]
   fn mastertofevent_sizes_header() {
