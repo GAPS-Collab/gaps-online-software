@@ -183,12 +183,10 @@ impl TofEventBuilderSettings {
 ///                    is needed so that the event builder can request
 ///                    paddles from readout boards.
 pub fn event_builder (m_trig_ev      : &cbc::Receiver<MasterTriggerEvent>,
-                      pp_query       : &Sender<Option<u32>>,
                       ev_from_rb     : &Receiver<RBEvent>,
                       data_sink      : &cbc::Sender<TofPacket>) { 
 
   let mut event_cache = VecDeque::<MasterTofEvent>::with_capacity(EVENT_BUILDER_EVID_CACHE_SIZE);
-  let mut paddle_cache : HashMap<u32,Vec::<PaddlePacket>> = HashMap::with_capacity(100); 
 
   // timeout in microsecnds
   let timeout_micro = 100;
@@ -217,17 +215,19 @@ pub fn event_builder (m_trig_ev      : &cbc::Receiver<MasterTriggerEvent>,
         }
         last_evid = event.mt_event.event_id;
         event_cache.push_back(event);
-        // we will push the MasterTriggerEvent down the sink
-        let tp = TofPacket::from(&mt);
-        match data_sink.try_send(tp) {
-          Err(err) => {
-            error!("Unable to send tof packet to data sink! {err}");
-          },
-          Ok(_)    => ()
-        }
+        //// we will push the MasterTriggerEvent down the sink
+        //let tp = TofPacket::from(&mt);
+        //match data_sink.try_send(tp) {
+        //  Err(err) => {
+        //    error!("Unable to send tof packet to data sink! {err}");
+        //  },
+        //  Ok(_)    => ()
+        //}
       }
     } // end match Ok(mt)
-    while !ev_from_rb.is_empty() {
+    // check this timeout
+    let mut n_received = 0usize;
+    while !ev_from_rb.is_empty() || n_received < 20 {
       match ev_from_rb.recv() {
         Err(err) => {
           error!("Can't receive RBEvent! Err {err}");
@@ -239,6 +239,7 @@ pub fn event_builder (m_trig_ev      : &cbc::Receiver<MasterTriggerEvent>,
               ev.rb_events.push(rb_ev.clone());
             }
           }
+          n_received += 1;
         }
       }
     }
@@ -253,7 +254,6 @@ pub fn event_builder (m_trig_ev      : &cbc::Receiver<MasterTriggerEvent>,
             debug!("Event with id {} send!", ev.mt_event.event_id);
           }
         }
-      
       }
     }
 

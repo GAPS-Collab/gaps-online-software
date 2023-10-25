@@ -41,10 +41,8 @@ use colored::Colorize;
 use tof_dataclasses::events::{MasterTriggerEvent,
                               RBEvent};
 use tof_dataclasses::threading::ThreadPool;
-use tof_dataclasses::packets::paddle_packet::PaddlePacket;
 use tof_dataclasses::packets::TofPacket;
-use tof_dataclasses::manifest::{get_ltbs_from_sqlite,
-                                get_rbs_from_sqlite};
+use tof_dataclasses::manifest::get_rbs_from_sqlite;
 use tof_dataclasses::DsiLtbRBMapping;
 use tof_dataclasses::commands::TofCommand;
 use liftof_lib::{master_trigger,
@@ -292,11 +290,8 @@ fn main() {
   // master thread -> event builder ocmmuncations
   let (master_ev_send, master_ev_rec): (cbc::Sender<MasterTriggerEvent>, cbc::Receiver<MasterTriggerEvent>) = cbc::unbounded(); 
   let (ev_to_builder, ev_from_rb) : (cbc::Sender<RBEvent>, cbc::Receiver<RBEvent>) = cbc::unbounded(); 
-  // event builder  <-> paddle cache communications
-  let (pp_send, pp_rec) : (cbc::Sender<Option<PaddlePacket>>, cbc::Receiver<Option<PaddlePacket>>) = cbc::unbounded(); 
   // readout boards <-> paddle cache communications 
   let (ev_to_builder, ev_from_rb) : (cbc::Sender<RBEvent>, cbc::Receiver<RBEvent>) = cbc::unbounded();
-  let (rb_send, rb_rec) : (cbc::Sender<PaddlePacket>, cbc::Receiver<PaddlePacket>) = cbc::unbounded();
   // paddle cache <-> event builder communications
   let (id_send, id_rec) : (cbc::Sender<Option<u32>>, cbc::Receiver<Option<u32>>) = cbc::unbounded();
   let (cmd_sender, cmd_receiver) : (cbc::Sender<TofPacket>, cbc::Receiver<TofPacket>) = cbc::unbounded();
@@ -333,14 +328,6 @@ fn main() {
     });
   }
 
-  //println!("==> Starting paddle cache thread...");
-  //worker_threads.execute(move || {
-  //                       paddle_packet_cache(&id_rec,
-  //                                           &rb_rec,
-  //                                           &pp_send);
-  //});
-  //println!("==> paddle cache thread started!");
-
   write_stream_path = String::from(stream_files_path.into_os_string().into_string().expect("Somehow the paths are messed up very badly! So I can't help it and I quit!"));
 
   println!("==> Starting data sink thread!");
@@ -356,7 +343,6 @@ fn main() {
     
 
   for n in 0..nboards {
-    let this_rb_pp_sender = rb_send.clone();
     let mut this_rb = rb_list[n].clone();
     let this_tp_to_sink_clone = tp_to_sink.clone();
     this_rb.infer_ip_address();
@@ -392,7 +378,6 @@ fn main() {
     let cmd_sender_2 = cmd_sender.clone();
     worker_threads.execute(move || {
                            event_builder(&master_ev_rec,
-                                         &id_send,
                                          &ev_from_rb,
                                          &tp_to_sink);
     });
