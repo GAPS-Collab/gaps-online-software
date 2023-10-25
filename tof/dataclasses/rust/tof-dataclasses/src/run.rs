@@ -23,6 +23,9 @@ use crate::errors::DecodingError;
 extern crate json;
 use json::JsonValue;
 
+extern crate serde;
+extern crate serde_json;
+
 /// A collection of parameters for tof runs
 ///
 /// * active_channel_mask : 8bit mask (1bit/channel)
@@ -30,7 +33,7 @@ use json::JsonValue;
 ///                         channel in ascending order with 
 ///                         increasing bit significance.
 ///
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct RunConfig {
   pub nevents                 : u32,
   pub is_active               : bool,
@@ -103,6 +106,16 @@ impl RunConfig {
     }
     Ok(self.active_channel_mask & u8::pow(ch - 1,2) > 0) 
   }
+
+  pub fn from_json_serde(config: &str) -> serde_json::Result<Self> {
+    let rc = serde_json::from_str(config)?;
+    Ok(rc)
+  }
+
+  pub fn to_json_serde(&self) -> serde_json::Result<String> {
+    let s = serde_json::to_string(self)?;
+    Ok(s)
+  }
 }
 
 impl Serialization for RunConfig {
@@ -147,25 +160,6 @@ impl Serialization for RunConfig {
     stream.extend_from_slice(&self.rb_buff_size.to_le_bytes());
     stream.extend_from_slice(&Self::TAIL.to_le_bytes());
     stream
-  }
-
-  fn from_json(config : &JsonValue)
-    -> Result<RunConfig, Box<dyn Error>> {
-    let mut rc = RunConfig::new();
-    rc.nevents                 = config["nevents"]                .as_u32 ().ok_or(SerializationError::JsonDecodingError)?; 
-    rc.is_active               = config["is_active"]              .as_bool().ok_or(SerializationError::JsonDecodingError)?;
-    rc.nseconds                = config["nseconds"]               .as_u32 ().ok_or(SerializationError::JsonDecodingError)?; 
-    rc.stream_any              = config["stream_any"]             .as_bool().ok_or(SerializationError::JsonDecodingError)?;
-    rc.trigger_poisson_rate    = config["trigger_poisson_rate"] .as_u32 ().ok_or(SerializationError::JsonDecodingError)?; 
-    rc.trigger_fixed_rate      = config["trigger_fixed_rate"].as_u32 ().ok_or(SerializationError::JsonDecodingError)?; 
-    rc.latch_to_mtb            = config["latch_to_mtb"].as_bool ().ok_or(SerializationError::JsonDecodingError)?; 
-    rc.active_channel_mask     = config["active_channel_mask"]    .as_u8  ().ok_or(SerializationError::JsonDecodingError)?; 
-    let data_type              = config["data_type"].as_u8().ok_or(SerializationError::JsonDecodingError)?;
-    rc.data_type               = DataType::from_u8(&data_type);
-    let data_format            = config["data_format"].as_u8().ok_or(SerializationError::JsonDecodingError)?;
-    rc.data_format             = DataFormat::from_u8(&data_format);
-    rc.rb_buff_size            = config["rb_buff_size"]           .as_u16 ().ok_or(SerializationError::JsonDecodingError)?;
-    Ok(rc)
   }
 }
 
@@ -236,5 +230,9 @@ fn serialization_runconfig() {
   let cfg  = RunConfig::from_random();
   let test = RunConfig::from_bytestream(&cfg.to_bytestream(), &mut 0).unwrap();
   assert_eq!(cfg, test);
+
+  let cfg_json = RunConfig::to_json_serde(&cfg).unwrap();
+  let test_json = RunConfig::from_json_serde(&cfg_json).unwrap();
+  assert_eq!(cfg, test_json);
 }
 

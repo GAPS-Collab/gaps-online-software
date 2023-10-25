@@ -1,10 +1,12 @@
 use std::fmt;
 
+extern crate serde;
+
 /// A generic data type
 ///
 /// Describe the purpose of the data. This
 /// is the semantics behind it. 
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 pub enum DataType {
   VoltageCalibration,
   TimingCalibration,

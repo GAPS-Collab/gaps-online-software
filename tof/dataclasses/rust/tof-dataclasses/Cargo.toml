@@ -43,5 +43,7 @@ statistical = "1.0"
 # with messages, iterators
 #strum = "0.24"
 #strum_macros = "0.24"
+serde = "1.0"
+serde_json = "1.0"
 
 
