@@ -226,19 +226,32 @@ pub fn event_builder (m_trig_ev      : &cbc::Receiver<MasterTriggerEvent>,
       }
     } // end match Ok(mt)
     // check this timeout
-    let mut n_received = 0usize;
+    let mut n_received        = 0usize;
+    let mut rb_events_added   = 0usize;
+    let mut iter_ev           = 0usize;
+    let mut rb_events_dropped = 0usize;
     while !ev_from_rb.is_empty() || n_received < 20 {
       match ev_from_rb.recv() {
         Err(err) => {
           error!("Can't receive RBEvent! Err {err}");
         },
-        // FIXME - remove the clone!!
         Ok(rb_ev) => {
+          // FIXME - this is technically a bit risky, but 
+          // mt event should arrive so much earlier (seconds)
+          // I hope it won't be a problem. Otherwise we have
+          // to add another cache.
           for ev in event_cache.iter_mut() {
+            iter_ev += 1;
             if ev.mt_event.event_id == rb_ev.header.event_id {
               ev.rb_events.push(rb_ev.clone());
+              rb_events_added += 1;
+              break;
             }
           }
+          if iter_ev == event_cache.len() {
+            error!("We dropped {}", rb_ev);
+          }
+
           n_received += 1;
         }
       }
