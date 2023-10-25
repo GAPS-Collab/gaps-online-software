@@ -1,5 +1,14 @@
 # OMILU series
 
+# v0.7.1
+* massive cleanup, removes lots of unsued features
+* no writing of raw RB data anymore
+* removes ltb list
+* since RBEventMemoryView will go away, cleaning up 
+  the match cases.
+* DataFormat will go away as well, removing this 
+  dependency.
+
 # v0.7.0
 * cleanup - removes all deprecated code
 

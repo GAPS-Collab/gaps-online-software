@@ -76,12 +76,6 @@ struct Args {
   /// Remotely trigger the readoutboards to run the calibration routines (tcal, vcal)
   #[arg(long, default_value_t = false)]
   calibration: bool,
-  /// Replay RB binary data (level 0) from a certain directory
-  #[arg(long)]
-  replay: Option<PathBuf>,
-  /// Together with --replay, set the rate for replaying data (in Hz)
-  #[arg(long, default_value_t = 100)]
-  replay_rate: u32,
   /// A json config file with detector information
   #[arg(short, long)]
   json_config: Option<PathBuf>,
@@ -116,10 +110,6 @@ fn main() {
   // deal with command line arguments
   let args = Args::parse();
 
-  // deal with arguments we have not implemented yet
-  if args.replay.is_some() {
-    todo!("Feature not yet implemented!");
-  }
   if args.calibration {
     todo!("Feature not yet implemented!");
   }
@@ -188,10 +178,7 @@ fn main() {
   let calib_file_path       = config["calibration_file_path"].as_str().unwrap().to_owned();
   let db_path               = Path::new(config["db_path"].as_str().unwrap());
   let db_path_c             = db_path.clone();
-  let mut ltb_list          = get_ltbs_from_sqlite(db_path);
   let mut rb_list           = get_rbs_from_sqlite(db_path_c);
-
-  let ltb_ignorelist = &config["ltb_ignorelist"];
   let rb_ignorelist  = &config["rb_ignorelist"];
   //exit(0);
   for k in 0..rb_ignorelist.len() {
@@ -199,17 +186,8 @@ fn main() {
     let bad_rb = rb_ignorelist[k].as_u8().unwrap();
     rb_list.retain(|x| x.rb_id != bad_rb);
   }
-  for k in 0..ltb_ignorelist.len() {
-    println!("=> We will remove LTB {} due to it being marked as IGNORE in the config file!", ltb_ignorelist[k]);
-    let bad_ltb = ltb_ignorelist[k].as_u8().unwrap();
-    ltb_list.retain(|x| x.ltb_id != bad_ltb);
-  }
   nboards = rb_list.len();
   println!("=> We will use the following tof manifest:");
-  println!("== ==> LTBs [{}]:", ltb_list.len());
-  for ltb in &ltb_list {
-    println!("\t {}", ltb);
-  }
   println!("== ==> RBs [{}]:", rb_list.len());
   for rb in &rb_list {
     println!("\t {}", rb);
