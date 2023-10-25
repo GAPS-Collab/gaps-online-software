@@ -742,7 +742,7 @@ pub fn readoutboard_commander(cmd : &Receiver<TofPacket>){
   let ctx = zmq::Context::new();
   let mut address_ip = String::from("tcp://");
   //let this_board_ip = local_ip().expect("Unable to obtainl local board IP. Something is messed up!");
-  let data_port    = DATAPORT;
+  let data_port     = DATAPORT;
   let this_board_ip = IpAddr::V4(Ipv4Addr::new(10, 0, 1, 1));
 
   match this_board_ip {
@@ -752,7 +752,7 @@ pub fn readoutboard_commander(cmd : &Receiver<TofPacket>){
   let data_address : String = address_ip.clone() + ":" + &data_port.to_string();
   let data_socket = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
   data_socket.bind(&data_address).expect("Unable to bind to data (PUB) socket {data_adress}");
-  info!("0MQ PUB socket bound to address {data_address}");
+  println!("==> 0MQ PUB socket bound to address {data_address}");
   loop {
     // check if we get a command from the main 
     // thread
@@ -774,11 +774,16 @@ pub fn readoutboard_commander(cmd : &Receiver<TofPacket>){
             let mut payload_str  = String::from("RB");
             match RBCommand::from_bytestream(&packet.payload, &mut 0) {
               Ok(rb_cmd) => {
+                let to_rb_id = rb_cmd.rb_id;
                 if rb_cmd.rb_id < 10 {
                   payload_str += &String::from("0");
+                  payload_str += &to_rb_id.to_string();
+                } else {
+                  payload_str += &to_rb_id.to_string();
                 }
+
                 let mut payload = payload_str.into_bytes();
-                payload.append(&mut packet.payload);
+                payload.append(&mut packet.to_bytestream());
                 match data_socket.send(&payload,0) {
                   Err(err) => error!("Unable to send command {}! Error {err}", rb_cmd),
                   Ok(_)    => info!("Making event request! {}", rb_cmd)

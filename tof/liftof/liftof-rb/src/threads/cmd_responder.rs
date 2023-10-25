@@ -113,6 +113,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
     }
 
     if !is_connected {
+      error!("Connection to C&C server lost!");
       continue;
     }
 

@@ -27,7 +27,7 @@ use tof_dataclasses::events::RBEvent;
 /// * control_ch : Receive operation mode instructions
 ///
 /// * waveform_analysis : For the events requested, do the waveform processing 
-///                         already
+///                       already
 pub fn event_cache(tp_recv           : Receiver<TofPacket>,
                    tp_to_pub         : &Sender<TofPacket>,
                    resp_to_cmd       : &Sender<TofResponse>,
