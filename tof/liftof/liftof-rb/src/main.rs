@@ -111,7 +111,7 @@ fn main() {
   let test_eventids            = args.test_eventids;
   
   //FIMXE - this needs to become part of clap
-  let cmd_server_ip = String::from("10.0.1.10");
+  let cmd_server_ip = String::from("10.0.1.1");
   //let cmd_server_ip     = args.cmd_server_ip;  
   let this_board_ip = local_ip().expect("Unable to obtainl local board IP. Something is messed up!");
   
@@ -313,7 +313,6 @@ fn main() {
     // we are either in calibration mode
     // or have started manually either with 
     // a config or not
-    println!("=> We are not run by systemd, so we will stop the program when it is done");
     if calibration {
       // we execute this routine first, then we 
       // can go into our loop listening for input
@@ -342,25 +341,27 @@ fn main() {
         rc_config.nevents = n_events_run;
       }
 
+      // if the runconfig does not have nevents different from 
+      // 0, we will not send it right now. The commander will 
+      // then take care of it and send it when it is time.
       if rc_config.nevents != 0 {
         println!("Got a number of events to be run > 0. Will stop the run after they are done. If you want to run continuously and listen for new runconfigs from the C&C server, set nevents to 0");
-        end_after_run = true
-      }
-
-      if !rc_config.is_active {
-        println!("=> The provided runconfig does not have the is_active field set to true. Won't start a run if that is what you were waiting for.");
-      } else {
-        println!("=> Waiting for threads to start..");
-        thread::sleep(time::Duration::from_secs(5));
-        println!("=> ..done");
-      }
-      match rc_to_runner.send(rc_config) {
-        Err(err) => error!("Could not initialzie Run! Err {err}"),
-        Ok(_)    => {
-          if rc_config.is_active {
-            println!("=> Runner configured! Attempting to start.");
-          } else {
-            println!("=> Stopping run..")
+        end_after_run = true;
+        if !rc_config.is_active {
+          println!("=> The provided runconfig does not have the is_active field set to true. Won't start a run if that is what you were waiting for.");
+        } else {
+          println!("=> Waiting for threads to start..");
+          thread::sleep(time::Duration::from_secs(5));
+          println!("=> ..done");
+        }
+        match rc_to_runner.send(rc_config) {
+          Err(err) => error!("Could not initialzie Run! Err {err}"),
+          Ok(_)    => {
+            if rc_config.is_active {
+              println!("=> Runner configured! Attempting to start.");
+            } else {
+              println!("=> Stopping run..")
+            }
           }
         }
       }
