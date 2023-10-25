@@ -1260,10 +1260,13 @@ pub fn event_cache(tp_recv           : Receiver<TofPacket>,
 
   let mut n_send_errors  = 0u64;   
   let mut op_mode_stream = false;
+  let mut packet_evid : u32 = 0;
 
-  let mut oldest_event_id : u32 = 0;
-  let mut event_cache   : HashMap::<u32, TofPacket> = HashMap::new();
-  let mut request_cache : HashMap::<u32, u8> = HashMap::new();
+  let mut oldest_event_id    : u32 = 0;
+  let mut event_cache        : HashMap::<u32, TofPacket> = HashMap::new();
+  let mut request_cache      : HashMap::<u32, u8> = HashMap::new();
+  let mut n_iter_loop        : usize = 0;
+  let max_len_request_cache  : usize = 10000;
   loop {
     // check changes in operation mode
     match get_op_mode.try_recv() {
@@ -1284,28 +1287,46 @@ pub fn event_cache(tp_recv           : Receiver<TofPacket>,
       Ok(packet) => {
         // FIXME - there need to be checks what the 
         // packet type is
-        let packet_evid : u32;
         match packet.packet_type {
           PacketType::RBCommand => {
-            // this will be the event requests
-            match RBCommand::from_bytestream(&packet.payload, &mut 0) {
-              Err(err) => {
-                error!("Unable to understand bytestream! Err {err}");
-                continue;
-              }
-              Ok(request) => {
-                // if we can serve the request, we are good, if not we put it in the 
-                // queue
-                if request.command_code != RBCommand::REQUEST_EVENT {
-                  error!("Can't deal with RBCommand {}", request);
+            // we only care if we are not in stream mode
+            if op_mode_stream {
+              debug!("Received RBCommand, but we are in StreamAny mode, ignoring...");
+            } else {
+              // this will be the event requests
+              match RBCommand::from_bytestream(&packet.payload, &mut 0) {
+                Err(err) => {
+                  error!("Unable to understand bytestream! Err {err}");
                   continue;
                 }
-                if !request_cache.contains_key(&request.payload) {
-                  request_cache.insert(request.payload, request.channel_mask);
+                Ok(request) => {
+                  // if we can serve the request, we are good, if not we put it in the 
+                  // queue
+                  info!("Received reqauest {}", request);
+                  if request.command_code != RBCommand::REQUEST_EVENT {
+                    error!("Can't deal with RBCommand {}", request);
+                    continue;
+                  }
+                  if !request_cache.contains_key(&request.payload) {
+                    request_cache.insert(request.payload, request.channel_mask);
+                  } else {
+                    // unwrap is fine, since we checked we have it
+                    let tp = event_cache.remove(&request.payload).unwrap();
+                    match tp_to_pub.try_send(tp) {
+                      Err(err) => trace!("Error sending event {}! {err}", request.payload),
+                      Ok(_)    => ()
+                    }
+                  }
+                  // make sure cache won't overflow
+                  if request_cache.len() > max_len_request_cache {
+                    error!("Error! event_cache overflow! Dropping oldest_request");
+                    error!("ACTUALLY THIS IS NOT IMPLEMENTED YET");
+                    // FIXME - we need to do something here
+                  }
+                  continue;
                 }
-                continue;
               }
-            }
+            } // end if not op_mode_stream
           },
           PacketType::RBEvent   => {
             // FIXME - proper matching, however, if implemented
@@ -1321,51 +1342,27 @@ pub fn event_cache(tp_recv           : Receiver<TofPacket>,
           },
           _ => {
             error!("RB event cache can not deal with packet type {}", packet.packet_type);
-            packet_evid = 0
+            packet_evid = 0;
+            continue;
           }
         }
         if oldest_event_id == 0 {
           oldest_event_id = packet_evid;
         } //endif
-        //// store the event in the cache
+        // store the event in the cache
         ////println!("Received payload with event id {}" ,event.event_id);
-        if !event_cache.contains_key(&packet_evid) {
+        if !event_cache.contains_key(&packet_evid) && packet_evid != 0 {
           event_cache.insert(packet_evid, packet);
         }
         //// keep track of the oldest event_id
         //trace!("We have a cache size of {}", event_cache.len());
         if event_cache.len() > cache_size {
+          error!("Event cache overflow! Deleting event {}", oldest_event_id);
           event_cache.remove(&oldest_event_id);
           oldest_event_id += 1;
         } //endif
       }
-    }
-
-
-    //// store incoming events in the cache  
-    //match recv_ev_pl.try_recv() {
-    //  Err(err) => {
-    //    trace!("No event payload! {err}");
-    //    //continue;
-    //  } // end err
-    //  Ok(event)  => {
-    //    trace!("Received next RBEvent!");
-    //    if oldest_event_id == 0 {
-    //      oldest_event_id = event.event_id;
-    //    } //endif
-    //    // store the event in the cache
-    //    //println!("Received payload with event id {}" ,event.event_id);
-    //    if !event_cache.contains_key(&event.event_id) {
-    //      event_cache.insert(event.event_id, event);
-    //    }
-    //    // keep track of the oldest event_id
-    //    trace!("We have a cache size of {}", event_cache.len());
-    //    if event_cache.len() > cache_size {
-    //      event_cache.remove(&oldest_event_id);
-    //      oldest_event_id += 1;
-    //    } //endif
-    //  }// end Ok
-    //} // end match
+    }  // end of tp_recv.try_recv() 
   
     // if we are in "stream_any" mode, we don't need to take care
     // of any fo the response/request.
@@ -1382,216 +1379,33 @@ pub fn event_cache(tp_recv           : Receiver<TofPacket>,
       event_cache.clear();
       continue; // makes rest of code unreachable
                 // for this case
+    } else {
+      // Here now, we have to make sure that the 
+      // caches get emptied. So we have to check for every request in our request cache,
+      // if the event_cache has it. Do this only every 10 iterations. (number should be configurable)
+      if n_iter_loop == 9 {
+        for event_key in request_cache.keys() {
+          if event_cache.contains_key(&event_key) {
+            // unwrap is fine, since we checked we have it
+            let tp = event_cache.remove(&event_key).unwrap();
+            info!("Responding with event {}", event_key);
+            match tp_to_pub.try_send(tp) {
+              Err(err) => trace!("Error sending event {}! {err}", event_key),
+              Ok(_)    => ()
+            }
+          } 
+        }
+        n_iter_loop == 0; 
+        continue;
+      }
     }
-    // this is the call/response
-    // case
-    //match recv_evid.try_recv() {
-    //  Err(err) => {
-    //    trace!("Issue receiving event id! Err: {err}");
-    //  },
-    //  Ok(event_id) => {
-    //    let has_it = event_cache.contains_key(&event_id);
-    //    if !has_it {
-    //      let resp = TofResponse::EventNotReady(event_id);
-    //      match resp_to_cmd.try_send(resp) {
-    //        Err(err) => trace!("Error informing the commander that we don't have that! Err {err}"),
-    //        Ok(_)    => ()
-    //      }
-    //      // hamwanich
-    //      warn!("We don't have {event_id}!");
-    //    } else {
-    //      let tp = event_cache.remove(&event_id).unwrap();
-    //      let resp =  TofResponse::Success(event_id);
-    //      match resp_to_cmd.try_send(resp) {
-    //        Err(err) => trace!("Error informing the commander that we do have {event_id}! Err {err}"),
-    //        Ok(_)    => ()
-    //      }
-    //      match tp_to_pub.try_send(tp) {
-    //        Err(err) => trace!("Error sending! {err}"),
-    //        Ok(_)    => ()
-    //      }
-    //    }
-    //  }
-    //} // end match
-    //if n_send_errors > 0 {
-    //  warn!("There were {n_send_errors} errors during sending!");
-    //}
+    if n_send_errors > 0 {
+      error!("There were {n_send_errors} errors during sending!");
+    }
+  n_iter_loop += 1;
   } // end loop
 }
 
-///// Deal with incoming commands
-/////
-/////
-/////
-/////
-//pub struct Commander<'a> {
-//
-//  pub evid_send        : Sender<u32>,
-//  pub change_op_mode   : Sender<TofOperationMode>, 
-//  pub rb_evt_recv      : Receiver<Option<RBEventPayload>>,
-//  pub hasit_from_cache : &'a Receiver<bool>,
-//}
-//
-//impl Commander<'_> {
-//
-//  pub fn new<'a> (send_ev          : Sender<u32>,
-//                  hasit_from_cache : &'a Receiver<bool>,
-//                  evpl_from_cache  : Receiver<Option<RBEventPayload>>,
-//                  change_op_mode   : Sender<TofOperationMode>)
-//    -> Commander<'a> {
-//
-//    Commander {
-//      evid_send        : send_ev,
-//      change_op_mode   : change_op_mode,
-//      rb_evt_recv      : evpl_from_cache,
-//      hasit_from_cache : hasit_from_cache,
-//    }
-//  }
-//
-//
-//  /// Interpret an incoming command 
-//  ///
-//  /// The command comes most likely somehow over 
-//  /// the wir from the tof computer
-//  ///
-//  /// Match with a list of known commands and 
-//  /// take action.
-//  ///
-//  /// # Arguments
-//  ///
-//  /// * command : A TofCommand instructing the 
-//  ///             commander what to do
-//  ///             Will generate a TofResponse 
-//  ///             
-//  pub fn command (&self, cmd : &TofCommand)
-//    -> Result<TofResponse, FIXME> {
-//    match cmd {
-//      TofCommand::PowerOn   (mask) => {
-//        warn!("Not implemented");
-//        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
-//      },
-//      TofCommand::PowerOff  (mask) => {
-//        warn!("Not implemented");
-//        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
-//      },
-//      TofCommand::PowerCycle(mask) => {
-//        warn!("Not implemented");
-//        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
-//      },
-//      TofCommand::RBSetup   (mask) => {
-//        warn!("Not implemented");
-//        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
-//      }, 
-//      TofCommand::SetThresholds   (thresholds) =>  {
-//        warn!("Not implemented");
-//        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
-//      },
-//      TofCommand::StartValidationRun  (_) => {
-//        warn!("Not implemented");
-//        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
-//      },
-//      TofCommand::RequestWaveforms (eventid) => {
-//        warn!("Not implemented");
-//        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
-//      },
-//      TofCommand::UnspoolEventCache   (_) => {
-//        warn!("Not implemented");
-//        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
-//      },
-//      TofCommand::StreamOnlyRequested (_) => {
-//        let op_mode = TofOperationMode::TofModeRequestReply;
-//        
-//        match self.change_op_mode.try_send(op_mode) {
-//          Err(err) => trace!("Error sending! {err}"),
-//          Ok(_)    => ()
-//        }
-//        return Ok(TofResponse::Success(RESP_SUCC_FINGERS_CROSSED));
-//      },
-//      TofCommand::StreamAnyEvent      (_) => {
-//        let op_mode = TofOperationMode::TofModeStreamAny;
-//        match self.change_op_mode.try_send(op_mode) {
-//          Err(err) => trace!("Error sending! {err}"),
-//          Ok(_)    => ()
-//        }
-//        return Ok(TofResponse::Success(RESP_SUCC_FINGERS_CROSSED));
-//      },
-//      //TofCommand::DataRunStart (max_event) => {
-//      //  // let's start a run. The value of the TofCommnad shall be 
-//      //  // nevents
-//      //  self.workforce.execute(move || {
-//      //      runner(Some(*max_event as u64),
-//      //             None,
-//      //             None,
-//      //             self.get_killed_chn,
-//      //             None);
-//      //  }); 
-//      //  return Ok(TofResponse::Success(RESP_SUCC_FINGERS_CROSSED));
-//      //}, 
-//      //TofCommand::DataRunEnd   => {
-//      //  if !self.run_active {
-//      //    return Ok(TofResponse::GeneralFail(RESP_ERR_NORUNACTIVE));
-//      //  }
-//      //  warn!("Will kill current run!");
-//      //  self.kill_chn.send(true);
-//      //  return Ok(TofResponse::Success(RESP_SUCC_FINGERS_CROSSED));
-//      //},
-//      TofCommand::VoltageCalibration (_) => {
-//        warn!("Not implemented");
-//        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
-//      },
-//      TofCommand::TimingCalibration  (_) => {
-//        warn!("Not implemented");
-//        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
-//      },
-//      TofCommand::CreateCalibrationFile (_) => {
-//        warn!("Not implemented");
-//        return Ok(TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED));
-//      },
-//      TofCommand::RequestEvent(eventid) => {
-//        match self.evid_send.send(*eventid) {
-//          Err(err) => {
-//            debug!("Problem sending event id to cache! Err {err}");
-//            return Ok(TofResponse::GeneralFail(*eventid));
-//          },
-//          Ok(_) => (),
-//        }
-//        match self.hasit_from_cache.recv() {
-//          Err(_) => {
-//            return Ok(TofResponse::EventNotReady(*eventid));
-//          }
-//          Ok(hasit) => {
-//            // FIXME - prefix topic
-//            if hasit {
-//              return Ok(TofResponse::Success(*eventid));
-//            } else {
-//              return Ok(TofResponse::EventNotReady(*eventid));
-//            }
-//            //Some(event) => {
-//            //  match self.zmq_pub_socket.send(event.payload, zmq::DONTWAIT) {
-//            //    Ok(_)  => {
-//            //      return Ok(TofResponse::Success(*eventid));
-//            //    }
-//            //    Err(err) => {
-//            //      debug!("Problem with PUB socket! Err {err}"); 
-//            //      return Ok(TofResponse::ZMQProblem(*eventid));
-//            //    }
-//            //  }
-//            //}
-//            //}
-//          }
-//        }
-//      },
-//      TofCommand::RequestMoni (_) => {
-//      },
-//      TofCommand::Unknown (_) => {
-//      }
-//      _ => {
-//      }
-//    } 
-//    let response = TofResponse::Success(1);
-//    Ok(response)
-//  }
-//}
 
 ///  Get the blob buffer size from occupancy register
 ///

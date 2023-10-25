@@ -28,11 +28,11 @@ use liftof_lib::color_log;
 use liftof_rb::threads::cmd_responder;
 use liftof_rb::api::*;
 use liftof_rb::control::*;
-use liftof_rb::memory::write_control_reg;
-use liftof_rb::memory::read_control_reg;
+//use liftof_rb::memory::write_control_reg;
+//use liftof_rb::memory::read_control_reg;
 use tof_dataclasses::threading::ThreadPool;
 use tof_dataclasses::packets::TofPacket;
-use tof_dataclasses::commands::{//TofCommand,
+use tof_dataclasses::commands::{//RBCommand,
                                 TofResponse,
                                 TofOperationMode};
 use tof_dataclasses::events::{DataType,
@@ -111,7 +111,7 @@ fn main() {
   let test_eventids            = args.test_eventids;
   
   //FIMXE - this needs to become part of clap
-  let cmd_server_ip = String::from("10.0.1.1");
+  let cmd_server_ip = String::from("10.0.1.10");
   //let cmd_server_ip     = args.cmd_server_ip;  
   let this_board_ip = local_ip().expect("Unable to obtainl local board IP. Something is messed up!");
   
@@ -121,11 +121,11 @@ fn main() {
   let dna   = get_device_dna().expect("Unable to obtain device DNA!"); 
 
   // deal with bug
-  let mut channel_reg = read_control_reg(0x44).unwrap();
-  println!("READING CHANNEL MASK {channel_reg}");
-  write_control_reg(0x44, 0x3FF).unwrap();
-  channel_reg = read_control_reg(0x44).unwrap();
-  println!("READING CHANNEL MASK {channel_reg}");
+  //let mut channel_reg = read_control_reg(0x44).unwrap();
+  //println!("READING CHANNEL MASK {channel_reg}");
+  //write_control_reg(0x44, 0x3FF).unwrap();
+  //channel_reg = read_control_reg(0x44).unwrap();
+  //println!("READING CHANNEL MASK {channel_reg}");
 
   // welcome banner!
   println!("-----------------------------------------------");
@@ -224,7 +224,6 @@ fn main() {
       (Sender<TofOperationMode>, Receiver<TofOperationMode>)                = unbounded();
   let (bs_send, bs_recv)             : (Sender<Vec<u8>>, Receiver<Vec<u8>>) = unbounded(); 
 
-  let (evid_to_cache, evid_from_cmdr)   : (Sender<u32>, Receiver<u32>)      = unbounded();
 
   
   // ucla debugging
@@ -278,10 +277,10 @@ fn main() {
                                 &tp_to_pub_ev,
                                 &rsp_to_sink,
                                 &opmode_from_runner, 
-                                evid_from_cmdr,
                                 wf_analysis,
                                 cache_size)
   });
+  let tp_to_cache_c        = tp_to_cache.clone();
   workforce.execute(move || {
                     event_processing(&bs_recv,
                                      &tp_to_cache,
@@ -298,7 +297,7 @@ fn main() {
                                   heartbeat_timeout_seconds,
                                   &rc_file_path,
                                   &rc_to_runner_c,
-                                  &evid_to_cache )
+                                  &tp_to_cache_c)
   
   });
   
