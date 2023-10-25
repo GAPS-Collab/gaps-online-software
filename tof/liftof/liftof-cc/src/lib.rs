@@ -1,6 +1,5 @@
 pub mod constants;
 pub mod api;
-pub mod event_builder;
 pub mod paddle_packet_cache;
 pub mod flight_comms;
 pub mod threads;
