@@ -36,7 +36,8 @@ use tof_dataclasses::commands::*;
 use tof_dataclasses::events::{RBEventHeader,
                               RBEvent,
                               RBEventMemoryView,
-                              DataType};
+                              DataType,
+                              DataFormat};
 use tof_dataclasses::serialization::search_for_u16;
 use tof_dataclasses::commands::{TofCommand,
                                 TofResponse,
@@ -699,9 +700,7 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
         evt_cnt      = 0;
         //delta_events = 0;
         n_events     = 0;
-
         rc          = new_config;
-        
         // first of all, check if the new run config is active. 
         // if not, stop all triggers
         if rc.is_active { 
@@ -732,13 +731,6 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
         //// from here on, we prepare to start 
         //// a new run with this RunConfig!
         //// set the channel mask
-        //match set_active_channel_mask(rc.active_channel_mask) { 
-        ////match set_active_channel_mask_with_ch9(rc.active_channel_mask as u32) {
-        //  Ok(_) => (),
-        //  Err(err) => {
-        //    error!("Unable to set channel mask! Err {err}");
-        //  }
-        //}
         reset_dma_and_buffers();
 
         // deal with the individual settings:

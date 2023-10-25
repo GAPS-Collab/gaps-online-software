@@ -1,9 +1,9 @@
-pub mod readoutboard_comm;
 pub mod constants;
 pub mod api;
 pub mod event_builder;
 pub mod paddle_packet_cache;
 pub mod flight_comms;
+pub mod threads;
 // this is a list of tests
 // FIXME - this should follow
 // the "official" structure
