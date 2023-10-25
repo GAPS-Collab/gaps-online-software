@@ -1,14 +1,9 @@
-use std::error::Error;
 use std::fmt;
-use crate::serialization::{parse_u8,
-                           parse_u16,
+use crate::serialization::{parse_u16,
                            parse_u32,
                            parse_bool, 
                            Serialization,
                            SerializationError};
-
-use crate::events::DataType;
-use crate::events::DataFormat;
 
 #[cfg(feature = "random")] 
 use crate::FromRandom;
@@ -18,10 +13,6 @@ extern crate rand;
 use rand::Rng;
 
 
-use crate::errors::DecodingError;
-
-extern crate json;
-use json::JsonValue;
 
 extern crate serde;
 extern crate serde_json;
@@ -42,15 +33,12 @@ pub struct RunConfig {
   pub trigger_poisson_rate    : u32,
   pub trigger_fixed_rate      : u32,
   pub latch_to_mtb            : bool,
-  pub active_channel_mask     : u8,
-  pub data_type               : DataType,
-  pub data_format             : DataFormat,
   pub rb_buff_size            : u16
 }
 
 impl RunConfig {
 
-  pub const VERSION            : &'static str = "1.1";
+  pub const VERSION            : &'static str = "1.3";
 
   pub fn new() -> Self {
     Self {
@@ -61,9 +49,6 @@ impl RunConfig {
       trigger_poisson_rate    : 0,
       trigger_fixed_rate      : 0,
       latch_to_mtb            : false,
-      active_channel_mask     : u8::MAX,
-      data_type               : DataType::Unknown, 
-      data_format             : DataFormat::Unknown,
       rb_buff_size            : 0,
     }
   }
@@ -74,37 +59,6 @@ impl RunConfig {
 
   pub fn runs_forever(&self) -> bool {
     self.nevents == 0 
-  }
-
-  /// Mark a channel as active
-  ///
-  /// # Arguments
-  ///
-  /// ch : 1-9 
-  pub fn activate_channel(&mut self, ch : u8) -> Result<(), DecodingError> {
-    if ch < 1 || ch > 9 {
-      error!("Channel id {ch} is invalid!");
-      return Err(DecodingError::ChannelOutOfBounds);
-    }
-    self.active_channel_mask = self.active_channel_mask | u8::pow(ch -1 ,2);
-    Ok(())
-  }
-  
-  pub fn deactivate_channel(&mut self, ch : u8) -> Result<(), DecodingError> {
-    if ch < 1 || ch > 9 {
-      error!("Channel id {ch} is invalid!");
-      return Err(DecodingError::ChannelOutOfBounds);
-    }
-    self.active_channel_mask = self.active_channel_mask & !u8::pow(ch -1,2);
-    Ok(())
-  }
-
-  pub fn is_active_channel(&self, ch : u8) -> Result<bool, DecodingError> {
-    if ch < 1 || ch > 9 {
-      error!("Channel id {ch} is invalid!");
-      return Err(DecodingError::ChannelOutOfBounds);
-    }
-    Ok(self.active_channel_mask & u8::pow(ch - 1,2) > 0) 
   }
 
   pub fn from_json_serde(config: &str) -> serde_json::Result<Self> {
@@ -121,7 +75,7 @@ impl RunConfig {
 impl Serialization for RunConfig {
   const HEAD               : u16   = 43690; //0xAAAA
   const TAIL               : u16   = 21845; //0x5555
-  const SIZE               : usize = 28; // bytes including HEADER + FOOTER
+  const SIZE               : usize = 25; // bytes including HEADER + FOOTER
   
   fn from_bytestream(bytestream : &Vec<u8>,
                      pos        : &mut usize)
@@ -135,9 +89,6 @@ impl Serialization for RunConfig {
     pars.trigger_poisson_rate    = parse_u32(bytestream, pos);
     pars.trigger_fixed_rate      = parse_u32(bytestream, pos);
     pars.latch_to_mtb            = parse_bool(bytestream, pos);
-    pars.active_channel_mask = parse_u8(bytestream, pos);
-    pars.data_type    = DataType::from_u8(&parse_u8(bytestream, pos));
-    pars.data_format  = DataFormat::from_u8(&parse_u8(bytestream, pos));
     pars.rb_buff_size = parse_u16(bytestream, pos);
     *pos += 2; // for the tail 
     //_ = parse_u16(bytestream, pos);
@@ -154,9 +105,6 @@ impl Serialization for RunConfig {
     stream.extend_from_slice(&self.trigger_poisson_rate.to_le_bytes());
     stream.extend_from_slice(&self.trigger_fixed_rate.to_le_bytes());
     stream.extend_from_slice(&u8::from(self.latch_to_mtb).to_le_bytes());
-    stream.push(self.active_channel_mask);
-    stream.extend_from_slice(&self.data_type.to_u8().to_le_bytes());
-    stream.extend_from_slice(&self.data_format.to_u8().to_le_bytes());
     stream.extend_from_slice(&self.rb_buff_size.to_le_bytes());
     stream.extend_from_slice(&Self::TAIL.to_le_bytes());
     stream
@@ -179,23 +127,17 @@ impl fmt::Display for RunConfig {
     nevents     : {}
     nseconds    : {}
     stream any  : {}
-    data type   : {}
-    data format : {} 
     tr_poi_rate : {}
     tr_fix_rate : {}
     mtb_latch   : {}
-    active_ch   : {}
       |--> data channels (ch 9 separate)
     buff size : {} [ev]>",
       self.nevents,
       self.nseconds,
       self.stream_any,
-      self.data_type.string_repr(),
-      self.data_format.string_repr(),
       self.trigger_poisson_rate,
       self.trigger_fixed_rate,
       self.latch_to_mtb,
-      self.active_channel_mask,
       self.rb_buff_size)
     }
   }
@@ -214,12 +156,6 @@ impl FromRandom for RunConfig {
     cfg.trigger_poisson_rate    = rng.gen::<u32>();
     cfg.trigger_fixed_rate      = rng.gen::<u32>();
     cfg.latch_to_mtb            = rng.gen::<bool>();
-    cfg.active_channel_mask     = rng.gen::<u8>();
-    // yes, this is not the smartest since it will typically generate
-    // Unknown data types. However, we test DataType seperatly, so 
-    // we might be ok.
-    cfg.data_type               = DataType::from_u8(&rng.gen::<u8>());
-    cfg.data_format             = DataFormat::from_u8(&rng.gen::<u8>());
     cfg.rb_buff_size            = rng.gen::<u16>();
     cfg
   }
