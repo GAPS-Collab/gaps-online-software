@@ -36,8 +36,7 @@ use tof_dataclasses::commands::*;
 use tof_dataclasses::events::{RBEventHeader,
                               RBEvent,
                               RBEventMemoryView,
-                              DataType,
-                              DataFormat};
+                              DataType};
 use tof_dataclasses::serialization::search_for_u16;
 use tof_dataclasses::commands::{TofCommand,
                                 TofResponse,
@@ -856,7 +855,7 @@ pub fn run_check() {
 pub fn runner(run_config              : &Receiver<RunConfig>,
               max_errors              : Option<u64>,
               bs_sender               : &Sender<Vec<u8>>,
-              dtf_to_evproc           : &Sender<(DataType,DataFormat)>,
+              dtf_to_evproc           : &Sender<DataType>,
               opmode_to_cache         : &Sender<TofOperationMode>,
               show_progress           : bool) { 
   
@@ -995,10 +994,8 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
           Ok(_)    => ()
         }
 
-        // send the data format/type directly to the 
-        let df_c = rc.data_format.clone();
         let dt_c = rc.data_type.clone();
-        match dtf_to_evproc.send((dt_c, df_c)) {
+        match dtf_to_evproc.send(dt_c) {
           Err(err) => {
             error!("Unable to send dataformat & type to the event processing subroutine! Err {err}");
           }
@@ -1497,200 +1494,6 @@ pub fn ram_buffer_handler(buff_trip     : usize,
 
 
 
-///  Transforms raw bytestream to RBEventPayload
-///
-///  This allows to get the eventid from the 
-///  binrary form of the RBEvent
-///
-///  #Arguments
-/// 
-///  * bs_recv     : A receiver for bytestreams. The 
-///                  bytestream comes directly from 
-///                  the data buffers.
-///  * tp_sender   : Send the resulting data product to 
-///                  get processed further
-///  * data_type   : If different from 0, do some processing
-///                  on the data read from memory
-///
-pub fn event_processing(bs_recv           : &Receiver<Vec<u8>>,
-                        tp_sender         : &Sender<TofPacket>,
-                        dtf_fr_runner     : &Receiver<(DataType,DataFormat)>,
-                        verbose           : bool) {
-  let mut n_events : u32;
-  let mut event_id : u32 = 0;
-  let mut last_event_id   : u32 = 0; // for checks
-  let mut events_not_sent : u64 = 0;
-  let mut data_type   : DataType   = DataType::Unknown;
-  let mut data_format : DataFormat = DataFormat::Unknown; 
-  let one_milli   = time::Duration::from_millis(1);
-  let mut skipped_events : usize = 0;
-  'main : loop {
-    let mut start_pos : usize = 0;
-    n_events = 0;
-    if !dtf_fr_runner.is_empty() {
-      match dtf_fr_runner.try_recv() {
-        Err(err) => {
-          error!("Issues receiving datatype/format! Err {err}");
-        }
-        Ok(dtf) => {
-          data_type   = dtf.0;
-          data_format = dtf.1; 
-          info!("Will process events for data type {}, format {}!", data_type, data_format);
-        }
-      }
-    }
-    if bs_recv.is_empty() {
-      thread::sleep(5*one_milli);
-      continue;
-    }
-    // this can't be blocking anymore, since 
-    // otherwise we miss the datatype
-    match bs_recv.recv() {
-      Ok(bytestream) => {
-        let mut packets_in_stream : u32 = 0;
-        'bytestream : loop {
-          //println!("Received bytestream");
-          match search_for_u16(RBEventMemoryView::HEAD, &bytestream, start_pos) {
-            Err(err) => {
-              debug!("Send {n_events} events. Got last event_id! {event_id}");
-              if start_pos == 0 {
-                error!("Got bytestream, but can not find HEAD bytes, err {err:?}");
-              }
-              break 'bytestream;},
-            Ok(head_pos) => {
-              let mut tail_pos = search_for_u16(RBEventMemoryView::TAIL, &bytestream, head_pos).unwrap_or(head_pos);
-              if tail_pos < head_pos {
-                tail_pos = head_pos;
-              }
-              //println!("Event size {}", tail_pos - head_pos);
-              if tail_pos == 0 {
-                tail_pos   = head_pos + RBEventMemoryView::SIZE;
-              }
-              if tail_pos >= bytestream.len() - 1 {
-                // we are finished here
-                warn!("Got a trunctaed event, discarding..");
-                trace!("Work on current blob complete. Extracted {n_events} events. Got last event_id! {event_id}");
-                break 'bytestream;
-              }
-              n_events += 1;
-              start_pos = tail_pos;
-              let mut tp = TofPacket::new();
-              match data_format {
-                DataFormat::MemoryView => {
-                  match RBEventMemoryView::decode_event_id(&bytestream[head_pos..tail_pos]) {
-                    Err(err) => {
-                      error!("Unable to decode event id! Err {err}");
-                      event_id = 0;
-                    },
-                    Ok(evid_stream) => {
-                      event_id = evid_stream;
-                    }
-                  }
-                  if event_id != last_event_id + 1 {
-                    error!("Event id not rising continuously! This {}, last {}", event_id, last_event_id);
-                  }
-                  last_event_id = event_id;
-                  let mut payload = Vec::<u8>::new();
-                  payload.extend_from_slice(&bytestream[head_pos..tail_pos + 2]);
-                  debug!("Prepared TofPacket for event {} with a payload size of {}", event_id, &payload.len());
-                  tp.packet_type = PacketType::RBEventMemoryView;
-                  tp.payload = payload;
-                }
-                DataFormat::Default => {
-                  let mut pos_in_stream = head_pos;
-                  match RBEvent::get_channel_packet_len(&bytestream, pos_in_stream) {
-                    Err(err)   => {
-                      error!("Unable to extract RBEvent from memory! Error {err}");
-                      events_not_sent += 1;
-                      warn!("Got a trunctaed event, discarding..");
-                      trace!("Work on current blob complete. Extracted {n_events} events. Got last event_id! {event_id}");
-                      break 'bytestream;
-                    },
-                    Ok(data) => {
-                      let packet_size = data.0;
-                      let ch_ids = data.1;
-                    }
-                  }
-
-                  match RBEvent::extract_from_rbeventmemoryview(&bytestream, &mut pos_in_stream) {
-                    Err(err)   => {
-                      error!("Unable to extract RBEvent from memory! Error {err}");
-                      events_not_sent += 1;
-                    },
-                    Ok (mut event) => {
-                      if event.header.event_id != last_event_id + 1 {
-                        skipped_events += event.header.event_id as usize - last_event_id as usize - 1;
-                        if event.header.lost_trigger { 
-                          warn!("Lost trigger!");
-                        } else {
-                          warn!("Event id not rising continuously! This {}, last {}", event.header.event_id, last_event_id);
-                          //println!("{}", event);
-                        }
-                      }
-                      last_event_id = event.header.event_id;
-                      if verbose {
-                        println!("{}", event);
-                      }
-                      event.data_type = data_type;
-                      tp = TofPacket::from(&event);
-                    }
-                  }
-                },
-                DataFormat::HeaderOnly => {
-                  let mut this_event_start_pos = head_pos;
-                  match RBEventHeader::extract_from_rbeventmemoryview(&bytestream, &mut this_event_start_pos) {
-                    Err(err) => {
-                      error!("Broken RBEventMemoryView data in memory! Err {}", err);
-                      error!("-- we tried to process {} bytes!", tail_pos - head_pos);
-                      //error!("{:?}", &bytestream[head_pos..head_pos + 100]);
-                      //error!("{:?}", &bytestream[tail_pos - 10..tail_pos + 130]);
-                      events_not_sent += 1;
-                    }
-                    Ok(event_header)    => {
-                      tp = TofPacket::from(&event_header);
-                    }
-                  }
-                }
-                _ => {todo!("Dataformat != 0, 1 or 2 is not supported!");}
-              } // end match data format
-              // set flags
-              match data_type {
-                DataType::VoltageCalibration |
-                DataType::TimingCalibration  | 
-                DataType::Noi => {
-                  tp.no_write_to_disk = true;
-                },
-                _ => ()
-              }
-              // send the packet
-              //println!("[EVENTPROC] => TofPacket to be send {}",tp);
-              match tp_sender.send(tp) {
-                Ok(_) => {
-                  packets_in_stream += 1;
-                },
-                Err(err) => error!("Problem sending TofPacket over channel! Err {err}"),
-              }
-              //debug_evids.push(event_id);
-              //info!("Got event_id {event_id}");
-              //continue 'bytestream;
-            }
-          } // end match search_for_u16 
-        } // end 'bytestream loop
-        info!("We have sent {packets_in_stream} packets for this bytestream of len {}", bytestream.len());
-      }, // end OK(recv)
-      Err(err) => {
-        error!("Received Garbage! Err {err}");
-        continue 'main;
-      }
-    }// end match 
-    if events_not_sent > 0 {
-      error!("There were {events_not_sent} unsent events!");
-    }
-    if skipped_events > 0 {
-      error!("We skipped {} events!", skipped_events);
-    }
-  } // end outer loop
-}
 
 
 ///  Prepare the whole readoutboard for data taking.

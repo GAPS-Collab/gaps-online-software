@@ -25,18 +25,16 @@ use local_ip_address::local_ip;
 use std::process::exit;
 use liftof_lib::color_log;
 
-use liftof_rb::threads::cmd_responder;
+use liftof_rb::threads::{cmd_responder,
+                         event_processing};
 use liftof_rb::api::*;
 use liftof_rb::control::*;
-//use liftof_rb::memory::write_control_reg;
-//use liftof_rb::memory::read_control_reg;
 use tof_dataclasses::threading::ThreadPool;
 use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::commands::{//RBCommand,
                                 TofResponse,
                                 TofOperationMode};
-use tof_dataclasses::events::{DataType,
-                              DataFormat};
+use tof_dataclasses::events::DataType;
 use tof_dataclasses::run::RunConfig;
 #[macro_use] extern crate log;
 
@@ -215,7 +213,7 @@ fn main() {
   let (tp_to_cache, tp_from_builder) : 
       (Sender<TofPacket>, Receiver<TofPacket>)                = unbounded();
   let (dtf_to_evproc, dtf_from_runner) :                
-      (Sender<(DataType, DataFormat)>, Receiver<(DataType, DataFormat)>)    = unbounded();
+      (Sender<DataType>, Receiver<DataType>)                  = unbounded();
   
   //let (rbcalib_to_evproc, rbcalib_from_calib)   : 
   //    (Sender<RBCalibrations>, Receiver<RBCalibrations>)                    = unbounded();
