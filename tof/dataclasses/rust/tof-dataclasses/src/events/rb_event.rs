@@ -174,6 +174,7 @@ impl FromRandom for RBMissingHit {
 /// FIXME - the channel mask is only one byte, 
 ///         and we can get rid of 3 bytes for 
 ///         the DNA
+#[deprecated(since="0.7.2", note="RBEvent is sufficient to fulfill all our needs!")]
 #[derive(Debug, Clone, PartialEq)]
 pub struct RBEventMemoryView {
   pub head            : u16, // Head of event marker

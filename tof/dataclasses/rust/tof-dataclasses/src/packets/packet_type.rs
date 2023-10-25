@@ -9,12 +9,12 @@ use std::fmt;
 pub enum PacketType {
   Unknown       , 
   TofEvent      ,
-  Monitor       ,
-  MasterTrigger , 
-  HeartBeat     ,
-  RBEventHeader ,
+  Monitor       ,    // needs to go away
+  MasterTrigger ,    // needs to be renamed to either MasterTriggerEvent or MTEvent
+  HeartBeat     ,    // might probably go away
+  RBEventHeader ,    // needs to go away
   RBEvent       ,
-  RBEventMemoryView,
+  RBEventMemoryView, // needs to go away
   TofCommand    ,
   RBCommand     ,
   RBMoni        ,
