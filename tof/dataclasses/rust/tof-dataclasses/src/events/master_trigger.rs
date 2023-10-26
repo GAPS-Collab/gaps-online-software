@@ -1191,7 +1191,7 @@ pub fn read_daq(socket : &UdpSocket,
   return Err(Box::new(MasterTriggerError::DAQNotAvailable));
 }
 
-#[cfg(test)]
+#[cfg(all(test,feature = "random"))]
 mod test_mastertriggerevent {
   use crate::serialization::Serialization;
   use crate::FromRandom;

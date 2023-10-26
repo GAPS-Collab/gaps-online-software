@@ -11,7 +11,7 @@ pub mod data_format;
 pub use master_trigger::MasterTriggerEvent;
 pub use master_trigger::MasterTriggerMapping;
 pub use tof_event::{MasterTofEvent,
-                    TofEvent};
+                    TofEventHeader};
 pub use data_type::DataType;
 pub use data_format::DataFormat;
 pub use rb_event::{RBEventMemoryView,

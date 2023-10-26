@@ -544,7 +544,7 @@ impl FromRandom for TofEventHeader {
       run_id               : rng.gen::<u32>(),
       event_id             : rng.gen::<u32>(),
       timestamp_32         : rng.gen::<u32>(),
-      timestamp_16         : rng.gen::<u32>(),
+      timestamp_16         : rng.gen::<u16>(),
       primary_beta         : rng.gen::<u16>(), 
       primary_beta_unc     : rng.gen::<u16>(), 
       primary_charge       : rng.gen::<u16>(), 
@@ -570,11 +570,12 @@ impl FromRandom for TofEventHeader {
 //
 // ============================================
 
-#[cfg(test)]
+#[cfg(all(test,feature = "random"))]
 mod test_tofevents {
   use crate::serialization::Serialization;
   use crate::FromRandom;
-  use crate::events::MasterTofEvent;
+  use crate::events::{MasterTofEvent,
+                      TofEventHeader};
 
   #[test]
   fn serialize_tofeventheader() {
