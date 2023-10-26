@@ -681,10 +681,16 @@ impl RBEvent {
 
     for ch in event.header.channel_packet_ids.iter() {
       *pos += 2; // ch id
-      for _ in 0..event.header.nwords {  
-        event.adc[*ch as usize].push(0x3FFF & parse_u16(stream, pos));  
+      if ch > &9 {
+        error!("Channel ID is messed up. Not sure if this event can be saved!");
+        *pos += 2*event.header.nwords;
+        *pos += 4;
+      } else {
+        for _ in 0..event.header.nwords {  
+          event.adc[*ch as usize].push(0x3FFF & parse_u16(stream, pos));  
+        }
+        *pos += 4; // trailer
       }
-      *pos += 4; // trailer
     }
     event.nchan = event.header.channel_packet_ids.len() as u8; 
     // FIXME
