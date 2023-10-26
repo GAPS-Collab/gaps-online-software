@@ -15,9 +15,6 @@ use crate::FromRandom;
 use rand::Rng;
 
 use crate::constants::EVENT_TIMEOUT;
-use crate::errors::EventError;
-
-use crate::packets::paddle_packet::PaddlePacket;
 use crate::serialization::{Serialization,
                            parse_u8,
                            parse_u16,
@@ -427,14 +424,14 @@ pub struct TofEventHeader  {
   // that for de/serialization, 
   // we need to know the length 
   // of the expected bytestream.
-  pub n_paddles          : u8, // we don't have more than 
+  pub n_paddles           : u8, // we don't have more than 
                                // 256 paddles.
 }
 
 impl Serialization for TofEventHeader {
-  const HEAD               : u16   = 43690; //0xAAAA
-  const TAIL               : u16   = 21845; //0x5555
-  const SIZE               : usize = 39;    // 14 + 20 + 5
+  const HEAD               : u16   = 0xAAAA;
+  const TAIL               : u16   = 0x5555;
+  const SIZE               : usize = 43; 
 
   fn from_bytestream(stream : &Vec<u8>, pos : &mut usize)
      -> Result<Self, SerializationError> {
@@ -574,7 +571,8 @@ impl FromRandom for TofEventHeader {
 mod test_tofevents {
   use crate::serialization::Serialization;
   use crate::FromRandom;
-  use crate::events::TofEvent;
+  use crate::events::{TofEvent,
+                      TofEventHeader};
 
   #[test]
   fn serialize_tofeventheader() {
