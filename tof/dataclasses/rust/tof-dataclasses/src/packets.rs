@@ -29,7 +29,7 @@ use crate::errors::SerializationError;
 use crate::events::{RBEventHeader,
                     RBEvent,
                     MasterTriggerEvent,
-                    MasterTofEvent};
+                    TofEvent};
 use crate::commands::{TofCommand,
                       RBCommand};
 use crate::calibrations::RBCalibrations;
@@ -133,8 +133,8 @@ impl TofPacket {
 
 }
 
-impl From<&MasterTofEvent> for TofPacket {
-  fn from(event : &MasterTofEvent) -> Self {
+impl From<&TofEvent> for TofPacket {
+  fn from(event : &TofEvent) -> Self {
     let mut tp = Self::new();
     tp.packet_type = PacketType::TofEvent;
     tp.payload = event.to_bytestream();

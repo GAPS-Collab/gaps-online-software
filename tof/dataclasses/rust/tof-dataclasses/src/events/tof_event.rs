@@ -191,7 +191,7 @@ impl EventQuality {
 }
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct MasterTofEvent {
+pub struct TofEvent {
 
   pub compression_level : CompressionLevel,
   pub quality           : EventQuality,
@@ -204,9 +204,9 @@ pub struct MasterTofEvent {
   pub creation_time      : Instant,
 }
 
-impl fmt::Display for MasterTofEvent {
+impl fmt::Display for TofEvent {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(f, "<MasterTofEvent:
+    write!(f, "<TofEvent:
             \t event id  : {}
             \t quality   : {}
             \t n_boards  : {}
@@ -220,14 +220,14 @@ impl fmt::Display for MasterTofEvent {
   }
 }
 
-impl Default for MasterTofEvent {
+impl Default for TofEvent {
 
   fn default() -> Self {
     Self::new()
   }
 }
 
-impl MasterTofEvent {
+impl TofEvent {
 
   pub fn new() -> Self {
     let creation_time = Instant::now();
@@ -293,7 +293,7 @@ impl MasterTofEvent {
   }
 }
 
-impl Serialization for MasterTofEvent {
+impl Serialization for TofEvent {
   
   const HEAD               : u16   = 43690; //0xAAAA
   const TAIL               : u16   = 21845; //0x5555
@@ -358,7 +358,7 @@ impl Serialization for MasterTofEvent {
 }
 
 #[cfg(feature="random")]
-impl FromRandom for MasterTofEvent {
+impl FromRandom for TofEvent {
 
   fn from_random() -> Self {
     let mut event   = Self::new();
@@ -384,9 +384,9 @@ impl FromRandom for MasterTofEvent {
   }
 }
 
-impl From<&MasterTriggerEvent> for MasterTofEvent {
+impl From<&MasterTriggerEvent> for TofEvent {
   fn from(mte : &MasterTriggerEvent) -> Self {
-    let mut te : MasterTofEvent = Default::default();
+    let mut te : TofEvent = Default::default();
     te.mt_event = *mte;
     te
   }
@@ -544,7 +544,7 @@ impl FromRandom for TofEventHeader {
       run_id               : rng.gen::<u32>(),
       event_id             : rng.gen::<u32>(),
       timestamp_32         : rng.gen::<u32>(),
-      timestamp_16         : rng.gen::<u32>(),
+      timestamp_16         : rng.gen::<u16>(),
       primary_beta         : rng.gen::<u16>(), 
       primary_beta_unc     : rng.gen::<u16>(), 
       primary_charge       : rng.gen::<u16>(), 
@@ -574,7 +574,7 @@ impl FromRandom for TofEventHeader {
 mod test_tofevents {
   use crate::serialization::Serialization;
   use crate::FromRandom;
-  use crate::events::MasterTofEvent;
+  use crate::events::TofEvent;
 
   #[test]
   fn serialize_tofeventheader() {
@@ -585,9 +585,9 @@ mod test_tofevents {
 
   #[test]
   fn mastertofevent_sizes_header() {
-    let data = MasterTofEvent::from_random();
+    let data = TofEvent::from_random();
     let mask = data.construct_sizes_header();
-    let size = MasterTofEvent::decode_size_header(&mask);
+    let size = TofEvent::decode_size_header(&mask);
     assert_eq!(size.0, data.rb_events.len());
     assert_eq!(size.1, data.missing_hits.len());
     assert_eq!(size.2, data.rb_moni.len());
@@ -595,8 +595,8 @@ mod test_tofevents {
 
   #[test]
   fn serialization_mastertofevent() {
-    let data = MasterTofEvent::from_random();
-    let test = MasterTofEvent::from_bytestream(&data.to_bytestream(), &mut 0).unwrap();
+    let data = TofEvent::from_random();
+    let test = TofEvent::from_bytestream(&data.to_bytestream(), &mut 0).unwrap();
     assert_eq!(data, test);
     //println!("{}", data);
   }
