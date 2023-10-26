@@ -140,27 +140,14 @@ pub fn data_publisher(data           : &Receiver<TofPacket>,
           }
         }
         if write_to_disk && !packet.no_write_to_disk {
-          if packet.packet_type    == PacketType::RBEvent  
-            || packet.packet_type  == PacketType::RBCalibration {
-            match data_type {
-              DataType::VoltageCalibration |
-              DataType::TimingCalibration  | 
-              DataType::Noi => (),
-              DataType::Unknown => {
-                error!("Don't know if I should write {} to disk!", data_type);
-              },
-              _ => {
-                match &mut file_on_disk {
-                  None => error!("We want to write data, however the file is invalid!"),
-                  Some(f) => {
-                    match f.write_all(packet.to_bytestream().as_slice()) {
-                      Err(err) => error!("Writing file to disk failed! Err {err}"),
-                      Ok(()) => ()
-                    }
-                  }
-                }
+          match &mut file_on_disk {
+            None => error!("We want to write data, however the file is invalid!"),
+            Some(f) => {
+              match f.write_all(packet.to_bytestream().as_slice()) {
+                Err(err) => error!("Writing file to disk failed! Err {err}"),
+                Ok(()) => ()
               }
-            } // end match  
+            }
           }
         }
         

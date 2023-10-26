@@ -1,10 +1,8 @@
 use std::path::Path;
 use std::time::Instant;
-use crossbeam_channel::{Sender,
-                        Receiver};
+use crossbeam_channel::Sender;
 
-use tof_dataclasses::commands::{RBCommand,
-                                TofCommand,
+use tof_dataclasses::commands::{TofCommand,
                                 TofResponse};
 use tof_dataclasses::packets::{TofPacket,
                                PacketType};
@@ -360,7 +358,12 @@ pub fn cmd_responder(cmd_server_ip             : String,
                 info!("Received RBCommand!");
                 // just forward the packet now, the cache 
                 // can understand if it is an event request or not
-                ev_request_to_cache.send(tp);
+                match ev_request_to_cache.send(tp) {
+                  Err(err) => {
+                    error!("Can not send event request! Err {err}");
+                  },
+                  Ok(_) => ()
+                }
                 // FIXME - notify this about TofOperation mode.
                 // if the TofOperation mode is StreamAny, 
                 // we won't do this.

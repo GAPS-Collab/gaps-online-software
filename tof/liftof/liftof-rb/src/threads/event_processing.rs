@@ -35,7 +35,6 @@ pub fn event_processing(bs_recv           : &Receiver<Vec<u8>>,
   let mut events_not_sent : u64 = 0;
   let mut data_type   : DataType   = DataType::Unknown;
   let one_milli   = Duration::from_millis(1);
-  let mut skipped_events : usize = 0;
   'main : loop {
     let mut start_pos : usize = 0;
     n_events = 0;
@@ -58,11 +57,13 @@ pub fn event_processing(bs_recv           : &Receiver<Vec<u8>>,
     // this can't be blocking anymore, since 
     // otherwise we miss the datatype
     let mut tail_pos = 0usize;
+    let mut skipped_events : usize = 0;
     match bs_recv.recv() {
       Ok(bytestream) => {
+        //println!("Getting new bytestream of len {}", bytestream.len());
         let mut packets_in_stream : u32 = 0;
         'bytestream : loop {
-          //println!("Received bytestream");
+          //println!("Starting at {start_pos}");
           match search_for_u16(RBEvent::HEAD, &bytestream, start_pos) {
             Err(err) => {
               debug!("Send {n_events} events. Got last event_id! {event_id}");
@@ -71,10 +72,11 @@ pub fn event_processing(bs_recv           : &Receiver<Vec<u8>>,
               }
               break 'bytestream;},
             Ok(head_pos) => {
+              //println!("HEAD found at {head_pos}");
               match search_for_u16(RBEvent::TAIL, &bytestream, head_pos) {
                 Err(err) => {
-                  error!("Unable to find complementing tail in bytestream! Err {err}");
-                  start_pos += 1; // the event in memory is broken, who knows where 
+                  error!("Unable to find complementing TAIL for HEAD at {} in bytestream! Err {err}", head_pos);
+                  start_pos = head_pos + 1; // the event in memory is broken, who knows where 
                                   // the next start is.
                   continue;
                 },
@@ -113,7 +115,9 @@ pub fn event_processing(bs_recv           : &Receiver<Vec<u8>>,
                 },
                 Ok (mut event) => {
                   if event.header.event_id != last_event_id + 1 {
-                    skipped_events += event.header.event_id as usize - last_event_id as usize - 1;
+                    if last_event_id != 0 {
+                      skipped_events += event.header.event_id as usize - last_event_id as usize - 1;
+                    }
                     if event.header.lost_trigger { 
                       warn!("Lost trigger!");
                     } else {
@@ -148,8 +152,8 @@ pub fn event_processing(bs_recv           : &Receiver<Vec<u8>>,
               }
             }
           } // end match search_for_u16 
+          info!("We have sent {packets_in_stream} packets for this bytestream of len {}", bytestream.len());
         } // end 'bytestream loop
-        info!("We have sent {packets_in_stream} packets for this bytestream of len {}", bytestream.len());
       }, // end OK(recv)
       Err(err) => {
         error!("Received Garbage! Err {err}");
