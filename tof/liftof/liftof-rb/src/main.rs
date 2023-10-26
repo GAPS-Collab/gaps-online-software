@@ -25,7 +25,8 @@ use local_ip_address::local_ip;
 use std::process::exit;
 use liftof_lib::color_log;
 
-use liftof_rb::threads::{cmd_responder,
+use liftof_rb::threads::{runner,
+                         cmd_responder,
                          event_processing,
                          event_cache,
                          data_publisher};
@@ -34,7 +35,6 @@ use liftof_rb::control::*;
 use tof_dataclasses::threading::ThreadPool;
 use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::commands::{//RBCommand,
-                                TofResponse,
                                 TofOperationMode};
 use tof_dataclasses::events::DataType;
 use tof_dataclasses::run::RunConfig;
@@ -208,8 +208,6 @@ fn main() {
   // setting up inter-thread comms
   let (rc_to_runner, rc_from_cmdr)      : 
       (Sender<RunConfig>, Receiver<RunConfig>)                = unbounded();
-  let (rsp_to_sink, _rsp_from_client)     : 
-      (Sender<TofResponse>, Receiver<TofResponse>)            = unbounded();
   let (tp_to_pub, tp_from_client)        : 
       (Sender<TofPacket>, Receiver<TofPacket>)                = unbounded();
   let (tp_to_cache, tp_from_builder) : 
@@ -275,7 +273,6 @@ fn main() {
   workforce.execute(move || {
                     event_cache(tp_from_builder,
                                 &tp_to_pub_ev,
-                                &rsp_to_sink,
                                 &opmode_from_runner, 
                                 wf_analysis,
                                 cache_size)

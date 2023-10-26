@@ -30,7 +30,6 @@ use tof_dataclasses::events::RBEvent;
 ///                       already
 pub fn event_cache(tp_recv           : Receiver<TofPacket>,
                    tp_to_pub         : &Sender<TofPacket>,
-                   resp_to_cmd       : &Sender<TofResponse>,
                    get_op_mode       : &Receiver<TofOperationMode>, 
                    waveform_analysis : bool,
                    cache_size   : usize) {
@@ -169,7 +168,7 @@ pub fn event_cache(tp_recv           : Receiver<TofPacket>,
             }
           } 
         }
-        n_iter_loop == 0; 
+        n_iter_loop = 0; 
         continue;
       }
     }
