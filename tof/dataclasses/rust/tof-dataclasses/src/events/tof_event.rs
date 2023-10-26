@@ -567,7 +567,7 @@ impl FromRandom for TofEventHeader {
 //
 // ============================================
 
-#[cfg(test)]
+#[cfg(all(test,feature = "random"))]
 mod test_tofevents {
   use crate::serialization::Serialization;
   use crate::FromRandom;

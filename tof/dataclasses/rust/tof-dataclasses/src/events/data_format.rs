@@ -1,11 +1,13 @@
 use std::fmt;
 
+extern crate serde;
+
 /// Data format adds meta information about 
 /// the syntax of the data
 ///
 /// Describe the layout of the data in 
 /// Memory
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 pub enum DataFormat {
   Default,
   HeaderOnly,
