@@ -1,10 +1,7 @@
 //! Routines for RB commiunication and data reception 
 
 use std::time::{SystemTime, UNIX_EPOCH};
-use std::{fs::File, path::Path};
-//use std::io::Read;
-use std::io::Write;
-use std::fs::OpenOptions;
+use std::path::Path;
 use crossbeam_channel::Sender;
 
 use liftof_lib::waveform_analysis;
@@ -12,8 +9,7 @@ use liftof_lib::waveform_analysis;
 use tof_dataclasses::manifest::ReadoutBoard;
 use tof_dataclasses::events::RBEvent;
 use tof_dataclasses::packets::{TofPacket,
-                               PacketType,
-                               PaddlePacket};
+                               PacketType};
 use tof_dataclasses::calibrations::RBCalibrations;
 
 use tof_dataclasses::serialization::Serialization;

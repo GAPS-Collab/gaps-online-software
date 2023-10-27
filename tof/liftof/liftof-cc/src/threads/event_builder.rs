@@ -3,26 +3,17 @@
 //!
 //!
 
-use crossbeam_channel::{Sender,
-                        Receiver};
+use crossbeam_channel::Receiver;
 
 use std::collections::VecDeque;
-use std::collections::HashMap;
-
-use std::time::{Duration, 
-                Instant};
+//use std::collections::HashMap;
 
 use tof_dataclasses::events::{MasterTriggerEvent,
-                              MasterTofEvent,
+                              TofEvent,
                               RBEvent};
 use crate::constants::EVENT_BUILDER_EVID_CACHE_SIZE;
-use tof_dataclasses::packets::{PacketType,
-                               TofPacket};
+use tof_dataclasses::packets::TofPacket;
 use crossbeam_channel as cbc;
-
-use tof_dataclasses::packets::paddle_packet::PaddlePacket;
-use tof_dataclasses::serialization::Serialization;
-
 
 /////  Walk over the event cache and check for each event
 /////  if new paddles can be added.
@@ -186,51 +177,48 @@ pub fn event_builder (m_trig_ev      : &cbc::Receiver<MasterTriggerEvent>,
                       ev_from_rb     : &Receiver<RBEvent>,
                       data_sink      : &cbc::Sender<TofPacket>) { 
 
-  let mut event_cache = VecDeque::<MasterTofEvent>::with_capacity(EVENT_BUILDER_EVID_CACHE_SIZE);
+  let mut event_cache = VecDeque::<TofEvent>::with_capacity(EVENT_BUILDER_EVID_CACHE_SIZE);
 
   // timeout in microsecnds
   let timeout_micro = 100;
   let use_timeout   = true;
-  let mut n_iter = 0; // don't worry it'll be simply wrapped around
+  let mut n_iter    = 0; // don't worry it'll be simply wrapped around
   // we try to receive eventids from the master trigger
-  let mut last_evid = 0;
+  let mut last_evid   = 0;
+  let n_mte_per_loop  = 100;
+  let n_rbe_per_loop  = 20;
+  let mut n_received        = 0usize;
   loop {
+    n_received = 0;
+    while n_received < n_mte_per_loop {
+      // every iteration, we welcome a new master event
+      match m_trig_ev.try_recv() {
+        Err(_) => {
+          trace!("No new event ready yet!");
+          continue;
+        }   
+        Ok(mt) => {
+          trace!("Got master trigger for event {} with {} expected hit paddles"
+                 , mt.event_id
+                 , mt.n_paddles);
+          // construct RB requests
 
-    // every iteration, we welcome a new master event
-    match m_trig_ev.try_recv() {
-      Err(_) => {
-        trace!("No new event ready yet!");
-        continue;
-      }   
-      Ok(mt) => {
-        trace!("Got master trigger for event {} with {} expected hit paddles"
-               , mt.event_id
-               , mt.n_paddles);
-        // construct RB requests
-
-        let event = MasterTofEvent::from(&mt);
-        if event.mt_event.event_id != last_evid + 1 {
-          let delta_id = event.mt_event.event_id - last_evid;
-          error!("We skipped event ids {}", delta_id );
+          let event = TofEvent::from(&mt);
+          if event.mt_event.event_id != last_evid + 1 {
+            let delta_id = event.mt_event.event_id - last_evid;
+            error!("We skipped event ids {}", delta_id );
+          }
+          last_evid = event.mt_event.event_id;
+          event_cache.push_back(event);
         }
-        last_evid = event.mt_event.event_id;
-        event_cache.push_back(event);
-        //// we will push the MasterTriggerEvent down the sink
-        //let tp = TofPacket::from(&mt);
-        //match data_sink.try_send(tp) {
-        //  Err(err) => {
-        //    error!("Unable to send tof packet to data sink! {err}");
-        //  },
-        //  Ok(_)    => ()
-        //}
-      }
-    } // end match Ok(mt)
+      } // end match Ok(mt)
+      n_received  += 1;
+    } // end getting MTEvents
     // check this timeout
-    let mut n_received        = 0usize;
     let mut rb_events_added   = 0usize;
     let mut iter_ev           = 0usize;
     let mut rb_events_dropped = 0usize;
-    while !ev_from_rb.is_empty() || n_received < 20 {
+    while !ev_from_rb.is_empty() || n_received < n_rbe_per_loop {
       match ev_from_rb.recv() {
         Err(err) => {
           error!("Can't receive RBEvent! Err {err}");
@@ -240,18 +228,22 @@ pub fn event_builder (m_trig_ev      : &cbc::Receiver<MasterTriggerEvent>,
           // mt event should arrive so much earlier (seconds)
           // I hope it won't be a problem. Otherwise we have
           // to add another cache.
+          //println!("==> Len evt cache {}", event_cache.len());
+          iter_ev = 0;
           for ev in event_cache.iter_mut() {
             iter_ev += 1;
+            //println!("==> mt event id {}", ev.mt_event.event_id);
+            //println!("==> rb event id {}", rb_ev.header.event_id);
             if ev.mt_event.event_id == rb_ev.header.event_id {
               ev.rb_events.push(rb_ev.clone());
               rb_events_added += 1;
+              //println!("==> RBEvent added!");
               break;
             }
           }
           if iter_ev == event_cache.len() {
             error!("We dropped {}", rb_ev);
           }
-
           n_received += 1;
         }
       }
