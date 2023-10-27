@@ -54,7 +54,7 @@ pub fn global_data_sink(incoming : &cbc::Receiver<TofPacket>,
 
   let mut writer : Option<TofPacketWriter> = None;
   if write_stream {
-    let mut streamfile_name = write_stream_path + "/stream";
+    let mut streamfile_name = write_stream_path + "/run_";
     streamfile_name += &runid.to_string();
     println!("==> Writing stream to file with prefix {}", streamfile_name);
     writer = Some(TofPacketWriter::new(streamfile_name));
@@ -138,5 +138,4 @@ pub fn global_data_sink(incoming : &cbc::Receiver<TofPacket>,
       info!("Sent {n_pack_sent} TofPacket!");
     }
   }
-
 }
