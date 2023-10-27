@@ -79,7 +79,7 @@ pub struct TofPacket {
   pub no_send_over_nw  : bool,
   /// creation_time for the instance
   pub creation_time      : Instant,
-
+  pub valid              : bool, // will be always valid, unless invalidated
 }
 
 
@@ -116,7 +116,8 @@ impl TofPacket {
       is_multi_packet  : false,
       no_write_to_disk : false,
       no_send_over_nw  : false,
-      creation_time    : creation_time
+      creation_time    : creation_time,
+      valid            : true,
     }
   }
   
@@ -138,15 +139,6 @@ impl TofPacket {
       return 1;
     }
   }
-
-
-  //impl from_bytes(stream : &[u8], start_pos : usize) {
-  //  -> Result<TofPacket, SerializationError> {
-  //    let (input, status) = le_u16(input)?;
-
-
-  //  }
-
 }
 
 impl From<&TofEvent> for TofPacket {
