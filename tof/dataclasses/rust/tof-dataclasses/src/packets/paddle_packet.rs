@@ -81,7 +81,6 @@ impl PartialEq for PaddlePacket {
   }
 }
 
-
 impl fmt::Display for PaddlePacket {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     write!(f, "<PaddlePacket:
@@ -176,6 +175,12 @@ impl Serialization for PaddlePacket {
     pp.timestamp_16  = parse_u16(stream, pos);
     *pos += 2; // always have to do this when using verify fixed
     Ok(pp)
+  }
+}
+
+impl Default for PaddlePacket {
+  fn default() -> Self {
+    Self::new()
   }
 }
 
