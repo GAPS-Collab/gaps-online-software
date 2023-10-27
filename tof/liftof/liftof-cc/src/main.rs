@@ -172,7 +172,6 @@ fn main() {
  
   let runid                 = config["run_id"].as_usize().unwrap(); 
   let mut write_stream_path = config["stream_savepath"].as_str().unwrap().to_owned();
-  let storage_savepath      = config["raw_storage_savepath"].as_str().unwrap().to_owned();
   let calib_file_path       = config["calibration_file_path"].as_str().unwrap().to_owned();
   let db_path               = Path::new(config["db_path"].as_str().unwrap());
   let db_path_c             = db_path.clone();
@@ -289,11 +288,9 @@ fn main() {
   let (rate_to_main, _rate_from_mt) : (cbc::Sender<u32>, cbc::Receiver<u32>) = cbc::unbounded();
   // master thread -> event builder ocmmuncations
   let (master_ev_send, master_ev_rec): (cbc::Sender<MasterTriggerEvent>, cbc::Receiver<MasterTriggerEvent>) = cbc::unbounded(); 
-  let (ev_to_builder, ev_from_rb) : (cbc::Sender<RBEvent>, cbc::Receiver<RBEvent>) = cbc::unbounded(); 
+  
   // readout boards <-> paddle cache communications 
   let (ev_to_builder, ev_from_rb) : (cbc::Sender<RBEvent>, cbc::Receiver<RBEvent>) = cbc::unbounded();
-  // paddle cache <-> event builder communications
-  let (id_send, id_rec) : (cbc::Sender<Option<u32>>, cbc::Receiver<Option<u32>>) = cbc::unbounded();
   let (cmd_sender, cmd_receiver) : (cbc::Sender<TofPacket>, cbc::Receiver<TofPacket>) = cbc::unbounded();
 
 

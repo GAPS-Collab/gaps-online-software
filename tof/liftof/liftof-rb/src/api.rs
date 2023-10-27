@@ -1,5 +1,8 @@
 //! Higher level functions, to deal with events/binary reprentation of it, 
 //! configure the drs4, etc.
+use std::net::IpAddr;
+use local_ip_address::local_ip;
+ use tof_dataclasses::events::DataFormat;
 
 use tof_dataclasses::serialization::Serialization;
 #[cfg(feature="tofcontrol")]

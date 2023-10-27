@@ -4,7 +4,6 @@ use crossbeam_channel::{Sender,
                         Receiver};
 
 use tof_dataclasses::commands::{RBCommand,
-                                TofResponse,
                                 TofOperationMode};
 use tof_dataclasses::packets::{TofPacket,
                                PacketType};
@@ -160,6 +159,7 @@ pub fn event_cache(tp_recv           : Receiver<TofPacket>,
         for event_key in request_cache.keys() {
           if event_cache.contains_key(&event_key) {
             // unwrap is fine, since we checked we have it
+            //let this_request = request_cache.remove(&event_key).unwrap();
             let tp = event_cache.remove(&event_key).unwrap();
             info!("Responding with event {}", event_key);
             match tp_to_pub.try_send(tp) {
