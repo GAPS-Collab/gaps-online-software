@@ -244,7 +244,8 @@ pub fn search_for_u16(number : u16, bytestream : &Vec<u8>, start_pos : usize)
     }
   }
   if !found {
-    error!("Can not find {} in bytestream of len {}!", number, bytestream.len());
+    let delta = bytestream.len() - start_pos;
+    warn!("Can not find {} in bytestream [-{}:{}]!", number, delta ,bytestream.len());
     return Err(SerializationError::ValueNotFound);
   }
   trace!("Found {number} at {pos}");
