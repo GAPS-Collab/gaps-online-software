@@ -671,7 +671,7 @@ impl RBEvent {
     //let mut active_channels = header.get_active_data_channels();
     //let mut nchan = active_channels.len();
     event.header = header;
-    // set the position marker to the start of the channeld
+    // set the position marker to the start of the channel
     // adc data field
     *pos = event.header.channel_packet_start; 
     if stream.len() < event.header.channel_packet_len + 44 {
@@ -1196,7 +1196,8 @@ impl FromRandom for RBEventHeader {
   }
 }
 
-#[cfg(all(test,feature = "random"))]
+#[cfg(feature = "random")]
+#[test]
 mod test_rbevents {
   use crate::serialization::Serialization;
   use crate::FromRandom;
