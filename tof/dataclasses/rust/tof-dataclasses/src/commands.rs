@@ -231,6 +231,10 @@ impl RBCommand {
     }
   }
 
+  pub fn get_payload_from_stream(stream : &Vec<u8>) -> u32 {
+    parse_u32(stream, &mut 3)
+  }
+
   pub fn command_code_to_string(cc : u8) -> String {
     match cc {
       Self::REQUEST_EVENT => {
