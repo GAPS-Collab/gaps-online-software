@@ -174,6 +174,7 @@ impl Serialization for PaddlePacket {
     pp.ctr_etx       = parse_u8(stream, pos);
     pp.timestamp_32  = parse_u32(stream, pos);
     pp.timestamp_16  = parse_u16(stream, pos);
+    *pos += 2; // always have to do this when using verify fixed
     Ok(pp)
   }
 }
@@ -320,7 +321,9 @@ impl PaddlePacket {
 
 #[test]
 fn serialization_paddle_packet() {
+    let mut pos = 0;
     let data = PaddlePacket::from_random();
-    let test = PaddlePacket::from_bytestream(&data.to_bytestream(), &mut 0).unwrap();
+    let test = PaddlePacket::from_bytestream(&data.to_bytestream(),&mut pos).unwrap();
+    assert_eq!(pos, PaddlePacket::SIZE);
     assert_eq!(data, test);
 }
