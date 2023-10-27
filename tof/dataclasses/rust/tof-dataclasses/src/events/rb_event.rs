@@ -533,7 +533,7 @@ pub fn unpack_traces_f32(events : &Vec<RBEvent>) -> Vec<Vec<Vec<f32>>> {
 /// by header.get_active_channels()
 ///
 ///
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct RBEvent {
   pub data_type : DataType,
   pub nchan     : u8,
@@ -832,14 +832,14 @@ impl FromRandom for RBEvent {
     event.header    = header;
     event.nchan     = 0u8; 
     let ch_ids      = event.header.get_active_data_channels();
-    if !event.header.event_fragment && !event.header.lost_trigger {
-      for k in ch_ids.iter() {
-        debug!("Found active data channel {}!", k);
-        let random_numbers: Vec<u16> = (0..NWORDS).map(|_| rng.gen()).collect();
-        event.adc[(k-1) as usize] = random_numbers;
-        event.nchan += 1;
-      }
+    //if !event.header.event_fragment && !event.header.lost_trigger {
+    for k in ch_ids.iter() {
+      debug!("Found active data channel {}!", k);
+      let random_numbers: Vec<u16> = (0..NWORDS).map(|_| rng.gen()).collect();
+      event.adc[(k-1) as usize] = random_numbers;
+      event.nchan += 1;
     }
+    //}
     event
   }
 }
@@ -885,7 +885,7 @@ impl From<&TofPacket> for RBEvent {
 /// per RB. 
 /// Contains information about event id, timestamps,
 /// etc.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct RBEventHeader {
   pub channel_mask         : u8   , 
   pub stop_cell            : u16  , 
@@ -1159,17 +1159,17 @@ impl Serialization for RBEventHeader {
   }
 }
 
-impl PartialEq for RBEventHeader {
-  fn eq(&self, other: &Self) -> bool {
-      self.event_id == other.event_id
-  }
-}
-
-impl PartialEq for RBEvent {
-  fn eq(&self, other: &Self) -> bool {
-      self.header.event_id == other.header.event_id
-  }
-}
+//impl PartialEq for RBEventHeader {
+//  fn eq(&self, other: &Self) -> bool {
+//      self.event_id == other.event_id
+//  }
+//}
+//
+//impl PartialEq for RBEvent {
+//  fn eq(&self, other: &Self) -> bool {
+//      self.header.event_id == other.header.event_id
+//  }
+//}
 
 #[cfg(feature = "random")]
 impl FromRandom for RBEventHeader {
@@ -1206,8 +1206,10 @@ mod test_rbevents {
                       RBEventHeader};
   #[test]
   fn serialization_rbeventheader() {
+    let mut pos = 0usize;
     let head = RBEventHeader::from_random();
-    let test = RBEventHeader::from_bytestream(&head.to_bytestream(), &mut 0).unwrap();
+    let test = RBEventHeader::from_bytestream(&head.to_bytestream(), &mut pos).unwrap();
+    assert_eq!(pos, RBEventHeader::SIZE);
     assert_eq!(head, test);
   }
   
