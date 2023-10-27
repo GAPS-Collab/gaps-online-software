@@ -2,7 +2,8 @@
 //! configure the drs4, etc.
 use std::net::IpAddr;
 use local_ip_address::local_ip;
- use tof_dataclasses::events::DataFormat;
+use std::fs::read_to_string;
+
 
 use tof_dataclasses::serialization::Serialization;
 #[cfg(feature="tofcontrol")]
@@ -192,9 +193,7 @@ pub fn rb_calibration(rc_to_runner    : &Sender<RunConfig>,
     trigger_poisson_rate    : 0,
     trigger_fixed_rate      : 100,
     latch_to_mtb            : false,
-    active_channel_mask     : 255,
     data_type               : DataType::Noi,
-    data_format             : DataFormat::Default,
     rb_buff_size            : 1000
   }; 
   // here is the general idea. We connect to our own 
@@ -369,13 +368,14 @@ pub fn is_systemd_process() -> bool {
 ///
 /// FIXME - panics...
 pub fn get_runconfig(rcfile : &Path) -> RunConfig {
-  match get_json_from_file(rcfile) {
+  //match get_json_from_file(rcfile) {
+  match read_to_string(rcfile) {
     Err(err) => {
       panic!("Unable to read the configuration file! Error {err}");
     }
     Ok(rc_from_file) => {
       println!("==> Found configuration file {}!", rcfile.display());
-      match RunConfig::from_json(&rc_from_file) {
+      match RunConfig::from_json_serde(&rc_from_file) {
         Err(err) => panic!("Can not read json from configuration file. Error {err}"),
         Ok(rc_json) => {
           rc_json
