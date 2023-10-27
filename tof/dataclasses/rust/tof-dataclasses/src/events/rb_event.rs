@@ -23,7 +23,8 @@
 use std::fmt;
 use std::path::Path;
 
-use crate::packets::{TofPacket, PacketType, PaddlePacket};
+use crate::packets::{TofPacket, PacketType};
+use crate::events::TofHit;
 use crate::constants::{NWORDS, NCHN};
 use crate::serialization::{u16_to_u8,
                            u8_to_u16,
@@ -427,6 +428,8 @@ impl FromRandom for RBEventMemoryView {
 }
 
 
+
+// FIXME - do we want this? OOP overkill?
 #[derive(Debug, Clone)]
 pub struct RBChannelData {
   pub header : u16, // that should be the channel id
@@ -540,7 +543,7 @@ pub struct RBEvent {
   pub n_paddles : u8, // number of entries in paddles vector
   pub header    : RBEventHeader,
   pub adc       : Vec<Vec<u16>>,
-  pub paddles   : Vec<PaddlePacket>
+  pub hits      : Vec<TofHit>
 }
 
 impl RBEvent {
@@ -556,7 +559,7 @@ impl RBEvent {
       n_paddles  : 0,
       header     : RBEventHeader::new(),
       adc        : adc,
-      paddles    : Vec::<PaddlePacket>::new(),
+      hits       : Vec::<TofHit>::new(),
     }
   }
 
@@ -740,15 +743,15 @@ impl Serialization for RBEvent {
     }
     if event.n_paddles > 0 {
       for _ in 0..event.n_paddles {
-        match PaddlePacket::from_bytestream(stream, pos) {
+        match TofHit::from_bytestream(stream, pos) {
           Err(err) => {
-            error!("Can't read PaddlePacket! Err {err}");
-            let mut pp = PaddlePacket::new();
-            pp.valid = false;
-            event.paddles.push(pp);
+            error!("Can't read TofHit! Err {err}");
+            let mut h = TofHit::new();
+            h.valid = false;
+            event.hits.push(h);
           },
-          Ok(pp) => {
-            event.paddles.push(pp);
+          Ok(h) => {
+            event.hits.push(h);
           }
         }
       }
@@ -776,7 +779,7 @@ impl Serialization for RBEvent {
     }
     if self.n_paddles > 0 {
       for k in 0..self.n_paddles {
-        stream.extend_from_slice(&self.paddles[k as usize].to_bytestream());
+        stream.extend_from_slice(&self.hits[k as usize].to_bytestream());
       }
     }
     stream.extend_from_slice(&Self::TAIL.to_le_bytes());
@@ -811,11 +814,13 @@ impl fmt::Display for RBEvent {
     {}
     data channels : {:?},
     adc nwords    : {:?},
+    n hits        : {},
     -- -- -- -- -- -- -- --
     ch 0 {:?} .. >",
     self.header,
     active_channels,
     adc,
+    self.hits.len(),
     demo_vec)
   }
 }

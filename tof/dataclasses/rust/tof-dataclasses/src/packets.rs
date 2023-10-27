@@ -14,11 +14,9 @@
 //! The total packet size is thus 13 + SIZE
 
 
-pub mod paddle_packet;
 use crate::constants::EVENT_TIMEOUT;
 
 // re-imports
-pub use paddle_packet::PaddlePacket;
 use std::time::Instant;
 use std::fmt;
 pub use crate::monitoring::{RBMoniData,
@@ -57,7 +55,7 @@ pub enum PacketQuality {
 ///
 /// Format when in bytestream
 /// HEAD : u16
-/// TYPE : u8
+
 /// PAYLOAD_SIZE : u32
 /// PYALOAD : [u8;PAYLOAD_SIZE]
 /// TAIL : u16
