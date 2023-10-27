@@ -1196,8 +1196,7 @@ impl FromRandom for RBEventHeader {
   }
 }
 
-#[cfg(feature = "random")]
-#[test]
+#[cfg(all(test,feature = "random"))]
 mod test_rbevents {
   use crate::serialization::Serialization;
   use crate::FromRandom;

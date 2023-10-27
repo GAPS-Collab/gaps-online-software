@@ -319,6 +319,7 @@ impl PaddlePacket {
   }
 }
 
+#[cfg(feature = "random")]
 #[test]
 fn serialization_paddle_packet() {
     let mut pos = 0;

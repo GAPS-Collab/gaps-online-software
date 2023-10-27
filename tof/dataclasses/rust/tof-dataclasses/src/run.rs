@@ -170,7 +170,8 @@ impl FromRandom for RunConfig {
   }
 }
 
-#[cfg(all(test,feature = "random"))]
+#[cfg(feature = "random")]
+#[test]
 fn serialization_runconfig() {
   let cfg  = RunConfig::from_random();
   let test = RunConfig::from_bytestream(&cfg.to_bytestream(), &mut 0).unwrap();

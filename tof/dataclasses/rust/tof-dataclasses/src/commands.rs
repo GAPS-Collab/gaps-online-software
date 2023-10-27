@@ -809,7 +809,7 @@ impl From<(u8, u32)> for TofResponse {
   }
 }
 
-
+#[cfg(feature = "random")]
 #[test]
 fn test_tofoperationmode() {
   let mut type_codes = Vec::<u8>::new();
@@ -821,6 +821,7 @@ fn test_tofoperationmode() {
   }
 }
 
+#[cfg(feature = "random")]
 #[test]
 fn serialization_rbcommand() {
   let cmd  = RBCommand::from_random();

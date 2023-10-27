@@ -1152,6 +1152,7 @@ impl From<&Path> for RBCalibrations {
   }
 }
 
+#[cfg(feature = "random")]
 #[test]
 fn serialization_rbcalibration() {
   let mut calis = Vec::<RBCalibrations>::new();

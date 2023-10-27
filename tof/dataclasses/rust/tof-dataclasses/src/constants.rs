@@ -11,7 +11,7 @@ pub const NCHN          : usize = 9;
 pub const NWORDS        : usize = 1024;
 
 /// The maximum number of supported readout boards
-#[deprecated(since="0.2")]
+#[deprecated(since="0.2.0")]
 pub const MAX_NBOARDS   : usize = 4;
 
 /// The maximum number of detectable peaks in a waveform
