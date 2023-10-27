@@ -1,9 +1,11 @@
 use std::fmt;
-use crate::serialization::{parse_u16,
+use crate::serialization::{parse_u8,
+                           parse_u16,
                            parse_u32,
                            parse_bool, 
                            Serialization,
                            SerializationError};
+use crate::events::DataType;
 
 #[cfg(feature = "random")] 
 use crate::FromRandom;
@@ -33,12 +35,13 @@ pub struct RunConfig {
   pub trigger_poisson_rate    : u32,
   pub trigger_fixed_rate      : u32,
   pub latch_to_mtb            : bool,
+  pub data_type               : DataType,
   pub rb_buff_size            : u16
 }
 
 impl RunConfig {
 
-  pub const VERSION            : &'static str = "1.3";
+  pub const VERSION            : &'static str = "1.4";
 
   pub fn new() -> Self {
     Self {
@@ -49,6 +52,7 @@ impl RunConfig {
       trigger_poisson_rate    : 0,
       trigger_fixed_rate      : 0,
       latch_to_mtb            : false,
+      data_type               : DataType::Unknown, 
       rb_buff_size            : 0,
     }
   }
@@ -75,7 +79,7 @@ impl RunConfig {
 impl Serialization for RunConfig {
   const HEAD               : u16   = 43690; //0xAAAA
   const TAIL               : u16   = 21845; //0x5555
-  const SIZE               : usize = 25; // bytes including HEADER + FOOTER
+  const SIZE               : usize = 26; // bytes including HEADER + FOOTER
   
   fn from_bytestream(bytestream : &Vec<u8>,
                      pos        : &mut usize)
@@ -89,6 +93,7 @@ impl Serialization for RunConfig {
     pars.trigger_poisson_rate    = parse_u32(bytestream, pos);
     pars.trigger_fixed_rate      = parse_u32(bytestream, pos);
     pars.latch_to_mtb            = parse_bool(bytestream, pos);
+    pars.data_type    = DataType::from_u8(&parse_u8(bytestream, pos));
     pars.rb_buff_size = parse_u16(bytestream, pos);
     *pos += 2; // for the tail 
     //_ = parse_u16(bytestream, pos);
@@ -105,6 +110,7 @@ impl Serialization for RunConfig {
     stream.extend_from_slice(&self.trigger_poisson_rate.to_le_bytes());
     stream.extend_from_slice(&self.trigger_fixed_rate.to_le_bytes());
     stream.extend_from_slice(&u8::from(self.latch_to_mtb).to_le_bytes());
+    stream.extend_from_slice(&self.data_type.to_u8().to_le_bytes());
     stream.extend_from_slice(&self.rb_buff_size.to_le_bytes());
     stream.extend_from_slice(&Self::TAIL.to_le_bytes());
     stream
@@ -127,6 +133,7 @@ impl fmt::Display for RunConfig {
     nevents     : {}
     nseconds    : {}
     stream any  : {}
+    data type   : {}
     tr_poi_rate : {}
     tr_fix_rate : {}
     mtb_latch   : {}
@@ -135,6 +142,7 @@ impl fmt::Display for RunConfig {
       self.nevents,
       self.nseconds,
       self.stream_any,
+      self.data_type.string_repr(),
       self.trigger_poisson_rate,
       self.trigger_fixed_rate,
       self.latch_to_mtb,
@@ -156,6 +164,7 @@ impl FromRandom for RunConfig {
     cfg.trigger_poisson_rate    = rng.gen::<u32>();
     cfg.trigger_fixed_rate      = rng.gen::<u32>();
     cfg.latch_to_mtb            = rng.gen::<bool>();
+    cfg.data_type               = DataType::from_u8(&rng.gen::<u8>());
     cfg.rb_buff_size            = rng.gen::<u16>();
     cfg
   }
