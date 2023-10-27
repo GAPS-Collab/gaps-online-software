@@ -18,6 +18,7 @@
 #include "tof_typedefs.h"
 #include "packets/monitoring.h"
 #include "packets/tof_packet.h"
+#include "events/tof_event_header.hpp"
 
 #define NCHN 9
 #define NWORDS 1024
@@ -246,8 +247,8 @@ struct MasterTriggerEvent {
   bool hits[N_LTBS][N_CHN_PER_LTB];
   //hits          : [[false;N_CHN_PER_LTB]; N_LTBS],
   u32 crc           ;
+  // these fields won't get serialized
   bool broken       ;
-  // valid does not get serialized
   bool valid        ;
 
   MasterTriggerEvent();
@@ -284,11 +285,11 @@ struct TofEvent {
   static const u16 HEAD = 0xAAAA;
   static const u16 TAIL = 0x5555;
 
+  TofEventHeader header;
   MasterTriggerEvent mt_event;
   
   Vec<RBEvent>      rb_events;
   Vec<RBMissingHit> missing_hits;
-  Vec<RBMoniData>   rb_moni_data;
 
   static TofEvent from_bytestream(const Vec<u8> &bytestream,
                                   u64 &pos);
@@ -297,8 +298,6 @@ struct TofEvent {
 
   static u32 get_n_rbmissinghits(u32 mask);
   static u32 get_n_rbevents(u32 mask);
-  static u32 get_n_paddlepackets(u32 mask);
-  static u32 get_n_rbmonis(u32 mask);
 
   std::string to_string() const;
 

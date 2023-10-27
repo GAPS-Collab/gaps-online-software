@@ -441,18 +441,6 @@ u32 TofEvent::get_n_rbevents(u32 mask){
 
 /**********************************************************/
 
-u32 TofEvent::get_n_paddlepackets(u32 mask) {
-  return ((mask & 0xFF0000)   >> 16);
-}
-
-/**********************************************************/
-
-u32 TofEvent::get_n_rbmonis(u32 mask) {
-  return ((mask & 0xFF000000) >> 24);
-}
-
-/**********************************************************/
-  
 TofEvent TofEvent::from_bytestream(const Vec<u8> &stream,
                                    u64 &pos) {
   spdlog::debug("Start decoding at pos {}", pos);
@@ -461,17 +449,16 @@ TofEvent TofEvent::from_bytestream(const Vec<u8> &stream,
     spdlog::error("No header signature found!");  
   }
   TofEvent event = TofEvent();
-  // for now split quality and compression level
+  // for now skip quality and compression level
   pos += 2;
+  event.header   = TofEventHeader::from_bytestream(stream, pos);
   event.mt_event = MasterTriggerEvent::from_bytestream(stream, pos);
   //pos += 45; // for now skip master trigger event
   u32 mask          = Gaps::parse_u32(stream, pos);
   u32 n_rbevents    = get_n_rbevents(mask);
-  u32 n_rbmonis     = get_n_rbmonis(mask);
   u32 n_missing     = get_n_rbmissinghits(mask);
-  u32 n_paddlepacks = get_n_paddlepackets(mask);
-  spdlog::debug("Expecting {} RBEvents, {} RBMonis, {} RBMissingHits and {} PaddlePackets",
-                n_rbevents, n_rbmonis, n_missing, n_paddlepacks);
+  spdlog::debug("Expecting {} RBEvents, {} RBMissingHits",
+                n_rbevents, n_missing);
 
   for (u32 k=0; k< n_rbevents; k++) {
     RBEvent rb_event = RBEvent::from_bytestream(stream, pos);
@@ -480,13 +467,6 @@ TofEvent TofEvent::from_bytestream(const Vec<u8> &stream,
   for (u32 k=0; k< n_missing; k++) {
     RBMissingHit missy = RBMissingHit::from_bytestream(stream, pos);
     event.missing_hits.push_back(missy);
-  }
-  for (u32 k=0; k< n_paddlepacks; k++) {
-    // we do not have this yet
-  }
-  for (u32 k=0; k< n_rbmonis; k++) {
-    RBMoniData moni = RBMoniData::from_bytestream(stream, pos);
-    event.rb_moni_data.push_back(moni);
   }
   
   //  event.compression_level = CompressionLevel::from_u8(&parse_u8(stream, pos));
@@ -703,16 +683,16 @@ MasterTriggerEvent MasterTriggerEvent::from_bytestream(const Vec<u8> &bytestream
 
 std::string MasterTriggerEvent::to_string() const {
   std::string repr = "<MasterTriggerEvent :";
-  repr += "\n\t event_id                    " + std::to_string(event_id                    ); 
-  repr += "\n\t timestamp                   " + std::to_string(timestamp                   ); 
-  repr += "\n\t tiu_timestamp               " + std::to_string(tiu_timestamp               ); 
-  repr += "\n\t tiu_gps_32                  " + std::to_string(tiu_gps_32                  ); 
-  repr += "\n\t tiu_gps_16                  " + std::to_string(tiu_gps_16                  ); 
-  repr += "\n\t n_paddles                   " + std::to_string(n_paddles                   ); 
-  repr += "\n\t crc                         " + std::to_string(crc                         );
-  repr += "\n\t broken                      " + std::to_string(broken                      );
-  repr += "\n\t valid                       " + std::to_string(valid                       );
-  repr += "\n -- hit mask --";
+  repr += "\n  event_id      : " + std::to_string(event_id                    ); 
+  repr += "\n  timestamp     : " + std::to_string(timestamp                   ); 
+  repr += "\n  tiu_timestamp : " + std::to_string(tiu_timestamp               ); 
+  repr += "\n  tiu_gps_32    : " + std::to_string(tiu_gps_32                  ); 
+  repr += "\n  tiu_gps_16    : " + std::to_string(tiu_gps_16                  ); 
+  repr += "\n  n_paddles     : " + std::to_string(n_paddles                   ); 
+  repr += "\n  crc           : " + std::to_string(crc                         );
+  repr += "\n  broken        : " + std::to_string(broken                      );
+  repr += "\n  valid         : " + std::to_string(valid                       );
+  repr += "\n  -- hit mask --";
   repr += "\n [DSI/J]";
   repr += "\n 1/1 - 1/2 - 1/3 - 1/4 - 1/5 - 2/1 - 2/2 - 2/3 - 2/4 - 2/5 - 3/1 - 3/2 - 3/3 - 3/4 - 3/5 - 4/1 - 4/2 - 4/3 - 4/4 - 4/5 \n";
   Vec<u8> hit_boards = Vec<u8>();
@@ -764,13 +744,12 @@ std::string MasterTriggerEvent::to_string() const {
 }
 
 std::string TofEvent::to_string() const {
-  std::string repr = "<TofEvent";
-  repr += "\tn missing hits: " + std::to_string(missing_hits.size() )  ;
-  repr += "\tn RBEvents    : " + std::to_string(rb_events.size() )     ;
-  repr += "\tn RBMonis     : " + std::to_string(rb_moni_data.size() )  ;
-  //repr += "\tn PaddlePackets "    + std::to_string(event.dna )       + "\n" ;
-  //repr += "\ttail "      + std::to_string(event.tail)       ;
-  repr += ">";
+  std::string repr = "<TofEvent\n";
+  repr += "  " + header.to_string()   + "\n";
+  repr += "  " + mt_event.to_string() + "\n";
+  repr += ".. .. ..\n";
+  repr += "  n RBEvents    : " + std::to_string(rb_events.size() )     ;
+  repr += "  missing hits  : " + std::to_string(missing_hits.size() ) + ">" ;
   return repr;
 }
 
