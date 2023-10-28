@@ -104,7 +104,7 @@ pub fn readoutboard_communicator(ev_to_builder       : &Sender<RBEvent>,
             match tp.packet_type {
               PacketType::RBEvent => {
                 let mut event = RBEvent::from(&tp);
-                if event.paddles.len() == 0 {
+                if event.hits.len() == 0 {
                   if run_analysis_engine {
                     match waveform_analysis(&mut event, 
                                             &rb,

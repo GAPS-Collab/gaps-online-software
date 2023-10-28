@@ -107,11 +107,11 @@ pub fn global_data_sink(incoming : &cbc::Receiver<TofPacket>,
             // sort the cache
             // FIXME - at this step, we should have checked if the 
             // packets are broken.
-            event_cache.sort_by(| a, b| TofEvent::get_evid_from_bytestream(&a.payload,0).unwrap().cmp(
-                                        &TofEvent::get_evid_from_bytestream(&b.payload,0).unwrap()));
+            event_cache.sort_by(| a, b|  TofEvent::extract_event_id_from_stream(&a.payload).unwrap().cmp(
+                                        &TofEvent::extract_event_id_from_stream(&b.payload).unwrap()));
            
             for ev in event_cache.iter() {
-              last_evid = TofEvent::get_evid_from_bytestream(&ev.payload,0).unwrap();
+              last_evid = TofEvent::extract_event_id_from_stream(&ev.payload).unwrap();
               match data_socket.send(&ev.to_bytestream(),0) {
                 Err(err) => error!("Not able to send packet over 0MQ PUB, {err}"),
                 Ok(_)    => { 

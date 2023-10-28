@@ -758,7 +758,7 @@ pub fn readoutboard_commander(cmd : &Receiver<TofPacket>){
     // thread
     match cmd.try_recv() {
       Err(err) => trace!("Did not receive a new command, error {err}"),
-      Ok(mut packet) => {
+      Ok(packet) => {
         // now we have several options
         match packet.packet_type {
           PacketType::TofCommand => {
@@ -854,8 +854,12 @@ pub fn waveform_analysis(event         : &mut RBEvent,
     };
   }
   // do the calibration
-  let mut active_channels = event.header.get_active_data_channels();
-  active_channels.push(9); // always do ch9 callibration
+  //let mut active_channels = event.header.get_active_data_channels();
+  //active_channels.push(9); // always do ch9 callibration
+  let mut active_channels = event.header.decode_channel_mask();
+  if event.header.has_ch9 {
+    active_channels.push(8); 
+  }
   // allocate memory for voltages
   // this allocates more memory than needed
   // (needed is active_channels.len()), however,
@@ -871,12 +875,19 @@ pub fn waveform_analysis(event         : &mut RBEvent,
   }
 
   for active_ch in &active_channels {
-    let ch = *active_ch as usize;
-    let adc          = event.get_adc_ch(*active_ch);
-    calibration.voltages(ch,
-                         event.header.stop_cell as usize,
-                         &adc,
-                         &mut all_voltages[ch]);
+    let ch  = *active_ch as usize;
+    match event.get_channel_by_id(ch) {
+      Ok(adc) => { 
+        calibration.voltages(ch,
+                             event.header.stop_cell as usize,
+                             &adc,
+                             &mut all_voltages[ch]);
+      },
+      Err(err) => {
+        error!("Can not get channel {ch}. Err {err}");  
+        return Err(AnalysisError::MissingChannel);
+      }
+    }
     calibration.nanoseconds(ch,
                             event.header.stop_cell as usize,
                             &mut all_times[ch]);
