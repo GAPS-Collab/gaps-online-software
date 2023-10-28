@@ -38,13 +38,14 @@ pub fn event_cache(tp_recv           : Receiver<TofPacket>,
 
   let mut n_send_errors     = 0u64;   
   let mut op_mode_stream    = false;
-  let mut packet_evid : u32 = 0;
+  let mut packet_evid       : u32;
 
-  let mut oldest_event_id    : u32 = 0;
-  let mut event_cache        : HashMap::<u32, TofPacket> = HashMap::new();
-  let mut request_cache      : HashMap::<u32, u8> = HashMap::new();
+  let mut event_cache        : HashMap::<u32, TofPacket> = HashMap::with_capacity(cache_size);
+  let mut request_cache      : HashMap::<u32, TofPacket> = HashMap::with_capacity(cache_size);
   let mut n_iter_loop        : usize = 0;
   let max_len_request_cache  : usize = 10000;
+
+
   loop {
     // check changes in operation mode
     match get_op_mode.try_recv() {
@@ -58,6 +59,7 @@ pub fn event_cache(tp_recv           : Receiver<TofPacket>,
         }
       }
     }
+
     match tp_recv.try_recv() {
       Err(err) =>   {
         trace!("No new TofPacket received! {err}");
@@ -85,9 +87,12 @@ pub fn event_cache(tp_recv           : Receiver<TofPacket>,
                     error!("Can't deal with RBCommand {}", request);
                     continue;
                   }
-                  if !request_cache.contains_key(&request.payload) {
-                    request_cache.insert(request.payload, request.channel_mask);
-                  } else {
+                  if !event_cache.contains_key(&request.payload) {
+                    // we will need to decode RBRequest later again, 
+                    // but since it is small it is probably fine.
+                    request_cache.insert(request.payload, packet);
+                  } else { // immediatly answer the request and 
+                           // throw the request away after.
                     // unwrap is fine, since we checked we have it
                     let tp = event_cache.remove(&request.payload).unwrap();
                     match tp_to_pub.try_send(tp) {
@@ -95,13 +100,6 @@ pub fn event_cache(tp_recv           : Receiver<TofPacket>,
                       Ok(_)    => ()
                     }
                   }
-                  // make sure cache won't overflow
-                  if request_cache.len() > max_len_request_cache {
-                    error!("Error! event_cache overflow! Dropping oldest_request");
-                    error!("ACTUALLY THIS IS NOT IMPLEMENTED YET");
-                    // FIXME - we need to do something here
-                  }
-                  continue;
                 }
               }
             } // end if not op_mode_stream
@@ -111,36 +109,26 @@ pub fn event_cache(tp_recv           : Receiver<TofPacket>,
             // correctly this should never fail since broken 
             // packets should not end up in the cache
             packet_evid = RBEvent::extract_eventid(&packet.payload).unwrap_or(0);
+            if !event_cache.contains_key(&packet_evid) && packet_evid != 0 {
+              event_cache.insert(packet_evid, packet);
+            } else {
+              error!("We have seen event {packet_evid} before! This seems to be a dupiclicate!");
+              continue;
+            }
           },
           _ => {
             error!("RB event cache can not deal with packet type {}", packet.packet_type);
-            packet_evid = 0;
             continue;
           }
         }
-        if oldest_event_id == 0 {
-          oldest_event_id = packet_evid;
-        } //endif
-        // store the event in the cache
-        ////println!("Received payload with event id {}" ,event.event_id);
-        if !event_cache.contains_key(&packet_evid) && packet_evid != 0 {
-          event_cache.insert(packet_evid, packet);
-        }
-        //// keep track of the oldest event_id
-        //trace!("We have a cache size of {}", event_cache.len());
-        if event_cache.len() > cache_size {
-          error!("Event cache overflow! Deleting event {}", oldest_event_id);
-          event_cache.remove(&oldest_event_id);
-          oldest_event_id += 1;
-        } //endif
       }
     }  // end of tp_recv.try_recv() 
   
     // if we are in "stream_any" mode, we don't need to take care
     // of any fo the response/request.
     if op_mode_stream {
-      for tp in event_cache.values() {
-        match tp_to_pub.try_send(tp.clone()) {
+      for (_,tp) in event_cache.drain() {
+        match tp_to_pub.try_send(tp) {
           Err(err) => {
             error!("Error sending! {err}");
             n_send_errors += 1;
@@ -148,7 +136,6 @@ pub fn event_cache(tp_recv           : Receiver<TofPacket>,
           Ok(_)    => ()
         }
       }
-      event_cache.clear();
       continue; // makes rest of code unreachable
                 // for this case
     } else {
@@ -156,6 +143,7 @@ pub fn event_cache(tp_recv           : Receiver<TofPacket>,
       // caches get emptied. So we have to check for every request in our request cache,
       // if the event_cache has it. Do this only every 10 iterations. (number should be configurable)
       if n_iter_loop == 9 {
+        let mut bad_keys = Vec::<u32>::new();
         for event_key in request_cache.keys() {
           if event_cache.contains_key(&event_key) {
             // unwrap is fine, since we checked we have it
@@ -166,8 +154,20 @@ pub fn event_cache(tp_recv           : Receiver<TofPacket>,
               Err(err) => trace!("Error sending event {}! {err}", event_key),
               Ok(_)    => ()
             }
+            bad_keys.push(*event_key);
           } 
         }
+        for k in bad_keys.iter() {
+          request_cache.remove(&k);
+        }
+        if request_cache.len() > max_len_request_cache {
+          warn!("Request too large! Will remove oldest entries!");
+          request_cache.retain(|_, v| !v.has_timed_out());
+        }
+        if event_cache.len() > cache_size {
+          warn!("Event too large! Will remove oldest entries!");
+          event_cache.retain(|_, v| !v.has_timed_out());
+        } //endif
         n_iter_loop = 0; 
         continue;
       }
@@ -175,7 +175,8 @@ pub fn event_cache(tp_recv           : Receiver<TofPacket>,
     if n_send_errors > 0 {
       error!("There were {n_send_errors} errors during sending!");
     }
-  n_iter_loop += 1;
+    // make sure cache won't overflow
+    n_iter_loop += 1;
   } // end loop
 }
 

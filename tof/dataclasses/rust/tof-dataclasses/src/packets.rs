@@ -15,10 +15,11 @@
 
 
 pub mod paddle_packet;
+use crate::constants::EVENT_TIMEOUT;
 
 // re-imports
 pub use paddle_packet::PaddlePacket;
-
+use std::time::Instant;
 use std::fmt;
 pub use crate::monitoring::{RBMoniData,
                             TofCmpMoniData,
@@ -70,11 +71,15 @@ pub struct TofPacket {
   // FUTURE EXTENSION: Be able to send
   // packets which contain multiple of the same packets
   pub is_multi_packet  : bool,
+  // fields which won't get serialize
   /// mark a packet as not eligible to be written to disk
   pub no_write_to_disk : bool,
   /// mark a packet as not eligible to be sent over network 
   /// FIXME - future extension
   pub no_send_over_nw  : bool,
+  /// creation_time for the instance
+  pub creation_time      : Instant,
+  pub valid              : bool, // will be always valid, unless invalidated
 }
 
 
@@ -104,13 +109,25 @@ impl TofPacket {
   pub const PRELUDE_SIZE : usize = 7; 
 
   pub fn new() -> Self {
+    let creation_time = Instant::now();
     Self {
       packet_type      : PacketType::Unknown,
       payload          : Vec::<u8>::new(),
       is_multi_packet  : false,
       no_write_to_disk : false,
-      no_send_over_nw  : false
+      no_send_over_nw  : false,
+      creation_time    : creation_time,
+      valid            : true,
     }
+  }
+  
+  /// Event can time out after specified time
+  pub fn has_timed_out(&self) -> bool {
+    return self.age() > EVENT_TIMEOUT;
+  }
+
+  pub fn age(&self) -> u64 {
+    self.creation_time.elapsed().as_secs()
   }
  
   pub fn get_n_packets(&self) -> u32 {
@@ -122,15 +139,6 @@ impl TofPacket {
       return 1;
     }
   }
-
-
-  //impl from_bytes(stream : &[u8], start_pos : usize) {
-  //  -> Result<TofPacket, SerializationError> {
-  //    let (input, status) = le_u16(input)?;
-
-
-  //  }
-
 }
 
 impl From<&TofEvent> for TofPacket {

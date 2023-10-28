@@ -13,6 +13,7 @@
 #include "packets/CommandPacket.h"
 #include "packets/MasterTriggerPacket.h"
 #include "packets/monitoring.h"
+#include "events/tof_event_header.hpp"
 
 #include "io.hpp"
 #include "serialization.h"
@@ -598,12 +599,42 @@ PYBIND11_MODULE(gaps_tof, m) {
                                   return rbmoni_to_string(moni);
                                   }) 
     ;
+    py::class_<TofEventHeader>(m, "TofEventHeader",
+        "Meta information, primary particle reconstruction & general variables.")
+        .def(py::init())
+        .def_readonly("run_id"              , &TofEventHeader::run_id             )
+        .def_readonly("event_id"            , &TofEventHeader::event_id           ) 
+        .def_readonly("timestamp_32"        , &TofEventHeader::timestamp_32       ) 
+        .def_readonly("timestamp_16"        , &TofEventHeader::timestamp_16       ) 
+        .def_readonly("primary_beta"        , &TofEventHeader::primary_beta       ) 
+        .def_readonly("primary_beta_unc"    , &TofEventHeader::primary_beta_unc   ) 
+        .def_readonly("primary_charge"      , &TofEventHeader::primary_charge     ) 
+        .def_readonly("primary_charge_unc"  , &TofEventHeader::primary_charge_unc ) 
+        .def_readonly("primary_outer_tof_x" , &TofEventHeader::primary_outer_tof_x) 
+        .def_readonly("primary_outer_tof_y" , &TofEventHeader::primary_outer_tof_y) 
+        .def_readonly("primary_outer_tof_z" , &TofEventHeader::primary_outer_tof_z) 
+        .def_readonly("primary_inner_tof_x" , &TofEventHeader::primary_inner_tof_x) 
+        .def_readonly("primary_inner_tof_y" , &TofEventHeader::primary_inner_tof_y) 
+        .def_readonly("primary_inner_tof_z" , &TofEventHeader::primary_inner_tof_z)  
+        .def_readonly("nhit_outer_tof"      , &TofEventHeader::nhit_outer_tof     ) 
+        .def_readonly("nhit_inner_tof"      , &TofEventHeader::nhit_inner_tof     ) 
+        .def_readonly("trigger_info"        , &TofEventHeader::trigger_info       ) 
+        .def_readonly("ctr_etx"             , &TofEventHeader::ctr_etx            ) 
+        .def_readonly("n_paddles"           , &TofEventHeader::n_paddles          ) 
+        .def("from_bytestream"              , &TofEvent::from_bytestream          )
+        //.def("from_tofpacket"               ,&TofEvent::from_tofpacket)
+        .def("__repr__",           [](const TofEventHeader &th) {
+                                   return th.to_string(); 
+                                   }) 
+
+    ;
+
     
     py::class_<TofEvent>(m, "TofEvent")
         .def(py::init())
+        //.def_readonly("header"              ,&TofEvent::header)
         .def_readonly("mt_event"            ,&TofEvent::mt_event)
         .def_readonly("missing_hits"        ,&TofEvent::missing_hits)
-        .def_readonly("rbmoni"              ,&TofEvent::rb_moni_data)
         .def_readonly("rbevents"            ,&TofEvent::rb_events)
         .def("get_rbids"                    ,&TofEvent::get_rbids,
                                              "Get a list of all RB ids contributing to this event."

@@ -437,7 +437,7 @@ impl Serialization for TofEventHeader {
   fn from_bytestream(stream : &Vec<u8>, pos : &mut usize)
      -> Result<Self, SerializationError> {
     Self::verify_fixed(stream, pos)?;
-    let mut event = Self::new();
+    let mut event             = Self::new();
     event.run_id              = parse_u32(stream, pos);
     event.event_id            = parse_u32(stream, pos);
     event.timestamp_32        = parse_u32(stream, pos);

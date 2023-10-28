@@ -22,11 +22,16 @@ be necessary to rebuild that_
 * inspect everything with `ccmake .`. There you can also set te path for the
 install directory and switch on the different components. In case you want 
 to build te pybindings, `pybind11` is required.
-* `make install`, then go to specified install directory.
+* `make (-j <njobs>)` to build the project.
+* `make install`,
+* if you get an error here, you might need to build the docs seperatly with `make doc`
+* then go to specified install directory.
 * in the install directory, `source setup-env.sh` to set the necessary paths.
 * A welcome banner should greet you.
 
-## BUild the docs
+_The rust pybindings are currently a bit experimental, and have to be built separatly. This is currently an expert option, so if you are interested, contact the maintainer._
+
+## Build the docs
 
 * docs can be built with `make doc`
 
