@@ -36,6 +36,7 @@ extern crate rand;
 #[cfg(feature = "random")]
 use rand::Rng;
 
+// TODO maybe enum at this point?
 /// en empty command
 pub const CMD_PING                : u8 = 1;
 /// command code for "Power off"
@@ -97,6 +98,7 @@ pub const CMD_DIS_TRIGGERMODE_FORCED_MTB : u8 = 27;
 // this allows to convey more information
 // e.g. event id
 
+// TODO maybe enum at this point?
 /// response code for: Command can not be executed on the server side
 pub const RESP_ERR_UNEXECUTABLE              : u32 = 500;
 pub const RESP_ERR_NOTIMPLEMENTED            : u32 = 404; 

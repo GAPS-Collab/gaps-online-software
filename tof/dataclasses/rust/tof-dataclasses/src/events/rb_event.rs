@@ -568,7 +568,8 @@ impl RBEvent {
     if stream.len() < 3 {
       return Err(SerializationError::StreamTooShort);
     }
-    Ok(DataType::from_u8(&stream[2]))
+    // TODO This might panic! Is it ok?
+    Ok(DataType::try_from(stream[2]).unwrap())
   }
   
   /// decode the len field in the in memroy represention of 
@@ -712,7 +713,7 @@ impl Serialization for RBEvent {
       error!("The given position {} does not point to a valid header signature of {}", pos, Self::HEAD);
       return Err(SerializationError::HeadInvalid {});
     }
-    event.data_type = DataType::from_u8(&parse_u8(stream, pos));
+    event.data_type = DataType::try_from(parse_u8(stream, pos)).unwrap();
     event.nchan     = parse_u8(stream, pos);
     event.n_paddles = parse_u8(stream, pos);
     event.header    = RBEventHeader::from_bytestream(stream, pos)?;
@@ -766,7 +767,7 @@ impl Serialization for RBEvent {
   fn to_bytestream(&self) -> Vec<u8> {
     let mut stream = Vec::<u8>::new();
     stream.extend_from_slice(&Self::HEAD.to_le_bytes());
-    stream.push(self.data_type.to_u8());
+    stream.push(self.data_type as u8);
     stream.push(self.nchan);
     stream.push(self.n_paddles);
     stream.extend_from_slice(&self.header.to_bytestream());

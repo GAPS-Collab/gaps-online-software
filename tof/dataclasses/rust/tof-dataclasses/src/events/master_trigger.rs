@@ -1132,6 +1132,7 @@ pub fn read_daq(socket : &UdpSocket,
       }
       for k in 0..event.board_mask.len() {
         if event.board_mask[k] {
+          // TODO This might panic! Is it ok?
           let thishits = hitmasks.pop_front().unwrap();
           //println!("Will assign {:?} for {k}", thishits);
           event.hits[k] = thishits;

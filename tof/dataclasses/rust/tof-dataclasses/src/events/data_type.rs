@@ -1,155 +1,94 @@
 use std::fmt;
 
 extern crate serde;
+extern crate serde_json;
+
+#[cfg(feature = "random")] 
+use crate::FromRandom;
+#[cfg(feature = "random")]
+extern crate rand;
+#[cfg(feature = "random")]
+use rand::Rng;
 
 /// A generic data type
 ///
 /// Describe the purpose of the data. This
-/// is the semantics behind it. 
+/// is the semantics behind it.
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
+#[repr(u8)]
 pub enum DataType {
-  VoltageCalibration,
-  TimingCalibration,
-  Noi,
-  Physics,
-  RBTriggerPeriodic,
-  RBTriggerPoisson,
-  MTBTriggerPoisson,
+  VoltageCalibration = 0u8,
+  TimingCalibration  = 10u8,
+  Noi                = 20u8,
+  Physics            = 30u8,
+  RBTriggerPeriodic  = 40u8,
+  RBTriggerPoisson   = 50u8,
+  MTBTriggerPoisson  = 60u8,
   // future extension for different trigger settings!
-  Unknown,
+  Unknown            = 70u8,
 }
 
 impl fmt::Display for DataType {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let r = self.string_repr();
+    let r = serde_json::to_string(self).unwrap_or(
+      String::from("Error: cannot unwrap this DataType"));
     write!(f, "<DataType: {}>", r)
   }
 }
 
-impl DataType {
-  pub const UNKNOWN               : u8 = 0;
-  pub const VOLTAGECALIBRATION    : u8 = 10;
-  pub const TIMINGCALIBRATION     : u8 = 20;
-  pub const NOI                   : u8 = 30;
-  pub const PHYSICS               : u8 = 40;
-  pub const RBTRIGGERPERIODIC     : u8 = 50;
-  pub const RBTRIGGERPOISSON      : u8 = 60;
-  pub const MTBTRIGGERPOISSON     : u8 = 70;
+impl TryFrom<u8> for DataType {
+  type Error = &'static str;
 
-  pub fn to_u8(&self) -> u8 {
-    let result : u8;
-    match self {
-      DataType::Unknown => {
-        result = DataType::UNKNOWN;
-      }
-      DataType::VoltageCalibration => {
-        result = DataType::VOLTAGECALIBRATION;
-      }
-      DataType::TimingCalibration => {
-        result = DataType::TIMINGCALIBRATION;
-      }
-      DataType::Noi => {
-        result = DataType::NOI;
-      }
-      DataType::Physics => {
-        result = DataType::PHYSICS;
-      }
-      DataType::MTBTriggerPoisson => {
-        result = DataType::MTBTRIGGERPOISSON;
-      }
-      DataType::RBTriggerPoisson => {
-        result = DataType::RBTRIGGERPOISSON;
-      }
-      DataType::RBTriggerPeriodic => {
-        result = DataType::RBTRIGGERPERIODIC;
-      }
+  // I am not sure about this hard coding, but the code
+  //  looks nicer - Paolo
+  fn try_from(value: u8) -> Result<Self, Self::Error> {
+    match value {
+      0u8  => Ok(DataType::VoltageCalibration),
+      10u8 => Ok(DataType::TimingCalibration),
+      20u8 => Ok(DataType::Noi),
+      30u8 => Ok(DataType::Physics),
+      40u8 => Ok(DataType::RBTriggerPeriodic),
+      50u8 => Ok(DataType::RBTriggerPoisson),
+      60u8 => Ok(DataType::MTBTriggerPoisson),
+      70u8 => Ok(DataType::Unknown),
+      _    => Err("I am not sure how to convert this value!")
     }
-    result
   }
+}
+
+#[cfg(feature = "random")]
+impl FromRandom for DataType {
   
-  pub fn from_u8(code : &u8) -> Self {
-    let mut result = DataType::Unknown;
-    match *code {
-      DataType::UNKNOWN => {
-        result = DataType::Unknown;
-      }
-      DataType::VOLTAGECALIBRATION => {
-        result = DataType::VoltageCalibration;
-      }
-      DataType::TIMINGCALIBRATION => {
-        result = DataType::TimingCalibration;
-      }
-      DataType::NOI => {
-        result = DataType::Noi;
-      }
-      DataType::PHYSICS => {
-        result = DataType::Physics;
-      }
-      DataType::MTBTRIGGERPOISSON => {
-        result = DataType::MTBTriggerPoisson;
-      }
-      DataType::RBTRIGGERPOISSON => {
-        result = DataType::RBTriggerPoisson;
-      }
-      DataType::RBTRIGGERPERIODIC => {
-        result = DataType::RBTriggerPeriodic;
-      }
-      _ => {
-        error!("Unknown DataType {}!", code);
-      }
-    }
-    result
-  }
-
-  /// String representation of the DataType
-  ///
-  /// This is basically the enum type as 
-  /// a string.
-  pub fn string_repr(&self) -> String { 
-    let repr : String;
-    match self {
-      DataType::Unknown => {
-        repr = String::from("Unknown");
-      }
-      DataType::VoltageCalibration => {
-        repr = String::from("VoltageCalibration");
-      }
-      DataType::TimingCalibration => {
-        repr = String::from("TimingCalibration");
-      }
-      DataType::Noi => {
-        repr = String::from("Noi");
-      }
-      DataType::Physics => {
-        repr = String::from("Physics");
-      }
-      DataType::MTBTriggerPoisson => {
-        repr = String::from("MTBTriggerPoisson");
-      }
-      DataType::RBTriggerPoisson => {
-        repr = String::from("RBTriggerPoisson");
-      }
-      DataType::RBTriggerPeriodic => {
-        repr = String::from("RBTriggerPeriodic");
-      }
-    }
-    repr
+  fn from_random() -> Self {
+    let choices = [
+      DataType::VoltageCalibration,
+      DataType::TimingCalibration,
+      DataType::Noi,
+      DataType::Physics,
+      DataType::RBTriggerPeriodic,
+      DataType::RBTriggerPoisson,
+      DataType::MTBTriggerPoisson,
+      DataType::Unknown
+    ];
+    let mut rng  = rand::thread_rng();
+    let idx = rng.gen_range(0..choices.len());
+    choices[idx]
   }
 }
 
 #[test]
 fn test_data_type() {
   let mut type_codes = Vec::<u8>::new();
-  type_codes.push(DataType::UNKNOWN); 
-  type_codes.push(DataType::VOLTAGECALIBRATION); 
-  type_codes.push(DataType::TIMINGCALIBRATION); 
-  type_codes.push(DataType::NOI); 
-  type_codes.push(DataType::PHYSICS); 
-  type_codes.push(DataType::MTBTRIGGERPOISSON); 
-  type_codes.push(DataType::RBTRIGGERPERIODIC); 
-  type_codes.push(DataType::RBTRIGGERPOISSON); 
+  type_codes.push(DataType::Unknown as u8); 
+  type_codes.push(DataType::VoltageCalibration as u8); 
+  type_codes.push(DataType::TimingCalibration as u8); 
+  type_codes.push(DataType::Noi as u8); 
+  type_codes.push(DataType::Physics as u8); 
+  type_codes.push(DataType::MTBTriggerPoisson as u8); 
+  type_codes.push(DataType::RBTriggerPeriodic as u8); 
+  type_codes.push(DataType::RBTriggerPoisson as u8); 
   for tc in type_codes.iter() {
-    assert_eq!(*tc,DataType::to_u8(&DataType::from_u8(tc)));  
+    assert_eq!(*tc,DataType::try_from(*tc).unwrap() as u8);
   }
 }
 

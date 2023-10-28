@@ -58,9 +58,7 @@ pub fn interpolate_time (voltages      : &Vec<f32>,
       lval = hval;
     }
   }
-  if ( lval > threshold) && (size != 1) {
-    return Ok(nanoseconds[idx]);
-  } else if lval == hval {
+  if ((lval > threshold) && (size != 1)) || lval == hval {
     return Ok(nanoseconds[idx]);
   } else {
     return Ok(nanoseconds[idx] 
@@ -243,11 +241,9 @@ pub fn find_peaks(voltages       : &Vec<f32>,
       break;
     }
   }
-  if pos == 0 && start_bin == 0 {
-    if voltages[pos] <  threshold {
-      // waveform did not cross threshold
-      return Err(WaveformError::DidNotCrossThreshold)
-    }
+  if pos == 0 && start_bin == 0 && voltages[pos] < threshold {
+    // waveform did not cross threshold
+    return Err(WaveformError::DidNotCrossThreshold)
   }
   // actual peak finding
   let mut nbins_peak   = 0usize;

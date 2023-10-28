@@ -201,6 +201,7 @@ fn median(input: &Vec<f32>) -> f32 {
     error!("Vector is empty, can not calculate median!");
     return f32::NAN;
   }
+  // TODO This might panic! Is it ok?
   data.sort_by(|a, b| a.partial_cmp(b).unwrap());
 
   if len % 2 == 0 {
@@ -858,62 +859,63 @@ impl RBCalibrations {
 
     if let Ok(lines) = read_lines(filename) {
       // we have NCHN-1*4 lines (no calibration data for channel 9)
-      for line in lines {
-        if let Ok(data) = line {        
-          let values: Vec<&str> = data.split(' ').collect();
-          match values.len() {
-            NWORDS => {
-              if vals == 0 {
-                for n in 0..NWORDS {
-                  // this will throw an error if calibration data 
-                  // is not following conventioss
-                  let data : f32 = values[n].parse::<f32>().unwrap();
-                  rb_cal.v_offsets[cnt][n] = data;
-                  //cals[cnt].v_offsets[n] = data;
-                }
-                vals += 1;
-                continue;
-              }
-              if vals == 1 {
-                for n in 0..NWORDS {
-                  // this will throw an error if calibration data 
-                  // is not following conventioss
-                  let data : f32 = values[n].parse::<f32>().unwrap();
-                  rb_cal.v_dips[cnt][n] = data;
-                  //cals[cnt].v_dips[n] = data;
-                }
-                vals += 1;
-                continue;
-              }
-              if vals == 2 {
-                for n in 0..NWORDS {
-                  // this will throw an error if calibration data 
-                  // is not following conventioss
-                  let data : f32 = values[n].parse::<f32>().unwrap();
-                  rb_cal.v_inc[cnt][n] = data;
-                  //cals[cnt].v_inc[n] = data;
-                }
-                vals += 1;
-                continue;
-              }
-              if vals == 3 {
-                for n in 0..NWORDS {
-                  // this will throw an error if calibration data 
-                  // is not following conventioss
-                  let data : f32 = values[n].parse::<f32>().unwrap();
-                  rb_cal.tbin[cnt][n] = data;
-                  //cals[cnt].tbin[n] = data;
-                  // reset vals & cnts
-                }
-                vals = 0;
-                cnt += 1;
-                continue;
-              }
-            },
-            _ => panic!("Invalid input line {}", data),
-          }; // end Ok lines
-          vals += 1;
+      for data in lines.flatten() {       
+        let values: Vec<&str> = data.split(' ').collect();
+        if values.len() == NWORDS {
+          if vals == 0 {
+            for n in 0..NWORDS {
+              // this will throw an error if calibration data 
+              // is not following conventioss
+              // TODO it will actually panic!!!
+              let data : f32 = values[n].parse::<f32>().unwrap();
+              rb_cal.v_offsets[cnt][n] = data;
+              //cals[cnt].v_offsets[n] = data;
+            }
+            vals += 1;
+            continue;
+          }
+          if vals == 1 {
+            for n in 0..NWORDS {
+              // this will throw an error if calibration data 
+              // is not following conventioss
+              // TODO it will actually panic!!!
+              let data : f32 = values[n].parse::<f32>().unwrap();
+              rb_cal.v_dips[cnt][n] = data;
+              //cals[cnt].v_dips[n] = data;
+            }
+            vals += 1;
+            continue;
+          }
+          if vals == 2 {
+            for n in 0..NWORDS {
+              // this will throw an error if calibration data 
+              // is not following conventioss
+              // TODO it will actually panic!!!
+              let data : f32 = values[n].parse::<f32>().unwrap();
+              rb_cal.v_inc[cnt][n] = data;
+              //cals[cnt].v_inc[n] = data;
+            }
+            vals += 1;
+            continue;
+          }
+          if vals == 3 {
+            for n in 0..NWORDS {
+              // this will throw an error if calibration data 
+              // is not following conventioss
+              // TODO it will actually panic!!!
+              let data : f32 = values[n].parse::<f32>().unwrap();
+              rb_cal.tbin[cnt][n] = data;
+              //cals[cnt].tbin[n] = data;
+              // reset vals & cnts
+            }
+            vals = 0;
+            cnt += 1;
+            continue;
+          }
+        } else {
+          panic!("Invalid input line {}", data)
         }
+        vals += 1;
       }
     }
     rb_cal
@@ -932,8 +934,10 @@ impl RBCalibrations {
         return 0;
       }
       Some(name) => {
+        // TODO This might panic! Is it ok?
         let fname = name.to_os_string().into_string().unwrap();
         let id    = &fname[2..4];
+        // TODO This might panic! Is it ok?
         rb_id     = id.parse::<u8>().unwrap();
         debug!("Extracted RB ID {} from filename {}", rb_id, fname);
       }

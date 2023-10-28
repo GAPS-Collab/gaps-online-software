@@ -6,9 +6,12 @@
 use std::error::Error;
 use std::fmt;
 
+extern crate serde;
+extern crate serde_json;
+
 ////////////////////////////////////////
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, serde::Deserialize, serde::Serialize)]
 pub enum CalibrationError {
   EmptyInputData,
   CanNotConnectToMyOwnZMQSocket  
@@ -16,11 +19,8 @@ pub enum CalibrationError {
 
 impl fmt::Display for CalibrationError {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let disp : String;
-    match self {
-      CalibrationError::CanNotConnectToMyOwnZMQSocket  => {disp = String::from("CanNotConnectToMyOwnZMQSocket");},
-      CalibrationError::EmptyInputData     => {disp = String::from("EmptyInputData");},
-    }
+    let disp = serde_json::to_string(self).unwrap_or(
+      String::from("Error: cannot unwrap this CalibrationError"));
     write!(f, "<CalibrationError : {}>", disp)
   }
 }
@@ -49,7 +49,7 @@ impl Error for EventError {
 /// This error shall be thrown whenver there
 /// is an issue in the de(serialization),
 /// e.g. the from_bytestream methods.
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, serde::Deserialize, serde::Serialize)]
 pub enum SerializationError {
   //HeaderNotFound,
   TailInvalid,
@@ -65,18 +65,8 @@ pub enum SerializationError {
 
 impl fmt::Display for SerializationError {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let disp : String;
-    match self {
-      SerializationError::TailInvalid     => {disp = String::from("TailInvalid");},
-      SerializationError::HeadInvalid     => {disp = String::from("HeadInvalid");},
-      SerializationError::StreamTooShort  => {disp = String::from("StreamTooShort");},
-      SerializationError::StreamTooLong   => {disp = String::from("StreamTooLong");},
-      SerializationError::ValueNotFound   => {disp = String::from("ValueNotFound");},
-      SerializationError::EventFragment   => {disp = String::from("EventFragment");},
-      SerializationError::UnknownPayload  => {disp = String::from("UnknownPayload");},
-      SerializationError::WrongByteSize   => {disp = String::from("WrongByteSize");},
-      SerializationError::JsonDecodingError   => {disp = String::from("JsonDecodingError");},
-    }
+    let disp = serde_json::to_string(self).unwrap_or(
+      String::from("Error: cannot unwrap this SerializationError"));
     write!(f, "<Serialization Error : {}>", disp)
   }
 }
@@ -86,7 +76,7 @@ impl Error for SerializationError {
 
 ////////////////////////////////////////
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, serde::Deserialize, serde::Serialize)]
 pub enum DecodingError {
   //HeaderNotFound,
   ChannelOutOfBounds,
@@ -95,11 +85,8 @@ pub enum DecodingError {
 
 impl fmt::Display for DecodingError {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let disp : String;
-    match self {
-      DecodingError::UnknownType  => {disp = String::from("UnknownType");},
-      DecodingError::ChannelOutOfBounds => {disp = String::from("Remember channels start from 1, not 0");},
-    }
+    let disp = serde_json::to_string(self).unwrap_or(
+      String::from("Error: cannot unwrap this DecodingError"));
     write!(f, "<DecodingError Error : {}>", disp)
   }
 }
@@ -111,7 +98,7 @@ impl Error for DecodingError {
 
 /// Error to be used for issues with 
 /// the communication to the MTB.
-#[derive(Debug,Copy,Clone)]
+#[derive(Debug, Copy, Clone, serde::Deserialize, serde::Serialize)]
 pub enum MasterTriggerError {
   QueueEmpty,
   MaskTooLarge,
@@ -121,13 +108,8 @@ pub enum MasterTriggerError {
 
 impl fmt::Display for MasterTriggerError {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let disp : String;
-    match self {
-      MasterTriggerError::QueueEmpty      => {disp = String::from("QueueEmpty");},
-      MasterTriggerError::MaskTooLarge    => {disp = String::from("MaskTooLarge");},
-      MasterTriggerError::BrokenPackage   => {disp = String::from("BrokenPackage");}
-      MasterTriggerError::DAQNotAvailable => {disp = String::from("DAQNotAvaiable");}
-    }
+    let disp = serde_json::to_string(self).unwrap_or(
+      String::from("Error: cannot unwrap this MasterTriggerError"));
     write!(f, "<MasterTriggerError : {}>", disp)
   }
 }
@@ -139,7 +121,7 @@ impl Error for MasterTriggerError {
 
 
 /// Problems in waveform analysis
-#[derive(Debug,Copy,Clone)]
+#[derive(Debug, Copy, Clone, serde::Deserialize, serde::Serialize)]
 pub enum WaveformError {
   TimeIndexOutOfBounds,
   TimesTooSmall,
@@ -150,29 +132,15 @@ pub enum WaveformError {
   TooSpiky,
 }
 
-impl WaveformError {
-  pub fn to_string(&self) -> String {
-    let disp : String;
-    match self {
-      WaveformError::TimeIndexOutOfBounds => {disp = String::from("TimeIndexOutOfBounds");},
-      WaveformError::TimesTooSmall        => {disp = String::from("TimesTooSmall");},
-      WaveformError::NegativeLowerBound   => {disp = String::from("NegativeLowerBound");},
-      WaveformError::OutOfRangeUpperBound => {disp = String::from("OutOfRangeUpperBound");},
-      WaveformError::OutOfRangeLowerBound => {disp = String::from("OutOfRangeLowerBound");},
-      WaveformError::DidNotCrossThreshold => {disp = String::from("DidNotCrossThreshold");},
-      WaveformError::TooSpiky             => {disp = String::from("TooSpiky");},
-    }
-    disp
-  }
-}
-
 impl fmt::Display for WaveformError {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let disp = self.to_string();
+    let disp = serde_json::to_string(self).unwrap_or(
+      String::from("Error: cannot unwrap this WaveformError"));
     write!(f, "<WaveformError: {}>", disp)
   }
 }
 
+// TODO is this needed?
 impl Error for WaveformError {
 }
 
@@ -183,17 +151,16 @@ impl Error for WaveformError {
 /// sending UDP packets with a header.
 /// This is used by the MTB to send its
 /// packets over UDP
-#[derive(Debug,Copy,Clone)]
+// TODO Isnt it too overkill to have an enum for this?
+#[derive(Debug, Copy, Clone, serde::Deserialize, serde::Serialize)]
 pub enum IPBusError {
   DecodingFailed,
 }
 
 impl fmt::Display for IPBusError {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let disp : String;
-    match self {
-      IPBusError::DecodingFailed => {disp = String::from("DecodingFailed");},
-    }
+    let disp = serde_json::to_string(self).unwrap_or(
+      String::from("Error: cannot unwrap this IPBusError"));
     write!(f, "<IPBusError Error : {}>", disp)
   }
 }
@@ -206,7 +173,7 @@ impl Error for IPBusError {
 /// Errors when converting events to PaddlePackets
 /// or more general, when doing any kind of analysis
 ///
-#[derive(Debug,Copy,Clone)]
+#[derive(Debug,Copy,Clone, serde::Deserialize, serde::Serialize)]
 pub enum AnalysisError {
   MissingChannel,
   InputBroken,
@@ -214,11 +181,8 @@ pub enum AnalysisError {
 
 impl fmt::Display for AnalysisError {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let disp : String;
-    match self {
-      AnalysisError::MissingChannel => {disp = String::from("MissingChannel");},
-      AnalysisError::InputBroken    => {disp = String::from("InputBroken");},
-    }
+    let disp = serde_json::to_string(self).unwrap_or(
+      String::from("Error: cannot unwrap this AnalysisError"));
     write!(f, "<AnalysisError : {}>", disp)
   }
 }
