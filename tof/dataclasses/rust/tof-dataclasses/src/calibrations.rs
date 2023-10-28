@@ -586,7 +586,7 @@ impl RBCalibrations {
         roll(&mut tcal_av_cp[ch], -1* (stop_cell as isize));
         // tcal data per definition has all channels active...
         // FIXME - we should not just assume this for each event.
-        let tcal_trace = &self.tcal_data[n].adc[ch];
+        let tcal_trace = &self.tcal_data[n].get_channel_by_id(ch).expect("Unable to get ch");
         let mut tcal_trace_f32 = Vec::<f32>::with_capacity(tcal_trace.len());
         for j in tcal_trace.iter() {
           tcal_trace_f32.push(*j as f32);
