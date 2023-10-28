@@ -37,8 +37,7 @@ use tof_dataclasses::DsiLtbRBMapping;
 use tof_dataclasses::constants::NWORDS;
 use tof_dataclasses::calibrations::RBCalibrations;
 use tof_dataclasses::packets::{TofPacket,
-                               PacketType,
-                               PaddlePacket};
+                               PacketType};
 use tof_dataclasses::errors::{SerializationError,
                               AnalysisError};
 use tof_dataclasses::serialization::{search_for_u16,
@@ -48,7 +47,8 @@ use tof_dataclasses::serialization::{search_for_u16,
 use tof_dataclasses::monitoring::MtbMoniData;
 use tof_dataclasses::commands::RBCommand;
 use tof_dataclasses::events::{RBEvent,
-                              MasterTriggerEvent};
+                              MasterTriggerEvent,
+                              TofHit};
 use tof_dataclasses::events::master_trigger::{read_daq,
                                               read_rate,
                                               reset_daq,
@@ -828,8 +828,6 @@ pub fn readoutboard_commander(cmd : &Receiver<TofPacket>){
 pub fn waveform_analysis(event         : &mut RBEvent,
                          readoutboard  : &mf::ReadoutBoard,
                          calibration   : &RBCalibrations)
-                         // settiungs will be future extension
-                         //settings      : &HashMap<String, f32>) 
 -> Result<(), AnalysisError> {
   if event.header.broken {
     // just return the analysis error, there 
@@ -837,7 +835,7 @@ pub fn waveform_analysis(event         : &mut RBEvent,
     return Err(AnalysisError::InputBroken);
   }
   let pids = readoutboard.get_all_pids();
-  let mut paddles = HashMap::<u8, PaddlePacket>::new();
+  let mut paddles = HashMap::<u8, TofHit>::new();
   // just paranoid
   if pids.len() != 4 {
     error!("RB {} seems to have a strange number of paddles ({}) connected!",
@@ -846,13 +844,9 @@ pub fn waveform_analysis(event         : &mut RBEvent,
   for k in pids.iter() {
     // fill the general information of 
     // the paddles already
-    let mut pp   = PaddlePacket::new();
-    pp.paddle_id = *k;
-    pp.event_id  = event.header.event_id;
-    // FIXME - think better about timestamps!
-    //pp.timestamp_32 = blob_data.timestamp_32;
-    //pp.timestamp_16 = blob_data.timestamp_16;
-    match paddles.insert(*k, pp) {
+    let mut hit   = TofHit::new();
+    hit.paddle_id = *k;
+    match paddles.insert(*k, hit) {
       None => (),
       Some(_) => {
         error!("We have seen paddle id {k} already!");
@@ -961,7 +955,7 @@ pub fn waveform_analysis(event         : &mut RBEvent,
     }
   }
   let result = paddles.into_values().collect();
-  event.paddles = result;
+  event.hits = result;
   Ok(())
 }
 
