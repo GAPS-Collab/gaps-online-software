@@ -28,7 +28,7 @@ use crate::events::{MasterTriggerEvent,
 
 use crate::monitoring::RBMoniData;
 
-
+// This looks like a TODO
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub enum CompressionLevel {
   Unknown,
@@ -38,7 +38,7 @@ pub enum CompressionLevel {
 impl fmt::Display for CompressionLevel {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let r = self.string_repr();
-    write!(f, "<EventQuality: {}>", r)
+    write!(f, "<CompressionLevel: {}>", r)
   }
 }
 
@@ -295,6 +295,7 @@ impl Serialization for TofEvent {
   const HEAD               : u16   = 43690; //0xAAAA
   const TAIL               : u16   = 21845; //0x5555
 
+  // unify to_le_bytes and other in to_bytestream ? TODO
   fn to_bytestream(&self) -> Vec<u8> {
     let mut stream = Vec::<u8>::new();
     stream.extend_from_slice(&Self::HEAD.to_le_bytes());

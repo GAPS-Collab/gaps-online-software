@@ -240,6 +240,7 @@ impl TofHit {
   }
 }
 
+#[cfg(feature = "random")]
 #[test]
 fn serialization_tofhit() {
     let mut pos = 0;

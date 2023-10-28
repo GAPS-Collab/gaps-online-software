@@ -49,21 +49,20 @@ pub struct BitMask32 {
 }
 
 impl BitMask32 {
+  const LENGTH: usize = 32;
   
   /// A boolean array representation of the Bitmask
-  pub fn decode(bitmask : u32) -> [bool;32] {
-    let mut decoded_mask = [false;32];
+  pub fn decode(bitmask : u32) -> [bool;BitMask32::LENGTH] {
+    let mut decoded_mask = [false;BitMask32::LENGTH];
     // FIXME this implicitly asserts that the fields for non available LTBs 
-    // will be 0 and all the fields will be in order 
-    let mut index = 32 - 1;
-    for n in 0..32 {
+    // will be 0 and all the fields will be in order
+    for n in 0..BitMask32::LENGTH {
       let mask = 1 << n;
       let bit_is_set = (mask & bitmask) > 0;
-      decoded_mask[index] = bit_is_set;
-      if index != 0 {
-          index -= 1;
-      }
+      decoded_mask[BitMask32::LENGTH-1 - n] = bit_is_set;
     }
     decoded_mask
   }
 }
+
+// TODO is this used tho? Sometimes you explicitly do that. One might want to generalise this fn to adapt to different scenarios or remove it completely

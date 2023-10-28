@@ -26,6 +26,7 @@ pub fn read_file(filename: &Path) -> io::Result<Vec<u8>> {
   let metadata = fs::metadata(&filename)?;
   let mut buffer = vec![0; metadata.len() as usize];
   info!("Read {} bytes from {}", buffer.len(), filename.display());
-  f.read(&mut buffer)?;
+  // read_exact if the amount is not specified
+  f.read_exact(&mut buffer)?;
   Ok(buffer)
 }

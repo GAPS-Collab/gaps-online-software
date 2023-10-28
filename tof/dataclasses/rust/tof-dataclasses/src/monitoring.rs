@@ -578,7 +578,7 @@ impl Serialization for MtbMoniData {
   }
 }
 
-#[cfg(test)]
+#[cfg(all(test,feature = "random"))]
 mod test_monitoring {
   use crate::serialization::Serialization;
   use crate::FromRandom;

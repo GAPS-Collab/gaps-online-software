@@ -93,7 +93,8 @@ impl Serialization for RunConfig {
     pars.trigger_poisson_rate    = parse_u32(bytestream, pos);
     pars.trigger_fixed_rate      = parse_u32(bytestream, pos);
     pars.latch_to_mtb            = parse_bool(bytestream, pos);
-    pars.data_type    = DataType::from_u8(&parse_u8(bytestream, pos));
+    pars.data_type    
+      = DataType::try_from(parse_u8(bytestream, pos)).unwrap();
     pars.rb_buff_size = parse_u16(bytestream, pos);
     *pos += 2; // for the tail 
     //_ = parse_u16(bytestream, pos);
@@ -110,7 +111,7 @@ impl Serialization for RunConfig {
     stream.extend_from_slice(&self.trigger_poisson_rate.to_le_bytes());
     stream.extend_from_slice(&self.trigger_fixed_rate.to_le_bytes());
     stream.extend_from_slice(&u8::from(self.latch_to_mtb).to_le_bytes());
-    stream.extend_from_slice(&self.data_type.to_u8().to_le_bytes());
+    stream.extend_from_slice(&(self.data_type as u8).to_le_bytes());
     stream.extend_from_slice(&self.rb_buff_size.to_le_bytes());
     stream.extend_from_slice(&Self::TAIL.to_le_bytes());
     stream
@@ -142,7 +143,7 @@ impl fmt::Display for RunConfig {
       self.nevents,
       self.nseconds,
       self.stream_any,
-      self.data_type.string_repr(),
+      self.data_type,
       self.trigger_poisson_rate,
       self.trigger_fixed_rate,
       self.latch_to_mtb,
@@ -164,13 +165,14 @@ impl FromRandom for RunConfig {
     cfg.trigger_poisson_rate    = rng.gen::<u32>();
     cfg.trigger_fixed_rate      = rng.gen::<u32>();
     cfg.latch_to_mtb            = rng.gen::<bool>();
-    cfg.data_type               = DataType::from_u8(&rng.gen::<u8>());
+    cfg.data_type               = DataType::from_random();
     cfg.rb_buff_size            = rng.gen::<u16>();
     cfg
   }
 }
 
-#[cfg(all(test,feature = "random"))]
+#[cfg(feature = "random")]
+#[test]
 fn serialization_runconfig() {
   let cfg  = RunConfig::from_random();
   let test = RunConfig::from_bytestream(&cfg.to_bytestream(), &mut 0).unwrap();

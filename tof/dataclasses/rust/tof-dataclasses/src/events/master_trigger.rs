@@ -65,7 +65,7 @@ pub enum IPBusPacketType {
   Read                 = 0,
   Write                = 1,
   ReadNonIncrement     = 2,
-  WriteNonIncrememnt   = 3,
+  WriteNonIncrement    = 3,
   RMW                  = 4
 }
 
@@ -78,7 +78,7 @@ impl TryFrom<u8> for IPBusPacketType {
       0 => {return Ok(IPBusPacketType::Read);},
       1 => {return Ok(IPBusPacketType::Write);},
       2 => {return Ok(IPBusPacketType::ReadNonIncrement);},
-      3 => {return Ok(IPBusPacketType::WriteNonIncrememnt);},
+      3 => {return Ok(IPBusPacketType::WriteNonIncrement);},
       4 => {return Ok(IPBusPacketType::RMW);},
       _ => {return Err(IPBusError::DecodingFailed);},
     }
@@ -93,7 +93,7 @@ impl From<IPBusPacketType> for u8 {
      IPBusPacketType::Read               => { result = 0;}, 
      IPBusPacketType::Write              => { result = 1;}, 
      IPBusPacketType::ReadNonIncrement   => { result = 2;},  
-     IPBusPacketType::WriteNonIncrememnt => { result = 3;},  
+     IPBusPacketType::WriteNonIncrement => { result = 3;},  
      IPBusPacketType::RMW                => { result = 4;}, 
     }
     result
@@ -736,7 +736,7 @@ pub fn encode_ipbus(addr        : u32,
     (addr  & 0x000000ff as u32) as u8]);
 
   if packet_type    == IPBusPacketType::Write
-     || packet_type == IPBusPacketType::WriteNonIncrememnt {
+     || packet_type == IPBusPacketType::WriteNonIncrement {
     for i in 0..size as usize {
       udp_data.push (((data[i] & 0xff000000 as u32) >> 24) as u8);
       udp_data.push (((data[i] & 0x00ff0000 as u32) >> 16) as u8);
@@ -776,20 +776,23 @@ pub fn decode_ipbus( message : &[u8;MT_MAX_PACKSIZE],
     let packet_type = IPBusPacketType::try_from(pt_val)?;
     // Read
 
-    if matches!(packet_type, IPBusPacketType::Read)
-    || matches!(packet_type, IPBusPacketType::ReadNonIncrement) {
-      for i in 0..size as usize {
-        data.push(  ((message[8 + i * 4]  as u32) << 24) 
-                  | ((message[9 + i * 4]  as u32) << 16) 
-                  | ((message[10 + i * 4] as u32) << 8)  
-                  |  message[11 + i * 4]  as u32)
-      }
+    match packet_type {
+      IPBusPacketType::Read |
+      IPBusPacketType::ReadNonIncrement => {
+        for i in 0..size as usize {
+          data.push(  ((message[8 + i * 4]  as u32) << 24) 
+                    | ((message[9 + i * 4]  as u32) << 16) 
+                    | ((message[10 + i * 4] as u32) << 8)  
+                    |  message[11 + i * 4]  as u32)
+        }
+      },
+      IPBusPacketType::Write => data.push(0),
+      IPBusPacketType::WriteNonIncrement
+        => error!("I am sorry, I don't know what to do with this packet!"),
+      IPBusPacketType::RMW
+        => error!("I am sorry, I don't know what to do with this packet!")
     }
 
-    // Write
-    if matches!(packet_type, IPBusPacketType::Write) {
-        data.push(0);
-    }
     if verbose { 
       println!("Decoding IPBus Packet:");
       println!(" > Msg = {:?}", message);
@@ -809,7 +812,6 @@ fn extract_values_from_32bit(number: u32) -> (u16, u16) {
   let upper_bits = (number >> 16) as u16;
   (lower_bits, upper_bits)
 }
-
 
 /// Remotely read out a specif register of the MTB over UDP
 ///
@@ -987,15 +989,11 @@ pub fn daq_word_available(socket : &UdpSocket,
 pub fn decode_board_mask(board_mask : u32) -> [bool;N_LTBS] {
   let mut decoded_mask = [false;N_LTBS];
   // FIXME this implicitly asserts that the fields for non available LTBs 
-  // will be 0 and all the fields will be in order 
-  let mut index = N_LTBS - 1;
+  // will be 0 and all the fields will be in order
   for n in 0..N_LTBS {
     let mask = 1 << n;
     let bit_is_set = (mask & board_mask) > 0;
-    decoded_mask[index] = bit_is_set;
-    if index != 0 {
-        index -= 1;
-    }
+    decoded_mask[N_LTBS-1 - n] = bit_is_set;
   }
   decoded_mask
 }
@@ -1006,24 +1004,16 @@ pub fn decode_hit_mask(hit_mask : u32) -> ([bool;N_CHN_PER_LTB],[bool;N_CHN_PER_
   let mut decoded_mask_1 = [false;N_CHN_PER_LTB];
   // FIXME this implicitly asserts that the fields for non available LTBs 
   // will be 0 and all the fields will be in order
-  let mut index = N_CHN_PER_LTB - 1;
   for n in 0..N_CHN_PER_LTB {
     let mask = 1 << n;
     //println!("MASK {:?}", mask);
     let bit_is_set = (mask & hit_mask) > 0;
-    decoded_mask_0[index] = bit_is_set;
-    if index != 0 {
-      index -= 1;
-    }
+    decoded_mask_0[N_CHN_PER_LTB-1 - n] = bit_is_set;
   }
-  index = N_CHN_PER_LTB -1;
   for n in N_CHN_PER_LTB..2*N_CHN_PER_LTB {
     let mask = 1 << n;
     let bit_is_set = (mask & hit_mask) > 0;
-    decoded_mask_1[index] = bit_is_set;
-    if index != 0 {
-      index -= 1;
-    }
+    decoded_mask_1[N_CHN_PER_LTB-1 - n] = bit_is_set;
   }
   (decoded_mask_0, decoded_mask_1)
 }
@@ -1089,7 +1079,7 @@ pub fn read_daq(socket : &UdpSocket,
   // until we get the header word. Then we have a new event 
   // and we fill the values of our MasterTriggerEvent by 
   // subsequently reading out the same register again
-  // this will eventually determin, 
+  // this will eventually determine, 
   // how often we will read the 
   // hit register
   let ntries = 100;
@@ -1142,6 +1132,7 @@ pub fn read_daq(socket : &UdpSocket,
       }
       for k in 0..event.board_mask.len() {
         if event.board_mask[k] {
+          // TODO This might panic! Is it ok?
           let thishits = hitmasks.pop_front().unwrap();
           //println!("Will assign {:?} for {k}", thishits);
           event.hits[k] = thishits;
@@ -1159,6 +1150,7 @@ pub fn read_daq(socket : &UdpSocket,
       return Ok(event);
     }
     trailer     = read_daq_word(socket, target_address, buffer, 1)?;
+    // I feel like these shouldn't be hard coded TODO - Paolo
     if trailer != 0x55555555 {
       if trailer == 0xAAAAAAAA {
         error!("New header found while we were not done with the old event!");
