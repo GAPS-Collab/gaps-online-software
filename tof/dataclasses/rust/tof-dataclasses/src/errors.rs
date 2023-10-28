@@ -30,14 +30,16 @@ impl Error for CalibrationError {
 
 ////////////////////////////////////////
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, serde::Deserialize, serde::Serialize)]
 pub enum EventError {
     EventIdMismatch
 }
 
 impl fmt::Display for EventError {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(f,"<EventError>")
+    let disp = serde_json::to_string(self).unwrap_or(
+      String::from("Error: cannot unwrap this EventError"));
+    write!(f, "<EventError : {}>", disp)
   }
 }
 

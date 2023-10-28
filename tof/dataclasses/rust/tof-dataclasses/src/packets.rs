@@ -64,7 +64,7 @@ pub enum PacketQuality {
 ///
 /// => Fixed size is 13
 ///
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, Clone)]
 pub struct TofPacket {
   pub packet_type      : PacketType,
   pub payload          : Vec<u8>,
@@ -81,7 +81,6 @@ pub struct TofPacket {
   pub creation_time      : Instant,
   pub valid              : bool, // will be always valid, unless invalidated
 }
-
 
 impl fmt::Display for TofPacket {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -101,6 +100,17 @@ impl fmt::Display for TofPacket {
 impl Default for TofPacket {
   fn default() -> Self {
     Self::new()
+  }
+}
+
+impl PartialEq for TofPacket {
+  fn eq(&self, other: &Self) -> bool {
+    (self.packet_type == other.packet_type)           &&
+    (self.payload == other.payload)                   &&
+    (self.is_multi_packet == other.is_multi_packet)   &&
+    (self.no_write_to_disk == other.no_write_to_disk) &&
+    (self.no_send_over_nw == other.no_send_over_nw)   &&
+    (self.valid == other.valid)
   }
 }
 

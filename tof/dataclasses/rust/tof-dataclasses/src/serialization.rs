@@ -8,8 +8,7 @@ pub use crate::errors::SerializationError;
 use std::error::Error;
 use std::path::Path;
 
-extern crate json;
-use json::JsonValue;
+extern crate serde_json;
 
 /// Convert a vector of u16 into a vector of u8
 ///
@@ -128,9 +127,9 @@ pub fn parse_bool(bs : &Vec::<u8>, pos : &mut usize) -> bool {
 }
 
 pub fn get_json_from_file(filename : &Path)
-    -> Result<JsonValue, Box<dyn Error>> {
+    -> Result<String, Box<dyn Error>> {
   let file_content = std::fs::read_to_string(filename)?;
-  let config = json::parse(&file_content)?;
+  let config = serde_json::from_str(&file_content)?;
   Ok(config)
 }
 
@@ -191,13 +190,6 @@ pub trait Serialization {
     println!("There can't be a default implementation for this trait!");
     todo!();
     }
-
-  fn from_json(_config : &JsonValue)
-    -> Result<Self, Box<dyn Error>>
-    where Self : Sized {
-    println!("There can't be a default implementation for this trait!"); 
-    todo!();
-  }
 
   /// Construct byte slice out of self.
   ///
