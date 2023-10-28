@@ -26,8 +26,6 @@ use crate::events::{MasterTriggerEvent,
                     RBEvent,
                     RBMissingHit};
 
-use crate::monitoring::RBMoniData;
-
 // This looks like a TODO
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub enum CompressionLevel {
@@ -192,10 +190,10 @@ pub struct TofEvent {
 
   pub compression_level : CompressionLevel,
   pub quality           : EventQuality,
+  pub header            : TofEventHeader,
   pub mt_event          : MasterTriggerEvent,
   pub rb_events         : Vec::<RBEvent>,
   pub missing_hits      : Vec::<RBMissingHit>, 
-  pub rb_moni           : Vec::<RBMoniData>,
   
   // won't get serialized
   pub creation_time      : Instant,
@@ -203,22 +201,22 @@ pub struct TofEvent {
 
 impl fmt::Display for TofEvent {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(f, "<TofEvent:
-            \t event id  : {}
-            \t quality   : {}
-            \t n_boards  : {}
-            \t miss_hits : {}
-            \t n_moni    : {}>"
-            ,self.mt_event.event_id,
-            self.quality,
+    write!(f, 
+"<TofEvent:
+     quality        :  {}
+     {} 
+     {}
+     n RBEvents      : {}
+     n RBMissingHit  : {} >"
+            ,self.quality,
+            self.header,
+            self.mt_event,
             self.rb_events.len(),
-            self.missing_hits.len(),
-            self.rb_moni.len())
+            self.missing_hits.len())
   }
 }
 
 impl Default for TofEvent {
-
   fn default() -> Self {
     Self::new()
   }
@@ -231,14 +229,20 @@ impl TofEvent {
     Self {
       compression_level : CompressionLevel::Unknown,
       quality           : EventQuality::Unknown,
+      header            : TofEventHeader::new(),
       mt_event          : MasterTriggerEvent::new(0,0),
       rb_events         : Vec::<RBEvent>::new(),
       missing_hits      : Vec::<RBMissingHit>::new(), 
-      rb_moni           : Vec::<RBMoniData>::new(),
       creation_time     : creation_time,
     }
   }
-  
+
+  pub fn extract_event_id_from_stream(stream : &Vec<u8>) 
+    -> Result<u32, SerializationError> {
+    // 2 + 2 + 2 + 2 + 4
+    let evid = parse_u32(stream, &mut 12);
+    Ok(evid)
+  }
   /// Event can time out after specified time
   ///
   pub fn has_timed_out(&self) -> bool {
@@ -267,26 +271,22 @@ impl TofEvent {
   pub fn construct_sizes_header(&self) -> u32 {
      let rb_event_len = self.rb_events.len() as u32;
      let miss_len     = self.missing_hits.len() as u32;
-     let moni_len     = self.rb_moni.len() as u32;
      let mut mask     = 0u32;
      mask = mask | rb_event_len;
      mask = mask | (miss_len << 8);
-     mask = mask | (moni_len << 16);
      mask
   }
 
   pub fn decode_size_header(mask : &u32) 
-    -> (usize, usize, usize) {
+    -> (usize, usize) {
     let rb_event_len = (mask & 0xFF)        as usize;
     let miss_len     = ((mask & 0xFF00)     >> 8)  as usize;
-    let moni_len     = ((mask & 0xFF0000)   >> 16) as usize;
-    (rb_event_len, miss_len, moni_len)
+    (rb_event_len, miss_len)
   }
   
   pub fn get_combined_vector_sizes(&self) -> usize {
     self.rb_events.len() 
     + self.missing_hits.len() 
-    + self.rb_moni.len()
   }
 }
 
@@ -301,6 +301,7 @@ impl Serialization for TofEvent {
     stream.extend_from_slice(&Self::HEAD.to_le_bytes());
     stream.extend_from_slice(&self.compression_level.to_u8().to_le_bytes());
     stream.extend_from_slice(&self.quality.to_u8().to_le_bytes());
+    stream.extend_from_slice(&self.header.to_bytestream());
     stream.extend_from_slice(&self.mt_event.to_bytestream());
     let sizes_header = self.construct_sizes_header();
     stream.extend_from_slice(&sizes_header.to_le_bytes());
@@ -309,9 +310,6 @@ impl Serialization for TofEvent {
     }
     for k in 0..self.missing_hits.len() {
       stream.extend_from_slice(&self.missing_hits[k].to_bytestream());
-    }
-    for k in 0..self.rb_moni.len() {
-      stream.extend_from_slice(&self.rb_moni[k].to_bytestream());
     }
     stream.extend_from_slice(&Self::TAIL.to_le_bytes());
     stream
@@ -325,6 +323,7 @@ impl Serialization for TofEvent {
     *pos = head_pos + 2;
     event.compression_level = CompressionLevel::from_u8(&parse_u8(stream, pos));
     event.quality           = EventQuality::from_u8(&parse_u8(stream, pos));
+    event.header            = TofEventHeader::from_bytestream(stream, pos)?;
     event.mt_event          = MasterTriggerEvent::from_bytestream(stream, pos)?;
     let v_sizes = Self::decode_size_header(&parse_u32(stream, pos));
     for k in 0..v_sizes.0 {
@@ -343,14 +342,6 @@ impl Serialization for TofEvent {
         }
       }
     }
-    for k in 0..v_sizes.2 {
-      match RBMoniData::from_bytestream(stream, pos) {
-        Err(err) => error!("Expected RBMoniPacket {} of {}, but got serialization error {}!", k,  v_sizes.2, err),
-        Ok(moni) => {
-          event.rb_moni.push(moni);
-        }
-      }
-    }
     Ok(event)
   }
 }
@@ -361,6 +352,7 @@ impl FromRandom for TofEvent {
   fn from_random() -> Self {
     let mut event   = Self::new();
     event.mt_event  = MasterTriggerEvent::from_random();
+    event.header    = TofEventHeader::from_random();
     let mut rng     = rand::thread_rng();
     let n_boards    = rng.gen::<u8>() as usize;
     //let n_paddles   = rng.gen::<u8>() as usize;
@@ -371,13 +363,9 @@ impl FromRandom for TofEvent {
     for _ in 0..n_missing {
       event.missing_hits.push(RBMissingHit::from_random());
     }
-    for _ in 0..n_boards {
-      event.rb_moni.push(RBMoniData::from_random());
-    }
     // for now, we do not randomize CompressionLevel and qualtiy
     //event.compression_level : CompressionLevel::,
     //event.quality           : EventQuality::Unknown,
-    //  paddle_packets    : Vec::<PaddlePacket>::new(),
     event
   }
 }
@@ -386,6 +374,7 @@ impl From<&MasterTriggerEvent> for TofEvent {
   fn from(mte : &MasterTriggerEvent) -> Self {
     let mut te : TofEvent = Default::default();
     te.mt_event = *mte;
+    te.header.event_id = te.mt_event.event_id;
     te
   }
 }
@@ -530,6 +519,52 @@ impl From<&MasterTriggerEvent> for TofEventHeader {
     te.timestamp_32          = mte.timestamp;
     te.n_paddles             = mte.get_hit_paddles();
     te
+  }
+}
+
+impl fmt::Display for TofEventHeader {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+  let mut repr = String::from("<TofEventHeader"); 
+  repr += &("\n  Run   ID          : ".to_owned() + &self.run_id              .to_string());
+  repr += &("\n  Event ID          : ".to_owned() + &self.event_id            .to_string());
+  repr += &("\n  Timestamp 32      : ".to_owned() + &self.timestamp_32        .to_string());
+  repr += &("\n  Timestamp 16      : ".to_owned() + &self.timestamp_16        .to_string());
+  repr += &("\n  Prim. Beta        : ".to_owned() + &self.primary_beta        .to_string());
+  repr += &("\n  Prim. Beta Unc    : ".to_owned() + &self.primary_beta_unc    .to_string());
+  repr += &("\n  Prim. Charge      : ".to_owned() + &self.primary_charge      .to_string());
+  repr += &("\n  Prim. Charge unc  : ".to_owned() + &self.primary_charge_unc  .to_string());
+  repr += &("\n  Prim. Outer Tof X : ".to_owned() + &self.primary_outer_tof_x .to_string());
+  repr += &("\n  Prim. Outer Tof Y : ".to_owned() + &self.primary_outer_tof_y .to_string());
+  repr += &("\n  Prim. Outer Tof Z : ".to_owned() + &self.primary_outer_tof_z .to_string());
+  repr += &("\n  Prim. Inner Tof X : ".to_owned() + &self.primary_inner_tof_x .to_string());
+  repr += &("\n  Prim. Inner Tof Y : ".to_owned() + &self.primary_inner_tof_y .to_string());
+  repr += &("\n  Prim. Inner Tof Z : ".to_owned() + &self.primary_inner_tof_z .to_string());
+  repr += &("\n  NHit  Outer Tof   : ".to_owned() + &self.nhit_outer_tof      .to_string());
+  repr += &("\n  NHit  Inner Tof   : ".to_owned() + &self.nhit_inner_tof      .to_string());
+  repr += &("\n  TriggerInfo       : ".to_owned() + &self.trigger_info        .to_string());
+  repr += &("\n  Ctr ETX           : ".to_owned() + &self.ctr_etx             .to_string());
+  repr += &("\n  NPaddles          : ".to_owned() + &self.n_paddles           .to_string());
+  repr += ">";
+  write!(f,"{}", repr)
+  //run_id       : u32,
+  //event_id     : u32,
+  //timestamp_32 : u32,
+  //timestamp_16 : u16, // -> 14 byres
+  //primary_beta        : u16, 
+  //primary_beta_unc    : u16, 
+  //primary_charge      : u16, 
+  //primary_charge_unc  : u16, 
+  //primary_outer_tof_x : u16, 
+  //primary_outer_tof_y : u16, 
+  //primary_outer_tof_z : u16, 
+  //primary_inner_tof_x : u16, 
+  //primary_inner_tof_y : u16, 
+  //primary_inner_tof_z : u16, //-> 20bytes primary 
+  //nhit_outer_tof       : u8,  
+  //nhit_inner_tof       : u8, 
+  //trigger_info         : u8,
+  //ctr_etx              : u8,
+  //n_paddles           : u8, // we don't have more than 
   }
 }
 
