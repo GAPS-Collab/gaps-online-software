@@ -52,10 +52,10 @@ pub const MAX_TRIGGER_RATE : usize = 200;
 /// with the master trigger.
 ///
 //pub const EVENT_TIMEOUT : u128 = 30000000;
-pub const EVENT_TIMEOUT : u64 = 30;
+pub const EVENT_TIMEOUT : u64 = 60;
 
 /// When should TofPackets time out? (sec)
-pub const TOFPACKET_TIMEOUT : u64 = 30;
+pub const TOFPACKET_TIMEOUT : u64 = 60;
 
 /// Limit the size of the internal paddle packet cache
 /// - all packets abvoe this value will be dropped
