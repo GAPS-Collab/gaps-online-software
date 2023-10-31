@@ -159,6 +159,7 @@ RBEventHeader RBEventHeader::from_bytestream(const Vec<u8> &stream,
   u16 tail                   = Gaps::parse_u16(stream, pos);
   if (tail != RBEventHeader::TAIL) {
     spdlog::error("Tail signature incorrect! Got tail {}", tail);
+    header.broken = true;
   }
   return header; 
 }
@@ -356,6 +357,9 @@ RBEvent RBEvent::from_bytestream(const Vec<u8> &stream,
   event.nchan     = Gaps::parse_u8(stream, pos);
   event.npaddles  = Gaps::parse_u8(stream, pos); 
   event.header    = RBEventHeader::from_bytestream(stream, pos);
+  if (event.header.broken) {
+    return event;
+  }
   spdlog::debug("Decoded RBEventHeader!");
   for (usize ch=0; ch<event.nchan; ch++) {
     spdlog::debug("Found active data channel {}!", ch);
