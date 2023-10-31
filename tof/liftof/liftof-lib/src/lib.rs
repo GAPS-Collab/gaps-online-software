@@ -1,5 +1,7 @@
 pub mod master_trigger;
-pub use master_trigger::master_trigger;
+pub use master_trigger::{connect_to_mtb,
+                         monitor_mtb,
+                         master_trigger};
 
 use std::error::Error;
 use std::time::{Duration, Instant};
@@ -140,7 +142,7 @@ impl TofPacketWriter {
     Self {
       file,
       file_prefix   : file_prefix,
-      pkts_per_file : 1000,
+      pkts_per_file : 3000,
       file_id       : 1,
       n_packets     : 0,
     }
