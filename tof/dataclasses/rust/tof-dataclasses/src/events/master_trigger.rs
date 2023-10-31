@@ -342,9 +342,11 @@ impl MasterTriggerEvent {
 
   pub fn get_n_rbs_expected(&self) -> u8 {
     let mut n_rbs = 0u8;
+    //println!("SELF HITS : {:?}", self.hits);
     for h in self.hits {
       let count = h.iter().filter(|&&x| x).count();
-      if count > 1 {
+      //println!("COUNT! {count}"); 
+      if count >= 1 {
         n_rbs += 1;
       } 
       if count > 8 {
@@ -362,10 +364,10 @@ impl MasterTriggerEvent {
     let mut dsi = 1u8;
     let mut j   = 1u8;
     let mut ch  : u8;
-    for k in (0..N_LTBS).rev() {
+    for k in 0..N_LTBS {
       if self.board_mask[k] {
         ch = 1;
-        for n in (0..self.hits[k].len()).rev() {
+        for n in 0..self.hits[k].len() {
           if self.hits[k][n] {
             dsi_js.push((dsi, j, ch));
           }
@@ -623,6 +625,7 @@ impl fmt::Display for MasterTriggerEvent {
     dsi_j.insert(17 , "4/4");
     dsi_j.insert(19 , "4/5");
     repr += " ";
+    println!("SELFBOARDMASK {:?}", self.board_mask);
     for k in 0..N_LTBS {
       if self.board_mask[k] {
         repr += "-X-   ";
@@ -990,31 +993,61 @@ pub fn decode_board_mask(board_mask : u32) -> [bool;N_LTBS] {
   let mut decoded_mask = [false;N_LTBS];
   // FIXME this implicitly asserts that the fields for non available LTBs 
   // will be 0 and all the fields will be in order
+  //println!("BOARD MASK {}", board_mask);
+  let mut index = N_LTBS - 1;
   for n in 0..N_LTBS {
     let mask = 1 << n;
     let bit_is_set = (mask & board_mask) > 0;
-    decoded_mask[N_LTBS-1 - n] = bit_is_set;
+    decoded_mask[index] = bit_is_set;
+    if index != 0 {
+        index -= 1;
+    }
+    //decoded_mask[N_LTBS-1 - n] = bit_is_set;
   }
+  //println!("DECODED MASK {:?}", decoded_mask);
+  // reverse the mask, so actually RAT0 is at position 0
+  decoded_mask.reverse();
   decoded_mask
 }
 
 /// Helper to get the number of the triggered LTB from the bitmask
 pub fn decode_hit_mask(hit_mask : u32) -> ([bool;N_CHN_PER_LTB],[bool;N_CHN_PER_LTB]) {
+  //println!("HITMASK NON DECODED :{}", hit_mask);
   let mut decoded_mask_0 = [false;N_CHN_PER_LTB];
   let mut decoded_mask_1 = [false;N_CHN_PER_LTB];
   // FIXME this implicitly asserts that the fields for non available LTBs 
   // will be 0 and all the fields will be in order
+  let mut index = N_CHN_PER_LTB - 1;
   for n in 0..N_CHN_PER_LTB {
     let mask = 1 << n;
     //println!("MASK {:?}", mask);
     let bit_is_set = (mask & hit_mask) > 0;
-    decoded_mask_0[N_CHN_PER_LTB-1 - n] = bit_is_set;
+    //println!("bit is set {}, index {}", bit_is_set, index);
+    //decoded_mask_0[N_CHN_PER_LTB-1 - n] = bit_is_set;
+    decoded_mask_0[index] = bit_is_set;
+    if index != 0 {
+      index -= 1;
+    }
   }
+  index = N_CHN_PER_LTB -1;
   for n in N_CHN_PER_LTB..2*N_CHN_PER_LTB {
     let mask = 1 << n;
     let bit_is_set = (mask & hit_mask) > 0;
-    decoded_mask_1[N_CHN_PER_LTB-1 - n] = bit_is_set;
+    //FIXME - this is buggy and panics. Until this is fixed,
+    //I'll revive my cringy way to do things.
+    //decoded_mask_1[N_CHN_PER_LTB-1 - n] = bit_is_set;
+    decoded_mask_1[index] = bit_is_set;
+    if index != 0 {
+      index -= 1;
+    }
   }
+  //println!("DECODED HITMASK 0 {:?}", decoded_mask_0);
+  //println!("DECODED HITMASK 1 {:?}", decoded_mask_1);
+  // reverse everything 
+  // so decoded_mask_0 is still for the first board, but 
+  // let's do the channels so that they count up
+  decoded_mask_0.reverse();
+  decoded_mask_1.reverse();
   (decoded_mask_0, decoded_mask_1)
 }
 
@@ -1137,7 +1170,6 @@ pub fn read_daq(socket : &UdpSocket,
           //println!("Will assign {:?} for {k}", thishits);
           event.hits[k] = thishits;
           //println!("EVENT HAS HITS ASSIGNED : {:?}", event.hits[k]);
-      
         }
       }
     //println!("EVENT HAS HITS ASSIGNED : {:?}", event.hits);
