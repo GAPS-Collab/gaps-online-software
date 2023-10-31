@@ -30,7 +30,6 @@ pub fn event_processing(bs_recv           : &Receiver<Vec<u8>>,
                         dtf_fr_runner     : &Receiver<DataType>,
                         verbose           : bool) {
   let mut n_events : u32;
-  let mut event_id : u32 = 0;
   let mut last_event_id   : u32 = 0; // for checks
   let mut events_not_sent : u64 = 0;
   let mut data_type   : DataType   = DataType::Unknown;
@@ -56,7 +55,7 @@ pub fn event_processing(bs_recv           : &Receiver<Vec<u8>>,
     }
     // this can't be blocking anymore, since 
     // otherwise we miss the datatype
-    let mut tail_pos = 0usize;
+    let mut tail_pos : usize;
     let mut skipped_events : usize = 0;
     match bs_recv.recv() {
       Ok(bytestream) => {
@@ -66,7 +65,7 @@ pub fn event_processing(bs_recv           : &Receiver<Vec<u8>>,
           //println!("Starting at {start_pos}");
           match search_for_u16(RBEvent::HEAD, &bytestream, start_pos) {
             Err(err) => {
-              debug!("Send {n_events} events. Got last event_id! {event_id}");
+              debug!("Sent {n_events} events.");
               if start_pos == 0 {
                 error!("Got bytestream, but can not find HEAD bytes, err {err:?}");
               }
@@ -87,7 +86,7 @@ pub fn event_processing(bs_recv           : &Receiver<Vec<u8>>,
               if tail_pos >= bytestream.len() - 1 {
                 // we are finished here
                 warn!("Got a trunctaed event, discarding..");
-                trace!("Work on current blob complete. Extracted {n_events} events. Got last event_id! {event_id}");
+                trace!("Work on current stream complete. Extracted {n_events} events.");
                 break 'bytestream;
               }
               n_events += 1;
@@ -99,12 +98,11 @@ pub fn event_processing(bs_recv           : &Receiver<Vec<u8>>,
                   error!("Unable to extract RBEvent from memory! Error {err}");
                   events_not_sent += 1;
                   warn!("Got a trunctaed event, discarding..");
-                  trace!("Work on current blob complete. Extracted {n_events} events. Got last event_id! {event_id}");
+                  trace!("Work on current stream complete. Extracted {n_events} events. ");
                   break 'bytestream;
                 },
                 Ok(data) => {
                   let packet_size = data.0;
-                  let ch_ids = data.1;
                 }
               }
 

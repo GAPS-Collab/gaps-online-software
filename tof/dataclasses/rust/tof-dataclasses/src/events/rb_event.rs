@@ -457,7 +457,8 @@ impl RBChannelData {
 /// number of RBEvents
 ///
 /// This will create a clone of all the 
-/// traces, so they can be manipulated
+/// traces including ch9,
+/// so they can be manipulated
 /// without regrets
 pub fn unpack_traces_f32(events : &Vec<RBEvent>) -> Vec<Vec<Vec<f32>>> {
   let nevents    = events.len();
@@ -468,11 +469,11 @@ pub fn unpack_traces_f32(events : &Vec<RBEvent>) -> Vec<Vec<Vec<f32>>> {
     if ev.adc[0].len() > 0 {
       nwords = ev.adc[0].len();   
     }
-    nchan = ev.header.get_nchan() as usize;
+    nchan = ev.header.get_ndatachan() as usize;
   }
   
   info!("Will construct traces cube with nchan {}, nevents {}, nwords {}", nchan, nevents, nwords);
-  let mut traces: Vec<Vec<Vec<f32>>> = vec![vec![vec![0.0f32; nwords]; nevents]; nchan];
+  let mut traces: Vec<Vec<Vec<f32>>> = vec![vec![vec![0.0f32; nwords]; nevents]; nchan + 1];
   if nevents == 0 {
     return traces;
   }
@@ -491,35 +492,48 @@ pub fn unpack_traces_f32(events : &Vec<RBEvent>) -> Vec<Vec<Vec<f32>>> {
         //println!("{}", traces[ch][ev].len());
         //println!("{}", traces[ch].len());
         //println!("{}", traces.len());
-
         traces[ch][ev][n] = events[ev].adc[ch][n] as f32;
       }
     }
   }
+  // ch9
+  for ev in 0..nevents { 
+    if !events[ev].header.has_ch9 {
+      nevents_skipped += 1;
+      continue
+    }
+    if events[ev].ch9_adc.len() != nwords {
+      // ignore corrupt events
+      //println!("{}", events[ev]);
+      nevents_skipped += 1;
+      continue;
+    }
+    for n in 0..nwords {
+      //println!("{}", events[ev].adc.len());
+      //println!("{}", events[ev].adc[ch].len());
+      //println!("{}", traces[ch][ev].len());
+      //println!("{}", traces[ch].len());
+      //println!("{}", traces.len());
+      traces[8][ev][n] = events[ev].ch9_adc[n] as f32;
+    }
+  }
   if nevents_skipped > 0 {
-    warn!("Skipping {nevents_skipped} events due to malformed traces!");
+    error!("Skipping {nevents_skipped} events due to malformed traces!");
   }
   traces
 }
 
-/// Default RB event data. 
+/// Event data for each individual ReadoutBoard (RB)
 ///
-/// This contains a channel adc values
-/// for each active channel as 
-/// well as a general header.
-///
-/// The order of the values in 
-/// the adc vector is defined 
-/// by header.get_active_channels()
-///
+/// 
 ///
 #[derive(Debug, Clone, PartialEq)]
 pub struct RBEvent {
   pub data_type : DataType,
   pub header    : RBEventHeader,
   pub adc       : Vec<Vec<u16>>,
+  pub ch9_adc   : Vec<u16>,
   pub hits      : Vec<TofHit>,
-  pub ch9_adc   : Vec<u16>
 }
 
 impl RBEvent {
@@ -533,8 +547,8 @@ impl RBEvent {
       data_type  : DataType::Unknown,
       header     : RBEventHeader::new(),
       adc        : adc,
+      ch9_adc    : Vec::<u16>::new(),
       hits       : Vec::<TofHit>::new(),
-      ch9_adc    : Vec::<u16>::new()
     }
   }
 
@@ -617,16 +631,55 @@ impl RBEvent {
     nchan += self.adc.len();
     nchan
   }
+  
+  pub fn get_ndatachan(&self) -> usize {
+    self.adc.len()
+  }
 
-  pub fn get_channel_by_label(&self, ch : u8) -> Result<&Vec::<u16>,UserError>  {
+  pub fn get_channel_by_id(&self, ch : usize) -> Result<&Vec::<u16>, UserError> {
+    if ch >= 9 {
+      error!("channel_by_id expects numbers from 0-8!");
+      return Err(UserError::IneligibleChannelLabel)
+    }
+    if ch < 8 {
+      return Ok(&self.adc[ch]);
+    } else {
+      if self.header.has_ch9 {
+        return Ok(&self.ch9_adc);
+      } else {
+        error!("No channel 9 data for this event!");
+        return Err(UserError::NoChannel9Data);
+      }
+    }
+  }
+
+  pub fn get_channel_by_label(&self, ch : u8) -> Result<&Vec::<u16>, UserError>  {
     //let mut ch_adc = Vec::<u16>::new();
     if ch == 0 || ch > 9 {
       error!("channel_by_label expects numbers from 1-9!");
       return Err(UserError::IneligibleChannelLabel)
     }
+    if ch == 9 {
+      if self.header.has_ch9 {
+        return Ok(&self.ch9_adc);
+      } else {
+        error!("No channel 9 data for this event!");
+        return Err(UserError::NoChannel9Data);
+      }
+    }
     Ok(&self.adc[ch as usize -1])
   }
 
+  pub fn get_adcs(&self) -> Vec<&Vec<u16>> {
+    let mut adcs = Vec::<&Vec<u16>>::new();
+    for v in self.adc.iter() {
+      adcs.push(&v);
+    }
+    if self.header.has_ch9 {
+      adcs.push(&self.ch9_adc);
+    }
+    adcs
+  }
 
   /// If we know that the stream contains an RBEventMemeoryView, 
   /// we can convert the stream directly to a RBEvent.
@@ -689,7 +742,6 @@ impl Serialization for RBEvent {
     event.data_type = DataType::try_from(parse_u8(stream, pos)).unwrap();
     let nchan_data  = parse_u8(stream, pos);
     let n_hits      = parse_u8(stream, pos);
-    let has_ch9     = parse_bool(stream, pos);
     event.header    = RBEventHeader::from_bytestream(stream, pos)?;
     //let ch_ids      = event.header.get_active_data_channels();
     let stream_len  = stream.len();
@@ -702,16 +754,23 @@ impl Serialization for RBEvent {
       return Ok(event);
     }
     for k in 0..nchan_data {
-      trace!("Found active data channel {}!", k);
       if *pos + 2*NWORDS >= stream_len {
         error!("The channel data for ch {} seems corrupt!", k);
         return Err(SerializationError::WrongByteSize {})
       }
       // 2*NWORDS because stream is Vec::<u8> and it is 16 bit words.
       let data = &stream[*pos..*pos+2*NWORDS];
-      // remember, that ch ids are 1..8
       //event.adc[k as usize] = u8_to_u16(data);
       event.adc.push(u8_to_u16(data));
+      *pos += 2*NWORDS;
+    }
+    if event.header.has_ch9 {
+      if *pos + 2*NWORDS >= stream_len {
+        error!("The channel data for ch 9 (calibration channel) seems corrupt!");
+        return Err(SerializationError::WrongByteSize {})
+      }
+      let data = &stream[*pos..*pos+2*NWORDS];
+      event.ch9_adc = u8_to_u16(data);
       *pos += 2*NWORDS;
     }
     for _ in 0..n_hits {
@@ -745,11 +804,6 @@ impl Serialization for RBEvent {
     stream.push(nchan_data);
     let n_hits      = self.hits.len() as u8;
     stream.push(n_hits);
-    let mut has_ch9 = 0u8;
-    if self.ch9_adc.len() > 0 {
-      has_ch9 = 1;
-    }
-    stream.push(has_ch9);
     stream.extend_from_slice(&self.header.to_bytestream());
     // for an empty channel, we will add an empty vector
     for channel_adc in self.adc.iter() {
@@ -785,14 +839,17 @@ impl fmt::Display for RBEvent {
       ch9_str += &k.to_string();
       ch9_str += ","
     }
+    ch9_str += " .. :";
+    ch9_str += &self.ch9_adc.len().to_string();
     ch9_str += "]";
     let mut ch_field = String::from("[\n");
     for (ch, vals) in self.adc.iter().enumerate() {
       let label = (ch + 1).to_string();
+      ch_field += "[ch ";
       ch_field += &ch.to_string();
       ch_field += "('";
       ch_field += &label;
-      ch_field += "')";
+      ch_field += "') ";
       for n in vals.iter().take(5) {
         ch_field += &n.to_string();
         ch_field += ",";
@@ -1050,6 +1107,10 @@ impl RBEventHeader {
       nchan += 1;
     }
     nchan
+  }
+  
+  pub fn get_ndatachan(&self) -> usize {
+    self.decode_channel_mask().len()
   }
 
   pub fn get_clock_cycles_48bit(&self) -> u64 {

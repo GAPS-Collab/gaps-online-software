@@ -586,7 +586,7 @@ impl RBCalibrations {
         roll(&mut tcal_av_cp[ch], -1* (stop_cell as isize));
         // tcal data per definition has all channels active...
         // FIXME - we should not just assume this for each event.
-        let tcal_trace = &self.tcal_data[n].adc[ch];
+        let tcal_trace = &self.tcal_data[n].get_channel_by_id(ch).expect("Unable to get ch");
         let mut tcal_trace_f32 = Vec::<f32>::with_capacity(tcal_trace.len());
         for j in tcal_trace.iter() {
           tcal_trace_f32.push(*j as f32);
@@ -982,16 +982,16 @@ impl Serialization for RBCalibrations {
       let n_noi  = parse_u16(bytestream, pos);
       println!("Found {n_noi} no input data events!");
       for _ in 0..n_noi {
-        for k in 0..10 {
-          println!("bytestream {k} {} ", bytestream[*pos+k]);
-        }
+        //for k in 0..10 {
+        //  println!("bytestream {k} {} ", bytestream[*pos+k]);
+        //}
         match RBEvent::from_bytestream(bytestream, pos) {
           Ok(ev) => {
-            println!("good");
+            //println!("good");
             rb_cal.noi_data.push(ev);            
           }
           Err(err) => {
-            println!("from_bytestream failed!, err {err}");
+            //println!("from_bytestream failed!, err {err}");
             rb_cal.noi_data.push(broken_event.clone());
           }
         }

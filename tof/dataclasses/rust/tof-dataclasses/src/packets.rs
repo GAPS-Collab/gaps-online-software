@@ -148,6 +148,15 @@ impl From<&TofEvent> for TofPacket {
   }
 }
 
+impl From<&mut TofEvent> for TofPacket {
+  fn from(event : &mut TofEvent) -> Self {
+    let mut tp     = Self::new();
+    tp.packet_type = PacketType::TofEvent;
+    tp.payload     = event.to_bytestream();
+    tp
+  }
+}
+
 impl From<&TofCommand> for TofPacket {
   fn from(cmd : &TofCommand) -> Self {
     let mut tp = Self::new();

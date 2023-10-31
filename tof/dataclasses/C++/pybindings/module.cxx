@@ -413,6 +413,7 @@ PYBIND11_MODULE(gaps_tof, m) {
       .def("get_n_datachan"              , &RBEventHeader::get_n_datachan)
       //.def("get_timestamp_16_corrected",   &RBEventHeader::get_timestamp_16_corrected)
       .def_readonly("channel_mask"       , &RBEventHeader::channel_mask)   
+      .def_readonly("has_ch9"            , &RBEventHeader::has_ch9     )
       .def_readonly("stop_cell"          , &RBEventHeader::stop_cell   )   
       .def_readonly("crc32"              , &RBEventHeader::crc32       )   
       .def_readonly("dtap0"              , &RBEventHeader::dtap0       )   
@@ -873,6 +874,9 @@ PYBIND11_MODULE(gaps_tof, m) {
        .def_readonly("v_incs",     &RBCalibration::v_incs)
        .def_readonly("v_dips",     &RBCalibration::v_dips)
        .def_readonly("t_bin",      &RBCalibration::t_bin)
+       .def_readonly("noi_data",   &RBCalibration::noi_data)
+       .def_readonly("vcal_data",  &RBCalibration::vcal_data)
+       .def_readonly("tcal_data",  &RBCalibration::tcal_data)
        .def_static("disable_eventdata",   &RBCalibration::disable_eventdata,
             "Don't load event data from a calibration file (if available). Just load the calibration constants. (This only works with binary files.")
        .def("from_tofpacket",      unpack_tp_to_rbcalibration,

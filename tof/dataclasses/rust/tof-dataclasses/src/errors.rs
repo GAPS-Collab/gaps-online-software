@@ -197,6 +197,7 @@ impl Error for AnalysisError {
 #[derive(Debug,Copy,Clone, serde::Deserialize, serde::Serialize)]
 pub enum UserError {
   IneligibleChannelLabel,
+  NoChannel9Data,
 }
 
 impl fmt::Display for UserError {
