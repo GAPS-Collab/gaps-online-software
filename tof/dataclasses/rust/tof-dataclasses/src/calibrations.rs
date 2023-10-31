@@ -982,16 +982,16 @@ impl Serialization for RBCalibrations {
       let n_noi  = parse_u16(bytestream, pos);
       println!("Found {n_noi} no input data events!");
       for _ in 0..n_noi {
-        for k in 0..10 {
-          println!("bytestream {k} {} ", bytestream[*pos+k]);
-        }
+        //for k in 0..10 {
+        //  println!("bytestream {k} {} ", bytestream[*pos+k]);
+        //}
         match RBEvent::from_bytestream(bytestream, pos) {
           Ok(ev) => {
-            println!("good");
+            //println!("good");
             rb_cal.noi_data.push(ev);            
           }
           Err(err) => {
-            println!("from_bytestream failed!, err {err}");
+            //println!("from_bytestream failed!, err {err}");
             rb_cal.noi_data.push(broken_event.clone());
           }
         }
