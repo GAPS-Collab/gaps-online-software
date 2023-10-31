@@ -124,6 +124,7 @@ pub fn data_publisher(data           : &Receiver<TofPacket>,
     last_10k_evids = Vec::<u32>::with_capacity(10000);
   }
   let mut n_tested : u32 = 0;
+  let mut n_sent   : u64 = 0;
   loop {
     let mut data_type = DataType::Unknown;
     match data.recv() {
@@ -214,8 +215,14 @@ pub fn data_publisher(data           : &Receiver<TofPacket>,
         }
 
         match data_socket.send(tp_payload,zmq::DONTWAIT) {
-          Ok(_)    => trace!("0MQ PUB socket.send() SUCCESS!"),
+          Ok(_)    => {
+            trace!("0MQ PUB socket.send() SUCCESS!");
+            n_sent += 1;
+          },
           Err(err) => error!("Not able to send over 0MQ PUB socket! Err {err}"),
+        }
+        if n_sent % 20 == 0 {
+          println!("==> We sent {n_sent} packets!");
         }
       }
     }
