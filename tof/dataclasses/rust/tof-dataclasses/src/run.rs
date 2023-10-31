@@ -126,8 +126,7 @@ impl fmt::Display for RunConfig {
     tr_poi_rate : {}
     tr_fix_rate : {}
     mtb_latch   : {}
-      |--> data channels (ch 9 separate)
-    buff size : {} [ev]>",
+    buff size : {} [events]>",
       self.nevents,
       self.nseconds,
       self.stream_any,

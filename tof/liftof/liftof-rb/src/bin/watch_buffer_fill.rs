@@ -114,7 +114,12 @@ fn buff_handler(which      : &BlobBuffer,
       // the buffer is actually full and needs to be reset
       //switch_ram_buffer();
       //thread::sleep_ms(SLEEP_AFTER_REG_WRITE);
-      reset_ram_buffer_occ(&which);
+      match reset_ram_buffer_occ(&which) {
+        Err(err) => {
+          error!("Can not reset ram_buffer");
+        },
+        Ok(_) => ()
+      }
       thread::sleep_ms(SLEEP_AFTER_REG_WRITE);
       let bytestream = get_bytestream(UIO1, buff_start_temp, 10).unwrap();
       let blob_size  = RBEventMemoryView::SIZE;
@@ -141,7 +146,12 @@ fn buff_handler(which      : &BlobBuffer,
     // reset the buffers
     //switch_ram_buffer();
     //thread::sleep_ms(SLEEP_AFTER_REG_WRITE);
-    reset_ram_buffer_occ(&which);
+    match reset_ram_buffer_occ(&which) {
+      Err(err) => {
+        error!("Can not reset RAM buffers!");
+      },
+      Ok(_) => (), 
+    }
     thread::sleep_ms(SLEEP_AFTER_REG_WRITE);
     // get the new size after reset
     match get_buff_size(&which, &mut buff_start_temp) {
@@ -294,7 +304,12 @@ fn main() {
     bar_ev.inc(delta_events);   
     // exit loop on n event basis
     if n_events > max_event {
-      idle_drs4_daq();
+      match idle_drs4_daq() {
+        Err(err) => {
+          error!("Can't set daq to idle mode!");
+        },
+        Ok(_) => (),
+      }
       println!("We skipped {skipped_events} events");
       thread::sleep(one_milli);
       bar_ev.finish();

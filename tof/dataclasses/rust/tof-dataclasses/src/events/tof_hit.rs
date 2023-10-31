@@ -1,12 +1,3 @@
-//! Event strucutures for data reconrded by the tof
-//!
-//!  These are used internally, and will get
-//!  serialized and send over the wire to the
-//!  flight computer. 
-//!
-//!  Find the corresponding C++ dataclasses
-//!  in this project
-
 use crate::errors::SerializationError;
 use crate::serialization::{parse_u8,
                            parse_u16,
@@ -22,19 +13,14 @@ use rand::Rng;
 
 const PADDLE_TIMEOUT : u64 = 30;
 
-/// Representation of analyzed data from a paddle
+/// Comprehensive paddle information
 ///
-/// Holds the results of waveform analysis for a 
-/// paddle, that is the reustl for 2 individual 
-/// waveforms from each end of the paddle.
+/// Results of the (online) waveform analysis
 ///
-/// Thus it is having methods like `get_time_a`
-/// where a and be refere to different 
-/// paddle ends.
+/// a and b are the different ends of the paddle
 ///
-///
-#[derive(Debug,Copy,Clone)]
-pub struct PaddlePacket  {
+#[derive(Debug,Copy,Clone,PartialEq)]
+pub struct TofHit {
   
   //unsigned short head = 0xF0F0;
   pub paddle_id    : u8,
@@ -56,34 +42,12 @@ pub struct PaddlePacket  {
 
   // fields which won't get 
   // serialized
-  pub event_id     : u32,
   pub valid        : bool,
-
-  pub creation_time      : Instant,
 }
 
-impl PartialEq for PaddlePacket {
-  fn eq(&self, other: &Self) -> bool {
-    // Compare only selected fields
-    self.paddle_id    == other.paddle_id && 
-    self.time_a       == other.time_a && 
-    self.time_b       == other.time_b && 
-    self.peak_a       == other.peak_a && 
-    self.peak_b       == other.peak_b && 
-    self.charge_a     == other.charge_a && 
-    self.charge_b     == other.charge_b && 
-    self.charge_min_i == other.charge_min_i && 
-    self.pos_across   == other.pos_across && 
-    self.t_average    == other.t_average && 
-    self.ctr_etx      == other.ctr_etx && 
-    self.timestamp_32 == other.timestamp_32 && 
-    self.timestamp_16 == other.timestamp_16 
-  }
-}
-
-impl fmt::Display for PaddlePacket {
+impl fmt::Display for TofHit {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(f, "<PaddlePacket:
+    write!(f, "<TofHit:
             \t VALID         {},   
             \t time_a        {},   
             \t time_b        {},   
@@ -113,17 +77,17 @@ impl fmt::Display for PaddlePacket {
   }
 }
 
-impl Serialization for PaddlePacket {
+impl Serialization for TofHit {
   
   const HEAD          : u16  = 61680; //0xF0F0)
   const TAIL          : u16  = 3855;
   const SIZE : usize = 30; // size in bytes with HEAD and TAIL
 
-  ///! Serialize the packet
+  /// Serialize the packet
   ///
-  ///  Not all fields witll get serialized, 
-  ///  only the relevant data for the 
-  ///  flight computer
+  /// Not all fields will get serialized, 
+  /// only the relevant data for the 
+  /// flight computer
   ///
   fn to_bytestream(&self) -> Vec<u8> {
 
@@ -160,13 +124,13 @@ impl Serialization for PaddlePacket {
     // since we passed the above test, the packet
     // is valid
     pp.valid     = true;
-    pp.paddle_id = parse_u8(stream, pos);
-    pp.time_a    = parse_u16(stream, pos);
-    pp.time_b    = parse_u16(stream, pos);
-    pp.peak_a    = parse_u16(stream, pos);
-    pp.peak_b    = parse_u16(stream, pos);
-    pp.charge_a  = parse_u16(stream, pos);
-    pp.charge_b  = parse_u16(stream, pos);
+    pp.paddle_id     = parse_u8(stream, pos);
+    pp.time_a        = parse_u16(stream, pos);
+    pp.time_b        = parse_u16(stream, pos);
+    pp.peak_a        = parse_u16(stream, pos);
+    pp.peak_b        = parse_u16(stream, pos);
+    pp.charge_a      = parse_u16(stream, pos);
+    pp.charge_b      = parse_u16(stream, pos);
     pp.charge_min_i  = parse_u16(stream, pos);
     pp.pos_across    = parse_u16(stream, pos);
     pp.t_average     = parse_u16(stream, pos);
@@ -178,20 +142,12 @@ impl Serialization for PaddlePacket {
   }
 }
 
-impl Default for PaddlePacket {
-  fn default() -> Self {
-    Self::new()
-  }
-}
+impl TofHit {
 
-impl PaddlePacket {
-
-  //pub const PACKETSIZE    : usize = 24;
   // update Feb 2023 - add 4 byte timestamp
   pub const VERSION       : &'static str = "1.2";
 
   pub fn new() -> Self {
-    let creation_time = Instant::now(); 
     Self{
          paddle_id    : 0,
          time_a       : 0,
@@ -207,25 +163,7 @@ impl PaddlePacket {
          timestamp_32 : 0,
          timestamp_16 : 0,
          // non-serialize fields
-         event_id     : 0,
          valid        : true,
-         creation_time : creation_time
-    }
-  }
-
-  pub fn invalidate(&mut self) {
-    self.valid = false;
-  }
-  
-  pub fn has_timed_out(&self) -> bool {
-    return self.age() > PADDLE_TIMEOUT;
-  }
- 
-  pub fn is_valid(&self, use_timeout : bool) -> bool {
-    if use_timeout {
-      return self.valid && !self.has_timed_out();
-    } else {
-      return self.valid;
     }
   }
 
@@ -279,32 +217,10 @@ impl PaddlePacket {
     if side == 1 {self.set_charge_b(charge);}
   }
 
-  pub fn age(&self) -> u64 {
-    self.creation_time.elapsed().as_secs()
-  }
-
-  pub fn reset(&mut self) {
-    self.paddle_id    =  0;
-    self.time_a       =  0;
-    self.time_b       =  0;
-    self.peak_a       =  0;
-    self.peak_b       =  0;
-    self.charge_a     =  0;
-    self.charge_b     =  0;
-    self.charge_min_i =  0;
-    self.pos_across   =  0;
-    self.t_average    =  0;
-    self.ctr_etx      =  0;
-    self.timestamp_32 =  0;
-    self.timestamp_16 =  0;
-    self.event_id     =  0;
-    self.valid        =  true;
-  }
-
 
   #[cfg(feature="random")]
-  pub fn from_random() -> PaddlePacket {
-    let mut pp  = PaddlePacket::new();
+  pub fn from_random() -> TofHit {
+    let mut pp  = TofHit::new();
     let mut rng = rand::thread_rng();
 
     pp.paddle_id    = rng.gen::<u8> ();
@@ -318,18 +234,18 @@ impl PaddlePacket {
     pp.pos_across   = rng.gen::<u16>();
     pp.t_average    = rng.gen::<u16>();
     pp.ctr_etx      = rng.gen::<u8>();
-    pp.timestamp_32    = rng.gen::<u32>();
-    pp.timestamp_16    = rng.gen::<u16>();
+    pp.timestamp_32 = rng.gen::<u32>();
+    pp.timestamp_16 = rng.gen::<u16>();
     pp
   }
 }
 
 #[cfg(feature = "random")]
 #[test]
-fn serialization_paddle_packet() {
+fn serialization_tofhit() {
     let mut pos = 0;
-    let data = PaddlePacket::from_random();
-    let test = PaddlePacket::from_bytestream(&data.to_bytestream(),&mut pos).unwrap();
-    assert_eq!(pos, PaddlePacket::SIZE);
+    let data = TofHit::from_random();
+    let test = TofHit::from_bytestream(&data.to_bytestream(),&mut pos).unwrap();
+    assert_eq!(pos, TofHit::SIZE);
     assert_eq!(data, test);
 }

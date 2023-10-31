@@ -89,6 +89,7 @@ struct RBEventHeader {
   static const u16 SIZE = 30; // size in bytes with HEAD and TAIL
 
   u8   channel_mask          ;
+  bool has_ch9               ;
   u16  stop_cell             ;
   u32  crc32                 ;
   u16  dtap0                 ;
@@ -149,12 +150,17 @@ struct RBEvent {
   u8 npaddles; 
   RBEventHeader header;
   Vec<Vec<u16>> adc; 
+  Vec<u16> ch9_adc;
 
   // FIXME - needs paddle packet extension
  
   RBEvent();
 
+  const Vec<u16>& get_channel_by_label(u8 channel) const;
+  const Vec<u16>& get_channel_by_id(u8 channel) const;
+
   const Vec<u16>& get_channel_adc(u8 channel) const; 
+  
 
   static RBEvent from_bytestream(const Vec<u8> &bytestream,
                                  u64 &pos);

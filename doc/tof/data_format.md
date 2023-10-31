@@ -45,6 +45,7 @@ The dataformat of the `TofEvent` as of gaps-online-software OMILU-0.7 is like th
         <RBEvent
           <RBEventHeader
             u8   channel_mask          
+            bool has_ch9
             u16  stop_cell             
             u32  crc32                 
             u16  dtap0                 
@@ -58,6 +59,7 @@ The dataformat of the `TofEvent` as of gaps-online-software OMILU-0.7 is like th
             u64  timestamp_48          
             bool broken      >        
             Vec<Vec<u16>> adc [NCHAN:[NWORDS]]    <- len of the vector is the bitsum of channel mask
+            Vec<Vec<u16>> ch9_adc    [NWORDS]     
             Vec<TofHit> [
               <TofHit 
                 u8 paddle_id;
@@ -93,6 +95,8 @@ The dataformat of the `TofEvent` as of gaps-online-software OMILU-0.7 is like th
 Please note the nested structure. Access methods will be provided, so that the user doesn't have to go too far into the tree. Currently, there are several redundant fields, however, they are helping with the debugging, e.g. we can double check if all the timestamps are in sync, or the event buidler is combining hits with the correct event ids. When we gain more experience, we might want to remove some of the redundant fields. 
 
 The event format is flexible - as well as the number of `RBEvent`, `RBMissingHit` might change and `RBEvent` is of flexible size too.
+
+Also note that `bool` will be represented as u8 on disc.
 
 `RBMissingHit` is currently a helper to identify hits which we have seen by the master trigger, howwever, we did not get RBEvent information for these in time.
 

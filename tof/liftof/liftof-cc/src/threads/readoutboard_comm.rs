@@ -79,7 +79,8 @@ pub fn readoutboard_communicator(ev_to_builder       : &Sender<RBEvent>,
 
   }
   let mut secs_since_epoch = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
-  let mut n_events = 0usize;
+  let mut n_events   = 0usize;
+  let mut n_received = 0usize;
   loop {
 
     // check if we got new data
@@ -101,10 +102,11 @@ pub fn readoutboard_communicator(ev_to_builder       : &Sender<RBEvent>,
             if print_packets {
               println!("==> Got {} for RB {}", tp.packet_type, rb.rb_id); 
             }
+            n_received += 1;
             match tp.packet_type {
               PacketType::RBEvent => {
                 let mut event = RBEvent::from(&tp);
-                if event.paddles.len() == 0 {
+                if event.hits.len() == 0 {
                   if run_analysis_engine {
                     match waveform_analysis(&mut event, 
                                             &rb,
@@ -141,6 +143,9 @@ pub fn readoutboard_communicator(ev_to_builder       : &Sender<RBEvent>,
     } // end match 
     debug!("Digested {n_chunk} chunks!");
     debug!("Noticed {n_errors} errors!");
+    if n_received % 100 == 0 {
+      println!("==> Received {n_received} packets!");
+    }
   } // end loop
 } // end fun
 

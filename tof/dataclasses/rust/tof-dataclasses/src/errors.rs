@@ -143,6 +143,8 @@ impl fmt::Display for WaveformError {
 }
 
 // TODO is this needed?
+// DONE - Yes, we talked about it. I think you need 
+// it if you want to returnt Box<Error>
 impl Error for WaveformError {
 }
 
@@ -190,5 +192,24 @@ impl fmt::Display for AnalysisError {
 }
 
 impl Error for AnalysisError {
+}
+
+////////////////////////////////////////
+
+#[derive(Debug,Copy,Clone, serde::Deserialize, serde::Serialize)]
+pub enum UserError {
+  IneligibleChannelLabel,
+  NoChannel9Data,
+}
+
+impl fmt::Display for UserError {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let disp = serde_json::to_string(self).unwrap_or(
+      String::from("Error: cannot unwrap this UserError"));
+    write!(f, "<UserError : {}>", disp)
+  }
+}
+
+impl Error for UserError {
 }
 

@@ -109,6 +109,7 @@ pub fn event_cache(tp_recv           : Receiver<TofPacket>,
             // correctly this should never fail since broken 
             // packets should not end up in the cache
             packet_evid = RBEvent::extract_eventid(&packet.payload).unwrap_or(0);
+            //println!("Received RBEvent, packet evid {}", packet_evid);
             if !event_cache.contains_key(&packet_evid) && packet_evid != 0 {
               event_cache.insert(packet_evid, packet);
             } else {
@@ -142,6 +143,8 @@ pub fn event_cache(tp_recv           : Receiver<TofPacket>,
       // Here now, we have to make sure that the 
       // caches get emptied. So we have to check for every request in our request cache,
       // if the event_cache has it. Do this only every 10 iterations. (number should be configurable)
+      //println!("==> Len RequestCache {}", request_cache.len());
+      //println!("==> Len EventCache   {}", event_cache.len());
       if n_iter_loop == 9 {
         let mut bad_keys = Vec::<u32>::new();
         for event_key in request_cache.keys() {
@@ -161,14 +164,15 @@ pub fn event_cache(tp_recv           : Receiver<TofPacket>,
           request_cache.remove(&k);
         }
         if request_cache.len() > max_len_request_cache {
-          warn!("Request too large! Will remove oldest entries!");
+          warn!("Request cache too large! Will remove oldest entries!");
           request_cache.retain(|_, v| !v.has_timed_out());
         }
         if event_cache.len() > cache_size {
-          warn!("Event too large! Will remove oldest entries!");
+          warn!("Event cache too large! Will remove oldest entries!");
           event_cache.retain(|_, v| !v.has_timed_out());
         } //endif
         n_iter_loop = 0; 
+        //println!("==> Event cache {} Request cache {}", event_cache.len(), request_cache.len());
         continue;
       }
     }
