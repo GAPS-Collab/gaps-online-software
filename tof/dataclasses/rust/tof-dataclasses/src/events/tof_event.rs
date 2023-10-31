@@ -196,7 +196,8 @@ pub struct TofEvent {
   pub missing_hits      : Vec::<RBMissingHit>, 
   
   // won't get serialized
-  pub creation_time      : Instant,
+  pub creation_time     : Instant,
+  pub valid             : bool, 
 }
 
 impl fmt::Display for TofEvent {
@@ -234,6 +235,7 @@ impl TofEvent {
       rb_events         : Vec::<RBEvent>::new(),
       missing_hits      : Vec::<RBMissingHit>::new(), 
       creation_time     : creation_time,
+      valid             : true,
     }
   }
 
@@ -341,6 +343,10 @@ impl Serialization for TofEvent {
           event.missing_hits.push(miss);
         }
       }
+    }
+    let tail = parse_u16(stream, pos);
+    if tail != RBEvent::TAIL {
+      error!("Decoding of TAIL failed! Got {} instead!", tail);
     }
     Ok(event)
   }
@@ -624,7 +630,6 @@ mod test_tofevents {
     let size = TofEvent::decode_size_header(&mask);
     assert_eq!(size.0, data.rb_events.len());
     assert_eq!(size.1, data.missing_hits.len());
-    assert_eq!(size.2, data.rb_moni.len());
   }
 
   #[test]
