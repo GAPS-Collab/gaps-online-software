@@ -14,9 +14,6 @@ extern crate rand;
 #[cfg(feature = "random")]
 use rand::Rng;
 
-extern crate serde;
-extern crate serde_json;
-
 /// A collection of parameters for tof runs
 ///
 /// * active_channel_mask : 8bit mask (1bit/channel)

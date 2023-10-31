@@ -42,7 +42,8 @@ extern crate statistical;
 
 /***********************************/
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, serde::Deserialize, serde::Serialize)]
+#[repr(u8)]
 pub enum Edge {
   Rising,
   Falling,
@@ -50,6 +51,45 @@ pub enum Edge {
   None
 }
 
+impl fmt::Display for Edge {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let r = serde_json::to_string(self).unwrap_or(
+      String::from("Error: cannot unwrap this Edge"));
+    write!(f, "<Edge: {}>", r)
+  }
+}
+
+impl TryFrom<u8> for Edge {
+  type Error = &'static str;
+
+  // I am not sure about this hard coding, but the code
+  //  looks nicer - Paolo
+  fn try_from(value: u8) -> Result<Self, Self::Error> {
+    match value {
+      0u8  => Ok(Edge::Rising),
+      10u8 => Ok(Edge::Falling),
+      20u8 => Ok(Edge::Average),
+      30u8 => Ok(Edge::None),
+      _    => Err("I am not sure how to convert this value!")
+    }
+  }
+}
+
+#[cfg(feature = "random")]
+impl FromRandom for Edge {
+  
+  fn from_random() -> Self {
+    let choices = [
+      Edge::Rising,
+      Edge::Falling,
+      Edge::Average,
+      Edge::None,
+    ];
+    let mut rng  = rand::thread_rng();
+    let idx = rng.gen_range(0..choices.len());
+    choices[idx]
+  }
+}
 
 /***********************************/
 

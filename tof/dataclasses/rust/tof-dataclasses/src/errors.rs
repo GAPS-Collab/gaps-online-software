@@ -6,9 +6,6 @@
 use std::error::Error;
 use std::fmt;
 
-extern crate serde;
-extern crate serde_json;
-
 ////////////////////////////////////////
 
 #[derive(Debug, Copy, Clone, serde::Deserialize, serde::Serialize)]

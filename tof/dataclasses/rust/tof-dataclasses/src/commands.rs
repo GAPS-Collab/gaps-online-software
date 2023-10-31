@@ -29,187 +29,302 @@ use std::fmt;
 use crate::serialization::{Serialization, SerializationError, parse_u8, parse_u32};
 use crate::packets::{TofPacket,
                      PacketType};
-#[cfg(feature = "random")] 
-use crate::FromRandom;
+
+cfg_if::cfg_if! {
+  if #[cfg(feature = "random")]  {
+    use crate::FromRandom;
+    extern crate rand;
+    use rand::Rng;
+  }
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
+#[repr(u8)]
+pub enum TofCommandCode {
+  /// en empty command
+  CmdPing                    = 1u8,
+  /// command code for "Power off"
+  CmdPowerOff                = 10u8,        
+  /// command code for "Power on"
+  CmdPowerOn                 = 11u8,       
+  /// command code for "Power cycle"
+  CmdPowerCycle              = 12u8,          
+  /// command code for "Run RBSetup"
+  CmdRBSetup                 = 20u8,         
+  /// command code for "Set LTB Thresholds"
+  CmdSetThresholds           = 21u8,         
+  /// command code for "Configure MTB"
+  CmdSetMTConfig             = 22u8,        
+  /// command code for "Stop Data taking"
+  CmdDataRunStop             = 30u8,  
+  /// command code for "Start Data taking"
+  CmdDataRunStart            = 31u8,    
+  /// command code for "Start validation run"
+  CmdStartValidationRun      = 32u8,         
+  /// command code for "Get all waveforms"
+  CmdGetFullWaveforms        = 41u8,      
+  /// command code for "Get waveforms/data for specific event"
+  CmdGetReducedDataPacket    = 42u8, 
+  /// command code for "Get monitoring data"
+  CmdRequestMoni             = 43u8,
+  /// command code for "Run voltage calibration"
+  CmdVoltageCalibration      = 51u8,       
+  /// command code for "Run timing calibration"
+  CmdTimingCalibration       = 52u8,      
+  /// command code for "Create a new calibration file"
+  CmdCreateCalibrationFile   = 53u8,   
+
+  /// command code for "Send the whole event cache over the wire"
+  CmdUnspoolEventCache       = 44u8,
+
+  /// command code for "Operate in a mode, where we stream any event 
+  /// (not only those which are requested)"
+  CmdStreamAnyEvent          = 45u8,
+  /// command code for "Stream only events which are explicitly requested"
+  CmdStreamOnlyRequested     = 46u8,
+  /// command code for setting the size of the rb buffers.
+  /// technically, this does not change the size, but sets 
+  /// a different value for trip
+  CmdSetRBDataBufSize        = 23u8,
+  /// command code for enable the forced trigger mode
+  /// on the RBs
+  CmdEnTriggerModeForced     = 24u8,
+  /// command code to disable the forced trigger mode 
+  /// on the RBs
+  CmdDisTriggerModeForced    = 25u8,
+  /// Set forced trigger mode on MTB
+  CmdEnTriggerModeForcedMTB  = 26u8,
+  // Disable forced trigger mode on MTB
+  CmdDisTriggerModeForcedMTB = 27u8,
+  Unknown                    = 90u8
+}
+
+impl fmt::Display for TofCommandCode {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let r = serde_json::to_string(self).unwrap_or(
+      String::from("Error: cannot unwrap this TofCommandCodes"));
+    write!(f, "<TofCommandCodes: {}>", r)
+  }
+}
+
+impl TryFrom<u8> for TofCommandCode {
+  type Error = &'static str;
+
+  // I am not sure about this hard coding, but the code
+  //  looks nicer - Paolo
+  fn try_from(value: u8) -> Result<Self, Self::Error> {
+    match value {
+      1u8  => Ok(TofCommandCode::CmdPing),
+      10u8 => Ok(TofCommandCode::CmdPowerOff),
+      11u8 => Ok(TofCommandCode::CmdPowerOn),
+      12u8 => Ok(TofCommandCode::CmdPowerCycle),
+      20u8 => Ok(TofCommandCode::CmdRBSetup),
+      21u8 => Ok(TofCommandCode::CmdSetThresholds),
+      22u8 => Ok(TofCommandCode::CmdSetMTConfig),
+      30u8 => Ok(TofCommandCode::CmdDataRunStop),
+      31u8 => Ok(TofCommandCode::CmdDataRunStart),
+      32u8 => Ok(TofCommandCode::CmdStartValidationRun),
+      41u8 => Ok(TofCommandCode::CmdGetFullWaveforms),
+      42u8 => Ok(TofCommandCode::CmdGetReducedDataPacket),
+      43u8 => Ok(TofCommandCode::CmdRequestMoni),
+      51u8 => Ok(TofCommandCode::CmdVoltageCalibration),
+      52u8 => Ok(TofCommandCode::CmdTimingCalibration),
+      53u8 => Ok(TofCommandCode::CmdCreateCalibrationFile),
+      44u8 => Ok(TofCommandCode::CmdUnspoolEventCache),
+      45u8 => Ok(TofCommandCode::CmdStreamAnyEvent),
+      46u8 => Ok(TofCommandCode::CmdStreamOnlyRequested),
+      23u8 => Ok(TofCommandCode::CmdSetRBDataBufSize),
+      24u8 => Ok(TofCommandCode::CmdEnTriggerModeForced),
+      25u8 => Ok(TofCommandCode::CmdDisTriggerModeForced),
+      26u8 => Ok(TofCommandCode::CmdEnTriggerModeForcedMTB),
+      27u8 => Ok(TofCommandCode::CmdDisTriggerModeForcedMTB),
+      90u8 => Ok(TofCommandCode::Unknown),
+      _    => Err("I am not sure how to convert this value!")
+    }
+  }
+}
+
 #[cfg(feature = "random")]
-extern crate rand;
-#[cfg(feature = "random")]
-use rand::Rng;
-
-// TODO maybe enum at this point?
-/// en empty command
-pub const CMD_PING                : u8 = 1;
-/// command code for "Power off"
-pub const CMD_POFF                : u8 = 10;        
-/// command code for "Power on"
-pub const CMD_PON                 : u8 = 11;       
-/// command code for "Power cycle"
-pub const CMD_PCYCLE              : u8 = 12;        
-/// command code for "Run RBSetup"
-pub const CMD_RBSETUP             : u8 = 20;         
-/// command code for "Set LTB Thresholds"
-pub const CMD_SETTHRESHOLD        : u8 = 21;         
-/// command code for "Configure MTB"
-pub const CMD_SETMTCONFIG         : u8 = 22;        
-/// command code for "Stop Data taking"
-pub const CMD_DATARUNSTOP         : u8 = 30;  
-/// command code for "Start Data taking"
-pub const CMD_DATARUNSTART        : u8 = 31;    
-/// command code for "Start validation run"
-pub const CMD_STARTVALIDATIONRUN  : u8 = 32;         
-/// command code for "Get all waveforms"
-pub const CMD_GETFULLWAVEFORMS    : u8 = 41;      
-/// command code for "Get waveforms/data for specific event"
-pub const CMD_REQEUESTEVENT       : u8 = 42; 
-/// command code for "Get monitoring data"
-pub const CMS_REQUESTMONI         : u8 = 43;
-/// command code for "Run voltage calibration"
-pub const CMD_VCALIB              : u8 = 51;       
-/// command code for "Run timing calibration"
-pub const CMD_TCALIB              : u8 = 52;      
-/// command code for "Create a new calibration file"
-pub const CMD_CREATECALIBF        : u8 = 53;   
-
-/// command code for "Send the whole event cache over the wire"
-pub const CMD_UNSPOOL_EVENT_CACHE : u8 = 44;
-
-/// command code for "Operate in a mode, where we stream any event 
-/// (not only those which are requested)"
-pub const CMD_STREAM_ANY_EVENT         : u8 = 45;
-/// command code for "Stream only events which are explicitly requested"
-pub const CMD_STREAM_ONLY_REQUESTED    : u8 = 46;
-/// command code for setting the size of the rb buffers.
-/// technically, this does not change the size, but sets 
-/// a different value for trip
-pub const CMD_SET_RB_DATABUF_SIZE      : u8 = 23;
-/// command code for enable the forced trigger mode
-/// on the RBs
-pub const CMD_EN_TRIGGERMODE_FORCED    : u8 = 24;
-/// command code to disable the forced trigger mode 
-/// on the RBs
-pub const CMD_DIS_TRIGGERMODE_FORCED   : u8 = 25;
-/// Set forced trigger mode on MTB
-pub const CMD_EN_TRIGGERMODE_FORCED_MTB : u8 = 26;
-// Disable forced trigger mode on MTB
-pub const CMD_DIS_TRIGGERMODE_FORCED_MTB : u8 = 27;
+impl FromRandom for TofCommandCode {
+  
+  fn from_random() -> Self {
+    let choices = [
+      TofCommandCode::CmdPing,
+      TofCommandCode::CmdPowerOff,
+      TofCommandCode::CmdPowerOn,
+      TofCommandCode::CmdPowerCycle,
+      TofCommandCode::CmdRBSetup,
+      TofCommandCode::CmdSetThresholds,
+      TofCommandCode::CmdSetMTConfig,
+      TofCommandCode::CmdDataRunStop,
+      TofCommandCode::CmdDataRunStart,
+      TofCommandCode::CmdStartValidationRun,
+      TofCommandCode::CmdGetFullWaveforms,
+      TofCommandCode::CmdGetReducedDataPacket,
+      TofCommandCode::CmdRequestMoni,
+      TofCommandCode::CmdVoltageCalibration,
+      TofCommandCode::CmdTimingCalibration,
+      TofCommandCode::CmdCreateCalibrationFile,
+      TofCommandCode::CmdUnspoolEventCache,
+      TofCommandCode::CmdStreamAnyEvent,
+      TofCommandCode::CmdStreamOnlyRequested,
+      TofCommandCode::CmdSetRBDataBufSize,
+      TofCommandCode::CmdEnTriggerModeForced,
+      TofCommandCode::CmdDisTriggerModeForced,
+      TofCommandCode::CmdEnTriggerModeForcedMTB,
+      TofCommandCode::CmdDisTriggerModeForcedMTB,
+      TofCommandCode::Unknown
+    ];
+    let mut rng  = rand::thread_rng();
+    let idx = rng.gen_range(0..choices.len());
+    choices[idx]
+  }
+}
 
 // Specific response codes
 // These are long (4 bytes) but 
 // this allows to convey more information
 // e.g. event id
+#[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
+#[repr(u32)]
+pub enum TofCommandResp {
+  /// response code for: Command can not be executed on the server side
+  RespErrUnexecutable                = 500u32,
+  RespErrNotImplemented              = 404u32, 
+  /// response code for: Something did not work quite right, 
+  /// however, the problem has either fixed itself or it is 
+  /// highly likely that if the command is issued again it 
+  /// will succeed.
+  RespErrLevelNoProblem              = 4000u32, 
+  RespErrLevelMedium                 = 4010u32, 
+  RespErrLevelSevere                 = 4020u32, 
+  /// response code for: A critical condition. This might need a fix somehow and can 
+  /// not be fixed automatically. Probably at least a power-cycle is necessary.
+  RespErrLevelCritical               = 4030u32, 
+  /// response code for: The severest error condition which can occur. This might
+  /// still be fixable, but it is probably a good advice to get help. Currently, 
+  /// the mission might be in a bad state.
+  RespErrLevelMissionCritical        = 4040u32, 
+  /// response code for: If you see this, it is probably reasonable to follow that advice..
+  /// Something unexplicable, which should never have happened, did happen and there is probably
+  /// no way to fix it. Call somebody if you see it, but probably the mission has failed.
+  RespErrLevelRunFoolRun             = 99999u32, 
+  /// response code for: The server has executed the command succesfully. 
+  /// THIS DOES NOT GUARANTEE THAT SERVER IS ACTUALLY DOING 
+  /// SOMETHING USEFUL, IT JUST ACKNOWLEDGES EXECUTION.
+  RespSuccFingersCrossed             = 200u32,
+  /// The command can't be executed since currently data taking is not active
+  RespErrNoRunActive                 = 501u32,
+  /// The command can't be executed since currently data taking is active
+  RespErrRunActive                   = 502u32,
+  /// The command got stuck somewhere and did not make it to the intended receiver
+  RespErrCmdStuck                    = 503u32
+}
 
-// TODO maybe enum at this point?
-/// response code for: Command can not be executed on the server side
-pub const RESP_ERR_UNEXECUTABLE              : u32 = 500;
-pub const RESP_ERR_NOTIMPLEMENTED            : u32 = 404; 
-/// response code for: Something did not work quite right, 
-/// however, the problem has either fixed itself or it is 
-/// highly likely that if the command is issued again it 
-/// will succeed.
-pub const RESP_ERR_LEVEL_NOPROBLEM           : u32 = 4000; 
-pub const RESP_ERR_LEVEL_MEDIUM              : u32 = 4010; 
-pub const RESP_ERR_LEVEL_SEVERE              : u32 = 4020; 
-/// response code for: A critical condition. This might need a fix somehow and can 
-/// not be fixed automatically. Probably at least a power-cycle is necessary.
-pub const RESP_ERR_LEVEL_CRITICAL            : u32 = 4030; 
-/// response code for: The severest error condition which can occur. This might
-/// still be fixable, but it is probably a good advice to get help. Currently, 
-/// the mission might be in a bad state.
-pub const RESP_ERR_LEVEL_MISSION_CRITICAL    : u32 = 4040; 
-/// response code for: If you see this, it is probably reasonable to follow that advice..
-/// Something unexplicable, which should never have happened, did happen and there is probably
-/// no way to fix it. Call somebody if you see it, but probably the mission has failed.
-pub const RESP_ERR_LEVEL_RUN_FOOL_RUN        : u32 = 99999; 
-/// response code for: The server has executed the command succesfully. 
-/// THIS DOES NOT GUARANTEE THAT SERVER IS ACTUALLY DOING 
-/// SOMETHING USEFUL, IT JUST ACKNOWLEDGES EXECUTION.
-pub const RESP_SUCC_FINGERS_CROSSED          : u32 = 200;
-/// The command can't be executed since currently data taking is not active
-pub const RESP_ERR_NORUNACTIVE               : u32 = 501;
-/// The command can't be executed since currently data taking is active
-pub const RESP_ERR_RUNACTIVE                 : u32 = 502;
-/// The command got stuck somewhere and did not make it to the intended receiver
-pub const RESP_ERR_CMD_STUCK                 : u32 = 503;
+impl fmt::Display for TofCommandResp {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let r = serde_json::to_string(self).unwrap_or(
+      String::from("Error: cannot unwrap this TofCommandResp"));
+    write!(f, "<TofCommandResp: {}>", r)
+  }
+}
 
+impl TryFrom<u32> for TofCommandResp {
+  type Error = &'static str;
 
+  // I am not sure about this hard coding, but the code
+  //  looks nicer - Paolo
+  fn try_from(value: u32) -> Result<Self, Self::Error> {
+    match value {
+      500u32   => Ok(TofCommandResp::RespErrUnexecutable),
+      404u32   => Ok(TofCommandResp::RespErrNotImplemented),
+      4000u32  => Ok(TofCommandResp::RespErrLevelNoProblem),
+      4010u32  => Ok(TofCommandResp::RespErrLevelMedium),
+      4020u32  => Ok(TofCommandResp::RespErrLevelSevere),
+      4030u32  => Ok(TofCommandResp::RespErrLevelCritical),
+      4040u32  => Ok(TofCommandResp::RespErrLevelMissionCritical),
+      99999u32 => Ok(TofCommandResp::RespErrLevelRunFoolRun),
+      200u32   => Ok(TofCommandResp::RespSuccFingersCrossed),
+      501u32   => Ok(TofCommandResp::RespErrNoRunActive),
+      502u32   => Ok(TofCommandResp::RespErrRunActive),
+      503u32   => Ok(TofCommandResp::RespErrCmdStuck),
+      _        => Err("I am not sure how to convert this value!")
+    }
+  }
+}
+
+#[cfg(feature = "random")]
+impl FromRandom for TofCommandResp {
+  
+  fn from_random() -> Self {
+    let choices = [
+      TofCommandResp::RespErrUnexecutable,
+      TofCommandResp::RespErrNotImplemented,
+      TofCommandResp::RespErrLevelNoProblem,
+      TofCommandResp::RespErrLevelMedium,
+      TofCommandResp::RespErrLevelSevere,
+      TofCommandResp::RespErrLevelCritical,
+      TofCommandResp::RespErrLevelMissionCritical,
+      TofCommandResp::RespErrLevelRunFoolRun,
+      TofCommandResp::RespSuccFingersCrossed,
+      TofCommandResp::RespErrNoRunActive,
+      TofCommandResp::RespErrRunActive,
+      TofCommandResp::RespErrCmdStuck
+    ];
+    let mut rng  = rand::thread_rng();
+    let idx = rng.gen_range(0..choices.len());
+    choices[idx]
+  }
+}
 
 /// How to operate the readout Default mode is to request
 /// events from the MasterTrigger. However, we can also stream
 /// all the waveforms.
 /// CAVEAT: For the whole tof, this will cap the rate at 
 /// 112 Hz, because of the capacity of the switches.
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
+#[repr(u8)]
 pub enum TofOperationMode {
-  RequestReply,
-  StreamAny,
-  Unknown
+  RequestReply = 0u8,
+  StreamAny    = 10u8,
+  Unknown      = 20u8
 }
 
 impl fmt::Display for TofOperationMode {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let r = self.string_repr();
+    let r = serde_json::to_string(self).unwrap_or(
+      String::from("Error: cannot unwrap this TofOperationMode"));
     write!(f, "<TofOperationMode: {}>", r)
   }
 }
 
-impl TofOperationMode {
-  pub const UNKNOWN               : u8 = 0;
-  pub const REQUESTREPLY          : u8 = 10;
-  pub const STREAMANY             : u8 = 20;
+impl TryFrom<u8> for TofOperationMode {
+  type Error = &'static str;
 
-  pub fn to_u8(&self) -> u8 {
-    let result : u8;
-    match self {
-      TofOperationMode::Unknown => {
-        result = TofOperationMode::UNKNOWN;
-      }
-      TofOperationMode::RequestReply => {
-        result = TofOperationMode::REQUESTREPLY;
-      }
-      TofOperationMode::StreamAny => {
-        result = TofOperationMode::STREAMANY;
-      }
+  // I am not sure about this hard coding, but the code
+  //  looks nicer - Paolo
+  fn try_from(value: u8) -> Result<Self, Self::Error> {
+    match value {
+      0u8  => Ok(TofOperationMode::RequestReply),
+      10u8 => Ok(TofOperationMode::StreamAny),
+      20u8 => Ok(TofOperationMode::Unknown),
+      _    => Err("I am not sure how to convert this value!")
     }
-    result
   }
+}
+
+#[cfg(feature = "random")]
+impl FromRandom for TofOperationMode {
   
-  pub fn from_u8(code : &u8) -> Self {
-    let mut result = TofOperationMode::Unknown;
-    match *code {
-      TofOperationMode::UNKNOWN => {
-        result = TofOperationMode::Unknown;
-      }
-      TofOperationMode::REQUESTREPLY => {
-        result = TofOperationMode::RequestReply;
-      }
-      TofOperationMode::STREAMANY => {
-        result = TofOperationMode::StreamAny;
-      }
-      _ => {
-        error!("Unknown TofOperationMode {}!", code);
-      }
-    }
-    result
-  }
-
-  /// String representation of the TofOperationMode
-  ///
-  /// This is basically the enum type as 
-  /// a string.
-  pub fn string_repr(&self) -> String { 
-    let repr : String;
-    match self {
-      TofOperationMode::Unknown => {
-        repr = String::from("Unknown");
-      }
-      TofOperationMode::RequestReply => {
-        repr = String::from("RequestReply");
-      }
-      TofOperationMode::StreamAny => {
-        repr = String::from("StreamAny");
-      }
-    }
-    repr
+  fn from_random() -> Self {
+    let choices = [
+      TofOperationMode::RequestReply,
+      TofOperationMode::StreamAny,
+      TofOperationMode::Unknown
+    ];
+    let mut rng  = rand::thread_rng();
+    let idx = rng.gen_range(0..choices.len());
+    choices[idx]
   }
 }
 
@@ -217,7 +332,7 @@ impl TofOperationMode {
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct RBCommand {
   pub rb_id        : u8, // receipient
-  pub command_code : u8,
+  pub tof_command_code : u8,
   pub channel_mask : u8,
   pub payload      : u32,
 }
@@ -227,7 +342,7 @@ impl RBCommand {
   pub fn new() -> Self {
     Self {
       rb_id        : 0,
-      command_code : 0,
+      tof_command_code : 0,
       channel_mask : 0,
       payload      : 0,
     }
@@ -237,10 +352,10 @@ impl RBCommand {
     parse_u32(stream, &mut 3)
   }
 
-  pub fn command_code_to_string(cc : u8) -> String {
+  pub fn tof_command_code_to_string(cc : u8) -> String {
     match cc {
       Self::REQUEST_EVENT => {
-        return String::from("RequestEvent");
+        return String::from("GetReducedDataPacket");
       }
       _ => {
         return String::from("Unknown");
@@ -267,7 +382,7 @@ impl From<&TofPacket> for RBCommand {
 }
 impl fmt::Display for RBCommand {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let cc = RBCommand::command_code_to_string(self.command_code);
+    let cc = RBCommand::tof_command_code_to_string(self.tof_command_code);
     write!(f, "<RBCommand: {}; RB ID {}; CH MASK {}; PAYLOAD {}>", cc, self.rb_id, self.channel_mask, self.payload)
   }
 }
@@ -290,7 +405,7 @@ impl Serialization for RBCommand {
     Self::verify_fixed(stream, pos)?;
     let mut command = RBCommand::new();
     command.rb_id        = parse_u8(stream, pos);
-    command.command_code = parse_u8(stream, pos);
+    command.tof_command_code = parse_u8(stream, pos);
     command.channel_mask = parse_u8(stream, pos);
     command.payload = parse_u32(stream, pos);
     *pos += 2;
@@ -301,7 +416,7 @@ impl Serialization for RBCommand {
     let mut stream = Vec::<u8>::with_capacity(9);
     stream.extend_from_slice(&RBCommand::HEAD.to_le_bytes());
     stream.push(self.rb_id);
-    stream.push(self.command_code);
+    stream.push(self.tof_command_code);
     stream.push(self.channel_mask);
     stream.extend_from_slice(&self.payload.to_le_bytes());
     stream.extend_from_slice(&RBCommand::TAIL.to_le_bytes());
@@ -315,7 +430,7 @@ impl FromRandom for RBCommand {
     let mut rng = rand::thread_rng();
     Self {
       rb_id        : rng.gen::<u8>(),
-      command_code : rng.gen::<u8>(),
+      tof_command_code : rng.gen::<u8>(),
       channel_mask : rng.gen::<u8>(),
       payload      : rng.gen::<u32>(),
     }
@@ -328,54 +443,40 @@ impl FromRandom for RBCommand {
 /// Each command can carry a 32bit field with further
 /// instructionns
 ///
-#[derive(Debug, PartialEq, Copy, Clone)]//, IntoEnumIterator)]
+#[derive(Debug, PartialEq, Copy, Clone, serde::Deserialize, serde::Serialize)]//, IntoEnumIterator)]
 pub enum TofCommand {
   Ping                    (u32),
-  PowerOn                 (u32),
   PowerOff                (u32),
+  PowerOn                 (u32),
   PowerCycle              (u32),
-  RBSetup                 (u32), 
+  RBSetup                 (u32),
   SetThresholds           (u32),
-  SetMtConfig             (u32),
+  SetMTConfig             (u32),
+  DataRunStop             (u32),
+  DataRunStart            (u32),
   StartValidationRun      (u32),
-  RequestWaveforms        (u32),
+  GetFullWaveforms        (u32),
+  GetReducedDataPacket    (u32),
+  RequestMoni             (u32),
+  VoltageCalibration      (u32),
+  TimingCalibration       (u32),
+  CreateCalibrationFile   (u32), // still need some insight
   UnspoolEventCache       (u32),
   StreamAnyEvent          (u32),
   StreamOnlyRequested     (u32),
-  /// Start a new run, the argument being the number 
-  /// of events.
-  DataRunStart            (u32), 
-  DataRunEnd              (u32),
-  VoltageCalibration      (u32),
-  TimingCalibration       (u32),
-  CreateCalibrationFile   (u32),
-  /// Request event data for a specific event being sent
-  /// over the data wire. The argument being the event id.
-  RequestEvent            (u32),
-  RequestMoni             (u32),
-  /// Set RB buffer trip value
-  SetRBBuffTrip           (u32),
-  /// Switch forced trigger mode ON (RB)
-  SetRBForcedTrigModeOn   (u32),
-  /// Switch forced trigger mode OFF (RB)
-  SetRBForcedTrigModeOff  (u32),
-  SetMTBForcedTrigModeOn  (u32),
-  /// Switch forced trigger mode OFF (RB)
-  SetMTBForcedTrigModeOff (u32),
-  Unknown                 (u32),
+  SetRBDataBufSize        (u32),
+  EnTriggerModeForced     (u32),
+  DisTriggerModeForced    (u32),
+  EnTriggerModeForcedMTB  (u32),
+  DisTriggerModeForcedMTB (u32),
+  Unknown                 (u32)
 }
 
 impl fmt::Display for TofCommand {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let cmd = self.string_repr();
-    //let arg = 
-    write!(f, "<TofCommand {}>", cmd)
-  }
-}
-
-impl Default for TofCommand {
-  fn default() -> TofCommand {
-    TofCommand::Unknown(0)
+    let r = serde_json::to_string(self).unwrap_or(
+      String::from("Error: cannot unwrap this TofCommand"));
+    write!(f, "<TofCommand: {}>", r)
   }
 }
 
@@ -408,7 +509,8 @@ impl TofCommand {
     let mut bytes = [0u8;TofCommand::SIZE];
     bytes[0] = 0xAA;
     bytes[1] = 0xAA;
-    bytes[2] = TofCommand::to_command_code(&self).expect("This can't fail, since this is implemented on MYSELF and I am a TofCommand!"); 
+    bytes[2] = TofCommand::to_tof_command_code(&self)
+      .expect("This can't fail, since this is implemented on MYSELF and I am a TofCommand!") as u8; 
     let value_bytes = self.get_value().to_le_bytes();
    
     for n in 0..4 {
@@ -425,7 +527,8 @@ impl TofCommand {
     let mut stream : Vec::<u8> = vec![0,0,0,0,0,0,0,0,0];
     stream[0] = 0xAA;
     stream[1] = 0xAA;
-    stream[2] = TofCommand::to_command_code(&self).expect("This can't fail, since this is implemented on MYSELF and I am a TofCommand!"); 
+    stream[2] = TofCommand::to_tof_command_code(&self)
+      .expect("This can't fail, since this is implemented on MYSELF and I am a TofCommand!") as u8; 
     let value_bytes = self.get_value().to_le_bytes();
    
     for n in 0..4 {
@@ -447,125 +550,89 @@ impl TofCommand {
       TofCommand::PowerCycle              (data) => { value = *data;}, 
       TofCommand::RBSetup                 (data) => { value = *data;}, 
       TofCommand::SetThresholds           (data) => { value = *data;},
-      TofCommand::SetMtConfig             (data) => { value = *data;},
+      TofCommand::SetMTConfig             (data) => { value = *data;},
       TofCommand::StartValidationRun      (data) => { value = *data;},
-      TofCommand::RequestWaveforms        (data) => { value = *data;},
+      TofCommand::GetFullWaveforms        (data) => { value = *data;},
       TofCommand::UnspoolEventCache       (data) => { value = *data;},
       TofCommand::StreamAnyEvent          (data) => { value = *data;},
       TofCommand::StreamOnlyRequested     (data) => { value = *data;},
       TofCommand::DataRunStart            (data) => { value = *data;},
-      TofCommand::DataRunEnd              (data) => { value = *data;},
+      TofCommand::DataRunStop             (data) => { value = *data;},
       TofCommand::VoltageCalibration      (data) => { value = *data;},
       TofCommand::TimingCalibration       (data) => { value = *data;},
       TofCommand::CreateCalibrationFile   (data) => { value = *data;},
-      TofCommand::RequestEvent            (data) => { value = *data;},
+      TofCommand::GetReducedDataPacket    (data) => { value = *data;},
       TofCommand::RequestMoni             (data) => { value = *data;},
-      TofCommand::SetRBBuffTrip           (data) => { value = *data;},
-      TofCommand::SetRBForcedTrigModeOn   (data) => { value = *data;},
-      TofCommand::SetRBForcedTrigModeOff  (data) => { value = *data;},
-      TofCommand::SetMTBForcedTrigModeOn  (data) => { value = *data;},
-      TofCommand::SetMTBForcedTrigModeOff (data) => { value = *data;},
+      TofCommand::SetRBDataBufSize        (data) => { value = *data;},
+      TofCommand::EnTriggerModeForced     (data) => { value = *data;},
+      TofCommand::DisTriggerModeForced    (data) => { value = *data;},
+      TofCommand::EnTriggerModeForcedMTB  (data) => { value = *data;},
+      TofCommand::DisTriggerModeForcedMTB (data) => { value = *data;},
       TofCommand::Unknown                 (data) => { value = *data;}, 
     }
     value
-  }
-
-  /// String representation of the enum
-  ///
-  /// This is basically the enum type as 
-  /// a string.
-  pub fn string_repr(&self) -> String { 
-    match self {
-      TofCommand::Ping                    (_) => {return String::from("Ping");},
-      TofCommand::PowerOn                 (_) => {return String::from("PowerOn");},
-      TofCommand::PowerOff                (_) => {return String::from("PowerOff");},
-      TofCommand::PowerCycle              (_) => {return String::from("PowerCycle");},
-      TofCommand::RBSetup                 (_) => {return String::from("RBSetup");}, 
-      TofCommand::SetThresholds           (_) => {return String::from("SetThresholds");},
-      TofCommand::SetMtConfig             (_) => {return String::from("SetMtConfig");},
-      TofCommand::StartValidationRun      (_) => {return String::from("StartValidationRun");},
-      TofCommand::RequestWaveforms        (_) => {return String::from("RequestWaveforms");},
-      TofCommand::UnspoolEventCache       (_) => {return String::from("UnspoolEventCache");},
-      TofCommand::StreamAnyEvent          (_) => {return String::from("StreamAnyEvent");},
-      TofCommand::StreamOnlyRequested     (_) => {return String::from("StreamOnlyRequested");},
-      TofCommand::DataRunStart            (_) => {return String::from("DataRunStart");}, 
-      TofCommand::DataRunEnd              (_) => {return String::from("DataRunEnd");},
-      TofCommand::VoltageCalibration      (_) => {return String::from("TimingCalibration");}, 
-      TofCommand::TimingCalibration       (_) => {return String::from("TimingCalibration");},
-      TofCommand::CreateCalibrationFile   (_) => {return String::from("CreateCalibrationFile");},
-      TofCommand::RequestEvent            (_) => {return String::from("RequestEvent");},
-      TofCommand::RequestMoni             (_) => {return String::from("RequestMoni");},
-      TofCommand::SetRBBuffTrip           (_) => {return String::from("SetRBBuffTrip");},
-      TofCommand::SetRBForcedTrigModeOn   (_) => {return String::from("SetRBForcedTrigModeOn");},
-      TofCommand::SetRBForcedTrigModeOff  (_) => {return String::from("SetRBForcedTrigModeOff");}
-      TofCommand::SetMTBForcedTrigModeOn  (_) => {return String::from("SetMTBForcedTrigModeOn");},
-      TofCommand::SetMTBForcedTrigModeOff (_) => {return String::from("SetMTBForcedTrigModeOff");}
-      TofCommand::Unknown                 (_) => {return String::from("Unknown");},
-      //_                                      => {return String::from("_");}
-    }
-  }
-  
+  }  
 
   /// Generate a TofCommand from the specific bytecode
   /// representation
-  pub fn from_command_code(cc : u8, value : u32) -> TofCommand {
+  pub fn from_tof_command_code(cc : TofCommandCode, value : u32) -> TofCommand {
     match cc {
-      CMD_PING                   => TofCommand::Ping                 (value),
-      CMD_POFF                   => TofCommand::PowerOff             (value),        
-      CMD_PON                    => TofCommand::PowerOn              (value),       
-      CMD_PCYCLE                 => TofCommand::PowerCycle           (value),        
-      CMD_RBSETUP                => TofCommand::RBSetup              (value),         
-      CMD_SETTHRESHOLD           => TofCommand::SetThresholds        (value),         
-      CMD_SETMTCONFIG            => TofCommand::SetMtConfig          (value),        
-      CMD_DATARUNSTART           => TofCommand::DataRunStart         (value),  
-      CMD_DATARUNSTOP            => TofCommand::DataRunEnd           (value),    
-      CMD_STARTVALIDATIONRUN     => TofCommand::StartValidationRun   (value),         
-      CMD_GETFULLWAVEFORMS       => TofCommand::RequestWaveforms     (value),      
-      CMD_REQEUESTEVENT          => TofCommand::RequestEvent         (value), 
-      CMS_REQUESTMONI            => TofCommand::RequestMoni          (value),
-      CMD_VCALIB                 => TofCommand::VoltageCalibration   (value),       
-      CMD_TCALIB                 => TofCommand::TimingCalibration    (value),      
-      CMD_CREATECALIBF           => TofCommand::CreateCalibrationFile(value),   
-      CMD_UNSPOOL_EVENT_CACHE    => TofCommand::UnspoolEventCache    (value),
-      CMD_STREAM_ANY_EVENT       => TofCommand::StreamAnyEvent       (value),
-      CMD_STREAM_ONLY_REQUESTED  => TofCommand::StreamOnlyRequested  (value),
-      CMD_SET_RB_DATABUF_SIZE    => TofCommand::SetRBBuffTrip        (value),
-      CMD_EN_TRIGGERMODE_FORCED  => TofCommand::SetRBForcedTrigModeOn(value),
-      CMD_DIS_TRIGGERMODE_FORCED => TofCommand::SetRBForcedTrigModeOff(value),
-      CMD_EN_TRIGGERMODE_FORCED_MTB  => TofCommand::SetMTBForcedTrigModeOn(value),
-      CMD_DIS_TRIGGERMODE_FORCED_MTB  => TofCommand::SetMTBForcedTrigModeOff(value),
-      _                               => TofCommand::Unknown              (value), 
+      TofCommandCode::CmdPing                    => TofCommand::Ping                    (0u32),
+      TofCommandCode::CmdPowerOff                => TofCommand::PowerOff                (value),
+      TofCommandCode::CmdPowerOn                 => TofCommand::PowerOn                 (value),
+      TofCommandCode::CmdPowerCycle              => TofCommand::PowerCycle              (value),
+      TofCommandCode::CmdRBSetup                 => TofCommand::RBSetup                 (value),
+      TofCommandCode::CmdSetThresholds           => TofCommand::SetThresholds           (value),
+      TofCommandCode::CmdSetMTConfig             => TofCommand::SetMTConfig             (value),
+      TofCommandCode::CmdDataRunStart            => TofCommand::DataRunStart            (value),
+      TofCommandCode::CmdDataRunStop             => TofCommand::DataRunStop             (0u32),
+      TofCommandCode::CmdStartValidationRun      => TofCommand::StartValidationRun      (value),
+      TofCommandCode::CmdGetFullWaveforms        => TofCommand::GetFullWaveforms        (0u32),
+      TofCommandCode::CmdGetReducedDataPacket    => TofCommand::GetReducedDataPacket    (0u32),
+      TofCommandCode::CmdRequestMoni             => TofCommand::RequestMoni             (0u32),
+      TofCommandCode::CmdVoltageCalibration      => TofCommand::VoltageCalibration      (value),
+      TofCommandCode::CmdTimingCalibration       => TofCommand::TimingCalibration       (value),
+      TofCommandCode::CmdCreateCalibrationFile   => TofCommand::CreateCalibrationFile   (value),
+      TofCommandCode::CmdUnspoolEventCache       => TofCommand::UnspoolEventCache       (0u32),
+      TofCommandCode::CmdStreamAnyEvent          => TofCommand::StreamAnyEvent          (0u32),
+      TofCommandCode::CmdStreamOnlyRequested     => TofCommand::StreamOnlyRequested     (0u32),
+      TofCommandCode::CmdSetRBDataBufSize        => TofCommand::SetRBDataBufSize        (0u32),
+      TofCommandCode::CmdEnTriggerModeForced     => TofCommand::EnTriggerModeForced     (0u32),
+      TofCommandCode::CmdDisTriggerModeForced    => TofCommand::DisTriggerModeForced    (0u32),
+      TofCommandCode::CmdEnTriggerModeForcedMTB  => TofCommand::EnTriggerModeForcedMTB  (0u32),
+      TofCommandCode::CmdDisTriggerModeForcedMTB => TofCommand::DisTriggerModeForcedMTB (0u32),
+      _                                          => TofCommand::Unknown                 (0u32),
     }
   }
     
   /// Translate a TofCommand into its specific byte representation
-  pub fn to_command_code(cmd : &TofCommand) -> Option<u8> {
+  pub fn to_tof_command_code(cmd : &TofCommand) -> Option<TofCommandCode> {
     match cmd {
-      TofCommand::Ping          (_)        => Some(CMD_PING              ),
-      TofCommand::PowerOff      (_)        => Some(CMD_POFF              ),        
-      TofCommand::PowerOn       (_)        => Some(CMD_PON               ),       
-      TofCommand::PowerCycle    (_)        => Some(CMD_PCYCLE            ),        
-      TofCommand::RBSetup       (_)        => Some(CMD_RBSETUP           ),         
-      TofCommand::SetThresholds (_)        => Some(CMD_SETTHRESHOLD      ),         
-      TofCommand::SetMtConfig   (_)        => Some(CMD_SETMTCONFIG       ),        
-      TofCommand::DataRunStart  (_)        => Some(CMD_DATARUNSTART       ),  
-      TofCommand::DataRunEnd    (_)        => Some(CMD_DATARUNSTOP        ),    
-      TofCommand::StartValidationRun   (_) => Some(CMD_STARTVALIDATIONRUN),         
-      TofCommand::RequestWaveforms (_)     => Some(CMD_GETFULLWAVEFORMS  ),      
-      TofCommand::RequestEvent     (_)     => Some(CMD_REQEUESTEVENT     ), 
-      TofCommand::RequestMoni      (_)     => Some(CMS_REQUESTMONI       ), 
-      TofCommand::VoltageCalibration  (_)  => Some(CMD_VCALIB            ),       
-      TofCommand::TimingCalibration   (_)  => Some(CMD_TCALIB            ),      
-      TofCommand::CreateCalibrationFile  (_) => Some(CMD_CREATECALIBF      )    ,
-      TofCommand::UnspoolEventCache      (_) => Some(CMD_UNSPOOL_EVENT_CACHE)   ,
-      TofCommand::StreamAnyEvent         (_) => Some(CMD_STREAM_ANY_EVENT)      ,
-      TofCommand::StreamOnlyRequested    (_) => Some(CMD_STREAM_ONLY_REQUESTED) ,
-      TofCommand::SetRBBuffTrip          (_) => Some(CMD_SET_RB_DATABUF_SIZE)   ,
-      TofCommand::SetRBForcedTrigModeOn  (_) => Some(CMD_EN_TRIGGERMODE_FORCED) ,
-      TofCommand::SetRBForcedTrigModeOff (_) => Some(CMD_DIS_TRIGGERMODE_FORCED),
-      TofCommand::SetMTBForcedTrigModeOn  (_) => Some(CMD_EN_TRIGGERMODE_FORCED_MTB) ,
-      TofCommand::SetMTBForcedTrigModeOff (_) => Some(CMD_DIS_TRIGGERMODE_FORCED_MTB),
-      TofCommand::Unknown                (_) => None                            , 
+      TofCommand::Ping                    (_) => Some(TofCommandCode::CmdPing),
+      TofCommand::PowerOff                (_) => Some(TofCommandCode::CmdPowerOff),
+      TofCommand::PowerOn                 (_) => Some(TofCommandCode::CmdPowerOn),
+      TofCommand::PowerCycle              (_) => Some(TofCommandCode::CmdPowerCycle),
+      TofCommand::RBSetup                 (_) => Some(TofCommandCode::CmdRBSetup),
+      TofCommand::SetThresholds           (_) => Some(TofCommandCode::CmdSetThresholds),
+      TofCommand::SetMTConfig             (_) => Some(TofCommandCode::CmdSetMTConfig),
+      TofCommand::DataRunStart            (_) => Some(TofCommandCode::CmdDataRunStart),
+      TofCommand::DataRunStop             (_) => Some(TofCommandCode::CmdDataRunStop),
+      TofCommand::StartValidationRun      (_) => Some(TofCommandCode::CmdStartValidationRun),
+      TofCommand::GetFullWaveforms        (_) => Some(TofCommandCode::CmdGetFullWaveforms),
+      TofCommand::GetReducedDataPacket    (_) => Some(TofCommandCode::CmdGetReducedDataPacket),
+      TofCommand::RequestMoni             (_) => Some(TofCommandCode::CmdRequestMoni),
+      TofCommand::VoltageCalibration      (_) => Some(TofCommandCode::CmdVoltageCalibration),
+      TofCommand::TimingCalibration       (_) => Some(TofCommandCode::CmdTimingCalibration),
+      TofCommand::CreateCalibrationFile   (_) => Some(TofCommandCode::CmdCreateCalibrationFile),
+      TofCommand::UnspoolEventCache       (_) => Some(TofCommandCode::CmdUnspoolEventCache),
+      TofCommand::StreamAnyEvent          (_) => Some(TofCommandCode::CmdStreamAnyEvent),
+      TofCommand::StreamOnlyRequested     (_) => Some(TofCommandCode::CmdStreamOnlyRequested),
+      TofCommand::SetRBDataBufSize        (_) => Some(TofCommandCode::CmdSetRBDataBufSize),
+      TofCommand::EnTriggerModeForced     (_) => Some(TofCommandCode::CmdEnTriggerModeForced),
+      TofCommand::DisTriggerModeForced    (_) => Some(TofCommandCode::CmdDisTriggerModeForced),
+      TofCommand::EnTriggerModeForcedMTB  (_) => Some(TofCommandCode::CmdEnTriggerModeForcedMTB),
+      TofCommand::DisTriggerModeForcedMTB (_) => Some(TofCommandCode::CmdDisTriggerModeForcedMTB),
+      TofCommand::Unknown                 (_) => None
     }
   }
 
@@ -600,29 +667,7 @@ impl From<(u8, u32)> for TofCommand {
   fn from(pair : (u8, u32)) -> TofCommand {
     let (input, value) = pair;
     trace!("Got in input {:?}", pair);
-    return TofCommand::from_command_code(input, value); 
-    //match input {
-    //  CMD_PING                => TofCommand::Ping                 (value) ,
-    //  CMD_POFF                => TofCommand::PowerOff             (value) ,        
-    //  CMD_PON                 => TofCommand::PowerOn              (value) ,       
-    //  CMD_PCYCLE              => TofCommand::PowerCycle           (value) ,        
-    //  CMD_RBSETUP             => TofCommand::RBSetup              (value) ,         
-    //  CMD_SETTHRESHOLD        => TofCommand::SetThresholds        (value) ,         
-    //  CMD_SETMTCONFIG         => TofCommand::SetMtConfig          (value) ,        
-    //  CMD_DATARUNSTOP         => TofCommand::DataRunEnd            (value),  
-    //  CMD_DATARUNSTART        => TofCommand::DataRunStart          (value) ,    
-    //  CMD_STARTVALIDATIONRUN  => TofCommand::StartValidationRun    (value),         
-    //  CMD_GETFULLWAVEFORMS    => TofCommand::RequestWaveforms      (value) ,      
-    //  CMD_REQEUESTEVENT       => TofCommand::RequestEvent          (value) , 
-    //  CMS_REQUESTMONI         => TofCommand::RequestMoni           (value),
-    //  CMD_VCALIB              => TofCommand::VoltageCalibration    (value),       
-    //  CMD_TCALIB              => TofCommand::TimingCalibration     (value),      
-    //  CMD_CREATECALIBF        => TofCommand::CreateCalibrationFile (value),   
-    //  CMD_UNSPOOL_EVENT_CACHE => TofCommand::UnspoolEventCache   (value) ,
-    //  CMD_STREAM_ANY_EVENT    => TofCommand::StreamAnyEvent      (value) ,
-    //  CMD_STREAM_ONLY_REQUESTED   => TofCommand::StreamOnlyRequested      (value) ,
-    //  _                       => TofCommand::Unknown              (value) , 
-    //}
+    TofCommand::from_tof_command_code(TofCommandCode::try_from(input).unwrap(), value)
   }
 }
 
@@ -678,7 +723,7 @@ impl Serialization for TofCommand {
 ///
 /// The responses are general classes, which carry a more
 /// specific 32-bit response code.
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 pub enum TofResponse {
   Success(u32),
   /// A unknown problem led to a non-execution
@@ -705,9 +750,28 @@ pub enum TofResponse {
 
 impl fmt::Display for TofResponse {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let r = self.string_repr();
-    //let arg = 
-    write!(f, "<TofResponse {}>", r)
+    let r = serde_json::to_string(self).unwrap_or(
+      String::from("Error: cannot unwrap this TofResponse"));
+    write!(f, "<TofResponse: {}>", r)
+  }
+}
+
+#[cfg(feature = "random")]
+impl FromRandom for TofResponse {
+  
+  fn from_random() -> Self {
+    let mut rng  = rand::thread_rng();
+    let val = rng.gen::<u32>();
+    let choices = [
+      TofResponse::Success(val),
+      TofResponse::GeneralFail(val),
+      TofResponse::EventNotReady(val),
+      TofResponse::SerializationIssue(val),
+      TofResponse::ZMQProblem(val),
+      TofResponse::Unknown,
+    ];
+    let idx = rng.gen_range(0..choices.len());
+    choices[idx]
   }
 }
 
@@ -732,19 +796,6 @@ impl TofResponse {
     bytestream.extend_from_slice(&value.to_le_bytes());
     bytestream.extend_from_slice(&TofResponse::TAIL.to_le_bytes());
     bytestream
-  }
-
-  pub fn string_repr(&self) -> String {
-    let repr : String;
-    match self {
-      TofResponse::Success           (data) => {repr = "Success(".to_owned()           + &data.to_string() + ")";},
-      TofResponse::GeneralFail       (data) => {repr = "GeneralFail(".to_owned()       + &data.to_string() + ")";},
-      TofResponse::EventNotReady     (data) => {repr = "EventNotReady(".to_owned()     + &data.to_string() + ")";},
-      TofResponse::SerializationIssue(data) => {repr = "SerializationIssue".to_owned() + &data.to_string() + ")";},
-      TofResponse::ZMQProblem        (data) => {repr = "ZMQProblem(".to_owned()        + &data.to_string() + ")";},
-      TofResponse::Unknown                  => {repr = "Unknown".to_owned();}, 
-    }
-  repr
   }
 }
 
@@ -819,11 +870,11 @@ impl From<(u8, u32)> for TofResponse {
 #[test]
 fn test_tofoperationmode() {
   let mut type_codes = Vec::<u8>::new();
-  type_codes.push(TofOperationMode::UNKNOWN); 
-  type_codes.push(TofOperationMode::STREAMANY); 
-  type_codes.push(TofOperationMode::REQUESTREPLY); 
+  type_codes.push(TofOperationMode::Unknown as u8); 
+  type_codes.push(TofOperationMode::StreamAny as u8); 
+  type_codes.push(TofOperationMode::RequestReply as u8); 
   for tc in type_codes.iter() {
-    assert_eq!(*tc,TofOperationMode::to_u8(&TofOperationMode::from_u8(tc)));  
+    assert_eq!(*tc,TofOperationMode::try_from(*tc).unwrap() as u8);  
   }
 }
 

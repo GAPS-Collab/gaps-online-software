@@ -1,7 +1,12 @@
 use std::fmt;
 
-extern crate serde;
-extern crate serde_json;
+cfg_if::cfg_if! {
+  if #[cfg(feature = "random")]  {
+    use crate::FromRandom;
+    extern crate rand;
+    use rand::Rng;
+  }
+}
 
 /// Data format adds meta information about 
 /// the syntax of the data
@@ -38,6 +43,22 @@ impl TryFrom<u8> for DataFormat {
       30u8 => Ok(DataFormat::Unknown),
       _    => Err("I am not sure how to convert this value!")
     }
+  }
+}
+
+#[cfg(feature = "random")]
+impl FromRandom for DataFormat {
+  
+  fn from_random() -> Self {
+    let choices = [
+      DataFormat::Default,
+      DataFormat::HeaderOnly,
+      DataFormat::MemoryView,
+      DataFormat::Unknown,
+    ];
+    let mut rng  = rand::thread_rng();
+    let idx = rng.gen_range(0..choices.len());
+    choices[idx]
   }
 }
 

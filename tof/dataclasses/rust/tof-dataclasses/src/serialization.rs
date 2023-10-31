@@ -8,8 +8,6 @@ pub use crate::errors::SerializationError;
 use std::error::Error;
 use std::path::Path;
 
-extern crate serde_json;
-
 /// Convert a vector of u16 into a vector of u8
 ///
 /// The resulting vector has twice the number

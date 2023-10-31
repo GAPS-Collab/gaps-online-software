@@ -1,7 +1,7 @@
 # tof-dataclasses
 
 The `tof-dataclasses` is the backbone for all tof-related operations.
-Included dataclasses contain containers for RB data of different 
+Included dataclasses contain containers for RB data of different
 processing levels, but also for general communications between
 the subsystems.
 
@@ -45,9 +45,29 @@ run the benches, run
 
 ## Data structures for control
 
-* commands
+### Commands
+Every command has an identifier, using enum `TofCommandCodes`, and a payload. The command seems to be u16 but it seems too much, is that by definition? The payload is not necessarily fixed but can vary based on the commands it is referring to. The necessary commands to be implemented are the following:
 
-* responses
+- [ ] Power On/Off (u16 which PDU)
+  - [ ] Power On/Off PDU (is this PB + RB + LTB + preamps?)
+  - ? Power On/Off MTB (This I think belongs to the first point)
+  - ? Power On/Off LTB (from the list this seemed possible, is that so?)
+  - ? Power On/Off preamps (from the list this seemed possible, is that so?)
+  - It appears to me that just the PDU are controllable, so one can not discern the specific LTB/preamps, but just the PB, which in turn power the RB, and the MTB.
+- [ ] Setup RB, for a specific RB or all (TOF -> RB) (u16 which RB) (there should be more data send with this command?)
+- [ ] Set thresholds (TOF -> RB) (u16 which threshold, u32 threshold level)
+  - [ ] For all LTBs
+  - ? For a specific LTB
+  - ? For a group of LTB
+- [ ] Set MTB configuration (TOF -> MTB) (u16 trigger config ID)
+- [ ] Start validation run on an RB or all (TOF), small data take (u16 # events, u16 which RB)
+- [ ] Start/stop data taking run (TOF -> RB), regular data take (u16 type of run, u16 # events, u16 time)
+- [ ] Voltage calibration run (TOF -> RB) (u32 second voltage level (???), u16 which RB, u32 extra (???))
+- [ ] Timing calibration run (TOF -> RB) (u16 which RB, u32 extra (???))
+- [ ] Create calibration file (TOF) for RB or all, from three calibration runs, which runs? V/timing and? (u32 second voltage level (???), u16 which RB)
+  - [ ] What one wants here still has to be defined.
+
+### Responses
 
 ## Constants
 

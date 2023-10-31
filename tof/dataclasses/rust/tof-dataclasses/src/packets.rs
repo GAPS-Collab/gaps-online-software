@@ -45,9 +45,6 @@ pub enum PacketQuality {
   UtterRubish
 }
 
-
-
-
 /// The most basic of all packets
 ///  
 /// A type and a payload. This wraps
@@ -268,9 +265,9 @@ impl Serialization for TofPacket {
     let packet_type_enc = stream[*pos];
     let packet_type : PacketType;
     *pos += 1;
-    match PacketType::from_u8(packet_type_enc) {
-      Some(pt) => packet_type = pt,
-      None => {
+    match PacketType::try_from(packet_type_enc) {
+      Ok(pt) => packet_type = pt,
+      Err(_) => {
         error!("Can not decode packet with packet type {}", packet_type_enc);
         return Err(SerializationError::UnknownPayload);}
     }
@@ -297,7 +294,7 @@ impl Serialization for TofPacket {
     }
     let mut bytestream = Vec::<u8>::with_capacity(6 + self.payload.len());
     bytestream.extend_from_slice(&TofPacket::HEAD.to_le_bytes());
-    let p_type = PacketType::as_u8(&self.packet_type);
+    let p_type = self.packet_type as u8;
     bytestream.push(p_type);
     // payload size of 32 bit accomodates up to 4 GB packet
     // a 16 bit size would only hold 65k, which might be not
