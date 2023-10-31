@@ -185,9 +185,14 @@ pub fn event_builder (m_trig_ev      : &cbc::Receiver<MasterTriggerEvent>,
   let mut n_iter    = 0; // don't worry it'll be simply wrapped around
   // we try to receive eventids from the master trigger
   let mut last_evid   = 0;
-  let n_mte_per_loop  = 100;
-  let n_rbe_per_loop  = 20;
+  let n_mte_per_loop  = 20;
+  let n_rbe_per_loop  = 10;
   let mut n_received        = 0usize;
+  let mut clear_cache = 0; // clear cache every 
+  let mut event_sending = 0;
+  let mut n_mte_received_tot = 0u64;
+  let mut n_rbe_received_tot = 0u64;
+
   loop {
     n_received = 0;
     while n_received < n_mte_per_loop {
@@ -198,7 +203,7 @@ pub fn event_builder (m_trig_ev      : &cbc::Receiver<MasterTriggerEvent>,
           continue;
         }   
         Ok(mt) => {
-          trace!("Got master trigger for event {} with {} expected hit paddles"
+          debug!("Got master trigger for event {} with {} expected hit paddles"
                  , mt.event_id
                  , mt.n_paddles);
           // construct RB requests
@@ -213,12 +218,20 @@ pub fn event_builder (m_trig_ev      : &cbc::Receiver<MasterTriggerEvent>,
         }
       } // end match Ok(mt)
       n_received  += 1;
+      //if n_received % 10 == 0 {
+      //  println!("==> Received 10 more MasterTriggerEvents");
+      //}
+      n_mte_received_tot += 1;
     } // end getting MTEvents
+    if n_mte_received_tot % 100 == 0 {
+      println!("==> Receive {} MTE", n_mte_received_tot);
+    }
     // check this timeout
     let mut rb_events_added   = 0usize;
     let mut iter_ev           = 0usize;
     let mut rb_events_dropped = 0usize;
-    while !ev_from_rb.is_empty() || n_received < n_rbe_per_loop {
+    n_received = 0;
+    while !ev_from_rb.is_empty() && n_received < n_rbe_per_loop {
       match ev_from_rb.recv() {
         Err(err) => {
           error!("Can't receive RBEvent! Err {err}");
@@ -229,10 +242,11 @@ pub fn event_builder (m_trig_ev      : &cbc::Receiver<MasterTriggerEvent>,
           // I hope it won't be a problem. Otherwise we have
           // to add another cache.
           //println!("==> Len evt cache {}", event_cache.len());
+          n_rbe_received_tot += 1;
           iter_ev = 0;
           for ev in event_cache.iter_mut() {
             iter_ev += 1;
-            //println!("==> mt event id {}", ev.mt_event.event_id);
+            //println!("==> mt event id {}, rb event id {}", ev.mt_event.event_id, rb_ev.header.event_id);
             //println!("==> rb event id {}", rb_ev.header.event_id);
             if ev.mt_event.event_id == rb_ev.header.event_id {
               ev.rb_events.push(rb_ev.clone());
@@ -241,27 +255,49 @@ pub fn event_builder (m_trig_ev      : &cbc::Receiver<MasterTriggerEvent>,
               break;
             }
           }
-          if iter_ev == event_cache.len() {
-            error!("We dropped {}", rb_ev);
-          }
+          //if iter_ev == event_cache.len() {
+          //  info!("We dropped {}", rb_ev);
+          //}
           n_received += 1;
+          //if n_received % 10 == 0 {
+          //  println!("==> Received 10 more RBEvents");
+          //}
         }
       }
     }
-    for ev in event_cache.iter() {
-      if ev.is_complete() || ev.has_timed_out() {
-        let pack = TofPacket::from(ev);
-        match data_sink.send(pack) {
-          Err(err) => {
-            error!("Packet sending failed! Err {}", err);
-          }
-          Ok(_)    => {
-            debug!("Event with id {} send!", ev.mt_event.event_id);
+    if n_rbe_received_tot % 100 == 0 {
+      println!("==> Received {n_rbe_received_tot} RBEvents!");
+    }
+    if event_sending == 200 {
+      for ev in event_cache.iter_mut() {
+        //println!("{}",ev.age());
+        if ev.is_complete() {
+          // FIXME - clone
+          println!("{} -- n rbevents {}", ev.mt_event.get_n_rbs_expected(), ev.rb_events.len()); 
+          let pack = TofPacket::from(&ev.clone());
+          match data_sink.send(pack) {
+            Err(err) => {
+              error!("Packet sending failed! Err {}", err);
+            }
+            Ok(_)    => {
+              debug!("Event with id {} send!", ev.mt_event.event_id);
+              ev.valid = false;
+            }
           }
         }
+        if ev.has_timed_out() {
+          ev.valid = false;
+        }
       }
+      event_sending = 0;
+    } 
+    event_sending += 1;
+    // remove sent events! 
+    if clear_cache == 500 {
+      event_cache.retain(|ev| ev.valid);
+      clear_cache = 0;
     }
-
+    clear_cache += 1
     //if n_iter  == 500 {
     //  build_events_in_cache(&mut event_cache, timeout_micro,
     //                        pp_query,
