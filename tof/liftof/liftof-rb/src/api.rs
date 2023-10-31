@@ -212,7 +212,7 @@ pub fn rb_calibration(rc_to_runner    : &Sender<RunConfig>,
     }
   }
   let mut calibration = RBCalibrations::new(board_id);
-
+  calibration.serialize_event_data = true;
   // set up zmq socket
   let mut address_ip = String::from("tcp://");
   let this_board_ip = local_ip().expect("Unable to obtainl local board IP. Something is messed up!");
