@@ -2,16 +2,16 @@
 # GAPS ONLINE SOFTWARE
 # CMAKE BUILD SYSTEM
 #
-#  - dataclasses
-#  - UCLA waveform tools
+#  - dataclasses (rust/C++)
+#  - flight software (liftof)
 #
 #==========================================
 
 cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
-project(GAPS_ONLINE_SOFTWARE VERSION 0.7.0 LANGUAGES C CXX)
+project(GAPS_ONLINE_SOFTWARE VERSION 0.8 LANGUAGES C CXX)
 
 message(STATUS "Running cmake for ${CMAKE_PROJECT_NAME} softwere version ${GAPS_ONLINE_SOFTWARE_VERSION}")
-message(STATUS "-- Current release OMILU (Bluefin Trevali)")
+message(STATUS "-- Current release NIUHI (Tiger shark)")
 message(STATUS "Using build directory: ${PROJECT_BINARY_DIR}")
 set(CMAKE_WARN_DEPRECATED ON)
 

@@ -1,12 +1,8 @@
-## GAPS DB - Collaboration wide database with calibration/geometry information@UH Manoa
+# GAPS DB - Gaps meta information database
 
-To gain access to the database, please contact Achim (stoessl@hawaii.edu)
-Currently, the database is only used for TOF information.
-The tof db layout is based on the master spreadsheet
+* currenttly, there is a sqlite database based on Sydney's paddle spreadsheet
+  containing paddle connection information.
+* python django project for easy access of the db
 
-
-
-### 
-
-django project to manage TOF RBs/LTBs/Paddles and generate tof-manifest.json files
-
+[!NOTE]
+There is a postgre sql database on uhcra, which in the future will be synced with the local db.

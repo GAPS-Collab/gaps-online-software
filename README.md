@@ -1,9 +1,15 @@
 # gaps-online-software
 
-This is branch OMILU-0.7. The omilu is a bluefin trevali.
+This is branch NIUHI-0.8. [Niuhi is a tiger shark](https://dlnr.hawaii.gov/sharks/sharks/tiger-shark/).
+![Tiger shark](https://dlnr.hawaii.gov/sharks/files/2014/06/TigerShark.jpg) 
+Tiger sharks roam the waters of the Hawaiian islands. 
 This branch is not necessarily connected to a measurement 
 campaign, but to a series of tests at UCLA, eg to investigate
 [issue 6](https://github.com/GAPS-Collab/gaps-online-software/issues/6). 
+It is related to the previous release branch, OMILU-0.7 in the soirit of 
+carrying on the development, however, since we now entered a phase of 
+datataking, the OMILU branch won't be updated any more with new features
+and it is easier to keep 2 related branches in paralell.
 
 ## prerequisites
 
@@ -45,6 +51,7 @@ After that, you can have a look at the `cmake` cache with
 `ccmake .` in your build directory. If everything seems ok, execute:
 
 `make`
+`make doc`
 `make install`
 
 After that, the `build` directory can be discarded, but might be kept for 
