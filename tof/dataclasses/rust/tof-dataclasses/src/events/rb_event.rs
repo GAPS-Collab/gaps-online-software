@@ -839,14 +839,17 @@ impl fmt::Display for RBEvent {
       ch9_str += &k.to_string();
       ch9_str += ","
     }
+    ch9_str += " .. :";
+    ch9_str += &self.ch9_adc.len().to_string();
     ch9_str += "]";
     let mut ch_field = String::from("[\n");
     for (ch, vals) in self.adc.iter().enumerate() {
       let label = (ch + 1).to_string();
+      ch_field += "[ch ";
       ch_field += &ch.to_string();
       ch_field += "('";
       ch_field += &label;
-      ch_field += "')";
+      ch_field += "') ";
       for n in vals.iter().take(5) {
         ch_field += &n.to_string();
         ch_field += ",";
