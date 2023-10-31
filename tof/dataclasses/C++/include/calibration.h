@@ -37,6 +37,7 @@ struct RBCalibration {
 
   u8 rb_id;
   f32 d_v;
+  u32 timestamp;
   Vec<Vec<f32>> v_offsets;
   Vec<Vec<f32>> v_dips;
   Vec<Vec<f32>> v_incs;

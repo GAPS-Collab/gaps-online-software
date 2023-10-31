@@ -334,8 +334,9 @@ RBCalibration RBCalibration::from_bytestream(const Vec<u8> &stream,
   if (head != RBCalibration::HEAD)  {
     spdlog::error("No header signature found!");  
   }
-  calibration.rb_id    = stream[pos]; pos += 1;
-  calibration.d_v = Gaps::parse_f32(stream, pos);
+  calibration.rb_id         = stream[pos]; pos += 1;
+  calibration.d_v           = Gaps::parse_f32(stream, pos);
+  calibration.timestamp     = Gaps::parse_u32(stream, pos);
   bool serialize_event_data = Gaps::parse_bool(stream, pos);
   serialize_event_data 
       = serialize_event_data && RBCalibration::serialize_event_data;  

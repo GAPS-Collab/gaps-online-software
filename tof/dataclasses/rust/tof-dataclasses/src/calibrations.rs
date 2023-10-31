@@ -13,13 +13,18 @@ use std::fs::File;
 use std::io::{self, BufRead, BufReader};
 use std::path::Path;
 use std::fmt;
+use std::time::{SystemTime,
+                Duration,
+                UNIX_EPOCH};
 
 use crate::constants::{NWORDS, NCHN};
 use crate::errors::{WaveformError,
                     CalibrationError};
 use crate::serialization::{Serialization,
                            parse_bool,
+                           parse_u8,
                            parse_u16,
+                           parse_u32,
                            parse_f32,
                            SerializationError};
 use crate::events::RBEvent;
@@ -314,6 +319,7 @@ pub struct RBCalibrations {
   pub rb_id      : u8,
   pub d_v        : f32, // input voltage difference between 
                         // vcal_data and noi data
+  pub timestamp  : u32, // time the calibration was taken
   pub serialize_event_data : bool,
   // calibration constants
   pub v_offsets : [[f32;NWORDS];NCHN], // voltage offset
@@ -825,9 +831,15 @@ impl RBCalibrations {
   }
 
   pub fn new(rb_id : u8) -> Self {
+    // FIXME
+    let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap_or(Duration::from_secs(0));
+
+    //info!("Created new calibration object with timestamp {}",now.format("%Y-%m-%d %H:%M:%S").to_string());
+    let timestamp = now.as_secs() as u32;
     Self {
       rb_id     : rb_id,
       d_v       : 182.0, // FIXME - this needs to be a constant
+      timestamp : timestamp,
       serialize_event_data : false, // per default, don't serialize the data 
       v_offsets : [[0.0;NWORDS];NCHN], 
       v_dips    : [[0.0;NWORDS];NCHN], 
@@ -959,10 +971,9 @@ impl Serialization for RBCalibrations {
     if parse_u16(bytestream, pos) != Self::HEAD {
       return Err(SerializationError::HeadInvalid {});
     }
-    let board_id = u8::from_le_bytes([bytestream[*pos]]);
-    *pos += 1;
-    rb_cal.rb_id = board_id;
-    rb_cal.d_v   = parse_f32(bytestream, pos);
+    rb_cal.rb_id                = parse_u8(bytestream, pos);
+    rb_cal.d_v                  = parse_f32(bytestream, pos);
+    rb_cal.timestamp            = parse_u32(bytestream, pos);
     rb_cal.serialize_event_data = parse_bool(bytestream, pos);
     for ch in 0..NCHN {
       for k in 0..NWORDS {
@@ -991,6 +1002,7 @@ impl Serialization for RBCalibrations {
             rb_cal.noi_data.push(ev);            
           }
           Err(err) => {
+            error!("Unable to read RBEvent! {err}");
             //println!("from_bytestream failed!, err {err}");
             rb_cal.noi_data.push(broken_event.clone());
           }
@@ -1019,6 +1031,7 @@ impl Serialization for RBCalibrations {
     bs.extend_from_slice(&Self::HEAD.to_le_bytes());
     bs.extend_from_slice(&self.rb_id.to_le_bytes());
     bs.extend_from_slice(&self.d_v.to_le_bytes());
+    bs.extend_from_slice(&self.timestamp.to_le_bytes());
     let serialize_event_data = self.serialize_event_data as u8;
     bs.push(serialize_event_data);
     for ch in 0..NCHN {
@@ -1085,36 +1098,6 @@ impl fmt::Display for RBCalibrations {
   } 
 }
 
-#[cfg(feature = "random")]
-impl FromRandom for RBCalibrations {
-    
-  fn from_random() -> Self {
-    let mut cali   = Self::new(0);
-    let mut rng    = rand::thread_rng();
-    cali.rb_id     = rng.gen::<u8>();
-    cali.d_v       = rng.gen::<f32>(); 
-    cali.serialize_event_data = rng.gen::<bool>();
-    for ch in 0..NCHN {
-      for n in 0..NWORDS { 
-        cali.v_offsets[ch][n] = rng.gen::<f32>();
-        cali.v_dips   [ch][n] = rng.gen::<f32>(); 
-        cali.v_inc    [ch][n] = rng.gen::<f32>(); 
-        cali.tbin     [ch][n] = rng.gen::<f32>();
-      }
-    }
-    if cali.serialize_event_data {
-      for _ in 0..1000 {
-        let mut ev = RBEvent::from_random();
-        cali.vcal_data.push(ev);
-        ev = RBEvent::from_random();
-        cali.noi_data.push(ev);
-        ev = RBEvent::from_random();
-        cali.tcal_data.push(ev);
-      }
-    }
-    cali
-  }
-}
 
 impl From<&Path> for RBCalibrations {
   
@@ -1157,8 +1140,55 @@ impl From<&Path> for RBCalibrations {
 }
 
 #[cfg(feature = "random")]
+impl FromRandom for RBCalibrations {
+    
+  fn from_random() -> Self {
+    let mut cali   = Self::new(0);
+    let mut rng    = rand::thread_rng();
+    cali.rb_id     = rng.gen::<u8>();
+    cali.d_v       = rng.gen::<f32>(); 
+    cali.serialize_event_data = rng.gen::<bool>();
+    for ch in 0..NCHN {
+      for n in 0..NWORDS { 
+        cali.v_offsets[ch][n] = rng.gen::<f32>();
+        cali.v_dips   [ch][n] = rng.gen::<f32>(); 
+        cali.v_inc    [ch][n] = rng.gen::<f32>(); 
+        cali.tbin     [ch][n] = rng.gen::<f32>();
+      }
+    }
+    if cali.serialize_event_data {
+      for _ in 0..1000 {
+        let mut ev = RBEvent::from_random();
+        cali.vcal_data.push(ev);
+        ev = RBEvent::from_random();
+        cali.noi_data.push(ev);
+        ev = RBEvent::from_random();
+        cali.tcal_data.push(ev);
+      }
+    }
+    cali
+  }
+}
+
+#[cfg(feature = "random")]
 #[test]
-fn serialization_rbcalibration() {
+fn serialization_rbcalibration_noeventpayload() {
+  let mut calis = Vec::<RBCalibrations>::new();
+  for n in 0..100 {
+    let cali = RBCalibrations::from_random();
+    if cali.serialize_event_data {
+      continue;
+    }
+    calis.push(cali);
+    break;
+  }
+  let test = RBCalibrations::from_bytestream(&calis[0].to_bytestream(), &mut 0).unwrap();
+  assert_eq!(calis[0], test);
+}
+
+#[cfg(feature = "random")]
+#[test]
+fn serialization_rbcalibration_witheventpayload() {
   let mut calis = Vec::<RBCalibrations>::new();
   for n in 0..100 {
     let cali = RBCalibrations::from_random();

@@ -870,6 +870,7 @@ PYBIND11_MODULE(gaps_tof, m) {
        .def(py::init())
        .def_readonly("rb_id",      &RBCalibration::rb_id)
        .def_readonly("d_v",        &RBCalibration::d_v)
+       .def_readonly("timestamp",  &RBCalibration::timestamp)
        .def_readonly("v_offsets",  &RBCalibration::v_offsets)
        .def_readonly("v_incs",     &RBCalibration::v_incs)
        .def_readonly("v_dips",     &RBCalibration::v_dips)
