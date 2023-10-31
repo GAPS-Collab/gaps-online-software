@@ -413,6 +413,7 @@ PYBIND11_MODULE(gaps_tof, m) {
       .def("get_n_datachan"              , &RBEventHeader::get_n_datachan)
       //.def("get_timestamp_16_corrected",   &RBEventHeader::get_timestamp_16_corrected)
       .def_readonly("channel_mask"       , &RBEventHeader::channel_mask)   
+      .def_readonly("has_ch9"            , &RBEventHeader::has_ch9     )
       .def_readonly("stop_cell"          , &RBEventHeader::stop_cell   )   
       .def_readonly("crc32"              , &RBEventHeader::crc32       )   
       .def_readonly("dtap0"              , &RBEventHeader::dtap0       )   

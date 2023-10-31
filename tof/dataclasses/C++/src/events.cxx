@@ -54,12 +54,6 @@ Vec<u16> RBEventMemoryView::get_channel_adc(u8 channel) const {
     spdlog::error("Please remembmer channel ids are ranged from 1-9! Ch0 does not exist");
     return adc;
   }
-  if (channel > 9) {
-    spdlog::error("Please remembmer channel ids are ranged from 1-9! Ch {} does not exist", channel);
-    return adc;
-  }
-  //for (usize k=0;k<NWORDS;k++) { 
-  adc = Vec<u16>(std::begin(ch_adc[channel-1]), std::end(ch_adc[channel-1]));
   //  adc[k] = ch_adc[channel -1][k];
   //}
   return adc;
@@ -122,19 +116,20 @@ RBEventHeader::RBEventHeader() {
 
 std::string RBEventHeader::to_string() const {
   std::string repr = "<RBEventHeader";
-  repr += "\n\t rb id "           + std::to_string(rb_id)                 ;
-  repr += "\n\t event id "        + std::to_string(event_id)              ;
-  repr += "\n\t is locked "       + std::to_string(is_locked)             ;
-  repr += "\n\t is locked (1s) "  + std::to_string(is_locked_last_sec)    ;
-  repr += "\n\t lost trigger "    + std::to_string(lost_trigger)          ;
-  repr += "\n\t event fragment "  + std::to_string(event_fragment)        ;
-  repr += "\n\t channel mask "    + std::to_string(channel_mask)          ;
-  repr += "\n\t stop cell "       + std::to_string(stop_cell)             ;
-  repr += "\n\t crc32 "           + std::to_string(crc32)                 ;
-  repr += "\n\t dtap0 "           + std::to_string(dtap0)                 ;
+  repr += "\n\t rb id          " + std::to_string(rb_id)                 ;
+  repr += "\n\t has ch9        " + std::to_string(has_ch9);
+  repr += "\n\t event id       " + std::to_string(event_id)              ;
+  repr += "\n\t is locked      " + std::to_string(is_locked)             ;
+  repr += "\n\t is locked (1s) " + std::to_string(is_locked_last_sec)    ;
+  repr += "\n\t lost trigger   " + std::to_string(lost_trigger)          ;
+  repr += "\n\t event fragment " + std::to_string(event_fragment)        ;
+  repr += "\n\t channel mask   " + std::to_string(channel_mask)          ;
+  repr += "\n\t stop cell      " + std::to_string(stop_cell)             ;
+  repr += "\n\t crc32          " + std::to_string(crc32)                 ;
+  repr += "\n\t dtap0          " + std::to_string(dtap0)                 ;
   repr += "\n\t timestamp (48bit) " + std::to_string(timestamp_48)        ;
-  repr += "\n\t FPGA temp [C] "     + std::to_string(get_fpga_temp())     ;
-  repr += "\n\t DRS4 temp [C] "     + std::to_string(get_drs_temp())      ;
+  repr += "\n\t FPGA temp [C]  " + std::to_string(get_fpga_temp())     ;
+  repr += "\n\t DRS4 temp [C]  " + std::to_string(get_drs_temp())      ;
   repr += ">";
   return repr;
 }
@@ -147,6 +142,7 @@ RBEventHeader RBEventHeader::from_bytestream(const Vec<u8> &stream,
   RBEventHeader header;
   pos += 2;
   header.channel_mask        = Gaps::parse_u8(stream  , pos);   
+  header.has_ch9             = Gaps::parse_bool(stream, pos);
   header.stop_cell           = Gaps::parse_u16(stream , pos);  
   header.crc32               = Gaps::parse_u32(stream , pos);  
   header.dtap0               = Gaps::parse_u16(stream , pos);  
@@ -160,15 +156,19 @@ RBEventHeader RBEventHeader::from_bytestream(const Vec<u8> &stream,
   header.rb_id               = Gaps::parse_u8(stream  , pos);  
   header.timestamp_48        = Gaps::parse_u64(stream , pos);  
   header.broken              = Gaps::parse_bool(stream, pos);  
-  pos += 2; //FIXME TAIL & HEADER check
+  u16 tail                   = Gaps::parse_u16(stream, pos);
+  if (tail != RBEventHeader::TAIL) {
+    spdlog::error("Tail signature incorrect! Got tail {}", tail);
+  }
   return header; 
 }
 
 /*************************************/
 
 f32 RBEventHeader::get_fpga_temp() const {
-  f32 temp = (fpga_temp * 503.975/4096) - 273.15;
-  return temp;
+  f32 zynq_temp = (((fpga_temp & 4095) * 503.975) / 4096.0) - 273.15;
+  //f32 temp = (fpga_temp * 503.975/4096) - 273.15;
+  return zynq_temp;
 }
 
 /*************************************/
@@ -322,7 +322,24 @@ const Vec<u16>& RBEvent::get_channel_adc(u8 channel) const {
   if (!(channel_check(channel))) {
     return _empty_channel;
   }
+  if (channel == 9) {
+    return ch9_adc;
+  }
   return adc[channel -1]; 
+}
+  
+const Vec<u16>& RBEvent::get_channel_by_label(u8 channel) const {
+  if (channel == 9) {
+    return ch9_adc;
+  }
+  return adc[channel];
+}
+
+const Vec<u16>& RBEvent::get_channel_by_id(u8 channel) const {
+  if (channel == 8) {
+    return ch9_adc;
+  }
+  return adc[channel - 1];
 }
 
 /**********************************************************/
@@ -346,6 +363,14 @@ RBEvent RBEvent::from_bytestream(const Vec<u8> &stream,
     Vec<u8>::const_iterator end   = stream.begin() + pos + 2*NWORDS;    // 2*NWORDS because stream is Vec::<u8> and it is 16 bit words.
     Vec<u8> data(start, end);
     event.adc[ch] = u8_to_u16(data);
+    pos += 2*NWORDS;
+  }
+  if (event.header.has_ch9) {
+    spdlog::debug("Trying to parse ch9 data!");
+    Vec<u8>::const_iterator start = stream.begin() + pos;
+    Vec<u8>::const_iterator end   = stream.begin() + pos + 2*NWORDS;    // 2*NWORDS because stream is Vec::<u8> and it is 16 bit words.
+    Vec<u8> data(start, end);
+    event.ch9_adc = u8_to_u16(data);
     pos += 2*NWORDS;
   }
   u16 tail = Gaps::parse_u16(stream, pos);
