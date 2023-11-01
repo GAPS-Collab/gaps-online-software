@@ -23,6 +23,11 @@
 use std::fmt;
 use std::path::Path;
 
+extern crate crc;
+use crc::Crc;
+//extern crate libdeflater;
+//use libdeflater::Crc;
+
 use crate::packets::{TofPacket, PacketType};
 use crate::events::TofHit;
 use crate::constants::{NWORDS, NCHN};
@@ -48,6 +53,7 @@ use crate::FromRandom;
 extern crate rand;
 #[cfg(feature = "random")]
 use rand::Rng;
+
 
 /// Debug information for missing hits. 
 ///
@@ -688,7 +694,12 @@ impl RBEvent {
     -> Result<Self, SerializationError> {
     let mut event  = Self::new();
     let header     = RBEventHeader::extract_from_rbeventmemoryview(stream, pos)?;
-  
+ 
+    /// calculate crc32 sums
+    let crc        = crc::Crc::<u32>::new(&crc::CRC_32_ISO_HDLC);
+    //let crc        = crc::Crc::<u32>::new(&crc::CRC_32_BZIP2);
+    let mut ch_crc       : u32;
+    let mut ch_crc_check : u32;
     if header.broken {
       error!("Broken event {}! This won't have any channel data, since the event end markes is not at the expected position. Treat the header values with caution!", &header.event_id);
       event.header   = header;
@@ -706,22 +717,34 @@ impl RBEvent {
     }
 
     for ch in event.header.channel_packet_ids.iter() {
+      let mut dig    = crc.digest_with_initial(0);
       *pos += 2; // ch id
       if ch > &9 {
         error!("Channel ID is messed up. Not sure if this event can be saved!");
         *pos += 2*event.header.nwords;
         *pos += 4;
       } else {
+        //ch_crc_check = crc.checksum(&stream[*pos..*pos+2*event.header.nwords]); 
+        //let mut crc_test = Crc::new();
+        //crc_test.update(&stream[*pos..*pos+2*event.header.nwords]);
+        //let ch_crc_check = crc_test.sum();
         let mut this_ch_adc = Vec::<u16>::with_capacity(event.header.nwords);
         for _ in 0..event.header.nwords {  
-          this_ch_adc.push(0x3FFF & parse_u16(stream, pos));  
+          //let this_bytes = [stream[*pos ], stream[*pos + 1]]; 
+          let this_word  = [stream[*pos], stream[*pos+1]];
+          
+          this_ch_adc.push(0x3FFF & parse_u16(stream, pos));
+          dig.update(&this_word);
         }
         if ch < &8 {
           event.adc.push(this_ch_adc);  
         } else {
           event.ch9_adc = this_ch_adc;
         }
-        *pos += 4; // trailer
+        ch_crc = parse_u32_for_16bit_words(stream, pos);
+        ch_crc_check = dig.finalize();
+        //println!("==> Calculated crc32 {}, expected crc32 {}", ch_crc_check, ch_crc);
+        //*pos += 4; // trailer
       }
     }
     Ok(event)
@@ -829,7 +852,6 @@ impl Default for RBEvent {
 
 impl fmt::Display for RBEvent {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let active_channels = self.header.decode_channel_mask();
     let mut adc = Vec::<usize>::new();
     for k in 0..self.adc.len() {
       adc.push(self.adc[k].len());

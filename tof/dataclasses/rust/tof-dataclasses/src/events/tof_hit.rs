@@ -11,7 +11,6 @@ extern crate rand;
 #[cfg(feature="random")]
 use rand::Rng;
 
-const PADDLE_TIMEOUT : u64 = 30;
 
 /// Comprehensive paddle information
 ///

@@ -33,11 +33,11 @@ fn main() {
     }).init();
  
 
- let (tp_send, tp_rec): (cbc::Sender<TofPacket>, cbc::Receiver<TofPacket>) = cbc::unbounded(); 
+ let (tp_send, _tp_rec): (cbc::Sender<TofPacket>, cbc::Receiver<TofPacket>) = cbc::unbounded(); 
  let (master_ev_send, master_ev_rec): (cbc::Sender<MasterTriggerEvent>, cbc::Receiver<MasterTriggerEvent>) = cbc::unbounded(); 
   
-  let mut ltb_rb_map : DsiLtbRBMapping = HashMap::<u8,HashMap::<u8,HashMap::<u8,(u8,u8)>>>::new();
- let master_trigger_ip   = String::from("192.168.36.121");
+  let ltb_rb_map : DsiLtbRBMapping = HashMap::<u8,HashMap::<u8,HashMap::<u8,(u8,u8)>>>::new();
+ let master_trigger_ip   = String::from("10.0.1.10");
  let master_trigger_port = 50001usize;
  let worker_threads = ThreadPool::new(2);
  let (rate_to_main, _rate_from_mt) : (cbc::Sender<u32>, cbc::Receiver<u32>) = cbc::unbounded();
