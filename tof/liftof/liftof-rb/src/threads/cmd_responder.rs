@@ -3,12 +3,10 @@ use std::time::Instant;
 use crossbeam_channel::Sender;
 
 use tof_dataclasses::commands::{TofCommand,
-                                TofResponse};
+                                TofResponse, TofCommandResp};
 use tof_dataclasses::packets::{TofPacket,
                                PacketType};
 use tof_dataclasses::run::RunConfig;
-use tof_dataclasses::commands::RESP_SUCC_FINGERS_CROSSED;
-use tof_dataclasses::commands::RESP_ERR_NOTIMPLEMENTED;
 
 use tof_dataclasses::serialization::Serialization;
 
@@ -79,6 +77,8 @@ pub fn cmd_responder(cmd_server_ip             : String,
   // Originally I thought the RBs get pinged every x seconds and if we
   // don't see the ping, we reconnect to the socket. But I don't know
   // if that scenario actually occurs.
+  // Paolo: instead of leaving the connection always open we might
+  //  want to reopen it if its not reachable anymore (so like command-oriented)...
   warn!("TODO: Heartbeat feature not yet implemented on C&C side");
   let heartbeat_received = false;
   loop {
@@ -119,18 +119,10 @@ pub fn cmd_responder(cmd_server_ip             : String,
     // Or don't block? Set a timeout? I guess technically since we are not doing
     // anything else here, we can block until we get something, this saves resources.
     // (in that case the DONTWAIT can go away)
-    //
-    //match cmd_socket.poll(zmq::POLLIN, 1) {
-    //  Err(err) => {
-    //    warn!("Polling the 0MQ command socket failed! Err: {err}");
-    //    thread::sleep(one_milli);
-    //    continue;
-    //  }
-    //  Ok(in_waiting) => {
-    //    trace!("poll successful!");
-    //    if in_waiting == 0 {
-    //        continue;
-    //    }
+    // Paolo: I would say that either blocking or setting a timeout is the best opt.
+    //  Probably setting a timeout is the best practice since, else, we might die.
+    //  If we wouldn't block some other commands might be sent and get stuck in the
+    //  process (?).
     match cmd_socket.recv_bytes(zmq::DONTWAIT) {
       Err(err) => trace!("Problem receiving command over 0MQ ! Err {err}"),
       Ok(cmd_bytes)  => {
@@ -151,7 +143,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
                   Ok(cmd)  => {
                     // we got a valid tof command, forward it and wait for the 
                     // response
-                    let tof_resp  = TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED);
+                    let tof_resp  = TofResponse::GeneralFail(TofCommandResp::RespErrNotImplemented as u32);
                     let resp_not_implemented = prefix_board_id(&mut tof_resp.to_bytestream());
                     //let resp_not_implemented = TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED);
                     match cmd {
@@ -259,13 +251,13 @@ pub fn cmd_responder(cmd_server_ip             : String,
                           Err(err) => error!("Error initializing run! {err}"),
                           Ok(_)    => ()
                         };
-                        let resp_good = TofResponse::Success(RESP_SUCC_FINGERS_CROSSED);
+                        let resp_good = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed as u32);
                         match cmd_socket.send(resp_good.to_bytestream(),0) {
                           Err(err) => warn!("Can not send response! Err {err}"),
                           Ok(_)    => trace!("Resp sent!")
                         }
                       },
-                      TofCommand::DataRunEnd(_)   => {
+                      TofCommand::DataRunStop(_)   => {
                         println!("Received command to end run!");
                         // default is not active for run config
 

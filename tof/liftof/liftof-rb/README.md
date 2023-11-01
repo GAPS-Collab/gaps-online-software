@@ -45,7 +45,7 @@ as a start parameter with the `-r` (for `--run-configuration`) paramater.
 ### Configuration file
 
 The configration file is a `.json` file and currently
-(Version 0.7) looks like the following. Parameters are
+(Version 1.4) looks like the following. Parameters are
 described below
 
 ```
@@ -57,9 +57,7 @@ described below
   "trigger_poisson_rate"    : 0,
   "trigger_fixed_rate"      : 0,
   "latch_to_mtb"            : 1,
-  "active_channel_mask"     : 255,
-  "data_type"               : 10,
-  "data_format"             : 40,
+  "data_type"               : "Physics",
   "rb_buff_size"            : 2000
 }
 ```
@@ -83,10 +81,7 @@ described below
 * `trigger_poisson_rate`    : Internal Poisson trigger rate
 * `trigger_fixed_rate`      : Internal periodic (fixed rate) trigger rate
 * `latch_to_mtb`            : Latch RB to the MasterTriggerBoard distributed trigger
-* `active_channel_mask`     : channel mask in binary 0 = no channels, 255 all channels, ch3 = 4,
-                              etc.
 * `data_type`               : `tof_dataclasses::events::DataType` (see either there or below)
-* `data_format`             : `tof_dataclasses::events::DataFormat` (see either there or below)
 * `rb_buff_size`            : Size of the internal eventbuffers which are mapped to /dev/uio1 
                               and /dev/uio2. These buffers are maximum of about 64 MBytes.
                               Depending on the event rate, this means that the events might
@@ -102,24 +97,20 @@ The data format is a number code defined by `tof_dataclasses::events::DataFormat
 For available formats check there, or here is a copy (might be outdated)
 
 ```
-impl DataType {
-  pub const UNKNOWN               : u8 = 0; 
-  pub const VOLTAGECALIBRATION    : u8 = 10;
-  pub const TIMINGCALIBRATION     : u8 = 20;
-  pub const NOI                   : u8 = 30;
-  pub const PHYSICS               : u8 = 40;
+pub enum DataType {
+  VoltageCalibration = 0u8,
+  TimingCalibration  = 10u8,
+  Noi                = 20u8,
+  Physics            = 30u8,
+  RBTriggerPeriodic  = 40u8,
+  RBTriggerPoisson   = 50u8,
+  MTBTriggerPoisson  = 60u8,
+  Unknown            = 70u8,
+}
 ```
-E.g for regular data, set `data_type : 40` (physics data). If only headers should be consired, it is
-50 and for the old-style "blob" data this is the MEMORYVIEW option of 60.
+The representation is now independent on the internal u8 value, so one should specify
+a string in the field. E.g for regular data, set `"data_type" : "Physics"`.
 
-Similar for the data format:
-```
-  pub const UNKNOWN               : u8 = 0;
-  pub const DEFAULT               : u8 = 10;
-  pub const HEADERONLY            : u8 = 20;
-  pub const MEMORYVIEW            : u8 = 30;
-
-```
 This might get extended with more data types & formats, so stay tuned!
 
 
@@ -129,7 +120,7 @@ This might get extended with more data types & formats, so stay tuned!
 
 ### Connectivity
 
-The commiunication with a central C&C server (either `liftof-cc`, `liftof-tui` or technically a python script) is done
+The communication with a central C&C server (either `liftof-cc`, `liftof-tui` or technically a python script) is done
 through 0MQ. We are offering:
 
 * A 0MQ PUB socket at <local-ip>:42000. All data (raw data, monitoring), but also `TofResponse` will be published there

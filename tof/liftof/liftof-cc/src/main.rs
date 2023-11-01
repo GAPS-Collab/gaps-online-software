@@ -45,6 +45,7 @@ use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::manifest::get_rbs_from_sqlite;
 use tof_dataclasses::DsiLtbRBMapping;
 use tof_dataclasses::commands::TofCommand;
+use tof_dataclasses::commands::TofCommandCode;
 use liftof_lib::{master_trigger,
                  readoutboard_commander};
 use liftof_lib::color_log;
@@ -403,7 +404,8 @@ fn main() {
   let cmd_sender_c = cmd_sender.clone();
   ctrlc::set_handler(move || {
     println!("==> \u{1F6D1} received Ctrl+C! We will stop triggers and end the run!");
-    let end_run = TofCommand::DataRunEnd(42);
+    let end_run =
+      TofCommand::from_command_code(TofCommandCode::CmdDataRunStop,0u32);
     let tp = TofPacket::from(&end_run);
     match cmd_sender_c.send(tp) {
      Err(err) => error!("Can not send end run command! {err}"),

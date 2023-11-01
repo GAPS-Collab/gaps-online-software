@@ -23,6 +23,13 @@ To see output of potential `println!` commands, add `-- --nocapture` as an argue
 
 ## Unit tests
 
+- [ ] TODO: we might want to avoid throwing errors when building up enums/structs when we
+can set their values to "Unknown." This way the functions that use these structs
+can check for these Unknown and throw an error if necessary. Right now an error is
+thrown in some enum encoding doesn't make sense, but that should be "Unknown" as result.
+- [ ] TODO: convert everything to either tryfrom of from.
+- [ ] TODO: implement better unit test following the above approach.
+
 `cargo test --features=random`
 
 ## Integration tests

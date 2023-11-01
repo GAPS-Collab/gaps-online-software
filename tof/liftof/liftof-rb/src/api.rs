@@ -6,10 +6,12 @@ use std::fs::read_to_string;
 
 
 use tof_dataclasses::serialization::Serialization;
-#[cfg(feature="tofcontrol")]
-use tof_dataclasses::calibrations::RBCalibrations;
-#[cfg(feature="tofcontrol")]
-use tof_dataclasses::errors::CalibrationError;
+cfg_if::cfg_if! {
+  if #[cfg(feature = "tofcontrol")]  {
+  use tof_dataclasses::calibrations::RBCalibrations;
+  use tof_dataclasses::errors::CalibrationError;
+  }
+}
 use std::path::Path;
 use std::time::{Duration,
                 Instant};
@@ -32,21 +34,20 @@ use tof_dataclasses::run::RunConfig;
 use tof_dataclasses::serialization::get_json_from_file;
 
 // Takeru's tof-control
-#[cfg(feature="tofcontrol")]
-use tof_control::rb_control::rb_temp::RBtemp;
-#[cfg(feature="tofcontrol")]
-use tof_control::rb_control::rb_mag::RBmag;
-#[cfg(feature="tofcontrol")]
-use tof_control::rb_control::rb_vcp::RBvcp;
-#[cfg(feature="tofcontrol")]
-use tof_control::rb_control::rb_ph::RBph;
+cfg_if::cfg_if! {
+  if #[cfg(feature = "tofcontrol")]  {
+    use tof_control::rb_control::rb_temp::RBtemp;
+    use tof_control::rb_control::rb_mag::RBmag;
+    use tof_control::rb_control::rb_vcp::RBvcp;
+    use tof_control::rb_control::rb_ph::RBph;
 
-// for calibration
-#[cfg(feature="tofcontrol")]
-use tof_control::rb_control::rb_mode::{select_noi_mode,
-                                       select_vcal_mode,
-                                       select_tcal_mode,
-                                       select_sma_mode};
+    // for calibration
+    use tof_control::rb_control::rb_mode::{select_noi_mode,
+                                          select_vcal_mode,
+                                          select_tcal_mode,
+                                          select_sma_mode};
+  }
+}
 
 
 /// The poisson self trigger mode of the board
@@ -76,7 +77,7 @@ pub fn enable_poisson_self_trigger(rate : f32) {
 /// until no run is active anymore.
 ///
 /// Check the trigger enabled register
-/// periodically to find out wether
+/// periodically to find out whether
 /// a run is active or not.
 ///
 /// if n_errors is reached, decide the
@@ -375,7 +376,7 @@ pub fn get_runconfig(rcfile : &Path) -> RunConfig {
     }
     Ok(rc_from_file) => {
       println!("==> Found configuration file {}!", rcfile.display());
-      match RunConfig::from_json_serde(&rc_from_file) {
+      match serde_json::from_str(&rc_from_file) {
         Err(err) => panic!("Can not read json from configuration file. Error {err}"),
         Ok(rc_json) => {
           rc_json
@@ -456,22 +457,18 @@ pub fn monitoring(ch : &Sender<TofPacket>,
     // get tof-control data
     let mut moni_dt = RBMoniData::new();
     moni_dt.board_id = board_id as u8; 
-    #[cfg(feature="tofcontrol")]
-    let rb_temp = RBtemp::new();
-    #[cfg(feature="tofcontrol")]
-    let rb_mag  = RBmag::new();
-    #[cfg(feature="tofcontrol")]
-    let rb_vcp  = RBvcp::new();
-    #[cfg(feature="tofcontrol")]
-    let rb_ph   = RBph::new();
-    #[cfg(feature="tofcontrol")]
-    moni_dt.add_rbtemp(&rb_temp);
-    #[cfg(feature="tofcontrol")]
-    moni_dt.add_rbmag(&rb_mag);
-    #[cfg(feature="tofcontrol")]
-    moni_dt.add_rbvcp(&rb_vcp);
-    #[cfg(feature="tofcontrol")]
-    moni_dt.add_rbph(&rb_ph);
+    cfg_if::cfg_if! {
+      if #[cfg(feature = "tofcontrol")]  {
+        let rb_temp = RBtemp::new();
+        let rb_mag  = RBmag::new();
+        let rb_vcp  = RBvcp::new();
+        let rb_ph   = RBph::new();
+        moni_dt.add_rbtemp(&rb_temp);
+        moni_dt.add_rbmag(&rb_mag);
+        moni_dt.add_rbvcp(&rb_vcp);
+        moni_dt.add_rbph(&rb_ph);
+      }
+    }
     
     let rate_query = get_trigger_rate();
     match rate_query {

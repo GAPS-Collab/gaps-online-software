@@ -20,7 +20,6 @@ use colored::{Colorize, ColoredString};
 
 use serde_json::Value;
 
-extern crate json;
 use log::Level;
 use macaddr::MacAddr6;
 use netneighbours::get_mac_to_ip_map;

@@ -332,7 +332,7 @@ impl FromRandom for TofOperationMode {
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct RBCommand {
   pub rb_id        : u8, // receipient
-  pub tof_command_code : u8,
+  pub command_code : u8,
   pub channel_mask : u8,
   pub payload      : u32,
 }
@@ -342,7 +342,7 @@ impl RBCommand {
   pub fn new() -> Self {
     Self {
       rb_id        : 0,
-      tof_command_code : 0,
+      command_code : 0,
       channel_mask : 0,
       payload      : 0,
     }
@@ -352,7 +352,7 @@ impl RBCommand {
     parse_u32(stream, &mut 3)
   }
 
-  pub fn tof_command_code_to_string(cc : u8) -> String {
+  pub fn command_code_to_string(cc : u8) -> String {
     match cc {
       Self::REQUEST_EVENT => {
         return String::from("GetReducedDataPacket");
@@ -382,7 +382,7 @@ impl From<&TofPacket> for RBCommand {
 }
 impl fmt::Display for RBCommand {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let cc = RBCommand::tof_command_code_to_string(self.tof_command_code);
+    let cc = RBCommand::command_code_to_string(self.command_code);
     write!(f, "<RBCommand: {}; RB ID {}; CH MASK {}; PAYLOAD {}>", cc, self.rb_id, self.channel_mask, self.payload)
   }
 }
@@ -405,7 +405,7 @@ impl Serialization for RBCommand {
     Self::verify_fixed(stream, pos)?;
     let mut command = RBCommand::new();
     command.rb_id        = parse_u8(stream, pos);
-    command.tof_command_code = parse_u8(stream, pos);
+    command.command_code = parse_u8(stream, pos);
     command.channel_mask = parse_u8(stream, pos);
     command.payload = parse_u32(stream, pos);
     *pos += 2;
@@ -416,7 +416,7 @@ impl Serialization for RBCommand {
     let mut stream = Vec::<u8>::with_capacity(9);
     stream.extend_from_slice(&RBCommand::HEAD.to_le_bytes());
     stream.push(self.rb_id);
-    stream.push(self.tof_command_code);
+    stream.push(self.command_code);
     stream.push(self.channel_mask);
     stream.extend_from_slice(&self.payload.to_le_bytes());
     stream.extend_from_slice(&RBCommand::TAIL.to_le_bytes());
@@ -430,7 +430,7 @@ impl FromRandom for RBCommand {
     let mut rng = rand::thread_rng();
     Self {
       rb_id        : rng.gen::<u8>(),
-      tof_command_code : rng.gen::<u8>(),
+      command_code : rng.gen::<u8>(),
       channel_mask : rng.gen::<u8>(),
       payload      : rng.gen::<u32>(),
     }
@@ -509,7 +509,7 @@ impl TofCommand {
     let mut bytes = [0u8;TofCommand::SIZE];
     bytes[0] = 0xAA;
     bytes[1] = 0xAA;
-    bytes[2] = TofCommand::to_tof_command_code(&self)
+    bytes[2] = TofCommand::to_command_code(&self)
       .expect("This can't fail, since this is implemented on MYSELF and I am a TofCommand!") as u8; 
     let value_bytes = self.get_value().to_le_bytes();
    
@@ -527,7 +527,7 @@ impl TofCommand {
     let mut stream : Vec::<u8> = vec![0,0,0,0,0,0,0,0,0];
     stream[0] = 0xAA;
     stream[1] = 0xAA;
-    stream[2] = TofCommand::to_tof_command_code(&self)
+    stream[2] = TofCommand::to_command_code(&self)
       .expect("This can't fail, since this is implemented on MYSELF and I am a TofCommand!") as u8; 
     let value_bytes = self.get_value().to_le_bytes();
    
@@ -575,7 +575,7 @@ impl TofCommand {
 
   /// Generate a TofCommand from the specific bytecode
   /// representation
-  pub fn from_tof_command_code(cc : TofCommandCode, value : u32) -> TofCommand {
+  pub fn from_command_code(cc : TofCommandCode, value : u32) -> TofCommand {
     match cc {
       TofCommandCode::CmdPing                    => TofCommand::Ping                    (0u32),
       TofCommandCode::CmdPowerOff                => TofCommand::PowerOff                (value),
@@ -606,7 +606,7 @@ impl TofCommand {
   }
     
   /// Translate a TofCommand into its specific byte representation
-  pub fn to_tof_command_code(cmd : &TofCommand) -> Option<TofCommandCode> {
+  pub fn to_command_code(cmd : &TofCommand) -> Option<TofCommandCode> {
     match cmd {
       TofCommand::Ping                    (_) => Some(TofCommandCode::CmdPing),
       TofCommand::PowerOff                (_) => Some(TofCommandCode::CmdPowerOff),
@@ -667,7 +667,7 @@ impl From<(u8, u32)> for TofCommand {
   fn from(pair : (u8, u32)) -> TofCommand {
     let (input, value) = pair;
     trace!("Got in input {:?}", pair);
-    TofCommand::from_tof_command_code(TofCommandCode::try_from(input).unwrap(), value)
+    TofCommand::from_command_code(TofCommandCode::try_from(input).unwrap(), value)
   }
 }
 
