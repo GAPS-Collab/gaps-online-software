@@ -25,7 +25,7 @@ use std::process::exit;
 
 use tof_dataclasses::packets::{PacketType,
                                TofPacket};
-use tof_dataclasses::events::{MasterTofEvent,
+use tof_dataclasses::events::{TofEvent,
                               RBEvent,
                               MasterTriggerMapping,
                               MasterTriggerEvent};
@@ -184,7 +184,7 @@ fn main() {
             if seen_evids.contains(&mtp.event_id) {
               continue;
             }
-            let mut master_tof_event = MasterTofEvent::new();
+            let mut master_tof_event = TofEvent::new();
             let rb_ids_debug = mapping.get_rb_ids_debug(&mtp, false);
             mtp_events_tot += 1;
             if args.no_missing_hits {
@@ -318,7 +318,7 @@ fn main() {
   } else {
     println!("=> Will merge events without master trigger information!");
     let mut alleventids = Vec::<u32>::new();
-    //let mut tofevents   = Vec::<MasterTofEvent>::new();
+    //let mut tofevents   = Vec::<TofEvent>::new();
     for rb in &available_rbs {
       //println!("RB {}", rb);
       alleventids.extend(robin_readers.get(&rb).expect("We do not have a file for RB").event_ids_in_cache());
@@ -334,7 +334,7 @@ fn main() {
     let mut n_processed = 0u64;
     let mut n_tofpackets = 0u64;
     for ev in alleventids {
-      let mut t_event   = MasterTofEvent::new();
+      let mut t_event   = TofEvent::new();
       let mut mt_event  = MasterTriggerEvent::default();
       mt_event.event_id = ev;
       t_event.mt_event = mt_event;

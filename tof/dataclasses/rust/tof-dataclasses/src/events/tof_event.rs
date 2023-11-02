@@ -9,10 +9,12 @@
 use std::time::Instant;
 use std::fmt;
 
-#[cfg(feature = "random")]
-use crate::FromRandom;
-#[cfg(feature = "random")]
-use rand::Rng;
+cfg_if::cfg_if! {
+  if #[cfg(feature = "random")]  {
+    use crate::FromRandom;
+    use rand::Rng;
+  }
+}
 
 use crate::constants::EVENT_TIMEOUT;
 use crate::serialization::{Serialization,
@@ -27,72 +29,35 @@ use crate::events::{MasterTriggerEvent,
                     RBMissingHit};
 
 // This looks like a TODO
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 pub enum CompressionLevel {
-  Unknown,
-  None,
+  Unknown = 0,
+  None    = 10,
 }
 
 impl fmt::Display for CompressionLevel {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let r = self.string_repr();
+    let r = serde_json::to_string(self).unwrap_or(
+      String::from("Error: cannot unwrap this CompressionLevel"));
     write!(f, "<CompressionLevel: {}>", r)
   }
 }
 
-impl CompressionLevel {
+impl TryFrom<u8> for CompressionLevel {
+  type Error = &'static str;
 
-  pub const UNKNOWN : u8 = 0;
-  pub const NONE    : u8 = 10;
-
-  pub fn to_u8(&self) -> u8 {
-    let result : u8;
-    match self {
-      CompressionLevel::Unknown => {
-        result = CompressionLevel::UNKNOWN;
-      }
-      CompressionLevel::None => {
-        result = CompressionLevel::NONE;
-      }
+  // I am not sure about this hard coding, but the code
+  //  looks nicer - Paolo
+  fn try_from(value: u8) -> Result<Self, Self::Error> {
+    match value {
+      0u8  => Ok(CompressionLevel::Unknown),
+      10u8 => Ok(CompressionLevel::None),
+      _    => Err("I am not sure how to convert this value!")
     }
-    result
-  }
-  
-  pub fn from_u8(code : &u8) -> Self {
-    let mut result = CompressionLevel::Unknown;
-    match *code {
-      CompressionLevel::UNKNOWN => {
-        result = CompressionLevel::Unknown;
-      }
-      CompressionLevel::NONE => {
-        result = CompressionLevel::None;
-      }
-      _ => {
-        error!("Unknown compression level {}!", code);
-      }
-    }
-    result
-  }
-
-  /// String representation of the enum
-  ///
-  /// This is basically the enum type as 
-  /// a string.
-  pub fn string_repr(&self) -> String { 
-    let repr : String;
-    match self {
-      CompressionLevel::Unknown => { 
-        repr = String::from("Unknown");
-      }
-      CompressionLevel::None => {
-        repr = String::from("None");
-      }
-    }
-    repr
   }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 pub enum EventQuality {
   Unknown        =  0,
   Silver         = 10,
@@ -103,85 +68,26 @@ pub enum EventQuality {
 
 impl fmt::Display for EventQuality {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let r = self.string_repr();
+    let r = serde_json::to_string(self).unwrap_or(
+      String::from("Error: cannot unwrap this EventQuality"));
     write!(f, "<EventQuality: {}>", r)
   }
 }
 
-impl EventQuality {
-  pub const UNKNOWN        : u8 =  0;
-  pub const SILVER         : u8 = 10;
-  pub const GOLD           : u8 = 20;
-  pub const DIAMOND        : u8 = 30;
-  pub const FOURLEAFCLOVER : u8 = 40;
-  
-  pub fn to_u8(&self) -> u8 {
-    let result : u8;
-    match self {
-      EventQuality::Unknown => {
-        result = EventQuality::UNKNOWN;
-      }
-      EventQuality::Silver => {
-        result = EventQuality::SILVER;
-      }
-      EventQuality::Gold => {
-        result = EventQuality::GOLD;
-      }
-      EventQuality::Diamond => {
-        result = EventQuality::DIAMOND;
-      }
-      EventQuality::FourLeafClover => {
-        result = EventQuality::FOURLEAFCLOVER;
-      }
-    }
-    result
-  }
-  
-  pub fn from_u8(code : &u8) -> Self {
-    let mut result = EventQuality::Unknown;
-    match *code {
-      EventQuality::UNKNOWN => {
-        result = EventQuality::Unknown;
-      }
-      EventQuality::SILVER => {
-        result = EventQuality::Silver;
-      }
-      EventQuality::GOLD => {
-        result = EventQuality::Gold;
-      }
-      EventQuality::DIAMOND => {
-        result = EventQuality::Diamond;
-      }
-      EventQuality::FOURLEAFCLOVER => {
-        result = EventQuality::FourLeafClover;
-      }
-      _ => {
-        error!("Unknown event quality {}!", code);
-      }
-    }
-    result
-  }
+impl TryFrom<u8> for EventQuality {
+  type Error = &'static str;
 
-  pub fn string_repr(&self) -> String { 
-    let repr : String;
-    match self {
-      EventQuality::Unknown => { 
-        repr = String::from("Unknown");
-      }
-      EventQuality::Silver => {
-        repr = String::from("Silver");
-      }
-      EventQuality::Gold => {
-        repr = String::from("Gold");
-      }
-      EventQuality::Diamond => {
-        repr = String::from("Diamond");
-      }
-      EventQuality::FourLeafClover => {
-        repr = String::from("FourLeafClover");
-      }
+  // I am not sure about this hard coding, but the code
+  //  looks nicer - Paolo
+  fn try_from(value: u8) -> Result<Self, Self::Error> {
+    match value {
+      0u8  => Ok(EventQuality::Unknown),
+      10u8 => Ok(EventQuality::Silver),
+      20u8 => Ok(EventQuality::Gold),
+      30u8 => Ok(EventQuality::Diamond),
+      40u8 => Ok(EventQuality::FourLeafClover),
+      _    => Err("I am not sure how to convert this value!")
     }
-    repr
   }
 }
 
@@ -301,8 +207,8 @@ impl Serialization for TofEvent {
   fn to_bytestream(&self) -> Vec<u8> {
     let mut stream = Vec::<u8>::new();
     stream.extend_from_slice(&Self::HEAD.to_le_bytes());
-    stream.extend_from_slice(&self.compression_level.to_u8().to_le_bytes());
-    stream.extend_from_slice(&self.quality.to_u8().to_le_bytes());
+    stream.extend_from_slice(&(self.compression_level as u8).to_le_bytes());
+    stream.extend_from_slice(&(self.quality as u8).to_le_bytes());
     stream.extend_from_slice(&self.header.to_bytestream());
     stream.extend_from_slice(&self.mt_event.to_bytestream());
     let sizes_header = self.construct_sizes_header();
@@ -323,8 +229,8 @@ impl Serialization for TofEvent {
     let mut event = Self::new();
     let head_pos = search_for_u16(Self::HEAD, stream, *pos)?; 
     *pos = head_pos + 2;
-    event.compression_level = CompressionLevel::from_u8(&parse_u8(stream, pos));
-    event.quality           = EventQuality::from_u8(&parse_u8(stream, pos));
+    event.compression_level = CompressionLevel::try_from(parse_u8(stream, pos)).unwrap();
+    event.quality           = EventQuality::try_from(parse_u8(stream, pos)).unwrap();
     event.header            = TofEventHeader::from_bytestream(stream, pos)?;
     event.mt_event          = MasterTriggerEvent::from_bytestream(stream, pos)?;
     let v_sizes = Self::decode_size_header(&parse_u32(stream, pos));

@@ -45,9 +45,6 @@ pub enum PacketQuality {
   UtterRubish
 }
 
-
-
-
 /// The most basic of all packets
 ///  
 /// A type and a payload. This wraps
@@ -62,7 +59,7 @@ pub enum PacketQuality {
 ///
 /// => Fixed size is 13
 ///
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, Clone)]
 pub struct TofPacket {
   pub packet_type      : PacketType,
   pub payload          : Vec<u8>,
@@ -79,7 +76,6 @@ pub struct TofPacket {
   pub creation_time      : Instant,
   pub valid              : bool, // will be always valid, unless invalidated
 }
-
 
 impl fmt::Display for TofPacket {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -99,6 +95,17 @@ impl fmt::Display for TofPacket {
 impl Default for TofPacket {
   fn default() -> Self {
     Self::new()
+  }
+}
+
+impl PartialEq for TofPacket {
+  fn eq(&self, other: &Self) -> bool {
+    (self.packet_type == other.packet_type)           &&
+    (self.payload == other.payload)                   &&
+    (self.is_multi_packet == other.is_multi_packet)   &&
+    (self.no_write_to_disk == other.no_write_to_disk) &&
+    (self.no_send_over_nw == other.no_send_over_nw)   &&
+    (self.valid == other.valid)
   }
 }
 
@@ -258,9 +265,9 @@ impl Serialization for TofPacket {
     let packet_type_enc = stream[*pos];
     let packet_type : PacketType;
     *pos += 1;
-    match PacketType::from_u8(packet_type_enc) {
-      Some(pt) => packet_type = pt,
-      None => {
+    match PacketType::try_from(packet_type_enc) {
+      Ok(pt) => packet_type = pt,
+      Err(_) => {
         error!("Can not decode packet with packet type {}", packet_type_enc);
         return Err(SerializationError::UnknownPayload);}
     }
@@ -287,7 +294,7 @@ impl Serialization for TofPacket {
     }
     let mut bytestream = Vec::<u8>::with_capacity(6 + self.payload.len());
     bytestream.extend_from_slice(&TofPacket::HEAD.to_le_bytes());
-    let p_type = PacketType::as_u8(&self.packet_type);
+    let p_type = self.packet_type as u8;
     bytestream.push(p_type);
     // payload size of 32 bit accomodates up to 4 GB packet
     // a 16 bit size would only hold 65k, which might be not

@@ -202,7 +202,7 @@ impl fmt::Display for RBMoniData {
            \t ZYNQ 3.3V         Power:  {:.3}  [V] | {:.3} [A] | {:.3} [W]
            \t 3.3V              Power:  {:.3}  [V] | {:.3} [A] | {:.3} [W]
            \t 3.5V              Power:  {:.3}  [V] | {:.3} [A] | {:.3} [W]
-           \t -1.5V             Power: {:.3}  [V] | {:.3} [A] | {:.3} [W]
+           \t -1.5V             Power:  {:.3}  [V] | {:.3} [A] | {:.3} [W]
            \t DRS4 Digital 2.5V Power:  {:.3}  [V] | {:.3} [A] | {:.3} [W]
            \t DRS4 Analog 2.5V  Power:  {:.3}  [V] | {:.3} [A] | {:.3} [W]
            \t ADC Digital 2.5V  Power:  {:.3}  [V] | {:.3} [A] | {:.3} [W]

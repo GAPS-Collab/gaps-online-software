@@ -14,11 +14,6 @@ extern crate rand;
 #[cfg(feature = "random")]
 use rand::Rng;
 
-
-
-extern crate serde;
-extern crate serde_json;
-
 /// A collection of parameters for tof runs
 ///
 /// * active_channel_mask : 8bit mask (1bit/channel)
@@ -63,16 +58,6 @@ impl RunConfig {
 
   pub fn runs_forever(&self) -> bool {
     self.nevents == 0 
-  }
-
-  pub fn from_json_serde(config: &str) -> serde_json::Result<Self> {
-    let rc = serde_json::from_str(config)?;
-    Ok(rc)
-  }
-
-  pub fn to_json_serde(&self) -> serde_json::Result<String> {
-    let s = serde_json::to_string(self)?;
-    Ok(s)
   }
 }
 
@@ -177,8 +162,9 @@ fn serialization_runconfig() {
   let test = RunConfig::from_bytestream(&cfg.to_bytestream(), &mut 0).unwrap();
   assert_eq!(cfg, test);
 
-  let cfg_json = RunConfig::to_json_serde(&cfg).unwrap();
-  let test_json = RunConfig::from_json_serde(&cfg_json).unwrap();
+  let cfg_json = serde_json::to_string(&cfg).unwrap();
+  let test_json 
+    = serde_json::from_str::<RunConfig>(&cfg_json).unwrap();
   assert_eq!(cfg, test_json);
 }
 

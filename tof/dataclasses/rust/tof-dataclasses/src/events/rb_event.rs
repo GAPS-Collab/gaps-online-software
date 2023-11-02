@@ -47,12 +47,13 @@ use crate::serialization::{u16_to_u8,
 use crate::events::DataType;
 use crate::errors::UserError;
 
-#[cfg(feature = "random")] 
-use crate::FromRandom;
-#[cfg(feature = "random")]
-extern crate rand;
-#[cfg(feature = "random")]
-use rand::Rng;
+cfg_if::cfg_if! {
+  if #[cfg(feature = "random")]  {
+    use crate::FromRandom;
+    extern crate rand;
+    use rand::Rng;
+  }
+}
 
 
 /// Debug information for missing hits. 

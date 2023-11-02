@@ -3,131 +3,114 @@
 /// This needs to be kept in sync with the C++ API
 use std::fmt;
 
-/// Types of serializable data structures used
-/// throughout the tof system
-#[derive(Debug, PartialEq, Clone)]
-pub enum PacketType {
-  Unknown       , 
-  TofEvent      ,
-  Monitor       ,    // needs to go away
-  MasterTrigger ,    // needs to be renamed to either MasterTriggerEvent or MTEvent
-  HeartBeat     ,    // might probably go away
-  RBEventHeader ,    // needs to go away
-  RBEvent       ,
-  RBEventMemoryView, // needs to go away
-  TofCommand    ,
-  RBCommand     ,
-  RBMoni        ,
-  MonitorTofCmp ,
-  MonitorMtb    ,
-  RBCalibration ,
+cfg_if::cfg_if! {
+  if #[cfg(feature = "random")]  {
+    use crate::FromRandom;
+    extern crate rand;
+    use rand::Rng;
+  }
 }
 
-impl PacketType {
-  pub const UNKNOWN           : u8 =  0;
-  pub const RBEVENT           : u8 = 20;
-  pub const TOFEVENT          : u8 = 21;
-  // not specific enough, deprecated. Use the packet
-  // types for monitor packets below
-  pub const MONITOR           : u8 = 30;
-  pub const HEARTBEAT         : u8 = 40;
-  pub const MT                : u8 = 60;
-  pub const RBEVENTHEADER     : u8 = 70;
-  // monitoring packets
-  pub const TOFCMP_MONI       : u8 = 80;
-  pub const MTB_MONI          : u8 = 90;
-  pub const RB_MONI           : u8 = 100;
-  pub const RBEVENTMEMORYVIEW : u8 = 120;
-  pub const RBCALIBRATION     : u8 = 130;
-  pub const TOFCOMMAND        : u8 = 140;
-  pub const RBCOMMAND         : u8 = 150;
-
-  pub fn as_u8(packet_type : &PacketType)   -> u8 {
-    match packet_type {
-      PacketType::Unknown           => Self::UNKNOWN,
-      PacketType::RBEvent           => Self::RBEVENT,
-      PacketType::RBEventHeader          => Self::RBEVENTHEADER,
-      PacketType::RBEventMemoryView => Self::RBEVENTMEMORYVIEW,
-      PacketType::TofEvent          => Self::TOFEVENT,
-      PacketType::Monitor           => Self::MONITOR,
-      PacketType::HeartBeat         => Self::HEARTBEAT,
-      PacketType::MasterTrigger     => Self::MT,
-      PacketType::RBMoni            => Self::RB_MONI,
-      PacketType::MonitorTofCmp     => Self::TOFCMP_MONI,
-      PacketType::MonitorMtb        => Self::MTB_MONI,
-      PacketType::RBCalibration     => Self::RBCALIBRATION,
-      PacketType::RBCommand         => Self::RBCOMMAND,
-      PacketType::TofCommand        => Self::TOFCOMMAND,
-    }
-  }
-
-  pub fn from_u8(value : u8) -> Option<PacketType> {
-    match value {
-      Self::UNKNOWN           => Some(PacketType::Unknown),  
-      Self::RBEVENT           => Some(PacketType::RBEvent), 
-      Self::TOFEVENT          => Some(PacketType::TofEvent),
-      Self::MONITOR           => Some(PacketType::Monitor), 
-      Self::HEARTBEAT         => Some(PacketType::HeartBeat),
-      Self::MT                => Some(PacketType::MasterTrigger),
-      Self::RBEVENTHEADER     => Some(PacketType::RBEventHeader),
-      Self::RBEVENTMEMORYVIEW => Some(PacketType::RBEventMemoryView),
-      Self::RB_MONI           => Some(PacketType::RBMoni),
-      Self::MTB_MONI          => Some(PacketType::MonitorMtb),
-      Self::TOFCMP_MONI       => Some(PacketType::MonitorTofCmp),
-      Self::RBCALIBRATION     => Some(PacketType::RBCalibration),
-      Self::TOFCOMMAND        => Some(PacketType::TofCommand),
-      Self::RBCOMMAND         => Some(PacketType::RBCommand),
-      _   => {
-        error!("Can not decode packet type of {}!", value); 
-        None
-      },
-    }
-  }
+/// Types of serializable data structures used
+/// throughout the tof system
+#[derive(Debug, PartialEq, Clone, Copy, serde::Deserialize, serde::Serialize)]
+#[repr(u8)]
+pub enum PacketType {
+  Unknown            = 0u8, 
+  TofEvent           = 20u8,
+  Monitor            = 21u8,    // needs to go away
+  MasterTrigger      = 30u8,    // needs to be renamed to either MasterTriggerEvent or MTEvent
+  HeartBeat          = 40u8,    // might probably go away
+  RBEventHeader      = 60u8,    // needs to go away
+  RBEvent            = 70u8,
+  RBEventMemoryView  = 80u8, // needs to go away
+  TofCommand         = 90u8,
+  RBCommand          = 100u8,
+  RBMoni             = 120u8,
+  MonitorTofCmp      = 130u8,
+  MonitorMtb         = 140u8,
+  RBCalibration      = 150u8,
 }
 
 impl fmt::Display for PacketType {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    
-    let repr : String;
-    match self {
-      PacketType::Unknown           => { repr = String::from("Unknown")     },
-      PacketType::RBEvent           => { repr = String::from("RBEvent")     },
-      PacketType::RBEventMemoryView => { repr = String::from("RBEventMemoryView") },
-      PacketType::TofEvent          => { repr = String::from("TOFEvent")    },
-      PacketType::Monitor           => { repr = String::from("Monitor")     },
-      PacketType::HeartBeat         => { repr = String::from("HeartBeat")   },
-      PacketType::MasterTrigger     => { repr = String::from("MasterTrigger") },
-      PacketType::RBEventHeader          => { repr = String::from("RBEventHeader")    },
-      PacketType::RBMoni            => { repr = String::from("RBMoni")     },
-      PacketType::MonitorTofCmp     => { repr = String::from("TOFCMPMoni") },
-      PacketType::MonitorMtb        => { repr = String::from("MTBMoni")    },
-      PacketType::RBCalibration     => { repr = String::from("RBCalibration")},
-      PacketType::TofCommand        => { repr = String::from("TofCommand")},
-      PacketType::RBCommand         => { repr = String::from("RBCommand")},
+    let r = serde_json::to_string(self).unwrap_or(
+      String::from("Error: cannot unwrap this PacketType"));
+    write!(f, "<PacketType: {}>", r)
+  }
+}
+
+impl TryFrom<u8> for PacketType {
+  type Error = &'static str;
+
+  // I am not sure about this hard coding, but the code
+  //  looks nicer - Paolo
+  fn try_from(value: u8) -> Result<Self, Self::Error> {
+    match value {
+      0u8   => Ok(PacketType::Unknown),
+      20u8  => Ok(PacketType::TofEvent),
+      21u8  => Ok(PacketType::Monitor),
+      30u8  => Ok(PacketType::MasterTrigger),
+      40u8  => Ok(PacketType::HeartBeat),
+      60u8  => Ok(PacketType::RBEventHeader),
+      70u8  => Ok(PacketType::RBEvent),
+      80u8  => Ok(PacketType::RBEventMemoryView),
+      90u8  => Ok(PacketType::TofCommand),
+      100u8 => Ok(PacketType::RBCommand),
+      120u8 => Ok(PacketType::RBMoni),
+      130u8 => Ok(PacketType::MonitorTofCmp),
+      140u8 => Ok(PacketType::MonitorMtb),
+      150u8 => Ok(PacketType::RBCalibration),
+      _     => Err("I am not sure how to convert this value!")
     }
-    write!(f, "<PacketType {}>", repr)
+  }
+}
+
+#[cfg(feature = "random")]
+impl FromRandom for PacketType {
+  
+  fn from_random() -> Self {
+    let choices = [
+      PacketType::Unknown,
+      PacketType::TofEvent,
+      PacketType::Monitor,
+      PacketType::MasterTrigger,
+      PacketType::HeartBeat,
+      PacketType::RBEventHeader,
+      PacketType::RBEvent,
+      PacketType::RBEventMemoryView,
+      PacketType::TofCommand,
+      PacketType::RBCommand,
+      PacketType::RBMoni,
+      PacketType::MonitorTofCmp,
+      PacketType::MonitorMtb,
+      PacketType::RBCalibration
+    ];
+    let mut rng  = rand::thread_rng();
+    let idx = rng.gen_range(0..choices.len());
+    choices[idx]
   }
 }
 
 #[test]
 fn test_packet_types() {
   let mut type_codes = Vec::<u8>::new();
-  type_codes.push(PacketType::UNKNOWN          ); 
-  type_codes.push(PacketType::RBEVENT          ); 
-  type_codes.push(PacketType::TOFEVENT         ); 
-  type_codes.push(PacketType::MONITOR          ); 
-  type_codes.push(PacketType::HEARTBEAT        ); 
-  type_codes.push(PacketType::MT               ); 
-  type_codes.push(PacketType::RBEVENTHEADER    ); 
-  type_codes.push(PacketType::TOFCMP_MONI      ); 
-  type_codes.push(PacketType::MTB_MONI         ); 
-  type_codes.push(PacketType::RB_MONI          );
-  type_codes.push(PacketType::RBEVENTMEMORYVIEW);
-  type_codes.push(PacketType::RBCALIBRATION    );
-  type_codes.push(PacketType::RBCOMMAND        );
-  type_codes.push(PacketType::TOFCOMMAND       );
+  type_codes.push(PacketType::Unknown as u8);
+  type_codes.push(PacketType::TofEvent as u8);
+  type_codes.push(PacketType::Monitor as u8);
+  type_codes.push(PacketType::MasterTrigger as u8);
+  type_codes.push(PacketType::HeartBeat as u8);
+  type_codes.push(PacketType::RBEventHeader as u8);
+  type_codes.push(PacketType::RBEvent as u8);
+  type_codes.push(PacketType::RBEventMemoryView as u8);
+  type_codes.push(PacketType::TofCommand as u8);
+  type_codes.push(PacketType::RBCommand as u8);
+  type_codes.push(PacketType::RBMoni as u8);
+  type_codes.push(PacketType::MonitorTofCmp as u8);
+  type_codes.push(PacketType::MonitorMtb as u8);
+  type_codes.push(PacketType::RBCalibration as u8);
   for tc in type_codes.iter() {
-    assert_eq!(*tc,PacketType::as_u8(&PacketType::from_u8(*tc).unwrap()));  
+    assert_eq!(*tc,PacketType::try_from(*tc).unwrap() as u8);  
   }
 }
 

@@ -22,10 +22,13 @@
 //! _Comment_ There is not much error handling for UDP. Most of it is that the IPAddress is wrong, 
 //! in this case it is legimate (and adviced) to panic.
 //! In the case, wher no data was received, this might need some thinking.
-#[cfg(feature="random")]
-use crate::FromRandom;
-#[cfg(feature = "random")]
-use rand::Rng;
+cfg_if::cfg_if! {
+  if #[cfg(feature = "random")]  {
+    use crate::FromRandom;
+    extern crate rand;
+    use rand::Rng;
+  }
+}
 
 use std::collections::VecDeque;
 use std::net::UdpSocket;
@@ -45,6 +48,7 @@ use crate::events::RBMissingHit;
 
 use crate::manifest::{LocalTriggerBoard,
                       ReadoutBoard};
+
 //const MT_MAX_PACKSIZE   : usize = 4096;
 /// Maximum packet size of packets we can 
 /// receive over UDP via the IPBus protocoll
@@ -59,7 +63,7 @@ const N_CHN_PER_LTB : usize = 16;
 /// instruct the receiver to either 
 /// write/read/etc. values from its
 /// registers.
-#[derive(Debug, PartialEq, Copy, Clone)]
+#[derive(Debug, PartialEq, Copy, Clone, serde::Deserialize, serde::Serialize)]
 #[repr(u8)]
 pub enum IPBusPacketType {
   Read                 = 0,
@@ -69,34 +73,44 @@ pub enum IPBusPacketType {
   RMW                  = 4
 }
 
+impl fmt::Display for IPBusPacketType {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let r = serde_json::to_string(self).unwrap_or(
+      String::from("Error: cannot unwrap this IPBusPacketType"));
+    write!(f, "<IPBusPacketType: {}>", r)
+  }
+}
+
 impl TryFrom<u8> for IPBusPacketType {
   type Error = IPBusError;
   
   fn try_from(pt : u8)
     -> Result<IPBusPacketType,IPBusError> {
     match pt {
-      0 => {return Ok(IPBusPacketType::Read);},
-      1 => {return Ok(IPBusPacketType::Write);},
-      2 => {return Ok(IPBusPacketType::ReadNonIncrement);},
-      3 => {return Ok(IPBusPacketType::WriteNonIncrement);},
-      4 => {return Ok(IPBusPacketType::RMW);},
-      _ => {return Err(IPBusError::DecodingFailed);},
+      0 => Ok(IPBusPacketType::Read),
+      1 => Ok(IPBusPacketType::Write),
+      2 => Ok(IPBusPacketType::ReadNonIncrement),
+      3 => Ok(IPBusPacketType::WriteNonIncrement),
+      4 => Ok(IPBusPacketType::RMW),
+      _ => Err(IPBusError::DecodingFailed)
     }
   }
 }
 
-impl From<IPBusPacketType> for u8 {
-  fn from(pt : IPBusPacketType)
-    -> u8 {
-    let result : u8;
-    match pt {
-     IPBusPacketType::Read               => { result = 0;}, 
-     IPBusPacketType::Write              => { result = 1;}, 
-     IPBusPacketType::ReadNonIncrement   => { result = 2;},  
-     IPBusPacketType::WriteNonIncrement => { result = 3;},  
-     IPBusPacketType::RMW                => { result = 4;}, 
-    }
-    result
+#[cfg(feature = "random")]
+impl FromRandom for IPBusPacketType {
+  
+  fn from_random() -> Self {
+    let choices = [
+      IPBusPacketType::Read,
+      IPBusPacketType::Write,
+      IPBusPacketType::ReadNonIncrement,
+      IPBusPacketType::WriteNonIncrement,
+      IPBusPacketType::RMW,
+    ];
+    let mut rng  = rand::thread_rng();
+    let idx = rng.gen_range(0..choices.len());
+    choices[idx]
   }
 }
 

@@ -6,8 +6,6 @@
   "trigger_poisson_rate"    : 0,
   "trigger_fixed_rate"      : 0,
   "latch_to_mtb"            : false,
-  "active_channel_mask"     : 255,
-  "data_type"               : 40, 
-  "data_format"             : 10,
+  "data_type"               : "Physics",
   "rb_buff_size"            : 2000
 }

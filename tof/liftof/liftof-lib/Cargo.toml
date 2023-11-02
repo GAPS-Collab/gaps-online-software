@@ -16,6 +16,7 @@ random = []
 # addess raw memeory, e.g. /dev/uio0
 memmap = "0.7"
 
+serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 
 # multi-producer/multi-consumer channels
@@ -35,14 +36,12 @@ local-ip-address = "0.5"
 # this is just for fun
 indicatif = "0.17"
 
-json = "0.12"
-
 # for connection to rb's at arbitrary ports
 #port_scanner = "0.1"
 #arp-toolkit = { verion = "0.3", features = ["sync"] }
 #mac_address = "1.1"
 netneighbours = "0.1"
-macaddr = "1.0"
+macaddr = {version="1.0", features = ["serde"]}
 
 #[target.armv7-unknown-linux-gnueabi]
 #linker = "/usr/bin/arm-none-eabi-gcc"

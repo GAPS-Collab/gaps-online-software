@@ -25,7 +25,6 @@ use colored::{Colorize, ColoredString};
 
 use serde_json::Value;
 
-extern crate json;
 use log::Level;
 use macaddr::MacAddr6;
 use netneighbours::get_mac_to_ip_map;
@@ -212,7 +211,7 @@ impl TofPacketReader {
     let mut pos = self.cursor + 2;
     let ptype_int  = parse_u8(stream, &mut pos);
     let next_psize = parse_u32(stream, &mut pos);
-    let ptype = PacketType::from_u8(ptype_int);
+    let ptype = ptype_int as u8;
     debug!("We anticpate a TofPacket of type {:?} and size {} (bytes)",ptype, next_psize);
     next_psize
   }
@@ -990,21 +989,18 @@ pub fn construct_event_request(rb_id : u8) -> String {
   request
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
+#[repr(u8)]
 pub enum ReadoutBoardError {
   NoConnectionInfo,
   NoResponse,
 }
 
-
-impl fmt::Display for ReadoutBoardError{
+impl fmt::Display for ReadoutBoardError {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let disp : String;
-    match self {
-      ReadoutBoardError::NoConnectionInfo => {disp = String::from("NoConnectionInfo");},
-      ReadoutBoardError::NoResponse       => {disp = String::from("NoResponse");},
-    } 
-    write!(f, "<ReadoutBoardError : {}>", disp)
+    let r = serde_json::to_string(self).unwrap_or(
+      String::from("Error: cannot unwrap this ReadoutBoardError"));
+    write!(f, "<ReadoutBoardError: {}>", r)
   }
 }
 
@@ -1017,7 +1013,7 @@ impl Error for ReadoutBoardError {
 ///
 /// This is important to make the mapping between 
 /// trigger information and readoutboard.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct LocalTriggerBoard {
   pub id : u8,
   /// The LTB has 16 channels, 
@@ -1054,34 +1050,9 @@ impl LocalTriggerBoard {
 
 impl fmt::Display for LocalTriggerBoard {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(f, "<LTB: \n ID \t\t: {} \n bitmask \t\t: {} \n channels \t: {:?} >", 
-            self.id.to_string() ,
-            self.mt_bitmask.to_string(),
-            self.ch_to_rb
-    )
-  }
-}
-
-impl From<&json::JsonValue> for LocalTriggerBoard {
-  fn from(json : &json::JsonValue) -> Self {
-    let id  = json["id"].as_u8().expect("id value json problem");
-    let dsi = json["DSI"].as_u8().expect("DSI value json problem");
-    let j   = json["J"].as_u8().expect("J value json problem");
-    //let mask = LocalTriggerBoard::get_mask_from_dsi_and_j(dsi, j);
-    let channels = &json["ch_to_rb"];//.members();
-    let mut rb_channels = [(0, 0);16];
-    for ch in 0..channels.len() {
-      if channels.has_key(&ch.to_string()) {
-        rb_channels[ch] = (channels[&ch.to_string()][0].as_u8().unwrap(),
-                           channels[&ch.to_string()][1].as_u8().unwrap());  
-      }
-    }
-    let bitmask = LocalTriggerBoard::get_mask_from_dsi_and_j(dsi, j);
-    LocalTriggerBoard {
-      id : id,
-      ch_to_rb : rb_channels,
-      mt_bitmask : bitmask
-    }
+    let r = serde_json::to_string(self).unwrap_or(
+      String::from("Error: cannot unwrap this LTB"));
+    write!(f, "<LTB: {}>", r)
   }
 }
 
@@ -1089,7 +1060,7 @@ impl From<&json::JsonValue> for LocalTriggerBoard {
 ///
 ///
 ///
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct ReadoutBoard {
   pub id           : Option<u8>,
   pub mac_address  : Option<MacAddr6>,
@@ -1192,75 +1163,15 @@ impl ReadoutBoard {
 
 impl fmt::Display for ReadoutBoard {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let default_ip  = Ipv4Addr::new(0,0,0,0);
-    let default_mac = MacAddr6::default();
-    write!(f, "<ReadoutBoard: \n ID \t\t: {} \n MAC addr \t: {} \n IP addr \t: {} \n 0MQ PUB \t: {} \n 0MQ REP \t: {} \n connected \t: {}\n calib file \t: {} \n uptime \t: {} >", 
-            self.id.unwrap_or(0).to_string()           ,      
-            self.mac_address.unwrap_or(default_mac).to_string()  ,
-            self.ip_address.unwrap_or(default_ip).to_string()   ,
-            self.data_port.unwrap_or(0).to_string()    ,
-            self.cmd_port.unwrap_or(0)     , 
-            self.is_connected.to_string() , 
-            "?",
-            //&self.calib_file.unwrap_or(String::from("")),
-            self.uptime.to_string()       ,
-    )
+    let r = serde_json::to_string(self).unwrap_or(
+      String::from("Error: cannot unwrap this ReadoutBoard"));
+    write!(f, "<ReadoutBoard: {}>", r)
   }
 }
 
 impl Default for ReadoutBoard {
   fn default() -> ReadoutBoard {
     ReadoutBoard::new()
-  }
-}
-
-impl From<&json::JsonValue> for ReadoutBoard {
-  fn from(json : &json::JsonValue) -> Self {
-    let mut board =  ReadoutBoard::new();
-    board.id = Some(json["id"].as_u8().unwrap());
-    //let identifier: Vec<&str> = ip.split(";").collect();
-    let identifier = json["mac_address"].as_str().unwrap();
-    let mc_address = identifier.replace(" ","");
-    let mc_address : Vec<&str> = mc_address.split(":").collect();
-    println!("{:?}", mc_address);
-    let mc_address : Vec<u8>   = mc_address.iter().map(|&x| {u8::from_str_radix(x,16).unwrap()} ).collect();
-    assert!(mc_address.len() == 6);
-    let mac = MacAddr6::new(mc_address[0],
-                            mc_address[1],
-                            mc_address[2],
-                            mc_address[3],
-                            mc_address[4],
-                            mc_address[5]);
-    let data_port = Some(json["port"].as_u16().unwrap());
-    let calib_file = json["calibration_file"].as_str().unwrap();
-    board.mac_address = Some(mac);
-    board.data_port   = data_port;
-    board.calib_file  = calib_file.to_string();
-    board.get_ip();
-    let ch_to_pid = &json["ch_to_pid"];
-    let mut ch_true : usize;
-    for ch in 0..ch_to_pid.len() {
-      ch_true = ch + 1;
-      //println!("{ch}");
-      //println!("{:?}", json["ch_to_pid"]);
-      match json["ch_to_pid"][&ch_true.to_string()].as_u8() {
-        Some(foo) => {board.ch_to_pid[ch] = foo;}
-        None => {
-          error!("Can not get data for ch {ch}");
-          board.ch_to_pid[ch] = 0;
-        }
-      }
-      //board.ch_to_pid[ch] = json["ch_to_pid"][&ch_true.to_string()].as_u8().unwrap();
-    }
-    let mut paddle_ids : [u8;4] = [0,0,0,0];
-    let mut counter = 0;
-    for ch in board.ch_to_pid.iter().step_by(2) {
-      paddle_ids[counter] = *ch;
-      counter += 1;
-    }
-    board.sorted_pids = paddle_ids;
-    board.configured  = true;
-    board
   }
 }
 
