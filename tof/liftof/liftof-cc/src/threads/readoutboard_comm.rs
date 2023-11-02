@@ -14,6 +14,7 @@ use tof_dataclasses::calibrations::RBCalibrations;
 
 use tof_dataclasses::serialization::Serialization;
 
+use liftof_lib::build_tcp_from_ip;
 
 /*************************************/
 
@@ -58,10 +59,8 @@ pub fn readoutboard_communicator(ev_to_builder       : &Sender<RBEvent>,
     let cal_file_path = Path::new(&rb.calib_file);//calibration_file);
     calibrations = RBCalibrations::from(cal_file_path);
   }
-  let address = "tcp://".to_owned() 
-              + &rb.ip_address.to_string()
-              + ":"
-              +  &rb.port.to_string();
+  let address = build_tcp_from_ip(rb.ip_address.to_string(),
+                                       rb.port.to_string());
 
   // FIXME - this panics, however, if we can't set up the socket, what's 
   // the point of this thread?

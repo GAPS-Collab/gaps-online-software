@@ -10,6 +10,10 @@ of the code shall
 * Packaging this information into a binary format
 * Sending the packaged information to the flight computer
 
+## TODO List
+- [ ] Read from json file the defaults (check out example-config.json).
+- [ ] Implement commands
+
 
 ### How to run
 

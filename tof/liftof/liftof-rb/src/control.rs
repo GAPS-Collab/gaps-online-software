@@ -12,6 +12,8 @@ use crate::memory::*;
 use std::time::Duration;
 use std::thread;
 
+extern crate liftof_lib;
+
 /// write header only packets when the drs is busyu
 pub fn enable_evt_fragments() -> Result<(), RegisterError> {
   trace!("Enable event fragment writing!");
@@ -277,3 +279,12 @@ pub fn get_board_id() -> Result<u32, RegisterError> {
   let board_id = read_control_reg(BOARD_ID)?;
   Ok(board_id)
 }
+
+///! Get the board ID from the control registers.
+pub fn get_board_id_string() -> Result<String, RegisterError> { 
+  let board_id = get_board_id()?;
+  let board_id_string = liftof_lib::to_board_id_string(board_id);
+  Ok(board_id_string)
+}
+
+

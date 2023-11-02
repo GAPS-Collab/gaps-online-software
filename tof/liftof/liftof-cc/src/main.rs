@@ -33,7 +33,9 @@ use clap::{arg,
            //value_parser,
            //ArgAction,
            //Command,
-           Parser};
+           Args,
+           Parser,
+           Subcommand};
 
 use crossbeam_channel as cbc; 
 use colored::Colorize;
@@ -56,11 +58,14 @@ use liftof_cc::api::tofcmp_and_mtb_moni;
 //use liftof_cc::paddle_packet_cache::paddle_packet_cache;
 use liftof_cc::flight_comms::global_data_sink;
 
+use liftof_cc::constants::*;
+
 /*************************************/
 
 #[derive(Parser, Debug)]
 #[command(author = "J.A.Stoessl", version, about, long_about = None)]
-struct Args {
+#[command(propagate_version = true)]
+struct LiftofCCArgs {
   /// Write the entire TofPacket Stream to a file
   #[arg(short, long, default_value_t = false)]
   write_stream: bool,
@@ -72,15 +77,55 @@ struct Args {
   /// Enhance output to console
   #[arg(short, long, default_value_t = false)]
   verbose: bool,
-  /// Remotely trigger the readoutboards to run the calibration routines (tcal, vcal)
-  #[arg(long, default_value_t = false)]
-  calibration: bool,
   /// A json config file with detector information
   #[arg(short, long)]
   json_config: Option<PathBuf>,
   /// A json file wit the ltb(dsi, j, ch) -> rb_id, rb_ch mapping.
   #[arg(long)]
   json_ltb_rb_map : Option<PathBuf>,
+  /// List of possible commands
+  #[command(subcommand)]
+  command: Command,
+}
+
+#[derive(Debug, Parser, PartialEq)]
+enum Command {
+  /// Remotely trigger the readoutboards to run the calibration routines (tcal, vcal).
+  #[command(subcommand)]
+  Calibration(CalibrationCmd)
+}
+
+#[derive(Debug, Subcommand, PartialEq)]
+enum CalibrationCmd {
+  /// Default calibration run, meaning 2 voltage calibrations and one timing calibration on all RBs with the default values.
+  Default,
+  /// Voltage calibration run. All RB are targeted and voltage are default ones if nothing else is specified.
+  Voltage(VoltageOpts),
+  /// Voltage calibration run. All RB are targeted if nothing else is specified.
+  Timing(TimingOpts)
+}
+
+#[derive(Debug, Args, PartialEq)]
+struct VoltageOpts {
+  /// Voltage level to be set in voltage calibration run.
+  #[arg(short, long)]
+  voltage_level: Option<u16>,
+  /// RB to target in voltage calibration run.
+  #[arg(short, long)]
+  rb_id: Option<u8>,
+  /// Extra arguments in voltage calibration run (not implemented).
+  #[arg(short, long)]
+  extra: Option<u8>,
+}
+
+#[derive(Debug, Args, PartialEq)]
+struct TimingOpts {
+  /// RB to target in timing calibration run.
+  #[arg(short, long)]
+  rb_id: Option<u8>,
+  /// Extra arguments in timing calibration run (not implemented).
+  #[arg(short, long)]
+  extra: Option<u8>,
 }
 
 /*************************************/
@@ -104,14 +149,9 @@ fn main() {
   println!(" .. This is the Command&Control server which connects to the MasterTriggerBoard and the ReadoutBoards");
   println!(" .. see the gitlab repository for documentation and submitting issues at" );
   println!(" **https://uhhepvcs.phys.hawaii.edu/Achim/gaps-online-software/-/tree/main/tof/liftof**");
-
-
+  
   // deal with command line arguments
-  let args = Args::parse();
-
-  if args.calibration {
-    todo!("Feature not yet implemented!");
-  }
+  let args = LiftofCCArgs::parse();
 
   let verbose = args.verbose;
 
@@ -416,14 +456,35 @@ fn main() {
     exit(0);
   })
   .expect("Error setting Ctrl-C handler");
-  
-  // start a new data run 
-  let start_run = TofCommand::DataRunStart(1000);
-  let tp = TofPacket::from(&start_run);
-  match cmd_sender.send(tp) {
-    Err(err) => error!("Unable to send command, error{err}"),
-    Ok(_)    => ()
+
+  match args.command {
+    // Matching calibration command
+    Command::Calibration(calibration_cmd) => {
+      match calibration_cmd {
+        CalibrationCmd::Default => {
+          liftof_cc::send_all_calibration(cmd_sender);
+        },
+        CalibrationCmd::Voltage(voltage_opts) => {
+          let voltage_level = voltage_opts.voltage_level.unwrap_or(DEFAULT_CALIB_VOLTAGE);
+          let rb_id = voltage_opts.rb_id.unwrap_or(DEFAULT_CALIB_RB);
+          let extra = voltage_opts.extra.unwrap_or(DEFAULT_CALIB_EXTRA);
+          liftof_cc::send_voltage_calibration(cmd_sender, voltage_level, rb_id, extra);
+        },
+        CalibrationCmd::Timing(timing_opts) => {
+          let rb_id = timing_opts.rb_id.unwrap_or(DEFAULT_CALIB_RB);
+          let extra = timing_opts.extra.unwrap_or(DEFAULT_CALIB_EXTRA);
+          liftof_cc::send_timing_calibration(cmd_sender, rb_id, extra);
+        }
+      }
+    }
   }
+  // start a new data run 
+  // let start_run = TofCommand::DataRunStart(1000);
+  // let tp = TofPacket::from(&start_run);
+  // match cmd_sender.send(tp) {
+  //   Err(err) => error!("Unable to send command, error{err}"),
+  //   Ok(_)    => ()
+  // }
 
   println!("==> All threads initialized!");
   loop{
