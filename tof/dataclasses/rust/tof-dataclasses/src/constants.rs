@@ -81,3 +81,12 @@ pub const EVENT_BUILDER_EVID_CACHE_SIZE : usize = 10000;
 ///
 pub const EXP_N_PADDLES_PER_EVENT : usize = 10;
 
+/// Masks for 32 bits commands (byte packets)
+///
+pub const MASK_CMD_8BIT  : u32 = 0x000000FF;
+pub const MASK_CMD_16BIT : u32 = 0x0000FFFF;
+pub const MASK_CMD_24BIT : u32 = 0x00FFFFFF;
+pub const MASK_CMD_32BIT : u32 = 0xFFFFFFFF;
+/// Padding for 32 bits commands (byte packets)
+///
+pub const PAD_CMD_32BIT  : u32 = 0x00000000;

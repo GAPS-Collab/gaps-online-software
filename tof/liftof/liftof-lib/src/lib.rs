@@ -722,6 +722,12 @@ impl Iterator for RobinReader {
 
 /**************************************************/
 
+/// Helper function to generate a proper tcp string starting
+/// from the ip one.
+pub fn build_tcp_from_ip(ip: String, port: String) -> String {
+  String::from("tcp://") + &ip + ":" + &port
+}
+
 /// Broadcast commands over the tof-computer network
 /// socket via zmq::PUB to the rb network.
 /// Currently, the only participants in the rb network
@@ -737,19 +743,17 @@ impl Iterator for RobinReader {
 /// * cmd        : a [crossbeam] receiver, to receive 
 ///                TofCommands.
 pub fn readoutboard_commander(cmd : &Receiver<TofPacket>){
-             
   debug!(".. started!");
   let ctx = zmq::Context::new();
-  let mut address_ip = String::from("tcp://");
   //let this_board_ip = local_ip().expect("Unable to obtainl local board IP. Something is messed up!");
-  let data_port     = DATAPORT;
   let this_board_ip = IpAddr::V4(Ipv4Addr::new(10, 0, 1, 1));
 
+  let address_ip;
   match this_board_ip {
-    IpAddr::V4(ip) => address_ip += &ip.to_string(),
+    IpAddr::V4(ip) => address_ip = ip.to_string().clone(),
     IpAddr::V6(_) => panic!("Currently, we do not support IPV6!")
   }
-  let data_address : String = address_ip.clone() + ":" + &data_port.to_string();
+  let data_address : String = build_tcp_from_ip(address_ip,DATAPORT.to_string());
   let data_socket = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
   data_socket.bind(&data_address).expect("Unable to bind to data (PUB) socket {data_adress}");
   println!("==> 0MQ PUB socket bound to address {data_address}");
@@ -1220,6 +1224,10 @@ pub fn get_ltb_dsi_j_ch_mapping(mapping_file : PathBuf) -> DsiLtbRBMapping {
   mapping
 }
 
+/// Convert an int value to the board ID string.
+pub fn to_board_id_string(rb_id: u32) -> String {
+  String::from("RB") + &format!("{:02}", rb_id)
+}
 
 #[test]
 fn test_display() {

@@ -9,12 +9,18 @@ use tof_dataclasses::packets::{TofPacket,
 use tof_dataclasses::run::RunConfig;
 
 use tof_dataclasses::serialization::Serialization;
+#[cfg(feature="tofcontrol")]
+use tof_dataclasses::constants::{MASK_CMD_8BIT,
+                                 MASK_CMD_16BIT,
+                                 MASK_CMD_24BIT,
+                                 MASK_CMD_32BIT};
 
-use liftof_lib::DATAPORT;
-
-use crate::api::get_runconfig;
+use crate::api::{get_runconfig, DATAPORT};
 use crate::api::prefix_board_id;
-use crate::control::get_board_id;
+#[cfg(feature="tofcontrol")]
+use crate::api::rb_calibration;
+use crate::control::get_board_id_string;
+use liftof_lib::build_tcp_from_ip;
 
 /// Centrailized command management
 /// 
@@ -33,20 +39,11 @@ pub fn cmd_responder(cmd_server_ip             : String,
                      ev_request_to_cache       : &Sender<TofPacket>) {
   // create 0MQ sockedts
   //let one_milli       = time::Duration::from_millis(1);
-  let cmd_address = String::from("tcp://") + &cmd_server_ip + ":" + &DATAPORT.to_string() ;
+  let port = DATAPORT.to_string();
+  let cmd_address = build_tcp_from_ip(cmd_server_ip,port);
   // we will subscribe to two types of messages, BRCT and RB + 2 digits 
   // of board id
-  let mut topic_board = String::from("RB");
-  // FIXME: Unsure what to do. We migt as well fail here, 
-  // since if we don't get the board id, we won't be 
-  // receiving requests and basically run rogue.
-  let brd_id = get_board_id().expect("Can not get board id!");
-  //let topic_board = get_board_id().expect("Can not get board id!")
-  //                  .to_string();
-  if brd_id < 10 {
-    topic_board += "0";
-  }
-  topic_board += &brd_id.to_string();
+  let topic_board = get_board_id_string().expect("Can not get board id!");
   let topic_broadcast = String::from("BRCT");
   let ctx = zmq::Context::new();
   // I guess expect is fine here, see above
@@ -276,13 +273,26 @@ pub fn cmd_responder(cmd_server_ip             : String,
                       //  return Ok(TofResponse::Success(RESP_SUCC_FINGERS_CROSSED));
                       },
                       // Voltage and timing calibration is connected now
-                      TofCommand::VoltageCalibration (_) => {
-                        warn!("Not implemented");
-                        match cmd_socket.send(resp_not_implemented,0) {
-                          Err(err) => warn!("Can not send response! Err {err}"),
-                          Ok(_)    => trace!("Resp sent!")
+                      TofCommand::VoltageCalibration (value) => {
+                        cfg_if::cfg_if! {
+                          if #[cfg(feature = "tofcontrol")]  {
+                            // MSB first 16 bits are voltage level
+                            let voltage_val: u16 = ((value | (MASK_CMD_16BIT << 16)) >> 16) as u16;
+                            // MSB third 8 bits are RB ID
+                            let rb_id: u8 = ((value | (MASK_CMD_8BIT << 8)) >> 8) as u8;
+                            // MSB fourth 8 bits are extra (not used)
+                            let extra: u8 = (value | MASK_CMD_8BIT) as u8;
+                            println!("Voltage_val: {}, RB ID: {}, extra: {}",voltage_val,rb_id,extra);
+                            continue;
+                          } else {
+                            warn!("The function is implemented, but one has to compile with --features=tofcontrol");
+                            match cmd_socket.send(resp_not_implemented,0) {
+                              Err(err) => warn!("Can not send response! Err {err}"),
+                              Ok(_)    => trace!("Resp sent!")
+                            }
+                            continue;
+                          }
                         }
-                        continue;
                       },
                       TofCommand::TimingCalibration  (_) => {
                         warn!("Not implemented");
@@ -375,4 +385,3 @@ pub fn cmd_responder(cmd_server_ip             : String,
     }
   }
 }
-
