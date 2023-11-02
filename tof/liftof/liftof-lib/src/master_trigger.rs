@@ -1,17 +1,9 @@
 use std::error::Error;
 use std::time::{Duration, Instant};
-//use std::thread;
 use std::fmt;
 use std::{fs::File, path::Path};
-use std::path::PathBuf;
-use std::fs::OpenOptions;
-use std::fs::read_to_string;
 use std::io::{self, BufReader};
 use std::net::{IpAddr, Ipv4Addr};
-use std::io::{Read,
-              Write,
-              Seek,
-              SeekFrom};
 use std::collections::HashMap;
 use std::net::{UdpSocket, SocketAddr};
 use crossbeam_channel::Receiver;
@@ -27,36 +19,79 @@ use netneighbours::get_mac_to_ip_map;
 use crossbeam_channel as cbc; 
 
 
-use tof_dataclasses::manifest as mf;
 use tof_dataclasses::DsiLtbRBMapping;
 use tof_dataclasses::constants::NWORDS;
 use tof_dataclasses::calibrations::RBCalibrations;
 use tof_dataclasses::packets::{TofPacket,
                                PacketType};
-use tof_dataclasses::errors::{SerializationError,
-                              AnalysisError};
-use tof_dataclasses::serialization::{search_for_u16,
-                                     parse_u8,
-                                     parse_u32,
-                                     Serialization};
 use tof_dataclasses::monitoring::MtbMoniData;
 use tof_dataclasses::commands::RBCommand;
-use tof_dataclasses::events::{RBEvent,
-                              MasterTriggerEvent,
-                              TofHit};
+use tof_dataclasses::events::MasterTriggerEvent;
 use tof_dataclasses::events::master_trigger::{read_daq,
                                               read_rate,
                                               reset_daq,
+                                              read_register,
+                                              read_register_multiple,
+                                              read_daq_word,
+                                              daq_word_available,
                                               read_adc_temp_and_vccint,
                                               read_adc_vccaux_and_vccbram};
 
-use tof_dataclasses::analysis::{calculate_pedestal,
-                                integrate,
-                                cfd_simple,
-                                find_peaks};
+use tof_dataclasses::errors::MasterTriggerError;
 
-pub const MT_MAX_PACKSIZE   : usize = 512;
+pub const MT_MAX_PACKSIZE   : usize = 1024;
 pub const DATAPORT : u32 = 42000;
+
+/// Read the complete event of the MTB
+///
+pub fn read_mtb_event(socket  : &UdpSocket,
+                      address : &str,
+                      buffer  : &mut [u8;MT_MAX_PACKSIZE]) -> Result<MasterTriggerEvent, MasterTriggerError> {
+  let mut mte = MasterTriggerEvent::new(0,0);
+  let ntries = 100;
+  let mut n_daq_words : u32;
+  for _ in 0..ntries {
+    // 0x13 is MT.EVENT_QUEUE>SIZE
+    match read_register(socket, address, 0x13 , buffer) {
+      Err(err) => {
+        error!("Timeout in read_register for MTB!");
+        continue;
+      },
+      Ok(_n_words) => {
+        n_daq_words = _n_words >> 16 as u16;
+        println!("Got n_daq_words {n_daq_words}");
+        n_daq_words = 2;
+        let foo = daq_word_available(socket, address, buffer).unwrap_or(false);
+        println!("{foo}");
+        loop {
+          match read_register_multiple(socket, address, 0x11, buffer, n_daq_words as usize) {
+            Err(err) => {
+              error!("Can't read register, err {err}");
+              continue;
+            }
+            Ok(data) => {
+              for k in data.iter() {
+                println!("Got {k}");
+              }
+              break;
+            }
+          }
+        }
+        //for _ in 0..n_daq_words {
+        //  match read_daq_word(socket, address, buffer,1) {
+        //    Err(err) => {},
+        //    Ok(foo)  => {
+        //      println!("Got word {foo}");
+        //    }
+        //  }
+        //}
+        break;
+      }
+    }
+  }
+  Ok(mte)
+}
+
 
 /// Connect to MTB Utp socket
 ///
@@ -297,6 +332,7 @@ pub fn master_trigger(mt_ip          : &str,
     //println!("Will read daq");
     //mt_event = read_daq(&socket, &mt_address, &mut buffer);
     //println!("Got event");
+    //read_mtb_event(&socket, &mt_address, &mut buffer);
     match read_daq(&socket, &mt_address, &mut buffer) {
       Err(err) => {
         trace!("Did not get new event, Err {err}");

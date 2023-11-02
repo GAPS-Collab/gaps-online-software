@@ -49,7 +49,7 @@ use crate::manifest::{LocalTriggerBoard,
 /// Maximum packet size of packets we can 
 /// receive over UDP via the IPBus protocoll
 /// (arbitrary number)
-const MT_MAX_PACKSIZE   : usize = 512;
+const MT_MAX_PACKSIZE   : usize = 1024;
 const N_LTBS : usize = 20;
 const N_CHN_PER_LTB : usize = 16;
 
@@ -826,10 +826,10 @@ fn extract_values_from_32bit(number: u32) -> (u16, u16) {
 ///                 be read
 /// * buffer      : pre-allocated byte array to hold the 
 ///                 register value
-fn read_register(socket      : &UdpSocket,
-                 target_addr : &str,
-                 reg_addr    : u32,
-                 buffer      : &mut [u8;MT_MAX_PACKSIZE])
+pub fn read_register(socket      : &UdpSocket,
+                     target_addr : &str,
+                     reg_addr    : u32,
+                     buffer      : &mut [u8;MT_MAX_PACKSIZE])
   -> Result<u32, Box<dyn Error>> {
   let send_data = Vec::<u32>::from([0]);
   let message   = encode_ipbus(reg_addr,
@@ -846,6 +846,37 @@ fn read_register(socket      : &UdpSocket,
   Ok(data[0])
 }
 
+pub fn read_register_multiple(socket      : &UdpSocket,
+                              target_addr : &str,
+                              reg_addr    : u32,
+                              buffer      : &mut [u8;MT_MAX_PACKSIZE],
+                              nwords      : usize)
+  -> Result<Vec<u32>, Box<dyn Error>> {
+  let send_data = vec![0u32;nwords];
+  //let send_data = Vec::<u32>::from([0]);
+  let message : Vec<u8>;
+  if send_data.len() > 1 {
+    message = encode_ipbus(reg_addr,
+                           IPBusPacketType::ReadNonIncrement,
+                           &send_data);
+  } else {
+    message   = encode_ipbus(reg_addr,
+                             IPBusPacketType::Read,
+                             &send_data);
+  }
+  socket.send_to(message.as_slice(), target_addr)?;
+  let (number_of_bytes, _) = socket.recv_from(buffer)?;
+  trace!("Received {} bytes from master trigger", number_of_bytes);
+  // this one can actually succeed, but return an emtpy vector
+  let data = decode_ipbus(buffer, true)?;
+  if data.len() == 0 { 
+    error!("Empty data!");
+    return Err(Box::new(IPBusError::DecodingFailed));
+  }
+  // this supports up to 100 Hz
+  Ok(data)
+}
+
 /// Write a register on the MTB over UDP
 ///
 /// # Arguments
@@ -860,10 +891,10 @@ fn read_register(socket      : &UdpSocket,
 ///                 response from the MTB
 /// FIXME - there is no verification step!
 pub fn write_register(socket      : &UdpSocket,
-                  target_addr : &str,
-                  reg_addr    : u32,
-                  data        : u32,
-                  buffer      : &mut [u8;MT_MAX_PACKSIZE])
+                      target_addr : &str,
+                      reg_addr    : u32,
+                      data        : u32,
+                      buffer      : &mut [u8;MT_MAX_PACKSIZE])
   -> Result<(), Box<dyn Error>> {
   let send_data = Vec::<u32>::from([data]);
   let message   = encode_ipbus(reg_addr,
@@ -880,6 +911,21 @@ pub fn write_register(socket      : &UdpSocket,
   //    if (verify and rdback != data):
   //        print("Error!")
   //
+  Ok(())
+}
+
+pub fn write_register_multiple(socket      : &UdpSocket,
+                               target_addr : &str,
+                               reg_addr    : u32,
+                               data        : &Vec<u32>,
+                               buffer      : &mut [u8;MT_MAX_PACKSIZE])
+  -> Result<(), Box<dyn Error>> {
+  let message   = encode_ipbus(reg_addr,
+                               IPBusPacketType::Write,
+                               &data);
+  socket.send_to(message.as_slice(), target_addr)?;
+  let (number_of_bytes, _) = socket.recv_from(buffer)?;
+  trace!("Received {} bytes from master trigger", number_of_bytes);
   Ok(())
 }
 
@@ -1122,7 +1168,7 @@ pub fn read_daq(socket : &UdpSocket,
     if head_found {
       // let mut paddles_rxd = 1;
       // we start a new daq package
-      event.event_id        = read_daq_word(socket, target_address, buffer, 1)?;
+      event.event_id    = read_daq_word(socket, target_address, buffer, 1)?;
       if event.event_id == 0 {
         return Err(Box::new(MasterTriggerError::DAQNotAvailable));
       }
