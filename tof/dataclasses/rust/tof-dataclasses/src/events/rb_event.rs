@@ -17,8 +17,8 @@
 //! * features: "random" - provides "::from_random" for all structs allowing to 
 //!   populate them with random data for tests.
 //!
+
 use std::fmt;
-use std::path::Path;
 
 extern crate crc;
 use crc::Crc;
@@ -255,10 +255,7 @@ pub struct RBEvent {
 impl RBEvent {
 
   pub fn new() -> Self {
-    let mut adc = Vec::<Vec<u16>>::with_capacity(NCHN);
-    //for _ in 0..NCHN {
-    //  adc.push(Vec::<u16>::new());
-    //}
+    let adc = Vec::<Vec<u16>>::with_capacity(NCHN);
     Self {
       data_type  : DataType::Unknown,
       header     : RBEventHeader::new(),
@@ -419,9 +416,9 @@ impl RBEvent {
                        //residue : 0xdebb20e3,
                      };
 
-    //let crc        = crc::Crc::<u32>::new(&crc::CRC_32_ISO_HDLC);
-    let crc          = crc::Crc::<u32>::new(&CUSTOM_ALG);
-    //let crc        = crc::Crc::<u32>::new(&crc::CRC_32_BZIP2);
+    //let crc        = Crc::<u32>::new(&crc::CRC_32_ISO_HDLC);
+    let crc          = Crc::<u32>::new(&CUSTOM_ALG);
+    //let crc        = Crc::<u32>::new(&crc::CRC_32_BZIP2);
     let mut ch_crc       : u32;
     let mut ch_crc_check : u32;
     if header.broken {

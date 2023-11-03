@@ -3,7 +3,6 @@ use crate::serialization::{parse_u8,
                            parse_u16,
                            parse_u32,
                            Serialization};
-use std::time::Instant;
 use std::fmt;
 
 #[cfg(feature="random")]

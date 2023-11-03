@@ -1,4 +1,10 @@
 # NIUHI series
+
+## 0.8.1
+* moves mtb related communication functions
+  to liftof-lib project
+* removes unused RBChannelData struct
+
 ## 0.8.0
 * adds timestamp field to calibration
 
