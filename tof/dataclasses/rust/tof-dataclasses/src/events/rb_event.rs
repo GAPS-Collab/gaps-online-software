@@ -436,30 +436,6 @@ impl FromRandom for RBEventMemoryView {
 }
 
 
-
-// FIXME - do we want this? OOP overkill?
-#[derive(Debug, Clone)]
-pub struct RBChannelData {
-  pub header : u16, // that should be the channel id
-  pub footer : u32, // crc32
-  pub nwords : u32, // 1024                   
-  pub data   : Vec<u8>,
-}
-
-impl RBChannelData {
-
-  pub fn get_adc(&self) -> Vec<i16> {
-    let mut adc = Vec::<i16>::with_capacity(self.nwords as usize);
-    let mut pos = 0;
-    for _ in 0..self.nwords {
-      adc.push( 0x3FFF & i16::from_le_bytes([self.data[pos],self.data[pos+1]]));
-      pos += 2;
-    }
-    adc
-  }
-}
-
-
 /// Get traces in a conscise form from a 
 /// number of RBEvents
 ///
