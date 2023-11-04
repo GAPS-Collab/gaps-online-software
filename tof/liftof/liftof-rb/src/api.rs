@@ -22,8 +22,6 @@ use crossbeam_channel::{Sender};
 use crate::control::*;
 use crate::memory::*;
 
-
-
 use tof_dataclasses::events::{RBEvent,
                               DataType};
 use tof_dataclasses::commands::TofCommand;
@@ -36,11 +34,6 @@ use tof_dataclasses::serialization::get_json_from_file;
 // Takeru's tof-control
 cfg_if::cfg_if! {
   if #[cfg(feature = "tofcontrol")]  {
-    use tof_control::rb_control::rb_temp::RBtemp;
-    use tof_control::rb_control::rb_mag::RBmag;
-    use tof_control::rb_control::rb_vcp::RBvcp;
-    use tof_control::rb_control::rb_ph::RBph;
-
     // for calibration
     use tof_control::rb_control::rb_mode::{select_noi_mode,
                                           select_vcal_mode,
@@ -446,52 +439,6 @@ pub fn cmd_from_bytestream(bytestream : &mut Vec<u8>) ->Result<TofCommand, Seria
 
 
 
-/// Gather monitoring data and pass it on
-pub fn monitoring(ch : &Sender<TofPacket>,
-                  verbose : bool) {
- 
-  let moni_interval  = 60;
-  let heartbeat      = time::Duration::from_secs(moni_interval);
-  let board_id = get_board_id().unwrap_or(0); 
-  loop {
-    // get tof-control data
-    let mut moni_dt = RBMoniData::new();
-    moni_dt.board_id = board_id as u8; 
-    cfg_if::cfg_if! {
-      if #[cfg(feature = "tofcontrol")]  {
-        let rb_temp = RBtemp::new();
-        let rb_mag  = RBmag::new();
-        let rb_vcp  = RBvcp::new();
-        let rb_ph   = RBph::new();
-        moni_dt.add_rbtemp(&rb_temp);
-        moni_dt.add_rbmag(&rb_mag);
-        moni_dt.add_rbvcp(&rb_vcp);
-        moni_dt.add_rbph(&rb_ph);
-      }
-    }
-    
-    let rate_query = get_trigger_rate();
-    match rate_query {
-      Ok(rate) => {
-        debug!("Monitoring thread -> Rate: {rate}Hz ");
-        moni_dt.rate = rate as u16;
-      },
-      Err(_)   => {
-        warn!("Can not send rate monitoring packet, register problem");
-      }
-    }
-   
-    if verbose {
-      println!("{}", moni_dt);
-    }
-    let tp = TofPacket::from(&moni_dt);
-    match ch.try_send(tp) {
-      Err(err) => {error!("Issue sending RBMoniData {:?}", err)},
-      Ok(_)    => {debug!("Send RBMoniData successfully!")}
-    }
-    thread::sleep(heartbeat);
-  }
-}
 
 /// Reset DMA pointer and buffer occupancy registers
 ///
@@ -542,12 +489,6 @@ pub fn reset_dma_and_buffers() {
   }
   // in any case, relax a bit
   thread::sleep(10*one_milli);
-}
-
-
-// palceholder
-#[derive(Debug)]
-pub struct FIXME {
 }
 
 /// Check if the buffers are actually filling
@@ -667,12 +608,6 @@ pub fn ram_buffer_handler(buff_trip     : usize,
   }
   Ok((which, buff_size))
 }
-
-
-
-
-
-
 
 ///  Prepare the whole readoutboard for data taking.
 ///

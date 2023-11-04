@@ -7,6 +7,7 @@
 //! Standalone, statically linked binary to be either run manually 
 //! or to be managed by systemd
 use std::{thread, time};
+use std::time::Duration;
 use std::io::Write;
 
 extern crate crossbeam_channel;
@@ -29,6 +30,7 @@ use liftof_rb::threads::{runner,
                          cmd_responder,
                          event_processing,
                          event_cache,
+                         monitoring,
                          data_publisher};
 use liftof_rb::api::*;
 use liftof_rb::control::*;
@@ -78,6 +80,14 @@ struct Args {
   /// no input data
   #[arg(long, default_value_t = false)]
   calibration : bool,
+  /// Select the monitoring interval for L1 monitoring data
+  /// L1 is the fast monitoring - only critical values
+  #[arg(long, default_value_t = 10)]
+  moni_interval_l1 : u64,
+  /// Select the monitoring interval for L2 monitoring data
+  /// L2 is the slow monitoring - all values
+  #[arg(long, default_value_t = 30)]
+  moni_interval_l2 : u64,
   ///// CnC server IP we should be listening to
   //#[arg(long, default_value_t = "10.0.1.1")]
   //cmd_server_ip : &'static str,
@@ -325,8 +335,12 @@ fn main() {
     } else {
       // only do monitoring when we don't do a 
       // calibration
+      let moni_interval_l1 = Duration::from_secs(args.moni_interval_l1);
+      let moni_interval_l2 = Duration::from_secs(args.moni_interval_l2);
       workforce.execute(move || {
         monitoring(&tp_to_pub,
+                   moni_interval_l1,
+                   moni_interval_l2,
                    verbose);
       });
     } 

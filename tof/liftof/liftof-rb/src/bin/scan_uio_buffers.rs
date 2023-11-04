@@ -1,17 +1,15 @@
 extern crate liftof_rb;
 
 use std::{thread, time};
-
 use indicatif::{ProgressBar, 
                 ProgressStyle};
-use tof_dataclasses::events::RBEventMemoryView;
+use tof_dataclasses::events::RBEvent;
 use tof_dataclasses::serialization::Serialization;
 
 use liftof_rb::control::*;
 use liftof_rb::memory::BlobBuffer;
 use liftof_rb::memory::RegisterError;
 use liftof_rb::memory::map_physical_mem_read;
-#[macro_use] extern crate env_logger;
 #[macro_use] extern crate log;
 
 ///! Return the bytes located at the memory
@@ -19,7 +17,7 @@ pub fn get_bytestream(addr_space : &str,
                   addr : u32,
                   len  : usize) -> Result<Vec::<u8>, RegisterError> {
 
-  let blobsize = RBEventMemoryView::SIZE;
+  let blobsize = RBEvent::SIZE;
   let vec_size = blobsize*len;
   // FIXME - allocate the vector elsewhere and 
   // pass it by reference

@@ -1,5 +1,12 @@
 # NIUHI series
 
+## v0.8,1
+* upstream changes in tof-control (removes panic) should 
+  allow more stable monitoring
+* adds new flags --moni-interval-l1 and --moni-interval-l2 to 
+  set the intervals for fast and slow monitoring through the 
+  command line
+
 ## v0.8.0
 
 

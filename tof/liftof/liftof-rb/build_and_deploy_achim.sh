@@ -1,6 +1,6 @@
 #! /bin/sh
 deploy_target() {
-  scp ../target/armv7-unknown-linux-musleabi/release/$1 $2:~/bin/$1-0.8
+  scp ../target/armv7-unknown-linux-musleabi/release/$1 $2:~/bin/$1-0.8.1
 }
 
 compile_and_deploy_target() {
@@ -20,6 +20,23 @@ SSL_RB="tof-rb01 tof-rb02 tof-rb03 tof-rb04 tof-rb07 tof-rb08 tof-rb09 tof-rb11 
 #  scp -r configs $rb:config;
 #done
 
-compile_and_deploy_target liftof-rb ucla-tof-rb25
-deploy_target liftof-rb ucla-tof-rb16
+compile_and_deploy_target liftof-rb nevis-rb21
+deploy_target liftof-rb nevis-rb29
+deploy_target liftof-rb nevis-rb31
+deploy_target liftof-rb nevis-rb23
+#scp configs/runconfig-example.json nevis-rb21:config/
+#scp configs/runconfig-example.json nevis-rb23:config/
+
+#
+#compile_and_deploy_target liftof-rb nevis-rb13
+deploy_target liftof-rb nevis-rb13
+deploy_target liftof-rb nevis-rb35
+deploy_target liftof-rb nevis-rb24
+deploy_target liftof-rb nevis-rb27
+#for k in 13 35 24 27; do
+#scp configs/runconfig-example.json nevis-rb$k:config/
+#done;
+
+#compile_and_deploy_target liftof-rb ucla-tof-rb16
+#deploy_target liftof-rb ucla-tof-rb43
 
