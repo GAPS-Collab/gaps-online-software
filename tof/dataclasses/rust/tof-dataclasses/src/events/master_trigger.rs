@@ -23,10 +23,6 @@ use crate::events::RBMissingHit;
 use crate::manifest::{LocalTriggerBoard,
                       ReadoutBoard};
 
-//const MT_MAX_PACKSIZE   : usize = 4096;
-/// Maximum packet size of packets we can 
-/// receive over UDP via the IPBus protocoll
-/// (arbitrary number)
 const N_LTBS : usize = 20;
 const N_CHN_PER_LTB : usize = 16;
 

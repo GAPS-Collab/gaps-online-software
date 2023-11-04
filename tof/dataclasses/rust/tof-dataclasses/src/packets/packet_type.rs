@@ -17,19 +17,19 @@ cfg_if::cfg_if! {
 #[repr(u8)]
 pub enum PacketType {
   Unknown            = 0u8, 
-  TofEvent           = 20u8,
-  Monitor            = 21u8,    // needs to go away
-  MasterTrigger      = 30u8,    // needs to be renamed to either MasterTriggerEvent or MTEvent
+  RBEvent            = 20u8,
+  TofEvent           = 21u8,
+  Monitor            = 30u8,    // needs to go away
   HeartBeat          = 40u8,    // might probably go away
-  RBEventHeader      = 60u8,    // needs to go away
-  RBEvent            = 70u8,
-  RBEventMemoryView  = 80u8, // needs to go away
-  TofCommand         = 90u8,
-  RBCommand          = 100u8,
-  RBMoni             = 120u8,
-  MonitorTofCmp      = 130u8,
-  MonitorMtb         = 140u8,
-  RBCalibration      = 150u8,
+  MasterTrigger      = 60u8,    // needs to be renamed to either MasterTriggerEvent or MTEvent
+  RBEventHeader      = 70u8,    // needs to go away
+  MonitorTofCmp      = 80u8,
+  MonitorMtb         = 90u8,
+  RBMoni             = 100u8,
+  RBEventMemoryView  = 120u8, // needs to go away
+  RBCalibration      = 130u8,
+  TofCommand         = 140u8,
+  RBCommand          = 150u8,
 }
 
 impl fmt::Display for PacketType {

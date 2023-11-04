@@ -464,7 +464,7 @@ impl RBEvent {
         }
         ch_crc = parse_u32_for_16bit_words(stream, pos);
         ch_crc_check = dig.finalize();
-        println!("==> Calculated crc32 {}, expected crc32 {}", ch_crc_check, ch_crc);
+        //println!("==> Calculated crc32 {}, expected crc32 {}", ch_crc_check, ch_crc);
         //*pos += 4; // trailer
       }
     }
