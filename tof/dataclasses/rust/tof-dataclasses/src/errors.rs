@@ -102,7 +102,9 @@ pub enum MasterTriggerError {
   QueueEmpty,
   MaskTooLarge,
   BrokenPackage,
-  DAQNotAvailable
+  DAQNotAvailable,
+  PackageHeaderIncorrect,
+  PackageFooterIncorrect,
 }
 
 impl fmt::Display for MasterTriggerError {
