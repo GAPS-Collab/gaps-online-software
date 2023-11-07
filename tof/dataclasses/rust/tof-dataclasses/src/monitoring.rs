@@ -497,12 +497,12 @@ pub struct MtbMoniData {
 
 impl MtbMoniData {
   
-  pub fn new() -> MtbMoniData {
-    MtbMoniData {
-      fpga_temp    : -4242.42,
-      fpga_vccint  : -4242.42,
-      fpga_vccaux  : -4242.42,
-      fpga_vccbram : -4242.42,
+  pub fn new() -> Self {
+    Self {
+      fpga_temp    : f32::MAX,
+      fpga_vccint  : f32::MAX,
+      fpga_vccaux  : f32::MAX,
+      fpga_vccbram : f32::MAX,
       rate         : u16::MAX,
       lost_rate    : u16::MAX
     }
@@ -510,8 +510,8 @@ impl MtbMoniData {
 }
 
 impl Default for MtbMoniData {
-  fn default() -> MtbMoniData {
-    MtbMoniData::new()
+  fn default() -> Self {
+    Self::new()
   }
 }
 
@@ -553,19 +553,9 @@ impl Serialization for MtbMoniData {
   }
 
   fn from_bytestream(stream : &Vec<u8>, pos : &mut usize)
-    -> Result<MtbMoniData, SerializationError> {
-    let mut moni_data = MtbMoniData::new();
-    let head_pos = search_for_u16(Self::HEAD, stream, *pos)?; 
-    let tail_pos = search_for_u16(Self::TAIL, stream, head_pos + MtbMoniData::SIZE-2)?;
-    // At this state, this can be a header or a full event. Check here and
-    // proceed depending on the options
-    if tail_pos + 2 - head_pos != Self::SIZE {
-      error!("MtbMoniData incomplete. Seing {} bytes, but expecting {}", tail_pos + 2 - head_pos, TofCmpMoniData::SIZE);
-      //error!("{:?}", &stream[head_pos + 18526..head_pos + 18540]);
-      *pos = head_pos + 2; //start_pos += RBBinaryDump::SIZE;
-      return Err(SerializationError::WrongByteSize);
-    }
-    *pos = head_pos + 2; 
+    -> Result<Self, SerializationError> {
+    let mut moni_data      = Self::new();
+    Self::verify_fixed(stream, pos)?;
     moni_data.fpga_temp    = parse_f32(&stream, pos);
     moni_data.fpga_vccint  = parse_f32(&stream, pos);
     moni_data.fpga_vccaux  = parse_f32(&stream, pos);
@@ -578,12 +568,35 @@ impl Serialization for MtbMoniData {
   }
 }
 
+#[cfg(feature = "random")]
+impl FromRandom for MtbMoniData {
+  fn from_random() -> Self {
+    let mut moni      = Self::new();
+    let mut rng       = rand::thread_rng();
+    moni.fpga_temp    = rng.gen::<f32>();
+    moni.fpga_vccint  = rng.gen::<f32>();
+    moni.fpga_vccaux  = rng.gen::<f32>();
+    moni.fpga_vccbram = rng.gen::<f32>();
+    moni.rate         = rng.gen::<u16>();
+    moni.lost_rate    = rng.gen::<u16>();
+    moni
+  }
+}
+
 #[cfg(all(test,feature = "random"))]
 mod test_monitoring {
   use crate::serialization::Serialization;
   use crate::FromRandom;
   use crate::monitoring::RBMoniData;
-  
+  use crate::monitoring::MtbMoniData;
+
+  #[test]
+  fn serialization_mtbmonidata() {
+    let data = MtbMoniData::from_random();
+    let test = MtbMoniData::from_bytestream(&data.to_bytestream(), &mut 0).unwrap();
+    assert_eq!(data, test);
+  }
+
   #[test]
   fn serialization_rbmonidata() {
     let data = RBMoniData::from_random();
