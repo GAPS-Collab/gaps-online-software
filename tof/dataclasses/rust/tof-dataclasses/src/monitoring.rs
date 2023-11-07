@@ -487,26 +487,45 @@ impl Serialization for TofCmpMoniData {
 /// Monitoring the MTB
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct MtbMoniData {
-  pub fpga_temp    : f32,
-  pub fpga_vccint  : f32,
-  pub fpga_vccaux  : f32,
-  pub fpga_vccbram : f32,
-  pub rate         : u16,
-  pub lost_rate    : u16
+  pub calibration : u16, 
+  pub vccpint     : u16, 
+  pub vccpaux     : u16, 
+  pub vccoddr     : u16, 
+  pub temp        : u16, 
+  pub vccint      : u16, 
+  pub vccaux      : u16, 
+  pub vccbram     : u16, 
+  pub rate        : u16, 
+  pub lost_rate   : u16, 
 }
 
 impl MtbMoniData {
   
   pub fn new() -> Self {
     Self {
-      fpga_temp    : f32::MAX,
-      fpga_vccint  : f32::MAX,
-      fpga_vccaux  : f32::MAX,
-      fpga_vccbram : f32::MAX,
+      calibration  : u16::MAX,
+      vccpint      : u16::MAX,
+      vccpaux      : u16::MAX,
+      vccoddr      : u16::MAX,
+      temp         : u16::MAX,
+      vccint       : u16::MAX,
+      vccaux       : u16::MAX,
+      vccbram      : u16::MAX,
       rate         : u16::MAX,
       lost_rate    : u16::MAX
     }
   }
+
+  /// Convert ADC temp from adc values to Celsius
+  pub fn get_fpga_temp(&self) -> f32 {
+    self.temp as f32 * 503.975 / 4096.0 - 273.15
+  }
+  
+  // Convert ADC VCCINT from adc values to Voltage
+  fn adc_vcc_conversion(data : u16) -> f32 {
+    3.0 * data as f32 / (2_u32.pow(12-1)) as f32
+  }
+
 }
 
 impl Default for MtbMoniData {
@@ -518,18 +537,27 @@ impl Default for MtbMoniData {
 impl fmt::Display for MtbMoniData {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     write!(f, "<MtbMoniData:
-           \t MTB  EVT RATE [Hz] {}
-           \t LOST EVT RATE [Hz] {}
-           \t FPGA TMP      [C]  {}
-           \t FPGA VCCINT   [V]  {}
-           \t FPGA VCCAUX   [V]  {}
-           \t FPGA VCCBRAM  [V]  {}>",
+  MTB  EVT RATE   [Hz] {}
+  LOST EVT RATE   [Hz] {}
+  CALIBRATION   [ADC?] {}
+  VCCPINT          [V] {}
+  VCCPAUX          [V] {}
+  VCCODDR          [V] {}
+  FPGA TEMP        [C] {}
+  VCCINT           [C] {}
+  VCCAUX           [V] {}
+  VCCBRAM          [V] {}>",
            self.rate,
            self.lost_rate,
-           self.fpga_vccint,
-           self.fpga_vccaux,
-           self.fpga_vccbram,
-           self.fpga_temp)
+           self.calibration,
+           MtbMoniData::adc_vcc_conversion(self.vccpint   ),
+           MtbMoniData::adc_vcc_conversion(self.vccpaux   ),
+           MtbMoniData::adc_vcc_conversion(self.vccoddr   ),
+           self.get_fpga_temp(),
+           MtbMoniData::adc_vcc_conversion(self.vccint    ),
+           MtbMoniData::adc_vcc_conversion(self.vccaux    ),
+           MtbMoniData::adc_vcc_conversion(self.vccbram   ),
+           )
   }
 }
 
@@ -542,12 +570,16 @@ impl Serialization for MtbMoniData {
   fn to_bytestream(&self) -> Vec<u8> {
     let mut stream = Vec::<u8>::with_capacity(Self::SIZE);
     stream.extend_from_slice(&Self::HEAD.to_le_bytes());
-    stream.extend_from_slice(&self.fpga_temp   .to_le_bytes());
-    stream.extend_from_slice(&self.fpga_vccint .to_le_bytes());
-    stream.extend_from_slice(&self.fpga_vccaux .to_le_bytes());
-    stream.extend_from_slice(&self.fpga_vccbram.to_le_bytes());
-    stream.extend_from_slice(&self.rate        .to_le_bytes());
-    stream.extend_from_slice(&self.lost_rate   .to_le_bytes());
+    stream.extend_from_slice(&self.calibration.to_le_bytes());
+    stream.extend_from_slice(&self.vccpint    .to_le_bytes());
+    stream.extend_from_slice(&self.vccpaux    .to_le_bytes());
+    stream.extend_from_slice(&self.vccoddr    .to_le_bytes());
+    stream.extend_from_slice(&self.temp       .to_le_bytes());
+    stream.extend_from_slice(&self.vccint     .to_le_bytes()); 
+    stream.extend_from_slice(&self.vccaux     .to_le_bytes()); 
+    stream.extend_from_slice(&self.vccbram    .to_le_bytes()); 
+    stream.extend_from_slice(&self.rate       .to_le_bytes()); 
+    stream.extend_from_slice(&self.lost_rate  .to_le_bytes());
     stream.extend_from_slice(&Self::TAIL.to_le_bytes());
     stream
   }
@@ -556,10 +588,14 @@ impl Serialization for MtbMoniData {
     -> Result<Self, SerializationError> {
     let mut moni_data      = Self::new();
     Self::verify_fixed(stream, pos)?;
-    moni_data.fpga_temp    = parse_f32(&stream, pos);
-    moni_data.fpga_vccint  = parse_f32(&stream, pos);
-    moni_data.fpga_vccaux  = parse_f32(&stream, pos);
-    moni_data.fpga_vccbram = parse_f32(&stream, pos);
+    moni_data.calibration  = parse_u16(&stream, pos);
+    moni_data.vccpint      = parse_u16(&stream, pos);
+    moni_data.vccpaux      = parse_u16(&stream, pos);
+    moni_data.vccoddr      = parse_u16(&stream, pos);
+    moni_data.temp         = parse_u16(&stream, pos);
+    moni_data.vccint       = parse_u16(&stream, pos);
+    moni_data.vccaux       = parse_u16(&stream, pos);
+    moni_data.vccbram      = parse_u16(&stream, pos);
     moni_data.rate         = parse_u16(&stream, pos);
     moni_data.lost_rate    = parse_u16(&stream, pos);
     *pos += 2; // since we deserialized the tail earlier and 
@@ -573,10 +609,14 @@ impl FromRandom for MtbMoniData {
   fn from_random() -> Self {
     let mut moni      = Self::new();
     let mut rng       = rand::thread_rng();
-    moni.fpga_temp    = rng.gen::<f32>();
-    moni.fpga_vccint  = rng.gen::<f32>();
-    moni.fpga_vccaux  = rng.gen::<f32>();
-    moni.fpga_vccbram = rng.gen::<f32>();
+    moni.calibration  = rng.gen::<u16>();
+    moni.vccpint      = rng.gen::<u16>();
+    moni.vccpaux      = rng.gen::<u16>();
+    moni.vccoddr      = rng.gen::<u16>();
+    moni.temp         = rng.gen::<u16>();
+    moni.vccint       = rng.gen::<u16>();
+    moni.vccaux       = rng.gen::<u16>();
+    moni.vccbram      = rng.gen::<u16>();
     moni.rate         = rng.gen::<u16>();
     moni.lost_rate    = rng.gen::<u16>();
     moni
