@@ -20,8 +20,8 @@ SSL_RB="tof-rb01 tof-rb02 tof-rb03 tof-rb04 tof-rb07 tof-rb08 tof-rb09 tof-rb11 
 #  scp -r configs $rb:config;
 #done
 
-compile_and_deploy_target liftof-rb nevis-rb14
-deploy_target liftof-rb nevis-rb32
+compile_and_deploy_target liftof-rb ucla-tof-rb25
+#deploy_target liftof-rb nevis-rb32
 #deploy_target liftof-rb nevis-rb31
 #deploy_target liftof-rb nevis-rb23
 ##scp configs/runconfig-example.json nevis-rb21:config/
