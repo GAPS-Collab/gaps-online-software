@@ -540,13 +540,13 @@ impl fmt::Display for MtbMoniData {
   MTB  EVT RATE   [Hz] {}
   LOST EVT RATE   [Hz] {}
   CALIBRATION   [ADC?] {}
-  VCCPINT          [V] {}
-  VCCPAUX          [V] {}
-  VCCODDR          [V] {}
-  FPGA TEMP        [C] {}
-  VCCINT           [C] {}
-  VCCAUX           [V] {}
-  VCCBRAM          [V] {}>",
+  VCCPINT          [V] {:.2}
+  VCCPAUX          [V] {:.2}
+  VCCODDR          [V] {:.2}
+  FPGA TEMP        [C] {:.2}
+  VCCINT           [C] {:.2}
+  VCCAUX           [V] {:.2}
+  VCCBRAM          [V] {:.2}>",
            self.rate,
            self.lost_rate,
            self.calibration,

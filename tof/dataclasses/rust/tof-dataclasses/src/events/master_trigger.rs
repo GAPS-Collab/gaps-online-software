@@ -246,8 +246,8 @@ impl MasterTriggerEvent {
   // + head + tail
   // 45
   const SIZE : usize = 45;
-  const TAIL : u16 = 0x5555;
-  const HEAD : u16 = 0xAAAA;
+  const TAIL : u16   = 0x5555;
+  const HEAD : u16   = 0xAAAA;
 
   pub fn new(event_id  : u32, 
              n_paddles : u8) -> Self {
@@ -507,30 +507,6 @@ impl Default for MasterTriggerEvent {
 
 impl fmt::Display for MasterTriggerEvent {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let mut repr = String::from("<MasterTriggerEvent");
-
-    repr += "\n\t event_id                    ";
-    repr += &self.event_id.to_string(); 
-    repr += "\n\t timestamp                   ";
-    repr += &self.timestamp.to_string(); 
-    repr += "\n\t tiu_timestamp               ";
-    repr += &self.tiu_timestamp.to_string(); 
-    repr += "\n\t tiu_gps_32                  ";
-    repr += &self.tiu_gps_32.to_string(); 
-    repr += "\n\t tiu_gps_16                  ";
-    repr += &self.tiu_gps_16.to_string(); 
-    repr += "\n\t n_paddles                   ";
-    repr += &self.n_paddles.to_string(); 
-    repr += "\n\t crc                         ";
-    repr += &self.crc.to_string();
-    repr += "\n\t broken                      ";
-    repr += &self.broken.to_string();
-    repr += "\n\t valid                       ";
-    repr += &self.valid.to_string();
-    repr += "\n -- hit mask --";
-    repr += "\n [DSI/J]";
-    repr += "\n 1/1 - 1/2 - 1/3 - 1/4 - 1/5 - 2/1 - 2/2 - 2/3 - 2/4 - 2/5 - 3/1 - 3/2 - 3/3 - 3/4 - 3/5 - 4/1 - 4/2 - 4/3 - 4/4 - 4/5 \n";
-    let mut hit_boards = Vec::<u8>::with_capacity(20);
     let mut dsi_j = HashMap::<u8, &str>::new();
     dsi_j.insert(0  , "1/1");
     dsi_j.insert(1  , "1/2");
@@ -552,17 +528,43 @@ impl fmt::Display for MasterTriggerEvent {
     dsi_j.insert(16 , "4/3");
     dsi_j.insert(17 , "4/4");
     dsi_j.insert(19 , "4/5");
-    repr += " ";
-    println!("SELFBOARDMASK {:?}", self.board_mask);
+    let mut hit_boards = Vec::<u8>::with_capacity(20);
+    
+    let mut repr = String::from("<MasterTriggerEvent");
+    repr += "\n  event_id                    ";
+    repr += &self.event_id.to_string(); 
+    repr += "\n  timestamp                   ";
+    repr += &self.timestamp.to_string(); 
+    repr += "\n  tiu_timestamp               ";
+    repr += &self.tiu_timestamp.to_string(); 
+    repr += "\n  tiu_gps_32                  ";
+    repr += &self.tiu_gps_32.to_string(); 
+    repr += "\n  tiu_gps_16                  ";
+    repr += &self.tiu_gps_16.to_string(); 
+    repr += "\n  n_paddles                   ";
+    repr += &self.n_paddles.to_string(); 
+    repr += "\n  crc                         ";
+    repr += &self.crc.to_string();
+    repr += "\n  broken                      ";
+    repr += &self.broken.to_string();
+    repr += "\n  valid                       ";
+    repr += &self.valid.to_string();
+    // a bit too excessive representation, might 
+    // be useful for debugging though?
+    //repr += "\n -- hit mask --";
+    //repr += "\n [DSI/J]";
+    //repr += "\n 1/1 - 1/2 - 1/3 - 1/4 - 1/5 - 2/1 - 2/2 - 2/3 - 2/4 - 2/5 - 3/1 - 3/2 - 3/3 - 3/4 - 3/5 - 4/1 - 4/2 - 4/3 - 4/4 - 4/5 \n";
+    //repr += " ";
+    //println!("SELFBOARDMASK {:?}", self.board_mask);
     for k in 0..N_LTBS {
       if self.board_mask[k] {
-        repr += "-X-   ";
+    //    repr += "-X-   ";
         hit_boards.push(k as u8);
       } else {
-        repr += "-0-   ";
+    //    repr += "-0-   ";
       }
     }
-    repr += "\n\t == == LTB HITS [BRD CH] == ==\n";
+    repr += "\n  == == LTB HITS [BRD CH] == ==\n";
     for  k in hit_boards.iter() {
       repr += "\t DSI/J ";
       repr += dsi_j[k];

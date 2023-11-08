@@ -105,6 +105,7 @@ pub enum MasterTriggerError {
   DAQNotAvailable,
   PackageHeaderIncorrect,
   PackageFooterIncorrect,
+  FailedOperation
 }
 
 impl fmt::Display for MasterTriggerError {
@@ -116,6 +117,14 @@ impl fmt::Display for MasterTriggerError {
 }
 
 impl Error for MasterTriggerError {
+}
+
+// Implement the From trait to convert from Box<dyn StdError>
+impl From<Box<dyn std::error::Error>> for MasterTriggerError {
+  fn from(err: Box<dyn std::error::Error>) -> Self {
+    error!("Converting {err} to MasterTriggerError! Exact error type might be incorrect!");
+    MasterTriggerError::FailedOperation
+  }
 }
 
 ////////////////////////////////////////
