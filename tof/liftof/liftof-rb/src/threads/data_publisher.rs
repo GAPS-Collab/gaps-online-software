@@ -221,8 +221,8 @@ pub fn data_publisher(data           : &Receiver<TofPacket>,
           },
           Err(err) => error!("Not able to send over 0MQ PUB socket! Err {err}"),
         }
-        if n_sent % 20 == 0 {
-          println!("==> We sent {n_sent} packets!");
+        if n_sent % 1000 == 0 {
+          info!("==> We sent {n_sent} packets!");
         }
       }
     }

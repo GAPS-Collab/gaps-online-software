@@ -13,7 +13,7 @@ use crossbeam_channel::Sender;
 use tof_dataclasses::monitoring::{TofCmpMoniData,
                                   MtbMoniData};
 use tof_dataclasses::packets::TofPacket;
-use liftof_lib:: monitor_mtb;
+//use liftof_lib:: monitor_mtb;
 
 /// Temperature monitoring for the tof computer. 
 /// This works only on that machine. Unfortunatly, nothing smart seems
@@ -105,7 +105,7 @@ pub fn tofcmp_and_mtb_moni(tp_to_sink    : &Sender<TofPacket>,
     // reconnect to MTB
     if timer.elapsed().as_secs() > moni_interval {
       if use_mtb {
-        monitor_mtb(&mtb_address, &mut mtb_moni);
+        //monitor_mtb(&mtb_address, &mut mtb_moni);
       }
 
       let (c1, c2, pch) = read_cpu_temperature();

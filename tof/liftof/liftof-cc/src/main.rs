@@ -323,10 +323,10 @@ fn main() {
   // prepare channels for inter thread communications
  
   let (tp_to_sink, tp_from_client) : (cbc::Sender<TofPacket>, cbc::Receiver<TofPacket>) = cbc::unbounded();
+  let mtb_moni_sender = tp_to_sink.clone();
 
   // send the rate from the master trigger to the main thread
   warn!("Endpoint of rate from mt channel currently not connected!");
-  let (rate_to_main, _rate_from_mt) : (cbc::Sender<u32>, cbc::Receiver<u32>) = cbc::unbounded();
   // master thread -> event builder ocmmuncations
   let (master_ev_send, master_ev_rec): (cbc::Sender<MasterTriggerEvent>, cbc::Receiver<MasterTriggerEvent>) = cbc::unbounded(); 
   
@@ -424,9 +424,11 @@ fn main() {
                            master_trigger(&master_trigger_ip, 
                                           master_trigger_port,
                                           &ltb_rb_map,
-                                          &rate_to_main,
                                           &master_ev_send,
                                           &cmd_sender_2,
+                                          &mtb_moni_sender,
+                                          10,
+                                          60,
                                           true);
     });
   } else {

@@ -13,6 +13,7 @@ use std::collections::HashMap;
 use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::threading::ThreadPool;
 use tof_dataclasses::DsiLtbRBMapping;
+use tof_dataclasses::events::MasterTriggerEvent;
 use liftof_lib::master_trigger;
 use crossbeam_channel as cbc;
 use std::io::Write;
@@ -31,8 +32,8 @@ fn main() {
       )
     }).init();
  
-
- let (tp_send, tp_rec): (cbc::Sender<TofPacket>, cbc::Receiver<TofPacket>) = cbc::unbounded(); 
+ let (mte_send, mte_rec): (cbc::Sender<MasterTriggerEvent>, cbc::Receiver<MasterTriggerEvent>) = cbc::unbounded(); 
+ let (tp_send_moni, _tp_rec_moni): (cbc::Sender<TofPacket>, cbc::Receiver<TofPacket>) = cbc::unbounded(); 
  let (tp_send_req, _tp_rec_req): (cbc::Sender<TofPacket>, cbc::Receiver<TofPacket>) = cbc::unbounded(); 
   
  let ltb_rb_map : DsiLtbRBMapping = HashMap::<u8,HashMap::<u8,HashMap::<u8,(u8,u8)>>>::new();
@@ -44,7 +45,8 @@ fn main() {
                         master_trigger(&master_trigger_ip, 
                                        master_trigger_port,
                                        &ltb_rb_map,
-                                       &tp_send,
+                                       &mte_send,
+                                       &tp_send_moni,
                                        &tp_send_req,
                                        10,
                                        60,
@@ -52,7 +54,7 @@ fn main() {
  });
 
  loop {
-   match tp_rec.recv() {
+   match mte_rec.recv() {
      Err(err)  => trace!("Can not receive events! Error {err}"),
      Ok(_ev)    => {
        //if ev.n_paddles > 0 {

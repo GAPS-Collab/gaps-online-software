@@ -425,8 +425,9 @@ pub fn get_mtbmonidata(socket         : &UdpSocket,
 pub fn master_trigger(mt_ip             : &str, 
                       mt_port           : usize,
                       dsi_j_mapping     : &DsiLtbRBMapping,
-                      mt_sender         : &Sender<TofPacket>,
+                      mt_sender         : &Sender<MasterTriggerEvent>,
                       rb_request_tp     : &Sender<TofPacket>,
+                      moni_sender       : &Sender<TofPacket>,
                       mtb_moni_interval : u64,
                       mtb_timeout_sec   : u64,
                       verbose           : bool) {
@@ -502,7 +503,7 @@ pub fn master_trigger(mt_ip             : &str,
         },
         Ok(_moni) => {
           let tp = TofPacket::from(&_moni);
-          match mt_sender.send(tp) {
+          match moni_sender.send(tp) {
             Err(err) => {
               error!("Can not send MtbMoniData over channel! {err}");
             },
@@ -533,18 +534,11 @@ pub fn master_trigger(mt_ip             : &str,
           }
         }
         last_event_id = _ev.event_id;
-        let tp = TofPacket::from(&_ev);
+        //let tp = TofPacket::from(&_ev);
         // we got an even successfully, so reset the 
         // connection timeout
         mtb_timeout = Instant::now();
         n_events += 1;
-        match mt_sender.send(tp) {
-          Err(err) => {
-            error!("Can not send MasterTriggerEvent over channel! {err}");
-            n_ev_unsent += 1;
-          },
-          Ok(_) => ()
-        }
         let request_enabled = false; //FIXME
         if request_enabled {
           trace!("Got new event id from master trigger {}",_ev.event_id);
@@ -593,6 +587,14 @@ pub fn master_trigger(mt_ip             : &str,
             }
           } 
         } // end if request
+        match mt_sender.send(_ev) {
+          Err(err) => {
+            error!("Can not send MasterTriggerEvent over channel! {err}");
+            n_ev_unsent += 1;
+          },
+          Ok(_) => ()
+        }
+
       }
     }
     if verbose {
