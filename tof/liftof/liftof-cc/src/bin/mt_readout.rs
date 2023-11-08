@@ -12,7 +12,6 @@ use std::collections::HashMap;
 
 use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::threading::ThreadPool;
-use tof_dataclasses::events::MasterTriggerEvent; 
 use tof_dataclasses::DsiLtbRBMapping;
 use liftof_lib::master_trigger;
 use crossbeam_channel as cbc;
@@ -33,31 +32,31 @@ fn main() {
     }).init();
  
 
- let (tp_send, _tp_rec): (cbc::Sender<TofPacket>, cbc::Receiver<TofPacket>) = cbc::unbounded(); 
- let (master_ev_send, master_ev_rec): (cbc::Sender<MasterTriggerEvent>, cbc::Receiver<MasterTriggerEvent>) = cbc::unbounded(); 
+ let (tp_send, tp_rec): (cbc::Sender<TofPacket>, cbc::Receiver<TofPacket>) = cbc::unbounded(); 
+ let (tp_send_req, _tp_rec_req): (cbc::Sender<TofPacket>, cbc::Receiver<TofPacket>) = cbc::unbounded(); 
   
-  let ltb_rb_map : DsiLtbRBMapping = HashMap::<u8,HashMap::<u8,HashMap::<u8,(u8,u8)>>>::new();
+ let ltb_rb_map : DsiLtbRBMapping = HashMap::<u8,HashMap::<u8,HashMap::<u8,(u8,u8)>>>::new();
  let master_trigger_ip   = String::from("10.0.1.10");
  let master_trigger_port = 50001usize;
- let worker_threads = ThreadPool::new(2);
- let (rate_to_main, _rate_from_mt) : (cbc::Sender<u32>, cbc::Receiver<u32>) = cbc::unbounded();
+ let worker_threads      = ThreadPool::new(2);
 
  worker_threads.execute(move || {
                         master_trigger(&master_trigger_ip, 
                                        master_trigger_port,
                                        &ltb_rb_map,
-                                       &rate_to_main,
-                                       &master_ev_send,
                                        &tp_send,
+                                       &tp_send_req,
+                                       10,
+                                       60,
                                        true);
  });
 
  loop {
-   match master_ev_rec.recv() {
-     Err(err)  => error!("Can not receive events! Error {err}"),
-     Ok(ev)    => {
+   match tp_rec.recv() {
+     Err(err)  => trace!("Can not receive events! Error {err}"),
+     Ok(_ev)    => {
        //if ev.n_paddles > 0 {
-         println!("Received event {}", ev);
+       //  println!("Received event {}", ev);
        //}
      }
    }

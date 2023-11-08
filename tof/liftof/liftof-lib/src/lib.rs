@@ -1,24 +1,21 @@
 pub mod master_trigger;
 pub use master_trigger::{connect_to_mtb,
-                         monitor_mtb,
                          master_trigger};
 
 use std::error::Error;
-use std::time::{Duration, Instant};
-//use std::thread;
 use std::fmt;
 use std::{fs::File, path::Path};
 use std::path::PathBuf;
 use std::fs::OpenOptions;
 use std::fs::read_to_string;
 use std::io::{self, BufReader};
-use std::net::{IpAddr, Ipv4Addr};
 use std::io::{Read,
               Write,
               Seek,
               SeekFrom};
 use std::collections::HashMap;
-use std::net::{UdpSocket, SocketAddr};
+use std::net::IpAddr;
+use std::net::Ipv4Addr;
 use crossbeam_channel::Receiver;
 use zmq;
 use colored::{Colorize, ColoredString};
@@ -28,7 +25,6 @@ use serde_json::Value;
 use log::Level;
 use macaddr::MacAddr6;
 use netneighbours::get_mac_to_ip_map;
-use crossbeam_channel as cbc; 
 
 extern crate indicatif;
 use indicatif::{ProgressBar, ProgressStyle};
@@ -48,10 +44,8 @@ use tof_dataclasses::serialization::{search_for_u16,
                                      parse_u8,
                                      parse_u32,
                                      Serialization};
-use tof_dataclasses::monitoring::MtbMoniData;
 use tof_dataclasses::commands::RBCommand;
 use tof_dataclasses::events::{RBEvent,
-                              MasterTriggerEvent,
                               TofHit};
 
 use tof_dataclasses::analysis::{calculate_pedestal,
