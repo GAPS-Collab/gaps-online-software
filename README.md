@@ -97,6 +97,18 @@ The software includes (<src> is the original source directory of `gaps-online-so
                       as python analysis code.
 - A live eventviewer : `<src>/event-viewer` This currently only shows the tracker in a 2d projection.
 
+## A note about testing
+
+`cargo` provides unit and integration tests. Without going into further detail here,
+please note that some care is needed that all tests are run when using `cargo test`. 
+In general, there is 
+
+* `cargo test --features=random` to run the unit tests
+* `cargo test --features=random --test=test` to run the integration tests
+
+The command `cargo test --features=random -- list` will list all tests. Further usefule
+is the addition of the `--no-capture` flag, e.g. `cargo test --features=random -- --no-captuer` in case the output of the tests shall be printed as well.
+
 ## getting help
 
 Please see the README.md in the individual subfolders. 
