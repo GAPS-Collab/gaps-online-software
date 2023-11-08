@@ -15,6 +15,8 @@
 #include "blobroutines.h"
 #include "events.h"
 
+class RBEvent;
+class RBEventMemoryView;
 
 
 /**

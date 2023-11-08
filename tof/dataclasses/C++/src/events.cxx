@@ -1,3 +1,5 @@
+#include<numeric>
+
 #include "events.h"
 #include "parsers.h"
 #include "serialization.h"
@@ -342,6 +344,42 @@ const Vec<u16>& RBEvent::get_channel_by_id(u8 channel) const {
   }
   return adc[channel - 1];
 }
+
+/**********************************************************/
+
+Vec<f32> RBEvent::get_baselines(const RBCalibration &cali,
+                                usize min_bin,
+                                usize max_bin) {
+  Vec<f32> baselines = Vec<f32>();
+  for (auto const &ch : adc) {
+    if (min_bin >= ch.size() || max_bin >= ch.size()) {
+      spdlog::error("Can not use bin range {} {} for ch with size {}", min_bin, max_bin, ch.size());
+      return baselines;
+    }
+  }
+  auto ch_bl = cali.voltages(*this, true);
+  for (usize ch = 0; ch<ch_bl.size(); ch++) {
+    //f32 bl     = std::accumulate(ch_bl[ch].begin() + min_bin, ch_bl[ch].begin() + max_bin,0);
+    f32 bl     = 0;
+    usize indx = 0;
+    for (auto const &val : ch_bl[ch]) {
+      if (indx < min_bin) {
+        indx++;
+        continue;
+      }
+      if (indx > max_bin) {
+        break;
+      }
+      bl += val;
+      indx++;
+    }
+    bl        /= (f32)(max_bin - min_bin);
+    baselines.push_back(bl);
+  }
+  return baselines;
+}
+
+
 
 /**********************************************************/
 

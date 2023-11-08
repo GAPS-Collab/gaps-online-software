@@ -19,6 +19,9 @@
 #include "packets/monitoring.h"
 #include "packets/tof_packet.h"
 #include "events/tof_event_header.hpp"
+#include "calibration.h"
+
+class RBCalibration;
 
 #define NCHN 9
 #define NWORDS 1024
@@ -160,7 +163,8 @@ struct RBEvent {
   const Vec<u16>& get_channel_by_id(u8 channel) const;
 
   const Vec<u16>& get_channel_adc(u8 channel) const; 
-  
+ 
+  Vec<f32> get_baselines(const RBCalibration &cali, usize min_bin, usize max_bin); 
 
   static RBEvent from_bytestream(const Vec<u8> &bytestream,
                                  u64 &pos);

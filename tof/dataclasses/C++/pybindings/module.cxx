@@ -440,6 +440,8 @@ PYBIND11_MODULE(gaps_tof, m) {
         .def_readonly("header"              ,&RBEvent::header)
         .def_readonly("nchan"               ,&RBEvent::nchan)
         .def_readonly("npaddles"            ,&RBEvent::npaddles)
+        .def("get_baselines"                ,&RBEvent::get_baselines,
+                                             "Calculate baselines using the given calibration object in min/max range")  
         .def("get_channel_adc"              ,&RBEvent::get_channel_adc,
                                              "Get the ADC values for a specific channel. Channel ids go from 1-9",
                                              py::arg("channel"),
