@@ -3,9 +3,9 @@ name: CMake
 on:
   workflow_dispatch:
   push:
-    branches: [ "KIHIKIHI-0.6", "main" ]
+    branches: [ "develop", "main", "NIUHI-0.8" ]
   pull_request:
-    branches: [ "KIHIKIHI-0.6", "main" ]
+    branches: [ "develop", "main", "NIUHI-0.8" ]
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
