@@ -50,6 +50,54 @@ cfg_if::cfg_if! {
   }
 }
 
+#[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
+#[repr(u8)]
+pub enum EventStatus {
+  Unknown            = 0u8,
+  CRC32Wrong         = 10u8,
+  TailWrong          = 11u8,
+  Perfect            = 42u8
+}
+
+impl fmt::Display for EventStatus {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let r = serde_json::to_string(self).unwrap_or(
+      String::from("Error: cannot unwrap this EventStatus"));
+    write!(f, "<EventStatus: {}>", r)
+  }
+}
+
+impl TryFrom<u8> for EventStatus {
+  type Error = &'static str;
+
+  // I am not sure about this hard coding, but the code
+  //  looks nicer - Paolo
+  fn try_from(value: u8) -> Result<Self, Self::Error> {
+    match value {
+      0u8  => Ok(EventStatus::Unknown),
+      10u8 => Ok(EventStatus::CRC32Wrong),
+      10u8 => Ok(EventStatus::TailWrong),
+      20u8 => Ok(EventStatus::Perfect),
+      _    => Err("I am not sure how to convert this value!")
+    }
+  }
+}
+
+#[cfg(feature = "random")]
+impl FromRandom for EventStatus {
+  
+  fn from_random() -> Self {
+    let choices = [
+      EventStatus::Unknown,
+      EventStatus::CRC32Wrong,
+      EventStatus::TailWrong,
+      EventStatus::Perfect,
+    ];
+    let mut rng  = rand::thread_rng();
+    let idx = rng.gen_range(0..choices.len());
+    choices[idx]
+  }
+}
 
 /// Debug information for missing hits. 
 ///
@@ -694,9 +742,12 @@ pub struct RBEventHeader {
   pub fpga_temp            : u16  , 
   pub event_id             : u32  , 
   pub rb_id                : u8   , 
+  pub timestamp32          : u32  ,
+  pub timestamp16          : u16  ,
   pub timestamp_48         : u64  , 
   pub broken               : bool , 
-
+  // channels (0-8)
+  pub channels             : Vec<u8>,
   // fields which don't get serialized
   pub nwords               : usize,
   pub channel_packet_len   : usize,
@@ -721,8 +772,11 @@ impl RBEventHeader {
       fpga_temp            : 0,  
       event_id             : 0,  
       rb_id                : 0,  
+      timestamp32          : 0,
+      timestamp16          : 0,
       timestamp_48         : 0,  
       broken               : false,  
+      channels             : Vec::<u8>::with_capacity(9),
       // fields that won't get serialized
       nwords               : 0,
       channel_packet_len   : 0,
@@ -738,6 +792,30 @@ impl RBEventHeader {
     event_id
   }
 
+  /// extract lock, drs busy and fpga temp from status field
+  pub fn parse_status(&mut self, status_bytes : u16) {
+    let mut status          = status_bytes;
+    self.event_fragment     = status & 1 > 0;
+    status                  = status >> 1;
+    self.lost_trigger       = status & 1 > 0;
+    status                  = status >> 1;
+    // FIXME - rename these fields
+    self.is_locked          = status & 1 > 0;
+    status                  = status >> 1;
+    self.is_locked_last_sec = status & 1 > 0;
+    status = status >> 1;
+    self.fpga_temp = status;
+  }
+
+  pub fn parse_channel_mask(&mut self, channel_mask : u16) {
+    let mut mask = channel_mask;
+    for ch in 0..9 {
+      if mask & 0x1 > 0 {
+        self.channels.push(ch as u8);
+        mask = mask >> 1;
+      }
+    }
+  }
 
   /// Get the temperature value (Celsius) from the fpga_temp adc.
   pub fn get_fpga_temp(&self) -> f32 {
@@ -759,16 +837,7 @@ impl RBEventHeader {
     // parsing the 2 bytes which contain
     // fpga_temp and status
     let mut status = parse_u16(stream, pos);
-
-    header.event_fragment = status & 1 > 0;
-    status = status >> 1;
-    header.lost_trigger = status & 1 > 0;
-    status = status >> 1;
-    header.is_locked = status & 1 > 0;
-    status = status >> 1;
-    header.is_locked_last_sec = status & 1 > 0;
-    status = status >> 1;
-    header.fpga_temp = status;
+    header.parse_status(status);
 
     header.has_ch9 = false; // we check for that later
     // don't write packet len and roi to struct
