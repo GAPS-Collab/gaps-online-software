@@ -156,8 +156,10 @@ RBEventHeader RBEventHeader::from_bytestream(const Vec<u8> &stream,
   header.fpga_temp           = Gaps::parse_u16(stream , pos);  
   header.event_id            = Gaps::parse_u32(stream , pos);  
   header.rb_id               = Gaps::parse_u8(stream  , pos);  
-  header.timestamp_48        = Gaps::parse_u64(stream , pos);  
-  header.broken              = Gaps::parse_bool(stream, pos);  
+  Gaps::parse_u16(stream, pos);
+  Gaps::parse_u16(stream, pos);
+  //header.timestamp_48        = Gaps::parse_u64(stream , pos);  
+  //header.broken              = Gaps::parse_bool(stream, pos);  
   u16 tail                   = Gaps::parse_u16(stream, pos);
   if (tail != RBEventHeader::TAIL) {
     spdlog::error("Tail signature incorrect! Got tail {}", tail);
@@ -409,6 +411,9 @@ RBEvent RBEvent::from_bytestream(const Vec<u8> &stream,
   }
   if (event.header.has_ch9) {
     spdlog::debug("Trying to parse ch9 data!");
+    if (stream.size() < pos + 2*NWORDS) {
+      spdlog::error("Not enough data available to parse ch9!");
+    }
     Vec<u8>::const_iterator start = stream.begin() + pos;
     Vec<u8>::const_iterator end   = stream.begin() + pos + 2*NWORDS;    // 2*NWORDS because stream is Vec::<u8> and it is 16 bit words.
     Vec<u8> data(start, end);
