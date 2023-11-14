@@ -48,19 +48,19 @@ impl TryFrom<u8> for PacketType {
   fn try_from(value: u8) -> Result<Self, Self::Error> {
     match value {
       0u8   => Ok(PacketType::Unknown),
-      20u8  => Ok(PacketType::TofEvent),
-      21u8  => Ok(PacketType::Monitor),
-      30u8  => Ok(PacketType::MasterTrigger),
+      20u8  => Ok(PacketType::RBEvent),
+      21u8  => Ok(PacketType::TofEvent),
+      30u8  => Ok(PacketType::Monitor),
       40u8  => Ok(PacketType::HeartBeat),
-      60u8  => Ok(PacketType::RBEventHeader),
-      70u8  => Ok(PacketType::RBEvent),
-      80u8  => Ok(PacketType::RBEventMemoryView),
-      90u8  => Ok(PacketType::TofCommand),
-      100u8 => Ok(PacketType::RBCommand),
-      120u8 => Ok(PacketType::RBMoni),
-      130u8 => Ok(PacketType::MonitorTofCmp),
-      140u8 => Ok(PacketType::MonitorMtb),
-      150u8 => Ok(PacketType::RBCalibration),
+      60u8  => Ok(PacketType::MasterTrigger),
+      70u8  => Ok(PacketType::RBEventHeader),
+      80u8  => Ok(PacketType::MonitorTofCmp),
+      90u8  => Ok(PacketType::MonitorMtb),
+      100u8 => Ok(PacketType::RBMoni),
+      120u8 => Ok(PacketType::RBEventMemoryView),
+      130u8 => Ok(PacketType::RBCalibration),
+      140u8 => Ok(PacketType::TofCommand),
+      150u8 => Ok(PacketType::RBCommand),
       _     => Err("I am not sure how to convert this value!")
     }
   }
