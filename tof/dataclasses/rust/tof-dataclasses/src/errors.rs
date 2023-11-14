@@ -9,6 +9,24 @@ use std::fmt;
 ////////////////////////////////////////
 
 #[derive(Debug, Copy, Clone, serde::Deserialize, serde::Serialize)]
+pub enum SensorError {
+  ReadoutError,
+}
+
+impl fmt::Display for SensorError {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let disp = serde_json::to_string(self).unwrap_or(
+      String::from("Error: cannot unwrap this SensorError"));
+    write!(f, "<ReadoutError : {}>", disp)
+  }
+}
+
+impl Error for SensorError {
+}
+
+////////////////////////////////////////
+
+#[derive(Debug, Copy, Clone, serde::Deserialize, serde::Serialize)]
 pub enum CalibrationError {
   EmptyInputData,
   CanNotConnectToMyOwnZMQSocket  
