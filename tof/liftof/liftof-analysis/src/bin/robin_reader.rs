@@ -33,10 +33,12 @@ use tof_dataclasses::manifest::{get_ltbs_from_sqlite,
                                 get_rbs_from_sqlite};
 use tof_dataclasses::serialization::Serialization;
 use tof_dataclasses::calibrations::RBCalibrations;
+use tof_dataclasses::io::RobinReader;
 
-use liftof_lib::{RobinReader,
-                 TofPacketWriter,
-                 TofPacketReader};
+use liftof_lib::{
+  TofPacketWriter,
+  TofPacketReader
+};
 
 
 #[derive(Parser, Default, Debug)]
@@ -83,7 +85,7 @@ fn main() {
       if let Ok(entries) = glob(calib_dir.to_str().unwrap()) { 
         for entry in entries {
           if let Ok(path) = entry {
-            let rb_calib = RBCalibrations::from(path.as_path());            
+            let rb_calib = RBCalibrations::from_txtfile(path.as_path());            
             println!("=> Loaded RB calibration: {} from file {:?}", rb_calib, path.display());
             calibrations.insert(rb_calib.rb_id, rb_calib);
             //let filename = path.into_os_string().into_string().unwrap();
@@ -133,18 +135,24 @@ fn main() {
   let re = Regex::new(pattern).unwrap();
  
   let mut available_rbs = Vec::<u8>::new();
-  if let Ok(entries) = glob(&args.robin_data) { 
+  if let Ok(entries) = glob(&args.robin_data) {
     for entry in entries {
       if let Ok(path) = entry {
         println!("Matched file: {:?}", path.display());
         let filename = path.into_os_string().into_string().unwrap();
         if let Some(mat) = re.captures(&filename) {
           let rb_id = mat.get(1).unwrap().as_str().parse::<u8>().unwrap();
+          if available_rbs.contains(&rb_id) {
+            //println!("=> Omiting {}", filename);
+            robin_readers.get_mut(&rb_id).unwrap().add_file(filename);
+            continue;
+          }
+          available_rbs.push(rb_id);
           let mut this_reader = RobinReader::new(filename);
           this_reader.cache_all_events();
+          // exit(1);
           robin_readers.insert(rb_id, this_reader);
           //println!("First one or two-digit number: {}", mat.get(1).unwrap().as_str());
-          available_rbs.push(rb_id);
         } else {
           error!("Can not recognize pattern!!");
         }
@@ -153,7 +161,13 @@ fn main() {
       }
     }
   }
-
+  println!("available rbs {:?}", available_rbs);
+  for k in available_rbs.iter() {
+    println!("{}", k);
+    println!("{}", robin_readers[k].filename); 
+    println!("{}", robin_readers[k].get_cache_size()); 
+  }
+  //exit(1);
   //let mut reader = robin_readers.get_mut(&22).unwrap();
   //reader.cache_all_events();
   //reader.print_index();
@@ -175,10 +189,9 @@ fn main() {
 
   if has_stream {
     for packet in packet_reader {
-      //println!("{}", packet);
+      println!("{}", packet);
       match packet.packet_type {
         PacketType::MasterTrigger =>  {
-          //println!("{:?}", packet.payload);
           let mt_packet = MasterTriggerEvent::from_bytestream(&packet.payload, &mut 0); 
           if let Ok(mtp) = mt_packet {
             if seen_evids.contains(&mtp.event_id) {
@@ -222,13 +235,13 @@ fn main() {
                 }
                 Some(rbevent) => {
                   //println!("{:?}", rbevent.adc);
-                  if !rbevent.is_over_adc_threshold(this_ev_rbch, 8000) {
-                    continue;
-                  }
+                  //if !rbevent.is_over_adc_threshold(this_ev_rbch, 8000) {
+                  //  continue;
+                  //}
                   if use_calibrations {
                     //let mut channel_data : [f32;1024] = [0.0;1024];
                     let mut channel_data = vec![0.0f32;1024];
-                    let channel_adc = rbevent.get_adc_ch(this_ev_rbch);
+                    let channel_adc = &rbevent.adc[this_ev_rbch as usize -1]; //get_adc_ch(this_ev_rbch);
                     //let mut channel_adc  : [u16;1024] = rbevent.get_adc_ch(this_ev_rbch).try_into().expect("Waveform does not have expected len of 1024!");
                     calibrations[&this_ev_rbid].voltages(this_ev_rbch as usize,
                                                          rbevent.header.stop_cell as usize,
@@ -242,7 +255,7 @@ fn main() {
                     //Chart::new(240, 60, 0.0, 1024.0)
                     //  .lineplot(&Shape::Lines(data.as_slice())).display();
                   } else {
-                    let channel_data = rbevent.get_adc_ch(this_ev_rbch);
+                    let channel_data = &rbevent.adc[this_ev_rbch as usize - 1];//get_adc_ch(this_ev_rbch);
                     //println!("ch {}", this_ev_rbch);
                     //println!("{:?}", channel_data);
                     //println!("{}", channel_data.len());
@@ -307,7 +320,8 @@ fn main() {
             
             let tof_packet = TofPacket::from(&master_tof_event);
             writer.add_tof_packet(&tof_packet);
-            exit(0);
+            //exit(0);
+
           } else {
             error!("Error decoding MasterTriggerPacket!");
           }

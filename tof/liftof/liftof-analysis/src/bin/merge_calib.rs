@@ -33,10 +33,15 @@ use tof_dataclasses::events::{RBEvent,
 use tof_dataclasses::serialization::{Serialization,
                                      search_for_u16};
 use tof_dataclasses::calibrations::RBCalibrations;
-use tof_dataclasses::io::read_file; 
-use liftof_lib::{RobinReader,
-                 color_log,
-                 TofPacketWriter};
+use tof_dataclasses::io::{
+    read_file,
+    RobinReader
+}; 
+
+use liftof_lib::{
+    color_log,
+    TofPacketWriter
+};
 
 
 #[derive(Parser, Default, Debug)]
@@ -60,10 +65,10 @@ fn main() {
   }).init();
 
 
-  let args      = Args::parse();
-  let noi_pattern   = String::from(".noi");
-  let vcal_pattern  = String::from(".vcal");
-  let tcal_pattern  = String::from(".tcal");
+  let args               = Args::parse();
+  let noi_pattern        = String::from(".noi");
+  let vcal_pattern       = String::from(".vcal");
+  let tcal_pattern       = String::from(".tcal");
   let mut board_ids      = Vec::<u8>::new(); 
   let mut calibrations   = HashMap::<u8, RBCalibrations>::new();
   let board_events_noi   = HashMap::<u8, Vec<RBEvent>>::new();
@@ -90,73 +95,34 @@ fn main() {
     bar.println("Checking ".to_owned() + filename + " ..");
     if let Some(mat) = rb_regex.captures(&filename) {
       let rb_id = mat.get(1).unwrap().as_str().parse::<u8>().unwrap();
-      if rb_id != 24 {
-        continue;
-      }
+      //if rb_id != 1 {
+      //  continue;
+      //}
       board_ids.push(rb_id);
-      //let mut reader = RobinReader::new((&filename).to_string());
-      //reader.cache_all_events();
       if !calibrations.contains_key(&rb_id) {
         calibrations.insert(rb_id, RBCalibrations::new(rb_id));
       }
       let mut cali   = calibrations.get_mut(&rb_id).unwrap();
       if filename.to_string().ends_with(".vcal") {
-        let file_path = Path::new(filename);
-        let bs = read_file(&file_path).unwrap();
-        let mut events = Vec::<RBEvent>::new();
-        let mut pos = search_for_u16(RBEventMemoryView::HEAD, &bs, 0).unwrap();
-        while pos + RBEventMemoryView::SIZE < bs.len() {
-          match RBEvent::extract_from_rbeventmemoryview(&bs, &mut pos) {
-            Ok(event) => {
-              events.push(event);
-            },
-            Err(err) => {
-              error!("error {err}");
-              pos += 1;
-            }
-          }
-        }
+        let mut reader    = RobinReader::new(filename.to_string());
+        reader.cache_all_events();
+        let mut events = reader.get_events();
+        println!("=> file {}", filename);
+        println!("=> Cache of size {}", reader.get_cache_size());
         events.dedup();
         cali.vcal_data = events;
-        //cali.vcal_data = reader.get_events();
       } else if filename.to_string().ends_with(".tcal") {
-        let file_path = Path::new(filename);
-        let bs = read_file(&file_path).unwrap();
-        let mut events = Vec::<RBEvent>::new();
-        let mut pos = search_for_u16(RBEventMemoryView::HEAD, &bs, 0).unwrap();
-        while pos + RBEventMemoryView::SIZE < bs.len() {
-          match RBEvent::extract_from_rbeventmemoryview(&bs, &mut pos) {
-            Ok(event) => {
-              events.push(event);
-            },
-            Err(err) => {
-              error!("error {err}");
-              pos += 1;
-            }
-          }
-        }
+        let mut reader    = RobinReader::new(filename.to_string());
+        reader.cache_all_events();
+        let mut events = reader.get_events();
         events.dedup();
         cali.tcal_data = events;
-        //cali.tcal_data = reader.get_events();
       } else if filename.to_string().ends_with(".noi") {
-        let file_path = Path::new(filename);
-        let bs = read_file(&file_path).unwrap();
-        let mut events = Vec::<RBEvent>::new();
-        let mut pos = search_for_u16(RBEventMemoryView::HEAD, &bs, 0).unwrap();
-        while pos + RBEventMemoryView::SIZE < bs.len() {
-          match RBEvent::extract_from_rbeventmemoryview(&bs, &mut pos) {
-            Ok(event) => {
-              events.push(event);
-            },
-            Err(err) => {
-              error!("error {err}");
-              pos += 1;
-            }
-          }
-        }
+        let mut reader    = RobinReader::new(filename.to_string());
+        reader.cache_all_events();
+        let mut events = reader.get_events();
         events.dedup();
         cali.noi_data = events;
-        //cali.noi_data = reader.get_events();
       } else {
         println!("=> Unable to identify file type of {}", filename);
       }
@@ -175,12 +141,13 @@ fn main() {
     println!("=> Cali: {}",calibrations[&rb]);
     calibrations.get_mut(&rb).unwrap().calibrate();
     println!("=> Cali: {}",calibrations[&rb]);
-    calibrations.get_mut(&rb).unwrap().serialize_event_data = false;
-    //cali.calibrate();
+    calibrations.get_mut(&rb).unwrap().serialize_event_data = true;
     let tp   = TofPacket::from(&calibrations[&rb]);
     let cali_filename = format!("rb{:02}.cali", rb);
     let mut writer = TofPacketWriter::new(cali_filename);
     writer.add_tof_packet(&tp);
+    println!("=> Calibration saved!");
   }
+println!("=> Done!");
 }
 
