@@ -8,6 +8,8 @@ pub use crate::errors::SerializationError;
 use std::error::Error;
 use std::path::Path;
 
+use std::collections::VecDeque;
+
 /// Convert a vector of u16 into a vector of u8
 ///
 /// The resulting vector has twice the number
@@ -38,6 +40,13 @@ pub fn parse_u8(bs : &Vec::<u8>, pos : &mut usize) -> u8 {
   value
 }
 
+pub fn parse_u8_deque(bs : &VecDeque::<u8>, pos : &mut usize) -> u8 {
+  let value = u8::from_le_bytes([bs[*pos]]);
+  *pos += 1;
+  value
+}
+
+
 /// Get u32 from a bytestream and move on the position marker
 ///
 /// # Arguments 
@@ -45,6 +54,13 @@ pub fn parse_u8(bs : &Vec::<u8>, pos : &mut usize) -> u8 {
 /// * bs
 /// * pos 
 pub fn parse_u16(bs : &Vec::<u8>, pos : &mut usize) -> u16 {
+  let value = u16::from_le_bytes([bs[*pos], bs[*pos+1]]);
+  *pos += 2;
+  value
+}
+
+// FIXME - make this a generic
+pub fn parse_u16_deque(bs : &VecDeque::<u8>, pos : &mut usize) -> u16 {
   let value = u16::from_le_bytes([bs[*pos], bs[*pos+1]]);
   *pos += 2;
   value
@@ -130,6 +146,7 @@ pub fn get_json_from_file(filename : &Path)
   let config = serde_json::from_str(&file_content)?;
   Ok(config)
 }
+
 
 /// Encode/decode structs to Vec::<u8> to write to a file or
 /// send over the network
@@ -222,7 +239,7 @@ pub fn search_for_u16(number : u16, bytestream : &Vec<u8>, start_pos : usize)
   }
   // if it is not at start pos, then traverse 
   // the stream
-  pos += 2;
+  pos += 1;
   let mut found = false;
   // we search for the next packet
   for n in pos..bytestream.len() - 1 {
