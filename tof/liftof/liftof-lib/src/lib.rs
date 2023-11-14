@@ -128,7 +128,8 @@ impl TofPacketWriter {
   /// * file_prefix : Prefix file with this string. A continuous number will get 
   ///                 appended to control the file size.
   pub fn new(file_prefix : String) -> Self {
-    let filename = file_prefix.clone() + "_0.tof.gaps";
+    //let filename = file_prefix.clone() + "_0.tof.gaps";
+    let filename = file_prefix.clone() + ".tof.gaps";
     let path = Path::new(&filename); 
     info!("Writing to file {filename}");
     let file = OpenOptions::new().create(true).append(true).open(path).expect("Unable to open file {filename}");
@@ -163,6 +164,7 @@ impl TofPacketWriter {
       self.n_packets = 0;
       self.file_id += 1;
     }
+  debug!("TofPacket written!");
   }
 }
 
@@ -342,380 +344,6 @@ impl Iterator for TofPacketReader {
   }
 }
 
-
-/**************************************************/
-
-/// Read RB binary (robin) files. These are also 
-/// known as "blob" files
-///
-/// The robin reader consumes a file. 
-///
-///
-#[derive(Debug)]
-pub struct RobinReader {
-  pub filename    : String,
-  file_reader     : Option<BufReader<File>>,
-  pub board_id    : u8,
-  // cache events
-  cache           : HashMap<u32, RBEvent>, 
-  // event id position of in stream
-  index           : HashMap<u32, usize>,
-  /// number of events we have successfully parsed from the file
-  n_events_read   : usize,
-  n_bytes_read    : usize,
-  pub eof_reached : bool,
-}
-
-impl RobinReader {
-
-  const EVENT_SIZE : usize = 18530;
-
-  pub fn new(filename : String) -> Self {
-    let filename_c = filename.clone();
-    let mut robin_reader = Self { 
-      filename      : String::from(""),
-      file_reader   : None,
-      board_id      : 0,
-      cache         : HashMap::<u32,RBEvent>::new(),
-      index         : HashMap::<u32,usize>::new(),
-      eof_reached   : false,
-      n_events_read : 0,
-      n_bytes_read  : 0
-    };
-    robin_reader.open(filename_c);
-    robin_reader.init();
-    robin_reader
-  }
-  
-  fn init(&mut self) {
-    //match self.search_start() {
-    //  Err(err) => {
-    //    error!("Can not find any header signature (typically 0xAAAA) in file! Err {err}");
-    //    panic!("This is most likely a useless endeavour! Hence, I panic!");
-    //  }
-    //  Ok(start_pos) => {
-    //    self.cursor = start_pos;
-    //  }
-    //}
-    // get the first event to infer board id, then rewind
-    if let Some(ev) = self.next() {
-      self.board_id = ev.header.rb_id;  
-      let rewind : i64 = RobinReader::EVENT_SIZE.try_into().expect("That needs to fit!");
-      match self.file_reader.as_mut().unwrap().seek(SeekFrom::Current(rewind)) {
-        Err(err) => {
-          error!("Read first event, but can not rewind stream! Err {}", err);
-          panic!("I don't understand, panicking...");
-        }
-        Ok(_) => {
-          self.n_bytes_read  = 0;
-          self.n_events_read = 0;
-        }
-      }
-    } else {
-      panic!("I can not find a single event in this file! Panicking!");
-    }
-    self.generate_index();
-  }
-
-  pub fn get_from_cache(&mut self, event_id : &u32) -> Option<RBEvent> {
-    self.cache.remove(event_id)
-  }
-
-  pub fn cache_all_events(&mut self) {
-    self.rewind();
-    while !self.eof_reached {
-      match self.next() {
-        None => {
-          break;
-        }
-        Some(ev) => {
-          //println!("{}", ev.header.event_id); 
-          self.cache.insert(ev.header.event_id, ev);
-        }
-      }
-    }
-    info!("Cached {} events!", self.cache.len());
-  }
-
-  /// Loop over the whole file and create a mapping event_id -> position
-  ///
-  /// This will allow to use the ::seek method
-  ///
-  pub fn generate_index(&mut self) {
-    if self.n_events_read > 0 {
-      error!("Can not generate index when events have already been read! Use ::rewind() first!");
-      return;
-    }
-    self.n_events_read  = 0;
-    let pb = ProgressBar::new_spinner();
-    pb.set_style(ProgressStyle::default_spinner().template("{spinner:.green} Generating eventid index...").unwrap());
-    let mut seen_before  = 0usize;
-    let mut total_events = 0usize;
-    while !self.eof_reached { 
-      if let Some(ev) = self.next() {
-        if self.index.contains_key(&ev.header.event_id) {
-          debug!("We have seen this event id {} before!", ev.header.event_id);
-          seen_before += 1;
-        }
-        self.index.insert(ev.header.event_id,self.n_events_read);
-        self.n_events_read += 1;
-        total_events += 1;
-      }
-      pb.tick();
-    }
-    if seen_before > 0 {
-      error!("There have been duplicate event ids! In total, we discard {}/{}", seen_before, total_events);
-    }
-    info!("Generated index by reading {} events!", self.n_events_read);
-    self.rewind();
-    info!("Generated index for {} events!", self.index.len());
-  }
-
-  pub fn get_cache_size(&self) -> usize {
-    self.cache.len()
-  }
-
-  pub fn print_index(&self) {
-    let mut reverse_index = HashMap::<usize, u32>::new();
-    for k in self.index.keys() {
-      reverse_index.insert(self.index[k], *k);
-    }
-    debug!("Generated reversed index of size {}", reverse_index.len());
-    //println!("Index [reversed]:");
-    //println!("\t pos -> event id");
-    //println!("{:?}", reverse_index);
-    //println!("{:?}", self.index);
-    let mut sorted_keys: Vec<&usize> = reverse_index.keys().collect();
-    sorted_keys.sort();
-    //let mut n = 0u32;
-    for k in sorted_keys {
-      //println!("{k} -> {}", reverse_index[&k]);
-      //n += 1;
-      //if n == 8000 {break;}
-    }
-  }
-
-  pub fn is_indexed(&self, event_id : &u32) -> bool {
-    self.index.contains_key(event_id)
-  }
-
-
-  /// Get RBEvents from the file in ascending order of event ID
-  ///
-  /// In case the event_id jumps, this function is not suitable
-  pub fn get_in_order(&mut self, event_id : &u32) -> Option<RBEvent> {
-    if !self.is_indexed(event_id) {
-      error!("Can not get event {} since it is not in the index!", event_id);
-      return None;
-    }
-    let event_idx = self.index.remove(event_id).unwrap();
-    if self.n_events_read > event_idx {
-      error!("Can not get event {} since we have already read it. You can use ::rewind() and try again!", event_id);
-      return None;
-    } else {
-      let delta = event_idx - self.n_events_read;
-      let mut n_read = 0usize;
-      //let mut ev = RBEvent::new();
-      loop {
-        match self.next() {
-          Some(ev) => {
-            n_read += 1;
-            if n_read == delta {
-              return Some(ev);
-            }
-          },
-          None => {
-            break;
-          }
-        }    
-      }
-    }
-    None
-  }
-  
-  /// Rewind the underlying file back to the beginning
-  pub fn rewind(&mut self) {
-    warn!("Rewinding {}", self.filename);
-    let mut rewind : i64 = self.n_bytes_read.try_into().unwrap();
-    rewind = -1*rewind;
-    debug!("Attempting to rewind {rewind} bytes");
-    match self.file_reader.as_mut().unwrap().seek(SeekFrom::Current(rewind)) {
-      Err(err) => {
-        error!("Can not rewind file buffer! Error {err}");
-      }
-      Ok(_) => {
-        info!("File rewound by {rewind} bytes!");
-        self.n_events_read = 0;
-        self.n_bytes_read  = 0;
-      }
-    }
-    self.eof_reached = false;
-  }
-
-  pub fn open(&mut self, filename : String) {
-    if self.filename != "" {
-      warn!("Overiding previously set filename {}", self.filename);
-    }
-    let self_filename = filename.clone();
-    self.filename     = self_filename;
-    if filename != "" {
-      let path = Path::new(&filename); 
-      info!("Reading from {}", &self.filename);
-      let file = OpenOptions::new().create(false).append(false).read(true).open(path).expect("Unable to open file {filename}");
-      self.file_reader = Some(BufReader::new(file));
-    }
-  }
-
-  pub fn precache_events(&mut self, n_events : usize) {
-    self.cache.clear();
-    let mut n_ev = 0usize;
-    if self.eof_reached {
-      return;
-    }
-    for _ in 0..n_events {
-      let event = self.next();
-      n_ev += 1;
-      if let Some(ev) = event {
-        self.cache.insert(ev.header.event_id, ev);
-      } else {
-        error!("Can not cache {}th event!", n_ev);
-        self.eof_reached = true;
-        break
-      }
-    }
-  }
-
-  pub fn max_cached_event_id(&self) -> Option<u32> {
-    let keys : Vec<u32> = self.cache.keys().cloned().collect();
-    keys.iter().max().copied()
-  }
-  
-  pub fn min_cached_event_id(&self) -> Option<u32> {
-    let keys : Vec<u32> = self.cache.keys().cloned().collect();
-    keys.iter().min().copied()
-  }
-
-  pub fn is_cached(&self, event_id : &u32) -> bool {
-    let keys : Vec<&u32> = self.cache.keys().collect();
-    keys.contains(&event_id)
-  }
-
-  pub fn get_event_by_id(&mut self, event_id : &u32) -> Option<RBEvent> {
-    self.cache.remove(event_id)
-  }
-
-  pub fn is_expired(&self) -> bool {
-    self.eof_reached && self.cache.len() == 0
-  }
-
-  pub fn event_ids_in_cache(&self) -> Vec<u32> {
-    trace!("We have {} elements in the cache!", self.cache.len());
-    let mut keys : Vec<u32> = self.cache.keys().cloned().collect();
-    trace!("We have {} elements in the cache!", keys.len());
-    keys.sort();
-    keys
-  }
-
-  pub fn get_events(&self) -> Vec<RBEvent> {
-    self.cache.values().cloned().collect()
-  }
-
-  pub fn count_packets(&self) -> u64 {
-    let metadata  = self.file_reader.as_ref().unwrap().get_ref().metadata().unwrap();
-    let file_size = metadata.len();
-    let n_packets =  file_size/RobinReader::EVENT_SIZE as u64; 
-    info!("The file {} contains likely ~{} event packets!", self.filename, n_packets);
-    n_packets
-  }
-}
-
-impl Default for RobinReader {
-
-  fn default() -> Self {
-    RobinReader::new(String::from(""))
-  }
-}
-
-impl Iterator for RobinReader {
-  type Item = RBEvent;
-
-  fn next(&mut self) -> Option<Self::Item> {
-    let event_size = 18532usize;
-    let chunk      = 1;
-    let packet : RBEvent;
-    let mut error_check = false;
-    loop {
-      if error_check {
-        loop {
-          let test_buff = read_n_bytes(self.file_reader.as_mut().unwrap(), 1).unwrap();
-          if test_buff.len() == 0 {
-            break;
-          }
-          if test_buff[0] == 0xa {
-            let test_buff_2 = read_n_bytes(self.file_reader.as_mut().unwrap(), 1).unwrap();
-            if test_buff_2.len() == 0 {
-              break;
-            }
-            if test_buff_2[0] == 0xa {
-              self.file_reader.as_mut().unwrap().seek(SeekFrom::Current(-2)).unwrap();
-              break;
-            }
-          }
-        }
-      }
-      match read_n_bytes(self.file_reader.as_mut().unwrap(), event_size*chunk) { 
-      //match self.file_reader.as_mut().expect("No file available!").read_until(b'\n', &mut line) {
-        Ok(buffer) => {
-          if buffer.len() > 0 {
-            //println!("{} {} {}", buffer[0], buffer[1], buffer[2]);
-            //println!("{} {} {}", buffer[buffer.len() - 3], buffer[buffer.len() -2], buffer[buffer.len() - 1]);
-            //panic!("boo!");
-            trace!("Read {} bytes", buffer.len());
-            self.n_bytes_read += buffer.len();
-            let mut pos_in_chunk = 0usize;
-            for _ in 0..chunk {
-              match RBEvent::extract_from_rbeventmemoryview(&buffer, &mut pos_in_chunk) {
-                Ok(pack) => {
-                  packet = pack;
-                  self.n_events_read += 1;     
-                  //println!("Read {} events!", self.n_events_read);
-                  return Some(packet);
-                }
-                Err(err) => { 
-                  error_check = true;
-                  let mut rewind : i64 = pos_in_chunk.try_into().unwrap();
-                  rewind = -1*rewind;
-                  debug!("Rewinding {rewind} bytes");
-                  match self.file_reader.as_mut().unwrap().seek(SeekFrom::Current(rewind)) {
-                    Err(err) => {
-                      error!("Can not rewind file buffer! Error {err}");
-                    }
-                    Ok(_) => ()
-                  }
-                  error!("Error getting packet from file {err}");
-                  //return None;
-                  break;
-                }
-              }
-            }
-          } else {
-            warn!("End of file reached!");
-            self.eof_reached = true;
-            return None;
-          }
-        },
-        Err(err) => {
-          self.eof_reached = true;
-          error!("Error reading from file {} error: {}", self.filename, err);
-          return None;
-        }
-      }
-    }
-  }
-}
-
-/**************************************************/
-
 /// Helper function to generate a proper tcp string starting
 /// from the ip one.
 pub fn build_tcp_from_ip(ip: String, port: String) -> String {
@@ -828,11 +456,12 @@ pub fn waveform_analysis(event         : &mut RBEvent,
                          readoutboard  : &mf::ReadoutBoard,
                          calibration   : &RBCalibrations)
 -> Result<(), AnalysisError> {
-  if event.header.broken {
-    // just return the analysis error, there 
-    // is probably nothing else we can do?
-    return Err(AnalysisError::InputBroken);
-  }
+  //if event.status != EventStatus::Perfect {
+  //if event.header.broken {
+  //  // just return the analysis error, there 
+  //  // is probably nothing else we can do?
+  //  return Err(AnalysisError::InputBroken);
+  //}
   let pids = readoutboard.get_all_pids();
   let mut paddles = HashMap::<u8, TofHit>::new();
   // just paranoid
@@ -855,10 +484,11 @@ pub fn waveform_analysis(event         : &mut RBEvent,
   // do the calibration
   //let mut active_channels = event.header.get_active_data_channels();
   //active_channels.push(9); // always do ch9 callibration
-  let mut active_channels = event.header.decode_channel_mask();
-  if event.header.has_ch9 {
-    active_channels.push(8); 
-  }
+  //let mut active_channels = event.header.decode_channel_mask();
+  let mut active_channels = event.header.get_channels();
+  //if event.header.has_ch9 {
+  //  active_channels.push(8); 
+  //}
   // allocate memory for voltages
   // this allocates more memory than needed
   // (needed is active_channels.len()), however,

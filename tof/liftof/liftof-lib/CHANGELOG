@@ -1,5 +1,9 @@
 # NIUHI series
 
+## v0.8.1
+
+* moves RobinReader to tof-dataclasses
+
 ## v0.8.0
 
 
