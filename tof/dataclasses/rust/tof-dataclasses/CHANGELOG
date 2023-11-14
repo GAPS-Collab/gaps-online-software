@@ -1,5 +1,30 @@
 # NIUHI series
 
+## 0.8.2 
+* substantial changes to RBEvent
+  - split up timestamp 48 to timestamp32 and timestamp16
+    timestamp32 is the faster one
+    this saves 16bytes
+  - summarize all stati (lock, lost trigger) in a single 
+    byte and use getters to decode it. 
+    this saves 3byte
+  - we could potentially save another byte if we merge this
+    with the channel mask
+  - channel mask is now 2byte to account for channel9
+  - get_channels will return channels from 0-8
+  - RBEvent.adc will always have the length of NCHAN.
+    If channels are not populated, it will have empty 
+    vectors.
+  - ch9 not treated separatly anymore
+  - adds a general event status instead of bool "broken"
+
+* io/RBEventMemoryStreamer - get RBEvents from plain 
+  RB data ("blob") either in RB memory or from a file
+  This will be the only place where we do this kind
+  of decoding.
+
+* RobinReader has moved to io from liftof-lib
+
 ## 0.8.1
 * moves mtb related communication functions
   to liftof-lib project

@@ -386,9 +386,12 @@ impl RBCalibrations {
   
   /// Remove events with invalid traces or event fragment bits set
   pub fn clean_input_data(&mut self) {
-    self.vcal_data.retain(|x| !x.header.broken & !x.header.lost_trigger & !x.header.event_fragment); 
-    self.tcal_data.retain(|x| !x.header.broken & !x.header.lost_trigger & !x.header.event_fragment); 
-    self.noi_data.retain(|x| !x.header.broken & !x.header.lost_trigger & !x.header.event_fragment); 
+    //self.vcal_data.retain(|x| !x.header.broken & !x.header.lost_trigger & !x.header.event_fragment); 
+    //self.tcal_data.retain(|x| !x.header.broken & !x.header.lost_trigger & !x.header.event_fragment); 
+    //self.noi_data.retain(|x| !x.header.broken & !x.header.lost_trigger & !x.header.event_fragment); 
+    self.vcal_data.retain(|x|  !x.header.drs_lost_trigger() & !x.header.is_event_fragment()); 
+    self.tcal_data.retain(|x|  !x.header.drs_lost_trigger() & !x.header.is_event_fragment()); 
+    self.noi_data.retain(|x|   !x.header.drs_lost_trigger() & !x.header.is_event_fragment()); 
   }
 
   // channel is from 0-8
@@ -1029,7 +1032,7 @@ impl Serialization for RBCalibrations {
     }
     if rb_cal.serialize_event_data {
       let mut broken_event = RBEvent::new();
-      broken_event.header.broken = true;
+      //broken_event.header.broken = true;
       let n_noi  = parse_u16(bytestream, pos);
       println!("Found {n_noi} no input data events!");
       for _ in 0..n_noi {
@@ -1044,13 +1047,14 @@ impl Serialization for RBCalibrations {
           Err(err) => {
             error!("Unable to read RBEvent! {err}");
             //println!("from_bytestream failed!, err {err}");
-            rb_cal.noi_data.push(broken_event.clone());
+            //rb_cal.noi_data.push(broken_event.clone());
           }
         }
         // FIXME - broken event won't advance the pos marker
       }
       let n_vcal = parse_u16(bytestream, pos); 
       println!("Found {n_vcal} VCal data events!");
+      let broken_event = RBEvent::new();
       for _ in 0..n_vcal {
         rb_cal.vcal_data.push(RBEvent::from_bytestream(bytestream, pos).unwrap_or(broken_event.clone()));
       }

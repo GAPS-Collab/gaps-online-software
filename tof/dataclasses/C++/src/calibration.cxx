@@ -328,6 +328,7 @@ Vec<f32> RBCalibration::nanoseconds(const RBEvent &event, const u8 channel) cons
 
 RBCalibration RBCalibration::from_bytestream(const Vec<u8> &stream,
                                              u64 &pos) {
+  //spdlog::set_pattern("[%^%l%$] [%s - %!:%#] [%Y-%m-%d %H:%M:%S] -- %v");
   RBCalibration calibration = RBCalibration();
   spdlog::debug("Start decoding at pos {}", pos);
   u16 head = Gaps::parse_u16(stream, pos);
@@ -355,16 +356,20 @@ RBCalibration RBCalibration::from_bytestream(const Vec<u8> &stream,
   }
   if (serialize_event_data) {
     u16 n_noi = Gaps::parse_u16(stream, pos);
+    spdlog::info("Decoding {} no input data events...", n_noi);
     for (u16 k=0; k<n_noi; k++) {
       auto ev = RBEvent::from_bytestream(stream, pos);
       calibration.noi_data.push_back(ev); 
+      return calibration;
     }
     u16 n_vcal = Gaps::parse_u16(stream, pos);
+    spdlog::info("Decoding {} vcal data events...", n_vcal);
     for (u16 k=0; k<n_vcal; k++) {
       auto ev = RBEvent::from_bytestream(stream, pos);
       calibration.vcal_data.push_back(ev); 
     }
     u16 n_tcal = Gaps::parse_u16(stream, pos);
+    spdlog::info("Decoding {} tcal data events...", n_tcal);
     for (u16 k=0; k<n_tcal; k++) {
       auto ev = RBEvent::from_bytestream(stream, pos);
       calibration.tcal_data.push_back(ev); 

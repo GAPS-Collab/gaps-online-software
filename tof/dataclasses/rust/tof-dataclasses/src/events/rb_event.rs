@@ -22,6 +22,8 @@ use std::fmt;
 
 extern crate crc;
 use crc::Crc;
+use colored::Colorize;
+
 
 use crate::packets::{TofPacket, PacketType};
 use crate::events::TofHit;
@@ -76,8 +78,8 @@ impl TryFrom<u8> for EventStatus {
     match value {
       0u8  => Ok(EventStatus::Unknown),
       10u8 => Ok(EventStatus::CRC32Wrong),
-      10u8 => Ok(EventStatus::TailWrong),
-      20u8 => Ok(EventStatus::Perfect),
+      11u8 => Ok(EventStatus::TailWrong),
+      42u8 => Ok(EventStatus::Perfect),
       _    => Err("I am not sure how to convert this value!")
     }
   }
@@ -228,14 +230,14 @@ pub fn unpack_traces_f32(events : &Vec<RBEvent>) -> Vec<Vec<Vec<f32>>> {
   let nevents    = events.len();
   let mut nchan  = 0usize;
   let mut nwords = 0usize;
-  // get a sane event
+  //// get a sane event
   for ev in events {
     if ev.adc[0].len() > 0 {
       nwords = ev.adc[0].len();   
     }
-    nchan = ev.header.get_ndatachan() as usize;
+  //  nchan = ev.header.get_ndatachan() as usize;
   }
-  
+  nchan = NCHN; 
   info!("Will construct traces cube with nchan {}, nevents {}, nwords {}", nchan, nevents, nwords);
   let mut traces: Vec<Vec<Vec<f32>>> = vec![vec![vec![0.0f32; nwords]; nevents]; nchan + 1];
   if nevents == 0 {
@@ -261,26 +263,26 @@ pub fn unpack_traces_f32(events : &Vec<RBEvent>) -> Vec<Vec<Vec<f32>>> {
     }
   }
   // ch9
-  for ev in 0..nevents { 
-    if !events[ev].header.has_ch9 {
-      nevents_skipped += 1;
-      continue
-    }
-    if events[ev].ch9_adc.len() != nwords {
-      // ignore corrupt events
-      //println!("{}", events[ev]);
-      nevents_skipped += 1;
-      continue;
-    }
-    for n in 0..nwords {
-      //println!("{}", events[ev].adc.len());
-      //println!("{}", events[ev].adc[ch].len());
-      //println!("{}", traces[ch][ev].len());
-      //println!("{}", traces[ch].len());
-      //println!("{}", traces.len());
-      traces[8][ev][n] = events[ev].ch9_adc[n] as f32;
-    }
-  }
+  //for ev in 0..nevents { 
+  //  if !events[ev].header.has_ch9 {
+  //    nevents_skipped += 1;
+  //    continue
+  //  }
+  //  if events[ev].ch9_adc.len() != nwords {
+  //    // ignore corrupt events
+  //    //println!("{}", events[ev]);
+  //    nevents_skipped += 1;
+  //    continue;
+  //  }
+  //  for n in 0..nwords {
+  //    //println!("{}", events[ev].adc.len());
+  //    //println!("{}", events[ev].adc[ch].len());
+  //    //println!("{}", traces[ch][ev].len());
+  //    //println!("{}", traces[ch].len());
+  //    //println!("{}", traces.len());
+  //    //traces[8][ev][n] = events[ev].ch9_adc[n] as f32;
+  //  }
+  //}
   if nevents_skipped > 0 {
     error!("Skipping {nevents_skipped} events due to malformed traces!");
   }
@@ -293,23 +295,28 @@ pub fn unpack_traces_f32(events : &Vec<RBEvent>) -> Vec<Vec<Vec<f32>>> {
 ///
 #[derive(Debug, Clone, PartialEq)]
 pub struct RBEvent {
-  pub data_type : DataType,
-  pub header    : RBEventHeader,
-  pub adc       : Vec<Vec<u16>>,
-  pub ch9_adc   : Vec<u16>,
-  pub hits      : Vec<TofHit>,
+  pub data_type    : DataType,
+  pub status       : EventStatus,
+  pub header       : RBEventHeader,
+  pub adc          : Vec<Vec<u16>>,
+  //pub ch9_adc      : Vec<u16>,
+  pub hits         : Vec<TofHit>,
 }
 
 impl RBEvent {
 
   pub fn new() -> Self {
-    let adc = Vec::<Vec<u16>>::with_capacity(NCHN);
+    let mut adc = Vec::<Vec<u16>>::with_capacity(NCHN);
+    for k in 0..NCHN {
+      adc.push(Vec::<u16>::new());
+    }
     Self {
-      data_type  : DataType::Unknown,
-      header     : RBEventHeader::new(),
-      adc        : adc,
-      ch9_adc    : Vec::<u16>::new(),
-      hits       : Vec::<TofHit>::new(),
+      data_type    : DataType::Unknown,
+      status       : EventStatus::Unknown,
+      header       : RBEventHeader::new(),
+      adc          : adc,
+      //ch9_adc      : Vec::<u16>::new(),
+      hits         : Vec::<TofHit>::new(),
     }
   }
 
@@ -375,23 +382,23 @@ impl RBEvent {
   ///
   /// This should be faster than decoding the whole event.
   pub fn extract_eventid(stream : &Vec<u8>) -> Result<u32, SerializationError> {
-    if stream.len() < 28 {
+    if stream.len() < 30 {
       return Err(SerializationError::StreamTooShort);
     }
-    // event header starts at position 5
-    // in the header, it is as positon 19
-    let event_id = parse_u32(stream, &mut 24);
+    // event header starts at position 7
+    // in the header, it is as positon 3
+    let event_id = parse_u32(stream, &mut 10);
     Ok(event_id)
   }
 
-  pub fn get_nchan(&self) -> usize {
-    let mut nchan = 0usize;
-    if self.ch9_adc.len() > 0 {
-      nchan += 1;
-    }
-    nchan += self.adc.len();
-    nchan
-  }
+  //pub fn get_nchan(&self) -> usize {
+  //  let mut nchan = 0usize;
+  //  if self.ch9_adc.len() > 0 {
+  //    nchan += 1;
+  //  }
+  //  nchan += self.adc.len();
+  //  nchan
+  //}
   
   pub fn get_ndatachan(&self) -> usize {
     self.adc.len()
@@ -402,16 +409,17 @@ impl RBEvent {
       error!("channel_by_id expects numbers from 0-8!");
       return Err(UserError::IneligibleChannelLabel)
     }
-    if ch < 8 {
-      return Ok(&self.adc[ch]);
-    } else {
-      if self.header.has_ch9 {
-        return Ok(&self.ch9_adc);
-      } else {
-        error!("No channel 9 data for this event!");
-        return Err(UserError::NoChannel9Data);
-      }
-    }
+    return Ok(&self.adc[ch]);
+    //if ch < 8 {
+    //  return Ok(&self.adc[ch]);
+    //} else {
+    //  if self.header.has_ch9 {
+    //    return Ok(&self.ch9_adc);
+    //  } else {
+    //    error!("No channel 9 data for this event!");
+    //    return Err(UserError::NoChannel9Data);
+    //  }
+    //}
   }
 
   pub fn get_channel_by_label(&self, ch : u8) -> Result<&Vec::<u16>, UserError>  {
@@ -420,104 +428,105 @@ impl RBEvent {
       error!("channel_by_label expects numbers from 1-9!");
       return Err(UserError::IneligibleChannelLabel)
     }
-    if ch == 9 {
-      if self.header.has_ch9 {
-        return Ok(&self.ch9_adc);
-      } else {
-        error!("No channel 9 data for this event!");
-        return Err(UserError::NoChannel9Data);
-      }
-    }
+    //if ch == 9 {
+    //  if self.header.has_ch9 {
+    //    return Ok(&self.ch9_adc);
+    //  } else {
+    //    error!("No channel 9 data for this event!");
+    //    return Err(UserError::NoChannel9Data);
+    //  }
+    //}
     Ok(&self.adc[ch as usize -1])
   }
 
-  pub fn get_adcs(&self) -> Vec<&Vec<u16>> {
-    let mut adcs = Vec::<&Vec<u16>>::new();
-    for v in self.adc.iter() {
-      adcs.push(&v);
-    }
-    if self.header.has_ch9 {
-      adcs.push(&self.ch9_adc);
-    }
-    adcs
-  }
+  //pub fn get_adcs(&self) -> &Vec<Vec<u16>> {
+  //  self.adc
+  //  //let mut adcs = Vec::<&Vec<u16>>::new();
+  //  //for v in self.adc.iter() {
+  //  //  adcs.push(&v);
+  //  //}
+  //  //if self.header.has_ch9 {
+  //  //  adcs.push(&self.ch9_adc);
+  //  //}
+  //  adcs
+  //}
 
-  /// If we know that the stream contains an RBEventMemeoryView, 
-  /// we can convert the stream directly to a RBEvent.
-  pub fn extract_from_rbeventmemoryview(stream : &Vec<u8>,
-                                        pos    : &mut usize) 
-    -> Result<Self, SerializationError> {
-    let mut event  = Self::new();
-    let header     = RBEventHeader::extract_from_rbeventmemoryview(stream, pos)?;
+  // If we know that the stream contains an RBEventMemeoryView, 
+  // we can convert the stream directly to a RBEvent.
+  //pub fn extract_from_rbeventmemoryview(stream : &Vec<u8>,
+  //                                      pos    : &mut usize) 
+  //  -> Result<Self, SerializationError> {
+  //  let mut event  = Self::new();
+  //  let header     = RBEventHeader::extract_from_rbeventmemoryview(stream, pos)?;
  
-    /// calculate crc32 sums
-    const CUSTOM_ALG: crc::Algorithm<u32> = crc::Algorithm {
-                       width   : 32u8,
-                       init    : 0xFFFFFFFF,
-                       poly    : 0xEDB88320,
-                       refin   : true,
-                       refout  : true,
-                       xorout  : 0xFFFFFFFF,
-                       check   : 1,
-                       residue : 1,
-                       //check   : 0xcbf43926,
-                       //residue : 0xdebb20e3,
-                     };
+  //  /// calculate crc32 sums
+  //  const CUSTOM_ALG: crc::Algorithm<u32> = crc::Algorithm {
+  //                     width   : 32u8,
+  //                     init    : 0xFFFFFFFF,
+  //                     poly    : 0xEDB88320,
+  //                     refin   : true,
+  //                     refout  : true,
+  //                     xorout  : 0xFFFFFFFF,
+  //                     check   : 1,
+  //                     residue : 1,
+  //                     //check   : 0xcbf43926,
+  //                     //residue : 0xdebb20e3,
+  //                   };
 
-    //let crc        = Crc::<u32>::new(&crc::CRC_32_ISO_HDLC);
-    let crc          = Crc::<u32>::new(&CUSTOM_ALG);
-    //let crc        = Crc::<u32>::new(&crc::CRC_32_BZIP2);
-    let mut ch_crc       : u32;
-    let mut ch_crc_check : u32;
-    if header.broken {
-      error!("Broken event {}! This won't have any channel data, since the event end markes is not at the expected position. Treat the header values with caution!", &header.event_id);
-      event.header   = header;
-      return Ok(event);
-    }
-    //let mut active_channels = header.get_active_data_channels();
-    //let mut nchan = active_channels.len();
-    event.header = header;
-    // set the position marker to the start of the channel
-    // adc data field
-    *pos = event.header.channel_packet_start; 
-    if stream.len() < event.header.channel_packet_len + 44 {
-      error!("The header says there is channel data, but the event is corrupt!");
-      return Err(SerializationError::StreamTooShort);
-    }
+  //  //let crc        = Crc::<u32>::new(&crc::CRC_32_ISO_HDLC);
+  //  let crc          = Crc::<u32>::new(&CUSTOM_ALG);
+  //  //let crc        = Crc::<u32>::new(&crc::CRC_32_BZIP2);
+  //  let mut ch_crc       : u32;
+  //  let mut ch_crc_check : u32;
+  //  //if header.broken {
+  //  //  error!("Broken event {}! This won't have any channel data, since the event end markes is not at the expected position. Treat the header values with caution!", &header.event_id);
+  //  //  event.header   = header;
+  //  //  return Ok(event);
+  //  //}
+  //  //let mut active_channels = header.get_active_data_channels();
+  //  //let mut nchan = active_channels.len();
+  //  event.header = header;
+  //  // set the position marker to the start of the channel
+  //  // adc data field
+  //  *pos = event.header.channel_packet_start; 
+  //  if stream.len() < event.header.channel_packet_len + 44 {
+  //    error!("The header says there is channel data, but the event is corrupt!");
+  //    return Err(SerializationError::StreamTooShort);
+  //  }
 
-    for ch in event.header.channel_packet_ids.iter() {
-      let mut dig    = crc.digest_with_initial(0);
-      *pos += 2; // ch id
-      if ch > &9 {
-        error!("Channel ID is messed up. Not sure if this event can be saved!");
-        *pos += 2*event.header.nwords;
-        *pos += 4;
-      } else {
-        //ch_crc_check = crc.checksum(&stream[*pos..*pos+2*event.header.nwords]); 
-        //let mut crc_test = Crc::new();
-        //crc_test.update(&stream[*pos..*pos+2*event.header.nwords]);
-        //let ch_crc_check = crc_test.sum();
-        let mut this_ch_adc = Vec::<u16>::with_capacity(event.header.nwords);
-        for _ in 0..event.header.nwords {  
-          //let this_bytes = [stream[*pos ], stream[*pos + 1]]; 
-          let this_word  = [stream[*pos+1], stream[*pos]];
-          
-          this_ch_adc.push(0x3FFF & parse_u16(stream, pos));
-          dig.update(&this_word);
-        }
-        if ch < &8 {
-          event.adc.push(this_ch_adc);  
-        } else {
-          event.ch9_adc = this_ch_adc;
-        }
-        ch_crc = parse_u32_for_16bit_words(stream, pos);
-        ch_crc_check = dig.finalize();
-        //println!("==> Calculated crc32 {}, expected crc32 {}", ch_crc_check, ch_crc);
-        //*pos += 4; // trailer
-      }
-    }
-    Ok(event)
-  }
+  //  for ch in event.header.channel_packet_ids.iter() {
+  //    let mut dig    = crc.digest_with_initial(0);
+  //    *pos += 2; // ch id
+  //    if ch > &9 {
+  //      error!("Channel ID is messed up. Not sure if this event can be saved!");
+  //      *pos += 2*event.header.nwords;
+  //      *pos += 4;
+  //    } else {
+  //      //ch_crc_check = crc.checksum(&stream[*pos..*pos+2*event.header.nwords]); 
+  //      //let mut crc_test = Crc::new();
+  //      //crc_test.update(&stream[*pos..*pos+2*event.header.nwords]);
+  //      //let ch_crc_check = crc_test.sum();
+  //      let mut this_ch_adc = Vec::<u16>::with_capacity(event.header.nwords);
+  //      for _ in 0..event.header.nwords {  
+  //        //let this_bytes = [stream[*pos ], stream[*pos + 1]]; 
+  //        let this_word  = [stream[*pos+1], stream[*pos]];
+  //        
+  //        this_ch_adc.push(0x3FFF & parse_u16(stream, pos));
+  //        dig.update(&this_word);
+  //      }
+  //      if ch < &8 {
+  //        event.adc.push(this_ch_adc);  
+  //      } else {
+  //        event.ch9_adc = this_ch_adc;
+  //      }
+  //      ch_crc = parse_u32_for_16bit_words(stream, pos);
+  //      ch_crc_check = dig.finalize();
+  //      //println!("==> Calculated crc32 {}, expected crc32 {}", ch_crc_check, ch_crc);
+  //      //*pos += 4; // trailer
+  //    }
+  //  }
+  //  Ok(event)
+  //}
 }
 
 impl Serialization for RBEvent {
@@ -532,39 +541,40 @@ impl Serialization for RBEvent {
       return Err(SerializationError::HeadInvalid {});
     }
     event.data_type = DataType::try_from(parse_u8(stream, pos)).unwrap();
-    let nchan_data  = parse_u8(stream, pos);
+    event.status    = EventStatus::try_from(parse_u8(stream, pos)).unwrap();
+    //let nchan_data  = parse_u8(stream, pos);
     let n_hits      = parse_u8(stream, pos);
     event.header    = RBEventHeader::from_bytestream(stream, pos)?;
     //let ch_ids      = event.header.get_active_data_channels();
     let stream_len  = stream.len();
-    if event.header.event_fragment {
+    if event.header.is_event_fragment() {
       error!("Fragmented event {} found! Disregarding channel data..", event.header.event_id);
       return Ok(event);
     }
-    if event.header.lost_trigger {
+    if event.header.drs_lost_trigger() {
       error!("Event {} has lost trigger! Disregarding channel data..", event.header.event_id);
       return Ok(event);
     }
-    for k in 0..nchan_data {
+    for ch in event.header.get_channels().iter() {
       if *pos + 2*NWORDS >= stream_len {
-        error!("The channel data for ch {} seems corrupt!", k);
+        error!("The channel data for ch {} seems corrupt!", ch);
         return Err(SerializationError::WrongByteSize {})
       }
       // 2*NWORDS because stream is Vec::<u8> and it is 16 bit words.
       let data = &stream[*pos..*pos+2*NWORDS];
       //event.adc[k as usize] = u8_to_u16(data);
-      event.adc.push(u8_to_u16(data));
+      event.adc[*ch as usize] = u8_to_u16(data);
       *pos += 2*NWORDS;
     }
-    if event.header.has_ch9 {
-      if *pos + 2*NWORDS >= stream_len {
-        error!("The channel data for ch 9 (calibration channel) seems corrupt!");
-        return Err(SerializationError::WrongByteSize {})
-      }
-      let data = &stream[*pos..*pos+2*NWORDS];
-      event.ch9_adc = u8_to_u16(data);
-      *pos += 2*NWORDS;
-    }
+    //if event.header.has_ch9() {
+    //  if *pos + 2*NWORDS >= stream_len {
+    //    error!("The channel data for ch 9 (calibration channel) seems corrupt!");
+    //    return Err(SerializationError::WrongByteSize {})
+    //  }
+    //  //let data = &stream[*pos..*pos+2*NWORDS];
+    //  //event.ch9_adc = u8_to_u16(data);
+    //  //*pos += 2*NWORDS;
+    //}
     for _ in 0..n_hits {
       match TofHit::from_bytestream(stream, pos) {
         Err(err) => {
@@ -592,18 +602,22 @@ impl Serialization for RBEvent {
     let mut stream = Vec::<u8>::new();
     stream.extend_from_slice(&Self::HEAD.to_le_bytes());
     stream.push(self.data_type as u8);
-    let nchan_data  = self.adc.len() as u8;
-    stream.push(nchan_data);
+    stream.push(self.status as u8);
+    //let nchan_data  = self.adc.len() as u8;
+    //stream.push(nchan_data);
     let n_hits      = self.hits.len() as u8;
     stream.push(n_hits);
     stream.extend_from_slice(&self.header.to_bytestream());
     // for an empty channel, we will add an empty vector
-    for channel_adc in self.adc.iter() {
-      stream.extend_from_slice(&u16_to_u8(&channel_adc)); 
+    let add_channels = !self.header.is_event_fragment() & !self.header.drs_lost_trigger();
+    if add_channels {
+      for channel_adc in self.adc.iter() {
+        stream.extend_from_slice(&u16_to_u8(&channel_adc)); 
+      }
     }
-    if self.ch9_adc.len() > 0 {
-      stream.extend_from_slice(&u16_to_u8(&self.ch9_adc));
-    }
+    //if self.ch9_adc.len() > 0 {
+    //  stream.extend_from_slice(&u16_to_u8(&self.ch9_adc));
+    //}
     for h in self.hits.iter() {
       stream.extend_from_slice(&h.to_bytestream());
     }
@@ -622,21 +636,24 @@ impl Default for RBEvent {
 impl fmt::Display for RBEvent {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let mut adc = Vec::<usize>::new();
-    for k in 0..self.adc.len() {
+    for k in 0..self.adc.len() -1 {
       adc.push(self.adc[k].len());
     }
     let mut ch9_str = String::from("[");
-    for k in self.ch9_adc.iter().take(5) {
+    for k in self.adc[8].iter().take(5) {
       ch9_str += &k.to_string();
       ch9_str += ","
     }
     ch9_str += " .. :";
-    ch9_str += &self.ch9_adc.len().to_string();
+    ch9_str += &self.adc[8].len().to_string();
     ch9_str += "]";
     let mut ch_field = String::from("[\n");
     for (ch, vals) in self.adc.iter().enumerate() {
+      if ch == 8 {
+        continue;
+      }
       let label = (ch + 1).to_string();
-      ch_field += "[ch ";
+      ch_field += "  [ch ";
       ch_field += &ch.to_string();
       ch_field += "('";
       ch_field += &label;
@@ -651,16 +668,20 @@ impl fmt::Display for RBEvent {
     }
     ch_field += "]\n";
     write!(f, "<RBEvent 
-    {}
-    .. .. 
-    has ch9       : {},
-      -> ch9      : {},
-    data channels : 
-      -> {},
-    n hits        : {},
-    .. .. .. .. .. .. .. >",
+  data type     : {},
+  event status  : {},
+  {}
+  .. .. 
+  has ch9       : {},
+    -> ch9      : {},
+  data channels : 
+    -> {},
+  n hits        : {},
+.. .. .. .. .. .. .. .. >",
+    self.data_type,
+    self.status,
     self.header,
-    self.header.has_ch9,
+    self.header.has_ch9(),
     ch9_str,
     ch_field,
     self.hits.len())
@@ -674,12 +695,20 @@ impl FromRandom for RBEvent {
     let mut event   = RBEvent::new();
     let header      = RBEventHeader::from_random();
     let mut rng     = rand::thread_rng();
-    event.data_type = DataType::Physics; 
+    event.data_type = DataType::from_random(); 
+    event.status    = EventStatus::from_random();
     event.header    = header;
+    // set a good status byte. RBEvents from 
+    // random will always be good
+    // status_byte is tested in RBEventHeader test
+    // and here we want to make sure channel data 
+    // gets serialized
+    // status byte of 0 means it is good
+    event.header.status_byte = 0;
     //if !event.header.event_fragment && !event.header.lost_trigger {
-    for k in 0..event.header.get_nchan() {
+    for ch in event.header.get_channels().iter() {
       let random_numbers: Vec<u16> = (0..NWORDS).map(|_| rng.gen()).collect();
-      event.adc.push(random_numbers);
+      event.adc[*ch as usize] = random_numbers;
     }
     //}
     event
@@ -690,18 +719,18 @@ impl FromRandom for RBEvent {
 impl From<&TofPacket> for RBEvent {
   fn from(pk : &TofPacket) -> Self {
     match pk.packet_type {
-      PacketType::RBEventMemoryView => {
-        match RBEvent::extract_from_rbeventmemoryview(&pk.payload, &mut 0) {
-          Ok(event) => {
-            return event;
-          }
-          Err(err) => { 
-            error!("Can not get RBEvent from RBEventMemoryView! Error {err}!");
-            error!("Returning empty event!");
-            return RBEvent::new();
-          }
-        }
-      },
+      //PacketType::RBEventMemoryView => {
+      //  match RBEvent::extract_from_rbeventmemoryview(&pk.payload, &mut 0) {
+      //    Ok(event) => {
+      //      return event;
+      //    }
+      //    Err(err) => { 
+      //      error!("Can not get RBEvent from RBEventMemoryView! Error {err}!");
+      //      error!("Returning empty event!");
+      //      return RBEvent::new();
+      //    }
+      //  }
+      //},
       PacketType::RBEvent => {
         match RBEvent::from_bytestream(&pk.payload, &mut 0) {
           Ok(event) => {
@@ -729,93 +758,112 @@ impl From<&TofPacket> for RBEvent {
 /// etc.
 #[derive(Debug, Clone, PartialEq)]
 pub struct RBEventHeader {
-  pub channel_mask         : u8   , 
-  pub has_ch9              : bool ,
+  pub rb_id                : u8   , 
+  pub event_id             : u32  , 
+  pub status_byte          : u8   ,
+  // FIXME - channel mask still has space
+  // for the status_bytes, since it only
+  // uses 9bits
+  pub channel_mask         : u16  , 
   pub stop_cell            : u16  , 
   pub crc32                : u32  , 
   pub dtap0                : u16  , 
   pub drs4_temp            : u16  , 
-  pub is_locked            : bool , 
-  pub is_locked_last_sec   : bool , 
-  pub lost_trigger         : bool , 
-  pub event_fragment       : bool ,
   pub fpga_temp            : u16  , 
-  pub event_id             : u32  , 
-  pub rb_id                : u8   , 
   pub timestamp32          : u32  ,
   pub timestamp16          : u16  ,
-  pub timestamp_48         : u64  , 
-  pub broken               : bool , 
   // channels (0-8)
-  pub channels             : Vec<u8>,
-  // fields which don't get serialized
-  pub nwords               : usize,
-  pub channel_packet_len   : usize,
-  pub channel_packet_start : usize,
-  pub channel_packet_ids   : Vec<u8>,
+  //pub channels             : Vec<u8>,
+  //// fields which don't get serialized
+  //pub nwords               : usize,
+  //pub channel_packet_len   : usize,
+  //pub channel_packet_start : usize,
+  //pub channel_packet_ids   : Vec<u8>,
 }
 
 impl RBEventHeader {
 
   pub fn new() -> Self {
     Self {
+      rb_id                : 0,  
+      status_byte          : 0, 
+      event_id             : 0,  
       channel_mask         : 0 ,  
-      has_ch9              : false ,
       stop_cell            : 0 ,  
       crc32                : 0 ,  
       dtap0                : 0 ,  
       drs4_temp            : 0 ,  
-      is_locked            : false,  
-      is_locked_last_sec   : false,  
-      lost_trigger         : false,  
-      event_fragment       : false,
       fpga_temp            : 0,  
-      event_id             : 0,  
-      rb_id                : 0,  
       timestamp32          : 0,
       timestamp16          : 0,
-      timestamp_48         : 0,  
-      broken               : false,  
-      channels             : Vec::<u8>::with_capacity(9),
-      // fields that won't get serialized
-      nwords               : 0,
-      channel_packet_len   : 0,
-      channel_packet_start : 0,
-      channel_packet_ids   : Vec::<u8>::with_capacity(9),
+      //channels             : Vec::<u8>::with_capacity(9),
+      //// fields that won't get serialized
+      //nwords               : 0,
+      //channel_packet_len   : 0,
+      //channel_packet_start : 0,
+      //channel_packet_ids   : Vec::<u8>::with_capacity(9),
     }
   }
 
   /// Only get the eventid from a binary stream
   pub fn extract_eventid_from_rbheader(stream :&Vec<u8>) -> u32 {
     // event id is 18 bytes in (including HEAD bytes)
-    let event_id = parse_u32(stream, &mut 19);
+    // event id is 3 bytes in (including HEAD bytes)
+    let event_id = parse_u32(stream, &mut 3); // or should it be 5?
     event_id
   }
+  
+  pub fn is_event_fragment(&self) -> bool {
+    self.status_byte & 1 > 0
+  }
+  
+  pub fn drs_lost_trigger(&self) -> bool {
+    (self.status_byte >> 1) & 1 > 0
+  }
 
+  pub fn lost_lock(&self) -> bool {
+    (self.status_byte >> 2) & 1 > 0
+  }
+
+  pub fn lost_lock_last_sec(&self) -> bool {
+    (self.status_byte >> 3) & 1 > 0
+  }
+
+  pub fn is_locked(&self) -> bool {
+    !self.lost_lock()
+  }
+  
+  pub fn is_locked_last_sec(&self) -> bool {
+    !self.lost_lock_last_sec()
+  }
   /// extract lock, drs busy and fpga temp from status field
   pub fn parse_status(&mut self, status_bytes : u16) {
-    let mut status          = status_bytes;
-    self.event_fragment     = status & 1 > 0;
-    status                  = status >> 1;
-    self.lost_trigger       = status & 1 > 0;
-    status                  = status >> 1;
+    // status byte is only 4bit really
+    self.status_byte        = (status_bytes & 0xf) as u8;
+    //let mut status          = status_bytes;
+    //self.event_fragment     = status & 1 > 0;
+    //status                  = status >> 1;
+    //self.lost_trigger       = status & 1 > 0;
+    //status                  = status >> 1;
     // FIXME - rename these fields
-    self.is_locked          = status & 1 > 0;
-    status                  = status >> 1;
-    self.is_locked_last_sec = status & 1 > 0;
-    status = status >> 1;
-    self.fpga_temp = status;
+    //self.lost_lock          = status & 1 > 0;
+    //status                  = status >> 1;
+    //self.lost_lock_last_sec = status & 1 > 0;
+    //status                  = status >> 1;
+    //self.fpga_temp = status;
+    self.fpga_temp = status_bytes >> 4;
   }
 
-  pub fn parse_channel_mask(&mut self, channel_mask : u16) {
-    let mut mask = channel_mask;
-    for ch in 0..9 {
-      if mask & 0x1 > 0 {
-        self.channels.push(ch as u8);
-        mask = mask >> 1;
-      }
-    }
-  }
+  //pub fn parse_channel_mask(&mut self, channel_mask : u16) {
+  //  //self.channel_mask = channel_mask;
+  //  let mut mask = channel_mask;
+  //  for ch in 0..9 {
+  //    if mask & 0x1 > 0 {
+  //      self.channels.push(ch as u8);
+  //      mask = mask >> 1;
+  //    }
+  //  }
+  //}
 
   /// Get the temperature value (Celsius) from the fpga_temp adc.
   pub fn get_fpga_temp(&self) -> f32 {
@@ -825,75 +873,77 @@ impl RBEventHeader {
 
   /// Get the entire header from a full binary representation of
   /// the raw RBEventMemoryView encoded in a binary stream
-  pub fn extract_from_rbeventmemoryview(stream : &Vec<u8>, pos : &mut usize) 
-    -> Result<Self, SerializationError> {
-    let mut header = Self::new();
-    let start = *pos;
-    // we look for headers/tails from RBEventMemoryView, not header!
-    let head_pos   = search_for_u16(RBEvent::HEAD, stream, *pos)?; 
-    // At this state, this can be a header or a full event. Check here and
-    // proceed depending on the options
-    *pos = head_pos + 2;   
-    // parsing the 2 bytes which contain
-    // fpga_temp and status
-    let mut status = parse_u16(stream, pos);
-    header.parse_status(status);
+  //pub fn extract_from_rbeventmemoryview(stream : &Vec<u8>, pos : &mut usize) 
+  //  -> Result<Self, SerializationError> {
+  //  let mut header = Self::new();
+  //  let start = *pos;
+  //  // we look for headers/tails from RBEventMemoryView, not header!
+  //  let head_pos   = search_for_u16(RBEvent::HEAD, stream, *pos)?; 
+  //  // At this state, this can be a header or a full event. Check here and
+  //  // proceed depending on the options
+  //  *pos = head_pos + 2;   
+  //  // parsing the 2 bytes which contain
+  //  // fpga_temp and status
+  //  let mut status = parse_u16(stream, pos);
+  //  header.parse_status(status);
 
-    header.has_ch9 = false; // we check for that later
-    // don't write packet len and roi to struct
-    let packet_len = parse_u16(stream, pos) as usize * 2;
-    let nwords     = parse_u16(stream, pos) as usize + 1; // the field will tell you the 
-                                                 // max index instead of len
-    debug!("Got packet len of {} bytes, roi of {}", packet_len, nwords);
-    *pos += 8 + 2 + 1; // skip dna, fw hash and reserved part of rb_id
-    header.rb_id        = parse_u8(stream, pos);
-    header.channel_mask = parse_u8(stream, pos);
-    *pos += 1;
-    header.event_id     = parse_u32_for_16bit_words(stream, pos);
-    header.dtap0        = parse_u16(stream, pos);
-    header.drs4_temp    = parse_u16(stream, pos); 
-    header.timestamp_48 = parse_u48_for_16bit_words(stream,pos);
-    //let nchan = 8;
-    // 36 bytes before event payload
-    // 8 bytes after
-    let channel_packet_start = head_pos + 36;
-    let nchan_data = packet_len - 44;
-    let mut nchan = 0usize;
-    //println!("========================================");
-    //println!("{} {} {}", nchan, nwords, nchan_data);
-    //println!("========================================");
-    while nchan * (2*nwords + 6) < nchan_data {
-      nchan += 1;
-    }
-    if nchan * (2*nwords + 6) != nchan_data {
-      error!("NCHAN consistency check failed! nchan {} , nwords {}, packet_len {}", nchan, nwords, packet_len);
-    }
-    let mut ch_ids = Vec::<u8>::new();
-    *pos = channel_packet_start;
-    for _ in 0..nchan {
-      let this_ch_id = parse_u16(stream, pos) as u8;
-      if this_ch_id == 8 {
-        header.has_ch9 = true;
-      }
-      ch_ids.push(this_ch_id);
-      *pos += (nwords*2) as usize;
-      *pos += 4; // trailer
-    }
-    debug!("Got channel ids {:?}", ch_ids);
-    header.nwords               = nwords;
-    header.channel_packet_len   = nchan_data;
-    header.channel_packet_start = channel_packet_start as usize;
-    header.channel_packet_ids   = ch_ids;
+  //  header.has_ch9 = false; // we check for that later
+  //  // don't write packet len and roi to struct
+  //  let packet_len = parse_u16(stream, pos) as usize * 2;
+  //  let nwords     = parse_u16(stream, pos) as usize + 1; // the field will tell you the 
+  //                                               // max index instead of len
+  //  debug!("Got packet len of {} bytes, roi of {}", packet_len, nwords);
+  //  *pos += 8 + 2 + 1; // skip dna, fw hash and reserved part of rb_id
+  //  header.rb_id        = parse_u8(stream, pos);
+  //  header.channel_mask = parse_u8(stream, pos);
+  //  *pos += 1;
+  //  header.event_id     = parse_u32_for_16bit_words(stream, pos);
+  //  header.dtap0        = parse_u16(stream, pos);
+  //  header.drs4_temp    = parse_u16(stream, pos); 
+  //  
+  //  //header.timestamp_48 = parse_u48_for_16bit_words(stream,pos);
+  //  //let nchan = 8;
+  //  // 36 bytes before event payload
+  //  // 8 bytes after
+  //  let channel_packet_start = head_pos + 36;
+  //  let nchan_data = packet_len - 44;
+  //  let mut nchan = 0usize;
+  //  //println!("========================================");
+  //  //println!("{} {} {}", nchan, nwords, nchan_data);
+  //  //println!("========================================");
+  //  while nchan * (2*nwords + 6) < nchan_data {
+  //    nchan += 1;
+  //  }
+  //  if nchan * (2*nwords + 6) != nchan_data {
+  //    error!("NCHAN consistency check failed! nchan {} , nwords {}, packet_len {}", nchan, nwords, packet_len);
+  //  }
+  //  let mut ch_ids = Vec::<u8>::new();
+  //  *pos = channel_packet_start;
+  //  for _ in 0..nchan {
+  //    let this_ch_id = parse_u16(stream, pos) as u8;
+  //    if this_ch_id == 8 {
+  //      header.has_ch9 = true;
+  //    }
+  //    ch_ids.push(this_ch_id);
+  //    *pos += (nwords*2) as usize;
+  //    *pos += 4; // trailer
+  //  }
+  //  debug!("Got channel ids {:?}", ch_ids);
+  //  header.nwords               = nwords;
+  //  header.channel_packet_len   = nchan_data;
+  //  header.channel_packet_start = channel_packet_start as usize;
+  //  header.channel_packet_ids   = ch_ids;
+  //  header.stop_cell = parse_u16(stream, pos);
+  //  header.crc32     = parse_u32_for_16bit_words(stream, pos);
+  //  let tail         = parse_u16(stream, pos);
+  //  if tail != RBEventHeader::TAIL {
+  //    error!("No tail signature found {} bytes from the start! Found {} instead Will set broken flag in header!", *pos - start - 2, tail );  
+  //  }
+  //  Ok(header)
+  //}
 
-    header.stop_cell = parse_u16(stream, pos);
-    header.crc32     = parse_u32_for_16bit_words(stream, pos);
-    let tail         = parse_u16(stream, pos);
-    if tail != RBEventHeader::TAIL {
-      error!("No tail signature found {} bytes from the start! Found {} instead Will set broken flag in header!", *pos - start - 2, tail );  
-    } else {
-      header.broken = false;
-    }
-    Ok(header)
+  pub fn has_ch9(&self) -> bool {
+    self.channel_mask & 256 > 0
   }
 
   /// Decode the channel mask into channel ids.
@@ -902,31 +952,35 @@ impl RBEventHeader {
   /// of the RB Event data ("blob") are from 0-7
   ///
   /// We keep ch9 seperate.
-  pub fn decode_channel_mask(&self) -> Vec<u8> {
+  //pub fn decode_channel_mask(&self) -> Vec<u8> {
+  pub fn get_channels(&self) -> Vec<u8> {
     let mut channels = Vec::<u8>::with_capacity(8);
     for k in 0..8 {
-      if self.channel_mask & 1 << k > 0 {
+      if self.channel_mask & (1 << k) > 0 {
         channels.push(k);
       }
+    }
+    if self.has_ch9() {
+      channels.push(8u8);
     }
     channels
   }
 
   /// Get the number of data channels + 1 for ch9
   pub fn get_nchan(&self) -> usize {
-    let mut nchan = self.decode_channel_mask().len();
-    if self.has_ch9 {
-      nchan += 1;
-    }
+    let mut nchan = self.get_channels().len();
+    //if self.has_ch9 {
+    //  nchan += 1;
+    //}
     nchan
   }
   
-  pub fn get_ndatachan(&self) -> usize {
-    self.decode_channel_mask().len()
-  }
+  //pub fn get_ndatachan(&self) -> usize {
+  //  self.decode_channel_mask().len()
+  //}
 
-  pub fn get_clock_cycles_48bit(&self) -> u64 {
-    self.timestamp_48
+  pub fn get_timestamp48(&self) -> u64 {
+    ((self.timestamp16 as u64) << 32) | self.timestamp32 as u64
   }
 }
 
@@ -939,37 +993,41 @@ impl Default for RBEventHeader {
 
 impl fmt::Display for RBEventHeader {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(f, "<RBEventHeader:
-           \t RB                 {}
-           \t ch mask            {} 
-           \t has ch9            {}
-           \t event id           {} 
-           \t timestamp (48bit)  {}
-           \t locked             {} 
-           \t locked last sec.   {} 
-           \t lost trigger.      {} 
-           \t is event fragment. {} 
-           \t drs4 Temp [C]      {} 
-           \t FPGA Temp [C]      {} 
-           \t stop cell          {} 
-           \t dtap0              {}
-           \t crc32              {}
-           \t broken             {}>",
-           self.rb_id,
-           self.channel_mask,
-           self.has_ch9,
-           self.event_id,
-           self.timestamp_48,
-           self.is_locked,
-           self.is_locked_last_sec,
-           self.lost_trigger,
-           self.event_fragment,
-           self.drs4_temp,
-           self.get_fpga_temp(),
-           self.stop_cell,
-           self.dtap0,
-           self.crc32,
-           self.broken)
+    let mut repr = String::from("<RBEventHeader:");
+    repr += &("\n  RB ID            ".to_owned() + &self.rb_id.to_string()); 
+    repr += &("\n  event id         ".to_owned() + &self.event_id.to_string());  
+    repr += &("\n  ch mask          ".to_owned() + &self.channel_mask.to_string());  
+    repr += &("\n  has ch9          ".to_owned() + &self.has_ch9().to_string()); 
+    repr += &("\n  DRS4 temp [C]    ".to_owned() + &self.drs4_temp.to_string());  
+    repr += &("\n  FPGA temp [C]    ".to_owned() + &self.get_fpga_temp().to_string()); 
+    repr += &("\n  timestamp32      ".to_owned() + &self.timestamp32.to_string()); 
+    repr += &("\n  timestamp16      ".to_owned() + &self.timestamp16.to_string()); 
+    repr += &("\n   |-> timestamp48 ".to_owned() + &self.get_timestamp48().to_string()); 
+    repr += &("\n  stop cell        ".to_owned() + &self.stop_cell.to_string()); 
+    repr += &("\n  dtap0            ".to_owned() + &self.dtap0.to_string()); 
+    repr += &("\n  crc32            ".to_owned() + &self.crc32.to_string()); 
+    let mut perfect = true;
+    if self.drs_lost_trigger() {
+      repr += &"\n  !! DRS4 REPORTS LOST TRIGGER!".red().bold();
+      perfect = false;
+    }
+    if self.is_event_fragment() {
+      repr += &"\n  !! EVENT FRAGMENT!".red().bold();
+      perfect = false;
+    }
+    if self.lost_lock() {
+      repr += &"\n  !! RB CLOCK IS NOT LOCKED!".yellow().bold();
+      perfect = false;
+    }
+    if self.lost_lock_last_sec() {
+      repr += &"\n  !! RB CLOCK HAS LOST ITS LOCK WITHIN THE LAST SECOND!".yellow().bold();
+      perfect = false;
+    }
+    if perfect {
+      repr += &"\n  -- locked: YES, locked last second; YES, no event fragemnet, and no lost trigger!".green();
+    }
+    repr += ">";
+    write!(f, "{}", repr)
   }
 }
 
@@ -977,50 +1035,42 @@ impl Serialization for RBEventHeader {
   
   const HEAD : u16   = 0xAAAA;
   const TAIL : u16   = 0x5555;
-  const SIZE : usize = 36; // size in bytes with HEAD and TAIL
+  const SIZE : usize = 30; // size in bytes with HEAD and TAIL
 
   fn from_bytestream(stream : &Vec<u8>, pos : &mut usize)
     -> Result<Self, SerializationError> {
     let mut header  = Self::new();
     Self::verify_fixed(stream, pos)?;
-    header.channel_mask        = parse_u8(stream  , pos);   
-    header.has_ch9             = parse_bool(stream, pos);
+    header.rb_id               = parse_u8(stream  , pos);  
+    header.event_id            = parse_u32(stream , pos);  
+    header.channel_mask        = parse_u16(stream  , pos);   
+    header.status_byte         = parse_u8(stream, pos);
     header.stop_cell           = parse_u16(stream , pos);  
     header.crc32               = parse_u32(stream , pos);  
     header.dtap0               = parse_u16(stream , pos);  
     header.drs4_temp           = parse_u16(stream , pos);  
-    // FIX - we should pack these 4 bits in a byte!
-    header.is_locked           = parse_bool(stream, pos);
-    header.is_locked_last_sec  = parse_bool(stream, pos);
-    header.lost_trigger        = parse_bool(stream, pos);
-    header.event_fragment      = parse_bool(stream, pos);
     header.fpga_temp           = parse_u16(stream , pos);  
-    header.event_id            = parse_u32(stream , pos);  
-    header.rb_id               = parse_u8(stream  , pos);  
-    header.timestamp_48        = parse_u64(stream , pos);  
-    header.broken              = parse_bool(stream, pos);  
+    header.timestamp32         = parse_u32(stream, pos);
+    header.timestamp16         = parse_u16(stream, pos);
     *pos += 2; // account for tail earlier 
     Ok(header) 
   }
+  
 
   fn to_bytestream(&self) -> Vec<u8> {
     let mut stream = Vec::<u8>::with_capacity(Self::SIZE);
     stream.extend_from_slice(&Self::HEAD.to_le_bytes());
+    stream.extend_from_slice(&self.rb_id             .to_le_bytes());
+    stream.extend_from_slice(&self.event_id          .to_le_bytes());
     stream.extend_from_slice(&self.channel_mask      .to_le_bytes());
-    stream.push(self.has_ch9 as u8);
+    stream.extend_from_slice(&self.status_byte       .to_le_bytes());
     stream.extend_from_slice(&self.stop_cell         .to_le_bytes());
     stream.extend_from_slice(&self.crc32             .to_le_bytes());
     stream.extend_from_slice(&self.dtap0             .to_le_bytes());
     stream.extend_from_slice(&self.drs4_temp         .to_le_bytes());
-    stream.extend_from_slice(&(u8::from(self.is_locked)  .to_le_bytes()));
-    stream.extend_from_slice(&(u8::from(self.is_locked_last_sec).to_le_bytes()));
-    stream.extend_from_slice(&(u8::from(self.lost_trigger)      .to_le_bytes()));
-    stream.extend_from_slice(&(u8::from(self.event_fragment)    .to_le_bytes()));
     stream.extend_from_slice(&self.fpga_temp         .to_le_bytes());
-    stream.extend_from_slice(&self.event_id          .to_le_bytes());
-    stream.extend_from_slice(&self.rb_id             .to_le_bytes());
-    stream.extend_from_slice(&self.timestamp_48      .to_le_bytes());
-    stream.extend_from_slice(&(u8::from(self.broken)      .to_le_bytes()));
+    stream.extend_from_slice(&self.timestamp32       .to_le_bytes());
+    stream.extend_from_slice(&self.timestamp16       .to_le_bytes());
     stream.extend_from_slice(&RBEventHeader::TAIL.to_le_bytes());
     stream
   }
@@ -1033,21 +1083,17 @@ impl FromRandom for RBEventHeader {
     let mut header = RBEventHeader::new();
     let mut rng = rand::thread_rng();
 
-    header.channel_mask         = rng.gen::<u8>();    
-    header.has_ch9              = rng.gen::<bool>();
+    header.rb_id                = rng.gen::<u8>();    
+    header.event_id             = rng.gen::<u32>();   
+    header.channel_mask         = rng.gen::<u16>();    
+    header.status_byte          = rng.gen::<u8>();    
     header.stop_cell            = rng.gen::<u16>();   
     header.crc32                = rng.gen::<u32>();   
     header.dtap0                = rng.gen::<u16>();   
     header.drs4_temp            = rng.gen::<u16>();   
-    header.is_locked            = rng.gen::<bool>();  
-    header.is_locked_last_sec   = rng.gen::<bool>();  
-    header.lost_trigger         = rng.gen::<bool>();  
-    header.event_fragment       = rng.gen::<bool>();  
     header.fpga_temp            = rng.gen::<u16>();   
-    header.event_id             = rng.gen::<u32>();   
-    header.rb_id                = rng.gen::<u8>();    
-    header.timestamp_48         = rng.gen::<u64>();   
-    header.broken               = rng.gen::<bool>();  
+    header.timestamp32          = rng.gen::<u32>();
+    header.timestamp16          = rng.gen::<u16>();
     header
   }
 }
@@ -1063,23 +1109,65 @@ mod test_rbevents {
   fn serialization_rbeventheader() {
     let mut pos = 0usize;
     let head = RBEventHeader::from_random();
-    let test = RBEventHeader::from_bytestream(&head.to_bytestream(), &mut pos).unwrap();
+    let stream = head.to_bytestream();
+    assert_eq!(stream.len(), RBEventHeader::SIZE);
+    let test = RBEventHeader::from_bytestream(&stream, &mut pos).unwrap();
     assert_eq!(pos, RBEventHeader::SIZE);
     assert_eq!(head, test);
+    assert_eq!(head.lost_lock()         , test.lost_lock());
+    assert_eq!(head.lost_lock_last_sec(), test.lost_lock_last_sec());
+    assert_eq!(head.drs_lost_trigger()  , test.drs_lost_trigger());
+
   }
   
   #[test]
   fn serialization_rbevent() {
-    let head = RBEvent::from_random();
-    let test = RBEvent::from_bytestream(&head.to_bytestream(), &mut 0).unwrap();
-    assert_eq!(head.header, test.header);
-    assert_eq!(head.header.get_nchan(), test.header.get_nchan());
-    assert_eq!(head, test);
-    //if head.header.event_fragment == test.header.event_fragment {
-    //  println!("Event fragment found, no channel data available!");
-    //} else {
-    //  assert_eq!(head, test);
-    //}
+    for _ in 0..100 {
+      let event  = RBEvent::from_random();
+      let stream = event.to_bytestream();
+      println!("[test rbevent] stream.len()   {:?}", stream.len());
+      let test   = RBEvent::from_bytestream(&stream, &mut 0).unwrap();
+      println!("[test rbevent] event frag   {:?}", event.header.is_event_fragment());
+      println!("[test rbevent] lost trig    {:?}", event.header.drs_lost_trigger());
+      println!("[test rbevent] event frag   {:?}", test.header.is_event_fragment());
+      println!("[test rbevent] lost trig    {:?}", test.header.drs_lost_trigger());
+      assert_eq!(event.header, test.header);
+      assert_eq!(event.header.get_nchan(), test.header.get_nchan());
+      assert_eq!(event.header.get_channels(), test.header.get_channels());
+      assert_eq!(event.data_type, test.data_type);
+      assert_eq!(event.status, test.status);
+      assert_eq!(event.adc.len(), test.adc.len());
+      assert_eq!(event.hits.len(), test.hits.len());
+      println!("[test rbevent] get_channels() {:?}", event.header.get_channels());
+      assert_eq!(event.adc[0].len(), test.adc[0].len());
+      assert_eq!(event.adc[1].len(), test.adc[1].len());
+      assert_eq!(event.adc[2].len(), test.adc[2].len());
+      assert_eq!(event.adc[3].len(), test.adc[3].len());
+      assert_eq!(event.adc[4].len(), test.adc[4].len());
+      assert_eq!(event.adc[5].len(), test.adc[5].len());
+      assert_eq!(event.adc[6].len(), test.adc[6].len());
+      assert_eq!(event.adc[7].len(), test.adc[7].len());
+      assert_eq!(event.adc[8].len(), test.adc[8].len());
+      assert_eq!(event.adc[0], test.adc[0]);
+      assert_eq!(event.adc[1], test.adc[1]);
+      assert_eq!(event.adc[2], test.adc[2]);
+      assert_eq!(event.adc[3], test.adc[3]);
+      assert_eq!(event.adc[4], test.adc[4]);
+      assert_eq!(event.adc[5], test.adc[5]);
+      assert_eq!(event.adc[6], test.adc[6]);
+      assert_eq!(event.adc[7], test.adc[7]);
+      assert_eq!(event.adc[8], test.adc[8]);
+      //for ch in (event.header.get_channels().iter()){
+      //  assert_eq!(event.adc[*ch as usize], test.adc[*ch as usize]);
+      //}
+      //assert_eq!(event, test);
+      
+      //if head.header.event_fragment == test.header.event_fragment {
+      //  println!("Event fragment found, no channel data available!");
+      //} else {
+      //  assert_eq!(head, test);
+      //}
+    }
   }
   
   #[test]

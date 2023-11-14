@@ -19,6 +19,7 @@ pub use data_type::DataType;
 pub use rb_eventmemoryview::RBEventMemoryView;
 pub use rb_event::{RBEventHeader,
                    RBEvent,
-                   RBMissingHit};
+                   RBMissingHit,
+                   EventStatus};
 
 // TODO what is this file?
