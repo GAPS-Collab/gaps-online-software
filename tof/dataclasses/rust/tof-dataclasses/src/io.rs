@@ -89,6 +89,9 @@ impl RBEventMemoryStreamer {
     }
   }
 
+  // FIXME - performance. Don't extend it. It would be 
+  // better if we'd consume the stream without 
+  // reallocating memory.
   pub fn add(&mut self, stream : &Vec<u8>, nbytes : usize) {
     //self.stream.extend(stream.iter().copied());
     //println!("self.pos {}", self.pos);
@@ -268,9 +271,6 @@ impl Iterator for RBEventMemoryStreamer {
         //println!("broken tail word {}", self.stream[k]);
         event_status = EventStatus::TailWrong;
       }
-      //header.broken = true;
-      //return Some(event);
-      //panic!("uff der titanic!");
     }
     self.stream.drain(0..self.pos);
     //self.seek_next_header(0xaa);

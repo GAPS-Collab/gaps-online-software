@@ -360,7 +360,6 @@ RBCalibration RBCalibration::from_bytestream(const Vec<u8> &stream,
     for (u16 k=0; k<n_noi; k++) {
       auto ev = RBEvent::from_bytestream(stream, pos);
       calibration.noi_data.push_back(ev); 
-      return calibration;
     }
     u16 n_vcal = Gaps::parse_u16(stream, pos);
     spdlog::info("Decoding {} vcal data events...", n_vcal);

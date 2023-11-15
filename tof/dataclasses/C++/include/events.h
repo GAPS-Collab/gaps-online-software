@@ -20,6 +20,7 @@
 #include "packets/tof_packet.h"
 #include "events/tof_event_header.hpp"
 #include "calibration.h"
+#include "packets/RPaddlePacket.h"
 
 class RBCalibration;
 
@@ -91,23 +92,17 @@ struct RBEventHeader {
   static const u16 TAIL = 0x5555;
   static const u16 SIZE = 30; // size in bytes with HEAD and TAIL
 
-  u8   channel_mask          ;
-  bool has_ch9               ;
+  u8   rb_id                 ;
+  u32  event_id              ;
+  u8   status_byte           ;
+  u16  channel_mask          ;
   u16  stop_cell             ;
   u32  crc32                 ;
   u16  dtap0                 ;
-  u16  drs4_temp             ;
-  bool is_locked             ;
-  bool is_locked_last_sec    ;
-  bool lost_trigger          ;
-  bool event_fragment        ;
   u16  fpga_temp             ;
-  u32  event_id              ;
-  u8   rb_id                 ;
-  //u32  timestamp_32          ;
-  //u16  timestamp_16          ;
-  u64  timestamp_48          ;
-  bool broken                ;  
+  u16  drs4_temp             ;
+  u32  timestamp32           ;
+  u16  timestamp16           ;
   
   RBEventHeader();
  
@@ -119,13 +114,22 @@ struct RBEventHeader {
    * process only the header part.
    *
    */
-  static RBEventHeader extract_from_rbbinarydump(const Vec<u8> &bytestream,
-                                                 u64 &pos);
+  //static RBEventHeader extract_from_rbbinarydump(const Vec<u8> &bytestream,
+  //                                               u64 &pos);
+  Vec<u8> get_channels()    const;
+  u8      get_nchan()       const;
   Vec<u8> get_active_data_channels() const;
-  u64 get_clock_cycles_48bit() const;
-  u8  get_n_datachan() const;
-  f32 get_fpga_temp() const;
-  f32 get_drs_temp() const;
+  bool has_ch9()            const;
+  u8   get_n_datachan()     const;
+  f32  get_fpga_temp()      const;
+  f32  get_drs_temp()       const;
+  bool is_event_fragment()  const;
+  bool drs_lost_trigger()   const;
+  bool lost_lock()          const;
+  bool lost_lock_last_sec() const;
+  bool is_locked()          const;
+  bool is_locked_last_sec() const;
+  u64  get_timestamp48()    const;
 
   std::string to_string() const;
 
@@ -147,15 +151,10 @@ struct RBEvent {
 
   // data type will be an enum
   u8 data_type;
-  // number of channels in this event
-  u8 nchan;
-  // number of paddle packets in this event
-  u8 npaddles; 
+  u8 status;
   RBEventHeader header;
   Vec<Vec<u16>> adc; 
-  Vec<u16> ch9_adc;
-
-  // FIXME - needs paddle packet extension
+  Vec<RPaddlePacket> hits;
  
   RBEvent();
 
@@ -231,6 +230,20 @@ enum class CompressionLevel : u8 {
 };
 
 std::ostream& operator<<(std::ostream& os, const CompressionLevel& level);
+  
+static const u8 EVENTSTATUS_UNKNOWN         =   0;
+static const u8 EVENTSTATUS_CRC32WRONG      =  10;
+static const u8 EVENTSTATUS_TAILWRONG       =  11;
+static const u8 EVENTSTATUS_PERFECT         =  42;
+
+enum class EventStatus : u8 {
+  Unknown        = EVENTSTATUS_UNKNOWN,
+  Crc32Wrong     = EVENTSTATUS_CRC32WRONG,
+  TailWrong      = EVENTSTATUS_TAILWRONG,
+  Perfect        = EVENTSTATUS_PERFECT,
+};
+
+std::ostream& operator<<(std::ostream& os, const EventStatus& status);
 
 /**
  * The MasterTriggerEvent represesnts the information

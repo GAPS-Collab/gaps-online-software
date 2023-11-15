@@ -25,9 +25,10 @@ Vec<RBEventHeader> get_rbeventheaders(const String &filename, bool is_headers) {
     if (is_headers) {
       header = RBEventHeader::from_bytestream(stream, pos);
     } else {
-      header = RBEventHeader::extract_from_rbbinarydump(stream, pos);
+      spdlog::error("Can not deal with this!");
+      //header = RBEventHeader::extract_from_rbbinarydump(stream, pos);
     }
-    header.broken ? n_bad++ : n_good++ ;
+    //header.broken ? n_bad++ : n_good++ ;
     headers.push_back(header);
     pos -= 2;
     pos = search_for_2byte_marker(stream, 0xAA, has_ended, pos);

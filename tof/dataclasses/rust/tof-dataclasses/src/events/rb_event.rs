@@ -955,13 +955,10 @@ impl RBEventHeader {
   //pub fn decode_channel_mask(&self) -> Vec<u8> {
   pub fn get_channels(&self) -> Vec<u8> {
     let mut channels = Vec::<u8>::with_capacity(8);
-    for k in 0..8 {
+    for k in 0..9 {
       if self.channel_mask & (1 << k) > 0 {
         channels.push(k);
       }
-    }
-    if self.has_ch9() {
-      channels.push(8u8);
     }
     channels
   }
