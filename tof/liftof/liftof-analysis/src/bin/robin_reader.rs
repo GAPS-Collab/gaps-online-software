@@ -8,6 +8,7 @@ extern crate json;
 extern crate glob;
 extern crate regex;
 extern crate textplots;
+extern crate env_logger;
 
 use glob::glob;
 use regex::Regex;
@@ -20,6 +21,7 @@ use clap::Parser;
 use std::path::PathBuf;
 use std::path::Path;
 use std::collections::HashMap;
+use std::io::Write;
 
 use std::process::exit;
 
@@ -36,8 +38,9 @@ use tof_dataclasses::calibrations::RBCalibrations;
 use tof_dataclasses::io::RobinReader;
 
 use liftof_lib::{
-  TofPacketWriter,
-  TofPacketReader
+    color_log,
+    TofPacketWriter,
+    TofPacketReader
 };
 
 
@@ -56,14 +59,26 @@ struct Args {
   /// Readoutboard callibration textfiles
   #[arg(short, long)]
   calibrations: Option<PathBuf>,
-  #[arg(long)]
+  /// Restrict number of events
+  #[arg(short, long, default_value_t=0)]
+  n_events        : u64,
+  #[arg(long, default_value_t=false)]
   no_missing_hits : bool,
 }
 
 
 fn main() {
   
-  pretty_env_logger::init();
+  env_logger::builder()
+    .format(|buf, record| {
+    writeln!( buf, "[{level}][{module_path}:{line}] {args}",
+      level = color_log(&record.level()),
+      module_path = record.module_path().unwrap_or("<unknown>"),
+      //target = record.target(),
+      line = record.line().unwrap_or(0),
+      args = record.args()
+      )
+    }).init();
 
   let args = Args::parse();
   
@@ -72,6 +87,10 @@ fn main() {
 
   let use_calibrations : bool;
   let mut calibrations = HashMap::<u8, RBCalibrations>::new();
+  if matches!(args.stream, None) {
+    println!("==> We can't identify missing hits without the MasterTrigger!");
+  }
+
   match args.calibrations {
     None => {
       use_calibrations = false;
@@ -142,6 +161,9 @@ fn main() {
         let filename = path.into_os_string().into_string().unwrap();
         if let Some(mat) = re.captures(&filename) {
           let rb_id = mat.get(1).unwrap().as_str().parse::<u8>().unwrap();
+          //if rb_id != 12 {
+          //  continue;
+          //}
           if available_rbs.contains(&rb_id) {
             //println!("=> Omiting {}", filename);
             robin_readers.get_mut(&rb_id).unwrap().add_file(filename);
@@ -153,6 +175,7 @@ fn main() {
           // exit(1);
           robin_readers.insert(rb_id, this_reader);
           //println!("First one or two-digit number: {}", mat.get(1).unwrap().as_str());
+          //break;
         } else {
           error!("Can not recognize pattern!!");
         }
@@ -162,11 +185,20 @@ fn main() {
     }
   }
   println!("available rbs {:?}", available_rbs);
+  //let mut max_evids = Vec::<u32>::new();
+  //let mut min_evids = Vec::<u32>::new();
   for k in available_rbs.iter() {
-    println!("{}", k);
-    println!("{}", robin_readers[k].filename); 
-    println!("{}", robin_readers[k].get_cache_size()); 
+    println!("==> For board {}, we read file {} and extraced {} events!", k, robin_readers[k].filename, robin_readers[k].get_cache_size());
+    println!("==> We cached events with number from {} to {}", robin_readers[k].min_cached_event_id().unwrap(), robin_readers[k].max_cached_event_id().unwrap());
+    //min_evids.push(robin_readers[k].min_cached_event_id().unwrap());
+    //max_evids.push(robin_readers[k].max_cached_event_id().unwrap());
+
+    let cached_eventids = robin_readers[k].event_ids_in_cache();
+    for k in 0..5 {
+      println!("== ==> evid {}", cached_eventids[k]);
+    }
   }
+
   //exit(1);
   //let mut reader = robin_readers.get_mut(&22).unwrap();
   //reader.cache_all_events();
@@ -178,7 +210,6 @@ fn main() {
   // everything in memory
   //println!("=> Cached {} events!", reader.get_cache_size());
 
-
   let r_events   = Vec::<RBEvent>::new();
   let mut seen_evids = Vec::<u32>::new(); 
   
@@ -186,10 +217,10 @@ fn main() {
   let mut mtp_events_tot  = 0;
 
   let mut writer = TofPacketWriter::new(String::from("combined"));
-
+  let mut n_events = 0u64;
   if has_stream {
     for packet in packet_reader {
-      println!("{}", packet);
+      //println!("{}", packet);
       match packet.packet_type {
         PacketType::MasterTrigger =>  {
           let mt_packet = MasterTriggerEvent::from_bytestream(&packet.payload, &mut 0); 
@@ -210,7 +241,8 @@ fn main() {
             master_tof_event.mt_event = mtp;
 
             println!("MTE: rbids {:?}", rb_ids_debug);
-            println!("available_rbs {:?}", available_rbs);
+            println!("MTE: evid {}", mtp.event_id);
+            //println!("available_rbs {:?}", available_rbs);
             //println!("MTE: ltbids {:?}", mapping.get_ltb_ids(&mtp));
             for k in rb_ids_debug.0 {
               let this_ev_rbid = k.0;
@@ -222,7 +254,7 @@ fn main() {
                   continue;
                 }
               }
-              println!("Getting RB {}", this_ev_rbid);
+              //println!("Getting RB {}", this_ev_rbid);
               let reader = robin_readers.get_mut(&this_ev_rbid).unwrap();
               //panic!("{}", reader.get_cache_size());
               match reader.get_from_cache(&mtp.event_id) {
@@ -230,14 +262,17 @@ fn main() {
                   //reader.print_index();
                   //println!("Events: {:?}", reader.event_ids_in_cache());
                   //println!("Reader has {} events", reader.event_ids_in_cache().len());
+                  //println!("==> We cached events with number from {} to {}", robin_readers[&this_ev_rbid].min_cached_event_id().unwrap(), robin_readers[&this_ev_rbid].max_cached_event_id().unwrap());
                   error!("We do not have that event {}!", mtp.event_id);
+                  //exit(1);
                   continue;
                 }
                 Some(rbevent) => {
-                  //println!("{:?}", rbevent.adc);
+                  println!("{:?}", rbevent.adc);
                   //if !rbevent.is_over_adc_threshold(this_ev_rbch, 8000) {
                   //  continue;
                   //}
+                  //exit(1);
                   if use_calibrations {
                     //let mut channel_data : [f32;1024] = [0.0;1024];
                     let mut channel_data = vec![0.0f32;1024];
@@ -328,6 +363,12 @@ fn main() {
         }
         _ => ()
       }
+      n_events += 1;
+      if args.n_events > 0 {
+        if n_events == args.n_events {
+          break;
+        }
+      }
     }
   } else {
     println!("=> Will merge events without master trigger information!");
@@ -368,6 +409,12 @@ fn main() {
       writer.add_tof_packet(&tof_packet);
       n_tofpackets += 1;
       //if n_tofpackets == 10 {break;}
+      n_events += 1;
+      if args.n_events > 0 {
+        if n_events == args.n_events {
+          break;
+        }
+      }
     }
     println!("=> We have written {} TofPackets!", n_tofpackets);
     bar.finish();

@@ -53,6 +53,7 @@ fn main() {
                                        true);
  });
 
+ let mut n_events = 0u64;
  loop {
    match mte_rec.recv() {
      Err(err)  => trace!("Can not receive events! Error {err}"),
@@ -60,6 +61,10 @@ fn main() {
        //if ev.n_paddles > 0 {
        //  println!("Received event {}", ev);
        //}
+       if n_events % 100 == 0 {
+         println!("{}", _ev);
+       } 
+       n_events += 1;
      }
    }
  }
