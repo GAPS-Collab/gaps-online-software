@@ -160,6 +160,7 @@ impl Iterator for RBEventMemoryStreamer {
     let mut event        = RBEvent::new();
     let mut event_status = EventStatus::Perfect;
     // start parsing
+    let first_pos = self.pos;
     let head   = parse_u16(&self.stream, &mut self.pos);
     let status = parse_u16(&self.stream, &mut self.pos);
     //let head_pos   = search_for_u16(RBEvent::HEAD, &self.stream, self.pos); 
@@ -222,6 +223,7 @@ impl Iterator for RBEventMemoryStreamer {
         self.pos_at_head = false;
         return None;
       }
+      //println!("{:?}", header.get_channels().iter());
       for ch in header.get_channels().iter() {
         let ch_id = parse_u16(&self.stream, &mut self.pos);
         if ch_id == *ch as u16 {
@@ -255,23 +257,26 @@ impl Iterator for RBEventMemoryStreamer {
     if !header.drs_lost_trigger() {
       header.stop_cell = parse_u16(&self.stream, &mut self.pos);
     }
-    let crc320       = parse_u16(&self.stream, &mut self.pos);
-    let crc321       = parse_u16(&self.stream, &mut self.pos);
+    let crc320         = parse_u16(&self.stream, &mut self.pos);
+    let crc321         = parse_u16(&self.stream, &mut self.pos);
     let mut crc32 : u32;
     if REVERSE_WORDS {
       crc32 = u32::from(crc320) << 16 | u32::from(crc321);
     } else {
       crc32 = u32::from(crc321) << 16 | u32::from(crc320);
     }
-    
     let tail         = parse_u16(&self.stream, &mut self.pos);
+    let delta_pos    = self.pos - first_pos;
     if tail != 0x5555 {
-      error!("Tail signature is wrong! Got {}", tail);
-      for k in self.pos - 10..self.pos+10 {
-        //println!("broken tail word {}", self.stream[k]);
-        event_status = EventStatus::TailWrong;
-      }
+      //error!("Delta pos {}", delta_pos);
+      error!("Tail signature is wrong! Got {} for board {}", tail, header.rb_id);
+      //for k in self.pos - 10..self.pos+10 {
+      //  println!("broken tail word {}", self.stream[k]);
+      //}
+      //println!("{}", header);
+      event_status = EventStatus::TailWrong;
     }
+    //println!("{}", header);
     self.stream.drain(0..self.pos);
     //self.seek_next_header(0xaa);
     //println!("{} {}", self.pos, self.stream.len());
