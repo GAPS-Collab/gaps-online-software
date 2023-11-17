@@ -1,6 +1,18 @@
 pub mod master_trigger;
+use constants::{DEFAULT_CALIB_VOLTAGE,
+                DEFAULT_CALIB_EXTRA,
+                DEFAULT_RB_ID,
+                DEFAULT_PB_ID,
+                DEFAULT_LTB_ID,
+                DEFAULT_PREAMP_ID,
+                DEFAULT_PREAMP_BIAS,
+                DEFAULT_POWER_STATUS,
+                DEFAULT_RUN_TYPE,
+                DEFAULT_RUN_EVENT_NO,
+                DEFAULT_RUN_TIME};
 pub use master_trigger::{connect_to_mtb,
                          master_trigger};
+pub mod constants;
 
 use std::error::Error;
 use std::fmt;
@@ -52,6 +64,14 @@ use tof_dataclasses::analysis::{calculate_pedestal,
                                 integrate,
                                 cfd_simple,
                                 find_peaks};
+
+use clap::{arg,
+  //value_parser,
+  //ArgAction,
+  //Command,
+  Parser,
+  Args,
+  Subcommand};
 
 pub const MT_MAX_PACKSIZE   : usize = 512;
 pub const DATAPORT : u32 = 42000;
@@ -852,6 +872,304 @@ pub fn get_ltb_dsi_j_ch_mapping(mapping_file : PathBuf) -> DsiLtbRBMapping {
 pub fn to_board_id_string(rb_id: u32) -> String {
   String::from("RB") + &format!("{:02}", rb_id)
 }
+
+/**********************************************************/
+/// Command Enums and stucts
+
+/// Calibration cmds ====================================================
+#[derive(Debug, Subcommand, PartialEq)]
+pub enum CalibrationCmd {
+  /// Default calibration run, meaning 2 voltage calibrations and one timing calibration on all RBs with the default values.
+  Default(DefaultOpts),
+  /// No input data taking run. All RB are targeted are default ones if nothing else is specified.
+  Noi(NoiOpts),
+  /// Voltage data taking run. All RB are targeted and voltage are default ones if nothing else is specified.
+  Voltage(VoltageOpts),
+  /// Timing data taking run. All RB are targeted and voltage are default ones if nothing else is specified.
+  Timing(TimingOpts)
+}
+
+#[derive(Debug, Args, PartialEq)]
+pub struct DefaultOpts {
+  /// Voltage level to be set in voltage calibration run.
+  #[arg(short, long, default_value_t = DEFAULT_CALIB_VOLTAGE)]
+  pub voltage_level: u16,
+  /// RB to target in voltage calibration run.
+  #[arg(short, long, default_value_t = DEFAULT_RB_ID)]
+  pub rb_id: u8,
+  /// Extra arguments in voltage calibration run (not implemented).
+  #[arg(short, long, default_value_t = DEFAULT_CALIB_EXTRA)]
+  pub extra: u8,
+}
+
+impl DefaultOpts {
+  pub fn new(voltage_level: u16, rb_id: u8, extra: u8) -> Self {
+    Self { 
+      voltage_level,
+      rb_id,
+      extra
+    }
+  }
+}
+
+#[derive(Debug, Args, PartialEq)]
+pub struct NoiOpts {
+  /// RB to target in timing calibration run.
+  #[arg(short, long, default_value_t = DEFAULT_RB_ID)]
+  pub rb_id: u8,
+  /// Extra arguments in timing calibration run (not implemented).
+  #[arg(short, long, default_value_t = DEFAULT_CALIB_EXTRA)]
+  pub extra: u8,
+}
+
+impl NoiOpts {
+  pub fn new(rb_id: u8, extra: u8) -> Self {
+    Self { 
+      rb_id,
+      extra
+    }
+  }
+}
+
+#[derive(Debug, Args, PartialEq)]
+pub struct VoltageOpts {
+  /// Voltage level to be set in voltage calibration run.
+  #[arg(short, long, default_value_t = DEFAULT_CALIB_VOLTAGE)]
+  pub voltage_level: u16,
+  /// RB to target in voltage calibration run.
+  #[arg(short, long, default_value_t = DEFAULT_RB_ID)]
+  pub rb_id: u8,
+  /// Extra arguments in voltage calibration run (not implemented).
+  #[arg(short, long, default_value_t = DEFAULT_CALIB_EXTRA)]
+  pub extra: u8,
+}
+
+impl VoltageOpts {
+  pub fn new(voltage_level: u16, rb_id: u8, extra: u8) -> Self {
+    Self { 
+      voltage_level,
+      rb_id,
+      extra
+    }
+  }
+}
+
+#[derive(Debug, Args, PartialEq)]
+pub struct TimingOpts {
+  /// Voltage level to be set in voltage calibration run.
+  #[arg(short, long, default_value_t = DEFAULT_CALIB_VOLTAGE)]
+  pub voltage_level: u16,
+  /// RB to target in voltage calibration run.
+  #[arg(short, long, default_value_t = DEFAULT_RB_ID)]
+  pub rb_id: u8,
+  /// Extra arguments in voltage calibration run (not implemented).
+  #[arg(short, long, default_value_t = DEFAULT_CALIB_EXTRA)]
+  pub extra: u8,
+}
+
+impl TimingOpts {
+  pub fn new(voltage_level: u16, rb_id: u8, extra: u8) -> Self {
+    Self { 
+      voltage_level,
+      rb_id,
+      extra
+    }
+  }
+}
+/// END Calibration cmds ================================================
+
+/// Power cmds ====================================================
+#[derive(Debug, Subcommand, PartialEq)]
+pub enum PowerCmd {
+  /// Power up everything (PB + RB + LTB + preamps + MT)
+  All(PowerStatus),
+  /// Power up MT alone
+  MT(PowerStatus),
+  /// Power up everything but MT (PB + RB + LTB + preamps)
+  AllButMT(PowerStatus),
+  /// Power up all or specific PBs
+  PB(PBPowerOpts),
+  /// Power up all or specific RBs
+  RB(RBPowerOpts),
+  /// Power up all or specific LTBs
+  LTB(LTBPowerOpts),
+  /// Power up all or specific preamp
+  Preamp(PreampPowerOpts)
+}
+
+#[derive(Debug, Args, PartialEq)]
+pub struct PowerStatus {
+  /// Which power status one wants to achieve
+  pub power_status: PowerStatusEnum
+}
+
+impl PowerStatus {
+  pub fn new(power_status: PowerStatusEnum) -> Self {
+    Self { 
+      power_status
+    }
+  }
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize, clap::ValueEnum)]
+#[repr(u8)]
+pub enum PowerStatusEnum {
+  OFF       = 0u8,
+  ON        = 10u8,
+  Cycle     = 20u8,
+}
+
+impl fmt::Display for PowerStatusEnum {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let r = serde_json::to_string(self).unwrap_or(
+      String::from("Error: cannot unwrap this DataType"));
+    write!(f, "<PowerStatusEnum: {}>", r)
+  }
+}
+
+impl TryFrom<u8> for PowerStatusEnum {
+  type Error = &'static str;
+
+  // I am not sure about this hard coding, but the code
+  //  looks nicer - Paolo
+  fn try_from(value: u8) -> Result<Self, Self::Error> {
+    match value {
+      0u8  => Ok(PowerStatusEnum::OFF),
+      10u8 => Ok(PowerStatusEnum::ON),
+      20u8 => Ok(PowerStatusEnum::Cycle),
+      _    => Err("I am not sure how to convert this value!")
+    }
+  }
+}
+
+#[derive(Debug, Args, PartialEq)]
+pub struct PBPowerOpts {
+  /// Which power status one wants to achieve
+  pub power_status: PowerStatusEnum,
+  /// ID of the PB to be powered up
+  #[arg(short, long, default_value_t = DEFAULT_PB_ID)]
+  pub pb_id: u8
+}
+
+impl PBPowerOpts {
+  pub fn new(power_status: PowerStatusEnum, pb_id: u8) -> Self {
+    Self { 
+      power_status,
+      pb_id
+    }
+  }
+}
+
+#[derive(Debug, Args, PartialEq)]
+pub struct RBPowerOpts {
+  /// Which power status one wants to achieve
+  pub power_status: PowerStatusEnum,
+  /// ID of the RB to be powered up
+  #[arg(short, long, default_value_t = DEFAULT_RB_ID)]
+  pub rb_id: u8
+}
+
+impl RBPowerOpts {
+  pub fn new(power_status: PowerStatusEnum, rb_id: u8) -> Self {
+    Self {
+      power_status,
+      rb_id
+    }
+  }
+}
+
+#[derive(Debug, Args, PartialEq)]
+pub struct LTBPowerOpts {
+  /// Which power status one wants to achieve
+  pub power_status: PowerStatusEnum,
+  /// ID of the LTB to be powered up
+  #[arg(short, long, default_value_t = DEFAULT_LTB_ID)]
+  pub ltb_id: u8
+}
+
+impl LTBPowerOpts {
+  pub fn new(power_status: PowerStatusEnum, ltb_id: u8) -> Self {
+    Self {
+      power_status,
+      ltb_id
+    }
+  }
+}
+
+#[derive(Debug, Args, PartialEq)]
+pub struct PreampPowerOpts {
+  /// Which power status one wants to achieve
+  pub power_status: PowerStatusEnum,
+  /// ID of the preamp to be powered up
+  #[arg(short, long, default_value_t = DEFAULT_PREAMP_ID)]
+  pub preamp_id: u8,
+  /// Turn on bias of the preamp specified
+  #[arg(short, long, default_value_t = DEFAULT_PREAMP_BIAS)]
+  pub preamp_bias: u16
+}
+
+impl PreampPowerOpts {
+  pub fn new(power_status: PowerStatusEnum, preamp_id: u8, preamp_bias: u16) -> Self {
+    Self {
+      power_status,
+      preamp_id,
+      preamp_bias
+    }
+  }
+}
+/// END Power cmds ================================================
+
+/// Run cmds ======================================================
+#[derive(Debug, Subcommand, PartialEq)]
+pub enum RunCmd {
+  /// Start data taking
+  Start(StartRunOpts),
+  /// Stop data taking
+  Stop(StopRunOpts)
+}
+
+#[derive(Debug, Args, PartialEq)]
+pub struct StartRunOpts {
+  /// Which kind of run is to be launched
+  #[arg(long, default_value_t = DEFAULT_RUN_TYPE)]
+  pub run_type: u8,
+  /// ID of the RB where to run data taking
+  #[arg(long, default_value_t = DEFAULT_RB_ID)]
+  pub rb_id: u8,
+  /// Number of events to be generated
+  #[arg(short, long, default_value_t = DEFAULT_RUN_EVENT_NO)]
+  pub event_no: u8,
+  /// Time the run is expected to go on for
+  #[arg(short, long, default_value_t = DEFAULT_RUN_TIME)]
+  pub time: u8
+}
+
+impl StartRunOpts {
+  pub fn new(run_type: u8, rb_id: u8, event_no: u8, time: u8) -> Self {
+    Self {
+      run_type,
+      rb_id,
+      event_no,
+      time
+    }
+  }
+}
+
+#[derive(Debug, Args, PartialEq)]
+pub struct StopRunOpts {
+  /// ID of the RB where to run data taking
+  #[arg(short, long, default_value_t = DEFAULT_RB_ID)]
+  pub rb_id: u8
+}
+
+impl StopRunOpts {
+  pub fn new(rb_id: u8) -> Self {
+    Self {
+      rb_id
+    }
+  }
+}
+/// END Run cmds ==================================================
 
 #[test]
 fn test_display() {

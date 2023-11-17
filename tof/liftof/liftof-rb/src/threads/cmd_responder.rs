@@ -273,6 +273,25 @@ pub fn cmd_responder(cmd_server_ip             : String,
                       //  return Ok(TofResponse::Success(RESP_SUCC_FINGERS_CROSSED));
                       },
                       // Voltage and timing calibration is connected now
+                      TofCommand::NoiCalibration (value) => {
+                        cfg_if::cfg_if! {
+                          if #[cfg(feature = "tofcontrol")]  {
+                            // MSB third 8 bits are RB ID
+                            let rb_id: u8 = ((value | (MASK_CMD_8BIT << 8)) >> 8) as u8;
+                            // MSB fourth 8 bits are extra (not used)
+                            let extra: u8 = (value | MASK_CMD_8BIT) as u8;
+                            println!("RB ID: {}, extra: {}",rb_id,extra);
+                            continue;
+                          } else {
+                            warn!("The function is implemented, but one has to compile with --features=tofcontrol");
+                            match cmd_socket.send(resp_not_implemented,0) {
+                              Err(err) => warn!("Can not send response! Err {err}"),
+                              Ok(_)    => trace!("Resp sent!")
+                            }
+                            continue;
+                          }
+                        }
+                      },
                       TofCommand::VoltageCalibration (value) => {
                         cfg_if::cfg_if! {
                           if #[cfg(feature = "tofcontrol")]  {
@@ -294,13 +313,47 @@ pub fn cmd_responder(cmd_server_ip             : String,
                           }
                         }
                       },
-                      TofCommand::TimingCalibration  (_) => {
-                        warn!("Not implemented");
-                        match cmd_socket.send(resp_not_implemented,0) {
-                          Err(err) => warn!("Can not send response! Err {err}"),
-                          Ok(_)    => trace!("Resp sent!")
+                      TofCommand::TimingCalibration  (value) => {
+                        cfg_if::cfg_if! {
+                          if #[cfg(feature = "tofcontrol")]  {
+                            // MSB first 16 bits are voltage level
+                            let voltage_val: u16 = ((value | (MASK_CMD_16BIT << 16)) >> 16) as u16;
+                            // MSB third 8 bits are RB ID
+                            let rb_id: u8 = ((value | (MASK_CMD_8BIT << 8)) >> 8) as u8;
+                            // MSB fourth 8 bits are extra (not used)
+                            let extra: u8 = (value | MASK_CMD_8BIT) as u8;
+                            println!("Voltage_val: {}, RB ID: {}, extra: {}",voltage_val,rb_id,extra);
+                            continue;
+                          } else {
+                            warn!("The function is implemented, but one has to compile with --features=tofcontrol");
+                            match cmd_socket.send(resp_not_implemented,0) {
+                              Err(err) => warn!("Can not send response! Err {err}"),
+                              Ok(_)    => trace!("Resp sent!")
+                            }
+                            continue;
+                          }
                         }
-                        continue;
+                      },
+                      TofCommand::DefaultCalibration  (value) => {
+                        cfg_if::cfg_if! {
+                          if #[cfg(feature = "tofcontrol")]  {
+                            // MSB first 16 bits are voltage level
+                            let voltage_val: u16 = ((value | (MASK_CMD_16BIT << 16)) >> 16) as u16;
+                            // MSB third 8 bits are RB ID
+                            let rb_id: u8 = ((value | (MASK_CMD_8BIT << 8)) >> 8) as u8;
+                            // MSB fourth 8 bits are extra (not used)
+                            let extra: u8 = (value | MASK_CMD_8BIT) as u8;
+                            println!("Voltage_val: {}, RB ID: {}, extra: {}",voltage_val,rb_id,extra);
+                            continue;
+                          } else {
+                            warn!("The function is implemented, but one has to compile with --features=tofcontrol");
+                            match cmd_socket.send(resp_not_implemented,0) {
+                              Err(err) => warn!("Can not send response! Err {err}"),
+                              Ok(_)    => trace!("Resp sent!")
+                            }
+                            continue;
+                          }
+                        }
                       },
                       TofCommand::CreateCalibrationFile (_) => {
                         warn!("Not implemented");

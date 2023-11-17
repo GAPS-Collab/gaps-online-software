@@ -33,12 +33,13 @@ use crate::packets::{PacketType,
                      TofPacket};
 use crate::io::read_file;
 
-#[cfg(feature = "random")] 
-use crate::FromRandom;
-#[cfg(feature = "random")]
-extern crate rand;
-#[cfg(feature = "random")]
-use rand::Rng;
+cfg_if::cfg_if! {
+  if #[cfg(feature = "random")]  {
+    use crate::FromRandom;
+    extern crate rand;
+    use rand::Rng;
+  }
+}
 
 extern crate statistical;
 

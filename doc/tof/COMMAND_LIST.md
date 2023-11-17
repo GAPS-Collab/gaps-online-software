@@ -41,7 +41,7 @@ The commands follow Sydney's list (Pad stands for padding):
 | -------------- | ------- | --------- | ---- |
 | 10,11,12 | Power on/off to PBs + RBs + LTBs + preamps (all at once) or MT | < 5/day Command to power on/off PDU channels (to PDU) | Pad:u16+u8, PDU:u8 |
 | 10,11,12 | Power on/off to LTB or preamp | < 2/day Command to power on/off various components (to TOF -> to RB)             | Pad:u16+u8, RB:u8 |
-| 20 | RBsetup ? Command to run rbsetup on a particular RB or all (to TOF -> to RBs) |                                        | Pad:u16+u8, RB:u8 |
+| 20 | RBsetup ? Command to run rbsetup on a particular RB or all (to TOF -> to RBs) <br />Comment: prolly not needed anymore? |                                        | Pad:u16+u8, RB:u8 |
 | 21 | Set Thresholds  | < 3/day Command to set a threshold level on all LTBs (to TOF -> to  RBs)                             | Pad:u8, Threshold:u8, Level:u16 |
 | 22 | Set MT Config 1/run | <10/day? Command to set MT trigger config (to TOF -> to MT)                                      | Pad:u16, TriggerConfig:u16 |
 | 32 | Start Validation Run 1/run | <10/day? Command to take a small amount of data on an RB or all (E events)                | Pad:u16, E:u8, RB:u8 |
@@ -49,9 +49,11 @@ The commands follow Sydney's list (Pad stands for padding):
 | 31 | Start Data-Taking Run 1/run  | <10/day? Command to take regular data (to TOF -> to RBs)                                | Pad:u8, RunType:u8, E:u8, Time:u8 |
 | 42 | Get reduced data packet (from Flight computer) | ?                                                                     | Pad:u32 |
 | 30 | Stop Run < 1/run | < 10/day Command to stop a run (to TOF -> to RBs)                                                   | Pad:u32 |
+| 50 | No input Calibration for an RB or all | ???                    | Pad:u16, RB:u8, Extra:u8 |
 | 51 | Voltage Calibration for an RB or all | Runs 1/day Command to take 2 voltage calibration runs (to TOF -> to RBs) 12 B                    | VoltageLevel:u16, RB:u8, Extra:u8 |
-| 52 | Timing Calibration for an RB or all | Run 1/day Command to take a timing calibration run (to TOF -> to RBs) 8 B                        | Pad:u16, RB:u8, Extra:u8 |
-| 53 | Create New Calibration File for an RB or all | ?                          | Pad:u8, VoltageLevel: u16, RB:u8 |
+| 52 | Timing Calibration for an RB or all | Run 1/day Command to take a timing calibration run (to TOF -> to RBs) 8 B                        | VoltageLevel:u16, RB:u8, Extra:u8 |
+| 53 | Default Calibration for an RB or all | ???                    | VoltageLevel:u16, RB:u8, Extra:u8 |
+| 54 | Create New Calibration File for an RB or all | Comment: does this really make sense? Whats the point of having a command that creates a file? Shouldnt it be integrated w/ smth else? | Pad:u8, VoltageLevel: u16, RB:u8 |
 
 Note: when "all" is needed it will be rendered as all ones.
 

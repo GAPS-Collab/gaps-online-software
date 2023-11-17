@@ -7,12 +7,13 @@ use crate::serialization::{parse_u8,
                            SerializationError};
 use crate::events::DataType;
 
-#[cfg(feature = "random")] 
-use crate::FromRandom;
-#[cfg(feature = "random")]
-extern crate rand;
-#[cfg(feature = "random")]
-use rand::Rng;
+cfg_if::cfg_if! {
+  if #[cfg(feature = "random")]  {
+    use crate::FromRandom;
+    extern crate rand;
+    use rand::Rng;
+  }
+}
 
 /// A collection of parameters for tof runs
 ///

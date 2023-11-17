@@ -10,21 +10,22 @@
 use std::fmt;
 
 // Takeru's tof-control code
-#[cfg(feature = "tof-control")]
-use tof_control::rb_control::rb_temp::RBtemp;
-#[cfg(feature = "tof-control")]
-use tof_control::rb_control::rb_mag::RBmag;
-#[cfg(feature = "tof-control")]
-use tof_control::rb_control::rb_vcp::RBvcp;
-#[cfg(feature = "tof-control")]
-use tof_control::rb_control::rb_ph::RBph;
+cfg_if::cfg_if! {
+  if #[cfg(feature = "tof-control")]  {
+    use tof_control::rb_control::rb_temp::RBtemp;
+    use tof_control::rb_control::rb_mag::RBmag;
+    use tof_control::rb_control::rb_vcp::RBvcp;
+    use tof_control::rb_control::rb_ph::RBph;
+  }
+}
 
-#[cfg(feature = "random")]
-use crate::FromRandom;
-#[cfg(feature = "random")]
-extern crate rand;
-#[cfg(feature = "random")]
-use rand::Rng;
+cfg_if::cfg_if! {
+  if #[cfg(feature = "random")]  {
+    use crate::FromRandom;
+    extern crate rand;
+    use rand::Rng;
+  }
+}
 
 
 use crate::serialization::{Serialization,

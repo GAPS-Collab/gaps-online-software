@@ -1,6 +1,6 @@
 #! /bin/sh
 deploy_target() {
-  scp ../target/armv7-unknown-linux-musleabi/release/$1 $2:~/bin/liftof-rb-0.8-paolo
+  scp ../target/armv7-unknown-linux-musleabi/release/$1 $2:~/bin/liftof-rb-0.9-paolo
 }
 
 compile_and_deploy_target() {

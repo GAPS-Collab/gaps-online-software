@@ -39,9 +39,10 @@ cfg_if::cfg_if! {
                                           select_vcal_mode,
                                           select_tcal_mode,
                                           select_sma_mode};
+
+    const FIVE_SECONDS: Duration = time::Duration::from_millis(5000);
   }
 }
-
 
 /// The poisson self trigger mode of the board
 /// triggers automatically, this means we don't 
@@ -178,7 +179,7 @@ pub fn rb_calibration(rc_to_runner    : &Sender<RunConfig>,
                       tp_to_publisher : &Sender<TofPacket>)
 -> Result<(), CalibrationError> {
   warn!("Commencing full RB calibration routine! This will take the board out of datataking for a few minutes!");
-  let five_seconds   = time::Duration::from_millis(5000);
+  // TODO this should become something that can be read from a local json file
   let mut run_config = RunConfig {
     nevents                 : 1300,
     is_active               : true,
@@ -187,15 +188,11 @@ pub fn rb_calibration(rc_to_runner    : &Sender<RunConfig>,
     trigger_poisson_rate    : 0,
     trigger_fixed_rate      : 100,
     latch_to_mtb            : false,
-    data_type               : DataType::Noi,
+    data_type               : DataType::Unknown,
     rb_buff_size            : 1000
   }; 
-  // here is the general idea. We connect to our own 
-  // zmq socket, to gather the events and store them 
-  // here locally. Then we apply the calibration 
-  // and we simply have to send it back to the 
-  // data publisher.
-  // This saves us a mutex!!
+  let socket = connect_to_zmq().expect("Not able to connect to socket, something REAL strange happened.");
+
   let mut board_id = 0u8;
   match get_board_id() {
     Err(err) => {
@@ -207,16 +204,263 @@ pub fn rb_calibration(rc_to_runner    : &Sender<RunConfig>,
   }
   let mut calibration = RBCalibrations::new(board_id);
   calibration.serialize_event_data = true;
-  // set up zmq socket
-  let mut address_ip = String::from("tcp://");
-  let this_board_ip = local_ip().expect("Unable to obtainl local board IP. Something is messed up!");
-  let data_port    = DATAPORT;
 
-  match this_board_ip {
-    IpAddr::V4(ip) => address_ip += &ip.to_string(),
-    IpAddr::V6(_)  => panic!("Currently, we do not support IPV6!")
+  run_config.data_type = DataType::Noi; 
+  run_noi_calibration(rc_to_runner, &socket, &mut calibration, run_config);
+
+  run_config.data_type = DataType::VoltageCalibration; 
+  run_voltage_calibration(rc_to_runner, &socket, &mut calibration, run_config);
+  
+  run_config.data_type = DataType::TimingCalibration;
+  run_timing_calibration(rc_to_runner, &socket, &mut calibration, run_config);
+
+  println!("==> Calibration data taking complete!"); 
+  println!("Calibration : {}", calibration);
+  println!("Cleaning data...");
+  calibration.clean_input_data();
+  println!("Calibration : {}", calibration);
+
+  info!("Will set board to sma mode!");
+  select_sma_mode();
+  run_config.is_active = false;  
+  match rc_to_runner.send(run_config) {
+    Err(err) => warn!("Can not send runconfig!, Err {err}"),
+    Ok(_)    => trace!("Success!")
   }
-  let data_address : String = address_ip.clone() + ":" + &data_port.to_string();
+  thread::sleep(FIVE_SECONDS);
+
+  // Do this only with the full calib
+  calibration.calibrate()?;
+  println!("Calibration : {}", calibration);
+
+  // Send it
+  let calib_pack = TofPacket::from(&calibration);
+  match tp_to_publisher.send(calib_pack) {
+    Err(err) => {
+      error!("Unable to send RBCalibration package! Error {err}");
+    },
+    Ok(_) => ()
+  }
+  info!("Calibration done!");
+  Ok(())
+}
+
+// TODO The following two functions are placeholder for subset of the
+// calibration routine. It is not clear whether these make sense or not.
+//
+// Only no input and publish.
+#[cfg(feature="tofcontrol")]
+pub fn rb_noi_subcalibration(rc_to_runner    : &Sender<RunConfig>,
+                             tp_to_publisher : &Sender<TofPacket>)
+-> Result<(), CalibrationError> {
+  warn!("Commencing RB No input sub-calibration routine! This will take the board out of datataking for a few minutes!");
+  // TODO this should become something that can be read from a local json file
+  let mut run_config = RunConfig {
+    nevents                 : 1300,
+    is_active               : true,
+    nseconds                : 0,
+    stream_any              : true,
+    trigger_poisson_rate    : 0,
+    trigger_fixed_rate      : 100,
+    latch_to_mtb            : false,
+    data_type               : DataType::Unknown,
+    rb_buff_size            : 1000
+  }; 
+  let socket = connect_to_zmq().expect("Not able to connect to socket, something REAL strange happened.");
+
+  let mut board_id = 0u8;
+  match get_board_id() {
+    Err(err) => {
+      error!("Unable to obtain board id. Calibration might be orphaned. Err {err}");
+    },
+    Ok(rb_id) => {
+      board_id = rb_id as u8;
+    }
+  }
+  let mut calibration = RBCalibrations::new(board_id);
+  calibration.serialize_event_data = true;
+
+  run_config.data_type = DataType::Noi; 
+  run_noi_calibration(rc_to_runner, &socket, &mut calibration, run_config);
+
+  println!("==> No input data taking complete!"); 
+  println!("Calibration : {}", calibration);
+  println!("Cleaning data...");
+  calibration.clean_input_data();
+  println!("Calibration : {}", calibration);
+
+  info!("Will set board to sma mode!");
+  select_sma_mode();
+  run_config.is_active = false;  
+  match rc_to_runner.send(run_config) {
+    Err(err) => warn!("Can not send runconfig!, Err {err}"),
+    Ok(_)    => trace!("Success!")
+  }
+  thread::sleep(FIVE_SECONDS);
+
+  println!("Calibration won't start cause the calibration datataking chain is not complete!");
+
+  // Send it
+  let calib_pack = TofPacket::from(&calibration);
+  match tp_to_publisher.send(calib_pack) {
+    Err(err) => {
+      error!("Unable to send RBCalibration package! Error {err}");
+    },
+    Ok(_) => ()
+  }
+  info!("Calibration done!");
+  Ok(())
+}
+
+// Noi -> Voltage chain and publish.
+#[cfg(feature="tofcontrol")]
+pub fn rb_noi_voltage_subcalibration(rc_to_runner    : &Sender<RunConfig>,
+                                     tp_to_publisher : &Sender<TofPacket>,
+                                     voltage_level   : u16) // where do we put this bad boi?
+-> Result<(), CalibrationError> {
+  warn!("Commencing RB no input + voltage sub-calibration routine! This will take the board out of datataking for a few minutes!");
+  // TODO this should become something that can be read from a local json file
+  let mut run_config = RunConfig {
+    nevents                 : 1300,
+    is_active               : true,
+    nseconds                : 0,
+    stream_any              : true,
+    trigger_poisson_rate    : 0,
+    trigger_fixed_rate      : 100,
+    latch_to_mtb            : false,
+    data_type               : DataType::Unknown,
+    rb_buff_size            : 1000
+  }; 
+  let socket = connect_to_zmq().expect("Not able to connect to socket, something REAL strange happened.");
+
+  let mut board_id = 0u8;
+  match get_board_id() {
+    Err(err) => {
+      error!("Unable to obtain board id. Calibration might be orphaned. Err {err}");
+    },
+    Ok(rb_id) => {
+      board_id = rb_id as u8;
+    }
+  }
+  let mut calibration = RBCalibrations::new(board_id);
+  calibration.serialize_event_data = true;
+
+  run_config.data_type = DataType::Noi; 
+  run_noi_calibration(rc_to_runner, &socket, &mut calibration, run_config);
+
+  run_config.data_type = DataType::VoltageCalibration; 
+  run_voltage_calibration(rc_to_runner, &socket, &mut calibration, run_config);
+
+  println!("==> No input + voltage data taking complete!"); 
+  println!("Calibration : {}", calibration);
+  println!("Cleaning data...");
+  calibration.clean_input_data();
+  println!("Calibration : {}", calibration);
+
+  info!("Will set board to sma mode!");
+  select_sma_mode();
+  run_config.is_active = false;  
+  match rc_to_runner.send(run_config) {
+    Err(err) => warn!("Can not send runconfig!, Err {err}"),
+    Ok(_)    => trace!("Success!")
+  }
+  thread::sleep(FIVE_SECONDS);
+
+  println!("Calibration won't start cause the calibration datataking chain is not complete!");
+
+  // Send it
+  let calib_pack = TofPacket::from(&calibration);
+  match tp_to_publisher.send(calib_pack) {
+    Err(err) => {
+      error!("Unable to send RBCalibration package! Error {err}");
+    },
+    Ok(_) => ()
+  }
+  info!("Calibration done!");
+  Ok(())
+}
+
+// Noi -> Voltage -> Timing chain and publish (no calib!).
+#[cfg(feature="tofcontrol")]
+pub fn rb_timing_subcalibration(rc_to_runner    : &Sender<RunConfig>,
+                                tp_to_publisher : &Sender<TofPacket>,
+                                voltage_level   : u16)
+-> Result<(), CalibrationError> {
+  warn!("Commencing RB no input + voltage + timing sub-calibration routine! This will take the board out of datataking for a few minutes!");
+  // TODO this should become something that can be read from a local json file
+  let mut run_config = RunConfig {
+    nevents                 : 1300,
+    is_active               : true,
+    nseconds                : 0,
+    stream_any              : true,
+    trigger_poisson_rate    : 0,
+    trigger_fixed_rate      : 100,
+    latch_to_mtb            : false,
+    data_type               : DataType::Unknown,
+    rb_buff_size            : 1000
+  }; 
+  let socket = connect_to_zmq().expect("Not able to connect to socket, something REAL strange happened.");
+
+  let mut board_id = 0u8;
+  match get_board_id() {
+    Err(err) => {
+      error!("Unable to obtain board id. Calibration might be orphaned. Err {err}");
+    },
+    Ok(rb_id) => {
+      board_id = rb_id as u8;
+    }
+  }
+  let mut calibration = RBCalibrations::new(board_id);
+  calibration.serialize_event_data = true;
+
+  run_config.data_type = DataType::Noi; 
+  run_noi_calibration(rc_to_runner, &socket, &mut calibration, run_config);
+
+  run_config.data_type = DataType::VoltageCalibration; 
+  run_voltage_calibration(rc_to_runner, &socket, &mut calibration, run_config);
+  
+  run_config.data_type = DataType::TimingCalibration;
+  run_timing_calibration(rc_to_runner, &socket, &mut calibration, run_config);
+
+  println!("==> No input + voltage + timing data taking complete!"); 
+  println!("Calibration : {}", calibration);
+  println!("Cleaning data...");
+  calibration.clean_input_data();
+  println!("Calibration : {}", calibration);
+
+  info!("Will set board to sma mode!");
+  select_sma_mode();
+  run_config.is_active = false;  
+  match rc_to_runner.send(run_config) {
+    Err(err) => warn!("Can not send runconfig!, Err {err}"),
+    Ok(_)    => trace!("Success!")
+  }
+  thread::sleep(FIVE_SECONDS);
+
+  println!("Calibration won't start. The data taking chain is complete, but a sub-calibration routine was called!");
+
+  // Send it
+  let calib_pack = TofPacket::from(&calibration);
+  match tp_to_publisher.send(calib_pack) {
+    Err(err) => {
+      error!("Unable to send RBCalibration package! Error {err}");
+    },
+    Ok(_) => ()
+  }
+  info!("Calibration done!");
+  Ok(())
+}
+
+#[cfg(feature="tofcontrol")]
+fn connect_to_zmq() -> Result<zmq::Socket, CalibrationError> {
+  // here is the general idea. We connect to our own 
+  // zmq socket, to gather the events and store them 
+  // here locally. Then we apply the calibration 
+  // and we simply have to send it back to the 
+  // data publisher.
+  // This saves us a mutex!!
+  let this_board_ip = local_ip().expect("Unable to obtain local board IP. Something is messed up!");
+  let data_address = liftof_lib::build_tcp_from_ip(this_board_ip.to_string(), DATAPORT.to_string());
 
   let ctx = zmq::Context::new();
   let socket : zmq::Socket; 
@@ -246,79 +490,66 @@ pub fn rb_calibration(rc_to_runner    : &Sender<RunConfig>,
     Err(err) => error!("Can not subscribe to {topic_local}, err {err}"),
     Ok(_)    => info!("Subscribing to local packages!"),
   }
-  // at this point, the zmq socket should be set up!
+  Ok(socket)
+}
+
+#[cfg(feature="tofcontrol")]
+fn run_noi_calibration(rc_to_runner: &Sender<RunConfig>,
+                       socket: &zmq::Socket,
+                       calibration: &mut RBCalibrations,
+                       run_config: RunConfig)
+                       -> Result<(), CalibrationError> {
   info!("Will set board to no input mode!");
   select_noi_mode();
   match rc_to_runner.send(run_config) {
     Err(err) => warn!("Can not send runconfig!, Err {err}"),
     Ok(_)    => trace!("Success!")
   }
-  let mut cal_dtype = DataType::Noi;
-  calibration.noi_data = wait_while_run_active(10, five_seconds, 1000, &cal_dtype, &socket);
+  let cal_dtype = DataType::Noi;
+  calibration.noi_data = wait_while_run_active(10, FIVE_SECONDS, 1000, &cal_dtype, socket);
   println!("==> No input (Voltage calibration) data taken!");
+  Ok(())
+}
 
+#[cfg(feature="tofcontrol")]
+fn run_voltage_calibration(rc_to_runner: &Sender<RunConfig>,
+                           socket: &zmq::Socket,
+                           calibration: &mut RBCalibrations,
+                           run_config: RunConfig)
+                           -> Result<(), CalibrationError> {
   info!("Will set board to vcal mode!");
-  select_vcal_mode();
-  run_config.data_type = DataType::VoltageCalibration;  
+  select_vcal_mode(); 
   match rc_to_runner.send(run_config) {
     Err(err) => warn!("Can not send runconfig!, Err {err}"),
     Ok(_)    => trace!("Success!")
   }  
-  cal_dtype             = DataType::VoltageCalibration;
-  calibration.vcal_data = wait_while_run_active(10, five_seconds, 1000, &cal_dtype, &socket);
-  
+  let cal_dtype             = DataType::VoltageCalibration;
+  calibration.vcal_data = wait_while_run_active(10, FIVE_SECONDS, 1000, &cal_dtype, socket);
   println!("==> Voltage calibration data taken!");
+  Ok(())
+}
+
+#[cfg(feature="tofcontrol")]
+fn run_timing_calibration(rc_to_runner: &Sender<RunConfig>,
+                          socket: &zmq::Socket,
+                          calibration: &mut RBCalibrations,
+                          mut run_config: RunConfig)
+                          -> Result<(), CalibrationError> {
   info!("Will set board to tcal mode!");
   run_config.trigger_poisson_rate  = 80;
   run_config.nevents               = 1800; // make sure we get 1000 events
   run_config.trigger_fixed_rate    = 0;
   //run_config.rb_buff_size          = 500;
-  run_config.data_type = DataType::TimingCalibration;  
   select_tcal_mode();
   match rc_to_runner.send(run_config) {
     Err(err) => warn!("Can not send runconfig!, Err {err}"),
     Ok(_)    => trace!("Success!")
   }
-  
-  cal_dtype             = DataType::TimingCalibration;
-  calibration.tcal_data = wait_while_run_active(10, five_seconds, 1000,&cal_dtype, &socket);
+  let cal_dtype = DataType::TimingCalibration;
+  calibration.tcal_data = wait_while_run_active(10, FIVE_SECONDS, 1000,&cal_dtype, socket);
   println!("==> Timing calibration data taken!");
-  println!("==> Calibration data taking complete!"); 
-  println!("Calibration : {}", calibration);
-  println!("Cleaning data...");
-  calibration.clean_input_data();
-  println!("Calibration : {}", calibration);
-
-  info!("Will set board to sma mode!");
-  select_sma_mode();
-  run_config.is_active = false;  
-  match rc_to_runner.send(run_config) {
-    Err(err) => warn!("Can not send runconfig!, Err {err}"),
-    Ok(_)    => trace!("Success!")
-  }
-  thread::sleep(five_seconds);
-  calibration.calibrate()?;
-  println!("Calibration : {}", calibration);
-  // now it just needs to be send to 
-  // the publisher
-  //for k in 0..10 {
-  //  println!("cali vcal  {}", calibration.v_offsets[0][k]);
-  //  println!("cali vincs {}", calibration.v_inc[0][k]);
-  //  println!("cali vdips {}", calibration.v_dips[0][k]);
-  //  println!("cali tbins {}", calibration.tbin[0][k]);
-  //}
-  let calib_pack = TofPacket::from(&calibration);
-  match tp_to_publisher.send(calib_pack) {
-    Err(err) => {
-      error!("Unable to send RBCalibration package! Error {err}");
-    },
-    Ok(_) => ()
-  }
-  info!("Calibration done!");
   Ok(())
 }
-
-
 
 const DMA_RESET_TRIES : u8 = 10;   // if we can not reset the DMA after this number
                                    // of retries, we'll panic!

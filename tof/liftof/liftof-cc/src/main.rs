@@ -60,6 +60,10 @@ use liftof_cc::flight_comms::global_data_sink;
 
 use liftof_cc::constants::*;
 
+use liftof_lib::constants::{DEFAULT_CALIB_VOLTAGE,
+                            DEFAULT_RB_ID,
+                            DEFAULT_CALIB_EXTRA};
+
 /*************************************/
 
 #[derive(Parser, Debug)]
@@ -90,42 +94,15 @@ struct LiftofCCArgs {
 
 #[derive(Debug, Parser, PartialEq)]
 enum Command {
+  /// Power control of TOF sub-systems.
+  #[command(subcommand)]
+  Power(liftof_lib::PowerCmd),
   /// Remotely trigger the readoutboards to run the calibration routines (tcal, vcal).
   #[command(subcommand)]
-  Calibration(CalibrationCmd)
-}
-
-#[derive(Debug, Subcommand, PartialEq)]
-enum CalibrationCmd {
-  /// Default calibration run, meaning 2 voltage calibrations and one timing calibration on all RBs with the default values.
-  Default,
-  /// Voltage calibration run. All RB are targeted and voltage are default ones if nothing else is specified.
-  Voltage(VoltageOpts),
-  /// Voltage calibration run. All RB are targeted if nothing else is specified.
-  Timing(TimingOpts)
-}
-
-#[derive(Debug, Args, PartialEq)]
-struct VoltageOpts {
-  /// Voltage level to be set in voltage calibration run.
-  #[arg(short, long)]
-  voltage_level: Option<u16>,
-  /// RB to target in voltage calibration run.
-  #[arg(short, long)]
-  rb_id: Option<u8>,
-  /// Extra arguments in voltage calibration run (not implemented).
-  #[arg(short, long)]
-  extra: Option<u8>,
-}
-
-#[derive(Debug, Args, PartialEq)]
-struct TimingOpts {
-  /// RB to target in timing calibration run.
-  #[arg(short, long)]
-  rb_id: Option<u8>,
-  /// Extra arguments in timing calibration run (not implemented).
-  #[arg(short, long)]
-  extra: Option<u8>,
+  Calibration(liftof_lib::CalibrationCmd),
+  /// Start/stop data taking run.
+  #[command(subcommand)]
+  Run(liftof_lib::RunCmd)
 }
 
 /*************************************/
@@ -460,25 +437,51 @@ fn main() {
   .expect("Error setting Ctrl-C handler");
 
   match args.command {
-    // Matching calibration command
+    Command::Power(power_cmd) => {
+      ()
+    },
     Command::Calibration(calibration_cmd) => {
       match calibration_cmd {
-        CalibrationCmd::Default => {
-          liftof_cc::send_all_calibration(cmd_sender);
+        liftof_lib::CalibrationCmd::Default(default_opts) => {
+          let voltage_level = default_opts.voltage_level;
+          let rb_id = default_opts.rb_id;
+          let extra = default_opts.extra;
+          liftof_cc::send_default_calibration(cmd_sender, voltage_level, rb_id, extra);
         },
-        CalibrationCmd::Voltage(voltage_opts) => {
-          let voltage_level = voltage_opts.voltage_level.unwrap_or(DEFAULT_CALIB_VOLTAGE);
-          let rb_id = voltage_opts.rb_id.unwrap_or(DEFAULT_CALIB_RB);
-          let extra = voltage_opts.extra.unwrap_or(DEFAULT_CALIB_EXTRA);
+        liftof_lib::CalibrationCmd::Noi(noi_opts) => {
+          let rb_id = noi_opts.rb_id;
+          let extra = noi_opts.extra;
+          liftof_cc::send_noi_calibration(cmd_sender, rb_id, extra);
+        },
+        liftof_lib::CalibrationCmd::Voltage(voltage_opts) => {
+          let voltage_level = voltage_opts.voltage_level;
+          let rb_id = voltage_opts.rb_id;
+          let extra = voltage_opts.extra;
           liftof_cc::send_voltage_calibration(cmd_sender, voltage_level, rb_id, extra);
         },
-        CalibrationCmd::Timing(timing_opts) => {
-          let rb_id = timing_opts.rb_id.unwrap_or(DEFAULT_CALIB_RB);
-          let extra = timing_opts.extra.unwrap_or(DEFAULT_CALIB_EXTRA);
-          liftof_cc::send_timing_calibration(cmd_sender, rb_id, extra);
+        liftof_lib::CalibrationCmd::Timing(timing_opts) => {
+          let voltage_level = timing_opts.voltage_level;
+          let rb_id = timing_opts.rb_id;
+          let extra = timing_opts.extra;
+          liftof_cc::send_timing_calibration(cmd_sender, voltage_level, rb_id, extra);
         }
       }
     }
+    Command::Run(run_cmd) => {
+      match run_cmd {
+        liftof_lib::RunCmd::Start(run_start_opts) => {
+          let run_type = run_start_opts.run_type;
+          let rb_id = run_start_opts.rb_id;
+          let event_no = run_start_opts.event_no;
+          let time = run_start_opts.time;
+          liftof_cc::send_run_start(cmd_sender, run_type, rb_id, event_no, time);
+        },
+        liftof_lib::RunCmd::Stop(run_stop_opts) => {
+          let rb_id = run_stop_opts.rb_id;
+          liftof_cc::send_run_stop(cmd_sender, rb_id);
+        }
+      }
+    },
   }
   // start a new data run 
   // let start_run = TofCommand::DataRunStart(1000);

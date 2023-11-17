@@ -6,13 +6,13 @@
 
 use std::fmt;
 use std::net::Ipv4Addr;
-#[cfg(feature = "database")]
-use std::path::Path;
-#[cfg(feature = "database")]
-use std::str::FromStr;
-
-#[cfg(feature = "database")]
-extern crate sqlite;
+cfg_if::cfg_if! {
+  if #[cfg(feature = "database")]  {
+    use std::path::Path;
+    use std::str::FromStr;
+    extern crate sqlite;
+  }
+}
 
 #[derive(Copy, Clone, Debug)]
 pub struct LocalTriggerBoard {

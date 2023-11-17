@@ -24,7 +24,7 @@ use local_ip_address::local_ip;
 
 //use std::collections::HashMap;
 use std::process::exit;
-use liftof_lib::color_log;
+use liftof_lib::{color_log, CalibrationCmd};
 
 use liftof_rb::threads::{runner,
                          cmd_responder,
@@ -46,6 +46,10 @@ extern crate clap;
 use clap::{arg,
            command,
            Parser};
+
+use liftof_lib::constants::{DEFAULT_CALIB_VOLTAGE,
+                            DEFAULT_CALIB_RB,
+                            DEFAULT_CALIB_EXTRA};
 
 #[derive(Parser, Debug)]
 #[command(author = "J.A.Stoessl", version, about, long_about = None)]
@@ -76,10 +80,6 @@ struct Args {
   /// Write the readoutboard binary data ('.robin') to the board itself
   #[arg(long, default_value_t = false)]
   to_local_file : bool,
-  /// Take data for calibration. This comprises tcal, vcal and 
-  /// no input data
-  #[arg(long, default_value_t = false)]
-  calibration : bool,
   /// Select the monitoring interval for L1 monitoring data
   /// L1 is the fast monitoring - only critical values
   #[arg(long, default_value_t = 10)]
@@ -95,7 +95,19 @@ struct Args {
   /// check the event ids for duplicates or missing ids
   #[arg(long, default_value_t = false)]
   test_eventids: bool,
+  /// List of possible commands
+  #[command(subcommand)]
+  command: Command,
 }
+
+#[derive(Debug, Parser, PartialEq)]
+enum Command {
+  /// Remotely trigger the readoutboards to run the calibration routines (tcal, vcal).
+  #[command(subcommand)]
+  Calibration(liftof_lib::CalibrationCmd)
+}
+
+/**********************************************************/
 
 fn main() {
   env_logger::builder()
@@ -115,7 +127,6 @@ fn main() {
   let show_progress            = args.show_progress;
   let cache_size               = args.cache_size;
   let wf_analysis              = args.waveform_analysis;
-  let calibration              = args.calibration;
   let mut to_local_file        = args.to_local_file;
   let run_config               = args.run_config;
   let test_eventids            = args.test_eventids;
@@ -169,6 +180,12 @@ fn main() {
   let mut rc_config     = RunConfig::new();
   let mut rc_file_path  = std::path::PathBuf::new();
   let mut end_after_run = false;
+  let mut calibration = false;
+  match args.command {
+    // Matching calibration command
+    Command::Calibration(_) => calibration = true,
+    _ => ()
+  }
 
   if calibration {
     println!("===================================================================");
@@ -182,7 +199,7 @@ fn main() {
   match run_config {
     None     => {
       if !calibration {
-        println!("=> We did not get a runconfig with the -r <RUNCONFIG> commandline switch! Currently we are just listening for input on the socket. This is the desired behavior, if run by systemd. If you want to take data in standalone mode, either send a runconfig to the socket or hit CTRL+C and start the program again, this time suppling the -r <RUNCONFIG> flag or in case you want to calibrate the board, use the --calibration flag.");
+        println!("=> We did not get a runconfig with the -r <RUNCONFIG> commandline switch! Currently we are just listening for input on the socket. This is the desired behavior, if run by systemd. If you want to take data in standalone mode, either send a runconfig to the socket or hit CTRL+C and start the program again, this time suppling the -r <RUNCONFIG> flag or in case you want to calibrate the board, use the calibration command.");
       }
       config_from_shell = false;
     }
@@ -267,6 +284,8 @@ fn main() {
   });
   let tp_to_pub_ev   = tp_to_pub.clone();
   #[cfg(feature="tofcontrol")]
+  let rc_to_runner_cal  = rc_to_runner.clone();
+  #[cfg(feature="tofcontrol")]
   let tp_to_pub_cal  = tp_to_pub.clone();
 
   // then the runner. It does nothing, until we send a set
@@ -324,14 +343,46 @@ fn main() {
       // we execute this routine first, then we 
       // can go into our loop listening for input
       #[cfg(feature="tofcontrol")]
-      match rb_calibration(&rc_to_runner, &tp_to_pub_cal) {
-        Ok(_) => (),
-        Err(err) => {
-          error!("Calibration failed! Error {err}!");
-        }
+      match args.command {
+        // Matching calibration command
+        Command::Calibration(CalibrationCmd::Default(default_opts)) => {
+          match rb_calibration(&rc_to_runner_cal, &tp_to_pub_cal) {
+            Ok(_) => (),
+            Err(err) => {
+              error!("Calibration failed! Error {err}!");
+            }
+          }
+        },
+        Command::Calibration(CalibrationCmd::Noi(noi_opts)) => {
+          match rb_noi_subcalibration(&rc_to_runner_cal, &tp_to_pub_cal) {
+            Ok(_) => (),
+            Err(err) => {
+              error!("Noi data taking failed! Error {err}!");
+            }
+          }
+        },
+        Command::Calibration(CalibrationCmd::Voltage(voltage_opts)) => {
+          let voltage_level = voltage_opts.voltage_level.unwrap_or(DEFAULT_CALIB_VOLTAGE);
+          match rb_noi_voltage_subcalibration(&rc_to_runner_cal, &tp_to_pub_cal, voltage_level) {
+            Ok(_) => (),
+            Err(err) => {
+              error!("Voltage calibration data taking failed! Error {err}!");
+            }
+          }
+        },
+        Command::Calibration(CalibrationCmd::Timing(timing_opts)) => {
+          let voltage_level = timing_opts.voltage_level.unwrap_or(DEFAULT_CALIB_VOLTAGE);
+          match rb_timing_subcalibration(&rc_to_runner_cal, &tp_to_pub_cal, voltage_level) {
+            Ok(_) => (),
+            Err(err) => {
+              error!("Timing calibration data taking failed! Error {err}!");
+            }
+          }
+        },
+        _ => ()
       }
       end = true; // in case of we have done the calibration
-                  // from shell. We finish after it is done.
+                      // from shell. We finish after it is done.
     } else {
       // only do monitoring when we don't do a 
       // calibration
