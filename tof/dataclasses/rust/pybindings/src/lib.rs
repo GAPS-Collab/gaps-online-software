@@ -11,6 +11,13 @@ use tof_dataclasses::analysis::{find_peaks,
                                 integrate,
                                 time2bin};
 
+use tof_dataclasses::calibrations::{
+    find_zero_crossings,
+    get_periods,
+    Edge,
+};
+    
+
 ///helper
 fn convert_pyarray1(arr : &PyArray1<f32>) -> Vec<f32> {
   let mut vec = Vec::<f32>::new();
@@ -19,6 +26,35 @@ fn convert_pyarray1(arr : &PyArray1<f32>) -> Vec<f32> {
   }
   return vec;
 }
+
+#[pyfunction]
+#[pyo3(name="get_periods")]
+/// Get the periods of a (sine) wave
+pub fn wrap_get_periods(trace   : &PyArray1<f32>,
+                        dts     : &PyArray1<f32>,
+                        nperiod : f32,
+                        nskip   : f32)
+    -> PyResult<(Vec<usize>, Vec<f32>)> {
+  // we fix the edge here
+  let edge = Edge::Rising;
+  let wr_trace = convert_pyarray1(trace);
+  let wr_dts   = convert_pyarray1(dts);
+  let result   = get_periods(&wr_trace, &wr_dts, nperiod, nskip, &edge);
+  Ok(result)
+}
+
+
+#[pyfunction]
+#[pyo3(name="find_zero_crossings")]
+/// Get a vector with the indizes where 
+/// the input array crosses zero
+pub fn wrap_find_zero_crossings(trace : &PyArray1<f32>) 
+  -> PyResult<Vec<usize>> {
+  let tr  = convert_pyarray1(trace);
+  let zcs = find_zero_crossings(&tr);
+  Ok(zcs)
+}
+
 
 
 #[pyfunction]
@@ -36,7 +72,7 @@ pub fn wrap_cfd_simple(voltages    : &PyArray1<f32>,
                        cfd_frac    : f32,
                        start_peak  : usize,
                        end_peak    : usize) -> PyResult<f32> {
-  let voltages_vec = convert_pyarray1(voltages);
+  let voltages_vec    = convert_pyarray1(voltages);
   let nanoseconds_vec = convert_pyarray1(nanoseconds);
   match cfd_simple(&voltages_vec   ,
                    &nanoseconds_vec,
@@ -206,5 +242,7 @@ fn rust_dataclasses(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(wrap_integrate,m)?)?;
     m.add_function(wrap_pyfunction!(wrap_interpolate_time,m)?)?;
     m.add_function(wrap_pyfunction!(wrap_cfd_simple,m)?)?;
+    m.add_function(wrap_pyfunction!(wrap_find_zero_crossings,m)?)?;
+    m.add_function(wrap_pyfunction!(wrap_get_periods,m)?)?;
     Ok(())
 }
