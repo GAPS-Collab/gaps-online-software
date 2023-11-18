@@ -108,11 +108,21 @@ where P: AsRef<Path>, {
 
 /***********************************/
 
-fn find_zero_crossings(trace: &Vec<f32>) -> Vec<usize> {
+/// Designed to match np.where(np.diff(np.signbit(trace)))[0] 
+pub fn find_zero_crossings(trace: &Vec<f32>) -> Vec<usize> {
   let mut zero_crossings = Vec::new();
   for i in 1..trace.len() {
+    // acccount for the fact that sometimes the second/first point can be 0
     if (trace[i - 1] > 0.0 && trace[i] < 0.0) || (trace[i - 1] < 0.0 && trace[i] > 0.0) {
-      zero_crossings.push(i);
+      zero_crossings.push(i - 1);
+    }
+    if i < trace.len() - 1 {
+      if (trace[i - 1] > 0.0 && trace[i] == 0.0 && trace[i+1] < 0.0) {
+        zero_crossings.push(1);
+      }
+      if (trace[i - 1] < 0.0 && trace[i] == 0.0 && trace[i+1] > 0.0) {
+        zero_crossings.push(i);
+      }
     }
   }
   zero_crossings
@@ -126,10 +136,11 @@ fn find_zero_crossings(trace: &Vec<f32>) -> Vec<usize> {
 /// # Arguments:
 ///
 /// * dts : some version of tcal data? FIXME
-fn get_periods(trace   : &Vec<f32>,
-               dts     : &Vec<f32>,
-               nperiod : f32,
-               edge    : &Edge) -> (Vec<usize>, Vec<f32>) {
+pub fn get_periods(trace   : &Vec<f32>,
+                   dts     : &Vec<f32>,
+                   nperiod : f32,
+                   nskip   : f32,
+                   edge    : &Edge) -> (Vec<usize>, Vec<f32>) {
   let mut trace_c = trace.clone();
   let mut periods = Vec::<f32>::new();
   if trace_c.len() == 0 {
@@ -137,7 +148,6 @@ fn get_periods(trace   : &Vec<f32>,
     return (foo, periods);
   }
   let firstbin : usize = 20;
-  let nskip : f32 = 0.0;
   let lastbin = firstbin + (nperiod * (900.0/nperiod).floor()).floor() as usize;
   //info!("firstbin {} lastbin {}", firstbin, lastbin);
   let mut vec_for_median = Vec::<f32>::new();
@@ -199,8 +209,13 @@ fn get_periods(trace   : &Vec<f32>,
     for n in zcs_a+1..*zcs_b {
       period += dts[n];
     }
+    println!("tra - {:?}", tr_a);
+    println!("trb = {:?}", tr_b);
+    println!("per - {}", period);
     period += dts[*zcs_a]*f32::abs(tr_a[1]/(tr_a[1] - tr_a[0])); // first semi bin
-    period += dts[*zcs_b]*f32::abs(tr_b[1]/(tr_b[1] - tr_b[0])); // first semi bin
+    println!("per - {}", period);
+    period += dts[*zcs_b]*f32::abs(tr_b[0]/(tr_b[1] - tr_b[0])); // first semi bin
+    println!("per - {}", period);
     if period.is_nan() {
       warn!("NAN in period found!");
       //println!("tr_a {} {}", tr_a[1], tr_a[0]);
@@ -629,59 +644,64 @@ impl RBCalibrations {
     let nperiod = Self::NOMINALFREQ/Self::CALFREQ; 
     //let mut n_correct = vec![0.0;NWORDS];
 
-    for n in 0..self.tcal_data.len() { // this is the nIterPeriod or nevents loop
-                                       // we choose nevents
-      let stop_cell = self.tcal_data[n].header.stop_cell;
-      for ch in 0..NCHN {
-        roll(&mut tcal_av_cp[ch], -1* (stop_cell as isize));
-        // tcal data per definition has all channels active...
-        // FIXME - we should not just assume this for each event.
-        let tcal_trace = &self.tcal_data[n].get_channel_by_id(ch).expect("Unable to get ch");
-        let mut tcal_trace_f32 = Vec::<f32>::with_capacity(tcal_trace.len());
-        for j in tcal_trace.iter() {
-          tcal_trace_f32.push(*j as f32);
-        }
-        let tracelen = tcal_trace_f32.len();
-        let (zcs, periods) = get_periods(&tcal_trace_f32,
-                                         &tcal_av_cp[ch],
-                                         nperiod,
-                                         &edge);
-        for (n_p,period) in periods.iter().enumerate() {
-          if *period == 0.0 {
-            println!("{:?}", periods);
+    let global = true;
+    if global {
+      for n in 0..self.tcal_data.len() { // this is the nIterPeriod or nevents loop
+                                         // we choose nevents
+        let stop_cell = self.tcal_data[n].header.stop_cell;
+        for ch in 0..NCHN {
+          roll(&mut tcal_av_cp[ch], -1* (stop_cell as isize));
+          // tcal data per definition has all channels active...
+          // FIXME - we should not just assume this for each event.
+          let tcal_trace = &self.tcal_data[n].get_channel_by_id(ch).expect("Unable to get ch");
+          let mut tcal_trace_f32 = Vec::<f32>::with_capacity(tcal_trace.len());
+          for j in tcal_trace.iter() {
+            tcal_trace_f32.push(*j as f32);
           }
-          if period.is_nan() {
-            println!("{:?}", periods);
-          }
-          let zcs_a = zcs[n_p] + stop_cell as usize;
-          let zcs_b = zcs[n_p + 1] + stop_cell as usize;
-          let mut corr = (1.0/Self::CALFREQ)/period;
-          if matches!(edge, Edge::None) {
-            corr *= 0.5;
-          }
-          if f32::abs(corr - 1.0) > corr_limit {
-            continue;
-          }
-          corr = (corr-1.0)*damping + 1.0;
-          let zcs_a_tl = zcs_a%tracelen;
-          let zcs_b_tl = zcs_b%tracelen;
-          if zcs_a < tracelen && zcs_b > tracelen {
-            for m in zcs_a..tcal_av[ch].len() {
-              tcal_av[ch][m] *= corr;
+          let tracelen = tcal_trace_f32.len();
+          let (zcs, periods) = get_periods(&tcal_trace_f32,
+                                           &tcal_av_cp[ch],
+                                           nperiod,
+                                           Self::NSKIP as f32,
+                                           &edge);
+          for (n_p,period) in periods.iter().enumerate() {
+            if *period == 0.0 {
+              println!("{:?}", periods);
             }
-            for m in 0..zcs_b_tl {
-              tcal_av[ch][m] *= corr;
+            if period.is_nan() {
+              println!("{:?}", periods);
             }
-          } else {
-            for m in zcs_a_tl..zcs_b_tl {
-              tcal_av[ch][m] *= corr;
+            let zcs_a = zcs[n_p]     + stop_cell as usize;
+            let zcs_b = zcs[n_p + 1] + stop_cell as usize;
+            let mut corr = (1.0/Self::CALFREQ)/period;
+            if matches!(edge, Edge::None) {
+              corr *= 0.5;
+            }
+            if f32::abs(corr - 1.0) > corr_limit {
+              continue;
+            }
+            corr = (corr-1.0)*damping + 1.0;
+            let zcs_a_tl = zcs_a%tracelen;
+            let zcs_b_tl = zcs_b%tracelen;
+            if zcs_a < tracelen && zcs_b > tracelen {
+              for m in zcs_a..tcal_av[ch].len() {
+                tcal_av[ch][m] *= corr;
+              }
+              for m in 0..zcs_b_tl {
+                tcal_av[ch][m] *= corr;
+              }
+            } else {
+              for m in zcs_a_tl..zcs_b_tl {
+                tcal_av[ch][m] *= corr;
+              }
             }
           }
-        }
-        //n_correct[ch] += 1.0;
-      } // end over nchannel
-      damping *= 0.99;
-    } // end loop over n_iter_period
+          //n_correct[ch] += 1.0;
+        } // end over nchannel
+        damping *= 0.99;
+      } // end loop over n_iter_period
+   
+    } // end global
     for ch in 0..NCHN {
       for k in 0..NWORDS {
         self.tbin[ch][k] = tcal_av[ch][k];
