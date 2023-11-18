@@ -881,6 +881,8 @@ PYBIND11_MODULE(gaps_tof, m) {
        .def_readonly("tcal_data",  &RBCalibration::tcal_data)
        .def_static("disable_eventdata",   &RBCalibration::disable_eventdata,
             "Don't load event data from a calibration file (if available). Just load the calibration constants. (This only works with binary files.")
+       .def("from_txtfile" ,       &RBCalibration::from_txtfile,
+            "Initialize the RBCalibration from a file with exactly one TofPacket")
        .def("from_califile" ,      &get_from_califile,
             "Initialize the RBCalibration from a file with exactly one TofPacket of type RBCalibration")
        .def("from_tofpacket",      unpack_tp_to_rbcalibration,
@@ -910,8 +912,7 @@ PYBIND11_MODULE(gaps_tof, m) {
        .def("from_bytestream",  &RBCalibration::from_bytestream, 
             "Deserialize a RBCalibration object from a Vec<u8>")
        .def("__repr__",        [](const RBCalibration &cali) {
-                                  return "<RBCalibration : board id "
-                                  + std::to_string(cali.rb_id) + ">";
+                                  return cali.to_string();
                                   }) 
    ;
 
