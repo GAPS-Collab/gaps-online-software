@@ -106,31 +106,31 @@ pub fn event_processing(bs_recv           : &Receiver<Vec<u8>>,
                 }
               }
 
-              match RBEvent::extract_from_rbeventmemoryview(&bytestream, &mut pos_in_stream) {
-                Err(err)   => {
-                  error!("Unable to extract RBEvent from memory! Error {err}");
-                  events_not_sent += 1;
-                },
-                Ok (mut event) => {
-                  if event.header.event_id != last_event_id + 1 {
-                    if last_event_id != 0 {
-                      skipped_events += event.header.event_id as usize - last_event_id as usize - 1;
-                    }
-                    if event.header.lost_trigger { 
-                      warn!("Lost trigger!");
-                    } else {
-                      warn!("Event id not rising continuously! This {}, last {}", event.header.event_id, last_event_id);
-                      //println!("{}", event);
-                    }
-                  }
-                  last_event_id = event.header.event_id;
-                  if verbose {
-                    println!("{}", event);
-                  }
-                  event.data_type = data_type;
-                  tp = TofPacket::from(&event);
-                }
-              }
+              // match RBEvent::extract_from_rbeventmemoryview(&bytestream, &mut pos_in_stream) {
+              //   Err(err)   => {
+              //     error!("Unable to extract RBEvent from memory! Error {err}");
+              //     events_not_sent += 1;
+              //   },
+              //   Ok (mut event) => {
+              //     if event.header.event_id != last_event_id + 1 {
+              //       if last_event_id != 0 {
+              //         skipped_events += event.header.event_id as usize - last_event_id as usize - 1;
+              //       }
+              //       if event.header.lost_trigger { 
+              //         warn!("Lost trigger!");
+              //       } else {
+              //         warn!("Event id not rising continuously! This {}, last {}", event.header.event_id, last_event_id);
+              //         //println!("{}", event);
+              //       }
+              //     }
+              //     last_event_id = event.header.event_id;
+              //     if verbose {
+              //       println!("{}", event);
+              //     }
+              //     event.data_type = data_type;
+              //     tp = TofPacket::from(&event);
+              //   }
+              // }
               // set flags
               match data_type {
                 DataType::VoltageCalibration |

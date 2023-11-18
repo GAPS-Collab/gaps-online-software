@@ -46,6 +46,25 @@ impl Error for CalibrationError {
 ////////////////////////////////////////
 
 #[derive(Debug, Copy, Clone, serde::Deserialize, serde::Serialize)]
+pub enum RunError {
+  EmptyInputData,
+  CanNotConnectToMyOwnZMQSocket  
+}
+
+impl fmt::Display for RunError {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let disp = serde_json::to_string(self).unwrap_or(
+      String::from("Error: cannot unwrap this RunError"));
+    write!(f, "<RunError : {}>", disp)
+  }
+}
+
+impl Error for RunError {
+}
+
+////////////////////////////////////////
+
+#[derive(Debug, Copy, Clone, serde::Deserialize, serde::Serialize)]
 pub enum EventError {
     EventIdMismatch
 }

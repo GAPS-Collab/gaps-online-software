@@ -1,11 +1,7 @@
 use crossbeam_channel::Sender;
 use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::commands::TofCommand;
-use tof_dataclasses::constants::{MASK_CMD_8BIT,
-                                 MASK_CMD_16BIT,
-                                 MASK_CMD_24BIT,
-                                 MASK_CMD_32BIT,
-                                 PAD_CMD_32BIT};
+use tof_dataclasses::constants::{PAD_CMD_32BIT};
 
 pub mod constants;
 pub mod api;

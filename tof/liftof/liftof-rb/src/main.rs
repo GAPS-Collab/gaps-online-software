@@ -47,9 +47,7 @@ use clap::{arg,
            command,
            Parser};
 
-use liftof_lib::constants::{DEFAULT_CALIB_VOLTAGE,
-                            DEFAULT_CALIB_RB,
-                            DEFAULT_CALIB_EXTRA};
+use liftof_lib::Command;
 
 #[derive(Parser, Debug)]
 #[command(author = "J.A.Stoessl", version, about, long_about = None)]
@@ -98,13 +96,6 @@ struct Args {
   /// List of possible commands
   #[command(subcommand)]
   command: Command,
-}
-
-#[derive(Debug, Parser, PartialEq)]
-enum Command {
-  /// Remotely trigger the readoutboards to run the calibration routines (tcal, vcal).
-  #[command(subcommand)]
-  Calibration(liftof_lib::CalibrationCmd)
 }
 
 /**********************************************************/
@@ -344,41 +335,73 @@ fn main() {
       // can go into our loop listening for input
       #[cfg(feature="tofcontrol")]
       match args.command {
-        // Matching calibration command
-        Command::Calibration(CalibrationCmd::Default(default_opts)) => {
-          match rb_calibration(&rc_to_runner_cal, &tp_to_pub_cal) {
-            Ok(_) => (),
-            Err(err) => {
-              error!("Calibration failed! Error {err}!");
+        // BEGIN Matching calibration command
+        Command::Calibration(calib_cmd) => {
+          match calib_cmd {
+            CalibrationCmd::Default(default_opts) => {
+              match rb_calibration(&rc_to_runner_cal, &tp_to_pub_cal) {
+                Ok(_) => (),
+                Err(err) => {
+                  error!("Calibration failed! Error {err}!");
+                }
+              }
+            },
+            CalibrationCmd::Noi(noi_opts) => {
+              match rb_noi_subcalibration(&rc_to_runner_cal, &tp_to_pub_cal) {
+                Ok(_) => (),
+                Err(err) => {
+                  error!("Noi data taking failed! Error {err}!");
+                }
+              }
+            },
+            CalibrationCmd::Voltage(voltage_opts) => {
+              let voltage_level = voltage_opts.voltage_level;
+              match rb_noi_voltage_subcalibration(&rc_to_runner_cal, &tp_to_pub_cal, voltage_level) {
+                Ok(_) => (),
+                Err(err) => {
+                  error!("Voltage calibration data taking failed! Error {err}!");
+                }
+              }
+            },
+            CalibrationCmd::Timing(timing_opts) => {
+              let voltage_level = timing_opts.voltage_level;
+              match rb_timing_subcalibration(&rc_to_runner_cal, &tp_to_pub_cal, voltage_level) {
+                Ok(_) => (),
+                Err(err) => {
+                  error!("Timing calibration data taking failed! Error {err}!");
+                }
+              }
             }
           }
         },
-        Command::Calibration(CalibrationCmd::Noi(noi_opts)) => {
-          match rb_noi_subcalibration(&rc_to_runner_cal, &tp_to_pub_cal) {
-            Ok(_) => (),
-            Err(err) => {
-              error!("Noi data taking failed! Error {err}!");
+        // END Matching calibration command
+        // BEGIN Matching run command
+        Command::Run(run_cmd) => {
+          match run_cmd {
+            liftof_lib::RunCmd::Start(run_start_opts) => {
+              let run_type = run_start_opts.run_type;
+              let rb_id = run_start_opts.rb_id;
+              let event_no = run_start_opts.event_no;
+              let time = run_start_opts.time;
+              match rb_start_run(&rc_to_runner_cal, rc_config, run_type, rb_id, event_no, time) {
+                Ok(_) => (),
+                Err(err) => {
+                  error!("Timing calibration data taking failed! Error {err}!");
+                }
+              }
+            },
+            liftof_lib::RunCmd::Stop(run_stop_opts) => {
+              let rb_id = run_stop_opts.rb_id;
+              match rb_stop_run(&rc_to_runner_cal, rb_id) {
+                Ok(_) => (),
+                Err(err) => {
+                  error!("Timing calibration data taking failed! Error {err}!");
+                }
+              }
             }
           }
         },
-        Command::Calibration(CalibrationCmd::Voltage(voltage_opts)) => {
-          let voltage_level = voltage_opts.voltage_level.unwrap_or(DEFAULT_CALIB_VOLTAGE);
-          match rb_noi_voltage_subcalibration(&rc_to_runner_cal, &tp_to_pub_cal, voltage_level) {
-            Ok(_) => (),
-            Err(err) => {
-              error!("Voltage calibration data taking failed! Error {err}!");
-            }
-          }
-        },
-        Command::Calibration(CalibrationCmd::Timing(timing_opts)) => {
-          let voltage_level = timing_opts.voltage_level.unwrap_or(DEFAULT_CALIB_VOLTAGE);
-          match rb_timing_subcalibration(&rc_to_runner_cal, &tp_to_pub_cal, voltage_level) {
-            Ok(_) => (),
-            Err(err) => {
-              error!("Timing calibration data taking failed! Error {err}!");
-            }
-          }
-        },
+        // END Matching run commmand
         _ => ()
       }
       end = true; // in case of we have done the calibration

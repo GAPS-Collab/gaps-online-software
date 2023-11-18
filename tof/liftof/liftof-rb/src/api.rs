@@ -9,7 +9,8 @@ use tof_dataclasses::serialization::Serialization;
 cfg_if::cfg_if! {
   if #[cfg(feature = "tofcontrol")]  {
   use tof_dataclasses::calibrations::RBCalibrations;
-  use tof_dataclasses::errors::CalibrationError;
+  use tof_dataclasses::errors::{CalibrationError,
+                                RunError};
   }
 }
 use std::path::Path;
@@ -158,7 +159,7 @@ pub fn wait_while_run_active(n_errors     : u32,
   }
 }
 
-
+// START Calibration stuff ====================================================
 // eventually, we have to rename that feature
 /// A full set of RB calibration
 ///
@@ -550,6 +551,41 @@ fn run_timing_calibration(rc_to_runner: &Sender<RunConfig>,
   println!("==> Timing calibration data taken!");
   Ok(())
 }
+// END Calibration stuff ======================================================
+
+// BEGIN Run stuff ============================================================
+#[cfg(feature="tofcontrol")]
+pub fn rb_start_run(rc_to_runner    : &Sender<RunConfig>,
+                    rc_config       : RunConfig,
+                    run_type        : u8,
+                    rb_id           : u8,
+                    event_no        : u8,
+                    time            : u8) -> Result<(), RunError> {
+  println!("==> Will initialize new run!");
+  match rc_to_runner.send(rc_config) {
+    Err(err) => error!("Error initializing run! {err}"),
+    Ok(_)    => ()
+  };
+  println!("==> Run successfully started!");
+  Ok(())
+}
+
+#[cfg(feature="tofcontrol")]
+pub fn rb_stop_run(rc_to_runner    : &Sender<RunConfig>,
+                   rb_id           : u8) -> Result<(), RunError> {
+  println!("==> Will initialize new run!");
+  println!("Received command to end run!");
+  // default is not active for run config
+
+  let  rc = RunConfig::new();
+  match rc_to_runner.send(rc) {
+    Err(err) => error!("Error stopping run! {err}"),
+    Ok(_)    => ()
+  }
+  println!("==> Run successfully stopped!");
+  Ok(())
+}
+// END Run stuff ==============================================================
 
 const DMA_RESET_TRIES : u8 = 10;   // if we can not reset the DMA after this number
                                    // of retries, we'll panic!

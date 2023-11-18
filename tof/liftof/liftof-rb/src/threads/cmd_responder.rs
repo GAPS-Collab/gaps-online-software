@@ -239,38 +239,59 @@ pub fn cmd_responder(cmd_server_ip             : String,
                         //}
                         continue;
                       },
-                      TofCommand::DataRunStart (_max_event) => {
-                        // let's start a run. The value of the TofCommnad shall be 
-                        // nevents
-                        println!("==> Will initialize new run!");
-                        let rc    = get_runconfig(&run_config_file);
-                        match run_config.send(rc) {
-                          Err(err) => error!("Error initializing run! {err}"),
-                          Ok(_)    => ()
-                        };
-                        let resp_good = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed as u32);
-                        match cmd_socket.send(resp_good.to_bytestream(),0) {
-                          Err(err) => warn!("Can not send response! Err {err}"),
-                          Ok(_)    => trace!("Resp sent!")
+                      TofCommand::DataRunStart (value) => {
+                        cfg_if::cfg_if! {
+                          if #[cfg(feature = "tofcontrol")]  {
+                            // let's start a run. The value of the TofCommnad shall be 
+                            // nevents
+                            println!("==> Will initialize new run!");
+                            let rc    = get_runconfig(&run_config_file);
+                            match run_config.send(rc) {
+                              Err(err) => error!("Error initializing run! {err}"),
+                              Ok(_)    => ()
+                            };
+                            let resp_good = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed as u32);
+                            match cmd_socket.send(resp_good.to_bytestream(),0) {
+                              Err(err) => warn!("Can not send response! Err {err}"),
+                              Ok(_)    => trace!("Resp sent!")
+                            }
+                          } else {
+                            warn!("The function is implemented, but one has to compile with --features=tofcontrol");
+                            match cmd_socket.send(resp_not_implemented,0) {
+                              Err(err) => warn!("Can not send response! Err {err}"),
+                              Ok(_)    => trace!("Resp sent!")
+                            }
+                            continue;
+                          }
                         }
                       },
-                      TofCommand::DataRunStop(_)   => {
-                        println!("Received command to end run!");
-                        // default is not active for run config
+                      TofCommand::DataRunStop(value)   => {
+                        cfg_if::cfg_if! {
+                          if #[cfg(feature = "tofcontrol")]  {
+                            // MSB fourth 8 bits are RB ID
+                            let rb_id: u8 = (value | MASK_CMD_8BIT) as u8;
+                            println!("Received command to end run!");
+                            // default is not active for run config
 
-                        let  rc = RunConfig::new();
-                        match run_config.send(rc) {
-                          Err(err) => error!("Error stopping run! {err}"),
-                          Ok(_)    => ()
+                            let  rc = RunConfig::new();
+                            match run_config.send(rc) {
+                              Err(err) => error!("Error stopping run! {err}"),
+                              Ok(_)    => ()
+                            }
+                            let resp_good = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed as u32);
+                            match cmd_socket.send(resp_good.to_bytestream(),0) {
+                              Err(err) => warn!("Can not send response! Err {err}"),
+                              Ok(_)    => trace!("Resp sent!")
+                            }
+                          } else {
+                            warn!("The function is implemented, but one has to compile with --features=tofcontrol");
+                            match cmd_socket.send(resp_not_implemented,0) {
+                              Err(err) => warn!("Can not send response! Err {err}"),
+                              Ok(_)    => trace!("Resp sent!")
+                            }
+                            continue;
+                          }
                         }
-                        // send response later 
-
-                      //  if !self.run_active {
-                      //    return Ok(TofResponse::GeneralFail(RESP_ERR_NORUNACTIVE));
-                      //  }
-                      //  warn!("Will kill current run!");
-                      //  self.kill_chn.send(true);
-                      //  return Ok(TofResponse::Success(RESP_SUCC_FINGERS_CROSSED));
                       },
                       // Voltage and timing calibration is connected now
                       TofCommand::NoiCalibration (value) => {

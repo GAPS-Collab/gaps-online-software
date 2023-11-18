@@ -875,6 +875,18 @@ pub fn to_board_id_string(rb_id: u32) -> String {
 
 /**********************************************************/
 /// Command Enums and stucts
+#[derive(Debug, Parser, PartialEq)]
+pub enum Command {
+  /// Power control of TOF sub-systems.
+  #[command(subcommand)]
+  Power(PowerCmd),
+  /// Remotely trigger the readoutboards to run the calibration routines (tcal, vcal).
+  #[command(subcommand)]
+  Calibration(CalibrationCmd),
+  /// Start/stop data taking run.
+  #[command(subcommand)]
+  Run(RunCmd)
+}
 
 /// Calibration cmds ====================================================
 #[derive(Debug, Subcommand, PartialEq)]

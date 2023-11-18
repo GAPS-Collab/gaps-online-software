@@ -60,9 +60,8 @@ use liftof_cc::flight_comms::global_data_sink;
 
 use liftof_cc::constants::*;
 
-use liftof_lib::constants::{DEFAULT_CALIB_VOLTAGE,
-                            DEFAULT_RB_ID,
-                            DEFAULT_CALIB_EXTRA};
+use liftof_lib::Command;
+
 
 /*************************************/
 
@@ -90,19 +89,6 @@ struct LiftofCCArgs {
   /// List of possible commands
   #[command(subcommand)]
   command: Command,
-}
-
-#[derive(Debug, Parser, PartialEq)]
-enum Command {
-  /// Power control of TOF sub-systems.
-  #[command(subcommand)]
-  Power(liftof_lib::PowerCmd),
-  /// Remotely trigger the readoutboards to run the calibration routines (tcal, vcal).
-  #[command(subcommand)]
-  Calibration(liftof_lib::CalibrationCmd),
-  /// Start/stop data taking run.
-  #[command(subcommand)]
-  Run(liftof_lib::RunCmd)
 }
 
 /*************************************/
@@ -481,7 +467,7 @@ fn main() {
           liftof_cc::send_run_stop(cmd_sender, rb_id);
         }
       }
-    },
+    }
   }
   // start a new data run 
   // let start_run = TofCommand::DataRunStart(1000);
