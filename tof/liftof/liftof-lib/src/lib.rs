@@ -883,10 +883,61 @@ pub enum Command {
   /// Remotely trigger the readoutboards to run the calibration routines (tcal, vcal).
   #[command(subcommand)]
   Calibration(CalibrationCmd),
+  /// Remotely set LTB thresholds or preamp bias.
+  #[command(subcommand)]
+  Set(SetCmd),
   /// Start/stop data taking run.
   #[command(subcommand)]
   Run(RunCmd)
 }
+
+/// Set cmds ====================================================
+#[derive(Debug, Subcommand, PartialEq)]
+pub enum SetCmd {
+  /// Set threshold level on all LTBs or a single LTB
+  LtbThreshold(LtbThresholdOpts),
+  /// Set bias level on all preamps or a single preamp
+  PreampBias(PreampBiasOpts)
+}
+
+#[derive(Debug, Args, PartialEq)]
+pub struct LtbThresholdOpts {
+  /// RB to target in voltage calibration run.
+  #[arg(short, long, default_value_t = DEFAULT_LTB_ID)]
+  pub ltb_id: u8,
+  /// Theshold level to be set
+  #[arg(short, long, required = true)]
+  pub threshold_level: u16
+}
+
+impl LtbThresholdOpts {
+  pub fn new(ltb_id: u8, threshold_level: u16) -> Self {
+    Self { 
+      ltb_id,
+      threshold_level
+    }
+  }
+}
+
+#[derive(Debug, Args, PartialEq)]
+pub struct PreampBiasOpts {
+  /// RB to target in voltage calibration run.
+  #[arg(long, default_value_t = DEFAULT_RB_ID)]
+  pub preamp_id: u8,
+  /// Theshold level to be set
+  #[arg(long, required = true)]
+  pub preamp_bias: u16
+}
+
+impl PreampBiasOpts {
+  pub fn new(preamp_id: u8, preamp_bias: u16) -> Self {
+    Self { 
+      preamp_id,
+      preamp_bias
+    }
+  }
+}
+/// END Set cmds ================================================
 
 /// Calibration cmds ====================================================
 #[derive(Debug, Subcommand, PartialEq)]
@@ -1012,6 +1063,7 @@ pub enum PowerCmd {
 #[derive(Debug, Args, PartialEq)]
 pub struct PowerStatus {
   /// Which power status one wants to achieve
+  #[arg(short, long)]
   pub power_status: PowerStatusEnum
 }
 
@@ -1104,9 +1156,10 @@ impl TryFrom<u16> for PowerStatusEnum {
 #[derive(Debug, Args, PartialEq)]
 pub struct PBPowerOpts {
   /// Which power status one wants to achieve
+  #[arg(long)]
   pub power_status: PowerStatusEnum,
   /// ID of the PB to be powered up
-  #[arg(short, long, default_value_t = DEFAULT_PB_ID)]
+  #[arg(long)]
   pub pb_id: u8
 }
 
@@ -1122,9 +1175,10 @@ impl PBPowerOpts {
 #[derive(Debug, Args, PartialEq)]
 pub struct RBPowerOpts {
   /// Which power status one wants to achieve
+  #[arg(short, long)]
   pub power_status: PowerStatusEnum,
   /// ID of the RB to be powered up
-  #[arg(short, long, default_value_t = DEFAULT_RB_ID)]
+  #[arg(short, long)]
   pub rb_id: u8
 }
 
@@ -1140,6 +1194,7 @@ impl RBPowerOpts {
 #[derive(Debug, Args, PartialEq)]
 pub struct LTBPowerOpts {
   /// Which power status one wants to achieve
+  #[arg(short, long)]
   pub power_status: PowerStatusEnum,
   /// ID of the LTB to be powered up
   #[arg(short, long, default_value_t = DEFAULT_LTB_ID)]
@@ -1158,12 +1213,13 @@ impl LTBPowerOpts {
 #[derive(Debug, Args, PartialEq)]
 pub struct PreampPowerOpts {
   /// Which power status one wants to achieve
+  #[arg(long)]
   pub power_status: PowerStatusEnum,
   /// ID of the preamp to be powered up
-  #[arg(short, long, default_value_t = DEFAULT_PREAMP_ID)]
+  #[arg(long, default_value_t = DEFAULT_PREAMP_ID)]
   pub preamp_id: u8,
   /// Turn on bias of the preamp specified
-  #[arg(short, long, default_value_t = DEFAULT_PREAMP_BIAS)]
+  #[arg(long, default_value_t = DEFAULT_PREAMP_BIAS)]
   pub preamp_bias: u16
 }
 

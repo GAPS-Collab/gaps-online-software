@@ -153,6 +153,36 @@ pub fn send_timing_calibration(cmd_sender: Sender<TofPacket>,
   }
 }
 
+/// Function that sends the threshold to be set on all or
+/// specific LTBs
+pub fn send_ltb_threshold(cmd_sender: Sender<TofPacket>,
+                          ltb_id: u8,
+                          threshold_level: u16) {
+  let payload: u32
+  = PAD_CMD_32BIT | (ltb_id as u32) << 16 | (threshold_level as u32);
+  let run_start = TofCommand::SetThresholds(payload);
+  let tp = TofPacket::from(&run_start);
+  match cmd_sender.send(tp) {
+    Err(err) => error!("Unable to send command, error{err}"),
+    Ok(_)    => ()
+  }
+}
+
+/// Function that sends the threshold to be set on all or
+/// specific LTBs
+pub fn send_preamp_bias(cmd_sender: Sender<TofPacket>,
+                        preamp_id: u8,
+                        preamp_bias: u16) {
+  let payload: u32
+  = PAD_CMD_32BIT | (preamp_id as u32) << 16 | (preamp_bias as u32);
+  let run_start = TofCommand::SetThresholds(payload);
+  let tp = TofPacket::from(&run_start);
+  match cmd_sender.send(tp) {
+    Err(err) => error!("Unable to send command, error{err}"),
+    Ok(_)    => ()
+  }
+}
+
 /// Default function that starts run data taking on all RBs
 /// with default values.
 pub fn send_run_start(cmd_sender: Sender<TofPacket>,

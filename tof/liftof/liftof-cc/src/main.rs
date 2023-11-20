@@ -49,7 +49,7 @@ use tof_dataclasses::DsiLtbRBMapping;
 use tof_dataclasses::commands::TofCommand;
 use tof_dataclasses::commands::TofCommandCode;
 use liftof_lib::{master_trigger,
-                 readoutboard_commander, RunCmd, CalibrationCmd, PowerCmd, PowerStatusEnum, TofComponent};
+                 readoutboard_commander, RunCmd, CalibrationCmd, PowerCmd, PowerStatusEnum, TofComponent, SetCmd};
 use liftof_lib::color_log;
 use liftof_lib::get_ltb_dsi_j_ch_mapping;
 use liftof_cc::threads::{readoutboard_communicator,
@@ -487,6 +487,20 @@ fn main() {
         }
       }
     }
+    Command::Set(set_cmd) => {
+      match set_cmd {
+        SetCmd::LtbThreshold(ltb_threshold_opts) => {
+          let ltb_id = ltb_threshold_opts.ltb_id;
+          let threshold_level = ltb_threshold_opts.threshold_level;
+          liftof_cc::send_ltb_threshold(cmd_sender, ltb_id, threshold_level);
+        },
+        SetCmd::PreampBias(preamp_bias_opts) => {
+          let preamp_id = preamp_bias_opts.preamp_id;
+          let preamp_bias = preamp_bias_opts.preamp_bias;
+          liftof_cc::send_preamp_bias(cmd_sender, preamp_id, preamp_bias);
+        }
+      }
+    },
     Command::Run(run_cmd) => {
       match run_cmd {
         RunCmd::Start(run_start_opts) => {
