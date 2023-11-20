@@ -375,6 +375,32 @@ fn main() {
           }
         },
         // END Matching calibration command
+        // BEGIN Matching set command
+        Command::Set(set_cmd) => {
+          match set_cmd {
+            liftof_lib::SetCmd::LtbThreshold(lbt_threshold_opts) => {
+              let ltb_id = lbt_threshold_opts.ltb_id;
+              let threshold_level = lbt_threshold_opts.threshold_level;
+              // match send_preamp_bias_set(&rc_to_runner_cal, rc_config, run_type, rb_id, event_no, time) {
+              //   Ok(_) => (),
+              //   Err(err) => {
+              //     error!("Timing calibration data taking failed! Error {err}!");
+              //   }
+              // }
+            },
+            liftof_lib::SetCmd::PreampBias(preamp_bias_opts) => {
+              let preamp_id = preamp_bias_opts.preamp_id;
+              let preamp_bias = preamp_bias_opts.preamp_bias;
+              match send_preamp_bias_set(preamp_bias) {
+                Ok(_) => (),
+                Err(err) => {
+                  error!("Unable to set preamp bias! Error {err}!");
+                }
+              }
+            }
+          }
+        },
+        // END Matching set commmand
         // BEGIN Matching run command
         Command::Run(run_cmd) => {
           match run_cmd {

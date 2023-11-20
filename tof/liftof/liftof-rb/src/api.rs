@@ -10,7 +10,8 @@ cfg_if::cfg_if! {
   if #[cfg(feature = "tofcontrol")]  {
   use tof_dataclasses::calibrations::RBCalibrations;
   use tof_dataclasses::errors::{CalibrationError,
-                                RunError};
+                                RunError,
+                                SetError};
   }
 }
 use std::path::Path;
@@ -40,6 +41,8 @@ cfg_if::cfg_if! {
                                           select_vcal_mode,
                                           select_tcal_mode,
                                           select_sma_mode};
+    // for threshold setting
+    use tof_control::preamp_control::preamp_bias;
 
     const FIVE_SECONDS: Duration = time::Duration::from_millis(5000);
   }
@@ -958,3 +961,9 @@ pub fn setup_drs4() -> Result<(), RegisterError> {
   Ok(())
 }
 
+#[cfg(feature = "tofcontrol")]
+// TODO We cant do much until we know more
+pub fn send_preamp_bias_set(bias_voltage: u16) -> Result<(), SetError> {
+  preamp_bias::PreampBiasSet::set_bias_manual(bias_voltage as f32);
+  Ok(())
+}

@@ -55,6 +55,8 @@ pub enum TofCommandCode {
   CmdSetThresholds           = 21u8,         
   /// command code for "Configure MTB"
   CmdSetMTConfig             = 22u8,        
+  /// command code for "Set preamp bias"
+  CmdSetPreampBias           = 28u8,         
   /// command code for "Stop Data taking"
   CmdDataRunStop             = 30u8,  
   /// command code for "Start Data taking"
@@ -125,6 +127,7 @@ impl TryFrom<u8> for TofCommandCode {
       20u8 => Ok(TofCommandCode::CmdRBSetup),
       21u8 => Ok(TofCommandCode::CmdSetThresholds),
       22u8 => Ok(TofCommandCode::CmdSetMTConfig),
+      28u8 => Ok(TofCommandCode::CmdSetPreampBias),
       30u8 => Ok(TofCommandCode::CmdDataRunStop),
       31u8 => Ok(TofCommandCode::CmdDataRunStart),
       32u8 => Ok(TofCommandCode::CmdStartValidationRun),
@@ -162,6 +165,7 @@ impl FromRandom for TofCommandCode {
       TofCommandCode::CmdRBSetup,
       TofCommandCode::CmdSetThresholds,
       TofCommandCode::CmdSetMTConfig,
+      TofCommandCode::CmdSetPreampBias,
       TofCommandCode::CmdDataRunStop,
       TofCommandCode::CmdDataRunStart,
       TofCommandCode::CmdStartValidationRun,
@@ -460,6 +464,7 @@ pub enum TofCommand {
   RBSetup                 (u32),
   SetThresholds           (u32),
   SetMTConfig             (u32),
+  SetPreampBias           (u32),
   DataRunStop             (u32),
   DataRunStart            (u32),
   StartValidationRun      (u32),
@@ -561,6 +566,7 @@ impl TofCommand {
       TofCommand::RBSetup                 (data) => { value = *data;}, 
       TofCommand::SetThresholds           (data) => { value = *data;},
       TofCommand::SetMTConfig             (data) => { value = *data;},
+      TofCommand::SetPreampBias           (data) => { value = *data;},
       TofCommand::StartValidationRun      (data) => { value = *data;},
       TofCommand::GetFullWaveforms        (data) => { value = *data;},
       TofCommand::UnspoolEventCache       (data) => { value = *data;},
@@ -596,6 +602,7 @@ impl TofCommand {
       TofCommandCode::CmdRBSetup                 => TofCommand::RBSetup                 (value),
       TofCommandCode::CmdSetThresholds           => TofCommand::SetThresholds           (value),
       TofCommandCode::CmdSetMTConfig             => TofCommand::SetMTConfig             (value),
+      TofCommandCode::CmdSetPreampBias           => TofCommand::SetPreampBias           (value),
       TofCommandCode::CmdDataRunStart            => TofCommand::DataRunStart            (value),
       TofCommandCode::CmdDataRunStop             => TofCommand::DataRunStop             (0u32),
       TofCommandCode::CmdStartValidationRun      => TofCommand::StartValidationRun      (value),
@@ -629,6 +636,7 @@ impl TofCommand {
       TofCommand::RBSetup                 (_) => Some(TofCommandCode::CmdRBSetup),
       TofCommand::SetThresholds           (_) => Some(TofCommandCode::CmdSetThresholds),
       TofCommand::SetMTConfig             (_) => Some(TofCommandCode::CmdSetMTConfig),
+      TofCommand::SetPreampBias           (_) => Some(TofCommandCode::CmdSetPreampBias),
       TofCommand::DataRunStart            (_) => Some(TofCommandCode::CmdDataRunStart),
       TofCommand::DataRunStop             (_) => Some(TofCommandCode::CmdDataRunStop),
       TofCommand::StartValidationRun      (_) => Some(TofCommandCode::CmdStartValidationRun),

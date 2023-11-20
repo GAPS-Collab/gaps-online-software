@@ -258,3 +258,21 @@ impl fmt::Display for UserError {
 impl Error for UserError {
 }
 
+////////////////////////////////////////
+
+#[derive(Debug, Copy, Clone, serde::Deserialize, serde::Serialize)]
+pub enum SetError {
+  EmptyInputData,
+  CanNotConnectToMyOwnZMQSocket  
+}
+
+impl fmt::Display for SetError {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let disp = serde_json::to_string(self).unwrap_or(
+      String::from("Error: cannot unwrap this SetError"));
+    write!(f, "<SetError : {}>", disp)
+  }
+}
+
+impl Error for SetError {
+}

@@ -9,18 +9,23 @@ use tof_dataclasses::packets::{TofPacket,
 use tof_dataclasses::run::RunConfig;
 
 use tof_dataclasses::serialization::Serialization;
-#[cfg(feature="tofcontrol")]
-use tof_dataclasses::constants::{MASK_CMD_8BIT,
-                                 MASK_CMD_16BIT,
-                                 MASK_CMD_24BIT,
-                                 MASK_CMD_32BIT};
 
 use crate::api::{get_runconfig, DATAPORT};
 use crate::api::prefix_board_id;
-#[cfg(feature="tofcontrol")]
-use crate::api::rb_calibration;
 use crate::control::get_board_id_string;
 use liftof_lib::build_tcp_from_ip;
+
+cfg_if::cfg_if! {
+  if #[cfg(feature = "tofcontrol")] {
+    use tof_dataclasses::constants::{MASK_CMD_8BIT,
+                                     MASK_CMD_16BIT,
+                                     MASK_CMD_24BIT,
+                                     MASK_CMD_32BIT};
+
+    use crate::api::rb_calibration;
+    use crate::api::send_preamp_bias_set;
+  }
+}
 
 /// Centrailized command management
 /// 
@@ -186,13 +191,60 @@ pub fn cmd_responder(cmd_server_ip             : String,
                         }
                         continue;
                       }, 
-                      TofCommand::SetThresholds   (_thresholds) =>  {
-                        warn!("Not implemented");
-                        match cmd_socket.send(resp_not_implemented,0) {
-                          Err(err) => warn!("Can not send response! Err {err}"),
-                          Ok(_)    => trace!("Resp sent!")
+                      TofCommand::SetThresholds   (value) =>  {
+                        cfg_if::cfg_if! {
+                          if #[cfg(feature = "tofcontrol")]  {
+                            info!("Received set threshold! Will communicate to LTBs");
+                            // MSB second 8 bits are LTB ID
+                            let ltb_id: u8 = ((value | (MASK_CMD_8BIT << 16)) >> 16) as u8;
+                            // MSB third 16 bits are extra (not used)
+                            let threshold_level: u16 = (value | MASK_CMD_16BIT) as u16;
+                            // TODO there should be a call here where one sets the threshold(s) on the LTB
+                            // rn only 2 function doing that are implemented but hard code values.
+                            //ltb_dac::LTBdac::set_threshold();
+                            match cmd_socket.send(resp_not_implemented,0) {
+                              Err(err) => warn!("Can not send response! Err {err}"),
+                              Ok(_)    => trace!("Resp sent!")
+                            }
+                            continue;
+                          } else {
+                            warn!("The function is implemented, but one has to compile with --features=tofcontrol");
+                            match cmd_socket.send(resp_not_implemented,0) {
+                              Err(err) => warn!("Can not send response! Err {err}"),
+                              Ok(_)    => trace!("Resp sent!")
+                            }
+                            continue;
+                          }
                         }
-                        continue;
+                      },
+                      TofCommand::SetPreampBias   (value) =>  {
+                        cfg_if::cfg_if! {
+                          if #[cfg(feature = "tofcontrol")]  {
+                            info!("Received set threshold! Will communicate to preamps");
+                            // MSB second 8 bits are LTB ID
+                            let preamp_id: u8 = ((value | (MASK_CMD_8BIT << 16)) >> 16) as u8;
+                            // MSB third 16 bits are extra (not used)
+                            let preamp_bias: u16 = (value | MASK_CMD_16BIT) as u16;
+                            // TODO it seems that the preamps are controlled together, is this
+                            // wanted?
+                            match send_preamp_bias_set(preamp_bias) {
+                              Err(err) => warn!("Can not set preamp bias! Err {err}"),
+                              Ok(_)    => trace!("Resp sent!")
+                            }
+                            match cmd_socket.send(resp_not_implemented,0) {
+                              Err(err) => warn!("Can not send response! Err {err}"),
+                              Ok(_)    => trace!("Resp sent!")
+                            }
+                            continue;
+                          } else {
+                            warn!("The function is implemented, but one has to compile with --features=tofcontrol");
+                            match cmd_socket.send(resp_not_implemented,0) {
+                              Err(err) => warn!("Can not send response! Err {err}"),
+                              Ok(_)    => trace!("Resp sent!")
+                            }
+                            continue;
+                          }
+                        }
                       },
                       TofCommand::StartValidationRun  (_) => {
                         warn!("Not implemented");
