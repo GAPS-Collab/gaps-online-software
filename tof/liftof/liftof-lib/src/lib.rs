@@ -1023,32 +1023,79 @@ impl PowerStatus {
   }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize, clap::ValueEnum)]
+#[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 #[repr(u8)]
-pub enum PowerStatusEnum {
-  OFF       = 0u8,
-  ON        = 10u8,
-  Cycle     = 20u8,
+pub enum TofComponent {
+  /// everything (PB + RB + LTB + preamps + MT)
+  All       = 0u8,
+  /// MT alone
+  MT        = 10u8,
+  /// everything but MT (PB + RB + LTB + preamps)
+  AllButMT  = 20u8,
+  /// all or specific PBs
+  PB        = 30u8,
+  /// all or specific RBs
+  RB        = 40u8,
+  /// all or specific LTBs
+  LTB       = 50u8,
+  /// all or specific preamp
+  Preamp    = 60u8
 }
 
-impl fmt::Display for PowerStatusEnum {
+impl fmt::Display for TofComponent {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let r = serde_json::to_string(self).unwrap_or(
-      String::from("Error: cannot unwrap this DataType"));
-    write!(f, "<PowerStatusEnum: {}>", r)
+      String::from("Error: cannot unwrap this TofComponent"));
+    write!(f, "<TofComponent: {}>", r)
   }
 }
 
-impl TryFrom<u8> for PowerStatusEnum {
+impl TryFrom<u8> for TofComponent {
   type Error = &'static str;
 
   // I am not sure about this hard coding, but the code
   //  looks nicer - Paolo
   fn try_from(value: u8) -> Result<Self, Self::Error> {
     match value {
-      0u8  => Ok(PowerStatusEnum::OFF),
-      10u8 => Ok(PowerStatusEnum::ON),
-      20u8 => Ok(PowerStatusEnum::Cycle),
+      0u8  => Ok(TofComponent::All),
+      10u8 => Ok(TofComponent::MT),
+      20u8 => Ok(TofComponent::AllButMT),
+      30u8 => Ok(TofComponent::PB),
+      40u8 => Ok(TofComponent::RB),
+      50u8 => Ok(TofComponent::LTB),
+      60u8 => Ok(TofComponent::Preamp),
+      _    => Err("I am not sure how to convert this value!")
+    }
+  }
+}
+
+// repr is u16 in order to leave room for preamp bias
+#[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize, clap::ValueEnum)]
+#[repr(u16)]
+pub enum PowerStatusEnum {
+  OFF       = 0u16,
+  ON        = 10u16,
+  Cycle     = 20u16,
+}
+
+impl fmt::Display for PowerStatusEnum {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let r = serde_json::to_string(self).unwrap_or(
+      String::from("Error: cannot unwrap this PowerStatusEnum"));
+    write!(f, "<PowerStatusEnum: {}>", r)
+  }
+}
+
+impl TryFrom<u16> for PowerStatusEnum {
+  type Error = &'static str;
+
+  // I am not sure about this hard coding, but the code
+  //  looks nicer - Paolo
+  fn try_from(value: u16) -> Result<Self, Self::Error> {
+    match value {
+      0u16  => Ok(PowerStatusEnum::OFF),
+      10u16 => Ok(PowerStatusEnum::ON),
+      20u16 => Ok(PowerStatusEnum::Cycle),
       _    => Err("I am not sure how to convert this value!")
     }
   }

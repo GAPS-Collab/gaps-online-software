@@ -49,7 +49,7 @@ use tof_dataclasses::DsiLtbRBMapping;
 use tof_dataclasses::commands::TofCommand;
 use tof_dataclasses::commands::TofCommandCode;
 use liftof_lib::{master_trigger,
-                 readoutboard_commander};
+                 readoutboard_commander, RunCmd, CalibrationCmd, PowerCmd, PowerStatusEnum, TofComponent};
 use liftof_lib::color_log;
 use liftof_lib::get_ltb_dsi_j_ch_mapping;
 use liftof_cc::threads::{readoutboard_communicator,
@@ -424,28 +424,62 @@ fn main() {
 
   match args.command {
     Command::Power(power_cmd) => {
-      ()
+      match power_cmd {
+        PowerCmd::All(power_status) => {
+          let power_status_enum: PowerStatusEnum = power_status.power_status;
+          liftof_cc::send_power(cmd_sender, TofComponent::All, power_status_enum);
+        },
+        PowerCmd::MT(power_status) => {
+          let power_status_enum: PowerStatusEnum = power_status.power_status;
+          liftof_cc::send_power(cmd_sender, TofComponent::MT, power_status_enum);
+        },
+        PowerCmd::AllButMT(power_status) => {
+          let power_status_enum: PowerStatusEnum = power_status.power_status;
+          liftof_cc::send_power(cmd_sender, TofComponent::AllButMT, power_status_enum);
+        },
+        PowerCmd::PB(pb_power_opts) => {
+          let power_status_enum: PowerStatusEnum = pb_power_opts.power_status;
+          let pb_id = pb_power_opts.pb_id;
+          liftof_cc::send_power_ID(cmd_sender, TofComponent::PB, power_status_enum, pb_id);
+        },
+        PowerCmd::RB(rb_power_opts) => {
+          let power_status_enum: PowerStatusEnum = rb_power_opts.power_status;
+          let rb_id = rb_power_opts.rb_id;
+          liftof_cc::send_power_ID(cmd_sender, TofComponent::RB, power_status_enum, rb_id);
+        },
+        PowerCmd::LTB(ltb_power_opts) => {
+          let power_status_enum: PowerStatusEnum = ltb_power_opts.power_status;
+          let ltb_id = ltb_power_opts.ltb_id;
+          liftof_cc::send_power_ID(cmd_sender, TofComponent::LTB, power_status_enum, ltb_id);
+        },
+        PowerCmd::Preamp(preamp_power_opts) => {
+          let power_status_enum: PowerStatusEnum = preamp_power_opts.power_status;
+          let preamp_id = preamp_power_opts.preamp_id;
+          let preamp_bias = preamp_power_opts.preamp_bias;
+          liftof_cc::send_power_preamp(cmd_sender, power_status_enum, preamp_id, preamp_bias);
+        }
+      }
     },
     Command::Calibration(calibration_cmd) => {
       match calibration_cmd {
-        liftof_lib::CalibrationCmd::Default(default_opts) => {
+        CalibrationCmd::Default(default_opts) => {
           let voltage_level = default_opts.voltage_level;
           let rb_id = default_opts.rb_id;
           let extra = default_opts.extra;
           liftof_cc::send_default_calibration(cmd_sender, voltage_level, rb_id, extra);
         },
-        liftof_lib::CalibrationCmd::Noi(noi_opts) => {
+        CalibrationCmd::Noi(noi_opts) => {
           let rb_id = noi_opts.rb_id;
           let extra = noi_opts.extra;
           liftof_cc::send_noi_calibration(cmd_sender, rb_id, extra);
         },
-        liftof_lib::CalibrationCmd::Voltage(voltage_opts) => {
+        CalibrationCmd::Voltage(voltage_opts) => {
           let voltage_level = voltage_opts.voltage_level;
           let rb_id = voltage_opts.rb_id;
           let extra = voltage_opts.extra;
           liftof_cc::send_voltage_calibration(cmd_sender, voltage_level, rb_id, extra);
         },
-        liftof_lib::CalibrationCmd::Timing(timing_opts) => {
+        CalibrationCmd::Timing(timing_opts) => {
           let voltage_level = timing_opts.voltage_level;
           let rb_id = timing_opts.rb_id;
           let extra = timing_opts.extra;
@@ -455,14 +489,14 @@ fn main() {
     }
     Command::Run(run_cmd) => {
       match run_cmd {
-        liftof_lib::RunCmd::Start(run_start_opts) => {
+        RunCmd::Start(run_start_opts) => {
           let run_type = run_start_opts.run_type;
           let rb_id = run_start_opts.rb_id;
           let event_no = run_start_opts.event_no;
           let time = run_start_opts.time;
           liftof_cc::send_run_start(cmd_sender, run_type, rb_id, event_no, time);
         },
-        liftof_lib::RunCmd::Stop(run_stop_opts) => {
+        RunCmd::Stop(run_stop_opts) => {
           let rb_id = run_stop_opts.rb_id;
           liftof_cc::send_run_stop(cmd_sender, rb_id);
         }

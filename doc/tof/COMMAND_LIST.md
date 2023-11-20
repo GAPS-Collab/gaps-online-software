@@ -39,7 +39,7 @@ The commands follow Sydney's list (Pad stands for padding):
 
 | TofCommandCode | Command | Frequency | Data |
 | -------------- | ------- | --------- | ---- |
-| 10,11,12 | Power on/off to PBs + RBs + LTBs + preamps (all at once) or MT | < 5/day Command to power on/off PDU channels (to PDU) | Pad:u16+u8, PDU:u8 |
+| 10,11,12 | Power on/off to PBs + RBs + LTBs + preamps (all at once) or MT | < 5/day Command to power on/off PDU channels (to PDU). Even though PDU seems the only thing that one can target, the command has room for every component | Component:u8, ComponentID: u8, Status:u16 |
 | 10,11,12 | Power on/off to LTB or preamp | < 2/day Command to power on/off various components (to TOF -> to RB)             | Pad:u16+u8, RB:u8 |
 | 20 | RBsetup ? Command to run rbsetup on a particular RB or all (to TOF -> to RBs) <br />Comment: prolly not needed anymore? |                                        | Pad:u16+u8, RB:u8 |
 | 21 | Set Thresholds  | < 3/day Command to set a threshold level on all LTBs (to TOF -> to  RBs)                             | Pad:u8, Threshold:u8, Level:u16 |
