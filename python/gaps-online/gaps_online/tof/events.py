@@ -5,8 +5,6 @@ import charmingbeauty as cb
 # monkey patch the C++ API RBEvent
 gt.RBEvent.calib = None
 
-
-
 def _adc_plotter(axes, ev, ch, calib=None):
     if ch == 9:
         ax_j  = 4
@@ -15,20 +13,20 @@ def _adc_plotter(axes, ev, ch, calib=None):
         lw    = 1.2
     elif ch % 2 == 0:
         ax_j  = int ((ch - 2) / 2)
-        color = 'r'
-        alpha = 0.7
-        lw    = 1.2
+        color = 'tab:red'
+        alpha = 0.9
+        lw    = 0.9
     else:
         ax_j  = int ((ch - 1) / 2)
-        color = 'b'
-        alpha = 0.7
-        lw    = 1.2
+        color = 'tab:blue'
+        alpha = 0.9
+        lw    = 0.9
     if calib is None:
-        xs = ev.get_channel_adc(ch)
-        ys = [k for k in range(1024)]
+        xs = [k for k in range(1024)]
+        ys = ev.get_channel_adc(ch)
     else:
-        xs = calib.voltages(ev, spike_cleaning=True)[ch - 1]
-        ys = calib.nanoseconds(ev)[ch - 1]
+        xs = calib.nanoseconds(ev)[ch - 1]
+        ys = calib.voltages(ev, spike_cleaning=True)[ch - 1]
     axes[ax_j].plot(xs,\
                     ys,\
                     color = color,\
@@ -40,8 +38,8 @@ def plot(self, calib=None):
       p.subplots(5, 1, sharex=True, figsize=cb.layout.FIGSIZE_A4)# layout='constrained', sharex=True)
     fig.subplots_adjust(hspace=0)
     if calib is None:
-        xlabel = '14bit-ADC bins'
-        ylabel = 'Timing sample bins [2GS/s]'
+        xlabel = 'Timing sample bins [2GS/s]'
+        ylabel = '14bit-ADC bins'
         xpos   = 0.5
     else:
         xlabel = 'nanoseconds'
