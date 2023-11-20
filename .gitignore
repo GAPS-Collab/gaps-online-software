@@ -17,6 +17,7 @@ tof/liftof/liftof-tui/Cargo.lock
 gaps-db/gaps_db/gaps_db/__pycache__/
 gaps-db/gaps_db/tof_db/__pycache__/
 tof/tof-calibration/python_calibration_scripts/tofpy/__pycache__/*
+python/gaps-online/gaps_online/tof/__pycache__/*
 
 # build products
 tof/dataclasses/rust/tof-dataclasses/target/*
