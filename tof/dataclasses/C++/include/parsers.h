@@ -60,6 +60,9 @@ i32 parse_i32(const Vec<u8> &bytestream,
 f32 parse_f32(const Vec<u8> &bytestream,
               usize &pos);
 
+f64 parse_f64(const Vec<u8> &bytestream,
+              usize &pos);
+
 u32 u32_from_le_bytes(const Vec<u8> &bytestream,
                       usize &pos);
 
