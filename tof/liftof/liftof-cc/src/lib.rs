@@ -155,9 +155,9 @@ pub fn send_timing_calibration(cmd_sender: Sender<TofPacket>,
 
 /// Function that sends the threshold to be set on all or
 /// specific LTBs
-pub fn send_ltb_threshold(cmd_sender: Sender<TofPacket>,
-                          ltb_id: u8,
-                          threshold_level: u16) {
+pub fn send_ltb_threshold_set(cmd_sender: Sender<TofPacket>,
+                              ltb_id: u8,
+                              threshold_level: u16) {
   let payload: u32
   = PAD_CMD_32BIT | (ltb_id as u32) << 16 | (threshold_level as u32);
   let ltb_threshold = TofCommand::SetThresholds(payload);
@@ -170,9 +170,9 @@ pub fn send_ltb_threshold(cmd_sender: Sender<TofPacket>,
 
 /// Function that sends the threshold to be set on all or
 /// specific LTBs
-pub fn send_preamp_bias(cmd_sender: Sender<TofPacket>,
-                        preamp_id: u8,
-                        preamp_bias: u16) {
+pub fn send_preamp_bias_set(cmd_sender: Sender<TofPacket>,
+                            preamp_id: u8,
+                            preamp_bias: u16) {
   let payload: u32
   = PAD_CMD_32BIT | (preamp_id as u32) << 16 | (preamp_bias as u32);
   let preamp_bias = TofCommand::SetPreampBias(payload);

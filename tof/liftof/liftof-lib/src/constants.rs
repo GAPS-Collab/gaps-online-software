@@ -26,3 +26,8 @@ pub const DEFAULT_RUN_TYPE: u8 = 0xFF;
 pub const DEFAULT_RUN_EVENT_NO: u8 = 0xFF;
 /// Time the run is expected to go on for by default
 pub const DEFAULT_RUN_TIME: u8 = 0xFF;
+
+/// Min preamp voltage
+pub const PREAMP_MIN_BIAS: i64 = 0;
+/// Max preamp voltage
+pub const PREAMP_MAX_BIAS: i64 = 68;

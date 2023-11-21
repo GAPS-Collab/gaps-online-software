@@ -39,9 +39,9 @@ The commands follow Sydney's list (Pad stands for padding):
 
 | TofCommandCode | Command | Frequency | Data |
 | -------------- | ------- | --------- | ---- |
-| 10,11,12 | Power on/off to PBs + RBs + LTBs + preamps (all at once) or MT | < 5/day Command to power on/off PDU channels (to PDU). Even though PDU seems the only thing that one can target, the command has room for every component | Component:u8, ComponentID: u8, Status:u16 |
-| 10,11,12 | Power on/off to LTB or preamp | < 2/day Command to power on/off various components (to TOF -> to RB)             | Pad:u16+u8, RB:u8 |
-| 21 | Set Thresholds  | < 3/day Command to set a threshold level on all LTBs (to TOF -> to  RBs)                             | Pad:u8, LTB_ID:u8, Level:u16 |
+| 10,11,12 | Power on/off to PBs + RBs + LTBs + preamps (all at once) or MT | < 5/day Command to power on/off PDU channels (to PDU). Even though PDU seems the only thing that one can target, the command has room for every component | Component:u8, ComponentID:u8, Status:u8 |
+| 10,11,12 | Power on/off to LTB or preamp | < 2/day Command to power on/off various components (to TOF -> to RB)             | Component(preamp):u8, preamp_ID:u8, Status:u8 |
+| 21 | Set Thresholds  | < 3/day Command to set a threshold level on all LTBs (to TOF -> to  RBs)                             | LTB_ID:u8, Threshold_name:u8, Level:u16 |
 | 22 | Set MT Config 1/run | <10/day? Command to set MT trigger config (to TOF -> to MT)                                      | Pad:u16, TriggerConfig:u16 |
 | 28 | Set preamp bias  | < 3/day Command to set a preamp bias on all preamps (to TOF -> to  RBs)                             | Pad:u8, Preamp_ID:u8, Preamp_level:u16 |
 | 32 | Start Validation Run 1/run | <10/day? Command to take a small amount of data on an RB or all (E events)                | Pad:u16, E:u8, RB:u8 |

@@ -482,12 +482,12 @@ fn main() {
         SetCmd::LtbThreshold(ltb_threshold_opts) => {
           let ltb_id = ltb_threshold_opts.ltb_id;
           let threshold_level = ltb_threshold_opts.threshold_level;
-          liftof_cc::send_ltb_threshold(cmd_sender, ltb_id, threshold_level);
+          liftof_cc::send_ltb_threshold_set(cmd_sender, ltb_id, threshold_level);
         },
         SetCmd::PreampBias(preamp_bias_opts) => {
           let preamp_id = preamp_bias_opts.preamp_id;
           let preamp_bias = preamp_bias_opts.preamp_bias;
-          liftof_cc::send_preamp_bias(cmd_sender, preamp_id, preamp_bias);
+          liftof_cc::send_preamp_bias_set(cmd_sender, preamp_id, preamp_bias);
         }
       }
     },

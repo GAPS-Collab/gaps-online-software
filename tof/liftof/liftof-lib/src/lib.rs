@@ -9,7 +9,9 @@ use constants::{DEFAULT_CALIB_VOLTAGE,
                 DEFAULT_POWER_STATUS,
                 DEFAULT_RUN_TYPE,
                 DEFAULT_RUN_EVENT_NO,
-                DEFAULT_RUN_TIME};
+                DEFAULT_RUN_TIME,
+                PREAMP_MIN_BIAS,
+                PREAMP_MAX_BIAS};
 pub use master_trigger::{connect_to_mtb,
                          master_trigger};
 pub mod constants;
@@ -902,19 +904,55 @@ pub enum SetCmd {
 
 #[derive(Debug, Args, PartialEq)]
 pub struct LtbThresholdOpts {
-  /// RB to target in voltage calibration run.
+  /// LTB to target
   #[arg(short, long, default_value_t = DEFAULT_LTB_ID)]
   pub ltb_id: u8,
-  /// Theshold level to be set
-  #[arg(short, long, required = true)]
+  /// LTB to target
+  #[arg(long, required = true)]
+  pub threshold_name: LTBThresholdName,
+  /// Threshold level to be set
+  #[arg(long, required = true)]
   pub threshold_level: u16
 }
 
 impl LtbThresholdOpts {
-  pub fn new(ltb_id: u8, threshold_level: u16) -> Self {
+  pub fn new(ltb_id: u8, threshold_name: LTBThresholdName, threshold_level: u16) -> Self {
     Self { 
       ltb_id,
+      threshold_name,
       threshold_level
+    }
+  }
+}
+
+// repr is u16 in order to leave room for preamp bias
+#[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize, clap::ValueEnum)]
+#[repr(u8)]
+pub enum LTBThresholdName {
+  Hit      = 0u8,
+  Beta     = 1u8,
+  Veto     = 2u8,
+}
+
+impl fmt::Display for LTBThresholdName {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let r = serde_json::to_string(self).unwrap_or(
+      String::from("Error: cannot unwrap this PowerStatusEnum"));
+    write!(f, "<PowerStatusEnum: {}>", r)
+  }
+}
+
+impl TryFrom<u8> for LTBThresholdName {
+  type Error = &'static str;
+
+  // I am not sure about this hard coding, but the code
+  //  looks nicer - Paolo
+  fn try_from(value: u8) -> Result<Self, Self::Error> {
+    match value {
+      0u8  => Ok(LTBThresholdName::Hit),
+      10u8 => Ok(LTBThresholdName::Beta),
+      20u8 => Ok(LTBThresholdName::Veto),
+      _    => Err("I am not sure how to convert this value!")
     }
   }
 }
@@ -925,7 +963,7 @@ pub struct PreampBiasOpts {
   #[arg(long, default_value_t = DEFAULT_RB_ID)]
   pub preamp_id: u8,
   /// Theshold level to be set
-  #[arg(long, required = true)]
+  #[arg(long, required = true, value_parser = clap::value_parser!(i64).range(PREAMP_MIN_BIAS..=PREAMP_MAX_BIAS))]
   pub preamp_bias: u16
 }
 
@@ -1113,11 +1151,11 @@ impl TryFrom<u8> for TofComponent {
 
 // repr is u16 in order to leave room for preamp bias
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize, clap::ValueEnum)]
-#[repr(u16)]
+#[repr(u8)]
 pub enum PowerStatusEnum {
-  OFF       = 0u16,
-  ON        = 10u16,
-  Cycle     = 20u16,
+  OFF       = 0u8,
+  ON        = 10u8,
+  Cycle     = 20u8,
 }
 
 impl fmt::Display for PowerStatusEnum {
@@ -1128,16 +1166,16 @@ impl fmt::Display for PowerStatusEnum {
   }
 }
 
-impl TryFrom<u16> for PowerStatusEnum {
+impl TryFrom<u8> for PowerStatusEnum {
   type Error = &'static str;
 
   // I am not sure about this hard coding, but the code
   //  looks nicer - Paolo
-  fn try_from(value: u16) -> Result<Self, Self::Error> {
+  fn try_from(value: u8) -> Result<Self, Self::Error> {
     match value {
-      0u16  => Ok(PowerStatusEnum::OFF),
-      10u16 => Ok(PowerStatusEnum::ON),
-      20u16 => Ok(PowerStatusEnum::Cycle),
+      0u8  => Ok(PowerStatusEnum::OFF),
+      10u8 => Ok(PowerStatusEnum::ON),
+      20u8 => Ok(PowerStatusEnum::Cycle),
       _    => Err("I am not sure how to convert this value!")
     }
   }

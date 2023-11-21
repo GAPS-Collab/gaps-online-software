@@ -23,7 +23,8 @@ cfg_if::cfg_if! {
                                      MASK_CMD_32BIT};
 
     use crate::api::rb_calibration;
-    use crate::api::send_preamp_bias_set;
+    use crate::api::{send_preamp_bias_set,
+                     send_ltb_threshold_set};
   }
 }
 
@@ -191,9 +192,10 @@ pub fn cmd_responder(cmd_server_ip             : String,
                             let ltb_id: u8 = ((value | (MASK_CMD_8BIT << 16)) >> 16) as u8;
                             // MSB third 16 bits are extra (not used)
                             let threshold_level: u16 = (value | MASK_CMD_16BIT) as u16;
-                            // TODO there should be a call here where one sets the threshold(s) on the LTB
-                            // rn only 2 function doing that are implemented but hard code values.
-                            //ltb_dac::LTBdac::set_threshold();
+                            match send_ltb_threshold_set(ltb_id, threshold_level) {
+                              Err(err) => warn!("Can not set ltb threshold! Err {err}"),
+                              Ok(_)    => trace!("Resp sent!")
+                            }
                             match cmd_socket.send(resp_not_implemented,0) {
                               Err(err) => warn!("Can not send response! Err {err}"),
                               Ok(_)    => trace!("Resp sent!")
@@ -217,8 +219,6 @@ pub fn cmd_responder(cmd_server_ip             : String,
                             let preamp_id: u8 = ((value | (MASK_CMD_8BIT << 16)) >> 16) as u8;
                             // MSB third 16 bits are extra (not used)
                             let preamp_bias: u16 = (value | MASK_CMD_16BIT) as u16;
-                            // TODO it seems that the preamps are controlled together, is this
-                            // wanted?
                             match send_preamp_bias_set(preamp_id, preamp_bias) {
                               Err(err) => warn!("Can not set preamp bias! Err {err}"),
                               Ok(_)    => trace!("Resp sent!")

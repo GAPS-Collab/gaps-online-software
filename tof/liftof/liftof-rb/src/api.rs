@@ -6,14 +6,6 @@ use std::fs::read_to_string;
 
 
 use tof_dataclasses::serialization::Serialization;
-cfg_if::cfg_if! {
-  if #[cfg(feature = "tofcontrol")]  {
-  use tof_dataclasses::calibrations::RBCalibrations;
-  use tof_dataclasses::errors::{CalibrationError,
-                                RunError,
-                                SetError};
-  }
-}
 use std::path::Path;
 use std::time::{Duration,
                 Instant};
@@ -36,6 +28,10 @@ use tof_dataclasses::serialization::get_json_from_file;
 // Takeru's tof-control
 cfg_if::cfg_if! {
   if #[cfg(feature = "tofcontrol")]  {
+    use tof_dataclasses::calibrations::RBCalibrations;
+    use tof_dataclasses::errors::{CalibrationError,
+                                  RunError,
+                                  SetError};
     // for calibration
     use tof_control::rb_control::rb_mode::{select_noi_mode,
                                           select_vcal_mode,
@@ -43,6 +39,7 @@ cfg_if::cfg_if! {
                                           select_sma_mode};
     // for threshold setting
     use tof_control::preamp_control::preamp_bias;
+    use tof_control::ltb_control::ltb_dac;
 
     const FIVE_SECONDS: Duration = time::Duration::from_millis(5000);
   }
@@ -964,5 +961,11 @@ pub fn setup_drs4() -> Result<(), RegisterError> {
 #[cfg(feature = "tofcontrol")]
 pub fn send_preamp_bias_set(preamp_id: u8, bias_voltage: u16) -> Result<(), SetError> {
   preamp_bias::PreampBiasSet::set_bias_manual_id(preamp_id, bias_voltage as f32);
+  Ok(())
+}
+
+#[cfg(feature = "tofcontrol")]
+pub fn send_ltb_threshold_set(ltb_id: u8, threshold_level: u16) -> Result<(), SetError> {
+  ltb_dac::LTBdac::set_threshold_ch(ltb_id, threshold_level as f32);
   Ok(())
 }

@@ -380,13 +380,13 @@ fn main() {
           match set_cmd {
             liftof_lib::SetCmd::LtbThreshold(lbt_threshold_opts) => {
               let ltb_id = lbt_threshold_opts.ltb_id;
-              let threshold_level = lbt_threshold_opts.threshold_level;
-              // match send_preamp_bias_set(&rc_to_runner_cal, rc_config, run_type, rb_id, event_no, time) {
-              //   Ok(_) => (),
-              //   Err(err) => {
-              //     error!("Timing calibration data taking failed! Error {err}!");
-              //   }
-              // }
+              let threshold_level: u16 = lbt_threshold_opts.threshold_level;
+              match send_ltb_threshold_set(ltb_id, threshold_level) {
+                Ok(_) => (),
+                Err(err) => {
+                  error!("Unable to set preamp bias! Error {err}!");
+                }
+              }
             },
             liftof_lib::SetCmd::PreampBias(preamp_bias_opts) => {
               let preamp_id = preamp_bias_opts.preamp_id;
