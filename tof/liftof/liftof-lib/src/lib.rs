@@ -1044,19 +1044,15 @@ impl TimingOpts {
 /// Power cmds ====================================================
 #[derive(Debug, Subcommand, PartialEq)]
 pub enum PowerCmd {
-  /// Power up everything (PB + RB + LTB + preamps + MT)
+  /// Power up everything (LTB + preamps + MT)
   All(PowerStatus),
   /// Power up MT alone
   MT(PowerStatus),
-  /// Power up everything but MT (PB + RB + LTB + preamps)
+  /// Power up everything but MT (LTB + preamps)
   AllButMT(PowerStatus),
-  /// Power up all or specific PBs
-  PB(PBPowerOpts),
-  /// Power up all or specific RBs
-  RB(RBPowerOpts),
   /// Power up all or specific LTBs
   LTB(LTBPowerOpts),
-  /// Power up all or specific preamp
+  /// Power up all or specific preamp (changes bias)
   Preamp(PreampPowerOpts)
 }
 
@@ -1078,20 +1074,16 @@ impl PowerStatus {
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 #[repr(u8)]
 pub enum TofComponent {
-  /// everything (PB + RB + LTB + preamps + MT)
+  /// everything (LTB + preamps + MT)
   All       = 0u8,
   /// MT alone
   MT        = 10u8,
-  /// everything but MT (PB + RB + LTB + preamps)
+  /// everything but MT (LTB + preamps)
   AllButMT  = 20u8,
-  /// all or specific PBs
-  PB        = 30u8,
-  /// all or specific RBs
-  RB        = 40u8,
   /// all or specific LTBs
-  LTB       = 50u8,
+  LTB       = 30u8,
   /// all or specific preamp
-  Preamp    = 60u8
+  Preamp    = 40u8
 }
 
 impl fmt::Display for TofComponent {
@@ -1112,8 +1104,6 @@ impl TryFrom<u8> for TofComponent {
       0u8  => Ok(TofComponent::All),
       10u8 => Ok(TofComponent::MT),
       20u8 => Ok(TofComponent::AllButMT),
-      30u8 => Ok(TofComponent::PB),
-      40u8 => Ok(TofComponent::RB),
       50u8 => Ok(TofComponent::LTB),
       60u8 => Ok(TofComponent::Preamp),
       _    => Err("I am not sure how to convert this value!")

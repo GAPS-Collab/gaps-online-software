@@ -437,16 +437,6 @@ fn main() {
           let power_status_enum: PowerStatusEnum = power_status.power_status;
           liftof_cc::send_power(cmd_sender, TofComponent::AllButMT, power_status_enum);
         },
-        PowerCmd::PB(pb_power_opts) => {
-          let power_status_enum: PowerStatusEnum = pb_power_opts.power_status;
-          let pb_id = pb_power_opts.pb_id;
-          liftof_cc::send_power_ID(cmd_sender, TofComponent::PB, power_status_enum, pb_id);
-        },
-        PowerCmd::RB(rb_power_opts) => {
-          let power_status_enum: PowerStatusEnum = rb_power_opts.power_status;
-          let rb_id = rb_power_opts.rb_id;
-          liftof_cc::send_power_ID(cmd_sender, TofComponent::RB, power_status_enum, rb_id);
-        },
         PowerCmd::LTB(ltb_power_opts) => {
           let power_status_enum: PowerStatusEnum = ltb_power_opts.power_status;
           let ltb_id = ltb_power_opts.ltb_id;
