@@ -391,7 +391,7 @@ fn main() {
             liftof_lib::SetCmd::PreampBias(preamp_bias_opts) => {
               let preamp_id = preamp_bias_opts.preamp_id;
               let preamp_bias = preamp_bias_opts.preamp_bias;
-              match send_preamp_bias_set(preamp_bias) {
+              match send_preamp_bias_set(preamp_id, preamp_bias) {
                 Ok(_) => (),
                 Err(err) => {
                   error!("Unable to set preamp bias! Error {err}!");

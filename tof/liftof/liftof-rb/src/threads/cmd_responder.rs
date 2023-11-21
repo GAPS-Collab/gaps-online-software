@@ -219,7 +219,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
                             let preamp_bias: u16 = (value | MASK_CMD_16BIT) as u16;
                             // TODO it seems that the preamps are controlled together, is this
                             // wanted?
-                            match send_preamp_bias_set(preamp_bias) {
+                            match send_preamp_bias_set(preamp_id, preamp_bias) {
                               Err(err) => warn!("Can not set preamp bias! Err {err}"),
                               Ok(_)    => trace!("Resp sent!")
                             }

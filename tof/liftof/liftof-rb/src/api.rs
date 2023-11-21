@@ -962,8 +962,7 @@ pub fn setup_drs4() -> Result<(), RegisterError> {
 }
 
 #[cfg(feature = "tofcontrol")]
-// TODO We cant do much until we know more
-pub fn send_preamp_bias_set(bias_voltage: u16) -> Result<(), SetError> {
-  preamp_bias::PreampBiasSet::set_bias_manual(bias_voltage as f32);
+pub fn send_preamp_bias_set(preamp_id: u8, bias_voltage: u16) -> Result<(), SetError> {
+  preamp_bias::PreampBiasSet::set_bias_manual_id(preamp_id, bias_voltage as f32);
   Ok(())
 }

@@ -160,8 +160,8 @@ pub fn send_ltb_threshold(cmd_sender: Sender<TofPacket>,
                           threshold_level: u16) {
   let payload: u32
   = PAD_CMD_32BIT | (ltb_id as u32) << 16 | (threshold_level as u32);
-  let run_start = TofCommand::SetThresholds(payload);
-  let tp = TofPacket::from(&run_start);
+  let ltb_threshold = TofCommand::SetThresholds(payload);
+  let tp = TofPacket::from(&ltb_threshold);
   match cmd_sender.send(tp) {
     Err(err) => error!("Unable to send command, error{err}"),
     Ok(_)    => ()
@@ -175,8 +175,8 @@ pub fn send_preamp_bias(cmd_sender: Sender<TofPacket>,
                         preamp_bias: u16) {
   let payload: u32
   = PAD_CMD_32BIT | (preamp_id as u32) << 16 | (preamp_bias as u32);
-  let run_start = TofCommand::SetThresholds(payload);
-  let tp = TofPacket::from(&run_start);
+  let preamp_bias = TofCommand::SetPreampBias(payload);
+  let tp = TofPacket::from(&preamp_bias);
   match cmd_sender.send(tp) {
     Err(err) => error!("Unable to send command, error{err}"),
     Ok(_)    => ()
