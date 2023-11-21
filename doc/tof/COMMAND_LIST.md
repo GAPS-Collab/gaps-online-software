@@ -41,7 +41,6 @@ The commands follow Sydney's list (Pad stands for padding):
 | -------------- | ------- | --------- | ---- |
 | 10,11,12 | Power on/off to PBs + RBs + LTBs + preamps (all at once) or MT | < 5/day Command to power on/off PDU channels (to PDU). Even though PDU seems the only thing that one can target, the command has room for every component | Component:u8, ComponentID: u8, Status:u16 |
 | 10,11,12 | Power on/off to LTB or preamp | < 2/day Command to power on/off various components (to TOF -> to RB)             | Pad:u16+u8, RB:u8 |
-| 20 | RBsetup ? Command to run rbsetup on a particular RB or all (to TOF -> to RBs) | THIS MIGHT NOT BE NEEDED ANYMORE | Pad:u16+u8, RB:u8 |
 | 21 | Set Thresholds  | < 3/day Command to set a threshold level on all LTBs (to TOF -> to  RBs)                             | Pad:u8, LTB_ID:u8, Level:u16 |
 | 22 | Set MT Config 1/run | <10/day? Command to set MT trigger config (to TOF -> to MT)                                      | Pad:u16, TriggerConfig:u16 |
 | 28 | Set preamp bias  | < 3/day Command to set a preamp bias on all preamps (to TOF -> to  RBs)                             | Pad:u8, Preamp_ID:u8, Preamp_level:u16 |
@@ -54,7 +53,6 @@ The commands follow Sydney's list (Pad stands for padding):
 | 51 | Voltage Calibration for an RB or all | Runs 1/day Command to take 2 voltage calibration runs (to TOF -> to RBs) 12 B                    | VoltageLevel:u16, RB:u8, Extra:u8 |
 | 52 | Timing Calibration for an RB or all | Run 1/day Command to take a timing calibration run (to TOF -> to RBs) 8 B                        | VoltageLevel:u16, RB:u8, Extra:u8 |
 | 53 | Default Calibration for an RB or all | ???                    | VoltageLevel:u16, RB:u8, Extra:u8 |
-| 54 | Create New Calibration File for an RB or all | Comment: does this really make sense? Whats the point of having a command that creates a file? Shouldnt it be integrated w/ smth else? | Pad:u8, VoltageLevel: u16, RB:u8 |
 
 Note: when "all" is needed it will be rendered as all ones.
 

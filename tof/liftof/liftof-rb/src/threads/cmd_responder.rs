@@ -183,14 +183,6 @@ pub fn cmd_responder(cmd_server_ip             : String,
                         }
                         continue;
                       },
-                      TofCommand::RBSetup   (_mask) => {
-                        warn!("Not implemented");
-                        match cmd_socket.send(resp_not_implemented,0) {
-                          Err(err) => warn!("Can not send response! Err {err}"),
-                          Ok(_)    => trace!("Resp sent!")
-                        }
-                        continue;
-                      }, 
                       TofCommand::SetThresholds   (value) =>  {
                         cfg_if::cfg_if! {
                           if #[cfg(feature = "tofcontrol")]  {
@@ -427,14 +419,6 @@ pub fn cmd_responder(cmd_server_ip             : String,
                             continue;
                           }
                         }
-                      },
-                      TofCommand::CreateCalibrationFile (_) => {
-                        warn!("Not implemented");
-                        match cmd_socket.send(resp_not_implemented,0) {
-                          Err(err) => error!("Can not send response! Err {err}"),
-                          Ok(_)    => trace!("Resp sent!")
-                        }
-                        continue;
                       },
                       TofCommand::RequestMoni (_) => {
                         warn!("Not implemented");
