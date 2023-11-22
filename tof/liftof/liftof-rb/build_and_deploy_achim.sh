@@ -1,42 +1,47 @@
 #! /bin/sh
+get_version() {
+  # build it for this architecture so we can parse the version
+  cargo build --release --bin=liftof-rb
+  VERSION=`../target/release/liftof-rb -V`
+  IFS=' '
+  read -ra arr <<< "$VERSION"
+  for val in "${arr[@]}";
+    do
+      VERSION=$val;
+    done
+  echo "$VERSION"
+}
+
 deploy_target() {
-  scp ../target/armv7-unknown-linux-musleabi/release/$1 $2:~/bin/$1-0.8.2
+  scp ../target/armv7-unknown-linux-musleabi/release/$1 $3:~/bin/$1-$2
+}
+
+compile_target() {
+  # first delete everything, since there might be remains of a previously issued cargo check
+  rm -rf ../target/armv7-unknown*
+  CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" cross build --bin $1 --target=armv7-unknown-linux-musleabi --features=tofcontrol --release 
 }
 
 compile_and_deploy_target() {
-  CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" cross build --bin $1 --target=armv7-unknown-linux-musleabi --features=tofcontrol --release && deploy_target $1 $2
+  compile_target $1 $2
+  cp ../target/armv7-unknown-linux-musleabi/release/$1 ../target/armv7-unknown-linux-musleabi/release/$1-$version
+  deploy_target $1 $version $2
 }
 
+# UCLA test stand
+UCLA_RB="ucla-tof-rb05 ucla-tof-rb28 ucla-tof-rb33 ucla-tof-rb34"
 
-# first delete everything, since there might be remains of a previously issued cargo check
-rm -rf ../target/armv7-unknown*
+compile_target liftof-rb
+version=$(get_version)
+for rb in `echo $UCLA_RB`;
+  do
+    echo "Deploying liftof-rb V$version to $rb" 
+    deploy_target liftof-rb $version $rb;
+done;
 
-# RBs at SSL
-SSL_RB="tof-rb01 tof-rb02 tof-rb03 tof-rb04 tof-rb07 tof-rb08 tof-rb09 tof-rb11 tof-rb12 tof-rb13 tof-rb14 tof-rb15 tof-rb16 tof-rb17 tof-rb18 tof-rb19 tof-rb20 tof-rb22 tof-rb24 tof-rb25 tof-rb26 tof-rb27"
-
-#for rb in `echo $SSL_RB`; 
+#for rb in `echo $UCLA_RB`; 
 #  do echo $rb;
 #  scp liftof.service $rb:bin/;
 #  scp -r configs $rb:config;
 #done
-
-compile_and_deploy_target liftof-rb ucla-tof-rb16
-#deploy_target liftof-rb nevis-rb32
-#deploy_target liftof-rb nevis-rb31
-#deploy_target liftof-rb nevis-rb23
-##scp configs/runconfig-example.json nevis-rb21:config/
-##scp configs/runconfig-example.json nevis-rb23:config/
-#
-##
-##compile_and_deploy_target liftof-rb nevis-rb13
-#deploy_target liftof-rb nevis-rb13
-#deploy_target liftof-rb nevis-rb35
-#deploy_target liftof-rb nevis-rb24
-#deploy_target liftof-rb nevis-rb27
-#for k in 13 35 24 27; do
-#scp configs/runconfig-example.json nevis-rb$k:config/
-#done;
-
-#compile_and_deploy_target liftof-rb ucla-tof-rb16
-#deploy_target liftof-rb ucla-tof-rb43
 
