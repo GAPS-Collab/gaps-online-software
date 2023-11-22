@@ -47,11 +47,6 @@ fn main() {
   let mut input_dir = args.input_data;
   input_dir += "*.tof.gaps";
 
-  let events1 = Vec::<RBEvent>::new();
-  let events2 = Vec::<RBEvent>::new();
-  let events3 = Vec::<RBEvent>::new();
-  let events4 = Vec::<RBEvent>::new();
-
   let mut events = Vec::<Vec<RBEvent>>::new();
   if let Ok(entries) = glob(input_dir.as_str()) { 
     for entry in entries.enumerate() {
@@ -69,7 +64,7 @@ fn main() {
               if tp.packet_type == PacketType::RBEvent {
                 let event = RBEvent::from_bytestream(&tp.payload, &mut 0);
                 match event {
-                  Err(err) => (),
+                  Err(err) => error!("Can not unpack RBEvent! {err}"),
                   Ok(ev) => {
                     events[entry.0].push(ev);
                   }

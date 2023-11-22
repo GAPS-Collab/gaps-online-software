@@ -20,21 +20,13 @@ use indicatif::{ProgressBar,
 
 use clap::Parser;
 use std::path::PathBuf;
-use std::path::Path;
 use std::collections::HashMap;
 
 use std::process::exit;
 
-use tof_dataclasses::packets::{PacketType,
-                               TofPacket};
-use tof_dataclasses::events::{RBEvent,
-                              RBEventMemoryView,
-                              MasterTriggerEvent};
-use tof_dataclasses::serialization::{Serialization,
-                                     search_for_u16};
+use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::calibrations::RBCalibrations;
 use tof_dataclasses::io::{
-    read_file,
     RobinReader
 }; 
 
@@ -66,14 +58,8 @@ fn main() {
 
 
   let args               = Args::parse();
-  let noi_pattern        = String::from(".noi");
-  let vcal_pattern       = String::from(".vcal");
-  let tcal_pattern       = String::from(".tcal");
   let mut board_ids      = Vec::<u8>::new(); 
   let mut calibrations   = HashMap::<u8, RBCalibrations>::new();
-  let board_events_noi   = HashMap::<u8, Vec<RBEvent>>::new();
-  let board_events_tcal  = HashMap::<u8, Vec<RBEvent>>::new();
-  let board_events_vcal  = HashMap::<u8, Vec<RBEvent>>::new();
   let rb_pattern = r#"rb(\d{1,2})"#; 
   let rb_regex   = Regex::new(rb_pattern).unwrap();
   let template_bar   : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.blue/grey} {human_pos:>7}/{human_len:7} ";
@@ -141,7 +127,13 @@ fn main() {
   for rb in board_ids.iter() {
     println!("=> Cali: {}",calibrations[&rb]);
     calibrations.get_mut(&rb).unwrap().clean_input_data();
-    calibrations.get_mut(&rb).unwrap().calibrate();
+    match calibrations.get_mut(&rb).unwrap().calibrate() {
+      Ok(_) => (),
+      Err(err) => {
+        error!("Can not calibrate data for RB {}! {err}", rb);
+        exit(1);
+      }
+    }
     println!("=> Cali: {}",calibrations[&rb]);
     calibrations.get_mut(&rb).unwrap().serialize_event_data = true;
     let tp   = TofPacket::from(&calibrations[&rb]);
