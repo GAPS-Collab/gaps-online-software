@@ -4,6 +4,14 @@ version = "0.8.0"
 edition = "2021"
 
 [[bin]]
+name = "rb-calibration"
+path = "src/bin/rb_calibration.rs"
+
+[[bin]]
+name = "merge-ucla"
+path = "src/bin/merge_ucla.rs"
+
+[[bin]]
 name = "liftof-analysis"
 path = "src/main.rs"
 
@@ -13,6 +21,9 @@ path = "src/bin/robin_reader.rs"
 [[bin]]
 name = "merge-calib"
 path = "src/bin/merge_calib.rs"
+[[bin]]
+name = "liftof-file-inspector"
+path = "src/file_inspector.rs"
 
 [dependencies]
 liftof-lib = { path = "../liftof-lib"} 
