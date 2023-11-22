@@ -45,17 +45,23 @@ fn main() {
   if args.recalibrate != String::from("") {
     println!("=> Will recalibrate {}", args.recalibrate);
     let mut reader = TofPacketReader::new(args.recalibrate);
-    let mut cali   = RBCalibrations::new(0);
+    let mut cali   : RBCalibrations;
     match reader.next() {
       None => {
         error!("Can not read from inputfile!");
       },
       Some(tp) => {
         match RBCalibrations::from_bytestream(&tp.payload, &mut 0) {
-          Err(err) => error!("Can not decode RBCalibration from input file!"),
+          Err(err) => error!("Can not decode RBCalibration from input file! {err}"),
           Ok(_cali) => {
             cali = _cali;
-            cali.calibrate();
+            match cali.calibrate() {
+              Err(err) => {
+                error!("Calibration failed, exiting! {err}");
+                exit(1);
+              },
+              Ok(_) => ()
+            }
             let rb_id = cali.rb_id;
             let mut outfile = String::from("rb");
             if rb_id < 10 {
@@ -111,7 +117,13 @@ fn main() {
       }
     }
   }
-  cali.calibrate();
+  match cali.calibrate() {
+    Err(err) => {
+      error!("Calibration failed, exiting! {err}");
+      exit(1);
+    },
+    Ok(_) => ()
+  }
   let mut writer = TofPacketWriter::new("rb27.cali.tof.gaps".to_string());
   let pack       = TofPacket::from(&cali);
   writer.add_tof_packet(&pack);
