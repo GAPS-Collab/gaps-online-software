@@ -24,7 +24,11 @@ pub use crate::monitoring::{RBMoniData,
                             MtbMoniData};
 use crate::serialization::{Serialization, 
                            parse_u32};
-use crate::errors::SerializationError;
+use std::error::Error;
+use crate::errors::{
+    SerializationError,
+    PacketError
+};
 use crate::events::{RBEventHeader,
                     RBEvent,
                     MasterTriggerEvent,
@@ -125,7 +129,16 @@ impl TofPacket {
       valid            : true,
     }
   }
-  
+
+  /// Unpack possible content
+  pub fn unpack_rbevent(&self) -> Result<RBEvent, Box<dyn Error>> {
+    if self.packet_type != PacketType::RBEvent {
+      error!("We expeckt packet type {}, but got packet type {} instead!", PacketType::RBEvent, self.packet_type);
+      return Err(Box::new(PacketError::WrongPacketType));
+    }
+    Ok(RBEvent::from_bytestream(&self.payload, &mut 0)?)
+  }
+
   /// Event can time out after specified time
   pub fn has_timed_out(&self) -> bool {
     return self.age() > EVENT_TIMEOUT;
