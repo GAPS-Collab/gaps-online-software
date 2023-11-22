@@ -116,6 +116,7 @@ fn main() {
         reader.cache_all_events();
         let mut events = reader.get_events();
         events.dedup();
+        events.sort_by(|a, b| a.header.event_id.cmp(&b.header.event_id));
         cali.tcal_data = events;
       } else if filename.to_string().ends_with(".noi") {
         let mut reader    = RobinReader::new(filename.to_string());
@@ -139,6 +140,7 @@ fn main() {
   board_ids.dedup();
   for rb in board_ids.iter() {
     println!("=> Cali: {}",calibrations[&rb]);
+    calibrations.get_mut(&rb).unwrap().clean_input_data();
     calibrations.get_mut(&rb).unwrap().calibrate();
     println!("=> Cali: {}",calibrations[&rb]);
     calibrations.get_mut(&rb).unwrap().serialize_event_data = true;
