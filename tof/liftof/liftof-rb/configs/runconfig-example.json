@@ -1,10 +1,10 @@
 {
-  "nevents"                 : 0,
+  "nevents"                 : 30000,
   "is_active"               : true,
   "nseconds"                : 0,
   "stream_any"              : true,
   "trigger_poisson_rate"    : 0,
-  "trigger_fixed_rate"      : 0,
+  "trigger_fixed_rate"      : 50,
   "latch_to_mtb"            : false,
   "data_type"               : "Physics",
   "rb_buff_size"            : 2000
