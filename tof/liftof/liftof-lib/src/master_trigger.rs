@@ -46,12 +46,6 @@ const MT_MAX_PACKSIZE   : usize = 1024;
 const N_LTBS : usize = 20;
 const N_CHN_PER_LTB : usize = 16;
 
-/// Helper function to separate a u32 into two u15
-fn extract_values_from_32bit(number: u32) -> (u16, u16) {
-  let lower_bits = number as u16;
-  let upper_bits = (number >> 16) as u16;
-  (lower_bits, upper_bits)
-}
 
 /// The IPBus standard encodes several packet types.
 ///
@@ -433,12 +427,10 @@ pub fn master_trigger(mt_ip             : &str,
                       verbose           : bool) {
 
   let mt_address = mt_ip.to_owned() + ":" + &mt_port.to_string(); 
-  let mut connected  = false;
-  let connection_timeout = Duration::from_millis(10); // random number
 
   // data buffer for MTB readout - allocate once and reuse
   let mut buffer = [0u8;MT_MAX_PACKSIZE];  
-
+  
   // FIXME - this panics. However, it seems there is no way to init an UdpSocket 
   // without binding it. And if it can't bind, it panics.
   let mut socket = connect_to_mtb(&mt_address).expect("Can not establish initial connection to MTB");
@@ -486,7 +478,7 @@ pub fn master_trigger(mt_ip             : &str,
       error!("MTB timed out! Attempting to reconnnect...");
       match connect_to_mtb(&mt_address) {
         Err(err) => {
-          error!("Can not establish initial connection to MTB");
+          error!("Can not establish initial connection to MTB! {err}");
         }
         Ok(_sock) => {
           info!(".. connected!");
@@ -519,7 +511,7 @@ pub fn master_trigger(mt_ip             : &str,
     }
     match get_mtevent(&socket, &mt_address, &mut buffer) {
       Err(err) => {
-        error!("Unable to get MasterTriggerEvent!");
+        error!("Unable to get MasterTriggerEvent! {err}");
         continue;
       },
       Ok(_ev) => {
