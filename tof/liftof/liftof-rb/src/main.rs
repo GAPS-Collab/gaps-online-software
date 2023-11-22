@@ -231,23 +231,6 @@ fn main() {
   let (opmode_to_cache, opmode_from_runner)     : 
       (Sender<TofOperationMode>, Receiver<TofOperationMode>)                = unbounded();
   let (bs_send, bs_recv)             : (Sender<Vec<u8>>, Receiver<Vec<u8>>) = unbounded(); 
-
-
-  
-  // ucla debugging
-  //match setup_drs4() {
-  //  Ok(_)    => (),
-  //  Err(err) => {
-  //    panic!("Setup drs4 failled! Error {err}");
-  //  }
-  //}
-  //match set_active_channel_mask_with_ch9(255) {
-  //  Ok(_) => (),
-  //  Err(err) => {
-  //    panic!("Settint the ch9 register failed!");
-  //  }
-  //}
-  //write_control_reg(0x44,u32::MAX);
   
   //FIXME - restrict to actual number of threads
   let n_threads = 8;

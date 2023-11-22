@@ -1,17 +1,9 @@
 //! Higher level functions, to deal with events/binary reprentation of it, 
 //! configure the drs4, etc.
-use std::net::IpAddr;
-use local_ip_address::local_ip;
 use std::fs::read_to_string;
 
 
 use tof_dataclasses::serialization::Serialization;
-cfg_if::cfg_if! {
-  if #[cfg(feature = "tofcontrol")]  {
-  use tof_dataclasses::calibrations::RBCalibrations;
-  use tof_dataclasses::errors::CalibrationError;
-  }
-}
 use std::path::Path;
 use std::time::{Duration,
                 Instant};
@@ -26,19 +18,22 @@ use tof_dataclasses::events::{RBEvent,
                               DataType};
 use tof_dataclasses::commands::TofCommand;
 use tof_dataclasses::packets::TofPacket;
-use tof_dataclasses::monitoring::RBMoniData;
 use tof_dataclasses::errors::SerializationError;
 use tof_dataclasses::run::RunConfig;
-use tof_dataclasses::serialization::get_json_from_file;
 
 // Takeru's tof-control
 cfg_if::cfg_if! {
   if #[cfg(feature = "tofcontrol")]  {
+    use std::net::IpAddr;
+    use local_ip_address::local_ip;
+    use tof_dataclasses::calibrations::RBCalibrations;
+    use tof_dataclasses::errors::CalibrationError;
+    use tof_dataclasses::monitoring::RBMoniData;
     // for calibration
     use tof_control::rb_control::rb_mode::{select_noi_mode,
-                                          select_vcal_mode,
-                                          select_tcal_mode,
-                                          select_sma_mode};
+                                           select_vcal_mode,
+                                           select_tcal_mode,
+                                           select_sma_mode};
   }
 }
 
