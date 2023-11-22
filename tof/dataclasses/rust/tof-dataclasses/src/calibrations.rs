@@ -17,6 +17,9 @@ use std::time::{SystemTime,
                 Duration,
                 UNIX_EPOCH};
 
+//extern crate streaming_stats;
+//use streaming_stats::{OnlineStats, OrderStats};
+
 use crate::constants::{NWORDS, NCHN};
 use crate::errors::{WaveformError,
                     CalibrationError};
@@ -29,6 +32,7 @@ use crate::serialization::{Serialization,
                            SerializationError};
 use crate::events::RBEvent;
 use crate::events::rb_event::unpack_traces_f32;
+
 use crate::packets::{PacketType,
                      TofPacket};
 use crate::io::read_file;
@@ -75,7 +79,10 @@ impl TryFrom<u8> for Edge {
       10u8 => Ok(Edge::Falling),
       20u8 => Ok(Edge::Average),
       30u8 => Ok(Edge::None),
-      _    => Err("I am not sure how to convert this value!")
+      _    => {
+        error!("{} is not a valid Edge!", value);
+        Err("I am not sure how to convert this value!")
+      }
     }
   }
 }
@@ -107,6 +114,74 @@ where P: AsRef<Path>, {
 
 /***********************************/
 
+fn trace_check(event : &RBEvent) -> bool {
+  let mut check = true;
+  let mut nchan = 0usize;
+  for ch in event.header.get_channels() {
+    if event.adc[ch as usize].len() != 1024 {
+      check = false;
+    }
+    nchan += 1;
+  }
+  check && nchan == NCHN
+}
+
+/***********************************/
+
+fn clean_spikes(traces : &mut Vec<Vec<Vec<f32>>>,vcaldone : bool) {
+  //# TODO: make robust (symmetric, doubles, fixed/estimated spike height)
+  let mut thresh : f32 = 360.0;
+  if vcaldone {
+    thresh = 16.0;
+  }
+  let mut spikes = Vec::<usize>::new();
+
+  // remember the structure of the traces here    
+  //nevents,nchan,tracelen = gbf.traces.shape
+  // we have chan, events, tracelen instead
+  let mut spikefilter0 = Vec::<f32>::new(); 
+  let mut spikefilter1 = Vec::<f32>::new();
+  let mut spikefilter2 = Vec::<f32>::new();
+  let mut spikefilter3 = Vec::<f32>::new();
+  let mut spf_allch    = vec![0usize;1023];
+  for ch in 0..traces.len() {
+    for ev in 0..traces[ch].len() {
+      let tracelen = traces[ch][ev].len();
+      spikefilter0 = (&traces[ch][ev][0..tracelen-3]).to_vec();
+      spikefilter1 = (&traces[ch][ev][1..tracelen-2]).to_vec();
+      spikefilter2 = (&traces[ch][ev][2..tracelen-1]).to_vec();
+      spikefilter3 = (&traces[ch][ev][3..tracelen]).to_vec();
+    }
+    let spf_len = spikefilter0.len();
+    let mut spf_sum = vec![0f32;1024];
+    for k in 0..spf_len {
+      spf_sum[k] += spikefilter1[k] - spikefilter0[k] + spikefilter2[k] - spikefilter3[k];
+    }
+    for k in 0..spf_len {
+      if spf_sum[k] > thresh {
+        spf_allch[k] += 1;
+      }
+    }
+  }
+  let mut spikes = Vec::<usize>::new();
+  for k in 0..spf_allch.len() {
+    if spf_allch[k] >= 2 {
+      spikes.push(k);
+    }
+  }
+  for spike in spikes.iter() {
+    for ch in 0..traces.len() {
+      for ev in 0..traces[ch].len() {
+        let dV : f32 = (traces[ch][ev][spike+3] - traces[ch][ev][*spike])/3.0;
+        traces[ch][ev][spike+1] = traces[ch][ev][*spike] + dV;
+        traces[ch][ev][spike+2] = traces[ch][ev][*spike] + 2.0*dV;
+      }
+    }
+  }
+}
+
+/***********************************/
+
 /// Designed to match np.where(np.diff(np.signbit(trace)))[0] 
 pub fn find_zero_crossings(trace: &Vec<f32>) -> Vec<usize> {
   let mut zero_crossings = Vec::new();
@@ -116,10 +191,10 @@ pub fn find_zero_crossings(trace: &Vec<f32>) -> Vec<usize> {
       zero_crossings.push(i - 1);
     }
     if i < trace.len() - 1 {
-      if (trace[i - 1] > 0.0 && trace[i] == 0.0 && trace[i+1] < 0.0) {
+      if trace[i - 1] > 0.0 && trace[i] == 0.0 && trace[i+1] < 0.0 {
         zero_crossings.push(1);
       }
-      if (trace[i - 1] < 0.0 && trace[i] == 0.0 && trace[i+1] > 0.0) {
+      if trace[i - 1] < 0.0 && trace[i] == 0.0 && trace[i+1] > 0.0 {
         zero_crossings.push(i);
       }
     }
@@ -151,9 +226,13 @@ pub fn get_periods(trace   : &Vec<f32>,
   //info!("firstbin {} lastbin {}", firstbin, lastbin);
   let mut vec_for_median = Vec::<f32>::new();
   for bin in firstbin..lastbin {
+    if trace[bin].is_nan() {
+      continue;
+    }
     vec_for_median.push(trace[bin]);
   }
   let median_val = median(&vec_for_median);
+  debug!("median val {median_val}");
   for k in 0..trace_c.len() {
     trace_c[k] -= median_val;
   }
@@ -188,12 +267,12 @@ pub fn get_periods(trace   : &Vec<f32>,
       }
     }
   }
-  
+  debug!("Found {} zero crossings!", zcs_filter.len()); 
   zcs = zcs_filter;
   if zcs.len() < 3 {
     return (zcs, periods);
   }
-  
+ 
   for k in 0..zcs.len() -1 {
     let zcs_a  = &zcs[k];
     let zcs_b  = &zcs[k+1];
@@ -205,31 +284,24 @@ pub fn get_periods(trace   : &Vec<f32>,
     let tr_a   = &trace_c[*zcs_a..*zcs_a+2];
     let tr_b   = &trace_c[*zcs_b..*zcs_b+2];
     let mut period : f32 = 0.0;
+    let mut n_zeros = 0usize;
     for n in zcs_a+1..*zcs_b {
       period += dts[n];
     }
-    println!("tra - {:?}", tr_a);
-    println!("trb = {:?}", tr_b);
-    println!("per - {}", period);
     period += dts[*zcs_a]*f32::abs(tr_a[1]/(tr_a[1] - tr_a[0])); // first semi bin
-    println!("per - {}", period);
     period += dts[*zcs_b]*f32::abs(tr_b[0]/(tr_b[1] - tr_b[0])); // first semi bin
-    println!("per - {}", period);
     if period.is_nan() {
-      warn!("NAN in period found!");
-      //println!("tr_a {} {}", tr_a[1], tr_a[0]);
-      //println!("tr_a {} {}", tr_b[1], tr_b[0]);
+      error!("NAN in period found!");
       continue;
     }
-    //println!("zcs_b, zcs_a, nperiod {} {} {}", zcs_b, zcs_a, nperiod);
-    //if f32::abs((zcb-zca)-nperiod as usize) > 5:
-    //         zcs = zcs[:i+1]
+    
     if f32::abs(*zcs_b as f32 - *zcs_a as f32 - nperiod) > 5.0 {
       let mut zcs_tmp = Vec::<usize>::new();
       zcs_tmp.extend_from_slice(&zcs[0..k+1]);
       zcs = zcs_tmp;
       break;
     }
+    trace!("zcs_a, zcs_b, period, nperiod {} {} {} {}", zcs_a, zcs_b, period, nperiod);
     periods.push(period);
   }
   debug!("Calculated {} zero-crossings and {} periods!", zcs.len(), periods.len());
@@ -243,10 +315,15 @@ fn mean(input: &Vec<f32>) -> f32 {
     error!("Vector is empty, can not calculate mean!");
     return f32::NAN;
   }
-  let n_entries = input.len() as f32;
+  let mut n_entries : f32 = 0.0;
   let mut sum : f32 = 0.0;
   for k in input.iter() {
+    if k.is_nan() {
+      continue;
+      
+    }
     sum += k;
+    n_entries += 1.0;
   }
   sum / n_entries
 }
@@ -254,25 +331,26 @@ fn mean(input: &Vec<f32>) -> f32 {
 /***********************************/
 
 fn median(input: &Vec<f32>) -> f32 {
-  let mut data = input.clone();
-  
-  let len = data.len();
-  if len == 0 {
-    error!("Vector is empty, can not calculate median!");
-    return f32::NAN;
-  }
-  // TODO This might panic! Is it ok?
-  data.sort_by(|a, b| a.partial_cmp(b).unwrap());
+  statistical::median(input)
+  //let mut data = input.clone();
+  //
+  //let len = data.len();
+  //if len == 0 {
+  //  error!("Vector is empty, can not calculate median!");
+  //  return f32::NAN;
+  //}
+  //// TODO This might panic! Is it ok?
+  //data.sort_by(|a, b| a.partial_cmp(b).unwrap());
 
-  if len % 2 == 0 {
-    // If the vector has an even number of elements, calculate the average of the middle two
-    let mid = len / 2;
-    (data[mid - 1] + data[mid]) / 2.0
-  } else {
-    // If the vector has an odd number of elements, return the middle element
-    let mid = len / 2;
-    data[mid]
-  }
+  //if len % 2 == 0 {
+  //  // If the vector has an even number of elements, calculate the average of the middle two
+  //  let mid = len / 2;
+  //  (data[mid - 1] + data[mid]) / 2.0
+  //} else {
+  //  // If the vector has an odd number of elements, return the middle element
+  //  let mid = len / 2;
+  //  data[mid]
+  //}
 }
 
 /***********************************/
@@ -285,7 +363,6 @@ fn calculate_column_medians(data: &Vec<Vec<f32>>) -> Vec<f32> {
   // Get the number of columns (assuming all sub-vectors have the same length)
   let num_columns = data[0].len();
   let num_rows    = data.len();
-  //println!("num rows {}", num_rows);
   // Initialize a Vec to store the column-wise medians
   let mut column_medians: Vec<f32> = vec![0.0; num_columns];
   debug!("Calculating medians for {} columns!", num_columns);
@@ -297,19 +374,16 @@ fn calculate_column_medians(data: &Vec<Vec<f32>>) -> Vec<f32> {
     for k in 0..num_rows {
       col_vals[k] = data[k][col];
     }
-    //println!("{:?}", col_vals);
     col_vals.retain(|x| !x.is_nan());
-    //println!("len col_vals {}", col_vals.len()); 
-    //info!("Col {col} has len {}", col_vals.len());
+    
     //column_medians[col] = median(&col_vals);//.unwrap_or(f32::NAN);
     if col_vals.len() == 0 {
       column_medians[col] = f32::NAN;
     } else {
+
+      //column_medians[col] = statistical::mean(col_vals.as_slice());
       column_medians[col] = statistical::median(col_vals.as_slice());//.unwrap_or(f32::NAN);
     }
-    //if column_medians[col] == 0.0 {
-    //  println!("{:?}", col_vals);
-    //}
   }
   column_medians
 }
@@ -321,9 +395,9 @@ fn calculate_column_means(data: &Vec<Vec<f32>>) -> Vec<f32> {
   // Get the number of columns (assuming all sub-vectors have the same length)
   let num_columns = data[0].len();
   let num_rows    = data.len();
+  info!("Calculating means for {} columns and {} rows", num_columns, num_rows);
   // Initialize a Vec to store the column-wise medians
   let mut column_means: Vec<f32> = vec![0.0; num_columns];
-  info!("Calculating means for {} columns!", num_columns);
   // Calculate the median for each column across all sub-vectors, ignoring NaN values
   for col in 0..num_columns  {
     let mut col_vals = vec![0.0; num_rows];
@@ -331,40 +405,95 @@ fn calculate_column_means(data: &Vec<Vec<f32>>) -> Vec<f32> {
       col_vals[k] = data[k][col];
     }
     col_vals.retain(|x| !x.is_nan());
-    //info!("Col {col} has len {}", col_vals.len());
-    column_means[col] = mean(&col_vals);//.unwrap_or(f32::NAN);
+    let thismean = mean(&col_vals);
+    if !thismean.is_nan() {
+      column_means[col] = thismean;
+    }
+    //column_means[col] = mean(&col_vals);//.unwrap_or(f32::NAN);
   }
   column_means
 }
 
 /***********************************/
 
-fn roll<T: Clone>(vec: &mut Vec<T>, shift: isize) {
-  let len = vec.len() as isize;
-  
-  // Calculate the effective shift by taking the remainder of the shift
-  // operation with the length of the vector to ensure it's within bounds.
-  let effective_shift = (shift % len + len) % len;
-  
-  // If the shift is zero, there's nothing to do.
-  if effective_shift == 0 {
-    return;
-  }
-  
-  // Clone the vector and clear it.
-  let temp = vec.clone();
-  vec.clear();
-  
-  // Split the vector into two parts and swap them to achieve the roll effect.
-  if effective_shift > 0 {
-    let (left, right) = temp.split_at(temp.len() - effective_shift as usize);
-    vec.extend_from_slice(right);
-    vec.extend_from_slice(left);
-  } else {
-    let (left, right) = temp.split_at(-effective_shift as usize);
-    vec.extend_from_slice(right);
-    vec.extend_from_slice(left);
-  }
+fn roll<T: Clone>(vec: &mut Vec<T>, offset: isize) {
+      let len = vec.len() as isize;
+
+    if len <= 1 {
+        return;
+    }
+
+    let offset = offset % len;
+
+    if offset == 0 {
+        return;
+    }
+
+    let split_point = if offset > 0 {
+        len - offset
+    } else {
+        -offset
+    } as usize;
+
+    let mut temp = Vec::with_capacity(len as usize);
+    temp.extend_from_slice(&vec[split_point..]);
+    temp.extend_from_slice(&vec[..split_point]);
+
+    vec.clear();
+    vec.extend_from_slice(&temp);
+
+  //let new_vec = Vec::<T>::new();
+  //let mut new_vec = vec.clone();
+  //if shift >= 0 {
+  //  for k in 0..vec.len() {
+  //    if shift as usize + k == vec.len() {
+  //      
+  //    }
+  //    if shift as usize + k < vec.len() {
+  //      new_vec[shift as usize + k] = vec[k].clone();
+  //    } 
+  //    if shift as usize + k > vec.len() {
+  //      new_vec[k - shift as usize] = vec[k].clone();
+  //    }
+  //  }
+  //} else {
+  //  for k in 0..vec.len() {
+  //    if shift + k as isize == 0 {
+  //      new_vec[0] = vec[(-1*shift) as usize].clone();
+  //    }
+  //    if (shift + k as isize )< 0 {
+  //      new_vec[vec.len() -1 + shift as usize] = vec[(-1*shift) as usize + k].clone();
+  //    } 
+  //    if (shift + k as isize) > 0 {
+  //      new_vec[k + shift as usize] = vec[k].clone();
+  //    }
+  //  }
+  //}
+  //let len = vec.len() as isize;
+  //
+  //// Calculate the effective shift by taking the remainder of the shift
+  //// operation with the length of the vector to ensure it's within bounds.
+  //let effective_shift = (shift % len + len) % len;
+  //
+  //// If the shift is zero, there's nothing to do.
+  //if effective_shift == 0 {
+  //  return;
+  //}
+  //
+  //// Clone the vector and clear it.
+  //let temp = vec.clone();
+  //vec.clear();
+  //
+  //// Split the vector into two parts and swap them to achieve the roll effect.
+  //if effective_shift > 0 {
+  //  let (left, right) = temp.split_at(temp.len() - effective_shift as usize);
+  //  vec.extend_from_slice(right);
+  //  vec.extend_from_slice(left);
+  //} else {
+  //  let (left, right) = temp.split_at(-effective_shift as usize);
+  //  vec.extend_from_slice(right);
+  //  vec.extend_from_slice(left);
+  //}
 }
 
 /***********************************/
@@ -401,12 +530,47 @@ impl RBCalibrations {
   
   /// Remove events with invalid traces or event fragment bits set
   pub fn clean_input_data(&mut self) {
-    //self.vcal_data.retain(|x| !x.header.broken & !x.header.lost_trigger & !x.header.event_fragment); 
-    //self.tcal_data.retain(|x| !x.header.broken & !x.header.lost_trigger & !x.header.event_fragment); 
-    //self.noi_data.retain(|x| !x.header.broken & !x.header.lost_trigger & !x.header.event_fragment); 
-    self.vcal_data.retain(|x|  !x.header.drs_lost_trigger() & !x.header.is_event_fragment()); 
-    self.tcal_data.retain(|x|  !x.header.drs_lost_trigger() & !x.header.is_event_fragment()); 
-    self.noi_data.retain(|x|   !x.header.drs_lost_trigger() & !x.header.is_event_fragment()); 
+    self.vcal_data.retain(|x|  !x.header.drs_lost_trigger()
+        && !x.header.is_event_fragment()
+        && trace_check(x)); 
+    self.tcal_data.retain(|x|  !x.header.drs_lost_trigger()
+        && !x.header.is_event_fragment()
+        && trace_check(x)); 
+    self.noi_data.retain(|x|   !x.header.drs_lost_trigger() 
+        && !x.header.is_event_fragment()
+        && trace_check(x)); 
+    self.noi_data.sort_by(|a, b| a.header.event_id.cmp(&b.header.event_id));
+    self.vcal_data.sort_by(|a, b| a.header.event_id.cmp(&b.header.event_id));
+    self.tcal_data.sort_by(|a, b| a.header.event_id.cmp(&b.header.event_id));
+  }
+
+  // apply the vcal to a dataset of the calibration
+  // (e.g. timing calibration)
+  fn apply_vcal(&self, 
+                data      : &Vec<RBEvent>)
+      -> (Vec<Vec<Vec<f32>>>,Vec<isize>) {
+    let nevents          = data.len();
+    let mut traces       = Vec::<Vec::<Vec::<f32>>>::new();
+    let mut trace        = Vec::<f32>::with_capacity(NWORDS);
+    let mut stop_cells   = Vec::<isize>::new();
+    let mut empty_events = Vec::<Vec::<f32>>::new();
+    for ev in 0..nevents {
+        empty_events.push(trace.clone());
+    }
+    for ch in 0..NCHN {
+      traces.push(empty_events.clone());
+      for (k,ev) in data.iter().enumerate() {
+        trace.clear();
+        stop_cells.push(ev.header.stop_cell as isize);
+        for k in 0..NWORDS {
+          trace.push(ev.adc[ch][k] as f32);
+        }
+        self.voltages(ch + 1, ev.header.stop_cell as usize,
+                      &ev.adc[ch], &mut trace);
+        traces[ch][k] = trace.clone();
+      }
+    }
+    (traces, stop_cells)
   }
 
   // channel is from 0-8
@@ -466,7 +630,6 @@ impl RBCalibrations {
              input_vcal_data[n].header.stop_cell as isize); 
       }// first loop over events done
       let v_offsets = calculate_column_medians(&rolled_traces[ch]);
-      //println!("v offsets {:?}", v_offsets);
       info!("We calculated {} voltage offset values for ch {}", v_offsets.len(), ch);
       // fill these in the prepared array structure
       for k in 0..v_offsets.len() {
@@ -491,64 +654,78 @@ impl RBCalibrations {
     }
     Ok((all_v_offsets, all_v_dips))
   }
-  
 
+
+  /// Voltage calibration has to be applied
+  /// 
+  /// # Returns
+  ///
+  ///   vec[ch[9], tbin[1024]]
+  ///
   pub fn timing_calibration(&self,
-                        edge : &Edge) 
+                            edge       : &Edge,
+                            apply_vcal : bool) 
   -> Result<Vec<Vec<f32>>, CalibrationError> {
     if self.tcal_data.len() == 0 {
       error!("Input data for timing calibration is empty!");
       return Err(CalibrationError::EmptyInputData);
     }
+    // tcal values are [channel][adc_cell] 
     let mut all_tcal = Vec::<Vec::<f32>>::new();
-    for _ in 0..NCHN {
-      let nfreq_vec : Vec<f32> = vec![1.0/Self::NOMINALFREQ;NWORDS];
-      all_tcal.push(nfreq_vec);  
-    }
-
-    // we temporarily get the adc traces
-    // traces are [channel][event][adc_cell]
-    let adc_traces = unpack_traces_f32(&self.tcal_data);
-    let mut traces  = adc_traces.clone();
-    let mut dtraces = traces.clone();
-    let trace_len   = traces[0][0].len();
     for ch in 0..NCHN {
-      for (n, ev) in self.tcal_data.iter().enumerate() {
-        traces[ch][n] = self.apply_vcal_constants(&adc_traces[ch][n], ch, ev.header.stop_cell as usize);
-        for k in 0..trace_len {
-          if k < Self::NSKIP {
-            traces[ch][n][k]  = f32::NAN;
-          }
-          let  trace_val =  traces[ch][n][k];
-          //let dtrace_val = dtraces[ch][n][k];
-          if f32::abs(trace_val) > Self::SINMAX as f32 { 
-            traces[ch][n][k]  = f32::NAN;
-          }// the traces are filled and the first 2 bins
-        }
+      all_tcal.push(Vec::<f32>::new());
+    }
+    // traces are [channel][event][adc_cell]
+    let mut traces   = Vec::<Vec::<Vec::<f32>>>::new();
+    let mut stop_cells   = Vec::<isize>::new();
+    if apply_vcal {
+      let result = self.apply_vcal(&self.tcal_data);
+      traces     = result.0;
+      stop_cells = result.1;
+    } else {
+      warn!("Not applying voltage calibration to tcal data. This most likely makes no sense!");
+      traces  = unpack_traces_f32(&self.tcal_data);
+      for ev in self.tcal_data.iter() {
+        stop_cells.push(ev.header.event_id as isize);
       }
     }
-    let mut drolled_traces = traces.clone();
-    //println!("{:?}", traces[0][0]);
+    let do_spike_cleaning = true;
+    if do_spike_cleaning {
+      clean_spikes(&mut traces, true);
+    }
+    let nwords = traces[0][0].len();
     for ch in 0..NCHN {
-      for n in 0..self.tcal_data.len() {
-      //for (n, ev) in self.tcal_data.iter().enumerate() {
-        // marked with nan, now need to get "rolled over",
-        // so that they start with the stop cell
-        roll(&mut drolled_traces[ch][n],
-             self.tcal_data[n].header.stop_cell as isize); 
-        //for ch in 0..NCHN { 
-        //  for ev in 0..traces[ch].len() {
-        for k in 0..traces[ch][n].len() {
-          let mut dval : f32;
-          if k == 0 {
-            dval = drolled_traces[ch][n][0] - drolled_traces[ch][n][traces[ch][n].len() -1];
-          } else {
-            dval = drolled_traces[ch][n][k] - drolled_traces[ch][n][k-1];      
+      for ev in 0..traces[ch].len() {
+        for k in 0..nwords {
+          if k < Self::NSKIP {
+            traces[ch][ev][k]  = f32::NAN;
           }
-          //println!("{}", dval);
+          if f32::abs(traces[ch][ev][k]) > Self::SINMAX as f32 { 
+            traces[ch][ev][k]  = f32::NAN;
+          }// the traces are filled and the first 2 bins
+        }
+      }  
+    }
+
+    let mut rolled_traces = traces.clone();
+    let mut drolled_traces = traces.clone();
+    for ch in 0..NCHN {
+      for ev in 0..traces[ch].len() {
+        roll(&mut rolled_traces[ch][ev],
+             stop_cells[ev]); 
+      }
+    }
+    for ch in 0..NCHN {
+      for ev in 0..traces[ch].len() {
+        for n in 0..traces[ch][ev].len() {
+          let mut dval : f32;
+          if n == 0 {
+            dval = rolled_traces[ch][ev][0] - rolled_traces[ch][ev][traces[ch][ev].len() -1];
+          } else {
+            dval = rolled_traces[ch][ev][n] - rolled_traces[ch][ev][n-1];      
+          }
           match edge {
-            Edge::Rising | 
-            Edge::Average => {
+            Edge::Rising | Edge::Average => {
               if dval < 0.0 {
                 dval = f32::NAN;
               }
@@ -558,25 +735,24 @@ impl RBCalibrations {
                 dval = f32::NAN;
               }
             },
-            Edge::None => (),
-          }
-          dval = f32::abs(dval);
-          // FIXME: check the 15
+            _ => {
+              // FIXME - better error handling
+              error!("Only average, rising or falling edge supported!");
+            }
+          } // end match
+          dval = f32::abs(dval); 
           if f32::abs(dval - 15.0) > Self::DVCUT {
             dval = f32::NAN;
           }
-          if k == 0 {
-            dtraces[ch][n][traces[ch][n].len() -1] = dval;
-          } else {
-            dtraces[ch][n][k-1] = dval;      
-          }
-        } 
-        //println!("{:?}", dtraces[ch][n]);
+          drolled_traces[ch][ev][n] = dval;
+        } // end loop over adc bins
       } // end loop over events
-      let col_means = calculate_column_means(&dtraces[ch]);
+      let col_means = calculate_column_means(&drolled_traces[ch]);
+      let nfreq_vec : Vec<f32> = vec![1.0/Self::NOMINALFREQ;NWORDS];
+      all_tcal[ch]  = nfreq_vec;
       let ch_mean   = mean(&col_means);
-      for k in 0..all_tcal[ch].len() {
-        all_tcal[ch][k] *= col_means[k]/ch_mean;  
+      for n in 0..all_tcal[ch].len() {
+        all_tcal[ch][n] *= col_means[n]/ch_mean;  
       }
     } // end loop over channels
     Ok(all_tcal)
@@ -596,7 +772,6 @@ impl RBCalibrations {
     let (v_offsets_low, v_dips_low) 
         = Self::voltage_offset_and_dips(&self.noi_data)?;
     // which of the v_offsets do we actually use?
-
     for ch in 0..NCHN {
       for k in 0..NWORDS {
         self.v_offsets[ch][k] = v_offsets_low[ch][k];
@@ -616,10 +791,10 @@ impl RBCalibrations {
       edge = Edge::Average;
     }
 
-    let mut tcal_av = self.timing_calibration( &edge)?;
+    let mut tcal_av = self.timing_calibration( &edge, true)?;
     if matches!(edge, Edge::Average) {
       edge = Edge::Falling;
-      let tcal_falling = self.timing_calibration(&edge)?;
+      let tcal_falling = self.timing_calibration(&edge, true)?;
       for ch in 0..NCHN {
         for k in 0..tcal_av.len() {
           tcal_av[ch][k] += tcal_falling[ch][k];
@@ -639,36 +814,36 @@ impl RBCalibrations {
     let corr_limit    : f32 = 0.05;
     //let n_iter_period : f32 = 1000; //#500 or nevents #
 
-    let mut tcal_av_cp = tcal_av.clone();
     let nperiod = Self::NOMINALFREQ/Self::CALFREQ; 
-    //let mut n_correct = vec![0.0;NWORDS];
-
     let global = true;
     if global {
-      for n in 0..self.tcal_data.len() { // this is the nIterPeriod or nevents loop
-                                         // we choose nevents
-        let stop_cell = self.tcal_data[n].header.stop_cell;
-        for ch in 0..NCHN {
+      
+      let mut tcal_traces   = Vec::<Vec::<Vec::<f32>>>::new();
+      let mut stop_cells    = Vec::<isize>::new();
+      let result  = self.apply_vcal(&self.tcal_data);
+      tcal_traces = result.0;
+      stop_cells  = result.1;
+
+      //for n in 0..1000 {
+      for ch in 0..NCHN {
+        for ev in 0..tcal_traces[ch].len() {
+          let tracelen = tcal_traces[ch][ev].len();
+          let stop_cell = stop_cells[ev];
+          let mut tcal_av_cp = tcal_av.clone();
           roll(&mut tcal_av_cp[ch], -1* (stop_cell as isize));
-          // tcal data per definition has all channels active...
-          // FIXME - we should not just assume this for each event.
-          let tcal_trace = &self.tcal_data[n].get_channel_by_id(ch).expect("Unable to get ch");
-          let mut tcal_trace_f32 = Vec::<f32>::with_capacity(tcal_trace.len());
-          for j in tcal_trace.iter() {
-            tcal_trace_f32.push(*j as f32);
-          }
-          let tracelen = tcal_trace_f32.len();
-          let (zcs, periods) = get_periods(&tcal_trace_f32,
+          
+          let (zcs, periods) = get_periods(&tcal_traces[ch][ev],
                                            &tcal_av_cp[ch],
                                            nperiod,
                                            Self::NSKIP as f32,
                                            &edge);
+          debug!("Will iterate over {} periods!", periods.len());
           for (n_p,period) in periods.iter().enumerate() {
             if *period == 0.0 {
-              println!("{:?}", periods);
+              warn!("period is 0 {:?}", periods);
             }
             if period.is_nan() {
-              println!("{:?}", periods);
+              warn!("period is nan! {:?}", periods);
             }
             let zcs_a = zcs[n_p]     + stop_cell as usize;
             let zcs_b = zcs[n_p + 1] + stop_cell as usize;
@@ -883,8 +1058,7 @@ impl RBCalibrations {
   pub fn nanoseconds(&self,
                      channel   : usize,
                      stop_cell : usize,
-                     times     : &mut Vec<f32>)
-    {
+                     times     : &mut Vec<f32>) {
     if channel > 9 || channel == 0 {
       error!("There is no channel larger than 9 and no channel 0! Channel {channel} was requested. Can not perform timing calibration!");
     }
@@ -896,8 +1070,6 @@ impl RBCalibrations {
   pub fn new(rb_id : u8) -> Self {
     // FIXME
     let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap_or(Duration::from_secs(0));
-
-    //info!("Created new calibration object with timestamp {}",now.format("%Y-%m-%d %H:%M:%S").to_string());
     let timestamp = now.as_secs() as u32;
     Self {
       rb_id     : rb_id,
@@ -914,12 +1086,10 @@ impl RBCalibrations {
     }
   }
 
-  ///
-  ///
   pub fn from_txtfile(filename : &Path) -> Self {
     let mut rb_cal = Self::new(0);
     rb_cal.get_id_from_filename(&filename);
-    debug!("Attempting to open file {}", filename.display());
+    info!("Attempting to open file {}", filename.display());
     let file = BufReader::new(File::open(filename).expect("Unable to open file {}"));
     // count lines and check if we have 4 lines per channel
     let mut cnt  = 0;
@@ -1052,34 +1222,33 @@ impl Serialization for RBCalibrations {
     }
     if rb_cal.serialize_event_data {
       let mut broken_event = RBEvent::new();
-      //broken_event.header.broken = true;
       let n_noi  = parse_u16(bytestream, pos);
-      println!("Found {n_noi} no input data events!");
+      info!("Found {n_noi} no input data events!");
       for _ in 0..n_noi {
-        //for k in 0..10 {
-        //  println!("bytestream {k} {} ", bytestream[*pos+k]);
-        //}
         match RBEvent::from_bytestream(bytestream, pos) {
           Ok(ev) => {
-            //println!("good");
             rb_cal.noi_data.push(ev);            
           }
           Err(err) => {
             error!("Unable to read RBEvent! {err}");
-            //println!("from_bytestream failed!, err {err}");
-            //rb_cal.noi_data.push(broken_event.clone());
           }
         }
         // FIXME - broken event won't advance the pos marker
       }
       let n_vcal = parse_u16(bytestream, pos); 
-      println!("Found {n_vcal} VCal data events!");
-      let broken_event = RBEvent::new();
+      info!("Found {n_vcal} VCal data events!");
       for _ in 0..n_vcal {
-        rb_cal.vcal_data.push(RBEvent::from_bytestream(bytestream, pos).unwrap_or(broken_event.clone()));
+        match RBEvent::from_bytestream(bytestream, pos) {
+          Err(err) => {
+            error!("Found broken event {err}");
+          },
+          Ok(good_ev) => {
+            rb_cal.vcal_data.push(good_ev);
+          }
+        }
       }
       let n_tcal = parse_u16(bytestream, pos); 
-      println!("Found {n_tcal} TCal data events!");
+      info!("Found {n_tcal} TCal data events!");
       for _ in 0..n_tcal {
         rb_cal.tcal_data.push(RBEvent::from_bytestream(bytestream, pos).unwrap_or(broken_event.clone()));
       }
@@ -1107,7 +1276,7 @@ impl Serialization for RBCalibrations {
       }
     }
     if self.serialize_event_data {
-      println!("Serializing calibration event data!");
+      info!("Serializing calibration event data!");
       let n_noi  = self.noi_data.len()  as u16;
       let n_vcal = self.vcal_data.len() as u16;
       let n_tcal = self.tcal_data.len() as u16;
@@ -1123,6 +1292,10 @@ impl Serialization for RBCalibrations {
       for ev in &self.tcal_data {
         bs.extend_from_slice(&ev.to_bytestream());
       }
+    } else {
+      bs.push(0); // noi data
+      bs.push(0); // vcal data
+      bs.push(0); // tcal data
     }
     bs.extend_from_slice(&Self::TAIL.to_le_bytes());
     bs
