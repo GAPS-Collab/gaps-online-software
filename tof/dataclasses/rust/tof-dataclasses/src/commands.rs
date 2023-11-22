@@ -139,7 +139,10 @@ impl TryFrom<u8> for TofCommandCode {
       26u8 => Ok(TofCommandCode::CmdEnTriggerModeForcedMTB),
       27u8 => Ok(TofCommandCode::CmdDisTriggerModeForcedMTB),
       90u8 => Ok(TofCommandCode::Unknown),
-      _    => Err("I am not sure how to convert this value!")
+      _    => {
+        error!("{} is not a avlid TofCommand code!", value);
+        Err("I am not sure how to convert this value!")
+      }
     }
   }
 }
@@ -248,7 +251,10 @@ impl TryFrom<u32> for TofCommandResp {
       501u32   => Ok(TofCommandResp::RespErrNoRunActive),
       502u32   => Ok(TofCommandResp::RespErrRunActive),
       503u32   => Ok(TofCommandResp::RespErrCmdStuck),
-      _        => Err("I am not sure how to convert this value!")
+      _        => {
+        error! ("{} is not a valid TofCommandResp!", value);
+        Err("I am not sure how to convert this value!")
+      }
     }
   }
 }
@@ -308,7 +314,10 @@ impl TryFrom<u8> for TofOperationMode {
       0u8  => Ok(TofOperationMode::RequestReply),
       10u8 => Ok(TofOperationMode::StreamAny),
       20u8 => Ok(TofOperationMode::Unknown),
-      _    => Err("I am not sure how to convert this value!")
+      _    => {
+        error!("{} is not a valid TofOperationMode!", value);
+        Err("I am not sure how to convert this value!")
+      }
     }
   }
 }
