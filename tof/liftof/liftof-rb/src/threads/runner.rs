@@ -19,6 +19,40 @@ use tof_dataclasses::run::RunConfig;
 
 type RamBuffer = BlobBuffer;
 
+
+/// Shutdown a run within the runner thread
+fn termination_seqeunce(prog_ev       : &ProgressBar,
+                        prog_a        : &ProgressBar,
+                        prog_b        : &ProgressBar,
+                        show_progress : bool,
+                        bs_sender     : &Sender<Vec<u8>>) {
+  info!("Calling terminatino sequence, will end current run!");
+  // just to be sure we set the self trigger rate to 0 
+  // this is for the poisson trigger)
+  match set_self_trig_rate(0) {
+    Err(err) => error!("Resetting self trigger rate to 0Hz failed! Err {err}"),
+    Ok(_)    => ()
+  }
+  match disable_trigger() {
+    Err(err) => error!("Can not disable triggers, error {err}"),
+    Ok(_)    => info!("Disabling triggers! Stopping current run!")
+  }
+  if show_progress {
+    prog_ev.finish();
+    prog_a.finish();
+    prog_b.finish();
+  }
+  match ram_buffer_handler(1,
+                           &bs_sender) { 
+    Err(err)   => {
+      error!("Can not deal with RAM buffers {err}");
+    },
+    Ok(_) => ()
+  }
+  info!("Termination sequence complete!");
+}
+
+
 /// Thread which controls run start/stop, deals with 
 /// runconfigs and dis/enable triggers accordingly
 ///
@@ -65,8 +99,8 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
   let now = time::Instant::now();
 
   // run start/stop conditions
-  let mut terminate = false;
-  let mut is_running = false;
+  let mut terminate             = false;
+  let mut is_running            = false;
   let mut listen_for_new_config = false;
   let mut rc = RunConfig::new();
   
@@ -123,32 +157,17 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
         rc          = new_config;
         // first of all, check if the new run config is active. 
         // if not, stop all triggers
-        if rc.is_active { 
-          terminate = false;
-          //is_running = true;
-        } else { 
+        if !rc.is_active {
           listen_for_new_config = true;
-          info!("Received runconfig is not active! Stop current run...");
-          // just to be sure we set the self trigger rate to 0 
-          // this is for the poisson trigger)
-          match set_self_trig_rate(0) {
-            Err(err) => error!("Resetting self trigger rate to 0Hz failed! Err {err}"),
-            Ok(_)    => ()
-          }
-          match disable_trigger() {
-            Err(err) => error!("Can not disable triggers, error {err}"),
-            Ok(_)    => info!("Disabling triggers! Stopping current run!")
-          }
-          if show_progress {
-            prog_ev.finish();
-            prog_a.finish();
-            prog_b.finish();
-          }
-          // do nothing else.
-          is_running = false;
-          terminate  = true;
+          termination_seqeunce(&prog_ev     ,
+                               &prog_a      ,
+                               &prog_b      ,
+                               show_progress,
+                               &bs_sender   );
           continue;
         }
+        // we have an active run, initializing
+        terminate = false;
         //// from here on, we prepare to start 
         //// a new run with this RunConfig!
         //// set the channel mask
@@ -276,25 +295,14 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
 
     if is_running {
       if terminate {
-        match disable_trigger() {
-          Err(err) => error!("Can not disable triggers, error {err}"),
-          Ok(_)    => info!("Triggers disabled!")
-        }
-        if show_progress {
-          prog_ev.finish();
-          prog_a.finish();
-          prog_b.finish();
-        }
         is_running = false;
-        // flush the buffers
-        match ram_buffer_handler(1,
-                                 &bs_sender) { 
-          Err(err)   => {
-            error!("Can not deal with RAM buffers {err}");
-          },
-          Ok(_) => ()
-        }
+        termination_seqeunce(&prog_ev     ,
+                             &prog_a      ,
+                             &prog_b      ,
+                             show_progress,
+                             &bs_sender   );
         info!("Run stopped! The runner has processed {n_events} events!");
+        continue;
       } // end if terminate
       
       // We did not terminate the run,
