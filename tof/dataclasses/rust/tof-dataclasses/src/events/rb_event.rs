@@ -58,6 +58,7 @@ pub enum EventStatus {
   Unknown            = 0u8,
   CRC32Wrong         = 10u8,
   TailWrong          = 11u8,
+  IncompleteReadout  = 21u8,
   Perfect            = 42u8
 }
 
@@ -597,7 +598,8 @@ impl Serialization for RBEvent {
   }
   
   fn to_bytestream(&self) -> Vec<u8> {
-    let mut stream = Vec::<u8>::new();
+    let mut stream = Vec::<u8>::with_capacity(18530);
+    //let mut stream = Vec::<u8>::new();
     stream.extend_from_slice(&Self::HEAD.to_le_bytes());
     stream.push(self.data_type as u8);
     stream.push(self.status as u8);
@@ -609,9 +611,18 @@ impl Serialization for RBEvent {
     // for an empty channel, we will add an empty vector
     let add_channels = !self.header.is_event_fragment() & !self.header.drs_lost_trigger();
     if add_channels {
-      for channel_adc in self.adc.iter() {
-        stream.extend_from_slice(&u16_to_u8(&channel_adc)); 
+      for n in 0..NCHN {
+        for k in 0..NWORDS {
+          if self.adc[n].len() == 0 {
+            continue;
+          }
+          stream.extend_from_slice(&self.adc[n][k].to_le_bytes());  
+        }
       }
+      // this is way slower
+      //for channel_adc in self.adc.iter() {
+      //  stream.extend_from_slice(&u16_to_u8(&channel_adc)); 
+      //}
     }
     //if self.ch9_adc.len() > 0 {
     //  stream.extend_from_slice(&u16_to_u8(&self.ch9_adc));

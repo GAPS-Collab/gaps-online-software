@@ -11,6 +11,7 @@ use std::fmt;
 #[derive(Debug, Copy, Clone, serde::Deserialize, serde::Serialize)]
 pub enum PacketError {
   WrongPacketType,
+  UnableToSendPacket,
 }
 
 impl fmt::Display for PacketError {

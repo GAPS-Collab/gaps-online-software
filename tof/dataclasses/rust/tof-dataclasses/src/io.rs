@@ -32,24 +32,25 @@ use std::collections::{
 
 extern crate indicatif;
 use indicatif::{ProgressBar, ProgressStyle};
-
-use crate::errors::SerializationError;
+use crossbeam_channel::Sender;
 use crate::events::{
     RBEvent,
     RBEventHeader,
     EventStatus,
 };
-use crate::serialization::{
-    u8_to_u16,
-    search_for_u16,
-    Serialization,
-    parse_u8,
-    parse_u16,
-    parse_u8_deque,
-    parse_u16_deque,
+use crate::packets::{
+    TofPacket,
+    PacketType,
 };
 
+use crate::serialization::{
+    u8_to_u16_14bit,
+    search_for_u16,
+    parse_u8,
+    parse_u16,
+};
 
+use crate::errors::PacketError;
 
 /// Read an entire file into memory
 ///
@@ -74,18 +75,52 @@ pub fn read_file(filename: &Path) -> io::Result<Vec<u8>> {
 /// Emit RBEvents from a stream of bytes
 #[derive(Debug, Clone)]
 pub struct RBEventMemoryStreamer {
-  pub stream      : Vec<u8>,
-  pub pos         : usize,
-  pub pos_at_head : bool
+  pub stream       : Vec<u8>,
+  pub pos          : usize,
+  pub pos_at_head  : bool,
+  pub tp_sender    : Option<Sender<TofPacket>>,
+  /// number of extracted events from stream
+  /// this manages how we are draining the stream
+  n_events_ext : usize,
+  pub is_depleted : bool,
 }
 
 impl RBEventMemoryStreamer {
 
   pub fn new() -> Self {
     Self {
-      stream      : Vec::<u8>::new(),
-      pos         : 0,
-      pos_at_head : false,
+      stream        : Vec::<u8>::new(),
+      pos           : 0,
+      pos_at_head   : false,
+      tp_sender     : None,
+      n_events_ext  : 0,
+      is_depleted   : false,
+    }
+  }
+
+  // EXPERIMENTAL
+  pub fn init_sender(&mut self, tp_sender : Sender<TofPacket>) {
+    self.tp_sender = Some(tp_sender);
+  }
+
+  // EXPERIMENTAL
+  pub fn send_all(&mut self) {
+    loop {
+      match self.next() {
+        None => {
+          info!("Streamer drained!");
+          break;
+        },
+        Some(ev) => {
+          let mut tp = TofPacket::from(&ev);
+          match self.tp_sender.as_ref().expect("Sender needs to be initialized first!").send(tp) {
+            Ok(_) => (),
+            Err(err) => {
+              error!("Unable to send TofPacket!");
+            }
+          }
+        }
+      }
     }
   }
 
@@ -96,10 +131,19 @@ impl RBEventMemoryStreamer {
     //self.stream.extend(stream.iter().copied());
     //println!("self.pos {}", self.pos);
     //println!("Stream before {}",self.stream.len());
+    self.is_depleted = false;
     self.stream.extend_from_slice(&stream[0..nbytes]);
     //println!("Stream after {}",self.stream.len());
   }
 
+  /// Take in a stream by consuming it, that means moving
+  /// This will avoid clones.
+  pub fn consume(&mut self, stream : &mut Vec<u8>) {
+    self.is_depleted = false;
+    // FIXME: append can panic
+    // we use it here, since it does not clone
+    self.stream.append(stream);
+  }
 
   /// Headers are expected to be a 2byte signature, 
   /// e.g. 0xaaaa. 
@@ -112,12 +156,13 @@ impl RBEventMemoryStreamer {
   /// # Returns
   /// 
   ///   * success   : header found
-  pub fn seek_next_header(&mut self, half_header : u8) -> bool{
+  pub fn seek_next_header(&mut self, header : u16) -> bool{
     //let start_pos = self.pos;
     //let mut byte1_found = false;
     //let mut byte1_pos   = 0usize;
-    match search_for_u16(0xaaaa, &self.stream, self.pos) {
-      Err(err) => {
+    match search_for_u16(header, &self.stream, self.pos) {
+      Err(_) => {
+        //error!("Did not find 0xaaaa signature!");
         return false;
       }
       Ok(head_pos) => {
@@ -127,22 +172,67 @@ impl RBEventMemoryStreamer {
       }
     }
   }
+
+  pub fn next_tofpacket(&mut self) -> Option<TofPacket> {
+    let begin_pos = self.pos; // in case we need
+                              // to reset the position
+    let mut head_pos  = self.pos;
+    let mut foot_pos  = self.pos;
+    if self.stream.len() == 0 {
+      trace!("Stream empty!");
+      return None;
+    }
+    if !self.pos_at_head {
+      if !self.seek_next_header(0xaaaa) {
+        debug!("Could not find another header...");
+        self.pos = begin_pos;
+        return None;
+      }
+    }
+    head_pos = self.pos;
+    if !self.seek_next_header(0x5555) {
+      debug!("Could not find another footer...");
+      self.pos = begin_pos;
+      return None;
+    }
+    //println!("{} {} {}", self.stream.len(), head_pos, foot_pos);
+    foot_pos = self.pos;
+    self.n_events_ext += 1;
+    let mut tp = TofPacket::new();
+    tp.packet_type = PacketType::RBEventMemoryView;
+    //let mut payload = Vec::<u8>::with_capacity(18530);
+    tp.payload.extend_from_slice(&self.stream[head_pos..foot_pos+2]);
+    //tp.payload = payload;
+    //self.pos += 2;
+    self.pos_at_head = false;
+    //self.stream.drain(0..foot_pos);
+    //self.pos = 0;
+    if self.n_events_ext % 200 == 0 {
+      self.stream.drain(0..foot_pos+3);
+      self.pos = 0;
+    }
+
+    Some(tp)
+  }
+
 }
 
 impl Iterator for RBEventMemoryStreamer {
   type Item = RBEvent;
 
+
   fn next(&mut self) -> Option<Self::Item> {
     let begin_pos = self.pos; // in case we need
                               // to reset the position
     if self.stream.len() == 0 {
-      error!("Stream empty!");
+      trace!("Stream empty!");
       return None;
     }
     if !self.pos_at_head {
-      if !self.seek_next_header(0xaa) {
+      if !self.seek_next_header(0xaaaa) {
         debug!("Could not find another header...");
         self.pos = begin_pos;
+        self.is_depleted = true;
         return None;
       }
     }
@@ -151,6 +241,7 @@ impl Iterator for RBEventMemoryStreamer {
     // the fixed size of header + footer is 42 bytes
     if !(self.stream.len() > self.pos + 42) {
       debug!("Less than 42 bytes reamin in stream after pos {}. This is not enough to extract status, len and roi, rb id and ch mask. The event might be incomplete and we will need more bytes to digest", self.pos);
+      self.is_depleted = true;
       return None;
     }
     //for k in self.pos..self.pos + 42 {
@@ -180,7 +271,7 @@ impl Iterator for RBEventMemoryStreamer {
     //println!("Header channels {:?}", header.channels);
     let event_id0    = parse_u16(&self.stream, &mut self.pos);
     let event_id1    = parse_u16(&self.stream, &mut self.pos);
-    let mut event_id : u32;
+    let event_id : u32;
     if REVERSE_WORDS {
       event_id = u32::from(event_id0) << 16 | u32::from(event_id1);
     } else {
@@ -193,8 +284,8 @@ impl Iterator for RBEventMemoryStreamer {
     let timestamp1   = parse_u16(&self.stream, &mut self.pos);
     let timestamp2   = parse_u16(&self.stream, &mut self.pos);
     //println!("TIMESTAMPS {} {} {}", timestamp0, timestamp1, timestamp2);
-    let mut timestamp16 : u16;
-    let mut timestamp32 : u32;
+    let timestamp16 : u16;
+    let timestamp32 : u32;
     if REVERSE_WORDS {
       timestamp16 = timestamp0;
       timestamp32 = u32::from(timestamp1) << 16 | u32::from(timestamp2);
@@ -207,53 +298,58 @@ impl Iterator for RBEventMemoryStreamer {
     // now the payload
     //println!("{}", header);
     //println!("{}", nwords);
-    let mut read_channels = true;
     if header.drs_lost_trigger() {
-      read_channels = false;
+      event.status = EventStatus::IncompleteReadout;
+      event.header = header;
+      self.pos_at_head = false;
+      return Some(event);
     }
-    if read_channels {
-      // make sure we can read them!
-      let expected_packet_size =   header.get_channels().len()*nwords*2 
-                                 + header.get_channels().len()*2 
-                                 + header.get_channels().len()*4;
-      if self.stream.len() < self.pos + expected_packet_size + 2 + 4 + 2 {
-        debug!("Stream ends prematurely, let's not return this event and rewind instead!");
-        debug!("{} bytes missing!", self.pos + expected_packet_size + 2 + 4 + 2 - self.stream.len());
-        self.pos = begin_pos;
-        self.pos_at_head = false;
-        return None;
-      }
-      //println!("{:?}", header.get_channels().iter());
-      for ch in header.get_channels().iter() {
-        let ch_id = parse_u16(&self.stream, &mut self.pos);
-        if ch_id == *ch as u16 {
-          //println!("Got ch id {}", ch_id);
-          //let header = parse_u16(&self.stream, &mut self.pos);
-          // noice!!
-          //let data : Vec<u8> = self.stream.iter().skip(self.pos).take(2*nwords).map(|&x| x).collect();
-          let mut this_ch_adc = Vec::<u16>::with_capacity(nwords);
-          for j in 0..nwords {
-            this_ch_adc.push(0x3fff & parse_u16(&self.stream, &mut self.pos))
-          }
-          event.adc[*ch as usize] = this_ch_adc;
-          //let data = &self.stream[self.pos..self.pos+2*nwords];
-          //event.adc.push(u8_to_u16(&data));
-          //self.pos += 2*nwords;
-          let crc320 = parse_u16(&self.stream, &mut self.pos);
-          let crc321 = parse_u16(&self.stream, &mut self.pos);
-          let mut crc32 : u32;
-          if REVERSE_WORDS {
-            crc32 = u32::from(crc321) << 16 | u32::from(crc320);
-          } else {
-            crc32 = u32::from(crc320) << 16 | u32::from(crc321);
-          }
+    // make sure we can read them!
+    let expected_packet_size =   header.get_channels().len()*nwords*2 
+                               + header.get_channels().len()*2 
+                               + header.get_channels().len()*4;
+    if self.stream.len() < self.pos + expected_packet_size + 2 + 4 + 2 {
+      debug!("Stream ends prematurely, let's not return this event and rewind instead!");
+      debug!("{} bytes missing!", self.pos + expected_packet_size + 2 + 4 + 2 - self.stream.len());
+      self.pos = begin_pos;
+      self.pos_at_head = false;
+      self.is_depleted = true;
+      return None;
+    }
+    //println!("{:?}", header.get_channels().iter());
+    for ch in header.get_channels().iter() {
+      let ch_id = parse_u16(&self.stream, &mut self.pos);
+      if ch_id == *ch as u16 {
+        //println!("Got ch id {}", ch_id);
+        //let header = parse_u16(&self.stream, &mut self.pos);
+        // noice!!
+        //let data : Vec<u8> = self.stream.iter().skip(self.pos).take(2*nwords).map(|&x| x).collect();
+        
+        event.adc[*ch as usize] = u8_to_u16_14bit(&self.stream[self.pos..self.pos + 2*nwords]);
+        self.pos += 2*nwords;
+        //let mut this_ch_adc = Vec::<u16>::with_capacity(nwords);
+        //for j in 0..nwords {
+        //  this_ch_adc.push(0x3fff & parse_u16(&self.stream, &mut self.pos))
+        //}
+        //event.adc[*ch as usize] = this_ch_adc;
+        
+        //let data = &self.stream[self.pos..self.pos+2*nwords];
+        //self.pos += 2*nwords;
+        let crc320 = parse_u16(&self.stream, &mut self.pos);
+        let crc321 = parse_u16(&self.stream, &mut self.pos);
+        let mut crc32 : u32;
+        if REVERSE_WORDS {
+          crc32 = u32::from(crc321) << 16 | u32::from(crc320);
         } else {
-          error!("We saw a ch id of {} in the data, but this is not accounted for in the channel mask in the header!", ch_id);
-          error!("We will skip this channel data, but that might cause corrupted event data!");
-          self.pos += 2 + 2*nwords + 4;
+          crc32 = u32::from(crc320) << 16 | u32::from(crc321);
         }
+      } else {
+        error!("We saw a ch id of {} in the data, but this is not accounted for in the channel mask in the header!", ch_id);
+        error!("We will skip this channel data, but that might cause corrupted event data!");
+        self.pos += 2*nwords + 4;
       }
     }
+    
     if !header.drs_lost_trigger() {
       header.stop_cell = parse_u16(&self.stream, &mut self.pos);
     }
@@ -266,7 +362,7 @@ impl Iterator for RBEventMemoryStreamer {
       crc32 = u32::from(crc321) << 16 | u32::from(crc320);
     }
     let tail         = parse_u16(&self.stream, &mut self.pos);
-    let delta_pos    = self.pos - first_pos;
+    //let delta_pos    = self.pos - first_pos;
     if tail != 0x5555 {
       //error!("Delta pos {}", delta_pos);
       error!("Tail signature is wrong! Got {} for board {}", tail, header.rb_id);
@@ -275,9 +371,16 @@ impl Iterator for RBEventMemoryStreamer {
       //}
       //println!("{}", header);
       event_status = EventStatus::TailWrong;
-    }
+    } 
+    self.n_events_ext += 1;
     //println!("{}", header);
     self.stream.drain(0..self.pos);
+    //if self.n_events_ext % 100 == 0 {
+    //  self.stream.drain(0..self.pos);
+    //  self.pos = 0;
+    //}
+
+    
     //self.seek_next_header(0xaa);
     //println!("{} {}", self.pos, self.stream.len());
     self.pos = 0;
@@ -365,7 +468,7 @@ impl RobinReader {
     } else {
       panic!("I can not find a single event in this file! Panicking!");
     }
-    self.generate_index();
+    //self.generate_index();
   }
 
   pub fn get_from_cache(&mut self, event_id : &u32) -> Option<RBEvent> {
@@ -440,7 +543,7 @@ impl RobinReader {
     sorted_keys.sort();
     //let mut n = 0u32;
     for k in sorted_keys {
-      //println!("{k} -> {}", reverse_index[&k]);
+      println!("{k} -> {}", reverse_index[&k]);
       //n += 1;
       //if n == 8000 {break;}
     }
@@ -598,8 +701,8 @@ impl Iterator for RobinReader {
       None => {
         // check if we can feed more data to the 
         // streamer
-        const chunksize : usize  = 200000;
-        let mut buffer      = [0u8;chunksize];
+        const CHUNKSIZE : usize  = 200000;
+        let mut buffer      = [0u8;CHUNKSIZE];
         match self.file_reader.as_mut().unwrap().read(&mut buffer) {
           Err(err) => {
             error!("Unable to read any bytes from file {}, {}", self.filename, err);
@@ -614,7 +717,9 @@ impl Iterator for RobinReader {
                 self.open(next_filename);
                 self.eof_reached = false;
                 match self.file_reader.as_mut().unwrap().read(&mut buffer) {
-                  Err(err) => {},
+                  Err(err) => {
+                    error!("Failed reading bytes from buffer! {}", err);
+                  },
                   Ok(_nbytes2) => {}
                 }
               }

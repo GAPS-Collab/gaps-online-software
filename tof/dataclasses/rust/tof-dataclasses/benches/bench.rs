@@ -1,16 +1,103 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use tof_dataclasses::events::RBEventMemoryView;
-use tof_dataclasses::io::read_file;
-use tof_dataclasses::serialization::Serialization;
 #[cfg(feature = "random")]
-use tof_dataclasses::FromRandom;
-//use tof_dataclasses::events::blob::BlobData;
 use std::path::Path;
+use tof_dataclasses::events::{
+    RBEventMemoryView,
+    RBEvent
+};
+use tof_dataclasses::packets::TofPacket;
+use tof_dataclasses::io::{
+    read_file,
+    RobinReader,
+    RBEventMemoryStreamer
+};
+
+use tof_dataclasses::serialization::Serialization;
+use tof_dataclasses::FromRandom;
+
+// FIXME - remember to measure throuput as well
+// group.throughput(Throughput::Bytes(bytes.len() as u64));
 
 
 fn bench_read_file(c: &mut Criterion) {
   c.bench_function("read_file", |b|
                    b.iter(|| read_file(&Path::new("test-data/tof-rb01.robin")).unwrap()));
+}
+
+fn bench_rreader_read_helper() {
+  let mut reader = RobinReader::new(("test-data/tof-rb01.robin").to_string());
+  //reader.cache_all_events();
+  let mut nevents = 0usize;
+  loop {
+    match reader.next() {
+      None => {
+        break;
+      },
+      Some(ev) => {
+        nevents += 1;
+        let tp = TofPacket::from(&ev);
+        continue;
+      }
+    }
+  }
+  //println!("extracted {} events!", nevents);
+}
+
+fn bench_rbeventmemoryview_readfile_helper() {
+  let data = read_file(&Path::new("test-data/tof-rb01.robin")).unwrap();
+  let mut pos = 0usize;
+  let mut nevents = 0usize;
+  while data.len() - pos > 18530 {
+    RBEventMemoryView::from_bytestream(&data, &mut pos);
+    nevents += 1;
+  }
+  //println!("extracted {} events", nevents);
+}
+
+fn bench_rbeventmemoryview_readfile(c: &mut Criterion) {
+  c.bench_function("rreventmemoryview_readfile", |b|
+                   b.iter(|| bench_rbeventmemoryview_readfile_helper()));
+}
+
+fn bench_streamer_tofpacket_helper() {
+  let mut streamer = RBEventMemoryStreamer::new();
+  let mut data = read_file(&Path::new("test-data/tof-rb01.robin")).unwrap();
+  streamer.consume(&mut data);      
+      //RobinReader::new(("test-data/tof-rb01.robin").to_string());
+  //reader.cache_all_events();
+  let mut nevents = 0usize;
+  loop {
+    match streamer.next_tofpacket() {
+      None => break,
+      Some(tp) => {
+        nevents += 1;
+        continue;
+      }
+    }
+  }
+  //println!("extracted {} events!", nevents);
+}
+
+fn bench_streamer_tofpacket(c: &mut Criterion) {
+  c.bench_function("streamer_tofpacket", |b|
+                   b.iter(|| bench_streamer_tofpacket_helper()));
+}
+
+fn bench_rbevent_serialization_helper() {
+  let ev = RBEvent::from_random();
+  let result = RBEvent::from_bytestream(&ev.to_bytestream(), &mut 0).unwrap();
+  let tp = TofPacket::from(&result);
+}
+
+fn bench_rbevent_serialization(c: &mut Criterion) {
+  c.bench_function("rbevent_serialization", |b|
+                   b.iter(|| bench_rbevent_serialization_helper()));
+}
+
+
+fn bench_rreader_read(c: &mut Criterion) {
+  c.bench_function("rreader_read", |b|
+                   b.iter(|| bench_rreader_read_helper()));
 }
 
 cfg_if::cfg_if! {
@@ -19,6 +106,7 @@ cfg_if::cfg_if! {
       c.bench_function("rbmemoryview_fromrandom", |b|
                        b.iter(|| RBEventMemoryView::from_random()));
     }
+
 
     fn bench_rbmemoryview_serialization_circle_helper() {
       let mut data = RBEventMemoryView::from_random();
@@ -40,25 +128,27 @@ cfg_if::cfg_if! {
         }) 
       );
     }
-    
   }
 }
+
+criterion_group!(name = benches;
+                 config = Criterion::default().sample_size(10);
+                 targets = bench_read_file, bench_rreader_read, bench_rbeventmemoryview_readfile, bench_streamer_tofpacket
+                 );
 
 cfg_if::cfg_if! {
   if #[cfg(feature = "random")] {
-    criterion_group!(benches,
-                    bench_read_file,
-                    bench_rbmemoryview_from_random,
-                    bench_rbmemoryview_serialization_circle,
-                    bench_rbmemoryview_serialization_circle_norandom,
-                    //bench_blobdata_serialization_circle_norandom);
-                    );
+    criterion_group!(benches_random,
+                     bench_rbmemoryview_from_random,
+                     bench_rbmemoryview_serialization_circle,
+                     bench_rbmemoryview_serialization_circle_norandom,
+                     bench_rbevent_serialization
+                     );
+    criterion_main!(benches, benches_random);
   } else {
-    criterion_group!(benches,
-                    bench_read_file
-                    //bench_blobdata_serialization_circle_norandom);
-                    );
+    criterion_main!(benches);
   }
 }
 
-criterion_main!(benches);
+
+
