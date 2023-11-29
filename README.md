@@ -2,9 +2,11 @@
 
 This is branch NIUHI-0.8. [Niuhi is a tiger shark](https://dlnr.hawaii.gov/sharks/sharks/tiger-shark/).
 
-![Tiger sharl](resources/assets/TigerShark.png)
+![Tiger shark](resources/assets/TigerShark.png)
 
+[!CAUTION] 
 Tiger sharks roam the waters of the Hawaiian islands. 
+
 This branch is not necessarily connected to a measurement 
 campaign, but to a series of tests at UCLA, eg to investigate
 [issue 6](https://github.com/GAPS-Collab/gaps-online-software/issues/6). 

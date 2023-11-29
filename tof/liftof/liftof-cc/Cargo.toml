@@ -46,8 +46,7 @@ local-ip-address = "0.5"
 crossbeam-channel = "0.5"
 
 ctrlc = "3.2"
-sensors = "0.2"
-
+#sensors = "0.2"
 
 # logging
 log = "0.4"

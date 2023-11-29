@@ -54,7 +54,7 @@ use liftof_lib::color_log;
 use liftof_lib::get_ltb_dsi_j_ch_mapping;
 use liftof_cc::threads::{readoutboard_communicator,
                          event_builder};
-use liftof_cc::api::tofcmp_and_mtb_moni;
+//use liftof_cc::api::tofcmp_and_mtb_moni;
 //use liftof_cc::paddle_packet_cache::paddle_packet_cache;
 use liftof_cc::flight_comms::global_data_sink;
 
@@ -354,16 +354,16 @@ fn main() {
   let worker_threads = ThreadPool::new(nthreads);
 
   if !no_monitoring {
-    println!("==> Starting main monitoring thread...");
-    let tp_to_sink_c = tp_to_sink.clone();
-    let moni_interval = 10u64; // in seconds
-    worker_threads.execute(move || {
-                           tofcmp_and_mtb_moni(&tp_to_sink_c,
-                                               &master_trigger_ip_c,
-                                               master_trigger_port_c,
-                                               moni_interval,
-                                               false);
-    });
+    //println!("==> Starting main monitoring thread...");
+    //let tp_to_sink_c = tp_to_sink.clone();
+    //let moni_interval = 10u64; // in seconds
+    //worker_threads.execute(move || {
+    //                       tofcmp_and_mtb_moni(&tp_to_sink_c,
+    //                                           &master_trigger_ip_c,
+    //                                           master_trigger_port_c,
+    //                                           moni_interval,
+    //                                           false);
+    //});
   }
 
   write_stream_path = String::from(stream_files_path.into_os_string().into_string().expect("Somehow the paths are messed up very badly! So I can't help it and I quit!"));
