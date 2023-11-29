@@ -173,6 +173,7 @@ fn main() {
           }
           available_rbs.push(rb_id);
           let mut this_reader = RobinReader::new(filename);
+          this_reader.generate_index();
           this_reader.cache_all_events();
           // exit(1);
           robin_readers.insert(rb_id, this_reader);
