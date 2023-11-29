@@ -60,7 +60,7 @@ jobs:
       uses: JamesIves/github-pages-deploy-action@3.7.1
       with:
         github_token: ${{ secrets.PAT_TOKEN }}
-        #branch: ${{ inputs.branch }}
+        branch: "develop"
         folder: ${{ github.workspace }}/build/doc/html/
 
     - name: Test
