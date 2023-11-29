@@ -63,11 +63,17 @@ jobs:
       run: cp -r ${{ github.workspace }}/tof/liftof/target/doc/* ${{ github.workspace }}/build/doc/html/
       shell: bash
 
-    - name: Deploy to GitHub Pages
-      uses: JamesIves/github-pages-deploy-action@3.7.1
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Setup Pages
+      uses: actions/configure-pages@v3
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v2
       with:
-        github_token: ${{ secrets.PAT_TOKEN }}
-        #branch: ${{ inputs.branch }}
-        folder: ${{ github.workspace }}/build/doc/html/
+          # Upload entire repository
+          path: '${{ github.workspace }}/build/doc/html'
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v2
 
 
