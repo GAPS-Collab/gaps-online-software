@@ -1,4 +1,4 @@
-name: CMake
+name: Pages-Only
 
 on:
   workflow_dispatch:
@@ -63,8 +63,6 @@ jobs:
       run: cp -r ${{ github.workspace }}/tof/liftof/target/doc/* ${{ github.workspace }}/build/doc/html/
       shell: bash
 
-    - name: Checkout
-      uses: actions/checkout@v3
     - name: Setup Pages
       uses: actions/configure-pages@v3
     - name: Upload artifact
