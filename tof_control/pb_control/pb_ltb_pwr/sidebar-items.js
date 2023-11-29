@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["power_off_ltb","power_on_ltb"]};

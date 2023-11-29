@@ -1,0 +1,133 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="tui is a library used to build rich terminal users interfaces and dashboards."><title>tui - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="tui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="logo-container" href="../tui/index.html"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><h2></h2></nav><nav class="sidebar"><a class="logo-container" href="../tui/index.html"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><h2 class="location"><a href="#">Crate tui</a></h2><div class="sidebar-elems"><ul class="block"><li class="version">Version 0.19.0</li><li><a id="all-types" href="all.html">All Items</a></li></ul><section><ul class="block"><li><a href="#reexports">Re-exports</a></li><li><a href="#modules">Modules</a></li></ul></section></div></nav><main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Crate <a class="mod" href="#">tui</a><button id="copy-path" title="Copy item path to clipboard"><img src="../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="src" href="../src/tui/lib.rs.html#1-173">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p><a href="https://github.com/fdehau/tui-rs">tui</a> is a library used to build rich
+terminal users interfaces and dashboards.</p>
+<p><img src="https://raw.githubusercontent.com/fdehau/tui-rs/master/assets/demo.gif" alt="" /></p>
+<h2 id="get-started"><a href="#get-started">Get started</a></h2><h3 id="adding-tui-as-a-dependency"><a href="#adding-tui-as-a-dependency">Adding <code>tui</code> as a dependency</a></h3><div class="example-wrap"><pre class="language-toml"><code>[dependencies]
+tui = &quot;0.19&quot;
+crossterm = &quot;0.25&quot;
+</code></pre></div>
+<p>The crate is using the <code>crossterm</code> backend by default that works on most platforms. But if for
+example you want to use the <code>termion</code> backend instead. This can be done by changing your
+dependencies specification to the following:</p>
+<div class="example-wrap"><pre class="language-toml"><code>[dependencies]
+termion = &quot;1.5&quot;
+tui = { version = &quot;0.19&quot;, default-features = false, features = [&#39;termion&#39;] }
+
+</code></pre></div>
+<p>The same logic applies for all other available backends.</p>
+<h3 id="creating-a-terminal"><a href="#creating-a-terminal">Creating a <code>Terminal</code></a></h3>
+<p>Every application using <code>tui</code> should start by instantiating a <code>Terminal</code>. It is a light
+abstraction over available backends that provides basic functionalities such as clearing the
+screen, hiding the cursor, etc.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::io;
+<span class="kw">use </span>tui::{backend::CrosstermBackend, Terminal};
+
+<span class="kw">fn </span>main() -&gt; <span class="prelude-ty">Result</span>&lt;(), io::Error&gt; {
+    <span class="kw">let </span>stdout = io::stdout();
+    <span class="kw">let </span>backend = CrosstermBackend::new(stdout);
+    <span class="kw">let </span><span class="kw-2">mut </span>terminal = Terminal::new(backend)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>(())
+}</code></pre></div>
+<p>If you had previously chosen <code>termion</code> as a backend, the terminal can be created in a similar
+way:</p>
+
+<div class="example-wrap ignore"><a href="#" class="tooltip" title="This example is not tested">ⓘ</a><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::io;
+<span class="kw">use </span>tui::{backend::TermionBackend, Terminal};
+<span class="kw">use </span>termion::raw::IntoRawMode;
+
+<span class="kw">fn </span>main() -&gt; <span class="prelude-ty">Result</span>&lt;(), io::Error&gt; {
+    <span class="kw">let </span>stdout = io::stdout().into_raw_mode()<span class="question-mark">?</span>;
+    <span class="kw">let </span>backend = TermionBackend::new(stdout);
+    <span class="kw">let </span><span class="kw-2">mut </span>terminal = Terminal::new(backend)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>(())
+}</code></pre></div>
+<p>You may also refer to the examples to find out how to create a <code>Terminal</code> for each available
+backend.</p>
+<h3 id="building-a-user-interface-ui"><a href="#building-a-user-interface-ui">Building a User Interface (UI)</a></h3>
+<p>Every component of your interface will be implementing the <code>Widget</code> trait. The library comes
+with a predefined set of widgets that should meet most of your use cases. You are also free to
+implement your own.</p>
+<p>Each widget follows a builder pattern API providing a default configuration along with methods
+to customize them. The widget is then rendered using <a href="terminal/struct.Frame.html#method.render_widget" title="method tui::terminal::Frame::render_widget"><code>Frame::render_widget</code></a> which takes
+your widget instance and an area to draw to.</p>
+<p>The following example renders a block of the size of the terminal:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::{io, thread, time::Duration};
+<span class="kw">use </span>tui::{
+    backend::CrosstermBackend,
+    widgets::{Widget, Block, Borders},
+    layout::{Layout, Constraint, Direction},
+    Terminal
+};
+<span class="kw">use </span>crossterm::{
+    event::{<span class="self">self</span>, DisableMouseCapture, EnableMouseCapture, Event, KeyCode},
+    execute,
+    terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
+};
+
+<span class="kw">fn </span>main() -&gt; <span class="prelude-ty">Result</span>&lt;(), io::Error&gt; {
+    <span class="comment">// setup terminal
+    </span>enable_raw_mode()<span class="question-mark">?</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>stdout = io::stdout();
+    <span class="macro">execute!</span>(stdout, EnterAlternateScreen, EnableMouseCapture)<span class="question-mark">?</span>;
+    <span class="kw">let </span>backend = CrosstermBackend::new(stdout);
+    <span class="kw">let </span><span class="kw-2">mut </span>terminal = Terminal::new(backend)<span class="question-mark">?</span>;
+
+    terminal.draw(|f| {
+        <span class="kw">let </span>size = f.size();
+        <span class="kw">let </span>block = Block::default()
+            .title(<span class="string">&quot;Block&quot;</span>)
+            .borders(Borders::ALL);
+        f.render_widget(block, size);
+    })<span class="question-mark">?</span>;
+
+    thread::sleep(Duration::from_millis(<span class="number">5000</span>));
+
+    <span class="comment">// restore terminal
+    </span>disable_raw_mode()<span class="question-mark">?</span>;
+    <span class="macro">execute!</span>(
+        terminal.backend_mut(),
+        LeaveAlternateScreen,
+        DisableMouseCapture
+    )<span class="question-mark">?</span>;
+    terminal.show_cursor()<span class="question-mark">?</span>;
+
+    <span class="prelude-val">Ok</span>(())
+}</code></pre></div>
+<h3 id="layout-1"><a href="#layout-1">Layout</a></h3>
+<p>The library comes with a basic yet useful layout management object called <code>Layout</code>. As you may
+see below and in the examples, the library makes heavy use of the builder pattern to provide
+full customization. And <code>Layout</code> is no exception:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>tui::{
+    backend::Backend,
+    layout::{Constraint, Direction, Layout},
+    widgets::{Block, Borders},
+    Frame,
+};
+<span class="kw">fn </span>ui&lt;B: Backend&gt;(f: <span class="kw-2">&amp;mut </span>Frame&lt;B&gt;) {
+   <span class="kw">let </span>chunks = Layout::default()
+        .direction(Direction::Vertical)
+        .margin(<span class="number">1</span>)
+        .constraints(
+            [
+                Constraint::Percentage(<span class="number">10</span>),
+                Constraint::Percentage(<span class="number">80</span>),
+                Constraint::Percentage(<span class="number">10</span>)
+            ].as_ref()
+        )
+        .split(f.size());
+    <span class="kw">let </span>block = Block::default()
+         .title(<span class="string">&quot;Block&quot;</span>)
+         .borders(Borders::ALL);
+    f.render_widget(block, chunks[<span class="number">0</span>]);
+    <span class="kw">let </span>block = Block::default()
+         .title(<span class="string">&quot;Block 2&quot;</span>)
+         .borders(Borders::ALL);
+    f.render_widget(block, chunks[<span class="number">1</span>]);
+}</code></pre></div>
+<p>This let you describe responsive terminal UI by nesting layouts. You should note that by
+default the computed layout tries to fill the available space completely. So if for any reason
+you might need a blank space somewhere, try to pass an additional constraint and don’t use the
+corresponding area.</p>
+</div></details><h2 id="reexports" class="small-section-header"><a href="#reexports">Re-exports</a></h2><ul class="item-table"><li><div class="item-name" id="reexport.Frame"><code>pub use self::terminal::<a class="struct" href="terminal/struct.Frame.html" title="struct tui::terminal::Frame">Frame</a>;</code></div></li><li><div class="item-name" id="reexport.Terminal"><code>pub use self::terminal::<a class="struct" href="terminal/struct.Terminal.html" title="struct tui::terminal::Terminal">Terminal</a>;</code></div></li><li><div class="item-name" id="reexport.TerminalOptions"><code>pub use self::terminal::<a class="struct" href="terminal/struct.TerminalOptions.html" title="struct tui::terminal::TerminalOptions">TerminalOptions</a>;</code></div></li><li><div class="item-name" id="reexport.Viewport"><code>pub use self::terminal::<a class="struct" href="terminal/struct.Viewport.html" title="struct tui::terminal::Viewport">Viewport</a>;</code></div></li></ul><h2 id="modules" class="small-section-header"><a href="#modules">Modules</a></h2><ul class="item-table"><li><div class="item-name"><a class="mod" href="backend/index.html" title="mod tui::backend">backend</a></div></li><li><div class="item-name"><a class="mod" href="buffer/index.html" title="mod tui::buffer">buffer</a></div></li><li><div class="item-name"><a class="mod" href="layout/index.html" title="mod tui::layout">layout</a></div></li><li><div class="item-name"><a class="mod" href="style/index.html" title="mod tui::style">style</a></div><div class="desc docblock-short"><code>style</code> contains the primitives used to control how your user interface will look.</div></li><li><div class="item-name"><a class="mod" href="symbols/index.html" title="mod tui::symbols">symbols</a></div></li><li><div class="item-name"><a class="mod" href="terminal/index.html" title="mod tui::terminal">terminal</a></div></li><li><div class="item-name"><a class="mod" href="text/index.html" title="mod tui::text">text</a></div><div class="desc docblock-short">Primitives for styled text.</div></li><li><div class="item-name"><a class="mod" href="widgets/index.html" title="mod tui::widgets">widgets</a></div><div class="desc docblock-short"><code>widgets</code> is a collection of types that implement <a href="widgets/trait.Widget.html" title="trait tui::widgets::Widget"><code>Widget</code></a> or <a href="widgets/trait.StatefulWidget.html" title="trait tui::widgets::StatefulWidget"><code>StatefulWidget</code></a> or both.</div></li></ul></section></div></main></body></html>

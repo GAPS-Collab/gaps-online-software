@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["preamp_bias_table","preamp_table","preamp_temp_table"]};

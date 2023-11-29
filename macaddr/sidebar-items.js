@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["MacAddr","ParseError"],"struct":["MacAddr6","MacAddr8"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"attr":["neli_enum"],"derive":["FromBytes","FromBytesWithInput","Header","Size","ToBytes"]};

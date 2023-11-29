@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["mean","median","merge_all","mode","stddev","variance"],"struct":["Frequencies","MinMax","OnlineStats","Unsorted"],"trait":["Commute"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["PacketQuality"],"mod":["packet_type"],"struct":["TofPacket"]};

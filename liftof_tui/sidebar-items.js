@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["MAX_LEN_MT_FPGA_TEMP","MAX_LEN_RATE","STREAM_CACHE_MAX_SIZE"],"enum":["Event"],"fn":["main","receive_stream","render_logs"],"mod":["menu","tab_commands","tab_mt","tab_status"],"struct":["Args","MasterLayout"]};

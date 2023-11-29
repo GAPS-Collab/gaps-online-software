@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["get_mac_to_ip_map","get_table"]};

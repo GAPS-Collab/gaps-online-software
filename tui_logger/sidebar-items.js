@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["TuiLoggerLevelOutput","TuiWidgetEvent"],"fn":["init_logger","move_events","set_default_level","set_hot_buffer_depth","set_level_for_target","set_log_file","slog_drain"],"struct":["CircularBuffer","Drain","LevelConfig","TuiLoggerSmartWidget","TuiLoggerTargetWidget","TuiLoggerWidget","TuiSlogDrain","TuiWidgetState"]};

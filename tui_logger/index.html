@@ -1,0 +1,147 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Logger with smart widget for the `tui` crate"><title>tui_logger - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="tui_logger" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0 (cc66ad468 2023-10-03)" data-channel="1.73.0" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="logo-container" href="../tui_logger/index.html"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><h2></h2></nav><nav class="sidebar"><a class="logo-container" href="../tui_logger/index.html"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><h2 class="location"><a href="#">Crate tui_logger</a></h2><div class="sidebar-elems"><ul class="block"><li class="version">Version 0.8.3</li><li><a id="all-types" href="all.html">All Items</a></li></ul><section><ul class="block"><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#functions">Functions</a></li></ul></section></div></nav><main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Crate <a class="mod" href="#">tui_logger</a><button id="copy-path" title="Copy item path to clipboard"><img src="../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="src" href="../src/tui_logger/lib.rs.html#3-1467">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><h2 id="logger-with-smart-widget-for-the-tui-crate"><a href="#logger-with-smart-widget-for-the-tui-crate">Logger with smart widget for the <code>tui</code> crate</a></h2>
+<p><img src="https://travis-ci.org/gin66/tui-logger.svg?branch=master" alt="Build Status" />
+<a href="https://deps.rs/repo/github/gin66/tui-logger"><img src="https://deps.rs/repo/github/gin66/tui-logger/status.svg?service=github&amp;nocache=0_6_6" alt="dependency status" /></a>
+<img src="https://github.com/gin66/tui-logger/workflows/Build%20examples/badge.svg?service=github" alt="Build examples" /></p>
+<h3 id="demo-of-the-widget"><a href="#demo-of-the-widget">Demo of the widget</a></h3>
+<p><img src="https://github.com/gin66/tui-logger/blob/master/doc/demo_v0.6.6.gif?raw=true" alt="Demo" /></p>
+<h3 id="documentation"><a href="#documentation">Documentation</a></h3>
+<p><a href="https://docs.rs/tui-logger/latest/tui_logger/">Documentation</a></p>
+<h3 id="features"><a href="#features">Features</a></h3>
+<ul>
+<li><input disabled="" type="checkbox" checked=""/>
+Logger implementation for the <code>log</code> crate</li>
+<li><input disabled="" type="checkbox" checked=""/>
+Logger enable/disable detection via hash table (avoid string compare)</li>
+<li><input disabled="" type="checkbox" checked=""/>
+Hot logger code only copies enabled log messages with timestamp into a circular buffer</li>
+<li><input disabled="" type="checkbox" checked=""/>
+Widgets/move_message() retrieve captured log messages from hot circular buffer</li>
+<li><input disabled="" type="checkbox" checked=""/>
+Lost message detection due to circular buffer</li>
+<li><input disabled="" type="checkbox" checked=""/>
+Log filtering performed on log record target</li>
+<li><input disabled="" type="checkbox" checked=""/>
+Simple Widgets to view logs and configure debuglevel per target</li>
+<li><input disabled="" type="checkbox" checked=""/>
+Logging of enabled logs to file</li>
+<li><input disabled="" type="checkbox" checked=""/>
+Scrollback in log history</li>
+<li><input disabled="" type="checkbox" checked=""/>
+Title of target and log pane can be configured</li>
+<li><input disabled="" type="checkbox" checked=""/>
+<code>slog</code> support, providing a Drain to integrate into your <code>slog</code> infrastructure</li>
+<li><input disabled="" type="checkbox"/>
+Allow configuration of target dependent loglevel specifically for file logging</li>
+<li><input disabled="" type="checkbox"/>
+Avoid duplicating of target, module and filename in every log record</li>
+<li><input disabled="" type="checkbox"/>
+Simultaneous modification of all targets’ display/hot logging loglevel by key command</li>
+</ul>
+<h3 id="smart-widget"><a href="#smart-widget">Smart Widget</a></h3>
+<p>Smart widget consists of two widgets. Left is the target selector widget and
+on the right side the logging messages view scrolling up. The target selector widget
+can be hidden/shown during runtime via key command.
+The key command to be provided to the TuiLoggerWidget via transition() function.</p>
+<p>The target selector widget looks like this:</p>
+<p><img src="https://github.com/gin66/tui-logger/blob/master/doc/example.png?raw=true" alt="widget" /></p>
+<p>It controls:</p>
+<ul>
+<li>Capturing of log messages by the logger</li>
+<li>Selection of levels for display in the logging message view</li>
+</ul>
+<p>The two columns have the following meaning:</p>
+<ul>
+<li>Code EWIDT: E stands for Error, W for Warn, Info, Debug and Trace.
+<ul>
+<li>Inverted characters (EWIDT) are enabled log levels in the view</li>
+<li>Normal characters show enabled capturing of a log level per target</li>
+<li>If any of EWIDT are not shown, then the respective log level is not captured</li>
+</ul>
+</li>
+<li>Target of the log events can be defined in the log e.g. <code>warn!(target: &quot;demo&quot;, &quot;Log message&quot;);</code></li>
+</ul>
+<h3 id="smart-widget-key-commands"><a href="#smart-widget-key-commands">Smart Widget Key Commands</a></h3>
+<div class="example-wrap ignore"><a href="#" class="tooltip" title="This example is not tested">ⓘ</a><pre class="rust rust-example-rendered"><code>|  KEY     | ACTION
+|----------|-----------------------------------------------------------|
+| h        | Toggles target selector widget hidden/visible
+| f        | Toggle focus on the selected target only
+| UP       | Select previous target <span class="kw">in </span>target selector widget
+| DOWN     | Select next target <span class="kw">in </span>target selector widget
+| LEFT     | Reduce SHOWN (!) log messages by one level
+| RIGHT    | Increase SHOWN (!) log messages by one level
+| -        | Reduce CAPTURED (!) log messages by one level
+| +        | Increase CAPTURED (!) log messages by one level
+| PAGEUP   | Enter Page Mode and scroll approx. half page up <span class="kw">in </span>log history.
+| PAGEDOWN | Only <span class="kw">in </span>page mode: scroll <span class="number">10 </span>events down <span class="kw">in </span>log history.
+| ESCAPE   | Exit page mode and go back to scrolling mode
+| SPACE    | Toggles hiding of targets, which have logfilter set to off</code></pre></div>
+<p>The mapping of key to action has to be done in the application. The respective TuiWidgetEvent
+has to be provided to TuiWidgetState::transition().</p>
+<p>Remark to the page mode: The timestamp of the event at event history’s bottom line is used as
+reference. This means, changing the filters in the EWIDT/focus from the target selector window
+should work as expected without jumps in the history. The page next/forward advances as
+per visibility of the events.</p>
+<h3 id="basic-usage-to-initialize-logger-system"><a href="#basic-usage-to-initialize-logger-system">Basic usage to initialize logger-system:</a></h3>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attr">#[macro_use]
+</span><span class="kw">extern crate </span>log;
+<span class="comment">//use tui_logger;
+
+</span><span class="kw">fn </span>main() {
+    <span class="comment">// Early initialization of the logger
+
+    // Set max_log_level to Trace
+    </span>tui_logger::init_logger(log::LevelFilter::Trace).unwrap();
+
+    <span class="comment">// Set default level for unknown targets to Trace
+    </span>tui_logger::set_default_level(log::LevelFilter::Trace);
+
+    <span class="comment">// code....
+</span>}</code></pre></div>
+<p>For use of the widget please check examples/demo.rs</p>
+<h3 id="slog-support"><a href="#slog-support"><code>slog</code> support</a></h3>
+<p><code>tui-logger</code> provides a TuiSlogDrain which implements <code>slog::Drain</code> and will route all records
+it receives to the <code>tui-logger</code> widget</p>
+<h3 id="custom-filtering"><a href="#custom-filtering">Custom filtering</a></h3>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attr">#[macro_use]
+</span><span class="kw">extern crate </span>log;
+<span class="comment">//use tui_logger;
+</span><span class="kw">use </span>env_logger;
+
+<span class="kw">fn </span>main() {
+    <span class="comment">// Early initialization of the logger
+    </span><span class="kw">let </span>drain = tui_logger::Drain::new();
+    <span class="comment">// instead of tui_logger::init_logger, we use `env_logger`
+    </span>env_logger::Builder::default()
+        .format(<span class="kw">move </span>|buf, record|
+            <span class="comment">// patch the env-logger entry through our drain to the tui-logger
+            </span><span class="prelude-val">Ok</span>(drain.log(record))
+        ).init(); <span class="comment">// make this the global logger
+    // code....
+</span>}</code></pre></div>
+<h3 id="applications-using-tui-logger"><a href="#applications-using-tui-logger">Applications using tui-logger</a></h3>
+<ul>
+<li><a href="https://github.com/wasmCloud/wash">wash</a></li>
+<li><a href="https://github.com/atlassian/rocker">rocker</a></li>
+</ul>
+<h3 id="thanks-to"><a href="#thanks-to">THANKS TO</a></h3>
+<ul>
+<li><a href="https://github.com/fdehau">Florian Dehau</a> for his great crate <a href="https://github.com/fdehau/tui-rs">tui-rs</a></li>
+<li><a href="https://github.com/abusch">Antoine Büsch</a> for providing the patches to tui-rs v0.3.0 and v0.6.0</li>
+<li><a href="https://github.com/ajsyp">Adam Sypniewski</a> for providing the patches to tui-rs v0.6.2</li>
+<li><a href="https://github.com/jklong">James aka jklong</a> for providing the patch to tui-rs v0.7</li>
+<li><a href="https://github.com/icy-ux">icy-ux</a> for adding slog support and example</li>
+<li><a href="https://github.com/alvinhochun">alvinhochun</a> for updating to tui 0.10 and crossterm support</li>
+<li><a href="https://github.com/brooksmtownsend">brooksmtownsend</a> Patch to remove verbose timestamp info</li>
+<li><a href="https://github.com/Kibouo">Kibouo</a> Patch to change Rc/Refcell to thread-safe counterparts</li>
+<li><a href="https://github.com/afonso360">Afonso Bordado</a> for providing the patch to tui-rs v0.17</li>
+<li><a href="https://github.com/gnunicorn">Benjamin Kampmann</a> for providing patch to tui-rs v0.18</li>
+<li><a href="https://github.com/pms1969">Paul Sanders</a> for providing patch in <a href="https://github.com/gin66/tui-logger/issues/30">issue #30</a></li>
+</ul>
+</div></details><h2 id="structs" class="small-section-header"><a href="#structs">Structs</a></h2><ul class="item-table"><li><div class="item-name"><a class="struct" href="struct.CircularBuffer.html" title="struct tui_logger::CircularBuffer">CircularBuffer</a></div><div class="desc docblock-short">CircularBuffer is used to store the last elements of an endless sequence.
+Oldest elements will be overwritten. The implementation focus on
+speed. So memory allocations are avoided.</div></li><li><div class="item-name"><a class="struct" href="struct.Drain.html" title="struct tui_logger::Drain">Drain</a></div><div class="desc docblock-short">A simple <code>Drain</code> to log any event directly.</div></li><li><div class="item-name"><a class="struct" href="struct.LevelConfig.html" title="struct tui_logger::LevelConfig">LevelConfig</a></div><div class="desc docblock-short">LevelConfig stores the relation target-&gt;LevelFilter in a hash table.</div></li><li><div class="item-name"><a class="struct" href="struct.TuiLoggerSmartWidget.html" title="struct tui_logger::TuiLoggerSmartWidget">TuiLoggerSmartWidget</a></div><div class="desc docblock-short">The Smart Widget combines the TuiLoggerWidget and the TuiLoggerTargetWidget
+into a nice combo, where the TuiLoggerTargetWidget can be shown/hidden.</div></li><li><div class="item-name"><a class="struct" href="struct.TuiLoggerTargetWidget.html" title="struct tui_logger::TuiLoggerTargetWidget">TuiLoggerTargetWidget</a></div><div class="desc docblock-short">This is the definition for the TuiLoggerTargetWidget,
+which allows configuration of the logger system and selection of log messages.</div></li><li><div class="item-name"><a class="struct" href="struct.TuiLoggerWidget.html" title="struct tui_logger::TuiLoggerWidget">TuiLoggerWidget</a></div></li><li><div class="item-name"><a class="struct" href="struct.TuiSlogDrain.html" title="struct tui_logger::TuiSlogDrain">TuiSlogDrain</a></div><div class="desc docblock-short">slog-compatible Drain that feeds messages to <code>tui-logger</code>.</div></li><li><div class="item-name"><a class="struct" href="struct.TuiWidgetState.html" title="struct tui_logger::TuiWidgetState">TuiWidgetState</a></div><div class="desc docblock-short">This struct contains the shared state of a TuiLoggerWidget and a TuiLoggerTargetWidget.</div></li></ul><h2 id="enums" class="small-section-header"><a href="#enums">Enums</a></h2><ul class="item-table"><li><div class="item-name"><a class="enum" href="enum.TuiLoggerLevelOutput.html" title="enum tui_logger::TuiLoggerLevelOutput">TuiLoggerLevelOutput</a></div><div class="desc docblock-short">The TuiLoggerWidget shows the logging messages in an endless scrolling view.
+It is controlled by a TuiWidgetState for selected events.</div></li><li><div class="item-name"><a class="enum" href="enum.TuiWidgetEvent.html" title="enum tui_logger::TuiWidgetEvent">TuiWidgetEvent</a></div></li></ul><h2 id="functions" class="small-section-header"><a href="#functions">Functions</a></h2><ul class="item-table"><li><div class="item-name"><a class="fn" href="fn.init_logger.html" title="fn tui_logger::init_logger">init_logger</a></div><div class="desc docblock-short">Init the logger and record with <code>log</code> crate.</div></li><li><div class="item-name"><a class="fn" href="fn.move_events.html" title="fn tui_logger::move_events">move_events</a></div><div class="desc docblock-short">Move events from hot circular buffer to the main one.
+If defined, log records will be written to file.</div></li><li><div class="item-name"><a class="fn" href="fn.set_default_level.html" title="fn tui_logger::set_default_level">set_default_level</a></div><div class="desc docblock-short">Set default levelfilter for unknown targets of the logger</div></li><li><div class="item-name"><a class="fn" href="fn.set_hot_buffer_depth.html" title="fn tui_logger::set_hot_buffer_depth">set_hot_buffer_depth</a></div><div class="desc docblock-short">Set the depth of the hot buffer in order to avoid message loss.
+This is effective only after a call to move_events()</div></li><li><div class="item-name"><a class="fn" href="fn.set_level_for_target.html" title="fn tui_logger::set_level_for_target">set_level_for_target</a></div><div class="desc docblock-short">Set levelfilter for a specific target in the logger</div></li><li><div class="item-name"><a class="fn" href="fn.set_log_file.html" title="fn tui_logger::set_log_file">set_log_file</a></div><div class="desc docblock-short">Define filename for logging.</div></li><li><div class="item-name"><a class="fn" href="fn.slog_drain.html" title="fn tui_logger::slog_drain">slog_drain</a></div></li></ul></section></div></main></body></html>

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["ucla_mode"]};

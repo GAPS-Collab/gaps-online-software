@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["DeError","NlError","SerError","WrappedError"],"struct":["Nlmsgerr","NlmsghdrErr"]};

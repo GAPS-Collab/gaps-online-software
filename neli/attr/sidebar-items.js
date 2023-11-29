@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["AttrHandle","AttrHandleMut"],"trait":["Attribute"]};
