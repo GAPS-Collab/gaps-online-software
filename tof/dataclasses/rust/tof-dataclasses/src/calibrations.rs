@@ -128,13 +128,16 @@ fn trace_check(event : &RBEvent) -> bool {
 
 /***********************************/
 
+
+/// Simplified version of spike cleaning 
+///
+/// Taken over from Jamie's python code
 fn clean_spikes(traces : &mut Vec<Vec<Vec<f32>>>,vcaldone : bool) {
   //# TODO: make robust (symmetric, doubles, fixed/estimated spike height)
   let mut thresh : f32 = 360.0;
   if vcaldone {
     thresh = 16.0;
   }
-  let mut spikes = Vec::<usize>::new();
 
   // remember the structure of the traces here    
   //nevents,nchan,tracelen = gbf.traces.shape
@@ -172,9 +175,9 @@ fn clean_spikes(traces : &mut Vec<Vec<Vec<f32>>>,vcaldone : bool) {
   for spike in spikes.iter() {
     for ch in 0..traces.len() {
       for ev in 0..traces[ch].len() {
-        let dV : f32 = (traces[ch][ev][spike+3] - traces[ch][ev][*spike])/3.0;
-        traces[ch][ev][spike+1] = traces[ch][ev][*spike] + dV;
-        traces[ch][ev][spike+2] = traces[ch][ev][*spike] + 2.0*dV;
+        let d_v : f32 = (traces[ch][ev][spike+3] - traces[ch][ev][*spike])/3.0;
+        traces[ch][ev][spike+1] = traces[ch][ev][*spike] + d_v;
+        traces[ch][ev][spike+2] = traces[ch][ev][*spike] + 2.0*d_v;
       }
     }
   }
@@ -284,7 +287,6 @@ pub fn get_periods(trace   : &Vec<f32>,
     let tr_a   = &trace_c[*zcs_a..*zcs_a+2];
     let tr_b   = &trace_c[*zcs_b..*zcs_b+2];
     let mut period : f32 = 0.0;
-    let mut n_zeros = 0usize;
     for n in zcs_a+1..*zcs_b {
       period += dts[n];
     }
@@ -375,13 +377,9 @@ fn calculate_column_medians(data: &Vec<Vec<f32>>) -> Vec<f32> {
       col_vals[k] = data[k][col];
     }
     col_vals.retain(|x| !x.is_nan());
-    
-    //column_medians[col] = median(&col_vals);//.unwrap_or(f32::NAN);
     if col_vals.len() == 0 {
       column_medians[col] = f32::NAN;
     } else {
-
-      //column_medians[col] = statistical::mean(col_vals.as_slice());
       column_medians[col] = statistical::median(col_vals.as_slice());//.unwrap_or(f32::NAN);
     }
   }
@@ -554,7 +552,7 @@ impl RBCalibrations {
     let mut trace        = Vec::<f32>::with_capacity(NWORDS);
     let mut stop_cells   = Vec::<isize>::new();
     let mut empty_events = Vec::<Vec::<f32>>::new();
-    for ev in 0..nevents {
+    for _ in 0..nevents {
         empty_events.push(trace.clone());
     }
     for ch in 0..NCHN {
@@ -629,15 +627,16 @@ impl RBCalibrations {
         roll(&mut rolled_traces[ch][n],
              input_vcal_data[n].header.stop_cell as isize); 
       }// first loop over events done
-      let v_offsets = calculate_column_medians(&rolled_traces[ch]);
-      info!("We calculated {} voltage offset values for ch {}", v_offsets.len(), ch);
+      all_v_offsets[ch] = calculate_column_means(&rolled_traces[ch]);
+      //let v_offsets = calculate_column_medians(&rolled_traces[ch]);
+      debug!("We calculated {} voltage offset values for ch {}", all_v_offsets[ch].len(), ch);
       // fill these in the prepared array structure
-      for k in 0..v_offsets.len() {
-        all_v_offsets[ch][k] = v_offsets[k];
-      }
+      //for k in 0..v_offsets.len() {
+      //  all_v_offsets[ch][k] = v_offsets[k];
+      //}
       for (n, ev) in input_vcal_data.iter().enumerate() {
         // now we roll the v_offsets back
-        let mut v_offsets_rolled = v_offsets.clone();
+        let mut v_offsets_rolled = all_v_offsets[ch].clone();
         roll(&mut v_offsets_rolled, -1*ev.header.stop_cell as isize);
         for k in 0..traces[ch][n].len() {
           traces[ch][n][k] -= v_offsets_rolled[k];
@@ -672,11 +671,11 @@ impl RBCalibrations {
     }
     // tcal values are [channel][adc_cell] 
     let mut all_tcal = Vec::<Vec::<f32>>::new();
-    for ch in 0..NCHN {
+    for _ in 0..NCHN {
       all_tcal.push(Vec::<f32>::new());
     }
     // traces are [channel][event][adc_cell]
-    let mut traces   = Vec::<Vec::<Vec::<f32>>>::new();
+    let mut traces       : Vec<Vec<Vec<f32>>>;
     let mut stop_cells   = Vec::<isize>::new();
     if apply_vcal {
       let result = self.apply_vcal(&self.tcal_data);
@@ -818,11 +817,12 @@ impl RBCalibrations {
     let global = true;
     if global {
       
-      let mut tcal_traces   = Vec::<Vec::<Vec::<f32>>>::new();
-      let mut stop_cells    = Vec::<isize>::new();
+      //let mut tcal_traces   = Vec::<Vec::<Vec::<f32>>>::new();
+      //let mut stop_cells    = Vec::<isize>::new();
+      
       let result  = self.apply_vcal(&self.tcal_data);
-      tcal_traces = result.0;
-      stop_cells  = result.1;
+      let tcal_traces = result.0;
+      let stop_cells  = result.1;
 
       //for n in 0..1000 {
       for ch in 0..NCHN {
@@ -1221,7 +1221,7 @@ impl Serialization for RBCalibrations {
       }
     }
     if rb_cal.serialize_event_data {
-      let mut broken_event = RBEvent::new();
+      let broken_event = RBEvent::new();
       let n_noi  = parse_u16(bytestream, pos);
       info!("Found {n_noi} no input data events!");
       for _ in 0..n_noi {

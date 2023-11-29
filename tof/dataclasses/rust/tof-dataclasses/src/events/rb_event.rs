@@ -20,26 +20,20 @@
 
 use std::fmt;
 
-extern crate crc;
-use crc::Crc;
 use colored::Colorize;
 
 
 use crate::packets::{TofPacket, PacketType};
 use crate::events::TofHit;
 use crate::constants::{NWORDS, NCHN};
-use crate::serialization::{u16_to_u8,
-                           u8_to_u16,
-                           search_for_u16,
-                           Serialization,
-                           SerializationError,
-                           parse_bool,
-                           parse_u8,
-                           parse_u16,
-                           parse_u32,
-                           parse_u32_for_16bit_words,
-                           parse_u48_for_16bit_words,
-                           parse_u64};
+use crate::serialization::{
+    u8_to_u16,
+    Serialization,
+    SerializationError,
+    parse_u8,
+    parse_u16,
+    parse_u32,
+};
 
 use crate::events::DataType;
 use crate::errors::UserError;
@@ -246,8 +240,8 @@ pub fn unpack_traces_f64(events : &Vec<RBEvent>)
   let mut trace        = Vec::<f64>::with_capacity(NWORDS);
   let mut stop_cells   = Vec::<isize>::new();
   let mut empty_events = Vec::<Vec::<f64>>::new();
-  for ev in 0..nevents {
-      empty_events.push(trace.clone());
+  for _ in 0..nevents {
+    empty_events.push(trace.clone());
   }
   for ch in 0..NCHN {
     traces.push(empty_events.clone());
@@ -270,8 +264,8 @@ pub fn unpack_traces_f32(events : &Vec<RBEvent>)
   let mut trace        = Vec::<f32>::with_capacity(NWORDS);
   let mut stop_cells   = Vec::<isize>::new();
   let mut empty_events = Vec::<Vec::<f32>>::new();
-  for ev in 0..nevents {
-      empty_events.push(trace.clone());
+  for _ in 0..nevents {
+    empty_events.push(trace.clone());
   }
   for ch in 0..NCHN {
     traces.push(empty_events.clone());
@@ -306,7 +300,7 @@ impl RBEvent {
 
   pub fn new() -> Self {
     let mut adc = Vec::<Vec<u16>>::with_capacity(NCHN);
-    for k in 0..NCHN {
+    for _ in 0..NCHN {
       adc.push(Vec::<u16>::new());
     }
     Self {
@@ -974,11 +968,7 @@ impl RBEventHeader {
 
   /// Get the number of data channels + 1 for ch9
   pub fn get_nchan(&self) -> usize {
-    let mut nchan = self.get_channels().len();
-    //if self.has_ch9 {
-    //  nchan += 1;
-    //}
-    nchan
+    self.get_channels().len()
   }
   
   //pub fn get_ndatachan(&self) -> usize {

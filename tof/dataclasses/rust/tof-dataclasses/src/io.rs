@@ -11,6 +11,23 @@
 // where the byteorder of u32 and larger 
 // is correct.
 const REVERSE_WORDS : bool = true;
+const CALC_CHECKSUM : bool = true;
+const ALGO : crc::Algorithm<u32> = crc::Algorithm {
+      width   : 32u8,
+      init    : 0xFFFFFFFF,
+      //poly    : 0xEDB88320,
+      poly    : 0x04C11DB7,
+      refin   : true,
+      refout  : true,
+      xorout  : 0xFFFFFFFF,
+      check   : 0,
+      residue : 0,
+      //check   : 0xcbf43926,
+      //residue : 0xdebb20e3,
+    };
+
+extern crate crc;
+use crc::Crc;
 
 use std::path::Path;
 use std::fs::{
@@ -26,9 +43,11 @@ use std::io::{
     Read
 };
 use std::collections::{
-    VecDeque,
+    //VecDeque,
     HashMap
 };
+
+use std::fmt;
 
 extern crate indicatif;
 use indicatif::{ProgressBar, ProgressStyle};
@@ -44,13 +63,13 @@ use crate::packets::{
 };
 
 use crate::serialization::{
+    Serialization,
     u8_to_u16_14bit,
     search_for_u16,
     parse_u8,
     parse_u16,
 };
 
-use crate::errors::PacketError;
 
 /// Read an entire file into memory
 ///
@@ -73,7 +92,6 @@ pub fn read_file(filename: &Path) -> io::Result<Vec<u8>> {
 
 
 /// Emit RBEvents from a stream of bytes
-#[derive(Debug, Clone)]
 pub struct RBEventMemoryStreamer {
   pub stream       : Vec<u8>,
   pub pos          : usize,
@@ -81,20 +99,35 @@ pub struct RBEventMemoryStreamer {
   pub tp_sender    : Option<Sender<TofPacket>>,
   /// number of extracted events from stream
   /// this manages how we are draining the stream
-  n_events_ext : usize,
-  pub is_depleted : bool,
+  n_events_ext     : usize,
+  pub is_depleted  : bool,
+  //crc32_algo       : crc::Algorithm<u32>,
+  //crc32_sum        : Crc::<u32>,
 }
+
+impl fmt::Debug for RBEventMemoryStreamer {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    f.debug_struct("<RBEventMemoryStreamer>")
+     //.field("x", &self.x)
+     //.field("y", &self.y)
+     .finish()
+  }
+}
+
 
 impl RBEventMemoryStreamer {
 
+
   pub fn new() -> Self {
     Self {
-      stream        : Vec::<u8>::new(),
-      pos           : 0,
-      pos_at_head   : false,
-      tp_sender     : None,
-      n_events_ext  : 0,
-      is_depleted   : false,
+      stream           : Vec::<u8>::new(),
+      pos              : 0,
+      pos_at_head      : false,
+      tp_sender        : None,
+      n_events_ext     : 0,
+      is_depleted      : false,
+      //crc32_algo       : algo,
+      //crc32_sum        : Crc::<u32>::new(&algo),
     }
   }
 
@@ -112,11 +145,11 @@ impl RBEventMemoryStreamer {
           break;
         },
         Some(ev) => {
-          let mut tp = TofPacket::from(&ev);
+          let tp = TofPacket::from(&ev);
           match self.tp_sender.as_ref().expect("Sender needs to be initialized first!").send(tp) {
             Ok(_) => (),
             Err(err) => {
-              error!("Unable to send TofPacket!");
+              error!("Unable to send TofPacket! {err}");
             }
           }
         }
@@ -176,8 +209,8 @@ impl RBEventMemoryStreamer {
   pub fn next_tofpacket(&mut self) -> Option<TofPacket> {
     let begin_pos = self.pos; // in case we need
                               // to reset the position
-    let mut head_pos  = self.pos;
-    let mut foot_pos  = self.pos;
+    let foot_pos : usize;
+    let head_pos : usize;
     if self.stream.len() == 0 {
       trace!("Stream empty!");
       return None;
@@ -189,7 +222,9 @@ impl RBEventMemoryStreamer {
         return None;
       }
     }
-    head_pos = self.pos;
+    head_pos  = self.pos;
+    //let mut foot_pos  = self.pos;
+    //head_pos = self.pos;
     if !self.seek_next_header(0x5555) {
       debug!("Could not find another footer...");
       self.pos = begin_pos;
@@ -222,6 +257,8 @@ impl Iterator for RBEventMemoryStreamer {
 
 
   fn next(&mut self) -> Option<Self::Item> {
+    
+    let crc32_sum = Crc::<u32>::new(&ALGO);
     let begin_pos = self.pos; // in case we need
                               // to reset the position
     if self.stream.len() == 0 {
@@ -251,14 +288,18 @@ impl Iterator for RBEventMemoryStreamer {
     let mut event        = RBEvent::new();
     let mut event_status = EventStatus::Perfect;
     // start parsing
-    let first_pos = self.pos;
+    //let first_pos = self.pos;
     let head   = parse_u16(&self.stream, &mut self.pos);
+    if head != RBEventHeader::HEAD {
+      error!("Event does not start with {}", RBEventHeader::HEAD);
+    }
     let status = parse_u16(&self.stream, &mut self.pos);
     //let head_pos   = search_for_u16(RBEvent::HEAD, &self.stream, self.pos); 
     // At this state, this can be a header or a full event. Check here and
     // proceed depending on the options
     header.parse_status(status);
     let packet_len = parse_u16(&self.stream, &mut self.pos) as usize * 2;
+    
     let nwords     = parse_u16(&self.stream, &mut self.pos) as usize + 1; // the field will tell you the 
     // now we skip the next 10 bytes, 
     // they are dna, rsv, rsv, rsv, fw_hash
@@ -324,24 +365,40 @@ impl Iterator for RBEventMemoryStreamer {
         //let header = parse_u16(&self.stream, &mut self.pos);
         // noice!!
         //let data : Vec<u8> = self.stream.iter().skip(self.pos).take(2*nwords).map(|&x| x).collect();
-        
-        event.adc[*ch as usize] = u8_to_u16_14bit(&self.stream[self.pos..self.pos + 2*nwords]);
-        self.pos += 2*nwords;
-        //let mut this_ch_adc = Vec::<u16>::with_capacity(nwords);
-        //for j in 0..nwords {
-        //  this_ch_adc.push(0x3fff & parse_u16(&self.stream, &mut self.pos))
-        //}
-        //event.adc[*ch as usize] = this_ch_adc;
-        
+         
+        //self.crc32_sum = Hasher::new();
+        //self.crc32_sum.update(&self.stream[self.pos..self.pos+2*nwords]);
+        // -> THis is the preferred way
+        let mut dig = crc32_sum.digest();
+        if CALC_CHECKSUM {
+          let mut this_ch_adc = Vec::<u16>::with_capacity(nwords);
+          for _ in 0..nwords {
+            let this_field = parse_u16(&self.stream, &mut self.pos);
+            dig.update(&this_field.to_le_bytes());
+            this_ch_adc.push(0x3fff & this_field)
+          }
+          event.adc[*ch as usize] = this_ch_adc;
+        } else {
+          event.adc[*ch as usize] = u8_to_u16_14bit(&self.stream[self.pos..self.pos + 2*nwords]);
+          self.pos += 2*nwords;
+        } 
         //let data = &self.stream[self.pos..self.pos+2*nwords];
         //self.pos += 2*nwords;
         let crc320 = parse_u16(&self.stream, &mut self.pos);
         let crc321 = parse_u16(&self.stream, &mut self.pos);
-        let mut crc32 : u32;
-        if REVERSE_WORDS {
-          crc32 = u32::from(crc321) << 16 | u32::from(crc320);
-        } else {
-          crc32 = u32::from(crc320) << 16 | u32::from(crc321);
+        //let checksum = self.crc32_sum.clone().finalize();
+        if CALC_CHECKSUM {
+          let crc32 : u32;
+          if REVERSE_WORDS {
+            crc32 = u32::from(crc320) << 16 | u32::from(crc321);
+          } else {
+            crc32 = u32::from(crc321) << 16 | u32::from(crc320);
+          }
+          let checksum = dig.finalize();
+          if checksum != crc32 {
+            event_status = EventStatus::CRC32Wrong;
+          }
+          println!("== ==> Checksum {}, channel checksum {}!", checksum, crc32); 
         }
       } else {
         error!("We saw a ch id of {} in the data, but this is not accounted for in the channel mask in the header!", ch_id);
@@ -355,11 +412,16 @@ impl Iterator for RBEventMemoryStreamer {
     }
     let crc320         = parse_u16(&self.stream, &mut self.pos);
     let crc321         = parse_u16(&self.stream, &mut self.pos);
-    let mut crc32 : u32;
-    if REVERSE_WORDS {
-      crc32 = u32::from(crc320) << 16 | u32::from(crc321);
-    } else {
-      crc32 = u32::from(crc321) << 16 | u32::from(crc320);
+    if CALC_CHECKSUM {
+      let crc32 : u32;
+      if REVERSE_WORDS {
+        crc32 = u32::from(crc320) << 16 | u32::from(crc321);
+      } else {
+        crc32 = u32::from(crc321) << 16 | u32::from(crc320);
+      }
+      if event.header.crc32 != crc32 {
+        trace!("Checksum test for the whole event is not yet implemented!");
+      }
     }
     let tail         = parse_u16(&self.stream, &mut self.pos);
     //let delta_pos    = self.pos - first_pos;
@@ -743,5 +805,14 @@ impl Iterator for RobinReader {
   }
 }
 
+#[test]
+fn crc32() {
+  let crc32_sum = Crc::<u32>::new(&ALGO);
+  let mut dig   = crc32_sum.digest();
+  dig.update(&0u16.to_le_bytes());
+  let result = dig.finalize();
+  //assert_eq!(stream.len(), RBEventHeader::SIZE);
+  assert_eq!(1104745215,result);
+}
 
 
