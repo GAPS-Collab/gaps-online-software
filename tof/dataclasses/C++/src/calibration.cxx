@@ -40,8 +40,7 @@ void spike_cleaning_drs4(Vec<Vec<f32>> &wf, u16 tCell, i32 spikes[]) {
   n_rsp = 0;
 
   /* set rsp to -1 */
-  for (i = 0; i < 10; i++)
-  {
+  for (i = 0; i < 10; i++) {
     rsp[i] = -1;
   }
   /* find spikes with special high-pass filters */
@@ -49,14 +48,14 @@ void spike_cleaning_drs4(Vec<Vec<f32>> &wf, u16 tCell, i32 spikes[]) {
     for (i = 0; i < nChn; i++) {
       filter = -wf[i][j] + wf[i][(j + 1) % 1024] + wf[i][(j + 2) % 1024] - wf[i][(j + 3) % 1024];
       dfilter = filter + 2 * wf[i][(j + 3) % 1024] + wf[i][(j + 4) % 1024] - wf[i][(j + 5) % 1024];
+      //spdlog::info("filter {}, dfilter {}", filter, dfilter);
       if (filter > 20 && filter < 100) {
         if (n_sp[i] < 10)   // record maximum of 10 spikes
         {
           sp[i][n_sp[i]] = (j + 1) % 1024;
           n_sp[i]++;
-        }
-        else                // too many spikes -> something wrong
-        {
+        } else {                // too many spikes -> something wrong
+          spdlog::warn("Spike cleaning not possible, too many spikes ({}) in ch {}!", n_sp[i],i);
           return;
         }
         // filter condition avoids mistaking pulse for spike sometimes
@@ -71,12 +70,15 @@ void spike_cleaning_drs4(Vec<Vec<f32>> &wf, u16 tCell, i32 spikes[]) {
         }
         else                // too many spikes -> something wrong
         {
+          spdlog::warn("Spike cleaning not possible, too many spikes ({}) in ch {}!", n_sp[i],i);
           return;
         }
       }
     }
   }
-
+  for (usize ch=0;ch<9;ch++) {
+    spdlog::info("Found {} spikes in channel {}!", n_sp[ch], ch);
+  }
   /* find spikes at cell #0 and #1023
   for (i = 0; i < nChn; i++) {
     if (wf[i][0] + wf[i][1] - 2*wf[i][2] > 20) {
@@ -138,13 +140,10 @@ void spike_cleaning_drs4(Vec<Vec<f32>> &wf, u16 tCell, i32 spikes[]) {
   }
 
   /* recognize spikes if at least one channel has it */
-  for (k = 0; k < n_rsp; k++)
-  {
+  for (k = 0; k < n_rsp; k++) {
     spikes[k] = rsp[k];
-    for (i = 0; i < nChn; i++)
-    {
-      if (k < n_rsp && fabs(rsp[k] - rsp[k + 1] % 1024) == 2)
-      {
+    for (i = 0; i < nChn; i++) {
+      if (k < n_rsp && fabs(rsp[k] - rsp[k + 1] % 1024) == 2) {
         /* remove double spike */
         j = rsp[k] > rsp[k + 1] ? rsp[k + 1] : rsp[k];
         x = wf[i][(j - 1) % 1024];
@@ -208,7 +207,8 @@ void RBCalibration::disable_eventdata() {
 
 /************************************************/
 
-Vec<Vec<f32>> RBCalibration::voltages    (const RBEventMemoryView &event, bool spike_cleaning) const {
+Vec<Vec<f32>> RBCalibration::voltages(const RBEventMemoryView &event,
+                                      bool spike_cleaning) const {
   Vec<Vec<f32>> all_ch_voltages;
   for (u8 ch=1;ch<NCHN+1;ch++) {
     all_ch_voltages.push_back(voltages(event, ch));
@@ -225,7 +225,8 @@ Vec<Vec<f32>> RBCalibration::voltages    (const RBEventMemoryView &event, bool s
 
 /************************************************/
 
-Vec<Vec<f32>> RBCalibration::voltages    (const RBEvent &event, bool spike_cleaning) const {
+Vec<Vec<f32>> RBCalibration::voltages    (const RBEvent &event,
+                                          bool spike_cleaning) const {
   Vec<Vec<f32>> all_ch_voltages;
   for (u8 ch=1;ch<NCHN+1;ch++) {
     all_ch_voltages.push_back(voltages(event, ch));
