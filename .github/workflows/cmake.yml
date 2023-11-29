@@ -33,7 +33,7 @@ jobs:
         
 
     - name: Install dependencies
-      run : sudo apt update && sudo apt install doxygen && sudo apt install pybind11-dev && sudo apt install cargo
+      run : sudo apt update && sudo apt install doxygen && sudo apt install pybind11-dev && sudo apt install cargo && sudo apt install lmsensors-dev
     
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
@@ -49,5 +49,6 @@ jobs:
       working-directory: ${{github.workspace}}/build
       # Execute tests defined by the CMake configuration.
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
-      run: ctest -C ${{env.BUILD_TYPE}}
+      #run: ctest -C ${{env.BUILD_TYPE}}
+      run: cd ${{github.workspace}}/tof/datatclasses/rust/tof-dataclasses && cargo test --features="random" && cargo test --features="random" --test=test
 
