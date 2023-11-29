@@ -37,7 +37,7 @@ for rb in `echo $UCLA_RB`;
   do
     echo "Deploying liftof-rb V$version to $rb" 
     deploy_target liftof-rb $version $rb;
-    #exit
+    exit
 done;
 
 #for rb in `echo $UCLA_RB`; 
