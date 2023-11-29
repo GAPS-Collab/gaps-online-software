@@ -5,7 +5,7 @@ import charmingbeauty as cb
 # monkey patch the C++ API RBEvent
 gt.RBEvent.calib = None
 
-def _adc_plotter(axes, ev, ch, calib=None):
+def _adc_plotter(axes, ev, ch, calib=None, plot_stop_cell=False):
     if ch == 9:
         ax_j  = 4
         color = 'k'
@@ -32,8 +32,23 @@ def _adc_plotter(axes, ev, ch, calib=None):
                     color = color,\
                     alpha = alpha,\
                     lw    = lw)
+    if plot_stop_cell:
+        axes[ax_j].vlines(ev.header.stop_cell, *axes[ax_j].get_xlim(),lw=0.9, ls='dashed', color='gray')
 
-def plot(self, calib=None):
+def plot(self,\
+         calib : gt.RBCalibration = None,
+         spike_cleaning = True,
+         plot_stop_cell = False):
+    """
+    Plot (un)calibrated waveforms of this event.
+    All channels.
+
+    # Keyword Args:
+        calib : RBCalibration for this board
+        remove_spikes : apply DRS4 spike cleaning routine
+
+    """
+
     fig, axes = \
       p.subplots(5, 1, sharex=True, figsize=cb.layout.FIGSIZE_A4)# layout='constrained', sharex=True)
     fig.subplots_adjust(hspace=0)
@@ -65,9 +80,9 @@ def plot(self, calib=None):
         print ("No calibration given! Will plot adc values!")
         axes[0].set_xlabel("")
         for ch in range(1,10):
-            _adc_plotter(axes, self, ch)
+            _adc_plotter(axes, self, ch, plot_stop_cell = plot_stop_cell)
     else:
-        volts = calib.voltages(self, spike_cleaning = True)
+        volts = calib.voltages(self, spike_cleaning = spike_cleaning)
         nanos = calib.nanoseconds(self)
         for ch in range(1,10):
             if ch % 2 == 0:
@@ -75,15 +90,31 @@ def plot(self, calib=None):
             else:
                 color = "b"
             if ch in [1,2]:
+                stop_cell_time = nanos[ch-1][self.header.stop_cell]
                 axes[0].plot(nanos[ch-1], volts[ch-1], lw=1.2, color=color )
+                if plot_stop_cell:
+                    axes[0].vlines(stop_cell_time, *axes[0].get_xlim(), lw=0.9, ls='dashed', color='gray')
             if ch in [3,4]:
+                stop_cell_time = nanos[ch-1][self.header.stop_cell]
                 axes[1].plot(nanos[ch-1], volts[ch-1], lw=1.2, color=color )
+                if plot_stop_cell:
+                    axes[1].vlines(stop_cell_time, *axes[0].get_xlim(), lw=0.9, ls='dashed', color='gray')
             if ch in [5,6]:
+                stop_cell_time = nanos[ch-1][self.header.stop_cell]
                 axes[2].plot(nanos[ch-1], volts[ch-1], lw=1.2, color=color )
+                if plot_stop_cell:
+                    axes[2].vlines(stop_cell_time, *axes[0].get_xlim(), lw=0.9, ls='dashed', color='gray')
+                    pass
             if ch in [7,8]:
+                stop_cell_time = nanos[ch-1][self.header.stop_cell]
                 axes[3].plot(nanos[ch-1], volts[ch-1], lw=1.2, color=color )
+                if plot_stop_cell:
+                    axes[3].vlines(stop_cell_time, *axes[0].get_xlim(), lw=0.9, ls='dashed', color='gray')
             if ch == 9:
+                stop_cell_time = nanos[ch-1][self.header.stop_cell]
                 axes[4].plot(nanos[ch-1], volts[ch-1], lw=1.2, color="k")
+                if plot_stop_cell:
+                    axes[4].vlines(stop_cell_time, *axes[0].get_xlim(), lw=0.9, ls='dashed', color='gray')
     return fig
 
 
