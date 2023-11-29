@@ -1,3 +1,14 @@
+//! On-board memory management for readoutboards
+//! 
+//! The DRS4 is able to map its registers and the 
+//! data buffer directly into OS memory.
+//!
+//! memory locations for the control 
+//! registers
+//! /dev/uio0 - DRS4 control
+//! /dev/uio1 - buffer 1 for blobs
+//! /dev/uio2 - buffer 2 for blobs
+
 extern crate memmap;
 
 use std::error::Error;
@@ -8,11 +19,9 @@ use memmap::{Mmap,
              MmapMut};
 
 use std::ptr;
-///  memory locations for the control 
-///  registers
-///  /dev/uio0 - DRS4 control
-///  /dev/uio1 - buffer 1 for blobs
-///  /dev/uio2 - buffer 2 for blobs
+
+use tof_dataclasses::io::RBEventMemoryStreamer;
+
 pub const UIO0 : &'static str = "/dev/uio0";
 pub const UIO1 : &'static str = "/dev/uio1";
 pub const UIO2 : &'static str = "/dev/uio2";
@@ -178,30 +187,6 @@ pub fn write_control_reg(addr       : u32,
   Ok(())
 }
 
-/// For debugging. This just prints the 
-/// memory at a certain address
-#[deprecated(since = "0.1.0", note = "This just prints out bare memory and is only useful for debugging in the very early dev")]
-pub fn dump_mem<T>(addr_space : &str, addr: u32, len: usize)
-where
-    T: std::fmt::LowerHex,
-{
-    let sz = std::mem::size_of::<T>();
-    let m = match map_physical_mem_read(addr_space,addr, len * sz) {
-        Ok(m) => m,
-        Err(err) => {
-            panic!("Failed to mmap: Err={:?}", err);
-        }
-    };
-    let p = m.as_ptr() as *const T;
-    (0..len).for_each(|x| unsafe {
-        println!(
-            "{:016x}: {:02$x}",
-            addr as usize + sz * x,
-            std::ptr::read_volatile(p.offset(x as isize)),
-            (sz * 2) as usize
-        );
-    });
-}
 
 ///  Read one of the data buffers and return a bytestream 
 ///  from the given address with the length in events.
@@ -248,4 +233,50 @@ pub fn read_data_buffer(which : &BlobBuffer,
   }
   Ok(bytestream)
 }
+
+///  Read a data buffer directly into a RBEventMemory streamer,
+///  avoiding the detour over vector.extend (which performs 
+///  clones), so this *should* actually be much more efficient.
+///
+///  # Arguments
+///     * which    : Select data buffer to read 
+///     * size     : in bytes
+///     * streamer : an instance of a RBEventMemoryStreamer
+pub fn read_buffer_into_streamer(which    : &BlobBuffer, 
+                                 size     : usize,
+                                 streamer : &mut RBEventMemoryStreamer)
+    -> Result<(), RegisterError> 
+  where
+    u32: std::fmt::LowerHex, {
+
+  let addr_space;
+  match which {
+    BlobBuffer::A => addr_space = UIO1,
+    BlobBuffer::B => addr_space = UIO2
+  }
+  let m = match map_physical_mem_read(addr_space, 0x0, size) {
+  //let mut m = match map_physical_mem_write(addr_space, 0x0, size) {
+    Ok(m) => m,
+    Err(err) => {
+      let error = RegisterError {};
+      warn!("Failed to mmap: Err={:?}", err);
+      return Err(error);
+    }
+  };
+  let p = m.as_ptr() as *const u8;
+  //println!("Trying to get slice from raw parts");
+  let slice = ptr::slice_from_raw_parts(p, size);
+  //let mut bytestream : Vec::<u8>;
+  let mut bytestream = Vec::<u8>::with_capacity(200000);
+  println!("Trying to get bytestream from raw parts!");
+  unsafe {
+    //bytestream = Vec::from_raw_parts(p as *mut u8, size, size);
+    bytestream.extend_from_slice(&*slice); 
+  }
+  streamer.consume(&mut bytestream);
+  println!(".. done!");
+  //Ok(bytestream)
+  Ok(())
+}
+
 

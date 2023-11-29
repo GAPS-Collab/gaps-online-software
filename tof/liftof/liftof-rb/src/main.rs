@@ -26,12 +26,16 @@ use local_ip_address::local_ip;
 use std::process::exit;
 use liftof_lib::color_log;
 
-use liftof_rb::threads::{runner,
-                         cmd_responder,
-                         event_processing,
-                         event_cache,
-                         monitoring,
-                         data_publisher};
+use liftof_rb::threads::{
+    runner,
+    experimental_runner,
+    cmd_responder,
+    event_processing,
+    event_cache,
+    monitoring,
+    data_publisher
+};
+
 use liftof_rb::api::*;
 use liftof_rb::control::*;
 use tof_dataclasses::threading::ThreadPool;
@@ -254,7 +258,15 @@ fn main() {
 
   // then the runner. It does nothing, until we send a set
   // of RunParams
+  let tp_to_cache_c        = tp_to_cache.clone();
   workforce.execute(move || {
+      //experimental_runner(&rc_from_cmdr_c,
+      //                    None, 
+      //                    //&bs_send,
+      //                    &tp_to_cache,
+      //                    &dtf_to_evproc,
+      //                    &opmode_to_cache,
+      //                    show_progress);
       runner(&rc_from_cmdr_c,
              None, 
              &bs_send,
@@ -270,7 +282,6 @@ fn main() {
                                 wf_analysis,
                                 cache_size)
   });
-  let tp_to_cache_c        = tp_to_cache.clone();
   workforce.execute(move || {
                     event_processing(&bs_recv,
                                      &tp_to_cache,

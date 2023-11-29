@@ -51,20 +51,28 @@ pub fn event_processing(bs_recv           : &Receiver<Vec<u8>>,
     // this can't be blocking anymore, since 
     // otherwise we miss the datatype
     let mut skipped_events : usize = 0;
+    let mut bytestream : Vec<u8>;
     match bs_recv.recv() {
       Err(err) => {
         error!("Received Garbage! Err {err}");
         continue 'main;
       }
-      Ok(bytestream) => {
-        streamer.add(&bytestream, bytestream.len());
+      Ok(_stream) => {
+        info!("[EVPROC] - Received {} bytes!", _stream.len());
+        bytestream = _stream;
+        //streamer.add(&bytestream, bytestream.len());
+        streamer.consume(&mut bytestream);
         let mut packets_in_stream : u32 = 0;
         let mut last_event_id     : u32 = 0;
         loop {
+          if streamer.is_depleted {
+            info!("Streamer exhausted after sending {} packets!", packets_in_stream);
+            break;
+          }
           match streamer.next() {
             None => {
-              info!("Streamer exhausted after sending {} packets!", packets_in_stream);
-              break;
+              //info!("Streamer exhausted after sending {} packets!", packets_in_stream);
+              //break;
             },
             Some(_event) => {
               let mut event = _event;

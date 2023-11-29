@@ -4,6 +4,8 @@ use std::fs::read_to_string;
 
 
 use tof_dataclasses::serialization::Serialization;
+use tof_dataclasses::io::RBEventMemoryStreamer;
+
 use std::path::Path;
 use std::time::{Duration,
                 Instant};
@@ -90,8 +92,10 @@ pub fn wait_while_run_active(n_errors     : u32,
   let mut errs : u32 = 0;
   let start = Instant::now();
   let mut triggers_have_stopped = false;
+  let mut kill_timer = Instant::now();
   loop {
     // listen to zmq here
+    debug!("Waiting for 0MQ socket...");
     match socket.recv_bytes(0) {
       Err(err) => {
         error!("Unable to recv on socket! Err {err}");
@@ -99,6 +103,7 @@ pub fn wait_while_run_active(n_errors     : u32,
       Ok(bytes) => {
         // the first 5 bytes are the identifier, in this case
         // LOCAL
+        debug!("Received {} bytes over 0MQ!", bytes.len());
         match TofPacket::from_bytestream(&bytes, &mut 5) {
           Err(err) => {
             error!("Can't unpack TofPacket, err {err}");
@@ -123,7 +128,13 @@ pub fn wait_while_run_active(n_errors     : u32,
       return events;
     }
     if triggers_have_stopped {
-      continue;
+      // wait for 10 more seconds..
+      if kill_timer.elapsed().as_secs() > 10 {
+        info!("Kill timer expired!");
+        return events;
+      } else {
+        continue;
+      }
     }
     if start.elapsed() > interval {
       match get_triggers_enabled() {
@@ -135,6 +146,7 @@ pub fn wait_while_run_active(n_errors     : u32,
           if !running {
             info!("Run has apparently terminated!");
             triggers_have_stopped = true;
+            kill_timer = Instant::now();
             //break;
           } else { 
             info!("We have waited the expected time, but there are still triggers...");
@@ -183,7 +195,7 @@ pub fn rb_calibration(rc_to_runner    : &Sender<RunConfig>,
     trigger_fixed_rate      : 100,
     latch_to_mtb            : false,
     data_type               : DataType::Noi,
-    rb_buff_size            : 1000
+    rb_buff_size            : 100
   }; 
   // here is the general idea. We connect to our own 
   // zmq socket, to gather the events and store them 
@@ -249,7 +261,7 @@ pub fn rb_calibration(rc_to_runner    : &Sender<RunConfig>,
     Ok(_)    => trace!("Success!")
   }
   let mut cal_dtype = DataType::Noi;
-  calibration.noi_data = wait_while_run_active(10, five_seconds, 1000, &cal_dtype, &socket);
+  calibration.noi_data = wait_while_run_active(20, 4*five_seconds, 1000, &cal_dtype, &socket);
   println!("==> No input (Voltage calibration) data taken!");
 
   info!("Will set board to vcal mode!");
@@ -260,7 +272,7 @@ pub fn rb_calibration(rc_to_runner    : &Sender<RunConfig>,
     Ok(_)    => trace!("Success!")
   }  
   cal_dtype             = DataType::VoltageCalibration;
-  calibration.vcal_data = wait_while_run_active(10, five_seconds, 1000, &cal_dtype, &socket);
+  calibration.vcal_data = wait_while_run_active(20, 4*five_seconds, 1000, &cal_dtype, &socket);
   
   println!("==> Voltage calibration data taken!");
   info!("Will set board to tcal mode!");
@@ -276,7 +288,16 @@ pub fn rb_calibration(rc_to_runner    : &Sender<RunConfig>,
   }
   
   cal_dtype             = DataType::TimingCalibration;
-  calibration.tcal_data = wait_while_run_active(10, five_seconds, 1000,&cal_dtype, &socket);
+  calibration.tcal_data = wait_while_run_active(20, 4*five_seconds, 1000,&cal_dtype, &socket);
+  run_config.is_active = false;  
+  match rc_to_runner.send(run_config) {
+    Err(err) => warn!("Can not send runconfig!, Err {err}"),
+    Ok(_)    => trace!("Success!")
+  }
+  info!("Waiting 5 seconds");
+  thread::sleep(five_seconds);
+  info!("Will set board to sma mode!");
+  select_sma_mode();
   println!("==> Timing calibration data taken!");
   println!("==> Calibration data taking complete!"); 
   println!("Calibration : {}", calibration);
@@ -284,14 +305,6 @@ pub fn rb_calibration(rc_to_runner    : &Sender<RunConfig>,
   calibration.clean_input_data();
   println!("Calibration : {}", calibration);
 
-  info!("Will set board to sma mode!");
-  select_sma_mode();
-  run_config.is_active = false;  
-  match rc_to_runner.send(run_config) {
-    Err(err) => warn!("Can not send runconfig!, Err {err}"),
-    Ok(_)    => trace!("Success!")
-  }
-  thread::sleep(five_seconds);
   calibration.calibrate()?;
   println!("Calibration : {}", calibration);
   // now it just needs to be send to 
@@ -543,6 +556,69 @@ pub fn get_buff_size(which : &BlobBuffer) ->Result<usize, RegisterError> {
   }
   let result = size as usize;
   Ok(result)
+}
+/// Manage the RAM buffers for event data
+/// 
+/// This experimental version of the ram buffer
+/// handler will directly push the content of 
+/// the ram buffer into an RBEventMemoryStreamer.
+///
+/// EXPERIMENTAL - there is some unsafe stuff 
+///                going on, which I am not sure 
+///                about. 
+///
+/// Rationale    - this avoids at least 2 clones 
+///                and possibly an entire thread.
+///                So it might boost performance.
+///
+/// Difference to previous approach:
+///
+/// Instead of sending the resulting vector of 
+/// bytes away, we fed the streamer. Then in 
+/// a second step, either the streamer has 
+/// to digest its data, or we need to send
+/// the streamer somewhere.
+///
+/// # Arguments:
+///
+/// * buff_trip : size which triggers buffer readout.
+/// * streamer  : RBEventMemoryStreamer which will consume
+///               the ram buffer
+pub fn experimental_ram_buffer_handler(buff_trip : usize,
+                                       streamer  : &mut RBEventMemoryStreamer)
+    -> Result<(RamBuffer, usize), RegisterError> {
+  let mut switch_buff = false;
+  if buff_trip < DATABUF_TOTAL_SIZE {
+    switch_buff = true;
+  }
+
+  let which          = get_active_buffer()?;
+  let mut buff_size  = get_buff_size(&which)?;
+  if buff_size >= buff_trip {
+    info!("Buff {which:?} tripped at a size of {buff_size}");  
+    debug!("Buff handler switch buffers {switch_buff}");
+    // 1) switch buffer
+    // 2) read out
+    // 3) reset
+    if switch_buff {
+      match switch_ram_buffer() {
+        Ok(_)  => {
+          info!("Ram buffer switched!");
+        },
+        Err(_) => error!("Unable to switch RAM buffers!") 
+      }
+    }
+    match read_buffer_into_streamer(&which, buff_size as usize, streamer) {
+      Err(err) => error!("Can not read data buffer into RBEventMemoryStreamer! {err}"),
+      Ok(_)    => (),
+    }
+    match reset_ram_buffer_occ(&which) {
+      Ok(_)  => debug!("Successfully reset the buffer occupancy value"),
+      Err(_) => error!("Unable to reset buffer!")
+    }
+    buff_size = 0;
+  }
+  Ok((which, buff_size))
 }
 
 /// Manage the RAM buffers for event data
