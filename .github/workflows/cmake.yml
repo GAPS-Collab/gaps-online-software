@@ -3,9 +3,15 @@ name: CMake
 on:
   workflow_dispatch:
   push:
-    branches: [ "develop", "main", "NIUHI-0.8" ]
+    branches:
+    - main
+    - develop
+    - NIUHI-0.8
   pull_request:
-    branches: [ "develop", "main", "NIUHI-0.8" ]
+    branches: 
+    - main
+    - develop
+    - NIUHI-0.8
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
@@ -19,16 +25,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
+      with: 
+        submodules: 'true'
+        show-progress: 'true'
+        token: ${{ secrets.PAT_TOKEN }}
+        
 
+    - name: Install dependencies
+      run : sudo apt update && sudo apt install doxygen && sudo apt install pybind11-dev && sudo apt install cargo
+    
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
-      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+      run: cmake -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/install -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DBUILD_LIFTOF=ON -DBUILD_PYBINDINGS=ON -DBUILD_EXAMPLES=ON
 
     - name: Build
       # Build your program with the given configuration
-      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+      #run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+      run: cd ${{github.workspace}}/build && make -j 4 && make doc && make install
 
     - name: Test
       working-directory: ${{github.workspace}}/build
