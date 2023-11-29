@@ -90,18 +90,18 @@ impl CommandTab<'_> {
     cmd_list.push(  TofCommand::PowerCycle            (0));   
     cmd_list.push(  TofCommand::RBSetup               (0));      
     cmd_list.push(  TofCommand::SetThresholds         (0));   
-    cmd_list.push(  TofCommand::SetMtConfig           (0));   
+    //cmd_list.push(  TofCommand::SetMtConfig           (0));   
     cmd_list.push(  TofCommand::StartValidationRun    (9));    
-    cmd_list.push(  TofCommand::RequestWaveforms      (0));     
+    //cmd_list.push(  TofCommand::RequestWaveforms      (0));     
     cmd_list.push(  TofCommand::UnspoolEventCache     (0));      
     cmd_list.push(  TofCommand::StreamAnyEvent        (0));     
     cmd_list.push(  TofCommand::StreamOnlyRequested   (0));     
     cmd_list.push(  TofCommand::DataRunStart          (0));    
-    cmd_list.push(  TofCommand::DataRunEnd            (0));       
+    //cmd_list.push(  TofCommand::DataRunEnd            (0));       
     cmd_list.push(  TofCommand::VoltageCalibration    (0));       
     cmd_list.push(  TofCommand::TimingCalibration     (0));       
     cmd_list.push(  TofCommand::CreateCalibrationFile (0));          
-    cmd_list.push(  TofCommand::RequestEvent          (0));        
+    //cmd_list.push(  TofCommand::RequestEvent          (0));        
     cmd_list.push(  TofCommand::RequestMoni           (0));   
     //];
 
@@ -180,18 +180,15 @@ impl CommandTab<'_> {
     match &pk.packet_type {
       PacketType::Unknown   => {
       },
-      PacketType::Command   => {
-      },
       PacketType::RBEvent   => {
-        let eventid = RBEventMemoryView::decode_event_id_from_stream(&pk.payload).unwrap();
+        //let eventid = RBEventMemoryView::decode_event_id_from_stream(&pk.payload).unwrap();
+        let eventid = 42u32;
         pk_repr = String::from("\u{2728} <") + &now + " " + &eventid.to_string() + " - RBEvent >";
       },
       PacketType::RBMoni   => {
         pk_repr = String::from("\u{1f4c8} <") + &now + " - RBMoniData >";
       },
       PacketType::HeartBeat => {
-      },
-      PacketType::Scalar    => {
       },
       _         => (),
     }
@@ -249,8 +246,8 @@ impl CommandTab<'_> {
           continue;
         }
         spans_resp.push(Spans::from(vec![Span::styled(
-            //String::from("PowerOn"),
-            response[n].unwrap().string_repr().clone(),
+            String::from("FIXME"),
+            //response[n].unwrap().string_repr().clone(),
             Style::default())])
         );
     }

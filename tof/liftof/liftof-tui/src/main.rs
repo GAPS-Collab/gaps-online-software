@@ -30,8 +30,7 @@ extern crate json;
 extern crate histo;
 use histo::Histogram;
 
-use liftof_lib::{master_trigger,
-                 monitor_mtb};
+use liftof_lib::master_trigger;
 
 use tui_logger::TuiLoggerWidget;
 
@@ -343,13 +342,13 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   });
 
 
-  workforce.execute(move || {
-    master_trigger(&master_trigger_ip,
-                   master_trigger_port,
-                   &mt_rate_to_main,
-                   &mt_to_main, 
-                   false);
-  });
+  //workforce.execute(move || {
+  //  master_trigger(&master_trigger_ip,
+  //                 master_trigger_port,
+  //                 &mt_rate_to_main,
+  //                 &mt_to_main, 
+  //                 false);
+  //});
 
   // set up the terminal
   enable_raw_mode().expect("can run in raw mode");
@@ -473,9 +472,9 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
           }    
           let update_detail = ten_second_update.elapsed().as_secs() > 10;
           
-          monitor_mtb(&mtb_address, &mut mtb_moni);
+          //monitor_mtb(&mtb_address, &mut mtb_moni);
           rates.push_back((mission_elapsed_time.elapsed().as_secs() as f64, mtb_moni.rate as f64));
-          fpga_temps.push_back((mission_elapsed_time.elapsed().as_secs() as f64, mtb_moni.fpga_temp as f64));
+          //fpga_temps.push_back((mission_elapsed_time.elapsed().as_secs() as f64, mtb_moni.fpga_temp as f64));
           info!("Received MtbMoniData {}", mtb_moni); 
           if update_detail {
               warn!("Ten seconds have passed!");
