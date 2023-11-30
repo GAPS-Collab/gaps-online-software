@@ -370,7 +370,8 @@ double calculate_pedestal_helper(Vec<f64> wave,
 
 PYBIND11_MODULE(gaps_tof, m) {
     m.doc() = "GAPS Tof dataclasses and utility tools";
-    
+    m.attr("__version__") = "0.8.4";
+
     py::class_<Gaps::TofPacketReader>(m, "TofPacketReader") 
       .def(py::init<String>())  
       .def("get_next_packet", &Gaps::TofPacketReader::get_next_packet,
@@ -458,6 +459,7 @@ PYBIND11_MODULE(gaps_tof, m) {
     py::class_<MasterTriggerEvent>(m, "MasterTriggerEvent", "The MasterTriggerEvent contains the information from the MTB.")
       .def(py::init())
       .def("from_bytestream", &MasterTriggerEvent::from_bytestream, "Deserialize from a list of bytes")
+      .def("get_dsi_j_ch"             , &MasterTriggerEvent::get_dsi_j_ch, "Get the value for DSI/J + LTB ch for each hit as seen by the MTB")
       .def_readonly("event_id"        , &MasterTriggerEvent::event_id, "MTB event id" ) 
       .def_readonly("timestamp"       , &MasterTriggerEvent::timestamp                )
       .def_readonly("tiu_timestamp"   , &MasterTriggerEvent::tiu_timestamp            )

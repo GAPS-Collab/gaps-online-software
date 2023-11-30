@@ -15,6 +15,8 @@
  *
  */ 
 
+#include <tuple>
+
 #include "tof_typedefs.h"
 #include "packets/monitoring.h"
 #include "packets/tof_packet.h"
@@ -296,6 +298,9 @@ struct MasterTriggerEvent {
   void set_board_mask(u32 mask);
   
   void set_hit_mask(usize ltb_index,u32 mask);
+
+  // Get the hits in terms of DSI/J/CH
+  Vec<std::tuple<u8,u8,u8>>  get_dsi_j_ch();
 
   std::string to_string() const;
 };

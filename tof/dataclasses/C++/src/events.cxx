@@ -8,6 +8,29 @@
 #include "spdlog/spdlog.h"
 #include "spdlog/cfg/env.h"
 
+const static HashMap<u8, std::pair<u8,u8>> LTB_DSI_MAP {
+  {0, {1,1}},
+  {1, {1,2}},
+  {2, {1,3}},
+  {3, {1,4}},
+  {4, {1,5}},
+  {5, {2,1}},
+  {6, {2,2}},
+  {7, {2,3}},
+  {8, {2,4}},
+  {9, {2,5}},
+  {10,{3,1}},
+  {11,{3,2}},
+  {12,{3,3}},
+  {13,{3,4}},
+  {14,{3,5}},
+  {15,{4,1}},
+  {16,{4,2}},
+  {17,{4,3}},
+  {18,{4,4}},
+  {19,{4,5}},
+};
+
 
 /**
  * Helper to get adc data from Vec<u8>
@@ -784,6 +807,35 @@ void MasterTriggerEvent::set_hit_mask(usize ltb_idx, u32 mask) {
 }
 
 /*************************************/
+  
+Vec<std::tuple<u8,u8,u8>>  MasterTriggerEvent::get_dsi_j_ch() {
+  u8 dsi    = 0;
+  u8 j      = 0;
+  u8 ltb_ch = 0;
+  auto hit_boards = Vec<u8>();
+  Vec<std::tuple<u8,u8,u8>> result;  
+  auto hit = std::make_tuple(dsi,j,ltb_ch);
+  
+  for (u8 k=0;k<N_LTBS;k++) {
+    if (board_mask[k]) {
+      hit_boards.push_back(k);
+    } 
+  }
+  for (u8 brd : hit_boards) {
+    for (usize ch=0;ch<N_CHN_PER_LTB;ch++) {
+      if (hits[brd][ch]) {
+        dsi = LTB_DSI_MAP.at(brd).first;
+        j   = LTB_DSI_MAP.at(brd).second; 
+        ltb_ch = (u8) ch;
+        auto hit = std::make_tuple(dsi,j,ltb_ch);
+        result.push_back(hit); 
+      }
+    }    
+  }
+  return result;
+}
+
+/*************************************/
 
 MasterTriggerEvent MasterTriggerEvent::from_bytestream(const Vec<u8> &bytestream,
                                                        u64 &pos) {
@@ -834,9 +886,9 @@ std::string MasterTriggerEvent::to_string() const {
   repr += "\n  crc           : " + std::to_string(crc                         );
   repr += "\n  broken        : " + std::to_string(broken                      );
   repr += "\n  valid         : " + std::to_string(valid                       );
-  repr += "\n  -- hit mask --";
-  repr += "\n [DSI/J]";
-  repr += "\n 1/1 - 1/2 - 1/3 - 1/4 - 1/5 - 2/1 - 2/2 - 2/3 - 2/4 - 2/5 - 3/1 - 3/2 - 3/3 - 3/4 - 3/5 - 4/1 - 4/2 - 4/3 - 4/4 - 4/5 \n";
+  //repr += "\n  -- hit mask --";
+  //repr += "\n [DSI/J]";
+  //repr += "\n 1/1 - 1/2 - 1/3 - 1/4 - 1/5 - 2/1 - 2/2 - 2/3 - 2/4 - 2/5 - 3/1 - 3/2 - 3/3 - 3/4 - 3/5 - 4/1 - 4/2 - 4/3 - 4/4 - 4/5 \n";
   Vec<u8> hit_boards = Vec<u8>();
   HashMap<u8, String> dsi_j = HashMap<u8, String>();
   dsi_j[0] = "1/1";
@@ -859,21 +911,21 @@ std::string MasterTriggerEvent::to_string() const {
   dsi_j[16] = "4/3";
   dsi_j[17] = "4/4";
   dsi_j[19] = "4/5";
-  repr += " ";
+  //repr += " ";
   for (usize k=0;k<N_LTBS;k++) {
     if (board_mask[k]) {
-      repr += "-X-   ";
+      //repr += "-X-   ";
       hit_boards.push_back(k);
     } else {
-      repr += "-0-   ";
+      //repr += "-0-   ";
     }
   }
-  repr += "\n\t == == LTB HITS [BRD CH] == ==\n";
+  repr += "\n == == LTB HITS DSI/J/CH => [RB_ID CH] == ==\n";
   for (auto k : hit_boards) {
-    repr += "\t DSI/J " + dsi_j[k] + "\t=> ";
+    repr += "\t DSI/J " + dsi_j[k];
     for (usize j=0;j<N_CHN_PER_LTB;j++) {
       if (hits[k][j]) {
-        repr += " " + std::to_string(j + 1) + " ";
+        repr += " " + std::to_string(j + 1) + " => ?";
       } else {
         continue;
         //repr += " N.A. ";
