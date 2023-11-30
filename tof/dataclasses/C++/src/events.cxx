@@ -827,7 +827,7 @@ Vec<std::tuple<u8,u8,u8>>  MasterTriggerEvent::get_dsi_j_ch() {
         dsi = LTB_DSI_MAP.at(brd).first;
         j   = LTB_DSI_MAP.at(brd).second; 
         ltb_ch = (u8) ch;
-        auto hit = std::make_tuple(dsi,j,ltb_ch);
+        auto hit = std::make_tuple(dsi,j,ltb_ch + 1);
         result.push_back(hit); 
       }
     }    
