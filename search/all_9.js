@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['simprimary_23',['SimPrimary',['../structSimPrimary.html',1,'']]],
-  ['socket_5finfo_24',['SOCKET_INFO',['../structSOCKET__INFO.html',1,'']]]
+  ['parse_5fbool_18',['parse_bool',['../namespaceGaps.html#a13cb72078c0645adb57076cc5697b9a1',1,'Gaps']]]
 ];
