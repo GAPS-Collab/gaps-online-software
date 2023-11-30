@@ -11,7 +11,6 @@
 // where the byteorder of u32 and larger 
 // is correct.
 const REVERSE_WORDS : bool = true;
-const CALC_CHECKSUM : bool = true;
 const ALGO : crc::Algorithm<u32> = crc::Algorithm {
       width   : 32u8,
       init    : 0xFFFFFFFF,
@@ -101,8 +100,7 @@ pub struct RBEventMemoryStreamer {
   /// this manages how we are draining the stream
   n_events_ext     : usize,
   pub is_depleted  : bool,
-  //crc32_algo       : crc::Algorithm<u32>,
-  //crc32_sum        : Crc::<u32>,
+  pub calc_crc32   : bool,
 }
 
 impl fmt::Debug for RBEventMemoryStreamer {
@@ -117,7 +115,6 @@ impl fmt::Debug for RBEventMemoryStreamer {
 
 impl RBEventMemoryStreamer {
 
-
   pub fn new() -> Self {
     Self {
       stream           : Vec::<u8>::new(),
@@ -126,6 +123,7 @@ impl RBEventMemoryStreamer {
       tp_sender        : None,
       n_events_ext     : 0,
       is_depleted      : false,
+      calc_crc32       : false,
       //crc32_algo       : algo,
       //crc32_sum        : Crc::<u32>::new(&algo),
     }
@@ -286,7 +284,12 @@ impl Iterator for RBEventMemoryStreamer {
     //}
     let mut header       = RBEventHeader::new();
     let mut event        = RBEvent::new();
-    let mut event_status = EventStatus::Perfect;
+    let mut event_status : EventStatus;
+    if self.calc_crc32 {
+        event_status = EventStatus::Perfect;
+    } else {
+      event_status = EventStatus::Unknown;
+    }
     // start parsing
     //let first_pos = self.pos;
     let head   = parse_u16(&self.stream, &mut self.pos);
@@ -370,7 +373,7 @@ impl Iterator for RBEventMemoryStreamer {
         //self.crc32_sum.update(&self.stream[self.pos..self.pos+2*nwords]);
         // -> THis is the preferred way
         let mut dig = crc32_sum.digest();
-        if CALC_CHECKSUM {
+        if self.calc_crc32 {
           let mut this_ch_adc = Vec::<u16>::with_capacity(nwords);
           for _ in 0..nwords {
             let this_field = parse_u16(&self.stream, &mut self.pos);
@@ -387,7 +390,7 @@ impl Iterator for RBEventMemoryStreamer {
         let crc320 = parse_u16(&self.stream, &mut self.pos);
         let crc321 = parse_u16(&self.stream, &mut self.pos);
         //let checksum = self.crc32_sum.clone().finalize();
-        if CALC_CHECKSUM {
+        if self.calc_crc32 {
           let crc32 : u32;
           if REVERSE_WORDS {
             crc32 = u32::from(crc320) << 16 | u32::from(crc321);
@@ -412,7 +415,7 @@ impl Iterator for RBEventMemoryStreamer {
     }
     let crc320         = parse_u16(&self.stream, &mut self.pos);
     let crc321         = parse_u16(&self.stream, &mut self.pos);
-    if CALC_CHECKSUM {
+    if self.calc_crc32 {
       let crc32 : u32;
       if REVERSE_WORDS {
         crc32 = u32::from(crc320) << 16 | u32::from(crc321);

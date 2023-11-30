@@ -99,6 +99,10 @@ struct Args {
   /// check the event ids for duplicates or missing ids
   #[arg(long, default_value_t = false)]
   test_eventids: bool,
+  /// Calculate the crc32 checksum per channel and set 
+  /// event status flag
+  #[arg(long, default_value_t = false)]
+  calc_crc32: bool,
 }
 
 fn main() {
@@ -123,7 +127,8 @@ fn main() {
   let mut to_local_file        = args.to_local_file;
   let run_config               = args.run_config;
   let test_eventids            = args.test_eventids;
-  
+  let calc_crc32               = args.calc_crc32;
+
   //FIMXE - this needs to become part of clap
   let cmd_server_ip = String::from("10.0.1.1");
   //let cmd_server_ip     = args.cmd_server_ip;  
@@ -286,7 +291,8 @@ fn main() {
                     event_processing(&bs_recv,
                                      &tp_to_cache,
                                      &dtf_from_runner,
-                                     args.verbose);
+                                     args.verbose,
+                                     calc_crc32);
   });
   
 

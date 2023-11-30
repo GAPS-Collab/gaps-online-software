@@ -26,11 +26,13 @@ use tof_dataclasses::io::RBEventMemoryStreamer;
 pub fn event_processing(bs_recv           : &Receiver<Vec<u8>>,
                         tp_sender         : &Sender<TofPacket>,
                         dtf_fr_runner     : &Receiver<DataType>,
-                        verbose           : bool) {
+                        verbose           : bool,
+                        calc_crc32        : bool) {
   let mut events_not_sent : u64 = 0;
   let mut data_type       : DataType   = DataType::Unknown;
   let one_milli           = Duration::from_millis(1);
   let mut streamer        = RBEventMemoryStreamer::new();
+  streamer.calc_crc32     = calc_crc32;
   'main : loop {
     if !dtf_fr_runner.is_empty() {
       match dtf_fr_runner.try_recv() {
