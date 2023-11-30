@@ -4,3 +4,6 @@
 [submodule "resources/extern/cxxopts"]
 	path = resources/extern/cxxopts
 	url = https://github.com/jarro2783/cxxopts.git
+[submodule "resources/extern/doxygen-awesome-css"]
+	path = resources/extern/doxygen-awesome-css
+	url = https://github.com/jothepro/doxygen-awesome-css.git
