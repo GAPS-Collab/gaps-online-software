@@ -13,6 +13,15 @@
 //! * commands/responses
 //!
 //! * TODO: alerts
+//!
+//! # features:
+//!
+//! * random - allow random number generated data classes for 
+//!            testing
+//!
+//! * database - access the SQLite data base for advanced paddle
+//!              mapping
+//!
 
 pub mod events;
 pub mod packets;

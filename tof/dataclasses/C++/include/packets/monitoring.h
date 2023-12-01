@@ -11,19 +11,24 @@ struct RBMoniData {
   static const u16 TAIL = 0x5555;
   static const u8  SIZE = 6;
 
-  u8  board_id           ; 
+  u8  board_id           ;  
+  /// Rate as recorded by the board itself
   u16 rate               ; 
   f32 tmp_drs            ; 
   f32 tmp_clk            ; 
   f32 tmp_adc            ; 
+  /// fpga temperature
   f32 tmp_zynq           ; 
   f32 tmp_lis3mdltr      ; 
   f32 tmp_bm280          ; 
+  /// ambient pressure
   f32 pressure           ; 
+  /// ambient humidity
   f32 humidity           ; 
   f32 mag_x              ; 
   f32 mag_y              ; 
   f32 mag_z              ; 
+  /// total strength of magnetic field
   f32 mag_tot            ; 
   f32 drs_dvdd_voltage   ; 
   f32 drs_dvdd_current   ; 
@@ -54,10 +59,8 @@ struct RBMoniData {
 
   static RBMoniData from_bytestream(const Vec<u8> &stream,
                                     usize &pos);
-  /// extract moni data from payload
-  //usize from_bytestream(Vec<u8>& payload,
-  //                      usize start_pos=0);
-
+  
+  /// String representatioin for printing
   std::string to_string() const;
 };
 

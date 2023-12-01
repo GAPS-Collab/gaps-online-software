@@ -14,10 +14,11 @@ Vec<T> slice(const Vec<T>& vec, usize start, usize end) {
   return Vec<T>(vec.begin() + start, vec.begin() + end);
 }
 
-
+[[deprecated("Use parse_u16 instead!")]]
 u16 u16_from_le_bytes(const Vec<u8> &bytestream,
                       u64 &pos);
 
+[[deprecated("Will go away!")]]
 void u16_to_le_bytes(const u16 value, 
                      Vec<u8> &bytestream,
                      usize &pos);
@@ -42,43 +43,56 @@ void u16_to_le_bytes(const u16 value,
 bool parse_bool(const Vec<u8> &bytestream,
                 usize &pos);
 
+/// get an unsigned char from a vector of bytes, advancing pos by 1
 u8 parse_u8(const Vec<u8> &bytestream,
             usize &pos);
 
+/// get an unsigned short from a vector of bytes, advancing pos by 2
 u16 parse_u16(const Vec<u8> &bytestream,
               usize &pos);
 
+/// get an unsigned 32bit int from a vector of bytes, advancing pos by 4
 u32 parse_u32(const Vec<u8> &bytestream,
               usize &pos);
 
+/// get an unsigned long64 from a vector of bytes, advancing pos by 8
 u64 parse_u64(const Vec<u8> &bytestream,
               usize &pos);
 
+/// get a signed 32bit int from a vector of bytes, advancing pos by 4
 i32 parse_i32(const Vec<u8> &bytestream,
               usize &pos);
 
+/// get a signed float32 from a vector of bytes, advancning pos by 4
 f32 parse_f32(const Vec<u8> &bytestream,
               usize &pos);
 
+/// get a signed long float (64) from a vector of bytes, advancing pos by 8
 f64 parse_f64(const Vec<u8> &bytestream,
               usize &pos);
 
+[[deprecated("Use parse_u32 instead!")]]
 u32 u32_from_le_bytes(const Vec<u8> &bytestream,
                       usize &pos);
 
+[[deprecated("Use parse_u64 instead!")]]
 u64 u64_from_le_bytes(const Vec<u8> &bytestream,
                       usize &pos);
 
+[[deprecated("Use parse_u32 instead!")]]
 u32 u32_from_be_bytes(const Vec<u8> &bytestream,
                       usize &pos);
 
+[[deprecated("The byteorder of this is confusing and it will go away!")]]
 u32 parse_u32_for_16bit_words(const Vec<u8> &bytestream,
                               usize &pos);
 
+[[deprecated("The byteorder of this is confusing and it will go away!")]]
 u64 parse_u48_for_16bit_words(const Vec<u8> &bytestream,
                               usize &pos);
 
 
+[[deprecated("This wil go away!")]]
 void u32_to_le_bytes(const u32 value, 
                      Vec<u8> &bytestream,
                      usize &pos);

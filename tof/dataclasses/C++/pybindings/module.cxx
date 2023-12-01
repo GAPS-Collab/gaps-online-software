@@ -121,26 +121,26 @@ usize get_current_blobevent_size() {
 //  return evt;
 //}
 
-std::string BlobEvtToString(BlobEvt_t event)
-{
-   std::string output = "";
-   output += "head "      + std::to_string(event.head )      + "\n" ;
-   output += "status "    + std::to_string(event.status )    + "\n" ;
-   output += "len "       + std::to_string(event.len )       + "\n" ;
-   output += "roi "       + std::to_string(event.roi )       + "\n" ;
-   output += "dna "       + std::to_string(event.dna )       + "\n" ;
-   output += "fw_hash "   + std::to_string(event.fw_hash )   + "\n" ;
-   output += "id "        + std::to_string(event.id )        + "\n" ;
-   output += "ch_mask "   + std::to_string(event.ch_mask )   + "\n" ;
-   output += "event_ctr " + std::to_string(event.event_ctr ) + "\n" ;
-   output += "dtap0 "     + std::to_string(event.dtap0 )     + "\n" ;
-   output += "dtap1 "     + std::to_string(event.dtap1 )     + "\n" ;
-   output += "timestamp " + std::to_string(event.timestamp ) + "\n" ;
-   output += "stop_cell " + std::to_string(event.stop_cell ) + "\n" ;
-   output += "crc32 "     + std::to_string(event.crc32 )     + "\n" ;
-   output += "tail "      + std::to_string(event.tail)       ;
-   return output;
-}
+//std::string BlobEvtToString(BlobEvt_t event)
+//{
+//   std::string output = "";
+//   output += "head "      + std::to_string(event.head )      + "\n" ;
+//   output += "status "    + std::to_string(event.status )    + "\n" ;
+//   output += "len "       + std::to_string(event.len )       + "\n" ;
+//   output += "roi "       + std::to_string(event.roi )       + "\n" ;
+//   output += "dna "       + std::to_string(event.dna )       + "\n" ;
+//   output += "fw_hash "   + std::to_string(event.fw_hash )   + "\n" ;
+//   output += "id "        + std::to_string(event.id )        + "\n" ;
+//   output += "ch_mask "   + std::to_string(event.ch_mask )   + "\n" ;
+//   output += "event_ctr " + std::to_string(event.event_ctr ) + "\n" ;
+//   output += "dtap0 "     + std::to_string(event.dtap0 )     + "\n" ;
+//   output += "dtap1 "     + std::to_string(event.dtap1 )     + "\n" ;
+//   output += "timestamp " + std::to_string(event.timestamp ) + "\n" ;
+//   output += "stop_cell " + std::to_string(event.stop_cell ) + "\n" ;
+//   output += "crc32 "     + std::to_string(event.crc32 )     + "\n" ;
+//   output += "tail "      + std::to_string(event.tail)       ;
+//   return output;
+//}
 
 template<class T>
 void nullsetter(T foo) 
@@ -799,9 +799,9 @@ PYBIND11_MODULE(gaps_tof, m) {
        .def_readwrite("stop_cell"               ,&BlobEvt_t::stop_cell )
        .def_readwrite("crc32"                   ,&BlobEvt_t::crc32 )
        .def_readwrite("tail"                    ,&BlobEvt_t::tail)
-       .def("__repr__",  [] (const BlobEvt_t &event) { 
-               return "<BlobEvt_t \n" + BlobEvtToString(event) + ">";
-               })
+       //.def("__repr__",  [] (const BlobEvt_t &event) { 
+       //        return "<BlobEvt_t \n" + BlobEvtToString(event) + ">";
+       //        })
    ;
     
    py::class_<Waveform>(m, "Waveform")

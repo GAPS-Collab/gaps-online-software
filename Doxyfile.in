@@ -12,5 +12,5 @@ GENERATE_TREEVIEW      = YES # optional. Also works without treeview
 DISABLE_INDEX = NO
 FULL_SIDEBAR = NO
 HTML_EXTRA_STYLESHEET  = @CMAKE_CURRENT_SOURCE_DIR@/resources/extern/doxygen-awesome-css/doxygen-awesome.css
-HTML_COLORSTYLE        = DARK # required with Doxygen >= 1.9.5
+HTML_COLORSTYLE        = LIGHT # required with Doxygen >= 1.9.5
 

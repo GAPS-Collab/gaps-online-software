@@ -1,13 +1,6 @@
 #ifndef SERIALIZATION_H_INCLUDED
 #define SERIALIZATION_H_INCLUDED
 
-/**
- * Serializer/Deserializers
- *
- *
- *
- */
-
 #include <iostream>
 #include <sstream>
 #include <bitset>

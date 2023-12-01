@@ -70,6 +70,12 @@ struct RBCalibration {
   Vec<f32> voltages   (const RBEvent &event, const u8 channel) const;
   Vec<f32> nanoseconds(const RBEvent &event, const u8 channel) const;
 
+  /**
+   * Factory function for RBCalibration
+   *
+   * @param
+   * @param
+   */
   static RBCalibration from_bytestream(const Vec<u8> &bytestream,
                                        u64 &pos);
 
@@ -77,17 +83,18 @@ struct RBCalibration {
   /// This does not allow to load the data assigned to 
   /// the calibration
   static RBCalibration from_txtfile(const String &filename);
- 
+
+  /// String representation for printing 
   std::string to_string() const;
 
-  //! Should the associated data be loaded 
-  //! in case it is available when 
-  //! from_bytestream is called?
+  /// Should the associated data be loaded 
+  /// in case it is available when 
+  /// from_bytestream is called?
   static void disable_eventdata();
 
   private:
 
-    //! Check if the channel follows the convention 1-9
+    /// Check if the channel follows the convention 1-9
     bool channel_check(u8 channel) const;
 };
 

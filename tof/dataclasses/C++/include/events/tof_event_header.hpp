@@ -10,7 +10,8 @@ struct TofEventHeader {
   
   u32 run_id      ; 
   u32 event_id    ; 
-  // the timestamp shall be comging from the master trigger
+  /// a reference to a timestamp
+  /// which is not yet decided
   u32 timestamp_32; 
   u16 timestamp_16;  // -> 14 byres
   
@@ -42,10 +43,7 @@ struct TofEventHeader {
   u8 n_paddles            ; // we don't have more than 
                                // 256 paddles.
 
-  /**
-   * String representation
-   *
-   */
+  /// String representation for printing to output
   std::string to_string() const;
 
   static TofEventHeader from_bytestream(const Vec<u8> &stream,
@@ -53,9 +51,6 @@ struct TofEventHeader {
 
 }; // end TofEventHeader
 
-
-
 std::ostream& operator<<(std::ostream& os, const TofEventHeader& h);
-
 
 #endif
