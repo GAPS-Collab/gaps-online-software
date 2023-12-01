@@ -10,8 +10,8 @@ name  = "liftof-cc"
 #bench = false
 
 [[bin]]
-name = "mt-readout"
-path = "src/bin/mt_readout.rs"
+name = "liftof-mt"
+path = "src/bin/liftof_mt.rs"
 
 [features]
 
