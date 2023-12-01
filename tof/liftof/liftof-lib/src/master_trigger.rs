@@ -82,7 +82,10 @@ impl TryFrom<u8> for IPBusPacketType {
       2 => Ok(IPBusPacketType::ReadNonIncrement),
       3 => Ok(IPBusPacketType::WriteNonIncrement),
       4 => Ok(IPBusPacketType::RMW),
-      _ => Err(IPBusError::DecodingFailed)
+      _ => {
+        error!("Unable to decode packet type {}", pt);
+        return Err(IPBusError::DecodingFailed);
+      }
     }
   }
 }
@@ -109,10 +112,10 @@ impl TryFrom<u8> for IPBusPacketType {
 ///
 /// # Arguments:
 ///
-/// addr        : register addresss
-/// packet_type : read/write register?
-/// data        : the data value at the specific
-///               register.
+/// * addr        : register addresss
+/// * packet_type : read/write register?
+/// * data        : the data value at the specific
+///                 register.
 ///
 pub fn encode_ipbus(addr        : u32,
                     packet_type : IPBusPacketType,
@@ -226,8 +229,14 @@ pub fn decode_ipbus( message : &[u8;MT_MAX_PACKSIZE],
 /// multiple events at once. 
 /// For that, we just have to query the
 /// event size register multiple times.
+///
+/// # Arguments
+///
+/// * socket    : local sockat for Udp comms
+/// * buffer    : location in memory where we
+///               can write what we received
+///               over Udp
 pub fn get_mtevent(socket  : &UdpSocket,
-                   address : &str,
                    buffer  : &mut [u8;MT_MAX_PACKSIZE]) -> Result<MasterTriggerEvent, MasterTriggerError> {
   let mut mte = MasterTriggerEvent::new(0,0);
   let mut n_daq_words : u32;
@@ -236,7 +245,9 @@ pub fn get_mtevent(socket  : &UdpSocket,
   let sleeptime = Duration::from_micros(10);
   loop {
     thread::sleep(sleeptime);
-    match read_register(socket, address, 0x13 , buffer) {
+    match read_register(socket, 
+                        //address,
+                        0x13 , buffer) {
       Err(err) => {
         error!("Timeout in read_register for MTB! {err}");
         continue;
@@ -254,7 +265,7 @@ pub fn get_mtevent(socket  : &UdpSocket,
     }
   }
   let data = read_register_multiple(socket,
-                                    address,
+                                    //address,
                                     0x11,
                                     buffer,
                                     IPBusPacketType::ReadNonIncrement,
@@ -356,12 +367,11 @@ pub fn connect_to_mtb(mt_address : &String)
 ///
 /// ISSUES - some values are always 0
 pub fn get_mtbmonidata(socket         : &UdpSocket,
-                       target_address : &str,
                        buffer         : &mut [u8;MT_MAX_PACKSIZE])
   -> Result<MtbMoniData, MasterTriggerError> {
   let mut moni = MtbMoniData::new();
   let data     = read_register_multiple(socket,
-                                        target_address,
+                                        //target_address,
                                         0x120,
                                         buffer,
                                         IPBusPacketType::Read,
@@ -378,7 +388,7 @@ pub fn get_mtbmonidata(socket         : &UdpSocket,
   moni.vccaux      = ( data[3] & first_word  ) as u16;  
   moni.vccbram     = ((data[3] & second_word ) >> 16) as u16;  
   let rate         = read_register_multiple(socket, 
-                                            target_address,
+                                            //target_address,
                                             0x17,
                                             buffer,
                                             IPBusPacketType::Read,
@@ -453,7 +463,7 @@ pub fn master_trigger(mt_ip             : &str,
   
   // step 1 - reset daq
   debug!("Resetting master trigger");
-  match reset_daq(&socket, &mt_address) {
+  match reset_daq(&socket) {//, &mt_address) {
     Err(err) => error!("Can not reset DAQ, error {err}"),
     Ok(_)    => ()
   }
@@ -488,7 +498,7 @@ pub fn master_trigger(mt_ip             : &str,
     }
     if moni_interval.elapsed().as_secs() > mtb_moni_interval {
       match get_mtbmonidata(&socket, 
-                            &mt_address,
+                            //&mt_address,
                             &mut buffer) {
         Err(err) => {
           error!("Can not get MtbMoniData! {err}");
@@ -509,7 +519,9 @@ pub fn master_trigger(mt_ip             : &str,
       }
       moni_interval = Instant::now();
     }
-    match get_mtevent(&socket, &mt_address, &mut buffer) {
+    match get_mtevent(&socket,
+                      //&mt_address,
+                      &mut buffer) {
       Err(err) => {
         error!("Unable to get MasterTriggerEvent! {err}");
         continue;
@@ -620,14 +632,13 @@ pub fn master_trigger(mt_ip             : &str,
 ///
 /// # Arguments
 ///
-/// * socket      : A valid UDP socket
-/// * target_addr : The IP address of the MTB
+/// * socket      : A valid UDP socket, "connected" to 
+///                 the MTB through UdpSocket::connect
 /// * reg_addr    : The address of the MTB register to 
 ///                 be read
 /// * buffer      : pre-allocated byte array to hold the 
 ///                 register value
 pub fn read_register(socket      : &UdpSocket,
-                     target_addr : &str,
                      reg_addr    : u32,
                      buffer      : &mut [u8;MT_MAX_PACKSIZE])
   -> Result<u32, Box<dyn Error>> {
@@ -635,7 +646,7 @@ pub fn read_register(socket      : &UdpSocket,
   let message   = encode_ipbus(reg_addr,
                                IPBusPacketType::Read,
                                &send_data);
-  socket.send_to(message.as_slice(), target_addr)?;
+  socket.send(message.as_slice())?;
   let (number_of_bytes, _) = socket.recv_from(buffer)?;
   trace!("Received {} bytes from master trigger", number_of_bytes);
   // this one can actually succeed, but return an emtpy vector
@@ -647,14 +658,12 @@ pub fn read_register(socket      : &UdpSocket,
 }
 
 pub fn read_register_multiple(socket      : &UdpSocket,
-                              target_addr : &str,
                               reg_addr    : u32,
                               buffer      : &mut [u8;MT_MAX_PACKSIZE],
                               ptype       : IPBusPacketType,
                               nwords      : usize)
   -> Result<Vec<u32>, Box<dyn Error>> {
   let send_data = vec![0u32;nwords];
-  //let send_data = Vec::<u32>::from([0]);
   let message : Vec<u8>;
   if send_data.len() > 1 {
     message = encode_ipbus(reg_addr,
@@ -665,7 +674,7 @@ pub fn read_register_multiple(socket      : &UdpSocket,
                              IPBusPacketType::Read,
                              &send_data);
   }
-  socket.send_to(message.as_slice(), target_addr)?;
+  socket.send(message.as_slice())?;
   let (number_of_bytes, _) = socket.recv_from(buffer)?;
   trace!("Received {} bytes from master trigger", number_of_bytes);
   // this one can actually succeed, but return an emtpy vector
@@ -682,8 +691,8 @@ pub fn read_register_multiple(socket      : &UdpSocket,
 ///
 /// # Arguments
 ///
-/// * socket      : A valid UDP socket
-/// * target_addr : The IP address of the MTB
+/// * socket      : A valid UDP socket, "connected" to
+///                 the MTB through UdpSocket::connect
 /// * reg_addr    : The address of the MTB register to 
 ///                 be written
 /// * data        : Write this number to the specific 
@@ -692,7 +701,6 @@ pub fn read_register_multiple(socket      : &UdpSocket,
 ///                 response from the MTB
 /// FIXME - there is no verification step!
 pub fn write_register(socket      : &UdpSocket,
-                      target_addr : &str,
                       reg_addr    : u32,
                       data        : u32,
                       buffer      : &mut [u8;MT_MAX_PACKSIZE])
@@ -701,14 +709,13 @@ pub fn write_register(socket      : &UdpSocket,
   let message   = encode_ipbus(reg_addr,
                                IPBusPacketType::Write,
                                &send_data);
-  socket.send_to(message.as_slice(), target_addr)?;
+  socket.send(message.as_slice())?;
   let (number_of_bytes, _) = socket.recv_from(buffer)?;
   trace!("Received {} bytes from master trigger", number_of_bytes);
   Ok(())
 }
 
 pub fn write_register_multiple(socket      : &UdpSocket,
-                               target_addr : &str,
                                reg_addr    : u32,
                                data        : &Vec<u32>,
                                buffer      : &mut [u8;MT_MAX_PACKSIZE])
@@ -716,7 +723,7 @@ pub fn write_register_multiple(socket      : &UdpSocket,
   let message   = encode_ipbus(reg_addr,
                                IPBusPacketType::Write,
                                &data);
-  socket.send_to(message.as_slice(), target_addr)?;
+  socket.send(message.as_slice())?;
   let (number_of_bytes, _) = socket.recv_from(buffer)?;
   trace!("Received {} bytes from master trigger", number_of_bytes);
   Ok(())
@@ -724,22 +731,23 @@ pub fn write_register_multiple(socket      : &UdpSocket,
 
 /// Read event counter register of MTB
 pub fn read_event_cnt(socket : &UdpSocket,
-                  target_address : &str,
-                  buffer : &mut [u8;MT_MAX_PACKSIZE])
+                      buffer : &mut [u8;MT_MAX_PACKSIZE])
   -> Result<u32, Box<dyn Error>> {
-  let event_count = read_register(socket, target_address, 0xd, buffer)?;
+  let event_count = read_register(socket,
+                                  //target_address,
+                                  0xd, buffer)?;
   trace!("Got event count! {} ", event_count);
   Ok(event_count)
 }
 
 
 /// Reset the state of the MTB DAQ
-pub fn reset_daq(socket : &UdpSocket,
-                 target_address : &str) 
+pub fn reset_daq(socket : &UdpSocket) 
   -> Result<(), Box<dyn Error>> {
   debug!("Resetting DAQ!");
   let mut buffer = [0u8;MT_MAX_PACKSIZE];
-  write_register(socket, target_address, 0x10, 1,&mut buffer)?;
+  write_register(socket,
+                 0x10, 1,&mut buffer)?;
   Ok(())
 }
 

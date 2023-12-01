@@ -1,5 +1,10 @@
 # NIUHI series
 
+## v0.8.2
+* small API change - removes address parameter
+  for methods which also get a UdpSocket in 
+  MTB related functions.
+
 ## v0.8.1
 
 * moves RobinReader to tof-dataclasses
