@@ -476,7 +476,7 @@ RBEvent RBEvent::from_bytestream(const Vec<u8> &stream,
   if (event.header.is_event_fragment() || event.header.drs_lost_trigger()) {
     return event;
   }
-  for (usize ch=0; ch<event.header.get_nchan(); ch++) {
+  for (auto const &ch : event.header.get_channels()) {
     spdlog::debug("Found active data channel {}!", ch);
     Vec<u8>::const_iterator start = stream.begin() + pos;
     Vec<u8>::const_iterator end   = stream.begin() + pos + 2*NWORDS;    // 2*NWORDS because stream is Vec::<u8> and it is 16 bit words.
