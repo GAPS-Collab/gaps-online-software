@@ -390,6 +390,7 @@ pub enum PaddleEndIdentifier {
 //}
 
 #[derive(Debug, Copy, Clone)]
+#[repr(u8)]
 pub enum PaddleEndLocation {
   PositiveX,
   NegativeX,

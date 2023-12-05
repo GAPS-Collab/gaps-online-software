@@ -30,9 +30,10 @@ use crate::events::{MasterTriggerEvent,
 
 // This looks like a TODO
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
+#[repr(u8)]
 pub enum CompressionLevel {
-  Unknown = 0,
-  None    = 10,
+  Unknown = 0u8,
+  None    = 10u8,
 }
 
 impl fmt::Display for CompressionLevel {
@@ -43,27 +44,24 @@ impl fmt::Display for CompressionLevel {
   }
 }
 
-impl TryFrom<u8> for CompressionLevel {
-  type Error = &'static str;
-
-  // I am not sure about this hard coding, but the code
-  //  looks nicer - Paolo
-  fn try_from(value: u8) -> Result<Self, Self::Error> {
+impl From<u8> for CompressionLevel {
+  fn from(value: u8) -> Self {
     match value {
-      0u8  => Ok(CompressionLevel::Unknown),
-      10u8 => Ok(CompressionLevel::None),
-      _    => Err("I am not sure how to convert this value!")
+      0u8  => CompressionLevel::Unknown,
+      10u8 => CompressionLevel::None,
+      _    => CompressionLevel::Unknown
     }
   }
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
+#[repr(u8)]
 pub enum EventQuality {
-  Unknown        =  0,
-  Silver         = 10,
-  Gold           = 20,
-  Diamond        = 30,
-  FourLeafClover = 40,
+  Unknown        =  0u8,
+  Silver         = 10u8,
+  Gold           = 20u8,
+  Diamond        = 30u8,
+  FourLeafClover = 40u8,
 }
 
 impl fmt::Display for EventQuality {
@@ -74,19 +72,15 @@ impl fmt::Display for EventQuality {
   }
 }
 
-impl TryFrom<u8> for EventQuality {
-  type Error = &'static str;
-
-  // I am not sure about this hard coding, but the code
-  //  looks nicer - Paolo
-  fn try_from(value: u8) -> Result<Self, Self::Error> {
+impl From<u8> for EventQuality {
+  fn from(value: u8) -> Self {
     match value {
-      0u8  => Ok(EventQuality::Unknown),
-      10u8 => Ok(EventQuality::Silver),
-      20u8 => Ok(EventQuality::Gold),
-      30u8 => Ok(EventQuality::Diamond),
-      40u8 => Ok(EventQuality::FourLeafClover),
-      _    => Err("I am not sure how to convert this value!")
+      0u8  => EventQuality::Unknown,
+      10u8 => EventQuality::Silver,
+      20u8 => EventQuality::Gold,
+      30u8 => EventQuality::Diamond,
+      40u8 => EventQuality::FourLeafClover,
+      _    => EventQuality::Unknown
     }
   }
 }

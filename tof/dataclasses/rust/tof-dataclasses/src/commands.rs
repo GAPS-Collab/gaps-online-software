@@ -41,6 +41,7 @@ cfg_if::cfg_if! {
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 #[repr(u8)]
 pub enum TofCommandCode {
+  Unknown                    = 0u8,
   /// en empty command
   CmdPing                    = 1u8,
   /// command code for "Power off"
@@ -101,8 +102,7 @@ pub enum TofCommandCode {
   /// Set forced trigger mode on MTB
   CmdEnTriggerModeForcedMTB  = 26u8,
   // Disable forced trigger mode on MTB
-  CmdDisTriggerModeForcedMTB = 27u8,
-  Unknown                    = 90u8
+  CmdDisTriggerModeForcedMTB = 27u8
 }
 
 impl fmt::Display for TofCommandCode {
@@ -113,52 +113,44 @@ impl fmt::Display for TofCommandCode {
   }
 }
 
-impl TryFrom<u8> for TofCommandCode {
-  type Error = &'static str;
-
-  // I am not sure about this hard coding, but the code
-  //  looks nicer - Paolo
-  fn try_from(value: u8) -> Result<Self, Self::Error> {
+impl From<u8> for TofCommandCode {
+  fn from(value: u8) -> Self {
     match value {
-      1u8  => Ok(TofCommandCode::CmdPing),
-      10u8 => Ok(TofCommandCode::CmdPowerOff),
-      11u8 => Ok(TofCommandCode::CmdPowerOn),
-      12u8 => Ok(TofCommandCode::CmdPowerCycle),
-      20u8 => Ok(TofCommandCode::CmdRBSetup),
-      21u8 => Ok(TofCommandCode::CmdSetThresholds),
-      22u8 => Ok(TofCommandCode::CmdSetMTConfig),
-      28u8 => Ok(TofCommandCode::CmdSetPreampBias),
-      30u8 => Ok(TofCommandCode::CmdDataRunStop),
-      31u8 => Ok(TofCommandCode::CmdDataRunStart),
-      32u8 => Ok(TofCommandCode::CmdStartValidationRun),
-      41u8 => Ok(TofCommandCode::CmdGetFullWaveforms),
-      42u8 => Ok(TofCommandCode::CmdGetReducedDataPacket),
-      43u8 => Ok(TofCommandCode::CmdRequestMoni),
-      50u8 => Ok(TofCommandCode::CmdNoiCalibration),
-      51u8 => Ok(TofCommandCode::CmdVoltageCalibration),
-      52u8 => Ok(TofCommandCode::CmdTimingCalibration),
-      53u8 => Ok(TofCommandCode::CmdDefaultCalibration),
-      54u8 => Ok(TofCommandCode::CmdCreateCalibrationFile),
-      44u8 => Ok(TofCommandCode::CmdUnspoolEventCache),
-      45u8 => Ok(TofCommandCode::CmdStreamAnyEvent),
-      46u8 => Ok(TofCommandCode::CmdStreamOnlyRequested),
-      23u8 => Ok(TofCommandCode::CmdSetRBDataBufSize),
-      24u8 => Ok(TofCommandCode::CmdEnTriggerModeForced),
-      25u8 => Ok(TofCommandCode::CmdDisTriggerModeForced),
-      26u8 => Ok(TofCommandCode::CmdEnTriggerModeForcedMTB),
-      27u8 => Ok(TofCommandCode::CmdDisTriggerModeForcedMTB),
-      90u8 => Ok(TofCommandCode::Unknown),
-      _    => {
-        error!("{} is not a avlid TofCommand code!", value);
-        Err("I am not sure how to convert this value!")
-      }
+      0u8  => TofCommandCode::Unknown,
+      1u8  => TofCommandCode::CmdPing,
+      10u8 => TofCommandCode::CmdPowerOff,
+      11u8 => TofCommandCode::CmdPowerOn,
+      12u8 => TofCommandCode::CmdPowerCycle,
+      20u8 => TofCommandCode::CmdRBSetup,
+      21u8 => TofCommandCode::CmdSetThresholds,
+      22u8 => TofCommandCode::CmdSetMTConfig,
+      28u8 => TofCommandCode::CmdSetPreampBias,
+      30u8 => TofCommandCode::CmdDataRunStop,
+      31u8 => TofCommandCode::CmdDataRunStart,
+      32u8 => TofCommandCode::CmdStartValidationRun,
+      41u8 => TofCommandCode::CmdGetFullWaveforms,
+      42u8 => TofCommandCode::CmdGetReducedDataPacket,
+      43u8 => TofCommandCode::CmdRequestMoni,
+      50u8 => TofCommandCode::CmdNoiCalibration,
+      51u8 => TofCommandCode::CmdVoltageCalibration,
+      52u8 => TofCommandCode::CmdTimingCalibration,
+      53u8 => TofCommandCode::CmdDefaultCalibration,
+      54u8 => TofCommandCode::CmdCreateCalibrationFile,
+      44u8 => TofCommandCode::CmdUnspoolEventCache,
+      45u8 => TofCommandCode::CmdStreamAnyEvent,
+      46u8 => TofCommandCode::CmdStreamOnlyRequested,
+      23u8 => TofCommandCode::CmdSetRBDataBufSize,
+      24u8 => TofCommandCode::CmdEnTriggerModeForced,
+      25u8 => TofCommandCode::CmdDisTriggerModeForced,
+      26u8 => TofCommandCode::CmdEnTriggerModeForcedMTB,
+      27u8 => TofCommandCode::CmdDisTriggerModeForcedMTB,
+      _    => TofCommandCode::Unknown
     }
   }
 }
 
 #[cfg(feature = "random")]
 impl FromRandom for TofCommandCode {
-  
   fn from_random() -> Self {
     let choices = [
       TofCommandCode::CmdPing,
@@ -203,6 +195,7 @@ impl FromRandom for TofCommandCode {
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 #[repr(u32)]
 pub enum TofCommandResp {
+  Unknown                            = 0u32,
   /// response code for: Command can not be executed on the server side
   RespErrUnexecutable                = 500u32,
   RespErrNotImplemented              = 404u32, 
@@ -244,29 +237,22 @@ impl fmt::Display for TofCommandResp {
   }
 }
 
-impl TryFrom<u32> for TofCommandResp {
-  type Error = &'static str;
-
-  // I am not sure about this hard coding, but the code
-  //  looks nicer - Paolo
-  fn try_from(value: u32) -> Result<Self, Self::Error> {
+impl From<u32> for TofCommandResp {
+  fn from(value: u32) -> Self {
     match value {
-      500u32   => Ok(TofCommandResp::RespErrUnexecutable),
-      404u32   => Ok(TofCommandResp::RespErrNotImplemented),
-      4000u32  => Ok(TofCommandResp::RespErrLevelNoProblem),
-      4010u32  => Ok(TofCommandResp::RespErrLevelMedium),
-      4020u32  => Ok(TofCommandResp::RespErrLevelSevere),
-      4030u32  => Ok(TofCommandResp::RespErrLevelCritical),
-      4040u32  => Ok(TofCommandResp::RespErrLevelMissionCritical),
-      99999u32 => Ok(TofCommandResp::RespErrLevelRunFoolRun),
-      200u32   => Ok(TofCommandResp::RespSuccFingersCrossed),
-      501u32   => Ok(TofCommandResp::RespErrNoRunActive),
-      502u32   => Ok(TofCommandResp::RespErrRunActive),
-      503u32   => Ok(TofCommandResp::RespErrCmdStuck),
-      _        => {
-        error! ("{} is not a valid TofCommandResp!", value);
-        Err("I am not sure how to convert this value!")
-      }
+      500u32   => TofCommandResp::RespErrUnexecutable,
+      404u32   => TofCommandResp::RespErrNotImplemented,
+      4000u32  => TofCommandResp::RespErrLevelNoProblem,
+      4010u32  => TofCommandResp::RespErrLevelMedium,
+      4020u32  => TofCommandResp::RespErrLevelSevere,
+      4030u32  => TofCommandResp::RespErrLevelCritical,
+      4040u32  => TofCommandResp::RespErrLevelMissionCritical,
+      99999u32 => TofCommandResp::RespErrLevelRunFoolRun,
+      200u32   => TofCommandResp::RespSuccFingersCrossed,
+      501u32   => TofCommandResp::RespErrNoRunActive,
+      502u32   => TofCommandResp::RespErrRunActive,
+      503u32   => TofCommandResp::RespErrCmdStuck,
+      _        => TofCommandResp::Unknown
     }
   }
 }
@@ -303,9 +289,9 @@ impl FromRandom for TofCommandResp {
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 #[repr(u8)]
 pub enum TofOperationMode {
-  RequestReply = 0u8,
-  StreamAny    = 10u8,
-  Unknown      = 20u8
+  Unknown      = 0u8,
+  RequestReply = 10u8,
+  StreamAny    = 20u8
 }
 
 impl fmt::Display for TofOperationMode {
@@ -316,20 +302,13 @@ impl fmt::Display for TofOperationMode {
   }
 }
 
-impl TryFrom<u8> for TofOperationMode {
-  type Error = &'static str;
-
-  // I am not sure about this hard coding, but the code
-  //  looks nicer - Paolo
-  fn try_from(value: u8) -> Result<Self, Self::Error> {
+impl From<u8> for TofOperationMode {
+  fn from(value: u8) -> Self {
     match value {
-      0u8  => Ok(TofOperationMode::RequestReply),
-      10u8 => Ok(TofOperationMode::StreamAny),
-      20u8 => Ok(TofOperationMode::Unknown),
-      _    => {
-        error!("{} is not a valid TofOperationMode!", value);
-        Err("I am not sure how to convert this value!")
-      }
+      0u8  => TofOperationMode::Unknown,
+      10u8 => TofOperationMode::RequestReply,
+      20u8 => TofOperationMode::StreamAny,
+      _    => TofOperationMode::Unknown
     }
   }
 }
@@ -339,9 +318,9 @@ impl FromRandom for TofOperationMode {
   
   fn from_random() -> Self {
     let choices = [
+      TofOperationMode::Unknown,
       TofOperationMode::RequestReply,
-      TofOperationMode::StreamAny,
-      TofOperationMode::Unknown
+      TofOperationMode::StreamAny      
     ];
     let mut rng  = rand::thread_rng();
     let idx = rng.gen_range(0..choices.len());

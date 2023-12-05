@@ -64,21 +64,14 @@ impl fmt::Display for EventStatus {
   }
 }
 
-impl TryFrom<u8> for EventStatus {
-  type Error = &'static str;
-
-  // I am not sure about this hard coding, but the code
-  //  looks nicer - Paolo
-  fn try_from(value: u8) -> Result<Self, Self::Error> {
+impl From<u8> for EventStatus {
+  fn from(value: u8) -> Self {
     match value {
-      0u8  => Ok(EventStatus::Unknown),
-      10u8 => Ok(EventStatus::CRC32Wrong),
-      11u8 => Ok(EventStatus::TailWrong),
-      42u8 => Ok(EventStatus::Perfect),
-      _    => {
-        error!("Can not convert {}! It is not a valid EventStatus!", value);
-        Err("Can not convert value!")
-      }
+      0u8  => EventStatus::Unknown,
+      10u8 => EventStatus::CRC32Wrong,
+      11u8 => EventStatus::TailWrong,
+      42u8 => EventStatus::Perfect,
+      _    => EventStatus::Unknown
     }
   }
 }
