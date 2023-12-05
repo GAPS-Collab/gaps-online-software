@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['simprimary_52',['SimPrimary',['../structSimPrimary.html',1,'']]],
-  ['socket_5finfo_53',['SOCKET_INFO',['../structSOCKET__INFO.html',1,'']]]
+  ['simprimary_44',['SimPrimary',['../structSimPrimary.html',1,'']]],
+  ['socket_5finfo_45',['SOCKET_INFO',['../structSOCKET__INFO.html',1,'']]]
 ];
