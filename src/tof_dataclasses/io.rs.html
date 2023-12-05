@@ -816,9 +816,6 @@
 <a href="#816" id="816">816</a>
 <a href="#817" id="817">817</a>
 <a href="#818" id="818">818</a>
-<a href="#819" id="819">819</a>
-<a href="#820" id="820">820</a>
-<a href="#821" id="821">821</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Input/Output 
 //!
 //! * Read files into memory
@@ -832,6 +829,7 @@
 // where the byteorder of u32 and larger 
 // is correct.
 </span><span class="kw">const </span>REVERSE_WORDS : bool = <span class="bool-val">true</span>;
+<span class="kw">const </span>CALC_CHECKSUM : bool = <span class="bool-val">true</span>;
 <span class="kw">const </span>ALGO : crc::Algorithm&lt;u32&gt; = crc::Algorithm {
       width   : <span class="number">32u8</span>,
       init    : <span class="number">0xFFFFFFFF</span>,
@@ -921,8 +919,9 @@
   /// this manages how we are draining the stream
   </span>n_events_ext     : usize,
   <span class="kw">pub </span>is_depleted  : bool,
-  <span class="kw">pub </span>calc_crc32   : bool,
-}
+  <span class="comment">//crc32_algo       : crc::Algorithm&lt;u32&gt;,
+  //crc32_sum        : Crc::&lt;u32&gt;,
+</span>}
 
 <span class="kw">impl </span>fmt::Debug <span class="kw">for </span>RBEventMemoryStreamer {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
@@ -936,6 +935,7 @@
 
 <span class="kw">impl </span>RBEventMemoryStreamer {
 
+
   <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
     <span class="self">Self </span>{
       stream           : Vec::&lt;u8&gt;::new(),
@@ -944,7 +944,6 @@
       tp_sender        : <span class="prelude-val">None</span>,
       n_events_ext     : <span class="number">0</span>,
       is_depleted      : <span class="bool-val">false</span>,
-      calc_crc32       : <span class="bool-val">false</span>,
       <span class="comment">//crc32_algo       : algo,
       //crc32_sum        : Crc::&lt;u32&gt;::new(&amp;algo),
     </span>}
@@ -1105,12 +1104,7 @@
     //}
     </span><span class="kw">let </span><span class="kw-2">mut </span>header       = RBEventHeader::new();
     <span class="kw">let </span><span class="kw-2">mut </span>event        = RBEvent::new();
-    <span class="kw">let </span><span class="kw-2">mut </span>event_status : EventStatus;
-    <span class="kw">if </span><span class="self">self</span>.calc_crc32 {
-        event_status = EventStatus::Perfect;
-    } <span class="kw">else </span>{
-      event_status = EventStatus::Unknown;
-    }
+    <span class="kw">let </span><span class="kw-2">mut </span>event_status = EventStatus::Perfect;
     <span class="comment">// start parsing
     //let first_pos = self.pos;
     </span><span class="kw">let </span>head   = parse_u16(<span class="kw-2">&amp;</span><span class="self">self</span>.stream, <span class="kw-2">&amp;mut </span><span class="self">self</span>.pos);
@@ -1194,7 +1188,7 @@
         //self.crc32_sum.update(&amp;self.stream[self.pos..self.pos+2*nwords]);
         // -&gt; THis is the preferred way
         </span><span class="kw">let </span><span class="kw-2">mut </span>dig = crc32_sum.digest();
-        <span class="kw">if </span><span class="self">self</span>.calc_crc32 {
+        <span class="kw">if </span>CALC_CHECKSUM {
           <span class="kw">let </span><span class="kw-2">mut </span>this_ch_adc = Vec::&lt;u16&gt;::with_capacity(nwords);
           <span class="kw">for _ in </span><span class="number">0</span>..nwords {
             <span class="kw">let </span>this_field = parse_u16(<span class="kw-2">&amp;</span><span class="self">self</span>.stream, <span class="kw-2">&amp;mut </span><span class="self">self</span>.pos);
@@ -1211,7 +1205,7 @@
         </span><span class="kw">let </span>crc320 = parse_u16(<span class="kw-2">&amp;</span><span class="self">self</span>.stream, <span class="kw-2">&amp;mut </span><span class="self">self</span>.pos);
         <span class="kw">let </span>crc321 = parse_u16(<span class="kw-2">&amp;</span><span class="self">self</span>.stream, <span class="kw-2">&amp;mut </span><span class="self">self</span>.pos);
         <span class="comment">//let checksum = self.crc32_sum.clone().finalize();
-        </span><span class="kw">if </span><span class="self">self</span>.calc_crc32 {
+        </span><span class="kw">if </span>CALC_CHECKSUM {
           <span class="kw">let </span>crc32 : u32;
           <span class="kw">if </span>REVERSE_WORDS {
             crc32 = u32::from(crc320) &lt;&lt; <span class="number">16 </span>| u32::from(crc321);
@@ -1236,7 +1230,7 @@
     }
     <span class="kw">let </span>crc320         = parse_u16(<span class="kw-2">&amp;</span><span class="self">self</span>.stream, <span class="kw-2">&amp;mut </span><span class="self">self</span>.pos);
     <span class="kw">let </span>crc321         = parse_u16(<span class="kw-2">&amp;</span><span class="self">self</span>.stream, <span class="kw-2">&amp;mut </span><span class="self">self</span>.pos);
-    <span class="kw">if </span><span class="self">self</span>.calc_crc32 {
+    <span class="kw">if </span>CALC_CHECKSUM {
       <span class="kw">let </span>crc32 : u32;
       <span class="kw">if </span>REVERSE_WORDS {
         crc32 = u32::from(crc320) &lt;&lt; <span class="number">16 </span>| u32::from(crc321);
