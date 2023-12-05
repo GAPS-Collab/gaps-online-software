@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["constant","device","ltb_control","memory","pb_control","preamp_control","rb_control"]};

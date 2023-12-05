@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["IPBusPacketType"],"fn":["connect_to_mtb","decode_board_mask","decode_hit_mask","decode_ipbus","encode_ipbus","get_mtbmonidata","get_mtevent","master_trigger","read_event_cnt","read_register","read_register_multiple","reset_daq","write_register","write_register_multiple"]};

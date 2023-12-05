@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["i2c_funcs","i2c_pec","i2c_rdwr","i2c_retries","i2c_slave","i2c_slave_force","i2c_smbus","i2c_tenbit","i2c_timeout"]};

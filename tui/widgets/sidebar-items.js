@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["BorderType","GraphType"],"mod":["canvas"],"struct":["Axis","BarChart","Block","Borders","Cell","Chart","Clear","Dataset","Gauge","LineGauge","List","ListItem","ListState","Paragraph","Row","Sparkline","Table","TableState","Tabs","Wrap"],"trait":["StatefulWidget","Widget"]};

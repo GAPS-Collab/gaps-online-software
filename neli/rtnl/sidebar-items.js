@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"struct":["Ifaddrmsg","Ifinfomsg","NdaCacheinfo","Ndmsg","Rtattr","Rtgenmsg","Rtmsg","Tcmsg"]};

@@ -1,0 +1,21 @@
+[Unit]
+Description=Liftof GAPS RB software
+After=network.target
+After=rb-wd.service
+After=rat-init.service
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+StandardOutput=append:/var/log/liftof.log
+StandardError=append:/var/log/liftof.log
+SyslogIdentifier=gaps
+User=gaps
+WorkingDirectory=/home/gaps/bin
+Environment="LIFTOF_IS_SYSTEMD=1"
+ExecStart=/home/gaps/bin/liftof-rb -r /home/gaps/config/runconfig.json
+
+[Install]
+WantedBy=multi-user.target

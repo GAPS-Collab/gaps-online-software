@@ -1,0 +1,47 @@
+# NIUHI series
+# v0.8.0
+
+# OMILU series
+
+# v0.7.1
+* massive cleanup, removes lots of unsued features
+* no writing of raw RB data anymore
+* removes ltb list
+* since RBEventMemoryView will go away, cleaning up 
+  the match cases.
+* DataFormat will go away as well, removing this 
+  dependency.
+
+# v0.7.0
+* cleanup - removes all deprecated code
+
+# KIHIKIHI series
+
+# v0.6.0
+* used for NTS data taking
+
+# UHU series
+
+# v0.5.2
+* fixes a critical bug in [liftof-rb] which mingled the 
+  vcal,tcal and noi settings, which lead to unpredictable
+  file size.
+
+# v0.5.1
+* introduction of a run number, paths for raw data as 
+  well as stream data will append the run number automatically,
+  directories will be created automatically as well, if they 
+  exist, user will be asked.
+
+# v0.5.0 
+* transition to sqlite db usage for paddle mapping
+* instead of marking which rbs to use, blacklist them   
+  in the json parameter file
+* environmental parameter capture and addition to the data
+  stream
+* CRITICAL FIX - readoutboard_comm will forward packets which 
+  are of non-event type
+
+# 0.2.0 
+
+* change to new PUB/SUB scheme, where the RBs prefix their stream with "RBXX"

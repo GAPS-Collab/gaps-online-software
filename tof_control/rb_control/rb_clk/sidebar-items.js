@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["configure_clk_synth","hard_reset_clk_synth","soft_reset_clk_synth"],"struct":["RBclk"]};

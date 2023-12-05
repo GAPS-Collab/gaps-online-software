@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["disable_nb3v9312c","enable_ad5675","enable_nb3v9312c","enable_si5345b","initialize","read_port","reset_si5345b","rf_input_select"],"struct":["RBgpioe"]};

@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["pb_dac","pb_init","pb_ltb_pwr","pb_table","pb_temp","pb_vcp"]};

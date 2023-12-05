@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["ltb_dac_table","ltb_env_table","ltb_table"]};

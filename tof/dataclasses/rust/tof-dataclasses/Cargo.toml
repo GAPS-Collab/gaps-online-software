@@ -1,0 +1,53 @@
+[package]
+name = "tof-dataclasses"
+version = "0.8.3"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[[bench]]
+name = "bench"
+harness = false
+
+[[test]]
+name = "test"
+required-features = ["random"]
+
+[features]
+random=["rand"]
+database=["sqlite"]
+tofcontrol=["tof-control"]
+advanced-algorithms=["smoothed_z_score"]
+
+[dev-dependencies]
+# for testing
+# used for the random number generation
+#rand = "0.8"
+criterion = "0.4"
+
+[dependencies]
+# logging
+log  = "0.4"
+#pretty_env_logger = "0.4"
+rand = {version = "0.8", optional = true}
+json = "0.12" 
+#statrs = "0.14"
+# Takeru's tof-control
+tof-control = {path = "../../../extern/tof-control", optional = true, version = "0.2", features=[] }
+smoothed_z_score = {version = "0.1", optional = true}
+sqlite = {version = "0.30", optional = true}
+statistical = "1.0"
+# nom for cominatoric parsers
+#nom = "7.1"
+# strum to enhance enum 
+# with messages, iterators
+#strum = "0.24"
+#strum_macros = "0.24"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+crc = "3.0"
+cfg-if = "1.0"
+indicatif = "0.17"
+colored = "2.0"
+crossbeam-channel="0.5"
+#streaming-stats = "0.2"

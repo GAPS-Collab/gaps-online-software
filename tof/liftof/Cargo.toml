@@ -1,0 +1,13 @@
+[workspace]
+resolver = "2"
+members = [
+  "liftof-lib",
+  "liftof-rb",
+  "liftof-cc", 
+  "liftof-tui",  
+  "liftof-analysis"
+]
+
+[profile.release]
+opt-level = 3
+

@@ -1,0 +1,62 @@
+[package]
+name = "liftof-rb"
+version = "0.8.4"
+edition = "2021"
+description = "Readoutboard data acquisition code for the TOF of the GAPS science experiment"
+
+[[bin]]
+name = "liftof-rb"
+path = "src/main.rs"
+
+[[bin]]
+name = "watch-buffer-fill"
+path = "src/bin/watch_buffer_fill.rs"
+
+[[bin]]
+name = "scan-uio-buffers"
+path = "src/bin/scan_uio_buffers.rs"
+
+[[bin]]
+name = "debug-idle"
+path = "src/bin/debug_idle.rs"
+
+
+[[bin]]
+name = "debug-registers"
+path = "src/bin/debug_registers.rs"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+#[net]
+#git-fetch-with-cli = true
+[features]
+tofcontrol = ["tof-control"]
+
+[dependencies]
+liftof-lib = { path = "../liftof-lib"} 
+
+# addess raw memeory, e.g. /dev/uio0
+memmap = "0.7"
+
+# multi-producer/multi-consumer channels
+crossbeam-channel = "0.5"
+
+tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["random", "tofcontrol"], version = "0.8.3"} 
+tof-control = {path = "../../extern/tof-control", optional = true, version = "0.2", features=[] }
+zmq = "0.10.0"
+
+log = "0.4"
+env_logger = "0.10"
+
+local-ip-address = "0.5"
+clap = { version = "4.0", features = ["derive"] }
+
+indicatif = ">=0.17.3"
+
+serde_json = "1.0"
+
+signal-hook = "0.3"
+
+#[target.armv7-unknown-linux-gnueabi]
+#linker = "/usr/bin/arm-none-eabi-gcc"
+cfg-if = "1.0"

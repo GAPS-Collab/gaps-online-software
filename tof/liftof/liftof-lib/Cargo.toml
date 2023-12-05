@@ -1,0 +1,47 @@
+[package]
+name = "liftof-lib"
+version = "0.8.1"
+edition = "2021"
+
+[features]
+random = []
+
+#[[lib]]
+#name = "liftof-lib"
+#path = "src/lib.rs"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+# addess raw memeory, e.g. /dev/uio0
+memmap = "0.7"
+
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# multi-producer/multi-consumer channels
+#crossbeam = "0.8"
+crossbeam-channel = "0.5"
+
+tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["random"], version = "0.8"} 
+
+zmq = "0.10.0"
+
+log = "0.4"
+colored = "2.0"
+#env_logger = "0.10"
+
+local-ip-address = "0.5"
+
+# this is just for fun
+indicatif = "0.17"
+
+# for connection to rb's at arbitrary ports
+#port_scanner = "0.1"
+#arp-toolkit = { verion = "0.3", features = ["sync"] }
+#mac_address = "1.1"
+netneighbours = "0.1"
+macaddr = {version="1.0", features = ["serde"]}
+
+#[target.armv7-unknown-linux-gnueabi]
+#linker = "/usr/bin/arm-none-eabi-gcc"

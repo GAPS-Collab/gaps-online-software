@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"struct":["CompletedFrame","Frame","Terminal","TerminalOptions","Viewport"]};

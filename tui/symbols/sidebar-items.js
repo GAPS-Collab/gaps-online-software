@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["DOT"],"enum":["Marker"],"mod":["bar","block","braille","line"]};

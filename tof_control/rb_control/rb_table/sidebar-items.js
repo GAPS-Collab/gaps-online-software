@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["rb_env_table","rb_info_table","rb_table","rb_vcp_table"]};
