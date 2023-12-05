@@ -26,7 +26,8 @@ pub enum PacketType {
   MonitorTofCmp      = 80u8,
   MonitorMtb         = 90u8,
   RBMoni             = 100u8,
-  RBEventMemoryView  = 120u8, // needs to go away
+  RBEventMemoryView  = 120u8, // We'll keep it for now - indicates that the event
+                              // still needs to be processed.
   RBCalibration      = 130u8,
   TofCommand         = 140u8,
   RBCommand          = 150u8,

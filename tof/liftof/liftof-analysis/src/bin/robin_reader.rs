@@ -1,5 +1,7 @@
-//! Read readoutboard binary files of the different levels
+//! Read "old" blobfiles and combine them offline into 
+//! TofEvents
 //!
+//! This can be used for NTS data
 
 #[macro_use] extern crate log;
 extern crate pretty_env_logger;
@@ -23,7 +25,7 @@ use std::path::Path;
 use std::collections::HashMap;
 use std::io::Write;
 
-use std::process::exit;
+//use std::process::exit;
 
 use tof_dataclasses::packets::{PacketType,
                                TofPacket};
@@ -171,6 +173,7 @@ fn main() {
           }
           available_rbs.push(rb_id);
           let mut this_reader = RobinReader::new(filename);
+          this_reader.generate_index();
           this_reader.cache_all_events();
           // exit(1);
           robin_readers.insert(rb_id, this_reader);

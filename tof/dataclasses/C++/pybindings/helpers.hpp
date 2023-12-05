@@ -9,6 +9,7 @@
 
 namespace py = pybind11;
 
+RBCalibration  get_from_califile(const String filename);
 
 Vec<TofPacket> wrap_get_tofpackets_from_file(const String filename);
 

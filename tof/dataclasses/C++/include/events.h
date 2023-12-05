@@ -34,6 +34,25 @@ struct RBEvent;
 struct RBEventMemoryView;
 struct MasterTriggerEvent;
 
+/*********************************************************/
+  
+static const u8 EVENTSTATUS_UNKNOWN           =   0;
+static const u8 EVENTSTATUS_CRC32WRONG        =  10;
+static const u8 EVENTSTATUS_TAILWRONG         =  11;
+static const u8 EVENTSTATUS_INCOMPLETEREADOUT =  21;
+static const u8 EVENTSTATUS_PERFECT           =  42;
+
+enum class EventStatus : u8 {
+  Unknown           = EVENTSTATUS_UNKNOWN,
+  Crc32Wrong        = EVENTSTATUS_CRC32WRONG,
+  TailWrong         = EVENTSTATUS_TAILWRONG,
+  IncompleteReadout = EVENTSTATUS_INCOMPLETEREADOUT,
+  Perfect           = EVENTSTATUS_PERFECT,
+};
+
+std::ostream& operator<<(std::ostream& os, const EventStatus& status);
+
+/*********************************************************/
 
 /**
  * The "purest" form of an event for a single RB. 
@@ -151,7 +170,7 @@ struct RBEvent {
 
   // data type will be an enum
   u8 data_type;
-  u8 status;
+  EventStatus status;
   RBEventHeader header;
   Vec<Vec<u16>> adc; 
   Vec<RPaddlePacket> hits;
@@ -205,6 +224,8 @@ struct RBMissingHit {
                                       u64 &pos);
 };
 
+/*********************************************************/
+
 static const u8 EVENT_QUALITY_UNKNOWN         =  0;
 static const u8 EVENT_QUALITY_SILVER          =  10;
 static const u8 EVENT_QUALITY_GOLD            =  20;
@@ -221,6 +242,8 @@ enum class EventQuality : u8 {
 
 std::ostream& operator<<(std::ostream& os, const EventQuality& qual);
 
+/*********************************************************/
+
 static const u8 COMPRESSION_LEVEL_UNKNOWN         =  0;
 static const u8 COMPRESSION_LEVEL_NONE            =  10;
 
@@ -230,20 +253,7 @@ enum class CompressionLevel : u8 {
 };
 
 std::ostream& operator<<(std::ostream& os, const CompressionLevel& level);
-  
-static const u8 EVENTSTATUS_UNKNOWN         =   0;
-static const u8 EVENTSTATUS_CRC32WRONG      =  10;
-static const u8 EVENTSTATUS_TAILWRONG       =  11;
-static const u8 EVENTSTATUS_PERFECT         =  42;
 
-enum class EventStatus : u8 {
-  Unknown        = EVENTSTATUS_UNKNOWN,
-  Crc32Wrong     = EVENTSTATUS_CRC32WRONG,
-  TailWrong      = EVENTSTATUS_TAILWRONG,
-  Perfect        = EVENTSTATUS_PERFECT,
-};
-
-std::ostream& operator<<(std::ostream& os, const EventStatus& status);
 
 /**
  * The MasterTriggerEvent represesnts the information

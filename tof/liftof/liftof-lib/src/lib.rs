@@ -40,10 +40,6 @@ use log::Level;
 use macaddr::MacAddr6;
 use netneighbours::get_mac_to_ip_map;
 
-extern crate indicatif;
-use indicatif::{ProgressBar, ProgressStyle};
-
-//extern crate pretty_env_logger;
 #[macro_use] extern crate log;
 
 use tof_dataclasses::manifest as mf;
@@ -181,7 +177,12 @@ impl TofPacketWriter {
       let filename = self.file_prefix.clone() + "_" + &self.file_id.to_string() + ".tof.gaps";
       let path  = Path::new(&filename);
       println!("==> [TOFPACKETWRITER] Will start a new file {}", path.display());
-      self.file.sync_all();
+      match self.file.sync_all() {
+        Err(err) => {
+          error!("Unable to sync file to disc! {err}");
+        },
+        Ok(_) => ()
+      }
       self.file = OpenOptions::new().create(true).append(true).open(path).expect("Unable to open file {filename}");
       self.n_packets = 0;
       self.file_id += 1;
@@ -504,13 +505,7 @@ pub fn waveform_analysis(event         : &mut RBEvent,
     };
   }
   // do the calibration
-  //let mut active_channels = event.header.get_active_data_channels();
-  //active_channels.push(9); // always do ch9 callibration
-  //let mut active_channels = event.header.decode_channel_mask();
-  let mut active_channels = event.header.get_channels();
-  //if event.header.has_ch9 {
-  //  active_channels.push(8); 
-  //}
+  let active_channels = event.header.get_channels();
   // allocate memory for voltages
   // this allocates more memory than needed
   // (needed is active_channels.len()), however,

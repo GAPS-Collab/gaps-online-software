@@ -1,5 +1,12 @@
 # NIUHI series
 
+## v0.8.2
+* based on updated tof-dataclasses, which fix the 
+  calibration timing bin bug
+
+## v0.8,2
+* changed event processing engine to RBEventMemoryStreamer
+
 ## v0.8,1
 * upstream changes in tof-control (removes panic) should 
   allow more stable monitoring

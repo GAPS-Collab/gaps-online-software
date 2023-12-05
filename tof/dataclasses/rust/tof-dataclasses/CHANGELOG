@@ -1,5 +1,9 @@
 # NIUHI series
 
+## 0.8.2
+* fixes timing bin width bug in RBCalibration (tbins exhibit a mean of 0.488
+  now) 
+
 ## 0.8.2 
 * substantial changes to RBEvent
   - split up timestamp 48 to timestamp32 and timestamp16

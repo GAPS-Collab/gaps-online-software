@@ -20,26 +20,20 @@
 
 use std::fmt;
 
-extern crate crc;
-use crc::Crc;
 use colored::Colorize;
 
 
 use crate::packets::{TofPacket, PacketType};
 use crate::events::TofHit;
 use crate::constants::{NWORDS, NCHN};
-use crate::serialization::{u16_to_u8,
-                           u8_to_u16,
-                           search_for_u16,
-                           Serialization,
-                           SerializationError,
-                           parse_bool,
-                           parse_u8,
-                           parse_u16,
-                           parse_u32,
-                           parse_u32_for_16bit_words,
-                           parse_u48_for_16bit_words,
-                           parse_u64};
+use crate::serialization::{
+    u8_to_u16,
+    Serialization,
+    SerializationError,
+    parse_u8,
+    parse_u16,
+    parse_u32,
+};
 
 use crate::events::DataType;
 use crate::errors::UserError;
@@ -58,6 +52,7 @@ pub enum EventStatus {
   Unknown            = 0u8,
   CRC32Wrong         = 10u8,
   TailWrong          = 11u8,
+  IncompleteReadout  = 21u8,
   Perfect            = 42u8
 }
 
@@ -80,7 +75,10 @@ impl TryFrom<u8> for EventStatus {
       10u8 => Ok(EventStatus::CRC32Wrong),
       11u8 => Ok(EventStatus::TailWrong),
       42u8 => Ok(EventStatus::Perfect),
-      _    => Err("I am not sure how to convert this value!")
+      _    => {
+        error!("Can not convert {}! It is not a valid EventStatus!", value);
+        Err("Can not convert value!")
+      }
     }
   }
 }
@@ -219,75 +217,70 @@ impl FromRandom for RBMissingHit {
   }
 }
 
-/// Get traces in a conscise form from a 
-/// number of RBEvents
+
+/// Get the traces for a set of RBEvents
 ///
-/// This will create a clone of all the 
-/// traces including ch9,
-/// so they can be manipulated
-/// without regrets
-pub fn unpack_traces_f32(events : &Vec<RBEvent>) -> Vec<Vec<Vec<f32>>> {
-  let nevents    = events.len();
-  let mut nchan  = 0usize;
-  let mut nwords = 0usize;
-  //// get a sane event
-  for ev in events {
-    if ev.adc[0].len() > 0 {
-      nwords = ev.adc[0].len();   
-    }
-  //  nchan = ev.header.get_ndatachan() as usize;
+/// This will return a cube of 
+/// The sice of this cube will be fixed
+/// in two dimensions, but not the third
+///
+/// The rationale of this is to be able 
+/// to quickly calculate means over all
+/// channels.
+///
+/// Shape
+/// [ch:9][nevents][adc_bin:1024]
+///
+/// # Args:
+///   events - events to get the traces from
+pub fn unpack_traces_f64(events : &Vec<RBEvent>)
+  -> Vec<Vec<Vec<f64>>> {
+  let nevents          = events.len();
+  let mut traces       = Vec::<Vec::<Vec::<f64>>>::new();
+  let mut trace        = Vec::<f64>::with_capacity(NWORDS);
+  let mut stop_cells   = Vec::<isize>::new();
+  let mut empty_events = Vec::<Vec::<f64>>::new();
+  for _ in 0..nevents {
+    empty_events.push(trace.clone());
   }
-  nchan = NCHN; 
-  info!("Will construct traces cube with nchan {}, nevents {}, nwords {}", nchan, nevents, nwords);
-  let mut traces: Vec<Vec<Vec<f32>>> = vec![vec![vec![0.0f32; nwords]; nevents]; nchan + 1];
-  if nevents == 0 {
-    return traces;
-  }
-  let mut nevents_skipped = 0u32;
-  for ch in 0..nchan {
-    for ev in 0..nevents { 
-      if events[ev].adc[ch].len() != nwords {
-        // ignore corrupt events
-        //println!("{}", events[ev]);
-        nevents_skipped += 1;
-        continue;
+  for ch in 0..NCHN {
+    traces.push(empty_events.clone());
+    for (k,ev) in events.iter().enumerate() {
+      trace.clear();
+      stop_cells.push(ev.header.stop_cell as isize);
+      for k in 0..NWORDS {
+        trace.push(ev.adc[ch][k] as f64);
       }
-      for n in 0..nwords {
-        //println!("{}", events[ev].adc.len());
-        //println!("{}", events[ev].adc[ch].len());
-        //println!("{}", traces[ch][ev].len());
-        //println!("{}", traces[ch].len());
-        //println!("{}", traces.len());
-        traces[ch][ev][n] = events[ev].adc[ch][n] as f32;
-      }
+      traces[ch][k] = trace.clone();
     }
-  }
-  // ch9
-  //for ev in 0..nevents { 
-  //  if !events[ev].header.has_ch9 {
-  //    nevents_skipped += 1;
-  //    continue
-  //  }
-  //  if events[ev].ch9_adc.len() != nwords {
-  //    // ignore corrupt events
-  //    //println!("{}", events[ev]);
-  //    nevents_skipped += 1;
-  //    continue;
-  //  }
-  //  for n in 0..nwords {
-  //    //println!("{}", events[ev].adc.len());
-  //    //println!("{}", events[ev].adc[ch].len());
-  //    //println!("{}", traces[ch][ev].len());
-  //    //println!("{}", traces[ch].len());
-  //    //println!("{}", traces.len());
-  //    //traces[8][ev][n] = events[ev].ch9_adc[n] as f32;
-  //  }
-  //}
-  if nevents_skipped > 0 {
-    error!("Skipping {nevents_skipped} events due to malformed traces!");
   }
   traces
 }
+
+pub fn unpack_traces_f32(events : &Vec<RBEvent>)
+  -> Vec<Vec<Vec<f32>>> {
+  let nevents          = events.len();
+  let mut traces       = Vec::<Vec::<Vec::<f32>>>::new();
+  let mut trace        = Vec::<f32>::with_capacity(NWORDS);
+  let mut stop_cells   = Vec::<isize>::new();
+  let mut empty_events = Vec::<Vec::<f32>>::new();
+  for _ in 0..nevents {
+    empty_events.push(trace.clone());
+  }
+  for ch in 0..NCHN {
+    traces.push(empty_events.clone());
+    for (k,ev) in events.iter().enumerate() {
+      trace.clear();
+      stop_cells.push(ev.header.stop_cell as isize);
+      for k in 0..NWORDS {
+        trace.push(ev.adc[ch][k] as f32);
+      }
+      traces[ch][k] = trace.clone();
+    }
+  }
+  traces
+}
+
 
 /// Event data for each individual ReadoutBoard (RB)
 ///
@@ -307,7 +300,7 @@ impl RBEvent {
 
   pub fn new() -> Self {
     let mut adc = Vec::<Vec<u16>>::with_capacity(NCHN);
-    for k in 0..NCHN {
+    for _ in 0..NCHN {
       adc.push(Vec::<u16>::new());
     }
     Self {
@@ -329,7 +322,7 @@ impl RBEvent {
       return Err(SerializationError::StreamTooShort);
     }
     // TODO This might panic! Is it ok?
-    Ok(DataType::try_from(stream[2]).unwrap())
+    Ok(DataType::try_from(stream[2]).unwrap_or(DataType::Unknown))
   }
   
   /// decode the len field in the in memroy represention of 
@@ -540,8 +533,8 @@ impl Serialization for RBEvent {
       error!("The given position {} does not point to a valid header signature of {}", pos, Self::HEAD);
       return Err(SerializationError::HeadInvalid {});
     }
-    event.data_type = DataType::try_from(parse_u8(stream, pos)).unwrap();
-    event.status    = EventStatus::try_from(parse_u8(stream, pos)).unwrap();
+    event.data_type = DataType::try_from(parse_u8(stream, pos)).unwrap_or(DataType::Unknown);
+    event.status    = EventStatus::try_from(parse_u8(stream, pos)).unwrap_or(EventStatus::Unknown);
     //let nchan_data  = parse_u8(stream, pos);
     let n_hits      = parse_u8(stream, pos);
     event.header    = RBEventHeader::from_bytestream(stream, pos)?;
@@ -599,7 +592,8 @@ impl Serialization for RBEvent {
   }
   
   fn to_bytestream(&self) -> Vec<u8> {
-    let mut stream = Vec::<u8>::new();
+    let mut stream = Vec::<u8>::with_capacity(18530);
+    //let mut stream = Vec::<u8>::new();
     stream.extend_from_slice(&Self::HEAD.to_le_bytes());
     stream.push(self.data_type as u8);
     stream.push(self.status as u8);
@@ -611,9 +605,18 @@ impl Serialization for RBEvent {
     // for an empty channel, we will add an empty vector
     let add_channels = !self.header.is_event_fragment() & !self.header.drs_lost_trigger();
     if add_channels {
-      for channel_adc in self.adc.iter() {
-        stream.extend_from_slice(&u16_to_u8(&channel_adc)); 
+      for n in 0..NCHN {
+        for k in 0..NWORDS {
+          if self.adc[n].len() == 0 {
+            continue;
+          }
+          stream.extend_from_slice(&self.adc[n][k].to_le_bytes());  
+        }
       }
+      // this is way slower
+      //for channel_adc in self.adc.iter() {
+      //  stream.extend_from_slice(&u16_to_u8(&channel_adc)); 
+      //}
     }
     //if self.ch9_adc.len() > 0 {
     //  stream.extend_from_slice(&u16_to_u8(&self.ch9_adc));
@@ -965,11 +968,7 @@ impl RBEventHeader {
 
   /// Get the number of data channels + 1 for ch9
   pub fn get_nchan(&self) -> usize {
-    let mut nchan = self.get_channels().len();
-    //if self.has_ch9 {
-    //  nchan += 1;
-    //}
-    nchan
+    self.get_channels().len()
   }
   
   //pub fn get_ndatachan(&self) -> usize {

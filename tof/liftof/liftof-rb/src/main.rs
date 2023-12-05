@@ -26,12 +26,16 @@ use local_ip_address::local_ip;
 use std::process::exit;
 use liftof_lib::{color_log, CalibrationCmd};
 
-use liftof_rb::threads::{runner,
-                         cmd_responder,
-                         event_processing,
-                         event_cache,
-                         monitoring,
-                         data_publisher};
+use liftof_rb::threads::{
+    runner,
+    experimental_runner,
+    cmd_responder,
+    event_processing,
+    event_cache,
+    monitoring,
+    data_publisher
+};
+
 use liftof_rb::api::*;
 use liftof_rb::control::*;
 use tof_dataclasses::threading::ThreadPool;
@@ -239,23 +243,6 @@ fn main() {
   let (opmode_to_cache, opmode_from_runner)     : 
       (Sender<TofOperationMode>, Receiver<TofOperationMode>)                = unbounded();
   let (bs_send, bs_recv)             : (Sender<Vec<u8>>, Receiver<Vec<u8>>) = unbounded(); 
-
-
-  
-  // ucla debugging
-  //match setup_drs4() {
-  //  Ok(_)    => (),
-  //  Err(err) => {
-  //    panic!("Setup drs4 failled! Error {err}");
-  //  }
-  //}
-  //match set_active_channel_mask_with_ch9(255) {
-  //  Ok(_) => (),
-  //  Err(err) => {
-  //    panic!("Settint the ch9 register failed!");
-  //  }
-  //}
-  //write_control_reg(0x44,u32::MAX);
   
   //FIXME - restrict to actual number of threads
   let n_threads = 8;
@@ -281,7 +268,15 @@ fn main() {
 
   // then the runner. It does nothing, until we send a set
   // of RunParams
+  let tp_to_cache_c        = tp_to_cache.clone();
   workforce.execute(move || {
+      //experimental_runner(&rc_from_cmdr_c,
+      //                    None, 
+      //                    //&bs_send,
+      //                    &tp_to_cache,
+      //                    &dtf_to_evproc,
+      //                    &opmode_to_cache,
+      //                    show_progress);
       runner(&rc_from_cmdr_c,
              None, 
              &bs_send,
@@ -297,7 +292,6 @@ fn main() {
                                 wf_analysis,
                                 cache_size)
   });
-  let tp_to_cache_c        = tp_to_cache.clone();
   workforce.execute(move || {
                     event_processing(&bs_recv,
                                      &tp_to_cache,

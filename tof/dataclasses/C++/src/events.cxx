@@ -1,4 +1,5 @@
 #include<numeric>
+#include<sstream>
 
 #include "events.h"
 #include "parsers.h"
@@ -331,7 +332,7 @@ f32 RBEventHeader::drs_adc_to_celsius(u16 adc) const {
 
 RBEvent::RBEvent() {  
   data_type = 0;
-  status    = 0;
+  status    = EventStatus::Unknown;
   header = RBEventHeader();
   adc    = Vec<Vec<u16>>(); 
   for (usize k=0; k<NCHN; k++) {
@@ -344,6 +345,10 @@ RBEvent::RBEvent() {
 
 std::string RBEvent::to_string() const {
   std::string repr = "<RBEvent\n";
+  std::stringstream ss;
+  ss << status;
+  //repr += "  data type : " + ss.str(); 
+  repr += "  status    : " + ss.str() + "\n";
   repr += header.to_string();
   repr += "\n";
   if (adc.size() > 0) {
@@ -435,7 +440,9 @@ RBEvent RBEvent::from_bytestream(const Vec<u8> &stream,
     spdlog::error("[RBEvent::from_bytestream] Header signature invalid!");  
   }
   event.data_type = Gaps::parse_u8(stream, pos);
-  event.status    = Gaps::parse_u8(stream, pos);
+  //event.status    = Gaps::parse_u8(stream, pos);
+  // FIXME - this can fail. Write a custom casting method that doesn't
+  event.status    = static_cast<EventStatus>(stream[pos]); pos+=1; 
   // hits are below when readking out hit vector
   // FIXME
   u8 nhits        = Gaps::parse_u8(stream, pos);
@@ -548,6 +555,10 @@ std::ostream& operator<<(std::ostream& os, const EventStatus& qual) {
      }
      case EventStatus::TailWrong : { 
        os << "TailWrong>";
+       break;
+     }
+     case EventStatus::IncompleteReadout : { 
+       os << "IncompleteReadout>";
        break;
      }
      case EventStatus::Perfect : { 

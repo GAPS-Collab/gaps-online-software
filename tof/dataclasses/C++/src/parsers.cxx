@@ -51,6 +51,16 @@ f32 Gaps::parse_f32(const Vec<u8> &bytestream,
   return result;
 }
 
+f64 Gaps::parse_f64(const Vec<u8> &bytestream,
+                    usize &pos) {
+  f64 result;
+  Vec<u8> bytes = Gaps::slice(bytestream,pos,pos+8); 
+  // Copy the bytes into a float variable using type punning
+  std::memcpy(&result, bytes.data(), sizeof(f64));
+  pos += 8;
+  return result;
+}
+
 u16 Gaps::u16_from_le_bytes(const Vec<u8> &bytestream,
                             u64 &pos) {
   u16 value = (u16)(

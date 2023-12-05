@@ -35,13 +35,37 @@ use crate::serialization::{Serialization,
                            parse_u16,
                            parse_f32};
 
+//use crate::errors::SensorError;
+
+/// Preamp temperature and bias data
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub struct PreampMoniData {
+  pub board_id           : u8,
+  pub temps              : [f32;16],
+  pub biases             : [f32;16]
+}
+
+impl PreampMoniData {
+
+  pub fn new() -> Self {
+    Self {
+      board_id  : 0,
+      temps     : [f32::MAX;16],
+      biases    : [f32::MAX;16]
+    }
+  }
+
+  //pub fn read(&mut self) -> Result<(),SensorError> {
+  //}
+}
+
+
 /// A collection of monitoring data
 /// from the readoutboards. This includes
 /// temperatures, power data, pressure, humidity
 /// as well as the magnetic sensors
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct RBMoniData {
-
   pub board_id           : u8,
   pub rate               : u16,
   pub tmp_drs            : f32,

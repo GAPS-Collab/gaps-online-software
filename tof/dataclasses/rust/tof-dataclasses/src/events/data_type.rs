@@ -15,15 +15,15 @@ cfg_if::cfg_if! {
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 #[repr(u8)]
 pub enum DataType {
-  VoltageCalibration = 0u8,
-  TimingCalibration  = 10u8,
-  Noi                = 20u8,
-  Physics            = 30u8,
-  RBTriggerPeriodic  = 40u8,
-  RBTriggerPoisson   = 50u8,
-  MTBTriggerPoisson  = 60u8,
+  Unknown            = 0u8,
+  VoltageCalibration = 10u8,
+  TimingCalibration  = 20u8,
+  Noi                = 30u8,
+  Physics            = 40u8,
+  RBTriggerPeriodic  = 50u8,
+  RBTriggerPoisson   = 60u8,
+  MTBTriggerPoisson  = 70u8,
   // future extension for different trigger settings!
-  Unknown            = 70u8,
 }
 
 impl fmt::Display for DataType {
@@ -41,15 +41,18 @@ impl TryFrom<u8> for DataType {
   //  looks nicer - Paolo
   fn try_from(value: u8) -> Result<Self, Self::Error> {
     match value {
-      0u8  => Ok(DataType::VoltageCalibration),
-      10u8 => Ok(DataType::TimingCalibration),
-      20u8 => Ok(DataType::Noi),
-      30u8 => Ok(DataType::Physics),
-      40u8 => Ok(DataType::RBTriggerPeriodic),
-      50u8 => Ok(DataType::RBTriggerPoisson),
-      60u8 => Ok(DataType::MTBTriggerPoisson),
-      70u8 => Ok(DataType::Unknown),
-      _    => Err("I am not sure how to convert this value!")
+      0u8  => Ok(DataType::Unknown),
+      10u8 => Ok(DataType::VoltageCalibration),
+      20u8 => Ok(DataType::TimingCalibration),
+      30u8 => Ok(DataType::Noi),
+      40u8 => Ok(DataType::Physics),
+      50u8 => Ok(DataType::RBTriggerPeriodic),
+      60u8 => Ok(DataType::RBTriggerPoisson),
+      70u8 => Ok(DataType::MTBTriggerPoisson),
+      _    => {
+        error!("{} is not a valid data type!", value);
+        Err("I am not sure how to convert this value!")
+      }
     }
   }
 }

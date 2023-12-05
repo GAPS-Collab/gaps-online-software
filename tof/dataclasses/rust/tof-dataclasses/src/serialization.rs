@@ -33,6 +33,18 @@ pub fn u8_to_u16(vec_u8: &[u8]) -> Vec<u16> {
         .collect()
 }
 
+/// Restore a vector of u16 from a vector of u8
+///
+/// This interpretes two following u8 as an u16
+/// Useful for deserialization of waveforms.
+/// Additionally it masks the last 2 bits 
+/// binary adding 0x3ff to each u16.
+pub fn u8_to_u16_14bit(vec_u8: &[u8]) -> Vec<u16> {
+    vec_u8.chunks_exact(2)
+        .map(|chunk| 0x3fff & u16::from_le_bytes([chunk[0], chunk[1]]))
+        .collect()
+}
+
 
 pub fn parse_u8(bs : &Vec::<u8>, pos : &mut usize) -> u8 {
   let value = u8::from_le_bytes([bs[*pos]]);

@@ -1,6 +1,6 @@
 [package]
 name = "liftof-rb"
-version = "0.8.1"
+version = "0.8.4"
 edition = "2021"
 description = "Readoutboard data acquisition code for the TOF of the GAPS science experiment"
 
@@ -41,7 +41,7 @@ memmap = "0.7"
 # multi-producer/multi-consumer channels
 crossbeam-channel = "0.5"
 
-tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["random", "tofcontrol"], version = "0.8"} 
+tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["random", "tofcontrol"], version = "0.8.3"} 
 tof-control = {path = "../../extern/tof-control", optional = true, version = "0.2", features=[] }
 zmq = "0.10.0"
 
