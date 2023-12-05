@@ -21,13 +21,23 @@ The python API will undergo some easy-of-use improvements soon.
 
 * [CXX-API](index.html)
 
-## Executable programs and hihher level libraries
+## Executable programs and higher level libraries [liftof]
+
+Liftof ("liftof is for TOF") is a collection of binaries and
+a library which are used for in-flight data taking.
+Liftof is written in [Rust](https://www.rust-lang.org/)
+It also ships with binaries for debugging and analysis.
 
 * [liftof-lib](liftof_lib/index.html)
 _high level library for applications_
 
 * [liftof-cc](liftof_cc/index.html)
 _command and control sever_
+
+liftof-cc contains 2 executable programs:
+    - liftof-cc : Command and control server
+    - liftof-mt : Readout/Diagnose MTB, show event stream and
+                  can send RBEventRequests to RBs
 
 * [liftof-rb](liftof_rb/index.html)
 _readoutboard code_

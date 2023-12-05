@@ -146,11 +146,15 @@ std::string RBEventHeader::to_string() const {
   repr += "\n  lost trigger   " + std::to_string(drs_lost_trigger())    ;
   repr += "\n  event fragment " + std::to_string(is_event_fragment())   ;
   repr += "\n  channel mask   " + std::to_string(channel_mask)          ;
+  repr += "\n  |-> channels   ";
+  for (auto ch : get_channels()) {
+    repr += " " + std::to_string(ch) + " ";
+  }
   repr += "\n  stop cell      " + std::to_string(stop_cell)             ;
   repr += "\n  crc32          " + std::to_string(crc32)                 ;
   repr += "\n  dtap0          " + std::to_string(dtap0)                 ;
   repr += "\n  timestamp32    " + std::to_string(timestamp32)           ;
-  repr += "\n  tiemstamp16    " + std::to_string(timestamp16)           ;
+  repr += "\n  timestamp16    " + std::to_string(timestamp16)           ;
   repr += "\n  |->timestamp48 " + std::to_string(get_timestamp48())     ;
   repr += "\n  FPGA temp [C]  " + std::to_string(get_fpga_temp())       ;
   repr += "\n  DRS4 temp [C]  " + std::to_string(get_drs_temp())        ;
@@ -374,12 +378,12 @@ std::string RBEvent::to_string() const {
   repr += "  status    : " + ss.str() + "\n";
   repr += header.to_string();
   repr += "\n";
-  if (adc.size() > 0) {
-    repr += "ADC CHANNELS : " + std::to_string(adc.size());
-    repr += "\n-- --  Ch 0 -- --\n";
-    repr += std::to_string(adc[0][0]);
+  repr += " -- -- adc -- --";
+  for (auto ch : header.get_channels()) {
+    repr += "\n " + std::to_string(ch)  + ": ..";
+    repr += std::to_string(adc[ch][0]);
     repr += " "; 
-    repr += std::to_string(adc[0][1]);
+    repr += std::to_string(adc[ch][1]);
     repr += " .. .. \n"; 
   }
   repr += ">";
