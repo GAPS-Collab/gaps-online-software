@@ -1,6 +1,5 @@
 var NAVTREEINDEX0 =
 {
-"":[1,0,1],
 "TOFCommon_8h.html#a5f060452f3f9dfc3631d631cafbfc135":[1,0,1,1],
 "TOFCommon_8h.html#a5f060452f3f9dfc3631d631cafbfc135a696b031073e74bf2cb98e5ef201d4aa3":[1,0,1,1,2],
 "TOFCommon_8h.html#a5f060452f3f9dfc3631d631cafbfc135a7fc56270e7a70fa81a5935b72eacbe29":[1,0,1,1,0],
@@ -98,7 +97,6 @@ var NAVTREEINDEX0 =
 "index.html":[0],
 "index.html#autotoc_md1":[0,0],
 "index.html#autotoc_md2":[0,1],
-"index.html#autotoc_md3":[0,2],
 "io_8hpp_source.html":[3,0,0,0,0,0,3],
 "namespaceGaps.html":[1,0,0],
 "namespaceGaps.html#a080f0ddfc1acdfd20d34ee1a05dc94ea":[1,0,0,15],
@@ -249,5 +247,7 @@ var NAVTREEINDEX0 =
 "structMasterTriggerEvent.html#aa878290e6a097045ff133161cbbae7c9":[2,0,9,3],
 "structMasterTriggerEvent.html#aa92539d1bcffb9b8cadf5f909a11d916":[2,0,9,9],
 "structMasterTriggerEvent.html#aabc131f9d53ef6256b235d953f6c3f3b":[2,0,9,4],
-"structMasterTriggerEvent.html#ab438df14fccd804df45411f51a85719b":[2,0,9,7]
+"structMasterTriggerEvent.html#ab438df14fccd804df45411f51a85719b":[2,0,9,7],
+"structMasterTriggerEvent.html#ae8d8cba7b4b2792bb94ef5e562103dab":[2,0,9,0],
+"structRBCalibration.html":[2,0,10]
 };

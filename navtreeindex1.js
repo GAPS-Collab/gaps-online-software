@@ -1,7 +1,5 @@
 var NAVTREEINDEX1 =
 {
-"structMasterTriggerEvent.html#ae8d8cba7b4b2792bb94ef5e562103dab":[2,0,9,0],
-"structRBCalibration.html":[2,0,10],
 "structRBCalibration.html#a01cd32b671c63fcf3a2efe6ba705c1f2":[2,0,10,4],
 "structRBCalibration.html#a12344c9161e0e0c94bb0f5381712508e":[2,0,10,9],
 "structRBCalibration.html#a15df67c92a7d9a2c93a48bf811465907":[2,0,10,5],
@@ -153,5 +151,6 @@ var NAVTREEINDEX1 =
 "structTofEvent.html#ac9c16f7b24c02f6ef7c4638a516ef325":[2,0,20,1],
 "structTofEvent.html#aea1f5e45ce3fd1d874eb6424d7c8c84d":[2,0,20,2],
 "tof__manifest_8h_source.html":[3,0,0,0,0,0,7],
-"tof__typedefs_8h_source.html":[3,0,0,0,0,0,8]
+"tof__typedefs_8h_source.html":[3,0,0,0,0,0,8],
+"":[1,0,1]
 };
