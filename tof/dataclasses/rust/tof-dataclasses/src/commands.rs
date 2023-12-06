@@ -42,16 +42,16 @@ cfg_if::cfg_if! {
 #[repr(u8)]
 pub enum TofCommandCode {
   Unknown                    = 0u8,
-  /// en empty command
+  /// en empty command just to check if stuff is online
   CmdPing                    = 1u8,
+  /// command code for getting the monitoring data from the component
+  CmdMoni                    = 2u8,
   /// command code for "Power off"
   CmdPowerOff                = 10u8,        
   /// command code for "Power on"
   CmdPowerOn                 = 11u8,       
   /// command code for "Power cycle"
-  CmdPowerCycle              = 12u8,          
-  /// command code for "Run RBSetup"
-  CmdRBSetup                 = 20u8,         
+  CmdPowerCycle              = 12u8,
   /// command code for "Set LTB Thresholds"
   CmdSetThresholds           = 21u8,         
   /// command code for "Configure MTB"
@@ -65,11 +65,7 @@ pub enum TofCommandCode {
   /// command code for "Start validation run"
   CmdStartValidationRun      = 32u8,         
   /// command code for "Get all waveforms"
-  CmdGetFullWaveforms        = 41u8,      
-  /// command code for "Get waveforms/data for specific event"
-  CmdGetReducedDataPacket    = 42u8, 
-  /// command code for "Get monitoring data"
-  CmdRequestMoni             = 43u8,
+  CmdGetFullWaveforms        = 41u8,
   /// command code for "Run no input calibration"
   CmdNoiCalibration          = 50u8,       
   /// command code for "Run voltage calibration"
@@ -77,32 +73,24 @@ pub enum TofCommandCode {
   /// command code for "Run timing calibration"
   CmdTimingCalibration       = 52u8,
   /// command code for "Run full calibration"
-  CmdDefaultCalibration      = 53u8,      
-  /// command code for "Create a new calibration file"
-  CmdCreateCalibrationFile   = 54u8,   
+  CmdDefaultCalibration      = 53u8, 
 
   /// command code for "Send the whole event cache over the wire"
   CmdUnspoolEventCache       = 44u8,
 
-  /// command code for "Operate in a mode, where we stream any event 
-  /// (not only those which are requested)"
-  CmdStreamAnyEvent          = 45u8,
-  /// command code for "Stream only events which are explicitly requested"
-  CmdStreamOnlyRequested     = 46u8,
   /// command code for setting the size of the rb buffers.
   /// technically, this does not change the size, but sets 
   /// a different value for trip
   CmdSetRBDataBufSize        = 23u8,
-  /// command code for enable the forced trigger mode
+  /// command code for enabling/disabling the forced trigger mode
   /// on the RBs
-  CmdEnTriggerModeForced     = 24u8,
-  /// command code to disable the forced trigger mode 
-  /// on the RBs
-  CmdDisTriggerModeForced    = 25u8,
-  /// Set forced trigger mode on MTB
-  CmdEnTriggerModeForcedMTB  = 26u8,
-  // Disable forced trigger mode on MTB
-  CmdDisTriggerModeForcedMTB = 27u8
+  CmdTriggerModeForced       = 24u8,
+  /// command code for enabling/disabling the forced trigger mode
+  /// on the MTB
+  CmdTriggerModeForcedMTB    = 25u8,
+
+  /// command code for restarting systemd
+  CmdSystemdReboot           = 60u8
 }
 
 impl fmt::Display for TofCommandCode {

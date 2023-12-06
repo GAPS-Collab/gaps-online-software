@@ -1,10 +1,10 @@
 ## Tof Commands
 
-_this is based on slides from Sydney, Dec 2022_
+_This is based on slides from Sydney, Dec 2022, Achim's input, and, hopefully, a good dose of common sense._
 
 ### Implementation 
 
-_obviously, this is subject to change_
+_This is subject to change._
 
 Each command has a `TofCommandCode` (u8) and a data field (u32).
 
@@ -16,59 +16,49 @@ Commands will be filled in a `TofCommand` with a fixed size of 9 bytes
   data           : u32
   TAIL           : u16 = 0x5555
 ```
-This does not follow exactly Sydney's proposal, but has some advantages:
-* The CommandClass is 1 byte shorter
-* Each CommandPacket has the same (fixed) size
-* A 32 bit data field can accomodate the event id, which is needed for the
-  event query.
 
 The CommandClass is a number (u8) so at max 255 different commands are available.
 We divide the CommandClass in several subgroups. Currently, a large number of 
 the command space is reserved.
-* `<Reserved>`  : 0-9
-* `<Reserved>`  : 100 - 199
-* `<Reserved>`  : 200 - 255
-* Power       : 10  - 19
-* Config      : 20  - 29
-* Run         : 30  - 39
-* Request     : 40  - 49
-* Calibration : 50  - 59
+* `<Reserved>`   : 0-9
+* `<Reserved>`   : 100 - 199
+* `<Reserved>`   : 200 - 255
+* Power          : 10  - 19
+* Config         : 20  - 29
+* Run            : 30  - 39
+* Request        : 40  - 49
+* Calibration    : 50  - 59
+* Tof SW related : 60 - 69
 
 
-The commands follow Sydney's list (Pad stands for padding):
+The commands follow Sydney's list, Achim's list, and additions (Pad stands for padding, first user commands and then nerd commands):
 
 | TofCommandCode | Command | Frequency | Data |
 | -------------- | ------- | --------- | ---- |
-| 10,11,12 | Power on/off to PBs + RBs + LTBs + preamps (all at once) or MT | < 5/day Command to power on/off PDU channels (to PDU). Even though PDU seems the only thing that one can target, the command has room for every component | Component:u8, ComponentID:u8, Status:u8 |
-| 10,11,12 | Power on/off to LTB or preamp | < 2/day Command to power on/off various components (to TOF -> to RB)             | Component(preamp):u8, preamp_ID:u8, Status:u8 |
-| 21 | Set Thresholds  | < 3/day Command to set a threshold level on all LTBs (to TOF -> to  RBs)                             | LTB_ID:u8, Threshold_name:u8, Level:u16 |
-| 22 | Set MT Config 1/run | <10/day? Command to set MT trigger config (to TOF -> to MT)                                      | Pad:u16, TriggerConfig:u16 |
-| 28 | Set preamp bias  | < 3/day Command to set a preamp bias on all preamps (to TOF -> to  RBs)                             | Pad:u8, Preamp_ID:u8, Preamp_level:u16 |
-| 32 | Start Validation Run 1/run | <10/day? Command to take a small amount of data on an RB or all (E events)                | Pad:u16, E:u8, RB:u8 |
-| 41 | Get full waveforms (360*E, after 32) (from TOF) | ?                                                                    | Pad:u32 |
-| 31 | Start Data-Taking Run 1/run  | <10/day? Command to take regular data (to TOF -> to RBs)                                | Pad:u8, RunType:u8, E:u8, Time:u8 |
-| 42 | Get reduced data packet (from Flight computer) | ?                                                                     | Pad:u32 |
-| 30 | Stop Run < 1/run | < 10/day Command to stop a run (to TOF -> to RBs)                                                   | Pad:u32 |
-| 50 | No input Calibration for an RB or all | ???                    | Pad:u16, RB:u8, Extra:u8 |
-| 51 | Voltage Calibration for an RB or all | Runs 1/day Command to take 2 voltage calibration runs (to TOF -> to RBs) 12 B                    | VoltageLevel:u16, RB:u8, Extra:u8 |
-| 52 | Timing Calibration for an RB or all | Run 1/day Command to take a timing calibration run (to TOF -> to RBs) 8 B                        | VoltageLevel:u16, RB:u8, Extra:u8 |
-| 53 | Default Calibration for an RB or all | ???                    | VoltageLevel:u16, RB:u8, Extra:u8 |
+| 0 | Unknown command | Deal with unrecognised command or corrupted commands | Pad:u32 |
+| 1 | Ping command | Ping tof components to check whether they are online                                                                      | Pad:u16, ComponentType:u8, ComponentID:u8 |
+| 2 | Monitor command | Request status of a specific tof component                                                                             | Pad:u16, ComponentType:u8, ComponentID:u8 |
+| 10,11,12 | Power on/off/cycle command | < 5/day Command to power on/off MTB, RB (only reboot), LTB, Preamp. RATs are managed by flight cpu   | Pad:u8, ComponentType:u8, ComponentID:u8, Status:u8 |
+| 21 | Set LTB Threshold command  | < 3/day Command to set a threshold level on LTBs (to TOF -> to  RBs)                                       | LTB_ID:u8, Threshold_name:u8, Level:u16 |
+| 22 | Set MTB Config command | <10/day? Command to set MTB trigger config (to TOF -> to MTB)                                                  | Pad:u16, TriggerConfig:u16 |
+| 28 | Set preamp bias command  | < 3/day Command to set a preamp bias on preamps (to TOF -> to RBs)                                           | Pad:u8, Preamp_ID:u8, Preamp_level:u16 |
+| 30 | Stop data-taking run command  | <10/day? Command to stop taking regular data (to TOF -> to RBs)                                         | Pad:u32 |
+| 31 | Start data-taking run command  | <10/day? Command to take regular data (to TOF -> to RBs)                                               | Pad:u8, RunType:u8, E:u8, Time:u8 |
+| 32 | Start validation run command | <10/day? Command to take a small amount of data on an RB or every RB (E events)                          | Pad:u16, E:u8, RB:u8 |
+| 41 | Get full waveforms (360*E, after 32) command | Command to take raw data from RB (?)                                                     | Pad:u32 |
+| 50 | No input Calibration command | Command to take data without input @ 100 Hz in self trigger (E = 1000 default) for an RB or every RB     | Pad:u16, RB:u8, Extra:u8 |
+| 51 | Voltage Calibration command | Command to take data with fixed voltage @ 100 Hz in self trigger (E = 1000 default) for an RB or every RB (it includes 50) | VoltageLevel:u16, RB:u8, Extra:u8 |
+| 52 | Timing Calibration command | Command to take data with poisson self trigger (E = 5000 default) for an RB or every RB (it includes 50/51)| VoltageLevel:u16, RB:u8, Extra:u8 |
+| 53 | Default Calibration command | Command to perform the default calibration step and calibrate RBs (it includes 50/51/52)                  | VoltageLevel:u16, RB:u8, Extra:u8 |
 
 Note: when "all" is needed it will be rendered as all ones.
 
-Further commands (Achim)
-| CommandCode | Command | _Comment_ | Data |
-| ----------- | ------- | --------- | ---- |
-| 12          | PowerCycle   | Combines 10 + 11 | Refer to single cmds |
-| 43          | RequestMoni  | Request monitoring/housekeeping data | Pad:u32 |
+Nerd commands, related to TOF SW:
 
-## Render the flowcharts for documentation
-
-This uses mermaid to render the flowcharts, generating images can be done via
-mermaid-cli.
-Install with
-`npm install -g @mermaid-js/mermaid-cli`
-
-and then use it e.g. like this:
-`mmdc -i input.mmd -o output.png -t dark -b transparent`
-
+| TofCommandCode | Command | Frequency | Data |
+| -------------- | ------- | --------- | ---- |
+| 23 | Set RB data buffer size command  | Command to set RB data buffer size (to TOF -> to  RBs)                                               | Pad:u8, RB:u8, Size:u16 |
+| 24 | Enable/disable trigger mode forced command  | Command to enable/disable trigger mode forced (to TOF -> to  RBs)                         | Pad:u16, RB:u8, Status:u8 |
+| 25 | Enable/disable trigger mode forced for MTB command  | Command to enable/disable trigger mode forced for MTB (to TOF -> to  RBs)         | Pad:u16, Pad:u8, Status:u8 |
+| 44 | Unspool event cache command | Command to unspool event cache if something bad happens                                                   | Pad:u32 |
+| 60 | Restart systemd command | Command to restart systemd if some mischievous stuff happens                                                  | Pad:u32 |
