@@ -384,7 +384,7 @@ std::string RBEvent::to_string() const {
     repr += std::to_string(adc[ch][0]);
     repr += " "; 
     repr += std::to_string(adc[ch][1]);
-    repr += " .. .. \n"; 
+    repr += " .. .."; 
   }
   repr += ">";
   return repr;

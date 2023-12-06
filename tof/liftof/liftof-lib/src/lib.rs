@@ -27,6 +27,7 @@ use macaddr::MacAddr6;
 use netneighbours::get_mac_to_ip_map;
 
 #[macro_use] extern crate log;
+extern crate env_logger;
 
 use tof_dataclasses::manifest as mf;
 use tof_dataclasses::DsiLtbRBMapping;
@@ -64,6 +65,22 @@ pub fn color_log(level : &Level) -> ColoredString {
   }
 }
 
+/// Set up the environmental (env) logger
+/// with our format
+///
+/// Ensure that the lines and module paths
+/// are printed in the logging output
+pub fn init_env_logger() {
+  env_logger::builder()
+    .format(|buf, record| {
+    writeln!( buf, "[{level}][{module_path}:{line}] {args}",
+      level = color_log(&record.level()),
+      module_path = record.module_path().unwrap_or("<unknown>"),
+      line = record.line().unwrap_or(0),
+      args = record.args()
+      )
+    }).init();
+}
 
 //*************************************************
 // I/O - read/write (general purpose) files
