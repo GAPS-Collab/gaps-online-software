@@ -1109,14 +1109,20 @@ impl PowerStatus {
 pub enum TofComponent {
   /// everything (LTB + preamps + MT)
   All       = 0u8,
+  /// everything but MT (LTB + preamps)
+  AllButMT  = 1u8,
+  /// TOF CPU
+  TofCpu   = 2u8,
   /// MT alone
   MT        = 10u8,
-  /// everything but MT (LTB + preamps)
-  AllButMT  = 20u8,
+  /// all or specific RBs
+  RB        = 20u8,
+  /// all or specific PBs
+  PB        = 30u8,
   /// all or specific LTBs
-  LTB       = 30u8,
+  LTB       = 40u8,
   /// all or specific preamp
-  Preamp    = 40u8
+  Preamp    = 50u8
 }
 
 impl fmt::Display for TofComponent {
@@ -1135,10 +1141,13 @@ impl TryFrom<u8> for TofComponent {
   fn try_from(value: u8) -> Result<Self, Self::Error> {
     match value {
       0u8  => Ok(TofComponent::All),
+      1u8  => Ok(TofComponent::AllButMT),
+      2u8  => Ok(TofComponent::TofCpu),
       10u8 => Ok(TofComponent::MT),
-      20u8 => Ok(TofComponent::AllButMT),
-      50u8 => Ok(TofComponent::LTB),
-      60u8 => Ok(TofComponent::Preamp),
+      20u8 => Ok(TofComponent::RB),
+      30u8 => Ok(TofComponent::PB),
+      40u8 => Ok(TofComponent::LTB),
+      50u8 => Ok(TofComponent::Preamp),
       _    => Err("I am not sure how to convert this value!")
     }
   }
