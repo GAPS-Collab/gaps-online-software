@@ -38,7 +38,7 @@ The commands follow Sydney's list, Achim's list, and additions (Pad stands for p
 | 0 | Unknown command | Deal with unrecognised command or corrupted commands | Pad:u32 |
 | 1 | Ping command | Ping tof components to check whether they are online                                                                      | Pad:u16, ComponentType:u8, ComponentID:u8 |
 | 2 | Monitor command | Request status of a specific tof component                                                                             | Pad:u16, ComponentType:u8, ComponentID:u8 |
-| 10,11,12 | Power on/off/cycle command | < 5/day Command to power on/off MTB, RB (only reboot), LTB, Preamp. RATs are managed by flight cpu   | Pad:u8, ComponentType:u8, ComponentID:u8, Status:u8 |
+| 10 | Power on/off/cycle command | < 5/day Command to power on/off/cycle MTB, RB (only reboot), LTB, Preamp. RATs are managed by flight cpu   | Pad:u8, ComponentType:u8, ComponentID:u8, Status:u8 |
 | 21 | Set LTB Threshold command  | < 3/day Command to set a threshold level on LTBs (to TOF -> to  RBs)                                       | LTB_ID:u8, Threshold_name:u8, Level:u16 |
 | 22 | Set MTB Config command | <10/day? Command to set MTB trigger config (to TOF -> to MTB)                                                  | Pad:u16, TriggerConfig:u16 |
 | 28 | Set preamp bias command  | < 3/day Command to set a preamp bias on preamps (to TOF -> to RBs)                                           | Pad:u8, Preamp_ID:u8, Preamp_level:u16 |
