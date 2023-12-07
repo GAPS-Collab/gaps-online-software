@@ -32,8 +32,6 @@ cfg_if::cfg_if! {
                                   SetError};
     use std::net::IpAddr;
     use local_ip_address::local_ip;
-    use tof_dataclasses::calibrations::RBCalibrations;
-    use tof_dataclasses::errors::CalibrationError;
     use tof_dataclasses::monitoring::RBMoniData;
     // for calibration
     use tof_control::rb_control::rb_mode::{select_noi_mode,
@@ -220,13 +218,34 @@ pub fn rb_calibration(rc_to_runner    : &Sender<RunConfig>,
   calibration.serialize_event_data = true;
 
   run_config.data_type = DataType::Noi; 
-  run_noi_calibration(rc_to_runner, &socket, &mut calibration, run_config);
+  match run_noi_calibration(rc_to_runner, tp_to_publisher, &socket, &mut calibration, run_config) {
+    Err(err) => {
+      error!("Unable to run no input calibration step. Err {err}");
+    },
+    Ok(_) => {
+      info!("Noi calibration step done!")
+    }
+  };
 
   run_config.data_type = DataType::VoltageCalibration; 
-  run_voltage_calibration(rc_to_runner, &socket, &mut calibration, run_config);
+  match run_voltage_calibration(rc_to_runner, tp_to_publisher, &socket, &mut calibration, run_config) {
+    Err(err) => {
+      error!("Unable to run voltage calibration step. Err {err}");
+    },
+    Ok(_) => {
+      info!("Voltage calibration step done!")
+    }
+  };
   
   run_config.data_type = DataType::TimingCalibration;
-  run_timing_calibration(rc_to_runner, &socket, &mut calibration, run_config);
+  match run_timing_calibration(rc_to_runner, tp_to_publisher, &socket, &mut calibration, run_config) {
+    Err(err) => {
+      error!("Unable to run timing calibration step. Err {err}");
+    },
+    Ok(_) => {
+      info!("Timing calibration step done!")
+    }
+  };
 
   println!("==> Calibration data taking complete!"); 
   println!("Calibration : {}", calibration);
@@ -295,7 +314,14 @@ pub fn rb_noi_subcalibration(rc_to_runner    : &Sender<RunConfig>,
   calibration.serialize_event_data = true;
 
   run_config.data_type = DataType::Noi; 
-  run_noi_calibration(rc_to_runner, &socket, &mut calibration, run_config);
+  match run_noi_calibration(rc_to_runner, tp_to_publisher, &socket, &mut calibration, run_config) {
+    Err(err) => {
+      error!("Unable to run noi calibration step. Err {err}");
+    },
+    Ok(_) => {
+      info!("Noi calibration step done!")
+    }
+  };
 
   println!("==> No input data taking complete!"); 
   println!("Calibration : {}", calibration);
@@ -360,10 +386,24 @@ pub fn rb_noi_voltage_subcalibration(rc_to_runner    : &Sender<RunConfig>,
   calibration.serialize_event_data = true;
 
   run_config.data_type = DataType::Noi; 
-  run_noi_calibration(rc_to_runner, &socket, &mut calibration, run_config);
+  match run_noi_calibration(rc_to_runner, tp_to_publisher, &socket, &mut calibration, run_config) {
+    Err(err) => {
+      error!("Unable to run noi calibration step. Err {err}");
+    },
+    Ok(_) => {
+      info!("Noi calibration step done!")
+    }
+  };
 
   run_config.data_type = DataType::VoltageCalibration; 
-  run_voltage_calibration(rc_to_runner, &socket, &mut calibration, run_config);
+  match run_voltage_calibration(rc_to_runner, tp_to_publisher, &socket, &mut calibration, run_config) {
+    Err(err) => {
+      error!("Unable to run voltage calibration step. Err {err}");
+    },
+    Ok(_) => {
+      info!("Voltage calibration step done!")
+    }
+  };
 
   println!("==> No input + voltage data taking complete!"); 
   println!("Calibration : {}", calibration);
@@ -428,13 +468,34 @@ pub fn rb_timing_subcalibration(rc_to_runner    : &Sender<RunConfig>,
   calibration.serialize_event_data = true;
 
   run_config.data_type = DataType::Noi; 
-  run_noi_calibration(rc_to_runner, &socket, &mut calibration, run_config);
+  match run_noi_calibration(rc_to_runner, tp_to_publisher, &socket, &mut calibration, run_config) {
+    Err(err) => {
+      error!("Unable to run no input calibration step. Err {err}");
+    },
+    Ok(_) => {
+      info!("Noi calibration step done!")
+    }
+  };
 
   run_config.data_type = DataType::VoltageCalibration; 
-  run_voltage_calibration(rc_to_runner, &socket, &mut calibration, run_config);
+  match run_voltage_calibration(rc_to_runner, tp_to_publisher, &socket, &mut calibration, run_config) {
+    Err(err) => {
+      error!("Unable to run voltage calibration step. Err {err}");
+    },
+    Ok(_) => {
+      info!("Voltage calibration step done!")
+    }
+  };
   
   run_config.data_type = DataType::TimingCalibration;
-  run_timing_calibration(rc_to_runner, &socket, &mut calibration, run_config);
+  match run_timing_calibration(rc_to_runner, tp_to_publisher, &socket, &mut calibration, run_config) {
+    Err(err) => {
+      error!("Unable to run timing calibration step. Err {err}");
+    },
+    Ok(_) => {
+      info!("Timing calibration step done!")
+    }
+  };
 
   println!("==> No input + voltage + timing data taking complete!"); 
   println!("Calibration : {}", calibration);
@@ -509,6 +570,7 @@ fn connect_to_zmq() -> Result<zmq::Socket, CalibrationError> {
 
 #[cfg(feature="tofcontrol")]
 fn run_noi_calibration(rc_to_runner: &Sender<RunConfig>,
+                       tp_to_publisher : &Sender<TofPacket>,
                        socket: &zmq::Socket,
                        calibration: &mut RBCalibrations,
                        run_config: RunConfig)
@@ -521,12 +583,23 @@ fn run_noi_calibration(rc_to_runner: &Sender<RunConfig>,
   }
   let mut cal_dtype = DataType::Noi;
   calibration.noi_data = wait_while_run_active(20, 4*FIVE_SECONDS, 1000, &cal_dtype, &socket);
+  
+  let calib_unmut = calibration.clone();
+  let calib_pack = TofPacket::from(&calib_unmut);
+  match tp_to_publisher.send(calib_pack) {
+    Err(err) => {
+      error!("Unable to send RBCalibration package! Error {err}");
+    },
+    Ok(_) => ()
+  }
+
   println!("==> No input (Voltage calibration) data taken!");
   Ok(())
 }
 
 #[cfg(feature="tofcontrol")]
 fn run_voltage_calibration(rc_to_runner: &Sender<RunConfig>,
+                           tp_to_publisher : &Sender<TofPacket>,
                            socket: &zmq::Socket,
                            calibration: &mut RBCalibrations,
                            run_config: RunConfig)
@@ -537,8 +610,17 @@ fn run_voltage_calibration(rc_to_runner: &Sender<RunConfig>,
     Err(err) => warn!("Can not send runconfig!, Err {err}"),
     Ok(_)    => trace!("Success!")
   }  
-  cal_dtype             = DataType::VoltageCalibration;
+  let cal_dtype             = DataType::VoltageCalibration;
   calibration.vcal_data = wait_while_run_active(20, 4*FIVE_SECONDS, 1000, &cal_dtype, &socket);
+
+  let calib_unmut = calibration.clone();
+  let calib_pack = TofPacket::from(&calib_unmut);
+  match tp_to_publisher.send(calib_pack) {
+    Err(err) => {
+      error!("Unable to send RBCalibration package! Error {err}");
+    },
+    Ok(_) => ()
+  }
   
   println!("==> Voltage calibration data taken!");
   Ok(())
@@ -546,6 +628,7 @@ fn run_voltage_calibration(rc_to_runner: &Sender<RunConfig>,
 
 #[cfg(feature="tofcontrol")]
 fn run_timing_calibration(rc_to_runner: &Sender<RunConfig>,
+                          tp_to_publisher : &Sender<TofPacket>,
                           socket: &zmq::Socket,
                           calibration: &mut RBCalibrations,
                           mut run_config: RunConfig)
@@ -561,7 +644,7 @@ fn run_timing_calibration(rc_to_runner: &Sender<RunConfig>,
     Ok(_)    => trace!("Success!")
   }
   
-  cal_dtype             = DataType::TimingCalibration;
+  let cal_dtype             = DataType::TimingCalibration;
   calibration.tcal_data = wait_while_run_active(20, 4*FIVE_SECONDS, 1000,&cal_dtype, &socket);
   run_config.is_active = false;  
   match rc_to_runner.send(run_config) {
@@ -586,7 +669,7 @@ fn run_timing_calibration(rc_to_runner: &Sender<RunConfig>,
     Err(err) => warn!("Can not send runconfig!, Err {err}"),
     Ok(_)    => trace!("Success!")
   }
-  thread::sleep(five_seconds);
+  thread::sleep(FIVE_SECONDS);
   calibration.calibrate()?;
   println!("Calibration : {}", calibration);
   // now it just needs to be send to 
@@ -597,7 +680,8 @@ fn run_timing_calibration(rc_to_runner: &Sender<RunConfig>,
   //  println!("cali vdips {}", calibration.v_dips[0][k]);
   //  println!("cali tbins {}", calibration.tbin[0][k]);
   //}
-  let calib_pack = TofPacket::from(&calibration);
+  let calib_unmut = calibration.clone();
+  let calib_pack = TofPacket::from(&calib_unmut);
   match tp_to_publisher.send(calib_pack) {
     Err(err) => {
       error!("Unable to send RBCalibration package! Error {err}");
