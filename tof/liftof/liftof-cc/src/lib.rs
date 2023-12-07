@@ -29,11 +29,7 @@ pub fn send_power(cmd_sender: Sender<TofPacket>,
                   power_status: PowerStatusEnum) {
   // no ID in the payload
   let payload: u32 = PAD_CMD_32BIT | (component as u32) << 24 | (power_status as u32);
-  let power = match power_status {
-    PowerStatusEnum::OFF => TofCommand::PowerOff(payload),
-    PowerStatusEnum::ON => TofCommand::PowerOn(payload),
-    PowerStatusEnum::Cycle => TofCommand::PowerCycle(payload)
-  };
+  let power = TofCommand::Power(payload);
   
   let tp = TofPacket::from(&power);
   match cmd_sender.send(tp) {
@@ -48,11 +44,7 @@ pub fn send_power_ID(cmd_sender: Sender<TofPacket>,
                      power_status: PowerStatusEnum,
                      component_id: u8) {
   let payload: u32 = PAD_CMD_32BIT | (component as u32) << 24 | (component_id as u32) << 16 | (power_status as u32);
-  let power_id = match power_status {
-    PowerStatusEnum::OFF => TofCommand::PowerOff(payload),
-    PowerStatusEnum::ON => TofCommand::PowerOn(payload),
-    PowerStatusEnum::Cycle => TofCommand::PowerCycle(payload)
-  };
+  let power_id = TofCommand::Power(payload);
   
   let tp = TofPacket::from(&power_id);
   match cmd_sender.send(tp) {
@@ -75,11 +67,7 @@ pub fn send_power_preamp(cmd_sender: Sender<TofPacket>,
     PowerStatusEnum::Cycle => 
       (TofComponent::Preamp as u32) << 16 | (preamp_id as u32) << 8 | preamp_bias as u32
   };
-  let power_preamp = match power_status {
-    PowerStatusEnum::OFF => TofCommand::PowerOff(payload),
-    PowerStatusEnum::ON => TofCommand::PowerOn(payload),
-    PowerStatusEnum::Cycle => TofCommand::PowerCycle(payload)
-  };
+  let power_preamp = TofCommand::Power(payload);
   
   let tp = TofPacket::from(&power_preamp);
   match cmd_sender.send(tp) {
