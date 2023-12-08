@@ -248,12 +248,9 @@ void Waveform::CalcPedestalRange(void)
   int ctr=0;
   for(int i=wf_ped_begin ; i<(wf_ped_begin+wf_ped_range) ; i++ )
   {
-    if (abs(WaveData[i]) < 10.0)
-    {
       sum  += (double) WaveData[i];
       sum2 += (double) SQR(WaveData[i]);
       ctr++;
-    }
   }
 
   //average = sum / (double) wf_ped_range;
