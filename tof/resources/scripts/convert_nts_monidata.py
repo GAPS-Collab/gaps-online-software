@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-import gaps_online.tof.converters
+import gaps_online.tof.converters as converters
 import argparse 
 import numpy as np
 

@@ -9,4 +9,4 @@ from gaps_tof import TofPacket,\
                      get_tofpackets
 
 from . import sensors
-form . import converters
+from . import converters
