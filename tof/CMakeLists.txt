@@ -232,7 +232,50 @@ if (BUILD_EXAMPLES)
           DESTINATION ${INSTALL_EXAMPLES_DIR}
 
   )
+
+  set(display-example "displayTofpackets")
+  add_executable(${display-example}
+      ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/displayTofpackets.cxx
+      ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/src/MainFrame.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/src/Waveform.cpp
+  )
+  target_include_directories(${display-example} 
+                            PUBLIC
+                            ${spdlog_SOURCE_DIR}/include
+                            ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/cxxopts/include
+                            ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
+                            $<$<BOOL:${BUILD_ROOTCOMPONENTS}>:${ROOT_INCLUDE_DIRS}>
+			    )
+  target_link_libraries(${display-example}
+                        PRIVATE
+                        ${GAPSTOF_LIBRARY_SHARED}
+			$<$<BOOL:${BUILD_ROOTCOMPONENTS}>:${ROOT_LIBRARY_SHARED}>
+			ROOT::Core ROOT::Gui ROOT::RIO ROOT::Net ROOT::Hist
+			)
+  install(TARGETS ${display-example}
+          DESTINATION ${INSTALL_EXAMPLES_DIR}
+
+	  )
+	
+  set(analyze-example "analyzeTofpackets")
+  add_executable(${analyze-example}
+      ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/analyzeTofpackets.cxx
+  )
+  target_include_directories(${analyze-example} 
+                            PUBLIC
+                            ${spdlog_SOURCE_DIR}/include
+                            ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/cxxopts/include
+                            ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
+                            )
+  target_link_libraries(${analyze-example}
+                        PRIVATE
+                        ${GAPSTOF_LIBRARY_SHARED})
+  install(TARGETS ${analyze-example}
+          DESTINATION ${INSTALL_EXAMPLES_DIR}
+  )
+
 endif()
+
 
 
 
