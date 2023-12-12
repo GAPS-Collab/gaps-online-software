@@ -924,9 +924,10 @@ impl LtbThresholdOpts {
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize, clap::ValueEnum)]
 #[repr(u8)]
 pub enum LTBThresholdName {
-  Hit      = 0u8,
-  Beta     = 1u8,
-  Veto     = 2u8,
+  Unknown  = 0u8,
+  Hit      = 10u8,
+  Beta     = 20u8,
+  Veto     = 30u8,
 }
 
 impl fmt::Display for LTBThresholdName {
@@ -937,17 +938,14 @@ impl fmt::Display for LTBThresholdName {
   }
 }
 
-impl TryFrom<u8> for LTBThresholdName {
-  type Error = &'static str;
-
-  // I am not sure about this hard coding, but the code
-  //  looks nicer - Paolo
-  fn try_from(value: u8) -> Result<Self, Self::Error> {
+impl From<u8> for LTBThresholdName {
+  fn from(value: u8) -> Self {
     match value {
-      0u8  => Ok(LTBThresholdName::Hit),
-      10u8 => Ok(LTBThresholdName::Beta),
-      20u8 => Ok(LTBThresholdName::Veto),
-      _    => Err("I am not sure how to convert this value!")
+      0u8  => LTBThresholdName::Unknown,
+      10u8 => LTBThresholdName::Hit,
+      20u8 => LTBThresholdName::Beta,
+      30u8 => LTBThresholdName::Veto,
+      _    => LTBThresholdName::Unknown
     }
   }
 }
@@ -1107,12 +1105,13 @@ impl PowerStatus {
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 #[repr(u8)]
 pub enum TofComponent {
+  Unknown   = 0u8,
   /// everything (LTB + preamps + MT)
-  All       = 0u8,
+  All       = 1u8,
   /// everything but MT (LTB + preamps)
-  AllButMT  = 1u8,
+  AllButMT  = 2u8,
   /// TOF CPU
-  TofCpu   = 2u8,
+  TofCpu    = 3u8,
   /// MT alone
   MT        = 10u8,
   /// all or specific RBs
@@ -1133,22 +1132,19 @@ impl fmt::Display for TofComponent {
   }
 }
 
-impl TryFrom<u8> for TofComponent {
-  type Error = &'static str;
-
-  // I am not sure about this hard coding, but the code
-  //  looks nicer - Paolo
-  fn try_from(value: u8) -> Result<Self, Self::Error> {
+impl From<u8> for TofComponent {
+  fn from(value: u8) -> Self {
     match value {
-      0u8  => Ok(TofComponent::All),
-      1u8  => Ok(TofComponent::AllButMT),
-      2u8  => Ok(TofComponent::TofCpu),
-      10u8 => Ok(TofComponent::MT),
-      20u8 => Ok(TofComponent::RB),
-      30u8 => Ok(TofComponent::PB),
-      40u8 => Ok(TofComponent::LTB),
-      50u8 => Ok(TofComponent::Preamp),
-      _    => Err("I am not sure how to convert this value!")
+      0u8  => TofComponent::Unknown,
+      1u8  => TofComponent::All,
+      2u8  => TofComponent::AllButMT,
+      3u8  => TofComponent::TofCpu,
+      10u8 => TofComponent::MT,
+      20u8 => TofComponent::RB,
+      30u8 => TofComponent::PB,
+      40u8 => TofComponent::LTB,
+      50u8 => TofComponent::Preamp,
+      _    => TofComponent::Unknown
     }
   }
 }
@@ -1157,9 +1153,10 @@ impl TryFrom<u8> for TofComponent {
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize, clap::ValueEnum)]
 #[repr(u8)]
 pub enum PowerStatusEnum {
-  OFF       = 0u8,
-  ON        = 10u8,
-  Cycle     = 20u8,
+  Unknown   = 0u8,
+  OFF       = 10u8,
+  ON        = 20u8,
+  Cycle     = 30u8
 }
 
 impl fmt::Display for PowerStatusEnum {
@@ -1170,17 +1167,14 @@ impl fmt::Display for PowerStatusEnum {
   }
 }
 
-impl TryFrom<u8> for PowerStatusEnum {
-  type Error = &'static str;
-
-  // I am not sure about this hard coding, but the code
-  //  looks nicer - Paolo
-  fn try_from(value: u8) -> Result<Self, Self::Error> {
+impl From<u8> for PowerStatusEnum {
+  fn from(value: u8) -> Self {
     match value {
-      0u8  => Ok(PowerStatusEnum::OFF),
-      10u8 => Ok(PowerStatusEnum::ON),
-      20u8 => Ok(PowerStatusEnum::Cycle),
-      _    => Err("I am not sure how to convert this value!")
+      0u8  => PowerStatusEnum::Unknown,
+      10u8 => PowerStatusEnum::OFF,
+      20u8 => PowerStatusEnum::ON,
+      30u8 => PowerStatusEnum::Cycle,
+      _    => PowerStatusEnum::Unknown
     }
   }
 }
