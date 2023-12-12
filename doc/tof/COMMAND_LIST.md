@@ -42,12 +42,12 @@ The commands follow Sydney's list, Achim's list, and additions (Pad stands for p
 | 22 | Set MTB Config command | < 3/day? Command to set MTB trigger config (to TOF -> to MTB)                                                  | Pad:u16, TriggerConfig:u16 |
 | 28 | Set preamp bias command  | < 3/day Command to set a preamp bias on preamps (to TOF -> to RBs)                                           | Pad:u8, Preamp_ID:u8, Preamp_level:u16 |
 | 30 | Stop data-taking run command  | <10/day? Command to stop taking regular data (to TOF -> to RBs)                                         | Pad:u32 |
-| 31 | Start data-taking run command  | <10/day? Command to take regular data (to TOF -> to RBs)                                               | Pad:u8, RunType:u8, E:u8, Time:u8 |
-| 32 | Start validation run command | <10/day? Command to take a small amount of data on an RB or every RB (E events)                          | Pad:u16, E:u8, RB:u8 |
-| 33 | Get full waveforms (360*E, after 32) command | Command to take raw data from RBs                                                        | Pad:u32 |
-| 50 | No input Calibration command | Command to take data without input @ 100 Hz in self trigger (E = 1000 default) for an RB or every RB     | Pad:u16, RB:u8, Extra:u8 |
-| 51 | Voltage Calibration command | Command to take data with fixed voltage @ 100 Hz in self trigger (E = 1000 default) for an RB or every RB (it includes 50) | VoltageLevel:u16, RB:u8, Extra:u8 |
-| 52 | Timing Calibration command | Command to take data with poisson self trigger (E = 5000 default) for an RB or every RB (it includes 50/51)| VoltageLevel:u16, RB:u8, Extra:u8 |
+| 31 | Start data-taking run command  | <10/day? Command to take regular data (to TOF -> to RBs)                                               | Pad:u8, RunType:u8, N_events:u8, Time:u8 |
+| 32 | Start validation run command | <10/day? Command to take a small amount of data on an RB or every RB (N_events events)                          | Pad:u16, N_events:u8, RB:u8 |
+| 33 | Get full waveforms (360*N_events, after 32) command | Command to take raw data from RBs                                                        | Pad:u32 |
+| 50 | No input Calibration command | Command to take data without input @ 100 Hz in self trigger (N_events = 1000 default) for an RB or every RB     | Pad:u16, RB:u8, Extra:u8 |
+| 51 | Voltage Calibration command | Command to take data with fixed voltage @ 100 Hz in self trigger (N_events = 1000 default) for an RB or every RB (it includes 50) | VoltageLevel:u16, RB:u8, Extra:u8 |
+| 52 | Timing Calibration command | Command to take data with poisson self trigger (N_events = 5000 default) for an RB or every RB (it includes 50/51)| VoltageLevel:u16, RB:u8, Extra:u8 |
 | 53 | Default Calibration command | Command to perform the default calibration step and calibrate RBs (it includes 50/51/52)                  | VoltageLevel:u16, RB:u8, Extra:u8 |
 
 Note: when "all" is needed it will be rendered as all ones.
