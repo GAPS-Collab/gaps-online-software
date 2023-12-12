@@ -1252,6 +1252,10 @@ impl Serialization for RBCalibrations {
       for _ in 0..n_tcal {
         rb_cal.tcal_data.push(RBEvent::from_bytestream(bytestream, pos).unwrap_or(broken_event.clone()));
       }
+    } else {
+      // we can skip the next 6 bytes, 
+      // which just contain 0
+      *pos += 6;
     }
     if parse_u16(bytestream, pos) != Self::TAIL {
       return Err(SerializationError::TailInvalid {});
@@ -1292,10 +1296,15 @@ impl Serialization for RBCalibrations {
       for ev in &self.tcal_data {
         bs.extend_from_slice(&ev.to_bytestream());
       }
-    } else {
-      bs.push(0); // noi data
-      bs.push(0); // vcal data
-      bs.push(0); // tcal data
+    } else { // if we don't serialize event data, write 0 
+             // for the empty data
+      // (3 16bit 0s) for noi, vcal, tcal
+      for k in 0..6 {
+        bs.push(0);
+      }
+      //bs.push(0); // noi data
+      //bs.push(0); // vcal data
+      //bs.push(0); // tcal data
     }
     bs.extend_from_slice(&Self::TAIL.to_le_bytes());
     bs
