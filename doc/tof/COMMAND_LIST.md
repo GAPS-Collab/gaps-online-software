@@ -41,9 +41,9 @@ The commands follow Sydney's list, Achim's list, and additions (Pad stands for p
 | 21 | Set LTB Threshold command  | < 3/day Command to set a threshold level on LTBs (to TOF -> to  RBs)                                       | LTB_ID:u8, Threshold_name:u8, Level:u16 |
 | 22 | Set MTB Config command | < 3/day? Command to set MTB trigger config (to TOF -> to MTB)                                                  | Pad:u16, TriggerConfig:u16 |
 | 28 | Set preamp bias command  | < 3/day Command to set a preamp bias on preamps (to TOF -> to RBs)                                           | Pad:u8, Preamp_ID:u8, Preamp_level:u16 |
-| 30 | Stop data-taking run command  | <10/day? Command to stop taking regular data (to TOF -> to RBs)                                         | Pad:u32 |
-| 31 | Start data-taking run command  | <10/day? Command to take regular data (to TOF -> to RBs)                                               | Pad:u8, RunType:u8, N_events:u8, Time:u8 |
-| 32 | Start validation run command | <10/day? Command to take a small amount of data on an RB or every RB (N_events events)                          | Pad:u16, N_events:u8, RB:u8 |
+| 30 | Stop data-taking run command  | <10/day? Command to stop taking regular data (to TOF -> to RBs)                                         | Pad:u16+u8, RB:u8 |
+| 31 | Start data-taking run command  | <10/day? Command to take regular data (to TOF -> to RBs)                                               | Pad:u8, RunType:u8, RB:u8, N_events:u8 |
+| 32 | Start validation run command | <10/day? Command to take a small amount of data on an RB or every RB (N_events events)                          | Pad:u16, RB:u8, N_events:u8 |
 | 33 | Get full waveforms (360*N_events, after 32) command | Command to take raw data from RBs                                                        | Pad:u32 |
 | 50 | No input Calibration command | Command to take data without input @ 100 Hz in self trigger (N_events = 1000 default) for an RB or every RB     | Pad:u16, RB:u8, Extra:u8 |
 | 51 | Voltage Calibration command | Command to take data with fixed voltage @ 100 Hz in self trigger (N_events = 1000 default) for an RB or every RB (it includes 50) | VoltageLevel:u16, RB:u8, Extra:u8 |

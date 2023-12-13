@@ -299,6 +299,12 @@ pub fn cmd_responder(cmd_server_ip             : String,
                       TofCommand::DataRunStart (value) => {
                         cfg_if::cfg_if! {
                           if #[cfg(feature = "tofcontrol")]  {
+                            // MSB second 8 bits are run_type
+                            let run_type: u8 = ((value | (MASK_CMD_8BIT << 16)) >> 16) as u8;
+                            // MSB third 8 bits are RB ID
+                            let rb_id: u8    = ((value | (MASK_CMD_8BIT << 8)) >> 8) as u8;
+                            // MSB fourth 8 bits are event number
+                            let event_no: u8 = (value | MASK_CMD_8BIT) as u8;
                             // let's start a run. The value of the TofCommnad shall be 
                             // nevents
                             println!("==> Will initialize new run!");

@@ -65,7 +65,11 @@ pub fn send_power_preamp(cmd_sender: Sender<TofPacket>,
     PowerStatusEnum::ON => 
       (TofComponent::Preamp as u32) << 16 | (preamp_id as u32) << 8 | preamp_bias as u32,
     PowerStatusEnum::Cycle => 
-      (TofComponent::Preamp as u32) << 16 | (preamp_id as u32) << 8 | preamp_bias as u32
+      (TofComponent::Preamp as u32) << 16 | (preamp_id as u32) << 8 | preamp_bias as u32,
+    _ => {
+      warn!("Status unknown, not doing stuff.");
+      return;
+    }
   };
   let power_preamp = TofCommand::Power(payload);
   
@@ -176,10 +180,9 @@ pub fn send_preamp_bias_set(cmd_sender: Sender<TofPacket>,
 pub fn send_run_start(cmd_sender: Sender<TofPacket>,
                 run_type: u8,
                 rb_id: u8,
-                event_no: u8,
-                time: u8) {
+                event_no: u8) {
   let payload: u32
-  = (run_type as u32) << 24 | (rb_id as u32) << 16 | (event_no as u32) << 8 | (time as u32);
+  = PAD_CMD_32BIT | (run_type as u32) << 16 | (rb_id as u32) << 8 | (event_no as u32);
   let run_start = TofCommand::DataRunStart(payload);
   let tp = TofPacket::from(&run_start);
   match cmd_sender.send(tp) {
@@ -195,6 +198,20 @@ pub fn send_run_stop(cmd_sender: Sender<TofPacket>,
   let payload: u32 = PAD_CMD_32BIT | (rb_id as u32);
   let run_stop = TofCommand::DataRunStop(payload);
   let tp = TofPacket::from(&run_stop);
+  match cmd_sender.send(tp) {
+    Err(err) => error!("Unable to send command, error{err}"),
+    Ok(_)    => ()
+  }
+}
+
+/// Default function that starts run data taking on all RBs
+/// with default values.
+pub fn send_ping(cmd_sender: Sender<TofPacket>,
+                 tof_component: TofComponent,
+                 id: u8) {
+  let payload: u32 = PAD_CMD_32BIT | (tof_component as u32) << 8 | (id as u32);
+  let ping = TofCommand::Ping(payload);
+  let tp = TofPacket::from(&ping);
   match cmd_sender.send(tp) {
     Err(err) => error!("Unable to send command, error{err}"),
     Ok(_)    => ()

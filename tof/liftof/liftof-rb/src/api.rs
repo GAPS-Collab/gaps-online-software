@@ -699,8 +699,7 @@ pub fn rb_start_run(rc_to_runner    : &Sender<RunConfig>,
                     rc_config       : RunConfig,
                     run_type        : u8,
                     rb_id           : u8,
-                    event_no        : u8,
-                    time            : u8) -> Result<(), RunError> {
+                    event_no        : u8) -> Result<(), RunError> {
   println!("==> Will initialize new run!");
   match rc_to_runner.send(rc_config) {
     Err(err) => error!("Error initializing run! {err}"),

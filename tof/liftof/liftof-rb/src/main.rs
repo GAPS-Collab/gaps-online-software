@@ -349,7 +349,7 @@ fn main() {
               }
             },
             CalibrationCmd::Voltage(voltage_opts) => {
-              let voltage_level = voltage_opts.voltage_level;
+              let voltage_level = voltage_opts.level;
               match rb_noi_voltage_subcalibration(&rc_to_runner_cal, &tp_to_pub_cal, voltage_level) {
                 Ok(_) => (),
                 Err(err) => {
@@ -358,7 +358,7 @@ fn main() {
               }
             },
             CalibrationCmd::Timing(timing_opts) => {
-              let voltage_level = timing_opts.voltage_level;
+              let voltage_level = timing_opts.level;
               match rb_timing_subcalibration(&rc_to_runner_cal, &tp_to_pub_cal, voltage_level) {
                 Ok(_) => (),
                 Err(err) => {
@@ -373,8 +373,8 @@ fn main() {
         Command::Set(set_cmd) => {
           match set_cmd {
             liftof_lib::SetCmd::LtbThreshold(lbt_threshold_opts) => {
-              let ltb_id = lbt_threshold_opts.ltb_id;
-              let threshold_level: u16 = lbt_threshold_opts.threshold_level;
+              let ltb_id = lbt_threshold_opts.id;
+              let threshold_level: u16 = lbt_threshold_opts.level;
               match send_ltb_threshold_set(ltb_id, threshold_level) {
                 Ok(_) => (),
                 Err(err) => {
@@ -383,8 +383,8 @@ fn main() {
               }
             },
             liftof_lib::SetCmd::PreampBias(preamp_bias_opts) => {
-              let preamp_id = preamp_bias_opts.preamp_id;
-              let preamp_bias = preamp_bias_opts.preamp_bias;
+              let preamp_id = preamp_bias_opts.id;
+              let preamp_bias = preamp_bias_opts.bias;
               match send_preamp_bias_set(preamp_id, preamp_bias) {
                 Ok(_) => (),
                 Err(err) => {
@@ -400,10 +400,9 @@ fn main() {
           match run_cmd {
             liftof_lib::RunCmd::Start(run_start_opts) => {
               let run_type = run_start_opts.run_type;
-              let rb_id = run_start_opts.rb_id;
-              let event_no = run_start_opts.event_no;
-              let time = run_start_opts.time;
-              match rb_start_run(&rc_to_runner_cal, rc_config, run_type, rb_id, event_no, time) {
+              let rb_id = run_start_opts.id;
+              let event_no = run_start_opts.no;
+              match rb_start_run(&rc_to_runner_cal, rc_config, run_type, rb_id, event_no) {
                 Ok(_) => (),
                 Err(err) => {
                   error!("Timing calibration data taking failed! Error {err}!");
@@ -411,7 +410,7 @@ fn main() {
               }
             },
             liftof_lib::RunCmd::Stop(run_stop_opts) => {
-              let rb_id = run_stop_opts.rb_id;
+              let rb_id = run_stop_opts.id;
               match rb_stop_run(&rc_to_runner_cal, rb_id) {
                 Ok(_) => (),
                 Err(err) => {

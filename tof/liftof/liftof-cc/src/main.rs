@@ -423,29 +423,38 @@ fn main() {
   .expect("Error setting Ctrl-C handler");
 
   match args.command {
+    Command::Ping(ping_cmd) => {
+      match ping_cmd.component {
+        TofComponent::TofCpu => (),
+        TofComponent::RB     => (),
+        TofComponent::LTB    => (),
+        TofComponent::MT     => (),
+        _                    => ()
+      }
+    },
     Command::Power(power_cmd) => {
       match power_cmd {
         PowerCmd::All(power_status) => {
-          let power_status_enum: PowerStatusEnum = power_status.power_status;
+          let power_status_enum: PowerStatusEnum = power_status.status;
           liftof_cc::send_power(cmd_sender, TofComponent::All, power_status_enum);
         },
         PowerCmd::MT(power_status) => {
-          let power_status_enum: PowerStatusEnum = power_status.power_status;
+          let power_status_enum: PowerStatusEnum = power_status.status;
           liftof_cc::send_power(cmd_sender, TofComponent::MT, power_status_enum);
         },
         PowerCmd::AllButMT(power_status) => {
-          let power_status_enum: PowerStatusEnum = power_status.power_status;
+          let power_status_enum: PowerStatusEnum = power_status.status;
           liftof_cc::send_power(cmd_sender, TofComponent::AllButMT, power_status_enum);
         },
         PowerCmd::LTB(ltb_power_opts) => {
-          let power_status_enum: PowerStatusEnum = ltb_power_opts.power_status;
-          let ltb_id = ltb_power_opts.ltb_id;
+          let power_status_enum: PowerStatusEnum = ltb_power_opts.status;
+          let ltb_id = ltb_power_opts.id;
           liftof_cc::send_power_ID(cmd_sender, TofComponent::LTB, power_status_enum, ltb_id);
         },
         PowerCmd::Preamp(preamp_power_opts) => {
-          let power_status_enum: PowerStatusEnum = preamp_power_opts.power_status;
-          let preamp_id = preamp_power_opts.preamp_id;
-          let preamp_bias = preamp_power_opts.preamp_bias;
+          let power_status_enum: PowerStatusEnum = preamp_power_opts.status;
+          let preamp_id = preamp_power_opts.id;
+          let preamp_bias = preamp_power_opts.bias;
           liftof_cc::send_power_preamp(cmd_sender, power_status_enum, preamp_id, preamp_bias);
         }
       }
@@ -453,25 +462,25 @@ fn main() {
     Command::Calibration(calibration_cmd) => {
       match calibration_cmd {
         CalibrationCmd::Default(default_opts) => {
-          let voltage_level = default_opts.voltage_level;
-          let rb_id = default_opts.rb_id;
+          let voltage_level = default_opts.level;
+          let rb_id = default_opts.id;
           let extra = default_opts.extra;
           liftof_cc::send_default_calibration(cmd_sender, voltage_level, rb_id, extra);
         },
         CalibrationCmd::Noi(noi_opts) => {
-          let rb_id = noi_opts.rb_id;
+          let rb_id = noi_opts.id;
           let extra = noi_opts.extra;
           liftof_cc::send_noi_calibration(cmd_sender, rb_id, extra);
         },
         CalibrationCmd::Voltage(voltage_opts) => {
-          let voltage_level = voltage_opts.voltage_level;
-          let rb_id = voltage_opts.rb_id;
+          let voltage_level = voltage_opts.level;
+          let rb_id = voltage_opts.id;
           let extra = voltage_opts.extra;
           liftof_cc::send_voltage_calibration(cmd_sender, voltage_level, rb_id, extra);
         },
         CalibrationCmd::Timing(timing_opts) => {
-          let voltage_level = timing_opts.voltage_level;
-          let rb_id = timing_opts.rb_id;
+          let voltage_level = timing_opts.level;
+          let rb_id = timing_opts.id;
           let extra = timing_opts.extra;
           liftof_cc::send_timing_calibration(cmd_sender, voltage_level, rb_id, extra);
         }
@@ -480,13 +489,13 @@ fn main() {
     Command::Set(set_cmd) => {
       match set_cmd {
         SetCmd::LtbThreshold(ltb_threshold_opts) => {
-          let ltb_id = ltb_threshold_opts.ltb_id;
-          let threshold_level = ltb_threshold_opts.threshold_level;
+          let ltb_id = ltb_threshold_opts.id;
+          let threshold_level = ltb_threshold_opts.level;
           liftof_cc::send_ltb_threshold_set(cmd_sender, ltb_id, threshold_level);
         },
         SetCmd::PreampBias(preamp_bias_opts) => {
-          let preamp_id = preamp_bias_opts.preamp_id;
-          let preamp_bias = preamp_bias_opts.preamp_bias;
+          let preamp_id = preamp_bias_opts.id;
+          let preamp_bias = preamp_bias_opts.bias;
           liftof_cc::send_preamp_bias_set(cmd_sender, preamp_id, preamp_bias);
         }
       }
@@ -495,13 +504,12 @@ fn main() {
       match run_cmd {
         RunCmd::Start(run_start_opts) => {
           let run_type = run_start_opts.run_type;
-          let rb_id = run_start_opts.rb_id;
-          let event_no = run_start_opts.event_no;
-          let time = run_start_opts.time;
-          liftof_cc::send_run_start(cmd_sender, run_type, rb_id, event_no, time);
+          let rb_id = run_start_opts.id;
+          let event_no = run_start_opts.no;
+          liftof_cc::send_run_start(cmd_sender, run_type, rb_id, event_no);
         },
         RunCmd::Stop(run_stop_opts) => {
-          let rb_id = run_stop_opts.rb_id;
+          let rb_id = run_stop_opts.id;
           liftof_cc::send_run_stop(cmd_sender, rb_id);
         }
       }

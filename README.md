@@ -17,6 +17,10 @@ and it is easier to keep 2 related branches in paralell.
 The tof flight software suite (`liftof`) requires a rust toolchain, since 
 it is written in rust.
 
+If library `lm-sensors` does give problems, check whether that lib is installed
+and if there is a symbolic link named `libsensors.so` in your `/usr/lib` or wherever
+you keep your libs.
+
 ## branches and how to get updates
 
 The main branch is set to the latest release, a release is a frozen 

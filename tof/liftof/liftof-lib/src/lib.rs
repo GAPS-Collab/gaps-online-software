@@ -874,6 +874,11 @@ pub fn to_board_id_string(rb_id: u32) -> String {
 /// Command Enums and stucts
 #[derive(Debug, Parser, PartialEq)]
 pub enum Command {
+  /// Ping a TOF sub-systems.
+  Ping(PingCmd),
+  /// Monitor a TOF sub-systems.
+  //#[command(subcommand)]
+  //Moni(MoniCmd),
   /// Power control of TOF sub-systems.
   #[command(subcommand)]
   Power(PowerCmd),
@@ -888,6 +893,27 @@ pub enum Command {
   Run(RunCmd)
 }
 
+/// TOF SW cmds ====================================================
+#[derive(Debug, Args, PartialEq)]
+pub struct PingCmd {
+  /// Component to target
+  #[arg(value_parser = clap::builder::PossibleValuesParser::new([
+          TofComponent::TofCpu,
+          TofComponent::MT,
+          TofComponent::RB,
+          TofComponent::LTB
+        ]),
+        required = true)]
+  pub component: TofComponent,
+  /// Component ID
+  #[arg(required = true)]
+  pub id: u8
+}
+
+
+/// END TOF SW cmds ================================================
+
+
 /// Set cmds ====================================================
 #[derive(Debug, Subcommand, PartialEq)]
 pub enum SetCmd {
@@ -899,23 +925,23 @@ pub enum SetCmd {
 
 #[derive(Debug, Args, PartialEq)]
 pub struct LtbThresholdOpts {
-  /// LTB to target
+  /// ID of the LTB to target
   #[arg(short, long, default_value_t = DEFAULT_LTB_ID)]
-  pub ltb_id: u8,
-  /// LTB to target
-  #[arg(long, required = true)]
-  pub threshold_name: LTBThresholdName,
+  pub id: u8,
+  /// Name of the threshold to be set
+  #[arg(required = true)]
+  pub name: LTBThresholdName,
   /// Threshold level to be set
-  #[arg(long, required = true)]
-  pub threshold_level: u16
+  #[arg(required = true)]
+  pub level: u16
 }
 
 impl LtbThresholdOpts {
-  pub fn new(ltb_id: u8, threshold_name: LTBThresholdName, threshold_level: u16) -> Self {
+  pub fn new(id: u8, name: LTBThresholdName, level: u16) -> Self {
     Self { 
-      ltb_id,
-      threshold_name,
-      threshold_level
+      id,
+      name,
+      level
     }
   }
 }
@@ -953,18 +979,19 @@ impl From<u8> for LTBThresholdName {
 #[derive(Debug, Args, PartialEq)]
 pub struct PreampBiasOpts {
   /// RB to target in voltage calibration run.
-  #[arg(long, default_value_t = DEFAULT_RB_ID)]
-  pub preamp_id: u8,
+  #[arg(short, long, default_value_t = DEFAULT_RB_ID)]
+  pub id: u8,
   /// Theshold level to be set
-  #[arg(long, required = true, value_parser = clap::value_parser!(i64).range(PREAMP_MIN_BIAS..=PREAMP_MAX_BIAS))]
-  pub preamp_bias: u16
+  #[arg(required = true, 
+        value_parser = clap::value_parser!(i64).range(PREAMP_MIN_BIAS..=PREAMP_MAX_BIAS))]
+  pub bias: u16
 }
 
 impl PreampBiasOpts {
-  pub fn new(preamp_id: u8, preamp_bias: u16) -> Self {
+  pub fn new(id: u8, bias: u16) -> Self {
     Self { 
-      preamp_id,
-      preamp_bias
+      id,
+      bias
     }
   }
 }
@@ -985,22 +1012,22 @@ pub enum CalibrationCmd {
 
 #[derive(Debug, Args, PartialEq)]
 pub struct DefaultOpts {
-  /// Voltage level to be set in voltage calibration run.
+  /// Voltage level to be set in default calibration run.
   #[arg(short, long, default_value_t = DEFAULT_CALIB_VOLTAGE)]
-  pub voltage_level: u16,
-  /// RB to target in voltage calibration run.
+  pub level: u16,
+  /// ID of the RB to target in default calibration run.
   #[arg(short, long, default_value_t = DEFAULT_RB_ID)]
-  pub rb_id: u8,
-  /// Extra arguments in voltage calibration run (not implemented).
+  pub id: u8,
+  /// Extra arguments in default calibration run (not implemented).
   #[arg(short, long, default_value_t = DEFAULT_CALIB_EXTRA)]
   pub extra: u8,
 }
 
 impl DefaultOpts {
-  pub fn new(voltage_level: u16, rb_id: u8, extra: u8) -> Self {
+  pub fn new(level: u16, id: u8, extra: u8) -> Self {
     Self { 
-      voltage_level,
-      rb_id,
+      level,
+      id,
       extra
     }
   }
@@ -1008,18 +1035,18 @@ impl DefaultOpts {
 
 #[derive(Debug, Args, PartialEq)]
 pub struct NoiOpts {
-  /// RB to target in timing calibration run.
+  /// ID of the RB to target in no input calibration run.
   #[arg(short, long, default_value_t = DEFAULT_RB_ID)]
-  pub rb_id: u8,
-  /// Extra arguments in timing calibration run (not implemented).
+  pub id: u8,
+  /// Extra arguments in no input calibration run (not implemented).
   #[arg(short, long, default_value_t = DEFAULT_CALIB_EXTRA)]
   pub extra: u8,
 }
 
 impl NoiOpts {
-  pub fn new(rb_id: u8, extra: u8) -> Self {
+  pub fn new(id: u8, extra: u8) -> Self {
     Self { 
-      rb_id,
+      id,
       extra
     }
   }
@@ -1029,20 +1056,20 @@ impl NoiOpts {
 pub struct VoltageOpts {
   /// Voltage level to be set in voltage calibration run.
   #[arg(short, long, default_value_t = DEFAULT_CALIB_VOLTAGE)]
-  pub voltage_level: u16,
+  pub level: u16,
   /// RB to target in voltage calibration run.
   #[arg(short, long, default_value_t = DEFAULT_RB_ID)]
-  pub rb_id: u8,
+  pub id: u8,
   /// Extra arguments in voltage calibration run (not implemented).
   #[arg(short, long, default_value_t = DEFAULT_CALIB_EXTRA)]
   pub extra: u8,
 }
 
 impl VoltageOpts {
-  pub fn new(voltage_level: u16, rb_id: u8, extra: u8) -> Self {
+  pub fn new(level: u16, id: u8, extra: u8) -> Self {
     Self { 
-      voltage_level,
-      rb_id,
+      level,
+      id,
       extra
     }
   }
@@ -1052,20 +1079,20 @@ impl VoltageOpts {
 pub struct TimingOpts {
   /// Voltage level to be set in voltage calibration run.
   #[arg(short, long, default_value_t = DEFAULT_CALIB_VOLTAGE)]
-  pub voltage_level: u16,
+  pub level: u16,
   /// RB to target in voltage calibration run.
   #[arg(short, long, default_value_t = DEFAULT_RB_ID)]
-  pub rb_id: u8,
+  pub id: u8,
   /// Extra arguments in voltage calibration run (not implemented).
   #[arg(short, long, default_value_t = DEFAULT_CALIB_EXTRA)]
   pub extra: u8,
 }
 
 impl TimingOpts {
-  pub fn new(voltage_level: u16, rb_id: u8, extra: u8) -> Self {
+  pub fn new(level: u16, id: u8, extra: u8) -> Self {
     Self { 
-      voltage_level,
-      rb_id,
+      level,
+      id,
       extra
     }
   }
@@ -1090,19 +1117,24 @@ pub enum PowerCmd {
 #[derive(Debug, Args, PartialEq)]
 pub struct PowerStatus {
   /// Which power status one wants to achieve
-  #[arg(short, long)]
-  pub power_status: PowerStatusEnum
+  #[arg(value_parser = clap::builder::PossibleValuesParser::new([
+          PowerStatusEnum::OFF,
+          PowerStatusEnum::ON,
+          PowerStatusEnum::Cycle
+        ]),
+        required = true)]
+  pub status: PowerStatusEnum
 }
 
 impl PowerStatus {
-  pub fn new(power_status: PowerStatusEnum) -> Self {
+  pub fn new(status: PowerStatusEnum) -> Self {
     Self { 
-      power_status
+      status
     }
   }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
+#[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize, clap::ValueEnum)]
 #[repr(u8)]
 pub enum TofComponent {
   Unknown   = 0u8,
@@ -1149,6 +1181,22 @@ impl From<u8> for TofComponent {
   }
 }
 
+impl From<TofComponent> for clap::builder::Str {
+  fn from(value: TofComponent) -> Self {
+    match value {
+      TofComponent::Unknown  => clap::builder::Str::from("Unknown"),
+      TofComponent::All      => clap::builder::Str::from("All"),
+      TofComponent::AllButMT => clap::builder::Str::from("AllButMT"),
+      TofComponent::TofCpu   => clap::builder::Str::from("TofCpu"),
+      TofComponent::MT       => clap::builder::Str::from("MT"),
+      TofComponent::RB       => clap::builder::Str::from("RB"),
+      TofComponent::PB       => clap::builder::Str::from("PB"),
+      TofComponent::LTB      => clap::builder::Str::from("LTB"),
+      TofComponent::Preamp   => clap::builder::Str::from("Preamp")
+    }
+  }
+}
+
 // repr is u16 in order to leave room for preamp bias
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize, clap::ValueEnum)]
 #[repr(u8)]
@@ -1179,21 +1227,32 @@ impl From<u8> for PowerStatusEnum {
   }
 }
 
+impl From<PowerStatusEnum> for clap::builder::Str {
+  fn from(value: PowerStatusEnum) -> Self {
+    match value {
+      PowerStatusEnum::Unknown => clap::builder::Str::from("Unknown"),
+      PowerStatusEnum::OFF     => clap::builder::Str::from("OFF"),
+      PowerStatusEnum::ON      => clap::builder::Str::from("ON"),
+      PowerStatusEnum::Cycle   => clap::builder::Str::from("Cycle")
+    }
+  }
+}
+
 #[derive(Debug, Args, PartialEq)]
 pub struct PBPowerOpts {
   /// Which power status one wants to achieve
   #[arg(long)]
-  pub power_status: PowerStatusEnum,
+  pub status: PowerStatusEnum,
   /// ID of the PB to be powered up
   #[arg(long)]
-  pub pb_id: u8
+  pub id: u8
 }
 
 impl PBPowerOpts {
-  pub fn new(power_status: PowerStatusEnum, pb_id: u8) -> Self {
+  pub fn new(status: PowerStatusEnum, id: u8) -> Self {
     Self { 
-      power_status,
-      pb_id
+      status,
+      id
     }
   }
 }
@@ -1202,17 +1261,17 @@ impl PBPowerOpts {
 pub struct RBPowerOpts {
   /// Which power status one wants to achieve
   #[arg(short, long)]
-  pub power_status: PowerStatusEnum,
+  pub status: PowerStatusEnum,
   /// ID of the RB to be powered up
   #[arg(short, long)]
-  pub rb_id: u8
+  pub id: u8
 }
 
 impl RBPowerOpts {
-  pub fn new(power_status: PowerStatusEnum, rb_id: u8) -> Self {
+  pub fn new(status: PowerStatusEnum, id: u8) -> Self {
     Self {
-      power_status,
-      rb_id
+      status,
+      id
     }
   }
 }
@@ -1220,18 +1279,23 @@ impl RBPowerOpts {
 #[derive(Debug, Args, PartialEq)]
 pub struct LTBPowerOpts {
   /// Which power status one wants to achieve
-  #[arg(short, long)]
-  pub power_status: PowerStatusEnum,
+  #[arg(value_parser = clap::builder::PossibleValuesParser::new([
+          PowerStatusEnum::OFF,
+          PowerStatusEnum::ON,
+          PowerStatusEnum::Cycle
+        ]),
+        required = true)]
+  pub status: PowerStatusEnum,
   /// ID of the LTB to be powered up
   #[arg(short, long, default_value_t = DEFAULT_LTB_ID)]
-  pub ltb_id: u8
+  pub id: u8
 }
 
 impl LTBPowerOpts {
-  pub fn new(power_status: PowerStatusEnum, ltb_id: u8) -> Self {
+  pub fn new(status: PowerStatusEnum, id: u8) -> Self {
     Self {
-      power_status,
-      ltb_id
+      status,
+      id
     }
   }
 }
@@ -1239,22 +1303,27 @@ impl LTBPowerOpts {
 #[derive(Debug, Args, PartialEq)]
 pub struct PreampPowerOpts {
   /// Which power status one wants to achieve
-  #[arg(long)]
-  pub power_status: PowerStatusEnum,
+  #[arg(value_parser = clap::builder::PossibleValuesParser::new([
+          PowerStatusEnum::OFF,
+          PowerStatusEnum::ON,
+          PowerStatusEnum::Cycle
+        ]),
+        required = true)]
+  pub status: PowerStatusEnum,
   /// ID of the preamp to be powered up
-  #[arg(long, default_value_t = DEFAULT_PREAMP_ID)]
-  pub preamp_id: u8,
+  #[arg(short, long, default_value_t = DEFAULT_PREAMP_ID)]
+  pub id: u8,
   /// Turn on bias of the preamp specified
-  #[arg(long, default_value_t = DEFAULT_PREAMP_BIAS)]
-  pub preamp_bias: u16
+  #[arg(short, long, default_value_t = DEFAULT_PREAMP_BIAS)]
+  pub bias: u16
 }
 
 impl PreampPowerOpts {
-  pub fn new(power_status: PowerStatusEnum, preamp_id: u8, preamp_bias: u16) -> Self {
+  pub fn new(status: PowerStatusEnum, id: u8, bias: u16) -> Self {
     Self {
-      power_status,
-      preamp_id,
-      preamp_bias
+      status,
+      id,
+      bias
     }
   }
 }
@@ -1272,26 +1341,22 @@ pub enum RunCmd {
 #[derive(Debug, Args, PartialEq)]
 pub struct StartRunOpts {
   /// Which kind of run is to be launched
-  #[arg(long, default_value_t = DEFAULT_RUN_TYPE)]
+  #[arg(short, long, default_value_t = DEFAULT_RUN_TYPE)]
   pub run_type: u8,
   /// ID of the RB where to run data taking
-  #[arg(long, default_value_t = DEFAULT_RB_ID)]
-  pub rb_id: u8,
-  /// Number of events to be generated
+  #[arg(short, long, default_value_t = DEFAULT_RB_ID)]
+  pub id: u8,
+  /// Number of events in the run
   #[arg(short, long, default_value_t = DEFAULT_RUN_EVENT_NO)]
-  pub event_no: u8,
-  /// Time the run is expected to go on for
-  #[arg(short, long, default_value_t = DEFAULT_RUN_TIME)]
-  pub time: u8
+  pub no: u8
 }
 
 impl StartRunOpts {
-  pub fn new(run_type: u8, rb_id: u8, event_no: u8, time: u8) -> Self {
+  pub fn new(run_type: u8, id: u8, no: u8) -> Self {
     Self {
       run_type,
-      rb_id,
-      event_no,
-      time
+      id,
+      no
     }
   }
 }
@@ -1300,13 +1365,13 @@ impl StartRunOpts {
 pub struct StopRunOpts {
   /// ID of the RB where to run data taking
   #[arg(short, long, default_value_t = DEFAULT_RB_ID)]
-  pub rb_id: u8
+  pub id: u8
 }
 
 impl StopRunOpts {
-  pub fn new(rb_id: u8) -> Self {
+  pub fn new(id: u8) -> Self {
     Self {
-      rb_id
+      id
     }
   }
 }
