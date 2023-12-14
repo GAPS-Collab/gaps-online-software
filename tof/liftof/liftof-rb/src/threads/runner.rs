@@ -202,7 +202,7 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
         //// from here on, we prepare to start 
         //// a new run with this RunConfig!
         //// set the channel mask
-        reset_dma_and_buffers();
+        //reset_dma_and_buffers();
 
         // deal with the individual settings:
         // first buffer size
@@ -250,7 +250,7 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
         if rc.trigger_poisson_rate > 0 {
           latch_to_mtb = false;
           // we also activate the poisson trigger
-          enable_poisson_self_trigger(rc.trigger_poisson_rate as f32);
+          //enable_poisson_self_trigger(rc.trigger_poisson_rate as f32);
         }
         if rc.trigger_fixed_rate>0 {
           force_trigger = true;
@@ -259,9 +259,16 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
           debug!("Will call trigger() every {} seconds...", time_between_events.unwrap());
           latch_to_mtb = false;
         }
-
+        match disable_trigger() {
+          Err(err) => error!("Can not disable triggers! {err}"),
+          Ok(_)    => ()
+        }
+        match soft_reset_board() {
+          Err(err) => error!("Unable to reset board! {err}"),
+          Ok(_)    => ()
+        }
         // preparations done, let's gooo
-        reset_dma_and_buffers();
+        //reset_dma_and_buffers();
 
         if latch_to_mtb {
           match set_master_trigger_mode() {
@@ -274,10 +281,14 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
             Ok(_)    => info!("Master trigger mode didsabled!")
           }
         }
+        
         // this basically signals "RUNSTART"
         match enable_trigger() {
           Err(err) => error!("Can not enable triggers! Err {err}"),
           Ok(_)    => info!("Triggers enabled - Run start!")
+        }
+        if rc.trigger_poisson_rate > 0 {
+          enable_poisson_self_trigger(rc.trigger_poisson_rate as f32);
         }
         // FIXME - only if above call Ok()
         is_running = true;
@@ -360,7 +371,8 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
       // calculate current event count
       if !force_trigger {
         // this checks if we have seen a new event
-        match get_event_count() {
+        match get_event_count_mt() {
+        //match get_event_count() {
           Err (err) => {
             error!("Can not obtain event count! Err {:?}", err);
             continue;
@@ -676,7 +688,11 @@ pub fn experimental_runner(run_config              : &Receiver<RunConfig>,
           thread::sleep(one_sec);
           match get_trigger_rate() {
             Err(err) => error!("Unable to obtain trigger rate! Err {err}"),
-            Ok(rate) => info!("Seing MTB trigger rate of {rate} Hz")
+            Ok(rate) => println!("Seing RB trigger rate of {rate} Hz")
+          }
+          match get_event_rate_mt() {
+            Err(err) => error!("Unable to obtain MT trigger rate! Err {err}"),
+            Ok(rate) => println!("Seing MTB trigger rate of {rate} Hz")
           }
         }
         if show_progress {

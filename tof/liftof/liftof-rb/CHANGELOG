@@ -1,5 +1,10 @@
 # NIUHI series
 
+## v0.8.5
+* removes event cache
+* performance boost
+* new SOFT_RESET routine
+
 ## v0.8.2
 * based on updated tof-dataclasses, which fix the 
   calibration timing bin bug
