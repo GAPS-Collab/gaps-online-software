@@ -84,6 +84,11 @@ if __name__ == '__main__':
                 print (this_j)
                 print (row_data)
                 thiscol = cols_for_dsi[int(k)]
+                try:
+                    row_data[thiscol] 
+                except KeyError as e:
+                    print(f'Can not find key {key}! {e}, skipping..')
+                    continue
                 if row_data[thiscol] == 'X':
                     continue
                 rat_id = pattern.search(row_data[thiscol]).groupdict()['rat_id']

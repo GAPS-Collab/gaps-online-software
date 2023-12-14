@@ -2,6 +2,7 @@ from django.db import models
 #from django.db.models import pre_save
 #from django.dispatch import receiver
 
+
 # ip/mac address consistency check
 IP_MAC_CHECK_POSSIBLE=False
 try :
@@ -254,7 +255,13 @@ class PaddleEnd(models.Model):
         self.paddle_id     = int(data['Paddle Number']) 
         self.end           = data['Paddle End (A/B)'] 
         self.end_location  = data['Paddle End Location']                       
-        self.panel_id      = int(data['Panel Number'] )
+        panel_id           = str(data['Panel Number'])
+        if panel_id.startswith('E'):
+            # this are these individual edge paddles
+            # we replace them with 1000 + the number 
+            # after E-X
+            panel_id = panel_id.replace("E-X","")
+            selfg.panel_id = int(panel_id) + 1000
         self.cable_length  = int(data['Cable length (cm)'] )
         self.rat           = int(data['RAT Number'] )
         ltb_info           = data['LTB Number-Channel'].split('-')
@@ -266,11 +273,26 @@ class PaddleEnd(models.Model):
         self.ltb_ch        = int(ltb_info[1])
         self.pb_ch         = int(pb_info[1] )
         self.rb_ch         = int(rb_info[1] )
-        self.dsi           = int(data['DSI card slot '])
-        rb_h_j             = data['LTB Harting Connection'].split('_')
-        ltb_h_j            = data['LTB Harting Connection'].split('_')
-        self.rb_harting_j  = int(rb_h_j[1])
-        self.ltb_harting_j = int(ltb_h_j[1])
+        # in some spreadsheets, the label differs,
+        # so we are just looking for some variant
+        good = False
+        for label in 'DSI card slot', 'DSI Card Slot', 'DSI card slot ', 'DSI Card Slot ':
+            try:
+                self.dsi           = int(data[label])
+                good               = True
+                #print("Found good key!")
+                break
+            except KeyError:
+                #print(f".. can't find key {label}, trying next variant..")
+                continue
+        if not good:
+            raise ValueError("Could not get DSI assignment!")
+        rb_h_j             = data['RB Harting Connection'].replace('J','')
+        ltb_h_j            = data['LTB Harting Connection'].replace('J','')
+        #rb_h_j             = data['RB Harting Connection'].split('_')
+        #ltb_h_j            = data['LTB Harting Connection'].split('_')
+        self.rb_harting_j  = int(rb_h_j)
+        self.ltb_harting_j = int(ltb_h_j)
 
     def __str__(self):
         return self.__repr__()
@@ -384,7 +406,9 @@ class RAT(models.Model):
         #  4:02 PM
         # Sydney:  oh, I see where your confusion is!in the RAT table, I list all the board ID numbers for the PB, RBs, and LTB inside each RAT. for the RBs and PBs, these board IDs are significant (for the RBs, it distinguishes which ip address the data will come out on. for the PBs, we will implement unique lookup tables that associate ADC values with actual measured voltages).However, for our LTBs, the board ID number listed in the RAT table is just so that I can keep track of each of the 22 LTBs that we have. the LTB board ID doesn't matter at all for data taking and control; each board behaves exactly the same way, uses the same firmware, is controlled identically.what does matter is the location of the LTB, and in particular which RAT the LTB is inside of (because this determines which paddles are connected and triggering). that is why in the paddle master spreadsheet, the LTB channel is just listed with the associated RAT.so, in conclusion, you should be able to completely ignore the LTB column of the RAT table
         self.ltb_id                    = self.rat_id
-        self.ltb_harting_cable_length  = int(data['LTB Harting cable length'].split(' ')[0])
+        #print(data)
+        #self.ltb_harting_cable_length  = int(data['LTB Harting cable length'].split(' ')[0])
+        self.ltb_harting_cable_length  = int(data['LTB Harting cable length'])
 
     def __str__(self):
         return self.__repr__()
@@ -418,7 +442,6 @@ class RB(models.Model):
     ch6_paddle       = models.ForeignKey(PaddleEnd, models.SET_NULL, blank=True, null=True,related_name='+' )
     ch7_paddle       = models.ForeignKey(PaddleEnd, models.SET_NULL, blank=True, null=True,related_name='+' )
     ch8_paddle       = models.ForeignKey(PaddleEnd, models.SET_NULL, blank=True, null=True,related_name='+' )
-
     #ch1_pid          = models.PositiveSmallIntegerField()
     #ch1_pend         = models.PositiveSmallIntegerField()
     #ch2_pid          = models.PositiveSmallIntegerField()
@@ -453,7 +476,26 @@ class RB(models.Model):
     #    for ch in ch_to_pid:
     #        setattr(self,f'ch{ch}_pid',ch_to_pid[ch])
     #    return None
-    
+    def get_channel(ch):
+        match ch:
+            case 1:
+                return self.ch1_paddle
+            case 2:
+                return self.ch2_paddle
+            case 3:
+                return self.ch3_paddle
+            case 4:
+                return self.ch4_paddle
+            case 5:
+                return self.ch5_paddle
+            case 6:
+                return self.ch6_paddle
+            case 7:
+                return self.ch7_paddle
+            case 8:
+                return self.ch8_paddle
+            case _:
+                raise ValueError(f"Don't have paddle for channel {ch}")
 
     def get_designated_ip(self):
         ip_address = "10.0.1.1" + str(self.rb_id).zfill(2)
