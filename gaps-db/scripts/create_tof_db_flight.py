@@ -147,6 +147,9 @@ if __name__ == '__main__':
             #print (row_data.keys())
             #print (row_data)
             #print ('----')
+            if paddle_end.panel_id is None:
+                print ('Error, no panel_id, setting 99')
+                paddle_end.panel_id = 99
             print (paddle_end)
             if not args.dry_run:
                 paddle_end.save()

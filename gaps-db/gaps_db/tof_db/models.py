@@ -261,7 +261,9 @@ class PaddleEnd(models.Model):
             # we replace them with 1000 + the number 
             # after E-X
             panel_id = panel_id.replace("E-X","")
-            selfg.panel_id = int(panel_id) + 1000
+            self.panel_id = int(panel_id) + 1000
+        else:
+            self.panel_id = int(panel_id)
         self.cable_length  = int(data['Cable length (cm)'] )
         self.rat           = int(data['RAT Number'] )
         ltb_info           = data['LTB Number-Channel'].split('-')
