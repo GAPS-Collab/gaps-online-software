@@ -476,7 +476,7 @@ class RB(models.Model):
     #    for ch in ch_to_pid:
     #        setattr(self,f'ch{ch}_pid',ch_to_pid[ch])
     #    return None
-    def get_channel(ch):
+    def get_channel(self,ch):
         match ch:
             case 1:
                 return self.ch1_paddle
