@@ -6,6 +6,16 @@ import charmingbeauty as cb
 gt.RBEvent.calib = None
 
 def _adc_plotter(axes, ev, ch, calib=None, plot_stop_cell=False):
+    """
+    Plot the raw adc values/time vs voltages for all channels for all events
+
+    # Arguments
+
+      * axes
+      * ev
+      * ch
+    """
+
     if ch == 9:
         ax_j  = 4
         color = 'k'
@@ -79,12 +89,16 @@ def plot(self,\
     if calib is None:
         print ("No calibration given! Will plot adc values!")
         axes[0].set_xlabel("")
-        for ch in range(1,10):
+        for ch in self.header.get_channels();
+        #for ch in range(1,10):
+            ch += 1
             _adc_plotter(axes, self, ch, plot_stop_cell = plot_stop_cell)
     else:
         volts = calib.voltages(self, spike_cleaning = spike_cleaning)
         nanos = calib.nanoseconds(self)
-        for ch in range(1,10):
+        for ch in self.header.get_channels():
+            ch += 1
+        #for ch in range(1,10):
             if ch % 2 == 0:
                 color = "r"
             else:
