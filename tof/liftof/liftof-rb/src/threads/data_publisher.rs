@@ -15,11 +15,13 @@ use local_ip_address::local_ip;
 use liftof_lib::DATAPORT;
 use tof_dataclasses::events::{RBEvent,
                               DataType};
-
 use tof_dataclasses::serialization::Serialization;
-use crate::api::{prefix_board_id,
-                 prefix_local};
-
+use crate::api::{
+    //prefix_board_id,
+    prefix_board_id_noquery,
+    prefix_local,
+};
+use crate::control::get_board_id;
 // this is just used for the testing case
 fn find_missing_elements(nums: &[u32]) -> Vec<u32> {
   let mut missing_elements = Vec::new();
@@ -125,6 +127,10 @@ pub fn data_publisher(data           : &Receiver<TofPacket>,
   }
   let mut n_tested : u32 = 0;
   let mut n_sent   : u64 = 0;
+  let board_id     = get_board_id().unwrap_or(0) as u8;
+  if board_id == 0 {
+    error!("We could not get the board id!");
+  }
   loop {
     let mut data_type = DataType::Unknown;
     match data.recv() {
@@ -196,24 +202,29 @@ pub fn data_publisher(data           : &Receiver<TofPacket>,
             last_10k_evids.clear();
           }
         } // end testing
-        
-        // prefix the board id, except for our Voltage, Timing and NOI 
-        // packages. For those, we prefix with LOCAL 
+        //
+        //// prefix the board id, except for our Voltage, Timing and NOI 
+        //// packages. For those, we prefix with LOCAL 
         let tp_payload : Vec<u8>;
         match data_type {
+          // FIXME - this makes that data types for 
+          // calibration will be rerouted back to 
+          // the same board. We have to make that 
+          // behaviour configurable. 
+          // It can simply subscribe to the same 
+          // message?
           DataType::VoltageCalibration |
           DataType::TimingCalibration  | 
           DataType::Noi => {
             tp_payload = prefix_local(&mut packet.to_bytestream());
           },
           _ => {
-            tp_payload = prefix_board_id(&mut packet.to_bytestream());
+            tp_payload = prefix_board_id_noquery(board_id, &mut packet.to_bytestream());
           }
         }
         if print_packets {
           println!("=> Tof packet type: {} with {} bytes!", packet.packet_type, packet.payload.len());
         }
-
         match data_socket.send(tp_payload,zmq::DONTWAIT) {
           Ok(_)    => {
             trace!("0MQ PUB socket.send() SUCCESS!");
@@ -221,7 +232,7 @@ pub fn data_publisher(data           : &Receiver<TofPacket>,
           },
           Err(err) => error!("Not able to send over 0MQ PUB socket! Err {err}"),
         }
-        if n_sent % 1000 == 0 {
+        if n_sent % 1000 == 0 && n_sent > 0 {
           info!("==> We sent {n_sent} packets!");
         }
       }

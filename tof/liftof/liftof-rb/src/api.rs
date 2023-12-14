@@ -414,13 +414,32 @@ pub fn prefix_local(input : &mut Vec<u8>) -> Vec<u8> {
   bytestream
 }
 
-/// add the board id to the bytestream in front of the 
-/// tof response
 pub fn prefix_board_id(input : &mut Vec<u8>) -> Vec<u8> {
   // FIUXME - this should not panic
   let board_id = get_board_id()//
                  .unwrap_or(0);
                                //.expect("Need to be able to obtain board id!");
+  let mut bytestream : Vec::<u8>;
+  let board : String;
+  if board_id < 10 {
+    board = String::from("RB0") + &board_id.to_string();
+  } else {
+    board = String::from("RB")  + &board_id.to_string();
+  }
+  //let mut response = 
+  bytestream = board.as_bytes().to_vec();
+  //bytestream.append(&mut resp.to_bytestream());
+  bytestream.append(input);
+  bytestream
+}
+
+/// add the board id to the bytestream in front of the 
+/// tof response
+pub fn prefix_board_id_noquery(board_id : u8, input : &mut Vec<u8>) -> Vec<u8> {
+  // FIUXME - this should not panic
+  //let board_id = get_board_id()//
+  //               .unwrap_or(0);
+  //                             //.expect("Need to be able to obtain board id!");
   let mut bytestream : Vec::<u8>;
   let board : String;
   if board_id < 10 {

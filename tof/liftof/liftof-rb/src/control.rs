@@ -70,7 +70,7 @@ pub fn soft_reset_board() -> Result<(), RegisterError> {
 
 /// Check if the soft reset procedure has finished
 pub fn soft_reset_done() -> Result<bool, RegisterError> {
-  let mask : u32 = ( 1 << 15 );
+  let mask : u32 = 1 << 15;
   let value = read_control_reg(SOFT_RESET_DONE)?;
   return Ok((value & mask) > 0)
 }

@@ -1,5 +1,5 @@
 use std::path::Path;
-use std::time::Instant;
+//use std::time::Instant;
 use crossbeam_channel::Sender;
 
 use tof_dataclasses::commands::{TofCommand,
@@ -33,7 +33,7 @@ use liftof_lib::build_tcp_from_ip;
 /// heartbeat_timeout_seconds : If we don't hear from the C&C server in this amount of 
 ///                             seconds, we try to reconnect.
 pub fn cmd_responder(cmd_server_ip             : String,
-                     heartbeat_timeout_seconds : u32,
+                     //heartbeat_timeout_seconds : u32,
                      run_config_file           : &Path,
                      run_config                : &Sender<RunConfig>,
                      ev_request_to_cache       : &Sender<TofPacket>) {
@@ -68,7 +68,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
     }
   }
   
-  let mut heartbeat     = Instant::now();
+  //let mut heartbeat     = Instant::now();
 
   // I don't know if we need this, maybe the whole block can go away.
   // Originally I thought the RBs get pinged every x seconds and if we
@@ -76,41 +76,41 @@ pub fn cmd_responder(cmd_server_ip             : String,
   // if that scenario actually occurs.
   // Paolo: instead of leaving the connection always open we might
   //  want to reopen it if its not reachable anymore (so like command-oriented)...
-  warn!("TODO: Heartbeat feature not yet implemented on C&C side");
-  let heartbeat_received = false;
+  //warn!("TODO: Heartbeat feature not yet implemented on C&C side");
+  //let heartbeat_received = false;
   loop {
-    if !heartbeat_received {
-      trace!("No heartbeat since {}", heartbeat.elapsed().as_secs());
-      if heartbeat.elapsed().as_secs() > heartbeat_timeout_seconds as u64 {
-        warn!("No heartbeat received since {heartbeat_timeout_seconds}. Attempting to reconnect!");
-        match cmd_socket.connect(&cmd_address) {
-          Err(err) => {
-            error!("Not able to connect to {}, Error {err}", cmd_address);
-            is_connected = false;
-          }
-          Ok(_)    => {
-            debug!("Connected to CnC server at {}", cmd_address);
-            is_connected = true;
-          }
-        }
-        if is_connected {
-          match cmd_socket.set_subscribe(&topic_broadcast.as_bytes()) {
-            Err(err) => error!("Can not subscribe to {topic_broadcast}, err {err}"),
-            Ok(_)    => ()
-          }
-          match cmd_socket.set_subscribe(&topic_board.as_bytes()) {
-            Err(err) => error!("Can not subscribe to {topic_board}, err {err}"),
-            Ok(_)    => ()
-          }
-        }
-        heartbeat = Instant::now();
-      }
-    }
+    //if !heartbeat_received {
+    //  trace!("No heartbeat since {}", heartbeat.elapsed().as_secs());
+    //  if heartbeat.elapsed().as_secs() > heartbeat_timeout_seconds as u64 {
+    //    warn!("No heartbeat received since {heartbeat_timeout_seconds}. Attempting to reconnect!");
+    //    match cmd_socket.connect(&cmd_address) {
+    //      Err(err) => {
+    //        error!("Not able to connect to {}, Error {err}", cmd_address);
+    //        is_connected = false;
+    //      }
+    //      Ok(_)    => {
+    //        debug!("Connected to CnC server at {}", cmd_address);
+    //        is_connected = true;
+    //      }
+    //    }
+    //    if is_connected {
+    //      match cmd_socket.set_subscribe(&topic_broadcast.as_bytes()) {
+    //        Err(err) => error!("Can not subscribe to {topic_broadcast}, err {err}"),
+    //        Ok(_)    => ()
+    //      }
+    //      match cmd_socket.set_subscribe(&topic_board.as_bytes()) {
+    //        Err(err) => error!("Can not subscribe to {topic_board}, err {err}"),
+    //        Ok(_)    => ()
+    //      }
+    //    }
+    //    heartbeat = Instant::now();
+    //  }
+    //}
 
-    if !is_connected {
-      error!("Connection to C&C server lost!");
-      continue;
-    }
+    //if !is_connected {
+    //  error!("Connection to C&C server lost!");
+    //  continue;
+    //}
 
     // Not sure how to deal with the connection. Poll? Or wait blocking?
     // Or don't block? Set a timeout? I guess technically since we are not doing
@@ -120,7 +120,8 @@ pub fn cmd_responder(cmd_server_ip             : String,
     //  Probably setting a timeout is the best practice since, else, we might die.
     //  If we wouldn't block some other commands might be sent and get stuck in the
     //  process (?).
-    match cmd_socket.recv_bytes(zmq::DONTWAIT) {
+    match cmd_socket.recv_bytes(0) {
+    //match cmd_socket.recv_bytes(zmq::DONTWAIT) {
       Err(err) => trace!("Problem receiving command over 0MQ ! Err {err}"),
       Ok(cmd_bytes)  => {
         debug!("Received bytes {}", cmd_bytes.len());
@@ -274,6 +275,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
                       },
                       // Voltage and timing calibration is connected now
                       TofCommand::VoltageCalibration (value) => {
+                        trace!("Got voltage calibration command with {value} value");
                         cfg_if::cfg_if! {
                           if #[cfg(feature = "tofcontrol")]  {
                             // MSB first 16 bits are voltage level
@@ -357,7 +359,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
                 }  
               },
               PacketType::RBCommand  => {
-                info!("Received RBCommand!");
+                trace!("Received RBCommand!");
                 // just forward the packet now, the cache 
                 // can understand if it is an event request or not
                 match ev_request_to_cache.send(tp) {

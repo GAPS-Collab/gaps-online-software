@@ -17,9 +17,16 @@ extern crate env_logger;
 use std::os::raw::c_int;
 use signal_hook::iterator::Signals;
 use signal_hook::consts::signal::{SIGTERM, SIGINT};
-use crossbeam_channel::{unbounded,
-                        Sender,
-                        Receiver};
+
+// FIXME - think about using 
+// bounded channels to not 
+// create a memory leak
+use crossbeam_channel::{
+    unbounded,
+    //bounded,
+    Sender,
+    Receiver
+};
 use local_ip_address::local_ip;
 
 //use std::collections::HashMap;
@@ -28,10 +35,9 @@ use liftof_lib::color_log;
 
 use liftof_rb::threads::{
     runner,
-    experimental_runner,
+    //experimental_runner,
     cmd_responder,
     event_processing,
-    event_cache,
     monitoring,
     data_publisher
 };
@@ -67,9 +73,6 @@ struct Args {
   /// number here (for convenience)
   #[arg(short, long, default_value_t = 0)]
   nevents: u32,
-  /// Cache size of the internal event cache in events
-  #[arg(short, long, default_value_t = 10000)]
-  cache_size: usize,
   /// Analyze the waveforms directly on the board. We will not send
   /// waveoform data, but paddle packets instead.
   #[arg(long, default_value_t = false)]
@@ -121,7 +124,6 @@ fn main() {
   let verbose                  = args.verbose;
   let n_events_run             = args.nevents;
   let show_progress            = args.show_progress;
-  let cache_size               = args.cache_size;
   let wf_analysis              = args.waveform_analysis;
   let calibration              = args.calibration;
   let mut to_local_file        = args.to_local_file;
@@ -215,7 +217,6 @@ fn main() {
 
   // threads and inter-thread communications
   // We have
-  // * event_cache thread
   // * buffer reader thread
   // * data analysis/sender thread
   // * monitoring thread
@@ -249,14 +250,17 @@ fn main() {
   // Setup routine. Start the threads in inverse order of 
   // how far they are away from the buffers.
   let rc_from_cmdr_c = rc_from_cmdr.clone();
+  let _worker_thread = thread::Builder::new()
+         .name("data-publisher".into())
+         .spawn(move || {
+            data_publisher(&tp_from_client,
+                           to_local_file,
+                           Some(&file_suffix),
+                           test_eventids,
+                           verbose); 
+          })
+         .expect("Failed to spawn master_trigger thread!");
   
-  workforce.execute(move || {
-    data_publisher(&tp_from_client,
-                   to_local_file,
-                   Some(&file_suffix),
-                   test_eventids,
-                   verbose); 
-  });
   let tp_to_pub_ev   = tp_to_pub.clone();
   #[cfg(feature="tofcontrol")]
   let tp_to_pub_cal  = tp_to_pub.clone();
@@ -281,15 +285,11 @@ fn main() {
   });
 
   workforce.execute(move || {
-                    event_cache(tp_from_builder,
-                                &tp_to_pub_ev,
-                                &opmode_from_runner, 
-                                wf_analysis,
-                                cache_size)
-  });
-  workforce.execute(move || {
-                    event_processing(&bs_recv,
-                                     &tp_to_cache,
+                    event_processing(
+                                     &tp_from_builder,
+                                     &bs_recv,
+                                     &opmode_from_runner, 
+                                     &tp_to_pub_ev,
                                      &dtf_from_runner,
                                      args.verbose,
                                      calc_crc32);
@@ -298,10 +298,10 @@ fn main() {
 
   // Respond to commands from the C&C server
   let rc_to_runner_c       = rc_to_runner.clone();
-  let heartbeat_timeout_seconds : u32 = 10;
+  //let heartbeat_timeout_seconds : u32 = 10;
   workforce.execute(move || {
                     cmd_responder(cmd_server_ip,
-                                  heartbeat_timeout_seconds,
+                                  //heartbeat_timeout_seconds,
                                   &rc_file_path,
                                   &rc_to_runner_c,
                                   &tp_to_cache_c)
@@ -310,7 +310,10 @@ fn main() {
   
   // should this program end after it is done?
   let mut end = false;
-
+  
+  let moni_interval_l1 = Duration::from_secs(args.moni_interval_l1);
+  let moni_interval_l2 = Duration::from_secs(args.moni_interval_l2);
+  let mut do_monitoring = true;
   // We can only start a run here, if this is not
   // run through systemd
   if is_systemd_process() {
@@ -330,22 +333,10 @@ fn main() {
           error!("Calibration failed! Error {err}!");
         }
       }
+      do_monitoring = false;
       end = true; // in case of we have done the calibration
                   // from shell. We finish after it is done.
-    } else {
-      // only do monitoring when we don't do a 
-      // calibration
-      let moni_interval_l1 = Duration::from_secs(args.moni_interval_l1);
-      let moni_interval_l2 = Duration::from_secs(args.moni_interval_l2);
-      workforce.execute(move || {
-        monitoring(&tp_to_pub,
-                   moni_interval_l1,
-                   moni_interval_l2,
-                   verbose);
-      });
     } 
-   
-
     if config_from_shell {
       if n_events_run > 0 {
         println!("=> We got a nevents argument from the commandline, requesting to run for {n_events_run}. This will OVERRIDE the setting in the run config file!");
@@ -378,7 +369,17 @@ fn main() {
       }
     } // end if config from shell
   } // end if not systemd process
-  
+  if do_monitoring {
+    // only do monitoring when we don't do a 
+    // calibration
+    workforce.execute(move || {
+      monitoring(&tp_to_pub,
+                 moni_interval_l1,
+                 moni_interval_l2,
+                 verbose);
+    });
+  }
+
   // Currently, the main thread just listens for SIGTERM and SIGINT.
   // We could give it more to do and save one of the other threads.
   // Probably, the functionality of the control thread would be 
