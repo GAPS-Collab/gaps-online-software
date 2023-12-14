@@ -49,6 +49,33 @@ pub fn disable_trigger() -> Result<(), RegisterError> {
   Ok(())
 }
 
+/// Reset the board and prepare for a new run
+///
+/// Procedure as discussed in 12/2023
+/// Trigger disable (0 to 0x11C[0])
+/// Set desired trigger mode  (1 to 0x114[0] for MTB trigger or 0 to 0x114[0] for software trigger)
+/// Soft reset (1 to 0x70[0])
+/// Check for soft reset done (read 0x74[15])
+/// Trigger enable (1 to 0x11C[0])
+pub fn soft_reset_board() -> Result<(), RegisterError> {
+  trace!("Initialize soft reset procedure!");
+  let eight_cycles = Duration::from_micros(4);
+  write_control_reg(SOFT_RESET, 0x1)?;
+  thread::sleep(eight_cycles);
+  while !soft_reset_done()? {
+    thread::sleep(eight_cycles);
+  }
+  Ok(())
+}
+
+/// Check if the soft reset procedure has finished
+pub fn soft_reset_done() -> Result<bool, RegisterError> {
+  let mask : u32 = ( 1 << 15 );
+  let value = read_control_reg(SOFT_RESET_DONE)?;
+  return Ok((value & mask) > 0)
+}
+
+
 /// Start DRS4 data acquistion
 pub fn start_drs4_daq() -> Result<(), RegisterError> {
   trace!("SET DRS4 START");
@@ -152,6 +179,17 @@ pub fn get_event_count() -> Result<u32, RegisterError> {
   Ok(value)
 }
 
+/// Get the event counter as sent from the MTB
+pub fn get_event_count_mt() -> Result<u32, RegisterError> {
+  let value = read_control_reg(MT_EVENT_CNT)?;
+  Ok(value)
+}
+
+/// Get the rate as sent from the MTB
+pub fn get_event_rate_mt() -> Result<u32, RegisterError> {
+  let value = read_control_reg(MT_TRIG_RATE)?;
+  Ok(value)
+}
 
 /// Get the lost events event counter from the DRS4
 pub fn get_lost_event_count() -> Result<u32, RegisterError> {
