@@ -1,6 +1,6 @@
 //! Routines for RB commiunication and data reception 
 
-use std::time::{SystemTime, UNIX_EPOCH};
+//use std::time::{SystemTime, UNIX_EPOCH};
 use std::path::Path;
 use crossbeam_channel::Sender;
 
@@ -45,6 +45,7 @@ pub fn readoutboard_communicator(ev_to_builder       : &Sender<RBEvent>,
                                  runid               : usize,
                                  print_packets       : bool,
                                  run_analysis_engine : bool) {
+  info!("Got run id {runid}");
   let zmq_ctx = zmq::Context::new();
   let board_id = rb.rb_id; //rb.id.unwrap();
   info!("initializing RB thread for board {}!", board_id);
@@ -77,8 +78,8 @@ pub fn readoutboard_communicator(ev_to_builder       : &Sender<RBEvent>,
    Ok(_) => ()
 
   }
-  let mut secs_since_epoch = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
-  let mut n_events   = 0usize;
+  //let mut secs_since_epoch = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
+  //let mut n_events   = 0usize;
   let mut n_received = 0usize;
   loop {
 
@@ -124,7 +125,7 @@ pub fn readoutboard_communicator(ev_to_builder       : &Sender<RBEvent>,
                     error!("Unable to send event! Err {err}");
                   }
                 }
-                n_events += 1;
+                //n_events += 1;
                 n_chunk += 1;
               }, 
               _ => {

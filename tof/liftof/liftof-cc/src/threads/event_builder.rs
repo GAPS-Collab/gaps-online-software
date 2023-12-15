@@ -180,14 +180,14 @@ pub fn event_builder (m_trig_ev      : &cbc::Receiver<MasterTriggerEvent>,
   let mut event_cache = VecDeque::<TofEvent>::with_capacity(EVENT_BUILDER_EVID_CACHE_SIZE);
 
   // timeout in microsecnds
-  let timeout_micro = 100;
-  let use_timeout   = true;
-  let mut n_iter    = 0; // don't worry it'll be simply wrapped around
+  //let timeout_micro = 100;
+  //let use_timeout   = true;
+  //let mut n_iter    = 0; // don't worry it'll be simply wrapped around
   // we try to receive eventids from the master trigger
   let mut last_evid   = 0;
   let n_mte_per_loop  = 20;
   let n_rbe_per_loop  = 10;
-  let mut n_received        = 0usize;
+  let mut n_received  : usize;
   let mut clear_cache = 0; // clear cache every 
   let mut event_sending = 0;
   let mut n_mte_received_tot = 0u64;
@@ -227,9 +227,9 @@ pub fn event_builder (m_trig_ev      : &cbc::Receiver<MasterTriggerEvent>,
       println!("==> Receive {} MTE", n_mte_received_tot);
     }
     // check this timeout
-    let mut rb_events_added   = 0usize;
-    let mut iter_ev           = 0usize;
-    let mut rb_events_dropped = 0usize;
+    //let mut rb_events_added   = 0usize;
+    //let mut iter_ev           = 0usize;
+    //let mut rb_events_dropped = 0usize;
     n_received = 0;
     while !ev_from_rb.is_empty() && n_received < n_rbe_per_loop {
       match ev_from_rb.recv() {
@@ -243,14 +243,14 @@ pub fn event_builder (m_trig_ev      : &cbc::Receiver<MasterTriggerEvent>,
           // to add another cache.
           //println!("==> Len evt cache {}", event_cache.len());
           n_rbe_received_tot += 1;
-          iter_ev = 0;
+          //iter_ev = 0;
           for ev in event_cache.iter_mut() {
-            iter_ev += 1;
+            //iter_ev += 1;
             //println!("==> mt event id {}, rb event id {}", ev.mt_event.event_id, rb_ev.header.event_id);
             //println!("==> rb event id {}", rb_ev.header.event_id);
             if ev.mt_event.event_id == rb_ev.header.event_id {
               ev.rb_events.push(rb_ev.clone());
-              rb_events_added += 1;
+              //rb_events_added += 1;
               //println!("==> RBEvent added!");
               break;
             }

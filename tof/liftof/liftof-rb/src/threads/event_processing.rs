@@ -156,7 +156,7 @@ pub fn event_processing(tp_recv           : &Receiver<TofPacket>,
         }
         let mut packets_in_stream : u32 = 0;
         let mut last_event_id     : u32 = 0;
-        println!("Streamer::stream size {}", streamer.stream.len());
+        //println!("Streamer::stream size {}", streamer.stream.len());
         'event_reader : loop {
           if streamer.is_depleted {
             info!("Streamer exhausted after sending {} packets!", packets_in_stream);
@@ -199,7 +199,7 @@ pub fn event_processing(tp_recv           : &Receiver<TofPacket>,
               }
               last_event_id = event.header.event_id;
               event.data_type = data_type;
-              println!("==> Sending event with header {}", event.header);
+              //println!("==> Sending event with header {}", event.header);
               let mut tp = TofPacket::from(&event);
               // set flags
               match data_type {
