@@ -38,8 +38,8 @@ use liftof_lib::{
 };
 
 use tof_dataclasses::packets::TofPacket;
-//use tof_dataclasses::threading::ThreadPool;
 use tof_dataclasses::events::MasterTriggerEvent;
+use tof_dataclasses::serialization::Serialization;
 use liftof_lib::master_trigger;
 use crossbeam_channel as cbc;
 //use std::io::Write;
@@ -139,7 +139,7 @@ fn main() {
        //}
        if publish_packets {
          let tp = TofPacket::from(&_ev);
-         match data_socket.send(tp.payload, 0) {
+         match data_socket.send(tp.to_bytestream(), 0) {
            Err(err) => error!("Can't send TofPacket! {err}"),
            Ok(_)    => ()
          }
