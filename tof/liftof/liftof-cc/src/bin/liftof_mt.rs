@@ -57,6 +57,10 @@ struct Args {
   /// Send RB request packets
   #[arg(long, default_value_t=false)]
   send_requests : bool,
+  /// Relay RB network traffic through 
+  /// open poart
+  #[arg(long, default_value_t=false)]
+  relay_rbs : bool,
   /// Apply trace suppression 
   #[arg(long, default_value_t=false)]
   trace_suppression : bool,
@@ -66,6 +70,30 @@ struct Args {
   /// A json file wit the ltb(dsi, j, ch) -> rb_id, rb_ch mapping.
   #[arg(long)]
   json_ltb_rb_map : Option<PathBuf>,
+}
+
+fn rb_relay() {
+  let ctx = zmq::Context::new();
+  let socket = ctx.socket(zmq::SUB).expect("Unable to create 0MQ SUB socket!");
+  let socket_out = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
+  for k in 1..41 {
+    let rb_id : usize;
+    let address = format!("tcp://10.0.1.1{:02}:42000", k);
+    socket.connect(&address).expect("Unable to bind to data (PUB) socket {adress}");
+    println!("==> 0MQ PUB socket bound to address {address}");
+  }
+  socket.set_subscribe(b"");
+  let address_out : &str = "tcp://100.96.207.91:42001";
+  socket_out.bind(address_out);
+  match socket.recv_bytes(0) {
+    Err(_err) => (),
+    Ok(data)  => {
+      match socket_out.send(data, 0) {
+        Err(_err) => (),
+        Ok(_)     => ()
+      }
+    }
+  }
 }
 
 
@@ -89,6 +117,7 @@ fn main() {
   let verbose             = args.verbose;
   let publish_packets     = args.publish_packets;
   let send_requests       = args.send_requests;
+  let relay_rbs           = args.relay_rbs;
 
   if args.send_requests {
     match args.json_ltb_rb_map {
@@ -124,6 +153,15 @@ fn main() {
                          readoutboard_commander(&tp_rec_req); 
                         })
                        .expect("Failed to spawn rb_commander thread!");
+ }
+ if relay_rbs {
+   let _relay_thread = thread::Builder::new()
+                       .name("rb_relay".into())
+                       .spawn(move || {
+                         rb_relay; 
+                        })
+                       .expect("Failed to spawn rb_relay thread!");
+ 
  }
  let mut n_events = 0u64;
  let ctx = zmq::Context::new();
