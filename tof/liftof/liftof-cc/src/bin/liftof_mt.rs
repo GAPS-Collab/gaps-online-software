@@ -158,7 +158,7 @@ fn main() {
    let _relay_thread = thread::Builder::new()
                        .name("rb_relay".into())
                        .spawn(move || {
-                         rb_relay; 
+                         rb_relay(); 
                         })
                        .expect("Failed to spawn rb_relay thread!");
  
