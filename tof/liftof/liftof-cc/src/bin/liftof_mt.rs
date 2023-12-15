@@ -8,8 +8,9 @@
 //!
 //!
 
+extern crate zmq;
+
 #[macro_use] extern crate log;
-//extern crate env_logger;
 extern crate crossbeam_channel;
 
 extern crate tof_dataclasses;
@@ -59,6 +60,9 @@ struct Args {
   /// Apply trace suppression 
   #[arg(long, default_value_t=false)]
   trace_suppression : bool,
+  /// Publish TofPackets at port 42000
+  #[arg(long, default_value_t=false)]
+  publish_packets : bool,
   /// A json file wit the ltb(dsi, j, ch) -> rb_id, rb_ch mapping.
   #[arg(long)]
   json_ltb_rb_map : Option<PathBuf>,
@@ -81,11 +85,9 @@ fn main() {
   let master_trigger_port = 50001usize;
   //let worker_threads      = ThreadPool::new(2);
 
-  let args = Args::parse();
-  let verbose = args.verbose;
-  //if args.trace_suppression {
-  //  match set_trace_suppression(  
-  //}
+  let args                = Args::parse();
+  let verbose             = args.verbose;
+  let publish_packets     = args.publish_packets;
 
   if args.send_requests {
     match args.json_ltb_rb_map {
@@ -122,12 +124,26 @@ fn main() {
 
  let mut n_events = 0u64;
  loop {
+   let ctx = zmq::Context::new();
+   let address : &str = "tcp://100.96.207.91:42000";
+   let data_socket = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
+   if publish_packets {
+     data_socket.bind(address).expect("Unable to bind to data (PUB) socket {adress}");
+     println!("==> 0MQ PUB socket bound to address {address}");
+   }
    match mte_rec.recv() {
      Err(err)  => debug!("Can not receive events! Error {err}"),
      Ok(_ev)    => {
        //if ev.n_paddles > 0 {
        //  println!("Received event {}", ev);
        //}
+       if publish_packets {
+         let tp = TofPacket::from(&_ev);
+         match data_socket.send(tp.payload, 0) {
+           Err(err) => error!("Can't send TofPacket! {err}"),
+           Ok(_)    => ()
+         }
+       }
        if n_events % 100 == 0 {
          if verbose {
            println!("{}", _ev);
