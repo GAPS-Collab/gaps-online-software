@@ -85,12 +85,14 @@ fn rb_relay() {
   socket.set_subscribe(b"");
   let address_out : &str = "tcp://100.96.207.91:42001";
   socket_out.bind(address_out);
-  match socket.recv_bytes(0) {
-    Err(_err) => (),
-    Ok(data)  => {
-      match socket_out.send(data, 0) {
-        Err(_err) => (),
-        Ok(_)     => ()
+  loop {
+    match socket.recv_bytes(0) {
+      Err(_err) => (),
+      Ok(data)  => {
+        match socket_out.send(data, 0) {
+          Err(_err) => (),
+          Ok(_)     => ()
+        }
       }
     }
   }
