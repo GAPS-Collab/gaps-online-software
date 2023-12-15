@@ -88,6 +88,7 @@ fn main() {
   let args                = Args::parse();
   let verbose             = args.verbose;
   let publish_packets     = args.publish_packets;
+  let send_requests       = args.send_requests;
 
   if args.send_requests {
     match args.json_ltb_rb_map {
@@ -100,6 +101,7 @@ fn main() {
     }
   }
   let args = Args::parse(); 
+  let verbose = args.verbose;
   let _worker_thread = thread::Builder::new()
          .name("master_trigger".into())
          .spawn(move || {
@@ -109,19 +111,20 @@ fn main() {
                            &mte_send,
                            &tp_send_req,
                            &tp_send_moni,
-                           10,
+                           1,
                            60,
-                           true,
+                           verbose,
                            args.send_requests);
          })
          .expect("Failed to spawn master_trigger thread!");
-  let _rbcmd_thread = thread::Builder::new()
-         .name("rb_commander".into())
-         .spawn(move || {
-            readoutboard_commander(&tp_rec_req); 
-         })
-         .expect("Failed to spawn rb_commander thread!");
-
+ if send_requests {
+   let _rbcmd_thread = thread::Builder::new()
+                       .name("rb_commander".into())
+                       .spawn(move || {
+                         readoutboard_commander(&tp_rec_req); 
+                        })
+                       .expect("Failed to spawn rb_commander thread!");
+ }
  let mut n_events = 0u64;
  let ctx = zmq::Context::new();
  let address : &str = "tcp://100.96.207.91:42000";
