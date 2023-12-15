@@ -123,14 +123,14 @@ fn main() {
          .expect("Failed to spawn rb_commander thread!");
 
  let mut n_events = 0u64;
+ let ctx = zmq::Context::new();
+ let address : &str = "tcp://100.96.207.91:42000";
+ let data_socket = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
+ if publish_packets {
+   data_socket.bind(address).expect("Unable to bind to data (PUB) socket {adress}");
+   println!("==> 0MQ PUB socket bound to address {address}");
+ }
  loop {
-   let ctx = zmq::Context::new();
-   let address : &str = "tcp://100.96.207.91:42000";
-   let data_socket = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
-   if publish_packets {
-     data_socket.bind(address).expect("Unable to bind to data (PUB) socket {adress}");
-     println!("==> 0MQ PUB socket bound to address {address}");
-   }
    match mte_rec.recv() {
      Err(err)  => debug!("Can not receive events! Error {err}"),
      Ok(_ev)    => {
