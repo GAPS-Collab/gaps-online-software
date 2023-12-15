@@ -18,16 +18,18 @@ extern crate liftof_lib;
 
 use std::collections::HashMap;
 
-use std::sync::{
-    Arc,
-    Mutex
-};
+//use std::sync::{
+//    Arc,
+//    Mutex
+//};
 
 use std::thread;
 use std::path::PathBuf;
 
 use tof_dataclasses::DsiLtbRBMapping;
-use tof_dataclasses::commands::RBCommand;
+//use tof_dataclasses::threading::ThreadControl;
+
+//use tof_dataclasses::commands::RBCommand;
 use liftof_lib::{
     get_ltb_dsi_j_ch_mapping,
     readoutboard_commander,
@@ -39,9 +41,9 @@ use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::events::MasterTriggerEvent;
 use liftof_lib::master_trigger;
 use crossbeam_channel as cbc;
-use std::io::Write;
+//use std::io::Write;
 
-use liftof_lib::color_log;
+//use liftof_lib::color_log;
 extern crate clap;
 use clap::Parser;
 
@@ -54,10 +56,14 @@ struct Args {
   /// Send RB request packets
   #[arg(long, default_value_t=false)]
   send_requests : bool,
+  /// Apply trace suppression 
+  #[arg(long, default_value_t=false)]
+  trace_suppression : bool,
   /// A json file wit the ltb(dsi, j, ch) -> rb_id, rb_ch mapping.
   #[arg(long)]
   json_ltb_rb_map : Option<PathBuf>,
 }
+
 
 fn main() {
 
@@ -66,7 +72,10 @@ fn main() {
   let (mte_send, mte_rec): (cbc::Sender<MasterTriggerEvent>, cbc::Receiver<MasterTriggerEvent>) = cbc::unbounded(); 
   let (tp_send_moni, _tp_rec_moni): (cbc::Sender<TofPacket>, cbc::Receiver<TofPacket>) = cbc::unbounded(); 
   let (tp_send_req, tp_rec_req): (cbc::Sender<TofPacket>, cbc::Receiver<TofPacket>) = cbc::unbounded(); 
-   
+ 
+  // Create shared data wrapped in an Arc and a Mutex for synchronization
+  //let thread_control = Arc::new(Mutex::new(ThreadControl::default()));
+
   let mut ltb_rb_map : DsiLtbRBMapping = HashMap::<u8,HashMap::<u8,HashMap::<u8,(u8,u8)>>>::new();
   let master_trigger_ip   = String::from("10.0.1.10");
   let master_trigger_port = 50001usize;
@@ -74,6 +83,10 @@ fn main() {
 
   let args = Args::parse();
   let verbose = args.verbose;
+  //if args.trace_suppression {
+  //  match set_trace_suppression(  
+  //}
+
   if args.send_requests {
     match args.json_ltb_rb_map {
       None => {
