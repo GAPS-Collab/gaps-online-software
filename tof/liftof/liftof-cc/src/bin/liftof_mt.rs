@@ -74,7 +74,7 @@ fn main() {
   init_env_logger();
   info!("Logging initialized!");
   let (mte_send, mte_rec): (cbc::Sender<MasterTriggerEvent>, cbc::Receiver<MasterTriggerEvent>) = cbc::unbounded(); 
-  let (tp_send_moni, _tp_rec_moni): (cbc::Sender<TofPacket>, cbc::Receiver<TofPacket>) = cbc::unbounded(); 
+  let (tp_send_moni, tp_rec_moni): (cbc::Sender<TofPacket>, cbc::Receiver<TofPacket>) = cbc::unbounded(); 
   let (tp_send_req, tp_rec_req): (cbc::Sender<TofPacket>, cbc::Receiver<TofPacket>) = cbc::unbounded(); 
  
   // Create shared data wrapped in an Arc and a Mutex for synchronization
@@ -149,6 +149,22 @@ fn main() {
            println!("{}", _ev);
          }
        } 
+       n_events += 1;
+     }
+   }
+   match tp_rec_moni.try_recv() {
+     Err(err)  => debug!("Can not receive events! Error {err}"),
+     Ok(_moni)    => {
+       if publish_packets {
+         //let tp = TofPacket::from(&_moni);
+         match data_socket.send(_moni.to_bytestream(), 0) {
+           Err(err) => error!("Can't send TofPacket! {err}"),
+           Ok(_)    => ()
+         }
+       }
+       if verbose {
+         println!("{}", _moni);
+       }
        n_events += 1;
      }
    }
