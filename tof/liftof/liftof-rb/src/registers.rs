@@ -91,4 +91,4 @@ pub const SOFT_RESET_DONE : u32 = 0x74;
 // MT EVENT REGISTERS
 pub const MT_EVENT_CNT : u32 = 0x120;
 pub const MT_TRIG_RATE : u32 = 0x124;
-
+pub const MT_LINK_ID   : u32 = 0x104;

@@ -14,6 +14,16 @@ use std::thread;
 
 extern crate liftof_lib;
 
+/// Read the link ID from the MTB 
+///
+/// THe link ID comes from the MTB
+pub fn mtb_link_id() -> Result<u32, RegisterError> {
+  trace!("Getting MTB Link ID!");
+  let val = read_control_reg(MT_LINK_ID)?;
+  Ok(val & 0x01F8) 
+}
+
+
 /// write header only packets when the drs is busyu
 pub fn enable_evt_fragments() -> Result<(), RegisterError> {
   trace!("Enable event fragment writing!");
