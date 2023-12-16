@@ -1299,7 +1299,7 @@ impl Serialization for RBCalibrations {
     } else { // if we don't serialize event data, write 0 
              // for the empty data
       // (3 16bit 0s) for noi, vcal, tcal
-      for k in 0..6 {
+      for _ in 0..6 {
         bs.push(0);
       }
       //bs.push(0); // noi data

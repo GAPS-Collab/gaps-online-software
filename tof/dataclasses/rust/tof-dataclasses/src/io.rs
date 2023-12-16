@@ -44,7 +44,6 @@ use std::collections::{
     HashMap
 };
 
-use std::fmt;
 
 extern crate indicatif;
 use indicatif::{ProgressBar, ProgressStyle};
@@ -66,7 +65,6 @@ use crate::serialization::{
     parse_u8,
     parse_u16,
 };
-use crate::serialization::SerializationError;
 
 /// Read an entire file into memory
 ///
@@ -343,13 +341,12 @@ impl RBEventMemoryStreamer {
 
   /// Retrive an RBEvent from a certain position
   pub fn get_event_at_pos_unchecked(&mut self,
-                                    ev_start_pos : usize,
                                     replace_channel_mask : Option<u16>)
       -> Option<RBEvent> {
     let mut header       = RBEventHeader::new();
     let mut event        = RBEvent::new();
     let mut event_status : EventStatus;
-    let begin_pos = self.pos;
+    //let begin_pos = self.pos;
     if self.calc_crc32 {
       event_status = EventStatus::Perfect;
     } else {
@@ -425,9 +422,9 @@ impl RBEventMemoryStreamer {
       return Some(event);
     }
     // make sure we can read them!
-    let expected_packet_size =   header.get_channels().len()*nwords*2 
-                               + header.get_channels().len()*2 
-                               + header.get_channels().len()*4;
+    //let expected_packet_size =   header.get_channels().len()*nwords*2 
+    //                           + header.get_channels().len()*2 
+    //                           + header.get_channels().len()*4;
     for ch in header.get_channels().iter() {
       let ch_id = parse_u16(&self.stream, &mut self.pos);
       if ch_id == *ch as u16 {
@@ -526,7 +523,7 @@ impl RBEventMemoryStreamer {
       return None;
     }
     self.pos = pos.0;
-    self.get_event_at_pos_unchecked(self.pos, replace_channel_mask)
+    self.get_event_at_pos_unchecked(replace_channel_mask)
   }
 }
 
@@ -536,8 +533,8 @@ impl Iterator for RBEventMemoryStreamer {
   fn next(&mut self) -> Option<Self::Item> {
     // FIXME - we should init this only once
     // event id from stream
-    let mut event_id  = 0u32;
-    let mut begin_pos : usize; // in case we need
+    //let event_id  = 0u32;
+    let begin_pos : usize; // in case we need
                                // to rewind
      
     // if there are requests, we will serve the 
@@ -610,7 +607,7 @@ impl Iterator for RBEventMemoryStreamer {
       }
     }
     
-    let event = self.get_event_at_pos_unchecked(self.pos, None)?;
+    let event = self.get_event_at_pos_unchecked(None)?;
     self.n_events_ext += 1;
     self.stream.drain(0..self.pos);
     self.pos = 0;
