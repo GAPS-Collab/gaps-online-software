@@ -37,6 +37,7 @@ use crate::serialization::{
 
 use crate::events::DataType;
 use crate::errors::UserError;
+use crate::io::RBEventMemoryStreamer;
 
 cfg_if::cfg_if! {
   if #[cfg(feature = "random")]  {
@@ -746,6 +747,19 @@ impl From<&TofPacket> for RBEvent {
           }
         }
       },
+      PacketType::RBEventMemoryView => {
+        let mut streamer = RBEventMemoryStreamer::new();
+        streamer.add(&pk.payload, pk.payload.len());
+        match streamer.get_event_at_pos_unchecked(None) {
+          None => {
+            return RBEvent::new();
+          },
+          Some(ev) => {
+            return ev;
+          }
+        }
+      },
+
       _ => {
         error!("Can not deal with {}! Returning empty event", pk);
         return RBEvent::new();
