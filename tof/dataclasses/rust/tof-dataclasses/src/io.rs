@@ -366,10 +366,10 @@ impl RBEventMemoryStreamer {
     header.parse_status(status);
     let packet_len = parse_u16(&self.stream, &mut self.pos) as usize * 2;
     let nwords     = parse_u16(&self.stream, &mut self.pos) as usize + 1; // the field will tell you the 
-    if self.pos - 4 + packet_len > self.stream.len() - 1 {
-      trace!("Stream is too short!");
+    if self.pos - 8 + packet_len > self.stream.len() { // -1?
+      error!("Stream is too short! Stream len is {}, packet len is {}. We are at pos {}", self.stream.len(), packet_len, self.pos);
       self.is_depleted = true;
-      self.pos -= 4;
+      self.pos -= 8;
       return None;
     }
     // now we skip the next 10 bytes, 
