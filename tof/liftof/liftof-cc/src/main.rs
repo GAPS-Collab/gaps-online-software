@@ -297,6 +297,10 @@ fn main() {
   let (ev_to_builder, ev_from_rb) : (cbc::Sender<RBEvent>, cbc::Receiver<RBEvent>) = cbc::unbounded();
   let (cmd_sender, cmd_receiver) : (cbc::Sender<TofPacket>, cbc::Receiver<TofPacket>) = cbc::unbounded();
 
+  let ctx = zmq::Context::new();
+  // I guess expect is fine here, see above
+  let socket = ctx.socket(zmq::SUB).expect("Unable to create 0MQ SUB socket!");
+
 
   // prepare a thread pool. Currently we have
   // 1 thread per rb, 1 master trigger thread
@@ -425,11 +429,11 @@ fn main() {
   match args.command {
     Command::Ping(ping_cmd) => {
       match ping_cmd.component {
-        TofComponent::TofCpu => (),
-        TofComponent::RB     => (),
-        TofComponent::LTB    => (),
-        TofComponent::MT     => (),
-        _                    => ()
+        TofComponent::TofCpu => liftof_cc::send_ping_response(cmd_sender, socket),
+        TofComponent::RB  |
+        TofComponent::LTB |
+        TofComponent::MT     => liftof_cc::send_ping(cmd_sender, ping_cmd.component, ping_cmd.id),
+        _                    => error!("The ping command is not implemented for this TofComponent!")
       }
     },
     Command::Power(power_cmd) => {

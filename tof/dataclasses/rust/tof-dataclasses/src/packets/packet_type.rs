@@ -31,6 +31,7 @@ pub enum PacketType {
   RBCalibration      = 130u8,
   TofCommand         = 140u8,
   RBCommand          = 150u8,
+  Ping               = 160u8,
 }
 
 impl fmt::Display for PacketType {

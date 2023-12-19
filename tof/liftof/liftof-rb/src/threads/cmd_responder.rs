@@ -12,8 +12,8 @@ use tof_dataclasses::serialization::Serialization;
 
 use crate::api::{get_runconfig, DATAPORT};
 use crate::api::prefix_board_id;
-use crate::control::get_board_id_string;
-use liftof_lib::build_tcp_from_ip;
+use crate::control::{get_board_id_string, get_board_id};
+use liftof_lib::{build_tcp_from_ip, TofComponent};
 
 cfg_if::cfg_if! {
   if #[cfg(feature = "tofcontrol")] {
@@ -162,11 +162,25 @@ pub fn cmd_responder(cmd_server_ip             : String,
                       },
                       TofCommand::Ping (_) => {
                         info!("Received ping command");
+                        // Function that just replies to a ping command send to tofcpu
+                        // get_board_id PANICS!! TODO
+                        let rb_id_u32 = get_board_id().unwrap().to_le_bytes();
+                        let rb_id_u8 = rb_id_u32[0];
+
+                        let mut tp = TofPacket::new();
+                        tp.packet_type = PacketType::Ping;
+                        tp.payload = vec![TofComponent::RB as u8, rb_id_u8];
+                        match ev_request_to_cache.send(tp) {
+                          Err(err) => error!("TofCpu ping sending failed! Err {}", err),
+                          Ok(_)    => ()
+                        }
+
                         let r = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed as u32);
                         match cmd_socket.send(r.to_bytestream(),0) {
                           Err(err) => warn!("Can not send response!, Err {err}"),
-                          Ok(_)    => info!("Responded to Ping!")
+                          Ok(_)    => info!("Responded to SetThreshold!")
                         }
+                        trace!("Resp sent!");
                         continue;
                       
                       },

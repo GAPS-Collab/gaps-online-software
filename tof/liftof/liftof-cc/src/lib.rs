@@ -1,8 +1,9 @@
 use crossbeam_channel::Sender;
 use liftof_lib::{PowerStatusEnum, TofComponent};
-use tof_dataclasses::packets::TofPacket;
-use tof_dataclasses::commands::TofCommand;
+use tof_dataclasses::packets::{TofPacket, PacketType};
+use tof_dataclasses::commands::{TofCommand, TofResponse, TofCommandResp};
 use tof_dataclasses::constants::PAD_CMD_32BIT;
+use zmq::Socket;
 
 pub mod constants;
 pub mod api;
@@ -216,4 +217,23 @@ pub fn send_ping(cmd_sender: Sender<TofPacket>,
     Err(err) => error!("Unable to send command, error{err}"),
     Ok(_)    => ()
   }
+}
+
+/// Function that just replies to a ping command send to tofcpu
+pub fn send_ping_response(cmd_sender: Sender<TofPacket>,
+                          socket:     Socket) {
+  let mut tp = TofPacket::new();
+  tp.packet_type = PacketType::Ping;
+  tp.payload = vec![TofComponent::TofCpu as u8];
+  match cmd_sender.send(tp) {
+    Err(err) => error!("TofCpu ping sending failed! Err {}", err),
+    Ok(_)    => () 
+  }
+
+  let r = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed as u32);
+  match socket.send(r.to_bytestream(), 0) {
+    Err(err) => warn!("Can not send response!, Err {err}"),
+    Ok(_)    => info!("Responded to SetThreshold!")
+  }
+  trace!("Resp sent!")
 }

@@ -135,8 +135,6 @@ pub fn tofcmp_and_mtb_moni(tp_to_sink    : &Sender<TofPacket>,
   }
 }
 
-
-
 #[test]
 fn test_read_cpu_temperature() {
   // Call the function to get the CPU temperature
