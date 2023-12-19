@@ -291,9 +291,15 @@ impl FromRandom for TofCommandResp {
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 #[repr(u8)]
 pub enum TofOperationMode {
-  RequestReply = 0u8,
-  StreamAny    = 10u8,
-  Unknown      = 20u8
+  #[deprecated(since="0.8.3")] 
+  RequestReply     = 0u8,
+  #[deprecated(since="0.8.3")] 
+  StreamAny        = 10u8,
+  Unknown          = 20u8
+  /// Don't decode any of the event 
+  /// data on the RB, just push it 
+  /// onward
+  RBHighThroughput = 30u8,
 }
 
 impl fmt::Display for TofOperationMode {
@@ -314,6 +320,7 @@ impl TryFrom<u8> for TofOperationMode {
       0u8  => Ok(TofOperationMode::RequestReply),
       10u8 => Ok(TofOperationMode::StreamAny),
       20u8 => Ok(TofOperationMode::Unknown),
+      30u8 => Ok(TofOperationMode::RBHighThroughput),
       _    => {
         error!("{} is not a valid TofOperationMode!", value);
         Err("I am not sure how to convert this value!")
@@ -329,6 +336,7 @@ impl FromRandom for TofOperationMode {
     let choices = [
       TofOperationMode::RequestReply,
       TofOperationMode::StreamAny,
+      TofOperationMode::RBHighThroughput,
       TofOperationMode::Unknown
     ];
     let mut rng  = rand::thread_rng();
