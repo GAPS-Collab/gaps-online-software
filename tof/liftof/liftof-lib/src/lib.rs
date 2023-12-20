@@ -49,7 +49,7 @@ use tof_dataclasses::calibrations::RBCalibrations;
 use tof_dataclasses::packets::{TofPacket,
                                PacketType};
 use tof_dataclasses::errors::{SerializationError,
-                              AnalysisError};
+                              AnalysisError, SetError};
 use tof_dataclasses::serialization::{search_for_u16,
                                      parse_u8,
                                      parse_u32,
@@ -956,6 +956,20 @@ pub enum LTBThresholdName {
   Veto     = 30u8,
 }
 
+impl LTBThresholdName {
+  pub fn get_ch_number(threshold_name: LTBThresholdName) -> Result<u8, SetError> {
+    match threshold_name {
+      LTBThresholdName::Hit     => Ok(0u8),
+      LTBThresholdName::Beta    => Ok(1u8),
+      LTBThresholdName::Veto    => Ok(2u8),
+      LTBThresholdName::Unknown => {
+        error!("Not able to get a LTB threshold from Unknown");
+        Err(SetError::EmptyInputData)
+      }
+    }
+  }
+}
+
 impl fmt::Display for LTBThresholdName {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let r = serde_json::to_string(self).unwrap_or(
@@ -1108,7 +1122,7 @@ pub enum PowerCmd {
   MT(PowerStatus),
   /// Power up everything but MT (LTB + preamps)
   AllButMT(PowerStatus),
-  /// Power up all or specific LTBs
+  /// Power up all or specific LTBs (changes threshold)
   LTB(LTBPowerOpts),
   /// Power up all or specific preamp (changes bias)
   Preamp(PreampPowerOpts)

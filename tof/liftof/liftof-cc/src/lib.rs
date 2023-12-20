@@ -1,5 +1,5 @@
 use crossbeam_channel::Sender;
-use liftof_lib::{PowerStatusEnum, TofComponent};
+use liftof_lib::{PowerStatusEnum, TofComponent, LTBThresholdName};
 use tof_dataclasses::packets::{TofPacket, PacketType};
 use tof_dataclasses::commands::{TofCommand, TofResponse, TofCommandResp};
 use tof_dataclasses::constants::PAD_CMD_32BIT;
@@ -150,9 +150,10 @@ pub fn send_timing_calibration(cmd_sender: Sender<TofPacket>,
 /// specific LTBs
 pub fn send_ltb_threshold_set(cmd_sender: Sender<TofPacket>,
                               ltb_id: u8,
+                              threshold_name: LTBThresholdName,
                               threshold_level: u16) {
   let payload: u32
-  = PAD_CMD_32BIT | (ltb_id as u32) << 16 | (threshold_level as u32);
+  = (ltb_id as u32) << 24 | (threshold_name as u32) << 16 | (threshold_level as u32);
   let ltb_threshold = TofCommand::SetThresholds(payload);
   let tp = TofPacket::from(&ltb_threshold);
   match cmd_sender.send(tp) {
@@ -224,7 +225,7 @@ pub fn send_ping_response(cmd_sender: Sender<TofPacket>,
                           socket:     Socket) {
   let mut tp = TofPacket::new();
   tp.packet_type = PacketType::Ping;
-  tp.payload = vec![TofComponent::TofCpu as u8];
+  tp.payload = vec![TofComponent::TofCpu as u8, 0u8];
   match cmd_sender.send(tp) {
     Err(err) => error!("TofCpu ping sending failed! Err {}", err),
     Ok(_)    => () 

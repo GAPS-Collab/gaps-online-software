@@ -14,9 +14,15 @@ pub const DEFAULT_RB_ID: u8 = 0xFF;
 pub const DEFAULT_PB_ID: u8 = 0xFF;
 /// Represents "all boards" for PB
 pub const DEFAULT_LTB_ID: u8 = 0xFF;
+/// Default LTB CH 0 threshold
+pub const DEFAULT_LTB_THRESHOLD_HIT: u16 = 50;
+/// Default LTB CH 1 threshold
+pub const DEFAULT_LTB_THRESHOLD_BETA: u16 = 50;
+/// Default LTB CH 2 threshold
+pub const DEFAULT_LTB_THRESHOLD_VETO: u16 = 150;
 /// Represents "all boards" for PB
 pub const DEFAULT_PREAMP_ID: u8 = 0xFF;
-/// TODO Not actually sure what we expect here
+/// Default preamp bias
 pub const DEFAULT_PREAMP_BIAS: u16 = 420;
 /// TODO Not actually sure what we expect here
 pub const DEFAULT_POWER_STATUS: PowerStatusEnum = PowerStatusEnum::OFF;

@@ -41,6 +41,16 @@ cfg_if::cfg_if! {
     // for threshold setting
     use tof_control::preamp_control::preamp_bias;
     use tof_control::ltb_control::ltb_dac;
+    // for power
+    use liftof_lib::{PowerStatusEnum,
+                     LTBThresholdName};
+    use zmq::Socket;
+    use liftof_lib::constants::{DEFAULT_PREAMP_BIAS,
+                                DEFAULT_PREAMP_ID,
+                                DEFAULT_LTB_ID,
+                                DEFAULT_LTB_THRESHOLD_HIT,
+                                DEFAULT_LTB_THRESHOLD_BETA,
+                                DEFAULT_LTB_THRESHOLD_VETO};
 
     const FIVE_SECONDS: Duration = time::Duration::from_millis(5000);
   }
@@ -1161,13 +1171,83 @@ pub fn setup_drs4() -> Result<(), RegisterError> {
 }
 
 #[cfg(feature = "tofcontrol")]
+pub fn send_preamp_bias_set_all(bias_voltage: u16) -> Result<(), SetError> {
+  preamp_bias::PreampBiasSet::set_bias_manual(bias_voltage as f32);
+  Ok(())
+}
+
+#[cfg(feature = "tofcontrol")]
 pub fn send_preamp_bias_set(preamp_id: u8, bias_voltage: u16) -> Result<(), SetError> {
   preamp_bias::PreampBiasSet::set_bias_manual_id(preamp_id, bias_voltage as f32);
   Ok(())
 }
 
 #[cfg(feature = "tofcontrol")]
-pub fn send_ltb_threshold_set(ltb_id: u8, threshold_level: u16) -> Result<(), SetError> {
-  ltb_dac::LTBdac::set_threshold_ch(ltb_id, threshold_level as f32);
+pub fn send_ltb_all_thresholds_set() -> Result<(), SetError> {
+  ltb_dac::LTBdac::set_threshold();
+  Ok(())
+}
+
+#[cfg(feature = "tofcontrol")]
+pub fn send_ltb_all_thresholds_reset() -> Result<(), SetError> {
+  ltb_dac::LTBdac::reset_threshold();
+  Ok(())
+}
+
+#[cfg(feature = "tofcontrol")]
+pub fn send_ltb_threshold_set(ltb_id: u8, threshold_name: LTBThresholdName, threshold_level: u16) -> Result<(), SetError> {
+  let ch = LTBThresholdName::get_ch_number(threshold_name).unwrap();
+  ltb_dac::LTBdac::set_threshold_ch(ch, threshold_level as f32);
+  Ok(())
+}
+
+#[cfg(feature = "tofcontrol")]
+pub fn power_preamp(cmd_socket: &Socket, preamp_id: u8, status: PowerStatusEnum) -> Result<(), SetError> {
+  match status {
+    PowerStatusEnum::ON => {
+      if preamp_id == DEFAULT_PREAMP_ID {
+        send_preamp_bias_set_all(DEFAULT_PREAMP_BIAS);
+      } else {
+        send_preamp_bias_set(DEFAULT_PREAMP_ID, DEFAULT_PREAMP_BIAS);
+      }
+    },
+    PowerStatusEnum::OFF => {
+      if preamp_id == DEFAULT_PREAMP_ID {
+        send_preamp_bias_set_all(0);
+      } else {
+        send_preamp_bias_set(DEFAULT_PREAMP_ID, 0);
+      }
+    },
+    PowerStatusEnum::Cycle => {
+      // about this command.How long is it right to power cycle stuff??? TODO
+      error!("Not implemented.")
+    },
+    _ => error!("The power status is not specified or outside expected values.")
+  }
+  Ok(())
+}
+
+#[cfg(feature = "tofcontrol")]
+pub fn power_ltb(cmd_socket: &Socket, ltb_id: u8, status: PowerStatusEnum) -> Result<(), SetError> {
+  // the differentiation between all and single ltb is done intrinsically by the fact that 1 RB -> 1 LTB
+  match status {
+    PowerStatusEnum::ON => {
+      // TODO add ID check for LTB to if
+      if ltb_id == DEFAULT_LTB_ID {
+        send_ltb_all_thresholds_set();
+      }
+    },
+    PowerStatusEnum::OFF => {
+      // TODO add ID check for LTB to if
+      if ltb_id == DEFAULT_LTB_ID {
+        send_ltb_all_thresholds_reset();
+      }
+    },
+    PowerStatusEnum::Cycle => {
+      // about this command.How long is it right to power cycle stuff??? TODO
+      error!("Not implemented.")
+    },
+    _ => error!("The power status is not specified or outside expected values.")
+  }
   Ok(())
 }

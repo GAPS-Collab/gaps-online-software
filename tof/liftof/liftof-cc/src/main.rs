@@ -494,8 +494,9 @@ fn main() {
       match set_cmd {
         SetCmd::LtbThreshold(ltb_threshold_opts) => {
           let ltb_id = ltb_threshold_opts.id;
+          let threshold_name = ltb_threshold_opts.name;
           let threshold_level = ltb_threshold_opts.level;
-          liftof_cc::send_ltb_threshold_set(cmd_sender, ltb_id, threshold_level);
+          liftof_cc::send_ltb_threshold_set(cmd_sender, ltb_id, threshold_name, threshold_level);
         },
         SetCmd::PreampBias(preamp_bias_opts) => {
           let preamp_id = preamp_bias_opts.id;
