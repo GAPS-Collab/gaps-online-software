@@ -25,7 +25,7 @@ fn experimental_termination_seqeunce(prog_ev       : &ProgressBar,
                                      prog_b        : &ProgressBar,
                                      show_progress : bool,
                                      streamer      : &mut RBEventMemoryStreamer) {
-  info!("Calling terminatino sequence, will end current run!");
+  info!("Calling termination sequence, will end current run!");
   // just to be sure we set the self trigger rate to 0 
   // this is for the poisson trigger)
   match set_self_trig_rate(0) {
@@ -185,7 +185,7 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
         evt_cnt      = 0;
         //delta_events = 0;
         n_events     = 0;
-        rc          = new_config;
+        rc           = new_config;
         // first of all, check if the new run config is active. 
         // if not, stop all triggers
         if !rc.is_active {
@@ -199,10 +199,6 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
         }
         // we have an active run, initializing
         terminate = false;
-        //// from here on, we prepare to start 
-        //// a new run with this RunConfig!
-        //// set the channel mask
-        //reset_dma_and_buffers();
 
         // deal with the individual settings:
         // first buffer size
@@ -217,11 +213,11 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
           uio2_total_size = buffer_trip;
         }
         
-        let mut tof_op_mode = TofOperationMode::RequestReply;
-        if rc.stream_any {
-          tof_op_mode = TofOperationMode::StreamAny;
-        }
-        match opmode_to_cache.send(tof_op_mode) {
+        //let mut tof_op_mode = TofOperationMode::RequestReply;
+        //if rc.stream_any {
+        //  tof_op_mode = TofOperationMode::StreamAny;
+        //}
+        match opmode_to_cache.send(rc.tof_op_mode.clone()) {
           Err(err) => {
             error!("Unable to send TofOperationMode to the event cache! Err {err}");
           }
@@ -371,8 +367,8 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
       // calculate current event count
       if !force_trigger {
         // this checks if we have seen a new event
-        match get_event_count_mt() {
-        //match get_event_count() {
+        //match get_event_count_mt() {
+        match get_event_count() {
           Err (err) => {
             error!("Can not obtain event count! Err {:?}", err);
             continue;
@@ -617,11 +613,11 @@ pub fn experimental_runner(run_config              : &Receiver<RunConfig>,
           uio2_total_size = buffer_trip;
         }
         
-        let mut tof_op_mode = TofOperationMode::RequestReply;
-        if rc.stream_any {
-          tof_op_mode = TofOperationMode::StreamAny;
-        }
-        match opmode_to_cache.send(tof_op_mode) {
+        //let mut tof_op_mode = TofOperationMode::RequestReply;
+        //if rc.stream_any {
+        //  tof_op_mode = TofOperationMode::StreamAny;
+        //}
+        match opmode_to_cache.send(rc.tof_op_mode.clone()) {
           Err(err) => {
             error!("Unable to send TofOperationMode to the event cache! Err {err}");
           }
