@@ -42,8 +42,10 @@ pub mod analysis;
 use std::collections::HashMap;
 
 /// A type for the master trigger mappings
-pub type DsiLtbRBMapping = HashMap<u8,HashMap<u8,HashMap<u8,(u8,u8)>>>;
+pub type DsiLtbRBMapping      = HashMap<u8,HashMap<u8,HashMap<u8,(u8,u8)>>>;
 
+/// A type for the mappings of RB channels - paddle ids
+pub type RBChannelPaddleIDMap = HashMap<u8,u8>;
 
 /// Create structures filled with random 
 /// number to be used for testing and 
@@ -53,25 +55,4 @@ pub trait FromRandom {
   fn from_random() -> Self;
 }
 
-/// Representation of 32 bit mask 
-pub struct BitMask32 {
-}
 
-impl BitMask32 {
-  const LENGTH: usize = 32;
-  
-  /// A boolean array representation of the Bitmask
-  pub fn decode(bitmask : u32) -> [bool;BitMask32::LENGTH] {
-    let mut decoded_mask = [false;BitMask32::LENGTH];
-    // FIXME this implicitly asserts that the fields for non available LTBs 
-    // will be 0 and all the fields will be in order
-    for n in 0..BitMask32::LENGTH {
-      let mask = 1 << n;
-      let bit_is_set = (mask & bitmask) > 0;
-      decoded_mask[BitMask32::LENGTH-1 - n] = bit_is_set;
-    }
-    decoded_mask
-  }
-}
-
-// TODO is this used tho? Sometimes you explicitly do that. One might want to generalise this fn to adapt to different scenarios or remove it completely
