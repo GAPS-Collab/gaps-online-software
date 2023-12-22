@@ -1,8 +1,10 @@
 use crate::errors::SerializationError;
-use crate::serialization::{parse_u8,
-                           parse_u16,
-                           parse_u32,
-                           Serialization};
+use crate::serialization::{
+    parse_u8,
+    parse_u16,
+    parse_u32,
+    Serialization
+};
 use std::fmt;
 
 #[cfg(feature="random")]
@@ -15,7 +17,7 @@ use rand::Rng;
 ///
 /// Results of the (online) waveform analysis
 ///
-/// a and b are the different ends of the paddle
+/// A and B are the different ends of the paddle
 ///
 #[derive(Debug,Copy,Clone,PartialEq)]
 pub struct TofHit {
@@ -35,31 +37,35 @@ pub struct TofHit {
 
   // this might be not needed, 
   // unsure
-  pub timestamp_32    : u32,
-  pub timestamp_16    : u16,
+  pub timestamp32   : u32,
+  pub timestamp16   : u16,
 
   // fields which won't get 
   // serialized
   pub valid        : bool,
 }
 
+impl Default for TofHit {
+  fn default() -> Self {
+    Self::new()
+  }
+}
+
 impl fmt::Display for TofHit {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     write!(f, "<TofHit:
-            \t VALID         {},   
-            \t time_a        {},   
-            \t time_b        {},   
-            \t peak_a        {},   
-            \t peak_b        {},   
-            \t charge_a      {},   
-            \t charge_b      {},   
-            \t charge_min_i  {},   
-            \t pos_across    {},   
-            \t t_average     {},   
-            \t ctr_etx       {},   
-            \t timestamp_32  {},  
-            \t timestamp_16  {}>", 
-            self.valid,
+  Peak:
+    LE Time A/B   {} {}   
+    Height  A/B   {} {}
+    Charge  A/B   {} {}
+  charge_min_i    {}   
+  pos_across      {}   
+  t_average       {}   
+  ctr_etx         {}   
+  timestamp32     {}  
+  timestamp16     {}
+  |-> timestamp48 {}
+  VALID           {}>", 
             self.time_a,
             self.time_b,
             self.peak_a,
@@ -70,8 +76,11 @@ impl fmt::Display for TofHit {
             self.pos_across,
             self.t_average,
             self.ctr_etx,
-            self.timestamp_32,
-            self.timestamp_16)
+            self.timestamp32,
+            self.timestamp16,
+            self.get_timestamp48(),
+            self.valid,
+            )
   }
 }
 
@@ -102,9 +111,9 @@ impl Serialization for TofHit {
     bytestream.extend_from_slice(&self.pos_across  .to_le_bytes()); 
     bytestream.extend_from_slice(&self.t_average   .to_le_bytes()); 
     bytestream.push(self.ctr_etx); 
-    bytestream.extend_from_slice(&self.timestamp_32   .to_le_bytes());
-    bytestream.extend_from_slice(&self.timestamp_16   .to_le_bytes());
-    bytestream.extend_from_slice(&Self::TAIL        .to_le_bytes()); 
+    bytestream.extend_from_slice(&self.timestamp32 .to_le_bytes());
+    bytestream.extend_from_slice(&self.timestamp16 .to_le_bytes());
+    bytestream.extend_from_slice(&Self::TAIL       .to_le_bytes()); 
     bytestream
   }
 
@@ -133,8 +142,8 @@ impl Serialization for TofHit {
     pp.pos_across    = parse_u16(stream, pos);
     pp.t_average     = parse_u16(stream, pos);
     pp.ctr_etx       = parse_u8(stream, pos);
-    pp.timestamp_32  = parse_u32(stream, pos);
-    pp.timestamp_16  = parse_u16(stream, pos);
+    pp.timestamp32   = parse_u32(stream, pos);
+    pp.timestamp16   = parse_u16(stream, pos);
     *pos += 2; // always have to do this when using verify fixed
     Ok(pp)
   }
@@ -158,11 +167,15 @@ impl TofHit {
          pos_across   : 0,
          t_average    : 0,
          ctr_etx      : 0,
-         timestamp_32 : 0,
-         timestamp_16 : 0,
+         timestamp32  : 0,
+         timestamp16  : 0,
          // non-serialize fields
          valid        : true,
     }
+  }
+
+  pub fn get_timestamp48(&self) -> u64 {
+    ((self.timestamp16 as u64) << 32) | self.timestamp32 as u64
   }
 
   pub fn set_peak_a(&mut self, peak : f32 ) {
@@ -232,8 +245,8 @@ impl TofHit {
     pp.pos_across   = rng.gen::<u16>();
     pp.t_average    = rng.gen::<u16>();
     pp.ctr_etx      = rng.gen::<u8>();
-    pp.timestamp_32 = rng.gen::<u32>();
-    pp.timestamp_16 = rng.gen::<u16>();
+    pp.timestamp32  = rng.gen::<u32>();
+    pp.timestamp16  = rng.gen::<u16>();
     pp
   }
 }
