@@ -1,10 +1,19 @@
-use std::time::{Duration, Instant};
+use std::time::{
+    Duration,
+    Instant
+};
+use std::sync::{
+    Arc,
+    Mutex,
+};
+
 use std::thread;
 
 use crossbeam_channel::Sender;
 
 use tof_dataclasses::monitoring::RBMoniData;
 use tof_dataclasses::packets::TofPacket;
+use tof_dataclasses::threading::ThreadControl;
 
 cfg_if::cfg_if! {
   if #[cfg(feature = "tofcontrol")]  {
@@ -33,12 +42,23 @@ use crate::control::{get_board_id,
 pub fn monitoring(ch               : &Sender<TofPacket>,
                   moni_interval_l1 : Duration,
                   moni_interval_l2 : Duration,
-                  verbose          : bool) {
+                  verbose          : bool,
+                  thread_control   : Arc<Mutex<ThreadControl>>) {
  
   let board_id           = get_board_id().unwrap_or(0); 
   let mut moni_timer_l1  = Instant::now();
   let mut moni_timer_l2  = Instant::now();
   loop {
+    match thread_control.lock() {
+      Ok(_) => {
+        info!("Received stop signal. Will stop thread!");
+        break;
+      },
+      Err(err) => {
+        trace!("Can't acquire lock! {err}");
+      },
+    }
+
     if moni_timer_l1.elapsed() > moni_interval_l1 {
       error!("L1 monitoring not implemented yet!");
       moni_timer_l1 = Instant::now();

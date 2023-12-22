@@ -6,6 +6,11 @@ use std::fs::OpenOptions;
 use std::ffi::OsString;
 use std::fs::File;
 use std::io::Write;
+use std::time::Instant;
+use std::sync::{
+    Arc,
+    Mutex,
+};
 
 use crossbeam_channel::Receiver;
 
@@ -16,6 +21,8 @@ use liftof_lib::DATAPORT;
 use tof_dataclasses::events::{RBEvent,
                               DataType};
 use tof_dataclasses::serialization::Serialization;
+use tof_dataclasses::threading::ThreadControl;
+
 use crate::api::{
     //prefix_board_id,
     prefix_board_id_noquery,
@@ -58,7 +65,8 @@ pub fn data_publisher(data           : &Receiver<TofPacket>,
                       write_to_disk  : bool,
                       file_suffix    : Option<&str> ,
                       testing        : bool,
-                      print_packets  : bool) {
+                      print_packets  : bool,
+                      thread_control : Arc<Mutex<ThreadControl>>) {
   let mut address_ip = String::from("tcp://");
   let this_board_ip = local_ip().expect("Unable to obtainl local board IP. Something is messed up!");
   let data_port    = DATAPORT;
@@ -131,7 +139,24 @@ pub fn data_publisher(data           : &Receiver<TofPacket>,
   if board_id == 0 {
     error!("We could not get the board id!");
   }
+  let mut sigint_received = false;
+  let mut kill_timer      = Instant::now();
   loop {
+    // check if we should end this
+    if sigint_received && kill_timer.elapsed().as_secs() > 10 {
+      info!("Kill timer expired. Ending thread!");
+      break;
+    }
+    match thread_control.lock() {
+      Ok(_) => {
+        info!("Received stop signal. Will stop thread!");
+        sigint_received = true;
+        kill_timer      = Instant::now();
+      },
+      Err(err) => {
+        trace!("Can't acquire lock! {err}");
+      },
+    }
     let mut data_type = DataType::Unknown;
     match data.recv() {
       Err(err) => trace!("Error receiving TofPacket {err}"),

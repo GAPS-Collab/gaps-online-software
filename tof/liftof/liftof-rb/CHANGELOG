@@ -1,5 +1,23 @@
 # NIUHI series
 
+## v0.8.6
+* logo show to welcome user
+* adapting to upstream changes in RunConfig
+* New TofOperationMode RBHighThroughput will
+  allow to just forward RB buffer content 
+  without reading it
+* removes -n command line argument. Just use
+  the number of events from the config file
+* adds --listen flag. If this instance should
+  listen to the central cc server, then add
+  --listen. This flag needs to be set to be
+  able to receive commands, e.g. run start/stop
+  signals
+* change to named threads instead of ThreadPool.
+  RATIONALE: More fine grained control, possibility
+  for heatrbeat, naming allows easier debugging in 
+  case a thread panics.
+
 ## v0.8.5
 * removes event cache
 * performance boost

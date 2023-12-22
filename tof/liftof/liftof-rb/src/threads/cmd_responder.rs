@@ -1,4 +1,9 @@
 use std::path::Path;
+use std::sync::{
+    Arc,
+    Mutex,
+};
+
 //use std::time::Instant;
 use crossbeam_channel::Sender;
 
@@ -9,16 +14,21 @@ use tof_dataclasses::packets::{TofPacket,
 use tof_dataclasses::run::RunConfig;
 
 use tof_dataclasses::serialization::Serialization;
+use tof_dataclasses::threading::ThreadControl;
+
 #[cfg(feature="tofcontrol")]
 use tof_dataclasses::constants::{MASK_CMD_8BIT,
                                  MASK_CMD_16BIT,
                                  MASK_CMD_24BIT,
                                  MASK_CMD_32BIT};
 
-use crate::api::{get_runconfig, DATAPORT};
-use crate::api::prefix_board_id;
+use crate::api::{
+    rb_calibration,
+    get_runconfig,
+    prefix_board_id,
+    DATAPORT
+};
 #[cfg(feature="tofcontrol")]
-use crate::api::rb_calibration;
 use crate::control::get_board_id_string;
 use liftof_lib::build_tcp_from_ip;
 
@@ -29,14 +39,18 @@ use liftof_lib::build_tcp_from_ip;
 ///
 /// # Arguments
 ///
-/// cmd_server_ip             : The IP addresss of the C&C server we are listening to.
-/// heartbeat_timeout_seconds : If we don't hear from the C&C server in this amount of 
-///                             seconds, we try to reconnect.
+/// * cmd_server_ip             : The IP addresss of the C&C server we are listening to.
+/// * run_config_file           : The default runconfig file. When we receive a simple
+///                               DataRunStartCommand, we will run this configuration
+/// * run_config                : A sender to send the dedicated run config to the 
+///                               runner
+/// * ev_request_to_cache       : When receiveing RBCommands which contain requests,
+///                               forward them to event processing.
 pub fn cmd_responder(cmd_server_ip             : String,
-                     //heartbeat_timeout_seconds : u32,
                      run_config_file           : &Path,
                      run_config                : &Sender<RunConfig>,
-                     ev_request_to_cache       : &Sender<TofPacket>) {
+                     ev_request_to_cache       : &Sender<TofPacket>,
+                     thread_control            : Arc<Mutex<ThreadControl>>) {
   // create 0MQ sockedts
   //let one_milli       = time::Duration::from_millis(1);
   let port = DATAPORT.to_string();
@@ -79,39 +93,15 @@ pub fn cmd_responder(cmd_server_ip             : String,
   //warn!("TODO: Heartbeat feature not yet implemented on C&C side");
   //let heartbeat_received = false;
   loop {
-    //if !heartbeat_received {
-    //  trace!("No heartbeat since {}", heartbeat.elapsed().as_secs());
-    //  if heartbeat.elapsed().as_secs() > heartbeat_timeout_seconds as u64 {
-    //    warn!("No heartbeat received since {heartbeat_timeout_seconds}. Attempting to reconnect!");
-    //    match cmd_socket.connect(&cmd_address) {
-    //      Err(err) => {
-    //        error!("Not able to connect to {}, Error {err}", cmd_address);
-    //        is_connected = false;
-    //      }
-    //      Ok(_)    => {
-    //        debug!("Connected to CnC server at {}", cmd_address);
-    //        is_connected = true;
-    //      }
-    //    }
-    //    if is_connected {
-    //      match cmd_socket.set_subscribe(&topic_broadcast.as_bytes()) {
-    //        Err(err) => error!("Can not subscribe to {topic_broadcast}, err {err}"),
-    //        Ok(_)    => ()
-    //      }
-    //      match cmd_socket.set_subscribe(&topic_board.as_bytes()) {
-    //        Err(err) => error!("Can not subscribe to {topic_board}, err {err}"),
-    //        Ok(_)    => ()
-    //      }
-    //    }
-    //    heartbeat = Instant::now();
-    //  }
-    //}
-
-    //if !is_connected {
-    //  error!("Connection to C&C server lost!");
-    //  continue;
-    //}
-
+    match thread_control.lock() {
+      Ok(_) => {
+        info!("Received stop signal. Will stop thread!");
+        break;
+      },
+      Err(err) => {
+        trace!("Can't acquire lock! {err}");
+      },
+    }
     // Not sure how to deal with the connection. Poll? Or wait blocking?
     // Or don't block? Set a timeout? I guess technically since we are not doing
     // anything else here, we can block until we get something, this saves resources.

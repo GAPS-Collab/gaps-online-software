@@ -17,6 +17,13 @@ pub struct ThreadControl {
   pub stop_flag: bool,
 }
 
+impl ThreadControl {
+  pub fn new() -> Self {
+    Self {
+      stop_flag : false,
+    }
+  }
+}
 
 enum Message {
   NewJob(Job),

@@ -1,6 +1,9 @@
 use std::thread;
 use std::time::Duration;
-//use std::collections::VecDeque;
+use std::sync::{
+    Arc,
+    Mutex,
+};
 
 use crossbeam_channel::{Sender,
                         Receiver};
@@ -12,6 +15,7 @@ use tof_dataclasses::packets::{
     PacketType
 };
 use tof_dataclasses::io::RBEventMemoryStreamer;
+use tof_dataclasses::threading::ThreadControl;
 use tof_dataclasses::commands::{
     RBCommand,
     TofOperationMode,
@@ -31,18 +35,32 @@ use tof_dataclasses::commands::{
 ///  * bs_recv     : A receiver for bytestreams. The 
 ///                  bytestream comes directly from 
 ///                  the data buffers.
+///  * get_op_mode : The TOF operation mode. Typically,
+///                  this is "StreamAny", meaning that 
+///                  whatever the TOF produceds, it gets
+///                  wrapped in TofPackets and send away.
+///                  In "RequestReply" mode, liftof-rb
+///                  waits for event requests sent by 
+///                  a third party
 ///  * tp_sender   : Send the resulting data product to 
 ///                  get processed further
 ///  * data_type   : If different from 0, do some processing
 ///                  on the data read from memory
-///
+///  * verbose     : More output to the console for debugging
+///  * calc_crc32  : Calucalate crc32 checksum for the channel
+///                  packet. Remember, this might impact 
+///                  performance
 pub fn event_processing(tp_recv           : &Receiver<TofPacket>,
                         bs_recv           : &Receiver<Vec<u8>>,
                         get_op_mode       : &Receiver<TofOperationMode>, 
                         tp_sender         : &Sender<TofPacket>,
                         dtf_fr_runner     : &Receiver<DataType>,
                         verbose           : bool,
-                        calc_crc32        : bool) {
+                        calc_crc32        : bool,
+                        thread_control    : Arc<Mutex<ThreadControl>>) {
+  // reasonable default ? 
+  let mut op_mode = TofOperationMode::StreamAny;
+  // FIXME - deprecate!
   let mut op_mode_stream  = true;
   let mut events_not_sent : u64 = 0;
   let mut data_type       : DataType   = DataType::Unknown;
@@ -56,10 +74,21 @@ pub fn event_processing(tp_recv           : &Receiver<TofPacket>,
   let mut n_request = 0;
   let ev_buff_size = 50;
   'main : loop {
+    match thread_control.lock() {
+      Ok(_) => {
+        info!("Received stop signal. Will stop thread!");
+        break;
+      },
+      Err(err) => {
+        trace!("Can't acquire lock! {err}");
+      },
+    }
+
     if !get_op_mode.is_empty() {
       match get_op_mode.try_recv() {
         Err(err) => trace!("No op mode change detected! Err {err}"),
         Ok(mode) => {
+          
           warn!("Will change operation mode to {:?}!", mode);
           match mode {
             TofOperationMode::RequestReply => {
@@ -72,6 +101,7 @@ pub fn event_processing(tp_recv           : &Receiver<TofPacket>,
             },
             _ => (),
           }
+          op_mode = mode;
         }
       }
     }
@@ -127,8 +157,8 @@ pub fn event_processing(tp_recv           : &Receiver<TofPacket>,
     if bs_recv.is_empty() {
       //println!("--> Empty bs_rec");
       // FIXME - benchmark
-      thread::sleep(one_milli);
-      continue;
+      //thread::sleep(one_milli/2);
+      continue 'main;
     }
     // this can't be blocking anymore, since 
     // otherwise we miss the datatype
@@ -162,65 +192,111 @@ pub fn event_processing(tp_recv           : &Receiver<TofPacket>,
             info!("Streamer exhausted after sending {} packets!", packets_in_stream);
             break 'event_reader;
           }
-          match streamer.next() {
-            None => {
-              if streamer.request_mode {
-                //info!("Streamer exhausted after sending {} packets!", packets_in_stream);
-                if streamer.request_cache.len() == 0 {
-                  break 'event_reader;
+          // FIXME - here we have the choice. 
+          // streamer.next() will yield the next event,
+          // decoded
+          // streamer.next_tofpacket() instead will only
+          // yield the next event, not deserialzed
+          // but wrapped already in a tofpacket
+          let mut tp_to_send = TofPacket::new();
+          match op_mode {
+            TofOperationMode::RBHighThroughput => {
+              match streamer.next_tofpacket() {
+                None => {
+                  streamer.is_depleted = true;
+                  continue;
+                },
+                Some(mut tp) => {
+                  tp_to_send = tp;
                 }
-                if streamer.is_ahead_by > 0 {
-                  break;
-                }
-                //println!("Streamer behind {}", streamer.is_behind_by);
-                //println!("Streamer ahead  {}", streamer.is_ahead_by);
-                //println!("Streamer is depeleted {}", streamer.is_depleted);
-                //println!("Streamer requests {}", streamer.request_cache.len());
-                // we need to go the whole loop, so trigger streamer.is_depleted, 
-                // even though it might not
-                streamer.is_behind_by = 0;
               }
-              streamer.is_depleted = true;
-              continue;
             },
-            Some(_event) => {
-              let mut event = _event;
-              if verbose {
-                println!("{}", event);
-              }
-              if last_event_id != 0 {
-                if event.header.event_id != last_event_id + 1 {
-                  if event.header.event_id > last_event_id {
-                      skipped_events += (event.header.event_id - last_event_id) as usize;
-                  } else {
-                    error!("Something with the event counter is messed up. Got event id {}, but the last event id was {}", event.header.event_id, last_event_id);
+            TofOperationMode::StreamAny |
+            TofOperationMode::RequestReply => {
+              match streamer.next() {
+                None => {
+                  if streamer.request_mode {
+                    //info!("Streamer exhausted after sending {} packets!", packets_in_stream);
+                    if streamer.request_cache.len() == 0 {
+                      break 'event_reader;
+                    }
+                    if streamer.is_ahead_by > 0 {
+                      break;
+                    }
+                    //println!("Streamer behind {}", streamer.is_behind_by);
+                    //println!("Streamer ahead  {}", streamer.is_ahead_by);
+                    //println!("Streamer is depeleted {}", streamer.is_depleted);
+                    //println!("Streamer requests {}", streamer.request_cache.len());
+                    // we need to go the whole loop, so trigger streamer.is_depleted, 
+                    // even though it might not
+                    streamer.is_behind_by = 0;
                   }
-                }
-              }
-              last_event_id = event.header.event_id;
-              event.data_type = data_type;
-              //println!("==> Sending event with header {}", event.header);
-              let mut tp = TofPacket::from(&event);
-              // set flags
-              match data_type {
-                DataType::VoltageCalibration |
-                DataType::TimingCalibration  | 
-                DataType::Noi => {
-                  tp.no_write_to_disk = true;
+                  streamer.is_depleted = true;
+                  continue;
                 },
-                _ => ()
-              }
-              // send the packet
-              //println!("[EVENTPROC] => TofPacket to be send {}",tp);
-              match tp_sender.send(tp) {
-                Ok(_) => {
-                  packets_in_stream += 1;
+                Some(mut event) => {
+                  if last_event_id != 0 {
+                    if event.header.event_id != last_event_id + 1 {
+                      if event.header.event_id > last_event_id {
+                          skipped_events += (event.header.event_id - last_event_id) as usize;
+                      } else {
+                        error!("Something with the event counter is messed up. Got event id {}, but the last event id was {}", event.header.event_id, last_event_id);
+                      }
+                    }
+                  }
+                  last_event_id = event.header.event_id;
+                  event.data_type = data_type;
+                  if verbose {
+                    println!("[EVTPROC (verbose)] => Sending event with header {}", event.header);
+                  }
+                  tp_to_send = TofPacket::from(&event);
                 },
-                Err(err) => {
-                  error!("Problem sending TofPacket over channel! {err}");
-                  events_not_sent += 1;
-                }
-              }
+              } // end match
+            },
+            _ => {
+              error!("Operation mode {} not available yet!", op_mode);
+            }
+          }
+
+
+            //Some(_event) => {
+            //  let mut event = _event;
+            //  if verbose {
+            //    println!("{}", event);
+            //  }
+            //  if last_event_id != 0 {
+            //    if event.header.event_id != last_event_id + 1 {
+            //      if event.header.event_id > last_event_id {
+            //          skipped_events += (event.header.event_id - last_event_id) as usize;
+            //      } else {
+            //        error!("Something with the event counter is messed up. Got event id {}, but the last event id was {}", event.header.event_id, last_event_id);
+            //      }
+            //    }
+            //  }
+            //  last_event_id = event.header.event_id;
+            //  event.data_type = data_type;
+            //  //println!("==> Sending event with header {}", event.header);
+            //  let mut tp = TofPacket::from(&event);
+          if verbose {
+            println!("[EVTPROC (verbose)] => TofPacket {}", tp_to_send);
+          }
+          // set flags
+          match data_type {
+            DataType::VoltageCalibration |
+            DataType::TimingCalibration  | 
+            DataType::Noi => {
+              tp_to_send.no_write_to_disk = true;
+            },
+            _ => ()
+          }
+          // send the packet
+          match tp_sender.send(tp_to_send) {
+            Ok(_) => {
+              packets_in_stream += 1;
+            },
+            Err(err) => {
+              error!("Problem sending TofPacket over channel! {err}");
+              events_not_sent += 1;
             }
           }
         }
