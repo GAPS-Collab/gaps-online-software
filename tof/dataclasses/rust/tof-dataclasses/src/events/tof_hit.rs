@@ -12,6 +12,47 @@ extern crate rand;
 #[cfg(feature="random")]
 use rand::Rng;
 
+/// Waveform peak
+///
+/// Helper to form TofHits
+#[derive(Debug,Copy,Clone,PartialEq)]
+pub struct Peak {
+  pub paddle_end_id : u16,
+  pub time          : f32,
+  pub charge        : f32,
+  pub height        : f32
+}
+
+impl Peak {
+  pub fn new() -> Self {
+    Self {
+      paddle_end_id : 40,
+      time          : 0.0,
+      charge        : 0.0,
+      height        : 0.0,
+    }
+  }
+}
+
+impl Default for Peak {
+  fn default() -> Self {
+    Self::new()
+  }
+}
+
+impl fmt::Display for Peak {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    write!(f, "<Peak:
+  p_end_id : {}
+  time     : {}
+  charge   : {}
+  height   : {}>",
+            self.paddle_end_id,
+            self.time,
+            self.charge,
+            self.height)
+  }
+}
 
 /// Comprehensive paddle information
 ///
@@ -153,6 +194,47 @@ impl TofHit {
 
   // update Feb 2023 - add 4 byte timestamp
   pub const VERSION       : &'static str = "1.2";
+
+  /// Get the (official) paddle id
+  ///
+  /// Convert the paddle end id following 
+  /// the convention
+  ///
+  /// A-side : paddle id + 1000
+  /// B-side : paddle id + 2000
+  ///
+  /// FIXME - maybe return Result?
+  pub fn get_pid(paddle_end_id : u16) -> u8 {
+    if paddle_end_id < 1000 {
+      return 0;
+    }
+    if paddle_end_id > 2000 {
+      return (paddle_end_id - 2000) as u8;
+    }
+    if paddle_end_id < 2000 {
+      return (paddle_end_id - 1000) as u8;
+    }
+    return 0;
+  }
+
+  pub fn add_peak(&mut self, peak : &Peak)  {
+    if self.paddle_id != TofHit::get_pid(peak.paddle_end_id) {
+      //error!("Can't add peak to 
+    }
+    if peak.paddle_end_id < 1000 {
+      error!("Invalide paddle end id {}", peak.paddle_end_id);
+    }
+    if peak.paddle_end_id < 1000 {
+      self.set_time_a  (peak.time);
+      self.set_peak_a  (peak.height);
+      self.set_charge_a(peak.charge);
+    }
+    if peak.paddle_end_id > 2000 {
+      self.set_time_b  (peak.time);
+      self.set_peak_b  (peak.height);
+      self.set_charge_b(peak.charge);
+    }
+  }
 
   pub fn new() -> Self {
     Self{
