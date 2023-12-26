@@ -169,8 +169,8 @@ pub fn cfd_simple(voltages    : &Vec<f32>,
   // trace until we find a bin value less than the threshold.
   let mut lo_bin : usize = voltages.len();
   let mut n = idx;
-  if idx >= start_peak {
-    error!("The index is smaller than the beginning of the peak!");
+  if idx < start_peak {
+    error!("The index {} is smaller than the beginning of the peak {}!", idx, start_peak);
     return Err(WaveformError::OutOfRangeLowerBound);
   }
   if start_peak >= 10 {
