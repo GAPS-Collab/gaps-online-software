@@ -212,25 +212,29 @@ impl Default for RBMoniData {
 impl fmt::Display for RBMoniData {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     write!(f, "<RBMoniData:
-           \t BOARD ID {}
-           \t RATE     {}    [Hz] 
-           \t DRS TMP  {:.3} [C]
-           \t CLK TMP  {:.3} [C]
-           \t ADC TMP  {:.3} [C]
-           \t ZYNQ TMP {:.3} [C]
-           \t LIS3MDLTR TMP  {:.3} [C]  
-           \t BM280 TMP      {:.3} [C]
-           \t PRESSURE      {:.3} [hPa]
-           \t HUMIDITY       {:.3} [%]
-           \t MAG_X , MAG_Y, MAG_Z, MAG_TOT: {:.3} [G] | {:.3} [G] | {:.3} [G] | {:.3} [G]
-           \t ZYNQ 3.3V         Power:  {:.3}  [V] | {:.3} [A] | {:.3} [W]
-           \t 3.3V              Power:  {:.3}  [V] | {:.3} [A] | {:.3} [W]
-           \t 3.5V              Power:  {:.3}  [V] | {:.3} [A] | {:.3} [W]
-           \t -1.5V             Power:  {:.3}  [V] | {:.3} [A] | {:.3} [W]
-           \t DRS4 Digital 2.5V Power:  {:.3}  [V] | {:.3} [A] | {:.3} [W]
-           \t DRS4 Analog 2.5V  Power:  {:.3}  [V] | {:.3} [A] | {:.3} [W]
-           \t ADC Digital 2.5V  Power:  {:.3}  [V] | {:.3} [A] | {:.3} [W]
-           \t ADC Analog 3.0V   Power:  {:.3}  [V] | {:.3} [A] | {:.3} [W]>",
+  BOARD ID       {}
+  RATE           {}    [Hz] 
+  ** Temperatures **
+  DRS TMP        {:.3} [C]
+  CLK TMP        {:.3} [C]
+  ADC TMP        {:.3} [C]
+  ZYNQ TMP       {:.3} [C]
+  LIS3MDLTR TMP  {:.3} [C]  
+  BM280 TMP      {:.3} [C]
+  ** Ambience **
+  PRESSURE       {:.3} [hPa]
+  HUMIDITY       {:.3} [%]
+  MAG_X , MAG_Y, MAG_Z, MAG_TOT:
+   |->  {:.3} [G] | {:.3} [G] | {:.3} [G] | {:.3} [G]
+  ** Power **
+  ZYNQ 3.3V         Power:  {:.3}  [V] | {:.3} [A] | {:.3} [W]
+  3.3V              Power:  {:.3}  [V] | {:.3} [A] | {:.3} [W]
+  3.5V              Power:  {:.3}  [V] | {:.3} [A] | {:.3} [W]
+  -1.5V             Power: {:.3}  [V] | {:.3} [A] | {:.3} [W]
+  DRS4 Digital 2.5V Power:  {:.3}  [V] | {:.3} [A] | {:.3} [W]
+  DRS4 Analog 2.5V  Power:  {:.3}  [V] | {:.3} [A] | {:.3} [W]
+  ADC Digital 2.5V  Power:  {:.3}  [V] | {:.3} [A] | {:.3} [W]
+  ADC Analog 3.0V   Power:  {:.3}  [V] | {:.3} [A] | {:.3} [W]>",
            self.board_id        , 
            self.rate            ,
            self.tmp_drs         ,
