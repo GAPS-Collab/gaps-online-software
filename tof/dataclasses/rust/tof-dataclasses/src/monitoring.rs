@@ -11,13 +11,12 @@ use std::fmt;
 
 // Takeru's tof-control code
 #[cfg(feature = "tof-control")]
-use tof_control::rb_control::rb_temp::RBtemp;
-#[cfg(feature = "tof-control")]
-use tof_control::rb_control::rb_mag::RBmag;
-#[cfg(feature = "tof-control")]
-use tof_control::rb_control::rb_vcp::RBvcp;
-#[cfg(feature = "tof-control")]
-use tof_control::rb_control::rb_ph::RBph;
+use tof_control::helper::rb_type::{
+    RBTemp,
+    RBMag,
+    RBVcp,
+    RBPh,
+};
 
 #[cfg(feature = "random")]
 use crate::FromRandom;
@@ -78,6 +77,7 @@ pub struct RBMoniData {
   pub mag_x              : f32,
   pub mag_y              : f32,
   pub mag_z              : f32,
+  #[deprecated(note="This is only the vector sum of the individual components!")]
   pub mag_tot            : f32,
   pub drs_dvdd_voltage   : f32, 
   pub drs_dvdd_current   : f32,
@@ -108,53 +108,55 @@ pub struct RBMoniData {
 impl RBMoniData {
 
   #[cfg(feature = "tof-control")]
-  pub fn add_rbtemp(&mut self, rb_temp : &RBtemp) {
+  pub fn add_rbtemp(&mut self, rb_temp : &RBTemp) {
     self.tmp_drs         = rb_temp.drs_temp      ; 
     self.tmp_clk         = rb_temp.clk_temp      ; 
     self.tmp_adc         = rb_temp.adc_temp      ; 
     self.tmp_zynq        = rb_temp.zynq_temp     ; 
-    self.tmp_lis3mdltr   = rb_temp.lis3mdltr_temp; 
-    self.tmp_bm280       = rb_temp.bme280_temp   ; 
+    //FIXME - this is on tof-control
+    //self.tmp_lis3mdltr   = rb_temp.lis3mdltr_temp; 
+    //self.tmp_bm280       = rb_temp.bme280_temp   ; 
   }
 
   #[cfg(feature = "tof-control")] 
-  pub fn add_rbmag(&mut self, rb_mag   : &RBmag) {
-    self.mag_x   = rb_mag.magnetic_x;
-    self.mag_y   = rb_mag.magnetic_y;
-    self.mag_z   = rb_mag.magnetic_z;
-    self.mag_tot = rb_mag.magnetic_t;
+  pub fn add_rbmag(&mut self, rb_mag   : &RBMag) {
+    self.mag_x   = rb_mag.mag_xyz[0];
+    self.mag_y   = rb_mag.mag_xyz[1];
+    self.mag_z   = rb_mag.mag_xyz[2];
+    // deprecated field!
+    //self.mag_tot = rb_mag.magnetic_t;
   }
   
   #[cfg(feature = "tof-control")]
-  pub fn add_rbvcp(&mut self, rb_vcp   : &RBvcp) {
-    self.drs_dvdd_voltage = rb_vcp.drs_dvdd_voltage ;
-    self.drs_dvdd_current = rb_vcp.drs_dvdd_current ;
-    self.drs_dvdd_power   = rb_vcp.drs_dvdd_power   ;
-    self.p3v3_voltage     = rb_vcp.p3v3_voltage     ;
-    self.p3v3_current     = rb_vcp.p3v3_current     ;
-    self.p3v3_power       = rb_vcp.p3v3_power       ;
-    self.zynq_voltage     = rb_vcp.zynq_voltage     ;
-    self.zynq_current     = rb_vcp.zynq_current     ;
-    self.zynq_power       = rb_vcp.zynq_power       ;
-    self.p3v5_voltage     = rb_vcp.p3v5_voltage     ;
-    self.p3v5_current     = rb_vcp.p3v5_current     ;
-    self.p3v5_power       = rb_vcp.p3v5_power       ;
-    self.adc_dvdd_voltage = rb_vcp.adc_dvdd_voltage ;
-    self.adc_dvdd_current = rb_vcp.adc_dvdd_current ;
-    self.adc_dvdd_power   = rb_vcp.adc_dvdd_power   ;
-    self.adc_avdd_voltage = rb_vcp.adc_avdd_voltage ;
-    self.adc_avdd_current = rb_vcp.adc_avdd_current ;
-    self.adc_avdd_power   = rb_vcp.adc_avdd_power   ;
-    self.drs_avdd_voltage = rb_vcp.drs_avdd_voltage ;
-    self.drs_avdd_current = rb_vcp.drs_avdd_current ;
-    self.drs_avdd_power   = rb_vcp.drs_avdd_power   ;
-    self.n1v5_voltage     = rb_vcp.n1v5_voltage     ;
-    self.n1v5_current     = rb_vcp.n1v5_current     ;
-    self.n1v5_power       = rb_vcp.n1v5_power       ;
+  pub fn add_rbvcp(&mut self, rb_vcp   : &RBVcp) {
+    self.drs_dvdd_voltage = rb_vcp.drs_dvdd_vcp[0] ;
+    self.drs_dvdd_current = rb_vcp.drs_dvdd_vcp[1] ;
+    self.drs_dvdd_power   = rb_vcp.drs_dvdd_vcp[2] ;
+    self.p3v3_voltage     = rb_vcp.p3v3_vcp[0]  ;
+    self.p3v3_current     = rb_vcp.p3v3_vcp[1]  ;
+    self.p3v3_power       = rb_vcp.p3v3_vcp[2]  ;
+    self.zynq_voltage     = rb_vcp.zynq_vcp[0]  ;
+    self.zynq_current     = rb_vcp.zynq_vcp[1]  ;
+    self.zynq_power       = rb_vcp.zynq_vcp[2]  ;
+    self.p3v5_voltage     = rb_vcp.p3v5_vcp[0]  ;
+    self.p3v5_current     = rb_vcp.p3v5_vcp[1]  ;
+    self.p3v5_power       = rb_vcp.p3v5_vcp[2]  ;
+    self.adc_dvdd_voltage = rb_vcp.adc_dvdd_vcp[0] ;
+    self.adc_dvdd_current = rb_vcp.adc_dvdd_vcp[1] ;
+    self.adc_dvdd_power   = rb_vcp.adc_dvdd_vcp[2] ;
+    self.adc_avdd_voltage = rb_vcp.adc_avdd_vcp[0]  ;
+    self.adc_avdd_current = rb_vcp.adc_avdd_vcp[1]  ;
+    self.adc_avdd_power   = rb_vcp.adc_avdd_vcp[2]  ;
+    self.drs_avdd_voltage = rb_vcp.drs_avdd_vcp[0]  ;
+    self.drs_avdd_current = rb_vcp.drs_avdd_vcp[1]  ;
+    self.drs_avdd_power   = rb_vcp.drs_avdd_vcp[2]  ;
+    self.n1v5_voltage     = rb_vcp.n1v5_vcp[0]      ;
+    self.n1v5_current     = rb_vcp.n1v5_vcp[1]      ;
+    self.n1v5_power       = rb_vcp.n1v5_vcp[2]      ;
   }
   
   #[cfg(feature = "tof-control")] 
-  pub fn add_rbph(&mut self, rb_ph   : &RBph) {
+  pub fn add_rbph(&mut self, rb_ph   : &RBPh) {
     self.pressure = rb_ph.pressure;
     self.humidity = rb_ph.humidity;
   }
@@ -433,7 +435,7 @@ impl Serialization for RBMoniData {
     moni_data.n1v5_voltage       = parse_f32(&stream, pos); 
     moni_data.n1v5_current       = parse_f32(&stream, pos); 
     moni_data.n1v5_power         = parse_f32(&stream, pos); 
-    *pos += 2;
+    *pos += 2; // for tail
     Ok(moni_data) 
   }
 }

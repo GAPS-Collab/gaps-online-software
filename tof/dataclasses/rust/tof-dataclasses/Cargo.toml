@@ -28,12 +28,11 @@ criterion = "0.4"
 [dependencies]
 # logging
 log  = "0.4"
-#pretty_env_logger = "0.4"
 rand = {version = "0.8", optional = true}
 json = "0.12" 
 #statrs = "0.14"
 # Takeru's tof-control
-tof-control = {path = "../../../extern/tof-control", optional = true, version = "0.2", features=[] }
+tof-control = {path = "../../../extern/tof-control", optional = true, version = "0.3", features=[] }
 smoothed_z_score = {version = "0.1", optional = true}
 sqlite = {version = "0.30", optional = true}
 statistical = "1.0"

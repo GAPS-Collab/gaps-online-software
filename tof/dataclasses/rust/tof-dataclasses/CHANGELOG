@@ -1,5 +1,14 @@
 # NIUHI series
 
+## 0.8.4
+* updates to tof-control main branch and version 0.3
+* mag_tot in RBMoniData is now deprecated. It was just
+  the vectorsum of mag_x, mag_y, mag_z
+
+## 0.8.3
+* deprecates TofOperationMode::StreamAny, TofOperationMode::RequestReply
+* fixes critical bug in RBEventMemoryViewStreamer
+
 ## 0.8.2
 * fixes timing bin width bug in RBCalibration (tbins exhibit a mean of 0.488
   now) 
