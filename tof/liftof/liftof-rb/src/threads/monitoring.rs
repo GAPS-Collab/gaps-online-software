@@ -15,14 +15,14 @@ use tof_dataclasses::monitoring::RBMoniData;
 use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::threading::ThreadControl;
 
-cfg_if::cfg_if! {
-  if #[cfg(feature = "tofcontrol")]  {
-    use tof_control::rb_control::rb_temp::RBtemp;
-    use tof_control::rb_control::rb_mag::RBmag;
-    use tof_control::rb_control::rb_vcp::RBvcp;
-    use tof_control::rb_control::rb_ph::RBph;
-  }
-}
+// Takeru's tof-control code
+#[cfg(feature = "tof-control")]
+use tof_control::helper::rb_type::{
+    RBTemp,
+    RBMag,
+    RBVcp,
+    RBPh,
+};
 
 
 use crate::control::{get_board_id,
@@ -50,9 +50,11 @@ pub fn monitoring(ch               : &Sender<TofPacket>,
   let mut moni_timer_l2  = Instant::now();
   loop {
     match thread_control.lock() {
-      Ok(_) => {
-        info!("Received stop signal. Will stop thread!");
-        break;
+      Ok(tc) => {
+        if tc.stop_flag {
+          info!("Received stop signal. Will stop thread!");
+          break;
+        }
       },
       Err(err) => {
         trace!("Can't acquire lock! {err}");
@@ -69,10 +71,10 @@ pub fn monitoring(ch               : &Sender<TofPacket>,
       moni_dt.board_id = board_id as u8; 
       cfg_if::cfg_if! {
         if #[cfg(feature = "tofcontrol")]  {
-          let rb_temp = RBtemp::new();
-          let rb_mag  = RBmag::new();
-          let rb_vcp  = RBvcp::new();
-          let rb_ph   = RBph::new();
+          let rb_temp = RBTemp::new();
+          let rb_mag  = RBMag::new();
+          let rb_vcp  = RBVcp::new();
+          let rb_ph   = RBPh::new();
           moni_dt.add_rbtemp(&rb_temp);
           moni_dt.add_rbmag(&rb_mag);
           moni_dt.add_rbvcp(&rb_vcp);
