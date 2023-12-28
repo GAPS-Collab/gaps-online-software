@@ -1035,6 +1035,10 @@ impl RBCalibrations {
       error!("There is no channel larger than 9 and no channel 0! Channel {channel} was requested. Can not perform voltage calibration!");
       return;
     }
+    if adc.len() != waveform.len() {
+      error!("Input len {} and output len {} don't match!", adc.len(), waveform.len());
+      return;
+    }
 
     let mut value : f32; 
     for k in 0..NWORDS {
