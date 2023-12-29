@@ -26,14 +26,207 @@ extern crate rand;
 use rand::Rng;
 
 
-use crate::serialization::{Serialization,
-                           SerializationError,
-                           search_for_u16,
-                           parse_u8,
-                           parse_u16,
-                           parse_f32};
+use crate::serialization::{
+    Serialization,
+    SerializationError,
+    search_for_u16,
+    parse_u8,
+    parse_u16,
+    parse_f32
+};
 
-//use crate::errors::SensorError;
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub struct PBMoniData {
+  pub board_id       : u8,
+  pub p3v6_preamp_vcp: [f32; 3],
+  pub n1v6_preamp_vcp: [f32; 3],
+  pub p3v4f_ltb_vcp  : [f32; 3],
+  pub p3v4d_ltb_vcp  : [f32; 3],
+  pub p3v6_ltb_vcp   : [f32; 3],
+  pub n1v6_ltb_vcp   : [f32; 3],
+  pub pds_temp       : f32,
+  pub pas_temp       : f32,
+  pub nas_temp       : f32,
+  pub shv_temp       : f32,
+}
+
+impl PBMoniData {
+  pub fn new() -> Self {
+    Self {
+      board_id       : 0,
+      p3v6_preamp_vcp: [f32::MAX, f32::MAX, f32::MAX],
+      n1v6_preamp_vcp: [f32::MAX, f32::MAX, f32::MAX],
+      p3v4f_ltb_vcp  : [f32::MAX, f32::MAX, f32::MAX],
+      p3v4d_ltb_vcp  : [f32::MAX, f32::MAX, f32::MAX],
+      p3v6_ltb_vcp   : [f32::MAX, f32::MAX, f32::MAX],
+      n1v6_ltb_vcp   : [f32::MAX, f32::MAX, f32::MAX],
+      pds_temp       : f32::MAX,
+      pas_temp       : f32::MAX,
+      nas_temp       : f32::MAX,
+      shv_temp       : f32::MAX,
+    }
+  }
+}
+
+impl Default for PBMoniData {
+  fn default() -> Self {
+    Self::new()
+  }
+}
+
+impl fmt::Display for PBMoniData {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    write!(f, "<PBMoniData:
+  BOARD ID     :  {}
+  ** Temperatures **
+  PDS TMP      :  {:.2} [C]
+  PAS TMP      :  {:.2} [C]
+  NAS TMP      :  {:.2} [C]
+  SHV TMP      :  {:.2} [C]
+  ** Power **
+  P3V6  Preamp :  {:.3}  [V] | {:.3} [A] | {:.3} [W]
+  N1V6  Preamp : {:.3}  [V] | {:.3} [A] | {:.3} [W]
+  P3V4f LTB    :  {:.3}  [V] | {:.3} [A] | {:.3} [W]
+  P3V4d LTB    :  {:.3}  [V] | {:.3} [A] | {:.3} [W]
+  P3V6  LTB    :  {:.3}  [V] | {:.3} [A] | {:.3} [W]
+  N1V6  LTB    : {:.3}  [V] | {:.3} [A] | {:.3} [W]>",
+           self.board_id        , 
+           self.pds_temp        ,
+           self.pas_temp        ,
+           self.nas_temp        ,
+           self.shv_temp        ,
+           self.p3v6_preamp_vcp[0],
+           self.p3v6_preamp_vcp[1],
+           self.p3v6_preamp_vcp[2],
+           self.n1v6_preamp_vcp[0],
+           self.n1v6_preamp_vcp[1],
+           self.n1v6_preamp_vcp[2],
+           self.p3v4f_ltb_vcp[0]  ,
+           self.p3v4f_ltb_vcp[1]  ,
+           self.p3v4f_ltb_vcp[2]  ,
+           self.p3v4d_ltb_vcp[0]  ,
+           self.p3v4d_ltb_vcp[1]  ,
+           self.p3v4d_ltb_vcp[2]  ,
+           self.p3v6_ltb_vcp[0]   ,
+           self.p3v6_ltb_vcp[1]   ,
+           self.p3v6_ltb_vcp[2]   ,
+           self.n1v6_ltb_vcp[0]   ,
+           self.n1v6_ltb_vcp[1]   ,
+           self.n1v6_ltb_vcp[2])
+  }
+}
+
+#[cfg(feature = "random")]
+impl FromRandom for PBMoniData {
+    
+  fn from_random() -> PBMoniData {
+    let mut moni = Self::new();
+    let mut rng = rand::thread_rng();
+    moni.board_id           = rng.gen::<u8>(); 
+    for k in 0..3 {
+      let foo = rng.gen::<f32>();
+      moni.p3v6_preamp_vcp[k] = foo;
+    }
+    for k in 0..3 {
+      let foo = rng.gen::<f32>();
+      moni.n1v6_preamp_vcp[k] = foo;
+    }
+    for k in 0..3 {
+      let foo = rng.gen::<f32>();
+      moni.p3v4f_ltb_vcp[k] = foo;
+    }
+    for k in 0..3 {
+      let foo = rng.gen::<f32>();
+      moni.p3v4d_ltb_vcp[k] = foo;
+    }
+    for k in 0..3 {
+      let foo = rng.gen::<f32>();
+      moni.p3v6_ltb_vcp[k] = foo;
+    }
+    for k in 0..3 {
+      let foo = rng.gen::<f32>();
+      moni.n1v6_ltb_vcp[k] = foo;
+    }
+    moni.pds_temp = rng.gen::<f32>(); 
+    moni.pas_temp = rng.gen::<f32>(); 
+    moni.nas_temp = rng.gen::<f32>(); 
+    moni.shv_temp = rng.gen::<f32>(); 
+    moni
+  }
+}
+
+impl Serialization for PBMoniData {
+  
+  const HEAD : u16 = 0xAAAA;
+  const TAIL : u16 = 0x5555;
+  /// The data size when serialized to a bytestream
+  /// This needs to be updated when we change the 
+  /// packet layout, e.g. add new members.
+  /// HEAD + TAIL + sum(sizeof(m) for m in _all_members_))
+  const SIZE : usize  = 89 + 4; // 4 header + footer
+  
+  fn to_bytestream(&self) -> Vec<u8> {
+    let mut stream = Vec::<u8>::with_capacity(Self::SIZE);
+    stream.extend_from_slice(&Self::HEAD.to_le_bytes());
+    stream.extend_from_slice(&self.board_id          .to_le_bytes());
+    stream.extend_from_slice(&self.p3v6_preamp_vcp[0].to_le_bytes());
+    stream.extend_from_slice(&self.p3v6_preamp_vcp[1].to_le_bytes());
+    stream.extend_from_slice(&self.p3v6_preamp_vcp[2].to_le_bytes());
+    stream.extend_from_slice(&self.n1v6_preamp_vcp[0].to_le_bytes());
+    stream.extend_from_slice(&self.n1v6_preamp_vcp[1].to_le_bytes());
+    stream.extend_from_slice(&self.n1v6_preamp_vcp[2].to_le_bytes());
+    stream.extend_from_slice(&self.p3v4f_ltb_vcp[0]  .to_le_bytes());
+    stream.extend_from_slice(&self.p3v4f_ltb_vcp[1]  .to_le_bytes());
+    stream.extend_from_slice(&self.p3v4f_ltb_vcp[2]  .to_le_bytes());
+    stream.extend_from_slice(&self.p3v4d_ltb_vcp[0]  .to_le_bytes());
+    stream.extend_from_slice(&self.p3v4d_ltb_vcp[1]  .to_le_bytes());
+    stream.extend_from_slice(&self.p3v4d_ltb_vcp[2]  .to_le_bytes());
+    stream.extend_from_slice(&self.p3v6_ltb_vcp[0]   .to_le_bytes());
+    stream.extend_from_slice(&self.p3v6_ltb_vcp[1]   .to_le_bytes());
+    stream.extend_from_slice(&self.p3v6_ltb_vcp[2]   .to_le_bytes());
+    stream.extend_from_slice(&self.n1v6_ltb_vcp[0]   .to_le_bytes());
+    stream.extend_from_slice(&self.n1v6_ltb_vcp[1]   .to_le_bytes());
+    stream.extend_from_slice(&self.n1v6_ltb_vcp[2]   .to_le_bytes());
+    stream.extend_from_slice(&self.pds_temp          .to_le_bytes());
+    stream.extend_from_slice(&self.pas_temp          .to_le_bytes());
+    stream.extend_from_slice(&self.nas_temp          .to_le_bytes());
+    stream.extend_from_slice(&self.shv_temp          .to_le_bytes());
+    stream.extend_from_slice(&Self::TAIL.to_le_bytes());
+    stream
+  } 
+
+  fn from_bytestream(stream    : &Vec<u8>, 
+                     pos       : &mut usize) 
+    -> Result<PBMoniData, SerializationError>{
+    Self::verify_fixed(stream, pos)?;
+    let mut moni            = PBMoniData::new();
+    moni.board_id           = parse_u8(stream, pos) ; 
+    moni.p3v6_preamp_vcp[0] = parse_f32(stream, pos);
+    moni.p3v6_preamp_vcp[1] = parse_f32(stream, pos);
+    moni.p3v6_preamp_vcp[2] = parse_f32(stream, pos);
+    moni.n1v6_preamp_vcp[0] = parse_f32(stream, pos);
+    moni.n1v6_preamp_vcp[1] = parse_f32(stream, pos);
+    moni.n1v6_preamp_vcp[2] = parse_f32(stream, pos);
+    moni.p3v4f_ltb_vcp[0]   = parse_f32(stream, pos);
+    moni.p3v4f_ltb_vcp[1]   = parse_f32(stream, pos);
+    moni.p3v4f_ltb_vcp[2]   = parse_f32(stream, pos);
+    moni.p3v4d_ltb_vcp[0]   = parse_f32(stream, pos);
+    moni.p3v4d_ltb_vcp[1]   = parse_f32(stream, pos);
+    moni.p3v4d_ltb_vcp[2]   = parse_f32(stream, pos);
+    moni.p3v6_ltb_vcp[0]    = parse_f32(stream, pos);
+    moni.p3v6_ltb_vcp[1]    = parse_f32(stream, pos);
+    moni.p3v6_ltb_vcp[2]    = parse_f32(stream, pos);
+    moni.n1v6_ltb_vcp[0]    = parse_f32(stream, pos);
+    moni.n1v6_ltb_vcp[1]    = parse_f32(stream, pos);
+    moni.n1v6_ltb_vcp[2]    = parse_f32(stream, pos);
+    moni.pds_temp           = parse_f32(stream, pos);
+    moni.pas_temp           = parse_f32(stream, pos);
+    moni.nas_temp           = parse_f32(stream, pos);
+    moni.shv_temp           = parse_f32(stream, pos);
+    *pos += 2;// account for tail
+    Ok(moni)
+  }
+}
 
 /// Preamp temperature and bias data
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -165,42 +358,42 @@ impl RBMoniData {
     Self {
       board_id           : 0, 
       rate               : 0,
-      tmp_drs            : 0.0,
-      tmp_clk            : 0.0,
-      tmp_adc            : 0.0,
-      tmp_zynq           : 0.0,
-      tmp_lis3mdltr      : 0.0,
-      tmp_bm280          : 0.0,
-      pressure           : 0.0,
-      humidity           : 0.0,
-      mag_x              : 0.0,
-      mag_y              : 0.0,
-      mag_z              : 0.0,
-      mag_tot            : 0.0,
-      drs_dvdd_voltage   : 0.0, 
-      drs_dvdd_current   : 0.0,
-      drs_dvdd_power     : 0.0,
-      p3v3_voltage       : 0.0,
-      p3v3_current       : 0.0,
-      p3v3_power         : 0.0,
-      zynq_voltage       : 0.0,
-      zynq_current       : 0.0,
-      zynq_power         : 0.0,
-      p3v5_voltage       : 0.0, 
-      p3v5_current       : 0.0,
-      p3v5_power         : 0.0,
-      adc_dvdd_voltage   : 0.0,
-      adc_dvdd_current   : 0.0,
-      adc_dvdd_power     : 0.0,
-      adc_avdd_voltage   : 0.0,
-      adc_avdd_current   : 0.0,
-      adc_avdd_power     : 0.0,
-      drs_avdd_voltage   : 0.0, 
-      drs_avdd_current   : 0.0,
-      drs_avdd_power     : 0.0,
-      n1v5_voltage       : 0.0,
-      n1v5_current       : 0.0,
-      n1v5_power         : 0.0,
+      tmp_drs            : f32::MAX,
+      tmp_clk            : f32::MAX,
+      tmp_adc            : f32::MAX,
+      tmp_zynq           : f32::MAX,
+      tmp_lis3mdltr      : f32::MAX,
+      tmp_bm280          : f32::MAX,
+      pressure           : f32::MAX,
+      humidity           : f32::MAX,
+      mag_x              : f32::MAX,
+      mag_y              : f32::MAX,
+      mag_z              : f32::MAX,
+      mag_tot            : f32::MAX,
+      drs_dvdd_voltage   : f32::MAX, 
+      drs_dvdd_current   : f32::MAX,
+      drs_dvdd_power     : f32::MAX,
+      p3v3_voltage       : f32::MAX,
+      p3v3_current       : f32::MAX,
+      p3v3_power         : f32::MAX,
+      zynq_voltage       : f32::MAX,
+      zynq_current       : f32::MAX,
+      zynq_power         : f32::MAX,
+      p3v5_voltage       : f32::MAX, 
+      p3v5_current       : f32::MAX,
+      p3v5_power         : f32::MAX,
+      adc_dvdd_voltage   : f32::MAX,
+      adc_dvdd_current   : f32::MAX,
+      adc_dvdd_power     : f32::MAX,
+      adc_avdd_voltage   : f32::MAX,
+      adc_avdd_current   : f32::MAX,
+      adc_avdd_power     : f32::MAX,
+      drs_avdd_voltage   : f32::MAX, 
+      drs_avdd_current   : f32::MAX,
+      drs_avdd_power     : f32::MAX,
+      n1v5_voltage       : f32::MAX,
+      n1v5_current       : f32::MAX,
+      n1v5_power         : f32::MAX,
     }
   }
 }
@@ -659,6 +852,15 @@ mod test_monitoring {
   use crate::FromRandom;
   use crate::monitoring::RBMoniData;
   use crate::monitoring::MtbMoniData;
+  use crate::monitoring::PBMoniData;  
+  #[test]
+  fn serialization_pbmonidata() {
+    for k in 0..100 {
+      let data = PBMoniData::from_random();
+      let test = PBMoniData::from_bytestream(&data.to_bytestream(), &mut 0).unwrap();
+      assert_eq!(data, test);
+    }
+  }
 
   #[test]
   fn serialization_mtbmonidata() {
