@@ -211,6 +211,15 @@ impl From<&RBCalibrations> for TofPacket {
   }
 }
 
+impl From<&mut RBCalibrations> for TofPacket {
+  fn from(calib : &mut RBCalibrations) -> Self {
+    let mut tp = Self::new();
+    tp.packet_type = PacketType::RBCalibration;
+    tp.payload = calib.to_bytestream();
+    tp
+  }
+}
+
 impl From<&RBEvent> for TofPacket {
   fn from(event : &RBEvent) -> Self {
     let mut tp = Self::new();

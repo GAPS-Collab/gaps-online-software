@@ -44,8 +44,11 @@ use std::collections::HashMap;
 /// A type for the master trigger mappings
 pub type DsiLtbRBMapping      = HashMap<u8,HashMap<u8,HashMap<u8,(u8,u8)>>>;
 
-/// A type for the mappings of RB channels - paddle ids
-pub type RBChannelPaddleIDMap = HashMap<u8,u8>;
+/// A type for the mappings of RB channels - paddle edn ids
+/// Paddle end ids are the paddle id + 1000 for A and 
+/// + 2000 for B
+/// <div class="warning">In this map RB Channels start from 1! This is consistent with the database</div>
+pub type RBChannelPaddleEndIDMap = HashMap<u8,u16>;
 
 /// Create structures filled with random 
 /// number to be used for testing and 

@@ -53,6 +53,7 @@ pub enum EventStatus {
   Unknown            = 0u8,
   CRC32Wrong         = 10u8,
   TailWrong          = 11u8,
+  ChannelIDWrong     = 12u8,
   IncompleteReadout  = 21u8,
   Perfect            = 42u8
 }
@@ -75,6 +76,7 @@ impl TryFrom<u8> for EventStatus {
       0u8  => Ok(EventStatus::Unknown),
       10u8 => Ok(EventStatus::CRC32Wrong),
       11u8 => Ok(EventStatus::TailWrong),
+      12u8 => Ok(EventStatus::ChannelIDWrong),
       42u8 => Ok(EventStatus::Perfect),
       _    => {
         error!("Can not convert {}! It is not a valid EventStatus!", value);
@@ -92,6 +94,7 @@ impl FromRandom for EventStatus {
       EventStatus::Unknown,
       EventStatus::CRC32Wrong,
       EventStatus::TailWrong,
+      EventStatus::ChannelIDWrong,
       EventStatus::Perfect,
     ];
     let mut rng  = rand::thread_rng();
