@@ -12,7 +12,7 @@ use std::fmt;
 // Takeru's tof-control code
 #[cfg(feature = "tof-control")]
 use tof_control::helper::rb_type::{
-    RBTemp,
+    RBTempDebug,
     RBMag,
     RBVcp,
     RBPh,
@@ -301,14 +301,14 @@ pub struct RBMoniData {
 impl RBMoniData {
 
   #[cfg(feature = "tof-control")]
-  pub fn add_rbtemp(&mut self, rb_temp : &RBTemp) {
+  pub fn add_rbtemp(&mut self, rb_temp : &RBTempDebug) {
     self.tmp_drs         = rb_temp.drs_temp      ; 
     self.tmp_clk         = rb_temp.clk_temp      ; 
     self.tmp_adc         = rb_temp.adc_temp      ; 
     self.tmp_zynq        = rb_temp.zynq_temp     ; 
     //FIXME - this is on tof-control
-    //self.tmp_lis3mdltr   = rb_temp.lis3mdltr_temp; 
-    //self.tmp_bm280       = rb_temp.bme280_temp   ; 
+    self.tmp_lis3mdltr   = rb_temp.lis3mdltr_temp; 
+    self.tmp_bm280       = rb_temp.bme280_temp   ; 
   }
 
   #[cfg(feature = "tof-control")] 
