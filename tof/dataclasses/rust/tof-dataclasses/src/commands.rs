@@ -320,9 +320,9 @@ impl TryFrom<u8> for TofOperationMode {
   //  looks nicer - Paolo
   fn try_from(value: u8) -> Result<Self, Self::Error> {
     match value {
-      0u8  => Ok(TofOperationMode::RequestReply),
+      0u8  => Ok(TofOperationMode::Unknown),
       10u8 => Ok(TofOperationMode::StreamAny),
-      20u8 => Ok(TofOperationMode::Unknown),
+      20u8 => Ok(TofOperationMode::RequestReply),
       30u8 => Ok(TofOperationMode::RBHighThroughput),
       40u8 => Ok(TofOperationMode::RBCalcCRC32),
       50u8 => Ok(TofOperationMode::RBWaveform),
