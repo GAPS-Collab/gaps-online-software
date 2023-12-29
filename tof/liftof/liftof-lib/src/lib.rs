@@ -42,13 +42,19 @@ use tof_dataclasses::serialization::{search_for_u16,
                                      parse_u32,
                                      Serialization};
 use tof_dataclasses::commands::RBCommand;
-use tof_dataclasses::events::{RBEvent,
-                              TofHit};
+use tof_dataclasses::events::{
+    RBEvent,
+    TofHit,
+};
+
+use tof_dataclasses::events::tof_hit::Peak;
 
 use tof_dataclasses::analysis::{calculate_pedestal,
                                 integrate,
                                 cfd_simple,
                                 find_peaks};
+
+use tof_dataclasses::RBChannelPaddleEndIDMap;
 
 pub const MT_MAX_PACKSIZE   : usize = 512;
 pub const DATAPORT : u32 = 42000;
@@ -538,25 +544,55 @@ pub fn readoutboard_commander(cmd : &Receiver<TofPacket>){
 // Analysis
 //
 
-
-/// Basically Rene's analysis engine. This creates 
-/// the PaddlePackets with reduced waveform 
-/// information from a version of the ReadoutBoard
-/// event. 
+/// Extract peaks from waveforms
 ///
-/// ISSUES:
-/// In the future, we might want to refactor this 
-/// a little bit and it might operate on a 
-/// RBEvent instaad and fill it paddle packet 
-/// members
+/// Helper for waveform analysis
+pub fn get_peaks() -> Vec<Peak> {
+  let peaks = Vec::<Peak>::new();
+  peaks
+}
+
+/// FIXME - this shoudl be 
+/// RBCalibrations::from_tofpacket
+/// but for that we have to move the
+/// TofPacketReader first
+pub fn load_calibration(board_id : u8,
+                        path     : String) -> Result<RBCalibrations, SerializationError> {
+  let mut cali   = RBCalibrations::new(board_id);
+  let mut reader = TofPacketReader::new(path);
+  match reader.next() {
+    None => {
+      error!("Can't load calibration!");
+    },
+    Some(pack) => {
+      cali = RBCalibrations::from_bytestream(&pack.payload, &mut 0)?;
+    }
+  }
+  //cali
+  Ok(cali)
+}
+
+/// Waveform analysis engine - identify waveform variables
+///
+/// This will populate the TofHits in an RBEvent
+///
+/// TofHits contain information about peak location,
+/// charge, timing.
 ///
 /// FIXME - I think this should take a HashMap with 
 /// algorithm settings, which we can load from a 
 /// json file
-/// FIXME - add the paddle packets to the RBEvent instead 
-/// of returning 
+///
+/// # Arguments
+///
+/// * event       : current RBEvent with waveforms to 
+///                 work on
+/// * channel_map : (HashMap) mapping providing channel
+///                 to paddle ID information
+/// * calibration : latest readoutboard calibration for 
+///                 the same board
 pub fn waveform_analysis(event         : &mut RBEvent,
-                         readoutboard  : &mf::ReadoutBoard,
+                         channel_map   : &RBChannelPaddleEndIDMap,
                          calibration   : &RBCalibrations)
 -> Result<(), AnalysisError> {
   //if event.status != EventStatus::Perfect {
@@ -565,80 +601,88 @@ pub fn waveform_analysis(event         : &mut RBEvent,
   //  // is probably nothing else we can do?
   //  return Err(AnalysisError::InputBroken);
   //}
-  let pids = readoutboard.get_all_pids();
-  let mut paddles = HashMap::<u8, TofHit>::new();
-  // just paranoid
-  if pids.len() != 4 {
-    error!("RB {} seems to have a strange number of paddles ({}) connected!",
-           readoutboard.rb_id, pids.len());
-  }
-  for k in pids.iter() {
-    // fill the general information of 
-    // the paddles already
-    let mut hit   = TofHit::new();
-    hit.paddle_id = *k;
-    match paddles.insert(*k, hit) {
-      None => (),
-      Some(_) => {
-        error!("We have seen paddle id {k} already!");
-      }
-    };
-  }
-  // do the calibration
-  let active_channels = event.header.get_channels();
-  // allocate memory for voltages
-  // this allocates more memory than needed
-  // (needed is active_channels.len()), however,
-  // in flight operations all channels should
-  // be active anyway.
-  let mut all_voltages = Vec::<Vec::<f32>>::new();
-  let mut all_times    = Vec::<Vec::<f32>>::new();
-  for _ in 0..9 {
-    let ch_voltages : Vec<f32>= vec![0.0; NWORDS];
-    all_voltages.push(ch_voltages);
-    let ch_times : Vec<f32>= vec![0.0; NWORDS];
-    all_times.push(ch_times);
-  }
 
-  for active_ch in &active_channels {
-    let ch  = *active_ch as usize;
-    match event.get_channel_by_id(ch) {
-      Ok(adc) => { 
-        calibration.voltages(ch,
-                             event.header.stop_cell as usize,
-                             &adc,
-                             &mut all_voltages[ch]);
-      },
-      Err(err) => {
-        error!("Can not get channel {ch}. Err {err}");  
-        return Err(AnalysisError::MissingChannel);
-      }
+  let mut paddles    = HashMap::<u8, TofHit>::new();
+  let mut valid_pids = Vec::<u8>::new();
+  let channels       = event.header.get_channels();
+  let channels_c     = channels.clone();
+  // first loop over channels - construct pids
+  let mut pid : u8 = 0;
+  for raw_ch in channels {
+    if raw_ch == 8 {
+      continue;
     }
-    calibration.nanoseconds(ch,
+    // +1 channel convention
+    let ch = raw_ch + 1;
+    //let mut TofHit::new();
+    let p_end_id = channel_map.get(&ch).unwrap_or(&0);
+    if p_end_id < &1000 {
+      error!("Invalid paddle end id {} for channel {}!", p_end_id, ch);
+      continue;
+    }
+    if p_end_id > &2000 {
+      // it is the B side then
+      pid = (p_end_id - 2000) as u8;
+    } else {
+      pid = (p_end_id - 1000) as u8;
+    }
+    if !paddles.contains_key(&pid) {
+      let mut hit   = TofHit::new();
+      hit.paddle_id = pid;
+      paddles.insert(pid, hit);
+    }
+  }
+  // second loop over channels. Now we have
+  // all the paddles set up in the hashmap
+  for raw_ch in channels_c {
+    if raw_ch == 8 {
+      continue;
+    }
+    // +1 channel convention
+    let ch = raw_ch + 1;
+    // FIXME - copy/paste from above, wrap in a 
+    // function
+    let p_end_id  = channel_map.get(&ch).unwrap_or(&0);
+    let mut is_a_side = false; 
+    if p_end_id < &1000 {
+      error!("Invalid paddle end id: {}!" ,p_end_id);
+      continue;
+    }
+    if p_end_id > &2000 {
+      // it is the B side then
+      pid = (p_end_id - 2000) as u8;
+    } else {
+      pid = (p_end_id - &1000) as u8;
+      is_a_side = true;
+    }
+    // allocate memory for the calbration results
+    let mut ch_voltages : Vec<f32>= vec![0.0; NWORDS];
+    let mut ch_times    : Vec<f32>= vec![0.0; NWORDS];
+    calibration.voltages(ch.into(),
+                         event.header.stop_cell as usize,
+                         &event.adc[ch as usize],
+                         &mut ch_voltages);
+    warn!("We have to rework the spike cleaning!");
+    //match RBCalibrations::spike_cleaning(&mut ch_voltages,
+    //                                     event.header.stop_cell) {
+    //  Err(err) => {
+    //    error!("Spike cleaning failed! {err}");
+    //  }
+    //  Ok(_)    => ()
+    //}
+    calibration.nanoseconds(ch.into(),
                             event.header.stop_cell as usize,
-                            &mut all_times[ch]);
-  }
-  match RBCalibrations::spike_cleaning(&mut all_voltages,
-                                       event.header.stop_cell) {
-    Err(err) => {
-      error!("Spike cleaning failed! Err {err}");
-    }
-    Ok(_)    => ()
-  }
-
-  // analysis
-  for active_ch in &active_channels {
-    let ch = *active_ch as usize;
-    let (ped, ped_err) = calculate_pedestal(&all_voltages[ch],
+                            &mut ch_times);
+    let (ped, ped_err) = calculate_pedestal(&ch_voltages,
                                             10.0, 10, 50);
     debug!("Got pedestal of {} +- {}", ped, ped_err);
-    for n in 0..all_voltages[ch].len() {
-      all_voltages[ch][n] -= ped;
+    for n in 0..ch_voltages.len() {
+      ch_voltages[n] -= ped;
     }
     let mut charge : f32 = 0.0;
-    warn!("Check impedance value!");
-    match integrate(&all_voltages[ch],
-                    &all_times[ch],
+    warn!("Check impedance value! Just using 50 [Ohm]");
+    match integrate(&ch_voltages,
+                    &ch_times,
                     270.0, 70.0, 50.0) {
       Err(err) => {
         error!("Integration failed! Err {err}");
@@ -647,10 +691,13 @@ pub fn waveform_analysis(event         : &mut RBEvent,
         charge = chrg;
       }
     }
-    let peaks : Vec::<(usize, usize)>;
+    //let peaks : Vec::<(usize, usize)>;
     let mut cfd_times = Vec::<f32>::new();
-    match find_peaks(&all_voltages[ch]    ,
-                     &all_times[ch]      ,
+    // We actually might have multiple peaks 
+    // here
+    // FIXME 
+    match find_peaks(&ch_voltages ,
+                     &ch_times    ,
                      270.0, 
                      70.0 ,
                      3    ,
@@ -659,12 +706,12 @@ pub fn waveform_analysis(event         : &mut RBEvent,
       Err(err) => {
         error!("Unable to find peaks for ch {ch}! Ignoring this channel!");
         error!("We won't be able to calculate timing information for this channel! Err {err}");
-      }
-      Ok(pks)  => {
-        peaks = pks;
+      },
+      Ok(peaks)  => {
+        //peaks = pks;
         for pk in peaks.iter() {
-          match cfd_simple(&all_voltages[ch],
-                           &all_times[ch],
+          match cfd_simple(&ch_voltages,
+                           &ch_times,
                            0.2,pk.0, pk.1) {
             Err(err) => {
               error!("Unable to calculate cfd for peak {} {}! Err {}", pk.0, pk.1, err);
@@ -674,23 +721,29 @@ pub fn waveform_analysis(event         : &mut RBEvent,
             }
           }
         }
-      }
+      }// end OK
+    } // end match find_peaks 
+    let mut this_hit = paddles.get_mut(&pid).unwrap();
+    let mut this_time    = 0.0f32;
+    if cfd_times.len() > 0 {
+      this_time = cfd_times[0];
     }
+    
+    if is_a_side {
+      this_hit.set_time_a(this_time);
+      this_hit.set_charge_a(charge);
+    } else {
+      this_hit.set_time_b(this_time);
+      this_hit.set_charge_b(charge);
+    }
+    // Technically, we can have more than one peak. 
+    // We need to adjust the integration window to 
+    // the peak min/max and then create Peak instances
+    // and sort them into TofHits
 
-    let ch_pid = readoutboard.get_pid_for_ch(ch);
-    let end    = readoutboard.get_paddle_end(ch); 
-    //FIXME : is it ok to panic here?
-    match end {
-      mf::PaddleEndIdentifier::A => {
-        paddles.get_mut(&ch_pid).expect("Bad paddlemap!").set_charge_a(charge);
-        paddles.get_mut(&ch_pid).expect("Bad paddlemap!").set_time_a(cfd_times[0]);
-      }
-      mf::PaddleEndIdentifier::B => {
-        paddles.get_mut(&ch_pid).expect("Bad paddlemap!").set_charge_b(charge);
-        paddles.get_mut(&ch_pid).expect("Bad paddlemap!").set_time_b(cfd_times[0]);
-      }
-    }
-  }
+
+    // FIXME - do more analysis here!
+  } // end loop over channels
   let result = paddles.into_values().collect();
   event.hits = result;
   Ok(())
@@ -898,6 +951,36 @@ impl Default for ReadoutBoard {
   fn default() -> ReadoutBoard {
     ReadoutBoard::new()
   }
+}
+
+pub fn get_rb_ch_pid_map(map_file : PathBuf) -> RBChannelPaddleEndIDMap {
+  let mut mapping = RBChannelPaddleEndIDMap::new();
+  let json_content : String;
+  match read_to_string(&map_file) {
+    Ok(_json_content) => {
+      json_content = _json_content;
+    },
+    Err(err) => { 
+      error!("Unable to parse json file {}. Error {err}", map_file.display());
+      return mapping;
+    }      
+  }
+  let json : Value;
+  match serde_json::from_str(&json_content) {
+    Ok(_json) => {
+      json = _json;
+    },
+    Err(err) => { 
+      error!("Unable to parse json file {}. Error {err}", map_file.display());
+      return mapping;
+    }
+  }
+  for ch in 0..8 {
+    let tmp_val = &json[(ch +1).to_string()];
+    let val = tmp_val.to_string().parse::<u16>().unwrap_or(0);
+    mapping.insert(ch as u8, val);
+  }
+  mapping
 }
 
 pub fn get_ltb_dsi_j_ch_mapping(mapping_file : PathBuf) -> DsiLtbRBMapping {
