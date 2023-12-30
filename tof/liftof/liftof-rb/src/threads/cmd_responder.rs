@@ -94,9 +94,11 @@ pub fn cmd_responder(cmd_server_ip             : String,
   //let heartbeat_received = false;
   loop {
     match thread_control.lock() {
-      Ok(_) => {
-        info!("Received stop signal. Will stop thread!");
-        break;
+      Ok(tc) => {
+        if tc.stop_flag {
+          info!("Received stop signal. Will stop thread!");
+          break;
+        }
       },
       Err(err) => {
         trace!("Can't acquire lock! {err}");

@@ -13,6 +13,9 @@
   --listen. This flag needs to be set to be
   able to receive commands, e.g. run start/stop
   signals
+* removes --moni-interval-l1 and --moni-interval-l2
+  in the future this will be controlled through 
+  the runconfig
 * change to named threads instead of ThreadPool.
   RATIONALE: More fine grained control, possibility
   for heatrbeat, naming allows easier debugging in 

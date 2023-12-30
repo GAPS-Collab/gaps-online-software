@@ -120,8 +120,6 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
   let mut evt_cnt      = 0u32;
   let mut delta_events : u64;
   let mut n_events     : u64 = 0;
-  // FIXME - this is currently useless
-  let     n_errors     : u64 = 0;
  
   // trigger settings. Per default, we latch to the 
   let mut latch_to_mtb = true;
@@ -168,14 +166,16 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
   let mut uio2_total_size = DATABUF_TOTAL_SIZE;
   loop {
     match thread_control.lock() {
-      Ok(_) => {
-        info!("Received stop signal. Will stop thread!");
-        termination_seqeunce(&prog_ev     ,
-                             &prog_a      ,
-                             &prog_b      ,
-                             show_progress,
-                             &bs_sender   );
-        break;
+      Ok(tc) => {
+        if tc.stop_flag {
+          info!("Received stop signal. Will stop thread!");
+          termination_seqeunce(&prog_ev     ,
+                               &prog_a      ,
+                               &prog_b      ,
+                               show_progress,
+                               &bs_sender   );
+          break;
+        }
       },
       Err(err) => {
         trace!("Can't acquire lock! {err}");
@@ -507,8 +507,6 @@ pub fn experimental_runner(run_config              : &Receiver<RunConfig>,
   let mut evt_cnt      = 0u32;
   let mut delta_events : u64;
   let mut n_events     : u64 = 0;
-  // FIXME - this is currently useless
-  let     n_errors     : u64 = 0;
   // experimental - use RBEventMemoryStreamer directly
   let mut streamer = RBEventMemoryStreamer::new();
 

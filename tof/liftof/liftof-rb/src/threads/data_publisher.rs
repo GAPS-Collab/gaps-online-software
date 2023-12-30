@@ -148,10 +148,12 @@ pub fn data_publisher(data           : &Receiver<TofPacket>,
       break;
     }
     match thread_control.lock() {
-      Ok(_) => {
-        info!("Received stop signal. Will stop thread!");
-        sigint_received = true;
-        kill_timer      = Instant::now();
+      Ok(tc) => {
+        if tc.stop_flag {
+          info!("Received stop signal. Will stop thread!");
+          sigint_received = true;
+          kill_timer      = Instant::now();
+        }
       },
       Err(err) => {
         trace!("Can't acquire lock! {err}");
@@ -247,9 +249,6 @@ pub fn data_publisher(data           : &Receiver<TofPacket>,
             tp_payload = prefix_board_id_noquery(board_id, &mut packet.to_bytestream());
           }
         }
-        if print_packets {
-          println!("=> Tof packet type: {} with {} bytes!", packet.packet_type, packet.payload.len());
-        }
         match data_socket.send(tp_payload,zmq::DONTWAIT) {
           Ok(_)    => {
             trace!("0MQ PUB socket.send() SUCCESS!");
@@ -257,8 +256,9 @@ pub fn data_publisher(data           : &Receiver<TofPacket>,
           },
           Err(err) => error!("Not able to send over 0MQ PUB socket! Err {err}"),
         }
-        if n_sent % 1000 == 0 && n_sent > 0 {
-          info!("==> We sent {n_sent} packets!");
+        if n_sent % 1000 == 0 && n_sent > 0 && print_packets {
+          println!("==> We sent {n_sent} packets!");
+          println!("==> Last Tofpacket type: {} with {} bytes!", packet.packet_type, packet.payload.len());
         }
       }
     }
