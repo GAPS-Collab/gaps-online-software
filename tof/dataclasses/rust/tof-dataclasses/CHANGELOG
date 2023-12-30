@@ -4,6 +4,8 @@
 * updates to tof-control main branch and version 0.3
 * mag_tot in RBMoniData is now deprecated. It was just
   the vectorsum of mag_x, mag_y, mag_z
+* LTBMoniData, PAMoniData, PBMoniData as new members of
+  the MoniData ohana.
 
 ## 0.8.3
 * deprecates TofOperationMode::StreamAny, TofOperationMode::RequestReply

@@ -73,8 +73,8 @@ struct RPaddlePacket  {
   void reset();
 
   Vec<u8> serialize() const; 
-  u32 deserialize(Vec<u8> &bytestream, 
-                  u32 start_pos);
+  static RPaddlePacket from_bytestream(const Vec<u8> &bytestream, 
+                                       u64 &pos);
  
   // easier print out
   std::string to_string() const;

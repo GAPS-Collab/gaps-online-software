@@ -134,84 +134,59 @@ Vec<u8> RPaddlePacket::serialize() const
 
 /*******************************************/
 
-u32 RPaddlePacket::deserialize(Vec<u8> &bytestream,
-                               u32 start_pos) {
- reset();
-     	// start from position in bytestream
- //u16 value; 
- //u32 end_pos = start_pos;
-
- //// find start marker in bytestream
- //for (size_t k=start_pos;k<bytestream.size();k++)
- //{
- //  value = decode_ushort(bytestream, start_pos=k);
- //  if (head == value)
- //   {
- //    // end pos should point to the start
- //    // of the next new value
- //    end_pos = k+2;
- //    break;
- //   }
- //}
-
- //u64 pos = end_pos; // position in bytestream
- //u16 expected_packet_size = Gaps::u16_from_le_bytes(bytestream, pos);
-
- //event_ctr = decode_uint32(bytestream, pos); pos+=4;
- u64 pos = start_pos;
- u16 maybe_header = Gaps::u16_from_le_bytes(bytestream, pos);
- if (maybe_header != head) {
+RPaddlePacket RPaddlePacket::from_bytestream(const Vec<u8> &bytestream,
+                                             u64 &pos) {
+ RPaddlePacket hit = RPaddlePacket();
+ u16 maybe_header = Gaps::parse_u16(bytestream, pos);
+ if (maybe_header != hit.head) {
    spdlog::error("Can not find HEADER at presumed position. Maybe give a different value for start_pos?");
  }
- paddle_id     = bytestream[pos]; pos+=1;
- time_a        = Gaps::u16_from_le_bytes(bytestream, pos); 
- time_b        = Gaps::u16_from_le_bytes(bytestream, pos); 
+ hit.paddle_id     = bytestream[pos]; pos+=1;
+ hit.time_a        = Gaps::parse_u16(bytestream, pos); 
+ hit.time_b        = Gaps::parse_u16(bytestream, pos); 
  //std::cout << " " << time_a << " " << time_b << " " << charge_a << " " << charge_b << std::endl;
- peak_a        = Gaps::u16_from_le_bytes(bytestream, pos); 
- peak_b        = Gaps::u16_from_le_bytes(bytestream, pos); 
- charge_a      = Gaps::u16_from_le_bytes(bytestream, pos); 
- charge_b      = Gaps::u16_from_le_bytes(bytestream, pos); 
- charge_min_i  = Gaps::u16_from_le_bytes(bytestream, pos); 
- x_pos         = Gaps::u16_from_le_bytes(bytestream, pos); 
- t_average     = Gaps::u16_from_le_bytes(bytestream, pos); 
+ hit.peak_a        = Gaps::parse_u16(bytestream, pos); 
+ hit.peak_b        = Gaps::parse_u16(bytestream, pos); 
+ hit.charge_a      = Gaps::parse_u16(bytestream, pos); 
+ hit.charge_b      = Gaps::parse_u16(bytestream, pos); 
+ hit.charge_min_i  = Gaps::parse_u16(bytestream, pos); 
+ hit.x_pos         = Gaps::parse_u16(bytestream, pos); 
+ hit.t_average     = Gaps::parse_u16(bytestream, pos); 
 
- ctr_etx = bytestream[pos]; pos+=1;
+ hit.ctr_etx = bytestream[pos]; pos+=1;
 
- timestamp_32 = Gaps::u32_from_le_bytes(bytestream, pos);
- timestamp_16 = Gaps::u16_from_le_bytes(bytestream, pos);
+ hit.timestamp_32 = Gaps::parse_u16(bytestream, pos);
+ hit.timestamp_16 = Gaps::parse_u16(bytestream, pos);
 
  // FIXME checks - packetlength, checksum ?
- tail = Gaps::u32_from_le_bytes(bytestream, pos);
- if (tail != 0xF0F) {
-   broken = true;
- }
- return pos; 
+ u16 tail = Gaps::parse_u16(bytestream, pos);
+ //if (tail != 0xF0F) {
+ //  broken = true;
+ //}
+ return hit; 
 }
 
 /*******************************************/
 
-std::string RPaddlePacket::to_string() const
-{
-  std::string repr = "";
-  repr += "RPADDLEPACKET-----------------------\n";
-  repr += "HEAD "          + std::to_string(head              ) + "\n";
-  repr += "-- BROKEN "     + std::to_string(broken            ) + "\n";
+std::string RPaddlePacket::to_string() const {
+  std::string repr = "<TofHit\n";
+  repr += "  BROKEN "     + std::to_string(broken            ) + "\n";
   //repr += "EVENT CTR "     + std::to_string(event_ctr         ) + "\n";
   //repr += "UTC TS "        + std::to_string(utc_timestamp     ) + "\n";
-  repr += "PADDLE ID "     + std::to_string(get_paddle_id()   ) + "\n";
-  repr += "TIMESTAMP 32 "  + std::to_string(timestamp_32      ) + "\n";
-  repr += "TIMESTAMP 16 "  + std::to_string(timestamp_16      ) + "\n";
-  repr += "PTIME_A "       + std::to_string(get_time_a()      ) + "\n";
-  repr += "PTIME_B "       + std::to_string(get_time_b()      ) + "\n";
-  repr += "PEAK_A "        + std::to_string(get_peak_a()      ) + "\n";
-  repr += "PEAK_B "        + std::to_string(get_peak_b()      ) + "\n";
-  repr += "CHARGE_A "      + std::to_string(get_charge_a()    ) + "\n";
-  repr += "CHARGE_B "      + std::to_string(get_charge_b()    ) + "\n";
-  repr += "CHARGE_MIN_I "  + std::to_string(get_charge_min_i()) + "\n";
-  repr += "X_POS "         + std::to_string(get_x_pos()       ) + "\n";
-  repr += "T_AVG "         + std::to_string(get_t_avg()       ) + "\n";
-  repr += "CTR_ETX "       + std::to_string(ctr_etx           ) + "\n";
-  repr += "TAIL "          + std::to_string(tail              ) + "\n"; 
+  repr += "  PADDLE ID "     + std::to_string(get_paddle_id()   ) + "\n";
+  repr += "  TIMESTAMP 32 "  + std::to_string(timestamp_32      ) + "\n";
+  repr += "  TIMESTAMP 16 "  + std::to_string(timestamp_16      ) + "\n";
+  repr += "  PTIME_A "       + std::to_string(get_time_a()      ) + "\n";
+  repr += "  PTIME_B "       + std::to_string(get_time_b()      ) + "\n";
+  repr += "  PEAK_A "        + std::to_string(get_peak_a()      ) + "\n";
+  repr += "  PEAK_B "        + std::to_string(get_peak_b()      ) + "\n";
+  repr += "  CHARGE_A "      + std::to_string(get_charge_a()    ) + "\n";
+  repr += "  CHARGE_B "      + std::to_string(get_charge_b()    ) + "\n";
+  repr += "  CHARGE_MIN_I "  + std::to_string(get_charge_min_i()) + "\n";
+  repr += "  X_POS "         + std::to_string(get_x_pos()       ) + "\n";
+  repr += "  T_AVG "         + std::to_string(get_t_avg()       ) + "\n";
+  repr += "  CTR_ETX "       + std::to_string(ctr_etx           ) + "\n";
+  repr += "  TAIL "          + std::to_string(tail              ) + "\n"; 
   return repr;
 }
 
