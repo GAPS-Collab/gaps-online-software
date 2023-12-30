@@ -91,7 +91,7 @@ impl PBMoniData {
   }
   
   #[cfg(feature = "tof-control")]
-  pub fn add_pbtmp(&mut self, pbtmp : &PBTemp) {
+  pub fn add_temps(&mut self, pbtmp : &PBTemp) {
     self.pds_temp = pbtmp.pds_temp; 
     self.pas_temp = pbtmp.pas_temp; 
     self.nas_temp = pbtmp.nas_temp; 
@@ -99,7 +99,7 @@ impl PBMoniData {
   }
   
   #[cfg(feature = "tof-control")]
-  pub fn add_pbvcp(&mut self, pbvcp : &PBVcp) {
+  pub fn add_vcp(&mut self, pbvcp : &PBVcp) {
     self.p3v6_preamp_vcp = pbvcp.p3v6_preamp_vcp; 
     self.n1v6_preamp_vcp = pbvcp.n1v6_preamp_vcp;  
     self.p3v4f_ltb_vcp   = pbvcp.p3v4f_ltb_vcp;

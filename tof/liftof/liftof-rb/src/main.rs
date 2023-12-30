@@ -8,7 +8,6 @@
 //! or to be managed by systemd
 use std::{
     thread,
-    time,
 };
 
 use std::sync::{
@@ -16,7 +15,10 @@ use std::sync::{
     Mutex,
 };
 
-use std::time::Duration;
+use std::time::{
+    Duration,
+    Instant,
+};
 use std::io::Write;
 
 extern crate crossbeam_channel;
@@ -50,7 +52,6 @@ use colored::Colorize;
 use std::process::exit;
 use tof_dataclasses::threading::{
     ThreadControl,
-    ThreadPool
 };
 use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::commands::{
@@ -63,6 +64,7 @@ use tof_dataclasses::run::RunConfig;
 use liftof_lib::{
     LIFTOF_LOGO_SHOW,
     color_log,
+    RunStatistics,
 };
 
 use liftof_rb::threads::{
@@ -102,14 +104,6 @@ struct Args {
   /// no input data
   #[arg(long, default_value_t = false)]
   calibration : bool,
-  /// Select the monitoring interval for L1 monitoring data
-  /// L1 is the fast monitoring - only critical values
-  #[arg(long, default_value_t = 10)]
-  moni_interval_l1 : u64,
-  /// Select the monitoring interval for L2 monitoring data
-  /// L2 is the slow monitoring - all values
-  #[arg(long, default_value_t = 30)]
-  moni_interval_l2 : u64,
   ///// CnC server IP we should be listening to
   //#[arg(long, default_value_t = "10.0.1.1")]
   //cmd_server_ip : &'static str,
@@ -117,6 +111,11 @@ struct Args {
   /// check the event ids for duplicates or missing ids
   #[arg(long, default_value_t = false)]
   test_eventids: bool,
+  /// If there is an issue with the events (if known)
+  /// don't send them. This can not work when the 
+  /// RB is in TofMode::RBHighThroughput
+  #[arg(long, default_value_t = false)]
+  only_perfect_events: bool,
   /// Calculate the crc32 checksum per channel and set 
   /// event status flag
   #[arg(long, default_value_t = false)]
@@ -134,7 +133,9 @@ fn main() {
       args = record.args()
       )
     }).init();
- 
+
+  let program_start_time       = Instant::now();
+
   let args = Args::parse();                   
   let verbose                  = args.verbose;
   let listen                   = args.listen;
@@ -144,6 +145,7 @@ fn main() {
   let run_config               = args.run_config;
   let test_eventids            = args.test_eventids;
   let calc_crc32               = args.calc_crc32;
+  let only_perfect_events      = args.only_perfect_events;
 
   //FIMXE - this needs to become part of clap
   let cmd_server_ip = String::from("10.0.1.1");
@@ -178,7 +180,8 @@ fn main() {
   let mut rc_config     = RunConfig::new();
   let mut rc_file_path  = std::path::PathBuf::new();
   let mut end_after_run = false;
-
+  let run_stat          = Arc::new(Mutex::new(RunStatistics::new()));
+   
   if calibration {
     println!("===================================================================");
     println!("=> Readoutboard calibration! This will override ALL other settings!");
@@ -211,7 +214,7 @@ fn main() {
   }
   // some pre-defined time units for 
   // sleeping
-  let one_sec     = time::Duration::from_secs(1);  
+  let one_sec     = Duration::from_secs(1);  
 
   // threads and inter-thread communications
   // We have
@@ -239,6 +242,7 @@ fn main() {
       (Sender<TofOperationMode>, Receiver<TofOperationMode>)                = unbounded();
   let (bs_send, bs_recv)             : (Sender<Vec<u8>>, Receiver<Vec<u8>>) = unbounded(); 
   
+  let mut signals = Signals::new(&[SIGTERM, SIGINT]).expect("Unknown signals");
   // Setup routine. Start the threads in inverse order of 
   // how far they are away from the buffers.
   // FIXME - reduce number of threads
@@ -299,6 +303,7 @@ fn main() {
   //           show_progress);
   //});
     let proc_control    = thread_control.clone();
+    let ev_stats        = run_stat.clone();
     let _ev_proc_thread = thread::Builder::new()
            .name("event-processing".into())
            .spawn(move || {
@@ -310,7 +315,9 @@ fn main() {
                                    &dtf_from_runner,
                                    args.verbose,
                                    calc_crc32,
-                                   proc_control)
+                                   proc_control,
+                                   ev_stats,
+                                   only_perfect_events)
            })
            .expect("Failed to spawn event_processing thread!");
   //workforce.execute(move || {
@@ -354,8 +361,6 @@ fn main() {
   // should this program end after it is done?
   let mut end = false;
   
-  let moni_interval_l1 = Duration::from_secs(args.moni_interval_l1);
-  let moni_interval_l2 = Duration::from_secs(args.moni_interval_l2);
   let mut do_monitoring = true;
   // We can only start a run here, if this is not
   // run through systemd
@@ -419,44 +424,42 @@ fn main() {
     let _monitoring_thread = thread::Builder::new()
            .name("rb-monitoring".into())
            .spawn(move || {
-              monitoring(&tp_to_pub,
-                         moni_interval_l1,
-                         moni_interval_l2,
+              monitoring(0,    // board id
+                         &tp_to_pub,
+                         5.0,  // every 10 sec a new set of RBMoniData
+                         2.0,  // every 20 sec a new set of Preamp moni data 
+                         1.0,  // every 10 sec a new set of Powerboard moni data
+                         2.0,  // every 20 sec a new set of LTB moni data
                          verbose,
                          moni_ctrl); 
             })
            .expect("Failed to spawn rb-monitoring thread!");
-  
-    //workforce.execute(move || {
-    //  monitoring(&tp_to_pub,
-    //             moni_interval_l1,
-    //             moni_interval_l2,
-    //             verbose);
-    //});
   }
-  println!("=> Waiting for threads to start..");
-  thread::sleep(time::Duration::from_secs(10));
-  println!("=> ..done");
-
+  if !calibration {
+    println!("=> Waiting for threads to start..");
+    thread::sleep(Duration::from_secs(10));
+    println!("=> ..done");
+  }
   // Currently, the main thread just listens for SIGTERM and SIGINT.
   // We could give it more to do and save one of the other threads.
   // Probably, the functionality of the control thread would be 
   // a good choice
-  let mut signals = Signals::new(&[SIGTERM, SIGINT]).expect("Unknown signals");
 
   loop {
     thread::sleep(1*one_sec);
     for signal in signals.pending() {
       match signal as c_int {
         SIGTERM => {
-          println!("SIGTERM received");
+          println!("=> {}", String::from("SIGTERM received").red().bold());
           end = true;
         }
         SIGINT  => {
-          println!("SIGINT received");
+          println!("=> {}", String::from("SIGINT received").red().bold());
           end = true;
         }
-        _       => ()
+        _       => {
+          error!("Received signal, but I don't have instructions what to do about it!");
+        }
       }
     }
 
@@ -488,6 +491,26 @@ fn main() {
         Ok(_) => ()
       }
       thread::sleep(10*one_sec);
+      // send the kill signal to all threads
+      match thread_control.lock() {
+        Ok(mut tc) => {
+          tc.stop_flag = true;
+        },
+        Err(err) => {
+          trace!("Can't acquire lock! {err}");
+        },
+      }
+      if verbose {
+        match run_stat.lock() {
+          Err(err) => error!("Can't access run statistics! {err}"),
+          Ok(stat) => {
+            println!("== Run summary! = == == == == == == ==");
+            println!("{}", stat);
+            println!("-- -- -- -- -- -- -- -- -- -- -- -- --");
+            println!("-- --> Elapsed seconds since prog start {}", program_start_time.elapsed().as_secs());
+          }
+        }
+      }
       println!("=> Terminated. So long and thanks for all the \u{1F41F}");
       exit(0);
     }
