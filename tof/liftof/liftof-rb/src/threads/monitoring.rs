@@ -90,9 +90,6 @@ pub fn monitoring(board_id          : u8,
   println!("[MONI] ==> Starting monitoring thread!");
 
   let mut rb_moni_timer  = Instant::now();
-  let mut pa_moni_timer  = Instant::now();
-  let mut pb_moni_timer  = Instant::now();
-  let mut ltb_moni_timer = Instant::now();
  
   // we calculate some sleep time, to reduce CPU load
   // check for the smallest interfval and use that as sleep.
@@ -160,7 +157,7 @@ pub fn monitoring(board_id          : u8,
       }
       rb_moni_timer = Instant::now(); 
     }
-    if pa_moni_timer.elapsed().as_secs_f32() > rb_moni_interval*pa_moni_every_x {
+    if rb_moni_timer.elapsed().as_secs_f32() > rb_moni_interval*pa_moni_every_x {
       let mut moni = PAMoniData::new();
       moni.board_id = board_id;
       cfg_if::cfg_if! {
@@ -183,7 +180,7 @@ pub fn monitoring(board_id          : u8,
         Ok(_)    => trace!("Sent PAMoniData successfully!"),
       }
     }
-    if pb_moni_timer.elapsed().as_secs_f32() > rb_moni_interval*pb_moni_every_x {
+    if rb_moni_timer.elapsed().as_secs_f32() > rb_moni_interval*pb_moni_every_x {
       let mut moni = PBMoniData::new();
       moni.board_id = board_id;
       cfg_if::cfg_if! {
@@ -203,13 +200,15 @@ pub fn monitoring(board_id          : u8,
         Ok(_)    => trace!("Sent PBMoniData successfully!"),
       }
     }
-    if ltb_moni_timer.elapsed().as_secs_f32() > rb_moni_interval*ltb_moni_every_x {
+    if rb_moni_timer.elapsed().as_secs_f32() > rb_moni_interval*ltb_moni_every_x {
       let mut moni = LTBMoniData::new();
       moni.board_id = board_id;
       cfg_if::cfg_if! {
         if #[cfg(feature = "tofcontrol")]  {
           let ltb_temp = LTBTemp::new();
           let ltb_thrs = LTBThreshold::new();
+          moni.add_temps(&ltb_temp);
+          moni.add_thresh(&ltb_thrs);
         }
       }
       if verbose {

@@ -460,7 +460,7 @@ impl LTBMoniData {
   }
 
   #[cfg(feature = "tof-control")]
-  pub fn add_tmps(&mut self, lt : &LTBTemp) {
+  pub fn add_temps(&mut self, lt : &LTBTemp) {
     self.trenz_temp = lt.trenz_temp;
     self.ltb_temp   = lt.board_temp;
   }
