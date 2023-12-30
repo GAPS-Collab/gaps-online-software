@@ -386,6 +386,14 @@ std::string RBEvent::to_string() const {
     repr += std::to_string(adc[ch][1]);
     repr += " .. .."; 
   }
+  if ( hits.size() > 0 ) {
+    repr += "\n-- -- hits -- --";
+    for (auto const &h : hits) {
+      repr += h.to_string();
+    } 
+  } else {
+    repr += "\n -- no hits!";
+  }
   repr += ">";
   return repr;
 }
@@ -488,6 +496,12 @@ RBEvent RBEvent::from_bytestream(const Vec<u8> &stream,
     event.adc[ch] = u8_to_u16(data);
     pos += 2*NWORDS;
   }
+  // Decode the hits
+  for (u8 k=0;k<nhits;k++) {
+    auto hit = RPaddlePacket::from_bytestream(stream, pos);
+    event.hits.push_back(hit);
+  }
+
   u16 tail = Gaps::parse_u16(stream, pos);
   if (tail != RBEvent::TAIL) {
     spdlog::error("After parsing the event, we found an invalid tail signature {}", tail);

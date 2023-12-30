@@ -181,20 +181,20 @@ u32 REventPacket::deserialize(Vec<u8> &bytestream,
   paddle_info.reserve(n_paddles);
   RPaddlePacket p;
   u8 paddles_found = 0;
-  while (paddles_found < n_paddles) {
-    p.deserialize(bytestream, pos);
-    if (!p.is_broken()) {
-      paddle_info.push_back(p);
-      pos += p.calculate_length();
-      paddles_found += 1;
-    } else {
-      paddle_info.push_back(p);
-      paddles_found += 1;
-      //std::cout << "BROKEN " << p << std::endl;
-      // we stop at the first broken package
-      break;
-    }
-  }
+  //while (paddles_found < n_paddles) {
+  //  p.from_bytestream(bytestream, pos);
+  //  if (!p.is_broken()) {
+  //    paddle_info.push_back(p);
+  //    pos += p.calculate_length();
+  //    paddles_found += 1;
+  //  } else {
+  //    paddle_info.push_back(p);
+  //    paddles_found += 1;
+  //    //std::cout << "BROKEN " << p << std::endl;
+  //    // we stop at the first broken package
+  //    break;
+  //  }
+  //}
   u16 payload_tail = Gaps::u32_from_le_bytes(bytestream, pos);
   if (payload_tail != tail) //|| (expected_packet_size != pos))
      {

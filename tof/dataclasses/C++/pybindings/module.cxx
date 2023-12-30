@@ -441,6 +441,7 @@ PYBIND11_MODULE(gaps_tof, m) {
     py::class_<RBEvent>(m, "RBEvent", "RBEvent contains an event header for this specific board as well as a (flexible) number of adc channels")
         .def(py::init())
         .def_readonly("header"              ,&RBEvent::header)
+        .def_readonly("hits"                ,&RBEvent::hits)
         .def("get_baselines"                ,&RBEvent::get_baselines,
                                              "Calculate baselines using the given calibration object in min/max range")  
         .def("get_channel_adc"              ,&RBEvent::get_channel_adc,
@@ -524,6 +525,7 @@ PYBIND11_MODULE(gaps_tof, m) {
       .value("Scalar",    PacketType::Scalar    )
       .value("HeartBeat", PacketType::HeartBeat )
       .value("MasterTrigger", PacketType::MasterTrigger )
+      .value("PT_MtbMoniData",   PacketType::MTBMoni)
       .export_values();
 
     py::enum_<PADDLE_END>(m, "PADDLE_END")
@@ -702,7 +704,7 @@ PYBIND11_MODULE(gaps_tof, m) {
     py::class_<RPaddlePacket>(m, "RPaddlePacket")
         .def(py::init())
         .def("serialize",         &RPaddlePacket::serialize)
-        .def("deserialize",       &RPaddlePacket::deserialize)
+        .def("from_bytestream",   &RPaddlePacket::from_bytestream)
         .def("calculate_length",  &static_helper)
         .def("reset",             &RPaddlePacket::reset)
         .def("is_broken",         &RPaddlePacket::is_broken)
