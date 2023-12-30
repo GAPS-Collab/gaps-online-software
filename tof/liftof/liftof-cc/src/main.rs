@@ -54,8 +54,7 @@ use liftof_lib::color_log;
 use liftof_lib::get_ltb_dsi_j_ch_mapping;
 use liftof_cc::threads::{readoutboard_communicator,
                          event_builder};
-//use liftof_cc::api::tofcmp_and_mtb_moni;
-//use liftof_cc::paddle_packet_cache::paddle_packet_cache;
+use liftof_lib::DATAPORT;
 use liftof_cc::flight_comms::global_data_sink;
 
 use liftof_cc::constants::*;
@@ -83,50 +82,92 @@ struct LiftofCCArgs {
   /// A json file wit the ltb(dsi, j, ch) -> rb_id, rb_ch mapping.
   #[arg(long)]
   json_ltb_rb_map : Option<PathBuf>,
-  /// List of possible commands
-  #[command(subcommand)]
-  command: Command,
+  ///// List of possible commands
+  //#[command(subcommand)]
+  //command: Command,
 }
 
-#[derive(Debug, Parser, PartialEq)]
-enum Command {
-  /// Remotely trigger the readoutboards to run the calibration routines (tcal, vcal).
-  #[command(subcommand)]
-  Calibration(CalibrationCmd)
-}
-
-#[derive(Debug, Subcommand, PartialEq)]
-enum CalibrationCmd {
-  /// Default calibration run, meaning 2 voltage calibrations and one timing calibration on all RBs with the default values.
-  Default,
-  /// Voltage calibration run. All RB are targeted and voltage are default ones if nothing else is specified.
-  Voltage(VoltageOpts),
-  /// Voltage calibration run. All RB are targeted if nothing else is specified.
-  Timing(TimingOpts)
-}
-
-#[derive(Debug, Args, PartialEq)]
-struct VoltageOpts {
-  /// Voltage level to be set in voltage calibration run.
-  #[arg(short, long)]
-  voltage_level: Option<u16>,
-  /// RB to target in voltage calibration run.
-  #[arg(short, long)]
-  rb_id: Option<u8>,
-  /// Extra arguments in voltage calibration run (not implemented).
-  #[arg(short, long)]
-  extra: Option<u8>,
-}
-
-#[derive(Debug, Args, PartialEq)]
-struct TimingOpts {
-  /// RB to target in timing calibration run.
-  #[arg(short, long)]
-  rb_id: Option<u8>,
-  /// Extra arguments in timing calibration run (not implemented).
-  #[arg(short, long)]
-  extra: Option<u8>,
-}
+//#[derive(Debug, Parser, PartialEq)]
+//enum Command {
+//  /// Remotely trigger the readoutboards to run the calibration routines (tcal, vcal).
+//  #[command(subcommand)]
+//  Calibration(CalibrationCmd)
+//  //#[command(subcommand)]
+//  //Run(RunCmd)
+//}
+//
+//#[derive(Debug, Subcommand, PartialEq)]
+//enum CalibrationCmd {
+//  /// Default calibration run, meaning 2 voltage calibrations and one timing calibration on all RBs with the default values.
+//  Default,
+//  /// Voltage calibration run. All RB are targeted and voltage are default ones if nothing else is specified.
+//  Voltage(VoltageOpts),
+//  /// Voltage calibration run. All RB are targeted if nothing else is specified.
+//  Timing(TimingOpts)
+//}
+//
+//#[derive(Debug, Args, PartialEq)]
+//struct VoltageOpts {
+//  /// Voltage level to be set in voltage calibration run.
+//  #[arg(short, long)]
+//  voltage_level: Option<u16>,
+//  /// RB to target in voltage calibration run.
+//  #[arg(short, long)]
+//  rb_id: Option<u8>,
+//  /// Extra arguments in voltage calibration run (not implemented).
+//  #[arg(short, long)]
+//  extra: Option<u8>,
+//}
+//
+//#[derive(Debug, Args, PartialEq)]
+//struct TimingOpts {
+//  /// RB to target in timing calibration run.
+//  #[arg(short, long)]
+//  rb_id: Option<u8>,
+//  /// Extra arguments in timing calibration run (not implemented).
+//  #[arg(short, long)]
+//  extra: Option<u8>,
+//}
+//
+//#[derive(Debug, Parser, PartialEq)]
+//enum Command {
+//  /// Remotely trigger the readoutboards to run the calibration routines (tcal, vcal).
+//  #[command(subcommand)]
+//  Calibration(CalibrationCmd)
+//}
+//
+//#[derive(Debug, Subcommand, PartialEq)]
+//enum CalibrationCmd {
+//  /// Default calibration run, meaning 2 voltage calibrations and one timing calibration on all RBs with the default values.
+//  Default,
+//  /// Voltage calibration run. All RB are targeted and voltage are default ones if nothing else is specified.
+//  Voltage(VoltageOpts),
+//  /// Voltage calibration run. All RB are targeted if nothing else is specified.
+//  Timing(TimingOpts)
+//}
+//
+//#[derive(Debug, Args, PartialEq)]
+//struct VoltageOpts {
+//  /// Voltage level to be set in voltage calibration run.
+//  #[arg(short, long)]
+//  voltage_level: Option<u16>,
+//  /// RB to target in voltage calibration run.
+//  #[arg(short, long)]
+//  rb_id: Option<u8>,
+//  /// Extra arguments in voltage calibration run (not implemented).
+//  #[arg(short, long)]
+//  extra: Option<u8>,
+//}
+//
+//#[derive(Debug, Args, PartialEq)]
+//struct TimingOpts {
+//  /// RB to target in timing calibration run.
+//  #[arg(short, long)]
+//  rb_id: Option<u8>,
+//  /// Extra arguments in timing calibration run (not implemented).
+//  #[arg(short, long)]
+//  extra: Option<u8>,
+//}
 
 /*************************************/
 
@@ -180,8 +221,8 @@ fn main() {
   let mut master_trigger_port   = 0usize;
   // create copies, since we need this information
   // for 2 threads at least (moni and event)
-  let mut master_trigger_ip_c   = String::from("");
-  let mut master_trigger_port_c = 0usize;
+  //let mut master_trigger_ip_c   = String::from("");
+  //let mut master_trigger_port_c = 0usize;
   
   match args.json_config {
     None => panic!("No .json config file provided! Please provide a config file with --json-config or -j flag!"),
@@ -204,8 +245,8 @@ fn main() {
 
     master_trigger_ip     = config["master_trigger"]["ip"].as_str().unwrap().to_owned();
     master_trigger_port   = config["master_trigger"]["port"].as_usize().unwrap();
-    master_trigger_ip_c   = master_trigger_ip.clone();
-    master_trigger_port_c = master_trigger_port.clone();
+    //master_trigger_ip_c   = master_trigger_ip.clone();
+    //master_trigger_port_c = master_trigger_port.clone();
     info!("Will connect to the master trigger board at {}:{}", master_trigger_ip, master_trigger_port);
   } else {
     println!("==> Will NOT connect to the MTB, since -u has not been provided in the commandlline!");
@@ -368,9 +409,14 @@ fn main() {
 
   write_stream_path = String::from(stream_files_path.into_os_string().into_string().expect("Somehow the paths are messed up very badly! So I can't help it and I quit!"));
 
+  // this is the tailscale address
+  let flight_address = format!("tcp://100.101.96.10:{}", DATAPORT);
+  // this is the address in the flight network
+  // flight_address = format!("tcp://10.0.1.1:{}", DATAPORT);
   println!("==> Starting data sink thread!");
   worker_threads.execute(move || {
                          global_data_sink(&tp_from_client,
+                                          &flight_address,
                                           write_stream,
                                           write_stream_path,
                                           runid,
@@ -378,7 +424,6 @@ fn main() {
   });
   println!("==> data sink thread started!");
   println!("==> Will now start rb threads..");
-    
 
   for n in 0..nboards {
     let mut this_rb = rb_list[n].clone();
@@ -429,7 +474,8 @@ fn main() {
                                           &mtb_moni_sender,
                                           10,
                                           60,
-                                          true);
+                                          false,
+                                          false);
     });
   } else {
     println!("=> {}", "NOT using the MTB! This means that currently we can only save the blobfiles directly and NO EVENT data will be passed on to the flight computer!".red().bold());
@@ -459,34 +505,34 @@ fn main() {
   })
   .expect("Error setting Ctrl-C handler");
 
-  match args.command {
-    // Matching calibration command
-    Command::Calibration(calibration_cmd) => {
-      match calibration_cmd {
-        CalibrationCmd::Default => {
-          liftof_cc::send_all_calibration(cmd_sender);
-        },
-        CalibrationCmd::Voltage(voltage_opts) => {
-          let voltage_level = voltage_opts.voltage_level.unwrap_or(DEFAULT_CALIB_VOLTAGE);
-          let rb_id = voltage_opts.rb_id.unwrap_or(DEFAULT_CALIB_RB);
-          let extra = voltage_opts.extra.unwrap_or(DEFAULT_CALIB_EXTRA);
-          liftof_cc::send_voltage_calibration(cmd_sender, voltage_level, rb_id, extra);
-        },
-        CalibrationCmd::Timing(timing_opts) => {
-          let rb_id = timing_opts.rb_id.unwrap_or(DEFAULT_CALIB_RB);
-          let extra = timing_opts.extra.unwrap_or(DEFAULT_CALIB_EXTRA);
-          liftof_cc::send_timing_calibration(cmd_sender, rb_id, extra);
-        }
-      }
-    }
-  }
+  //match args.command {
+  //  // Matching calibration command
+  //  Command::Calibration(calibration_cmd) => {
+  //    match calibration_cmd {
+  //      CalibrationCmd::Default => {
+  //        liftof_cc::send_all_calibration(cmd_sender);
+  //      },
+  //      CalibrationCmd::Voltage(voltage_opts) => {
+  //        let voltage_level = voltage_opts.voltage_level.unwrap_or(DEFAULT_CALIB_VOLTAGE);
+  //        let rb_id = voltage_opts.rb_id.unwrap_or(DEFAULT_CALIB_RB);
+  //        let extra = voltage_opts.extra.unwrap_or(DEFAULT_CALIB_EXTRA);
+  //        liftof_cc::send_voltage_calibration(cmd_sender, voltage_level, rb_id, extra);
+  //      },
+  //      CalibrationCmd::Timing(timing_opts) => {
+  //        let rb_id = timing_opts.rb_id.unwrap_or(DEFAULT_CALIB_RB);
+  //        let extra = timing_opts.extra.unwrap_or(DEFAULT_CALIB_EXTRA);
+  //        liftof_cc::send_timing_calibration(cmd_sender, rb_id, extra);
+  //      }
+  //    }
+  //  }
+  //}
   // start a new data run 
-  // let start_run = TofCommand::DataRunStart(1000);
-  // let tp = TofPacket::from(&start_run);
-  // match cmd_sender.send(tp) {
-  //   Err(err) => error!("Unable to send command, error{err}"),
-  //   Ok(_)    => ()
-  // }
+  let start_run = TofCommand::DataRunStart(1000);
+  let tp = TofPacket::from(&start_run);
+  match cmd_sender.send(tp) {
+    Err(err) => error!("Unable to send command, error{err}"),
+    Ok(_)    => ()
+  }
 
   println!("==> All threads initialized!");
   loop{
