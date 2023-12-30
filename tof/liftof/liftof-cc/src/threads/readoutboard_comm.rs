@@ -75,7 +75,7 @@ pub fn readoutboard_communicator(ev_to_builder       : &Sender<RBEvent>,
   let topic = b"";
   match socket.set_subscribe(topic) {
    Err(err) => error!("Unable to subscribe to topic! {err}"),
-   Ok(_) => ()
+   Ok(_) => info!("Subscribed to {:?}!", topic),
 
   }
   //let mut secs_since_epoch = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
@@ -104,19 +104,20 @@ pub fn readoutboard_communicator(ev_to_builder       : &Sender<RBEvent>,
             }
             n_received += 1;
             match tp.packet_type {
-              PacketType::RBEvent => {
+              PacketType::RBEvent | PacketType::RBEventMemoryView => {
                 let mut event = RBEvent::from(&tp);
                 if event.hits.len() == 0 {
                   if run_analysis_engine {
-                    match waveform_analysis(&mut event, 
-                                            &rb,
-                                            &calibrations) {
-                        
-                      Ok(_) => (),
-                      Err(err) => {
-                        error!("Unable to analyze waveforms for this event! Err {err}");
-                      }
-                    }
+                    error!("Analysis engine currently not available");
+                    //match waveform_analysis(&mut event, 
+                    //                        &rb,
+                    //                        &calibrations) {
+                    //    
+                    //  Ok(_) => (),
+                    //  Err(err) => {
+                    //    error!("Unable to analyze waveforms for this event! Err {err}");
+                    //  }
+                    //}
                   }
                 };
                 match ev_to_builder.send(event) {
@@ -144,7 +145,7 @@ pub fn readoutboard_communicator(ev_to_builder       : &Sender<RBEvent>,
     debug!("Digested {n_chunk} chunks!");
     debug!("Noticed {n_errors} errors!");
     if n_received % 100 == 0 {
-      println!("==> Received {n_received} packets!");
+      println!("[RBCOM] => Received {n_received} packets!");
     }
   } // end loop
 } // end fun
