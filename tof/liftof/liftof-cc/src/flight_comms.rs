@@ -5,14 +5,18 @@
 //!
 //!
 
-use local_ip_address::local_ip;
-use std::net::IpAddr;
+use std::time::{
+    Instant,
+    Duration,
+};
 
 extern crate crossbeam_channel;
-use crossbeam_channel as cbc; 
+use crossbeam_channel::Receiver; 
 
-use tof_dataclasses::packets::{TofPacket,
-                               PacketType};
+use tof_dataclasses::packets::{
+    TofPacket,
+    PacketType
+};
 
 use tof_dataclasses::monitoring::{RBMoniData,
                                   MtbMoniData,
@@ -21,36 +25,36 @@ use tof_dataclasses::monitoring::{RBMoniData,
 use tof_dataclasses::events::TofEvent;
 use tof_dataclasses::serialization::Serialization;
 use liftof_lib::TofPacketWriter;
+
 /// Manages "outgoing" 0MQ PUB socket
 ///
 /// Everything should send to here, and 
 /// then it gets passed on over the 
 /// connection to the flight computer
-pub fn global_data_sink(incoming : &cbc::Receiver<TofPacket>,
-                        write_stream : bool,
+///
+/// # Arguments
+///
+/// * flight_address   : The address the flight computer
+///                      (or whomever) wants to listen.
+///                      A 0MQ PUB socket witll be bound 
+///                      to this address.
+pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
+                        flight_address     : &str,
+                        write_stream       : bool,
                         write_stream_path  : String,
                         runid              : usize,
                         print_moni_packets : bool) {
 
   let ctx = zmq::Context::new();
-  let mut address_ip = String::from("tcp://");
-  let this_ip = local_ip().unwrap();
-  let data_port    = 40000;
-  match this_ip {
-    IpAddr::V4(ip) => address_ip += &ip.to_string(),
-    IpAddr::V6(_) => panic!("Currently, we do not support IPV6!")
-  }
-  let data_address : String = address_ip + ":" + &data_port.to_string();
-
   // FIXME - should we just move to another socket if that one is not working?
   let data_socket = ctx.socket(zmq::PUB).expect("Can not create socket!");
   let unlim : i32 = 1000000;
   data_socket.set_sndhwm(unlim).unwrap();
-  match data_socket.bind(&data_address) {
-    Err(err) => panic!("Can not bind to address {}, Err {}", data_address, err),
+  match data_socket.bind(flight_address) {
+    Err(err) => panic!("Can not bind to address {}! {}", flight_address, err),
     Ok(_)    => ()
   }
-  info!("ZMQ PUB Socket for global data sink bound to {data_address}");
+  info!("ZMQ PUB Socket for global data sink bound to {flight_address}");
 
   let mut writer : Option<TofPacketWriter> = None;
   if write_stream {
@@ -63,6 +67,9 @@ pub fn global_data_sink(incoming : &cbc::Receiver<TofPacket>,
 
   let mut n_pack_sent = 0;
   let mut last_evid   = 0u32;
+
+  // for debugging/profiling
+  let mut timer = Instant::now();
   loop {
     match incoming.recv() {
       Err(err) => trace!("No new packet, err {err}"),
@@ -78,7 +85,9 @@ pub fn global_data_sink(incoming : &cbc::Receiver<TofPacket>,
             PacketType::RBMoni => {
               let moni = RBMoniData::from_bytestream(&pack.payload, &mut pos);
               match moni {
-                Ok(data) => {println!("{}", data);},
+                Ok(data) => {
+                  debug!("Sending RBMoniData {}", data);
+                },
                 Err(err) => error!("Can not unpack RBMoniData! {err}")}
               }, 
             PacketType::MonitorTofCmp => {
@@ -96,46 +105,47 @@ pub fn global_data_sink(incoming : &cbc::Receiver<TofPacket>,
             _ => ()
           } // end match 
         }
-        if pack.packet_type == PacketType::TofEvent {
-          if event_cache.len() != 100 {
-            event_cache.push(pack);
-            continue;
-          } else {
-            if n_pack_sent % 1000 == 0 && n_pack_sent != 0 {
-              println!("=> [SINK] Sent {n_pack_sent}, last evid {last_evid} ===");
-            }
-            // sort the cache
-            // FIXME - at this step, we should have checked if the 
-            // packets are broken.
-            event_cache.sort_by(| a, b|  TofEvent::extract_event_id_from_stream(&a.payload).unwrap().cmp(
-                                        &TofEvent::extract_event_id_from_stream(&b.payload).unwrap()));
-           
-            for ev in event_cache.iter() {
-              last_evid = TofEvent::extract_event_id_from_stream(&ev.payload).unwrap();
-              match data_socket.send(&ev.to_bytestream(),0) {
-                Err(err) => error!("Not able to send packet over 0MQ PUB, {err}"),
-                Ok(_)    => { 
-                  trace!("TofPacket sent");
-                  n_pack_sent += 1;
-                }
-              }
-            }
-            event_cache.clear();
-          }
+        //if pack.packet_type == PacketType::TofEvent {
+        //  if event_cache.len() != 100 {
+        //    event_cache.push(pack);
+        //    continue;
+        //  } else {
+        //    if n_pack_sent % 1000 == 0 && n_pack_sent != 0 {
+        //      println!("=> [SINK] Sent {n_pack_sent}, last evid {last_evid} ===");
+        //    }
+        //    // sort the cache
+        //    // FIXME - at this step, we should have checked if the 
+        //    // packets are broken.
+        //    event_cache.sort_by(| a, b|  TofEvent::extract_event_id_from_stream(&a.payload).unwrap().cmp(
+        //                                &TofEvent::extract_event_id_from_stream(&b.payload).unwrap()));
+        //   
+        //    for ev in event_cache.iter() {
+        //      last_evid = TofEvent::extract_event_id_from_stream(&ev.payload).unwrap();
+        //      match data_socket.send(&ev.to_bytestream(),0) {
+        //        Err(err) => error!("Not able to send packet over 0MQ PUB, {err}"),
+        //        Ok(_)    => { 
+        //          trace!("TofPacket sent");
+        //          n_pack_sent += 1;
+        //        }
+        //      }
+        //    }
+        //    event_cache.clear();
+        //  }
 
-        } else {
-          match data_socket.send(pack.to_bytestream(),0) {
-            Err(err) => error !("Not able to send packet over 0MQ PUBi {err}"),
-            Ok(_)    => {
-              trace!("TofPacket sent");
-              n_pack_sent += 1;
-            }
-          } // end match
-        } // end else
+        //} else {
+        match data_socket.send(pack.to_bytestream(),0) {
+          Err(err) => error !("Not able to send packet over 0MQ PUB! {err}"),
+          Ok(_)    => {
+            trace!("TofPacket sent");
+            n_pack_sent += 1;
+          }
+        } // end match
+        //} // end else
       } // end if pk == event packet
     } // end incoming.recv 
     if n_pack_sent % 1000 == 0 {
-      info!("Sent {n_pack_sent} TofPacket!");
+      println!("[FLIGHT] Sent {n_pack_sent} TofPacket in {} sec!", timer.elapsed().as_secs());
+      timer = Instant::now();
     }
   }
 }
