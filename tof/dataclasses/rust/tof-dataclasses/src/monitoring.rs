@@ -121,10 +121,10 @@ impl fmt::Display for PBMoniData {
     write!(f, "<PBMoniData:
   BOARD ID     :  {}
   ** Temperatures **
-  PDS TMP      :  {:.2} [C]
-  PAS TMP      :  {:.2} [C]
-  NAS TMP      :  {:.2} [C]
-  SHV TMP      :  {:.2} [C]
+  PDS TMP      :  {:.2} [\u{00B0}C]
+  PAS TMP      :  {:.2} [\u{00B0}C]
+  NAS TMP      :  {:.2} [\u{00B0}C]
+  SHV TMP      :  {:.2} [\u{00B0}C]
   ** Power **
   P3V6  Preamp :  {:.3}  [V] | {:.3} [A] | {:.3} [W]
   N1V6  Preamp : {:.3}  [V] | {:.3} [A] | {:.3} [W]
@@ -132,29 +132,29 @@ impl fmt::Display for PBMoniData {
   P3V4d LTB    :  {:.3}  [V] | {:.3} [A] | {:.3} [W]
   P3V6  LTB    :  {:.3}  [V] | {:.3} [A] | {:.3} [W]
   N1V6  LTB    : {:.3}  [V] | {:.3} [A] | {:.3} [W]>",
-           self.board_id        , 
-           self.pds_temp        ,
-           self.pas_temp        ,
-           self.nas_temp        ,
-           self.shv_temp        ,
-           self.p3v6_preamp_vcp[0],
-           self.p3v6_preamp_vcp[1],
-           self.p3v6_preamp_vcp[2],
-           self.n1v6_preamp_vcp[0],
-           self.n1v6_preamp_vcp[1],
-           self.n1v6_preamp_vcp[2],
-           self.p3v4f_ltb_vcp[0]  ,
-           self.p3v4f_ltb_vcp[1]  ,
-           self.p3v4f_ltb_vcp[2]  ,
-           self.p3v4d_ltb_vcp[0]  ,
-           self.p3v4d_ltb_vcp[1]  ,
-           self.p3v4d_ltb_vcp[2]  ,
-           self.p3v6_ltb_vcp[0]   ,
-           self.p3v6_ltb_vcp[1]   ,
-           self.p3v6_ltb_vcp[2]   ,
-           self.n1v6_ltb_vcp[0]   ,
-           self.n1v6_ltb_vcp[1]   ,
-           self.n1v6_ltb_vcp[2])
+           self.board_id       , 
+           if self.pds_temp != f32::MAX {self.pds_temp.to_string()} else {String::from("f32::MAX (ERR)")},
+           if self.pas_temp != f32::MAX {self.pas_temp.to_string()} else {String::from("f32::MAX (ERR)")},
+           if self.nas_temp != f32::MAX {self.nas_temp.to_string()} else {String::from("f32::MAX (ERR)")},
+           if self.shv_temp != f32::MAX {self.shv_temp.to_string()} else {String::from("f32::MAX (ERR)")},
+           if self.p3v6_preamp_vcp[0] != f32::MAX {self.p3v6_preamp_vcp[0].to_string()} else {String::from("f32::MAX (ERR)")},
+           if self.p3v6_preamp_vcp[1] != f32::MAX {self.p3v6_preamp_vcp[1].to_string()} else {String::from("f32::MAX (ERR)")},
+           if self.p3v6_preamp_vcp[2] != f32::MAX {self.p3v6_preamp_vcp[2].to_string()} else {String::from("f32::MAX (ERR)")},
+           if self.n1v6_preamp_vcp[0] != f32::MAX {self.n1v6_preamp_vcp[0].to_string()} else {String::from("f32::MAX (ERR)")},
+           if self.n1v6_preamp_vcp[1] != f32::MAX {self.n1v6_preamp_vcp[1].to_string()} else {String::from("f32::MAX (ERR)")},
+           if self.n1v6_preamp_vcp[2] != f32::MAX {self.n1v6_preamp_vcp[2].to_string()} else {String::from("f32::MAX (ERR)")},
+           if self.p3v4f_ltb_vcp[0]   != f32::MAX {self.p3v4f_ltb_vcp[0].to_string()  } else {String::from("f32::MAX (ERR)")},
+           if self.p3v4f_ltb_vcp[1]   != f32::MAX {self.p3v4f_ltb_vcp[1].to_string()  } else {String::from("f32::MAX (ERR)")},
+           if self.p3v4f_ltb_vcp[2]   != f32::MAX {self.p3v4f_ltb_vcp[2].to_string()  } else {String::from("f32::MAX (ERR)")},
+           if self.p3v4d_ltb_vcp[0]   != f32::MAX {self.p3v4d_ltb_vcp[0].to_string()  } else {String::from("f32::MAX (ERR)")},
+           if self.p3v4d_ltb_vcp[1]   != f32::MAX {self.p3v4d_ltb_vcp[1].to_string()  } else {String::from("f32::MAX (ERR)")},
+           if self.p3v4d_ltb_vcp[2]   != f32::MAX {self.p3v4d_ltb_vcp[2].to_string()  } else {String::from("f32::MAX (ERR)")},
+           if self.p3v6_ltb_vcp[0]    != f32::MAX {self.p3v6_ltb_vcp[0].to_string()   } else {String::from("f32::MAX (ERR)")},
+           if self.p3v6_ltb_vcp[1]    != f32::MAX {self.p3v6_ltb_vcp[1].to_string()   } else {String::from("f32::MAX (ERR)")},
+           if self.p3v6_ltb_vcp[2]    != f32::MAX {self.p3v6_ltb_vcp[2].to_string()   } else {String::from("f32::MAX (ERR)")},
+           if self.n1v6_ltb_vcp[0]    != f32::MAX {self.n1v6_ltb_vcp[0].to_string()   } else {String::from("f32::MAX (ERR)")},
+           if self.n1v6_ltb_vcp[1]    != f32::MAX {self.n1v6_ltb_vcp[1].to_string()   } else {String::from("f32::MAX (ERR)")},
+           if self.n1v6_ltb_vcp[2]    != f32::MAX {self.n1v6_ltb_vcp[2].to_string()   } else {String::from("f32::MAX (ERR)")})
   }
 }
 
@@ -713,12 +713,12 @@ impl fmt::Display for RBMoniData {
   BOARD ID       {}
   RATE           {}    [Hz] 
   ** Temperatures **
-  DRS TMP        {:.3} [C]
-  CLK TMP        {:.3} [C]
-  ADC TMP        {:.3} [C]
-  ZYNQ TMP       {:.3} [C]
-  LIS3MDLTR TMP  {:.3} [C]  
-  BM280 TMP      {:.3} [C]
+  DRS TMP        {:.3} [\u{00B0}C]
+  CLK TMP        {:.3} [\u{00B0}C]
+  ADC TMP        {:.3} [\u{00B0}C]
+  ZYNQ TMP       {:.3} [\u{00B0}C]
+  LIS3MDLTR TMP  {:.3} [\u{00B0}C]  
+  BM280 TMP      {:.3} [\u{00B0}C]
   ** Ambience **
   PRESSURE       {:.3} [hPa]
   HUMIDITY       {:.3} [%]

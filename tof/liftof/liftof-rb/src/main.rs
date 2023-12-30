@@ -6,15 +6,17 @@
 //!
 //! Standalone, statically linked binary to be either run manually 
 //! or to be managed by systemd
+
+//use std::collections::HashMap;
+use std::os::raw::c_int;
+use std::process::exit;
 use std::{
     thread,
 };
-
 use std::sync::{
     Arc,
     Mutex,
 };
-
 use std::time::{
     Duration,
     Instant,
@@ -25,16 +27,17 @@ extern crate crossbeam_channel;
 extern crate signal_hook;
 extern crate env_logger;
 
-use std::os::raw::c_int;
 use signal_hook::iterator::Signals;
 use signal_hook::consts::signal::{SIGTERM, SIGINT};
 
 #[macro_use] extern crate log;
 
 extern crate clap;
-use clap::{arg,
-           command,
-           Parser};
+use clap::{
+    arg,
+    command,
+    Parser
+};
 
 // FIXME - think about using 
 // bounded channels to not 
@@ -48,8 +51,10 @@ use crossbeam_channel::{
 use local_ip_address::local_ip;
 use colored::Colorize;
 
-//use std::collections::HashMap;
-use std::process::exit;
+
+// TOF specific crates
+use tof_control::helper::rb_type::RBInfo;
+
 use tof_dataclasses::threading::{
     ThreadControl,
 };
@@ -151,22 +156,47 @@ fn main() {
   let cmd_server_ip = String::from("10.0.1.1");
   //let cmd_server_ip     = args.cmd_server_ip;  
   let this_board_ip = local_ip().expect("Unable to obtainl local board IP. Something is messed up!");
-  
+
+  // get board info 
+  let rb_info = RBInfo::new();
+  // check if it is sane. If we are not able to 
+  // get the board id, we might as well panic and restart.
+  if rb_info.board_id == u8::MAX {
+    error!("Board ID field has been set to error state of {}", rb_info.board_id);
+    panic!("Unable to obtain board id! This is a CRITICAL error! Abort!");
+  }
+  let ltb_connected = rb_info.sub_board == 1;
+  let pb_connected  = rb_info.sub_board == 2;
   // General parameters, readout board id,, 
   // ip to tof computer
-  let rb_id = get_board_id().expect("Unable to obtain board ID!");
+  let rb_id = rb_info.board_id;
   let dna   = get_device_dna().expect("Unable to obtain device DNA!"); 
 
   // welcome banner!
   println!("{}", LIFTOF_LOGO_SHOW);
   println!(" ** Welcome to liftof-rb \u{1F680} \u{1F388} *****");
-  println!(" .. liftof if a software suite for the time-of-flight detector ");
+  println!(" .. liftof is a software suite for the time-of-flight detector ");
   println!(" .. for the GAPS experiment \u{1F496}");
   println!(" .. this client can be run standalone or connect to liftof-cc" );
   println!(" .. or liftof-tui for an interactive experience" );
+  println!(" .. this client will be publishing TofPackets on the bound port!");
   println!("-----------------------------------------------");
-  println!(" => Running client for RB {}", rb_id);
-  println!(" => ReadoutBoard DNA {}", dna);
+  println!(" .. RBInfo:");
+  println!(" .. .. ReadoutBoard  ID {}", rb_id);
+  println!(" .. .. ReadoutBoard DNA {}", dna);
+  println!(" .. .. Current Rate     {} [Hz]", rb_info.trig_rate);
+  println!(" .. Connected boards:");
+  if ltb_connected {
+    println!("..     LTB                     - {}", String::from("YES").green());
+  } else {
+    println!("..     LTB                     - {}", String::from("NO").red());
+  }
+  if pb_connected {
+    println!("..     PB (including preamps) - {}", String::from("YES").green());
+  } else {
+    println!("..     PB (including preamps) - {}", String::from("NO").red());
+  }
+  println!("-----------------------------------------------");
   println!(" => We will BIND this port to the local ip address at {}", this_board_ip);
   println!(" => -- -- PORT {} (0MQ PUB) to publish our data", DATAPORT);
   println!(" => We will CONNECT to the following port on the C&C server at address: {}", cmd_server_ip);
@@ -194,10 +224,11 @@ fn main() {
   match run_config {
     None     => {
       if !calibration {
-        println!("=> We did not get a runconfig with the -r <RUNCONFIG> commandline switch! Currently we are just listening for input on the socket. This is the desired behavior, if run by systemd. If you want to take data in standalone mode, either send a runconfig to the socket or hit CTRL+C and start the program again, this time suppling the -r <RUNCONFIG> flag or in case you want to calibrate the board, use the --calibration flag.");
+        // FIXME - something happened
+        //println!("=> We did not get a runconfig with the -r <RUNCONFIG> commandline switch! Currently we are just listening for input on the socket. This is the desired behavior, if run by systemd. If you want to take data in standalone mode, either send a runconfig to the socket or hit CTRL+C and start the program again, this time suppling the -r <RUNCONFIG> flag or in case you want to calibrate the board, use the --calibration flag.");
       }
       config_from_shell = false;
-    }
+    },
     Some(rcfile) => {
       println!("=> Instructed to use runconfig {:?}", rcfile);
       rc_file_path   = rcfile.clone();
@@ -216,16 +247,22 @@ fn main() {
   // sleeping
   let one_sec     = Duration::from_secs(1);  
 
-  // threads and inter-thread communications
-  // We have
-  // * buffer reader thread
-  // * data analysis/sender thread
-  // * monitoring thread
-  // * run thread
-  // + main thread, which does not need a 
-  //   separate thread
-
-  // FIXME - MESSAGES GET CONSUMED!!
+  //// FIXME - this will come from future runconfig
+  let rb_mon_interv   = 5.0f32; 
+  let mut pb_mon_every_x  = 2.0f32;
+  let mut pa_mon_every_x  = 1.0f32; 
+  let mut ltb_mon_every_x = 2.0f32;
+  
+  // for now just set the intervals to inf, 
+  // better would be to switch the whole thing
+  // off.
+  if !pb_connected {
+    pb_mon_every_x = f32::MAX;
+    pa_mon_every_x = f32::MAX;
+  }
+  if !ltb_connected {
+    ltb_mon_every_x = f32::MAX;
+  }
   // setting up inter-thread comms
   let thread_control : Arc<Mutex<ThreadControl>> = Arc::new(Mutex::new(ThreadControl::new())); 
 
@@ -264,13 +301,14 @@ fn main() {
                            Some(&file_suffix),
                            test_eventids,
                            verbose,
-                           ctrl_cl); 
+                           ctrl_cl) 
           })
          .expect("Failed to spawn data-publsher thread!");
   
   let tp_to_pub_ev   = tp_to_pub.clone();
   #[cfg(feature="tofcontrol")]
   let tp_to_pub_cal  = tp_to_pub.clone();
+
 
   // then the runner. It does nothing, until we send a set
   // of RunParams
@@ -308,6 +346,7 @@ fn main() {
            .name("event-processing".into())
            .spawn(move || {
                   event_processing(
+                                   rb_id,
                                    &tp_from_builder,
                                    &bs_recv,
                                    &opmode_from_runner, 
@@ -320,16 +359,6 @@ fn main() {
                                    only_perfect_events)
            })
            .expect("Failed to spawn event_processing thread!");
-  //workforce.execute(move || {
-  //                  event_processing(
-  //                                   &tp_from_builder,
-  //                                   &bs_recv,
-  //                                   &opmode_from_runner, 
-  //                                   &tp_to_pub_ev,
-  //                                   &dtf_from_runner,
-  //                                   args.verbose,
-  //                                   calc_crc32);
-  //});
   
 
   // Respond to commands from the C&C server
@@ -424,13 +453,14 @@ fn main() {
     let _monitoring_thread = thread::Builder::new()
            .name("rb-monitoring".into())
            .spawn(move || {
-              monitoring(0,    // board id
+              monitoring(rb_id,    // board id
                          &tp_to_pub,
-                         5.0,  // every 10 sec a new set of RBMoniData
-                         2.0,  // every 20 sec a new set of Preamp moni data 
-                         1.0,  // every 10 sec a new set of Powerboard moni data
-                         2.0,  // every 20 sec a new set of LTB moni data
-                         verbose,
+                         rb_mon_interv,  
+                         pa_mon_every_x, 
+                         pb_mon_every_x, 
+                         ltb_mon_every_x, 
+                         //verbose,
+                         true,
                          moni_ctrl); 
             })
            .expect("Failed to spawn rb-monitoring thread!");

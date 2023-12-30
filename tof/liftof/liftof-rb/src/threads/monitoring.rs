@@ -89,7 +89,10 @@ pub fn monitoring(board_id          : u8,
 
   println!("[MONI] ==> Starting monitoring thread!");
 
-  let mut rb_moni_timer  = Instant::now();
+  let mut rb_moni_timer   = Instant::now();
+  let mut pa_moni_timer   = Instant::now();
+  let mut pb_moni_timer   = Instant::now();
+  let mut ltb_moni_timer  = Instant::now();
  
   // we calculate some sleep time, to reduce CPU load
   // check for the smallest interfval and use that as sleep.
@@ -103,6 +106,7 @@ pub fn monitoring(board_id          : u8,
   if ltb_moni_every_x*rb_moni_interval < sleeptime_sec {
     sleeptime_sec = ltb_moni_every_x*rb_moni_interval;
   }
+  debug!("Setting sleeptime to {} seconds!", sleeptime_sec);
   let sleeptime = Duration::from_secs_f32(sleeptime_sec);
 
   loop {
@@ -155,9 +159,9 @@ pub fn monitoring(board_id          : u8,
         Err(err) => error!("Issue sending RBMoniData {:?}", err),
         Ok(_)    => trace!("Sent RBMoniData successfully!"),
       }
-      rb_moni_timer = Instant::now(); 
+      rb_moni_timer = Instant::now();
     }
-    if rb_moni_timer.elapsed().as_secs_f32() > rb_moni_interval*pa_moni_every_x {
+    if pa_moni_timer.elapsed().as_secs_f32() > rb_moni_interval*pa_moni_every_x {
       let mut moni = PAMoniData::new();
       moni.board_id = board_id;
       cfg_if::cfg_if! {
@@ -179,8 +183,9 @@ pub fn monitoring(board_id          : u8,
         Err(err) => error!("Issue sending PAMoniData {:?}", err),
         Ok(_)    => trace!("Sent PAMoniData successfully!"),
       }
+      pa_moni_timer = Instant::now();
     }
-    if rb_moni_timer.elapsed().as_secs_f32() > rb_moni_interval*pb_moni_every_x {
+    if pb_moni_timer.elapsed().as_secs_f32() > rb_moni_interval*pb_moni_every_x {
       let mut moni = PBMoniData::new();
       moni.board_id = board_id;
       cfg_if::cfg_if! {
@@ -199,8 +204,9 @@ pub fn monitoring(board_id          : u8,
         Err(err) => error!("Issue sending PBMoniData {:?}", err),
         Ok(_)    => trace!("Sent PBMoniData successfully!"),
       }
+      pb_moni_timer = Instant::now();
     }
-    if rb_moni_timer.elapsed().as_secs_f32() > rb_moni_interval*ltb_moni_every_x {
+    if ltb_moni_timer.elapsed().as_secs_f32() > rb_moni_interval*ltb_moni_every_x {
       let mut moni = LTBMoniData::new();
       moni.board_id = board_id;
       cfg_if::cfg_if! {
@@ -219,8 +225,8 @@ pub fn monitoring(board_id          : u8,
         Err(err) => error!("Issue sending LTBMoniData {:?}", err),
         Ok(_)    => debug!("Sent LTBMoniData successfully!"),
       }
+      ltb_moni_timer = Instant::now();
     }
-
     thread::sleep(sleeptime);
   }
 }
