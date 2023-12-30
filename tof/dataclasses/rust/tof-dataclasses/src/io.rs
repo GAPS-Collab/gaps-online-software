@@ -467,6 +467,8 @@ impl RBEventMemoryStreamer {
       } else {
         if ch_id > 9 {
           error!("Channel id {} in data outside of requested channel mask! Skipping..", ch_id);
+          error!(" - - Header of this event: {}", header);
+          event_status = EventStatus::ChannelIDWrong;
         } else {
           warn!("Channel id {} in data outside of requested channel mask! Skipping..", ch_id);
         }

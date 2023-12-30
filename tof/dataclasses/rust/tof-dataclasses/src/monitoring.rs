@@ -622,7 +622,12 @@ impl RBMoniData {
     // deprecated field!
     //self.mag_tot = rb_mag.magnetic_t;
   }
-  
+ 
+  pub fn get_mag_tot(&self) -> f32 {
+    (self.mag_x.powi(2) + self.mag_y.powi(2) + self.mag_z.powi(2)).sqrt()
+  }
+
+
   #[cfg(feature = "tof-control")]
   pub fn add_rbvcp(&mut self, rb_vcp   : &RBVcp) {
     self.drs_dvdd_voltage = rb_vcp.drs_dvdd_vcp[0] ;
@@ -746,7 +751,7 @@ impl fmt::Display for RBMoniData {
            self.mag_x           ,
            self.mag_y           ,
            self.mag_z           ,
-           self.mag_tot         ,
+           self.get_mag_tot()   ,
            self.zynq_voltage    ,
            self.zynq_current    ,
            self.zynq_power      ,
