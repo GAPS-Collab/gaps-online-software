@@ -86,6 +86,7 @@ DATABASES = {
 
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
+        #"NAME": BASE_DIR / "gaps_nts.db",
         "NAME": BASE_DIR / "gaps_flight.db",
     }
 }
