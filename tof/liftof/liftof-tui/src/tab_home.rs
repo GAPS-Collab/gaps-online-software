@@ -23,28 +23,9 @@ use ratatui::widgets::{
     Paragraph,
 };
 
+use liftof_lib::LIFTOF_LOGO_SHOW;
 use crate::colors::ColorTheme2;
 
-const logo : &str = "
-                                  ___                         ___           ___     
-                                 /\\__\\                       /\\  \\         /\\__\\    
-                    ___         /:/ _/_         ___         /::\\  \\       /:/ _/_   
-                   /\\__\\       /:/ /\\__\\       /\\__\\       /:/\\:\\  \\     /:/ /\\__\\  
-    ___     ___   /:/__/      /:/ /:/  /      /:/  /      /:/  \\:\\  \\   /:/ /:/  /  
-   /\\  \\   /\\__\\ /::\\  \\     /:/_/:/  /      /:/__/      /:/__/ \\:\\__\\ /:/_/:/  /   
-   \\:\\  \\ /:/  / \\/\\:\\  \\__  \\:\\/:/  /      /::\\  \\      \\:\\  \\ /:/  / \\:\\/:/  /    
-    \\:\\  /:/  /   ~~\\:\\/\\__\\  \\::/__/      /:/\\:\\  \\      \\:\\  /:/  /   \\::/__/     
-     \\:\\/:/  /       \\::/  /   \\:\\  \\      \\/__\\:\\  \\      \\:\\/:/  /     \\:\\  \\     
-      \\::/  /        /:/  /     \\:\\__\\          \\:\\__\\      \\::/  /       \\:\\__\\    
-       \\/__/         \\/__/       \\/__/           \\/__/       \\/__/         \\/__/    
-
-          (LIFTOF - liftof is for tof, Version 0.8 'NIUHI', Dec 2023)
-
-          * Documentation
-          ==> GitHub   https://github.com/GAPS-Collab/gaps-online-software/tree/NIUHI-0.8
-          ==> API docs https://gaps-collab.github.io/gaps-online-software/
-
-";
 
 #[derive(Debug, Clone)]
 pub struct HomeTab {
@@ -116,7 +97,7 @@ impl HomeTab {
     );
         
 
-    let main_view = Paragraph::new(logo)
+    let main_view = Paragraph::new(LIFTOF_LOGO_SHOW)
     .style(self.theme.style())
     .alignment(Alignment::Center)
     .block(

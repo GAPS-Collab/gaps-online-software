@@ -23,9 +23,9 @@ use ratatui::{
     Terminal,
 };
 
-use crossbeam_channel::{unbounded,
-                        Sender,
-                        Receiver};
+use crossbeam_channel::{
+    Receiver
+};
 
 use std::collections::VecDeque;
 
@@ -55,6 +55,8 @@ pub enum RBTabView {
 pub struct RBTab<'a>  {
   pub tp_receiver   : Receiver<TofPacket>,
   pub rb_receiver   : Receiver<RBEvent>,
+  pub rb_selector   : u8,
+  pub rb_changed    : bool, 
   pub event_queue   : VecDeque<RBEvent>,
   pub moni_queue    : VecDeque<RBMoniData>,
   pub met_queue     : VecDeque<f64>,
@@ -114,6 +116,8 @@ impl RBTab<'_>  {
     RBTab {
       tp_receiver   : tp_receiver,
       rb_receiver   : rb_receiver,
+      rb_selector   : 0,
+      rb_changed    : false,
       event_queue   : VecDeque::<RBEvent>::with_capacity(queue_size),
       moni_queue    : VecDeque::<RBMoniData>::with_capacity(queue_size),
       met_queue     : VecDeque::<f64>::with_capacity(queue_size),
@@ -150,6 +154,22 @@ impl RBTab<'_>  {
     let met = self.timer.elapsed().as_secs_f64();
     let mut ev = RBEvent::new();
     
+    if self.rb_changed {
+      // currently, only one RB at a time is supported
+      self.moni_queue.clear();
+      self.rate_queue.clear();
+      self.pressure.clear();
+      self.humidity.clear();
+      self.mag_x.clear();
+      self.mag_y.clear();
+      self.mag_z.clear();
+      self.mag_tot.clear();
+      self.event_queue.clear();
+      self.met_queue.clear();
+      self.fpgatmp_queue.clear();
+      self.nch_histo = Histogram::with_buckets(50);
+    }
+
     if !self.rb_receiver.is_empty() {
       match self.rb_receiver.try_recv() {
         Err(err) => (),
@@ -168,38 +188,40 @@ impl RBTab<'_>  {
               info!("Got new RBMoniData!");
               let moni = RBMoniData::from_bytestream(&pack.payload, &mut 0)?;
               self.n_moni += 1;
-              self.moni_queue.push_back(moni);
-              if self.moni_queue.len() > self.queue_size {
-                self.moni_queue.pop_front();
-              }
-              self.rate_queue.push_back((met, moni.rate as f64));
-              if self.rate_queue.len() > self.queue_size {
-                self.rate_queue.pop_front();
-              }
-              
-              self.pressure.push_back((met, moni.pressure as f64));
-              if self.pressure.len() > self.queue_size {
-                self.pressure.pop_front();
-              }
-              self.humidity.push_back((met, moni.humidity as f64));
-              if self.humidity.len() > self.queue_size {
-                self.humidity.pop_front();
-              }
-              self.mag_x.push_back((met, moni.mag_x as f64));
-              if self.mag_x.len() > self.queue_size {
-                self.mag_x.pop_front();
-              }
-              self.mag_y.push_back((met, moni.mag_y as f64));
-              if self.mag_y.len() > self.queue_size {
-                self.mag_y.pop_front();
-              }
-              self.mag_z.push_back((met, moni.mag_z as f64));
-              if self.mag_z.len() > self.queue_size {
-                self.mag_z.pop_front();
-              }
-              self.mag_tot.push_back((met, moni.mag_tot as f64));
-              if self.mag_tot.len() > self.queue_size {
-                self.mag_tot.pop_front();
+              if moni.board_id == self.rb_selector {
+                self.moni_queue.push_back(moni);
+                if self.moni_queue.len() > self.queue_size {
+                  self.moni_queue.pop_front();
+                }
+                self.rate_queue.push_back((met, moni.rate as f64));
+                if self.rate_queue.len() > self.queue_size {
+                  self.rate_queue.pop_front();
+                }
+                
+                self.pressure.push_back((met, moni.pressure as f64));
+                if self.pressure.len() > self.queue_size {
+                  self.pressure.pop_front();
+                }
+                self.humidity.push_back((met, moni.humidity as f64));
+                if self.humidity.len() > self.queue_size {
+                  self.humidity.pop_front();
+                }
+                self.mag_x.push_back((met, moni.mag_x as f64));
+                if self.mag_x.len() > self.queue_size {
+                  self.mag_x.pop_front();
+                }
+                self.mag_y.push_back((met, moni.mag_y as f64));
+                if self.mag_y.len() > self.queue_size {
+                  self.mag_y.pop_front();
+                }
+                self.mag_z.push_back((met, moni.mag_z as f64));
+                if self.mag_z.len() > self.queue_size {
+                  self.mag_z.pop_front();
+                }
+                self.mag_tot.push_back((met, moni.get_mag_tot() as f64));
+                if self.mag_tot.len() > self.queue_size {
+                  self.mag_tot.pop_front();
+                }
               }
               return Ok(());
             },
@@ -226,7 +248,7 @@ impl RBTab<'_>  {
       }
     }
    
-    if ev.header.event_id != 0 {
+    if ev.header.event_id != 0 && self.rb_selector == ev.header.rb_id {
       for ch in ev.header.get_channels() {
         for k in 0..ev.adc[ch as usize].len() {
           let vals = (k as f64, ev.adc[ch as usize][k] as f64);
@@ -321,8 +343,24 @@ impl RBTab<'_>  {
           .highlight_symbol(">>")
           .repeat_highlight_symbol(true);
         match self.rbl_state.selected() {
-          None => self.rbl_state.select(Some(1)),
-          Some(_) => (),
+          None    => {
+            let selector =  1;
+            if self.rb_selector != selector {
+              self.rb_changed = true;
+              self.rb_selector = selector;
+            } else {
+              self.rb_changed = false;
+            }
+          },
+          Some(_rbid) => {
+            let selector =  _rbid as u8 + 1;
+            if self.rb_selector != selector {
+              self.rb_changed = true;
+              self.rb_selector = selector;
+            } else {
+              self.rb_changed = false;
+            }
+          },
         }
         frame.render_stateful_widget(rb_select_list, list_chunks[0], &mut self.rbl_state );
 
@@ -524,15 +562,6 @@ impl RBTab<'_>  {
           )
           .split(*main_window);
 
-        //let col0 = Layout::default()
-        //  .direction(Direction::Vertical)
-        //  .constraints(
-        //      [Constraint::Percentage(34),
-        //       Constraint::Percentage(33),
-        //       Constraint::Percentage(33),
-        //      ].as_ref(),
-        //  )
-        //  .split(columns[0]);
         let col1 = Layout::default()
           .direction(Direction::Vertical)
           .constraints(
@@ -631,6 +660,42 @@ impl RBTab<'_>  {
                                  pres_ds_title,
                                  &pres_tc_theme);
         frame.render_widget(pres_tc, col2[1]);
+        
+        let mag_ds_x_name   = String::from("Magnetic x [G]");
+        let mag_ds_x_title  = String::from("Magnetic x [G}");
+        let mag_tc_x_theme  = self.theme.clone();
+        let mag_tc_x = timeseries(&mut self.mag_x,
+                                  t_min    ,
+                                  t_max    ,
+                                  &t_labels,
+                                  mag_ds_x_name,
+                                  mag_ds_x_title,
+                                  &mag_tc_x_theme);
+        frame.render_widget(mag_tc_x, col3[0]);
+        
+        let mag_ds_y_name   = String::from("Magnetic y [G]");
+        let mag_ds_y_title  = String::from("Magnetic y [G}");
+        let mag_tc_y_theme  = self.theme.clone();
+        let mag_tc_y = timeseries(&mut self.mag_y,
+                                  t_min    ,
+                                  t_max    ,
+                                  &t_labels,
+                                  mag_ds_y_name,
+                                  mag_ds_y_title,
+                                  &mag_tc_y_theme);
+        frame.render_widget(mag_tc_y, col3[1]);
+        
+        let mag_ds_z_name   = String::from("Magnetic z [G]");
+        let mag_ds_z_title  = String::from("Magnetic z [G}");
+        let mag_tc_z_theme  = self.theme.clone();
+        let mag_tc_z = timeseries(&mut self.mag_z,
+                                  t_min    ,
+                                  t_max    ,
+                                  &t_labels,
+                                  mag_ds_z_name,
+                                  mag_ds_z_title,
+                                  &mag_tc_z_theme);
+        frame.render_widget(mag_tc_z, col3[2]);
 
       },
       RBTabView::Info => {

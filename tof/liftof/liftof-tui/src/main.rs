@@ -279,7 +279,10 @@ fn packet_receiver(tp_sender_mt : Sender<TofPacket>,
   let data_socket = ctx.socket(zmq::SUB).expect("Unable to create 0MQ SUB socket!");
   data_socket.connect(address).expect("Unable to connect to data (PUB) socket {adress}");
   //data_socket.connect(address_rb).expect("Unable to connect to (PUB) socket {address_rb}");
-  data_socket.set_subscribe(b"");
+  match data_socket.set_subscribe(b"") {
+    Err(err) => error!("Can't subscribe to any message on 0MQ socket!"),
+    Ok(_)    => (),
+  }
   let mut n_pack = 0usize;
   info!("0MQ SUB socket connected to address {address}");
   loop {
@@ -405,6 +408,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   // sender receiver for inter thread communication with decoded packets
   let (mte_send, mte_recv)         : (Sender<MasterTriggerEvent>, Receiver<MasterTriggerEvent>) = unbounded();
   let (rbe_send, rbe_recv)         : (Sender<RBEvent>, Receiver<RBEvent>) = unbounded();
+
 
   // FIXME - spawn a new thread per each tab!
   let _packet_recv_thread = thread::Builder::new()
