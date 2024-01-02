@@ -224,15 +224,14 @@ impl TofHit {
     if peak.paddle_end_id < 1000 {
       error!("Invalide paddle end id {}", peak.paddle_end_id);
     }
-    if peak.paddle_end_id < 1000 {
-      self.set_time_a  (peak.time);
-      self.set_peak_a  (peak.height);
-      self.set_charge_a(peak.charge);
-    }
     if peak.paddle_end_id > 2000 {
       self.set_time_b  (peak.time);
       self.set_peak_b  (peak.height);
       self.set_charge_b(peak.charge);
+    } else if peak.paddle_end_id < 2000 {
+      self.set_time_a  (peak.time);
+      self.set_peak_a  (peak.height);
+      self.set_charge_a(peak.charge);
     }
   }
 
