@@ -19,12 +19,14 @@ use crate::constants::EVENT_TIMEOUT;
 // re-imports
 use std::time::Instant;
 use std::fmt;
-pub use crate::monitoring::{RBMoniData,
-                            PBMoniData,
-                            LTBMoniData,
-                            PAMoniData,
-                            TofCmpMoniData,
-                            MtbMoniData};
+pub use crate::monitoring::{
+    RBMoniData,
+    PBMoniData,
+    LTBMoniData,
+    PAMoniData,
+    TofCmpMoniData,
+    MtbMoniData
+};
 use crate::serialization::{
     Serialization, 
     parse_u8,
@@ -267,6 +269,7 @@ impl From<&LTBMoniData> for TofPacket {
     tp
   }
 }
+
 impl From<&PAMoniData> for TofPacket {
   fn from(moni : &PAMoniData) -> Self {
     let mut tp     = Self::new();

@@ -786,9 +786,15 @@ pub struct RBEventHeader {
   // uses 9bits
   pub channel_mask         : u16  , 
   pub stop_cell            : u16  , 
-  pub crc32                : u32  , 
-  pub dtap0                : u16  , 
-  pub drs4_temp            : u16  , 
+  // we change this by keeping the byte
+  // order the same to accomodate the sine 
+  // values
+  pub ch9_amp                : u16,
+  pub ch9_freq               : u16,
+  pub ch9_phase              : u32,
+  //pub crc32                : u32  , 
+  //pub dtap0                : u16  , 
+  //pub drs4_temp            : u16  , 
   pub fpga_temp            : u16  , 
   pub timestamp32          : u32  ,
   pub timestamp16          : u16  ,
@@ -810,9 +816,12 @@ impl RBEventHeader {
       event_id             : 0,  
       channel_mask         : 0 ,  
       stop_cell            : 0 ,  
-      crc32                : 0 ,  
-      dtap0                : 0 ,  
-      drs4_temp            : 0 ,  
+      ch9_amp              : 0 ,
+      ch9_freq             : 0 ,
+      ch9_phase            : 0 ,
+      //crc32                : 0 ,  
+      //dtap0                : 0 ,  
+      //drs4_temp            : 0 ,  
       fpga_temp            : 0,  
       timestamp32          : 0,
       timestamp16          : 0,
@@ -823,6 +832,40 @@ impl RBEventHeader {
       //channel_packet_start : 0,
       //channel_packet_ids   : Vec::<u8>::with_capacity(9),
     }
+  }
+
+  pub fn set_sine_fit(&mut self, input : (f32, f32, f32)) {
+    // we have to squeze 3 f32 into 64 bit, to 
+    // fit into the dataformat (we don't want to 
+    // change anything. 
+    // let's use an arbitrary precision for a 
+    // range of -10 to 10 
+    let mut amp   = (input.0 + 10.0)*(20.0/(u16::MAX) as f32);
+    let mut freq  = (input.1 + 10.0)*(20.0/(u16::MAX) as f32);
+    let mut phase = (input.2 + 10.0)*(20.0/(u32::MAX) as f32);
+
+    if amp < 0.0 {
+      warn!("amp out of range!");
+      amp = 0.0;
+    }
+    if freq < 0.0 {
+      warn!("freq out of range!");
+      freq = 0.0;
+    }
+    if phase < 0.0 {
+      warn!("phase out of range!");
+      phase = 0.0;
+    }
+    self.ch9_amp   = amp   as u16;  
+    self.ch9_freq  = freq  as u16;
+    self.ch9_phase = phase as u32;
+  }
+  
+  pub fn get_sine_fit(&self) -> (f32, f32, f32) {
+    let amp    = (20.0 * self.ch9_amp as f32)/(u16::MAX as f32) - 10.0;
+    let freq   = (20.0 * self.ch9_freq as f32)/(u16::MAX as f32) - 10.0;
+    let phase  = (20.0 * self.ch9_phase as f32)/(u16::MAX as f32) - 10.0;
+    (amp, freq, phase)
   }
 
   /// Only get the eventid from a binary stream
@@ -873,17 +916,6 @@ impl RBEventHeader {
     //self.fpga_temp = status;
     self.fpga_temp = status_bytes >> 4;
   }
-
-  //pub fn parse_channel_mask(&mut self, channel_mask : u16) {
-  //  //self.channel_mask = channel_mask;
-  //  let mut mask = channel_mask;
-  //  for ch in 0..9 {
-  //    if mask & 0x1 > 0 {
-  //      self.channels.push(ch as u8);
-  //      mask = mask >> 1;
-  //    }
-  //  }
-  //}
 
   /// Get the temperature value (Celsius) from the fpga_temp adc.
   pub fn get_fpga_temp(&self) -> f32 {
@@ -972,7 +1004,6 @@ impl RBEventHeader {
   /// of the RB Event data ("blob") are from 0-7
   ///
   /// We keep ch9 seperate.
-  //pub fn decode_channel_mask(&self) -> Vec<u8> {
   pub fn get_channels(&self) -> Vec<u8> {
     let mut channels = Vec::<u8>::with_capacity(8);
     for k in 0..9 {
@@ -988,10 +1019,6 @@ impl RBEventHeader {
     self.get_channels().len()
   }
   
-  //pub fn get_ndatachan(&self) -> usize {
-  //  self.decode_channel_mask().len()
-  //}
-
   pub fn get_timestamp48(&self) -> u64 {
     ((self.timestamp16 as u64) << 32) | self.timestamp32 as u64
   }
@@ -1006,19 +1033,21 @@ impl Default for RBEventHeader {
 
 impl fmt::Display for RBEventHeader {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let sfit = self.get_sine_fit();
     let mut repr = String::from("<RBEventHeader:");
+    let sine_field = format!("\n    --> fit sine {:3} AMP {:3} FREQ {:3} PHASE", sfit.0, sfit.1, sfit.2);
     repr += &("\n  RB ID            ".to_owned() + &self.rb_id.to_string()); 
     repr += &("\n  event id         ".to_owned() + &self.event_id.to_string());  
     repr += &("\n  ch mask          ".to_owned() + &self.channel_mask.to_string());  
     repr += &("\n  has ch9          ".to_owned() + &self.has_ch9().to_string()); 
-    repr += &("\n  DRS4 temp [C]    ".to_owned() + &self.drs4_temp.to_string());  
-    repr += &("\n  FPGA temp [C]    ".to_owned() + &self.get_fpga_temp().to_string()); 
+    //repr += &("\n  DRS4 temp [C]    ".to_owned() + &self.drs4_temp.to_string());  
+    repr += &("\n  FPGA temp [\u{00B0}C]    ".to_owned() + &self.get_fpga_temp().to_string()); 
     repr += &("\n  timestamp32      ".to_owned() + &self.timestamp32.to_string()); 
     repr += &("\n  timestamp16      ".to_owned() + &self.timestamp16.to_string()); 
     repr += &("\n   |-> timestamp48 ".to_owned() + &self.get_timestamp48().to_string()); 
     repr += &("\n  stop cell        ".to_owned() + &self.stop_cell.to_string()); 
-    repr += &("\n  dtap0            ".to_owned() + &self.dtap0.to_string()); 
-    repr += &("\n  crc32            ".to_owned() + &self.crc32.to_string()); 
+    //repr += &("\n  dtap0            ".to_owned() + &self.dtap0.to_string()); 
+    //repr += &("\n  crc32            ".to_owned() + &self.crc32.to_string()); 
     let mut perfect = true;
     if self.drs_lost_trigger() {
       repr += &"\n  !! DRS4 REPORTS LOST TRIGGER!".red().bold();
@@ -1059,9 +1088,12 @@ impl Serialization for RBEventHeader {
     header.channel_mask        = parse_u16(stream  , pos);   
     header.status_byte         = parse_u8(stream, pos);
     header.stop_cell           = parse_u16(stream , pos);  
-    header.crc32               = parse_u32(stream , pos);  
-    header.dtap0               = parse_u16(stream , pos);  
-    header.drs4_temp           = parse_u16(stream , pos);  
+    header.ch9_amp             = parse_u16(stream, pos);
+    header.ch9_freq            = parse_u16(stream, pos);
+    header.ch9_phase           = parse_u32(stream, pos);
+    //header.crc32               = parse_u32(stream , pos);  
+    //header.dtap0               = parse_u16(stream , pos);  
+    //header.drs4_temp           = parse_u16(stream , pos);  
     header.fpga_temp           = parse_u16(stream , pos);  
     header.timestamp32         = parse_u32(stream, pos);
     header.timestamp16         = parse_u16(stream, pos);
@@ -1078,9 +1110,12 @@ impl Serialization for RBEventHeader {
     stream.extend_from_slice(&self.channel_mask      .to_le_bytes());
     stream.extend_from_slice(&self.status_byte       .to_le_bytes());
     stream.extend_from_slice(&self.stop_cell         .to_le_bytes());
-    stream.extend_from_slice(&self.crc32             .to_le_bytes());
-    stream.extend_from_slice(&self.dtap0             .to_le_bytes());
-    stream.extend_from_slice(&self.drs4_temp         .to_le_bytes());
+    stream.extend_from_slice(&self.ch9_amp           .to_le_bytes());
+    stream.extend_from_slice(&self.ch9_freq          .to_le_bytes());
+    stream.extend_from_slice(&self.ch9_phase         .to_le_bytes());
+    //stream.extend_from_slice(&self.crc32             .to_le_bytes());
+    //stream.extend_from_slice(&self.dtap0             .to_le_bytes());
+    //stream.extend_from_slice(&self.drs4_temp         .to_le_bytes());
     stream.extend_from_slice(&self.fpga_temp         .to_le_bytes());
     stream.extend_from_slice(&self.timestamp32       .to_le_bytes());
     stream.extend_from_slice(&self.timestamp16       .to_le_bytes());
@@ -1101,9 +1136,12 @@ impl FromRandom for RBEventHeader {
     header.channel_mask         = rng.gen::<u16>();    
     header.status_byte          = rng.gen::<u8>();    
     header.stop_cell            = rng.gen::<u16>();   
-    header.crc32                = rng.gen::<u32>();   
-    header.dtap0                = rng.gen::<u16>();   
-    header.drs4_temp            = rng.gen::<u16>();   
+    header.ch9_amp              = rng.gen::<u16>();
+    header.ch9_freq             = rng.gen::<u16>();
+    header.ch9_phase            = rng.gen::<u32>();
+    //header.crc32                = rng.gen::<u32>();   
+    //header.dtap0                = rng.gen::<u16>();   
+    //header.drs4_temp            = rng.gen::<u16>();   
     header.fpga_temp            = rng.gen::<u16>();   
     header.timestamp32          = rng.gen::<u32>();
     header.timestamp16          = rng.gen::<u16>();

@@ -1017,7 +1017,7 @@ impl RBCalibrations {
   }
 
   /// Apply the voltage calibration to a single channel 
-  ///
+  /// FIXME - mixing of naming conventions for the channels
   /// # Arguments
   ///
   /// * channel   : Channel id 1-9

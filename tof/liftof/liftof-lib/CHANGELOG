@@ -1,6 +1,7 @@
 # NIUHI series
 
 ## v0.8.3
+* allows to fit the ch9 sine wave
 * re-imagines waveform analysis to be actually
   usable on the RBs
 * introduces RunStatistics to centralize

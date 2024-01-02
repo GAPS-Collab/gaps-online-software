@@ -89,7 +89,7 @@ def plot(self,\
     if calib is None:
         print ("No calibration given! Will plot adc values!")
         axes[0].set_xlabel("")
-        for ch in self.header.get_channels();
+        for ch in self.header.get_channels():
         #for ch in range(1,10):
             ch += 1
             _adc_plotter(axes, self, ch, plot_stop_cell = plot_stop_cell)

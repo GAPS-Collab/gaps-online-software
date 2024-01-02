@@ -29,7 +29,10 @@ use netneighbours::get_mac_to_ip_map;
 #[macro_use] extern crate log;
 extern crate env_logger;
 
-use tof_dataclasses::manifest as mf;
+use nalgebra::{DMatrix, DVector};
+use nalgebra::linalg::SVD;
+
+//use tof_dataclasses::manifest as mf;
 use tof_dataclasses::DsiLtbRBMapping;
 use tof_dataclasses::constants::NWORDS;
 use tof_dataclasses::calibrations::RBCalibrations;
@@ -57,9 +60,9 @@ use tof_dataclasses::analysis::{calculate_pedestal,
 use tof_dataclasses::RBChannelPaddleEndIDMap;
 
 pub const MT_MAX_PACKSIZE   : usize = 512;
-pub const DATAPORT : u32 = 42000;
-
-pub const LIFTOF_LOGO_SHOW : &str = "
+pub const DATAPORT          : u32   = 42000;
+pub const ASSET_DIR         : &str  = "/home/gaps/assets/"; 
+pub const LIFTOF_LOGO_SHOW  : &str  = "
                                   ___                         ___           ___     
                                  /\\__\\                       /\\  \\         /\\__\\    
                     ___         /:/ _/_         ___         /::\\  \\       /:/ _/_   
@@ -172,6 +175,46 @@ impl fmt::Display for RunStatistics {
     write!(f, "{}", resp)
   }
 }
+
+/// FIXME - this comes straight right out of ChatGPT
+fn fit_sine_function(time: Vec<f32>, data: Vec<f32>) -> (f32, f32, f32) {
+    // Build the design matrix A
+    let a = DMatrix::<f32>::from_fn(time.len(), 3, |i, j| {
+        match j {
+            0 => 1.0,
+            1 => (2.0 * std::f32::consts::PI * time[i]).sin(),
+            2 => (2.0 * std::f32::consts::PI * time[i]).cos(),
+            _ => unreachable!(),
+        }
+    });
+
+    // Create the target vector b
+    let b = DVector::from_vec(data);
+
+    // Solve the linear system Ax = b using Singular Value Decomposition
+    let svd = SVD::new(a.clone(), true, true);
+    let eps = 0.0001;
+    match svd.solve(&b, eps) {
+      Err(err) => {
+        error!("Sinus fit failed! {err}");
+        return (f32::MAX, f32::MAX, f32::MAX);
+      },
+      Ok(x) => {
+        let amplitude = x[0];
+        let frequency = x[1] / (2.0 * std::f64::consts::PI) as f32;
+        let phase = -x[2].atan2(x[1]);
+        return (amplitude as f32, frequency as f32, phase as f32);
+      }
+    }
+
+    // Extract parameters from the solution vector x
+    //let amplitude = x[0];
+    //let frequency = x[1] / (2.0 * std::f64::consts::PI);
+    //let phase = -x[2].atan2(x[1]);
+    //(0.0,0.0,0.0)
+    //(amplitude, frequency, phase)
+}
+
 
 //*************************************************
 // I/O - read/write (general purpose) files
@@ -608,6 +651,8 @@ pub fn waveform_analysis(event         : &mut RBEvent,
   let channels_c     = channels.clone();
   // first loop over channels - construct pids
   let mut pid : u8 = 0;
+  // will become a parameter
+  let fit_sinus = true;
   for raw_ch in channels {
     if raw_ch == 8 {
       continue;
@@ -636,7 +681,33 @@ pub fn waveform_analysis(event         : &mut RBEvent,
   // all the paddles set up in the hashmap
   for raw_ch in channels_c {
     if raw_ch == 8 {
-      continue;
+      if fit_sinus {
+        // +1 channel convention
+        let ch = raw_ch + 1;
+        
+        let mut ch_voltages : Vec<f32>= vec![0.0; NWORDS];
+        let mut ch_times    : Vec<f32>= vec![0.0; NWORDS];
+        calibration.voltages(ch.into(),
+                             event.header.stop_cell as usize,
+                             &event.adc[8],
+                             &mut ch_voltages);
+        warn!("We have to rework the spike cleaning!");
+        //match RBCalibrations::spike_cleaning(&mut ch_voltages,
+        //                                     event.header.stop_cell) {
+        //  Err(err) => {
+        //    error!("Spike cleaning failed! {err}");
+        //  }
+        //  Ok(_)    => ()
+        //}
+        calibration.nanoseconds(ch.into(),
+                                event.header.stop_cell as usize,
+                                &mut ch_times);
+        let fit_result = fit_sine_function(ch_times, ch_voltages);
+        //println!("FIT RESULT = {:?}", fit_result);
+        event.header.set_sine_fit(fit_result);
+      } else {
+        continue;
+      }
     }
     // +1 channel convention
     let ch = raw_ch + 1;

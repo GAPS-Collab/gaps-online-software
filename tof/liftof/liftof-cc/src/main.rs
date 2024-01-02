@@ -57,7 +57,7 @@ use liftof_cc::threads::{readoutboard_communicator,
 use liftof_lib::DATAPORT;
 use liftof_cc::flight_comms::global_data_sink;
 
-use liftof_cc::constants::*;
+//use liftof_cc::constants::*;
 
 /*************************************/
 
@@ -445,7 +445,7 @@ fn main() {
                                 &this_rb,
                                 runid,
                                 false,
-                                false);
+                                true);
     });
   } // end for loop over nboards
   println!("==> All RB threads started!");

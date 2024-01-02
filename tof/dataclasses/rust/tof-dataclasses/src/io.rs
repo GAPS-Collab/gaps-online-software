@@ -395,8 +395,9 @@ impl RBEventMemoryStreamer {
     }
     
     header.event_id  = event_id;
-    header.dtap0     = parse_u16(&self.stream, &mut self.pos);
-    header.drs4_temp = parse_u16(&self.stream, &mut self.pos);
+    // we are currently not using these
+    let dtap0        = parse_u16(&self.stream, &mut self.pos);
+    let drs4_temp    = parse_u16(&self.stream, &mut self.pos);
     let timestamp0   = parse_u16(&self.stream, &mut self.pos);
     let timestamp1   = parse_u16(&self.stream, &mut self.pos);
     let timestamp2   = parse_u16(&self.stream, &mut self.pos);
@@ -488,9 +489,10 @@ impl RBEventMemoryStreamer {
       } else {
         crc32 = u32::from(crc321) << 16 | u32::from(crc320);
       }
-      if event.header.crc32 != crc32 {
-        trace!("Checksum test for the whole event is not yet implemented!");
-      }
+      warn!("Checksum test for the whole event is not yet implemented!");
+      //if event.header.crc32 != crc32 {
+      //  trace!("Checksum test for the whole event is not yet implemented!");
+      //}
     }
     let tail         = parse_u16(&self.stream, &mut self.pos);
     //let delta_pos    = self.pos - first_pos;
