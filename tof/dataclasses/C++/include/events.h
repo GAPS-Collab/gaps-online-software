@@ -437,6 +437,63 @@ struct TofEvent {
     RBEvent _empty_event = RBEvent();
 };
 
+/***********************************************
+ * Reconstructed waveform peak information
+ * 
+ * There should be one TofHit per reconstructed
+ * peak
+ * 
+ *
+ */
+struct TofHit  {
+  static const u16 HEAD = 0xF0F0;
+  static const u16 TAIL = 0xF0F;
+
+  u8   paddle_id;
+  bool broken;
+
+  u32 timestamp32;
+  u16 timestamp16;
+
+  u8 ctr_etx;
+  u16 tail = 0xF0F; 
+
+  f32 get_time_a()       const;
+  f32 get_time_b()       const;
+  f32 get_peak_a()       const;
+  f32 get_peak_b()       const;
+  f32 get_charge_a()     const;
+  f32 get_charge_b()     const;
+  f32 get_charge_min_i() const;
+  f32 get_x_pos()        const;
+  f32 get_t_avg()        const;
+  f64 get_timestamp48()  const;
+
+  static TofHit from_bytestream(const Vec<u8> &bytestream, 
+                                       u64 &pos);
+ 
+  // easier print out
+  std::string to_string() const;
+  
+  private:
+    // we keep this private, since 
+    // the user should use the getters
+    // to get the values converted 
+    // back to f32
+    u16 time_a;
+    u16 time_b;
+    u16 peak_a;
+    u16 peak_b;
+    u16 charge_a;
+    u16 charge_b;
+    u16 charge_min_i;
+    u16 x_pos;
+    u16 t_average;
+    // don't serialize
+};
+
+std::ostream& operator<<(std::ostream& os, const TofHit& pad);
+
 std::ostream& operator<<(std::ostream& os, const MasterTriggerEvent& mt);
 
 std::ostream& operator<<(std::ostream& os, const TofEvent& et);

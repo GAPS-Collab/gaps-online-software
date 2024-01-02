@@ -16,6 +16,8 @@
  * information. 
  *
  **********************************************************/
+
+[[deprecated("RPaddlePacket is deprecated in favor of TofHit (since 0.8.3)")]]
 struct RPaddlePacket  {
 
   u16 head = 0xF0F0;

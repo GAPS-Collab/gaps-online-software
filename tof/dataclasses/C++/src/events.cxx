@@ -965,6 +965,123 @@ std::string TofEvent::to_string() const {
   return repr;
 }
 
+/*************************************/
+
+f32 TofHit::get_time_a() const {
+ f32 prec = 0.004;
+ return prec*time_a;
+}
+
+f32 TofHit::get_time_b() const {
+  f32 prec = 0.004;//ns
+  return prec*time_b;
+}
+
+f32 TofHit::get_peak_a() const {
+  f32 prec = 0.2;
+  return prec*peak_a;
+}
+
+f32 TofHit::get_peak_b() const {
+  f32 prec = 0.2;
+  return prec*peak_b;
+}
+
+f32 TofHit::get_charge_a() const {
+  f32 prec = 0.01; //pC
+  return prec*charge_a - 50;
+}
+
+f32 TofHit::get_charge_b() const {
+  f32 prec = 0.01;
+  return prec*charge_b - 50;
+}
+
+f32 TofHit::get_charge_min_i() const {
+  f32 prec = 0.002;// minI
+  return prec*charge_min_i - 10;
+}
+
+f32 TofHit::get_x_pos() const {
+  // FIXME - check if it is really in the middle
+  f32 prec = 0.005; //cm
+  return prec*x_pos - 163.8;
+}
+
+f32 TofHit::get_t_avg() const {
+  f32 prec = 0.004;//ps
+  return prec*t_average;
+}
+
+/// combine the slow timestamp with 
+/// the fast to get the full
+f64 TofHit::get_timestamp48() const {
+  f64 ts48 = timestamp16 << 16 | timestamp32;
+  return ts48;
+}
+
+TofHit TofHit::from_bytestream(const Vec<u8> &bytestream,
+                               u64 &pos) {
+ TofHit hit = TofHit();
+ u16 maybe_header = Gaps::parse_u16(bytestream, pos);
+ if (maybe_header != hit.HEAD) {
+   spdlog::error("Can not find HEADER at presumed position. Maybe give a different value for start_pos?");
+ }
+ hit.paddle_id     = bytestream[pos]; pos+=1;
+ hit.time_a        = Gaps::parse_u16(bytestream, pos); 
+ hit.time_b        = Gaps::parse_u16(bytestream, pos); 
+ //std::cout << " " << time_a << " " << time_b << " " << charge_a << " " << charge_b << std::endl;
+ hit.peak_a        = Gaps::parse_u16(bytestream, pos); 
+ hit.peak_b        = Gaps::parse_u16(bytestream, pos); 
+ hit.charge_a      = Gaps::parse_u16(bytestream, pos); 
+ hit.charge_b      = Gaps::parse_u16(bytestream, pos); 
+ hit.charge_min_i  = Gaps::parse_u16(bytestream, pos); 
+ hit.x_pos         = Gaps::parse_u16(bytestream, pos); 
+ hit.t_average     = Gaps::parse_u16(bytestream, pos); 
+
+ hit.ctr_etx = bytestream[pos]; pos+=1;
+
+ hit.timestamp32 = Gaps::parse_u16(bytestream, pos);
+ hit.timestamp16 = Gaps::parse_u16(bytestream, pos);
+
+ // FIXME checks - packetlength, checksum ?
+ u16 tail = Gaps::parse_u16(bytestream, pos);
+ if (tail != TAIL) {
+   spdlog::error("Tail signature is incorrect!");
+ }
+ //if (tail != 0xF0F) {
+ //  broken = true;
+ //}
+ return hit; 
+}
+
+std::string TofHit::to_string() const {
+  std::string repr = "<TofHit\n";
+  repr += "\n  paddle ID       :  "     + std::to_string(paddle_id         );
+  repr += "\n  timestamp32     :  "     + std::to_string(timestamp32       );
+  repr += "\n  timestamp16     :  "     + std::to_string(timestamp16       );
+  repr += "\n   |-> timestamp48:  "     + std::to_string(get_timestamp48() ); 
+  repr += "\n  ** Peak";
+  repr += "\n    time   A;B    :  "     + std::to_string(get_time_a()      )
+       +  " " + std::to_string(get_time_b());
+  repr += "\n    height A;B    :  "     + std::to_string(get_peak_a()      )
+       +  " " + std::to_string(get_time_a());
+  repr += "\n    charge A;B    :  "     + std::to_string(get_charge_a()    )
+       +  " " + std::to_string(get_time_b());
+  repr += "\n    charge min_I  :  "     + std::to_string(get_charge_min_i());
+  repr += "\n    in padd. pos  :  "     + std::to_string(get_x_pos()       );
+  repr += "\n    t_avg         :  "     + std::to_string(get_t_avg()       );
+  repr += "\n  cntr ETX        :  "     + std::to_string(ctr_etx           );
+  repr += "\n  broken (?depr)  :  "     + std::to_string(broken            );
+  return repr;
+}
+
+std::ostream& operator<<(std::ostream& os, const TofHit& th) {
+  os << th.to_string();
+  return os;
+}
+
+
 std::ostream& operator<<(std::ostream& os, const MasterTriggerEvent& mt) {
   os << mt.to_string();
   return os;

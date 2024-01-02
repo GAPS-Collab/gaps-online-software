@@ -7,8 +7,6 @@
 #include <pybind11/chrono.h>
 #include <pybind11/numpy.h>
 
-#include "packets/REventPacket.h"
-#include "packets/RPaddlePacket.h"
 #include "packets/tof_packet.h"
 #include "packets/CommandPacket.h"
 #include "packets/MasterTriggerPacket.h"
@@ -34,9 +32,6 @@ namespace py = pybind11;
 /********************/
 // helpers
 
-int static_helper(RPaddlePacket& pp){
-    return RPaddlePacket::calculate_length();
-}
 
 std::string tof_command_to_str(const TofCommand &cmd) {
  switch (cmd) {
@@ -410,16 +405,13 @@ PYBIND11_MODULE(gaps_tof, m) {
       .def("get_active_data_channels"    , &RBEventHeader::get_active_data_channels, "Get a list of active channels, excluding ch9. Channel9 will (usually) always be on, as long as a single data channel is switched on as well.")
       .def("get_fpga_temp"               , &RBEventHeader::get_fpga_temp, "The FPGA temperature in C")
       .def("get_drs_temp"                , &RBEventHeader::get_drs_temp, "The DRS4 temperature in C, read out by software")
-      .def("get_timestamp48"             , &RBEventHeader::get_timestamp48, "The complete 48bit timestamp, derived from the RB clock (usually 33MHz)")
+      .def_property_readonly("timestamp48"  , &RBEventHeader::get_timestamp48, "The complete 48bit timestamp, derived from the RB clock (usually 33MHz)")
       .def("get_n_datachan"              , &RBEventHeader::get_n_datachan)
       .def("get_nchan"                   , &RBEventHeader::get_nchan) 
       .def("get_channels"                , &RBEventHeader::get_channels) 
       .def_readonly("channel_mask"       , &RBEventHeader::channel_mask)   
       .def("has_ch9"                     , &RBEventHeader::has_ch9, "Ch9 is available"     )
       .def_readonly("stop_cell"          , &RBEventHeader::stop_cell   )   
-      .def_readonly("crc32"              , &RBEventHeader::crc32       )   
-      .def_readonly("dtap0"              , &RBEventHeader::dtap0       )   
-      .def_readonly("drs4_temp"          , &RBEventHeader::drs4_temp   )   
       .def("is_locked"                   , &RBEventHeader::is_locked   )   
       .def("is_locked_last_sec"          , &RBEventHeader::is_locked_last_sec)   
       .def("lost_lock"                   , &RBEventHeader::lost_lock   )   
@@ -440,10 +432,11 @@ PYBIND11_MODULE(gaps_tof, m) {
 
     py::class_<RBEvent>(m, "RBEvent", "RBEvent contains an event header for this specific board as well as a (flexible) number of adc channels")
         .def(py::init())
-        .def_readonly("header"              ,&RBEvent::header)
+        .def_readonly("header"              ,&RBEvent::header,
+                "RBEventHeader stores all information which is NOT channel data")
         .def_readonly("hits"                ,&RBEvent::hits)
         .def("get_baselines"                ,&RBEvent::get_baselines,
-                                             "Calculate baselines using the given calibration object in min/max range")  
+                "Calculate baselines using the given calibration object in min/max range")  
         .def("get_channel_adc"              ,&RBEvent::get_channel_adc,
                                              "Get the ADC values for a specific channel. Channel ids go from 1-9",
                                              py::arg("channel"),
@@ -475,20 +468,6 @@ PYBIND11_MODULE(gaps_tof, m) {
     ;
   
 
-    py::class_<CommandPacket>(m, "CommandPacket") 
-      .def(py::init<TofCommand const&, u32 const>())  
-      .def("to_bytestream",   &CommandPacket::to_bytestream  , "Translate the command to a list of bytes")
-      .def("from_bytestream", &CommandPacket::from_bytestream, "Retrieve a command from a list of bytes")
-      .def("get_command" ,    [](const CommandPacket &pk) {
-                                  return pk.command;
-                              })
-      .def("__repr__",        [](const CommandPacket &pk) {
-                                  return "<CommandPacket : "
-                                  + tof_command_to_str(pk.command)
-                                  + " "
-                                  + std::to_string(pk.value) + ">";
-                                  }) 
-    ;
 
     py::enum_<TofResponse>(m, "TofResponse")
       .value("Success"                 ,TofResponse::Success) 
@@ -499,32 +478,14 @@ PYBIND11_MODULE(gaps_tof, m) {
       .export_values()
     ;
    
-    py::class_<ResponsePacket>(m, "ResponsePacket") 
-      .def(py::init<TofResponse const&, u32 const>())  
-      .def("to_bytestream",   &ResponsePacket::to_bytestream)
-      .def("from_bytestream", &ResponsePacket::from_bytestream)
-      .def("translate_response_code", &ResponsePacket::translate_response_code,
-                                      "Translate the response code into some human readable string")
-      .def("get_response"   ,    [](const ResponsePacket &pk) {
-                                  return pk.response; 
-                                 }
-                              , "Get the RESPONSE_CODE from the response. This will provide further information.")
-      .def("__repr__",        [](const ResponsePacket &pk) {
-                                  return "<ResponsePacket : "
-                                  + tof_response_to_str(pk.response)
-                                  + " "
-                                  + pk.translate_response_code(pk.value) + ">";
-                                  }) 
-    ;
     py::enum_<PacketType>(m, "PacketType")
-      .value("Unknown",   PacketType::Unknown   )
-      .value("Command",   PacketType::Command   )
-      .value("PT_RBEvent",   PacketType::RBEvent   )
-      .value("PT_TofEvent",  PacketType::TofEvent  )
-      .value("Monitor",   PacketType::Monitor   )
-      .value("Scalar",    PacketType::Scalar    )
-      .value("HeartBeat", PacketType::HeartBeat )
-      .value("MasterTrigger", PacketType::MasterTrigger )
+      .value("Unknown",          PacketType::Unknown   )
+      .value("Command",          PacketType::Command   )
+      .value("PT_RBEvent",       PacketType::RBEvent   )
+      .value("PT_TofEvent",      PacketType::TofEvent  )
+      .value("Monitor",          PacketType::Monitor   )
+      .value("HeartBeat",        PacketType::HeartBeat )
+      .value("MasterTrigger",    PacketType::MasterTrigger )
       .value("PT_MtbMoniData",   PacketType::MTBMoni)
       .export_values();
 
@@ -611,8 +572,8 @@ PYBIND11_MODULE(gaps_tof, m) {
         .def(py::init())
         .def_readonly("run_id"              , &TofEventHeader::run_id             )
         .def_readonly("event_id"            , &TofEventHeader::event_id           ) 
-        .def_readonly("timestamp_32"        , &TofEventHeader::timestamp_32       ) 
-        .def_readonly("timestamp_16"        , &TofEventHeader::timestamp_16       ) 
+        .def_readonly("timestamp32"         , &TofEventHeader::timestamp_32       ) 
+        .def_readonly("timestamp16"         , &TofEventHeader::timestamp_16       ) 
         .def_readonly("primary_beta"        , &TofEventHeader::primary_beta       ) 
         .def_readonly("primary_beta_unc"    , &TofEventHeader::primary_beta_unc   ) 
         .def_readonly("primary_charge"      , &TofEventHeader::primary_charge     ) 
@@ -640,52 +601,26 @@ PYBIND11_MODULE(gaps_tof, m) {
     py::class_<TofEvent>(m, "TofEvent")
         .def(py::init())
         //.def_readonly("header"              ,&TofEvent::header)
-        .def_readonly("mt_event"            ,&TofEvent::mt_event)
+        .def_readonly("mt_event"            ,&TofEvent::mt_event,
+                "The event information comming from the MasterTriggerBoard")
         .def_readonly("missing_hits"        ,&TofEvent::missing_hits)
-        .def_readonly("rbevents"            ,&TofEvent::rb_events)
+        .def_readonly("rbevents"            ,&TofEvent::rb_events,
+                "A list of all RBEvents which contributed to this event")
         .def("get_rbids"                    ,&TofEvent::get_rbids,
-                                             "Get a list of all RB ids contributing to this event."
+                "Get a list of all RB ids contributing to this event"
                                              )
         .def("get_rbevent"                  ,&TofEvent::get_rbevent,
-                                             "Return a the event for this specif RB id",
+                 "Return a the event for this specif RB id",
                                              py::arg("rb_id"))
         .def("from_bytestream"              ,&TofEvent::from_bytestream)
-        .def("from_tofpacket"               ,&TofEvent::from_tofpacket)
+        .def("from_tofpacket"               ,&TofEvent::from_tofpacket,
+                 "Factory function: Unpack a TofEvent from a TofPacket")
         .def("__repr__",           [](const TofEvent &te) {
                                    return te.to_string(); 
                                    }) 
 
     ;
 
-    py::class_<REventPacket>(m, "REventPacket")
-        .def(py::init())
-        .def("to_bytestream"                ,&REventPacket::serialize)
-        .def("from_bytestream"              ,&REventPacket::deserialize)
-        .def("calculate_length"             ,&REventPacket::calculate_length)
-        .def("is_broken"                    ,&REventPacket::is_broken)
-        .def("reset"                        ,&REventPacket::reset)
-        .def("add_paddle_packet"            ,&REventPacket::add_paddle_packet)
-        .def("is_broken"                    ,&REventPacket::is_broken)
-        .def_readwrite("event_id"           ,&REventPacket::event_ctr)
-        .def_readwrite("n_paddles"          ,&REventPacket::n_paddles)
-        .def_readwrite("timestamp_32"       ,&REventPacket::timestamp_32)
-        .def_readwrite("timestamp_16"       ,&REventPacket::timestamp_16)
-        .def_readwrite("primary_beta"       ,&REventPacket::primary_beta)
-        .def_readwrite("primary_beta_unc"   ,&REventPacket::primary_beta_unc)
-        .def_readwrite("primary_charge"     ,&REventPacket::primary_charge)
-        .def_readwrite("primary_charge_unc" ,&REventPacket::primary_charge_unc)
-        .def_readwrite("primary_outer_tof_x",&REventPacket::primary_outer_tof_x)
-        .def_readwrite("primary_outer_tof_y",&REventPacket::primary_outer_tof_y)
-        .def_readwrite("primary_outer_tof_z",&REventPacket::primary_outer_tof_z)
-        .def_readwrite("primary_inner_tof_x",&REventPacket::primary_inner_tof_x)
-        .def_readwrite("primary_inner_tof_y",&REventPacket::primary_inner_tof_y)
-        .def_readwrite("primary_inner_tof_z",&REventPacket::primary_inner_tof_z)
-    .def_readonly("paddle_packets",      &REventPacket::paddle_info)
-    .def("__repr__",          [](const REventPacket &ev) {
-                                  return "<REventPacket : " + ev.to_string(true) + "'>";
-                                  }) 
-
-    ;
     py::class_<TofPacket>(m, "TofPacket")
         .def(py::init())
         .def("to_bytestream",         &TofPacket::to_bytestream)
@@ -701,57 +636,39 @@ PYBIND11_MODULE(gaps_tof, m) {
                                   return pkg.to_string();
                                   }); 
 
-    py::class_<RPaddlePacket>(m, "RPaddlePacket")
+    py::class_<TofHit>(m, "TofHit",
+            "Reconstructed waveform information for the 2 channels of a paddle.")
         .def(py::init())
-        .def("serialize",         &RPaddlePacket::serialize)
-        .def("from_bytestream",   &RPaddlePacket::from_bytestream)
-        .def("calculate_length",  &static_helper)
-        .def("reset",             &RPaddlePacket::reset)
-        .def("is_broken",         &RPaddlePacket::is_broken)
-        .def("get_paddle_id",     &RPaddlePacket::get_paddle_id) 
-        .def_property("time_a",   &RPaddlePacket::get_time_a, &RPaddlePacket::set_time_a)
-        .def_property("time_b",   &RPaddlePacket::get_time_b, &RPaddlePacket::set_time_b)
-        .def_property("peak_a",   &RPaddlePacket::get_peak_a, &RPaddlePacket::set_peak_a)
-        .def_property("peak_b",   &RPaddlePacket::get_peak_b, &RPaddlePacket::set_peak_b)
-        .def_property("charge_a", &RPaddlePacket::get_charge_a, &RPaddlePacket::set_charge_a)
-        .def_property("charge_b", &RPaddlePacket::get_charge_b, &RPaddlePacket::set_charge_b)
-        .def_property("charge_min_i",  &RPaddlePacket::get_charge_min_i, &RPaddlePacket::set_charge_min_i) 
-        .def_property("x_pos",         &RPaddlePacket::get_x_pos, &RPaddlePacket::set_x_pos) 
-        .def_property("t_avg",         &RPaddlePacket::get_t_avg, &RPaddlePacket::set_t_avg) 
-        .def("get_time_a",        &RPaddlePacket::get_time_a) 
-        .def("get_time_b",        &RPaddlePacket::get_time_b) 
-        .def("get_peak_a",        &RPaddlePacket::get_peak_a) 
-        .def("get_peak_b",        &RPaddlePacket::get_peak_b) 
-        .def("get_charge_a",      &RPaddlePacket::get_charge_a) 
-        .def("get_charge_b",      &RPaddlePacket::get_charge_b) 
-        .def("get_charge_min_i",  &RPaddlePacket::get_charge_min_i) 
-        .def("get_x_pos",         &RPaddlePacket::get_x_pos) 
-        .def("get_t_avg",         &RPaddlePacket::get_t_avg) 
-        //.def("set_paddle_id",     &RPaddlePacket::set_paddle_id) 
-        .def("set_time_a",        &RPaddlePacket::set_time_a) 
-        .def("set_time_b",        &RPaddlePacket::set_time_b) 
-        .def("set_peak_a",        &RPaddlePacket::set_peak_a) 
-        .def("set_peak_b",        &RPaddlePacket::set_peak_b) 
-        .def("set_charge_a",      &RPaddlePacket::set_charge_a) 
-        .def("set_charge_b",      &RPaddlePacket::set_charge_b) 
-        .def("set_charge_min_i",  &RPaddlePacket::set_charge_min_i) 
-        .def("set_x_pos",         &RPaddlePacket::set_x_pos) 
-        .def("set_t_avg",         &RPaddlePacket::set_t_avg) 
-
-        // atributes
-        .def_readwrite("paddle_id" ,    &RPaddlePacket::paddle_id)
-        .def_readwrite("timestamp_32" ,    &RPaddlePacket::timestamp_32)
-        .def_readwrite("timestamp_16" ,    &RPaddlePacket::timestamp_16)
-        //.def_readwrite("time_a" ,       &RPaddlePacket::time_a)
-        //.def_readwrite("time_b" ,       &RPaddlePacket::time_b)
-        //.def_readwrite("charge_a" ,     &RPaddlePacket::charge_a)
-        //.def_readwrite("charge_b" ,     &RPaddlePacket::charge_b)
-        //.def_readwrite("charge_min_i" , &RPaddlePacket::charge_min_i)
-        //.def_readwrite("x_pos" ,        &RPaddlePacket::x_pos)
-        //.def_readwrite("t_avg" ,        &RPaddlePacket::t_average)
-
-        .def("__repr__",          [](const RPaddlePacket &pp) {
-                                  return "<RPaddlePacket : " + pp.to_string() + "'>";
+        .def("from_bytestream",        &TofHit::from_bytestream, 
+               "Factory method to deserialize a TofHit")
+        .def_readonly("paddle_id",     &TofHit::paddle_id     , 
+               "The unique identifier for this paddle (1-160)")
+        .def_property_readonly("time_a",        &TofHit::get_time_a  ,
+               "Reconstructed peak start time for side A")
+        .def_property_readonly("time_b",        &TofHit::get_time_b  ,
+               "Reconstructed peak start time for side B")
+        .def_property_readonly("peak_a",        &TofHit::get_peak_a  ,
+               "Reconstructed peak height for side A")
+        .def_property_readonly("peak_b",        &TofHit::get_peak_b  ,
+               "Reconstructed peak height for side B")
+        .def_property_readonly("charge_a",      &TofHit::get_charge_a,
+               "Reconstructed charge for side A")
+        .def_property_readonly("charge_b",      &TofHit::get_charge_b,
+               "Reconstructed charge for side B")
+        .def_property_readonly("charge_min_i",  &TofHit::get_charge_min_i,
+               "Reconstructed paddle charge in units of MinI") 
+        .def_property_readonly("x_pos",         &TofHit::get_x_pos,
+               "Reconstructed position along the paddle")
+        .def_property_readonly("t_avg",         &TofHit::get_t_avg,
+               "(FIXME) - the reconstructed hit time") 
+        .def_readonly("timestamp16",   &TofHit::timestamp16,
+               "MSB part of the timestamp (slow)")
+        .def_readonly("timestamp32",   &TofHit::timestamp32,
+               "LSB part of the timestamp (fast)")
+        .def_property_readonly("timestamp48",   &TofHit::get_timestamp48,
+               "Complete timestamp (48 bits)")
+        .def("__repr__",          [](const TofHit &th) {
+                                  return "<TofHit : " + th.to_string() + "'>";
                                   }) 
 
     ;
