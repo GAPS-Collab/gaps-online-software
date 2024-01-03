@@ -221,7 +221,6 @@ PYBIND11_MODULE(gaps_tof, m) {
       //.def("extract_from_rbmemoryview"   , &RBEventHeader::extract_from_rbbinarydump, "Get header from full rbevent binary stream ('blob')")
       .def("get_active_data_channels"    , &RBEventHeader::get_active_data_channels, "Get a list of active channels, excluding ch9. Channel9 will (usually) always be on, as long as a single data channel is switched on as well.")
       .def("get_fpga_temp"               , &RBEventHeader::get_fpga_temp, "The FPGA temperature in C")
-      .def("get_drs_temp"                , &RBEventHeader::get_drs_temp, "The DRS4 temperature in C, read out by software")
       .def_property_readonly("timestamp48"  , &RBEventHeader::get_timestamp48, "The complete 48bit timestamp, derived from the RB clock (usually 33MHz)")
       .def("get_n_datachan"              , &RBEventHeader::get_n_datachan)
       .def("get_nchan"                   , &RBEventHeader::get_nchan) 
@@ -229,17 +228,23 @@ PYBIND11_MODULE(gaps_tof, m) {
       .def_readonly("channel_mask"       , &RBEventHeader::channel_mask)   
       .def("has_ch9"                     , &RBEventHeader::has_ch9, "Ch9 is available"     )
       .def_readonly("stop_cell"          , &RBEventHeader::stop_cell   )   
-      .def("is_locked"                   , &RBEventHeader::is_locked   )   
-      .def("is_locked_last_sec"          , &RBEventHeader::is_locked_last_sec)   
-      .def("lost_lock"                   , &RBEventHeader::lost_lock   )   
-      .def("lost_lock_last_sec"          , &RBEventHeader::lost_lock_last_sec)   
-      .def("lost_trigger"                , &RBEventHeader::drs_lost_trigger)   
-      .def("event_fragment"              , &RBEventHeader::is_event_fragment)   
+      .def_property_readonly("is_locked"                   , &RBEventHeader::is_locked,
+           "Is the RB loceked?"   )   
+      .def_property_readonly("is_locked_last_sec"          , &RBEventHeader::is_locked_last_sec,
+           "Has the RB been locked continuously throughout the last second?")   
+      .def_property_readonly("lost_lock"                   , &RBEventHeader::lost_lock   )   
+      .def_property_readonly("lost_lock_last_sec"          , &RBEventHeader::lost_lock_last_sec)   
+      .def_property_readonly("lost_trigger"                , &RBEventHeader::drs_lost_trigger)   
+      .def_property_readonly("event_fragment"              , &RBEventHeader::is_event_fragment) 
+      .def("get_sine_fit"                , &RBEventHeader::get_sine_fit,
+            "Get the result (amp,freq,phase) of an online sine fit to ch9")  
       .def_readonly("fpga_temp"          , &RBEventHeader::fpga_temp   )   
       .def_readonly("event_id"           , &RBEventHeader::event_id    )   
       .def_readonly("rb_id"              , &RBEventHeader::rb_id       )   
-      .def_readonly("timestamp32"        , &RBEventHeader::timestamp32)   
-      .def_readonly("timestamp16"        , &RBEventHeader::timestamp16)   
+      .def_readonly("timestamp32"        , &RBEventHeader::timestamp32, 
+              "LSB of the 48bit timestamp. Fast component")   
+      .def_readonly("timestamp16"        , &RBEventHeader::timestamp16,
+              "MSB of the 48bit timestamp. Slow component")   
       .def("__repr__",        [](const RBEventHeader &h) {
                                    return h.to_string();
                                  })

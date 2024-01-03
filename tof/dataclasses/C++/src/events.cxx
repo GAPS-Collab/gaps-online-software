@@ -127,9 +127,9 @@ RBEventHeader::RBEventHeader() {
   channel_mask       = 0; 
   status_byte        = 0;
   stop_cell          = 0; 
-  crc32              = 0;
-  dtap0              = 0;
-  drs4_temp          = 0; 
+  ch9_amp            = 0;
+  ch9_freq           = 0;
+  ch9_phase          = 0;
   fpga_temp          = 0;
   timestamp16        = 0; 
   timestamp32        = 0; 
@@ -138,6 +138,7 @@ RBEventHeader::RBEventHeader() {
 /*************************************/
 
 std::string RBEventHeader::to_string() const {
+  auto sfit = get_sine_fit();
   std::string repr = "<RBEventHeader";
   repr += "\n  rb id          " + std::to_string(rb_id)                 ;
   repr += "\n  event id       " + std::to_string(event_id)              ;
@@ -151,13 +152,14 @@ std::string RBEventHeader::to_string() const {
     repr += " " + std::to_string(ch) + " ";
   }
   repr += "\n  stop cell      " + std::to_string(stop_cell)             ;
-  repr += "\n  crc32          " + std::to_string(crc32)                 ;
-  repr += "\n  dtap0          " + std::to_string(dtap0)                 ;
+  repr += "\n  ** online ch9 fit amp, freq, phase";
+  repr += "\n    AMP " + std::to_string(sfit[0]);
+  repr += "  FREQ " + std::to_string(sfit[1]);
+  repr += "  PHASE " + std::to_string(sfit[2]); 
   repr += "\n  timestamp32    " + std::to_string(timestamp32)           ;
   repr += "\n  timestamp16    " + std::to_string(timestamp16)           ;
   repr += "\n  |->timestamp48 " + std::to_string(get_timestamp48())     ;
   repr += "\n  FPGA temp [C]  " + std::to_string(get_fpga_temp())       ;
-  repr += "\n  DRS4 temp [C]  " + std::to_string(get_drs_temp())        ;
   repr += ">";
   return repr;
 }
@@ -194,9 +196,9 @@ RBEventHeader RBEventHeader::from_bytestream(const Vec<u8> &stream,
   header.channel_mask        = Gaps::parse_u16(stream, pos);   
   header.status_byte         = Gaps::parse_u8(stream , pos); 
   header.stop_cell           = Gaps::parse_u16(stream, pos);  
-  header.crc32               = Gaps::parse_u32(stream, pos);  
-  header.dtap0               = Gaps::parse_u16(stream, pos);  
-  header.drs4_temp           = Gaps::parse_u16(stream, pos);  
+  header.ch9_amp             = Gaps::parse_u16(stream, pos);  
+  header.ch9_freq            = Gaps::parse_u16(stream, pos);  
+  header.ch9_phase           = Gaps::parse_u32(stream, pos);  
   header.fpga_temp           = Gaps::parse_u16(stream, pos);  
   header.timestamp32         = Gaps::parse_u32(stream, pos);
   header.timestamp16         = Gaps::parse_u16(stream, pos);
@@ -283,79 +285,16 @@ u8 RBEventHeader::get_n_datachan() const {
 
 /*************************************/
 
-f32 RBEventHeader::get_drs_temp() const {
-  f32 temp = drs_adc_to_celsius(drs4_temp);
-  return temp;
+std::array<f32, 3> RBEventHeader::get_sine_fit() const {
+  f32 u16_MAX = 65535;
+  auto amp    = (20.0 * ch9_amp   /u16_MAX) - 10.0;
+  auto freq   = (20.0 * ch9_freq  /u16_MAX) - 10.0;
+  auto phase  = (20.0 * ch9_phase /u16_MAX) - 10.0;
+  std::array<f32, 3> result = {amp,freq,phase};
+  return result;
 }
 
 /*************************************/
-
-f32 RBEventHeader::drs_adc_to_celsius(u16 adc) const {
-  f32 sign = 1.0;
-  if (adc >= 0x800) {
-    sign = -1.0;
-    adc = 0xFFF - adc;
-  }
-  return sign * (f32)adc * 0.0625;
-}                                             
-
-/*************************************/
-
-//RBEventHeader RBEventHeader::extract_from_rbbinarydump(const Vec<u8> &bs,
-//                                                       u64 &pos) {
-//  RBEventHeader header = RBEventHeader();
-//  u64 start = pos;
-//  spdlog::debug("Start decoding at pos {}", pos);
-//  u16 head = Gaps::u16_from_le_bytes(bs, pos);
-//  if (head != RBEventHeader::HEAD)  {
-//    spdlog::error("No header signature found!");  
-//  }
-//  // status field is at bytes 3,4;
-//  u16 status = Gaps::u16_from_le_bytes(bs, pos);
-//  header.lost_trigger = (status & 2 ) == 2;
-//  header.is_locked    = (status & 4 ) == 4;
-//  header.is_locked_last_sec = (status & 8) == 8;
-//  header.event_fragment = (status & 1 ) == 1;
-//  header.fpga_temp    = (status >> 4); 
-//  
-//  pos += 2 + 2 + 8 + 2 + 1; // skip len, roi, dna, fw hash and reserved part of rb_id
-//  header.rb_id = bs[pos];
-//  pos += 1;
-//  header.channel_mask = bs[pos];
-//  pos += 2;
-//  //header.event_id  = Gaps::u32_from_be_bytes(bs, pos);
-//  header.event_id     = Gaps::parse_u32_for_16bit_words(bs, pos); 
-//  header.dtap0        = Gaps::u16_from_le_bytes(bs, pos);
-//  header.drs4_temp    = Gaps::u16_from_le_bytes(bs, pos);
-//  header.timestamp_48 = Gaps::parse_u48_for_16bit_words(bs, pos);
-//  // FIXME - currently, the number of samples is still fixed
-//  u8 nchan = header.get_n_datachan();
-//  // we have to skip for each ch:
-//  // 1) head -> 2bytes
-//  // 2) NWORDS * 2bytes 
-//  // 3) trail -> 4bytes
-//  // if no channel is active, ch9 won't be active,
-//  // otherwise ch9 is ALWAYS active
-//  
-//  // THe header up to this point consists of 36 bytes
-//  u32 skip_bytes = 0;
-//  if ( nchan != 0) {
-//    skip_bytes = (nchan + 1) * (NWORDS * 2 + 6);
-//  }
-//  spdlog::debug("Skipping {} bytes of channel data!", skip_bytes);
-//  pos += skip_bytes;
-//  header.stop_cell = Gaps::parse_u16(bs, pos);
-//  header.crc32     = Gaps::parse_u32_for_16bit_words(bs, pos);
-//  spdlog::debug("Looking for TAIL at pos {}", pos);
-//  u16 tail         = Gaps::u16_from_le_bytes(bs, pos);
-//  if (tail != RBEventHeader::TAIL)  {
-//    spdlog::error("No tail signature found {} bytes from the start! Found {} instead", pos -start - 2, tail );  
-//  } else {
-//  }
-//  return header;
-//} 
-
-/**********************************************************/
 
 RBEvent::RBEvent() {  
   data_type = 0;

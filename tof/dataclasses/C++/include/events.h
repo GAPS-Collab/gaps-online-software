@@ -16,6 +16,7 @@
  */ 
 
 #include <tuple>
+#include <array>
 
 #include "tof_typedefs.h"
 #include "packets/monitoring.h"
@@ -134,10 +135,10 @@ struct RBEventHeader {
   u8   status_byte           ;
   u16  channel_mask          ;
   u16  stop_cell             ;
-  u32  crc32                 ;
-  u16  dtap0                 ;
+  u16  ch9_amp               ;
+  u16  ch9_freq              ;
+  u16  ch9_phase             ; 
   u16  fpga_temp             ;
-  u16  drs4_temp             ;
   u32  timestamp32           ;
   u16  timestamp16           ;
   
@@ -152,21 +153,20 @@ struct RBEventHeader {
   bool has_ch9()            const;
   u8   get_n_datachan()     const;
   f32  get_fpga_temp()      const;
-  f32  get_drs_temp()       const;
   bool is_event_fragment()  const;
   bool drs_lost_trigger()   const;
   bool lost_lock()          const;
   bool lost_lock_last_sec() const;
   bool is_locked()          const;
   bool is_locked_last_sec() const;
+
+  std::array<f32, 3> get_sine_fit() const;
+    
+  /// the combined timestamp 
   u64  get_timestamp48()    const;
 
   /// string representation for printing
   std::string to_string() const;
-
-  private:
-    /// conversion method for drs temperature readout
-    f32 drs_adc_to_celsius(u16 adc) const; 
 };
 
 /**
