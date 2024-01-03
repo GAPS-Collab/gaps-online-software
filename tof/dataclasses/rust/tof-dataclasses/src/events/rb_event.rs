@@ -22,7 +22,6 @@ use std::fmt;
 
 use colored::Colorize;
 
-
 use crate::packets::{TofPacket, PacketType};
 use crate::events::TofHit;
 use crate::constants::{NWORDS, NCHN};
@@ -840,9 +839,9 @@ impl RBEventHeader {
     // change anything. 
     // let's use an arbitrary precision for a 
     // range of -10 to 10 
-    let mut amp   = (input.0 + 10.0)*(20.0/(u16::MAX) as f32);
-    let mut freq  = (input.1 + 10.0)*(20.0/(u16::MAX) as f32);
-    let mut phase = (input.2 + 10.0)*(20.0/(u32::MAX) as f32);
+    let mut amp   = (input.0 + 10.0)*(u16::MAX as f32 / 20.0);
+    let mut freq  = (input.1 + 10.0)*(u16::MAX as f32 / 20.0);
+    let mut phase = (input.2 + 10.0)*(u32::MAX as f32 / 20.0);
 
     if amp < 0.0 {
       warn!("amp out of range!");
@@ -1035,12 +1034,13 @@ impl fmt::Display for RBEventHeader {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let sfit = self.get_sine_fit();
     let mut repr = String::from("<RBEventHeader:");
-    let sine_field = format!("\n    --> fit sine {:3} AMP {:3} FREQ {:3} PHASE", sfit.0, sfit.1, sfit.2);
+    let sine_field = format!("\n    --> online fit AMP {:3} FREQ {:3} PHASE {:3}", sfit.0, sfit.1, sfit.2);
     repr += &("\n  RB ID            ".to_owned() + &self.rb_id.to_string()); 
     repr += &("\n  event id         ".to_owned() + &self.event_id.to_string());  
     repr += &("\n  ch mask          ".to_owned() + &self.channel_mask.to_string());  
     repr += &("\n  has ch9          ".to_owned() + &self.has_ch9().to_string()); 
     //repr += &("\n  DRS4 temp [C]    ".to_owned() + &self.drs4_temp.to_string());  
+    repr += &sine_field;
     repr += &("\n  FPGA temp [\u{00B0}C]    ".to_owned() + &self.get_fpga_temp().to_string()); 
     repr += &("\n  timestamp32      ".to_owned() + &self.timestamp32.to_string()); 
     repr += &("\n  timestamp16      ".to_owned() + &self.timestamp16.to_string()); 
