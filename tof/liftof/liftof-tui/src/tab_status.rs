@@ -9,8 +9,6 @@ use std::time::Instant;
 extern crate histo;
 use histo::Histogram;
 
-use chrono::Utc;
-
 use ratatui::{
     symbols,
     backend::{Backend,CrosstermBackend},
@@ -60,6 +58,7 @@ pub struct RBTab<'a>  {
   pub event_queue   : VecDeque<RBEvent>,
   pub moni_queue    : VecDeque<RBMoniData>,
   pub met_queue     : VecDeque<f64>,
+  pub met_queue_moni: VecDeque<f64>,
   /// Holds waveform data
   pub ch_data       : Vec<Vec<(f64,f64)>>,
   /// Holds the monitoring qunatities
@@ -103,8 +102,6 @@ impl RBTab<'_>  {
       let this_item = format!("RB{:0>2}", k);
       rb_select_items.push(ListItem::new(Line::from(this_item)));
     }
-     
-
 
     let queue_size = 1000usize;
     let mut ch_data    = Vec::<Vec::<(f64,f64)>>::with_capacity(1024);
@@ -114,39 +111,40 @@ impl RBTab<'_>  {
       ch_data.push(tmp_vec);
     }
     RBTab {
-      tp_receiver   : tp_receiver,
-      rb_receiver   : rb_receiver,
-      rb_selector   : 0,
-      rb_changed    : false,
-      event_queue   : VecDeque::<RBEvent>::with_capacity(queue_size),
-      moni_queue    : VecDeque::<RBMoniData>::with_capacity(queue_size),
-      met_queue     : VecDeque::<f64>::with_capacity(queue_size),
-      rate_queue    : VecDeque::<(f64,f64)>::with_capacity(queue_size),
-      fpgatmp_queue : VecDeque::<(f64,f64)>::with_capacity(queue_size),
-      pressure      : VecDeque::<(f64,f64)>::with_capacity(queue_size),
-      humidity      : VecDeque::<(f64,f64)>::with_capacity(queue_size),
-      mag_x         : VecDeque::<(f64,f64)>::with_capacity(queue_size),
-      mag_y         : VecDeque::<(f64,f64)>::with_capacity(queue_size),
-      mag_z         : VecDeque::<(f64,f64)>::with_capacity(queue_size),
-      mag_tot       : VecDeque::<(f64,f64)>::with_capacity(queue_size),
+      tp_receiver    : tp_receiver,
+      rb_receiver    : rb_receiver,
+      rb_selector    : 0,
+      rb_changed     : false,
+      event_queue    : VecDeque::<RBEvent>::with_capacity(queue_size),
+      moni_queue     : VecDeque::<RBMoniData>::with_capacity(queue_size),
+      met_queue      : VecDeque::<f64>::with_capacity(queue_size),
+      met_queue_moni : VecDeque::<f64>::with_capacity(queue_size),
+      rate_queue     : VecDeque::<(f64,f64)>::with_capacity(queue_size),
+      fpgatmp_queue  : VecDeque::<(f64,f64)>::with_capacity(queue_size),
+      pressure       : VecDeque::<(f64,f64)>::with_capacity(queue_size),
+      humidity       : VecDeque::<(f64,f64)>::with_capacity(queue_size),
+      mag_x          : VecDeque::<(f64,f64)>::with_capacity(queue_size),
+      mag_y          : VecDeque::<(f64,f64)>::with_capacity(queue_size),
+      mag_z          : VecDeque::<(f64,f64)>::with_capacity(queue_size),
+      mag_tot        : VecDeque::<(f64,f64)>::with_capacity(queue_size),
 
-      ch_data       : ch_data,
+      ch_data        : ch_data,
 
-      queue_size    : queue_size,
+      queue_size     : queue_size,
       
-      n_events      : 0,
-      n_moni        : 0,
-      miss_evid     : 0,
-      last_evid     : 0,
-      nch_histo     : Histogram::with_buckets(50),
-      timer         : Instant::now(),
+      n_events       : 0,
+      n_moni         : 0,
+      miss_evid      : 0,
+      last_evid      : 0,
+      nch_histo      : Histogram::with_buckets(50),
+      timer          : Instant::now(),
   
-      theme         : theme,
-      view          : RBTabView::Waveform,
+      theme          : theme,
+      view           : RBTabView::Waveform,
     
-      rbl_state     : ListState::default(),
-      rbl_items     : rb_select_items,
-      rbl_active    : false,
+      rbl_state      : ListState::default(),
+      rbl_items      : rb_select_items,
+      rbl_active     : false,
     }
   }
   
@@ -166,13 +164,14 @@ impl RBTab<'_>  {
       self.mag_tot.clear();
       self.event_queue.clear();
       self.met_queue.clear();
+      self.met_queue_moni.clear();
       self.fpgatmp_queue.clear();
       self.nch_histo = Histogram::with_buckets(50);
     }
 
     if !self.rb_receiver.is_empty() {
       match self.rb_receiver.try_recv() {
-        Err(err) => (),
+        Err(_) => (),
         Ok(_ev)   => {
           ev = _ev;
         }
@@ -189,6 +188,10 @@ impl RBTab<'_>  {
               let moni = RBMoniData::from_bytestream(&pack.payload, &mut 0)?;
               self.n_moni += 1;
               if moni.board_id == self.rb_selector {
+                self.met_queue_moni.push_back(met); 
+                if self.met_queue_moni.len() > self.queue_size {
+                  self.met_queue_moni.pop_front();
+                }
                 self.moni_queue.push_back(moni);
                 if self.moni_queue.len() > self.queue_size {
                   self.moni_queue.pop_front();
@@ -363,23 +366,6 @@ impl RBTab<'_>  {
           },
         }
         frame.render_stateful_widget(rb_select_list, list_chunks[0], &mut self.rbl_state );
-
-
-        //frame.render_widget(info_view, main_view[0]); 
-
-        //let info_view = Paragraph::new()
-        //.style(self.theme.style())
-        //.alignment(Alignment::Left)
-        //.block(
-        //  Block::default()
-        //    .borders(Borders::ALL)
-        //    .style(self.theme.style())
-        //    .title("Overview")
-        //    .border_type(BorderType::Rounded),
-        //);
-
-        // render everything
-
       },
       RBTabView::Waveform => {
         // set up general layout
@@ -629,9 +615,6 @@ impl RBTab<'_>  {
         let fpga_ds_title  = String::from("FPGA T [\u{00B0}C] ");
         let fpga_tc_theme  = self.theme.clone();
         let fpga_tc = timeseries(&mut self.fpgatmp_queue,
-                                 t_min    ,
-                                 t_max    ,
-                                 &t_labels,
                                  fpga_ds_name,
                                  fpga_ds_title,
                                  &fpga_tc_theme  );
@@ -641,9 +624,6 @@ impl RBTab<'_>  {
         let humi_ds_title  = String::from("Humidity %");
         let humi_tc_theme  = self.theme.clone();
         let humi_tc = timeseries(&mut self.humidity,
-                                 t_min    ,
-                                 t_max    ,
-                                 &t_labels,
                                  humi_ds_name,
                                  humi_ds_title,
                                  &humi_tc_theme);
@@ -653,9 +633,6 @@ impl RBTab<'_>  {
         let pres_ds_title  = String::from("Pressure [hPa]");
         let pres_tc_theme  = self.theme.clone();
         let pres_tc = timeseries(&mut self.pressure,
-                                 t_min    ,
-                                 t_max    ,
-                                 &t_labels,
                                  pres_ds_name,
                                  pres_ds_title,
                                  &pres_tc_theme);
@@ -665,9 +642,6 @@ impl RBTab<'_>  {
         let mag_ds_x_title  = String::from("Magnetic x [G}");
         let mag_tc_x_theme  = self.theme.clone();
         let mag_tc_x = timeseries(&mut self.mag_x,
-                                  t_min    ,
-                                  t_max    ,
-                                  &t_labels,
                                   mag_ds_x_name,
                                   mag_ds_x_title,
                                   &mag_tc_x_theme);
@@ -677,9 +651,6 @@ impl RBTab<'_>  {
         let mag_ds_y_title  = String::from("Magnetic y [G}");
         let mag_tc_y_theme  = self.theme.clone();
         let mag_tc_y = timeseries(&mut self.mag_y,
-                                  t_min    ,
-                                  t_max    ,
-                                  &t_labels,
                                   mag_ds_y_name,
                                   mag_ds_y_title,
                                   &mag_tc_y_theme);
@@ -689,13 +660,19 @@ impl RBTab<'_>  {
         let mag_ds_z_title  = String::from("Magnetic z [G}");
         let mag_tc_z_theme  = self.theme.clone();
         let mag_tc_z = timeseries(&mut self.mag_z,
-                                  t_min    ,
-                                  t_max    ,
-                                  &t_labels,
                                   mag_ds_z_name,
                                   mag_ds_z_title,
                                   &mag_tc_z_theme);
         frame.render_widget(mag_tc_z, col3[2]);
+        
+        let mag_ds_tot_name   = String::from("Magnetic TOT [G]");
+        let mag_ds_tot_title  = String::from("Magnetic TOT [G}");
+        let mag_tc_tot_theme  = self.theme.clone();
+        let mag_tc_tot = timeseries(&mut self.mag_tot,
+                                     mag_ds_tot_name,
+                                     mag_ds_tot_title,
+                                    &mag_tc_tot_theme);
+        frame.render_widget(mag_tc_tot, col2[2]);
 
       },
       RBTabView::Info => {

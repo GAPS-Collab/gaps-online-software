@@ -3,7 +3,6 @@ use std::collections::VecDeque;
 use ratatui::symbols;
 use ratatui::text::Span;
 use ratatui::terminal::Frame;
-use ratatui::layout::Rect;
 use ratatui::style::{
     Color,
     Style,
@@ -16,38 +15,78 @@ use ratatui::widgets::{
     Dataset,
     Chart,
     Borders,
-    Cell,
-    List,
-    ListItem,
-    ListState,
-    Paragraph,
-    Row,
-    Table,
-    Tabs,
 };
 
 
 use crate::colors::ColorTheme2;
 
-// FIXME - make some smart decisions 
-// about palette
 pub fn timeseries<'a>(data        : &'a mut VecDeque<(f64,f64)>,
-                      t_min       : u64,
-                      t_max       : u64,
-                      t_labels    : &'a Vec<String>,
                       ds_name     : String,
                       xlabel      : String,
                       theme       : &'a ColorTheme2) -> Chart<'a> {
-  let y_only : Vec::<i64> = data.iter().map(|z| z.1.round() as i64).collect();
-  let y_max = *y_only.iter().max().unwrap_or(&0) + 5;
-  let y_min = *y_only.iter().min().unwrap_or(&0) - 5;
-  let y_spacing = (y_max - y_min)/5;
-  let y_labels = vec![y_min.to_string(),
-                       (y_min + y_spacing).to_string(),
-                       (y_min + 2*y_spacing).to_string(),
-                       (y_min + 3*y_spacing).to_string(),
-                       (y_min + 4*y_spacing).to_string(),
-                       (y_min + 5*y_spacing).to_string()];
+  let x_only : Vec::<f64> = data.iter().map(|z| z.0).collect();
+  // get timing axis
+  let t_min : u64;
+  let mut t_max : u64;
+  if x_only.len() == 0 {
+    t_min = 0;
+    t_max = 0;
+  } else {   
+    t_min = x_only[0] as u64;
+    t_max = x_only[x_only.len() -1] as u64;
+  }
+  t_max += (0.05*t_max as f64).round() as u64;
+  let t_spacing = (t_max - t_min)/10;
+  let mut t_labels = Vec::<String>::new();
+  for k in 0..10 {
+    let _label = format!("{}", (t_min + t_spacing * k as u64));
+    t_labels.push(_label);
+  }
+
+  let y_only : Vec::<f64> = data.iter().map(|z| z.1).collect();
+  let mut y_min = f64::MAX;
+  let mut y_max = f64::MIN;
+  if y_only.len() == 0 {
+    y_max = 0.0;
+    y_min = 0.0;
+  }
+  for y in y_only {
+    if y < y_min {
+      y_min = y;
+    }
+    if y > y_max {
+      y_max = y;
+    }
+  }
+  y_max += f64::abs(y_max)*0.05;
+  y_min -= f64::abs(y_min)*0.05;
+  let y_spacing = f64::abs(y_max - y_min)/5.0;
+  let mut y_labels = Vec::<String>::new() ;
+  let mut precision = 0u8;
+  if f64::abs(y_max - y_min) <= 10.0 {
+    precision = 1;
+  }
+  if f64::abs(y_max - y_min) <= 1.0 {
+    precision = 2;
+  }
+  for k in 0..5 {
+    match precision {
+      0 => {
+        let _label = format!("{}", (y_min + y_spacing * k as f64).round() as i64);
+        y_labels.push(_label);
+      },
+      1 => {
+        let _label = format!("{:.1}", (y_min + y_spacing * k as f64));
+        y_labels.push(_label);
+      },
+      2 => {
+        let _label = format!("{:.2}", (y_min + y_spacing * k as f64));
+        y_labels.push(_label);
+      },
+      _ => (),
+    }
+  }
+
   let dataset = vec![Dataset::default()
       .name(ds_name)
       .marker(symbols::Marker::Braille)

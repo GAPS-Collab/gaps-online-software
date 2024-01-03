@@ -1,9 +1,6 @@
 //! Master Trigger tab
 //! 
 //! Show current data from the master trigger
-//! The layout is somewhat like this
-//!
-//! | Logs                                  |
 
 use std::collections::VecDeque;
 
@@ -55,28 +52,28 @@ pub const HIST_LABELS : [&str;100]  = ["0",   "1", "2",  "3",  "4",  "5",  "6", 
 
 #[derive(Debug, Clone)]
 pub struct MTTab {
-  pub main_layout   : Vec<Rect>,
-  pub info_layout   : Vec<Rect>,
-  pub detail_layout : Vec<Rect>,
-  pub view_layout   : Vec<Rect>,
+  pub main_layout    : Vec<Rect>,
+  pub info_layout    : Vec<Rect>,
+  pub detail_layout  : Vec<Rect>,
+  pub view_layout    : Vec<Rect>,
 
-  pub event_queue   : VecDeque<MasterTriggerEvent>,
-  pub moni_queue    : VecDeque<MtbMoniData>,
-  pub met_queue     : VecDeque<f64>,
-  pub rate_queue    : VecDeque<(f64,f64)>,
-  pub fpgatmp_queue : VecDeque<(f64,f64)>,
-  pub tp_receiver   : Receiver<TofPacket>,
-  pub mte_receiver  : Receiver<MasterTriggerEvent>,
-  pub queue_size    : usize,
+  pub event_queue    : VecDeque<MasterTriggerEvent>,
+  pub moni_queue     : VecDeque<MtbMoniData>,
+  pub met_queue      : VecDeque<f64>,
+  pub rate_queue     : VecDeque<(f64,f64)>,
+  pub fpgatmp_queue  : VecDeque<(f64,f64)>,
+  pub tp_receiver    : Receiver<TofPacket>,
+  pub mte_receiver   : Receiver<MasterTriggerEvent>,
+  pub queue_size     : usize,
  
-  pub n_events      : usize,
-  pub n_moni        : usize,
-  pub miss_evid     : usize,
-  pub last_evid     : u32,
-  pub nch_histo     : Histogram,
-  pub theme         : ColorTheme2,
+  pub n_events       : usize,
+  pub n_moni         : usize,
+  pub miss_evid      : usize,
+  pub last_evid      : u32,
+  pub nch_histo      : Histogram,
+  pub theme          : ColorTheme2,
 
-  timer             : Instant,
+  timer              : Instant,
 
 }
 
@@ -86,25 +83,25 @@ impl MTTab {
              mte_receiver : Receiver<MasterTriggerEvent>,
              theme        : ColorTheme2) -> MTTab {
     MTTab {
-      main_layout   : Vec::<Rect>::new(),
-      info_layout   : Vec::<Rect>::new(),
-      detail_layout : Vec::<Rect>::new(),
-      view_layout   : Vec::<Rect>::new(),
-      event_queue   : VecDeque::<MasterTriggerEvent>::with_capacity(1000),
-      moni_queue    : VecDeque::<MtbMoniData>::with_capacity(1000),
-      met_queue     : VecDeque::<f64>::with_capacity(1000),
-      rate_queue    : VecDeque::<(f64,f64)>::with_capacity(1000),
-      fpgatmp_queue : VecDeque::<(f64,f64)>::with_capacity(1000),
-      tp_receiver   : tp_receiver,
-      mte_receiver  : mte_receiver,
-      queue_size    : 1000, // random
-      n_events      : 0,
-      n_moni        : 0,
-      miss_evid     : 0,
-      last_evid     : 0,
-      nch_histo     : Histogram::with_buckets(50),
-      theme         : theme,
-      timer         : Instant::now(),
+      main_layout    : Vec::<Rect>::new(),
+      info_layout    : Vec::<Rect>::new(),
+      detail_layout  : Vec::<Rect>::new(),
+      view_layout    : Vec::<Rect>::new(),
+      event_queue    : VecDeque::<MasterTriggerEvent>::with_capacity(1000),
+      moni_queue     : VecDeque::<MtbMoniData>::with_capacity(1000),
+      met_queue      : VecDeque::<f64>::with_capacity(1000),
+      rate_queue     : VecDeque::<(f64,f64)>::with_capacity(1000),
+      fpgatmp_queue  : VecDeque::<(f64,f64)>::with_capacity(1000),
+      tp_receiver    : tp_receiver,
+      mte_receiver   : mte_receiver,
+      queue_size     : 1000, // random
+      n_events       : 0,
+      n_moni         : 0,
+      miss_evid      : 0,
+      last_evid      : 0,
+      nch_histo      : Histogram::with_buckets(50),
+      theme          : theme,
+      timer          : Instant::now(),
     }
   }
 

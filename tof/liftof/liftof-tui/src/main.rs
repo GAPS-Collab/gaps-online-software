@@ -27,8 +27,6 @@ use std::time::{Duration, Instant};
 use std::io;
 use std::path::{Path, PathBuf};
 use std::collections::{VecDeque, HashMap};
-
-extern crate pretty_env_logger;
 #[macro_use] extern crate log;
 
 extern crate json;
@@ -73,8 +71,6 @@ use tof_dataclasses::events::{
 use tof_dataclasses::monitoring::MtbMoniData;
 use tof_dataclasses::manifest::ReadoutBoard;
 
-
-//use crate::tab_commands::CommandTab;
 use crate::tab_mt::{
     MTTab,
 };
@@ -96,6 +92,7 @@ use crate::tab_status::{
     RBTab,
     RBTabView
 };
+
 use crate::menu::{
     MenuItem,
     MainMenu,
@@ -110,8 +107,6 @@ use crate::colors::{
     ColorTheme2,
     COLORSETBW,
     COLORSETOMILU,
-    LiftofTuiTheme,
-    LiftofTuiThemeOmilu,
 };
 
 // keep at max this amount of tof packets
@@ -280,7 +275,7 @@ fn packet_receiver(tp_sender_mt : Sender<TofPacket>,
   data_socket.connect(address).expect("Unable to connect to data (PUB) socket {adress}");
   //data_socket.connect(address_rb).expect("Unable to connect to (PUB) socket {address_rb}");
   match data_socket.set_subscribe(b"") {
-    Err(err) => error!("Can't subscribe to any message on 0MQ socket!"),
+    Err(err) => error!("Can't subscribe to any message on 0MQ socket! {err}"),
     Ok(_)    => (),
   }
   let mut n_pack = 0usize;
@@ -303,7 +298,7 @@ fn packet_receiver(tp_sender_mt : Sender<TofPacket>,
                 n_pack += 1;
                 //println!("Got TP {}", tp);
                 match str_list.lock() {
-                  Err(err) => (),
+                  Err(err) => error!("Can't lock shared memory! {err}"),
                   Ok(mut _list)    => {
                     let prefix  = String::from_utf8(payload[0..4].to_vec()).unwrap();
                     let message = format!("{}-{} {}", n_pack,prefix, tp.to_string());
@@ -322,7 +317,7 @@ fn packet_receiver(tp_sender_mt : Sender<TofPacket>,
             packet_sorter(&tp.packet_type, &pck_map);
             n_pack += 1;
             match str_list.lock() {
-              Err(err) => (),
+              Err(err) => error!("Can't lock shared memory!"),
               Ok(mut _list)    => {
                 let message = format!("{} {}", n_pack, tp.to_string());
                 _list.push_back(message);
@@ -376,6 +371,9 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
 
   let home_stream_wd_cnt : Arc<Mutex<VecDeque<String>>> = Arc::new(Mutex::new(VecDeque::new()));
   let home_streamer      = home_stream_wd_cnt.clone();
+
+  // a shared location for frame and main window, so that the individual tabs can render to it
+  let shared_frame : Arc<Mutex<Frame>>;//  = Arc::new(Mutex::new(Frame::new()));
 
   let mut pm = HashMap::<String, usize>::new();
   pm.insert(String::from("Unknown"          ) ,0);
@@ -435,7 +433,6 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   //let debug_local       = args.debug_local;         
   //let autodiscover_rb   = args.autodiscover_rb;    
   //
-  ////pretty_env_logger::init();
   let mut ten_second_update = Instant::now();
   let mission_elapsed_time  = Instant::now();
  
@@ -502,8 +499,6 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   
   let (tx, rx) = mpsc::channel();
 
-  //let tick_rate = Duration::from_millis(100);
-
   // heartbeat, keeps it going
   let _heartbeat_thread = thread::Builder::new()
     .name("heartbeat".into())
@@ -530,10 +525,8 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                    }
     ).expect("Failed to spawn heartbeat thread!");
 
-
   //let mut rb_list_state = ListState::default();
   //rb_list_state.select(Some(0));
- 
 
   //  containers for the auto-updating data which will be shown 
   //  in the different widgets
@@ -542,9 +535,9 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let mut packets         = VecDeque::<String>::new();
   
   // containers for the values monitoring the MTB
-  let mut rates           = VecDeque::<(f64,f64)>::new();
-  let mut fpga_temps      = VecDeque::<(f64,f64)>::new();
-  let mut mtb_moni        = MtbMoniData::new();
+  //let mut rates           = VecDeque::<(f64,f64)>::new();
+  //let mut fpga_temps      = VecDeque::<(f64,f64)>::new();
+  //let mut mtb_moni        = MtbMoniData::new();
 
 
   //let mut n_paddle_data   = VecDeque::<u8>::new();
@@ -552,7 +545,6 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   //let mut n_paddle_hist   = Histogram::with_buckets(160);
 
   // A color theme, can be changed later
-  let mut theme           = LiftofTuiThemeOmilu::new();
   let mut color_theme     = ColorTheme2::new();
   color_theme.update(&COLORSETOMILU);
   //let mut color_set_bw    = 
@@ -575,7 +567,21 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let mut home_tab        = HomeTab::new(color_theme.clone(), home_streamer, packet_map_home);
   let mut event_tab       = EventTab::new(ev_pack_recv, mte_send, rbe_send, color_theme);
 
+  // FIXME - multithread it
   loop {
+    match mt_tab2.receive_packet() {
+      Err(err) => error!("Can not receive TofPackets for MTTab!"),
+      Ok(_)    => ()
+    }
+    match wf_tab.receive_packet() {
+      Err(err) => error!("Can not receive TofPackets for WfTab!"),
+      Ok(_)    => ()
+    }
+    match event_tab.receive_packet() {
+      Err(err) => error!("Can not receive TofPackets for EventTab!"),
+      Ok(_)    => ()
+    }
+    
     match rx.recv() {
       Err(err) => trace!("No update"),
       Ok(event) => {
@@ -705,22 +711,11 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
             } // end match ui_menu
           },
           Event::Tick => {
-            match mt_tab2.receive_packet() {
-              Err(err) => error!("Can not receive TofPackets for MTTab!"),
-              Ok(_)    => ()
-            }
-            match wf_tab.receive_packet() {
-              Err(err) => error!("Can not receive TofPackets for WfTab!"),
-              Ok(_)    => ()
-            }
-            match event_tab.receive_packet() {
-              Err(err) => error!("Can not receive TofPackets for EventTab!"),
-              Ok(_)    => ()
-            }
           }
         }
       }
     } // end rx.recv()
+    // FIXME - terminal draw should run in its own thread
     terminal.draw(|rect| {
       let size           = rect.size();
       let mster_lo       = MasterLayout::new(size); 
@@ -1359,38 +1354,4 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
     //}
   } // end loop;
   Ok(())
-        //KeyCode::Char('h') => active_menu_item = MenuItem::Home,
-        //KeyCode::Char('p') => active_menu_item = MenuItem::Pets,
-        //KeyCode::Char('a') => {
-        //    add_random_pet_to_db().expect("can add new random pet");
-        //}
-        //KeyCode::Char('d') => {
-        //    remove_pet_at_index(&mut pet_list_state).expect("can remove pet");
-        //}
-        //KeyCode::Down => {
-        //    if let Some(selected) = pet_list_state.selected() {
-        //        let amount_pets = read_db().expect("can fetch pet list").len();
-        //        if selected >= amount_pets - 1 { 
-        //            pet_list_state.select(Some(0));
-        //        } else {
-        //            pet_list_state.select(Some(selected + 1));
-        //        }
-        //    }
-        //}
-        //KeyCode::Up => {
-        //    if let Some(selected) = pet_list_state.selected() {
-        //        let amount_pets = read_db().expect("can fetch pet list").len();
-        //        if selected > 0 { 
-        //            pet_list_state.select(Some(selected - 1));
-        //        } else {
-        //            pet_list_state.select(Some(amount_pets - 1));
-        //        }
-        //    }
-        //}
-        //  _ => (),
-        //} // end match key
-  //    }// end match event/tick
-  //  }; // end terminal.draw
-  //} // end loop
-  //return Ok(()); 
 }
