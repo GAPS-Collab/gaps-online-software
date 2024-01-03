@@ -67,107 +67,12 @@ std::string tof_response_to_str(const TofResponse &cmd) {
  return "Unknown";
 }
 
-Vec<u16> ch_head_getter(BlobEvt_t evt)
-{
-    Vec<u16> ch_head;
-    for (size_t k=0; k<NCHN; k++) 
-    {ch_head.push_back(evt.ch_head[k]);}
-    return ch_head;
-}
-
-Vec<u64> ch_trail_getter(BlobEvt_t evt)
-{
-    Vec<u64> ch_trail;
-    for (size_t k=0; k<NCHN; k++) 
-    {ch_trail.push_back(evt.ch_trail[k]);}
-    return ch_trail;
-}
-
-Vec<Vec<i16>> ch_getter(BlobEvt_t evt)
-{
-    Vec<Vec<i16>> channels;
-    for (size_t k=0; k<NCHN; k++) 
-      {  channels.push_back({});
-         for (size_t l=0; l < NWORDS; l++)
-            {
-               channels[k].push_back(evt.ch_adc[k][l]);
-            }
-      }
-    return channels;
-}
-
-usize get_current_blobevent_size() {
-  return 36 + (NCHN*2) + (NCHN*NWORDS*2) + (NCHN*4) + 8;
-}
-
-//bytestream blobevent_encoder(BlobEvt_t evt, size_t startpos)
-//{
-//  bytestream buffer;
-//  buffer.reserve(get_current_blobevent_size());
-//  for (size_t k=0; k<get_current_blobevent_size(); k++)
-//  {buffer.push_back(0);}
-//  encode_blobevent(&evt, buffer, startpos);
-//  return buffer;
-//}
-//
-//BlobEvt_t blobevent_decoder(bytestream buffer, size_t startpos)
-//{
-//  BlobEvt_t evt = decode_blobevent(buffer, startpos);
-//  return evt;
-//}
-
-//std::string BlobEvtToString(BlobEvt_t event)
-//{
-//   std::string output = "";
-//   output += "head "      + std::to_string(event.head )      + "\n" ;
-//   output += "status "    + std::to_string(event.status )    + "\n" ;
-//   output += "len "       + std::to_string(event.len )       + "\n" ;
-//   output += "roi "       + std::to_string(event.roi )       + "\n" ;
-//   output += "dna "       + std::to_string(event.dna )       + "\n" ;
-//   output += "fw_hash "   + std::to_string(event.fw_hash )   + "\n" ;
-//   output += "id "        + std::to_string(event.id )        + "\n" ;
-//   output += "ch_mask "   + std::to_string(event.ch_mask )   + "\n" ;
-//   output += "event_ctr " + std::to_string(event.event_ctr ) + "\n" ;
-//   output += "dtap0 "     + std::to_string(event.dtap0 )     + "\n" ;
-//   output += "dtap1 "     + std::to_string(event.dtap1 )     + "\n" ;
-//   output += "timestamp " + std::to_string(event.timestamp ) + "\n" ;
-//   output += "stop_cell " + std::to_string(event.stop_cell ) + "\n" ;
-//   output += "crc32 "     + std::to_string(event.crc32 )     + "\n" ;
-//   output += "tail "      + std::to_string(event.tail)       ;
-//   return output;
-//}
-
-template<class T>
-void nullsetter(T foo) 
-{
-    std::cerr << "Can not set this property!" << std::endl;
-}
 
 void set_payload_helper(TofPacket &packet,
                         const Vec<u8> payload) {
   packet.payload = payload;
   packet.payload_size = payload.size();
 }
-
-//void set_ptype_helper(TofPacket &packet,
-//                      const PacketType &ptype) {
-//  packet.packet_type = ptype;
-//}
-
-/********************/
-
-BlobEvt_t read_event_helper(std::string filename, i32 n)
-{
-    FILE* f = fopen(filename.c_str(), "rb");
-    BlobEvt_t event;
-    while(n >= 0) {
-      ReadEvent(f, &event, false);
-      n--;
-    }
-    return event;
-}
-
-/********************/
 
 /*****************
  * Dismantle a readoutboard file and return the individual
@@ -230,95 +135,6 @@ py::dict splice_readoutboard_datafile(const std::string filename) {
                 "adc_ch8"_a=adc_8,\
                 "adc_ch9"_a=adc_9);
   return data;
-}
-
-
-int get_nevents_from_file(std::string filename){
-  FILE* f = fopen(filename.c_str(), "rb");
-  BlobEvt_t event;
-  i32 result = 0;
-  u32 nevents = 0;
-  while (result >= 0) {
-    result = ReadEvent(f, &event, false);
-    nevents++;
-  }
-  return nevents;
-}
-
-/********************/
-
-std::vector<Calibrations_t> read_calibration_file (std::string filename) {
-  std::vector<Calibrations_t> all_channel_calibrations = std::vector<Calibrations_t>{NCHN};
-  std::fstream calfile(filename.c_str(), std::ios_base::in);
-  if (calfile.fail()) {
-    std::cerr << "[ERROR] Can't open " << filename << " - not calibrating" << std::endl;
-    return all_channel_calibrations;
-  }
-  for (size_t i=0; i<NCHN; i++) {
-    for (size_t j=0; j<NWORDS; j++)
-      calfile >> all_channel_calibrations[i].vofs[j];
-    for (size_t j=0; j<NWORDS; j++)
-      calfile >> all_channel_calibrations[i].vdip[j];
-    for (size_t j=0; j<NWORDS; j++)
-      calfile >> all_channel_calibrations[i].vinc[j];
-    for (size_t j=0; j<NWORDS; j++)
-      calfile >> all_channel_calibrations[i].tbin[j];
-  }
-  return all_channel_calibrations;
-}
-
-/********************/
-
-Vec<Vec<f64>> offset_getter(const std::vector<Calibrations_t> &cal)
-{
-  Vec<Vec<f64>> offsets;
-  for (size_t k=0; k<NCHN; k++) 
-    {  offsets.push_back({});
-       for (size_t l=0; l < NWORDS; l++)
-          {
-             offsets[k].push_back(cal[k].vofs[l]);
-          }
-    }
-  return offsets;
-}
-
-Vec<Vec<f64>> dip_getter(const std::vector<Calibrations_t> &cal)
-{
-    Vec<Vec<f64>> dips;
-    for (size_t k=0; k<NCHN; k++) 
-      {  dips.push_back({});
-         for (size_t l=0; l < NWORDS; l++)
-           {
-             dips[k].push_back(cal[k].vdip[l]);
-           }
-      }
-    return dips;
-}
-
-Vec<Vec<f64>> increment_getter(const std::vector<Calibrations_t> &cal)
-{
-  Vec<Vec<f64>> incs;
-  for (size_t k=0; k<NCHN; k++) 
-    {  incs.push_back({});
-       for (uint l=0; l < NWORDS; l++)
-        {
-          incs[k].push_back(cal[k].vinc[l]);
-        }
-    }
-  return incs;
-}
-
-Vec<Vec<f64>> tbin_getter(const std::vector<Calibrations_t> cal)
-{
-    Vec<Vec<f64>> tbins;
-    for (size_t k=0; k<NCHN; k++) 
-      {  tbins.push_back({});
-         for (size_t l=0; l < NWORDS; l++)
-            {
-              tbins[k].push_back(cal[k].tbin[l]);
-            }
-      }
-    return tbins;
 }
 
 /********************/
@@ -747,34 +563,6 @@ PYBIND11_MODULE(gaps_tof, m) {
        })
    ;
 
-
-    py::class_<BlobEvt_t>(m, "BlobEvt")
-       .def(py::init())
-       .def_readwrite("head"                    ,&BlobEvt_t::head ) 
-       .def_readwrite("status"                  ,&BlobEvt_t::status )
-       .def_readwrite("len"                     ,&BlobEvt_t::len )
-       .def_readwrite("roi"                     ,&BlobEvt_t::roi )
-       .def_readwrite("dna"                     ,&BlobEvt_t::dna )
-       .def_readwrite("fw_hash"                 ,&BlobEvt_t::fw_hash )
-       .def_readwrite("id"                      ,&BlobEvt_t::id )
-       .def_readwrite("ch_mask"                 ,&BlobEvt_t::ch_mask )
-       .def_readwrite("event_ctr"               ,&BlobEvt_t::event_ctr )
-       .def_readwrite("dtap0"                   ,&BlobEvt_t::dtap0 )
-       .def_readwrite("dtap1"                   ,&BlobEvt_t::dtap1 )
-       .def_readwrite("timestamp"               ,&BlobEvt_t::timestamp )
-       //.def_readwrite("timestamp_32"            ,&BlobEvt_t::timestamp_32 )
-       //.def_readwrite("timestamp_16"            ,&BlobEvt_t::timestamp_16 )
-       //.def_property("ch_head"      , &ch_head_getter , &nullsetter<std::vector<unsigned short>  )
-       .def("get_ch_head"                       ,&ch_head_getter)
-       .def("get_ch_adc"                        ,&ch_getter )
-       .def("get_ch_trail"                      ,&ch_trail_getter )
-       .def_readwrite("stop_cell"               ,&BlobEvt_t::stop_cell )
-       .def_readwrite("crc32"                   ,&BlobEvt_t::crc32 )
-       .def_readwrite("tail"                    ,&BlobEvt_t::tail)
-       //.def("__repr__",  [] (const BlobEvt_t &event) { 
-       //        return "<BlobEvt_t \n" + BlobEvtToString(event) + ">";
-       //        })
-   ;
     
    py::class_<Waveform>(m, "Waveform")
        .def(py::init<int>())
@@ -907,24 +695,13 @@ PYBIND11_MODULE(gaps_tof, m) {
                                           py::arg("filename"));
    m.def("get_event_ids_from_raw_stream", &get_event_ids_from_raw_stream);
    m.def("get_bytestream_from_file",      &get_bytestream_from_file);
-   m.def("get_nevents_from_file",         &get_nevents_from_file);
-   m.def("ReadEvent",                     &read_event_helper);
    m.def("get_rbeventheaders",            &get_rbeventheaders); 
    
-   //m.def("encode_blobevent",      &blobevent_encoder);
-   //m.def("decode_blobevent",      &blobevent_decoder);   
-   m.def("get_current_blobevent_size", &get_current_blobevent_size);
-
    // functions to read and parse blob files
    m.def("splice_readoutboard_datafile",   &splice_readoutboard_datafile);
 
    // Calibration functions
    m.def("remove_spikes",            &remove_spikes_helper);
-   m.def("read_calibration_file",    &read_calibration_file);
-   m.def("get_offsets",              &offset_getter);
-   m.def("get_vincs",                &increment_getter);
-   m.def("get_vdips",                &dip_getter);
-   m.def("get_tbins",                &tbin_getter);
    // waveform stuff
    m.def("calculate_pedestal",       &calculate_pedestal_helper);
 }
