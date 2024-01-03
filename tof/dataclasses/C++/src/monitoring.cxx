@@ -3,6 +3,47 @@
 
 #include "spdlog/spdlog.h"
 
+LTBMoniData::LTBMoniData() {
+  board_id          = 0;
+  trenz_temp        = 0;
+  ltb_temp          = 0;
+  thresh            = {0,0,0};
+}
+
+LTBMoniData LTBMoniData::from_bytestream(const Vec<u8> &stream,
+                                         usize &pos) {
+  auto moni = LTBMoniData();
+  u16 head          = Gaps::parse_u16(stream, pos);
+  if (head != LTBMoniData::HEAD) {
+    spdlog::error("No header signature (0xAAAA) found for decoding of LTBMoniData!");   
+  }
+  moni.board_id    = Gaps::parse_u8(stream, pos);
+  moni.trenz_temp  = Gaps::parse_f32(stream, pos);
+  moni.ltb_temp    = Gaps::parse_f32(stream, pos);
+  for (usize k=0;k<3;k++) {
+    moni.thresh[k] = Gaps::parse_f32(stream, pos);
+  }
+  u16 tail         = Gaps::parse_u16(stream, pos);
+  if (tail != LTBMoniData::TAIL) {
+    spdlog::error("No tail signature (0x5555) found for decoding of LTBMoniData!");   
+  }
+  return moni;
+}
+  
+std::string LTBMoniData::to_string() const {
+  std::string repr = "<LTBMoniData   : ";
+  repr += "\n  board_id              : " + std::to_string(board_id   );
+  repr += "\n  trenz temp       [C]  : " + std::to_string(trenz_temp );
+  repr += "\n  LTB   temp       [C]  : " + std::to_string(ltb_temp         );
+  repr += "\n  ** Thresholds **";
+  repr += "\n  THR1, THR2, THR3 [mV] : " + std::to_string(thresh[0]) 
+       +  " " + std::to_string(thresh[1])
+       +  " " + std::to_string(thresh[2]);
+  repr += ">";
+  return repr;
+}
+
+
 RBMoniData::RBMoniData() {
   
   board_id          = 0;  
@@ -99,7 +140,7 @@ RBMoniData RBMoniData::from_bytestream(const Vec<u8> &payload,
 }
   
 std::string RBMoniData::to_string() const {
-  std::string repr = "<RBMoniData : >";
+  std::string repr = "<RBMoniData : ";
   repr += "\n\t board_id           : " + std::to_string(board_id         );
   repr += "\n\t rate               : " + std::to_string(rate             );
   repr += "\n\t tmp_drs            : " + std::to_string(tmp_drs          );

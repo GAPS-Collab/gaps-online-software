@@ -521,6 +521,22 @@ PYBIND11_MODULE(gaps_tof, m) {
                                   }) 
     ;
 
+    py::class_<LTBMoniData>(m, "LTBMoniData",
+            "Environmental sensors & thresholds for LocalTriggerBoards")
+        .def(py::init())
+        .def("from_bytestream",   &LTBMoniData::from_bytestream,
+                "Factory function to recreate LTBMoniData from byte representation")
+        .def_readonly("board_id", &LTBMoniData::board_id,
+                "The ID of the RB the LTB is connected to")
+        .def_readonly("trenz_temp", &LTBMoniData::trenz_temp) 
+        .def_readonly("ltb_temp"  , &LTBMoniData::ltb_temp)
+        .def_readonly("thresholds", &LTBMoniData::thresh,
+                "Trigger thresholds applied to the low gain signal of paddle ends. In mV")
+        .def("__repr__",          [](const LTBMoniData &moni) {
+                                  return moni.to_string();
+                                  }) 
+    ;
+
     py::class_<RBMoniData>(m, "RBMoniData",
             "Packet with monitoring data from the individual readout boards.")
         .def(py::init())

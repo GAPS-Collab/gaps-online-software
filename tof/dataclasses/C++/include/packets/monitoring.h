@@ -1,7 +1,38 @@
 #ifndef MONITORINGPACKETS_H_INCLUDED
 #define MONITORINGPACKETS_H_INCLUDED
 
+#include <array>
 #include "tof_typedefs.h"
+
+/// Monitoring data from the LTBs
+///
+/// Only one of the RBs per RAT is 
+/// connected to the LTB of the RAT
+///
+/// temperature and threshold 
+/// information
+///
+struct LTBMoniData {
+  static const u16 HEAD = 0xAAAA;
+  static const u16 TAIL = 0x5555;
+  /// byte size with HEAD + TAIL
+  static const u8  SIZE = 25; 
+  
+  u8                 board_id  ; 
+  f32                trenz_temp; 
+  f32                ltb_temp  ; 
+  std::array<f32, 3> thresh    ; 
+  
+  LTBMoniData();
+
+  /// Factory function - recreate LTBMoniData from 
+  /// byte representation
+  static LTBMoniData from_bytestream(const Vec<u8> &stream,
+                                     usize &pos);
+  
+  /// String representatioin for printing
+  std::string to_string() const;
+};
 
 /// Radoutbaord sensors, covering the RB electronics 
 /// as well as the preamps.
