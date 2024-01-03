@@ -19,6 +19,7 @@ extern crate colored;
 extern crate liftof_lib;
 extern crate liftof_cc;
 
+use std::time::Instant;
 use std::collections::HashMap;
 use std::io;
 use std::io::Write;
@@ -255,6 +256,7 @@ fn main() {
   let runid                 = config["run_id"].as_usize().unwrap(); 
   let mut write_stream_path = config["stream_savepath"].as_str().unwrap().to_owned();
   let calib_file_path       = config["calibration_file_path"].as_str().unwrap().to_owned();
+  let runtime_nseconds      = config["runtime_seconds"].as_f32().unwrap_or(0.0);
   let db_path               = Path::new(config["db_path"].as_str().unwrap());
   let db_path_c             = db_path.clone();
   let mut rb_list           = get_rbs_from_sqlite(db_path_c);
@@ -271,6 +273,9 @@ fn main() {
   for rb in &rb_list {
     println!("\t {}", rb);
   }
+
+  // A global kill timer
+  let program_start = Instant::now();
 
   // Prepare outputfiles
   let mut stream_files_path = PathBuf::from(write_stream_path);
@@ -542,6 +547,11 @@ fn main() {
     thread::sleep(1*one_second); 
     thread::sleep(1*one_minute);
     println!("...");
+    if program_start.elapsed().as_secs_f32() > runtime_nseconds {
+      println!("=> Runtime seconds of {} have expired!", runtime_nseconds);
+      println!("=> Ending program. If you don't want that behaviour, change the confifguration file.");
+      exit(0);    
+    }
   }
   //println!("Program terminating after specified runtime! So long and thanks for all the {}", fish); 
 }
