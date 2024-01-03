@@ -262,6 +262,7 @@ fn main() {
   let mut write_stream_path = config["stream_savepath"].as_str().unwrap().to_owned();
   let calib_file_path       = config["calibration_file_path"].as_str().unwrap().to_owned();
   let runtime_nseconds      = config["runtime_seconds"].as_f32().unwrap_or(0.0);
+  let write_npack_file      = config["packets_per_stream"].as_usize().unwrap_or(10000);
   let db_path               = Path::new(config["db_path"].as_str().unwrap());
   let db_path_c             = db_path.clone();
   let mut rb_list           = get_rbs_from_sqlite(db_path_c);
@@ -429,6 +430,7 @@ fn main() {
                                           &flight_address,
                                           write_stream,
                                           write_stream_path,
+                                          write_npack_file,
                                           runid,
                                           verbose);
   });

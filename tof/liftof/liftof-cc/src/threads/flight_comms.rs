@@ -38,10 +38,14 @@ use tof_dataclasses::io::TofPacketWriter;
 ///                      (or whomever) wants to listen.
 ///                      A 0MQ PUB socket witll be bound 
 ///                      to this address.
+/// * write_npack_file : Write this many TofPackets to a 
+///                      single file before starting a 
+///                      new one.
 pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
                         flight_address     : &str,
                         write_stream       : bool,
                         write_stream_path  : String,
+                        write_npack_file   : usize,
                         runid              : usize,
                         print_moni_packets : bool) {
 
@@ -62,6 +66,7 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
     streamfile_name += &runid.to_string();
     println!("==> Writing stream to file with prefix {}", streamfile_name);
     writer = Some(TofPacketWriter::new(streamfile_name));
+    writer.as_mut().unwrap().pkts_per_file = write_npack_file;
   }
   //let mut event_cache = Vec::<TofPacket>::with_capacity(100); 
 
