@@ -47,6 +47,15 @@ std::string packet_type_to_string(const PacketType pt) {
       case PacketType::RBMoni : {
       return "RBMoni";
     }
+      case PacketType::PBMoniData : {
+      return "PBMoniData";
+    }
+      case PacketType::LTBMoniData : {
+      return "LTBMoniData";
+    }
+      case PacketType::PAMoniData : {
+      return "PAMoniData";
+    }
       case PacketType::RBCalibration : {
       return "RBCalibration";
     }

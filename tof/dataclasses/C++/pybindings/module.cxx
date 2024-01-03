@@ -212,7 +212,8 @@ PYBIND11_MODULE(gaps_tof, m) {
       .value("UnspoolEventCache"    ,TofCommand::UnspoolEventCache)
       .value("StreamAnyEvent"       ,TofCommand::StreamAnyEvent) 
       .value("Unknown"              ,TofCommand::Unknown) 
-      .export_values();
+      //.export_values();
+      ;
 
     py::class_<RBEventHeader>(m, "RBEventHeader", "The event header contains the event id, information about active channels, temperatures, trigger stop cell etc. Basically everythin except channel adc data.")
       .def(py::init())
@@ -291,26 +292,31 @@ PYBIND11_MODULE(gaps_tof, m) {
       .value("EventNotReady"           ,TofResponse::EventNotReady) 
       .value("EventSerializationIssue" ,TofResponse::SerializationIssue) 
       .value("Unknown"                 ,TofResponse::Unknown) 
-      .export_values()
+      //.export_values()
     ;
    
     py::enum_<PacketType>(m, "PacketType")
       .value("Unknown",          PacketType::Unknown   )
       .value("Command",          PacketType::Command   )
-      .value("PT_RBEvent",       PacketType::RBEvent   )
-      .value("PT_TofEvent",      PacketType::TofEvent  )
-      .value("Monitor",          PacketType::Monitor   )
+      .value("RBEvent",          PacketType::RBEvent   )
+      .value("TofEvent",         PacketType::TofEvent  )
+      .value("RBMoniData",       PacketType::Monitor   )
+      .value("PAMoniData",       PacketType::PAMoniData)
+      .value("PBMoniData",       PacketType::PBMoniData)
+      .value("LTBMoniData",      PacketType::LTBMoniData)
       .value("HeartBeat",        PacketType::HeartBeat )
       .value("MasterTrigger",    PacketType::MasterTrigger )
-      .value("PT_MtbMoniData",   PacketType::MTBMoni)
-      .export_values();
+      .value("MtbMoniData",      PacketType::MTBMoni)
+      ;
+      //.export_values();
 
     py::enum_<PADDLE_END>(m, "PADDLE_END")
         .value("A", PADDLE_END::A)
         .value("B", PADDLE_END::B)
         .value("UNKNOWN", PADDLE_END::UNKNOWN)
-        .export_values();
-    
+        //.export_values();
+        ;
+
     py::class_<MtbMoniData>(m, "MtbMoniData",
             "Monitoring data from the master trigger board.")
         .def(py::init())
@@ -325,6 +331,7 @@ PYBIND11_MODULE(gaps_tof, m) {
                                   return moni.to_string();
                                   }) 
     ;
+    
     py::class_<TofCmpMoniData>(m, "TofCmpMoniData",
             "Monitoring data from the tof flight computer (TOF-CPU)")
         .def(py::init())
@@ -435,6 +442,7 @@ PYBIND11_MODULE(gaps_tof, m) {
                                   return rbmoni_to_string(moni);
                                   }) 
     ;
+    
     py::class_<TofEventHeader>(m, "TofEventHeader",
         "Meta information, primary particle reconstruction & general variables.")
         .def(py::init())
