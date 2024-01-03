@@ -76,15 +76,20 @@ fn rb_relay() {
   let ctx = zmq::Context::new();
   let socket = ctx.socket(zmq::SUB).expect("Unable to create 0MQ SUB socket!");
   let socket_out = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
-  for k in 1..41 {
-    let rb_id : usize;
-    let address = format!("tcp://10.0.1.1{:02}:42000", k);
+  for rb_id in 1..41 {
+    let address = format!("tcp://10.0.1.1{:02}:42000", rb_id);
     socket.connect(&address).expect("Unable to bind to data (PUB) socket {adress}");
     println!("==> 0MQ PUB socket bound to address {address}");
   }
-  socket.set_subscribe(b"");
+  match socket.set_subscribe(b"") {
+    Err(err) => error!("Unable to subscribe to any message! {err}"),
+    Ok(_)    => ()
+  }
   let address_out : &str = "tcp://100.96.207.91:42001";
-  socket_out.bind(address_out);
+  match socket_out.bind(address_out) {
+    Err(err) => error!("Unable to bind to PUB socket at {}! {err}", address_out),
+    Ok(_)    => ()
+  }
   loop {
     match socket.recv_bytes(0) {
       Err(_err) => (),
@@ -131,8 +136,6 @@ fn main() {
       }
     }
   }
-  let args = Args::parse(); 
-  let verbose = args.verbose;
   let _worker_thread = thread::Builder::new()
          .name("master_trigger".into())
          .spawn(move || {
@@ -145,7 +148,7 @@ fn main() {
                            1,
                            60,
                            verbose,
-                           args.send_requests);
+                           send_requests);
          })
          .expect("Failed to spawn master_trigger thread!");
  if send_requests {

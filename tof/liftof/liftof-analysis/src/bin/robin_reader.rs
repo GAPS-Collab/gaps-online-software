@@ -37,12 +37,13 @@ use tof_dataclasses::manifest::{get_ltbs_from_sqlite,
                                 get_rbs_from_sqlite};
 use tof_dataclasses::serialization::Serialization;
 use tof_dataclasses::calibrations::RBCalibrations;
-use tof_dataclasses::io::RobinReader;
-
+use tof_dataclasses::io::{
+    RobinReader,
+    TofPacketReader,
+    TofPacketWriter
+};
 use liftof_lib::{
     color_log,
-    TofPacketWriter,
-    TofPacketReader
 };
 
 

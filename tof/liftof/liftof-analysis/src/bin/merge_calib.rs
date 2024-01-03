@@ -27,12 +27,12 @@ use std::process::exit;
 use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::calibrations::RBCalibrations;
 use tof_dataclasses::io::{
-    RobinReader
+    RobinReader,
+    TofPacketWriter,
 }; 
 
 use liftof_lib::{
     color_log,
-    TofPacketWriter
 };
 
 
@@ -88,7 +88,7 @@ fn main() {
       if !calibrations.contains_key(&rb_id) {
         calibrations.insert(rb_id, RBCalibrations::new(rb_id));
       }
-      let mut cali   = calibrations.get_mut(&rb_id).unwrap();
+      let cali   = calibrations.get_mut(&rb_id).unwrap();
       if filename.to_string().ends_with(".vcal") {
         let mut reader    = RobinReader::new(filename.to_string());
         reader.cache_all_events();

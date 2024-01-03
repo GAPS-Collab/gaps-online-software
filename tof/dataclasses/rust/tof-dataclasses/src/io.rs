@@ -1,10 +1,17 @@
-//! Input/Output 
+//! Dataio - readino/writing of different types
+//! of TOF data products.
 //!
-//! * Read files into memory
-//!   
+//! * TofPacketReader/Writer - sequentially read/write
+//!   TofPackets from/to a file on disk.
+//!   -> upcoming: Will connect to a network socket
 //!
+//! * RobinReader: Read (old) RB data files, where 
+//!   the file is simply a dump of the internal 
+//!   buffers ("RBEventMemoryView").
 //!
-//!
+//! * RBEventMemoryStreamer: Walk over "raw" RBEvents
+//!   representations ("RBEventMemoryView") and extract
+//!   RBEvents
 //!
 
 // change if we switch to a firmware
@@ -37,7 +44,8 @@ use std::io::{
     BufReader,
     Seek,
     SeekFrom,
-    Read
+    Read,
+    Write,
 };
 use std::collections::{
     VecDeque,
@@ -60,11 +68,32 @@ use crate::packets::{
 
 use crate::serialization::{
     Serialization,
+    SerializationError,
     u8_to_u16_14bit,
     search_for_u16,
     parse_u8,
     parse_u16,
+    parse_u32,
 };
+
+//FIXME : this needs to become a trait
+fn read_n_bytes(file: &mut BufReader<File>, n: usize) -> io::Result<Vec<u8>> {
+  let mut buffer = vec![0u8; n];
+  match file.read_exact(&mut buffer) {
+    Err(ref err) if err.kind() == io::ErrorKind::UnexpectedEof => {
+      // Reached the end of the file
+      buffer = Vec::<u8>::new();
+      file.read_to_end(&mut buffer)?;
+      return Ok(buffer);
+    },
+    Err(err) => {
+      error!("Can not read {n} bytes from file! Error {err}");
+      return Err(err);
+    },
+    Ok(_) => ()
+  }
+  Ok(buffer)
+}
 
 /// Read an entire file into memory
 ///
@@ -381,7 +410,7 @@ impl RBEventMemoryStreamer {
     match replace_channel_mask {
       None => (),
       Some(mask) => {
-        println!("== --> Replaceing ch mask {} with {}", header.channel_mask, mask);
+        println!("==> Replacing ch mask {} with {}", header.channel_mask, mask);
         header.channel_mask    = mask; 
       }
     }
@@ -396,8 +425,9 @@ impl RBEventMemoryStreamer {
     
     header.event_id  = event_id;
     // we are currently not using these
-    let dtap0        = parse_u16(&self.stream, &mut self.pos);
-    let drs4_temp    = parse_u16(&self.stream, &mut self.pos);
+    //let _dtap0       = parse_u16(&self.stream, &mut self.pos);
+    //let _drs4_temp   = parse_u16(&self.stream, &mut self.pos);
+    self.pos += 4;
     let timestamp0   = parse_u16(&self.stream, &mut self.pos);
     let timestamp1   = parse_u16(&self.stream, &mut self.pos);
     let timestamp2   = parse_u16(&self.stream, &mut self.pos);
@@ -622,6 +652,252 @@ impl Iterator for RBEventMemoryStreamer {
   }
 }
 
+/// Read serialized TofPackets from an existing file
+///
+/// This is mainly to read stream files previously
+/// written by TofPacketWriter
+#[derive(Debug)]
+pub struct TofPacketReader {
+
+  pub filename    : String,
+  file_reader     : Option<BufReader<File>>,
+  cursor          : usize
+}
+
+impl TofPacketReader {
+
+  pub fn new(filename : String) -> TofPacketReader {
+    let filename_c = filename.clone();
+    let mut packet_reader = TofPacketReader { 
+      filename       : filename,
+      file_reader    : None,
+      cursor : 0,
+    };
+    packet_reader.open(filename_c);
+    packet_reader
+  }
+ 
+  pub fn get_next_packet_size(&self, stream : &Vec<u8>) -> u32 {
+    // cursor needs at HEAD position and then we have to 
+    // add one byte for the packet type
+    let mut pos = self.cursor + 2;
+    let ptype_int  = parse_u8(stream, &mut pos);
+    let next_psize = parse_u32(stream, &mut pos);
+    let ptype = ptype_int as u8;
+    debug!("We anticpate a TofPacket of type {:?} and size {} (bytes)",ptype, next_psize);
+    next_psize
+  }
+
+  pub fn open(&mut self, filename : String) {
+    if self.filename != "" {
+      warn!("Overiding previously set filename {}", self.filename);
+    }
+    let self_filename = filename.clone();
+    self.filename     = self_filename;
+    if filename != "" {
+      let path = Path::new(&filename); 
+      info!("Reading from {}", &self.filename);
+      let file = OpenOptions::new().create(false).append(false).read(true).open(path).expect("Unable to open file {filename}");
+      self.file_reader    = Some(BufReader::new(file));
+      self.init();
+    }
+  }
+
+  fn init(&mut self) {
+    match self.search_start() {
+      Err(err) => {
+        error!("Can not find any header signature (typically 0xAAAA) in file! Err {err}");
+        panic!("This is most likely a useless endeavour! Hence, I panic!");
+      }
+      Ok(start_pos) => {
+        self.cursor = start_pos;
+      }
+    }
+  }
+
+  fn search_start(&mut self) -> Result<usize, SerializationError> {
+    let mut pos       = 0u64;
+    let mut start_pos = 0usize; 
+    //let mut stream  = Vec::<u8>::new();
+    let max_bytes   = self.get_file_nbytes();
+    info!("Using file with {max_bytes} bytes!");
+    let chunk       = 10usize;
+    while pos < max_bytes {
+      match read_n_bytes(self.file_reader.as_mut().unwrap(), chunk) {
+        Err(err) => {
+          error!("Can not read from file, error {err}");
+          error!("Most likely, the file/stream is too short!");
+          return Err(SerializationError::StreamTooShort);
+        }
+        Ok(stream) => {
+          debug!("Got stream {:?}", stream);
+          match search_for_u16(TofPacket::HEAD, &stream, 0) {
+            Err(_) => {
+              pos += chunk as u64;
+              continue;
+            }
+            Ok(result) => {
+              start_pos = result + pos as usize;           
+              // make sure the current chunk is accounted 
+              // for before the break
+              pos += chunk as u64;
+              break;
+            }
+          }
+        } // end Ok
+      } // end match 
+    } // end while
+    let mut rewind : i64 = pos.try_into().unwrap();
+    rewind = -1*rewind + start_pos as i64;
+    debug!("Rewinding {rewind} bytes");
+    match self.file_reader.as_mut().unwrap().seek(SeekFrom::Current(rewind)) {
+      Err(err) => {
+        error!("Can not rewind file buffer! Error {err}");
+      }
+      Ok(_) => ()
+    }
+    Ok(start_pos)
+  }
+  
+  fn get_file_nbytes(&self) -> u64 {
+    let metadata  = self.file_reader.as_ref().unwrap().get_ref().metadata().unwrap();
+    let file_size = metadata.len();
+    file_size
+  }
+}
+
+impl Default for TofPacketReader {
+  fn default() -> Self {
+    TofPacketReader::new(String::from(""))
+  }
+}
+
+impl Iterator for TofPacketReader {
+  type Item = TofPacket;
+  //type Item = io::Result<TofPacket>;
+
+  fn next(&mut self) -> Option<Self::Item> {
+    let packet : TofPacket;
+    match read_n_bytes(self.file_reader.as_mut().unwrap(), 7) { 
+    //match self.file_reader.as_mut().expect("No file available!").read_until(b'\n', &mut line) {
+      Err(err) => {
+        error!("Error reading from file {} error: {}", self.filename, err);
+      },
+      Ok(chunk) => {
+        if chunk.len() < 7 {
+          error!("The stream is too short!");
+          return None;
+        }
+        else {
+          trace!("Read {} bytes", chunk.len());
+          let expected_payload_size = self.get_next_packet_size(&chunk) as usize; 
+          match read_n_bytes(self.file_reader.as_mut().unwrap(), expected_payload_size + 2) {
+            Err(err) => {
+              error!("Unable to read {} requested bytes to decode tof packet! Err {err}", expected_payload_size - 7 );
+              return None;
+            },
+            Ok(data) => {
+              let mut stream = Vec::<u8>::with_capacity(expected_payload_size + 9);
+              stream.extend_from_slice(&chunk);
+              stream.extend_from_slice(&data);
+              //println!("{:?}", stream);
+              match TofPacket::from_bytestream(&stream, &mut 0) {
+                Ok(pack) => {
+                  packet = pack;
+                  return Some(packet);
+                }
+                Err(err) => { 
+                  error!("Error getting packet from file {err}");
+                  return None;
+                }
+              }
+            }
+          }
+        }
+      }, // end outer OK
+    }
+  None
+  }
+}
+
+/// Write TofPackets to disk.
+///
+/// Operates sequentially, packets can 
+/// be added one at a time, then will
+/// be synced to disk.
+pub struct TofPacketWriter {
+
+  pub file          : File,
+  pub file_prefix   : String,
+  /// The maximum number of packets 
+  /// for a single file. Ater this 
+  /// number is reached, a new 
+  /// file is started.
+  pub pkts_per_file : usize,
+  
+  file_id           : usize,
+  /// internal packet counter, number of 
+  /// packets which went through the writer
+  n_packets         : usize,
+}
+
+impl TofPacketWriter {
+
+  /// Instantiate a new PacketWriter 
+  ///
+  /// # Arguments
+  ///
+  /// * file_prefix : Prefix file with this string. A continuous number will get 
+  ///                 appended to control the file size.
+  pub fn new(file_prefix : String) -> Self {
+    //let filename = file_prefix.clone() + "_0.tof.gaps";
+    let filename = file_prefix.clone() + ".tof.gaps";
+    let path = Path::new(&filename); 
+    info!("Writing to file {filename}");
+    let file = OpenOptions::new().create(true).append(true).open(path).expect("Unable to open file {filename}");
+    Self {
+      file,
+      file_prefix   : file_prefix,
+      pkts_per_file : 3000,
+      file_id       : 1,
+      n_packets     : 0,
+    }
+  }
+
+  /// Induce serialization to disk for a TofPacket
+  ///
+  ///
+  pub fn add_tof_packet(&mut self, packet : &TofPacket) {
+    let buffer = packet.to_bytestream();
+    match self.file.write_all(buffer.as_slice()) {
+      Err(err) => error!("Writing to file with prefix {} failed. Err {}", self.file_prefix, err),
+      Ok(_)    => ()
+    }
+    self.n_packets += 1;
+    if self.n_packets == self.pkts_per_file {
+      let filename = self.file_prefix.clone() + "_" + &self.file_id.to_string() + ".tof.gaps";
+      let path  = Path::new(&filename);
+      println!("==> [TOFPACKETWRITER] Will start a new file {}", path.display());
+      match self.file.sync_all() {
+        Err(err) => {
+          error!("Unable to sync file to disc! {err}");
+        },
+        Ok(_) => ()
+      }
+      self.file = OpenOptions::new().create(true).append(true).open(path).expect("Unable to open file {filename}");
+      self.n_packets = 0;
+      self.file_id += 1;
+    }
+  debug!("TofPacket written!");
+  }
+}
+
+impl Default for TofPacketWriter {
+  fn default() -> TofPacketWriter {
+    TofPacketWriter::new(String::from(""))
+  }
+}
+
 /// Read RB binary (robin) files. These are also 
 /// known as "blob" files
 ///
@@ -646,6 +922,8 @@ pub struct RobinReader {
 
 impl RobinReader {
 
+  /// The "old" Robin files have a fixed 
+  /// bytesize by design
   const EVENT_SIZE : usize = 18530;
 
   pub fn new(filename : String) -> Self {

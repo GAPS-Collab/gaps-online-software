@@ -1,4 +1,11 @@
 # NIUHI series
+
+# v0.8.1
+* waveform analysis enabled by default
+* allows to stop the program after a 
+  certain amount of seconds defined in 
+  the config file.
+
 # v0.8.0
 * renames mt-readout to liftof-mt and make it generally more
   useful

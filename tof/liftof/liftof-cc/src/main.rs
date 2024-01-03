@@ -29,14 +29,11 @@ use std::{fs,
           time};
 use std::path::{Path, PathBuf};
 
-use clap::{arg,
-           command,
-           //value_parser,
-           //ArgAction,
-           //Command,
-           Args,
-           Parser,
-           Subcommand};
+use clap::{
+    arg,
+    command,
+    Parser,
+};
 
 use crossbeam_channel as cbc; 
 use colored::Colorize;
@@ -49,14 +46,17 @@ use tof_dataclasses::manifest::get_rbs_from_sqlite;
 use tof_dataclasses::DsiLtbRBMapping;
 use tof_dataclasses::commands::TofCommand;
 use tof_dataclasses::commands::TofCommandCode;
-use liftof_lib::{master_trigger,
-                 readoutboard_commander};
-use liftof_lib::color_log;
-use liftof_lib::get_ltb_dsi_j_ch_mapping;
+use liftof_lib::{
+    master_trigger,
+    readoutboard_commander,
+    color_log,
+    get_ltb_dsi_j_ch_mapping,
+    DATAPORT,
+    LIFTOF_LOGO_SHOW,
+};
 use liftof_cc::threads::{readoutboard_communicator,
                          event_builder,
                          global_data_sink};
-use liftof_lib::DATAPORT;
 
 //use liftof_cc::constants::*;
 
@@ -184,14 +184,19 @@ fn main() {
     }).init();
 
   // welcome banner!
+  println!("{}", LIFTOF_LOGO_SHOW);
   println!("-----------------------------------------------");
-  println!(" ** Welcome to liftof-cc \u{1F680} \u{1F388} *****");
-  println!(" .. liftof is a software suite for the time-of-flight detector (TOF) ");
-  println!(" .. for the GAPS experiment \u{1F496}");
-  println!(" .. This is the Command&Control server which connects to the MasterTriggerBoard and the ReadoutBoards");
-  println!(" .. see the gitlab repository for documentation and submitting issues at" );
-  println!(" **https://uhhepvcs.phys.hawaii.edu/Achim/gaps-online-software/-/tree/main/tof/liftof**");
-  
+  println!(" >> Welcome to liftof-cc \u{1F680} \u{1F388} ");
+  println!(" >> liftof is a software suite for the time-of-flight detector (TOF) ");
+  println!(" >> for the GAPS experiment \u{1F496}");
+  println!(" >> This is the Command&Control server which connects to the MasterTriggerBoard and the ReadoutBoards");
+  //println!(" >> see the gitlab repository for documentation and submitting issues at" );
+  //let repo_url    = "https://github.com/GAPS-Collab/gaps-online-software";
+  //let api_doc_url = "https://gaps-collab.github.io/gaps-online-software/";
+  //let gitlab_repo = format!("\x1B]8;;{}\x07{}\x1B]8;;\x07", repo_url, repo_url);
+  //let api_docs    = format!("\x1B]8;;{}\x07{}\x1B]8;;\x07", api_doc_url, api_doc_url);
+  //println!(" >> >> Software repo    : {}", gitlab_repo);
+  //println!(" >> >> API documentation: {}", api_docs);
   // deal with command line arguments
   let args = LiftofCCArgs::parse();
 

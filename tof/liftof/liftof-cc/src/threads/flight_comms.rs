@@ -24,7 +24,7 @@ use tof_dataclasses::monitoring::{RBMoniData,
 
 use tof_dataclasses::events::TofEvent;
 use tof_dataclasses::serialization::Serialization;
-use liftof_lib::TofPacketWriter;
+use tof_dataclasses::io::TofPacketWriter;
 
 /// Manages "outgoing" 0MQ PUB socket
 ///
@@ -63,10 +63,10 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
     println!("==> Writing stream to file with prefix {}", streamfile_name);
     writer = Some(TofPacketWriter::new(streamfile_name));
   }
-  let mut event_cache = Vec::<TofPacket>::with_capacity(100); 
+  //let mut event_cache = Vec::<TofPacket>::with_capacity(100); 
 
   let mut n_pack_sent = 0;
-  let mut last_evid   = 0u32;
+  //let mut last_evid   = 0u32;
 
   // for debugging/profiling
   let mut timer = Instant::now();
@@ -133,6 +133,7 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
         //  }
 
         //} else {
+        // FIXME - disentangle network and disk I/O?
         match data_socket.send(pack.to_bytestream(),0) {
           Err(err) => error !("Not able to send packet over 0MQ PUB! {err}"),
           Ok(_)    => {
