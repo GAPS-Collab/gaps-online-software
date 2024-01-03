@@ -97,6 +97,57 @@ struct RBMoniData {
 
 std::ostream& operator<<(std::ostream& os, const RBMoniData& moni);
 
+/// Powerboard monitoring
+struct PBMoniData {
+  static const u16 HEAD = 0xAAAA;
+  static const u16 TAIL = 0x5555;
+  static const u8  SIZE = 89;
+
+  u8 board_id;
+  std::array<f32, 3> p3v6_preamp_vcp;
+  std::array<f32, 3> n1v6_preamp_vcp;
+  std::array<f32, 3> p3v4f_ltb_vcp;
+  std::array<f32, 3> p3v4d_ltb_vcp;
+  std::array<f32, 3> p3v6_ltb_vcp;
+  std::array<f32, 3> n1v6_ltb_vcp;
+  f32 pds_temp;
+  f32 pas_temp;
+  f32 nas_temp;
+  f32 shv_temp;
+  
+  PBMoniData();
+
+  /// Factor function - restore PAMoniData from byte-representation
+  static PBMoniData from_bytestream(const Vec<u8> &stream,
+                                    usize &pos);
+  
+  /// String representation for pretty printing
+  std::string to_string() const;
+};
+
+std::ostream& operator<<(std::ostream& os, const PBMoniData& moni);
+
+/// Preamp Monitoring
+struct PAMoniData {
+  static const u16 HEAD = 0xAAAA;
+  static const u16 TAIL = 0x5555;
+  static const u8  SIZE = 89;
+
+  u8 board_id;
+  std::array<f32, 16> temps;
+  std::array<f32, 16> biases; 
+  PAMoniData();
+
+  /// Factory function - restore PAMoniData from byte-representation
+  static PAMoniData from_bytestream(const Vec<u8> &stream,
+                                    usize &pos);
+  
+  /// String representation for pretty printing
+  std::string to_string() const;
+};
+  
+std::ostream& operator<<(std::ostream& os, const PAMoniData& moni);
+
 /// MasterTriggerBoard internal sensors
 struct MtbMoniData {
   static const u16 HEAD = 0xAAAA;

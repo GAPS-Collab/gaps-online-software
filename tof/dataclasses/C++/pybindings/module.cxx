@@ -536,6 +536,42 @@ PYBIND11_MODULE(gaps_tof, m) {
                                   return moni.to_string();
                                   }) 
     ;
+    
+    py::class_<PBMoniData>(m, "PBMoniData",
+            "Sensors on the Powerboards")
+        .def(py::init())
+        .def("from_bytestream",   &PBMoniData::from_bytestream,
+                "Factory function to recreate PBMoniData from byte representation")
+        .def_readonly("board_id", &PBMoniData::board_id,
+                "The ID of the RB the PB is connected to")
+        .def_readonly("p3v6_preamp_vcp", &PBMoniData::p3v6_preamp_vcp  ) 
+        .def_readonly("n1v6_preamp_vcp", &PBMoniData::n1v6_preamp_vcp ) 
+        .def_readonly("p3v4f_ltb_vcp"  , &PBMoniData::p3v4f_ltb_vcp   ) 
+        .def_readonly("p3v4d_ltb_vcp"  , &PBMoniData::p3v4d_ltb_vcp   ) 
+        .def_readonly("p3v6_ltb_vcp"   , &PBMoniData::p3v6_ltb_vcp ) 
+        .def_readonly("n1v6_ltb_vcp"   , &PBMoniData::n1v6_ltb_vcp ) 
+        .def_readonly("pds_temp"       , &PBMoniData::pds_temp ) 
+        .def_readonly("pas_temp"       , &PBMoniData::pas_temp ) 
+        .def_readonly("nas_temp"       , &PBMoniData::nas_temp ) 
+        .def_readonly("shv_temp"       , &PBMoniData::shv_temp ) 
+        .def("__repr__",          [](const PBMoniData &moni) {
+                                  return moni.to_string();
+                                  }) 
+    ;
+    
+    py::class_<PAMoniData>(m, "PAMoniData",
+            "Sensors for the preamps")
+        .def(py::init())
+        .def("from_bytestream",   &PAMoniData::from_bytestream,
+                "Factory function to recreate PAMoniData from byte representation")
+        .def_readonly("board_id", &PAMoniData::board_id,
+                "The ID of the RB which is used to read out these sensors")
+        .def_readonly("temps",    &PAMoniData::temps  ) 
+        .def_readonly("biases",   &PAMoniData::biases ) 
+        .def("__repr__",          [](const PAMoniData &moni) {
+                                  return moni.to_string();
+                                  }) 
+    ;
 
     py::class_<RBMoniData>(m, "RBMoniData",
             "Packet with monitoring data from the individual readout boards.")
