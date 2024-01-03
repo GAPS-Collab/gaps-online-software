@@ -18,7 +18,7 @@ set(CMAKE_WARN_DEPRECATED ON)
 # suppress the Up-to-date output when installing
 set(CMAKE_INSTALL_MESSAGE LAZY)
 
-set(CMAKE_CXX_STANDARD 17 CACHE STRING "C++ standard has to be >= 17")
+set(CMAKE_CXX_STANDARD 20 CACHE STRING "C++ standard has to be >= 20")
 
 include(FetchContent)
 
