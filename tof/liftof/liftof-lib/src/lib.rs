@@ -596,55 +596,6 @@ impl fmt::Display for ReadoutBoardError {
 impl Error for ReadoutBoardError {
 }
 
-
-
-/// A generic representation of a LocalTriggerBoard
-///
-/// This is important to make the mapping between 
-/// trigger information and readoutboard.
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
-pub struct LocalTriggerBoard {
-  pub id : u8,
-  /// The LTB has 16 channels, 
-  /// which are connected to the RBs
-  /// Each channel corresponds to a 
-  /// specific RB channel, represented
-  /// by the tuple (RBID, CHANNELID)
-  pub ch_to_rb : [(u8,u8);16],
-  /// the MTB bit in the MTEvent this 
-  /// LTB should reply to
-  pub mt_bitmask : u32,
-}
-
-impl LocalTriggerBoard {
-  pub fn new() -> LocalTriggerBoard {
-    LocalTriggerBoard {
-      id : 0,
-      ch_to_rb : [(0,0);16],
-      mt_bitmask : 0
-    }
-  }
-
-  /// Calculate the position in the bitmask from the connectors
-  pub fn get_mask_from_dsi_and_j(dsi : u8, j : u8) -> u32 {
-    if dsi == 0 || j == 0 {
-      warn!("Invalid dsi/J connection!");
-      return 0;
-    }
-    let mut mask : u32 = 1;
-    mask = mask << (dsi*5 + j -1) ;
-    mask
-  }
-}
-
-impl fmt::Display for LocalTriggerBoard {
-  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let r = serde_json::to_string(self).unwrap_or(
-      String::from("Error: cannot unwrap this LTB"));
-    write!(f, "<LTB: {}>", r)
-  }
-}
-
 /// A generic representation of a Readout board
 ///
 ///
