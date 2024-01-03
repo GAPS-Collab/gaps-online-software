@@ -35,7 +35,10 @@ use crate::events::rb_event::unpack_traces_f32;
 
 use crate::packets::{PacketType,
                      TofPacket};
-use crate::io::read_file;
+use crate::io::{
+    read_file,
+    TofPacketReader,
+};
 
 #[cfg(feature = "random")] 
 use crate::FromRandom;
@@ -1088,6 +1091,31 @@ impl RBCalibrations {
       tcal_data : Vec::<RBEvent>::new(),
       noi_data  : Vec::<RBEvent>::new()
     }
+  }
+
+  /// Gets the calibration from a file which 
+  /// has the RBCalibration stored in a 
+  /// TofPacket
+  ///
+  /// E.g. if it was written with TofPacketWriter
+  pub fn from_file(filename : String) -> Result<Self, SerializationError> {
+    let mut reader = TofPacketReader::new(filename);
+    loop {
+      match reader.next() {
+        None => {
+          error!("Can't load calibration!");
+        },
+        Some(pack) => {
+          if pack.packet_type == PacketType::RBCalibration { 
+            let cali = RBCalibrations::from_bytestream(&pack.payload, &mut 0)?;
+            return Ok(cali);
+          } else {
+            continue;
+          }
+        }
+      }
+    }
+    Err(SerializationError::StreamTooShort)
   }
 
   pub fn from_txtfile(filename : &Path) -> Self {
