@@ -28,6 +28,8 @@ cfg_if::cfg_if! {
                      send_ltb_threshold_set,
                      power_preamp,
                      power_ltb};
+    
+    use liftof_lib::constants::DEFAULT_RB_ID;
   }
 }
 
@@ -155,37 +157,51 @@ pub fn cmd_responder(cmd_server_ip             : String,
                     match cmd {
                       TofCommand::Unknown (_) => {
                         info!("Received unknown command");
-                        let r = TofResponse::Unknown;
+                        let r = TofResponse::GeneralFail(TofCommandResp::RespErrUnexecutable as u32);
                         match cmd_socket.send(r.to_bytestream(),0) {
                           Err(err) => warn!("Can not send response!, Err {err}"),
-                          Ok(_)    => info!("Responded to Unknown!")
+                          Ok(_)    => info!("Responded to Uknown!")
                         }
+                        warn!("Can not interpret Unknown command!");
                         continue;
-                      
                       },
-                      TofCommand::Ping (_) => {
+                      TofCommand::Ping (value) => {
                         cfg_if::cfg_if! {
                           if #[cfg(feature = "tofcontrol")] {
-                            info!("Received ping command");
-                            // Function that just replies to a ping command send to tofcpu
-                            // get_board_id PANICS!! TODO
-                            let rb_id = get_board_id().unwrap() as u8;
+                            // MSB third 8 bits are 
+                            let tof_component: TofComponent = TofComponent::from(((value | MASK_CMD_8BIT << 8) >> 8) as u8);
+                            // MSB fourth 8 bits are 
+                            let id: u8 = (value | MASK_CMD_8BIT) as u8;
 
-                            let mut tp = TofPacket::new();
-                            tp.packet_type = PacketType::Ping;
-                            tp.payload = vec![TofComponent::RB as u8, rb_id];
-                            match ev_request_to_cache.send(tp) {
-                              Err(err) => error!("TofCpu ping sending failed! Err {}", err),
-                              Ok(_)    => ()
-                            }
+                            if tof_component == TofComponent::RB {
+                              info!("Received ping command");
+                              // Function that just replies to a ping command send to tofcpu
+                              // get_board_id PANICS!! TODO
+                              let rb_id = get_board_id().unwrap() as u8;
 
-                            let r = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed as u32);
-                            match cmd_socket.send(r.to_bytestream(),0) {
-                              Err(err) => warn!("Can not send response!, Err {err}"),
-                              Ok(_)    => info!("Responded to SetThreshold!")
+                              if rb_id == id {
+                                let mut tp = TofPacket::new();
+                                tp.packet_type = PacketType::Ping;
+                                tp.payload = vec![TofComponent::RB as u8, rb_id];
+                                match ev_request_to_cache.send(tp) {
+                                  Err(err) => error!("TofCpu ping sending failed! Err {}", err),
+                                  Ok(_)    => ()
+                                }
+
+                                let r = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed as u32);
+                                match cmd_socket.send(r.to_bytestream(),0) {
+                                  Err(err) => warn!("Can not send response!, Err {err}"),
+                                  Ok(_)    => info!("Responded to SetThreshold!")
+                                }
+                                trace!("Resp sent!");
+                                continue;
+                              }
+                            } else {
+                              // to be redirected to subsys TODO
+                              // check if id is compatible
+                              // return reply
+                              todo!();
                             }
-                            trace!("Resp sent!");
-                            continue;
                           } else {
                             warn!("The function is implemented, but one has to compile with --features=tofcontrol");
                             match cmd_socket.send(resp_not_implemented,0) {
@@ -196,13 +212,55 @@ pub fn cmd_responder(cmd_server_ip             : String,
                           }
                         }
                       },
-                      TofCommand::Moni (_) => {
-                        warn!("Not implemented");
-                        match cmd_socket.send(resp_not_implemented,0) {
-                          Err(err) => warn!("Can not send response! Err {err}"),
-                          Ok(_)    => trace!("Resp sent!")
+                      TofCommand::Moni (value) => {
+                        cfg_if::cfg_if! {
+                          if #[cfg(feature = "tofcontrol")] {
+                            // MSB third 8 bits are 
+                            let tof_component: TofComponent = TofComponent::from(((value | MASK_CMD_8BIT << 8) >> 8) as u8);
+                            // MSB fourth 8 bits are 
+                            let id: u8 = (value | MASK_CMD_8BIT) as u8;
+
+                            if tof_component == TofComponent::RB {
+                              info!("Received moni command");
+                              // Function that just replies to a ping command send to tofcpu
+                              // get_board_id PANICS!! TODO
+                              let rb_id = get_board_id().unwrap() as u8;
+
+                              if rb_id == id {
+                                let mut tp = TofPacket::new();
+                                tp.packet_type = PacketType::Monitor;
+                                tp.payload = vec![TofComponent::RB as u8, rb_id];
+
+                                // JUST A PLACEHOLDER TODO! WHAT DO WE WANT TO HAVE HERE
+
+                                match ev_request_to_cache.send(tp) {
+                                  Err(err) => error!("TofCpu ping sending failed! Err {}", err),
+                                  Ok(_)    => ()
+                                }
+
+                                let r = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed as u32);
+                                match cmd_socket.send(r.to_bytestream(),0) {
+                                  Err(err) => warn!("Can not send response!, Err {err}"),
+                                  Ok(_)    => info!("Responded to SetThreshold!")
+                                }
+                                trace!("Resp sent!");
+                                continue;
+                              }
+                            } else {
+                              // to be redirected to subsys TODO
+                              // check if id is compatible
+                              // return reply
+                              todo!();
+                            }
+                          } else {
+                            warn!("The function is implemented, but one has to compile with --features=tofcontrol");
+                            match cmd_socket.send(resp_not_implemented,0) {
+                              Err(err) => warn!("Can not send response! Err {err}"),
+                              Ok(_)    => trace!("Resp sent!")
+                            }
+                            continue;
+                          }
                         }
-                        continue;
                       },
                       TofCommand::Power   (value) => {
                         cfg_if::cfg_if! {
@@ -364,26 +422,31 @@ pub fn cmd_responder(cmd_server_ip             : String,
                           if #[cfg(feature = "tofcontrol")]  {
                             // MSB fourth 8 bits are RB ID
                             let rb_id: u8 = (value | MASK_CMD_8BIT) as u8;
-                            println!("Received command to end run!");
-                            // default is not active for run config
 
-                            let  rc = RunConfig::new();
-                            match run_config.send(rc) {
-                              Err(err) => error!("Error stopping run! {err}"),
-                              Ok(_)    => ()
+                            let my_rb_id = get_board_id().unwrap() as u8;
+                            // if this RB is the one then do stuff
+                            if rb_id == DEFAULT_RB_ID || rb_id == my_rb_id {
+                              println!("Received command to end run!");
+                              // default is not active for run config
+
+                              let rc = RunConfig::new();
+                              match run_config.send(rc) {
+                                Err(err) => error!("Error stopping run! {err}"),
+                                Ok(_)    => ()
+                              }
+                              let resp_good = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed as u32);
+                              match cmd_socket.send(resp_good.to_bytestream(),0) {
+                                Err(err) => warn!("Can not send response! Err {err}"),
+                                Ok(_)    => trace!("Resp sent!")
+                              }
+                            } else {
+                              warn!("The function is implemented, but one has to compile with --features=tofcontrol");
+                              match cmd_socket.send(resp_not_implemented,0) {
+                                Err(err) => warn!("Can not send response! Err {err}"),
+                                Ok(_)    => trace!("Resp sent!")
+                              }
+                              continue;
                             }
-                            let resp_good = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed as u32);
-                            match cmd_socket.send(resp_good.to_bytestream(),0) {
-                              Err(err) => warn!("Can not send response! Err {err}"),
-                              Ok(_)    => trace!("Resp sent!")
-                            }
-                          } else {
-                            warn!("The function is implemented, but one has to compile with --features=tofcontrol");
-                            match cmd_socket.send(resp_not_implemented,0) {
-                              Err(err) => warn!("Can not send response! Err {err}"),
-                              Ok(_)    => trace!("Resp sent!")
-                            }
-                            continue;
                           }
                         }
                       },
@@ -398,24 +461,29 @@ pub fn cmd_responder(cmd_server_ip             : String,
                             let event_no: u8 = (value | MASK_CMD_8BIT) as u8;
                             // let's start a run. The value of the TofCommnad shall be 
                             // nevents
-                            println!("==> Will initialize new run!");
-                            let rc    = get_runconfig(&run_config_file);
-                            match run_config.send(rc) {
-                              Err(err) => error!("Error initializing run! {err}"),
-                              Ok(_)    => ()
-                            };
-                            let resp_good = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed as u32);
-                            match cmd_socket.send(resp_good.to_bytestream(),0) {
-                              Err(err) => warn!("Can not send response! Err {err}"),
-                              Ok(_)    => trace!("Resp sent!")
+
+                            let my_rb_id = get_board_id().unwrap() as u8;
+                            // if this RB is the one then do stuff
+                            if rb_id == DEFAULT_RB_ID || rb_id == my_rb_id {
+                              println!("==> Will initialize new run!");
+                              let rc    = get_runconfig(&run_config_file);
+                              match run_config.send(rc) {
+                                Err(err) => error!("Error initializing run! {err}"),
+                                Ok(_)    => ()
+                              };
+                              let resp_good = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed as u32);
+                              match cmd_socket.send(resp_good.to_bytestream(),0) {
+                                Err(err) => warn!("Can not send response! Err {err}"),
+                                Ok(_)    => trace!("Resp sent!")
+                              }
+                            } else {
+                              warn!("The function is implemented, but one has to compile with --features=tofcontrol");
+                              match cmd_socket.send(resp_not_implemented,0) {
+                                Err(err) => warn!("Can not send response! Err {err}"),
+                                Ok(_)    => trace!("Resp sent!")
+                              }
+                              continue;
                             }
-                          } else {
-                            warn!("The function is implemented, but one has to compile with --features=tofcontrol");
-                            match cmd_socket.send(resp_not_implemented,0) {
-                              Err(err) => warn!("Can not send response! Err {err}"),
-                              Ok(_)    => trace!("Resp sent!")
-                            }
-                            continue;
                           }
                         }
                       },

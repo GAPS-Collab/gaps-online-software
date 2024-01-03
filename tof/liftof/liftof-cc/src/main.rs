@@ -436,6 +436,15 @@ fn main() {
         _                    => error!("The ping command is not implemented for this TofComponent!")
       }
     },
+    Command::Moni(moni_cmd) => {
+      match moni_cmd.component {
+        TofComponent::TofCpu => liftof_cc::send_moni_response(cmd_sender, socket),
+        TofComponent::RB  |
+        TofComponent::LTB |
+        TofComponent::MT     => liftof_cc::send_moni(cmd_sender, moni_cmd.component, moni_cmd.id),
+        _                    => error!("The moni command is not implemented for this TofComponent!")
+      }
+    },
     Command::Power(power_cmd) => {
       match power_cmd {
         PowerCmd::All(power_status) => {

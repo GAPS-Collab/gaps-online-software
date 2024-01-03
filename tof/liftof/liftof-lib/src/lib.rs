@@ -874,11 +874,10 @@ pub fn to_board_id_string(rb_id: u32) -> String {
 /// Command Enums and stucts
 #[derive(Debug, Parser, PartialEq)]
 pub enum Command {
-  /// Ping a TOF sub-systems.
+  /// Ping a TOF sub-system.
   Ping(PingCmd),
-  /// Monitor a TOF sub-systems.
-  //#[command(subcommand)]
-  //Moni(MoniCmd),
+  /// Monitor a TOF sub-system.
+  Moni(MoniCmd),
   /// Power control of TOF sub-systems.
   #[command(subcommand)]
   Power(PowerCmd),
@@ -910,7 +909,21 @@ pub struct PingCmd {
   pub id: u8
 }
 
-
+#[derive(Debug, Args, PartialEq)]
+pub struct MoniCmd {
+  /// Component to target
+  #[arg(value_parser = clap::builder::PossibleValuesParser::new([
+          TofComponent::TofCpu,
+          TofComponent::MT,
+          TofComponent::RB,
+          TofComponent::LTB
+        ]),
+        required = true)]
+  pub component: TofComponent,
+  /// Component ID
+  #[arg(required = true)]
+  pub id: u8
+}
 /// END TOF SW cmds ================================================
 
 

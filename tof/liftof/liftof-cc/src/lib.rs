@@ -206,8 +206,7 @@ pub fn send_run_stop(cmd_sender: Sender<TofPacket>,
   }
 }
 
-/// Default function that starts run data taking on all RBs
-/// with default values.
+/// Function that manages ping commands from ground
 pub fn send_ping(cmd_sender: Sender<TofPacket>,
                  tof_component: TofComponent,
                  id: u8) {
@@ -234,7 +233,39 @@ pub fn send_ping_response(cmd_sender: Sender<TofPacket>,
   let r = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed as u32);
   match socket.send(r.to_bytestream(), 0) {
     Err(err) => warn!("Can not send response!, Err {err}"),
-    Ok(_)    => info!("Responded to SetThreshold!")
+    Ok(_)    => info!("Responded to Ping!")
+  }
+  trace!("Resp sent!")
+}
+
+/// Function that manages moni commands from ground
+pub fn send_moni(cmd_sender: Sender<TofPacket>,
+  tof_component: TofComponent,
+  id: u8) {
+  let payload: u32 = PAD_CMD_32BIT | (tof_component as u32) << 8 | (id as u32);
+  let moni = TofCommand::Moni(payload);
+  let tp = TofPacket::from(&moni);
+  match cmd_sender.send(tp) {
+    Err(err) => error!("Unable to send command, error{err}"),
+    Ok(_)    => ()
+  }
+}
+
+/// Function that just replies to a moni command send to tofcpu
+pub fn send_moni_response(cmd_sender: Sender<TofPacket>,
+           socket:     Socket) {
+  let mut tp = TofPacket::new();
+  tp.packet_type = PacketType::Monitor;
+  tp.payload = vec![TofComponent::TofCpu as u8, 0u8];
+  match cmd_sender.send(tp) {
+    Err(err) => error!("TofCpu moni sending failed! Err {}", err),
+    Ok(_)    => () 
+  }
+
+  let r = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed as u32);
+  match socket.send(r.to_bytestream(), 0) {
+    Err(err) => warn!("Can not send response!, Err {err}"),
+    Ok(_)    => info!("Responded to Moni!")
   }
   trace!("Resp sent!")
 }
