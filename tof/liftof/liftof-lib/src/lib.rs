@@ -705,6 +705,7 @@ pub fn waveform_analysis(event         : &mut RBEvent,
         let fit_result = fit_sine_function(ch_times, ch_voltages);
         //println!("FIT RESULT = {:?}", fit_result);
         event.header.set_sine_fit(fit_result);
+        continue;
       } else {
         continue;
       }
@@ -1024,6 +1025,7 @@ impl Default for ReadoutBoard {
   }
 }
 
+/// This will load the map as in the file. Channels go from 1-8
 pub fn get_rb_ch_pid_map(map_file : PathBuf) -> RBChannelPaddleEndIDMap {
   let mut mapping = RBChannelPaddleEndIDMap::new();
   let json_content : String;
@@ -1049,7 +1051,7 @@ pub fn get_rb_ch_pid_map(map_file : PathBuf) -> RBChannelPaddleEndIDMap {
   for ch in 0..8 {
     let tmp_val = &json[(ch +1).to_string()];
     let val = tmp_val.to_string().parse::<u16>().unwrap_or(0);
-    mapping.insert(ch as u8, val);
+    mapping.insert(ch as u8 + 1, val);
   }
   mapping
 }
