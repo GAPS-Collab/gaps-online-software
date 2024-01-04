@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["GenlId","NlTypeWrapper","NlmF","Nlmsg"],"struct":["NlmFFlags"],"trait":["NlType"]};

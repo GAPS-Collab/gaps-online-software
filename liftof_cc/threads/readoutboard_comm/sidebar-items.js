@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["readoutboard_communicator"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["reset_threshold","set_default_threshold","set_threshold"]};

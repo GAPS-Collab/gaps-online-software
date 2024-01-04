@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["async_stdin","get_tty","is_tty","terminal_size","terminal_size_pixels"],"mod":["clear","color","cursor","event","input","raw","screen","scroll","style"],"struct":["AsyncReader"]};
