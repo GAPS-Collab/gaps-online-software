@@ -11,12 +11,6 @@
  * Extract tof dataclasses from files
  */
 
-/**
- * Extract "BlobEvents" from a bytestream
- *
- */
-[[deprecated("Use RBEventMemoryView instead of BlobEvt_t!")]]
-Vec<BlobEvt_t> get_events_from_stream(const Vec<u8> &bytestream, u64 start_pos);
 
 /**
  * Get RBEventMemoryViews from a raw data ("*.robin") file

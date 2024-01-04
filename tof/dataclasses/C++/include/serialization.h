@@ -125,16 +125,6 @@ int16_t decode_14bit(const Vec<u8>& bytestream,
 
 /***********************************************/
 
-void encode_blobevent(const BlobEvt_t* evt, Vec<u8> &bytestream, unsigned int start_pos);
-
-/***********************************************/
-
-[[deprecated("Use RBEventMemoryView::from_bytestream instead!")]]
-BlobEvt_t decode_blobevent(const Vec<u8> &bytestream,
-                           u32 start_pos);
-
-/***********************************************/
-
 /**
  * Idnentify the postion of a byte marker in a stream
  *

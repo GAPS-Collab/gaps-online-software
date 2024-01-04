@@ -5,26 +5,7 @@
 ## in case of Release build, we set the NDEBUG preprocessor directive
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG=1")
 
-
 ################
-# Configure number of readoutboards, nchannels
-set(N_READOUT_BOARDS 4 CACHE STRING "Compile for a specific number of readout boards" )
-set(USE_CHANNEL_9  ON CACHE STRING "Compile for all channels (including channel 9 which holds the sine wave for synchornisation" )
-set(NCHANNELS 8 CACHE INTERNAL "Number of readoutboard channels" )
-set(MEMEVENTS 10000 CACHE STRING "Size of internam event cache (in events)" )
-set(DATAFILES "${CMAKE_CURRENT_SOURCE_DIR}/datafiles" CACHE PATH "Location of the datafiles directory which contains calibration and paddle info files.")
-
-message(STATUS "Configuring...")
-message(STATUS " -- Will compile software for ${N_READOUT_BOARDS} readout boards!")
-if(USE_CHANNEL_9)
-  message(STATUS " -- Will compile software for the use of channel 9 (sine-wave)")
-  set(NCHANNELS 9 CACHE INTERNAL "Number of readoutboard channels" FORCE)
-else()
-  message(WARNING " -- Will compile software for the use with channel 9! No synchronisation across boards possible!")
-  set(NCHANNELS 8 CACHE INTERNAL "Number of readoutboard channels" FORCE)
-endif(USE_CHANNEL_9) 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include/TOFCommon.h.in ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include/TOFCommon.h @ONLY)
-#configure_file(${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/threads/TOFParam.cpp.in ${CMAKE_CURRENT_SOURCE_DIR}/threads/TOFParam.cpp @ONLY)
 
 # ROOT part is still needed for the blobroutines!
 # Locate the ROOT package and defines a number of variables (e.g. ROOT_INCLUDE_DIRS)

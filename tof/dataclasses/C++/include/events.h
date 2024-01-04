@@ -36,6 +36,7 @@ struct RBEventHeader;
 struct RBEvent;
 struct RBEventMemoryView;
 struct MasterTriggerEvent;
+struct TofHit;
 
 /*********************************************************/
   
@@ -186,7 +187,7 @@ struct RBEvent {
   EventStatus status;
   RBEventHeader header;
   Vec<Vec<u16>> adc; 
-  Vec<RPaddlePacket> hits;
+  Vec<TofHit> hits;
  
   RBEvent();
 
