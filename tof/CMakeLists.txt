@@ -87,26 +87,16 @@ target_link_libraries(${GAPSTOF_LIBRARY_SHARED}
 
 if (BUILD_PYBINDINGS)
   set(pybindings "gaps_tof")
+  # populates Python_INCLUDE_DIRS
+  find_package (Python COMPONENTS Development)
 
   pybind11_add_module(${pybindings} MODULE dataclasses/C++/pybindings/module.cxx 
                                            dataclasses/C++/pybindings/helpers.cxx)
   target_include_directories(${pybindings}
                             PUBLIC
                             ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
-                            )
-  get_property(the_include_dirs TARGET ${pybindings} PROPERTY INCLUDE_DIRECTORIES)
-  foreach(dir ${the_include_dirs})
-  message(STATUS "dir='${dir}'")
-  endforeach()
-  list(REMOVE_ITEM ${the_include_dirs} "/usr/include/python2.7")
-  #list(APPEND ${the_include_dirs} "/usr/include/python3.8")
-  #string(REPLACE "/usr/include/python2.7" ";;"  new_include_dirs ${the_include_dirs})
-  #list(APPEND ${new_include_dirs} "/usr/include/python3.8")
-  set(pybind_include_dirs "/usr/include/python3.10"  "${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include") 
-  foreach(dir ${pybind_include_dirs})
-  message(STATUS "dir='${dir}'")
-  endforeach()
-  set_property(TARGET ${pybindings} PROPERTY INCLUDE_DIRECTORIES ${pybind_include_dirs})
+			    ${Python_INCLUDE_DIRS}
+			    )
   target_link_libraries(${pybindings}
                         PRIVATE
                         ${GAPSTOF_LIBRARY_SHARED})
