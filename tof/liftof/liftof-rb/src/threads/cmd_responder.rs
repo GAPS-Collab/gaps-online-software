@@ -27,8 +27,8 @@ use crate::api::{
     DATAPORT
 };
 use crate::api::rb_calibration;
-
 use crate::control::get_board_id_string;
+
 use liftof_lib::build_tcp_from_ip;
 
 /// Centrailized command management

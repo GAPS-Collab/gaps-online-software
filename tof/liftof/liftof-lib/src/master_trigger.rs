@@ -13,15 +13,6 @@
 //! The data is encoded in IPBus packets.
 //! [see docs here](https://ipbus.web.cern.ch/doc/user/html/)
 //! 
-//! Issues: I do not like the error handling with
-//! Box<dyn Error> here, since the additional runtime
-//! cost. This needs to have a better error handling,
-//! which should not be too difficult, I guess most 
-//! times it can be replaced by some Udp realted 
-//! error. [See issue #21](https://uhhepvcs.phys.hawaii.edu/Achim/gaps-online-software/-/issues/21)
-//! _Comment_ There is not much error handling for UDP. Most of it is that the IPAddress is wrong, 
-//! in this case it is legimate (and adviced) to panic.
-//! In the case, wher no data was received, this might need some thinking.
 use std::error::Error;
 use std::time::{Duration, Instant};
 use std::fmt;

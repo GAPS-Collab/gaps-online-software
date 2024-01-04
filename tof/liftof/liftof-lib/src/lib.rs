@@ -254,7 +254,7 @@ pub fn build_tcp_from_ip(ip: String, port: String) -> String {
 ///
 /// # Arguments 
 ///
-/// * cmd        : a [crossbeam] receiver, to receive 
+/// * cmd        : a \[crossbeam\] receiver, to receive 
 ///                TofCommands.
 pub fn readoutboard_commander(cmd : &Receiver<TofPacket>){
   debug!(".. started!");
