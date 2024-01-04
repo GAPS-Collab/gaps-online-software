@@ -13,9 +13,9 @@ static const usize N_LTBS = 20;
 static const usize N_CHN_PER_LTB = 16;
 
 struct MasterTriggerPacket {
-  const u64 SIZE = 45;
-  u16 head = 0xAAAA;
-  u16 tail = 0x5555;
+  static const u64 SIZE = 45;
+  static const u16 HEAD = 0xAAAA;
+  static const u16 TAIL = 0x5555;
   u32 event_id        ; 
   u32 timestamp       ; 
   u32 tiu_timestamp   ; 
@@ -37,33 +37,10 @@ struct MasterTriggerPacket {
    * FIXME - nan would be better
    */
   void reset();
-  
-  /**
-   * Transcode to bytestream
-   *
-   *
-   */
-  [[deprecated("Use ::to_bytestream instead!")]]
-  Vec<u8> serialize() const;
-
-  /**
-   * Transcode from bytestream
-   *
-   * Returns:
-   *    position where the event is found in the bytestream
-   *    (tail position +=1, so that bytestream can be iterated
-   *    over easily)
-   */
-  [[deprecated("Use ::from_bytestream instead!")]]
-  u64 deserialize(Vec<u8> &payload,
-                  u64 start_pos=0);
-
-  //! Byte representation of the packet
-  Vec<u8> to_bytestream() const;
 
   //! Decode packet from byte representation
-  u64 from_bytestream(Vec<u8> &payload, 
-                      u64 start_pos=0);
+  static MasterTriggerPacket from_bytestream(Vec<u8> &payload, 
+                                             u64 &pos);
 
 
   //! The hit board ids
