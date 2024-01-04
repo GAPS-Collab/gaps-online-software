@@ -9,7 +9,6 @@
 
 #include "packets/tof_packet.h"
 #include "packets/CommandPacket.h"
-#include "packets/MasterTriggerPacket.h"
 #include "packets/monitoring.h"
 #include "events/tof_event_header.hpp"
 
