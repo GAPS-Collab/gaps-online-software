@@ -16,19 +16,18 @@ use tof_dataclasses::run::RunConfig;
 use tof_dataclasses::serialization::Serialization;
 use tof_dataclasses::threading::ThreadControl;
 
-#[cfg(feature="tofcontrol")]
 use tof_dataclasses::constants::{MASK_CMD_8BIT,
                                  MASK_CMD_16BIT,
                                  MASK_CMD_24BIT,
                                  MASK_CMD_32BIT};
 
 use crate::api::{
-    rb_calibration,
     get_runconfig,
     prefix_board_id,
     DATAPORT
 };
-#[cfg(feature="tofcontrol")]
+use crate::api::rb_calibration;
+
 use crate::control::get_board_id_string;
 use liftof_lib::build_tcp_from_ip;
 
@@ -268,25 +267,14 @@ pub fn cmd_responder(cmd_server_ip             : String,
                       // Voltage and timing calibration is connected now
                       TofCommand::VoltageCalibration (value) => {
                         trace!("Got voltage calibration command with {value} value");
-                        cfg_if::cfg_if! {
-                          if #[cfg(feature = "tofcontrol")]  {
-                            // MSB first 16 bits are voltage level
-                            let voltage_val: u16 = ((value | (MASK_CMD_16BIT << 16)) >> 16) as u16;
-                            // MSB third 8 bits are RB ID
-                            let rb_id: u8 = ((value | (MASK_CMD_8BIT << 8)) >> 8) as u8;
-                            // MSB fourth 8 bits are extra (not used)
-                            let extra: u8 = (value | MASK_CMD_8BIT) as u8;
-                            println!("Voltage_val: {}, RB ID: {}, extra: {}",voltage_val,rb_id,extra);
-                            continue;
-                          } else {
-                            warn!("The function is implemented, but one has to compile with --features=tofcontrol");
-                            match cmd_socket.send(resp_not_implemented,0) {
-                              Err(err) => warn!("Can not send response! Err {err}"),
-                              Ok(_)    => trace!("Resp sent!")
-                            }
-                            continue;
-                          }
-                        }
+                        // MSB first 16 bits are voltage level
+                        let voltage_val: u16 = ((value | (MASK_CMD_16BIT << 16)) >> 16) as u16;
+                        // MSB third 8 bits are RB ID
+                        let rb_id: u8 = ((value | (MASK_CMD_8BIT << 8)) >> 8) as u8;
+                        // MSB fourth 8 bits are extra (not used)
+                        let extra: u8 = (value | MASK_CMD_8BIT) as u8;
+                        println!("Voltage_val: {}, RB ID: {}, extra: {}",voltage_val,rb_id,extra);
+                        continue;
                       },
                       TofCommand::TimingCalibration  (_) => {
                         warn!("Not implemented");

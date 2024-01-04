@@ -306,7 +306,6 @@ fn main() {
          .expect("Failed to spawn data-publsher thread!");
   
   let tp_to_pub_ev   = tp_to_pub.clone();
-  #[cfg(feature="tofcontrol")]
   let tp_to_pub_cal  = tp_to_pub.clone();
 
 
@@ -403,7 +402,6 @@ fn main() {
     if calibration {
       // we execute this routine first, then we 
       // can go into our loop listening for input
-      #[cfg(feature="tofcontrol")]
       match rb_calibration(&rc_to_runner, &tp_to_pub_cal) {
         Ok(_) => (),
         Err(err) => {

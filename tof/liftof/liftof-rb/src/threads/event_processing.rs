@@ -27,7 +27,6 @@ use tof_dataclasses::commands::{
 
 use liftof_lib::{
     RunStatistics,
-    load_calibration,
     get_rb_ch_pid_map,
     waveform_analysis,
 };
@@ -89,7 +88,7 @@ pub fn event_processing(board_id            : u8,
   let pmap_path  = PathBuf::from(&pmap_file);
 
   let paddle_map = get_rb_ch_pid_map(pmap_path);
-  match load_calibration(board_id, cali_path) {
+  match RBCalibrations::from_file(cali_path) {
     Err(err) => {
       error!("Can't load calibration! {err}");
     },
@@ -104,7 +103,7 @@ pub fn event_processing(board_id            : u8,
   let mut op_mode_stream  = true;
   let mut events_not_sent : u64 = 0;
   let mut data_type       : DataType   = DataType::Unknown;
-  let one_milli           = Duration::from_millis(1);
+  //let one_milli           = Duration::from_millis(1);
   let mut streamer        = RBEventMemoryStreamer::new();
   streamer.calc_crc32     = calc_crc32;
   // our cachesize is 50 events. This means each time we 
@@ -292,7 +291,7 @@ pub fn event_processing(board_id            : u8,
                   event.data_type = data_type;
                   if verbose {
                     match stat.lock() {
-                      Err(err) => error!("Can't acquire lock on statistics field!"),
+                      Err(err) => error!("Unable to acquire lock on shared memory for RunStatisitcis! {err}"),
                       Ok(mut s) => {
                         if s.first_evid == 0 {
                           s.first_evid = event.header.event_id;
@@ -334,7 +333,7 @@ pub fn event_processing(board_id            : u8,
           }
           if verbose {
             match stat.lock() {
-              Err(err) => error!("Unable to acquire lock on shared memory for RunStatisitcis!"),
+              Err(err) => error!("Unable to acquire lock on shared memory for RunStatisitcis! {err}"),
               Ok(mut _st)  => {
                 _st.evproc_npack += 1; 
               }

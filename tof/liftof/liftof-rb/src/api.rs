@@ -31,19 +31,15 @@ use tof_dataclasses::errors::SerializationError;
 use tof_dataclasses::run::RunConfig;
 
 // Takeru's tof-control
-cfg_if::cfg_if! {
-  if #[cfg(feature = "tofcontrol")]  {
-    use std::net::IpAddr;
-    use tof_dataclasses::errors::CalibrationError;
-    use tof_dataclasses::calibrations::RBCalibrations;
-    use local_ip_address::local_ip;
-    // for calibration
-    use tof_control::rb_control::rb_mode::{select_noi_mode,
-                                           select_vcal_mode,
-                                           select_tcal_mode,
-                                           select_sma_mode};
-  }
-}
+use std::net::IpAddr;
+use tof_dataclasses::errors::CalibrationError;
+use tof_dataclasses::calibrations::RBCalibrations;
+use local_ip_address::local_ip;
+// for calibration
+use tof_control::rb_control::rb_mode::{select_noi_mode,
+                                       select_vcal_mode,
+                                       select_tcal_mode,
+                                       select_sma_mode};
 
 
 /// The poisson self trigger mode of the board
@@ -186,7 +182,6 @@ pub fn wait_while_run_active(n_errors     : u32,
 /// - apply calibration script (Jamie)
 ///   save result in binary and in textfile,
 ///   send downstream
-#[cfg(feature="tofcontrol")]
 pub fn rb_calibration(rc_to_runner    : &Sender<RunConfig>,
                       tp_to_publisher : &Sender<TofPacket>)
 -> Result<(), CalibrationError> {
