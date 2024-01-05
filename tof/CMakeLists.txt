@@ -208,7 +208,7 @@ if (BUILD_EXAMPLES)
     )
     target_include_directories(${display-example} 
                               PUBLIC
-                              ${CMAKE_CURRENT_SOURCE_DIR/../resources/extern/spdlog/include
+                              ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include
                               ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/cxxopts/include
                               ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
                               $<$<BOOL:${BUILD_ROOTCOMPONENTS}>:${ROOT_INCLUDE_DIRS}>

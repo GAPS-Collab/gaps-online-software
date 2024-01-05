@@ -18,7 +18,7 @@
 #include "io.hpp"
 #include "calibration.h"
 
-#include "WaveGAPS.h"
+#include "legacy.h"
 #include <vector>
 
 const int NRB   = 49; // Technically, it is 48, but we don't use 0
