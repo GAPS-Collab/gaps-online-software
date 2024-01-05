@@ -1,5 +1,6 @@
 #include<numeric>
 #include<sstream>
+#include<format>
 
 #include "events.h"
 #include "parsers.h"
@@ -287,9 +288,9 @@ u8 RBEventHeader::get_n_datachan() const {
 
 std::array<f32, 3> RBEventHeader::get_sine_fit() const {
   f32 u16_MAX = 65535;
-  auto amp    = (20.0 * ch9_amp   /u16_MAX) - 10.0;
-  auto freq   = (20.0 * ch9_freq  /u16_MAX) - 10.0;
-  auto phase  = (20.0 * ch9_phase /u16_MAX) - 10.0;
+  f32 amp    = (20.0 * ch9_amp   /u16_MAX) - 10.0;
+  f32 freq   = (20.0 * ch9_freq  /u16_MAX) - 10.0;
+  f32 phase  = (20.0 * ch9_phase /u16_MAX) - 10.0;
   std::array<f32, 3> result = {amp,freq,phase};
   return result;
 }
@@ -304,7 +305,7 @@ RBEvent::RBEvent() {
   for (usize k=0; k<NCHN; k++) {
     adc.push_back(Vec<u16>(NWORDS/2,0));
   }
-  hits  = Vec<RPaddlePacket>();
+  hits  = Vec<TofHit>();
 }
 
 /**********************************************************/
@@ -326,9 +327,10 @@ std::string RBEvent::to_string() const {
     repr += " .. .."; 
   }
   if ( hits.size() > 0 ) {
-    repr += "\n-- -- hits -- --";
+    repr += "\n\n ** ** hits ** **\n";
     for (auto const &h : hits) {
       repr += h.to_string();
+      repr += "\n";
     } 
   } else {
     repr += "\n -- no hits!";
@@ -437,7 +439,7 @@ RBEvent RBEvent::from_bytestream(const Vec<u8> &stream,
   }
   // Decode the hits
   for (u8 k=0;k<nhits;k++) {
-    auto hit = RPaddlePacket::from_bytestream(stream, pos);
+    auto hit = TofHit::from_bytestream(stream, pos);
     event.hits.push_back(hit);
   }
 
@@ -771,7 +773,6 @@ Vec<std::tuple<u8,u8,u8>>  MasterTriggerEvent::get_dsi_j_ch() {
   u8 ltb_ch = 0;
   auto hit_boards = Vec<u8>();
   Vec<std::tuple<u8,u8,u8>> result;  
-  auto hit = std::make_tuple(dsi,j,ltb_ch);
   
   for (u8 k=0;k<N_LTBS;k++) {
     if (board_mask[k]) {
@@ -995,23 +996,26 @@ TofHit TofHit::from_bytestream(const Vec<u8> &bytestream,
 }
 
 std::string TofHit::to_string() const {
-  std::string repr = "<TofHit\n";
-  repr += "\n  paddle ID       :  "     + std::to_string(paddle_id         );
-  repr += "\n  timestamp32     :  "     + std::to_string(timestamp32       );
-  repr += "\n  timestamp16     :  "     + std::to_string(timestamp16       );
-  repr += "\n   |-> timestamp48:  "     + std::to_string(get_timestamp48() ); 
-  repr += "\n  ** Peak";
-  repr += "\n    time   A;B    :  "     + std::to_string(get_time_a()      )
+  std::string repr = "<TofHit";
+  //repr += std::format("\n -- format test {:.2f}", get_time_a() );
+  repr += "\n  paddle ID         : "     + std::to_string(paddle_id         );
+  repr += "\n  timestamp32       : "     + std::to_string(timestamp32       );
+  repr += "\n  timestamp16       : "     + std::to_string(timestamp16       );
+  repr += "\n   |-> timestamp48  : "     + std::to_string(get_timestamp48() ); 
+  repr += "\n  _________";
+  repr += "\n  ##  Peak:";
+  repr += "\n  >>  time   A | B  : "     + std::to_string(get_time_a()      )
        +  " " + std::to_string(get_time_b());
-  repr += "\n    height A;B    :  "     + std::to_string(get_peak_a()      )
+  repr += "\n  >>  height A | B  : "     + std::to_string(get_peak_a()      )
        +  " " + std::to_string(get_time_a());
-  repr += "\n    charge A;B    :  "     + std::to_string(get_charge_a()    )
+  repr += "\n  >>  charge A | B  : "     + std::to_string(get_charge_a()    )
        +  " " + std::to_string(get_time_b());
-  repr += "\n    charge min_I  :  "     + std::to_string(get_charge_min_i());
-  repr += "\n    in padd. pos  :  "     + std::to_string(get_x_pos()       );
-  repr += "\n    t_avg         :  "     + std::to_string(get_t_avg()       );
-  repr += "\n  cntr ETX        :  "     + std::to_string(ctr_etx           );
-  repr += "\n  broken (?depr)  :  "     + std::to_string(broken            );
+  repr += "\n  >>  charge min_I  : "     + std::to_string(get_charge_min_i());
+  repr += "\n  >>  in pad. pos   : "     + std::to_string(get_x_pos()       );
+  repr += "\n  >>  t_avg         : "     + std::to_string(get_t_avg()       );
+  repr += "\n  cntr ETX          : "     + std::to_string(ctr_etx           );
+  repr += "\n  broken (?depr)    : "     + std::to_string(broken            );
+  repr += ">";
   return repr;
 }
 

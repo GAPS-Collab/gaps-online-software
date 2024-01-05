@@ -88,7 +88,7 @@ struct TofPacket {
 
   Vec<u8> payload;
 
-  Vec<u8> to_bytestream() const;
+  //Vec<u8> to_bytestream() const;
 
   /**
    * Transcode from bytestream

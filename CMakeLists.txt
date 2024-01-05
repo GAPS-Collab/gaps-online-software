@@ -20,25 +20,6 @@ set(CMAKE_INSTALL_MESSAGE LAZY)
 
 set(CMAKE_CXX_STANDARD 20 CACHE STRING "C++ standard has to be >= 20")
 
-include(FetchContent)
-
-FetchContent_Declare(
-  spdlog
-  GIT_REPOSITORY https://github.com/gabime/spdlog.git 
-  GIT_TAG        ad0e89cbfb4d0c1ce4d097e134eb7be67baebb36 # release-1.10.0
-)
-FetchContent_MakeAvailable(spdlog)
-FetchContent_GetProperties(spdlog)
-if(NOT spdlog_POPULATED)
-  # Fetch the content using previously declared details
-  FetchContent_Populate(spdlog)
-
-  # Set custom variables, policies, etc.
-  # ...
-
-  # Bring the populated content into the build
-  add_subdirectory(${spdlog_SOURCE_DIR} ${spdlog_BINARY_DIR})
-endif()
 
 # == ALEX bfsw repository. 
 # == currently not used, but maybe in the future?

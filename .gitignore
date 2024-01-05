@@ -35,10 +35,6 @@ build/*
 # vim fragments
 *.swp
 
-# these files get configured by cmake
-tof/readoutboard-emulator/bin/RBEmulator.cxx
-tof/dataclasses/C++/include/TOFCommon.h
-
 # django created files
 gaps-db/gaps_db/tof_db/migrations/*
 

@@ -1,14 +1,19 @@
-#ifndef GAPS_WAVEFORM_H_INCLUDED
-#define GAPS_WAVEFORM_H_INCLUDED
-
-/**********************************
- * Code from Jeff's original 
- * waveform library
- */ 
-
+#ifndef LEGACY_H_INCLUDED
+#define LEGACY_H_INCLUDED
 
 #include <vector>
 
+#include "tof_typedefs.h"
+
+/** 
+ * Legacy code, mostly written by 
+ * J. Zweerink. 
+ *
+ * Waveform class
+ *
+ */ 
+
+#define NCHN         9
 #define MAX_NUM_PEAKS   50  
 #define ERRVAL		(999999999)
 
@@ -17,7 +22,17 @@
 #define PEAK_OFFSET  -4
 #define PEAK_LENGTH  12
 
+
+void RemoveSpikes(double wf[NCHN][1024], unsigned int tCell, int spikes[]);
+
+
 namespace GAPS { 
+  
+enum class PADDLE_END : u16 {
+    A = 10,
+    B = 20,
+    UNKNOWN = 30
+};
 
 // Types of Thresholds to use in determining timing
 enum THRTYPE { CONSTANT, CFD_ELEC, CFD_SIMPLE, PCONSTANT, PCFD };

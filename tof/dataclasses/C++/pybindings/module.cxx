@@ -9,16 +9,13 @@
 
 #include "packets/tof_packet.h"
 #include "packets/CommandPacket.h"
-#include "packets/MasterTriggerPacket.h"
 #include "packets/monitoring.h"
 #include "events/tof_event_header.hpp"
 
+#include "legacy.h"
 #include "io.hpp"
 #include "serialization.h"
 #include "calibration.h"
-#include "blobroutines.h"
-#include "WaveGAPS.h"
-#include "TOFCommon.h"
 #include "events.h"
 
 #include "tof_typedefs.h"
@@ -68,76 +65,7 @@ std::string tof_response_to_str(const TofResponse &cmd) {
 }
 
 
-void set_payload_helper(TofPacket &packet,
-                        const Vec<u8> payload) {
-  packet.payload = payload;
-  packet.payload_size = payload.size();
-}
 
-/*****************
- * Dismantle a readoutboard file and return the individual
- * fields as arrays in a python dictionary
- *
- */
-py::dict splice_readoutboard_datafile(const std::string filename) {
-  bytestream stream             = get_bytestream_from_file(filename);
-  std::vector<BlobEvt_t> events = get_events_from_stream(stream, 0);
-  Vec<u32> event_ids  = Vec<u32>(); 
-  Vec<u16> stop_cells = Vec<u16>(); 
-  Vec<u64> timestamps = Vec<u64>();
-  
-  // channels, times
-  Vec<Vec<u16>> t_1     = Vec<Vec<u16>>();
-  Vec<Vec<u16>> t_2     = Vec<Vec<u16>>();
-  Vec<Vec<u16>> t_3     = Vec<Vec<u16>>();
-  Vec<Vec<u16>> t_4     = Vec<Vec<u16>>();
-  Vec<Vec<u16>> t_5     = Vec<Vec<u16>>();
-  Vec<Vec<u16>> t_6     = Vec<Vec<u16>>();
-  Vec<Vec<u16>> t_7     = Vec<Vec<u16>>();
-  Vec<Vec<u16>> t_8     = Vec<Vec<u16>>();
-  Vec<Vec<u16>> t_9     = Vec<Vec<u16>>();
-  
-  Vec<Vec<i16>> adc_1     = Vec<Vec<i16>>();
-  Vec<Vec<i16>> adc_2     = Vec<Vec<i16>>();
-  Vec<Vec<i16>> adc_3     = Vec<Vec<i16>>();
-  Vec<Vec<i16>> adc_4     = Vec<Vec<i16>>();
-  Vec<Vec<i16>> adc_5     = Vec<Vec<i16>>();
-  Vec<Vec<i16>> adc_6     = Vec<Vec<i16>>();
-  Vec<Vec<i16>> adc_7     = Vec<Vec<i16>>();
-  Vec<Vec<i16>> adc_8     = Vec<Vec<i16>>();
-  Vec<Vec<i16>> adc_9     = Vec<Vec<i16>>();
- 
-  for (auto ev : events) {
-     event_ids .push_back(ev.event_ctr);
-     stop_cells.push_back(ev.stop_cell);
-     timestamps.push_back(ev.timestamp);
-     adc_1       .push_back(Vec<i16>(ev.ch_adc[0], std::end(ev.ch_adc[0])));
-     adc_2       .push_back(Vec<i16>(ev.ch_adc[1], std::end(ev.ch_adc[1])));
-     adc_3       .push_back(Vec<i16>(ev.ch_adc[2], std::end(ev.ch_adc[2])));
-     adc_4       .push_back(Vec<i16>(ev.ch_adc[3], std::end(ev.ch_adc[3])));
-     adc_5       .push_back(Vec<i16>(ev.ch_adc[4], std::end(ev.ch_adc[4])));
-     adc_6       .push_back(Vec<i16>(ev.ch_adc[5], std::end(ev.ch_adc[5])));
-     adc_7       .push_back(Vec<i16>(ev.ch_adc[6], std::end(ev.ch_adc[6])));
-     adc_8       .push_back(Vec<i16>(ev.ch_adc[7], std::end(ev.ch_adc[7])));
-     adc_9       .push_back(Vec<i16>(ev.ch_adc[8], std::end(ev.ch_adc[8])));
-  }
-  py::dict data(
-                "event_id"_a  =py::array_t<u32>(event_ids.size(),  event_ids.data()),\
-                "stop_cell"_a =py::array_t<u16>(stop_cells.size(), stop_cells.data()),\
-                "timestamps"_a=py::array_t<u64>(timestamps.size(), timestamps.data()),\
-                "adc_ch1"_a=adc_1,\
-                "adc_ch2"_a=adc_2,\
-                "adc_ch3"_a=adc_3,\
-                "adc_ch4"_a=adc_4,\
-                "adc_ch5"_a=adc_5,\
-                "adc_ch6"_a=adc_6,\
-                "adc_ch7"_a=adc_7,\
-                "adc_ch8"_a=adc_8,\
-                "adc_ch9"_a=adc_9);
-  return data;
-}
-
-/********************/
 
 Vec<Vec<f64>> remove_spikes_helper(u16 stop_cell,
                                  Vec<Vec<f64>> waveforms) {
@@ -504,12 +432,7 @@ PYBIND11_MODULE(gaps_tof, m) {
 
     py::class_<TofPacket>(m, "TofPacket")
         .def(py::init())
-        .def("to_bytestream",         &TofPacket::to_bytestream)
         .def("from_bytestream",       &TofPacket::from_bytestream)
-        .def("set_payload",           &set_payload_helper)
-        //.def("set_packet_type",       &set_ptype_helper) 
-        .def_readonly("head",         &TofPacket::head)
-        .def_readonly("tail",         &TofPacket::tail)
         .def_readonly("payload",      &TofPacket::payload)
         .def_readonly("payload_size", &TofPacket::payload_size)
         .def_readonly("packet_type",  &TofPacket::packet_type)
@@ -637,10 +560,6 @@ PYBIND11_MODULE(gaps_tof, m) {
                })
    ;
    
-   py::class_<Calibrations_t>(m, "Calibrations")
-       .def(py::init())
-   ;
-  
    py::class_<RBCalibration>(m, "RBCalibration", 
       "RBCalibration holds th calibration constants (one per bin) per each channel for a single RB. This needs to be used in order to convert ADC to voltages/nanoseconds!")
        .def(py::init())
@@ -710,8 +629,6 @@ PYBIND11_MODULE(gaps_tof, m) {
    m.def("get_bytestream_from_file",      &get_bytestream_from_file);
    m.def("get_rbeventheaders",            &get_rbeventheaders); 
    
-   // functions to read and parse blob files
-   m.def("splice_readoutboard_datafile",   &splice_readoutboard_datafile);
 
    // Calibration functions
    m.def("remove_spikes",            &remove_spikes_helper);

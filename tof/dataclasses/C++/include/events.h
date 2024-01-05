@@ -23,7 +23,6 @@
 #include "packets/tof_packet.h"
 #include "events/tof_event_header.hpp"
 #include "calibration.h"
-#include "packets/RPaddlePacket.h"
 
 class RBCalibration;
 
@@ -36,6 +35,7 @@ struct RBEventHeader;
 struct RBEvent;
 struct RBEventMemoryView;
 struct MasterTriggerEvent;
+struct TofHit;
 
 /*********************************************************/
   
@@ -150,15 +150,15 @@ struct RBEventHeader {
   Vec<u8> get_channels()    const;
   u8      get_nchan()       const;
   Vec<u8> get_active_data_channels() const;
-  bool has_ch9()            const;
-  u8   get_n_datachan()     const;
-  f32  get_fpga_temp()      const;
-  bool is_event_fragment()  const;
-  bool drs_lost_trigger()   const;
-  bool lost_lock()          const;
-  bool lost_lock_last_sec() const;
-  bool is_locked()          const;
-  bool is_locked_last_sec() const;
+  bool    has_ch9()            const;
+  u8      get_n_datachan()     const;
+  f32     get_fpga_temp()      const;
+  bool    is_event_fragment()  const;
+  bool    drs_lost_trigger()   const;
+  bool    lost_lock()          const;
+  bool    lost_lock_last_sec() const;
+  bool    is_locked()          const;
+  bool    is_locked_last_sec() const;
 
   std::array<f32, 3> get_sine_fit() const;
     
@@ -186,7 +186,7 @@ struct RBEvent {
   EventStatus status;
   RBEventHeader header;
   Vec<Vec<u16>> adc; 
-  Vec<RPaddlePacket> hits;
+  Vec<TofHit> hits;
  
   RBEvent();
 
