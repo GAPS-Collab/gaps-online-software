@@ -7,7 +7,6 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG=1")
 
 ################
 
-# ROOT part is still needed for the blobroutines!
 # Locate the ROOT package and defines a number of variables (e.g. ROOT_INCLUDE_DIRS)
 option(BUILD_ROOTCOMPONENTS "build components of the software which require CERN ROOT" ON)
 
@@ -27,34 +26,23 @@ if(BUILD_ROOTCOMPONENTS)
   endif(ROOT_FOUND)
 endif(BUILD_ROOTCOMPONENTS)
 
-###############################
-# Server shared libary 
-# - packets
-# - blobroutines 
-#
-################################3
-
 set(GAPSTOF_LIBRARY_SHARED GapsTof CACHE INTERNAL "GapsTof shared library" FORCE)
-add_library(${GAPSTOF_LIBRARY_SHARED}
-    SHARED dataclasses/C++/src/blobroutines.cpp 
+add_library(${GAPSTOF_LIBRARY_SHARED} SHARED
     dataclasses/C++/src/tof_packet.cxx
     dataclasses/C++/src/tof_event_header.cxx
-    dataclasses/C++/src/REventPacket.cxx
-    dataclasses/C++/src/RPaddlePacket.cxx
     dataclasses/C++/src/calibration.cxx
     dataclasses/C++/src/serialization.cxx
     dataclasses/C++/src/parsers.cxx
     dataclasses/C++/src/events.cxx
     dataclasses/C++/src/io.cxx
     dataclasses/C++/src/monitoring.cxx
-    dataclasses/C++/src/WaveGAPS.cpp
     dataclasses/C++/src/CommandPacket.cxx
+    dataclasses/C++/src/legacy.cxx
 )
-
 target_compile_options(${GAPSTOF_LIBRARY_SHARED} PRIVATE -Wall -Wextra -Wpedantic)# -Werror)
 target_include_directories(${GAPSTOF_LIBRARY_SHARED}
                             PUBLIC
-                            ${spdlog_SOURCE_DIR}/include
+                            ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include
                             ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
                               $<$<BOOL:${BUILD_ROOTCOMPONENTS}>:${ROOT_INCLUDE_DIRS}>
                               ${Boost_INCLUDE_DIR}
@@ -74,12 +62,12 @@ if (BUILD_PYBINDINGS)
                                            dataclasses/C++/pybindings/helpers.cxx)
   target_include_directories(${pybindings}
                             PUBLIC
-                            ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
-			    ${Python_INCLUDE_DIRS}
-			    )
+                              ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
+            			      ${Python_INCLUDE_DIRS}
+			                )
   target_link_libraries(${pybindings}
                         PRIVATE
-                        ${GAPSTOF_LIBRARY_SHARED})
+                          ${GAPSTOF_LIBRARY_SHARED})
 
 endif(BUILD_PYBINDINGS)
 
@@ -108,10 +96,10 @@ endif()
 if (BUILD_LIFTOF)
   
   # Define the command to build your Rust project
-  set(RUST_BUILD_COMMAND cargo build --release)
+  set(RUST_BUILD_COMMAND cargo build --release --all-features)
   add_custom_target(
     liftof-doc
-      COMMAND cargo doc
+      COMMAND cargo doc 
       WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tof/liftof
   )
   add_custom_target(
@@ -200,7 +188,7 @@ if (BUILD_EXAMPLES)
   )
   target_include_directories(${unpack-example} 
                             PUBLIC
-                            ${spdlog_SOURCE_DIR}/include
+                            ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include
                             ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/cxxopts/include
                             ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
                             )
@@ -220,7 +208,7 @@ if (BUILD_EXAMPLES)
     )
     target_include_directories(${display-example} 
                               PUBLIC
-                              ${spdlog_SOURCE_DIR}/include
+                              ${CMAKE_CURRENT_SOURCE_DIR/../resources/extern/spdlog/include
                               ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/cxxopts/include
                               ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
                               $<$<BOOL:${BUILD_ROOTCOMPONENTS}>:${ROOT_INCLUDE_DIRS}>
@@ -242,7 +230,7 @@ if (BUILD_EXAMPLES)
     )
     target_include_directories(${analyze-example} 
                               PUBLIC
-                              ${spdlog_SOURCE_DIR}/include
+                              ${CMAKE_CURRENT_SOURCE_DIR}/../resources/example/spdlog/include
                               ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/cxxopts/include
                               ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
                               )

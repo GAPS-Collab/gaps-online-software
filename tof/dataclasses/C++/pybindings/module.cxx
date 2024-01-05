@@ -12,12 +12,10 @@
 #include "packets/monitoring.h"
 #include "events/tof_event_header.hpp"
 
+#include "legacy.h"
 #include "io.hpp"
 #include "serialization.h"
 #include "calibration.h"
-#include "blobroutines.h"
-#include "WaveGAPS.h"
-#include "TOFCommon.h"
 #include "events.h"
 
 #include "tof_typedefs.h"
@@ -67,11 +65,6 @@ std::string tof_response_to_str(const TofResponse &cmd) {
 }
 
 
-void set_payload_helper(TofPacket &packet,
-                        const Vec<u8> payload) {
-  packet.payload = payload;
-  packet.payload_size = payload.size();
-}
 
 
 Vec<Vec<f64>> remove_spikes_helper(u16 stop_cell,
@@ -439,12 +432,7 @@ PYBIND11_MODULE(gaps_tof, m) {
 
     py::class_<TofPacket>(m, "TofPacket")
         .def(py::init())
-        .def("to_bytestream",         &TofPacket::to_bytestream)
         .def("from_bytestream",       &TofPacket::from_bytestream)
-        .def("set_payload",           &set_payload_helper)
-        //.def("set_packet_type",       &set_ptype_helper) 
-        .def_readonly("head",         &TofPacket::head)
-        .def_readonly("tail",         &TofPacket::tail)
         .def_readonly("payload",      &TofPacket::payload)
         .def_readonly("payload_size", &TofPacket::payload_size)
         .def_readonly("packet_type",  &TofPacket::packet_type)
@@ -572,10 +560,6 @@ PYBIND11_MODULE(gaps_tof, m) {
                })
    ;
    
-   py::class_<Calibrations_t>(m, "Calibrations")
-       .def(py::init())
-   ;
-  
    py::class_<RBCalibration>(m, "RBCalibration", 
       "RBCalibration holds th calibration constants (one per bin) per each channel for a single RB. This needs to be used in order to convert ADC to voltages/nanoseconds!")
        .def(py::init())

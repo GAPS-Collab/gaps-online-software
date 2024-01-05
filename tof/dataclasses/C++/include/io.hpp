@@ -5,7 +5,6 @@
 
 #include "events.h"
 #include "packets/tof_packet.h"
-#include "TOFCommon.h"
 
 /**
  * Extract tof dataclasses from files
