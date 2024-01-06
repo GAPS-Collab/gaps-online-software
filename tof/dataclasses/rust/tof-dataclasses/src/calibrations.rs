@@ -189,6 +189,7 @@ fn clean_spikes(traces : &mut Vec<Vec<Vec<f32>>>,vcaldone : bool) {
 /***********************************/
 
 /// Designed to match np.where(np.diff(np.signbit(trace)))[0] 
+/// FIXME -> This needs to be moved to analysis!
 pub fn find_zero_crossings(trace: &Vec<f32>) -> Vec<usize> {
   let mut zero_crossings = Vec::new();
   for i in 1..trace.len() {
@@ -1104,6 +1105,7 @@ impl RBCalibrations {
       match reader.next() {
         None => {
           error!("Can't load calibration!");
+          break;
         },
         Some(pack) => {
           if pack.packet_type == PacketType::RBCalibration { 
