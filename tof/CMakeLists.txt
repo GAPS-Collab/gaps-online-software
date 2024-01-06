@@ -103,6 +103,11 @@ if (BUILD_LIFTOF)
       WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tof/liftof
   )
   add_custom_target(
+    rust-pybindings
+    COMMAND ${CMAKE_SOURCE_DIR}/tof/dataclasses/rust/pybindings/build.sh
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tof/dataclasses/rust/pybindings 
+  )
+  add_custom_target(
     liftof-cc
       ALL
       COMMAND ${RUST_BUILD_COMMAND}
@@ -137,6 +142,11 @@ if (BUILD_LIFTOF)
   )
   install(PROGRAMS ${CMAKE_SOURCE_DIR}/tof/liftof/target/release/liftof-tui
       DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
+  )
+  install(FILES ${CMAKE_SOURCE_DIR}/tof/dataclasses/rust/pybindings/target/release/librust_dataclasses.so
+      DESTINATION ${INSTALL_PYTHON_DIR}/
+      RENAME rust_dataclasses.so
+      PERMISSIONS OWNER_EXECUTE
   )
 
 endif(BUILD_LIFTOF)

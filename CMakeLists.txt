@@ -108,6 +108,7 @@ if(DOXYGEN_FOUND)
   set(DOXYGEN_GENERATE_MAN NO) # You can enable this if you want man pages
   configure_file(${CMAKE_SOURCE_DIR}/Doxyfile.in ${CMAKE_BINARY_DIR}/Doxyfile @ONLY)
   add_custom_target(doc
+    ALL
     COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_BINARY_DIR}/Doxyfile
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     COMMENT "Generating C++ API documentation with Doxygen"
@@ -136,4 +137,10 @@ configure_file(${SETUP_SCRIPT_SOURCE} ${SETUP_SCRIPT_DEST} @ONLY)
 #
 ## Install the generated setup script during installation
 install(FILES ${SETUP_SCRIPT_DEST} DESTINATION ${CMAKE_INSTALL_PREFIX})
+
+## Install the python wrapper for the API
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/python/gaps-online/gaps_online
+        DESTINATION ${INSTALL_PYTHON_DIR}
+       )
+
 
