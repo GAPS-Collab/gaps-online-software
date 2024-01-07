@@ -28,7 +28,10 @@ extern crate signal_hook;
 extern crate env_logger;
 
 use signal_hook::iterator::Signals;
-use signal_hook::consts::signal::{SIGTERM, SIGINT};
+use signal_hook::consts::signal::{
+    SIGTERM,
+    SIGINT
+};
 
 #[macro_use] extern crate log;
 
@@ -50,7 +53,6 @@ use crossbeam_channel::{
 };
 use local_ip_address::local_ip;
 use colored::Colorize;
-
 
 // TOF specific crates
 use tof_control::helper::rb_type::RBInfo;
@@ -234,6 +236,12 @@ fn main() {
       rc_file_path   = rcfile.clone();
       rc_config      = get_runconfig(&rcfile);
       end_after_run  = rc_config.nevents > 0 || rc_config.nseconds > 0;
+      if rc_config.trigger_fixed_rate > 0 {
+        // we have to set this, since for fixed rate, 
+        // triggers won't be enabled, since we are 
+        // issuing them manually
+        end_after_run = false;
+      }
       config_from_shell = true;
     }
   }
@@ -425,7 +433,6 @@ fn main() {
         println!("=> The runconfig request to take {} events or to run for {} seconds!", rc_config.nevents, rc_config.nseconds);
         println!("=> The run will be stopped when it is finished!");
         println!("=> {}", String::from("!If that is not what you want, check out the --listen flag!").green());
-        end_after_run = true;
         if !rc_config.is_active {
           println!("=> The provided runconfig does not have the is_active field set to true. Won't start a run if that is what you were waiting for.");
         } 
@@ -458,7 +465,7 @@ fn main() {
                          pb_mon_every_x, 
                          ltb_mon_every_x, 
                          //verbose,
-                         true,
+                         verbose,
                          moni_ctrl); 
             })
            .expect("Failed to spawn rb-monitoring thread!");
@@ -495,12 +502,17 @@ fn main() {
       Err(err) => error!("Can not read trigger enabled register! Error {err}"),
       Ok(enabled) => {
         if enabled {
-          debug!("Board is triggering!");
+          trace!("Trigger enabled register is asserted!");
         } else {
-          debug!("No triggers active!");
+          debug!("Trigger enabled register is NOT asserted!");
         }
         //println!("Current trigger enabled status {}. WIll end after a run {}", enabled, end_after_run);
         if !enabled && end_after_run {
+          end = true;
+        }
+        // in case we have nseconds and the fixed rate trigger,
+        // we have end_after_run == false 
+        if program_start_time.elapsed().as_secs() > rc_config.nseconds as u64 && rc_config.nseconds > 0 {
           end = true;
         }
       }

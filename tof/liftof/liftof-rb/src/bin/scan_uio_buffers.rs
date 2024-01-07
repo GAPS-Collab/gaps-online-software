@@ -27,9 +27,8 @@ pub fn get_bytestream(addr_space : &str,
   let m = match map_physical_mem_read(addr_space, addr, vec_size * sz) {
     Ok(m) => m,
     Err(err) => {
-      let error = RegisterError {};
-      println!("Failed to mmap: Err={:?}", err);
-      return Err(error);
+      println!("Failed to mmap! {:?}", err);
+      return Err(RegisterError::MMapFail);
     }
   };
   let p = m.as_ptr() as *const u8;

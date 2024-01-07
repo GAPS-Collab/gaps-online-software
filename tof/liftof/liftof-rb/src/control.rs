@@ -72,8 +72,17 @@ pub fn soft_reset_board() -> Result<(), RegisterError> {
   let eight_cycles = Duration::from_micros(4);
   write_control_reg(SOFT_RESET, 0x1)?;
   thread::sleep(eight_cycles);
+  let mut ncycles = 0;
   while !soft_reset_done()? {
     thread::sleep(eight_cycles);
+    ncycles += 1;
+    if ncycles % 10 == 0 {
+      error!("Not getting SOFT_RESET_DONE acknowledged. Will try DMA reset");
+      reset_dma();
+    }
+    if ncycles == 29 {
+      return Err(RegisterError::RegisterTimeOut);     
+    }
   }
   Ok(())
 }
