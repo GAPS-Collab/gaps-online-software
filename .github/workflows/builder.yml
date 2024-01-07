@@ -1,4 +1,4 @@
-name: CMake
+name: BuildBot
 
 on:
   workflow_dispatch:
@@ -48,6 +48,13 @@ jobs:
     - name: Docs
       run: cd ${{github.workspace}}/build && make doc && make liftof-doc
       
+    - name: Test
+      working-directory: ${{github.workspace}}/build
+      # Execute tests defined by the CMake configuration.
+      # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
+      #run: ctest -C ${{env.BUILD_TYPE}}
+      run: cd ${{github.workspace}}/tof/datatclasses/rust/tof-dataclasses && cargo test --features="random" && cargo test --features="random" --test=test
+
     - name: Create .nojekyll
       run: touch ${{ github.workspace }}/build/doc/html/.nojekyll
       shell: bash
@@ -60,12 +67,7 @@ jobs:
       uses: JamesIves/github-pages-deploy-action@3.7.1
       with:
         github_token: ${{ secrets.PAT_TOKEN }}
-        branch: "develop"
+        #branch: ${{ inputs.branch }}
         folder: ${{ github.workspace }}/build/doc/html/
 
-    - name: Test
-      working-directory: ${{github.workspace}}/build
-      # Execute tests defined by the CMake configuration.
-      # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
-      #run: ctest -C ${{env.BUILD_TYPE}}
-      run: cd ${{github.workspace}}/tof/dataclasses/rust/tof-dataclasses && cargo test --features="random" && cargo test --features="random" --test=test
+
