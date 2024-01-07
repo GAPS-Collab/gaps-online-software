@@ -1,0 +1,22 @@
+#! /bin/sh
+export PATH=$PATH:@CMAKE_INSTALL_PREFIX@/bin
+export PYTHONPATH=$PYTHONPATH:@CMAKE_INSTALL_PREFIX@/python
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:@CMAKE_INSTALL_PREFIX@/lib
+export DJANGO_SETTINGS_MODULE=gaps_db.settings
+
+echo -e "************************************************"
+echo -e "* WELCOME TO GAPS-ONLINE-SOFTWARE V0.8 'NIUHI' *"
+echo -e "************************************************"
+echo -e " -- We have set the following variables:"
+echo -e " -- PYTHONPATH=$PYTHONPATH"
+echo -e " -- PATH=$PATH"
+echo -e " -- LD_LIBRARY_PATH=$LD_LIBRARY_PATH"
+echo -e "********************************************"
+echo -e " => software repositories:"
+echo -e "    - https://uhhepvcs.phys.hawaii.edu/Achim/gaps-online-software"
+echo -e "    - https://github.com/GAPS-Collab/gaps-online-software"
+echo -e " => Where to get help?:"
+echo -e "    - README.md"
+echo -e " => Maintainer?:"
+echo -e "    - stoessl@hawaii.edu"
+

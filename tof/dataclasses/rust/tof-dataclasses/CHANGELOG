@@ -1,0 +1,134 @@
+# NIUHI series
+
+## 0.8.2
+* fixes timing bin width bug in RBCalibration (tbins exhibit a mean of 0.488
+  now) 
+
+## 0.8.2 
+* substantial changes to RBEvent
+  - split up timestamp 48 to timestamp32 and timestamp16
+    timestamp32 is the faster one
+    this saves 16bytes
+  - summarize all stati (lock, lost trigger) in a single 
+    byte and use getters to decode it. 
+    this saves 3byte
+  - we could potentially save another byte if we merge this
+    with the channel mask
+  - channel mask is now 2byte to account for channel9
+  - get_channels will return channels from 0-8
+  - RBEvent.adc will always have the length of NCHAN.
+    If channels are not populated, it will have empty 
+    vectors.
+  - ch9 not treated separatly anymore
+  - adds a general event status instead of bool "broken"
+
+* io/RBEventMemoryStreamer - get RBEvents from plain 
+  RB data ("blob") either in RB memory or from a file
+  This will be the only place where we do this kind
+  of decoding.
+
+* RobinReader has moved to io from liftof-lib
+
+## 0.8.1
+* moves mtb related communication functions
+  to liftof-lib project
+* removes unused RBChannelData struct
+
+## 0.8.0
+* adds timestamp field to calibration
+
+# OMILU series
+
+## 0.7.3
+* Renames MasterTofEvent to TofEvent and thus 
+  more or less finalizes the data structure.
+
+## 0.7.2
+* Changes in API of MasterTofEvent/TofEvent
+
+## 0.7.1
+* Fixes a critical bug in RBEvent, where the channels where 
+  shifted by one, so that channel 9 was ignored.
+* adds a nchan field to RBEvent, indicating how many channels 
+  we are reading out.
+* Fixes a bunch of bugs in the calibration routine.
+
+## 0.7.0 
+* DataFormat : enum helper to define shape
+  of RB event data
+* DataType : enum helper to define purpose of 
+  dataset
+* Renames RBBinaryDump to RBMemoryView, to align it 
+  with development in C++ version of dataclasses
+* Removes warnings
+* A bug in get_ch_adc fixed, which would return 
+  the wrong channel (ch - 1) instead of ch.
+  _FIXME_ these kinds of bugs are expected due to 
+  channel naming scheme. Should we change this internally?
+* Adds more From trait methods to readoutboard events
+
+
+#0.6.x - KIHIKIHI series
+
+##0.6.1 
+* introduces MasterTriggerEvent::from_bytestream
+* moves MasterTriggerEvent::to_bytestream to Serialization trait
+* WARNING! MasterTriggerEvent::from_bytestream will check for 
+  0.6.0 tail signature (0x555) and issue a warning!
+* ISSUES/CHANGE request: Do not decode MasterTrigger board/hit masks just yet.
+* RBMissingHit - debug information for MTB/RB/LTB mismatch
+
+##0.6.0
+* Bug in MasterTriggerEvent::TAIL which is 0x555 instead of 0x5555.
+
+#0.5.x - UHU series
+* adds new monitoring classes 
+  - TofCompMoni
+  - MtbMoni
+  to monitor MTB as well as the tof computer itself
+* reworks RB monitoring, adds new class RBMoni
+
+#0.4.0
+FEATURES
+
+* LTB/RB/Paddle/PaddleEndClasses
+* Get these classes from a sqlite database
+* MasterTriggerMapping provides translation of MTB triggermask
+  to LTB/RB
+
+
+#0.3.0
+
+FEATURES
+
+* classes/functions to interact with MTB over UDP
+* extends TofCommands with new commands:
+  - SetRBBuffTrip : Set the trip value of the RB buffers
+  - Enable/Disable forced trigger mode.
+
+REFACTOR
+
+* starting to implement `Serialization` traits
+* errors have the proper Error traits, including 
+  Display trait
+
+DEPRECATED
+* `CommandPacket` is marked as deprecated. 
+  _Comment_ : Instead of having a class + packet, 
+  we prefer to implment `to_/from_bytestream` for 
+  each class, thus a specific "Packet" implementation
+  is superfluos. 
+
+0.2.0 
+
+API change - 
+
+* Rename BlobData::event_ctr to 
+  BlobData::event_id, to not get 
+  confused with actual event counters
+
+NEW FEATURES
+
+* extends BlobData with ::decode_eventid 
+* introduces RBEventPayload - which is a 
+  binary stream together with an event id

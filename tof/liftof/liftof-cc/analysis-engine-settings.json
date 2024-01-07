@@ -1,0 +1,15 @@
+{
+  "ignore_channels"      : [],
+  "integration_start"    : 270.0,
+  "integration_window"   : 70.0, 
+  "pedestal_threshold"   : 10.0,
+  "pedestal_begin_bin"   : 10,
+  "pedestal_window_bins" : 50,
+  "use_zscore_algorithm_for_peakfinding" : 0.0,
+  "find_peaks_t_start"   : 270.0,
+  "find_peaks_t_window"  : 70.0,
+  "find_peaks_min_peak_size" : 3,
+  "find_peaks_threshold" : 10.0,
+  "find_peaks_max_peaks" : 5,
+  "cfd_fraction"         : 0.2
+}

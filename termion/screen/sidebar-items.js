@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"struct":["AlternateScreen","ToAlternateScreen","ToMainScreen"],"trait":["IntoAlternateScreen"]};

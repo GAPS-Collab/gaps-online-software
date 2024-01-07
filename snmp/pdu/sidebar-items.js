@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["build_get","build_getbulk","build_getnext","build_set"],"struct":["Buf"]};

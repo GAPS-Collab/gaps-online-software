@@ -1,0 +1,12 @@
+p, li, ul {
+    font-size: 12px;
+    line-height:150%;
+}
+code {
+    font-size: 9px;
+    line-height:150%;
+}
+table {
+    font-size: 10px;
+    line-height:150%;
+}

@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["State","Type","Value"],"fn":["open","version"],"struct":["Connection","ConnectionWithFullMutex","Cursor","CursorWithOwnership","Error","OpenFlags","Row","Statement"],"trait":["Bindable","BindableWithIndex","ColumnIndex","ParameterIndex","ReadableWithIndex","RowIndex"],"type":["Result"]};

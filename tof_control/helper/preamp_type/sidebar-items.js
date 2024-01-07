@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["PreampBiasError","PreampError","PreampInitError","PreampTempError"],"struct":["PreampMoniData","PreampReadBias","PreampSetBias","PreampTemp"]};

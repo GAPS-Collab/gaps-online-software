@@ -1,0 +1,22 @@
+{
+  "meta"      : "",
+  "unix_time" : "",
+  "raw_storage_savepath" : "/tpool/tofdata/nts/raw/",
+  "stream_savepath" : "/tpool/tofdata/nts/stream/", 
+  "db_path"   : "/data0/gaps/nts/db-nts.sqlite3", 
+  "events_per_file"    : 10000,
+  "packets_per_stream" : 1000000,
+  "run_id"             : 48, 
+  "calibration_file_path" : "/tpool/tofdata/nts/calibrations/2/txt-files/",
+  "master_trigger" : {
+    "ip"   : "10.0.1.10", 
+    "port" : 50001
+  },
+  "flight_computer" : {
+    "ip_address"   : "127.0.0.1", 
+    "port" : 50001
+  },
+  "rb_ignorelist" : [5,6,9,10,13,14,16,18,21,23,25,28,29,30,31,32,33,34,35,36,37,38,39,40],
+  "ltb_ignorelist" : []
+}
+

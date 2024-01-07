@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["Alaska","Aleutian","Arizona","Central","EastIndiana","Eastern","Hawaii","IndianaStarke","Michigan","Mountain","Pacific","Samoa"]};

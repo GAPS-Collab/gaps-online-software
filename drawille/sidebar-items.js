@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["PixelColor"],"struct":["Canvas","Turtle"]};

@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["Viewport"],"macro":["assert_buffer_eq"],"mod":["backend","buffer","layout","prelude","style","symbols","terminal","text","widgets"],"struct":["CompletedFrame","Frame","Terminal","TerminalOptions"]};

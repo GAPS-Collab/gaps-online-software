@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"struct":["AfterCursor","All","BeforeCursor","CurrentLine","UntilNewline"]};

@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["cpu_info","cpu_temp"]};
