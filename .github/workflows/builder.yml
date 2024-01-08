@@ -72,5 +72,5 @@ jobs:
         github_token: ${{ secrets.PAT_TOKEN }}
         #branch: ${{ inputs.branch }}
         folder: ${{ github.workspace }}/build/doc/html/
-
+        branch: gh-pages
 
