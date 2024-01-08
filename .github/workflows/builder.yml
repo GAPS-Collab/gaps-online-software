@@ -1,4 +1,4 @@
-name: CMake
+name: BuildBot
 
 on:
   workflow_dispatch:
@@ -23,14 +23,17 @@ jobs:
     # You can convert this to a matrix build if you need cross-platform coverage.
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v4
       with: 
         submodules: 'true'
         show-progress: 'true'
         token: ${{ secrets.PAT_TOKEN }}
-        
+    - name: Set up GCC
+      uses: egor-tensin/setup-gcc@v1
+      with:
+        version: 13
+        platform: x64   
 
     - name: Install dependencies
       run : sudo apt update && sudo apt install doxygen && sudo apt install pybind11-dev && sudo apt install cargo && sudo apt install lm-sensors
@@ -48,6 +51,13 @@ jobs:
     - name: Docs
       run: cd ${{github.workspace}}/build && make doc && make liftof-doc
       
+    - name: Test
+      working-directory: ${{github.workspace}}/build
+      # Execute tests defined by the CMake configuration.
+      # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
+      #run: ctest -C ${{env.BUILD_TYPE}}
+      run: cd ${{github.workspace}}/tof/dataclasses/rust/tof-dataclasses && cargo test --features="random" && cargo test --features="random" --test=test
+
     - name: Create .nojekyll
       run: touch ${{ github.workspace }}/build/doc/html/.nojekyll
       shell: bash
@@ -60,12 +70,7 @@ jobs:
       uses: JamesIves/github-pages-deploy-action@3.7.1
       with:
         github_token: ${{ secrets.PAT_TOKEN }}
-        branch: "develop"
+        #branch: ${{ inputs.branch }}
         folder: ${{ github.workspace }}/build/doc/html/
+        branch: gh-pages
 
-    - name: Test
-      working-directory: ${{github.workspace}}/build
-      # Execute tests defined by the CMake configuration.
-      # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
-      #run: ctest -C ${{env.BUILD_TYPE}}
-      run: cd ${{github.workspace}}/tof/dataclasses/rust/tof-dataclasses && cargo test --features="random" && cargo test --features="random" --test=test
