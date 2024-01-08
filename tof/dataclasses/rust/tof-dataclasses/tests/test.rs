@@ -9,37 +9,6 @@ pub mod tests {
   use tof_dataclasses::FromRandom;
   use tof_dataclasses::io::read_file;
 
-  #[test]
-  fn read_file_test_for_rbbinarydump() {
-    let stream = read_file(&Path::new("test-data/tof-rb01.robin")).unwrap();
-    let size = stream.len();
-    let mut pos = 0usize;
-    let mut events = Vec::<RBEventMemoryView>::new(); 
-    //let mut n_events = (size / 15830) as usize;
-    let mut n_broken = 0;
-    let mut n_good   = 0;
-    let mut block_size = 0;
-    while pos <= size {
-      //pos += 1;
-      block_size = pos - block_size;
-      //println!("SIZE {block_size}");
-      //println!("POS {pos}");
-      match RBEventMemoryView::from_bytestream(&stream,&mut pos) {
-        Ok(event) => {
-          events.push(event);
-          n_good += 1;
-        },
-        Err(_err)  => {
-          //println!("error decoding RBEventMemoryView, err {err}");
-          n_broken += 1;
-          pos += 1;
-          //break;
-        }
-      }
-    }
-    println!("We decoded {} events", n_good);
-    println!("We saw {} broken events", n_broken);
-  }
 
   #[test]
   fn serialization_circle_test_for_rbbinarydump() {
