@@ -146,7 +146,6 @@ if (BUILD_LIFTOF)
   install(FILES ${CMAKE_SOURCE_DIR}/tof/dataclasses/rust/pybindings/target/release/librust_dataclasses.so
       DESTINATION ${INSTALL_PYTHON_DIR}/
       RENAME rust_dataclasses.so
-      PERMISSIONS OWNER_EXECUTE
   )
 
 endif(BUILD_LIFTOF)
