@@ -1,7 +1,7 @@
 #! /bin/sh
 get_version() {
   # build it for this architecture so we can parse the version
-  cargo build --release --bin=liftof-rb
+  cargo build --all-features --release --bin=liftof-rb
   VERSION=`../target/release/liftof-rb -V`
   IFS=' '
   read -ra arr <<< "$VERSION"
@@ -19,7 +19,8 @@ deploy_target() {
 compile_target() {
   # first delete everything, since there might be remains of a previously issued cargo check
   rm -rf ../target/armv7-unknown*
-  CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" cross build --bin $1 --target=armv7-unknown-linux-musleabi --features=tofcontrol --release 
+  #cross clean
+  CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" cross build --bin $1 --target=armv7-unknown-linux-musleabi --all-features --release 
 }
 
 compile_and_deploy_target() {
@@ -29,7 +30,8 @@ compile_and_deploy_target() {
 }
 
 # UCLA test stand
-UCLA_RB="ucla-tof-rb05 ucla-tof-rb28 ucla-tof-rb33 ucla-tof-rb34"
+UCLA_RB="ucla-tof-rb47 ucla-tof-rb33 ucla-tof-rb34"
+#UCLA_RB="ucla-tof-rb05 ucla-tof-rb28 ucla-tof-rb33 ucla-tof-rb34"
 
 compile_target liftof-rb
 version=$(get_version)
@@ -39,7 +41,6 @@ for rb in `echo $UCLA_RB`;
     deploy_target liftof-rb $version $rb;
     exit
 done;
-
 #for rb in `echo $UCLA_RB`; 
 #  do echo $rb;
 #  scp liftof.service $rb:bin/;

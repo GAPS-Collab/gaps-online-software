@@ -43,8 +43,9 @@ use tof_control::helper::rb_type::{
     RBPh,
 };
 
-use crate::control::{get_board_id,
-                     get_trigger_rate};
+use crate::control::{
+    get_trigger_rate
+};
 
 
 /// Gather monitoring data and pass it on over a channel

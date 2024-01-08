@@ -30,13 +30,16 @@ use netneighbours::get_mac_to_ip_map;
 #[macro_use] extern crate log;
 extern crate env_logger;
 
-use nalgebra::{DMatrix, DVector};
-use nalgebra::linalg::SVD;
+//use ndarray::{array, Array1};
+//use nlopt::{Algorithm, Objective, Optimization, Result};
 
 //use tof_dataclasses::manifest as mf;
 use tof_dataclasses::DsiLtbRBMapping;
 use tof_dataclasses::constants::NWORDS;
-use tof_dataclasses::calibrations::RBCalibrations;
+use tof_dataclasses::calibrations::{
+    RBCalibrations,
+    find_zero_crossings,
+};
 use tof_dataclasses::packets::{TofPacket,
                                PacketType};
 use tof_dataclasses::errors::{SerializationError,
@@ -110,6 +113,12 @@ pub fn init_env_logger() {
     }).init();
 }
 
+/// Common settings for apps, e.g. liftof-tui
+#[derive(Debug, Clone)]
+pub struct AppSettings {
+  pub cali_master_path : String,
+}
+
 /// Keep track of run related statistics, errors
 #[derive(Debug, Copy, Clone)]
 pub struct RunStatistics {
@@ -175,43 +184,50 @@ impl fmt::Display for RunStatistics {
   }
 }
 
-/// FIXME - this comes straight right out of ChatGPT
-fn fit_sine_function(time: Vec<f32>, data: Vec<f32>) -> (f32, f32, f32) {
-    // Build the design matrix A
-    let a = DMatrix::<f32>::from_fn(time.len(), 3, |i, j| {
-        match j {
-            0 => 1.0,
-            1 => (2.0 * std::f32::consts::PI * time[i]).sin(),
-            2 => (2.0 * std::f32::consts::PI * time[i]).cos(),
-            _ => unreachable!(),
-        }
-    });
+//fn sine_to_fit(amp : f32, freq : f32, phase : f32, time : &Vec<f32>, ys : &mut Vec<f32>) {
+//  //let ys = Vec::<f32>::with_capacity(time.len());
+//  for k in 0..time.len() {
+//    ys[k] = amp * (freq * time[k] + phase).sin(); 
+//  }
+//}
+//
+//fn cost_function(amp : f32, freq : f32, phase : f32, time : &Vec<f32>, volts : &Vec<f32>) -> f32 {
+//  //let 
+//  //let fitted_values = amplitude * (2.0 * std::f32::consts::PI * frequency * time + phase).sin();
+//  let fit_volts = Vec::<f32>::with_capacity(time.len());
+//  sine_to_fit(amp, freq, phase, &time, &mut fit_volts);
+//  let mut chi_square = 0f32;
+//  for k in 0..fit_volts.len() {
+//    chi_square += (volts[k] - fit_volts[k]).powi(2);
+//    // FIXME - error
+//  }
+//  chi_square
+//}
 
-    // Create the target vector b
-    let b = DVector::from_vec(data);
 
-    // Solve the linear system Ax = b using Singular Value Decomposition
-    let svd = SVD::new(a.clone(), true, true);
-    let eps = 0.0001;
-    match svd.solve(&b, eps) {
-      Err(err) => {
-        error!("Sinus fit failed! {err}");
-        return (f32::MAX, f32::MAX, f32::MAX);
-      },
-      Ok(x) => {
-        let amplitude = x[0];
-        let frequency = x[1] / (2.0 * std::f64::consts::PI) as f32;
-        let phase = -x[2].atan2(x[1]);
-        return (amplitude as f32, frequency as f32, phase as f32);
-      }
+/// FIXME - proper fitting algorithm
+/// This here is bad, because it does not interpolate between 
+/// the bins
+fn fit_sine(time: Vec<f32>, data: Vec<f32>) -> (f32, f32, f32) {
+  let z_cross = find_zero_crossings(&data);
+  let mut y_max = f32::MIN;
+  let mut y_min = f32::MAX;
+  for y in data {
+    if y > y_max {
+      y_max = y;
     }
-
-    // Extract parameters from the solution vector x
-    //let amplitude = x[0];
-    //let frequency = x[1] / (2.0 * std::f64::consts::PI);
-    //let phase = -x[2].atan2(x[1]);
-    //(0.0,0.0,0.0)
-    //(amplitude, frequency, phase)
+    if y < y_min {
+      y_min = y;
+    }
+  }
+  let amp   = f32::abs(y_max - y_min)/2.0;
+  let mut phase = 0.0;
+  let mut freq  = 0.0;
+  if z_cross.len() >= 3 {
+    phase = time[z_cross[0]];
+    freq  = 1.0/(time[z_cross[2]] - time[z_cross[0]]);
+  }
+  (amp,freq,phase)
 }
 
 
@@ -335,25 +351,6 @@ pub fn get_peaks() -> Vec<Peak> {
   peaks
 }
 
-/// FIXME - this shoudl be 
-/// RBCalibrations::from_tofpacket
-/// but for that we have to move the
-/// TofPacketReader first
-pub fn load_calibration(board_id : u8,
-                        path     : String) -> Result<RBCalibrations, SerializationError> {
-  let mut cali   = RBCalibrations::new(board_id);
-  let mut reader = TofPacketReader::new(path);
-  match reader.next() {
-    None => {
-      error!("Can't load calibration!");
-    },
-    Some(pack) => {
-      cali = RBCalibrations::from_bytestream(&pack.payload, &mut 0)?;
-    }
-  }
-  //cali
-  Ok(cali)
-}
 
 /// Waveform analysis engine - identify waveform variables
 ///
@@ -441,7 +438,7 @@ pub fn waveform_analysis(event         : &mut RBEvent,
         calibration.nanoseconds(ch.into(),
                                 event.header.stop_cell as usize,
                                 &mut ch_times);
-        let fit_result = fit_sine_function(ch_times, ch_voltages);
+        let fit_result = fit_sine(ch_times, ch_voltages);
         //println!("FIT RESULT = {:?}", fit_result);
         event.header.set_sine_fit(fit_result);
         continue;
