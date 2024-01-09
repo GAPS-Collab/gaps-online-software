@@ -65,22 +65,17 @@ impl fmt::Display for EventStatus {
   }
 }
 
-impl TryFrom<u8> for EventStatus {
-  type Error = &'static str;
-
+impl From<u8> for EventStatus {
+  fn from(value: u8) -> Self {
   // I am not sure about this hard coding, but the code
   //  looks nicer - Paolo
-  fn try_from(value: u8) -> Result<Self, Self::Error> {
     match value {
-      0u8  => Ok(EventStatus::Unknown),
-      10u8 => Ok(EventStatus::CRC32Wrong),
-      11u8 => Ok(EventStatus::TailWrong),
-      12u8 => Ok(EventStatus::ChannelIDWrong),
-      42u8 => Ok(EventStatus::Perfect),
-      _    => {
-        error!("Can not convert {}! It is not a valid EventStatus!", value);
-        Err("Can not convert value!")
-      }
+      0u8  => EventStatus::Unknown,
+      10u8 => EventStatus::CRC32Wrong,
+      11u8 => EventStatus::TailWrong,
+      12u8 => EventStatus::ChannelIDWrong,
+      42u8 => EventStatus::Perfect,
+      _    => EventStatus::Unknown,
     }
   }
 }
@@ -839,9 +834,9 @@ impl RBEventHeader {
     // change anything. 
     // let's use an arbitrary precision for a 
     // range of -10 to 10 
-    let mut amp   = (input.0 + 10.0)*(u16::MAX as f32 / 20.0);
-    let mut freq  = (input.1 + 10.0)*(u16::MAX as f32 / 20.0);
-    let mut phase = (input.2 + 10.0)*(u32::MAX as f32 / 20.0);
+    let mut amp   = (input.0 + 1090.0)*(u16::MAX as f32 / 2000.0);
+    let mut freq  = (input.1 + 1090.0)*(u16::MAX as f32 / 2000.0);
+    let mut phase = (input.2 + 1090.0)*(u32::MAX as f32 / 2000.0);
 
     if amp < 0.0 {
       warn!("amp out of range!");
@@ -861,9 +856,9 @@ impl RBEventHeader {
   }
   
   pub fn get_sine_fit(&self) -> (f32, f32, f32) {
-    let amp    = (20.0 * self.ch9_amp as f32)/(u16::MAX as f32) - 10.0;
-    let freq   = (20.0 * self.ch9_freq as f32)/(u16::MAX as f32) - 10.0;
-    let phase  = (20.0 * self.ch9_phase as f32)/(u16::MAX as f32) - 10.0;
+    let amp    = (2000.0 * self.ch9_amp   as f32)/(u16::MAX as f32) - 1000.0;
+    let freq   = (2000.0 * self.ch9_freq  as f32)/(u16::MAX as f32) - 1000.0;
+    let phase  = (2000.0 * self.ch9_phase as f32)/(u16::MAX as f32) - 1000.0;
     (amp, freq, phase)
   }
 

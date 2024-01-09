@@ -1,6 +1,4 @@
-use std::thread;
 use std::path::PathBuf;
-use std::time::Duration;
 use std::sync::{
     Arc,
     Mutex,
@@ -9,7 +7,6 @@ use std::sync::{
 use crossbeam_channel::{Sender,
                         Receiver};
 
-use tof_dataclasses::RBChannelPaddleEndIDMap;
 use tof_dataclasses::events::DataType;
 use tof_dataclasses::serialization::Serialization;
 use tof_dataclasses::packets::{
@@ -130,20 +127,28 @@ pub fn event_processing(board_id            : u8,
       match get_op_mode.try_recv() {
         Err(err) => trace!("No op mode change detected! Err {err}"),
         Ok(mode) => {
-          
           warn!("Will change operation mode to {:?}!", mode);
           match mode {
             TofOperationMode::RequestReply => {
               streamer.request_mode = true;
               op_mode_stream = false;
+              op_mode = mode;
             },
             TofOperationMode::StreamAny    => {
               op_mode_stream = true;
               streamer.request_mode = false;
+              op_mode = mode;
             },
+            TofOperationMode::RBWaveform   => {
+              if !cali_loaded {
+                error!("Requesting waveform analysis without having a calibration loaded!");
+                error!("Can't do waveform analysis without calibration!");
+                error!("Switching mode to StreamAny");
+                op_mode = TofOperationMode::StreamAny;
+              }
+            }
             _ => (),
           }
-          op_mode = mode;
         }
       }
     }

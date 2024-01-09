@@ -5,32 +5,32 @@
 //!
 
 use std::time::Instant;
+use std::fs;
+use std::collections::VecDeque;
 
 extern crate histo;
 use histo::Histogram;
 
 use ratatui::{
     symbols,
-    backend::{Backend,CrosstermBackend},
+    //backend::CrosstermBackend,
     terminal::Frame,
     layout::{Alignment, Constraint, Direction, Layout, Rect},
     style::{Color, Modifier, Style},
-    text::{Span, Line, Text},
+    text::{Span, Line},
     widgets::{
-        Block, Dataset, Sparkline, Axis, GraphType, BorderType, Chart, Borders, Cell, List, ListItem, ListState, Paragraph, Row, Table, Tabs,    },
-    Terminal,
+        Block, Dataset, Sparkline, Axis, GraphType, BorderType, Chart, Borders, List, ListItem, ListState, Paragraph, Row, Table, Tabs,    },
 };
 
 use crossbeam_channel::{
     Receiver
 };
 
-use std::collections::VecDeque;
 
 use tof_dataclasses::packets::{TofPacket, PacketType};
 use tof_dataclasses::commands::{TofCommand,
                                 TofResponse};
-use tof_dataclasses::manifest::ReadoutBoard;
+use tof_dataclasses::calibrations::RBCalibrations;
 use tof_dataclasses::errors::SerializationError;
 use tof_dataclasses::events::RBEvent;
 use tof_dataclasses::serialization::Serialization;
@@ -51,45 +51,46 @@ pub enum RBTabView {
 
 #[derive(Debug, Clone)]
 pub struct RBTab<'a>  {
-  pub tp_receiver   : Receiver<TofPacket>,
-  pub rb_receiver   : Receiver<RBEvent>,
-  pub rb_selector   : u8,
-  pub rb_changed    : bool, 
-  pub event_queue   : VecDeque<RBEvent>,
-  pub moni_queue    : VecDeque<RBMoniData>,
-  pub met_queue     : VecDeque<f64>,
-  pub met_queue_moni: VecDeque<f64>,
+  pub tp_receiver    : Receiver<TofPacket>,
+  pub rb_receiver    : Receiver<RBEvent>,
+  pub rb_selector    : u8,
+  pub rb_changed     : bool,
+  pub rb_calibration : RBCalibrations,
+  pub cali_loaded    : bool,
+  pub event_queue    : VecDeque<RBEvent>,
+  pub moni_queue     : VecDeque<RBMoniData>,
+  pub met_queue      : VecDeque<f64>,
+  pub met_queue_moni : VecDeque<f64>,
   /// Holds waveform data
-  pub ch_data       : Vec<Vec<(f64,f64)>>,
+  pub ch_data        : Vec<Vec<(f64,f64)>>,
   /// Holds the monitoring qunatities
-  pub rate_queue    : VecDeque<(f64,f64)>,
-  pub fpgatmp_queue : VecDeque<(f64,f64)>,
+  pub rate_queue     : VecDeque<(f64,f64)>,
+  pub fpgatmp_queue  : VecDeque<(f64,f64)>,
   
-  pub pressure      : VecDeque<(f64,f64)>,
-  pub humidity      : VecDeque<(f64,f64)>,
+  pub pressure       : VecDeque<(f64,f64)>,
+  pub humidity       : VecDeque<(f64,f64)>,
   
-  pub mag_x         : VecDeque<(f64,f64)>,
-  pub mag_y         : VecDeque<(f64,f64)>,
-  pub mag_z         : VecDeque<(f64,f64)>,
-  pub mag_tot       : VecDeque<(f64,f64)>,
+  pub mag_x          : VecDeque<(f64,f64)>,
+  pub mag_y          : VecDeque<(f64,f64)>,
+  pub mag_z          : VecDeque<(f64,f64)>,
+  pub mag_tot        : VecDeque<(f64,f64)>,
 
-  pub queue_size    : usize,
+  pub queue_size     : usize,
   
-  pub n_events      : usize,
-  pub n_moni        : usize,
-  pub miss_evid     : usize,
-  pub last_evid     : u32,
-  pub nch_histo     : Histogram,
-  timer             : Instant,
+  pub n_events       : usize,
+  pub n_moni         : usize,
+  pub miss_evid      : usize,
+  pub last_evid      : u32,
+  pub nch_histo      : Histogram,
+  timer              : Instant,
 
-  pub theme         : ColorTheme2,
-  pub view          : RBTabView,
+  pub theme          : ColorTheme2,
+  pub view           : RBTabView,
 
   // list for the rb selector
-  pub rbl_state  : ListState,
-  pub rbl_items  : Vec::<ListItem<'a>>,
-  pub rbl_active : bool,
-
+  pub rbl_state      : ListState,
+  pub rbl_items      : Vec::<ListItem<'a>>,
+  pub rbl_active     : bool,
 }
 
 impl RBTab<'_>  {
@@ -115,6 +116,8 @@ impl RBTab<'_>  {
       rb_receiver    : rb_receiver,
       rb_selector    : 0,
       rb_changed     : false,
+      rb_calibration : RBCalibrations::new(0),
+      cali_loaded    : false,
       event_queue    : VecDeque::<RBEvent>::with_capacity(queue_size),
       moni_queue     : VecDeque::<RBMoniData>::with_capacity(queue_size),
       met_queue      : VecDeque::<f64>::with_capacity(queue_size),
@@ -167,6 +170,26 @@ impl RBTab<'_>  {
       self.met_queue_moni.clear();
       self.fpgatmp_queue.clear();
       self.nch_histo = Histogram::with_buckets(50);
+      // try to get a new calibration
+      match self.rbl_state.selected() {
+        None => {
+          self.cali_loaded = false;
+        }, 
+        Some(_rb_id) => {
+          let cali_path = format!("calibrations/rb_{:02}.cali.tof.gaps", _rb_id + 1);
+          if fs::metadata(cali_path.clone()).is_ok() {
+            match RBCalibrations::from_file(cali_path.clone()) {
+              Err(err) => error!("Unable to load RBCalibration from file {}! {err}", cali_path),
+              Ok(cali) => {
+                self.rb_calibration = cali;
+                self.cali_loaded    = true;
+              }
+            } 
+          } else {
+            self.cali_loaded = false;
+          }
+        }
+      }
     }
 
     if !self.rb_receiver.is_empty() {
@@ -253,9 +276,23 @@ impl RBTab<'_>  {
    
     if ev.header.event_id != 0 && self.rb_selector == ev.header.rb_id {
       for ch in ev.header.get_channels() {
-        for k in 0..ev.adc[ch as usize].len() {
-          let vals = (k as f64, ev.adc[ch as usize][k] as f64);
-          self.ch_data[ch as usize][k] = vals;
+        if self.cali_loaded {
+          let mut nanos = vec![0f32;1024];
+          let mut volts = vec![0f32;1024];
+          self.rb_calibration.nanoseconds(ch as usize + 1, ev.header.stop_cell as usize, 
+                                          &mut nanos);
+          self.rb_calibration.voltages(ch as usize + 1, ev.header.stop_cell as usize, 
+                                       &ev.adc[ch as usize], &mut volts);
+          //let 
+          for k in 0..nanos.len() {
+            let vals = (nanos[k] as f64, volts[k] as f64);
+            self.ch_data[ch as usize][k] = vals;
+          }
+        } else {
+          for k in 0..ev.adc[ch as usize].len() {
+            let vals = (k as f64, ev.adc[ch as usize][k] as f64);
+            self.ch_data[ch as usize][k] = vals;
+          }
           //println!("{:?}", self.ch_data[ch as usize]);
         }
       }
@@ -434,80 +471,89 @@ impl RBTab<'_>  {
         // the waveform plots
         let mut charts  = Vec::<Chart>::new();
         for ch in 0..9 {
-          let label = format!("Ch{}", ch);
-          let mut x_max = 1024u64;
-          let mut x_min = 0u64;
-          //println!("{:?}",self.ch_data[ch]);
-          if self.ch_data[ch].len() != 0 {
-            x_min = self.ch_data[ch][0].0 as u64;
-            x_max = self.ch_data[ch][self.ch_data[ch].len() - 1].0 as u64;
-          }
-          
-          //println!("Ch {} xmin {} xmax {}", ch, x_min, x_max);
-          let x_spacing = (x_max - x_min)/5;
-          let x_labels = vec![x_min.to_string(),
-                             (x_min + x_spacing).to_string(),
-                             (x_min + 2*x_spacing).to_string(),
-                             (x_min + 3*x_spacing).to_string(),
-                             (x_min + 4*x_spacing).to_string(),
-                             (x_min + 5*x_spacing).to_string()];
-          
-          let mut y_max = 0u64; //14 bit max
-          let mut y_min = 16384u64;
-          for val in self.ch_data[ch].iter() {
-            if val.1 > y_max as f64 {
-              y_max = val.1 as u64;
-            }
-            if val.1 < y_min as f64 {
-              y_min = val.1 as u64;
-            }
-          }
-          if y_min > y_max {
-            y_min = 0;
-            y_max = 16384;
-          }
-          
+          let label          = format!("Ch{}", ch);
+          let ch_tc_theme    = self.theme.clone();
+          let mut ch_ts_data = VecDeque::from(self.ch_data[ch].clone());
+          let ch_ts = timeseries(&mut ch_ts_data,
+                                 label.clone(),
+                                 label.clone(),
+                                 &ch_tc_theme  );
+          // this schmagoigl is only for the ADC case
+          //let mut x_max = 1024u64;
+          //let mut x_min = 0u64;
+          ////println!("{:?}",self.ch_data[ch]);
           //if self.ch_data[ch].len() != 0 {
-          //  y_min = self.ch_data[ch].iter().map(|&x| x.1).collect().min() as u64;
-          //  y_max = self.ch_data[ch].iter().map(|&x| x.1).collect().max()as u64;
+          //  x_min = self.ch_data[ch][0].0 as u64;
+          //  x_max = self.ch_data[ch][self.ch_data[ch].len() - 1].0 as u64;
           //}
-          let y_spacing = (y_max - y_min)/5;
-          let y_labels = vec![y_min.to_string(),
-                             (y_min + y_spacing).to_string(),
-                             (y_min + 2*y_spacing).to_string(),
-                             (y_min + 3*y_spacing).to_string(),
-                             (y_min + 4*y_spacing).to_string(),
-                             (y_min + 5*y_spacing).to_string()];
-          let ds = vec![Dataset::default()
-            .name(label.clone())
-            .marker(symbols::Marker::Braille)
-            .graph_type(GraphType::Line)
-            .style(self.theme.style())
-            .data(&self.ch_data[ch])];
-          let chart = Chart::new(ds)
-          .block(
-            Block::default()
-              .borders(Borders::ALL)
-              .style(self.theme.style())
-              .title(label)
-              .border_type(BorderType::Plain),
-          )
-          .x_axis(Axis::default()
-            .title(Span::styled("bin", Style::default().fg(Color::White)))
-            .style(self.theme.style())
-            .bounds([x_min as f64, x_max as f64])
-            .labels(x_labels.clone().iter().cloned().map(Span::from).collect()))
-          .y_axis(Axis::default()
-            .title(Span::styled("ADC", Style::default().fg(Color::White)))
-            .style(self.theme.style())
-            .bounds([y_min as f64, y_max as f64])
-            .labels(y_labels.clone().iter().cloned().map(Span::from).collect()))
-          .style(self.theme.style()); 
+          //
+          ////println!("Ch {} xmin {} xmax {}", ch, x_min, x_max);
+          //let x_spacing = (x_max - x_min)/5;
+          //let x_labels = vec![x_min.to_string(),
+          //                   (x_min + x_spacing).to_string(),
+          //                   (x_min + 2*x_spacing).to_string(),
+          //                   (x_min + 3*x_spacing).to_string(),
+          //                   (x_min + 4*x_spacing).to_string(),
+          //                   (x_min + 5*x_spacing).to_string()];
+          //
+          //let mut y_max = 0u64; //14 bit max
+          //let mut y_min = 16384u64;
+          //for val in self.ch_data[ch].iter() {
+          //  if val.1 > y_max as f64 {
+          //    y_max = val.1 as u64;
+          //  }
+          //  if val.1 < y_min as f64 {
+          //    y_min = val.1 as u64;
+          //  }
+          //}
+          //if y_min > y_max {
+          //  y_min = 0;
+          //  y_max = 16384;
+          //}
+          //
+          ////if self.ch_data[ch].len() != 0 {
+          ////  y_min = self.ch_data[ch].iter().map(|&x| x.1).collect().min() as u64;
+          ////  y_max = self.ch_data[ch].iter().map(|&x| x.1).collect().max()as u64;
+          ////}
+          //let y_spacing = (y_max - y_min)/5;
+          //let y_labels = vec![y_min.to_string(),
+          //                   (y_min + y_spacing).to_string(),
+          //                   (y_min + 2*y_spacing).to_string(),
+          //                   (y_min + 3*y_spacing).to_string(),
+          //                   (y_min + 4*y_spacing).to_string(),
+          //                   (y_min + 5*y_spacing).to_string()];
+          //let ds = vec![Dataset::default()
+          //  .name(label.clone())
+          //  .marker(symbols::Marker::Braille)
+          //  .graph_type(GraphType::Line)
+          //  .style(self.theme.style())
+          //  .data(&self.ch_data[ch])];
+          //let chart = Chart::new(ds)
+          //.block(
+          //  Block::default()
+          //    .borders(Borders::ALL)
+          //    .style(self.theme.style())
+          //    .title(label)
+          //    .border_type(BorderType::Plain),
+          //)
+          //.x_axis(Axis::default()
+          //  .title(Span::styled("bin", Style::default().fg(Color::White)))
+          //  .style(self.theme.style())
+          //  .bounds([x_min as f64, x_max as f64])
+          //  .labels(x_labels.clone().iter().cloned().map(Span::from).collect()))
+          //.y_axis(Axis::default()
+          //  .title(Span::styled("ADC", Style::default().fg(Color::White)))
+          //  .style(self.theme.style())
+          //  .bounds([y_min as f64, y_max as f64])
+          //  .labels(y_labels.clone().iter().cloned().map(Span::from).collect()))
+          //.style(self.theme.style()); 
           // render it!
           if ch == 8 {
-            frame.render_widget(chart, detail_and_ch9_chunks[0]);
+            //frame.render_widget(chart, detail_and_ch9_chunks[0]);
+            frame.render_widget(ch_ts,detail_and_ch9_chunks[0]);
           } else {
-            frame.render_widget(chart, ch_chunks[ch]);
+            frame.render_widget(ch_ts,ch_chunks[ch]);
+            //frame.render_widget(chart, ch_chunks[ch]);
           }
         //charts.push(chart);
         } // end loop over channels

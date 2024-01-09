@@ -312,22 +312,22 @@ impl fmt::Display for PAMoniData {
     write!(f, "<PAMoniData:
   Board ID : {}
   **16 Temp values**
-  T1   : {:.3} [\u{00B0}C]
-  T2   : {:.3} [\u{00B0}C]
-  T3   : {:.3} [\u{00B0}C]
-  T4   : {:.3} [\u{00B0}C]
-  T5   : {:.3} [\u{00B0}C]
-  T6   : {:.3} [\u{00B0}C]
-  T7   : {:.3} [\u{00B0}C]
-  T8   : {:.3} [\u{00B0}C]
-  T9   : {:.3} [\u{00B0}C]
-  T10  : {:.3} [\u{00B0}C]
-  T11  : {:.3} [\u{00B0}C]
-  T12  : {:.3} [\u{00B0}C]
-  T13  : {:.3} [\u{00B0}C]
-  T14  : {:.3} [\u{00B0}C]
-  T15  : {:.3} [\u{00B0}C]
-  T16  : {:.3} [\u{00B0}C]
+  T1   : {:.2} [\u{00B0}C]
+  T2   : {:.2} [\u{00B0}C]
+  T3   : {:.2} [\u{00B0}C]
+  T4   : {:.2} [\u{00B0}C]
+  T5   : {:.2} [\u{00B0}C]
+  T6   : {:.2} [\u{00B0}C]
+  T7   : {:.2} [\u{00B0}C]
+  T8   : {:.2} [\u{00B0}C]
+  T9   : {:.2} [\u{00B0}C]
+  T10  : {:.2} [\u{00B0}C]
+  T11  : {:.2} [\u{00B0}C]
+  T12  : {:.2} [\u{00B0}C]
+  T13  : {:.2} [\u{00B0}C]
+  T14  : {:.2} [\u{00B0}C]
+  T15  : {:.2} [\u{00B0}C]
+  T16  : {:.2} [\u{00B0}C]
   **16 Bias voltages**
   V1   : {:.3} [V]
   V2   : {:.3} [V]
@@ -346,22 +346,22 @@ impl fmt::Display for PAMoniData {
   V15  : {:.3} [V]
   V16  : {:.3} [V]>",
   self.board_id,
-  self.temps[0],
-  self.temps[1],
-  self.temps[2],
-  self.temps[3],
-  self.temps[4],
-  self.temps[5],
-  self.temps[6],
-  self.temps[7],
-  self.temps[8],
-  self.temps[9],
-  self.temps[10],
-  self.temps[11],
-  self.temps[12],
-  self.temps[13],
-  self.temps[14],
-  self.temps[15],
+  if self.temps[0]  != f32::MAX {self.temps[0 ].to_string()} else {String::from("f32::MAX (ERR)")},
+  if self.temps[1]  != f32::MAX {self.temps[1 ].to_string()} else {String::from("f32::MAX (ERR)")},
+  if self.temps[2]  != f32::MAX {self.temps[2 ].to_string()} else {String::from("f32::MAX (ERR)")},
+  if self.temps[3]  != f32::MAX {self.temps[3 ].to_string()} else {String::from("f32::MAX (ERR)")},
+  if self.temps[4]  != f32::MAX {self.temps[4 ].to_string()} else {String::from("f32::MAX (ERR)")},
+  if self.temps[5]  != f32::MAX {self.temps[5 ].to_string()} else {String::from("f32::MAX (ERR)")},
+  if self.temps[6]  != f32::MAX {self.temps[6 ].to_string()} else {String::from("f32::MAX (ERR)")},
+  if self.temps[7]  != f32::MAX {self.temps[7 ].to_string()} else {String::from("f32::MAX (ERR)")},
+  if self.temps[8]  != f32::MAX {self.temps[8 ].to_string()} else {String::from("f32::MAX (ERR)")},
+  if self.temps[9]  != f32::MAX {self.temps[9 ].to_string()} else {String::from("f32::MAX (ERR)")},
+  if self.temps[10] != f32::MAX {self.temps[10].to_string()} else {String::from("f32::MAX (ERR)")},
+  if self.temps[11] != f32::MAX {self.temps[11].to_string()} else {String::from("f32::MAX (ERR)")},
+  if self.temps[12] != f32::MAX {self.temps[12].to_string()} else {String::from("f32::MAX (ERR)")},
+  if self.temps[13] != f32::MAX {self.temps[13].to_string()} else {String::from("f32::MAX (ERR)")},
+  if self.temps[14] != f32::MAX {self.temps[14].to_string()} else {String::from("f32::MAX (ERR)")},
+  if self.temps[15] != f32::MAX {self.temps[15].to_string()} else {String::from("f32::MAX (ERR)")},
   self.biases[0],
   self.biases[1],
   self.biases[2],
