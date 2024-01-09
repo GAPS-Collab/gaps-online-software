@@ -445,6 +445,10 @@ fn main() {
         _                    => error!("The moni command is not implemented for this TofComponent!")
       }
     },
+    Command::SystemdReboot(systemd_reboot_cmd) => {
+      let rb_id = systemd_reboot_cmd.id;
+      liftof_cc::send_systemd_reboot(cmd_sender, rb_id);
+    },
     Command::Power(power_cmd) => {
       match power_cmd {
         PowerCmd::All(power_status) => {

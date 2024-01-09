@@ -240,8 +240,8 @@ pub fn send_ping_response(cmd_sender: Sender<TofPacket>,
 
 /// Function that manages moni commands from ground
 pub fn send_moni(cmd_sender: Sender<TofPacket>,
-  tof_component: TofComponent,
-  id: u8) {
+                tof_component: TofComponent,
+                id: u8) {
   let payload: u32 = PAD_CMD_32BIT | (tof_component as u32) << 8 | (id as u32);
   let moni = TofCommand::Moni(payload);
   let tp = TofPacket::from(&moni);
@@ -253,7 +253,7 @@ pub fn send_moni(cmd_sender: Sender<TofPacket>,
 
 /// Function that just replies to a moni command send to tofcpu
 pub fn send_moni_response(cmd_sender: Sender<TofPacket>,
-           socket:     Socket) {
+                          socket:     Socket) {
   let mut tp = TofPacket::new();
   tp.packet_type = PacketType::Monitor;
   tp.payload = vec![TofComponent::TofCpu as u8, 0u8];
@@ -268,4 +268,16 @@ pub fn send_moni_response(cmd_sender: Sender<TofPacket>,
     Ok(_)    => info!("Responded to Moni!")
   }
   trace!("Resp sent!")
+}
+
+/// Function that send a restart command to RBs
+pub fn send_systemd_reboot(cmd_sender: Sender<TofPacket>,
+                            id: u8) {
+  let payload: u32 = PAD_CMD_32BIT | (id as u32);
+  let systemd_reboot = TofCommand::SystemdReboot(payload);
+  let tp = TofPacket::from(&systemd_reboot);
+  match cmd_sender.send(tp) {
+    Err(err) => error!("Unable to send command, error{err}"),
+    Ok(_)    => ()
+  }
 }

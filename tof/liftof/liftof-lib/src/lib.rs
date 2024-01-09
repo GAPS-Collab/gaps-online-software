@@ -878,6 +878,8 @@ pub enum Command {
   Ping(PingCmd),
   /// Monitor a TOF sub-system.
   Moni(MoniCmd),
+  /// Restart RB systemd
+  SystemdReboot(SystemdRebootCmd),
   /// Power control of TOF sub-systems.
   #[command(subcommand)]
   Power(PowerCmd),
@@ -924,17 +926,46 @@ pub struct MoniCmd {
   #[arg(required = true)]
   pub id: u8
 }
+
+#[derive(Debug, Args, PartialEq)]
+pub struct SystemdRebootCmd {
+  /// RB ID
+  #[arg(required = true)]
+  pub id: u8
+}
 /// END TOF SW cmds ================================================
 
 
 /// Set cmds ====================================================
 #[derive(Debug, Subcommand, PartialEq)]
 pub enum SetCmd {
+  /// Set MT configuration (WHAT SHOULD I DO WITH THIS TODO)
+  //MTConfig(MTConfigOpts),
   /// Set threshold level on all LTBs or a single LTB
   LtbThreshold(LtbThresholdOpts),
   /// Set bias level on all preamps or a single preamp
   PreampBias(PreampBiasOpts)
 }
+
+// #[derive(Debug, Args, PartialEq)]
+// pub struct MTConfigOpts {
+//   /// RB to target in voltage calibration run.
+//   #[arg(short, long, default_value_t = DEFAULT_RB_ID)]
+//   pub id: u8,
+//   /// Theshold level to be set
+//   #[arg(required = true, 
+//         value_parser = clap::value_parser!(i64).range(PREAMP_MIN_BIAS..=PREAMP_MAX_BIAS))]
+//   pub bias: u16
+// }
+
+// impl MTConfigOpts {
+//   pub fn new(id: u8, bias: u16) -> Self {
+//     Self { 
+//       id,
+//       bias
+//     }
+//   }
+// }
 
 #[derive(Debug, Args, PartialEq)]
 pub struct LtbThresholdOpts {
