@@ -104,8 +104,9 @@ if (BUILD_LIFTOF)
   )
   add_custom_target(
     rust-pybindings
-    COMMAND ${CMAKE_SOURCE_DIR}/tof/dataclasses/rust/pybindings/build.sh
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tof/dataclasses/rust/pybindings 
+      ALL
+      COMMAND ${RUST_BUILD_COMMAND} 
+      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tof/dataclasses/rust/pybindings 
   )
   add_custom_target(
     liftof-cc

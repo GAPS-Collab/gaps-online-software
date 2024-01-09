@@ -1,6 +1,9 @@
+
 # CMAKE 
 CMakeCache.txt
 CMakeFiles/*
+Docyfile
+Makefile
 
 # project files
 .idea/*
