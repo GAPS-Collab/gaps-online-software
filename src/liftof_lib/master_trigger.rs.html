@@ -845,15 +845,6 @@
 <a href="#845" id="845">845</a>
 <a href="#846" id="846">846</a>
 <a href="#847" id="847">847</a>
-<a href="#848" id="848">848</a>
-<a href="#849" id="849">849</a>
-<a href="#850" id="850">850</a>
-<a href="#851" id="851">851</a>
-<a href="#852" id="852">852</a>
-<a href="#853" id="853">853</a>
-<a href="#854" id="854">854</a>
-<a href="#855" id="855">855</a>
-<a href="#856" id="856">856</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! MasterTriggerBoard communications
 //!
 //! The MTB (MasterTriggerBoard) is currently
@@ -869,15 +860,6 @@
 //! The data is encoded in IPBus packets.
 //! [see docs here](https://ipbus.web.cern.ch/doc/user/html/)
 //! 
-//! Issues: I do not like the error handling with
-//! Box&lt;dyn Error&gt; here, since the additional runtime
-//! cost. This needs to have a better error handling,
-//! which should not be too difficult, I guess most 
-//! times it can be replaced by some Udp realted 
-//! error. [See issue #21](https://uhhepvcs.phys.hawaii.edu/Achim/gaps-online-software/-/issues/21)
-//! _Comment_ There is not much error handling for UDP. Most of it is that the IPAddress is wrong, 
-//! in this case it is legimate (and adviced) to panic.
-//! In the case, wher no data was received, this might need some thinking.
 </span><span class="kw">use </span>std::error::Error;
 <span class="kw">use </span>std::time::{Duration, Instant};
 <span class="kw">use </span>std::fmt;
