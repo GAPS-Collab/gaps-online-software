@@ -280,6 +280,21 @@
 <a href="#280" id="280">280</a>
 <a href="#281" id="281">281</a>
 <a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
+<a href="#284" id="284">284</a>
+<a href="#285" id="285">285</a>
+<a href="#286" id="286">286</a>
+<a href="#287" id="287">287</a>
+<a href="#288" id="288">288</a>
+<a href="#289" id="289">289</a>
+<a href="#290" id="290">290</a>
+<a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
+<a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
+<a href="#295" id="295">295</a>
+<a href="#296" id="296">296</a>
+<a href="#297" id="297">297</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! On-board memory management for readoutboards
 //! 
 //! The DRS4 is able to map its registers and the 
@@ -331,15 +346,33 @@
 
 
 <span class="attr">#[derive(Debug, Copy, Clone)]
-</span><span class="kw">pub struct </span>RegisterError {
+</span><span class="kw">pub enum </span>RegisterError {
+  RegisterTimeOut,
+  MMapFail,
+  Unknown,
 }
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>RegisterError {
-
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
-    <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, <span class="string">&quot;&lt;RegisterError&gt;&quot;</span>)
+    <span class="kw">let </span>etype : String;
+    <span class="kw">match </span><span class="self">self </span>{
+      RegisterError::RegisterTimeOut =&gt; {
+        etype = String::from(<span class="string">&quot;RegisterTimeOut&quot;</span>);
+      },
+      RegisterError::Unknown =&gt; {
+        etype = String::from(<span class="string">&quot;Unknown&quot;</span>);
+      },
+      <span class="kw">_ </span>=&gt; {
+        etype = String::from(<span class="string">&quot;not defined&quot;</span>);
+      }
+    }
+    <span class="macro">write!</span>(f, <span class="string">&quot;&lt;RegisterError: {}&gt;&quot;</span>, etype)
   }
 }
+
+<span class="kw">impl </span>Error <span class="kw">for </span>RegisterError {
+}
+
 
 <span class="doccomment">///! There are 2 data buffers, commonly 
 ///  denoted as &quot;A&quot; and &quot;B&quot;.
@@ -432,9 +465,8 @@
   </span><span class="kw">let </span>m = <span class="kw">match </span>map_physical_mem_read(UIO0, addr, SIZEOF_U32) {
     <span class="prelude-val">Ok</span>(m) =&gt; m,
     <span class="prelude-val">Err</span>(err) =&gt; {
-      <span class="kw">let </span>error = RegisterError {};
-      <span class="macro">warn!</span>(<span class="string">&quot;Failed to mmap: Err={:?}&quot;</span>, err);
-      <span class="kw">return </span><span class="prelude-val">Err</span>(error);
+      <span class="macro">error!</span>(<span class="string">&quot;Failed to mmap: {:?}&quot;</span>, err);
+      <span class="kw">return </span><span class="prelude-val">Err</span>(RegisterError::MMapFail);
     }
   };
   <span class="kw">let </span>p = m.as_ptr() <span class="kw">as </span><span class="kw-2">*const </span>u32;
@@ -457,9 +489,8 @@
   </span><span class="kw">let </span>m = <span class="kw">match </span>map_physical_mem_write(UIO0,addr,SIZEOF_U32) {
     <span class="prelude-val">Ok</span>(m) =&gt; m,
     <span class="prelude-val">Err</span>(err) =&gt; {
-      <span class="kw">let </span>error = RegisterError {};
-      <span class="macro">warn!</span>(<span class="string">&quot;[write_control_reg] Failed to mmap: Err={:?}&quot;</span>, err);
-      <span class="kw">return </span><span class="prelude-val">Err</span>(error);
+      <span class="macro">warn!</span>(<span class="string">&quot;[write_control_reg] Failed to mmap! {:?}&quot;</span>, err);
+      <span class="kw">return </span><span class="prelude-val">Err</span>(RegisterError::MMapFail);
     }
   };
   <span class="kw">let </span>p = m.as_ptr() <span class="kw">as </span><span class="kw-2">*mut </span>u32;
@@ -498,9 +529,9 @@
   <span class="comment">//let mut m = match map_physical_mem_write(addr_space, 0x0, size) {
     </span><span class="prelude-val">Ok</span>(m) =&gt; m,
     <span class="prelude-val">Err</span>(err) =&gt; {
-      <span class="kw">let </span>error = RegisterError {};
-      <span class="macro">warn!</span>(<span class="string">&quot;Failed to mmap: Err={:?}&quot;</span>, err);
-      <span class="kw">return </span><span class="prelude-val">Err</span>(error);
+      <span class="comment">//let error = RegisterError {};
+      </span><span class="macro">warn!</span>(<span class="string">&quot;Failed to mmap! {:?}&quot;</span>, err);
+      <span class="kw">return </span><span class="prelude-val">Err</span>(RegisterError::MMapFail);
     }
   };
  
@@ -540,9 +571,8 @@
   <span class="comment">//let mut m = match map_physical_mem_write(addr_space, 0x0, size) {
     </span><span class="prelude-val">Ok</span>(m) =&gt; m,
     <span class="prelude-val">Err</span>(err) =&gt; {
-      <span class="kw">let </span>error = RegisterError {};
-      <span class="macro">warn!</span>(<span class="string">&quot;Failed to mmap: Err={:?}&quot;</span>, err);
-      <span class="kw">return </span><span class="prelude-val">Err</span>(error);
+      <span class="macro">warn!</span>(<span class="string">&quot;Failed to mmap: {:?}&quot;</span>, err);
+      <span class="kw">return </span><span class="prelude-val">Err</span>(RegisterError::MMapFail);
     }
   };
   <span class="kw">let </span>p = m.as_ptr() <span class="kw">as </span><span class="kw-2">*const </span>u8;

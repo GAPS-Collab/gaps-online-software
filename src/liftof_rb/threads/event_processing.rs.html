@@ -371,9 +371,12 @@
 <a href="#371" id="371">371</a>
 <a href="#372" id="372">372</a>
 <a href="#373" id="373">373</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>std::thread;
-<span class="kw">use </span>std::path::PathBuf;
-<span class="kw">use </span>std::time::Duration;
+<a href="#374" id="374">374</a>
+<a href="#375" id="375">375</a>
+<a href="#376" id="376">376</a>
+<a href="#377" id="377">377</a>
+<a href="#378" id="378">378</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::path::PathBuf;
 <span class="kw">use </span>std::sync::{
     Arc,
     Mutex,
@@ -382,7 +385,6 @@
 <span class="kw">use </span>crossbeam_channel::{Sender,
                         Receiver};
 
-<span class="kw">use </span>tof_dataclasses::RBChannelPaddleEndIDMap;
 <span class="kw">use </span>tof_dataclasses::events::DataType;
 <span class="kw">use </span>tof_dataclasses::serialization::Serialization;
 <span class="kw">use </span>tof_dataclasses::packets::{
@@ -503,20 +505,28 @@
       <span class="kw">match </span>get_op_mode.try_recv() {
         <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">trace!</span>(<span class="string">&quot;No op mode change detected! Err {err}&quot;</span>),
         <span class="prelude-val">Ok</span>(mode) =&gt; {
-          
           <span class="macro">warn!</span>(<span class="string">&quot;Will change operation mode to {:?}!&quot;</span>, mode);
           <span class="kw">match </span>mode {
             TofOperationMode::RequestReply =&gt; {
               streamer.request_mode = <span class="bool-val">true</span>;
               op_mode_stream = <span class="bool-val">false</span>;
+              op_mode = mode;
             },
             TofOperationMode::StreamAny    =&gt; {
               op_mode_stream = <span class="bool-val">true</span>;
               streamer.request_mode = <span class="bool-val">false</span>;
+              op_mode = mode;
             },
+            TofOperationMode::RBWaveform   =&gt; {
+              <span class="kw">if </span>!cali_loaded {
+                <span class="macro">error!</span>(<span class="string">&quot;Requesting waveform analysis without having a calibration loaded!&quot;</span>);
+                <span class="macro">error!</span>(<span class="string">&quot;Can&#39;t do waveform analysis without calibration!&quot;</span>);
+                <span class="macro">error!</span>(<span class="string">&quot;Switching mode to StreamAny&quot;</span>);
+                op_mode = TofOperationMode::StreamAny;
+              }
+            }
             <span class="kw">_ </span>=&gt; (),
           }
-          op_mode = mode;
         }
       }
     }

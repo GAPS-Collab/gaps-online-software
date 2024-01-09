@@ -336,6 +336,15 @@
 <a href="#336" id="336">336</a>
 <a href="#337" id="337">337</a>
 <a href="#338" id="338">338</a>
+<a href="#339" id="339">339</a>
+<a href="#340" id="340">340</a>
+<a href="#341" id="341">341</a>
+<a href="#342" id="342">342</a>
+<a href="#343" id="343">343</a>
+<a href="#344" id="344">344</a>
+<a href="#345" id="345">345</a>
+<a href="#346" id="346">346</a>
+<a href="#347" id="347">347</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Convenience functions to read/write
 //!  the various control registers
 //!
@@ -410,8 +419,17 @@
   <span class="kw">let </span>eight_cycles = Duration::from_micros(<span class="number">4</span>);
   write_control_reg(SOFT_RESET, <span class="number">0x1</span>)<span class="question-mark">?</span>;
   thread::sleep(eight_cycles);
+  <span class="kw">let </span><span class="kw-2">mut </span>ncycles = <span class="number">0</span>;
   <span class="kw">while </span>!soft_reset_done()<span class="question-mark">? </span>{
     thread::sleep(eight_cycles);
+    ncycles += <span class="number">1</span>;
+    <span class="kw">if </span>ncycles % <span class="number">10 </span>== <span class="number">0 </span>{
+      <span class="macro">error!</span>(<span class="string">&quot;Not getting SOFT_RESET_DONE acknowledged. Will try DMA reset&quot;</span>);
+      reset_dma();
+    }
+    <span class="kw">if </span>ncycles == <span class="number">29 </span>{
+      <span class="kw">return </span><span class="prelude-val">Err</span>(RegisterError::RegisterTimeOut);     
+    }
   }
   <span class="prelude-val">Ok</span>(())
 }

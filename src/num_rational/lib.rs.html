@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/num-rational-0.4.1/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="num_rational" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.1 (a28077b28 2023-12-04)" data-channel="1.74.1" data-search-js="search-8be46b629f5f14a8.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../num_rational/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/num-rational-0.2.4/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="num_rational" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.1 (a28077b28 2023-12-04)" data-channel="1.74.1" data-search-js="search-8be46b629f5f14a8.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../num_rational/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -2514,596 +2514,6 @@
 <a href="#2514" id="2514">2514</a>
 <a href="#2515" id="2515">2515</a>
 <a href="#2516" id="2516">2516</a>
-<a href="#2517" id="2517">2517</a>
-<a href="#2518" id="2518">2518</a>
-<a href="#2519" id="2519">2519</a>
-<a href="#2520" id="2520">2520</a>
-<a href="#2521" id="2521">2521</a>
-<a href="#2522" id="2522">2522</a>
-<a href="#2523" id="2523">2523</a>
-<a href="#2524" id="2524">2524</a>
-<a href="#2525" id="2525">2525</a>
-<a href="#2526" id="2526">2526</a>
-<a href="#2527" id="2527">2527</a>
-<a href="#2528" id="2528">2528</a>
-<a href="#2529" id="2529">2529</a>
-<a href="#2530" id="2530">2530</a>
-<a href="#2531" id="2531">2531</a>
-<a href="#2532" id="2532">2532</a>
-<a href="#2533" id="2533">2533</a>
-<a href="#2534" id="2534">2534</a>
-<a href="#2535" id="2535">2535</a>
-<a href="#2536" id="2536">2536</a>
-<a href="#2537" id="2537">2537</a>
-<a href="#2538" id="2538">2538</a>
-<a href="#2539" id="2539">2539</a>
-<a href="#2540" id="2540">2540</a>
-<a href="#2541" id="2541">2541</a>
-<a href="#2542" id="2542">2542</a>
-<a href="#2543" id="2543">2543</a>
-<a href="#2544" id="2544">2544</a>
-<a href="#2545" id="2545">2545</a>
-<a href="#2546" id="2546">2546</a>
-<a href="#2547" id="2547">2547</a>
-<a href="#2548" id="2548">2548</a>
-<a href="#2549" id="2549">2549</a>
-<a href="#2550" id="2550">2550</a>
-<a href="#2551" id="2551">2551</a>
-<a href="#2552" id="2552">2552</a>
-<a href="#2553" id="2553">2553</a>
-<a href="#2554" id="2554">2554</a>
-<a href="#2555" id="2555">2555</a>
-<a href="#2556" id="2556">2556</a>
-<a href="#2557" id="2557">2557</a>
-<a href="#2558" id="2558">2558</a>
-<a href="#2559" id="2559">2559</a>
-<a href="#2560" id="2560">2560</a>
-<a href="#2561" id="2561">2561</a>
-<a href="#2562" id="2562">2562</a>
-<a href="#2563" id="2563">2563</a>
-<a href="#2564" id="2564">2564</a>
-<a href="#2565" id="2565">2565</a>
-<a href="#2566" id="2566">2566</a>
-<a href="#2567" id="2567">2567</a>
-<a href="#2568" id="2568">2568</a>
-<a href="#2569" id="2569">2569</a>
-<a href="#2570" id="2570">2570</a>
-<a href="#2571" id="2571">2571</a>
-<a href="#2572" id="2572">2572</a>
-<a href="#2573" id="2573">2573</a>
-<a href="#2574" id="2574">2574</a>
-<a href="#2575" id="2575">2575</a>
-<a href="#2576" id="2576">2576</a>
-<a href="#2577" id="2577">2577</a>
-<a href="#2578" id="2578">2578</a>
-<a href="#2579" id="2579">2579</a>
-<a href="#2580" id="2580">2580</a>
-<a href="#2581" id="2581">2581</a>
-<a href="#2582" id="2582">2582</a>
-<a href="#2583" id="2583">2583</a>
-<a href="#2584" id="2584">2584</a>
-<a href="#2585" id="2585">2585</a>
-<a href="#2586" id="2586">2586</a>
-<a href="#2587" id="2587">2587</a>
-<a href="#2588" id="2588">2588</a>
-<a href="#2589" id="2589">2589</a>
-<a href="#2590" id="2590">2590</a>
-<a href="#2591" id="2591">2591</a>
-<a href="#2592" id="2592">2592</a>
-<a href="#2593" id="2593">2593</a>
-<a href="#2594" id="2594">2594</a>
-<a href="#2595" id="2595">2595</a>
-<a href="#2596" id="2596">2596</a>
-<a href="#2597" id="2597">2597</a>
-<a href="#2598" id="2598">2598</a>
-<a href="#2599" id="2599">2599</a>
-<a href="#2600" id="2600">2600</a>
-<a href="#2601" id="2601">2601</a>
-<a href="#2602" id="2602">2602</a>
-<a href="#2603" id="2603">2603</a>
-<a href="#2604" id="2604">2604</a>
-<a href="#2605" id="2605">2605</a>
-<a href="#2606" id="2606">2606</a>
-<a href="#2607" id="2607">2607</a>
-<a href="#2608" id="2608">2608</a>
-<a href="#2609" id="2609">2609</a>
-<a href="#2610" id="2610">2610</a>
-<a href="#2611" id="2611">2611</a>
-<a href="#2612" id="2612">2612</a>
-<a href="#2613" id="2613">2613</a>
-<a href="#2614" id="2614">2614</a>
-<a href="#2615" id="2615">2615</a>
-<a href="#2616" id="2616">2616</a>
-<a href="#2617" id="2617">2617</a>
-<a href="#2618" id="2618">2618</a>
-<a href="#2619" id="2619">2619</a>
-<a href="#2620" id="2620">2620</a>
-<a href="#2621" id="2621">2621</a>
-<a href="#2622" id="2622">2622</a>
-<a href="#2623" id="2623">2623</a>
-<a href="#2624" id="2624">2624</a>
-<a href="#2625" id="2625">2625</a>
-<a href="#2626" id="2626">2626</a>
-<a href="#2627" id="2627">2627</a>
-<a href="#2628" id="2628">2628</a>
-<a href="#2629" id="2629">2629</a>
-<a href="#2630" id="2630">2630</a>
-<a href="#2631" id="2631">2631</a>
-<a href="#2632" id="2632">2632</a>
-<a href="#2633" id="2633">2633</a>
-<a href="#2634" id="2634">2634</a>
-<a href="#2635" id="2635">2635</a>
-<a href="#2636" id="2636">2636</a>
-<a href="#2637" id="2637">2637</a>
-<a href="#2638" id="2638">2638</a>
-<a href="#2639" id="2639">2639</a>
-<a href="#2640" id="2640">2640</a>
-<a href="#2641" id="2641">2641</a>
-<a href="#2642" id="2642">2642</a>
-<a href="#2643" id="2643">2643</a>
-<a href="#2644" id="2644">2644</a>
-<a href="#2645" id="2645">2645</a>
-<a href="#2646" id="2646">2646</a>
-<a href="#2647" id="2647">2647</a>
-<a href="#2648" id="2648">2648</a>
-<a href="#2649" id="2649">2649</a>
-<a href="#2650" id="2650">2650</a>
-<a href="#2651" id="2651">2651</a>
-<a href="#2652" id="2652">2652</a>
-<a href="#2653" id="2653">2653</a>
-<a href="#2654" id="2654">2654</a>
-<a href="#2655" id="2655">2655</a>
-<a href="#2656" id="2656">2656</a>
-<a href="#2657" id="2657">2657</a>
-<a href="#2658" id="2658">2658</a>
-<a href="#2659" id="2659">2659</a>
-<a href="#2660" id="2660">2660</a>
-<a href="#2661" id="2661">2661</a>
-<a href="#2662" id="2662">2662</a>
-<a href="#2663" id="2663">2663</a>
-<a href="#2664" id="2664">2664</a>
-<a href="#2665" id="2665">2665</a>
-<a href="#2666" id="2666">2666</a>
-<a href="#2667" id="2667">2667</a>
-<a href="#2668" id="2668">2668</a>
-<a href="#2669" id="2669">2669</a>
-<a href="#2670" id="2670">2670</a>
-<a href="#2671" id="2671">2671</a>
-<a href="#2672" id="2672">2672</a>
-<a href="#2673" id="2673">2673</a>
-<a href="#2674" id="2674">2674</a>
-<a href="#2675" id="2675">2675</a>
-<a href="#2676" id="2676">2676</a>
-<a href="#2677" id="2677">2677</a>
-<a href="#2678" id="2678">2678</a>
-<a href="#2679" id="2679">2679</a>
-<a href="#2680" id="2680">2680</a>
-<a href="#2681" id="2681">2681</a>
-<a href="#2682" id="2682">2682</a>
-<a href="#2683" id="2683">2683</a>
-<a href="#2684" id="2684">2684</a>
-<a href="#2685" id="2685">2685</a>
-<a href="#2686" id="2686">2686</a>
-<a href="#2687" id="2687">2687</a>
-<a href="#2688" id="2688">2688</a>
-<a href="#2689" id="2689">2689</a>
-<a href="#2690" id="2690">2690</a>
-<a href="#2691" id="2691">2691</a>
-<a href="#2692" id="2692">2692</a>
-<a href="#2693" id="2693">2693</a>
-<a href="#2694" id="2694">2694</a>
-<a href="#2695" id="2695">2695</a>
-<a href="#2696" id="2696">2696</a>
-<a href="#2697" id="2697">2697</a>
-<a href="#2698" id="2698">2698</a>
-<a href="#2699" id="2699">2699</a>
-<a href="#2700" id="2700">2700</a>
-<a href="#2701" id="2701">2701</a>
-<a href="#2702" id="2702">2702</a>
-<a href="#2703" id="2703">2703</a>
-<a href="#2704" id="2704">2704</a>
-<a href="#2705" id="2705">2705</a>
-<a href="#2706" id="2706">2706</a>
-<a href="#2707" id="2707">2707</a>
-<a href="#2708" id="2708">2708</a>
-<a href="#2709" id="2709">2709</a>
-<a href="#2710" id="2710">2710</a>
-<a href="#2711" id="2711">2711</a>
-<a href="#2712" id="2712">2712</a>
-<a href="#2713" id="2713">2713</a>
-<a href="#2714" id="2714">2714</a>
-<a href="#2715" id="2715">2715</a>
-<a href="#2716" id="2716">2716</a>
-<a href="#2717" id="2717">2717</a>
-<a href="#2718" id="2718">2718</a>
-<a href="#2719" id="2719">2719</a>
-<a href="#2720" id="2720">2720</a>
-<a href="#2721" id="2721">2721</a>
-<a href="#2722" id="2722">2722</a>
-<a href="#2723" id="2723">2723</a>
-<a href="#2724" id="2724">2724</a>
-<a href="#2725" id="2725">2725</a>
-<a href="#2726" id="2726">2726</a>
-<a href="#2727" id="2727">2727</a>
-<a href="#2728" id="2728">2728</a>
-<a href="#2729" id="2729">2729</a>
-<a href="#2730" id="2730">2730</a>
-<a href="#2731" id="2731">2731</a>
-<a href="#2732" id="2732">2732</a>
-<a href="#2733" id="2733">2733</a>
-<a href="#2734" id="2734">2734</a>
-<a href="#2735" id="2735">2735</a>
-<a href="#2736" id="2736">2736</a>
-<a href="#2737" id="2737">2737</a>
-<a href="#2738" id="2738">2738</a>
-<a href="#2739" id="2739">2739</a>
-<a href="#2740" id="2740">2740</a>
-<a href="#2741" id="2741">2741</a>
-<a href="#2742" id="2742">2742</a>
-<a href="#2743" id="2743">2743</a>
-<a href="#2744" id="2744">2744</a>
-<a href="#2745" id="2745">2745</a>
-<a href="#2746" id="2746">2746</a>
-<a href="#2747" id="2747">2747</a>
-<a href="#2748" id="2748">2748</a>
-<a href="#2749" id="2749">2749</a>
-<a href="#2750" id="2750">2750</a>
-<a href="#2751" id="2751">2751</a>
-<a href="#2752" id="2752">2752</a>
-<a href="#2753" id="2753">2753</a>
-<a href="#2754" id="2754">2754</a>
-<a href="#2755" id="2755">2755</a>
-<a href="#2756" id="2756">2756</a>
-<a href="#2757" id="2757">2757</a>
-<a href="#2758" id="2758">2758</a>
-<a href="#2759" id="2759">2759</a>
-<a href="#2760" id="2760">2760</a>
-<a href="#2761" id="2761">2761</a>
-<a href="#2762" id="2762">2762</a>
-<a href="#2763" id="2763">2763</a>
-<a href="#2764" id="2764">2764</a>
-<a href="#2765" id="2765">2765</a>
-<a href="#2766" id="2766">2766</a>
-<a href="#2767" id="2767">2767</a>
-<a href="#2768" id="2768">2768</a>
-<a href="#2769" id="2769">2769</a>
-<a href="#2770" id="2770">2770</a>
-<a href="#2771" id="2771">2771</a>
-<a href="#2772" id="2772">2772</a>
-<a href="#2773" id="2773">2773</a>
-<a href="#2774" id="2774">2774</a>
-<a href="#2775" id="2775">2775</a>
-<a href="#2776" id="2776">2776</a>
-<a href="#2777" id="2777">2777</a>
-<a href="#2778" id="2778">2778</a>
-<a href="#2779" id="2779">2779</a>
-<a href="#2780" id="2780">2780</a>
-<a href="#2781" id="2781">2781</a>
-<a href="#2782" id="2782">2782</a>
-<a href="#2783" id="2783">2783</a>
-<a href="#2784" id="2784">2784</a>
-<a href="#2785" id="2785">2785</a>
-<a href="#2786" id="2786">2786</a>
-<a href="#2787" id="2787">2787</a>
-<a href="#2788" id="2788">2788</a>
-<a href="#2789" id="2789">2789</a>
-<a href="#2790" id="2790">2790</a>
-<a href="#2791" id="2791">2791</a>
-<a href="#2792" id="2792">2792</a>
-<a href="#2793" id="2793">2793</a>
-<a href="#2794" id="2794">2794</a>
-<a href="#2795" id="2795">2795</a>
-<a href="#2796" id="2796">2796</a>
-<a href="#2797" id="2797">2797</a>
-<a href="#2798" id="2798">2798</a>
-<a href="#2799" id="2799">2799</a>
-<a href="#2800" id="2800">2800</a>
-<a href="#2801" id="2801">2801</a>
-<a href="#2802" id="2802">2802</a>
-<a href="#2803" id="2803">2803</a>
-<a href="#2804" id="2804">2804</a>
-<a href="#2805" id="2805">2805</a>
-<a href="#2806" id="2806">2806</a>
-<a href="#2807" id="2807">2807</a>
-<a href="#2808" id="2808">2808</a>
-<a href="#2809" id="2809">2809</a>
-<a href="#2810" id="2810">2810</a>
-<a href="#2811" id="2811">2811</a>
-<a href="#2812" id="2812">2812</a>
-<a href="#2813" id="2813">2813</a>
-<a href="#2814" id="2814">2814</a>
-<a href="#2815" id="2815">2815</a>
-<a href="#2816" id="2816">2816</a>
-<a href="#2817" id="2817">2817</a>
-<a href="#2818" id="2818">2818</a>
-<a href="#2819" id="2819">2819</a>
-<a href="#2820" id="2820">2820</a>
-<a href="#2821" id="2821">2821</a>
-<a href="#2822" id="2822">2822</a>
-<a href="#2823" id="2823">2823</a>
-<a href="#2824" id="2824">2824</a>
-<a href="#2825" id="2825">2825</a>
-<a href="#2826" id="2826">2826</a>
-<a href="#2827" id="2827">2827</a>
-<a href="#2828" id="2828">2828</a>
-<a href="#2829" id="2829">2829</a>
-<a href="#2830" id="2830">2830</a>
-<a href="#2831" id="2831">2831</a>
-<a href="#2832" id="2832">2832</a>
-<a href="#2833" id="2833">2833</a>
-<a href="#2834" id="2834">2834</a>
-<a href="#2835" id="2835">2835</a>
-<a href="#2836" id="2836">2836</a>
-<a href="#2837" id="2837">2837</a>
-<a href="#2838" id="2838">2838</a>
-<a href="#2839" id="2839">2839</a>
-<a href="#2840" id="2840">2840</a>
-<a href="#2841" id="2841">2841</a>
-<a href="#2842" id="2842">2842</a>
-<a href="#2843" id="2843">2843</a>
-<a href="#2844" id="2844">2844</a>
-<a href="#2845" id="2845">2845</a>
-<a href="#2846" id="2846">2846</a>
-<a href="#2847" id="2847">2847</a>
-<a href="#2848" id="2848">2848</a>
-<a href="#2849" id="2849">2849</a>
-<a href="#2850" id="2850">2850</a>
-<a href="#2851" id="2851">2851</a>
-<a href="#2852" id="2852">2852</a>
-<a href="#2853" id="2853">2853</a>
-<a href="#2854" id="2854">2854</a>
-<a href="#2855" id="2855">2855</a>
-<a href="#2856" id="2856">2856</a>
-<a href="#2857" id="2857">2857</a>
-<a href="#2858" id="2858">2858</a>
-<a href="#2859" id="2859">2859</a>
-<a href="#2860" id="2860">2860</a>
-<a href="#2861" id="2861">2861</a>
-<a href="#2862" id="2862">2862</a>
-<a href="#2863" id="2863">2863</a>
-<a href="#2864" id="2864">2864</a>
-<a href="#2865" id="2865">2865</a>
-<a href="#2866" id="2866">2866</a>
-<a href="#2867" id="2867">2867</a>
-<a href="#2868" id="2868">2868</a>
-<a href="#2869" id="2869">2869</a>
-<a href="#2870" id="2870">2870</a>
-<a href="#2871" id="2871">2871</a>
-<a href="#2872" id="2872">2872</a>
-<a href="#2873" id="2873">2873</a>
-<a href="#2874" id="2874">2874</a>
-<a href="#2875" id="2875">2875</a>
-<a href="#2876" id="2876">2876</a>
-<a href="#2877" id="2877">2877</a>
-<a href="#2878" id="2878">2878</a>
-<a href="#2879" id="2879">2879</a>
-<a href="#2880" id="2880">2880</a>
-<a href="#2881" id="2881">2881</a>
-<a href="#2882" id="2882">2882</a>
-<a href="#2883" id="2883">2883</a>
-<a href="#2884" id="2884">2884</a>
-<a href="#2885" id="2885">2885</a>
-<a href="#2886" id="2886">2886</a>
-<a href="#2887" id="2887">2887</a>
-<a href="#2888" id="2888">2888</a>
-<a href="#2889" id="2889">2889</a>
-<a href="#2890" id="2890">2890</a>
-<a href="#2891" id="2891">2891</a>
-<a href="#2892" id="2892">2892</a>
-<a href="#2893" id="2893">2893</a>
-<a href="#2894" id="2894">2894</a>
-<a href="#2895" id="2895">2895</a>
-<a href="#2896" id="2896">2896</a>
-<a href="#2897" id="2897">2897</a>
-<a href="#2898" id="2898">2898</a>
-<a href="#2899" id="2899">2899</a>
-<a href="#2900" id="2900">2900</a>
-<a href="#2901" id="2901">2901</a>
-<a href="#2902" id="2902">2902</a>
-<a href="#2903" id="2903">2903</a>
-<a href="#2904" id="2904">2904</a>
-<a href="#2905" id="2905">2905</a>
-<a href="#2906" id="2906">2906</a>
-<a href="#2907" id="2907">2907</a>
-<a href="#2908" id="2908">2908</a>
-<a href="#2909" id="2909">2909</a>
-<a href="#2910" id="2910">2910</a>
-<a href="#2911" id="2911">2911</a>
-<a href="#2912" id="2912">2912</a>
-<a href="#2913" id="2913">2913</a>
-<a href="#2914" id="2914">2914</a>
-<a href="#2915" id="2915">2915</a>
-<a href="#2916" id="2916">2916</a>
-<a href="#2917" id="2917">2917</a>
-<a href="#2918" id="2918">2918</a>
-<a href="#2919" id="2919">2919</a>
-<a href="#2920" id="2920">2920</a>
-<a href="#2921" id="2921">2921</a>
-<a href="#2922" id="2922">2922</a>
-<a href="#2923" id="2923">2923</a>
-<a href="#2924" id="2924">2924</a>
-<a href="#2925" id="2925">2925</a>
-<a href="#2926" id="2926">2926</a>
-<a href="#2927" id="2927">2927</a>
-<a href="#2928" id="2928">2928</a>
-<a href="#2929" id="2929">2929</a>
-<a href="#2930" id="2930">2930</a>
-<a href="#2931" id="2931">2931</a>
-<a href="#2932" id="2932">2932</a>
-<a href="#2933" id="2933">2933</a>
-<a href="#2934" id="2934">2934</a>
-<a href="#2935" id="2935">2935</a>
-<a href="#2936" id="2936">2936</a>
-<a href="#2937" id="2937">2937</a>
-<a href="#2938" id="2938">2938</a>
-<a href="#2939" id="2939">2939</a>
-<a href="#2940" id="2940">2940</a>
-<a href="#2941" id="2941">2941</a>
-<a href="#2942" id="2942">2942</a>
-<a href="#2943" id="2943">2943</a>
-<a href="#2944" id="2944">2944</a>
-<a href="#2945" id="2945">2945</a>
-<a href="#2946" id="2946">2946</a>
-<a href="#2947" id="2947">2947</a>
-<a href="#2948" id="2948">2948</a>
-<a href="#2949" id="2949">2949</a>
-<a href="#2950" id="2950">2950</a>
-<a href="#2951" id="2951">2951</a>
-<a href="#2952" id="2952">2952</a>
-<a href="#2953" id="2953">2953</a>
-<a href="#2954" id="2954">2954</a>
-<a href="#2955" id="2955">2955</a>
-<a href="#2956" id="2956">2956</a>
-<a href="#2957" id="2957">2957</a>
-<a href="#2958" id="2958">2958</a>
-<a href="#2959" id="2959">2959</a>
-<a href="#2960" id="2960">2960</a>
-<a href="#2961" id="2961">2961</a>
-<a href="#2962" id="2962">2962</a>
-<a href="#2963" id="2963">2963</a>
-<a href="#2964" id="2964">2964</a>
-<a href="#2965" id="2965">2965</a>
-<a href="#2966" id="2966">2966</a>
-<a href="#2967" id="2967">2967</a>
-<a href="#2968" id="2968">2968</a>
-<a href="#2969" id="2969">2969</a>
-<a href="#2970" id="2970">2970</a>
-<a href="#2971" id="2971">2971</a>
-<a href="#2972" id="2972">2972</a>
-<a href="#2973" id="2973">2973</a>
-<a href="#2974" id="2974">2974</a>
-<a href="#2975" id="2975">2975</a>
-<a href="#2976" id="2976">2976</a>
-<a href="#2977" id="2977">2977</a>
-<a href="#2978" id="2978">2978</a>
-<a href="#2979" id="2979">2979</a>
-<a href="#2980" id="2980">2980</a>
-<a href="#2981" id="2981">2981</a>
-<a href="#2982" id="2982">2982</a>
-<a href="#2983" id="2983">2983</a>
-<a href="#2984" id="2984">2984</a>
-<a href="#2985" id="2985">2985</a>
-<a href="#2986" id="2986">2986</a>
-<a href="#2987" id="2987">2987</a>
-<a href="#2988" id="2988">2988</a>
-<a href="#2989" id="2989">2989</a>
-<a href="#2990" id="2990">2990</a>
-<a href="#2991" id="2991">2991</a>
-<a href="#2992" id="2992">2992</a>
-<a href="#2993" id="2993">2993</a>
-<a href="#2994" id="2994">2994</a>
-<a href="#2995" id="2995">2995</a>
-<a href="#2996" id="2996">2996</a>
-<a href="#2997" id="2997">2997</a>
-<a href="#2998" id="2998">2998</a>
-<a href="#2999" id="2999">2999</a>
-<a href="#3000" id="3000">3000</a>
-<a href="#3001" id="3001">3001</a>
-<a href="#3002" id="3002">3002</a>
-<a href="#3003" id="3003">3003</a>
-<a href="#3004" id="3004">3004</a>
-<a href="#3005" id="3005">3005</a>
-<a href="#3006" id="3006">3006</a>
-<a href="#3007" id="3007">3007</a>
-<a href="#3008" id="3008">3008</a>
-<a href="#3009" id="3009">3009</a>
-<a href="#3010" id="3010">3010</a>
-<a href="#3011" id="3011">3011</a>
-<a href="#3012" id="3012">3012</a>
-<a href="#3013" id="3013">3013</a>
-<a href="#3014" id="3014">3014</a>
-<a href="#3015" id="3015">3015</a>
-<a href="#3016" id="3016">3016</a>
-<a href="#3017" id="3017">3017</a>
-<a href="#3018" id="3018">3018</a>
-<a href="#3019" id="3019">3019</a>
-<a href="#3020" id="3020">3020</a>
-<a href="#3021" id="3021">3021</a>
-<a href="#3022" id="3022">3022</a>
-<a href="#3023" id="3023">3023</a>
-<a href="#3024" id="3024">3024</a>
-<a href="#3025" id="3025">3025</a>
-<a href="#3026" id="3026">3026</a>
-<a href="#3027" id="3027">3027</a>
-<a href="#3028" id="3028">3028</a>
-<a href="#3029" id="3029">3029</a>
-<a href="#3030" id="3030">3030</a>
-<a href="#3031" id="3031">3031</a>
-<a href="#3032" id="3032">3032</a>
-<a href="#3033" id="3033">3033</a>
-<a href="#3034" id="3034">3034</a>
-<a href="#3035" id="3035">3035</a>
-<a href="#3036" id="3036">3036</a>
-<a href="#3037" id="3037">3037</a>
-<a href="#3038" id="3038">3038</a>
-<a href="#3039" id="3039">3039</a>
-<a href="#3040" id="3040">3040</a>
-<a href="#3041" id="3041">3041</a>
-<a href="#3042" id="3042">3042</a>
-<a href="#3043" id="3043">3043</a>
-<a href="#3044" id="3044">3044</a>
-<a href="#3045" id="3045">3045</a>
-<a href="#3046" id="3046">3046</a>
-<a href="#3047" id="3047">3047</a>
-<a href="#3048" id="3048">3048</a>
-<a href="#3049" id="3049">3049</a>
-<a href="#3050" id="3050">3050</a>
-<a href="#3051" id="3051">3051</a>
-<a href="#3052" id="3052">3052</a>
-<a href="#3053" id="3053">3053</a>
-<a href="#3054" id="3054">3054</a>
-<a href="#3055" id="3055">3055</a>
-<a href="#3056" id="3056">3056</a>
-<a href="#3057" id="3057">3057</a>
-<a href="#3058" id="3058">3058</a>
-<a href="#3059" id="3059">3059</a>
-<a href="#3060" id="3060">3060</a>
-<a href="#3061" id="3061">3061</a>
-<a href="#3062" id="3062">3062</a>
-<a href="#3063" id="3063">3063</a>
-<a href="#3064" id="3064">3064</a>
-<a href="#3065" id="3065">3065</a>
-<a href="#3066" id="3066">3066</a>
-<a href="#3067" id="3067">3067</a>
-<a href="#3068" id="3068">3068</a>
-<a href="#3069" id="3069">3069</a>
-<a href="#3070" id="3070">3070</a>
-<a href="#3071" id="3071">3071</a>
-<a href="#3072" id="3072">3072</a>
-<a href="#3073" id="3073">3073</a>
-<a href="#3074" id="3074">3074</a>
-<a href="#3075" id="3075">3075</a>
-<a href="#3076" id="3076">3076</a>
-<a href="#3077" id="3077">3077</a>
-<a href="#3078" id="3078">3078</a>
-<a href="#3079" id="3079">3079</a>
-<a href="#3080" id="3080">3080</a>
-<a href="#3081" id="3081">3081</a>
-<a href="#3082" id="3082">3082</a>
-<a href="#3083" id="3083">3083</a>
-<a href="#3084" id="3084">3084</a>
-<a href="#3085" id="3085">3085</a>
-<a href="#3086" id="3086">3086</a>
-<a href="#3087" id="3087">3087</a>
-<a href="#3088" id="3088">3088</a>
-<a href="#3089" id="3089">3089</a>
-<a href="#3090" id="3090">3090</a>
-<a href="#3091" id="3091">3091</a>
-<a href="#3092" id="3092">3092</a>
-<a href="#3093" id="3093">3093</a>
-<a href="#3094" id="3094">3094</a>
-<a href="#3095" id="3095">3095</a>
-<a href="#3096" id="3096">3096</a>
-<a href="#3097" id="3097">3097</a>
-<a href="#3098" id="3098">3098</a>
-<a href="#3099" id="3099">3099</a>
-<a href="#3100" id="3100">3100</a>
-<a href="#3101" id="3101">3101</a>
-<a href="#3102" id="3102">3102</a>
-<a href="#3103" id="3103">3103</a>
-<a href="#3104" id="3104">3104</a>
-<a href="#3105" id="3105">3105</a>
-<a href="#3106" id="3106">3106</a>
 </pre></div><pre class="rust"><code><span class="comment">// Copyright 2013-2014 The Rust Project Developers. See the COPYRIGHT
 // file at the top-level directory of this distribution and at
 // http://rust-lang.org/COPYRIGHT.
@@ -3118,39 +2528,40 @@
 //!
 //! ## Compatibility
 //!
-//! The `num-rational` crate is tested for rustc 1.31 and greater.
+//! The `num-rational` crate is tested for rustc 1.15 and greater.
 
-</span><span class="attr">#![doc(html_root_url = <span class="string">&quot;https://docs.rs/num-rational/0.4&quot;</span>)]
+</span><span class="attr">#![doc(html_root_url = <span class="string">&quot;https://docs.rs/num-rational/0.2&quot;</span>)]
 #![no_std]
-</span><span class="comment">// Ratio ops often use other &quot;suspicious&quot; ops
-</span><span class="attr">#![allow(clippy::suspicious_arithmetic_impl)]
-#![allow(clippy::suspicious_op_assign_impl)]
 
-#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
-#[macro_use]
+#[cfg(feature = <span class="string">&quot;bigint&quot;</span>)]
+</span><span class="kw">extern crate </span>num_bigint <span class="kw">as </span>bigint;
+<span class="attr">#[cfg(feature = <span class="string">&quot;serde&quot;</span>)]
+</span><span class="kw">extern crate </span>serde;
+
+<span class="kw">extern crate </span>num_integer <span class="kw">as </span>integer;
+<span class="kw">extern crate </span>num_traits <span class="kw">as </span>traits;
+
+<span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+#[cfg_attr(test, macro_use)]
 </span><span class="kw">extern crate </span>std;
 
 <span class="kw">use </span>core::cmp;
 <span class="kw">use </span>core::fmt;
-<span class="kw">use </span>core::fmt::{Binary, Display, Formatter, LowerExp, LowerHex, Octal, UpperExp, UpperHex};
 <span class="kw">use </span>core::hash::{Hash, Hasher};
-<span class="kw">use </span>core::ops::{Add, Div, Mul, Neg, Rem, ShlAssign, Sub};
+<span class="kw">use </span>core::ops::{Add, Div, Mul, Neg, Rem, Sub};
 <span class="kw">use </span>core::str::FromStr;
 <span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
 </span><span class="kw">use </span>std::error::Error;
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;num-bigint&quot;</span>)]
-</span><span class="kw">use </span>num_bigint::{BigInt, BigUint, Sign, ToBigInt};
+<span class="attr">#[cfg(feature = <span class="string">&quot;bigint&quot;</span>)]
+</span><span class="kw">use </span>bigint::{BigInt, BigUint, Sign};
 
-<span class="kw">use </span>num_integer::Integer;
-<span class="kw">use </span>num_traits::float::FloatCore;
-<span class="kw">use </span>num_traits::ToPrimitive;
-<span class="kw">use </span>num_traits::{
+<span class="kw">use </span>integer::Integer;
+<span class="kw">use </span>traits::float::FloatCore;
+<span class="kw">use </span>traits::{
     Bounded, CheckedAdd, CheckedDiv, CheckedMul, CheckedSub, FromPrimitive, Inv, Num, NumCast, One,
     Pow, Signed, Zero,
 };
-
-<span class="kw">mod </span>pow;
 
 <span class="doccomment">/// Represents the ratio between two numbers.
 </span><span class="attr">#[derive(Copy, Clone, Debug)]
@@ -3163,48 +2574,54 @@
 }
 
 <span class="doccomment">/// Alias for a `Ratio` of machine-sized integers.
-</span><span class="attr">#[deprecated(
-    since = <span class="string">&quot;0.4.0&quot;</span>,
-    note = <span class="string">&quot;it&#39;s better to use a specific size, like `Rational32` or `Rational64`&quot;
-</span>)]
 </span><span class="kw">pub type </span>Rational = Ratio&lt;isize&gt;;
 <span class="doccomment">/// Alias for a `Ratio` of 32-bit-sized integers.
 </span><span class="kw">pub type </span>Rational32 = Ratio&lt;i32&gt;;
 <span class="doccomment">/// Alias for a `Ratio` of 64-bit-sized integers.
 </span><span class="kw">pub type </span>Rational64 = Ratio&lt;i64&gt;;
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;num-bigint&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;bigint&quot;</span>)]
 </span><span class="doccomment">/// Alias for arbitrary precision rationals.
 </span><span class="kw">pub type </span>BigRational = Ratio&lt;BigInt&gt;;
 
+<span class="macro">macro_rules! </span>maybe_const {
+    ($( $(<span class="attr">#[<span class="macro-nonterminal">$attr</span>:meta]</span>)* <span class="kw">pub fn </span><span class="macro-nonterminal">$name</span>:ident <span class="macro-nonterminal">$args</span>:tt -&gt; <span class="macro-nonterminal">$ret</span>:ty <span class="macro-nonterminal">$body</span>:block )<span class="kw-2">*</span>) =&gt; {$(
+        <span class="attr">#[cfg(has_const_fn)]
+        </span>$(<span class="attr">#[<span class="macro-nonterminal">$attr</span>]</span>)* <span class="kw">pub const fn </span><span class="macro-nonterminal">$name $args </span>-&gt; <span class="macro-nonterminal">$ret $body
+
+        </span><span class="attr">#[cfg(not(has_const_fn))]
+        </span>$(<span class="attr">#[<span class="macro-nonterminal">$attr</span>]</span>)* <span class="kw">pub fn </span><span class="macro-nonterminal">$name $args </span>-&gt; <span class="macro-nonterminal">$ret $body
+    </span>)<span class="kw-2">*</span>}
+}
+
 <span class="doccomment">/// These method are `const` for Rust 1.31 and later.
 </span><span class="kw">impl</span>&lt;T&gt; Ratio&lt;T&gt; {
-    <span class="doccomment">/// Creates a `Ratio` without checking for `denom == 0` or reducing.
-    ///
-    /// **There are several methods that will panic if used on a `Ratio` with
-    /// `denom == 0`.**
-    </span><span class="attr">#[inline]
-    </span><span class="kw">pub const fn </span>new_raw(numer: T, denom: T) -&gt; Ratio&lt;T&gt; {
-        Ratio { numer, denom }
-    }
+    <span class="macro">maybe_const! </span>{
+        <span class="doccomment">/// Creates a `Ratio` without checking for `denom == 0` or reducing.
+        </span><span class="attr">#[inline]
+        </span><span class="kw">pub fn </span>new_raw(numer: T, denom: T) -&gt; Ratio&lt;T&gt; {
+            Ratio {
+                numer: numer,
+                denom: denom,
+            }
+        }
 
-    <span class="doccomment">/// Gets an immutable reference to the numerator.
-    </span><span class="attr">#[inline]
-    </span><span class="kw">pub const fn </span>numer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>T {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.numer
-    }
+        <span class="doccomment">/// Gets an immutable reference to the numerator.
+        </span><span class="attr">#[inline]
+        </span><span class="kw">pub fn </span>numer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>T {
+            <span class="kw-2">&amp;</span><span class="self">self</span>.numer
+        }
 
-    <span class="doccomment">/// Gets an immutable reference to the denominator.
-    </span><span class="attr">#[inline]
-    </span><span class="kw">pub const fn </span>denom(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>T {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.denom
+        <span class="doccomment">/// Gets an immutable reference to the denominator.
+        </span><span class="attr">#[inline]
+        </span><span class="kw">pub fn </span>denom(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>T {
+            <span class="kw-2">&amp;</span><span class="self">self</span>.denom
+        }
     }
 }
 
 <span class="kw">impl</span>&lt;T: Clone + Integer&gt; Ratio&lt;T&gt; {
-    <span class="doccomment">/// Creates a new `Ratio`.
-    ///
-    /// **Panics if `denom` is zero.**
+    <span class="doccomment">/// Creates a new `Ratio`. Fails if `denom` is zero.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>new(numer: T, denom: T) -&gt; Ratio&lt;T&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>ret = Ratio::new_raw(numer, denom);
@@ -3230,9 +2647,7 @@
         <span class="self">self</span>.denom.is_one()
     }
 
-    <span class="doccomment">/// Puts self into lowest terms, with `denom` &gt; 0.
-    ///
-    /// **Panics if `denom` is zero.**
+    <span class="doccomment">/// Puts self into lowest terms, with denom &gt; 0.
     </span><span class="kw">fn </span>reduce(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="kw">if </span><span class="self">self</span>.denom.is_zero() {
             <span class="macro">panic!</span>(<span class="string">&quot;denominator == 0&quot;</span>);
@@ -3248,24 +2663,18 @@
         <span class="kw">let </span>g: T = <span class="self">self</span>.numer.gcd(<span class="kw-2">&amp;</span><span class="self">self</span>.denom);
 
         <span class="comment">// FIXME(#5992): assignment operator overloads
+        // self.numer /= g;
         // T: Clone + Integer != T: Clone + NumAssign
-
-        </span><span class="attr">#[inline]
-        </span><span class="kw">fn </span>replace_with&lt;T: Zero&gt;(x: <span class="kw-2">&amp;mut </span>T, f: <span class="kw">impl </span>FnOnce(T) -&gt; T) {
-            <span class="kw">let </span>y = core::mem::replace(x, T::zero());
-            <span class="kw-2">*</span>x = f(y);
-        }
-
-        <span class="comment">// self.numer /= g;
-        </span>replace_with(<span class="kw-2">&amp;mut </span><span class="self">self</span>.numer, |x| x / g.clone());
-
-        <span class="comment">// self.denom /= g;
-        </span>replace_with(<span class="kw-2">&amp;mut </span><span class="self">self</span>.denom, |x| x / g);
+        </span><span class="self">self</span>.numer = <span class="self">self</span>.numer.clone() / g.clone();
+        <span class="comment">// FIXME(#5992): assignment operator overloads
+        // self.denom /= g;
+        // T: Clone + Integer != T: Clone + NumAssign
+        </span><span class="self">self</span>.denom = <span class="self">self</span>.denom.clone() / g;
 
         <span class="comment">// keep denom positive!
         </span><span class="kw">if </span><span class="self">self</span>.denom &lt; T::zero() {
-            replace_with(<span class="kw-2">&amp;mut </span><span class="self">self</span>.numer, |x| T::zero() - x);
-            replace_with(<span class="kw-2">&amp;mut </span><span class="self">self</span>.denom, |x| T::zero() - x);
+            <span class="self">self</span>.numer = T::zero() - <span class="self">self</span>.numer.clone();
+            <span class="self">self</span>.denom = T::zero() - <span class="self">self</span>.denom.clone();
         }
     }
 
@@ -3273,8 +2682,6 @@
     ///
     /// In general, it is not necessary to use this method, as the only
     /// method of procuring a non-reduced fraction is through `new_raw`.
-    ///
-    /// **Panics if `denom` is zero.**
     </span><span class="kw">pub fn </span>reduced(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Ratio&lt;T&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>ret = <span class="self">self</span>.clone();
         ret.reduce();
@@ -3283,18 +2690,16 @@
 
     <span class="doccomment">/// Returns the reciprocal.
     ///
-    /// **Panics if the `Ratio` is zero.**
+    /// Fails if the `Ratio` is zero.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>recip(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Ratio&lt;T&gt; {
-        <span class="self">self</span>.clone().into_recip()
-    }
-
-    <span class="attr">#[inline]
-    </span><span class="kw">fn </span>into_recip(<span class="self">self</span>) -&gt; Ratio&lt;T&gt; {
         <span class="kw">match </span><span class="self">self</span>.numer.cmp(<span class="kw-2">&amp;</span>T::zero()) {
-            cmp::Ordering::Equal =&gt; <span class="macro">panic!</span>(<span class="string">&quot;division by zero&quot;</span>),
-            cmp::Ordering::Greater =&gt; Ratio::new_raw(<span class="self">self</span>.denom, <span class="self">self</span>.numer),
-            cmp::Ordering::Less =&gt; Ratio::new_raw(T::zero() - <span class="self">self</span>.denom, T::zero() - <span class="self">self</span>.numer),
+            cmp::Ordering::Equal =&gt; <span class="macro">panic!</span>(<span class="string">&quot;numerator == 0&quot;</span>),
+            cmp::Ordering::Greater =&gt; Ratio::new_raw(<span class="self">self</span>.denom.clone(), <span class="self">self</span>.numer.clone()),
+            cmp::Ordering::Less =&gt; Ratio::new_raw(
+                T::zero() - <span class="self">self</span>.denom.clone(),
+                T::zero() - <span class="self">self</span>.numer.clone(),
+            ),
         }
     }
 
@@ -3340,10 +2745,10 @@
         <span class="comment">// The algorithm compares the unsigned fractional part with 1/2, that
         // is, a/b &gt;= 1/2, or a &gt;= b/2. For odd denominators, we use
         // a &gt;= (b/2)+1. This avoids overflow issues.
-        </span><span class="kw">let </span>half_or_larger = <span class="kw">if </span>fractional.denom.is_even() {
-            fractional.numer &gt;= fractional.denom / two
+        </span><span class="kw">let </span>half_or_larger = <span class="kw">if </span>fractional.denom().is_even() {
+            <span class="kw-2">*</span>fractional.numer() &gt;= fractional.denom().clone() / two.clone()
         } <span class="kw">else </span>{
-            fractional.numer &gt;= (fractional.denom / two) + one
+            <span class="kw-2">*</span>fractional.numer() &gt;= (fractional.denom().clone() / two.clone()) + one.clone()
         };
 
         <span class="kw">if </span>half_or_larger {
@@ -3371,18 +2776,90 @@
     </span><span class="kw">pub fn </span>fract(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Ratio&lt;T&gt; {
         Ratio::new_raw(<span class="self">self</span>.numer.clone() % <span class="self">self</span>.denom.clone(), <span class="self">self</span>.denom.clone())
     }
+}
 
+<span class="kw">impl</span>&lt;T: Clone + Integer + Pow&lt;u32, Output = T&gt;&gt; Ratio&lt;T&gt; {
     <span class="doccomment">/// Raises the `Ratio` to the power of an exponent.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>pow(<span class="kw-2">&amp;</span><span class="self">self</span>, expon: i32) -&gt; Ratio&lt;T&gt;
-    <span class="kw">where
-        for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T: Pow&lt;u32, Output = T&gt;,
-    {
+    </span><span class="kw">pub fn </span>pow(<span class="kw-2">&amp;</span><span class="self">self</span>, expon: i32) -&gt; Ratio&lt;T&gt; {
         Pow::pow(<span class="self">self</span>, expon)
     }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;num-bigint&quot;</span>)]
+<span class="macro">macro_rules! </span>pow_impl {
+    (<span class="macro-nonterminal">$exp</span>:ty) =&gt; {
+        <span class="macro">pow_impl!</span>(<span class="macro-nonterminal">$exp</span>, <span class="macro-nonterminal">$exp</span>);
+    };
+    (<span class="macro-nonterminal">$exp</span>:ty, <span class="macro-nonterminal">$unsigned</span>:ty) =&gt; {
+        <span class="kw">impl</span>&lt;T: Clone + Integer + Pow&lt;<span class="macro-nonterminal">$unsigned</span>, Output = T&gt;&gt; Pow&lt;<span class="macro-nonterminal">$exp</span>&gt; <span class="kw">for </span>Ratio&lt;T&gt; {
+            <span class="kw">type </span>Output = Ratio&lt;T&gt;;
+            <span class="attr">#[inline]
+            </span><span class="kw">fn </span>pow(<span class="self">self</span>, expon: <span class="macro-nonterminal">$exp</span>) -&gt; Ratio&lt;T&gt; {
+                <span class="kw">match </span>expon.cmp(<span class="kw-2">&amp;</span><span class="number">0</span>) {
+                    cmp::Ordering::Equal =&gt; One::one(),
+                    cmp::Ordering::Less =&gt; {
+                        <span class="kw">let </span>expon = expon.wrapping_abs() <span class="kw">as </span><span class="macro-nonterminal">$unsigned</span>;
+                        Ratio::new_raw(Pow::pow(<span class="self">self</span>.denom, expon), Pow::pow(<span class="self">self</span>.numer, expon))
+                    }
+                    cmp::Ordering::Greater =&gt; Ratio::new_raw(
+                        Pow::pow(<span class="self">self</span>.numer, expon <span class="kw">as </span><span class="macro-nonterminal">$unsigned</span>),
+                        Pow::pow(<span class="self">self</span>.denom, expon <span class="kw">as </span><span class="macro-nonterminal">$unsigned</span>),
+                    ),
+                }
+            }
+        }
+        <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: Clone + Integer + Pow&lt;<span class="macro-nonterminal">$unsigned</span>, Output = T&gt;&gt; Pow&lt;<span class="macro-nonterminal">$exp</span>&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Ratio&lt;T&gt; {
+            <span class="kw">type </span>Output = Ratio&lt;T&gt;;
+            <span class="attr">#[inline]
+            </span><span class="kw">fn </span>pow(<span class="self">self</span>, expon: <span class="macro-nonterminal">$exp</span>) -&gt; Ratio&lt;T&gt; {
+                Pow::pow(<span class="self">self</span>.clone(), expon)
+            }
+        }
+        <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: Clone + Integer + Pow&lt;<span class="macro-nonterminal">$unsigned</span>, Output = T&gt;&gt; Pow&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="macro-nonterminal">$exp</span>&gt; <span class="kw">for </span>Ratio&lt;T&gt; {
+            <span class="kw">type </span>Output = Ratio&lt;T&gt;;
+            <span class="attr">#[inline]
+            </span><span class="kw">fn </span>pow(<span class="self">self</span>, expon: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="macro-nonterminal">$exp</span>) -&gt; Ratio&lt;T&gt; {
+                Pow::pow(<span class="self">self</span>, <span class="kw-2">*</span>expon)
+            }
+        }
+        <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, T: Clone + Integer + Pow&lt;<span class="macro-nonterminal">$unsigned</span>, Output = T&gt;&gt; Pow&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="macro-nonterminal">$exp</span>&gt;
+            <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>Ratio&lt;T&gt;
+        {
+            <span class="kw">type </span>Output = Ratio&lt;T&gt;;
+            <span class="attr">#[inline]
+            </span><span class="kw">fn </span>pow(<span class="self">self</span>, expon: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="macro-nonterminal">$exp</span>) -&gt; Ratio&lt;T&gt; {
+                Pow::pow(<span class="self">self</span>.clone(), <span class="kw-2">*</span>expon)
+            }
+        }
+    };
+}
+
+<span class="comment">// this is solely to make `pow_impl!` work
+</span><span class="kw">trait </span>WrappingAbs: Sized {
+    <span class="kw">fn </span>wrapping_abs(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="self">self
+    </span>}
+}
+<span class="kw">impl </span>WrappingAbs <span class="kw">for </span>u8 {}
+<span class="kw">impl </span>WrappingAbs <span class="kw">for </span>u16 {}
+<span class="kw">impl </span>WrappingAbs <span class="kw">for </span>u32 {}
+<span class="kw">impl </span>WrappingAbs <span class="kw">for </span>u64 {}
+<span class="kw">impl </span>WrappingAbs <span class="kw">for </span>usize {}
+
+<span class="macro">pow_impl!</span>(i8, u8);
+<span class="macro">pow_impl!</span>(i16, u16);
+<span class="macro">pow_impl!</span>(i32, u32);
+<span class="macro">pow_impl!</span>(i64, u64);
+<span class="macro">pow_impl!</span>(isize, usize);
+<span class="macro">pow_impl!</span>(u8);
+<span class="macro">pow_impl!</span>(u16);
+<span class="macro">pow_impl!</span>(u32);
+<span class="macro">pow_impl!</span>(u64);
+<span class="macro">pow_impl!</span>(usize);
+
+<span class="comment">// TODO: pow_impl!(BigUint) and pow_impl!(BigInt, BigUint)
+
+</span><span class="attr">#[cfg(feature = <span class="string">&quot;bigint&quot;</span>)]
 </span><span class="kw">impl </span>Ratio&lt;BigInt&gt; {
     <span class="doccomment">/// Converts a float into a rational number.
     </span><span class="kw">pub fn </span>from_float&lt;T: FloatCore&gt;(f: T) -&gt; <span class="prelude-ty">Option</span>&lt;BigRational&gt; {
@@ -3398,19 +2875,12 @@
             <span class="prelude-val">Some</span>(Ratio::new(BigInt::from_biguint(bigint_sign, numer), denom))
         } <span class="kw">else </span>{
             <span class="kw">let </span><span class="kw-2">mut </span>numer: BigUint = FromPrimitive::from_u64(mantissa).unwrap();
-            numer &lt;&lt;= exponent <span class="kw">as </span>usize;
+            numer = numer &lt;&lt; (exponent <span class="kw">as </span>usize);
             <span class="prelude-val">Some</span>(Ratio::from_integer(BigInt::from_biguint(
                 bigint_sign,
                 numer,
             )))
         }
-    }
-}
-
-<span class="kw">impl</span>&lt;T: Clone + Integer&gt; Default <span class="kw">for </span>Ratio&lt;T&gt; {
-    <span class="doccomment">/// Returns zero
-    </span><span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
-        Ratio::zero()
     }
 }
 
@@ -3527,10 +2997,10 @@
 }
 
 <span class="kw">mod </span>iter_sum_product {
-    <span class="kw">use </span><span class="kw">crate</span>::Ratio;
     <span class="kw">use </span>core::iter::{Product, Sum};
-    <span class="kw">use </span>num_integer::Integer;
-    <span class="kw">use </span>num_traits::{One, Zero};
+    <span class="kw">use </span>integer::Integer;
+    <span class="kw">use </span>traits::{One, Zero};
+    <span class="kw">use </span>Ratio;
 
     <span class="kw">impl</span>&lt;T: Integer + Clone&gt; Sum <span class="kw">for </span>Ratio&lt;T&gt; {
         <span class="kw">fn </span>sum&lt;I&gt;(iter: I) -&gt; <span class="self">Self
@@ -3572,9 +3042,9 @@
 <span class="kw">mod </span>opassign {
     <span class="kw">use </span>core::ops::{AddAssign, DivAssign, MulAssign, RemAssign, SubAssign};
 
-    <span class="kw">use </span><span class="kw">crate</span>::Ratio;
-    <span class="kw">use </span>num_integer::Integer;
-    <span class="kw">use </span>num_traits::NumAssign;
+    <span class="kw">use </span>integer::Integer;
+    <span class="kw">use </span>traits::NumAssign;
+    <span class="kw">use </span>Ratio;
 
     <span class="kw">impl</span>&lt;T: Clone + Integer + NumAssign&gt; AddAssign <span class="kw">for </span>Ratio&lt;T&gt; {
         <span class="kw">fn </span>add_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: Ratio&lt;T&gt;) {
@@ -3600,7 +3070,7 @@
             <span class="self">self</span>.numer <span class="kw-2">*</span>= other.denom / gcd_bd.clone();
             <span class="self">self</span>.denom /= gcd_bd;
             <span class="self">self</span>.denom <span class="kw-2">*</span>= other.numer / gcd_ac;
-            <span class="self">self</span>.reduce(); <span class="comment">// TODO: remove this line. see #8.
+            <span class="self">self</span>.reduce(); <span class="comment">//TODO: remove this line. see #8.
         </span>}
     }
 
@@ -3613,7 +3083,7 @@
             <span class="self">self</span>.numer <span class="kw-2">*</span>= other.numer / gcd_bc.clone();
             <span class="self">self</span>.denom /= gcd_bc;
             <span class="self">self</span>.denom <span class="kw-2">*</span>= other.denom / gcd_ad;
-            <span class="self">self</span>.reduce(); <span class="comment">// TODO: remove this line. see #8.
+            <span class="self">self</span>.reduce(); <span class="comment">//TODO: remove this line. see #8.
         </span>}
     }
 
@@ -3660,7 +3130,7 @@
             <span class="kw">let </span>gcd = <span class="self">self</span>.numer.gcd(<span class="kw-2">&amp;</span>other);
             <span class="self">self</span>.numer /= gcd.clone();
             <span class="self">self</span>.denom <span class="kw-2">*</span>= other / gcd;
-            <span class="self">self</span>.reduce(); <span class="comment">// TODO: remove this line. see #8.
+            <span class="self">self</span>.reduce(); <span class="comment">//TODO: remove this line. see #8.
         </span>}
     }
 
@@ -3669,7 +3139,7 @@
             <span class="kw">let </span>gcd = <span class="self">self</span>.denom.gcd(<span class="kw-2">&amp;</span>other);
             <span class="self">self</span>.denom /= gcd.clone();
             <span class="self">self</span>.numer <span class="kw-2">*</span>= other / gcd;
-            <span class="self">self</span>.reduce(); <span class="comment">// TODO: remove this line. see #8.
+            <span class="self">self</span>.reduce(); <span class="comment">//TODO: remove this line. see #8.
         </span>}
     }
 
@@ -3891,6 +3361,17 @@
 <span class="macro">arith_impl!</span>(<span class="kw">impl </span>Sub, sub);
 <span class="macro">arith_impl!</span>(<span class="kw">impl </span>Rem, rem);
 
+<span class="comment">// Like `std::try!` for Option&lt;T&gt;, unwrap the value or early-return None.
+// Since Rust 1.22 this can be replaced by the `?` operator.
+</span><span class="macro">macro_rules! </span>otry {
+    (<span class="macro-nonterminal">$expr</span>:expr) =&gt; {
+        <span class="kw">match </span><span class="macro-nonterminal">$expr </span>{
+            <span class="prelude-val">Some</span>(val) =&gt; val,
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
+        }
+    };
+}
+
 <span class="comment">// a/b * c/d = (a*c)/(b*d)
 </span><span class="kw">impl</span>&lt;T&gt; CheckedMul <span class="kw">for </span>Ratio&lt;T&gt;
 <span class="kw">where
@@ -3901,9 +3382,9 @@
         <span class="kw">let </span>gcd_ad = <span class="self">self</span>.numer.gcd(<span class="kw-2">&amp;</span>rhs.denom);
         <span class="kw">let </span>gcd_bc = <span class="self">self</span>.denom.gcd(<span class="kw-2">&amp;</span>rhs.numer);
         <span class="prelude-val">Some</span>(Ratio::new(
-            (<span class="self">self</span>.numer.clone() / gcd_ad.clone())
-                .checked_mul(<span class="kw-2">&amp;</span>(rhs.numer.clone() / gcd_bc.clone()))<span class="question-mark">?</span>,
-            (<span class="self">self</span>.denom.clone() / gcd_bc).checked_mul(<span class="kw-2">&amp;</span>(rhs.denom.clone() / gcd_ad))<span class="question-mark">?</span>,
+            <span class="macro">otry!</span>((<span class="self">self</span>.numer.clone() / gcd_ad.clone())
+                .checked_mul(<span class="kw-2">&amp;</span>(rhs.numer.clone() / gcd_bc.clone()))),
+            <span class="macro">otry!</span>((<span class="self">self</span>.denom.clone() / gcd_bc).checked_mul(<span class="kw-2">&amp;</span>(rhs.denom.clone() / gcd_ad))),
         ))
     }
 }
@@ -3925,10 +3406,11 @@
         } <span class="kw">else </span>{
             <span class="kw">let </span>gcd_ac = <span class="self">self</span>.numer.gcd(<span class="kw-2">&amp;</span>rhs.numer);
             <span class="kw">let </span>gcd_bd = <span class="self">self</span>.denom.gcd(<span class="kw-2">&amp;</span>rhs.denom);
+            <span class="kw">let </span>denom = <span class="macro">otry!</span>((<span class="self">self</span>.denom.clone() / gcd_bd.clone())
+                .checked_mul(<span class="kw-2">&amp;</span>(rhs.numer.clone() / gcd_ac.clone())));
             (
-                (<span class="self">self</span>.numer.clone() / gcd_ac.clone())
-                    .checked_mul(<span class="kw-2">&amp;</span>(rhs.denom.clone() / gcd_bd.clone()))<span class="question-mark">?</span>,
-                (<span class="self">self</span>.denom.clone() / gcd_bd).checked_mul(<span class="kw-2">&amp;</span>(rhs.numer.clone() / gcd_ac))<span class="question-mark">?</span>,
+                <span class="macro">otry!</span>((<span class="self">self</span>.numer.clone() / gcd_ac).checked_mul(<span class="kw-2">&amp;</span>(rhs.denom.clone() / gcd_bd))),
+                denom,
             )
         };
         <span class="comment">// Manual `reduce()`, avoiding sharp edges
@@ -3946,7 +3428,7 @@
                 <span class="comment">// We need to keep denom positive, but 2&#39;s-complement MIN may
                 // overflow negation -- instead we can check multiplying -1.
                 </span><span class="kw">let </span>n1 = T::zero() - T::one();
-                Ratio::new_raw(numer.checked_mul(<span class="kw-2">&amp;</span>n1)<span class="question-mark">?</span>, denom.checked_mul(<span class="kw-2">&amp;</span>n1)<span class="question-mark">?</span>)
+                Ratio::new_raw(<span class="macro">otry!</span>(numer.checked_mul(<span class="kw-2">&amp;</span>n1)), <span class="macro">otry!</span>(denom.checked_mul(<span class="kw-2">&amp;</span>n1)))
             } <span class="kw">else </span>{
                 Ratio::new_raw(numer, denom)
             };
@@ -3962,10 +3444,10 @@
             <span class="attr">#[inline]
             </span><span class="kw">fn </span><span class="macro-nonterminal">$method</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, rhs: <span class="kw-2">&amp;</span>Ratio&lt;T&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;Ratio&lt;T&gt;&gt; {
                 <span class="kw">let </span>gcd = <span class="self">self</span>.denom.clone().gcd(<span class="kw-2">&amp;</span>rhs.denom);
-                <span class="kw">let </span>lcm = (<span class="self">self</span>.denom.clone() / gcd.clone()).checked_mul(<span class="kw-2">&amp;</span>rhs.denom)<span class="question-mark">?</span>;
-                <span class="kw">let </span>lhs_numer = (lcm.clone() / <span class="self">self</span>.denom.clone()).checked_mul(<span class="kw-2">&amp;</span><span class="self">self</span>.numer)<span class="question-mark">?</span>;
-                <span class="kw">let </span>rhs_numer = (lcm.clone() / rhs.denom.clone()).checked_mul(<span class="kw-2">&amp;</span>rhs.numer)<span class="question-mark">?</span>;
-                <span class="prelude-val">Some</span>(Ratio::new(lhs_numer.<span class="macro-nonterminal">$method</span>(<span class="kw-2">&amp;</span>rhs_numer)<span class="question-mark">?</span>, lcm))
+                <span class="kw">let </span>lcm = <span class="macro">otry!</span>((<span class="self">self</span>.denom.clone() / gcd.clone()).checked_mul(<span class="kw-2">&amp;</span>rhs.denom));
+                <span class="kw">let </span>lhs_numer = <span class="macro">otry!</span>((lcm.clone() / <span class="self">self</span>.denom.clone()).checked_mul(<span class="kw-2">&amp;</span><span class="self">self</span>.numer));
+                <span class="kw">let </span>rhs_numer = <span class="macro">otry!</span>((lcm.clone() / rhs.denom.clone()).checked_mul(<span class="kw-2">&amp;</span>rhs.numer));
+                <span class="prelude-val">Some</span>(Ratio::new(<span class="macro">otry!</span>(lhs_numer.<span class="macro-nonterminal">$method</span>(<span class="kw-2">&amp;</span>rhs_numer)), lcm))
             }
         }
     };
@@ -4134,70 +3616,19 @@
 }
 
 <span class="comment">// String conversions
-</span><span class="macro">macro_rules! </span>impl_formatting {
-    (<span class="macro-nonterminal">$fmt_trait</span>:ident, <span class="macro-nonterminal">$prefix</span>:expr, <span class="macro-nonterminal">$fmt_str</span>:expr, <span class="macro-nonterminal">$fmt_alt</span>:expr) =&gt; {
-        <span class="kw">impl</span>&lt;T: <span class="macro-nonterminal">$fmt_trait </span>+ Clone + Integer&gt; <span class="macro-nonterminal">$fmt_trait </span><span class="kw">for </span>Ratio&lt;T&gt; {
-            <span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
-            </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
-                <span class="kw">let </span>pre_pad = <span class="kw">if </span><span class="self">self</span>.denom.is_one() {
-                    <span class="macro">format!</span>(<span class="macro-nonterminal">$fmt_str</span>, <span class="self">self</span>.numer)
-                } <span class="kw">else </span>{
-                    <span class="kw">if </span>f.alternate() {
-                        <span class="macro">format!</span>(<span class="macro">concat!</span>(<span class="macro-nonterminal">$fmt_str</span>, <span class="string">&quot;/&quot;</span>, <span class="macro-nonterminal">$fmt_alt</span>), <span class="self">self</span>.numer, <span class="self">self</span>.denom)
-                    } <span class="kw">else </span>{
-                        <span class="macro">format!</span>(<span class="macro">concat!</span>(<span class="macro-nonterminal">$fmt_str</span>, <span class="string">&quot;/&quot;</span>, <span class="macro-nonterminal">$fmt_str</span>), <span class="self">self</span>.numer, <span class="self">self</span>.denom)
-                    }
-                };
-                <span class="comment">// TODO: replace with strip_prefix, when stabalized
-                </span><span class="kw">let </span>(pre_pad, non_negative) = {
-                    <span class="kw">if </span>pre_pad.starts_with(<span class="string">&quot;-&quot;</span>) {
-                        (<span class="kw-2">&amp;</span>pre_pad[<span class="number">1</span>..], <span class="bool-val">false</span>)
-                    } <span class="kw">else </span>{
-                        (<span class="kw-2">&amp;</span>pre_pad[..], <span class="bool-val">true</span>)
-                    }
-                };
-                f.pad_integral(non_negative, <span class="macro-nonterminal">$prefix</span>, pre_pad)
-            }
-            <span class="attr">#[cfg(not(feature = <span class="string">&quot;std&quot;</span>))]
-            </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
-                <span class="kw">let </span>plus = <span class="kw">if </span>f.sign_plus() &amp;&amp; <span class="self">self</span>.numer &gt;= T::zero() {
-                    <span class="string">&quot;+&quot;
-                </span>} <span class="kw">else </span>{
-                    <span class="string">&quot;&quot;
-                </span>};
-                <span class="kw">if </span><span class="self">self</span>.denom.is_one() {
-                    <span class="kw">if </span>f.alternate() {
-                        <span class="macro">write!</span>(f, <span class="macro">concat!</span>(<span class="string">&quot;{}&quot;</span>, <span class="macro-nonterminal">$fmt_alt</span>), plus, <span class="self">self</span>.numer)
-                    } <span class="kw">else </span>{
-                        <span class="macro">write!</span>(f, <span class="macro">concat!</span>(<span class="string">&quot;{}&quot;</span>, <span class="macro-nonterminal">$fmt_str</span>), plus, <span class="self">self</span>.numer)
-                    }
-                } <span class="kw">else </span>{
-                    <span class="kw">if </span>f.alternate() {
-                        <span class="macro">write!</span>(
-                            f,
-                            <span class="macro">concat!</span>(<span class="string">&quot;{}&quot;</span>, <span class="macro-nonterminal">$fmt_alt</span>, <span class="string">&quot;/&quot;</span>, <span class="macro-nonterminal">$fmt_alt</span>),
-                            plus, <span class="self">self</span>.numer, <span class="self">self</span>.denom
-                        )
-                    } <span class="kw">else </span>{
-                        <span class="macro">write!</span>(
-                            f,
-                            <span class="macro">concat!</span>(<span class="string">&quot;{}&quot;</span>, <span class="macro-nonterminal">$fmt_str</span>, <span class="string">&quot;/&quot;</span>, <span class="macro-nonterminal">$fmt_str</span>),
-                            plus, <span class="self">self</span>.numer, <span class="self">self</span>.denom
-                        )
-                    }
-                }
-            }
+</span><span class="kw">impl</span>&lt;T&gt; fmt::Display <span class="kw">for </span>Ratio&lt;T&gt;
+<span class="kw">where
+    </span>T: fmt::Display + Eq + One,
+{
+    <span class="doccomment">/// Renders as `numer/denom`. If denom=1, renders as numer.
+    </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="kw">if </span><span class="self">self</span>.denom.is_one() {
+            <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.numer)
+        } <span class="kw">else </span>{
+            <span class="macro">write!</span>(f, <span class="string">&quot;{}/{}&quot;</span>, <span class="self">self</span>.numer, <span class="self">self</span>.denom)
         }
-    };
+    }
 }
-
-<span class="macro">impl_formatting!</span>(Display, <span class="string">&quot;&quot;</span>, <span class="string">&quot;{}&quot;</span>, <span class="string">&quot;{:#}&quot;</span>);
-<span class="macro">impl_formatting!</span>(Octal, <span class="string">&quot;0o&quot;</span>, <span class="string">&quot;{:o}&quot;</span>, <span class="string">&quot;{:#o}&quot;</span>);
-<span class="macro">impl_formatting!</span>(Binary, <span class="string">&quot;0b&quot;</span>, <span class="string">&quot;{:b}&quot;</span>, <span class="string">&quot;{:#b}&quot;</span>);
-<span class="macro">impl_formatting!</span>(LowerHex, <span class="string">&quot;0x&quot;</span>, <span class="string">&quot;{:x}&quot;</span>, <span class="string">&quot;{:#x}&quot;</span>);
-<span class="macro">impl_formatting!</span>(UpperHex, <span class="string">&quot;0x&quot;</span>, <span class="string">&quot;{:X}&quot;</span>, <span class="string">&quot;{:#X}&quot;</span>);
-<span class="macro">impl_formatting!</span>(LowerExp, <span class="string">&quot;&quot;</span>, <span class="string">&quot;{:e}&quot;</span>, <span class="string">&quot;{:#e}&quot;</span>);
-<span class="macro">impl_formatting!</span>(UpperExp, <span class="string">&quot;&quot;</span>, <span class="string">&quot;{:E}&quot;</span>, <span class="string">&quot;{:#E}&quot;</span>);
 
 <span class="kw">impl</span>&lt;T: FromStr + Clone + Integer&gt; FromStr <span class="kw">for </span>Ratio&lt;T&gt; {
     <span class="kw">type </span><span class="prelude-val">Err </span>= ParseRatioError;
@@ -4258,7 +3689,7 @@
     {
         <span class="kw">use </span>serde::de::Error;
         <span class="kw">use </span>serde::de::Unexpected;
-        <span class="kw">let </span>(numer, denom): (T, T) = serde::Deserialize::deserialize(deserializer)<span class="question-mark">?</span>;
+        <span class="kw">let </span>(numer, denom): (T, T) = <span class="macro">try!</span>(serde::Deserialize::deserialize(deserializer));
         <span class="kw">if </span>denom.is_zero() {
             <span class="prelude-val">Err</span>(Error::invalid_value(
                 Unexpected::Signed(<span class="number">0</span>),
@@ -4283,15 +3714,14 @@
 }
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>ParseRatioError {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
         <span class="self">self</span>.kind.description().fmt(f)
     }
 }
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
 </span><span class="kw">impl </span>Error <span class="kw">for </span>ParseRatioError {
-    <span class="attr">#[allow(deprecated)]
-    </span><span class="kw">fn </span>description(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+    <span class="kw">fn </span>description(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
         <span class="self">self</span>.kind.description()
     }
 }
@@ -4305,13 +3735,14 @@
     }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;num-bigint&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">&quot;bigint&quot;</span>)]
 </span><span class="kw">impl </span>FromPrimitive <span class="kw">for </span>Ratio&lt;BigInt&gt; {
     <span class="kw">fn </span>from_i64(n: i64) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
         <span class="prelude-val">Some</span>(Ratio::from_integer(n.into()))
     }
 
-    <span class="kw">fn </span>from_i128(n: i128) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+    <span class="attr">#[cfg(has_i128)]
+    </span><span class="kw">fn </span>from_i128(n: i128) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
         <span class="prelude-val">Some</span>(Ratio::from_integer(n.into()))
     }
 
@@ -4319,7 +3750,8 @@
         <span class="prelude-val">Some</span>(Ratio::from_integer(n.into()))
     }
 
-    <span class="kw">fn </span>from_u128(n: u128) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+    <span class="attr">#[cfg(has_i128)]
+    </span><span class="kw">fn </span>from_u128(n: u128) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
         <span class="prelude-val">Some</span>(Ratio::from_integer(n.into()))
     }
 
@@ -4339,7 +3771,8 @@
                 &lt;<span class="macro-nonterminal">$typ </span><span class="kw">as </span>FromPrimitive&gt;::from_i64(n).map(Ratio::from_integer)
             }
 
-            <span class="kw">fn </span>from_i128(n: i128) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+            <span class="attr">#[cfg(has_i128)]
+            </span><span class="kw">fn </span>from_i128(n: i128) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
                 &lt;<span class="macro-nonterminal">$typ </span><span class="kw">as </span>FromPrimitive&gt;::from_i128(n).map(Ratio::from_integer)
             }
 
@@ -4347,7 +3780,8 @@
                 &lt;<span class="macro-nonterminal">$typ </span><span class="kw">as </span>FromPrimitive&gt;::from_u64(n).map(Ratio::from_integer)
             }
 
-            <span class="kw">fn </span>from_u128(n: u128) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+            <span class="attr">#[cfg(has_i128)]
+            </span><span class="kw">fn </span>from_u128(n: u128) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
                 &lt;<span class="macro-nonterminal">$typ </span><span class="kw">as </span>FromPrimitive&gt;::from_u128(n).map(Ratio::from_integer)
             }
 
@@ -4366,14 +3800,16 @@
 <span class="macro">from_primitive_integer!</span>(i16, approximate_float);
 <span class="macro">from_primitive_integer!</span>(i32, approximate_float);
 <span class="macro">from_primitive_integer!</span>(i64, approximate_float);
-<span class="macro">from_primitive_integer!</span>(i128, approximate_float);
+<span class="attr">#[cfg(has_i128)]
+</span><span class="macro">from_primitive_integer!</span>(i128, approximate_float);
 <span class="macro">from_primitive_integer!</span>(isize, approximate_float);
 
 <span class="macro">from_primitive_integer!</span>(u8, approximate_float_unsigned);
 <span class="macro">from_primitive_integer!</span>(u16, approximate_float_unsigned);
 <span class="macro">from_primitive_integer!</span>(u32, approximate_float_unsigned);
 <span class="macro">from_primitive_integer!</span>(u64, approximate_float_unsigned);
-<span class="macro">from_primitive_integer!</span>(u128, approximate_float_unsigned);
+<span class="attr">#[cfg(has_i128)]
+</span><span class="macro">from_primitive_integer!</span>(u128, approximate_float_unsigned);
 <span class="macro">from_primitive_integer!</span>(usize, approximate_float_unsigned);
 
 <span class="kw">impl</span>&lt;T: Integer + Signed + Bounded + NumCast + Clone&gt; Ratio&lt;T&gt; {
@@ -4394,10 +3830,14 @@
     <span class="kw">let </span>negative = val.is_sign_negative();
     <span class="kw">let </span>abs_val = val.abs();
 
-    <span class="kw">let </span>r = approximate_float_unsigned(abs_val, max_error, max_iterations)<span class="question-mark">?</span>;
+    <span class="kw">let </span>r = approximate_float_unsigned(abs_val, max_error, max_iterations);
 
     <span class="comment">// Make negative again if needed
-    </span><span class="prelude-val">Some</span>(<span class="kw">if </span>negative { r.neg() } <span class="kw">else </span>{ r })
+    </span><span class="kw">if </span>negative {
+        r.map(|r| r.neg())
+    } <span class="kw">else </span>{
+        r
+    }
 }
 
 <span class="comment">// No Unsigned constraint because this also works on positive integers and is called
@@ -4421,7 +3861,10 @@
     <span class="kw">let </span><span class="kw-2">mut </span>d1 = T::zero();
 
     <span class="kw">let </span>t_max = T::max_value();
-    <span class="kw">let </span>t_max_f = &lt;F <span class="kw">as </span>NumCast&gt;::from(t_max.clone())<span class="question-mark">?</span>;
+    <span class="kw">let </span>t_max_f = <span class="kw">match </span>&lt;F <span class="kw">as </span>NumCast&gt;::from(t_max.clone()) {
+        <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
+        <span class="prelude-val">Some</span>(t_max_f) =&gt; t_max_f,
+    };
 
     <span class="comment">// 1/epsilon &gt; T::MAX
     </span><span class="kw">let </span>epsilon = t_max_f.recip();
@@ -4493,303 +3936,6 @@
     <span class="prelude-val">Some</span>(Ratio::new(n1, d1))
 }
 
-<span class="attr">#[cfg(not(feature = <span class="string">&quot;num-bigint&quot;</span>))]
-</span><span class="macro">macro_rules! </span>to_primitive_small {
-    ($(<span class="macro-nonterminal">$type_name</span>:ty)<span class="kw-2">*</span>) =&gt; ($(
-        <span class="kw">impl </span>ToPrimitive <span class="kw">for </span>Ratio&lt;<span class="macro-nonterminal">$type_name</span>&gt; {
-            <span class="kw">fn </span>to_i64(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;i64&gt; {
-                <span class="self">self</span>.to_integer().to_i64()
-            }
-
-            <span class="kw">fn </span>to_i128(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;i128&gt; {
-                <span class="self">self</span>.to_integer().to_i128()
-            }
-
-            <span class="kw">fn </span>to_u64(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u64&gt; {
-                <span class="self">self</span>.to_integer().to_u64()
-            }
-
-            <span class="kw">fn </span>to_u128(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u128&gt; {
-                <span class="self">self</span>.to_integer().to_u128()
-            }
-
-            <span class="kw">fn </span>to_f64(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;f64&gt; {
-                <span class="kw">let </span>float = <span class="self">self</span>.numer.to_f64().unwrap() / <span class="self">self</span>.denom.to_f64().unwrap();
-                <span class="kw">if </span>float.is_nan() {
-                    <span class="prelude-val">None
-                </span>} <span class="kw">else </span>{
-                    <span class="prelude-val">Some</span>(float)
-                }
-            }
-        }
-    )<span class="kw-2">*</span>)
-}
-
-<span class="attr">#[cfg(not(feature = <span class="string">&quot;num-bigint&quot;</span>))]
-</span><span class="macro">to_primitive_small!</span>(u8 i8 u16 i16 u32 i32);
-
-<span class="attr">#[cfg(all(target_pointer_width = <span class="string">&quot;32&quot;</span>, not(feature = <span class="string">&quot;num-bigint&quot;</span>)))]
-</span><span class="macro">to_primitive_small!</span>(usize isize);
-
-<span class="attr">#[cfg(not(feature = <span class="string">&quot;num-bigint&quot;</span>))]
-</span><span class="macro">macro_rules! </span>to_primitive_64 {
-    ($(<span class="macro-nonterminal">$type_name</span>:ty)<span class="kw-2">*</span>) =&gt; ($(
-        <span class="kw">impl </span>ToPrimitive <span class="kw">for </span>Ratio&lt;<span class="macro-nonterminal">$type_name</span>&gt; {
-            <span class="kw">fn </span>to_i64(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;i64&gt; {
-                <span class="self">self</span>.to_integer().to_i64()
-            }
-
-            <span class="kw">fn </span>to_i128(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;i128&gt; {
-                <span class="self">self</span>.to_integer().to_i128()
-            }
-
-            <span class="kw">fn </span>to_u64(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u64&gt; {
-                <span class="self">self</span>.to_integer().to_u64()
-            }
-
-            <span class="kw">fn </span>to_u128(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u128&gt; {
-                <span class="self">self</span>.to_integer().to_u128()
-            }
-
-            <span class="kw">fn </span>to_f64(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;f64&gt; {
-                <span class="kw">let </span>float = ratio_to_f64(
-                    <span class="self">self</span>.numer <span class="kw">as </span>i128,
-                    <span class="self">self</span>.denom <span class="kw">as </span>i128
-                );
-                <span class="kw">if </span>float.is_nan() {
-                    <span class="prelude-val">None
-                </span>} <span class="kw">else </span>{
-                    <span class="prelude-val">Some</span>(float)
-                }
-            }
-        }
-    )<span class="kw-2">*</span>)
-}
-
-<span class="attr">#[cfg(not(feature = <span class="string">&quot;num-bigint&quot;</span>))]
-</span><span class="macro">to_primitive_64!</span>(u64 i64);
-
-<span class="attr">#[cfg(all(target_pointer_width = <span class="string">&quot;64&quot;</span>, not(feature = <span class="string">&quot;num-bigint&quot;</span>)))]
-</span><span class="macro">to_primitive_64!</span>(usize isize);
-
-<span class="attr">#[cfg(feature = <span class="string">&quot;num-bigint&quot;</span>)]
-</span><span class="kw">impl</span>&lt;T: Clone + Integer + ToPrimitive + ToBigInt&gt; ToPrimitive <span class="kw">for </span>Ratio&lt;T&gt; {
-    <span class="kw">fn </span>to_i64(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;i64&gt; {
-        <span class="self">self</span>.to_integer().to_i64()
-    }
-
-    <span class="kw">fn </span>to_i128(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;i128&gt; {
-        <span class="self">self</span>.to_integer().to_i128()
-    }
-
-    <span class="kw">fn </span>to_u64(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u64&gt; {
-        <span class="self">self</span>.to_integer().to_u64()
-    }
-
-    <span class="kw">fn </span>to_u128(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u128&gt; {
-        <span class="self">self</span>.to_integer().to_u128()
-    }
-
-    <span class="kw">fn </span>to_f64(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;f64&gt; {
-        <span class="kw">let </span>float = <span class="kw">match </span>(<span class="self">self</span>.numer.to_i64(), <span class="self">self</span>.denom.to_i64()) {
-            (<span class="prelude-val">Some</span>(numer), <span class="prelude-val">Some</span>(denom)) =&gt; ratio_to_f64(
-                &lt;i128 <span class="kw">as </span>From&lt;<span class="kw">_</span>&gt;&gt;::from(numer),
-                &lt;i128 <span class="kw">as </span>From&lt;<span class="kw">_</span>&gt;&gt;::from(denom),
-            ),
-            <span class="kw">_ </span>=&gt; {
-                <span class="kw">let </span>numer: BigInt = <span class="self">self</span>.numer.to_bigint()<span class="question-mark">?</span>;
-                <span class="kw">let </span>denom: BigInt = <span class="self">self</span>.denom.to_bigint()<span class="question-mark">?</span>;
-                ratio_to_f64(numer, denom)
-            }
-        };
-        <span class="kw">if </span>float.is_nan() {
-            <span class="prelude-val">None
-        </span>} <span class="kw">else </span>{
-            <span class="prelude-val">Some</span>(float)
-        }
-    }
-}
-
-<span class="kw">trait </span>Bits {
-    <span class="kw">fn </span>bits(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64;
-}
-
-<span class="attr">#[cfg(feature = <span class="string">&quot;num-bigint&quot;</span>)]
-</span><span class="kw">impl </span>Bits <span class="kw">for </span>BigInt {
-    <span class="kw">fn </span>bits(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
-        <span class="self">self</span>.bits()
-    }
-}
-
-<span class="kw">impl </span>Bits <span class="kw">for </span>i128 {
-    <span class="kw">fn </span>bits(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
-        (<span class="number">128 </span>- <span class="self">self</span>.wrapping_abs().leading_zeros()).into()
-    }
-}
-
-<span class="doccomment">/// Converts a ratio of `T` to an f64.
-///
-/// In addition to stated trait bounds, `T` must be able to hold numbers 56 bits larger than
-/// the largest of `numer` and `denom`. This is automatically true if `T` is `BigInt`.
-</span><span class="kw">fn </span>ratio_to_f64&lt;T: Bits + Clone + Integer + Signed + ShlAssign&lt;usize&gt; + ToPrimitive&gt;(
-    numer: T,
-    denom: T,
-) -&gt; f64 {
-    <span class="kw">use </span>core::f64::{INFINITY, MANTISSA_DIGITS, MAX_EXP, MIN_EXP, RADIX};
-
-    <span class="macro">assert_eq!</span>(
-        RADIX, <span class="number">2</span>,
-        <span class="string">&quot;only floating point implementations with radix 2 are supported&quot;
-    </span>);
-
-    <span class="comment">// Inclusive upper and lower bounds to the range of exactly-representable ints in an f64.
-    </span><span class="kw">const </span>MAX_EXACT_INT: i64 = <span class="number">1i64 </span>&lt;&lt; MANTISSA_DIGITS;
-    <span class="kw">const </span>MIN_EXACT_INT: i64 = -MAX_EXACT_INT;
-
-    <span class="kw">let </span>flo_sign = numer.signum().to_f64().unwrap() / denom.signum().to_f64().unwrap();
-    <span class="kw">if </span>!flo_sign.is_normal() {
-        <span class="kw">return </span>flo_sign;
-    }
-
-    <span class="comment">// Fast track: both sides can losslessly be converted to f64s. In this case, letting the
-    // FPU do the job is faster and easier. In any other case, converting to f64s may lead
-    // to an inexact result: https://stackoverflow.com/questions/56641441/.
-    </span><span class="kw">if let </span>(<span class="prelude-val">Some</span>(n), <span class="prelude-val">Some</span>(d)) = (numer.to_i64(), denom.to_i64()) {
-        <span class="kw">if </span>MIN_EXACT_INT &lt;= n &amp;&amp; n &lt;= MAX_EXACT_INT &amp;&amp; MIN_EXACT_INT &lt;= d &amp;&amp; d &lt;= MAX_EXACT_INT {
-            <span class="kw">return </span>n.to_f64().unwrap() / d.to_f64().unwrap();
-        }
-    }
-
-    <span class="comment">// Otherwise, the goal is to obtain a quotient with at least 55 bits. 53 of these bits will
-    // be used as the mantissa of the resulting float, and the remaining two are for rounding.
-    // There&#39;s an error of up to 1 on the number of resulting bits, so we may get either 55 or
-    // 56 bits.
-    </span><span class="kw">let </span><span class="kw-2">mut </span>numer = numer.abs();
-    <span class="kw">let </span><span class="kw-2">mut </span>denom = denom.abs();
-    <span class="kw">let </span>(is_diff_positive, absolute_diff) = <span class="kw">match </span>numer.bits().checked_sub(denom.bits()) {
-        <span class="prelude-val">Some</span>(diff) =&gt; (<span class="bool-val">true</span>, diff),
-        <span class="prelude-val">None </span>=&gt; (<span class="bool-val">false</span>, denom.bits() - numer.bits()),
-    };
-
-    <span class="comment">// Filter out overflows and underflows. After this step, the signed difference fits in an
-    // isize.
-    </span><span class="kw">if </span>is_diff_positive &amp;&amp; absolute_diff &gt; MAX_EXP <span class="kw">as </span>u64 {
-        <span class="kw">return </span>INFINITY * flo_sign;
-    }
-    <span class="kw">if </span>!is_diff_positive &amp;&amp; absolute_diff &gt; -MIN_EXP <span class="kw">as </span>u64 + MANTISSA_DIGITS <span class="kw">as </span>u64 + <span class="number">1 </span>{
-        <span class="kw">return </span><span class="number">0.0 </span>* flo_sign;
-    }
-    <span class="kw">let </span>diff = <span class="kw">if </span>is_diff_positive {
-        absolute_diff.to_isize().unwrap()
-    } <span class="kw">else </span>{
-        -absolute_diff.to_isize().unwrap()
-    };
-
-    <span class="comment">// Shift is chosen so that the quotient will have 55 or 56 bits. The exception is if the
-    // quotient is going to be subnormal, in which case it may have fewer bits.
-    </span><span class="kw">let </span>shift: isize = diff.max(MIN_EXP <span class="kw">as </span>isize) - MANTISSA_DIGITS <span class="kw">as </span>isize - <span class="number">2</span>;
-    <span class="kw">if </span>shift &gt;= <span class="number">0 </span>{
-        denom &lt;&lt;= shift <span class="kw">as </span>usize
-    } <span class="kw">else </span>{
-        numer &lt;&lt;= -shift <span class="kw">as </span>usize
-    };
-
-    <span class="kw">let </span>(quotient, remainder) = numer.div_rem(<span class="kw-2">&amp;</span>denom);
-
-    <span class="comment">// This is guaranteed to fit since we&#39;ve set up quotient to be at most 56 bits.
-    </span><span class="kw">let </span><span class="kw-2">mut </span>quotient = quotient.to_u64().unwrap();
-    <span class="kw">let </span>n_rounding_bits = {
-        <span class="kw">let </span>quotient_bits = <span class="number">64 </span>- quotient.leading_zeros() <span class="kw">as </span>isize;
-        <span class="kw">let </span>subnormal_bits = MIN_EXP <span class="kw">as </span>isize - shift;
-        quotient_bits.max(subnormal_bits) - MANTISSA_DIGITS <span class="kw">as </span>isize
-    } <span class="kw">as </span>usize;
-    <span class="macro">debug_assert!</span>(n_rounding_bits == <span class="number">2 </span>|| n_rounding_bits == <span class="number">3</span>);
-    <span class="kw">let </span>rounding_bit_mask = (<span class="number">1u64 </span>&lt;&lt; n_rounding_bits) - <span class="number">1</span>;
-
-    <span class="comment">// Round to 53 bits with round-to-even. For rounding, we need to take into account both
-    // our rounding bits and the division&#39;s remainder.
-    </span><span class="kw">let </span>ls_bit = quotient &amp; (<span class="number">1u64 </span>&lt;&lt; n_rounding_bits) != <span class="number">0</span>;
-    <span class="kw">let </span>ms_rounding_bit = quotient &amp; (<span class="number">1u64 </span>&lt;&lt; (n_rounding_bits - <span class="number">1</span>)) != <span class="number">0</span>;
-    <span class="kw">let </span>ls_rounding_bits = quotient &amp; (rounding_bit_mask &gt;&gt; <span class="number">1</span>) != <span class="number">0</span>;
-    <span class="kw">if </span>ms_rounding_bit &amp;&amp; (ls_bit || ls_rounding_bits || !remainder.is_zero()) {
-        quotient += <span class="number">1u64 </span>&lt;&lt; n_rounding_bits;
-    }
-    quotient &amp;= !rounding_bit_mask;
-
-    <span class="comment">// The quotient is guaranteed to be exactly representable as it&#39;s now 53 bits + 2 or 3
-    // trailing zeros, so there is no risk of a rounding error here.
-    </span><span class="kw">let </span>q_float = quotient <span class="kw">as </span>f64 * flo_sign;
-    ldexp(q_float, shift <span class="kw">as </span>i32)
-}
-
-<span class="doccomment">/// Multiply `x` by 2 to the power of `exp`. Returns an accurate result even if `2^exp` is not
-/// representable.
-</span><span class="kw">fn </span>ldexp(x: f64, exp: i32) -&gt; f64 {
-    <span class="kw">use </span>core::f64::{INFINITY, MANTISSA_DIGITS, MAX_EXP, RADIX};
-
-    <span class="macro">assert_eq!</span>(
-        RADIX, <span class="number">2</span>,
-        <span class="string">&quot;only floating point implementations with radix 2 are supported&quot;
-    </span>);
-
-    <span class="kw">const </span>EXPONENT_MASK: u64 = <span class="number">0x7ff </span>&lt;&lt; <span class="number">52</span>;
-    <span class="kw">const </span>MAX_UNSIGNED_EXPONENT: i32 = <span class="number">0x7fe</span>;
-    <span class="kw">const </span>MIN_SUBNORMAL_POWER: i32 = MANTISSA_DIGITS <span class="kw">as </span>i32;
-
-    <span class="kw">if </span>x.is_zero() || x.is_infinite() || x.is_nan() {
-        <span class="kw">return </span>x;
-    }
-
-    <span class="comment">// Filter out obvious over / underflows to make sure the resulting exponent fits in an isize.
-    </span><span class="kw">if </span>exp &gt; <span class="number">3 </span>* MAX_EXP {
-        <span class="kw">return </span>INFINITY * x.signum();
-    } <span class="kw">else if </span>exp &lt; -<span class="number">3 </span>* MAX_EXP {
-        <span class="kw">return </span><span class="number">0.0 </span>* x.signum();
-    }
-
-    <span class="comment">// curr_exp is the x&#39;s *biased* exponent, and is in the [-54, MAX_UNSIGNED_EXPONENT] range.
-    </span><span class="kw">let </span>(bits, curr_exp) = <span class="kw">if </span>!x.is_normal() {
-        <span class="comment">// If x is subnormal, we make it normal by multiplying by 2^53. This causes no loss of
-        // precision or rounding.
-        </span><span class="kw">let </span>normal_x = x * <span class="number">2f64</span>.powi(MIN_SUBNORMAL_POWER);
-        <span class="kw">let </span>bits = normal_x.to_bits();
-        <span class="comment">// This cast is safe because the exponent is at most 0x7fe, which fits in an i32.
-        </span>(
-            bits,
-            ((bits &amp; EXPONENT_MASK) &gt;&gt; <span class="number">52</span>) <span class="kw">as </span>i32 - MIN_SUBNORMAL_POWER,
-        )
-    } <span class="kw">else </span>{
-        <span class="kw">let </span>bits = x.to_bits();
-        <span class="kw">let </span>curr_exp = (bits &amp; EXPONENT_MASK) &gt;&gt; <span class="number">52</span>;
-        <span class="comment">// This cast is safe because the exponent is at most 0x7fe, which fits in an i32.
-        </span>(bits, curr_exp <span class="kw">as </span>i32)
-    };
-
-    <span class="comment">// The addition can&#39;t overflow because exponent is between 0 and 0x7fe, and exp is between
-    // -2*MAX_EXP and 2*MAX_EXP.
-    </span><span class="kw">let </span>new_exp = curr_exp + exp;
-
-    <span class="kw">if </span>new_exp &gt; MAX_UNSIGNED_EXPONENT {
-        INFINITY * x.signum()
-    } <span class="kw">else if </span>new_exp &gt; <span class="number">0 </span>{
-        <span class="comment">// Normal case: exponent is not too large nor subnormal.
-        </span><span class="kw">let </span>new_bits = (bits &amp; !EXPONENT_MASK) | ((new_exp <span class="kw">as </span>u64) &lt;&lt; <span class="number">52</span>);
-        f64::from_bits(new_bits)
-    } <span class="kw">else if </span>new_exp &gt;= -(MANTISSA_DIGITS <span class="kw">as </span>i32) {
-        <span class="comment">// Result is subnormal but may not be zero.
-        // In this case, we increase the exponent by 54 to make it normal, then multiply the end
-        // result by 2^-53. This results in a single multiplication with no prior rounding error,
-        // so there is no risk of double rounding.
-        </span><span class="kw">let </span>new_exp = new_exp + MIN_SUBNORMAL_POWER;
-        <span class="macro">debug_assert!</span>(new_exp &gt;= <span class="number">0</span>);
-        <span class="kw">let </span>new_bits = (bits &amp; !EXPONENT_MASK) | ((new_exp <span class="kw">as </span>u64) &lt;&lt; <span class="number">52</span>);
-        f64::from_bits(new_bits) * <span class="number">2f64</span>.powi(-MIN_SUBNORMAL_POWER)
-    } <span class="kw">else </span>{
-        <span class="comment">// Result is zero.
-        </span><span class="kw">return </span><span class="number">0.0 </span>* x.signum();
-    }
-}
-
 <span class="attr">#[cfg(test)]
 #[cfg(feature = <span class="string">&quot;std&quot;</span>)]
 </span><span class="kw">fn </span>hash&lt;T: Hash&gt;(x: <span class="kw-2">&amp;</span>T) -&gt; u64 {
@@ -4802,105 +3948,78 @@
 
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>test {
-    <span class="kw">use </span><span class="kw">super</span>::ldexp;
-    <span class="attr">#[cfg(all(feature = <span class="string">&quot;num-bigint&quot;</span>))]
-    </span><span class="kw">use </span><span class="kw">super</span>::BigInt;
-    <span class="attr">#[cfg(feature = <span class="string">&quot;num-bigint&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">&quot;bigint&quot;</span>)]
     </span><span class="kw">use </span><span class="kw">super</span>::BigRational;
-    <span class="kw">use super</span>::{Ratio, Rational64};
+    <span class="kw">use super</span>::{Ratio, Rational, Rational64};
 
     <span class="kw">use </span>core::f64;
     <span class="kw">use </span>core::i32;
-    <span class="kw">use </span>core::i64;
+    <span class="kw">use </span>core::isize;
     <span class="kw">use </span>core::str::FromStr;
-    <span class="kw">use </span>num_integer::Integer;
-    <span class="kw">use </span>num_traits::ToPrimitive;
-    <span class="kw">use </span>num_traits::{FromPrimitive, One, Pow, Signed, Zero};
+    <span class="kw">use </span>integer::Integer;
+    <span class="kw">use </span>traits::{FromPrimitive, One, Pow, Signed, Zero};
 
-    <span class="kw">pub const </span>_0: Rational64 = Ratio { numer: <span class="number">0</span>, denom: <span class="number">1 </span>};
-    <span class="kw">pub const </span>_1: Rational64 = Ratio { numer: <span class="number">1</span>, denom: <span class="number">1 </span>};
-    <span class="kw">pub const </span>_2: Rational64 = Ratio { numer: <span class="number">2</span>, denom: <span class="number">1 </span>};
-    <span class="kw">pub const </span>_NEG2: Rational64 = Ratio {
+    <span class="kw">pub const </span>_0: Rational = Ratio { numer: <span class="number">0</span>, denom: <span class="number">1 </span>};
+    <span class="kw">pub const </span>_1: Rational = Ratio { numer: <span class="number">1</span>, denom: <span class="number">1 </span>};
+    <span class="kw">pub const </span>_2: Rational = Ratio { numer: <span class="number">2</span>, denom: <span class="number">1 </span>};
+    <span class="kw">pub const </span>_NEG2: Rational = Ratio {
         numer: -<span class="number">2</span>,
         denom: <span class="number">1</span>,
     };
-    <span class="kw">pub const </span>_8: Rational64 = Ratio { numer: <span class="number">8</span>, denom: <span class="number">1 </span>};
-    <span class="kw">pub const </span>_15: Rational64 = Ratio {
-        numer: <span class="number">15</span>,
-        denom: <span class="number">1</span>,
-    };
-    <span class="kw">pub const </span>_16: Rational64 = Ratio {
-        numer: <span class="number">16</span>,
-        denom: <span class="number">1</span>,
-    };
-
-    <span class="kw">pub const </span>_1_2: Rational64 = Ratio { numer: <span class="number">1</span>, denom: <span class="number">2 </span>};
-    <span class="kw">pub const </span>_1_8: Rational64 = Ratio { numer: <span class="number">1</span>, denom: <span class="number">8 </span>};
-    <span class="kw">pub const </span>_1_15: Rational64 = Ratio {
-        numer: <span class="number">1</span>,
-        denom: <span class="number">15</span>,
-    };
-    <span class="kw">pub const </span>_1_16: Rational64 = Ratio {
-        numer: <span class="number">1</span>,
-        denom: <span class="number">16</span>,
-    };
-    <span class="kw">pub const </span>_3_2: Rational64 = Ratio { numer: <span class="number">3</span>, denom: <span class="number">2 </span>};
-    <span class="kw">pub const </span>_5_2: Rational64 = Ratio { numer: <span class="number">5</span>, denom: <span class="number">2 </span>};
-    <span class="kw">pub const </span>_NEG1_2: Rational64 = Ratio {
+    <span class="kw">pub const </span>_1_2: Rational = Ratio { numer: <span class="number">1</span>, denom: <span class="number">2 </span>};
+    <span class="kw">pub const </span>_3_2: Rational = Ratio { numer: <span class="number">3</span>, denom: <span class="number">2 </span>};
+    <span class="kw">pub const </span>_5_2: Rational = Ratio { numer: <span class="number">5</span>, denom: <span class="number">2 </span>};
+    <span class="kw">pub const </span>_NEG1_2: Rational = Ratio {
         numer: -<span class="number">1</span>,
         denom: <span class="number">2</span>,
     };
-    <span class="kw">pub const </span>_1_NEG2: Rational64 = Ratio {
+    <span class="kw">pub const </span>_1_NEG2: Rational = Ratio {
         numer: <span class="number">1</span>,
         denom: -<span class="number">2</span>,
     };
-    <span class="kw">pub const </span>_NEG1_NEG2: Rational64 = Ratio {
+    <span class="kw">pub const </span>_NEG1_NEG2: Rational = Ratio {
         numer: -<span class="number">1</span>,
         denom: -<span class="number">2</span>,
     };
-    <span class="kw">pub const </span>_1_3: Rational64 = Ratio { numer: <span class="number">1</span>, denom: <span class="number">3 </span>};
-    <span class="kw">pub const </span>_NEG1_3: Rational64 = Ratio {
+    <span class="kw">pub const </span>_1_3: Rational = Ratio { numer: <span class="number">1</span>, denom: <span class="number">3 </span>};
+    <span class="kw">pub const </span>_NEG1_3: Rational = Ratio {
         numer: -<span class="number">1</span>,
         denom: <span class="number">3</span>,
     };
-    <span class="kw">pub const </span>_2_3: Rational64 = Ratio { numer: <span class="number">2</span>, denom: <span class="number">3 </span>};
-    <span class="kw">pub const </span>_NEG2_3: Rational64 = Ratio {
+    <span class="kw">pub const </span>_2_3: Rational = Ratio { numer: <span class="number">2</span>, denom: <span class="number">3 </span>};
+    <span class="kw">pub const </span>_NEG2_3: Rational = Ratio {
         numer: -<span class="number">2</span>,
         denom: <span class="number">3</span>,
     };
-    <span class="kw">pub const </span>_MIN: Rational64 = Ratio {
-        numer: i64::MIN,
+    <span class="kw">pub const </span>_MIN: Rational = Ratio {
+        numer: isize::MIN,
         denom: <span class="number">1</span>,
     };
-    <span class="kw">pub const </span>_MIN_P1: Rational64 = Ratio {
-        numer: i64::MIN + <span class="number">1</span>,
+    <span class="kw">pub const </span>_MIN_P1: Rational = Ratio {
+        numer: isize::MIN + <span class="number">1</span>,
         denom: <span class="number">1</span>,
     };
-    <span class="kw">pub const </span>_MAX: Rational64 = Ratio {
-        numer: i64::MAX,
+    <span class="kw">pub const </span>_MAX: Rational = Ratio {
+        numer: isize::MAX,
         denom: <span class="number">1</span>,
     };
-    <span class="kw">pub const </span>_MAX_M1: Rational64 = Ratio {
-        numer: i64::MAX - <span class="number">1</span>,
-        denom: <span class="number">1</span>,
-    };
-    <span class="kw">pub const </span>_BILLION: Rational64 = Ratio {
-        numer: <span class="number">1_000_000_000</span>,
+    <span class="kw">pub const </span>_MAX_M1: Rational = Ratio {
+        numer: isize::MAX - <span class="number">1</span>,
         denom: <span class="number">1</span>,
     };
 
-    <span class="attr">#[cfg(feature = <span class="string">&quot;num-bigint&quot;</span>)]
-    </span><span class="kw">pub fn </span>to_big(n: Rational64) -&gt; BigRational {
+    <span class="attr">#[cfg(feature = <span class="string">&quot;bigint&quot;</span>)]
+    </span><span class="kw">pub fn </span>to_big(n: Rational) -&gt; BigRational {
         Ratio::new(
-            FromPrimitive::from_i64(n.numer).unwrap(),
-            FromPrimitive::from_i64(n.denom).unwrap(),
+            FromPrimitive::from_isize(n.numer).unwrap(),
+            FromPrimitive::from_isize(n.denom).unwrap(),
         )
     }
-    <span class="attr">#[cfg(not(feature = <span class="string">&quot;num-bigint&quot;</span>))]
-    </span><span class="kw">pub fn </span>to_big(n: Rational64) -&gt; Rational64 {
+    <span class="attr">#[cfg(not(feature = <span class="string">&quot;bigint&quot;</span>))]
+    </span><span class="kw">pub fn </span>to_big(n: Rational) -&gt; Rational {
         Ratio::new(
-            FromPrimitive::from_i64(n.numer).unwrap(),
-            FromPrimitive::from_i64(n.denom).unwrap(),
+            FromPrimitive::from_isize(n.numer).unwrap(),
+            FromPrimitive::from_isize(n.denom).unwrap(),
         )
     }
 
@@ -4971,7 +4090,6 @@
     }
 
     <span class="attr">#[test]
-    #[allow(clippy::eq_op)]
     </span><span class="kw">fn </span>test_cmp() {
         <span class="macro">assert!</span>(_0 == _0 &amp;&amp; _1 == _1);
         <span class="macro">assert!</span>(_0 != _1 &amp;&amp; _1 != _0);
@@ -4984,7 +4102,7 @@
         <span class="macro">assert!</span>(_0 &gt;= _0 &amp;&amp; _1 &gt;= _1);
         <span class="macro">assert!</span>(_1 &gt;= _0 &amp;&amp; !(_0 &gt;= _1));
 
-        <span class="kw">let </span>_0_2: Rational64 = Ratio::new_raw(<span class="number">0</span>, <span class="number">2</span>);
+        <span class="kw">let </span>_0_2: Rational = Ratio::new_raw(<span class="number">0</span>, <span class="number">2</span>);
         <span class="macro">assert_eq!</span>(_0, _0_2);
     }
 
@@ -5066,177 +4184,26 @@
         <span class="macro">assert!</span>(!_NEG1_2.is_integer());
     }
 
-    <span class="attr">#[cfg(not(feature = <span class="string">&quot;std&quot;</span>))]
-    </span><span class="kw">use </span>core::fmt::{<span class="self">self</span>, Write};
-    <span class="attr">#[cfg(not(feature = <span class="string">&quot;std&quot;</span>))]
-    #[derive(Debug)]
-    </span><span class="kw">struct </span>NoStdTester {
-        cursor: usize,
-        buf: [u8; NoStdTester::BUF_SIZE],
-    }
-
-    <span class="attr">#[cfg(not(feature = <span class="string">&quot;std&quot;</span>))]
-    </span><span class="kw">impl </span>NoStdTester {
-        <span class="kw">fn </span>new() -&gt; NoStdTester {
-            NoStdTester {
-                buf: [<span class="number">0</span>; <span class="self">Self</span>::BUF_SIZE],
-                cursor: <span class="number">0</span>,
-            }
-        }
-
-        <span class="kw">fn </span>clear(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-            <span class="self">self</span>.buf = [<span class="number">0</span>; <span class="self">Self</span>::BUF_SIZE];
-            <span class="self">self</span>.cursor = <span class="number">0</span>;
-        }
-
-        <span class="kw">const </span>WRITE_ERR: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;Formatted output too long&quot;</span>;
-        <span class="kw">const </span>BUF_SIZE: usize = <span class="number">32</span>;
-    }
-
-    <span class="attr">#[cfg(not(feature = <span class="string">&quot;std&quot;</span>))]
-    </span><span class="kw">impl </span>Write <span class="kw">for </span>NoStdTester {
-        <span class="kw">fn </span>write_str(<span class="kw-2">&amp;mut </span><span class="self">self</span>, s: <span class="kw-2">&amp;</span>str) -&gt; fmt::Result {
-            <span class="kw">for </span>byte <span class="kw">in </span>s.bytes() {
-                <span class="self">self</span>.buf[<span class="self">self</span>.cursor] = byte;
-                <span class="self">self</span>.cursor += <span class="number">1</span>;
-                <span class="kw">if </span><span class="self">self</span>.cursor &gt;= <span class="self">self</span>.buf.len() {
-                    <span class="kw">return </span><span class="prelude-val">Err</span>(fmt::Error {});
-                }
-            }
-            <span class="prelude-val">Ok</span>(())
-        }
-    }
-
-    <span class="attr">#[cfg(not(feature = <span class="string">&quot;std&quot;</span>))]
-    </span><span class="kw">impl </span>PartialEq&lt;str&gt; <span class="kw">for </span>NoStdTester {
-        <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>str) -&gt; bool {
-            <span class="kw">let </span>other = other.as_bytes();
-            <span class="kw">for </span>index <span class="kw">in </span><span class="number">0</span>..<span class="self">self</span>.cursor {
-                <span class="kw">if </span><span class="self">self</span>.buf.get(index) != other.get(index) {
-                    <span class="kw">return </span><span class="bool-val">false</span>;
-                }
-            }
-            <span class="bool-val">true
-        </span>}
-    }
-
-    <span class="macro">macro_rules! </span>assert_fmt_eq {
-        (<span class="macro-nonterminal">$fmt_args</span>:expr, <span class="macro-nonterminal">$string</span>:expr) =&gt; {
-            <span class="attr">#[cfg(not(feature = <span class="string">&quot;std&quot;</span>))]
-            </span>{
-                <span class="kw">let </span><span class="kw-2">mut </span>tester = NoStdTester::new();
-                <span class="macro">write!</span>(tester, <span class="string">&quot;{}&quot;</span>, <span class="macro-nonterminal">$fmt_args</span>).expect(NoStdTester::WRITE_ERR);
-                <span class="macro">assert_eq!</span>(tester, <span class="kw-2">*</span><span class="macro-nonterminal">$string</span>);
-                tester.clear();
-            }
-            <span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
-            </span>{
-                <span class="macro">assert_eq!</span>(std::fmt::format(<span class="macro-nonterminal">$fmt_args</span>), <span class="macro-nonterminal">$string</span>);
-            }
-        };
-    }
-
     <span class="attr">#[test]
+    #[cfg(feature = <span class="string">&quot;std&quot;</span>)]
     </span><span class="kw">fn </span>test_show() {
-        <span class="comment">// Test:
-        // :b :o :x, :X, :?
-        // alternate or not (#)
-        // positive and negative
-        // padding
-        // does not test precision (i.e. truncation)
-        </span><span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{}&quot;</span>, _2), <span class="string">&quot;2&quot;</span>);
-        <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:+}&quot;</span>, _2), <span class="string">&quot;+2&quot;</span>);
-        <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:-}&quot;</span>, _2), <span class="string">&quot;2&quot;</span>);
-        <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{}&quot;</span>, _1_2), <span class="string">&quot;1/2&quot;</span>);
-        <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{}&quot;</span>, -_1_2), <span class="string">&quot;-1/2&quot;</span>); <span class="comment">// test negatives
-        </span><span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{}&quot;</span>, _0), <span class="string">&quot;0&quot;</span>);
-        <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{}&quot;</span>, -_2), <span class="string">&quot;-2&quot;</span>);
-        <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:+}&quot;</span>, -_2), <span class="string">&quot;-2&quot;</span>);
-        <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:b}&quot;</span>, _2), <span class="string">&quot;10&quot;</span>);
-        <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:#b}&quot;</span>, _2), <span class="string">&quot;0b10&quot;</span>);
-        <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:b}&quot;</span>, _1_2), <span class="string">&quot;1/10&quot;</span>);
-        <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:+b}&quot;</span>, _1_2), <span class="string">&quot;+1/10&quot;</span>);
-        <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:-b}&quot;</span>, _1_2), <span class="string">&quot;1/10&quot;</span>);
-        <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:b}&quot;</span>, _0), <span class="string">&quot;0&quot;</span>);
-        <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:#b}&quot;</span>, _1_2), <span class="string">&quot;0b1/0b10&quot;</span>);
-        <span class="comment">// no std does not support padding
-        </span><span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
-        </span><span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{:010b}&quot;</span>, _1_2), <span class="string">&quot;0000001/10&quot;</span>);
-        <span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
-        </span><span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{:#010b}&quot;</span>, _1_2), <span class="string">&quot;0b001/0b10&quot;</span>);
-        <span class="kw">let </span>half_i8: Ratio&lt;i8&gt; = Ratio::new(<span class="number">1_i8</span>, <span class="number">2_i8</span>);
-        <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:b}&quot;</span>, -half_i8), <span class="string">&quot;11111111/10&quot;</span>);
-        <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:#b}&quot;</span>, -half_i8), <span class="string">&quot;0b11111111/0b10&quot;</span>);
-        <span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
-        </span><span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{:05}&quot;</span>, Ratio::new(-<span class="number">1_i8</span>, <span class="number">1_i8</span>)), <span class="string">&quot;-0001&quot;</span>);
-
-        <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:o}&quot;</span>, _8), <span class="string">&quot;10&quot;</span>);
-        <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:o}&quot;</span>, _1_8), <span class="string">&quot;1/10&quot;</span>);
-        <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:o}&quot;</span>, _0), <span class="string">&quot;0&quot;</span>);
-        <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:#o}&quot;</span>, _1_8), <span class="string">&quot;0o1/0o10&quot;</span>);
-        <span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
-        </span><span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{:010o}&quot;</span>, _1_8), <span class="string">&quot;0000001/10&quot;</span>);
-        <span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
-        </span><span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{:#010o}&quot;</span>, _1_8), <span class="string">&quot;0o001/0o10&quot;</span>);
-        <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:o}&quot;</span>, -half_i8), <span class="string">&quot;377/2&quot;</span>);
-        <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:#o}&quot;</span>, -half_i8), <span class="string">&quot;0o377/0o2&quot;</span>);
-
-        <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:x}&quot;</span>, _16), <span class="string">&quot;10&quot;</span>);
-        <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:x}&quot;</span>, _15), <span class="string">&quot;f&quot;</span>);
-        <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:x}&quot;</span>, _1_16), <span class="string">&quot;1/10&quot;</span>);
-        <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:x}&quot;</span>, _1_15), <span class="string">&quot;1/f&quot;</span>);
-        <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:x}&quot;</span>, _0), <span class="string">&quot;0&quot;</span>);
-        <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:#x}&quot;</span>, _1_16), <span class="string">&quot;0x1/0x10&quot;</span>);
-        <span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
-        </span><span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{:010x}&quot;</span>, _1_16), <span class="string">&quot;0000001/10&quot;</span>);
-        <span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
-        </span><span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{:#010x}&quot;</span>, _1_16), <span class="string">&quot;0x001/0x10&quot;</span>);
-        <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:x}&quot;</span>, -half_i8), <span class="string">&quot;ff/2&quot;</span>);
-        <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:#x}&quot;</span>, -half_i8), <span class="string">&quot;0xff/0x2&quot;</span>);
-
-        <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:X}&quot;</span>, _16), <span class="string">&quot;10&quot;</span>);
-        <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:X}&quot;</span>, _15), <span class="string">&quot;F&quot;</span>);
-        <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:X}&quot;</span>, _1_16), <span class="string">&quot;1/10&quot;</span>);
-        <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:X}&quot;</span>, _1_15), <span class="string">&quot;1/F&quot;</span>);
-        <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:X}&quot;</span>, _0), <span class="string">&quot;0&quot;</span>);
-        <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:#X}&quot;</span>, _1_16), <span class="string">&quot;0x1/0x10&quot;</span>);
-        <span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
-        </span><span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:010X}&quot;</span>, _1_16), <span class="string">&quot;0000001/10&quot;</span>);
-        <span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
-        </span><span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:#010X}&quot;</span>, _1_16), <span class="string">&quot;0x001/0x10&quot;</span>);
-        <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:X}&quot;</span>, -half_i8), <span class="string">&quot;FF/2&quot;</span>);
-        <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:#X}&quot;</span>, -half_i8), <span class="string">&quot;0xFF/0x2&quot;</span>);
-
-        <span class="attr">#[cfg(has_int_exp_fmt)]
-        </span>{
-            <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:e}&quot;</span>, -_2), <span class="string">&quot;-2e0&quot;</span>);
-            <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:#e}&quot;</span>, -_2), <span class="string">&quot;-2e0&quot;</span>);
-            <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:+e}&quot;</span>, -_2), <span class="string">&quot;-2e0&quot;</span>);
-            <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:e}&quot;</span>, _BILLION), <span class="string">&quot;1e9&quot;</span>);
-            <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:+e}&quot;</span>, _BILLION), <span class="string">&quot;+1e9&quot;</span>);
-            <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:e}&quot;</span>, _BILLION.recip()), <span class="string">&quot;1e0/1e9&quot;</span>);
-            <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:+e}&quot;</span>, _BILLION.recip()), <span class="string">&quot;+1e0/1e9&quot;</span>);
-
-            <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:E}&quot;</span>, -_2), <span class="string">&quot;-2E0&quot;</span>);
-            <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:#E}&quot;</span>, -_2), <span class="string">&quot;-2E0&quot;</span>);
-            <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:+E}&quot;</span>, -_2), <span class="string">&quot;-2E0&quot;</span>);
-            <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:E}&quot;</span>, _BILLION), <span class="string">&quot;1E9&quot;</span>);
-            <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:+E}&quot;</span>, _BILLION), <span class="string">&quot;+1E9&quot;</span>);
-            <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:E}&quot;</span>, _BILLION.recip()), <span class="string">&quot;1E0/1E9&quot;</span>);
-            <span class="macro">assert_fmt_eq!</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:+E}&quot;</span>, _BILLION.recip()), <span class="string">&quot;+1E0/1E9&quot;</span>);
-        }
+        <span class="kw">use </span>std::string::ToString;
+        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, _2), <span class="string">&quot;2&quot;</span>.to_string());
+        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, _1_2), <span class="string">&quot;1/2&quot;</span>.to_string());
+        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, _0), <span class="string">&quot;0&quot;</span>.to_string());
+        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, Ratio::from_integer(-<span class="number">2</span>)), <span class="string">&quot;-2&quot;</span>.to_string());
     }
 
     <span class="kw">mod </span>arith {
-        <span class="kw">use </span><span class="kw">super</span>::<span class="kw">super</span>::{Ratio, Rational64};
+        <span class="kw">use </span><span class="kw">super</span>::<span class="kw">super</span>::{Ratio, Rational};
         <span class="kw">use super</span>::{to_big, _0, _1, _1_2, _2, _3_2, _5_2, _MAX, _MAX_M1, _MIN, _MIN_P1, _NEG1_2};
         <span class="kw">use </span>core::fmt::Debug;
-        <span class="kw">use </span>num_integer::Integer;
-        <span class="kw">use </span>num_traits::{Bounded, CheckedAdd, CheckedDiv, CheckedMul, CheckedSub, NumAssign};
+        <span class="kw">use </span>integer::Integer;
+        <span class="kw">use </span>traits::{Bounded, CheckedAdd, CheckedDiv, CheckedMul, CheckedSub, NumAssign};
 
         <span class="attr">#[test]
         </span><span class="kw">fn </span>test_add() {
-            <span class="kw">fn </span>test(a: Rational64, b: Rational64, c: Rational64) {
+            <span class="kw">fn </span>test(a: Rational, b: Rational, c: Rational) {
                 <span class="macro">assert_eq!</span>(a + b, c);
                 <span class="macro">assert_eq!</span>(
                     {
@@ -5250,7 +4217,7 @@
                 <span class="macro">assert_eq!</span>(a.checked_add(<span class="kw-2">&amp;</span>b), <span class="prelude-val">Some</span>(c));
                 <span class="macro">assert_eq!</span>(to_big(a).checked_add(<span class="kw-2">&amp;</span>to_big(b)), <span class="prelude-val">Some</span>(to_big(c)));
             }
-            <span class="kw">fn </span>test_assign(a: Rational64, b: i64, c: Rational64) {
+            <span class="kw">fn </span>test_assign(a: Rational, b: isize, c: Rational) {
                 <span class="macro">assert_eq!</span>(a + b, c);
                 <span class="macro">assert_eq!</span>(
                     {
@@ -5284,10 +4251,10 @@
                 <span class="macro">assert_eq!</span>(
                     {
                         <span class="kw">let </span><span class="kw-2">mut </span>tmp = _1_max.clone();
-                        tmp += _1_max;
+                        tmp += _1_max.clone();
                         tmp
                     },
-                    _2_max
+                    _2_max.clone()
                 );
             }
             test_add_typed_overflow::&lt;u8&gt;();
@@ -5295,19 +4262,21 @@
             test_add_typed_overflow::&lt;u32&gt;();
             test_add_typed_overflow::&lt;u64&gt;();
             test_add_typed_overflow::&lt;usize&gt;();
-            test_add_typed_overflow::&lt;u128&gt;();
+            <span class="attr">#[cfg(has_u128)]
+            </span>test_add_typed_overflow::&lt;u128&gt;();
 
             test_add_typed_overflow::&lt;i8&gt;();
             test_add_typed_overflow::&lt;i16&gt;();
             test_add_typed_overflow::&lt;i32&gt;();
             test_add_typed_overflow::&lt;i64&gt;();
             test_add_typed_overflow::&lt;isize&gt;();
-            test_add_typed_overflow::&lt;i128&gt;();
+            <span class="attr">#[cfg(has_i128)]
+            </span>test_add_typed_overflow::&lt;i128&gt;();
         }
 
         <span class="attr">#[test]
         </span><span class="kw">fn </span>test_sub() {
-            <span class="kw">fn </span>test(a: Rational64, b: Rational64, c: Rational64) {
+            <span class="kw">fn </span>test(a: Rational, b: Rational, c: Rational) {
                 <span class="macro">assert_eq!</span>(a - b, c);
                 <span class="macro">assert_eq!</span>(
                     {
@@ -5321,7 +4290,7 @@
                 <span class="macro">assert_eq!</span>(a.checked_sub(<span class="kw-2">&amp;</span>b), <span class="prelude-val">Some</span>(c));
                 <span class="macro">assert_eq!</span>(to_big(a).checked_sub(<span class="kw-2">&amp;</span>to_big(b)), <span class="prelude-val">Some</span>(to_big(c)));
             }
-            <span class="kw">fn </span>test_assign(a: Rational64, b: i64, c: Rational64) {
+            <span class="kw">fn </span>test_assign(a: Rational, b: isize, c: Rational) {
                 <span class="macro">assert_eq!</span>(a - b, c);
                 <span class="macro">assert_eq!</span>(
                     {
@@ -5351,7 +4320,7 @@
                 <span class="macro">assert!</span>(T::is_zero(<span class="kw-2">&amp;</span>(_1_max.clone() - _1_max.clone()).numer));
                 {
                     <span class="kw">let </span><span class="kw-2">mut </span>tmp: Ratio&lt;T&gt; = _1_max.clone();
-                    tmp -= _1_max;
+                    tmp -= _1_max.clone();
                     <span class="macro">assert!</span>(T::is_zero(<span class="kw-2">&amp;</span>tmp.numer));
                 }
             }
@@ -5360,19 +4329,21 @@
             test_sub_typed_overflow::&lt;u32&gt;();
             test_sub_typed_overflow::&lt;u64&gt;();
             test_sub_typed_overflow::&lt;usize&gt;();
-            test_sub_typed_overflow::&lt;u128&gt;();
+            <span class="attr">#[cfg(has_u128)]
+            </span>test_sub_typed_overflow::&lt;u128&gt;();
 
             test_sub_typed_overflow::&lt;i8&gt;();
             test_sub_typed_overflow::&lt;i16&gt;();
             test_sub_typed_overflow::&lt;i32&gt;();
             test_sub_typed_overflow::&lt;i64&gt;();
             test_sub_typed_overflow::&lt;isize&gt;();
-            test_sub_typed_overflow::&lt;i128&gt;();
+            <span class="attr">#[cfg(has_i128)]
+            </span>test_sub_typed_overflow::&lt;i128&gt;();
         }
 
         <span class="attr">#[test]
         </span><span class="kw">fn </span>test_mul() {
-            <span class="kw">fn </span>test(a: Rational64, b: Rational64, c: Rational64) {
+            <span class="kw">fn </span>test(a: Rational, b: Rational, c: Rational) {
                 <span class="macro">assert_eq!</span>(a * b, c);
                 <span class="macro">assert_eq!</span>(
                     {
@@ -5386,7 +4357,7 @@
                 <span class="macro">assert_eq!</span>(a.checked_mul(<span class="kw-2">&amp;</span>b), <span class="prelude-val">Some</span>(c));
                 <span class="macro">assert_eq!</span>(to_big(a).checked_mul(<span class="kw-2">&amp;</span>to_big(b)), <span class="prelude-val">Some</span>(to_big(c)));
             }
-            <span class="kw">fn </span>test_assign(a: Rational64, b: i64, c: Rational64) {
+            <span class="kw">fn </span>test_assign(a: Rational, b: isize, c: Rational) {
                 <span class="macro">assert_eq!</span>(a * b, c);
                 <span class="macro">assert_eq!</span>(
                     {
@@ -5426,21 +4397,21 @@
                     _1_big.clone().checked_mul(<span class="kw-2">&amp;</span>_2_3.clone())
                 );
                 <span class="macro">assert_eq!</span>(expected, {
-                    <span class="kw">let </span><span class="kw-2">mut </span>tmp = _1_big;
+                    <span class="kw">let </span><span class="kw-2">mut </span>tmp = _1_big.clone();
                     tmp <span class="kw-2">*</span>= _2_3;
                     tmp
                 });
 
                 <span class="comment">// big/3 * 3 = big/1
                 // make big = max/2, but make it indivisible by 3
-                </span><span class="kw">let </span>big = T::max_value() / two / _3.clone() * _3.clone() + T::one();
+                </span><span class="kw">let </span>big = T::max_value() / two.clone() / _3.clone() * _3.clone() + T::one();
                 <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, big.clone().checked_mul(<span class="kw-2">&amp;</span>_3.clone()));
                 <span class="kw">let </span>big_3 = Ratio::new(big.clone(), _3.clone());
-                <span class="kw">let </span>expected = Ratio::new(big, T::one());
+                <span class="kw">let </span>expected = Ratio::new(big.clone(), T::one());
                 <span class="macro">assert_eq!</span>(expected, big_3.clone() * _3.clone());
                 <span class="macro">assert_eq!</span>(expected, {
-                    <span class="kw">let </span><span class="kw-2">mut </span>tmp = big_3;
-                    tmp <span class="kw-2">*</span>= _3;
+                    <span class="kw">let </span><span class="kw-2">mut </span>tmp = big_3.clone();
+                    tmp <span class="kw-2">*</span>= _3.clone();
                     tmp
                 });
             }
@@ -5449,19 +4420,21 @@
             test_mul_typed_overflow::&lt;u32&gt;();
             test_mul_typed_overflow::&lt;u64&gt;();
             test_mul_typed_overflow::&lt;usize&gt;();
-            test_mul_typed_overflow::&lt;u128&gt;();
+            <span class="attr">#[cfg(has_u128)]
+            </span>test_mul_typed_overflow::&lt;u128&gt;();
 
             test_mul_typed_overflow::&lt;i8&gt;();
             test_mul_typed_overflow::&lt;i16&gt;();
             test_mul_typed_overflow::&lt;i32&gt;();
             test_mul_typed_overflow::&lt;i64&gt;();
             test_mul_typed_overflow::&lt;isize&gt;();
-            test_mul_typed_overflow::&lt;i128&gt;();
+            <span class="attr">#[cfg(has_i128)]
+            </span>test_mul_typed_overflow::&lt;i128&gt;();
         }
 
         <span class="attr">#[test]
         </span><span class="kw">fn </span>test_div() {
-            <span class="kw">fn </span>test(a: Rational64, b: Rational64, c: Rational64) {
+            <span class="kw">fn </span>test(a: Rational, b: Rational, c: Rational) {
                 <span class="macro">assert_eq!</span>(a / b, c);
                 <span class="macro">assert_eq!</span>(
                     {
@@ -5475,7 +4448,7 @@
                 <span class="macro">assert_eq!</span>(a.checked_div(<span class="kw-2">&amp;</span>b), <span class="prelude-val">Some</span>(c));
                 <span class="macro">assert_eq!</span>(to_big(a).checked_div(<span class="kw-2">&amp;</span>to_big(b)), <span class="prelude-val">Some</span>(to_big(c)));
             }
-            <span class="kw">fn </span>test_assign(a: Rational64, b: i64, c: Rational64) {
+            <span class="kw">fn </span>test_assign(a: Rational, b: isize, c: Rational) {
                 <span class="macro">assert_eq!</span>(a / b, c);
                 <span class="macro">assert_eq!</span>(
                     {
@@ -5508,28 +4481,28 @@
                 <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, big.clone().checked_mul(<span class="kw-2">&amp;</span>_3.clone()));
                 <span class="kw">let </span>_1_big: Ratio&lt;T&gt; = Ratio::new(T::one(), big.clone());
                 <span class="kw">let </span>_3_two: Ratio&lt;T&gt; = Ratio::new(_3.clone(), two.clone());
-                <span class="kw">let </span>expected = Ratio::new(T::one(), big / two.clone() * _3.clone());
+                <span class="kw">let </span>expected = Ratio::new(T::one(), big.clone() / two.clone() * _3.clone());
                 <span class="macro">assert_eq!</span>(expected.clone(), _1_big.clone() / _3_two.clone());
                 <span class="macro">assert_eq!</span>(
                     <span class="prelude-val">Some</span>(expected.clone()),
                     _1_big.clone().checked_div(<span class="kw-2">&amp;</span>_3_two.clone())
                 );
                 <span class="macro">assert_eq!</span>(expected, {
-                    <span class="kw">let </span><span class="kw-2">mut </span>tmp = _1_big;
+                    <span class="kw">let </span><span class="kw-2">mut </span>tmp = _1_big.clone();
                     tmp /= _3_two;
                     tmp
                 });
 
                 <span class="comment">// 3/big / 3 = 1/big where big is max/2
                 // big ~ max/2, and big is not divisible by 3
-                </span><span class="kw">let </span>big = T::max_value() / two / _3.clone() * _3.clone() + T::one();
+                </span><span class="kw">let </span>big = T::max_value() / two.clone() / _3.clone() * _3.clone() + T::one();
                 <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, big.clone().checked_mul(<span class="kw-2">&amp;</span>_3.clone()));
                 <span class="kw">let </span>_3_big = Ratio::new(_3.clone(), big.clone());
-                <span class="kw">let </span>expected = Ratio::new(T::one(), big);
+                <span class="kw">let </span>expected = Ratio::new(T::one(), big.clone());
                 <span class="macro">assert_eq!</span>(expected, _3_big.clone() / _3.clone());
                 <span class="macro">assert_eq!</span>(expected, {
-                    <span class="kw">let </span><span class="kw-2">mut </span>tmp = _3_big;
-                    tmp /= _3;
+                    <span class="kw">let </span><span class="kw-2">mut </span>tmp = _3_big.clone();
+                    tmp /= _3.clone();
                     tmp
                 });
             }
@@ -5538,19 +4511,21 @@
             test_div_typed_overflow::&lt;u32&gt;();
             test_div_typed_overflow::&lt;u64&gt;();
             test_div_typed_overflow::&lt;usize&gt;();
-            test_div_typed_overflow::&lt;u128&gt;();
+            <span class="attr">#[cfg(has_u128)]
+            </span>test_div_typed_overflow::&lt;u128&gt;();
 
             test_div_typed_overflow::&lt;i8&gt;();
             test_div_typed_overflow::&lt;i16&gt;();
             test_div_typed_overflow::&lt;i32&gt;();
             test_div_typed_overflow::&lt;i64&gt;();
             test_div_typed_overflow::&lt;isize&gt;();
-            test_div_typed_overflow::&lt;i128&gt;();
+            <span class="attr">#[cfg(has_i128)]
+            </span>test_div_typed_overflow::&lt;i128&gt;();
         }
 
         <span class="attr">#[test]
         </span><span class="kw">fn </span>test_rem() {
-            <span class="kw">fn </span>test(a: Rational64, b: Rational64, c: Rational64) {
+            <span class="kw">fn </span>test(a: Rational, b: Rational, c: Rational) {
                 <span class="macro">assert_eq!</span>(a % b, c);
                 <span class="macro">assert_eq!</span>(
                     {
@@ -5562,7 +4537,7 @@
                 );
                 <span class="macro">assert_eq!</span>(to_big(a) % to_big(b), to_big(c))
             }
-            <span class="kw">fn </span>test_assign(a: Rational64, b: i64, c: Rational64) {
+            <span class="kw">fn </span>test_assign(a: Rational, b: isize, c: Rational) {
                 <span class="macro">assert_eq!</span>(a % b, c);
                 <span class="macro">assert_eq!</span>(
                     {
@@ -5591,14 +4566,14 @@
                 </span>T: Integer + Bounded + Clone + Debug + NumAssign,
             {
                 <span class="kw">let </span>two = T::one() + T::one();
-                <span class="comment">// value near to maximum, but divisible by two
+                <span class="comment">//value near to maximum, but divisible by two
                 </span><span class="kw">let </span>max_div2 = T::max_value() / two.clone() * two.clone();
-                <span class="kw">let </span>_1_max: Ratio&lt;T&gt; = Ratio::new(T::one(), max_div2);
+                <span class="kw">let </span>_1_max: Ratio&lt;T&gt; = Ratio::new(T::one(), max_div2.clone());
                 <span class="kw">let </span>_1_two: Ratio&lt;T&gt; = Ratio::new(T::one(), two);
                 <span class="macro">assert!</span>(T::is_zero(<span class="kw-2">&amp;</span>(_1_two.clone() % _1_max.clone()).numer));
                 {
-                    <span class="kw">let </span><span class="kw-2">mut </span>tmp: Ratio&lt;T&gt; = _1_two;
-                    tmp %= _1_max;
+                    <span class="kw">let </span><span class="kw-2">mut </span>tmp: Ratio&lt;T&gt; = _1_two.clone();
+                    tmp %= _1_max.clone();
                     <span class="macro">assert!</span>(T::is_zero(<span class="kw-2">&amp;</span>tmp.numer));
                 }
             }
@@ -5607,19 +4582,21 @@
             test_rem_typed_overflow::&lt;u32&gt;();
             test_rem_typed_overflow::&lt;u64&gt;();
             test_rem_typed_overflow::&lt;usize&gt;();
-            test_rem_typed_overflow::&lt;u128&gt;();
+            <span class="attr">#[cfg(has_u128)]
+            </span>test_rem_typed_overflow::&lt;u128&gt;();
 
             test_rem_typed_overflow::&lt;i8&gt;();
             test_rem_typed_overflow::&lt;i16&gt;();
             test_rem_typed_overflow::&lt;i32&gt;();
             test_rem_typed_overflow::&lt;i64&gt;();
             test_rem_typed_overflow::&lt;isize&gt;();
-            test_rem_typed_overflow::&lt;i128&gt;();
+            <span class="attr">#[cfg(has_i128)]
+            </span>test_rem_typed_overflow::&lt;i128&gt;();
         }
 
         <span class="attr">#[test]
         </span><span class="kw">fn </span>test_neg() {
-            <span class="kw">fn </span>test(a: Rational64, b: Rational64) {
+            <span class="kw">fn </span>test(a: Rational, b: Rational) {
                 <span class="macro">assert_eq!</span>(-a, b);
                 <span class="macro">assert_eq!</span>(-to_big(a), to_big(b))
             }
@@ -5629,7 +4606,6 @@
             test(-_1, _1);
         }
         <span class="attr">#[test]
-        #[allow(clippy::eq_op)]
         </span><span class="kw">fn </span>test_zero() {
             <span class="macro">assert_eq!</span>(_0 + _0, _0);
             <span class="macro">assert_eq!</span>(_0 * _0, _0);
@@ -5807,30 +4783,17 @@
     }
 
     <span class="attr">#[test]
-    #[should_panic(expected = <span class="string">&quot;division by zero&quot;</span>)]
+    #[should_panic(expected = <span class="string">&quot;== 0&quot;</span>)]
     </span><span class="kw">fn </span>test_recip_fail() {
         <span class="kw">let </span>_a = Ratio::new(<span class="number">0</span>, <span class="number">1</span>).recip();
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_pow() {
-        <span class="kw">fn </span>test(r: Rational64, e: i32, expected: Rational64) {
+        <span class="kw">fn </span>test(r: Rational, e: i32, expected: Rational) {
             <span class="macro">assert_eq!</span>(r.pow(e), expected);
             <span class="macro">assert_eq!</span>(Pow::pow(r, e), expected);
             <span class="macro">assert_eq!</span>(Pow::pow(r, <span class="kw-2">&amp;</span>e), expected);
-            <span class="macro">assert_eq!</span>(Pow::pow(<span class="kw-2">&amp;</span>r, e), expected);
-            <span class="macro">assert_eq!</span>(Pow::pow(<span class="kw-2">&amp;</span>r, <span class="kw-2">&amp;</span>e), expected);
-            <span class="attr">#[cfg(feature = <span class="string">&quot;num-bigint&quot;</span>)]
-            </span>test_big(r, e, expected);
-        }
-
-        <span class="attr">#[cfg(feature = <span class="string">&quot;num-bigint&quot;</span>)]
-        </span><span class="kw">fn </span>test_big(r: Rational64, e: i32, expected: Rational64) {
-            <span class="kw">let </span>r = BigRational::new_raw(r.numer.into(), r.denom.into());
-            <span class="kw">let </span>expected = BigRational::new_raw(expected.numer.into(), expected.denom.into());
-            <span class="macro">assert_eq!</span>((<span class="kw-2">&amp;</span>r).pow(e), expected);
-            <span class="macro">assert_eq!</span>(Pow::pow(r.clone(), e), expected);
-            <span class="macro">assert_eq!</span>(Pow::pow(r.clone(), <span class="kw-2">&amp;</span>e), expected);
             <span class="macro">assert_eq!</span>(Pow::pow(<span class="kw-2">&amp;</span>r, e), expected);
             <span class="macro">assert_eq!</span>(Pow::pow(<span class="kw-2">&amp;</span>r, <span class="kw-2">&amp;</span>e), expected);
         }
@@ -5851,7 +4814,7 @@
     #[cfg(feature = <span class="string">&quot;std&quot;</span>)]
     </span><span class="kw">fn </span>test_to_from_str() {
         <span class="kw">use </span>std::string::{String, ToString};
-        <span class="kw">fn </span>test(r: Rational64, s: String) {
+        <span class="kw">fn </span>test(r: Rational, s: String) {
             <span class="macro">assert_eq!</span>(FromStr::from_str(<span class="kw-2">&amp;</span>s), <span class="prelude-val">Ok</span>(r));
             <span class="macro">assert_eq!</span>(r.to_string(), s);
         }
@@ -5865,7 +4828,7 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_from_str_fail() {
         <span class="kw">fn </span>test(s: <span class="kw-2">&amp;</span>str) {
-            <span class="kw">let </span>rational: <span class="prelude-ty">Result</span>&lt;Rational64, <span class="kw">_</span>&gt; = FromStr::from_str(s);
+            <span class="kw">let </span>rational: <span class="prelude-ty">Result</span>&lt;Rational, <span class="kw">_</span>&gt; = FromStr::from_str(s);
             <span class="macro">assert!</span>(rational.is_err());
         }
 
@@ -5875,10 +4838,10 @@
         }
     }
 
-    <span class="attr">#[cfg(feature = <span class="string">&quot;num-bigint&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">&quot;bigint&quot;</span>)]
     #[test]
     </span><span class="kw">fn </span>test_from_float() {
-        <span class="kw">use </span>num_traits::float::FloatCore;
+        <span class="kw">use </span>traits::float::FloatCore;
         <span class="kw">fn </span>test&lt;T: FloatCore&gt;(given: T, (numer, denom): (<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span>str)) {
             <span class="kw">let </span>ratio: BigRational = Ratio::from_float(given).unwrap();
             <span class="macro">assert_eq!</span>(
@@ -5891,12 +4854,9 @@
         }
 
         <span class="comment">// f32
-        </span>test(core::f32::consts::PI, (<span class="string">&quot;13176795&quot;</span>, <span class="string">&quot;4194304&quot;</span>));
+        </span>test(<span class="number">3.14159265359f32</span>, (<span class="string">&quot;13176795&quot;</span>, <span class="string">&quot;4194304&quot;</span>));
         test(<span class="number">2f32</span>.powf(<span class="number">100.</span>), (<span class="string">&quot;1267650600228229401496703205376&quot;</span>, <span class="string">&quot;1&quot;</span>));
-        test(
-            -(<span class="number">2f32</span>.powf(<span class="number">100.</span>)),
-            (<span class="string">&quot;-1267650600228229401496703205376&quot;</span>, <span class="string">&quot;1&quot;</span>),
-        );
+        test(-<span class="number">2f32</span>.powf(<span class="number">100.</span>), (<span class="string">&quot;-1267650600228229401496703205376&quot;</span>, <span class="string">&quot;1&quot;</span>));
         test(
             <span class="number">1.0 </span>/ <span class="number">2f32</span>.powf(<span class="number">100.</span>),
             (<span class="string">&quot;1&quot;</span>, <span class="string">&quot;1267650600228229401496703205376&quot;</span>),
@@ -5905,15 +4865,9 @@
         test(-<span class="number">8573.5918555f32</span>, (<span class="string">&quot;-4389679&quot;</span>, <span class="string">&quot;512&quot;</span>));
 
         <span class="comment">// f64
-        </span>test(
-            core::f64::consts::PI,
-            (<span class="string">&quot;884279719003555&quot;</span>, <span class="string">&quot;281474976710656&quot;</span>),
-        );
+        </span>test(<span class="number">3.14159265359f64</span>, (<span class="string">&quot;3537118876014453&quot;</span>, <span class="string">&quot;1125899906842624&quot;</span>));
         test(<span class="number">2f64</span>.powf(<span class="number">100.</span>), (<span class="string">&quot;1267650600228229401496703205376&quot;</span>, <span class="string">&quot;1&quot;</span>));
-        test(
-            -(<span class="number">2f64</span>.powf(<span class="number">100.</span>)),
-            (<span class="string">&quot;-1267650600228229401496703205376&quot;</span>, <span class="string">&quot;1&quot;</span>),
-        );
+        test(-<span class="number">2f64</span>.powf(<span class="number">100.</span>), (<span class="string">&quot;-1267650600228229401496703205376&quot;</span>, <span class="string">&quot;1&quot;</span>));
         test(<span class="number">684729.48391f64</span>, (<span class="string">&quot;367611342500051&quot;</span>, <span class="string">&quot;536870912&quot;</span>));
         test(-<span class="number">8573.5918555f64</span>, (<span class="string">&quot;-4713381968463931&quot;</span>, <span class="string">&quot;549755813888&quot;</span>));
         test(
@@ -5922,7 +4876,7 @@
         );
     }
 
-    <span class="attr">#[cfg(feature = <span class="string">&quot;num-bigint&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">&quot;bigint&quot;</span>)]
     #[test]
     </span><span class="kw">fn </span>test_from_float_fail() {
         <span class="kw">use </span>core::{f32, f64};
@@ -5941,7 +4895,7 @@
         <span class="macro">assert_eq!</span>(_3_2.abs_sub(<span class="kw-2">&amp;</span>_1_2), _1);
         <span class="macro">assert_eq!</span>(_1_2.abs_sub(<span class="kw-2">&amp;</span>_3_2), Zero::zero());
         <span class="macro">assert_eq!</span>(_1_2.signum(), One::one());
-        <span class="macro">assert_eq!</span>(_NEG1_2.signum(), -&lt;Ratio&lt;i64&gt;&gt;::one());
+        <span class="macro">assert_eq!</span>(_NEG1_2.signum(), -&lt;Ratio&lt;isize&gt;&gt;::one());
         <span class="macro">assert_eq!</span>(_0.signum(), Zero::zero());
         <span class="macro">assert!</span>(_NEG1_2.is_negative());
         <span class="macro">assert!</span>(_1_NEG2.is_negative());
@@ -5958,19 +4912,19 @@
     <span class="attr">#[test]
     #[cfg(feature = <span class="string">&quot;std&quot;</span>)]
     </span><span class="kw">fn </span>test_hash() {
-        <span class="macro">assert!</span>(<span class="kw">crate</span>::hash(<span class="kw-2">&amp;</span>_0) != <span class="kw">crate</span>::hash(<span class="kw-2">&amp;</span>_1));
-        <span class="macro">assert!</span>(<span class="kw">crate</span>::hash(<span class="kw-2">&amp;</span>_0) != <span class="kw">crate</span>::hash(<span class="kw-2">&amp;</span>_3_2));
+        <span class="macro">assert!</span>(::hash(<span class="kw-2">&amp;</span>_0) != ::hash(<span class="kw-2">&amp;</span>_1));
+        <span class="macro">assert!</span>(::hash(<span class="kw-2">&amp;</span>_0) != ::hash(<span class="kw-2">&amp;</span>_3_2));
 
         <span class="comment">// a == b -&gt; hash(a) == hash(b)
-        </span><span class="kw">let </span>a = Rational64::new_raw(<span class="number">4</span>, <span class="number">2</span>);
-        <span class="kw">let </span>b = Rational64::new_raw(<span class="number">6</span>, <span class="number">3</span>);
+        </span><span class="kw">let </span>a = Rational::new_raw(<span class="number">4</span>, <span class="number">2</span>);
+        <span class="kw">let </span>b = Rational::new_raw(<span class="number">6</span>, <span class="number">3</span>);
         <span class="macro">assert_eq!</span>(a, b);
-        <span class="macro">assert_eq!</span>(<span class="kw">crate</span>::hash(<span class="kw-2">&amp;</span>a), <span class="kw">crate</span>::hash(<span class="kw-2">&amp;</span>b));
+        <span class="macro">assert_eq!</span>(::hash(<span class="kw-2">&amp;</span>a), ::hash(<span class="kw-2">&amp;</span>b));
 
-        <span class="kw">let </span>a = Rational64::new_raw(<span class="number">123456789</span>, <span class="number">1000</span>);
-        <span class="kw">let </span>b = Rational64::new_raw(<span class="number">123456789 </span>* <span class="number">5</span>, <span class="number">5000</span>);
+        <span class="kw">let </span>a = Rational::new_raw(<span class="number">123456789</span>, <span class="number">1000</span>);
+        <span class="kw">let </span>b = Rational::new_raw(<span class="number">123456789 </span>* <span class="number">5</span>, <span class="number">5000</span>);
         <span class="macro">assert_eq!</span>(a, b);
-        <span class="macro">assert_eq!</span>(<span class="kw">crate</span>::hash(<span class="kw-2">&amp;</span>a), <span class="kw">crate</span>::hash(<span class="kw-2">&amp;</span>b));
+        <span class="macro">assert_eq!</span>(::hash(<span class="kw-2">&amp;</span>a), ::hash(<span class="kw-2">&amp;</span>b));
     }
 
     <span class="attr">#[test]
@@ -6042,7 +4996,7 @@
 
         <span class="kw">let </span><span class="kw-2">mut </span>r = Rational64::new(<span class="number">123</span>, <span class="number">456</span>);
         <span class="macro">assert!</span>(!r.is_zero());
-        <span class="macro">assert_eq!</span>(r + zero, r);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>r + <span class="kw-2">&amp;</span>zero, r);
 
         r.set_zero();
         <span class="macro">assert!</span>(r.is_zero());
@@ -6055,13 +5009,14 @@
 
         <span class="kw">let </span><span class="kw-2">mut </span>r = Rational64::new(<span class="number">123</span>, <span class="number">456</span>);
         <span class="macro">assert!</span>(!r.is_one());
-        <span class="macro">assert_eq!</span>(r * one, r);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>r * <span class="kw-2">&amp;</span>one, r);
 
         r.set_one();
         <span class="macro">assert!</span>(r.is_one());
     }
 
-    <span class="attr">#[test]
+    <span class="attr">#[cfg(has_const_fn)]
+    #[test]
     </span><span class="kw">fn </span>test_const() {
         <span class="kw">const </span>N: Ratio&lt;i32&gt; = Ratio::new_raw(<span class="number">123</span>, <span class="number">456</span>);
         <span class="kw">const </span>N_NUMER: <span class="kw-2">&amp;</span>i32 = N.numer();
@@ -6073,141 +5028,6 @@
         <span class="kw">let </span>r = N.reduced();
         <span class="macro">assert_eq!</span>(r.numer(), <span class="kw-2">&amp;</span>(<span class="number">123 </span>/ <span class="number">3</span>));
         <span class="macro">assert_eq!</span>(r.denom(), <span class="kw-2">&amp;</span>(<span class="number">456 </span>/ <span class="number">3</span>));
-    }
-
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_ratio_to_i64() {
-        <span class="macro">assert_eq!</span>(<span class="number">5</span>, Rational64::new(<span class="number">70</span>, <span class="number">14</span>).to_u64().unwrap());
-        <span class="macro">assert_eq!</span>(-<span class="number">3</span>, Rational64::new(-<span class="number">31</span>, <span class="number">8</span>).to_i64().unwrap());
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, Rational64::new(-<span class="number">31</span>, <span class="number">8</span>).to_u64());
-    }
-
-    <span class="attr">#[test]
-    #[cfg(feature = <span class="string">&quot;num-bigint&quot;</span>)]
-    </span><span class="kw">fn </span>test_ratio_to_i128() {
-        <span class="macro">assert_eq!</span>(
-            <span class="number">1i128 </span>&lt;&lt; <span class="number">70</span>,
-            Ratio::&lt;i128&gt;::new(<span class="number">1i128 </span>&lt;&lt; <span class="number">77</span>, <span class="number">1i128 </span>&lt;&lt; <span class="number">7</span>)
-                .to_i128()
-                .unwrap()
-        );
-    }
-
-    <span class="attr">#[test]
-    #[cfg(feature = <span class="string">&quot;num-bigint&quot;</span>)]
-    </span><span class="kw">fn </span>test_big_ratio_to_f64() {
-        <span class="macro">assert_eq!</span>(
-            BigRational::new(
-                <span class="string">&quot;1234567890987654321234567890987654321234567890&quot;
-                    </span>.parse()
-                    .unwrap(),
-                <span class="string">&quot;3&quot;</span>.parse().unwrap()
-            )
-            .to_f64(),
-            <span class="prelude-val">Some</span>(<span class="number">411522630329218100000000000000000000000000000f64</span>)
-        );
-        <span class="macro">assert_eq!</span>(Ratio::from_float(<span class="number">5e-324</span>).unwrap().to_f64(), <span class="prelude-val">Some</span>(<span class="number">5e-324</span>));
-        <span class="macro">assert_eq!</span>(
-            <span class="comment">// subnormal
-            </span>BigRational::new(BigInt::one(), BigInt::one() &lt;&lt; <span class="number">1050</span>).to_f64(),
-            <span class="prelude-val">Some</span>(<span class="number">2.0f64</span>.powi(-<span class="number">50</span>).powi(<span class="number">21</span>))
-        );
-        <span class="macro">assert_eq!</span>(
-            <span class="comment">// definite underflow
-            </span>BigRational::new(BigInt::one(), BigInt::one() &lt;&lt; <span class="number">1100</span>).to_f64(),
-            <span class="prelude-val">Some</span>(<span class="number">0.0</span>)
-        );
-        <span class="macro">assert_eq!</span>(
-            BigRational::from(BigInt::one() &lt;&lt; <span class="number">1050</span>).to_f64(),
-            <span class="prelude-val">Some</span>(core::f64::INFINITY)
-        );
-        <span class="macro">assert_eq!</span>(
-            BigRational::from((-BigInt::one()) &lt;&lt; <span class="number">1050</span>).to_f64(),
-            <span class="prelude-val">Some</span>(core::f64::NEG_INFINITY)
-        );
-        <span class="macro">assert_eq!</span>(
-            BigRational::new(
-                <span class="string">&quot;1234567890987654321234567890&quot;</span>.parse().unwrap(),
-                <span class="string">&quot;987654321234567890987654321&quot;</span>.parse().unwrap()
-            )
-            .to_f64(),
-            <span class="prelude-val">Some</span>(<span class="number">1.2499999893125f64</span>)
-        );
-        <span class="macro">assert_eq!</span>(
-            BigRational::new_raw(BigInt::one(), BigInt::zero()).to_f64(),
-            <span class="prelude-val">Some</span>(core::f64::INFINITY)
-        );
-        <span class="macro">assert_eq!</span>(
-            BigRational::new_raw(-BigInt::one(), BigInt::zero()).to_f64(),
-            <span class="prelude-val">Some</span>(core::f64::NEG_INFINITY)
-        );
-        <span class="macro">assert_eq!</span>(
-            BigRational::new_raw(BigInt::zero(), BigInt::zero()).to_f64(),
-            <span class="prelude-val">None
-        </span>);
-    }
-
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_ratio_to_f64() {
-        <span class="macro">assert_eq!</span>(Ratio::&lt;u8&gt;::new(<span class="number">1</span>, <span class="number">2</span>).to_f64(), <span class="prelude-val">Some</span>(<span class="number">0.5f64</span>));
-        <span class="macro">assert_eq!</span>(Rational64::new(<span class="number">1</span>, <span class="number">2</span>).to_f64(), <span class="prelude-val">Some</span>(<span class="number">0.5f64</span>));
-        <span class="macro">assert_eq!</span>(Rational64::new(<span class="number">1</span>, -<span class="number">2</span>).to_f64(), <span class="prelude-val">Some</span>(-<span class="number">0.5f64</span>));
-        <span class="macro">assert_eq!</span>(Rational64::new(<span class="number">0</span>, <span class="number">2</span>).to_f64(), <span class="prelude-val">Some</span>(<span class="number">0.0f64</span>));
-        <span class="macro">assert_eq!</span>(Rational64::new(<span class="number">0</span>, -<span class="number">2</span>).to_f64(), <span class="prelude-val">Some</span>(-<span class="number">0.0f64</span>));
-        <span class="macro">assert_eq!</span>(Rational64::new((<span class="number">1 </span>&lt;&lt; <span class="number">57</span>) + <span class="number">1</span>, <span class="number">1 </span>&lt;&lt; <span class="number">54</span>).to_f64(), <span class="prelude-val">Some</span>(<span class="number">8f64</span>));
-        <span class="macro">assert_eq!</span>(
-            Rational64::new((<span class="number">1 </span>&lt;&lt; <span class="number">52</span>) + <span class="number">1</span>, <span class="number">1 </span>&lt;&lt; <span class="number">52</span>).to_f64(),
-            <span class="prelude-val">Some</span>(<span class="number">1.0000000000000002f64</span>),
-        );
-        <span class="macro">assert_eq!</span>(
-            Rational64::new((<span class="number">1 </span>&lt;&lt; <span class="number">60</span>) + (<span class="number">1 </span>&lt;&lt; <span class="number">8</span>), <span class="number">1 </span>&lt;&lt; <span class="number">60</span>).to_f64(),
-            <span class="prelude-val">Some</span>(<span class="number">1.0000000000000002f64</span>),
-        );
-        <span class="macro">assert_eq!</span>(
-            Ratio::&lt;i32&gt;::new_raw(<span class="number">1</span>, <span class="number">0</span>).to_f64(),
-            <span class="prelude-val">Some</span>(core::f64::INFINITY)
-        );
-        <span class="macro">assert_eq!</span>(
-            Ratio::&lt;i32&gt;::new_raw(-<span class="number">1</span>, <span class="number">0</span>).to_f64(),
-            <span class="prelude-val">Some</span>(core::f64::NEG_INFINITY)
-        );
-        <span class="macro">assert_eq!</span>(Ratio::&lt;i32&gt;::new_raw(<span class="number">0</span>, <span class="number">0</span>).to_f64(), <span class="prelude-val">None</span>);
-    }
-
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_ldexp() {
-        <span class="kw">use </span>core::f64::{INFINITY, MAX_EXP, MIN_EXP, NAN, NEG_INFINITY};
-        <span class="macro">assert_eq!</span>(ldexp(<span class="number">1.0</span>, <span class="number">0</span>), <span class="number">1.0</span>);
-        <span class="macro">assert_eq!</span>(ldexp(<span class="number">1.0</span>, <span class="number">1</span>), <span class="number">2.0</span>);
-        <span class="macro">assert_eq!</span>(ldexp(<span class="number">0.0</span>, <span class="number">1</span>), <span class="number">0.0</span>);
-        <span class="macro">assert_eq!</span>(ldexp(-<span class="number">0.0</span>, <span class="number">1</span>), -<span class="number">0.0</span>);
-
-        <span class="comment">// Cases where ldexp is equivalent to multiplying by 2^exp because there&#39;s no over- or
-        // underflow.
-        </span><span class="macro">assert_eq!</span>(ldexp(<span class="number">3.5</span>, <span class="number">5</span>), <span class="number">3.5 </span>* <span class="number">2f64</span>.powi(<span class="number">5</span>));
-        <span class="macro">assert_eq!</span>(ldexp(<span class="number">1.0</span>, MAX_EXP - <span class="number">1</span>), <span class="number">2f64</span>.powi(MAX_EXP - <span class="number">1</span>));
-        <span class="macro">assert_eq!</span>(ldexp(<span class="number">2.77</span>, MIN_EXP + <span class="number">3</span>), <span class="number">2.77 </span>* <span class="number">2f64</span>.powi(MIN_EXP + <span class="number">3</span>));
-
-        <span class="comment">// Case where initial value is subnormal
-        </span><span class="macro">assert_eq!</span>(ldexp(<span class="number">5e-324</span>, <span class="number">4</span>), <span class="number">5e-324 </span>* <span class="number">2f64</span>.powi(<span class="number">4</span>));
-        <span class="macro">assert_eq!</span>(ldexp(<span class="number">5e-324</span>, <span class="number">200</span>), <span class="number">5e-324 </span>* <span class="number">2f64</span>.powi(<span class="number">200</span>));
-
-        <span class="comment">// Near underflow (2^exp is too small to represent, but not x*2^exp)
-        </span><span class="macro">assert_eq!</span>(ldexp(<span class="number">4.0</span>, MIN_EXP - <span class="number">3</span>), <span class="number">2f64</span>.powi(MIN_EXP - <span class="number">1</span>));
-
-        <span class="comment">// Near overflow
-        </span><span class="macro">assert_eq!</span>(ldexp(<span class="number">0.125</span>, MAX_EXP + <span class="number">3</span>), <span class="number">2f64</span>.powi(MAX_EXP));
-
-        <span class="comment">// Overflow and underflow cases
-        </span><span class="macro">assert_eq!</span>(ldexp(<span class="number">1.0</span>, MIN_EXP - <span class="number">54</span>), <span class="number">0.0</span>);
-        <span class="macro">assert_eq!</span>(ldexp(-<span class="number">1.0</span>, MIN_EXP - <span class="number">54</span>), -<span class="number">0.0</span>);
-        <span class="macro">assert_eq!</span>(ldexp(<span class="number">1.0</span>, MAX_EXP), INFINITY);
-        <span class="macro">assert_eq!</span>(ldexp(-<span class="number">1.0</span>, MAX_EXP), NEG_INFINITY);
-
-        <span class="comment">// Special values
-        </span><span class="macro">assert_eq!</span>(ldexp(INFINITY, <span class="number">1</span>), INFINITY);
-        <span class="macro">assert_eq!</span>(ldexp(NEG_INFINITY, <span class="number">1</span>), NEG_INFINITY);
-        <span class="macro">assert!</span>(ldexp(NAN, <span class="number">1</span>).is_nan());
     }
 }
 </code></pre></div></section></main></body></html>

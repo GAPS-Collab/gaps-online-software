@@ -801,9 +801,6 @@
 <a href="#801" id="801">801</a>
 <a href="#802" id="802">802</a>
 <a href="#803" id="803">803</a>
-<a href="#804" id="804">804</a>
-<a href="#805" id="805">805</a>
-<a href="#806" id="806">806</a>
 </pre></div><pre class="rust"><code><span class="kw">pub mod </span>master_trigger;
 <span class="kw">pub use </span>master_trigger::{connect_to_mtb,
                          master_trigger};
@@ -836,13 +833,16 @@
 <span class="attr">#[macro_use] </span><span class="kw">extern crate </span>log;
 <span class="kw">extern crate </span>env_logger;
 
-<span class="kw">use </span>nalgebra::{DMatrix, DVector};
-<span class="kw">use </span>nalgebra::linalg::SVD;
+<span class="comment">//use ndarray::{array, Array1};
+//use nlopt::{Algorithm, Objective, Optimization, Result};
 
-<span class="comment">//use tof_dataclasses::manifest as mf;
+//use tof_dataclasses::manifest as mf;
 </span><span class="kw">use </span>tof_dataclasses::DsiLtbRBMapping;
 <span class="kw">use </span>tof_dataclasses::constants::NWORDS;
-<span class="kw">use </span>tof_dataclasses::calibrations::RBCalibrations;
+<span class="kw">use </span>tof_dataclasses::calibrations::{
+    RBCalibrations,
+    find_zero_crossings,
+};
 <span class="kw">use </span>tof_dataclasses::packets::{TofPacket,
                                PacketType};
 <span class="kw">use </span>tof_dataclasses::errors::{SerializationError,
@@ -916,6 +916,12 @@
     }).init();
 }
 
+<span class="doccomment">/// Common settings for apps, e.g. liftof-tui
+</span><span class="attr">#[derive(Debug, Clone)]
+</span><span class="kw">pub struct </span>AppSettings {
+  <span class="kw">pub </span>cali_master_path : String,
+}
+
 <span class="doccomment">/// Keep track of run related statistics, errors
 </span><span class="attr">#[derive(Debug, Copy, Clone)]
 </span><span class="kw">pub struct </span>RunStatistics {
@@ -981,44 +987,51 @@
   }
 }
 
-<span class="doccomment">/// FIXME - this comes straight right out of ChatGPT
-</span><span class="kw">fn </span>fit_sine_function(time: Vec&lt;f32&gt;, data: Vec&lt;f32&gt;) -&gt; (f32, f32, f32) {
-    <span class="comment">// Build the design matrix A
-    </span><span class="kw">let </span>a = DMatrix::&lt;f32&gt;::from_fn(time.len(), <span class="number">3</span>, |i, j| {
-        <span class="kw">match </span>j {
-            <span class="number">0 </span>=&gt; <span class="number">1.0</span>,
-            <span class="number">1 </span>=&gt; (<span class="number">2.0 </span>* std::f32::consts::PI * time[i]).sin(),
-            <span class="number">2 </span>=&gt; (<span class="number">2.0 </span>* std::f32::consts::PI * time[i]).cos(),
-            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
-        }
-    });
+<span class="comment">//fn sine_to_fit(amp : f32, freq : f32, phase : f32, time : &amp;Vec&lt;f32&gt;, ys : &amp;mut Vec&lt;f32&gt;) {
+//  //let ys = Vec::&lt;f32&gt;::with_capacity(time.len());
+//  for k in 0..time.len() {
+//    ys[k] = amp * (freq * time[k] + phase).sin(); 
+//  }
+//}
+//
+//fn cost_function(amp : f32, freq : f32, phase : f32, time : &amp;Vec&lt;f32&gt;, volts : &amp;Vec&lt;f32&gt;) -&gt; f32 {
+//  //let 
+//  //let fitted_values = amplitude * (2.0 * std::f32::consts::PI * frequency * time + phase).sin();
+//  let fit_volts = Vec::&lt;f32&gt;::with_capacity(time.len());
+//  sine_to_fit(amp, freq, phase, &amp;time, &amp;mut fit_volts);
+//  let mut chi_square = 0f32;
+//  for k in 0..fit_volts.len() {
+//    chi_square += (volts[k] - fit_volts[k]).powi(2);
+//    // FIXME - error
+//  }
+//  chi_square
+//}
 
-    <span class="comment">// Create the target vector b
-    </span><span class="kw">let </span>b = DVector::from_vec(data);
 
-    <span class="comment">// Solve the linear system Ax = b using Singular Value Decomposition
-    </span><span class="kw">let </span>svd = SVD::new(a.clone(), <span class="bool-val">true</span>, <span class="bool-val">true</span>);
-    <span class="kw">let </span>eps = <span class="number">0.0001</span>;
-    <span class="kw">match </span>svd.solve(<span class="kw-2">&amp;</span>b, eps) {
-      <span class="prelude-val">Err</span>(err) =&gt; {
-        <span class="macro">error!</span>(<span class="string">&quot;Sinus fit failed! {err}&quot;</span>);
-        <span class="kw">return </span>(f32::MAX, f32::MAX, f32::MAX);
-      },
-      <span class="prelude-val">Ok</span>(x) =&gt; {
-        <span class="kw">let </span>amplitude = x[<span class="number">0</span>];
-        <span class="kw">let </span>frequency = x[<span class="number">1</span>] / (<span class="number">2.0 </span>* std::f64::consts::PI) <span class="kw">as </span>f32;
-        <span class="kw">let </span>phase = -x[<span class="number">2</span>].atan2(x[<span class="number">1</span>]);
-        <span class="kw">return </span>(amplitude <span class="kw">as </span>f32, frequency <span class="kw">as </span>f32, phase <span class="kw">as </span>f32);
-      }
+</span><span class="doccomment">/// FIXME - proper fitting algorithm
+/// This here is bad, because it does not interpolate between 
+/// the bins
+</span><span class="kw">fn </span>fit_sine(time: Vec&lt;f32&gt;, data: Vec&lt;f32&gt;) -&gt; (f32, f32, f32) {
+  <span class="kw">let </span>z_cross = find_zero_crossings(<span class="kw-2">&amp;</span>data);
+  <span class="kw">let </span><span class="kw-2">mut </span>y_max = f32::MIN;
+  <span class="kw">let </span><span class="kw-2">mut </span>y_min = f32::MAX;
+  <span class="kw">for </span>y <span class="kw">in </span>data {
+    <span class="kw">if </span>y &gt; y_max {
+      y_max = y;
     }
-
-    <span class="comment">// Extract parameters from the solution vector x
-    //let amplitude = x[0];
-    //let frequency = x[1] / (2.0 * std::f64::consts::PI);
-    //let phase = -x[2].atan2(x[1]);
-    //(0.0,0.0,0.0)
-    //(amplitude, frequency, phase)
-</span>}
+    <span class="kw">if </span>y &lt; y_min {
+      y_min = y;
+    }
+  }
+  <span class="kw">let </span>amp   = f32::abs(y_max - y_min)/<span class="number">2.0</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>phase = <span class="number">0.0</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>freq  = <span class="number">0.0</span>;
+  <span class="kw">if </span>z_cross.len() &gt;= <span class="number">3 </span>{
+    phase = time[z_cross[<span class="number">0</span>]];
+    freq  = <span class="number">1.0</span>/(time[z_cross[<span class="number">2</span>]] - time[z_cross[<span class="number">0</span>]]);
+  }
+  (amp,freq,phase)
+}
 
 
 <span class="comment">//*************************************************
@@ -1141,25 +1154,6 @@
   peaks
 }
 
-<span class="doccomment">/// FIXME - this shoudl be 
-/// RBCalibrations::from_tofpacket
-/// but for that we have to move the
-/// TofPacketReader first
-</span><span class="kw">pub fn </span>load_calibration(board_id : u8,
-                        path     : String) -&gt; <span class="prelude-ty">Result</span>&lt;RBCalibrations, SerializationError&gt; {
-  <span class="kw">let </span><span class="kw-2">mut </span>cali   = RBCalibrations::new(board_id);
-  <span class="kw">let </span><span class="kw-2">mut </span>reader = TofPacketReader::new(path);
-  <span class="kw">match </span>reader.next() {
-    <span class="prelude-val">None </span>=&gt; {
-      <span class="macro">error!</span>(<span class="string">&quot;Can&#39;t load calibration!&quot;</span>);
-    },
-    <span class="prelude-val">Some</span>(pack) =&gt; {
-      cali = RBCalibrations::from_bytestream(<span class="kw-2">&amp;</span>pack.payload, <span class="kw-2">&amp;mut </span><span class="number">0</span>)<span class="question-mark">?</span>;
-    }
-  }
-  <span class="comment">//cali
-  </span><span class="prelude-val">Ok</span>(cali)
-}
 
 <span class="doccomment">/// Waveform analysis engine - identify waveform variables
 ///
@@ -1247,7 +1241,7 @@
         </span>calibration.nanoseconds(ch.into(),
                                 event.header.stop_cell <span class="kw">as </span>usize,
                                 <span class="kw-2">&amp;mut </span>ch_times);
-        <span class="kw">let </span>fit_result = fit_sine_function(ch_times, ch_voltages);
+        <span class="kw">let </span>fit_result = fit_sine(ch_times, ch_voltages);
         <span class="comment">//println!(&quot;FIT RESULT = {:?}&quot;, fit_result);
         </span>event.header.set_sine_fit(fit_result);
         <span class="kw">continue</span>;

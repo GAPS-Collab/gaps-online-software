@@ -1,6 +1,5 @@
 var NAVTREEINDEX1 =
 {
-"structRBEventMemoryView.html#a271d8736ad6c712425a0e2e2d3da7c6a":[2,0,7,8],
 "structRBEventMemoryView.html#a2b1688b99c876fbbe77c8ed099723e5b":[2,0,7,6],
 "structRBEventMemoryView.html#a5a939bbb1fe0cd42eb5a0daf91b65f99":[2,0,7,19],
 "structRBEventMemoryView.html#a603c13df4980f608b5aaa0f944945967":[2,0,7,17],
@@ -66,5 +65,6 @@ var NAVTREEINDEX1 =
 "structTofHit.html#af2c2846772959b0c6f1929b5fd0c939c":[2,0,11,6],
 "structTofHit.html#afa2cbd718256a9ba9f611c8189cf695f":[2,0,11,10],
 "tof__manifest_8h_source.html":[3,0,0,0,0,0,8],
-"tof__typedefs_8h_source.html":[3,0,0,0,0,0,9]
+"tof__typedefs_8h_source.html":[3,0,0,0,0,0,9],
+"":[1,0,1]
 };

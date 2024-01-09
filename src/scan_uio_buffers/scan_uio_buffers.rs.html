@@ -191,7 +191,6 @@
 <a href="#191" id="191">191</a>
 <a href="#192" id="192">192</a>
 <a href="#193" id="193">193</a>
-<a href="#194" id="194">194</a>
 </pre></div><pre class="rust"><code><span class="kw">extern crate </span>liftof_rb;
 
 <span class="kw">use </span>std::{thread, time};
@@ -221,9 +220,8 @@
   <span class="kw">let </span>m = <span class="kw">match </span>map_physical_mem_read(addr_space, addr, vec_size * sz) {
     <span class="prelude-val">Ok</span>(m) =&gt; m,
     <span class="prelude-val">Err</span>(err) =&gt; {
-      <span class="kw">let </span>error = RegisterError {};
-      <span class="macro">println!</span>(<span class="string">&quot;Failed to mmap: Err={:?}&quot;</span>, err);
-      <span class="kw">return </span><span class="prelude-val">Err</span>(error);
+      <span class="macro">println!</span>(<span class="string">&quot;Failed to mmap! {:?}&quot;</span>, err);
+      <span class="kw">return </span><span class="prelude-val">Err</span>(RegisterError::MMapFail);
     }
   };
   <span class="kw">let </span>p = m.as_ptr() <span class="kw">as </span><span class="kw-2">*const </span>u8;

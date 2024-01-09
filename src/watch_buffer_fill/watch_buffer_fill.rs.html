@@ -270,7 +270,7 @@
     <span class="macro">debug!</span>(<span class="string">&quot;It reads {occ}&quot;</span>);
     <span class="comment">//size = occ;
     //*buff_start = occ;
-    </span><span class="kw">return </span><span class="prelude-val">Err</span>(RegisterError {});
+    </span><span class="kw">return </span><span class="prelude-val">Err</span>(RegisterError::Unknown);
   } <span class="kw">else </span>{
     size  = occ - <span class="kw-2">*</span>buff_start;
   }

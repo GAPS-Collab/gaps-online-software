@@ -1515,22 +1515,22 @@
     <span class="macro">write!</span>(f, <span class="string">&quot;&lt;PAMoniData:
   Board ID : {}
   **16 Temp values**
-  T1   : {:.3} [\u{00B0}C]
-  T2   : {:.3} [\u{00B0}C]
-  T3   : {:.3} [\u{00B0}C]
-  T4   : {:.3} [\u{00B0}C]
-  T5   : {:.3} [\u{00B0}C]
-  T6   : {:.3} [\u{00B0}C]
-  T7   : {:.3} [\u{00B0}C]
-  T8   : {:.3} [\u{00B0}C]
-  T9   : {:.3} [\u{00B0}C]
-  T10  : {:.3} [\u{00B0}C]
-  T11  : {:.3} [\u{00B0}C]
-  T12  : {:.3} [\u{00B0}C]
-  T13  : {:.3} [\u{00B0}C]
-  T14  : {:.3} [\u{00B0}C]
-  T15  : {:.3} [\u{00B0}C]
-  T16  : {:.3} [\u{00B0}C]
+  T1   : {:.2} [\u{00B0}C]
+  T2   : {:.2} [\u{00B0}C]
+  T3   : {:.2} [\u{00B0}C]
+  T4   : {:.2} [\u{00B0}C]
+  T5   : {:.2} [\u{00B0}C]
+  T6   : {:.2} [\u{00B0}C]
+  T7   : {:.2} [\u{00B0}C]
+  T8   : {:.2} [\u{00B0}C]
+  T9   : {:.2} [\u{00B0}C]
+  T10  : {:.2} [\u{00B0}C]
+  T11  : {:.2} [\u{00B0}C]
+  T12  : {:.2} [\u{00B0}C]
+  T13  : {:.2} [\u{00B0}C]
+  T14  : {:.2} [\u{00B0}C]
+  T15  : {:.2} [\u{00B0}C]
+  T16  : {:.2} [\u{00B0}C]
   **16 Bias voltages**
   V1   : {:.3} [V]
   V2   : {:.3} [V]
@@ -1549,22 +1549,22 @@
   V15  : {:.3} [V]
   V16  : {:.3} [V]&gt;&quot;</span>,
   <span class="self">self</span>.board_id,
-  <span class="self">self</span>.temps[<span class="number">0</span>],
-  <span class="self">self</span>.temps[<span class="number">1</span>],
-  <span class="self">self</span>.temps[<span class="number">2</span>],
-  <span class="self">self</span>.temps[<span class="number">3</span>],
-  <span class="self">self</span>.temps[<span class="number">4</span>],
-  <span class="self">self</span>.temps[<span class="number">5</span>],
-  <span class="self">self</span>.temps[<span class="number">6</span>],
-  <span class="self">self</span>.temps[<span class="number">7</span>],
-  <span class="self">self</span>.temps[<span class="number">8</span>],
-  <span class="self">self</span>.temps[<span class="number">9</span>],
-  <span class="self">self</span>.temps[<span class="number">10</span>],
-  <span class="self">self</span>.temps[<span class="number">11</span>],
-  <span class="self">self</span>.temps[<span class="number">12</span>],
-  <span class="self">self</span>.temps[<span class="number">13</span>],
-  <span class="self">self</span>.temps[<span class="number">14</span>],
-  <span class="self">self</span>.temps[<span class="number">15</span>],
+  <span class="kw">if </span><span class="self">self</span>.temps[<span class="number">0</span>]  != f32::MAX {<span class="self">self</span>.temps[<span class="number">0 </span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
+  <span class="kw">if </span><span class="self">self</span>.temps[<span class="number">1</span>]  != f32::MAX {<span class="self">self</span>.temps[<span class="number">1 </span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
+  <span class="kw">if </span><span class="self">self</span>.temps[<span class="number">2</span>]  != f32::MAX {<span class="self">self</span>.temps[<span class="number">2 </span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
+  <span class="kw">if </span><span class="self">self</span>.temps[<span class="number">3</span>]  != f32::MAX {<span class="self">self</span>.temps[<span class="number">3 </span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
+  <span class="kw">if </span><span class="self">self</span>.temps[<span class="number">4</span>]  != f32::MAX {<span class="self">self</span>.temps[<span class="number">4 </span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
+  <span class="kw">if </span><span class="self">self</span>.temps[<span class="number">5</span>]  != f32::MAX {<span class="self">self</span>.temps[<span class="number">5 </span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
+  <span class="kw">if </span><span class="self">self</span>.temps[<span class="number">6</span>]  != f32::MAX {<span class="self">self</span>.temps[<span class="number">6 </span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
+  <span class="kw">if </span><span class="self">self</span>.temps[<span class="number">7</span>]  != f32::MAX {<span class="self">self</span>.temps[<span class="number">7 </span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
+  <span class="kw">if </span><span class="self">self</span>.temps[<span class="number">8</span>]  != f32::MAX {<span class="self">self</span>.temps[<span class="number">8 </span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
+  <span class="kw">if </span><span class="self">self</span>.temps[<span class="number">9</span>]  != f32::MAX {<span class="self">self</span>.temps[<span class="number">9 </span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
+  <span class="kw">if </span><span class="self">self</span>.temps[<span class="number">10</span>] != f32::MAX {<span class="self">self</span>.temps[<span class="number">10</span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
+  <span class="kw">if </span><span class="self">self</span>.temps[<span class="number">11</span>] != f32::MAX {<span class="self">self</span>.temps[<span class="number">11</span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
+  <span class="kw">if </span><span class="self">self</span>.temps[<span class="number">12</span>] != f32::MAX {<span class="self">self</span>.temps[<span class="number">12</span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
+  <span class="kw">if </span><span class="self">self</span>.temps[<span class="number">13</span>] != f32::MAX {<span class="self">self</span>.temps[<span class="number">13</span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
+  <span class="kw">if </span><span class="self">self</span>.temps[<span class="number">14</span>] != f32::MAX {<span class="self">self</span>.temps[<span class="number">14</span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
+  <span class="kw">if </span><span class="self">self</span>.temps[<span class="number">15</span>] != f32::MAX {<span class="self">self</span>.temps[<span class="number">15</span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
   <span class="self">self</span>.biases[<span class="number">0</span>],
   <span class="self">self</span>.biases[<span class="number">1</span>],
   <span class="self">self</span>.biases[<span class="number">2</span>],

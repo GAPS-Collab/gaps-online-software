@@ -1508,6 +1508,8 @@
 <a href="#1508" id="1508">1508</a>
 <a href="#1509" id="1509">1509</a>
 <a href="#1510" id="1510">1510</a>
+<a href="#1511" id="1511">1511</a>
+<a href="#1512" id="1512">1512</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! The ReadoutBoardCalibration is 
 //! the first stage in a 3 stage 
 //! calibration process for the tof
@@ -1699,6 +1701,7 @@
 <span class="comment">/***********************************/
 
 </span><span class="doccomment">/// Designed to match np.where(np.diff(np.signbit(trace)))[0] 
+/// FIXME -&gt; This needs to be moved to analysis!
 </span><span class="kw">pub fn </span>find_zero_crossings(trace: <span class="kw-2">&amp;</span>Vec&lt;f32&gt;) -&gt; Vec&lt;usize&gt; {
   <span class="kw">let </span><span class="kw-2">mut </span>zero_crossings = Vec::new();
   <span class="kw">for </span>i <span class="kw">in </span><span class="number">1</span>..trace.len() {
@@ -2614,6 +2617,7 @@
       <span class="kw">match </span>reader.next() {
         <span class="prelude-val">None </span>=&gt; {
           <span class="macro">error!</span>(<span class="string">&quot;Can&#39;t load calibration!&quot;</span>);
+          <span class="kw">break</span>;
         },
         <span class="prelude-val">Some</span>(pack) =&gt; {
           <span class="kw">if </span>pack.packet_type == PacketType::RBCalibration { 
