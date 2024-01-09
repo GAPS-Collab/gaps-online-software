@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "gaps-online"
-version = "0.1.0"
+version = "0.8.0"
 description = ""
 authors = ["Achim Stoessl <achim.stoessl@gmail.com>"]
 readme = "README.md"
