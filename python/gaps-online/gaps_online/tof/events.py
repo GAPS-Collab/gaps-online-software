@@ -1,5 +1,6 @@
 import gaps_tof as gt
 import pylab as p
+import numpy as np
 try:
     import charmingbeauty as cb
     FIGSIZE=cb.layout.FIGSIZE_A4  
