@@ -18,27 +18,8 @@ set(CMAKE_WARN_DEPRECATED ON)
 # suppress the Up-to-date output when installing
 set(CMAKE_INSTALL_MESSAGE LAZY)
 
-set(CMAKE_CXX_STANDARD 17 CACHE STRING "C++ standard has to be >= 17")
+set(CMAKE_CXX_STANDARD 20 CACHE STRING "C++ standard has to be >= 20")
 
-include(FetchContent)
-
-FetchContent_Declare(
-  spdlog
-  GIT_REPOSITORY https://github.com/gabime/spdlog.git 
-  GIT_TAG        ad0e89cbfb4d0c1ce4d097e134eb7be67baebb36 # release-1.10.0
-)
-FetchContent_MakeAvailable(spdlog)
-FetchContent_GetProperties(spdlog)
-if(NOT spdlog_POPULATED)
-  # Fetch the content using previously declared details
-  FetchContent_Populate(spdlog)
-
-  # Set custom variables, policies, etc.
-  # ...
-
-  # Bring the populated content into the build
-  add_subdirectory(${spdlog_SOURCE_DIR} ${spdlog_BINARY_DIR})
-endif()
 
 # == ALEX bfsw repository. 
 # == currently not used, but maybe in the future?
@@ -87,8 +68,6 @@ endif(NOT CMAKE_BUILD_TYPE)
 ## in case of Release build, we set the NDEBUG preprocessor directive
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG=1")
 
-add_subdirectory(tof)
-
 
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/install/gaps-online-sw-v${GAPS_ONLINE_SOFTWARE_VERSION}" CACHE PATH "default install path" FORCE)
@@ -100,6 +79,8 @@ set(INSTALL_LIBRARY_DIR  "${CMAKE_INSTALL_PREFIX}/lib" CACHE PATH      "installa
 set(INSTALL_INCLUDE_DIR  "${CMAKE_INSTALL_PREFIX}/include" CACHE PATH  "installation directory for header files" FORCE)
 set(INSTALL_BINARY_DIR   "${CMAKE_INSTALL_PREFIX}/bin" CACHE PATH      "installation directory for executables" FORCE)
 set(INSTALL_PYTHON_DIR   "${CMAKE_INSTALL_PREFIX}/python" CACHE PATH   "installation directory for python code" FORCE)
+
+add_subdirectory(tof)
 
 # Make relative paths absolute (needed later on)
 foreach(p LIBRARY BINARY INCLUDE PYTHON EXAMPLES)
@@ -127,6 +108,7 @@ if(DOXYGEN_FOUND)
   set(DOXYGEN_GENERATE_MAN NO) # You can enable this if you want man pages
   configure_file(${CMAKE_SOURCE_DIR}/Doxyfile.in ${CMAKE_BINARY_DIR}/Doxyfile @ONLY)
   add_custom_target(doc
+    ALL
     COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_BINARY_DIR}/Doxyfile
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     COMMENT "Generating C++ API documentation with Doxygen"
@@ -155,4 +137,10 @@ configure_file(${SETUP_SCRIPT_SOURCE} ${SETUP_SCRIPT_DEST} @ONLY)
 #
 ## Install the generated setup script during installation
 install(FILES ${SETUP_SCRIPT_DEST} DESTINATION ${CMAKE_INSTALL_PREFIX})
+
+## Install the python wrapper for the API
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/python/gaps-online/gaps_online
+        DESTINATION ${INSTALL_PYTHON_DIR}
+       )
+
 

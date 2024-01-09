@@ -3,6 +3,47 @@
 
 #include "spdlog/spdlog.h"
 
+LTBMoniData::LTBMoniData() {
+  board_id          = 0;
+  trenz_temp        = 0;
+  ltb_temp          = 0;
+  thresh            = {0,0,0};
+}
+
+LTBMoniData LTBMoniData::from_bytestream(const Vec<u8> &stream,
+                                         usize &pos) {
+  auto moni = LTBMoniData();
+  u16 head          = Gaps::parse_u16(stream, pos);
+  if (head != LTBMoniData::HEAD) {
+    spdlog::error("No header signature (0xAAAA) found for decoding of LTBMoniData!");   
+  }
+  moni.board_id    = Gaps::parse_u8(stream, pos);
+  moni.trenz_temp  = Gaps::parse_f32(stream, pos);
+  moni.ltb_temp    = Gaps::parse_f32(stream, pos);
+  for (usize k=0;k<3;k++) {
+    moni.thresh[k] = Gaps::parse_f32(stream, pos);
+  }
+  u16 tail         = Gaps::parse_u16(stream, pos);
+  if (tail != LTBMoniData::TAIL) {
+    spdlog::error("No tail signature (0x5555) found for decoding of LTBMoniData!");   
+  }
+  return moni;
+}
+  
+std::string LTBMoniData::to_string() const {
+  std::string repr = "<LTBMoniData   : ";
+  repr += "\n  board_id              : " + std::to_string(board_id   );
+  repr += "\n  trenz temp       [C]  : " + std::to_string(trenz_temp );
+  repr += "\n  LTB   temp       [C]  : " + std::to_string(ltb_temp         );
+  repr += "\n  ** Thresholds **";
+  repr += "\n  THR1, THR2, THR3 [mV] : " + std::to_string(thresh[0]) 
+       +  " " + std::to_string(thresh[1])
+       +  " " + std::to_string(thresh[2]);
+  repr += ">";
+  return repr;
+}
+
+
 RBMoniData::RBMoniData() {
   
   board_id          = 0;  
@@ -99,55 +140,161 @@ RBMoniData RBMoniData::from_bytestream(const Vec<u8> &payload,
 }
   
 std::string RBMoniData::to_string() const {
-  std::string repr = "<RBMoniData : >";
-  repr += "\n\t board_id           : " + std::to_string(board_id         );
-  repr += "\n\t rate               : " + std::to_string(rate             );
-  repr += "\n\t tmp_drs            : " + std::to_string(tmp_drs          );
-  repr += "\n\t tmp_clk            : " + std::to_string(tmp_clk          );
-  repr += "\n\t tmp_adc            : " + std::to_string(tmp_adc          );
-  repr += "\n\t tmp_zynq           : " + std::to_string(tmp_zynq         );
-  repr += "\n\t tmp_lis3mdltr      : " + std::to_string(tmp_lis3mdltr    );
-  repr += "\n\t tmp_bm280          : " + std::to_string(tmp_bm280        );
-  repr += "\n\t pressure           : " + std::to_string(pressure         );
-  repr += "\n\t humidity           : " + std::to_string(humidity         );
-  repr += "\n\t mag_x              : " + std::to_string(mag_x            );
-  repr += "\n\t mag_y              : " + std::to_string(mag_y            );
-  repr += "\n\t mag_z              : " + std::to_string(mag_z            );
-  repr += "\n\t mag_tot            : " + std::to_string(mag_tot          );
-  repr += "\n\t drs_dvdd_voltage   : " + std::to_string(drs_dvdd_voltage );
-  repr += "\n\t drs_dvdd_current   : " + std::to_string(drs_dvdd_current );
-  repr += "\n\t drs_dvdd_power     : " + std::to_string(drs_dvdd_power   );
-  repr += "\n\t p3v3_voltage       : " + std::to_string(p3v3_voltage     );
-  repr += "\n\t p3v3_current       : " + std::to_string(p3v3_current     );
-  repr += "\n\t p3v3_power         : " + std::to_string(p3v3_power       );
-  repr += "\n\t zynq_voltage       : " + std::to_string(zynq_voltage     );
-  repr += "\n\t zynq_current       : " + std::to_string(zynq_current     );
-  repr += "\n\t zynq_power         : " + std::to_string(zynq_power       );
-  repr += "\n\t p3v5_voltage       : " + std::to_string(p3v5_voltage     );
-  repr += "\n\t p3v5_current       : " + std::to_string(p3v5_current     );
-  repr += "\n\t p3v5_power         : " + std::to_string(p3v5_power       );
-  repr += "\n\t adc_dvdd_voltage   : " + std::to_string(adc_dvdd_voltage );
-  repr += "\n\t adc_dvdd_current   : " + std::to_string(adc_dvdd_current );
-  repr += "\n\t adc_dvdd_power     : " + std::to_string(adc_dvdd_power   );
-  repr += "\n\t adc_avdd_voltage   : " + std::to_string(adc_avdd_voltage );
-  repr += "\n\t adc_avdd_current   : " + std::to_string(adc_avdd_current );
-  repr += "\n\t adc_avdd_power     : " + std::to_string(adc_avdd_power   );
-  repr += "\n\t drs_avdd_voltage   : " + std::to_string(drs_avdd_voltage );
-  repr += "\n\t drs_avdd_current   : " + std::to_string(drs_avdd_current );
-  repr += "\n\t drs_avdd_power     : " + std::to_string(drs_avdd_power   );
-  repr += "\n\t n1v5_voltage       : " + std::to_string(n1v5_voltage     );
-  repr += "\n\t n1v5_current       : " + std::to_string(n1v5_current     );
-  repr += "\n\t n1v5_power         : " + std::to_string(n1v5_power       );
+  std::string repr = "<RBMoniData : ";
+  repr += "\n board_id           : " + std::to_string(board_id         );
+  repr += "\n rate               : " + std::to_string(rate             );
+  repr += "\n tmp_drs            : " + std::to_string(tmp_drs          );
+  repr += "\n tmp_clk            : " + std::to_string(tmp_clk          );
+  repr += "\n tmp_adc            : " + std::to_string(tmp_adc          );
+  repr += "\n tmp_zynq           : " + std::to_string(tmp_zynq         );
+  repr += "\n tmp_lis3mdltr      : " + std::to_string(tmp_lis3mdltr    );
+  repr += "\n tmp_bm280          : " + std::to_string(tmp_bm280        );
+  repr += "\n pressure           : " + std::to_string(pressure         );
+  repr += "\n humidity           : " + std::to_string(humidity         );
+  repr += "\n mag_x              : " + std::to_string(mag_x            );
+  repr += "\n mag_y              : " + std::to_string(mag_y            );
+  repr += "\n mag_z              : " + std::to_string(mag_z            );
+  repr += "\n mag_tot            : " + std::to_string(mag_tot          );
+  repr += "\n drs_dvdd_voltage   : " + std::to_string(drs_dvdd_voltage );
+  repr += "\n drs_dvdd_current   : " + std::to_string(drs_dvdd_current );
+  repr += "\n drs_dvdd_power     : " + std::to_string(drs_dvdd_power   );
+  repr += "\n p3v3_voltage       : " + std::to_string(p3v3_voltage     );
+  repr += "\n p3v3_current       : " + std::to_string(p3v3_current     );
+  repr += "\n p3v3_power         : " + std::to_string(p3v3_power       );
+  repr += "\n zynq_voltage       : " + std::to_string(zynq_voltage     );
+  repr += "\n zynq_current       : " + std::to_string(zynq_current     );
+  repr += "\n zynq_power         : " + std::to_string(zynq_power       );
+  repr += "\n p3v5_voltage       : " + std::to_string(p3v5_voltage     );
+  repr += "\n p3v5_current       : " + std::to_string(p3v5_current     );
+  repr += "\n p3v5_power         : " + std::to_string(p3v5_power       );
+  repr += "\n adc_dvdd_voltage   : " + std::to_string(adc_dvdd_voltage );
+  repr += "\n adc_dvdd_current   : " + std::to_string(adc_dvdd_current );
+  repr += "\n adc_dvdd_power     : " + std::to_string(adc_dvdd_power   );
+  repr += "\n adc_avdd_voltage   : " + std::to_string(adc_avdd_voltage );
+  repr += "\n adc_avdd_current   : " + std::to_string(adc_avdd_current );
+  repr += "\n adc_avdd_power     : " + std::to_string(adc_avdd_power   );
+  repr += "\n drs_avdd_voltage   : " + std::to_string(drs_avdd_voltage );
+  repr += "\n drs_avdd_current   : " + std::to_string(drs_avdd_current );
+  repr += "\n drs_avdd_power     : " + std::to_string(drs_avdd_power   );
+  repr += "\n n1v5_voltage       : " + std::to_string(n1v5_voltage     );
+  repr += "\n n1v5_current       : " + std::to_string(n1v5_current     );
+  repr += "\n n1v5_power         : " + std::to_string(n1v5_power       );
+  repr += ">";
+  return repr;
+}
+
+PBMoniData::PBMoniData() {
+  board_id         = 0;
+  p3v6_preamp_vcp  = {0,0,0};
+  n1v6_preamp_vcp  = {0,0,0};
+  p3v4f_ltb_vcp    = {0,0,0};
+  p3v4d_ltb_vcp    = {0,0,0};
+  p3v6_ltb_vcp     = {0,0,0};
+  n1v6_ltb_vcp     = {0,0,0};
+  pds_temp         = 0;
+  pas_temp         = 0;
+  nas_temp         = 0;
+  shv_temp         = 0;
+}
+
+PBMoniData PBMoniData::from_bytestream(const Vec<u8> &stream,
+                                       usize &pos) {
+  auto moni = PBMoniData();
+  u16 head             = Gaps::parse_u16(stream, pos);
+  if (head != PBMoniData::HEAD) {
+    spdlog::error("No header signature (0xAAAA) found for decoding of PBMoniData!");   
+  }
+  moni.board_id         = Gaps::parse_u8(stream, pos);
+  for (auto k : {0,1,2}) {
+    moni.p3v6_preamp_vcp[k]  = Gaps::parse_f32(stream, pos);
+  }
+  for (auto k : {0,1,2}) {
+    moni.n1v6_preamp_vcp[k]  = Gaps::parse_f32(stream, pos);
+  }
+  for (auto k : {0,1,2}) {
+    moni.p3v4f_ltb_vcp[k]    = Gaps::parse_f32(stream, pos);
+  }
+  for (auto k : {0,1,2}) {
+    moni.p3v4d_ltb_vcp[k]    = Gaps::parse_f32(stream, pos);
+  }
+  for (auto k : {0,1,2}) {
+    moni.p3v6_ltb_vcp[k]     = Gaps::parse_f32(stream, pos);
+  }
+  for (auto k : {0,1,2}) {
+    moni.n1v6_ltb_vcp[k]     = Gaps::parse_f32(stream, pos);
+  }
+  moni.pds_temp         = Gaps::parse_f32(stream, pos);
+  moni.pas_temp         = Gaps::parse_f32(stream, pos);
+  moni.nas_temp         = Gaps::parse_f32(stream, pos);
+  moni.shv_temp         = Gaps::parse_f32(stream, pos);
+  u16 tail              = Gaps::parse_u16(stream, pos);
+  if (tail != PBMoniData::TAIL) {
+    spdlog::error("No tail signature (0x5555) found for decoding of PBMoniData!");   
+  }
+  return moni;
+}
+
+std::string PBMoniData::to_string() const {
+  std::string repr = "<PBMoniData :";
+  repr += "\n board_id        : " + std::to_string(board_id         );
+  repr += "\n p3v6_preamp_vcp : " + std::to_string( p3v6_preamp_vcp [0] )+ std::to_string( p3v6_preamp_vcp [1] )+ std::to_string( p3v6_preamp_vcp [2] );
+  repr += "\n n1v6_preamp_vcp : " + std::to_string( n1v6_preamp_vcp [0] )+ std::to_string( n1v6_preamp_vcp [1] )+ std::to_string( n1v6_preamp_vcp [2] );
+  repr += "\n p3v4f_ltb_vcp   : " + std::to_string( p3v4f_ltb_vcp   [0] )+ std::to_string( p3v4f_ltb_vcp   [1] )+ std::to_string( p3v4f_ltb_vcp   [2] );
+  repr += "\n p3v4d_ltb_vcp   : " + std::to_string( p3v4d_ltb_vcp   [0] )+ std::to_string( p3v4d_ltb_vcp   [1] )+ std::to_string( p3v4d_ltb_vcp   [2] );
+  repr += "\n p3v6_ltb_vcp    : " + std::to_string( p3v6_ltb_vcp    [0] )+ std::to_string( p3v6_ltb_vcp    [1] )+ std::to_string( p3v6_ltb_vcp    [2] );
+  repr += "\n n1v6_ltb_vcp    : " + std::to_string( n1v6_ltb_vcp    [0] )+ std::to_string( n1v6_ltb_vcp    [1] )+ std::to_string( n1v6_ltb_vcp    [2] );
+  repr += "\n pds_temp        : " + std::to_string( pds_temp         );
+  repr += "\n pas_temp        : " + std::to_string( pas_temp         );
+  repr += "\n nas_temp        : " + std::to_string( nas_temp         );
+  repr += "\n shv_temp        : " + std::to_string( shv_temp         );
+  return repr;
+}
+
+PAMoniData::PAMoniData() {
+  board_id = 0;
+  temps.fill(0);
+  biases.fill(0);
+}
+
+PAMoniData PAMoniData::from_bytestream(const Vec<u8> &stream,
+                                       usize &pos) {
+  auto moni            = PAMoniData();
+  u16 head             = Gaps::parse_u16(stream, pos);
+  if (head != PAMoniData::HEAD) {
+    spdlog::error("No header signature (0xAAAA) found for decoding of PAMoniData!");   
+  }
+  moni.board_id        = Gaps::parse_u8(stream, pos);
+  for (usize k=0;k<16;k++) {
+    moni.temps[k]      = Gaps::parse_f32(stream, pos);
+  }
+  for (usize k=0;k<16;k++) {
+    moni.biases[k]     = Gaps::parse_f32(stream, pos);  
+  }
+  u16 tail             = Gaps::parse_u16(stream, pos);
+  if (tail != PAMoniData::TAIL) {
+    spdlog::error("No tail signature (0x5555) found for decoding of PAMoniData!");   
+  }
+  return moni;
+}
+
+std::string PAMoniData::to_string() const {
+  std::string repr = "<PBMoniData :";
+  repr += "\n board_id        : " + std::to_string(board_id         );
+  repr += "\n **temps  (16x) [C] ";
+  for (const auto &k : temps) {
+    repr += std::to_string(k) + " | "; 
+  }
+  repr += ">";
   return repr;
 }
 
 MtbMoniData::MtbMoniData() {
-  fpga_temp    = 0 ;
-  fpga_vccint  = 0 ;
-  fpga_vccaux  = 0 ;
-  fpga_vccbram = 0 ;
-  rate         = 0 ;
-  lost_rate    = 0 ;
+  fpga_temp    = 0;
+  fpga_vccint  = 0;
+  fpga_vccaux  = 0;
+  fpga_vccbram = 0;
+  rate         = 0;
+  lost_rate    = 0;
 }
 
 MtbMoniData MtbMoniData::from_bytestream(const Vec<u8> &payload,
@@ -172,12 +319,12 @@ MtbMoniData MtbMoniData::from_bytestream(const Vec<u8> &payload,
 
 std::string MtbMoniData::to_string() const {
   std::string repr = "<MtbMoniData :";
-  repr += "\n\t fpga_temp    :" + std::to_string(fpga_temp     );
-  repr += "\n\t fpga_vccint  :" + std::to_string(fpga_vccint   );
-  repr += "\n\t fpga_vccaux  :" + std::to_string(fpga_vccaux   );
-  repr += "\n\t fpga_vccbram :" + std::to_string(fpga_vccbram  );
-  repr += "\n\t rate         :" + std::to_string(rate          );
-  repr += "\n\t lost_rate    :" + std::to_string(lost_rate     );
+  repr += "\n fpga_temp    :" + std::to_string(fpga_temp     );
+  repr += "\n fpga_vccint  :" + std::to_string(fpga_vccint   );
+  repr += "\n fpga_vccaux  :" + std::to_string(fpga_vccaux   );
+  repr += "\n fpga_vccbram :" + std::to_string(fpga_vccbram  );
+  repr += "\n rate         :" + std::to_string(rate          );
+  repr += "\n lost_rate    :" + std::to_string(lost_rate     );
   return repr; 
 }
 
@@ -219,6 +366,16 @@ std::ostream& operator<<(std::ostream& os, const TofCmpMoniData& moni){
 }
 
 std::ostream& operator<<(std::ostream& os, const RBMoniData& moni){
+  os << moni.to_string();
+  return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const PBMoniData& moni){
+  os << moni.to_string();
+  return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const PAMoniData& moni){
   os << moni.to_string();
   return os;
 }

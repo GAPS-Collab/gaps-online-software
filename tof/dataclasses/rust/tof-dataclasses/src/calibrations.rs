@@ -35,7 +35,10 @@ use crate::events::rb_event::unpack_traces_f32;
 
 use crate::packets::{PacketType,
                      TofPacket};
-use crate::io::read_file;
+use crate::io::{
+    read_file,
+    TofPacketReader,
+};
 
 cfg_if::cfg_if! {
   if #[cfg(feature = "random")]  {
@@ -182,6 +185,7 @@ fn clean_spikes(traces : &mut Vec<Vec<Vec<f32>>>,vcaldone : bool) {
 /***********************************/
 
 /// Designed to match np.where(np.diff(np.signbit(trace)))[0] 
+/// FIXME -> This needs to be moved to analysis!
 pub fn find_zero_crossings(trace: &Vec<f32>) -> Vec<usize> {
   let mut zero_crossings = Vec::new();
   for i in 1..trace.len() {
@@ -1016,7 +1020,7 @@ impl RBCalibrations {
   }
 
   /// Apply the voltage calibration to a single channel 
-  ///
+  /// FIXME - mixing of naming conventions for the channels
   /// # Arguments
   ///
   /// * channel   : Channel id 1-9
@@ -1032,6 +1036,10 @@ impl RBCalibrations {
                   //waveform  : &mut [f32;NWORDS]) {
     if channel > 9 || channel == 0 {
       error!("There is no channel larger than 9 and no channel 0! Channel {channel} was requested. Can not perform voltage calibration!");
+      return;
+    }
+    if adc.len() != waveform.len() {
+      error!("Input len {} and output len {} don't match!", adc.len(), waveform.len());
       return;
     }
 
@@ -1083,6 +1091,32 @@ impl RBCalibrations {
       tcal_data : Vec::<RBEvent>::new(),
       noi_data  : Vec::<RBEvent>::new()
     }
+  }
+
+  /// Gets the calibration from a file which 
+  /// has the RBCalibration stored in a 
+  /// TofPacket
+  ///
+  /// E.g. if it was written with TofPacketWriter
+  pub fn from_file(filename : String) -> Result<Self, SerializationError> {
+    let mut reader = TofPacketReader::new(filename);
+    loop {
+      match reader.next() {
+        None => {
+          error!("Can't load calibration!");
+          break;
+        },
+        Some(pack) => {
+          if pack.packet_type == PacketType::RBCalibration { 
+            let cali = RBCalibrations::from_bytestream(&pack.payload, &mut 0)?;
+            return Ok(cali);
+          } else {
+            continue;
+          }
+        }
+      }
+    }
+    Err(SerializationError::StreamTooShort)
   }
 
   pub fn from_txtfile(filename : &Path) -> Self {
@@ -1251,6 +1285,10 @@ impl Serialization for RBCalibrations {
       for _ in 0..n_tcal {
         rb_cal.tcal_data.push(RBEvent::from_bytestream(bytestream, pos).unwrap_or(broken_event.clone()));
       }
+    } else {
+      // we can skip the next 6 bytes, 
+      // which just contain 0
+      *pos += 6;
     }
     if parse_u16(bytestream, pos) != Self::TAIL {
       return Err(SerializationError::TailInvalid {});
@@ -1291,10 +1329,15 @@ impl Serialization for RBCalibrations {
       for ev in &self.tcal_data {
         bs.extend_from_slice(&ev.to_bytestream());
       }
-    } else {
-      bs.push(0); // noi data
-      bs.push(0); // vcal data
-      bs.push(0); // tcal data
+    } else { // if we don't serialize event data, write 0 
+             // for the empty data
+      // (3 16bit 0s) for noi, vcal, tcal
+      for _ in 0..6 {
+        bs.push(0);
+      }
+      //bs.push(0); // noi data
+      //bs.push(0); // vcal data
+      //bs.push(0); // tcal data
     }
     bs.extend_from_slice(&Self::TAIL.to_le_bytes());
     bs

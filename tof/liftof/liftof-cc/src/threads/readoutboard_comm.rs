@@ -1,20 +1,29 @@
 //! Routines for RB commiunication and data reception 
 
-use std::time::{SystemTime, UNIX_EPOCH};
-use std::path::Path;
+//use std::time::{SystemTime, UNIX_EPOCH};
+use std::path::{
+    Path,
+    PathBuf,
+};
 use crossbeam_channel::Sender;
 
-use liftof_lib::waveform_analysis;
 
 use tof_dataclasses::manifest::ReadoutBoard;
 use tof_dataclasses::events::RBEvent;
-use tof_dataclasses::packets::{TofPacket,
-                               PacketType};
+use tof_dataclasses::packets::{
+    TofPacket,
+    PacketType
+};
 use tof_dataclasses::calibrations::RBCalibrations;
-
 use tof_dataclasses::serialization::Serialization;
+use tof_dataclasses::RBChannelPaddleEndIDMap;
 
-use liftof_lib::build_tcp_from_ip;
+use liftof_lib::{
+    build_tcp_from_ip,
+    get_rb_ch_pid_map,
+    waveform_analysis,
+    ASSET_DIR,
+};
 
 /*************************************/
 
@@ -45,6 +54,7 @@ pub fn readoutboard_communicator(ev_to_builder       : &Sender<RBEvent>,
                                  runid               : usize,
                                  print_packets       : bool,
                                  run_analysis_engine : bool) {
+  info!("Got run id {runid}");
   let zmq_ctx = zmq::Context::new();
   let board_id = rb.rb_id; //rb.id.unwrap();
   info!("initializing RB thread for board {}!", board_id);
@@ -55,8 +65,11 @@ pub fn readoutboard_communicator(ev_to_builder       : &Sender<RBEvent>,
   let mut calibrations = RBCalibrations::new(rb.rb_id);
   let do_calibration = true;
   if do_calibration {
-    info!("Reading calibrations from file {}", &rb.calib_file);
-    let cal_file_path = Path::new(&rb.calib_file);//calibration_file);
+    let cal_file = format!("/tpool/rb_calibrations/rb_{:02}.cali.tof.gaps", board_id);
+    info!("Reading calibrations from file {}", cal_file);
+    let cal_file_path_buf : PathBuf = cal_file.into();
+    let cal_file_path     : &Path   = &cal_file_path_buf;
+    //let cal_file_path = Path::new(&rb.calib_file);//calibration_file);
     calibrations = RBCalibrations::from(cal_file_path);
   }
   let address = build_tcp_from_ip(rb.ip_address.to_string(),
@@ -74,12 +87,14 @@ pub fn readoutboard_communicator(ev_to_builder       : &Sender<RBEvent>,
   let topic = b"";
   match socket.set_subscribe(topic) {
    Err(err) => error!("Unable to subscribe to topic! {err}"),
-   Ok(_) => ()
+   Ok(_) => info!("Subscribed to {:?}!", topic),
 
   }
-  let mut secs_since_epoch = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
-  let mut n_events   = 0usize;
+  //let mut secs_since_epoch = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
+  //let mut n_events   = 0usize;
   let mut n_received = 0usize;
+  let map_file  = format!("{}/rb{:02}_paddle_map.json", ASSET_DIR, board_id);
+  let rb_ch_map = get_rb_ch_pid_map(map_file.into());
   loop {
 
     // check if we got new data
@@ -103,17 +118,17 @@ pub fn readoutboard_communicator(ev_to_builder       : &Sender<RBEvent>,
             }
             n_received += 1;
             match tp.packet_type {
-              PacketType::RBEvent => {
+              PacketType::RBEvent | PacketType::RBEventMemoryView => {
                 let mut event = RBEvent::from(&tp);
                 if event.hits.len() == 0 {
                   if run_analysis_engine {
                     match waveform_analysis(&mut event, 
-                                            &rb,
+                                            &rb_ch_map,
                                             &calibrations) {
                         
                       Ok(_) => (),
                       Err(err) => {
-                        error!("Unable to analyze waveforms for this event! Err {err}");
+                        error!("Unable to analyze waveforms for this event! {err}");
                       }
                     }
                   }
@@ -124,7 +139,7 @@ pub fn readoutboard_communicator(ev_to_builder       : &Sender<RBEvent>,
                     error!("Unable to send event! Err {err}");
                   }
                 }
-                n_events += 1;
+                //n_events += 1;
                 n_chunk += 1;
               }, 
               _ => {
@@ -143,7 +158,7 @@ pub fn readoutboard_communicator(ev_to_builder       : &Sender<RBEvent>,
     debug!("Digested {n_chunk} chunks!");
     debug!("Noticed {n_errors} errors!");
     if n_received % 100 == 0 {
-      println!("==> Received {n_received} packets!");
+      println!("[RBCOM] => Received {n_received} packets!");
     }
   } // end loop
 } // end fun

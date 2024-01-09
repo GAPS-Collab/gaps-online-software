@@ -7,7 +7,6 @@ use zmq::Socket;
 
 pub mod constants;
 pub mod api;
-pub mod flight_comms;
 pub mod threads;
 #[macro_use] extern crate log;
 extern crate clap;

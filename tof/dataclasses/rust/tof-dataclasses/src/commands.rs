@@ -387,11 +387,11 @@ impl Serialization for RBCommand {
                      pos       : &mut usize) 
     -> Result<Self, SerializationError>{
     Self::verify_fixed(stream, pos)?;
-    let mut command = RBCommand::new();
+    let mut command      = RBCommand::new();
     command.rb_id        = parse_u8(stream, pos);
     command.command_code = parse_u8(stream, pos);
     command.channel_mask = parse_u8(stream, pos);
-    command.payload = parse_u32(stream, pos);
+    command.payload      = parse_u32(stream, pos);
     *pos += 2;
     Ok(command)
   }

@@ -19,11 +19,21 @@ use crate::constants::EVENT_TIMEOUT;
 // re-imports
 use std::time::Instant;
 use std::fmt;
-pub use crate::monitoring::{RBMoniData,
-                            TofCmpMoniData,
-                            MtbMoniData};
-use crate::serialization::{Serialization, 
-                           parse_u32};
+pub use crate::monitoring::{
+    RBMoniData,
+    PBMoniData,
+    LTBMoniData,
+    PAMoniData,
+    TofCmpMoniData,
+    MtbMoniData
+};
+use crate::serialization::{
+    Serialization, 
+    parse_u8,
+    parse_u16,
+    parse_u32
+};
+
 use std::error::Error;
 use crate::errors::{
     SerializationError,
@@ -65,17 +75,17 @@ pub enum PacketQuality {
 ///
 #[derive(Debug, Clone)]
 pub struct TofPacket {
-  pub packet_type      : PacketType,
-  pub payload          : Vec<u8>,
+  pub packet_type        : PacketType,
+  pub payload            : Vec<u8>,
   // FUTURE EXTENSION: Be able to send
-  // packets which contain multiple of the same packets
-  pub is_multi_packet  : bool,
-  // fields which won't get serialize
+  /// packets which contain multiple of the same packets
+  pub is_multi_packet    : bool,
+  // fields which won't get serialized
   /// mark a packet as not eligible to be written to disk
-  pub no_write_to_disk : bool,
+  pub no_write_to_disk   : bool,
   /// mark a packet as not eligible to be sent over network 
   /// FIXME - future extension
-  pub no_send_over_nw  : bool,
+  pub no_send_over_nw    : bool,
   /// creation_time for the instance
   pub creation_time    : Instant,
   pub valid            : bool, // will be always valid, unless invalidated
@@ -102,6 +112,8 @@ impl Default for TofPacket {
   }
 }
 
+/// Implement because TofPacket saves the creation time, 
+/// which never will be the same for 2 different instances
 impl PartialEq for TofPacket {
   fn eq(&self, other: &Self) -> bool {
     (self.packet_type == other.packet_type)           &&
@@ -116,7 +128,7 @@ impl PartialEq for TofPacket {
 impl TofPacket {
 
   pub const PRELUDE_SIZE : usize = 7; 
-
+ 
   pub fn new() -> Self {
     let creation_time = Instant::now();
     Self {
@@ -204,6 +216,15 @@ impl From<&RBCalibrations> for TofPacket {
   }
 }
 
+impl From<&mut RBCalibrations> for TofPacket {
+  fn from(calib : &mut RBCalibrations) -> Self {
+    let mut tp = Self::new();
+    tp.packet_type = PacketType::RBCalibration;
+    tp.payload = calib.to_bytestream();
+    tp
+  }
+}
+
 impl From<&RBEvent> for TofPacket {
   fn from(event : &RBEvent) -> Self {
     let mut tp = Self::new();
@@ -224,10 +245,36 @@ impl From<&MasterTriggerEvent> for TofPacket {
 
 
 impl From<&RBMoniData> for TofPacket {
-  fn from(moni : &RBMoniData) -> TofPacket {
-    let mut tp = TofPacket::new();
+  fn from(moni : &RBMoniData) -> Self {
+    let mut tp     = Self::new();
     tp.packet_type = PacketType::RBMoni;
-    tp.payload = moni.to_bytestream();
+    tp.payload     = moni.to_bytestream();
+    tp
+  }
+}
+
+impl From<&PBMoniData> for TofPacket {
+  fn from(moni : &PBMoniData) -> Self {
+    let mut tp     = Self::new();
+    tp.packet_type = PacketType::PBMoniData;
+    tp.payload     = moni.to_bytestream();
+    tp
+  }
+}
+impl From<&LTBMoniData> for TofPacket {
+  fn from(moni : &LTBMoniData) -> Self {
+    let mut tp     = Self::new();
+    tp.packet_type = PacketType::LTBMoniData;
+    tp.payload     = moni.to_bytestream();
+    tp
+  }
+}
+
+impl From<&PAMoniData> for TofPacket {
+  fn from(moni : &PAMoniData) -> Self {
+    let mut tp     = Self::new();
+    tp.packet_type = PacketType::PAMoniData;
+    tp.payload     = moni.to_bytestream();
     tp
   }
 }
@@ -264,20 +311,16 @@ impl Serialization for TofPacket {
   const HEAD : u16 = 0xaaaa;
   const TAIL : u16 = 0x5555;
   const SIZE : usize = 0; // FIXME - size/prelude_size 
+
   fn from_bytestream(stream : &Vec<u8>, pos : &mut usize)
   -> Result<Self, SerializationError> {
-    let mut two_bytes : [u8;2];
-    two_bytes = [stream[*pos],
-                 stream[*pos+1]];
-        
-    *pos += 2;
-    if Self::HEAD != u16::from_le_bytes(two_bytes) {
-      warn!("Packet does not start with HEAD signature");
+    let head = parse_u16(stream, pos);
+    if Self::HEAD != head {
+      error!("Packet does not start with HEAD signature");
       return Err(SerializationError::HeadInvalid {});
     }
-    let packet_type_enc = stream[*pos];
     let packet_type : PacketType;
-    *pos += 1;
+    let packet_type_enc = parse_u8(stream, pos);
     match PacketType::try_from(packet_type_enc) {
       Ok(pt) => packet_type = pt,
       Err(_) => {
@@ -285,18 +328,18 @@ impl Serialization for TofPacket {
         return Err(SerializationError::UnknownPayload);}
     }
     let payload_size = parse_u32(stream, pos);
-    two_bytes = [stream[*pos + payload_size as usize], stream[*pos + 1 + payload_size as usize]];
-    if Self::TAIL != u16::from_le_bytes(two_bytes) {
-      warn!("Packet does not end with TAIL signature");
+    *pos += payload_size as usize; 
+    let tail = parse_u16(stream, pos);
+    if Self::TAIL != tail {
+      error!("Packet does not end with TAIL signature");
       return Err(SerializationError::TailInvalid {});
     }
-    let mut payload = Vec::<u8>::with_capacity(payload_size as usize);
-    payload.extend_from_slice(&stream[*pos..*pos+payload_size as usize]);
-    //println!("PAYLOAD: {payload:?}");
-    //trace!("TofPacket with Payload {payload:?}"
+    *pos -= 2; // for tail parsing
+    *pos -= payload_size as usize;
+
     let mut tp = TofPacket::new();
     tp.packet_type = packet_type;
-    tp.payload     = payload;
+    tp.payload.extend_from_slice(&stream[*pos..*pos+payload_size as usize]);
     Ok(tp) 
   }
   
@@ -323,22 +366,101 @@ impl Serialization for TofPacket {
   }
 }
 
-
-#[test]
-fn test_serialize_tofpacket() ->Result<(), SerializationError> {
-  let mut pk     = TofPacket::new();
-  pk.packet_type = PacketType::TofEvent;
-  let mut pl     = Vec::<u8>::new();
-  for n in 0..200000 {
-    pl.push(n as u8);
-  }
-  pk.payload = pl;
-  //pk.payload     = vec![1,2,3,4];
-  let bs = pk.to_bytestream();
-  //println!("{bs:?}");
-  let mut pos = 0usize;
-  let pk2 = TofPacket::from_bytestream(&bs, &mut pos)?;
-  
-  assert_eq!(pk, pk2);
-  Ok(())
+#[cfg(feature="random")]
+#[test] 
+fn tofpacket_from_rbevent() {
+  let data = RBEvent::new();
+  let pk   = TofPacket::from(&data);
+  let test = TofPacket::from_bytestream(&pk.to_bytestream(),&mut 0).unwrap();
+  assert_eq!(pk.packet_type, PacketType::RBEvent);
+  assert_eq!(pk, test);
+  let data_test = RBEvent::from_bytestream(&pk.payload, &mut 0).unwrap();
+  assert_eq!(data, data_test);
 }
+
+#[cfg(feature="random")]
+#[test] 
+fn tofpacket_from_tofevent() {
+  let data = TofEvent::new();
+  let pk   = TofPacket::from(&data);
+  let test = TofPacket::from_bytestream(&pk.to_bytestream(),&mut 0).unwrap();
+  assert_eq!(pk.packet_type, PacketType::TofEvent);
+  assert_eq!(pk, test);
+  warn!("PartialEq missing for TofEvent!");
+  //let data_test = TofEvent::from_bytestream(&pk.payload, &mut 0).unwrap();
+  //assert_eq!(data, data_test);
+}
+
+#[cfg(feature="random")]
+#[test] 
+fn tofpacket_from_mtevent() {
+  let data = MasterTriggerEvent::new(0,0);
+  let pk   = TofPacket::from(&data);
+  let test = TofPacket::from_bytestream(&pk.to_bytestream(),&mut 0).unwrap();
+  assert_eq!(pk.packet_type, PacketType::MasterTrigger);
+  assert_eq!(pk, test);
+  let data_test = MasterTriggerEvent::from_bytestream(&pk.payload, &mut 0).unwrap();
+  assert_eq!(data, data_test);
+}
+
+#[cfg(feature="random")]
+#[test] 
+fn tofpacket_from_rbmonidata() {
+  let data = RBMoniData::new();
+  let pk   = TofPacket::from(&data);
+  let test = TofPacket::from_bytestream(&pk.to_bytestream(),&mut 0).unwrap();
+  assert_eq!(pk.packet_type, PacketType::RBMoni);
+  assert_eq!(pk, test);
+  let data_test = RBMoniData::from_bytestream(&pk.payload, &mut 0).unwrap();
+  assert_eq!(data, data_test);
+}
+
+#[cfg(feature="random")]
+#[test] 
+fn tofpacket_from_ltbmonidata() {
+  let data = LTBMoniData::new();
+  let pk   = TofPacket::from(&data);
+  let test = TofPacket::from_bytestream(&pk.to_bytestream(),&mut 0).unwrap();
+  assert_eq!(pk.packet_type, PacketType::LTBMoniData);
+  assert_eq!(pk, test);
+  let data_test = LTBMoniData::from_bytestream(&pk.payload, &mut 0).unwrap();
+  assert_eq!(data, data_test);
+}
+
+#[cfg(feature="random")]
+#[test] 
+fn tofpacket_from_pbmonidata() {
+  let data = PBMoniData::new();
+  let pk   = TofPacket::from(&data);
+  let test = TofPacket::from_bytestream(&pk.to_bytestream(),&mut 0).unwrap();
+  assert_eq!(pk.packet_type, PacketType::PBMoniData);
+  assert_eq!(pk, test);
+  let data_test = PBMoniData::from_bytestream(&pk.payload, &mut 0).unwrap();
+  assert_eq!(data, data_test);
+}
+
+#[cfg(feature="random")]
+#[test] 
+fn tofpacket_from_pamonidata() {
+  let data = PAMoniData::new();
+  let pk   = TofPacket::from(&data);
+  let test = TofPacket::from_bytestream(&pk.to_bytestream(),&mut 0).unwrap();
+  assert_eq!(pk.packet_type, PacketType::PAMoniData);
+  assert_eq!(pk, test);
+  let data_test = PAMoniData::from_bytestream(&pk.payload, &mut 0).unwrap();
+  assert_eq!(data, data_test);
+}
+
+#[cfg(feature="random")]
+#[test] 
+fn tofpacket_from_mtbmonidata() {
+  let data = MtbMoniData::new();
+  let pk   = TofPacket::from(&data);
+  let test = TofPacket::from_bytestream(&pk.to_bytestream(),&mut 0).unwrap();
+  assert_eq!(pk.packet_type, PacketType::MonitorMtb);
+  assert_eq!(pk, test);
+  let data_test = MtbMoniData::from_bytestream(&pk.payload, &mut 0).unwrap();
+  assert_eq!(data, data_test);
+}
+
+

@@ -2,10 +2,16 @@ use std::time::{Instant};
 use std::{thread, time};
 use crossbeam_channel::{Sender,
                         Receiver};
+use std::sync::{
+    Arc,
+    Mutex,
+};
 
-use indicatif::{MultiProgress,
-                ProgressBar,
-                ProgressStyle};
+use indicatif::{
+    MultiProgress,
+    ProgressBar,
+    ProgressStyle
+};
 
 use crate::control::*;
 use crate::memory::*;
@@ -16,6 +22,7 @@ use tof_dataclasses::commands::{TofOperationMode};
 use tof_dataclasses::run::RunConfig;
 use tof_dataclasses::io::RBEventMemoryStreamer;
 use tof_dataclasses::packets::TofPacket;
+use tof_dataclasses::threading::ThreadControl;
 
 type RamBuffer = BlobBuffer;
 
@@ -25,7 +32,7 @@ fn experimental_termination_seqeunce(prog_ev       : &ProgressBar,
                                      prog_b        : &ProgressBar,
                                      show_progress : bool,
                                      streamer      : &mut RBEventMemoryStreamer) {
-  info!("Calling terminatino sequence, will end current run!");
+  info!("Calling termination sequence, will end current run!");
   // just to be sure we set the self trigger rate to 0 
   // this is for the poisson trigger)
   match set_self_trig_rate(0) {
@@ -57,7 +64,7 @@ fn termination_seqeunce(prog_ev       : &ProgressBar,
                         prog_b        : &ProgressBar,
                         show_progress : bool,
                         bs_sender     : &Sender<Vec<u8>>) {
-  info!("Calling terminatino sequence, will end current run!");
+  info!("Calling termination sequence, will end current run!");
   // just to be sure we set the self trigger rate to 0 
   // this is for the poisson trigger)
   match set_self_trig_rate(0) {
@@ -94,19 +101,17 @@ fn termination_seqeunce(prog_ev       : &ProgressBar,
 ///                     This will either initialize data taking or 
 ///                     stop it.
 /// 
-///  * max_errors     : End myself when I see a certain
-///                     number of errors
 ///  * prog_op_ev     : An option for a progress bar which
 ///                     is helpful for debugging
 ///  * force_trigger  : Run in forced trigger mode
 ///
 ///
 pub fn runner(run_config              : &Receiver<RunConfig>,
-              max_errors              : Option<u64>,
               bs_sender               : &Sender<Vec<u8>>,
               dtf_to_evproc           : &Sender<DataType>,
               opmode_to_cache         : &Sender<TofOperationMode>,
-              show_progress           : bool) { 
+              show_progress           : bool,
+              thread_control          : Arc<Mutex<ThreadControl>>) { 
   
   let one_milli        = time::Duration::from_millis(1);
   let one_sec          = time::Duration::from_secs(1);
@@ -115,8 +120,6 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
   let mut evt_cnt      = 0u32;
   let mut delta_events : u64;
   let mut n_events     : u64 = 0;
-  // FIXME - this is currently useless
-  let     n_errors     : u64 = 0;
  
   // trigger settings. Per default, we latch to the 
   let mut latch_to_mtb = true;
@@ -127,7 +130,7 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
   // The Poisson trigger triggers automatically.
   let mut force_trigger = false;
   let mut time_between_events : Option<f32> = None;
-  let now = time::Instant::now();
+  let met = time::Instant::now();
 
   // run start/stop conditions
   let mut terminate             = false;
@@ -162,6 +165,22 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
   let mut uio1_total_size = DATABUF_TOTAL_SIZE;
   let mut uio2_total_size = DATABUF_TOTAL_SIZE;
   loop {
+    match thread_control.lock() {
+      Ok(tc) => {
+        if tc.stop_flag {
+          info!("Received stop signal. Will stop thread!");
+          termination_seqeunce(&prog_ev     ,
+                               &prog_a      ,
+                               &prog_b      ,
+                               show_progress,
+                               &bs_sender   );
+          break;
+        }
+      },
+      Err(err) => {
+        trace!("Can't acquire lock! {err}");
+      },
+    }
     match run_config.try_recv() {
       Err(err) => {
         trace!("Did not receive a new RunConfig! Err {err}");
@@ -185,7 +204,7 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
         evt_cnt      = 0;
         //delta_events = 0;
         n_events     = 0;
-        rc          = new_config;
+        rc           = new_config;
         // first of all, check if the new run config is active. 
         // if not, stop all triggers
         if !rc.is_active {
@@ -199,10 +218,6 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
         }
         // we have an active run, initializing
         terminate = false;
-        //// from here on, we prepare to start 
-        //// a new run with this RunConfig!
-        //// set the channel mask
-        reset_dma_and_buffers();
 
         // deal with the individual settings:
         // first buffer size
@@ -217,23 +232,27 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
           uio2_total_size = buffer_trip;
         }
         
-        let mut tof_op_mode = TofOperationMode::RequestReply;
-        if rc.stream_any {
-          tof_op_mode = TofOperationMode::StreamAny;
-        }
-        match opmode_to_cache.send(tof_op_mode) {
+        //let mut tof_op_mode = TofOperationMode::RequestReply;
+        //if rc.stream_any {
+        //  tof_op_mode = TofOperationMode::StreamAny;
+        //}
+        match opmode_to_cache.send(rc.tof_op_mode.clone()) {
           Err(err) => {
             error!("Unable to send TofOperationMode to the event cache! Err {err}");
           }
-          Ok(_)    => ()
+          Ok(_)    => {
+            info!("Send TofOperationMode {} to event processing thread!", rc.tof_op_mode);
+          }
         }
 
         let dt_c = rc.data_type.clone();
         match dtf_to_evproc.send(dt_c) {
           Err(err) => {
-            error!("Unable to send dataformat & type to the event processing subroutine! Err {err}");
+            error!("Unable to send dataformat to event processing thread! {err}");
           }
-          Ok(_) => ()
+          Ok(_) => {
+            info!("Sent dataformat {} to event processing thread!", rc.data_type);
+          }
         }
 
         // data type
@@ -250,7 +269,7 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
         if rc.trigger_poisson_rate > 0 {
           latch_to_mtb = false;
           // we also activate the poisson trigger
-          enable_poisson_self_trigger(rc.trigger_poisson_rate as f32);
+          //enable_poisson_self_trigger(rc.trigger_poisson_rate as f32);
         }
         if rc.trigger_fixed_rate>0 {
           force_trigger = true;
@@ -259,9 +278,17 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
           debug!("Will call trigger() every {} seconds...", time_between_events.unwrap());
           latch_to_mtb = false;
         }
-
+        match disable_trigger() {
+          Err(err) => error!("Can not disable triggers! {err}"),
+          Ok(_)    => info!("Triggers disabled awaiting SOFT_RESET!"),
+        }
+        info!("Attempting soft reset...");
+        match soft_reset_board() {
+          Err(err) => error!("Unable to reset board! {err}"),
+          Ok(_)    => info!("SOFT_RESET succesful!"),
+        }
         // preparations done, let's gooo
-        reset_dma_and_buffers();
+        //reset_dma_and_buffers();
 
         if latch_to_mtb {
           match set_master_trigger_mode() {
@@ -274,10 +301,14 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
             Ok(_)    => info!("Master trigger mode didsabled!")
           }
         }
+        
         // this basically signals "RUNSTART"
         match enable_trigger() {
           Err(err) => error!("Can not enable triggers! Err {err}"),
           Ok(_)    => info!("Triggers enabled - Run start!")
+        }
+        if rc.trigger_poisson_rate > 0 {
+          enable_poisson_self_trigger(rc.trigger_poisson_rate as f32);
         }
         // FIXME - only if above call Ok()
         is_running = true;
@@ -360,6 +391,7 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
       // calculate current event count
       if !force_trigger {
         // this checks if we have seen a new event
+        //match get_event_count_mt() {
         match get_event_count() {
           Err (err) => {
             error!("Can not obtain event count! Err {:?}", err);
@@ -414,11 +446,16 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
         }
         prog_ev.set_position(n_events);
       }
-
     } // end is_running
     
     // from here on, check termination 
     // conditions
+    if rc.nseconds > 0 {
+      if met.elapsed().as_secs() > rc.nseconds  as u64{
+        terminate = true;
+      }
+    }
+    
     if !rc.runs_forever() {
       if rc.nevents != 0 {
         if n_events > rc.nevents as u64{
@@ -427,19 +464,11 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
       }
       
       if rc.nseconds > 0 {
-          if now.elapsed().as_secs() > rc.nseconds  as u64{
+          if met.elapsed().as_secs() > rc.nseconds  as u64{
             terminate = true;
           }
         }
 
-      match max_errors {
-        None => (),
-        Some(max_e) => {
-          if n_errors > max_e {
-            terminate = true;
-          }
-        }
-      }
       // reduce cpu load
       if !terminate {
         if !force_trigger { 
@@ -460,15 +489,12 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
 ///                     This will either initialize data taking or 
 ///                     stop it.
 /// 
-///  * max_errors     : End myself when I see a certain
-///                     number of errors
 ///  * prog_op_ev     : An option for a progress bar which
 ///                     is helpful for debugging
 ///  * force_trigger  : Run in forced trigger mode
 ///
 ///
 pub fn experimental_runner(run_config              : &Receiver<RunConfig>,
-                           max_errors              : Option<u64>,
                            tp_sender               : &Sender<TofPacket>,
                            dtf_to_evproc           : &Sender<DataType>,
                            opmode_to_cache         : &Sender<TofOperationMode>,
@@ -481,8 +507,6 @@ pub fn experimental_runner(run_config              : &Receiver<RunConfig>,
   let mut evt_cnt      = 0u32;
   let mut delta_events : u64;
   let mut n_events     : u64 = 0;
-  // FIXME - this is currently useless
-  let     n_errors     : u64 = 0;
   // experimental - use RBEventMemoryStreamer directly
   let mut streamer = RBEventMemoryStreamer::new();
 
@@ -605,11 +629,11 @@ pub fn experimental_runner(run_config              : &Receiver<RunConfig>,
           uio2_total_size = buffer_trip;
         }
         
-        let mut tof_op_mode = TofOperationMode::RequestReply;
-        if rc.stream_any {
-          tof_op_mode = TofOperationMode::StreamAny;
-        }
-        match opmode_to_cache.send(tof_op_mode) {
+        //let mut tof_op_mode = TofOperationMode::RequestReply;
+        //if rc.stream_any {
+        //  tof_op_mode = TofOperationMode::StreamAny;
+        //}
+        match opmode_to_cache.send(rc.tof_op_mode.clone()) {
           Err(err) => {
             error!("Unable to send TofOperationMode to the event cache! Err {err}");
           }
@@ -676,7 +700,11 @@ pub fn experimental_runner(run_config              : &Receiver<RunConfig>,
           thread::sleep(one_sec);
           match get_trigger_rate() {
             Err(err) => error!("Unable to obtain trigger rate! Err {err}"),
-            Ok(rate) => info!("Seing MTB trigger rate of {rate} Hz")
+            Ok(rate) => println!("Seing RB trigger rate of {rate} Hz")
+          }
+          match get_event_rate_mt() {
+            Err(err) => error!("Unable to obtain MT trigger rate! Err {err}"),
+            Ok(rate) => println!("Seing MTB trigger rate of {rate} Hz")
           }
         }
         if show_progress {
@@ -856,17 +884,8 @@ pub fn experimental_runner(run_config              : &Receiver<RunConfig>,
       }
       
       if rc.nseconds > 0 {
-          if now.elapsed().as_secs() > rc.nseconds  as u64{
-            terminate = true;
-          }
-        }
-
-      match max_errors {
-        None => (),
-        Some(max_e) => {
-          if n_errors > max_e {
-            terminate = true;
-          }
+        if now.elapsed().as_secs() > rc.nseconds  as u64{
+          terminate = true;
         }
       }
       // reduce cpu load

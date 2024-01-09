@@ -1,6 +1,6 @@
 [package]
 name = "liftof-rb"
-version = "0.8.4"
+version = "0.8.6"
 edition = "2021"
 description = "Readoutboard data acquisition code for the TOF of the GAPS science experiment"
 
@@ -29,22 +29,20 @@ path = "src/bin/debug_registers.rs"
 
 #[net]
 #git-fetch-with-cli = true
-[features]
-tofcontrol = ["tof-control"]
 
 [dependencies]
-liftof-lib = { path = "../liftof-lib"} 
-
 # addess raw memeory, e.g. /dev/uio0
 memmap = "0.7"
 
 # multi-producer/multi-consumer channels
 crossbeam-channel = "0.5"
 
-tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["random", "tofcontrol"], version = "0.8.3"} 
-tof-control = {path = "../../extern/tof-control", optional = true, version = "0.3", features=[] }
+tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["random", "tofcontrol"], version = "0.8"} 
+liftof-lib  = { path = "../liftof-lib", version="0.8"} 
+tof-control = {path = "../../extern/tof-control", optional = false, version = "0.3", features=[] }
 zmq = "0.10.0"
 
+colored = "2.0"
 log = "0.4"
 env_logger = "0.10"
 

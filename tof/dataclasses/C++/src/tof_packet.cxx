@@ -47,6 +47,15 @@ std::string packet_type_to_string(const PacketType pt) {
       case PacketType::RBMoni : {
       return "RBMoni";
     }
+      case PacketType::PBMoniData : {
+      return "PBMoniData";
+    }
+      case PacketType::LTBMoniData : {
+      return "LTBMoniData";
+    }
+      case PacketType::PAMoniData : {
+      return "PAMoniData";
+    }
       case PacketType::RBCalibration : {
       return "RBCalibration";
     }
@@ -70,28 +79,28 @@ std::ostream& operator<<(std::ostream& os, const PacketType& pck)
 
 /**************************************************/
 
-Vec<u8> TofPacket::to_bytestream() const
-{
-
-  // first we need to hold only 5 bytes, then 
-  // the payload will grow the vector with "insert"
-  Vec<u8> buffer(p_size_fixed);
-  //buffer.reserve(p_size_fixed + payload.size());
-  spdlog::debug("Will add payload of size {}", payload.size());
-  usize pos = 0; // position in bytestream
-  encode_ushort(head, buffer, pos); pos+=2;
-  buffer[pos] = static_cast<u8>(packet_type); pos += 1;
-  u32_to_le_bytes(payload_size, buffer, pos);  pos+=4;
-
-  //std::cout << "buffer size " << buffer.size() << std::endl;
-  //std::cout << "payload size " << payload.size() << std::endl;
-  buffer.insert(buffer.begin() + 7, payload.begin(), payload.end()); pos += payload.size();
-  //std::cout << "buffer size " << buffer.size() << std::endl;
-  encode_ushort(tail, buffer, pos); pos+=2;
-  //std::cout << "buffer size " << buffer.size() << std::endl;
-  spdlog::info("TofPacket of size {}", buffer.size());
-  return buffer;
-}
+//Vec<u8> TofPacket::to_bytestream() const
+//{
+//
+//  // first we need to hold only 5 bytes, then 
+//  // the payload will grow the vector with "insert"
+//  Vec<u8> buffer(p_size_fixed);
+//  //buffer.reserve(p_size_fixed + payload.size());
+//  spdlog::debug("Will add payload of size {}", payload.size());
+//  usize pos = 0; // position in bytestream
+//  encode_ushort(head, buffer, pos); pos+=2;
+//  buffer[pos] = static_cast<u8>(packet_type); pos += 1;
+//  Gaps::u32_to_le_bytes(payload_size, buffer, pos);  pos+=4;
+//
+//  //std::cout << "buffer size " << buffer.size() << std::endl;
+//  //std::cout << "payload size " << payload.size() << std::endl;
+//  buffer.insert(buffer.begin() + 7, payload.begin(), payload.end()); pos += payload.size();
+//  //std::cout << "buffer size " << buffer.size() << std::endl;
+//  encode_ushort(tail, buffer, pos); pos+=2;
+//  //std::cout << "buffer size " << buffer.size() << std::endl;
+//  spdlog::info("TofPacket of size {}", buffer.size());
+//  return buffer;
+//}
 
 /**************************************************/
 

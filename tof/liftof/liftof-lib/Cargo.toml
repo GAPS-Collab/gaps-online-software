@@ -13,8 +13,11 @@ random = []
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-# addess raw memeory, e.g. /dev/uio0
-memmap = "0.7"
+#ndarray = "0.15"
+#nlopt = "0.7"
+
+#nalgebra = "0.32"
+#nalgebra-linalg = "0.32"
 
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
@@ -29,7 +32,7 @@ zmq = "0.10.0"
 
 log = "0.4"
 colored = "2.0"
-#env_logger = "0.10"
+env_logger = "0.10"
 
 local-ip-address = "0.5"
 

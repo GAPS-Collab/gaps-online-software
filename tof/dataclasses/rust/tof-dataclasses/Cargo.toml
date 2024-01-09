@@ -28,7 +28,6 @@ criterion = "0.4"
 [dependencies]
 # logging
 log  = "0.4"
-#pretty_env_logger = "0.4"
 rand = {version = "0.8", optional = true}
 json = "0.12" 
 #statrs = "0.14"

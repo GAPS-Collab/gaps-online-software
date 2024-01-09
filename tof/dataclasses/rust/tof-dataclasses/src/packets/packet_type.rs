@@ -23,15 +23,20 @@ pub enum PacketType {
   HeartBeat          = 40u8,    // might probably go away
   MasterTrigger      = 60u8,    // needs to be renamed to either MasterTriggerEvent or MTEvent
   RBEventHeader      = 70u8,    // needs to go away
-  MonitorTofCmp      = 80u8,
+  MonitorTofCmp      = 80u8,    // needs to go away
   MonitorMtb         = 90u8,
   RBMoni             = 100u8,
+  PBMoniData         = 101u8,
+  LTBMoniData        = 102u8,
+  PAMoniData         = 103u8,
   RBEventMemoryView  = 120u8, // We'll keep it for now - indicates that the event
                               // still needs to be processed.
   RBCalibration      = 130u8,
   TofCommand         = 140u8,
   RBCommand          = 150u8,
   Ping               = 160u8,
+  /// a MultiPacket consists of other TofPackets
+  MultiPacket        = 255u8,
 }
 
 impl fmt::Display for PacketType {
@@ -59,6 +64,8 @@ impl From<u8> for PacketType {
       130u8 => PacketType::RBCalibration,
       140u8 => PacketType::TofCommand,
       150u8 => PacketType::RBCommand,
+      160u8 => PacketType::Ping,
+      255u8 => PacketType::MultiPacket,
       _     => PacketType::Unknown
     }
   }
@@ -80,6 +87,9 @@ impl FromRandom for PacketType {
       PacketType::TofCommand,
       PacketType::RBCommand,
       PacketType::RBMoni,
+      PacketType::PBMoniData,
+      PacketType::LTBMoniData,
+      PacketType::PAMoniData,
       PacketType::MonitorTofCmp,
       PacketType::MonitorMtb,
       PacketType::RBCalibration
@@ -104,6 +114,9 @@ fn test_packet_types() {
   type_codes.push(PacketType::TofCommand as u8);
   type_codes.push(PacketType::RBCommand as u8);
   type_codes.push(PacketType::RBMoni as u8);
+  type_codes.push(PacketType::PBMoniData as u8);
+  type_codes.push(PacketType::LTBMoniData as u8);
+  type_codes.push(PacketType::PAMoniData as u8);
   type_codes.push(PacketType::MonitorTofCmp as u8);
   type_codes.push(PacketType::MonitorMtb as u8);
   type_codes.push(PacketType::RBCalibration as u8);

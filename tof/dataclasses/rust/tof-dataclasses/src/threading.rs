@@ -8,11 +8,33 @@ use std::sync::mpsc;
 use std::sync::Arc;
 use std::sync::Mutex;
 
+
+/// Send runtime information 
+/// to threads via shared memory
+/// (Arc(Mutex)
+#[derive(Default, Debug)]
+pub struct ThreadControl {
+  pub stop_flag: bool,
+}
+
+impl ThreadControl {
+  pub fn new() -> Self {
+    Self {
+      stop_flag : false,
+    }
+  }
+}
+
 enum Message {
   NewJob(Job),
   Terminate,
 }
 
+
+/// Implements "standard" Threadpool. 
+///
+/// Threadpool spawns unnamed threads 
+/// for workers
 pub struct ThreadPool {
   workers: Vec<Worker>,
   sender: mpsc::Sender<Message>,

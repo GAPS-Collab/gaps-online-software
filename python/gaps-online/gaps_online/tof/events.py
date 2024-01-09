@@ -1,11 +1,32 @@
 import gaps_tof as gt
 import pylab as p
-import charmingbeauty as cb
+import numpy as np
+try:
+    import charmingbeauty as cb
+    FIGSIZE=cb.layout.FIGSIZE_A4  
+except ImportError as e:
+    print(f"Can't find charmingbeauty for nice looking plots! {e}")
+    GOLDEN_RATIO = (1 + np.sqrt(5))/2.
+    WIDTH_A4 = 5.78851 # inch
+    FIGSIZE_A4_LANDSCAPE = (WIDTH_A4, WIDTH_A4/GOLDEN_RATIO)
+    FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT = (WIDTH_A4, (WIDTH_A4/(2*GOLDEN_RATIO)))
+    FIGSIZE_A4 = (WIDTH_A4, (WIDTH_A4/GOLDEN_RATIO) + WIDTH_A4)
+    FIGSIZE=FIGSIZE_A4
 
 # monkey patch the C++ API RBEvent
 gt.RBEvent.calib = None
 
 def _adc_plotter(axes, ev, ch, calib=None, plot_stop_cell=False):
+    """
+    Plot the raw adc values/time vs voltages for all channels for all events
+
+    # Arguments
+
+      * axes
+      * ev
+      * ch
+    """
+
     if ch == 9:
         ax_j  = 4
         color = 'k'
@@ -79,12 +100,16 @@ def plot(self,\
     if calib is None:
         print ("No calibration given! Will plot adc values!")
         axes[0].set_xlabel("")
-        for ch in range(1,10):
+        for ch in self.header.get_channels():
+        #for ch in range(1,10):
+            ch += 1
             _adc_plotter(axes, self, ch, plot_stop_cell = plot_stop_cell)
     else:
         volts = calib.voltages(self, spike_cleaning = spike_cleaning)
         nanos = calib.nanoseconds(self)
-        for ch in range(1,10):
+        for ch in self.header.get_channels():
+            ch += 1
+        #for ch in range(1,10):
             if ch % 2 == 0:
                 color = "r"
             else:

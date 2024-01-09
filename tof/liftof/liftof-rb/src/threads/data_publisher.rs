@@ -6,6 +6,11 @@ use std::fs::OpenOptions;
 use std::ffi::OsString;
 use std::fs::File;
 use std::io::Write;
+use std::time::Instant;
+use std::sync::{
+    Arc,
+    Mutex,
+};
 
 use crossbeam_channel::Receiver;
 
@@ -15,11 +20,15 @@ use local_ip_address::local_ip;
 use liftof_lib::DATAPORT;
 use tof_dataclasses::events::{RBEvent,
                               DataType};
-
 use tof_dataclasses::serialization::Serialization;
-use crate::api::{prefix_board_id,
-                 prefix_local};
+use tof_dataclasses::threading::ThreadControl;
 
+use crate::api::{
+    //prefix_board_id,
+    prefix_board_id_noquery,
+    prefix_local,
+};
+use crate::control::get_board_id;
 // this is just used for the testing case
 fn find_missing_elements(nums: &[u32]) -> Vec<u32> {
   let mut missing_elements = Vec::new();
@@ -56,7 +65,8 @@ pub fn data_publisher(data           : &Receiver<TofPacket>,
                       write_to_disk  : bool,
                       file_suffix    : Option<&str> ,
                       testing        : bool,
-                      print_packets  : bool) {
+                      print_packets  : bool,
+                      thread_control : Arc<Mutex<ThreadControl>>) {
   let mut address_ip = String::from("tcp://");
   let this_board_ip = local_ip().expect("Unable to obtainl local board IP. Something is messed up!");
   let data_port    = DATAPORT;
@@ -125,7 +135,30 @@ pub fn data_publisher(data           : &Receiver<TofPacket>,
   }
   let mut n_tested : u32 = 0;
   let mut n_sent   : u64 = 0;
+  let board_id     = get_board_id().unwrap_or(0) as u8;
+  if board_id == 0 {
+    error!("We could not get the board id!");
+  }
+  let mut sigint_received = false;
+  let mut kill_timer      = Instant::now();
   loop {
+    // check if we should end this
+    if sigint_received && kill_timer.elapsed().as_secs() > 10 {
+      info!("Kill timer expired. Ending thread!");
+      break;
+    }
+    match thread_control.lock() {
+      Ok(tc) => {
+        if tc.stop_flag {
+          info!("Received stop signal. Will stop thread!");
+          sigint_received = true;
+          kill_timer      = Instant::now();
+        }
+      },
+      Err(err) => {
+        trace!("Can't acquire lock! {err}");
+      },
+    }
     let mut data_type = DataType::Unknown;
     match data.recv() {
       Err(err) => trace!("Error receiving TofPacket {err}"),
@@ -196,24 +229,26 @@ pub fn data_publisher(data           : &Receiver<TofPacket>,
             last_10k_evids.clear();
           }
         } // end testing
-        
-        // prefix the board id, except for our Voltage, Timing and NOI 
-        // packages. For those, we prefix with LOCAL 
+        //
+        //// prefix the board id, except for our Voltage, Timing and NOI 
+        //// packages. For those, we prefix with LOCAL 
         let tp_payload : Vec<u8>;
         match data_type {
+          // FIXME - this makes that data types for 
+          // calibration will be rerouted back to 
+          // the same board. We have to make that 
+          // behaviour configurable. 
+          // It can simply subscribe to the same 
+          // message?
           DataType::VoltageCalibration |
           DataType::TimingCalibration  | 
           DataType::Noi => {
             tp_payload = prefix_local(&mut packet.to_bytestream());
           },
           _ => {
-            tp_payload = prefix_board_id(&mut packet.to_bytestream());
+            tp_payload = prefix_board_id_noquery(board_id, &mut packet.to_bytestream());
           }
         }
-        if print_packets {
-          println!("=> Tof packet type: {} with {} bytes!", packet.packet_type, packet.payload.len());
-        }
-
         match data_socket.send(tp_payload,zmq::DONTWAIT) {
           Ok(_)    => {
             trace!("0MQ PUB socket.send() SUCCESS!");
@@ -221,8 +256,9 @@ pub fn data_publisher(data           : &Receiver<TofPacket>,
           },
           Err(err) => error!("Not able to send over 0MQ PUB socket! Err {err}"),
         }
-        if n_sent % 1000 == 0 {
-          info!("==> We sent {n_sent} packets!");
+        if n_sent % 1000 == 0 && n_sent > 0 && print_packets {
+          println!("==> We sent {n_sent} packets!");
+          println!("==> Last Tofpacket type: {} with {} bytes!", packet.packet_type, packet.payload.len());
         }
       }
     }

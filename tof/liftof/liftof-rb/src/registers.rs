@@ -71,7 +71,7 @@ pub const CNT_READOUTS_COMPLETED     : u32 = 0x148; // [31:0] Number of readouts
 pub const CNT_DMA_READOUTS_COMPLETED : u32 = 0x14c; //[31:0] Number of readouts completed since reset
 pub const CNT_LOST_EVENT             : u32 = 0x150; //[31:16] Number of trigger lost due to deadtime
 pub const CNT_EVENT                  : u32 = 0x154; //[31:0] Number of triggers received
-pub const TRIGGER_RATE               : u32 = 0x158;        //[31:0] Rate of triggers in Hz
+pub const TRIGGER_RATE               : u32 = 0x158; //[31:0] Rate of triggers in Hz
 pub const LOST_TRIGGER_RATE          : u32 = 0x15c; //[31:0]Rate of lost triggers in Hz  
 pub const CNT_RESET                  : u32 = 0x160; //[0]Reset the counters
 
@@ -84,3 +84,11 @@ pub const DNA_MSBS : u32 = 0x84;    //[24:0]    Device DNA [56:32]
 // FPGA
 pub const BOARD_ID : u32 = 0xa8;    //[7:0]	    Board ID Number
 
+// SOFT RESET
+pub const SOFT_RESET : u32 = 0x70;
+pub const SOFT_RESET_DONE : u32 = 0x74;
+
+// MT EVENT REGISTERS
+pub const MT_EVENT_CNT : u32 = 0x120;
+pub const MT_TRIG_RATE : u32 = 0x124;
+pub const MT_LINK_ID   : u32 = 0x104;

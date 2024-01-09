@@ -19,6 +19,7 @@ extern crate colored;
 extern crate liftof_lib;
 extern crate liftof_cc;
 
+use std::time::Instant;
 use std::collections::HashMap;
 use std::io;
 use std::io::Write;
@@ -30,12 +31,7 @@ use std::path::{Path, PathBuf};
 
 use clap::{arg,
            command,
-           //value_parser,
-           //ArgAction,
-           //Command,
-           Args,
-           Parser,
-           Subcommand};
+           Parser};
 
 use crossbeam_channel as cbc; 
 use colored::Colorize;
@@ -48,17 +44,18 @@ use tof_dataclasses::manifest::get_rbs_from_sqlite;
 use tof_dataclasses::DsiLtbRBMapping;
 use tof_dataclasses::commands::TofCommand;
 use tof_dataclasses::commands::TofCommandCode;
-use liftof_lib::{master_trigger,
-                 readoutboard_commander, RunCmd, CalibrationCmd, PowerCmd, PowerStatusEnum, TofComponent, SetCmd};
-use liftof_lib::color_log;
-use liftof_lib::get_ltb_dsi_j_ch_mapping;
+use liftof_lib::{
+    master_trigger,
+    readoutboard_commander,
+    color_log,
+    get_ltb_dsi_j_ch_mapping,
+    DATAPORT,
+    LIFTOF_LOGO_SHOW,
+    RunCmd, CalibrationCmd, PowerCmd, PowerStatusEnum, TofComponent, SetCmd
+};
 use liftof_cc::threads::{readoutboard_communicator,
-                         event_builder};
-use liftof_cc::api::tofcmp_and_mtb_moni;
-//use liftof_cc::paddle_packet_cache::paddle_packet_cache;
-use liftof_cc::flight_comms::global_data_sink;
-
-use liftof_cc::constants::*;
+                         event_builder,
+                         global_data_sink};
 
 use liftof_lib::Command;
 
@@ -105,14 +102,19 @@ fn main() {
     }).init();
 
   // welcome banner!
+  println!("{}", LIFTOF_LOGO_SHOW);
   println!("-----------------------------------------------");
-  println!(" ** Welcome to liftof-cc \u{1F680} \u{1F388} *****");
-  println!(" .. liftof is a software suite for the time-of-flight detector (TOF) ");
-  println!(" .. for the GAPS experiment \u{1F496}");
-  println!(" .. This is the Command&Control server which connects to the MasterTriggerBoard and the ReadoutBoards");
-  println!(" .. see the gitlab repository for documentation and submitting issues at" );
-  println!(" **https://uhhepvcs.phys.hawaii.edu/Achim/gaps-online-software/-/tree/main/tof/liftof**");
-  
+  println!(" >> Welcome to liftof-cc \u{1F680} \u{1F388} ");
+  println!(" >> liftof is a software suite for the time-of-flight detector (TOF) ");
+  println!(" >> for the GAPS experiment \u{1F496}");
+  println!(" >> This is the Command&Control server which connects to the MasterTriggerBoard and the ReadoutBoards");
+  //println!(" >> see the gitlab repository for documentation and submitting issues at" );
+  //let repo_url    = "https://github.com/GAPS-Collab/gaps-online-software";
+  //let api_doc_url = "https://gaps-collab.github.io/gaps-online-software/";
+  //let gitlab_repo = format!("\x1B]8;;{}\x07{}\x1B]8;;\x07", repo_url, repo_url);
+  //let api_docs    = format!("\x1B]8;;{}\x07{}\x1B]8;;\x07", api_doc_url, api_doc_url);
+  //println!(" >> >> Software repo    : {}", gitlab_repo);
+  //println!(" >> >> API documentation: {}", api_docs);
   // deal with command line arguments
   let args = LiftofCCArgs::parse();
 
@@ -143,8 +145,8 @@ fn main() {
   let mut master_trigger_port   = 0usize;
   // create copies, since we need this information
   // for 2 threads at least (moni and event)
-  let mut master_trigger_ip_c   = String::from("");
-  let mut master_trigger_port_c = 0usize;
+  //let mut master_trigger_ip_c   = String::from("");
+  //let mut master_trigger_port_c = 0usize;
   
   match args.json_config {
     None => panic!("No .json config file provided! Please provide a config file with --json-config or -j flag!"),
@@ -167,8 +169,8 @@ fn main() {
 
     master_trigger_ip     = config["master_trigger"]["ip"].as_str().unwrap().to_owned();
     master_trigger_port   = config["master_trigger"]["port"].as_usize().unwrap();
-    master_trigger_ip_c   = master_trigger_ip.clone();
-    master_trigger_port_c = master_trigger_port.clone();
+    //master_trigger_ip_c   = master_trigger_ip.clone();
+    //master_trigger_port_c = master_trigger_port.clone();
     info!("Will connect to the master trigger board at {}:{}", master_trigger_ip, master_trigger_port);
   } else {
     println!("==> Will NOT connect to the MTB, since -u has not been provided in the commandlline!");
@@ -177,6 +179,8 @@ fn main() {
   let runid                 = config["run_id"].as_usize().unwrap(); 
   let mut write_stream_path = config["stream_savepath"].as_str().unwrap().to_owned();
   let calib_file_path       = config["calibration_file_path"].as_str().unwrap().to_owned();
+  let runtime_nseconds      = config["runtime_seconds"].as_f32().unwrap_or(0.0);
+  let write_npack_file      = config["packets_per_stream"].as_usize().unwrap_or(10000);
   let db_path               = Path::new(config["db_path"].as_str().unwrap());
   let db_path_c             = db_path.clone();
   let mut rb_list           = get_rbs_from_sqlite(db_path_c);
@@ -193,6 +197,9 @@ fn main() {
   for rb in &rb_list {
     println!("\t {}", rb);
   }
+
+  // A global kill timer
+  let program_start = Instant::now();
 
   // Prepare outputfiles
   let mut stream_files_path = PathBuf::from(write_stream_path);
@@ -321,31 +328,36 @@ fn main() {
   let worker_threads = ThreadPool::new(nthreads);
 
   if !no_monitoring {
-    println!("==> Starting main monitoring thread...");
-    let tp_to_sink_c = tp_to_sink.clone();
-    let moni_interval = 10u64; // in seconds
-    worker_threads.execute(move || {
-                           tofcmp_and_mtb_moni(&tp_to_sink_c,
-                                               &master_trigger_ip_c,
-                                               master_trigger_port_c,
-                                               moni_interval,
-                                               false);
-    });
+    //println!("==> Starting main monitoring thread...");
+    //let tp_to_sink_c = tp_to_sink.clone();
+    //let moni_interval = 10u64; // in seconds
+    //worker_threads.execute(move || {
+    //                       tofcmp_and_mtb_moni(&tp_to_sink_c,
+    //                                           &master_trigger_ip_c,
+    //                                           master_trigger_port_c,
+    //                                           moni_interval,
+    //                                           false);
+    //});
   }
 
   write_stream_path = String::from(stream_files_path.into_os_string().into_string().expect("Somehow the paths are messed up very badly! So I can't help it and I quit!"));
 
+  // this is the tailscale address
+  let flight_address = format!("tcp://100.101.96.10:{}", DATAPORT);
+  // this is the address in the flight network
+  // flight_address = format!("tcp://10.0.1.1:{}", DATAPORT);
   println!("==> Starting data sink thread!");
   worker_threads.execute(move || {
                          global_data_sink(&tp_from_client,
+                                          &flight_address,
                                           write_stream,
                                           write_stream_path,
+                                          write_npack_file,
                                           runid,
                                           verbose);
   });
   println!("==> data sink thread started!");
   println!("==> Will now start rb threads..");
-    
 
   for n in 0..nboards {
     let mut this_rb = rb_list[n].clone();
@@ -367,7 +379,7 @@ fn main() {
                                 &this_rb,
                                 runid,
                                 false,
-                                false);
+                                true);
     });
   } // end for loop over nboards
   println!("==> All RB threads started!");
@@ -396,7 +408,8 @@ fn main() {
                                           &mtb_moni_sender,
                                           10,
                                           60,
-                                          true);
+                                          false,
+                                          false);
     });
   } else {
     println!("=> {}", "NOT using the MTB! This means that currently we can only save the blobfiles directly and NO EVENT data will be passed on to the flight computer!".red().bold());
@@ -426,53 +439,54 @@ fn main() {
   })
   .expect("Error setting Ctrl-C handler");
 
+  let cmd_sender_c = cmd_sender.clone();
   match args.command {
     Command::Ping(ping_cmd) => {
       match ping_cmd.component {
-        TofComponent::TofCpu => liftof_cc::send_ping_response(cmd_sender, socket),
+        TofComponent::TofCpu => liftof_cc::send_ping_response(cmd_sender_c, socket),
         TofComponent::RB  |
         TofComponent::LTB |
-        TofComponent::MT     => liftof_cc::send_ping(cmd_sender, ping_cmd.component, ping_cmd.id),
+        TofComponent::MT     => liftof_cc::send_ping(cmd_sender_c, ping_cmd.component, ping_cmd.id),
         _                    => error!("The ping command is not implemented for this TofComponent!")
       }
     },
     Command::Moni(moni_cmd) => {
       match moni_cmd.component {
-        TofComponent::TofCpu => liftof_cc::send_moni_response(cmd_sender, socket),
+        TofComponent::TofCpu => liftof_cc::send_moni_response(cmd_sender_c, socket),
         TofComponent::RB  |
         TofComponent::LTB |
-        TofComponent::MT     => liftof_cc::send_moni(cmd_sender, moni_cmd.component, moni_cmd.id),
+        TofComponent::MT     => liftof_cc::send_moni(cmd_sender_c, moni_cmd.component, moni_cmd.id),
         _                    => error!("The moni command is not implemented for this TofComponent!")
       }
     },
     Command::SystemdReboot(systemd_reboot_cmd) => {
       let rb_id = systemd_reboot_cmd.id;
-      liftof_cc::send_systemd_reboot(cmd_sender, rb_id);
+      liftof_cc::send_systemd_reboot(cmd_sender_c, rb_id);
     },
     Command::Power(power_cmd) => {
       match power_cmd {
         PowerCmd::All(power_status) => {
           let power_status_enum: PowerStatusEnum = power_status.status;
-          liftof_cc::send_power(cmd_sender, TofComponent::All, power_status_enum);
+          liftof_cc::send_power(cmd_sender_c, TofComponent::All, power_status_enum);
         },
         PowerCmd::MT(power_status) => {
           let power_status_enum: PowerStatusEnum = power_status.status;
-          liftof_cc::send_power(cmd_sender, TofComponent::MT, power_status_enum);
+          liftof_cc::send_power(cmd_sender_c, TofComponent::MT, power_status_enum);
         },
         PowerCmd::AllButMT(power_status) => {
           let power_status_enum: PowerStatusEnum = power_status.status;
-          liftof_cc::send_power(cmd_sender, TofComponent::AllButMT, power_status_enum);
+          liftof_cc::send_power(cmd_sender_c, TofComponent::AllButMT, power_status_enum);
         },
         PowerCmd::LTB(ltb_power_opts) => {
           let power_status_enum: PowerStatusEnum = ltb_power_opts.status;
           let ltb_id = ltb_power_opts.id;
-          liftof_cc::send_power_ID(cmd_sender, TofComponent::LTB, power_status_enum, ltb_id);
+          liftof_cc::send_power_ID(cmd_sender_c, TofComponent::LTB, power_status_enum, ltb_id);
         },
         PowerCmd::Preamp(preamp_power_opts) => {
           let power_status_enum: PowerStatusEnum = preamp_power_opts.status;
           let preamp_id = preamp_power_opts.id;
           let preamp_bias = preamp_power_opts.bias;
-          liftof_cc::send_power_preamp(cmd_sender, power_status_enum, preamp_id, preamp_bias);
+          liftof_cc::send_power_preamp(cmd_sender_c, power_status_enum, preamp_id, preamp_bias);
         }
       }
     },
@@ -482,24 +496,24 @@ fn main() {
           let voltage_level = default_opts.level;
           let rb_id = default_opts.id;
           let extra = default_opts.extra;
-          liftof_cc::send_default_calibration(cmd_sender, voltage_level, rb_id, extra);
+          liftof_cc::send_default_calibration(cmd_sender_c, voltage_level, rb_id, extra);
         },
         CalibrationCmd::Noi(noi_opts) => {
           let rb_id = noi_opts.id;
           let extra = noi_opts.extra;
-          liftof_cc::send_noi_calibration(cmd_sender, rb_id, extra);
+          liftof_cc::send_noi_calibration(cmd_sender_c, rb_id, extra);
         },
         CalibrationCmd::Voltage(voltage_opts) => {
           let voltage_level = voltage_opts.level;
           let rb_id = voltage_opts.id;
           let extra = voltage_opts.extra;
-          liftof_cc::send_voltage_calibration(cmd_sender, voltage_level, rb_id, extra);
+          liftof_cc::send_voltage_calibration(cmd_sender_c, voltage_level, rb_id, extra);
         },
         CalibrationCmd::Timing(timing_opts) => {
           let voltage_level = timing_opts.level;
           let rb_id = timing_opts.id;
           let extra = timing_opts.extra;
-          liftof_cc::send_timing_calibration(cmd_sender, voltage_level, rb_id, extra);
+          liftof_cc::send_timing_calibration(cmd_sender_c, voltage_level, rb_id, extra);
         }
       }
     }
@@ -509,12 +523,12 @@ fn main() {
           let ltb_id = ltb_threshold_opts.id;
           let threshold_name = ltb_threshold_opts.name;
           let threshold_level = ltb_threshold_opts.level;
-          liftof_cc::send_ltb_threshold_set(cmd_sender, ltb_id, threshold_name, threshold_level);
+          liftof_cc::send_ltb_threshold_set(cmd_sender_c, ltb_id, threshold_name, threshold_level);
         },
         SetCmd::PreampBias(preamp_bias_opts) => {
           let preamp_id = preamp_bias_opts.id;
           let preamp_bias = preamp_bias_opts.bias;
-          liftof_cc::send_preamp_bias_set(cmd_sender, preamp_id, preamp_bias);
+          liftof_cc::send_preamp_bias_set(cmd_sender_c, preamp_id, preamp_bias);
         }
       }
     },
@@ -524,22 +538,22 @@ fn main() {
           let run_type = run_start_opts.run_type;
           let rb_id = run_start_opts.id;
           let event_no = run_start_opts.no;
-          liftof_cc::send_run_start(cmd_sender, run_type, rb_id, event_no);
+          liftof_cc::send_run_start(cmd_sender_c, run_type, rb_id, event_no);
         },
         RunCmd::Stop(run_stop_opts) => {
           let rb_id = run_stop_opts.id;
-          liftof_cc::send_run_stop(cmd_sender, rb_id);
+          liftof_cc::send_run_stop(cmd_sender_c, rb_id);
         }
       }
     }
   }
   // start a new data run 
-  // let start_run = TofCommand::DataRunStart(1000);
-  // let tp = TofPacket::from(&start_run);
-  // match cmd_sender.send(tp) {
-  //   Err(err) => error!("Unable to send command, error{err}"),
-  //   Ok(_)    => ()
-  // }
+  let start_run = TofCommand::DataRunStart(1000);
+  let tp = TofPacket::from(&start_run);
+  match cmd_sender.send(tp) {
+    Err(err) => error!("Unable to send command, error{err}"),
+    Ok(_)    => ()
+  }
 
   println!("==> All threads initialized!");
   loop{
@@ -549,6 +563,11 @@ fn main() {
     thread::sleep(1*one_second); 
     thread::sleep(1*one_minute);
     println!("...");
+    if program_start.elapsed().as_secs_f32() > runtime_nseconds {
+      println!("=> Runtime seconds of {} have expired!", runtime_nseconds);
+      println!("=> Ending program. If you don't want that behaviour, change the confifguration file.");
+      exit(0);    
+    }
   }
   //println!("Program terminating after specified runtime! So long and thanks for all the {}", fish); 
 }

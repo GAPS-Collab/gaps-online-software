@@ -206,48 +206,6 @@ Vec<RBEventMemoryView> get_rbeventmemoryviews(const Vec<u8> &bytestream,
 
 /***************************************************/
 
-Vec<BlobEvt_t> get_events_from_stream(const Vec<u8> &bytestream,
-	       			                  u64 start_pos) {
-  u64 nevents_in_stream = (float)bytestream.size()/BLOBEVENTSIZE;
-  spdlog::info("There might be at max {} events in the stream", nevents_in_stream);
-
-  Vec<BlobEvt_t> events; 
-  BlobEvt_t event;
-  usize pos              = start_pos;
-  bool has_ended         = false;
-  usize n_events_decoded = 0;
-  usize corrupt_events   = 0;
-  while (n_events_decoded < nevents_in_stream + 1) { 
-    // where are assuming that there is 
-    // less than one event of garbaget
-    // at the beginning of the stream
-    pos = search_for_2byte_marker(bytestream,
-                                  0xaa,
-                                  has_ended,
-                                  pos,
-                                  pos+BLOBEVENTSIZE);
-    if ((has_ended) || (pos + BLOBEVENTSIZE > bytestream.size())) {
-      break;
-    } 
-    event = decode_blobevent(bytestream,
-                             pos);
-    if (event.tail != 0x5555) {
-      corrupt_events++;
-      pos += 2; // skip header
-      continue;
-    }
-    //std::cout << event << std::endl;
-    events.push_back(event);
-    n_events_decoded++;
-    pos += BLOBEVENTSIZE + 2;
-  }
-  spdlog::info("Retrieved {} events from stream!", n_events_decoded);
-  spdlog::info("{} times a header with no corresponding footer was found. This does not necessarily mean there is a problem, instead it could also be padding bytes introduced due to wrapper packages.", corrupt_events);
-  return events;
-}
-
-/***************************************************/
-
 Vec<TofEvent> unpack_tofevents_from_tofpackets(const Vec<u8> &bytestream, u64 start_pos) {
   Vec<TofEvent> events = Vec<TofEvent>();
   u64 pos  = start_pos;

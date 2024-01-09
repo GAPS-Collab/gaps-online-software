@@ -1,8 +1,15 @@
 # gaps-online-software
 
+![build-badge](https://github.com/GAPS-Collab/gaps-online-software/workflows/CMake/badge.svg)
+![build-docs-badge](https://github.com/GAPS-Collab/gaps-online-software/workflows/Pages-Only/badge.svg)
+
 This is branch NIUHI-0.8. [Niuhi is a tiger shark](https://dlnr.hawaii.gov/sharks/sharks/tiger-shark/).
-![Tiger shark](https://dlnr.hawaii.gov/sharks/files/2014/06/TigerShark.jpg) 
-Tiger sharks roam the waters of the Hawaiian islands. 
+
+![Tiger shark](resources/assets/TigerShark.png)
+
+>[!CAUTION] 
+>Tiger sharks roam the waters of the Hawaiian islands. 
+
 This branch is not necessarily connected to a measurement 
 campaign, but to a series of tests at UCLA, eg to investigate
 [issue 6](https://github.com/GAPS-Collab/gaps-online-software/issues/6). 
@@ -10,6 +17,13 @@ It is related to the previous release branch, OMILU-0.7 in the soirit of
 carrying on the development, however, since we now entered a phase of 
 datataking, the OMILU branch won't be updated any more with new features
 and it is easier to keep 2 related branches in paralell.
+
+## API docs 
+
+The API docs for Rust as well as for the C++ API are hosted on github-pages. Documentation
+for the python API will follow soon.
+
+[API-docs](https://gaps-collab.github.io/gaps-online-software/)
 
 ## prerequisites
 
