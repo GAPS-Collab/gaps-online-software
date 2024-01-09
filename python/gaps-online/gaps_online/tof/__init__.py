@@ -9,4 +9,7 @@ from gaps_tof import TofPacket,\
                      get_tofpackets
 
 from . import sensors
-from . import converters
+try:
+    from . import converters
+except ImportError as e:
+    print(f"HDF converter tools not available! {e}")
