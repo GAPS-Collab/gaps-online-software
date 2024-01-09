@@ -257,9 +257,17 @@ impl FromRandom for TofCommandResp {
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 #[repr(u8)]
 pub enum TofOperationMode {
-  Unknown      = 0u8,
-  RequestReply = 10u8,
-  StreamAny    = 20u8
+  Unknown          = 0u8,
+  #[deprecated(since="0.8.3")] 
+  StreamAny        = 10u8,
+  #[deprecated(since="0.8.3")] 
+  RequestReply     = 20u8,
+  /// Don't decode any of the event 
+  /// data on the RB, just push it 
+  /// onward
+  RBHighThroughput = 30u8,
+  RBCalcCRC32      = 40u8,
+  RBWaveform       = 50u8,
 }
 
 impl fmt::Display for TofOperationMode {
@@ -274,8 +282,12 @@ impl From<u8> for TofOperationMode {
   fn from(value: u8) -> Self {
     match value {
       0u8  => TofOperationMode::Unknown,
-      10u8 => TofOperationMode::RequestReply,
-      20u8 => TofOperationMode::StreamAny,
+      10u8 => TofOperationMode::StreamAny,
+      20u8 => TofOperationMode::RequestReply,
+      20u8 => TofOperationMode::Unknown,
+      30u8 => TofOperationMode::RBHighThroughput,
+      40u8 => TofOperationMode::RBCalcCRC32,
+      50u8 => TofOperationMode::RBWaveform,
       _    => TofOperationMode::Unknown
     }
   }
@@ -288,7 +300,11 @@ impl FromRandom for TofOperationMode {
     let choices = [
       TofOperationMode::Unknown,
       TofOperationMode::RequestReply,
-      TofOperationMode::StreamAny      
+      TofOperationMode::StreamAny,
+      TofOperationMode::RBHighThroughput,
+      TofOperationMode::RBCalcCRC32,
+      TofOperationMode::RBWaveform,
+      TofOperationMode::Unknown
     ];
     let mut rng  = rand::thread_rng();
     let idx = rng.gen_range(0..choices.len());
