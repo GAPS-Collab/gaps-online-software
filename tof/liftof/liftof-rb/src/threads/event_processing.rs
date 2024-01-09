@@ -1,3 +1,4 @@
+use std::fs;
 use std::path::PathBuf;
 use std::sync::{
     Arc,
@@ -83,19 +84,22 @@ pub fn event_processing(board_id            : u8,
   let cali_path  = format!("/home/gaps/calib/rb_{:0>2}.cali.tof.gaps", board_id);
   let pmap_file  = String::from("/home/gaps/config/rb_paddle_map.json");
   let pmap_path  = PathBuf::from(&pmap_file);
-
+  let cali_path_buf = PathBuf::from(&cali_path);
   let paddle_map = get_rb_ch_pid_map(pmap_path);
-  match RBCalibrations::from_file(cali_path) {
-    Err(err) => {
-      error!("Can't load calibration! {err}");
-    },
-    Ok(_c) => {
-      cali = _c;
-      cali_loaded = true;
+  if !fs::metadata(cali_path_buf).is_ok() {
+    match RBCalibrations::from_file(cali_path) {
+      Err(err) => {
+        error!("Can't load calibration! {err}");
+      },
+      Ok(_c) => {
+        cali = _c;
+        cali_loaded = true;
+      }
     }
+  } else {
+    warn!("Calibration file not available!");
+    cali_loaded = false;
   }
-
-
   // FIXME - deprecate!
   let mut op_mode_stream  = true;
   let mut events_not_sent : u64 = 0;
