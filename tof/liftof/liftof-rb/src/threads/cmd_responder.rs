@@ -220,40 +220,6 @@ pub fn cmd_responder(cmd_server_ip             : String,
                             // MSB fourth 8 bits are 
                             let id: u8 = (value | MASK_CMD_8BIT) as u8;
 
-<<<<<<< HEAD
-                            if tof_component == TofComponent::RB {
-                              info!("Received moni command");
-                              // Function that just replies to a ping command send to tofcpu
-                              // get_board_id PANICS!! TODO
-                              let rb_id = get_board_id().unwrap() as u8;
-
-                              if rb_id == id {
-                                let mut tp = TofPacket::new();
-                                tp.packet_type = PacketType::Monitor;
-                                tp.payload = vec![TofComponent::RB as u8, rb_id];
-
-                                // JUST A PLACEHOLDER TODO! WHAT DO WE WANT TO HAVE HERE
-
-                                match ev_request_to_cache.send(tp) {
-                                  Err(err) => error!("TofCpu ping sending failed! Err {}", err),
-                                  Ok(_)    => ()
-                                }
-
-                                let r = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed as u32);
-                                match cmd_socket.send(r.to_bytestream(),0) {
-                                  Err(err) => warn!("Can not send response!, Err {err}"),
-                                  Ok(_)    => info!("Responded to SetThreshold!")
-                                }
-                                trace!("Resp sent!");
-                                continue;
-                              }
-                            } else {
-                              // to be redirected to subsys TODO
-                              // check if id is compatible
-                              // return reply
-                              todo!();
-                            }
-=======
                             // TODO implement proper routines
                             let return_val;
                             match tof_component {
@@ -315,7 +281,6 @@ pub fn cmd_responder(cmd_server_ip             : String,
                               }
                             }
                             continue;
->>>>>>> parent of a322dc071 (Deploying to develop from  @ afbf8221195fbf560dfc4f6a08172fbcedf8d753 🚀)
                           } else {
                             warn!("The function is implemented, but one has to compile with --features=tofcontrol");
                             match cmd_socket.send(resp_not_implemented,0) {
@@ -336,10 +301,6 @@ pub fn cmd_responder(cmd_server_ip             : String,
                             let component_id: u8 = ((value | MASK_CMD_8BIT << 8) >> 8) as u8;
                             // MSB fourth 8 bits are 
                             let status: PowerStatusEnum = PowerStatusEnum::from((value | MASK_CMD_8BIT) as u8);
-<<<<<<< HEAD
-=======
-                            
->>>>>>> parent of a322dc071 (Deploying to develop from  @ afbf8221195fbf560dfc4f6a08172fbcedf8d753 🚀)
                             // TODO implement proper routines
                             let return_val;
                             match tof_component {
@@ -374,10 +335,6 @@ pub fn cmd_responder(cmd_server_ip             : String,
                                 error!("Power operation not implemented for Unknown!")
                               }
                             }
-<<<<<<< HEAD
-=======
-
->>>>>>> parent of a322dc071 (Deploying to develop from  @ afbf8221195fbf560dfc4f6a08172fbcedf8d753 🚀)
                             match return_val {
                               Err(_) => {
                                 let r = TofResponse::GeneralFail(TofCommandResp::RespErrUnexecutable as u32);
