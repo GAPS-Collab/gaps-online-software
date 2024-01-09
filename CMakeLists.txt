@@ -48,6 +48,8 @@ set(CMAKE_CXX_STANDARD 20 CACHE STRING "C++ standard has to be >= 20")
 option(BUILD_PYBINDINGS "build pybindings with pybind11" OFF)
 if (BUILD_PYBINDINGS)
 message(STATUS "Checking for pyoind11....")
+# populates Python_INCLUDE_DIRS
+find_package (Python 3.10 COMPONENTS Interpreter Development)
 find_package(pybind11 )
   if(NOT ${pybind11_FOUND})
     message(WARNING "-- Can not find pybind11! Please install with sudo apt install pybind11-dev on a linux system!")
