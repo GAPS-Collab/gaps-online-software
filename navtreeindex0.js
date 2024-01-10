@@ -1,5 +1,6 @@
 var NAVTREEINDEX0 =
 {
+"":[1,0,1],
 "annotated.html":[2,0],
 "calibration_8h_source.html":[3,0,0,0,0,0,0],
 "classGAPS_1_1Waveform.html":[2,0,1,0],
@@ -73,8 +74,8 @@ var NAVTREEINDEX0 =
 "functions.html":[2,2,0],
 "functions_func.html":[2,2,1],
 "functions_vars.html":[2,2,2],
-"index.html":[],
 "index.html":[0],
+"index.html":[],
 "index.html#autotoc_md1":[0,0],
 "index.html#autotoc_md2":[0,1],
 "index.html#autotoc_md3":[0,2],
@@ -248,6 +249,5 @@ var NAVTREEINDEX0 =
 "structRBEventMemoryView.html":[2,0,7],
 "structRBEventMemoryView.html#a05bfe5708913454a1c33cc6cb735e931":[2,0,7,14],
 "structRBEventMemoryView.html#a0a0305863a60a957d55d12f4b13ccc2a":[2,0,7,13],
-"structRBEventMemoryView.html#a212599b76ec8471cdfe82522cea38aa2":[2,0,7,12],
-"structRBEventMemoryView.html#a271d8736ad6c712425a0e2e2d3da7c6a":[2,0,7,8]
+"structRBEventMemoryView.html#a212599b76ec8471cdfe82522cea38aa2":[2,0,7,12]
 };
