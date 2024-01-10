@@ -203,7 +203,12 @@ class Panel(models.Model):
 
 class Paddle(models.Model):
     paddle_id                 = models.PositiveSmallIntegerField(unique=True, primary_key=True)
-    volume_id                 = models.PositiveBigIntegerField(unique=True)
+    volume_id                 = models.PositiveBigIntegerField(
+                                  unique=True,
+                                  help_text="The VolumeId as used in the GAPS simulation code")
+    pos_in_panel              = models.CharField(max_length=4,
+                                                 null=True,
+                                                 default="")
     height                    = models.FloatField()
     width                     = models.PositiveSmallIntegerField()
     length                    = models.PositiveSmallIntegerField()
@@ -225,6 +230,10 @@ class PaddleEnd(models.Model):
     end_location  = models.CharField(max_length=2,\
                                     help_text="Location of the paddle end relative to the paddle center")
     panel_id      = models.PositiveSmallIntegerField()
+    pos_in_panel  = models.CharField(max_length=4,\
+                                     help_text="Identifier in global coordinates about the location in the panel",\
+                                     null=True,\
+                                     default="")
     cable_length  = models.FloatField(help_text="Cable length in cm")
     rat           = models.PositiveSmallIntegerField()
     ltb_id        = models.PositiveSmallIntegerField()
@@ -236,7 +245,7 @@ class PaddleEnd(models.Model):
     dsi           = models.PositiveSmallIntegerField()
     rb_harting_j  = models.PositiveSmallIntegerField()
     ltb_harting_j = models.PositiveSmallIntegerField()
-
+    
     def setup_unique_paddle_end_id(self):
         """
         Introduce a uuid. We have 160 paddles with 2 ends. Make the uuid the following
@@ -275,6 +284,7 @@ class PaddleEnd(models.Model):
         self.ltb_ch        = int(ltb_info[1])
         self.pb_ch         = int(pb_info[1] )
         self.rb_ch         = int(rb_info[1] )
+        
         # in some spreadsheets, the label differs,
         # so we are just looking for some variant
         good = False
@@ -302,22 +312,23 @@ class PaddleEnd(models.Model):
     def __repr__(self):
     
         _repr = '<PaddleEnd:\n'
-        _repr += f'\tID        : {self.paddle_end_id}\n'     
-        _repr += f'\tPADDLE ID : {self.paddle_id}\n'     
-        _repr += f'\tEND       : {self.end}\n'          
-        _repr += f'\tEND LOC   : {self.end_location}\n' 
-        _repr += f'\tPANEL     : {self.panel_id}\n'     
-        _repr += f'\tCABLE[CM] : {self.cable_length}\n' 
-        _repr += f'\tRAT       : {self.rat}\n'           
-        _repr += f'\tLTB       : {self.ltb_id}\n'        
-        _repr += f'\tRB        : {self.rb_id}\n'         
-        _repr += f'\tPB        : {self.pb_id}\n'         
-        _repr += f'\tLTB CH    : {self.ltb_ch}\n'        
-        _repr += f'\tPB CH     : {self.pb_ch}\n'         
-        _repr += f'\tRB CH     : {self.rb_ch}\n'         
-        _repr += f'\tDSI       : {self.dsi}\n'           
-        _repr += f'\tRB  HRT J : {self.rb_harting_j}\n'  
-        _repr += f'\tLTB HRT J : {self.ltb_harting_j}>' 
+        _repr += f'  ID        : {self.paddle_end_id}\n'     
+        _repr += f'  PADDLE ID : {self.paddle_id}\n'     
+        _repr += f'  END       : {self.end}\n'          
+        _repr += f'  END LOC   : {self.end_location}\n' 
+        _repr += f'  PANEL     : {self.panel_id}\n'     
+        _repr += f'  LOC PANEL : {self.pos_in_panel}\n'
+        _repr += f'  CABLE[CM] : {self.cable_length}\n' 
+        _repr += f'  RAT       : {self.rat}\n'           
+        _repr += f'  LTB       : {self.ltb_id}\n'        
+        _repr += f'  RB        : {self.rb_id}\n'         
+        _repr += f'  PB        : {self.pb_id}\n'         
+        _repr += f'  LTB CH    : {self.ltb_ch}\n'        
+        _repr += f'  PB CH     : {self.pb_ch}\n'         
+        _repr += f'  RB CH     : {self.rb_ch}\n'         
+        _repr += f'  DSI       : {self.dsi}\n'           
+        _repr += f'  RB  HRT J : {self.rb_harting_j}\n'  
+        _repr += f'  LTB HRT J : {self.ltb_harting_j}>' 
         return _repr
 
 class DSICard(models.Model):
@@ -478,7 +489,15 @@ class RB(models.Model):
     #    for ch in ch_to_pid:
     #        setattr(self,f'ch{ch}_pid',ch_to_pid[ch])
     #    return None
-    
+
+    def get_pid_for_channel(self, ch):
+        return get_channel(ch).paddle_id
+
+    def get_ploc_for_channel(self, ch):
+        panel = get_channel(ch).panel_id
+        panel = Panel.objects.filter(id=panel)[0]
+        print(panel)
+
     def get_channel(self,ch):
         match ch:
             case 1:
