@@ -6,6 +6,8 @@ django.setup()
 import sys
 import pandas
 import re
+# FIXME - move from pandas to polars!
+import polars
 
 import tof_db.models as m
 
@@ -35,6 +37,8 @@ if __name__ == '__main__':
                         help="(Re)create the panel table from the spreadsheet")
     parser.add_argument('--create-ltb-table',      action='store_true', default=False,\
                         help="(Re)create the LTB table from the spreadsheet")
+    parser.add_argument('--create-pid-table',      action='store_true', default=False,\
+                        help="(Re)create the Paddle ID table from the spreadsheet")
     parser.add_argument('--create-all-tables',       action='store_true', default=False,\
                         help="(Re)create all tables")
 
@@ -46,6 +50,7 @@ if __name__ == '__main__':
         args.create_panel_table      = True
         args.create_rb_table         = True
         args.create_ltb_table        = True
+        args.create_pid_table        = True
     #sure = input(f'Whatever you have selected, it is likely that current values in the global GAPS DB will get overwriten. Are you certain that you want to proceed? (YES/<any>\n\t')
     #if not sure:
     #    print(f'Abort! Nothing happend.')
@@ -137,6 +142,13 @@ if __name__ == '__main__':
         except Exception as e:
             print (f'Can not read spreadsheet with name {SPREADSHEET_PADDLE_END}. Exception {e} thrown. Abort!')
             sys.exit(1)
+        try:
+            sheet_plr = polars.read_excel(args.input, sheet_name=SPREADSHEET_PADDLE_END)
+        except Exception as e:
+            print (f'Can not read spreadsheet with name {SPREADSHEET_PADDLE_END}. Exception {e} thrown. Abort!')
+            sys.exit(1)
+        
+        ploc_col = sheet_plr.get_column("Paddle Location in Panel ")
         for row in range(1,len(sheet.index)):
             paddle_end = m.PaddleEnd()
             row_data = sheet.loc[row,:]
@@ -144,6 +156,7 @@ if __name__ == '__main__':
             print(row_data)
             paddle_end.fill_from_spreadsheet(row_data)
             paddle_end.setup_unique_paddle_end_id()
+            paddle_end.pos_in_panel = ploc_col[row]
             #print (row_data.keys())
             #print (row_data)
             #print ('----')
@@ -153,6 +166,16 @@ if __name__ == '__main__':
             print (paddle_end)
             if not args.dry_run:
                 paddle_end.save()
+    if args.create_pid_table:
+        paddle_ends = m.PaddleEnd.objects.all()
+        if len(paddle_ends) == 0:
+            print (f'[FATAL] - need to create paddle end table first! Abort..')
+            sys.exit(1)
+        #pid_dict = {m.Paddle() for k in range(160)}
+        #for k in pid_dict.keys():
+        #    pid_dict[k].paddle_id = k+1
+
+
     if args.create_rb_table:
         paddle_ends = m.PaddleEnd.objects.all()
         #paddle_ends_rb = { : []}
