@@ -99,7 +99,7 @@ impl RBTab<'_>  {
              rb_receiver : Receiver<RBEvent>,
              theme       : ColorTheme2) -> RBTab<'static>  {
     let mut rb_select_items = Vec::<ListItem>::new();
-    for k in 1..41 {
+    for k in 1..51 {
       let this_item = format!("RB{:0>2}", k);
       rb_select_items.push(ListItem::new(Line::from(this_item)));
     }
