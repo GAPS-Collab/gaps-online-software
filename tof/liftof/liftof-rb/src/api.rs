@@ -1242,50 +1242,78 @@ pub fn setup_drs4() -> Result<(), RegisterError> {
 
 
 pub fn send_preamp_bias_set_all(bias_voltage: u16) -> Result<(), SetError> {
-  PreampSetBias::set_manual_bias(None, bias_voltage as f32);
+  match PreampSetBias::set_manual_bias(None, bias_voltage as f32) {
+    Ok(_) => (),
+    Err(_) => {
+      error!("Unable to set preamp bias! Error LTBThresholdError!");
+    }
+  };
   Ok(())
 }
 
 
 pub fn send_preamp_bias_set(preamp_id: u8, bias_voltage: u16) -> Result<(), SetError> {
-  PreampSetBias::set_manual_bias(Some(preamp_id), bias_voltage as f32);
+  // TODO add check for LTB of interest
+  match PreampSetBias::set_manual_bias(Some(preamp_id), bias_voltage as f32) {
+    Ok(_) => (),
+    Err(_) => {
+      error!("Unable to set preamp bias! Error LTBThresholdError!");
+    }
+  };
   Ok(())
 }
 
 
 pub fn send_ltb_all_thresholds_set() -> Result<(), SetError> {
-  ltb_threshold::set_default_threshold();
+  match ltb_threshold::set_default_threshold() {
+    Ok(_) => (),
+    Err(_) => {
+      error!("Unable to set preamp bias! Error LTBThresholdError!");
+    }
+  };
   Ok(())
 }
 
 
 pub fn send_ltb_all_thresholds_reset() -> Result<(), SetError> {
-  ltb_threshold::reset_threshold();
+  match ltb_threshold::reset_threshold() {
+    Ok(_) => (),
+    Err(_) => {
+      error!("Unable to set preamp bias! Error LTBThresholdError!");
+    }
+  };
   Ok(())
 }
 
 
 pub fn send_ltb_threshold_set(ltb_id: u8, threshold_name: LTBThresholdName, threshold_level: u16) -> Result<(), SetError> {
+  // TODO add check for LTB of interest
   let ch = LTBThresholdName::get_ch_number(threshold_name).unwrap();
-  ltb_threshold::set_threshold(ch, threshold_level as f32);
+  match ltb_threshold::set_threshold(ch, threshold_level as f32) {
+    Ok(_) => (),
+    Err(_) => {
+      error!("Unable to set preamp bias! Error LTBThresholdError!");
+    }
+  };
   Ok(())
 }
 
 
-pub fn power_preamp(cmd_socket: &Socket, preamp_id: u8, status: PowerStatusEnum) -> Result<(), SetError> {
+pub fn power_preamp(preamp_id: u8, status: PowerStatusEnum) -> Result<(), SetError> {
+  let mut result = Ok(());
   match status {
     PowerStatusEnum::ON => {
       if preamp_id == DEFAULT_PREAMP_ID {
-        send_preamp_bias_set_all(DEFAULT_PREAMP_BIAS);
+        result = send_preamp_bias_set_all(DEFAULT_PREAMP_BIAS);
       } else {
-        send_preamp_bias_set(DEFAULT_PREAMP_ID, DEFAULT_PREAMP_BIAS);
+        result = send_preamp_bias_set(DEFAULT_PREAMP_ID, DEFAULT_PREAMP_BIAS);
       }
     },
     PowerStatusEnum::OFF => {
       if preamp_id == DEFAULT_PREAMP_ID {
-        send_preamp_bias_set_all(0);
+        result = send_preamp_bias_set_all(0);
       } else {
-        send_preamp_bias_set(DEFAULT_PREAMP_ID, 0);
+        result = send_preamp_bias_set(DEFAULT_PREAMP_ID, 0);
       }
     },
     PowerStatusEnum::Cycle => {
@@ -1294,23 +1322,31 @@ pub fn power_preamp(cmd_socket: &Socket, preamp_id: u8, status: PowerStatusEnum)
     },
     _ => error!("The power status is not specified or outside expected values.")
   }
+
+  match result {
+    Ok(_) => (),
+    Err(_) => {
+      error!("Unable to set preamp bias! Error LTBThresholdError!");
+    }
+  };
   Ok(())
 }
 
 
-pub fn power_ltb(cmd_socket: &Socket, ltb_id: u8, status: PowerStatusEnum) -> Result<(), SetError> {
+pub fn power_ltb(ltb_id: u8, status: PowerStatusEnum) -> Result<(), SetError> {
+  let mut result = Ok(());
   // the differentiation between all and single ltb is done intrinsically by the fact that 1 RB -> 1 LTB
   match status {
     PowerStatusEnum::ON => {
       // TODO add ID check for LTB to if
       if ltb_id == DEFAULT_LTB_ID {
-        send_ltb_all_thresholds_set();
+        result = send_ltb_all_thresholds_set();
       }
     },
     PowerStatusEnum::OFF => {
       // TODO add ID check for LTB to if
       if ltb_id == DEFAULT_LTB_ID {
-        send_ltb_all_thresholds_reset();
+        result = send_ltb_all_thresholds_reset();
       }
     },
     PowerStatusEnum::Cycle => {
@@ -1319,5 +1355,12 @@ pub fn power_ltb(cmd_socket: &Socket, ltb_id: u8, status: PowerStatusEnum) -> Re
     },
     _ => error!("The power status is not specified or outside expected values.")
   }
+
+  match result {
+    Ok(_) => (),
+    Err(_) => {
+      error!("Unable to set preamp bias! Error LTBThresholdError!");
+    }
+  };
   Ok(())
 }

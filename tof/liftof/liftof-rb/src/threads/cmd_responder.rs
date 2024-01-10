@@ -310,14 +310,14 @@ pub fn cmd_responder(cmd_server_ip             : String,
                                 warn!("Not implemented for AllButMT yet")
                               }, //power_allbutmt(cmd_socket, component_id, status),
                               TofComponent::LTB      => {
-                                return_val = power_ltb(&cmd_socket, component_id, status);
+                                return_val = power_ltb(component_id, status);
                                 match return_val {
                                   Ok(_)  => trace!("LTB powered up!"),
                                   Err(_) => warn!("Not able to power up LTB!")
                                 };
                               },
                               TofComponent::Preamp   => {
-                                return_val = power_preamp(&cmd_socket, component_id, status);
+                                return_val = power_preamp(component_id, status);
                                 match return_val {
                                   Ok(_)  => trace!("Preamp powered up!"),
                                   Err(_) => warn!("Not able to power up Preamp!")
