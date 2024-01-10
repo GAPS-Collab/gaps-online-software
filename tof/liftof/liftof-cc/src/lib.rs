@@ -239,8 +239,8 @@ pub fn send_ping_response(cmd_sender: Sender<TofPacket>,
 
 /// Function that manages moni commands from ground
 pub fn send_moni(cmd_sender: Sender<TofPacket>,
-                tof_component: TofComponent,
-                id: u8) {
+                 tof_component: TofComponent,
+                 id: u8) {
   let payload: u32 = PAD_CMD_32BIT | (tof_component as u32) << 8 | (id as u32);
   let moni = TofCommand::Moni(payload);
   let tp = TofPacket::from(&moni);
