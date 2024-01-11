@@ -7,11 +7,13 @@ on:
     - main
     - develop
     - NIUHI-0.8
+    - HAHALUA-0.9
   pull_request:
     branches: 
     - main
     - develop
     - NIUHI-0.8
+    - HAHALUA-0.9
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
