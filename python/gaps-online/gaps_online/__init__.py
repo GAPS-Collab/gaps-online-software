@@ -24,3 +24,4 @@ try:
 except ImportError as e:
     print(f"Can't load RUST API! {e}")
 
+__version__ = "0.9.x"

@@ -4,6 +4,8 @@
 
 Dataclasses are available for 2 APIs, python and rust. 
 Each of them have their own pybindings.
+The dataclasses are binary compatible through the
+serialzation methods.
 
 -rust 
  |__ tof-dataclasses

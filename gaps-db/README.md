@@ -4,5 +4,5 @@
   containing paddle connection information.
 * python django project for easy access of the db
 
-[!NOTE]
-There is a postgre sql database on uhcra, which in the future will be synced with the local db.
+>[!NOTE]
+>There is a postgre sql database on uhcra, which in the future will be synced with the local db.

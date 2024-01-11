@@ -1,6 +1,6 @@
 [package]
 name = "liftof-rb"
-version = "0.8.6"
+version = "0.9.0"
 edition = "2021"
 description = "Readoutboard data acquisition code for the TOF of the GAPS science experiment"
 
