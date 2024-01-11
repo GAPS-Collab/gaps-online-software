@@ -3,6 +3,7 @@
 import django
 django.setup()
 
+import json
 import sys
 import pandas
 import re
@@ -23,6 +24,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="(Re)create tables in the global GAPS database from paddle mapping spreadsheets")
     parser.add_argument('input', metavar='input', type=str,\
                         help='Input XLS spreadsheet')
+    parser.add_argument('--volid-map', default="",\
+                        help=".json file with mapping pid->volid")
+    parser.add_argument('--level0-geo', default="",\
+                        help=".json file with mapping volid->l0 geo coord")
     parser.add_argument('--dry-run', action='store_true', default=False,\
                         help="Don't do anything, just print.")
     parser.add_argument('--create-paddle-end-table', action='store_true', default=False,\
@@ -51,6 +56,10 @@ if __name__ == '__main__':
         args.create_rb_table         = True
         args.create_ltb_table        = True
         args.create_pid_table        = True
+    
+    if not args.volid_map or not args.level0_geo:
+        args.create_pid_table = False
+        print("Not creating PID tablew without volid map and level0 geo!")
     #sure = input(f'Whatever you have selected, it is likely that current values in the global GAPS DB will get overwriten. Are you certain that you want to proceed? (YES/<any>\n\t')
     #if not sure:
     #    print(f'Abort! Nothing happend.')
@@ -171,10 +180,22 @@ if __name__ == '__main__':
         if len(paddle_ends) == 0:
             print (f'[FATAL] - need to create paddle end table first! Abort..')
             sys.exit(1)
-        #pid_dict = {m.Paddle() for k in range(160)}
-        #for k in pid_dict.keys():
-        #    pid_dict[k].paddle_id = k+1
-
+        pid_dict = {k : m.Paddle() for k in range(1,161)}
+        
+        volid_map  = json.load(open(args.volid_map))
+        level0_geo = json.load(open(args.level0_geo))
+        for k in pid_dict.keys():
+            pid_dict[k].paddle_id = k
+            vid = int(volid_map[str(k)])
+            pid_dict[k].volume_id = vid
+            l0_coord = level0_geo[str(vid)]
+            x,y,z = l0_coord['x'], l0_coord['y'], l0_coord['z']
+            pid_dict[k].global_pos_x_l0 = x
+            pid_dict[k].global_pos_y_l0 = y
+            pid_dict[k].global_pos_z_l0 = z
+            if not args.dry_run:
+                print (f'{pid_dict[k]}')
+                pid_dict[k].save()
 
     if args.create_rb_table:
         paddle_ends = m.PaddleEnd.objects.all()
