@@ -1,7 +1,8 @@
 var annotated_dup =
 [
     [ "Gaps", "namespaceGaps.html", [
-      [ "TofPacketReader", "classGaps_1_1TofPacketReader.html", "classGaps_1_1TofPacketReader" ]
+      [ "TofPacketReader", "classGaps_1_1TofPacketReader.html", "classGaps_1_1TofPacketReader" ],
+      [ "FatalException", "classGaps_1_1FatalException.html", null ]
     ] ],
     [ "GAPS", null, [
       [ "Waveform", "classGAPS_1_1Waveform.html", "classGAPS_1_1Waveform" ]

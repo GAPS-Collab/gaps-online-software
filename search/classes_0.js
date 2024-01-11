@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['ltb_51',['LTB',['../structLTB.html',1,'']]]
+  ['fatalexception_53',['FatalException',['../classGaps_1_1FatalException.html',1,'Gaps']]]
 ];

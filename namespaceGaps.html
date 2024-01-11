@@ -87,6 +87,7 @@ $(document).ready(function(){initNavTree('namespaceGaps.html',''); initResizable
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
+<a href="#typedef-members">Typedefs</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">Gaps Namespace Reference</div>  </div>
@@ -100,9 +101,23 @@ $(document).ready(function(){initNavTree('namespaceGaps.html',''); initResizable
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGaps_1_1TofPacketReader.html">TofPacketReader</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGaps_1_1FatalException.html">FatalException</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Exception for log_fatal(..) macro.  <a href="classGaps_1_1FatalException.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
+Typedefs</h2></td></tr>
+<tr class="memitem:a7e7d9bb141f5f926934e44b33429a44c"><td class="memItemLeft" align="right" valign="top"><a id="a7e7d9bb141f5f926934e44b33429a44c"></a>
+typedef spdlog::level::level_enum&#160;</td><td class="memItemRight" valign="bottom"><b>LOGLEVEL</b></td></tr>
+<tr class="separator:a7e7d9bb141f5f926934e44b33429a44c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:a63983ede070cd10b4e310de973772319"><td class="memItemLeft" align="right" valign="top"><a id="a63983ede070cd10b4e310de973772319"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><b>severity_to_str</b> (const LOGLEVEL &amp;severity)</td></tr>
+<tr class="separator:a63983ede070cd10b4e310de973772319"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a212013efcb580c37612821937fa4ff8d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceGaps.html#a212013efcb580c37612821937fa4ff8d">set_loglevel</a> (LOGLEVEL severity)</td></tr>
+<tr class="separator:a212013efcb580c37612821937fa4ff8d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a22fc40b41968b7d4462f0c11ac07b53f"><td class="memTemplParams" colspan="2"><a id="a22fc40b41968b7d4462f0c11ac07b53f"></a>
 template&lt;typename T &gt; </td></tr>
 <tr class="memitem:a22fc40b41968b7d4462f0c11ac07b53f"><td class="memTemplItemLeft" align="right" valign="top">Vec&lt; T &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>slice</b> (const Vec&lt; T &gt; &amp;vec, usize start, usize end)</td></tr>
@@ -196,6 +211,30 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>u32_to_le_bytes</b> (
 <p>let value = u32::from_le_bytes([0x78, 0x56, 0x34, 0x12]); assert_eq!(value, 0x12345678);</p>
 <p>@params:</p>
 <p>@pos : this gets advanced by 4 bytes </p>
+
+</div>
+</div>
+<a id="a212013efcb580c37612821937fa4ff8d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a212013efcb580c37612821937fa4ff8d">&#9670;&nbsp;</a></span>set_loglevel()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Gaps::set_loglevel </td>
+          <td>(</td>
+          <td class="paramtype">LOGLEVEL&#160;</td>
+          <td class="paramname"><em>severity</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Suppress log messages if their severity is lower than </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">severity</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
