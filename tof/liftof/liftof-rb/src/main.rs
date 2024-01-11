@@ -446,7 +446,7 @@ fn main() {
             },
             CalibrationCmd::Voltage(voltage_opts) => {
               let voltage_level = voltage_opts.level;
-              match rb_noi_voltage_subcalibration(&rc_to_runner_cal, &tp_to_pub_cal, voltage_level) {
+              match rb_voltage_subcalibration(&rc_to_runner_cal, &tp_to_pub_cal, voltage_level) {
                 Ok(_) => (),
                 Err(err) => {
                   error!("Voltage calibration data taking failed! Error {err}!");

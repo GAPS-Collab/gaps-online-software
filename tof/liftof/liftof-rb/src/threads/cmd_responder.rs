@@ -23,22 +23,21 @@ use tof_dataclasses::constants::{MASK_CMD_8BIT,
                                   MASK_CMD_24BIT,
                                   MASK_CMD_32BIT};
 
-use crate::api::rb_calibration;
-use crate::api::{send_preamp_bias_set,
-                  send_ltb_threshold_set,
-                  power_preamp,
-                  power_ltb};
+use crate::api::{rb_calibration,
+                 rb_noi_subcalibration,
+                 rb_voltage_subcalibration,
+                 rb_timing_subcalibration,
+                 send_preamp_bias_set,
+                 send_ltb_threshold_set,
+                 power_preamp,
+                 power_ltb,
+                 get_runconfig,
+                 prefix_board_id,
+                 DATAPORT};
 
 use liftof_lib::constants::DEFAULT_RB_ID;
 
 use tof_dataclasses::threading::ThreadControl;
-
-
-use crate::api::{
-    get_runconfig,
-    prefix_board_id,
-    DATAPORT
-};
 
 use crate::control::{get_board_id_string,
                      get_board_id};
@@ -504,7 +503,23 @@ pub fn cmd_responder(cmd_server_ip             : String,
                         let rb_id: u8 = ((value | (MASK_CMD_8BIT << 8)) >> 8) as u8;
                         // MSB fourth 8 bits are extra (not used)
                         let extra: u8 = (value | MASK_CMD_8BIT) as u8;
-                        println!("RB ID: {}, extra: {}",rb_id,extra);
+                        
+                        let my_rb_id = get_board_id().unwrap() as u8;
+                        // if this RB is the one then do stuff
+                        if rb_id == DEFAULT_RB_ID || rb_id == my_rb_id {
+                          match rb_noi_subcalibration(&run_config, &ev_request_to_cache) {
+                            Ok(_) => (),
+                            Err(err) => {
+                              error!("Noi data taking failed! Error {err}!");
+                            }
+                          }
+
+                          let resp_good = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed as u32);
+                          match cmd_socket.send(resp_good.to_bytestream(),0) {
+                            Err(err) => warn!("Can not send response! Err {err}"),
+                            Ok(_)    => trace!("Resp sent!")
+                          }
+                        }
                         continue;
                       },
                       TofCommand::VoltageCalibration (value) => {
@@ -515,7 +530,23 @@ pub fn cmd_responder(cmd_server_ip             : String,
                         let rb_id: u8 = ((value | (MASK_CMD_8BIT << 8)) >> 8) as u8;
                         // MSB fourth 8 bits are extra (not used)
                         let extra: u8 = (value | MASK_CMD_8BIT) as u8;
-                        println!("Voltage_val: {}, RB ID: {}, extra: {}",voltage_val,rb_id,extra);
+                        
+                        let my_rb_id = get_board_id().unwrap() as u8;
+                        // if this RB is the one then do stuff
+                        if rb_id == DEFAULT_RB_ID || rb_id == my_rb_id {
+                          match rb_voltage_subcalibration(&run_config, &ev_request_to_cache, voltage_val) {
+                            Ok(_) => (),
+                            Err(err) => {
+                              error!("Noi data taking failed! Error {err}!");
+                            }
+                          }
+
+                          let resp_good = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed as u32);
+                          match cmd_socket.send(resp_good.to_bytestream(),0) {
+                            Err(err) => warn!("Can not send response! Err {err}"),
+                            Ok(_)    => trace!("Resp sent!")
+                          }
+                        }
                         continue;
                       },
                       TofCommand::TimingCalibration  (value) => {
@@ -525,7 +556,23 @@ pub fn cmd_responder(cmd_server_ip             : String,
                         let rb_id: u8 = ((value | (MASK_CMD_8BIT << 8)) >> 8) as u8;
                         // MSB fourth 8 bits are extra (not used)
                         let extra: u8 = (value | MASK_CMD_8BIT) as u8;
-                        println!("Voltage_val: {}, RB ID: {}, extra: {}",voltage_val,rb_id,extra);
+                        
+                        let my_rb_id = get_board_id().unwrap() as u8;
+                        // if this RB is the one then do stuff
+                        if rb_id == DEFAULT_RB_ID || rb_id == my_rb_id {
+                          match rb_timing_subcalibration(&run_config, &ev_request_to_cache, voltage_val) {
+                            Ok(_) => (),
+                            Err(err) => {
+                              error!("Noi data taking failed! Error {err}!");
+                            }
+                          }
+
+                          let resp_good = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed as u32);
+                          match cmd_socket.send(resp_good.to_bytestream(),0) {
+                            Err(err) => warn!("Can not send response! Err {err}"),
+                            Ok(_)    => trace!("Resp sent!")
+                          }
+                        }
                         continue;
                       },
                       TofCommand::DefaultCalibration  (value) => {
@@ -535,7 +582,23 @@ pub fn cmd_responder(cmd_server_ip             : String,
                         let rb_id: u8 = ((value | (MASK_CMD_8BIT << 8)) >> 8) as u8;
                         // MSB fourth 8 bits are extra (not used)
                         let extra: u8 = (value | MASK_CMD_8BIT) as u8;
-                        println!("Voltage_val: {}, RB ID: {}, extra: {}",voltage_val,rb_id,extra);
+
+                        let my_rb_id = get_board_id().unwrap() as u8;
+                        // if this RB is the one then do stuff
+                        if rb_id == DEFAULT_RB_ID || rb_id == my_rb_id {
+                          match rb_calibration(&run_config, &ev_request_to_cache) {
+                            Ok(_) => (),
+                            Err(err) => {
+                              error!("Calibration failed! Error {err}!");
+                            }
+                          }
+
+                          let resp_good = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed as u32);
+                          match cmd_socket.send(resp_good.to_bytestream(),0) {
+                            Err(err) => warn!("Can not send response! Err {err}"),
+                            Ok(_)    => trace!("Resp sent!")
+                          }
+                        }
                         continue;
                       },
                       TofCommand::SetRBDataBufSize   (_) => {
