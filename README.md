@@ -66,7 +66,7 @@ most stable and useful version at the time.
 ### Build system
 
 The installation uses `cmake`. Create a build directory and execute
-`cmake <gaps-online-software source directory> --prefix <install_dir>`
+`cmake <gaps-online-software source directory> --install-prefix <install_dir>`
 
 After that, you can have a look at the `cmake` cache with 
 `ccmake .` in your build directory. If everything seems ok, execute:

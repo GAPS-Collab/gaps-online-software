@@ -34,6 +34,7 @@ pub enum PacketType {
   RBCalibration      = 130u8,
   TofCommand         = 140u8,
   RBCommand          = 150u8,
+  Ping               = 160u8,
   /// a MultiPacket consists of other TofPackets
   MultiPacket        = 255u8,
 }
@@ -46,31 +47,26 @@ impl fmt::Display for PacketType {
   }
 }
 
-impl TryFrom<u8> for PacketType {
-  type Error = &'static str;
-
-  // I am not sure about this hard coding, but the code
-  //  looks nicer - Paolo
-  fn try_from(value: u8) -> Result<Self, Self::Error> {
+impl From<u8> for PacketType {
+  fn from(value: u8) -> Self {
     match value {
-      0u8   => Ok(PacketType::Unknown),
-      20u8  => Ok(PacketType::RBEvent),
-      21u8  => Ok(PacketType::TofEvent),
-      30u8  => Ok(PacketType::Monitor),
-      40u8  => Ok(PacketType::HeartBeat),
-      60u8  => Ok(PacketType::MasterTrigger),
-      70u8  => Ok(PacketType::RBEventHeader),
-      80u8  => Ok(PacketType::MonitorTofCmp),
-      90u8  => Ok(PacketType::MonitorMtb),
-      100u8 => Ok(PacketType::RBMoni),
-      101u8 => Ok(PacketType::PBMoniData),
-      102u8 => Ok(PacketType::LTBMoniData),
-      103u8 => Ok(PacketType::PAMoniData),
-      120u8 => Ok(PacketType::RBEventMemoryView),
-      130u8 => Ok(PacketType::RBCalibration),
-      140u8 => Ok(PacketType::TofCommand),
-      150u8 => Ok(PacketType::RBCommand),
-      _     => Err("I am not sure how to convert this value!")
+      0u8   => PacketType::Unknown,
+      20u8  => PacketType::RBEvent,
+      21u8  => PacketType::TofEvent,
+      30u8  => PacketType::Monitor,
+      40u8  => PacketType::HeartBeat,
+      60u8  => PacketType::MasterTrigger,
+      70u8  => PacketType::RBEventHeader,
+      80u8  => PacketType::MonitorTofCmp,
+      90u8  => PacketType::MonitorMtb,
+      100u8 => PacketType::RBMoni,
+      120u8 => PacketType::RBEventMemoryView,
+      130u8 => PacketType::RBCalibration,
+      140u8 => PacketType::TofCommand,
+      150u8 => PacketType::RBCommand,
+      160u8 => PacketType::Ping,
+      255u8 => PacketType::MultiPacket,
+      _     => PacketType::Unknown
     }
   }
 }

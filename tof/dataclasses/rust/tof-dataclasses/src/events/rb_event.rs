@@ -67,15 +67,13 @@ impl fmt::Display for EventStatus {
 
 impl From<u8> for EventStatus {
   fn from(value: u8) -> Self {
-  // I am not sure about this hard coding, but the code
-  //  looks nicer - Paolo
     match value {
       0u8  => EventStatus::Unknown,
       10u8 => EventStatus::CRC32Wrong,
       11u8 => EventStatus::TailWrong,
       12u8 => EventStatus::ChannelIDWrong,
       42u8 => EventStatus::Perfect,
-      _    => EventStatus::Unknown,
+      _    => EventStatus::Unknown
     }
   }
 }

@@ -29,11 +29,9 @@ use std::{fs,
           time};
 use std::path::{Path, PathBuf};
 
-use clap::{
-    arg,
-    command,
-    Parser,
-};
+use clap::{arg,
+           command,
+           Parser};
 
 use crossbeam_channel as cbc; 
 use colored::Colorize;
@@ -53,12 +51,14 @@ use liftof_lib::{
     get_ltb_dsi_j_ch_mapping,
     DATAPORT,
     LIFTOF_LOGO_SHOW,
+    RunCmd, CalibrationCmd, PowerCmd, PowerStatusEnum, TofComponent, SetCmd
 };
 use liftof_cc::threads::{readoutboard_communicator,
                          event_builder,
                          global_data_sink};
 
-//use liftof_cc::constants::*;
+use liftof_lib::Command;
+
 
 /*************************************/
 
@@ -83,92 +83,10 @@ struct LiftofCCArgs {
   /// A json file wit the ltb(dsi, j, ch) -> rb_id, rb_ch mapping.
   #[arg(long)]
   json_ltb_rb_map : Option<PathBuf>,
-  ///// List of possible commands
-  //#[command(subcommand)]
-  //command: Command,
+  /// List of possible commands
+  #[command(subcommand)]
+  command: Command,
 }
-
-//#[derive(Debug, Parser, PartialEq)]
-//enum Command {
-//  /// Remotely trigger the readoutboards to run the calibration routines (tcal, vcal).
-//  #[command(subcommand)]
-//  Calibration(CalibrationCmd)
-//  //#[command(subcommand)]
-//  //Run(RunCmd)
-//}
-//
-//#[derive(Debug, Subcommand, PartialEq)]
-//enum CalibrationCmd {
-//  /// Default calibration run, meaning 2 voltage calibrations and one timing calibration on all RBs with the default values.
-//  Default,
-//  /// Voltage calibration run. All RB are targeted and voltage are default ones if nothing else is specified.
-//  Voltage(VoltageOpts),
-//  /// Voltage calibration run. All RB are targeted if nothing else is specified.
-//  Timing(TimingOpts)
-//}
-//
-//#[derive(Debug, Args, PartialEq)]
-//struct VoltageOpts {
-//  /// Voltage level to be set in voltage calibration run.
-//  #[arg(short, long)]
-//  voltage_level: Option<u16>,
-//  /// RB to target in voltage calibration run.
-//  #[arg(short, long)]
-//  rb_id: Option<u8>,
-//  /// Extra arguments in voltage calibration run (not implemented).
-//  #[arg(short, long)]
-//  extra: Option<u8>,
-//}
-//
-//#[derive(Debug, Args, PartialEq)]
-//struct TimingOpts {
-//  /// RB to target in timing calibration run.
-//  #[arg(short, long)]
-//  rb_id: Option<u8>,
-//  /// Extra arguments in timing calibration run (not implemented).
-//  #[arg(short, long)]
-//  extra: Option<u8>,
-//}
-//
-//#[derive(Debug, Parser, PartialEq)]
-//enum Command {
-//  /// Remotely trigger the readoutboards to run the calibration routines (tcal, vcal).
-//  #[command(subcommand)]
-//  Calibration(CalibrationCmd)
-//}
-//
-//#[derive(Debug, Subcommand, PartialEq)]
-//enum CalibrationCmd {
-//  /// Default calibration run, meaning 2 voltage calibrations and one timing calibration on all RBs with the default values.
-//  Default,
-//  /// Voltage calibration run. All RB are targeted and voltage are default ones if nothing else is specified.
-//  Voltage(VoltageOpts),
-//  /// Voltage calibration run. All RB are targeted if nothing else is specified.
-//  Timing(TimingOpts)
-//}
-//
-//#[derive(Debug, Args, PartialEq)]
-//struct VoltageOpts {
-//  /// Voltage level to be set in voltage calibration run.
-//  #[arg(short, long)]
-//  voltage_level: Option<u16>,
-//  /// RB to target in voltage calibration run.
-//  #[arg(short, long)]
-//  rb_id: Option<u8>,
-//  /// Extra arguments in voltage calibration run (not implemented).
-//  #[arg(short, long)]
-//  extra: Option<u8>,
-//}
-//
-//#[derive(Debug, Args, PartialEq)]
-//struct TimingOpts {
-//  /// RB to target in timing calibration run.
-//  #[arg(short, long)]
-//  rb_id: Option<u8>,
-//  /// Extra arguments in timing calibration run (not implemented).
-//  #[arg(short, long)]
-//  extra: Option<u8>,
-//}
 
 /*************************************/
 
@@ -386,6 +304,10 @@ fn main() {
   let (ev_to_builder, ev_from_rb) : (cbc::Sender<RBEvent>, cbc::Receiver<RBEvent>) = cbc::unbounded();
   let (cmd_sender, cmd_receiver) : (cbc::Sender<TofPacket>, cbc::Receiver<TofPacket>) = cbc::unbounded();
 
+  let ctx = zmq::Context::new();
+  // I guess expect is fine here, see above
+  let socket = ctx.socket(zmq::SUB).expect("Unable to create 0MQ SUB socket!");
+
 
   // prepare a thread pool. Currently we have
   // 1 thread per rb, 1 master trigger thread
@@ -517,27 +439,114 @@ fn main() {
   })
   .expect("Error setting Ctrl-C handler");
 
-  //match args.command {
-  //  // Matching calibration command
-  //  Command::Calibration(calibration_cmd) => {
-  //    match calibration_cmd {
-  //      CalibrationCmd::Default => {
-  //        liftof_cc::send_all_calibration(cmd_sender);
-  //      },
-  //      CalibrationCmd::Voltage(voltage_opts) => {
-  //        let voltage_level = voltage_opts.voltage_level.unwrap_or(DEFAULT_CALIB_VOLTAGE);
-  //        let rb_id = voltage_opts.rb_id.unwrap_or(DEFAULT_CALIB_RB);
-  //        let extra = voltage_opts.extra.unwrap_or(DEFAULT_CALIB_EXTRA);
-  //        liftof_cc::send_voltage_calibration(cmd_sender, voltage_level, rb_id, extra);
-  //      },
-  //      CalibrationCmd::Timing(timing_opts) => {
-  //        let rb_id = timing_opts.rb_id.unwrap_or(DEFAULT_CALIB_RB);
-  //        let extra = timing_opts.extra.unwrap_or(DEFAULT_CALIB_EXTRA);
-  //        liftof_cc::send_timing_calibration(cmd_sender, rb_id, extra);
-  //      }
-  //    }
-  //  }
-  //}
+  let cmd_sender_c = cmd_sender.clone();
+  match args.command {
+    Command::Ping(ping_cmd) => {
+      match ping_cmd.component {
+        TofComponent::TofCpu => liftof_cc::send_ping_response(cmd_sender_c, socket),
+        TofComponent::RB  |
+        TofComponent::LTB |
+        TofComponent::MT     => liftof_cc::send_ping(cmd_sender_c, ping_cmd.component, ping_cmd.id),
+        _                    => error!("The ping command is not implemented for this TofComponent!")
+      }
+    },
+    Command::Moni(moni_cmd) => {
+      match moni_cmd.component {
+        TofComponent::TofCpu => liftof_cc::send_moni_response(cmd_sender_c, socket),
+        TofComponent::RB  |
+        TofComponent::LTB |
+        TofComponent::MT     => liftof_cc::send_moni(cmd_sender_c, moni_cmd.component, moni_cmd.id),
+        _                    => error!("The moni command is not implemented for this TofComponent!")
+      }
+    },
+    Command::SystemdReboot(systemd_reboot_cmd) => {
+      let rb_id = systemd_reboot_cmd.id;
+      liftof_cc::send_systemd_reboot(cmd_sender_c, rb_id);
+    },
+    Command::Power(power_cmd) => {
+      match power_cmd {
+        PowerCmd::All(power_status) => {
+          let power_status_enum: PowerStatusEnum = power_status.status;
+          liftof_cc::send_power(cmd_sender_c, TofComponent::All, power_status_enum);
+        },
+        PowerCmd::MT(power_status) => {
+          let power_status_enum: PowerStatusEnum = power_status.status;
+          liftof_cc::send_power(cmd_sender_c, TofComponent::MT, power_status_enum);
+        },
+        PowerCmd::AllButMT(power_status) => {
+          let power_status_enum: PowerStatusEnum = power_status.status;
+          liftof_cc::send_power(cmd_sender_c, TofComponent::AllButMT, power_status_enum);
+        },
+        PowerCmd::LTB(ltb_power_opts) => {
+          let power_status_enum: PowerStatusEnum = ltb_power_opts.status;
+          let ltb_id = ltb_power_opts.id;
+          liftof_cc::send_power_ID(cmd_sender_c, TofComponent::LTB, power_status_enum, ltb_id);
+        },
+        PowerCmd::Preamp(preamp_power_opts) => {
+          let power_status_enum: PowerStatusEnum = preamp_power_opts.status;
+          let preamp_id = preamp_power_opts.id;
+          let preamp_bias = preamp_power_opts.bias;
+          liftof_cc::send_power_preamp(cmd_sender_c, power_status_enum, preamp_id, preamp_bias);
+        }
+      }
+    },
+    Command::Calibration(calibration_cmd) => {
+      match calibration_cmd {
+        CalibrationCmd::Default(default_opts) => {
+          let voltage_level = default_opts.level;
+          let rb_id = default_opts.id;
+          let extra = default_opts.extra;
+          liftof_cc::send_default_calibration(cmd_sender_c, voltage_level, rb_id, extra);
+        },
+        CalibrationCmd::Noi(noi_opts) => {
+          let rb_id = noi_opts.id;
+          let extra = noi_opts.extra;
+          liftof_cc::send_noi_calibration(cmd_sender_c, rb_id, extra);
+        },
+        CalibrationCmd::Voltage(voltage_opts) => {
+          let voltage_level = voltage_opts.level;
+          let rb_id = voltage_opts.id;
+          let extra = voltage_opts.extra;
+          liftof_cc::send_voltage_calibration(cmd_sender_c, voltage_level, rb_id, extra);
+        },
+        CalibrationCmd::Timing(timing_opts) => {
+          let voltage_level = timing_opts.level;
+          let rb_id = timing_opts.id;
+          let extra = timing_opts.extra;
+          liftof_cc::send_timing_calibration(cmd_sender_c, voltage_level, rb_id, extra);
+        }
+      }
+    }
+    Command::Set(set_cmd) => {
+      match set_cmd {
+        SetCmd::LtbThreshold(ltb_threshold_opts) => {
+          let ltb_id = ltb_threshold_opts.id;
+          let threshold_name = ltb_threshold_opts.name;
+          let threshold_level = ltb_threshold_opts.level;
+          liftof_cc::send_ltb_threshold_set(cmd_sender_c, ltb_id, threshold_name, threshold_level);
+        },
+        SetCmd::PreampBias(preamp_bias_opts) => {
+          let preamp_id = preamp_bias_opts.id;
+          let preamp_bias = preamp_bias_opts.bias;
+          liftof_cc::send_preamp_bias_set(cmd_sender_c, preamp_id, preamp_bias);
+        }
+      }
+    },
+    Command::Run(run_cmd) => {
+      match run_cmd {
+        RunCmd::Start(run_start_opts) => {
+          let run_type = run_start_opts.run_type;
+          let rb_id = run_start_opts.id;
+          let event_no = run_start_opts.no;
+          liftof_cc::send_run_start(cmd_sender_c, run_type, rb_id, event_no);
+        },
+        RunCmd::Stop(run_stop_opts) => {
+          let rb_id = run_stop_opts.id;
+          liftof_cc::send_run_stop(cmd_sender_c, rb_id);
+        }
+      }
+    }
+  }
   // start a new data run 
   let start_run = TofCommand::DataRunStart(1000);
   let tp = TofPacket::from(&start_run);

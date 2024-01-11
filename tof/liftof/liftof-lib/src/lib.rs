@@ -1,6 +1,20 @@
 pub mod master_trigger;
+use constants::{DEFAULT_CALIB_VOLTAGE,
+                DEFAULT_CALIB_EXTRA,
+                DEFAULT_RB_ID,
+                DEFAULT_PB_ID,
+                DEFAULT_LTB_ID,
+                DEFAULT_PREAMP_ID,
+                DEFAULT_PREAMP_BIAS,
+                DEFAULT_POWER_STATUS,
+                DEFAULT_RUN_TYPE,
+                DEFAULT_RUN_EVENT_NO,
+                DEFAULT_RUN_TIME,
+                PREAMP_MIN_BIAS,
+                PREAMP_MAX_BIAS};
 pub use master_trigger::{connect_to_mtb,
                          master_trigger};
+pub mod constants;
 
 use std::error::Error;
 use std::fmt;
@@ -43,8 +57,8 @@ use tof_dataclasses::calibrations::{
 use tof_dataclasses::packets::{TofPacket,
                                PacketType};
 use tof_dataclasses::errors::{SerializationError,
-                              AnalysisError};
-use tof_dataclasses::serialization::Serialization;
+                              AnalysisError, SetError};
+use tof_dataclasses::serialization::{Serialization};
 use tof_dataclasses::commands::RBCommand;
 use tof_dataclasses::events::{
     RBEvent,
@@ -60,6 +74,14 @@ use tof_dataclasses::analysis::{calculate_pedestal,
                                 find_peaks};
 
 use tof_dataclasses::RBChannelPaddleEndIDMap;
+
+use clap::{arg,
+  //value_parser,
+  //ArgAction,
+  //Command,
+  Parser,
+  Args,
+  Subcommand};
 
 pub const MT_MAX_PACKSIZE   : usize = 512;
 pub const DATAPORT          : u32   = 42000;
@@ -229,7 +251,6 @@ fn fit_sine(time: Vec<f32>, data: Vec<f32>) -> (f32, f32, f32) {
   }
   (amp,freq,phase)
 }
-
 
 //*************************************************
 // I/O - read/write (general purpose) files
@@ -792,6 +813,571 @@ pub fn get_ltb_dsi_j_ch_mapping(mapping_file : PathBuf) -> DsiLtbRBMapping {
 pub fn to_board_id_string(rb_id: u32) -> String {
   String::from("RB") + &format!("{:02}", rb_id)
 }
+
+/**********************************************************/
+/// Command Enums and stucts
+#[derive(Debug, Parser, PartialEq)]
+pub enum Command {
+  /// Ping a TOF sub-system.
+  Ping(PingCmd),
+  /// Monitor a TOF sub-system.
+  Moni(MoniCmd),
+  /// Restart RB systemd
+  SystemdReboot(SystemdRebootCmd),
+  /// Power control of TOF sub-systems.
+  #[command(subcommand)]
+  Power(PowerCmd),
+  /// Remotely trigger the readoutboards to run the calibration routines (tcal, vcal).
+  #[command(subcommand)]
+  Calibration(CalibrationCmd),
+  /// Remotely set LTB thresholds or preamp bias.
+  #[command(subcommand)]
+  Set(SetCmd),
+  /// Start/stop data taking run.
+  #[command(subcommand)]
+  Run(RunCmd)
+}
+
+/// TOF SW cmds ====================================================
+#[derive(Debug, Args, PartialEq)]
+pub struct PingCmd {
+  /// Component to target
+  #[arg(value_parser = clap::builder::PossibleValuesParser::new([
+          TofComponent::TofCpu,
+          TofComponent::MT,
+          TofComponent::RB,
+          TofComponent::LTB
+        ]),
+        required = true)]
+  pub component: TofComponent,
+  /// Component ID
+  #[arg(required = true)]
+  pub id: u8
+}
+
+#[derive(Debug, Args, PartialEq)]
+pub struct MoniCmd {
+  /// Component to target
+  #[arg(value_parser = clap::builder::PossibleValuesParser::new([
+          TofComponent::TofCpu,
+          TofComponent::MT,
+          TofComponent::RB,
+          TofComponent::LTB
+        ]),
+        required = true)]
+  pub component: TofComponent,
+  /// Component ID
+  #[arg(required = true)]
+  pub id: u8
+}
+
+#[derive(Debug, Args, PartialEq)]
+pub struct SystemdRebootCmd {
+  /// RB ID
+  #[arg(required = true)]
+  pub id: u8
+}
+/// END TOF SW cmds ================================================
+
+
+/// Set cmds ====================================================
+#[derive(Debug, Subcommand, PartialEq)]
+pub enum SetCmd {
+  /// Set MT configuration (WHAT SHOULD I DO WITH THIS TODO)
+  //MTConfig(MTConfigOpts),
+  /// Set threshold level on all LTBs or a single LTB
+  LtbThreshold(LtbThresholdOpts),
+  /// Set bias level on all preamps or a single preamp
+  PreampBias(PreampBiasOpts)
+}
+
+// #[derive(Debug, Args, PartialEq)]
+// pub struct MTConfigOpts {
+//   /// RB to target in voltage calibration run.
+//   #[arg(short, long, default_value_t = DEFAULT_RB_ID)]
+//   pub id: u8,
+//   /// Theshold level to be set
+//   #[arg(required = true, 
+//         value_parser = clap::value_parser!(i64).range(PREAMP_MIN_BIAS..=PREAMP_MAX_BIAS))]
+//   pub bias: u16
+// }
+
+// impl MTConfigOpts {
+//   pub fn new(id: u8, bias: u16) -> Self {
+//     Self { 
+//       id,
+//       bias
+//     }
+//   }
+// }
+
+#[derive(Debug, Args, PartialEq)]
+pub struct LtbThresholdOpts {
+  /// ID of the LTB to target
+  #[arg(short, long, default_value_t = DEFAULT_LTB_ID)]
+  pub id: u8,
+  /// Name of the threshold to be set
+  #[arg(required = true)]
+  pub name: LTBThresholdName,
+  /// Threshold level to be set
+  #[arg(required = true)]
+  pub level: u16
+}
+
+impl LtbThresholdOpts {
+  pub fn new(id: u8, name: LTBThresholdName, level: u16) -> Self {
+    Self { 
+      id,
+      name,
+      level
+    }
+  }
+}
+
+// repr is u16 in order to leave room for preamp bias
+#[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize, clap::ValueEnum)]
+#[repr(u8)]
+pub enum LTBThresholdName {
+  Unknown  = 0u8,
+  Hit      = 10u8,
+  Beta     = 20u8,
+  Veto     = 30u8,
+}
+
+impl LTBThresholdName {
+  pub fn get_ch_number(threshold_name: LTBThresholdName) -> Result<u8, SetError> {
+    match threshold_name {
+      LTBThresholdName::Hit     => Ok(0u8),
+      LTBThresholdName::Beta    => Ok(1u8),
+      LTBThresholdName::Veto    => Ok(2u8),
+      LTBThresholdName::Unknown => {
+        error!("Not able to get a LTB threshold from Unknown");
+        Err(SetError::EmptyInputData)
+      }
+    }
+  }
+}
+
+impl fmt::Display for LTBThresholdName {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let r = serde_json::to_string(self).unwrap_or(
+      String::from("Error: cannot unwrap this PowerStatusEnum"));
+    write!(f, "<PowerStatusEnum: {}>", r)
+  }
+}
+
+impl From<u8> for LTBThresholdName {
+  fn from(value: u8) -> Self {
+    match value {
+      0u8  => LTBThresholdName::Unknown,
+      10u8 => LTBThresholdName::Hit,
+      20u8 => LTBThresholdName::Beta,
+      30u8 => LTBThresholdName::Veto,
+      _    => LTBThresholdName::Unknown
+    }
+  }
+}
+
+#[derive(Debug, Args, PartialEq)]
+pub struct PreampBiasOpts {
+  /// RB to target in voltage calibration run.
+  #[arg(short, long, default_value_t = DEFAULT_RB_ID)]
+  pub id: u8,
+  /// Theshold level to be set
+  #[arg(required = true, 
+        value_parser = clap::value_parser!(i64).range(PREAMP_MIN_BIAS..=PREAMP_MAX_BIAS))]
+  pub bias: u16
+}
+
+impl PreampBiasOpts {
+  pub fn new(id: u8, bias: u16) -> Self {
+    Self { 
+      id,
+      bias
+    }
+  }
+}
+/// END Set cmds ================================================
+
+/// Calibration cmds ====================================================
+#[derive(Debug, Subcommand, PartialEq)]
+pub enum CalibrationCmd {
+  /// Default calibration run, meaning 2 voltage calibrations and one timing calibration on all RBs with the default values.
+  Default(DefaultOpts),
+  /// No input data taking run. All RB are targeted are default ones if nothing else is specified.
+  Noi(NoiOpts),
+  /// Voltage data taking run. All RB are targeted and voltage are default ones if nothing else is specified.
+  Voltage(VoltageOpts),
+  /// Timing data taking run. All RB are targeted and voltage are default ones if nothing else is specified.
+  Timing(TimingOpts)
+}
+
+#[derive(Debug, Args, PartialEq)]
+pub struct DefaultOpts {
+  /// Voltage level to be set in default calibration run.
+  #[arg(short, long, default_value_t = DEFAULT_CALIB_VOLTAGE)]
+  pub level: u16,
+  /// ID of the RB to target in default calibration run.
+  #[arg(short, long, default_value_t = DEFAULT_RB_ID)]
+  pub id: u8,
+  /// Extra arguments in default calibration run (not implemented).
+  #[arg(short, long, default_value_t = DEFAULT_CALIB_EXTRA)]
+  pub extra: u8,
+}
+
+impl DefaultOpts {
+  pub fn new(level: u16, id: u8, extra: u8) -> Self {
+    Self { 
+      level,
+      id,
+      extra
+    }
+  }
+}
+
+#[derive(Debug, Args, PartialEq)]
+pub struct NoiOpts {
+  /// ID of the RB to target in no input calibration run.
+  #[arg(short, long, default_value_t = DEFAULT_RB_ID)]
+  pub id: u8,
+  /// Extra arguments in no input calibration run (not implemented).
+  #[arg(short, long, default_value_t = DEFAULT_CALIB_EXTRA)]
+  pub extra: u8,
+}
+
+impl NoiOpts {
+  pub fn new(id: u8, extra: u8) -> Self {
+    Self { 
+      id,
+      extra
+    }
+  }
+}
+
+#[derive(Debug, Args, PartialEq)]
+pub struct VoltageOpts {
+  /// Voltage level to be set in voltage calibration run.
+  #[arg(short, long, default_value_t = DEFAULT_CALIB_VOLTAGE)]
+  pub level: u16,
+  /// RB to target in voltage calibration run.
+  #[arg(short, long, default_value_t = DEFAULT_RB_ID)]
+  pub id: u8,
+  /// Extra arguments in voltage calibration run (not implemented).
+  #[arg(short, long, default_value_t = DEFAULT_CALIB_EXTRA)]
+  pub extra: u8,
+}
+
+impl VoltageOpts {
+  pub fn new(level: u16, id: u8, extra: u8) -> Self {
+    Self { 
+      level,
+      id,
+      extra
+    }
+  }
+}
+
+#[derive(Debug, Args, PartialEq)]
+pub struct TimingOpts {
+  /// Voltage level to be set in voltage calibration run.
+  #[arg(short, long, default_value_t = DEFAULT_CALIB_VOLTAGE)]
+  pub level: u16,
+  /// RB to target in voltage calibration run.
+  #[arg(short, long, default_value_t = DEFAULT_RB_ID)]
+  pub id: u8,
+  /// Extra arguments in voltage calibration run (not implemented).
+  #[arg(short, long, default_value_t = DEFAULT_CALIB_EXTRA)]
+  pub extra: u8,
+}
+
+impl TimingOpts {
+  pub fn new(level: u16, id: u8, extra: u8) -> Self {
+    Self { 
+      level,
+      id,
+      extra
+    }
+  }
+}
+/// END Calibration cmds ================================================
+
+/// Power cmds ====================================================
+#[derive(Debug, Subcommand, PartialEq)]
+pub enum PowerCmd {
+  /// Power up everything (LTB + preamps + MT)
+  All(PowerStatus),
+  /// Power up MT alone
+  MT(PowerStatus),
+  /// Power up everything but MT (LTB + preamps)
+  AllButMT(PowerStatus),
+  /// Power up all or specific LTBs (changes threshold)
+  LTB(LTBPowerOpts),
+  /// Power up all or specific preamp (changes bias)
+  Preamp(PreampPowerOpts)
+}
+
+#[derive(Debug, Args, PartialEq)]
+pub struct PowerStatus {
+  /// Which power status one wants to achieve
+  #[arg(value_parser = clap::builder::PossibleValuesParser::new([
+          PowerStatusEnum::OFF,
+          PowerStatusEnum::ON,
+          PowerStatusEnum::Cycle
+        ]),
+        required = true)]
+  pub status: PowerStatusEnum
+}
+
+impl PowerStatus {
+  pub fn new(status: PowerStatusEnum) -> Self {
+    Self { 
+      status
+    }
+  }
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize, clap::ValueEnum)]
+#[repr(u8)]
+pub enum TofComponent {
+  Unknown   = 0u8,
+  /// everything (LTB + preamps + MT)
+  All       = 1u8,
+  /// everything but MT (LTB + preamps)
+  AllButMT  = 2u8,
+  /// TOF CPU
+  TofCpu    = 3u8,
+  /// MT alone
+  MT        = 10u8,
+  /// all or specific RBs
+  RB        = 20u8,
+  /// all or specific PBs
+  PB        = 30u8,
+  /// all or specific LTBs
+  LTB       = 40u8,
+  /// all or specific preamp
+  Preamp    = 50u8
+}
+
+impl fmt::Display for TofComponent {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let r = serde_json::to_string(self).unwrap_or(
+      String::from("Error: cannot unwrap this TofComponent"));
+    write!(f, "<TofComponent: {}>", r)
+  }
+}
+
+impl From<u8> for TofComponent {
+  fn from(value: u8) -> Self {
+    match value {
+      0u8  => TofComponent::Unknown,
+      1u8  => TofComponent::All,
+      2u8  => TofComponent::AllButMT,
+      3u8  => TofComponent::TofCpu,
+      10u8 => TofComponent::MT,
+      20u8 => TofComponent::RB,
+      30u8 => TofComponent::PB,
+      40u8 => TofComponent::LTB,
+      50u8 => TofComponent::Preamp,
+      _    => TofComponent::Unknown
+    }
+  }
+}
+
+impl From<TofComponent> for clap::builder::Str {
+  fn from(value: TofComponent) -> Self {
+    match value {
+      TofComponent::Unknown  => clap::builder::Str::from("Unknown"),
+      TofComponent::All      => clap::builder::Str::from("All"),
+      TofComponent::AllButMT => clap::builder::Str::from("AllButMT"),
+      TofComponent::TofCpu   => clap::builder::Str::from("TofCpu"),
+      TofComponent::MT       => clap::builder::Str::from("MT"),
+      TofComponent::RB       => clap::builder::Str::from("RB"),
+      TofComponent::PB       => clap::builder::Str::from("PB"),
+      TofComponent::LTB      => clap::builder::Str::from("LTB"),
+      TofComponent::Preamp   => clap::builder::Str::from("Preamp")
+    }
+  }
+}
+
+// repr is u16 in order to leave room for preamp bias
+#[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize, clap::ValueEnum)]
+#[repr(u8)]
+pub enum PowerStatusEnum {
+  Unknown   = 0u8,
+  OFF       = 10u8,
+  ON        = 20u8,
+  Cycle     = 30u8
+}
+
+impl fmt::Display for PowerStatusEnum {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let r = serde_json::to_string(self).unwrap_or(
+      String::from("Error: cannot unwrap this PowerStatusEnum"));
+    write!(f, "<PowerStatusEnum: {}>", r)
+  }
+}
+
+impl From<u8> for PowerStatusEnum {
+  fn from(value: u8) -> Self {
+    match value {
+      0u8  => PowerStatusEnum::Unknown,
+      10u8 => PowerStatusEnum::OFF,
+      20u8 => PowerStatusEnum::ON,
+      30u8 => PowerStatusEnum::Cycle,
+      _    => PowerStatusEnum::Unknown
+    }
+  }
+}
+
+impl From<PowerStatusEnum> for clap::builder::Str {
+  fn from(value: PowerStatusEnum) -> Self {
+    match value {
+      PowerStatusEnum::Unknown => clap::builder::Str::from("Unknown"),
+      PowerStatusEnum::OFF     => clap::builder::Str::from("OFF"),
+      PowerStatusEnum::ON      => clap::builder::Str::from("ON"),
+      PowerStatusEnum::Cycle   => clap::builder::Str::from("Cycle")
+    }
+  }
+}
+
+#[derive(Debug, Args, PartialEq)]
+pub struct PBPowerOpts {
+  /// Which power status one wants to achieve
+  #[arg(long)]
+  pub status: PowerStatusEnum,
+  /// ID of the PB to be powered up
+  #[arg(long)]
+  pub id: u8
+}
+
+impl PBPowerOpts {
+  pub fn new(status: PowerStatusEnum, id: u8) -> Self {
+    Self { 
+      status,
+      id
+    }
+  }
+}
+
+#[derive(Debug, Args, PartialEq)]
+pub struct RBPowerOpts {
+  /// Which power status one wants to achieve
+  #[arg(short, long)]
+  pub status: PowerStatusEnum,
+  /// ID of the RB to be powered up
+  #[arg(short, long)]
+  pub id: u8
+}
+
+impl RBPowerOpts {
+  pub fn new(status: PowerStatusEnum, id: u8) -> Self {
+    Self {
+      status,
+      id
+    }
+  }
+}
+
+#[derive(Debug, Args, PartialEq)]
+pub struct LTBPowerOpts {
+  /// Which power status one wants to achieve
+  #[arg(value_parser = clap::builder::PossibleValuesParser::new([
+          PowerStatusEnum::OFF,
+          PowerStatusEnum::ON,
+          PowerStatusEnum::Cycle
+        ]),
+        required = true)]
+  pub status: PowerStatusEnum,
+  /// ID of the LTB to be powered up
+  #[arg(short, long, default_value_t = DEFAULT_LTB_ID)]
+  pub id: u8
+}
+
+impl LTBPowerOpts {
+  pub fn new(status: PowerStatusEnum, id: u8) -> Self {
+    Self {
+      status,
+      id
+    }
+  }
+}
+
+#[derive(Debug, Args, PartialEq)]
+pub struct PreampPowerOpts {
+  /// Which power status one wants to achieve
+  #[arg(value_parser = clap::builder::PossibleValuesParser::new([
+          PowerStatusEnum::OFF,
+          PowerStatusEnum::ON,
+          PowerStatusEnum::Cycle
+        ]),
+        required = true)]
+  pub status: PowerStatusEnum,
+  /// ID of the preamp to be powered up
+  #[arg(short, long, default_value_t = DEFAULT_PREAMP_ID)]
+  pub id: u8,
+  /// Turn on bias of the preamp specified
+  #[arg(short, long, default_value_t = DEFAULT_PREAMP_BIAS)]
+  pub bias: u16
+}
+
+impl PreampPowerOpts {
+  pub fn new(status: PowerStatusEnum, id: u8, bias: u16) -> Self {
+    Self {
+      status,
+      id,
+      bias
+    }
+  }
+}
+/// END Power cmds ================================================
+
+/// Run cmds ======================================================
+#[derive(Debug, Subcommand, PartialEq)]
+pub enum RunCmd {
+  /// Start data taking
+  Start(StartRunOpts),
+  /// Stop data taking
+  Stop(StopRunOpts)
+}
+
+#[derive(Debug, Args, PartialEq)]
+pub struct StartRunOpts {
+  /// Which kind of run is to be launched
+  #[arg(short, long, default_value_t = DEFAULT_RUN_TYPE)]
+  pub run_type: u8,
+  /// ID of the RB where to run data taking
+  #[arg(short, long, default_value_t = DEFAULT_RB_ID)]
+  pub id: u8,
+  /// Number of events in the run
+  #[arg(short, long, default_value_t = DEFAULT_RUN_EVENT_NO)]
+  pub no: u8
+}
+
+impl StartRunOpts {
+  pub fn new(run_type: u8, id: u8, no: u8) -> Self {
+    Self {
+      run_type,
+      id,
+      no
+    }
+  }
+}
+
+#[derive(Debug, Args, PartialEq)]
+pub struct StopRunOpts {
+  /// ID of the RB where to run data taking
+  #[arg(short, long, default_value_t = DEFAULT_RB_ID)]
+  pub id: u8
+}
+
+impl StopRunOpts {
+  pub fn new(id: u8) -> Self {
+    Self {
+      id
+    }
+  }
+}
+/// END Run cmds ==================================================
 
 #[test]
 fn test_display() {

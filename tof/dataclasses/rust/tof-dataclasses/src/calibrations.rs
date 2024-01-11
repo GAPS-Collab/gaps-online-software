@@ -40,12 +40,13 @@ use crate::io::{
     TofPacketReader,
 };
 
-#[cfg(feature = "random")] 
-use crate::FromRandom;
-#[cfg(feature = "random")]
-extern crate rand;
-#[cfg(feature = "random")]
-use rand::Rng;
+cfg_if::cfg_if! {
+  if #[cfg(feature = "random")]  {
+    use crate::FromRandom;
+    extern crate rand;
+    use rand::Rng;
+  }
+}
 
 extern crate statistical;
 
@@ -57,10 +58,11 @@ extern crate statistical;
 #[derive(Debug, Copy, Clone, serde::Deserialize, serde::Serialize)]
 #[repr(u8)]
 pub enum Edge {
-  Rising,
-  Falling,
-  Average,
-  None
+  Unknown = 0u8,
+  Rising  = 10u8,
+  Falling = 20u8,
+  Average = 30u8,
+  None    = 40u8
 }
 
 impl fmt::Display for Edge {
@@ -71,21 +73,15 @@ impl fmt::Display for Edge {
   }
 }
 
-impl TryFrom<u8> for Edge {
-  type Error = &'static str;
-
-  // I am not sure about this hard coding, but the code
-  //  looks nicer - Paolo
-  fn try_from(value: u8) -> Result<Self, Self::Error> {
+impl From<u8> for Edge {
+  fn from(value: u8) -> Self {
     match value {
-      0u8  => Ok(Edge::Rising),
-      10u8 => Ok(Edge::Falling),
-      20u8 => Ok(Edge::Average),
-      30u8 => Ok(Edge::None),
-      _    => {
-        error!("{} is not a valid Edge!", value);
-        Err("I am not sure how to convert this value!")
-      }
+      0u8  => Edge::Unknown,
+      10u8 => Edge::Rising,
+      20u8 => Edge::Falling,
+      30u8 => Edge::Average,
+      40u8 => Edge::None,
+      _    => Edge::Unknown
     }
   }
 }
@@ -271,6 +267,9 @@ pub fn get_periods(trace   : &Vec<f32>,
       },
       Edge::Average => {
         warn!("Unsure what to do for Edge::Average");
+      },
+      Edge::Unknown => {
+        warn!("Unsure what to do for Edge::Unknown");
       }
     }
   }

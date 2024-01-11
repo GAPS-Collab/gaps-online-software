@@ -3,6 +3,7 @@
 use std::fs::read_to_string;
 
 
+use tof_control::ltb_control::ltb_threshold;
 use tof_dataclasses::serialization::Serialization;
 use tof_dataclasses::io::RBEventMemoryStreamer;
 use std::path::Path;
@@ -31,16 +32,31 @@ use tof_dataclasses::errors::SerializationError;
 use tof_dataclasses::run::RunConfig;
 
 // Takeru's tof-control
-use std::net::IpAddr;
-use tof_dataclasses::errors::CalibrationError;
 use tof_dataclasses::calibrations::RBCalibrations;
+use tof_dataclasses::errors::{CalibrationError,
+                              RunError,
+                              SetError};
+use std::net::IpAddr;
 use local_ip_address::local_ip;
 // for calibration
 use tof_control::rb_control::rb_mode::{select_noi_mode,
-                                       select_vcal_mode,
-                                       select_tcal_mode,
-                                       select_sma_mode};
+                                      select_vcal_mode,
+                                      select_tcal_mode,
+                                      select_sma_mode};
 
+// for threshold setting
+use tof_control::preamp_control::preamp_bias;
+// for preamp bias
+use tof_control::helper::preamp_type::{PreampReadBias, PreampSetBias, PreampTemp, PreampBiasError};
+// for power
+use liftof_lib::{PowerStatusEnum,
+                  LTBThresholdName};
+use zmq::Socket;
+use liftof_lib::constants::{DEFAULT_PREAMP_BIAS,
+                            DEFAULT_PREAMP_ID,
+                            DEFAULT_LTB_ID};
+
+const FIVE_SECONDS: Duration = time::Duration::from_millis(5000);
 
 /// The poisson self trigger mode of the board
 /// triggers automatically, this means we don't 
@@ -166,7 +182,7 @@ pub fn wait_while_run_active(n_errors     : u32,
   }
 }
 
-
+// START Calibration stuff ====================================================
 // eventually, we have to rename that feature
 /// A full set of RB calibration
 ///
@@ -186,7 +202,7 @@ pub fn rb_calibration(rc_to_runner    : &Sender<RunConfig>,
                       tp_to_publisher : &Sender<TofPacket>)
 -> Result<(), CalibrationError> {
   warn!("Commencing full RB calibration routine! This will take the board out of datataking for a few minutes!");
-  let five_seconds   = time::Duration::from_millis(5000);
+  // TODO this should become something that can be read from a local json file
   let mut run_config = RunConfig {
     runid                   : 0,
     nevents                 : 1300,
@@ -197,7 +213,7 @@ pub fn rb_calibration(rc_to_runner    : &Sender<RunConfig>,
     trigger_fixed_rate      : 100,
     data_type               : DataType::Noi,
     rb_buff_size            : 100
-  }; 
+  };
   // here is the general idea. We connect to our own 
   // zmq socket, to gather the events and store them 
   // here locally. Then we apply the calibration 
@@ -215,6 +231,7 @@ pub fn rb_calibration(rc_to_runner    : &Sender<RunConfig>,
   }
   let mut calibration = RBCalibrations::new(board_id);
   calibration.serialize_event_data = true;
+
   // set up zmq socket
   let mut address_ip = String::from("tcp://");
   let this_board_ip = local_ip().expect("Unable to obtainl local board IP. Something is messed up!");
@@ -255,6 +272,360 @@ pub fn rb_calibration(rc_to_runner    : &Sender<RunConfig>,
     Ok(_)    => info!("Subscribing to local packages!"),
   }
   // at this point, the zmq socket should be set up!
+  
+  run_config.data_type = DataType::Noi; 
+  match run_noi_calibration(rc_to_runner, tp_to_publisher, &socket, &mut calibration, run_config) {
+    Err(err) => {
+      error!("Unable to run no input calibration step. Err {err}");
+    },
+    Ok(_) => {
+      info!("Noi calibration step done!")
+    }
+  };
+
+  run_config.data_type = DataType::VoltageCalibration; 
+  match run_voltage_calibration(rc_to_runner, tp_to_publisher, &socket, &mut calibration, run_config) {
+    Err(err) => {
+      error!("Unable to run voltage calibration step. Err {err}");
+    },
+    Ok(_) => {
+      info!("Voltage calibration step done!")
+    }
+  };
+  
+  run_config.data_type = DataType::TimingCalibration;
+  match run_timing_calibration(rc_to_runner, tp_to_publisher, &socket, &mut calibration, run_config) {
+    Err(err) => {
+      error!("Unable to run timing calibration step. Err {err}");
+    },
+    Ok(_) => {
+      info!("Timing calibration step done!")
+    }
+  };
+
+  println!("==> Calibration data taking complete!"); 
+  println!("Calibration : {}", calibration);
+  println!("Cleaning data...");
+  calibration.clean_input_data();
+  println!("Calibration : {}", calibration);
+
+  info!("Will set board to sma mode!");
+  select_sma_mode();
+  run_config.is_active = false;  
+  match rc_to_runner.send(run_config) {
+    Err(err) => warn!("Can not send runconfig!, Err {err}"),
+    Ok(_)    => trace!("Success!")
+  }
+  thread::sleep(FIVE_SECONDS);
+
+  // Do this only with the full calib
+  calibration.calibrate()?;
+  println!("Calibration : {}", calibration);
+
+  // Send it
+  let calib_pack = TofPacket::from(&calibration);
+  match tp_to_publisher.send(calib_pack) {
+    Err(err) => {
+      error!("Unable to send RBCalibration package! Error {err}");
+    },
+    Ok(_) => ()
+  }
+  info!("Calibration done!");
+  Ok(())
+}
+
+// TODO The following two functions are placeholder for subset of the
+// calibration routine. It is not clear whether these make sense or not.
+//
+// Only no input and publish.
+pub fn rb_noi_subcalibration(rc_to_runner    : &Sender<RunConfig>,
+                             tp_to_publisher : &Sender<TofPacket>)
+-> Result<(), CalibrationError> {
+  warn!("Commencing RB No input sub-calibration routine! This will take the board out of datataking for a few minutes!");
+  // TODO this should become something that can be read from a local json file
+  let mut run_config = RunConfig {
+    runid                   : 0,
+    nevents                 : 1300,
+    is_active               : true,
+    nseconds                : 0,
+    tof_op_mode             : TofOperationMode::StreamAny,
+    trigger_poisson_rate    : 0,
+    trigger_fixed_rate      : 100,
+    data_type               : DataType::Noi,
+    rb_buff_size            : 100
+  }; 
+  let socket = connect_to_zmq().expect("Not able to connect to socket, something REAL strange happened.");
+
+  let mut board_id = 0u8;
+  match get_board_id() {
+    Err(err) => {
+      error!("Unable to obtain board id. Calibration might be orphaned. Err {err}");
+    },
+    Ok(rb_id) => {
+      board_id = rb_id as u8;
+    }
+  }
+  let mut calibration = RBCalibrations::new(board_id);
+  calibration.serialize_event_data = true;
+
+  run_config.data_type = DataType::Noi; 
+  match run_noi_calibration(rc_to_runner, tp_to_publisher, &socket, &mut calibration, run_config) {
+    Err(err) => {
+      error!("Unable to run noi calibration step. Err {err}");
+    },
+    Ok(_) => {
+      info!("Noi calibration step done!")
+    }
+  };
+
+  println!("==> No input data taking complete!"); 
+  println!("Calibration : {}", calibration);
+  println!("Cleaning data...");
+  calibration.clean_input_data();
+  println!("Calibration : {}", calibration);
+
+  info!("Will set board to sma mode!");
+  select_sma_mode();
+  run_config.is_active = false;  
+  match rc_to_runner.send(run_config) {
+    Err(err) => warn!("Can not send runconfig!, Err {err}"),
+    Ok(_)    => trace!("Success!")
+  }
+  thread::sleep(FIVE_SECONDS);
+
+  println!("Calibration won't start cause the calibration datataking chain is not complete!");
+
+  // Send it
+  let calib_pack = TofPacket::from(&calibration);
+  match tp_to_publisher.send(calib_pack) {
+    Err(err) => {
+      error!("Unable to send RBCalibration package! Error {err}");
+    },
+    Ok(_) => ()
+  }
+  info!("Calibration done!");
+  Ok(())
+}
+
+// Noi -> Voltage chain and publish.
+pub fn rb_voltage_subcalibration(rc_to_runner    : &Sender<RunConfig>,
+                                     tp_to_publisher : &Sender<TofPacket>,
+                                     voltage_level   : u16) // where do we put this bad boi?
+-> Result<(), CalibrationError> {
+  warn!("Commencing RB no input + voltage sub-calibration routine! This will take the board out of datataking for a few minutes!");
+  // TODO this should become something that can be read from a local json file
+  let mut run_config = RunConfig {
+    runid                   : 0,
+    nevents                 : 1300,
+    is_active               : true,
+    nseconds                : 0,
+    tof_op_mode             : TofOperationMode::StreamAny,
+    trigger_poisson_rate    : 0,
+    trigger_fixed_rate      : 100,
+    data_type               : DataType::VoltageCalibration,
+    rb_buff_size            : 1000
+  }; 
+  let socket = connect_to_zmq().expect("Not able to connect to socket, something REAL strange happened.");
+
+  let mut board_id = 0u8;
+  match get_board_id() {
+    Err(err) => {
+      error!("Unable to obtain board id. Calibration might be orphaned. Err {err}");
+    },
+    Ok(rb_id) => {
+      board_id = rb_id as u8;
+    }
+  }
+  let mut calibration = RBCalibrations::new(board_id);
+  calibration.serialize_event_data = true;
+
+  run_config.data_type = DataType::Noi; 
+  match run_noi_calibration(rc_to_runner, tp_to_publisher, &socket, &mut calibration, run_config) {
+    Err(err) => {
+      error!("Unable to run noi calibration step. Err {err}");
+    },
+    Ok(_) => {
+      info!("Noi calibration step done!")
+    }
+  };
+
+  run_config.data_type = DataType::VoltageCalibration; 
+  match run_voltage_calibration(rc_to_runner, tp_to_publisher, &socket, &mut calibration, run_config) {
+    Err(err) => {
+      error!("Unable to run voltage calibration step. Err {err}");
+    },
+    Ok(_) => {
+      info!("Voltage calibration step done!")
+    }
+  };
+
+  println!("==> No input + voltage data taking complete!"); 
+  println!("Calibration : {}", calibration);
+  println!("Cleaning data...");
+  calibration.clean_input_data();
+  println!("Calibration : {}", calibration);
+
+  info!("Will set board to sma mode!");
+  select_sma_mode();
+  run_config.is_active = false;  
+  match rc_to_runner.send(run_config) {
+    Err(err) => warn!("Can not send runconfig!, Err {err}"),
+    Ok(_)    => trace!("Success!")
+  }
+  thread::sleep(FIVE_SECONDS);
+
+  println!("Calibration won't start cause the calibration datataking chain is not complete!");
+
+  // Send it
+  let calib_pack = TofPacket::from(&calibration);
+  match tp_to_publisher.send(calib_pack) {
+    Err(err) => {
+      error!("Unable to send RBCalibration package! Error {err}");
+    },
+    Ok(_) => ()
+  }
+  info!("Calibration done!");
+  Ok(())
+}
+
+// Noi -> Voltage -> Timing chain and publish (no calib!).
+pub fn rb_timing_subcalibration(rc_to_runner    : &Sender<RunConfig>,
+                                tp_to_publisher : &Sender<TofPacket>,
+                                voltage_level   : u16)
+-> Result<(), CalibrationError> {
+  warn!("Commencing RB no input + voltage + timing sub-calibration routine! This will take the board out of datataking for a few minutes!");
+  // TODO this should become something that can be read from a local json file
+  let mut run_config = RunConfig {
+    runid                   : 0,
+    nevents                 : 1300,
+    is_active               : true,
+    nseconds                : 0,
+    tof_op_mode             : TofOperationMode::StreamAny,
+    trigger_poisson_rate    : 0,
+    trigger_fixed_rate      : 100,
+    data_type               : DataType::TimingCalibration,
+    rb_buff_size            : 1000
+  }; 
+  let socket = connect_to_zmq().expect("Not able to connect to socket, something REAL strange happened.");
+
+  let mut board_id = 0u8;
+  match get_board_id() {
+    Err(err) => {
+      error!("Unable to obtain board id. Calibration might be orphaned. Err {err}");
+    },
+    Ok(rb_id) => {
+      board_id = rb_id as u8;
+    }
+  }
+  let mut calibration = RBCalibrations::new(board_id);
+  calibration.serialize_event_data = true;
+
+  run_config.data_type = DataType::Noi; 
+  match run_noi_calibration(rc_to_runner, tp_to_publisher, &socket, &mut calibration, run_config) {
+    Err(err) => {
+      error!("Unable to run no input calibration step. Err {err}");
+    },
+    Ok(_) => {
+      info!("Noi calibration step done!")
+    }
+  };
+
+  run_config.data_type = DataType::VoltageCalibration; 
+  match run_voltage_calibration(rc_to_runner, tp_to_publisher, &socket, &mut calibration, run_config) {
+    Err(err) => {
+      error!("Unable to run voltage calibration step. Err {err}");
+    },
+    Ok(_) => {
+      info!("Voltage calibration step done!")
+    }
+  };
+  
+  run_config.data_type = DataType::TimingCalibration;
+  match run_timing_calibration(rc_to_runner, tp_to_publisher, &socket, &mut calibration, run_config) {
+    Err(err) => {
+      error!("Unable to run timing calibration step. Err {err}");
+    },
+    Ok(_) => {
+      info!("Timing calibration step done!")
+    }
+  };
+
+  println!("==> No input + voltage + timing data taking complete!"); 
+  println!("Calibration : {}", calibration);
+  println!("Cleaning data...");
+  calibration.clean_input_data();
+  println!("Calibration : {}", calibration);
+
+  info!("Will set board to sma mode!");
+  select_sma_mode();
+  run_config.is_active = false;  
+  match rc_to_runner.send(run_config) {
+    Err(err) => warn!("Can not send runconfig!, Err {err}"),
+    Ok(_)    => trace!("Success!")
+  }
+  thread::sleep(FIVE_SECONDS);
+
+  println!("Calibration won't start. The data taking chain is complete, but a sub-calibration routine was called!");
+
+  // Send it
+  let calib_pack = TofPacket::from(&calibration);
+  match tp_to_publisher.send(calib_pack) {
+    Err(err) => {
+      error!("Unable to send RBCalibration package! Error {err}");
+    },
+    Ok(_) => ()
+  }
+  info!("Calibration done!");
+  Ok(())
+}
+
+fn connect_to_zmq() -> Result<zmq::Socket, CalibrationError> {
+  // here is the general idea. We connect to our own 
+  // zmq socket, to gather the events and store them 
+  // here locally. Then we apply the calibration 
+  // and we simply have to send it back to the 
+  // data publisher.
+  // This saves us a mutex!!
+  let this_board_ip = local_ip().expect("Unable to obtain local board IP. Something is messed up!");
+  let data_address = liftof_lib::build_tcp_from_ip(this_board_ip.to_string(), DATAPORT.to_string());
+
+  let ctx = zmq::Context::new();
+  let socket : zmq::Socket; 
+  match ctx.socket(zmq::SUB) {
+    Err(err) => {
+      error!("Unable to create zmq socket! Err {err}. This is BAD!");
+      return Err(CalibrationError::CanNotConnectToMyOwnZMQSocket);
+    }
+    Ok(sock) => {
+      socket = sock;
+    }
+  }
+  match socket.connect(&data_address) {
+    Err(err) => {
+      error!("Unable to connect to data (PUB) socket {data_address}, Err {err}");
+      return Err(CalibrationError::CanNotConnectToMyOwnZMQSocket);
+    },
+    Ok(_) => ()
+  }
+  
+  // The packets relevant for us here in this context, will 
+  // all be prefixed with "LOCAL"
+  // See the respective section in data_publisher 
+  // (search for prefix_local)
+  let topic_local = String::from("LOCAL");
+  match socket.set_subscribe(&topic_local.as_bytes()) {
+    Err(err) => error!("Can not subscribe to {topic_local}, err {err}"),
+    Ok(_)    => info!("Subscribing to local packages!"),
+  }
+  Ok(socket)
+}
+
+fn run_noi_calibration(rc_to_runner: &Sender<RunConfig>,
+                       tp_to_publisher : &Sender<TofPacket>,
+                       socket: &zmq::Socket,
+                       calibration: &mut RBCalibrations,
+                       run_config: RunConfig)
+                       -> Result<(), CalibrationError> {
   info!("Will set board to no input mode!");
   match select_noi_mode() {
     Err(err) => error!("Unable to select SMA mode! {err:?}"),
@@ -265,23 +636,59 @@ pub fn rb_calibration(rc_to_runner    : &Sender<RunConfig>,
     Ok(_)    => trace!("Success!")
   }
   let mut cal_dtype = DataType::Noi;
-  calibration.noi_data = wait_while_run_active(20, 4*five_seconds, 1000, &cal_dtype, &socket);
-  println!("==> No input (Voltage calibration) data taken!");
+  calibration.noi_data = wait_while_run_active(20, 4*FIVE_SECONDS, 1000, &cal_dtype, &socket);
+  
+  let calib_unmut = calibration.clone();
+  let calib_pack = TofPacket::from(&calib_unmut);
+  match tp_to_publisher.send(calib_pack) {
+    Err(err) => {
+      error!("Unable to send RBCalibration package! Error {err}");
+    },
+    Ok(_) => ()
+  }
 
+  println!("==> No input (Voltage calibration) data taken!");
+  Ok(())
+}
+
+fn run_voltage_calibration(rc_to_runner: &Sender<RunConfig>,
+                           tp_to_publisher : &Sender<TofPacket>,
+                           socket: &zmq::Socket,
+                           calibration: &mut RBCalibrations,
+                           mut run_config: RunConfig)
+                           -> Result<(), CalibrationError> {
   info!("Will set board to vcal mode!");
   match select_vcal_mode() {
     Err(err) => error!("Unable to select VCAL mode! {err:?}"),
     Ok(_)     => ()
   }
-  run_config.data_type = DataType::VoltageCalibration;  
+  run_config.data_type = DataType::VoltageCalibration;
   match rc_to_runner.send(run_config) {
     Err(err) => warn!("Can not send runconfig! {err}"),
     Ok(_)    => trace!("Success!")
   }  
-  cal_dtype             = DataType::VoltageCalibration;
-  calibration.vcal_data = wait_while_run_active(20, 4*five_seconds, 1000, &cal_dtype, &socket);
+  let cal_dtype             = DataType::VoltageCalibration;
+  calibration.vcal_data = wait_while_run_active(20, 4*FIVE_SECONDS, 1000, &cal_dtype, &socket);
+
+  let calib_unmut = calibration.clone();
+  let calib_pack = TofPacket::from(&calib_unmut);
+  match tp_to_publisher.send(calib_pack) {
+    Err(err) => {
+      error!("Unable to send RBCalibration package! Error {err}");
+    },
+    Ok(_) => ()
+  }
   
   println!("==> Voltage calibration data taken!");
+  Ok(())
+}
+
+fn run_timing_calibration(rc_to_runner: &Sender<RunConfig>,
+                          tp_to_publisher : &Sender<TofPacket>,
+                          socket: &zmq::Socket,
+                          calibration: &mut RBCalibrations,
+                          mut run_config: RunConfig)
+                          -> Result<(), CalibrationError> {
   info!("Will set board to tcal mode!");
   run_config.trigger_poisson_rate  = 80;
   run_config.nevents               = 1800; // make sure we get 1000 events
@@ -297,15 +704,15 @@ pub fn rb_calibration(rc_to_runner    : &Sender<RunConfig>,
     Ok(_)    => trace!("Success!")
   }
   
-  cal_dtype             = DataType::TimingCalibration;
-  calibration.tcal_data = wait_while_run_active(20, 4*five_seconds, 1000,&cal_dtype, &socket);
+  let cal_dtype             = DataType::TimingCalibration;
+  calibration.tcal_data = wait_while_run_active(20, 4*FIVE_SECONDS, 1000,&cal_dtype, &socket);
   run_config.is_active = false;  
   match rc_to_runner.send(run_config) {
     Err(err) => warn!("Can not send runconfig! {err}"),
     Ok(_)    => trace!("Success!")
   }
   info!("Waiting 5 seconds");
-  thread::sleep(five_seconds);
+  thread::sleep(FIVE_SECONDS);
   info!("Will set board to sma mode!");
   match select_sma_mode() {
     Err(err) => error!("Can not set SMA mode! {err:?}"),
@@ -318,6 +725,14 @@ pub fn rb_calibration(rc_to_runner    : &Sender<RunConfig>,
   calibration.clean_input_data();
   println!("Calibration : {}", calibration);
 
+  info!("Will set board to sma mode!");
+  select_sma_mode();
+  run_config.is_active = false;  
+  match rc_to_runner.send(run_config) {
+    Err(err) => warn!("Can not send runconfig!, Err {err}"),
+    Ok(_)    => trace!("Success!")
+  }
+  thread::sleep(FIVE_SECONDS);
   calibration.calibrate()?;
   println!("Calibration : {}", calibration);
   // now it just needs to be send to 
@@ -328,7 +743,8 @@ pub fn rb_calibration(rc_to_runner    : &Sender<RunConfig>,
   //  println!("cali vdips {}", calibration.v_dips[0][k]);
   //  println!("cali tbins {}", calibration.tbin[0][k]);
   //}
-  let calib_pack = TofPacket::from(&calibration);
+  let calib_unmut = calibration.clone();
+  let calib_pack = TofPacket::from(&calib_unmut);
   match tp_to_publisher.send(calib_pack) {
     Err(err) => {
       error!("Unable to send RBCalibration package! Error {err}");
@@ -338,8 +754,38 @@ pub fn rb_calibration(rc_to_runner    : &Sender<RunConfig>,
   info!("Calibration done!");
   Ok(())
 }
+// END Calibration stuff ======================================================
 
+// BEGIN Run stuff ============================================================
+pub fn rb_start_run(rc_to_runner    : &Sender<RunConfig>,
+                    rc_config       : RunConfig,
+                    run_type        : u8,
+                    rb_id           : u8,
+                    event_no        : u8) -> Result<(), RunError> {
+  println!("==> Will initialize new run!");
+  match rc_to_runner.send(rc_config) {
+    Err(err) => error!("Error initializing run! {err}"),
+    Ok(_)    => ()
+  };
+  println!("==> Run successfully started!");
+  Ok(())
+}
 
+pub fn rb_stop_run(rc_to_runner    : &Sender<RunConfig>,
+                   rb_id           : u8) -> Result<(), RunError> {
+  println!("==> Will initialize new run!");
+  println!("Received command to end run!");
+  // default is not active for run config
+
+  let  rc = RunConfig::new();
+  match rc_to_runner.send(rc) {
+    Err(err) => error!("Error stopping run! {err}"),
+    Ok(_)    => ()
+  }
+  println!("==> Run successfully stopped!");
+  Ok(())
+}
+// END Run stuff ==============================================================
 
 const DMA_RESET_TRIES : u8 = 10;   // if we can not reset the DMA after this number
                                    // of retries, we'll panic!
@@ -794,3 +1240,127 @@ pub fn setup_drs4() -> Result<(), RegisterError> {
   Ok(())
 }
 
+
+pub fn send_preamp_bias_set_all(bias_voltage: u16) -> Result<(), SetError> {
+  match PreampSetBias::set_manual_bias(None, bias_voltage as f32) {
+    Ok(_) => (),
+    Err(_) => {
+      error!("Unable to set preamp bias! Error LTBThresholdError!");
+    }
+  };
+  Ok(())
+}
+
+
+pub fn send_preamp_bias_set(preamp_id: u8, bias_voltage: u16) -> Result<(), SetError> {
+  // TODO add check for LTB of interest
+  match PreampSetBias::set_manual_bias(Some(preamp_id), bias_voltage as f32) {
+    Ok(_) => (),
+    Err(_) => {
+      error!("Unable to set preamp bias! Error LTBThresholdError!");
+    }
+  };
+  Ok(())
+}
+
+
+pub fn send_ltb_all_thresholds_set() -> Result<(), SetError> {
+  match ltb_threshold::set_default_threshold() {
+    Ok(_) => (),
+    Err(_) => {
+      error!("Unable to set preamp bias! Error LTBThresholdError!");
+    }
+  };
+  Ok(())
+}
+
+
+pub fn send_ltb_all_thresholds_reset() -> Result<(), SetError> {
+  match ltb_threshold::reset_threshold() {
+    Ok(_) => (),
+    Err(_) => {
+      error!("Unable to set preamp bias! Error LTBThresholdError!");
+    }
+  };
+  Ok(())
+}
+
+
+pub fn send_ltb_threshold_set(ltb_id: u8, threshold_name: LTBThresholdName, threshold_level: u16) -> Result<(), SetError> {
+  // TODO add check for LTB of interest
+  let ch = LTBThresholdName::get_ch_number(threshold_name).unwrap();
+  match ltb_threshold::set_threshold(ch, threshold_level as f32) {
+    Ok(_) => (),
+    Err(_) => {
+      error!("Unable to set preamp bias! Error LTBThresholdError!");
+    }
+  };
+  Ok(())
+}
+
+
+pub fn power_preamp(preamp_id: u8, status: PowerStatusEnum) -> Result<(), SetError> {
+  let mut result = Ok(());
+  match status {
+    PowerStatusEnum::ON => {
+      if preamp_id == DEFAULT_PREAMP_ID {
+        result = send_preamp_bias_set_all(DEFAULT_PREAMP_BIAS);
+      } else {
+        result = send_preamp_bias_set(DEFAULT_PREAMP_ID, DEFAULT_PREAMP_BIAS);
+      }
+    },
+    PowerStatusEnum::OFF => {
+      if preamp_id == DEFAULT_PREAMP_ID {
+        result = send_preamp_bias_set_all(0);
+      } else {
+        result = send_preamp_bias_set(DEFAULT_PREAMP_ID, 0);
+      }
+    },
+    PowerStatusEnum::Cycle => {
+      // about this command.How long is it right to power cycle stuff??? TODO
+      error!("Not implemented.")
+    },
+    _ => error!("The power status is not specified or outside expected values.")
+  }
+
+  match result {
+    Ok(_) => (),
+    Err(_) => {
+      error!("Unable to set preamp bias! Error LTBThresholdError!");
+    }
+  };
+  Ok(())
+}
+
+
+pub fn power_ltb(ltb_id: u8, status: PowerStatusEnum) -> Result<(), SetError> {
+  let mut result = Ok(());
+  // the differentiation between all and single ltb is done intrinsically by the fact that 1 RB -> 1 LTB
+  match status {
+    PowerStatusEnum::ON => {
+      // TODO add ID check for LTB to if
+      if ltb_id == DEFAULT_LTB_ID {
+        result = send_ltb_all_thresholds_set();
+      }
+    },
+    PowerStatusEnum::OFF => {
+      // TODO add ID check for LTB to if
+      if ltb_id == DEFAULT_LTB_ID {
+        result = send_ltb_all_thresholds_reset();
+      }
+    },
+    PowerStatusEnum::Cycle => {
+      // about this command.How long is it right to power cycle stuff??? TODO
+      error!("Not implemented.")
+    },
+    _ => error!("The power status is not specified or outside expected values.")
+  }
+
+  match result {
+    Ok(_) => (),
+    Err(_) => {
+      error!("Unable to set preamp bias! Error LTBThresholdError!");
+    }
+  };
+  Ok(())
+}

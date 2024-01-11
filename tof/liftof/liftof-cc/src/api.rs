@@ -136,7 +136,6 @@
 //}
 
 
-
 //#[test]
 //fn test_read_cpu_temperature() {
 //  // Call the function to get the CPU temperature

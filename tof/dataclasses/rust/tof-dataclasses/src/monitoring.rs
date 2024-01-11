@@ -37,13 +37,13 @@ use tof_control::helper::rb_type::{
     RBPh,
 };
 
-#[cfg(feature = "random")]
-use crate::FromRandom;
-#[cfg(feature = "random")]
-extern crate rand;
-#[cfg(feature = "random")]
-use rand::Rng;
-
+cfg_if::cfg_if! {
+  if #[cfg(feature = "random")]  {
+    use crate::FromRandom;
+    extern crate rand;
+    use rand::Rng;
+  }
+}
 
 use crate::serialization::{
     Serialization,

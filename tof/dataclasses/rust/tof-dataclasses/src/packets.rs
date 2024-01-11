@@ -87,8 +87,8 @@ pub struct TofPacket {
   /// FIXME - future extension
   pub no_send_over_nw    : bool,
   /// creation_time for the instance
-  pub creation_time      : Instant,
-  pub valid              : bool, // will be always valid, unless invalidated
+  pub creation_time    : Instant,
+  pub valid            : bool, // will be always valid, unless invalidated
 }
 
 impl fmt::Display for TofPacket {

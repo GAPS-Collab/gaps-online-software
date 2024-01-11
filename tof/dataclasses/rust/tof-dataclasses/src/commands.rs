@@ -41,20 +41,19 @@ cfg_if::cfg_if! {
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 #[repr(u8)]
 pub enum TofCommandCode {
-  /// en empty command
+  CmdUnknown                 = 0u8,
+  /// en empty command just to check if stuff is online
   CmdPing                    = 1u8,
-  /// command code for "Power off"
-  CmdPowerOff                = 10u8,        
-  /// command code for "Power on"
-  CmdPowerOn                 = 11u8,       
-  /// command code for "Power cycle"
-  CmdPowerCycle              = 12u8,          
-  /// command code for "Run RBSetup"
-  CmdRBSetup                 = 20u8,         
+  /// command code for getting the monitoring data from the component
+  CmdMoni                    = 2u8,
+  /// command code for power management
+  CmdPower                   = 10u8,
   /// command code for "Set LTB Thresholds"
   CmdSetThresholds           = 21u8,         
   /// command code for "Configure MTB"
   CmdSetMTConfig             = 22u8,        
+  /// command code for "Set preamp bias"
+  CmdSetPreampBias           = 28u8,         
   /// command code for "Stop Data taking"
   CmdDataRunStop             = 30u8,  
   /// command code for "Start Data taking"
@@ -62,41 +61,32 @@ pub enum TofCommandCode {
   /// command code for "Start validation run"
   CmdStartValidationRun      = 32u8,         
   /// command code for "Get all waveforms"
-  CmdGetFullWaveforms        = 41u8,      
-  /// command code for "Get waveforms/data for specific event"
-  CmdGetReducedDataPacket    = 42u8, 
-  /// command code for "Get monitoring data"
-  CmdRequestMoni             = 43u8,
+  CmdGetFullWaveforms        = 41u8,
+  /// command code for "Run no input calibration"
+  CmdNoiCalibration          = 50u8,       
   /// command code for "Run voltage calibration"
   CmdVoltageCalibration      = 51u8,       
   /// command code for "Run timing calibration"
-  CmdTimingCalibration       = 52u8,      
-  /// command code for "Create a new calibration file"
-  CmdCreateCalibrationFile   = 53u8,   
+  CmdTimingCalibration       = 52u8,
+  /// command code for "Run full calibration"
+  CmdDefaultCalibration      = 53u8, 
 
   /// command code for "Send the whole event cache over the wire"
   CmdUnspoolEventCache       = 44u8,
 
-  /// command code for "Operate in a mode, where we stream any event 
-  /// (not only those which are requested)"
-  CmdStreamAnyEvent          = 45u8,
-  /// command code for "Stream only events which are explicitly requested"
-  CmdStreamOnlyRequested     = 46u8,
   /// command code for setting the size of the rb buffers.
   /// technically, this does not change the size, but sets 
   /// a different value for trip
   CmdSetRBDataBufSize        = 23u8,
-  /// command code for enable the forced trigger mode
+  /// command code for enabling/disabling the forced trigger mode
   /// on the RBs
-  CmdEnTriggerModeForced     = 24u8,
-  /// command code to disable the forced trigger mode 
-  /// on the RBs
-  CmdDisTriggerModeForced    = 25u8,
-  /// Set forced trigger mode on MTB
-  CmdEnTriggerModeForcedMTB  = 26u8,
-  // Disable forced trigger mode on MTB
-  CmdDisTriggerModeForcedMTB = 27u8,
-  Unknown                    = 90u8
+  CmdTriggerModeForced       = 24u8,
+  /// command code for enabling/disabling the forced trigger mode
+  /// on the MTB
+  CmdTriggerModeForcedMTB    = 25u8,
+
+  /// command code for restarting systemd
+  CmdSystemdReboot           = 60u8
 }
 
 impl fmt::Display for TofCommandCode {
@@ -107,76 +97,58 @@ impl fmt::Display for TofCommandCode {
   }
 }
 
-impl TryFrom<u8> for TofCommandCode {
-  type Error = &'static str;
-
-  // I am not sure about this hard coding, but the code
-  //  looks nicer - Paolo
-  fn try_from(value: u8) -> Result<Self, Self::Error> {
+impl From<u8> for TofCommandCode {
+  fn from(value: u8) -> Self {
     match value {
-      1u8  => Ok(TofCommandCode::CmdPing),
-      10u8 => Ok(TofCommandCode::CmdPowerOff),
-      11u8 => Ok(TofCommandCode::CmdPowerOn),
-      12u8 => Ok(TofCommandCode::CmdPowerCycle),
-      20u8 => Ok(TofCommandCode::CmdRBSetup),
-      21u8 => Ok(TofCommandCode::CmdSetThresholds),
-      22u8 => Ok(TofCommandCode::CmdSetMTConfig),
-      30u8 => Ok(TofCommandCode::CmdDataRunStop),
-      31u8 => Ok(TofCommandCode::CmdDataRunStart),
-      32u8 => Ok(TofCommandCode::CmdStartValidationRun),
-      41u8 => Ok(TofCommandCode::CmdGetFullWaveforms),
-      42u8 => Ok(TofCommandCode::CmdGetReducedDataPacket),
-      43u8 => Ok(TofCommandCode::CmdRequestMoni),
-      51u8 => Ok(TofCommandCode::CmdVoltageCalibration),
-      52u8 => Ok(TofCommandCode::CmdTimingCalibration),
-      53u8 => Ok(TofCommandCode::CmdCreateCalibrationFile),
-      44u8 => Ok(TofCommandCode::CmdUnspoolEventCache),
-      45u8 => Ok(TofCommandCode::CmdStreamAnyEvent),
-      46u8 => Ok(TofCommandCode::CmdStreamOnlyRequested),
-      23u8 => Ok(TofCommandCode::CmdSetRBDataBufSize),
-      24u8 => Ok(TofCommandCode::CmdEnTriggerModeForced),
-      25u8 => Ok(TofCommandCode::CmdDisTriggerModeForced),
-      26u8 => Ok(TofCommandCode::CmdEnTriggerModeForcedMTB),
-      27u8 => Ok(TofCommandCode::CmdDisTriggerModeForcedMTB),
-      90u8 => Ok(TofCommandCode::Unknown),
-      _    => {
-        error!("{} is not a avlid TofCommand code!", value);
-        Err("I am not sure how to convert this value!")
-      }
+      0u8  => TofCommandCode::CmdUnknown,
+      1u8  => TofCommandCode::CmdPing,
+      2u8  => TofCommandCode::CmdMoni,
+      10u8 => TofCommandCode::CmdPower,
+      21u8 => TofCommandCode::CmdSetThresholds,
+      22u8 => TofCommandCode::CmdSetMTConfig,
+      28u8 => TofCommandCode::CmdSetPreampBias,
+      30u8 => TofCommandCode::CmdDataRunStop,
+      31u8 => TofCommandCode::CmdDataRunStart,
+      32u8 => TofCommandCode::CmdStartValidationRun,
+      41u8 => TofCommandCode::CmdGetFullWaveforms,
+      50u8 => TofCommandCode::CmdNoiCalibration,
+      51u8 => TofCommandCode::CmdVoltageCalibration,
+      52u8 => TofCommandCode::CmdTimingCalibration,
+      53u8 => TofCommandCode::CmdDefaultCalibration,
+      44u8 => TofCommandCode::CmdUnspoolEventCache,
+      23u8 => TofCommandCode::CmdSetRBDataBufSize,
+      24u8 => TofCommandCode::CmdTriggerModeForced,
+      25u8 => TofCommandCode::CmdTriggerModeForcedMTB,
+      60u8 => TofCommandCode::CmdSystemdReboot,
+      _    => TofCommandCode::CmdUnknown
     }
   }
 }
 
 #[cfg(feature = "random")]
 impl FromRandom for TofCommandCode {
-  
   fn from_random() -> Self {
     let choices = [
+      TofCommandCode::CmdUnknown,
       TofCommandCode::CmdPing,
-      TofCommandCode::CmdPowerOff,
-      TofCommandCode::CmdPowerOn,
-      TofCommandCode::CmdPowerCycle,
-      TofCommandCode::CmdRBSetup,
+      TofCommandCode::CmdMoni,
+      TofCommandCode::CmdPower,
       TofCommandCode::CmdSetThresholds,
       TofCommandCode::CmdSetMTConfig,
+      TofCommandCode::CmdSetPreampBias,
       TofCommandCode::CmdDataRunStop,
       TofCommandCode::CmdDataRunStart,
       TofCommandCode::CmdStartValidationRun,
       TofCommandCode::CmdGetFullWaveforms,
-      TofCommandCode::CmdGetReducedDataPacket,
-      TofCommandCode::CmdRequestMoni,
+      TofCommandCode::CmdNoiCalibration,
       TofCommandCode::CmdVoltageCalibration,
       TofCommandCode::CmdTimingCalibration,
-      TofCommandCode::CmdCreateCalibrationFile,
+      TofCommandCode::CmdDefaultCalibration,
       TofCommandCode::CmdUnspoolEventCache,
-      TofCommandCode::CmdStreamAnyEvent,
-      TofCommandCode::CmdStreamOnlyRequested,
       TofCommandCode::CmdSetRBDataBufSize,
-      TofCommandCode::CmdEnTriggerModeForced,
-      TofCommandCode::CmdDisTriggerModeForced,
-      TofCommandCode::CmdEnTriggerModeForcedMTB,
-      TofCommandCode::CmdDisTriggerModeForcedMTB,
-      TofCommandCode::Unknown
+      TofCommandCode::CmdTriggerModeForced,
+      TofCommandCode::CmdTriggerModeForcedMTB,
+      TofCommandCode::CmdSystemdReboot
     ];
     let mut rng  = rand::thread_rng();
     let idx = rng.gen_range(0..choices.len());
@@ -191,6 +163,7 @@ impl FromRandom for TofCommandCode {
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 #[repr(u32)]
 pub enum TofCommandResp {
+  Unknown                            = 0u32,
   /// response code for: Command can not be executed on the server side
   RespErrUnexecutable                = 500u32,
   RespErrNotImplemented              = 404u32, 
@@ -232,29 +205,22 @@ impl fmt::Display for TofCommandResp {
   }
 }
 
-impl TryFrom<u32> for TofCommandResp {
-  type Error = &'static str;
-
-  // I am not sure about this hard coding, but the code
-  //  looks nicer - Paolo
-  fn try_from(value: u32) -> Result<Self, Self::Error> {
+impl From<u32> for TofCommandResp {
+  fn from(value: u32) -> Self {
     match value {
-      500u32   => Ok(TofCommandResp::RespErrUnexecutable),
-      404u32   => Ok(TofCommandResp::RespErrNotImplemented),
-      4000u32  => Ok(TofCommandResp::RespErrLevelNoProblem),
-      4010u32  => Ok(TofCommandResp::RespErrLevelMedium),
-      4020u32  => Ok(TofCommandResp::RespErrLevelSevere),
-      4030u32  => Ok(TofCommandResp::RespErrLevelCritical),
-      4040u32  => Ok(TofCommandResp::RespErrLevelMissionCritical),
-      99999u32 => Ok(TofCommandResp::RespErrLevelRunFoolRun),
-      200u32   => Ok(TofCommandResp::RespSuccFingersCrossed),
-      501u32   => Ok(TofCommandResp::RespErrNoRunActive),
-      502u32   => Ok(TofCommandResp::RespErrRunActive),
-      503u32   => Ok(TofCommandResp::RespErrCmdStuck),
-      _        => {
-        error! ("{} is not a valid TofCommandResp!", value);
-        Err("I am not sure how to convert this value!")
-      }
+      500u32   => TofCommandResp::RespErrUnexecutable,
+      404u32   => TofCommandResp::RespErrNotImplemented,
+      4000u32  => TofCommandResp::RespErrLevelNoProblem,
+      4010u32  => TofCommandResp::RespErrLevelMedium,
+      4020u32  => TofCommandResp::RespErrLevelSevere,
+      4030u32  => TofCommandResp::RespErrLevelCritical,
+      4040u32  => TofCommandResp::RespErrLevelMissionCritical,
+      99999u32 => TofCommandResp::RespErrLevelRunFoolRun,
+      200u32   => TofCommandResp::RespSuccFingersCrossed,
+      501u32   => TofCommandResp::RespErrNoRunActive,
+      502u32   => TofCommandResp::RespErrRunActive,
+      503u32   => TofCommandResp::RespErrCmdStuck,
+      _        => TofCommandResp::Unknown
     }
   }
 }
@@ -302,7 +268,6 @@ pub enum TofOperationMode {
   RBHighThroughput = 30u8,
   RBCalcCRC32      = 40u8,
   RBWaveform       = 50u8,
-
 }
 
 impl fmt::Display for TofOperationMode {
@@ -313,23 +278,17 @@ impl fmt::Display for TofOperationMode {
   }
 }
 
-impl TryFrom<u8> for TofOperationMode {
-  type Error = &'static str;
-
-  // I am not sure about this hard coding, but the code
-  //  looks nicer - Paolo
-  fn try_from(value: u8) -> Result<Self, Self::Error> {
+impl From<u8> for TofOperationMode {
+  fn from(value: u8) -> Self {
     match value {
-      0u8  => Ok(TofOperationMode::Unknown),
-      10u8 => Ok(TofOperationMode::StreamAny),
-      20u8 => Ok(TofOperationMode::RequestReply),
-      30u8 => Ok(TofOperationMode::RBHighThroughput),
-      40u8 => Ok(TofOperationMode::RBCalcCRC32),
-      50u8 => Ok(TofOperationMode::RBWaveform),
-      _    => {
-        error!("{} is not a valid TofOperationMode!", value);
-        Err("I am not sure how to convert this value!")
-      }
+      0u8  => TofOperationMode::Unknown,
+      10u8 => TofOperationMode::StreamAny,
+      20u8 => TofOperationMode::RequestReply,
+      20u8 => TofOperationMode::Unknown,
+      30u8 => TofOperationMode::RBHighThroughput,
+      40u8 => TofOperationMode::RBCalcCRC32,
+      50u8 => TofOperationMode::RBWaveform,
+      _    => TofOperationMode::Unknown
     }
   }
 }
@@ -339,6 +298,7 @@ impl FromRandom for TofOperationMode {
   
   fn from_random() -> Self {
     let choices = [
+      TofOperationMode::Unknown,
       TofOperationMode::RequestReply,
       TofOperationMode::StreamAny,
       TofOperationMode::RBHighThroughput,
@@ -469,31 +429,26 @@ impl FromRandom for RBCommand {
 ///
 #[derive(Debug, PartialEq, Copy, Clone, serde::Deserialize, serde::Serialize)]//, IntoEnumIterator)]
 pub enum TofCommand {
+  Unknown                 (u32),
   Ping                    (u32),
-  PowerOff                (u32),
-  PowerOn                 (u32),
-  PowerCycle              (u32),
-  RBSetup                 (u32),
+  Moni                    (u32),
+  Power                   (u32),
   SetThresholds           (u32),
   SetMTConfig             (u32),
+  SetPreampBias           (u32),
   DataRunStop             (u32),
   DataRunStart            (u32),
   StartValidationRun      (u32),
   GetFullWaveforms        (u32),
-  GetReducedDataPacket    (u32),
-  RequestMoni             (u32),
+  NoiCalibration          (u32),
   VoltageCalibration      (u32),
   TimingCalibration       (u32),
-  CreateCalibrationFile   (u32), // still need some insight
+  DefaultCalibration      (u32),
   UnspoolEventCache       (u32),
-  StreamAnyEvent          (u32),
-  StreamOnlyRequested     (u32),
   SetRBDataBufSize        (u32),
-  EnTriggerModeForced     (u32),
-  DisTriggerModeForced    (u32),
-  EnTriggerModeForcedMTB  (u32),
-  DisTriggerModeForcedMTB (u32),
-  Unknown                 (u32)
+  TriggerModeForced       (u32),
+  TriggerModeForcedMTB    (u32),
+  SystemdReboot           (u32),
 }
 
 impl fmt::Display for TofCommand {
@@ -568,31 +523,26 @@ impl TofCommand {
   pub fn get_value(&self) -> u32 {
     let value : u32;
     match self {
+      TofCommand::Unknown                 (data) => { value = *data;}, 
       TofCommand::Ping                    (data) => { value = *data;},
-      TofCommand::PowerOn                 (data) => { value = *data;}, 
-      TofCommand::PowerOff                (data) => { value = *data;}, 
-      TofCommand::PowerCycle              (data) => { value = *data;}, 
-      TofCommand::RBSetup                 (data) => { value = *data;}, 
+      TofCommand::Moni                    (data) => { value = *data;},
+      TofCommand::Power                   (data) => { value = *data;},
       TofCommand::SetThresholds           (data) => { value = *data;},
       TofCommand::SetMTConfig             (data) => { value = *data;},
+      TofCommand::SetPreampBias           (data) => { value = *data;},
+      TofCommand::DataRunStop             (data) => { value = *data;},
+      TofCommand::DataRunStart            (data) => { value = *data;},
       TofCommand::StartValidationRun      (data) => { value = *data;},
       TofCommand::GetFullWaveforms        (data) => { value = *data;},
-      TofCommand::UnspoolEventCache       (data) => { value = *data;},
-      TofCommand::StreamAnyEvent          (data) => { value = *data;},
-      TofCommand::StreamOnlyRequested     (data) => { value = *data;},
-      TofCommand::DataRunStart            (data) => { value = *data;},
-      TofCommand::DataRunStop             (data) => { value = *data;},
+      TofCommand::NoiCalibration          (data) => { value = *data;},
       TofCommand::VoltageCalibration      (data) => { value = *data;},
       TofCommand::TimingCalibration       (data) => { value = *data;},
-      TofCommand::CreateCalibrationFile   (data) => { value = *data;},
-      TofCommand::GetReducedDataPacket    (data) => { value = *data;},
-      TofCommand::RequestMoni             (data) => { value = *data;},
+      TofCommand::DefaultCalibration      (data) => { value = *data;},
+      TofCommand::UnspoolEventCache       (data) => { value = *data;},
       TofCommand::SetRBDataBufSize        (data) => { value = *data;},
-      TofCommand::EnTriggerModeForced     (data) => { value = *data;},
-      TofCommand::DisTriggerModeForced    (data) => { value = *data;},
-      TofCommand::EnTriggerModeForcedMTB  (data) => { value = *data;},
-      TofCommand::DisTriggerModeForcedMTB (data) => { value = *data;},
-      TofCommand::Unknown                 (data) => { value = *data;}, 
+      TofCommand::TriggerModeForced       (data) => { value = *data;},
+      TofCommand::TriggerModeForcedMTB    (data) => { value = *data;},
+      TofCommand::SystemdReboot           (data) => { value = *data;},
     }
     value
   }  
@@ -601,62 +551,52 @@ impl TofCommand {
   /// representation
   pub fn from_command_code(cc : TofCommandCode, value : u32) -> TofCommand {
     match cc {
+      TofCommandCode::CmdUnknown                 => TofCommand::Unknown                 (0u32),
       TofCommandCode::CmdPing                    => TofCommand::Ping                    (0u32),
-      TofCommandCode::CmdPowerOff                => TofCommand::PowerOff                (value),
-      TofCommandCode::CmdPowerOn                 => TofCommand::PowerOn                 (value),
-      TofCommandCode::CmdPowerCycle              => TofCommand::PowerCycle              (value),
-      TofCommandCode::CmdRBSetup                 => TofCommand::RBSetup                 (value),
+      TofCommandCode::CmdMoni                    => TofCommand::Moni                    (0u32),
+      TofCommandCode::CmdPower                   => TofCommand::Power                   (value),
       TofCommandCode::CmdSetThresholds           => TofCommand::SetThresholds           (value),
       TofCommandCode::CmdSetMTConfig             => TofCommand::SetMTConfig             (value),
-      TofCommandCode::CmdDataRunStart            => TofCommand::DataRunStart            (value),
+      TofCommandCode::CmdSetPreampBias           => TofCommand::SetPreampBias           (value),
       TofCommandCode::CmdDataRunStop             => TofCommand::DataRunStop             (0u32),
+      TofCommandCode::CmdDataRunStart            => TofCommand::DataRunStart            (value),
       TofCommandCode::CmdStartValidationRun      => TofCommand::StartValidationRun      (value),
       TofCommandCode::CmdGetFullWaveforms        => TofCommand::GetFullWaveforms        (0u32),
-      TofCommandCode::CmdGetReducedDataPacket    => TofCommand::GetReducedDataPacket    (0u32),
-      TofCommandCode::CmdRequestMoni             => TofCommand::RequestMoni             (0u32),
+      TofCommandCode::CmdNoiCalibration          => TofCommand::NoiCalibration          (value),
       TofCommandCode::CmdVoltageCalibration      => TofCommand::VoltageCalibration      (value),
       TofCommandCode::CmdTimingCalibration       => TofCommand::TimingCalibration       (value),
-      TofCommandCode::CmdCreateCalibrationFile   => TofCommand::CreateCalibrationFile   (value),
+      TofCommandCode::CmdDefaultCalibration      => TofCommand::DefaultCalibration      (value),
       TofCommandCode::CmdUnspoolEventCache       => TofCommand::UnspoolEventCache       (0u32),
-      TofCommandCode::CmdStreamAnyEvent          => TofCommand::StreamAnyEvent          (0u32),
-      TofCommandCode::CmdStreamOnlyRequested     => TofCommand::StreamOnlyRequested     (0u32),
       TofCommandCode::CmdSetRBDataBufSize        => TofCommand::SetRBDataBufSize        (0u32),
-      TofCommandCode::CmdEnTriggerModeForced     => TofCommand::EnTriggerModeForced     (0u32),
-      TofCommandCode::CmdDisTriggerModeForced    => TofCommand::DisTriggerModeForced    (0u32),
-      TofCommandCode::CmdEnTriggerModeForcedMTB  => TofCommand::EnTriggerModeForcedMTB  (0u32),
-      TofCommandCode::CmdDisTriggerModeForcedMTB => TofCommand::DisTriggerModeForcedMTB (0u32),
-      _                                          => TofCommand::Unknown                 (0u32),
+      TofCommandCode::CmdTriggerModeForced       => TofCommand::TriggerModeForced       (0u32),
+      TofCommandCode::CmdTriggerModeForcedMTB    => TofCommand::TriggerModeForcedMTB    (0u32),
+      TofCommandCode::CmdSystemdReboot           => TofCommand::SystemdReboot           (0u32)
     }
   }
     
   /// Translate a TofCommand into its specific byte representation
   pub fn to_command_code(cmd : &TofCommand) -> Option<TofCommandCode> {
     match cmd {
+      TofCommand::Unknown                 (_) => Some(TofCommandCode::CmdUnknown),
       TofCommand::Ping                    (_) => Some(TofCommandCode::CmdPing),
-      TofCommand::PowerOff                (_) => Some(TofCommandCode::CmdPowerOff),
-      TofCommand::PowerOn                 (_) => Some(TofCommandCode::CmdPowerOn),
-      TofCommand::PowerCycle              (_) => Some(TofCommandCode::CmdPowerCycle),
-      TofCommand::RBSetup                 (_) => Some(TofCommandCode::CmdRBSetup),
+      TofCommand::Moni                    (_) => Some(TofCommandCode::CmdMoni),
+      TofCommand::Power                   (_) => Some(TofCommandCode::CmdPower),
       TofCommand::SetThresholds           (_) => Some(TofCommandCode::CmdSetThresholds),
       TofCommand::SetMTConfig             (_) => Some(TofCommandCode::CmdSetMTConfig),
-      TofCommand::DataRunStart            (_) => Some(TofCommandCode::CmdDataRunStart),
+      TofCommand::SetPreampBias           (_) => Some(TofCommandCode::CmdSetPreampBias),
       TofCommand::DataRunStop             (_) => Some(TofCommandCode::CmdDataRunStop),
+      TofCommand::DataRunStart            (_) => Some(TofCommandCode::CmdDataRunStart),
       TofCommand::StartValidationRun      (_) => Some(TofCommandCode::CmdStartValidationRun),
       TofCommand::GetFullWaveforms        (_) => Some(TofCommandCode::CmdGetFullWaveforms),
-      TofCommand::GetReducedDataPacket    (_) => Some(TofCommandCode::CmdGetReducedDataPacket),
-      TofCommand::RequestMoni             (_) => Some(TofCommandCode::CmdRequestMoni),
+      TofCommand::NoiCalibration          (_) => Some(TofCommandCode::CmdNoiCalibration),
       TofCommand::VoltageCalibration      (_) => Some(TofCommandCode::CmdVoltageCalibration),
       TofCommand::TimingCalibration       (_) => Some(TofCommandCode::CmdTimingCalibration),
-      TofCommand::CreateCalibrationFile   (_) => Some(TofCommandCode::CmdCreateCalibrationFile),
+      TofCommand::DefaultCalibration      (_) => Some(TofCommandCode::CmdDefaultCalibration),
       TofCommand::UnspoolEventCache       (_) => Some(TofCommandCode::CmdUnspoolEventCache),
-      TofCommand::StreamAnyEvent          (_) => Some(TofCommandCode::CmdStreamAnyEvent),
-      TofCommand::StreamOnlyRequested     (_) => Some(TofCommandCode::CmdStreamOnlyRequested),
       TofCommand::SetRBDataBufSize        (_) => Some(TofCommandCode::CmdSetRBDataBufSize),
-      TofCommand::EnTriggerModeForced     (_) => Some(TofCommandCode::CmdEnTriggerModeForced),
-      TofCommand::DisTriggerModeForced    (_) => Some(TofCommandCode::CmdDisTriggerModeForced),
-      TofCommand::EnTriggerModeForcedMTB  (_) => Some(TofCommandCode::CmdEnTriggerModeForcedMTB),
-      TofCommand::DisTriggerModeForcedMTB (_) => Some(TofCommandCode::CmdDisTriggerModeForcedMTB),
-      TofCommand::Unknown                 (_) => None
+      TofCommand::TriggerModeForced       (_) => Some(TofCommandCode::CmdTriggerModeForced),
+      TofCommand::TriggerModeForcedMTB    (_) => Some(TofCommandCode::CmdTriggerModeForcedMTB),
+      TofCommand::SystemdReboot           (_) => Some(TofCommandCode::CmdSystemdReboot)
     }
   }
 
@@ -692,6 +632,39 @@ impl From<(u8, u32)> for TofCommand {
     let (input, value) = pair;
     trace!("Got in input {:?}", pair);
     TofCommand::from_command_code(TofCommandCode::try_from(input).unwrap(), value)
+  }
+}
+
+#[cfg(feature = "random")]
+impl FromRandom for TofCommand {
+  
+  fn from_random() -> Self {
+    let mut rng  = rand::thread_rng();
+    let val = rng.gen::<u32>();
+    let choices = [
+      TofCommand::Unknown                 (val),
+      TofCommand::Ping                    (val),
+      TofCommand::Moni                    (val),
+      TofCommand::Power                   (val),
+      TofCommand::SetThresholds           (val),
+      TofCommand::SetMTConfig             (val),
+      TofCommand::SetPreampBias           (val),
+      TofCommand::DataRunStop             (val),
+      TofCommand::DataRunStart            (val),
+      TofCommand::StartValidationRun      (val),
+      TofCommand::GetFullWaveforms        (val),
+      TofCommand::NoiCalibration          (val),
+      TofCommand::VoltageCalibration      (val),
+      TofCommand::TimingCalibration       (val),
+      TofCommand::DefaultCalibration      (val),
+      TofCommand::UnspoolEventCache       (val),
+      TofCommand::SetRBDataBufSize        (val),
+      TofCommand::TriggerModeForced       (val),
+      TofCommand::TriggerModeForcedMTB    (val),
+      TofCommand::SystemdReboot           (val)
+    ];
+    let idx = rng.gen_range(0..choices.len());
+    choices[idx]
   }
 }
 

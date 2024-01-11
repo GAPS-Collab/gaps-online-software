@@ -72,6 +72,7 @@ use liftof_lib::{
     LIFTOF_LOGO_SHOW,
     color_log,
     RunStatistics,
+    CalibrationCmd
 };
 
 use liftof_rb::threads::{
@@ -85,6 +86,8 @@ use liftof_rb::threads::{
 
 use liftof_rb::api::*;
 use liftof_rb::control::*;
+
+use liftof_lib::Command;
 
 #[derive(Parser, Debug)]
 #[command(author = "J.A.Stoessl", version, about, long_about = None)]
@@ -127,7 +130,12 @@ struct Args {
   /// event status flag
   #[arg(long, default_value_t = false)]
   calc_crc32: bool,
+  /// List of possible commands
+  #[command(subcommand)]
+  command: Command
 }
+
+/**********************************************************/
 
 fn main() {
   env_logger::builder()
@@ -212,8 +220,13 @@ fn main() {
   let mut rc_config     = RunConfig::new();
   let mut rc_file_path  = std::path::PathBuf::new();
   let mut end_after_run = false;
+  let mut calibration = false;
+  match args.command {
+    // Matching calibration command
+    Command::Calibration(_) => calibration = true,
+    _ => ()
+  }
   let run_stat          = Arc::new(Mutex::new(RunStatistics::new()));
-   
   if calibration {
     println!("===================================================================");
     println!("=> Readoutboard calibration! This will override ALL other settings!");
@@ -314,6 +327,7 @@ fn main() {
          .expect("Failed to spawn data-publsher thread!");
   
   let tp_to_pub_ev   = tp_to_pub.clone();
+  let rc_to_runner_cal  = rc_to_runner.clone();
   let tp_to_pub_cal  = tp_to_pub.clone();
 
 
@@ -410,15 +424,105 @@ fn main() {
     if calibration {
       // we execute this routine first, then we 
       // can go into our loop listening for input
-      match rb_calibration(&rc_to_runner, &tp_to_pub_cal) {
-        Ok(_) => (),
-        Err(err) => {
-          error!("Calibration failed! Error {err}!");
-        }
+      match args.command {
+        // BEGIN Matching calibration command
+        Command::Calibration(calib_cmd) => {
+          match calib_cmd {
+            CalibrationCmd::Default(default_opts) => {
+              match rb_calibration(&rc_to_runner_cal, &tp_to_pub_cal) {
+                Ok(_) => (),
+                Err(err) => {
+                  error!("Calibration failed! Error {err}!");
+                }
+              }
+            },
+            CalibrationCmd::Noi(noi_opts) => {
+              match rb_noi_subcalibration(&rc_to_runner_cal, &tp_to_pub_cal) {
+                Ok(_) => (),
+                Err(err) => {
+                  error!("Noi data taking failed! Error {err}!");
+                }
+              }
+            },
+            CalibrationCmd::Voltage(voltage_opts) => {
+              let voltage_level = voltage_opts.level;
+              match rb_voltage_subcalibration(&rc_to_runner_cal, &tp_to_pub_cal, voltage_level) {
+                Ok(_) => (),
+                Err(err) => {
+                  error!("Voltage calibration data taking failed! Error {err}!");
+                }
+              }
+            },
+            CalibrationCmd::Timing(timing_opts) => {
+              let voltage_level = timing_opts.level;
+              match rb_timing_subcalibration(&rc_to_runner_cal, &tp_to_pub_cal, voltage_level) {
+                Ok(_) => (),
+                Err(err) => {
+                  error!("Timing calibration data taking failed! Error {err}!");
+                }
+              }
+            }
+          }
+        },
+        // END Matching calibration command
+        // BEGIN Matching set command
+        Command::Set(set_cmd) => {
+          match set_cmd {
+            liftof_lib::SetCmd::LtbThreshold(lbt_threshold_opts) => {
+              let ltb_id = lbt_threshold_opts.id;
+              let threshold_name = lbt_threshold_opts.name;
+              let threshold_level: u16 = lbt_threshold_opts.level;
+              match send_ltb_threshold_set(ltb_id, threshold_name, threshold_level) {
+                Ok(_) => (),
+                Err(err) => {
+                  error!("Unable to set preamp bias! Error {err}!");
+                }
+              }
+            },
+            liftof_lib::SetCmd::PreampBias(preamp_bias_opts) => {
+              let preamp_id = preamp_bias_opts.id;
+              let preamp_bias = preamp_bias_opts.bias;
+              match send_preamp_bias_set(preamp_id, preamp_bias) {
+                Ok(_) => (),
+                Err(err) => {
+                  error!("Unable to set preamp bias! Error {err}!");
+                }
+              }
+            }
+          }
+        },
+        // END Matching set commmand
+        // BEGIN Matching run command
+        Command::Run(run_cmd) => {
+          match run_cmd {
+            liftof_lib::RunCmd::Start(run_start_opts) => {
+              let run_type = run_start_opts.run_type;
+              let rb_id = run_start_opts.id;
+              let event_no = run_start_opts.no;
+              match rb_start_run(&rc_to_runner_cal, rc_config, run_type, rb_id, event_no) {
+                Ok(_) => (),
+                Err(err) => {
+                  error!("Timing calibration data taking failed! Error {err}!");
+                }
+              }
+            },
+            liftof_lib::RunCmd::Stop(run_stop_opts) => {
+              let rb_id = run_stop_opts.id;
+              match rb_stop_run(&rc_to_runner_cal, rb_id) {
+                Ok(_) => (),
+                Err(err) => {
+                  error!("Timing calibration data taking failed! Error {err}!");
+                }
+              }
+            }
+          }
+        },
+        // END Matching run commmand
+        _ => ()
       }
       do_monitoring = false;
       end = true; // in case of we have done the calibration
-                  // from shell. We finish after it is done.
+                      // from shell. We finish after it is done.
     } else {
       // only do monitoring when we don't do a 
       // calibration
@@ -526,7 +630,7 @@ fn main() {
       rc_terminate.is_active = false;
       match rc_to_runner.send(rc_terminate) {
         Err(err) => {
-          error!("We were unable to terminate the run! Error {err}. However, we will end leaving the board in an uknown state...");
+          error!("We were unable to terminate the run! Error {err}. However, we will end leaving the board in an unknown state...");
         }
         Ok(_) => ()
       }

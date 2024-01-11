@@ -9,6 +9,7 @@ use std::fmt;
 ////////////////////////////////////////
 
 #[derive(Debug, Copy, Clone, serde::Deserialize, serde::Serialize)]
+#[repr(u8)]
 pub enum PacketError {
   WrongPacketType,
   UnableToSendPacket,
@@ -28,6 +29,7 @@ impl Error for PacketError {
 ////////////////////////////////////////
 
 #[derive(Debug, Copy, Clone, serde::Deserialize, serde::Serialize)]
+#[repr(u8)]
 pub enum SensorError {
   ReadoutError,
 }
@@ -46,6 +48,7 @@ impl Error for SensorError {
 ////////////////////////////////////////
 
 #[derive(Debug, Copy, Clone, serde::Deserialize, serde::Serialize)]
+#[repr(u8)]
 pub enum CalibrationError {
   EmptyInputData,
   CanNotConnectToMyOwnZMQSocket  
@@ -65,6 +68,27 @@ impl Error for CalibrationError {
 ////////////////////////////////////////
 
 #[derive(Debug, Copy, Clone, serde::Deserialize, serde::Serialize)]
+#[repr(u8)]
+pub enum RunError {
+  EmptyInputData,
+  CanNotConnectToMyOwnZMQSocket  
+}
+
+impl fmt::Display for RunError {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let disp = serde_json::to_string(self).unwrap_or(
+      String::from("Error: cannot unwrap this RunError"));
+    write!(f, "<RunError : {}>", disp)
+  }
+}
+
+impl Error for RunError {
+}
+
+////////////////////////////////////////
+
+#[derive(Debug, Copy, Clone, serde::Deserialize, serde::Serialize)]
+#[repr(u8)]
 pub enum EventError {
     EventIdMismatch
 }
@@ -86,6 +110,7 @@ impl Error for EventError {
 /// is an issue in the de(serialization),
 /// e.g. the from_bytestream methods.
 #[derive(Debug, Copy, Clone, serde::Deserialize, serde::Serialize)]
+#[repr(u8)]
 pub enum SerializationError {
   //HeaderNotFound,
   TailInvalid,
@@ -113,6 +138,7 @@ impl Error for SerializationError {
 ////////////////////////////////////////
 
 #[derive(Debug, Copy, Clone, serde::Deserialize, serde::Serialize)]
+#[repr(u8)]
 pub enum DecodingError {
   //HeaderNotFound,
   ChannelOutOfBounds,
@@ -135,6 +161,7 @@ impl Error for DecodingError {
 /// Error to be used for issues with 
 /// the communication to the MTB.
 #[derive(Debug, Copy, Clone, serde::Deserialize, serde::Serialize)]
+#[repr(u8)]
 pub enum MasterTriggerError {
   QueueEmpty,
   MaskTooLarge,
@@ -169,6 +196,7 @@ impl From<Box<dyn std::error::Error>> for MasterTriggerError {
 
 /// Problems in waveform analysis
 #[derive(Debug, Copy, Clone, serde::Deserialize, serde::Serialize)]
+#[repr(u8)]
 pub enum WaveformError {
   TimeIndexOutOfBounds,
   TimesTooSmall,
@@ -202,6 +230,7 @@ impl Error for WaveformError {
 /// packets over UDP
 // TODO Isnt it too overkill to have an enum for this?
 #[derive(Debug, Copy, Clone, serde::Deserialize, serde::Serialize)]
+#[repr(u8)]
 pub enum IPBusError {
   DecodingFailed,
 }
@@ -223,6 +252,7 @@ impl Error for IPBusError {
 /// or more general, when doing any kind of analysis
 ///
 #[derive(Debug,Copy,Clone, serde::Deserialize, serde::Serialize)]
+#[repr(u8)]
 pub enum AnalysisError {
   MissingChannel,
   InputBroken,
@@ -242,6 +272,7 @@ impl Error for AnalysisError {
 ////////////////////////////////////////
 
 #[derive(Debug,Copy,Clone, serde::Deserialize, serde::Serialize)]
+#[repr(u8)]
 pub enum UserError {
   IneligibleChannelLabel,
   NoChannel9Data,
@@ -258,3 +289,22 @@ impl fmt::Display for UserError {
 impl Error for UserError {
 }
 
+////////////////////////////////////////
+
+#[derive(Debug, Copy, Clone, serde::Deserialize, serde::Serialize)]
+#[repr(u8)]
+pub enum SetError {
+  EmptyInputData,
+  CanNotConnectToMyOwnZMQSocket  
+}
+
+impl fmt::Display for SetError {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let disp = serde_json::to_string(self).unwrap_or(
+      String::from("Error: cannot unwrap this SetError"));
+    write!(f, "<SetError : {}>", disp)
+  }
+}
+
+impl Error for SetError {
+}

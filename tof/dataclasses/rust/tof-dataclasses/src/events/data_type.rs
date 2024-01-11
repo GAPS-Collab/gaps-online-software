@@ -34,25 +34,18 @@ impl fmt::Display for DataType {
   }
 }
 
-impl TryFrom<u8> for DataType {
-  type Error = &'static str;
-
-  // I am not sure about this hard coding, but the code
-  //  looks nicer - Paolo
-  fn try_from(value: u8) -> Result<Self, Self::Error> {
+impl From<u8> for DataType {
+  fn from(value: u8) -> Self {
     match value {
-      0u8  => Ok(DataType::Unknown),
-      10u8 => Ok(DataType::VoltageCalibration),
-      20u8 => Ok(DataType::TimingCalibration),
-      30u8 => Ok(DataType::Noi),
-      40u8 => Ok(DataType::Physics),
-      50u8 => Ok(DataType::RBTriggerPeriodic),
-      60u8 => Ok(DataType::RBTriggerPoisson),
-      70u8 => Ok(DataType::MTBTriggerPoisson),
-      _    => {
-        error!("{} is not a valid data type!", value);
-        Err("I am not sure how to convert this value!")
-      }
+      0u8  => DataType::Unknown,
+      10u8 => DataType::VoltageCalibration,
+      20u8 => DataType::TimingCalibration,
+      30u8 => DataType::Noi,
+      40u8 => DataType::Physics,
+      50u8 => DataType::RBTriggerPeriodic,
+      60u8 => DataType::RBTriggerPoisson,
+      70u8 => DataType::MTBTriggerPoisson,
+      _    => DataType::Unknown
     }
   }
 }
@@ -62,14 +55,14 @@ impl FromRandom for DataType {
   
   fn from_random() -> Self {
     let choices = [
+      DataType::Unknown,
       DataType::VoltageCalibration,
       DataType::TimingCalibration,
       DataType::Noi,
       DataType::Physics,
       DataType::RBTriggerPeriodic,
       DataType::RBTriggerPoisson,
-      DataType::MTBTriggerPoisson,
-      DataType::Unknown
+      DataType::MTBTriggerPoisson
     ];
     let mut rng  = rand::thread_rng();
     let idx = rng.gen_range(0..choices.len());

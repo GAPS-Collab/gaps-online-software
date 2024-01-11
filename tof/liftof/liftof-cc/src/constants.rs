@@ -38,9 +38,3 @@ pub const EVENT_BUILDER_EVID_CACHE_SIZE : usize = 10000;
 
 ///! Average number of paddle packets per event
 pub const EXP_N_PADDLES_PER_EVENT : usize = 10;
-
-///! Command constants
-/// Calibration constants
-pub const DEFAULT_CALIB_VOLTAGE: u16 = 4000;
-pub const DEFAULT_CALIB_RB: u8 = 0xFF;
-pub const DEFAULT_CALIB_EXTRA: u8 = 0x00;

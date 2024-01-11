@@ -9,27 +9,38 @@ use crossbeam_channel::Sender;
 
 use tof_dataclasses::commands::{TofCommand,
                                 TofResponse, TofCommandResp};
+use tof_dataclasses::errors::SetError;
 use tof_dataclasses::packets::{TofPacket,
                                PacketType};
 use tof_dataclasses::run::RunConfig;
 
 use tof_dataclasses::serialization::Serialization;
-use tof_dataclasses::threading::ThreadControl;
+
+use liftof_lib::{build_tcp_from_ip, TofComponent, PowerStatusEnum, LTBThresholdName};
 
 use tof_dataclasses::constants::{MASK_CMD_8BIT,
-                                 MASK_CMD_16BIT,
-                                 MASK_CMD_24BIT,
-                                 MASK_CMD_32BIT};
+                                  MASK_CMD_16BIT,
+                                  MASK_CMD_24BIT,
+                                  MASK_CMD_32BIT};
 
-use crate::api::{
-    get_runconfig,
-    prefix_board_id,
-    DATAPORT
-};
-use crate::api::rb_calibration;
-use crate::control::get_board_id_string;
+use crate::api::{rb_calibration,
+                 rb_noi_subcalibration,
+                 rb_voltage_subcalibration,
+                 rb_timing_subcalibration,
+                 send_preamp_bias_set,
+                 send_ltb_threshold_set,
+                 power_preamp,
+                 power_ltb,
+                 get_runconfig,
+                 prefix_board_id,
+                 DATAPORT};
 
-use liftof_lib::build_tcp_from_ip;
+use liftof_lib::constants::DEFAULT_RB_ID;
+
+use tof_dataclasses::threading::ThreadControl;
+
+use crate::control::{get_board_id_string,
+                     get_board_id};
 
 /// Centrailized command management
 /// 
@@ -136,53 +147,337 @@ pub fn cmd_responder(cmd_server_ip             : String,
                     let resp_not_implemented = prefix_board_id(&mut tof_resp.to_bytestream());
                     //let resp_not_implemented = TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED);
                     match cmd {
-                      TofCommand::Ping (_) => {
-                        info!("Received ping signal");
-                        let r = TofResponse::Success(0);
+                      TofCommand::Unknown (_) => {
+                        info!("Received unknown command");
+                        let r = TofResponse::GeneralFail(TofCommandResp::RespErrUnexecutable as u32);
                         match cmd_socket.send(r.to_bytestream(),0) {
                           Err(err) => warn!("Can not send response!, Err {err}"),
-                          Ok(_)    => info!("Responded to Ping!")
+                          Ok(_)    => info!("Responded to Uknown!")
                         }
+                        warn!("Can not interpret Unknown command!");
                         continue;
-                      
-                      }
-                      TofCommand::PowerOn   (_mask) => {
-                        error!("Not implemented");
-                        match cmd_socket.send(resp_not_implemented,0) {
-                          Err(err) => error!("Can not send response! Err {err}"),
-                          Ok(_)    => trace!("Resp sent!")
+                      },
+                      TofCommand::Ping (value) => {
+                        // MSB third 8 bits are 
+                        let tof_component: TofComponent = TofComponent::from(((value | MASK_CMD_8BIT << 8) >> 8) as u8);
+                        // MSB fourth 8 bits are 
+                        let id: u8 = (value | MASK_CMD_8BIT) as u8;
+
+                        let return_val;
+                        match tof_component {
+                          TofComponent::RB => {
+                            info!("Received moni command");
+                            // Function that just replies to a ping command send to tofcpu
+                            // get_board_id PANICS!! TODO
+                            let rb_id = get_board_id().unwrap() as u8;
+
+                            if rb_id == id {
+                              let mut tp = TofPacket::new();
+                              tp.packet_type = PacketType::Ping;
+                              // TODO what do we want here
+                              tp.payload = vec![TofComponent::RB as u8, rb_id];
+
+                              match ev_request_to_cache.send(tp) {
+                                Err(err) => {
+                                  error!("TofCpu moni sending failed! Err {}", err);
+                                  return_val = Err(SetError::CanNotConnectToMyOwnZMQSocket);
+                                }
+                                Ok(_)    => {
+                                  return_val = Ok(());
+                                }
+                              };
+                            } else {
+                              // The packet was not for this RB so bye
+                              continue;
+                            }
+                            
+                            match return_val {
+                              Err(_) => {
+                                let r = TofResponse::GeneralFail(TofCommandResp::RespErrUnexecutable as u32);
+                                match cmd_socket.send(r.to_bytestream(),0) {
+                                  Err(err) => warn!("Can not send response!, Err {err}"),
+                                  Ok(_)    => info!("Responded to Moni!")
+                                }
+                              },
+                              Ok(_)    => {
+                                let r = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed as u32);
+                                match cmd_socket.send(r.to_bytestream(),0) {
+                                  Err(err) => warn!("Can not send response!, Err {err}"),
+                                  Ok(_)    => info!("Responded to Moni!")
+                                }
+                              }
+                            }
+                            continue;
+                          },
+                          TofComponent::PB  => {
+                            return_val = Err(SetError::EmptyInputData);
+                            warn!("Not implemented for PB yet")
+                          },
+                          TofComponent::LTB => {
+                            return_val = Err(SetError::EmptyInputData);
+                            warn!("Not implemented for LTB yet")
+                          },
+                          _                 => {
+                            return_val = Err(SetError::EmptyInputData);
+                            error!("An RB can control just PBs and LTBs.")
+                          }
+                        }
+
+                        match return_val {
+                          Err(_) => {
+                            let r = TofResponse::GeneralFail(TofCommandResp::RespErrUnexecutable as u32);
+                            match cmd_socket.send(r.to_bytestream(),0) {
+                              Err(err) => warn!("Can not send response!, Err {err}"),
+                              Ok(_)    => info!("Responded to Power!")
+                            }
+                          },
+                          Ok(_)  => {
+                            let r = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed as u32);
+                            match cmd_socket.send(r.to_bytestream(),0) {
+                              Err(err) => warn!("Can not send response!, Err {err}"),
+                              Ok(_)    => info!("Responded to Moni!")
+                            }
+                          }
                         }
                         continue;
                       },
-                      TofCommand::PowerOff  (_mask) => {
-                        error!("Not implemented");
-                        match cmd_socket.send(resp_not_implemented,0) {
-                          Err(err) => error!("Can not send response! {err}"),
-                          Ok(_)    => trace!("Resp sent!")
+                      TofCommand::Moni (value) => {
+                        // MSB third 8 bits are 
+                        let tof_component: TofComponent = TofComponent::from(((value | MASK_CMD_8BIT << 8) >> 8) as u8);
+                        // MSB fourth 8 bits are 
+                        let id: u8 = (value | MASK_CMD_8BIT) as u8;
+
+                        // TODO implement proper routines
+                        let return_val;
+                        match tof_component {
+                          TofComponent::RB => {
+                            info!("Received moni command");
+                            // Function that just replies to a ping command send to tofcpu
+                            // get_board_id PANICS!! TODO
+                            let rb_id = get_board_id().unwrap() as u8;
+
+                            if rb_id == id {
+                              let mut tp = TofPacket::new();
+                              tp.packet_type = PacketType::Monitor;
+                              tp.payload = vec![TofComponent::RB as u8, rb_id];
+
+                              // JUST A PLACEHOLDER TODO! WHAT DO WE WANT TO HAVE HERE
+
+                              match ev_request_to_cache.send(tp) {
+                                Err(err) => {
+                                  error!("TofCpu moni sending failed! Err {}", err);
+                                  return_val = Err(SetError::CanNotConnectToMyOwnZMQSocket);
+                                }
+                                Ok(_)    => {
+                                  return_val = Ok(());
+                                }
+                              };
+                            } else {
+                              // The packet was not for this RB so bye
+                              continue;
+                            }
+                          },
+                          TofComponent::PB  => {
+                            return_val = Err(SetError::EmptyInputData);
+                            warn!("Not implemented for PB yet")
+                          },
+                          TofComponent::LTB => {
+                            return_val = Err(SetError::EmptyInputData);
+                            warn!("Not implemented for LTB yet")
+                          },
+                          _                 => {
+                            return_val = Err(SetError::EmptyInputData);
+                            error!("An RB can control just PBs and LTBs.")
+                          }
+                        }
+
+                        match return_val {
+                          Err(_) => {
+                            let r = TofResponse::GeneralFail(TofCommandResp::RespErrUnexecutable as u32);
+                            match cmd_socket.send(r.to_bytestream(),0) {
+                              Err(err) => warn!("Can not send response!, Err {err}"),
+                              Ok(_)    => info!("Responded to Power!")
+                            }
+                          },
+                          Ok(_)    => {
+                            let r = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed as u32);
+                            match cmd_socket.send(r.to_bytestream(),0) {
+                              Err(err) => warn!("Can not send response!, Err {err}"),
+                              Ok(_)    => info!("Responded to Moni!")
+                            }
+                          }
                         }
                         continue;
                       },
-                      TofCommand::PowerCycle(_mask) => {
-                        error!("Not implemented");
-                        match cmd_socket.send(resp_not_implemented,0) {
-                          Err(err) => error!("Can not send response! {err}"),
-                          Ok(_)    => trace!("Resp sent!")
+                      TofCommand::Power   (value) => {
+                        info!("Received set threshold command! Will communicate to LTBs");
+                        // MSB second 8 bits are tof component
+                        let tof_component: TofComponent = TofComponent::from(((value | (MASK_CMD_8BIT << 16)) >> 16) as u8);
+                        // MSB third 8 bits are 
+                        let component_id: u8 = ((value | MASK_CMD_8BIT << 8) >> 8) as u8;
+                        // MSB fourth 8 bits are 
+                        let status: PowerStatusEnum = PowerStatusEnum::from((value | MASK_CMD_8BIT) as u8);
+                        // TODO implement proper routines
+                        let return_val;
+                        match tof_component {
+                          TofComponent::All      => {
+                            return_val = Err(SetError::EmptyInputData);
+                            warn!("Not implemented for All yet")
+                          }, //power_all(cmd_socket, component_id, status),
+                          TofComponent::MT       => {
+                            return_val = Err(SetError::EmptyInputData);
+                            warn!("Not implemented for MT yet")
+                          }, //power_mt(cmd_socket, component_id, status),
+                          TofComponent::AllButMT => {
+                            return_val = Err(SetError::EmptyInputData);
+                            warn!("Not implemented for AllButMT yet")
+                          }, //power_allbutmt(cmd_socket, component_id, status),
+                          TofComponent::LTB      => {
+                            return_val = power_ltb(component_id, status);
+                            match return_val {
+                              Ok(_)  => trace!("LTB powered up!"),
+                              Err(_) => warn!("Not able to power up LTB!")
+                            };
+                          },
+                          TofComponent::Preamp   => {
+                            return_val = power_preamp(component_id, status);
+                            match return_val {
+                              Ok(_)  => trace!("Preamp powered up!"),
+                              Err(_) => warn!("Not able to power up Preamp!")
+                            };
+                          },
+                          _                      => {
+                            return_val = Err(SetError::EmptyInputData);
+                            error!("Power operation not implemented for Unknown!")
+                          }
+                        }
+                        match return_val {
+                          Err(_) => {
+                            let r = TofResponse::GeneralFail(TofCommandResp::RespErrUnexecutable as u32);
+                            match cmd_socket.send(r.to_bytestream(),0) {
+                              Err(err) => warn!("Can not send response!, Err {err}"),
+                              Ok(_)    => info!("Responded to Power!")
+                            }
+                          },
+                          Ok(_)    => {
+                            let r = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed as u32);
+                            match cmd_socket.send(r.to_bytestream(),0) {
+                              Err(err) => warn!("Can not send response!, Err {err}"),
+                              Ok(_)    => info!("Responded to Power!")
+                            }
+                          }
                         }
                         continue;
                       },
-                      TofCommand::RBSetup   (_mask) => {
+                      TofCommand::SetThresholds   (value) =>  {
+                        info!("Received set threshold command! Will communicate to LTBs");
+                        // MSB first 8 bits are LTB ID
+                        let ltb_id: u8 = ((value | (MASK_CMD_8BIT << 24)) >> 24) as u8;
+                        // MSB second 8 bits are LTB ID
+                        let threshold_name: LTBThresholdName = LTBThresholdName::from(((value | (MASK_CMD_8BIT << 16)) >> 16) as u8);
+                        // MSB third 16 bits are extra (not used)
+                        let threshold_level: u16 = (value | MASK_CMD_16BIT) as u16;
+                        match send_ltb_threshold_set(ltb_id, threshold_name, threshold_level) {
+                          Err(err) => {
+                            let r = TofResponse::GeneralFail(TofCommandResp::RespErrUnexecutable as u32);
+                            match cmd_socket.send(r.to_bytestream(),0) {
+                              Err(err) => warn!("Can not send response!, Err {err}"),
+                              Ok(_)    => info!("Responded to SetThreshold!")
+                            }
+                            warn!("Can not set ltb threshold! Err {err}")
+                          },
+                          Ok(_)    => {
+                            let r = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed as u32);
+                            match cmd_socket.send(r.to_bytestream(),0) {
+                              Err(err) => warn!("Can not send response!, Err {err}"),
+                              Ok(_)    => info!("Responded to SetThreshold!")
+                            }
+                            trace!("Resp sent!")
+                          }
+                        }
+                        continue;
+                      },
+                      TofCommand::SetMTConfig  (_) => {
                         warn!("Not implemented");
                         match cmd_socket.send(resp_not_implemented,0) {
                           Err(err) => warn!("Can not send response! Err {err}"),
                           Ok(_)    => trace!("Resp sent!")
                         }
                         continue;
-                      }, 
-                      TofCommand::SetThresholds   (_thresholds) =>  {
-                        warn!("Not implemented");
-                        match cmd_socket.send(resp_not_implemented,0) {
-                          Err(err) => warn!("Can not send response! Err {err}"),
-                          Ok(_)    => trace!("Resp sent!")
+                      },
+                      TofCommand::SetPreampBias   (value) =>  {
+                        info!("Received set preamp bias command! Will communicate to preamps");
+                        // MSB second 8 bits are LTB ID
+                        let preamp_id: u8 = ((value | (MASK_CMD_8BIT << 16)) >> 16) as u8;
+                        // MSB third 16 bits are extra (not used)
+                        let preamp_bias: u16 = (value | MASK_CMD_16BIT) as u16;
+                        match send_preamp_bias_set(preamp_id, preamp_bias) {
+                          Err(err) => {
+                            let r = TofResponse::GeneralFail(TofCommandResp::RespErrUnexecutable as u32);
+                            match cmd_socket.send(r.to_bytestream(),0) {
+                              Err(err) => warn!("Can not send response!, Err {err}"),
+                              Ok(_)    => info!("Responded to SetPreampBias!")
+                            }
+                            warn!("Can not set ltb threshold! Err {err}")
+                          },
+                          Ok(_)    => {
+                            let r = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed as u32);
+                            match cmd_socket.send(r.to_bytestream(),0) {
+                              Err(err) => warn!("Can not send response!, Err {err}"),
+                              Ok(_)    => info!("Responded to SetPreampBias!")
+                            }
+                            trace!("Resp sent!")
+                          }
+                        }
+                        continue;
+                      },
+                      TofCommand::DataRunStop(value)   => {
+                        // MSB fourth 8 bits are RB ID
+                        let rb_id: u8 = (value | MASK_CMD_8BIT) as u8;
+
+                        let my_rb_id = get_board_id().unwrap() as u8;
+                        // if this RB is the one then do stuff
+                        if rb_id == DEFAULT_RB_ID || rb_id == my_rb_id {
+                          println!("Received command to end run!");
+                          // default is not active for run config
+
+                          let rc = RunConfig::new();
+                          match run_config.send(rc) {
+                            Err(err) => error!("Error stopping run! {err}"),
+                            Ok(_)    => ()
+                          }
+                          let resp_good = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed as u32);
+                          match cmd_socket.send(resp_good.to_bytestream(),0) {
+                            Err(err) => warn!("Can not send response! Err {err}"),
+                            Ok(_)    => trace!("Resp sent!")
+                          }
+                        }
+                        continue;
+                      },
+                      TofCommand::DataRunStart (value) => {
+                        // MSB second 8 bits are run_type
+                        let run_type: u8 = ((value | (MASK_CMD_8BIT << 16)) >> 16) as u8;
+                        // MSB third 8 bits are RB ID
+                        let rb_id: u8    = ((value | (MASK_CMD_8BIT << 8)) >> 8) as u8;
+                        // MSB fourth 8 bits are event number
+                        let event_no: u8 = (value | MASK_CMD_8BIT) as u8;
+                        // let's start a run. The value of the TofCommnad shall be 
+                        // nevents
+
+                        let my_rb_id = get_board_id().unwrap() as u8;
+                        // if this RB is the one then do stuff
+                        if rb_id == DEFAULT_RB_ID || rb_id == my_rb_id {
+                          println!("==> Will initialize new run!");
+                          let rc    = get_runconfig(&run_config_file);
+                          match run_config.send(rc) {
+                            Err(err) => error!("Error initializing run! {err}"),
+                            Ok(_)    => ()
+                          };
+                          let resp_good = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed as u32);
+                          match cmd_socket.send(resp_good.to_bytestream(),0) {
+                            Err(err) => warn!("Can not send response! Err {err}"),
+                            Ok(_)    => trace!("Resp sent!")
+                          }
                         }
                         continue;
                       },
@@ -194,7 +489,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
                         }
                         continue;
                       },
-                      TofCommand::UnspoolEventCache   (_) => {
+                      TofCommand::GetFullWaveforms  (_) => {
                         warn!("Not implemented");
                         match cmd_socket.send(resp_not_implemented,0) {
                           Err(err) => warn!("Can not send response! Err {err}"),
@@ -202,69 +497,31 @@ pub fn cmd_responder(cmd_server_ip             : String,
                         }
                         continue;
                       },
-                      TofCommand::StreamOnlyRequested (_) => {
-                        error!("This feature is deprecated in favor of having entire runs in a certain TofOperationMode. This simplifies configuration, while reducing flexibility. These decidsions are not easy, and we might go back to reimplementing this feature again.");
-                        //let mode = TofOperationMode::TofModeRequestReply;
-                        //
-                        //match op_mode.try_send(mode) {
-                        //  Err(err) => trace!("Error sending! {err}"),
-                        //  Ok(_)    => ()
-                        //}
-                        //let resp_good = TofResponse::Success(RESP_SUCC_FINGERS_CROSSED);
-                        //match cmd_socket.send(resp_good.to_bytestream(),0) {
-                        //  Err(err) => warn!("Can not send response! Err {err}"),
-                        //  Ok(_)    => trace!("Resp sent!")
-                        //}
-                        continue;
-                      },
-                      TofCommand::StreamAnyEvent      (_) => {
-                        error!("This feature is deprecated in favor of having entire runs in a certain TofOperationMode. This simplifies configuration, while reducing flexibility. These decidsions are not easy, and we might go back to reimplementing this feature again.");
-                        //let mode = TofOperationMode::StreamAny;
-                        //match op_mode.try_send(mode) {
-                        //  Err(err) => trace!("Error sending! {err}"),
-                        //  Ok(_)    => ()
-                        //}
-                        //let resp_good = TofResponse::Success(RESP_SUCC_FINGERS_CROSSED);
-                        //match cmd_socket.send(resp_good.to_bytestream(),0) {
-                        //  Err(err) => warn!("Can not send response! Err {err}"),
-                        //  Ok(_)    => trace!("Resp sent!")
-                        //}
-                        continue;
-                      },
-                      TofCommand::DataRunStart (_max_event) => {
-                        // let's start a run. The value of the TofCommnad shall be 
-                        // nevents
-                        println!("==> Will initialize new run!");
-                        let rc    = get_runconfig(&run_config_file);
-                        match run_config.send(rc) {
-                          Err(err) => error!("Error initializing run! {err}"),
-                          Ok(_)    => ()
-                        };
-                        let resp_good = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed as u32);
-                        match cmd_socket.send(resp_good.to_bytestream(),0) {
-                          Err(err) => warn!("Can not send response! Err {err}"),
-                          Ok(_)    => trace!("Resp sent!")
-                        }
-                      },
-                      TofCommand::DataRunStop(_)   => {
-                        println!("Received command to end run!");
-                        // default is not active for run config
-
-                        let  rc = RunConfig::new();
-                        match run_config.send(rc) {
-                          Err(err) => error!("Error stopping run! {err}"),
-                          Ok(_)    => ()
-                        }
-                        // send response later 
-
-                      //  if !self.run_active {
-                      //    return Ok(TofResponse::GeneralFail(RESP_ERR_NORUNACTIVE));
-                      //  }
-                      //  warn!("Will kill current run!");
-                      //  self.kill_chn.send(true);
-                      //  return Ok(TofResponse::Success(RESP_SUCC_FINGERS_CROSSED));
-                      },
                       // Voltage and timing calibration is connected now
+                      TofCommand::NoiCalibration (value) => {
+                        // MSB third 8 bits are RB ID
+                        let rb_id: u8 = ((value | (MASK_CMD_8BIT << 8)) >> 8) as u8;
+                        // MSB fourth 8 bits are extra (not used)
+                        let extra: u8 = (value | MASK_CMD_8BIT) as u8;
+                        
+                        let my_rb_id = get_board_id().unwrap() as u8;
+                        // if this RB is the one then do stuff
+                        if rb_id == DEFAULT_RB_ID || rb_id == my_rb_id {
+                          match rb_noi_subcalibration(&run_config, &ev_request_to_cache) {
+                            Ok(_) => (),
+                            Err(err) => {
+                              error!("Noi data taking failed! Error {err}!");
+                            }
+                          }
+
+                          let resp_good = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed as u32);
+                          match cmd_socket.send(resp_good.to_bytestream(),0) {
+                            Err(err) => warn!("Can not send response! Err {err}"),
+                            Ok(_)    => trace!("Resp sent!")
+                          }
+                        }
+                        continue;
+                      },
                       TofCommand::VoltageCalibration (value) => {
                         trace!("Got voltage calibration command with {value} value");
                         // MSB first 16 bits are voltage level
@@ -273,10 +530,78 @@ pub fn cmd_responder(cmd_server_ip             : String,
                         let rb_id: u8 = ((value | (MASK_CMD_8BIT << 8)) >> 8) as u8;
                         // MSB fourth 8 bits are extra (not used)
                         let extra: u8 = (value | MASK_CMD_8BIT) as u8;
-                        println!("Voltage_val: {}, RB ID: {}, extra: {}",voltage_val,rb_id,extra);
+                        
+                        let my_rb_id = get_board_id().unwrap() as u8;
+                        // if this RB is the one then do stuff
+                        if rb_id == DEFAULT_RB_ID || rb_id == my_rb_id {
+                          match rb_voltage_subcalibration(&run_config, &ev_request_to_cache, voltage_val) {
+                            Ok(_) => (),
+                            Err(err) => {
+                              error!("Noi data taking failed! Error {err}!");
+                            }
+                          }
+
+                          let resp_good = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed as u32);
+                          match cmd_socket.send(resp_good.to_bytestream(),0) {
+                            Err(err) => warn!("Can not send response! Err {err}"),
+                            Ok(_)    => trace!("Resp sent!")
+                          }
+                        }
                         continue;
                       },
-                      TofCommand::TimingCalibration  (_) => {
+                      TofCommand::TimingCalibration  (value) => {
+                        // MSB first 16 bits are voltage level
+                        let voltage_val: u16 = ((value | (MASK_CMD_16BIT << 16)) >> 16) as u16;
+                        // MSB third 8 bits are RB ID
+                        let rb_id: u8 = ((value | (MASK_CMD_8BIT << 8)) >> 8) as u8;
+                        // MSB fourth 8 bits are extra (not used)
+                        let extra: u8 = (value | MASK_CMD_8BIT) as u8;
+                        
+                        let my_rb_id = get_board_id().unwrap() as u8;
+                        // if this RB is the one then do stuff
+                        if rb_id == DEFAULT_RB_ID || rb_id == my_rb_id {
+                          match rb_timing_subcalibration(&run_config, &ev_request_to_cache, voltage_val) {
+                            Ok(_) => (),
+                            Err(err) => {
+                              error!("Noi data taking failed! Error {err}!");
+                            }
+                          }
+
+                          let resp_good = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed as u32);
+                          match cmd_socket.send(resp_good.to_bytestream(),0) {
+                            Err(err) => warn!("Can not send response! Err {err}"),
+                            Ok(_)    => trace!("Resp sent!")
+                          }
+                        }
+                        continue;
+                      },
+                      TofCommand::DefaultCalibration  (value) => {
+                        // MSB first 16 bits are voltage level
+                        let voltage_val: u16 = ((value | (MASK_CMD_16BIT << 16)) >> 16) as u16;
+                        // MSB third 8 bits are RB ID
+                        let rb_id: u8 = ((value | (MASK_CMD_8BIT << 8)) >> 8) as u8;
+                        // MSB fourth 8 bits are extra (not used)
+                        let extra: u8 = (value | MASK_CMD_8BIT) as u8;
+
+                        let my_rb_id = get_board_id().unwrap() as u8;
+                        // if this RB is the one then do stuff
+                        if rb_id == DEFAULT_RB_ID || rb_id == my_rb_id {
+                          match rb_calibration(&run_config, &ev_request_to_cache) {
+                            Ok(_) => (),
+                            Err(err) => {
+                              error!("Calibration failed! Error {err}!");
+                            }
+                          }
+
+                          let resp_good = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed as u32);
+                          match cmd_socket.send(resp_good.to_bytestream(),0) {
+                            Err(err) => warn!("Can not send response! Err {err}"),
+                            Ok(_)    => trace!("Resp sent!")
+                          }
+                        }
+                        continue;
+                      },
+                      TofCommand::SetRBDataBufSize   (_) => {
                         warn!("Not implemented");
                         match cmd_socket.send(resp_not_implemented,0) {
                           Err(err) => warn!("Can not send response! Err {err}"),
@@ -284,57 +609,39 @@ pub fn cmd_responder(cmd_server_ip             : String,
                         }
                         continue;
                       },
-                      TofCommand::CreateCalibrationFile (_) => {
+                      TofCommand::TriggerModeForced  (_) => {
                         warn!("Not implemented");
                         match cmd_socket.send(resp_not_implemented,0) {
-                          Err(err) => error!("Can not send response! Err {err}"),
+                          Err(err) => warn!("Can not send response! Err {err}"),
                           Ok(_)    => trace!("Resp sent!")
                         }
                         continue;
                       },
-                      TofCommand::RequestMoni (_) => {
+                      TofCommand::TriggerModeForcedMTB   (_) => {
                         warn!("Not implemented");
                         match cmd_socket.send(resp_not_implemented,0) {
-                          Err(err) => error!("Can not send response! Err {err}"),
+                          Err(err) => warn!("Can not send response! Err {err}"),
                           Ok(_)    => trace!("Resp sent!")
                         }
                         continue;
                       },
-                      TofCommand::Unknown (_) => {
+                      TofCommand::UnspoolEventCache  (_) => {
                         warn!("Not implemented");
                         match cmd_socket.send(resp_not_implemented,0) {
-                          Err(err) => error!("Can not send response! Error {err}"),
+                          Err(err) => warn!("Can not send response! Err {err}"),
                           Ok(_)    => trace!("Resp sent!")
                         }
                         continue;
-                      }
-                      _ => {
+                      },
+                      TofCommand::SystemdReboot  (_) => {
+                        warn!("Not implemented");
                         match cmd_socket.send(resp_not_implemented,0) {
-                          Err(err) => warn!("Can not send response! Error {err}"),
+                          Err(err) => warn!("Can not send response! Err {err}"),
                           Ok(_)    => trace!("Resp sent!")
                         }
                         continue;
                       }
-                    } 
-                 
-                    //// now get the response from the clients
-                    //match rsp_receiver.recv() {
-                    //  Err(err) => {
-                    //    trace!("Did not recv response!");
-                    //    warn!("Intended command receiver did not reply! Responding with Failure");
-                    //    let resp = TofResponse::GeneralFail(RESP_ERR_CMD_STUCK);
-                    //    match cmd_socket.send(resp.to_bytestream(), 0) {
-                    //      Err(err) => warn!("The command likely failed and we could not send a response. This is bad!"),
-                    //      Ok(_)    => trace!("The command likely failed, but we did not lose connection"),
-                    //    }
-                    //  },
-                    //  Ok(resp) => {
-                    //    match cmd_socket.send(resp.to_bytestream(), 0) {
-                    //      Err(err) => warn!("The command likely went through, but we could not send a response. This is bad!"),
-                    //      Ok(_)    => trace!("The command likely went through, but we did not lose connection"),
-                    //    }
-                    //  }
-                    //}
+                    }
                   }
                 }  
               },

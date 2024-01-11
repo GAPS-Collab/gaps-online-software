@@ -48,3 +48,6 @@ macaddr = {version="1.0", features = ["serde"]}
 
 #[target.armv7-unknown-linux-gnueabi]
 #linker = "/usr/bin/arm-none-eabi-gcc"
+
+# parse command line arguments
+clap = { version = "4.0", features = ["derive"] }
