@@ -10,7 +10,7 @@ This is branch HAHALUA-0.9. [Hahalua is a manta ray](https://dlnr.hawaii.gov/dar
 >Manta rays can be spotted in the Hawaiian waters. There is over 100 different individuals who have been seen in front of the Kona coast, Big Island. Please report sightings [here](https://mprf.net/identification/report-a-sighting.html), and remember to take a picture of their belly, since the spotted pattern on their underside is unique for every individual and allows to identify them. 
 
 >[!NOTE]
->Manta rays seem to be extremly intelligent, and there are indications that they might even recognize themselves in a mirror, however, [this is active research]{https://www.science.org/content/article/manta-rays-show-evidence-being-self-aware) 
+>Manta rays seem to be extremly intelligent, and there are indications that they might even recognize themselves in a mirror, however, [this is active research](https://www.science.org/content/article/manta-rays-show-evidence-being-self-aware) 
 
 This branch is the last version before we claim flight-readiness, which will be our first "true" release.
 The main purpose of this branch is to merge the command suite with what we learned from the UCLA teststand.
