@@ -409,7 +409,8 @@ PYBIND11_MODULE(gaps_tof, m) {
     
     py::class_<TofEvent>(m, "TofEvent")
         .def(py::init())
-        //.def_readonly("header"              ,&TofEvent::header)
+        .def_readonly("header"              ,&TofEvent::header,
+                "Online reconstruction and summary information")
         .def_readonly("mt_event"            ,&TofEvent::mt_event,
                 "The event information comming from the MasterTriggerBoard")
         .def_readonly("missing_hits"        ,&TofEvent::missing_hits)

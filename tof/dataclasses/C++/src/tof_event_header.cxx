@@ -1,16 +1,17 @@
 #include "events/tof_event_header.hpp"
 #include "parsers.h"
+#include "logging.hpp"
 //#include "serialization.h"
 
-#include "spdlog/spdlog.h"
+//#include "spdlog/spdlog.h"
 //#include "spdlog/cfg/env.h"
 
 TofEventHeader TofEventHeader::from_bytestream(const Vec<u8> &stream, 
                                                u64 &pos) {
-  spdlog::debug("Start decoding at pos {}", pos);
+  log_debug("Start decoding at pos {}", pos);
   u16 head = Gaps::parse_u16(stream, pos);
   if (head != TofEventHeader::HEAD)  {
-    spdlog::error("No header signature found!");  
+    log_error("No header signature found!");  
   }
   TofEventHeader header      = TofEventHeader();
   header.run_id              = Gaps::parse_u32(stream, pos);
@@ -34,7 +35,7 @@ TofEventHeader TofEventHeader::from_bytestream(const Vec<u8> &stream,
   header.n_paddles           = Gaps::parse_u8(stream, pos); 
   u16 tail                   = Gaps::parse_u16(stream, pos);
   if (tail != TAIL) {
-    spdlog::error("TAIL signature not found! Got {} instead.", tail);
+    log_error("TAIL signature not found! Got {} instead.", tail);
   }
   return header;
 } 

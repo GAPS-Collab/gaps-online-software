@@ -5,7 +5,7 @@
 
 #include "serialization.h"
 #include "parsers.h"
-
+#include "logging.hpp"
 #include "io.hpp"
 
 /***************************************************/
@@ -18,14 +18,14 @@ Vec<RBEventHeader> get_rbeventheaders(const String &filename, bool is_headers) {
   bytestream stream = get_bytestream_from_file(filename); 
   bool has_ended = false;
   auto pos = search_for_2byte_marker(stream,0xAA, has_ended );
-  spdlog::info("Read {} bytes from {}", stream.size(), filename);
-  spdlog::info("For 8+1 channels and RB compression level 0, this mean a max number of events of {}", stream.size()/18530.0);
+  log_info("Read " << stream.size() << " bytes from " << filename);
+  log_info("For 8+1 channels and RB compression level 0, this mean a max number of events of {}", stream.size()/18530.0);
   while (!has_ended) {
     RBEventHeader header;
     if (is_headers) {
       header = RBEventHeader::from_bytestream(stream, pos);
     } else {
-      spdlog::error("Can not deal with this!");
+      log_error("Can not deal with this!");
       //header = RBEventHeader::extract_from_rbbinarydump(stream, pos);
     }
     //header.broken ? n_bad++ : n_good++ ;
@@ -37,7 +37,7 @@ Vec<RBEventHeader> get_rbeventheaders(const String &filename, bool is_headers) {
     //  std::cout << (u32)header.channel_mask << std::endl;
     //}
   }
-  spdlog::info("Retrieved {} good headers, but {} of which we had to set the `broken` flag", n_good, n_bad);
+  log_info("Retrieved {} good headers, but {} of which we had to set the `broken` flag", n_good, n_bad);
   return headers;
 }
 
@@ -71,9 +71,7 @@ Vec<TofPacket> get_tofpackets(const Vec<u8> &bytestream, u64 start_pos) {
   u64 n_packets = 0;
   while (true) {
     packet = TofPacket::from_bytestream(bytestream, pos);
-    //if (n_packets == 100) {break;}
     if (pos != last_pos) {
-      //spdlog::info("pos: {}", pos);
       packets.push_back(packet);
       n_packets += 1;
     } else {
@@ -81,7 +79,7 @@ Vec<TofPacket> get_tofpackets(const Vec<u8> &bytestream, u64 start_pos) {
     }
     last_pos = pos;
   }
-  spdlog::info("Read out {} packets from bytestream!", n_packets);
+  log_info("Read out " << n_packets << " packets from bytestream!");
   return packets;
 }
 
@@ -93,11 +91,11 @@ Vec<TofPacket> get_tofpackets(const String filename) {
   bool has_ended = false;
   auto pos = search_for_2byte_marker(stream,0xAA, has_ended );
   if (has_ended) {
-    spdlog::error("The stream ended before we found any header marker!");
+    log_error("The stream ended before we found any header marker!");
   } else {
-    spdlog::info("Found the first header at pos {}", pos);
+    log_debug("Found the first header at pos " << pos);
   }
-  spdlog::info("Read {} bytes from {}", stream.size(), filename);
+  log_debug("Read " << stream.size() << " bytes from " << filename);
   return get_tofpackets(stream, pos);
 }
 
@@ -108,7 +106,7 @@ Vec<RBEventMemoryView> get_rbeventmemoryviews(const String &filename, bool omit_
   auto stream = get_bytestream_from_file(filename); 
   bool has_ended = false;
   auto pos = search_for_2byte_marker(stream,0xAA, has_ended );
-  spdlog::info("Read {} bytes from {}", stream.size(), filename);
+  log_info("Read {} bytes from {}", stream.size(), filename);
   return get_rbeventmemoryviews(stream, pos, omit_duplicates);
 }
 
@@ -118,9 +116,9 @@ Vec<RBEventMemoryView> get_rbeventmemoryviews(const Vec<u8> &bytestream,
                                               u64 start_pos,
                                               bool omit_duplicates) {
   u64 nevents_in_stream = (float)bytestream.size()/RBEventMemoryView::SIZE;
-  spdlog::info("There might be at max {} events in the stream", nevents_in_stream);
+  log_info("There might be at max {} events in the stream", nevents_in_stream);
   if (omit_duplicates) {
-    spdlog::warn("Will try to elimiinate duplicate events. This might come at a performance cost!");
+    log_warn("Will try to elimiinate duplicate events. This might come at a performance cost!");
   }
   Vec<u32> eventid_registry = Vec<u32>();
   usize n_duplicates        = 0;
@@ -166,11 +164,11 @@ Vec<RBEventMemoryView> get_rbeventmemoryviews(const Vec<u8> &bytestream,
     events.push_back(event);
     n_events_decoded++;
   }
-  spdlog::info("Retrieved {} events from stream!", n_events_decoded);
+  log_info("Retrieved {} events from stream!", n_events_decoded);
   if (n_duplicates > 0) {
-    spdlog::warn("We have seen {} duplicate events!", n_duplicates);
+    log_warn("We have seen {} duplicate events!", n_duplicates);
   }
-  spdlog::info("{} times a header with no corresponding footer was found. This does not necessarily mean there is a problem, instead it could also be padding bytes introduced due to wrapper packages.", corrupt_events);
+  log_info("{} times a header with no corresponding footer was found. This does not necessarily mean there is a problem, instead it could also be padding bytes introduced due to wrapper packages.", corrupt_events);
   return events;
   //u64 pos  = start_pos;
   //Vec<RBEventMemoryView> events;
@@ -181,7 +179,7 @@ Vec<RBEventMemoryView> get_rbeventmemoryviews(const Vec<u8> &bytestream,
   //usize nevents = 0;
   //usize nbytes_read = 0;
   //if (stream.size() < RBEventMemoryView::SIZE) {
-  //  spdlog::error("Stream of {} bytes is shorter than a single event ({} bytes)!", 
+  //  log_error("Stream of {} bytes is shorter than a single event ({} bytes)!", 
   //                 stream.size(), RBEventMemoryView::SIZE);
   //  return events;
   //}
@@ -200,7 +198,7 @@ Vec<RBEventMemoryView> get_rbeventmemoryviews(const Vec<u8> &bytestream,
   //    break;
   //  }
   //}
-  //spdlog::info("Retried {} RBEventMemoryViews from file!", nevents);
+  //log_info("Retried {} RBEventMemoryViews from file!", nevents);
   //return events;
 }
 
@@ -221,18 +219,18 @@ Vec<TofEvent> unpack_tofevents_from_tofpackets(const Vec<u8> &bytestream, u64 st
     //if (n_packets == 100) {break;}
     if (pos != last_pos) {
       if (packet.packet_type == PacketType::TofEvent) {
-        //spdlog::info("Got packet with payload {}", packet.payload.size());  
+        //log_info("Got packet with payload {}", packet.payload.size());  
         event = TofEvent::from_tofpacket(packet);
         events.push_back(event);
       }
-      //spdlog::info("pos: {}", pos);
+      //log_info("pos: {}", pos);
       //packets.push_back(packet);
       //n_packets += 1;
     } else {
       break;
     }
   }
-  spdlog::info("Read {} TofEvents!", events.size());
+  log_info("Read " << events.size() << " TofEvents!");
   return events;
 }
 
@@ -241,11 +239,11 @@ Vec<TofEvent> unpack_tofevents_from_tofpackets(const Vec<u8> &bytestream, u64 st
 Vec<TofEvent> unpack_tofevents_from_tofpackets(const String filename) {
   Vec<TofEvent> events = Vec<TofEvent>();
   auto stream = get_bytestream_from_file(filename); 
-  spdlog::debug("Read {} bytes from {}", stream.size(), filename);
+  log_debug("Read {} bytes from {}", stream.size(), filename);
   bool has_ended = false;
   auto pos = search_for_2byte_marker(stream, 0xAA, has_ended );
   if (has_ended) {
-    spdlog::error("Opened file {}, but no start marker {} could be found indicating that this file is no good!",filename, TofPacket::HEAD);
+    log_error("Opened file {}, but no start marker {} could be found indicating that this file is no good!",filename, TofPacket::HEAD);
     return events;
   }
   return unpack_tofevents_from_tofpackets(stream, pos);
@@ -275,7 +273,7 @@ Vec<u8> read_chunk(const String& filename, usize offset) {
     buffer.insert(buffer.end(), chunk, chunk + file.gcount());
   } else if (!file) {
     // Error occurred while reading the file
-    spdlog::error("Failed to read file: {}", filename);
+    log_error("Failed to read file " << filename);
     buffer.clear();
   }
   return buffer;
@@ -284,10 +282,10 @@ Vec<u8> read_chunk(const String& filename, usize offset) {
 
 Gaps::TofPacketReader::TofPacketReader(String filename) {
   if (fs::exists(filename)) {
-    spdlog::info("Will read packets from {}", filename);
+    log_info("Will read packets from " << filename);
     filename_ = filename;
   } else {
-    spdlog::error("File {} does not exist!", filename); 
+    log_error("File " << filename << " does not exist!"); 
     filename_ = "";
     return;
   }

@@ -80,7 +80,7 @@ struct TofPacket {
   u16 tail = 0x5555;
 
   // head (2) + tail (2) + type (1) + payload size (4)
-  u8  p_size_fixed = 9;
+  //u8  p_size_fixed = 9;
   PacketType  packet_type; 
   // just the size of the payload, 
   // not including type, header or tail
@@ -88,8 +88,7 @@ struct TofPacket {
 
   Vec<u8> payload;
 
-  //Vec<u8> to_bytestream() const;
-
+  TofPacket();
   /**
    * Transcode from bytestream
    *

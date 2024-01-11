@@ -1,6 +1,6 @@
 #! /bin/sh
 export PATH=$PATH:@CMAKE_INSTALL_PREFIX@/bin
-export PYTHONPATH=$PYTHONPATH:@CMAKE_INSTALL_PREFIX@/python:@CMAKE_INSTALL_PREFIX@/gaps-db/gaps_db
+export PYTHONPATH=$PYTHONPATH:@CMAKE_INSTALL_PREFIX@/python:@CMAKE_CURRENT_SOURCE_DIR@/gaps-db/gaps_db
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:@CMAKE_INSTALL_PREFIX@/lib
 export DJANGO_SETTINGS_MODULE=gaps_db.settings
 
@@ -10,8 +10,8 @@ echo -e "  * WELCOME TO GAPS-ONLINE-SOFTWARE V0.8 'NIUHI' *"
 echo -e "  ************************************************"
 echo -e "   -- We have set the following variables:"
 echo -e "   -- PYTHONPATH=$PYTHONPATH"
-echo -e "   -- PATH=$PATH"
-echo -e "   -- LD_LIBRARY_PATH=$LD_LIBRARY_PATH"
+echo -e "   -- PATH=${PATH//:/\\n  }"
+echo -e "   -- LD_LIBRARY_PATH=${LD_LIBRARY_PATH//:/\\n  }"
 echo -e "  ********************************************"
 echo -e "   => software repository:"
 echo -e "      - https://github.com/GAPS-Collab/gaps-online-software"
