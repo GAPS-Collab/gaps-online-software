@@ -124,7 +124,9 @@ if (BUILD_LIFTOF)
   install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tof/liftof/target/doc/ DESTINATION ${CMAKE_INSTALL_PREFIX}/doc/RustAPI/)
 endif()
 
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/gaps-db/gaps_db/ DESTINATION ${INSTALL_PYTHON_DIR})
+# don't install it. Django get's confused when copied/symlinked. Let's just use it from source 
+# and set the PYTHONPATH in the setup-env accordingly
+#install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/gaps-db/gaps_db/ DESTINATION ${INSTALL_PYTHON_DIR})
 
 ###################################
 # Write setup-env.sh shell script
