@@ -10,14 +10,12 @@ use std::time::{
 
 use ratatui::{
     symbols,
-    backend::{Backend,CrosstermBackend},
     layout::{Alignment, Constraint, Direction, Layout, Rect},
     style::{Color, Modifier, Style},
-    text::{Span, Text},
+    text::Span,
     terminal::Frame,
     widgets::{
-        Block, Dataset, Sparkline, Axis, GraphType, BorderType, Chart, BarChart, Borders, Cell, List, ListItem, ListState, Paragraph, Row, Table, Tabs,    },
-    Terminal,
+        Block, Dataset, Axis, GraphType, BorderType, Chart, BarChart, Borders, Paragraph, },
 };
 
 extern crate crossbeam_channel;
@@ -32,7 +30,6 @@ use tof_dataclasses::errors::SerializationError;
 use tof_dataclasses::serialization::Serialization;
 
 use crate::colors::{
-    ColorTheme,
     ColorTheme2,
 };
 
@@ -271,11 +268,8 @@ impl MTTab {
       }
       vec_index += 1;
     }
-    bins.retain(|&(x,y)| x <= max_pop_bin);
+    bins.retain(|&(x,_)| x <= max_pop_bin);
     let mut bins_for_bc = Vec::<(&str, u64)>::new();
-    //let mut label;
-    let mut labels = Vec::<&str>::with_capacity(vec_index as usize);
-    //let mut n_iter = 0;
     debug!("bins: {:?}", bins);
     for n in bins.iter() {
       bins_for_bc.push((HIST_LABELS[n.0 as usize], n.1));

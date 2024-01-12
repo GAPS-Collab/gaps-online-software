@@ -25,14 +25,12 @@ use std::sync::{
 use std::thread;
 use std::time::{Duration, Instant};
 use std::io;
-use std::path::{Path, PathBuf};
 use std::collections::{VecDeque, HashMap};
 #[macro_use] extern crate log;
 
 extern crate json;
 
 extern crate histo;
-use histo::Histogram;
 
 use tui_logger::TuiLoggerWidget;
 
@@ -48,14 +46,11 @@ use crossbeam_channel::{unbounded,
 
 
 use ratatui::{
-    symbols,
     backend::CrosstermBackend,
-    layout::{Alignment, Constraint, Direction, Layout, Rect},
-    terminal::Frame,
-    style::{Color, Modifier, Style},
-    text::{Span, Text},
+    layout::{Constraint, Direction, Layout, Rect},
+    style::{Color, Style},
     widgets::{
-        Block, Borders, ListState, Paragraph, Row, Table, Tabs,    },
+        Block, Borders, },
     Terminal,
 };
 
@@ -67,8 +62,6 @@ use tof_dataclasses::events::{
     MasterTriggerEvent,
     RBEvent,
 };
-use tof_dataclasses::monitoring::MtbMoniData;
-use tof_dataclasses::manifest::ReadoutBoard;
 
 use crate::tab_mt::{
     MTTab,

@@ -8,14 +8,8 @@ use std::sync::{
 };
 use ratatui::prelude::*;
 
-use ratatui::symbols;
-use ratatui::text::Span;
 use ratatui::terminal::Frame;
 use ratatui::layout::Rect;
-use ratatui::style::{
-    Color,
-    Style,
-};
 use ratatui::widgets::{
     Block,
     BorderType,
