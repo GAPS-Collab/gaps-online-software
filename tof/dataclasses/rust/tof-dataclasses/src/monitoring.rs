@@ -983,7 +983,7 @@ impl Default for CPUMoniData {
 
 impl fmt::Display for CPUMoniData {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(f, "<CPUMoniData:\n
+    write!(f, "<CPUMoniData:
   core0   temp [\u{00B0}C] : {:.2} 
   core1   temp [\u{00B0}C] : {:.2} 
   CPU     temp [\u{00B0}C] : {:.2} 

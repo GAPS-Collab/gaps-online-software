@@ -149,7 +149,7 @@ fn main() {
   match args.json_config {
     None => panic!("No .json config file provided! Please provide a config file with --json-config or -j flag!"),
     Some(_) => {
-      json_content = std::fs::read_to_string(args.json_config.as_ref().unwrap()).expect("Can not open json file");
+      json_content = std::fs::read_to_string(args.json_config.as_ref().unwrap()).expect("Can not open json file to load configuration!");
       config = json::parse(&json_content).expect("Unable to parse json file");
     } // end Some
   } // end match
@@ -171,9 +171,9 @@ fn main() {
   let runid                 = config["run_id"]          .as_usize() .unwrap(); 
   let mut write_stream_path = config["data_dir"]        .as_str()   .expect("Need to know where data should be stored. Please add 'data_dir' to the configuration file!").to_owned();
   let calib_file_path       = config["calibration_dir"] .as_str()   .expect("Need to know wher calibraton should be stored. Please add 'calib_file_path' to the configuration file!").to_owned();
-  let runtime_nseconds      = config["runtime_seconds"] .as_f32()   .unwrap_or(0.0);
+  let runtime_nseconds      = config["runtime_seconds"]  .as_f32()  .unwrap_or(0.0);
   let write_npack_file      = config["packets_per_file"] .as_usize().unwrap_or(10000);
-  //let db_path               = Path::new(config["db_path"].as_str()  .expect("Need to know where the local sqlite database is stored. Please add 'db_path' to the configuration file!"));
+  //let db_path             = Path::new(config["db_path"].as_str()  .expect("Need to know where the local sqlite database is stored. Please add 'db_path' to the configuration file!"));
   let mtb_moni_interval     = config["mtb_moni_interval"].as_u64()  .unwrap_or(10);
   let cpu_moni_interval     = config["cpu_moni_interval"].as_u64()  .unwrap_or(20);
   let nrb_failsafe : Option<usize> 
