@@ -6,18 +6,8 @@
 //!
 
 
-//mod tab_commands;
-mod tab_mt;
-mod tab_home;
-mod tab_status;
-mod menu;
-mod colors;
-mod widgets;
-mod tab_settings;
-mod tab_events;
 
 use std::sync::{
-    mpsc,
     Arc,
     Mutex,
 };
@@ -25,14 +15,12 @@ use std::sync::{
 use std::thread;
 use std::time::{Duration, Instant};
 use std::io;
-use std::path::{Path, PathBuf};
 use std::collections::{VecDeque, HashMap};
 #[macro_use] extern crate log;
 
 extern crate json;
 
 extern crate histo;
-use histo::Histogram;
 
 use tui_logger::TuiLoggerWidget;
 
@@ -48,52 +36,24 @@ use crossbeam_channel::{unbounded,
 
 
 use ratatui::{
-    symbols,
     backend::CrosstermBackend,
-    layout::{Alignment, Constraint, Direction, Layout, Rect},
-    terminal::Frame,
-    style::{Color, Modifier, Style},
-    text::{Span, Text},
+    layout::{Constraint, Direction, Layout, Rect},
+    style::{Color, Style},
     widgets::{
-        Block, Borders, ListState, Paragraph, Row, Table, Tabs,    },
+        Block, Borders, },
     Terminal,
 };
 
 
 
-use tof_dataclasses::commands::{TofCommand, TofResponse};
 use tof_dataclasses::packets::{TofPacket, PacketType};
 use tof_dataclasses::serialization::Serialization;
 use tof_dataclasses::events::{
     MasterTriggerEvent,
     RBEvent,
 };
-use tof_dataclasses::monitoring::MtbMoniData;
-use tof_dataclasses::manifest::ReadoutBoard;
 
-use crate::tab_mt::{
-    MTTab,
-};
-
-use crate::tab_settings::{
-    SettingsTab,
-};
-
-use crate::tab_home::{
-    HomeTab,
-};
-
-use crate::tab_events::{
-    EventTab,
-};
-
-use crate::tab_status::{
-    //StatusTab,
-    RBTab,
-    RBTabView
-};
-
-use crate::menu::{
+use liftof_tui::menu::{
     MenuItem,
     MainMenu,
     RBMenuItem,
@@ -102,13 +62,19 @@ use crate::menu::{
     SettingsMenu,
 };
 
-use crate::colors::{
-    ColorTheme,
+use liftof_tui::colors::{
     ColorTheme2,
-    COLORSETBW,
-    COLORSETOMILU,
+    COLORSETOMILU, // current default
 };
 
+use liftof_tui::{
+    EventTab,
+    HomeTab,
+    SettingsTab,
+    RBTab,
+    RBTabView,
+    MTTab
+};
 
 extern crate clap;
 use clap::{arg,
@@ -122,16 +88,14 @@ use clap::{arg,
 #[derive(Parser, Debug)]
 #[command(author = "J.A.Stoessl", version, about, long_about = None)]
 struct Args {
-  /// Don't discover readoutboards, but connect to some 
-  /// local fake instances instead.
-  #[arg(short, long, default_value_t = false)]
-  debug_local: bool,
-  /// Autodiscover connected readoutboards
-  #[arg(short, long, default_value_t = false)]
-  autodiscover_rb: bool,
-  /// A json config file with detector information
-  #[arg(short, long)]
-  json_config: Option<std::path::PathBuf>,
+  /// Adjust the rendering rate for the application in Hz
+  /// The higher the rate, the more strenous on the 
+  /// system, but the more responsive it gets.
+  /// On a decent system 1kHz should be ok.
+  /// If screen flickering appears, try to change
+  /// this parameter. 
+  #[arg(short, long, default_value_t = 1000.0)]
+  refresh_rate: f32,
 }
 
 enum Event<I> {
@@ -249,6 +213,7 @@ fn packet_sorter(packet_type : &PacketType,
       }
     },
     Err(err) => {
+      error!("Can't lock shared memory! {err}");
     }
   }
 }
@@ -403,6 +368,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let (mte_send, mte_recv)         : (Sender<MasterTriggerEvent>, Receiver<MasterTriggerEvent>) = unbounded();
   let (rbe_send, rbe_recv)         : (Sender<RBEvent>, Receiver<RBEvent>) = unbounded();
 
+  //let (_tx, _rx)                     : (Sender<Event>, Receiver<Event<I>>) = unbounded();
 
   // FIXME - spawn a new thread per each tab!
   let _packet_recv_thread = thread::Builder::new()
@@ -426,14 +392,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   tui_logger::set_default_level(log::LevelFilter::Info);
   
   let args = Args::parse();                   
-  let mission_elapsed_time  = Instant::now();
- 
-  let (rsp_to_main, rsp_from_cmdr) :
-    (Sender<Vec<Option<TofResponse>>>, Receiver<Vec<Option<TofResponse>>>) = unbounded();
-  //let ev_to_main, ev_from_thread) : Sender
-  let (rb_id_to_receiver, rb_id_from_main) : (Sender<u8>, Receiver<u8>) = unbounded();
-
-
+  
   // set up the terminal
   enable_raw_mode().expect("Unable to enter raw mode");
   let stdout       = io::stdout();
@@ -441,7 +400,8 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let mut terminal = Terminal::new(backend)?;
   terminal.clear()?;
   
-  let (tx, rx) = mpsc::channel();
+  //let (tx, rx) = mpsc::channel();
+  let (tx, rx) = unbounded();
 
   // heartbeat, keeps it going
   let _heartbeat_thread = thread::Builder::new()
@@ -449,7 +409,8 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
     .spawn(move || {
                      // change this to make it more/less 
                      // responsive
-                     let tick_rate = Duration::from_millis(1);
+                     let refresh_perioad = 1000.0/args.refresh_rate as f32;
+                     let tick_rate = Duration::from_millis(refresh_perioad.round() as u64);
                      let mut last_tick = Instant::now();
                      loop {
                        let timeout = tick_rate
@@ -496,7 +457,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   // FIXME - multithread it
   loop {
     match mt_tab2.receive_packet() {
-      Err(err) => error!("Can not receive TofPackets for MTTab!"),
+      Err(err) => error!("Can not receive TofPackets for MTTab! {err}"),
       Ok(_)    => ()
     }
     match wf_tab.receive_packet() {
@@ -678,7 +639,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
         }
       }
     }) {
-      Err(err) => error!("Can't render terminal!"),
+      Err(err) => error!("Can't render terminal! {err}"),
       Ok(_)    => () ,
     }
     // end terminal.draw

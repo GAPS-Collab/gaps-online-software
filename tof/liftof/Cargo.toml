@@ -11,3 +11,6 @@ members = [
 [profile.release]
 opt-level = 3
 
+[workspace.metadata]
+authors     = ["J.A. Stoessl <stoessl@hawaii.edu>", "Paolo Lazzaroni <paolo.lazzaroni@unibg.it>", "Jeff Zweerink <zweering@astro.ucla.edu>"]
+description = "The liftof suite comprises programs and tools to control the GAPS TOF system and acquire data"

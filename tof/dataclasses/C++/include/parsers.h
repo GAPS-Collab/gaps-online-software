@@ -14,14 +14,6 @@ Vec<T> slice(const Vec<T>& vec, usize start, usize end) {
   return Vec<T>(vec.begin() + start, vec.begin() + end);
 }
 
-[[deprecated("Use parse_u16 instead!")]]
-u16 u16_from_le_bytes(const Vec<u8> &bytestream,
-                      u64 &pos);
-
-[[deprecated("Will go away!")]]
-void u16_to_le_bytes(const u16 value, 
-                     Vec<u8> &bytestream,
-                     usize &pos);
 
 
 

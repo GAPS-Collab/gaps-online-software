@@ -17,12 +17,22 @@ u8 Gaps::parse_u8(const Vec<u8> &bytestream,
 
 u16 Gaps::parse_u16(const Vec<u8> &bytestream,
                     u64 &pos) {
-  return Gaps::u16_from_le_bytes(bytestream, pos);
+  u16 value = (u16)(
+        ((bytestream[pos+1] & 0xFF) << 8)
+      |  (bytestream[pos]));
+  pos += 2;
+  return value;
 }
 
 u32 Gaps::parse_u32(const Vec<u8> &bytestream,
                     u64 &pos) {
-  return Gaps::u32_from_le_bytes(bytestream, pos);
+  u32 value = (u32)(
+         ((bytestream[pos+3] & 0xFF) << 24)
+      |  ((bytestream[pos+2] & 0xFF) << 16)
+      |  ((bytestream[pos+1] & 0xFF) << 8)
+      |   (bytestream[pos+0]));
+  pos += 4;
+  return value;
 }
 
 u64 Gaps::parse_u64(const Vec<u8> &bytestream,
@@ -61,22 +71,7 @@ f64 Gaps::parse_f64(const Vec<u8> &bytestream,
   return result;
 }
 
-u16 Gaps::u16_from_le_bytes(const Vec<u8> &bytestream,
-                            u64 &pos) {
-  u16 value = (u16)(
-        ((bytestream[pos+1] & 0xFF) << 8)
-      |  (bytestream[pos]));
-  pos += 2;
-  return value;
-}
 
-void Gaps::u16_to_le_bytes(const u16 value, 
-                     Vec<u8> &bytestream,
-                     usize &pos) {
-  bytestream[pos + 1] = (value >> 8)  & 0xFF;
-  bytestream[pos] = value & 0xFF;
-  pos += 2;
-}
 
 u32 Gaps::u32_from_le_bytes(const Vec<u8> &bytestream,
                             usize &pos) {

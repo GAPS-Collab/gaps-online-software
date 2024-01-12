@@ -2,7 +2,6 @@ use std::collections::VecDeque;
 
 use ratatui::symbols;
 use ratatui::text::Span;
-use ratatui::terminal::Frame;
 use ratatui::style::{
     Color,
     Style,

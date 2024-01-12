@@ -56,16 +56,16 @@ use tof_dataclasses::calibrations::{
 };
 use tof_dataclasses::packets::{TofPacket,
                                PacketType};
-use tof_dataclasses::errors::{SerializationError,
-                              AnalysisError, SetError};
-use tof_dataclasses::serialization::{Serialization};
+use tof_dataclasses::errors::{
+    AnalysisError,
+    SetError
+};
+use tof_dataclasses::serialization::Serialization;
 use tof_dataclasses::commands::RBCommand;
 use tof_dataclasses::events::{
     RBEvent,
     TofHit,
 };
-use tof_dataclasses::io::TofPacketReader;
-
 use tof_dataclasses::events::tof_hit::Peak;
 
 use tof_dataclasses::analysis::{calculate_pedestal,
@@ -99,10 +99,10 @@ pub const LIFTOF_LOGO_SHOW  : &str  = "
       \\::/  /        /:/  /     \\:\\__\\          \\:\\__\\      \\::/  /       \\:\\__\\    
        \\/__/         \\/__/       \\/__/           \\/__/       \\/__/         \\/__/    
 
-          (LIFTOF - liftof is for tof, Version 0.8 'NIUHI', Dec 2023)
+          (LIFTOF - liftof is for tof, Version 0.9 'HAHALUA', Dec 2023)
 
           * Documentation
-          ==> GitHub   https://github.com/GAPS-Collab/gaps-online-software/tree/NIUHI-0.8
+          ==> GitHub   https://github.com/GAPS-Collab/gaps-online-software/tree/HAHALUA-0.9
           ==> API docs https://gaps-collab.github.io/gaps-online-software/
 
   ";

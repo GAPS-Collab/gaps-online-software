@@ -36,66 +36,6 @@ pub mod tests {
     }
   }
   
-  #[test]
-  fn serialization_circle_test_for_rbmonidata() {
-    // try this 100 times
-    for _n in 0..100 {
-      let moni       = RBMoniData::from_random();
-      let moni_ser   = moni.to_bytestream();
-      let mut pos = 0usize;
-      //println!("{:?}", moni_ser);
-      let foo = search_for_u16(RBMoniData::HEAD, &moni_ser, 0); 
-      //println!("{:?}", foo);
-      let mut moni_deser = RBMoniData::from_bytestream(&moni_ser, &mut pos);
-      //println!("After ser/deser {}", rb_bin_deser.as_ref().unwrap());
-      match moni_deser {
-        Ok(_) => (),
-        Err(err)   => println!("Can not deserialize RBMoniData! {err}")
-      }
-      pos = 0;
-      moni_deser = RBMoniData::from_bytestream(&moni_ser, &mut pos);
-      let result = moni_deser.unwrap(); 
-      assert_eq!(result.board_id          ,moni.board_id           );
-      assert_eq!(result.rate              ,moni.rate               );
-      assert_eq!(result.tmp_drs           ,moni.tmp_drs            );
-      assert_eq!(result.tmp_clk           ,moni.tmp_clk            );
-      assert_eq!(result.tmp_adc           ,moni.tmp_adc            );
-      assert_eq!(result.tmp_zynq          ,moni.tmp_zynq           );
-      assert_eq!(result.tmp_lis3mdltr     ,moni.tmp_lis3mdltr      );
-      assert_eq!(result.tmp_bm280         ,moni.tmp_bm280          );
-      assert_eq!(result.pressure          ,moni.pressure           );
-      assert_eq!(result.humidity          ,moni.humidity           );
-      assert_eq!(result.mag_x             ,moni.mag_x              );
-      assert_eq!(result.mag_y             ,moni.mag_y              );
-      assert_eq!(result.mag_z             ,moni.mag_z              );
-      assert_eq!(result.mag_tot           ,moni.mag_tot            );
-      assert_eq!(result.drs_dvdd_voltage  ,moni.drs_dvdd_voltage   );
-      assert_eq!(result.drs_dvdd_current  ,moni.drs_dvdd_current   );
-      assert_eq!(result.drs_dvdd_power    ,moni.drs_dvdd_power     );
-      assert_eq!(result.p3v3_voltage      ,moni.p3v3_voltage       );
-      assert_eq!(result.p3v3_current      ,moni.p3v3_current       );
-      assert_eq!(result.p3v3_power        ,moni.p3v3_power         );
-      assert_eq!(result.zynq_voltage      ,moni.zynq_voltage       );
-      assert_eq!(result.zynq_current      ,moni.zynq_current       );
-      assert_eq!(result.zynq_power        ,moni.zynq_power         );
-      assert_eq!(result.p3v5_voltage      ,moni.p3v5_voltage       );
-      assert_eq!(result.p3v5_current      ,moni.p3v5_current       );
-      assert_eq!(result.p3v5_power        ,moni.p3v5_power         );
-      assert_eq!(result.adc_dvdd_voltage  ,moni.adc_dvdd_voltage   );
-      assert_eq!(result.adc_dvdd_current  ,moni.adc_dvdd_current   );
-      assert_eq!(result.adc_dvdd_power    ,moni.adc_dvdd_power     );
-      assert_eq!(result.adc_avdd_voltage  ,moni.adc_avdd_voltage   );
-      assert_eq!(result.adc_avdd_current  ,moni.adc_avdd_current   );
-      assert_eq!(result.adc_avdd_power    ,moni.adc_avdd_power     );
-      assert_eq!(result.drs_avdd_voltage  ,moni.drs_avdd_voltage   );
-      assert_eq!(result.drs_avdd_current  ,moni.drs_avdd_current   );
-      assert_eq!(result.drs_avdd_power    ,moni.drs_avdd_power     );
-      assert_eq!(result.n1v5_voltage      ,moni.n1v5_voltage       );
-      assert_eq!(result.n1v5_current      ,moni.n1v5_current       );
-      assert_eq!(result.n1v5_power        ,moni.n1v5_power         );
-      assert_eq!(result, moni);
-    }
-  }
 
   #[test]
   fn serialization_circle_test_for_rbeventheader() {

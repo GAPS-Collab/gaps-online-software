@@ -8,6 +8,12 @@
 #include "logging.hpp"
 #include "io.hpp"
 
+namespace fs = std::filesystem;
+
+// has to be larger than max packet size
+const usize CHUNK_SIZE = 20000;
+
+
 /***************************************************/
 
 Vec<RBEventHeader> get_rbeventheaders(const String &filename, bool is_headers) {
@@ -19,7 +25,7 @@ Vec<RBEventHeader> get_rbeventheaders(const String &filename, bool is_headers) {
   bool has_ended = false;
   auto pos = search_for_2byte_marker(stream,0xAA, has_ended );
   log_info("Read " << stream.size() << " bytes from " << filename);
-  log_info("For 8+1 channels and RB compression level 0, this mean a max number of events of {}", stream.size()/18530.0);
+  log_info("For 8+1 channels and RB compression level 0, this mean a max number of events of " << stream.size()/18530.0);
   while (!has_ended) {
     RBEventHeader header;
     if (is_headers) {
@@ -37,7 +43,7 @@ Vec<RBEventHeader> get_rbeventheaders(const String &filename, bool is_headers) {
     //  std::cout << (u32)header.channel_mask << std::endl;
     //}
   }
-  log_info("Retrieved {} good headers, but {} of which we had to set the `broken` flag", n_good, n_bad);
+  log_info("Retrieved " << n_good << " good headers, but " << n_bad << " of which we had to set the `broken` flag");
   return headers;
 }
 
@@ -87,6 +93,10 @@ Vec<TofPacket> get_tofpackets(const Vec<u8> &bytestream, u64 start_pos) {
 
 Vec<TofPacket> get_tofpackets(const String filename) {
   spdlog::cfg::load_env_levels();
+  if (!fs::exists(filename)) {
+    log_fatal("Can't open " << filename << " since it does not exist!");
+  }
+
   auto stream = get_bytestream_from_file(filename); 
   bool has_ended = false;
   auto pos = search_for_2byte_marker(stream,0xAA, has_ended );
@@ -106,7 +116,7 @@ Vec<RBEventMemoryView> get_rbeventmemoryviews(const String &filename, bool omit_
   auto stream = get_bytestream_from_file(filename); 
   bool has_ended = false;
   auto pos = search_for_2byte_marker(stream,0xAA, has_ended );
-  log_info("Read {} bytes from {}", stream.size(), filename);
+  log_debug("Read " << stream.size() << " bytes from " <<  filename);
   return get_rbeventmemoryviews(stream, pos, omit_duplicates);
 }
 
@@ -116,7 +126,7 @@ Vec<RBEventMemoryView> get_rbeventmemoryviews(const Vec<u8> &bytestream,
                                               u64 start_pos,
                                               bool omit_duplicates) {
   u64 nevents_in_stream = (float)bytestream.size()/RBEventMemoryView::SIZE;
-  log_info("There might be at max {} events in the stream", nevents_in_stream);
+  log_info("There might be at max " << nevents_in_stream << " events in the stream");
   if (omit_duplicates) {
     log_warn("Will try to elimiinate duplicate events. This might come at a performance cost!");
   }
@@ -148,7 +158,6 @@ Vec<RBEventMemoryView> get_rbeventmemoryviews(const Vec<u8> &bytestream,
       pos += 2; // skip header
       continue;
     }
-    //std::cout << event << std::endl;
     if (omit_duplicates) {
       auto it = std::find(eventid_registry.begin(),
                           eventid_registry.end(),
@@ -164,11 +173,11 @@ Vec<RBEventMemoryView> get_rbeventmemoryviews(const Vec<u8> &bytestream,
     events.push_back(event);
     n_events_decoded++;
   }
-  log_info("Retrieved {} events from stream!", n_events_decoded);
+  log_info("Retrieved " << n_events_decoded << " events from stream!");
   if (n_duplicates > 0) {
-    log_warn("We have seen {} duplicate events!", n_duplicates);
+    log_warn("We have seen " << n_duplicates << " duplicate events!");
   }
-  log_info("{} times a header with no corresponding footer was found. This does not necessarily mean there is a problem, instead it could also be padding bytes introduced due to wrapper packages.", corrupt_events);
+  log_info(" " << corrupt_events << " times a header with no corresponding footer was found. This does not necessarily mean there is a problem, instead it could also be padding bytes introduced due to wrapper packages.");
   return events;
   //u64 pos  = start_pos;
   //Vec<RBEventMemoryView> events;
@@ -212,7 +221,6 @@ Vec<TofEvent> unpack_tofevents_from_tofpackets(const Vec<u8> &bytestream, u64 st
   u64 last_pos = start_pos += 1;
   TofPacket packet;
   TofEvent event;
-  u64 n_packets = 0;
   while (true) {
     last_pos = pos;
     packet = TofPacket::from_bytestream(bytestream, pos);
@@ -239,21 +247,18 @@ Vec<TofEvent> unpack_tofevents_from_tofpackets(const Vec<u8> &bytestream, u64 st
 Vec<TofEvent> unpack_tofevents_from_tofpackets(const String filename) {
   Vec<TofEvent> events = Vec<TofEvent>();
   auto stream = get_bytestream_from_file(filename); 
-  log_debug("Read {} bytes from {}", stream.size(), filename);
+  log_debug("Read " << stream.size() << " bytes from " <<  filename);
   bool has_ended = false;
   auto pos = search_for_2byte_marker(stream, 0xAA, has_ended );
   if (has_ended) {
-    log_error("Opened file {}, but no start marker {} could be found indicating that this file is no good!",filename, TofPacket::HEAD);
+    log_error("Opened file " << filename << " but no start marker " << TofPacket::HEAD << " could be found indicating that this file is no good!");
     return events;
   }
   return unpack_tofevents_from_tofpackets(stream, pos);
 }
 
+/***************************************************/
 
-namespace fs = std::filesystem;
-
-// has to be larger than max packet size
-const usize CHUNK_SIZE = 20000;
 
 Vec<u8> read_chunk(const String& filename, usize offset) {
 
@@ -279,6 +284,7 @@ Vec<u8> read_chunk(const String& filename, usize offset) {
   return buffer;
 }
 
+/***************************************************/
 
 Gaps::TofPacketReader::TofPacketReader(String filename) {
   if (fs::exists(filename)) {
@@ -297,6 +303,8 @@ Gaps::TofPacketReader::TofPacketReader(String filename) {
   last_packet_ = TofPacket();
 }
 
+/***************************************************/
+
 void Gaps::TofPacketReader::process_chunk() {
   auto stream = read_chunk(filename_, current_pos_);
   bool has_ended = false;
@@ -309,9 +317,13 @@ void Gaps::TofPacketReader::process_chunk() {
   }
 }
 
+/***************************************************/
+
 String Gaps::TofPacketReader::get_filename() const {
   return filename_;
 }
+
+/***************************************************/
 
 TofPacket Gaps::TofPacketReader::get_next_packet() {
     process_chunk();

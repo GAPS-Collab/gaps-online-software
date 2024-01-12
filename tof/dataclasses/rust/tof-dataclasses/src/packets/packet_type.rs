@@ -23,7 +23,7 @@ pub enum PacketType {
   HeartBeat          = 40u8,    // might probably go away
   MasterTrigger      = 60u8,    // needs to be renamed to either MasterTriggerEvent or MTEvent
   RBEventHeader      = 70u8,    // needs to go away
-  MonitorTofCmp      = 80u8,    // needs to go away
+  CPUMoniData      = 80u8,    // needs to go away
   MonitorMtb         = 90u8,
   RBMoni             = 100u8,
   PBMoniData         = 101u8,
@@ -57,7 +57,7 @@ impl From<u8> for PacketType {
       40u8  => PacketType::HeartBeat,
       60u8  => PacketType::MasterTrigger,
       70u8  => PacketType::RBEventHeader,
-      80u8  => PacketType::MonitorTofCmp,
+      80u8  => PacketType::CPUMoniData,
       90u8  => PacketType::MonitorMtb,
       100u8 => PacketType::RBMoni,
       120u8 => PacketType::RBEventMemoryView,
@@ -90,7 +90,7 @@ impl FromRandom for PacketType {
       PacketType::PBMoniData,
       PacketType::LTBMoniData,
       PacketType::PAMoniData,
-      PacketType::MonitorTofCmp,
+      PacketType::CPUMoniData,
       PacketType::MonitorMtb,
       PacketType::RBCalibration
     ];
@@ -117,7 +117,7 @@ fn test_packet_types() {
   type_codes.push(PacketType::PBMoniData as u8);
   type_codes.push(PacketType::LTBMoniData as u8);
   type_codes.push(PacketType::PAMoniData as u8);
-  type_codes.push(PacketType::MonitorTofCmp as u8);
+  type_codes.push(PacketType::CPUMoniData as u8);
   type_codes.push(PacketType::MonitorMtb as u8);
   type_codes.push(PacketType::RBCalibration as u8);
   for tc in type_codes.iter() {

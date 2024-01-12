@@ -33,11 +33,9 @@ for the python API will follow soon.
    requires a minimum of `gcc-13` and python `3.10`
 *  a number of C++ libraries are pulled from github during installation.
 
-### software repositories
+### software repository
 
-There are two repositories, which are both (hopefully) kept in sync, so they are interchangeable
-
-* [gitlab (UH)](https://uhhepvcs.phys.hawaii.edu/Achim/gaps-online-software)
+The code is organized in a (private) github repository at 
 * [github](https://github.com/GAPS-Collab/gaps-online-software)
 
 ## installation
@@ -137,4 +135,4 @@ Please see the README.md in the individual subfolders.
 ## maintainer
 
 A. Stoessl <stoessl@hawaii.edu>
-
+P. Lazzaroni <paolo.lazzaroni@unibg.it>
