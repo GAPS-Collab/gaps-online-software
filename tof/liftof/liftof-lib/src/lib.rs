@@ -4,15 +4,16 @@ pub use master_trigger::{connect_to_mtb,
 
 use std::error::Error;
 use std::fmt;
-use std::{fs::File, path::Path};
+use std::{
+    fs::File,
+};
 use std::path::PathBuf;
-use std::fs::OpenOptions;
 use std::fs::read_to_string;
-use std::io::{self, BufReader};
-use std::io::{Read,
-              Write,
-              Seek,
-              SeekFrom};
+use std::io::{
+    self,
+    Read,
+    Write,
+};
 use std::collections::HashMap;
 use std::net::IpAddr;
 use std::net::Ipv4Addr;
@@ -27,31 +28,62 @@ use macaddr::MacAddr6;
 use netneighbours::get_mac_to_ip_map;
 
 #[macro_use] extern crate log;
+extern crate env_logger;
 
-use tof_dataclasses::manifest as mf;
+//use ndarray::{array, Array1};
+//use nlopt::{Algorithm, Objective, Optimization, Result};
+
+//use tof_dataclasses::manifest as mf;
 use tof_dataclasses::DsiLtbRBMapping;
 use tof_dataclasses::constants::NWORDS;
-use tof_dataclasses::calibrations::RBCalibrations;
+use tof_dataclasses::calibrations::{
+    RBCalibrations,
+    find_zero_crossings,
+};
 use tof_dataclasses::packets::{TofPacket,
                                PacketType};
 use tof_dataclasses::errors::{SerializationError,
                               AnalysisError};
-use tof_dataclasses::serialization::{search_for_u16,
-                                     parse_u8,
-                                     parse_u32,
-                                     Serialization};
+use tof_dataclasses::serialization::Serialization;
 use tof_dataclasses::commands::RBCommand;
-use tof_dataclasses::events::{RBEvent,
-                              TofHit};
+use tof_dataclasses::events::{
+    RBEvent,
+    TofHit,
+};
+use tof_dataclasses::io::TofPacketReader;
+
+use tof_dataclasses::events::tof_hit::Peak;
 
 use tof_dataclasses::analysis::{calculate_pedestal,
                                 integrate,
                                 cfd_simple,
                                 find_peaks};
 
-pub const MT_MAX_PACKSIZE   : usize = 512;
-pub const DATAPORT : u32 = 42000;
+use tof_dataclasses::RBChannelPaddleEndIDMap;
 
+pub const MT_MAX_PACKSIZE   : usize = 512;
+pub const DATAPORT          : u32   = 42000;
+pub const ASSET_DIR         : &str  = "/home/gaps/assets/"; 
+pub const LIFTOF_LOGO_SHOW  : &str  = "
+                                  ___                         ___           ___     
+                                 /\\__\\                       /\\  \\         /\\__\\    
+                    ___         /:/ _/_         ___         /::\\  \\       /:/ _/_   
+                   /\\__\\       /:/ /\\__\\       /\\__\\       /:/\\:\\  \\     /:/ /\\__\\  
+    ___     ___   /:/__/      /:/ /:/  /      /:/  /      /:/  \\:\\  \\   /:/ /:/  /  
+   /\\  \\   /\\__\\ /::\\  \\     /:/_/:/  /      /:/__/      /:/__/ \\:\\__\\ /:/_/:/  /   
+   \\:\\  \\ /:/  / \\/\\:\\  \\__  \\:\\/:/  /      /::\\  \\      \\:\\  \\ /:/  / \\:\\/:/  /    
+    \\:\\  /:/  /   ~~\\:\\/\\__\\  \\::/__/      /:/\\:\\  \\      \\:\\  /:/  /   \\::/__/     
+     \\:\\/:/  /       \\::/  /   \\:\\  \\      \\/__\\:\\  \\      \\:\\/:/  /     \\:\\  \\     
+      \\::/  /        /:/  /     \\:\\__\\          \\:\\__\\      \\::/  /       \\:\\__\\    
+       \\/__/         \\/__/       \\/__/           \\/__/       \\/__/         \\/__/    
+
+          (LIFTOF - liftof is for tof, Version 0.8 'NIUHI', Dec 2023)
+
+          * Documentation
+          ==> GitHub   https://github.com/GAPS-Collab/gaps-online-software/tree/NIUHI-0.8
+          ==> API docs https://gaps-collab.github.io/gaps-online-software/
+
+  ";
 
 /// Make sure that the loglevel is in color, even though not using pretty_env logger
 pub fn color_log(level : &Level) -> ColoredString {
@@ -62,6 +94,140 @@ pub fn color_log(level : &Level) -> ColoredString {
     Level::Debug    => String::from(" debug ").blue(),
     Level::Trace    => String::from(" trace ").cyan(),
   }
+}
+
+/// Set up the environmental (env) logger
+/// with our format
+///
+/// Ensure that the lines and module paths
+/// are printed in the logging output
+pub fn init_env_logger() {
+  env_logger::builder()
+    .format(|buf, record| {
+    writeln!( buf, "[{level}][{module_path}:{line}] {args}",
+      level = color_log(&record.level()),
+      module_path = record.module_path().unwrap_or("<unknown>"),
+      line = record.line().unwrap_or(0),
+      args = record.args()
+      )
+    }).init();
+}
+
+/// Common settings for apps, e.g. liftof-tui
+#[derive(Debug, Clone)]
+pub struct AppSettings {
+  pub cali_master_path : String,
+}
+
+/// Keep track of run related statistics, errors
+#[derive(Debug, Copy, Clone)]
+pub struct RunStatistics {
+  /// The number of events we have recorded
+  pub n_events_rec      : usize,
+  /// The number of packets going through 
+  /// the event processing
+  pub evproc_npack      : usize,
+  /// The first event id we saw
+  pub first_evid        : u32,
+  /// The last event id we saw
+  pub last_evid         : u32,
+  /// The number of times we encountered 
+  /// a deserialization issue
+  pub n_err_deser       : usize,
+  /// The number of times we encountered 
+  /// an issue while sending over zmq
+  pub n_err_zmq_send    : usize,
+  /// The number of times we encountered
+  /// an issue with a wrong channel identifier
+  pub n_err_chid_wrong  : usize,
+  /// How many times did we read out an incorrect
+  /// tail?
+  pub n_err_tail_wrong  : usize,
+  /// The number of times we failed a crc32 check
+  pub n_err_crc32_wrong : usize,
+}
+
+impl RunStatistics {
+  
+  pub fn new() -> Self {
+    Self {
+      n_events_rec      : 0,
+      evproc_npack      : 0,
+      first_evid        : 0,
+      last_evid         : 0,
+      n_err_deser       : 0,
+      n_err_zmq_send    : 0,
+      n_err_chid_wrong  : 0,
+      n_err_tail_wrong  : 0,
+      n_err_crc32_wrong : 0,
+    }
+  }
+
+  pub fn get_n_anticipated(&self) -> i32 {
+    self.last_evid as i32 - self.first_evid as i32
+  }
+}
+
+impl fmt::Display for RunStatistics {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut resp = String::from("<RunStatistics:\n");
+    resp += &(format!("  first event id : {}\n", self.first_evid));
+    resp += &(format!("  last  event id : {}\n", self.last_evid));
+    resp += &(format!("  --> expected {} event (ids)\n", self.get_n_anticipated()));
+    resp += &(format!("  event_processing #packets : {}\n", self.evproc_npack));
+    if self.get_n_anticipated() != self.evproc_npack as i32 {
+      resp += &(format!("  --> discrepancy of {} event (ids)\n", self.get_n_anticipated() - self.evproc_npack as i32))
+    }
+    resp += &(format!("  event_processing n tail err : {}\n", self.n_err_tail_wrong));
+    resp += &(format!("  event_processing n chid err : {}\n", self.n_err_chid_wrong));
+    write!(f, "{}", resp)
+  }
+}
+
+//fn sine_to_fit(amp : f32, freq : f32, phase : f32, time : &Vec<f32>, ys : &mut Vec<f32>) {
+//  //let ys = Vec::<f32>::with_capacity(time.len());
+//  for k in 0..time.len() {
+//    ys[k] = amp * (freq * time[k] + phase).sin(); 
+//  }
+//}
+//
+//fn cost_function(amp : f32, freq : f32, phase : f32, time : &Vec<f32>, volts : &Vec<f32>) -> f32 {
+//  //let 
+//  //let fitted_values = amplitude * (2.0 * std::f32::consts::PI * frequency * time + phase).sin();
+//  let fit_volts = Vec::<f32>::with_capacity(time.len());
+//  sine_to_fit(amp, freq, phase, &time, &mut fit_volts);
+//  let mut chi_square = 0f32;
+//  for k in 0..fit_volts.len() {
+//    chi_square += (volts[k] - fit_volts[k]).powi(2);
+//    // FIXME - error
+//  }
+//  chi_square
+//}
+
+
+/// FIXME - proper fitting algorithm
+/// This here is bad, because it does not interpolate between 
+/// the bins
+fn fit_sine(time: Vec<f32>, data: Vec<f32>) -> (f32, f32, f32) {
+  let z_cross = find_zero_crossings(&data);
+  let mut y_max = f32::MIN;
+  let mut y_min = f32::MAX;
+  for y in data {
+    if y > y_max {
+      y_max = y;
+    }
+    if y < y_min {
+      y_min = y;
+    }
+  }
+  let amp   = f32::abs(y_max - y_min)/2.0;
+  let mut phase = 0.0;
+  let mut freq  = 0.0;
+  if z_cross.len() >= 3 {
+    phase = time[z_cross[0]];
+    freq  = 1.0/(time[z_cross[2]] - time[z_cross[0]]);
+  }
+  (amp,freq,phase)
 }
 
 
@@ -80,270 +246,11 @@ pub fn read_value_from_file(file_path: &str) -> io::Result<u32> {
 }
 
 
-//FIXME : this needs to become a trait
-fn read_n_bytes(file: &mut BufReader<File>, n: usize) -> io::Result<Vec<u8>> {
-  let mut buffer = vec![0u8; n];
-  match file.read_exact(&mut buffer) {
-    Err(ref err) if err.kind() == io::ErrorKind::UnexpectedEof => {
-      // Reached the end of the file
-      buffer = Vec::<u8>::new();
-      file.read_to_end(&mut buffer)?;
-      return Ok(buffer);
-    },
-    Err(err) => {
-      error!("Can not read {n} bytes from file! Error {err}");
-      return Err(err);
-    },
-    Ok(_) => ()
-  }
-  Ok(buffer)
-}
 
 
-/// Open a new file and write TofPackets
-/// in binary representation
-///
-/// One packet per line
-///
-pub struct TofPacketWriter {
-
-  //pub filename : String,
-  pub file        : File,
-  pub file_prefix : String,
-  pkts_per_file   : usize,
-  file_id         : usize,
-  n_packets       : usize,
-}
-
-impl TofPacketWriter {
-
-  /// Instantiate a new PacketWriter 
-  ///
-  /// # Arguments
-  ///
-  /// * file_prefix : Prefix file with this string. A continuous number will get 
-  ///                 appended to control the file size.
-  pub fn new(file_prefix : String) -> Self {
-    //let filename = file_prefix.clone() + "_0.tof.gaps";
-    let filename = file_prefix.clone() + ".tof.gaps";
-    let path = Path::new(&filename); 
-    info!("Writing to file {filename}");
-    let file = OpenOptions::new().create(true).append(true).open(path).expect("Unable to open file {filename}");
-    Self {
-      file,
-      file_prefix   : file_prefix,
-      pkts_per_file : 3000,
-      file_id       : 1,
-      n_packets     : 0,
-    }
-  }
-
-  pub fn add_tof_packet(&mut self, packet : &TofPacket) {
-    let buffer = packet.to_bytestream();
-    match self.file.write_all(buffer.as_slice()) {
-      Err(err) => error!("Writing to file with prefix {} failed. Err {}", self.file_prefix, err),
-      Ok(_)    => ()
-    }
-    // FIXME - this must go into the drop method
-    match self.file.sync_all() {
-      Err(err) => error!("File syncing failed! error {err}"),
-      Ok(_)    => ()
-    }
-    self.n_packets += 1;
-    if self.n_packets == self.pkts_per_file {
-      //drop(self.file);
-      let filename = self.file_prefix.clone() + "_" + &self.file_id.to_string() + ".tof.gaps";
-      let path  = Path::new(&filename);
-      println!("==> [TOFPACKETWRITER] Will start a new file {}", path.display());
-      match self.file.sync_all() {
-        Err(err) => {
-          error!("Unable to sync file to disc! {err}");
-        },
-        Ok(_) => ()
-      }
-      self.file = OpenOptions::new().create(true).append(true).open(path).expect("Unable to open file {filename}");
-      self.n_packets = 0;
-      self.file_id += 1;
-    }
-  debug!("TofPacket written!");
-  }
-}
-
-impl Default for TofPacketWriter {
-  fn default() -> TofPacketWriter {
-    TofPacketWriter::new(String::from(""))
-  }
-}
 
 /**************************************************/
 
-/// Read serialized TofPackets from an existing file
-///
-/// This is mainly to read stream files previously
-/// written by TofPacketWriter
-#[derive(Debug)]
-pub struct TofPacketReader {
-
-  pub filename    : String,
-  file_reader     : Option<BufReader<File>>,
-  cursor          : usize
-}
-
-impl TofPacketReader {
-
-  pub fn new(filename : String) -> TofPacketReader {
-    let filename_c = filename.clone();
-    let mut packet_reader = TofPacketReader { 
-      filename       : filename,
-      file_reader    : None,
-      cursor : 0,
-    };
-    packet_reader.open(filename_c);
-    packet_reader
-  }
- 
-  pub fn get_next_packet_size(&self, stream : &Vec<u8>) -> u32 {
-    // cursor needs at HEAD position and then we have to 
-    // add one byte for the packet type
-    let mut pos = self.cursor + 2;
-    let ptype_int  = parse_u8(stream, &mut pos);
-    let next_psize = parse_u32(stream, &mut pos);
-    let ptype = ptype_int as u8;
-    debug!("We anticpate a TofPacket of type {:?} and size {} (bytes)",ptype, next_psize);
-    next_psize
-  }
-
-  pub fn open(&mut self, filename : String) {
-    if self.filename != "" {
-      warn!("Overiding previously set filename {}", self.filename);
-    }
-    let self_filename = filename.clone();
-    self.filename     = self_filename;
-    if filename != "" {
-      let path = Path::new(&filename); 
-      info!("Reading from {}", &self.filename);
-      let file = OpenOptions::new().create(false).append(false).read(true).open(path).expect("Unable to open file {filename}");
-      self.file_reader    = Some(BufReader::new(file));
-      self.init();
-    }
-  }
-
-  fn init(&mut self) {
-    match self.search_start() {
-      Err(err) => {
-        error!("Can not find any header signature (typically 0xAAAA) in file! Err {err}");
-        panic!("This is most likely a useless endeavour! Hence, I panic!");
-      }
-      Ok(start_pos) => {
-        self.cursor = start_pos;
-      }
-    }
-  }
-
-  fn search_start(&mut self) -> Result<usize, SerializationError> {
-    let mut pos       = 0u64;
-    let mut start_pos = 0usize; 
-    //let mut stream  = Vec::<u8>::new();
-    let max_bytes   = self.get_file_nbytes();
-    info!("Using file with {max_bytes} bytes!");
-    let chunk       = 10usize;
-    while pos < max_bytes {
-      match read_n_bytes(self.file_reader.as_mut().unwrap(), chunk) {
-        Err(err) => {
-          error!("Can not read from file, error {err}");
-          error!("Most likely, the file/stream is too short!");
-          return Err(SerializationError::StreamTooShort);
-        }
-        Ok(stream) => {
-          debug!("Got stream {:?}", stream);
-          match search_for_u16(TofPacket::HEAD, &stream, 0) {
-            Err(_) => {
-              pos += chunk as u64;
-              continue;
-            }
-            Ok(result) => {
-              start_pos = result + pos as usize;           
-              // make sure the current chunk is accounted 
-              // for before the break
-              pos += chunk as u64;
-              break;
-            }
-          }
-        } // end Ok
-      } // end match 
-    } // end while
-    let mut rewind : i64 = pos.try_into().unwrap();
-    rewind = -1*rewind + start_pos as i64;
-    debug!("Rewinding {rewind} bytes");
-    match self.file_reader.as_mut().unwrap().seek(SeekFrom::Current(rewind)) {
-      Err(err) => {
-        error!("Can not rewind file buffer! Error {err}");
-      }
-      Ok(_) => ()
-    }
-    Ok(start_pos)
-  }
-  
-  fn get_file_nbytes(&self) -> u64 {
-    let metadata  = self.file_reader.as_ref().unwrap().get_ref().metadata().unwrap();
-    let file_size = metadata.len();
-    file_size
-  }
-}
-
-impl Default for TofPacketReader {
-  fn default() -> Self {
-    TofPacketReader::new(String::from(""))
-  }
-}
-
-impl Iterator for TofPacketReader {
-  type Item = TofPacket;
-  //type Item = io::Result<TofPacket>;
-
-  fn next(&mut self) -> Option<Self::Item> {
-    let packet : TofPacket;
-    match read_n_bytes(self.file_reader.as_mut().unwrap(), 7) { 
-    //match self.file_reader.as_mut().expect("No file available!").read_until(b'\n', &mut line) {
-      Err(err) => {
-        error!("Error reading from file {} error: {}", self.filename, err);
-      },
-      Ok(chunk) => {
-        if chunk.len() < 7 {
-          error!("The stream is too short!");
-          return None;
-        }
-        else {
-          trace!("Read {} bytes", chunk.len());
-          let expected_payload_size = self.get_next_packet_size(&chunk) as usize; 
-          match read_n_bytes(self.file_reader.as_mut().unwrap(), expected_payload_size + 2) {
-            Err(err) => {
-              error!("Unable to read {} requested bytes to decode tof packet! Err {err}", expected_payload_size - 7 );
-              return None;
-            },
-            Ok(data) => {
-              let mut stream = Vec::<u8>::with_capacity(expected_payload_size + 9);
-              stream.extend_from_slice(&chunk);
-              stream.extend_from_slice(&data);
-              //println!("{:?}", stream);
-              match TofPacket::from_bytestream(&stream, &mut 0) {
-                Ok(pack) => {
-                  packet = pack;
-                  return Some(packet);
-                }
-                Err(err) => { 
-                  error!("Error getting packet from file {err}");
-                  return None;
-                }
-              }
-            }
-          }
-        }
-      }, // end outer OK
-    }
-  None
-  }
-}
 
 /// Helper function to generate a proper tcp string starting
 /// from the ip one.
@@ -363,7 +270,7 @@ pub fn build_tcp_from_ip(ip: String, port: String) -> String {
 ///
 /// # Arguments 
 ///
-/// * cmd        : a [crossbeam] receiver, to receive 
+/// * cmd        : a \[crossbeam\] receiver, to receive 
 ///                TofCommands.
 pub fn readoutboard_commander(cmd : &Receiver<TofPacket>){
   debug!(".. started!");
@@ -436,25 +343,36 @@ pub fn readoutboard_commander(cmd : &Receiver<TofPacket>){
 // Analysis
 //
 
-
-/// Basically Rene's analysis engine. This creates 
-/// the PaddlePackets with reduced waveform 
-/// information from a version of the ReadoutBoard
-/// event. 
+/// Extract peaks from waveforms
 ///
-/// ISSUES:
-/// In the future, we might want to refactor this 
-/// a little bit and it might operate on a 
-/// RBEvent instaad and fill it paddle packet 
-/// members
+/// Helper for waveform analysis
+pub fn get_peaks() -> Vec<Peak> {
+  let peaks = Vec::<Peak>::new();
+  peaks
+}
+
+
+/// Waveform analysis engine - identify waveform variables
+///
+/// This will populate the TofHits in an RBEvent
+///
+/// TofHits contain information about peak location,
+/// charge, timing.
 ///
 /// FIXME - I think this should take a HashMap with 
 /// algorithm settings, which we can load from a 
 /// json file
-/// FIXME - add the paddle packets to the RBEvent instead 
-/// of returning 
+///
+/// # Arguments
+///
+/// * event       : current RBEvent with waveforms to 
+///                 work on
+/// * channel_map : (HashMap) mapping providing channel
+///                 to paddle ID information
+/// * calibration : latest readoutboard calibration for 
+///                 the same board
 pub fn waveform_analysis(event         : &mut RBEvent,
-                         readoutboard  : &mf::ReadoutBoard,
+                         channel_map   : &RBChannelPaddleEndIDMap,
                          calibration   : &RBCalibrations)
 -> Result<(), AnalysisError> {
   //if event.status != EventStatus::Perfect {
@@ -463,80 +381,116 @@ pub fn waveform_analysis(event         : &mut RBEvent,
   //  // is probably nothing else we can do?
   //  return Err(AnalysisError::InputBroken);
   //}
-  let pids = readoutboard.get_all_pids();
-  let mut paddles = HashMap::<u8, TofHit>::new();
-  // just paranoid
-  if pids.len() != 4 {
-    error!("RB {} seems to have a strange number of paddles ({}) connected!",
-           readoutboard.rb_id, pids.len());
-  }
-  for k in pids.iter() {
-    // fill the general information of 
-    // the paddles already
-    let mut hit   = TofHit::new();
-    hit.paddle_id = *k;
-    match paddles.insert(*k, hit) {
-      None => (),
-      Some(_) => {
-        error!("We have seen paddle id {k} already!");
-      }
-    };
-  }
-  // do the calibration
-  let active_channels = event.header.get_channels();
-  // allocate memory for voltages
-  // this allocates more memory than needed
-  // (needed is active_channels.len()), however,
-  // in flight operations all channels should
-  // be active anyway.
-  let mut all_voltages = Vec::<Vec::<f32>>::new();
-  let mut all_times    = Vec::<Vec::<f32>>::new();
-  for _ in 0..9 {
-    let ch_voltages : Vec<f32>= vec![0.0; NWORDS];
-    all_voltages.push(ch_voltages);
-    let ch_times : Vec<f32>= vec![0.0; NWORDS];
-    all_times.push(ch_times);
-  }
 
-  for active_ch in &active_channels {
-    let ch  = *active_ch as usize;
-    match event.get_channel_by_id(ch) {
-      Ok(adc) => { 
-        calibration.voltages(ch,
+  let mut paddles    = HashMap::<u8, TofHit>::new();
+  let channels       = event.header.get_channels();
+  let channels_c     = channels.clone();
+  // first loop over channels - construct pids
+  let mut pid        : u8;
+  // will become a parameter
+  let fit_sinus = true;
+  for raw_ch in channels {
+    if raw_ch == 8 {
+      continue;
+    }
+    // +1 channel convention
+    let ch = raw_ch + 1;
+    //let mut TofHit::new();
+    let p_end_id = channel_map.get(&ch).unwrap_or(&0);
+    if p_end_id < &1000 {
+      error!("Invalid paddle end id {} for channel {}!", p_end_id, ch);
+      continue;
+    }
+    if p_end_id > &2000 {
+      // it is the B side then
+      pid = (p_end_id - 2000) as u8;
+    } else {
+      pid = (p_end_id - 1000) as u8;
+    }
+    if !paddles.contains_key(&pid) {
+      let mut hit   = TofHit::new();
+      hit.paddle_id = pid;
+      paddles.insert(pid, hit);
+    }
+  }
+  // second loop over channels. Now we have
+  // all the paddles set up in the hashmap
+  for raw_ch in channels_c {
+    if raw_ch == 8 {
+      if fit_sinus {
+        // +1 channel convention
+        let ch = raw_ch + 1;
+        
+        let mut ch_voltages : Vec<f32>= vec![0.0; NWORDS];
+        let mut ch_times    : Vec<f32>= vec![0.0; NWORDS];
+        calibration.voltages(ch.into(),
                              event.header.stop_cell as usize,
-                             &adc,
-                             &mut all_voltages[ch]);
-      },
-      Err(err) => {
-        error!("Can not get channel {ch}. Err {err}");  
-        return Err(AnalysisError::MissingChannel);
+                             &event.adc[8],
+                             &mut ch_voltages);
+        warn!("We have to rework the spike cleaning!");
+        //match RBCalibrations::spike_cleaning(&mut ch_voltages,
+        //                                     event.header.stop_cell) {
+        //  Err(err) => {
+        //    error!("Spike cleaning failed! {err}");
+        //  }
+        //  Ok(_)    => ()
+        //}
+        calibration.nanoseconds(ch.into(),
+                                event.header.stop_cell as usize,
+                                &mut ch_times);
+        let fit_result = fit_sine(ch_times, ch_voltages);
+        //println!("FIT RESULT = {:?}", fit_result);
+        event.header.set_sine_fit(fit_result);
+        continue;
+      } else {
+        continue;
       }
     }
-    calibration.nanoseconds(ch,
-                            event.header.stop_cell as usize,
-                            &mut all_times[ch]);
-  }
-  match RBCalibrations::spike_cleaning(&mut all_voltages,
-                                       event.header.stop_cell) {
-    Err(err) => {
-      error!("Spike cleaning failed! Err {err}");
+    // +1 channel convention
+    let ch = raw_ch + 1;
+    // FIXME - copy/paste from above, wrap in a 
+    // function
+    let p_end_id  = channel_map.get(&ch).unwrap_or(&0);
+    let mut is_a_side = false; 
+    if p_end_id < &1000 {
+      error!("Invalid paddle end id: {}!" ,p_end_id);
+      continue;
     }
-    Ok(_)    => ()
-  }
-
-  // analysis
-  for active_ch in &active_channels {
-    let ch = *active_ch as usize;
-    let (ped, ped_err) = calculate_pedestal(&all_voltages[ch],
+    if p_end_id > &2000 {
+      // it is the B side then
+      pid = (p_end_id - 2000) as u8;
+    } else {
+      pid = (p_end_id - &1000) as u8;
+      is_a_side = true;
+    }
+    // allocate memory for the calbration results
+    let mut ch_voltages : Vec<f32>= vec![0.0; NWORDS];
+    let mut ch_times    : Vec<f32>= vec![0.0; NWORDS];
+    calibration.voltages(ch.into(),
+                         event.header.stop_cell as usize,
+                         &event.adc[ch as usize],
+                         &mut ch_voltages);
+    warn!("We have to rework the spike cleaning!");
+    //match RBCalibrations::spike_cleaning(&mut ch_voltages,
+    //                                     event.header.stop_cell) {
+    //  Err(err) => {
+    //    error!("Spike cleaning failed! {err}");
+    //  }
+    //  Ok(_)    => ()
+    //}
+    calibration.nanoseconds(ch.into(),
+                            event.header.stop_cell as usize,
+                            &mut ch_times);
+    let (ped, ped_err) = calculate_pedestal(&ch_voltages,
                                             10.0, 10, 50);
     debug!("Got pedestal of {} +- {}", ped, ped_err);
-    for n in 0..all_voltages[ch].len() {
-      all_voltages[ch][n] -= ped;
+    for n in 0..ch_voltages.len() {
+      ch_voltages[n] -= ped;
     }
     let mut charge : f32 = 0.0;
-    warn!("Check impedance value!");
-    match integrate(&all_voltages[ch],
-                    &all_times[ch],
+    warn!("Check impedance value! Just using 50 [Ohm]");
+    match integrate(&ch_voltages,
+                    &ch_times,
                     270.0, 70.0, 50.0) {
       Err(err) => {
         error!("Integration failed! Err {err}");
@@ -545,10 +499,13 @@ pub fn waveform_analysis(event         : &mut RBEvent,
         charge = chrg;
       }
     }
-    let peaks : Vec::<(usize, usize)>;
+    //let peaks : Vec::<(usize, usize)>;
     let mut cfd_times = Vec::<f32>::new();
-    match find_peaks(&all_voltages[ch]    ,
-                     &all_times[ch]      ,
+    // We actually might have multiple peaks 
+    // here
+    // FIXME 
+    match find_peaks(&ch_voltages ,
+                     &ch_times    ,
                      270.0, 
                      70.0 ,
                      3    ,
@@ -557,12 +514,12 @@ pub fn waveform_analysis(event         : &mut RBEvent,
       Err(err) => {
         error!("Unable to find peaks for ch {ch}! Ignoring this channel!");
         error!("We won't be able to calculate timing information for this channel! Err {err}");
-      }
-      Ok(pks)  => {
-        peaks = pks;
+      },
+      Ok(peaks)  => {
+        //peaks = pks;
         for pk in peaks.iter() {
-          match cfd_simple(&all_voltages[ch],
-                           &all_times[ch],
+          match cfd_simple(&ch_voltages,
+                           &ch_times,
                            0.2,pk.0, pk.1) {
             Err(err) => {
               error!("Unable to calculate cfd for peak {} {}! Err {}", pk.0, pk.1, err);
@@ -572,23 +529,29 @@ pub fn waveform_analysis(event         : &mut RBEvent,
             }
           }
         }
-      }
+      }// end OK
+    } // end match find_peaks 
+    let this_hit      = paddles.get_mut(&pid).unwrap();
+    let mut this_time = 0.0f32;
+    if cfd_times.len() > 0 {
+      this_time = cfd_times[0];
     }
+    
+    if is_a_side {
+      this_hit.set_time_a(this_time);
+      this_hit.set_charge_a(charge);
+    } else {
+      this_hit.set_time_b(this_time);
+      this_hit.set_charge_b(charge);
+    }
+    // Technically, we can have more than one peak. 
+    // We need to adjust the integration window to 
+    // the peak min/max and then create Peak instances
+    // and sort them into TofHits
 
-    let ch_pid = readoutboard.get_pid_for_ch(ch);
-    let end    = readoutboard.get_paddle_end(ch); 
-    //FIXME : is it ok to panic here?
-    match end {
-      mf::PaddleEndIdentifier::A => {
-        paddles.get_mut(&ch_pid).expect("Bad paddlemap!").set_charge_a(charge);
-        paddles.get_mut(&ch_pid).expect("Bad paddlemap!").set_time_a(cfd_times[0]);
-      }
-      mf::PaddleEndIdentifier::B => {
-        paddles.get_mut(&ch_pid).expect("Bad paddlemap!").set_charge_b(charge);
-        paddles.get_mut(&ch_pid).expect("Bad paddlemap!").set_time_b(cfd_times[0]);
-      }
-    }
-  }
+
+    // FIXME - do more analysis here!
+  } // end loop over channels
   let result = paddles.into_values().collect();
   event.hits = result;
   Ok(())
@@ -628,55 +591,6 @@ impl fmt::Display for ReadoutBoardError {
 }
 
 impl Error for ReadoutBoardError {
-}
-
-
-
-/// A generic representation of a LocalTriggerBoard
-///
-/// This is important to make the mapping between 
-/// trigger information and readoutboard.
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
-pub struct LocalTriggerBoard {
-  pub id : u8,
-  /// The LTB has 16 channels, 
-  /// which are connected to the RBs
-  /// Each channel corresponds to a 
-  /// specific RB channel, represented
-  /// by the tuple (RBID, CHANNELID)
-  pub ch_to_rb : [(u8,u8);16],
-  /// the MTB bit in the MTEvent this 
-  /// LTB should reply to
-  pub mt_bitmask : u32,
-}
-
-impl LocalTriggerBoard {
-  pub fn new() -> LocalTriggerBoard {
-    LocalTriggerBoard {
-      id : 0,
-      ch_to_rb : [(0,0);16],
-      mt_bitmask : 0
-    }
-  }
-
-  /// Calculate the position in the bitmask from the connectors
-  pub fn get_mask_from_dsi_and_j(dsi : u8, j : u8) -> u32 {
-    if dsi == 0 || j == 0 {
-      warn!("Invalid dsi/J connection!");
-      return 0;
-    }
-    let mut mask : u32 = 1;
-    mask = mask << (dsi*5 + j -1) ;
-    mask
-  }
-}
-
-impl fmt::Display for LocalTriggerBoard {
-  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let r = serde_json::to_string(self).unwrap_or(
-      String::from("Error: cannot unwrap this LTB"));
-    write!(f, "<LTB: {}>", r)
-  }
 }
 
 /// A generic representation of a Readout board
@@ -796,6 +710,37 @@ impl Default for ReadoutBoard {
   fn default() -> ReadoutBoard {
     ReadoutBoard::new()
   }
+}
+
+/// This will load the map as in the file. Channels go from 1-8
+pub fn get_rb_ch_pid_map(map_file : PathBuf) -> RBChannelPaddleEndIDMap {
+  let mut mapping = RBChannelPaddleEndIDMap::new();
+  let json_content : String;
+  match read_to_string(&map_file) {
+    Ok(_json_content) => {
+      json_content = _json_content;
+    },
+    Err(err) => { 
+      error!("Unable to parse json file {}. Error {err}", map_file.display());
+      return mapping;
+    }      
+  }
+  let json : Value;
+  match serde_json::from_str(&json_content) {
+    Ok(_json) => {
+      json = _json;
+    },
+    Err(err) => { 
+      error!("Unable to parse json file {}. Error {err}", map_file.display());
+      return mapping;
+    }
+  }
+  for ch in 0..8 {
+    let tmp_val = &json[(ch +1).to_string()];
+    let val = tmp_val.to_string().parse::<u16>().unwrap_or(0);
+    mapping.insert(ch as u8 + 1, val);
+  }
+  mapping
 }
 
 pub fn get_ltb_dsi_j_ch_mapping(mapping_file : PathBuf) -> DsiLtbRBMapping {

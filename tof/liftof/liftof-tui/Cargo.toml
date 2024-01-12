@@ -10,17 +10,17 @@ serde = {version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 chrono = { version = "0.4", features = ["serde"] }
 rand = { version = "0.7.3", default-features = false, features = ["std"] }
-tui = { version = "0.19", default-features = false, features = ['crossterm', 'serde'] }
-thiserror = "1.0"
+#tui = { version = "0.19", default-features = false, features = ['crossterm', 'serde'] }
+#thiserror = "1.0"
 
-tui-logger = "0.8.1"
+tui-logger = { version = "0.10" } 
+ratatui = { version = "0.24", features = ["all-widgets"]}
 
 
 crossterm = { version = "0.23", features=["serde"]}
-tokio = { version = "1", features = ["full"] }
+#tokio = { version = "1", features = ["full"] }
 
-eyre = "0.6"
-
+#eyre = "0.6"
 sysinfo = "0.27"
 
 # multi-producer/multi-consumer channels
@@ -36,9 +36,8 @@ histo = "0.1.0"
 zmq = "0.10.0"
 
 log = "0.4"
-pretty_env_logger = "0.4"
 json = "0.12"
-local-ip-address = "0.5"
+#local-ip-address = "0.5"
 clap = { version = "4.0", features = ["derive"] }
 
 

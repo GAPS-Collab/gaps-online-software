@@ -49,7 +49,7 @@ fn get_buff_size(which : &BlobBuffer, buff_start : &mut u32) ->Result<u32, Regis
     debug!("It reads {occ}");
     //size = occ;
     //*buff_start = occ;
-    return Err(RegisterError {});
+    return Err(RegisterError::Unknown);
   } else {
     size  = occ - *buff_start;
   }

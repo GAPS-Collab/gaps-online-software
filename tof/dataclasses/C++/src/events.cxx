@@ -1,12 +1,12 @@
 #include<numeric>
 #include<sstream>
+#include<format>
 
 #include "events.h"
 #include "parsers.h"
 #include "serialization.h"
+#include "logging.hpp"
 
-#include "spdlog/spdlog.h"
-#include "spdlog/cfg/env.h"
 
 const static HashMap<u8, std::pair<u8,u8>> LTB_DSI_MAP {
   {0, {1,1}},
@@ -77,7 +77,7 @@ RBEventMemoryView::RBEventMemoryView() {
 Vec<u16> RBEventMemoryView::get_channel_adc(u8 channel) const {
   Vec<u16> adc = Vec<u16>(NWORDS, 0);
   if (channel == 0) {
-    spdlog::error("Please remembmer channel ids are ranged from 1-9! Ch0 does not exist");
+    log_fatal("Please remembmer channel ids are ranged from 1-9! Ch0 does not exist");
     return adc;
   }
   //  adc[k] = ch_adc[channel -1][k];
@@ -127,9 +127,9 @@ RBEventHeader::RBEventHeader() {
   channel_mask       = 0; 
   status_byte        = 0;
   stop_cell          = 0; 
-  crc32              = 0;
-  dtap0              = 0;
-  drs4_temp          = 0; 
+  ch9_amp            = 0;
+  ch9_freq           = 0;
+  ch9_phase          = 0;
   fpga_temp          = 0;
   timestamp16        = 0; 
   timestamp32        = 0; 
@@ -138,6 +138,7 @@ RBEventHeader::RBEventHeader() {
 /*************************************/
 
 std::string RBEventHeader::to_string() const {
+  auto sfit = get_sine_fit();
   std::string repr = "<RBEventHeader";
   repr += "\n  rb id          " + std::to_string(rb_id)                 ;
   repr += "\n  event id       " + std::to_string(event_id)              ;
@@ -151,13 +152,14 @@ std::string RBEventHeader::to_string() const {
     repr += " " + std::to_string(ch) + " ";
   }
   repr += "\n  stop cell      " + std::to_string(stop_cell)             ;
-  repr += "\n  crc32          " + std::to_string(crc32)                 ;
-  repr += "\n  dtap0          " + std::to_string(dtap0)                 ;
+  repr += "\n  ** online ch9 fit amp, freq, phase";
+  repr += "\n    AMP " + std::to_string(sfit[0]);
+  repr += "  FREQ " + std::to_string(sfit[1]);
+  repr += "  PHASE " + std::to_string(sfit[2]); 
   repr += "\n  timestamp32    " + std::to_string(timestamp32)           ;
   repr += "\n  timestamp16    " + std::to_string(timestamp16)           ;
   repr += "\n  |->timestamp48 " + std::to_string(get_timestamp48())     ;
   repr += "\n  FPGA temp [C]  " + std::to_string(get_fpga_temp())       ;
-  repr += "\n  DRS4 temp [C]  " + std::to_string(get_drs_temp())        ;
   repr += ">";
   return repr;
 }
@@ -184,25 +186,26 @@ u8 RBEventHeader::get_nchan() const {
 
 RBEventHeader RBEventHeader::from_bytestream(const Vec<u8> &stream,
                                              u64 &pos){
+  Gaps::set_loglevel(Gaps::LOGLEVEL::info);
   RBEventHeader header;
   u16 head                  = Gaps::parse_u16(stream, pos);
   if (head != RBEventHeader::HEAD) {
-    spdlog::error("[RBEventHeader::from_bytestream] Header signature {} invalid!", head);
+    log_error("[RBEventHeader::from_bytestream] Header signature {} invalid!", head);
   }
   header.rb_id               = Gaps::parse_u8(stream , pos);  
   header.event_id            = Gaps::parse_u32(stream, pos);  
   header.channel_mask        = Gaps::parse_u16(stream, pos);   
   header.status_byte         = Gaps::parse_u8(stream , pos); 
   header.stop_cell           = Gaps::parse_u16(stream, pos);  
-  header.crc32               = Gaps::parse_u32(stream, pos);  
-  header.dtap0               = Gaps::parse_u16(stream, pos);  
-  header.drs4_temp           = Gaps::parse_u16(stream, pos);  
+  header.ch9_amp             = Gaps::parse_u16(stream, pos);  
+  header.ch9_freq            = Gaps::parse_u16(stream, pos);  
+  header.ch9_phase           = Gaps::parse_u32(stream, pos);  
   header.fpga_temp           = Gaps::parse_u16(stream, pos);  
   header.timestamp32         = Gaps::parse_u32(stream, pos);
   header.timestamp16         = Gaps::parse_u16(stream, pos);
   u16 tail                   = Gaps::parse_u16(stream, pos);
   if (tail != RBEventHeader::TAIL) {
-    spdlog::error("Tail signature incorrect! Got tail {}", tail);
+    log_error("Tail signature incorrect! Got tail {}", tail);
   }
   return header; 
 }
@@ -283,79 +286,16 @@ u8 RBEventHeader::get_n_datachan() const {
 
 /*************************************/
 
-f32 RBEventHeader::get_drs_temp() const {
-  f32 temp = drs_adc_to_celsius(drs4_temp);
-  return temp;
+std::array<f32, 3> RBEventHeader::get_sine_fit() const {
+  f32 u16_MAX = 65535;
+  f32 amp    = (20.0 * ch9_amp   /u16_MAX) - 10.0;
+  f32 freq   = (20.0 * ch9_freq  /u16_MAX) - 10.0;
+  f32 phase  = (20.0 * ch9_phase /u16_MAX) - 10.0;
+  std::array<f32, 3> result = {amp,freq,phase};
+  return result;
 }
 
 /*************************************/
-
-f32 RBEventHeader::drs_adc_to_celsius(u16 adc) const {
-  f32 sign = 1.0;
-  if (adc >= 0x800) {
-    sign = -1.0;
-    adc = 0xFFF - adc;
-  }
-  return sign * (f32)adc * 0.0625;
-}                                             
-
-/*************************************/
-
-//RBEventHeader RBEventHeader::extract_from_rbbinarydump(const Vec<u8> &bs,
-//                                                       u64 &pos) {
-//  RBEventHeader header = RBEventHeader();
-//  u64 start = pos;
-//  spdlog::debug("Start decoding at pos {}", pos);
-//  u16 head = Gaps::u16_from_le_bytes(bs, pos);
-//  if (head != RBEventHeader::HEAD)  {
-//    spdlog::error("No header signature found!");  
-//  }
-//  // status field is at bytes 3,4;
-//  u16 status = Gaps::u16_from_le_bytes(bs, pos);
-//  header.lost_trigger = (status & 2 ) == 2;
-//  header.is_locked    = (status & 4 ) == 4;
-//  header.is_locked_last_sec = (status & 8) == 8;
-//  header.event_fragment = (status & 1 ) == 1;
-//  header.fpga_temp    = (status >> 4); 
-//  
-//  pos += 2 + 2 + 8 + 2 + 1; // skip len, roi, dna, fw hash and reserved part of rb_id
-//  header.rb_id = bs[pos];
-//  pos += 1;
-//  header.channel_mask = bs[pos];
-//  pos += 2;
-//  //header.event_id  = Gaps::u32_from_be_bytes(bs, pos);
-//  header.event_id     = Gaps::parse_u32_for_16bit_words(bs, pos); 
-//  header.dtap0        = Gaps::u16_from_le_bytes(bs, pos);
-//  header.drs4_temp    = Gaps::u16_from_le_bytes(bs, pos);
-//  header.timestamp_48 = Gaps::parse_u48_for_16bit_words(bs, pos);
-//  // FIXME - currently, the number of samples is still fixed
-//  u8 nchan = header.get_n_datachan();
-//  // we have to skip for each ch:
-//  // 1) head -> 2bytes
-//  // 2) NWORDS * 2bytes 
-//  // 3) trail -> 4bytes
-//  // if no channel is active, ch9 won't be active,
-//  // otherwise ch9 is ALWAYS active
-//  
-//  // THe header up to this point consists of 36 bytes
-//  u32 skip_bytes = 0;
-//  if ( nchan != 0) {
-//    skip_bytes = (nchan + 1) * (NWORDS * 2 + 6);
-//  }
-//  spdlog::debug("Skipping {} bytes of channel data!", skip_bytes);
-//  pos += skip_bytes;
-//  header.stop_cell = Gaps::parse_u16(bs, pos);
-//  header.crc32     = Gaps::parse_u32_for_16bit_words(bs, pos);
-//  spdlog::debug("Looking for TAIL at pos {}", pos);
-//  u16 tail         = Gaps::u16_from_le_bytes(bs, pos);
-//  if (tail != RBEventHeader::TAIL)  {
-//    spdlog::error("No tail signature found {} bytes from the start! Found {} instead", pos -start - 2, tail );  
-//  } else {
-//  }
-//  return header;
-//} 
-
-/**********************************************************/
 
 RBEvent::RBEvent() {  
   data_type = 0;
@@ -365,7 +305,7 @@ RBEvent::RBEvent() {
   for (usize k=0; k<NCHN; k++) {
     adc.push_back(Vec<u16>(NWORDS/2,0));
   }
-  hits  = Vec<RPaddlePacket>();
+  hits  = Vec<TofHit>();
 }
 
 /**********************************************************/
@@ -384,7 +324,16 @@ std::string RBEvent::to_string() const {
     repr += std::to_string(adc[ch][0]);
     repr += " "; 
     repr += std::to_string(adc[ch][1]);
-    repr += " .. .. \n"; 
+    repr += " .. .."; 
+  }
+  if ( hits.size() > 0 ) {
+    repr += "\n\n ** ** hits ** **\n";
+    for (auto const &h : hits) {
+      repr += h.to_string();
+      repr += "\n";
+    } 
+  } else {
+    repr += "\n -- no hits!";
   }
   repr += ">";
   return repr;
@@ -395,11 +344,11 @@ std::string RBEvent::to_string() const {
 
 bool RBEvent::channel_check(u8 channel) const {
   if (channel == 0) {
-    spdlog::error("Remember, channels start at 1. 0 does not exist!");
+    log_error("Remember, channels start at 1. 0 does not exist!");
     return false;
   }
   if (channel > 9) {
-    spdlog::error("Thera are no channels > 9!");
+    log_error("Thera are no channels > 9!");
     return false;
   }
   return true;
@@ -430,7 +379,7 @@ Vec<f32> RBEvent::get_baselines(const RBCalibration &cali,
   Vec<f32> baselines = Vec<f32>();
   for (auto const &ch : adc) {
     if (min_bin >= ch.size() || max_bin >= ch.size()) {
-      spdlog::error("Can not use bin range {} {} for ch with size {}", min_bin, max_bin, ch.size());
+      log_error("Can not use bin range {} {} for ch with size {}", min_bin, max_bin, ch.size());
       return baselines;
     }
   }
@@ -461,10 +410,10 @@ Vec<f32> RBEvent::get_baselines(const RBCalibration &cali,
 RBEvent RBEvent::from_bytestream(const Vec<u8> &stream,
                                  u64 &pos) {
   RBEvent event = RBEvent();
-  spdlog::debug("Start decoding at pos {}", pos);
+  log_debug("Start decoding at pos {}", pos);
   u16 head = Gaps::parse_u16(stream, pos);
   if (head != RBEvent::HEAD)  {
-    spdlog::error("[RBEvent::from_bytestream] Header signature invalid!");  
+    log_error("[RBEvent::from_bytestream] Header signature invalid!");  
   }
   event.data_type = Gaps::parse_u8(stream, pos);
   //event.status    = Gaps::parse_u8(stream, pos);
@@ -476,21 +425,27 @@ RBEvent RBEvent::from_bytestream(const Vec<u8> &stream,
   //spdlog::info("{}", event.data_type);
   //spdlog::info("{}", event.status);
   event.header    = RBEventHeader::from_bytestream(stream, pos);
-  spdlog::debug("Decoded RBEventHeader!");
+  log_debug("Decoded RBEventHeader!");
   if (event.header.is_event_fragment() || event.header.drs_lost_trigger()) {
     return event;
   }
   for (auto const &ch : event.header.get_channels()) {
-    spdlog::debug("Found active data channel {}!", ch);
+    log_debug("Found active data channel {}!", ch);
     Vec<u8>::const_iterator start = stream.begin() + pos;
     Vec<u8>::const_iterator end   = stream.begin() + pos + 2*NWORDS;    // 2*NWORDS because stream is Vec::<u8> and it is 16 bit words.
     Vec<u8> data(start, end);
     event.adc[ch] = u8_to_u16(data);
     pos += 2*NWORDS;
   }
+  // Decode the hits
+  for (u8 k=0;k<nhits;k++) {
+    auto hit = TofHit::from_bytestream(stream, pos);
+    event.hits.push_back(hit);
+  }
+
   u16 tail = Gaps::parse_u16(stream, pos);
   if (tail != RBEvent::TAIL) {
-    spdlog::error("After parsing the event, we found an invalid tail signature {}", tail);
+    log_error("After parsing the event, we found an invalid tail signature {}", tail);
   }
   return event;
 }
@@ -499,10 +454,10 @@ RBEvent RBEvent::from_bytestream(const Vec<u8> &stream,
 
 RBMissingHit RBMissingHit::from_bytestream(const Vec<u8> &stream,
                                            u64 &pos) {
-  spdlog::debug("Start decoding at pos {}", pos);
+  log_debug("Start decoding at pos {}", pos);
   u16 head = Gaps::parse_u16(stream, pos);
   if (head != RBMissingHit::HEAD)  {
-    spdlog::error("No header signature found!");  
+    log_error("No header signature found!");  
   }
   // verify_fixed already advances pos by 2
   RBMissingHit miss  = RBMissingHit();
@@ -516,7 +471,7 @@ RBMissingHit RBMissingHit::from_bytestream(const Vec<u8> &stream,
   miss.rb_ch         = Gaps::parse_u8(stream, pos);
   u16 tail = Gaps::parse_u16(stream, pos);
   if (tail != RBMissingHit::TAIL) {
-    spdlog::error("After parsing the event, we found an invalid tail signature {}", tail);
+    log_error("After parsing the event, we found an invalid tail signature {}", tail);
   }
   return miss;
 }
@@ -612,10 +567,10 @@ u32 TofEvent::get_n_rbevents(u32 mask){
 
 TofEvent TofEvent::from_bytestream(const Vec<u8> &stream,
                                    u64 &pos) {
-  spdlog::debug("Start decoding at pos {}", pos);
+  log_debug("Start decoding at pos {}", pos);
   u16 head = Gaps::parse_u16(stream, pos);
   if (head != TofEvent::HEAD)  {
-    spdlog::error("No header signature found!");  
+    log_error("No header signature found!");  
   }
   TofEvent event = TofEvent();
   // for now skip quality and compression level
@@ -626,7 +581,7 @@ TofEvent TofEvent::from_bytestream(const Vec<u8> &stream,
   u32 mask          = Gaps::parse_u32(stream, pos);
   u32 n_rbevents    = get_n_rbevents(mask);
   u32 n_missing     = get_n_rbmissinghits(mask);
-  spdlog::debug("Expecting {} RBEvents, {} RBMissingHits",
+  log_debug("Expecting {} RBEvents, {} RBMissingHits",
                 n_rbevents, n_missing);
 
   for (u32 k=0; k< n_rbevents; k++) {
@@ -685,7 +640,7 @@ TofEvent TofEvent::from_bytestream(const Vec<u8> &stream,
 TofEvent TofEvent::from_tofpacket(const TofPacket &packet) {
   TofEvent event;
   if (packet.packet_type != PacketType::TofEvent) {
-    spdlog::error("Wrong packet type! {}", packet_type_to_string(packet.packet_type));
+    log_error("Wrong packet type! {}", packet_type_to_string(packet.packet_type));
     return event;
   } 
   u64 _pos = 0;
@@ -701,7 +656,7 @@ const RBEvent& TofEvent::get_rbevent(u8 board_id) const {
       return ev;
     }
   }
-  spdlog::error("No RBEvent for board {}", board_id);
+  log_error("No RBEvent for board {}", board_id);
   return _empty_event;
 }
 
@@ -718,7 +673,7 @@ Vec<u8> TofEvent::get_rbids() const {
 /**********************************************************/
     
 bool TofEvent::passed_consistency_check() {
-  spdlog::error("This is not implmented yet!");
+  log_error("This is not implmented yet!");
   return false;
 }
 
@@ -818,7 +773,6 @@ Vec<std::tuple<u8,u8,u8>>  MasterTriggerEvent::get_dsi_j_ch() {
   u8 ltb_ch = 0;
   auto hit_boards = Vec<u8>();
   Vec<std::tuple<u8,u8,u8>> result;  
-  auto hit = std::make_tuple(dsi,j,ltb_ch);
   
   for (u8 k=0;k<N_LTBS;k++) {
     if (board_mask[k]) {
@@ -847,7 +801,7 @@ MasterTriggerEvent MasterTriggerEvent::from_bytestream(const Vec<u8> &bytestream
   MasterTriggerEvent event;
   u16 header = Gaps::parse_u16(bytestream, pos);
   if (header != MasterTriggerEvent::HEAD) {
-    spdlog::error("Wrong header signature!");
+    log_error("Wrong header signature!");
     return event;
   }
   event.event_id           = Gaps::parse_u32(bytestream, pos);
@@ -869,12 +823,12 @@ MasterTriggerEvent MasterTriggerEvent::from_bytestream(const Vec<u8> &bytestream
   u8 tail_a = Gaps::parse_u8 (bytestream, pos);
   u8 tail_b = Gaps::parse_u8 (bytestream, pos);
   if (tail_a == 85 && tail_b == 85) {
-    spdlog::debug("Correct tail found!");
+    log_debug("Correct tail found!");
   }
   else if (tail_a == 85 && tail_b == 5) {
-     spdlog::warn("Tail for version 0.6.0/0.6.1 found");
+    log_warn("Tail for version 0.6.0/0.6.1 found");
   } else {
-    spdlog::error("Tail is messed up. See comment for version 0.6.0/0.6.1 in CHANGELOG! We got {} {} but were expecting 85 5", tail_a, tail_b);
+    log_error("Tail is messed up. See comment for version 0.6.0/0.6.1 in CHANGELOG! We got {} {} but were expecting 85 5", tail_a, tail_b);
   }
   return event;
 }
@@ -950,6 +904,126 @@ std::string TofEvent::to_string() const {
   repr += "  missing hits  : " + std::to_string(missing_hits.size() ) + ">" ;
   return repr;
 }
+
+/*************************************/
+
+f32 TofHit::get_time_a() const {
+ f32 prec = 0.004;
+ return prec*time_a;
+}
+
+f32 TofHit::get_time_b() const {
+  f32 prec = 0.004;//ns
+  return prec*time_b;
+}
+
+f32 TofHit::get_peak_a() const {
+  f32 prec = 0.2;
+  return prec*peak_a;
+}
+
+f32 TofHit::get_peak_b() const {
+  f32 prec = 0.2;
+  return prec*peak_b;
+}
+
+f32 TofHit::get_charge_a() const {
+  f32 prec = 0.01; //pC
+  return prec*charge_a - 50;
+}
+
+f32 TofHit::get_charge_b() const {
+  f32 prec = 0.01;
+  return prec*charge_b - 50;
+}
+
+f32 TofHit::get_charge_min_i() const {
+  f32 prec = 0.002;// minI
+  return prec*charge_min_i - 10;
+}
+
+f32 TofHit::get_x_pos() const {
+  // FIXME - check if it is really in the middle
+  f32 prec = 0.005; //cm
+  return prec*x_pos - 163.8;
+}
+
+f32 TofHit::get_t_avg() const {
+  f32 prec = 0.004;//ps
+  return prec*t_average;
+}
+
+/// combine the slow timestamp with 
+/// the fast to get the full
+f64 TofHit::get_timestamp48() const {
+  f64 ts48 = timestamp16 << 16 | timestamp32;
+  return ts48;
+}
+
+TofHit TofHit::from_bytestream(const Vec<u8> &bytestream,
+                               u64 &pos) {
+ TofHit hit = TofHit();
+ u16 maybe_header = Gaps::parse_u16(bytestream, pos);
+ if (maybe_header != hit.HEAD) {
+   log_error("Can not find HEADER at presumed position. Maybe give a different value for start_pos?");
+ }
+ hit.paddle_id     = bytestream[pos]; pos+=1;
+ hit.time_a        = Gaps::parse_u16(bytestream, pos); 
+ hit.time_b        = Gaps::parse_u16(bytestream, pos); 
+ //std::cout << " " << time_a << " " << time_b << " " << charge_a << " " << charge_b << std::endl;
+ hit.peak_a        = Gaps::parse_u16(bytestream, pos); 
+ hit.peak_b        = Gaps::parse_u16(bytestream, pos); 
+ hit.charge_a      = Gaps::parse_u16(bytestream, pos); 
+ hit.charge_b      = Gaps::parse_u16(bytestream, pos); 
+ hit.charge_min_i  = Gaps::parse_u16(bytestream, pos); 
+ hit.x_pos         = Gaps::parse_u16(bytestream, pos); 
+ hit.t_average     = Gaps::parse_u16(bytestream, pos); 
+
+ hit.ctr_etx = bytestream[pos]; pos+=1;
+
+ hit.timestamp32 = Gaps::parse_u16(bytestream, pos);
+ hit.timestamp16 = Gaps::parse_u16(bytestream, pos);
+
+ // FIXME checks - packetlength, checksum ?
+ u16 tail = Gaps::parse_u16(bytestream, pos);
+ if (tail != TAIL) {
+   log_error("Tail signature is incorrect!");
+ }
+ //if (tail != 0xF0F) {
+ //  broken = true;
+ //}
+ return hit; 
+}
+
+std::string TofHit::to_string() const {
+  std::string repr = "<TofHit";
+  //repr += std::format("\n -- format test {:.2f}", get_time_a() );
+  repr += "\n  paddle ID         : "     + std::to_string(paddle_id         );
+  repr += "\n  timestamp32       : "     + std::to_string(timestamp32       );
+  repr += "\n  timestamp16       : "     + std::to_string(timestamp16       );
+  repr += "\n   |-> timestamp48  : "     + std::to_string(get_timestamp48() ); 
+  repr += "\n  _________";
+  repr += "\n  ##  Peak:";
+  repr += "\n  >>  time   A | B  : "     + std::to_string(get_time_a()      )
+       +  " " + std::to_string(get_time_b());
+  repr += "\n  >>  height A | B  : "     + std::to_string(get_peak_a()      )
+       +  " " + std::to_string(get_time_a());
+  repr += "\n  >>  charge A | B  : "     + std::to_string(get_charge_a()    )
+       +  " " + std::to_string(get_time_b());
+  repr += "\n  >>  charge min_I  : "     + std::to_string(get_charge_min_i());
+  repr += "\n  >>  in pad. pos   : "     + std::to_string(get_x_pos()       );
+  repr += "\n  >>  t_avg         : "     + std::to_string(get_t_avg()       );
+  repr += "\n  cntr ETX          : "     + std::to_string(ctr_etx           );
+  repr += "\n  broken (?depr)    : "     + std::to_string(broken            );
+  repr += ">";
+  return repr;
+}
+
+std::ostream& operator<<(std::ostream& os, const TofHit& th) {
+  os << th.to_string();
+  return os;
+}
+
 
 std::ostream& operator<<(std::ostream& os, const MasterTriggerEvent& mt) {
   os << mt.to_string();

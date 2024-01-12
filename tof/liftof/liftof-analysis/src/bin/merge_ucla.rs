@@ -9,8 +9,6 @@ use clap::Parser;
 
 use liftof_lib::{
     color_log,
-    TofPacketWriter,
-    TofPacketReader
 };
 
 
@@ -21,7 +19,10 @@ use tof_dataclasses::packets::{
 use tof_dataclasses::events::{TofEvent,
                               RBEvent};
 use tof_dataclasses::serialization::Serialization;
-
+use tof_dataclasses::io::{
+    TofPacketReader,
+    TofPacketWriter,
+};
 
 #[derive(Parser, Default, Debug)]
 #[command(author = "J.A.Stoessl", version, about, long_about = None)]

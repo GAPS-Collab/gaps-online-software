@@ -7,20 +7,15 @@
 #include <pybind11/chrono.h>
 #include <pybind11/numpy.h>
 
-#include "packets/REventPacket.h"
-#include "packets/RPaddlePacket.h"
 #include "packets/tof_packet.h"
 #include "packets/CommandPacket.h"
-#include "packets/MasterTriggerPacket.h"
 #include "packets/monitoring.h"
 #include "events/tof_event_header.hpp"
 
+#include "legacy.h"
 #include "io.hpp"
 #include "serialization.h"
 #include "calibration.h"
-#include "blobroutines.h"
-#include "WaveGAPS.h"
-#include "TOFCommon.h"
 #include "events.h"
 
 #include "tof_typedefs.h"
@@ -34,9 +29,6 @@ namespace py = pybind11;
 /********************/
 // helpers
 
-int static_helper(RPaddlePacket& pp){
-    return RPaddlePacket::calculate_length();
-}
 
 std::string tof_command_to_str(const TofCommand &cmd) {
  switch (cmd) {
@@ -72,261 +64,8 @@ std::string tof_response_to_str(const TofResponse &cmd) {
  return "Unknown";
 }
 
-Vec<u16> ch_head_getter(BlobEvt_t evt)
-{
-    Vec<u16> ch_head;
-    for (size_t k=0; k<NCHN; k++) 
-    {ch_head.push_back(evt.ch_head[k]);}
-    return ch_head;
-}
-
-Vec<u64> ch_trail_getter(BlobEvt_t evt)
-{
-    Vec<u64> ch_trail;
-    for (size_t k=0; k<NCHN; k++) 
-    {ch_trail.push_back(evt.ch_trail[k]);}
-    return ch_trail;
-}
-
-Vec<Vec<i16>> ch_getter(BlobEvt_t evt)
-{
-    Vec<Vec<i16>> channels;
-    for (size_t k=0; k<NCHN; k++) 
-      {  channels.push_back({});
-         for (size_t l=0; l < NWORDS; l++)
-            {
-               channels[k].push_back(evt.ch_adc[k][l]);
-            }
-      }
-    return channels;
-}
-
-usize get_current_blobevent_size() {
-  return 36 + (NCHN*2) + (NCHN*NWORDS*2) + (NCHN*4) + 8;
-}
-
-//bytestream blobevent_encoder(BlobEvt_t evt, size_t startpos)
-//{
-//  bytestream buffer;
-//  buffer.reserve(get_current_blobevent_size());
-//  for (size_t k=0; k<get_current_blobevent_size(); k++)
-//  {buffer.push_back(0);}
-//  encode_blobevent(&evt, buffer, startpos);
-//  return buffer;
-//}
-//
-//BlobEvt_t blobevent_decoder(bytestream buffer, size_t startpos)
-//{
-//  BlobEvt_t evt = decode_blobevent(buffer, startpos);
-//  return evt;
-//}
-
-//std::string BlobEvtToString(BlobEvt_t event)
-//{
-//   std::string output = "";
-//   output += "head "      + std::to_string(event.head )      + "\n" ;
-//   output += "status "    + std::to_string(event.status )    + "\n" ;
-//   output += "len "       + std::to_string(event.len )       + "\n" ;
-//   output += "roi "       + std::to_string(event.roi )       + "\n" ;
-//   output += "dna "       + std::to_string(event.dna )       + "\n" ;
-//   output += "fw_hash "   + std::to_string(event.fw_hash )   + "\n" ;
-//   output += "id "        + std::to_string(event.id )        + "\n" ;
-//   output += "ch_mask "   + std::to_string(event.ch_mask )   + "\n" ;
-//   output += "event_ctr " + std::to_string(event.event_ctr ) + "\n" ;
-//   output += "dtap0 "     + std::to_string(event.dtap0 )     + "\n" ;
-//   output += "dtap1 "     + std::to_string(event.dtap1 )     + "\n" ;
-//   output += "timestamp " + std::to_string(event.timestamp ) + "\n" ;
-//   output += "stop_cell " + std::to_string(event.stop_cell ) + "\n" ;
-//   output += "crc32 "     + std::to_string(event.crc32 )     + "\n" ;
-//   output += "tail "      + std::to_string(event.tail)       ;
-//   return output;
-//}
-
-template<class T>
-void nullsetter(T foo) 
-{
-    std::cerr << "Can not set this property!" << std::endl;
-}
-
-void set_payload_helper(TofPacket &packet,
-                        const Vec<u8> payload) {
-  packet.payload = payload;
-  packet.payload_size = payload.size();
-}
-
-//void set_ptype_helper(TofPacket &packet,
-//                      const PacketType &ptype) {
-//  packet.packet_type = ptype;
-//}
-
-/********************/
-
-BlobEvt_t read_event_helper(std::string filename, i32 n)
-{
-    FILE* f = fopen(filename.c_str(), "rb");
-    BlobEvt_t event;
-    while(n >= 0) {
-      ReadEvent(f, &event, false);
-      n--;
-    }
-    return event;
-}
-
-/********************/
-
-/*****************
- * Dismantle a readoutboard file and return the individual
- * fields as arrays in a python dictionary
- *
- */
-py::dict splice_readoutboard_datafile(const std::string filename) {
-  bytestream stream             = get_bytestream_from_file(filename);
-  std::vector<BlobEvt_t> events = get_events_from_stream(stream, 0);
-  Vec<u32> event_ids  = Vec<u32>(); 
-  Vec<u16> stop_cells = Vec<u16>(); 
-  Vec<u64> timestamps = Vec<u64>();
-  
-  // channels, times
-  Vec<Vec<u16>> t_1     = Vec<Vec<u16>>();
-  Vec<Vec<u16>> t_2     = Vec<Vec<u16>>();
-  Vec<Vec<u16>> t_3     = Vec<Vec<u16>>();
-  Vec<Vec<u16>> t_4     = Vec<Vec<u16>>();
-  Vec<Vec<u16>> t_5     = Vec<Vec<u16>>();
-  Vec<Vec<u16>> t_6     = Vec<Vec<u16>>();
-  Vec<Vec<u16>> t_7     = Vec<Vec<u16>>();
-  Vec<Vec<u16>> t_8     = Vec<Vec<u16>>();
-  Vec<Vec<u16>> t_9     = Vec<Vec<u16>>();
-  
-  Vec<Vec<i16>> adc_1     = Vec<Vec<i16>>();
-  Vec<Vec<i16>> adc_2     = Vec<Vec<i16>>();
-  Vec<Vec<i16>> adc_3     = Vec<Vec<i16>>();
-  Vec<Vec<i16>> adc_4     = Vec<Vec<i16>>();
-  Vec<Vec<i16>> adc_5     = Vec<Vec<i16>>();
-  Vec<Vec<i16>> adc_6     = Vec<Vec<i16>>();
-  Vec<Vec<i16>> adc_7     = Vec<Vec<i16>>();
-  Vec<Vec<i16>> adc_8     = Vec<Vec<i16>>();
-  Vec<Vec<i16>> adc_9     = Vec<Vec<i16>>();
- 
-  for (auto ev : events) {
-     event_ids .push_back(ev.event_ctr);
-     stop_cells.push_back(ev.stop_cell);
-     timestamps.push_back(ev.timestamp);
-     adc_1       .push_back(Vec<i16>(ev.ch_adc[0], std::end(ev.ch_adc[0])));
-     adc_2       .push_back(Vec<i16>(ev.ch_adc[1], std::end(ev.ch_adc[1])));
-     adc_3       .push_back(Vec<i16>(ev.ch_adc[2], std::end(ev.ch_adc[2])));
-     adc_4       .push_back(Vec<i16>(ev.ch_adc[3], std::end(ev.ch_adc[3])));
-     adc_5       .push_back(Vec<i16>(ev.ch_adc[4], std::end(ev.ch_adc[4])));
-     adc_6       .push_back(Vec<i16>(ev.ch_adc[5], std::end(ev.ch_adc[5])));
-     adc_7       .push_back(Vec<i16>(ev.ch_adc[6], std::end(ev.ch_adc[6])));
-     adc_8       .push_back(Vec<i16>(ev.ch_adc[7], std::end(ev.ch_adc[7])));
-     adc_9       .push_back(Vec<i16>(ev.ch_adc[8], std::end(ev.ch_adc[8])));
-  }
-  py::dict data(
-                "event_id"_a  =py::array_t<u32>(event_ids.size(),  event_ids.data()),\
-                "stop_cell"_a =py::array_t<u16>(stop_cells.size(), stop_cells.data()),\
-                "timestamps"_a=py::array_t<u64>(timestamps.size(), timestamps.data()),\
-                "adc_ch1"_a=adc_1,\
-                "adc_ch2"_a=adc_2,\
-                "adc_ch3"_a=adc_3,\
-                "adc_ch4"_a=adc_4,\
-                "adc_ch5"_a=adc_5,\
-                "adc_ch6"_a=adc_6,\
-                "adc_ch7"_a=adc_7,\
-                "adc_ch8"_a=adc_8,\
-                "adc_ch9"_a=adc_9);
-  return data;
-}
 
 
-int get_nevents_from_file(std::string filename){
-  FILE* f = fopen(filename.c_str(), "rb");
-  BlobEvt_t event;
-  i32 result = 0;
-  u32 nevents = 0;
-  while (result >= 0) {
-    result = ReadEvent(f, &event, false);
-    nevents++;
-  }
-  return nevents;
-}
-
-/********************/
-
-std::vector<Calibrations_t> read_calibration_file (std::string filename) {
-  std::vector<Calibrations_t> all_channel_calibrations = std::vector<Calibrations_t>{NCHN};
-  std::fstream calfile(filename.c_str(), std::ios_base::in);
-  if (calfile.fail()) {
-    std::cerr << "[ERROR] Can't open " << filename << " - not calibrating" << std::endl;
-    return all_channel_calibrations;
-  }
-  for (size_t i=0; i<NCHN; i++) {
-    for (size_t j=0; j<NWORDS; j++)
-      calfile >> all_channel_calibrations[i].vofs[j];
-    for (size_t j=0; j<NWORDS; j++)
-      calfile >> all_channel_calibrations[i].vdip[j];
-    for (size_t j=0; j<NWORDS; j++)
-      calfile >> all_channel_calibrations[i].vinc[j];
-    for (size_t j=0; j<NWORDS; j++)
-      calfile >> all_channel_calibrations[i].tbin[j];
-  }
-  return all_channel_calibrations;
-}
-
-/********************/
-
-Vec<Vec<f64>> offset_getter(const std::vector<Calibrations_t> &cal)
-{
-  Vec<Vec<f64>> offsets;
-  for (size_t k=0; k<NCHN; k++) 
-    {  offsets.push_back({});
-       for (size_t l=0; l < NWORDS; l++)
-          {
-             offsets[k].push_back(cal[k].vofs[l]);
-          }
-    }
-  return offsets;
-}
-
-Vec<Vec<f64>> dip_getter(const std::vector<Calibrations_t> &cal)
-{
-    Vec<Vec<f64>> dips;
-    for (size_t k=0; k<NCHN; k++) 
-      {  dips.push_back({});
-         for (size_t l=0; l < NWORDS; l++)
-           {
-             dips[k].push_back(cal[k].vdip[l]);
-           }
-      }
-    return dips;
-}
-
-Vec<Vec<f64>> increment_getter(const std::vector<Calibrations_t> &cal)
-{
-  Vec<Vec<f64>> incs;
-  for (size_t k=0; k<NCHN; k++) 
-    {  incs.push_back({});
-       for (uint l=0; l < NWORDS; l++)
-        {
-          incs[k].push_back(cal[k].vinc[l]);
-        }
-    }
-  return incs;
-}
-
-Vec<Vec<f64>> tbin_getter(const std::vector<Calibrations_t> cal)
-{
-    Vec<Vec<f64>> tbins;
-    for (size_t k=0; k<NCHN; k++) 
-      {  tbins.push_back({});
-         for (size_t l=0; l < NWORDS; l++)
-            {
-              tbins[k].push_back(cal[k].tbin[l]);
-            }
-      }
-    return tbins;
-}
-
-/********************/
 
 Vec<Vec<f64>> remove_spikes_helper(u16 stop_cell,
                                  Vec<Vec<f64>> waveforms) {
@@ -401,7 +140,8 @@ PYBIND11_MODULE(gaps_tof, m) {
       .value("UnspoolEventCache"    ,TofCommand::UnspoolEventCache)
       .value("StreamAnyEvent"       ,TofCommand::StreamAnyEvent) 
       .value("Unknown"              ,TofCommand::Unknown) 
-      .export_values();
+      //.export_values();
+      ;
 
     py::class_<RBEventHeader>(m, "RBEventHeader", "The event header contains the event id, information about active channels, temperatures, trigger stop cell etc. Basically everythin except channel adc data.")
       .def(py::init())
@@ -409,28 +149,30 @@ PYBIND11_MODULE(gaps_tof, m) {
       //.def("extract_from_rbmemoryview"   , &RBEventHeader::extract_from_rbbinarydump, "Get header from full rbevent binary stream ('blob')")
       .def("get_active_data_channels"    , &RBEventHeader::get_active_data_channels, "Get a list of active channels, excluding ch9. Channel9 will (usually) always be on, as long as a single data channel is switched on as well.")
       .def("get_fpga_temp"               , &RBEventHeader::get_fpga_temp, "The FPGA temperature in C")
-      .def("get_drs_temp"                , &RBEventHeader::get_drs_temp, "The DRS4 temperature in C, read out by software")
-      .def("get_timestamp48"             , &RBEventHeader::get_timestamp48, "The complete 48bit timestamp, derived from the RB clock (usually 33MHz)")
+      .def_property_readonly("timestamp48"  , &RBEventHeader::get_timestamp48, "The complete 48bit timestamp, derived from the RB clock (usually 33MHz)")
       .def("get_n_datachan"              , &RBEventHeader::get_n_datachan)
       .def("get_nchan"                   , &RBEventHeader::get_nchan) 
       .def("get_channels"                , &RBEventHeader::get_channels) 
       .def_readonly("channel_mask"       , &RBEventHeader::channel_mask)   
       .def("has_ch9"                     , &RBEventHeader::has_ch9, "Ch9 is available"     )
       .def_readonly("stop_cell"          , &RBEventHeader::stop_cell   )   
-      .def_readonly("crc32"              , &RBEventHeader::crc32       )   
-      .def_readonly("dtap0"              , &RBEventHeader::dtap0       )   
-      .def_readonly("drs4_temp"          , &RBEventHeader::drs4_temp   )   
-      .def("is_locked"                   , &RBEventHeader::is_locked   )   
-      .def("is_locked_last_sec"          , &RBEventHeader::is_locked_last_sec)   
-      .def("lost_lock"                   , &RBEventHeader::lost_lock   )   
-      .def("lost_lock_last_sec"          , &RBEventHeader::lost_lock_last_sec)   
-      .def("lost_trigger"                , &RBEventHeader::drs_lost_trigger)   
-      .def("event_fragment"              , &RBEventHeader::is_event_fragment)   
+      .def_property_readonly("is_locked"                   , &RBEventHeader::is_locked,
+           "Is the RB loceked?"   )   
+      .def_property_readonly("is_locked_last_sec"          , &RBEventHeader::is_locked_last_sec,
+           "Has the RB been locked continuously throughout the last second?")   
+      .def_property_readonly("lost_lock"                   , &RBEventHeader::lost_lock   )   
+      .def_property_readonly("lost_lock_last_sec"          , &RBEventHeader::lost_lock_last_sec)   
+      .def_property_readonly("lost_trigger"                , &RBEventHeader::drs_lost_trigger)   
+      .def_property_readonly("event_fragment"              , &RBEventHeader::is_event_fragment) 
+      .def("get_sine_fit"                , &RBEventHeader::get_sine_fit,
+            "Get the result (amp,freq,phase) of an online sine fit to ch9")  
       .def_readonly("fpga_temp"          , &RBEventHeader::fpga_temp   )   
       .def_readonly("event_id"           , &RBEventHeader::event_id    )   
       .def_readonly("rb_id"              , &RBEventHeader::rb_id       )   
-      .def_readonly("timestamp32"        , &RBEventHeader::timestamp32)   
-      .def_readonly("timestamp16"        , &RBEventHeader::timestamp16)   
+      .def_readonly("timestamp32"        , &RBEventHeader::timestamp32, 
+              "LSB of the 48bit timestamp. Fast component")   
+      .def_readonly("timestamp16"        , &RBEventHeader::timestamp16,
+              "MSB of the 48bit timestamp. Slow component")   
       .def("__repr__",        [](const RBEventHeader &h) {
                                    return h.to_string();
                                  })
@@ -440,9 +182,11 @@ PYBIND11_MODULE(gaps_tof, m) {
 
     py::class_<RBEvent>(m, "RBEvent", "RBEvent contains an event header for this specific board as well as a (flexible) number of adc channels")
         .def(py::init())
-        .def_readonly("header"              ,&RBEvent::header)
+        .def_readonly("header"              ,&RBEvent::header,
+                "RBEventHeader stores all information which is NOT channel data")
+        .def_readonly("hits"                ,&RBEvent::hits)
         .def("get_baselines"                ,&RBEvent::get_baselines,
-                                             "Calculate baselines using the given calibration object in min/max range")  
+                "Calculate baselines using the given calibration object in min/max range")  
         .def("get_channel_adc"              ,&RBEvent::get_channel_adc,
                                              "Get the ADC values for a specific channel. Channel ids go from 1-9",
                                              py::arg("channel"),
@@ -474,20 +218,6 @@ PYBIND11_MODULE(gaps_tof, m) {
     ;
   
 
-    py::class_<CommandPacket>(m, "CommandPacket") 
-      .def(py::init<TofCommand const&, u32 const>())  
-      .def("to_bytestream",   &CommandPacket::to_bytestream  , "Translate the command to a list of bytes")
-      .def("from_bytestream", &CommandPacket::from_bytestream, "Retrieve a command from a list of bytes")
-      .def("get_command" ,    [](const CommandPacket &pk) {
-                                  return pk.command;
-                              })
-      .def("__repr__",        [](const CommandPacket &pk) {
-                                  return "<CommandPacket : "
-                                  + tof_command_to_str(pk.command)
-                                  + " "
-                                  + std::to_string(pk.value) + ">";
-                                  }) 
-    ;
 
     py::enum_<TofResponse>(m, "TofResponse")
       .value("Success"                 ,TofResponse::Success) 
@@ -495,43 +225,31 @@ PYBIND11_MODULE(gaps_tof, m) {
       .value("EventNotReady"           ,TofResponse::EventNotReady) 
       .value("EventSerializationIssue" ,TofResponse::SerializationIssue) 
       .value("Unknown"                 ,TofResponse::Unknown) 
-      .export_values()
+      //.export_values()
     ;
    
-    py::class_<ResponsePacket>(m, "ResponsePacket") 
-      .def(py::init<TofResponse const&, u32 const>())  
-      .def("to_bytestream",   &ResponsePacket::to_bytestream)
-      .def("from_bytestream", &ResponsePacket::from_bytestream)
-      .def("translate_response_code", &ResponsePacket::translate_response_code,
-                                      "Translate the response code into some human readable string")
-      .def("get_response"   ,    [](const ResponsePacket &pk) {
-                                  return pk.response; 
-                                 }
-                              , "Get the RESPONSE_CODE from the response. This will provide further information.")
-      .def("__repr__",        [](const ResponsePacket &pk) {
-                                  return "<ResponsePacket : "
-                                  + tof_response_to_str(pk.response)
-                                  + " "
-                                  + pk.translate_response_code(pk.value) + ">";
-                                  }) 
-    ;
     py::enum_<PacketType>(m, "PacketType")
-      .value("Unknown",   PacketType::Unknown   )
-      .value("Command",   PacketType::Command   )
-      .value("PT_RBEvent",   PacketType::RBEvent   )
-      .value("PT_TofEvent",  PacketType::TofEvent  )
-      .value("Monitor",   PacketType::Monitor   )
-      .value("Scalar",    PacketType::Scalar    )
-      .value("HeartBeat", PacketType::HeartBeat )
-      .value("MasterTrigger", PacketType::MasterTrigger )
-      .export_values();
+      .value("Unknown",          PacketType::Unknown   )
+      .value("Command",          PacketType::Command   )
+      .value("RBEvent",          PacketType::RBEvent   )
+      .value("TofEvent",         PacketType::TofEvent  )
+      .value("RBMoniData",       PacketType::Monitor   )
+      .value("PAMoniData",       PacketType::PAMoniData)
+      .value("PBMoniData",       PacketType::PBMoniData)
+      .value("LTBMoniData",      PacketType::LTBMoniData)
+      .value("HeartBeat",        PacketType::HeartBeat )
+      .value("MasterTrigger",    PacketType::MasterTrigger )
+      .value("MtbMoniData",      PacketType::MTBMoni)
+      ;
+      //.export_values();
 
     py::enum_<PADDLE_END>(m, "PADDLE_END")
         .value("A", PADDLE_END::A)
         .value("B", PADDLE_END::B)
         .value("UNKNOWN", PADDLE_END::UNKNOWN)
-        .export_values();
-    
+        //.export_values();
+        ;
+
     py::class_<MtbMoniData>(m, "MtbMoniData",
             "Monitoring data from the master trigger board.")
         .def(py::init())
@@ -546,6 +264,7 @@ PYBIND11_MODULE(gaps_tof, m) {
                                   return moni.to_string();
                                   }) 
     ;
+    
     py::class_<TofCmpMoniData>(m, "TofCmpMoniData",
             "Monitoring data from the tof flight computer (TOF-CPU)")
         .def(py::init())
@@ -554,6 +273,58 @@ PYBIND11_MODULE(gaps_tof, m) {
         .def_readonly("core2_tmp" , &TofCmpMoniData::core2_tmp) 
         .def_readonly("pch_tmp"   , &TofCmpMoniData::pch_tmp  ) 
         .def("__repr__",          [](const TofCmpMoniData &moni) {
+                                  return moni.to_string();
+                                  }) 
+    ;
+
+    py::class_<LTBMoniData>(m, "LTBMoniData",
+            "Environmental sensors & thresholds for LocalTriggerBoards")
+        .def(py::init())
+        .def("from_bytestream",   &LTBMoniData::from_bytestream,
+                "Factory function to recreate LTBMoniData from byte representation")
+        .def_readonly("board_id", &LTBMoniData::board_id,
+                "The ID of the RB the LTB is connected to")
+        .def_readonly("trenz_temp", &LTBMoniData::trenz_temp) 
+        .def_readonly("ltb_temp"  , &LTBMoniData::ltb_temp)
+        .def_readonly("thresholds", &LTBMoniData::thresh,
+                "Trigger thresholds applied to the low gain signal of paddle ends. In mV")
+        .def("__repr__",          [](const LTBMoniData &moni) {
+                                  return moni.to_string();
+                                  }) 
+    ;
+    
+    py::class_<PBMoniData>(m, "PBMoniData",
+            "Sensors on the Powerboards")
+        .def(py::init())
+        .def("from_bytestream",   &PBMoniData::from_bytestream,
+                "Factory function to recreate PBMoniData from byte representation")
+        .def_readonly("board_id", &PBMoniData::board_id,
+                "The ID of the RB the PB is connected to")
+        .def_readonly("p3v6_preamp_vcp", &PBMoniData::p3v6_preamp_vcp  ) 
+        .def_readonly("n1v6_preamp_vcp", &PBMoniData::n1v6_preamp_vcp ) 
+        .def_readonly("p3v4f_ltb_vcp"  , &PBMoniData::p3v4f_ltb_vcp   ) 
+        .def_readonly("p3v4d_ltb_vcp"  , &PBMoniData::p3v4d_ltb_vcp   ) 
+        .def_readonly("p3v6_ltb_vcp"   , &PBMoniData::p3v6_ltb_vcp ) 
+        .def_readonly("n1v6_ltb_vcp"   , &PBMoniData::n1v6_ltb_vcp ) 
+        .def_readonly("pds_temp"       , &PBMoniData::pds_temp ) 
+        .def_readonly("pas_temp"       , &PBMoniData::pas_temp ) 
+        .def_readonly("nas_temp"       , &PBMoniData::nas_temp ) 
+        .def_readonly("shv_temp"       , &PBMoniData::shv_temp ) 
+        .def("__repr__",          [](const PBMoniData &moni) {
+                                  return moni.to_string();
+                                  }) 
+    ;
+    
+    py::class_<PAMoniData>(m, "PAMoniData",
+            "Sensors for the preamps")
+        .def(py::init())
+        .def("from_bytestream",   &PAMoniData::from_bytestream,
+                "Factory function to recreate PAMoniData from byte representation")
+        .def_readonly("board_id", &PAMoniData::board_id,
+                "The ID of the RB which is used to read out these sensors")
+        .def_readonly("temps",    &PAMoniData::temps  ) 
+        .def_readonly("biases",   &PAMoniData::biases ) 
+        .def("__repr__",          [](const PAMoniData &moni) {
                                   return moni.to_string();
                                   }) 
     ;
@@ -604,13 +375,14 @@ PYBIND11_MODULE(gaps_tof, m) {
                                   return rbmoni_to_string(moni);
                                   }) 
     ;
+    
     py::class_<TofEventHeader>(m, "TofEventHeader",
         "Meta information, primary particle reconstruction & general variables.")
         .def(py::init())
         .def_readonly("run_id"              , &TofEventHeader::run_id             )
         .def_readonly("event_id"            , &TofEventHeader::event_id           ) 
-        .def_readonly("timestamp_32"        , &TofEventHeader::timestamp_32       ) 
-        .def_readonly("timestamp_16"        , &TofEventHeader::timestamp_16       ) 
+        .def_readonly("timestamp32"         , &TofEventHeader::timestamp_32       ) 
+        .def_readonly("timestamp16"         , &TofEventHeader::timestamp_16       ) 
         .def_readonly("primary_beta"        , &TofEventHeader::primary_beta       ) 
         .def_readonly("primary_beta_unc"    , &TofEventHeader::primary_beta_unc   ) 
         .def_readonly("primary_charge"      , &TofEventHeader::primary_charge     ) 
@@ -637,61 +409,31 @@ PYBIND11_MODULE(gaps_tof, m) {
     
     py::class_<TofEvent>(m, "TofEvent")
         .def(py::init())
-        //.def_readonly("header"              ,&TofEvent::header)
-        .def_readonly("mt_event"            ,&TofEvent::mt_event)
+        .def_readonly("header"              ,&TofEvent::header,
+                "Online reconstruction and summary information")
+        .def_readonly("mt_event"            ,&TofEvent::mt_event,
+                "The event information comming from the MasterTriggerBoard")
         .def_readonly("missing_hits"        ,&TofEvent::missing_hits)
-        .def_readonly("rbevents"            ,&TofEvent::rb_events)
+        .def_readonly("rbevents"            ,&TofEvent::rb_events,
+                "A list of all RBEvents which contributed to this event")
         .def("get_rbids"                    ,&TofEvent::get_rbids,
-                                             "Get a list of all RB ids contributing to this event."
+                "Get a list of all RB ids contributing to this event"
                                              )
         .def("get_rbevent"                  ,&TofEvent::get_rbevent,
-                                             "Return a the event for this specif RB id",
+                 "Return a the event for this specif RB id",
                                              py::arg("rb_id"))
         .def("from_bytestream"              ,&TofEvent::from_bytestream)
-        .def("from_tofpacket"               ,&TofEvent::from_tofpacket)
+        .def("from_tofpacket"               ,&TofEvent::from_tofpacket,
+                 "Factory function: Unpack a TofEvent from a TofPacket")
         .def("__repr__",           [](const TofEvent &te) {
                                    return te.to_string(); 
                                    }) 
 
     ;
 
-    py::class_<REventPacket>(m, "REventPacket")
-        .def(py::init())
-        .def("to_bytestream"                ,&REventPacket::serialize)
-        .def("from_bytestream"              ,&REventPacket::deserialize)
-        .def("calculate_length"             ,&REventPacket::calculate_length)
-        .def("is_broken"                    ,&REventPacket::is_broken)
-        .def("reset"                        ,&REventPacket::reset)
-        .def("add_paddle_packet"            ,&REventPacket::add_paddle_packet)
-        .def("is_broken"                    ,&REventPacket::is_broken)
-        .def_readwrite("event_id"           ,&REventPacket::event_ctr)
-        .def_readwrite("n_paddles"          ,&REventPacket::n_paddles)
-        .def_readwrite("timestamp_32"       ,&REventPacket::timestamp_32)
-        .def_readwrite("timestamp_16"       ,&REventPacket::timestamp_16)
-        .def_readwrite("primary_beta"       ,&REventPacket::primary_beta)
-        .def_readwrite("primary_beta_unc"   ,&REventPacket::primary_beta_unc)
-        .def_readwrite("primary_charge"     ,&REventPacket::primary_charge)
-        .def_readwrite("primary_charge_unc" ,&REventPacket::primary_charge_unc)
-        .def_readwrite("primary_outer_tof_x",&REventPacket::primary_outer_tof_x)
-        .def_readwrite("primary_outer_tof_y",&REventPacket::primary_outer_tof_y)
-        .def_readwrite("primary_outer_tof_z",&REventPacket::primary_outer_tof_z)
-        .def_readwrite("primary_inner_tof_x",&REventPacket::primary_inner_tof_x)
-        .def_readwrite("primary_inner_tof_y",&REventPacket::primary_inner_tof_y)
-        .def_readwrite("primary_inner_tof_z",&REventPacket::primary_inner_tof_z)
-    .def_readonly("paddle_packets",      &REventPacket::paddle_info)
-    .def("__repr__",          [](const REventPacket &ev) {
-                                  return "<REventPacket : " + ev.to_string(true) + "'>";
-                                  }) 
-
-    ;
     py::class_<TofPacket>(m, "TofPacket")
         .def(py::init())
-        .def("to_bytestream",         &TofPacket::to_bytestream)
         .def("from_bytestream",       &TofPacket::from_bytestream)
-        .def("set_payload",           &set_payload_helper)
-        //.def("set_packet_type",       &set_ptype_helper) 
-        .def_readonly("head",         &TofPacket::head)
-        .def_readonly("tail",         &TofPacket::tail)
         .def_readonly("payload",      &TofPacket::payload)
         .def_readonly("payload_size", &TofPacket::payload_size)
         .def_readonly("packet_type",  &TofPacket::packet_type)
@@ -699,57 +441,39 @@ PYBIND11_MODULE(gaps_tof, m) {
                                   return pkg.to_string();
                                   }); 
 
-    py::class_<RPaddlePacket>(m, "RPaddlePacket")
+    py::class_<TofHit>(m, "TofHit",
+            "Reconstructed waveform information for the 2 channels of a paddle.")
         .def(py::init())
-        .def("serialize",         &RPaddlePacket::serialize)
-        .def("deserialize",       &RPaddlePacket::deserialize)
-        .def("calculate_length",  &static_helper)
-        .def("reset",             &RPaddlePacket::reset)
-        .def("is_broken",         &RPaddlePacket::is_broken)
-        .def("get_paddle_id",     &RPaddlePacket::get_paddle_id) 
-        .def_property("time_a",   &RPaddlePacket::get_time_a, &RPaddlePacket::set_time_a)
-        .def_property("time_b",   &RPaddlePacket::get_time_b, &RPaddlePacket::set_time_b)
-        .def_property("peak_a",   &RPaddlePacket::get_peak_a, &RPaddlePacket::set_peak_a)
-        .def_property("peak_b",   &RPaddlePacket::get_peak_b, &RPaddlePacket::set_peak_b)
-        .def_property("charge_a", &RPaddlePacket::get_charge_a, &RPaddlePacket::set_charge_a)
-        .def_property("charge_b", &RPaddlePacket::get_charge_b, &RPaddlePacket::set_charge_b)
-        .def_property("charge_min_i",  &RPaddlePacket::get_charge_min_i, &RPaddlePacket::set_charge_min_i) 
-        .def_property("x_pos",         &RPaddlePacket::get_x_pos, &RPaddlePacket::set_x_pos) 
-        .def_property("t_avg",         &RPaddlePacket::get_t_avg, &RPaddlePacket::set_t_avg) 
-        .def("get_time_a",        &RPaddlePacket::get_time_a) 
-        .def("get_time_b",        &RPaddlePacket::get_time_b) 
-        .def("get_peak_a",        &RPaddlePacket::get_peak_a) 
-        .def("get_peak_b",        &RPaddlePacket::get_peak_b) 
-        .def("get_charge_a",      &RPaddlePacket::get_charge_a) 
-        .def("get_charge_b",      &RPaddlePacket::get_charge_b) 
-        .def("get_charge_min_i",  &RPaddlePacket::get_charge_min_i) 
-        .def("get_x_pos",         &RPaddlePacket::get_x_pos) 
-        .def("get_t_avg",         &RPaddlePacket::get_t_avg) 
-        //.def("set_paddle_id",     &RPaddlePacket::set_paddle_id) 
-        .def("set_time_a",        &RPaddlePacket::set_time_a) 
-        .def("set_time_b",        &RPaddlePacket::set_time_b) 
-        .def("set_peak_a",        &RPaddlePacket::set_peak_a) 
-        .def("set_peak_b",        &RPaddlePacket::set_peak_b) 
-        .def("set_charge_a",      &RPaddlePacket::set_charge_a) 
-        .def("set_charge_b",      &RPaddlePacket::set_charge_b) 
-        .def("set_charge_min_i",  &RPaddlePacket::set_charge_min_i) 
-        .def("set_x_pos",         &RPaddlePacket::set_x_pos) 
-        .def("set_t_avg",         &RPaddlePacket::set_t_avg) 
-
-        // atributes
-        .def_readwrite("paddle_id" ,    &RPaddlePacket::paddle_id)
-        .def_readwrite("timestamp_32" ,    &RPaddlePacket::timestamp_32)
-        .def_readwrite("timestamp_16" ,    &RPaddlePacket::timestamp_16)
-        //.def_readwrite("time_a" ,       &RPaddlePacket::time_a)
-        //.def_readwrite("time_b" ,       &RPaddlePacket::time_b)
-        //.def_readwrite("charge_a" ,     &RPaddlePacket::charge_a)
-        //.def_readwrite("charge_b" ,     &RPaddlePacket::charge_b)
-        //.def_readwrite("charge_min_i" , &RPaddlePacket::charge_min_i)
-        //.def_readwrite("x_pos" ,        &RPaddlePacket::x_pos)
-        //.def_readwrite("t_avg" ,        &RPaddlePacket::t_average)
-
-        .def("__repr__",          [](const RPaddlePacket &pp) {
-                                  return "<RPaddlePacket : " + pp.to_string() + "'>";
+        .def("from_bytestream",        &TofHit::from_bytestream, 
+               "Factory method to deserialize a TofHit")
+        .def_readonly("paddle_id",     &TofHit::paddle_id     , 
+               "The unique identifier for this paddle (1-160)")
+        .def_property_readonly("time_a",        &TofHit::get_time_a  ,
+               "Reconstructed peak start time for side A")
+        .def_property_readonly("time_b",        &TofHit::get_time_b  ,
+               "Reconstructed peak start time for side B")
+        .def_property_readonly("peak_a",        &TofHit::get_peak_a  ,
+               "Reconstructed peak height for side A")
+        .def_property_readonly("peak_b",        &TofHit::get_peak_b  ,
+               "Reconstructed peak height for side B")
+        .def_property_readonly("charge_a",      &TofHit::get_charge_a,
+               "Reconstructed charge for side A")
+        .def_property_readonly("charge_b",      &TofHit::get_charge_b,
+               "Reconstructed charge for side B")
+        .def_property_readonly("charge_min_i",  &TofHit::get_charge_min_i,
+               "Reconstructed paddle charge in units of MinI") 
+        .def_property_readonly("x_pos",         &TofHit::get_x_pos,
+               "Reconstructed position along the paddle")
+        .def_property_readonly("t_avg",         &TofHit::get_t_avg,
+               "(FIXME) - the reconstructed hit time") 
+        .def_readonly("timestamp16",   &TofHit::timestamp16,
+               "MSB part of the timestamp (slow)")
+        .def_readonly("timestamp32",   &TofHit::timestamp32,
+               "LSB part of the timestamp (fast)")
+        .def_property_readonly("timestamp48",   &TofHit::get_timestamp48,
+               "Complete timestamp (48 bits)")
+        .def("__repr__",          [](const TofHit &th) {
+                                  return "<TofHit : " + th.to_string() + "'>";
                                   }) 
 
     ;
@@ -776,34 +500,6 @@ PYBIND11_MODULE(gaps_tof, m) {
        })
    ;
 
-
-    py::class_<BlobEvt_t>(m, "BlobEvt")
-       .def(py::init())
-       .def_readwrite("head"                    ,&BlobEvt_t::head ) 
-       .def_readwrite("status"                  ,&BlobEvt_t::status )
-       .def_readwrite("len"                     ,&BlobEvt_t::len )
-       .def_readwrite("roi"                     ,&BlobEvt_t::roi )
-       .def_readwrite("dna"                     ,&BlobEvt_t::dna )
-       .def_readwrite("fw_hash"                 ,&BlobEvt_t::fw_hash )
-       .def_readwrite("id"                      ,&BlobEvt_t::id )
-       .def_readwrite("ch_mask"                 ,&BlobEvt_t::ch_mask )
-       .def_readwrite("event_ctr"               ,&BlobEvt_t::event_ctr )
-       .def_readwrite("dtap0"                   ,&BlobEvt_t::dtap0 )
-       .def_readwrite("dtap1"                   ,&BlobEvt_t::dtap1 )
-       .def_readwrite("timestamp"               ,&BlobEvt_t::timestamp )
-       //.def_readwrite("timestamp_32"            ,&BlobEvt_t::timestamp_32 )
-       //.def_readwrite("timestamp_16"            ,&BlobEvt_t::timestamp_16 )
-       //.def_property("ch_head"      , &ch_head_getter , &nullsetter<std::vector<unsigned short>  )
-       .def("get_ch_head"                       ,&ch_head_getter)
-       .def("get_ch_adc"                        ,&ch_getter )
-       .def("get_ch_trail"                      ,&ch_trail_getter )
-       .def_readwrite("stop_cell"               ,&BlobEvt_t::stop_cell )
-       .def_readwrite("crc32"                   ,&BlobEvt_t::crc32 )
-       .def_readwrite("tail"                    ,&BlobEvt_t::tail)
-       //.def("__repr__",  [] (const BlobEvt_t &event) { 
-       //        return "<BlobEvt_t \n" + BlobEvtToString(event) + ">";
-       //        })
-   ;
     
    py::class_<Waveform>(m, "Waveform")
        .def(py::init<int>())
@@ -865,10 +561,6 @@ PYBIND11_MODULE(gaps_tof, m) {
                })
    ;
    
-   py::class_<Calibrations_t>(m, "Calibrations")
-       .def(py::init())
-   ;
-  
    py::class_<RBCalibration>(m, "RBCalibration", 
       "RBCalibration holds th calibration constants (one per bin) per each channel for a single RB. This needs to be used in order to convert ADC to voltages/nanoseconds!")
        .def(py::init())
@@ -936,24 +628,11 @@ PYBIND11_MODULE(gaps_tof, m) {
                                           py::arg("filename"));
    m.def("get_event_ids_from_raw_stream", &get_event_ids_from_raw_stream);
    m.def("get_bytestream_from_file",      &get_bytestream_from_file);
-   m.def("get_nevents_from_file",         &get_nevents_from_file);
-   m.def("ReadEvent",                     &read_event_helper);
    m.def("get_rbeventheaders",            &get_rbeventheaders); 
    
-   //m.def("encode_blobevent",      &blobevent_encoder);
-   //m.def("decode_blobevent",      &blobevent_decoder);   
-   m.def("get_current_blobevent_size", &get_current_blobevent_size);
-
-   // functions to read and parse blob files
-   m.def("splice_readoutboard_datafile",   &splice_readoutboard_datafile);
 
    // Calibration functions
    m.def("remove_spikes",            &remove_spikes_helper);
-   m.def("read_calibration_file",    &read_calibration_file);
-   m.def("get_offsets",              &offset_getter);
-   m.def("get_vincs",                &increment_getter);
-   m.def("get_vdips",                &dip_getter);
-   m.def("get_tbins",                &tbin_getter);
    // waveform stuff
    m.def("calculate_pedestal",       &calculate_pedestal_helper);
 }

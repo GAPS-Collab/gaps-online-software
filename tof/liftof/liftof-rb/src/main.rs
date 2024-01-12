@@ -6,50 +6,85 @@
 //!
 //! Standalone, statically linked binary to be either run manually 
 //! or to be managed by systemd
-use std::{thread, time};
-use std::time::Duration;
+
+//use std::collections::HashMap;
+use std::os::raw::c_int;
+use std::process::exit;
+use std::{
+    thread,
+};
+use std::sync::{
+    Arc,
+    Mutex,
+};
+use std::time::{
+    Duration,
+    Instant,
+};
 use std::io::Write;
 
 extern crate crossbeam_channel;
 extern crate signal_hook;
 extern crate env_logger;
 
-use std::os::raw::c_int;
 use signal_hook::iterator::Signals;
-use signal_hook::consts::signal::{SIGTERM, SIGINT};
-use crossbeam_channel::{unbounded,
-                        Sender,
-                        Receiver};
-use local_ip_address::local_ip;
+use signal_hook::consts::signal::{
+    SIGTERM,
+    SIGINT
+};
 
-//use std::collections::HashMap;
-use std::process::exit;
-use liftof_lib::color_log;
+#[macro_use] extern crate log;
+
+extern crate clap;
+use clap::{
+    arg,
+    command,
+    Parser
+};
+
+// FIXME - think about using 
+// bounded channels to not 
+// create a memory leak
+use crossbeam_channel::{
+    unbounded,
+    //bounded,
+    Sender,
+    Receiver
+};
+use local_ip_address::local_ip;
+use colored::Colorize;
+
+// TOF specific crates
+use tof_control::helper::rb_type::RBInfo;
+
+use tof_dataclasses::threading::{
+    ThreadControl,
+};
+use tof_dataclasses::packets::TofPacket;
+use tof_dataclasses::commands::{
+    //RBCommand,
+    TofOperationMode
+};
+use tof_dataclasses::events::DataType;
+use tof_dataclasses::run::RunConfig;
+
+use liftof_lib::{
+    LIFTOF_LOGO_SHOW,
+    color_log,
+    RunStatistics,
+};
 
 use liftof_rb::threads::{
     runner,
-    experimental_runner,
+    //experimental_runner,
     cmd_responder,
     event_processing,
-    event_cache,
     monitoring,
     data_publisher
 };
 
 use liftof_rb::api::*;
 use liftof_rb::control::*;
-use tof_dataclasses::threading::ThreadPool;
-use tof_dataclasses::packets::TofPacket;
-use tof_dataclasses::commands::{//RBCommand,
-                                TofOperationMode};
-use tof_dataclasses::events::DataType;
-use tof_dataclasses::run::RunConfig;
-#[macro_use] extern crate log;
-
-extern crate clap;
-use clap::{arg,
-           command,
-           Parser};
 
 #[derive(Parser, Debug)]
 #[command(author = "J.A.Stoessl", version, about, long_about = None)]
@@ -59,22 +94,14 @@ struct Args {
   /// If in this configuration one wants to take data, ONE HAS TO SUPPLY A RUNCONFIG!
   #[arg(short, long)]
   run_config: Option<std::path::PathBuf>,
+  /// Listen to remote input from the TOF computer at 
+  /// the expected IP address
+  #[arg(short, long, default_value_t = false)]
+  listen: bool,
   /// Show progress bars to indicate buffer fill values and number of acquired events
   #[arg(long, default_value_t = false)]
   show_progress: bool,
-  /// Acquire this many events. This will OVERRIDE the setting from the runconfig. 
-  /// A runconfig is STILL NEEDED! However, for quick debugging, we can change the 
-  /// number here (for convenience)
-  #[arg(short, long, default_value_t = 0)]
-  nevents: u32,
-  /// Cache size of the internal event cache in events
-  #[arg(short, long, default_value_t = 10000)]
-  cache_size: usize,
-  /// Analyze the waveforms directly on the board. We will not send
-  /// waveoform data, but paddle packets instead.
-  #[arg(long, default_value_t = false)]
-  waveform_analysis: bool,
-  /// show moni data 
+  /// Print out (even more) debugging information 
   #[arg(long, default_value_t = false)]
   verbose : bool,
   /// Write the readoutboard binary data ('.robin') to the board itself
@@ -84,14 +111,6 @@ struct Args {
   /// no input data
   #[arg(long, default_value_t = false)]
   calibration : bool,
-  /// Select the monitoring interval for L1 monitoring data
-  /// L1 is the fast monitoring - only critical values
-  #[arg(long, default_value_t = 10)]
-  moni_interval_l1 : u64,
-  /// Select the monitoring interval for L2 monitoring data
-  /// L2 is the slow monitoring - all values
-  #[arg(long, default_value_t = 30)]
-  moni_interval_l2 : u64,
   ///// CnC server IP we should be listening to
   //#[arg(long, default_value_t = "10.0.1.1")]
   //cmd_server_ip : &'static str,
@@ -99,6 +118,11 @@ struct Args {
   /// check the event ids for duplicates or missing ids
   #[arg(long, default_value_t = false)]
   test_eventids: bool,
+  /// If there is an issue with the events (if known)
+  /// don't send them. This can not work when the 
+  /// RB is in TofMode::RBHighThroughput
+  #[arg(long, default_value_t = false)]
+  only_perfect_events: bool,
   /// Calculate the crc32 checksum per channel and set 
   /// event status flag
   #[arg(long, default_value_t = false)]
@@ -116,48 +140,65 @@ fn main() {
       args = record.args()
       )
     }).init();
- 
+
+  let program_start_time       = Instant::now();
+
   let args = Args::parse();                   
   let verbose                  = args.verbose;
-  let n_events_run             = args.nevents;
+  let listen                   = args.listen;
   let show_progress            = args.show_progress;
-  let cache_size               = args.cache_size;
-  let wf_analysis              = args.waveform_analysis;
   let calibration              = args.calibration;
   let mut to_local_file        = args.to_local_file;
   let run_config               = args.run_config;
   let test_eventids            = args.test_eventids;
   let calc_crc32               = args.calc_crc32;
+  let only_perfect_events      = args.only_perfect_events;
 
   //FIMXE - this needs to become part of clap
   let cmd_server_ip = String::from("10.0.1.1");
   //let cmd_server_ip     = args.cmd_server_ip;  
   let this_board_ip = local_ip().expect("Unable to obtainl local board IP. Something is messed up!");
-  
+
+  // get board info 
+  let rb_info = RBInfo::new();
+  // check if it is sane. If we are not able to 
+  // get the board id, we might as well panic and restart.
+  if rb_info.board_id == u8::MAX {
+    error!("Board ID field has been set to error state of {}", rb_info.board_id);
+    panic!("Unable to obtain board id! This is a CRITICAL error! Abort!");
+  }
+  let ltb_connected = rb_info.sub_board == 1;
+  let pb_connected  = rb_info.sub_board == 2;
   // General parameters, readout board id,, 
   // ip to tof computer
-  let rb_id = get_board_id().expect("Unable to obtain board ID!");
+  let rb_id = rb_info.board_id;
   let dna   = get_device_dna().expect("Unable to obtain device DNA!"); 
 
-  // deal with bug
-  //let mut channel_reg = read_control_reg(0x44).unwrap();
-  //println!("READING CHANNEL MASK {channel_reg}");
-  //write_control_reg(0x44, 0x3FF).unwrap();
-  //channel_reg = read_control_reg(0x44).unwrap();
-  //println!("READING CHANNEL MASK {channel_reg}");
-
   // welcome banner!
-  println!("-----------------------------------------------");
+  println!("{}", LIFTOF_LOGO_SHOW);
   println!(" ** Welcome to liftof-rb \u{1F680} \u{1F388} *****");
-  println!(" .. liftof if a software suite for the time-of-flight detector ");
+  println!(" .. liftof is a software suite for the time-of-flight detector ");
   println!(" .. for the GAPS experiment \u{1F496}");
   println!(" .. this client can be run standalone or connect to liftof-cc" );
   println!(" .. or liftof-tui for an interactive experience" );
-  println!(" .. see the gitlab repository for documentation and submitting issues at" );
-  println!(" **https://uhhepvcs.phys.hawaii.edu/Achim/gaps-online-software/-/tree/main/tof/liftof**");
+  println!(" .. this client will be publishing TofPackets on the bound port!");
   println!("-----------------------------------------------");
-  println!(" => Running client for RB {}", rb_id);
-  println!(" => ReadoutBoard DNA {}", dna);
+  println!(" .. RBInfo:");
+  println!(" .. .. ReadoutBoard  ID {}", rb_id);
+  println!(" .. .. ReadoutBoard DNA {}", dna);
+  println!(" .. .. Current Rate     {} [Hz]", rb_info.trig_rate);
+  println!(" .. Connected boards:");
+  if ltb_connected {
+    println!("..     LTB                     - {}", String::from("YES").green());
+  } else {
+    println!("..     LTB                     - {}", String::from("NO").red());
+  }
+  if pb_connected {
+    println!("..     PB (including preamps) - {}", String::from("YES").green());
+  } else {
+    println!("..     PB (including preamps) - {}", String::from("NO").red());
+  }
+  println!("-----------------------------------------------");
   println!(" => We will BIND this port to the local ip address at {}", this_board_ip);
   println!(" => -- -- PORT {} (0MQ PUB) to publish our data", DATAPORT);
   println!(" => We will CONNECT to the following port on the C&C server at address: {}", cmd_server_ip);
@@ -167,18 +208,12 @@ fn main() {
   if test_eventids {
     warn!("Testing mode! Only for debugging!");
   }
-  if wf_analysis {
-    todo!("--waveform-analysis is currently not implemented!");
-  }
-
-  // per default the data type should be 
-  // header with all waveform data
-  //let mut data_type = DataType::Physics;
 
   let mut rc_config     = RunConfig::new();
   let mut rc_file_path  = std::path::PathBuf::new();
   let mut end_after_run = false;
-
+  let run_stat          = Arc::new(Mutex::new(RunStatistics::new()));
+   
   if calibration {
     println!("===================================================================");
     println!("=> Readoutboard calibration! This will override ALL other settings!");
@@ -191,15 +226,22 @@ fn main() {
   match run_config {
     None     => {
       if !calibration {
-        println!("=> We did not get a runconfig with the -r <RUNCONFIG> commandline switch! Currently we are just listening for input on the socket. This is the desired behavior, if run by systemd. If you want to take data in standalone mode, either send a runconfig to the socket or hit CTRL+C and start the program again, this time suppling the -r <RUNCONFIG> flag or in case you want to calibrate the board, use the --calibration flag.");
+        // FIXME - something happened
+        //println!("=> We did not get a runconfig with the -r <RUNCONFIG> commandline switch! Currently we are just listening for input on the socket. This is the desired behavior, if run by systemd. If you want to take data in standalone mode, either send a runconfig to the socket or hit CTRL+C and start the program again, this time suppling the -r <RUNCONFIG> flag or in case you want to calibrate the board, use the --calibration flag.");
       }
       config_from_shell = false;
-    }
+    },
     Some(rcfile) => {
       println!("=> Instructed to use runconfig {:?}", rcfile);
       rc_file_path   = rcfile.clone();
       rc_config      = get_runconfig(&rcfile);
       end_after_run  = rc_config.nevents > 0 || rc_config.nseconds > 0;
+      if rc_config.trigger_fixed_rate > 0 {
+        // we have to set this, since for fixed rate, 
+        // triggers won't be enabled, since we are 
+        // issuing them manually
+        end_after_run = false;
+      }
       config_from_shell = true;
     }
   }
@@ -211,20 +253,27 @@ fn main() {
   }
   // some pre-defined time units for 
   // sleeping
-  let one_sec     = time::Duration::from_secs(1);  
+  let one_sec     = Duration::from_secs(1);  
 
-  // threads and inter-thread communications
-  // We have
-  // * event_cache thread
-  // * buffer reader thread
-  // * data analysis/sender thread
-  // * monitoring thread
-  // * run thread
-  // + main thread, which does not need a 
-  //   separate thread
-
-  // FIXME - MESSAGES GET CONSUMED!!
+  //// FIXME - this will come from future runconfig
+  let rb_mon_interv   = 5.0f32; 
+  let mut pb_mon_every_x  = 2.0f32;
+  let mut pa_mon_every_x  = 1.0f32; 
+  let mut ltb_mon_every_x = 2.0f32;
+  
+  // for now just set the intervals to inf, 
+  // better would be to switch the whole thing
+  // off.
+  if !pb_connected {
+    pb_mon_every_x = f32::MAX;
+    pa_mon_every_x = f32::MAX;
+  }
+  if !ltb_connected {
+    ltb_mon_every_x = f32::MAX;
+  }
   // setting up inter-thread comms
+  let thread_control : Arc<Mutex<ThreadControl>> = Arc::new(Mutex::new(ThreadControl::new())); 
+
   let (rc_to_runner, rc_from_cmdr)      : 
       (Sender<RunConfig>, Receiver<RunConfig>)                = unbounded();
   let (tp_to_pub, tp_from_client)        : 
@@ -234,83 +283,121 @@ fn main() {
   let (dtf_to_evproc, dtf_from_runner) :                
       (Sender<DataType>, Receiver<DataType>)                  = unbounded();
   
-  //let (rbcalib_to_evproc, rbcalib_from_calib)   : 
-  //    (Sender<RBCalibrations>, Receiver<RBCalibrations>)                    = unbounded();
-
   let (opmode_to_cache, opmode_from_runner)     : 
       (Sender<TofOperationMode>, Receiver<TofOperationMode>)                = unbounded();
   let (bs_send, bs_recv)             : (Sender<Vec<u8>>, Receiver<Vec<u8>>) = unbounded(); 
   
-  //FIXME - restrict to actual number of threads
-  let n_threads = 8;
-  info!("Will start ThreadPool with {n_threads} threads");
-  let workforce = ThreadPool::new(n_threads);
- 
+  let mut signals = Signals::new(&[SIGTERM, SIGINT]).expect("Unknown signals");
   // Setup routine. Start the threads in inverse order of 
   // how far they are away from the buffers.
+  // FIXME - reduce number of threads
+  // E.g while the runner is sleeping, we could 
+  // check for new commands and do monitoring
+  // We currently have 5 threads + main thread
+  // 1) Runner
+  // 2) Event processing
+  // 3) Data publisher
+  // 4) Commander
+  // 5) Monitoring
   let rc_from_cmdr_c = rc_from_cmdr.clone();
+  let ctrl_cl        = thread_control.clone();
+  let _data_pub_thread = thread::Builder::new()
+         .name("data-publisher".into())
+         .spawn(move || {
+            data_publisher(&tp_from_client,
+                           to_local_file,
+                           Some(&file_suffix),
+                           test_eventids,
+                           verbose,
+                           ctrl_cl) 
+          })
+         .expect("Failed to spawn data-publsher thread!");
   
-  workforce.execute(move || {
-    data_publisher(&tp_from_client,
-                   to_local_file,
-                   Some(&file_suffix),
-                   test_eventids,
-                   verbose); 
-  });
   let tp_to_pub_ev   = tp_to_pub.clone();
-  #[cfg(feature="tofcontrol")]
   let tp_to_pub_cal  = tp_to_pub.clone();
+
 
   // then the runner. It does nothing, until we send a set
   // of RunParams
   let tp_to_cache_c        = tp_to_cache.clone();
-  workforce.execute(move || {
-      //experimental_runner(&rc_from_cmdr_c,
-      //                    None, 
-      //                    //&bs_send,
-      //                    &tp_to_cache,
-      //                    &dtf_to_evproc,
-      //                    &opmode_to_cache,
-      //                    show_progress);
-      runner(&rc_from_cmdr_c,
-             None, 
-             &bs_send,
-             &dtf_to_evproc,
-             &opmode_to_cache,
-             show_progress);
-  });
-
-  workforce.execute(move || {
-                    event_cache(tp_from_builder,
-                                &tp_to_pub_ev,
-                                &opmode_from_runner, 
-                                wf_analysis,
-                                cache_size)
-  });
-  workforce.execute(move || {
-                    event_processing(&bs_recv,
-                                     &tp_to_cache,
-                                     &dtf_from_runner,
-                                     args.verbose,
-                                     calc_crc32);
-  });
+  let run_control          = thread_control.clone();
+  let _runner_thread = thread::Builder::new()
+         .name("runner".into())
+         .spawn(move || {
+                runner(&rc_from_cmdr_c,
+                       &bs_send,
+                       &dtf_to_evproc,
+                       &opmode_to_cache,
+                       show_progress,
+                       run_control)
+         })
+         .expect("Failed to spawn runner thread!");
+  //workforce.execute(move || {
+  //    //experimental_runner(&rc_from_cmdr_c,
+  //    //                    None, 
+  //    //                    //&bs_send,
+  //    //                    &tp_to_cache,
+  //    //                    &dtf_to_evproc,
+  //    //                    &opmode_to_cache,
+  //    //                    show_progress);
+  //    runner(&rc_from_cmdr_c,
+  //           None, 
+  //           &bs_send,
+  //           &dtf_to_evproc,
+  //           &opmode_to_cache,
+  //           show_progress);
+  //});
+    let proc_control    = thread_control.clone();
+    let ev_stats        = run_stat.clone();
+    let _ev_proc_thread = thread::Builder::new()
+           .name("event-processing".into())
+           .spawn(move || {
+                  event_processing(
+                                   rb_id,
+                                   &tp_from_builder,
+                                   &bs_recv,
+                                   &opmode_from_runner, 
+                                   &tp_to_pub_ev,
+                                   &dtf_from_runner,
+                                   args.verbose,
+                                   calc_crc32,
+                                   proc_control,
+                                   ev_stats,
+                                   only_perfect_events)
+           })
+           .expect("Failed to spawn event_processing thread!");
   
 
   // Respond to commands from the C&C server
-  let rc_to_runner_c       = rc_to_runner.clone();
-  let heartbeat_timeout_seconds : u32 = 10;
-  workforce.execute(move || {
-                    cmd_responder(cmd_server_ip,
-                                  heartbeat_timeout_seconds,
-                                  &rc_file_path,
-                                  &rc_to_runner_c,
-                                  &tp_to_cache_c)
-  
-  });
-  
+  // This obviously requires that we are 
+  // listening, so this needs the --listen 
+  // flag
+  if listen {
+    let cmd_control      = thread_control.clone(); 
+    let rc_to_runner_c   = rc_to_runner.clone();
+    let _cmd_resp_thread = thread::Builder::new()
+           .name("cmd-responder".into())
+           .spawn(move || {
+              cmd_responder(cmd_server_ip,
+                            &rc_file_path,
+                            &rc_to_runner_c,
+                            &tp_to_cache_c,
+                            cmd_control)
+            })
+           .expect("Failed to spawn cmd_responder thread!");
+           //workforce.execute(move || {
+           //                  cmd_responder(cmd_server_ip,
+           //                                &rc_file_path,
+           //                                &rc_to_runner_c,
+           //                                &tp_to_cache_c)
+           //
+           //});
+  }
+
   // should this program end after it is done?
   let mut end = false;
-
+  
+  let mut do_monitoring = true;
   // We can only start a run here, if this is not
   // run through systemd
   if is_systemd_process() {
@@ -323,93 +410,109 @@ fn main() {
     if calibration {
       // we execute this routine first, then we 
       // can go into our loop listening for input
-      #[cfg(feature="tofcontrol")]
       match rb_calibration(&rc_to_runner, &tp_to_pub_cal) {
         Ok(_) => (),
         Err(err) => {
           error!("Calibration failed! Error {err}!");
         }
       }
+      do_monitoring = false;
       end = true; // in case of we have done the calibration
                   // from shell. We finish after it is done.
     } else {
       // only do monitoring when we don't do a 
       // calibration
-      let moni_interval_l1 = Duration::from_secs(args.moni_interval_l1);
-      let moni_interval_l2 = Duration::from_secs(args.moni_interval_l2);
-      workforce.execute(move || {
-        monitoring(&tp_to_pub,
-                   moni_interval_l1,
-                   moni_interval_l2,
-                   verbose);
-      });
+      do_monitoring = true;
     } 
-   
-
     if config_from_shell {
-      if n_events_run > 0 {
-        println!("=> We got a nevents argument from the commandline, requesting to run for {n_events_run}. This will OVERRIDE the setting in the run config file!");
-        rc_config.nevents = n_events_run;
-      }
 
       // if the runconfig does not have nevents different from 
       // 0, we will not send it right now. The commander will 
       // then take care of it and send it when it is time.
-      if rc_config.nevents != 0 {
-        println!("Got a number of events to be run > 0. Will stop the run after they are done. If you want to run continuously and listen for new runconfigs from the C&C server, set nevents to 0");
-        end_after_run = true;
+      if rc_config.nevents != 0 || rc_config.nseconds != 0 {
+        println!("=> The runconfig request to take {} events or to run for {} seconds!", rc_config.nevents, rc_config.nseconds);
+        println!("=> The run will be stopped when it is finished!");
+        println!("=> {}", String::from("!If that is not what you want, check out the --listen flag!").green());
         if !rc_config.is_active {
           println!("=> The provided runconfig does not have the is_active field set to true. Won't start a run if that is what you were waiting for.");
-        } else {
-          println!("=> Waiting for threads to start..");
-          thread::sleep(time::Duration::from_secs(5));
-          println!("=> ..done");
-        }
-        match rc_to_runner.send(rc_config) {
-          Err(err) => error!("Could not initialzie Run! Err {err}"),
-          Ok(_)    => {
-            if rc_config.is_active {
-              println!("=> Runner configured! Attempting to start.");
-            } else {
-              println!("=> Stopping run..")
+        } 
+        if !listen {
+          match rc_to_runner.send(rc_config) {
+            Err(err) => error!("Could not initialzie Run! Err {err}"),
+            Ok(_)    => {
+              if rc_config.is_active {
+                println!("=> Runner configured! Attempting to start.");
+              } else {
+                println!("=> Stopping run..")
+              }
             }
           }
         }
       }
     } // end if config from shell
   } // end if not systemd process
-  
+  if do_monitoring {
+    // only do monitoring when we don't do a 
+    // calibration
+    let moni_ctrl          = thread_control.clone();
+    let _monitoring_thread = thread::Builder::new()
+           .name("rb-monitoring".into())
+           .spawn(move || {
+              monitoring(rb_id,    // board id
+                         &tp_to_pub,
+                         rb_mon_interv,  
+                         pa_mon_every_x, 
+                         pb_mon_every_x, 
+                         ltb_mon_every_x, 
+                         //verbose,
+                         verbose,
+                         moni_ctrl); 
+            })
+           .expect("Failed to spawn rb-monitoring thread!");
+  }
+  if !calibration {
+    println!("=> Waiting for threads to start..");
+    thread::sleep(Duration::from_secs(10));
+    println!("=> ..done");
+  }
   // Currently, the main thread just listens for SIGTERM and SIGINT.
   // We could give it more to do and save one of the other threads.
   // Probably, the functionality of the control thread would be 
   // a good choice
-  let mut signals = Signals::new(&[SIGTERM, SIGINT]).expect("Unknown signals");
 
-
-
-  // Wait until all threads are set up
-  thread::sleep(5*one_sec);
   loop {
     thread::sleep(1*one_sec);
     for signal in signals.pending() {
       match signal as c_int {
         SIGTERM => {
-          println!("SIGTERM received");
+          println!("=> {}", String::from("SIGTERM received").red().bold());
           end = true;
         }
         SIGINT  => {
-          println!("SIGINT received");
+          println!("=> {}", String::from("SIGINT received").red().bold());
           end = true;
         }
-        _       => ()
+        _       => {
+          error!("Received signal, but I don't have instructions what to do about it!");
+        }
       }
     }
 
     match get_triggers_enabled() {
       Err(err) => error!("Can not read trigger enabled register! Error {err}"),
       Ok(enabled) => {
+        if enabled {
+          trace!("Trigger enabled register is asserted!");
+        } else {
+          debug!("Trigger enabled register is NOT asserted!");
+        }
         //println!("Current trigger enabled status {}. WIll end after a run {}", enabled, end_after_run);
         if !enabled && end_after_run {
+          end = true;
+        }
+        // in case we have nseconds and the fixed rate trigger,
+        // we have end_after_run == false 
+        if program_start_time.elapsed().as_secs() > rc_config.nseconds as u64 && rc_config.nseconds > 0 {
           end = true;
         }
       }
@@ -428,6 +531,26 @@ fn main() {
         Ok(_) => ()
       }
       thread::sleep(10*one_sec);
+      // send the kill signal to all threads
+      match thread_control.lock() {
+        Ok(mut tc) => {
+          tc.stop_flag = true;
+        },
+        Err(err) => {
+          trace!("Can't acquire lock! {err}");
+        },
+      }
+      if verbose {
+        match run_stat.lock() {
+          Err(err) => error!("Can't access run statistics! {err}"),
+          Ok(stat) => {
+            println!("== Run summary! = == == == == == == ==");
+            println!("{}", stat);
+            println!("-- -- -- -- -- -- -- -- -- -- -- -- --");
+            println!("-- --> Elapsed seconds since prog start {}", program_start_time.elapsed().as_secs());
+          }
+        }
+      }
       println!("=> Terminated. So long and thanks for all the \u{1F41F}");
       exit(0);
     }

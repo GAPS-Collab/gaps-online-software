@@ -15,7 +15,7 @@ SyslogIdentifier=gaps
 User=gaps
 WorkingDirectory=/home/gaps/bin
 Environment="LIFTOF_IS_SYSTEMD=1"
-ExecStart=/home/gaps/bin/liftof-rb -r /home/gaps/config/runconfig.json
+ExecStart=/home/gaps/bin/liftof-rb -r /home/gaps/config/gaps-flight-01.json --listen
 
 [Install]
 WantedBy=multi-user.target

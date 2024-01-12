@@ -1,29 +1,4 @@
 from django.db import models
-#from django.db.models import pre_save
-#from django.dispatch import receiver
-
-# ip/mac address consistency check
-IP_MAC_CHECK_POSSIBLE=False
-try :
-    from python_arptable import get_arp_table
-
-    def mac_ip_is_consistent(mac, ip):
-        arp = get_arp_table()
-        for k in arp:
-            if k['HW address'] == mac and\
-               k['IP address'] == ip:
-                   return True
-        return False
-    
-    def get_mac_for_ip(ip):
-        arp = get_arp_table()
-        for k in arp:
-            if k['IP address'] == ip:
-                return k['HW address']
-
-except ImportError:
-    print(f"Can not import python_arptable. Unable to verify ip/mac address matching through system's arptables")
-
 # Create your models here.
 class LTB(models.Model):
     """
@@ -163,7 +138,9 @@ class Panel(models.Model):
     """ 
     A tof panel (can be subsection of a face)
     """
-    panel_id                  = models.PositiveSmallIntegerField()
+    panel_id                  = models.PositiveSmallIntegerField(
+                                    unique=True,
+                                    primary_key=True)
     desc                      = models.CharField(max_length=128)
     normal_coordinate_no_sign = models.CharField(max_length=1,\
                                                 null=True,\
@@ -195,35 +172,67 @@ class Panel(models.Model):
         return self.__repr__()
 
     def __repr__(self):
-        _repr = '<Panel:\n'
-        _repr += f'ID   : {self.panel_id}\n'
-        _repr += f'DESC : {self.desc}>'
+        _repr = '<Panel:'
+        _repr += f'\n  id    : {self.panel_id}'
+        _repr += f'\n  descr : {self.desc}>'
         return _repr
 
 class Paddle(models.Model):
     paddle_id                 = models.PositiveSmallIntegerField(unique=True, primary_key=True)
-    volume_id                 = models.PositiveBigIntegerField(unique=True)
-    height                    = models.FloatField()
-    width                     = models.PositiveSmallIntegerField()
-    length                    = models.PositiveSmallIntegerField()
-    unit                      = models.CharField(max_length=2)
-    global_pos_x              = models.PositiveSmallIntegerField(null=True, blank=True)
-    global_pos_y              = models.PositiveSmallIntegerField(null=True, blank=True)
-    global_pos_z              = models.PositiveSmallIntegerField(null=True, blank=True)
+    volume_id                 = models.PositiveBigIntegerField(
+                                  unique=True,
+                                  help_text="The VolumeId as used in the GAPS simulation code")
+    pos_in_panel              = models.CharField(max_length=4,
+                                                 null=True,
+                                                 default="")
+    height                    = models.FloatField(null=True)
+    width                     = models.PositiveSmallIntegerField(null=True)
+    length                    = models.PositiveSmallIntegerField(null=True)
+    unit                      = models.CharField(
+                                    null=True,
+                                    max_length=2)
+    global_pos_x_l0           = models.FloatField(
+                                    null=True,
+                                    blank=True,
+                                    help_text="Global X coordinate from simulation")
+    global_pos_y_l0           = models.FloatField(
+                                    null=True,
+                                    blank=True,
+                                    help_text="Global Y coordinate from simulation")
+    global_pos_z_l0           = models.FloatField(
+                                    null=True,
+                                    blank=True,
+                                    help_text="Global Z coordinate from simulation")
+    def __str__(self):
+        return self.__repr__()
 
+    def __repr__(self):
+    
+        _repr  = '<Paddle:\n'
+        _repr += f'  pid            : {self.paddle_id}\n'
+        _repr += f'  vid            : {self.volume_id}\n'
+        _repr += f'  L0 coord (sim) : [{self.global_pos_x_l0}, {self.global_pos_y_l0}, {self.global_pos_z_l0}] >'
+        return _repr
 
 class PaddleEnd(models.Model):
     """
     One end of a paddle with SiPM array
     """
     PADDLE_END    = [('A', 'A'), ('B', 'B')]
+    paddle_end_id = models.PositiveSmallIntegerField(
+                        primary_key=True,
+                        unique=True,
+                        help_text="PaddleID + 1000 for A and PaddleID + 2000 for B")
     paddle_id     = models.PositiveSmallIntegerField()
-    paddle_end_id = models.PositiveSmallIntegerField(primary_key=True, unique=True)
 
     end           = models.CharField(max_length=1, choices=PADDLE_END)
     end_location  = models.CharField(max_length=2,\
                                     help_text="Location of the paddle end relative to the paddle center")
     panel_id      = models.PositiveSmallIntegerField()
+    pos_in_panel  = models.CharField(max_length=4,\
+                                     help_text="Identifier in global coordinates about the location in the panel",\
+                                     null=True,\
+                                     default="")
     cable_length  = models.FloatField(help_text="Cable length in cm")
     rat           = models.PositiveSmallIntegerField()
     ltb_id        = models.PositiveSmallIntegerField()
@@ -235,7 +244,7 @@ class PaddleEnd(models.Model):
     dsi           = models.PositiveSmallIntegerField()
     rb_harting_j  = models.PositiveSmallIntegerField()
     ltb_harting_j = models.PositiveSmallIntegerField()
-
+    
     def setup_unique_paddle_end_id(self):
         """
         Introduce a uuid. We have 160 paddles with 2 ends. Make the uuid the following
@@ -254,7 +263,15 @@ class PaddleEnd(models.Model):
         self.paddle_id     = int(data['Paddle Number']) 
         self.end           = data['Paddle End (A/B)'] 
         self.end_location  = data['Paddle End Location']                       
-        self.panel_id      = int(data['Panel Number'] )
+        panel_id           = str(data['Panel Number'])
+        if panel_id.startswith('E'):
+            # this are these individual edge paddles
+            # we replace them with 1000 + the number 
+            # after E-X
+            panel_id = panel_id.replace("E-X","")
+            self.panel_id = int(panel_id) + 1000
+        else:
+            self.panel_id = int(panel_id)
         self.cable_length  = int(data['Cable length (cm)'] )
         self.rat           = int(data['RAT Number'] )
         ltb_info           = data['LTB Number-Channel'].split('-')
@@ -266,34 +283,54 @@ class PaddleEnd(models.Model):
         self.ltb_ch        = int(ltb_info[1])
         self.pb_ch         = int(pb_info[1] )
         self.rb_ch         = int(rb_info[1] )
-        self.dsi           = int(data['DSI card slot '])
-        rb_h_j             = data['LTB Harting Connection'].split('_')
-        ltb_h_j            = data['LTB Harting Connection'].split('_')
-        self.rb_harting_j  = int(rb_h_j[1])
-        self.ltb_harting_j = int(ltb_h_j[1])
+        
+        # in some spreadsheets, the label differs,
+        # so we are just looking for some variant
+        good = False
+        for label in 'DSI card slot', 'DSI Card Slot', 'DSI card slot ', 'DSI Card Slot ':
+            try:
+                self.dsi           = int(data[label])
+                good               = True
+                #print("Found good key!")
+                break
+            except KeyError:
+                #print(f".. can't find key {label}, trying next variant..")
+                continue
+        if not good:
+            raise ValueError("Could not get DSI assignment!")
+        rb_h_j             = data['RB Harting Connection'].replace('J','')
+        ltb_h_j            = data['LTB Harting Connection'].replace('J','')
+        #rb_h_j             = data['RB Harting Connection'].split('_')
+        #ltb_h_j            = data['LTB Harting Connection'].split('_')
+        self.rb_harting_j  = int(rb_h_j)
+        self.ltb_harting_j = int(ltb_h_j)
 
     def __str__(self):
         return self.__repr__()
 
     def __repr__(self):
-    
-        _repr = '<PaddleEnd:\n'
-        _repr += f'\tID        : {self.paddle_end_id}\n'     
-        _repr += f'\tPADDLE ID : {self.paddle_id}\n'     
-        _repr += f'\tEND       : {self.end}\n'          
-        _repr += f'\tEND LOC   : {self.end_location}\n' 
-        _repr += f'\tPANEL     : {self.panel_id}\n'     
-        _repr += f'\tCABLE[CM] : {self.cable_length}\n' 
-        _repr += f'\tRAT       : {self.rat}\n'           
-        _repr += f'\tLTB       : {self.ltb_id}\n'        
-        _repr += f'\tRB        : {self.rb_id}\n'         
-        _repr += f'\tPB        : {self.pb_id}\n'         
-        _repr += f'\tLTB CH    : {self.ltb_ch}\n'        
-        _repr += f'\tPB CH     : {self.pb_ch}\n'         
-        _repr += f'\tRB CH     : {self.rb_ch}\n'         
-        _repr += f'\tDSI       : {self.dsi}\n'           
-        _repr += f'\tRB  HRT J : {self.rb_harting_j}\n'  
-        _repr += f'\tLTB HRT J : {self.ltb_harting_j}>' 
+        panel  = Panel.objects.filter(panel_id=self.panel_id)[0]
+        paddle = Paddle.objects.filter(paddle_id=self.paddle_id)[0] 
+        _repr = '<PaddleEnd:'
+        _repr += f'\n  ** identifiers **'
+        _repr += f'\n   id             : {self.paddle_end_id}'     
+        _repr += f'\n   pid            : {self.paddle_id}'     
+        _repr += f'\n   end (A|B)      : {self.end}'  
+        _repr += f'\n  ** connedtions **'
+        _repr += f'\n   DSI/J/CH (LG)  :  {self.dsi} | {self.ltb_harting_j} | {self.ltb_ch:02}'
+        _repr += f'\n   DSI/J/CH (HG)  :  {self.dsi} | {self.rb_harting_j} | {self.rb_ch:02}'
+        _repr += f'\n   RB/CH          : {self.rb_id:02} | {self.rb_ch:02}'
+        _repr += f'\n   PB/CH          : {self.pb_id:02} | {self.pb_ch:02}'
+        _repr += f'\n   RAT id         : {self.rat}'
+        _repr += f'\n   cable len [cm] :'
+        _repr += f'\n    \u21B3 {self.cable_length}'
+        _repr += f'\n    (Harting -> RB)'
+        _repr += f'\n  ** panel & location **'
+        _repr += f'\n   end ->         : {self.end_location}' 
+        #_repr += f'\n   panel id       : {self.panel_id}'     
+        _repr += f'\n   loc. in panel  : {self.pos_in_panel}'
+        _repr += f'\n   {panel}'
+        _repr += f'\n   {paddle}>'
         return _repr
 
 class DSICard(models.Model):
@@ -384,7 +421,9 @@ class RAT(models.Model):
         #  4:02 PM
         # Sydney:  oh, I see where your confusion is!in the RAT table, I list all the board ID numbers for the PB, RBs, and LTB inside each RAT. for the RBs and PBs, these board IDs are significant (for the RBs, it distinguishes which ip address the data will come out on. for the PBs, we will implement unique lookup tables that associate ADC values with actual measured voltages).However, for our LTBs, the board ID number listed in the RAT table is just so that I can keep track of each of the 22 LTBs that we have. the LTB board ID doesn't matter at all for data taking and control; each board behaves exactly the same way, uses the same firmware, is controlled identically.what does matter is the location of the LTB, and in particular which RAT the LTB is inside of (because this determines which paddles are connected and triggering). that is why in the paddle master spreadsheet, the LTB channel is just listed with the associated RAT.so, in conclusion, you should be able to completely ignore the LTB column of the RAT table
         self.ltb_id                    = self.rat_id
-        self.ltb_harting_cable_length  = int(data['LTB Harting cable length'].split(' ')[0])
+        #print(data)
+        #self.ltb_harting_cable_length  = int(data['LTB Harting cable length'].split(' ')[0])
+        self.ltb_harting_cable_length  = int(data['LTB Harting cable length'])
 
     def __str__(self):
         return self.__repr__()
@@ -419,41 +458,34 @@ class RB(models.Model):
     ch7_paddle       = models.ForeignKey(PaddleEnd, models.SET_NULL, blank=True, null=True,related_name='+' )
     ch8_paddle       = models.ForeignKey(PaddleEnd, models.SET_NULL, blank=True, null=True,related_name='+' )
 
-    #ch1_pid          = models.PositiveSmallIntegerField()
-    #ch1_pend         = models.PositiveSmallIntegerField()
-    #ch2_pid          = models.PositiveSmallIntegerField()
-    #ch2_pend         = models.PositiveSmallIntegerField()
-    #ch3_pid          = models.PositiveSmallIntegerField()
-    #ch3_pend         = models.PositiveSmallIntegerField()
-    #ch4_pid          = models.PositiveSmallIntegerField()
-    #ch4_pend         = models.PositiveSmallIntegerField()
-    #ch5_pid          = models.PositiveSmallIntegerField()
-    #ch5_pend         = models.PositiveSmallIntegerField()
-    #ch6_pid          = models.PositiveSmallIntegerField()
-    #ch6_pend         = models.PositiveSmallIntegerField()
-    #ch7_pid          = models.PositiveSmallIntegerField()
-    #ch7_pid          = models.PositiveSmallIntegerField()
+    def get_pid_for_channel(self, ch):
+        return get_channel(ch).paddle_id
 
-    #def set_ch_pid(self, ch, pid):
-    #    setattr(self, 'ch{ch}_pid', pid)
-    #    print (f'We set {ch} {pid}')
-    #    print (f'cross-check self.ch{ch}_pid', self.__getattribute__('ch{ch}_pid'))
+    def get_ploc_for_channel(self, ch):
+        panel = get_channel(ch).panel_id
+        panel = Panel.objects.filter(id=panel)[0]
+        print(panel)
 
-    #def get_ch_to_pid(self):
-    #    ch_to_pid = dict()
-    #    for ch in range(1,9):
-    #        ch_to_pid[ch] = self.__getattribute__(f'ch{ch}_pid')
-    #    return ch_to_pid
-
-    #def set_ch_to_pid(self, ch_to_pid):
-    #    """
-    #    Args:
-    #        ch_to_pid (dict) : mapping rb channel -> paddle id
-    #    """
-    #    for ch in ch_to_pid:
-    #        setattr(self,f'ch{ch}_pid',ch_to_pid[ch])
-    #    return None
-    
+    def get_channel(self,ch):
+        match ch:
+            case 1:
+                return self.ch1_paddle
+            case 2:
+                return self.ch2_paddle
+            case 3:
+                return self.ch3_paddle
+            case 4:
+                return self.ch4_paddle
+            case 5:
+                return self.ch5_paddle
+            case 6:
+                return self.ch6_paddle
+            case 7:
+                return self.ch7_paddle
+            case 8:
+                return self.ch8_paddle
+            case _:
+                raise ValueError(f"Don't have paddle for channel {ch}")
 
     def get_designated_ip(self):
         ip_address = "10.0.1.1" + str(self.rb_id).zfill(2)
@@ -520,47 +552,4 @@ def get_dsi_j_for_ltb(ltb, rats, dsi_cards, dry_run = False):
     print(f" Will write dsi {dsi} and j {j}")
     if not dry_run:
         ltb.save()
-
-#FIXME - pre save hook
-#@receiver(pre_save, sender=PaddleEnd)
-#def create_paddle_end_uuid(sender, instance):
-#    instance
-
-
-
-
-#def __init__(self):
-#        self.id        = 0
-#        self.ch_to_pid = dict()
-#        self.dna       = 0
-#        self.port      = 42000
-#        self.calibration_file = ""
-#        self.mac_address = ""
-#        self.ip_address = ""
-
-    #def __init__(self):
-    #    self.id  = 0
-    #    self.DSI = 0
-    #    self.J   = 0
-    #    self.channels_to_rb = []
-
-    #def update(self, data):
-    #    self.id  = int(data['id'])
-    #    self.DSI = int(data['DSI'])
-    #    self.J   = int(data['J'])
-    #
-    #def to_dict(self):
-    #    data = OrderedDict()
-    #    data['id']  = self.id
-    #    data['DSI'] = self.DSI
-    #    data['J']   = self.J
-    #    data['ch_to_rb'] = dict()
-    #    for ch in self.channels_to_rb:
-    #        data['ch_to_rb'][str(ch[0])] = [int(ch[1]), int(ch[2])]
-    #    return data
-
-    #def to_json(self):
-    #    #return hjson.dumps(self.to_dict(), use_decimal=False)
-    #    return json.dumps(self.to_dict())
-
 

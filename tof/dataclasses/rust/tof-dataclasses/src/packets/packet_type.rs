@@ -23,14 +23,19 @@ pub enum PacketType {
   HeartBeat          = 40u8,    // might probably go away
   MasterTrigger      = 60u8,    // needs to be renamed to either MasterTriggerEvent or MTEvent
   RBEventHeader      = 70u8,    // needs to go away
-  MonitorTofCmp      = 80u8,
+  MonitorTofCmp      = 80u8,    // needs to go away
   MonitorMtb         = 90u8,
   RBMoni             = 100u8,
+  PBMoniData         = 101u8,
+  LTBMoniData        = 102u8,
+  PAMoniData         = 103u8,
   RBEventMemoryView  = 120u8, // We'll keep it for now - indicates that the event
                               // still needs to be processed.
   RBCalibration      = 130u8,
   TofCommand         = 140u8,
   RBCommand          = 150u8,
+  /// a MultiPacket consists of other TofPackets
+  MultiPacket        = 255u8,
 }
 
 impl fmt::Display for PacketType {
@@ -58,6 +63,9 @@ impl TryFrom<u8> for PacketType {
       80u8  => Ok(PacketType::MonitorTofCmp),
       90u8  => Ok(PacketType::MonitorMtb),
       100u8 => Ok(PacketType::RBMoni),
+      101u8 => Ok(PacketType::PBMoniData),
+      102u8 => Ok(PacketType::LTBMoniData),
+      103u8 => Ok(PacketType::PAMoniData),
       120u8 => Ok(PacketType::RBEventMemoryView),
       130u8 => Ok(PacketType::RBCalibration),
       140u8 => Ok(PacketType::TofCommand),
@@ -83,6 +91,9 @@ impl FromRandom for PacketType {
       PacketType::TofCommand,
       PacketType::RBCommand,
       PacketType::RBMoni,
+      PacketType::PBMoniData,
+      PacketType::LTBMoniData,
+      PacketType::PAMoniData,
       PacketType::MonitorTofCmp,
       PacketType::MonitorMtb,
       PacketType::RBCalibration
@@ -107,6 +118,9 @@ fn test_packet_types() {
   type_codes.push(PacketType::TofCommand as u8);
   type_codes.push(PacketType::RBCommand as u8);
   type_codes.push(PacketType::RBMoni as u8);
+  type_codes.push(PacketType::PBMoniData as u8);
+  type_codes.push(PacketType::LTBMoniData as u8);
+  type_codes.push(PacketType::PAMoniData as u8);
   type_codes.push(PacketType::MonitorTofCmp as u8);
   type_codes.push(PacketType::MonitorMtb as u8);
   type_codes.push(PacketType::RBCalibration as u8);

@@ -65,21 +65,21 @@ enum class TofResponse {
  *
  *
  */
-struct CommandPacket {
-  const u16 head = 0xAAAA;
-  const u16 tail = 0x5555;
-  // every command packet is 9 bytes
-  u16 p_length_fixed = 9;
-  TofCommand command;
-  u32 value;
-
-  CommandPacket(const TofCommand &cmd, const u32 value);
-  Vec<u8> to_bytestream();
-
-  usize from_bytestream(Vec<u8>& payload,
-                        usize start_pos=0);
-
-};
+//struct CommandPacket {
+//  const u16 head = 0xAAAA;
+//  const u16 tail = 0x5555;
+//  // every command packet is 9 bytes
+//  u16 p_length_fixed = 9;
+//  TofCommand command;
+//  u32 value;
+//
+//  CommandPacket(const TofCommand &cmd, const u32 value);
+//  Vec<u8> to_bytestream();
+//
+//  usize from_bytestream(Vec<u8>& payload,
+//                        usize start_pos=0);
+//
+//};
 
 
 /**************************************
@@ -92,35 +92,35 @@ struct CommandPacket {
  *
  *************************/
 
-struct ResponsePacket {
-  // these are the specific response code
-  static const u32 RESP_ERR_LEVEL_NOPROBLEM	        = 4000;
-  static const u32 RESP_ERR_LEVEL_MEDIUM            = 4010;
-  static const u32 RESP_ERR_LEVEL_CRITICAL	        = 4030; 
-  static const u32 RESP_ERR_LEVEL_MISSION_CRITICAL  = 4040; 
-  static const u32 RESP_ERR_LEVEL_RUN_FOOL_RUN	    = 99999; 
-  static const u32 RESP_ERR_LEVEL_SEVERE            = 4020; 
-  static const u32 RESP_ERR_NORUNACTIVE	            = 501; 
-  static const u32 RESP_ERR_NOTIMPLEMENTED          = 404; 
-  static const u32 RESP_ERR_RUNACTIVE	            = 502; 
-  static const u32 RESP_ERR_UNEXECUTABLE	        = 500; 
-  static const u32 RESP_SUCC_FINGERS_CROSSED	    = 200; 
-  
-  u16 head = 0xAAAA;
-  u16 tail = 0x5555;
-  // every command packet is 9 bytes
-  u16 p_length_fixed = 9;
-  TofResponse response;
-  u32 value;
-
-  ResponsePacket(const TofResponse &resp, const u32 value);
-  Vec<u8> to_bytestream() const;
-
-  usize from_bytestream(Vec<u8>& payload,
-                        usize start_pos=0);
-
-  //! Get a string represntation of the response codes
-  std::string translate_response_code(u32 code) const;
-};
+//struct ResponsePacket {
+//  // these are the specific response code
+//  static const u32 RESP_ERR_LEVEL_NOPROBLEM	        = 4000;
+//  static const u32 RESP_ERR_LEVEL_MEDIUM            = 4010;
+//  static const u32 RESP_ERR_LEVEL_CRITICAL	        = 4030; 
+//  static const u32 RESP_ERR_LEVEL_MISSION_CRITICAL  = 4040; 
+//  static const u32 RESP_ERR_LEVEL_RUN_FOOL_RUN	    = 99999; 
+//  static const u32 RESP_ERR_LEVEL_SEVERE            = 4020; 
+//  static const u32 RESP_ERR_NORUNACTIVE	            = 501; 
+//  static const u32 RESP_ERR_NOTIMPLEMENTED          = 404; 
+//  static const u32 RESP_ERR_RUNACTIVE	            = 502; 
+//  static const u32 RESP_ERR_UNEXECUTABLE	        = 500; 
+//  static const u32 RESP_SUCC_FINGERS_CROSSED	    = 200; 
+//  
+//  u16 head = 0xAAAA;
+//  u16 tail = 0x5555;
+//  // every command packet is 9 bytes
+//  u16 p_length_fixed = 9;
+//  TofResponse response;
+//  u32 value;
+//
+//  ResponsePacket(const TofResponse &resp, const u32 value);
+//  Vec<u8> to_bytestream() const;
+//
+//  usize from_bytestream(Vec<u8>& payload,
+//                        usize start_pos=0);
+//
+//  //! Get a string represntation of the response codes
+//  std::string translate_response_code(u32 code) const;
+//};
 
 #endif

@@ -5,11 +5,15 @@ use std::fs::read_to_string;
 
 use tof_dataclasses::serialization::Serialization;
 use tof_dataclasses::io::RBEventMemoryStreamer;
-
 use std::path::Path;
-use std::time::{Duration,
-                Instant};
-use std::{thread, time};
+use std::time::{
+    Duration,
+    Instant
+};
+use std::{
+    thread,
+    time
+};
 use std::env;
 use crossbeam_channel::{Sender};
 
@@ -18,26 +22,24 @@ use crate::memory::*;
 
 use tof_dataclasses::events::{RBEvent,
                               DataType};
-use tof_dataclasses::commands::TofCommand;
+use tof_dataclasses::commands::{
+    TofCommand,
+    TofOperationMode,
+};
 use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::errors::SerializationError;
 use tof_dataclasses::run::RunConfig;
 
 // Takeru's tof-control
-cfg_if::cfg_if! {
-  if #[cfg(feature = "tofcontrol")]  {
-    use std::net::IpAddr;
-    use local_ip_address::local_ip;
-    use tof_dataclasses::calibrations::RBCalibrations;
-    use tof_dataclasses::errors::CalibrationError;
-    use tof_dataclasses::monitoring::RBMoniData;
-    // for calibration
-    use tof_control::rb_control::rb_mode::{select_noi_mode,
-                                           select_vcal_mode,
-                                           select_tcal_mode,
-                                           select_sma_mode};
-  }
-}
+use std::net::IpAddr;
+use tof_dataclasses::errors::CalibrationError;
+use tof_dataclasses::calibrations::RBCalibrations;
+use local_ip_address::local_ip;
+// for calibration
+use tof_control::rb_control::rb_mode::{select_noi_mode,
+                                       select_vcal_mode,
+                                       select_tcal_mode,
+                                       select_sma_mode};
 
 
 /// The poisson self trigger mode of the board
@@ -180,20 +182,19 @@ pub fn wait_while_run_active(n_errors     : u32,
 /// - apply calibration script (Jamie)
 ///   save result in binary and in textfile,
 ///   send downstream
-#[cfg(feature="tofcontrol")]
 pub fn rb_calibration(rc_to_runner    : &Sender<RunConfig>,
                       tp_to_publisher : &Sender<TofPacket>)
 -> Result<(), CalibrationError> {
   warn!("Commencing full RB calibration routine! This will take the board out of datataking for a few minutes!");
   let five_seconds   = time::Duration::from_millis(5000);
   let mut run_config = RunConfig {
+    runid                   : 0,
     nevents                 : 1300,
     is_active               : true,
     nseconds                : 0,
-    stream_any              : true,
+    tof_op_mode             : TofOperationMode::StreamAny,
     trigger_poisson_rate    : 0,
     trigger_fixed_rate      : 100,
-    latch_to_mtb            : false,
     data_type               : DataType::Noi,
     rb_buff_size            : 100
   }; 
@@ -255,7 +256,10 @@ pub fn rb_calibration(rc_to_runner    : &Sender<RunConfig>,
   }
   // at this point, the zmq socket should be set up!
   info!("Will set board to no input mode!");
-  select_noi_mode();
+  match select_noi_mode() {
+    Err(err) => error!("Unable to select SMA mode! {err:?}"),
+    Ok(_)     => (),
+  }
   match rc_to_runner.send(run_config) {
     Err(err) => warn!("Can not send runconfig!, Err {err}"),
     Ok(_)    => trace!("Success!")
@@ -265,10 +269,13 @@ pub fn rb_calibration(rc_to_runner    : &Sender<RunConfig>,
   println!("==> No input (Voltage calibration) data taken!");
 
   info!("Will set board to vcal mode!");
-  select_vcal_mode();
+  match select_vcal_mode() {
+    Err(err) => error!("Unable to select VCAL mode! {err:?}"),
+    Ok(_)     => ()
+  }
   run_config.data_type = DataType::VoltageCalibration;  
   match rc_to_runner.send(run_config) {
-    Err(err) => warn!("Can not send runconfig!, Err {err}"),
+    Err(err) => warn!("Can not send runconfig! {err}"),
     Ok(_)    => trace!("Success!")
   }  
   cal_dtype             = DataType::VoltageCalibration;
@@ -281,9 +288,12 @@ pub fn rb_calibration(rc_to_runner    : &Sender<RunConfig>,
   run_config.trigger_fixed_rate    = 0;
   //run_config.rb_buff_size          = 500;
   run_config.data_type = DataType::TimingCalibration;  
-  select_tcal_mode();
+  match select_tcal_mode() {
+    Err(err) => error!("Can not set board to TCAL mode! {err:?}"),
+    Ok(_)     => (),
+  }
   match rc_to_runner.send(run_config) {
-    Err(err) => warn!("Can not send runconfig!, Err {err}"),
+    Err(err) => warn!("Can not send runconfig! {err}"),
     Ok(_)    => trace!("Success!")
   }
   
@@ -291,13 +301,16 @@ pub fn rb_calibration(rc_to_runner    : &Sender<RunConfig>,
   calibration.tcal_data = wait_while_run_active(20, 4*five_seconds, 1000,&cal_dtype, &socket);
   run_config.is_active = false;  
   match rc_to_runner.send(run_config) {
-    Err(err) => warn!("Can not send runconfig!, Err {err}"),
+    Err(err) => warn!("Can not send runconfig! {err}"),
     Ok(_)    => trace!("Success!")
   }
   info!("Waiting 5 seconds");
   thread::sleep(five_seconds);
   info!("Will set board to sma mode!");
-  select_sma_mode();
+  match select_sma_mode() {
+    Err(err) => error!("Can not set SMA mode! {err:?}"),
+    Ok(_)    => (),
+  }
   println!("==> Timing calibration data taken!");
   println!("==> Calibration data taking complete!"); 
   println!("Calibration : {}", calibration);
@@ -414,13 +427,32 @@ pub fn prefix_local(input : &mut Vec<u8>) -> Vec<u8> {
   bytestream
 }
 
-/// add the board id to the bytestream in front of the 
-/// tof response
 pub fn prefix_board_id(input : &mut Vec<u8>) -> Vec<u8> {
   // FIUXME - this should not panic
   let board_id = get_board_id()//
                  .unwrap_or(0);
                                //.expect("Need to be able to obtain board id!");
+  let mut bytestream : Vec::<u8>;
+  let board : String;
+  if board_id < 10 {
+    board = String::from("RB0") + &board_id.to_string();
+  } else {
+    board = String::from("RB")  + &board_id.to_string();
+  }
+  //let mut response = 
+  bytestream = board.as_bytes().to_vec();
+  //bytestream.append(&mut resp.to_bytestream());
+  bytestream.append(input);
+  bytestream
+}
+
+/// add the board id to the bytestream in front of the 
+/// tof response
+pub fn prefix_board_id_noquery(board_id : u8, input : &mut Vec<u8>) -> Vec<u8> {
+  // FIUXME - this should not panic
+  //let board_id = get_board_id()//
+  //               .unwrap_or(0);
+  //                             //.expect("Need to be able to obtain board id!");
   let mut bytestream : Vec::<u8>;
   let board : String;
   if board_id < 10 {

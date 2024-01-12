@@ -8,8 +8,9 @@
 //!
 //!
 
+extern crate zmq;
+
 #[macro_use] extern crate log;
-//extern crate env_logger;
 extern crate crossbeam_channel;
 
 extern crate tof_dataclasses;
@@ -18,16 +19,18 @@ extern crate liftof_lib;
 
 use std::collections::HashMap;
 
-use std::sync::{
-    Arc,
-    Mutex
-};
+//use std::sync::{
+//    Arc,
+//    Mutex
+//};
 
 use std::thread;
 use std::path::PathBuf;
 
 use tof_dataclasses::DsiLtbRBMapping;
-use tof_dataclasses::commands::RBCommand;
+//use tof_dataclasses::threading::ThreadControl;
+
+//use tof_dataclasses::commands::RBCommand;
 use liftof_lib::{
     get_ltb_dsi_j_ch_mapping,
     readoutboard_commander,
@@ -35,13 +38,13 @@ use liftof_lib::{
 };
 
 use tof_dataclasses::packets::TofPacket;
-//use tof_dataclasses::threading::ThreadPool;
 use tof_dataclasses::events::MasterTriggerEvent;
+use tof_dataclasses::serialization::Serialization;
 use liftof_lib::master_trigger;
 use crossbeam_channel as cbc;
-use std::io::Write;
+//use std::io::Write;
 
-use liftof_lib::color_log;
+//use liftof_lib::color_log;
 extern crate clap;
 use clap::Parser;
 
@@ -54,26 +57,75 @@ struct Args {
   /// Send RB request packets
   #[arg(long, default_value_t=false)]
   send_requests : bool,
+  /// Relay RB network traffic through 
+  /// open poart
+  #[arg(long, default_value_t=false)]
+  relay_rbs : bool,
+  /// Apply trace suppression 
+  #[arg(long, default_value_t=false)]
+  trace_suppression : bool,
+  /// Publish TofPackets at port 42000
+  #[arg(long, default_value_t=false)]
+  publish_packets : bool,
   /// A json file wit the ltb(dsi, j, ch) -> rb_id, rb_ch mapping.
   #[arg(long)]
   json_ltb_rb_map : Option<PathBuf>,
 }
+
+fn rb_relay() {
+  let ctx = zmq::Context::new();
+  let socket = ctx.socket(zmq::SUB).expect("Unable to create 0MQ SUB socket!");
+  let socket_out = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
+  for rb_id in 1..41 {
+    let address = format!("tcp://10.0.1.1{:02}:42000", rb_id);
+    socket.connect(&address).expect("Unable to bind to data (PUB) socket {adress}");
+    println!("==> 0MQ PUB socket bound to address {address}");
+  }
+  match socket.set_subscribe(b"") {
+    Err(err) => error!("Unable to subscribe to any message! {err}"),
+    Ok(_)    => ()
+  }
+  let address_out : &str = "tcp://100.96.207.91:42001";
+  match socket_out.bind(address_out) {
+    Err(err) => error!("Unable to bind to PUB socket at {}! {err}", address_out),
+    Ok(_)    => ()
+  }
+  loop {
+    match socket.recv_bytes(0) {
+      Err(_err) => (),
+      Ok(data)  => {
+        match socket_out.send(data, 0) {
+          Err(_err) => (),
+          Ok(_)     => ()
+        }
+      }
+    }
+  }
+}
+
 
 fn main() {
 
   init_env_logger();
   info!("Logging initialized!");
   let (mte_send, mte_rec): (cbc::Sender<MasterTriggerEvent>, cbc::Receiver<MasterTriggerEvent>) = cbc::unbounded(); 
-  let (tp_send_moni, _tp_rec_moni): (cbc::Sender<TofPacket>, cbc::Receiver<TofPacket>) = cbc::unbounded(); 
+  let (tp_send_moni, tp_rec_moni): (cbc::Sender<TofPacket>, cbc::Receiver<TofPacket>) = cbc::unbounded(); 
   let (tp_send_req, tp_rec_req): (cbc::Sender<TofPacket>, cbc::Receiver<TofPacket>) = cbc::unbounded(); 
-   
+ 
+  // Create shared data wrapped in an Arc and a Mutex for synchronization
+  //let thread_control = Arc::new(Mutex::new(ThreadControl::default()));
+
   let mut ltb_rb_map : DsiLtbRBMapping = HashMap::<u8,HashMap::<u8,HashMap::<u8,(u8,u8)>>>::new();
   let master_trigger_ip   = String::from("10.0.1.10");
   let master_trigger_port = 50001usize;
   //let worker_threads      = ThreadPool::new(2);
 
-  let args = Args::parse();
-  let verbose = args.verbose;
+  let args                = Args::parse();
+  let verbose             = args.verbose;
+  let publish_packets     = args.publish_packets;
+  let send_requests       = args.send_requests;
+  let relay_rbs           = args.relay_rbs;
+
   if args.send_requests {
     match args.json_ltb_rb_map {
       None => {
@@ -84,7 +136,6 @@ fn main() {
       }
     }
   }
-  let args = Args::parse(); 
   let _worker_thread = thread::Builder::new()
          .name("master_trigger".into())
          .spawn(move || {
@@ -94,20 +145,37 @@ fn main() {
                            &mte_send,
                            &tp_send_req,
                            &tp_send_moni,
-                           10,
+                           1,
                            60,
-                           true,
-                           args.send_requests);
+                           verbose,
+                           send_requests);
          })
          .expect("Failed to spawn master_trigger thread!");
-  let _rbcmd_thread = thread::Builder::new()
-         .name("rb_commander".into())
-         .spawn(move || {
-            readoutboard_commander(&tp_rec_req); 
-         })
-         .expect("Failed to spawn rb_commander thread!");
-
+ if send_requests {
+   let _rbcmd_thread = thread::Builder::new()
+                       .name("rb_commander".into())
+                       .spawn(move || {
+                         readoutboard_commander(&tp_rec_req); 
+                        })
+                       .expect("Failed to spawn rb_commander thread!");
+ }
+ if relay_rbs {
+   let _relay_thread = thread::Builder::new()
+                       .name("rb_relay".into())
+                       .spawn(move || {
+                         rb_relay(); 
+                        })
+                       .expect("Failed to spawn rb_relay thread!");
+ 
+ }
  let mut n_events = 0u64;
+ let ctx = zmq::Context::new();
+ let address : &str = "tcp://100.96.207.91:42000";
+ let data_socket = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
+ if publish_packets {
+   data_socket.bind(address).expect("Unable to bind to data (PUB) socket {adress}");
+   println!("==> 0MQ PUB socket bound to address {address}");
+ }
  loop {
    match mte_rec.recv() {
      Err(err)  => debug!("Can not receive events! Error {err}"),
@@ -115,11 +183,34 @@ fn main() {
        //if ev.n_paddles > 0 {
        //  println!("Received event {}", ev);
        //}
+       if publish_packets {
+         let tp = TofPacket::from(&_ev);
+         match data_socket.send(tp.to_bytestream(), 0) {
+           Err(err) => error!("Can't send TofPacket! {err}"),
+           Ok(_)    => ()
+         }
+       }
        if n_events % 100 == 0 {
          if verbose {
            println!("{}", _ev);
          }
        } 
+       n_events += 1;
+     }
+   }
+   match tp_rec_moni.try_recv() {
+     Err(err)  => debug!("Can not receive events! Error {err}"),
+     Ok(_moni)    => {
+       if publish_packets {
+         //let tp = TofPacket::from(&_moni);
+         match data_socket.send(_moni.to_bytestream(), 0) {
+           Err(err) => error!("Can't send TofPacket! {err}"),
+           Ok(_)    => ()
+         }
+       }
+       if verbose {
+         println!("{}", _moni);
+       }
        n_events += 1;
      }
    }

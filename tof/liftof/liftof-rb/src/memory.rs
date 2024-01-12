@@ -49,15 +49,33 @@ pub const SIZEOF_U32 : usize = 4;
 
 
 #[derive(Debug, Copy, Clone)]
-pub struct RegisterError {
+pub enum RegisterError {
+  RegisterTimeOut,
+  MMapFail,
+  Unknown,
 }
 
 impl fmt::Display for RegisterError {
-
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(f, "{}", "<RegisterError>")
+    let etype : String;
+    match self {
+      RegisterError::RegisterTimeOut => {
+        etype = String::from("RegisterTimeOut");
+      },
+      RegisterError::Unknown => {
+        etype = String::from("Unknown");
+      },
+      _ => {
+        etype = String::from("not defined");
+      }
+    }
+    write!(f, "<RegisterError: {}>", etype)
   }
 }
+
+impl Error for RegisterError {
+}
+
 
 ///! There are 2 data buffers, commonly 
 ///  denoted as "A" and "B".
@@ -150,9 +168,8 @@ pub fn read_control_reg(addr : u32)
   let m = match map_physical_mem_read(UIO0, addr, SIZEOF_U32) {
     Ok(m) => m,
     Err(err) => {
-      let error = RegisterError {};
-      warn!("Failed to mmap: Err={:?}", err);
-      return Err(error);
+      error!("Failed to mmap: {:?}", err);
+      return Err(RegisterError::MMapFail);
     }
   };
   let p = m.as_ptr() as *const u32;
@@ -175,9 +192,8 @@ pub fn write_control_reg(addr       : u32,
   let m = match map_physical_mem_write(UIO0,addr,SIZEOF_U32) {
     Ok(m) => m,
     Err(err) => {
-      let error = RegisterError {};
-      warn!("[write_control_reg] Failed to mmap: Err={:?}", err);
-      return Err(error);
+      warn!("[write_control_reg] Failed to mmap! {:?}", err);
+      return Err(RegisterError::MMapFail);
     }
   };
   let p = m.as_ptr() as *mut u32;
@@ -216,9 +232,9 @@ pub fn read_data_buffer(which : &BlobBuffer,
   //let mut m = match map_physical_mem_write(addr_space, 0x0, size) {
     Ok(m) => m,
     Err(err) => {
-      let error = RegisterError {};
-      warn!("Failed to mmap: Err={:?}", err);
-      return Err(error);
+      //let error = RegisterError {};
+      warn!("Failed to mmap! {:?}", err);
+      return Err(RegisterError::MMapFail);
     }
   };
  
@@ -258,9 +274,8 @@ pub fn read_buffer_into_streamer(which    : &BlobBuffer,
   //let mut m = match map_physical_mem_write(addr_space, 0x0, size) {
     Ok(m) => m,
     Err(err) => {
-      let error = RegisterError {};
-      warn!("Failed to mmap: Err={:?}", err);
-      return Err(error);
+      warn!("Failed to mmap: {:?}", err);
+      return Err(RegisterError::MMapFail);
     }
   };
   let p = m.as_ptr() as *const u8;

@@ -4,16 +4,18 @@ use clap::Parser;
 extern crate env_logger;
 use std::io::Write;
 
+
 use liftof_lib::{
     color_log,
-    TofPacketWriter,
-    TofPacketReader
 };
 
 use tof_dataclasses::calibrations::RBCalibrations;
 use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::serialization::Serialization;
-
+use tof_dataclasses::io::{
+    TofPacketReader,
+    TofPacketWriter,
+};
 #[derive(Parser, Default, Debug)]
 #[command(author = "J.A.Stoessl", version, about, long_about = None)]
 struct Args {

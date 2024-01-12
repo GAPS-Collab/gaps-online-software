@@ -16,13 +16,13 @@
  */ 
 
 #include <tuple>
+#include <array>
 
 #include "tof_typedefs.h"
 #include "packets/monitoring.h"
 #include "packets/tof_packet.h"
 #include "events/tof_event_header.hpp"
 #include "calibration.h"
-#include "packets/RPaddlePacket.h"
 
 class RBCalibration;
 
@@ -35,6 +35,7 @@ struct RBEventHeader;
 struct RBEvent;
 struct RBEventMemoryView;
 struct MasterTriggerEvent;
+struct TofHit;
 
 /*********************************************************/
   
@@ -134,10 +135,10 @@ struct RBEventHeader {
   u8   status_byte           ;
   u16  channel_mask          ;
   u16  stop_cell             ;
-  u32  crc32                 ;
-  u16  dtap0                 ;
+  u16  ch9_amp               ;
+  u16  ch9_freq              ;
+  u16  ch9_phase             ; 
   u16  fpga_temp             ;
-  u16  drs4_temp             ;
   u32  timestamp32           ;
   u16  timestamp16           ;
   
@@ -149,24 +150,23 @@ struct RBEventHeader {
   Vec<u8> get_channels()    const;
   u8      get_nchan()       const;
   Vec<u8> get_active_data_channels() const;
-  bool has_ch9()            const;
-  u8   get_n_datachan()     const;
-  f32  get_fpga_temp()      const;
-  f32  get_drs_temp()       const;
-  bool is_event_fragment()  const;
-  bool drs_lost_trigger()   const;
-  bool lost_lock()          const;
-  bool lost_lock_last_sec() const;
-  bool is_locked()          const;
-  bool is_locked_last_sec() const;
+  bool    has_ch9()            const;
+  u8      get_n_datachan()     const;
+  f32     get_fpga_temp()      const;
+  bool    is_event_fragment()  const;
+  bool    drs_lost_trigger()   const;
+  bool    lost_lock()          const;
+  bool    lost_lock_last_sec() const;
+  bool    is_locked()          const;
+  bool    is_locked_last_sec() const;
+
+  std::array<f32, 3> get_sine_fit() const;
+    
+  /// the combined timestamp 
   u64  get_timestamp48()    const;
 
   /// string representation for printing
   std::string to_string() const;
-
-  private:
-    /// conversion method for drs temperature readout
-    f32 drs_adc_to_celsius(u16 adc) const; 
 };
 
 /**
@@ -186,7 +186,7 @@ struct RBEvent {
   EventStatus status;
   RBEventHeader header;
   Vec<Vec<u16>> adc; 
-  Vec<RPaddlePacket> hits;
+  Vec<TofHit> hits;
  
   RBEvent();
 
@@ -436,6 +436,63 @@ struct TofEvent {
     /// in case of a null result.
     RBEvent _empty_event = RBEvent();
 };
+
+/***********************************************
+ * Reconstructed waveform peak information
+ * 
+ * There should be one TofHit per reconstructed
+ * peak
+ * 
+ *
+ */
+struct TofHit  {
+  static const u16 HEAD = 0xF0F0;
+  static const u16 TAIL = 0xF0F;
+
+  u8   paddle_id;
+  bool broken;
+
+  u32 timestamp32;
+  u16 timestamp16;
+
+  u8 ctr_etx;
+  u16 tail = 0xF0F; 
+
+  f32 get_time_a()       const;
+  f32 get_time_b()       const;
+  f32 get_peak_a()       const;
+  f32 get_peak_b()       const;
+  f32 get_charge_a()     const;
+  f32 get_charge_b()     const;
+  f32 get_charge_min_i() const;
+  f32 get_x_pos()        const;
+  f32 get_t_avg()        const;
+  f64 get_timestamp48()  const;
+
+  static TofHit from_bytestream(const Vec<u8> &bytestream, 
+                                       u64 &pos);
+ 
+  // easier print out
+  std::string to_string() const;
+  
+  private:
+    // we keep this private, since 
+    // the user should use the getters
+    // to get the values converted 
+    // back to f32
+    u16 time_a;
+    u16 time_b;
+    u16 peak_a;
+    u16 peak_b;
+    u16 charge_a;
+    u16 charge_b;
+    u16 charge_min_i;
+    u16 x_pos;
+    u16 t_average;
+    // don't serialize
+};
+
+std::ostream& operator<<(std::ostream& os, const TofHit& pad);
 
 std::ostream& operator<<(std::ostream& os, const MasterTriggerEvent& mt);
 

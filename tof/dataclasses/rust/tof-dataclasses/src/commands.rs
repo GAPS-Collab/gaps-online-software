@@ -291,9 +291,18 @@ impl FromRandom for TofCommandResp {
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 #[repr(u8)]
 pub enum TofOperationMode {
-  RequestReply = 0u8,
-  StreamAny    = 10u8,
-  Unknown      = 20u8
+  Unknown          = 0u8,
+  #[deprecated(since="0.8.3")] 
+  StreamAny        = 10u8,
+  #[deprecated(since="0.8.3")] 
+  RequestReply     = 20u8,
+  /// Don't decode any of the event 
+  /// data on the RB, just push it 
+  /// onward
+  RBHighThroughput = 30u8,
+  RBCalcCRC32      = 40u8,
+  RBWaveform       = 50u8,
+
 }
 
 impl fmt::Display for TofOperationMode {
@@ -311,9 +320,12 @@ impl TryFrom<u8> for TofOperationMode {
   //  looks nicer - Paolo
   fn try_from(value: u8) -> Result<Self, Self::Error> {
     match value {
-      0u8  => Ok(TofOperationMode::RequestReply),
+      0u8  => Ok(TofOperationMode::Unknown),
       10u8 => Ok(TofOperationMode::StreamAny),
-      20u8 => Ok(TofOperationMode::Unknown),
+      20u8 => Ok(TofOperationMode::RequestReply),
+      30u8 => Ok(TofOperationMode::RBHighThroughput),
+      40u8 => Ok(TofOperationMode::RBCalcCRC32),
+      50u8 => Ok(TofOperationMode::RBWaveform),
       _    => {
         error!("{} is not a valid TofOperationMode!", value);
         Err("I am not sure how to convert this value!")
@@ -329,6 +341,9 @@ impl FromRandom for TofOperationMode {
     let choices = [
       TofOperationMode::RequestReply,
       TofOperationMode::StreamAny,
+      TofOperationMode::RBHighThroughput,
+      TofOperationMode::RBCalcCRC32,
+      TofOperationMode::RBWaveform,
       TofOperationMode::Unknown
     ];
     let mut rng  = rand::thread_rng();
@@ -412,11 +427,11 @@ impl Serialization for RBCommand {
                      pos       : &mut usize) 
     -> Result<Self, SerializationError>{
     Self::verify_fixed(stream, pos)?;
-    let mut command = RBCommand::new();
+    let mut command      = RBCommand::new();
     command.rb_id        = parse_u8(stream, pos);
     command.command_code = parse_u8(stream, pos);
     command.channel_mask = parse_u8(stream, pos);
-    command.payload = parse_u32(stream, pos);
+    command.payload      = parse_u32(stream, pos);
     *pos += 2;
     Ok(command)
   }

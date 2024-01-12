@@ -1,5 +1,10 @@
 use std::path::Path;
-use std::time::Instant;
+use std::sync::{
+    Arc,
+    Mutex,
+};
+
+//use std::time::Instant;
 use crossbeam_channel::Sender;
 
 use tof_dataclasses::commands::{TofCommand,
@@ -9,17 +14,21 @@ use tof_dataclasses::packets::{TofPacket,
 use tof_dataclasses::run::RunConfig;
 
 use tof_dataclasses::serialization::Serialization;
-#[cfg(feature="tofcontrol")]
+use tof_dataclasses::threading::ThreadControl;
+
 use tof_dataclasses::constants::{MASK_CMD_8BIT,
                                  MASK_CMD_16BIT,
                                  MASK_CMD_24BIT,
                                  MASK_CMD_32BIT};
 
-use crate::api::{get_runconfig, DATAPORT};
-use crate::api::prefix_board_id;
-#[cfg(feature="tofcontrol")]
+use crate::api::{
+    get_runconfig,
+    prefix_board_id,
+    DATAPORT
+};
 use crate::api::rb_calibration;
 use crate::control::get_board_id_string;
+
 use liftof_lib::build_tcp_from_ip;
 
 /// Centrailized command management
@@ -29,14 +38,18 @@ use liftof_lib::build_tcp_from_ip;
 ///
 /// # Arguments
 ///
-/// cmd_server_ip             : The IP addresss of the C&C server we are listening to.
-/// heartbeat_timeout_seconds : If we don't hear from the C&C server in this amount of 
-///                             seconds, we try to reconnect.
+/// * cmd_server_ip             : The IP addresss of the C&C server we are listening to.
+/// * run_config_file           : The default runconfig file. When we receive a simple
+///                               DataRunStartCommand, we will run this configuration
+/// * run_config                : A sender to send the dedicated run config to the 
+///                               runner
+/// * ev_request_to_cache       : When receiveing RBCommands which contain requests,
+///                               forward them to event processing.
 pub fn cmd_responder(cmd_server_ip             : String,
-                     heartbeat_timeout_seconds : u32,
                      run_config_file           : &Path,
                      run_config                : &Sender<RunConfig>,
-                     ev_request_to_cache       : &Sender<TofPacket>) {
+                     ev_request_to_cache       : &Sender<TofPacket>,
+                     thread_control            : Arc<Mutex<ThreadControl>>) {
   // create 0MQ sockedts
   //let one_milli       = time::Duration::from_millis(1);
   let port = DATAPORT.to_string();
@@ -68,7 +81,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
     }
   }
   
-  let mut heartbeat     = Instant::now();
+  //let mut heartbeat     = Instant::now();
 
   // I don't know if we need this, maybe the whole block can go away.
   // Originally I thought the RBs get pinged every x seconds and if we
@@ -76,42 +89,20 @@ pub fn cmd_responder(cmd_server_ip             : String,
   // if that scenario actually occurs.
   // Paolo: instead of leaving the connection always open we might
   //  want to reopen it if its not reachable anymore (so like command-oriented)...
-  warn!("TODO: Heartbeat feature not yet implemented on C&C side");
-  let heartbeat_received = false;
+  //warn!("TODO: Heartbeat feature not yet implemented on C&C side");
+  //let heartbeat_received = false;
   loop {
-    if !heartbeat_received {
-      trace!("No heartbeat since {}", heartbeat.elapsed().as_secs());
-      if heartbeat.elapsed().as_secs() > heartbeat_timeout_seconds as u64 {
-        warn!("No heartbeat received since {heartbeat_timeout_seconds}. Attempting to reconnect!");
-        match cmd_socket.connect(&cmd_address) {
-          Err(err) => {
-            error!("Not able to connect to {}, Error {err}", cmd_address);
-            is_connected = false;
-          }
-          Ok(_)    => {
-            debug!("Connected to CnC server at {}", cmd_address);
-            is_connected = true;
-          }
+    match thread_control.lock() {
+      Ok(tc) => {
+        if tc.stop_flag {
+          info!("Received stop signal. Will stop thread!");
+          break;
         }
-        if is_connected {
-          match cmd_socket.set_subscribe(&topic_broadcast.as_bytes()) {
-            Err(err) => error!("Can not subscribe to {topic_broadcast}, err {err}"),
-            Ok(_)    => ()
-          }
-          match cmd_socket.set_subscribe(&topic_board.as_bytes()) {
-            Err(err) => error!("Can not subscribe to {topic_board}, err {err}"),
-            Ok(_)    => ()
-          }
-        }
-        heartbeat = Instant::now();
-      }
+      },
+      Err(err) => {
+        trace!("Can't acquire lock! {err}");
+      },
     }
-
-    if !is_connected {
-      error!("Connection to C&C server lost!");
-      continue;
-    }
-
     // Not sure how to deal with the connection. Poll? Or wait blocking?
     // Or don't block? Set a timeout? I guess technically since we are not doing
     // anything else here, we can block until we get something, this saves resources.
@@ -120,7 +111,8 @@ pub fn cmd_responder(cmd_server_ip             : String,
     //  Probably setting a timeout is the best practice since, else, we might die.
     //  If we wouldn't block some other commands might be sent and get stuck in the
     //  process (?).
-    match cmd_socket.recv_bytes(zmq::DONTWAIT) {
+    match cmd_socket.recv_bytes(0) {
+    //match cmd_socket.recv_bytes(zmq::DONTWAIT) {
       Err(err) => trace!("Problem receiving command over 0MQ ! Err {err}"),
       Ok(cmd_bytes)  => {
         debug!("Received bytes {}", cmd_bytes.len());
@@ -274,25 +266,15 @@ pub fn cmd_responder(cmd_server_ip             : String,
                       },
                       // Voltage and timing calibration is connected now
                       TofCommand::VoltageCalibration (value) => {
-                        cfg_if::cfg_if! {
-                          if #[cfg(feature = "tofcontrol")]  {
-                            // MSB first 16 bits are voltage level
-                            let voltage_val: u16 = ((value | (MASK_CMD_16BIT << 16)) >> 16) as u16;
-                            // MSB third 8 bits are RB ID
-                            let rb_id: u8 = ((value | (MASK_CMD_8BIT << 8)) >> 8) as u8;
-                            // MSB fourth 8 bits are extra (not used)
-                            let extra: u8 = (value | MASK_CMD_8BIT) as u8;
-                            println!("Voltage_val: {}, RB ID: {}, extra: {}",voltage_val,rb_id,extra);
-                            continue;
-                          } else {
-                            warn!("The function is implemented, but one has to compile with --features=tofcontrol");
-                            match cmd_socket.send(resp_not_implemented,0) {
-                              Err(err) => warn!("Can not send response! Err {err}"),
-                              Ok(_)    => trace!("Resp sent!")
-                            }
-                            continue;
-                          }
-                        }
+                        trace!("Got voltage calibration command with {value} value");
+                        // MSB first 16 bits are voltage level
+                        let voltage_val: u16 = ((value | (MASK_CMD_16BIT << 16)) >> 16) as u16;
+                        // MSB third 8 bits are RB ID
+                        let rb_id: u8 = ((value | (MASK_CMD_8BIT << 8)) >> 8) as u8;
+                        // MSB fourth 8 bits are extra (not used)
+                        let extra: u8 = (value | MASK_CMD_8BIT) as u8;
+                        println!("Voltage_val: {}, RB ID: {}, extra: {}",voltage_val,rb_id,extra);
+                        continue;
                       },
                       TofCommand::TimingCalibration  (_) => {
                         warn!("Not implemented");
@@ -357,7 +339,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
                 }  
               },
               PacketType::RBCommand  => {
-                info!("Received RBCommand!");
+                trace!("Received RBCommand!");
                 // just forward the packet now, the cache 
                 // can understand if it is an event request or not
                 match ev_request_to_cache.send(tp) {

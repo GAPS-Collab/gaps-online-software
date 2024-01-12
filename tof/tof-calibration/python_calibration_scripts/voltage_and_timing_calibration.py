@@ -55,8 +55,9 @@ def is_not_empty(f):
 
 
 # calibration file path
-calpath = Path('/tpool/tofdata/nts/calibrations')
-cal_output_path = Path(f'/tpool/tofdata/nts/calibrations/{sys.argv[1]}/txt-files/')
+calpath = Path('/data0/gaps/nts/calibrations/44/')
+#cal_output_path = Path(f'/tpool/tofdata/nts/calibrations/{sys.argv[1]}/txt-files/')
+cal_output_path = Path('calibrations/txt-files')
 vcal_files = sorted(glob(str(calpath / "*.vcal")))
 tcal_files = sorted(glob(str(calpath / "*.tcal")))
 noi_files  = sorted(glob(str(calpath / "*.noi")))
@@ -111,12 +112,14 @@ for k in rbs:
     calib_files.append(f)
 
 print (calib_files)
-#dv = float(args.d)
-
 for k in calib_files:
     if not k.is_complete():
         print (f"Can not run calibration for board {k.id}, files missing or they have 0 size!")
     else:
+        if k.id != "27":
+            continue
+        else:
+            print (f'not doing for {k.id}')
         print (f"Attempting calibration for board {k.id}")
         gbf  = tofpy.load(k.noi)
         gbf2 = tofpy.load(k.vcal)

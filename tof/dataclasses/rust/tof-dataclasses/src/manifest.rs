@@ -559,7 +559,7 @@ impl ReadoutBoard {
     Self {
       rb_id         : 0,  
       dna           : 0, 
-      port          : 0, 
+      port          : 42000, 
       ip_address    : Ipv4Addr::new(0,0,0,0),
       channel_to_paddle_end_id : [0;8],
       calib_file    : String::from(""),

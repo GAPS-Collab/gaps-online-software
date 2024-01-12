@@ -18,6 +18,9 @@ static const u8 RBHEADER           = 70;
 static const u8 TOFCMP_MONI        = 80;
 static const u8 MTB_MONI           = 90;
 static const u8 RB_MONI            = 100;
+static const u8 PBMONIDATA         = 101;
+static const u8 LTBMONIDATA        = 102;
+static const u8 PAMONIDATA         = 103;
 static const u8 RBEVENTPAYLOAD     = 110;
 static const u8 RBEVENTMEMORYVIEW  = 120;
 static const u8 RBCALIBRATION      = 130;
@@ -36,6 +39,9 @@ enum class PacketType : u8 {
   TOFCmpMoni        = TOFCMP_MONI        ,
   MTBMoni           = MTB_MONI           ,
   RBMoni            = RB_MONI            ,
+  PBMoniData        = PBMONIDATA         , 
+  LTBMoniData       = LTBMONIDATA        ,
+  PAMoniData        = PAMONIDATA         , 
   RBEventPayload    = RBEVENTPAYLOAD     ,
   RBEventMemoryView = RBEVENTMEMORYVIEW  ,
   RBCalibration     = RBCALIBRATION      ,
@@ -74,7 +80,7 @@ struct TofPacket {
   u16 tail = 0x5555;
 
   // head (2) + tail (2) + type (1) + payload size (4)
-  u8  p_size_fixed = 9;
+  //u8  p_size_fixed = 9;
   PacketType  packet_type; 
   // just the size of the payload, 
   // not including type, header or tail
@@ -82,8 +88,7 @@ struct TofPacket {
 
   Vec<u8> payload;
 
-  Vec<u8> to_bytestream() const;
-
+  TofPacket();
   /**
    * Transcode from bytestream
    *

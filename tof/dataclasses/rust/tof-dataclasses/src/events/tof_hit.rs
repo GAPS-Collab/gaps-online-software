@@ -1,8 +1,10 @@
 use crate::errors::SerializationError;
-use crate::serialization::{parse_u8,
-                           parse_u16,
-                           parse_u32,
-                           Serialization};
+use crate::serialization::{
+    parse_u8,
+    parse_u16,
+    parse_u32,
+    Serialization
+};
 use std::fmt;
 
 #[cfg(feature="random")]
@@ -10,12 +12,53 @@ extern crate rand;
 #[cfg(feature="random")]
 use rand::Rng;
 
+/// Waveform peak
+///
+/// Helper to form TofHits
+#[derive(Debug,Copy,Clone,PartialEq)]
+pub struct Peak {
+  pub paddle_end_id : u16,
+  pub time          : f32,
+  pub charge        : f32,
+  pub height        : f32
+}
+
+impl Peak {
+  pub fn new() -> Self {
+    Self {
+      paddle_end_id : 40,
+      time          : 0.0,
+      charge        : 0.0,
+      height        : 0.0,
+    }
+  }
+}
+
+impl Default for Peak {
+  fn default() -> Self {
+    Self::new()
+  }
+}
+
+impl fmt::Display for Peak {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    write!(f, "<Peak:
+  p_end_id : {}
+  time     : {}
+  charge   : {}
+  height   : {}>",
+            self.paddle_end_id,
+            self.time,
+            self.charge,
+            self.height)
+  }
+}
 
 /// Comprehensive paddle information
 ///
 /// Results of the (online) waveform analysis
 ///
-/// a and b are the different ends of the paddle
+/// A and B are the different ends of the paddle
 ///
 #[derive(Debug,Copy,Clone,PartialEq)]
 pub struct TofHit {
@@ -35,31 +78,35 @@ pub struct TofHit {
 
   // this might be not needed, 
   // unsure
-  pub timestamp_32    : u32,
-  pub timestamp_16    : u16,
+  pub timestamp32   : u32,
+  pub timestamp16   : u16,
 
   // fields which won't get 
   // serialized
   pub valid        : bool,
 }
 
+impl Default for TofHit {
+  fn default() -> Self {
+    Self::new()
+  }
+}
+
 impl fmt::Display for TofHit {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     write!(f, "<TofHit:
-            \t VALID         {},   
-            \t time_a        {},   
-            \t time_b        {},   
-            \t peak_a        {},   
-            \t peak_b        {},   
-            \t charge_a      {},   
-            \t charge_b      {},   
-            \t charge_min_i  {},   
-            \t pos_across    {},   
-            \t t_average     {},   
-            \t ctr_etx       {},   
-            \t timestamp_32  {},  
-            \t timestamp_16  {}>", 
-            self.valid,
+  Peak:
+    LE Time A/B   {} {}   
+    Height  A/B   {} {}
+    Charge  A/B   {} {}
+  charge_min_i    {}   
+  pos_across      {}   
+  t_average       {}   
+  ctr_etx         {}   
+  timestamp32     {}  
+  timestamp16     {}
+  |-> timestamp48 {}
+  VALID           {}>", 
             self.time_a,
             self.time_b,
             self.peak_a,
@@ -70,8 +117,11 @@ impl fmt::Display for TofHit {
             self.pos_across,
             self.t_average,
             self.ctr_etx,
-            self.timestamp_32,
-            self.timestamp_16)
+            self.timestamp32,
+            self.timestamp16,
+            self.get_timestamp48(),
+            self.valid,
+            )
   }
 }
 
@@ -102,9 +152,9 @@ impl Serialization for TofHit {
     bytestream.extend_from_slice(&self.pos_across  .to_le_bytes()); 
     bytestream.extend_from_slice(&self.t_average   .to_le_bytes()); 
     bytestream.push(self.ctr_etx); 
-    bytestream.extend_from_slice(&self.timestamp_32   .to_le_bytes());
-    bytestream.extend_from_slice(&self.timestamp_16   .to_le_bytes());
-    bytestream.extend_from_slice(&Self::TAIL        .to_le_bytes()); 
+    bytestream.extend_from_slice(&self.timestamp32 .to_le_bytes());
+    bytestream.extend_from_slice(&self.timestamp16 .to_le_bytes());
+    bytestream.extend_from_slice(&Self::TAIL       .to_le_bytes()); 
     bytestream
   }
 
@@ -133,8 +183,8 @@ impl Serialization for TofHit {
     pp.pos_across    = parse_u16(stream, pos);
     pp.t_average     = parse_u16(stream, pos);
     pp.ctr_etx       = parse_u8(stream, pos);
-    pp.timestamp_32  = parse_u32(stream, pos);
-    pp.timestamp_16  = parse_u16(stream, pos);
+    pp.timestamp32   = parse_u32(stream, pos);
+    pp.timestamp16   = parse_u16(stream, pos);
     *pos += 2; // always have to do this when using verify fixed
     Ok(pp)
   }
@@ -144,6 +194,46 @@ impl TofHit {
 
   // update Feb 2023 - add 4 byte timestamp
   pub const VERSION       : &'static str = "1.2";
+
+  /// Get the (official) paddle id
+  ///
+  /// Convert the paddle end id following 
+  /// the convention
+  ///
+  /// A-side : paddle id + 1000
+  /// B-side : paddle id + 2000
+  ///
+  /// FIXME - maybe return Result?
+  pub fn get_pid(paddle_end_id : u16) -> u8 {
+    if paddle_end_id < 1000 {
+      return 0;
+    }
+    if paddle_end_id > 2000 {
+      return (paddle_end_id - 2000) as u8;
+    }
+    if paddle_end_id < 2000 {
+      return (paddle_end_id - 1000) as u8;
+    }
+    return 0;
+  }
+
+  pub fn add_peak(&mut self, peak : &Peak)  {
+    if self.paddle_id != TofHit::get_pid(peak.paddle_end_id) {
+      //error!("Can't add peak to 
+    }
+    if peak.paddle_end_id < 1000 {
+      error!("Invalide paddle end id {}", peak.paddle_end_id);
+    }
+    if peak.paddle_end_id > 2000 {
+      self.set_time_b  (peak.time);
+      self.set_peak_b  (peak.height);
+      self.set_charge_b(peak.charge);
+    } else if peak.paddle_end_id < 2000 {
+      self.set_time_a  (peak.time);
+      self.set_peak_a  (peak.height);
+      self.set_charge_a(peak.charge);
+    }
+  }
 
   pub fn new() -> Self {
     Self{
@@ -158,11 +248,15 @@ impl TofHit {
          pos_across   : 0,
          t_average    : 0,
          ctr_etx      : 0,
-         timestamp_32 : 0,
-         timestamp_16 : 0,
+         timestamp32  : 0,
+         timestamp16  : 0,
          // non-serialize fields
          valid        : true,
     }
+  }
+
+  pub fn get_timestamp48(&self) -> u64 {
+    ((self.timestamp16 as u64) << 32) | self.timestamp32 as u64
   }
 
   pub fn set_peak_a(&mut self, peak : f32 ) {
@@ -232,8 +326,8 @@ impl TofHit {
     pp.pos_across   = rng.gen::<u16>();
     pp.t_average    = rng.gen::<u16>();
     pp.ctr_etx      = rng.gen::<u8>();
-    pp.timestamp_32 = rng.gen::<u32>();
-    pp.timestamp_16 = rng.gen::<u16>();
+    pp.timestamp32  = rng.gen::<u32>();
+    pp.timestamp16  = rng.gen::<u16>();
     pp
   }
 }
