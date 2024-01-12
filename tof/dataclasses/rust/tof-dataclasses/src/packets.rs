@@ -24,9 +24,10 @@ pub use crate::monitoring::{
     PBMoniData,
     LTBMoniData,
     PAMoniData,
-    TofCmpMoniData,
-    MtbMoniData
+    MtbMoniData,
+    CPUMoniData
 };
+
 use crate::serialization::{
     Serialization, 
     parse_u8,
@@ -216,6 +217,15 @@ impl From<&RBCalibrations> for TofPacket {
   }
 }
 
+impl From<&CPUMoniData> for TofPacket {
+  fn from(moni : &CPUMoniData) -> Self {
+    let mut tp = Self::new();
+    tp.packet_type = PacketType::CPUMoniData;
+    tp.payload     = moni.to_bytestream();
+    tp
+  }
+}
+
 impl From<&mut RBCalibrations> for TofPacket {
   fn from(calib : &mut RBCalibrations) -> Self {
     let mut tp = Self::new();
@@ -287,16 +297,6 @@ impl From<&MtbMoniData> for TofPacket {
     tp
   }
 }
-
-impl From<&TofCmpMoniData> for TofPacket {
-  fn from(moni : &TofCmpMoniData) -> TofPacket {
-    let mut tp = TofPacket::new();
-    tp.packet_type = PacketType::MonitorTofCmp;
-    tp.payload = moni.to_bytestream();
-    tp
-  }
-}
-
 
 impl From<&RBEventHeader> for TofPacket {
   fn from(ev_header : &RBEventHeader) -> TofPacket {
