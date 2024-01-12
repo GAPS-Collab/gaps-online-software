@@ -1,11 +1,11 @@
 use std::collections::{
-    HashMap,
+    //HashMap,
     VecDeque,
 };
-use std::sync::{
-    Arc,
-    Mutex,
-};
+//use std::sync::{
+//    Arc,
+//    Mutex,
+//};
 
 use crossbeam_channel::{
     Receiver,
@@ -14,30 +14,13 @@ use crossbeam_channel::{
 
 use ratatui::prelude::*;
 
-use ratatui::symbols;
-use ratatui::text::Span;
 use ratatui::terminal::Frame;
 use ratatui::layout::Rect;
-use ratatui::style::{
-    Color,
-    Style,
-};
 use ratatui::widgets::{
-    Axis,
     Block,
     BorderType,
-    GraphType,
-    Dataset,
-    Chart,
     Borders,
-    Cell,
-    List,
-    ListItem,
-    ListState,
     Paragraph,
-    Row,
-    Table,
-    Tabs,
 };
 
 use tof_dataclasses::serialization::Serialization;
@@ -124,7 +107,7 @@ impl EventTab {
       )
       .split(*main_window);
    
-    let mut header      = TofEventHeader::new();
+    let header      = TofEventHeader::new();
     let mut header_string = header.to_string();
     match self.event_queue.back() {
       None => (),

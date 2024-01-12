@@ -12,14 +12,13 @@ extern crate histo;
 use histo::Histogram;
 
 use ratatui::{
-    symbols,
     //backend::CrosstermBackend,
     terminal::Frame,
     layout::{Alignment, Constraint, Direction, Layout, Rect},
-    style::{Color, Modifier, Style},
+    style::{Modifier, Style},
     text::{Span, Line},
     widgets::{
-        Block, Dataset, Sparkline, Axis, GraphType, BorderType, Chart, Borders, List, ListItem, ListState, Paragraph, Row, Table, Tabs,    },
+        Block, BorderType, Borders, List, ListItem, ListState, Paragraph},
 };
 
 use crossbeam_channel::{
@@ -28,8 +27,6 @@ use crossbeam_channel::{
 
 
 use tof_dataclasses::packets::{TofPacket, PacketType};
-use tof_dataclasses::commands::{TofCommand,
-                                TofResponse};
 use tof_dataclasses::calibrations::RBCalibrations;
 use tof_dataclasses::errors::SerializationError;
 use tof_dataclasses::events::RBEvent;
@@ -106,7 +103,7 @@ impl RBTab<'_>  {
 
     let queue_size = 1000usize;
     let mut ch_data    = Vec::<Vec::<(f64,f64)>>::with_capacity(1024);
-    for ch in 0..9 {
+    for _channel in 0..9 {
       let tmp_vec = vec![(0.0f64,0.0f64);1024];
       //ch_data.push(Vec::<(f64,f64)>::new());
       ch_data.push(tmp_vec);
@@ -421,14 +418,6 @@ impl RBTab<'_>  {
           )
           .split(status_chunks[0]);
 
-        let list_and_detail_chunks = Layout::default()
-          .direction(Direction::Horizontal)
-          .constraints(
-              [Constraint::Percentage(50),
-               Constraint::Percentage(50)].as_ref(),
-          )
-          .split(detail_and_ch9_chunks[0]);
-
         let wf_chunks = Layout::default()
           .direction(Direction::Horizontal)
           .constraints(
@@ -458,18 +447,7 @@ impl RBTab<'_>  {
           .split(wf_chunks[1]).to_vec();
 
         ch_chunks.append(&mut ch_chunks_2);
-        //  let items: Vec<_> = rb_list
-        //  .iter()
-        //  .map(|rb| {
-        //    ListItem::new(Spans::from(vec![Span::styled(
-        //      "RB ".to_owned() + &rb.rb_id.to_string(),
-        //      Style::default(),
-        //    )]))
-        //  })
-        //  .collect();
-
         // the waveform plots
-        let mut charts  = Vec::<Chart>::new();
         for ch in 0..9 {
           let label          = format!("Ch{}", ch);
           let ch_tc_theme    = self.theme.clone();
@@ -646,17 +624,6 @@ impl RBTab<'_>  {
         );
         frame.render_widget(moni_view, columns[0]);
        
-        // get timing axis
-        let t_min = *self.met_queue.front().unwrap_or(&0.0) as u64;
-        let t_max = *self.met_queue.back().unwrap_or(&0.0)  as u64;
-        let t_spacing = (t_max - t_min)/5;
-
-        let t_labels = vec![t_min.to_string(),
-                           (t_min + t_spacing).to_string(),
-                           (t_min + 2*t_spacing).to_string(),
-                           (t_min + 3*t_spacing).to_string(),
-                           (t_min + 4*t_spacing).to_string(),
-                           (t_min + 5*t_spacing).to_string()];
         let fpga_ds_name   = String::from("FPGA T");
         let fpga_ds_title  = String::from("FPGA T [\u{00B0}C] ");
         let fpga_tc_theme  = self.theme.clone();
@@ -748,8 +715,7 @@ impl RBTab<'_>  {
 
         // render everything
         frame.render_widget(info_view, main_view[0]); 
-      },
-      _ => ()
+      }
     } //end match 
   }
 }
