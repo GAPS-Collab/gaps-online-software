@@ -14,7 +14,7 @@
     "ip_address"   : "127.0.0.1", 
     "port" : 50001
   },
-  "tofevent_complete"      : 4,
+  "nrb_failsafe"           : 4,
   "rb_ignorelist"          : [],
   "mtb_moni_interval"      : 20,
   "cpu_moni_interval"      : 20

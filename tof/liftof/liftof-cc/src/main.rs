@@ -19,15 +19,23 @@ extern crate colored;
 extern crate liftof_lib;
 extern crate liftof_cc;
 
+use std::sync::{
+    Arc,
+    Mutex,
+};
+
 use std::time::Instant;
-use std::collections::HashMap;
+//use std::collections::HashMap;
 use std::io;
 use std::io::Write;
 use std::process::exit;
 use std::{fs,
           thread,
           time};
-use std::path::{Path, PathBuf};
+use std::path::{
+    //Path,
+    PathBuf,
+};
 
 use clap::{arg,
            command,
@@ -38,7 +46,11 @@ use colored::Colorize;
 
 use tof_dataclasses::events::{MasterTriggerEvent,
                               RBEvent};
-use tof_dataclasses::threading::ThreadPool;
+use tof_dataclasses::threading::{
+    ThreadPool,
+    ThreadControl,
+};
+
 use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::manifest::ReadoutBoard;
 use tof_dataclasses::DsiLtbRBMapping;
@@ -55,10 +67,10 @@ use liftof_lib::{
 };
 use liftof_cc::threads::{readoutboard_communicator,
                          event_builder,
-                         global_data_sink};
+                         global_data_sink,
+                         monitor_cpu };
 
 use liftof_lib::Command;
-
 
 /*************************************/
 
@@ -69,9 +81,6 @@ struct LiftofCCArgs {
   /// Write the entire TofPacket Stream to a file
   #[arg(short, long, default_value_t = false)]
   write_stream: bool,
-  /// Disable monitoring features
-  #[arg(short, long, default_value_t = false)]
-  no_monitoring: bool,
   /// Enhance output to console
   #[arg(short, long, default_value_t = false)]
   verbose: bool,
@@ -105,19 +114,15 @@ fn main() {
   println!(" >> Welcome to liftof-cc \u{1F680} \u{1F388} ");
   println!(" >> liftof is a software suite for the time-of-flight detector (TOF) ");
   println!(" >> for the GAPS experiment \u{1F496}");
-  println!(" >> This is the Command&Control server which connects to the MasterTriggerBoard and the ReadoutBoards");
-  //println!(" >> see the gitlab repository for documentation and submitting issues at" );
-  //let repo_url    = "https://github.com/GAPS-Collab/gaps-online-software";
-  //let api_doc_url = "https://gaps-collab.github.io/gaps-online-software/";
-  //let gitlab_repo = format!("\x1B]8;;{}\x07{}\x1B]8;;\x07", repo_url, repo_url);
-  //let api_docs    = format!("\x1B]8;;{}\x07{}\x1B]8;;\x07", api_doc_url, api_doc_url);
-  //println!(" >> >> Software repo    : {}", gitlab_repo);
-  //println!(" >> >> API documentation: {}", api_docs);
+  println!(" >> This is the Command&Control server");
+  println!(" >> It connects to the MasterTriggerBoard and the ReadoutBoards");
+  
   // deal with command line arguments
   let args = LiftofCCArgs::parse();
 
   let verbose = args.verbose;
 
+  // log testing
   //error!("error");
   //warn!("warn");
   //info!("info");
@@ -128,18 +133,14 @@ fn main() {
   if write_stream {
     info!("Will write the entire stream to files");
   }
-  let no_monitoring = args.no_monitoring;
-  if no_monitoring {
-    warn!("All monitoring features disabled!");
-  }
 
   let json_content  : String;
   let config        : json::JsonValue;
   
   let nboards       : usize;
 
-  let mut master_trigger_ip     = String::from("");
-  let mut master_trigger_port   = 0usize;
+  let master_trigger_ip   : String;//  = String::from("");
+  let master_trigger_port : usize; //  = 0usize;
   // create copies, since we need this information
   // for 2 threads at least (moni and event)
   //let mut master_trigger_ip_c   = String::from("");
@@ -153,7 +154,7 @@ fn main() {
     } // end Some
   } // end match
 
-  let mut ltb_rb_map : DsiLtbRBMapping = HashMap::<u8,HashMap::<u8,HashMap::<u8,(u8,u8)>>>::new();
+  let ltb_rb_map : DsiLtbRBMapping;// = HashMap::<u8,HashMap::<u8,HashMap::<u8,(u8,u8)>>>::new();
   match args.json_ltb_rb_map {
     None => {
       panic!("Will need json ltb -> rb mapping when MasterTrigger shall be used")
@@ -167,13 +168,17 @@ fn main() {
   master_trigger_port   = config["master_trigger"]["port"].as_usize().unwrap();
   info!("Will connect to the master trigger board at {}:{}", master_trigger_ip, master_trigger_port);
  
-  let runid                 = config["run_id"].as_usize().unwrap(); 
-  let mut write_stream_path = config["data_dir"].as_str().unwrap().to_owned();
-  let calib_file_path       = config["calibration_file_path"].as_str().unwrap().to_owned();
-  let runtime_nseconds      = config["runtime_seconds"].as_f32().unwrap_or(0.0);
-  let write_npack_file      = config["packets_per_file"].as_usize().unwrap_or(10000);
-  let db_path               = Path::new(config["db_path"].as_str().unwrap());
-  let db_path_c             = db_path.clone();
+  let runid                 = config["run_id"]          .as_usize() .unwrap(); 
+  let mut write_stream_path = config["data_dir"]        .as_str()   .expect("Need to know where data should be stored. Please add 'data_dir' to the configuration file!").to_owned();
+  let calib_file_path       = config["calibration_dir"] .as_str()   .expect("Need to know wher calibraton should be stored. Please add 'calib_file_path' to the configuration file!").to_owned();
+  let runtime_nseconds      = config["runtime_seconds"] .as_f32()   .unwrap_or(0.0);
+  let write_npack_file      = config["packets_per_file"] .as_usize().unwrap_or(10000);
+  //let db_path               = Path::new(config["db_path"].as_str()  .expect("Need to know where the local sqlite database is stored. Please add 'db_path' to the configuration file!"));
+  let mtb_moni_interval     = config["mtb_moni_interval"].as_u64()  .unwrap_or(10);
+  let cpu_moni_interval     = config["cpu_moni_interval"].as_u64()  .unwrap_or(20);
+  let nrb_failsafe : Option<usize> 
+                            = config["nrb_failsafe"     ].as_usize();
+  //let db_path_c             = db_path.clone();
   let mut rb_list           = vec![ReadoutBoard::new();50];
   for k in 0..rb_list.len() {
     rb_list[k].rb_id = k as u8 + 1;
@@ -312,22 +317,21 @@ fn main() {
   // The number of threads should be fixed at 
   // runtime, but it should be possible to 
   // respawn them
-  //let mut nthreads = nboards + 2; // 
-  let mut nthreads = 60;
+  let nthreads = 60;
 
   let worker_threads = ThreadPool::new(nthreads);
+  let thread_control = Arc::new(Mutex::new(ThreadControl::new()));
 
-  if !no_monitoring {
-    //println!("==> Starting main monitoring thread...");
-    //let tp_to_sink_c = tp_to_sink.clone();
-    //let moni_interval = 10u64; // in seconds
-    //worker_threads.execute(move || {
-    //                       tofcmp_and_mtb_moni(&tp_to_sink_c,
-    //                                           &master_trigger_ip_c,
-    //                                           master_trigger_port_c,
-    //                                           moni_interval,
-    //                                           false);
-    //});
+  if cpu_moni_interval > 0 {
+    println!("==> Starting main monitoring thread...");
+    let tp_to_sink_c = tp_to_sink.clone();
+    worker_threads.execute(move || {
+                            monitor_cpu(
+                              tp_to_sink_c,
+                              cpu_moni_interval,
+                              thread_control,
+                              verbose)
+    });
   }
 
   write_stream_path = String::from(stream_files_path.into_os_string().into_string().expect("Somehow the paths are messed up very badly! So I can't help it and I quit!"));
@@ -385,7 +389,8 @@ fn main() {
   worker_threads.execute(move || {
                          event_builder(&master_ev_rec,
                                        &ev_from_rb,
-                                       &tp_to_sink);
+                                       &tp_to_sink,
+                                       nrb_failsafe);
   });
   // master trigger
   worker_threads.execute(move || {
@@ -395,7 +400,7 @@ fn main() {
                                         &master_ev_send,
                                         &cmd_sender_2,
                                         &mtb_moni_sender,
-                                        10,
+                                        mtb_moni_interval,
                                         60,
                                         false,
                                         false);

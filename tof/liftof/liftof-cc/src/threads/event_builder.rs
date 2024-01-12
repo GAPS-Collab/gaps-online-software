@@ -1,8 +1,3 @@
-//! Assemble paddle packets to full events
-//!
-//!
-//!
-
 use std::time::Instant;
 
 use crossbeam_channel::{
@@ -152,15 +147,15 @@ impl TofEventBuilderSettings {
   }
 }
 
-/// The event builder, assembling events from an id given by the 
-/// master trigger
+/// Events ... assemble! 
 ///
-/// This requires the master trigger sending `MasterTriggerEvents`
-/// over the channel. The event builder then will querey the 
-/// paddle_packet cache for paddle packets with the same event id
-/// Queries which can not be satisfied will lead to events being 
-/// cached until they can be completed, or discarded after 
-/// a timeout.
+/// The event_builder collects all available event information,
+/// beginning with the MasterTriggerEvent defining the event 
+/// id. It collects the requested number of RBEvents.
+/// The final product then will be a TofEvent
+///
+/// The event_builder is the heart of this software and crucial
+/// to all operations.
 ///
 /// # Arguments
 ///
@@ -177,9 +172,16 @@ impl TofEventBuilderSettings {
 /// * cmd_sender     : Sending tof commands to comander thread. This 
 ///                    is needed so that the event builder can request
 ///                    paddles from readout boards.
+/// * nrb_failsafe   : This is kind of a failsafe mode. In case we are 
+///                    not deciding by fw how many RBEvents we expect 
+///                    for each event, we can set this number manually.
+///                    THIS SHOULD NOT BE TEMPERED WITH IN NORMAL OPERATIONS
+///                    AND SHOULD BE SET TO NONE!
+
 pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
                       ev_from_rb     : &Receiver<RBEvent>,
-                      data_sink      : &Sender<TofPacket>) { 
+                      data_sink      : &Sender<TofPacket>,
+                      nrb_failsafe   : Option<usize>) { 
 
   //let mut event_cache = VecDeque::<TofEvent>::with_capacity(EVENT_BUILDER_EVID_CACHE_SIZE);
   let mut event_cache = HashMap::<u32, TofEvent>::new();
@@ -344,13 +346,28 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
           Some(ev) => {
           //for evid in event_id_cache.iter() {
             //println!("{}",ev.age());
-            let is_timed_out = ev.has_timed_out();
-            if ev.is_complete() || is_timed_out {
-              if is_timed_out {
-                n_timed_out += 1;
+            let ev_timed_out = ev.has_timed_out();
+            let mut cache_it = false;
+            if ev_timed_out {
+              n_timed_out += 1;
+            }
+
+            match nrb_failsafe {
+              None => {
+                // normal operations
+                if ev.is_complete() || ev_timed_out {
+                  cache_it = false;
+                }
+              },
+              Some(n_rb_ev) => {
+                if ev_timed_out || ev.rb_events.len() == n_rb_ev {
+                  cache_it = true;
+                }
               }
-              // FIXME - clone
-              //println!("[EVTBLDR] ==> Event ID {} expected n rbs {} --> actual {}",ev.mt_event.event_id , ev.mt_event.get_n_rbs_expected(), ev.rb_events.len()); 
+            }
+            if cache_it {
+              event_id_cache.push_back(evid);
+            } else {
               let ev_to_send = event_cache.remove(&evid).unwrap();
               n_rbs_per_ev += ev_to_send.rb_events.len(); 
               let pack = TofPacket::from(&ev_to_send);
@@ -361,11 +378,8 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
                 Ok(_)    => {
                   debug!("Event with id {} send!", evid);
                   n_sent += 1;
-                  //ev.valid = false;
                 }
               }
-            } else {
-              event_id_cache.push_back(evid);
             }
           }
         }

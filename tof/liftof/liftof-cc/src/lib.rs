@@ -17,12 +17,9 @@ extern crate local_ip_address;
 extern crate crossbeam_channel;
 extern crate liftof_lib;
 
-#[cfg(feature="random")]
-extern crate rand;
-
 extern crate zmq;
 extern crate tof_dataclasses;
-
+extern crate tof_control;
 /// Power function that targets the component specified, no ID
 pub fn send_power(cmd_sender: Sender<TofPacket>,
                   component: TofComponent,
