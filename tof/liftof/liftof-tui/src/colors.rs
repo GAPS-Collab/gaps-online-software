@@ -123,24 +123,3 @@ impl ColorTheme2 {
   }
 }
 
-
-/// Stylize everything with color themes
-pub trait ColorTheme {
-  /// color gradient from darkest (c0) to brightest (c1)
-  const C0 : Color = Color::Black;
-  const C1 : Color = Color::White;
-  const C2 : Color = Color::Black;
-  const C3 : Color = Color::White;
-  
-  /// color for highlights
-  const HC : Color = Color::White;
-  fn style(&self)        -> Style;
-
-  fn style_soft(&self)   -> Style;
-
-  fn highlight(&self)    -> Style;
-
-  fn highlight_fg(&self) -> Style;
-
-  fn background(&self)   -> Style;
-}

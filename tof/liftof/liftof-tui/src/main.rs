@@ -6,15 +6,6 @@
 //!
 
 
-//mod tab_commands;
-mod tab_mt;
-mod tab_home;
-mod tab_status;
-mod menu;
-mod colors;
-mod widgets;
-mod tab_settings;
-mod tab_events;
 
 use std::sync::{
     mpsc,
@@ -63,29 +54,7 @@ use tof_dataclasses::events::{
     RBEvent,
 };
 
-use crate::tab_mt::{
-    MTTab,
-};
-
-use crate::tab_settings::{
-    SettingsTab,
-};
-
-use crate::tab_home::{
-    HomeTab,
-};
-
-use crate::tab_events::{
-    EventTab,
-};
-
-use crate::tab_status::{
-    //StatusTab,
-    RBTab,
-    RBTabView
-};
-
-use crate::menu::{
+use liftof_tui::menu::{
     MenuItem,
     MainMenu,
     RBMenuItem,
@@ -94,11 +63,19 @@ use crate::menu::{
     SettingsMenu,
 };
 
-use crate::colors::{
+use liftof_tui::colors::{
     ColorTheme2,
     COLORSETOMILU, // current default
 };
 
+use liftof_tui::{
+    EventTab,
+    HomeTab,
+    SettingsTab,
+    RBTab,
+    RBTabView,
+    MTTab
+};
 
 extern crate clap;
 use clap::{arg,
