@@ -42,16 +42,13 @@ use tof_dataclasses::calibrations::{
 };
 use tof_dataclasses::packets::{TofPacket,
                                PacketType};
-use tof_dataclasses::errors::{SerializationError,
-                              AnalysisError};
+use tof_dataclasses::errors::AnalysisError;
 use tof_dataclasses::serialization::Serialization;
 use tof_dataclasses::commands::RBCommand;
 use tof_dataclasses::events::{
     RBEvent,
     TofHit,
 };
-use tof_dataclasses::io::TofPacketReader;
-
 use tof_dataclasses::events::tof_hit::Peak;
 
 use tof_dataclasses::analysis::{calculate_pedestal,
