@@ -8,7 +8,6 @@
 
 
 use std::sync::{
-    mpsc,
     Arc,
     Mutex,
 };
@@ -369,6 +368,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let (mte_send, mte_recv)         : (Sender<MasterTriggerEvent>, Receiver<MasterTriggerEvent>) = unbounded();
   let (rbe_send, rbe_recv)         : (Sender<RBEvent>, Receiver<RBEvent>) = unbounded();
 
+  //let (_tx, _rx)                     : (Sender<Event>, Receiver<Event<I>>) = unbounded();
 
   // FIXME - spawn a new thread per each tab!
   let _packet_recv_thread = thread::Builder::new()
@@ -400,7 +400,8 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let mut terminal = Terminal::new(backend)?;
   terminal.clear()?;
   
-  let (tx, rx) = mpsc::channel();
+  //let (tx, rx) = mpsc::channel();
+  let (tx, rx) = unbounded();
 
   // heartbeat, keeps it going
   let _heartbeat_thread = thread::Builder::new()
