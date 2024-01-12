@@ -40,7 +40,7 @@ use tof_dataclasses::events::{MasterTriggerEvent,
                               RBEvent};
 use tof_dataclasses::threading::ThreadPool;
 use tof_dataclasses::packets::TofPacket;
-use tof_dataclasses::manifest::get_rbs_from_sqlite;
+use tof_dataclasses::manifest::ReadoutBoard;
 use tof_dataclasses::DsiLtbRBMapping;
 use tof_dataclasses::commands::TofCommand;
 use tof_dataclasses::commands::TofCommandCode;
@@ -69,8 +69,6 @@ struct LiftofCCArgs {
   /// Write the entire TofPacket Stream to a file
   #[arg(short, long, default_value_t = false)]
   write_stream: bool,
-  #[arg(short, long, default_value_t = false)]
-  use_master_trigger: bool,
   /// Disable monitoring features
   #[arg(short, long, default_value_t = false)]
   no_monitoring: bool,
@@ -140,7 +138,6 @@ fn main() {
   
   let nboards       : usize;
 
-  let use_master_trigger        = args.use_master_trigger;
   let mut master_trigger_ip     = String::from("");
   let mut master_trigger_port   = 0usize;
   // create copies, since we need this information
@@ -157,45 +154,41 @@ fn main() {
   } // end match
 
   let mut ltb_rb_map : DsiLtbRBMapping = HashMap::<u8,HashMap::<u8,HashMap::<u8,(u8,u8)>>>::new();
-  if use_master_trigger {
-    match args.json_ltb_rb_map {
-      None => {
-        panic!("Will need json ltb -> rb mapping when MasterTrigger shall be used")
-      },
-      Some(_json_ltb_rb_map) => {
-        ltb_rb_map = get_ltb_dsi_j_ch_mapping(_json_ltb_rb_map);
-      }
+  match args.json_ltb_rb_map {
+    None => {
+      panic!("Will need json ltb -> rb mapping when MasterTrigger shall be used")
+    },
+    Some(_json_ltb_rb_map) => {
+      ltb_rb_map = get_ltb_dsi_j_ch_mapping(_json_ltb_rb_map);
     }
-
-    master_trigger_ip     = config["master_trigger"]["ip"].as_str().unwrap().to_owned();
-    master_trigger_port   = config["master_trigger"]["port"].as_usize().unwrap();
-    //master_trigger_ip_c   = master_trigger_ip.clone();
-    //master_trigger_port_c = master_trigger_port.clone();
-    info!("Will connect to the master trigger board at {}:{}", master_trigger_ip, master_trigger_port);
-  } else {
-    println!("==> Will NOT connect to the MTB, since -u has not been provided in the commandlline!");
   }
+
+  master_trigger_ip     = config["master_trigger"]["ip"].as_str().unwrap().to_owned();
+  master_trigger_port   = config["master_trigger"]["port"].as_usize().unwrap();
+  info!("Will connect to the master trigger board at {}:{}", master_trigger_ip, master_trigger_port);
  
   let runid                 = config["run_id"].as_usize().unwrap(); 
-  let mut write_stream_path = config["stream_savepath"].as_str().unwrap().to_owned();
+  let mut write_stream_path = config["data_dir"].as_str().unwrap().to_owned();
   let calib_file_path       = config["calibration_file_path"].as_str().unwrap().to_owned();
   let runtime_nseconds      = config["runtime_seconds"].as_f32().unwrap_or(0.0);
-  let write_npack_file      = config["packets_per_stream"].as_usize().unwrap_or(10000);
+  let write_npack_file      = config["packets_per_file"].as_usize().unwrap_or(10000);
   let db_path               = Path::new(config["db_path"].as_str().unwrap());
   let db_path_c             = db_path.clone();
-  let mut rb_list           = get_rbs_from_sqlite(db_path_c);
-  let rb_ignorelist  = &config["rb_ignorelist"];
-  //exit(0);
+  let mut rb_list           = vec![ReadoutBoard::new();50];
+  for k in 0..rb_list.len() {
+    rb_list[k].rb_id = k as u8 + 1;
+  }
+  let rb_ignorelist         = &config["rb_ignorelist"];
   for k in 0..rb_ignorelist.len() {
     println!("=> We will remove RB {} due to it being marked as IGNORE in the config file!", rb_ignorelist[k]);
     let bad_rb = rb_ignorelist[k].as_u8().unwrap();
     rb_list.retain(|x| x.rb_id != bad_rb);
   }
   nboards = rb_list.len();
-  println!("=> We will use the following tof manifest:");
-  println!("== ==> RBs [{}]:", rb_list.len());
+  println!("=> Expecting {} readoutboards!", rb_list.len());
+  info!("--> Following RBs are expected:");
   for rb in &rb_list {
-    println!("\t {}", rb);
+    info!("     -{}", rb);
   }
 
   // A global kill timer
@@ -209,11 +202,11 @@ fn main() {
     // Check if the directory exists
     if let Ok(metadata) = fs::metadata(&stream_files_path) {
       if metadata.is_dir() {
-        println!("=> Directory {} exists.", stream_files_path.display());
+        println!("=> Directory {} for run number {} already consists and may contain files!", stream_files_path.display(), runid);
         // FILXME - in flight, we can not have interactivity.
         // But the whole system with the run ids might change 
         // anyway
-        print!("=> You are risking overwriting files in that directory. You might have used rununmber {} before. Are you sure you want to continue? (YES/<any>): ", runid);
+        print!("=> {}", "You are risking overwriting files in that directory. You might have used this run number before. Are you sure you want to continue? (YES/<any>): ".red().bold());
         io::stdout().flush().unwrap(); // Ensure the prompt is displayed
         // Read user input
         let mut input = String::new();
@@ -222,15 +215,15 @@ fn main() {
         let input = input.trim().to_lowercase();
         // Check user input and end the program if desired
         if input == "YES" {
-          println!("==> Continuing on request of user...");
+          println!("=> Continuing on request of user...");
         } else {
-          println!("==> Abort program!");
+          println!("=> Abort program!");
         }
       } 
     } else {
       match fs::create_dir(&stream_files_path) {
         Ok(())   => println!("=> Created {} to save stream data", stream_files_path.display()),
-        Err(err) => panic!("Failed to create directory: {}, Error {}", stream_files_path.display(), err),
+        Err(err) => panic!("Failed to create directory: {}! {}", stream_files_path.display(), err),
       }
     }
   }
@@ -321,9 +314,6 @@ fn main() {
   // respawn them
   //let mut nthreads = nboards + 2; // 
   let mut nthreads = 60;
-  if use_master_trigger { 
-    nthreads += 1;
-  }
 
   let worker_threads = ThreadPool::new(nthreads);
 
@@ -389,32 +379,27 @@ fn main() {
   worker_threads.execute(move || {
     readoutboard_commander(&cmd_receiver);
   });
-  if use_master_trigger {
-    // start the event builder thread
-    println!("==> Starting event builder and master trigger threads...");
-    let cmd_sender_2 = cmd_sender.clone();
-    worker_threads.execute(move || {
-                           event_builder(&master_ev_rec,
-                                         &ev_from_rb,
-                                         &tp_to_sink);
-    });
-    // master trigger
-    worker_threads.execute(move || {
-                           master_trigger(&master_trigger_ip, 
-                                          master_trigger_port,
-                                          &ltb_rb_map,
-                                          &master_ev_send,
-                                          &cmd_sender_2,
-                                          &mtb_moni_sender,
-                                          10,
-                                          60,
-                                          false,
-                                          false);
-    });
-  } else {
-    println!("=> {}", "NOT using the MTB! This means that currently we can only save the blobfiles directly and NO EVENT data will be passed on to the flight computer!".red().bold());
-    println!("=> {}", "This mode is still useful for calibration runs or to save RBBinary data locally!".italic());
-  }
+  // start the event builder thread
+  println!("==> Starting event builder and master trigger threads...");
+  let cmd_sender_2 = cmd_sender.clone();
+  worker_threads.execute(move || {
+                         event_builder(&master_ev_rec,
+                                       &ev_from_rb,
+                                       &tp_to_sink);
+  });
+  // master trigger
+  worker_threads.execute(move || {
+                         master_trigger(&master_trigger_ip, 
+                                        master_trigger_port,
+                                        &ltb_rb_map,
+                                        &master_ev_send,
+                                        &cmd_sender_2,
+                                        &mtb_moni_sender,
+                                        10,
+                                        60,
+                                        false,
+                                        false);
+  });
 
   let one_minute = time::Duration::from_millis(60000);
   
@@ -560,7 +545,6 @@ fn main() {
     // first we issue start commands until we receive
     // at least 1 positive
     //cmd_sender.send(start_run);
-    thread::sleep(1*one_second); 
     thread::sleep(1*one_minute);
     println!("...");
     if program_start.elapsed().as_secs_f32() > runtime_nseconds {
@@ -569,5 +553,4 @@ fn main() {
       exit(0);    
     }
   }
-  //println!("Program terminating after specified runtime! So long and thanks for all the {}", fish); 
 }

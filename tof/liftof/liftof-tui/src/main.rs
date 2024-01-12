@@ -177,8 +177,8 @@ fn packet_sorter(packet_type : &PacketType,
         PacketType::RBEventHeader      => { 
           *pm.get_mut("RBEventHeader").unwrap() += 1;
         },
-        PacketType::MonitorTofCmp      => { 
-          *pm.get_mut("MonitorTofCmp").unwrap() += 1;
+        PacketType::CPUMoniData      => { 
+          *pm.get_mut("CPUMoniData").unwrap() += 1;
         },
         PacketType::MonitorMtb         => { 
           *pm.get_mut("MonitorMtb").unwrap() += 1;
@@ -209,6 +209,9 @@ fn packet_sorter(packet_type : &PacketType,
         },
         PacketType::MultiPacket        => { 
           *pm.get_mut("MultiPacket").unwrap() += 1;
+        },
+        PacketType::Ping               => {
+          *pm.get_mut("PingPacket").unwrap() += 1;
         }
       }
     },
@@ -344,7 +347,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   pm.insert(String::from("HeartBeat"        ) ,0); 
   pm.insert(String::from("MasterTrigger"    ) ,0);
   pm.insert(String::from("RBEventHeader"    ) ,0);
-  pm.insert(String::from("MonitorTofCmp"    ) ,0); 
+  pm.insert(String::from("CPUMoniData"      ) ,0); 
   pm.insert(String::from("MonitorMtb"       ) ,0); 
   pm.insert(String::from("RBMoni"           ) ,0); 
   pm.insert(String::from("PAMoniData"       ) ,0); 
@@ -355,6 +358,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   pm.insert(String::from("TofCommand"       ) ,0); 
   pm.insert(String::from("RBCommand"        ) ,0); 
   pm.insert(String::from("MultiPacket"      ) ,0); 
+  pm.insert(String::from("PingPacket"       ) ,0); 
  
   let packet_map : Arc<Mutex<HashMap<String, usize>>> = Arc::new(Mutex::new(pm));
   let packet_map_home = packet_map.clone();
