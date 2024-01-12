@@ -510,22 +510,30 @@ impl RBEventMemoryStreamer {
     if !header.drs_lost_trigger() {
       header.stop_cell = parse_u16(&self.stream, &mut self.pos);
     }
-    let crc320         = parse_u16(&self.stream, &mut self.pos);
-    let crc321         = parse_u16(&self.stream, &mut self.pos);
-    if self.calc_crc32 {
-      let crc32 : u32;
-      if REVERSE_WORDS {
-        crc32 = u32::from(crc320) << 16 | u32::from(crc321);
-      } else {
-        crc32 = u32::from(crc321) << 16 | u32::from(crc320);
-      }
-      warn!("Checksum test for the whole event is not yet implemented!");
-      //if event.header.crc32 != crc32 {
-      //  trace!("Checksum test for the whole event is not yet implemented!");
-      //}
-    }
+    // CRC32 checksum - next 4 bytes
+    // FIXME
+    // skip crc32 checksum
+    self.pos += 4;
+
+    // in principle there is a checksum for the whole event, whcih
+    // we are currently not using (it is easy to spot wrong bytes
+    // in the header)
+    //let crc320         = parse_u16(&self.stream, &mut self.pos);
+    //let crc321         = parse_u16(&self.stream, &mut self.pos);
+    //if self.calc_crc32 {
+    //  let crc32 : u32;
+    //  if REVERSE_WORDS {
+    //    crc32 = u32::from(crc320) << 16 | u32::from(crc321);
+    //  } else {
+    //    crc32 = u32::from(crc321) << 16 | u32::from(crc320);
+    //  }
+    //  warn!("Checksum test for the whole event is not yet implemented!");
+    //  //if event.header.crc32 != crc32 {
+    //  //  trace!("Checksum test for the whole event is not yet implemented!");
+    //  //}
+    //}
+    
     let tail         = parse_u16(&self.stream, &mut self.pos);
-    //let delta_pos    = self.pos - first_pos;
     if tail != 0x5555 {
       error!("Tail signature is wrong! Got {} for board {}", tail, header.rb_id);
       event_status = EventStatus::TailWrong;

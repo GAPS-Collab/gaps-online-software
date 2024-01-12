@@ -2,7 +2,8 @@
 
 ![build-docs-badge](https://github.com/GAPS-Collab/gaps-online-software/workflows/BuildBot/badge.svg)
 
-This is branch HAHALUA-0.9. [Hahalua is a manta ray](https://dlnr.hawaii.gov/dar/sharks-and-rays/).![Manta ray](resources/assets/hahalua.png)
+This is branch HAHALUA-0.9. [Hahalua is a manta ray](https://dlnr.hawaii.gov/dar/sharks-and-rays/).
+![Manta ray](resources/assets/hahalua.png)
 
 >[!TIP] 
 >Manta rays can be spotted in the Hawaiian waters. There are over 100 different individuals who have been seen in front of the Kona coast, Big Island. Please report sightings [here](https://mprf.net/identification/report-a-sighting.html), and remember to take a picture of their belly, since the spotted pattern on their underside is unique for every individual and allows to identify them. 
