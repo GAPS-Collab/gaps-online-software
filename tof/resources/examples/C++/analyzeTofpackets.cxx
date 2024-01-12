@@ -21,7 +21,7 @@
 #include "WaveGAPS.h"
 #include <vector>
 
-const int NRB   = 49; // Technically, it is 48, but we don't use 0
+const int NRB   = 50; // Technically, it is 49, but we don't use 0
 const int NCH   = 9;
 const int NTOT  = (NCH-1) * NRB; // NTOT is the number of SiPMs
 const int NPADS = NTOT/2;        // NPAD: 1 per 2 SiPMs
@@ -53,8 +53,43 @@ int main(int argc, char *argv[]){
  
   auto calname = result["calibration"].as<std::string>();
   RBCalibration cali[NRB]; // "cali" stores values for one RB
-  //RBCalibration cali; // "cali" stores values for one RB
+
+  // To read calibration data from individual binary files, when -c is
+  // given with the directory of the calibration files
   if (calname != "") {
+    for (int i=1; i<NRB; i++) {
+      // First, determine the proper RB filename from its number
+      std::string f_str;
+      if (i<10) // Little Kludgy, but it works
+	f_str = calname + "rb_0" + std::to_string(i) + ".cali.tof.gaps";
+      else
+	f_str = calname + "rb_" + std::to_string(i) + ".cali.tof.gaps";
+      //spdlog::info("Extracting RB data from file {}", f_str);
+      
+      // Read the packets from the file
+      //if ( std::filesystem::exists(f_str) ) {
+      //printf("%s file exists\n", f_str.c_str() );
+      //}
+      // Before proceeding, check that the file exists. 
+      struct stat buffer; 
+      if ( stat(f_str.c_str(), &buffer) != -1 ) {
+	auto packet = get_tofpackets(f_str);
+	spdlog::info("We loaded {} packets from {}", packet.size(), f_str);
+	// Loop over the packets (should only be 1) and read into storage
+	for (auto const &p : packet) {
+	  if (p.packet_type == PacketType::RBCalibration) {
+	    // Should have the one calibration tofpacket stored in "packet".
+	    usize pos = 0;
+	    cali[i] = RBCalibration::from_bytestream(p.payload, pos); 
+	  }
+	}
+      } //else {printf("File does not exist: %s\n", f_str.c_str());}
+    }
+  }
+  
+  // To read calibration data from individual text files, when -c is
+  // given with the directory of the calibration files
+  /*if (calname != "") {
     // obviously here we have to get all the calibration files, 
     // but for the sake of the example let's use only one
     // Ultimatly, they will be stored in the stream.
@@ -64,13 +99,13 @@ int main(int argc, char *argv[]){
 	f_str = calname + "/txt-files/rb0" + std::to_string(i) + "_cal.txt";
       else
 	f_str = calname + "/txt-files/rb" + std::to_string(i) + "_cal.txt";
-            
+      
       //spdlog::info("Will use calibration file {}", calname);
       //cali[i] = RBCalibration::from_txtfile(calname);
       spdlog::info("Will use calibration file {}", f_str);
       cali[i] = RBCalibration::from_txtfile(f_str);
     }
-  }
+    }*/
 
   // the reader is something for the future, when the 
   // files get bigger so they might not fit into memory
@@ -90,7 +125,7 @@ int main(int argc, char *argv[]){
 
   for (auto const &p : packets) {
     // print it
-    std::cout << p << std::endl;
+    //std::cout << p << std::endl;
     // there will be a more generic way to unpack TofPackets in the future
     // for now we have to use the packet_type field
     switch (p.packet_type) {
@@ -123,10 +158,10 @@ int main(int argc, char *argv[]){
 	GAPS::Waveform *wave[NTOT];
 	GAPS::Waveform *wch9[NRB];
 	float Ped_low   = 10;
-	float Ped_win   = 100;
-	float CThresh   = 15.0;
-	float CFDS_frac = 0.10;
-	float Qwin_low  = 150;
+	float Ped_win   = 90;
+	float CThresh   = 5.0;
+	float CFDS_frac = 0.40;
+	float Qwin_low  = 100;
 	float Qwin_size = 100;
 	float Ped[NTOT];
 	float PedRMS[NTOT];
@@ -137,7 +172,7 @@ int main(int argc, char *argv[]){
 	
         auto ev = TofEvent::from_bytestream(p.payload, pos);
 	unsigned long int evt_ctr = ev.mt_event.event_id;
-	printf("Event %ld: RBs -", evt_ctr);
+	//printf("Event %ld: RBs -", evt_ctr);
 	for (auto const &rbid : ev.get_rbids()) {
 	  RBEvent rb_event = ev.get_rbevent(rbid);
 	  // Now that we know the RBID, we can set the starting ch_no
@@ -165,7 +200,7 @@ int main(int argc, char *argv[]){
 	    wch9[rbid]->CalcPedestalRange(); 
 	    float ch9RMS = wch9[rbid]->GetPedsigma();
 	    //printf(" %d(%.1f)", rbid, ch9RMS);
-	    printf(" %d", rbid);
+	    // printf(" %d", rbid);
 	      
 	    // Now, deal with all the SiPM data
 	    for(int c=0;c<NCH-1;c++) {
@@ -190,16 +225,17 @@ int main(int argc, char *argv[]){
 	      }
 
 
-
 	      // Set thresholds and find pulses
 	      wave[cw]->SetThreshold(CThresh);
 	      wave[cw]->SetCFDSFraction(CFDS_frac);
 	      VPeak[cw] = wave[cw]->GetPeakValue(Qwin_low, Qwin_size);
 	      Qint[cw]  = wave[cw]->Integrate(Qwin_low, Qwin_size);
 	      wave[cw]->FindPeaks(Qwin_low, Qwin_size);
-	      if ( (wave[cw]->GetNumPeaks() > 0) && (Qint[cw] > 5.0) ) {
-		wave[cw]->FindTdc(0, GAPS::CFD_SIMPLE);       // Simple CFD                
+	      //if ( (wave[cw]->GetNumPeaks() > 0) && (Qint[cw] > 5.0) ) {
+	      if ( (wave[cw]->GetNumPeaks() > 0) ) {
+		wave[cw]->FindTdc(0, GAPS::CFD_SIMPLE);       // Simple CFD
 		TCFDS[cw] = wave[cw]->GetTdcs(0);
+		printf("EVT %12ld - ch %3ld: %10.5f\n", evt_ctr, cw, TCFDS[cw]);
 	      }		
 	    }
 	  }
