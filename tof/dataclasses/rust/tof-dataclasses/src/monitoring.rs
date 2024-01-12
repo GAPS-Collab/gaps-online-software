@@ -37,6 +37,12 @@ use tof_control::helper::rb_type::{
     RBPh,
 };
 
+#[cfg(feature = "tof-control")]
+use tof_control::helper::cpu_type::{
+    CPUTempDebug,
+    CPUInfo,
+};
+
 #[cfg(feature = "random")]
 use crate::FromRandom;
 #[cfg(feature = "random")]
@@ -48,9 +54,9 @@ use rand::Rng;
 use crate::serialization::{
     Serialization,
     SerializationError,
-    search_for_u16,
     parse_u8,
     parse_u16,
+    parse_u32,
     parse_f32
 };
 
@@ -573,8 +579,6 @@ pub struct RBMoniData {
   pub mag_x              : f32,
   pub mag_y              : f32,
   pub mag_z              : f32,
-  #[deprecated(note="This is only the vector sum of the individual components!")]
-  pub mag_tot            : f32,
   pub drs_dvdd_voltage   : f32, 
   pub drs_dvdd_current   : f32,
   pub drs_dvdd_power     : f32,
@@ -619,8 +623,6 @@ impl RBMoniData {
     self.mag_x   = rb_mag.mag_xyz[0];
     self.mag_y   = rb_mag.mag_xyz[1];
     self.mag_z   = rb_mag.mag_xyz[2];
-    // deprecated field!
-    //self.mag_tot = rb_mag.magnetic_t;
   }
  
   pub fn get_mag_tot(&self) -> f32 {
@@ -677,7 +679,6 @@ impl RBMoniData {
       mag_x              : f32::MAX,
       mag_y              : f32::MAX,
       mag_z              : f32::MAX,
-      mag_tot            : f32::MAX,
       drs_dvdd_voltage   : f32::MAX, 
       drs_dvdd_current   : f32::MAX,
       drs_dvdd_power     : f32::MAX,
@@ -798,7 +799,6 @@ impl FromRandom for RBMoniData {
     moni.mag_x              = rng.gen::<f32>();
     moni.mag_y              = rng.gen::<f32>();
     moni.mag_z              = rng.gen::<f32>();
-    moni.mag_tot            = rng.gen::<f32>();
     moni.drs_dvdd_voltage   = rng.gen::<f32>(); 
     moni.drs_dvdd_current   = rng.gen::<f32>();
     moni.drs_dvdd_power     = rng.gen::<f32>();
@@ -853,8 +853,9 @@ impl Serialization for RBMoniData {
     stream.extend_from_slice(&self.humidity          .to_le_bytes()); 
     stream.extend_from_slice(&self.mag_x             .to_le_bytes()); 
     stream.extend_from_slice(&self.mag_y             .to_le_bytes()); 
-    stream.extend_from_slice(&self.mag_z             .to_le_bytes()); 
-    stream.extend_from_slice(&self.mag_tot           .to_le_bytes()); 
+    stream.extend_from_slice(&self.mag_z             .to_le_bytes());
+    // padding - just for compatibility
+    stream.extend_from_slice(&0.0_f32                 .to_le_bytes());
     stream.extend_from_slice(&self.drs_dvdd_voltage   .to_le_bytes()); 
     stream.extend_from_slice(&self.drs_dvdd_current   .to_le_bytes()); 
     stream.extend_from_slice(&self.drs_dvdd_power     .to_le_bytes()); 
@@ -901,7 +902,8 @@ impl Serialization for RBMoniData {
     moni_data.mag_x              = parse_f32(stream, pos); 
     moni_data.mag_y              = parse_f32(stream, pos); 
     moni_data.mag_z              = parse_f32(stream, pos); 
-    moni_data.mag_tot            = parse_f32(stream, pos); 
+    // compatibility, no mag_tot anymore
+    *pos += 4;
     moni_data.drs_dvdd_voltage   = parse_f32(stream, pos); 
     moni_data.drs_dvdd_current   = parse_f32(stream, pos); 
     moni_data.drs_dvdd_power     = parse_f32(stream, pos); 
@@ -933,78 +935,133 @@ impl Serialization for RBMoniData {
 
 ///////////////////////////////////////////////////////
 
-/// Monitoring the main tof computer
-#[deprecated(note="Not depending on LM-sensors anymore, might pull CPU data through tof-control!")]
 #[derive(Debug, Copy, Clone, PartialEq)]
-pub struct TofCmpMoniData {
-  pub core1_tmp : u8,
-  pub core2_tmp : u8,
-  pub pch_tmp   : u8
+pub struct CPUMoniData {
+  pub uptime     : u32,
+  pub disk_usage : u8,
+  pub cpu_freq   : [u32; 4],
+  pub cpu_temp   : f32,
+  pub cpu0_temp  : f32,
+  pub cpu1_temp  : f32,
+  pub mb_temp    : f32,
 }
 
-impl TofCmpMoniData {
-  
-  pub fn new() -> TofCmpMoniData {
-    TofCmpMoniData {
-      core1_tmp : 0,
-      core2_tmp : 0,
-      pch_tmp   : 0
+impl CPUMoniData {
+  pub fn new() -> Self {
+    Self {
+      uptime     : u32::MAX,
+      disk_usage : u8::MAX,
+      cpu_freq   : [u32::MAX; 4],
+      cpu_temp   : f32::MAX,
+      cpu0_temp  : f32::MAX,
+      cpu1_temp  : f32::MAX,
+      mb_temp    : f32::MAX,
     }
   }
-}
 
-impl Default for TofCmpMoniData {
-  fn default() -> TofCmpMoniData {
-    TofCmpMoniData::new()
+  #[cfg(feature = "tof-control")]
+  pub fn add_temps(&mut self, cpu_temps : &CPUTempDebug) {
+    self.cpu_temp   = cpu_temps.cpu_temp;
+    self.cpu0_temp  = cpu_temps.cpu0_temp;
+    self.cpu1_temp  = cpu_temps.cpu1_temp;
+    self.mb_temp    = cpu_temps.mb_temp;
+  }
+
+  #[cfg(feature = "tof-control")]
+  pub fn add_info(&mut self, cpu_info : &CPUInfo) {
+    self.uptime = cpu_info.uptime;
+    self.disk_usage = cpu_info.disk_usage;
+    self.cpu_freq   = cpu_info.cpu_freq;
   }
 }
 
-impl fmt::Display for TofCmpMoniData {
+impl Default for CPUMoniData {
+  fn default() -> Self {
+    CPUMoniData::new()
+  }
+}
+
+impl fmt::Display for CPUMoniData {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(f, "<TofCmpMoniData:
-           \t CORE1 TMP {}: [C]
-           \t CORE2 TMP {}: [C]
-           \t PCH   TMP {}: [C]>",
-           self.core1_tmp, self.core2_tmp, self.pch_tmp)
+    write!(f, "<CPUMoniData:\n
+  core0   temp [\u{00B0}C] : {:.2} 
+  core1   temp [\u{00B0}C] : {:.2} 
+  CPU     temp [\u{00B0}C] : {:.2} 
+  MB      temp [\u{00B0}C] : {:.2} 
+  CPU (4) freq [Hz] : {} | {} | {} | {} 
+  Disc usage   [%]  : {} 
+  Uptime       [s]  : {}>",
+           self.cpu0_temp,
+           self.cpu1_temp,
+           self.cpu_temp,
+           self.mb_temp,
+           self.cpu_freq[0],
+           self.cpu_freq[1],
+           self.cpu_freq[2],
+           self.cpu_freq[3],
+           self.disk_usage,
+           self.uptime)
   }
 }
 
-impl Serialization for TofCmpMoniData {
+impl Serialization for CPUMoniData {
   
-  const SIZE : usize = 7;
+  const SIZE : usize = 41;
   const HEAD : u16   = 0xAAAA;
   const TAIL : u16   = 0x5555;
 
   fn to_bytestream(&self) -> Vec<u8> {
-    let mut stream = Vec::<u8>::with_capacity(TofCmpMoniData::SIZE);
-    stream.extend_from_slice(&TofCmpMoniData::HEAD.to_le_bytes());
-    stream.extend_from_slice(&self.core1_tmp  .to_le_bytes());
-    stream.extend_from_slice(&self.core2_tmp  .to_le_bytes());
-    stream.extend_from_slice(&self.pch_tmp    .to_le_bytes());
-    stream.extend_from_slice(&TofCmpMoniData::TAIL.to_le_bytes());
+    let mut stream = Vec::<u8>::with_capacity(Self::SIZE);
+    stream.extend_from_slice(&Self::HEAD.to_le_bytes());
+    stream.extend_from_slice(&self.uptime  .to_le_bytes());
+    stream.extend_from_slice(&self.disk_usage  .to_le_bytes());
+    for k in 0..4 {
+      stream.extend_from_slice(&self.cpu_freq[k].to_le_bytes());
+    }
+    stream.extend_from_slice(&self.cpu_temp .to_le_bytes());
+    stream.extend_from_slice(&self.cpu0_temp.to_le_bytes());
+    stream.extend_from_slice(&self.cpu1_temp.to_le_bytes());
+    stream.extend_from_slice(&self.mb_temp  .to_le_bytes());
+    stream.extend_from_slice(&Self::TAIL.to_le_bytes());
     stream
   }
 
   fn from_bytestream(stream : &Vec<u8>, pos : &mut usize)
-    -> Result<TofCmpMoniData, SerializationError> {
-    let mut moni_data = TofCmpMoniData::new();
-    let head_pos = search_for_u16(TofCmpMoniData::HEAD, stream, *pos)?; 
-    let tail_pos = search_for_u16(TofCmpMoniData::TAIL, stream, head_pos + TofCmpMoniData::SIZE-2)?;
-    // At this state, this can be a header or a full event. Check here and
-    // proceed depending on the options
-    if tail_pos + 2 - head_pos != TofCmpMoniData::SIZE {
-      error!("TofCmpMoniData incomplete. Seing {} bytes, but expecting {}", tail_pos + 2 - head_pos, TofCmpMoniData::SIZE);
-      //error!("{:?}", &stream[head_pos + 18526..head_pos + 18540]);
-      *pos = head_pos + 2; //start_pos += RBBinaryDump::SIZE;
-      return Err(SerializationError::WrongByteSize);
+    -> Result<Self, SerializationError> {
+    Self::verify_fixed(stream, pos)?;
+    let mut moni = CPUMoniData::new();
+    moni.uptime     = parse_u32(stream, pos); 
+    moni.disk_usage = parse_u8(stream, pos); 
+    for k in 0..4 {
+      moni.cpu_freq[k] = parse_u32(stream, pos);
     }
-    *pos = head_pos + 2; 
-    moni_data.core1_tmp  = parse_u8(&stream, pos);
-    moni_data.core2_tmp  = parse_u8(&stream, pos);
-    moni_data.pch_tmp    = parse_u8(&stream, pos);
-    *pos += 2; // since we deserialized the tail earlier and 
-              // didn't account for it
-    Ok(moni_data)
+    moni.cpu_temp   = parse_f32(stream, pos);
+    moni.cpu0_temp  = parse_f32(stream, pos);
+    moni.cpu1_temp  = parse_f32(stream, pos);
+    moni.mb_temp    = parse_f32(stream, pos);
+    *pos += 2;
+    Ok(moni)
+  }
+}
+
+///////////////////////////////////////////////////////
+
+#[cfg(feature = "random")]
+impl FromRandom for CPUMoniData {
+    
+  fn from_random() -> Self {
+    let mut moni    = Self::new();
+    let mut rng     = rand::thread_rng();
+    moni.uptime     = rng.gen::<u32>();
+    moni.disk_usage = rng.gen::<u8>();
+    for k in 0..4 {
+      moni.cpu_freq[k] = rng.gen::<u32>();
+    }
+    moni.cpu_temp   = rng.gen::<f32>();
+    moni.cpu0_temp  = rng.gen::<f32>();
+    moni.cpu1_temp  = rng.gen::<f32>();
+    moni.mb_temp    = rng.gen::<f32>();
+    moni
   }
 }
 
@@ -1158,6 +1215,7 @@ mod test_monitoring {
   use crate::monitoring::PBMoniData;  
   use crate::monitoring::PAMoniData;
   use crate::monitoring::LTBMoniData;
+  use crate::monitoring::CPUMoniData;
 
   #[test]
   fn serialization_ltbmonidata() {
@@ -1198,6 +1256,15 @@ mod test_monitoring {
     let data = RBMoniData::from_random();
     let test = RBMoniData::from_bytestream(&data.to_bytestream(), &mut 0).unwrap();
     assert_eq!(data, test);
+  }
+  
+  #[test]
+  fn serialization_cpumonidata() {
+    for k in 0..100 {
+      let data = CPUMoniData::from_random();
+      let test = CPUMoniData::from_bytestream(&data.to_bytestream(), &mut 0).unwrap();
+      assert_eq!(data, test);
+    }
   }
 }
 

@@ -20,7 +20,7 @@ use tof_dataclasses::packets::{
 
 use tof_dataclasses::monitoring::{RBMoniData,
                                   MtbMoniData,
-                                  TofCmpMoniData};
+                                  CPUMoniData};
 
 use tof_dataclasses::events::TofEvent;
 use tof_dataclasses::serialization::Serialization;
@@ -95,8 +95,8 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
                 },
                 Err(err) => error!("Can not unpack RBMoniData! {err}")}
               }, 
-            PacketType::MonitorTofCmp => {
-              let moni = TofCmpMoniData::from_bytestream(&pack.payload, &mut pos);
+            PacketType::CPUMoniData => {
+              let moni = CPUMoniData::from_bytestream(&pack.payload, &mut pos);
               match moni {
                 Ok(data) => {println!("{}", data);},
                 Err(err) => error!("Can not unpack TofCmpData! {err}")}
