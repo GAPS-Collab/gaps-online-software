@@ -190,7 +190,7 @@ RBEventHeader RBEventHeader::from_bytestream(const Vec<u8> &stream,
   RBEventHeader header;
   u16 head                  = Gaps::parse_u16(stream, pos);
   if (head != RBEventHeader::HEAD) {
-    log_error("[RBEventHeader::from_bytestream] Header signature {} invalid!", head);
+    log_error("[RBEventHeader::from_bytestream] Header signature " << head << " invalid!");
   }
   header.rb_id               = Gaps::parse_u8(stream , pos);  
   header.event_id            = Gaps::parse_u32(stream, pos);  
@@ -205,7 +205,7 @@ RBEventHeader RBEventHeader::from_bytestream(const Vec<u8> &stream,
   header.timestamp16         = Gaps::parse_u16(stream, pos);
   u16 tail                   = Gaps::parse_u16(stream, pos);
   if (tail != RBEventHeader::TAIL) {
-    log_error("Tail signature incorrect! Got tail {}", tail);
+    log_error("Tail signature incorrect! Got tail " << tail);
   }
   return header; 
 }
@@ -379,7 +379,7 @@ Vec<f32> RBEvent::get_baselines(const RBCalibration &cali,
   Vec<f32> baselines = Vec<f32>();
   for (auto const &ch : adc) {
     if (min_bin >= ch.size() || max_bin >= ch.size()) {
-      log_error("Can not use bin range {} {} for ch with size {}", min_bin, max_bin, ch.size());
+      log_error("Can not use bin range " << min_bin << " -> " << max_bin << " for ch with size " <<  ch.size());
       return baselines;
     }
   }
@@ -410,7 +410,7 @@ Vec<f32> RBEvent::get_baselines(const RBCalibration &cali,
 RBEvent RBEvent::from_bytestream(const Vec<u8> &stream,
                                  u64 &pos) {
   RBEvent event = RBEvent();
-  log_debug("Start decoding at pos {}", pos);
+  log_debug("Start decoding at pos " << pos);
   u16 head = Gaps::parse_u16(stream, pos);
   if (head != RBEvent::HEAD)  {
     log_error("[RBEvent::from_bytestream] Header signature invalid!");  
@@ -430,7 +430,7 @@ RBEvent RBEvent::from_bytestream(const Vec<u8> &stream,
     return event;
   }
   for (auto const &ch : event.header.get_channels()) {
-    log_debug("Found active data channel {}!", ch);
+    log_debug("Found active data channel " <<  ch);
     Vec<u8>::const_iterator start = stream.begin() + pos;
     Vec<u8>::const_iterator end   = stream.begin() + pos + 2*NWORDS;    // 2*NWORDS because stream is Vec::<u8> and it is 16 bit words.
     Vec<u8> data(start, end);
@@ -445,7 +445,7 @@ RBEvent RBEvent::from_bytestream(const Vec<u8> &stream,
 
   u16 tail = Gaps::parse_u16(stream, pos);
   if (tail != RBEvent::TAIL) {
-    log_error("After parsing the event, we found an invalid tail signature {}", tail);
+    log_error("After parsing the event, we found an invalid tail signature " << tail);
   }
   return event;
 }
@@ -454,7 +454,7 @@ RBEvent RBEvent::from_bytestream(const Vec<u8> &stream,
 
 RBMissingHit RBMissingHit::from_bytestream(const Vec<u8> &stream,
                                            u64 &pos) {
-  log_debug("Start decoding at pos {}", pos);
+  log_debug("Start decoding at pos " << pos);
   u16 head = Gaps::parse_u16(stream, pos);
   if (head != RBMissingHit::HEAD)  {
     log_error("No header signature found!");  
@@ -471,7 +471,7 @@ RBMissingHit RBMissingHit::from_bytestream(const Vec<u8> &stream,
   miss.rb_ch         = Gaps::parse_u8(stream, pos);
   u16 tail = Gaps::parse_u16(stream, pos);
   if (tail != RBMissingHit::TAIL) {
-    log_error("After parsing the event, we found an invalid tail signature {}", tail);
+    log_error("After parsing the event, we found an invalid tail signature " << tail);
   }
   return miss;
 }
@@ -567,7 +567,7 @@ u32 TofEvent::get_n_rbevents(u32 mask){
 
 TofEvent TofEvent::from_bytestream(const Vec<u8> &stream,
                                    u64 &pos) {
-  log_debug("Start decoding at pos {}", pos);
+  log_debug("Start decoding at pos " << pos);
   u16 head = Gaps::parse_u16(stream, pos);
   if (head != TofEvent::HEAD)  {
     log_error("No header signature found!");  
@@ -581,8 +581,7 @@ TofEvent TofEvent::from_bytestream(const Vec<u8> &stream,
   u32 mask          = Gaps::parse_u32(stream, pos);
   u32 n_rbevents    = get_n_rbevents(mask);
   u32 n_missing     = get_n_rbmissinghits(mask);
-  log_debug("Expecting {} RBEvents, {} RBMissingHits",
-                n_rbevents, n_missing);
+  log_debug("Expecting " << n_rbevents << " RBEvents, " << n_missing << " RBMissingHits");
 
   for (u32 k=0; k< n_rbevents; k++) {
     RBEvent rb_event = RBEvent::from_bytestream(stream, pos);
@@ -640,7 +639,7 @@ TofEvent TofEvent::from_bytestream(const Vec<u8> &stream,
 TofEvent TofEvent::from_tofpacket(const TofPacket &packet) {
   TofEvent event;
   if (packet.packet_type != PacketType::TofEvent) {
-    log_error("Wrong packet type! {}", packet_type_to_string(packet.packet_type));
+    log_error("Wrong packet type! " << packet_type_to_string(packet.packet_type));
     return event;
   } 
   u64 _pos = 0;
@@ -656,7 +655,7 @@ const RBEvent& TofEvent::get_rbevent(u8 board_id) const {
       return ev;
     }
   }
-  log_error("No RBEvent for board {}", board_id);
+  log_error("No RBEvent for board " << board_id);
   return _empty_event;
 }
 
@@ -828,7 +827,7 @@ MasterTriggerEvent MasterTriggerEvent::from_bytestream(const Vec<u8> &bytestream
   else if (tail_a == 85 && tail_b == 5) {
     log_warn("Tail for version 0.6.0/0.6.1 found");
   } else {
-    log_error("Tail is messed up. See comment for version 0.6.0/0.6.1 in CHANGELOG! We got {} {} but were expecting 85 5", tail_a, tail_b);
+    log_error("Tail is messed up. See comment for version 0.6.0/0.6.1 in CHANGELOG! We got " << tail_a << " " << tail_b << " but were expecting 85 5");
   }
   return event;
 }

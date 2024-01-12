@@ -8,7 +8,7 @@
 
 TofEventHeader TofEventHeader::from_bytestream(const Vec<u8> &stream, 
                                                u64 &pos) {
-  log_debug("Start decoding at pos {}", pos);
+  log_debug("Start decoding at pos " <<  pos);
   u16 head = Gaps::parse_u16(stream, pos);
   if (head != TofEventHeader::HEAD)  {
     log_error("No header signature found!");  
@@ -35,7 +35,7 @@ TofEventHeader TofEventHeader::from_bytestream(const Vec<u8> &stream,
   header.n_paddles           = Gaps::parse_u8(stream, pos); 
   u16 tail                   = Gaps::parse_u16(stream, pos);
   if (tail != TAIL) {
-    log_error("TAIL signature not found! Got {} instead.", tail);
+    log_error("TAIL signature not found! Got " << tail << " instead.");
   }
   return header;
 } 

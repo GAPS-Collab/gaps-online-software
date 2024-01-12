@@ -5,8 +5,7 @@
 #include <math.h>
 #include <iostream>
 
-#include <spdlog/spdlog.h>
-
+#include "logging.hpp"
 #include "legacy.h"
 
 
@@ -373,12 +372,12 @@ void Waveform::SetPedRange(float range) {
     char txt[1000];
     sprintf(txt,"Invalid range for calculating pedestals--%4d.  Not set", 
             bin_range);
-    spdlog::trace(txt);
+    log_trace(txt);
   } else if (wf_ped_begin+bin_range > wf_size) {
     char txt[1000];
-    spdlog::warn("SetPedRange:  Range goes beyond waveform.");
+    log_warn("SetPedRange:  Range goes beyond waveform.");
     sprintf(txt,"\twf_bin_range not set to %d",bin_range);
-    spdlog::warn(txt);
+    log_warn(txt);
   } else {
     wf_ped_range = bin_range;
   }
@@ -393,14 +392,14 @@ void Waveform::SetPedBegin(float begin)
   int begin_bin = Time2Bin(begin);
   if (begin_bin < 0)
   {
-    spdlog::trace("Unable to set a negative pedestal beginning.");
+    log_trace("Unable to set a negative pedestal beginning.");
   }
   else if (begin_bin+wf_ped_range > wf_size)
   {
     char txt[1000];
-    spdlog::warn("Starting too far into waveform.");
+    log_warn("Starting too far into waveform.");
     sprintf(txt,"\twf_ped_begin not set to %d(%d)",begin_bin,wf_ped_range);
-    spdlog::warn(txt);
+    log_warn(txt);
   }
   else
   {
@@ -892,8 +891,8 @@ int Waveform::Time2Bin(float t_ns){
     if (WaveTime[i] > t_ns) 
       return (i-1); 
 
-  //spdlog::trace("-- " << t_ns);
-  spdlog::trace("Did not find a bin corresponding to the given time.");
+  //log_trace("-- " << t_ns);
+  log_trace("Did not find a bin corresponding to the given time.");
   return (-1);
 }
 ////////////////////////////////////////////////////////////////////////////
