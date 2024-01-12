@@ -133,5 +133,6 @@ Please see the README.md in the individual subfolders.
 
 ## maintainer
 
-A. Stoessl <stoessl@hawaii.edu>
-P. Lazzaroni <paolo.lazzaroni@unibg.it>
+* A. Stoessl <stoessl@hawaii.edu>
+
+* P. Lazzaroni <paolo.lazzaroni@unibg.it>
