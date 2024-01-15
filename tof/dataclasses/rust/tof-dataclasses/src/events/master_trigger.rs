@@ -12,14 +12,15 @@ use std::fmt;
 //use std::time::Duration;
 use std::collections::HashMap;
 
-use crate::serialization::{Serialization,
-                           SerializationError,
-                           parse_u8,
-                           parse_u16,
-                           parse_u32};
+use crate::serialization::{
+    Serialization,
+    SerializationError,
+    parse_u8,
+    parse_u16,
+    parse_u32
+};
 
 use crate::events::RBMissingHit;
-
 use crate::manifest::{LocalTriggerBoard,
                       ReadoutBoard};
 
@@ -472,29 +473,19 @@ impl Serialization for MasterTriggerEvent {
       mt.decode_hit_mask(n, hit_mask);
     }
     mt.crc                = parse_u32(bs, pos);
-    warn!("This is specific to data written with <= 0.6.0 KIHIKIHI! This is a BUG! It needs to be fixed in future versions! Version 0.6.1 should already fix ::to_bytestream, but leaves a modded ::from_bytestream for current analysis.");
     let tail_a              = parse_u8(bs, pos);
     let tail_b              = parse_u8(bs, pos);
     if tail_a == 85 && tail_b == 85 {
-      debug!("Correct tail found!");
+      trace!("Correct tail found!");
     }
     else if tail_a == 85 && tail_b == 5 {
-      debug!("Tail for version 0.6.0/0.6.1 found");  
+      warn!("This is specific to data written with <= 0.6.0 KIHIKIHI! This is a BUG! It needs to be fixed in future versions! Version 0.6.1 should already fix ::to_bytestream, but leaves a modded ::from_bytestream for current analysis.");
+      warn!("Tail for version 0.6.0/0.6.1 found");  
     } else {
       error!("Tail is messed up. See comment for version 0.6.0/0.6.1 in CHANGELOG! We got {} {} but were expecting 85 5", tail_a, tail_b);
       //error!("Got {} for MTE tail signature! Expecting {}", tail, MasterTriggerEvent::TAIL);
       return Err(SerializationError::TailInvalid);
     }
-    //let tail              = parse_u16(bs, pos);
-    //if tail != MasterTriggerEvent::TAIL {
-    //  error!("Got {} for MTE tail signature! Expecting {}", tail, MasterTriggerEvent::TAIL);
-    //  return Err(SerializationError::TailInvalid);
-    //}
-    //let hit_mask          = 
-
-    //mt.n_paddles          = parse_u8(bs, pos);
-    //bs.extend_from_slice(&self.n_paddles.to_le_bytes());
-
     Ok(mt)
   }
 }
