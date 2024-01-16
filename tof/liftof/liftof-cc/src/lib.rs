@@ -5,9 +5,6 @@ use tof_dataclasses::commands::{TofCommand, TofResponse, TofCommandResp};
 use tof_dataclasses::constants::PAD_CMD_32BIT;
 use zmq::Socket;
 
-pub mod constants;
-pub mod api;
-pub mod threads;
 #[macro_use] extern crate log;
 extern crate clap;
 extern crate json;
@@ -20,6 +17,10 @@ extern crate liftof_lib;
 extern crate zmq;
 extern crate tof_dataclasses;
 extern crate tof_control;
+
+pub mod constants;
+pub mod threads;
+
 /// Power function that targets the component specified, no ID
 pub fn send_power(cmd_sender: Sender<TofPacket>,
                   component: TofComponent,

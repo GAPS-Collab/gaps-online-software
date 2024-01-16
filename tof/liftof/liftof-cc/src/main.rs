@@ -424,7 +424,7 @@ fn main() {
      Ok(_)    => ()
     }
     thread::sleep(one_second);
-    println!("So long and thanks for all the \u{1F41F}"); 
+    println!(">> So long and thanks for all the \u{1F41F} <<"); 
     exit(0);
   })
   .expect("Error setting Ctrl-C handler");

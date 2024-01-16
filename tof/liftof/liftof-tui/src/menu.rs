@@ -19,6 +19,7 @@ pub enum MenuItem {
   TofEvents,
   ReadoutBoards,
   MasterTrigger,
+  TOFCpu, 
   Settings,
   Quit,
 }
@@ -34,8 +35,9 @@ impl From<MenuItem> for usize {
       //MenuItem::Commands      => 3,
       //MenuItem::Dashboard     => 4,
       MenuItem::MasterTrigger => 3,
-      MenuItem::Settings      => 4,
-      MenuItem::Quit          => 5,
+      MenuItem::TOFCpu        => 4,
+      MenuItem::Settings      => 5,
+      MenuItem::Quit          => 6,
     }   
   }
 }
@@ -56,8 +58,7 @@ impl MainMenu {
   }
 
   pub fn render(&mut self, main_window : &Rect, frame : &mut Frame) {
-    //let menu_titles  = vec!["Home", "RBStatus", "Commands", "Alerts", "Dashboard", "MasterTrigger" ,  "Quit" ];
-    let menu_titles  = vec!["Home", "TofEvents", "ReadoutBoards", "MasterTrigger", "Settings", "Quit" ];
+    let menu_titles  = vec!["Home", "TofEvents", "ReadoutBoards", "MasterTrigger", "CPUMoni" , "Settings", "Quit" ];
     let menu : Vec<Line> = menu_titles
                .iter()
                .map(|t| {

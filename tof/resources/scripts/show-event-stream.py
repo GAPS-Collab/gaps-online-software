@@ -11,6 +11,7 @@ if __name__ == '__main__':
     #sock.connect('tcp://localhost:42000')
     sock.subscribe('')
     nevents = 0
+    n_tofevents = 0
     while True:    
         data = sock.recv()
         if data.startswith(b"RB"):
@@ -18,23 +19,27 @@ if __name__ == '__main__':
         #pack = gt.TofPacket.from_bytestream([k for k in data], 4)
         #print (data)
         pack = gt.TofPacket.from_bytestream([k for k in data],0)
-        print (f' --> nevents {nevents} next packet {pack}')
+        #print (f' --> nevents {nevents} next packet {pack}')
         match pack.packet_type:
             case gt.PacketType.MasterTrigger:
                 ev = gt.MasterTriggerEvent.from_bytestream(pack.payload, 0)
                 print (ev)
                 continue
-            case gt.PacketType.PT_RBEvent:
+            case gt.PacketType.RBEvent:
                 ev = gt.RBEvent.from_bytestream(pack.payload, 0)
                 #if ev.header.channel_mask < 500
                 print (ev)
                 nevents += 1
                 #if ev.header.channel_mask != 0:
                 #    raise
-            case gt.PacketType.Monitor:
+            case gt.PacketType.TofEvent:
+                ev = gt.TofEvent.from_bytestream(pack.payload, 0)
+                n_tofevents += 1
+            case gt.PacketType.RBMoniData:
                 moni = gt.RBMoniData.from_bytestream(pack.payload, 0)
                 print (moni)
-            case gt.PacketType.PT_MtbMoniData :
+            case gt.PacketType.MtbMoniData :
                 moni = gt.MtbMoniData.from_bytestream(pack.payload, 0)
             case _ :
+                print ([int(k) for k in data][:10])
                 print (f"Unknown packet type! {pack}")

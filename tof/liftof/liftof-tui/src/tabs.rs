@@ -3,6 +3,7 @@ pub mod tab_home;
 pub mod tab_status;
 pub mod tab_settings;
 pub mod tab_events;
+pub mod tab_cpu;
 
 pub use crate::tab_mt::MTTab;
 pub use crate::tab_settings::SettingsTab;
@@ -12,5 +13,6 @@ pub use crate::tab_status::{
         RBTab,
         RBTabView
 };
+pub use crate::tab_cpu::CPUTab;
 
 

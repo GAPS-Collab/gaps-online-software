@@ -959,6 +959,10 @@ impl CPUMoniData {
     }
   }
 
+  pub fn get_temps(&self) -> Vec<f32> {
+    vec![self.cpu0_temp, self.cpu1_temp, self.cpu_temp, self.mb_temp]
+  }
+
   #[cfg(feature = "tof-control")]
   pub fn add_temps(&mut self, cpu_temps : &CPUTempDebug) {
     self.cpu_temp   = cpu_temps.cpu_temp;
@@ -977,7 +981,7 @@ impl CPUMoniData {
 
 impl Default for CPUMoniData {
   fn default() -> Self {
-    CPUMoniData::new()
+    Self::new()
   }
 }
 
@@ -1120,16 +1124,16 @@ impl Default for MtbMoniData {
 impl fmt::Display for MtbMoniData {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     write!(f, "<MtbMoniData:
-  MTB  EVT RATE   [Hz] {}
-  LOST EVT RATE   [Hz] {}
-  CALIBRATION   [ADC?] {}
-  VCCPINT          [V] {:.2}
-  VCCPAUX          [V] {:.2}
-  VCCODDR          [V] {:.2}
-  FPGA TEMP        [C] {:.2}
-  VCCINT           [C] {:.2}
-  VCCAUX           [V] {:.2}
-  VCCBRAM          [V] {:.2}>",
+  MTB  EVT RATE  [Hz] {}
+  LOST EVT RATE  [Hz] {}
+  CALIBRATION  [ADC?] {}
+  VCCPINT         [V] {:.3}
+  VCCPAUX         [V] {:.3}
+  VCCODDR         [V] {:.3}
+  FPGA TEMP      [\u{00B0}C] {:.2}
+  VCCINT          [V] {:.3}
+  VCCAUX          [V] {:.3}
+  VCCBRAM         [V] {:.3}>",
            self.rate,
            self.lost_rate,
            self.calibration,

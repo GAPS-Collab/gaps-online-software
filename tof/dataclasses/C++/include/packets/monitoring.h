@@ -174,23 +174,27 @@ std::ostream& operator<<(std::ostream& os, const MtbMoniData& moni);
 
 /// System performance and temperature data 
 /// of the central tof computer
-struct TofCmpMoniData {
+struct CPUMoniData {
   static const u16 HEAD = 0xAAAA;
   static const u16 TAIL = 0x5555;
-  static const u8  SIZE = 6;
+  static const u8  SIZE = 41;
+
+  u32                uptime     ; 
+  u8                 disk_usage ; 
+  std::array<u32, 4> cpu_freq   ;
+  f32                cpu_temp   ;
+  f32                cpu0_temp  ;
+  f32                cpu1_temp  ;
+  f32                mb_temp    ;
   
-  u8 core1_tmp ; 
-  u8 core2_tmp ; 
-  u8 pch_tmp   ; 
- 
-  TofCmpMoniData(); 
+  CPUMoniData(); 
   /// extract moni data from payload
-  static TofCmpMoniData from_bytestream(const Vec<u8>& payload,
-                                        usize &pos);
+  static CPUMoniData from_bytestream(const Vec<u8>& payload,
+                                     usize &pos);
 
   std::string to_string() const;
 };
 
-std::ostream& operator<<(std::ostream& os, const TofCmpMoniData& moni);
+std::ostream& operator<<(std::ostream& os, const CPUMoniData& moni);
 
 #endif

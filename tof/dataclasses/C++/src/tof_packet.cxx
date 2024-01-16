@@ -37,8 +37,8 @@ std::string packet_type_to_string(const PacketType pt) {
       case PacketType::RBHeader : {
       return "RBEventHeader";
     }
-      case PacketType::TOFCmpMoni : {
-      return "TofCmpMoni";
+      case PacketType::CPUMoniData : {
+      return "CPUMoniData";
     }
       case PacketType::MTBMoni : {
       return "MtbMoni";

@@ -1,3 +1,5 @@
+#include <format>
+
 #include "packets/monitoring.h"
 #include "parsers.h"
 #include "logging.hpp"
@@ -328,38 +330,52 @@ std::string MtbMoniData::to_string() const {
 }
 
 
-TofCmpMoniData::TofCmpMoniData() {
-  core1_tmp = 0; 
-  core2_tmp = 0; 
-  pch_tmp   = 0; 
+CPUMoniData::CPUMoniData() {
+  uptime     = 0; 
+  disk_usage = 0; 
+  cpu_freq   = {0,0,0,0};
+  cpu_temp   = 9999;
+  cpu0_temp  = 9999;
+  cpu1_temp  = 9999;
+  mb_temp    = 9999;
 }
 
-TofCmpMoniData TofCmpMoniData::from_bytestream(const Vec<u8> &payload,
+CPUMoniData CPUMoniData::from_bytestream(const Vec<u8> &stream,
                                                usize &pos) {
-  auto moni = TofCmpMoniData();
-  u16 head  = Gaps::parse_u16(payload, pos);
-  if (head != TofCmpMoniData::HEAD) {
-    log_error("No header signature (0xAAAA) found for decoding of TofCmpMoniData!");   
+  auto moni = CPUMoniData();
+  u16 head  = Gaps::parse_u16(stream, pos);
+  if (head != CPUMoniData::HEAD) {
+    log_error("No header signature (0xAAAA) found for decoding of CPUMoniData!");   
   }
-  moni.core1_tmp = Gaps::parse_u8(payload, pos); 
-  moni.core2_tmp = Gaps::parse_u8(payload, pos); 
-  moni.pch_tmp   = Gaps::parse_u8(payload, pos); 
-  u16 tail  = Gaps::parse_u16(payload, pos);
-  if (tail != TofCmpMoniData::TAIL) {
-    log_error("No tail signature (0x5555) found for decoding of TofCmpMoniData!");   
+  moni.uptime        = Gaps::parse_u32(stream, pos); 
+  moni.disk_usage    = Gaps::parse_u8(stream, pos); 
+  for (usize k : {0,1,2,3}) {
+    moni.cpu_freq[k] = Gaps::parse_u32(stream, pos);
+  }
+  moni.cpu_temp   = Gaps::parse_f32(stream, pos);
+  moni.cpu0_temp  = Gaps::parse_f32(stream, pos);
+  moni.cpu1_temp  = Gaps::parse_f32(stream, pos);
+  moni.mb_temp    = Gaps::parse_f32(stream, pos);
+  u16 tail  = Gaps::parse_u16(stream, pos);
+  if (tail != CPUMoniData::TAIL) {
+    log_error("No tail signature (0x5555) found for decoding of CPUMoniData!");   
   }
   return moni;
 }
 
-std::string TofCmpMoniData::to_string() const {
-  std::string repr = "<TofCmpMoniData : ";
-  repr += "\n\t core1_tmp :" + std::to_string(core1_tmp);
-  repr += "\n\t core2_tmp :" + std::to_string(core2_tmp);
-  repr += "\n\t pch_tmp   :" + std::to_string(pch_tmp) + ">";
+std::string CPUMoniData::to_string() const {
+  std::string repr = "<CPUMoniData:";
+  repr += std::format("\n  core0   T    [\u00B0C] : {:.2}", cpu0_temp); 
+  repr += std::format("\n  core1   T    [\u00B0C] : {:.2}", cpu1_temp); 
+  repr += std::format("\n  CPU     T    [\u00B0C] : {:.2}", cpu_temp); 
+  repr += std::format("\n  MB      T    [\u00B0C] : {:.2}", mb_temp); 
+  repr += std::format("\n  CPU (4) freq [Hz] : {} | {} | {} | {}", cpu_freq[0], cpu_freq[1], cpu_freq[2], cpu_freq[3]); 
+  repr += std::format("\n  Disc usage    [%] : {}", disk_usage); 
+  repr += std::format("\n  Uptime        [s] : {}>", uptime   );
   return repr;
 }
 
-std::ostream& operator<<(std::ostream& os, const TofCmpMoniData& moni){
+std::ostream& operator<<(std::ostream& os, const CPUMoniData& moni){
   os << moni.to_string();
   return os;
 }

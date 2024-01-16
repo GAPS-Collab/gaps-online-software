@@ -23,7 +23,7 @@ pub enum PacketType {
   HeartBeat          = 40u8,    // might probably go away
   MasterTrigger      = 60u8,    // needs to be renamed to either MasterTriggerEvent or MTEvent
   RBEventHeader      = 70u8,    // needs to go away
-  CPUMoniData      = 80u8,    // needs to go away
+  CPUMoniData        = 80u8,
   MonitorMtb         = 90u8,
   RBMoni             = 100u8,
   PBMoniData         = 101u8,
@@ -60,6 +60,9 @@ impl From<u8> for PacketType {
       80u8  => PacketType::CPUMoniData,
       90u8  => PacketType::MonitorMtb,
       100u8 => PacketType::RBMoni,
+      101u8 => PacketType::PBMoniData   ,
+      102u8 => PacketType::LTBMoniData  ,
+      103u8 => PacketType::PAMoniData   ,
       120u8 => PacketType::RBEventMemoryView,
       130u8 => PacketType::RBCalibration,
       140u8 => PacketType::TofCommand,

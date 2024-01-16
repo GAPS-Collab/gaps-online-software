@@ -73,7 +73,8 @@ use liftof_tui::{
     SettingsTab,
     RBTab,
     RBTabView,
-    MTTab
+    MTTab,
+    CPUTab,
 };
 
 extern crate clap;
@@ -157,7 +158,7 @@ fn packet_sorter(packet_type : &PacketType,
     Ok(mut pm) => {
       match packet_type {
         PacketType::Unknown            => {
-          *pm.get_mut("Unkwown").unwrap() += 1;
+          *pm.get_mut("Unknown").unwrap() += 1;
         },
         PacketType::RBEvent            => { 
           *pm.get_mut("RBEvent").unwrap() += 1;
@@ -229,6 +230,7 @@ fn packet_sorter(packet_type : &PacketType,
 fn packet_receiver(tp_sender_mt : Sender<TofPacket>,
                    tp_sender_rb : Sender<TofPacket>,
                    tp_sender_ev : Sender<TofPacket>,
+                   tp_sender_cp : Sender<TofPacket>,
                    str_list     : Arc<Mutex<VecDeque<String>>>,
                    pck_map      : Arc<Mutex<HashMap<String, usize>>>) {
   let ctx = zmq::Context::new();
@@ -260,13 +262,14 @@ fn packet_receiver(tp_sender_mt : Sender<TofPacket>,
                 error!("Don't understand bytestream! {err}"); 
               },
               Ok(tp) => {
+                println!("{:?}", pck_map);
                 packet_sorter(&tp.packet_type, &pck_map);
                 n_pack += 1;
                 //println!("Got TP {}", tp);
                 match str_list.lock() {
                   Err(err) => error!("Can't lock shared memory! {err}"),
                   Ok(mut _list)    => {
-                    let prefix  = String::from_utf8(payload[0..4].to_vec()).unwrap();
+                    let prefix  = String::from_utf8(payload[0..4].to_vec()).expect("Can't get prefix!");
                     let message = format!("{}-{} {}", n_pack,prefix, tp.to_string());
                     _list.push_back(message);
                   }
@@ -322,7 +325,13 @@ fn packet_receiver(tp_sender_mt : Sender<TofPacket>,
                   Err(err) => error!("Can't send TP! {err}"),
                   Ok(_)    => (),
                 }
-              },
+              }
+              PacketType::CPUMoniData => {
+                match tp_sender_cp.send(tp) {
+                  Err(err) => error!("Can't send TP! {err}"),
+                  Ok(_)    => (),
+                }
+              }
               _ => () 
             }
           }
@@ -367,6 +376,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let (mt_pack_send, mt_pack_recv) : (Sender<TofPacket>, Receiver<TofPacket>) = unbounded();
   let (rb_pack_send, rb_pack_recv) : (Sender<TofPacket>, Receiver<TofPacket>) = unbounded();
   let (ev_pack_send, ev_pack_recv) : (Sender<TofPacket>, Receiver<TofPacket>) = unbounded();
+  let (cp_pack_send, cp_pack_recv) : (Sender<TofPacket>, Receiver<TofPacket>) = unbounded();
 
   // sender receiver for inter thread communication with decoded packets
   let (mte_send, mte_recv)         : (Sender<MasterTriggerEvent>, Receiver<MasterTriggerEvent>) = unbounded();
@@ -381,6 +391,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
            packet_receiver(mt_pack_send, 
                            rb_pack_send,
                            ev_pack_send,
+                           cp_pack_send,
                            home_stream_wd_cnt,
                            packet_map,
                            );
@@ -449,7 +460,9 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let mut mt_tab2         = MTTab::new(mt_pack_recv,
                                        mte_recv,
                                        color_theme.clone());
-  
+ 
+  let mut cpu_tab         = CPUTab::new(cp_pack_recv,
+                                        color_theme.clone());
   // waifu tab
   let mut wf_tab          = RBTab::new(rb_pack_recv,
                                        rbe_recv,
@@ -470,6 +483,10 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
     }
     match event_tab.receive_packet() {
       Err(err) => error!("Can not receive TofPackets for EventTab! {err}"),
+      Ok(_)    => ()
+    }
+    match cpu_tab.receive_packet() {
+      Err(err) => error!("Can not receive TofPackets for CPUTab! {err}"),
       Ok(_)    => ()
     }
     
@@ -503,6 +520,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                           wf_tab.theme.update(&cs);
                           mt_tab2.theme.update(&cs);
                           settings_tab.theme.update(&cs);
+                          cpu_tab.theme.update(&cs);
                           color_theme.update(&cs);
                         }
                       }
@@ -523,6 +541,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                           wf_tab.theme.update(&cs);
                           mt_tab2.theme.update(&cs);
                           settings_tab.theme.update(&cs);
+                          cpu_tab.theme.update(&cs);
                           color_theme.update(&cs);
                         }
                       }
@@ -590,6 +609,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                   KeyCode::Char('r') => ui_menu.active_menu_item = MenuItem::ReadoutBoards,
                   KeyCode::Char('s') => ui_menu.active_menu_item = MenuItem::Settings,
                   KeyCode::Char('m') => ui_menu.active_menu_item = MenuItem::MasterTrigger,
+                  KeyCode::Char('c') => ui_menu.active_menu_item = MenuItem::TOFCpu,
                   KeyCode::Char('q') => {
                     disable_raw_mode()?;
                     terminal.clear()?;
@@ -621,7 +641,11 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
         MenuItem::TofEvents => {
           ui_menu.render(&mster_lo.rect[0], rect);
           event_tab.render(&mster_lo.rect[1], rect);
-        }
+        },
+        MenuItem::TOFCpu => { 
+          ui_menu.render(&mster_lo.rect[0], rect);
+          cpu_tab.render(&mster_lo.rect[1], rect);
+        },
         MenuItem::MasterTrigger => {
           //rect.render_widget(ui_menu.tabs.clone(), mster_lo.rect[0]);
           mt_menu.render(&mster_lo.rect[0], rect);

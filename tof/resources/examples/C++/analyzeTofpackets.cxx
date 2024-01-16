@@ -246,9 +246,9 @@ int main(int argc, char *argv[]){
         n_mte++;
         break;
       }
-      case PacketType::TOFCmpMoni : {
+      case PacketType::CPUMoniData : {
         usize pos = 0;
-        auto tcmoni = TofCmpMoniData::from_bytestream(p.payload, pos);
+        auto tcmoni = CPUMoniData::from_bytestream(p.payload, pos);
         if (verbose) {
           std::cout << tcmoni << std::endl;
         }
@@ -280,7 +280,7 @@ int main(int argc, char *argv[]){
   std::cout << "-- -- RBMoniData        : " << n_rbmoni  << "\t (packets) " <<  std::endl;
   std::cout << "-- -- MasterTriggerEvent: " << n_mte     << "\t (packets) " <<  std::endl;
   std::cout << "-- -- TofEvent          : " << n_tofevents  << "\t (packets) " <<  std::endl;
-  std::cout << "-- -- TofCmpMoniData    : " << n_tcmoni  << "\t (packets) " <<  std::endl;
+  std::cout << "-- -- CPUMoniData    : " << n_tcmoni  << "\t (packets) " <<  std::endl;
   std::cout << "-- -- MtbMoniData       : " << n_mtbmoni << "\t (packets) " <<  std::endl;
   std::cout << "-- -- undecoded         : " << n_unknown << "\t (packets) " <<  std::endl;
 

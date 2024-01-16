@@ -233,11 +233,12 @@ PYBIND11_MODULE(gaps_tof, m) {
       .value("Command",          PacketType::Command   )
       .value("RBEvent",          PacketType::RBEvent   )
       .value("TofEvent",         PacketType::TofEvent  )
-      .value("RBMoniData",       PacketType::Monitor   )
+      .value("RBMoniData",       PacketType::RBMoni    )
       .value("PAMoniData",       PacketType::PAMoniData)
       .value("PBMoniData",       PacketType::PBMoniData)
       .value("LTBMoniData",      PacketType::LTBMoniData)
       .value("HeartBeat",        PacketType::HeartBeat )
+      .value("CPUMoniData",      PacketType::CPUMoniData)
       .value("MasterTrigger",    PacketType::MasterTrigger )
       .value("MtbMoniData",      PacketType::MTBMoni)
       ;
@@ -265,14 +266,18 @@ PYBIND11_MODULE(gaps_tof, m) {
                                   }) 
     ;
     
-    py::class_<TofCmpMoniData>(m, "TofCmpMoniData",
+    py::class_<CPUMoniData>(m, "CPUMoniData",
             "Monitoring data from the tof flight computer (TOF-CPU)")
         .def(py::init())
-        .def("from_bytestream"    , &TofCmpMoniData::from_bytestream)
-        .def_readonly("core1_tmp" , &TofCmpMoniData::core1_tmp ) 
-        .def_readonly("core2_tmp" , &TofCmpMoniData::core2_tmp) 
-        .def_readonly("pch_tmp"   , &TofCmpMoniData::pch_tmp  ) 
-        .def("__repr__",          [](const TofCmpMoniData &moni) {
+        .def("from_bytestream"      , &CPUMoniData::from_bytestream)
+        .def_readonly("uptime"      , &CPUMoniData::uptime     ) 
+        .def_readonly("disk_usage"  , &CPUMoniData::disk_usage ) 
+        .def_readonly("cpu_freq"    , &CPUMoniData::cpu_freq   ) 
+        .def_readonly("cpu_temp"    , &CPUMoniData::cpu_temp   ) 
+        .def_readonly("cpu0_temp"   , &CPUMoniData::cpu0_temp  ) 
+        .def_readonly("cpu1_temp"   , &CPUMoniData::cpu1_temp  ) 
+        .def_readonly("mb_temp"     , &CPUMoniData::mb_temp    ) 
+        .def("__repr__",          [](const CPUMoniData &moni) {
                                   return moni.to_string();
                                   }) 
     ;
