@@ -86,7 +86,8 @@ pub fn event_processing(board_id            : u8,
   let pmap_path  = PathBuf::from(&pmap_file);
   let cali_path_buf = PathBuf::from(&cali_path);
   let paddle_map = get_rb_ch_pid_map(pmap_path);
-  if !fs::metadata(cali_path_buf).is_ok() {
+  if fs::metadata(cali_path_buf.clone()).is_ok() {
+    info!("Found valid calibration file path {cali_path_buf:?}");
     match RBCalibrations::from_file(cali_path) {
       Err(err) => {
         error!("Can't load calibration! {err}");
