@@ -72,7 +72,9 @@ use liftof_lib::{
     LIFTOF_LOGO_SHOW,
     color_log,
     RunStatistics,
-    CalibrationCmd
+    CalibrationCmd,
+    get_califilename,
+    get_runfilename,
 };
 
 use liftof_rb::threads::{
@@ -110,10 +112,6 @@ struct Args {
   /// Write the readoutboard binary data ('.robin') to the board itself
   #[arg(long, default_value_t = false)]
   to_local_file : bool,
-  /// Take data for calibration. This comprises tcal, vcal and 
-  /// no input data
-  #[arg(long, default_value_t = false)]
-  calibration : bool,
   ///// CnC server IP we should be listening to
   //#[arg(long, default_value_t = "10.0.1.1")]
   //cmd_server_ip : &'static str,
@@ -155,7 +153,6 @@ fn main() {
   let verbose                  = args.verbose;
   let listen                   = args.listen;
   let show_progress            = args.show_progress;
-  let calibration              = args.calibration;
   let mut to_local_file        = args.to_local_file;
   let run_config               = args.run_config;
   let test_eventids            = args.test_eventids;
@@ -258,11 +255,11 @@ fn main() {
       config_from_shell = true;
     }
   }
-  let file_suffix : String;
+  let output_fname : String;
   if calibration {
-    file_suffix = String::from(".cali.tof.gaps");
+    output_fname = get_califilename(rb_id, false);
   } else {
-    file_suffix = String::from(".tof.gaps");
+    output_fname = get_runfilename(1,1,Some(rb_id));
   }
   // some pre-defined time units for 
   // sleeping
@@ -319,7 +316,7 @@ fn main() {
          .spawn(move || {
             data_publisher(&tp_from_client,
                            to_local_file,
-                           Some(&file_suffix),
+                           Some(output_fname),
                            test_eventids,
                            verbose,
                            ctrl_cl) 
