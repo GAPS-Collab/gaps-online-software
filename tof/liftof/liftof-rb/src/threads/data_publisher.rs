@@ -16,8 +16,7 @@ use crossbeam_channel::Receiver;
 
 use tof_dataclasses::packets::{TofPacket,
                                PacketType};
-use local_ip_address::local_ip;
-use liftof_lib::DATAPORT;
+//use local_ip_address::local_ip;
 use tof_dataclasses::events::{RBEvent,
                               DataType};
 use tof_dataclasses::serialization::Serialization;
@@ -55,6 +54,9 @@ fn find_missing_elements(nums: &[u32]) -> Vec<u32> {
 /// * write_to_disk : Write data to local disk (most likely
 ///                   a SD card). This option should be only
 ///                   used for diagnostic purposes.
+/// * address       : IP address to use for the local PUB 
+///                   socket to publish data over the 
+///                   network
 /// * output_fname  : In case a local file should be written,
 ///                   write it with this name.
 ///                   In case of a calibration file, then 
@@ -63,29 +65,20 @@ fn find_missing_elements(nums: &[u32]) -> Vec<u32> {
 ///
 pub fn data_publisher(data           : &Receiver<TofPacket>,
                       write_to_disk  : bool,
+                      address        : String,
                       output_fname   : Option<String> ,
                       testing        : bool,
                       print_packets  : bool,
                       thread_control : Arc<Mutex<ThreadControl>>) {
-  let mut address_ip = String::from("tcp://");
-  let this_board_ip = local_ip().expect("Unable to obtainl local board IP. Something is messed up!");
-  let data_port    = DATAPORT;
   if testing {
     warn!("Testing mode!");
   }
 
-  match this_board_ip {
-    IpAddr::V4(ip) => address_ip += &ip.to_string(),
-    IpAddr::V6(_) => panic!("Currently, we do not support IPV6!")
-  }
-  let data_address : String = address_ip.clone() + ":" + &data_port.to_string();
   let ctx = zmq::Context::new();
-  
   let data_socket = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
-  data_socket.bind(&data_address).expect("Unable to bind to data (PUB) socket {data_adress}");
-  info!("0MQ PUB socket bound to address {data_address}");
+  data_socket.bind(&address).expect("Unable to bind to data (PUB) socket {data_adress}");
+  info!("0MQ PUB socket bound to address {address}");
 
-  let board_id = address_ip.split_off(address_ip.len() -2);
   let mut file_on_disk : Option<File> = None;//let mut output = File::create(path)?;
   if write_to_disk {
     let fname : String;

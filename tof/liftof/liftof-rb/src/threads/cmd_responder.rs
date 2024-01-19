@@ -56,10 +56,14 @@ use crate::control::{get_board_id_string,
 ///                               runner
 /// * ev_request_to_cache       : When receiveing RBCommands which contain requests,
 ///                               forward them to event processing.
+/// * address_for_cali          : The local (self) PUB address, so that the rb_calibratoin,
+///                               can subscribe to it to loop itself the event packets
+/// * thread_control            : Manage thread control signals, e.g. stop
 pub fn cmd_responder(cmd_server_ip             : String,
                      run_config_file           : &Path,
                      run_config                : &Sender<RunConfig>,
                      ev_request_to_cache       : &Sender<TofPacket>,
+                     address_for_cali          : String,
                      thread_control            : Arc<Mutex<ThreadControl>>) {
   // create 0MQ sockedts
   //let one_milli       = time::Duration::from_millis(1);
@@ -586,7 +590,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
                         let my_rb_id = get_board_id().unwrap() as u8;
                         // if this RB is the one then do stuff
                         if rb_id == DEFAULT_RB_ID || rb_id == my_rb_id {
-                          match rb_calibration(&run_config, &ev_request_to_cache) {
+                          match rb_calibration(&run_config, &ev_request_to_cache, address_for_cali.clone()) {
                             Ok(_) => (),
                             Err(err) => {
                               error!("Calibration failed! Error {err}!");

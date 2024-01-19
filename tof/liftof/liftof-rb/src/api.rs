@@ -37,7 +37,7 @@ use tof_dataclasses::errors::{CalibrationError,
                               RunError,
                               SetError};
 use std::net::IpAddr;
-use local_ip_address::local_ip;
+//use local_ip_address::local_ip;
 // for calibration
 use tof_control::rb_control::rb_mode::{select_noi_mode,
                                       select_vcal_mode,
@@ -198,8 +198,21 @@ pub fn wait_while_run_active(n_errors     : u32,
 /// - apply calibration script (Jamie)
 ///   save result in binary and in textfile,
 ///   send downstream
+///
+/// # Arguments
+///
+/// * rc_to_runner    : send calibration specific config
+///                     to the runner thread
+/// * tp_to_publisher : send calibration packets (wrapped 
+///                     in TofPacket) to publisher thread
+/// * address         : the publisher's data address
+///                     We use a trick to get the event
+///                     packets for the calibration:
+///                     We are subscribing to the PUB 
+///                     socket of the publisher
 pub fn rb_calibration(rc_to_runner    : &Sender<RunConfig>,
-                      tp_to_publisher : &Sender<TofPacket>)
+                      tp_to_publisher : &Sender<TofPacket>,
+                      address         : String)
 -> Result<(), CalibrationError> {
   warn!("Commencing full RB calibration routine! This will take the board out of datataking for a few minutes!");
   // TODO this should become something that can be read from a local json file
@@ -232,16 +245,6 @@ pub fn rb_calibration(rc_to_runner    : &Sender<RunConfig>,
   let mut calibration = RBCalibrations::new(board_id);
   calibration.serialize_event_data = true;
 
-  // set up zmq socket
-  let mut address_ip = String::from("tcp://");
-  let this_board_ip = local_ip().expect("Unable to obtainl local board IP. Something is messed up!");
-  let data_port    = DATAPORT;
-
-  match this_board_ip {
-    IpAddr::V4(ip) => address_ip += &ip.to_string(),
-    IpAddr::V6(_)  => panic!("Currently, we do not support IPV6!")
-  }
-  let data_address : String = address_ip.clone() + ":" + &data_port.to_string();
 
   let ctx = zmq::Context::new();
   let socket : zmq::Socket; 
@@ -254,9 +257,9 @@ pub fn rb_calibration(rc_to_runner    : &Sender<RunConfig>,
       socket = sock;
     }
   }
-  match socket.connect(&data_address) {
+  match socket.connect(&address) {
     Err(err) => {
-      error!("Unable to connect to data (PUB) socket {data_address}, Err {err}");
+      error!("Unable to connect to data (PUB) socket {address}, Err {err}");
       return Err(CalibrationError::CanNotConnectToMyOwnZMQSocket);
     },
     Ok(_) => ()
@@ -586,8 +589,18 @@ fn connect_to_zmq() -> Result<zmq::Socket, CalibrationError> {
   // and we simply have to send it back to the 
   // data publisher.
   // This saves us a mutex!!
-  let this_board_ip = local_ip().expect("Unable to obtain local board IP. Something is messed up!");
-  let data_address = liftof_lib::build_tcp_from_ip(this_board_ip.to_string(), DATAPORT.to_string());
+  //let this_board_ip = local_ip().expect("Unable to obtain local board IP. Something is messed up!");
+  let mut board_id = 0u8;
+  match get_board_id() {
+    Err(err) => {
+      error!("Unable to obtain board id. Calibration might be orphaned. Err {err}");
+    },
+    Ok(rb_id) => {
+      board_id = rb_id as u8;
+    }
+  }
+  let data_address = format!("tcp://10.0.1.1{:02}:{}", board_id, DATAPORT);
+  //let data_address = liftof_lib::build_tcp_from_ip(this_board_ip.to_string(), DATAPORT.to_string());
 
   let ctx = zmq::Context::new();
   let socket : zmq::Socket; 

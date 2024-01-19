@@ -51,7 +51,7 @@ use crossbeam_channel::{
     Sender,
     Receiver
 };
-use local_ip_address::local_ip;
+//use local_ip_address::local_ip;
 use colored::Colorize;
 
 // TOF specific crates
@@ -70,6 +70,7 @@ use tof_dataclasses::run::RunConfig;
 
 use liftof_lib::{
     LIFTOF_LOGO_SHOW,
+    DATAPORT,
     color_log,
     RunStatistics,
     CalibrationCmd,
@@ -162,7 +163,8 @@ fn main() {
   //FIMXE - this needs to become part of clap
   let cmd_server_ip = String::from("10.0.1.1");
   //let cmd_server_ip     = args.cmd_server_ip;  
-  let this_board_ip = local_ip().expect("Unable to obtainl local board IP. Something is messed up!");
+  //let this_board_ip = local_ip().expect("Unable to obtainl local board IP. Something is messed up!");
+
 
   // get board info 
   let rb_info = RBInfo::new();
@@ -178,7 +180,7 @@ fn main() {
   // ip to tof computer
   let rb_id = rb_info.board_id;
   let dna   = get_device_dna().expect("Unable to obtain device DNA!"); 
-
+  let ip_address = format!("tcp://10.0.1.1{:02}:{}", rb_id, DATAPORT);
   // welcome banner!
   println!("{}", LIFTOF_LOGO_SHOW);
   println!(" ** Welcome to liftof-rb \u{1F680} \u{1F388} *****");
@@ -204,8 +206,7 @@ fn main() {
     println!("..     PB (including preamps) - {}", String::from("NO").red());
   }
   println!("-----------------------------------------------");
-  println!(" => We will BIND this port to the local ip address at {}", this_board_ip);
-  println!(" => -- -- PORT {} (0MQ PUB) to publish our data", DATAPORT);
+  println!(" => We will BIND 0MQ PUB to address/port at {}", ip_address);
   println!(" => We will CONNECT to the following port on the C&C server at address: {}", cmd_server_ip);
   println!(" => -- -- PORT {} (0MQ SUB) where we will be listening for commands", DATAPORT);
   println!("-----------------------------------------------");
@@ -311,11 +312,13 @@ fn main() {
   // 5) Monitoring
   let rc_from_cmdr_c = rc_from_cmdr.clone();
   let ctrl_cl        = thread_control.clone();
+  let address        = ip_address.clone();
   let _data_pub_thread = thread::Builder::new()
          .name("data-publisher".into())
          .spawn(move || {
             data_publisher(&tp_from_client,
                            to_local_file,
+                           address,
                            Some(output_fname),
                            test_eventids,
                            verbose,
@@ -386,6 +389,7 @@ fn main() {
   if listen {
     let cmd_control      = thread_control.clone(); 
     let rc_to_runner_c   = rc_to_runner.clone();
+    let address          = ip_address.clone();
     let _cmd_resp_thread = thread::Builder::new()
            .name("cmd-responder".into())
            .spawn(move || {
@@ -393,6 +397,7 @@ fn main() {
                             &rc_file_path,
                             &rc_to_runner_c,
                             &tp_to_cache_c,
+                            address,
                             cmd_control)
             })
            .expect("Failed to spawn cmd_responder thread!");
@@ -426,7 +431,9 @@ fn main() {
         Command::Calibration(calib_cmd) => {
           match calib_cmd {
             CalibrationCmd::Default(default_opts) => {
-              match rb_calibration(&rc_to_runner_cal, &tp_to_pub_cal) {
+              match rb_calibration(&rc_to_runner_cal,
+                                   &tp_to_pub_cal,
+                                   ip_address) {
                 Ok(_) => (),
                 Err(err) => {
                   error!("Calibration failed! Error {err}!");
