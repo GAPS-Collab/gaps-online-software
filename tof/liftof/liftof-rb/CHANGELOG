@@ -1,6 +1,8 @@
 # NIUHI series
 
 ## v0.9.1
+* does not care if run by systemd or not, makes 
+  handling simpler
 * removes  --calibration since it is duplicated
 * changes default local filenames, add timestamps
 

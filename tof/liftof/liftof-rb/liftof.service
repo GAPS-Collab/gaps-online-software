@@ -9,13 +9,12 @@ StartLimitIntervalSec=0
 Type=simple
 Restart=always
 RestartSec=1
-StandardOutput=append:/var/log/liftof.log
-StandardError=append:/var/log/liftof.log
+StandardOutput=append:/home/gaps/log/liftof.log
+StandardError=append:/home/gaps/log/liftof.err
 SyslogIdentifier=gaps
 User=gaps
 WorkingDirectory=/home/gaps/bin
-Environment="LIFTOF_IS_SYSTEMD=1"
-ExecStart=/home/gaps/bin/liftof-rb -r /home/gaps/config/gaps-flight-01.json --listen
+ExecStart=/home/gaps/bin/liftof-rb-0.9.1 -r /home/gaps/config/liftof-rb-config-0.9.0.json --listen
 
 [Install]
 WantedBy=multi-user.target
