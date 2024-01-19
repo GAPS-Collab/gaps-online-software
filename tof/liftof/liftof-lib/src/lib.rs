@@ -38,11 +38,12 @@ use colored::{Colorize, ColoredString};
 use serde_json::Value;
 
 use log::Level;
-use macaddr::MacAddr6;
-use netneighbours::get_mac_to_ip_map;
 
 #[macro_use] extern crate log;
 extern crate env_logger;
+
+extern crate chrono;
+use chrono::{DateTime, Utc};
 
 //use ndarray::{array, Array1};
 //use nlopt::{Algorithm, Objective, Optimization, Result};
@@ -139,6 +140,57 @@ pub fn init_env_logger() {
 #[derive(Debug, Clone)]
 pub struct AppSettings {
   pub cali_master_path : String,
+}
+
+/// Get a human readable timestamp
+pub fn get_utc_htimestamp() -> String {
+  let now: DateTime<Utc> = Utc::now();
+  // Format the timestamp as "YYYY_MM_DD_HH_MM"
+  let timestamp_str = now.format("%Y_%m_%d_%H_%M").to_string();
+  timestamp_str
+}
+
+/// A standardized name for calibration files saved by 
+/// the liftof suite
+///
+/// # Arguments
+///
+/// * rb_id   : unique identfier for the 
+///             Readoutboard (1-50)
+/// * default : if default, just add 
+///             "latest" instead of 
+///             a timestamp
+pub fn get_califilename(rb_id : u8, latest : bool) -> String {
+  let ts = get_utc_htimestamp();
+  if latest {
+    format!("RB{rb_id}_latest.cali.tof.gaps")
+  } else {
+    format!("RB{rb_id}_{ts}.cali.tof.gaps")
+  }
+}
+
+/// A standardized name for regular run files saved by
+/// the liftof suite
+///
+/// # Arguments
+///
+/// * run    : run id (identifier)
+/// * subrun : subrun id (identifier of file # within
+///            the run
+/// * rb_id  : in case this should be used on the rb, 
+///            a rb id can be specified as well
+pub fn get_runfilename(run : u64, subrun : u64, rb_id : Option<u8>) -> String {
+  let ts = get_utc_htimestamp();
+  let fname : String;
+  match rb_id {
+    None => {
+      fname = format!("Run{run}_{subrun}_{ts}.gaps.tof");
+    }
+    Some(rbid) => {
+      fname = format!("Run{run}_{subrun}_{ts}_RB{rbid:02}.gaps.tof");
+    }
+  }
+  fname
 }
 
 /// Keep track of run related statistics, errors
@@ -419,7 +471,7 @@ pub fn waveform_analysis(event         : &mut RBEvent,
     //let mut TofHit::new();
     let p_end_id = channel_map.get(&ch).unwrap_or(&0);
     if p_end_id < &1000 {
-      error!("Invalid paddle end id {} for channel {}!", p_end_id, ch);
+      //error!("Invalid paddle end id {} for channel {}!", p_end_id, ch);
       continue;
     }
     if p_end_id > &2000 {
@@ -448,7 +500,7 @@ pub fn waveform_analysis(event         : &mut RBEvent,
                              event.header.stop_cell as usize,
                              &event.adc[8],
                              &mut ch_voltages);
-        warn!("We have to rework the spike cleaning!");
+        //warn!("We have to rework the spike cleaning!");
         //match RBCalibrations::spike_cleaning(&mut ch_voltages,
         //                                     event.header.stop_cell) {
         //  Err(err) => {
@@ -474,7 +526,7 @@ pub fn waveform_analysis(event         : &mut RBEvent,
     let p_end_id  = channel_map.get(&ch).unwrap_or(&0);
     let mut is_a_side = false; 
     if p_end_id < &1000 {
-      error!("Invalid paddle end id: {}!" ,p_end_id);
+      //error!("Invalid paddle end id: {}!" ,p_end_id);
       continue;
     }
     if p_end_id > &2000 {
@@ -491,7 +543,7 @@ pub fn waveform_analysis(event         : &mut RBEvent,
                          event.header.stop_cell as usize,
                          &event.adc[ch as usize],
                          &mut ch_voltages);
-    warn!("We have to rework the spike cleaning!");
+    //warn!("We have to rework the spike cleaning!");
     //match RBCalibrations::spike_cleaning(&mut ch_voltages,
     //                                     event.header.stop_cell) {
     //  Err(err) => {
@@ -614,124 +666,6 @@ impl fmt::Display for ReadoutBoardError {
 impl Error for ReadoutBoardError {
 }
 
-/// A generic representation of a Readout board
-///
-///
-///
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
-pub struct ReadoutBoard {
-  pub id           : Option<u8>,
-  pub mac_address  : Option<MacAddr6>,
-  pub ip_address   : Option<Ipv4Addr>, 
-  pub data_port    : Option<u16>,
-  pub cmd_port     : Option<u16>,
-  pub is_connected : bool,
-  pub uptime       : u32,
-  pub ch_to_pid    : [u8;8],
-  pub sorted_pids  : [u8;4],
-  pub calib_file   : String,
-  pub configured   : bool,
-}
-
-impl ReadoutBoard {
-
-  pub fn new() -> ReadoutBoard {
-    ReadoutBoard {
-      id            : None,
-      mac_address   : None,
-      ip_address    : None,
-      data_port     : None,
-      cmd_port      : None,
-      is_connected  : false,
-      uptime        : 0,
-      ch_to_pid     : [0;8],
-      sorted_pids   : [0;4], 
-      calib_file    : String::from(""),
-      configured    : false
-    }
-  }
-
-  pub fn get_connection_string(&mut self) -> String {
-    if !self.configured {
-      panic!("Can not get connection string. This board has not been configured. Get the information from corresponding json tof manifest");
-    }
-
-    self.get_ip();
-    let mut address_ip = String::from("tcp://");
-    match self.ip_address {
-      None => panic!("This board does not have an ip address. Unable to obtain connection information"),
-      Some(ip) => {
-        address_ip = address_ip + &ip.to_string();
-      }
-    }
-    match self.data_port {
-      None => panic!("This board does not have a known data port. Typically, this should be 42000. Please check your tof-manifest.jsdon"),
-      Some(port) => {
-        address_ip += &":".to_owned();
-        address_ip += &port.to_string();
-      }
-    }
-    address_ip
-  }
-
-  /// Get the readoutboard ip address from 
-  /// the ARP tables
-  pub fn get_ip(&mut self) {
-    let mac_table = get_mac_to_ip_map();
-    let rb_ip = mac_table.get(&self.mac_address.unwrap());
-    info!("Found ip address {:?} for RB {}", rb_ip, self.id.unwrap_or(0));
-    match rb_ip {
-      None => panic!("Can not resolve RBBoard with MAC address {:?}, it is not in the system's ARP tables", &self.mac_address),
-      Some(ip)   => match ip[0] {
-        IpAddr::V6(a) => panic!("IPV6 {a} not suppported!"),
-        IpAddr::V4(a) => {
-          self.ip_address = Some(a); 
-        }
-      }
-    }
-  }
-    
-  ///// Ping it  
-  //pub fn ping(&mut self) -> Result<(), Box<dyn Error>> { 
-  //  // connect to the command port and send a ping
-  //  // message
-  //  let ctx =  zmq::Context::new();
-  //  if matches!(self.ip_address, None) || matches!(self.cmd_port, None) {
-  //    self.is_connected = false;
-  //    return Err(Box::new(ReadoutBoardError::NoConnectionInfo));
-  //  }
-  //  let address = "tcp://".to_owned() + &self.ip_address.unwrap().to_string() + ":" + &self.cmd_port.unwrap().to_string(); 
-  //  let socket  = ctx.socket(zmq::REQ)?;
-  //  socket.connect(&address)?;
-  //  info!("Have connected to adress {address}");
-  //  // if the readoutboard is there, it should send *something* back
-  //  let p = TofCommand::Ping(1);
-
-  //  socket.send(p.to_bytestream(), 0)?;
-  //  info!("Sent ping signal, waiting for response!");
-  //  let data = socket.recv_bytes(0)?;
-  //  if data.len() != 0 {
-  //    self.is_connected = true;
-  //    return Ok(());
-  //  }
-  //  self.is_connected = false;
-  //  return Err(Box::new(ReadoutBoardError::NoResponse));
-  //}
-}
-
-impl fmt::Display for ReadoutBoard {
-  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let r = serde_json::to_string(self).unwrap_or(
-      String::from("Error: cannot unwrap this ReadoutBoard"));
-    write!(f, "<ReadoutBoard: {}>", r)
-  }
-}
-
-impl Default for ReadoutBoard {
-  fn default() -> ReadoutBoard {
-    ReadoutBoard::new()
-  }
-}
 
 /// This will load the map as in the file. Channels go from 1-8
 pub fn get_rb_ch_pid_map(map_file : PathBuf) -> RBChannelPaddleEndIDMap {
