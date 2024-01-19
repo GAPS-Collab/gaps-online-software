@@ -192,7 +192,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
   //let mut n_iter    = 0; // don't worry it'll be simply wrapped around
   // we try to receive eventids from the master trigger
   let n_mte_per_loop         = 1;
-  let n_rbe_per_loop         = 4;
+  let n_rbe_per_loop         = 40;
   let send_every_x_event     = 200usize;
 
   let mut n_received         : usize;
@@ -256,7 +256,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
     //let mut iter_ev           = 0usize;
     //let mut rb_events_dropped = 0usize;
     n_received = 0;
-    while !ev_from_rb.is_empty() && n_received < n_rbe_per_loop {
+    'main: while !ev_from_rb.is_empty() && n_received < n_rbe_per_loop {
     // try to catch up
     //while !ev_from_rb.is_empty() && last_rb_evid < last_evid {
       match ev_from_rb.try_recv() {
@@ -284,6 +284,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
               //println!("Surprisingly we don't have that!");
               // insert a new TofEvent
               //let new_ev = TofEvent::new();
+              continue 'main;
             },
             Some(ev) => {
               ev.rb_events.push(rb_ev);
@@ -361,6 +362,8 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
               },
               Some(n_rb_ev) => {
                 if ev_timed_out || ev.rb_events.len() == n_rb_ev {
+                  cache_it = false;
+                } else {
                   cache_it = true;
                 }
               }
