@@ -128,21 +128,33 @@ use tof_dataclasses::packets::TofPacket;
 //  }
 //}
 
-
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub enum BuildStrategy {
+  Unknown,
+  Smart,
+  Adaptive,
+  WaitForNBoards(usize)
+}
 
 /// Settings to change the configuration of the TOF Eventbuilder on the fly
 pub struct TofEventBuilderSettings {
   pub cachesize         : usize,
+  pub n_mte_per_loop    : usize,
+  pub n_rbe_per_loop    : usize,
   pub build_interval    : usize,
-  pub use_mastertrigger : bool
+  pub use_mastertrigger : bool,
+  pub build_strategy    : BuildStrategy
 }
 
 impl TofEventBuilderSettings {
   pub fn new() -> TofEventBuilderSettings {
     TofEventBuilderSettings {
       cachesize         : 100000,
+      n_mte_per_loop    : 1,
+      n_rbe_per_loop    : 40,
       build_interval    : 1000,
-      use_mastertrigger : true
+      use_mastertrigger : true,
+      build_strategy    : BuildStrategy::Adaptive,
     }
   }
 }
@@ -172,29 +184,15 @@ impl TofEventBuilderSettings {
 /// * cmd_sender     : Sending tof commands to comander thread. This 
 ///                    is needed so that the event builder can request
 ///                    paddles from readout boards.
-/// * nrb_failsafe   : This is kind of a failsafe mode. In case we are 
-///                    not deciding by fw how many RBEvents we expect 
-///                    for each event, we can set this number manually.
-///                    THIS SHOULD NOT BE TEMPERED WITH IN NORMAL OPERATIONS
-///                    AND SHOULD BE SET TO NONE!
-
+/// * settings       : Configure the event builder
 pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
                       ev_from_rb     : &Receiver<RBEvent>,
                       data_sink      : &Sender<TofPacket>,
-                      nrb_failsafe   : Option<usize>) { 
-
-  //let mut event_cache = VecDeque::<TofEvent>::with_capacity(EVENT_BUILDER_EVID_CACHE_SIZE);
-  let mut event_cache = HashMap::<u32, TofEvent>::new();
-  let mut event_id_cache = VecDeque::<u32>::with_capacity(EVENT_BUILDER_EVID_CACHE_SIZE);
-  // timeout in microsecnds
-  //let timeout_micro = 100;
-  //let use_timeout   = true;
-  //let mut n_iter    = 0; // don't worry it'll be simply wrapped around
-  // we try to receive eventids from the master trigger
-  let n_mte_per_loop         = 1;
-  let n_rbe_per_loop         = 40;
-  let send_every_x_event     = 200usize;
-
+                      mut settings   : TofEventBuilderSettings) { 
+  // event caches for assembled events
+  let mut event_cache      = HashMap::<u32, TofEvent>::new();
+  let mut event_id_cache   = VecDeque::<u32>::with_capacity(EVENT_BUILDER_EVID_CACHE_SIZE);
+  
   let mut n_received         : usize;
   let mut clear_cache        = 0; // clear cache every 
   let mut event_sending      = 0;
@@ -207,16 +205,10 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
   // debug
   let mut last_rb_evid       = 0u32;
   let mut n_rbs_per_ev       = 0usize;
-
-  // Depending on the MasterTrigger Rate, 
-  // we want to change the interval when 
-  // we send out new events
-
   loop {
     n_received = 0;
     let debug_timer = Instant::now();
-
-    while n_received < n_mte_per_loop {
+    while n_received < settings.n_mte_per_loop {
       // every iteration, we welcome a new master event
       match m_trig_ev.try_recv() {
         Err(_) => {
@@ -235,7 +227,6 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
             error!("We skipped event ids {}", delta_id );
           }
           last_evid = event.mt_event.event_id;
-          //event_cache.push_back(event);
           event_cache.insert(last_evid, event);
           // use this to keep track of the order
           // of events
@@ -256,7 +247,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
     //let mut iter_ev           = 0usize;
     //let mut rb_events_dropped = 0usize;
     n_received = 0;
-    'main: while !ev_from_rb.is_empty() && n_received < n_rbe_per_loop {
+    'main: while !ev_from_rb.is_empty() && n_received < settings.n_rbe_per_loop {
     // try to catch up
     //while !ev_from_rb.is_empty() && last_rb_evid < last_evid {
       match ev_from_rb.try_recv() {
@@ -313,7 +304,11 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
         }
       }
     }
-    if n_mte_received_tot % 100 == 0 {
+    let av_rb_ev = n_rbs_per_ev as f64 / n_sent as f64;
+    if settings.build_strategy == BuildStrategy::Adaptive {
+      settings.n_rbe_per_loop = av_rb_ev.ceil() as usize; 
+    }
+    if n_mte_received_tot % 10000 == 0 {
       println!("[EVTBLDR] ==> Received {} MTE", n_mte_received_tot);
       println!("[EVTBLDR] ==> Received {n_rbe_received_tot} RBEvents!");
       println!("[EVTBLDR] ==> Delta Last MTE evid - Last RB evid  {}", last_evid - last_rb_evid);
@@ -352,27 +347,26 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
             if ev_timed_out {
               n_timed_out += 1;
             }
-
-            match nrb_failsafe {
-              None => {
-                // normal operations
-                if ev.is_complete() || ev_timed_out {
-                  cache_it = false;
-                }
-              },
-              Some(n_rb_ev) => {
-                if ev_timed_out || ev.rb_events.len() == n_rb_ev {
-                  cache_it = false;
-                } else {
-                  cache_it = true;
-                }
+            if let BuildStrategy::WaitForNBoards(wait_nrb) = settings.build_strategy {
+              if ev_timed_out || ev.rb_events.len() == wait_nrb {
+                cache_it = false;
+              } else {
+                cache_it = true;
+              }
+            } else {
+              // "normal" build strategy
+              if ev.is_complete() || ev_timed_out {
+                cache_it = false;
+              } else {
+                cache_it = true;
               }
             }
             if cache_it {
               event_id_cache.push_back(evid);
             } else {
+              // if we don't cache it, we have to send it. 
               let ev_to_send = event_cache.remove(&evid).unwrap();
-              n_rbs_per_ev += ev_to_send.rb_events.len(); 
+              n_rbs_per_ev  += ev_to_send.rb_events.len(); 
               let pack = TofPacket::from(&ev_to_send);
               match data_sink.send(pack) {
                 Err(err) => {

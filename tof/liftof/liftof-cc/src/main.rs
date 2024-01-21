@@ -69,7 +69,7 @@ use liftof_cc::threads::{readoutboard_communicator,
                          event_builder,
                          global_data_sink,
                          monitor_cpu };
-
+use liftof_cc::threads::event_builder::TofEventBuilderSettings;
 use liftof_lib::Command;
 
 /*************************************/
@@ -337,9 +337,10 @@ fn main() {
   write_stream_path = String::from(stream_files_path.into_os_string().into_string().expect("Somehow the paths are messed up very badly! So I can't help it and I quit!"));
 
   // this is the tailscale address
-  let flight_address = format!("tcp://100.101.96.10:{}", DATAPORT);
+  //let flight_address = format!("tcp://100.101.96.10:{}", DATAPORT);
   // this is the address in the flight network
   // flight_address = format!("tcp://10.0.1.1:{}", DATAPORT);
+  let flight_address = format!("tcp://192.168.37.20:{}", DATAPORT);
   println!("==> Starting data sink thread!");
   worker_threads.execute(move || {
                          global_data_sink(&tp_from_client,
@@ -386,11 +387,12 @@ fn main() {
   // start the event builder thread
   println!("==> Starting event builder and master trigger threads...");
   let cmd_sender_2 = cmd_sender.clone();
+  let settings = TofEventBuilderSettings::new();
   worker_threads.execute(move || {
                          event_builder(&master_ev_rec,
                                        &ev_from_rb,
                                        &tp_to_sink,
-                                       nrb_failsafe);
+                                       settings);
   });
   // master trigger
   worker_threads.execute(move || {
