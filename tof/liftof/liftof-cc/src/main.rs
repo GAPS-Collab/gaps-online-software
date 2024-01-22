@@ -453,8 +453,8 @@ fn main() {
     Command::Moni(moni_cmd) => {
       match moni_cmd.component {
         TofComponent::TofCpu => liftof_cc::send_moni_response(cmd_sender_c, socket),
-        TofComponent::RB  |
-        TofComponent::LTB |
+        TofComponent::RB    |
+        TofComponent::LTB   |
         TofComponent::MT     => liftof_cc::send_moni(cmd_sender_c, moni_cmd.component, moni_cmd.id),
         _                    => error!("The moni command is not implemented for this TofComponent!")
       }

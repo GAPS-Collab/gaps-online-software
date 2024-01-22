@@ -34,6 +34,7 @@ use crate::api::{rb_calibration,
                  get_runconfig,
                  prefix_board_id,
                  DATAPORT};
+use crate::threads::monitoring::{get_ltb_moni, get_pb_moni, get_rb_moni};
 
 use liftof_lib::constants::DEFAULT_RB_ID;
 
@@ -162,16 +163,18 @@ pub fn cmd_responder(cmd_server_ip             : String,
                         let tof_component: TofComponent = TofComponent::from(((value | MASK_CMD_8BIT << 8) >> 8) as u8);
                         // MSB fourth 8 bits are 
                         let id: u8 = (value | MASK_CMD_8BIT) as u8;
+                        // Function that just replies to a ping command send to tofcpu
+                        // get_board_id PANICS!! TODO
+                        let rb_id = get_board_id().unwrap() as u8;
 
                         let return_val;
-                        match tof_component {
-                          TofComponent::RB => {
-                            info!("Received moni command");
-                            // Function that just replies to a ping command send to tofcpu
-                            // get_board_id PANICS!! TODO
-                            let rb_id = get_board_id().unwrap() as u8;
-
-                            if rb_id == id {
+                        if rb_id != id {
+                          // The packet was not for this RB so bye
+                          continue;
+                        } else {
+                          match tof_component {
+                            TofComponent::RB => {
+                              info!("Received moni command");
                               let mut tp = TofPacket::new();
                               tp.packet_type = PacketType::Ping;
                               // TODO what do we want here
@@ -186,60 +189,39 @@ pub fn cmd_responder(cmd_server_ip             : String,
                                   return_val = Ok(());
                                 }
                               };
-                            } else {
-                              // The packet was not for this RB so bye
-                              continue;
+                            },
+                            TofComponent::PB  => {
+                              return_val = Err(SetError::EmptyInputData);
+                              warn!("Not implemented for PB yet")
+                            },
+                            TofComponent::LTB => {
+                              return_val = Err(SetError::EmptyInputData);
+                              warn!("Not implemented for LTB yet")
+                            },
+                            _                 => {
+                              return_val = Err(SetError::EmptyInputData);
+                              error!("An RB can control just PBs and LTBs.")
                             }
-                            
-                            match return_val {
-                              Err(_) => {
-                                let r = TofResponse::GeneralFail(TofCommandResp::RespErrUnexecutable as u32);
-                                match cmd_socket.send(r.to_bytestream(),0) {
-                                  Err(err) => warn!("Can not send response!, Err {err}"),
-                                  Ok(_)    => info!("Responded to Moni!")
-                                }
-                              },
-                              Ok(_)    => {
-                                let r = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed as u32);
-                                match cmd_socket.send(r.to_bytestream(),0) {
-                                  Err(err) => warn!("Can not send response!, Err {err}"),
-                                  Ok(_)    => info!("Responded to Moni!")
-                                }
+                          }
+
+                          match return_val {
+                            Err(_) => {
+                              let r = TofResponse::GeneralFail(TofCommandResp::RespErrUnexecutable as u32);
+                              match cmd_socket.send(r.to_bytestream(),0) {
+                                Err(err) => warn!("Can not send response!, Err {err}"),
+                                Ok(_)    => info!("Responded to Power!")
+                              }
+                            },
+                            Ok(_)  => {
+                              let r = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed as u32);
+                              match cmd_socket.send(r.to_bytestream(),0) {
+                                Err(err) => warn!("Can not send response!, Err {err}"),
+                                Ok(_)    => info!("Responded to Moni!")
                               }
                             }
-                            continue;
-                          },
-                          TofComponent::PB  => {
-                            return_val = Err(SetError::EmptyInputData);
-                            warn!("Not implemented for PB yet")
-                          },
-                          TofComponent::LTB => {
-                            return_val = Err(SetError::EmptyInputData);
-                            warn!("Not implemented for LTB yet")
-                          },
-                          _                 => {
-                            return_val = Err(SetError::EmptyInputData);
-                            error!("An RB can control just PBs and LTBs.")
                           }
+                          continue;
                         }
-
-                        match return_val {
-                          Err(_) => {
-                            let r = TofResponse::GeneralFail(TofCommandResp::RespErrUnexecutable as u32);
-                            match cmd_socket.send(r.to_bytestream(),0) {
-                              Err(err) => warn!("Can not send response!, Err {err}"),
-                              Ok(_)    => info!("Responded to Power!")
-                            }
-                          },
-                          Ok(_)  => {
-                            let r = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed as u32);
-                            match cmd_socket.send(r.to_bytestream(),0) {
-                              Err(err) => warn!("Can not send response!, Err {err}"),
-                              Ok(_)    => info!("Responded to Moni!")
-                            }
-                          }
-                        }
-                        continue;
                       },
                       TofCommand::Moni (value) => {
                         // MSB third 8 bits are 
@@ -247,67 +229,85 @@ pub fn cmd_responder(cmd_server_ip             : String,
                         // MSB fourth 8 bits are 
                         let id: u8 = (value | MASK_CMD_8BIT) as u8;
 
-                        // TODO implement proper routines
+                        // Function that just replies to a ping command send to tofcpu
+                        // get_board_id PANICS!! TODO
+                        let rb_id = get_board_id().unwrap() as u8;
+
                         let return_val;
-                        match tof_component {
-                          TofComponent::RB => {
-                            info!("Received moni command");
-                            // Function that just replies to a ping command send to tofcpu
-                            // get_board_id PANICS!! TODO
-                            let rb_id = get_board_id().unwrap() as u8;
-
-                            if rb_id == id {
-                              let mut tp = TofPacket::new();
-                              tp.packet_type = PacketType::Monitor;
-                              tp.payload = vec![TofComponent::RB as u8, rb_id];
-
-                              // JUST A PLACEHOLDER TODO! WHAT DO WE WANT TO HAVE HERE
+                        if rb_id != id {
+                          // The packet was not for this RB so bye
+                          continue;
+                        } else {
+                          match tof_component {
+                            TofComponent::RB => {
+                              info!("Received RB moni command");
+                              let moni = get_rb_moni(id).unwrap();
+                              let tp = TofPacket::from(&moni);
 
                               match ev_request_to_cache.send(tp) {
                                 Err(err) => {
-                                  error!("TofCpu moni sending failed! Err {}", err);
+                                  error!("RB moni sending failed! Err {}", err);
                                   return_val = Err(SetError::CanNotConnectToMyOwnZMQSocket);
                                 }
                                 Ok(_)    => {
                                   return_val = Ok(());
                                 }
                               };
-                            } else {
-                              // The packet was not for this RB so bye
-                              continue;
-                            }
-                          },
-                          TofComponent::PB  => {
-                            return_val = Err(SetError::EmptyInputData);
-                            warn!("Not implemented for PB yet")
-                          },
-                          TofComponent::LTB => {
-                            return_val = Err(SetError::EmptyInputData);
-                            warn!("Not implemented for LTB yet")
-                          },
-                          _                 => {
-                            return_val = Err(SetError::EmptyInputData);
-                            error!("An RB can control just PBs and LTBs.")
-                          }
-                        }
+                            },
+                            TofComponent::PB  => {
+                              info!("Received PB moni command");
+                              let moni = get_pb_moni(id).unwrap();
+                              let tp = TofPacket::from(&moni);
 
-                        match return_val {
-                          Err(_) => {
-                            let r = TofResponse::GeneralFail(TofCommandResp::RespErrUnexecutable as u32);
-                            match cmd_socket.send(r.to_bytestream(),0) {
-                              Err(err) => warn!("Can not send response!, Err {err}"),
-                              Ok(_)    => info!("Responded to Power!")
-                            }
-                          },
-                          Ok(_)    => {
-                            let r = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed as u32);
-                            match cmd_socket.send(r.to_bytestream(),0) {
-                              Err(err) => warn!("Can not send response!, Err {err}"),
-                              Ok(_)    => info!("Responded to Moni!")
+                              match ev_request_to_cache.send(tp) {
+                                Err(err) => {
+                                  error!("PB moni sending failed! Err {}", err);
+                                  return_val = Err(SetError::CanNotConnectToMyOwnZMQSocket);
+                                }
+                                Ok(_)    => {
+                                  return_val = Ok(());
+                                }
+                              };
+                            },
+                            TofComponent::LTB => {
+                              info!("Received LTB moni command");
+                              let moni = get_ltb_moni(id).unwrap();
+                              let tp = TofPacket::from(&moni);
+
+                              match ev_request_to_cache.send(tp) {
+                                Err(err) => {
+                                  error!("LTB moni sending failed! Err {}", err);
+                                  return_val = Err(SetError::CanNotConnectToMyOwnZMQSocket);
+                                }
+                                Ok(_)    => {
+                                  return_val = Ok(());
+                                }
+                              };
+                            },
+                            _                 => {
+                              return_val = Err(SetError::EmptyInputData);
+                              error!("An RB can control just PBs and LTBs.")
                             }
                           }
+
+                          match return_val {
+                            Err(_) => {
+                              let r = TofResponse::GeneralFail(TofCommandResp::RespErrUnexecutable as u32);
+                              match cmd_socket.send(r.to_bytestream(),0) {
+                                Err(err) => warn!("Can not send response!, Err {err}"),
+                                Ok(_)    => info!("Responded to Power!")
+                              }
+                            },
+                            Ok(_)    => {
+                              let r = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed as u32);
+                              match cmd_socket.send(r.to_bytestream(),0) {
+                                Err(err) => warn!("Can not send response!, Err {err}"),
+                                Ok(_)    => info!("Responded to Moni!")
+                              }
+                            }
+                          }
+                          continue;
                         }
-                        continue;
                       },
                       TofCommand::Power   (value) => {
                         info!("Received set threshold command! Will communicate to LTBs");

@@ -44,14 +44,12 @@ use tof_control::rb_control::rb_mode::{select_noi_mode,
                                       select_tcal_mode,
                                       select_sma_mode};
 
-// for threshold setting
-use tof_control::preamp_control::preamp_bias;
-// for preamp bias
-use tof_control::helper::preamp_type::{PreampReadBias, PreampSetBias, PreampTemp, PreampBiasError};
+// for general control over rb, ltb and pb
+use tof_control::helper::preamp_type::PreampSetBias;
 // for power
 use liftof_lib::{PowerStatusEnum,
                   LTBThresholdName};
-use zmq::Socket;
+
 use liftof_lib::constants::{DEFAULT_PREAMP_BIAS,
                             DEFAULT_PREAMP_ID,
                             DEFAULT_LTB_ID};
@@ -1362,5 +1360,10 @@ pub fn power_ltb(ltb_id: u8, status: PowerStatusEnum) -> Result<(), SetError> {
       error!("Unable to set preamp bias! Error LTBThresholdError!");
     }
   };
+  Ok(())
+}
+
+pub fn get_info(rb_id: u8) -> Result<(), SetError> {
+  
   Ok(())
 }
