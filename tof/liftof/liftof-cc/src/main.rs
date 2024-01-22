@@ -8,7 +8,6 @@
 #[macro_use] extern crate log;
 extern crate env_logger;
 extern crate clap;
-extern crate json;
 extern crate ctrlc;
 extern crate zmq;
 extern crate tof_dataclasses;
@@ -43,12 +42,11 @@ use clap::{arg,
            Parser};
 
 use crossbeam_channel as cbc; 
-use colored::Colorize;
+//use colored::Colorize;
 
 use tof_dataclasses::events::{MasterTriggerEvent,
                               RBEvent};
 use tof_dataclasses::threading::{
-    ThreadPool,
     ThreadControl,
 };
 
@@ -70,7 +68,6 @@ use liftof_cc::threads::{readoutboard_communicator,
                          global_data_sink,
                          monitor_cpu };
 use liftof_cc::settings::{
-    TofEventBuilderSettings,
     LiftofCCSettings,
 };
 use liftof_lib::Command;
@@ -298,32 +295,24 @@ fn main() {
   // I guess expect is fine here, see above
   let socket = ctx.socket(zmq::SUB).expect("Unable to create 0MQ SUB socket!");
 
-
-  // prepare a thread pool. Currently we have
-  // 1 thread per rb, 1 master trigger thread
-  // and 1 event builder thread.
-  // Also, the paddle cache is its separate 
-  // thread.
-  // There might
-  // be a monitoring thread, too.
-  // The number of threads should be fixed at 
-  // runtime, but it should be possible to 
-  // respawn them
-  let nthreads = 60;
-
-  let worker_threads = ThreadPool::new(nthreads);
   let thread_control = Arc::new(Mutex::new(ThreadControl::new()));
 
   if cpu_moni_interval > 0 {
     println!("==> Starting main monitoring thread...");
     let tp_to_sink_c = tp_to_sink.clone();
-    worker_threads.execute(move || {
-                            monitor_cpu(
-                              tp_to_sink_c,
-                              cpu_moni_interval,
-                              thread_control,
-                              verbose)
-    });
+    // this is anonymus, but we control the thread
+    // through the thread control mechanism, so we
+    // can still end it.
+    let _cpu_moni_thread = thread::Builder::new()
+         .name("cpu-monitoring".into())
+         .spawn(move || {
+           monitor_cpu(
+             tp_to_sink_c,
+             cpu_moni_interval,
+             thread_control,
+             verbose)
+          })
+         .expect("Failed to spawn cpu-monitoring thread!");
   }
 
   write_stream_path = String::from(stream_files_path.into_os_string().into_string().expect("Somehow the paths are messed up very badly! So I can't help it and I quit!"));
@@ -333,15 +322,18 @@ fn main() {
   // this is the address in the flight network
   // flight_address = format!("tcp://10.0.1.1:{}", DATAPORT);
   println!("==> Starting data sink thread!");
-  worker_threads.execute(move || {
-                         global_data_sink(&tp_from_client,
-                                          &flight_address,
-                                          write_stream,
-                                          write_stream_path,
-                                          write_npack_file,
-                                          runid,
-                                          verbose);
-  });
+  let _data_sink_thread = thread::Builder::new()
+       .name("data-sink".into())
+       .spawn(move || {
+         global_data_sink(&tp_from_client,
+                          &flight_address,
+                          write_stream,
+                          write_stream_path,
+                          write_npack_file,
+                          runid,
+                          verbose);
+        })
+       .expect("Failed to spawn data-sink thread!");
   println!("==> data sink thread started!");
   println!("==> Will now start rb threads..");
 
@@ -359,34 +351,46 @@ fn main() {
     //this_rb.calib_file += "_cal.txt";
     println!("==> Starting RB thread for {}", this_rb);
     let ev_to_builder_c = ev_to_builder.clone();
-    worker_threads.execute(move || {
+    let thread_name = format!("rb-comms-{}", this_rb.rb_id);
+    let _rb_comm_thread = thread::Builder::new()
+         .name(thread_name)
+         .spawn(move || {
       readoutboard_communicator(&ev_to_builder_c,
                                 this_tp_to_sink_clone,
                                 &this_rb,
                                 runid,
                                 false,
                                 true);
-    });
+          })
+         .expect("Failed to spawn readoutboard-communicator thread!");
   } // end for loop over nboards
   println!("==> All RB threads started!");
   
   let one_second = time::Duration::from_millis(1000);
   println!("==> Starting RB commander thread!");
-  worker_threads.execute(move || {
-    readoutboard_commander(&cmd_receiver);
-  });
+    let _rb_cmd_thread = thread::Builder::new()
+         .name("rb-commander".into())
+         .spawn(move || {
+            readoutboard_commander(&cmd_receiver);
+          })
+         .expect("Failed to spawn rb-commander thread!");
   // start the event builder thread
   println!("==> Starting event builder and master trigger threads...");
   let cmd_sender_2 = cmd_sender.clone();
   let settings = config.event_builder_settings;
-  worker_threads.execute(move || {
+    let _evb_thread = thread::Builder::new()
+         .name("cpu-monitoring".into())
+         .spawn(move || {
                          event_builder(&master_ev_rec,
                                        &ev_from_rb,
                                        &tp_to_sink,
                                        settings);
-  });
+          })
+         .expect("Failed to spawn cpu-monitoring thread!");
   // master trigger
-  worker_threads.execute(move || {
+    let _mtb_thread = thread::Builder::new()
+         .name("master-trigger".into())
+         .spawn(move || {
                          master_trigger(mtb_address, 
                                         &ltb_rb_map,
                                         &master_ev_send,
@@ -396,7 +400,8 @@ fn main() {
                                         60,
                                         false,
                                         false);
-  });
+          })
+         .expect("Failed to spawn cpu-monitoring thread!");
 
   let one_minute = time::Duration::from_millis(60000);
   

@@ -1,6 +1,7 @@
 # HAHALUA series
 
 # v0.9.1
+* switch from ThreadPool to named threads
 * reworked the settings. Introduced a .toml
   file with sections for event builder and 
   analysis engine.
