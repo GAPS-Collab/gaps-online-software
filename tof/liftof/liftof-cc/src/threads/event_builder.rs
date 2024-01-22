@@ -12,152 +12,12 @@ use tof_dataclasses::events::{MasterTriggerEvent,
                               TofEvent,
                               RBEvent};
 use crate::constants::EVENT_BUILDER_EVID_CACHE_SIZE;
+use crate::settings::{
+    TofEventBuilderSettings,
+    BuildStrategy
+};
 use tof_dataclasses::packets::TofPacket;
 
-/////  Walk over the event cache and check for each event
-/////  if new paddles can be added.
-/////
-/////  # Arguments:
-/////
-/////
-/////  * clean_up : call vec::retain to only keep events which 
-/////               have not yet been sent.
-//fn build_events_in_cache(event_cache   : &mut VecDeque<MasterTofEvent>,
-//                         timeout_micro : u64,
-//                         evid_query    : &Sender<Option<u32>>,
-//                         pp_recv       : &Receiver<Option<PaddlePacket>>,
-//                         clean_up      : bool,
-//                         use_timeout   : bool,
-//                         paddle_cache  : &mut HashMap::<u32,Vec::<PaddlePacket>>,
-//                         data_sink     : &cbc::Sender<TofPacket>) { 
-//                         //socket        : &zmq::Socket) {
-//
-//  for ev in event_cache.iter_mut() {
-//    trace!("Event {} is {} sec old", ev.event_id, ev.age());
-//    let start   = Instant::now();
-//    let timeout = Duration::from_micros(timeout_micro);
-//    if !ev.valid {
-//      continue;
-//    }
-//    
-//
-//    // first check, if we have pps in the paddle_cache
-//    if paddle_cache.contains_key(&ev.event_id) {
-//      let pps = paddle_cache.get_mut(&ev.event_id).unwrap();
-//      //for pp in pps.iter_mut() {
-//      for k in 0..pps.len() {
-//        if !pps[k].valid
-//          {continue;}
-//        match ev.add_paddle(pps[k]) {
-//         Err(err) => error!("Unable to add paddle! {err}"),
-//         Ok(_)    => ()
-//        }
-//        pps[k].invalidate();
-//      }
-//    }
-//    // events must be valid at this point
-//    if ev.is_ready_to_send(use_timeout) {
-//      (*ev).valid = false;
-//      let bytestream = ev.to_bytestream();
-//      //error!("Event ready to send, we have {} {} {} {}", ev.n_paddles, ev.n_paddles_expected, ev.age(), ev.paddle_packets.len());
-//      //println!("{:?}", ev.paddle_packets);
-//      //error!("We have a bytestream len of {}", bytestream.len());
-//      let mut pack = TofPacket::new();
-//      pack.packet_type = PacketType::TofEvent;
-//      pack.payload = bytestream;
-//      if ev.n_paddles > 0 {
-//        trace!("{:?}", ev);
-//        trace!("{:?}", ev.paddle_packets);
-//      }
-//      match data_sink.send(pack) {
-//        Err(err) => error!("Packet sending failed! Err {}", err),
-//        Ok(_)    => debug!("Event {} with {} paddles sent and {} paddles were expected!", ev.event_id, ev.paddle_packets.len(),ev.n_paddles) 
-//      }
-//      continue;
-//    } // end ready to send
-//    match evid_query.send(Some(ev.event_id)) {
-//      Err(err) => error!("Can not send even query for event {}, {}", ev.event_id, err),
-//      Ok(_)    =>()
-//    }
-//    let mut n_received = 0;
-//    let mut n_new      = 0;
-//    let mut n_seen    = 0;
-//    while start.elapsed() < timeout {
-//      match pp_recv.try_recv() { 
-//        Err(_) => {}
-//        Ok(pp_option) => {
-//          match pp_option {
-//            None => {
-//              continue;
-//            },
-//            Some(pp) => {
-//              if pp.event_id == ev.event_id {
-//                n_received += 1;
-//                match ev.add_paddle(pp) {
-//                  Err(err) => error!("Can not add paddle to event {}, Error {err}", ev.event_id),
-//                  Ok(_)    => ()
-//                }
-//              } else {
-//                if paddle_cache.contains_key(&pp.event_id) {
-//                  paddle_cache.get_mut(&pp.event_id).unwrap().push(pp);
-//                  //println!("{:?} inserting pp with", pp);
-//                  n_new += 1;
-//                } else {
-//                  let ev_paddles = vec![pp];
-//                  paddle_cache.insert(pp.event_id, ev_paddles);
-//                  //println!("{:?} inserting pp with", pp);
-//                  //println!("{:?}", paddle_cache[&pp.event_id].len());
-//                  //println!("{:?}", paddle_cache);
-//                  n_seen += 1;
-//                }
-//              }
-//            }
-//          }
-//        } 
-//      } // end while
-//    } // end while not timeout
-//    debug!("n_seen {n_seen}, n_new {n_new} n_received {n_received}");
-//  } // end iter over cache
-//  // clean the cache - remove all completed events
-//  if clean_up {
-//    let size_b4 = event_cache.len();
-//    event_cache.retain(|ev| ev.valid);
-//    //paddle_cache.retain(|pp| pp.valid);
-//    let size_af = event_cache.len();
-//    println!("==> [EVTBLD::CACHE] Size of event cache before {} and after clean up {}", size_b4, size_af);
-//  }
-//}
-
-#[derive(Debug, Copy, Clone, PartialEq)]
-pub enum BuildStrategy {
-  Unknown,
-  Smart,
-  Adaptive,
-  WaitForNBoards(usize)
-}
-
-/// Settings to change the configuration of the TOF Eventbuilder on the fly
-pub struct TofEventBuilderSettings {
-  pub cachesize         : usize,
-  pub n_mte_per_loop    : usize,
-  pub n_rbe_per_loop    : usize,
-  pub build_interval    : usize,
-  pub use_mastertrigger : bool,
-  pub build_strategy    : BuildStrategy
-}
-
-impl TofEventBuilderSettings {
-  pub fn new() -> TofEventBuilderSettings {
-    TofEventBuilderSettings {
-      cachesize         : 100000,
-      n_mte_per_loop    : 1,
-      n_rbe_per_loop    : 40,
-      build_interval    : 1000,
-      use_mastertrigger : true,
-      build_strategy    : BuildStrategy::Adaptive,
-    }
-  }
-}
 
 /// Events ... assemble! 
 ///
@@ -205,6 +65,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
   // debug
   let mut last_rb_evid       = 0u32;
   let mut n_rbs_per_ev       = 0usize;
+  let mut rb_ev_wo_mte       = 0usize;
   loop {
     n_received = 0;
     let debug_timer = Instant::now();
@@ -240,7 +101,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
       n_mte_received_tot += 1;
     } // end getting MTEvents
     trace!("Debug timer MTE received! {:?}", debug_timer.elapsed());
-    //first_evid = event_cache[0].mt_event.event_id; 
+    first_evid = event_id_cache[0]; 
     
     // check this timeout
     //let mut rb_events_added   = 0usize;
@@ -275,6 +136,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
               //println!("Surprisingly we don't have that!");
               // insert a new TofEvent
               //let new_ev = TofEvent::new();
+              rb_ev_wo_mte += 1;
               continue 'main;
             },
             Some(ev) => {
@@ -306,7 +168,11 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
     }
     let av_rb_ev = n_rbs_per_ev as f64 / n_sent as f64;
     if settings.build_strategy == BuildStrategy::Adaptive {
-      settings.n_rbe_per_loop = av_rb_ev.ceil() as usize; 
+      settings.n_rbe_per_loop = av_rb_ev.ceil() as usize;
+      if settings.n_rbe_per_loop == 0 {
+        // failsafe
+        settings.n_rbe_per_loop = 40;
+      }
     }
     if n_mte_received_tot % 10000 == 0 {
       println!("[EVTBLDR] ==> Received {} MTE", n_mte_received_tot);
@@ -314,7 +180,12 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
       println!("[EVTBLDR] ==> Delta Last MTE evid - Last RB evid  {}", last_evid - last_rb_evid);
       println!("[EVTBLDR] ==> Size of event cache {}", event_cache.len());
       println!("[EVTBLDR] ==> Size of event ID cache {}", event_id_cache.len());
+      println!("[EVTBLDR] ==> Get MTE from cache for RB ev failed {rb_ev_wo_mte} times!");
       println!("[EVTBLDR] ==> Sent {n_sent} events!");
+      println!("[EVTBLDR] ==> Chn len MTE receiver {}",m_trig_ev.len() );
+      println!("[EVTBLDR] ==> Chn len RBE receiver {}",ev_from_rb.len());
+      println!("[EVTBLDR] ==> Chn len TP  sender   {}",data_sink.len());
+      
       if n_sent > 0 {
         let av_rb_ev = n_rbs_per_ev as f64 / n_sent as f64;
         println!("[EVTBLDR] ==> Average number of RBEvents/TofEvent {:4.2}", av_rb_ev);

@@ -52,10 +52,13 @@ use std::collections::{
     HashMap
 };
 
+extern crate chrono;
+use chrono::{DateTime, Utc};
 
 extern crate indicatif;
 use indicatif::{ProgressBar, ProgressStyle};
 use crossbeam_channel::Sender;
+
 use crate::events::{
     RBEvent,
     RBEventHeader,
@@ -75,6 +78,66 @@ use crate::serialization::{
     parse_u16,
     parse_u32,
 };
+
+/// Types of files
+#[derive(Debug, Copy, Clone)]
+pub enum FileType {
+  Unknown,
+  /// Calibration file for specific RB with id
+  CalibrationFile(u8),
+  RunFile(u32),
+}
+
+/// Get a human readable timestamp
+pub fn get_utc_timestamp() -> String {
+  let now: DateTime<Utc> = Utc::now();
+  // Format the timestamp as "YYYY_MM_DD_HH_MM"
+  let timestamp_str = now.format("%Y-%m-%d_%H-%M-%S").to_string();
+  timestamp_str
+}
+
+/// A standardized name for calibration files saved by 
+/// the liftof suite
+///
+/// # Arguments
+///
+/// * rb_id   : unique identfier for the 
+///             Readoutboard (1-50)
+/// * default : if default, just add 
+///             "latest" instead of 
+///             a timestamp
+pub fn get_califilename(rb_id : u8, latest : bool) -> String {
+  let ts = get_utc_timestamp();
+  if latest {
+    format!("RB{rb_id}_latest.cali.tof.gaps")
+  } else {
+    format!("RB{rb_id}_{ts}.cali.tof.gaps")
+  }
+}
+
+/// A standardized name for regular run files saved by
+/// the liftof suite
+///
+/// # Arguments
+///
+/// * run    : run id (identifier)
+/// * subrun : subrun id (identifier of file # within
+///            the run
+/// * rb_id  : in case this should be used on the rb, 
+///            a rb id can be specified as well
+pub fn get_runfilename(run : u32, subrun : u64, rb_id : Option<u8>) -> String {
+  let ts = get_utc_timestamp();
+  let fname : String;
+  match rb_id {
+    None => {
+      fname = format!("Run{run}_{subrun}_{ts}.gaps.tof");
+    }
+    Some(rbid) => {
+      fname = format!("Run{run}_{subrun}_{ts}_RB{rbid:02}.gaps.tof");
+    }
+  }
+  fname
+}
 
 //FIXME : this needs to become a trait
 fn read_n_bytes(file: &mut BufReader<File>, n: usize) -> io::Result<Vec<u8>> {
@@ -835,18 +898,21 @@ impl Iterator for TofPacketReader {
 /// be synced to disk.
 pub struct TofPacketWriter {
 
-  pub file          : File,
-  pub file_prefix   : String,
+  pub file            : File,
+  /// location to store the file
+  pub file_path       : String,
   /// The maximum number of packets 
   /// for a single file. Ater this 
   /// number is reached, a new 
   /// file is started.
-  pub pkts_per_file : usize,
-  
-  file_id           : usize,
+  pub pkts_per_file   : usize,
+  /// add timestamps to filenames
+  pub file_type       : FileType,
+
+  file_id             : usize,
   /// internal packet counter, number of 
   /// packets which went through the writer
-  n_packets         : usize,
+  n_packets           : usize,
 }
 
 impl TofPacketWriter {
@@ -855,21 +921,69 @@ impl TofPacketWriter {
   ///
   /// # Arguments
   ///
-  /// * file_prefix : Prefix file with this string. A continuous number will get 
-  ///                 appended to control the file size.
-  pub fn new(file_prefix : String) -> Self {
+  /// * file_prefix     : Prefix file with this string. A continuous number will get 
+  ///                     appended to control the file size.
+  /// * file_type       : control the behaviour of how the filename is
+  ///                     assigned.
+  pub fn new(mut file_path : String, file_type : FileType) -> Self {
     //let filename = file_prefix.clone() + "_0.tof.gaps";
-    let filename = file_prefix.clone() + ".tof.gaps";
-    let path = Path::new(&filename); 
-    info!("Writing to file {filename}");
-    let file = OpenOptions::new().create(true).append(true).open(path).expect("Unable to open file {filename}");
+    let file : File;
+    if !file_path.ends_with("/") {
+      file_path += "/";
+    }
+    match file_type {
+      FileType::Unknown => {
+        let filename = file_path.clone() + "Data.tof.gaps";
+        let path     = Path::new(&filename); 
+        info!("Writing to file {filename}");
+        file = OpenOptions::new().create(true).append(true).open(path).expect("Unable to open file {filename}");
+      }
+      FileType::RunFile(runid) => {
+        let filename = file_path.clone() + &get_runfilename(runid,1, None);
+        let path     = Path::new(&filename); 
+        info!("Writing to file {filename}");
+        file = OpenOptions::new().create(true).append(true).open(path).expect("Unable to open file {filename}");
+      }
+      FileType::CalibrationFile(rbid) => {
+        let filename = file_path.clone() + &get_califilename(rbid,false);
+        let path     = Path::new(&filename); 
+        info!("Writing to file {filename}");
+        file = OpenOptions::new().create(true).append(true).open(path).expect("Unable to open file {filename}");
+      }
+    }
     Self {
       file,
-      file_prefix   : file_prefix,
-      pkts_per_file : 3000,
-      file_id       : 1,
-      n_packets     : 0,
+      file_path       : file_path,
+      pkts_per_file   : 3000,
+      file_type       : file_type,
+      file_id         : 1,
+      n_packets       : 0,
     }
+  }
+
+  pub fn get_file(&self) -> File { 
+    let file : File;
+    match self.file_type {
+      FileType::Unknown => {
+        let filename = self.file_path.clone() + "Data.tof.gaps";
+        let path     = Path::new(&filename); 
+        info!("Writing to file {filename}");
+        file = OpenOptions::new().create(true).append(true).open(path).expect("Unable to open file {filename}");
+      }
+      FileType::RunFile(runid) => {
+        let filename = self.file_path.clone() + &get_runfilename(runid,self.file_id as u64, None);
+        let path     = Path::new(&filename); 
+        info!("Writing to file {filename}");
+        file = OpenOptions::new().create(true).append(true).open(path).expect("Unable to open file {filename}");
+      }
+      FileType::CalibrationFile(rbid) => {
+        let filename = self.file_path.clone() + &get_califilename(rbid,false);
+        let path     = Path::new(&filename); 
+        info!("Writing to file {filename}");
+        file = OpenOptions::new().create(true).append(true).open(path).expect("Unable to open file {filename}");
+      }
+    }
+    file
   }
 
   /// Induce serialization to disk for a TofPacket
@@ -878,23 +992,26 @@ impl TofPacketWriter {
   pub fn add_tof_packet(&mut self, packet : &TofPacket) {
     let buffer = packet.to_bytestream();
     match self.file.write_all(buffer.as_slice()) {
-      Err(err) => error!("Writing to file with prefix {} failed. Err {}", self.file_prefix, err),
+      Err(err) => error!("Writing to file to path {} failed! {}", self.file_path, err),
       Ok(_)    => ()
     }
     self.n_packets += 1;
     if self.n_packets == self.pkts_per_file {
-      let filename = self.file_prefix.clone() + "_" + &self.file_id.to_string() + ".tof.gaps";
-      let path  = Path::new(&filename);
-      println!("==> [TOFPACKETWRITER] Will start a new file {}", path.display());
+      //let filename = self.file_prefix.clone() + "_" + &self.file_id.to_string() + ".tof.gaps";
       match self.file.sync_all() {
         Err(err) => {
           error!("Unable to sync file to disc! {err}");
         },
         Ok(_) => ()
       }
-      self.file = OpenOptions::new().create(true).append(true).open(path).expect("Unable to open file {filename}");
+      self.file = self.get_file();
       self.n_packets = 0;
       self.file_id += 1;
+      //let path  = Path::new(&filename);
+      //println!("==> [TOFPACKETWRITER] Will start a new file {}", path.display());
+      //self.file = OpenOptions::new().create(true).append(true).open(path).expect("Unable to open file {filename}");
+      //self.n_packets = 0;
+      //self.file_id += 1;
     }
   debug!("TofPacket written!");
   }
@@ -902,7 +1019,7 @@ impl TofPacketWriter {
 
 impl Default for TofPacketWriter {
   fn default() -> TofPacketWriter {
-    TofPacketWriter::new(String::from(""))
+    TofPacketWriter::new(String::from(""), FileType::Unknown)
   }
 }
 
@@ -1131,7 +1248,7 @@ impl RobinReader {
     if filename != "" {
       let path = Path::new(&filename); 
       info!("Reading from {}", &self.filename);
-      let file = OpenOptions::new().create(false).append(false).read(true).open(path).expect("Unable to open file {filename}");
+      let file = OpenOptions::new().create(false).append(true).read(true).open(path).expect("Unable to open file {filename}");
       self.file_reader = Some(BufReader::new(file));
     }
   }

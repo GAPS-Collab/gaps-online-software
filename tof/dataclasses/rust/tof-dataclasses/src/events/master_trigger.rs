@@ -24,8 +24,8 @@ use crate::events::RBMissingHit;
 use crate::manifest::{LocalTriggerBoard,
                       ReadoutBoard};
 
-const N_LTBS : usize = 20;
-const N_CHN_PER_LTB : usize = 16;
+pub const N_LTBS : usize = 25;
+pub const N_CHN_PER_LTB : usize = 16;
 
 
 /////////////////////////////////////////////////
@@ -519,6 +519,11 @@ impl fmt::Display for MasterTriggerEvent {
     dsi_j.insert(16 , "4/3");
     dsi_j.insert(17 , "4/4");
     dsi_j.insert(19 , "4/5");
+    dsi_j.insert(20 , "5/1");
+    dsi_j.insert(21 , "5/2");
+    dsi_j.insert(22 , "5/3");
+    dsi_j.insert(23 , "5/4");
+    dsi_j.insert(24 , "5/5");
     let mut hit_boards = Vec::<u8>::with_capacity(20);
     
     let mut repr = String::from("<MasterTriggerEvent");

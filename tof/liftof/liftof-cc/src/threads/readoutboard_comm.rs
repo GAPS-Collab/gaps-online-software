@@ -147,7 +147,7 @@ pub fn readoutboard_communicator(ev_to_builder       : &Sender<RBEvent>,
                 // directly to the data sink
                 match tp_to_sink.send(tp) {
                   Err(err) => error!("Can not send tof packet to data sink! Err {err}"),
-                  Ok(_)    => info!("Packet sent"),
+                  Ok(_)    => debug!("Packet sent"),
                 }
               }
             } // end match packet type
@@ -157,9 +157,9 @@ pub fn readoutboard_communicator(ev_to_builder       : &Sender<RBEvent>,
     } // end match 
     debug!("Digested {n_chunk} chunks!");
     debug!("Noticed {n_errors} errors!");
-    if n_received % 100 == 0 {
-      println!("[RBCOM] => Received {n_received} packets!");
-    }
+    //if n_received % 100000 == 0 {
+    //  println!("[RBCOM] => Received {n_received} packets!");
+    //}
   } // end loop
 } // end fun
 

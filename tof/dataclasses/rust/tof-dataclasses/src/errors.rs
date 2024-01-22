@@ -121,7 +121,8 @@ pub enum SerializationError {
   EventFragment,
   UnknownPayload,
   WrongByteSize,
-  JsonDecodingError
+  JsonDecodingError,
+  TomlDecodingError,
 }
 
 impl fmt::Display for SerializationError {

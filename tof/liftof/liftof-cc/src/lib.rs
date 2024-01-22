@@ -7,7 +7,6 @@ use zmq::Socket;
 
 #[macro_use] extern crate log;
 extern crate clap;
-extern crate json;
 extern crate colored;
 
 extern crate local_ip_address;
@@ -20,6 +19,7 @@ extern crate tof_control;
 
 pub mod constants;
 pub mod threads;
+pub mod settings;
 
 /// Power function that targets the component specified, no ID
 pub fn send_power(cmd_sender: Sender<TofPacket>,

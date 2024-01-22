@@ -14,5 +14,5 @@ compile_and_deploy_target() {
 # first delete everything, since there might be remains of a previously issued cargo check
 rm -rf ../target/x86_64-unknown-linux-musl/*
 
-compile_and_deploy_target liftof-cc tof-cpu
+compile_and_deploy_target liftof-cc nevis-tof
 

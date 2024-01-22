@@ -24,7 +24,10 @@ use tof_dataclasses::monitoring::{RBMoniData,
 
 use tof_dataclasses::events::TofEvent;
 use tof_dataclasses::serialization::Serialization;
-use tof_dataclasses::io::TofPacketWriter;
+use tof_dataclasses::io::{
+    TofPacketWriter,
+    FileType
+};
 
 /// Manages "outgoing" 0MQ PUB socket
 ///
@@ -62,10 +65,11 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
 
   let mut writer : Option<TofPacketWriter> = None;
   if write_stream {
-    let mut streamfile_name = write_stream_path + "/run_";
-    streamfile_name += &runid.to_string();
-    println!("==> Writing stream to file with prefix {}", streamfile_name);
-    writer = Some(TofPacketWriter::new(streamfile_name));
+    //let mut streamfile_name = write_stream_path + "/run_";
+    //streamfile_name += &runid.to_string();
+    let file_type = FileType::RunFile(runid as u32);
+    //println!("==> Writing stream to file with prefix {}", streamfile_name);
+    writer = Some(TofPacketWriter::new(write_stream_path, file_type));
     writer.as_mut().unwrap().pkts_per_file = write_npack_file;
   }
   //let mut event_cache = Vec::<TofPacket>::with_capacity(100); 
