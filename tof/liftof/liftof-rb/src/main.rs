@@ -8,6 +8,7 @@
 //! or to be managed by systemd
 
 //use std::collections::HashMap;
+use std::path::PathBuf;
 use std::os::raw::c_int;
 use std::process::exit;
 use std::{
@@ -65,17 +66,22 @@ use tof_dataclasses::commands::{
     //RBCommand,
     TofOperationMode
 };
+
+use tof_dataclasses::RBChannelPaddleEndIDMap;
 use tof_dataclasses::events::DataType;
 use tof_dataclasses::run::RunConfig;
+use tof_dataclasses::io::{
+    get_califilename,
+    get_runfilename
+};
 
 use liftof_lib::{
     LIFTOF_LOGO_SHOW,
     DATAPORT,
     color_log,
+    get_rb_ch_pid_map,
     RunStatistics,
     CalibrationCmd,
-    get_califilename,
-    get_runfilename,
 };
 
 use liftof_rb::threads::{
@@ -100,6 +106,10 @@ struct Args {
   /// If in this configuration one wants to take data, ONE HAS TO SUPPLY A RUNCONFIG!
   #[arg(short, long)]
   run_config: Option<std::path::PathBuf>,
+  /// Paddle map - this is only needed when the RBs 
+  /// should do waveform analysis
+  #[arg(short, long)]
+  paddle_map: Option<std::path::PathBuf>,
   /// Listen to remote input from the TOF computer at 
   /// the expected IP address
   #[arg(short, long, default_value_t = false)]
@@ -162,9 +172,6 @@ fn main() {
 
   //FIMXE - this needs to become part of clap
   let cmd_server_ip = String::from("10.0.1.1");
-  //let cmd_server_ip     = args.cmd_server_ip;  
-  //let this_board_ip = local_ip().expect("Unable to obtainl local board IP. Something is messed up!");
-
 
   // get board info 
   let rb_info = RBInfo::new();
@@ -178,8 +185,8 @@ fn main() {
   let pb_connected  = rb_info.sub_board == 2;
   // General parameters, readout board id,, 
   // ip to tof computer
-  let rb_id = rb_info.board_id;
-  let dna   = get_device_dna().expect("Unable to obtain device DNA!"); 
+  let rb_id      = rb_info.board_id;
+  let dna        = get_device_dna().expect("Unable to obtain device DNA!"); 
   let ip_address = format!("tcp://10.0.1.1{:02}:{}", rb_id, DATAPORT);
   // welcome banner!
   println!("{}", LIFTOF_LOGO_SHOW);
@@ -267,7 +274,7 @@ fn main() {
   let one_sec     = Duration::from_secs(1);  
 
   //// FIXME - this will come from future runconfig
-  let rb_mon_interv   = 5.0f32; 
+  let rb_mon_interv       = 5.0f32; 
   let mut pb_mon_every_x  = 2.0f32;
   let mut pa_mon_every_x  = 1.0f32; 
   let mut ltb_mon_every_x = 2.0f32;
@@ -346,23 +353,20 @@ fn main() {
                        run_control)
          })
          .expect("Failed to spawn runner thread!");
-  //workforce.execute(move || {
-  //    //experimental_runner(&rc_from_cmdr_c,
-  //    //                    None, 
-  //    //                    //&bs_send,
-  //    //                    &tp_to_cache,
-  //    //                    &dtf_to_evproc,
-  //    //                    &opmode_to_cache,
-  //    //                    show_progress);
-  //    runner(&rc_from_cmdr_c,
-  //           None, 
-  //           &bs_send,
-  //           &dtf_to_evproc,
-  //           &opmode_to_cache,
-  //           show_progress);
-  //});
+    
     let proc_control    = thread_control.clone();
     let ev_stats        = run_stat.clone();
+    let paddle_map      : RBChannelPaddleEndIDMap;
+    match args.paddle_map {
+      None => {
+        warn!("Did not get a paddle map! Can NOT perform waveform analysis on-board!");
+        paddle_map = RBChannelPaddleEndIDMap::new();
+      }
+      Some(pmap_path) => {
+        paddle_map      = get_rb_ch_pid_map(pmap_path, rb_info.board_id);
+      }
+    }
+
     let _ev_proc_thread = thread::Builder::new()
            .name("event-processing".into())
            .spawn(move || {
@@ -373,6 +377,7 @@ fn main() {
                                    &opmode_from_runner, 
                                    &tp_to_pub_ev,
                                    &dtf_from_runner,
+                                   paddle_map,
                                    args.verbose,
                                    calc_crc32,
                                    proc_control,
