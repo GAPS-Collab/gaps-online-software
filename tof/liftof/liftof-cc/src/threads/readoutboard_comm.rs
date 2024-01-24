@@ -72,8 +72,7 @@ pub fn readoutboard_communicator(ev_to_builder       : &Sender<RBEvent>,
     //let cal_file_path = Path::new(&rb.calib_file);//calibration_file);
     calibrations = RBCalibrations::from(cal_file_path);
   }
-  let address = build_tcp_from_ip(rb.ip_address.to_string(),
-                                       rb.port.to_string());
+  let address = rb.guess_address();
 
   // FIXME - this panics, however, if we can't set up the socket, what's 
   // the point of this thread?
@@ -94,7 +93,7 @@ pub fn readoutboard_communicator(ev_to_builder       : &Sender<RBEvent>,
   //let mut n_events   = 0usize;
   let mut n_received = 0usize;
   let map_file  = format!("{}/rb{:02}_paddle_map.json", ASSET_DIR, board_id);
-  let rb_ch_map = get_rb_ch_pid_map(map_file.into());
+  let rb_ch_map = get_rb_ch_pid_map(map_file.into(),rb.rb_id);
   loop {
 
     // check if we got new data
