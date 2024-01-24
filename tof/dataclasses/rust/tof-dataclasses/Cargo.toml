@@ -26,6 +26,7 @@ advanced-algorithms=["smoothed_z_score"]
 criterion = "0.4"
 
 [dependencies]
+chrono = "0.4"
 # logging
 log  = "0.4"
 rand = {version = "0.8", optional = true}

@@ -170,7 +170,8 @@ pub enum MasterTriggerError {
   DAQNotAvailable,
   PackageHeaderIncorrect,
   PackageFooterIncorrect,
-  FailedOperation
+  FailedOperation,
+  DataTooShort
 }
 
 impl fmt::Display for MasterTriggerError {

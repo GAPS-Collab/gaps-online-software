@@ -30,11 +30,32 @@ pub const N_CHN_PER_LTB : usize = 16;
 
 /////////////////////////////////////////////////
 
+
+/// Hold additional information about the status
+/// of the registers on the MTB
+pub struct MTBInfo {
+  pub tiu_emulation_mode : bool,
+  pub tiu_bad            : bool,
+  pub dsi_status         : [bool;5],
+  pub rb_int_window      : u32,
+  pub read_all_rbchan    : bool,
+  pub gaps_trig_en       : bool,
+  pub require_beta       : bool,
+  pub trigger_rate       : bool,
+  pub lost_trigger_rate  : bool,
+  pub inner_tof_thresh   : u32,
+  pub outer_tof_thresh   : u32,
+  pub total_tof_thresh   : u32,
+  pub any_trig_is_glob   : bool,
+  pub track_trig_is_glob : bool
+}
+
 /// MasterTrigger related mapping
 ///
 /// Caches ltb/rb relevant information 
 /// and can generate rb/ltb id lists
 #[derive(Debug, Clone)]
+#[deprecated(since="0.9.1", note="Not used and overkill")]
 pub struct MasterTriggerMapping {
   pub ltb_list : Vec<LocalTriggerBoard>,
   pub rb_list  : Vec<ReadoutBoard>,
@@ -80,7 +101,6 @@ impl MasterTriggerMapping {
     for k in 0..N_LTBS {
       debug! ("{k} -> {}", self.ltb_mapping[k]);
     }
-    //panic!("Uff");
   }
 
   /// Mapping trigger LTB board mask - LTB ids

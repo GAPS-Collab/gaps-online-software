@@ -1,5 +1,11 @@
 # HAHALUA series
 
+# v0.9.2
+* adds another eventbuilder setting
+  tofevent_time = () 
+  - only wait this amount of seconds
+  before event is sent
+
 # v0.9.1
 * switch from ThreadPool to named threads
 * reworked the settings. Introduced a .toml
