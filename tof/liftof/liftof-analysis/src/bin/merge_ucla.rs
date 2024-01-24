@@ -22,6 +22,7 @@ use tof_dataclasses::serialization::Serialization;
 use tof_dataclasses::io::{
     TofPacketReader,
     TofPacketWriter,
+    FileType,
 };
 
 #[derive(Parser, Default, Debug)]
@@ -79,8 +80,9 @@ fn main() {
     }
   }
   // here we have all our events
-  let outfile    = String::from("merged.tof.gaps");
-  let mut writer = TofPacketWriter::new(outfile);
+  let outfile    = String::from("");
+  let ftype      = FileType::RunFile(1);
+  let mut writer = TofPacketWriter::new(outfile, ftype);
   for ev in events[2].iter() {
     let mut tof_event = TofEvent::new();
     tof_event.rb_events.push(ev.clone());

@@ -29,6 +29,7 @@ use tof_dataclasses::calibrations::RBCalibrations;
 use tof_dataclasses::io::{
     RobinReader,
     TofPacketWriter,
+    FileType,
 }; 
 
 use liftof_lib::{
@@ -136,9 +137,10 @@ fn main() {
     }
     println!("=> Cali: {}",calibrations[&rb]);
     calibrations.get_mut(&rb).unwrap().serialize_event_data = true;
+    let ftype = FileType::CalibrationFile(*rb);
     let tp   = TofPacket::from(&calibrations[&rb]);
     let cali_filename = format!("rb{:02}.cali", rb);
-    let mut writer = TofPacketWriter::new(cali_filename);
+    let mut writer = TofPacketWriter::new(cali_filename,ftype);
     writer.add_tof_packet(&tp);
     println!("=> Calibration saved!");
   }

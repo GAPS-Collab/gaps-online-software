@@ -40,7 +40,8 @@ use tof_dataclasses::calibrations::RBCalibrations;
 use tof_dataclasses::io::{
     RobinReader,
     TofPacketReader,
-    TofPacketWriter
+    TofPacketWriter,
+    FileType,
 };
 use liftof_lib::{
     color_log,
@@ -220,7 +221,8 @@ fn main() {
   let mut ev_with_missing = 0;
   let mut mtp_events_tot  = 0;
 
-  let mut writer = TofPacketWriter::new(String::from("combined"));
+  let ftype      = FileType::RunFile(1); 
+  let mut writer = TofPacketWriter::new(String::from(""), ftype);
   let mut n_events = 0u64;
   if has_stream {
     for packet in packet_reader {
