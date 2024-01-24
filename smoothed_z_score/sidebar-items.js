@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["Peak"],"struct":["PeaksDetector","PeaksIter"],"trait":["PeaksFilter"]};

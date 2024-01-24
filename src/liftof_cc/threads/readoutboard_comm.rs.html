@@ -162,7 +162,6 @@
 <a href="#162" id="162">162</a>
 <a href="#163" id="163">163</a>
 <a href="#164" id="164">164</a>
-<a href="#165" id="165">165</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Routines for RB commiunication and data reception 
 
 </span><span class="comment">//use std::time::{SystemTime, UNIX_EPOCH};
@@ -237,8 +236,7 @@
     <span class="comment">//let cal_file_path = Path::new(&amp;rb.calib_file);//calibration_file);
     </span>calibrations = RBCalibrations::from(cal_file_path);
   }
-  <span class="kw">let </span>address = build_tcp_from_ip(rb.ip_address.to_string(),
-                                       rb.port.to_string());
+  <span class="kw">let </span>address = rb.guess_address();
 
   <span class="comment">// FIXME - this panics, however, if we can&#39;t set up the socket, what&#39;s 
   // the point of this thread?
@@ -259,7 +257,7 @@
   //let mut n_events   = 0usize;
   </span><span class="kw">let </span><span class="kw-2">mut </span>n_received = <span class="number">0usize</span>;
   <span class="kw">let </span>map_file  = <span class="macro">format!</span>(<span class="string">&quot;{}/rb{:02}_paddle_map.json&quot;</span>, ASSET_DIR, board_id);
-  <span class="kw">let </span>rb_ch_map = get_rb_ch_pid_map(map_file.into());
+  <span class="kw">let </span>rb_ch_map = get_rb_ch_pid_map(map_file.into(),rb.rb_id);
   <span class="kw">loop </span>{
 
     <span class="comment">// check if we got new data
@@ -312,7 +310,7 @@
                 // directly to the data sink
                 </span><span class="kw">match </span>tp_to_sink.send(tp) {
                   <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Can not send tof packet to data sink! Err {err}&quot;</span>),
-                  <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">&quot;Packet sent&quot;</span>),
+                  <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">debug!</span>(<span class="string">&quot;Packet sent&quot;</span>),
                 }
               }
             } <span class="comment">// end match packet type
@@ -322,10 +320,10 @@
     </span>} <span class="comment">// end match 
     </span><span class="macro">debug!</span>(<span class="string">&quot;Digested {n_chunk} chunks!&quot;</span>);
     <span class="macro">debug!</span>(<span class="string">&quot;Noticed {n_errors} errors!&quot;</span>);
-    <span class="kw">if </span>n_received % <span class="number">100 </span>== <span class="number">0 </span>{
-      <span class="macro">println!</span>(<span class="string">&quot;[RBCOM] =&gt; Received {n_received} packets!&quot;</span>);
-    }
-  } <span class="comment">// end loop
+    <span class="comment">//if n_received % 100000 == 0 {
+    //  println!(&quot;[RBCOM] =&gt; Received {n_received} packets!&quot;);
+    //}
+  </span>} <span class="comment">// end loop
 </span>} <span class="comment">// end fun
 
 </span></code></pre></div></section></main></body></html>

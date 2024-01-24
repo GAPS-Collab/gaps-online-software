@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['mastertriggerevent_55',['MasterTriggerEvent',['../structMasterTriggerEvent.html',1,'']]]
+  ['ltb_72',['LTB',['../structLTB.html',1,'']]],
+  ['ltbmonidata_73',['LTBMoniData',['../structLTBMoniData.html',1,'']]]
 ];

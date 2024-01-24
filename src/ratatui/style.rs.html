@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.24.0/src/style.rs`."><title>style.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.25.0/src/style.rs`."><title>style.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -626,6 +626,38 @@
 <a href="#626" id="626">626</a>
 <a href="#627" id="627">627</a>
 <a href="#628" id="628">628</a>
+<a href="#629" id="629">629</a>
+<a href="#630" id="630">630</a>
+<a href="#631" id="631">631</a>
+<a href="#632" id="632">632</a>
+<a href="#633" id="633">633</a>
+<a href="#634" id="634">634</a>
+<a href="#635" id="635">635</a>
+<a href="#636" id="636">636</a>
+<a href="#637" id="637">637</a>
+<a href="#638" id="638">638</a>
+<a href="#639" id="639">639</a>
+<a href="#640" id="640">640</a>
+<a href="#641" id="641">641</a>
+<a href="#642" id="642">642</a>
+<a href="#643" id="643">643</a>
+<a href="#644" id="644">644</a>
+<a href="#645" id="645">645</a>
+<a href="#646" id="646">646</a>
+<a href="#647" id="647">647</a>
+<a href="#648" id="648">648</a>
+<a href="#649" id="649">649</a>
+<a href="#650" id="650">650</a>
+<a href="#651" id="651">651</a>
+<a href="#652" id="652">652</a>
+<a href="#653" id="653">653</a>
+<a href="#654" id="654">654</a>
+<a href="#655" id="655">655</a>
+<a href="#656" id="656">656</a>
+<a href="#657" id="657">657</a>
+<a href="#658" id="658">658</a>
+<a href="#659" id="659">659</a>
+<a href="#660" id="660">660</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! `style` contains the primitives used to control how your user interface will look.
 //!
 //! There are two ways to set styles:
@@ -644,9 +676,9 @@
 //! use ratatui::prelude::*;
 //!
 //! let heading_style = Style::new()
-//!    .fg(Color::Black)
-//!    .bg(Color::Green)
-//!    .add_modifier(Modifier::ITALIC | Modifier::BOLD);
+//!     .fg(Color::Black)
+//!     .bg(Color::Green)
+//!     .add_modifier(Modifier::ITALIC | Modifier::BOLD);
 //! let span = Span::styled(&quot;hello&quot;, heading_style);
 //! ```
 //!
@@ -672,16 +704,24 @@
 //! use ratatui::{prelude::*, widgets::*};
 //!
 //! assert_eq!(
-//!    &quot;hello&quot;.red().on_blue().bold(),
+//!     &quot;hello&quot;.red().on_blue().bold(),
 //!     Span::styled(
 //!         &quot;hello&quot;,
-//!         Style::default().fg(Color::Red).bg(Color::Blue).add_modifier(Modifier::BOLD))
+//!         Style::default()
+//!             .fg(Color::Red)
+//!             .bg(Color::Blue)
+//!             .add_modifier(Modifier::BOLD)
+//!     )
 //! );
 //!
 //! assert_eq!(
 //!     Paragraph::new(&quot;hello&quot;).red().on_blue().bold(),
-//!     Paragraph::new(&quot;hello&quot;)
-//!         .style(Style::default().fg(Color::Red).bg(Color::Blue).add_modifier(Modifier::BOLD))
+//!     Paragraph::new(&quot;hello&quot;).style(
+//!         Style::default()
+//!             .fg(Color::Red)
+//!             .bg(Color::Blue)
+//!             .add_modifier(Modifier::BOLD)
+//!     )
 //! );
 //! ```
 //!
@@ -741,7 +781,7 @@
 <span class="doccomment">/// Style lets you control the main characteristics of the displayed elements.
 ///
 /// ```rust
-/// use ratatui::{prelude::*};
+/// use ratatui::prelude::*;
 ///
 /// Style::default()
 ///     .fg(Color::Black)
@@ -763,18 +803,24 @@
 /// just S3.
 ///
 /// ```rust
-/// use ratatui::{prelude::*};
+/// use ratatui::prelude::*;
 ///
 /// let styles = [
-///     Style::default().fg(Color::Blue).add_modifier(Modifier::BOLD | Modifier::ITALIC),
-///     Style::default().bg(Color::Red).add_modifier(Modifier::UNDERLINED),
+///     Style::default()
+///         .fg(Color::Blue)
+///         .add_modifier(Modifier::BOLD | Modifier::ITALIC),
+///     Style::default()
+///         .bg(Color::Red)
+///         .add_modifier(Modifier::UNDERLINED),
 ///     #[cfg(feature = &quot;underline-color&quot;)]
 ///     Style::default().underline_color(Color::Green),
-///     Style::default().fg(Color::Yellow).remove_modifier(Modifier::ITALIC),
+///     Style::default()
+///         .fg(Color::Yellow)
+///         .remove_modifier(Modifier::ITALIC),
 /// ];
 /// let mut buffer = Buffer::empty(Rect::new(0, 0, 1, 1));
 /// for style in &amp;styles {
-///   buffer.get_mut(0, 0).set_style(*style);
+///     buffer.get_mut(0, 0).set_style(*style);
 /// }
 /// assert_eq!(
 ///     Style {
@@ -793,15 +839,17 @@
 /// reset all properties until that point use [`Style::reset`].
 ///
 /// ```
-/// use ratatui::{prelude::*};
+/// use ratatui::prelude::*;
 ///
 /// let styles = [
-///     Style::default().fg(Color::Blue).add_modifier(Modifier::BOLD | Modifier::ITALIC),
+///     Style::default()
+///         .fg(Color::Blue)
+///         .add_modifier(Modifier::BOLD | Modifier::ITALIC),
 ///     Style::reset().fg(Color::Yellow),
 /// ];
 /// let mut buffer = Buffer::empty(Rect::new(0, 0, 1, 1));
 /// for style in &amp;styles {
-///   buffer.get_mut(0, 0).set_style(*style);
+///     buffer.get_mut(0, 0).set_style(*style);
 /// }
 /// assert_eq!(
 ///     Style {
@@ -877,6 +925,7 @@
     /// let diff = Style::default().fg(Color::Red);
     /// assert_eq!(style.patch(diff), Style::default().fg(Color::Red));
     /// ```
+    </span><span class="attr">#[must_use = <span class="string">&quot;`fg` returns the modified style without modifying the original&quot;</span>]
     </span><span class="kw">pub const fn </span>fg(<span class="kw-2">mut </span><span class="self">self</span>, color: Color) -&gt; Style {
         <span class="self">self</span>.fg = <span class="prelude-val">Some</span>(color);
         <span class="self">self
@@ -892,6 +941,7 @@
     /// let diff = Style::default().bg(Color::Red);
     /// assert_eq!(style.patch(diff), Style::default().bg(Color::Red));
     /// ```
+    </span><span class="attr">#[must_use = <span class="string">&quot;`bg` returns the modified style without modifying the original&quot;</span>]
     </span><span class="kw">pub const fn </span>bg(<span class="kw-2">mut </span><span class="self">self</span>, color: Color) -&gt; Style {
         <span class="self">self</span>.bg = <span class="prelude-val">Some</span>(color);
         <span class="self">self
@@ -911,11 +961,21 @@
     ///
     /// ```rust
     /// # use ratatui::prelude::*;
-    /// let style = Style::default().underline_color(Color::Blue).add_modifier(Modifier::UNDERLINED);
-    /// let diff = Style::default().underline_color(Color::Red).add_modifier(Modifier::UNDERLINED);
-    /// assert_eq!(style.patch(diff), Style::default().underline_color(Color::Red).add_modifier(Modifier::UNDERLINED));
+    /// let style = Style::default()
+    ///     .underline_color(Color::Blue)
+    ///     .add_modifier(Modifier::UNDERLINED);
+    /// let diff = Style::default()
+    ///     .underline_color(Color::Red)
+    ///     .add_modifier(Modifier::UNDERLINED);
+    /// assert_eq!(
+    ///     style.patch(diff),
+    ///     Style::default()
+    ///         .underline_color(Color::Red)
+    ///         .add_modifier(Modifier::UNDERLINED)
+    /// );
     /// ```
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;underline-color&quot;</span>)]
+    #[must_use = <span class="string">&quot;`underline_color` returns the modified style without modifying the original&quot;</span>]
     </span><span class="kw">pub const fn </span>underline_color(<span class="kw-2">mut </span><span class="self">self</span>, color: Color) -&gt; Style {
         <span class="self">self</span>.underline_color = <span class="prelude-val">Some</span>(color);
         <span class="self">self
@@ -935,6 +995,7 @@
     /// assert_eq!(patched.add_modifier, Modifier::BOLD | Modifier::ITALIC);
     /// assert_eq!(patched.sub_modifier, Modifier::empty());
     /// ```
+    </span><span class="attr">#[must_use = <span class="string">&quot;`add_modifier` returns the modified style without modifying the original&quot;</span>]
     </span><span class="kw">pub const fn </span>add_modifier(<span class="kw-2">mut </span><span class="self">self</span>, modifier: Modifier) -&gt; Style {
         <span class="self">self</span>.sub_modifier = <span class="self">self</span>.sub_modifier.difference(modifier);
         <span class="self">self</span>.add_modifier = <span class="self">self</span>.add_modifier.union(modifier);
@@ -955,6 +1016,7 @@
     /// assert_eq!(patched.add_modifier, Modifier::BOLD);
     /// assert_eq!(patched.sub_modifier, Modifier::ITALIC);
     /// ```
+    </span><span class="attr">#[must_use = <span class="string">&quot;`remove_modifier` returns the modified style without modifying the original&quot;</span>]
     </span><span class="kw">pub const fn </span>remove_modifier(<span class="kw-2">mut </span><span class="self">self</span>, modifier: Modifier) -&gt; Style {
         <span class="self">self</span>.add_modifier = <span class="self">self</span>.add_modifier.difference(modifier);
         <span class="self">self</span>.sub_modifier = <span class="self">self</span>.sub_modifier.union(modifier);
@@ -972,8 +1034,10 @@
     /// let combined = style_1.patch(style_2);
     /// assert_eq!(
     ///     Style::default().patch(style_1).patch(style_2),
-    ///     Style::default().patch(combined));
+    ///     Style::default().patch(combined)
+    /// );
     /// ```
+    </span><span class="attr">#[must_use = <span class="string">&quot;`patch` returns the modified style without modifying the original&quot;</span>]
     </span><span class="kw">pub fn </span>patch(<span class="kw-2">mut </span><span class="self">self</span>, other: Style) -&gt; Style {
         <span class="self">self</span>.fg = other.fg.or(<span class="self">self</span>.fg);
         <span class="self">self</span>.bg = other.bg.or(<span class="self">self</span>.bg);

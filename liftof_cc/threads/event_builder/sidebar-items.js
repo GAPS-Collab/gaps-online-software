@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["event_builder"],"struct":["TofEventBuilderSettings"]};
+window.SIDEBAR_ITEMS = {"fn":["event_builder"]};

@@ -845,6 +845,18 @@
 <a href="#845" id="845">845</a>
 <a href="#846" id="846">846</a>
 <a href="#847" id="847">847</a>
+<a href="#848" id="848">848</a>
+<a href="#849" id="849">849</a>
+<a href="#850" id="850">850</a>
+<a href="#851" id="851">851</a>
+<a href="#852" id="852">852</a>
+<a href="#853" id="853">853</a>
+<a href="#854" id="854">854</a>
+<a href="#855" id="855">855</a>
+<a href="#856" id="856">856</a>
+<a href="#857" id="857">857</a>
+<a href="#858" id="858">858</a>
+<a href="#859" id="859">859</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! MasterTriggerBoard communications
 //!
 //! The MTB (MasterTriggerBoard) is currently
@@ -866,7 +878,10 @@
 <span class="kw">use </span>std::io;
 <span class="kw">use </span>std::collections::HashMap;
 <span class="kw">use </span>std::collections::VecDeque;
-<span class="kw">use </span>std::net::{UdpSocket, SocketAddr};
+<span class="kw">use </span>std::net::{
+    UdpSocket,
+    SocketAddr
+};
 <span class="kw">use </span>std::thread;
 <span class="kw">use </span>crossbeam_channel::Sender;
 <span class="kw">use </span>colored::Colorize;
@@ -881,9 +896,10 @@
 
 <span class="kw">const </span>MT_MAX_PACKSIZE   : usize = <span class="number">1024</span>;
 
-<span class="kw">const </span>N_LTBS : usize = <span class="number">20</span>;
-<span class="kw">const </span>N_CHN_PER_LTB : usize = <span class="number">16</span>;
-
+<span class="kw">use </span>tof_dataclasses::events::master_trigger::{
+    N_LTBS,
+    N_CHN_PER_LTB,
+};
 
 <span class="doccomment">/// The IPBus standard encodes several packet types.
 ///
@@ -1113,6 +1129,10 @@
     <span class="kw">return </span><span class="prelude-val">Err</span>(MasterTriggerError::PackageHeaderIncorrect);
   }
   <span class="kw">let </span>foot_pos = (n_daq_words - <span class="number">1</span>) <span class="kw">as </span>usize;
+  <span class="kw">if </span>data.len() &lt;= foot_pos {
+    <span class="macro">error!</span>(<span class="string">&quot;Got MTB data, but the format is not correct&quot;</span>);
+    <span class="kw">return </span><span class="prelude-val">Err</span>(MasterTriggerError::PackageHeaderIncorrect);
+  }
   <span class="kw">if </span>data[foot_pos] != <span class="number">0x55555555 </span>{
     <span class="macro">error!</span>(<span class="string">&quot;Got MTB data, but the footer is incorrect {}&quot;</span>, data[foot_pos]);
     <span class="kw">return </span><span class="prelude-val">Err</span>(MasterTriggerError::PackageFooterIncorrect);
@@ -1148,6 +1168,7 @@
       }
     }
   }
+  mte.n_paddles = mte.get_hit_paddles(); 
   <span class="prelude-val">Ok</span>(mte)
 }
 
@@ -1164,8 +1185,8 @@
 ///
 </span><span class="kw">pub fn </span>connect_to_mtb(mt_address : <span class="kw-2">&amp;</span>String) 
   -&gt;io::Result&lt;UdpSocket&gt; {
-  <span class="kw">let </span>local_port = <span class="string">&quot;0.0.0.0:50100&quot;</span>;
-  <span class="kw">let </span>local_addrs = [
+  <span class="comment">// provide a number of local ports to try
+  </span><span class="kw">let </span>local_addrs = [
     SocketAddr::from(([<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>], <span class="number">50100</span>)),
     SocketAddr::from(([<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>], <span class="number">50101</span>)),
     SocketAddr::from(([<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>], <span class="number">50102</span>)),
@@ -1176,11 +1197,11 @@
   <span class="kw">let </span>socket : UdpSocket;
   <span class="kw">match </span>local_socket {
     <span class="prelude-val">Err</span>(err)   =&gt; {
-      <span class="macro">error!</span>(<span class="string">&quot;Can not create local UDP port for master trigger connection at {}!, err {}&quot;</span>, local_port, err);
+      <span class="macro">error!</span>(<span class="string">&quot;Can not create local UDP socket for master trigger connection!, err {}&quot;</span>, err);
       <span class="kw">return </span><span class="prelude-val">Err</span>(err);
     }
     <span class="prelude-val">Ok</span>(value)  =&gt; {
-      <span class="macro">info!</span>(<span class="string">&quot;Successfully bound UDP socket for master trigger communcations to {}&quot;</span>, local_port);
+      <span class="macro">info!</span>(<span class="string">&quot;Successfully bound UDP socket for master trigger communcations to {:?}&quot;</span>, value);
       socket = value;
       <span class="comment">// this is not strrictly necessary, but 
       // it is nice to limit communications
@@ -1215,6 +1236,9 @@
                                         buffer,
                                         IPBusPacketType::Read,
                                         <span class="number">4</span>)<span class="question-mark">?</span>;
+  <span class="kw">if </span>data.len() &lt; <span class="number">4 </span>{
+    <span class="kw">return </span><span class="prelude-val">Err</span>(MasterTriggerError::BrokenPackage);
+  }
   <span class="kw">let </span>first_word   = <span class="number">0x00000fff</span>;
   <span class="kw">let </span>second_word  = <span class="number">0x0fff0000</span>;
   <span class="comment">//println!(&quot;{:?} data&quot;, data);
@@ -1226,6 +1250,7 @@
   moni.vccint      = ((data[<span class="number">2</span>] &amp; second_word ) &gt;&gt; <span class="number">16</span>) <span class="kw">as </span>u16;  
   moni.vccaux      = ( data[<span class="number">3</span>] &amp; first_word  ) <span class="kw">as </span>u16;  
   moni.vccbram     = ((data[<span class="number">3</span>] &amp; second_word ) &gt;&gt; <span class="number">16</span>) <span class="kw">as </span>u16;  
+  
   <span class="kw">let </span>rate         = read_register_multiple(socket, 
                                             <span class="comment">//target_address,
                                             </span><span class="number">0x17</span>,
@@ -1252,9 +1277,7 @@
 ///
 /// # Arguments
 ///
-/// * mt_ip       : ip address of the master trigger, most likely 
-///                 something like 10.0.1.10
-/// * mt_port     : 
+/// * mt_address        : Udp address of the MasterTriggerBoard
 ///
 /// * dsi_j_mapping     : A DsiLtbRBMapping containing mapping 
 ///                       information for DSI/J/CH (LTB) -&gt; RBID/RBCH (RB)
@@ -1273,8 +1296,7 @@
 /// * send_requests     : Send RBCommand instances with event 
 ///                       requests in TofPackets to the 
 ///                       rb_reqeust_tp Sender
-</span><span class="kw">pub fn </span>master_trigger(mt_ip             : <span class="kw-2">&amp;</span>str, 
-                      mt_port           : usize,
+</span><span class="kw">pub fn </span>master_trigger(mt_address        : String,
                       dsi_j_mapping     : <span class="kw-2">&amp;</span>DsiLtbRBMapping,
                       mt_sender         : <span class="kw-2">&amp;</span>Sender&lt;MasterTriggerEvent&gt;,
                       rb_request_tp     : <span class="kw-2">&amp;</span>Sender&lt;TofPacket&gt;,
@@ -1283,8 +1305,6 @@
                       mtb_timeout_sec   : u64,
                       verbose           : bool,
                       send_requests     : bool) {
-
-  <span class="kw">let </span>mt_address = mt_ip.to_owned() + <span class="string">&quot;:&quot; </span>+ <span class="kw-2">&amp;</span>mt_port.to_string(); 
 
   <span class="comment">// data buffer for MTB readout - allocate once and reuse
   </span><span class="kw">let </span><span class="kw-2">mut </span>buffer = [<span class="number">0u8</span>;MT_MAX_PACKSIZE];  
@@ -1542,6 +1562,10 @@
   <span class="kw">if </span>data.len() == <span class="number">0 </span>{ 
     <span class="macro">error!</span>(<span class="string">&quot;Empty data!&quot;</span>);
     <span class="kw">return </span><span class="prelude-val">Err</span>(Box::new(IPBusError::DecodingFailed));
+  }
+  <span class="kw">if </span>data.len() != nwords {
+    <span class="macro">error!</span>(<span class="string">&quot;Data too short!&quot;</span>);
+    <span class="kw">return </span><span class="prelude-val">Err</span>(Box::new(MasterTriggerError::DataTooShort));
   }
   <span class="comment">// this supports up to 100 Hz
   </span><span class="prelude-val">Ok</span>(data)

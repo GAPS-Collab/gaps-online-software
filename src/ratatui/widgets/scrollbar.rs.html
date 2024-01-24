@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.24.0/src/widgets/scrollbar.rs`."><title>scrollbar.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.25.0/src/widgets/scrollbar.rs`."><title>scrollbar.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1002,6 +1002,27 @@
 <a href="#1002" id="1002">1002</a>
 <a href="#1003" id="1003">1003</a>
 <a href="#1004" id="1004">1004</a>
+<a href="#1005" id="1005">1005</a>
+<a href="#1006" id="1006">1006</a>
+<a href="#1007" id="1007">1007</a>
+<a href="#1008" id="1008">1008</a>
+<a href="#1009" id="1009">1009</a>
+<a href="#1010" id="1010">1010</a>
+<a href="#1011" id="1011">1011</a>
+<a href="#1012" id="1012">1012</a>
+<a href="#1013" id="1013">1013</a>
+<a href="#1014" id="1014">1014</a>
+<a href="#1015" id="1015">1015</a>
+<a href="#1016" id="1016">1016</a>
+<a href="#1017" id="1017">1017</a>
+<a href="#1018" id="1018">1018</a>
+<a href="#1019" id="1019">1019</a>
+<a href="#1020" id="1020">1020</a>
+<a href="#1021" id="1021">1021</a>
+<a href="#1022" id="1022">1022</a>
+<a href="#1023" id="1023">1023</a>
+<a href="#1024" id="1024">1024</a>
+<a href="#1025" id="1025">1025</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>strum::{Display, EnumString};
 
 <span class="kw">use </span><span class="kw">super</span>::StatefulWidget;
@@ -1066,18 +1087,21 @@
         }
     }
     <span class="doccomment">/// Sets the scroll position of the scrollbar and returns the modified ScrollbarState.
+    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
     </span><span class="kw">pub fn </span>position(<span class="kw-2">mut </span><span class="self">self</span>, position: usize) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.position = position;
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Sets the length of the scrollable content and returns the modified ScrollbarState.
+    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
     </span><span class="kw">pub fn </span>content_length(<span class="kw-2">mut </span><span class="self">self</span>, content_length: usize) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.content_length = content_length;
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Sets the length of the viewport content and returns the modified ScrollbarState.
+    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
     </span><span class="kw">pub fn </span>viewport_content_length(<span class="kw-2">mut </span><span class="self">self</span>, viewport_content_length: usize) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.viewport_content_length = viewport_content_length;
         <span class="self">self
@@ -1151,7 +1175,11 @@
 ///
 /// let vertical_scroll = 0; // from app state
 ///
-/// let items = vec![Line::from(&quot;Item 1&quot;), Line::from(&quot;Item 2&quot;), Line::from(&quot;Item 3&quot;)];
+/// let items = vec![
+///     Line::from(&quot;Item 1&quot;),
+///     Line::from(&quot;Item 2&quot;),
+///     Line::from(&quot;Item 3&quot;),
+/// ];
 /// let paragraph = Paragraph::new(items.clone())
 ///     .scroll((vertical_scroll as u16, 0))
 ///     .block(Block::new().borders(Borders::RIGHT)); // to show a background for the scrollbar
@@ -1164,12 +1192,14 @@
 ///
 /// let area = frame.size();
 /// frame.render_widget(paragraph, area);
-/// frame.render_stateful_widget(scrollbar,
+/// frame.render_stateful_widget(
+///     scrollbar,
 ///     area.inner(&amp;Margin {
 ///         vertical: 1,
 ///         horizontal: 0,
 ///     }), // using a inner vertical margin of 1 unit makes the scrollbar inside the block
-///    &amp;mut scrollbar_state);
+///     &amp;mut scrollbar_state,
+/// );
 /// # }
 /// ```
 </span><span class="attr">#[derive(Debug, Clone, Eq, PartialEq, Hash)]
@@ -1208,6 +1238,7 @@
 
     <span class="doccomment">/// Sets the orientation of the scrollbar.
     /// Resets the symbols to [`DOUBLE_VERTICAL`] or [`DOUBLE_HORIZONTAL`] based on orientation
+    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
     </span><span class="kw">pub fn </span>orientation(<span class="kw-2">mut </span><span class="self">self</span>, orientation: ScrollbarOrientation) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.orientation = orientation;
         <span class="kw">let </span>set = <span class="kw">if </span><span class="self">self</span>.is_vertical() {
@@ -1219,54 +1250,63 @@
     }
 
     <span class="doccomment">/// Sets the orientation and symbols for the scrollbar from a [`Set`].
+    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
     </span><span class="kw">pub fn </span>orientation_and_symbol(<span class="kw-2">mut </span><span class="self">self</span>, orientation: ScrollbarOrientation, set: Set) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.orientation = orientation;
         <span class="self">self</span>.symbols(set)
     }
 
     <span class="doccomment">/// Sets the symbol that represents the thumb of the scrollbar.
+    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
     </span><span class="kw">pub fn </span>thumb_symbol(<span class="kw-2">mut </span><span class="self">self</span>, thumb_symbol: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.thumb_symbol = thumb_symbol;
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Sets the style that represents the thumb of the scrollbar.
+    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
     </span><span class="kw">pub fn </span>thumb_style(<span class="kw-2">mut </span><span class="self">self</span>, thumb_style: Style) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.thumb_style = thumb_style;
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Sets the symbol that represents the track of the scrollbar.
+    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
     </span><span class="kw">pub fn </span>track_symbol(<span class="kw-2">mut </span><span class="self">self</span>, track_symbol: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.track_symbol = track_symbol;
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Sets the style that is used for the track of the scrollbar.
+    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
     </span><span class="kw">pub fn </span>track_style(<span class="kw-2">mut </span><span class="self">self</span>, track_style: Style) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.track_style = track_style;
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Sets the symbol that represents the beginning of the scrollbar.
+    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
     </span><span class="kw">pub fn </span>begin_symbol(<span class="kw-2">mut </span><span class="self">self</span>, begin_symbol: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.begin_symbol = begin_symbol;
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Sets the style that is used for the beginning of the scrollbar.
+    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
     </span><span class="kw">pub fn </span>begin_style(<span class="kw-2">mut </span><span class="self">self</span>, begin_style: Style) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.begin_style = begin_style;
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Sets the symbol that represents the end of the scrollbar.
+    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
     </span><span class="kw">pub fn </span>end_symbol(<span class="kw-2">mut </span><span class="self">self</span>, end_symbol: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.end_symbol = end_symbol;
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Sets the style that is used for the end of the scrollbar.
+    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
     </span><span class="kw">pub fn </span>end_style(<span class="kw-2">mut </span><span class="self">self</span>, end_style: Style) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.end_style = end_style;
         <span class="self">self
@@ -1285,6 +1325,7 @@
     ///
     /// Only sets begin_symbol, end_symbol and track_symbol if they already contain a value.
     /// If they were set to `None` explicitly, this function will respect that choice.
+    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
     </span><span class="kw">pub fn </span>symbols(<span class="kw-2">mut </span><span class="self">self</span>, symbol: Set) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.thumb_symbol = symbol.thumb;
         <span class="kw">if </span><span class="self">self</span>.track_symbol.is_some() {
@@ -1308,6 +1349,7 @@
     /// │  └──────── thumb
     /// └─────────── begin
     /// ```
+    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
     </span><span class="kw">pub fn </span>style(<span class="kw-2">mut </span><span class="self">self</span>, style: Style) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.track_style = style;
         <span class="self">self</span>.thumb_style = style;

@@ -490,9 +490,10 @@
     PBMoniData,
     LTBMoniData,
     PAMoniData,
-    TofCmpMoniData,
-    MtbMoniData
+    MtbMoniData,
+    CPUMoniData
 };
+
 <span class="kw">use </span><span class="kw">crate</span>::serialization::{
     Serialization, 
     parse_u8,
@@ -553,8 +554,8 @@
   /// FIXME - future extension
   </span><span class="kw">pub </span>no_send_over_nw    : bool,
   <span class="doccomment">/// creation_time for the instance
-  </span><span class="kw">pub </span>creation_time      : Instant,
-  <span class="kw">pub </span>valid              : bool, <span class="comment">// will be always valid, unless invalidated
+  </span><span class="kw">pub </span>creation_time    : Instant,
+  <span class="kw">pub </span>valid            : bool, <span class="comment">// will be always valid, unless invalidated
 </span>}
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>TofPacket {
@@ -682,6 +683,15 @@
   }
 }
 
+<span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>CPUMoniData&gt; <span class="kw">for </span>TofPacket {
+  <span class="kw">fn </span>from(moni : <span class="kw-2">&amp;</span>CPUMoniData) -&gt; <span class="self">Self </span>{
+    <span class="kw">let </span><span class="kw-2">mut </span>tp = <span class="self">Self</span>::new();
+    tp.packet_type = PacketType::CPUMoniData;
+    tp.payload     = moni.to_bytestream();
+    tp
+  }
+}
+
 <span class="kw">impl </span>From&lt;<span class="kw-2">&amp;mut </span>RBCalibrations&gt; <span class="kw">for </span>TofPacket {
   <span class="kw">fn </span>from(calib : <span class="kw-2">&amp;mut </span>RBCalibrations) -&gt; <span class="self">Self </span>{
     <span class="kw">let </span><span class="kw-2">mut </span>tp = <span class="self">Self</span>::new();
@@ -753,16 +763,6 @@
     tp
   }
 }
-
-<span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>TofCmpMoniData&gt; <span class="kw">for </span>TofPacket {
-  <span class="kw">fn </span>from(moni : <span class="kw-2">&amp;</span>TofCmpMoniData) -&gt; TofPacket {
-    <span class="kw">let </span><span class="kw-2">mut </span>tp = TofPacket::new();
-    tp.packet_type = PacketType::MonitorTofCmp;
-    tp.payload = moni.to_bytestream();
-    tp
-  }
-}
-
 
 <span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>RBEventHeader&gt; <span class="kw">for </span>TofPacket {
   <span class="kw">fn </span>from(ev_header : <span class="kw-2">&amp;</span>RBEventHeader) -&gt; TofPacket {

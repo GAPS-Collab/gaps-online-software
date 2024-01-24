@@ -16,8 +16,6 @@ var namespaceGaps =
     [ "set_loglevel", "namespaceGaps.html#a212013efcb580c37612821937fa4ff8d", null ],
     [ "severity_to_str", "namespaceGaps.html#a63983ede070cd10b4e310de973772319", null ],
     [ "slice", "namespaceGaps.html#a22fc40b41968b7d4462f0c11ac07b53f", null ],
-    [ "u16_from_le_bytes", "namespaceGaps.html#ad39068d83173e5806ad5f91ea5dc4222", null ],
-    [ "u16_to_le_bytes", "namespaceGaps.html#aed18915f379b51e6bd45c7beaebe9152", null ],
     [ "u32_from_be_bytes", "namespaceGaps.html#a2b7380cce1160bf677b6db59f2f73708", null ],
     [ "u32_from_le_bytes", "namespaceGaps.html#a080f0ddfc1acdfd20d34ee1a05dc94ea", null ],
     [ "u32_to_le_bytes", "namespaceGaps.html#a408dcd7e14dffcc0e3b239335bbaffb3", null ],

@@ -108,6 +108,8 @@
 <a href="#108" id="108">108</a>
 <a href="#109" id="109">109</a>
 <a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
 </pre></div><pre class="rust"><code><span class="attr">#[macro_use] </span><span class="kw">extern crate </span>log;
 <span class="kw">extern crate </span>env_logger;
 <span class="kw">extern crate </span>glob;
@@ -132,6 +134,7 @@
 <span class="kw">use </span>tof_dataclasses::io::{
     TofPacketReader,
     TofPacketWriter,
+    FileType,
 };
 
 <span class="attr">#[derive(Parser, Default, Debug)]
@@ -189,8 +192,9 @@
     }
   }
   <span class="comment">// here we have all our events
-  </span><span class="kw">let </span>outfile    = String::from(<span class="string">&quot;merged.tof.gaps&quot;</span>);
-  <span class="kw">let </span><span class="kw-2">mut </span>writer = TofPacketWriter::new(outfile);
+  </span><span class="kw">let </span>outfile    = String::from(<span class="string">&quot;&quot;</span>);
+  <span class="kw">let </span>ftype      = FileType::RunFile(<span class="number">1</span>);
+  <span class="kw">let </span><span class="kw-2">mut </span>writer = TofPacketWriter::new(outfile, ftype);
   <span class="kw">for </span>ev <span class="kw">in </span>events[<span class="number">2</span>].iter() {
     <span class="kw">let </span><span class="kw-2">mut </span>tof_event = TofEvent::new();
     tof_event.rb_events.push(ev.clone());

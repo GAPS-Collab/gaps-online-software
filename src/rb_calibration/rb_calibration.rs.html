@@ -130,6 +130,9 @@
 <a href="#130" id="130">130</a>
 <a href="#131" id="131">131</a>
 <a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::process::exit;
 <span class="kw">use </span>clap::Parser;
 <span class="attr">#[macro_use] </span><span class="kw">extern crate </span>log;
@@ -147,6 +150,7 @@
 <span class="kw">use </span>tof_dataclasses::io::{
     TofPacketReader,
     TofPacketWriter,
+    FileType,
 };
 <span class="attr">#[derive(Parser, Default, Debug)]
 #[command(author = <span class="string">&quot;J.A.Stoessl&quot;</span>, version, about, long_about = <span class="prelude-val">None</span>)]
@@ -203,7 +207,8 @@
             }
             outfile += <span class="kw-2">&amp;</span>rb_id.to_string();
             outfile += <span class="string">&quot;.cali&quot;</span>;
-            <span class="kw">let </span><span class="kw-2">mut </span>writer  = TofPacketWriter::new(outfile);
+            <span class="kw">let </span>ftype = FileType::CalibrationFile(rb_id);
+            <span class="kw">let </span><span class="kw-2">mut </span>writer  = TofPacketWriter::new(outfile, ftype);
             <span class="kw">let </span>pack        = TofPacket::from(<span class="kw-2">&amp;</span>cali);
             writer.add_tof_packet(<span class="kw-2">&amp;</span>pack);
             <span class="macro">println!</span>(<span class="string">&quot;=&gt; Done, exciting!&quot;</span>);
@@ -258,7 +263,8 @@
     },
     <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; ()
   }
-  <span class="kw">let </span><span class="kw-2">mut </span>writer = TofPacketWriter::new(<span class="string">&quot;rb27.cali.tof.gaps&quot;</span>.to_string());
+  <span class="kw">let </span>ftype = FileType::CalibrationFile(cali.rb_id);
+  <span class="kw">let </span><span class="kw-2">mut </span>writer = TofPacketWriter::new(<span class="string">&quot;&quot;</span>.to_string(), ftype);
   <span class="kw">let </span>pack       = TofPacket::from(<span class="kw-2">&amp;</span>cali);
   writer.add_tof_packet(<span class="kw-2">&amp;</span>pack);
 }

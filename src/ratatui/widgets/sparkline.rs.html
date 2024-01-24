@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.24.0/src/widgets/sparkline.rs`."><title>sparkline.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.25.0/src/widgets/sparkline.rs`."><title>sparkline.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -267,7 +267,60 @@
 <a href="#267" id="267">267</a>
 <a href="#268" id="268">268</a>
 <a href="#269" id="269">269</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>std::cmp::min;
+<a href="#270" id="270">270</a>
+<a href="#271" id="271">271</a>
+<a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
+<a href="#276" id="276">276</a>
+<a href="#277" id="277">277</a>
+<a href="#278" id="278">278</a>
+<a href="#279" id="279">279</a>
+<a href="#280" id="280">280</a>
+<a href="#281" id="281">281</a>
+<a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
+<a href="#284" id="284">284</a>
+<a href="#285" id="285">285</a>
+<a href="#286" id="286">286</a>
+<a href="#287" id="287">287</a>
+<a href="#288" id="288">288</a>
+<a href="#289" id="289">289</a>
+<a href="#290" id="290">290</a>
+<a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
+<a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
+<a href="#295" id="295">295</a>
+<a href="#296" id="296">296</a>
+<a href="#297" id="297">297</a>
+<a href="#298" id="298">298</a>
+<a href="#299" id="299">299</a>
+<a href="#300" id="300">300</a>
+<a href="#301" id="301">301</a>
+<a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
+<a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+</pre></div><pre class="rust"><code><span class="attr">#![warn(missing_docs)]
+</span><span class="kw">use </span>std::cmp::min;
 
 <span class="kw">use </span>strum::{Display, EnumString};
 
@@ -281,6 +334,18 @@
 
 <span class="doccomment">/// Widget to render a sparkline over one or more lines.
 ///
+/// You can create a `Sparkline` using [`Sparkline::default`].
+///
+/// `Sparkline` can be styled either using [`Sparkline::style`] or preferably using the methods
+/// provided by the [`Stylize`](crate::style::Stylize) trait.
+///
+/// # Setter methods
+///
+/// - [`Sparkline::block`] wraps the sparkline in a [`Block`]
+/// - [`Sparkline::data`] defines the dataset, you&#39;ll almost always want to use it
+/// - [`Sparkline::max`] sets the maximum value of bars
+/// - [`Sparkline::direction`] sets the render direction
+///
 /// # Examples
 ///
 /// ```
@@ -290,7 +355,8 @@
 ///     .block(Block::default().title(&quot;Sparkline&quot;).borders(Borders::ALL))
 ///     .data(&amp;[0, 2, 3, 4, 1, 4, 10])
 ///     .max(5)
-///     .style(Style::default().fg(Color::Red).bg(Color::White));
+///     .direction(RenderDirection::RightToLeft)
+///     .style(Style::default().red().on_white());
 /// ```
 </span><span class="attr">#[derive(Debug, Clone, Eq, PartialEq)]
 </span><span class="kw">pub struct </span>Sparkline&lt;<span class="lifetime">&#39;a</span>&gt; {
@@ -309,11 +375,16 @@
     </span>direction: RenderDirection,
 }
 
-<span class="attr">#[derive(Debug, Default, Display, EnumString, Clone, Copy, Eq, PartialEq, Hash)]
+<span class="doccomment">/// Defines the direction in which sparkline will be rendered.
+///
+/// See [`Sparkline::direction`].
+</span><span class="attr">#[derive(Debug, Default, Display, EnumString, Clone, Copy, Eq, PartialEq, Hash)]
 </span><span class="kw">pub enum </span>RenderDirection {
-    <span class="attr">#[default]
+    <span class="doccomment">/// The first value is on the left, going to the right
+    </span><span class="attr">#[default]
     </span>LeftToRight,
-    RightToLeft,
+    <span class="doccomment">/// The first value is on the right, going to the left
+    </span>RightToLeft,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Default <span class="kw">for </span>Sparkline&lt;<span class="lifetime">&#39;a</span>&gt; {
@@ -330,32 +401,65 @@
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Sparkline&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">pub fn </span>block(<span class="kw-2">mut </span><span class="self">self</span>, block: Block&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; Sparkline&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Wraps the sparkline with the given `block`.
+    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
+    </span><span class="kw">pub fn </span>block(<span class="kw-2">mut </span><span class="self">self</span>, block: Block&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; Sparkline&lt;<span class="lifetime">&#39;a</span>&gt; {
         <span class="self">self</span>.block = <span class="prelude-val">Some</span>(block);
         <span class="self">self
     </span>}
 
-    <span class="kw">pub fn </span>style(<span class="kw-2">mut </span><span class="self">self</span>, style: Style) -&gt; Sparkline&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Sets the style of the entire widget.
+    ///
+    /// The foreground corresponds to the bars while the background is everything else.
+    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
+    </span><span class="kw">pub fn </span>style(<span class="kw-2">mut </span><span class="self">self</span>, style: Style) -&gt; Sparkline&lt;<span class="lifetime">&#39;a</span>&gt; {
         <span class="self">self</span>.style = style;
         <span class="self">self
     </span>}
 
-    <span class="kw">pub fn </span>data(<span class="kw-2">mut </span><span class="self">self</span>, data: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u64]) -&gt; Sparkline&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Sets the dataset for the sparkline.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use ratatui::{prelude::*, widgets::*};
+    /// # fn ui(frame: &amp;mut Frame) {
+    /// # let area = Rect::default();
+    /// let sparkline = Sparkline::default().data(&amp;[1, 2, 3]);
+    /// frame.render_widget(sparkline, area);
+    /// # }
+    /// ```
+    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
+    </span><span class="kw">pub fn </span>data(<span class="kw-2">mut </span><span class="self">self</span>, data: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u64]) -&gt; Sparkline&lt;<span class="lifetime">&#39;a</span>&gt; {
         <span class="self">self</span>.data = data;
         <span class="self">self
     </span>}
 
-    <span class="kw">pub fn </span>max(<span class="kw-2">mut </span><span class="self">self</span>, max: u64) -&gt; Sparkline&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Sets the maximum value of bars.
+    ///
+    /// Every bar will be scaled accordingly. If no max is given, this will be the max in the
+    /// dataset.
+    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
+    </span><span class="kw">pub fn </span>max(<span class="kw-2">mut </span><span class="self">self</span>, max: u64) -&gt; Sparkline&lt;<span class="lifetime">&#39;a</span>&gt; {
         <span class="self">self</span>.max = <span class="prelude-val">Some</span>(max);
         <span class="self">self
     </span>}
 
-    <span class="kw">pub fn </span>bar_set(<span class="kw-2">mut </span><span class="self">self</span>, bar_set: symbols::bar::Set) -&gt; Sparkline&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Sets the characters used to display the bars.
+    ///
+    /// Can be [`symbols::bar::THREE_LEVELS`], [`symbols::bar::NINE_LEVELS`] (default) or a custom
+    /// [`Set`](symbols::bar::Set).
+    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
+    </span><span class="kw">pub fn </span>bar_set(<span class="kw-2">mut </span><span class="self">self</span>, bar_set: symbols::bar::Set) -&gt; Sparkline&lt;<span class="lifetime">&#39;a</span>&gt; {
         <span class="self">self</span>.bar_set = bar_set;
         <span class="self">self
     </span>}
 
-    <span class="kw">pub fn </span>direction(<span class="kw-2">mut </span><span class="self">self</span>, direction: RenderDirection) -&gt; Sparkline&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Sets the direction of the sparkline.
+    ///
+    /// [`RenderDirection::LeftToRight`] by default.
+    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
+    </span><span class="kw">pub fn </span>direction(<span class="kw-2">mut </span><span class="self">self</span>, direction: RenderDirection) -&gt; Sparkline&lt;<span class="lifetime">&#39;a</span>&gt; {
         <span class="self">self</span>.direction = direction;
         <span class="self">self
     </span>}

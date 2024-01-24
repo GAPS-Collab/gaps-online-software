@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["Alignment","Constraint","Corner","Direction"],"struct":["Layout","Margin","Rect","Size"]};
+window.SIDEBAR_ITEMS = {"enum":["Alignment","Constraint","Corner","Direction"],"struct":["Layout","Margin","Offset","Rect","Size"]};

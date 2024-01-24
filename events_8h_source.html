@@ -28,7 +28,7 @@
   <td id="projectlogo"><img alt="Logo" src="GAPSLOGO_2023_ico.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">gaps-online-software
-   &#160;<span id="projectnumber">0.8</span>
+   &#160;<span id="projectnumber">0.9</span>
    </div>
    <div id="projectbrief">online software for the TOF system for the GAPS experiment</div>
   </td>
@@ -331,7 +331,7 @@ $(document).ready(function(){initNavTree('events_8h_source.html',''); initResiza
 <div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u16 HEAD = 0xAAAA;</div>
 <div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u16 TAIL = 0x5555;</div>
 <div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160; </div>
-<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;  TofEventHeader header;</div>
+<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;  <a class="code" href="structTofEventHeader.html">TofEventHeader</a> header;</div>
 <div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;  <a class="code" href="structMasterTriggerEvent.html">MasterTriggerEvent</a> mt_event;</div>
 <div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160; </div>
 <div class="line"><a name="l00378"></a><span class="lineno"><a class="line" href="structTofEvent.html#a577628b0f2d6beacc40f6bad1adc135a">  378</a></span>&#160;  Vec&lt;RBEvent&gt;      <a class="code" href="structTofEvent.html#a577628b0f2d6beacc40f6bad1adc135a">rb_events</a>;</div>
@@ -341,7 +341,7 @@ $(document).ready(function(){initNavTree('events_8h_source.html',''); initResiza
 <div class="line"><a name="l00396"></a><span class="lineno"><a class="line" href="structTofEvent.html#ac62d2f3b9db6a01c93cfa7f76ad30451">  396</a></span>&#160;  <span class="keyword">static</span> <a class="code" href="structTofEvent.html">TofEvent</a> <a class="code" href="structTofEvent.html#ac62d2f3b9db6a01c93cfa7f76ad30451">from_bytestream</a>(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;bytestream,</div>
 <div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;                                  u64 &amp;pos);</div>
 <div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160; </div>
-<div class="line"><a name="l00410"></a><span class="lineno"><a class="line" href="structTofEvent.html#a42760fc8fa3384f7ff5676875dea6e77">  410</a></span>&#160;  <span class="keyword">static</span> <a class="code" href="structTofEvent.html">TofEvent</a> <a class="code" href="structTofEvent.html#a42760fc8fa3384f7ff5676875dea6e77">from_tofpacket</a>(<span class="keyword">const</span> TofPacket &amp;packet);</div>
+<div class="line"><a name="l00410"></a><span class="lineno"><a class="line" href="structTofEvent.html#a42760fc8fa3384f7ff5676875dea6e77">  410</a></span>&#160;  <span class="keyword">static</span> <a class="code" href="structTofEvent.html">TofEvent</a> <a class="code" href="structTofEvent.html#a42760fc8fa3384f7ff5676875dea6e77">from_tofpacket</a>(<span class="keyword">const</span> <a class="code" href="structTofPacket.html">TofPacket</a> &amp;packet);</div>
 <div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160; </div>
 <div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;  <span class="keyword">static</span> u32 get_n_rbmissinghits(u32 mask);</div>
 <div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;  <span class="keyword">static</span> u32 get_n_rbevents(u32 mask);</div>
@@ -448,6 +448,7 @@ $(document).ready(function(){initNavTree('events_8h_source.html',''); initResiza
 <div class="ttc" id="astructRBEventMemoryView_html_a9d21fcd750ff7629b1648691363a9449"><div class="ttname"><a href="structRBEventMemoryView.html#a9d21fcd750ff7629b1648691363a9449">RBEventMemoryView::get_channel_adc</a></div><div class="ttdeci">Vec&lt; u16 &gt; get_channel_adc(u8 channel) const</div></div>
 <div class="ttc" id="astructRBEvent_html"><div class="ttname"><a href="structRBEvent.html">RBEvent</a></div><div class="ttdef"><b>Definition:</b> events.h:180</div></div>
 <div class="ttc" id="astructRBMissingHit_html"><div class="ttname"><a href="structRBMissingHit.html">RBMissingHit</a></div><div class="ttdef"><b>Definition:</b> events.h:221</div></div>
+<div class="ttc" id="astructTofEventHeader_html"><div class="ttname"><a href="structTofEventHeader.html">TofEventHeader</a></div><div class="ttdef"><b>Definition:</b> tof_event_header.hpp:6</div></div>
 <div class="ttc" id="astructTofEvent_html"><div class="ttname"><a href="structTofEvent.html">TofEvent</a></div><div class="ttdef"><b>Definition:</b> events.h:369</div></div>
 <div class="ttc" id="astructTofEvent_html_a42760fc8fa3384f7ff5676875dea6e77"><div class="ttname"><a href="structTofEvent.html#a42760fc8fa3384f7ff5676875dea6e77">TofEvent::from_tofpacket</a></div><div class="ttdeci">static TofEvent from_tofpacket(const TofPacket &amp;packet)</div></div>
 <div class="ttc" id="astructTofEvent_html_a577628b0f2d6beacc40f6bad1adc135a"><div class="ttname"><a href="structTofEvent.html#a577628b0f2d6beacc40f6bad1adc135a">TofEvent::rb_events</a></div><div class="ttdeci">Vec&lt; RBEvent &gt; rb_events</div><div class="ttdef"><b>Definition:</b> events.h:378</div></div>
@@ -457,6 +458,7 @@ $(document).ready(function(){initNavTree('events_8h_source.html',''); initResiza
 <div class="ttc" id="astructTofEvent_html_ac9c16f7b24c02f6ef7c4638a516ef325"><div class="ttname"><a href="structTofEvent.html#ac9c16f7b24c02f6ef7c4638a516ef325">TofEvent::get_rbids</a></div><div class="ttdeci">Vec&lt; u8 &gt; get_rbids() const</div></div>
 <div class="ttc" id="astructTofEvent_html_aea1f5e45ce3fd1d874eb6424d7c8c84d"><div class="ttname"><a href="structTofEvent.html#aea1f5e45ce3fd1d874eb6424d7c8c84d">TofEvent::to_string</a></div><div class="ttdeci">std::string to_string() const</div><div class="ttdoc">string representation for printing</div></div>
 <div class="ttc" id="astructTofHit_html"><div class="ttname"><a href="structTofHit.html">TofHit</a></div><div class="ttdef"><b>Definition:</b> events.h:448</div></div>
+<div class="ttc" id="astructTofPacket_html"><div class="ttname"><a href="structTofPacket.html">TofPacket</a></div><div class="ttdef"><b>Definition:</b> tof_packet.h:75</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

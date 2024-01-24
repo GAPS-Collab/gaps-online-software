@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.24.0/src/text/span.rs`."><title>span.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.25.0/src/text/span.rs`."><title>span.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -304,6 +304,91 @@
 <a href="#304" id="304">304</a>
 <a href="#305" id="305">305</a>
 <a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
+<a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
+<a href="#323" id="323">323</a>
+<a href="#324" id="324">324</a>
+<a href="#325" id="325">325</a>
+<a href="#326" id="326">326</a>
+<a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
+<a href="#329" id="329">329</a>
+<a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
+<a href="#333" id="333">333</a>
+<a href="#334" id="334">334</a>
+<a href="#335" id="335">335</a>
+<a href="#336" id="336">336</a>
+<a href="#337" id="337">337</a>
+<a href="#338" id="338">338</a>
+<a href="#339" id="339">339</a>
+<a href="#340" id="340">340</a>
+<a href="#341" id="341">341</a>
+<a href="#342" id="342">342</a>
+<a href="#343" id="343">343</a>
+<a href="#344" id="344">344</a>
+<a href="#345" id="345">345</a>
+<a href="#346" id="346">346</a>
+<a href="#347" id="347">347</a>
+<a href="#348" id="348">348</a>
+<a href="#349" id="349">349</a>
+<a href="#350" id="350">350</a>
+<a href="#351" id="351">351</a>
+<a href="#352" id="352">352</a>
+<a href="#353" id="353">353</a>
+<a href="#354" id="354">354</a>
+<a href="#355" id="355">355</a>
+<a href="#356" id="356">356</a>
+<a href="#357" id="357">357</a>
+<a href="#358" id="358">358</a>
+<a href="#359" id="359">359</a>
+<a href="#360" id="360">360</a>
+<a href="#361" id="361">361</a>
+<a href="#362" id="362">362</a>
+<a href="#363" id="363">363</a>
+<a href="#364" id="364">364</a>
+<a href="#365" id="365">365</a>
+<a href="#366" id="366">366</a>
+<a href="#367" id="367">367</a>
+<a href="#368" id="368">368</a>
+<a href="#369" id="369">369</a>
+<a href="#370" id="370">370</a>
+<a href="#371" id="371">371</a>
+<a href="#372" id="372">372</a>
+<a href="#373" id="373">373</a>
+<a href="#374" id="374">374</a>
+<a href="#375" id="375">375</a>
+<a href="#376" id="376">376</a>
+<a href="#377" id="377">377</a>
+<a href="#378" id="378">378</a>
+<a href="#379" id="379">379</a>
+<a href="#380" id="380">380</a>
+<a href="#381" id="381">381</a>
+<a href="#382" id="382">382</a>
+<a href="#383" id="383">383</a>
+<a href="#384" id="384">384</a>
+<a href="#385" id="385">385</a>
+<a href="#386" id="386">386</a>
+<a href="#387" id="387">387</a>
+<a href="#388" id="388">388</a>
+<a href="#389" id="389">389</a>
+<a href="#390" id="390">390</a>
+<a href="#391" id="391">391</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::{borrow::Cow, fmt::Debug};
 
 <span class="kw">use </span>unicode_segmentation::UnicodeSegmentation;
@@ -316,6 +401,26 @@
 ///
 /// A `Span` is the smallest unit of text that can be styled. It is usually combined in the [`Line`]
 /// type to represent a line of text where each `Span` may have a different style.
+///
+/// # Constructor Methods
+///
+/// - [`Span::default`] creates an span with empty content and the default style.
+/// - [`Span::raw`] creates an span with the specified content and the default style.
+/// - [`Span::styled`] creates an span with the specified content and style.
+///
+/// # Setter Methods
+///
+/// These methods are fluent setters. They return a new `Span` with the specified property set.
+///
+/// - [`Span::content`] sets the content of the span.
+/// - [`Span::style`] sets the style of the span.
+///
+/// # Other Methods
+///
+/// - [`Span::patch_style`] patches the style of the span, adding modifiers from the given style.
+/// - [`Span::reset_style`] resets the style of the span.
+/// - [`Span::width`] returns the unicode width of the content held by this span.
+/// - [`Span::styled_graphemes`] returns an iterator over the graphemes held by this span.
 ///
 /// # Examples
 ///
@@ -341,18 +446,23 @@
 ///
 /// let span = Span::styled(&quot;test content&quot;, Style::new().green());
 /// let span = Span::styled(String::from(&quot;test content&quot;), Style::new().green());
+///
+/// // using Stylize trait shortcuts
 /// let span = &quot;test content&quot;.green();
 /// let span = String::from(&quot;test content&quot;).green();
 /// ```
 ///
-/// `Span` implements [`Stylize`], which allows it to be styled using the shortcut methods. Styles
-/// applied are additive.
+/// `Span` implements the [`Styled`] trait, which allows it to be styled using the shortcut methods
+/// defined in the [`Stylize`] trait.
 ///
 /// ```rust
 /// use ratatui::prelude::*;
 ///
 /// let span = Span::raw(&quot;test content&quot;).green().on_yellow().italic();
-/// let span = Span::raw(String::from(&quot;test content&quot;)).green().on_yellow().italic();
+/// let span = Span::raw(String::from(&quot;test content&quot;))
+///     .green()
+///     .on_yellow()
+///     .italic();
 /// ```
 ///
 /// [`Line`]: crate::text::Line
@@ -406,47 +516,51 @@
         }
     }
 
-    <span class="doccomment">/// Returns the unicode width of the content held by this span.
-    </span><span class="kw">pub fn </span>width(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
-        <span class="self">self</span>.content.width()
-    }
-
-    <span class="doccomment">/// Returns an iterator over the graphemes held by this span.
+    <span class="doccomment">/// Sets the content of the span.
     ///
-    /// `base_style` is the [`Style`] that will be patched with the `Span`&#39;s `style` to get the
-    /// resulting [`Style`].
+    /// This is a fluent setter method which must be chained or used as it consumes self
     ///
-    /// # Example
+    /// Accepts any type that can be converted to [`Cow&lt;str&gt;`] (e.g. `&amp;str`, `String`, `&amp;String`,
+    /// etc.).
+    ///
+    /// # Examples
     ///
     /// ```rust
-    /// use std::iter::Iterator;
-    /// use ratatui::{prelude::*, text::StyledGrapheme};
-    ///
-    /// let span = Span::styled(&quot;Test&quot;, Style::new().green().italic());
-    /// let style = Style::new().red().on_yellow();
-    /// assert_eq!(
-    ///     span.styled_graphemes(style).collect::&lt;Vec&lt;StyledGrapheme&gt;&gt;(),
-    ///     vec![
-    ///         StyledGrapheme::new(&quot;T&quot;, Style::new().green().on_yellow().italic()),
-    ///         StyledGrapheme::new(&quot;e&quot;, Style::new().green().on_yellow().italic()),
-    ///         StyledGrapheme::new(&quot;s&quot;, Style::new().green().on_yellow().italic()),
-    ///         StyledGrapheme::new(&quot;t&quot;, Style::new().green().on_yellow().italic()),
-    ///     ],
-    /// );
+    /// # use ratatui::prelude::*;
+    /// let mut span = Span::default().content(&quot;content&quot;);
     /// ```
-    </span><span class="kw">pub fn </span>styled_graphemes(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
-        base_style: Style,
-    ) -&gt; <span class="kw">impl </span>Iterator&lt;Item = StyledGrapheme&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
-        <span class="self">self</span>.content
-            .as_ref()
-            .graphemes(<span class="bool-val">true</span>)
-            .filter(|g| <span class="kw-2">*</span>g != <span class="string">&quot;\n&quot;</span>)
-            .map(<span class="kw">move </span>|g| StyledGrapheme {
-                symbol: g,
-                style: base_style.patch(<span class="self">self</span>.style),
-            })
-    }
+    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
+    </span><span class="kw">pub fn </span>content&lt;T&gt;(<span class="kw-2">mut </span><span class="self">self</span>, content: T) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>T: Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
+    {
+        <span class="self">self</span>.content = content.into();
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Sets the style of the span.
+    ///
+    /// This is a fluent setter method which must be chained or used as it consumes self
+    ///
+    /// In contrast to [`Span::patch_style`], this method replaces the style of the span instead of
+    /// patching it.
+    ///
+    /// Accepts any type that can be converted to [`Style`]
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use ratatui::prelude::*;
+    /// let mut span = Span::default().style(Style::new().green());
+    /// ```
+    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
+    </span><span class="kw">pub fn </span>style&lt;T&gt;(<span class="kw-2">mut </span><span class="self">self</span>, style: T) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>T: Into&lt;Style&gt;,
+    {
+        <span class="self">self</span>.style = style.into();
+        <span class="self">self
+    </span>}
 
     <span class="doccomment">/// Patches the style of the Span, adding modifiers from the given style.
     ///
@@ -476,6 +590,50 @@
     /// ```
     </span><span class="kw">pub fn </span>reset_style(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="self">self</span>.patch_style(Style::reset());
+    }
+
+    <span class="doccomment">/// Returns the unicode width of the content held by this span.
+    </span><span class="kw">pub fn </span>width(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.content.width()
+    }
+
+    <span class="doccomment">/// Returns an iterator over the graphemes held by this span.
+    ///
+    /// `base_style` is the [`Style`] that will be patched with the `Span`&#39;s `style` to get the
+    /// resulting [`Style`].
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use std::iter::Iterator;
+    ///
+    /// use ratatui::{prelude::*, text::StyledGrapheme};
+    ///
+    /// let span = Span::styled(&quot;Test&quot;, Style::new().green().italic());
+    /// let style = Style::new().red().on_yellow();
+    /// assert_eq!(
+    ///     span.styled_graphemes(style)
+    ///         .collect::&lt;Vec&lt;StyledGrapheme&gt;&gt;(),
+    ///     vec![
+    ///         StyledGrapheme::new(&quot;T&quot;, Style::new().green().on_yellow().italic()),
+    ///         StyledGrapheme::new(&quot;e&quot;, Style::new().green().on_yellow().italic()),
+    ///         StyledGrapheme::new(&quot;s&quot;, Style::new().green().on_yellow().italic()),
+    ///         StyledGrapheme::new(&quot;t&quot;, Style::new().green().on_yellow().italic()),
+    ///     ],
+    /// );
+    /// ```
+    </span><span class="kw">pub fn </span>styled_graphemes(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
+        base_style: Style,
+    ) -&gt; <span class="kw">impl </span>Iterator&lt;Item = StyledGrapheme&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        <span class="self">self</span>.content
+            .as_ref()
+            .graphemes(<span class="bool-val">true</span>)
+            .filter(|g| <span class="kw-2">*</span>g != <span class="string">&quot;\n&quot;</span>)
+            .map(<span class="kw">move </span>|g| StyledGrapheme {
+                symbol: g,
+                style: base_style.patch(<span class="self">self</span>.style),
+            })
     }
 }
 
@@ -543,6 +701,18 @@
         <span class="kw">let </span>span = Span::styled(content.clone(), style);
         <span class="macro">assert_eq!</span>(span.content, Cow::Owned::&lt;str&gt;(content));
         <span class="macro">assert_eq!</span>(span.style, style);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>set_content() {
+        <span class="kw">let </span>span = Span::default().content(<span class="string">&quot;test content&quot;</span>);
+        <span class="macro">assert_eq!</span>(span.content, Cow::Borrowed(<span class="string">&quot;test content&quot;</span>));
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>set_style() {
+        <span class="kw">let </span>span = Span::default().style(Style::new().green());
+        <span class="macro">assert_eq!</span>(span.style, Style::new().green());
     }
 
     <span class="attr">#[test]

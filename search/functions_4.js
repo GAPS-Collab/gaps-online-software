@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['set_5floglevel_84',['set_loglevel',['../namespaceGaps.html#a212013efcb580c37612821937fa4ff8d',1,'Gaps']]]
+  ['set_5floglevel_109',['set_loglevel',['../namespaceGaps.html#a212013efcb580c37612821937fa4ff8d',1,'Gaps']]]
 ];

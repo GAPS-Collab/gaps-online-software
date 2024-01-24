@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.24.0/src/widgets/reflow.rs`."><title>reflow.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.25.0/src/widgets/reflow.rs`."><title>reflow.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -690,6 +690,24 @@
 <a href="#690" id="690">690</a>
 <a href="#691" id="691">691</a>
 <a href="#692" id="692">692</a>
+<a href="#693" id="693">693</a>
+<a href="#694" id="694">694</a>
+<a href="#695" id="695">695</a>
+<a href="#696" id="696">696</a>
+<a href="#697" id="697">697</a>
+<a href="#698" id="698">698</a>
+<a href="#699" id="699">699</a>
+<a href="#700" id="700">700</a>
+<a href="#701" id="701">701</a>
+<a href="#702" id="702">702</a>
+<a href="#703" id="703">703</a>
+<a href="#704" id="704">704</a>
+<a href="#705" id="705">705</a>
+<a href="#706" id="706">706</a>
+<a href="#707" id="707">707</a>
+<a href="#708" id="708">708</a>
+<a href="#709" id="709">709</a>
+<a href="#710" id="710">710</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::{collections::VecDeque, vec::IntoIter};
 
 <span class="kw">use </span>unicode_segmentation::UnicodeSegmentation;
@@ -703,7 +721,16 @@
 /// Cannot implement it as Iterator since it yields slices of the internal buffer (need streaming
 /// iterators for that).
 </span><span class="kw">pub trait </span>LineComposer&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">fn </span>next_line(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;(<span class="kw-2">&amp;</span>[StyledGrapheme&lt;<span class="lifetime">&#39;a</span>&gt;], u16, Alignment)&gt;;
+    <span class="kw">fn </span>next_line&lt;<span class="lifetime">&#39;lend</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;lend </span><span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;WrappedLine&lt;<span class="lifetime">&#39;lend</span>, <span class="lifetime">&#39;a</span>&gt;&gt;;
+}
+
+<span class="kw">pub struct </span>WrappedLine&lt;<span class="lifetime">&#39;lend</span>, <span class="lifetime">&#39;text</span>&gt; {
+    <span class="doccomment">/// One line reflowed to the correct width
+    </span><span class="kw">pub </span>line: <span class="kw-2">&amp;</span><span class="lifetime">&#39;lend </span>[StyledGrapheme&lt;<span class="lifetime">&#39;text</span>&gt;],
+    <span class="doccomment">/// The width of the line
+    </span><span class="kw">pub </span>width: u16,
+    <span class="doccomment">/// Whether the line was aligned left or right
+    </span><span class="kw">pub </span>alignment: Alignment,
 }
 
 <span class="doccomment">/// A state machine that wraps lines on word boundaries.
@@ -748,7 +775,7 @@
     </span>O: Iterator&lt;Item = (I, Alignment)&gt;,
     I: Iterator&lt;Item = StyledGrapheme&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
 {
-    <span class="kw">fn </span>next_line(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;(<span class="kw-2">&amp;</span>[StyledGrapheme&lt;<span class="lifetime">&#39;a</span>&gt;], u16, Alignment)&gt; {
+    <span class="kw">fn </span>next_line&lt;<span class="lifetime">&#39;lend</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;lend </span><span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;WrappedLine&lt;<span class="lifetime">&#39;lend</span>, <span class="lifetime">&#39;a</span>&gt;&gt; {
         <span class="kw">if </span><span class="self">self</span>.max_line_width == <span class="number">0 </span>{
             <span class="kw">return </span><span class="prelude-val">None</span>;
         }
@@ -892,7 +919,11 @@
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(line) = current_line {
             <span class="self">self</span>.current_line = line;
-            <span class="prelude-val">Some</span>((<span class="kw-2">&amp;</span><span class="self">self</span>.current_line[..], line_width, <span class="self">self</span>.current_alignment))
+            <span class="prelude-val">Some</span>(WrappedLine {
+                line: <span class="kw-2">&amp;</span><span class="self">self</span>.current_line[..],
+                width: line_width,
+                alignment: <span class="self">self</span>.current_alignment,
+            })
         } <span class="kw">else </span>{
             <span class="prelude-val">None
         </span>}
@@ -941,7 +972,7 @@
     </span>O: Iterator&lt;Item = (I, Alignment)&gt;,
     I: Iterator&lt;Item = StyledGrapheme&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
 {
-    <span class="kw">fn </span>next_line(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;(<span class="kw-2">&amp;</span>[StyledGrapheme&lt;<span class="lifetime">&#39;a</span>&gt;], u16, Alignment)&gt; {
+    <span class="kw">fn </span>next_line&lt;<span class="lifetime">&#39;lend</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;lend </span><span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;WrappedLine&lt;<span class="lifetime">&#39;lend</span>, <span class="lifetime">&#39;a</span>&gt;&gt; {
         <span class="kw">if </span><span class="self">self</span>.max_line_width == <span class="number">0 </span>{
             <span class="kw">return </span><span class="prelude-val">None</span>;
         }
@@ -988,11 +1019,11 @@
         <span class="kw">if </span>lines_exhausted {
             <span class="prelude-val">None
         </span>} <span class="kw">else </span>{
-            <span class="prelude-val">Some</span>((
-                <span class="kw-2">&amp;</span><span class="self">self</span>.current_line[..],
-                current_line_width,
-                current_alignment,
-            ))
+            <span class="prelude-val">Some</span>(WrappedLine {
+                line: <span class="kw-2">&amp;</span><span class="self">self</span>.current_line[..],
+                width: current_line_width,
+                alignment: current_alignment,
+            })
         }
     }
 }
@@ -1052,7 +1083,12 @@
         <span class="kw">let </span><span class="kw-2">mut </span>lines = <span class="macro">vec!</span>[];
         <span class="kw">let </span><span class="kw-2">mut </span>widths = <span class="macro">vec!</span>[];
         <span class="kw">let </span><span class="kw-2">mut </span>alignments = <span class="macro">vec!</span>[];
-        <span class="kw">while let </span><span class="prelude-val">Some</span>((styled, width, alignment)) = composer.next_line() {
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(WrappedLine {
+            line: styled,
+            width,
+            alignment,
+        }) = composer.next_line()
+        {
             <span class="kw">let </span>line = styled
                 .iter()
                 .map(|StyledGrapheme { symbol, .. }| <span class="kw-2">*</span>symbol)

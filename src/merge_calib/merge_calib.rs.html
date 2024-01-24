@@ -145,6 +145,8 @@
 <a href="#145" id="145">145</a>
 <a href="#146" id="146">146</a>
 <a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
+<a href="#149" id="149">149</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Create RBCalibration in binary format from a bunch of 
 //! files
 //!
@@ -176,6 +178,7 @@
 <span class="kw">use </span>tof_dataclasses::io::{
     RobinReader,
     TofPacketWriter,
+    FileType,
 }; 
 
 <span class="kw">use </span>liftof_lib::{
@@ -283,9 +286,10 @@
     }
     <span class="macro">println!</span>(<span class="string">&quot;=&gt; Cali: {}&quot;</span>,calibrations[<span class="kw-2">&amp;</span>rb]);
     calibrations.get_mut(<span class="kw-2">&amp;</span>rb).unwrap().serialize_event_data = <span class="bool-val">true</span>;
+    <span class="kw">let </span>ftype = FileType::CalibrationFile(<span class="kw-2">*</span>rb);
     <span class="kw">let </span>tp   = TofPacket::from(<span class="kw-2">&amp;</span>calibrations[<span class="kw-2">&amp;</span>rb]);
     <span class="kw">let </span>cali_filename = <span class="macro">format!</span>(<span class="string">&quot;rb{:02}.cali&quot;</span>, rb);
-    <span class="kw">let </span><span class="kw-2">mut </span>writer = TofPacketWriter::new(cali_filename);
+    <span class="kw">let </span><span class="kw-2">mut </span>writer = TofPacketWriter::new(cali_filename,ftype);
     writer.add_tof_packet(<span class="kw-2">&amp;</span>tp);
     <span class="macro">println!</span>(<span class="string">&quot;=&gt; Calibration saved!&quot;</span>);
   }

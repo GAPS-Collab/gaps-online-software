@@ -7,14 +7,22 @@ var annotated_dup =
     [ "GAPS", null, [
       [ "Waveform", "classGAPS_1_1Waveform.html", "classGAPS_1_1Waveform" ]
     ] ],
+    [ "CPUMoniData", "structCPUMoniData.html", "structCPUMoniData" ],
     [ "LTB", "structLTB.html", "structLTB" ],
+    [ "LTBMoniData", "structLTBMoniData.html", "structLTBMoniData" ],
     [ "MasterTriggerEvent", "structMasterTriggerEvent.html", "structMasterTriggerEvent" ],
+    [ "MtbMoniData", "structMtbMoniData.html", "structMtbMoniData" ],
+    [ "PAMoniData", "structPAMoniData.html", "structPAMoniData" ],
+    [ "PBMoniData", "structPBMoniData.html", "structPBMoniData" ],
     [ "RBCalibration", "structRBCalibration.html", "structRBCalibration" ],
     [ "RBEvent", "structRBEvent.html", "structRBEvent" ],
     [ "RBEventHeader", "structRBEventHeader.html", "structRBEventHeader" ],
     [ "RBEventMemoryView", "structRBEventMemoryView.html", "structRBEventMemoryView" ],
     [ "RBMissingHit", "structRBMissingHit.html", "structRBMissingHit" ],
+    [ "RBMoniData", "structRBMoniData.html", "structRBMoniData" ],
     [ "SimPrimary", "structSimPrimary.html", "structSimPrimary" ],
     [ "TofEvent", "structTofEvent.html", "structTofEvent" ],
-    [ "TofHit", "structTofHit.html", "structTofHit" ]
+    [ "TofEventHeader", "structTofEventHeader.html", "structTofEventHeader" ],
+    [ "TofHit", "structTofHit.html", "structTofHit" ],
+    [ "TofPacket", "structTofPacket.html", "structTofPacket" ]
 ];

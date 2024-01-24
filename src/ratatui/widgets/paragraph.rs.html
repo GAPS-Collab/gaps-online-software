@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.24.0/src/widgets/paragraph.rs`."><title>paragraph.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.25.0/src/widgets/paragraph.rs`."><title>paragraph.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -793,6 +793,135 @@
 <a href="#793" id="793">793</a>
 <a href="#794" id="794">794</a>
 <a href="#795" id="795">795</a>
+<a href="#796" id="796">796</a>
+<a href="#797" id="797">797</a>
+<a href="#798" id="798">798</a>
+<a href="#799" id="799">799</a>
+<a href="#800" id="800">800</a>
+<a href="#801" id="801">801</a>
+<a href="#802" id="802">802</a>
+<a href="#803" id="803">803</a>
+<a href="#804" id="804">804</a>
+<a href="#805" id="805">805</a>
+<a href="#806" id="806">806</a>
+<a href="#807" id="807">807</a>
+<a href="#808" id="808">808</a>
+<a href="#809" id="809">809</a>
+<a href="#810" id="810">810</a>
+<a href="#811" id="811">811</a>
+<a href="#812" id="812">812</a>
+<a href="#813" id="813">813</a>
+<a href="#814" id="814">814</a>
+<a href="#815" id="815">815</a>
+<a href="#816" id="816">816</a>
+<a href="#817" id="817">817</a>
+<a href="#818" id="818">818</a>
+<a href="#819" id="819">819</a>
+<a href="#820" id="820">820</a>
+<a href="#821" id="821">821</a>
+<a href="#822" id="822">822</a>
+<a href="#823" id="823">823</a>
+<a href="#824" id="824">824</a>
+<a href="#825" id="825">825</a>
+<a href="#826" id="826">826</a>
+<a href="#827" id="827">827</a>
+<a href="#828" id="828">828</a>
+<a href="#829" id="829">829</a>
+<a href="#830" id="830">830</a>
+<a href="#831" id="831">831</a>
+<a href="#832" id="832">832</a>
+<a href="#833" id="833">833</a>
+<a href="#834" id="834">834</a>
+<a href="#835" id="835">835</a>
+<a href="#836" id="836">836</a>
+<a href="#837" id="837">837</a>
+<a href="#838" id="838">838</a>
+<a href="#839" id="839">839</a>
+<a href="#840" id="840">840</a>
+<a href="#841" id="841">841</a>
+<a href="#842" id="842">842</a>
+<a href="#843" id="843">843</a>
+<a href="#844" id="844">844</a>
+<a href="#845" id="845">845</a>
+<a href="#846" id="846">846</a>
+<a href="#847" id="847">847</a>
+<a href="#848" id="848">848</a>
+<a href="#849" id="849">849</a>
+<a href="#850" id="850">850</a>
+<a href="#851" id="851">851</a>
+<a href="#852" id="852">852</a>
+<a href="#853" id="853">853</a>
+<a href="#854" id="854">854</a>
+<a href="#855" id="855">855</a>
+<a href="#856" id="856">856</a>
+<a href="#857" id="857">857</a>
+<a href="#858" id="858">858</a>
+<a href="#859" id="859">859</a>
+<a href="#860" id="860">860</a>
+<a href="#861" id="861">861</a>
+<a href="#862" id="862">862</a>
+<a href="#863" id="863">863</a>
+<a href="#864" id="864">864</a>
+<a href="#865" id="865">865</a>
+<a href="#866" id="866">866</a>
+<a href="#867" id="867">867</a>
+<a href="#868" id="868">868</a>
+<a href="#869" id="869">869</a>
+<a href="#870" id="870">870</a>
+<a href="#871" id="871">871</a>
+<a href="#872" id="872">872</a>
+<a href="#873" id="873">873</a>
+<a href="#874" id="874">874</a>
+<a href="#875" id="875">875</a>
+<a href="#876" id="876">876</a>
+<a href="#877" id="877">877</a>
+<a href="#878" id="878">878</a>
+<a href="#879" id="879">879</a>
+<a href="#880" id="880">880</a>
+<a href="#881" id="881">881</a>
+<a href="#882" id="882">882</a>
+<a href="#883" id="883">883</a>
+<a href="#884" id="884">884</a>
+<a href="#885" id="885">885</a>
+<a href="#886" id="886">886</a>
+<a href="#887" id="887">887</a>
+<a href="#888" id="888">888</a>
+<a href="#889" id="889">889</a>
+<a href="#890" id="890">890</a>
+<a href="#891" id="891">891</a>
+<a href="#892" id="892">892</a>
+<a href="#893" id="893">893</a>
+<a href="#894" id="894">894</a>
+<a href="#895" id="895">895</a>
+<a href="#896" id="896">896</a>
+<a href="#897" id="897">897</a>
+<a href="#898" id="898">898</a>
+<a href="#899" id="899">899</a>
+<a href="#900" id="900">900</a>
+<a href="#901" id="901">901</a>
+<a href="#902" id="902">902</a>
+<a href="#903" id="903">903</a>
+<a href="#904" id="904">904</a>
+<a href="#905" id="905">905</a>
+<a href="#906" id="906">906</a>
+<a href="#907" id="907">907</a>
+<a href="#908" id="908">908</a>
+<a href="#909" id="909">909</a>
+<a href="#910" id="910">910</a>
+<a href="#911" id="911">911</a>
+<a href="#912" id="912">912</a>
+<a href="#913" id="913">913</a>
+<a href="#914" id="914">914</a>
+<a href="#915" id="915">915</a>
+<a href="#916" id="916">916</a>
+<a href="#917" id="917">917</a>
+<a href="#918" id="918">918</a>
+<a href="#919" id="919">919</a>
+<a href="#920" id="920">920</a>
+<a href="#921" id="921">921</a>
+<a href="#922" id="922">922</a>
+<a href="#923" id="923">923</a>
+<a href="#924" id="924">924</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>unicode_width::UnicodeWidthStr;
 
 <span class="kw">use crate</span>::{
@@ -801,7 +930,7 @@
     style::{Style, Styled},
     text::{StyledGrapheme, Text},
     widgets::{
-        reflow::{LineComposer, LineTruncator, WordWrapper},
+        reflow::{LineComposer, LineTruncator, WordWrapper, WrappedLine},
         Block, Widget,
     },
 };
@@ -824,16 +953,14 @@
 /// let text = vec![
 ///     Line::from(vec![
 ///         Span::raw(&quot;First&quot;),
-///         Span::styled(&quot;line&quot;,Style::new().green().italic()),
+///         Span::styled(&quot;line&quot;, Style::new().green().italic()),
 ///         &quot;.&quot;.into(),
 ///     ]),
 ///     Line::from(&quot;Second line&quot;.red()),
 ///     &quot;Third line&quot;.into(),
 /// ];
 /// Paragraph::new(text)
-///     .block(Block::new()
-///         .title(&quot;Paragraph&quot;)
-///         .borders(Borders::ALL))
+///     .block(Block::new().title(&quot;Paragraph&quot;).borders(Borders::ALL))
 ///     .style(Style::new().white().on_black())
 ///     .alignment(Alignment::Center)
 ///     .wrap(Wrap { trim: true });
@@ -861,9 +988,11 @@
 /// ```
 /// use ratatui::{prelude::*, widgets::*};
 ///
-/// let bullet_points = Text::from(r#&quot;Some indented points:
+/// let bullet_points = Text::from(
+///     r#&quot;Some indented points:
 ///     - First thing goes here and is long so that it wraps
-///     - Here is another point that is long enough to wrap&quot;#);
+///     - Here is another point that is long enough to wrap&quot;#,
+/// );
 ///
 /// // With leading spaces trimmed (window width of 30 chars):
 /// Paragraph::new(bullet_points.clone()).wrap(Wrap { trim: true });
@@ -903,10 +1032,8 @@
     /// let paragraph = Paragraph::new(&quot;Hello, world!&quot;);
     /// let paragraph = Paragraph::new(String::from(&quot;Hello, world!&quot;));
     /// let paragraph = Paragraph::new(Text::raw(&quot;Hello, world!&quot;));
-    /// let paragraph = Paragraph::new(
-    ///     Text::styled(&quot;Hello, world!&quot;, Style::default()));
-    /// let paragraph = Paragraph::new(
-    ///     Line::from(vec![&quot;Hello, &quot;.into(), &quot;world!&quot;.red()]));
+    /// let paragraph = Paragraph::new(Text::styled(&quot;Hello, world!&quot;, Style::default()));
+    /// let paragraph = Paragraph::new(Line::from(vec![&quot;Hello, &quot;.into(), &quot;world!&quot;.red()]));
     /// ```
     </span><span class="kw">pub fn </span>new&lt;T&gt;(text: T) -&gt; Paragraph&lt;<span class="lifetime">&#39;a</span>&gt;
     <span class="kw">where
@@ -929,10 +1056,9 @@
     /// ```rust
     /// # use ratatui::{prelude::*, widgets::*};
     /// let paragraph = Paragraph::new(&quot;Hello, world!&quot;)
-    ///    .block(Block::default()
-    ///         .title(&quot;Paragraph&quot;)
-    ///         .borders(Borders::ALL));
+    ///     .block(Block::default().title(&quot;Paragraph&quot;).borders(Borders::ALL));
     /// ```
+    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
     </span><span class="kw">pub fn </span>block(<span class="kw-2">mut </span><span class="self">self</span>, block: Block&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; Paragraph&lt;<span class="lifetime">&#39;a</span>&gt; {
         <span class="self">self</span>.block = <span class="prelude-val">Some</span>(block);
         <span class="self">self
@@ -947,9 +1073,9 @@
     ///
     /// ```rust
     /// # use ratatui::{prelude::*, widgets::*};
-    /// let paragraph = Paragraph::new(&quot;Hello, world!&quot;)
-    ///    .style(Style::new().red().on_white());
+    /// let paragraph = Paragraph::new(&quot;Hello, world!&quot;).style(Style::new().red().on_white());
     /// ```
+    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
     </span><span class="kw">pub fn </span>style(<span class="kw-2">mut </span><span class="self">self</span>, style: Style) -&gt; Paragraph&lt;<span class="lifetime">&#39;a</span>&gt; {
         <span class="self">self</span>.style = style;
         <span class="self">self
@@ -963,9 +1089,9 @@
     ///
     /// ```rust
     /// # use ratatui::{prelude::*, widgets::*};
-    /// let paragraph = Paragraph::new(&quot;Hello, world!&quot;)
-    ///   .wrap(Wrap { trim: true });
+    /// let paragraph = Paragraph::new(&quot;Hello, world!&quot;).wrap(Wrap { trim: true });
     /// ```
+    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
     </span><span class="kw">pub fn </span>wrap(<span class="kw-2">mut </span><span class="self">self</span>, wrap: Wrap) -&gt; Paragraph&lt;<span class="lifetime">&#39;a</span>&gt; {
         <span class="self">self</span>.wrap = <span class="prelude-val">Some</span>(wrap);
         <span class="self">self
@@ -982,6 +1108,7 @@
     ///
     /// For more information about future scrolling design and concerns, see [RFC: Design of
     /// Scrollable Widgets](https://github.com/ratatui-org/ratatui/issues/174) on GitHub.
+    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
     </span><span class="kw">pub fn </span>scroll(<span class="kw-2">mut </span><span class="self">self</span>, offset: (Vertical, Horizontal)) -&gt; Paragraph&lt;<span class="lifetime">&#39;a</span>&gt; {
         <span class="self">self</span>.scroll = offset;
         <span class="self">self
@@ -996,13 +1123,84 @@
     ///
     /// ```rust
     /// # use ratatui::{prelude::*, widgets::*};
-    /// let paragraph = Paragraph::new(&quot;Hello World&quot;)
-    ///     .alignment(Alignment::Center);
+    /// let paragraph = Paragraph::new(&quot;Hello World&quot;).alignment(Alignment::Center);
     /// ```
+    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
     </span><span class="kw">pub fn </span>alignment(<span class="kw-2">mut </span><span class="self">self</span>, alignment: Alignment) -&gt; Paragraph&lt;<span class="lifetime">&#39;a</span>&gt; {
         <span class="self">self</span>.alignment = alignment;
         <span class="self">self
     </span>}
+
+    <span class="doccomment">/// Calculates the number of lines needed to fully render.
+    ///
+    /// Given a max line width, this method calculates the number of lines that a paragraph will
+    /// need in order to be fully rendered. For paragraphs that do not use wrapping, this count is
+    /// simply the number of lines present in the paragraph.
+    ///
+    /// # Example
+    ///
+    /// ```ignore
+    /// # use ratatui::{prelude::*, widgets::*};
+    /// let paragraph = Paragraph::new(&quot;Hello World&quot;)
+    ///     .wrap(Wrap { trim: false });
+    /// assert_eq!(paragraph.line_count(20), 1);
+    /// assert_eq!(paragraph.line_count(10), 2);
+    /// ```
+    </span><span class="attr">#[stability::unstable(
+        feature = <span class="string">&quot;rendered-line-info&quot;</span>,
+        reason = <span class="string">&quot;The design for text wrapping is not stable and might affect this API.&quot;</span>,
+        issue = <span class="string">&quot;https://github.com/ratatui-org/ratatui/issues/293&quot;
+    </span>)]
+    </span><span class="kw">pub fn </span>line_count(<span class="kw-2">&amp;</span><span class="self">self</span>, width: u16) -&gt; usize {
+        <span class="kw">if </span>width &lt; <span class="number">1 </span>{
+            <span class="kw">return </span><span class="number">0</span>;
+        }
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(Wrap { trim }) = <span class="self">self</span>.wrap {
+            <span class="kw">let </span>styled = <span class="self">self</span>.text.lines.iter().map(|line| {
+                <span class="kw">let </span>graphemes = line
+                    .spans
+                    .iter()
+                    .flat_map(|span| span.styled_graphemes(<span class="self">self</span>.style));
+                <span class="kw">let </span>alignment = line.alignment.unwrap_or(<span class="self">self</span>.alignment);
+                (graphemes, alignment)
+            });
+            <span class="kw">let </span><span class="kw-2">mut </span>line_composer = WordWrapper::new(styled, width, trim);
+            <span class="kw">let </span><span class="kw-2">mut </span>count = <span class="number">0</span>;
+            <span class="kw">while </span>line_composer.next_line().is_some() {
+                count += <span class="number">1</span>;
+            }
+            count
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.text.lines.len()
+        }
+    }
+
+    <span class="doccomment">/// Calculates the shortest line width needed to avoid any word being wrapped or truncated.
+    ///
+    /// # Example
+    ///
+    /// ```ignore
+    /// # use ratatui::{prelude::*, widgets::*};
+    /// let paragraph = Paragraph::new(&quot;Hello World&quot;);
+    /// assert_eq!(paragraph.line_width(), 11);
+    ///
+    /// let paragraph = Paragraph::new(&quot;Hello World\nhi\nHello World!!!&quot;);
+    /// assert_eq!(paragraph.line_width(), 14);
+    /// ```
+    </span><span class="attr">#[stability::unstable(
+        feature = <span class="string">&quot;rendered-line-info&quot;</span>,
+        reason = <span class="string">&quot;The design for text wrapping is not stable and might affect this API.&quot;</span>,
+        issue = <span class="string">&quot;https://github.com/ratatui-org/ratatui/issues/293&quot;
+    </span>)]
+    </span><span class="kw">pub fn </span>line_width(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.text
+            .lines
+            .iter()
+            .map(|l| l.width())
+            .max()
+            .unwrap_or_default()
+    }
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Widget <span class="kw">for </span>Paragraph&lt;<span class="lifetime">&#39;a</span>&gt; {
@@ -1021,49 +1219,53 @@
             <span class="kw">return</span>;
         }
 
-        <span class="kw">let </span>style = <span class="self">self</span>.style;
         <span class="kw">let </span>styled = <span class="self">self</span>.text.lines.iter().map(|line| {
-            (
-                line.spans
-                    .iter()
-                    .flat_map(|span| span.styled_graphemes(style)),
-                line.alignment.unwrap_or(<span class="self">self</span>.alignment),
-            )
+            <span class="kw">let </span>graphemes = line
+                .spans
+                .iter()
+                .flat_map(|span| span.styled_graphemes(<span class="self">self</span>.style));
+            <span class="kw">let </span>alignment = line.alignment.unwrap_or(<span class="self">self</span>.alignment);
+            (graphemes, alignment)
         });
 
-        <span class="kw">let </span><span class="kw-2">mut </span>line_composer: Box&lt;<span class="kw">dyn </span>LineComposer&gt; = <span class="kw">if let </span><span class="prelude-val">Some</span>(Wrap { trim }) = <span class="self">self</span>.wrap {
-            Box::new(WordWrapper::new(styled, text_area.width, trim))
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(Wrap { trim }) = <span class="self">self</span>.wrap {
+            <span class="kw">let </span>line_composer = WordWrapper::new(styled, text_area.width, trim);
+            <span class="self">self</span>.render_text(line_composer, text_area, buf);
         } <span class="kw">else </span>{
-            <span class="kw">let </span><span class="kw-2">mut </span>line_composer = Box::new(LineTruncator::new(styled, text_area.width));
+            <span class="kw">let </span><span class="kw-2">mut </span>line_composer = LineTruncator::new(styled, text_area.width);
             line_composer.set_horizontal_offset(<span class="self">self</span>.scroll.<span class="number">1</span>);
-            line_composer
-        };
+            <span class="self">self</span>.render_text(line_composer, text_area, buf);
+        }
+    }
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Paragraph&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>render_text&lt;C: LineComposer&lt;<span class="lifetime">&#39;a</span>&gt;&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut </span>composer: C, area: Rect, buf: <span class="kw-2">&amp;mut </span>Buffer) {
         <span class="kw">let </span><span class="kw-2">mut </span>y = <span class="number">0</span>;
-        <span class="kw">while let </span><span class="prelude-val">Some</span>((current_line, current_line_width, current_line_alignment)) =
-            line_composer.next_line()
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(WrappedLine {
+            line: current_line,
+            width: current_line_width,
+            alignment: current_line_alignment,
+        }) = composer.next_line()
         {
             <span class="kw">if </span>y &gt;= <span class="self">self</span>.scroll.<span class="number">0 </span>{
-                <span class="kw">let </span><span class="kw-2">mut </span>x =
-                    get_line_offset(current_line_width, text_area.width, current_line_alignment);
+                <span class="kw">let </span><span class="kw-2">mut </span>x = get_line_offset(current_line_width, area.width, current_line_alignment);
                 <span class="kw">for </span>StyledGrapheme { symbol, style } <span class="kw">in </span>current_line {
                     <span class="kw">let </span>width = symbol.width();
                     <span class="kw">if </span>width == <span class="number">0 </span>{
                         <span class="kw">continue</span>;
                     }
-                    buf.get_mut(text_area.left() + x, text_area.top() + y - <span class="self">self</span>.scroll.<span class="number">0</span>)
-                        .set_symbol(<span class="kw">if </span>symbol.is_empty() {
-                            <span class="comment">// If the symbol is empty, the last char which rendered last time will
-                            // leave on the line. It&#39;s a quick fix.
-                            </span><span class="string">&quot; &quot;
-                        </span>} <span class="kw">else </span>{
-                            symbol
-                        })
+                    <span class="comment">// If the symbol is empty, the last char which rendered last time will
+                    // leave on the line. It&#39;s a quick fix.
+                    </span><span class="kw">let </span>symbol = <span class="kw">if </span>symbol.is_empty() { <span class="string">&quot; &quot; </span>} <span class="kw">else </span>{ symbol };
+                    buf.get_mut(area.left() + x, area.top() + y - <span class="self">self</span>.scroll.<span class="number">0</span>)
+                        .set_symbol(symbol)
                         .set_style(<span class="kw-2">*</span>style);
                     x += width <span class="kw">as </span>u16;
                 }
             }
             y += <span class="number">1</span>;
-            <span class="kw">if </span>y &gt;= text_area.height + <span class="self">self</span>.scroll.<span class="number">0 </span>{
+            <span class="kw">if </span>y &gt;= area.height + <span class="self">self</span>.scroll.<span class="number">0 </span>{
                 <span class="kw">break</span>;
             }
         }
@@ -1089,7 +1291,7 @@
         backend::TestBackend,
         style::{Color, Modifier, Stylize},
         text::{Line, Span},
-        widgets::Borders,
+        widgets::{block::Position, Borders},
         Terminal,
     };
 
@@ -1269,6 +1471,20 @@
                 <span class="string">&quot;│worlds!    │&quot;</span>,
                 <span class="string">&quot;└───────────┘&quot;</span>,
             ]),
+        );
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_render_paragraph_with_block_with_bottom_title_and_border() {
+        <span class="kw">let </span>block = Block::default()
+            .title(<span class="string">&quot;Title&quot;</span>)
+            .title_position(Position::Bottom)
+            .borders(Borders::BOTTOM);
+        <span class="kw">let </span>paragraph = Paragraph::new(<span class="string">&quot;Hello, world!&quot;</span>).block(block);
+
+        test_case(
+            <span class="kw-2">&amp;</span>paragraph,
+            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;Hello, world!  &quot;</span>, <span class="string">&quot;Title──────────&quot;</span>]),
         );
     }
 
@@ -1586,6 +1802,48 @@
                 .add_modifier(Modifier::BOLD)
                 .remove_modifier(Modifier::DIM)
         )
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>widgets_paragraph_count_rendered_lines() {
+        <span class="kw">let </span>paragraph = Paragraph::new(<span class="string">&quot;Hello World&quot;</span>);
+        <span class="macro">assert_eq!</span>(paragraph.line_count(<span class="number">20</span>), <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(paragraph.line_count(<span class="number">10</span>), <span class="number">1</span>);
+        <span class="kw">let </span>paragraph = Paragraph::new(<span class="string">&quot;Hello World&quot;</span>).wrap(Wrap { trim: <span class="bool-val">false </span>});
+        <span class="macro">assert_eq!</span>(paragraph.line_count(<span class="number">20</span>), <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(paragraph.line_count(<span class="number">10</span>), <span class="number">2</span>);
+        <span class="kw">let </span>paragraph = Paragraph::new(<span class="string">&quot;Hello World&quot;</span>).wrap(Wrap { trim: <span class="bool-val">true </span>});
+        <span class="macro">assert_eq!</span>(paragraph.line_count(<span class="number">20</span>), <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(paragraph.line_count(<span class="number">10</span>), <span class="number">2</span>);
+
+        <span class="kw">let </span>text = <span class="string">&quot;Hello World &quot;</span>.repeat(<span class="number">100</span>);
+        <span class="kw">let </span>paragraph = Paragraph::new(text.trim());
+        <span class="macro">assert_eq!</span>(paragraph.line_count(<span class="number">11</span>), <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(paragraph.line_count(<span class="number">6</span>), <span class="number">1</span>);
+        <span class="kw">let </span>paragraph = paragraph.wrap(Wrap { trim: <span class="bool-val">false </span>});
+        <span class="macro">assert_eq!</span>(paragraph.line_count(<span class="number">11</span>), <span class="number">100</span>);
+        <span class="macro">assert_eq!</span>(paragraph.line_count(<span class="number">6</span>), <span class="number">200</span>);
+        <span class="kw">let </span>paragraph = paragraph.wrap(Wrap { trim: <span class="bool-val">true </span>});
+        <span class="macro">assert_eq!</span>(paragraph.line_count(<span class="number">11</span>), <span class="number">100</span>);
+        <span class="macro">assert_eq!</span>(paragraph.line_count(<span class="number">6</span>), <span class="number">200</span>);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>widgets_paragraph_line_width() {
+        <span class="kw">let </span>paragraph = Paragraph::new(<span class="string">&quot;Hello World&quot;</span>);
+        <span class="macro">assert_eq!</span>(paragraph.line_width(), <span class="number">11</span>);
+        <span class="kw">let </span>paragraph = Paragraph::new(<span class="string">&quot;Hello World&quot;</span>).wrap(Wrap { trim: <span class="bool-val">false </span>});
+        <span class="macro">assert_eq!</span>(paragraph.line_width(), <span class="number">11</span>);
+        <span class="kw">let </span>paragraph = Paragraph::new(<span class="string">&quot;Hello World&quot;</span>).wrap(Wrap { trim: <span class="bool-val">true </span>});
+        <span class="macro">assert_eq!</span>(paragraph.line_width(), <span class="number">11</span>);
+
+        <span class="kw">let </span>text = <span class="string">&quot;Hello World &quot;</span>.repeat(<span class="number">100</span>);
+        <span class="kw">let </span>paragraph = Paragraph::new(text);
+        <span class="macro">assert_eq!</span>(paragraph.line_width(), <span class="number">1200</span>);
+        <span class="kw">let </span>paragraph = paragraph.wrap(Wrap { trim: <span class="bool-val">false </span>});
+        <span class="macro">assert_eq!</span>(paragraph.line_width(), <span class="number">1200</span>);
+        <span class="kw">let </span>paragraph = paragraph.wrap(Wrap { trim: <span class="bool-val">true </span>});
+        <span class="macro">assert_eq!</span>(paragraph.line_width(), <span class="number">1200</span>);
     }
 }
 </code></pre></div></section></main></body></html>

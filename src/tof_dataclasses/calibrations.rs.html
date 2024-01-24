@@ -1509,7 +1509,6 @@
 <a href="#1509" id="1509">1509</a>
 <a href="#1510" id="1510">1510</a>
 <a href="#1511" id="1511">1511</a>
-<a href="#1512" id="1512">1512</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! The ReadoutBoardCalibration is 
 //! the first stage in a 3 stage 
 //! calibration process for the tof
@@ -1552,12 +1551,13 @@
     TofPacketReader,
 };
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;random&quot;</span>)] 
-</span><span class="kw">use </span><span class="kw">crate</span>::FromRandom;
-<span class="attr">#[cfg(feature = <span class="string">&quot;random&quot;</span>)]
-</span><span class="kw">extern crate </span>rand;
-<span class="attr">#[cfg(feature = <span class="string">&quot;random&quot;</span>)]
-</span><span class="kw">use </span>rand::Rng;
+<span class="macro">cfg_if::cfg_if! </span>{
+  <span class="kw">if </span><span class="attr">#[cfg(feature = <span class="string">&quot;random&quot;</span>)]  </span>{
+    <span class="kw">use </span><span class="kw">crate</span>::FromRandom;
+    <span class="kw">extern crate </span>rand;
+    <span class="kw">use </span>rand::Rng;
+  }
+}
 
 <span class="kw">extern crate </span>statistical;
 
@@ -1569,10 +1569,11 @@
 </span><span class="attr">#[derive(Debug, Copy, Clone, serde::Deserialize, serde::Serialize)]
 #[repr(u8)]
 </span><span class="kw">pub enum </span>Edge {
-  Rising,
-  Falling,
-  Average,
-  <span class="prelude-val">None
+  Unknown = <span class="number">0u8</span>,
+  Rising  = <span class="number">10u8</span>,
+  Falling = <span class="number">20u8</span>,
+  Average = <span class="number">30u8</span>,
+  <span class="prelude-val">None    </span>= <span class="number">40u8
 </span>}
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>Edge {
@@ -1583,21 +1584,15 @@
   }
 }
 
-<span class="kw">impl </span>TryFrom&lt;u8&gt; <span class="kw">for </span>Edge {
-  <span class="kw">type </span>Error = <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str;
-
-  <span class="comment">// I am not sure about this hard coding, but the code
-  //  looks nicer - Paolo
-  </span><span class="kw">fn </span>try_from(value: u8) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+<span class="kw">impl </span>From&lt;u8&gt; <span class="kw">for </span>Edge {
+  <span class="kw">fn </span>from(value: u8) -&gt; <span class="self">Self </span>{
     <span class="kw">match </span>value {
-      <span class="number">0u8  </span>=&gt; <span class="prelude-val">Ok</span>(Edge::Rising),
-      <span class="number">10u8 </span>=&gt; <span class="prelude-val">Ok</span>(Edge::Falling),
-      <span class="number">20u8 </span>=&gt; <span class="prelude-val">Ok</span>(Edge::Average),
-      <span class="number">30u8 </span>=&gt; <span class="prelude-val">Ok</span>(Edge::None),
-      <span class="kw">_    </span>=&gt; {
-        <span class="macro">error!</span>(<span class="string">&quot;{} is not a valid Edge!&quot;</span>, value);
-        <span class="prelude-val">Err</span>(<span class="string">&quot;I am not sure how to convert this value!&quot;</span>)
-      }
+      <span class="number">0u8  </span>=&gt; Edge::Unknown,
+      <span class="number">10u8 </span>=&gt; Edge::Rising,
+      <span class="number">20u8 </span>=&gt; Edge::Falling,
+      <span class="number">30u8 </span>=&gt; Edge::Average,
+      <span class="number">40u8 </span>=&gt; Edge::None,
+      <span class="kw">_    </span>=&gt; Edge::Unknown
     }
   }
 }
@@ -1783,6 +1778,9 @@
       },
       Edge::Average =&gt; {
         <span class="macro">warn!</span>(<span class="string">&quot;Unsure what to do for Edge::Average&quot;</span>);
+      },
+      Edge::Unknown =&gt; {
+        <span class="macro">warn!</span>(<span class="string">&quot;Unsure what to do for Edge::Unknown&quot;</span>);
       }
     }
   }

@@ -155,6 +155,10 @@
 <a href="#155" id="155">155</a>
 <a href="#156" id="156">156</a>
 <a href="#157" id="157">157</a>
+<a href="#158" id="158">158</a>
+<a href="#159" id="159">159</a>
+<a href="#160" id="160">160</a>
+<a href="#161" id="161">161</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Communication with the flight computer
 //!
 //! Using two dedicated 0MQ wires - one for 
@@ -177,11 +181,14 @@
 
 <span class="kw">use </span>tof_dataclasses::monitoring::{RBMoniData,
                                   MtbMoniData,
-                                  TofCmpMoniData};
+                                  CPUMoniData};
 
 <span class="kw">use </span>tof_dataclasses::events::TofEvent;
 <span class="kw">use </span>tof_dataclasses::serialization::Serialization;
-<span class="kw">use </span>tof_dataclasses::io::TofPacketWriter;
+<span class="kw">use </span>tof_dataclasses::io::{
+    TofPacketWriter,
+    FileType
+};
 
 <span class="doccomment">/// Manages &quot;outgoing&quot; 0MQ PUB socket
 ///
@@ -219,10 +226,11 @@
 
   <span class="kw">let </span><span class="kw-2">mut </span>writer : <span class="prelude-ty">Option</span>&lt;TofPacketWriter&gt; = <span class="prelude-val">None</span>;
   <span class="kw">if </span>write_stream {
-    <span class="kw">let </span><span class="kw-2">mut </span>streamfile_name = write_stream_path + <span class="string">&quot;/run_&quot;</span>;
-    streamfile_name += <span class="kw-2">&amp;</span>runid.to_string();
-    <span class="macro">println!</span>(<span class="string">&quot;==&gt; Writing stream to file with prefix {}&quot;</span>, streamfile_name);
-    writer = <span class="prelude-val">Some</span>(TofPacketWriter::new(streamfile_name));
+    <span class="comment">//let mut streamfile_name = write_stream_path + &quot;/run_&quot;;
+    //streamfile_name += &amp;runid.to_string();
+    </span><span class="kw">let </span>file_type = FileType::RunFile(runid <span class="kw">as </span>u32);
+    <span class="comment">//println!(&quot;==&gt; Writing stream to file with prefix {}&quot;, streamfile_name);
+    </span>writer = <span class="prelude-val">Some</span>(TofPacketWriter::new(write_stream_path, file_type));
     writer.as_mut().unwrap().pkts_per_file = write_npack_file;
   }
   <span class="comment">//let mut event_cache = Vec::&lt;TofPacket&gt;::with_capacity(100); 
@@ -252,8 +260,8 @@
                 },
                 <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Can not unpack RBMoniData! {err}&quot;</span>)}
               }, 
-            PacketType::MonitorTofCmp =&gt; {
-              <span class="kw">let </span>moni = TofCmpMoniData::from_bytestream(<span class="kw-2">&amp;</span>pack.payload, <span class="kw-2">&amp;mut </span>pos);
+            PacketType::CPUMoniData =&gt; {
+              <span class="kw">let </span>moni = CPUMoniData::from_bytestream(<span class="kw-2">&amp;</span>pack.payload, <span class="kw-2">&amp;mut </span>pos);
               <span class="kw">match </span>moni {
                 <span class="prelude-val">Ok</span>(data) =&gt; {<span class="macro">println!</span>(<span class="string">&quot;{}&quot;</span>, data);},
                 <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Can not unpack TofCmpData! {err}&quot;</span>)}

@@ -286,122 +286,7 @@
 <a href="#286" id="286">286</a>
 <a href="#287" id="287">287</a>
 <a href="#288" id="288">288</a>
-<a href="#289" id="289">289</a>
-<a href="#290" id="290">290</a>
-<a href="#291" id="291">291</a>
-<a href="#292" id="292">292</a>
-<a href="#293" id="293">293</a>
-<a href="#294" id="294">294</a>
-<a href="#295" id="295">295</a>
-<a href="#296" id="296">296</a>
-<a href="#297" id="297">297</a>
-<a href="#298" id="298">298</a>
-<a href="#299" id="299">299</a>
-<a href="#300" id="300">300</a>
-<a href="#301" id="301">301</a>
-<a href="#302" id="302">302</a>
-<a href="#303" id="303">303</a>
-<a href="#304" id="304">304</a>
-<a href="#305" id="305">305</a>
-<a href="#306" id="306">306</a>
-<a href="#307" id="307">307</a>
-<a href="#308" id="308">308</a>
-<a href="#309" id="309">309</a>
-<a href="#310" id="310">310</a>
-<a href="#311" id="311">311</a>
-<a href="#312" id="312">312</a>
-<a href="#313" id="313">313</a>
-<a href="#314" id="314">314</a>
-<a href="#315" id="315">315</a>
-<a href="#316" id="316">316</a>
-<a href="#317" id="317">317</a>
-<a href="#318" id="318">318</a>
-<a href="#319" id="319">319</a>
-<a href="#320" id="320">320</a>
-<a href="#321" id="321">321</a>
-<a href="#322" id="322">322</a>
-<a href="#323" id="323">323</a>
-<a href="#324" id="324">324</a>
-<a href="#325" id="325">325</a>
-<a href="#326" id="326">326</a>
-<a href="#327" id="327">327</a>
-<a href="#328" id="328">328</a>
-<a href="#329" id="329">329</a>
-<a href="#330" id="330">330</a>
-<a href="#331" id="331">331</a>
-<a href="#332" id="332">332</a>
-<a href="#333" id="333">333</a>
-<a href="#334" id="334">334</a>
-<a href="#335" id="335">335</a>
-<a href="#336" id="336">336</a>
-<a href="#337" id="337">337</a>
-<a href="#338" id="338">338</a>
-<a href="#339" id="339">339</a>
-<a href="#340" id="340">340</a>
-<a href="#341" id="341">341</a>
-<a href="#342" id="342">342</a>
-<a href="#343" id="343">343</a>
-<a href="#344" id="344">344</a>
-<a href="#345" id="345">345</a>
-<a href="#346" id="346">346</a>
-<a href="#347" id="347">347</a>
-<a href="#348" id="348">348</a>
-<a href="#349" id="349">349</a>
-<a href="#350" id="350">350</a>
-<a href="#351" id="351">351</a>
-<a href="#352" id="352">352</a>
-<a href="#353" id="353">353</a>
-<a href="#354" id="354">354</a>
-<a href="#355" id="355">355</a>
-<a href="#356" id="356">356</a>
-<a href="#357" id="357">357</a>
-<a href="#358" id="358">358</a>
-<a href="#359" id="359">359</a>
-<a href="#360" id="360">360</a>
-<a href="#361" id="361">361</a>
-<a href="#362" id="362">362</a>
-<a href="#363" id="363">363</a>
-<a href="#364" id="364">364</a>
-<a href="#365" id="365">365</a>
-<a href="#366" id="366">366</a>
-<a href="#367" id="367">367</a>
-<a href="#368" id="368">368</a>
-<a href="#369" id="369">369</a>
-<a href="#370" id="370">370</a>
-<a href="#371" id="371">371</a>
-<a href="#372" id="372">372</a>
-<a href="#373" id="373">373</a>
-<a href="#374" id="374">374</a>
-<a href="#375" id="375">375</a>
-<a href="#376" id="376">376</a>
-<a href="#377" id="377">377</a>
-<a href="#378" id="378">378</a>
-<a href="#379" id="379">379</a>
-<a href="#380" id="380">380</a>
-<a href="#381" id="381">381</a>
-<a href="#382" id="382">382</a>
-<a href="#383" id="383">383</a>
-<a href="#384" id="384">384</a>
-<a href="#385" id="385">385</a>
-<a href="#386" id="386">386</a>
-<a href="#387" id="387">387</a>
-<a href="#388" id="388">388</a>
-<a href="#389" id="389">389</a>
-<a href="#390" id="390">390</a>
-<a href="#391" id="391">391</a>
-<a href="#392" id="392">392</a>
-<a href="#393" id="393">393</a>
-<a href="#394" id="394">394</a>
-<a href="#395" id="395">395</a>
-<a href="#396" id="396">396</a>
-<a href="#397" id="397">397</a>
-<a href="#398" id="398">398</a>
-</pre></div><pre class="rust"><code><span class="doccomment">//! Assemble paddle packets to full events
-//!
-//!
-//!
-
-</span><span class="kw">use </span>std::time::Instant;
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::time::Instant;
 
 <span class="kw">use </span>crossbeam_channel::{
     Receiver,
@@ -415,150 +300,22 @@
                               TofEvent,
                               RBEvent};
 <span class="kw">use </span><span class="kw">crate</span>::constants::EVENT_BUILDER_EVID_CACHE_SIZE;
+<span class="kw">use </span><span class="kw">crate</span>::settings::{
+    TofEventBuilderSettings,
+    BuildStrategy
+};
 <span class="kw">use </span>tof_dataclasses::packets::TofPacket;
 
-<span class="comment">/////  Walk over the event cache and check for each event
-/////  if new paddles can be added.
-/////
-/////  # Arguments:
-/////
-/////
-/////  * clean_up : call vec::retain to only keep events which 
-/////               have not yet been sent.
-//fn build_events_in_cache(event_cache   : &amp;mut VecDeque&lt;MasterTofEvent&gt;,
-//                         timeout_micro : u64,
-//                         evid_query    : &amp;Sender&lt;Option&lt;u32&gt;&gt;,
-//                         pp_recv       : &amp;Receiver&lt;Option&lt;PaddlePacket&gt;&gt;,
-//                         clean_up      : bool,
-//                         use_timeout   : bool,
-//                         paddle_cache  : &amp;mut HashMap::&lt;u32,Vec::&lt;PaddlePacket&gt;&gt;,
-//                         data_sink     : &amp;cbc::Sender&lt;TofPacket&gt;) { 
-//                         //socket        : &amp;zmq::Socket) {
-//
-//  for ev in event_cache.iter_mut() {
-//    trace!(&quot;Event {} is {} sec old&quot;, ev.event_id, ev.age());
-//    let start   = Instant::now();
-//    let timeout = Duration::from_micros(timeout_micro);
-//    if !ev.valid {
-//      continue;
-//    }
-//    
-//
-//    // first check, if we have pps in the paddle_cache
-//    if paddle_cache.contains_key(&amp;ev.event_id) {
-//      let pps = paddle_cache.get_mut(&amp;ev.event_id).unwrap();
-//      //for pp in pps.iter_mut() {
-//      for k in 0..pps.len() {
-//        if !pps[k].valid
-//          {continue;}
-//        match ev.add_paddle(pps[k]) {
-//         Err(err) =&gt; error!(&quot;Unable to add paddle! {err}&quot;),
-//         Ok(_)    =&gt; ()
-//        }
-//        pps[k].invalidate();
-//      }
-//    }
-//    // events must be valid at this point
-//    if ev.is_ready_to_send(use_timeout) {
-//      (*ev).valid = false;
-//      let bytestream = ev.to_bytestream();
-//      //error!(&quot;Event ready to send, we have {} {} {} {}&quot;, ev.n_paddles, ev.n_paddles_expected, ev.age(), ev.paddle_packets.len());
-//      //println!(&quot;{:?}&quot;, ev.paddle_packets);
-//      //error!(&quot;We have a bytestream len of {}&quot;, bytestream.len());
-//      let mut pack = TofPacket::new();
-//      pack.packet_type = PacketType::TofEvent;
-//      pack.payload = bytestream;
-//      if ev.n_paddles &gt; 0 {
-//        trace!(&quot;{:?}&quot;, ev);
-//        trace!(&quot;{:?}&quot;, ev.paddle_packets);
-//      }
-//      match data_sink.send(pack) {
-//        Err(err) =&gt; error!(&quot;Packet sending failed! Err {}&quot;, err),
-//        Ok(_)    =&gt; debug!(&quot;Event {} with {} paddles sent and {} paddles were expected!&quot;, ev.event_id, ev.paddle_packets.len(),ev.n_paddles) 
-//      }
-//      continue;
-//    } // end ready to send
-//    match evid_query.send(Some(ev.event_id)) {
-//      Err(err) =&gt; error!(&quot;Can not send even query for event {}, {}&quot;, ev.event_id, err),
-//      Ok(_)    =&gt;()
-//    }
-//    let mut n_received = 0;
-//    let mut n_new      = 0;
-//    let mut n_seen    = 0;
-//    while start.elapsed() &lt; timeout {
-//      match pp_recv.try_recv() { 
-//        Err(_) =&gt; {}
-//        Ok(pp_option) =&gt; {
-//          match pp_option {
-//            None =&gt; {
-//              continue;
-//            },
-//            Some(pp) =&gt; {
-//              if pp.event_id == ev.event_id {
-//                n_received += 1;
-//                match ev.add_paddle(pp) {
-//                  Err(err) =&gt; error!(&quot;Can not add paddle to event {}, Error {err}&quot;, ev.event_id),
-//                  Ok(_)    =&gt; ()
-//                }
-//              } else {
-//                if paddle_cache.contains_key(&amp;pp.event_id) {
-//                  paddle_cache.get_mut(&amp;pp.event_id).unwrap().push(pp);
-//                  //println!(&quot;{:?} inserting pp with&quot;, pp);
-//                  n_new += 1;
-//                } else {
-//                  let ev_paddles = vec![pp];
-//                  paddle_cache.insert(pp.event_id, ev_paddles);
-//                  //println!(&quot;{:?} inserting pp with&quot;, pp);
-//                  //println!(&quot;{:?}&quot;, paddle_cache[&amp;pp.event_id].len());
-//                  //println!(&quot;{:?}&quot;, paddle_cache);
-//                  n_seen += 1;
-//                }
-//              }
-//            }
-//          }
-//        } 
-//      } // end while
-//    } // end while not timeout
-//    debug!(&quot;n_seen {n_seen}, n_new {n_new} n_received {n_received}&quot;);
-//  } // end iter over cache
-//  // clean the cache - remove all completed events
-//  if clean_up {
-//    let size_b4 = event_cache.len();
-//    event_cache.retain(|ev| ev.valid);
-//    //paddle_cache.retain(|pp| pp.valid);
-//    let size_af = event_cache.len();
-//    println!(&quot;==&gt; [EVTBLD::CACHE] Size of event cache before {} and after clean up {}&quot;, size_b4, size_af);
-//  }
-//}
 
-
-
-</span><span class="doccomment">/// Settings to change the configuration of the TOF Eventbuilder on the fly
-</span><span class="kw">pub struct </span>TofEventBuilderSettings {
-  <span class="kw">pub </span>cachesize         : usize,
-  <span class="kw">pub </span>build_interval    : usize,
-  <span class="kw">pub </span>use_mastertrigger : bool
-}
-
-<span class="kw">impl </span>TofEventBuilderSettings {
-  <span class="kw">pub fn </span>new() -&gt; TofEventBuilderSettings {
-    TofEventBuilderSettings {
-      cachesize         : <span class="number">100000</span>,
-      build_interval    : <span class="number">1000</span>,
-      use_mastertrigger : <span class="bool-val">true
-    </span>}
-  }
-}
-
-<span class="doccomment">/// The event builder, assembling events from an id given by the 
-/// master trigger
+<span class="doccomment">/// Events ... assemble! 
 ///
-/// This requires the master trigger sending `MasterTriggerEvents`
-/// over the channel. The event builder then will querey the 
-/// paddle_packet cache for paddle packets with the same event id
-/// Queries which can not be satisfied will lead to events being 
-/// cached until they can be completed, or discarded after 
-/// a timeout.
+/// The event_builder collects all available event information,
+/// beginning with the MasterTriggerEvent defining the event 
+/// id. It collects the requested number of RBEvents.
+/// The final product then will be a TofEvent
+///
+/// The event_builder is the heart of this software and crucial
+/// to all operations.
 ///
 /// # Arguments
 ///
@@ -575,22 +332,15 @@
 /// * cmd_sender     : Sending tof commands to comander thread. This 
 ///                    is needed so that the event builder can request
 ///                    paddles from readout boards.
+/// * settings       : Configure the event builder
 </span><span class="kw">pub fn </span>event_builder (m_trig_ev      : <span class="kw-2">&amp;</span>Receiver&lt;MasterTriggerEvent&gt;,
                       ev_from_rb     : <span class="kw-2">&amp;</span>Receiver&lt;RBEvent&gt;,
-                      data_sink      : <span class="kw-2">&amp;</span>Sender&lt;TofPacket&gt;) { 
-
-  <span class="comment">//let mut event_cache = VecDeque::&lt;TofEvent&gt;::with_capacity(EVENT_BUILDER_EVID_CACHE_SIZE);
-  </span><span class="kw">let </span><span class="kw-2">mut </span>event_cache = HashMap::&lt;u32, TofEvent&gt;::new();
-  <span class="kw">let </span><span class="kw-2">mut </span>event_id_cache = VecDeque::&lt;u32&gt;::with_capacity(EVENT_BUILDER_EVID_CACHE_SIZE);
-  <span class="comment">// timeout in microsecnds
-  //let timeout_micro = 100;
-  //let use_timeout   = true;
-  //let mut n_iter    = 0; // don&#39;t worry it&#39;ll be simply wrapped around
-  // we try to receive eventids from the master trigger
-  </span><span class="kw">let </span>n_mte_per_loop         = <span class="number">1</span>;
-  <span class="kw">let </span>n_rbe_per_loop         = <span class="number">4</span>;
-  <span class="kw">let </span>send_every_x_event     = <span class="number">200usize</span>;
-
+                      data_sink      : <span class="kw-2">&amp;</span>Sender&lt;TofPacket&gt;,
+                      <span class="kw-2">mut </span>settings   : TofEventBuilderSettings) { 
+  <span class="comment">// event caches for assembled events
+  </span><span class="kw">let </span><span class="kw-2">mut </span>event_cache      = HashMap::&lt;u32, TofEvent&gt;::new();
+  <span class="kw">let </span><span class="kw-2">mut </span>event_id_cache   = VecDeque::&lt;u32&gt;::with_capacity(EVENT_BUILDER_EVID_CACHE_SIZE);
+  
   <span class="kw">let </span><span class="kw-2">mut </span>n_received         : usize;
   <span class="kw">let </span><span class="kw-2">mut </span>clear_cache        = <span class="number">0</span>; <span class="comment">// clear cache every 
   </span><span class="kw">let </span><span class="kw-2">mut </span>event_sending      = <span class="number">0</span>;
@@ -603,16 +353,12 @@
   <span class="comment">// debug
   </span><span class="kw">let </span><span class="kw-2">mut </span>last_rb_evid       = <span class="number">0u32</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>n_rbs_per_ev       = <span class="number">0usize</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>rb_ev_wo_mte       = <span class="number">0usize</span>;
 
-  <span class="comment">// Depending on the MasterTrigger Rate, 
-  // we want to change the interval when 
-  // we send out new events
-
-  </span><span class="kw">loop </span>{
+  <span class="kw">loop </span>{
     n_received = <span class="number">0</span>;
     <span class="kw">let </span>debug_timer = Instant::now();
-
-    <span class="kw">while </span>n_received &lt; n_mte_per_loop {
+    <span class="kw">while </span>n_received &lt; settings.n_mte_per_loop {
       <span class="comment">// every iteration, we welcome a new master event
       </span><span class="kw">match </span>m_trig_ev.try_recv() {
         <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
@@ -631,8 +377,7 @@
             <span class="macro">error!</span>(<span class="string">&quot;We skipped event ids {}&quot;</span>, delta_id );
           }
           last_evid = event.mt_event.event_id;
-          <span class="comment">//event_cache.push_back(event);
-          </span>event_cache.insert(last_evid, event);
+          event_cache.insert(last_evid, event);
           <span class="comment">// use this to keep track of the order
           // of events
           </span>event_id_cache.push_back(last_evid);
@@ -645,14 +390,14 @@
       </span>n_mte_received_tot += <span class="number">1</span>;
     } <span class="comment">// end getting MTEvents
     </span><span class="macro">trace!</span>(<span class="string">&quot;Debug timer MTE received! {:?}&quot;</span>, debug_timer.elapsed());
-    <span class="comment">//first_evid = event_cache[0].mt_event.event_id; 
+    first_evid = event_id_cache[<span class="number">0</span>]; 
     
-    // check this timeout
+    <span class="comment">// check this timeout
     //let mut rb_events_added   = 0usize;
     //let mut iter_ev           = 0usize;
     //let mut rb_events_dropped = 0usize;
     </span>n_received = <span class="number">0</span>;
-    <span class="kw">while </span>!ev_from_rb.is_empty() &amp;&amp; n_received &lt; n_rbe_per_loop {
+    <span class="lifetime">&#39;main</span>: <span class="kw">while </span>!ev_from_rb.is_empty() &amp;&amp; n_received &lt; settings.n_rbe_per_loop {
     <span class="comment">// try to catch up
     //while !ev_from_rb.is_empty() &amp;&amp; last_rb_evid &lt; last_evid {
       </span><span class="kw">match </span>ev_from_rb.try_recv() {
@@ -680,7 +425,9 @@
               //println!(&quot;Surprisingly we don&#39;t have that!&quot;);
               // insert a new TofEvent
               //let new_ev = TofEvent::new();
-            </span>},
+              </span>rb_ev_wo_mte += <span class="number">1</span>;
+              <span class="kw">continue </span><span class="lifetime">&#39;main</span>;
+            },
             <span class="prelude-val">Some</span>(ev) =&gt; {
               ev.rb_events.push(rb_ev);
               <span class="comment">//break;
@@ -708,13 +455,33 @@
         </span>}
       }
     }
-    <span class="kw">if </span>n_mte_received_tot % <span class="number">100 </span>== <span class="number">0 </span>{
+    <span class="kw">let </span>av_rb_ev = n_rbs_per_ev <span class="kw">as </span>f64 / n_sent <span class="kw">as </span>f64;
+    <span class="kw">if </span>settings.build_strategy == BuildStrategy::Adaptive {
+      settings.n_rbe_per_loop = av_rb_ev.ceil() <span class="kw">as </span>usize;
+      <span class="kw">if </span>settings.n_rbe_per_loop == <span class="number">0 </span>{
+        <span class="comment">// failsafe
+        </span>settings.n_rbe_per_loop = <span class="number">40</span>;
+      }
+    }
+    <span class="kw">if let </span>BuildStrategy::AdaptiveGreedy(greediness) = settings.build_strategy {
+      settings.n_rbe_per_loop = av_rb_ev.ceil() <span class="kw">as </span>usize + greediness;
+      <span class="kw">if </span>settings.n_rbe_per_loop == <span class="number">0 </span>{
+        <span class="comment">// failsafe
+        </span>settings.n_rbe_per_loop = <span class="number">40</span>;
+      }
+    }
+    <span class="kw">if </span>n_mte_received_tot % <span class="number">10000 </span>== <span class="number">0 </span>{
       <span class="macro">println!</span>(<span class="string">&quot;[EVTBLDR] ==&gt; Received {} MTE&quot;</span>, n_mte_received_tot);
       <span class="macro">println!</span>(<span class="string">&quot;[EVTBLDR] ==&gt; Received {n_rbe_received_tot} RBEvents!&quot;</span>);
       <span class="macro">println!</span>(<span class="string">&quot;[EVTBLDR] ==&gt; Delta Last MTE evid - Last RB evid  {}&quot;</span>, last_evid - last_rb_evid);
       <span class="macro">println!</span>(<span class="string">&quot;[EVTBLDR] ==&gt; Size of event cache {}&quot;</span>, event_cache.len());
       <span class="macro">println!</span>(<span class="string">&quot;[EVTBLDR] ==&gt; Size of event ID cache {}&quot;</span>, event_id_cache.len());
+      <span class="macro">println!</span>(<span class="string">&quot;[EVTBLDR] ==&gt; Get MTE from cache for RB ev failed {rb_ev_wo_mte} times!&quot;</span>);
       <span class="macro">println!</span>(<span class="string">&quot;[EVTBLDR] ==&gt; Sent {n_sent} events!&quot;</span>);
+      <span class="macro">println!</span>(<span class="string">&quot;[EVTBLDR] ==&gt; Chn len MTE receiver {}&quot;</span>,m_trig_ev.len() );
+      <span class="macro">println!</span>(<span class="string">&quot;[EVTBLDR] ==&gt; Chn len RBE receiver {}&quot;</span>,ev_from_rb.len());
+      <span class="macro">println!</span>(<span class="string">&quot;[EVTBLDR] ==&gt; Chn len TP  sender   {}&quot;</span>,data_sink.len());
+      
       <span class="kw">if </span>n_sent &gt; <span class="number">0 </span>{
         <span class="kw">let </span>av_rb_ev = n_rbs_per_ev <span class="kw">as </span>f64 / n_sent <span class="kw">as </span>f64;
         <span class="macro">println!</span>(<span class="string">&quot;[EVTBLDR] ==&gt; Average number of RBEvents/TofEvent {:4.2}&quot;</span>, av_rb_ev);
@@ -742,15 +509,31 @@
           <span class="prelude-val">Some</span>(ev) =&gt; {
           <span class="comment">//for evid in event_id_cache.iter() {
             //println!(&quot;{}&quot;,ev.age());
-            </span><span class="kw">let </span>is_timed_out = ev.has_timed_out();
-            <span class="kw">if </span>ev.is_complete() || is_timed_out {
-              <span class="kw">if </span>is_timed_out {
-                n_timed_out += <span class="number">1</span>;
+            </span><span class="kw">let </span>ev_timed_out = ev.age() &gt;= settings.te_timeout_sec <span class="kw">as </span>u64;
+            <span class="kw">let </span><span class="kw-2">mut </span>cache_it = <span class="bool-val">false</span>;
+            <span class="kw">if </span>ev_timed_out {
+              n_timed_out += <span class="number">1</span>;
+            }
+            <span class="kw">if let </span>BuildStrategy::WaitForNBoards(wait_nrb) = settings.build_strategy {
+              <span class="kw">if </span>ev_timed_out || ev.rb_events.len() == wait_nrb {
+                cache_it = <span class="bool-val">false</span>;
+              } <span class="kw">else </span>{
+                cache_it = <span class="bool-val">true</span>;
               }
-              <span class="comment">// FIXME - clone
-              //println!(&quot;[EVTBLDR] ==&gt; Event ID {} expected n rbs {} --&gt; actual {}&quot;,ev.mt_event.event_id , ev.mt_event.get_n_rbs_expected(), ev.rb_events.len()); 
+            } <span class="kw">else </span>{
+              <span class="comment">// &quot;normal&quot; build strategy
+              </span><span class="kw">if </span>ev.is_complete() || ev_timed_out {
+                cache_it = <span class="bool-val">false</span>;
+              } <span class="kw">else </span>{
+                cache_it = <span class="bool-val">true</span>;
+              }
+            }
+            <span class="kw">if </span>cache_it {
+              event_id_cache.push_back(evid);
+            } <span class="kw">else </span>{
+              <span class="comment">// if we don&#39;t cache it, we have to send it. 
               </span><span class="kw">let </span>ev_to_send = event_cache.remove(<span class="kw-2">&amp;</span>evid).unwrap();
-              n_rbs_per_ev += ev_to_send.rb_events.len(); 
+              n_rbs_per_ev  += ev_to_send.rb_events.len(); 
               <span class="kw">let </span>pack = TofPacket::from(<span class="kw-2">&amp;</span>ev_to_send);
               <span class="kw">match </span>data_sink.send(pack) {
                 <span class="prelude-val">Err</span>(err) =&gt; {
@@ -759,11 +542,8 @@
                 <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
                   <span class="macro">debug!</span>(<span class="string">&quot;Event with id {} send!&quot;</span>, evid);
                   n_sent += <span class="number">1</span>;
-                  <span class="comment">//ev.valid = false;
-                </span>}
+                }
               }
-            } <span class="kw">else </span>{
-              event_id_cache.push_back(evid);
             }
           }
         }

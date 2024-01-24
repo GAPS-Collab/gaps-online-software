@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["tab_cpu","tab_events","tab_home","tab_mt","tab_settings","tab_status"]};

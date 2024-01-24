@@ -881,34 +881,6 @@
 <a href="#881" id="881">881</a>
 <a href="#882" id="882">882</a>
 <a href="#883" id="883">883</a>
-<a href="#884" id="884">884</a>
-<a href="#885" id="885">885</a>
-<a href="#886" id="886">886</a>
-<a href="#887" id="887">887</a>
-<a href="#888" id="888">888</a>
-<a href="#889" id="889">889</a>
-<a href="#890" id="890">890</a>
-<a href="#891" id="891">891</a>
-<a href="#892" id="892">892</a>
-<a href="#893" id="893">893</a>
-<a href="#894" id="894">894</a>
-<a href="#895" id="895">895</a>
-<a href="#896" id="896">896</a>
-<a href="#897" id="897">897</a>
-<a href="#898" id="898">898</a>
-<a href="#899" id="899">899</a>
-<a href="#900" id="900">900</a>
-<a href="#901" id="901">901</a>
-<a href="#902" id="902">902</a>
-<a href="#903" id="903">903</a>
-<a href="#904" id="904">904</a>
-<a href="#905" id="905">905</a>
-<a href="#906" id="906">906</a>
-<a href="#907" id="907">907</a>
-<a href="#908" id="908">908</a>
-<a href="#909" id="909">909</a>
-<a href="#910" id="910">910</a>
-<a href="#911" id="911">911</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Commmands which can be issued
 //! to the various components of 
 //! the tof system.
@@ -952,20 +924,19 @@
 <span class="attr">#[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 #[repr(u8)]
 </span><span class="kw">pub enum </span>TofCommandCode {
-  <span class="doccomment">/// en empty command
+  CmdUnknown                 = <span class="number">0u8</span>,
+  <span class="doccomment">/// en empty command just to check if stuff is online
   </span>CmdPing                    = <span class="number">1u8</span>,
-  <span class="doccomment">/// command code for &quot;Power off&quot;
-  </span>CmdPowerOff                = <span class="number">10u8</span>,        
-  <span class="doccomment">/// command code for &quot;Power on&quot;
-  </span>CmdPowerOn                 = <span class="number">11u8</span>,       
-  <span class="doccomment">/// command code for &quot;Power cycle&quot;
-  </span>CmdPowerCycle              = <span class="number">12u8</span>,          
-  <span class="doccomment">/// command code for &quot;Run RBSetup&quot;
-  </span>CmdRBSetup                 = <span class="number">20u8</span>,         
+  <span class="doccomment">/// command code for getting the monitoring data from the component
+  </span>CmdMoni                    = <span class="number">2u8</span>,
+  <span class="doccomment">/// command code for power management
+  </span>CmdPower                   = <span class="number">10u8</span>,
   <span class="doccomment">/// command code for &quot;Set LTB Thresholds&quot;
   </span>CmdSetThresholds           = <span class="number">21u8</span>,         
   <span class="doccomment">/// command code for &quot;Configure MTB&quot;
   </span>CmdSetMTConfig             = <span class="number">22u8</span>,        
+  <span class="doccomment">/// command code for &quot;Set preamp bias&quot;
+  </span>CmdSetPreampBias           = <span class="number">28u8</span>,         
   <span class="doccomment">/// command code for &quot;Stop Data taking&quot;
   </span>CmdDataRunStop             = <span class="number">30u8</span>,  
   <span class="doccomment">/// command code for &quot;Start Data taking&quot;
@@ -973,41 +944,32 @@
   <span class="doccomment">/// command code for &quot;Start validation run&quot;
   </span>CmdStartValidationRun      = <span class="number">32u8</span>,         
   <span class="doccomment">/// command code for &quot;Get all waveforms&quot;
-  </span>CmdGetFullWaveforms        = <span class="number">41u8</span>,      
-  <span class="doccomment">/// command code for &quot;Get waveforms/data for specific event&quot;
-  </span>CmdGetReducedDataPacket    = <span class="number">42u8</span>, 
-  <span class="doccomment">/// command code for &quot;Get monitoring data&quot;
-  </span>CmdRequestMoni             = <span class="number">43u8</span>,
+  </span>CmdGetFullWaveforms        = <span class="number">41u8</span>,
+  <span class="doccomment">/// command code for &quot;Run no input calibration&quot;
+  </span>CmdNoiCalibration          = <span class="number">50u8</span>,       
   <span class="doccomment">/// command code for &quot;Run voltage calibration&quot;
   </span>CmdVoltageCalibration      = <span class="number">51u8</span>,       
   <span class="doccomment">/// command code for &quot;Run timing calibration&quot;
-  </span>CmdTimingCalibration       = <span class="number">52u8</span>,      
-  <span class="doccomment">/// command code for &quot;Create a new calibration file&quot;
-  </span>CmdCreateCalibrationFile   = <span class="number">53u8</span>,   
+  </span>CmdTimingCalibration       = <span class="number">52u8</span>,
+  <span class="doccomment">/// command code for &quot;Run full calibration&quot;
+  </span>CmdDefaultCalibration      = <span class="number">53u8</span>, 
 
   <span class="doccomment">/// command code for &quot;Send the whole event cache over the wire&quot;
   </span>CmdUnspoolEventCache       = <span class="number">44u8</span>,
 
-  <span class="doccomment">/// command code for &quot;Operate in a mode, where we stream any event 
-  /// (not only those which are requested)&quot;
-  </span>CmdStreamAnyEvent          = <span class="number">45u8</span>,
-  <span class="doccomment">/// command code for &quot;Stream only events which are explicitly requested&quot;
-  </span>CmdStreamOnlyRequested     = <span class="number">46u8</span>,
   <span class="doccomment">/// command code for setting the size of the rb buffers.
   /// technically, this does not change the size, but sets 
   /// a different value for trip
   </span>CmdSetRBDataBufSize        = <span class="number">23u8</span>,
-  <span class="doccomment">/// command code for enable the forced trigger mode
+  <span class="doccomment">/// command code for enabling/disabling the forced trigger mode
   /// on the RBs
-  </span>CmdEnTriggerModeForced     = <span class="number">24u8</span>,
-  <span class="doccomment">/// command code to disable the forced trigger mode 
-  /// on the RBs
-  </span>CmdDisTriggerModeForced    = <span class="number">25u8</span>,
-  <span class="doccomment">/// Set forced trigger mode on MTB
-  </span>CmdEnTriggerModeForcedMTB  = <span class="number">26u8</span>,
-  <span class="comment">// Disable forced trigger mode on MTB
-  </span>CmdDisTriggerModeForcedMTB = <span class="number">27u8</span>,
-  Unknown                    = <span class="number">90u8
+  </span>CmdTriggerModeForced       = <span class="number">24u8</span>,
+  <span class="doccomment">/// command code for enabling/disabling the forced trigger mode
+  /// on the MTB
+  </span>CmdTriggerModeForcedMTB    = <span class="number">25u8</span>,
+
+  <span class="doccomment">/// command code for restarting systemd
+  </span>CmdSystemdReboot           = <span class="number">60u8
 </span>}
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>TofCommandCode {
@@ -1018,76 +980,58 @@
   }
 }
 
-<span class="kw">impl </span>TryFrom&lt;u8&gt; <span class="kw">for </span>TofCommandCode {
-  <span class="kw">type </span>Error = <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str;
-
-  <span class="comment">// I am not sure about this hard coding, but the code
-  //  looks nicer - Paolo
-  </span><span class="kw">fn </span>try_from(value: u8) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+<span class="kw">impl </span>From&lt;u8&gt; <span class="kw">for </span>TofCommandCode {
+  <span class="kw">fn </span>from(value: u8) -&gt; <span class="self">Self </span>{
     <span class="kw">match </span>value {
-      <span class="number">1u8  </span>=&gt; <span class="prelude-val">Ok</span>(TofCommandCode::CmdPing),
-      <span class="number">10u8 </span>=&gt; <span class="prelude-val">Ok</span>(TofCommandCode::CmdPowerOff),
-      <span class="number">11u8 </span>=&gt; <span class="prelude-val">Ok</span>(TofCommandCode::CmdPowerOn),
-      <span class="number">12u8 </span>=&gt; <span class="prelude-val">Ok</span>(TofCommandCode::CmdPowerCycle),
-      <span class="number">20u8 </span>=&gt; <span class="prelude-val">Ok</span>(TofCommandCode::CmdRBSetup),
-      <span class="number">21u8 </span>=&gt; <span class="prelude-val">Ok</span>(TofCommandCode::CmdSetThresholds),
-      <span class="number">22u8 </span>=&gt; <span class="prelude-val">Ok</span>(TofCommandCode::CmdSetMTConfig),
-      <span class="number">30u8 </span>=&gt; <span class="prelude-val">Ok</span>(TofCommandCode::CmdDataRunStop),
-      <span class="number">31u8 </span>=&gt; <span class="prelude-val">Ok</span>(TofCommandCode::CmdDataRunStart),
-      <span class="number">32u8 </span>=&gt; <span class="prelude-val">Ok</span>(TofCommandCode::CmdStartValidationRun),
-      <span class="number">41u8 </span>=&gt; <span class="prelude-val">Ok</span>(TofCommandCode::CmdGetFullWaveforms),
-      <span class="number">42u8 </span>=&gt; <span class="prelude-val">Ok</span>(TofCommandCode::CmdGetReducedDataPacket),
-      <span class="number">43u8 </span>=&gt; <span class="prelude-val">Ok</span>(TofCommandCode::CmdRequestMoni),
-      <span class="number">51u8 </span>=&gt; <span class="prelude-val">Ok</span>(TofCommandCode::CmdVoltageCalibration),
-      <span class="number">52u8 </span>=&gt; <span class="prelude-val">Ok</span>(TofCommandCode::CmdTimingCalibration),
-      <span class="number">53u8 </span>=&gt; <span class="prelude-val">Ok</span>(TofCommandCode::CmdCreateCalibrationFile),
-      <span class="number">44u8 </span>=&gt; <span class="prelude-val">Ok</span>(TofCommandCode::CmdUnspoolEventCache),
-      <span class="number">45u8 </span>=&gt; <span class="prelude-val">Ok</span>(TofCommandCode::CmdStreamAnyEvent),
-      <span class="number">46u8 </span>=&gt; <span class="prelude-val">Ok</span>(TofCommandCode::CmdStreamOnlyRequested),
-      <span class="number">23u8 </span>=&gt; <span class="prelude-val">Ok</span>(TofCommandCode::CmdSetRBDataBufSize),
-      <span class="number">24u8 </span>=&gt; <span class="prelude-val">Ok</span>(TofCommandCode::CmdEnTriggerModeForced),
-      <span class="number">25u8 </span>=&gt; <span class="prelude-val">Ok</span>(TofCommandCode::CmdDisTriggerModeForced),
-      <span class="number">26u8 </span>=&gt; <span class="prelude-val">Ok</span>(TofCommandCode::CmdEnTriggerModeForcedMTB),
-      <span class="number">27u8 </span>=&gt; <span class="prelude-val">Ok</span>(TofCommandCode::CmdDisTriggerModeForcedMTB),
-      <span class="number">90u8 </span>=&gt; <span class="prelude-val">Ok</span>(TofCommandCode::Unknown),
-      <span class="kw">_    </span>=&gt; {
-        <span class="macro">error!</span>(<span class="string">&quot;{} is not a avlid TofCommand code!&quot;</span>, value);
-        <span class="prelude-val">Err</span>(<span class="string">&quot;I am not sure how to convert this value!&quot;</span>)
-      }
+      <span class="number">0u8  </span>=&gt; TofCommandCode::CmdUnknown,
+      <span class="number">1u8  </span>=&gt; TofCommandCode::CmdPing,
+      <span class="number">2u8  </span>=&gt; TofCommandCode::CmdMoni,
+      <span class="number">10u8 </span>=&gt; TofCommandCode::CmdPower,
+      <span class="number">21u8 </span>=&gt; TofCommandCode::CmdSetThresholds,
+      <span class="number">22u8 </span>=&gt; TofCommandCode::CmdSetMTConfig,
+      <span class="number">28u8 </span>=&gt; TofCommandCode::CmdSetPreampBias,
+      <span class="number">30u8 </span>=&gt; TofCommandCode::CmdDataRunStop,
+      <span class="number">31u8 </span>=&gt; TofCommandCode::CmdDataRunStart,
+      <span class="number">32u8 </span>=&gt; TofCommandCode::CmdStartValidationRun,
+      <span class="number">41u8 </span>=&gt; TofCommandCode::CmdGetFullWaveforms,
+      <span class="number">50u8 </span>=&gt; TofCommandCode::CmdNoiCalibration,
+      <span class="number">51u8 </span>=&gt; TofCommandCode::CmdVoltageCalibration,
+      <span class="number">52u8 </span>=&gt; TofCommandCode::CmdTimingCalibration,
+      <span class="number">53u8 </span>=&gt; TofCommandCode::CmdDefaultCalibration,
+      <span class="number">44u8 </span>=&gt; TofCommandCode::CmdUnspoolEventCache,
+      <span class="number">23u8 </span>=&gt; TofCommandCode::CmdSetRBDataBufSize,
+      <span class="number">24u8 </span>=&gt; TofCommandCode::CmdTriggerModeForced,
+      <span class="number">25u8 </span>=&gt; TofCommandCode::CmdTriggerModeForcedMTB,
+      <span class="number">60u8 </span>=&gt; TofCommandCode::CmdSystemdReboot,
+      <span class="kw">_    </span>=&gt; TofCommandCode::CmdUnknown
     }
   }
 }
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;random&quot;</span>)]
 </span><span class="kw">impl </span>FromRandom <span class="kw">for </span>TofCommandCode {
-  
   <span class="kw">fn </span>from_random() -&gt; <span class="self">Self </span>{
     <span class="kw">let </span>choices = [
+      TofCommandCode::CmdUnknown,
       TofCommandCode::CmdPing,
-      TofCommandCode::CmdPowerOff,
-      TofCommandCode::CmdPowerOn,
-      TofCommandCode::CmdPowerCycle,
-      TofCommandCode::CmdRBSetup,
+      TofCommandCode::CmdMoni,
+      TofCommandCode::CmdPower,
       TofCommandCode::CmdSetThresholds,
       TofCommandCode::CmdSetMTConfig,
+      TofCommandCode::CmdSetPreampBias,
       TofCommandCode::CmdDataRunStop,
       TofCommandCode::CmdDataRunStart,
       TofCommandCode::CmdStartValidationRun,
       TofCommandCode::CmdGetFullWaveforms,
-      TofCommandCode::CmdGetReducedDataPacket,
-      TofCommandCode::CmdRequestMoni,
+      TofCommandCode::CmdNoiCalibration,
       TofCommandCode::CmdVoltageCalibration,
       TofCommandCode::CmdTimingCalibration,
-      TofCommandCode::CmdCreateCalibrationFile,
+      TofCommandCode::CmdDefaultCalibration,
       TofCommandCode::CmdUnspoolEventCache,
-      TofCommandCode::CmdStreamAnyEvent,
-      TofCommandCode::CmdStreamOnlyRequested,
       TofCommandCode::CmdSetRBDataBufSize,
-      TofCommandCode::CmdEnTriggerModeForced,
-      TofCommandCode::CmdDisTriggerModeForced,
-      TofCommandCode::CmdEnTriggerModeForcedMTB,
-      TofCommandCode::CmdDisTriggerModeForcedMTB,
-      TofCommandCode::Unknown
+      TofCommandCode::CmdTriggerModeForced,
+      TofCommandCode::CmdTriggerModeForcedMTB,
+      TofCommandCode::CmdSystemdReboot
     ];
     <span class="kw">let </span><span class="kw-2">mut </span>rng  = rand::thread_rng();
     <span class="kw">let </span>idx = rng.gen_range(<span class="number">0</span>..choices.len());
@@ -1102,6 +1046,7 @@
 </span><span class="attr">#[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 #[repr(u32)]
 </span><span class="kw">pub enum </span>TofCommandResp {
+  Unknown                            = <span class="number">0u32</span>,
   <span class="doccomment">/// response code for: Command can not be executed on the server side
   </span>RespErrUnexecutable                = <span class="number">500u32</span>,
   RespErrNotImplemented              = <span class="number">404u32</span>, 
@@ -1143,29 +1088,22 @@
   }
 }
 
-<span class="kw">impl </span>TryFrom&lt;u32&gt; <span class="kw">for </span>TofCommandResp {
-  <span class="kw">type </span>Error = <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str;
-
-  <span class="comment">// I am not sure about this hard coding, but the code
-  //  looks nicer - Paolo
-  </span><span class="kw">fn </span>try_from(value: u32) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+<span class="kw">impl </span>From&lt;u32&gt; <span class="kw">for </span>TofCommandResp {
+  <span class="kw">fn </span>from(value: u32) -&gt; <span class="self">Self </span>{
     <span class="kw">match </span>value {
-      <span class="number">500u32   </span>=&gt; <span class="prelude-val">Ok</span>(TofCommandResp::RespErrUnexecutable),
-      <span class="number">404u32   </span>=&gt; <span class="prelude-val">Ok</span>(TofCommandResp::RespErrNotImplemented),
-      <span class="number">4000u32  </span>=&gt; <span class="prelude-val">Ok</span>(TofCommandResp::RespErrLevelNoProblem),
-      <span class="number">4010u32  </span>=&gt; <span class="prelude-val">Ok</span>(TofCommandResp::RespErrLevelMedium),
-      <span class="number">4020u32  </span>=&gt; <span class="prelude-val">Ok</span>(TofCommandResp::RespErrLevelSevere),
-      <span class="number">4030u32  </span>=&gt; <span class="prelude-val">Ok</span>(TofCommandResp::RespErrLevelCritical),
-      <span class="number">4040u32  </span>=&gt; <span class="prelude-val">Ok</span>(TofCommandResp::RespErrLevelMissionCritical),
-      <span class="number">99999u32 </span>=&gt; <span class="prelude-val">Ok</span>(TofCommandResp::RespErrLevelRunFoolRun),
-      <span class="number">200u32   </span>=&gt; <span class="prelude-val">Ok</span>(TofCommandResp::RespSuccFingersCrossed),
-      <span class="number">501u32   </span>=&gt; <span class="prelude-val">Ok</span>(TofCommandResp::RespErrNoRunActive),
-      <span class="number">502u32   </span>=&gt; <span class="prelude-val">Ok</span>(TofCommandResp::RespErrRunActive),
-      <span class="number">503u32   </span>=&gt; <span class="prelude-val">Ok</span>(TofCommandResp::RespErrCmdStuck),
-      <span class="kw">_        </span>=&gt; {
-        <span class="macro">error! </span>(<span class="string">&quot;{} is not a valid TofCommandResp!&quot;</span>, value);
-        <span class="prelude-val">Err</span>(<span class="string">&quot;I am not sure how to convert this value!&quot;</span>)
-      }
+      <span class="number">500u32   </span>=&gt; TofCommandResp::RespErrUnexecutable,
+      <span class="number">404u32   </span>=&gt; TofCommandResp::RespErrNotImplemented,
+      <span class="number">4000u32  </span>=&gt; TofCommandResp::RespErrLevelNoProblem,
+      <span class="number">4010u32  </span>=&gt; TofCommandResp::RespErrLevelMedium,
+      <span class="number">4020u32  </span>=&gt; TofCommandResp::RespErrLevelSevere,
+      <span class="number">4030u32  </span>=&gt; TofCommandResp::RespErrLevelCritical,
+      <span class="number">4040u32  </span>=&gt; TofCommandResp::RespErrLevelMissionCritical,
+      <span class="number">99999u32 </span>=&gt; TofCommandResp::RespErrLevelRunFoolRun,
+      <span class="number">200u32   </span>=&gt; TofCommandResp::RespSuccFingersCrossed,
+      <span class="number">501u32   </span>=&gt; TofCommandResp::RespErrNoRunActive,
+      <span class="number">502u32   </span>=&gt; TofCommandResp::RespErrRunActive,
+      <span class="number">503u32   </span>=&gt; TofCommandResp::RespErrCmdStuck,
+      <span class="kw">_        </span>=&gt; TofCommandResp::Unknown
     }
   }
 }
@@ -1213,7 +1151,6 @@
   </span>RBHighThroughput = <span class="number">30u8</span>,
   RBCalcCRC32      = <span class="number">40u8</span>,
   RBWaveform       = <span class="number">50u8</span>,
-
 }
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>TofOperationMode {
@@ -1224,23 +1161,16 @@
   }
 }
 
-<span class="kw">impl </span>TryFrom&lt;u8&gt; <span class="kw">for </span>TofOperationMode {
-  <span class="kw">type </span>Error = <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str;
-
-  <span class="comment">// I am not sure about this hard coding, but the code
-  //  looks nicer - Paolo
-  </span><span class="kw">fn </span>try_from(value: u8) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+<span class="kw">impl </span>From&lt;u8&gt; <span class="kw">for </span>TofOperationMode {
+  <span class="kw">fn </span>from(value: u8) -&gt; <span class="self">Self </span>{
     <span class="kw">match </span>value {
-      <span class="number">0u8  </span>=&gt; <span class="prelude-val">Ok</span>(TofOperationMode::Unknown),
-      <span class="number">10u8 </span>=&gt; <span class="prelude-val">Ok</span>(TofOperationMode::StreamAny),
-      <span class="number">20u8 </span>=&gt; <span class="prelude-val">Ok</span>(TofOperationMode::RequestReply),
-      <span class="number">30u8 </span>=&gt; <span class="prelude-val">Ok</span>(TofOperationMode::RBHighThroughput),
-      <span class="number">40u8 </span>=&gt; <span class="prelude-val">Ok</span>(TofOperationMode::RBCalcCRC32),
-      <span class="number">50u8 </span>=&gt; <span class="prelude-val">Ok</span>(TofOperationMode::RBWaveform),
-      <span class="kw">_    </span>=&gt; {
-        <span class="macro">error!</span>(<span class="string">&quot;{} is not a valid TofOperationMode!&quot;</span>, value);
-        <span class="prelude-val">Err</span>(<span class="string">&quot;I am not sure how to convert this value!&quot;</span>)
-      }
+      <span class="number">0u8  </span>=&gt; TofOperationMode::Unknown,
+      <span class="number">10u8 </span>=&gt; TofOperationMode::StreamAny,
+      <span class="number">20u8 </span>=&gt; TofOperationMode::RequestReply,
+      <span class="number">30u8 </span>=&gt; TofOperationMode::RBHighThroughput,
+      <span class="number">40u8 </span>=&gt; TofOperationMode::RBCalcCRC32,
+      <span class="number">50u8 </span>=&gt; TofOperationMode::RBWaveform,
+      <span class="kw">_    </span>=&gt; TofOperationMode::Unknown
     }
   }
 }
@@ -1250,6 +1180,7 @@
   
   <span class="kw">fn </span>from_random() -&gt; <span class="self">Self </span>{
     <span class="kw">let </span>choices = [
+      TofOperationMode::Unknown,
       TofOperationMode::RequestReply,
       TofOperationMode::StreamAny,
       TofOperationMode::RBHighThroughput,
@@ -1380,31 +1311,26 @@
 ///
 </span><span class="attr">#[derive(Debug, PartialEq, Copy, Clone, serde::Deserialize, serde::Serialize)]</span><span class="comment">//, IntoEnumIterator)]
 </span><span class="kw">pub enum </span>TofCommand {
+  Unknown                 (u32),
   Ping                    (u32),
-  PowerOff                (u32),
-  PowerOn                 (u32),
-  PowerCycle              (u32),
-  RBSetup                 (u32),
+  Moni                    (u32),
+  Power                   (u32),
   SetThresholds           (u32),
   SetMTConfig             (u32),
+  SetPreampBias           (u32),
   DataRunStop             (u32),
   DataRunStart            (u32),
   StartValidationRun      (u32),
   GetFullWaveforms        (u32),
-  GetReducedDataPacket    (u32),
-  RequestMoni             (u32),
+  NoiCalibration          (u32),
   VoltageCalibration      (u32),
   TimingCalibration       (u32),
-  CreateCalibrationFile   (u32), <span class="comment">// still need some insight
-  </span>UnspoolEventCache       (u32),
-  StreamAnyEvent          (u32),
-  StreamOnlyRequested     (u32),
+  DefaultCalibration      (u32),
+  UnspoolEventCache       (u32),
   SetRBDataBufSize        (u32),
-  EnTriggerModeForced     (u32),
-  DisTriggerModeForced    (u32),
-  EnTriggerModeForcedMTB  (u32),
-  DisTriggerModeForcedMTB (u32),
-  Unknown                 (u32)
+  TriggerModeForced       (u32),
+  TriggerModeForcedMTB    (u32),
+  SystemdReboot           (u32),
 }
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>TofCommand {
@@ -1479,31 +1405,26 @@
   </span><span class="kw">pub fn </span>get_value(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
     <span class="kw">let </span>value : u32;
     <span class="kw">match </span><span class="self">self </span>{
+      TofCommand::Unknown                 (data) =&gt; { value = <span class="kw-2">*</span>data;}, 
       TofCommand::Ping                    (data) =&gt; { value = <span class="kw-2">*</span>data;},
-      TofCommand::PowerOn                 (data) =&gt; { value = <span class="kw-2">*</span>data;}, 
-      TofCommand::PowerOff                (data) =&gt; { value = <span class="kw-2">*</span>data;}, 
-      TofCommand::PowerCycle              (data) =&gt; { value = <span class="kw-2">*</span>data;}, 
-      TofCommand::RBSetup                 (data) =&gt; { value = <span class="kw-2">*</span>data;}, 
+      TofCommand::Moni                    (data) =&gt; { value = <span class="kw-2">*</span>data;},
+      TofCommand::Power                   (data) =&gt; { value = <span class="kw-2">*</span>data;},
       TofCommand::SetThresholds           (data) =&gt; { value = <span class="kw-2">*</span>data;},
       TofCommand::SetMTConfig             (data) =&gt; { value = <span class="kw-2">*</span>data;},
+      TofCommand::SetPreampBias           (data) =&gt; { value = <span class="kw-2">*</span>data;},
+      TofCommand::DataRunStop             (data) =&gt; { value = <span class="kw-2">*</span>data;},
+      TofCommand::DataRunStart            (data) =&gt; { value = <span class="kw-2">*</span>data;},
       TofCommand::StartValidationRun      (data) =&gt; { value = <span class="kw-2">*</span>data;},
       TofCommand::GetFullWaveforms        (data) =&gt; { value = <span class="kw-2">*</span>data;},
-      TofCommand::UnspoolEventCache       (data) =&gt; { value = <span class="kw-2">*</span>data;},
-      TofCommand::StreamAnyEvent          (data) =&gt; { value = <span class="kw-2">*</span>data;},
-      TofCommand::StreamOnlyRequested     (data) =&gt; { value = <span class="kw-2">*</span>data;},
-      TofCommand::DataRunStart            (data) =&gt; { value = <span class="kw-2">*</span>data;},
-      TofCommand::DataRunStop             (data) =&gt; { value = <span class="kw-2">*</span>data;},
+      TofCommand::NoiCalibration          (data) =&gt; { value = <span class="kw-2">*</span>data;},
       TofCommand::VoltageCalibration      (data) =&gt; { value = <span class="kw-2">*</span>data;},
       TofCommand::TimingCalibration       (data) =&gt; { value = <span class="kw-2">*</span>data;},
-      TofCommand::CreateCalibrationFile   (data) =&gt; { value = <span class="kw-2">*</span>data;},
-      TofCommand::GetReducedDataPacket    (data) =&gt; { value = <span class="kw-2">*</span>data;},
-      TofCommand::RequestMoni             (data) =&gt; { value = <span class="kw-2">*</span>data;},
+      TofCommand::DefaultCalibration      (data) =&gt; { value = <span class="kw-2">*</span>data;},
+      TofCommand::UnspoolEventCache       (data) =&gt; { value = <span class="kw-2">*</span>data;},
       TofCommand::SetRBDataBufSize        (data) =&gt; { value = <span class="kw-2">*</span>data;},
-      TofCommand::EnTriggerModeForced     (data) =&gt; { value = <span class="kw-2">*</span>data;},
-      TofCommand::DisTriggerModeForced    (data) =&gt; { value = <span class="kw-2">*</span>data;},
-      TofCommand::EnTriggerModeForcedMTB  (data) =&gt; { value = <span class="kw-2">*</span>data;},
-      TofCommand::DisTriggerModeForcedMTB (data) =&gt; { value = <span class="kw-2">*</span>data;},
-      TofCommand::Unknown                 (data) =&gt; { value = <span class="kw-2">*</span>data;}, 
+      TofCommand::TriggerModeForced       (data) =&gt; { value = <span class="kw-2">*</span>data;},
+      TofCommand::TriggerModeForcedMTB    (data) =&gt; { value = <span class="kw-2">*</span>data;},
+      TofCommand::SystemdReboot           (data) =&gt; { value = <span class="kw-2">*</span>data;},
     }
     value
   }  
@@ -1512,63 +1433,53 @@
   /// representation
   </span><span class="kw">pub fn </span>from_command_code(cc : TofCommandCode, value : u32) -&gt; TofCommand {
     <span class="kw">match </span>cc {
+      TofCommandCode::CmdUnknown                 =&gt; TofCommand::Unknown                 (<span class="number">0u32</span>),
       TofCommandCode::CmdPing                    =&gt; TofCommand::Ping                    (<span class="number">0u32</span>),
-      TofCommandCode::CmdPowerOff                =&gt; TofCommand::PowerOff                (value),
-      TofCommandCode::CmdPowerOn                 =&gt; TofCommand::PowerOn                 (value),
-      TofCommandCode::CmdPowerCycle              =&gt; TofCommand::PowerCycle              (value),
-      TofCommandCode::CmdRBSetup                 =&gt; TofCommand::RBSetup                 (value),
+      TofCommandCode::CmdMoni                    =&gt; TofCommand::Moni                    (<span class="number">0u32</span>),
+      TofCommandCode::CmdPower                   =&gt; TofCommand::Power                   (value),
       TofCommandCode::CmdSetThresholds           =&gt; TofCommand::SetThresholds           (value),
       TofCommandCode::CmdSetMTConfig             =&gt; TofCommand::SetMTConfig             (value),
-      TofCommandCode::CmdDataRunStart            =&gt; TofCommand::DataRunStart            (value),
+      TofCommandCode::CmdSetPreampBias           =&gt; TofCommand::SetPreampBias           (value),
       TofCommandCode::CmdDataRunStop             =&gt; TofCommand::DataRunStop             (<span class="number">0u32</span>),
+      TofCommandCode::CmdDataRunStart            =&gt; TofCommand::DataRunStart            (value),
       TofCommandCode::CmdStartValidationRun      =&gt; TofCommand::StartValidationRun      (value),
       TofCommandCode::CmdGetFullWaveforms        =&gt; TofCommand::GetFullWaveforms        (<span class="number">0u32</span>),
-      TofCommandCode::CmdGetReducedDataPacket    =&gt; TofCommand::GetReducedDataPacket    (<span class="number">0u32</span>),
-      TofCommandCode::CmdRequestMoni             =&gt; TofCommand::RequestMoni             (<span class="number">0u32</span>),
+      TofCommandCode::CmdNoiCalibration          =&gt; TofCommand::NoiCalibration          (value),
       TofCommandCode::CmdVoltageCalibration      =&gt; TofCommand::VoltageCalibration      (value),
       TofCommandCode::CmdTimingCalibration       =&gt; TofCommand::TimingCalibration       (value),
-      TofCommandCode::CmdCreateCalibrationFile   =&gt; TofCommand::CreateCalibrationFile   (value),
+      TofCommandCode::CmdDefaultCalibration      =&gt; TofCommand::DefaultCalibration      (value),
       TofCommandCode::CmdUnspoolEventCache       =&gt; TofCommand::UnspoolEventCache       (<span class="number">0u32</span>),
-      TofCommandCode::CmdStreamAnyEvent          =&gt; TofCommand::StreamAnyEvent          (<span class="number">0u32</span>),
-      TofCommandCode::CmdStreamOnlyRequested     =&gt; TofCommand::StreamOnlyRequested     (<span class="number">0u32</span>),
       TofCommandCode::CmdSetRBDataBufSize        =&gt; TofCommand::SetRBDataBufSize        (<span class="number">0u32</span>),
-      TofCommandCode::CmdEnTriggerModeForced     =&gt; TofCommand::EnTriggerModeForced     (<span class="number">0u32</span>),
-      TofCommandCode::CmdDisTriggerModeForced    =&gt; TofCommand::DisTriggerModeForced    (<span class="number">0u32</span>),
-      TofCommandCode::CmdEnTriggerModeForcedMTB  =&gt; TofCommand::EnTriggerModeForcedMTB  (<span class="number">0u32</span>),
-      TofCommandCode::CmdDisTriggerModeForcedMTB =&gt; TofCommand::DisTriggerModeForcedMTB (<span class="number">0u32</span>),
-      <span class="kw">_                                          </span>=&gt; TofCommand::Unknown                 (<span class="number">0u32</span>),
+      TofCommandCode::CmdTriggerModeForced       =&gt; TofCommand::TriggerModeForced       (<span class="number">0u32</span>),
+      TofCommandCode::CmdTriggerModeForcedMTB    =&gt; TofCommand::TriggerModeForcedMTB    (<span class="number">0u32</span>),
+      TofCommandCode::CmdSystemdReboot           =&gt; TofCommand::SystemdReboot           (<span class="number">0u32</span>)
     }
   }
     
   <span class="doccomment">/// Translate a TofCommand into its specific byte representation
   </span><span class="kw">pub fn </span>to_command_code(cmd : <span class="kw-2">&amp;</span>TofCommand) -&gt; <span class="prelude-ty">Option</span>&lt;TofCommandCode&gt; {
     <span class="kw">match </span>cmd {
+      TofCommand::Unknown                 (<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(TofCommandCode::CmdUnknown),
       TofCommand::Ping                    (<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(TofCommandCode::CmdPing),
-      TofCommand::PowerOff                (<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(TofCommandCode::CmdPowerOff),
-      TofCommand::PowerOn                 (<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(TofCommandCode::CmdPowerOn),
-      TofCommand::PowerCycle              (<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(TofCommandCode::CmdPowerCycle),
-      TofCommand::RBSetup                 (<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(TofCommandCode::CmdRBSetup),
+      TofCommand::Moni                    (<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(TofCommandCode::CmdMoni),
+      TofCommand::Power                   (<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(TofCommandCode::CmdPower),
       TofCommand::SetThresholds           (<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(TofCommandCode::CmdSetThresholds),
       TofCommand::SetMTConfig             (<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(TofCommandCode::CmdSetMTConfig),
-      TofCommand::DataRunStart            (<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(TofCommandCode::CmdDataRunStart),
+      TofCommand::SetPreampBias           (<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(TofCommandCode::CmdSetPreampBias),
       TofCommand::DataRunStop             (<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(TofCommandCode::CmdDataRunStop),
+      TofCommand::DataRunStart            (<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(TofCommandCode::CmdDataRunStart),
       TofCommand::StartValidationRun      (<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(TofCommandCode::CmdStartValidationRun),
       TofCommand::GetFullWaveforms        (<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(TofCommandCode::CmdGetFullWaveforms),
-      TofCommand::GetReducedDataPacket    (<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(TofCommandCode::CmdGetReducedDataPacket),
-      TofCommand::RequestMoni             (<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(TofCommandCode::CmdRequestMoni),
+      TofCommand::NoiCalibration          (<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(TofCommandCode::CmdNoiCalibration),
       TofCommand::VoltageCalibration      (<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(TofCommandCode::CmdVoltageCalibration),
       TofCommand::TimingCalibration       (<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(TofCommandCode::CmdTimingCalibration),
-      TofCommand::CreateCalibrationFile   (<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(TofCommandCode::CmdCreateCalibrationFile),
+      TofCommand::DefaultCalibration      (<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(TofCommandCode::CmdDefaultCalibration),
       TofCommand::UnspoolEventCache       (<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(TofCommandCode::CmdUnspoolEventCache),
-      TofCommand::StreamAnyEvent          (<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(TofCommandCode::CmdStreamAnyEvent),
-      TofCommand::StreamOnlyRequested     (<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(TofCommandCode::CmdStreamOnlyRequested),
       TofCommand::SetRBDataBufSize        (<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(TofCommandCode::CmdSetRBDataBufSize),
-      TofCommand::EnTriggerModeForced     (<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(TofCommandCode::CmdEnTriggerModeForced),
-      TofCommand::DisTriggerModeForced    (<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(TofCommandCode::CmdDisTriggerModeForced),
-      TofCommand::EnTriggerModeForcedMTB  (<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(TofCommandCode::CmdEnTriggerModeForcedMTB),
-      TofCommand::DisTriggerModeForcedMTB (<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(TofCommandCode::CmdDisTriggerModeForcedMTB),
-      TofCommand::Unknown                 (<span class="kw">_</span>) =&gt; <span class="prelude-val">None
-    </span>}
+      TofCommand::TriggerModeForced       (<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(TofCommandCode::CmdTriggerModeForced),
+      TofCommand::TriggerModeForcedMTB    (<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(TofCommandCode::CmdTriggerModeForcedMTB),
+      TofCommand::SystemdReboot           (<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(TofCommandCode::CmdSystemdReboot)
+    }
   }
 
   <span class="kw">pub fn </span>from_tof_packet(packet : <span class="kw-2">&amp;</span>TofPacket) 
@@ -1603,6 +1514,39 @@
     <span class="kw">let </span>(input, value) = pair;
     <span class="macro">trace!</span>(<span class="string">&quot;Got in input {:?}&quot;</span>, pair);
     TofCommand::from_command_code(TofCommandCode::try_from(input).unwrap(), value)
+  }
+}
+
+<span class="attr">#[cfg(feature = <span class="string">&quot;random&quot;</span>)]
+</span><span class="kw">impl </span>FromRandom <span class="kw">for </span>TofCommand {
+  
+  <span class="kw">fn </span>from_random() -&gt; <span class="self">Self </span>{
+    <span class="kw">let </span><span class="kw-2">mut </span>rng  = rand::thread_rng();
+    <span class="kw">let </span>val = rng.gen::&lt;u32&gt;();
+    <span class="kw">let </span>choices = [
+      TofCommand::Unknown                 (val),
+      TofCommand::Ping                    (val),
+      TofCommand::Moni                    (val),
+      TofCommand::Power                   (val),
+      TofCommand::SetThresholds           (val),
+      TofCommand::SetMTConfig             (val),
+      TofCommand::SetPreampBias           (val),
+      TofCommand::DataRunStop             (val),
+      TofCommand::DataRunStart            (val),
+      TofCommand::StartValidationRun      (val),
+      TofCommand::GetFullWaveforms        (val),
+      TofCommand::NoiCalibration          (val),
+      TofCommand::VoltageCalibration      (val),
+      TofCommand::TimingCalibration       (val),
+      TofCommand::DefaultCalibration      (val),
+      TofCommand::UnspoolEventCache       (val),
+      TofCommand::SetRBDataBufSize        (val),
+      TofCommand::TriggerModeForced       (val),
+      TofCommand::TriggerModeForcedMTB    (val),
+      TofCommand::SystemdReboot           (val)
+    ];
+    <span class="kw">let </span>idx = rng.gen_range(<span class="number">0</span>..choices.len());
+    choices[idx]
   }
 }
 

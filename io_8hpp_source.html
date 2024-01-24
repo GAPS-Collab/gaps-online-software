@@ -28,7 +28,7 @@
   <td id="projectlogo"><img alt="Logo" src="GAPSLOGO_2023_ico.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">gaps-online-software
-   &#160;<span id="projectnumber">0.8</span>
+   &#160;<span id="projectnumber">0.9</span>
    </div>
    <div id="projectbrief">online software for the TOF system for the GAPS experiment</div>
   </td>
@@ -134,14 +134,14 @@ $(document).ready(function(){initNavTree('io_8hpp_source.html',''); initResizabl
 <div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    <span class="keyword">public</span>: </div>
 <div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;      <a class="code" href="classGaps_1_1TofPacketReader.html">TofPacketReader</a>(String filename);</div>
 <div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;      <span class="keywordtype">void</span> process_chunk();</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;      TofPacket get_next_packet();</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;      <a class="code" href="structTofPacket.html">TofPacket</a> get_next_packet();</div>
 <div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;      String get_filename() <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    <span class="keyword">private</span>:</div>
 <div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;      String filename_;</div>
 <div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;      usize  file_size_;</div>
 <div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;      usize  nchunks_;</div>
 <div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;      usize  current_pos_;</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;      TofPacket last_packet_;</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;      <a class="code" href="structTofPacket.html">TofPacket</a> last_packet_;</div>
 <div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;      std::ifstream stream_file_;</div>
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;  };</div>
 <div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;}</div>
@@ -150,6 +150,7 @@ $(document).ready(function(){initNavTree('io_8hpp_source.html',''); initResizabl
 <div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="aclassGaps_1_1TofPacketReader_html"><div class="ttname"><a href="classGaps_1_1TofPacketReader.html">Gaps::TofPacketReader</a></div><div class="ttdef"><b>Definition:</b> io.hpp:101</div></div>
 <div class="ttc" id="anamespaceGaps_html"><div class="ttname"><a href="namespaceGaps.html">Gaps</a></div><div class="ttdoc">‍**</div><div class="ttdef"><b>Definition:</b> io.hpp:97</div></div>
+<div class="ttc" id="astructTofPacket_html"><div class="ttname"><a href="structTofPacket.html">TofPacket</a></div><div class="ttdef"><b>Definition:</b> tof_packet.h:75</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

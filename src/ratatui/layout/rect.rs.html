@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.24.0/src/layout/rect.rs`."><title>rect.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.25.0/src/layout/rect.rs`."><title>rect.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -289,6 +289,71 @@
 <a href="#289" id="289">289</a>
 <a href="#290" id="290">290</a>
 <a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
+<a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
+<a href="#295" id="295">295</a>
+<a href="#296" id="296">296</a>
+<a href="#297" id="297">297</a>
+<a href="#298" id="298">298</a>
+<a href="#299" id="299">299</a>
+<a href="#300" id="300">300</a>
+<a href="#301" id="301">301</a>
+<a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
+<a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
+<a href="#323" id="323">323</a>
+<a href="#324" id="324">324</a>
+<a href="#325" id="325">325</a>
+<a href="#326" id="326">326</a>
+<a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
+<a href="#329" id="329">329</a>
+<a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
+<a href="#333" id="333">333</a>
+<a href="#334" id="334">334</a>
+<a href="#335" id="335">335</a>
+<a href="#336" id="336">336</a>
+<a href="#337" id="337">337</a>
+<a href="#338" id="338">338</a>
+<a href="#339" id="339">339</a>
+<a href="#340" id="340">340</a>
+<a href="#341" id="341">341</a>
+<a href="#342" id="342">342</a>
+<a href="#343" id="343">343</a>
+<a href="#344" id="344">344</a>
+<a href="#345" id="345">345</a>
+<a href="#346" id="346">346</a>
+<a href="#347" id="347">347</a>
+<a href="#348" id="348">348</a>
+<a href="#349" id="349">349</a>
+<a href="#350" id="350">350</a>
+<a href="#351" id="351">351</a>
+<a href="#352" id="352">352</a>
+<a href="#353" id="353">353</a>
+<a href="#354" id="354">354</a>
+<a href="#355" id="355">355</a>
+<a href="#356" id="356">356</a>
 </pre></div><pre class="rust"><code><span class="attr">#![warn(missing_docs)]
 </span><span class="kw">use </span>std::{
     cmp::{max, min},
@@ -296,6 +361,10 @@
 };
 
 <span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
+
+<span class="kw">mod </span>offset;
+
+<span class="kw">pub use </span>offset::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// A simple rectangle used in the computation of the layout and to give widgets a hint about the
 /// area they are supposed to render to.
@@ -397,6 +466,26 @@
         }
     }
 
+    <span class="doccomment">/// Moves the `Rect` without modifying its size.
+    ///
+    /// Moves the `Rect` according to the given offset without modifying its [`width`](Rect::width)
+    /// or [`height`](Rect::height).
+    /// - Positive `x` moves the whole `Rect` to the right, negative to the left.
+    /// - Positive `y` moves the whole `Rect` to the bottom, negative to the top.
+    ///
+    /// See [`Offset`] for details.
+    </span><span class="kw">pub fn </span>offset(<span class="self">self</span>, offset: Offset) -&gt; Rect {
+        Rect {
+            x: i32::from(<span class="self">self</span>.x)
+                .saturating_add(offset.x)
+                .clamp(<span class="number">0</span>, (u16::MAX - <span class="self">self</span>.width) <span class="kw">as </span>i32) <span class="kw">as </span>u16,
+            y: i32::from(<span class="self">self</span>.y)
+                .saturating_add(offset.y)
+                .clamp(<span class="number">0</span>, (u16::MAX - <span class="self">self</span>.height) <span class="kw">as </span>i32) <span class="kw">as </span>u16,
+            ..<span class="self">self
+        </span>}
+    }
+
     <span class="doccomment">/// Returns a new rect that contains both the current one and the given one.
     </span><span class="kw">pub fn </span>union(<span class="self">self</span>, other: Rect) -&gt; Rect {
         <span class="kw">let </span>x1 = min(<span class="self">self</span>.x, other.x);
@@ -422,8 +511,8 @@
         Rect {
             x: x1,
             y: y1,
-            width: x2 - x1,
-            height: y2 - y1,
+            width: x2.saturating_sub(x1),
+            height: y2.saturating_sub(y1),
         }
     }
 
@@ -499,6 +588,39 @@
     }
 
     <span class="attr">#[test]
+    </span><span class="kw">fn </span>offset() {
+        <span class="macro">assert_eq!</span>(
+            Rect::new(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>).offset(Offset { x: <span class="number">5</span>, y: <span class="number">6 </span>}),
+            Rect::new(<span class="number">6</span>, <span class="number">8</span>, <span class="number">3</span>, <span class="number">4</span>),
+        );
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>negative_offset() {
+        <span class="macro">assert_eq!</span>(
+            Rect::new(<span class="number">4</span>, <span class="number">3</span>, <span class="number">3</span>, <span class="number">4</span>).offset(Offset { x: -<span class="number">2</span>, y: -<span class="number">1 </span>}),
+            Rect::new(<span class="number">2</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>),
+        );
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>negative_offset_saturate() {
+        <span class="macro">assert_eq!</span>(
+            Rect::new(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>).offset(Offset { x: -<span class="number">5</span>, y: -<span class="number">6 </span>}),
+            Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">3</span>, <span class="number">4</span>),
+        );
+    }
+
+    <span class="doccomment">/// Offsets a [`Rect`] making it go outside [`u16::MAX`], it should keep its size.
+    </span><span class="attr">#[test]
+    </span><span class="kw">fn </span>offset_saturate_max() {
+        <span class="macro">assert_eq!</span>(
+            Rect::new(u16::MAX - <span class="number">500</span>, u16::MAX - <span class="number">500</span>, <span class="number">100</span>, <span class="number">100</span>).offset(Offset { x: <span class="number">1000</span>, y: <span class="number">1000 </span>}),
+            Rect::new(u16::MAX - <span class="number">100</span>, u16::MAX - <span class="number">100</span>, <span class="number">100</span>, <span class="number">100</span>),
+        );
+    }
+
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>union() {
         <span class="macro">assert_eq!</span>(
             Rect::new(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>).union(Rect::new(<span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>)),
@@ -511,6 +633,14 @@
         <span class="macro">assert_eq!</span>(
             Rect::new(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>).intersection(Rect::new(<span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>)),
             Rect::new(<span class="number">2</span>, <span class="number">3</span>, <span class="number">2</span>, <span class="number">3</span>)
+        );
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>intersection_underflow() {
+        <span class="macro">assert_eq!</span>(
+            Rect::new(<span class="number">1</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">2</span>).intersection(Rect::new(<span class="number">4</span>, <span class="number">4</span>, <span class="number">2</span>, <span class="number">2</span>)),
+            Rect::new(<span class="number">4</span>, <span class="number">4</span>, <span class="number">0</span>, <span class="number">0</span>)
         );
     }
 

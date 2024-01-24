@@ -228,9 +228,6 @@
 <a href="#228" id="228">228</a>
 <a href="#229" id="229">229</a>
 <a href="#230" id="230">230</a>
-<a href="#231" id="231">231</a>
-<a href="#232" id="232">232</a>
-<a href="#233" id="233">233</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Standalone application to get events from the MTB (master trigger board)
 //!
 //! This will connect to the MTB over Udp and request the event queue, 
@@ -349,11 +346,9 @@
   //let thread_control = Arc::new(Mutex::new(ThreadControl::default()));
 
   </span><span class="kw">let </span><span class="kw-2">mut </span>ltb_rb_map : DsiLtbRBMapping = HashMap::&lt;u8,HashMap::&lt;u8,HashMap::&lt;u8,(u8,u8)&gt;&gt;&gt;::new();
-  <span class="kw">let </span>master_trigger_ip   = String::from(<span class="string">&quot;10.0.1.10&quot;</span>);
-  <span class="kw">let </span>master_trigger_port = <span class="number">50001usize</span>;
-  <span class="comment">//let worker_threads      = ThreadPool::new(2);
+  <span class="kw">let </span>mt_address          = String::from(<span class="string">&quot;10.0.1.10:50001&quot;</span>);
 
-  </span><span class="kw">let </span>args                = Args::parse();
+  <span class="kw">let </span>args                = Args::parse();
   <span class="kw">let </span>verbose             = args.verbose;
   <span class="kw">let </span>publish_packets     = args.publish_packets;
   <span class="kw">let </span>send_requests       = args.send_requests;
@@ -372,8 +367,7 @@
   <span class="kw">let </span>_worker_thread = thread::Builder::new()
          .name(<span class="string">&quot;master_trigger&quot;</span>.into())
          .spawn(<span class="kw">move </span>|| {
-            master_trigger(<span class="kw-2">&amp;</span>master_trigger_ip, 
-                           master_trigger_port,
+            master_trigger(mt_address, 
                            <span class="kw-2">&amp;</span>ltb_rb_map,
                            <span class="kw-2">&amp;</span>mte_send,
                            <span class="kw-2">&amp;</span>tp_send_req,

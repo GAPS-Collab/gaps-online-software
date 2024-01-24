@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.24.0/src/widgets/tabs.rs`."><title>tabs.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.25.0/src/widgets/tabs.rs`."><title>tabs.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -343,21 +343,155 @@
 <a href="#343" id="343">343</a>
 <a href="#344" id="344">344</a>
 <a href="#345" id="345">345</a>
+<a href="#346" id="346">346</a>
+<a href="#347" id="347">347</a>
+<a href="#348" id="348">348</a>
+<a href="#349" id="349">349</a>
+<a href="#350" id="350">350</a>
+<a href="#351" id="351">351</a>
+<a href="#352" id="352">352</a>
+<a href="#353" id="353">353</a>
+<a href="#354" id="354">354</a>
+<a href="#355" id="355">355</a>
+<a href="#356" id="356">356</a>
+<a href="#357" id="357">357</a>
+<a href="#358" id="358">358</a>
+<a href="#359" id="359">359</a>
+<a href="#360" id="360">360</a>
+<a href="#361" id="361">361</a>
+<a href="#362" id="362">362</a>
+<a href="#363" id="363">363</a>
+<a href="#364" id="364">364</a>
+<a href="#365" id="365">365</a>
+<a href="#366" id="366">366</a>
+<a href="#367" id="367">367</a>
+<a href="#368" id="368">368</a>
+<a href="#369" id="369">369</a>
+<a href="#370" id="370">370</a>
+<a href="#371" id="371">371</a>
+<a href="#372" id="372">372</a>
+<a href="#373" id="373">373</a>
+<a href="#374" id="374">374</a>
+<a href="#375" id="375">375</a>
+<a href="#376" id="376">376</a>
+<a href="#377" id="377">377</a>
+<a href="#378" id="378">378</a>
+<a href="#379" id="379">379</a>
+<a href="#380" id="380">380</a>
+<a href="#381" id="381">381</a>
+<a href="#382" id="382">382</a>
+<a href="#383" id="383">383</a>
+<a href="#384" id="384">384</a>
+<a href="#385" id="385">385</a>
+<a href="#386" id="386">386</a>
+<a href="#387" id="387">387</a>
+<a href="#388" id="388">388</a>
+<a href="#389" id="389">389</a>
+<a href="#390" id="390">390</a>
+<a href="#391" id="391">391</a>
+<a href="#392" id="392">392</a>
+<a href="#393" id="393">393</a>
+<a href="#394" id="394">394</a>
+<a href="#395" id="395">395</a>
+<a href="#396" id="396">396</a>
+<a href="#397" id="397">397</a>
+<a href="#398" id="398">398</a>
+<a href="#399" id="399">399</a>
+<a href="#400" id="400">400</a>
+<a href="#401" id="401">401</a>
+<a href="#402" id="402">402</a>
+<a href="#403" id="403">403</a>
+<a href="#404" id="404">404</a>
+<a href="#405" id="405">405</a>
+<a href="#406" id="406">406</a>
+<a href="#407" id="407">407</a>
+<a href="#408" id="408">408</a>
+<a href="#409" id="409">409</a>
+<a href="#410" id="410">410</a>
+<a href="#411" id="411">411</a>
+<a href="#412" id="412">412</a>
+<a href="#413" id="413">413</a>
+<a href="#414" id="414">414</a>
+<a href="#415" id="415">415</a>
+<a href="#416" id="416">416</a>
+<a href="#417" id="417">417</a>
+<a href="#418" id="418">418</a>
+<a href="#419" id="419">419</a>
+<a href="#420" id="420">420</a>
+<a href="#421" id="421">421</a>
+<a href="#422" id="422">422</a>
+<a href="#423" id="423">423</a>
+<a href="#424" id="424">424</a>
+<a href="#425" id="425">425</a>
+<a href="#426" id="426">426</a>
+<a href="#427" id="427">427</a>
+<a href="#428" id="428">428</a>
+<a href="#429" id="429">429</a>
+<a href="#430" id="430">430</a>
+<a href="#431" id="431">431</a>
+<a href="#432" id="432">432</a>
+<a href="#433" id="433">433</a>
+<a href="#434" id="434">434</a>
+<a href="#435" id="435">435</a>
+<a href="#436" id="436">436</a>
+<a href="#437" id="437">437</a>
+<a href="#438" id="438">438</a>
+<a href="#439" id="439">439</a>
+<a href="#440" id="440">440</a>
+<a href="#441" id="441">441</a>
+<a href="#442" id="442">442</a>
+<a href="#443" id="443">443</a>
+<a href="#444" id="444">444</a>
+<a href="#445" id="445">445</a>
+<a href="#446" id="446">446</a>
+<a href="#447" id="447">447</a>
+<a href="#448" id="448">448</a>
+<a href="#449" id="449">449</a>
+<a href="#450" id="450">450</a>
+<a href="#451" id="451">451</a>
+<a href="#452" id="452">452</a>
+<a href="#453" id="453">453</a>
+<a href="#454" id="454">454</a>
+<a href="#455" id="455">455</a>
+<a href="#456" id="456">456</a>
+<a href="#457" id="457">457</a>
+<a href="#458" id="458">458</a>
+<a href="#459" id="459">459</a>
+<a href="#460" id="460">460</a>
+<a href="#461" id="461">461</a>
+<a href="#462" id="462">462</a>
+<a href="#463" id="463">463</a>
+<a href="#464" id="464">464</a>
+<a href="#465" id="465">465</a>
+<a href="#466" id="466">466</a>
+<a href="#467" id="467">467</a>
+<a href="#468" id="468">468</a>
+<a href="#469" id="469">469</a>
+<a href="#470" id="470">470</a>
+<a href="#471" id="471">471</a>
+<a href="#472" id="472">472</a>
+<a href="#473" id="473">473</a>
+<a href="#474" id="474">474</a>
 </pre></div><pre class="rust"><code><span class="attr">#![deny(missing_docs)]
 </span><span class="kw">use crate</span>::{
     buffer::Buffer,
     layout::Rect,
-    style::{Style, Styled},
+    style::{Modifier, Style, Styled},
     symbols,
     text::{Line, Span},
     widgets::{Block, Widget},
 };
 
+<span class="kw">const </span>DEFAULT_HIGHLIGHT_STYLE: Style = Style::new().add_modifier(Modifier::REVERSED);
+
 <span class="doccomment">/// A widget that displays a horizontal set of Tabs with a single tab selected.
 ///
 /// Each tab title is stored as a [`Line`] which can be individually styled. The selected tab is set
 /// using [`Tabs::select`] and styled using [`Tabs::highlight_style`]. The divider can be customized
-/// with [`Tabs::divider`].
+/// with [`Tabs::divider`]. Padding can be set with [`Tabs::padding`] or [`Tabs::padding_left`] and
+/// [`Tabs::padding_right`].
+///
+/// The divider defaults to |, and padding defaults to a singular space on each side.
 ///
 /// # Example
 ///
@@ -369,7 +503,8 @@
 ///     .style(Style::default().white())
 ///     .highlight_style(Style::default().yellow())
 ///     .select(2)
-///     .divider(symbols::DOT);
+///     .divider(symbols::DOT)
+///     .padding(&quot;-&gt;&quot;, &quot;&lt;-&quot;);
 /// ```
 </span><span class="attr">#[derive(Debug, Default, Clone, Eq, PartialEq, Hash)]
 </span><span class="kw">pub struct </span>Tabs&lt;<span class="lifetime">&#39;a</span>&gt; {
@@ -385,6 +520,10 @@
     </span>highlight_style: Style,
     <span class="doccomment">/// Tab divider
     </span>divider: Span&lt;<span class="lifetime">&#39;a</span>&gt;,
+    <span class="doccomment">/// Tab Left Padding
+    </span>padding_left: Line&lt;<span class="lifetime">&#39;a</span>&gt;,
+    <span class="doccomment">/// Tab Right Padding
+    </span>padding_right: Line&lt;<span class="lifetime">&#39;a</span>&gt;,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Tabs&lt;<span class="lifetime">&#39;a</span>&gt; {
@@ -392,6 +531,18 @@
     ///
     /// `titles` can be a [`Vec`] of [`&amp;str`], [`String`] or anything that can be converted into
     /// [`Line`]. As such, titles can be styled independently.
+    ///
+    /// The selected tab can be set with [`Tabs::select`]. The first tab has index 0 (this is also
+    /// the default index).
+    ///
+    /// The selected tab can have a different style with [`Tabs::highlight_style`]. This defaults to
+    /// a style with the [`Modifier::REVERSED`] modifier added.
+    ///
+    /// The default divider is a pipe (`|`), but it can be customized with [`Tabs::divider`].
+    ///
+    /// The entire widget can be styled with [`Tabs::style`].
+    ///
+    /// The widget can be wrapped in a [`Block`] using [`Tabs::block`].
     ///
     /// # Examples
     ///
@@ -415,12 +566,15 @@
             titles: titles.into_iter().map(Into::into).collect(),
             selected: <span class="number">0</span>,
             style: Style::default(),
-            highlight_style: Style::default(),
+            highlight_style: DEFAULT_HIGHLIGHT_STYLE,
             divider: Span::raw(symbols::line::VERTICAL),
+            padding_left: Line::from(<span class="string">&quot; &quot;</span>),
+            padding_right: Line::from(<span class="string">&quot; &quot;</span>),
         }
     }
 
     <span class="doccomment">/// Surrounds the `Tabs` with a [`Block`].
+    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
     </span><span class="kw">pub fn </span>block(<span class="kw-2">mut </span><span class="self">self</span>, block: Block&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; Tabs&lt;<span class="lifetime">&#39;a</span>&gt; {
         <span class="self">self</span>.block = <span class="prelude-val">Some</span>(block);
         <span class="self">self
@@ -428,8 +582,9 @@
 
     <span class="doccomment">/// Sets the selected tab.
     ///
-    /// The first tab has index 0 (this is also the default index).  
+    /// The first tab has index 0 (this is also the default index).
     /// The selected tab can have a different style with [`Tabs::highlight_style`].
+    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
     </span><span class="kw">pub fn </span>select(<span class="kw-2">mut </span><span class="self">self</span>, selected: usize) -&gt; Tabs&lt;<span class="lifetime">&#39;a</span>&gt; {
         <span class="self">self</span>.selected = selected;
         <span class="self">self
@@ -440,6 +595,7 @@
     /// This will set the given style on the entire render area.
     /// More precise style can be applied to the titles by styling the ones given to [`Tabs::new`].
     /// The selected tab can be styled differently using [`Tabs::highlight_style`].
+    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
     </span><span class="kw">pub fn </span>style(<span class="kw-2">mut </span><span class="self">self</span>, style: Style) -&gt; Tabs&lt;<span class="lifetime">&#39;a</span>&gt; {
         <span class="self">self</span>.style = style;
         <span class="self">self
@@ -448,6 +604,7 @@
     <span class="doccomment">/// Sets the style for the highlighted tab.
     ///
     /// Highlighted tab can be selected with [`Tabs::select`].
+    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
     </span><span class="kw">pub fn </span>highlight_style(<span class="kw-2">mut </span><span class="self">self</span>, style: Style) -&gt; Tabs&lt;<span class="lifetime">&#39;a</span>&gt; {
         <span class="self">self</span>.highlight_style = style;
         <span class="self">self
@@ -466,7 +623,7 @@
     /// ```
     /// Use dash (`-`) as separator.
     /// ```
-    /// # use ratatui::{prelude::*, widgets::Tabs, symbols};
+    /// # use ratatui::{prelude::*, widgets::Tabs};
     /// let tabs = Tabs::new(vec![&quot;Tab 1&quot;, &quot;Tab 2&quot;]).divider(&quot;-&quot;);
     /// ```
     </span><span class="kw">pub fn </span>divider&lt;T&gt;(<span class="kw-2">mut </span><span class="self">self</span>, divider: T) -&gt; Tabs&lt;<span class="lifetime">&#39;a</span>&gt;
@@ -474,6 +631,70 @@
         </span>T: Into&lt;Span&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     {
         <span class="self">self</span>.divider = divider.into();
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Sets the padding between tabs.
+    ///
+    /// Both default to space.
+    ///
+    /// # Examples
+    ///
+    /// A space on either side of the tabs.
+    /// ```
+    /// # use ratatui::{prelude::*, widgets::Tabs};
+    /// let tabs = Tabs::new(vec![&quot;Tab 1&quot;, &quot;Tab 2&quot;]).padding(&quot; &quot;, &quot; &quot;);
+    /// ```
+    /// Nothing on either side of the tabs.
+    /// ```
+    /// # use ratatui::{prelude::*, widgets::Tabs};
+    /// let tabs = Tabs::new(vec![&quot;Tab 1&quot;, &quot;Tab 2&quot;]).padding(&quot;&quot;, &quot;&quot;);
+    /// ```
+    </span><span class="kw">pub fn </span>padding&lt;T, U&gt;(<span class="kw-2">mut </span><span class="self">self</span>, left: T, right: U) -&gt; Tabs&lt;<span class="lifetime">&#39;a</span>&gt;
+    <span class="kw">where
+        </span>T: Into&lt;Line&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+        U: Into&lt;Line&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    {
+        <span class="self">self</span>.padding_left = left.into();
+        <span class="self">self</span>.padding_right = right.into();
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Sets the left side padding between tabs.
+    ///
+    /// Defaults to a space.
+    ///
+    /// # Example
+    ///
+    /// An arrow on the left of tabs.
+    /// ```
+    /// # use ratatui::{prelude::*, widgets::Tabs};
+    /// let tabs = Tabs::new(vec![&quot;Tab 1&quot;, &quot;Tab 2&quot;]).padding_left(&quot;-&gt;&quot;);
+    /// ```
+    </span><span class="kw">pub fn </span>padding_left&lt;T&gt;(<span class="kw-2">mut </span><span class="self">self</span>, padding: T) -&gt; Tabs&lt;<span class="lifetime">&#39;a</span>&gt;
+    <span class="kw">where
+        </span>T: Into&lt;Line&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    {
+        <span class="self">self</span>.padding_left = padding.into();
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Sets the right side padding between tabs.
+    ///
+    /// Defaults to a space.
+    ///
+    /// # Example
+    ///
+    /// An arrow on the right of tabs.
+    /// ```
+    /// # use ratatui::{prelude::*, widgets::Tabs};
+    /// let tabs = Tabs::new(vec![&quot;Tab 1&quot;, &quot;Tab 2&quot;]).padding_right(&quot;&lt;-&quot;);
+    /// ```
+    </span><span class="kw">pub fn </span>padding_right&lt;T&gt;(<span class="kw-2">mut </span><span class="self">self</span>, padding: T) -&gt; Tabs&lt;<span class="lifetime">&#39;a</span>&gt;
+    <span class="kw">where
+        </span>T: Into&lt;Line&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    {
+        <span class="self">self</span>.padding_left = padding.into();
         <span class="self">self
     </span>}
 }
@@ -510,12 +731,22 @@
         <span class="kw">let </span>titles_length = <span class="self">self</span>.titles.len();
         <span class="kw">for </span>(i, title) <span class="kw">in </span><span class="self">self</span>.titles.into_iter().enumerate() {
             <span class="kw">let </span>last_title = titles_length - <span class="number">1 </span>== i;
-            x = x.saturating_add(<span class="number">1</span>);
+            <span class="kw">let </span>remaining_width = tabs_area.right().saturating_sub(x);
+
+            <span class="kw">if </span>remaining_width == <span class="number">0 </span>{
+                <span class="kw">break</span>;
+            }
+
+            <span class="comment">// Left Padding
+            </span><span class="kw">let </span>pos = buf.set_line(x, tabs_area.top(), <span class="kw-2">&amp;</span><span class="self">self</span>.padding_left, remaining_width);
+            x = pos.<span class="number">0</span>;
             <span class="kw">let </span>remaining_width = tabs_area.right().saturating_sub(x);
             <span class="kw">if </span>remaining_width == <span class="number">0 </span>{
                 <span class="kw">break</span>;
             }
-            <span class="kw">let </span>pos = buf.set_line(x, tabs_area.top(), <span class="kw-2">&amp;</span>title, remaining_width);
+
+            <span class="comment">// Title
+            </span><span class="kw">let </span>pos = buf.set_line(x, tabs_area.top(), <span class="kw-2">&amp;</span>title, remaining_width);
             <span class="kw">if </span>i == <span class="self">self</span>.selected {
                 buf.set_style(
                     Rect {
@@ -527,11 +758,20 @@
                     <span class="self">self</span>.highlight_style,
                 );
             }
-            x = pos.<span class="number">0</span>.saturating_add(<span class="number">1</span>);
+            x = pos.<span class="number">0</span>;
+            <span class="kw">let </span>remaining_width = tabs_area.right().saturating_sub(x);
+            <span class="kw">if </span>remaining_width == <span class="number">0 </span>{
+                <span class="kw">break</span>;
+            }
+
+            <span class="comment">// Right Padding
+            </span><span class="kw">let </span>pos = buf.set_line(x, tabs_area.top(), <span class="kw-2">&amp;</span><span class="self">self</span>.padding_right, remaining_width);
+            x = pos.<span class="number">0</span>;
             <span class="kw">let </span>remaining_width = tabs_area.right().saturating_sub(x);
             <span class="kw">if </span>remaining_width == <span class="number">0 </span>|| last_title {
                 <span class="kw">break</span>;
             }
+
             <span class="kw">let </span>pos = buf.set_span(x, tabs_area.top(), <span class="kw-2">&amp;</span><span class="self">self</span>.divider, remaining_width);
             x = pos.<span class="number">0</span>;
         }
@@ -559,8 +799,10 @@
                 ],
                 selected: <span class="number">0</span>,
                 style: Style::default(),
-                highlight_style: Style::default(),
+                highlight_style: DEFAULT_HIGHLIGHT_STYLE,
                 divider: Span::raw(symbols::line::VERTICAL),
+                padding_right: Line::from(<span class="string">&quot; &quot;</span>),
+                padding_left: Line::from(<span class="string">&quot; &quot;</span>),
             }
         );
     }
@@ -574,40 +816,56 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>render_default() {
         <span class="kw">let </span>tabs = Tabs::new(<span class="macro">vec!</span>[<span class="string">&quot;Tab1&quot;</span>, <span class="string">&quot;Tab2&quot;</span>, <span class="string">&quot;Tab3&quot;</span>, <span class="string">&quot;Tab4&quot;</span>]);
-        <span class="macro">assert_buffer_eq!</span>(
-            render(tabs, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">30</span>, <span class="number">1</span>)),
-            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot; Tab1 │ Tab2 │ Tab3 │ Tab4    &quot;</span>])
-        );
+        <span class="kw">let </span><span class="kw-2">mut </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot; Tab1 │ Tab2 │ Tab3 │ Tab4    &quot;</span>]);
+        <span class="comment">// first tab selected
+        </span>expected.set_style(Rect::new(<span class="number">1</span>, <span class="number">0</span>, <span class="number">4</span>, <span class="number">1</span>), DEFAULT_HIGHLIGHT_STYLE);
+        <span class="macro">assert_buffer_eq!</span>(render(tabs, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">30</span>, <span class="number">1</span>)), expected);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>render_no_padding() {
+        <span class="kw">let </span>tabs = Tabs::new(<span class="macro">vec!</span>[<span class="string">&quot;Tab1&quot;</span>, <span class="string">&quot;Tab2&quot;</span>, <span class="string">&quot;Tab3&quot;</span>, <span class="string">&quot;Tab4&quot;</span>]).padding(<span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;Tab1│Tab2│Tab3│Tab4           &quot;</span>]);
+        <span class="comment">// first tab selected
+        </span>expected.set_style(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">4</span>, <span class="number">1</span>), DEFAULT_HIGHLIGHT_STYLE);
+        <span class="macro">assert_buffer_eq!</span>(render(tabs, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">30</span>, <span class="number">1</span>)), expected);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>render_more_padding() {
+        <span class="kw">let </span>tabs = Tabs::new(<span class="macro">vec!</span>[<span class="string">&quot;Tab1&quot;</span>, <span class="string">&quot;Tab2&quot;</span>, <span class="string">&quot;Tab3&quot;</span>, <span class="string">&quot;Tab4&quot;</span>]).padding(<span class="string">&quot;---&quot;</span>, <span class="string">&quot;++&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;---Tab1++│---Tab2++│---Tab3++│&quot;</span>]);
+        <span class="comment">// first tab selected
+        </span>expected.set_style(Rect::new(<span class="number">3</span>, <span class="number">0</span>, <span class="number">4</span>, <span class="number">1</span>), DEFAULT_HIGHLIGHT_STYLE);
+        <span class="macro">assert_buffer_eq!</span>(render(tabs, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">30</span>, <span class="number">1</span>)), expected);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>render_with_block() {
         <span class="kw">let </span>tabs = Tabs::new(<span class="macro">vec!</span>[<span class="string">&quot;Tab1&quot;</span>, <span class="string">&quot;Tab2&quot;</span>, <span class="string">&quot;Tab3&quot;</span>, <span class="string">&quot;Tab4&quot;</span>])
             .block(Block::default().title(<span class="string">&quot;Tabs&quot;</span>).borders(Borders::ALL));
-        <span class="macro">assert_buffer_eq!</span>(
-            render(tabs, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">30</span>, <span class="number">3</span>)),
-            Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">&quot;┌Tabs────────────────────────┐&quot;</span>,
-                <span class="string">&quot;│ Tab1 │ Tab2 │ Tab3 │ Tab4  │&quot;</span>,
-                <span class="string">&quot;└────────────────────────────┘&quot;</span>,
-            ])
-        );
+        <span class="kw">let </span><span class="kw-2">mut </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[
+            <span class="string">&quot;┌Tabs────────────────────────┐&quot;</span>,
+            <span class="string">&quot;│ Tab1 │ Tab2 │ Tab3 │ Tab4  │&quot;</span>,
+            <span class="string">&quot;└────────────────────────────┘&quot;</span>,
+        ]);
+        <span class="comment">// first tab selected
+        </span>expected.set_style(Rect::new(<span class="number">2</span>, <span class="number">1</span>, <span class="number">4</span>, <span class="number">1</span>), DEFAULT_HIGHLIGHT_STYLE);
+        <span class="macro">assert_buffer_eq!</span>(render(tabs, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">30</span>, <span class="number">3</span>)), expected);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>render_style() {
         <span class="kw">let </span>tabs =
             Tabs::new(<span class="macro">vec!</span>[<span class="string">&quot;Tab1&quot;</span>, <span class="string">&quot;Tab2&quot;</span>, <span class="string">&quot;Tab3&quot;</span>, <span class="string">&quot;Tab4&quot;</span>]).style(Style::default().fg(Color::Red));
-        <span class="macro">assert_buffer_eq!</span>(
-            render(tabs, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">30</span>, <span class="number">1</span>)),
-            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot; Tab1 │ Tab2 │ Tab3 │ Tab4    &quot;</span>.red()])
-        );
+        <span class="kw">let </span><span class="kw-2">mut </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot; Tab1 │ Tab2 │ Tab3 │ Tab4    &quot;</span>.red()]);
+        expected.set_style(Rect::new(<span class="number">1</span>, <span class="number">0</span>, <span class="number">4</span>, <span class="number">1</span>), DEFAULT_HIGHLIGHT_STYLE.red());
+        <span class="macro">assert_buffer_eq!</span>(render(tabs, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">30</span>, <span class="number">1</span>)), expected);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>render_select() {
-        <span class="kw">let </span>tabs = Tabs::new(<span class="macro">vec!</span>[<span class="string">&quot;Tab1&quot;</span>, <span class="string">&quot;Tab2&quot;</span>, <span class="string">&quot;Tab3&quot;</span>, <span class="string">&quot;Tab4&quot;</span>])
-            .highlight_style(Style::new().reversed());
+        <span class="kw">let </span>tabs = Tabs::new(<span class="macro">vec!</span>[<span class="string">&quot;Tab1&quot;</span>, <span class="string">&quot;Tab2&quot;</span>, <span class="string">&quot;Tab3&quot;</span>, <span class="string">&quot;Tab4&quot;</span>]);
 
         <span class="comment">// first tab selected
         </span><span class="macro">assert_buffer_eq!</span>(
@@ -650,13 +908,13 @@
     </span><span class="kw">fn </span>render_style_and_selected() {
         <span class="kw">let </span>tabs = Tabs::new(<span class="macro">vec!</span>[<span class="string">&quot;Tab1&quot;</span>, <span class="string">&quot;Tab2&quot;</span>, <span class="string">&quot;Tab3&quot;</span>, <span class="string">&quot;Tab4&quot;</span>])
             .style(Style::new().red())
-            .highlight_style(Style::new().reversed())
+            .highlight_style(Style::new().underlined())
             .select(<span class="number">0</span>);
         <span class="macro">assert_buffer_eq!</span>(
             render(tabs, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">30</span>, <span class="number">1</span>)),
             Buffer::with_lines(<span class="macro">vec!</span>[Line::from(<span class="macro">vec!</span>[
                 <span class="string">&quot; &quot;</span>.red(),
-                <span class="string">&quot;Tab1&quot;</span>.red().reversed(),
+                <span class="string">&quot;Tab1&quot;</span>.red().underlined(),
                 <span class="string">&quot; │ Tab2 │ Tab3 │ Tab4    &quot;</span>.red(),
             ])])
         );
@@ -665,10 +923,10 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>render_divider() {
         <span class="kw">let </span>tabs = Tabs::new(<span class="macro">vec!</span>[<span class="string">&quot;Tab1&quot;</span>, <span class="string">&quot;Tab2&quot;</span>, <span class="string">&quot;Tab3&quot;</span>, <span class="string">&quot;Tab4&quot;</span>]).divider(<span class="string">&quot;--&quot;</span>);
-        <span class="macro">assert_buffer_eq!</span>(
-            render(tabs, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">30</span>, <span class="number">1</span>)),
-            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot; Tab1 -- Tab2 -- Tab3 -- Tab4 &quot;</span>,])
-        );
+        <span class="kw">let </span><span class="kw-2">mut </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot; Tab1 -- Tab2 -- Tab3 -- Tab4 &quot;</span>]);
+        <span class="comment">// first tab selected
+        </span>expected.set_style(Rect::new(<span class="number">1</span>, <span class="number">0</span>, <span class="number">4</span>, <span class="number">1</span>), DEFAULT_HIGHLIGHT_STYLE);
+        <span class="macro">assert_buffer_eq!</span>(render(tabs, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">30</span>, <span class="number">1</span>)), expected);
     }
 
     <span class="attr">#[test]

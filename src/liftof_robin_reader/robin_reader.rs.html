@@ -445,6 +445,8 @@
 <a href="#445" id="445">445</a>
 <a href="#446" id="446">446</a>
 <a href="#447" id="447">447</a>
+<a href="#448" id="448">448</a>
+<a href="#449" id="449">449</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Read &quot;old&quot; blobfiles and combine them offline into 
 //! TofEvents
 //!
@@ -487,7 +489,8 @@
 <span class="kw">use </span>tof_dataclasses::io::{
     RobinReader,
     TofPacketReader,
-    TofPacketWriter
+    TofPacketWriter,
+    FileType,
 };
 <span class="kw">use </span>liftof_lib::{
     color_log,
@@ -667,7 +670,8 @@
   <span class="kw">let </span><span class="kw-2">mut </span>ev_with_missing = <span class="number">0</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>mtp_events_tot  = <span class="number">0</span>;
 
-  <span class="kw">let </span><span class="kw-2">mut </span>writer = TofPacketWriter::new(String::from(<span class="string">&quot;combined&quot;</span>));
+  <span class="kw">let </span>ftype      = FileType::RunFile(<span class="number">1</span>); 
+  <span class="kw">let </span><span class="kw-2">mut </span>writer = TofPacketWriter::new(String::from(<span class="string">&quot;&quot;</span>), ftype);
   <span class="kw">let </span><span class="kw-2">mut </span>n_events = <span class="number">0u64</span>;
   <span class="kw">if </span>has_stream {
     <span class="kw">for </span>packet <span class="kw">in </span>packet_reader {

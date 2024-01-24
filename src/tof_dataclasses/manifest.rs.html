@@ -684,30 +684,6 @@
 <a href="#684" id="684">684</a>
 <a href="#685" id="685">685</a>
 <a href="#686" id="686">686</a>
-<a href="#687" id="687">687</a>
-<a href="#688" id="688">688</a>
-<a href="#689" id="689">689</a>
-<a href="#690" id="690">690</a>
-<a href="#691" id="691">691</a>
-<a href="#692" id="692">692</a>
-<a href="#693" id="693">693</a>
-<a href="#694" id="694">694</a>
-<a href="#695" id="695">695</a>
-<a href="#696" id="696">696</a>
-<a href="#697" id="697">697</a>
-<a href="#698" id="698">698</a>
-<a href="#699" id="699">699</a>
-<a href="#700" id="700">700</a>
-<a href="#701" id="701">701</a>
-<a href="#702" id="702">702</a>
-<a href="#703" id="703">703</a>
-<a href="#704" id="704">704</a>
-<a href="#705" id="705">705</a>
-<a href="#706" id="706">706</a>
-<a href="#707" id="707">707</a>
-<a href="#708" id="708">708</a>
-<a href="#709" id="709">709</a>
-<a href="#710" id="710">710</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Entities of the tof, that is LocalTriggerBoard, ReadoutBoard, PB, MTB...
 //! 
 //! This provides structs to hold their metainformation,
@@ -716,13 +692,13 @@
 
 </span><span class="kw">use </span>std::fmt;
 <span class="kw">use </span>std::net::Ipv4Addr;
-<span class="attr">#[cfg(feature = <span class="string">&quot;database&quot;</span>)]
-</span><span class="kw">use </span>std::path::Path;
-<span class="attr">#[cfg(feature = <span class="string">&quot;database&quot;</span>)]
-</span><span class="kw">use </span>std::str::FromStr;
-
-<span class="attr">#[cfg(feature = <span class="string">&quot;database&quot;</span>)]
-</span><span class="kw">extern crate </span>sqlite;
+<span class="macro">cfg_if::cfg_if! </span>{
+  <span class="kw">if </span><span class="attr">#[cfg(feature = <span class="string">&quot;database&quot;</span>)]  </span>{
+    <span class="kw">use </span>std::path::Path;
+    <span class="kw">use </span>std::str::FromStr;
+    <span class="kw">extern crate </span>sqlite;
+  }
+}
 
 <span class="attr">#[derive(Copy, Clone, Debug)]
 </span><span class="kw">pub struct </span>LocalTriggerBoard {
@@ -813,17 +789,15 @@
           <span class="macro">debug!</span>(<span class="string">&quot;{} = {}&quot;</span>, name, v);
           <span class="kw">match </span>name {
             <span class="string">&quot;rb_id&quot;      </span>=&gt; {rb.rb_id  = u8::from_str(v).unwrap_or(<span class="number">0</span>);},
-            <span class="string">&quot;port&quot;       </span>=&gt; {rb.port   = u16::from_str(v).unwrap_or(<span class="number">0</span>);},
-            <span class="comment">//&quot;ip_address&quot; =&gt; {10.0.1.116
-            </span><span class="string">&quot;ch1_paddle_id&quot; </span>=&gt; {rb.set_paddle_end_id_for_rb_channel(<span class="number">1</span>, u16::from_str(v).unwrap_or(<span class="number">0</span>));},
-            <span class="string">&quot;ch2_paddle_id&quot; </span>=&gt; {rb.set_paddle_end_id_for_rb_channel(<span class="number">2</span>, u16::from_str(v).unwrap_or(<span class="number">0</span>));},
-            <span class="string">&quot;ch3_paddle_id&quot; </span>=&gt; {rb.set_paddle_end_id_for_rb_channel(<span class="number">3</span>, u16::from_str(v).unwrap_or(<span class="number">0</span>));},
-            <span class="string">&quot;ch4_paddle_id&quot; </span>=&gt; {rb.set_paddle_end_id_for_rb_channel(<span class="number">4</span>, u16::from_str(v).unwrap_or(<span class="number">0</span>));},
-            <span class="string">&quot;ch5_paddle_id&quot; </span>=&gt; {rb.set_paddle_end_id_for_rb_channel(<span class="number">5</span>, u16::from_str(v).unwrap_or(<span class="number">0</span>));},
-            <span class="string">&quot;ch6_paddle_id&quot; </span>=&gt; {rb.set_paddle_end_id_for_rb_channel(<span class="number">6</span>, u16::from_str(v).unwrap_or(<span class="number">0</span>));},
-            <span class="string">&quot;ch7_paddle_id&quot; </span>=&gt; {rb.set_paddle_end_id_for_rb_channel(<span class="number">7</span>, u16::from_str(v).unwrap_or(<span class="number">0</span>));},
-            <span class="string">&quot;ch8_paddle_id&quot; </span>=&gt; {rb.set_paddle_end_id_for_rb_channel(<span class="number">8</span>, u16::from_str(v).unwrap_or(<span class="number">0</span>));},
-            <span class="kw">_ </span>=&gt; {<span class="macro">debug!</span>(<span class="string">&quot;Found name {}&quot;</span>, name);}                         
+            <span class="string">&quot;ch1_paddle&quot; </span>=&gt; {rb.set_paddle_end_id_for_rb_channel(<span class="number">1</span>, u16::from_str(v).unwrap_or(<span class="number">0</span>));},
+            <span class="string">&quot;ch2_paddle&quot; </span>=&gt; {rb.set_paddle_end_id_for_rb_channel(<span class="number">2</span>, u16::from_str(v).unwrap_or(<span class="number">0</span>));},
+            <span class="string">&quot;ch3_paddle&quot; </span>=&gt; {rb.set_paddle_end_id_for_rb_channel(<span class="number">3</span>, u16::from_str(v).unwrap_or(<span class="number">0</span>));},
+            <span class="string">&quot;ch4_paddle&quot; </span>=&gt; {rb.set_paddle_end_id_for_rb_channel(<span class="number">4</span>, u16::from_str(v).unwrap_or(<span class="number">0</span>));},
+            <span class="string">&quot;ch5_paddle&quot; </span>=&gt; {rb.set_paddle_end_id_for_rb_channel(<span class="number">5</span>, u16::from_str(v).unwrap_or(<span class="number">0</span>));},
+            <span class="string">&quot;ch6_paddle&quot; </span>=&gt; {rb.set_paddle_end_id_for_rb_channel(<span class="number">6</span>, u16::from_str(v).unwrap_or(<span class="number">0</span>));},
+            <span class="string">&quot;ch7_paddle&quot; </span>=&gt; {rb.set_paddle_end_id_for_rb_channel(<span class="number">7</span>, u16::from_str(v).unwrap_or(<span class="number">0</span>));},
+            <span class="string">&quot;ch8_paddle&quot; </span>=&gt; {rb.set_paddle_end_id_for_rb_channel(<span class="number">8</span>, u16::from_str(v).unwrap_or(<span class="number">0</span>));},
+            <span class="kw">_ </span>=&gt; {<span class="macro">warn!</span>(<span class="string">&quot;Found name {}, but not mapping it to self!&quot;</span>, name);}                         
           }
         }
       }
@@ -1100,6 +1074,7 @@
 //}
 
 </span><span class="attr">#[derive(Debug, Copy, Clone)]
+#[repr(u8)]
 </span><span class="kw">pub enum </span>PaddleEndLocation {
   PositiveX,
   NegativeX,
@@ -1255,13 +1230,9 @@
 </span><span class="kw">pub struct </span>ReadoutBoard {
   <span class="kw">pub </span>rb_id             : u8,  
   <span class="kw">pub </span>dna               : u64, 
-  <span class="kw">pub </span>port              : u16, 
-  <span class="kw">pub </span>ip_address        : Ipv4Addr,
-  <span class="comment">//pub ip_address       = models.GenericIPAddressField(unique=True)
-  //pub mac_address      = models.CharField(max_length=11, unique=True, null=True)
-  </span>channel_to_paddle_end_id : [u16;<span class="number">8</span>],
-  <span class="kw">pub </span>calib_file    : String,
-  <span class="kw">pub </span>trig_ch_mask  : [bool;<span class="number">8</span>],
+  channel_to_paddle_end_id : [u16;<span class="number">8</span>],
+  <span class="kw">pub </span>calib_file        : String,
+  <span class="kw">pub </span>trig_ch_mask      : [bool;<span class="number">8</span>],
 }
 
 <span class="kw">impl </span>ReadoutBoard {
@@ -1269,8 +1240,6 @@
     <span class="self">Self </span>{
       rb_id         : <span class="number">0</span>,  
       dna           : <span class="number">0</span>, 
-      port          : <span class="number">42000</span>, 
-      ip_address    : Ipv4Addr::new(<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>),
       channel_to_paddle_end_id : [<span class="number">0</span>;<span class="number">8</span>],
       calib_file    : String::from(<span class="string">&quot;&quot;</span>),
       trig_ch_mask  : [<span class="bool-val">false</span>;<span class="number">8</span>],
@@ -1288,20 +1257,14 @@
     cali
   }
 
-
-  <span class="kw">pub fn </span>infer_ip_address(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-    <span class="kw">let </span>address = <span class="number">100 </span>+ <span class="self">self</span>.rb_id;
-    <span class="self">self</span>.ip_address = Ipv4Addr::new(<span class="number">10</span>,<span class="number">0</span>,<span class="number">1</span>,address);
+  <span class="doccomment">/// The address the RB is publishing packets on 
+  ///
+  /// There is NO GUARANTEE that this is the correct
+  /// address!
+  </span><span class="kw">pub fn </span>guess_address(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+    <span class="macro">format!</span>(<span class="string">&quot;tcp://10.0.1.1{:02}:42000&quot;</span>, <span class="self">self</span>.rb_id)
   }
 
-  <span class="kw">pub fn </span>get_connection_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
-
-    <span class="kw">let </span><span class="kw-2">mut </span>address_ip = String::from(<span class="string">&quot;tcp://&quot;</span>);
-    address_ip = address_ip + <span class="kw-2">&amp;</span><span class="self">self</span>.ip_address.to_string();
-    address_ip += <span class="kw-2">&amp;</span><span class="string">&quot;:&quot;</span>.to_owned();
-    address_ip += <span class="kw-2">&amp;</span><span class="self">self</span>.port.to_string();
-    address_ip
-  }
 
   <span class="kw">pub fn </span>get_triggered_pids(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;u8&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>pids = Vec::&lt;u8&gt;::new();
@@ -1396,26 +1359,15 @@
 <span class="string">&quot;&lt;ReadoutBoard:
     ID                :  {}
     DNA               :  {} 
-    PORT              :  {} 
-    IP                :  {}
     CALIBRATION FILE  :  {}
     CHANNEL/PADDLE END:  {:?}
     TRIG_CH_MASK      :  {:?}&gt;&quot;</span>,
       <span class="self">self</span>.rb_id,
       <span class="self">self</span>.dna,
-      <span class="self">self</span>.port,
-      <span class="self">self</span>.ip_address,
       <span class="self">self</span>.calib_file,
       <span class="self">self</span>.channel_to_paddle_end_id,
       <span class="self">self</span>.trig_ch_mask)
   }
 }
 
-<span class="comment">//#[test]
-//fn test_get_rbs_sqlite() {
-//  get_ltbs_from_sqlite();
-//  get_rbs_from_sqlite();
-//}
-
-
-</span></code></pre></div></section></main></body></html>
+</code></pre></div></section></main></body></html>

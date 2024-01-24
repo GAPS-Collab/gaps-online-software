@@ -198,6 +198,7 @@
 <a href="#198" id="198">198</a>
 <a href="#199" id="199">199</a>
 <a href="#200" id="200">200</a>
+<a href="#201" id="201">201</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Provides run configuration and 
 //! settings for RBs and Tof CPU
 //!
@@ -218,12 +219,13 @@
 <span class="kw">use </span><span class="kw">crate</span>::events::DataType;
 <span class="kw">use </span><span class="kw">crate</span>::commands::TofOperationMode;
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;random&quot;</span>)] 
-</span><span class="kw">use </span><span class="kw">crate</span>::FromRandom;
-<span class="attr">#[cfg(feature = <span class="string">&quot;random&quot;</span>)]
-</span><span class="kw">extern crate </span>rand;
-<span class="attr">#[cfg(feature = <span class="string">&quot;random&quot;</span>)]
-</span><span class="kw">use </span>rand::Rng;
+<span class="macro">cfg_if::cfg_if! </span>{
+  <span class="kw">if </span><span class="attr">#[cfg(feature = <span class="string">&quot;random&quot;</span>)]  </span>{
+    <span class="kw">use </span><span class="kw">crate</span>::FromRandom;
+    <span class="kw">extern crate </span>rand;
+    <span class="kw">use </span>rand::Rng;
+  }
+}
 
 <span class="doccomment">/// Readoutboard configuration for a specific run
 </span><span class="attr">#[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]

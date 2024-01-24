@@ -128,7 +128,6 @@
 <a href="#128" id="128">128</a>
 <a href="#129" id="129">129</a>
 <a href="#130" id="130">130</a>
-<a href="#131" id="131">131</a>
 </pre></div><pre class="rust"><code><span class="doccomment">/// PacketType identifies the payload in TofPackets
 ///
 /// This needs to be kept in sync with the C++ API
@@ -154,8 +153,8 @@
   </span>HeartBeat          = <span class="number">40u8</span>,    <span class="comment">// might probably go away
   </span>MasterTrigger      = <span class="number">60u8</span>,    <span class="comment">// needs to be renamed to either MasterTriggerEvent or MTEvent
   </span>RBEventHeader      = <span class="number">70u8</span>,    <span class="comment">// needs to go away
-  </span>MonitorTofCmp      = <span class="number">80u8</span>,    <span class="comment">// needs to go away
-  </span>MonitorMtb         = <span class="number">90u8</span>,
+  </span>CPUMoniData        = <span class="number">80u8</span>,
+  MonitorMtb         = <span class="number">90u8</span>,
   RBMoni             = <span class="number">100u8</span>,
   PBMoniData         = <span class="number">101u8</span>,
   LTBMoniData        = <span class="number">102u8</span>,
@@ -165,6 +164,7 @@
   </span>RBCalibration      = <span class="number">130u8</span>,
   TofCommand         = <span class="number">140u8</span>,
   RBCommand          = <span class="number">150u8</span>,
+  Ping               = <span class="number">160u8</span>,
   <span class="doccomment">/// a MultiPacket consists of other TofPackets
   </span>MultiPacket        = <span class="number">255u8</span>,
 }
@@ -177,31 +177,29 @@
   }
 }
 
-<span class="kw">impl </span>TryFrom&lt;u8&gt; <span class="kw">for </span>PacketType {
-  <span class="kw">type </span>Error = <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str;
-
-  <span class="comment">// I am not sure about this hard coding, but the code
-  //  looks nicer - Paolo
-  </span><span class="kw">fn </span>try_from(value: u8) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+<span class="kw">impl </span>From&lt;u8&gt; <span class="kw">for </span>PacketType {
+  <span class="kw">fn </span>from(value: u8) -&gt; <span class="self">Self </span>{
     <span class="kw">match </span>value {
-      <span class="number">0u8   </span>=&gt; <span class="prelude-val">Ok</span>(PacketType::Unknown),
-      <span class="number">20u8  </span>=&gt; <span class="prelude-val">Ok</span>(PacketType::RBEvent),
-      <span class="number">21u8  </span>=&gt; <span class="prelude-val">Ok</span>(PacketType::TofEvent),
-      <span class="number">30u8  </span>=&gt; <span class="prelude-val">Ok</span>(PacketType::Monitor),
-      <span class="number">40u8  </span>=&gt; <span class="prelude-val">Ok</span>(PacketType::HeartBeat),
-      <span class="number">60u8  </span>=&gt; <span class="prelude-val">Ok</span>(PacketType::MasterTrigger),
-      <span class="number">70u8  </span>=&gt; <span class="prelude-val">Ok</span>(PacketType::RBEventHeader),
-      <span class="number">80u8  </span>=&gt; <span class="prelude-val">Ok</span>(PacketType::MonitorTofCmp),
-      <span class="number">90u8  </span>=&gt; <span class="prelude-val">Ok</span>(PacketType::MonitorMtb),
-      <span class="number">100u8 </span>=&gt; <span class="prelude-val">Ok</span>(PacketType::RBMoni),
-      <span class="number">101u8 </span>=&gt; <span class="prelude-val">Ok</span>(PacketType::PBMoniData),
-      <span class="number">102u8 </span>=&gt; <span class="prelude-val">Ok</span>(PacketType::LTBMoniData),
-      <span class="number">103u8 </span>=&gt; <span class="prelude-val">Ok</span>(PacketType::PAMoniData),
-      <span class="number">120u8 </span>=&gt; <span class="prelude-val">Ok</span>(PacketType::RBEventMemoryView),
-      <span class="number">130u8 </span>=&gt; <span class="prelude-val">Ok</span>(PacketType::RBCalibration),
-      <span class="number">140u8 </span>=&gt; <span class="prelude-val">Ok</span>(PacketType::TofCommand),
-      <span class="number">150u8 </span>=&gt; <span class="prelude-val">Ok</span>(PacketType::RBCommand),
-      <span class="kw">_     </span>=&gt; <span class="prelude-val">Err</span>(<span class="string">&quot;I am not sure how to convert this value!&quot;</span>)
+      <span class="number">0u8   </span>=&gt; PacketType::Unknown,
+      <span class="number">20u8  </span>=&gt; PacketType::RBEvent,
+      <span class="number">21u8  </span>=&gt; PacketType::TofEvent,
+      <span class="number">30u8  </span>=&gt; PacketType::Monitor,
+      <span class="number">40u8  </span>=&gt; PacketType::HeartBeat,
+      <span class="number">60u8  </span>=&gt; PacketType::MasterTrigger,
+      <span class="number">70u8  </span>=&gt; PacketType::RBEventHeader,
+      <span class="number">80u8  </span>=&gt; PacketType::CPUMoniData,
+      <span class="number">90u8  </span>=&gt; PacketType::MonitorMtb,
+      <span class="number">100u8 </span>=&gt; PacketType::RBMoni,
+      <span class="number">101u8 </span>=&gt; PacketType::PBMoniData   ,
+      <span class="number">102u8 </span>=&gt; PacketType::LTBMoniData  ,
+      <span class="number">103u8 </span>=&gt; PacketType::PAMoniData   ,
+      <span class="number">120u8 </span>=&gt; PacketType::RBEventMemoryView,
+      <span class="number">130u8 </span>=&gt; PacketType::RBCalibration,
+      <span class="number">140u8 </span>=&gt; PacketType::TofCommand,
+      <span class="number">150u8 </span>=&gt; PacketType::RBCommand,
+      <span class="number">160u8 </span>=&gt; PacketType::Ping,
+      <span class="number">255u8 </span>=&gt; PacketType::MultiPacket,
+      <span class="kw">_     </span>=&gt; PacketType::Unknown
     }
   }
 }
@@ -225,7 +223,7 @@
       PacketType::PBMoniData,
       PacketType::LTBMoniData,
       PacketType::PAMoniData,
-      PacketType::MonitorTofCmp,
+      PacketType::CPUMoniData,
       PacketType::MonitorMtb,
       PacketType::RBCalibration
     ];
@@ -252,7 +250,7 @@
   type_codes.push(PacketType::PBMoniData <span class="kw">as </span>u8);
   type_codes.push(PacketType::LTBMoniData <span class="kw">as </span>u8);
   type_codes.push(PacketType::PAMoniData <span class="kw">as </span>u8);
-  type_codes.push(PacketType::MonitorTofCmp <span class="kw">as </span>u8);
+  type_codes.push(PacketType::CPUMoniData <span class="kw">as </span>u8);
   type_codes.push(PacketType::MonitorMtb <span class="kw">as </span>u8);
   type_codes.push(PacketType::RBCalibration <span class="kw">as </span>u8);
   <span class="kw">for </span>tc <span class="kw">in </span>type_codes.iter() {

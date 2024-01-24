@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["LTBMoniData","MtbMoniData","PAMoniData","PBMoniData","RBMoniData","TofCmpMoniData"]};
+window.SIDEBAR_ITEMS = {"struct":["CPUMoniData","LTBMoniData","MtbMoniData","PAMoniData","PBMoniData","RBMoniData"]};
