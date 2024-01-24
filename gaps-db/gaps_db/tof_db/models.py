@@ -394,7 +394,22 @@ class DSICard(models.Model):
             return
         setattr(self, f'j{j}_rat_id', rat_id)
         
-    
+    def get_rat(self, j):
+        match j:
+            case 1:
+                return self.j1_rat_id
+            case 2:
+                return self.j2_rat_id
+            case 3:
+                return self.j3_rat_id
+            case 4:
+                return self.j4_rat_id
+            case 5:
+                return self.j5_rat_id
+            case _:
+                print(f"Can't get rat id for J {f}")
+                return None
+
     def __str__(self):
         return self.__repr__()
 
