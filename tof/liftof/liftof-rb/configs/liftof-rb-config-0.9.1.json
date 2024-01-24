@@ -7,5 +7,6 @@
   "trigger_poisson_rate"    : 0,
   "trigger_fixed_rate"      : 0,
   "data_type"               : "Physics",
-  "rb_buff_size"            : 50
+  "rb_buff_size"            : 50,
+  "paddle_map"              : "/home/gaps/config/rbch-vs-paddle.json"
 }
