@@ -18,7 +18,10 @@ use tof_dataclasses::errors::SerializationError;
 pub enum BuildStrategy {
   Unknown,
   Smart,
+  /// adjust the number of boards based on nrbes/mtb
   Adaptive,
+  /// like adaptive, but add usize to the expected number of boards
+  AdaptiveGreedy(usize),
   WaitForNBoards(usize)
 }
 
@@ -92,6 +95,7 @@ pub struct TofEventBuilderSettings {
   pub cachesize         : usize,
   pub n_mte_per_loop    : usize,
   pub n_rbe_per_loop    : usize,
+  pub te_timeout_sec    : u32,
   pub build_strategy    : BuildStrategy,
 }
 
@@ -101,6 +105,7 @@ impl TofEventBuilderSettings {
       cachesize         : 100000,
       n_mte_per_loop    : 1,
       n_rbe_per_loop    : 40,
+      te_timeout_sec    : 30,
       build_strategy    : BuildStrategy::WaitForNBoards(40),
     }
   }
@@ -127,6 +132,8 @@ pub struct LiftofCCSettings {
   pub data_dir                   : String,
   /// default location for RBCalibration files
   pub calibration_dir            : String,
+  /// default location for the database
+  pub db_path                    : String,
   /// Runtime in seconds
   pub runtime_sec                : u64,
   /// TOFPackets per file. This defines the "length" of 
@@ -161,6 +168,7 @@ impl LiftofCCSettings {
     LiftofCCSettings {
       data_dir                  : String::from(""),
       calibration_dir           : String::from(""),
+      db_path                   : String::from("/home/gaps/config/gaps_flight.db"),
       runtime_sec               : 0,
       packs_per_file            : 0,
       fc_pub_address            : String::from(""),
@@ -171,23 +179,6 @@ impl LiftofCCSettings {
       rb_ignorelist             : Vec::<u8>::new(),
       event_builder_settings    : TofEventBuilderSettings::new(),
       analysis_engine_settings  : AnalysisEngineSettings::new(),
-      //evb_cachesize         : 0,
-      //evb_n_mte_per_loop    : 0,
-      //evb_n_rbe_per_loop    : 0,
-      //evb_build_strategy    : BuildStrategy::WaitForNBoards(40),
-      //evb_build_strategy    : BuildStrategy::Adaptive,
-      //ana_int_start         : 270.0,
-      //ana_int_window        : 70.0, 
-      //ana_ped_thresh        : 10.0,
-      //ana_ped_begin_bin     : 10,
-      //ana_ped_win_bins      : 50,
-      //ana_use_zscore        : false,
-      //ana_find_pks_t_start  : 270.0,
-      //ana_find_pks_t_window : 70.0,
-      //ana_min_peak_size     : 3,
-      //ana_find_pks_thresh   : 10.0,
-      //ana_max_peaks         : 5,
-      //ana_cfd_fraction      : 0.2
     }
   }
 

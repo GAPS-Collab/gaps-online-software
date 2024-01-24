@@ -81,7 +81,10 @@ struct LiftofCCArgs {
   /// Write the entire TofPacket Stream to a file
   #[arg(short, long, default_value_t = false)]
   write_stream: bool,
-  /// Enhance output to console
+  /// Define a run id for later identification
+  #[arg(short, long)]
+  run_id: usize,
+  /// More detailed output for debugging
   #[arg(short, long, default_value_t = false)]
   verbose: bool,
   /// Configuration of liftof-cc. Configure analysis engine,
@@ -172,7 +175,7 @@ fn main() {
   info!("Will connect to the master trigger board at {}!", mtb_address);
  
   // FIXME
-  let runid                 = 48;
+  let runid                 = args.run_id;
   let mut write_stream_path = config.data_dir;
   let calib_file_path       = config.calibration_dir;
   let runtime_nseconds      = config.runtime_sec;
@@ -340,7 +343,6 @@ fn main() {
   for n in 0..nboards {
     let mut this_rb = rb_list[n].clone();
     let this_tp_to_sink_clone = tp_to_sink.clone();
-    this_rb.infer_ip_address();
     let cali_fname = this_rb.guess_calibration_filename();
     this_rb.calib_file = calib_file_path.clone() + &cali_fname;
     //this_rb.calib_file = calib_file_path.clone() + "/" + "rb";
