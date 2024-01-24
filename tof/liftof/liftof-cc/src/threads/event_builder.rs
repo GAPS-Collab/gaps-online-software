@@ -66,6 +66,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
   let mut last_rb_evid       = 0u32;
   let mut n_rbs_per_ev       = 0usize;
   let mut rb_ev_wo_mte       = 0usize;
+
   loop {
     n_received = 0;
     let debug_timer = Instant::now();
@@ -174,6 +175,13 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
         settings.n_rbe_per_loop = 40;
       }
     }
+    if let BuildStrategy::AdaptiveGreedy(greediness) = settings.build_strategy {
+      settings.n_rbe_per_loop = av_rb_ev.ceil() as usize + greediness;
+      if settings.n_rbe_per_loop == 0 {
+        // failsafe
+        settings.n_rbe_per_loop = 40;
+      }
+    }
     if n_mte_received_tot % 10000 == 0 {
       println!("[EVTBLDR] ==> Received {} MTE", n_mte_received_tot);
       println!("[EVTBLDR] ==> Received {n_rbe_received_tot} RBEvents!");
@@ -213,7 +221,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
           Some(ev) => {
           //for evid in event_id_cache.iter() {
             //println!("{}",ev.age());
-            let ev_timed_out = ev.has_timed_out();
+            let ev_timed_out = ev.age() >= settings.te_timeout_sec as u64;
             let mut cache_it = false;
             if ev_timed_out {
               n_timed_out += 1;
