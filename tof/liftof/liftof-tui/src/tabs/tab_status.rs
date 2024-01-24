@@ -204,7 +204,7 @@ impl RBTab<'_>  {
           debug!("Got next packet {}!", pack);
           match pack.packet_type {
             PacketType::RBMoni   => {
-              info!("Got new RBMoniData!");
+              trace!("Got new RBMoniData!");
               let moni = RBMoniData::from_bytestream(&pack.payload, &mut 0)?;
               self.n_moni += 1;
               if moni.board_id == self.rb_selector {

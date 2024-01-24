@@ -14,7 +14,7 @@ rand = { version = "0.7.3", default-features = false, features = ["std"] }
 #thiserror = "1.0"
 
 tui-logger = { version = "0.10" } 
-ratatui = { version = "0.24", features = ["all-widgets"]}
+ratatui = { version = "0.25", features = ["all-widgets"]}
 
 
 crossterm = { version = "0.23", features=["serde"]}

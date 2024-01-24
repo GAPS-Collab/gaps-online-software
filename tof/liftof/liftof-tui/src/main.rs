@@ -238,7 +238,8 @@ fn packet_receiver(tp_sender_mt : Sender<TofPacket>,
   // tof-computer tailscale is 100.101.96.10/32
   //let address    : &str = "tcp://100.96.207.91:42000";
   //let address_rb : &str = "tcp://100.96.207.91:42001";
-  let address : &str = "tcp://100.101.96.10:42000";
+  let address : &str = "tcp://192.168.37.20:42000";
+  //let address : &str = "tcp://100.101.96.10:42000";
   let data_socket = ctx.socket(zmq::SUB).expect("Unable to create 0MQ SUB socket!");
   data_socket.connect(address).expect("Unable to connect to data (PUB) socket {adress}");
   //data_socket.connect(address_rb).expect("Unable to connect to (PUB) socket {address_rb}");
