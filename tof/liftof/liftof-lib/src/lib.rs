@@ -42,9 +42,6 @@ use log::Level;
 #[macro_use] extern crate log;
 extern crate env_logger;
 
-extern crate chrono;
-use chrono::{DateTime, Utc};
-
 //use ndarray::{array, Array1};
 //use nlopt::{Algorithm, Objective, Optimization, Result};
 
@@ -142,56 +139,7 @@ pub struct AppSettings {
   pub cali_master_path : String,
 }
 
-/// Get a human readable timestamp
-pub fn get_utc_htimestamp() -> String {
-  let now: DateTime<Utc> = Utc::now();
-  // Format the timestamp as "YYYY_MM_DD_HH_MM"
-  let timestamp_str = now.format("%Y_%m_%d_%H_%M").to_string();
-  timestamp_str
-}
 
-/// A standardized name for calibration files saved by 
-/// the liftof suite
-///
-/// # Arguments
-///
-/// * rb_id   : unique identfier for the 
-///             Readoutboard (1-50)
-/// * default : if default, just add 
-///             "latest" instead of 
-///             a timestamp
-pub fn get_califilename(rb_id : u8, latest : bool) -> String {
-  let ts = get_utc_htimestamp();
-  if latest {
-    format!("RB{rb_id}_latest.cali.tof.gaps")
-  } else {
-    format!("RB{rb_id}_{ts}.cali.tof.gaps")
-  }
-}
-
-/// A standardized name for regular run files saved by
-/// the liftof suite
-///
-/// # Arguments
-///
-/// * run    : run id (identifier)
-/// * subrun : subrun id (identifier of file # within
-///            the run
-/// * rb_id  : in case this should be used on the rb, 
-///            a rb id can be specified as well
-pub fn get_runfilename(run : u64, subrun : u64, rb_id : Option<u8>) -> String {
-  let ts = get_utc_htimestamp();
-  let fname : String;
-  match rb_id {
-    None => {
-      fname = format!("Run{run}_{subrun}_{ts}.gaps.tof");
-    }
-    Some(rbid) => {
-      fname = format!("Run{run}_{subrun}_{ts}_RB{rbid:02}.gaps.tof");
-    }
-  }
-  fname
-}
 
 /// Keep track of run related statistics, errors
 #[derive(Debug, Copy, Clone)]
@@ -667,8 +615,12 @@ impl Error for ReadoutBoardError {
 }
 
 
-/// This will load the map as in the file. Channels go from 1-8
-pub fn get_rb_ch_pid_map(map_file : PathBuf) -> RBChannelPaddleEndIDMap {
+/// Load the rb channel vs paddle end id mapping
+///
+/// The map file is expected to have information for 
+/// all rbs, rb_id is used to grab the section for 
+/// the specific rb.
+pub fn get_rb_ch_pid_map(map_file : PathBuf, rb_id : u8) -> RBChannelPaddleEndIDMap {
   let mut mapping = RBChannelPaddleEndIDMap::new();
   let json_content : String;
   match read_to_string(&map_file) {
@@ -691,7 +643,7 @@ pub fn get_rb_ch_pid_map(map_file : PathBuf) -> RBChannelPaddleEndIDMap {
     }
   }
   for ch in 0..8 {
-    let tmp_val = &json[(ch +1).to_string()];
+    let tmp_val = &json[rb_id.to_string()][(ch +1).to_string()];
     let val = tmp_val.to_string().parse::<u16>().unwrap_or(0);
     mapping.insert(ch as u8 + 1, val);
   }
