@@ -4,22 +4,29 @@
 #include <array>
 #include "tof_typedefs.h"
 
-/// Monitoring data from the LTBs
-///
-/// Only one of the RBs per RAT is 
-/// connected to the LTB of the RAT
-///
-/// temperature and threshold 
-/// information
-///
+/**
+ *
+ * Monitoring data from the LTBs
+ * 
+ * Only one of the RBs per RAT is 
+ * connected to the LTB of the RAT
+ *
+ * temperature and threshold 
+ * information
+ */
 struct LTBMoniData {
+  /// struct begin marker bytes
   static const u16 HEAD = 0xAAAA;
+  /// struct end marker bytes
   static const u16 TAIL = 0x5555;
   /// byte size with HEAD + TAIL
   static const u8  SIZE = 25; 
   
+  /// FIXME - this might be the RB id
   u8                 board_id  ; 
+  /// FIXME - temperature
   f32                trenz_temp; 
+  /// 
   f32                ltb_temp  ; 
   std::array<f32, 3> thresh    ; 
   
@@ -34,9 +41,11 @@ struct LTBMoniData {
   std::string to_string() const;
 };
 
-/// Radoutbaord sensors, covering the RB electronics 
-/// as well as the preamps.
-/// 
+/**
+ * Sensors on the Readoutboards
+ *
+ *
+ */ 
 struct RBMoniData {
   static const u16 HEAD = 0xAAAA;
   static const u16 TAIL = 0x5555;
@@ -97,7 +106,9 @@ struct RBMoniData {
 
 std::ostream& operator<<(std::ostream& os, const RBMoniData& moni);
 
-/// Powerboard monitoring
+/**
+ * Sensors on the Power Board
+ */ 
 struct PBMoniData {
   static const u16 HEAD = 0xAAAA;
   static const u16 TAIL = 0x5555;
@@ -127,7 +138,9 @@ struct PBMoniData {
 
 std::ostream& operator<<(std::ostream& os, const PBMoniData& moni);
 
-/// Preamp Monitoring
+/**
+ * Preamp sensors
+ */
 struct PAMoniData {
   static const u16 HEAD = 0xAAAA;
   static const u16 TAIL = 0x5555;
@@ -148,7 +161,10 @@ struct PAMoniData {
   
 std::ostream& operator<<(std::ostream& os, const PAMoniData& moni);
 
-/// MasterTriggerBoard internal sensors
+/**
+ * Sensors on the MasterTriggerBoard (MTB)
+ *
+ */
 struct MtbMoniData {
   static const u16 HEAD = 0xAAAA;
   static const u16 TAIL = 0x5555;
@@ -172,8 +188,10 @@ struct MtbMoniData {
 
 std::ostream& operator<<(std::ostream& os, const MtbMoniData& moni);
 
-/// System performance and temperature data 
-/// of the central tof computer
+/**
+ * System performance and temperature data 
+ * of the central tof computer
+ */
 struct CPUMoniData {
   static const u16 HEAD = 0xAAAA;
   static const u16 TAIL = 0x5555;
