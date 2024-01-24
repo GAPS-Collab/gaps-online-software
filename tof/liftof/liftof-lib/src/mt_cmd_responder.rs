@@ -51,15 +51,9 @@ use crate::control::{get_board_id_string,
 /// # Arguments
 ///
 /// * cmd_server_ip             : The IP addresss of the C&C server we are listening to.
-/// * run_config_file           : The default runconfig file. When we receive a simple
-///                               DataRunStartCommand, we will run this configuration
-/// * run_config                : A sender to send the dedicated run config to the 
-///                               runner
 /// * ev_request_to_cache       : When receiveing RBCommands which contain requests,
 ///                               forward them to event processing.
 pub fn cmd_responder(cmd_server_ip             : String,
-                     run_config_file           : &Path,
-                     run_config                : &Sender<RunConfig>,
                      ev_request_to_cache       : &Sender<TofPacket>,
                      thread_control            : Arc<Mutex<ThreadControl>>) {
   // create 0MQ sockedts
@@ -93,16 +87,6 @@ pub fn cmd_responder(cmd_server_ip             : String,
     }
   }
   
-  //let mut heartbeat     = Instant::now();
-
-  // I don't know if we need this, maybe the whole block can go away.
-  // Originally I thought the RBs get pinged every x seconds and if we
-  // don't see the ping, we reconnect to the socket. But I don't know
-  // if that scenario actually occurs.
-  // Paolo: instead of leaving the connection always open we might
-  //  want to reopen it if its not reachable anymore (so like command-oriented)...
-  //warn!("TODO: Heartbeat feature not yet implemented on C&C side");
-  //let heartbeat_received = false;
   loop {
     match thread_control.lock() {
       Ok(tc) => {
@@ -115,14 +99,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
         trace!("Can't acquire lock! {err}");
       },
     }
-    // Not sure how to deal with the connection. Poll? Or wait blocking?
-    // Or don't block? Set a timeout? I guess technically since we are not doing
-    // anything else here, we can block until we get something, this saves resources.
-    // (in that case the DONTWAIT can go away)
-    // Paolo: I would say that either blocking or setting a timeout is the best opt.
-    //  Probably setting a timeout is the best practice since, else, we might die.
-    //  If we wouldn't block some other commands might be sent and get stuck in the
-    //  process (?).
+
     match cmd_socket.recv_bytes(0) {
     //match cmd_socket.recv_bytes(zmq::DONTWAIT) {
       Err(err) => trace!("Problem receiving command over 0MQ ! Err {err}"),
@@ -163,16 +140,10 @@ pub fn cmd_responder(cmd_server_ip             : String,
                         let tof_component: TofComponent = TofComponent::from(((value | MASK_CMD_8BIT << 8) >> 8) as u8);
                         // MSB fourth 8 bits are 
                         let id: u8 = (value | MASK_CMD_8BIT) as u8;
-                        // Function that just replies to a ping command send to tofcpu
-                        // get_board_id PANICS!! TODO
-                        let rb_id = get_board_id().unwrap() as u8;
 
                         let return_val;
-                        if tof_component != TofComponent::MT &&
-                           tof_component != TofComponent::TofCpu &&
-                           tof_component != TofComponent::Unknown &&
-                           rb_id != id {
-                          // The packet was not for this RB so bye
+                        if tof_component != TofComponent::MT {
+                          // The packet was not for the MT so bye
                           continue;
                         } else {
                           match tof_component {

@@ -87,7 +87,8 @@ use liftof_rb::threads::{
 use liftof_rb::api::*;
 use liftof_rb::control::*;
 
-use liftof_lib::Command;
+use liftof_lib::{Command,
+                 CommandRB};
 
 #[derive(Parser, Debug)]
 #[command(author = "J.A.Stoessl", version, about, long_about = None)]
@@ -132,7 +133,7 @@ struct Args {
   calc_crc32: bool,
   /// List of possible commands
   #[command(subcommand)]
-  command: Command
+  command: CommandRB
 }
 
 /**********************************************************/
@@ -223,7 +224,7 @@ fn main() {
   let mut calibration = false;
   match args.command {
     // Matching calibration command
-    Command::Calibration(_) => calibration = true,
+    CommandRB::Calibration(_) => calibration = true,
     _ => ()
   }
   let run_stat          = Arc::new(Mutex::new(RunStatistics::new()));
@@ -426,7 +427,7 @@ fn main() {
       // can go into our loop listening for input
       match args.command {
         // BEGIN Matching calibration command
-        Command::Calibration(calib_cmd) => {
+        CommandRB::Calibration(calib_cmd) => {
           match calib_cmd {
             CalibrationCmd::Default(default_opts) => {
               match rb_calibration(&rc_to_runner_cal, &tp_to_pub_cal) {
@@ -466,7 +467,7 @@ fn main() {
         },
         // END Matching calibration command
         // BEGIN Matching set command
-        Command::Set(set_cmd) => {
+        CommandRB::Set(set_cmd) => {
           match set_cmd {
             liftof_lib::SetCmd::LtbThreshold(lbt_threshold_opts) => {
               let ltb_id = lbt_threshold_opts.id;
@@ -493,7 +494,7 @@ fn main() {
         },
         // END Matching set commmand
         // BEGIN Matching run command
-        Command::Run(run_cmd) => {
+        CommandRB::Run(run_cmd) => {
           match run_cmd {
             liftof_lib::RunCmd::Start(run_start_opts) => {
               let run_type = run_start_opts.run_type;

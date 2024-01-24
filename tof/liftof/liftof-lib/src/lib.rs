@@ -838,6 +838,22 @@ pub enum Command {
   Run(RunCmd)
 }
 
+/// Command Enums and stucts
+#[derive(Debug, Parser, PartialEq)]
+pub enum CommandRB {
+  /// Restart RB systemd
+  SystemdReboot(SystemdRebootCmd),
+  /// Remotely trigger the readoutboards to run the calibration routines (tcal, vcal).
+  #[command(subcommand)]
+  Calibration(CalibrationCmd),
+  /// Remotely set LTB thresholds or preamp bias.
+  #[command(subcommand)]
+  Set(SetCmd),
+  /// Start/stop data taking run.
+  #[command(subcommand)]
+  Run(RunCmd)
+}
+
 /// TOF SW cmds ====================================================
 #[derive(Debug, Args, PartialEq)]
 pub struct PingCmd {
