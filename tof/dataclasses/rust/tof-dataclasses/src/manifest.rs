@@ -103,17 +103,15 @@ pub fn get_rbs_from_sqlite(filename : &Path) -> Vec<ReadoutBoard> {
           debug!("{} = {}", name, v);
           match name {
             "rb_id"      => {rb.rb_id  = u8::from_str(v).unwrap_or(0);},
-            "port"       => {rb.port   = u16::from_str(v).unwrap_or(0);},
-            //"ip_address" => {10.0.1.116
-            "ch1_paddle_id" => {rb.set_paddle_end_id_for_rb_channel(1, u16::from_str(v).unwrap_or(0));},
-            "ch2_paddle_id" => {rb.set_paddle_end_id_for_rb_channel(2, u16::from_str(v).unwrap_or(0));},
-            "ch3_paddle_id" => {rb.set_paddle_end_id_for_rb_channel(3, u16::from_str(v).unwrap_or(0));},
-            "ch4_paddle_id" => {rb.set_paddle_end_id_for_rb_channel(4, u16::from_str(v).unwrap_or(0));},
-            "ch5_paddle_id" => {rb.set_paddle_end_id_for_rb_channel(5, u16::from_str(v).unwrap_or(0));},
-            "ch6_paddle_id" => {rb.set_paddle_end_id_for_rb_channel(6, u16::from_str(v).unwrap_or(0));},
-            "ch7_paddle_id" => {rb.set_paddle_end_id_for_rb_channel(7, u16::from_str(v).unwrap_or(0));},
-            "ch8_paddle_id" => {rb.set_paddle_end_id_for_rb_channel(8, u16::from_str(v).unwrap_or(0));},
-            _ => {debug!("Found name {}", name);}                         
+            "ch1_paddle" => {rb.set_paddle_end_id_for_rb_channel(1, u16::from_str(v).unwrap_or(0));},
+            "ch2_paddle" => {rb.set_paddle_end_id_for_rb_channel(2, u16::from_str(v).unwrap_or(0));},
+            "ch3_paddle" => {rb.set_paddle_end_id_for_rb_channel(3, u16::from_str(v).unwrap_or(0));},
+            "ch4_paddle" => {rb.set_paddle_end_id_for_rb_channel(4, u16::from_str(v).unwrap_or(0));},
+            "ch5_paddle" => {rb.set_paddle_end_id_for_rb_channel(5, u16::from_str(v).unwrap_or(0));},
+            "ch6_paddle" => {rb.set_paddle_end_id_for_rb_channel(6, u16::from_str(v).unwrap_or(0));},
+            "ch7_paddle" => {rb.set_paddle_end_id_for_rb_channel(7, u16::from_str(v).unwrap_or(0));},
+            "ch8_paddle" => {rb.set_paddle_end_id_for_rb_channel(8, u16::from_str(v).unwrap_or(0));},
+            _ => {warn!("Found name {}, but not mapping it to self!", name);}                         
           }
         }
       }
@@ -546,13 +544,9 @@ impl fmt::Display for RAT {
 pub struct ReadoutBoard {
   pub rb_id             : u8,  
   pub dna               : u64, 
-  pub port              : u16, 
-  pub ip_address        : Ipv4Addr,
-  //pub ip_address       = models.GenericIPAddressField(unique=True)
-  //pub mac_address      = models.CharField(max_length=11, unique=True, null=True)
   channel_to_paddle_end_id : [u16;8],
-  pub calib_file    : String,
-  pub trig_ch_mask  : [bool;8],
+  pub calib_file        : String,
+  pub trig_ch_mask      : [bool;8],
 }
 
 impl ReadoutBoard {
@@ -560,8 +554,6 @@ impl ReadoutBoard {
     Self {
       rb_id         : 0,  
       dna           : 0, 
-      port          : 42000, 
-      ip_address    : Ipv4Addr::new(0,0,0,0),
       channel_to_paddle_end_id : [0;8],
       calib_file    : String::from(""),
       trig_ch_mask  : [false;8],
@@ -579,20 +571,14 @@ impl ReadoutBoard {
     cali
   }
 
-
-  pub fn infer_ip_address(&mut self) {
-    let address = 100 + self.rb_id;
-    self.ip_address = Ipv4Addr::new(10,0,1,address);
+  /// The address the RB is publishing packets on 
+  ///
+  /// There is NO GUARANTEE that this is the correct
+  /// address!
+  pub fn guess_address(&self) -> String {
+    format!("tcp://10.0.1.1{:02}:42000", self.rb_id)
   }
 
-  pub fn get_connection_string(&self) -> String {
-
-    let mut address_ip = String::from("tcp://");
-    address_ip = address_ip + &self.ip_address.to_string();
-    address_ip += &":".to_owned();
-    address_ip += &self.port.to_string();
-    address_ip
-  }
 
   pub fn get_triggered_pids(&self) -> Vec<u8> {
     let mut pids = Vec::<u8>::new();
@@ -687,25 +673,14 @@ impl fmt::Display for ReadoutBoard {
 "<ReadoutBoard:
     ID                :  {}
     DNA               :  {} 
-    PORT              :  {} 
-    IP                :  {}
     CALIBRATION FILE  :  {}
     CHANNEL/PADDLE END:  {:?}
     TRIG_CH_MASK      :  {:?}>",
       self.rb_id,
       self.dna,
-      self.port,
-      self.ip_address,
       self.calib_file,
       self.channel_to_paddle_end_id,
       self.trig_ch_mask)
   }
 }
-
-//#[test]
-//fn test_get_rbs_sqlite() {
-//  get_ltbs_from_sqlite();
-//  get_rbs_from_sqlite();
-//}
-
 
