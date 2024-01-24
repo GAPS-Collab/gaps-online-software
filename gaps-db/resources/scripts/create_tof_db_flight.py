@@ -9,8 +9,11 @@ import pandas
 import re
 # FIXME - move from pandas to polars!
 import polars
+import numpy as np
 
 import tof_db.models as m
+
+RB_IGNORELIST = [10,12,37,38,43,45,47,48,49,50,51]
 
 SPREADSHEET_PADDLE_END = 'Paddle End Master Spreadsheet'
 SPREADSHEET_PANELS     = 'Panels'
@@ -74,17 +77,20 @@ if __name__ == '__main__':
         dsi_cards_row = [k for k in dsi_card_header.index if not k.startswith('Unnamed')]
         pattern = re.compile('DSI card (?P<dsi_id>1|2|3|4|5)')
         dsi_cards = dict()
+        print (dsi_card_header)
         for k in dsi_cards_row:
             card_id = int(pattern.search(k).groupdict()['dsi_id'])
             dsi_cards[card_id] = m.DSICard()
             dsi_cards[card_id].dsi_id = card_id
+            
         pattern = re.compile('RBs RAT(?P<rat_id>\d{1,2})')
         for row in range(2,len(sheet.index)):
             row_data = sheet.loc[row,:]
             cols_for_dsi = {1 : 'Unnamed: 1',\
                             2 : 'Unnamed: 4',\
                             3 : 'Unnamed: 7',\
-                            4 : 'Unnamed: 10'}
+                            4 : 'Unnamed: 10',\
+                            5 : 'Unnamed: 13'}
             for k in dsi_cards.keys():
                 key = f'DSI card {k}'
                 print ('key',key)
@@ -105,7 +111,16 @@ if __name__ == '__main__':
                     continue
                 if row_data[thiscol] == 'X':
                     continue
-                rat_id = pattern.search(row_data[thiscol]).groupdict()['rat_id']
+                
+                #if np.isnan(row_data[thiscol]):
+                #    continue
+                try:
+                    rat_id = pattern.search(row_data[thiscol]).groupdict()['rat_id']
+                except TypeError as e:
+                    print (thiscol)
+                    print (row_data[thiscol])
+                    print (f"Error, can't parse! {e}")
+                    continue
                 dsi_cards[int(k)].add_rat_id_for_j(this_j, rat_id)
         for card in dsi_cards:
             print (f"Found DSI card {dsi_cards[card]}")
@@ -140,7 +155,12 @@ if __name__ == '__main__':
         for row in range(1,len(sheet.index)):
             row_data = sheet.loc[row,:]
             panel = m.Panel()
-            panel.fill_from_spreadsheet(row_data)
+            try:
+                panel.fill_from_spreadsheet(row_data)
+            except Exception as e:
+                print (row_data)
+                print (f"Can't parse panel! {e}")
+                continue
             print (panel)
             if not args.dry_run:
                 panel.save()
@@ -198,48 +218,21 @@ if __name__ == '__main__':
                 pid_dict[k].save()
 
     if args.create_rb_table:
-        paddle_ends = m.PaddleEnd.objects.all()
-        #paddle_ends_rb = { : []}
-        #for k in paddle_ends:
-
-        print (f'We got {len(paddle_ends)} Paddle ends.')
-        rbs = {k : m.RB() for k in range(1,41)}
+        rbs = {k : m.RB() for k in range(1,51)}
         
         for k in rbs:
+            if k in RB_IGNORELIST:
+                continue
             rbs[k].rb_id = k
-            rbs[k].get_designated_ip()
-            try:
-                rbs[k].ch1_paddle = [j for j in paddle_ends if j.rb_id == k and j.rb_ch == 1][0]
-            except Exception as e: 
-                print (f"Can't add paddle end for ch1, exception {e}")
-            try:
-                rbs[k].ch2_paddle = [j for j in paddle_ends if j.rb_id == k and j.rb_ch == 2][0]
-            except Exception as e: 
-                print (f"Can't add paddle end for ch2, exception {e}")
-            try:
-                rbs[k].ch3_paddle = [j for j in paddle_ends if j.rb_id == k and j.rb_ch == 3][0]
-            except Exception as e: 
-                print (f"Can't add paddle end for ch3, exception {e}")
-            try:
-                rbs[k].ch4_paddle = [j for j in paddle_ends if j.rb_id == k and j.rb_ch == 4][0]
-            except Exception as e: 
-                print (f"Can't add paddle end for ch4, exception {e}")
-            try:
-                rbs[k].ch5_paddle = [j for j in paddle_ends if j.rb_id == k and j.rb_ch == 5][0]
-            except Exception as e: 
-                print (f"Can't add paddle end for ch5, exception {e}")
-            try:
-                rbs[k].ch6_paddle = [j for j in paddle_ends if j.rb_id == k and j.rb_ch == 6][0]
-            except Exception as e: 
-                print (f"Can't add paddle end for ch6, exception {e}")
-            try:
-                rbs[k].ch7_paddle = [j for j in paddle_ends if j.rb_id == k and j.rb_ch == 7][0]
-            except Exception as e: 
-                print (f"Can't add paddle end for ch7, exception {e}")
-            try:
-                rbs[k].ch8_paddle = [j for j in paddle_ends if j.rb_id == k and j.rb_ch == 8][0]
-            except Exception as e: 
-                print (f"Can't add paddle end for ch8, exception {e}")
+            for ch in range(1,9):
+                try:
+                    pend = m.PaddleEnd.objects.filter(\
+                            rb_id = rbs[k].rb_id,\
+                            rb_ch = ch)[0]
+                except Exception as e:
+                    print (f"Can't get info for {rbs[k].rb_id} {ch}")
+                    raise
+                rbs[k].set_channel(ch, pend)
             print (rbs[k])
             if not args.dry_run:
                 rbs[k].save()

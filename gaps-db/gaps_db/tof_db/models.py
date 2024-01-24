@@ -240,6 +240,7 @@ class PaddleEnd(models.Model):
     pb_id         = models.PositiveSmallIntegerField()
     ltb_ch        = models.PositiveSmallIntegerField()
     pb_ch         = models.PositiveSmallIntegerField()
+    #FIXME - is this starting from 0 or 1?
     rb_ch         = models.PositiveSmallIntegerField()
     dsi           = models.PositiveSmallIntegerField()
     rb_harting_j  = models.PositiveSmallIntegerField()
@@ -309,8 +310,14 @@ class PaddleEnd(models.Model):
         return self.__repr__()
 
     def __repr__(self):
-        panel  = Panel.objects.filter(panel_id=self.panel_id)[0]
-        paddle = Paddle.objects.filter(paddle_id=self.paddle_id)[0] 
+        try:
+            panel  = Panel.objects.filter(panel_id=self.panel_id)[0]
+        except Exception as e:
+            panel  = 'UNKNOWN'
+        try:
+            paddle = Paddle.objects.filter(paddle_id=self.paddle_id)[0] 
+        except:
+            paddle = 'UNKNOWN'
         _repr = '<PaddleEnd:'
         _repr += f'\n  ** identifiers **'
         _repr += f'\n   id             : {self.paddle_end_id}'     
@@ -438,6 +445,25 @@ class RAT(models.Model):
         _repr += f'HRT CBL LEN [FT] : {self.ltb_harting_cable_length}>' 
         return _repr
 
+class Run(models.Model):
+    """
+    Meta information which defines a data run
+    """
+
+    run_id         = models.PositiveBigIntegerField(primary_key=True)
+    #shifter        =
+    #                 help_text="Name of the responsible person for data taking"
+    #comment        = 
+    #                  help_text="Purpose of this run"
+    #timestamp      = 
+    #                  help_text="UTC timestamp of run start"
+    #trigger_config = 
+    #                  help_text="Trigger configuration of run start"
+    #prescale       =
+    #                  help_text="Applied prescale factor for trigger config"
+    #configuration  = 
+    #                  help_text="Serialized .toml" file for run configuration"
+
 class RB(models.Model):
     """
     Representation of a readoutboard
@@ -446,9 +472,6 @@ class RB(models.Model):
     
     rb_id            = models.PositiveSmallIntegerField(unique=True, primary_key=True)
     dna              = models.PositiveBigIntegerField(unique=True, null=True)
-    port             = models.PositiveSmallIntegerField(default=42000)
-    ip_address       = models.GenericIPAddressField(unique=True)
-    mac_address      = models.CharField(max_length=11, unique=True, null=True)
     ch1_paddle       = models.ForeignKey(PaddleEnd, models.SET_NULL, blank=True, null=True,related_name='+' )
     ch2_paddle       = models.ForeignKey(PaddleEnd, models.SET_NULL, blank=True, null=True,related_name='+' )
     ch3_paddle       = models.ForeignKey(PaddleEnd, models.SET_NULL, blank=True, null=True,related_name='+' )
@@ -466,7 +489,28 @@ class RB(models.Model):
         panel = Panel.objects.filter(id=panel)[0]
         print(panel)
 
-    def get_channel(self,ch):
+    def set_channel(self, ch, pend):
+        match ch:
+            case 1:
+                self.ch1_paddle = pend
+            case 2:
+                self.ch2_paddle = pend
+            case 3:
+                self.ch3_paddle = pend
+            case 4:
+                self.ch4_paddle = pend
+            case 5:
+                self.ch5_paddle = pend
+            case 6:
+                self.ch6_paddle = pend
+            case 7:
+                self.ch7_paddle = pend
+            case 8:
+                self.ch8_paddle = pend
+            case _:
+                raise ValueError(f"Can't set paddle for channel {ch}")
+
+    def get_channel(self, ch):
         match ch:
             case 1:
                 return self.ch1_paddle
@@ -487,29 +531,26 @@ class RB(models.Model):
             case _:
                 raise ValueError(f"Don't have paddle for channel {ch}")
 
-    def get_designated_ip(self):
+    def guess_address(self):
         ip_address = "10.0.1.1" + str(self.rb_id).zfill(2)
-        self.ip_address = ip_address
         return ip_address 
 
     def __str__(self):
         return self.__repr__()
 
     def __repr__(self):
-        _repr  = '<RB:\n'
-        _repr += f'ID      : {self.rb_id}\n'            
-        _repr += f'DNA     : {self.dna}\n'             
-        _repr += f'PORT    : {self.port}\n'            
-        _repr += f'IP      : {self.ip_address}\n'      
-        _repr += f'MAC     : {self.mac_address}\n'     
-        _repr += f'CH1_PDL : {self.ch1_paddle}\n'         
-        _repr += f'CH2_PDL : {self.ch2_paddle}\n'         
-        _repr += f'CH3_PDL : {self.ch3_paddle}\n'         
-        _repr += f'CH4_PDL : {self.ch4_paddle}\n'         
-        _repr += f'CH5_PDL : {self.ch5_paddle}\n'         
-        _repr += f'CH6_PDL : {self.ch6_paddle}\n'         
-        _repr += f'CH7_PDL : {self.ch7_paddle}\n'         
-        _repr += f'CH8_PDL : {self.ch8_paddle}>'         
+        _repr  = '<ReadoutBoard:'
+        _repr += f'\n  Board id : {self.rb_id}'            
+        _repr += f'\n  dna      : {self.dna}'          
+        _repr += f'\n  **Connected paddle ends**'
+        _repr += f'\n  Ch0(1)   : {self.ch1_paddle}'         
+        _repr += f'\n  Ch1(2)   : {self.ch2_paddle}'         
+        _repr += f'\n  Ch2(3)   : {self.ch3_paddle}'         
+        _repr += f'\n  Ch3(4)   : {self.ch4_paddle}'         
+        _repr += f'\n  Ch4(5)   : {self.ch5_paddle}'         
+        _repr += f'\n  Ch5(6)   : {self.ch6_paddle}'         
+        _repr += f'\n  Ch6(7)   : {self.ch7_paddle}'         
+        _repr += f'\n  Ch7(8)   : {self.ch8_paddle}>'         
         return _repr
 
 ####################################################
