@@ -92,7 +92,7 @@ pub enum FileType {
 pub fn get_utc_timestamp() -> String {
   let now: DateTime<Utc> = Utc::now();
   // Format the timestamp as "YYYY_MM_DD_HH_MM"
-  let timestamp_str = now.format("%Y-%m-%d_%H-%M-%S").to_string();
+  let timestamp_str = now.format("%Y_%m_%d-%H_%M_%S").to_string();
   timestamp_str
 }
 
@@ -109,9 +109,9 @@ pub fn get_utc_timestamp() -> String {
 pub fn get_califilename(rb_id : u8, latest : bool) -> String {
   let ts = get_utc_timestamp();
   if latest {
-    format!("RB{rb_id}_latest.cali.tof.gaps")
+    format!("RB{rb_id:02}_latest.cali.tof.gaps")
   } else {
-    format!("RB{rb_id}_{ts}.cali.tof.gaps")
+    format!("RB{rb_id:02}_{ts}.cali.tof.gaps")
   }
 }
 
@@ -130,10 +130,10 @@ pub fn get_runfilename(run : u32, subrun : u64, rb_id : Option<u8>) -> String {
   let fname : String;
   match rb_id {
     None => {
-      fname = format!("Run{run}_{subrun}_{ts}.gaps.tof");
+      fname = format!("Run{run}_{subrun}.{ts}.gaps.tof");
     }
     Some(rbid) => {
-      fname = format!("Run{run}_{subrun}_{ts}_RB{rbid:02}.gaps.tof");
+      fname = format!("Run{run}_{subrun}.{ts}.RB{rbid:02}.gaps.tof");
     }
   }
   fname
