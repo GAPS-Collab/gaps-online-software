@@ -148,6 +148,12 @@ pub struct LiftofCCSettings {
   /// The UDP port to be used to get packets from the 
   /// MTB
   pub mtb_address                : String,
+  /// Enable trace suppression on the MTB. If enabled, 
+  /// only those RB which hits will read out waveforms.
+  /// In case it is disabled, ALL RBs will readout events
+  /// ALL the time. For this, we need also the eventbuilder
+  /// strategy "WaitForNBoards(40)"
+  pub mtb_trace_suppression     : bool,
   /// The interval (in seconds) to retrieve MtbMoniData from 
   /// the Mtb
   pub mtb_moni_interval_sec      : u64,
@@ -174,6 +180,7 @@ impl LiftofCCSettings {
       fc_pub_address            : String::from(""),
       fc_sub_address            : String::from(""),
       mtb_address               : String::from("10.0.1.10:50001"),
+      mtb_trace_suppression     : true,
       mtb_moni_interval_sec     : 0,
       cpu_moni_interval_sec     : 0,
       rb_ignorelist             : Vec::<u8>::new(),
@@ -256,9 +263,6 @@ impl LiftofCCSettings {
         }
       }
     }
-
-      let settings = LiftofCCSettings::new();
-    Ok(settings)
   }
 }
 

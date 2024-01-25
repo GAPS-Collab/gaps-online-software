@@ -16,10 +16,10 @@ use tof_dataclasses::packets::{
 };
 use tof_dataclasses::calibrations::RBCalibrations;
 use tof_dataclasses::serialization::Serialization;
-use tof_dataclasses::RBChannelPaddleEndIDMap;
+//use tof_dataclasses::RBChannelPaddleEndIDMap;
 
 use liftof_lib::{
-    build_tcp_from_ip,
+    //build_tcp_from_ip,
     get_rb_ch_pid_map,
     waveform_analysis,
     ASSET_DIR,
@@ -91,7 +91,7 @@ pub fn readoutboard_communicator(ev_to_builder       : &Sender<RBEvent>,
   }
   //let mut secs_since_epoch = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
   //let mut n_events   = 0usize;
-  let mut n_received = 0usize;
+  //let mut n_received = 0usize;
   let map_file  = format!("{}/rb{:02}_paddle_map.json", ASSET_DIR, board_id);
   let rb_ch_map = get_rb_ch_pid_map(map_file.into(),rb.rb_id);
   loop {
@@ -115,7 +115,7 @@ pub fn readoutboard_communicator(ev_to_builder       : &Sender<RBEvent>,
             if print_packets {
               println!("==> Got {} for RB {}", tp.packet_type, rb.rb_id); 
             }
-            n_received += 1;
+            //n_received += 1;
             match tp.packet_type {
               PacketType::RBEvent | PacketType::RBEventMemoryView => {
                 let mut event = RBEvent::from(&tp);

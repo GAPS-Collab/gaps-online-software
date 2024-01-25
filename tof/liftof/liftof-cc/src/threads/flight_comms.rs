@@ -7,7 +7,7 @@
 
 use std::time::{
     Instant,
-    Duration,
+    //Duration,
 };
 
 extern crate crossbeam_channel;
@@ -18,11 +18,13 @@ use tof_dataclasses::packets::{
     PacketType
 };
 
-use tof_dataclasses::monitoring::{RBMoniData,
-                                  MtbMoniData,
-                                  CPUMoniData};
+use tof_dataclasses::monitoring::{
+    RBMoniData,
+    MtbMoniData,
+    CPUMoniData
+};
 
-use tof_dataclasses::events::TofEvent;
+//use tof_dataclasses::events::TofEvent;
 use tof_dataclasses::serialization::Serialization;
 use tof_dataclasses::io::{
     TofPacketWriter,

@@ -444,6 +444,7 @@ pub fn master_trigger(mt_address        : String,
                       moni_sender       : &Sender<TofPacket>,
                       mtb_moni_interval : u64,
                       mtb_timeout_sec   : u64,
+                      trace_suppression : bool,
                       verbose           : bool,
                       send_requests     : bool) {
 
@@ -476,10 +477,17 @@ pub fn master_trigger(mt_address        : String,
     Err(err) => error!("Can not reset DAQ, error {err}"),
     Ok(_)    => ()
   }
-  
-  match set_trace_suppression(&socket, true) {
+ 
+  match set_trace_suppression(&socket, trace_suppression) {
     Err(err) => error!("Unable to set trace suppression mode! {err}"),
-    Ok(_)    => println!("Setting register to do trace suppression on the MTB"),
+    Ok(_)    => {
+      if trace_suppression {
+        println!("==> Setting MTB to trace suppression mode!");
+      } else {
+        println!("==> Setting MTB to ALL_RB_READOUT mode!");
+        warn!("Reading out all events from all RBs! Data might be very large!");
+      }
+    }
   }
 
   // step 2 - event loop

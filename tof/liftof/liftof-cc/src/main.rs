@@ -184,7 +184,7 @@ fn main() {
   let mtb_moni_interval     = config.mtb_moni_interval_sec;
   let cpu_moni_interval     = config.cpu_moni_interval_sec;
   let flight_address        = config.fc_pub_address;
-
+  let mtb_trace_suppression = config.mtb_trace_suppression;
   let mut rb_list           = vec![ReadoutBoard::new();50];
   for k in 0..rb_list.len() {
     rb_list[k].rb_id = k as u8 + 1;
@@ -399,7 +399,8 @@ fn main() {
                                         &cmd_sender_2,
                                         &mtb_moni_sender,
                                         mtb_moni_interval,
-                                        60,
+                                        60, // allowed mtb timeout
+                                        mtb_trace_suppression,
                                         false,
                                         false);
           })

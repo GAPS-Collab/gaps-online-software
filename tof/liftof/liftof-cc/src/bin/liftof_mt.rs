@@ -123,6 +123,7 @@ fn main() {
   let publish_packets     = args.publish_packets;
   let send_requests       = args.send_requests;
   let relay_rbs           = args.relay_rbs;
+  let trace_suppression   = args.trace_suppression;
 
   if args.send_requests {
     match args.json_ltb_rb_map {
@@ -144,6 +145,7 @@ fn main() {
                            &tp_send_moni,
                            1,
                            60,
+                           trace_suppression,
                            verbose,
                            send_requests);
          })
