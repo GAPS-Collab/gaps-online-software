@@ -422,121 +422,133 @@ fn main() {
   let mut do_monitoring = true;
   // We can only start a run here, if this is not
   // run through systemd
-  if is_systemd_process() {
-    println!("=> Executed by systemd. Waiting for input from C&C server!");
+  // if we are not as systemd, 
+  // we are either in calibration mode
+  // or have started manually either with 
+  // a config or not
+  if calibration {
+    // we execute this routine first, then we 
+    // can go into our loop listening for input
+    match args.command {
+      // BEGIN Matching calibration command
+      CommandRB::Calibration(calib_cmd) => {
+        match calib_cmd {
+          CalibrationCmd::Default(default_opts) => {
+            match rb_calibration(&rc_to_runner_cal, 
+                &tp_to_pub_cal,
+                                  ip_address) {
+              Ok(_) => (),
+              Err(err) => {
+                error!("Calibration failed! Error {err}!");
+              }
+            }
+          },
+          CalibrationCmd::Noi(noi_opts) => {
+            match rb_noi_subcalibration(&rc_to_runner_cal, 
+                        &tp_to_pub_cal) {
+              Ok(_) => (),
+              Err(err) => {
+                error!("Noi data taking failed! Error {err}!");
+              }
+            }
+          },
+          CalibrationCmd::Voltage(voltage_opts) => {
+            let voltage_level = voltage_opts.level;
+            match rb_voltage_subcalibration(&rc_to_runner_cal, 
+                            &tp_to_pub_cal,
+                                            voltage_level) {
+              Ok(_) => (),
+              Err(err) => {
+                error!("Voltage calibration data taking failed! Error {err}!");
+              }
+            }
+          },
+          CalibrationCmd::Timing(timing_opts) => {
+            let voltage_level = timing_opts.level;
+            match rb_timing_subcalibration(&rc_to_runner_cal, 
+                            &tp_to_pub_cal,
+                                            voltage_level) {
+              Ok(_) => (),
+              Err(err) => {
+                error!("Timing calibration data taking failed! Error {err}!");
+              }
+            }
+          }
+        }
+      },
+      // END Matching calibration command
+      // BEGIN Matching set command
+      CommandRB::Set(set_cmd) => {
+        match set_cmd {
+          liftof_lib::SetCmd::LtbThreshold(lbt_threshold_opts) => {
+            let ltb_id = lbt_threshold_opts.id;
+            let threshold_name = lbt_threshold_opts.name;
+            let threshold_level: u16 = lbt_threshold_opts.level;
+            match send_ltb_threshold_set(ltb_id,
+                                          threshold_name,
+                                          threshold_level) {
+              Ok(_) => (),
+              Err(err) => {
+                error!("Unable to set LTB thresholds! Error {err}!");
+              }
+            }
+          },
+          liftof_lib::SetCmd::PreampBias(preamp_bias_opts) => {
+            let preamp_id = preamp_bias_opts.id;
+            let preamp_bias = preamp_bias_opts.bias;
+            match send_preamp_bias_set(preamp_id, 
+                                        preamp_bias) {
+              Ok(_) => (),
+              Err(err) => {
+                error!("Unable to set preamp bias! Error {err}!");
+              }
+            }
+          }
+        }
+      },
+      // END Matching set commmand
+      // BEGIN Matching run command
+      CommandRB::Run(run_cmd) => {
+        match run_cmd {
+          liftof_lib::RunCmd::Start(run_start_opts) => {
+            let run_type = run_start_opts.run_type;
+            let rb_id    = run_start_opts.id;
+            let event_no = run_start_opts.no;
+            match rb_start_run(&rc_to_runner_cal,
+                                rc_config,
+                                run_type,
+                                rb_id,
+                                event_no) {
+              Ok(_) => (),
+              Err(err) => {
+                error!("Run start failed! Error {err}!");
+              }
+            }
+          },
+          liftof_lib::RunCmd::Stop(run_stop_opts) => {
+            let rb_id = run_stop_opts.id;
+            match rb_stop_run(&rc_to_runner_cal,
+                              rb_id) {
+              Ok(_) => (),
+              Err(err) => {
+                error!("Run stop failed! Error {err}!");
+              }
+            }
+          }
+        }
+      },
+      // END Matching run commmand
+      _ => ()
+    }
+    do_monitoring = false;
+    end = true; // in case of we have done the calibration
+                    // from shell. We finish after it is done.
   } else {
-    // if we are not as systemd, 
-    // we are either in calibration mode
-    // or have started manually either with 
-    // a config or not
-    if calibration {
-      // we execute this routine first, then we 
-      // can go into our loop listening for input
-      match args.command {
-        // BEGIN Matching calibration command
-        CommandRB::Calibration(calib_cmd) => {
-          match calib_cmd {
-            CalibrationCmd::Default(default_opts) => {
-              match rb_calibration(&rc_to_runner_cal, &tp_to_pub_cal) {
-                Ok(_) => (),
-                Err(err) => {
-                  error!("Calibration failed! Error {err}!");
-                }
-              }
-            },
-            CalibrationCmd::Noi(noi_opts) => {
-              match rb_noi_subcalibration(&rc_to_runner_cal, &tp_to_pub_cal) {
-                Ok(_) => (),
-                Err(err) => {
-                  error!("Noi data taking failed! Error {err}!");
-                }
-              }
-            },
-            CalibrationCmd::Voltage(voltage_opts) => {
-              let voltage_level = voltage_opts.level;
-              match rb_voltage_subcalibration(&rc_to_runner_cal, &tp_to_pub_cal, voltage_level) {
-                Ok(_) => (),
-                Err(err) => {
-                  error!("Voltage calibration data taking failed! Error {err}!");
-                }
-              }
-            },
-            CalibrationCmd::Timing(timing_opts) => {
-              let voltage_level = timing_opts.level;
-              match rb_timing_subcalibration(&rc_to_runner_cal, &tp_to_pub_cal, voltage_level) {
-                Ok(_) => (),
-                Err(err) => {
-                  error!("Timing calibration data taking failed! Error {err}!");
-                }
-              }
-            }
-          }
-        },
-        // END Matching calibration command
-        // BEGIN Matching set command
-        CommandRB::Set(set_cmd) => {
-          match set_cmd {
-            liftof_lib::SetCmd::LtbThreshold(lbt_threshold_opts) => {
-              let ltb_id = lbt_threshold_opts.id;
-              let threshold_name = lbt_threshold_opts.name;
-              let threshold_level: u16 = lbt_threshold_opts.level;
-              match send_ltb_threshold_set(ltb_id, threshold_name, threshold_level) {
-                Ok(_) => (),
-                Err(err) => {
-                  error!("Unable to set preamp bias! Error {err}!");
-                }
-              }
-            },
-            liftof_lib::SetCmd::PreampBias(preamp_bias_opts) => {
-              let preamp_id = preamp_bias_opts.id;
-              let preamp_bias = preamp_bias_opts.bias;
-              match send_preamp_bias_set(preamp_id, preamp_bias) {
-                Ok(_) => (),
-                Err(err) => {
-                  error!("Unable to set preamp bias! Error {err}!");
-                }
-              }
-            }
-          }
-        },
-        // END Matching set commmand
-        // BEGIN Matching run command
-        CommandRB::Run(run_cmd) => {
-          match run_cmd {
-            liftof_lib::RunCmd::Start(run_start_opts) => {
-              let run_type = run_start_opts.run_type;
-              let rb_id = run_start_opts.id;
-              let event_no = run_start_opts.no;
-              match rb_start_run(&rc_to_runner_cal, rc_config, run_type, rb_id, event_no) {
-                Ok(_) => (),
-                Err(err) => {
-                  error!("Timing calibration data taking failed! Error {err}!");
-                }
-              }
-            },
-            liftof_lib::RunCmd::Stop(run_stop_opts) => {
-              let rb_id = run_stop_opts.id;
-              match rb_stop_run(&rc_to_runner_cal, rb_id) {
-                Ok(_) => (),
-                Err(err) => {
-                  error!("Timing calibration data taking failed! Error {err}!");
-                }
-              }
-            }
-          }
-        },
-        // END Matching run commmand
-        _ => ()
-      }
-      do_monitoring = false;
-      end = true; // in case of we have done the calibration
-                      // from shell. We finish after it is done.
-    } else {
-      // only do monitoring when we don't do a 
-      // calibration
-      do_monitoring = true;
-    } 
-    if config_from_shell {
+    // only do monitoring when we don't do a 
+    // calibration
+    do_monitoring = true;
+  } 
+  if config_from_shell {
 
     // if the runconfig does not have nevents different from 
     // 0, we will not send it right now. The commander will 

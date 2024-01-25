@@ -727,8 +727,6 @@ pub enum Command {
 /// Command Enums and stucts
 #[derive(Debug, Parser, PartialEq)]
 pub enum CommandRB {
-  /// Restart RB systemd
-  SystemdReboot(SystemdRebootCmd),
   /// Remotely trigger the readoutboards to run the calibration routines (tcal, vcal).
   #[command(subcommand)]
   Calibration(CalibrationCmd),
