@@ -6,7 +6,7 @@ authors = ["Achim Stoessl <achim.stoessl@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.9,<3.13"
+python = ">=3.10,<3.13"
 charmingbeauty = "^0.1.1"
 tornado = "^6.3.3"
 pygobject = "^3.46.0"

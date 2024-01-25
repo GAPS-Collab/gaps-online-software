@@ -16,8 +16,7 @@ use crossbeam_channel::Receiver;
 
 use tof_dataclasses::packets::{TofPacket,
                                PacketType};
-use local_ip_address::local_ip;
-use liftof_lib::DATAPORT;
+//use local_ip_address::local_ip;
 use tof_dataclasses::events::{RBEvent,
                               DataType};
 use tof_dataclasses::serialization::Serialization;
@@ -55,51 +54,48 @@ fn find_missing_elements(nums: &[u32]) -> Vec<u32> {
 /// * write_to_disk : Write data to local disk (most likely
 ///                   a SD card). This option should be only
 ///                   used for diagnostic purposes.
-/// * file_suffix   : basically the ending of the file. If None,
-///                   this will be .gaps.tof. If cali.gaps.tof, 
-///                   this will trigger to be stored in a 
-///                   seperate calibration folder.
+/// * address       : IP address to use for the local PUB 
+///                   socket to publish data over the 
+///                   network
+/// * output_fname  : In case a local file should be written,
+///                   write it with this name.
+///                   In case of a calibration file, then 
+///                   also save it in the dedicated foler.
 /// * print_packets : Print outgoing packets to terminal
 ///
 pub fn data_publisher(data           : &Receiver<TofPacket>,
                       write_to_disk  : bool,
-                      file_suffix    : Option<&str> ,
+                      address        : String,
+                      output_fname   : Option<String> ,
                       testing        : bool,
                       print_packets  : bool,
                       thread_control : Arc<Mutex<ThreadControl>>) {
-  let mut address_ip = String::from("tcp://");
-  let this_board_ip = local_ip().expect("Unable to obtainl local board IP. Something is messed up!");
-  let data_port    = DATAPORT;
   if testing {
     warn!("Testing mode!");
   }
 
-  match this_board_ip {
-    IpAddr::V4(ip) => address_ip += &ip.to_string(),
-    IpAddr::V6(_) => panic!("Currently, we do not support IPV6!")
-  }
-  let data_address : String = address_ip.clone() + ":" + &data_port.to_string();
   let ctx = zmq::Context::new();
-  
   let data_socket = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
-  data_socket.bind(&data_address).expect("Unable to bind to data (PUB) socket {data_adress}");
-  info!("0MQ PUB socket bound to address {data_address}");
-
-  let board_id = address_ip.split_off(address_ip.len() -2);
-  let outputfile_name = "rb_".to_owned()
-                       + &board_id.to_string()
-                       + file_suffix.unwrap_or(".gaps.tof");
-
-  let blobfile_path = Path::new(&outputfile_name);
-  
+  data_socket.bind(&address).expect("Unable to bind to data (PUB) socket {data_adress}");
+  info!("0MQ PUB socket bound to address {address}");
 
   let mut file_on_disk : Option<File> = None;//let mut output = File::create(path)?;
   if write_to_disk {
+    let fname : String;
+    match output_fname {
+      None => {
+        fname = String::from("Unknown.tof.gaps");
+      }
+      Some(_fname) => {
+        fname = _fname;
+      }
+    }
+    let datafile_output_file = Path::new(&fname);
     // in case it is a calibration file, delete any old 
     // calibration and write it to a specific location
     let home      = env::var_os("HOME").unwrap_or(OsString::from("/home/gaps"));
     let calib_dir = home.to_string_lossy().to_string() + "/calib"; 
-    if outputfile_name.ends_with("cali.tof.gaps") {
+    if fname.ends_with("cali.tof.gaps") {
       match fs::metadata(&calib_dir) {
         Ok(metadata) => {
           // Check if the metadata is for a directory
@@ -119,12 +115,12 @@ pub fn data_publisher(data           : &Receiver<TofPacket>,
         }
       } // end match
       let calib_file = Path::new(&calib_dir);
-      let local_file = calib_file.join(outputfile_name);
+      let local_file = calib_file.join(fname);
       info!("Writing calibration to {}", local_file.display() );
       file_on_disk = OpenOptions::new().create(true).write(true).open(local_file).ok()
     } else {
-      info!("Writing packets to {}", outputfile_name );
-      file_on_disk = OpenOptions::new().append(true).create(true).open(blobfile_path).ok()
+      info!("Writing to local file {}!", fname );
+      file_on_disk = OpenOptions::new().append(true).create(true).open(datafile_output_file).ok()
     }
   }
  

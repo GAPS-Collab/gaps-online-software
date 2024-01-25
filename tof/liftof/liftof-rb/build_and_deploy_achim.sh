@@ -13,7 +13,7 @@ get_version() {
 }
 
 deploy_target() {
-  scp ../target/armv7-unknown-linux-musleabi/release/$1 $3:~/bin/$1-$2
+  scp ../target/armv7-unknown-linux-musleabi/release/$1 $3:~/bootstrap-tof/$1-$2
 }
 
 compile_target() {
@@ -32,6 +32,7 @@ compile_and_deploy_target() {
 # UCLA test stand
 UCLA_RB="ucla-tof-rb47 ucla-tof-rb33 ucla-tof-rb34"
 #UCLA_RB="ucla-tof-rb05 ucla-tof-rb28 ucla-tof-rb33 ucla-tof-rb34"
+UCLA_RB="nevis-tof"
 
 compile_target liftof-rb
 version=$(get_version)
@@ -39,7 +40,7 @@ for rb in `echo $UCLA_RB`;
   do
     echo "Deploying liftof-rb V$version to $rb" 
     deploy_target liftof-rb $version $rb;
-    exit
+    scp configs/liftof-rb-config-0.9.1.json nevis-tof:bootstrap-tof/
 done;
 #for rb in `echo $UCLA_RB`; 
 #  do echo $rb;

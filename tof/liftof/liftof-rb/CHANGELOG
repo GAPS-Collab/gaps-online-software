@@ -1,5 +1,15 @@
 # NIUHI series
 
+## v0.9.1
+* does not care if run by systemd or not, makes 
+  handling simpler
+* removes  --calibration since it is duplicated
+* changes default local filenames, add timestamps
+
+## v0.9.0
+* preamp, powerboard and LTB monitoring
+* integration of Paolo's command suite
+
 ## v0.8.6
 * logo show to welcome user
 * adapting to upstream changes in RunConfig

@@ -121,7 +121,8 @@ pub enum SerializationError {
   EventFragment,
   UnknownPayload,
   WrongByteSize,
-  JsonDecodingError
+  JsonDecodingError,
+  TomlDecodingError,
 }
 
 impl fmt::Display for SerializationError {
@@ -169,7 +170,8 @@ pub enum MasterTriggerError {
   DAQNotAvailable,
   PackageHeaderIncorrect,
   PackageFooterIncorrect,
-  FailedOperation
+  FailedOperation,
+  DataTooShort
 }
 
 impl fmt::Display for MasterTriggerError {

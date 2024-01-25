@@ -1,6 +1,6 @@
 [package]
 name = "liftof-lib"
-version = "0.8.5"
+version = "0.9.0"
 edition = "2021"
 
 [features]
@@ -26,7 +26,7 @@ serde_json = "1.0"
 #crossbeam = "0.8"
 crossbeam-channel = "0.5"
 
-tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["random"], version = "0.8"} 
+tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["random","database","tofcontrol","smoothed_z_score"], version = "0.9"} 
 
 zmq = "0.10.0"
 
@@ -43,8 +43,8 @@ indicatif = "0.17"
 #port_scanner = "0.1"
 #arp-toolkit = { verion = "0.3", features = ["sync"] }
 #mac_address = "1.1"
-netneighbours = "0.1"
-macaddr = {version="1.0", features = ["serde"]}
+#netneighbours = "0.1"
+#macaddr = {version="1.0", features = ["serde"]}
 
 #[target.armv7-unknown-linux-gnueabi]
 #linker = "/usr/bin/arm-none-eabi-gcc"

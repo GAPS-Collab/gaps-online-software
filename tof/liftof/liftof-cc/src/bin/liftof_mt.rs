@@ -116,9 +116,7 @@ fn main() {
   //let thread_control = Arc::new(Mutex::new(ThreadControl::default()));
 
   let mut ltb_rb_map : DsiLtbRBMapping = HashMap::<u8,HashMap::<u8,HashMap::<u8,(u8,u8)>>>::new();
-  let master_trigger_ip   = String::from("10.0.1.10");
-  let master_trigger_port = 50001usize;
-  //let worker_threads      = ThreadPool::new(2);
+  let mt_address          = String::from("10.0.1.10:50001");
 
   let args                = Args::parse();
   let verbose             = args.verbose;
@@ -139,8 +137,7 @@ fn main() {
   let _worker_thread = thread::Builder::new()
          .name("master_trigger".into())
          .spawn(move || {
-            master_trigger(&master_trigger_ip, 
-                           master_trigger_port,
+            master_trigger(mt_address, 
                            &ltb_rb_map,
                            &mte_send,
                            &tp_send_req,

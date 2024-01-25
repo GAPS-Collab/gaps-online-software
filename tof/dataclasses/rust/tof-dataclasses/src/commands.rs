@@ -284,7 +284,6 @@ impl From<u8> for TofOperationMode {
       0u8  => TofOperationMode::Unknown,
       10u8 => TofOperationMode::StreamAny,
       20u8 => TofOperationMode::RequestReply,
-      20u8 => TofOperationMode::Unknown,
       30u8 => TofOperationMode::RBHighThroughput,
       40u8 => TofOperationMode::RBCalcCRC32,
       50u8 => TofOperationMode::RBWaveform,

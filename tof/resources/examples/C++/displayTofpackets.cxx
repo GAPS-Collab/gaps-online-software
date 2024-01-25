@@ -317,11 +317,11 @@ int main(int argc, char *argv[]){
         n_mte++;
         break;
       }
-      case PacketType::TOFCmpMoni : {
+      case PacketType::CPUMoniData : {
         usize pos = 0;
-        auto tcmoni = TofCmpMoniData::from_bytestream(p.payload, pos);
+        auto cpumoni = CPUMoniData::from_bytestream(p.payload, pos);
         if (verbose) {
-          std::cout << tcmoni << std::endl;
+          std::cout << cpumoni << std::endl;
         }
         n_tcmoni++;
         break;

@@ -8,6 +8,7 @@
 //! or to be managed by systemd
 
 //use std::collections::HashMap;
+use std::path::PathBuf;
 use std::os::raw::c_int;
 use std::process::exit;
 use std::{
@@ -51,7 +52,7 @@ use crossbeam_channel::{
     Sender,
     Receiver
 };
-use local_ip_address::local_ip;
+//use local_ip_address::local_ip;
 use colored::Colorize;
 
 // TOF specific crates
@@ -65,14 +66,22 @@ use tof_dataclasses::commands::{
     //RBCommand,
     TofOperationMode
 };
+
+use tof_dataclasses::RBChannelPaddleEndIDMap;
 use tof_dataclasses::events::DataType;
 use tof_dataclasses::run::RunConfig;
+use tof_dataclasses::io::{
+    get_califilename,
+    get_runfilename
+};
 
 use liftof_lib::{
     LIFTOF_LOGO_SHOW,
+    DATAPORT,
     color_log,
+    get_rb_ch_pid_map,
     RunStatistics,
-    CalibrationCmd
+    CalibrationCmd,
 };
 
 use liftof_rb::threads::{
@@ -98,6 +107,10 @@ struct Args {
   /// If in this configuration one wants to take data, ONE HAS TO SUPPLY A RUNCONFIG!
   #[arg(short, long)]
   run_config: Option<std::path::PathBuf>,
+  /// Paddle map - this is only needed when the RBs 
+  /// should do waveform analysis
+  #[arg(short, long)]
+  paddle_map: Option<std::path::PathBuf>,
   /// Listen to remote input from the TOF computer at 
   /// the expected IP address
   #[arg(short, long, default_value_t = false)]
@@ -111,10 +124,6 @@ struct Args {
   /// Write the readoutboard binary data ('.robin') to the board itself
   #[arg(long, default_value_t = false)]
   to_local_file : bool,
-  /// Take data for calibration. This comprises tcal, vcal and 
-  /// no input data
-  #[arg(long, default_value_t = false)]
-  calibration : bool,
   ///// CnC server IP we should be listening to
   //#[arg(long, default_value_t = "10.0.1.1")]
   //cmd_server_ip : &'static str,
@@ -156,7 +165,6 @@ fn main() {
   let verbose                  = args.verbose;
   let listen                   = args.listen;
   let show_progress            = args.show_progress;
-  let calibration              = args.calibration;
   let mut to_local_file        = args.to_local_file;
   let run_config               = args.run_config;
   let test_eventids            = args.test_eventids;
@@ -165,8 +173,6 @@ fn main() {
 
   //FIMXE - this needs to become part of clap
   let cmd_server_ip = String::from("10.0.1.1");
-  //let cmd_server_ip     = args.cmd_server_ip;  
-  let this_board_ip = local_ip().expect("Unable to obtainl local board IP. Something is messed up!");
 
   // get board info 
   let rb_info = RBInfo::new();
@@ -180,9 +186,9 @@ fn main() {
   let pb_connected  = rb_info.sub_board == 2;
   // General parameters, readout board id,, 
   // ip to tof computer
-  let rb_id = rb_info.board_id;
-  let dna   = get_device_dna().expect("Unable to obtain device DNA!"); 
-
+  let rb_id      = rb_info.board_id;
+  let dna        = get_device_dna().expect("Unable to obtain device DNA!"); 
+  let ip_address = format!("tcp://10.0.1.1{:02}:{}", rb_id, DATAPORT);
   // welcome banner!
   println!("{}", LIFTOF_LOGO_SHOW);
   println!(" ** Welcome to liftof-rb \u{1F680} \u{1F388} *****");
@@ -208,8 +214,7 @@ fn main() {
     println!("..     PB (including preamps) - {}", String::from("NO").red());
   }
   println!("-----------------------------------------------");
-  println!(" => We will BIND this port to the local ip address at {}", this_board_ip);
-  println!(" => -- -- PORT {} (0MQ PUB) to publish our data", DATAPORT);
+  println!(" => We will BIND 0MQ PUB to address/port at {}", ip_address);
   println!(" => We will CONNECT to the following port on the C&C server at address: {}", cmd_server_ip);
   println!(" => -- -- PORT {} (0MQ SUB) where we will be listening for commands", DATAPORT);
   println!("-----------------------------------------------");
@@ -259,18 +264,18 @@ fn main() {
       config_from_shell = true;
     }
   }
-  let file_suffix : String;
+  let output_fname : String;
   if calibration {
-    file_suffix = String::from(".cali.tof.gaps");
+    output_fname = get_califilename(rb_id, false);
   } else {
-    file_suffix = String::from(".tof.gaps");
+    output_fname = get_runfilename(1,1,Some(rb_id));
   }
   // some pre-defined time units for 
   // sleeping
   let one_sec     = Duration::from_secs(1);  
 
   //// FIXME - this will come from future runconfig
-  let rb_mon_interv   = 5.0f32; 
+  let rb_mon_interv       = 5.0f32; 
   let mut pb_mon_every_x  = 2.0f32;
   let mut pa_mon_every_x  = 1.0f32; 
   let mut ltb_mon_every_x = 2.0f32;
@@ -315,12 +320,14 @@ fn main() {
   // 5) Monitoring
   let rc_from_cmdr_c = rc_from_cmdr.clone();
   let ctrl_cl        = thread_control.clone();
+  let address        = ip_address.clone();
   let _data_pub_thread = thread::Builder::new()
          .name("data-publisher".into())
          .spawn(move || {
             data_publisher(&tp_from_client,
                            to_local_file,
-                           Some(&file_suffix),
+                           address,
+                           Some(output_fname),
                            test_eventids,
                            verbose,
                            ctrl_cl) 
@@ -347,23 +354,20 @@ fn main() {
                        run_control)
          })
          .expect("Failed to spawn runner thread!");
-  //workforce.execute(move || {
-  //    //experimental_runner(&rc_from_cmdr_c,
-  //    //                    None, 
-  //    //                    //&bs_send,
-  //    //                    &tp_to_cache,
-  //    //                    &dtf_to_evproc,
-  //    //                    &opmode_to_cache,
-  //    //                    show_progress);
-  //    runner(&rc_from_cmdr_c,
-  //           None, 
-  //           &bs_send,
-  //           &dtf_to_evproc,
-  //           &opmode_to_cache,
-  //           show_progress);
-  //});
+    
     let proc_control    = thread_control.clone();
     let ev_stats        = run_stat.clone();
+    let paddle_map      : RBChannelPaddleEndIDMap;
+    match args.paddle_map {
+      None => {
+        warn!("Did not get a paddle map! Can NOT perform waveform analysis on-board!");
+        paddle_map = RBChannelPaddleEndIDMap::new();
+      }
+      Some(pmap_path) => {
+        paddle_map      = get_rb_ch_pid_map(pmap_path, rb_info.board_id);
+      }
+    }
+
     let _ev_proc_thread = thread::Builder::new()
            .name("event-processing".into())
            .spawn(move || {
@@ -374,6 +378,7 @@ fn main() {
                                    &opmode_from_runner, 
                                    &tp_to_pub_ev,
                                    &dtf_from_runner,
+                                   paddle_map,
                                    args.verbose,
                                    calc_crc32,
                                    proc_control,
@@ -390,6 +395,7 @@ fn main() {
   if listen {
     let cmd_control      = thread_control.clone(); 
     let rc_to_runner_c   = rc_to_runner.clone();
+    let address          = ip_address.clone();
     let _cmd_resp_thread = thread::Builder::new()
            .name("cmd-responder".into())
            .spawn(move || {
@@ -397,6 +403,7 @@ fn main() {
                             &rc_file_path,
                             &rc_to_runner_c,
                             &tp_to_cache_c,
+                            address,
                             cmd_control)
             })
            .expect("Failed to spawn cmd_responder thread!");
@@ -531,31 +538,30 @@ fn main() {
     } 
     if config_from_shell {
 
-      // if the runconfig does not have nevents different from 
-      // 0, we will not send it right now. The commander will 
-      // then take care of it and send it when it is time.
-      if rc_config.nevents != 0 || rc_config.nseconds != 0 {
-        println!("=> The runconfig request to take {} events or to run for {} seconds!", rc_config.nevents, rc_config.nseconds);
-        println!("=> The run will be stopped when it is finished!");
-        println!("=> {}", String::from("!If that is not what you want, check out the --listen flag!").green());
-        if !rc_config.is_active {
-          println!("=> The provided runconfig does not have the is_active field set to true. Won't start a run if that is what you were waiting for.");
-        } 
-        if !listen {
-          match rc_to_runner.send(rc_config) {
-            Err(err) => error!("Could not initialzie Run! Err {err}"),
-            Ok(_)    => {
-              if rc_config.is_active {
-                println!("=> Runner configured! Attempting to start.");
-              } else {
-                println!("=> Stopping run..")
-              }
+    // if the runconfig does not have nevents different from 
+    // 0, we will not send it right now. The commander will 
+    // then take care of it and send it when it is time.
+    if rc_config.nevents != 0 || rc_config.nseconds != 0 {
+      println!("=> The runconfig request to take {} events or to run for {} seconds!", rc_config.nevents, rc_config.nseconds);
+      println!("=> The run will be stopped when it is finished!");
+      println!("=> {}", String::from("!If that is not what you want, check out the --listen flag!").green());
+      if !rc_config.is_active {
+        println!("=> The provided runconfig does not have the is_active field set to true. Won't start a run if that is what you were waiting for.");
+      } 
+      if !listen {
+        match rc_to_runner.send(rc_config) {
+          Err(err) => error!("Could not initialzie Run! Err {err}"),
+          Ok(_)    => {
+            if rc_config.is_active {
+              println!("=> Runner configured! Attempting to start.");
+            } else {
+              println!("=> Stopping run..")
             }
           }
         }
       }
-    } // end if config from shell
-  } // end if not systemd process
+    }
+  } // end if config from shell
   if do_monitoring {
     // only do monitoring when we don't do a 
     // calibration

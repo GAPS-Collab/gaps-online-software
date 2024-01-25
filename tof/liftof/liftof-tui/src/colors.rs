@@ -43,16 +43,11 @@ pub const COLORSETNIUHI : ColorSet = ColorSet::new(Color::Rgb(0,41,170),
                                                    Color::Rgb(0,80,157),
                                                    Color::Rgb(253,197,0),
                                                    Color::Rgb(255,213,0));
-pub const COLORSETDUNE : ColorSet = ColorSet::new(Color::Rgb(223,135,53),
-                                                  Color::Rgb(244,193,110),
+pub const COLORSETDUNE : ColorSet = ColorSet::new(Color::Rgb(161,18,37),
+                                                  Color::Rgb(223,135,53),
                                                   Color::Rgb(181,164,146),
-                                                  Color::Rgb(161,18,37),
-                                                  Color::Rgb(225, 170, 116));
-pub const COLORSETGMAPS : ColorSet = ColorSet::new(Color::Rgb(74,128,245),
-                                                   Color::Rgb(155,191,244),
-                                                   Color::Rgb(167,205,242),
-                                                   Color::Rgb(187,218,164),
-                                                   Color::Rgb(241,141,0));
+                                                  Color::Rgb(225, 170, 116),
+                                                  Color::Rgb(244,193,110));
 
 pub const COLORSETLD    : ColorSet = ColorSet::new(Color::Rgb(255,68,0),
                                                    Color::Rgb(255, 170, 68),
@@ -60,11 +55,23 @@ pub const COLORSETLD    : ColorSet = ColorSet::new(Color::Rgb(255,68,0),
                                                    Color::Rgb(255, 204, 153),
                                                    Color::Rgb(255, 238, 204));
 
-pub const COLORSETMATRIX : ColorSet = ColorSet::new(Color::Rgb(54,186,1),
-                                                    Color::Rgb(0,154,34),
-                                                    Color::Rgb(0,255,43),
-                                                    Color::Rgb(0,154,34),
-                                                    Color::Rgb(54,186,1));
+pub const COLORSETMATRIX : ColorSet = ColorSet::new(Color::Rgb(2,2,4),
+                                                    Color::Rgb(32,72,41),
+                                                    Color::Rgb(34,180,85),
+                                                    Color::Rgb(128,206,135),
+                                                    Color::Rgb(156,229,161));
+
+pub const COLORSETSTARFIELD : ColorSet = ColorSet::new(Color::Rgb(48,76,122),
+                                                       Color::Rgb(224,98,54),
+                                                       Color::Rgb(215,166,75),
+                                                       Color::Rgb(244,245,247),
+                                                       Color::Rgb(199,33,56));
+
+pub const COLORSETGAPS : ColorSet = ColorSet::new(Color::Rgb(27,51,88),
+                                                  Color::Rgb(228,60,65),
+                                                  Color::Rgb(132,203,187),
+                                                  Color::Rgb(212,202,87),
+                                                  Color::Rgb(227,76,68));
 
 
 #[derive(Debug, Copy, Clone)]
@@ -116,24 +123,3 @@ impl ColorTheme2 {
   }
 }
 
-
-/// Stylize everything with color themes
-pub trait ColorTheme {
-  /// color gradient from darkest (c0) to brightest (c1)
-  const C0 : Color = Color::Black;
-  const C1 : Color = Color::White;
-  const C2 : Color = Color::Black;
-  const C3 : Color = Color::White;
-  
-  /// color for highlights
-  const HC : Color = Color::White;
-  fn style(&self)        -> Style;
-
-  fn style_soft(&self)   -> Style;
-
-  fn highlight(&self)    -> Style;
-
-  fn highlight_fg(&self) -> Style;
-
-  fn background(&self)   -> Style;
-}

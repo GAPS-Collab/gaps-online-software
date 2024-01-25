@@ -1,22 +1,20 @@
 # gaps-online-software
 
-![build-badge](https://github.com/GAPS-Collab/gaps-online-software/workflows/CMake/badge.svg)
-![build-docs-badge](https://github.com/GAPS-Collab/gaps-online-software/workflows/Pages-Only/badge.svg)
+![build-docs-badge](https://github.com/GAPS-Collab/gaps-online-software/workflows/BuildBot/badge.svg)
 
-This is branch NIUHI-0.8. [Niuhi is a tiger shark](https://dlnr.hawaii.gov/sharks/sharks/tiger-shark/).
+This is branch HAHALUA-0.9. [Hahalua is a manta ray](https://dlnr.hawaii.gov/dar/sharks-and-rays/).
+![Manta ray](resources/assets/hahalua.png)
 
-![Tiger shark](resources/assets/TigerShark.png)
+>[!TIP] 
+>Manta rays can be spotted in the Hawaiian waters. There are over 100 different individuals who have been seen in front of the Kona coast, Big Island. Please report sightings [here](https://mprf.net/identification/report-a-sighting.html), and remember to take a picture of their belly, since the spotted pattern on their underside is unique for every individual and allows to identify them. 
 
->[!CAUTION] 
->Tiger sharks roam the waters of the Hawaiian islands. 
+>[!NOTE]
+>Manta rays seem to be extremly intelligent, and there are indications that they might even recognize themselves in a mirror, however, [this is active research](https://www.science.org/content/article/manta-rays-show-evidence-being-self-aware) 
 
-This branch is not necessarily connected to a measurement 
-campaign, but to a series of tests at UCLA, eg to investigate
-[issue 6](https://github.com/GAPS-Collab/gaps-online-software/issues/6). 
-It is related to the previous release branch, OMILU-0.7 in the soirit of 
-carrying on the development, however, since we now entered a phase of 
-datataking, the OMILU branch won't be updated any more with new features
-and it is easier to keep 2 related branches in paralell.
+This branch is the last version before we claim flight-readiness, which will be our first "true" release.
+The main purpose of this branch is to merge the command suite with what we learned from the UCLA teststand.
+
+The branch is related to a [milestone](https://github.com/GAPS-Collab/gaps-online-software/milestone/3), however, we are not strictly following the milestone concept.
 
 ## API docs 
 
@@ -27,31 +25,16 @@ for the python API will follow soon.
 
 ## prerequisites
 
-`cmake` and `pybind11` are needed in case pybindings should be compiled.
-The tof flight software suite (`liftof`) requires a rust toolchain, since 
-it is written in rust.
+* rust toolchain - to compile `liftof` flight software suite as well as
+  `tof-dataclasses` which are the backbone of `liftof`
+* `cmake` is used as a build system
+* `pybind11` is used to build the pybindings for the C++ API. It also 
+   requires a minimum of `gcc-13` and python `3.10`
+*  a number of C++ libraries are pulled from github during installation.
 
-If library `lm-sensors` does give problems, check whether that lib is installed
-and if there is a symbolic link named `libsensors.so` in your `/usr/lib` or wherever
-you keep your libs.
+### software repository
 
-## branches and how to get updates
-
-The main branch is set to the latest release, a release is a frozen 
-version at the end of a development cycle. To get the newest code, 
-one has to switch to the branch with the highest version number 
-available, e.g. KIHIKIHI-0.6. Releases are typically related to specific
-test campaigns, e.g. NTS. The develop branch is intended for forward and 
-far-future development and might contain experimental features. 
-The branches/releases are named after fish in Hawaii. A fish 
-identification card can be found [here](https://www.honolulu.gov/rep/site/dpr/dpr_docs/hbep_fish_id_card.pdf).
-You can switch branches with `git checkout <branch>`. To get updates, use `git pull`
-
-### software repositories
-
-There are two repositories, which are both (hopefully) kept in sync, so they are interchangeable
-
-* [gitlab (UH)](https://uhhepvcs.phys.hawaii.edu/Achim/gaps-online-software)
+The code is organized in a (private) github repository at 
 * [github](https://github.com/GAPS-Collab/gaps-online-software)
 
 ## installation
@@ -61,6 +44,23 @@ There are two repositories, which are both (hopefully) kept in sync, so they are
 We are using git submodules to pull in some of the dependencies.
 To automatically check them out when clone te repository, use
 `git clone --recurse-submodules`
+
+### Branches and how to get updates
+
+The branches/releases are named after fish in Hawaii. A fish 
+identification card can be found [here](https://www.honolulu.gov/rep/site/dpr/dpr_docs/hbep_fish_id_card.pdf).
+You can switch branches with `git checkout <branch>`. To get updates, use `git pull`
+
+Usually, each branch has a specific purpose, everything with version numbers < 1.0.0 or 
+named `develop` or `<name>_dev` will be unstable.
+The branches following the naming scheme "FISHNAME-X.X" are dedicated to specific tasks, 
+e.g. the NTS campaign. Please see the dedicated README for this branch.
+
+We are following a git-flow model, which is e.g. described [here](https://www.gitkraken.com/learn/git/git-flow). This means that `main` should point to the latest release, however, it has to be considered that until
+we are at version < 1.0.0, there are no "official" releases. Instead, the main branch will point to the 
+most stable and useful version at the time.
+
+### Build system
 
 The installation uses `cmake`. Create a build directory and execute
 `cmake <gaps-online-software source directory> --install-prefix <install_dir>`
@@ -133,5 +133,6 @@ Please see the README.md in the individual subfolders.
 
 ## maintainer
 
-A. Stoessl <stoessl@hawaii.edu>
+* A. Stoessl <stoessl@hawaii.edu>
 
+* P. Lazzaroni <paolo.lazzaroni@unibg.it>

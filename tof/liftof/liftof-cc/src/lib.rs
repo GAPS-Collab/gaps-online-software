@@ -5,23 +5,21 @@ use tof_dataclasses::commands::{TofCommand, TofResponse, TofCommandResp};
 use tof_dataclasses::constants::PAD_CMD_32BIT;
 use zmq::Socket;
 
-pub mod constants;
-pub mod api;
-pub mod threads;
 #[macro_use] extern crate log;
 extern crate clap;
-extern crate json;
 extern crate colored;
 
 extern crate local_ip_address;
 extern crate crossbeam_channel;
 extern crate liftof_lib;
 
-#[cfg(feature="random")]
-extern crate rand;
-
 extern crate zmq;
 extern crate tof_dataclasses;
+extern crate tof_control;
+
+pub mod constants;
+pub mod threads;
+pub mod settings;
 
 /// Power function that targets the component specified, no ID
 pub fn send_power(cmd_sender: Sender<TofPacket>,

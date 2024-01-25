@@ -8,7 +8,6 @@
 #[macro_use] extern crate log;
 extern crate env_logger;
 extern crate clap;
-extern crate json;
 extern crate ctrlc;
 extern crate zmq;
 extern crate tof_dataclasses;
@@ -19,28 +18,40 @@ extern crate colored;
 extern crate liftof_lib;
 extern crate liftof_cc;
 
+use std::sync::{
+    Arc,
+    Mutex,
+};
+
 use std::time::Instant;
-use std::collections::HashMap;
-use std::io;
+//use std::collections::HashMap;
 use std::io::Write;
 use std::process::exit;
-use std::{fs,
-          thread,
-          time};
-use std::path::{Path, PathBuf};
+use std::{
+    fs,
+    thread,
+    time
+};
+use std::path::{
+    //Path,
+    PathBuf,
+};
 
 use clap::{arg,
            command,
            Parser};
 
 use crossbeam_channel as cbc; 
-use colored::Colorize;
+//use colored::Colorize;
 
 use tof_dataclasses::events::{MasterTriggerEvent,
                               RBEvent};
-use tof_dataclasses::threading::ThreadPool;
+use tof_dataclasses::threading::{
+    ThreadControl,
+};
+
 use tof_dataclasses::packets::TofPacket;
-use tof_dataclasses::manifest::get_rbs_from_sqlite;
+use tof_dataclasses::manifest::ReadoutBoard;
 use tof_dataclasses::DsiLtbRBMapping;
 use tof_dataclasses::commands::TofCommand;
 use tof_dataclasses::commands::TofCommandCode;
@@ -49,16 +60,17 @@ use liftof_lib::{
     readoutboard_commander,
     color_log,
     get_ltb_dsi_j_ch_mapping,
-    DATAPORT,
     LIFTOF_LOGO_SHOW,
     RunCmd, CalibrationCmd, PowerCmd, PowerStatusEnum, TofComponent, SetCmd
 };
 use liftof_cc::threads::{readoutboard_communicator,
                          event_builder,
-                         global_data_sink};
-
+                         global_data_sink,
+                         monitor_cpu };
+use liftof_cc::settings::{
+    LiftofCCSettings,
+};
 use liftof_lib::Command;
-
 
 /*************************************/
 
@@ -69,17 +81,16 @@ struct LiftofCCArgs {
   /// Write the entire TofPacket Stream to a file
   #[arg(short, long, default_value_t = false)]
   write_stream: bool,
-  #[arg(short, long, default_value_t = false)]
-  use_master_trigger: bool,
-  /// Disable monitoring features
-  #[arg(short, long, default_value_t = false)]
-  no_monitoring: bool,
-  /// Enhance output to console
+  /// Define a run id for later identification
+  #[arg(short, long)]
+  run_id: usize,
+  /// More detailed output for debugging
   #[arg(short, long, default_value_t = false)]
   verbose: bool,
-  /// A json config file with detector information
+  /// Configuration of liftof-cc. Configure analysis engine,
+  /// event builder and general settings.
   #[arg(short, long)]
-  json_config: Option<PathBuf>,
+  config: Option<String>,
   /// A json file wit the ltb(dsi, j, ch) -> rb_id, rb_ch mapping.
   #[arg(long)]
   json_ltb_rb_map : Option<PathBuf>,
@@ -107,19 +118,13 @@ fn main() {
   println!(" >> Welcome to liftof-cc \u{1F680} \u{1F388} ");
   println!(" >> liftof is a software suite for the time-of-flight detector (TOF) ");
   println!(" >> for the GAPS experiment \u{1F496}");
-  println!(" >> This is the Command&Control server which connects to the MasterTriggerBoard and the ReadoutBoards");
-  //println!(" >> see the gitlab repository for documentation and submitting issues at" );
-  //let repo_url    = "https://github.com/GAPS-Collab/gaps-online-software";
-  //let api_doc_url = "https://gaps-collab.github.io/gaps-online-software/";
-  //let gitlab_repo = format!("\x1B]8;;{}\x07{}\x1B]8;;\x07", repo_url, repo_url);
-  //let api_docs    = format!("\x1B]8;;{}\x07{}\x1B]8;;\x07", api_doc_url, api_doc_url);
-  //println!(" >> >> Software repo    : {}", gitlab_repo);
-  //println!(" >> >> API documentation: {}", api_docs);
+  println!(" >> This is the Command&Control server");
+  println!(" >> It connects to the MasterTriggerBoard and the ReadoutBoards");
+  
   // deal with command line arguments
   let args = LiftofCCArgs::parse();
-
   let verbose = args.verbose;
-
+  // log testing
   //error!("error");
   //warn!("warn");
   //info!("info");
@@ -130,72 +135,71 @@ fn main() {
   if write_stream {
     info!("Will write the entire stream to files");
   }
-  let no_monitoring = args.no_monitoring;
-  if no_monitoring {
-    warn!("All monitoring features disabled!");
-  }
 
-  let json_content  : String;
-  let config        : json::JsonValue;
-  
-  let nboards       : usize;
+  let config          : LiftofCCSettings;
+  let nboards         : usize;
 
-  let use_master_trigger        = args.use_master_trigger;
-  let mut master_trigger_ip     = String::from("");
-  let mut master_trigger_port   = 0usize;
-  // create copies, since we need this information
-  // for 2 threads at least (moni and event)
-  //let mut master_trigger_ip_c   = String::from("");
-  //let mut master_trigger_port_c = 0usize;
-  
-  match args.json_config {
-    None => panic!("No .json config file provided! Please provide a config file with --json-config or -j flag!"),
-    Some(_) => {
-      json_content = std::fs::read_to_string(args.json_config.as_ref().unwrap()).expect("Can not open json file");
-      config = json::parse(&json_content).expect("Unable to parse json file");
+  //let foo_settings = LiftofCCSettings::new();
+  //foo_settings.to_toml(String::from("foo"));
+  //exit(0);
+
+  match args.config {
+    None => panic!("No config file provided! Please provide a config file with --config or -c flag!"),
+    Some(cfg_file) => {
+      match LiftofCCSettings::from_toml(cfg_file) {
+        Err(err) => {
+          error!("CRITICAL! Unable to parse .toml settings file! {}", err);
+          panic!("Unable to parse config file!");
+        }
+        Ok(_cfg) => {
+          config = _cfg;
+        }
+      }
     } // end Some
   } // end match
-
-  let mut ltb_rb_map : DsiLtbRBMapping = HashMap::<u8,HashMap::<u8,HashMap::<u8,(u8,u8)>>>::new();
-  if use_master_trigger {
-    match args.json_ltb_rb_map {
-      None => {
-        panic!("Will need json ltb -> rb mapping when MasterTrigger shall be used")
-      },
-      Some(_json_ltb_rb_map) => {
-        ltb_rb_map = get_ltb_dsi_j_ch_mapping(_json_ltb_rb_map);
-      }
-    }
-
-    master_trigger_ip     = config["master_trigger"]["ip"].as_str().unwrap().to_owned();
-    master_trigger_port   = config["master_trigger"]["port"].as_usize().unwrap();
-    //master_trigger_ip_c   = master_trigger_ip.clone();
-    //master_trigger_port_c = master_trigger_port.clone();
-    info!("Will connect to the master trigger board at {}:{}", master_trigger_ip, master_trigger_port);
-  } else {
-    println!("==> Will NOT connect to the MTB, since -u has not been provided in the commandlline!");
-  }
- 
-  let runid                 = config["run_id"].as_usize().unwrap(); 
-  let mut write_stream_path = config["stream_savepath"].as_str().unwrap().to_owned();
-  let calib_file_path       = config["calibration_file_path"].as_str().unwrap().to_owned();
-  let runtime_nseconds      = config["runtime_seconds"].as_f32().unwrap_or(0.0);
-  let write_npack_file      = config["packets_per_stream"].as_usize().unwrap_or(10000);
-  let db_path               = Path::new(config["db_path"].as_str().unwrap());
-  let db_path_c             = db_path.clone();
-  let mut rb_list           = get_rbs_from_sqlite(db_path_c);
-  let rb_ignorelist  = &config["rb_ignorelist"];
+  
+  println!("=> Using the following config as parsed from the config file:\n{}", config);
   //exit(0);
+
+  let ltb_rb_map : DsiLtbRBMapping;// = HashMap::<u8,HashMap::<u8,HashMap::<u8,(u8,u8)>>>::new();
+  match args.json_ltb_rb_map {
+    None => {
+      panic!("Will need json ltb -> rb mapping when MasterTrigger shall be used")
+    },
+    Some(_json_ltb_rb_map) => {
+      ltb_rb_map = get_ltb_dsi_j_ch_mapping(_json_ltb_rb_map);
+    }
+  }
+
+  let mtb_address           = config.mtb_address;
+  info!("Will connect to the master trigger board at {}!", mtb_address);
+ 
+  // FIXME
+  let runid                 = args.run_id;
+  let mut write_stream_path = config.data_dir;
+  let calib_file_path       = config.calibration_dir;
+  let runtime_nseconds      = config.runtime_sec;
+  let write_npack_file      = config.packs_per_file;
+  //let db_path             = Path::new(config["db_path"].as_str()  .expect("Need to know where the local sqlite database is stored. Please add 'db_path' to the configuration file!"));
+  let mtb_moni_interval     = config.mtb_moni_interval_sec;
+  let cpu_moni_interval     = config.cpu_moni_interval_sec;
+  let flight_address        = config.fc_pub_address;
+
+  let mut rb_list           = vec![ReadoutBoard::new();50];
+  for k in 0..rb_list.len() {
+    rb_list[k].rb_id = k as u8 + 1;
+  }
+  let rb_ignorelist         = config.rb_ignorelist.clone();
   for k in 0..rb_ignorelist.len() {
     println!("=> We will remove RB {} due to it being marked as IGNORE in the config file!", rb_ignorelist[k]);
-    let bad_rb = rb_ignorelist[k].as_u8().unwrap();
+    let bad_rb = rb_ignorelist[k];
     rb_list.retain(|x| x.rb_id != bad_rb);
   }
   nboards = rb_list.len();
-  println!("=> We will use the following tof manifest:");
-  println!("== ==> RBs [{}]:", rb_list.len());
+  println!("=> Expecting {} readoutboards!", rb_list.len());
+  info!("--> Following RBs are expected:");
   for rb in &rb_list {
-    println!("\t {}", rb);
+    info!("     -{}", rb);
   }
 
   // A global kill timer
@@ -209,28 +213,14 @@ fn main() {
     // Check if the directory exists
     if let Ok(metadata) = fs::metadata(&stream_files_path) {
       if metadata.is_dir() {
-        println!("=> Directory {} exists.", stream_files_path.display());
+        println!("=> Directory {} for run number {} already consists and may contain files!", stream_files_path.display(), runid);
         // FILXME - in flight, we can not have interactivity.
         // But the whole system with the run ids might change 
-        // anyway
-        print!("=> You are risking overwriting files in that directory. You might have used rununmber {} before. Are you sure you want to continue? (YES/<any>): ", runid);
-        io::stdout().flush().unwrap(); // Ensure the prompt is displayed
-        // Read user input
-        let mut input = String::new();
-        io::stdin().read_line(&mut input).unwrap();
-        // Trim leading/trailing whitespaces and convert to lowercase
-        let input = input.trim().to_lowercase();
-        // Check user input and end the program if desired
-        if input == "YES" {
-          println!("==> Continuing on request of user...");
-        } else {
-          println!("==> Abort program!");
-        }
       } 
     } else {
       match fs::create_dir(&stream_files_path) {
         Ok(())   => println!("=> Created {} to save stream data", stream_files_path.display()),
-        Err(err) => panic!("Failed to create directory: {}, Error {}", stream_files_path.display(), err),
+        Err(err) => panic!("Failed to create directory: {}! {}", stream_files_path.display(), err),
       }
     }
   }
@@ -308,61 +298,51 @@ fn main() {
   // I guess expect is fine here, see above
   let socket = ctx.socket(zmq::SUB).expect("Unable to create 0MQ SUB socket!");
 
+  let thread_control = Arc::new(Mutex::new(ThreadControl::new()));
 
-  // prepare a thread pool. Currently we have
-  // 1 thread per rb, 1 master trigger thread
-  // and 1 event builder thread.
-  // Also, the paddle cache is its separate 
-  // thread.
-  // There might
-  // be a monitoring thread, too.
-  // The number of threads should be fixed at 
-  // runtime, but it should be possible to 
-  // respawn them
-  //let mut nthreads = nboards + 2; // 
-  let mut nthreads = 60;
-  if use_master_trigger { 
-    nthreads += 1;
-  }
-
-  let worker_threads = ThreadPool::new(nthreads);
-
-  if !no_monitoring {
-    //println!("==> Starting main monitoring thread...");
-    //let tp_to_sink_c = tp_to_sink.clone();
-    //let moni_interval = 10u64; // in seconds
-    //worker_threads.execute(move || {
-    //                       tofcmp_and_mtb_moni(&tp_to_sink_c,
-    //                                           &master_trigger_ip_c,
-    //                                           master_trigger_port_c,
-    //                                           moni_interval,
-    //                                           false);
-    //});
+  if cpu_moni_interval > 0 {
+    println!("==> Starting main monitoring thread...");
+    let tp_to_sink_c = tp_to_sink.clone();
+    // this is anonymus, but we control the thread
+    // through the thread control mechanism, so we
+    // can still end it.
+    let _cpu_moni_thread = thread::Builder::new()
+         .name("cpu-monitoring".into())
+         .spawn(move || {
+           monitor_cpu(
+             tp_to_sink_c,
+             cpu_moni_interval,
+             thread_control,
+             verbose)
+          })
+         .expect("Failed to spawn cpu-monitoring thread!");
   }
 
   write_stream_path = String::from(stream_files_path.into_os_string().into_string().expect("Somehow the paths are messed up very badly! So I can't help it and I quit!"));
 
   // this is the tailscale address
-  let flight_address = format!("tcp://100.101.96.10:{}", DATAPORT);
+  //let flight_address = format!("tcp://100.101.96.10:{}", DATAPORT);
   // this is the address in the flight network
   // flight_address = format!("tcp://10.0.1.1:{}", DATAPORT);
   println!("==> Starting data sink thread!");
-  worker_threads.execute(move || {
-                         global_data_sink(&tp_from_client,
-                                          &flight_address,
-                                          write_stream,
-                                          write_stream_path,
-                                          write_npack_file,
-                                          runid,
-                                          verbose);
-  });
+  let _data_sink_thread = thread::Builder::new()
+       .name("data-sink".into())
+       .spawn(move || {
+         global_data_sink(&tp_from_client,
+                          &flight_address,
+                          write_stream,
+                          write_stream_path,
+                          write_npack_file,
+                          runid,
+                          verbose);
+        })
+       .expect("Failed to spawn data-sink thread!");
   println!("==> data sink thread started!");
   println!("==> Will now start rb threads..");
 
   for n in 0..nboards {
     let mut this_rb = rb_list[n].clone();
     let this_tp_to_sink_clone = tp_to_sink.clone();
-    this_rb.infer_ip_address();
     let cali_fname = this_rb.guess_calibration_filename();
     this_rb.calib_file = calib_file_path.clone() + &cali_fname;
     //this_rb.calib_file = calib_file_path.clone() + "/" + "rb";
@@ -373,48 +353,57 @@ fn main() {
     //this_rb.calib_file += "_cal.txt";
     println!("==> Starting RB thread for {}", this_rb);
     let ev_to_builder_c = ev_to_builder.clone();
-    worker_threads.execute(move || {
+    let thread_name = format!("rb-comms-{}", this_rb.rb_id);
+    let _rb_comm_thread = thread::Builder::new()
+         .name(thread_name)
+         .spawn(move || {
       readoutboard_communicator(&ev_to_builder_c,
                                 this_tp_to_sink_clone,
                                 &this_rb,
                                 runid,
                                 false,
                                 true);
-    });
+          })
+         .expect("Failed to spawn readoutboard-communicator thread!");
   } // end for loop over nboards
   println!("==> All RB threads started!");
   
   let one_second = time::Duration::from_millis(1000);
   println!("==> Starting RB commander thread!");
-  worker_threads.execute(move || {
-    readoutboard_commander(&cmd_receiver);
-  });
-  if use_master_trigger {
-    // start the event builder thread
-    println!("==> Starting event builder and master trigger threads...");
-    let cmd_sender_2 = cmd_sender.clone();
-    worker_threads.execute(move || {
-                           event_builder(&master_ev_rec,
-                                         &ev_from_rb,
-                                         &tp_to_sink);
-    });
-    // master trigger
-    worker_threads.execute(move || {
-                           master_trigger(&master_trigger_ip, 
-                                          master_trigger_port,
-                                          &ltb_rb_map,
-                                          &master_ev_send,
-                                          &cmd_sender_2,
-                                          &mtb_moni_sender,
-                                          10,
-                                          60,
-                                          false,
-                                          false);
-    });
-  } else {
-    println!("=> {}", "NOT using the MTB! This means that currently we can only save the blobfiles directly and NO EVENT data will be passed on to the flight computer!".red().bold());
-    println!("=> {}", "This mode is still useful for calibration runs or to save RBBinary data locally!".italic());
-  }
+    let _rb_cmd_thread = thread::Builder::new()
+         .name("rb-commander".into())
+         .spawn(move || {
+            readoutboard_commander(&cmd_receiver);
+          })
+         .expect("Failed to spawn rb-commander thread!");
+  // start the event builder thread
+  println!("==> Starting event builder and master trigger threads...");
+  let cmd_sender_2 = cmd_sender.clone();
+  let settings = config.event_builder_settings;
+    let _evb_thread = thread::Builder::new()
+         .name("cpu-monitoring".into())
+         .spawn(move || {
+                         event_builder(&master_ev_rec,
+                                       &ev_from_rb,
+                                       &tp_to_sink,
+                                       settings);
+          })
+         .expect("Failed to spawn cpu-monitoring thread!");
+  // master trigger
+    let _mtb_thread = thread::Builder::new()
+         .name("master-trigger".into())
+         .spawn(move || {
+                         master_trigger(mtb_address, 
+                                        &ltb_rb_map,
+                                        &master_ev_send,
+                                        &cmd_sender_2,
+                                        &mtb_moni_sender,
+                                        mtb_moni_interval,
+                                        60,
+                                        false,
+                                        false);
+          })
+         .expect("Failed to spawn cpu-monitoring thread!");
 
   let one_minute = time::Duration::from_millis(60000);
   
@@ -434,7 +423,7 @@ fn main() {
      Ok(_)    => ()
     }
     thread::sleep(one_second);
-    println!("So long and thanks for all the \u{1F41F}"); 
+    println!(">> So long and thanks for all the \u{1F41F} <<"); 
     exit(0);
   })
   .expect("Error setting Ctrl-C handler");
@@ -560,14 +549,12 @@ fn main() {
     // first we issue start commands until we receive
     // at least 1 positive
     //cmd_sender.send(start_run);
-    thread::sleep(1*one_second); 
     thread::sleep(1*one_minute);
     println!("...");
-    if program_start.elapsed().as_secs_f32() > runtime_nseconds {
+    if program_start.elapsed().as_secs_f64() > runtime_nseconds as f64 {
       println!("=> Runtime seconds of {} have expired!", runtime_nseconds);
       println!("=> Ending program. If you don't want that behaviour, change the confifguration file.");
       exit(0);    
     }
   }
-  //println!("Program terminating after specified runtime! So long and thanks for all the {}", fish); 
 }

@@ -12,28 +12,50 @@ use std::fmt;
 //use std::time::Duration;
 use std::collections::HashMap;
 
-use crate::serialization::{Serialization,
-                           SerializationError,
-                           parse_u8,
-                           parse_u16,
-                           parse_u32};
+use crate::serialization::{
+    Serialization,
+    SerializationError,
+    parse_u8,
+    parse_u16,
+    parse_u32
+};
 
 use crate::events::RBMissingHit;
-
 use crate::manifest::{LocalTriggerBoard,
                       ReadoutBoard};
 
-const N_LTBS : usize = 20;
-const N_CHN_PER_LTB : usize = 16;
+pub const N_LTBS : usize = 25;
+pub const N_CHN_PER_LTB : usize = 16;
 
 
 /////////////////////////////////////////////////
+
+
+/// Hold additional information about the status
+/// of the registers on the MTB
+pub struct MTBInfo {
+  pub tiu_emulation_mode : bool,
+  pub tiu_bad            : bool,
+  pub dsi_status         : [bool;5],
+  pub rb_int_window      : u32,
+  pub read_all_rbchan    : bool,
+  pub gaps_trig_en       : bool,
+  pub require_beta       : bool,
+  pub trigger_rate       : bool,
+  pub lost_trigger_rate  : bool,
+  pub inner_tof_thresh   : u32,
+  pub outer_tof_thresh   : u32,
+  pub total_tof_thresh   : u32,
+  pub any_trig_is_glob   : bool,
+  pub track_trig_is_glob : bool
+}
 
 /// MasterTrigger related mapping
 ///
 /// Caches ltb/rb relevant information 
 /// and can generate rb/ltb id lists
 #[derive(Debug, Clone)]
+#[deprecated(since="0.9.1", note="Not used and overkill")]
 pub struct MasterTriggerMapping {
   pub ltb_list : Vec<LocalTriggerBoard>,
   pub rb_list  : Vec<ReadoutBoard>,
@@ -79,7 +101,6 @@ impl MasterTriggerMapping {
     for k in 0..N_LTBS {
       debug! ("{k} -> {}", self.ltb_mapping[k]);
     }
-    //panic!("Uff");
   }
 
   /// Mapping trigger LTB board mask - LTB ids
@@ -472,29 +493,19 @@ impl Serialization for MasterTriggerEvent {
       mt.decode_hit_mask(n, hit_mask);
     }
     mt.crc                = parse_u32(bs, pos);
-    warn!("This is specific to data written with <= 0.6.0 KIHIKIHI! This is a BUG! It needs to be fixed in future versions! Version 0.6.1 should already fix ::to_bytestream, but leaves a modded ::from_bytestream for current analysis.");
     let tail_a              = parse_u8(bs, pos);
     let tail_b              = parse_u8(bs, pos);
     if tail_a == 85 && tail_b == 85 {
-      debug!("Correct tail found!");
+      trace!("Correct tail found!");
     }
     else if tail_a == 85 && tail_b == 5 {
-      debug!("Tail for version 0.6.0/0.6.1 found");  
+      warn!("This is specific to data written with <= 0.6.0 KIHIKIHI! This is a BUG! It needs to be fixed in future versions! Version 0.6.1 should already fix ::to_bytestream, but leaves a modded ::from_bytestream for current analysis.");
+      warn!("Tail for version 0.6.0/0.6.1 found");  
     } else {
       error!("Tail is messed up. See comment for version 0.6.0/0.6.1 in CHANGELOG! We got {} {} but were expecting 85 5", tail_a, tail_b);
       //error!("Got {} for MTE tail signature! Expecting {}", tail, MasterTriggerEvent::TAIL);
       return Err(SerializationError::TailInvalid);
     }
-    //let tail              = parse_u16(bs, pos);
-    //if tail != MasterTriggerEvent::TAIL {
-    //  error!("Got {} for MTE tail signature! Expecting {}", tail, MasterTriggerEvent::TAIL);
-    //  return Err(SerializationError::TailInvalid);
-    //}
-    //let hit_mask          = 
-
-    //mt.n_paddles          = parse_u8(bs, pos);
-    //bs.extend_from_slice(&self.n_paddles.to_le_bytes());
-
     Ok(mt)
   }
 }
@@ -528,6 +539,11 @@ impl fmt::Display for MasterTriggerEvent {
     dsi_j.insert(16 , "4/3");
     dsi_j.insert(17 , "4/4");
     dsi_j.insert(19 , "4/5");
+    dsi_j.insert(20 , "5/1");
+    dsi_j.insert(21 , "5/2");
+    dsi_j.insert(22 , "5/3");
+    dsi_j.insert(23 , "5/4");
+    dsi_j.insert(24 , "5/5");
     let mut hit_boards = Vec::<u8>::with_capacity(20);
     
     let mut repr = String::from("<MasterTriggerEvent");

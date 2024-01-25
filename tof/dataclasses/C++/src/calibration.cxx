@@ -2,9 +2,7 @@
 #include <iostream>
 #include <regex>
 
-#include "spdlog/spdlog.h"
-#include "spdlog/cfg/env.h"
-
+#include "logging.hpp"
 #include "parsers.h"
 #include "calibration.h"
 
@@ -12,7 +10,7 @@ u8 extract_rbid(const String& filename) {
   std::regex pattern("rb(\\d+)_cal"); // Match "RB" followed by digits, an underscore, and more digits
   std::smatch match;
   if (std::regex_search(filename, match, pattern)) {
-    spdlog::debug("Filename matches pattern for RB ID {}!", match[1].str());
+    log_debug("Filename matches pattern for RB ID " << match[1].str() << "!");
     u32 number1 = std::stoi(match[1].str());
     return number1;
   } else {
@@ -48,14 +46,14 @@ void spike_cleaning_drs4(Vec<Vec<f32>> &wf, u16 tCell, i32 spikes[]) {
     for (i = 0; i < nChn; i++) {
       filter = -wf[i][j] + wf[i][(j + 1) % 1024] + wf[i][(j + 2) % 1024] - wf[i][(j + 3) % 1024];
       dfilter = filter + 2 * wf[i][(j + 3) % 1024] + wf[i][(j + 4) % 1024] - wf[i][(j + 5) % 1024];
-      //spdlog::info("filter {}, dfilter {}", filter, dfilter);
+      //::info("filter {}, dfilter {}", filter, dfilter);
       if (filter > 20 && filter < 100) {
         if (n_sp[i] < 10)   // record maximum of 10 spikes
         {
           sp[i][n_sp[i]] = (j + 1) % 1024;
           n_sp[i]++;
         } else {                // too many spikes -> something wrong
-          spdlog::warn("Spike cleaning not possible, too many spikes ({}) in ch {}!", n_sp[i],i);
+          log_warn("Spike cleaning not possible, too many spikes (" << n_sp[i] << ") in ch " << i << "!");
           return;
         }
         // filter condition avoids mistaking pulse for spike sometimes
@@ -70,14 +68,14 @@ void spike_cleaning_drs4(Vec<Vec<f32>> &wf, u16 tCell, i32 spikes[]) {
         }
         else                // too many spikes -> something wrong
         {
-          spdlog::warn("Spike cleaning not possible, too many spikes ({}) in ch {}!", n_sp[i],i);
+          log_warn("Spike cleaning not possible, too many spikes (" << n_sp[i] << ") in ch " << i << "!");
           return;
         }
       }
     }
   }
   for (usize ch=0;ch<9;ch++) {
-    spdlog::info("Found {} spikes in channel {}!", n_sp[ch], ch);
+    log_info("Found " << n_sp[ch] << " spikes in channel " << ch << "!");
   }
   /* find spikes at cell #0 and #1023
   for (i = 0; i < nChn; i++) {
@@ -329,12 +327,13 @@ Vec<f32> RBCalibration::nanoseconds(const RBEvent &event, const u8 channel) cons
 
 RBCalibration RBCalibration::from_bytestream(const Vec<u8> &stream,
                                              u64 &pos) {
-  //spdlog::set_pattern("[%^%l%$] [%s - %!:%#] [%Y-%m-%d %H:%M:%S] -- %v");
+  //::set_pattern("[%^%l%$] [%s - %!:%#] [%Y-%m-%d %H:%M:%S] -- %v");
   RBCalibration calibration = RBCalibration();
-  spdlog::debug("Start decoding at pos {}", pos);
+  log_debug("Start decoding at pos " << pos);
   u16 head = Gaps::parse_u16(stream, pos);
   if (head != RBCalibration::HEAD)  {
-    spdlog::error("No header signature found!");  
+    log_warn("No header signature found!");  
+    return calibration;
   }
   calibration.rb_id         = stream[pos]; pos += 1;
   calibration.d_v           = Gaps::parse_f32(stream, pos);
@@ -357,19 +356,19 @@ RBCalibration RBCalibration::from_bytestream(const Vec<u8> &stream,
   }
   if (serialize_event_data) {
     u16 n_noi = Gaps::parse_u16(stream, pos);
-    spdlog::info("Decoding {} no input data events...", n_noi);
+    log_info("Decoding " << n_noi << " no input data events..");
     for (u16 k=0; k<n_noi; k++) {
       auto ev = RBEvent::from_bytestream(stream, pos);
       calibration.noi_data.push_back(ev); 
     }
     u16 n_vcal = Gaps::parse_u16(stream, pos);
-    spdlog::info("Decoding {} vcal data events...", n_vcal);
+    log_info("Decoding " << n_vcal << " VCAL data events...");
     for (u16 k=0; k<n_vcal; k++) {
       auto ev = RBEvent::from_bytestream(stream, pos);
       calibration.vcal_data.push_back(ev); 
     }
     u16 n_tcal = Gaps::parse_u16(stream, pos);
-    spdlog::info("Decoding {} tcal data events...", n_tcal);
+    log_info("Decoding " << n_tcal << " TCAL data events...");
     for (u16 k=0; k<n_tcal; k++) {
       auto ev = RBEvent::from_bytestream(stream, pos);
       calibration.tcal_data.push_back(ev); 
@@ -377,7 +376,7 @@ RBCalibration RBCalibration::from_bytestream(const Vec<u8> &stream,
   }
   u16 tail = Gaps::parse_u16(stream, pos);
   if (tail != RBEvent::TAIL) {
-    spdlog::error("After parsing the event, we found an invalid tail signature {}", tail);
+    log_error("After parsing the event, we found an invalid tail signature " << tail);
   }
   return calibration;
 }
@@ -392,7 +391,7 @@ RBCalibration RBCalibration::from_txtfile(const String &filename) {
   calibration.rb_id = rb_id;
   std::fstream calfile(filename.c_str(), std::ios_base::in);
   if (calfile.fail()) {
-    spdlog::error("Can't open {}",filename);
+    log_fatal("Can't open " << filename);
     return calibration;
   }
   for (size_t i=0; i<NCHN; i++) {
@@ -405,7 +404,7 @@ RBCalibration RBCalibration::from_txtfile(const String &filename) {
     for (size_t j=0; j<NWORDS; j++)
       calfile >> calibration.t_bin[i][j];
   }
-  spdlog::info("Loaded calibration for RB {}!", rb_id);
+  log_info("Loaded calibration for RB " << rb_id << "!");
   return calibration;
 }
 
@@ -413,11 +412,11 @@ RBCalibration RBCalibration::from_txtfile(const String &filename) {
 
 bool RBCalibration::channel_check(u8 channel) const {
   if (channel == 0) {
-    spdlog::error("Remember, channels start at 1. 0 does not exist!");
+    log_error("Remember, channels start at 1. 0 does not exist!");
     return false;
   }
   if (channel > 9) {
-    spdlog::error("Thera are no channels > 9!");
+    log_error("Thera are no channels > 9!");
     return false;
   }
   return true;

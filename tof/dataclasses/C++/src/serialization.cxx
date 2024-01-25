@@ -1,9 +1,10 @@
 #include <fstream>
 #include "spdlog/spdlog.h"
+#include "spdlog/cfg/env.h"
 
 #include "tof_typedefs.h"
 #include "parsers.h"
-
+#include "logging.hpp"
 #include "serialization.h"
 
 uint64_t decode_uint64_rev(const Vec<u8>& bytestream,
@@ -29,6 +30,7 @@ uint64_t decode_uint64_rev(const Vec<u8>& bytestream,
 // file i/o
 
 bytestream get_bytestream_from_file(const String &filename) {
+  spdlog::cfg::load_env_levels();
   // bytestream stream;
   // Not going to explicitly check these.
   // // The use of gcount() below will compensate for a failure here.
@@ -37,7 +39,7 @@ bytestream get_bytestream_from_file(const String &filename) {
   is.seekg (0, is.end);
   u64 length = is.tellg();
   is.seekg (0, is.beg);
-  spdlog::debug("Read {} bytes from file!", length);
+  log_debug("Read " << length << " bytes from " << filename << "!");
   bytestream stream = bytestream(length);
   is.read(reinterpret_cast<char*>(stream.data()), length);
   return stream;

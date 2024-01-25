@@ -1,0 +1,73 @@
+##########################################
+# Master configuration file for 
+# liftof-cc, HAHALUA edition (>= 0.9.1)
+#
+##########################################
+
+
+# location of data stored on the TOF CPU
+data_dir              = "/tofdata/run/"
+# location to store calibration files on the TOF CPUE
+calibration_dir       = "/tofdata/calibration/"
+# location of the database
+db_path               = "/home/gaps/config/gaps_flight.db"
+# default runtime of the program
+runtime_sec           = 3600
+# number of tofpackets per file before a new file
+# gets started
+packs_per_file        = 20000
+# use this address for UCLA teststand (tailscale)
+#fc_pub_address       = "tcp://100.101.96.10:42000"
+# flight computer needs to subscribe to this address to 
+# recieve tof packets
+fc_pub_address        = "tcp://192.168.37.20:42000"
+# TOF computer needs to subscribe to this address to 
+# recieve commands
+fc_sub_address        = "tcp://192.168.37.200:41662"
+# UDP connection to the MTB
+mtb_address           = "tcp://10.0.1.10:50001"
+# Receive MtbMoniData every X secs
+mtb_moni_interval_sec = 20
+# Query the TOF computer for CPUMoniData every X secs
+cpu_moni_interval_sec = 20
+# Non existent/broken RBs (in range 1-50)
+rb_ignorelist         = [10, 12, 37, 38, 43, 45, 47, 48, 49, 50]
+# DSI/J/RB-CH mapping (in the future this will come from the DB)
+dsi_j_rbch_map        = "/home/gaps/config/dsi_j_ch_map.gaps.json"
+
+
+# not supported yet
+[event_builder_settings]
+cachesize      = 100000
+n_mte_per_loop = 1
+n_rbe_per_loop = 40
+# tof event timeout (in secs)
+# if the event is not completed within this timewindow
+# it is sent despite the fact
+te_timeout_sec = 30
+# Decide on event builder strategy. Adaptive will automatically 
+# adjust the number of expected RBEvents for each MTBEvent and 
+# wait for this number of RBEvents come in 
+build_strategy = "Adaptive"
+
+# in case we want to select a build 
+# strategy with a parameter, use
+# this section
+#[event_builder_settings.build_strategy]
+#WaitForNBoards = 40
+
+[analysis_engine_settings]
+integration_start      = 270.0
+integration_window     = 70.0
+pedestal_thresh        = 10.0
+pedestal_begin_bin     = 10
+pedestal_win_bins      = 50
+use_zscore             = false
+find_pks_t_start       = 270.0
+find_pks_t_window      = 70.0
+min_peak_size          = 3
+find_pks_thresh        = 10.0
+max_peaks              = 5
+cfd_fraction           = 0.2
+
+

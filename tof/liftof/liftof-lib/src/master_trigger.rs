@@ -13,22 +13,16 @@
 //! The data is encoded in IPBus packets.
 //! [see docs here](https://ipbus.web.cern.ch/doc/user/html/)
 //! 
-//! Issues: I do not like the error handling with
-//! Box<dyn Error> here, since the additional runtime
-//! cost. This needs to have a better error handling,
-//! which should not be too difficult, I guess most 
-//! times it can be replaced by some Udp realted 
-//! error. [See issue #21](https://uhhepvcs.phys.hawaii.edu/Achim/gaps-online-software/-/issues/21)
-//! _Comment_ There is not much error handling for UDP. Most of it is that the IPAddress is wrong, 
-//! in this case it is legimate (and adviced) to panic.
-//! In the case, wher no data was received, this might need some thinking.
 use std::error::Error;
 use std::time::{Duration, Instant};
 use std::fmt;
 use std::io;
 use std::collections::HashMap;
 use std::collections::VecDeque;
-use std::net::{UdpSocket, SocketAddr};
+use std::net::{
+    UdpSocket,
+    SocketAddr
+};
 use std::thread;
 use crossbeam_channel::Sender;
 use colored::Colorize;
@@ -43,9 +37,10 @@ use tof_dataclasses::errors::{IPBusError, MasterTriggerError};
 
 const MT_MAX_PACKSIZE   : usize = 1024;
 
-const N_LTBS : usize = 20;
-const N_CHN_PER_LTB : usize = 16;
-
+use tof_dataclasses::events::master_trigger::{
+    N_LTBS,
+    N_CHN_PER_LTB,
+};
 
 /// The IPBus standard encodes several packet types.
 ///
@@ -275,6 +270,10 @@ pub fn get_mtevent(socket  : &UdpSocket,
     return Err(MasterTriggerError::PackageHeaderIncorrect);
   }
   let foot_pos = (n_daq_words - 1) as usize;
+  if data.len() <= foot_pos {
+    error!("Got MTB data, but the format is not correct");
+    return Err(MasterTriggerError::PackageHeaderIncorrect);
+  }
   if data[foot_pos] != 0x55555555 {
     error!("Got MTB data, but the footer is incorrect {}", data[foot_pos]);
     return Err(MasterTriggerError::PackageFooterIncorrect);
@@ -310,6 +309,7 @@ pub fn get_mtevent(socket  : &UdpSocket,
       }
     }
   }
+  mte.n_paddles = mte.get_hit_paddles(); 
   Ok(mte)
 }
 
@@ -326,7 +326,7 @@ pub fn get_mtevent(socket  : &UdpSocket,
 ///
 pub fn connect_to_mtb(mt_address : &String) 
   ->io::Result<UdpSocket> {
-  let local_port = "0.0.0.0:50100";
+  // provide a number of local ports to try
   let local_addrs = [
     SocketAddr::from(([0, 0, 0, 0], 50100)),
     SocketAddr::from(([0, 0, 0, 0], 50101)),
@@ -338,11 +338,11 @@ pub fn connect_to_mtb(mt_address : &String)
   let socket : UdpSocket;
   match local_socket {
     Err(err)   => {
-      error!("Can not create local UDP port for master trigger connection at {}!, err {}", local_port, err);
+      error!("Can not create local UDP socket for master trigger connection!, err {}", err);
       return Err(err);
     }
     Ok(value)  => {
-      info!("Successfully bound UDP socket for master trigger communcations to {}", local_port);
+      info!("Successfully bound UDP socket for master trigger communcations to {:?}", value);
       socket = value;
       // this is not strrictly necessary, but 
       // it is nice to limit communications
@@ -377,6 +377,9 @@ pub fn get_mtbmonidata(socket         : &UdpSocket,
                                         buffer,
                                         IPBusPacketType::Read,
                                         4)?;
+  if data.len() < 4 {
+    return Err(MasterTriggerError::BrokenPackage);
+  }
   let first_word   = 0x00000fff;
   let second_word  = 0x0fff0000;
   //println!("{:?} data", data);
@@ -388,6 +391,7 @@ pub fn get_mtbmonidata(socket         : &UdpSocket,
   moni.vccint      = ((data[2] & second_word ) >> 16) as u16;  
   moni.vccaux      = ( data[3] & first_word  ) as u16;  
   moni.vccbram     = ((data[3] & second_word ) >> 16) as u16;  
+  
   let rate         = read_register_multiple(socket, 
                                             //target_address,
                                             0x17,
@@ -414,9 +418,7 @@ pub fn get_mtbmonidata(socket         : &UdpSocket,
 ///
 /// # Arguments
 ///
-/// * mt_ip       : ip address of the master trigger, most likely 
-///                 something like 10.0.1.10
-/// * mt_port     : 
+/// * mt_address        : Udp address of the MasterTriggerBoard
 ///
 /// * dsi_j_mapping     : A DsiLtbRBMapping containing mapping 
 ///                       information for DSI/J/CH (LTB) -> RBID/RBCH (RB)
@@ -435,8 +437,7 @@ pub fn get_mtbmonidata(socket         : &UdpSocket,
 /// * send_requests     : Send RBCommand instances with event 
 ///                       requests in TofPackets to the 
 ///                       rb_reqeust_tp Sender
-pub fn master_trigger(mt_ip             : &str, 
-                      mt_port           : usize,
+pub fn master_trigger(mt_address        : String,
                       dsi_j_mapping     : &DsiLtbRBMapping,
                       mt_sender         : &Sender<MasterTriggerEvent>,
                       rb_request_tp     : &Sender<TofPacket>,
@@ -445,8 +446,6 @@ pub fn master_trigger(mt_ip             : &str,
                       mtb_timeout_sec   : u64,
                       verbose           : bool,
                       send_requests     : bool) {
-
-  let mt_address = mt_ip.to_owned() + ":" + &mt_port.to_string(); 
 
   // data buffer for MTB readout - allocate once and reuse
   let mut buffer = [0u8;MT_MAX_PACKSIZE];  
@@ -704,6 +703,10 @@ pub fn read_register_multiple(socket      : &UdpSocket,
   if data.len() == 0 { 
     error!("Empty data!");
     return Err(Box::new(IPBusError::DecodingFailed));
+  }
+  if data.len() != nwords {
+    error!("Data too short!");
+    return Err(Box::new(MasterTriggerError::DataTooShort));
   }
   // this supports up to 100 Hz
   Ok(data)

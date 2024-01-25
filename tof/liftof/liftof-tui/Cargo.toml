@@ -1,6 +1,6 @@
 [package]
 name = "liftof-tui"
-version = "0.8.0"
+version = "0.9.0"
 edition = "2021"
 
 
@@ -14,7 +14,7 @@ rand = { version = "0.7.3", default-features = false, features = ["std"] }
 #thiserror = "1.0"
 
 tui-logger = { version = "0.10" } 
-ratatui = { version = "0.24", features = ["all-widgets"]}
+ratatui = { version = "0.25", features = ["all-widgets"]}
 
 
 crossterm = { version = "0.23", features=["serde"]}
@@ -27,8 +27,8 @@ sysinfo = "0.27"
 #crossbeam = "0.8"
 crossbeam-channel = "0.5"
 
-tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["random", "database"], version = "0.8"}
-liftof-lib = { path = "../liftof-lib" , features = ["random"], version = "0.8"}
+tof-dataclasses = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["random", "database"], version = "0.9"}
+liftof-lib = { path = "../liftof-lib" , features = ["random"], version = "0.9"}
 
 histo = "0.1.0"
 # histogram = "0.7" 

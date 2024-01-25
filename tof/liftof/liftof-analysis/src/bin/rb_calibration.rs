@@ -15,6 +15,7 @@ use tof_dataclasses::serialization::Serialization;
 use tof_dataclasses::io::{
     TofPacketReader,
     TofPacketWriter,
+    FileType,
 };
 #[derive(Parser, Default, Debug)]
 #[command(author = "J.A.Stoessl", version, about, long_about = None)]
@@ -71,7 +72,8 @@ fn main() {
             }
             outfile += &rb_id.to_string();
             outfile += ".cali";
-            let mut writer  = TofPacketWriter::new(outfile);
+            let ftype = FileType::CalibrationFile(rb_id);
+            let mut writer  = TofPacketWriter::new(outfile, ftype);
             let pack        = TofPacket::from(&cali);
             writer.add_tof_packet(&pack);
             println!("=> Done, exciting!");
@@ -126,7 +128,8 @@ fn main() {
     },
     Ok(_) => ()
   }
-  let mut writer = TofPacketWriter::new("rb27.cali.tof.gaps".to_string());
+  let ftype = FileType::CalibrationFile(cali.rb_id);
+  let mut writer = TofPacketWriter::new("".to_string(), ftype);
   let pack       = TofPacket::from(&cali);
   writer.add_tof_packet(&pack);
 }

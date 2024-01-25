@@ -12,14 +12,13 @@ extern crate histo;
 use histo::Histogram;
 
 use ratatui::{
-    symbols,
     //backend::CrosstermBackend,
     terminal::Frame,
     layout::{Alignment, Constraint, Direction, Layout, Rect},
-    style::{Color, Modifier, Style},
+    style::{Modifier, Style},
     text::{Span, Line},
     widgets::{
-        Block, Dataset, Sparkline, Axis, GraphType, BorderType, Chart, Borders, List, ListItem, ListState, Paragraph, Row, Table, Tabs,    },
+        Block, BorderType, Borders, List, ListItem, ListState, Paragraph},
 };
 
 use crossbeam_channel::{
@@ -28,8 +27,6 @@ use crossbeam_channel::{
 
 
 use tof_dataclasses::packets::{TofPacket, PacketType};
-use tof_dataclasses::commands::{TofCommand,
-                                TofResponse};
 use tof_dataclasses::calibrations::RBCalibrations;
 use tof_dataclasses::errors::SerializationError;
 use tof_dataclasses::events::RBEvent;
@@ -99,14 +96,14 @@ impl RBTab<'_>  {
              rb_receiver : Receiver<RBEvent>,
              theme       : ColorTheme2) -> RBTab<'static>  {
     let mut rb_select_items = Vec::<ListItem>::new();
-    for k in 1..41 {
+    for k in 1..51 {
       let this_item = format!("RB{:0>2}", k);
       rb_select_items.push(ListItem::new(Line::from(this_item)));
     }
 
     let queue_size = 1000usize;
     let mut ch_data    = Vec::<Vec::<(f64,f64)>>::with_capacity(1024);
-    for ch in 0..9 {
+    for _channel in 0..9 {
       let tmp_vec = vec![(0.0f64,0.0f64);1024];
       //ch_data.push(Vec::<(f64,f64)>::new());
       ch_data.push(tmp_vec);
@@ -207,7 +204,7 @@ impl RBTab<'_>  {
           debug!("Got next packet {}!", pack);
           match pack.packet_type {
             PacketType::RBMoni   => {
-              info!("Got new RBMoniData!");
+              trace!("Got new RBMoniData!");
               let moni = RBMoniData::from_bytestream(&pack.payload, &mut 0)?;
               self.n_moni += 1;
               if moni.board_id == self.rb_selector {
@@ -421,14 +418,6 @@ impl RBTab<'_>  {
           )
           .split(status_chunks[0]);
 
-        let list_and_detail_chunks = Layout::default()
-          .direction(Direction::Horizontal)
-          .constraints(
-              [Constraint::Percentage(50),
-               Constraint::Percentage(50)].as_ref(),
-          )
-          .split(detail_and_ch9_chunks[0]);
-
         let wf_chunks = Layout::default()
           .direction(Direction::Horizontal)
           .constraints(
@@ -458,18 +447,7 @@ impl RBTab<'_>  {
           .split(wf_chunks[1]).to_vec();
 
         ch_chunks.append(&mut ch_chunks_2);
-        //  let items: Vec<_> = rb_list
-        //  .iter()
-        //  .map(|rb| {
-        //    ListItem::new(Spans::from(vec![Span::styled(
-        //      "RB ".to_owned() + &rb.rb_id.to_string(),
-        //      Style::default(),
-        //    )]))
-        //  })
-        //  .collect();
-
         // the waveform plots
-        let mut charts  = Vec::<Chart>::new();
         for ch in 0..9 {
           let label          = format!("Ch{}", ch);
           let ch_tc_theme    = self.theme.clone();
@@ -478,75 +456,6 @@ impl RBTab<'_>  {
                                  label.clone(),
                                  label.clone(),
                                  &ch_tc_theme  );
-          // this schmagoigl is only for the ADC case
-          //let mut x_max = 1024u64;
-          //let mut x_min = 0u64;
-          ////println!("{:?}",self.ch_data[ch]);
-          //if self.ch_data[ch].len() != 0 {
-          //  x_min = self.ch_data[ch][0].0 as u64;
-          //  x_max = self.ch_data[ch][self.ch_data[ch].len() - 1].0 as u64;
-          //}
-          //
-          ////println!("Ch {} xmin {} xmax {}", ch, x_min, x_max);
-          //let x_spacing = (x_max - x_min)/5;
-          //let x_labels = vec![x_min.to_string(),
-          //                   (x_min + x_spacing).to_string(),
-          //                   (x_min + 2*x_spacing).to_string(),
-          //                   (x_min + 3*x_spacing).to_string(),
-          //                   (x_min + 4*x_spacing).to_string(),
-          //                   (x_min + 5*x_spacing).to_string()];
-          //
-          //let mut y_max = 0u64; //14 bit max
-          //let mut y_min = 16384u64;
-          //for val in self.ch_data[ch].iter() {
-          //  if val.1 > y_max as f64 {
-          //    y_max = val.1 as u64;
-          //  }
-          //  if val.1 < y_min as f64 {
-          //    y_min = val.1 as u64;
-          //  }
-          //}
-          //if y_min > y_max {
-          //  y_min = 0;
-          //  y_max = 16384;
-          //}
-          //
-          ////if self.ch_data[ch].len() != 0 {
-          ////  y_min = self.ch_data[ch].iter().map(|&x| x.1).collect().min() as u64;
-          ////  y_max = self.ch_data[ch].iter().map(|&x| x.1).collect().max()as u64;
-          ////}
-          //let y_spacing = (y_max - y_min)/5;
-          //let y_labels = vec![y_min.to_string(),
-          //                   (y_min + y_spacing).to_string(),
-          //                   (y_min + 2*y_spacing).to_string(),
-          //                   (y_min + 3*y_spacing).to_string(),
-          //                   (y_min + 4*y_spacing).to_string(),
-          //                   (y_min + 5*y_spacing).to_string()];
-          //let ds = vec![Dataset::default()
-          //  .name(label.clone())
-          //  .marker(symbols::Marker::Braille)
-          //  .graph_type(GraphType::Line)
-          //  .style(self.theme.style())
-          //  .data(&self.ch_data[ch])];
-          //let chart = Chart::new(ds)
-          //.block(
-          //  Block::default()
-          //    .borders(Borders::ALL)
-          //    .style(self.theme.style())
-          //    .title(label)
-          //    .border_type(BorderType::Plain),
-          //)
-          //.x_axis(Axis::default()
-          //  .title(Span::styled("bin", Style::default().fg(Color::White)))
-          //  .style(self.theme.style())
-          //  .bounds([x_min as f64, x_max as f64])
-          //  .labels(x_labels.clone().iter().cloned().map(Span::from).collect()))
-          //.y_axis(Axis::default()
-          //  .title(Span::styled("ADC", Style::default().fg(Color::White)))
-          //  .style(self.theme.style())
-          //  .bounds([y_min as f64, y_max as f64])
-          //  .labels(y_labels.clone().iter().cloned().map(Span::from).collect()))
-          //.style(self.theme.style()); 
           // render it!
           if ch == 8 {
             //frame.render_widget(chart, detail_and_ch9_chunks[0]);
@@ -646,17 +555,6 @@ impl RBTab<'_>  {
         );
         frame.render_widget(moni_view, columns[0]);
        
-        // get timing axis
-        let t_min = *self.met_queue.front().unwrap_or(&0.0) as u64;
-        let t_max = *self.met_queue.back().unwrap_or(&0.0)  as u64;
-        let t_spacing = (t_max - t_min)/5;
-
-        let t_labels = vec![t_min.to_string(),
-                           (t_min + t_spacing).to_string(),
-                           (t_min + 2*t_spacing).to_string(),
-                           (t_min + 3*t_spacing).to_string(),
-                           (t_min + 4*t_spacing).to_string(),
-                           (t_min + 5*t_spacing).to_string()];
         let fpga_ds_name   = String::from("FPGA T");
         let fpga_ds_title  = String::from("FPGA T [\u{00B0}C] ");
         let fpga_tc_theme  = self.theme.clone();
@@ -748,8 +646,7 @@ impl RBTab<'_>  {
 
         // render everything
         frame.render_widget(info_view, main_view[0]); 
-      },
-      _ => ()
+      }
     } //end match 
   }
 }

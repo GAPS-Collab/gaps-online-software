@@ -38,6 +38,7 @@ add_library(${GAPSTOF_LIBRARY_SHARED} SHARED
     dataclasses/C++/src/monitoring.cxx
     dataclasses/C++/src/CommandPacket.cxx
     dataclasses/C++/src/legacy.cxx
+    dataclasses/C++/src/logging.cxx
 )
 target_compile_options(${GAPSTOF_LIBRARY_SHARED} PRIVATE -Wall -Wextra -Wpedantic)# -Werror)
 target_include_directories(${GAPSTOF_LIBRARY_SHARED}
@@ -55,8 +56,6 @@ target_link_libraries(${GAPSTOF_LIBRARY_SHARED}
 
 if (BUILD_PYBINDINGS)
   set(pybindings "gaps_tof")
-  # populates Python_INCLUDE_DIRS
-  find_package (Python COMPONENTS Development)
 
   pybind11_add_module(${pybindings} MODULE dataclasses/C++/pybindings/module.cxx 
                                            dataclasses/C++/pybindings/helpers.cxx)

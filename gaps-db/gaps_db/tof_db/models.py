@@ -1,30 +1,4 @@
 from django.db import models
-#from django.db.models import pre_save
-#from django.dispatch import receiver
-
-
-# ip/mac address consistency check
-IP_MAC_CHECK_POSSIBLE=False
-try :
-    from python_arptable import get_arp_table
-
-    def mac_ip_is_consistent(mac, ip):
-        arp = get_arp_table()
-        for k in arp:
-            if k['HW address'] == mac and\
-               k['IP address'] == ip:
-                   return True
-        return False
-    
-    def get_mac_for_ip(ip):
-        arp = get_arp_table()
-        for k in arp:
-            if k['IP address'] == ip:
-                return k['HW address']
-
-except ImportError:
-    print(f"Can not import python_arptable. Unable to verify ip/mac address matching through system's arptables")
-
 # Create your models here.
 class LTB(models.Model):
     """
@@ -164,7 +138,9 @@ class Panel(models.Model):
     """ 
     A tof panel (can be subsection of a face)
     """
-    panel_id                  = models.PositiveSmallIntegerField()
+    panel_id                  = models.PositiveSmallIntegerField(
+                                    unique=True,
+                                    primary_key=True)
     desc                      = models.CharField(max_length=128)
     normal_coordinate_no_sign = models.CharField(max_length=1,\
                                                 null=True,\
@@ -196,35 +172,67 @@ class Panel(models.Model):
         return self.__repr__()
 
     def __repr__(self):
-        _repr = '<Panel:\n'
-        _repr += f'ID   : {self.panel_id}\n'
-        _repr += f'DESC : {self.desc}>'
+        _repr = '<Panel:'
+        _repr += f'\n  id    : {self.panel_id}'
+        _repr += f'\n  descr : {self.desc}>'
         return _repr
 
 class Paddle(models.Model):
     paddle_id                 = models.PositiveSmallIntegerField(unique=True, primary_key=True)
-    volume_id                 = models.PositiveBigIntegerField(unique=True)
-    height                    = models.FloatField()
-    width                     = models.PositiveSmallIntegerField()
-    length                    = models.PositiveSmallIntegerField()
-    unit                      = models.CharField(max_length=2)
-    global_pos_x              = models.PositiveSmallIntegerField(null=True, blank=True)
-    global_pos_y              = models.PositiveSmallIntegerField(null=True, blank=True)
-    global_pos_z              = models.PositiveSmallIntegerField(null=True, blank=True)
+    volume_id                 = models.PositiveBigIntegerField(
+                                  unique=True,
+                                  help_text="The VolumeId as used in the GAPS simulation code")
+    pos_in_panel              = models.CharField(max_length=4,
+                                                 null=True,
+                                                 default="")
+    height                    = models.FloatField(null=True)
+    width                     = models.PositiveSmallIntegerField(null=True)
+    length                    = models.PositiveSmallIntegerField(null=True)
+    unit                      = models.CharField(
+                                    null=True,
+                                    max_length=2)
+    global_pos_x_l0           = models.FloatField(
+                                    null=True,
+                                    blank=True,
+                                    help_text="Global X coordinate from simulation")
+    global_pos_y_l0           = models.FloatField(
+                                    null=True,
+                                    blank=True,
+                                    help_text="Global Y coordinate from simulation")
+    global_pos_z_l0           = models.FloatField(
+                                    null=True,
+                                    blank=True,
+                                    help_text="Global Z coordinate from simulation")
+    def __str__(self):
+        return self.__repr__()
 
+    def __repr__(self):
+    
+        _repr  = '<Paddle:\n'
+        _repr += f'  pid            : {self.paddle_id}\n'
+        _repr += f'  vid            : {self.volume_id}\n'
+        _repr += f'  L0 coord (sim) : [{self.global_pos_x_l0}, {self.global_pos_y_l0}, {self.global_pos_z_l0}] >'
+        return _repr
 
 class PaddleEnd(models.Model):
     """
     One end of a paddle with SiPM array
     """
     PADDLE_END    = [('A', 'A'), ('B', 'B')]
+    paddle_end_id = models.PositiveSmallIntegerField(
+                        primary_key=True,
+                        unique=True,
+                        help_text="PaddleID + 1000 for A and PaddleID + 2000 for B")
     paddle_id     = models.PositiveSmallIntegerField()
-    paddle_end_id = models.PositiveSmallIntegerField(primary_key=True, unique=True)
 
     end           = models.CharField(max_length=1, choices=PADDLE_END)
     end_location  = models.CharField(max_length=2,\
                                     help_text="Location of the paddle end relative to the paddle center")
     panel_id      = models.PositiveSmallIntegerField()
+    pos_in_panel  = models.CharField(max_length=4,\
+                                     help_text="Identifier in global coordinates about the location in the panel",\
+                                     null=True,\
+                                     default="")
     cable_length  = models.FloatField(help_text="Cable length in cm")
     rat           = models.PositiveSmallIntegerField()
     ltb_id        = models.PositiveSmallIntegerField()
@@ -232,11 +240,12 @@ class PaddleEnd(models.Model):
     pb_id         = models.PositiveSmallIntegerField()
     ltb_ch        = models.PositiveSmallIntegerField()
     pb_ch         = models.PositiveSmallIntegerField()
+    #FIXME - is this starting from 0 or 1?
     rb_ch         = models.PositiveSmallIntegerField()
     dsi           = models.PositiveSmallIntegerField()
     rb_harting_j  = models.PositiveSmallIntegerField()
     ltb_harting_j = models.PositiveSmallIntegerField()
-
+    
     def setup_unique_paddle_end_id(self):
         """
         Introduce a uuid. We have 160 paddles with 2 ends. Make the uuid the following
@@ -275,6 +284,7 @@ class PaddleEnd(models.Model):
         self.ltb_ch        = int(ltb_info[1])
         self.pb_ch         = int(pb_info[1] )
         self.rb_ch         = int(rb_info[1] )
+        
         # in some spreadsheets, the label differs,
         # so we are just looking for some variant
         good = False
@@ -300,24 +310,34 @@ class PaddleEnd(models.Model):
         return self.__repr__()
 
     def __repr__(self):
-    
-        _repr = '<PaddleEnd:\n'
-        _repr += f'\tID        : {self.paddle_end_id}\n'     
-        _repr += f'\tPADDLE ID : {self.paddle_id}\n'     
-        _repr += f'\tEND       : {self.end}\n'          
-        _repr += f'\tEND LOC   : {self.end_location}\n' 
-        _repr += f'\tPANEL     : {self.panel_id}\n'     
-        _repr += f'\tCABLE[CM] : {self.cable_length}\n' 
-        _repr += f'\tRAT       : {self.rat}\n'           
-        _repr += f'\tLTB       : {self.ltb_id}\n'        
-        _repr += f'\tRB        : {self.rb_id}\n'         
-        _repr += f'\tPB        : {self.pb_id}\n'         
-        _repr += f'\tLTB CH    : {self.ltb_ch}\n'        
-        _repr += f'\tPB CH     : {self.pb_ch}\n'         
-        _repr += f'\tRB CH     : {self.rb_ch}\n'         
-        _repr += f'\tDSI       : {self.dsi}\n'           
-        _repr += f'\tRB  HRT J : {self.rb_harting_j}\n'  
-        _repr += f'\tLTB HRT J : {self.ltb_harting_j}>' 
+        try:
+            panel  = Panel.objects.filter(panel_id=self.panel_id)[0]
+        except Exception as e:
+            panel  = 'UNKNOWN'
+        try:
+            paddle = Paddle.objects.filter(paddle_id=self.paddle_id)[0] 
+        except:
+            paddle = 'UNKNOWN'
+        _repr = '<PaddleEnd:'
+        _repr += f'\n  ** identifiers **'
+        _repr += f'\n   id             : {self.paddle_end_id}'     
+        _repr += f'\n   pid            : {self.paddle_id}'     
+        _repr += f'\n   end (A|B)      : {self.end}'  
+        _repr += f'\n  ** connedtions **'
+        _repr += f'\n   DSI/J/CH (LG)  :  {self.dsi} | {self.ltb_harting_j} | {self.ltb_ch:02}'
+        _repr += f'\n   DSI/J/CH (HG)  :  {self.dsi} | {self.rb_harting_j} | {self.rb_ch:02}'
+        _repr += f'\n   RB/CH          : {self.rb_id:02} | {self.rb_ch:02}'
+        _repr += f'\n   PB/CH          : {self.pb_id:02} | {self.pb_ch:02}'
+        _repr += f'\n   RAT id         : {self.rat}'
+        _repr += f'\n   cable len [cm] :'
+        _repr += f'\n    \u21B3 {self.cable_length}'
+        _repr += f'\n    (Harting -> RB)'
+        _repr += f'\n  ** panel & location **'
+        _repr += f'\n   end ->         : {self.end_location}' 
+        #_repr += f'\n   panel id       : {self.panel_id}'     
+        _repr += f'\n   loc. in panel  : {self.pos_in_panel}'
+        _repr += f'\n   {panel}'
+        _repr += f'\n   {paddle}>'
         return _repr
 
 class DSICard(models.Model):
@@ -374,7 +394,22 @@ class DSICard(models.Model):
             return
         setattr(self, f'j{j}_rat_id', rat_id)
         
-    
+    def get_rat(self, j):
+        match j:
+            case 1:
+                return self.j1_rat_id
+            case 2:
+                return self.j2_rat_id
+            case 3:
+                return self.j3_rat_id
+            case 4:
+                return self.j4_rat_id
+            case 5:
+                return self.j5_rat_id
+            case _:
+                print(f"Can't get rat id for J {f}")
+                return None
+
     def __str__(self):
         return self.__repr__()
 
@@ -425,6 +460,25 @@ class RAT(models.Model):
         _repr += f'HRT CBL LEN [FT] : {self.ltb_harting_cable_length}>' 
         return _repr
 
+class Run(models.Model):
+    """
+    Meta information which defines a data run
+    """
+
+    run_id         = models.PositiveBigIntegerField(primary_key=True)
+    #shifter        =
+    #                 help_text="Name of the responsible person for data taking"
+    #comment        = 
+    #                  help_text="Purpose of this run"
+    #timestamp      = 
+    #                  help_text="UTC timestamp of run start"
+    #trigger_config = 
+    #                  help_text="Trigger configuration of run start"
+    #prescale       =
+    #                  help_text="Applied prescale factor for trigger config"
+    #configuration  = 
+    #                  help_text="Serialized .toml" file for run configuration"
+
 class RB(models.Model):
     """
     Representation of a readoutboard
@@ -433,9 +487,6 @@ class RB(models.Model):
     
     rb_id            = models.PositiveSmallIntegerField(unique=True, primary_key=True)
     dna              = models.PositiveBigIntegerField(unique=True, null=True)
-    port             = models.PositiveSmallIntegerField(default=42000)
-    ip_address       = models.GenericIPAddressField(unique=True)
-    mac_address      = models.CharField(max_length=11, unique=True, null=True)
     ch1_paddle       = models.ForeignKey(PaddleEnd, models.SET_NULL, blank=True, null=True,related_name='+' )
     ch2_paddle       = models.ForeignKey(PaddleEnd, models.SET_NULL, blank=True, null=True,related_name='+' )
     ch3_paddle       = models.ForeignKey(PaddleEnd, models.SET_NULL, blank=True, null=True,related_name='+' )
@@ -444,42 +495,37 @@ class RB(models.Model):
     ch6_paddle       = models.ForeignKey(PaddleEnd, models.SET_NULL, blank=True, null=True,related_name='+' )
     ch7_paddle       = models.ForeignKey(PaddleEnd, models.SET_NULL, blank=True, null=True,related_name='+' )
     ch8_paddle       = models.ForeignKey(PaddleEnd, models.SET_NULL, blank=True, null=True,related_name='+' )
-    #ch1_pid          = models.PositiveSmallIntegerField()
-    #ch1_pend         = models.PositiveSmallIntegerField()
-    #ch2_pid          = models.PositiveSmallIntegerField()
-    #ch2_pend         = models.PositiveSmallIntegerField()
-    #ch3_pid          = models.PositiveSmallIntegerField()
-    #ch3_pend         = models.PositiveSmallIntegerField()
-    #ch4_pid          = models.PositiveSmallIntegerField()
-    #ch4_pend         = models.PositiveSmallIntegerField()
-    #ch5_pid          = models.PositiveSmallIntegerField()
-    #ch5_pend         = models.PositiveSmallIntegerField()
-    #ch6_pid          = models.PositiveSmallIntegerField()
-    #ch6_pend         = models.PositiveSmallIntegerField()
-    #ch7_pid          = models.PositiveSmallIntegerField()
-    #ch7_pid          = models.PositiveSmallIntegerField()
 
-    #def set_ch_pid(self, ch, pid):
-    #    setattr(self, 'ch{ch}_pid', pid)
-    #    print (f'We set {ch} {pid}')
-    #    print (f'cross-check self.ch{ch}_pid', self.__getattribute__('ch{ch}_pid'))
+    def get_pid_for_channel(self, ch):
+        return get_channel(ch).paddle_id
 
-    #def get_ch_to_pid(self):
-    #    ch_to_pid = dict()
-    #    for ch in range(1,9):
-    #        ch_to_pid[ch] = self.__getattribute__(f'ch{ch}_pid')
-    #    return ch_to_pid
+    def get_ploc_for_channel(self, ch):
+        panel = get_channel(ch).panel_id
+        panel = Panel.objects.filter(id=panel)[0]
+        print(panel)
 
-    #def set_ch_to_pid(self, ch_to_pid):
-    #    """
-    #    Args:
-    #        ch_to_pid (dict) : mapping rb channel -> paddle id
-    #    """
-    #    for ch in ch_to_pid:
-    #        setattr(self,f'ch{ch}_pid',ch_to_pid[ch])
-    #    return None
-    
-    def get_channel(self,ch):
+    def set_channel(self, ch, pend):
+        match ch:
+            case 1:
+                self.ch1_paddle = pend
+            case 2:
+                self.ch2_paddle = pend
+            case 3:
+                self.ch3_paddle = pend
+            case 4:
+                self.ch4_paddle = pend
+            case 5:
+                self.ch5_paddle = pend
+            case 6:
+                self.ch6_paddle = pend
+            case 7:
+                self.ch7_paddle = pend
+            case 8:
+                self.ch8_paddle = pend
+            case _:
+                raise ValueError(f"Can't set paddle for channel {ch}")
+
+    def get_channel(self, ch):
         match ch:
             case 1:
                 return self.ch1_paddle
@@ -500,29 +546,26 @@ class RB(models.Model):
             case _:
                 raise ValueError(f"Don't have paddle for channel {ch}")
 
-    def get_designated_ip(self):
+    def guess_address(self):
         ip_address = "10.0.1.1" + str(self.rb_id).zfill(2)
-        self.ip_address = ip_address
         return ip_address 
 
     def __str__(self):
         return self.__repr__()
 
     def __repr__(self):
-        _repr  = '<RB:\n'
-        _repr += f'ID      : {self.rb_id}\n'            
-        _repr += f'DNA     : {self.dna}\n'             
-        _repr += f'PORT    : {self.port}\n'            
-        _repr += f'IP      : {self.ip_address}\n'      
-        _repr += f'MAC     : {self.mac_address}\n'     
-        _repr += f'CH1_PDL : {self.ch1_paddle}\n'         
-        _repr += f'CH2_PDL : {self.ch2_paddle}\n'         
-        _repr += f'CH3_PDL : {self.ch3_paddle}\n'         
-        _repr += f'CH4_PDL : {self.ch4_paddle}\n'         
-        _repr += f'CH5_PDL : {self.ch5_paddle}\n'         
-        _repr += f'CH6_PDL : {self.ch6_paddle}\n'         
-        _repr += f'CH7_PDL : {self.ch7_paddle}\n'         
-        _repr += f'CH8_PDL : {self.ch8_paddle}>'         
+        _repr  = '<ReadoutBoard:'
+        _repr += f'\n  Board id : {self.rb_id}'            
+        _repr += f'\n  dna      : {self.dna}'          
+        _repr += f'\n  **Connected paddle ends**'
+        _repr += f'\n  Ch0(1)   : {self.ch1_paddle}'         
+        _repr += f'\n  Ch1(2)   : {self.ch2_paddle}'         
+        _repr += f'\n  Ch2(3)   : {self.ch3_paddle}'         
+        _repr += f'\n  Ch3(4)   : {self.ch4_paddle}'         
+        _repr += f'\n  Ch4(5)   : {self.ch5_paddle}'         
+        _repr += f'\n  Ch5(6)   : {self.ch6_paddle}'         
+        _repr += f'\n  Ch6(7)   : {self.ch7_paddle}'         
+        _repr += f'\n  Ch7(8)   : {self.ch8_paddle}>'         
         return _repr
 
 ####################################################
@@ -565,47 +608,4 @@ def get_dsi_j_for_ltb(ltb, rats, dsi_cards, dry_run = False):
     print(f" Will write dsi {dsi} and j {j}")
     if not dry_run:
         ltb.save()
-
-#FIXME - pre save hook
-#@receiver(pre_save, sender=PaddleEnd)
-#def create_paddle_end_uuid(sender, instance):
-#    instance
-
-
-
-
-#def __init__(self):
-#        self.id        = 0
-#        self.ch_to_pid = dict()
-#        self.dna       = 0
-#        self.port      = 42000
-#        self.calibration_file = ""
-#        self.mac_address = ""
-#        self.ip_address = ""
-
-    #def __init__(self):
-    #    self.id  = 0
-    #    self.DSI = 0
-    #    self.J   = 0
-    #    self.channels_to_rb = []
-
-    #def update(self, data):
-    #    self.id  = int(data['id'])
-    #    self.DSI = int(data['DSI'])
-    #    self.J   = int(data['J'])
-    #
-    #def to_dict(self):
-    #    data = OrderedDict()
-    #    data['id']  = self.id
-    #    data['DSI'] = self.DSI
-    #    data['J']   = self.J
-    #    data['ch_to_rb'] = dict()
-    #    for ch in self.channels_to_rb:
-    #        data['ch_to_rb'][str(ch[0])] = [int(ch[1]), int(ch[2])]
-    #    return data
-
-    #def to_json(self):
-    #    #return hjson.dumps(self.to_dict(), use_decimal=False)
-    #    return json.dumps(self.to_dict())
-
 

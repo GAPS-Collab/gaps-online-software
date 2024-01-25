@@ -8,10 +8,10 @@
 #==========================================
 
 cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
-project(GAPS_ONLINE_SOFTWARE VERSION 0.8 LANGUAGES C CXX)
+project(GAPS_ONLINE_SOFTWARE VERSION 0.9 LANGUAGES C CXX)
 
 message(STATUS "Running cmake for ${CMAKE_PROJECT_NAME} softwere version ${GAPS_ONLINE_SOFTWARE_VERSION}")
-message(STATUS "-- Current release NIUHI (Tiger shark)")
+message(STATUS "-- Current release HAHALUA (Manta Ray)")
 message(STATUS "Using build directory: ${PROJECT_BINARY_DIR}")
 set(CMAKE_WARN_DEPRECATED ON)
 
@@ -48,6 +48,8 @@ set(CMAKE_CXX_STANDARD 20 CACHE STRING "C++ standard has to be >= 20")
 option(BUILD_PYBINDINGS "build pybindings with pybind11" OFF)
 if (BUILD_PYBINDINGS)
 message(STATUS "Checking for pyoind11....")
+# populates Python_INCLUDE_DIRS
+find_package (Python 3.10 COMPONENTS Interpreter Development)
 find_package(pybind11 )
   if(NOT ${pybind11_FOUND})
     message(WARNING "-- Can not find pybind11! Please install with sudo apt install pybind11-dev on a linux system!")
@@ -122,7 +124,9 @@ if (BUILD_LIFTOF)
   install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tof/liftof/target/doc/ DESTINATION ${CMAKE_INSTALL_PREFIX}/doc/RustAPI/)
 endif()
 
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/gaps-db/gaps_db/ DESTINATION ${INSTALL_PYTHON_DIR})
+# don't install it. Django get's confused when copied/symlinked. Let's just use it from source 
+# and set the PYTHONPATH in the setup-env accordingly
+#install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/gaps-db/gaps_db/ DESTINATION ${INSTALL_PYTHON_DIR})
 
 ###################################
 # Write setup-env.sh shell script

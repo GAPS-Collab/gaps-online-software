@@ -1,3 +1,4 @@
+use std::fs;
 use std::path::PathBuf;
 use std::sync::{
     Arc,
@@ -21,10 +22,10 @@ use tof_dataclasses::commands::{
     RBCommand,
     TofOperationMode,
 };
+use tof_dataclasses::RBChannelPaddleEndIDMap;
 
 use liftof_lib::{
     RunStatistics,
-    get_rb_ch_pid_map,
     waveform_analysis,
 };
 
@@ -69,6 +70,7 @@ pub fn event_processing(board_id            : u8,
                         get_op_mode         : &Receiver<TofOperationMode>, 
                         tp_sender           : &Sender<TofPacket>,
                         dtf_fr_runner       : &Receiver<DataType>,
+                        paddle_map          : RBChannelPaddleEndIDMap, 
                         verbose             : bool,
                         calc_crc32          : bool,
                         thread_control      : Arc<Mutex<ThreadControl>>,
@@ -79,23 +81,24 @@ pub fn event_processing(board_id            : u8,
 
   // load calibration just in case?
   let mut cali_loaded = false;
-  let mut cali   = RBCalibrations::new(0);
-  let cali_path  = format!("/home/gaps/calib/rb_{:0>2}.cali.tof.gaps", board_id);
-  let pmap_file  = String::from("/home/gaps/config/rb_paddle_map.json");
-  let pmap_path  = PathBuf::from(&pmap_file);
-
-  let paddle_map = get_rb_ch_pid_map(pmap_path);
-  match RBCalibrations::from_file(cali_path) {
-    Err(err) => {
-      error!("Can't load calibration! {err}");
-    },
-    Ok(_c) => {
-      cali = _c;
-      cali_loaded = true;
+  let mut cali        = RBCalibrations::new(0);
+  let cali_path       = format!("/home/gaps/calib/rb_{:0>2}.cali.tof.gaps", board_id);
+  let cali_path_buf   = PathBuf::from(&cali_path);
+  if fs::metadata(cali_path_buf.clone()).is_ok() {
+    info!("Found valid calibration file path {cali_path_buf:?}");
+    match RBCalibrations::from_file(cali_path) {
+      Err(err) => {
+        error!("Can't load calibration! {err}");
+      },
+      Ok(_c) => {
+        cali = _c;
+        cali_loaded = true;
+      }
     }
+  } else {
+    warn!("Calibration file not available!");
+    cali_loaded = false;
   }
-
-
   // FIXME - deprecate!
   let mut op_mode_stream  = true;
   let mut events_not_sent : u64 = 0;

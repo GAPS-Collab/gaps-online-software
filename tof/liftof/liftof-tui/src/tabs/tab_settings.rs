@@ -29,16 +29,16 @@ use ratatui::widgets::{
 };
 
 use crate::colors::{
-    ColorTheme,
     ColorTheme2,
     ColorSet,
     COLORSETOMILU,
     COLORSETBW,
     COLORSETDUNE,
-    COLORSETGMAPS,
     COLORSETLD,
     COLORSETNIUHI,
     COLORSETMATRIX,
+    COLORSETSTARFIELD,
+    COLORSETGAPS,
 };
 
 
@@ -53,11 +53,12 @@ pub struct SettingsTab<'a> {
 impl SettingsTab<'_> {
   pub fn new(theme : ColorTheme2) -> SettingsTab<'static> {
     let ct_list_items = vec![ListItem::new(Line::from("Black&White")),
+                             ListItem::new(Line::from("StarField")),
                              ListItem::new(Line::from("Omiliu")),
-                             ListItem::new(Line::from("Dune")),
-                             ListItem::new(Line::from("GMaps")),
-                             ListItem::new(Line::from("LowerDecks")),
+                             ListItem::new(Line::from("GAPS")),
                              ListItem::new(Line::from("Niuhi")),
+                             ListItem::new(Line::from("Dune")),
+                             ListItem::new(Line::from("LowerDecks")),
                              ListItem::new(Line::from("Matrix")),
                              ];
     SettingsTab {
@@ -105,12 +106,13 @@ impl SettingsTab<'_> {
       Some(i) => {
         match i {
           0 => Some(COLORSETBW),
-          1 => Some(COLORSETOMILU),
-          2 => Some(COLORSETDUNE),
-          3 => Some(COLORSETGMAPS),
-          4 => Some(COLORSETLD),
-          5 => Some(COLORSETNIUHI),
-          6 => Some(COLORSETMATRIX),
+          1 => Some(COLORSETSTARFIELD),
+          2 => Some(COLORSETOMILU),
+          3 => Some(COLORSETGAPS),
+          4 => Some(COLORSETNIUHI),
+          5 => Some(COLORSETDUNE),
+          6 => Some(COLORSETLD),
+          7 => Some(COLORSETMATRIX),
           _ => None,
         }
       }
@@ -137,6 +139,15 @@ impl SettingsTab<'_> {
         )
         .split(main_rows[0]);
 
+    let sub_rows0 = Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints(
+            [Constraint::Percentage(50),
+             Constraint::Percentage(50)
+            ].as_ref()
+        )
+        .split(main_cols0[1]);
+
     let main_cols1 = Layout::default()
         .direction(Direction::Vertical)
         .constraints(
@@ -145,23 +156,15 @@ impl SettingsTab<'_> {
             ].as_ref()
         )
         .split(main_rows[1]);
-//      let items: Vec<_> = rb_list
-//      .iter()
-//      .map(|rb| {
-//        ListItem::new(Line::from(vec![Span::styled(
-//          "RB ".to_owned() + &rb.rb_id.to_string(),
-//          Style::default(),
-//        )]))
-//      })
-//      .collect();
       let par_title_string = String::from("Apply Color Theme");
       let (first, rest) = par_title_string.split_at(1);
       let par_title = Line::from(vec![
         Span::styled(
             first,
             Style::default()
-                .fg(Color::Yellow)
-                .add_modifier(Modifier::UNDERLINED),
+                .fg(self.theme.hc)
+                .add_modifier(Modifier::UNDERLINED)
+                .add_modifier(Modifier::BOLD),
         ),
         Span::styled(rest, self.theme.style()),
       ]);
@@ -180,22 +183,6 @@ impl SettingsTab<'_> {
         None => self.ctl_state.select(Some(1)),
         Some(_) => (),
       }
-        //.direction(ListDirection::BottomToTop);  
-//
-//    let rb_detail =  Paragraph::new(selected_rb.to_string())
-//     .style(Style::default().fg(Color::LightCyan))
-//     .alignment(Alignment::Left)
-//     //.scroll((5, 10))
-//     //.text(rb_list[0].to_string())
-//     .block(
-//       Block::default()
-//         .borders(Borders::ALL)
-//         .style(Style::default().fg(Color::White))
-//         .title("Detail")
-//         .border_type(BorderType::Double),
-//    );
-
-
     let content = "Settings (WIP)"; 
     let main_view = Paragraph::new(content)
     .style(self.theme.style())
@@ -204,6 +191,30 @@ impl SettingsTab<'_> {
       Block::default()
         .borders(Borders::NONE)
     );
+
+    let par_refresh_string = String::from("Refresh rate");
+    let (first, rest) = par_refresh_string.split_at(1);
+    let par_refresh_title = Line::from(vec![
+      Span::styled(
+          first,
+          Style::default()
+              .fg(self.theme.hc)
+              .add_modifier(Modifier::UNDERLINED)
+              .add_modifier(Modifier::BOLD),
+      ),
+      Span::styled(rest, self.theme.style()),
+    ]);
+
+    let refresh_view = Paragraph::new(content)
+    .style(self.theme.style())
+    .alignment(Alignment::Center)
+    .block(
+      Block::default()
+        .title(par_refresh_title)
+        .borders(Borders::ALL)
+        .border_type(BorderType::Rounded),
+    );
+
     let stream : String = String::from("");
     let side_view = Paragraph::new(stream)
     .style(self.theme.style())
@@ -216,7 +227,8 @@ impl SettingsTab<'_> {
     );
     frame.render_widget(main_view, main_cols1[1]);
     frame.render_widget(side_view, main_cols0[0]);
-    frame.render_stateful_widget(color_theme_list, main_cols0[1], &mut self.ctl_state );
+    frame.render_widget(refresh_view, sub_rows0[1]);
+    frame.render_stateful_widget(color_theme_list, sub_rows0[0], &mut self.ctl_state );
   }
 }
 
