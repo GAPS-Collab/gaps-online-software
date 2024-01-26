@@ -14,7 +14,7 @@ StandardError=append:/home/gaps/log/liftof.err
 SyslogIdentifier=gaps
 User=gaps
 WorkingDirectory=/home/gaps/bin
-ExecStart=/home/gaps/bin/liftof-rb-0.9.1 -r /home/gaps/config/liftof-rb-config-0.9.0.json --listen
+ExecStart=/home/gaps/bin/liftof-rb-0.9.2 -r /home/gaps/config/liftof-rb-config-0.9.1.json --listen
 
 [Install]
 WantedBy=multi-user.target
