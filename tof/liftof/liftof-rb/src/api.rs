@@ -216,6 +216,7 @@ pub fn rb_calibration(rc_to_runner    : &Sender<RunConfig>,
 -> Result<(), CalibrationError> {
   warn!("Commencing full RB calibration routine! This will take the board out of datataking for a few minutes!");
   // TODO this should become something that can be read from a local json file
+  let five_seconds   = time::Duration::from_millis(5000);
   let mut run_config = RunConfig {
     runid                   : 0,
     nevents                 : 1300,
@@ -275,57 +276,79 @@ pub fn rb_calibration(rc_to_runner    : &Sender<RunConfig>,
     Ok(_)    => info!("Subscribing to local packages!"),
   }
   // at this point, the zmq socket should be set up!
-  
-  run_config.data_type = DataType::Noi; 
-  match run_noi_calibration(rc_to_runner, tp_to_publisher, &socket, &mut calibration, run_config) {
-    Err(err) => {
-      error!("Unable to run no input calibration step. Err {err}");
-    },
-    Ok(_) => {
-      info!("Noi calibration step done!")
-    }
-  };
+  info!("Will set board to no input mode!");
+  match select_noi_mode() {
+    Err(err) => error!("Unable to select SMA mode! {err:?}"),
+    Ok(_)     => (),
+  }
+  match rc_to_runner.send(run_config) {
+    Err(err) => warn!("Can not send runconfig!, Err {err}"),
+    Ok(_)    => trace!("Success!")
+  }
+  let mut cal_dtype = DataType::Noi;
+  calibration.noi_data = wait_while_run_active(20, 4*five_seconds, 1000, &cal_dtype, &socket);
+  println!("==> No input (Voltage calibration) data taken!");
 
-  run_config.data_type = DataType::VoltageCalibration; 
-  match run_voltage_calibration(rc_to_runner, tp_to_publisher, &socket, &mut calibration, run_config) {
-    Err(err) => {
-      error!("Unable to run voltage calibration step. Err {err}");
-    },
-    Ok(_) => {
-      info!("Voltage calibration step done!")
-    }
-  };
+  info!("Will set board to vcal mode!");
+  match select_vcal_mode() {
+    Err(err) => error!("Unable to select VCAL mode! {err:?}"),
+    Ok(_)     => ()
+  }
+  run_config.data_type = DataType::VoltageCalibration;  
+  match rc_to_runner.send(run_config) {
+    Err(err) => warn!("Can not send runconfig! {err}"),
+    Ok(_)    => trace!("Success!")
+  }  
+  cal_dtype             = DataType::VoltageCalibration;
+  calibration.vcal_data = wait_while_run_active(20, 4*five_seconds, 1000, &cal_dtype, &socket);
   
-  run_config.data_type = DataType::TimingCalibration;
-  match run_timing_calibration(rc_to_runner, tp_to_publisher, &socket, &mut calibration, run_config) {
-    Err(err) => {
-      error!("Unable to run timing calibration step. Err {err}");
-    },
-    Ok(_) => {
-      info!("Timing calibration step done!")
-    }
-  };
-
+  println!("==> Voltage calibration data taken!");
+  info!("Will set board to tcal mode!");
+  run_config.trigger_poisson_rate  = 80;
+  run_config.nevents               = 1800; // make sure we get 1000 events
+  run_config.trigger_fixed_rate    = 0;
+  //run_config.rb_buff_size          = 500;
+  run_config.data_type = DataType::TimingCalibration;  
+  match select_tcal_mode() {
+    Err(err) => error!("Can not set board to TCAL mode! {err:?}"),
+    Ok(_)     => (),
+  }
+  match rc_to_runner.send(run_config) {
+    Err(err) => warn!("Can not send runconfig! {err}"),
+    Ok(_)    => trace!("Success!")
+  }
+  
+  cal_dtype             = DataType::TimingCalibration;
+  calibration.tcal_data = wait_while_run_active(20, 4*five_seconds, 1000,&cal_dtype, &socket);
+  run_config.is_active = false;  
+  match rc_to_runner.send(run_config) {
+    Err(err) => warn!("Can not send runconfig! {err}"),
+    Ok(_)    => trace!("Success!")
+  }
+  info!("Waiting 5 seconds");
+  thread::sleep(five_seconds);
+  info!("Will set board to sma mode!");
+  match select_sma_mode() {
+    Err(err) => error!("Can not set SMA mode! {err:?}"),
+    Ok(_)    => (),
+  }
+  println!("==> Timing calibration data taken!");
   println!("==> Calibration data taking complete!"); 
   println!("Calibration : {}", calibration);
   println!("Cleaning data...");
   calibration.clean_input_data();
   println!("Calibration : {}", calibration);
 
-  info!("Will set board to sma mode!");
-  select_sma_mode();
-  run_config.is_active = false;  
-  match rc_to_runner.send(run_config) {
-    Err(err) => warn!("Can not send runconfig!, Err {err}"),
-    Ok(_)    => trace!("Success!")
-  }
-  thread::sleep(FIVE_SECONDS);
-
-  // Do this only with the full calib
   calibration.calibrate()?;
   println!("Calibration : {}", calibration);
-
-  // Send it
+  // now it just needs to be send to 
+  // the publisher
+  //for k in 0..10 {
+  //  println!("cali vcal  {}", calibration.v_offsets[0][k]);
+  //  println!("cali vincs {}", calibration.v_inc[0][k]);
+  //  println!("cali vdips {}", calibration.v_dips[0][k]);
+  //  println!("cali tbins {}", calibration.tbin[0][k]);
+  //}
   let calib_pack = TofPacket::from(&calibration);
   match tp_to_publisher.send(calib_pack) {
     Err(err) => {

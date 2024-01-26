@@ -1,5 +1,9 @@
 # NIUHI series
 
+## v0.9.2
+* fixe 4 packet calibration bug by using a 
+  a workaround for now
+
 ## v0.9.1
 * does not care if run by systemd or not, makes 
   handling simpler
