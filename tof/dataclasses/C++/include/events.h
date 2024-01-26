@@ -28,7 +28,7 @@ class RBCalibration;
 
 #define NCHN 9
 #define NWORDS 1024
-#define N_LTBS 20
+#define N_LTBS 25
 #define N_CHN_PER_LTB 16
 
 struct RBEventHeader;
