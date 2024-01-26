@@ -24,7 +24,7 @@
 #include "./include/EventGAPS.h"
 
 const int NRB   = 50; // Technically, it is 49, but we don't use 0
-const int NCH   = 8;  // 8 SiPM channels, one clock channel per RB
+const int NCH   = 8;
 const int NTOT  = NCH * NRB; // NTOT is the number of SiPMs
 const int NPADS = NTOT/2;        // NPAD: 1 per 2 SiPMs
 
@@ -144,7 +144,7 @@ int main(int argc, char *argv[]){
     status = fscanf(fp,"%[^\n]",line); // Scan the rest of the line
   }
   fclose(fp); 
-  
+
   // the reader is something for the future, when the 
   // files get bigger so they might not fit into memory
   // at the same time
@@ -200,6 +200,7 @@ int main(int argc, char *argv[]){
 	unsigned long int evt_ctr = ev.mt_event.event_id;
 	//printf("Event %ld: RBs -", evt_ctr);
 	for (auto const &rbid : ev.get_rbids()) {
+	  printf("Getting RB %d event data\n", rbid); fflush(stdout);
 	  RBEvent rb_event = ev.get_rbevent(rbid);
 	  // Now that we know the RBID, we can set the starting ch_no
 	  // Eventually we will use a function to map RB_ch to GAPS_ch
@@ -220,11 +221,11 @@ int main(int argc, char *argv[]){
 	    // First, store the waveform for channel 9
 	    Vec<f64> ch9_volts(volts[8].begin(), volts[8].end());
 	    Vec<f64> ch9_times(times[8].begin(), times[8].end());
-	    wch9[rbid] = new GAPS::Waveform(ch9_volts.data(),ch9_times.data(),rbid,0);
-	    wch9[rbid]->SetPedBegin(Ped_low);
-	    wch9[rbid]->SetPedRange(Ped_win);
-	    wch9[rbid]->CalcPedestalRange(); 
-	    float ch9RMS = wch9[rbid]->GetPedsigma();
+	    //wch9[rbid] = new GAPS::Waveform(ch9_volts.data(),ch9_times.data(),rbid,0);
+	    //wch9[rbid]->SetPedBegin(Ped_low);
+	    //wch9[rbid]->SetPedRange(Ped_win);
+	    //wch9[rbid]->CalcPedestalRange(); 
+	    //float ch9RMS = wch9[rbid]->GetPedsigma();
 	    //printf(" %d(%.1f)", rbid, ch9RMS);
 	    // printf(" %d", rbid);
 	      
@@ -234,10 +235,10 @@ int main(int argc, char *argv[]){
 
 	      Vec<f64> ch_volts(volts[c].begin(), volts[c].end());
 	      Vec<f64> ch_times(times[c].begin(), times[c].end());
-	      wave[cw] = new GAPS::Waveform(ch_volts.data(),ch_times.data() ,cw,0);
+	      //wave[cw] = new GAPS::Waveform(ch_volts.data(),ch_times.data() ,cw,0);
 	      
 	      // Calculate the pedestal
-	      wave[cw]->SetPedBegin(Ped_low);
+	      /*wave[cw]->SetPedBegin(Ped_low);
 	      wave[cw]->SetPedRange(Ped_win);
 	      wave[cw]->CalcPedestalRange(); 
 	      wave[cw]->SubtractPedestal(); 
@@ -246,12 +247,10 @@ int main(int argc, char *argv[]){
 	      if ( c==0 && (PedRMS[cw] > 15) && (ch9RMS < 190) ) {
 		// RMS_ch1 has ch9 data && RMS_ch9 has normal data        
 		printf(" %ld Row %d: %8.1f %8.1f\n", evt_ctr, rbid, ch9RMS, PedRMS[cw]);
-		//for(int j=0;j<8;j++) printf(" %8.1f",PedRMS[ch_start+j]);
-		//printf("\n");
-	      }
+		}*/
 
 	      // Set thresholds and find pulses
-	      wave[cw]->SetThreshold(CThresh);
+	      /*wave[cw]->SetThreshold(CThresh);
 	      wave[cw]->SetCFDSFraction(CFDS_frac);
 	      VPeak[cw] = wave[cw]->GetPeakValue(Qwin_low, Qwin_size);
 	      Qint[cw]  = wave[cw]->Integrate(Qwin_low, Qwin_size);
@@ -261,7 +260,7 @@ int main(int argc, char *argv[]){
 		wave[cw]->FindTdc(0, GAPS::CFD_SIMPLE);       // Simple CFD
 		TCFDS[cw] = wave[cw]->GetTdcs(0);
 		printf("EVT %12ld - ch %3ld: %10.5f -- %.2f\n", evt_ctr, cw, TCFDS[cw], wave[cw]->GetPedsigma());
-	      }		
+	      }	*/	
 	    }
 	  }
 	}
