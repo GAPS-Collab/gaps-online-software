@@ -342,11 +342,11 @@
   <span class="kw">let </span><span class="kw-2">mut </span>event_id_cache   = VecDeque::&lt;u32&gt;::with_capacity(EVENT_BUILDER_EVID_CACHE_SIZE);
   
   <span class="kw">let </span><span class="kw-2">mut </span>n_received         : usize;
-  <span class="kw">let </span><span class="kw-2">mut </span>clear_cache        = <span class="number">0</span>; <span class="comment">// clear cache every 
-  </span><span class="kw">let </span><span class="kw-2">mut </span>event_sending      = <span class="number">0</span>;
-  <span class="kw">let </span><span class="kw-2">mut </span>n_mte_received_tot = <span class="number">0u64</span>;
+  <span class="comment">//let mut clear_cache        = 0; // clear cache every 
+  //let mut event_sending      = 0;
+  </span><span class="kw">let </span><span class="kw-2">mut </span>n_mte_received_tot = <span class="number">0u64</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>n_rbe_received_tot = <span class="number">0u64</span>;
-  <span class="kw">let </span><span class="kw-2">mut </span>first_evid         = <span class="number">0u32</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>first_evid         : u32;
   <span class="kw">let </span><span class="kw-2">mut </span>last_evid          = <span class="number">0</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>n_sent             = <span class="number">0usize</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>n_timed_out        = <span class="number">0usize</span>; 
@@ -497,7 +497,7 @@
     </span><span class="kw">if </span><span class="bool-val">true </span>{
       <span class="comment">//for ev in event_cache.iter_mut() {
       </span><span class="kw">let </span>this_cache_size = event_id_cache.len();
-      <span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..this_cache_size {
+      <span class="kw">for _ in </span><span class="number">0</span>..this_cache_size {
         <span class="comment">// if there wasn&#39;t a first element, size would be 0
         </span><span class="kw">let </span>evid = event_id_cache.pop_front().unwrap();
         <span class="kw">match </span>event_cache.get(<span class="kw-2">&amp;</span>evid) {
@@ -510,7 +510,7 @@
           <span class="comment">//for evid in event_id_cache.iter() {
             //println!(&quot;{}&quot;,ev.age());
             </span><span class="kw">let </span>ev_timed_out = ev.age() &gt;= settings.te_timeout_sec <span class="kw">as </span>u64;
-            <span class="kw">let </span><span class="kw-2">mut </span>cache_it = <span class="bool-val">false</span>;
+            <span class="kw">let </span>cache_it : bool;
             <span class="kw">if </span>ev_timed_out {
               n_timed_out += <span class="number">1</span>;
             }
@@ -548,8 +548,8 @@
           }
         }
       }
-      event_sending = <span class="number">0</span>;
-      <span class="comment">//event_cache.retain(|ev| ev.valid);
+      <span class="comment">//event_sending = 0;
+      //event_cache.retain(|ev| ev.valid);
       </span><span class="macro">debug!</span>(<span class="string">&quot;Debug timer! EVT SENDING {:?}&quot;</span>, debug_timer.elapsed());
     } 
 

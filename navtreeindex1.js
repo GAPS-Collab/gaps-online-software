@@ -1,6 +1,5 @@
 var NAVTREEINDEX1 =
 {
-"structRBCalibration.html#a96a7e0dbca4ecd7dc6c8eea7664435fb":[2,0,9,3],
 "structRBCalibration.html#a9a662d95458ae79bfc9bfd200d5b5558":[2,0,9,13],
 "structRBCalibration.html#ac1986aa0fb98cfd5010a7e67af1fe160":[2,0,9,8],
 "structRBCalibration.html#adfab387bd6bebb965be054e754076452":[2,0,9,6],
@@ -193,5 +192,6 @@ var NAVTREEINDEX1 =
 "tof__event__header_8hpp_source.html":[3,0,0,0,0,0,0,0],
 "tof__manifest_8h_source.html":[3,0,0,0,0,0,11],
 "tof__packet_8h_source.html":[3,0,0,0,0,0,1,2],
-"tof__typedefs_8h_source.html":[3,0,0,0,0,0,12]
+"tof__typedefs_8h_source.html":[3,0,0,0,0,0,12],
+"":[1,0,1]
 };

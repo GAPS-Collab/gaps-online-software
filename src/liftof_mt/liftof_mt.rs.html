@@ -228,6 +228,8 @@
 <a href="#228" id="228">228</a>
 <a href="#229" id="229">229</a>
 <a href="#230" id="230">230</a>
+<a href="#231" id="231">231</a>
+<a href="#232" id="232">232</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Standalone application to get events from the MTB (master trigger board)
 //!
 //! This will connect to the MTB over Udp and request the event queue, 
@@ -353,6 +355,7 @@
   <span class="kw">let </span>publish_packets     = args.publish_packets;
   <span class="kw">let </span>send_requests       = args.send_requests;
   <span class="kw">let </span>relay_rbs           = args.relay_rbs;
+  <span class="kw">let </span>trace_suppression   = args.trace_suppression;
 
   <span class="kw">if </span>args.send_requests {
     <span class="kw">match </span>args.json_ltb_rb_map {
@@ -374,6 +377,7 @@
                            <span class="kw-2">&amp;</span>tp_send_moni,
                            <span class="number">1</span>,
                            <span class="number">60</span>,
+                           trace_suppression,
                            verbose,
                            send_requests);
          })

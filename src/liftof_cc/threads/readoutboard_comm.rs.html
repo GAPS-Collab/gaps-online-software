@@ -180,11 +180,11 @@
 };
 <span class="kw">use </span>tof_dataclasses::calibrations::RBCalibrations;
 <span class="kw">use </span>tof_dataclasses::serialization::Serialization;
-<span class="kw">use </span>tof_dataclasses::RBChannelPaddleEndIDMap;
+<span class="comment">//use tof_dataclasses::RBChannelPaddleEndIDMap;
 
-<span class="kw">use </span>liftof_lib::{
-    build_tcp_from_ip,
-    get_rb_ch_pid_map,
+</span><span class="kw">use </span>liftof_lib::{
+    <span class="comment">//build_tcp_from_ip,
+    </span>get_rb_ch_pid_map,
     waveform_analysis,
     ASSET_DIR,
 };
@@ -255,8 +255,8 @@
   }
   <span class="comment">//let mut secs_since_epoch = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
   //let mut n_events   = 0usize;
-  </span><span class="kw">let </span><span class="kw-2">mut </span>n_received = <span class="number">0usize</span>;
-  <span class="kw">let </span>map_file  = <span class="macro">format!</span>(<span class="string">&quot;{}/rb{:02}_paddle_map.json&quot;</span>, ASSET_DIR, board_id);
+  //let mut n_received = 0usize;
+  </span><span class="kw">let </span>map_file  = <span class="macro">format!</span>(<span class="string">&quot;{}/rb{:02}_paddle_map.json&quot;</span>, ASSET_DIR, board_id);
   <span class="kw">let </span>rb_ch_map = get_rb_ch_pid_map(map_file.into(),rb.rb_id);
   <span class="kw">loop </span>{
 
@@ -279,8 +279,8 @@
             <span class="kw">if </span>print_packets {
               <span class="macro">println!</span>(<span class="string">&quot;==&gt; Got {} for RB {}&quot;</span>, tp.packet_type, rb.rb_id); 
             }
-            n_received += <span class="number">1</span>;
-            <span class="kw">match </span>tp.packet_type {
+            <span class="comment">//n_received += 1;
+            </span><span class="kw">match </span>tp.packet_type {
               PacketType::RBEvent | PacketType::RBEventMemoryView =&gt; {
                 <span class="kw">let </span><span class="kw-2">mut </span>event = RBEvent::from(<span class="kw-2">&amp;</span>tp);
                 <span class="kw">if </span>event.hits.len() == <span class="number">0 </span>{
