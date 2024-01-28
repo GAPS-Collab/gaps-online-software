@@ -210,7 +210,7 @@ PYBIND11_MODULE(gaps_tof, m) {
       .def_readonly("tiu_timestamp"   , &MasterTriggerEvent::tiu_timestamp            )
       .def_readonly("gps_timestamp_16", &MasterTriggerEvent::tiu_gps_16               )
       .def_readonly("gps_timestamp_32", &MasterTriggerEvent::tiu_gps_32               )
-      .def_readonly("board_mask"      , &MasterTriggerEvent::board_mask               )
+      //.def_readonly("board_mask"      , &MasterTriggerEvent::board_mask               )
       .def_readonly("n_paddles"       , &MasterTriggerEvent::n_paddles                ) 
       .def("__repr__",        [](const MasterTriggerEvent &ev) {
                                  return ev.to_string(); 

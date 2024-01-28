@@ -7,6 +7,7 @@
 #include "serialization.h"
 #include "logging.hpp"
 
+#include "spdlog/cfg/env.h"
 
 const static HashMap<u8, std::pair<u8,u8>> LTB_DSI_MAP {
   {0, {1,1}},
@@ -567,6 +568,7 @@ u32 TofEvent::get_n_rbevents(u32 mask){
 
 TofEvent TofEvent::from_bytestream(const Vec<u8> &stream,
                                    u64 &pos) {
+  spdlog::cfg::load_env_levels();
   log_debug("Start decoding at pos " << pos);
   u16 head = Gaps::parse_u16(stream, pos);
   if (head != TofEvent::HEAD)  {
@@ -582,7 +584,6 @@ TofEvent TofEvent::from_bytestream(const Vec<u8> &stream,
   u32 n_rbevents    = get_n_rbevents(mask);
   u32 n_missing     = get_n_rbmissinghits(mask);
   log_debug("Expecting " << n_rbevents << " RBEvents, " << n_missing << " RBMissingHits");
-
   for (u32 k=0; k< n_rbevents; k++) {
     RBEvent rb_event = RBEvent::from_bytestream(stream, pos);
     event.rb_events.push_back(rb_event);
@@ -594,43 +595,6 @@ TofEvent TofEvent::from_bytestream(const Vec<u8> &stream,
   
   //  event.compression_level = CompressionLevel::from_u8(&parse_u8(stream, pos));
   //  event.quality           = EventQuality::from_u8(&parse_u8(stream, pos));
-  //  event.mt_event          = MasterTriggerEvent::from_bytestream(stream, pos)?;
-  //  let v_sizes = Self::decode_size_header(&parse_u32(stream, pos));
-  //  for k in 0..v_sizes.0 {
-  //    match RBEvent::from_bytestream(stream, pos) {
-  //      Err(err) => error!("Expected RBEvent {} of {}, but got serialization error {}!", k,  v_sizes.0, err),
-  //      Ok(ev) => {
-  //        event.rb_events.push(ev);
-  //      }
-  //    }
-  //  }
-  //  for k in 0..v_sizes.1 {
-  //    match RBMissingHit::from_bytestream(stream, pos) {
-  //      Err(err) => error!("Expected RBMissingHit {} of {}, but got serialization error {}!", k,  v_sizes.1, err),
-  //      Ok(miss) => {
-  //        event.missing_hits.push(miss);
-  //      }
-  //    }
-  //  }
-  //  for k in 0..v_sizes.2 {
-  //    //match PaddlePacket::from_bytestream(stream, pos) {
-  //    //  Err(err) => error!("Expected PaddlePacket {} of {}, but got serialization error {}!", k,  v_sizes.2, err),
-  //    //  Ok(pp) => {
-  //    //    event.paddle_packets.push(pp);
-  //    //  }
-  //    //}
-  //    //event.paddle_packets(PaddlePacket::from_bytestream(stream, pos));
-  //  }
-  //  for k in 0..v_sizes.3 {
-  //    match RBMoniData::from_bytestream(stream, pos) {
-  //      Err(err) => error!("Expected RBMoniPacket {} of {}, but got serialization error {}!", k,  v_sizes.3, err),
-  //      Ok(moni) => {
-  //        event.rb_moni.push(moni);
-  //      }
-  //    }
-  //  }
-  //  Ok(event)
-  //}
   return event;
 }
   
@@ -676,44 +640,57 @@ bool TofEvent::passed_consistency_check() {
   return false;
 }
 
+/**********************************************************/
+
 MasterTriggerEvent::MasterTriggerEvent() {
+  MasterTriggerEvent(N_LTBS);
+}  
+
+/**********************************************************/
+
+MasterTriggerEvent::MasterTriggerEvent(usize n_ltbs) {
   event_id      = 0; 
   timestamp     = 0; 
   tiu_timestamp = 0; 
   tiu_gps_32    = 0; 
   tiu_gps_16    = 0; 
   n_paddles     = 0; 
-  std::fill(board_mask, board_mask + N_LTBS, 0);
-  for (usize k=0;k<N_LTBS;k++) {
+
+  // this is the default setting
+  n_ltbs_ = n_ltbs;
+
+  std::fill(board_mask, board_mask + n_ltbs_, 0);
+  for (usize k=0;k<n_ltbs_;k++) {
     std::fill(hits[k], hits[k] + N_CHN_PER_LTB, 0);
   }
   crc = 0;
   broken = true;
   valid  = false;
-}  
+
+  
+}
 
 /**********************************************************/
 
 /// Helper to get the number of the triggered LTB from the bitmask
-void MasterTriggerEvent::decode_board_mask(u32 mask_number, bool (&decoded_mask)[N_LTBS]) {
-  //bool decoded_mask[N_LTBS];
-  std::fill(decoded_mask, decoded_mask + N_LTBS, false);
-  //std::fill(board_mask, board_mask + N_LTBS, false);
-  // FIXME this implicitly asserts that the fields for non available LTBs 
-  // will be 0 and all the fields will be in order 
-  usize index = N_LTBS - 1;
-  //for n in 0..N_LTBS {
-  for (usize n=0;n<N_LTBS; n++) {
-    u32 mask = 1 << n;
-    bool bit_is_set = (mask & mask_number) > 0;
-    //decoded_mask[index] = bit_is_set;
-    decoded_mask[index] = bit_is_set;
-    if (index != 0) {
-      index -= 1;
-    }
-  }
-  //board_mask = decoded_mask;
-}
+//void MasterTriggerEvent::decode_board_mask(u32 mask_number, bool (&decoded_mask)[N_LTBS]) {
+//  //bool decoded_mask[N_LTBS];
+//  std::fill(decoded_mask, decoded_mask + N_LTBS, false);
+//  //std::fill(board_mask, board_mask + N_LTBS, false);
+//  // FIXME this implicitly asserts that the fields for non available LTBs 
+//  // will be 0 and all the fields will be in order 
+//  usize index = n_ltbs_ - 1;
+//  for (usize n=0;n<n_ltbs_; n++) {
+//    u32 mask = 1 << n;
+//    bool bit_is_set = (mask & mask_number) > 0;
+//    //decoded_mask[index] = bit_is_set;
+//    decoded_mask[index] = bit_is_set;
+//    if (index != 0) {
+//      index -= 1;
+//    }
+//  }
+//  //board_mask = decoded_mask;
+//}
 
 /*************************************/
 
@@ -751,7 +728,7 @@ void MasterTriggerEvent::set_board_mask(u32 mask) {
   // FIXME -> This basically inverses the order of the LTBs
   // so bit 0 (rightmost in the mask is the leftmost in the 
   // array 
-  for (usize i=0;i<N_LTBS;i++) {
+  for (usize i=0;i<n_ltbs_;i++) {
      board_mask[i] = (mask & (1 << i)) != 0;
   } 
 }   
@@ -773,7 +750,7 @@ Vec<std::tuple<u8,u8,u8>>  MasterTriggerEvent::get_dsi_j_ch() {
   auto hit_boards = Vec<u8>();
   Vec<std::tuple<u8,u8,u8>> result;  
   
-  for (u8 k=0;k<N_LTBS;k++) {
+  for (u8 k=0;k<n_ltbs_;k++) {
     if (board_mask[k]) {
       hit_boards.push_back(k);
     } 
@@ -793,11 +770,45 @@ Vec<std::tuple<u8,u8,u8>>  MasterTriggerEvent::get_dsi_j_ch() {
 }
 
 /*************************************/
+  
+usize MasterTriggerEvent::get_packet_size(const Vec<u8> &stream,
+                                          usize pos,  
+                                          usize expected_size) {
+  bool has_ended;
+  u64 head_pos = search_for_2byte_marker(stream, 0xAA, has_ended, pos);
+  u64 tail_pos = search_for_2byte_marker(stream, 0x55, has_ended, pos);
+  
+  u64 packet_size = tail_pos + 2 - head_pos;
+  if (has_ended) {
+    log_error("The size of the packet could not be determined!");
+    return 0;
+  }
+  return packet_size;
+}
+
+/*************************************/
 
 MasterTriggerEvent MasterTriggerEvent::from_bytestream(const Vec<u8> &bytestream,
                                                        u64 &pos) {
 
   MasterTriggerEvent event;
+  usize n_ltbs = 20;
+  // now we have to figure out if we have 20 or 25 
+  // LTBS
+  usize packet_size = MasterTriggerEvent::get_packet_size(bytestream,
+                                                          pos,
+                                                          MasterTriggerEvent::SIZE_LTB20);
+  if (packet_size == MasterTriggerEvent::SIZE_LTB20) {
+    n_ltbs = 20;
+    event = MasterTriggerEvent(n_ltbs);
+  } else if (packet_size == MasterTriggerEvent::SIZE_LTB25) {
+    n_ltbs = 25;
+    event = MasterTriggerEvent(n_ltbs);
+  } else {
+    log_error("Size matches neither 20 nor 25 LTBs!");
+    return event;
+  }
+  
   u16 header = Gaps::parse_u16(bytestream, pos);
   if (header != MasterTriggerEvent::HEAD) {
     log_error("Wrong header signature!");
@@ -811,10 +822,8 @@ MasterTriggerEvent MasterTriggerEvent::from_bytestream(const Vec<u8> &bytestream
   event.n_paddles          = Gaps::parse_u8 (bytestream, pos);
 
   event.set_board_mask(Gaps::parse_u32(bytestream, pos));
-  //decode_board_mask(Gaps::parse_u32(bytestream, pos), event.board_mask);
-
   // FIXME
-  for (usize k=0;k<N_LTBS;k++) {
+  for (usize k=0;k<n_ltbs;k++) {
     u32 hitmask = Gaps::parse_u32(bytestream, pos);
     event.set_hit_mask(k, hitmask);
   }
@@ -833,7 +842,7 @@ MasterTriggerEvent MasterTriggerEvent::from_bytestream(const Vec<u8> &bytestream
 }
 
 std::string MasterTriggerEvent::to_string() const {
-  std::string repr = "<MasterTriggerEvent :";
+  std::string repr = "<MasterTriggerEvent : [N LTBS " + std::to_string(n_ltbs_) + "]";
   repr += "\n  event_id      : " + std::to_string(event_id                    ); 
   repr += "\n  timestamp     : " + std::to_string(timestamp                   ); 
   repr += "\n  tiu_timestamp : " + std::to_string(tiu_timestamp               ); 
@@ -848,16 +857,16 @@ std::string MasterTriggerEvent::to_string() const {
   //repr += "\n 1/1 - 1/2 - 1/3 - 1/4 - 1/5 - 2/1 - 2/2 - 2/3 - 2/4 - 2/5 - 3/1 - 3/2 - 3/3 - 3/4 - 3/5 - 4/1 - 4/2 - 4/3 - 4/4 - 4/5 \n";
   Vec<u8> hit_boards = Vec<u8>();
   HashMap<u8, String> dsi_j = HashMap<u8, String>();
-  dsi_j[0] = "1/1";
-  dsi_j[1] = "1/2";
-  dsi_j[2] = "1/3";
-  dsi_j[3] = "1/4";
-  dsi_j[4] = "1/5";
-  dsi_j[5] = "2/1";
-  dsi_j[6] = "2/2";
-  dsi_j[7] = "2/3";
-  dsi_j[8] = "2/4";
-  dsi_j[9] = "2/5";
+  dsi_j[0]  = "1/1";
+  dsi_j[1]  = "1/2";
+  dsi_j[2]  = "1/3";
+  dsi_j[3]  = "1/4";
+  dsi_j[4]  = "1/5";
+  dsi_j[5]  = "2/1";
+  dsi_j[6]  = "2/2";
+  dsi_j[7]  = "2/3";
+  dsi_j[8]  = "2/4";
+  dsi_j[9]  = "2/5";
   dsi_j[10] = "3/1";
   dsi_j[11] = "3/2";
   dsi_j[12] = "3/3";
@@ -868,8 +877,13 @@ std::string MasterTriggerEvent::to_string() const {
   dsi_j[16] = "4/3";
   dsi_j[17] = "4/4";
   dsi_j[19] = "4/5";
+  dsi_j[20] = "5/1";
+  dsi_j[21] = "5/2";
+  dsi_j[22] = "5/3";
+  dsi_j[23] = "5/4";
+  dsi_j[24] = "5/5";
   //repr += " ";
-  for (usize k=0;k<N_LTBS;k++) {
+  for (usize k=0;k<n_ltbs_;k++) {
     if (board_mask[k]) {
       //repr += "-X-   ";
       hit_boards.push_back(k);

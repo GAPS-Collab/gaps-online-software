@@ -49,8 +49,7 @@ u64 search_for_2byte_marker(const Vec<u8> &bytestream,
                             u8 marker,
                             bool &has_ended,
                             u64 start_pos,
-                            u64 end_pos)
-{
+                            u64 end_pos) {
   has_ended = false;
   if ((end_pos == bytestream.size()) || (end_pos == 0)) 
     { end_pos = bytestream.size() - 1;} 
