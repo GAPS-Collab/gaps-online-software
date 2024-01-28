@@ -38,7 +38,7 @@ rb_ignorelist         = [10, 12, 37, 38, 43, 45, 47, 48, 49, 50]
 # DSI/J/RB-CH mapping (in the future this will come from the DB)
 dsi_j_rbch_map        = "/home/gaps/config/dsi_j_ch_map.gaps.json"
 # should TofHits be calculated for RBEvents? [should be true for flight]
-use_analysis_engine   = true
+run_analysis_engine   = true
 
 # not supported yet
 [event_builder_settings]
