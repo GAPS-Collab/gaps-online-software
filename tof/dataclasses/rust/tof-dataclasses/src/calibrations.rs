@@ -16,7 +16,7 @@ use std::fmt;
 use std::time::{SystemTime,
                 Duration,
                 UNIX_EPOCH};
-
+use chrono::{DateTime, Utc, TimeZone};
 //extern crate streaming_stats;
 //use streaming_stats::{OnlineStats, OrderStats};
 
@@ -1352,16 +1352,19 @@ impl Default for RBCalibrations {
 
 impl fmt::Display for RBCalibrations {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let datetime_utc: DateTime<Utc> = Utc.timestamp(self.timestamp as i64, 0);
+    let timestamp_str = datetime_utc.format("%Y/%m/%d %H:%M:%S").to_string();
     write!(f, 
-  "<ReadoutboardCalibration:
-      RB : {}
-      VCalData    : {} (events)
-      TCalData    : {} (events)
-      NoInputData : {} (events)
+  "<ReadoutboardCalibration [{}]:
+      RB             : {}
+      VCalData       : {} (events)
+      TCalData       : {} (events)
+      NoInputData    : {} (events)
       V Offsets [ch0]: .. {:?} {:?} ..
       V Incrmts [ch0]: .. {:?} {:?} ..
       V Dips    [ch0]: .. {:?} {:?} ..
       T Bins    [ch0]: .. {:?} {:?} ..>",
+      timestamp_str,
       self.rb_id,
       self.vcal_data.len(),
       self.tcal_data.len(),

@@ -163,6 +163,8 @@ pub struct LiftofCCSettings {
   /// ignore these RB. These RB ids do not exist in the configuration.
   /// Every RB Id > 50 will be ignored by default
   pub rb_ignorelist              : Vec<u8>,
+  /// Should TofHits be generated?
+  pub run_analysis_engine        : bool,
   /// Settings for the TOF event builder
   pub event_builder_settings     : TofEventBuilderSettings,
   /// Settings for the analysis engine
@@ -181,9 +183,10 @@ impl LiftofCCSettings {
       fc_sub_address            : String::from(""),
       mtb_address               : String::from("10.0.1.10:50001"),
       mtb_trace_suppression     : true,
-      mtb_moni_interval_sec     : 0,
-      cpu_moni_interval_sec     : 0,
+      mtb_moni_interval_sec     : 30,
+      cpu_moni_interval_sec     : 60,
       rb_ignorelist             : Vec::<u8>::new(),
+      run_analysis_engine       : true,
       event_builder_settings    : TofEventBuilderSettings::new(),
       analysis_engine_settings  : AnalysisEngineSettings::new(),
     }

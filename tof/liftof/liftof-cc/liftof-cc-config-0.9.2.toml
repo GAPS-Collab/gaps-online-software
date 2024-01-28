@@ -12,10 +12,10 @@ calibration_dir       = "/tofdata/calibration/"
 # location of the database
 db_path               = "/home/gaps/config/gaps_flight.db"
 # default runtime of the program
-runtime_sec           = 3600
+runtime_sec           = 600
 # number of tofpackets per file before a new file
 # gets started
-packs_per_file        = 20000
+packs_per_file        = 1000
 # use this address for UCLA teststand (tailscale)
 #fc_pub_address       = "tcp://100.101.96.10:42000"
 # flight computer needs to subscribe to this address to 
@@ -24,17 +24,21 @@ fc_pub_address        = "tcp://192.168.37.20:42000"
 # TOF computer needs to subscribe to this address to 
 # recieve commands
 fc_sub_address        = "tcp://192.168.37.200:41662"
-# UDP connection to the MTB
-mtb_address           = "tcp://10.0.1.10:50001"
+# UDP connection to the MTB (does NOT start with tcp://)
+mtb_address           = "10.0.1.10:50001"
 # Receive MtbMoniData every X secs
 mtb_moni_interval_sec = 20
+# if false, we will ALWAYS read out ALL RB, wether 
+# they have pulses or not
+mtb_trace_suppression = false
 # Query the TOF computer for CPUMoniData every X secs
 cpu_moni_interval_sec = 20
 # Non existent/broken RBs (in range 1-50)
 rb_ignorelist         = [10, 12, 37, 38, 43, 45, 47, 48, 49, 50]
 # DSI/J/RB-CH mapping (in the future this will come from the DB)
 dsi_j_rbch_map        = "/home/gaps/config/dsi_j_ch_map.gaps.json"
-
+# should TofHits be calculated for RBEvents? [should be true for flight]
+use_analysis_engine   = true
 
 # not supported yet
 [event_builder_settings]
@@ -48,13 +52,13 @@ te_timeout_sec = 30
 # Decide on event builder strategy. Adaptive will automatically 
 # adjust the number of expected RBEvents for each MTBEvent and 
 # wait for this number of RBEvents come in 
-build_strategy = "Adaptive"
+#build_strategy = "Adaptive"
 
 # in case we want to select a build 
 # strategy with a parameter, use
 # this section
-#[event_builder_settings.build_strategy]
-#WaitForNBoards = 40
+[event_builder_settings.build_strategy]
+WaitForNBoards = 40
 
 [analysis_engine_settings]
 integration_start      = 270.0
