@@ -50,7 +50,7 @@ var srcIndex = JSON.parse('{\
 "i2c_linux_sys":["",[],["lib.rs"]],\
 "i2cdev":["",[],["core.rs","ffi.rs","lib.rs","linux.rs","mock.rs"]],\
 "iana_time_zone":["",[],["ffi_utils.rs","lib.rs","tz_linux.rs"]],\
-"indexmap":["",[["map",[["core",[],["raw.rs"]]],["core.rs","iter.rs","slice.rs"]],["set",[],["iter.rs","slice.rs"]]],["arbitrary.rs","lib.rs","macros.rs","map.rs","mutable_keys.rs","set.rs","util.rs"]],\
+"indexmap":["",[["map",[["core",[],["entry.rs","raw.rs","raw_entry_v1.rs"]]],["core.rs","iter.rs","slice.rs"]],["set",[],["iter.rs","slice.rs"]]],["arbitrary.rs","lib.rs","macros.rs","map.rs","mutable_keys.rs","set.rs","util.rs"]],\
 "indicatif":["",[],["draw_target.rs","format.rs","iter.rs","lib.rs","multi.rs","progress_bar.rs","state.rs","style.rs","term_like.rs"]],\
 "indoc":["",[],["error.rs","expr.rs","lib.rs","unindent.rs"]],\
 "is_terminal":["",[],["lib.rs"]],\

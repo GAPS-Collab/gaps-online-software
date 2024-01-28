@@ -159,9 +159,6 @@
 <a href="#159" id="159">159</a>
 <a href="#160" id="160">160</a>
 <a href="#161" id="161">161</a>
-<a href="#162" id="162">162</a>
-<a href="#163" id="163">163</a>
-<a href="#164" id="164">164</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Routines for RB commiunication and data reception 
 
 </span><span class="comment">//use std::time::{SystemTime, UNIX_EPOCH};
@@ -227,14 +224,12 @@
   </span><span class="kw">let </span><span class="kw-2">mut </span>n_chunk  = <span class="number">0usize</span>;
   <span class="comment">// in case we want to do calibratoins
   </span><span class="kw">let </span><span class="kw-2">mut </span>calibrations = RBCalibrations::new(rb.rb_id);
-  <span class="kw">let </span>do_calibration = <span class="bool-val">true</span>;
-  <span class="kw">if </span>do_calibration {
-    <span class="kw">let </span>cal_file = <span class="macro">format!</span>(<span class="string">&quot;/tpool/rb_calibrations/rb_{:02}.cali.tof.gaps&quot;</span>, board_id);
-    <span class="macro">info!</span>(<span class="string">&quot;Reading calibrations from file {}&quot;</span>, cal_file);
-    <span class="kw">let </span>cal_file_path_buf : PathBuf = cal_file.into();
-    <span class="kw">let </span>cal_file_path     : <span class="kw-2">&amp;</span>Path   = <span class="kw-2">&amp;</span>cal_file_path_buf;
-    <span class="comment">//let cal_file_path = Path::new(&amp;rb.calib_file);//calibration_file);
-    </span>calibrations = RBCalibrations::from(cal_file_path);
+  <span class="kw">if </span>run_analysis_engine {
+    <span class="kw">if </span>rb.calibration.rb_id == <span class="number">0 </span>{
+      <span class="macro">error!</span>(<span class="string">&quot;Requested to run analysis engine for board {}, but we did not load a valid calibration!&quot;</span>, board_id);
+    } <span class="kw">else </span>{
+      <span class="comment">//calibrations = rb.calibration;
+    </span>}
   }
   <span class="kw">let </span>address = rb.guess_address();
 
@@ -251,7 +246,6 @@
   <span class="kw">match </span>socket.set_subscribe(topic) {
    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Unable to subscribe to topic! {err}&quot;</span>),
    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="macro">info!</span>(<span class="string">&quot;Subscribed to {:?}!&quot;</span>, topic),
-
   }
   <span class="comment">//let mut secs_since_epoch = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
   //let mut n_events   = 0usize;
@@ -287,7 +281,7 @@
                   <span class="kw">if </span>run_analysis_engine {
                     <span class="kw">match </span>waveform_analysis(<span class="kw-2">&amp;mut </span>event, 
                                             <span class="kw-2">&amp;</span>rb_ch_map,
-                                            <span class="kw-2">&amp;</span>calibrations) {
+                                            <span class="kw-2">&amp;</span>rb.calibration) {
                         
                       <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; (),
                       <span class="prelude-val">Err</span>(err) =&gt; {

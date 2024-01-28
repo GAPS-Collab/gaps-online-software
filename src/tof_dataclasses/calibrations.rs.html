@@ -1509,6 +1509,9 @@
 <a href="#1509" id="1509">1509</a>
 <a href="#1510" id="1510">1510</a>
 <a href="#1511" id="1511">1511</a>
+<a href="#1512" id="1512">1512</a>
+<a href="#1513" id="1513">1513</a>
+<a href="#1514" id="1514">1514</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! The ReadoutBoardCalibration is 
 //! the first stage in a 3 stage 
 //! calibration process for the tof
@@ -1527,7 +1530,7 @@
 <span class="kw">use </span>std::time::{SystemTime,
                 Duration,
                 UNIX_EPOCH};
-
+<span class="kw">use </span>chrono::{DateTime, Utc, TimeZone};
 <span class="comment">//extern crate streaming_stats;
 //use streaming_stats::{OnlineStats, OrderStats};
 
@@ -2863,16 +2866,19 @@
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>RBCalibrations {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+    <span class="kw">let </span>datetime_utc: DateTime&lt;Utc&gt; = Utc.timestamp(<span class="self">self</span>.timestamp <span class="kw">as </span>i64, <span class="number">0</span>);
+    <span class="kw">let </span>timestamp_str = datetime_utc.format(<span class="string">&quot;%Y/%m/%d %H:%M:%S&quot;</span>).to_string();
     <span class="macro">write!</span>(f, 
-  <span class="string">&quot;&lt;ReadoutboardCalibration:
-      RB : {}
-      VCalData    : {} (events)
-      TCalData    : {} (events)
-      NoInputData : {} (events)
+  <span class="string">&quot;&lt;ReadoutboardCalibration [{}]:
+      RB             : {}
+      VCalData       : {} (events)
+      TCalData       : {} (events)
+      NoInputData    : {} (events)
       V Offsets [ch0]: .. {:?} {:?} ..
       V Incrmts [ch0]: .. {:?} {:?} ..
       V Dips    [ch0]: .. {:?} {:?} ..
       T Bins    [ch0]: .. {:?} {:?} ..&gt;&quot;</span>,
+      timestamp_str,
       <span class="self">self</span>.rb_id,
       <span class="self">self</span>.vcal_data.len(),
       <span class="self">self</span>.tcal_data.len(),

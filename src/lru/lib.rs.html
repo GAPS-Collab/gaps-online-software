@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/lru-0.12.1/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="lru" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/lru-0.12.2/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="lru" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -2274,6 +2274,52 @@
 <a href="#2274" id="2274">2274</a>
 <a href="#2275" id="2275">2275</a>
 <a href="#2276" id="2276">2276</a>
+<a href="#2277" id="2277">2277</a>
+<a href="#2278" id="2278">2278</a>
+<a href="#2279" id="2279">2279</a>
+<a href="#2280" id="2280">2280</a>
+<a href="#2281" id="2281">2281</a>
+<a href="#2282" id="2282">2282</a>
+<a href="#2283" id="2283">2283</a>
+<a href="#2284" id="2284">2284</a>
+<a href="#2285" id="2285">2285</a>
+<a href="#2286" id="2286">2286</a>
+<a href="#2287" id="2287">2287</a>
+<a href="#2288" id="2288">2288</a>
+<a href="#2289" id="2289">2289</a>
+<a href="#2290" id="2290">2290</a>
+<a href="#2291" id="2291">2291</a>
+<a href="#2292" id="2292">2292</a>
+<a href="#2293" id="2293">2293</a>
+<a href="#2294" id="2294">2294</a>
+<a href="#2295" id="2295">2295</a>
+<a href="#2296" id="2296">2296</a>
+<a href="#2297" id="2297">2297</a>
+<a href="#2298" id="2298">2298</a>
+<a href="#2299" id="2299">2299</a>
+<a href="#2300" id="2300">2300</a>
+<a href="#2301" id="2301">2301</a>
+<a href="#2302" id="2302">2302</a>
+<a href="#2303" id="2303">2303</a>
+<a href="#2304" id="2304">2304</a>
+<a href="#2305" id="2305">2305</a>
+<a href="#2306" id="2306">2306</a>
+<a href="#2307" id="2307">2307</a>
+<a href="#2308" id="2308">2308</a>
+<a href="#2309" id="2309">2309</a>
+<a href="#2310" id="2310">2310</a>
+<a href="#2311" id="2311">2311</a>
+<a href="#2312" id="2312">2312</a>
+<a href="#2313" id="2313">2313</a>
+<a href="#2314" id="2314">2314</a>
+<a href="#2315" id="2315">2315</a>
+<a href="#2316" id="2316">2316</a>
+<a href="#2317" id="2317">2317</a>
+<a href="#2318" id="2318">2318</a>
+<a href="#2319" id="2319">2319</a>
+<a href="#2320" id="2320">2320</a>
+<a href="#2321" id="2321">2321</a>
+<a href="#2322" id="2322">2322</a>
 </pre></div><pre class="rust"><code><span class="comment">// MIT License
 
 // Copyright (c) 2016 Jerome Froelich
@@ -2374,7 +2420,11 @@
 }
 
 <span class="kw">impl</span>&lt;K: PartialEq&gt; PartialEq <span class="kw">for </span>KeyRef&lt;K&gt; {
-    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>KeyRef&lt;K&gt;) -&gt; bool {
+    <span class="comment">// NB: The unconditional_recursion lint was added in 1.76.0 and can be removed
+    // once the current stable version of Rust is 1.76.0 or higher.
+    </span><span class="attr">#![allow(unknown_lints)]
+    #[allow(clippy::unconditional_recursion)]
+    </span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>KeyRef&lt;K&gt;) -&gt; bool {
         <span class="kw">unsafe </span>{ (<span class="kw-2">*</span><span class="self">self</span>.k).eq(<span class="kw-2">&amp;*</span>other.k) }
     }
 }
@@ -2400,7 +2450,11 @@
 }
 
 <span class="kw">impl</span>&lt;K: <span class="question-mark">?</span>Sized + PartialEq&gt; PartialEq <span class="kw">for </span>KeyWrapper&lt;K&gt; {
-    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+    <span class="comment">// NB: The unconditional_recursion lint was added in 1.76.0 and can be removed
+    // once the current stable version of Rust is 1.76.0 or higher.
+    </span><span class="attr">#![allow(unknown_lints)]
+    #[allow(clippy::unconditional_recursion)]
+    </span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
         <span class="self">self</span>.<span class="number">0</span>.eq(<span class="kw-2">&amp;</span>other.<span class="number">0</span>)
     }
 }
@@ -2460,6 +2514,22 @@
     <span class="comment">// head and tail are sigil nodes to facilitate inserting entries
     </span>head: <span class="kw-2">*mut </span>LruEntry&lt;K, V&gt;,
     tail: <span class="kw-2">*mut </span>LruEntry&lt;K, V&gt;,
+}
+
+<span class="kw">impl</span>&lt;K, V&gt; Clone <span class="kw">for </span>LruCache&lt;K, V&gt;
+<span class="kw">where
+    </span>K: Hash + PartialEq + Eq + Clone,
+    V: Clone,
+{
+    <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>new_lru = LruCache::new(<span class="self">self</span>.cap());
+
+        <span class="kw">for </span>(key, value) <span class="kw">in </span><span class="self">self</span>.iter().rev() {
+            new_lru.push(key.clone(), value.clone());
+        }
+
+        new_lru
+    }
 }
 
 <span class="kw">impl</span>&lt;K: Hash + Eq, V&gt; LruCache&lt;K, V&gt; {
@@ -4534,6 +4604,28 @@
             <span class="prelude-val">Some</span>((<span class="kw-2">&amp;</span>String::from(<span class="string">&quot;apple&quot;</span>), <span class="kw-2">&amp;</span><span class="string">&quot;red&quot;</span>))
         );
         <span class="macro">assert_eq!</span>(cache.get_key_value(<span class="string">&quot;banana&quot;</span>), <span class="prelude-val">None</span>);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_clone() {
+        <span class="kw">let </span><span class="kw-2">mut </span>cache = LruCache::new(NonZeroUsize::new(<span class="number">3</span>).unwrap());
+        cache.put(<span class="string">&quot;a&quot;</span>, <span class="number">1</span>);
+        cache.put(<span class="string">&quot;b&quot;</span>, <span class="number">2</span>);
+        cache.put(<span class="string">&quot;c&quot;</span>, <span class="number">3</span>);
+
+        <span class="kw">let </span><span class="kw-2">mut </span>cloned = cache.clone();
+
+        <span class="macro">assert_eq!</span>(cache.pop_lru(), <span class="prelude-val">Some</span>((<span class="string">&quot;a&quot;</span>, <span class="number">1</span>)));
+        <span class="macro">assert_eq!</span>(cloned.pop_lru(), <span class="prelude-val">Some</span>((<span class="string">&quot;a&quot;</span>, <span class="number">1</span>)));
+
+        <span class="macro">assert_eq!</span>(cache.pop_lru(), <span class="prelude-val">Some</span>((<span class="string">&quot;b&quot;</span>, <span class="number">2</span>)));
+        <span class="macro">assert_eq!</span>(cloned.pop_lru(), <span class="prelude-val">Some</span>((<span class="string">&quot;b&quot;</span>, <span class="number">2</span>)));
+
+        <span class="macro">assert_eq!</span>(cache.pop_lru(), <span class="prelude-val">Some</span>((<span class="string">&quot;c&quot;</span>, <span class="number">3</span>)));
+        <span class="macro">assert_eq!</span>(cloned.pop_lru(), <span class="prelude-val">Some</span>((<span class="string">&quot;c&quot;</span>, <span class="number">3</span>)));
+
+        <span class="macro">assert_eq!</span>(cache.pop_lru(), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(cloned.pop_lru(), <span class="prelude-val">None</span>);
     }
 }
 

@@ -684,6 +684,60 @@
 <a href="#684" id="684">684</a>
 <a href="#685" id="685">685</a>
 <a href="#686" id="686">686</a>
+<a href="#687" id="687">687</a>
+<a href="#688" id="688">688</a>
+<a href="#689" id="689">689</a>
+<a href="#690" id="690">690</a>
+<a href="#691" id="691">691</a>
+<a href="#692" id="692">692</a>
+<a href="#693" id="693">693</a>
+<a href="#694" id="694">694</a>
+<a href="#695" id="695">695</a>
+<a href="#696" id="696">696</a>
+<a href="#697" id="697">697</a>
+<a href="#698" id="698">698</a>
+<a href="#699" id="699">699</a>
+<a href="#700" id="700">700</a>
+<a href="#701" id="701">701</a>
+<a href="#702" id="702">702</a>
+<a href="#703" id="703">703</a>
+<a href="#704" id="704">704</a>
+<a href="#705" id="705">705</a>
+<a href="#706" id="706">706</a>
+<a href="#707" id="707">707</a>
+<a href="#708" id="708">708</a>
+<a href="#709" id="709">709</a>
+<a href="#710" id="710">710</a>
+<a href="#711" id="711">711</a>
+<a href="#712" id="712">712</a>
+<a href="#713" id="713">713</a>
+<a href="#714" id="714">714</a>
+<a href="#715" id="715">715</a>
+<a href="#716" id="716">716</a>
+<a href="#717" id="717">717</a>
+<a href="#718" id="718">718</a>
+<a href="#719" id="719">719</a>
+<a href="#720" id="720">720</a>
+<a href="#721" id="721">721</a>
+<a href="#722" id="722">722</a>
+<a href="#723" id="723">723</a>
+<a href="#724" id="724">724</a>
+<a href="#725" id="725">725</a>
+<a href="#726" id="726">726</a>
+<a href="#727" id="727">727</a>
+<a href="#728" id="728">728</a>
+<a href="#729" id="729">729</a>
+<a href="#730" id="730">730</a>
+<a href="#731" id="731">731</a>
+<a href="#732" id="732">732</a>
+<a href="#733" id="733">733</a>
+<a href="#734" id="734">734</a>
+<a href="#735" id="735">735</a>
+<a href="#736" id="736">736</a>
+<a href="#737" id="737">737</a>
+<a href="#738" id="738">738</a>
+<a href="#739" id="739">739</a>
+<a href="#740" id="740">740</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Entities of the tof, that is LocalTriggerBoard, ReadoutBoard, PB, MTB...
 //! 
 //! This provides structs to hold their metainformation,
@@ -691,7 +745,7 @@
 //! well as to serialize them locally.
 
 </span><span class="kw">use </span>std::fmt;
-<span class="kw">use </span>std::net::Ipv4Addr;
+
 <span class="macro">cfg_if::cfg_if! </span>{
   <span class="kw">if </span><span class="attr">#[cfg(feature = <span class="string">&quot;database&quot;</span>)]  </span>{
     <span class="kw">use </span>std::path::Path;
@@ -699,6 +753,12 @@
     <span class="kw">extern crate </span>sqlite;
   }
 }
+
+<span class="kw">use </span>regex::Regex;
+<span class="kw">use </span>glob::glob;
+<span class="kw">use </span>chrono::{NaiveDateTime, Utc};
+
+<span class="kw">use </span><span class="kw">crate</span>::calibrations::RBCalibrations;
 
 <span class="attr">#[derive(Copy, Clone, Debug)]
 </span><span class="kw">pub struct </span>LocalTriggerBoard {
@@ -786,17 +846,17 @@
       <span class="kw">match </span>value {
         <span class="prelude-val">None    </span>=&gt; {<span class="kw">continue</span>;},
         <span class="prelude-val">Some</span>(v) =&gt; {
-          <span class="macro">debug!</span>(<span class="string">&quot;{} = {}&quot;</span>, name, v);
+          <span class="macro">println!</span>(<span class="string">&quot;{} = {}&quot;</span>, name, v);
           <span class="kw">match </span>name {
             <span class="string">&quot;rb_id&quot;      </span>=&gt; {rb.rb_id  = u8::from_str(v).unwrap_or(<span class="number">0</span>);},
-            <span class="string">&quot;ch1_paddle&quot; </span>=&gt; {rb.set_paddle_end_id_for_rb_channel(<span class="number">1</span>, u16::from_str(v).unwrap_or(<span class="number">0</span>));},
-            <span class="string">&quot;ch2_paddle&quot; </span>=&gt; {rb.set_paddle_end_id_for_rb_channel(<span class="number">2</span>, u16::from_str(v).unwrap_or(<span class="number">0</span>));},
-            <span class="string">&quot;ch3_paddle&quot; </span>=&gt; {rb.set_paddle_end_id_for_rb_channel(<span class="number">3</span>, u16::from_str(v).unwrap_or(<span class="number">0</span>));},
-            <span class="string">&quot;ch4_paddle&quot; </span>=&gt; {rb.set_paddle_end_id_for_rb_channel(<span class="number">4</span>, u16::from_str(v).unwrap_or(<span class="number">0</span>));},
-            <span class="string">&quot;ch5_paddle&quot; </span>=&gt; {rb.set_paddle_end_id_for_rb_channel(<span class="number">5</span>, u16::from_str(v).unwrap_or(<span class="number">0</span>));},
-            <span class="string">&quot;ch6_paddle&quot; </span>=&gt; {rb.set_paddle_end_id_for_rb_channel(<span class="number">6</span>, u16::from_str(v).unwrap_or(<span class="number">0</span>));},
-            <span class="string">&quot;ch7_paddle&quot; </span>=&gt; {rb.set_paddle_end_id_for_rb_channel(<span class="number">7</span>, u16::from_str(v).unwrap_or(<span class="number">0</span>));},
-            <span class="string">&quot;ch8_paddle&quot; </span>=&gt; {rb.set_paddle_end_id_for_rb_channel(<span class="number">8</span>, u16::from_str(v).unwrap_or(<span class="number">0</span>));},
+            <span class="string">&quot;ch1_paddle_id&quot; </span>=&gt; {rb.set_paddle_end_id_for_rb_channel(<span class="number">1</span>, u16::from_str(v).unwrap_or(<span class="number">0</span>));},
+            <span class="string">&quot;ch2_paddle_id&quot; </span>=&gt; {rb.set_paddle_end_id_for_rb_channel(<span class="number">2</span>, u16::from_str(v).unwrap_or(<span class="number">0</span>));},
+            <span class="string">&quot;ch3_paddle_id&quot; </span>=&gt; {rb.set_paddle_end_id_for_rb_channel(<span class="number">3</span>, u16::from_str(v).unwrap_or(<span class="number">0</span>));},
+            <span class="string">&quot;ch4_paddle_id&quot; </span>=&gt; {rb.set_paddle_end_id_for_rb_channel(<span class="number">4</span>, u16::from_str(v).unwrap_or(<span class="number">0</span>));},
+            <span class="string">&quot;ch5_paddle_id&quot; </span>=&gt; {rb.set_paddle_end_id_for_rb_channel(<span class="number">5</span>, u16::from_str(v).unwrap_or(<span class="number">0</span>));},
+            <span class="string">&quot;ch6_paddle_id&quot; </span>=&gt; {rb.set_paddle_end_id_for_rb_channel(<span class="number">6</span>, u16::from_str(v).unwrap_or(<span class="number">0</span>));},
+            <span class="string">&quot;ch7_paddle_id&quot; </span>=&gt; {rb.set_paddle_end_id_for_rb_channel(<span class="number">7</span>, u16::from_str(v).unwrap_or(<span class="number">0</span>));},
+            <span class="string">&quot;ch8_paddle_id&quot; </span>=&gt; {rb.set_paddle_end_id_for_rb_channel(<span class="number">8</span>, u16::from_str(v).unwrap_or(<span class="number">0</span>));},
             <span class="kw">_ </span>=&gt; {<span class="macro">warn!</span>(<span class="string">&quot;Found name {}, but not mapping it to self!&quot;</span>, name);}                         
           }
         }
@@ -1228,25 +1288,71 @@
 
 <span class="attr">#[derive(Clone, Debug)]
 </span><span class="kw">pub struct </span>ReadoutBoard {
-  <span class="kw">pub </span>rb_id             : u8,  
-  <span class="kw">pub </span>dna               : u64, 
+  <span class="kw">pub </span>rb_id                : u8,  
+  <span class="kw">pub </span>dna                  : u64, 
   channel_to_paddle_end_id : [u16;<span class="number">8</span>],
-  <span class="kw">pub </span>calib_file        : String,
-  <span class="kw">pub </span>trig_ch_mask      : [bool;<span class="number">8</span>],
+  <span class="kw">pub </span>calib_file_path      : String,
+  <span class="kw">pub </span>calibration          : RBCalibrations,       
+  <span class="kw">pub </span>trig_ch_mask         : [bool;<span class="number">8</span>],
 }
 
 <span class="kw">impl </span>ReadoutBoard {
   <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
     <span class="self">Self </span>{
-      rb_id         : <span class="number">0</span>,  
-      dna           : <span class="number">0</span>, 
+      rb_id                    : <span class="number">0</span>,  
+      dna                      : <span class="number">0</span>, 
       channel_to_paddle_end_id : [<span class="number">0</span>;<span class="number">8</span>],
-      calib_file    : String::from(<span class="string">&quot;&quot;</span>),
-      trig_ch_mask  : [<span class="bool-val">false</span>;<span class="number">8</span>],
+      calib_file_path          : String::from(<span class="string">&quot;&quot;</span>),
+      calibration              : RBCalibrations::new(<span class="number">0</span>),
+      trig_ch_mask             : [<span class="bool-val">false</span>;<span class="number">8</span>],
     }
   }
- 
-  <span class="kw">pub fn </span>guess_calibration_filename(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+
+  <span class="doccomment">/// Load the newest calibration from the calibration file path
+  </span><span class="kw">pub fn </span>load_latest_calibration(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), Box&lt;<span class="kw">dyn </span>std::error::Error&gt;&gt; {
+    <span class="comment">//  files look like RB20_2024_01_26-08_15_54.cali.tof.gaps
+    </span><span class="kw">let </span>re = Regex::new(<span class="string">r&quot;(\d{4}_\d{2}_\d{2}-\d{2}_\d{2}_\d{2})&quot;</span>)<span class="question-mark">?</span>;
+    <span class="comment">// Define your file pattern (e.g., &quot;logs/*.log&quot; for all .log files in the logs directory)
+    </span><span class="kw">let </span>pattern = <span class="macro">format!</span>(<span class="string">&quot;{}/RB{:02}_*&quot;</span>, <span class="self">self</span>.calib_file_path, <span class="self">self</span>.rb_id); <span class="comment">// Adjust this pattern to your files&#39; naming convention
+    </span><span class="kw">let </span><span class="kw-2">mut </span>newest_file = (String::from(<span class="string">&quot;&quot;</span>), NaiveDateTime::from_timestamp_opt(<span class="number">0</span>, <span class="number">0</span>).unwrap());
+    
+    <span class="comment">// Iterate over files that match the pattern
+    </span><span class="kw">let </span><span class="kw-2">mut </span>filename : String;
+    <span class="kw">for </span>entry <span class="kw">in </span>glob(<span class="kw-2">&amp;</span>pattern)<span class="question-mark">? </span>{
+      <span class="kw">if let </span><span class="prelude-val">Ok</span>(path) = entry {
+        <span class="comment">// Get the filename as a string
+        //let cpath = path.clone();
+        </span><span class="kw">match </span>path.file_name() {
+          <span class="prelude-val">None </span>=&gt; <span class="kw">continue</span>,
+          <span class="prelude-val">Some</span>(fname) =&gt; {
+              <span class="comment">// the expect might be ok, since this is something done during initialization
+              </span>filename = fname.to_os_string().into_string().expect(<span class="string">&quot;Unwrapping filename failed!&quot;</span>);
+          }
+        }
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(caps) = re.captures(<span class="kw-2">&amp;</span>filename) {
+          <span class="kw">if let </span><span class="prelude-val">Some</span>(timestamp_str) = caps.get(<span class="number">0</span>).map(|m| m.as_str()) {
+            <span class="kw">let </span>timestamp = NaiveDateTime::parse_from_str(timestamp_str, <span class="string">&quot;%Y_%m_%d_%H_%M&quot;</span>)<span class="question-mark">?</span>;
+            <span class="kw">if </span>timestamp &gt; newest_file.<span class="number">1 </span>{
+              newest_file.<span class="number">1 </span>= timestamp;
+              newest_file.<span class="number">0 </span>= filename.clone();
+            }
+          }
+        }
+      }
+    }
+    
+    <span class="kw">if </span>newest_file.<span class="number">0</span>.is_empty() {
+      <span class="macro">error!</span>(<span class="string">&quot;No matching calibration available for board {}!&quot;</span>, <span class="self">self</span>.rb_id);
+    } <span class="kw">else </span>{
+      <span class="macro">println!</span>(<span class="string">&quot;==&gt; Loading calibration from file: {}&quot;</span>, newest_file.<span class="number">0</span>);
+      <span class="self">self</span>.calibration = RBCalibrations::from_file(newest_file.<span class="number">0</span>)<span class="question-mark">?</span>;
+      <span class="macro">println!</span>(<span class="string">&quot;==&gt; Loaded calibration {}&quot;</span>, <span class="self">self</span>.calibration);
+    }
+    <span class="prelude-val">Ok</span>(())
+  }
+
+  <span class="attr">#[deprecated(note=<span class="string">&quot;Won&#39;t work with tmiestamped cali files!&quot;</span>)]
+  </span><span class="kw">pub fn </span>guess_calibration_filename(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
     <span class="kw">let </span><span class="kw-2">mut </span>cali = String::from(<span class="string">&quot;&quot;</span>);
     cali += <span class="string">&quot;rb_&quot;</span>;
     <span class="kw">if </span><span class="self">self</span>.rb_id &lt; <span class="number">10 </span>{
@@ -1281,7 +1387,7 @@
   }
 
   <span class="kw">pub fn </span>get_calibration(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
-    <span class="kw">return </span><span class="self">self</span>.calib_file.clone();
+    <span class="kw">return </span><span class="self">self</span>.calib_file_path.clone();
   }
 
   <span class="kw">pub fn </span>get_paddle_end(<span class="kw-2">&amp;</span><span class="self">self</span>, ch : usize) 
@@ -1359,12 +1465,14 @@
 <span class="string">&quot;&lt;ReadoutBoard:
     ID                :  {}
     DNA               :  {} 
-    CALIBRATION FILE  :  {}
+    calibration path  :  {}
+    calibration       :  {}
     CHANNEL/PADDLE END:  {:?}
     TRIG_CH_MASK      :  {:?}&gt;&quot;</span>,
       <span class="self">self</span>.rb_id,
       <span class="self">self</span>.dna,
-      <span class="self">self</span>.calib_file,
+      <span class="self">self</span>.calib_file_path,
+      <span class="self">self</span>.calibration,
       <span class="self">self</span>.channel_to_paddle_end_id,
       <span class="self">self</span>.trig_ch_mask)
   }

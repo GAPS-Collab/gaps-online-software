@@ -280,6 +280,9 @@
 <a href="#280" id="280">280</a>
 <a href="#281" id="281">281</a>
 <a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
+<a href="#284" id="284">284</a>
+<a href="#285" id="285">285</a>
 </pre></div><pre class="rust"><code><span class="doccomment">/// Generalized settings for liftof-cc
 ///
 /// Configure it from a .json config 
@@ -445,6 +448,8 @@
   <span class="doccomment">/// ignore these RB. These RB ids do not exist in the configuration.
   /// Every RB Id &gt; 50 will be ignored by default
   </span><span class="kw">pub </span>rb_ignorelist              : Vec&lt;u8&gt;,
+  <span class="doccomment">/// Should TofHits be generated?
+  </span><span class="kw">pub </span>run_analysis_engine        : bool,
   <span class="doccomment">/// Settings for the TOF event builder
   </span><span class="kw">pub </span>event_builder_settings     : TofEventBuilderSettings,
   <span class="doccomment">/// Settings for the analysis engine
@@ -463,9 +468,10 @@
       fc_sub_address            : String::from(<span class="string">&quot;&quot;</span>),
       mtb_address               : String::from(<span class="string">&quot;10.0.1.10:50001&quot;</span>),
       mtb_trace_suppression     : <span class="bool-val">true</span>,
-      mtb_moni_interval_sec     : <span class="number">0</span>,
-      cpu_moni_interval_sec     : <span class="number">0</span>,
+      mtb_moni_interval_sec     : <span class="number">30</span>,
+      cpu_moni_interval_sec     : <span class="number">60</span>,
       rb_ignorelist             : Vec::&lt;u8&gt;::new(),
+      run_analysis_engine       : <span class="bool-val">true</span>,
       event_builder_settings    : TofEventBuilderSettings::new(),
       analysis_engine_settings  : AnalysisEngineSettings::new(),
     }
