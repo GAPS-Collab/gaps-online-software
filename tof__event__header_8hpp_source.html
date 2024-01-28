@@ -97,53 +97,54 @@ $(document).ready(function(){initNavTree('tof__event__header_8hpp_source.html','
 <div class="line"><a name="l00006"></a><span class="lineno"><a class="line" href="structTofEventHeader.html">    6</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structTofEventHeader.html">TofEventHeader</a> {</div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u16 HEAD   = 0xAAAA;</div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u16 TAIL   = 0x5555;</div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> usize SIZE = 43; </div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;  </div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;  u32 run_id      ; </div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;  u32 event_id    ; </div>
-<div class="line"><a name="l00015"></a><span class="lineno"><a class="line" href="structTofEventHeader.html#a9c8d2d71c838e0cab0d8b6f66d3ab4ce">   15</a></span>&#160;  u32 <a class="code" href="structTofEventHeader.html#a9c8d2d71c838e0cab0d8b6f66d3ab4ce">timestamp_32</a>; </div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;  u16 timestamp_16;  <span class="comment">// -&gt; 14 byres</span></div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;  </div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;  <span class="comment">// reconstructed quantities</span></div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;  u16 primary_beta        ; </div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;  u16 primary_beta_unc    ; </div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;  u16 primary_charge      ; </div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;  u16 primary_charge_unc  ; </div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;  u16 primary_outer_tof_x ; </div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  u16 primary_outer_tof_y ; </div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;  u16 primary_outer_tof_z ; </div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;  u16 primary_inner_tof_x ; </div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  u16 primary_inner_tof_y ; </div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  u16 primary_inner_tof_z ; <span class="comment">//-&gt; 20bytes primary </span></div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  u8 nhit_outer_tof       ;  </div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  <span class="comment">// no need to save this, can be </span></div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  <span class="comment">// rereated from paddle_info.size() - nhit_outer_tof</span></div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  u8 nhit_inner_tof       ;</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  u8 trigger_info         ; </div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  u8 ctr_etx              ;</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160; </div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  <span class="comment">// this field can be debated</span></div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  <span class="comment">// the reason we have it is </span></div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  <span class="comment">// that for de/serialization, </span></div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  <span class="comment">// we need to know the length </span></div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  <span class="comment">// of the expected bytestream.</span></div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  u8 n_paddles            ; <span class="comment">// we don&#39;t have more than </span></div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;                               <span class="comment">// 256 paddles.</span></div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
-<div class="line"><a name="l00047"></a><span class="lineno"><a class="line" href="structTofEventHeader.html#ad7e84dfa55bed3b8b27b2a8b188b96c0">   47</a></span>&#160;  std::string <a class="code" href="structTofEventHeader.html#ad7e84dfa55bed3b8b27b2a8b188b96c0">to_string</a>() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  <span class="keyword">static</span> <a class="code" href="structTofEventHeader.html">TofEventHeader</a> from_bytestream(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;stream,</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;                                        u64 &amp;pos);</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160; </div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;}; <span class="comment">// end TofEventHeader</span></div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160; </div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, <span class="keyword">const</span> <a class="code" href="structTofEventHeader.html">TofEventHeader</a>&amp; h);</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160; </div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno"><a class="line" href="structTofEventHeader.html#ac4744665f64968853fbf6c909dc808e6">   10</a></span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> usize <a class="code" href="structTofEventHeader.html#ac4744665f64968853fbf6c909dc808e6">SIZE</a> = 47; </div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;  </div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;  u32 run_id      ; </div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;  u32 event_id    ; </div>
+<div class="line"><a name="l00016"></a><span class="lineno"><a class="line" href="structTofEventHeader.html#a9c8d2d71c838e0cab0d8b6f66d3ab4ce">   16</a></span>&#160;  u32 <a class="code" href="structTofEventHeader.html#a9c8d2d71c838e0cab0d8b6f66d3ab4ce">timestamp_32</a>; </div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;  u16 timestamp_16;  <span class="comment">// -&gt; 14 byres</span></div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;  </div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;  <span class="comment">// reconstructed quantities</span></div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;  u16 primary_beta        ; </div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;  u16 primary_beta_unc    ; </div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;  u16 primary_charge      ; </div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;  u16 primary_charge_unc  ; </div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  u16 primary_outer_tof_x ; </div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;  u16 primary_outer_tof_y ; </div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;  u16 primary_outer_tof_z ; </div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  u16 primary_inner_tof_x ; </div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  u16 primary_inner_tof_y ; </div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  u16 primary_inner_tof_z ; <span class="comment">//-&gt; 20bytes primary </span></div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  u8 nhit_outer_tof       ;  </div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  <span class="comment">// no need to save this, can be </span></div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  <span class="comment">// rereated from paddle_info.size() - nhit_outer_tof</span></div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  u8 nhit_inner_tof       ;</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  u8 trigger_info         ; </div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  u8 ctr_etx              ;</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160; </div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  <span class="comment">// this field can be debated</span></div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  <span class="comment">// the reason we have it is </span></div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  <span class="comment">// that for de/serialization, </span></div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  <span class="comment">// we need to know the length </span></div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  <span class="comment">// of the expected bytestream.</span></div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  u8 n_paddles            ; <span class="comment">// we don&#39;t have more than </span></div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;                               <span class="comment">// 256 paddles.</span></div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160; </div>
+<div class="line"><a name="l00048"></a><span class="lineno"><a class="line" href="structTofEventHeader.html#ad7e84dfa55bed3b8b27b2a8b188b96c0">   48</a></span>&#160;  std::string <a class="code" href="structTofEventHeader.html#ad7e84dfa55bed3b8b27b2a8b188b96c0">to_string</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <span class="keyword">static</span> <a class="code" href="structTofEventHeader.html">TofEventHeader</a> from_bytestream(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;stream,</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;                                        u64 &amp;pos);</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160; </div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;}; <span class="comment">// end TofEventHeader</span></div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160; </div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, <span class="keyword">const</span> <a class="code" href="structTofEventHeader.html">TofEventHeader</a>&amp; h);</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160; </div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="astructTofEventHeader_html"><div class="ttname"><a href="structTofEventHeader.html">TofEventHeader</a></div><div class="ttdef"><b>Definition:</b> tof_event_header.hpp:6</div></div>
-<div class="ttc" id="astructTofEventHeader_html_a9c8d2d71c838e0cab0d8b6f66d3ab4ce"><div class="ttname"><a href="structTofEventHeader.html#a9c8d2d71c838e0cab0d8b6f66d3ab4ce">TofEventHeader::timestamp_32</a></div><div class="ttdeci">u32 timestamp_32</div><div class="ttdef"><b>Definition:</b> tof_event_header.hpp:15</div></div>
+<div class="ttc" id="astructTofEventHeader_html_a9c8d2d71c838e0cab0d8b6f66d3ab4ce"><div class="ttname"><a href="structTofEventHeader.html#a9c8d2d71c838e0cab0d8b6f66d3ab4ce">TofEventHeader::timestamp_32</a></div><div class="ttdeci">u32 timestamp_32</div><div class="ttdef"><b>Definition:</b> tof_event_header.hpp:16</div></div>
+<div class="ttc" id="astructTofEventHeader_html_ac4744665f64968853fbf6c909dc808e6"><div class="ttname"><a href="structTofEventHeader.html#ac4744665f64968853fbf6c909dc808e6">TofEventHeader::SIZE</a></div><div class="ttdeci">static const usize SIZE</div><div class="ttdoc">fixed size including head and tail</div><div class="ttdef"><b>Definition:</b> tof_event_header.hpp:10</div></div>
 <div class="ttc" id="astructTofEventHeader_html_ad7e84dfa55bed3b8b27b2a8b188b96c0"><div class="ttname"><a href="structTofEventHeader.html#ad7e84dfa55bed3b8b27b2a8b188b96c0">TofEventHeader::to_string</a></div><div class="ttdeci">std::string to_string() const</div><div class="ttdoc">String representation for printing to output.</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->

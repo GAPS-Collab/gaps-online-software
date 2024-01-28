@@ -115,11 +115,11 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
+<tr class="memitem:aab5152c48bacdba0d8a32f5d8e85a245"><td class="memItemLeft" align="right" valign="top"><a id="aab5152c48bacdba0d8a32f5d8e85a245"></a>
+static usize&#160;</td><td class="memItemRight" valign="bottom"><b>get_packet_size</b> (const Vec&lt; u8 &gt; &amp;stream, usize pos, usize expected_size)</td></tr>
+<tr class="separator:aab5152c48bacdba0d8a32f5d8e85a245"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a92eba169f890dbdf936adba5572e06fe"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="structMasterTriggerEvent.html">MasterTriggerEvent</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMasterTriggerEvent.html#a92eba169f890dbdf936adba5572e06fe">from_bytestream</a> (const Vec&lt; u8 &gt; &amp;bytestream, u64 &amp;pos)</td></tr>
 <tr class="separator:a92eba169f890dbdf936adba5572e06fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a75c807de4e8cb89cd2bb925f41b2f816"><td class="memItemLeft" align="right" valign="top"><a id="a75c807de4e8cb89cd2bb925f41b2f816"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><b>decode_board_mask</b> (u32 mask_number, bool(&amp;decoded_mask)[N_LTBS])</td></tr>
-<tr class="separator:a75c807de4e8cb89cd2bb925f41b2f816"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a39fe79edbdea9c4394a861ea02853e1d"><td class="memItemLeft" align="right" valign="top"><a id="a39fe79edbdea9c4394a861ea02853e1d"></a>
 static void&#160;</td><td class="memItemRight" valign="bottom"><b>decode_hit_mask</b> (u32 mask_number, bool(&amp;hitmask_1)[N_CHN_PER_LTB], bool(&amp;hitmask_2)[N_CHN_PER_LTB])</td></tr>
 <tr class="separator:a39fe79edbdea9c4394a861ea02853e1d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -180,6 +180,12 @@ static const u16&#160;</td><td class="memItemRight" valign="bottom"><a class="el
 static const usize&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMasterTriggerEvent.html#ae8de2d59e0cdb02a7ad7b6073011983d">SIZE</a> = 45</td></tr>
 <tr class="memdesc:ae8de2d59e0cdb02a7ad7b6073011983d"><td class="mdescLeft">&#160;</td><td class="mdescRight">the struct has a fixed size of SIZE <br /></td></tr>
 <tr class="separator:ae8de2d59e0cdb02a7ad7b6073011983d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aff5e1b47bb33bc397369183e8d46c088"><td class="memItemLeft" align="right" valign="top"><a id="aff5e1b47bb33bc397369183e8d46c088"></a>
+static const usize&#160;</td><td class="memItemRight" valign="bottom"><b>SIZE_LTB20</b> = 113</td></tr>
+<tr class="separator:aff5e1b47bb33bc397369183e8d46c088"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab1030345bf4aeefc392d37a33efbf0e0"><td class="memItemLeft" align="right" valign="top"><a id="ab1030345bf4aeefc392d37a33efbf0e0"></a>
+static const usize&#160;</td><td class="memItemRight" valign="bottom"><b>SIZE_LTB25</b> = 113 + 5*4</td></tr>
+<tr class="separator:ab1030345bf4aeefc392d37a33efbf0e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The <a class="el" href="structMasterTriggerEvent.html">MasterTriggerEvent</a> represesnts the information provided by the MTB for this one specific event. Most notably, it includes a board mask, which is the DSI/J connections which triggered, and a hit mask. The hit mask gives hit channels per DSI/J, which correspond to hit channels on a <a class="el" href="structLTB.html">LTB</a>. </p>
