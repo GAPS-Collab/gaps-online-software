@@ -54,11 +54,11 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
   let mut event_id_cache   = VecDeque::<u32>::with_capacity(EVENT_BUILDER_EVID_CACHE_SIZE);
   
   let mut n_received         : usize;
-  let mut clear_cache        = 0; // clear cache every 
-  let mut event_sending      = 0;
+  //let mut clear_cache        = 0; // clear cache every 
+  //let mut event_sending      = 0;
   let mut n_mte_received_tot = 0u64;
   let mut n_rbe_received_tot = 0u64;
-  let mut first_evid         = 0u32;
+  let mut first_evid         : u32;
   let mut last_evid          = 0;
   let mut n_sent             = 0usize;
   let mut n_timed_out        = 0usize; 
@@ -209,7 +209,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
     if true {
       //for ev in event_cache.iter_mut() {
       let this_cache_size = event_id_cache.len();
-      for k in 0..this_cache_size {
+      for _ in 0..this_cache_size {
         // if there wasn't a first element, size would be 0
         let evid = event_id_cache.pop_front().unwrap();
         match event_cache.get(&evid) {
@@ -222,7 +222,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
           //for evid in event_id_cache.iter() {
             //println!("{}",ev.age());
             let ev_timed_out = ev.age() >= settings.te_timeout_sec as u64;
-            let mut cache_it = false;
+            let cache_it : bool;
             if ev_timed_out {
               n_timed_out += 1;
             }
@@ -260,7 +260,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
           }
         }
       }
-      event_sending = 0;
+      //event_sending = 0;
       //event_cache.retain(|ev| ev.valid);
       debug!("Debug timer! EVT SENDING {:?}", debug_timer.elapsed());
     } 

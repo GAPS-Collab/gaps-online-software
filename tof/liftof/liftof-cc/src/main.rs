@@ -33,7 +33,7 @@ use std::{
     time
 };
 use std::path::{
-    //Path,
+    Path,
     PathBuf,
 };
 
@@ -52,7 +52,10 @@ use tof_dataclasses::threading::{
 };
 
 use tof_dataclasses::packets::TofPacket;
-use tof_dataclasses::manifest::ReadoutBoard;
+use tof_dataclasses::manifest::{
+    //ReadoutBoard,
+    get_rbs_from_sqlite
+};
 use tof_dataclasses::DsiLtbRBMapping;
 use tof_dataclasses::commands::TofCommand;
 use tof_dataclasses::commands::TofCommandCode;
@@ -177,13 +180,15 @@ fn main() {
   let mut write_stream_path = config.data_dir;
   let calib_file_path            = config.calibration_dir;
   let runtime_nseconds      = config.runtime_sec;
-  let write_npack_file    = config.packs_per_file;
-  //let db_path             = Path::new(config["db_path"].as_str()  .expect("Need to know where the local sqlite database is stored. Please add 'db_path' to the configuration file!"));
+  let write_npack_file      = config.packs_per_file;
+  let db_path               = Path::new(&config.db_path);
   let mtb_moni_interval     = config.mtb_moni_interval_sec;
   let cpu_moni_interval          = config.cpu_moni_interval_sec;
   let flight_address        = config.fc_pub_address;
-
-  let mut rb_list           = vec![ReadoutBoard::new();50];
+  let mtb_trace_suppression = config.mtb_trace_suppression;
+  let run_analysis_engine   = config.run_analysis_engine;
+  let mut rb_list           = get_rbs_from_sqlite(db_path);
+  //let mut rb_list           = vec![ReadoutBoard::new();50];
   for k in 0..rb_list.len() {
     rb_list[k].rb_id = k as u8 + 1;
   }
@@ -193,6 +198,10 @@ fn main() {
     let bad_rb = rb_ignorelist[k];
     rb_list.retain(|x| x.rb_id != bad_rb);
   }
+  for k in rb_list {
+    println!("{}", k);
+  }
+  exit(0);
   nboards = rb_list.len();
   println!("=> Expecting {} readoutboards!", rb_list.len());
   info!("--> Following RBs are expected:");
@@ -341,16 +350,13 @@ fn main() {
   println!("==> Will now start rb threads..");
 
   for n in 0..nboards {
-    let mut this_rb = rb_list[n].clone();
+    let mut this_rb           = rb_list[n].clone();
     let this_tp_to_sink_clone = tp_to_sink.clone();
-    let cali_fname = this_rb.guess_calibration_filename();
-    this_rb.calib_file = calib_file_path.clone() + &cali_fname;
-    //this_rb.calib_file = calib_file_path.clone() + "/" + "rb";
-    //if this_rb.rb_id < 10 {
-    //  this_rb.calib_file += "0";
-    //}
-    //this_rb.calib_file += &(this_rb.rb_id).to_string();
-    //this_rb.calib_file += "_cal.txt";
+    this_rb.calib_file_path   = calib_file_path.clone();
+    match this_rb.load_latest_calibration() {
+      Err(err) => error!("Unable to load calibration for RB {}! {}", this_rb.rb_id, err),
+      Ok(_)    => ()
+    }
     println!("==> Starting RB thread for {}", this_rb);
     let ev_to_builder_c = ev_to_builder.clone();
     let thread_name = format!("rb-comms-{}", this_rb.rb_id);
@@ -362,7 +368,7 @@ fn main() {
                                 &this_rb,
                                 runid,
                                 false,
-                                true);
+                                run_analysis_engine);
           })
          .expect("Failed to spawn readoutboard-communicator thread!");
   } // end for loop over nboards
@@ -400,7 +406,8 @@ fn main() {
                                         &cmd_sender_2,
                                         &mtb_moni_sender,
                                         mtb_moni_interval,
-                                        60,
+                                        60, // allowed mtb timeout
+                                        mtb_trace_suppression,
                                         false,
                                         false);
           })

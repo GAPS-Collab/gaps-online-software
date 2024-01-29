@@ -6,7 +6,8 @@
 struct TofEventHeader {
   static const u16 HEAD   = 0xAAAA;
   static const u16 TAIL   = 0x5555;
-  static const usize SIZE = 43; 
+  /// fixed size including head and tail
+  static const usize SIZE = 47; 
   
   u32 run_id      ; 
   u32 event_id    ; 

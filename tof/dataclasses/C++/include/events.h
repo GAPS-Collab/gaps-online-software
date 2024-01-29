@@ -28,7 +28,7 @@ class RBCalibration;
 
 #define NCHN 9
 #define NWORDS 1024
-#define N_LTBS 20
+#define N_LTBS 25
 #define N_CHN_PER_LTB 16
 
 struct RBEventHeader;
@@ -295,6 +295,8 @@ struct MasterTriggerEvent {
   static const u16 TAIL = 0x5555;
   /// the struct has a fixed size of SIZE
   static const usize SIZE = 45; // size in bytes
+  static const usize SIZE_LTB20 = 113;
+  static const usize SIZE_LTB25 = 113 + 5*4; 
 
   /// event_id as assigned by the MasterTriggerBoard
   u32 event_id      ; 
@@ -319,6 +321,15 @@ struct MasterTriggerEvent {
   bool valid        ;
 
   MasterTriggerEvent();
+  
+  // FIXME - become a concept
+  // Basically verify that the size of the bytestream
+  // is what we expect. In case where N_LTB is 25 
+  // instead of 20 it will be longer.
+  static usize get_packet_size(const Vec<u8> &stream, 
+                               usize pos,
+                               usize expected_size);
+
 
   /**
    * Factory function for MasterTriggerEvent
@@ -333,7 +344,7 @@ struct MasterTriggerEvent {
    */
   static MasterTriggerEvent from_bytestream(const Vec<u8> &bytestream,
                                             u64 &pos);
-  static void decode_board_mask(u32 mask_number, bool (&decoded_mask)[N_LTBS]); 
+  //static void decode_board_mask(u32 mask_number, bool (&decoded_mask)[N_LTBS]); 
 
   static void decode_hit_mask(u32 mask_number, bool (&hitmask_1)[N_CHN_PER_LTB], bool (&hitmask_2)[N_CHN_PER_LTB]);
 
@@ -350,6 +361,20 @@ struct MasterTriggerEvent {
 
   /// String representation of the struct
   std::string to_string() const;
+
+  private:
+    // a fix for different versions 
+    // of the data. There are some 
+    // whcih have N_LTBS = 20 and 
+    // others which have N_LTBS = 25
+    // we can set this switch so that 
+    // this does not affect us
+    usize n_ltbs_;
+    // let's have another constructor, to get out of the N_LTB
+    // conundrum
+    MasterTriggerEvent(usize n_ltbs);
+
+
 };
 
 

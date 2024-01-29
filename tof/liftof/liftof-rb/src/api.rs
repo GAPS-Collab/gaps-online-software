@@ -213,6 +213,7 @@ pub fn rb_calibration(rc_to_runner    : &Sender<RunConfig>,
 -> Result<(), CalibrationError> {
   warn!("Commencing full RB calibration routine! This will take the board out of datataking for a few minutes!");
   // TODO this should become something that can be read from a local json file
+  let five_seconds   = time::Duration::from_millis(5000);
   let mut run_config = RunConfig {
     runid                   : 0,
     nevents                 : 1300,
@@ -272,7 +273,6 @@ pub fn rb_calibration(rc_to_runner    : &Sender<RunConfig>,
     Ok(_)    => info!("Subscribing to local packages!"),
   }
   // at this point, the zmq socket should be set up!
-  
   run_config.data_type = DataType::Noi; 
   match run_noi_calibration(rc_to_runner, &socket, &mut calibration, run_config) {
     Err(err) => {
@@ -335,8 +335,14 @@ pub fn rb_calibration(rc_to_runner    : &Sender<RunConfig>,
   // Do this only with the full calib
   calibration.calibrate()?;
   println!("Calibration : {}", calibration);
-
-  // Send it
+  // now it just needs to be send to 
+  // the publisher
+  //for k in 0..10 {
+  //  println!("cali vcal  {}", calibration.v_offsets[0][k]);
+  //  println!("cali vincs {}", calibration.v_inc[0][k]);
+  //  println!("cali vdips {}", calibration.v_dips[0][k]);
+  //  println!("cali tbins {}", calibration.tbin[0][k]);
+  //}
   let calib_pack = TofPacket::from(&calibration);
   match tp_to_publisher.send(calib_pack) {
     Err(err) => {
