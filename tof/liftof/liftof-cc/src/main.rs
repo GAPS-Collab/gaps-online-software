@@ -66,7 +66,8 @@ use liftof_lib::{
 use liftof_cc::threads::{readoutboard_communicator,
                          event_builder,
                          global_data_sink,
-                         monitor_cpu };
+                         monitor_cpu,
+                         fligh_cpu_listener};
 use liftof_cc::settings::{
     LiftofCCSettings,
 };
@@ -82,7 +83,7 @@ struct LiftofCCArgs {
   #[arg(short, long, default_value_t = false)]
   write_stream: bool,
   /// Define a run id for later identification
-  #[arg(short, long)]
+  #[arg(short, long, default_value_t = 0)]
   run_id: usize,
   /// More detailed output for debugging
   #[arg(short, long, default_value_t = false)]
@@ -175,14 +176,14 @@ fn main() {
   info!("Will connect to the master trigger board at {}!", mtb_address);
  
   // FIXME
-  let runid                 = args.run_id;
+  let runid               = args.run_id;
   let mut write_stream_path = config.data_dir;
-  let calib_file_path       = config.calibration_dir;
+  let calib_file_path            = config.calibration_dir;
   let runtime_nseconds      = config.runtime_sec;
-  let write_npack_file      = config.packs_per_file;
+  let write_npack_file    = config.packs_per_file;
   //let db_path             = Path::new(config["db_path"].as_str()  .expect("Need to know where the local sqlite database is stored. Please add 'db_path' to the configuration file!"));
   let mtb_moni_interval     = config.mtb_moni_interval_sec;
-  let cpu_moni_interval     = config.cpu_moni_interval_sec;
+  let cpu_moni_interval          = config.cpu_moni_interval_sec;
   let flight_address        = config.fc_pub_address;
 
   let mut rb_list           = vec![ReadoutBoard::new();50];
@@ -430,6 +431,19 @@ fn main() {
 
   let cmd_sender_c = cmd_sender.clone();
   match args.command {
+    Command::Listen(_) => {
+      let _cmd_interval: u64 = 1000;
+      let _flight_cpu_listener = thread::Builder::new()
+                    .name("flight-cpu-listener".into())
+                    .spawn(move || {
+                                    flight_cpu_listener(flight_address,
+                                                        incoming,
+                                                        outgoing,
+                                                        _cmd_interval,
+                                                        thread_control);
+                    })
+                    .expect("Failed to spawn flight-cpu-listener thread!");
+    },
     Command::Ping(ping_cmd) => {
       match ping_cmd.component {
         TofComponent::TofCpu => liftof_cc::send_ping_response(cmd_sender_c, socket),

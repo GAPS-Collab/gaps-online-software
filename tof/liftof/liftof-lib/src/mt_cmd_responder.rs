@@ -43,17 +43,18 @@ use tof_dataclasses::threading::ThreadControl;
 use crate::control::{get_board_id_string,
                      get_board_id};
 
-/// Centrailized command management
+/// Centralized command management
 /// 
-/// Maintain 0MQ command connection and faciliate 
+/// Maintain 0MQ command connection and facilitate 
 /// forwarding of commands and responses
 ///
 /// # Arguments
 ///
-/// * cmd_server_ip             : The IP addresss of the C&C server we are listening to.
-/// * ev_request_to_cache       : When receiveing RBCommands which contain requests,
-///                               forward them to event processing.
-pub fn cmd_responder(cmd_server_ip             : String,
+/// * mt_address                : address of the MTB.
+/// * cmd_server_ip             : The IP address of the C&C server we are listening to.
+/// * ev_request_to_cache       : When receiving commands for MTB which contain requests.
+pub fn cmd_responder(mt_address                : String,
+                     cmd_server_ip             : String,
                      ev_request_to_cache       : &Sender<TofPacket>,
                      thread_control            : Arc<Mutex<ThreadControl>>) {
   // create 0MQ sockedts
@@ -138,45 +139,28 @@ pub fn cmd_responder(cmd_server_ip             : String,
                       TofCommand::Ping (value) => {
                         // MSB third 8 bits are 
                         let tof_component: TofComponent = TofComponent::from(((value | MASK_CMD_8BIT << 8) >> 8) as u8);
-                        // MSB fourth 8 bits are 
-                        let id: u8 = (value | MASK_CMD_8BIT) as u8;
+                        let socket = connect_to_mtb(mt_address) 
 
                         let return_val;
                         if tof_component != TofComponent::MT {
                           // The packet was not for the MT so bye
                           continue;
                         } else {
-                          match tof_component {
-                            TofComponent::RB => {
-                              info!("Received moni command");
-                              let mut tp = TofPacket::new();
-                              tp.packet_type = PacketType::Ping;
-                              // TODO what do we want here
-                              tp.payload = vec![TofComponent::RB as u8, rb_id];
+                          info!("MTB received ping command");
+                          let mut tp = TofPacket::new();
+                          tp.packet_type = PacketType::Ping;
+                          
+                          tp.payload = vec![TofComponent::MT as u8, 0u8];
 
-                              match ev_request_to_cache.send(tp) {
-                                Err(err) => {
-                                  error!("TofCpu moni sending failed! Err {}", err);
-                                  return_val = Err(SetError::CanNotConnectToMyOwnZMQSocket);
-                                }
-                                Ok(_)    => {
-                                  return_val = Ok(());
-                                }
-                              };
-                            },
-                            TofComponent::PB  => {
-                              return_val = Err(SetError::EmptyInputData);
-                              warn!("Not implemented for PB yet")
-                            },
-                            TofComponent::LTB => {
-                              return_val = Err(SetError::EmptyInputData);
-                              warn!("Not implemented for LTB yet")
-                            },
-                            _                 => {
-                              return_val = Err(SetError::EmptyInputData);
-                              error!("An RB can control just PBs and LTBs.")
+                          match ev_request_to_cache.send(tp) {
+                            Err(err) => {
+                              error!("TofCpu ping sending failed! Err {}", err);
+                              return_val = Err(SetError::CanNotConnectToMyOwnZMQSocket);
                             }
-                          }
+                            Ok(_)    => {
+                              return_val = Ok(());
+                            }
+                          };
 
                           match return_val {
                             Err(_) => {

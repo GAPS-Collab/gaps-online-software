@@ -223,7 +223,10 @@ pub fn send_ping_response(cmd_sender: Sender<TofPacket>,
   tp.packet_type = PacketType::Ping;
   tp.payload = vec![TofComponent::TofCpu as u8, 0u8];
   match cmd_sender.send(tp) {
-    Err(err) => error!("TofCpu ping sending failed! Err {}", err),
+    Err(err) => {
+      error!("TofCpu ping sending failed! Err {}", err);
+      return_val = Err(SetError::CanNotConnectToMyOwnZMQSocket);
+    },
     Ok(_)    => () 
   }
 
@@ -277,4 +280,15 @@ pub fn send_systemd_reboot(cmd_sender: Sender<TofPacket>,
     Err(err) => error!("Unable to send command, error{err}"),
     Ok(_)    => ()
   }
+}
+
+pub fn prefix_tof_cpu(input : &mut Vec<u8>) -> Vec<u8> {
+  let mut bytestream : Vec::<u8>;
+  let tof_cpu : String;
+  tof_cpu = String::from("TOFCPU")  + &tof_cpu.to_string();
+  //let mut response = 
+  bytestream = tof_cpu.as_bytes().to_vec();
+  //bytestream.append(&mut resp.to_bytestream());
+  bytestream.append(input);
+  bytestream
 }

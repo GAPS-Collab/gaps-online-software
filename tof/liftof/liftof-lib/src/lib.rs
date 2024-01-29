@@ -705,6 +705,8 @@ pub fn to_board_id_string(rb_id: u32) -> String {
 #[derive(Debug, Parser, PartialEq)]
 pub enum Command {
   /// Ping a TOF sub-system.
+  Listen(ListenCmd),
+  /// Ping a TOF sub-system.
   Ping(PingCmd),
   /// Monitor a TOF sub-system.
   Moni(MoniCmd),
@@ -739,6 +741,9 @@ pub enum CommandRB {
 }
 
 /// TOF SW cmds ====================================================
+#[derive(Debug, Args, PartialEq)]
+pub struct ListenCmd { }
+
 #[derive(Debug, Args, PartialEq)]
 pub struct PingCmd {
   /// Component to target
