@@ -152,9 +152,16 @@ pub fn cmd_responder(cmd_server_ip             : String,
                     match cmd {
                       TofCommand::Unknown (_) => {
                         info!("Received unknown command");
+                        error!("Cannot interpret unknown command");
                         return_val = Err(CmdError::UnknownError);
                       },
+                      TofCommand::Listen (_) => {
+                        info!("Received listen command");
+                        error!("Listening inception!");
+                        return_val = Err(CmdError::ListenError);
+                      },
                       TofCommand::Ping (value) => {
+                        info!("Received ping command");
                         // MSB third 8 bits are 
                         let tof_component: TofComponent = TofComponent::from(((value | MASK_CMD_8BIT << 8) >> 8) as u8);
                         // MSB fourth 8 bits are 
@@ -277,7 +284,7 @@ pub fn cmd_responder(cmd_server_ip             : String,
                         }
                       },
                       TofCommand::Power   (value) => {
-                        info!("Received set threshold command! Will communicate to LTBs");
+                        info!("Received power command");
                         // MSB second 8 bits are tof component
                         let tof_component: TofComponent = TofComponent::from(((value | (MASK_CMD_8BIT << 16)) >> 16) as u8);
                         // MSB third 8 bits are 

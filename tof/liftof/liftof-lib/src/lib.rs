@@ -704,7 +704,7 @@ pub fn to_board_id_string(rb_id: u32) -> String {
 /// Command Enums and stucts
 #[derive(Debug, Parser, PartialEq)]
 pub enum Command {
-  /// Ping a TOF sub-system.
+  /// Listen for flight CPU commands.
   Listen(ListenCmd),
   /// Ping a TOF sub-system.
   Ping(PingCmd),

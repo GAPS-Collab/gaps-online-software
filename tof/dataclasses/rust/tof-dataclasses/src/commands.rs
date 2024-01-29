@@ -86,7 +86,9 @@ pub enum TofCommandCode {
   CmdTriggerModeForcedMTB    = 25u8,
 
   /// command code for restarting systemd
-  CmdSystemdReboot           = 60u8
+  CmdSystemdReboot           = 60u8,
+  /// command code for putting liftof-cc in listening mode
+  CmdListen                  = 70u8
 }
 
 impl fmt::Display for TofCommandCode {
@@ -448,6 +450,7 @@ pub enum TofCommand {
   TriggerModeForced       (u32),
   TriggerModeForcedMTB    (u32),
   SystemdReboot           (u32),
+  Listen                  (u32),
 }
 
 impl fmt::Display for TofCommand {
@@ -542,6 +545,7 @@ impl TofCommand {
       TofCommand::TriggerModeForced       (data) => { value = *data;},
       TofCommand::TriggerModeForcedMTB    (data) => { value = *data;},
       TofCommand::SystemdReboot           (data) => { value = *data;},
+      TofCommand::Listen                  (data) => { value = *data;}
     }
     value
   }  
@@ -569,7 +573,8 @@ impl TofCommand {
       TofCommandCode::CmdSetRBDataBufSize        => TofCommand::SetRBDataBufSize        (0u32),
       TofCommandCode::CmdTriggerModeForced       => TofCommand::TriggerModeForced       (0u32),
       TofCommandCode::CmdTriggerModeForcedMTB    => TofCommand::TriggerModeForcedMTB    (0u32),
-      TofCommandCode::CmdSystemdReboot           => TofCommand::SystemdReboot           (0u32)
+      TofCommandCode::CmdSystemdReboot           => TofCommand::SystemdReboot           (0u32),
+      TofCommandCode::CmdListen                  => TofCommand::Listen                  (0u32)
     }
   }
     
@@ -595,7 +600,8 @@ impl TofCommand {
       TofCommand::SetRBDataBufSize        (_) => Some(TofCommandCode::CmdSetRBDataBufSize),
       TofCommand::TriggerModeForced       (_) => Some(TofCommandCode::CmdTriggerModeForced),
       TofCommand::TriggerModeForcedMTB    (_) => Some(TofCommandCode::CmdTriggerModeForcedMTB),
-      TofCommand::SystemdReboot           (_) => Some(TofCommandCode::CmdSystemdReboot)
+      TofCommand::SystemdReboot           (_) => Some(TofCommandCode::CmdSystemdReboot),
+      TofCommand::Listen                  (_) => Some(TofCommandCode::CmdListen)
     }
   }
 
@@ -660,7 +666,8 @@ impl FromRandom for TofCommand {
       TofCommand::SetRBDataBufSize        (val),
       TofCommand::TriggerModeForced       (val),
       TofCommand::TriggerModeForcedMTB    (val),
-      TofCommand::SystemdReboot           (val)
+      TofCommand::SystemdReboot           (val),
+      TofCommand::Listen                  (val)
     ];
     let idx = rng.gen_range(0..choices.len());
     choices[idx]

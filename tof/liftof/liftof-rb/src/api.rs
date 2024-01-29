@@ -429,8 +429,8 @@ pub fn rb_noi_subcalibration(rc_to_runner    : &Sender<RunConfig>,
 
 // Noi -> Voltage chain and publish.
 pub fn rb_voltage_subcalibration(rc_to_runner    : &Sender<RunConfig>,
-                                     tp_to_publisher : &Sender<TofPacket>,
-                                     voltage_level   : u16) // where do we put this bad boi?
+                                 tp_to_publisher : &Sender<TofPacket>,
+                                 voltage_level   : u16) // where do we put this bad boi?
 -> Result<(), CalibrationError> {
   warn!("Commencing RB no input + voltage sub-calibration routine! This will take the board out of datataking for a few minutes!");
   // TODO this should become something that can be read from a local json file
