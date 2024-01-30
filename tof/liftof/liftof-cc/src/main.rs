@@ -594,7 +594,7 @@ fn main() {
     thread::sleep(1*one_minute);
     println!("...");
     // I think the main shouldn't die if we are in listening mode
-    if run_continuously || program_start.elapsed().as_secs_f64() > runtime_nseconds as f64 {
+    if !run_continuously || program_start.elapsed().as_secs_f64() > runtime_nseconds as f64 {
       println!("=> Runtime seconds of {} have expired!", runtime_nseconds);
       println!("=> Ending program. If you don't want that behaviour, change the confifguration file.");
       exit(0);    
