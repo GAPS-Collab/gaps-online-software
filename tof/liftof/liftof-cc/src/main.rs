@@ -443,7 +443,7 @@ fn main() {
 
   let return_val: Result<TofCommandCode, CmdError>;
   let cmd_sender_c = cmd_sender.clone();
-  let mut run_continuously = false;
+  let mut dont_stop = false;
   match args.command {
     Command::Listen(_) => {
       let _flight_address_c = flight_address.clone();
@@ -461,7 +461,7 @@ fn main() {
                                                         _thread_control_c);
                     })
                     .expect("Failed to spawn flight-cpu-listener thread!");
-      run_continuously = true;
+      dont_stop = true;
       return_val = Ok(TofCommandCode::CmdListen);
     },
     Command::Ping(ping_cmd) => {
@@ -594,7 +594,9 @@ fn main() {
     thread::sleep(1*one_minute);
     println!("...");
     // I think the main shouldn't die if we are in listening mode
-    if !run_continuously || program_start.elapsed().as_secs_f64() > runtime_nseconds as f64 {
+    if dont_stop {
+      continue;
+    } else if program_start.elapsed().as_secs_f64() > runtime_nseconds as f64 {
       println!("=> Runtime seconds of {} have expired!", runtime_nseconds);
       println!("=> Ending program. If you don't want that behaviour, change the confifguration file.");
       exit(0);    
