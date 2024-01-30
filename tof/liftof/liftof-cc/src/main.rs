@@ -198,10 +198,10 @@ fn main() {
     let bad_rb = rb_ignorelist[k];
     rb_list.retain(|x| x.rb_id != bad_rb);
   }
-  for k in rb_list {
+  let rb_list_c = rb_list.clone();
+  for k in rb_list_c {
     println!("{}", k);
   }
-  exit(0);
   nboards = rb_list.len();
   println!("=> Expecting {} readoutboards!", rb_list.len());
   info!("--> Following RBs are expected:");
