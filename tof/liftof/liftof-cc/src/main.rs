@@ -95,6 +95,9 @@ struct LiftofCCArgs {
   /// A json file wit the ltb(dsi, j, ch) -> rb_id, rb_ch mapping.
   #[arg(long)]
   json_ltb_rb_map : Option<PathBuf>,
+  /// For cmd debug purposes
+  #[arg(short, long)]
+  only_cmd : bool,
   /// List of possible commands
   #[command(subcommand)]
   command: Command,
@@ -307,137 +310,140 @@ fn main() {
 
   let thread_control = Arc::new(Mutex::new(ThreadControl::new()));
 
-  if cpu_moni_interval > 0 {
-    println!("==> Starting main monitoring thread...");
-    let tp_to_sink_c = tp_to_sink.clone();
-    let _thread_control_c = thread_control.clone();
-    // this is anonymus, but we control the thread
-    // through the thread control mechanism, so we
-    // can still end it.
-    let _cpu_moni_thread = thread::Builder::new()
-         .name("cpu-monitoring".into())
-         .spawn(move || {
-           monitor_cpu(
-             tp_to_sink_c,
-             cpu_moni_interval,
-             _thread_control_c,
-             verbose)
-          })
-         .expect("Failed to spawn cpu-monitoring thread!");
-  }
-
-  write_stream_path = String::from(stream_files_path.into_os_string().into_string().expect("Somehow the paths are messed up very badly! So I can't help it and I quit!"));
-
-  // this is the tailscale address
-  //let flight_address = format!("tcp://100.101.96.10:{}", DATAPORT);
-  // this is the address in the flight network
-  // flight_address = format!("tcp://10.0.1.1:{}", DATAPORT);
-  println!("==> Starting data sink thread!");
-  let flight_address_c = flight_address.clone();
-  let _data_sink_thread = thread::Builder::new()
-       .name("data-sink".into())
-       .spawn(move || {
-         global_data_sink(&tp_from_client,
-                          &flight_address_c,
-                          write_stream,
-                          write_stream_path,
-                          write_npack_file,
-                          runid,
-                          verbose);
-        })
-       .expect("Failed to spawn data-sink thread!");
-  println!("==> data sink thread started!");
-  println!("==> Will now start rb threads..");
-
-  for n in 0..nboards {
-    let mut this_rb           = rb_list[n].clone();
-    let this_tp_to_sink_clone = tp_to_sink.clone();
-    this_rb.calib_file_path   = calib_file_path.clone();
-    match this_rb.load_latest_calibration() {
-      Err(err) => error!("Unable to load calibration for RB {}! {}", this_rb.rb_id, err),
-      Ok(_)    => ()
-    }
-    println!("==> Starting RB thread for {}", this_rb);
-    let ev_to_builder_c = ev_to_builder.clone();
-    let thread_name = format!("rb-comms-{}", this_rb.rb_id);
-    let _rb_comm_thread = thread::Builder::new()
-         .name(thread_name)
-         .spawn(move || {
-      readoutboard_communicator(&ev_to_builder_c,
-                                this_tp_to_sink_clone,
-                                &this_rb,
-                                runid,
-                                false,
-                                run_analysis_engine);
-          })
-         .expect("Failed to spawn readoutboard-communicator thread!");
-  } // end for loop over nboards
-  println!("==> All RB threads started!");
-  
-  let one_second = time::Duration::from_millis(1000);
-  let cmd_receiver_c = cmd_receiver.clone();
-  println!("==> Starting RB commander thread!");
-    let _rb_cmd_thread = thread::Builder::new()
-         .name("rb-commander".into())
-         .spawn(move || {
-            readoutboard_commander(&cmd_receiver_c);
-          })
-         .expect("Failed to spawn rb-commander thread!");
-  // start the event builder thread
-  println!("==> Starting event builder and master trigger threads...");
-  let cmd_sender_2 = cmd_sender.clone();
-  let settings = config.event_builder_settings;
-    let _evb_thread = thread::Builder::new()
-         .name("cpu-monitoring".into())
-         .spawn(move || {
-                         event_builder(&master_ev_rec,
-                                       &ev_from_rb,
-                                       &tp_to_sink,
-                                       settings);
-          })
-         .expect("Failed to spawn cpu-monitoring thread!");
-  // master trigger
-    let _mtb_thread = thread::Builder::new()
-         .name("master-trigger".into())
-         .spawn(move || {
-                         master_trigger(mtb_address, 
-                                        &ltb_rb_map,
-                                        &master_ev_send,
-                                        &cmd_sender_2,
-                                        &mtb_moni_sender,
-                                        mtb_moni_interval,
-                                        60, // allowed mtb timeout
-                                        mtb_trace_suppression,
-                                        false,
-                                        false);
-          })
-         .expect("Failed to spawn cpu-monitoring thread!");
-
   let one_minute = time::Duration::from_millis(60000);
-  
-  println!("==> Sleeping 10 seconds to give the rb's a chance to fire up..");
-  thread::sleep(10*one_second);
-  println!("==> Sleeping done!");
-
-  // set the handler for SIGINT
-  let cmd_sender_1 = cmd_sender.clone();
-  ctrlc::set_handler(move || {
-    println!("==> \u{1F6D1} received Ctrl+C! We will stop triggers and end the run!");
-    let end_run =
-      TofCommand::from_command_code(TofCommandCode::CmdDataRunStop,0u32);
-    let tp = TofPacket::from(&end_run);
-    match cmd_sender_1.send(tp) {
-     Err(err) => error!("Can not send end run command! {err}"),
-     Ok(_)    => ()
+  let only_cmd = args.only_cmd;
+  if !only_cmd {
+    if cpu_moni_interval > 0 {
+      println!("==> Starting main monitoring thread...");
+      let tp_to_sink_c = tp_to_sink.clone();
+      let _thread_control_c = thread_control.clone();
+      // this is anonymus, but we control the thread
+      // through the thread control mechanism, so we
+      // can still end it.
+      let _cpu_moni_thread = thread::Builder::new()
+          .name("cpu-monitoring".into())
+          .spawn(move || {
+            monitor_cpu(
+              tp_to_sink_c,
+              cpu_moni_interval,
+              _thread_control_c,
+              verbose)
+            })
+          .expect("Failed to spawn cpu-monitoring thread!");
     }
-    thread::sleep(one_second);
-    println!(">> So long and thanks for all the \u{1F41F} <<"); 
-    exit(0);
-  })
-  .expect("Error setting Ctrl-C handler");
+
+    write_stream_path = String::from(stream_files_path.into_os_string().into_string().expect("Somehow the paths are messed up very badly! So I can't help it and I quit!"));
+
+    // this is the tailscale address
+    //let flight_address = format!("tcp://100.101.96.10:{}", DATAPORT);
+    // this is the address in the flight network
+    // flight_address = format!("tcp://10.0.1.1:{}", DATAPORT);
+    println!("==> Starting data sink thread!");
+    let flight_address_c = flight_address.clone();
+    let _data_sink_thread = thread::Builder::new()
+        .name("data-sink".into())
+        .spawn(move || {
+          global_data_sink(&tp_from_client,
+                            &flight_address_c,
+                            write_stream,
+                            write_stream_path,
+                            write_npack_file,
+                            runid,
+                            verbose);
+          })
+        .expect("Failed to spawn data-sink thread!");
+    println!("==> data sink thread started!");
+    println!("==> Will now start rb threads..");
+
+    for n in 0..nboards {
+      let mut this_rb           = rb_list[n].clone();
+      let this_tp_to_sink_clone = tp_to_sink.clone();
+      this_rb.calib_file_path   = calib_file_path.clone();
+      match this_rb.load_latest_calibration() {
+        Err(err) => error!("Unable to load calibration for RB {}! {}", this_rb.rb_id, err),
+        Ok(_)    => ()
+      }
+      println!("==> Starting RB thread for {}", this_rb);
+      let ev_to_builder_c = ev_to_builder.clone();
+      let thread_name = format!("rb-comms-{}", this_rb.rb_id);
+      let _rb_comm_thread = thread::Builder::new()
+          .name(thread_name)
+          .spawn(move || {
+        readoutboard_communicator(&ev_to_builder_c,
+                                  this_tp_to_sink_clone,
+                                  &this_rb,
+                                  runid,
+                                  false,
+                                  run_analysis_engine);
+            })
+          .expect("Failed to spawn readoutboard-communicator thread!");
+    } // end for loop over nboards
+    println!("==> All RB threads started!");
+    
+    let one_second = time::Duration::from_millis(1000);
+    let cmd_receiver_c = cmd_receiver.clone();
+    println!("==> Starting RB commander thread!");
+      let _rb_cmd_thread = thread::Builder::new()
+          .name("rb-commander".into())
+          .spawn(move || {
+              readoutboard_commander(&cmd_receiver_c);
+            })
+          .expect("Failed to spawn rb-commander thread!");
+    // start the event builder thread
+    println!("==> Starting event builder and master trigger threads...");
+    let cmd_sender_2 = cmd_sender.clone();
+    let settings = config.event_builder_settings;
+      let _evb_thread = thread::Builder::new()
+          .name("cpu-monitoring".into())
+          .spawn(move || {
+                          event_builder(&master_ev_rec,
+                                        &ev_from_rb,
+                                        &tp_to_sink,
+                                        settings);
+            })
+          .expect("Failed to spawn cpu-monitoring thread!");
+    // master trigger
+      let _mtb_thread = thread::Builder::new()
+          .name("master-trigger".into())
+          .spawn(move || {
+                          master_trigger(mtb_address, 
+                                          &ltb_rb_map,
+                                          &master_ev_send,
+                                          &cmd_sender_2,
+                                          &mtb_moni_sender,
+                                          mtb_moni_interval,
+                                          60, // allowed mtb timeout
+                                          mtb_trace_suppression,
+                                          false,
+                                          false);
+            })
+          .expect("Failed to spawn cpu-monitoring thread!");
+    
+    println!("==> Sleeping 10 seconds to give the rb's a chance to fire up..");
+    thread::sleep(10*one_second);
+    println!("==> Sleeping done!");
+
+    // set the handler for SIGINT
+    let cmd_sender_1 = cmd_sender.clone();
+    ctrlc::set_handler(move || {
+      println!("==> \u{1F6D1} received Ctrl+C! We will stop triggers and end the run!");
+      let end_run =
+        TofCommand::from_command_code(TofCommandCode::CmdDataRunStop,0u32);
+      let tp = TofPacket::from(&end_run);
+      match cmd_sender_1.send(tp) {
+      Err(err) => error!("Can not send end run command! {err}"),
+      Ok(_)    => ()
+      }
+      thread::sleep(one_second);
+      println!(">> So long and thanks for all the \u{1F41F} <<"); 
+      exit(0);
+    })
+    .expect("Error setting Ctrl-C handler");
+  }
 
   let return_val: Result<TofCommandCode, CmdError>;
   let cmd_sender_c = cmd_sender.clone();
+  let mut run_continuously = false;
   match args.command {
     Command::Listen(_) => {
       let _flight_address_c = flight_address.clone();
@@ -455,6 +461,7 @@ fn main() {
                                                         _thread_control_c);
                     })
                     .expect("Failed to spawn flight-cpu-listener thread!");
+      run_continuously = true;
       return_val = Ok(TofCommandCode::CmdListen);
     },
     Command::Ping(ping_cmd) => {
@@ -586,7 +593,8 @@ fn main() {
     //cmd_sender.send(start_run);
     thread::sleep(1*one_minute);
     println!("...");
-    if program_start.elapsed().as_secs_f64() > runtime_nseconds as f64 {
+    // I think the main shouldn't die if we are in listening mode
+    if run_continuously || program_start.elapsed().as_secs_f64() > runtime_nseconds as f64 {
       println!("=> Runtime seconds of {} have expired!", runtime_nseconds);
       println!("=> Ending program. If you don't want that behaviour, change the confifguration file.");
       exit(0);    
