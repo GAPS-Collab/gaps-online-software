@@ -410,7 +410,9 @@ pub fn find_peaks_zscore(nanoseconds    : &Vec<f32>,
       peak_high.push(k.0);
     }
   }
-  peaks = find_sequence_ranges(peak_high); 
+  if peaks.len() > 0 {
+    peaks = find_sequence_ranges(peak_high); 
+  }
   Ok(peaks)
 }
 
