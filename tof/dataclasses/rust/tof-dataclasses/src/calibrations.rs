@@ -1077,7 +1077,8 @@ impl RBCalibrations {
   pub fn new(rb_id : u8) -> Self {
     // FIXME
     let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap_or(Duration::from_secs(0));
-    let timestamp = now.as_secs() as u32;
+    //let timestamp = now.as_secs() as u32;
+    let timestamp = 0;
     Self {
       rb_id     : rb_id,
       d_v       : 182.0, // FIXME - this needs to be a constant
@@ -1355,7 +1356,7 @@ impl fmt::Display for RBCalibrations {
     let datetime_utc: DateTime<Utc> = Utc.timestamp(self.timestamp as i64, 0);
     let timestamp_str = datetime_utc.format("%Y/%m/%d %H:%M:%S").to_string();
     write!(f, 
-  "<ReadoutboardCalibration [{}]:
+  "<ReadoutboardCalibration [{} UTC]:
       RB             : {}
       VCalData       : {} (events)
       TCalData       : {} (events)
