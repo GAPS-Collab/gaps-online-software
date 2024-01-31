@@ -721,10 +721,10 @@ impl RBCalibrations {
       for ev in 0..traces[ch].len() {
         for n in 0..traces[ch][ev].len() {
           let mut dval : f32;
-          if n == 0 {
+          if n == traces[ch][ev].len() - 1 {
             dval = rolled_traces[ch][ev][0] - rolled_traces[ch][ev][traces[ch][ev].len() -1];
           } else {
-            dval = rolled_traces[ch][ev][n] - rolled_traces[ch][ev][n-1];      
+            dval = rolled_traces[ch][ev][n + 1] - rolled_traces[ch][ev][n];      
           }
           match edge {
             Edge::Rising | Edge::Average => {
