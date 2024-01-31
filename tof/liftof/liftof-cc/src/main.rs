@@ -85,7 +85,7 @@ struct LiftofCCArgs {
   #[arg(short, long, default_value_t = false)]
   write_stream: bool,
   /// Define a run id for later identification
-  #[arg(short, long)]
+  #[arg(short, long, default_value_t=0)]
   run_id: usize,
   /// More detailed output for debugging
   #[arg(short, long, default_value_t = false)]
@@ -124,9 +124,6 @@ fn main() {
   println!(" >> This is the Command&Control server");
   println!(" >> It connects to the MasterTriggerBoard and the ReadoutBoards");
   
-  // deal with command line arguments
-  let args = LiftofCCArgs::parse();
-  let verbose = args.verbose;
   // log testing
   //error!("error");
   //warn!("warn");
@@ -134,17 +131,13 @@ fn main() {
   //debug!("debug");
   //trace!("trace");
  
-  let write_stream = args.write_stream;
-  if write_stream {
-    info!("Will write the entire stream to files");
-  }
 
+  // deal with command line arguments
   let config          : LiftofCCSettings;
   let nboards         : usize;
-
-  //let foo_settings = LiftofCCSettings::new();
-  //foo_settings.to_toml(String::from("foo"));
-  //exit(0);
+  
+  let args = LiftofCCArgs::parse();
+  let verbose = args.verbose;
 
   match args.config {
     None => panic!("No config file provided! Please provide a config file with --config or -c flag!"),
@@ -174,19 +167,24 @@ fn main() {
     }
   }
 
-  let mtb_address           = config.mtb_address;
+  let mtb_address           = config.mtb_address.clone();
   info!("Will connect to the master trigger board at {}!", mtb_address);
  
   // FIXME
   let runid                 = args.run_id;
-  let mut write_stream_path = config.data_dir;
-  let calib_file_path       = config.calibration_dir;
+  let write_stream          = args.write_stream;
+  if write_stream && runid == 0 {
+    panic!("Writing data to disk requires a run id != 0! Please specify runid through the --run_id parameter!");
+  }
+  // clone the strings, so we can save the config later
+  let mut write_stream_path = config.data_dir.clone();
+  let calib_file_path       = config.calibration_dir.clone();
   let runtime_nseconds      = config.runtime_sec;
   let write_npack_file      = config.packs_per_file;
   let db_path               = Path::new(&config.db_path);
   let mtb_moni_interval     = config.mtb_moni_interval_sec;
   let cpu_moni_interval     = config.cpu_moni_interval_sec;
-  let flight_address        = config.fc_pub_address;
+  let flight_address        = config.fc_pub_address.clone();
   let mtb_trace_suppression = config.mtb_trace_suppression;
   let run_analysis_engine   = config.run_analysis_engine;
   let mut rb_list           = get_rbs_from_sqlite(db_path);
@@ -200,15 +198,15 @@ fn main() {
     let bad_rb = rb_ignorelist[k];
     rb_list.retain(|x| x.rb_id != bad_rb);
   }
-  for k in rb_list {
-    println!("{}", k);
-  }
-  exit(0);
   nboards = rb_list.len();
   println!("=> Expecting {} readoutboards!", rb_list.len());
   info!("--> Following RBs are expected:");
   for rb in &rb_list {
+    //rb.load_latest_calibration();
     info!("     -{}", rb);
+    if verbose {
+      println!("{}", rb);
+    }
   }
 
   // A global kill timer
@@ -232,6 +230,12 @@ fn main() {
         Err(err) => panic!("Failed to create directory: {}! {}", stream_files_path.display(), err),
       }
     }
+    // Write the settings to the directory where 
+    // we want to save the run to
+    let settings_fname = format!("{}/run{}.toml",stream_files_path.display(), runid); 
+    println!("=> Writing data to {}!", stream_files_path.display());
+    println!("=> Writing settings to {}!", settings_fname);
+    config.to_toml(settings_fname);
   }
   //let matches = command!() // requires `cargo` feature
   //     //.arg(arg!([name] "Optional name to operate on"))
@@ -287,8 +291,6 @@ fn main() {
   //}
 
   println!(" .. .. .. .. .. .. .. ..");
-  
-
   // prepare channels for inter thread communications
  
   let (tp_to_sink, tp_from_client) : (cbc::Sender<TofPacket>, cbc::Receiver<TofPacket>) = cbc::unbounded();
@@ -353,9 +355,11 @@ fn main() {
     let mut this_rb           = rb_list[n].clone();
     let this_tp_to_sink_clone = tp_to_sink.clone();
     this_rb.calib_file_path   = calib_file_path.clone();
-    match this_rb.load_latest_calibration() {
-      Err(err) => error!("Unable to load calibration for RB {}! {}", this_rb.rb_id, err),
-      Ok(_)    => ()
+    if run_analysis_engine { 
+      match this_rb.load_latest_calibration() {
+        Err(err) => error!("Unable to load calibration for RB {}! {}", this_rb.rb_id, err),
+        Ok(_)    => ()
+      }
     }
     println!("==> Starting RB thread for {}", this_rb);
     let ev_to_builder_c = ev_to_builder.clone();
