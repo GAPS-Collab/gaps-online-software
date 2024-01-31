@@ -410,6 +410,8 @@ pub fn waveform_analysis(event         : &mut RBEvent,
   let mut pid        : u8;
   // will become a parameter
   let fit_sinus = true;
+  
+  // FIXME - don't do this per every event
   for raw_ch in channels {
     if raw_ch == 8 {
       continue;
@@ -437,6 +439,11 @@ pub fn waveform_analysis(event         : &mut RBEvent,
   // second loop over channels. Now we have
   // all the paddles set up in the hashmap
   for raw_ch in channels_c {
+    if event.adc[raw_ch as usize].len() == 0 {
+      // we are most likely running in trace suppression mode, 
+      // this channel is simply not populated
+      continue;
+    }
     if raw_ch == 8 {
       if fit_sinus {
         // +1 channel convention

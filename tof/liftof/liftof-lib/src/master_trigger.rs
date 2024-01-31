@@ -244,7 +244,10 @@ pub fn get_mtevent(socket  : &UdpSocket,
                         //address,
                         0x13 , buffer) {
       Err(err) => {
-        error!("Timeout in read_register for MTB! {err}");
+        // A timeout does not ncecessarily mean that there 
+        // is no event, it can also just mean that 
+        // the rate is low.
+        debug!("Timeout in read_register for MTB! {err}");
         continue;
       },
       Ok(_n_words) => {
