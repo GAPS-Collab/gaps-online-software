@@ -591,7 +591,8 @@ impl ReadoutBoard {
         }
         if let Some(caps) = re.captures(&filename) {
           if let Some(timestamp_str) = caps.get(0).map(|m| m.as_str()) {
-            let timestamp = NaiveDateTime::parse_from_str(timestamp_str, "%Y_%m_%d_%H_%M")?;
+            println!("{}",timestamp_str);
+            let timestamp = NaiveDateTime::parse_from_str(timestamp_str, "%Y_%m_%d-%H_%M_%S")?;
             if timestamp > newest_file.1 {
               newest_file.1 = timestamp;
               newest_file.0 = filename.clone();
@@ -604,8 +605,9 @@ impl ReadoutBoard {
     if newest_file.0.is_empty() {
       error!("No matching calibration available for board {}!", self.rb_id);
     } else {
-      println!("==> Loading calibration from file: {}", newest_file.0);
-      self.calibration = RBCalibrations::from_file(newest_file.0)?;
+      let file_to_load = self.calib_file_path.clone() + "/" + &newest_file.0;
+      println!("==> Loading calibration from file: {}", file_to_load);
+      self.calibration = RBCalibrations::from_file(file_to_load)?;
       println!("==> Loaded calibration {}", self.calibration);
     }
     Ok(())
