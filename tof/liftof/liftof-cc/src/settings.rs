@@ -13,6 +13,7 @@ use std::fmt;
 
 extern crate toml;
 use tof_dataclasses::errors::SerializationError;
+use tof_dataclasses::events::master_trigger::TriggerType;
 
 #[derive(Debug, Copy, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub enum BuildStrategy {
@@ -165,6 +166,13 @@ pub struct LiftofCCSettings {
   pub rb_ignorelist              : Vec<u8>,
   /// Should TofHits be generated?
   pub run_analysis_engine        : bool,
+  /// Select the trigger type for this run
+  pub trigger_type               : TriggerType,
+  /// Select the prescale factor for a run. The
+  /// prescale factor is between 0 (no events)
+  /// and 1.0 (all events). E.g. 0.1 means allow 
+  /// only 10% of the events
+  pub trigger_prescale           : f32,
   /// Settings for the TOF event builder
   pub event_builder_settings     : TofEventBuilderSettings,
   /// Settings for the analysis engine
@@ -187,6 +195,8 @@ impl LiftofCCSettings {
       cpu_moni_interval_sec     : 60,
       rb_ignorelist             : Vec::<u8>::new(),
       run_analysis_engine       : true,
+      trigger_type              : TriggerType::Unknown,
+      trigger_prescale          : 1.0,
       event_builder_settings    : TofEventBuilderSettings::new(),
       analysis_engine_settings  : AnalysisEngineSettings::new(),
     }

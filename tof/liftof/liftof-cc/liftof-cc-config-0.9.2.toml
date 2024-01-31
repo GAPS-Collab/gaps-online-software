@@ -8,7 +8,7 @@
 # location of data stored on the TOF CPU
 data_dir              = "/tofdata/run/"
 # location to store calibration files on the TOF CPUE
-calibration_dir       = "/tofdata/calibration/"
+calibration_dir       = "/tofdata/calibration/latest/"
 # location of the database
 db_path               = "/home/gaps/config/gaps_flight.db"
 # default runtime of the program
@@ -39,6 +39,10 @@ rb_ignorelist         = [10, 12, 37, 38, 43, 45, 47, 48, 49, 50]
 dsi_j_rbch_map        = "/home/gaps/config/dsi_j_ch_map.gaps.json"
 # should TofHits be calculated for RBEvents? [should be true for flight]
 run_analysis_engine   = true
+# can be either Gaps, Track or Poisson
+trigger_type          = "Track"
+# prescale is between 0 and 1
+trigger_prescale      = 1.0
 
 # not supported yet
 [event_builder_settings]

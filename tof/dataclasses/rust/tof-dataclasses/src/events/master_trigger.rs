@@ -27,12 +27,62 @@ use crate::manifest::{LocalTriggerBoard,
 pub const N_LTBS : usize = 25;
 pub const N_CHN_PER_LTB : usize = 16;
 
+#[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
+#[repr(u8)]
+pub enum TriggerType {
+  Unknown   = 0u8,
+  /// -> 1-10 "pysics" triggers
+  Any       = 1u8,
+  Track     = 2u8,
+  Gaps      = 3u8,
+  /// > 100 -> Debug triggers
+  Poisson   = 100u8,
+}
+
+impl fmt::Display for TriggerType {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let r = serde_json::to_string(self).unwrap_or(
+      String::from("ERROR: DeserializationError!"));
+    write!(f, "<TriggerType: {}>", r)
+  }
+}
+
+impl From<u8> for TriggerType {
+  fn from(value: u8) -> Self {
+    match value {
+      0u8   => TriggerType::Unknown,
+      100u8 => TriggerType::Poisson,
+      1u8   => TriggerType::Any,
+      2u8   => TriggerType::Track,
+      3u8   => TriggerType::Gaps,
+      _     => TriggerType::Unknown
+    }
+  }
+}
+
+#[cfg(feature = "random")]
+impl FromRandom for TriggerType {
+  
+  fn from_random() -> Self {
+    let choices = [
+      TriggerType::Unknown,
+      TriggerType::Poisson,
+      TriggerType::Any,
+      TriggerType::Track,
+      TriggerType::Gaps,
+    ];
+    let mut rng  = rand::thread_rng();
+    let idx = rng.gen_range(0..choices.len());
+    choices[idx]
+  }
+}
 
 /////////////////////////////////////////////////
 
 
 /// Hold additional information about the status
 /// of the registers on the MTB
+/// FUTURE EXTENSION/WIP
 pub struct MTBInfo {
   pub tiu_emulation_mode : bool,
   pub tiu_bad            : bool,
@@ -625,6 +675,7 @@ impl FromRandom for MasterTriggerEvent {
     event
   }
 }
+
 
 #[cfg(all(test,feature = "random"))]
 mod test_mastertriggerevent {
