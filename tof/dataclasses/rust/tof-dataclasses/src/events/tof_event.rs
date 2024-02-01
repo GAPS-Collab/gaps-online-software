@@ -16,7 +16,6 @@ cfg_if::cfg_if! {
   }
 }
 
-use crate::constants::EVENT_TIMEOUT;
 use crate::serialization::{Serialization,
                            parse_u8,
                            parse_u16,
@@ -146,11 +145,6 @@ impl TofEvent {
     // 2 + 2 + 2 + 2 + 4
     let evid = parse_u32(stream, &mut 12);
     Ok(evid)
-  }
-  /// Event can time out after specified time
-  ///
-  pub fn has_timed_out(&self) -> bool {
-    return self.age() > EVENT_TIMEOUT;
   }
 
   pub fn age(&self) -> u64 {
