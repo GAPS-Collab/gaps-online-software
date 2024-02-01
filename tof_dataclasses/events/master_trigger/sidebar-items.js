@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":["N_CHN_PER_LTB","N_LTBS"],"struct":["MTBInfo","MasterTriggerEvent","MasterTriggerMapping"]};
+window.SIDEBAR_ITEMS = {"constant":["N_CHN_PER_LTB","N_LTBS"],"enum":["TriggerType"],"struct":["MTBInfo","MasterTriggerEvent","MasterTriggerMapping"]};

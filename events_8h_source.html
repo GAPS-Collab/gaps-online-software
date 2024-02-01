@@ -227,243 +227,246 @@ $(document).ready(function(){initNavTree('events_8h_source.html',''); initResiza
 <div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160; </div>
 <div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;  <span class="keyword">const</span> Vec&lt;u16&gt;&amp; get_channel_adc(u8 channel) <span class="keyword">const</span>; </div>
 <div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160; </div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;  Vec&lt;f32&gt; get_baselines(<span class="keyword">const</span> <a class="code" href="structRBCalibration.html">RBCalibration</a> &amp;cali, usize min_bin, usize max_bin); </div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160; </div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;  <span class="keyword">static</span> <a class="code" href="structRBEvent.html">RBEvent</a> from_bytestream(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;bytestream,</div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;                                 u64 &amp;pos);</div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160; </div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;  std::string to_string() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160; </div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;  <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160; </div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;    <span class="keywordtype">bool</span> channel_check(u8 channel) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;    Vec&lt;u16&gt; _empty_channel = Vec&lt;u16&gt;();</div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;};</div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160; </div>
-<div class="line"><a name="l00221"></a><span class="lineno"><a class="line" href="structRBMissingHit.html">  221</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structRBMissingHit.html">RBMissingHit</a> {</div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;  </div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u16 HEAD = 0xAAAA;</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u16 TAIL = 0x5555;</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> usize SIZE = 15; <span class="comment">// bytes</span></div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;  </div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;  u32 event_id     ;  </div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;  u8  ltb_hit_index;  </div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;  u8  ltb_id       ;  </div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;  u8  ltb_dsi      ;  </div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;  u8  ltb_j        ;  </div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;  u8  ltb_ch       ;  </div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;  u8  rb_id        ;  </div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;  u8  rb_ch        ;  </div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160; </div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;  <span class="keyword">static</span> <a class="code" href="structRBMissingHit.html">RBMissingHit</a> from_bytestream(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;bytestream,</div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;                                      u64 &amp;pos);</div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;};</div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160; </div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;<span class="comment">/*********************************************************/</span></div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160; </div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;<span class="keyword">static</span> <span class="keyword">const</span> u8 EVENT_QUALITY_UNKNOWN         =  0;</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;<span class="keyword">static</span> <span class="keyword">const</span> u8 EVENT_QUALITY_SILVER          =  10;</div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;<span class="keyword">static</span> <span class="keyword">const</span> u8 EVENT_QUALITY_GOLD            =  20;</div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;<span class="keyword">static</span> <span class="keyword">const</span> u8 EVENT_QUALITY_DIAMOND         =  30;</div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;<span class="keyword">static</span> <span class="keyword">const</span> u8 EVENT_QUALITY_FOURLEAFCLOVER  =  40;</div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160; </div>
+<div class="line"><a name="l00199"></a><span class="lineno"><a class="line" href="structRBEvent.html#a8d2136632b5e60dd4b9f317ed4f0a473">  199</a></span>&#160;  <span class="keyword">static</span> f32 <a class="code" href="structRBEvent.html#a8d2136632b5e60dd4b9f317ed4f0a473">calc_baseline</a>(<span class="keyword">const</span> Vec&lt;f32&gt; &amp;volts, usize min_bin, usize max_bin); </div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160; </div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;  <span class="keyword">static</span> <a class="code" href="structRBEvent.html">RBEvent</a> from_bytestream(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;bytestream,</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;                                 u64 &amp;pos);</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160; </div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;  std::string to_string() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160; </div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;  <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160; </div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;    <span class="keywordtype">bool</span> channel_check(u8 channel) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;    Vec&lt;u16&gt; _empty_channel = Vec&lt;u16&gt;();</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;};</div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160; </div>
+<div class="line"><a name="l00222"></a><span class="lineno"><a class="line" href="structRBMissingHit.html">  222</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structRBMissingHit.html">RBMissingHit</a> {</div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;  </div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u16 HEAD = 0xAAAA;</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u16 TAIL = 0x5555;</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> usize SIZE = 15; <span class="comment">// bytes</span></div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;  </div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;  u32 event_id     ;  </div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;  u8  ltb_hit_index;  </div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;  u8  ltb_id       ;  </div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;  u8  ltb_dsi      ;  </div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;  u8  ltb_j        ;  </div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;  u8  ltb_ch       ;  </div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;  u8  rb_id        ;  </div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;  u8  rb_ch        ;  </div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160; </div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;  <span class="keyword">static</span> <a class="code" href="structRBMissingHit.html">RBMissingHit</a> from_bytestream(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;bytestream,</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;                                      u64 &amp;pos);</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;};</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160; </div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;<span class="comment">/*********************************************************/</span></div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160; </div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;<span class="keyword">static</span> <span class="keyword">const</span> u8 EVENT_QUALITY_UNKNOWN         =  0;</div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;<span class="keyword">static</span> <span class="keyword">const</span> u8 EVENT_QUALITY_SILVER          =  10;</div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;<span class="keyword">static</span> <span class="keyword">const</span> u8 EVENT_QUALITY_GOLD            =  20;</div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;<span class="keyword">static</span> <span class="keyword">const</span> u8 EVENT_QUALITY_DIAMOND         =  30;</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;<span class="keyword">static</span> <span class="keyword">const</span> u8 EVENT_QUALITY_FOURLEAFCLOVER  =  40;</div>
 <div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160; </div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;<span class="keyword">enum class</span> EventQuality : u8 {</div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;  Unknown        = EVENT_QUALITY_UNKNOWN,</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;  Silver         = EVENT_QUALITY_SILVER,</div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;  Gold           = EVENT_QUALITY_GOLD,</div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;  Diamond        = EVENT_QUALITY_DIAMOND,</div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;  FourLeafClover = EVENT_QUALITY_FOURLEAFCLOVER</div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;};</div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160; </div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, <span class="keyword">const</span> EventQuality&amp; qual);</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160; </div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;<span class="comment">/*********************************************************/</span></div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160; </div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;<span class="keyword">static</span> <span class="keyword">const</span> u8 COMPRESSION_LEVEL_UNKNOWN         =  0;</div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;<span class="keyword">static</span> <span class="keyword">const</span> u8 COMPRESSION_LEVEL_NONE            =  10;</div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160; </div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;<span class="keyword">enum class</span> CompressionLevel : u8 {</div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;  Unknown        = COMPRESSION_LEVEL_UNKNOWN,</div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;  None           = COMPRESSION_LEVEL_NONE,</div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;};</div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160; </div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, <span class="keyword">const</span> CompressionLevel&amp; level);</div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160; </div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160; </div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;<span class="keyword">enum class</span> EventQuality : u8 {</div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;  Unknown        = EVENT_QUALITY_UNKNOWN,</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;  Silver         = EVENT_QUALITY_SILVER,</div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;  Gold           = EVENT_QUALITY_GOLD,</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;  Diamond        = EVENT_QUALITY_DIAMOND,</div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;  FourLeafClover = EVENT_QUALITY_FOURLEAFCLOVER</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;};</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160; </div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, <span class="keyword">const</span> EventQuality&amp; qual);</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160; </div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;<span class="comment">/*********************************************************/</span></div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160; </div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;<span class="keyword">static</span> <span class="keyword">const</span> u8 COMPRESSION_LEVEL_UNKNOWN         =  0;</div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;<span class="keyword">static</span> <span class="keyword">const</span> u8 COMPRESSION_LEVEL_NONE            =  10;</div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160; </div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;<span class="keyword">enum class</span> CompressionLevel : u8 {</div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;  Unknown        = COMPRESSION_LEVEL_UNKNOWN,</div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;  None           = COMPRESSION_LEVEL_NONE,</div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;};</div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160; </div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, <span class="keyword">const</span> CompressionLevel&amp; level);</div>
 <div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160; </div>
-<div class="line"><a name="l00291"></a><span class="lineno"><a class="line" href="structMasterTriggerEvent.html">  291</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structMasterTriggerEvent.html">MasterTriggerEvent</a> {</div>
-<div class="line"><a name="l00293"></a><span class="lineno"><a class="line" href="structMasterTriggerEvent.html#a237c05d33e1485cf4bace993c9ae6ee9">  293</a></span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u16 <a class="code" href="structMasterTriggerEvent.html#a237c05d33e1485cf4bace993c9ae6ee9">HEAD</a> = 0xAAAA;</div>
-<div class="line"><a name="l00295"></a><span class="lineno"><a class="line" href="structMasterTriggerEvent.html#a19a8c42a5953fd1ae8a0aec831863c3c">  295</a></span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u16 <a class="code" href="structMasterTriggerEvent.html#a19a8c42a5953fd1ae8a0aec831863c3c">TAIL</a> = 0x5555;</div>
-<div class="line"><a name="l00297"></a><span class="lineno"><a class="line" href="structMasterTriggerEvent.html#ae8de2d59e0cdb02a7ad7b6073011983d">  297</a></span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> usize <a class="code" href="structMasterTriggerEvent.html#ae8de2d59e0cdb02a7ad7b6073011983d">SIZE</a> = 45; <span class="comment">// size in bytes</span></div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> usize SIZE_LTB20 = 113;</div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> usize SIZE_LTB25 = 113 + 5*4; </div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160; </div>
-<div class="line"><a name="l00302"></a><span class="lineno"><a class="line" href="structMasterTriggerEvent.html#a2fc1e8b3d4f1e769b4bce8a58a166c78">  302</a></span>&#160;  u32 <a class="code" href="structMasterTriggerEvent.html#a2fc1e8b3d4f1e769b4bce8a58a166c78">event_id</a>      ; </div>
-<div class="line"><a name="l00304"></a><span class="lineno"><a class="line" href="structMasterTriggerEvent.html#a886a68d557a93210b86b3e2d1b96bfa9">  304</a></span>&#160;  u32 <a class="code" href="structMasterTriggerEvent.html#a886a68d557a93210b86b3e2d1b96bfa9">timestamp</a>     ; </div>
-<div class="line"><a name="l00306"></a><span class="lineno"><a class="line" href="structMasterTriggerEvent.html#a30d57d1dc8bd9e7fc55d1af7ad6ebc92">  306</a></span>&#160;  u32 <a class="code" href="structMasterTriggerEvent.html#a30d57d1dc8bd9e7fc55d1af7ad6ebc92">tiu_timestamp</a> ; </div>
-<div class="line"><a name="l00308"></a><span class="lineno"><a class="line" href="structMasterTriggerEvent.html#aa02e973d0cf453f05bf1c9c591a14af8">  308</a></span>&#160;  u32 <a class="code" href="structMasterTriggerEvent.html#aa02e973d0cf453f05bf1c9c591a14af8">tiu_gps_32</a>    ; </div>
-<div class="line"><a name="l00310"></a><span class="lineno"><a class="line" href="structMasterTriggerEvent.html#a812af2c197e987f663477039dfb349da">  310</a></span>&#160;  u32 <a class="code" href="structMasterTriggerEvent.html#a812af2c197e987f663477039dfb349da">tiu_gps_16</a>    ; </div>
-<div class="line"><a name="l00312"></a><span class="lineno"><a class="line" href="structMasterTriggerEvent.html#a3584e8178fab07839e43d3eec831d0bc">  312</a></span>&#160;  u8  <a class="code" href="structMasterTriggerEvent.html#a3584e8178fab07839e43d3eec831d0bc">n_paddles</a>     ; </div>
-<div class="line"><a name="l00314"></a><span class="lineno"><a class="line" href="structMasterTriggerEvent.html#a3e2850cccfd9056e60da6512216a7aff">  314</a></span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="structMasterTriggerEvent.html#a3e2850cccfd9056e60da6512216a7aff">board_mask</a>[N_LTBS];</div>
-<div class="line"><a name="l00317"></a><span class="lineno"><a class="line" href="structMasterTriggerEvent.html#aa92539d1bcffb9b8cadf5f909a11d916">  317</a></span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="structMasterTriggerEvent.html#aa92539d1bcffb9b8cadf5f909a11d916">hits</a>[N_LTBS][N_CHN_PER_LTB];</div>
-<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;  u32 crc           ;</div>
-<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;  <span class="comment">// these fields won&#39;t get serialized</span></div>
-<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;  <span class="keywordtype">bool</span> broken       ;</div>
-<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;  <span class="keywordtype">bool</span> valid        ;</div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160; </div>
-<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;  <a class="code" href="structMasterTriggerEvent.html">MasterTriggerEvent</a>();</div>
-<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;  </div>
-<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;  <span class="comment">// FIXME - become a concept</span></div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;  <span class="comment">// Basically verify that the size of the bytestream</span></div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;  <span class="comment">// is what we expect. In case where N_LTB is 25 </span></div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;  <span class="comment">// instead of 20 it will be longer.</span></div>
-<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;  <span class="keyword">static</span> usize get_packet_size(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;stream, </div>
-<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;                               usize pos,</div>
-<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;                               usize expected_size);</div>
-<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160; </div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160; </div>
+<div class="line"><a name="l00292"></a><span class="lineno"><a class="line" href="structMasterTriggerEvent.html">  292</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structMasterTriggerEvent.html">MasterTriggerEvent</a> {</div>
+<div class="line"><a name="l00294"></a><span class="lineno"><a class="line" href="structMasterTriggerEvent.html#a237c05d33e1485cf4bace993c9ae6ee9">  294</a></span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u16 <a class="code" href="structMasterTriggerEvent.html#a237c05d33e1485cf4bace993c9ae6ee9">HEAD</a> = 0xAAAA;</div>
+<div class="line"><a name="l00296"></a><span class="lineno"><a class="line" href="structMasterTriggerEvent.html#a19a8c42a5953fd1ae8a0aec831863c3c">  296</a></span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u16 <a class="code" href="structMasterTriggerEvent.html#a19a8c42a5953fd1ae8a0aec831863c3c">TAIL</a> = 0x5555;</div>
+<div class="line"><a name="l00298"></a><span class="lineno"><a class="line" href="structMasterTriggerEvent.html#ae8de2d59e0cdb02a7ad7b6073011983d">  298</a></span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> usize <a class="code" href="structMasterTriggerEvent.html#ae8de2d59e0cdb02a7ad7b6073011983d">SIZE</a> = 45; <span class="comment">// size in bytes</span></div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> usize SIZE_LTB20 = 113;</div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> usize SIZE_LTB25 = 113 + 5*4; </div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160; </div>
+<div class="line"><a name="l00303"></a><span class="lineno"><a class="line" href="structMasterTriggerEvent.html#a2fc1e8b3d4f1e769b4bce8a58a166c78">  303</a></span>&#160;  u32 <a class="code" href="structMasterTriggerEvent.html#a2fc1e8b3d4f1e769b4bce8a58a166c78">event_id</a>      ; </div>
+<div class="line"><a name="l00305"></a><span class="lineno"><a class="line" href="structMasterTriggerEvent.html#a886a68d557a93210b86b3e2d1b96bfa9">  305</a></span>&#160;  u32 <a class="code" href="structMasterTriggerEvent.html#a886a68d557a93210b86b3e2d1b96bfa9">timestamp</a>     ; </div>
+<div class="line"><a name="l00307"></a><span class="lineno"><a class="line" href="structMasterTriggerEvent.html#a30d57d1dc8bd9e7fc55d1af7ad6ebc92">  307</a></span>&#160;  u32 <a class="code" href="structMasterTriggerEvent.html#a30d57d1dc8bd9e7fc55d1af7ad6ebc92">tiu_timestamp</a> ; </div>
+<div class="line"><a name="l00309"></a><span class="lineno"><a class="line" href="structMasterTriggerEvent.html#aa02e973d0cf453f05bf1c9c591a14af8">  309</a></span>&#160;  u32 <a class="code" href="structMasterTriggerEvent.html#aa02e973d0cf453f05bf1c9c591a14af8">tiu_gps_32</a>    ; </div>
+<div class="line"><a name="l00311"></a><span class="lineno"><a class="line" href="structMasterTriggerEvent.html#a812af2c197e987f663477039dfb349da">  311</a></span>&#160;  u32 <a class="code" href="structMasterTriggerEvent.html#a812af2c197e987f663477039dfb349da">tiu_gps_16</a>    ; </div>
+<div class="line"><a name="l00313"></a><span class="lineno"><a class="line" href="structMasterTriggerEvent.html#a3584e8178fab07839e43d3eec831d0bc">  313</a></span>&#160;  u8  <a class="code" href="structMasterTriggerEvent.html#a3584e8178fab07839e43d3eec831d0bc">n_paddles</a>     ; </div>
+<div class="line"><a name="l00315"></a><span class="lineno"><a class="line" href="structMasterTriggerEvent.html#a3e2850cccfd9056e60da6512216a7aff">  315</a></span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="structMasterTriggerEvent.html#a3e2850cccfd9056e60da6512216a7aff">board_mask</a>[N_LTBS];</div>
+<div class="line"><a name="l00318"></a><span class="lineno"><a class="line" href="structMasterTriggerEvent.html#aa92539d1bcffb9b8cadf5f909a11d916">  318</a></span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="structMasterTriggerEvent.html#aa92539d1bcffb9b8cadf5f909a11d916">hits</a>[N_LTBS][N_CHN_PER_LTB];</div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;  u32 crc           ;</div>
+<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;  <span class="comment">// these fields won&#39;t get serialized</span></div>
+<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;  <span class="keywordtype">bool</span> broken       ;</div>
+<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;  <span class="keywordtype">bool</span> valid        ;</div>
+<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160; </div>
+<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;  <a class="code" href="structMasterTriggerEvent.html">MasterTriggerEvent</a>();</div>
+<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;  </div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;  <span class="comment">// FIXME - become a concept</span></div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;  <span class="comment">// Basically verify that the size of the bytestream</span></div>
+<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;  <span class="comment">// is what we expect. In case where N_LTB is 25 </span></div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;  <span class="comment">// instead of 20 it will be longer.</span></div>
+<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;  <span class="keyword">static</span> usize get_packet_size(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;stream, </div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;                               usize pos,</div>
+<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;                               usize expected_size);</div>
 <div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160; </div>
-<div class="line"><a name="l00345"></a><span class="lineno"><a class="line" href="structMasterTriggerEvent.html#a92eba169f890dbdf936adba5572e06fe">  345</a></span>&#160;  <span class="keyword">static</span> <a class="code" href="structMasterTriggerEvent.html">MasterTriggerEvent</a> <a class="code" href="structMasterTriggerEvent.html#a92eba169f890dbdf936adba5572e06fe">from_bytestream</a>(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;bytestream,</div>
-<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;                                            u64 &amp;pos);</div>
-<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;  <span class="comment">//static void decode_board_mask(u32 mask_number, bool (&amp;decoded_mask)[N_LTBS]); </span></div>
-<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160; </div>
-<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;  <span class="keyword">static</span> <span class="keywordtype">void</span> decode_hit_mask(u32 mask_number, <span class="keywordtype">bool</span> (&amp;hitmask_1)[N_CHN_PER_LTB], <span class="keywordtype">bool</span> (&amp;hitmask_2)[N_CHN_PER_LTB]);</div>
-<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160; </div>
-<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;  <span class="keywordtype">void</span> set_board_mask(u32 mask);</div>
-<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;  </div>
-<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;  <span class="keywordtype">void</span> set_hit_mask(usize ltb_index,u32 mask);</div>
-<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160; </div>
-<div class="line"><a name="l00360"></a><span class="lineno"><a class="line" href="structMasterTriggerEvent.html#a7fb481cacc0a272a464bba031b880669">  360</a></span>&#160;  Vec&lt;std::tuple&lt;u8,u8,u8&gt;&gt;  <a class="code" href="structMasterTriggerEvent.html#a7fb481cacc0a272a464bba031b880669">get_dsi_j_ch</a>();</div>
-<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160; </div>
-<div class="line"><a name="l00363"></a><span class="lineno"><a class="line" href="structMasterTriggerEvent.html#aabc131f9d53ef6256b235d953f6c3f3b">  363</a></span>&#160;  std::string <a class="code" href="structMasterTriggerEvent.html#aabc131f9d53ef6256b235d953f6c3f3b">to_string</a>() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160; </div>
-<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;  <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;    <span class="comment">// a fix for different versions </span></div>
-<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;    <span class="comment">// of the data. There are some </span></div>
-<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;    <span class="comment">// whcih have N_LTBS = 20 and </span></div>
-<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;    <span class="comment">// others which have N_LTBS = 25</span></div>
-<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;    <span class="comment">// we can set this switch so that </span></div>
-<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;    <span class="comment">// this does not affect us</span></div>
-<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;    usize n_ltbs_;</div>
-<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;    <span class="comment">// let&#39;s have another constructor, to get out of the N_LTB</span></div>
-<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;    <span class="comment">// conundrum</span></div>
-<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;    <a class="code" href="structMasterTriggerEvent.html">MasterTriggerEvent</a>(usize n_ltbs);</div>
-<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160; </div>
+<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160; </div>
+<div class="line"><a name="l00346"></a><span class="lineno"><a class="line" href="structMasterTriggerEvent.html#a92eba169f890dbdf936adba5572e06fe">  346</a></span>&#160;  <span class="keyword">static</span> <a class="code" href="structMasterTriggerEvent.html">MasterTriggerEvent</a> <a class="code" href="structMasterTriggerEvent.html#a92eba169f890dbdf936adba5572e06fe">from_bytestream</a>(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;bytestream,</div>
+<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;                                            u64 &amp;pos);</div>
+<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;  <span class="comment">//static void decode_board_mask(u32 mask_number, bool (&amp;decoded_mask)[N_LTBS]); </span></div>
+<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160; </div>
+<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;  <span class="keyword">static</span> <span class="keywordtype">void</span> decode_hit_mask(u32 mask_number, <span class="keywordtype">bool</span> (&amp;hitmask_1)[N_CHN_PER_LTB], <span class="keywordtype">bool</span> (&amp;hitmask_2)[N_CHN_PER_LTB]);</div>
+<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160; </div>
+<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;  <span class="keywordtype">void</span> set_board_mask(u32 mask);</div>
+<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;  </div>
+<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;  <span class="keywordtype">void</span> set_hit_mask(usize ltb_index,u32 mask);</div>
+<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160; </div>
+<div class="line"><a name="l00361"></a><span class="lineno"><a class="line" href="structMasterTriggerEvent.html#a7fb481cacc0a272a464bba031b880669">  361</a></span>&#160;  Vec&lt;std::tuple&lt;u8,u8,u8&gt;&gt;  <a class="code" href="structMasterTriggerEvent.html#a7fb481cacc0a272a464bba031b880669">get_dsi_j_ch</a>();</div>
+<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160; </div>
+<div class="line"><a name="l00364"></a><span class="lineno"><a class="line" href="structMasterTriggerEvent.html#aabc131f9d53ef6256b235d953f6c3f3b">  364</a></span>&#160;  std::string <a class="code" href="structMasterTriggerEvent.html#aabc131f9d53ef6256b235d953f6c3f3b">to_string</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160; </div>
+<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;  <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;    <span class="comment">// a fix for different versions </span></div>
+<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;    <span class="comment">// of the data. There are some </span></div>
+<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;    <span class="comment">// whcih have N_LTBS = 20 and </span></div>
+<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;    <span class="comment">// others which have N_LTBS = 25</span></div>
+<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;    <span class="comment">// we can set this switch so that </span></div>
+<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;    <span class="comment">// this does not affect us</span></div>
+<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;    usize n_ltbs_;</div>
+<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;    <span class="comment">// let&#39;s have another constructor, to get out of the N_LTB</span></div>
+<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;    <span class="comment">// conundrum</span></div>
+<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;    <a class="code" href="structMasterTriggerEvent.html">MasterTriggerEvent</a>(usize n_ltbs);</div>
 <div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160; </div>
-<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;};</div>
-<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160; </div>
+<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160; </div>
+<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;};</div>
 <div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160; </div>
-<div class="line"><a name="l00394"></a><span class="lineno"><a class="line" href="structTofEvent.html">  394</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structTofEvent.html">TofEvent</a> {</div>
-<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u16 HEAD = 0xAAAA;</div>
-<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u16 TAIL = 0x5555;</div>
-<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160; </div>
-<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;  <a class="code" href="structTofEventHeader.html">TofEventHeader</a> header;</div>
-<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;  <a class="code" href="structMasterTriggerEvent.html">MasterTriggerEvent</a> mt_event;</div>
-<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160; </div>
-<div class="line"><a name="l00403"></a><span class="lineno"><a class="line" href="structTofEvent.html#a577628b0f2d6beacc40f6bad1adc135a">  403</a></span>&#160;  Vec&lt;RBEvent&gt;      <a class="code" href="structTofEvent.html#a577628b0f2d6beacc40f6bad1adc135a">rb_events</a>;</div>
-<div class="line"><a name="l00407"></a><span class="lineno"><a class="line" href="structTofEvent.html#aa9745620cfaea3f6655d2c214a51f7e3">  407</a></span>&#160;  Vec&lt;RBMissingHit&gt; <a class="code" href="structTofEvent.html#aa9745620cfaea3f6655d2c214a51f7e3">missing_hits</a>;</div>
-<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160; </div>
-<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160; </div>
-<div class="line"><a name="l00421"></a><span class="lineno"><a class="line" href="structTofEvent.html#ac62d2f3b9db6a01c93cfa7f76ad30451">  421</a></span>&#160;  <span class="keyword">static</span> <a class="code" href="structTofEvent.html">TofEvent</a> <a class="code" href="structTofEvent.html#ac62d2f3b9db6a01c93cfa7f76ad30451">from_bytestream</a>(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;bytestream,</div>
-<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;                                  u64 &amp;pos);</div>
-<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160; </div>
-<div class="line"><a name="l00435"></a><span class="lineno"><a class="line" href="structTofEvent.html#a42760fc8fa3384f7ff5676875dea6e77">  435</a></span>&#160;  <span class="keyword">static</span> <a class="code" href="structTofEvent.html">TofEvent</a> <a class="code" href="structTofEvent.html#a42760fc8fa3384f7ff5676875dea6e77">from_tofpacket</a>(<span class="keyword">const</span> <a class="code" href="structTofPacket.html">TofPacket</a> &amp;packet);</div>
-<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160; </div>
-<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;  <span class="keyword">static</span> u32 get_n_rbmissinghits(u32 mask);</div>
-<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;  <span class="keyword">static</span> u32 get_n_rbevents(u32 mask);</div>
-<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160; </div>
-<div class="line"><a name="l00441"></a><span class="lineno"><a class="line" href="structTofEvent.html#aea1f5e45ce3fd1d874eb6424d7c8c84d">  441</a></span>&#160;  std::string <a class="code" href="structTofEvent.html#aea1f5e45ce3fd1d874eb6424d7c8c84d">to_string</a>() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160; </div>
-<div class="line"><a name="l00446"></a><span class="lineno"><a class="line" href="structTofEvent.html#a794247ff0963ea316256d0423b9460f7">  446</a></span>&#160;  <span class="keyword">const</span> <a class="code" href="structRBEvent.html">RBEvent</a>&amp; <a class="code" href="structTofEvent.html#a794247ff0963ea316256d0423b9460f7">get_rbevent</a>(u8 board_id) <span class="keyword">const</span>; </div>
-<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160; </div>
-<div class="line"><a name="l00451"></a><span class="lineno"><a class="line" href="structTofEvent.html#ac9c16f7b24c02f6ef7c4638a516ef325">  451</a></span>&#160;  Vec&lt;u8&gt; <a class="code" href="structTofEvent.html#ac9c16f7b24c02f6ef7c4638a516ef325">get_rbids</a>() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160; </div>
-<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;  <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;    <span class="keywordtype">bool</span> passed_consistency_check();</div>
-<div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160; </div>
-<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;    <a class="code" href="structRBEvent.html">RBEvent</a> _empty_event = <a class="code" href="structRBEvent.html">RBEvent</a>();</div>
-<div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160;};</div>
-<div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160; </div>
-<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;<span class="comment">/***********************************************</span></div>
-<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;<span class="comment"> * Reconstructed waveform peak information</span></div>
-<div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160;<span class="comment"> * </span></div>
-<div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;<span class="comment"> * There should be one TofHit per reconstructed</span></div>
-<div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160;<span class="comment"> * peak</span></div>
-<div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;<span class="comment"> * </span></div>
-<div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;<span class="comment"> */</span></div>
-<div class="line"><a name="l00473"></a><span class="lineno"><a class="line" href="structTofHit.html">  473</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structTofHit.html">TofHit</a>  {</div>
-<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u16 HEAD = 0xF0F0;</div>
-<div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u16 TAIL = 0xF0F;</div>
-<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160; </div>
-<div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;  u8   paddle_id;</div>
-<div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;  <span class="keywordtype">bool</span> broken;</div>
-<div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160; </div>
-<div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160;  u32 timestamp32;</div>
-<div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160;  u16 timestamp16;</div>
-<div class="line"><a name="l00482"></a><span class="lineno">  482</span>&#160; </div>
-<div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160;  u8 ctr_etx;</div>
-<div class="line"><a name="l00484"></a><span class="lineno">  484</span>&#160;  u16 tail = 0xF0F; </div>
-<div class="line"><a name="l00485"></a><span class="lineno">  485</span>&#160; </div>
-<div class="line"><a name="l00486"></a><span class="lineno">  486</span>&#160;  f32 get_time_a()       <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160;  f32 get_time_b()       <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160;  f32 get_peak_a()       <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;  f32 get_peak_b()       <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;  f32 get_charge_a()     <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;  f32 get_charge_b()     <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160;  f32 get_charge_min_i() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;  f32 get_x_pos()        <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;  f32 get_t_avg()        <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160;  f64 get_timestamp48()  <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160; </div>
-<div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;  <span class="keyword">static</span> <a class="code" href="structTofHit.html">TofHit</a> from_bytestream(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;bytestream, </div>
-<div class="line"><a name="l00498"></a><span class="lineno">  498</span>&#160;                                       u64 &amp;pos);</div>
-<div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160; </div>
-<div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160;  <span class="comment">// easier print out</span></div>
-<div class="line"><a name="l00501"></a><span class="lineno">  501</span>&#160;  std::string to_string() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00502"></a><span class="lineno">  502</span>&#160;  </div>
-<div class="line"><a name="l00503"></a><span class="lineno">  503</span>&#160;  <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00504"></a><span class="lineno">  504</span>&#160;    <span class="comment">// we keep this private, since </span></div>
-<div class="line"><a name="l00505"></a><span class="lineno">  505</span>&#160;    <span class="comment">// the user should use the getters</span></div>
-<div class="line"><a name="l00506"></a><span class="lineno">  506</span>&#160;    <span class="comment">// to get the values converted </span></div>
-<div class="line"><a name="l00507"></a><span class="lineno">  507</span>&#160;    <span class="comment">// back to f32</span></div>
-<div class="line"><a name="l00508"></a><span class="lineno">  508</span>&#160;    u16 time_a;</div>
-<div class="line"><a name="l00509"></a><span class="lineno">  509</span>&#160;    u16 time_b;</div>
-<div class="line"><a name="l00510"></a><span class="lineno">  510</span>&#160;    u16 peak_a;</div>
-<div class="line"><a name="l00511"></a><span class="lineno">  511</span>&#160;    u16 peak_b;</div>
-<div class="line"><a name="l00512"></a><span class="lineno">  512</span>&#160;    u16 charge_a;</div>
-<div class="line"><a name="l00513"></a><span class="lineno">  513</span>&#160;    u16 charge_b;</div>
-<div class="line"><a name="l00514"></a><span class="lineno">  514</span>&#160;    u16 charge_min_i;</div>
-<div class="line"><a name="l00515"></a><span class="lineno">  515</span>&#160;    u16 x_pos;</div>
-<div class="line"><a name="l00516"></a><span class="lineno">  516</span>&#160;    u16 t_average;</div>
-<div class="line"><a name="l00517"></a><span class="lineno">  517</span>&#160;    <span class="comment">// don&#39;t serialize</span></div>
-<div class="line"><a name="l00518"></a><span class="lineno">  518</span>&#160;};</div>
-<div class="line"><a name="l00519"></a><span class="lineno">  519</span>&#160; </div>
-<div class="line"><a name="l00520"></a><span class="lineno">  520</span>&#160;std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, <span class="keyword">const</span> <a class="code" href="structTofHit.html">TofHit</a>&amp; pad);</div>
-<div class="line"><a name="l00521"></a><span class="lineno">  521</span>&#160; </div>
-<div class="line"><a name="l00522"></a><span class="lineno">  522</span>&#160;std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, <span class="keyword">const</span> <a class="code" href="structMasterTriggerEvent.html">MasterTriggerEvent</a>&amp; mt);</div>
+<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160; </div>
+<div class="line"><a name="l00395"></a><span class="lineno"><a class="line" href="structTofEvent.html">  395</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structTofEvent.html">TofEvent</a> {</div>
+<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u16 HEAD = 0xAAAA;</div>
+<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u16 TAIL = 0x5555;</div>
+<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160; </div>
+<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;  EventStatus status;</div>
+<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;  <a class="code" href="structTofEventHeader.html">TofEventHeader</a> header;</div>
+<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;  <a class="code" href="structMasterTriggerEvent.html">MasterTriggerEvent</a> mt_event;</div>
+<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160; </div>
+<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160; </div>
+<div class="line"><a name="l00406"></a><span class="lineno"><a class="line" href="structTofEvent.html#a577628b0f2d6beacc40f6bad1adc135a">  406</a></span>&#160;  Vec&lt;RBEvent&gt;      <a class="code" href="structTofEvent.html#a577628b0f2d6beacc40f6bad1adc135a">rb_events</a>;</div>
+<div class="line"><a name="l00410"></a><span class="lineno"><a class="line" href="structTofEvent.html#aa9745620cfaea3f6655d2c214a51f7e3">  410</a></span>&#160;  Vec&lt;RBMissingHit&gt; <a class="code" href="structTofEvent.html#aa9745620cfaea3f6655d2c214a51f7e3">missing_hits</a>;</div>
+<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160; </div>
+<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;  <a class="code" href="structTofEvent.html">TofEvent</a>();</div>
+<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160; </div>
+<div class="line"><a name="l00425"></a><span class="lineno"><a class="line" href="structTofEvent.html#ac62d2f3b9db6a01c93cfa7f76ad30451">  425</a></span>&#160;  <span class="keyword">static</span> <a class="code" href="structTofEvent.html">TofEvent</a> <a class="code" href="structTofEvent.html#ac62d2f3b9db6a01c93cfa7f76ad30451">from_bytestream</a>(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;bytestream,</div>
+<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;                                  u64 &amp;pos);</div>
+<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160; </div>
+<div class="line"><a name="l00439"></a><span class="lineno"><a class="line" href="structTofEvent.html#a42760fc8fa3384f7ff5676875dea6e77">  439</a></span>&#160;  <span class="keyword">static</span> <a class="code" href="structTofEvent.html">TofEvent</a> <a class="code" href="structTofEvent.html#a42760fc8fa3384f7ff5676875dea6e77">from_tofpacket</a>(<span class="keyword">const</span> <a class="code" href="structTofPacket.html">TofPacket</a> &amp;packet);</div>
+<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160; </div>
+<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;  <span class="keyword">static</span> u32 get_n_rbmissinghits(u32 mask);</div>
+<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;  <span class="keyword">static</span> u32 get_n_rbevents(u32 mask);</div>
+<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160; </div>
+<div class="line"><a name="l00445"></a><span class="lineno"><a class="line" href="structTofEvent.html#aea1f5e45ce3fd1d874eb6424d7c8c84d">  445</a></span>&#160;  std::string <a class="code" href="structTofEvent.html#aea1f5e45ce3fd1d874eb6424d7c8c84d">to_string</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160; </div>
+<div class="line"><a name="l00450"></a><span class="lineno"><a class="line" href="structTofEvent.html#a794247ff0963ea316256d0423b9460f7">  450</a></span>&#160;  <span class="keyword">const</span> <a class="code" href="structRBEvent.html">RBEvent</a>&amp; <a class="code" href="structTofEvent.html#a794247ff0963ea316256d0423b9460f7">get_rbevent</a>(u8 board_id) <span class="keyword">const</span>; </div>
+<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160; </div>
+<div class="line"><a name="l00455"></a><span class="lineno"><a class="line" href="structTofEvent.html#ac9c16f7b24c02f6ef7c4638a516ef325">  455</a></span>&#160;  Vec&lt;u8&gt; <a class="code" href="structTofEvent.html#ac9c16f7b24c02f6ef7c4638a516ef325">get_rbids</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160; </div>
+<div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;  <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;    <span class="keywordtype">bool</span> passed_consistency_check();</div>
+<div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160; </div>
+<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;    <a class="code" href="structRBEvent.html">RBEvent</a> _empty_event = <a class="code" href="structRBEvent.html">RBEvent</a>();</div>
+<div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160;};</div>
+<div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160; </div>
+<div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160;<span class="comment">/***********************************************</span></div>
+<div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;<span class="comment"> * Reconstructed waveform peak information</span></div>
+<div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;<span class="comment"> * </span></div>
+<div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;<span class="comment"> * There should be one TofHit per reconstructed</span></div>
+<div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;<span class="comment"> * peak</span></div>
+<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;<span class="comment"> * </span></div>
+<div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;<span class="comment"> *</span></div>
+<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;<span class="comment"> */</span></div>
+<div class="line"><a name="l00477"></a><span class="lineno"><a class="line" href="structTofHit.html">  477</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structTofHit.html">TofHit</a>  {</div>
+<div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u16 HEAD = 0xF0F0;</div>
+<div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160;  <span class="keyword">static</span> <span class="keyword">const</span> u16 TAIL = 0xF0F;</div>
+<div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160; </div>
+<div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160;  u8   paddle_id;</div>
+<div class="line"><a name="l00482"></a><span class="lineno">  482</span>&#160;  <span class="keywordtype">bool</span> broken;</div>
+<div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160; </div>
+<div class="line"><a name="l00484"></a><span class="lineno">  484</span>&#160;  u32 timestamp32;</div>
+<div class="line"><a name="l00485"></a><span class="lineno">  485</span>&#160;  u16 timestamp16;</div>
+<div class="line"><a name="l00486"></a><span class="lineno">  486</span>&#160; </div>
+<div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160;  u8 ctr_etx;</div>
+<div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160;  u16 tail = 0xF0F; </div>
+<div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160; </div>
+<div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;  f32 get_time_a()       <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;  f32 get_time_b()       <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160;  f32 get_peak_a()       <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;  f32 get_peak_b()       <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;  f32 get_charge_a()     <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160;  f32 get_charge_b()     <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160;  f32 get_charge_min_i() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;  f32 get_x_pos()        <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00498"></a><span class="lineno">  498</span>&#160;  f32 get_t_avg()        <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;  f64 get_timestamp48()  <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160; </div>
+<div class="line"><a name="l00501"></a><span class="lineno">  501</span>&#160;  <span class="keyword">static</span> <a class="code" href="structTofHit.html">TofHit</a> from_bytestream(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;bytestream, </div>
+<div class="line"><a name="l00502"></a><span class="lineno">  502</span>&#160;                                       u64 &amp;pos);</div>
+<div class="line"><a name="l00503"></a><span class="lineno">  503</span>&#160; </div>
+<div class="line"><a name="l00504"></a><span class="lineno">  504</span>&#160;  <span class="comment">// easier print out</span></div>
+<div class="line"><a name="l00505"></a><span class="lineno">  505</span>&#160;  std::string to_string() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00506"></a><span class="lineno">  506</span>&#160;  </div>
+<div class="line"><a name="l00507"></a><span class="lineno">  507</span>&#160;  <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00508"></a><span class="lineno">  508</span>&#160;    <span class="comment">// we keep this private, since </span></div>
+<div class="line"><a name="l00509"></a><span class="lineno">  509</span>&#160;    <span class="comment">// the user should use the getters</span></div>
+<div class="line"><a name="l00510"></a><span class="lineno">  510</span>&#160;    <span class="comment">// to get the values converted </span></div>
+<div class="line"><a name="l00511"></a><span class="lineno">  511</span>&#160;    <span class="comment">// back to f32</span></div>
+<div class="line"><a name="l00512"></a><span class="lineno">  512</span>&#160;    u16 time_a;</div>
+<div class="line"><a name="l00513"></a><span class="lineno">  513</span>&#160;    u16 time_b;</div>
+<div class="line"><a name="l00514"></a><span class="lineno">  514</span>&#160;    u16 peak_a;</div>
+<div class="line"><a name="l00515"></a><span class="lineno">  515</span>&#160;    u16 peak_b;</div>
+<div class="line"><a name="l00516"></a><span class="lineno">  516</span>&#160;    u16 charge_a;</div>
+<div class="line"><a name="l00517"></a><span class="lineno">  517</span>&#160;    u16 charge_b;</div>
+<div class="line"><a name="l00518"></a><span class="lineno">  518</span>&#160;    u16 charge_min_i;</div>
+<div class="line"><a name="l00519"></a><span class="lineno">  519</span>&#160;    u16 x_pos;</div>
+<div class="line"><a name="l00520"></a><span class="lineno">  520</span>&#160;    u16 t_average;</div>
+<div class="line"><a name="l00521"></a><span class="lineno">  521</span>&#160;    <span class="comment">// don&#39;t serialize</span></div>
+<div class="line"><a name="l00522"></a><span class="lineno">  522</span>&#160;};</div>
 <div class="line"><a name="l00523"></a><span class="lineno">  523</span>&#160; </div>
-<div class="line"><a name="l00524"></a><span class="lineno">  524</span>&#160;std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, <span class="keyword">const</span> <a class="code" href="structTofEvent.html">TofEvent</a>&amp; et);</div>
+<div class="line"><a name="l00524"></a><span class="lineno">  524</span>&#160;std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, <span class="keyword">const</span> <a class="code" href="structTofHit.html">TofHit</a>&amp; pad);</div>
 <div class="line"><a name="l00525"></a><span class="lineno">  525</span>&#160; </div>
-<div class="line"><a name="l00526"></a><span class="lineno">  526</span>&#160;std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, <span class="keyword">const</span> <a class="code" href="structRBEvent.html">RBEvent</a>&amp; re);</div>
+<div class="line"><a name="l00526"></a><span class="lineno">  526</span>&#160;std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, <span class="keyword">const</span> <a class="code" href="structMasterTriggerEvent.html">MasterTriggerEvent</a>&amp; mt);</div>
 <div class="line"><a name="l00527"></a><span class="lineno">  527</span>&#160; </div>
-<div class="line"><a name="l00528"></a><span class="lineno">  528</span>&#160;std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, <span class="keyword">const</span> <a class="code" href="structRBEventHeader.html">RBEventHeader</a>&amp; rh);</div>
+<div class="line"><a name="l00528"></a><span class="lineno">  528</span>&#160;std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, <span class="keyword">const</span> <a class="code" href="structTofEvent.html">TofEvent</a>&amp; et);</div>
 <div class="line"><a name="l00529"></a><span class="lineno">  529</span>&#160; </div>
-<div class="line"><a name="l00530"></a><span class="lineno">  530</span>&#160;<span class="preprocessor">#endif </span></div>
-<div class="ttc" id="astructMasterTriggerEvent_html"><div class="ttname"><a href="structMasterTriggerEvent.html">MasterTriggerEvent</a></div><div class="ttdef"><b>Definition:</b> events.h:291</div></div>
-<div class="ttc" id="astructMasterTriggerEvent_html_a19a8c42a5953fd1ae8a0aec831863c3c"><div class="ttname"><a href="structMasterTriggerEvent.html#a19a8c42a5953fd1ae8a0aec831863c3c">MasterTriggerEvent::TAIL</a></div><div class="ttdeci">static const u16 TAIL</div><div class="ttdoc">end struct marker</div><div class="ttdef"><b>Definition:</b> events.h:295</div></div>
-<div class="ttc" id="astructMasterTriggerEvent_html_a237c05d33e1485cf4bace993c9ae6ee9"><div class="ttname"><a href="structMasterTriggerEvent.html#a237c05d33e1485cf4bace993c9ae6ee9">MasterTriggerEvent::HEAD</a></div><div class="ttdeci">static const u16 HEAD</div><div class="ttdoc">begin struct marker</div><div class="ttdef"><b>Definition:</b> events.h:293</div></div>
-<div class="ttc" id="astructMasterTriggerEvent_html_a2fc1e8b3d4f1e769b4bce8a58a166c78"><div class="ttname"><a href="structMasterTriggerEvent.html#a2fc1e8b3d4f1e769b4bce8a58a166c78">MasterTriggerEvent::event_id</a></div><div class="ttdeci">u32 event_id</div><div class="ttdoc">event_id as assigned by the MasterTriggerBoard</div><div class="ttdef"><b>Definition:</b> events.h:302</div></div>
-<div class="ttc" id="astructMasterTriggerEvent_html_a30d57d1dc8bd9e7fc55d1af7ad6ebc92"><div class="ttname"><a href="structMasterTriggerEvent.html#a30d57d1dc8bd9e7fc55d1af7ad6ebc92">MasterTriggerEvent::tiu_timestamp</a></div><div class="ttdeci">u32 tiu_timestamp</div><div class="ttdoc">Tracker (?) timestamp.</div><div class="ttdef"><b>Definition:</b> events.h:306</div></div>
-<div class="ttc" id="astructMasterTriggerEvent_html_a3584e8178fab07839e43d3eec831d0bc"><div class="ttname"><a href="structMasterTriggerEvent.html#a3584e8178fab07839e43d3eec831d0bc">MasterTriggerEvent::n_paddles</a></div><div class="ttdeci">u8 n_paddles</div><div class="ttdoc">triggered paddles as seen by the MTB</div><div class="ttdef"><b>Definition:</b> events.h:312</div></div>
-<div class="ttc" id="astructMasterTriggerEvent_html_a3e2850cccfd9056e60da6512216a7aff"><div class="ttname"><a href="structMasterTriggerEvent.html#a3e2850cccfd9056e60da6512216a7aff">MasterTriggerEvent::board_mask</a></div><div class="ttdeci">bool board_mask[N_LTBS]</div><div class="ttdoc">bitmask indicating hit LTBs, identified by DSI/J</div><div class="ttdef"><b>Definition:</b> events.h:314</div></div>
+<div class="line"><a name="l00530"></a><span class="lineno">  530</span>&#160;std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, <span class="keyword">const</span> <a class="code" href="structRBEvent.html">RBEvent</a>&amp; re);</div>
+<div class="line"><a name="l00531"></a><span class="lineno">  531</span>&#160; </div>
+<div class="line"><a name="l00532"></a><span class="lineno">  532</span>&#160;std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, <span class="keyword">const</span> <a class="code" href="structRBEventHeader.html">RBEventHeader</a>&amp; rh);</div>
+<div class="line"><a name="l00533"></a><span class="lineno">  533</span>&#160; </div>
+<div class="line"><a name="l00534"></a><span class="lineno">  534</span>&#160;<span class="preprocessor">#endif </span></div>
+<div class="ttc" id="astructMasterTriggerEvent_html"><div class="ttname"><a href="structMasterTriggerEvent.html">MasterTriggerEvent</a></div><div class="ttdef"><b>Definition:</b> events.h:292</div></div>
+<div class="ttc" id="astructMasterTriggerEvent_html_a19a8c42a5953fd1ae8a0aec831863c3c"><div class="ttname"><a href="structMasterTriggerEvent.html#a19a8c42a5953fd1ae8a0aec831863c3c">MasterTriggerEvent::TAIL</a></div><div class="ttdeci">static const u16 TAIL</div><div class="ttdoc">end struct marker</div><div class="ttdef"><b>Definition:</b> events.h:296</div></div>
+<div class="ttc" id="astructMasterTriggerEvent_html_a237c05d33e1485cf4bace993c9ae6ee9"><div class="ttname"><a href="structMasterTriggerEvent.html#a237c05d33e1485cf4bace993c9ae6ee9">MasterTriggerEvent::HEAD</a></div><div class="ttdeci">static const u16 HEAD</div><div class="ttdoc">begin struct marker</div><div class="ttdef"><b>Definition:</b> events.h:294</div></div>
+<div class="ttc" id="astructMasterTriggerEvent_html_a2fc1e8b3d4f1e769b4bce8a58a166c78"><div class="ttname"><a href="structMasterTriggerEvent.html#a2fc1e8b3d4f1e769b4bce8a58a166c78">MasterTriggerEvent::event_id</a></div><div class="ttdeci">u32 event_id</div><div class="ttdoc">event_id as assigned by the MasterTriggerBoard</div><div class="ttdef"><b>Definition:</b> events.h:303</div></div>
+<div class="ttc" id="astructMasterTriggerEvent_html_a30d57d1dc8bd9e7fc55d1af7ad6ebc92"><div class="ttname"><a href="structMasterTriggerEvent.html#a30d57d1dc8bd9e7fc55d1af7ad6ebc92">MasterTriggerEvent::tiu_timestamp</a></div><div class="ttdeci">u32 tiu_timestamp</div><div class="ttdoc">Tracker (?) timestamp.</div><div class="ttdef"><b>Definition:</b> events.h:307</div></div>
+<div class="ttc" id="astructMasterTriggerEvent_html_a3584e8178fab07839e43d3eec831d0bc"><div class="ttname"><a href="structMasterTriggerEvent.html#a3584e8178fab07839e43d3eec831d0bc">MasterTriggerEvent::n_paddles</a></div><div class="ttdeci">u8 n_paddles</div><div class="ttdoc">triggered paddles as seen by the MTB</div><div class="ttdef"><b>Definition:</b> events.h:313</div></div>
+<div class="ttc" id="astructMasterTriggerEvent_html_a3e2850cccfd9056e60da6512216a7aff"><div class="ttname"><a href="structMasterTriggerEvent.html#a3e2850cccfd9056e60da6512216a7aff">MasterTriggerEvent::board_mask</a></div><div class="ttdeci">bool board_mask[N_LTBS]</div><div class="ttdoc">bitmask indicating hit LTBs, identified by DSI/J</div><div class="ttdef"><b>Definition:</b> events.h:315</div></div>
 <div class="ttc" id="astructMasterTriggerEvent_html_a7fb481cacc0a272a464bba031b880669"><div class="ttname"><a href="structMasterTriggerEvent.html#a7fb481cacc0a272a464bba031b880669">MasterTriggerEvent::get_dsi_j_ch</a></div><div class="ttdeci">Vec&lt; std::tuple&lt; u8, u8, u8 &gt; &gt; get_dsi_j_ch()</div></div>
-<div class="ttc" id="astructMasterTriggerEvent_html_a812af2c197e987f663477039dfb349da"><div class="ttname"><a href="structMasterTriggerEvent.html#a812af2c197e987f663477039dfb349da">MasterTriggerEvent::tiu_gps_16</a></div><div class="ttdeci">u32 tiu_gps_16</div><div class="ttdoc">GAPS GPS clock value (fast)</div><div class="ttdef"><b>Definition:</b> events.h:310</div></div>
-<div class="ttc" id="astructMasterTriggerEvent_html_a886a68d557a93210b86b3e2d1b96bfa9"><div class="ttname"><a href="structMasterTriggerEvent.html#a886a68d557a93210b86b3e2d1b96bfa9">MasterTriggerEvent::timestamp</a></div><div class="ttdeci">u32 timestamp</div><div class="ttdoc">MTB timestamp.</div><div class="ttdef"><b>Definition:</b> events.h:304</div></div>
+<div class="ttc" id="astructMasterTriggerEvent_html_a812af2c197e987f663477039dfb349da"><div class="ttname"><a href="structMasterTriggerEvent.html#a812af2c197e987f663477039dfb349da">MasterTriggerEvent::tiu_gps_16</a></div><div class="ttdeci">u32 tiu_gps_16</div><div class="ttdoc">GAPS GPS clock value (fast)</div><div class="ttdef"><b>Definition:</b> events.h:311</div></div>
+<div class="ttc" id="astructMasterTriggerEvent_html_a886a68d557a93210b86b3e2d1b96bfa9"><div class="ttname"><a href="structMasterTriggerEvent.html#a886a68d557a93210b86b3e2d1b96bfa9">MasterTriggerEvent::timestamp</a></div><div class="ttdeci">u32 timestamp</div><div class="ttdoc">MTB timestamp.</div><div class="ttdef"><b>Definition:</b> events.h:305</div></div>
 <div class="ttc" id="astructMasterTriggerEvent_html_a92eba169f890dbdf936adba5572e06fe"><div class="ttname"><a href="structMasterTriggerEvent.html#a92eba169f890dbdf936adba5572e06fe">MasterTriggerEvent::from_bytestream</a></div><div class="ttdeci">static MasterTriggerEvent from_bytestream(const Vec&lt; u8 &gt; &amp;bytestream, u64 &amp;pos)</div></div>
-<div class="ttc" id="astructMasterTriggerEvent_html_aa02e973d0cf453f05bf1c9c591a14af8"><div class="ttname"><a href="structMasterTriggerEvent.html#aa02e973d0cf453f05bf1c9c591a14af8">MasterTriggerEvent::tiu_gps_32</a></div><div class="ttdeci">u32 tiu_gps_32</div><div class="ttdoc">GAPS GPS clock value (slow)</div><div class="ttdef"><b>Definition:</b> events.h:308</div></div>
-<div class="ttc" id="astructMasterTriggerEvent_html_aa92539d1bcffb9b8cadf5f909a11d916"><div class="ttname"><a href="structMasterTriggerEvent.html#aa92539d1bcffb9b8cadf5f909a11d916">MasterTriggerEvent::hits</a></div><div class="ttdeci">bool hits[N_LTBS][N_CHN_PER_LTB]</div><div class="ttdef"><b>Definition:</b> events.h:317</div></div>
+<div class="ttc" id="astructMasterTriggerEvent_html_aa02e973d0cf453f05bf1c9c591a14af8"><div class="ttname"><a href="structMasterTriggerEvent.html#aa02e973d0cf453f05bf1c9c591a14af8">MasterTriggerEvent::tiu_gps_32</a></div><div class="ttdeci">u32 tiu_gps_32</div><div class="ttdoc">GAPS GPS clock value (slow)</div><div class="ttdef"><b>Definition:</b> events.h:309</div></div>
+<div class="ttc" id="astructMasterTriggerEvent_html_aa92539d1bcffb9b8cadf5f909a11d916"><div class="ttname"><a href="structMasterTriggerEvent.html#aa92539d1bcffb9b8cadf5f909a11d916">MasterTriggerEvent::hits</a></div><div class="ttdeci">bool hits[N_LTBS][N_CHN_PER_LTB]</div><div class="ttdef"><b>Definition:</b> events.h:318</div></div>
 <div class="ttc" id="astructMasterTriggerEvent_html_aabc131f9d53ef6256b235d953f6c3f3b"><div class="ttname"><a href="structMasterTriggerEvent.html#aabc131f9d53ef6256b235d953f6c3f3b">MasterTriggerEvent::to_string</a></div><div class="ttdeci">std::string to_string() const</div><div class="ttdoc">String representation of the struct.</div></div>
-<div class="ttc" id="astructMasterTriggerEvent_html_ae8de2d59e0cdb02a7ad7b6073011983d"><div class="ttname"><a href="structMasterTriggerEvent.html#ae8de2d59e0cdb02a7ad7b6073011983d">MasterTriggerEvent::SIZE</a></div><div class="ttdeci">static const usize SIZE</div><div class="ttdoc">the struct has a fixed size of SIZE</div><div class="ttdef"><b>Definition:</b> events.h:297</div></div>
+<div class="ttc" id="astructMasterTriggerEvent_html_ae8de2d59e0cdb02a7ad7b6073011983d"><div class="ttname"><a href="structMasterTriggerEvent.html#ae8de2d59e0cdb02a7ad7b6073011983d">MasterTriggerEvent::SIZE</a></div><div class="ttdeci">static const usize SIZE</div><div class="ttdoc">the struct has a fixed size of SIZE</div><div class="ttdef"><b>Definition:</b> events.h:298</div></div>
 <div class="ttc" id="astructRBCalibration_html"><div class="ttname"><a href="structRBCalibration.html">RBCalibration</a></div><div class="ttdef"><b>Definition:</b> calibration.h:33</div></div>
 <div class="ttc" id="astructRBEventHeader_html"><div class="ttname"><a href="structRBEventHeader.html">RBEventHeader</a></div><div class="ttdef"><b>Definition:</b> events.h:128</div></div>
 <div class="ttc" id="astructRBEventHeader_html_a033544a0bc53370e1fc995e2d5f29ca4"><div class="ttname"><a href="structRBEventHeader.html#a033544a0bc53370e1fc995e2d5f29ca4">RBEventHeader::to_string</a></div><div class="ttdeci">std::string to_string() const</div><div class="ttdoc">string representation for printing</div></div>
@@ -472,17 +475,18 @@ $(document).ready(function(){initNavTree('events_8h_source.html',''); initResiza
 <div class="ttc" id="astructRBEventMemoryView_html_a0c29583eaf1c834bbacd4533c295b1f9"><div class="ttname"><a href="structRBEventMemoryView.html#a0c29583eaf1c834bbacd4533c295b1f9">RBEventMemoryView::from_bytestream</a></div><div class="ttdeci">static RBEventMemoryView from_bytestream(const Vec&lt; u8 &gt; &amp;bytestream, u64 &amp;pos)</div></div>
 <div class="ttc" id="astructRBEventMemoryView_html_a9d21fcd750ff7629b1648691363a9449"><div class="ttname"><a href="structRBEventMemoryView.html#a9d21fcd750ff7629b1648691363a9449">RBEventMemoryView::get_channel_adc</a></div><div class="ttdeci">Vec&lt; u16 &gt; get_channel_adc(u8 channel) const</div></div>
 <div class="ttc" id="astructRBEvent_html"><div class="ttname"><a href="structRBEvent.html">RBEvent</a></div><div class="ttdef"><b>Definition:</b> events.h:180</div></div>
-<div class="ttc" id="astructRBMissingHit_html"><div class="ttname"><a href="structRBMissingHit.html">RBMissingHit</a></div><div class="ttdef"><b>Definition:</b> events.h:221</div></div>
+<div class="ttc" id="astructRBEvent_html_a8d2136632b5e60dd4b9f317ed4f0a473"><div class="ttname"><a href="structRBEvent.html#a8d2136632b5e60dd4b9f317ed4f0a473">RBEvent::calc_baseline</a></div><div class="ttdeci">static f32 calc_baseline(const Vec&lt; f32 &gt; &amp;volts, usize min_bin, usize max_bin)</div><div class="ttdoc">Get the baseline for a single channel.</div></div>
+<div class="ttc" id="astructRBMissingHit_html"><div class="ttname"><a href="structRBMissingHit.html">RBMissingHit</a></div><div class="ttdef"><b>Definition:</b> events.h:222</div></div>
 <div class="ttc" id="astructTofEventHeader_html"><div class="ttname"><a href="structTofEventHeader.html">TofEventHeader</a></div><div class="ttdef"><b>Definition:</b> tof_event_header.hpp:6</div></div>
-<div class="ttc" id="astructTofEvent_html"><div class="ttname"><a href="structTofEvent.html">TofEvent</a></div><div class="ttdef"><b>Definition:</b> events.h:394</div></div>
+<div class="ttc" id="astructTofEvent_html"><div class="ttname"><a href="structTofEvent.html">TofEvent</a></div><div class="ttdef"><b>Definition:</b> events.h:395</div></div>
 <div class="ttc" id="astructTofEvent_html_a42760fc8fa3384f7ff5676875dea6e77"><div class="ttname"><a href="structTofEvent.html#a42760fc8fa3384f7ff5676875dea6e77">TofEvent::from_tofpacket</a></div><div class="ttdeci">static TofEvent from_tofpacket(const TofPacket &amp;packet)</div></div>
-<div class="ttc" id="astructTofEvent_html_a577628b0f2d6beacc40f6bad1adc135a"><div class="ttname"><a href="structTofEvent.html#a577628b0f2d6beacc40f6bad1adc135a">TofEvent::rb_events</a></div><div class="ttdeci">Vec&lt; RBEvent &gt; rb_events</div><div class="ttdef"><b>Definition:</b> events.h:403</div></div>
+<div class="ttc" id="astructTofEvent_html_a577628b0f2d6beacc40f6bad1adc135a"><div class="ttname"><a href="structTofEvent.html#a577628b0f2d6beacc40f6bad1adc135a">TofEvent::rb_events</a></div><div class="ttdeci">Vec&lt; RBEvent &gt; rb_events</div><div class="ttdef"><b>Definition:</b> events.h:406</div></div>
 <div class="ttc" id="astructTofEvent_html_a794247ff0963ea316256d0423b9460f7"><div class="ttname"><a href="structTofEvent.html#a794247ff0963ea316256d0423b9460f7">TofEvent::get_rbevent</a></div><div class="ttdeci">const RBEvent &amp; get_rbevent(u8 board_id) const</div></div>
-<div class="ttc" id="astructTofEvent_html_aa9745620cfaea3f6655d2c214a51f7e3"><div class="ttname"><a href="structTofEvent.html#aa9745620cfaea3f6655d2c214a51f7e3">TofEvent::missing_hits</a></div><div class="ttdeci">Vec&lt; RBMissingHit &gt; missing_hits</div><div class="ttdef"><b>Definition:</b> events.h:407</div></div>
+<div class="ttc" id="astructTofEvent_html_aa9745620cfaea3f6655d2c214a51f7e3"><div class="ttname"><a href="structTofEvent.html#aa9745620cfaea3f6655d2c214a51f7e3">TofEvent::missing_hits</a></div><div class="ttdeci">Vec&lt; RBMissingHit &gt; missing_hits</div><div class="ttdef"><b>Definition:</b> events.h:410</div></div>
 <div class="ttc" id="astructTofEvent_html_ac62d2f3b9db6a01c93cfa7f76ad30451"><div class="ttname"><a href="structTofEvent.html#ac62d2f3b9db6a01c93cfa7f76ad30451">TofEvent::from_bytestream</a></div><div class="ttdeci">static TofEvent from_bytestream(const Vec&lt; u8 &gt; &amp;bytestream, u64 &amp;pos)</div></div>
 <div class="ttc" id="astructTofEvent_html_ac9c16f7b24c02f6ef7c4638a516ef325"><div class="ttname"><a href="structTofEvent.html#ac9c16f7b24c02f6ef7c4638a516ef325">TofEvent::get_rbids</a></div><div class="ttdeci">Vec&lt; u8 &gt; get_rbids() const</div></div>
 <div class="ttc" id="astructTofEvent_html_aea1f5e45ce3fd1d874eb6424d7c8c84d"><div class="ttname"><a href="structTofEvent.html#aea1f5e45ce3fd1d874eb6424d7c8c84d">TofEvent::to_string</a></div><div class="ttdeci">std::string to_string() const</div><div class="ttdoc">string representation for printing</div></div>
-<div class="ttc" id="astructTofHit_html"><div class="ttname"><a href="structTofHit.html">TofHit</a></div><div class="ttdef"><b>Definition:</b> events.h:473</div></div>
+<div class="ttc" id="astructTofHit_html"><div class="ttname"><a href="structTofHit.html">TofHit</a></div><div class="ttdef"><b>Definition:</b> events.h:477</div></div>
 <div class="ttc" id="astructTofPacket_html"><div class="ttname"><a href="structTofPacket.html">TofPacket</a></div><div class="ttdef"><b>Definition:</b> tof_packet.h:75</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->

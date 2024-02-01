@@ -1,11 +1,8 @@
 var searchData=
 [
-  ['parse_5fbool_101',['parse_bool',['../namespaceGaps.html#a13cb72078c0645adb57076cc5697b9a1',1,'Gaps']]],
-  ['parse_5ff32_102',['parse_f32',['../namespaceGaps.html#aa324d073f3fec42714ed7f1dfa9528ce',1,'Gaps']]],
-  ['parse_5ff64_103',['parse_f64',['../namespaceGaps.html#a75bc2048681872469a0e8164a07eb145',1,'Gaps']]],
-  ['parse_5fi32_104',['parse_i32',['../namespaceGaps.html#a2fa35da8776bb053ebdb6f9da7ea245e',1,'Gaps']]],
-  ['parse_5fu16_105',['parse_u16',['../namespaceGaps.html#a8d5ee03930328391169c3f11a9b06e8e',1,'Gaps']]],
-  ['parse_5fu32_106',['parse_u32',['../namespaceGaps.html#ac09d7b4a66f0df27a63af339dd6d7ea8',1,'Gaps']]],
-  ['parse_5fu64_107',['parse_u64',['../namespaceGaps.html#aa913722aa6668823951e07f44b8698d6',1,'Gaps']]],
-  ['parse_5fu8_108',['parse_u8',['../namespaceGaps.html#af02b80458f7649651a342344e3b103ee',1,'Gaps']]]
+  ['get_5fchannel_5fadc_98',['get_channel_adc',['../structRBEventMemoryView.html#a9d21fcd750ff7629b1648691363a9449',1,'RBEventMemoryView']]],
+  ['get_5fdsi_5fj_5fch_99',['get_dsi_j_ch',['../structMasterTriggerEvent.html#a7fb481cacc0a272a464bba031b880669',1,'MasterTriggerEvent']]],
+  ['get_5frbevent_100',['get_rbevent',['../structTofEvent.html#a794247ff0963ea316256d0423b9460f7',1,'TofEvent']]],
+  ['get_5frbids_101',['get_rbids',['../structTofEvent.html#ac9c16f7b24c02f6ef7c4638a516ef325',1,'TofEvent']]],
+  ['get_5ftimestamp48_102',['get_timestamp48',['../structRBEventHeader.html#a824de6e619d8ccb6fa71fa7a73d4017b',1,'RBEventHeader']]]
 ];

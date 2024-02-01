@@ -107,49 +107,49 @@ $(document).ready(function(){initNavTree('io_8hpp_source.html',''); initResizabl
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; </div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;Vec&lt;u32&gt; get_event_ids_from_raw_stream(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;bytestream, u64 &amp;start_pos);</div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;Vec&lt;TofPacket&gt; get_tofpackets(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;bytestream, u64 start_pos);</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160; </div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;Vec&lt;TofPacket&gt; get_tofpackets(<span class="keyword">const</span> String filename);</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160; </div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;Vec&lt;TofEvent&gt; unpack_tofevents_from_tofpackets(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;bytestream, u64 start_pos);</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160; </div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;Vec&lt;TofEvent&gt; unpack_tofevents_from_tofpackets(<span class="keyword">const</span> String filename);</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160; </div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;<span class="comment">// * Extract TofEvents from a stream of binary data </span></div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="comment">// *</span></div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;<span class="comment">// * @param bytestream : Binary TofEvent data.</span></div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;<span class="comment">// * @param start_pos  : Byte position to start searching from in bytestream</span></div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="comment">// */</span></div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="comment">//Vec&lt;TofPacket&gt; get_tofpackets(const Vec&lt;u8&gt; &amp;bytestream, u64 start_pos);</span></div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="comment">//</span></div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="comment"></span><span class="comment">// * Extract TofEvents from a file on disk</span></div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;<span class="comment">// *</span></div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;<span class="comment">// * @param filename : Full path to binary file with TofEvents.</span></div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;<span class="comment">// */</span></div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;<span class="comment">//Vec&lt;TofPacket&gt; get_tofpackets(const String filename);</span></div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160; </div>
-<div class="line"><a name="l00097"></a><span class="lineno"><a class="line" href="namespaceGaps.html">   97</a></span>&#160;<span class="keyword">namespace </span><a class="code" href="namespaceGaps.html">Gaps</a> {</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160; </div>
-<div class="line"><a name="l00101"></a><span class="lineno"><a class="line" href="classGaps_1_1TofPacketReader.html">  101</a></span>&#160;  <span class="keyword">class </span><a class="code" href="classGaps_1_1TofPacketReader.html">TofPacketReader</a> {</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    <span class="keyword">public</span>: </div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;      <a class="code" href="classGaps_1_1TofPacketReader.html">TofPacketReader</a>(String filename);</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;      <span class="keywordtype">void</span> process_chunk();</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;      <a class="code" href="structTofPacket.html">TofPacket</a> get_next_packet();</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;      String get_filename() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;      String filename_;</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;      usize  file_size_;</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;      usize  nchunks_;</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;      usize  current_pos_;</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;      <a class="code" href="structTofPacket.html">TofPacket</a> last_packet_;</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;      std::ifstream stream_file_;</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;  };</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;}</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160; </div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160; </div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="ttc" id="aclassGaps_1_1TofPacketReader_html"><div class="ttname"><a href="classGaps_1_1TofPacketReader.html">Gaps::TofPacketReader</a></div><div class="ttdef"><b>Definition:</b> io.hpp:101</div></div>
-<div class="ttc" id="anamespaceGaps_html"><div class="ttname"><a href="namespaceGaps.html">Gaps</a></div><div class="ttdoc">‍**</div><div class="ttdef"><b>Definition:</b> io.hpp:97</div></div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;Vec&lt;TofPacket&gt; get_tofpackets(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;bytestream, u64 start_pos, PacketType filter=PacketType::Unknown);</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160; </div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;Vec&lt;TofPacket&gt; get_tofpackets(<span class="keyword">const</span> String filename, PacketType filter = PacketType::Unknown);</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160; </div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;Vec&lt;TofEvent&gt; unpack_tofevents_from_tofpackets(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;bytestream, u64 start_pos);</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160; </div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;Vec&lt;TofEvent&gt; unpack_tofevents_from_tofpackets(<span class="keyword">const</span> String filename);</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160; </div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="comment">// * Extract TofEvents from a stream of binary data </span></div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="comment">// *</span></div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="comment">// * @param bytestream : Binary TofEvent data.</span></div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="comment">// * @param start_pos  : Byte position to start searching from in bytestream</span></div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="comment">// */</span></div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;<span class="comment">//Vec&lt;TofPacket&gt; get_tofpackets(const Vec&lt;u8&gt; &amp;bytestream, u64 start_pos);</span></div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;<span class="comment">//</span></div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;<span class="comment"></span><span class="comment">// * Extract TofEvents from a file on disk</span></div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;<span class="comment">// *</span></div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;<span class="comment">// * @param filename : Full path to binary file with TofEvents.</span></div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;<span class="comment">// */</span></div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;<span class="comment">//Vec&lt;TofPacket&gt; get_tofpackets(const String filename);</span></div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160; </div>
+<div class="line"><a name="l00101"></a><span class="lineno"><a class="line" href="namespaceGaps.html">  101</a></span>&#160;<span class="keyword">namespace </span><a class="code" href="namespaceGaps.html">Gaps</a> {</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160; </div>
+<div class="line"><a name="l00105"></a><span class="lineno"><a class="line" href="classGaps_1_1TofPacketReader.html">  105</a></span>&#160;  <span class="keyword">class </span><a class="code" href="classGaps_1_1TofPacketReader.html">TofPacketReader</a> {</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    <span class="keyword">public</span>: </div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;      <a class="code" href="classGaps_1_1TofPacketReader.html">TofPacketReader</a>(String filename);</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;      <span class="keywordtype">void</span> process_chunk();</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;      <a class="code" href="structTofPacket.html">TofPacket</a> get_next_packet();</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;      String get_filename() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;      String filename_;</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;      usize  file_size_;</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;      usize  nchunks_;</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;      usize  current_pos_;</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;      <a class="code" href="structTofPacket.html">TofPacket</a> last_packet_;</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;      std::ifstream stream_file_;</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;  };</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;}</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160; </div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160; </div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="ttc" id="aclassGaps_1_1TofPacketReader_html"><div class="ttname"><a href="classGaps_1_1TofPacketReader.html">Gaps::TofPacketReader</a></div><div class="ttdef"><b>Definition:</b> io.hpp:105</div></div>
+<div class="ttc" id="anamespaceGaps_html"><div class="ttname"><a href="namespaceGaps.html">Gaps</a></div><div class="ttdoc">‍**</div><div class="ttdef"><b>Definition:</b> io.hpp:101</div></div>
 <div class="ttc" id="astructTofPacket_html"><div class="ttname"><a href="structTofPacket.html">TofPacket</a></div><div class="ttdef"><b>Definition:</b> tof_packet.h:75</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->

@@ -1273,6 +1273,17 @@
 <a href="#1273" id="1273">1273</a>
 <a href="#1274" id="1274">1274</a>
 <a href="#1275" id="1275">1275</a>
+<a href="#1276" id="1276">1276</a>
+<a href="#1277" id="1277">1277</a>
+<a href="#1278" id="1278">1278</a>
+<a href="#1279" id="1279">1279</a>
+<a href="#1280" id="1280">1280</a>
+<a href="#1281" id="1281">1281</a>
+<a href="#1282" id="1282">1282</a>
+<a href="#1283" id="1283">1283</a>
+<a href="#1284" id="1284">1284</a>
+<a href="#1285" id="1285">1285</a>
+<a href="#1286" id="1286">1286</a>
 </pre></div><pre class="rust"><code><span class="kw">pub mod </span>master_trigger;
 <span class="kw">use </span>constants::{DEFAULT_CALIB_VOLTAGE,
                 DEFAULT_CALIB_EXTRA,
@@ -1287,8 +1298,12 @@
                 <span class="comment">//DEFAULT_RUN_TIME,
                 </span>PREAMP_MIN_BIAS,
                 PREAMP_MAX_BIAS};
-<span class="kw">pub use </span>master_trigger::{connect_to_mtb,
-                         master_trigger};
+<span class="kw">pub use </span>master_trigger::{
+    connect_to_mtb,
+    master_trigger,
+    MTBSettings
+};
+
 <span class="kw">pub mod </span>constants;
 
 <span class="kw">use </span>std::error::Error;
@@ -1685,7 +1700,9 @@
   </span><span class="kw">let </span><span class="kw-2">mut </span>pid        : u8;
   <span class="comment">// will become a parameter
   </span><span class="kw">let </span>fit_sinus = <span class="bool-val">true</span>;
-  <span class="kw">for </span>raw_ch <span class="kw">in </span>channels {
+  
+  <span class="comment">// FIXME - don&#39;t do this per every event
+  </span><span class="kw">for </span>raw_ch <span class="kw">in </span>channels {
     <span class="kw">if </span>raw_ch == <span class="number">8 </span>{
       <span class="kw">continue</span>;
     }
@@ -1712,6 +1729,11 @@
   <span class="comment">// second loop over channels. Now we have
   // all the paddles set up in the hashmap
   </span><span class="kw">for </span>raw_ch <span class="kw">in </span>channels_c {
+    <span class="kw">if </span>event.adc[raw_ch <span class="kw">as </span>usize].len() == <span class="number">0 </span>{
+      <span class="comment">// we are most likely running in trace suppression mode, 
+      // this channel is simply not populated
+      </span><span class="kw">continue</span>;
+    }
     <span class="kw">if </span>raw_ch == <span class="number">8 </span>{
       <span class="kw">if </span>fit_sinus {
         <span class="comment">// +1 channel convention

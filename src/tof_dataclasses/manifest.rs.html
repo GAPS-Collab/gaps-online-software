@@ -738,6 +738,8 @@
 <a href="#738" id="738">738</a>
 <a href="#739" id="739">739</a>
 <a href="#740" id="740">740</a>
+<a href="#741" id="741">741</a>
+<a href="#742" id="742">742</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Entities of the tof, that is LocalTriggerBoard, ReadoutBoard, PB, MTB...
 //! 
 //! This provides structs to hold their metainformation,
@@ -1331,7 +1333,8 @@
         }
         <span class="kw">if let </span><span class="prelude-val">Some</span>(caps) = re.captures(<span class="kw-2">&amp;</span>filename) {
           <span class="kw">if let </span><span class="prelude-val">Some</span>(timestamp_str) = caps.get(<span class="number">0</span>).map(|m| m.as_str()) {
-            <span class="kw">let </span>timestamp = NaiveDateTime::parse_from_str(timestamp_str, <span class="string">&quot;%Y_%m_%d_%H_%M&quot;</span>)<span class="question-mark">?</span>;
+            <span class="macro">println!</span>(<span class="string">&quot;{}&quot;</span>,timestamp_str);
+            <span class="kw">let </span>timestamp = NaiveDateTime::parse_from_str(timestamp_str, <span class="string">&quot;%Y_%m_%d-%H_%M_%S&quot;</span>)<span class="question-mark">?</span>;
             <span class="kw">if </span>timestamp &gt; newest_file.<span class="number">1 </span>{
               newest_file.<span class="number">1 </span>= timestamp;
               newest_file.<span class="number">0 </span>= filename.clone();
@@ -1344,8 +1347,9 @@
     <span class="kw">if </span>newest_file.<span class="number">0</span>.is_empty() {
       <span class="macro">error!</span>(<span class="string">&quot;No matching calibration available for board {}!&quot;</span>, <span class="self">self</span>.rb_id);
     } <span class="kw">else </span>{
-      <span class="macro">println!</span>(<span class="string">&quot;==&gt; Loading calibration from file: {}&quot;</span>, newest_file.<span class="number">0</span>);
-      <span class="self">self</span>.calibration = RBCalibrations::from_file(newest_file.<span class="number">0</span>)<span class="question-mark">?</span>;
+      <span class="kw">let </span>file_to_load = <span class="self">self</span>.calib_file_path.clone() + <span class="string">&quot;/&quot; </span>+ <span class="kw-2">&amp;</span>newest_file.<span class="number">0</span>;
+      <span class="macro">println!</span>(<span class="string">&quot;==&gt; Loading calibration from file: {}&quot;</span>, file_to_load);
+      <span class="self">self</span>.calibration = RBCalibrations::from_file(file_to_load)<span class="question-mark">?</span>;
       <span class="macro">println!</span>(<span class="string">&quot;==&gt; Loaded calibration {}&quot;</span>, <span class="self">self</span>.calibration);
     }
     <span class="prelude-val">Ok</span>(())

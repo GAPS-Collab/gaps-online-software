@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['disable_5feventdata_92',['disable_eventdata',['../structRBCalibration.html#a6b7713557f7ff9223f3c2dc5b598adb6',1,'RBCalibration']]]
+  ['calc_5fbaseline_93',['calc_baseline',['../structRBEvent.html#a8d2136632b5e60dd4b9f317ed4f0a473',1,'RBEvent']]]
 ];

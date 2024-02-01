@@ -1519,10 +1519,10 @@
   <span class="kw">let </span>fname : String;
   <span class="kw">match </span>rb_id {
     <span class="prelude-val">None </span>=&gt; {
-      fname = <span class="macro">format!</span>(<span class="string">&quot;Run{run}_{subrun}.{ts}.gaps.tof&quot;</span>);
+      fname = <span class="macro">format!</span>(<span class="string">&quot;Run{run}_{subrun}.{ts}.tof.gaps&quot;</span>);
     }
     <span class="prelude-val">Some</span>(rbid) =&gt; {
-      fname = <span class="macro">format!</span>(<span class="string">&quot;Run{run}_{subrun}.{ts}.RB{rbid:02}.gaps.tof&quot;</span>);
+      fname = <span class="macro">format!</span>(<span class="string">&quot;Run{run}_{subrun}.{ts}.RB{rbid:02}.tof.gaps&quot;</span>);
     }
   }
   fname
@@ -2140,10 +2140,10 @@
   <span class="kw">pub fn </span>get_next_packet_size(<span class="kw-2">&amp;</span><span class="self">self</span>, stream : <span class="kw-2">&amp;</span>Vec&lt;u8&gt;) -&gt; u32 {
     <span class="comment">// cursor needs at HEAD position and then we have to 
     // add one byte for the packet type
-    </span><span class="kw">let </span><span class="kw-2">mut </span>pos = <span class="self">self</span>.cursor + <span class="number">2</span>;
+    </span><span class="kw">let </span><span class="kw-2">mut </span>pos    = <span class="self">self</span>.cursor + <span class="number">2</span>;
     <span class="kw">let </span>ptype_int  = parse_u8(stream, <span class="kw-2">&amp;mut </span>pos);
     <span class="kw">let </span>next_psize = parse_u32(stream, <span class="kw-2">&amp;mut </span>pos);
-    <span class="kw">let </span>ptype = ptype_int <span class="kw">as </span>u8;
+    <span class="kw">let </span>ptype      = ptype_int <span class="kw">as </span>u8;
     <span class="macro">debug!</span>(<span class="string">&quot;We anticpate a TofPacket of type {:?} and size {} (bytes)&quot;</span>,ptype, next_psize);
     next_psize
   }

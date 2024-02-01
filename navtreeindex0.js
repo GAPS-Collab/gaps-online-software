@@ -1,6 +1,5 @@
 var NAVTREEINDEX0 =
 {
-"":[1,0,1],
 "CommandPacket_8h_source.html":[3,0,0,0,0,0,1,0],
 "annotated.html":[2,0],
 "calibration_8h_source.html":[3,0,0,0,0,0,2],
@@ -79,8 +78,8 @@ var NAVTREEINDEX0 =
 "functions_func.html":[2,3,1],
 "functions_vars.html":[2,3,2],
 "hierarchy.html":[2,2],
-"index.html":[0],
 "index.html":[],
+"index.html":[0],
 "index.html#autotoc_md1":[0,0],
 "index.html#autotoc_md2":[0,1],
 "index.html#autotoc_md3":[0,2],
@@ -249,5 +248,6 @@ var NAVTREEINDEX0 =
 "structRBCalibration.html#a54f57d67ab00764f13943ea89fa82f06":[2,0,9,7],
 "structRBCalibration.html#a6e22a6009c58d6366a6a732b41e751a0":[2,0,9,2],
 "structRBCalibration.html#a71265fb6bc6cd97c69bc54923cc06f0e":[2,0,9,11],
-"structRBCalibration.html#a7b2b7e4fd0b4e106a8ec53d0c019be3a":[2,0,9,19]
+"structRBCalibration.html#a7b2b7e4fd0b4e106a8ec53d0c019be3a":[2,0,9,19],
+"structRBCalibration.html#a96a7e0dbca4ecd7dc6c8eea7664435fb":[2,0,9,3]
 };

@@ -230,6 +230,12 @@
 <a href="#230" id="230">230</a>
 <a href="#231" id="231">231</a>
 <a href="#232" id="232">232</a>
+<a href="#233" id="233">233</a>
+<a href="#234" id="234">234</a>
+<a href="#235" id="235">235</a>
+<a href="#236" id="236">236</a>
+<a href="#237" id="237">237</a>
+<a href="#238" id="238">238</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Standalone application to get events from the MTB (master trigger board)
 //!
 //! This will connect to the MTB over Udp and request the event queue, 
@@ -272,7 +278,11 @@
 <span class="kw">use </span>tof_dataclasses::packets::TofPacket;
 <span class="kw">use </span>tof_dataclasses::events::MasterTriggerEvent;
 <span class="kw">use </span>tof_dataclasses::serialization::Serialization;
-<span class="kw">use </span>liftof_lib::master_trigger;
+<span class="kw">use </span>liftof_lib::{
+    master_trigger,
+    MTBSettings
+};
+
 <span class="kw">use </span>crossbeam_channel <span class="kw">as </span>cbc;
 <span class="comment">//use std::io::Write;
 
@@ -357,6 +367,10 @@
   <span class="kw">let </span>relay_rbs           = args.relay_rbs;
   <span class="kw">let </span>trace_suppression   = args.trace_suppression;
 
+  <span class="comment">//FIXME - just make it work now
+  </span><span class="kw">let </span><span class="kw-2">mut </span>settings = MTBSettings::new();
+  settings.trace_suppression = trace_suppression;
+
   <span class="kw">if </span>args.send_requests {
     <span class="kw">match </span>args.json_ltb_rb_map {
       <span class="prelude-val">None </span>=&gt; {
@@ -375,9 +389,7 @@
                            <span class="kw-2">&amp;</span>mte_send,
                            <span class="kw-2">&amp;</span>tp_send_req,
                            <span class="kw-2">&amp;</span>tp_send_moni,
-                           <span class="number">1</span>,
-                           <span class="number">60</span>,
-                           trace_suppression,
+                           settings,
                            verbose,
                            send_requests);
          })

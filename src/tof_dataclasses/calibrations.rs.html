@@ -1512,6 +1512,7 @@
 <a href="#1512" id="1512">1512</a>
 <a href="#1513" id="1513">1513</a>
 <a href="#1514" id="1514">1514</a>
+<a href="#1515" id="1515">1515</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! The ReadoutBoardCalibration is 
 //! the first stage in a 3 stage 
 //! calibration process for the tof
@@ -2235,10 +2236,10 @@
       <span class="kw">for </span>ev <span class="kw">in </span><span class="number">0</span>..traces[ch].len() {
         <span class="kw">for </span>n <span class="kw">in </span><span class="number">0</span>..traces[ch][ev].len() {
           <span class="kw">let </span><span class="kw-2">mut </span>dval : f32;
-          <span class="kw">if </span>n == <span class="number">0 </span>{
+          <span class="kw">if </span>n == traces[ch][ev].len() - <span class="number">1 </span>{
             dval = rolled_traces[ch][ev][<span class="number">0</span>] - rolled_traces[ch][ev][traces[ch][ev].len() -<span class="number">1</span>];
           } <span class="kw">else </span>{
-            dval = rolled_traces[ch][ev][n] - rolled_traces[ch][ev][n-<span class="number">1</span>];      
+            dval = rolled_traces[ch][ev][n + <span class="number">1</span>] - rolled_traces[ch][ev][n];      
           }
           <span class="kw">match </span>edge {
             Edge::Rising | Edge::Average =&gt; {
@@ -2591,7 +2592,8 @@
   <span class="kw">pub fn </span>new(rb_id : u8) -&gt; <span class="self">Self </span>{
     <span class="comment">// FIXME
     </span><span class="kw">let </span>now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap_or(Duration::from_secs(<span class="number">0</span>));
-    <span class="kw">let </span>timestamp = now.as_secs() <span class="kw">as </span>u32;
+    <span class="comment">//let timestamp = now.as_secs() as u32;
+    </span><span class="kw">let </span>timestamp = <span class="number">0</span>;
     <span class="self">Self </span>{
       rb_id     : rb_id,
       d_v       : <span class="number">182.0</span>, <span class="comment">// FIXME - this needs to be a constant
@@ -2869,7 +2871,7 @@
     <span class="kw">let </span>datetime_utc: DateTime&lt;Utc&gt; = Utc.timestamp(<span class="self">self</span>.timestamp <span class="kw">as </span>i64, <span class="number">0</span>);
     <span class="kw">let </span>timestamp_str = datetime_utc.format(<span class="string">&quot;%Y/%m/%d %H:%M:%S&quot;</span>).to_string();
     <span class="macro">write!</span>(f, 
-  <span class="string">&quot;&lt;ReadoutboardCalibration [{}]:
+  <span class="string">&quot;&lt;ReadoutboardCalibration [{} UTC]:
       RB             : {}
       VCalData       : {} (events)
       TCalData       : {} (events)

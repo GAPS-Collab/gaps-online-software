@@ -281,8 +281,6 @@
 <a href="#281" id="281">281</a>
 <a href="#282" id="282">282</a>
 <a href="#283" id="283">283</a>
-<a href="#284" id="284">284</a>
-<a href="#285" id="285">285</a>
 </pre></div><pre class="rust"><code><span class="doccomment">/// Generalized settings for liftof-cc
 ///
 /// Configure it from a .json config 
@@ -298,6 +296,9 @@
 
 <span class="kw">extern crate </span>toml;
 <span class="kw">use </span>tof_dataclasses::errors::SerializationError;
+<span class="kw">use </span>tof_dataclasses::events::master_trigger::TriggerType;
+
+<span class="kw">use </span>liftof_lib::master_trigger::MTBSettings;
 
 <span class="attr">#[derive(Debug, Copy, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 </span><span class="kw">pub enum </span>BuildStrategy {
@@ -309,6 +310,7 @@
   </span>AdaptiveGreedy(usize),
   WaitForNBoards(usize)
 }
+
 
 <span class="doccomment">/// Settings to change the configuration of the analysis engine 
 /// (pulse extraction)
@@ -380,7 +382,9 @@
   <span class="kw">pub </span>cachesize         : usize,
   <span class="kw">pub </span>n_mte_per_loop    : usize,
   <span class="kw">pub </span>n_rbe_per_loop    : usize,
-  <span class="kw">pub </span>te_timeout_sec    : u32,
+  <span class="doccomment">/// The timeout parameter for the TofEvent. If not
+  /// complete after this time, send it onwards anyway
+  </span><span class="kw">pub </span>te_timeout_sec    : u32,
   <span class="kw">pub </span>build_strategy    : BuildStrategy,
 }
 
@@ -433,15 +437,6 @@
   <span class="doccomment">/// The UDP port to be used to get packets from the 
   /// MTB
   </span><span class="kw">pub </span>mtb_address                : String,
-  <span class="doccomment">/// Enable trace suppression on the MTB. If enabled, 
-  /// only those RB which hits will read out waveforms.
-  /// In case it is disabled, ALL RBs will readout events
-  /// ALL the time. For this, we need also the eventbuilder
-  /// strategy &quot;WaitForNBoards(40)&quot;
-  </span><span class="kw">pub </span>mtb_trace_suppression     : bool,
-  <span class="doccomment">/// The interval (in seconds) to retrieve MtbMoniData from 
-  /// the Mtb
-  </span><span class="kw">pub </span>mtb_moni_interval_sec      : u64,
   <span class="doccomment">/// The interval (in seconds) to retrive CPUMoniData from 
   /// the TOF CPU
   </span><span class="kw">pub </span>cpu_moni_interval_sec      : u64,
@@ -450,6 +445,8 @@
   </span><span class="kw">pub </span>rb_ignorelist              : Vec&lt;u8&gt;,
   <span class="doccomment">/// Should TofHits be generated?
   </span><span class="kw">pub </span>run_analysis_engine        : bool,
+  <span class="doccomment">/// Settings to control the MTB
+  </span><span class="kw">pub </span>mtb_settings               : MTBSettings,
   <span class="doccomment">/// Settings for the TOF event builder
   </span><span class="kw">pub </span>event_builder_settings     : TofEventBuilderSettings,
   <span class="doccomment">/// Settings for the analysis engine
@@ -467,11 +464,10 @@
       fc_pub_address            : String::from(<span class="string">&quot;&quot;</span>),
       fc_sub_address            : String::from(<span class="string">&quot;&quot;</span>),
       mtb_address               : String::from(<span class="string">&quot;10.0.1.10:50001&quot;</span>),
-      mtb_trace_suppression     : <span class="bool-val">true</span>,
-      mtb_moni_interval_sec     : <span class="number">30</span>,
       cpu_moni_interval_sec     : <span class="number">60</span>,
       rb_ignorelist             : Vec::&lt;u8&gt;::new(),
       run_analysis_engine       : <span class="bool-val">true</span>,
+      mtb_settings              : MTBSettings::new(),
       event_builder_settings    : TofEventBuilderSettings::new(),
       analysis_engine_settings  : AnalysisEngineSettings::new(),
     }

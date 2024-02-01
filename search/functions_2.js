@@ -1,8 +1,6 @@
 var searchData=
 [
-  ['get_5fchannel_5fadc_96',['get_channel_adc',['../structRBEventMemoryView.html#a9d21fcd750ff7629b1648691363a9449',1,'RBEventMemoryView']]],
-  ['get_5fdsi_5fj_5fch_97',['get_dsi_j_ch',['../structMasterTriggerEvent.html#a7fb481cacc0a272a464bba031b880669',1,'MasterTriggerEvent']]],
-  ['get_5frbevent_98',['get_rbevent',['../structTofEvent.html#a794247ff0963ea316256d0423b9460f7',1,'TofEvent']]],
-  ['get_5frbids_99',['get_rbids',['../structTofEvent.html#ac9c16f7b24c02f6ef7c4638a516ef325',1,'TofEvent']]],
-  ['get_5ftimestamp48_100',['get_timestamp48',['../structRBEventHeader.html#a824de6e619d8ccb6fa71fa7a73d4017b',1,'RBEventHeader']]]
+  ['from_5fbytestream_95',['from_bytestream',['../structRBCalibration.html#a8026b38840d099cc45d463e07578d829',1,'RBCalibration::from_bytestream()'],['../structRBEventMemoryView.html#a0c29583eaf1c834bbacd4533c295b1f9',1,'RBEventMemoryView::from_bytestream()'],['../structMasterTriggerEvent.html#a92eba169f890dbdf936adba5572e06fe',1,'MasterTriggerEvent::from_bytestream()'],['../structTofEvent.html#ac62d2f3b9db6a01c93cfa7f76ad30451',1,'TofEvent::from_bytestream()'],['../structLTBMoniData.html#aefb436425beaa3961db07a8af2fc5916',1,'LTBMoniData::from_bytestream()'],['../structPBMoniData.html#a307509a33e6e6fe59f6c50ed35b736a8',1,'PBMoniData::from_bytestream()'],['../structPAMoniData.html#a8576c002af8a04e3660ab40dba03cc55',1,'PAMoniData::from_bytestream()'],['../structMtbMoniData.html#a108660e8d66cfddde8c71b5f56783714',1,'MtbMoniData::from_bytestream()'],['../structCPUMoniData.html#ada7e8973c01ac0f7690b7b6f4d53b8f2',1,'CPUMoniData::from_bytestream()'],['../structTofPacket.html#a7ab592f11c676473ff62dac29e9e9861',1,'TofPacket::from_bytestream()']]],
+  ['from_5ftofpacket_96',['from_tofpacket',['../structTofEvent.html#a42760fc8fa3384f7ff5676875dea6e77',1,'TofEvent']]],
+  ['from_5ftxtfile_97',['from_txtfile',['../structRBCalibration.html#a3a13e042d18ab68914ebe48dd1ea1783',1,'RBCalibration']]]
 ];

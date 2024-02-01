@@ -1,7 +1,6 @@
 var structRBEvent =
 [
     [ "RBEvent", "structRBEvent.html#ac70a9aa70bfd93f7fdc5e16a415a41ee", null ],
-    [ "get_baselines", "structRBEvent.html#aaab87984722173afa5d274e56a91b751", null ],
     [ "get_channel_adc", "structRBEvent.html#ad236bde2bfd9fdaf1fd4cc7ae4331cf3", null ],
     [ "get_channel_by_id", "structRBEvent.html#ae8b833bac9a1ec35dcc6b6ff5ffb1edb", null ],
     [ "get_channel_by_label", "structRBEvent.html#a1cdf0a7511f4f0db19c410e6adb45123", null ],
