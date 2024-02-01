@@ -887,8 +887,16 @@ pub fn set_trace_suppression(socket : &UdpSocket,
   info!("Setting MTB trace suppression {}!", sup);
   let mut buffer = [0u8;MT_MAX_PACKSIZE];
   let mut value = read_register(socket, 0xf, &mut buffer)?;
-  let val = !sup;
-  value = value | (val as u32) << 13;
+  // bit 13 has to be 1 for read all channels
+  let mut read_all_ch = u32::pow(2, 13);
+  if sup { // sup means !read_all_ch
+    value = value & !read_all_ch;
+  }
+  else {
+    value = value | read_all_ch; 
+  }
+  //let val = !sup;
+  //value = value | (val as u32) << 13;
   write_register(socket,
                  0xf,
                  value,
