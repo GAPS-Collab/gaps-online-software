@@ -48,6 +48,7 @@ use tof_dataclasses::packets::TofPacket;
 pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
                       ev_from_rb     : &Receiver<RBEvent>,
                       data_sink      : &Sender<TofPacket>,
+                      run_id         : u32,
                       mut settings   : TofEventBuilderSettings) { 
   // event caches for assembled events
   let mut event_cache      = HashMap::<u32, TofEvent>::new();
@@ -83,7 +84,8 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
                  , mt.n_paddles);
           // construct RB requests
 
-          let event = TofEvent::from(&mt);
+          let mut event = TofEvent::from(&mt);
+          event.header.run_id = run_id;
           if event.mt_event.event_id != last_evid + 1 {
             let delta_id = event.mt_event.event_id - last_evid;
             error!("We skipped event ids {}", delta_id );

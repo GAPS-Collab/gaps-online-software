@@ -401,6 +401,7 @@ fn main() {
                          event_builder(&master_ev_rec,
                                        &ev_from_rb,
                                        &tp_to_sink,
+                                       runid as u32,
                                        settings);
           })
          .expect("Failed to spawn cpu-monitoring thread!");
