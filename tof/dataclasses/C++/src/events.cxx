@@ -191,7 +191,7 @@ RBEventHeader RBEventHeader::from_bytestream(const Vec<u8> &stream,
   RBEventHeader header;
   u16 head                  = Gaps::parse_u16(stream, pos);
   if (head != RBEventHeader::HEAD) {
-    log_error("[RBEventHeader::from_bytestream] Header signature " << head << " invalid!");
+    //log_error("[RBEventHeader::from_bytestream] Header signature " << head << " invalid!");
   }
   header.rb_id               = Gaps::parse_u8(stream , pos);  
   header.event_id            = Gaps::parse_u32(stream, pos);  
@@ -374,36 +374,23 @@ const Vec<u16>& RBEvent::get_channel_by_id(u8 channel) const {
 
 /**********************************************************/
 
-Vec<f32> RBEvent::get_baselines(const RBCalibration &cali,
-                                usize min_bin,
-                                usize max_bin) {
-  Vec<f32> baselines = Vec<f32>();
-  for (auto const &ch : adc) {
-    if (min_bin >= ch.size() || max_bin >= ch.size()) {
-      log_error("Can not use bin range " << min_bin << " -> " << max_bin << " for ch with size " <<  ch.size());
-      return baselines;
-    }
-  }
-  auto ch_bl = cali.voltages(*this, true);
-  for (usize ch = 0; ch<ch_bl.size(); ch++) {
+f32 RBEvent::calc_baseline(const Vec<f32> &volts,
+                           usize min_bin,
+                           usize max_bin) {
+  f32 bl     = 0;
+  for (usize idx = 0; idx<volts.size(); idx++) {
     //f32 bl     = std::accumulate(ch_bl[ch].begin() + min_bin, ch_bl[ch].begin() + max_bin,0);
-    f32 bl     = 0;
-    usize indx = 0;
-    for (auto const &val : ch_bl[ch]) {
-      if (indx < min_bin) {
-        indx++;
-        continue;
-      }
-      if (indx > max_bin) {
-        break;
-      }
-      bl += val;
-      indx++;
+    if (idx <= min_bin) {
+      continue;
+    } else if ((idx > min_bin) && (idx <=max_bin)) {
+      bl += volts[idx];
+    } else {
+      break;
     }
-    bl        /= (f32)(max_bin - min_bin);
-    baselines.push_back(bl);
   }
-  return baselines;
+  bl        /= (f32)(max_bin - min_bin);
+    //baselines.push_back(bl);
+  return bl;
 }
 
 /**********************************************************/
@@ -414,7 +401,9 @@ RBEvent RBEvent::from_bytestream(const Vec<u8> &stream,
   log_debug("Start decoding at pos " << pos);
   u16 head = Gaps::parse_u16(stream, pos);
   if (head != RBEvent::HEAD)  {
-    log_error("[RBEvent::from_bytestream] Header signature invalid!");  
+    //log_error("[RBEvent::from_bytestream] Header signature invalid!");  
+    event.status = EventStatus::IncompleteReadout;
+    return event;
   }
   event.data_type = Gaps::parse_u8(stream, pos);
   //event.status    = Gaps::parse_u8(stream, pos);
@@ -457,11 +446,12 @@ RBMissingHit RBMissingHit::from_bytestream(const Vec<u8> &stream,
                                            u64 &pos) {
   log_debug("Start decoding at pos " << pos);
   u16 head = Gaps::parse_u16(stream, pos);
+  RBMissingHit miss  = RBMissingHit();
   if (head != RBMissingHit::HEAD)  {
-    log_error("No header signature found!");  
+    //log_error("No header signature found!");  
+    return miss;  
   }
   // verify_fixed already advances pos by 2
-  RBMissingHit miss  = RBMissingHit();
   miss.event_id      = Gaps::parse_u32(stream, pos);
   miss.ltb_hit_index = Gaps::parse_u8(stream, pos);
   miss.ltb_id        = Gaps::parse_u8(stream, pos);
@@ -566,19 +556,40 @@ u32 TofEvent::get_n_rbevents(u32 mask){
 
 /**********************************************************/
 
+TofEvent::TofEvent() {
+  status       = EventStatus::IncompleteReadout;
+  header       = TofEventHeader();
+  mt_event     = MasterTriggerEvent();
+  rb_events    = Vec<RBEvent>();
+  missing_hits = Vec<RBMissingHit>();
+}
+
+/**********************************************************/
+
 TofEvent TofEvent::from_bytestream(const Vec<u8> &stream,
                                    u64 &pos) {
   spdlog::cfg::load_env_levels();
+  TofEvent event = TofEvent();
+  // FIXME - we need more of these checks
+  // update expected_size as we go
+  usize expected_size = 4
+      + 2
+      + TofEventHeader::SIZE
+      + MasterTriggerEvent::SIZE
+      + 12;
+  if (stream.size() - pos < expected_size) {
+    event.status = EventStatus::IncompleteReadout;
+    return event;
+  }
   log_debug("Start decoding at pos " << pos);
   u16 head = Gaps::parse_u16(stream, pos);
   if (head != TofEvent::HEAD)  {
     log_error("No header signature found!");  
   }
-  TofEvent event = TofEvent();
   // for now skip quality and compression level
   pos += 2;
-  event.header   = TofEventHeader::from_bytestream(stream, pos);
-  event.mt_event = MasterTriggerEvent::from_bytestream(stream, pos);
+  event.header      = TofEventHeader::from_bytestream(stream, pos);
+  event.mt_event    = MasterTriggerEvent::from_bytestream(stream, pos);
   //pos += 45; // for now skip master trigger event
   u32 mask          = Gaps::parse_u32(stream, pos);
   u32 n_rbevents    = get_n_rbevents(mask);
@@ -587,7 +598,11 @@ TofEvent TofEvent::from_bytestream(const Vec<u8> &stream,
   for (u32 k=0; k< n_rbevents; k++) {
     RBEvent rb_event = RBEvent::from_bytestream(stream, pos);
     event.rb_events.push_back(rb_event);
+    if (rb_event.status == EventStatus::IncompleteReadout) {
+      event.status = EventStatus::IncompleteReadout;
+    }
   }
+
   for (u32 k=0; k< n_missing; k++) {
     RBMissingHit missy = RBMissingHit::from_bytestream(stream, pos);
     event.missing_hits.push_back(missy);
@@ -978,7 +993,8 @@ TofHit TofHit::from_bytestream(const Vec<u8> &bytestream,
  TofHit hit = TofHit();
  u16 maybe_header = Gaps::parse_u16(bytestream, pos);
  if (maybe_header != hit.HEAD) {
-   log_error("Can not find HEADER at presumed position. Maybe give a different value for start_pos?");
+   //log_error("Can not find HEADER at presumed position. Maybe give a different value for start_pos?");
+   return hit;
  }
  hit.paddle_id     = bytestream[pos]; pos+=1;
  hit.time_a        = Gaps::parse_u16(bytestream, pos); 

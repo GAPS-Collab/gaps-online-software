@@ -195,7 +195,8 @@ struct RBEvent {
 
   const Vec<u16>& get_channel_adc(u8 channel) const; 
  
-  Vec<f32> get_baselines(const RBCalibration &cali, usize min_bin, usize max_bin); 
+  /// Get the baseline for a single channel
+  static f32 calc_baseline(const Vec<f32> &volts, usize min_bin, usize max_bin); 
 
   static RBEvent from_bytestream(const Vec<u8> &bytestream,
                                  u64 &pos);
@@ -395,8 +396,10 @@ struct TofEvent {
   static const u16 HEAD = 0xAAAA;
   static const u16 TAIL = 0x5555;
 
+  EventStatus status;
   TofEventHeader header;
   MasterTriggerEvent mt_event;
+
 
   /// A container holding the individual events from all RBs with 
   /// triggers in this event  
@@ -406,6 +409,7 @@ struct TofEvent {
   /// get an associated RBEvent within a timeout
   Vec<RBMissingHit> missing_hits;
 
+  TofEvent();
 
   /**
    * Factory function for TofEvents.

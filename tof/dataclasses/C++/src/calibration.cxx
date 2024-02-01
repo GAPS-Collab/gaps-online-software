@@ -75,8 +75,10 @@ void spike_cleaning_drs4(Vec<Vec<f32>> &wf, u16 tCell, i32 spikes[]) {
     }
   }
   for (usize ch=0;ch<9;ch++) {
-    log_info("Found " << n_sp[ch] << " spikes in channel " << ch << "!");
+    // be less verbose for now, FIXME
+    //log_info("Found " << n_sp[ch] << " spikes in channel " << ch << "!");
   }
+
   /* find spikes at cell #0 and #1023
   for (i = 0; i < nChn; i++) {
     if (wf[i][0] + wf[i][1] - 2*wf[i][2] > 20) {

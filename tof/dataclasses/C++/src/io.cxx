@@ -67,31 +67,35 @@ Vec<u32> get_event_ids_from_raw_stream(const Vec<u8> &bytestream, u64 &pos) {
 
 /***************************************************/
 
-Vec<TofPacket> get_tofpackets(const Vec<u8> &bytestream, u64 start_pos) {
+Vec<TofPacket> get_tofpackets(const Vec<u8> &bytestream, u64 start_pos, PacketType filter) {
   Vec<TofPacket> packets;
   u64 pos  = start_pos;
   // just make sure in the beginning they
   // are not the same
   u64 last_pos = start_pos += 1;
   TofPacket packet;
-  u64 n_packets = 0;
   while (true) {
     packet = TofPacket::from_bytestream(bytestream, pos);
     if (pos != last_pos) {
+      if (filter != PacketType::Unknown) {
+        if (packet.packet_type != filter) {
+          last_pos = pos;
+          continue;
+        }
+      }
       packets.push_back(packet);
-      n_packets += 1;
     } else {
       break;
     }
     last_pos = pos;
   }
-  log_info("Read out " << n_packets << " packets from bytestream!");
+  log_info("Read out " << packets.size() << " packets from bytestream!");
   return packets;
 }
 
 /***************************************************/
 
-Vec<TofPacket> get_tofpackets(const String filename) {
+Vec<TofPacket> get_tofpackets(const String filename, PacketType filter) {
   spdlog::cfg::load_env_levels();
   if (!fs::exists(filename)) {
     log_fatal("Can't open " << filename << " since it does not exist!");
@@ -106,7 +110,7 @@ Vec<TofPacket> get_tofpackets(const String filename) {
     log_debug("Found the first header at pos " << pos);
   }
   log_debug("Read " << stream.size() << " bytes from " << filename);
-  return get_tofpackets(stream, pos);
+  return get_tofpackets(stream, pos, filter);
 }
 
 /***************************************************/
