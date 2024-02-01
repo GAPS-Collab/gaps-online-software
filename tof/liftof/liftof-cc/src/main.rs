@@ -46,6 +46,7 @@ use crossbeam_channel as cbc;
 
 use tof_dataclasses::events::{MasterTriggerEvent,
                               RBEvent};
+use tof_dataclasses::events::master_trigger::TriggerType;
 use tof_dataclasses::threading::{
     ThreadControl,
 };
@@ -123,6 +124,11 @@ fn main() {
   println!(" >> for the GAPS experiment \u{1F496}");
   println!(" >> This is the Command&Control server");
   println!(" >> It connects to the MasterTriggerBoard and the ReadoutBoards");
+
+  // settings 
+  //let foo = LiftofCCSettings::new();
+  //foo.to_toml(String::from("foo-settings.toml"));
+  //exit(0);
   
   // log testing
   //error!("error");
@@ -182,10 +188,9 @@ fn main() {
   let runtime_nseconds      = config.runtime_sec;
   let write_npack_file      = config.packs_per_file;
   let db_path               = Path::new(&config.db_path);
-  let mtb_moni_interval     = config.mtb_moni_interval_sec;
   let cpu_moni_interval     = config.cpu_moni_interval_sec;
   let flight_address        = config.fc_pub_address.clone();
-  let mtb_trace_suppression = config.mtb_trace_suppression;
+  let mtb_settings          = config.mtb_settings;
   let run_analysis_engine   = config.run_analysis_engine;
   let mut rb_list           = get_rbs_from_sqlite(db_path);
   //let mut rb_list           = vec![ReadoutBoard::new();50];
@@ -408,11 +413,12 @@ fn main() {
                                         &master_ev_send,
                                         &cmd_sender_2,
                                         &mtb_moni_sender,
-                                        mtb_moni_interval,
-                                        60, // allowed mtb timeout
-                                        mtb_trace_suppression,
+                                        mtb_settings,
+                                        // verbosity is currently too much 
+                                        // output
                                         false,
-                                        false);
+                                        // currently never set requets
+                                        false); 
           })
          .expect("Failed to spawn cpu-monitoring thread!");
 

@@ -12,8 +12,12 @@ use constants::{DEFAULT_CALIB_VOLTAGE,
                 //DEFAULT_RUN_TIME,
                 PREAMP_MIN_BIAS,
                 PREAMP_MAX_BIAS};
-pub use master_trigger::{connect_to_mtb,
-                         master_trigger};
+pub use master_trigger::{
+    connect_to_mtb,
+    master_trigger,
+    MTBSettings
+};
+
 pub mod constants;
 
 use std::error::Error;

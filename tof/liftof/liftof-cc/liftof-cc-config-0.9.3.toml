@@ -1,6 +1,6 @@
 ##########################################
 # Master configuration file for 
-# liftof-cc, HAHALUA edition (>= 0.9.1)
+# liftof-cc, HAHALUA edition (>= 0.9.2)
 #
 ##########################################
 
@@ -15,7 +15,7 @@ db_path               = "/home/gaps/config/gaps_flight.db"
 runtime_sec           = 600
 # number of tofpackets per file before a new file
 # gets started
-packs_per_file        = 1000
+packs_per_file        = 100000
 # use this address for UCLA teststand (tailscale)
 #fc_pub_address       = "tcp://100.101.96.10:42000"
 # flight computer needs to subscribe to this address to 
@@ -39,10 +39,19 @@ rb_ignorelist         = [10, 12, 37, 38, 43, 45, 47, 48, 49, 50]
 dsi_j_rbch_map        = "/home/gaps/config/dsi_j_ch_map.gaps.json"
 # should TofHits be calculated for RBEvents? [should be true for flight]
 run_analysis_engine   = true
-# can be either Gaps, Track or Poisson
+
+[mtb_settings]
+# can be either Gaps, Track, Any or Poisson
+# set it to "Unknown" if you want to use 
+# pico_hal.py to set the trigger conditions
 trigger_type          = "Track"
 # prescale is between 0 and 1
-trigger_prescale      = 1.0
+trigger_prescale      = 0.1
+poisson_trigger_rate  = 0
+gaps_trigger_use_beta = true
+trace_suppression     = true
+mtb_moni_interval     = 30
+mtb_timeout_sec       = 60
 
 # not supported yet
 [event_builder_settings]
