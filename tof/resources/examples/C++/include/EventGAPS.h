@@ -7,6 +7,7 @@
 #include <TROOT.h>
 
 #include <legacy.h>
+#include "./constants.h"
 
 #ifndef EVENTGAPS
 #define EVENTGAPS
@@ -22,34 +23,63 @@ class EventGAPS {
 
 public:
 
-  EventGAPS (GAPS::Waveform *wave[], GAPS::Waveform *wch9[]);
-  // Constructor 'flag' is set by default unless the waveform is
-  // constructed with a call to the contrary.  Thus, the default
-  // behavior is to provide immediate access to pulse positions,
-  // times, heights, etc....  For someone who wants to do a more
-  // specialized analysis, the constructor can be called with flag=0
-  // so that we do not waste time doing the ped and peak calculations.
+  EventGAPS (void);
 
-  EventGAPS (int size);
   ~EventGAPS (void);
 
   // MEMBER FUNCTIONS
 
-  // Stuff related to the actual data
-  void    SetThreshold(float PmtThreshold);
-  //int     GetWaveSize(void){return wf_size;}
+  void    InitializeWaveforms(GAPS::Waveform *wave[], GAPS::Waveform *wch9[]);
+  void    UnsetWaveforms(void);
 
+  // Stuff related to the actual data
+  void    AnalyzePedestals(float Ped_begin, float Ped_win);
+  void    SetThreshold(float PmtThreshold);
+  void    SetCFDFraction(float CFDS_frac);
+  void    AnalyzePulses(float Pulse_low, float Pulse_win);
+
+  // Stuff related to plotting
+  void    InitializeHistograms(void);
+  void    FillChannelHistos(void);
+  void    FillPaddleHistos(void);
+  void    WriteHistograms(void);
+
+  
 private:
 
   // DATA MEMBERS
 
-  int     ch;                        // STACEE channel we are working with
+  // Local pointers to waveforms
+  GAPS::Waveform  *wData[NTOT];
+  GAPS::Waveform  *wClock[NRB];       
+
+  int     ch;                        // channel we are working with
   int     runno;                     // Run Number
   float   Threshold;                 // PMT Threshold in DC (for now...)
+  float   CFDFraction;               // CFD Fraction for TDC calculation
 
-  double  wf_pedestal;               // Pedestal value
-  int     *peaks;          // Bin values of the actual peak positions
+  float   Pedestal[NTOT];             // Pedestal values
+  float   PedRMS[NTOT];               // Pedestal RMS values
+  float   ClockPedestal[NRB];         // Pedestal values
+  float   ClockPedRMS[NRB];           // Pedestal RMS values
+ 
+  float   VPeak[NTOT];                // Pulse peak value
+  float   QInt[NTOT];                 // Pulse charge value
+  float   TDC[NTOT];                  // TDC value (CFD method)
+  
+  TH1D    *pedHist[NTOT];              // Pedestal histograms
+  TH1D    *pedRMSHist[NTOT];           // Pedestal RMS histograms
+  TH1D    *Peak[NTOT];                 // VPeak histograms
+  TH1D    *Charge[NTOT];               // Charge histograms
+  TH1D    *Charge_cut[NTOT];           // Charge (cut) histograms
+  TH1D    *tdcCFD[NTOT];                  // TDC histograms
 
+  TH2D    *QEnd2End[NPAD];             // End 2 End charge 
+  TH1D    *HitMask[NPAD];              // Hit mask of paddle
+  TH1D    *NPaddlesUpper;
+  TH1D    *NPaddlesLower;
+  TH1D    *NPaddlesOuter;
+  
   // MEMBER FUNCTIONS
   void    InitializeVariables(int no_acq);
   void    Message(const char *s);           // Print out messages as needed

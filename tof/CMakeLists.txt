@@ -13,7 +13,8 @@ option(BUILD_ROOTCOMPONENTS "build components of the software which require CERN
 if(BUILD_ROOTCOMPONENTS)
 
   list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
-  find_package(ROOT 6.26.00)
+#  find_package(ROOT 6.26.00)
+  find_package(ROOT 6.30.00)
   
   if(ROOT_FOUND)
       include(${ROOT_USE_FILE})
@@ -249,6 +250,69 @@ if (BUILD_EXAMPLES)
     install(TARGETS ${analyze-example}
             DESTINATION ${INSTALL_EXAMPLES_DIR}
     )
+
+    set(display-sydney "displaySydney")
+    add_executable(${display-sydney}
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/displaySydney.cxx
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/src/MainFrame.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/src/Waveform.cpp
+    )
+    target_include_directories(${display-sydney} 
+                              PUBLIC
+                              ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include
+                              ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/cxxopts/include
+                              ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
+                              $<$<BOOL:${BUILD_ROOTCOMPONENTS}>:${ROOT_INCLUDE_DIRS}>
+      		    )
+    target_link_libraries(${display-sydney}
+                          PRIVATE
+                          ${GAPSTOF_LIBRARY_SHARED}
+      		$<$<BOOL:${BUILD_ROOTCOMPONENTS}>:${ROOT_LIBRARY_SHARED}>
+      		ROOT::Core ROOT::Gui ROOT::RIO ROOT::Net ROOT::Hist
+      		)
+    install(TARGETS ${display-sydney}
+            DESTINATION ${INSTALL_EXAMPLES_DIR}
+
+        )
+      
+    set(analyze-sydney "analyzeSydney")
+    add_executable(${analyze-sydney}
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/analyzeSydney.cxx
+    )
+    target_include_directories(${analyze-sydney} 
+                              PUBLIC
+                              ${CMAKE_CURRENT_SOURCE_DIR}/../resources/example/spdlog/include
+                              ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/cxxopts/include
+                              ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
+                              )
+    target_link_libraries(${analyze-sydney}
+                          PRIVATE
+                          ${GAPSTOF_LIBRARY_SHARED})
+    install(TARGETS ${analyze-sydney}
+            DESTINATION ${INSTALL_EXAMPLES_DIR}
+    )
+
+    set(analyze-nevis "analyzeNevis")
+    add_executable(${analyze-nevis}
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/analyzeNevis.cxx
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/src/EventGAPS.cpp
+    )
+    target_include_directories(${analyze-nevis} 
+                              PUBLIC
+                              ${CMAKE_CURRENT_SOURCE_DIR}/../resources/example/spdlog/include
+                              ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/cxxopts/include
+                              ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
+                              )
+    target_link_libraries(${analyze-nevis}
+                          PRIVATE
+                          ${GAPSTOF_LIBRARY_SHARED}
+      			  $<$<BOOL:${BUILD_ROOTCOMPONENTS}>:${ROOT_LIBRARY_SHARED}>
+      			  ROOT::Gui ROOT::Core ROOT::RIO ROOT::Net ROOT::Hist ROOT::Tree ROOT::Rint
+			  )
+    install(TARGETS ${analyze-nevis}
+            DESTINATION ${INSTALL_EXAMPLES_DIR}
+    )
+
   endif(BUILD_ROOTCOMPONENTS)
 endif()
 

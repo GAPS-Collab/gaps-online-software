@@ -30,11 +30,12 @@
 /* Global Variables */
 int n_chan = 0;
 
-const int NRB   = 49; // Technically, it is 48, but we don't use 0
-const int NCH   = 9;
-const int NTOT  = (NCH-1) * NRB; // NTOT is the number of SiPMs
+const int NRB   = 50; // Technically, it is 49, but we don't use 0
+const int NCH   = 8;
+const int NTOT  = NCH * NRB; // NTOT is the number of SiPMs
 const int NPADS = NTOT/2;        // NPAD: 1 per 2 SiPMs
 
+// These are declared globally to make it easier to plot
 //Vec<Waveform> wave;
 //Vec<Waveform> wch9;
 Waveplot *wave[NTOT];
@@ -82,11 +83,48 @@ int main(int argc, char *argv[]){
   // -> Gaps relevant code starts here
  
   read_events();  // List of event numbers to plot
-    
+
   auto calname = result["calibration"].as<std::string>();
   RBCalibration cali[NRB]; // "cali" stores values for one RB
-  //RBCalibration cali; // "cali" stores values for one RB
+
+  // To read calibration data from individual binary files, when -c is
+  // given with the directory of the calibration files
   if (calname != "") {
+    for (int i=1; i<NRB; i++) {
+      // First, determine the proper RB filename from its number
+      std::string f_str;
+      if (i<10) // Little Kludgy, but it works
+	f_str = calname + "rb_0" + std::to_string(i) + ".cali.tof.gaps";
+      else
+	f_str = calname + "rb_" + std::to_string(i) + ".cali.tof.gaps";
+      //spdlog::info("Extracting RB data from file {}", f_str);
+      
+      // Read the packets from the file
+      //if ( std::filesystem::exists(f_str) ) {
+      //printf("%s file exists\n", f_str.c_str() );
+      //}
+      // Before proceeding, check that the file exists. 
+      struct stat buffer; 
+      if ( stat(f_str.c_str(), &buffer) != -1 ) {
+	auto packet = get_tofpackets(f_str);
+	spdlog::info("We loaded {} packets from {}", packet.size(), f_str);
+	// Loop over the packets (should only be 1) and read into storage
+	for (auto const &p : packet) {
+	  //int ctr=0;
+	  if (p.packet_type == PacketType::RBCalibration) {
+	    // Should have the one calibration tofpacket stored in "packet".
+	    usize pos = 0;
+	    //if (++ctr == 4)  // 4th packet is the one we want
+	    cali[i] = RBCalibration::from_bytestream(p.payload, pos); 
+	  }
+	}
+      } //else {printf("File does not exist: %s\n", f_str.c_str());}
+    }
+  }
+  
+  // To read calibration data from individual text files, when -c is
+  // given with the directory of the calibration files
+  /*if (calname != "") {
     // obviously here we have to get all the calibration files, 
     // but for the sake of the example let's use only one
     // Ultimatly, they will be stored in the stream.
@@ -96,13 +134,13 @@ int main(int argc, char *argv[]){
 	f_str = calname + "/txt-files/rb0" + std::to_string(i) + "_cal.txt";
       else
 	f_str = calname + "/txt-files/rb" + std::to_string(i) + "_cal.txt";
-            
+      
       //spdlog::info("Will use calibration file {}", calname);
       //cali[i] = RBCalibration::from_txtfile(calname);
       spdlog::info("Will use calibration file {}", f_str);
       cali[i] = RBCalibration::from_txtfile(f_str);
     }
-  }
+    }*/
 
   // the reader is something for the future, when the 
   // files get bigger so they might not fit into memory
@@ -125,7 +163,7 @@ int main(int argc, char *argv[]){
   x_sc_lo =    0.0;    // in ns
   x_sc_hi =  500.0;    // in ns
   y_sc_lo =  -20.0;    // in mV
-  y_sc_hi =  100.0;    // in mV
+  y_sc_hi =   60.0;    // in mV
   //y_sc_lo = -500.0;    // in mV
   //y_sc_hi = 1500.0;    // in mV
   //x_sc_lo =  -9999;    // in ns
@@ -141,7 +179,7 @@ int main(int argc, char *argv[]){
   
   for (auto const &p : packets) {
     // print it
-    std::cout << p << std::endl;
+    //std::cout << p << std::endl;
     // there will be a more generic way to unpack TofPackets in the future
     // for now we have to use the packet_type field
     switch (p.packet_type) {
@@ -183,13 +221,14 @@ int main(int argc, char *argv[]){
 	
         auto ev = TofEvent::from_bytestream(p.payload, pos);
 	unsigned long int evt_ctr = ev.mt_event.event_id;
+	printf("%ld.", evt_ctr);
 	for (auto const &rbid : ev.get_rbids()) {
 	  RBEvent rb_event = ev.get_rbevent(rbid);
 	  // Now that we know the RBID, we can set the starting ch_no
 	  // Eventually we will use a function to map RB_ch to GAPS_ch
-	  ch_start = (rbid-1)*(NCH-1); // first RB is #1
+	  ch_start = (rbid-1)*NCH; // first RB is #1
 	  nrbs++;
-	  printf("Event %ld: RB %d: start %ld\n", evt_ctr, rbid, ch_start);
+	  //printf("Event %ld: RB %d: start %ld\n", evt_ctr, rbid, ch_start);
 	  if (verbose) {
 	    std::cout << rb_event << std::endl;
           }
@@ -212,10 +251,10 @@ int main(int argc, char *argv[]){
 	    wch9[rbid]->SetPedRange(100);
 	    wch9[rbid]->CalcPedestalRange(); 
 	    float ch9RMS = wch9[rbid]->GetPedsigma();
-	    printf(" %d(%.1f)", rbid, ch9RMS);
+	    //printf(" %d(%.1f)", rbid, ch9RMS);
 	    
 	    // Now, deal with all the SiPM data
-	    for(int c=0;c<NCH-1;c++) {
+	    for(int c=0;c<NCH;c++) {
 	      Vec<f64> ch_volts(volts[c].begin(), volts[c].end());
 	      Vec<f64> ch_times(times[c].begin(), times[c].end());
 
@@ -225,15 +264,14 @@ int main(int argc, char *argv[]){
 	      
 	      // Calculate the pedestal
 	      wave[cw]->SetPedBegin(10);
-	      wave[cw]->SetPedRange(80);
+	      wave[cw]->SetPedRange(90);
 	      wave[cw]->CalcPedestalRange(); 
-	      double tmp_adc = wave[cw]->GetBin(1020);
 	      wave[cw]->SubtractPedestal(); 
+	      //if (c==0) printf("%ld(%.2f) ", cw, wave[cw]->GetPedestal());
 	    }
 	  }
 	}
 	
-	n_chan = NCH-1;
 	n_chan = NTOT;
 	// Now, let's plot the data to see what it looks like
 	int PLOT_EVENT = event_flag(evt_ctr);
@@ -315,15 +353,6 @@ int main(int argc, char *argv[]){
           std::cout << mte << std::endl;
         }
         n_mte++;
-        break;
-      }
-      case PacketType::CPUMoniData : {
-        usize pos = 0;
-        auto cpumoni = CPUMoniData::from_bytestream(p.payload, pos);
-        if (verbose) {
-          std::cout << cpumoni << std::endl;
-        }
-        n_tcmoni++;
         break;
       }
       case PacketType::MTBMoni : {
@@ -474,10 +503,10 @@ void plotall(int n_ch, int nrbs) {
     int rbid;
     for (int i = 0; i < n_ch; i++) {
       if (wave[i] != NULL) {
-	pl_num = ctr*NCH+1 + ch_num++;
+	pl_num = ctr*(NCH+1)+1 + ch_num++;
 	cm->cd( pl_num ); 
 	//wave[ch]->SetPeakPlot(1); // Put some additional info on the plot  
-	//printf("Plotting (%d %d...", i, pl_num);fflush(stdout);
+	//printf("Plotting (%d %d).", i, pl_num);fflush(stdout);
 	if (restrict_range)
 	  wave[i]->PlotWaveform(0, x_scr_lo, x_scr_hi, y_scr_lo, y_scr_hi);
 	else
@@ -485,8 +514,8 @@ void plotall(int n_ch, int nrbs) {
 	//printf("Done\n");fflush(stdout);
       }
       if (i%8 == 7) {  // finished with 8 SiPM channels on RB
-	rbid = i/(NCH-1) + 1;
-	cm->cd(ctr*NCH+9);
+	rbid = i/NCH + 1;
+	cm->cd(ctr*(NCH+1)+9);
 	if (wch9[rbid] != NULL) {
 	  wch9[rbid]->PlotWaveform(0, x_sc_lo, x_sc_hi, -400, +400);
 	  ctr++; // increment the number of RBs plotted
