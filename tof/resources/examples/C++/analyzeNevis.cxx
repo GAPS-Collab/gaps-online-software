@@ -259,7 +259,8 @@ int main(int argc, char *argv[]){
 	Event.AnalyzePulses(Qwin_low, Qwin_size);
 	
 	// Now calculate beta, charge, and inner/outer tof x,y,z, etc.
-
+	Event.AnalyzeEvent();
+	
 	// Now fill out histograms
 	Event.FillChannelHistos();
 	Event.FillPaddleHistos();

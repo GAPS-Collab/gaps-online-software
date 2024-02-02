@@ -185,48 +185,29 @@ void EventGAPS::InitializeHistograms(void) {
 void EventGAPS::WriteHistograms() {
   
   TFile *outfile = TFile::Open("/home/gaps/zweerink/agfp.root", "RECREATE"); 
-
+  
   // For reasons I don't understand, the code to make subdirectories
   // is not compiling properly and gives an error (below) when run
-
+  
   //./analyzeNevis: symbol lookup error: ./analyzeNevis: undefined
   //symbol: _ZN10TDirectory30GetSharedLocalCurrentDirectoryEv
-
+  
   // For now, I am simply writing all the plots to the main directory.
   
   //create directories for the raw plots
   /*TDirectory *savdir = gDirectory;
-  TDirectory *Peddir = savdir->mkdir("Pedestals");
-  TDirectory *Peakdir = savdir->mkdir("VPeakplots");
-  TDirectory *Chargedir = savdir->mkdir("Chargeplots");
-  TDirectory *Hitmaskdir = savdir->mkdir("Hitmasks");
-
-  TDirectory *TDCdir = savdir->mkdir("TDCplots");
+    TDirectory *Peddir = savdir->mkdir("Pedestals");
+    TDirectory *Peakdir = savdir->mkdir("VPeakplots");
+    TDirectory *Chargedir = savdir->mkdir("Chargeplots");
+    TDirectory *Hitmaskdir = savdir->mkdir("Hitmasks");
+    
+    TDirectory *TDCdir = savdir->mkdir("TDCplots");
   */
   // Plots made using simple CFD timing
   //TDirectory *CFDTimingdir = savdir->mkdir("CFDTimingplots");
   //TDirectory *CFDTimeVsQdir = savdir->mkdir("CFDTimeVsQplots");
   //TDirectory *CFDTVsTdir = savdir->mkdir("CFDTvsTplots");
-
-  //write all the Trace plots to the root file
-  //Peddir->cd();
-  for (int i = 0; i < NTOT; i++) {
-
   
-  //create directories for the raw plots
-  /*TDirectory *savdir = gDirectory;
-  TDirectory *Peddir = savdir->mkdir("Pedestals");
-  TDirectory *Peakdir = savdir->mkdir("VPeakplots");
-  TDirectory *Chargedir = savdir->mkdir("Chargeplots");
-  TDirectory *Hitmaskdir = savdir->mkdir("Hitmasks");
-
-  TDirectory *TDCdir = savdir->mkdir("TDCplots");
-  */
-  // Plots made using simple CFD timing
-  //TDirectory *CFDTimingdir = savdir->mkdir("CFDTimingplots");
-  //TDirectory *CFDTimeVsQdir = savdir->mkdir("CFDTimeVsQplots");
-  //TDirectory *CFDTVsTdir = savdir->mkdir("CFDTvsTplots");
-
   //write all the Trace plots to the root file
   //Peddir->cd();
   for (int i = 0; i < NTOT; i++) {
@@ -236,18 +217,17 @@ void EventGAPS::WriteHistograms() {
   
   //Peakdir->cd();
   for (int i = 0; i < NTOT; i++) Peak[i]->Write();
-       
+  
   //Chargedir->cd();
   for (int i = 0; i < NTOT; i++) {
     Charge[i]->Write();
     Charge_cut[i]->Write();
   }
   for (int j = 0; j < NPAD; j++) QEnd2End[j]->Write();
-
-
+  
   //TDCdir->cd();
   for (int i = 0; i < NTOT; i++) tdcCFD[i]->Write();
-      
+  
   //Hitmaskdir->cd();
   NPaddlesUpper->Write();
   NPaddlesLower->Write();
@@ -314,6 +294,18 @@ void EventGAPS::AnalyzePulses(float Pulse_low, float Pulse_win) {
       }
     }
   }
+}
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+void EventGAPS::AnalyzeEvent(void) {
+  // Assuming previous calls to AnalyzePedestals and AnalyzePulses,
+  // you have access to Pedestals, charges, Peaks, TDCs etc so
+  // calculate any interesting quantities here.
+  
+  
 }
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////

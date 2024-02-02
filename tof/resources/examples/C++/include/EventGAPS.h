@@ -37,6 +37,7 @@ public:
   void    SetThreshold(float PmtThreshold);
   void    SetCFDFraction(float CFDS_frac);
   void    AnalyzePulses(float Pulse_low, float Pulse_win);
+  void    AnalyzeEvent(void);
 
   // Stuff related to plotting
   void    InitializeHistograms(void);
