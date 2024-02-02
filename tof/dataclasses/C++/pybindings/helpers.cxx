@@ -19,14 +19,14 @@ RBCalibration get_from_califile(const String filename) {
 
 /***********************************************/
 
-Vec<TofPacket> wrap_get_tofpackets_from_file(const String filename) {
-  return get_tofpackets(filename);
+Vec<TofPacket> wrap_get_tofpackets_from_file(const String filename, PacketType filter) {
+  return get_tofpackets(filename, filter);
 }
 
 /***********************************************/
 
-Vec<TofPacket> wrap_get_tofpackets_from_stream(const Vec<u8> &stream, u64 pos) {
-  return get_tofpackets(stream, pos);
+Vec<TofPacket> wrap_get_tofpackets_from_stream(const Vec<u8> &stream, u64 pos, PacketType filter) {
+  return get_tofpackets(stream, pos, filter);
 }
 
 /***********************************************/

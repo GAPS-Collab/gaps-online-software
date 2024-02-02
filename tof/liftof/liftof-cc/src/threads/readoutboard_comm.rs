@@ -63,14 +63,12 @@ pub fn readoutboard_communicator(ev_to_builder       : &Sender<RBEvent>,
   let mut n_chunk  = 0usize;
   // in case we want to do calibratoins
   let mut calibrations = RBCalibrations::new(rb.rb_id);
-  let do_calibration = true;
-  if do_calibration {
-    let cal_file = format!("/tpool/rb_calibrations/rb_{:02}.cali.tof.gaps", board_id);
-    info!("Reading calibrations from file {}", cal_file);
-    let cal_file_path_buf : PathBuf = cal_file.into();
-    let cal_file_path     : &Path   = &cal_file_path_buf;
-    //let cal_file_path = Path::new(&rb.calib_file);//calibration_file);
-    calibrations = RBCalibrations::from(cal_file_path);
+  if run_analysis_engine {
+    if rb.calibration.rb_id == 0 {
+      error!("Requested to run analysis engine for board {}, but we did not load a valid calibration!", board_id);
+    } else {
+      //calibrations = rb.calibration;
+    }
   }
   let address = rb.guess_address();
 
@@ -87,7 +85,6 @@ pub fn readoutboard_communicator(ev_to_builder       : &Sender<RBEvent>,
   match socket.set_subscribe(topic) {
    Err(err) => error!("Unable to subscribe to topic! {err}"),
    Ok(_) => info!("Subscribed to {:?}!", topic),
-
   }
   //let mut secs_since_epoch = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
   //let mut n_events   = 0usize;
@@ -123,7 +120,7 @@ pub fn readoutboard_communicator(ev_to_builder       : &Sender<RBEvent>,
                   if run_analysis_engine {
                     match waveform_analysis(&mut event, 
                                             &rb_ch_map,
-                                            &calibrations) {
+                                            &rb.calibration) {
                         
                       Ok(_) => (),
                       Err(err) => {

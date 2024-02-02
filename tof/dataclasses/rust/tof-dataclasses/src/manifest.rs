@@ -5,7 +5,7 @@
 //! well as to serialize them locally.
 
 use std::fmt;
-use std::net::Ipv4Addr;
+
 cfg_if::cfg_if! {
   if #[cfg(feature = "database")]  {
     use std::path::Path;
@@ -13,6 +13,12 @@ cfg_if::cfg_if! {
     extern crate sqlite;
   }
 }
+
+use regex::Regex;
+use glob::glob;
+use chrono::{NaiveDateTime, Utc};
+
+use crate::calibrations::RBCalibrations;
 
 #[derive(Copy, Clone, Debug)]
 pub struct LocalTriggerBoard {
@@ -100,17 +106,17 @@ pub fn get_rbs_from_sqlite(filename : &Path) -> Vec<ReadoutBoard> {
       match value {
         None    => {continue;},
         Some(v) => {
-          debug!("{} = {}", name, v);
+          println!("{} = {}", name, v);
           match name {
             "rb_id"      => {rb.rb_id  = u8::from_str(v).unwrap_or(0);},
-            "ch1_paddle" => {rb.set_paddle_end_id_for_rb_channel(1, u16::from_str(v).unwrap_or(0));},
-            "ch2_paddle" => {rb.set_paddle_end_id_for_rb_channel(2, u16::from_str(v).unwrap_or(0));},
-            "ch3_paddle" => {rb.set_paddle_end_id_for_rb_channel(3, u16::from_str(v).unwrap_or(0));},
-            "ch4_paddle" => {rb.set_paddle_end_id_for_rb_channel(4, u16::from_str(v).unwrap_or(0));},
-            "ch5_paddle" => {rb.set_paddle_end_id_for_rb_channel(5, u16::from_str(v).unwrap_or(0));},
-            "ch6_paddle" => {rb.set_paddle_end_id_for_rb_channel(6, u16::from_str(v).unwrap_or(0));},
-            "ch7_paddle" => {rb.set_paddle_end_id_for_rb_channel(7, u16::from_str(v).unwrap_or(0));},
-            "ch8_paddle" => {rb.set_paddle_end_id_for_rb_channel(8, u16::from_str(v).unwrap_or(0));},
+            "ch1_paddle_id" => {rb.set_paddle_end_id_for_rb_channel(1, u16::from_str(v).unwrap_or(0));},
+            "ch2_paddle_id" => {rb.set_paddle_end_id_for_rb_channel(2, u16::from_str(v).unwrap_or(0));},
+            "ch3_paddle_id" => {rb.set_paddle_end_id_for_rb_channel(3, u16::from_str(v).unwrap_or(0));},
+            "ch4_paddle_id" => {rb.set_paddle_end_id_for_rb_channel(4, u16::from_str(v).unwrap_or(0));},
+            "ch5_paddle_id" => {rb.set_paddle_end_id_for_rb_channel(5, u16::from_str(v).unwrap_or(0));},
+            "ch6_paddle_id" => {rb.set_paddle_end_id_for_rb_channel(6, u16::from_str(v).unwrap_or(0));},
+            "ch7_paddle_id" => {rb.set_paddle_end_id_for_rb_channel(7, u16::from_str(v).unwrap_or(0));},
+            "ch8_paddle_id" => {rb.set_paddle_end_id_for_rb_channel(8, u16::from_str(v).unwrap_or(0));},
             _ => {warn!("Found name {}, but not mapping it to self!", name);}                         
           }
         }
@@ -542,24 +548,72 @@ impl fmt::Display for RAT {
 
 #[derive(Clone, Debug)]
 pub struct ReadoutBoard {
-  pub rb_id             : u8,  
-  pub dna               : u64, 
+  pub rb_id                : u8,  
+  pub dna                  : u64, 
   channel_to_paddle_end_id : [u16;8],
-  pub calib_file        : String,
-  pub trig_ch_mask      : [bool;8],
+  pub calib_file_path      : String,
+  pub calibration          : RBCalibrations,       
+  pub trig_ch_mask         : [bool;8],
 }
 
 impl ReadoutBoard {
   pub fn new() -> Self {
     Self {
-      rb_id         : 0,  
-      dna           : 0, 
+      rb_id                    : 0,  
+      dna                      : 0, 
       channel_to_paddle_end_id : [0;8],
-      calib_file    : String::from(""),
-      trig_ch_mask  : [false;8],
+      calib_file_path          : String::from(""),
+      calibration              : RBCalibrations::new(0),
+      trig_ch_mask             : [false;8],
     }
   }
- 
+
+  /// Load the newest calibration from the calibration file path
+  pub fn load_latest_calibration(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+    //  files look like RB20_2024_01_26-08_15_54.cali.tof.gaps
+    let re = Regex::new(r"(\d{4}_\d{2}_\d{2}-\d{2}_\d{2}_\d{2})")?;
+    // Define your file pattern (e.g., "logs/*.log" for all .log files in the logs directory)
+    let pattern = format!("{}/RB{:02}_*", self.calib_file_path, self.rb_id); // Adjust this pattern to your files' naming convention
+    let mut newest_file = (String::from(""), NaiveDateTime::from_timestamp_opt(0, 0).unwrap());
+    
+    // Iterate over files that match the pattern
+    let mut filename : String;
+    for entry in glob(&pattern)? {
+      if let Ok(path) = entry {
+        // Get the filename as a string
+        //let cpath = path.clone();
+        match path.file_name() {
+          None => continue,
+          Some(fname) => {
+              // the expect might be ok, since this is something done during initialization
+              filename = fname.to_os_string().into_string().expect("Unwrapping filename failed!");
+          }
+        }
+        if let Some(caps) = re.captures(&filename) {
+          if let Some(timestamp_str) = caps.get(0).map(|m| m.as_str()) {
+            println!("{}",timestamp_str);
+            let timestamp = NaiveDateTime::parse_from_str(timestamp_str, "%Y_%m_%d-%H_%M_%S")?;
+            if timestamp > newest_file.1 {
+              newest_file.1 = timestamp;
+              newest_file.0 = filename.clone();
+            }
+          }
+        }
+      }
+    }
+    
+    if newest_file.0.is_empty() {
+      error!("No matching calibration available for board {}!", self.rb_id);
+    } else {
+      let file_to_load = self.calib_file_path.clone() + "/" + &newest_file.0;
+      println!("==> Loading calibration from file: {}", file_to_load);
+      self.calibration = RBCalibrations::from_file(file_to_load)?;
+      println!("==> Loaded calibration {}", self.calibration);
+    }
+    Ok(())
+  }
+
+  #[deprecated(note="Won't work with tmiestamped cali files!")]
   pub fn guess_calibration_filename(&self) -> String {
     let mut cali = String::from("");
     cali += "rb_";
@@ -595,7 +649,7 @@ impl ReadoutBoard {
   }
 
   pub fn get_calibration(&self) -> String {
-    return self.calib_file.clone();
+    return self.calib_file_path.clone();
   }
 
   pub fn get_paddle_end(&self, ch : usize) 
@@ -673,12 +727,14 @@ impl fmt::Display for ReadoutBoard {
 "<ReadoutBoard:
     ID                :  {}
     DNA               :  {} 
-    CALIBRATION FILE  :  {}
+    calibration path  :  {}
+    calibration       :  {}
     CHANNEL/PADDLE END:  {:?}
     TRIG_CH_MASK      :  {:?}>",
       self.rb_id,
       self.dna,
-      self.calib_file,
+      self.calib_file_path,
+      self.calibration,
       self.channel_to_paddle_end_id,
       self.trig_ch_mask)
   }

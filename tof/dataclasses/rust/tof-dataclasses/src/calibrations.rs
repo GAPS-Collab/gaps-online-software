@@ -16,7 +16,7 @@ use std::fmt;
 use std::time::{SystemTime,
                 Duration,
                 UNIX_EPOCH};
-
+use chrono::{DateTime, Utc, TimeZone};
 //extern crate streaming_stats;
 //use streaming_stats::{OnlineStats, OrderStats};
 
@@ -721,10 +721,10 @@ impl RBCalibrations {
       for ev in 0..traces[ch].len() {
         for n in 0..traces[ch][ev].len() {
           let mut dval : f32;
-          if n == 0 {
+          if n == traces[ch][ev].len() - 1 {
             dval = rolled_traces[ch][ev][0] - rolled_traces[ch][ev][traces[ch][ev].len() -1];
           } else {
-            dval = rolled_traces[ch][ev][n] - rolled_traces[ch][ev][n-1];      
+            dval = rolled_traces[ch][ev][n + 1] - rolled_traces[ch][ev][n];      
           }
           match edge {
             Edge::Rising | Edge::Average => {
@@ -1077,7 +1077,8 @@ impl RBCalibrations {
   pub fn new(rb_id : u8) -> Self {
     // FIXME
     let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap_or(Duration::from_secs(0));
-    let timestamp = now.as_secs() as u32;
+    //let timestamp = now.as_secs() as u32;
+    let timestamp = 0;
     Self {
       rb_id     : rb_id,
       d_v       : 182.0, // FIXME - this needs to be a constant
@@ -1352,16 +1353,19 @@ impl Default for RBCalibrations {
 
 impl fmt::Display for RBCalibrations {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let datetime_utc: DateTime<Utc> = Utc.timestamp(self.timestamp as i64, 0);
+    let timestamp_str = datetime_utc.format("%Y/%m/%d %H:%M:%S").to_string();
     write!(f, 
-  "<ReadoutboardCalibration:
-      RB : {}
-      VCalData    : {} (events)
-      TCalData    : {} (events)
-      NoInputData : {} (events)
+  "<ReadoutboardCalibration [{} UTC]:
+      RB             : {}
+      VCalData       : {} (events)
+      TCalData       : {} (events)
+      NoInputData    : {} (events)
       V Offsets [ch0]: .. {:?} {:?} ..
       V Incrmts [ch0]: .. {:?} {:?} ..
       V Dips    [ch0]: .. {:?} {:?} ..
       T Bins    [ch0]: .. {:?} {:?} ..>",
+      timestamp_str,
       self.rb_id,
       self.vcal_data.len(),
       self.tcal_data.len(),

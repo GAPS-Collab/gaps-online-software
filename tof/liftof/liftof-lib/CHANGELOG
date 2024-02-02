@@ -1,3 +1,12 @@
+# HAHALUA series
+
+## v0.9.1
+* Entire settings class to configure mtb
+* allows to set trace suppression on the MTB
+  to on/off
+* Don't attempt waveform analysis for empty 
+  channels
+
 # NIUHI series
 
 ## v0.8.3

@@ -13,6 +13,9 @@ use std::fmt;
 
 extern crate toml;
 use tof_dataclasses::errors::SerializationError;
+use tof_dataclasses::events::master_trigger::TriggerType;
+
+use liftof_lib::master_trigger::MTBSettings;
 
 #[derive(Debug, Copy, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub enum BuildStrategy {
@@ -24,6 +27,7 @@ pub enum BuildStrategy {
   AdaptiveGreedy(usize),
   WaitForNBoards(usize)
 }
+
 
 /// Settings to change the configuration of the analysis engine 
 /// (pulse extraction)
@@ -95,6 +99,8 @@ pub struct TofEventBuilderSettings {
   pub cachesize         : usize,
   pub n_mte_per_loop    : usize,
   pub n_rbe_per_loop    : usize,
+  /// The timeout parameter for the TofEvent. If not
+  /// complete after this time, send it onwards anyway
   pub te_timeout_sec    : u32,
   pub build_strategy    : BuildStrategy,
 }
@@ -148,21 +154,16 @@ pub struct LiftofCCSettings {
   /// The UDP port to be used to get packets from the 
   /// MTB
   pub mtb_address                : String,
-  /// Enable trace suppression on the MTB. If enabled, 
-  /// only those RB which hits will read out waveforms.
-  /// In case it is disabled, ALL RBs will readout events
-  /// ALL the time. For this, we need also the eventbuilder
-  /// strategy "WaitForNBoards(40)"
-  pub mtb_trace_suppression     : bool,
-  /// The interval (in seconds) to retrieve MtbMoniData from 
-  /// the Mtb
-  pub mtb_moni_interval_sec      : u64,
   /// The interval (in seconds) to retrive CPUMoniData from 
   /// the TOF CPU
   pub cpu_moni_interval_sec      : u64,
   /// ignore these RB. These RB ids do not exist in the configuration.
   /// Every RB Id > 50 will be ignored by default
   pub rb_ignorelist              : Vec<u8>,
+  /// Should TofHits be generated?
+  pub run_analysis_engine        : bool,
+  /// Settings to control the MTB
+  pub mtb_settings               : MTBSettings,
   /// Settings for the TOF event builder
   pub event_builder_settings     : TofEventBuilderSettings,
   /// Settings for the analysis engine
@@ -180,10 +181,10 @@ impl LiftofCCSettings {
       fc_pub_address            : String::from(""),
       fc_sub_address            : String::from(""),
       mtb_address               : String::from("10.0.1.10:50001"),
-      mtb_trace_suppression     : true,
-      mtb_moni_interval_sec     : 0,
-      cpu_moni_interval_sec     : 0,
+      cpu_moni_interval_sec     : 60,
       rb_ignorelist             : Vec::<u8>::new(),
+      run_analysis_engine       : true,
+      mtb_settings              : MTBSettings::new(),
       event_builder_settings    : TofEventBuilderSettings::new(),
       analysis_engine_settings  : AnalysisEngineSettings::new(),
     }

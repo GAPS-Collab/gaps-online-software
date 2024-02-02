@@ -27,10 +27,13 @@ criterion = "0.4"
 
 [dependencies]
 chrono = "0.4"
+regex = "1.5"
+glob = "0.3"
+
 # logging
 log  = "0.4"
 rand = {version = "0.8", optional = true}
-json = "0.12" 
+#json = "0.12" 
 #statrs = "0.14"
 # Takeru's tof-control
 tof-control = {path = "../../../extern/tof-control", optional = true, version = "0.3", features=[] }

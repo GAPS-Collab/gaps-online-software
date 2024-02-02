@@ -33,6 +33,7 @@ use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::monitoring::MtbMoniData;
 use tof_dataclasses::commands::RBCommand;
 use tof_dataclasses::events::MasterTriggerEvent;
+use tof_dataclasses::events::master_trigger::TriggerType;
 use tof_dataclasses::errors::{IPBusError, MasterTriggerError};
 
 const MT_MAX_PACKSIZE   : usize = 1024;
@@ -216,6 +217,74 @@ pub fn decode_ipbus( message : &[u8;MT_MAX_PACKSIZE],
     Ok(data)
 }
 
+/// Configure the trigger
+#[derive(Debug, Copy, Clone, serde::Serialize, serde::Deserialize)]
+pub struct MTBSettings {
+  /// Select the trigger type for this run
+  pub trigger_type           : TriggerType,
+  /// Select the prescale factor for a run. The
+  /// prescale factor is between 0 (no events)
+  /// and 1.0 (all events). E.g. 0.1 means allow 
+  /// only 10% of the events
+  /// THIS DOES NOT APPLY TO THE GAPS OR POISSON 
+  /// TRIGGER!
+  pub trigger_prescale               : f32,
+  /// in case trigger_type = "Poisson", set rate here
+  pub poisson_trigger_rate           : u32,
+  /// in case trigger_type = "Gaps", set if we want to use 
+  /// beta
+  pub gaps_trigger_use_beta     : bool,
+  /// not sure
+  //pub gaps_trigger_inner_thresh : u32,
+  ///// not sure
+  //pub gaps_trigger_outer_thresh : u32, 
+  ///// not sure
+  //pub gaps_trigger_total_thresh : u32, 
+  ///// not sure
+  //pub gaps_trigger_hit_thresh   : u32,
+  /// Enable trace suppression on the MTB. If enabled, 
+  /// only those RB which hits will read out waveforms.
+  /// In case it is disabled, ALL RBs will readout events
+  /// ALL the time. For this, we need also the eventbuilder
+  /// strategy "WaitForNBoards(40)"
+  pub trace_suppression      : bool,
+  /// Time in seconds between housekkeping 
+  /// packets
+  pub mtb_moni_interval : u64,
+  /// The number of seconds we want to wait
+  /// without hearing from the MTB before
+  /// we attempt a reconnect
+  pub mtb_timeout_sec   : u64,
+}
+
+impl MTBSettings {
+  pub fn new() -> Self {
+    Self {
+      trigger_type           : TriggerType::Unknown,
+      trigger_prescale       : 0.0,
+      poisson_trigger_rate   : 0,
+      gaps_trigger_use_beta  : true,
+      trace_suppression      : true,
+      mtb_moni_interval      : 30,
+      mtb_timeout_sec        : 60,
+    }
+  }
+}
+
+impl fmt::Display for MTBSettings {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let disp = toml::to_string(self).unwrap_or(
+      String::from("-- DESERIALIZATION ERROR! --"));
+    write!(f, "<MTBSettings :\n{}>", disp)
+  }
+}
+
+impl Default for MTBSettings {
+  fn default() -> Self {
+    Self::new()
+  }
+}
+
 
 
 /// Read the complete event of the MTB
@@ -244,7 +313,10 @@ pub fn get_mtevent(socket  : &UdpSocket,
                         //address,
                         0x13 , buffer) {
       Err(err) => {
-        error!("Timeout in read_register for MTB! {err}");
+        // A timeout does not ncecessarily mean that there 
+        // is no event, it can also just mean that 
+        // the rate is low.
+        debug!("Timeout in read_register for MTB! {err}");
         continue;
       },
       Ok(_n_words) => {
@@ -442,9 +514,9 @@ pub fn master_trigger(mt_address        : String,
                       mt_sender         : &Sender<MasterTriggerEvent>,
                       rb_request_tp     : &Sender<TofPacket>,
                       moni_sender       : &Sender<TofPacket>,
-                      mtb_moni_interval : u64,
-                      mtb_timeout_sec   : u64,
-                      trace_suppression : bool,
+                      // FIXME - eventually merge these settings
+                      // to trigger settings
+                      settings          : MTBSettings,
                       verbose           : bool,
                       send_requests     : bool) {
 
@@ -477,7 +549,9 @@ pub fn master_trigger(mt_address        : String,
     Err(err) => error!("Can not reset DAQ, error {err}"),
     Ok(_)    => ()
   }
- 
+
+  // configure MTB here
+  let trace_suppression = settings.trace_suppression;
   match set_trace_suppression(&socket, trace_suppression) {
     Err(err) => error!("Unable to set trace suppression mode! {err}"),
     Ok(_)    => {
@@ -489,6 +563,34 @@ pub fn master_trigger(mt_address        : String,
       }
     }
   }
+  info!("Resetting trigger!");
+  match settings.trigger_type {
+    TriggerType::Poisson => {
+      unset_all_triggers(&socket); 
+      set_poisson_trigger(&socket,settings.poisson_trigger_rate);
+    }
+    TriggerType::Any     => {
+      unset_all_triggers(&socket); 
+      set_any_trigger(&socket,settings.trigger_prescale); 
+    }
+    TriggerType::Track   => {
+      unset_all_triggers(&socket); 
+      set_track_trigger(&socket, settings.trigger_prescale);
+    }
+    TriggerType::Gaps    => {
+      unset_all_triggers(&socket); 
+      set_gaps_trigger(&socket, settings.gaps_trigger_use_beta);
+    }
+    TriggerType::Unknown => {
+      println!("== ==> Not setting any trigger condition. You can set it through pico_hal.py");
+      warn!("Trigger condition undefined! Not setting anything!");
+      error!("Trigger conditions unknown!");
+    }
+    _ => {
+      // actually panic here since this does not make sense
+      panic!("Can't set trigger for trigger type {}", settings.trigger_type);
+    }
+  }
 
   // step 2 - event loop
   
@@ -497,6 +599,8 @@ pub fn master_trigger(mt_address        : String,
   // certain timeinterval
   let mut mtb_timeout   = Instant::now();
   let mut moni_interval = Instant::now();
+  let mtb_timeout_sec   = settings.mtb_timeout_sec;
+  let mtb_moni_interval = settings.mtb_moni_interval;
   // verbose, debugging
   let mut last_event_id = 0u32;
   let mut n_events      = 0u64;
@@ -657,7 +761,7 @@ pub fn master_trigger(mt_address        : String,
   }
 }
 
-/// Remotely read out a specif register of the MTB over UDP
+/// Remotely read out a specific register of the MTB over UDP
 ///
 /// # Arguments
 ///
@@ -780,7 +884,7 @@ pub fn read_event_cnt(socket : &UdpSocket,
 pub fn set_trace_suppression(socket : &UdpSocket,
                              sup    : bool) 
   -> Result<(), Box<dyn Error>> {
-  debug!("Resetting DAQ!");
+  info!("Setting MTB trace suppression {}!", sup);
   let mut buffer = [0u8;MT_MAX_PACKSIZE];
   let mut value = read_register(socket, 0xf, &mut buffer)?;
   let val = !sup;
@@ -795,10 +899,86 @@ pub fn set_trace_suppression(socket : &UdpSocket,
 /// Reset the state of the MTB DAQ
 pub fn reset_daq(socket : &UdpSocket) 
   -> Result<(), Box<dyn Error>> {
-  debug!("Resetting DAQ!");
+  info!("Resetting DAQ!");
   let mut buffer = [0u8;MT_MAX_PACKSIZE];
   write_register(socket,
                  0x10, 1,&mut buffer)?;
+  Ok(())
+}
+
+/// Set the poisson trigger with a prescale
+pub fn set_poisson_trigger(socket : &UdpSocket, rate : u32) 
+  -> Result<(), Box<dyn Error>> {
+  let clk_period = 1.0e8; 
+  let rate_val = (u32::MAX as f32*rate as f32/(1.0/ clk_period)).floor() as u32;
+  info!("Setting poisson trigger with rate {}!", rate);
+  let mut buffer = [0u8;MT_MAX_PACKSIZE];
+  write_register(socket,
+                 0x9,
+                 rate_val,
+                 &mut buffer)?;
+  Ok(())
+}
+
+/// Set the any trigger with a prescale
+pub fn set_any_trigger(socket : &UdpSocket, prescale : f32) 
+  -> Result<(), Box<dyn Error>> {
+  let prescale_val = (u32::MAX as f32 * prescale).floor() as u32;
+  info!("Setting any trigger with prescale {}!", prescale);
+  let mut buffer = [0u8;MT_MAX_PACKSIZE];
+  write_register(socket,
+                 0x40,
+                 prescale_val,
+                 &mut buffer)?;
+  Ok(())
+}
+
+/// Set the track trigger with a prescale
+pub fn set_track_trigger(socket : &UdpSocket, prescale : f32) 
+  -> Result<(), Box<dyn Error>> {
+  let prescale_val = (u32::MAX as f32 * prescale).floor() as u32;
+  info!("Setting track trigger with prescale {}!", prescale);
+  let mut buffer = [0u8;MT_MAX_PACKSIZE];
+  write_register(socket,
+                 0x41,
+                 prescale_val,
+                 &mut buffer)?;
+  Ok(())
+}
+
+/// Disable all triggers
+pub fn unset_all_triggers(socket : &UdpSocket) 
+  -> Result<(), Box<dyn Error>> {
+  let mut buffer = [0u8;MT_MAX_PACKSIZE];
+  // first the GAPS trigger, whcih is a more 
+  // complicated register, where we only have
+  // to flip 1 bit
+  let mut trig_settings =  read_register(socket, 0x14 , &mut buffer)?;
+  trig_settings = trig_settings & !u32::pow(2,24);
+  write_register(socket,
+                 0x14,
+                 trig_settings,
+                 &mut buffer)?;
+  set_poisson_trigger(socket, 0);
+  set_any_trigger    (socket, 0.0);
+  set_track_trigger  (socket, 0.0);
+  Ok(())
+}
+
+/// Set the gaps trigger with a prescale
+pub fn set_gaps_trigger(socket : &UdpSocket, use_beta : bool) 
+  -> Result<(), Box<dyn Error>> {
+  info!("Setting GAPS Antiparticle trigger, use beta {}!", use_beta);
+  let mut buffer = [0u8;MT_MAX_PACKSIZE];
+  let mut trig_settings =  read_register(socket, 0x14 , &mut buffer)?;
+  trig_settings = trig_settings | u32::pow(2,24);
+  if use_beta {
+    trig_settings = trig_settings | u32::pow(2,25);
+  }
+  write_register(socket,
+                 0x14,
+                 trig_settings,
+                 &mut buffer)?;
   Ok(())
 }
 
@@ -864,4 +1044,6 @@ pub fn decode_hit_mask(hit_mask : u32) -> ([bool;N_CHN_PER_LTB],[bool;N_CHN_PER_
   decoded_mask_1.reverse();
   (decoded_mask_0, decoded_mask_1)
 }
+
+
 

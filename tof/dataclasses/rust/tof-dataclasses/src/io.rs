@@ -130,10 +130,10 @@ pub fn get_runfilename(run : u32, subrun : u64, rb_id : Option<u8>) -> String {
   let fname : String;
   match rb_id {
     None => {
-      fname = format!("Run{run}_{subrun}.{ts}.gaps.tof");
+      fname = format!("Run{run}_{subrun}.{ts}.tof.gaps");
     }
     Some(rbid) => {
-      fname = format!("Run{run}_{subrun}.{ts}.RB{rbid:02}.gaps.tof");
+      fname = format!("Run{run}_{subrun}.{ts}.RB{rbid:02}.tof.gaps");
     }
   }
   fname
@@ -751,10 +751,10 @@ impl TofPacketReader {
   pub fn get_next_packet_size(&self, stream : &Vec<u8>) -> u32 {
     // cursor needs at HEAD position and then we have to 
     // add one byte for the packet type
-    let mut pos = self.cursor + 2;
+    let mut pos    = self.cursor + 2;
     let ptype_int  = parse_u8(stream, &mut pos);
     let next_psize = parse_u32(stream, &mut pos);
-    let ptype = ptype_int as u8;
+    let ptype      = ptype_int as u8;
     debug!("We anticpate a TofPacket of type {:?} and size {} (bytes)",ptype, next_psize);
     next_psize
   }
