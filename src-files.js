@@ -85,6 +85,7 @@ var srcIndex = JSON.parse('{\
 "num":["",[],["lib.rs"]],\
 "num_bigint":["",[],["algorithms.rs","bigint.rs","biguint.rs","lib.rs","macros.rs","monty.rs"]],\
 "num_complex":["",[],["cast.rs","lib.rs","pow.rs"]],\
+"num_conv":["",[],["lib.rs"]],\
 "num_integer":["",[],["average.rs","lib.rs","roots.rs"]],\
 "num_iter":["",[],["lib.rs"]],\
 "num_rational":["",[],["lib.rs"]],\
@@ -148,7 +149,7 @@ var srcIndex = JSON.parse('{\
 "textplots":["",[],["lib.rs","scale.rs","utils.rs"]],\
 "thiserror":["",[],["aserror.rs","display.rs","lib.rs"]],\
 "thiserror_impl":["",[],["ast.rs","attr.rs","expand.rs","fmt.rs","generics.rs","lib.rs","prop.rs","span.rs","valid.rs"]],\
-"time":["",[["error",[],["component_range.rs","conversion_range.rs","different_variant.rs","indeterminate_offset.rs","invalid_variant.rs","mod.rs"]],["sys",[["local_offset_at",[],["mod.rs","unix.rs"]]],["mod.rs"]]],["date.rs","date_time.rs","duration.rs","ext.rs","instant.rs","internal_macros.rs","lib.rs","month.rs","offset_date_time.rs","primitive_date_time.rs","time.rs","utc_offset.rs","util.rs","weekday.rs"]],\
+"time":["",[["error",[],["component_range.rs","conversion_range.rs","different_variant.rs","indeterminate_offset.rs","invalid_variant.rs","mod.rs"]],["sys",[["local_offset_at",[],["mod.rs","unix.rs"]]],["mod.rs"]]],["date.rs","duration.rs","ext.rs","instant.rs","internal_macros.rs","lib.rs","month.rs","offset_date_time.rs","primitive_date_time.rs","time.rs","utc_offset.rs","util.rs","weekday.rs"]],\
 "time_core":["",[],["convert.rs","lib.rs","util.rs"]],\
 "tof_control":["",[["cpc_control",[],["cpc_temp.rs"]],["cpu_control",[],["cpu_info.rs","cpu_temp.rs"]],["device",[],["ad5675.rs","bme280.rs","cy8c9560a.rs","ina219.rs","ina226.rs","lis3mdltr.rs","max11615.rs","max11617.rs","max11645.rs","max5815.rs","max5825.rs","max7320.rs","pca9548a.rs","si5345b.rs","tmp1075.rs","tmp112.rs"]],["helper",[],["cpc_type.rs","cpu_type.rs","ltb_type.rs","pb_type.rs","preamp_type.rs","rb_type.rs","tcpc_type.rs"]],["ltb_control",[],["ltb_init.rs","ltb_temp.rs","ltb_threshold.rs"]],["pb_control",[],["pb_init.rs","pb_ltb_pwr.rs","pb_temp.rs","pb_vcp.rs"]],["preamp_control",[],["preamp_bias.rs","preamp_init.rs","preamp_temp.rs"]],["rb_control",[],["rb_clk.rs","rb_config.rs","rb_dac.rs","rb_gpioe.rs","rb_info.rs","rb_init.rs","rb_input.rs","rb_mag.rs","rb_mode.rs","rb_ph.rs","rb_temp.rs","rb_vcp.rs"]],["tcpc_control",[],["tcpc_temp.rs","tcpc_vcp.rs"]],["tui",[],["ltb_ui.rs","pb_ui.rs","preamp_ui.rs","rat_app.rs","rat_crossterm.rs","rat_ui.rs","rb_ui.rs"]]],["constant.rs","cpc_control.rs","cpu_control.rs","device.rs","helper.rs","lib.rs","ltb_control.rs","memory.rs","pb_control.rs","preamp_control.rs","rb_control.rs","tcpc_control.rs","tui.rs"]],\
 "tof_dataclasses":["",[["events",[],["data_type.rs","master_trigger.rs","rb_event.rs","rb_eventmemoryview.rs","tof_event.rs","tof_hit.rs"]],["packets",[],["packet_type.rs"]]],["analysis.rs","calibrations.rs","commands.rs","constants.rs","errors.rs","events.rs","io.rs","lib.rs","manifest.rs","monitoring.rs","packets.rs","run.rs","serialization.rs","threading.rs"]],\
