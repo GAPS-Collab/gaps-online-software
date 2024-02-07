@@ -46,7 +46,6 @@ use crossbeam_channel as cbc;
 
 use tof_dataclasses::events::{MasterTriggerEvent,
                               RBEvent};
-use tof_dataclasses::events::master_trigger::TriggerType;
 use tof_dataclasses::threading::{
     ThreadControl,
 };
@@ -54,16 +53,15 @@ use tof_dataclasses::threading::{
 use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::manifest::{
     //ReadoutBoard,
-    get_rbs_from_sqlite
+    get_rbs_from_sqlite,
+    get_dsi_j_ltbch_vs_rbch_map,
 };
-use tof_dataclasses::DsiLtbRBMapping;
 use tof_dataclasses::commands::TofCommand;
 use tof_dataclasses::commands::TofCommandCode;
 use liftof_lib::{
     master_trigger,
     readoutboard_commander,
     color_log,
-    get_ltb_dsi_j_ch_mapping,
     LIFTOF_LOGO_SHOW,
     RunCmd, CalibrationCmd, PowerCmd, PowerStatusEnum, TofComponent, SetCmd
 };
@@ -95,9 +93,6 @@ struct LiftofCCArgs {
   /// event builder and general settings.
   #[arg(short, long)]
   config: Option<String>,
-  /// A json file wit the ltb(dsi, j, ch) -> rb_id, rb_ch mapping.
-  #[arg(long)]
-  json_ltb_rb_map : Option<PathBuf>,
   /// List of possible commands
   #[command(subcommand)]
   command: Command,
@@ -163,15 +158,14 @@ fn main() {
   println!("=> Using the following config as parsed from the config file:\n{}", config);
   //exit(0);
 
-  let ltb_rb_map : DsiLtbRBMapping;// = HashMap::<u8,HashMap::<u8,HashMap::<u8,(u8,u8)>>>::new();
-  match args.json_ltb_rb_map {
-    None => {
-      panic!("Will need json ltb -> rb mapping when MasterTrigger shall be used")
-    },
-    Some(_json_ltb_rb_map) => {
-      ltb_rb_map = get_ltb_dsi_j_ch_mapping(_json_ltb_rb_map);
-    }
-  }
+  //match args.json_ltb_rb_map {
+  //  None => {
+  //    panic!("Will need json ltb -> rb mapping when MasterTrigger shall be used")
+  //  },
+  //  Some(_json_ltb_rb_map) => {
+  //    ltb_rb_map = get_ltb_dsi_j_ch_mapping(_json_ltb_rb_map);
+  //  }
+  //}
 
   let mtb_address           = config.mtb_address.clone();
   info!("Will connect to the master trigger board at {}!", mtb_address);
@@ -192,6 +186,7 @@ fn main() {
   let flight_address        = config.fc_pub_address.clone();
   let mtb_settings          = config.mtb_settings;
   let run_analysis_engine   = config.run_analysis_engine;
+  let ltb_rb_map            = get_dsi_j_ltbch_vs_rbch_map(db_path);
   let mut rb_list           = get_rbs_from_sqlite(db_path);
   //let mut rb_list           = vec![ReadoutBoard::new();50];
   for k in 0..rb_list.len() {
@@ -501,8 +496,8 @@ fn main() {
       match calibration_cmd {
         CalibrationCmd::Default(default_opts) => {
           let voltage_level = default_opts.level;
-          let rb_id = default_opts.id;
-          let extra = default_opts.extra;
+          let rb_id         = default_opts.id;
+          let extra         = default_opts.extra;
           liftof_cc::send_default_calibration(cmd_sender_c, voltage_level, rb_id, extra);
         },
         CalibrationCmd::Noi(noi_opts) => {

@@ -516,8 +516,6 @@ pub fn master_trigger(mt_address        : String,
                       mt_sender         : &Sender<MasterTriggerEvent>,
                       rb_request_tp     : &Sender<TofPacket>,
                       moni_sender       : &Sender<TofPacket>,
-                      // FIXME - eventually merge these settings
-                      // to trigger settings
                       settings          : MTBSettings,
                       verbose           : bool,
                       send_requests     : bool) {
