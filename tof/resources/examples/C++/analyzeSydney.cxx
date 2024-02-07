@@ -19,7 +19,7 @@
 #include "calibration.h"
 
 #include "legacy.h"
-#include "analysis.h"
+//#include "analysis.h"
 #include <vector>
 
 const int NRB   = 50; // Technically, it is 49, but we don't use 0
@@ -181,12 +181,10 @@ int main(int argc, char *argv[]){
 	spdlog::info("We loaded {} packets from {}", packet.size(), f_str);
 	// Loop over the packets (should only be 1) and read into storage
 	for (auto const &p : packet) {
-	  int ctr=0;
 	  if (p.packet_type == PacketType::RBCalibration) {
 	    // Should have the one calibration tofpacket stored in "packet".
 	    usize pos = 0;
-	    if (++ctr == 4)  // 4th packet is the one we want
-	      cali[i] = RBCalibration::from_bytestream(p.payload, pos); 
+	    cali[i] = RBCalibration::from_bytestream(p.payload, pos); 
 	  }
 	}
       } //else {printf("File does not exist: %s\n", f_str.c_str());}
@@ -458,7 +456,7 @@ int main(int argc, char *argv[]){
           myfile3 << VPeak[i] << ",";
           myfile3.close();
         }
-        myfile3 << std::endl
+        myfile3 << std::endl;
 
 	n_tofevents++;
         break;

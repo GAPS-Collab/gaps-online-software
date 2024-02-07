@@ -358,19 +358,19 @@ RBCalibration RBCalibration::from_bytestream(const Vec<u8> &stream,
   }
   if (serialize_event_data) {
     u16 n_noi = Gaps::parse_u16(stream, pos);
-    log_info("Decoding " << n_noi << " no input data events..");
+    //log_info("Decoding " << n_noi << " no input data events..");
     for (u16 k=0; k<n_noi; k++) {
       auto ev = RBEvent::from_bytestream(stream, pos);
       calibration.noi_data.push_back(ev); 
     }
     u16 n_vcal = Gaps::parse_u16(stream, pos);
-    log_info("Decoding " << n_vcal << " VCAL data events...");
+    //log_info("Decoding " << n_vcal << " VCAL data events...");
     for (u16 k=0; k<n_vcal; k++) {
       auto ev = RBEvent::from_bytestream(stream, pos);
       calibration.vcal_data.push_back(ev); 
     }
     u16 n_tcal = Gaps::parse_u16(stream, pos);
-    log_info("Decoding " << n_tcal << " TCAL data events...");
+    //log_info("Decoding " << n_tcal << " TCAL data events...");
     for (u16 k=0; k<n_tcal; k++) {
       auto ev = RBEvent::from_bytestream(stream, pos);
       calibration.tcal_data.push_back(ev); 
