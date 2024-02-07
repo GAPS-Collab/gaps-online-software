@@ -521,7 +521,14 @@ impl RBEventMemoryStreamer {
     //                           + header.get_channels().len()*4;
     for ch in header.get_channels().iter() {
       let ch_id = parse_u16(&self.stream, &mut self.pos);
-      if ch_id == *ch as u16 {
+      if ch_id != *ch as u16 {
+        error!("We got {ch_id} but where expecting {ch}");
+        event_status = EventStatus::ChannelIDWrong;
+        error!("Channel id {} in data outside of requested channel mask! Skipping..", ch_id);
+        self.pos += 2*nwords + 4;
+        continue;
+      } else {
+      //if ch_id == *ch as u16 {
         //println!("Got ch id {}", ch_id);
         //let header = parse_u16(&self.stream, &mut self.pos);
         // noice!!
@@ -558,15 +565,6 @@ impl RBEventMemoryStreamer {
           }
           println!("== ==> Checksum {}, channel checksum {}!", checksum, crc32); 
         }
-      } else {
-        if ch_id > 9 {
-          error!("Channel id {} in data outside of requested channel mask! Skipping..", ch_id);
-          error!(" - - Header of this event: {}", header);
-          event_status = EventStatus::ChannelIDWrong;
-        } else {
-          warn!("Channel id {} in data outside of requested channel mask! Skipping..", ch_id);
-        }
-        self.pos += 2*nwords + 4;
       }
     }
     
