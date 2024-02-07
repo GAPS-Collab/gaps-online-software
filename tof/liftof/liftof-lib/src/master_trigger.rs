@@ -255,6 +255,7 @@ pub struct MTBSettings {
   /// without hearing from the MTB before
   /// we attempt a reconnect
   pub mtb_timeout_sec   : u64,
+  pub rb_int_window     : u8,
 }
 
 impl MTBSettings {
@@ -267,6 +268,7 @@ impl MTBSettings {
       trace_suppression      : true,
       mtb_moni_interval      : 30,
       mtb_timeout_sec        : 60,
+      rb_int_window          : 1,
     }
   }
 }
@@ -563,6 +565,15 @@ pub fn master_trigger(mt_address        : String,
       }
     }
   }
+  info!("Settting rb integration window!");
+  let int_wind = settings.rb_int_window;
+  match set_rb_int_window(&socket, int_wind) {
+    Err(err) => error!("Unable to set rb integration window! {err}"),
+    Ok(_)    => {
+      info!("rb integration window set to {}", int_wind); 
+    } 
+  }
+
   info!("Resetting trigger!");
   match settings.trigger_type {
     TriggerType::Poisson => {
@@ -911,6 +922,24 @@ pub fn reset_daq(socket : &UdpSocket)
   let mut buffer = [0u8;MT_MAX_PACKSIZE];
   write_register(socket,
                  0x10, 1,&mut buffer)?;
+  Ok(())
+}
+
+/// FIXME
+pub fn set_rb_int_window(socket : &UdpSocket, wind : u8)
+  -> Result<(), Box<dyn Error>> {
+  info!("Setting RB_INT_WINDOW to {}!", wind);
+  let mut buffer = [0u8;MT_MAX_PACKSIZE];
+  let mut value =  read_register(socket, 0xf , &mut buffer)?;
+  let mask  = !((0xf as u32) << 8);
+  // switch the bins off
+  value = value & mask;
+  let wind_bits = (wind as u32) << 8;
+  value = value | wind_bits;
+  write_register(socket,
+                 0xf,
+                 value,
+                 &mut buffer)?;
   Ok(())
 }
 
