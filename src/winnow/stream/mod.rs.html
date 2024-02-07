@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/winnow-0.5.36/src/stream/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="winnow" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/winnow-0.5.39/src/stream/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="winnow" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -3174,6 +3174,577 @@
 <a href="#3174" id="3174">3174</a>
 <a href="#3175" id="3175">3175</a>
 <a href="#3176" id="3176">3176</a>
+<a href="#3177" id="3177">3177</a>
+<a href="#3178" id="3178">3178</a>
+<a href="#3179" id="3179">3179</a>
+<a href="#3180" id="3180">3180</a>
+<a href="#3181" id="3181">3181</a>
+<a href="#3182" id="3182">3182</a>
+<a href="#3183" id="3183">3183</a>
+<a href="#3184" id="3184">3184</a>
+<a href="#3185" id="3185">3185</a>
+<a href="#3186" id="3186">3186</a>
+<a href="#3187" id="3187">3187</a>
+<a href="#3188" id="3188">3188</a>
+<a href="#3189" id="3189">3189</a>
+<a href="#3190" id="3190">3190</a>
+<a href="#3191" id="3191">3191</a>
+<a href="#3192" id="3192">3192</a>
+<a href="#3193" id="3193">3193</a>
+<a href="#3194" id="3194">3194</a>
+<a href="#3195" id="3195">3195</a>
+<a href="#3196" id="3196">3196</a>
+<a href="#3197" id="3197">3197</a>
+<a href="#3198" id="3198">3198</a>
+<a href="#3199" id="3199">3199</a>
+<a href="#3200" id="3200">3200</a>
+<a href="#3201" id="3201">3201</a>
+<a href="#3202" id="3202">3202</a>
+<a href="#3203" id="3203">3203</a>
+<a href="#3204" id="3204">3204</a>
+<a href="#3205" id="3205">3205</a>
+<a href="#3206" id="3206">3206</a>
+<a href="#3207" id="3207">3207</a>
+<a href="#3208" id="3208">3208</a>
+<a href="#3209" id="3209">3209</a>
+<a href="#3210" id="3210">3210</a>
+<a href="#3211" id="3211">3211</a>
+<a href="#3212" id="3212">3212</a>
+<a href="#3213" id="3213">3213</a>
+<a href="#3214" id="3214">3214</a>
+<a href="#3215" id="3215">3215</a>
+<a href="#3216" id="3216">3216</a>
+<a href="#3217" id="3217">3217</a>
+<a href="#3218" id="3218">3218</a>
+<a href="#3219" id="3219">3219</a>
+<a href="#3220" id="3220">3220</a>
+<a href="#3221" id="3221">3221</a>
+<a href="#3222" id="3222">3222</a>
+<a href="#3223" id="3223">3223</a>
+<a href="#3224" id="3224">3224</a>
+<a href="#3225" id="3225">3225</a>
+<a href="#3226" id="3226">3226</a>
+<a href="#3227" id="3227">3227</a>
+<a href="#3228" id="3228">3228</a>
+<a href="#3229" id="3229">3229</a>
+<a href="#3230" id="3230">3230</a>
+<a href="#3231" id="3231">3231</a>
+<a href="#3232" id="3232">3232</a>
+<a href="#3233" id="3233">3233</a>
+<a href="#3234" id="3234">3234</a>
+<a href="#3235" id="3235">3235</a>
+<a href="#3236" id="3236">3236</a>
+<a href="#3237" id="3237">3237</a>
+<a href="#3238" id="3238">3238</a>
+<a href="#3239" id="3239">3239</a>
+<a href="#3240" id="3240">3240</a>
+<a href="#3241" id="3241">3241</a>
+<a href="#3242" id="3242">3242</a>
+<a href="#3243" id="3243">3243</a>
+<a href="#3244" id="3244">3244</a>
+<a href="#3245" id="3245">3245</a>
+<a href="#3246" id="3246">3246</a>
+<a href="#3247" id="3247">3247</a>
+<a href="#3248" id="3248">3248</a>
+<a href="#3249" id="3249">3249</a>
+<a href="#3250" id="3250">3250</a>
+<a href="#3251" id="3251">3251</a>
+<a href="#3252" id="3252">3252</a>
+<a href="#3253" id="3253">3253</a>
+<a href="#3254" id="3254">3254</a>
+<a href="#3255" id="3255">3255</a>
+<a href="#3256" id="3256">3256</a>
+<a href="#3257" id="3257">3257</a>
+<a href="#3258" id="3258">3258</a>
+<a href="#3259" id="3259">3259</a>
+<a href="#3260" id="3260">3260</a>
+<a href="#3261" id="3261">3261</a>
+<a href="#3262" id="3262">3262</a>
+<a href="#3263" id="3263">3263</a>
+<a href="#3264" id="3264">3264</a>
+<a href="#3265" id="3265">3265</a>
+<a href="#3266" id="3266">3266</a>
+<a href="#3267" id="3267">3267</a>
+<a href="#3268" id="3268">3268</a>
+<a href="#3269" id="3269">3269</a>
+<a href="#3270" id="3270">3270</a>
+<a href="#3271" id="3271">3271</a>
+<a href="#3272" id="3272">3272</a>
+<a href="#3273" id="3273">3273</a>
+<a href="#3274" id="3274">3274</a>
+<a href="#3275" id="3275">3275</a>
+<a href="#3276" id="3276">3276</a>
+<a href="#3277" id="3277">3277</a>
+<a href="#3278" id="3278">3278</a>
+<a href="#3279" id="3279">3279</a>
+<a href="#3280" id="3280">3280</a>
+<a href="#3281" id="3281">3281</a>
+<a href="#3282" id="3282">3282</a>
+<a href="#3283" id="3283">3283</a>
+<a href="#3284" id="3284">3284</a>
+<a href="#3285" id="3285">3285</a>
+<a href="#3286" id="3286">3286</a>
+<a href="#3287" id="3287">3287</a>
+<a href="#3288" id="3288">3288</a>
+<a href="#3289" id="3289">3289</a>
+<a href="#3290" id="3290">3290</a>
+<a href="#3291" id="3291">3291</a>
+<a href="#3292" id="3292">3292</a>
+<a href="#3293" id="3293">3293</a>
+<a href="#3294" id="3294">3294</a>
+<a href="#3295" id="3295">3295</a>
+<a href="#3296" id="3296">3296</a>
+<a href="#3297" id="3297">3297</a>
+<a href="#3298" id="3298">3298</a>
+<a href="#3299" id="3299">3299</a>
+<a href="#3300" id="3300">3300</a>
+<a href="#3301" id="3301">3301</a>
+<a href="#3302" id="3302">3302</a>
+<a href="#3303" id="3303">3303</a>
+<a href="#3304" id="3304">3304</a>
+<a href="#3305" id="3305">3305</a>
+<a href="#3306" id="3306">3306</a>
+<a href="#3307" id="3307">3307</a>
+<a href="#3308" id="3308">3308</a>
+<a href="#3309" id="3309">3309</a>
+<a href="#3310" id="3310">3310</a>
+<a href="#3311" id="3311">3311</a>
+<a href="#3312" id="3312">3312</a>
+<a href="#3313" id="3313">3313</a>
+<a href="#3314" id="3314">3314</a>
+<a href="#3315" id="3315">3315</a>
+<a href="#3316" id="3316">3316</a>
+<a href="#3317" id="3317">3317</a>
+<a href="#3318" id="3318">3318</a>
+<a href="#3319" id="3319">3319</a>
+<a href="#3320" id="3320">3320</a>
+<a href="#3321" id="3321">3321</a>
+<a href="#3322" id="3322">3322</a>
+<a href="#3323" id="3323">3323</a>
+<a href="#3324" id="3324">3324</a>
+<a href="#3325" id="3325">3325</a>
+<a href="#3326" id="3326">3326</a>
+<a href="#3327" id="3327">3327</a>
+<a href="#3328" id="3328">3328</a>
+<a href="#3329" id="3329">3329</a>
+<a href="#3330" id="3330">3330</a>
+<a href="#3331" id="3331">3331</a>
+<a href="#3332" id="3332">3332</a>
+<a href="#3333" id="3333">3333</a>
+<a href="#3334" id="3334">3334</a>
+<a href="#3335" id="3335">3335</a>
+<a href="#3336" id="3336">3336</a>
+<a href="#3337" id="3337">3337</a>
+<a href="#3338" id="3338">3338</a>
+<a href="#3339" id="3339">3339</a>
+<a href="#3340" id="3340">3340</a>
+<a href="#3341" id="3341">3341</a>
+<a href="#3342" id="3342">3342</a>
+<a href="#3343" id="3343">3343</a>
+<a href="#3344" id="3344">3344</a>
+<a href="#3345" id="3345">3345</a>
+<a href="#3346" id="3346">3346</a>
+<a href="#3347" id="3347">3347</a>
+<a href="#3348" id="3348">3348</a>
+<a href="#3349" id="3349">3349</a>
+<a href="#3350" id="3350">3350</a>
+<a href="#3351" id="3351">3351</a>
+<a href="#3352" id="3352">3352</a>
+<a href="#3353" id="3353">3353</a>
+<a href="#3354" id="3354">3354</a>
+<a href="#3355" id="3355">3355</a>
+<a href="#3356" id="3356">3356</a>
+<a href="#3357" id="3357">3357</a>
+<a href="#3358" id="3358">3358</a>
+<a href="#3359" id="3359">3359</a>
+<a href="#3360" id="3360">3360</a>
+<a href="#3361" id="3361">3361</a>
+<a href="#3362" id="3362">3362</a>
+<a href="#3363" id="3363">3363</a>
+<a href="#3364" id="3364">3364</a>
+<a href="#3365" id="3365">3365</a>
+<a href="#3366" id="3366">3366</a>
+<a href="#3367" id="3367">3367</a>
+<a href="#3368" id="3368">3368</a>
+<a href="#3369" id="3369">3369</a>
+<a href="#3370" id="3370">3370</a>
+<a href="#3371" id="3371">3371</a>
+<a href="#3372" id="3372">3372</a>
+<a href="#3373" id="3373">3373</a>
+<a href="#3374" id="3374">3374</a>
+<a href="#3375" id="3375">3375</a>
+<a href="#3376" id="3376">3376</a>
+<a href="#3377" id="3377">3377</a>
+<a href="#3378" id="3378">3378</a>
+<a href="#3379" id="3379">3379</a>
+<a href="#3380" id="3380">3380</a>
+<a href="#3381" id="3381">3381</a>
+<a href="#3382" id="3382">3382</a>
+<a href="#3383" id="3383">3383</a>
+<a href="#3384" id="3384">3384</a>
+<a href="#3385" id="3385">3385</a>
+<a href="#3386" id="3386">3386</a>
+<a href="#3387" id="3387">3387</a>
+<a href="#3388" id="3388">3388</a>
+<a href="#3389" id="3389">3389</a>
+<a href="#3390" id="3390">3390</a>
+<a href="#3391" id="3391">3391</a>
+<a href="#3392" id="3392">3392</a>
+<a href="#3393" id="3393">3393</a>
+<a href="#3394" id="3394">3394</a>
+<a href="#3395" id="3395">3395</a>
+<a href="#3396" id="3396">3396</a>
+<a href="#3397" id="3397">3397</a>
+<a href="#3398" id="3398">3398</a>
+<a href="#3399" id="3399">3399</a>
+<a href="#3400" id="3400">3400</a>
+<a href="#3401" id="3401">3401</a>
+<a href="#3402" id="3402">3402</a>
+<a href="#3403" id="3403">3403</a>
+<a href="#3404" id="3404">3404</a>
+<a href="#3405" id="3405">3405</a>
+<a href="#3406" id="3406">3406</a>
+<a href="#3407" id="3407">3407</a>
+<a href="#3408" id="3408">3408</a>
+<a href="#3409" id="3409">3409</a>
+<a href="#3410" id="3410">3410</a>
+<a href="#3411" id="3411">3411</a>
+<a href="#3412" id="3412">3412</a>
+<a href="#3413" id="3413">3413</a>
+<a href="#3414" id="3414">3414</a>
+<a href="#3415" id="3415">3415</a>
+<a href="#3416" id="3416">3416</a>
+<a href="#3417" id="3417">3417</a>
+<a href="#3418" id="3418">3418</a>
+<a href="#3419" id="3419">3419</a>
+<a href="#3420" id="3420">3420</a>
+<a href="#3421" id="3421">3421</a>
+<a href="#3422" id="3422">3422</a>
+<a href="#3423" id="3423">3423</a>
+<a href="#3424" id="3424">3424</a>
+<a href="#3425" id="3425">3425</a>
+<a href="#3426" id="3426">3426</a>
+<a href="#3427" id="3427">3427</a>
+<a href="#3428" id="3428">3428</a>
+<a href="#3429" id="3429">3429</a>
+<a href="#3430" id="3430">3430</a>
+<a href="#3431" id="3431">3431</a>
+<a href="#3432" id="3432">3432</a>
+<a href="#3433" id="3433">3433</a>
+<a href="#3434" id="3434">3434</a>
+<a href="#3435" id="3435">3435</a>
+<a href="#3436" id="3436">3436</a>
+<a href="#3437" id="3437">3437</a>
+<a href="#3438" id="3438">3438</a>
+<a href="#3439" id="3439">3439</a>
+<a href="#3440" id="3440">3440</a>
+<a href="#3441" id="3441">3441</a>
+<a href="#3442" id="3442">3442</a>
+<a href="#3443" id="3443">3443</a>
+<a href="#3444" id="3444">3444</a>
+<a href="#3445" id="3445">3445</a>
+<a href="#3446" id="3446">3446</a>
+<a href="#3447" id="3447">3447</a>
+<a href="#3448" id="3448">3448</a>
+<a href="#3449" id="3449">3449</a>
+<a href="#3450" id="3450">3450</a>
+<a href="#3451" id="3451">3451</a>
+<a href="#3452" id="3452">3452</a>
+<a href="#3453" id="3453">3453</a>
+<a href="#3454" id="3454">3454</a>
+<a href="#3455" id="3455">3455</a>
+<a href="#3456" id="3456">3456</a>
+<a href="#3457" id="3457">3457</a>
+<a href="#3458" id="3458">3458</a>
+<a href="#3459" id="3459">3459</a>
+<a href="#3460" id="3460">3460</a>
+<a href="#3461" id="3461">3461</a>
+<a href="#3462" id="3462">3462</a>
+<a href="#3463" id="3463">3463</a>
+<a href="#3464" id="3464">3464</a>
+<a href="#3465" id="3465">3465</a>
+<a href="#3466" id="3466">3466</a>
+<a href="#3467" id="3467">3467</a>
+<a href="#3468" id="3468">3468</a>
+<a href="#3469" id="3469">3469</a>
+<a href="#3470" id="3470">3470</a>
+<a href="#3471" id="3471">3471</a>
+<a href="#3472" id="3472">3472</a>
+<a href="#3473" id="3473">3473</a>
+<a href="#3474" id="3474">3474</a>
+<a href="#3475" id="3475">3475</a>
+<a href="#3476" id="3476">3476</a>
+<a href="#3477" id="3477">3477</a>
+<a href="#3478" id="3478">3478</a>
+<a href="#3479" id="3479">3479</a>
+<a href="#3480" id="3480">3480</a>
+<a href="#3481" id="3481">3481</a>
+<a href="#3482" id="3482">3482</a>
+<a href="#3483" id="3483">3483</a>
+<a href="#3484" id="3484">3484</a>
+<a href="#3485" id="3485">3485</a>
+<a href="#3486" id="3486">3486</a>
+<a href="#3487" id="3487">3487</a>
+<a href="#3488" id="3488">3488</a>
+<a href="#3489" id="3489">3489</a>
+<a href="#3490" id="3490">3490</a>
+<a href="#3491" id="3491">3491</a>
+<a href="#3492" id="3492">3492</a>
+<a href="#3493" id="3493">3493</a>
+<a href="#3494" id="3494">3494</a>
+<a href="#3495" id="3495">3495</a>
+<a href="#3496" id="3496">3496</a>
+<a href="#3497" id="3497">3497</a>
+<a href="#3498" id="3498">3498</a>
+<a href="#3499" id="3499">3499</a>
+<a href="#3500" id="3500">3500</a>
+<a href="#3501" id="3501">3501</a>
+<a href="#3502" id="3502">3502</a>
+<a href="#3503" id="3503">3503</a>
+<a href="#3504" id="3504">3504</a>
+<a href="#3505" id="3505">3505</a>
+<a href="#3506" id="3506">3506</a>
+<a href="#3507" id="3507">3507</a>
+<a href="#3508" id="3508">3508</a>
+<a href="#3509" id="3509">3509</a>
+<a href="#3510" id="3510">3510</a>
+<a href="#3511" id="3511">3511</a>
+<a href="#3512" id="3512">3512</a>
+<a href="#3513" id="3513">3513</a>
+<a href="#3514" id="3514">3514</a>
+<a href="#3515" id="3515">3515</a>
+<a href="#3516" id="3516">3516</a>
+<a href="#3517" id="3517">3517</a>
+<a href="#3518" id="3518">3518</a>
+<a href="#3519" id="3519">3519</a>
+<a href="#3520" id="3520">3520</a>
+<a href="#3521" id="3521">3521</a>
+<a href="#3522" id="3522">3522</a>
+<a href="#3523" id="3523">3523</a>
+<a href="#3524" id="3524">3524</a>
+<a href="#3525" id="3525">3525</a>
+<a href="#3526" id="3526">3526</a>
+<a href="#3527" id="3527">3527</a>
+<a href="#3528" id="3528">3528</a>
+<a href="#3529" id="3529">3529</a>
+<a href="#3530" id="3530">3530</a>
+<a href="#3531" id="3531">3531</a>
+<a href="#3532" id="3532">3532</a>
+<a href="#3533" id="3533">3533</a>
+<a href="#3534" id="3534">3534</a>
+<a href="#3535" id="3535">3535</a>
+<a href="#3536" id="3536">3536</a>
+<a href="#3537" id="3537">3537</a>
+<a href="#3538" id="3538">3538</a>
+<a href="#3539" id="3539">3539</a>
+<a href="#3540" id="3540">3540</a>
+<a href="#3541" id="3541">3541</a>
+<a href="#3542" id="3542">3542</a>
+<a href="#3543" id="3543">3543</a>
+<a href="#3544" id="3544">3544</a>
+<a href="#3545" id="3545">3545</a>
+<a href="#3546" id="3546">3546</a>
+<a href="#3547" id="3547">3547</a>
+<a href="#3548" id="3548">3548</a>
+<a href="#3549" id="3549">3549</a>
+<a href="#3550" id="3550">3550</a>
+<a href="#3551" id="3551">3551</a>
+<a href="#3552" id="3552">3552</a>
+<a href="#3553" id="3553">3553</a>
+<a href="#3554" id="3554">3554</a>
+<a href="#3555" id="3555">3555</a>
+<a href="#3556" id="3556">3556</a>
+<a href="#3557" id="3557">3557</a>
+<a href="#3558" id="3558">3558</a>
+<a href="#3559" id="3559">3559</a>
+<a href="#3560" id="3560">3560</a>
+<a href="#3561" id="3561">3561</a>
+<a href="#3562" id="3562">3562</a>
+<a href="#3563" id="3563">3563</a>
+<a href="#3564" id="3564">3564</a>
+<a href="#3565" id="3565">3565</a>
+<a href="#3566" id="3566">3566</a>
+<a href="#3567" id="3567">3567</a>
+<a href="#3568" id="3568">3568</a>
+<a href="#3569" id="3569">3569</a>
+<a href="#3570" id="3570">3570</a>
+<a href="#3571" id="3571">3571</a>
+<a href="#3572" id="3572">3572</a>
+<a href="#3573" id="3573">3573</a>
+<a href="#3574" id="3574">3574</a>
+<a href="#3575" id="3575">3575</a>
+<a href="#3576" id="3576">3576</a>
+<a href="#3577" id="3577">3577</a>
+<a href="#3578" id="3578">3578</a>
+<a href="#3579" id="3579">3579</a>
+<a href="#3580" id="3580">3580</a>
+<a href="#3581" id="3581">3581</a>
+<a href="#3582" id="3582">3582</a>
+<a href="#3583" id="3583">3583</a>
+<a href="#3584" id="3584">3584</a>
+<a href="#3585" id="3585">3585</a>
+<a href="#3586" id="3586">3586</a>
+<a href="#3587" id="3587">3587</a>
+<a href="#3588" id="3588">3588</a>
+<a href="#3589" id="3589">3589</a>
+<a href="#3590" id="3590">3590</a>
+<a href="#3591" id="3591">3591</a>
+<a href="#3592" id="3592">3592</a>
+<a href="#3593" id="3593">3593</a>
+<a href="#3594" id="3594">3594</a>
+<a href="#3595" id="3595">3595</a>
+<a href="#3596" id="3596">3596</a>
+<a href="#3597" id="3597">3597</a>
+<a href="#3598" id="3598">3598</a>
+<a href="#3599" id="3599">3599</a>
+<a href="#3600" id="3600">3600</a>
+<a href="#3601" id="3601">3601</a>
+<a href="#3602" id="3602">3602</a>
+<a href="#3603" id="3603">3603</a>
+<a href="#3604" id="3604">3604</a>
+<a href="#3605" id="3605">3605</a>
+<a href="#3606" id="3606">3606</a>
+<a href="#3607" id="3607">3607</a>
+<a href="#3608" id="3608">3608</a>
+<a href="#3609" id="3609">3609</a>
+<a href="#3610" id="3610">3610</a>
+<a href="#3611" id="3611">3611</a>
+<a href="#3612" id="3612">3612</a>
+<a href="#3613" id="3613">3613</a>
+<a href="#3614" id="3614">3614</a>
+<a href="#3615" id="3615">3615</a>
+<a href="#3616" id="3616">3616</a>
+<a href="#3617" id="3617">3617</a>
+<a href="#3618" id="3618">3618</a>
+<a href="#3619" id="3619">3619</a>
+<a href="#3620" id="3620">3620</a>
+<a href="#3621" id="3621">3621</a>
+<a href="#3622" id="3622">3622</a>
+<a href="#3623" id="3623">3623</a>
+<a href="#3624" id="3624">3624</a>
+<a href="#3625" id="3625">3625</a>
+<a href="#3626" id="3626">3626</a>
+<a href="#3627" id="3627">3627</a>
+<a href="#3628" id="3628">3628</a>
+<a href="#3629" id="3629">3629</a>
+<a href="#3630" id="3630">3630</a>
+<a href="#3631" id="3631">3631</a>
+<a href="#3632" id="3632">3632</a>
+<a href="#3633" id="3633">3633</a>
+<a href="#3634" id="3634">3634</a>
+<a href="#3635" id="3635">3635</a>
+<a href="#3636" id="3636">3636</a>
+<a href="#3637" id="3637">3637</a>
+<a href="#3638" id="3638">3638</a>
+<a href="#3639" id="3639">3639</a>
+<a href="#3640" id="3640">3640</a>
+<a href="#3641" id="3641">3641</a>
+<a href="#3642" id="3642">3642</a>
+<a href="#3643" id="3643">3643</a>
+<a href="#3644" id="3644">3644</a>
+<a href="#3645" id="3645">3645</a>
+<a href="#3646" id="3646">3646</a>
+<a href="#3647" id="3647">3647</a>
+<a href="#3648" id="3648">3648</a>
+<a href="#3649" id="3649">3649</a>
+<a href="#3650" id="3650">3650</a>
+<a href="#3651" id="3651">3651</a>
+<a href="#3652" id="3652">3652</a>
+<a href="#3653" id="3653">3653</a>
+<a href="#3654" id="3654">3654</a>
+<a href="#3655" id="3655">3655</a>
+<a href="#3656" id="3656">3656</a>
+<a href="#3657" id="3657">3657</a>
+<a href="#3658" id="3658">3658</a>
+<a href="#3659" id="3659">3659</a>
+<a href="#3660" id="3660">3660</a>
+<a href="#3661" id="3661">3661</a>
+<a href="#3662" id="3662">3662</a>
+<a href="#3663" id="3663">3663</a>
+<a href="#3664" id="3664">3664</a>
+<a href="#3665" id="3665">3665</a>
+<a href="#3666" id="3666">3666</a>
+<a href="#3667" id="3667">3667</a>
+<a href="#3668" id="3668">3668</a>
+<a href="#3669" id="3669">3669</a>
+<a href="#3670" id="3670">3670</a>
+<a href="#3671" id="3671">3671</a>
+<a href="#3672" id="3672">3672</a>
+<a href="#3673" id="3673">3673</a>
+<a href="#3674" id="3674">3674</a>
+<a href="#3675" id="3675">3675</a>
+<a href="#3676" id="3676">3676</a>
+<a href="#3677" id="3677">3677</a>
+<a href="#3678" id="3678">3678</a>
+<a href="#3679" id="3679">3679</a>
+<a href="#3680" id="3680">3680</a>
+<a href="#3681" id="3681">3681</a>
+<a href="#3682" id="3682">3682</a>
+<a href="#3683" id="3683">3683</a>
+<a href="#3684" id="3684">3684</a>
+<a href="#3685" id="3685">3685</a>
+<a href="#3686" id="3686">3686</a>
+<a href="#3687" id="3687">3687</a>
+<a href="#3688" id="3688">3688</a>
+<a href="#3689" id="3689">3689</a>
+<a href="#3690" id="3690">3690</a>
+<a href="#3691" id="3691">3691</a>
+<a href="#3692" id="3692">3692</a>
+<a href="#3693" id="3693">3693</a>
+<a href="#3694" id="3694">3694</a>
+<a href="#3695" id="3695">3695</a>
+<a href="#3696" id="3696">3696</a>
+<a href="#3697" id="3697">3697</a>
+<a href="#3698" id="3698">3698</a>
+<a href="#3699" id="3699">3699</a>
+<a href="#3700" id="3700">3700</a>
+<a href="#3701" id="3701">3701</a>
+<a href="#3702" id="3702">3702</a>
+<a href="#3703" id="3703">3703</a>
+<a href="#3704" id="3704">3704</a>
+<a href="#3705" id="3705">3705</a>
+<a href="#3706" id="3706">3706</a>
+<a href="#3707" id="3707">3707</a>
+<a href="#3708" id="3708">3708</a>
+<a href="#3709" id="3709">3709</a>
+<a href="#3710" id="3710">3710</a>
+<a href="#3711" id="3711">3711</a>
+<a href="#3712" id="3712">3712</a>
+<a href="#3713" id="3713">3713</a>
+<a href="#3714" id="3714">3714</a>
+<a href="#3715" id="3715">3715</a>
+<a href="#3716" id="3716">3716</a>
+<a href="#3717" id="3717">3717</a>
+<a href="#3718" id="3718">3718</a>
+<a href="#3719" id="3719">3719</a>
+<a href="#3720" id="3720">3720</a>
+<a href="#3721" id="3721">3721</a>
+<a href="#3722" id="3722">3722</a>
+<a href="#3723" id="3723">3723</a>
+<a href="#3724" id="3724">3724</a>
+<a href="#3725" id="3725">3725</a>
+<a href="#3726" id="3726">3726</a>
+<a href="#3727" id="3727">3727</a>
+<a href="#3728" id="3728">3728</a>
+<a href="#3729" id="3729">3729</a>
+<a href="#3730" id="3730">3730</a>
+<a href="#3731" id="3731">3731</a>
+<a href="#3732" id="3732">3732</a>
+<a href="#3733" id="3733">3733</a>
+<a href="#3734" id="3734">3734</a>
+<a href="#3735" id="3735">3735</a>
+<a href="#3736" id="3736">3736</a>
+<a href="#3737" id="3737">3737</a>
+<a href="#3738" id="3738">3738</a>
+<a href="#3739" id="3739">3739</a>
+<a href="#3740" id="3740">3740</a>
+<a href="#3741" id="3741">3741</a>
+<a href="#3742" id="3742">3742</a>
+<a href="#3743" id="3743">3743</a>
+<a href="#3744" id="3744">3744</a>
+<a href="#3745" id="3745">3745</a>
+<a href="#3746" id="3746">3746</a>
+<a href="#3747" id="3747">3747</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Stream capability for combinators to parse
 //!
 //! Stream types include:
@@ -3189,6 +3760,8 @@
 <span class="kw">use </span>core::num::NonZeroUsize;
 
 <span class="kw">use </span><span class="kw">crate</span>::ascii::Caseless <span class="kw">as </span>AsciiCaseless;
+<span class="attr">#[cfg(feature = <span class="string">&quot;unstable-recover&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::error::FromRecoverableError;
 <span class="kw">use </span><span class="kw">crate</span>::error::Needed;
 <span class="kw">use </span><span class="kw">crate</span>::lib::std::iter::{Cloned, Enumerate};
 <span class="kw">use </span><span class="kw">crate</span>::lib::std::slice::Iter;
@@ -3197,7 +3770,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::lib::std::str::FromStr;
 
 <span class="attr">#[allow(unused_imports)]
-#[cfg(feature = <span class="string">&quot;unstable-doc&quot;</span>)]
+#[cfg(any(feature = <span class="string">&quot;unstable-doc&quot;</span>, feature = <span class="string">&quot;unstable-recover&quot;</span>))]
 </span><span class="kw">use </span><span class="kw">crate</span>::error::ErrMode;
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
@@ -3321,6 +3894,84 @@
 <span class="kw">impl</span>&lt;I: <span class="kw">crate</span>::lib::std::fmt::Display&gt; <span class="kw">crate</span>::lib::std::fmt::Display <span class="kw">for </span>Located&lt;I&gt; {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span><span class="kw">crate</span>::lib::std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="kw">crate</span>::lib::std::fmt::Result {
         <span class="self">self</span>.input.fmt(f)
+    }
+}
+
+<span class="doccomment">/// Allow recovering from parse errors, capturing them as the parser continues
+///
+/// Generally, this will be used indirectly via
+/// [`RecoverableParser::recoverable_parse`][crate::RecoverableParser::recoverable_parse].
+</span><span class="attr">#[cfg(feature = <span class="string">&quot;unstable-recover&quot;</span>)]
+#[derive(Clone, Debug)]
+</span><span class="kw">pub struct </span>Recoverable&lt;I, E&gt;
+<span class="kw">where
+    </span>I: Stream,
+{
+    input: I,
+    errors: Vec&lt;E&gt;,
+    is_recoverable: bool,
+}
+
+<span class="attr">#[cfg(feature = <span class="string">&quot;unstable-recover&quot;</span>)]
+</span><span class="kw">impl</span>&lt;I, E&gt; Recoverable&lt;I, E&gt;
+<span class="kw">where
+    </span>I: Stream,
+{
+    <span class="doccomment">/// Track recoverable errors with the stream
+    </span><span class="kw">pub fn </span>new(input: I) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            input,
+            errors: Default::default(),
+            is_recoverable: <span class="bool-val">true</span>,
+        }
+    }
+
+    <span class="doccomment">/// Act as a normal stream
+    </span><span class="kw">pub fn </span>unrecoverable(input: I) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            input,
+            errors: Default::default(),
+            is_recoverable: <span class="bool-val">false</span>,
+        }
+    }
+
+    <span class="doccomment">/// Access the current input and errors
+    </span><span class="kw">pub fn </span>into_parts(<span class="self">self</span>) -&gt; (I, Vec&lt;E&gt;) {
+        (<span class="self">self</span>.input, <span class="self">self</span>.errors)
+    }
+}
+
+<span class="attr">#[cfg(feature = <span class="string">&quot;unstable-recover&quot;</span>)]
+</span><span class="kw">impl</span>&lt;I, E&gt; AsRef&lt;I&gt; <span class="kw">for </span>Recoverable&lt;I, E&gt;
+<span class="kw">where
+    </span>I: Stream,
+{
+    <span class="attr">#[inline(always)]
+    </span><span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>I {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.input
+    }
+}
+
+<span class="attr">#[cfg(feature = <span class="string">&quot;unstable-recover&quot;</span>)]
+</span><span class="kw">impl</span>&lt;I, E&gt; <span class="kw">crate</span>::lib::std::ops::Deref <span class="kw">for </span>Recoverable&lt;I, E&gt;
+<span class="kw">where
+    </span>I: Stream,
+{
+    <span class="kw">type </span>Target = I;
+
+    <span class="attr">#[inline(always)]
+    </span><span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.input
+    }
+}
+
+<span class="attr">#[cfg(feature = <span class="string">&quot;unstable-recover&quot;</span>)]
+</span><span class="kw">impl</span>&lt;I: <span class="kw">crate</span>::lib::std::fmt::Display, E&gt; <span class="kw">crate</span>::lib::std::fmt::Display <span class="kw">for </span>Recoverable&lt;I, E&gt;
+<span class="kw">where
+    </span>I: Stream,
+{
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span><span class="kw">crate</span>::lib::std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="kw">crate</span>::lib::std::fmt::Result {
+        <span class="kw">crate</span>::lib::std::fmt::Display::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.input, f)
     }
 }
 
@@ -3523,49 +4174,56 @@
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T&gt; SliceLen <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[T] {
-    <span class="attr">#[inline]
+    <span class="attr">#[inline(always)]
     </span><span class="kw">fn </span>slice_len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
         <span class="self">self</span>.len()
     }
 }
 
 <span class="kw">impl</span>&lt;T, <span class="kw">const </span>LEN: usize&gt; SliceLen <span class="kw">for </span>[T; LEN] {
-    <span class="attr">#[inline]
+    <span class="attr">#[inline(always)]
     </span><span class="kw">fn </span>slice_len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
         <span class="self">self</span>.len()
     }
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T, <span class="kw">const </span>LEN: usize&gt; SliceLen <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[T; LEN] {
-    <span class="attr">#[inline]
+    <span class="attr">#[inline(always)]
     </span><span class="kw">fn </span>slice_len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
         <span class="self">self</span>.len()
     }
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; SliceLen <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str {
-    <span class="attr">#[inline]
+    <span class="attr">#[inline(always)]
     </span><span class="kw">fn </span>slice_len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
         <span class="self">self</span>.len()
     }
 }
 
+<span class="kw">impl </span>SliceLen <span class="kw">for </span>u8 {
+    <span class="attr">#[inline(always)]
+    </span><span class="kw">fn </span>slice_len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="number">1
+    </span>}
+}
+
 <span class="kw">impl </span>SliceLen <span class="kw">for </span>char {
-    <span class="attr">#[inline]
+    <span class="attr">#[inline(always)]
     </span><span class="kw">fn </span>slice_len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
         <span class="self">self</span>.len_utf8()
     }
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; SliceLen <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Bytes {
-    <span class="attr">#[inline]
+    <span class="attr">#[inline(always)]
     </span><span class="kw">fn </span>slice_len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
         <span class="self">self</span>.len()
     }
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; SliceLen <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BStr {
-    <span class="attr">#[inline]
+    <span class="attr">#[inline(always)]
     </span><span class="kw">fn </span>slice_len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
         <span class="self">self</span>.len()
     }
@@ -3584,6 +4242,18 @@
 <span class="kw">impl</span>&lt;I&gt; SliceLen <span class="kw">for </span>Located&lt;I&gt;
 <span class="kw">where
     </span>I: SliceLen,
+{
+    <span class="attr">#[inline(always)]
+    </span><span class="kw">fn </span>slice_len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.input.slice_len()
+    }
+}
+
+<span class="attr">#[cfg(feature = <span class="string">&quot;unstable-recover&quot;</span>)]
+</span><span class="kw">impl</span>&lt;I, E&gt; SliceLen <span class="kw">for </span>Recoverable&lt;I, E&gt;
+<span class="kw">where
+    </span>I: SliceLen,
+    I: Stream,
 {
     <span class="attr">#[inline(always)]
     </span><span class="kw">fn </span>slice_len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
@@ -4158,6 +4828,63 @@
     }
 }
 
+<span class="attr">#[cfg(feature = <span class="string">&quot;unstable-recover&quot;</span>)]
+</span><span class="kw">impl</span>&lt;I, E: <span class="kw">crate</span>::lib::std::fmt::Debug&gt; Stream <span class="kw">for </span>Recoverable&lt;I, E&gt;
+<span class="kw">where
+    </span>I: Stream,
+{
+    <span class="kw">type </span>Token = &lt;I <span class="kw">as </span>Stream&gt;::Token;
+    <span class="kw">type </span>Slice = &lt;I <span class="kw">as </span>Stream&gt;::Slice;
+
+    <span class="kw">type </span>IterOffsets = &lt;I <span class="kw">as </span>Stream&gt;::IterOffsets;
+
+    <span class="kw">type </span>Checkpoint = Checkpoint&lt;I::Checkpoint&gt;;
+
+    <span class="attr">#[inline(always)]
+    </span><span class="kw">fn </span>iter_offsets(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::IterOffsets {
+        <span class="self">self</span>.input.iter_offsets()
+    }
+    <span class="attr">#[inline(always)]
+    </span><span class="kw">fn </span>eof_offset(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.input.eof_offset()
+    }
+
+    <span class="attr">#[inline(always)]
+    </span><span class="kw">fn </span>next_token(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Token&gt; {
+        <span class="self">self</span>.input.next_token()
+    }
+
+    <span class="attr">#[inline(always)]
+    </span><span class="kw">fn </span>offset_for&lt;P&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, predicate: P) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt;
+    <span class="kw">where
+        </span>P: Fn(<span class="self">Self</span>::Token) -&gt; bool,
+    {
+        <span class="self">self</span>.input.offset_for(predicate)
+    }
+    <span class="attr">#[inline(always)]
+    </span><span class="kw">fn </span>offset_at(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: usize) -&gt; <span class="prelude-ty">Result</span>&lt;usize, Needed&gt; {
+        <span class="self">self</span>.input.offset_at(tokens)
+    }
+    <span class="attr">#[inline(always)]
+    </span><span class="kw">fn </span>next_slice(<span class="kw-2">&amp;mut </span><span class="self">self</span>, offset: usize) -&gt; <span class="self">Self</span>::Slice {
+        <span class="self">self</span>.input.next_slice(offset)
+    }
+
+    <span class="attr">#[inline(always)]
+    </span><span class="kw">fn </span>checkpoint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::Checkpoint {
+        Checkpoint(<span class="self">self</span>.input.checkpoint())
+    }
+    <span class="attr">#[inline(always)]
+    </span><span class="kw">fn </span>reset(<span class="kw-2">&amp;mut </span><span class="self">self</span>, checkpoint: <span class="self">Self</span>::Checkpoint) {
+        <span class="self">self</span>.input.reset(checkpoint.<span class="number">0</span>);
+    }
+
+    <span class="attr">#[inline(always)]
+    </span><span class="kw">fn </span>raw(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw">dyn </span><span class="kw">crate</span>::lib::std::fmt::Debug {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.input
+    }
+}
+
 <span class="kw">impl</span>&lt;I: Stream, S: <span class="kw">crate</span>::lib::std::fmt::Debug&gt; Stream <span class="kw">for </span>Stateful&lt;I, S&gt; {
     <span class="kw">type </span>Token = &lt;I <span class="kw">as </span>Stream&gt;::Token;
     <span class="kw">type </span>Slice = &lt;I <span class="kw">as </span>Stream&gt;::Slice;
@@ -4265,6 +4992,8 @@
 }
 
 <span class="doccomment">/// Number of indices input has advanced since start of parsing
+///
+/// See [`Located`] for adding location tracking to your [`Stream`]
 </span><span class="kw">pub trait </span>Location {
     <span class="doccomment">/// Number of indices input has advanced since start of parsing
     </span><span class="kw">fn </span>location(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize;
@@ -4277,6 +5006,18 @@
     <span class="attr">#[inline(always)]
     </span><span class="kw">fn </span>location(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
         <span class="self">self</span>.location()
+    }
+}
+
+<span class="attr">#[cfg(feature = <span class="string">&quot;unstable-recover&quot;</span>)]
+</span><span class="kw">impl</span>&lt;I, E&gt; Location <span class="kw">for </span>Recoverable&lt;I, E&gt;
+<span class="kw">where
+    </span>I: Location,
+    I: Stream,
+{
+    <span class="attr">#[inline(always)]
+    </span><span class="kw">fn </span>location(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.input.location()
     }
 }
 
@@ -4298,6 +5039,232 @@
     </span><span class="kw">fn </span>location(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
         <span class="self">self</span>.input.location()
     }
+}
+
+<span class="doccomment">/// Capture top-level errors in the middle of parsing so parsing can resume
+///
+/// See [`Recoverable`] for adding error recovery tracking to your [`Stream`]
+</span><span class="attr">#[cfg(feature = <span class="string">&quot;unstable-recover&quot;</span>)]
+</span><span class="kw">pub trait </span>Recover&lt;E&gt;: Stream {
+    <span class="doccomment">/// Capture a top-level error
+    ///
+    /// May return `Err(err)` if recovery is not possible (e.g. if [`Recover::is_recovery_supported`]
+    /// returns `false`).
+    </span><span class="kw">fn </span>record_err(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        token_start: <span class="kw-2">&amp;</span><span class="self">Self</span>::Checkpoint,
+        err_start: <span class="kw-2">&amp;</span><span class="self">Self</span>::Checkpoint,
+        err: ErrMode&lt;E&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), ErrMode&lt;E&gt;&gt;;
+
+    <span class="doccomment">/// Report whether the [`Stream`] can save off errors for recovery
+    </span><span class="kw">fn </span>is_recovery_supported() -&gt; bool;
+}
+
+<span class="attr">#[cfg(feature = <span class="string">&quot;unstable-recover&quot;</span>)]
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T, E&gt; Recover&lt;E&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[T]
+<span class="kw">where
+    </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[T]: Stream,
+{
+    <span class="attr">#[inline(always)]
+    </span><span class="kw">fn </span>record_err(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        _token_start: <span class="kw-2">&amp;</span><span class="self">Self</span>::Checkpoint,
+        _err_start: <span class="kw-2">&amp;</span><span class="self">Self</span>::Checkpoint,
+        err: ErrMode&lt;E&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), ErrMode&lt;E&gt;&gt; {
+        <span class="prelude-val">Err</span>(err)
+    }
+
+    <span class="doccomment">/// Report whether the [`Stream`] can save off errors for recovery
+    </span><span class="attr">#[inline(always)]
+    </span><span class="kw">fn </span>is_recovery_supported() -&gt; bool {
+        <span class="bool-val">false
+    </span>}
+}
+
+<span class="attr">#[cfg(feature = <span class="string">&quot;unstable-recover&quot;</span>)]
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, E&gt; Recover&lt;E&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str {
+    <span class="attr">#[inline(always)]
+    </span><span class="kw">fn </span>record_err(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        _token_start: <span class="kw-2">&amp;</span><span class="self">Self</span>::Checkpoint,
+        _err_start: <span class="kw-2">&amp;</span><span class="self">Self</span>::Checkpoint,
+        err: ErrMode&lt;E&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), ErrMode&lt;E&gt;&gt; {
+        <span class="prelude-val">Err</span>(err)
+    }
+
+    <span class="doccomment">/// Report whether the [`Stream`] can save off errors for recovery
+    </span><span class="attr">#[inline(always)]
+    </span><span class="kw">fn </span>is_recovery_supported() -&gt; bool {
+        <span class="bool-val">false
+    </span>}
+}
+
+<span class="attr">#[cfg(feature = <span class="string">&quot;unstable-recover&quot;</span>)]
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, E&gt; Recover&lt;E&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Bytes {
+    <span class="attr">#[inline(always)]
+    </span><span class="kw">fn </span>record_err(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        _token_start: <span class="kw-2">&amp;</span><span class="self">Self</span>::Checkpoint,
+        _err_start: <span class="kw-2">&amp;</span><span class="self">Self</span>::Checkpoint,
+        err: ErrMode&lt;E&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), ErrMode&lt;E&gt;&gt; {
+        <span class="prelude-val">Err</span>(err)
+    }
+
+    <span class="doccomment">/// Report whether the [`Stream`] can save off errors for recovery
+    </span><span class="attr">#[inline(always)]
+    </span><span class="kw">fn </span>is_recovery_supported() -&gt; bool {
+        <span class="bool-val">false
+    </span>}
+}
+
+<span class="attr">#[cfg(feature = <span class="string">&quot;unstable-recover&quot;</span>)]
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, E&gt; Recover&lt;E&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BStr {
+    <span class="attr">#[inline(always)]
+    </span><span class="kw">fn </span>record_err(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        _token_start: <span class="kw-2">&amp;</span><span class="self">Self</span>::Checkpoint,
+        _err_start: <span class="kw-2">&amp;</span><span class="self">Self</span>::Checkpoint,
+        err: ErrMode&lt;E&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), ErrMode&lt;E&gt;&gt; {
+        <span class="prelude-val">Err</span>(err)
+    }
+
+    <span class="doccomment">/// Report whether the [`Stream`] can save off errors for recovery
+    </span><span class="attr">#[inline(always)]
+    </span><span class="kw">fn </span>is_recovery_supported() -&gt; bool {
+        <span class="bool-val">false
+    </span>}
+}
+
+<span class="attr">#[cfg(feature = <span class="string">&quot;unstable-recover&quot;</span>)]
+</span><span class="kw">impl</span>&lt;I, E&gt; Recover&lt;E&gt; <span class="kw">for </span>(I, usize)
+<span class="kw">where
+    </span>I: Recover&lt;E&gt;,
+    I: Stream&lt;Token = u8&gt; + Clone,
+{
+    <span class="attr">#[inline(always)]
+    </span><span class="kw">fn </span>record_err(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        _token_start: <span class="kw-2">&amp;</span><span class="self">Self</span>::Checkpoint,
+        _err_start: <span class="kw-2">&amp;</span><span class="self">Self</span>::Checkpoint,
+        err: ErrMode&lt;E&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), ErrMode&lt;E&gt;&gt; {
+        <span class="prelude-val">Err</span>(err)
+    }
+
+    <span class="doccomment">/// Report whether the [`Stream`] can save off errors for recovery
+    </span><span class="attr">#[inline(always)]
+    </span><span class="kw">fn </span>is_recovery_supported() -&gt; bool {
+        <span class="bool-val">false
+    </span>}
+}
+
+<span class="attr">#[cfg(feature = <span class="string">&quot;unstable-recover&quot;</span>)]
+</span><span class="kw">impl</span>&lt;I, E&gt; Recover&lt;E&gt; <span class="kw">for </span>Located&lt;I&gt;
+<span class="kw">where
+    </span>I: Recover&lt;E&gt;,
+    I: Stream,
+{
+    <span class="attr">#[inline(always)]
+    </span><span class="kw">fn </span>record_err(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        _token_start: <span class="kw-2">&amp;</span><span class="self">Self</span>::Checkpoint,
+        _err_start: <span class="kw-2">&amp;</span><span class="self">Self</span>::Checkpoint,
+        err: ErrMode&lt;E&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), ErrMode&lt;E&gt;&gt; {
+        <span class="prelude-val">Err</span>(err)
+    }
+
+    <span class="doccomment">/// Report whether the [`Stream`] can save off errors for recovery
+    </span><span class="attr">#[inline(always)]
+    </span><span class="kw">fn </span>is_recovery_supported() -&gt; bool {
+        <span class="bool-val">false
+    </span>}
+}
+
+<span class="attr">#[cfg(feature = <span class="string">&quot;unstable-recover&quot;</span>)]
+</span><span class="kw">impl</span>&lt;I, E, R&gt; Recover&lt;E&gt; <span class="kw">for </span>Recoverable&lt;I, R&gt;
+<span class="kw">where
+    </span>I: Stream,
+    R: FromRecoverableError&lt;<span class="self">Self</span>, E&gt;,
+    R: <span class="kw">crate</span>::lib::std::fmt::Debug,
+{
+    <span class="kw">fn </span>record_err(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        token_start: <span class="kw-2">&amp;</span><span class="self">Self</span>::Checkpoint,
+        err_start: <span class="kw-2">&amp;</span><span class="self">Self</span>::Checkpoint,
+        err: ErrMode&lt;E&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), ErrMode&lt;E&gt;&gt; {
+        <span class="kw">if </span><span class="self">self</span>.is_recoverable {
+            <span class="kw">match </span>err {
+                ErrMode::Incomplete(need) =&gt; <span class="prelude-val">Err</span>(ErrMode::Incomplete(need)),
+                ErrMode::Backtrack(err) | ErrMode::Cut(err) =&gt; {
+                    <span class="self">self</span>.errors
+                        .push(R::from_recoverable_error(token_start, err_start, <span class="self">self</span>, err));
+                    <span class="prelude-val">Ok</span>(())
+                }
+            }
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Err</span>(err)
+        }
+    }
+
+    <span class="doccomment">/// Report whether the [`Stream`] can save off errors for recovery
+    </span><span class="attr">#[inline(always)]
+    </span><span class="kw">fn </span>is_recovery_supported() -&gt; bool {
+        <span class="bool-val">true
+    </span>}
+}
+
+<span class="attr">#[cfg(feature = <span class="string">&quot;unstable-recover&quot;</span>)]
+</span><span class="kw">impl</span>&lt;I, E, S&gt; Recover&lt;E&gt; <span class="kw">for </span>Stateful&lt;I, S&gt;
+<span class="kw">where
+    </span>I: Recover&lt;E&gt;,
+    I: Stream,
+    S: Clone + <span class="kw">crate</span>::lib::std::fmt::Debug,
+{
+    <span class="attr">#[inline(always)]
+    </span><span class="kw">fn </span>record_err(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        _token_start: <span class="kw-2">&amp;</span><span class="self">Self</span>::Checkpoint,
+        _err_start: <span class="kw-2">&amp;</span><span class="self">Self</span>::Checkpoint,
+        err: ErrMode&lt;E&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), ErrMode&lt;E&gt;&gt; {
+        <span class="prelude-val">Err</span>(err)
+    }
+
+    <span class="doccomment">/// Report whether the [`Stream`] can save off errors for recovery
+    </span><span class="attr">#[inline(always)]
+    </span><span class="kw">fn </span>is_recovery_supported() -&gt; bool {
+        <span class="bool-val">false
+    </span>}
+}
+
+<span class="attr">#[cfg(feature = <span class="string">&quot;unstable-recover&quot;</span>)]
+</span><span class="kw">impl</span>&lt;I, E&gt; Recover&lt;E&gt; <span class="kw">for </span>Partial&lt;I&gt;
+<span class="kw">where
+    </span>I: Recover&lt;E&gt;,
+    I: Stream,
+{
+    <span class="attr">#[inline(always)]
+    </span><span class="kw">fn </span>record_err(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        _token_start: <span class="kw-2">&amp;</span><span class="self">Self</span>::Checkpoint,
+        _err_start: <span class="kw-2">&amp;</span><span class="self">Self</span>::Checkpoint,
+        err: ErrMode&lt;E&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), ErrMode&lt;E&gt;&gt; {
+        <span class="prelude-val">Err</span>(err)
+    }
+
+    <span class="doccomment">/// Report whether the [`Stream`] can save off errors for recovery
+    </span><span class="attr">#[inline(always)]
+    </span><span class="kw">fn </span>is_recovery_supported() -&gt; bool {
+        <span class="bool-val">false
+    </span>}
 }
 
 <span class="doccomment">/// Marks the input as being the complete buffer or a partial buffer for streaming input
@@ -4410,6 +5377,33 @@
 <span class="kw">impl</span>&lt;I&gt; StreamIsPartial <span class="kw">for </span>Located&lt;I&gt;
 <span class="kw">where
     </span>I: StreamIsPartial,
+{
+    <span class="kw">type </span>PartialState = I::PartialState;
+
+    <span class="kw">fn </span>complete(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="self">Self</span>::PartialState {
+        <span class="self">self</span>.input.complete()
+    }
+
+    <span class="kw">fn </span>restore_partial(<span class="kw-2">&amp;mut </span><span class="self">self</span>, state: <span class="self">Self</span>::PartialState) {
+        <span class="self">self</span>.input.restore_partial(state);
+    }
+
+    <span class="attr">#[inline(always)]
+    </span><span class="kw">fn </span>is_partial_supported() -&gt; bool {
+        I::is_partial_supported()
+    }
+
+    <span class="attr">#[inline(always)]
+    </span><span class="kw">fn </span>is_partial(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.input.is_partial()
+    }
+}
+
+<span class="attr">#[cfg(feature = <span class="string">&quot;unstable-recover&quot;</span>)]
+</span><span class="kw">impl</span>&lt;I, E&gt; StreamIsPartial <span class="kw">for </span>Recoverable&lt;I, E&gt;
+<span class="kw">where
+    </span>I: StreamIsPartial,
+    I: Stream,
 {
     <span class="kw">type </span>PartialState = I::PartialState;
 
@@ -4597,6 +5591,30 @@
     }
 }
 
+<span class="attr">#[cfg(feature = <span class="string">&quot;unstable-recover&quot;</span>)]
+</span><span class="kw">impl</span>&lt;I, E&gt; Offset <span class="kw">for </span>Recoverable&lt;I, E&gt;
+<span class="kw">where
+    </span>I: Stream,
+    E: <span class="kw">crate</span>::lib::std::fmt::Debug,
+{
+    <span class="attr">#[inline(always)]
+    </span><span class="kw">fn </span>offset_from(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; usize {
+        <span class="self">self</span>.offset_from(<span class="kw-2">&amp;</span>other.checkpoint())
+    }
+}
+
+<span class="attr">#[cfg(feature = <span class="string">&quot;unstable-recover&quot;</span>)]
+</span><span class="kw">impl</span>&lt;I, E&gt; Offset&lt;&lt;Recoverable&lt;I, E&gt; <span class="kw">as </span>Stream&gt;::Checkpoint&gt; <span class="kw">for </span>Recoverable&lt;I, E&gt;
+<span class="kw">where
+    </span>I: Stream,
+    E: <span class="kw">crate</span>::lib::std::fmt::Debug,
+{
+    <span class="attr">#[inline(always)]
+    </span><span class="kw">fn </span>offset_from(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>&lt;Recoverable&lt;I, E&gt; <span class="kw">as </span>Stream&gt;::Checkpoint) -&gt; usize {
+        <span class="self">self</span>.checkpoint().offset_from(other)
+    }
+}
+
 <span class="kw">impl</span>&lt;I, S&gt; Offset <span class="kw">for </span>Stateful&lt;I, S&gt;
 <span class="kw">where
     </span>I: Stream,
@@ -4679,6 +5697,18 @@
     }
 }
 
+<span class="attr">#[cfg(feature = <span class="string">&quot;unstable-recover&quot;</span>)]
+</span><span class="kw">impl</span>&lt;I, E&gt; AsBytes <span class="kw">for </span>Recoverable&lt;I, E&gt;
+<span class="kw">where
+    </span>I: Stream,
+    I: AsBytes,
+{
+    <span class="attr">#[inline(always)]
+    </span><span class="kw">fn </span>as_bytes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="self">self</span>.input.as_bytes()
+    }
+}
+
 <span class="kw">impl</span>&lt;I, S&gt; AsBytes <span class="kw">for </span>Stateful&lt;I, S&gt;
 <span class="kw">where
     </span>I: AsBytes,
@@ -4729,6 +5759,18 @@
 <span class="kw">impl</span>&lt;I&gt; AsBStr <span class="kw">for </span>Located&lt;I&gt;
 <span class="kw">where
     </span>I: AsBStr,
+{
+    <span class="attr">#[inline(always)]
+    </span><span class="kw">fn </span>as_bstr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="self">self</span>.input.as_bstr()
+    }
+}
+
+<span class="attr">#[cfg(feature = <span class="string">&quot;unstable-recover&quot;</span>)]
+</span><span class="kw">impl</span>&lt;I, E&gt; AsBStr <span class="kw">for </span>Recoverable&lt;I, E&gt;
+<span class="kw">where
+    </span>I: Stream,
+    I: AsBStr,
 {
     <span class="attr">#[inline(always)]
     </span><span class="kw">fn </span>as_bstr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
@@ -4900,6 +5942,38 @@
     }
 }
 
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Compare&lt;u8&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8] {
+    <span class="attr">#[inline]
+    </span><span class="kw">fn </span>compare(<span class="kw-2">&amp;</span><span class="self">self</span>, t: u8) -&gt; CompareResult {
+        <span class="kw">match </span><span class="self">self</span>.first().copied() {
+            <span class="prelude-val">Some</span>(c) <span class="kw">if </span>t == c =&gt; CompareResult::Ok,
+            <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; CompareResult::Error,
+            <span class="prelude-val">None </span>=&gt; CompareResult::Incomplete,
+        }
+    }
+    <span class="attr">#[inline(always)]
+    #[allow(deprecated)]
+    </span><span class="kw">fn </span>compare_no_case(<span class="kw-2">&amp;</span><span class="self">self</span>, t: u8) -&gt; CompareResult {
+        <span class="self">self</span>.compare(AsciiCaseless(t))
+    }
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Compare&lt;AsciiCaseless&lt;u8&gt;&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8] {
+    <span class="attr">#[inline]
+    </span><span class="kw">fn </span>compare(<span class="kw-2">&amp;</span><span class="self">self</span>, t: AsciiCaseless&lt;u8&gt;) -&gt; CompareResult {
+        <span class="kw">match </span><span class="self">self</span>.first() {
+            <span class="prelude-val">Some</span>(c) <span class="kw">if </span>t.<span class="number">0</span>.eq_ignore_ascii_case(c) =&gt; CompareResult::Ok,
+            <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; CompareResult::Error,
+            <span class="prelude-val">None </span>=&gt; CompareResult::Incomplete,
+        }
+    }
+    <span class="attr">#[inline(always)]
+    #[allow(deprecated)]
+    </span><span class="kw">fn </span>compare_no_case(<span class="kw-2">&amp;</span><span class="self">self</span>, t: AsciiCaseless&lt;u8&gt;) -&gt; CompareResult {
+        <span class="self">self</span>.compare(t)
+    }
+}
+
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Compare&lt;char&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8] {
     <span class="attr">#[inline(always)]
     </span><span class="kw">fn </span>compare(<span class="kw-2">&amp;</span><span class="self">self</span>, t: char) -&gt; CompareResult {
@@ -4914,7 +5988,7 @@
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Compare&lt;AsciiCaseless&lt;char&gt;&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8] {
-    <span class="attr">#[inline]
+    <span class="attr">#[inline(always)]
     </span><span class="kw">fn </span>compare(<span class="kw-2">&amp;</span><span class="self">self</span>, t: AsciiCaseless&lt;char&gt;) -&gt; CompareResult {
         <span class="self">self</span>.compare(AsciiCaseless(t.<span class="number">0</span>.encode_utf8(<span class="kw-2">&amp;mut </span>[<span class="number">0</span>; <span class="number">4</span>]).as_bytes()))
     }
@@ -4952,10 +6026,34 @@
     }
 }
 
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Compare&lt;u8&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str {
+    <span class="attr">#[inline(always)]
+    </span><span class="kw">fn </span>compare(<span class="kw-2">&amp;</span><span class="self">self</span>, t: u8) -&gt; CompareResult {
+        <span class="self">self</span>.as_bytes().compare(t)
+    }
+    <span class="attr">#[inline(always)]
+    #[allow(deprecated)]
+    </span><span class="kw">fn </span>compare_no_case(<span class="kw-2">&amp;</span><span class="self">self</span>, t: u8) -&gt; CompareResult {
+        <span class="self">self</span>.compare(AsciiCaseless(t))
+    }
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Compare&lt;AsciiCaseless&lt;u8&gt;&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str {
+    <span class="attr">#[inline(always)]
+    </span><span class="kw">fn </span>compare(<span class="kw-2">&amp;</span><span class="self">self</span>, t: AsciiCaseless&lt;u8&gt;) -&gt; CompareResult {
+        <span class="self">self</span>.as_bytes().compare(t)
+    }
+    <span class="attr">#[inline(always)]
+    #[allow(deprecated)]
+    </span><span class="kw">fn </span>compare_no_case(<span class="kw-2">&amp;</span><span class="self">self</span>, t: AsciiCaseless&lt;u8&gt;) -&gt; CompareResult {
+        <span class="self">self</span>.compare(t)
+    }
+}
+
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Compare&lt;char&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str {
     <span class="attr">#[inline(always)]
     </span><span class="kw">fn </span>compare(<span class="kw-2">&amp;</span><span class="self">self</span>, t: char) -&gt; CompareResult {
-        <span class="self">self</span>.compare(t.encode_utf8(<span class="kw-2">&amp;mut </span>[<span class="number">0</span>; <span class="number">4</span>]).as_bytes())
+        <span class="self">self</span>.as_bytes().compare(t)
     }
 
     <span class="attr">#[inline(always)]
@@ -4966,9 +6064,9 @@
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Compare&lt;AsciiCaseless&lt;char&gt;&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str {
-    <span class="attr">#[inline]
+    <span class="attr">#[inline(always)]
     </span><span class="kw">fn </span>compare(<span class="kw-2">&amp;</span><span class="self">self</span>, t: AsciiCaseless&lt;char&gt;) -&gt; CompareResult {
-        <span class="self">self</span>.compare(AsciiCaseless(t.<span class="number">0</span>.encode_utf8(<span class="kw-2">&amp;mut </span>[<span class="number">0</span>; <span class="number">4</span>]).as_bytes()))
+        <span class="self">self</span>.as_bytes().compare(t)
     }
 
     <span class="attr">#[inline(always)]
@@ -4981,7 +6079,7 @@
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; Compare&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>[u8]&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str {
     <span class="attr">#[inline(always)]
     </span><span class="kw">fn </span>compare(<span class="kw-2">&amp;</span><span class="self">self</span>, t: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>[u8]) -&gt; CompareResult {
-        AsBStr::as_bstr(<span class="self">self</span>).compare(t)
+        <span class="self">self</span>.as_bytes().compare(t)
     }
     <span class="attr">#[inline(always)]
     #[allow(deprecated)]
@@ -4993,7 +6091,7 @@
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; Compare&lt;AsciiCaseless&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>[u8]&gt;&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str {
     <span class="attr">#[inline(always)]
     </span><span class="kw">fn </span>compare(<span class="kw-2">&amp;</span><span class="self">self</span>, t: AsciiCaseless&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>[u8]&gt;) -&gt; CompareResult {
-        AsBStr::as_bstr(<span class="self">self</span>).compare(t)
+        <span class="self">self</span>.as_bytes().compare(t)
     }
     <span class="attr">#[inline(always)]
     #[allow(deprecated)]
@@ -5041,6 +6139,24 @@
 <span class="kw">impl</span>&lt;I, U&gt; Compare&lt;U&gt; <span class="kw">for </span>Located&lt;I&gt;
 <span class="kw">where
     </span>I: Compare&lt;U&gt;,
+{
+    <span class="attr">#[inline(always)]
+    </span><span class="kw">fn </span>compare(<span class="kw-2">&amp;</span><span class="self">self</span>, other: U) -&gt; CompareResult {
+        <span class="self">self</span>.input.compare(other)
+    }
+
+    <span class="attr">#[inline(always)]
+    #[allow(deprecated)]
+    </span><span class="kw">fn </span>compare_no_case(<span class="kw-2">&amp;</span><span class="self">self</span>, other: U) -&gt; CompareResult {
+        <span class="self">self</span>.input.compare_no_case(other)
+    }
+}
+
+<span class="attr">#[cfg(feature = <span class="string">&quot;unstable-recover&quot;</span>)]
+</span><span class="kw">impl</span>&lt;I, E, U&gt; Compare&lt;U&gt; <span class="kw">for </span>Recoverable&lt;I, E&gt;
+<span class="kw">where
+    </span>I: Stream,
+    I: Compare&lt;U&gt;,
 {
     <span class="attr">#[inline(always)]
     </span><span class="kw">fn </span>compare(<span class="kw-2">&amp;</span><span class="self">self</span>, other: U) -&gt; CompareResult {
@@ -5315,6 +6431,18 @@
     }
 }
 
+<span class="attr">#[cfg(feature = <span class="string">&quot;unstable-recover&quot;</span>)]
+</span><span class="kw">impl</span>&lt;I, E, T&gt; FindSlice&lt;T&gt; <span class="kw">for </span>Recoverable&lt;I, E&gt;
+<span class="kw">where
+    </span>I: Stream,
+    I: FindSlice&lt;T&gt;,
+{
+    <span class="attr">#[inline(always)]
+    </span><span class="kw">fn </span>find_slice(<span class="kw-2">&amp;</span><span class="self">self</span>, substr: T) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
+        <span class="self">self</span>.input.find_slice(substr)
+    }
+}
+
 <span class="kw">impl</span>&lt;I, S, T&gt; FindSlice&lt;T&gt; <span class="kw">for </span>Stateful&lt;I, S&gt;
 <span class="kw">where
     </span>I: FindSlice&lt;T&gt;,
@@ -5398,6 +6526,20 @@
 <span class="kw">impl</span>&lt;I&gt; UpdateSlice <span class="kw">for </span>Located&lt;I&gt;
 <span class="kw">where
     </span>I: UpdateSlice,
+{
+    <span class="attr">#[inline(always)]
+    </span><span class="kw">fn </span>update_slice(<span class="kw-2">mut </span><span class="self">self</span>, inner: <span class="self">Self</span>::Slice) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.input = I::update_slice(<span class="self">self</span>.input, inner);
+        <span class="self">self
+    </span>}
+}
+
+<span class="attr">#[cfg(feature = <span class="string">&quot;unstable-recover&quot;</span>)]
+</span><span class="kw">impl</span>&lt;I, E&gt; UpdateSlice <span class="kw">for </span>Recoverable&lt;I, E&gt;
+<span class="kw">where
+    </span>I: Stream,
+    I: UpdateSlice,
+    E: <span class="kw">crate</span>::lib::std::fmt::Debug,
 {
     <span class="attr">#[inline(always)]
     </span><span class="kw">fn </span>update_slice(<span class="kw-2">mut </span><span class="self">self</span>, inner: <span class="self">Self</span>::Slice) -&gt; <span class="self">Self </span>{

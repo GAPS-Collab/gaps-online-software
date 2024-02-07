@@ -2591,8 +2591,8 @@
 
   <span class="kw">pub fn </span>new(rb_id : u8) -&gt; <span class="self">Self </span>{
     <span class="comment">// FIXME
-    </span><span class="kw">let </span>now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap_or(Duration::from_secs(<span class="number">0</span>));
-    <span class="comment">//let timestamp = now.as_secs() as u32;
+    //let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap_or(Duration::from_secs(0));
+    //let timestamp = now.as_secs() as u32;
     </span><span class="kw">let </span>timestamp = <span class="number">0</span>;
     <span class="self">Self </span>{
       rb_id     : rb_id,

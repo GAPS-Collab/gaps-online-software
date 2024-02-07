@@ -1047,6 +1047,43 @@
 <a href="#1047" id="1047">1047</a>
 <a href="#1048" id="1048">1048</a>
 <a href="#1049" id="1049">1049</a>
+<a href="#1050" id="1050">1050</a>
+<a href="#1051" id="1051">1051</a>
+<a href="#1052" id="1052">1052</a>
+<a href="#1053" id="1053">1053</a>
+<a href="#1054" id="1054">1054</a>
+<a href="#1055" id="1055">1055</a>
+<a href="#1056" id="1056">1056</a>
+<a href="#1057" id="1057">1057</a>
+<a href="#1058" id="1058">1058</a>
+<a href="#1059" id="1059">1059</a>
+<a href="#1060" id="1060">1060</a>
+<a href="#1061" id="1061">1061</a>
+<a href="#1062" id="1062">1062</a>
+<a href="#1063" id="1063">1063</a>
+<a href="#1064" id="1064">1064</a>
+<a href="#1065" id="1065">1065</a>
+<a href="#1066" id="1066">1066</a>
+<a href="#1067" id="1067">1067</a>
+<a href="#1068" id="1068">1068</a>
+<a href="#1069" id="1069">1069</a>
+<a href="#1070" id="1070">1070</a>
+<a href="#1071" id="1071">1071</a>
+<a href="#1072" id="1072">1072</a>
+<a href="#1073" id="1073">1073</a>
+<a href="#1074" id="1074">1074</a>
+<a href="#1075" id="1075">1075</a>
+<a href="#1076" id="1076">1076</a>
+<a href="#1077" id="1077">1077</a>
+<a href="#1078" id="1078">1078</a>
+<a href="#1079" id="1079">1079</a>
+<a href="#1080" id="1080">1080</a>
+<a href="#1081" id="1081">1081</a>
+<a href="#1082" id="1082">1082</a>
+<a href="#1083" id="1083">1083</a>
+<a href="#1084" id="1084">1084</a>
+<a href="#1085" id="1085">1085</a>
+<a href="#1086" id="1086">1086</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! MasterTriggerBoard communications
 //!
 //! The MTB (MasterTriggerBoard) is currently
@@ -1304,6 +1341,7 @@
   /// without hearing from the MTB before
   /// we attempt a reconnect
   </span><span class="kw">pub </span>mtb_timeout_sec   : u64,
+  <span class="kw">pub </span>rb_int_window     : u8,
 }
 
 <span class="kw">impl </span>MTBSettings {
@@ -1316,6 +1354,7 @@
       trace_suppression      : <span class="bool-val">true</span>,
       mtb_moni_interval      : <span class="number">30</span>,
       mtb_timeout_sec        : <span class="number">60</span>,
+      rb_int_window          : <span class="number">1</span>,
     }
   }
 }
@@ -1612,6 +1651,15 @@
       }
     }
   }
+  <span class="macro">info!</span>(<span class="string">&quot;Settting rb integration window!&quot;</span>);
+  <span class="kw">let </span>int_wind = settings.rb_int_window;
+  <span class="kw">match </span>set_rb_int_window(<span class="kw-2">&amp;</span>socket, int_wind) {
+    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Unable to set rb integration window! {err}&quot;</span>),
+    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
+      <span class="macro">info!</span>(<span class="string">&quot;rb integration window set to {}&quot;</span>, int_wind); 
+    } 
+  }
+
   <span class="macro">info!</span>(<span class="string">&quot;Resetting trigger!&quot;</span>);
   <span class="kw">match </span>settings.trigger_type {
     TriggerType::Poisson =&gt; {
@@ -1936,9 +1984,17 @@
   <span class="macro">info!</span>(<span class="string">&quot;Setting MTB trace suppression {}!&quot;</span>, sup);
   <span class="kw">let </span><span class="kw-2">mut </span>buffer = [<span class="number">0u8</span>;MT_MAX_PACKSIZE];
   <span class="kw">let </span><span class="kw-2">mut </span>value = read_register(socket, <span class="number">0xf</span>, <span class="kw-2">&amp;mut </span>buffer)<span class="question-mark">?</span>;
-  <span class="kw">let </span>val = !sup;
-  value = value | (val <span class="kw">as </span>u32) &lt;&lt; <span class="number">13</span>;
-  write_register(socket,
+  <span class="comment">// bit 13 has to be 1 for read all channels
+  </span><span class="kw">let </span><span class="kw-2">mut </span>read_all_ch = u32::pow(<span class="number">2</span>, <span class="number">13</span>);
+  <span class="kw">if </span>sup { <span class="comment">// sup means !read_all_ch
+    </span>value = value &amp; !read_all_ch;
+  }
+  <span class="kw">else </span>{
+    value = value | read_all_ch; 
+  }
+  <span class="comment">//let val = !sup;
+  //value = value | (val as u32) &lt;&lt; 13;
+  </span>write_register(socket,
                  <span class="number">0xf</span>,
                  value,
                  <span class="kw-2">&amp;mut </span>buffer)<span class="question-mark">?</span>;
@@ -1952,6 +2008,24 @@
   <span class="kw">let </span><span class="kw-2">mut </span>buffer = [<span class="number">0u8</span>;MT_MAX_PACKSIZE];
   write_register(socket,
                  <span class="number">0x10</span>, <span class="number">1</span>,<span class="kw-2">&amp;mut </span>buffer)<span class="question-mark">?</span>;
+  <span class="prelude-val">Ok</span>(())
+}
+
+<span class="doccomment">/// FIXME
+</span><span class="kw">pub fn </span>set_rb_int_window(socket : <span class="kw-2">&amp;</span>UdpSocket, wind : u8)
+  -&gt; <span class="prelude-ty">Result</span>&lt;(), Box&lt;<span class="kw">dyn </span>Error&gt;&gt; {
+  <span class="macro">info!</span>(<span class="string">&quot;Setting RB_INT_WINDOW to {}!&quot;</span>, wind);
+  <span class="kw">let </span><span class="kw-2">mut </span>buffer = [<span class="number">0u8</span>;MT_MAX_PACKSIZE];
+  <span class="kw">let </span><span class="kw-2">mut </span>value =  read_register(socket, <span class="number">0xf </span>, <span class="kw-2">&amp;mut </span>buffer)<span class="question-mark">?</span>;
+  <span class="kw">let </span>mask  = !((<span class="number">0xf </span><span class="kw">as </span>u32) &lt;&lt; <span class="number">8</span>);
+  <span class="comment">// switch the bins off
+  </span>value = value &amp; mask;
+  <span class="kw">let </span>wind_bits = (wind <span class="kw">as </span>u32) &lt;&lt; <span class="number">8</span>;
+  value = value | wind_bits;
+  write_register(socket,
+                 <span class="number">0xf</span>,
+                 value,
+                 <span class="kw-2">&amp;mut </span>buffer)<span class="question-mark">?</span>;
   <span class="prelude-val">Ok</span>(())
 }
 

@@ -286,6 +286,8 @@
 <a href="#286" id="286">286</a>
 <a href="#287" id="287">287</a>
 <a href="#288" id="288">288</a>
+<a href="#289" id="289">289</a>
+<a href="#290" id="290">290</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::time::Instant;
 
 <span class="kw">use </span>crossbeam_channel::{
@@ -336,6 +338,7 @@
 </span><span class="kw">pub fn </span>event_builder (m_trig_ev      : <span class="kw-2">&amp;</span>Receiver&lt;MasterTriggerEvent&gt;,
                       ev_from_rb     : <span class="kw-2">&amp;</span>Receiver&lt;RBEvent&gt;,
                       data_sink      : <span class="kw-2">&amp;</span>Sender&lt;TofPacket&gt;,
+                      run_id         : u32,
                       <span class="kw-2">mut </span>settings   : TofEventBuilderSettings) { 
   <span class="comment">// event caches for assembled events
   </span><span class="kw">let </span><span class="kw-2">mut </span>event_cache      = HashMap::&lt;u32, TofEvent&gt;::new();
@@ -371,7 +374,8 @@
                  , mt.n_paddles);
           <span class="comment">// construct RB requests
 
-          </span><span class="kw">let </span>event = TofEvent::from(<span class="kw-2">&amp;</span>mt);
+          </span><span class="kw">let </span><span class="kw-2">mut </span>event = TofEvent::from(<span class="kw-2">&amp;</span>mt);
+          event.header.run_id = run_id;
           <span class="kw">if </span>event.mt_event.event_id != last_evid + <span class="number">1 </span>{
             <span class="kw">let </span>delta_id = event.mt_event.event_id - last_evid;
             <span class="macro">error!</span>(<span class="string">&quot;We skipped event ids {}&quot;</span>, delta_id );
