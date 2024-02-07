@@ -42,6 +42,7 @@ pub mod analysis;
 use std::collections::HashMap;
 
 /// A type for the master trigger mappings
+/// Dsi -> J -> (RBID,RBCH)
 pub type DsiLtbRBMapping      = HashMap<u8,HashMap<u8,HashMap<u8,(u8,u8)>>>;
 
 /// A type for the mappings of RB channels - paddle edn ids

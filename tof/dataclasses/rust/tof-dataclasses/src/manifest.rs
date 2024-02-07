@@ -10,6 +10,7 @@ cfg_if::cfg_if! {
   if #[cfg(feature = "database")]  {
     use std::path::Path;
     use std::str::FromStr;
+    use std::collections::HashMap;
     extern crate sqlite;
   }
 }
@@ -19,6 +20,7 @@ use glob::glob;
 use chrono::{NaiveDateTime, Utc};
 
 use crate::calibrations::RBCalibrations;
+use crate::DsiLtbRBMapping;
 
 #[derive(Copy, Clone, Debug)]
 pub struct LocalTriggerBoard {
@@ -302,7 +304,72 @@ pub fn get_ltbs_from_sqlite(filename : &Path) -> Vec<LocalTriggerBoard> {
   ltbs
 }
 
+///////////////////////////////////////////////////////////
+#[cfg(feature = "database")]
+pub fn get_dsi_from_sqlite(filename : &Path) -> Vec<DSICard> {
+  let connection    = sqlite::open(filename).expect("Unable to open DB file!");
+  let query         = "SELECT * FROM tof_db_dsicard";
+  let mut dsi_cards = Vec::<DSICard>::new();
+  match connection.iterate(query, |pairs| {
+    let mut dsi  = DSICard::new();
+    for &(name, value) in pairs.iter() {
+      match value {
+        None    => {continue;},
+        Some(v) => {
+          //println!("{} = {}", name, v);
+          match name {
+            "dsi_id"         => {dsi.dsi_id    = u8::from_str(v).unwrap_or(0);},
+            "j1_rat_id"      => {dsi.j1_rat_id = u8::from_str(v).unwrap_or(0);},
+            "j2_rat_id"      => {dsi.j2_rat_id = u8::from_str(v).unwrap_or(0);},
+            "j3_rat_id"      => {dsi.j3_rat_id = u8::from_str(v).unwrap_or(0);},
+            "j4_rat_id"      => {dsi.j4_rat_id = u8::from_str(v).unwrap_or(0);},
+            "j5_rat_id"      => {dsi.j5_rat_id = u8::from_str(v).unwrap_or(0);},
+            _                => () 
+          }
+        }
+      }
+      dsi_cards.push(dsi);
+    }
+    true
+  }) {
+    Err(err) => {
+      error!("Unable to query DB for DSILtbRBMap! {err}");
+    },
+    Ok(_) => {
+      debug!("DB query successful!");
+    }
+  }
+  dsi_cards
+}
 
+/// Dsi -> J -> (RBID,RBCH)
+#[cfg(feature = "database")]
+pub fn get_dsi_j_ltbch_vs_rbch_map(filename : &Path) -> DsiLtbRBMapping {
+  let mut map = DsiLtbRBMapping::new();
+  let ltbs    = get_ltbs_from_sqlite(filename);
+  for dsi in 1..6 {
+    let mut jmap = HashMap::<u8, HashMap<u8, (u8, u8)>>::new();
+    for j in 1..6 {
+      let mut rbidch_map : HashMap<u8, (u8,u8)> = HashMap::new();
+      for ch in 1..17 {
+        let rbidch = (0,0);
+        rbidch_map.insert(ch,rbidch).unwrap();
+        //map[dsi] = 
+      }
+      jmap.insert(j,rbidch_map).unwrap();
+    }
+    map.insert(dsi,jmap).unwrap();
+  }
+  for ltb in ltbs {
+    for ch in 1..17 {
+      let rb_id = ltb.get_rb_id(ch as u8);
+      let rb_ch = ltb.get_rb_ch(ch as u8);
+      *map.get_mut(&ltb.ltb_dsi).unwrap().get_mut(&ltb.ltb_j).unwrap().get_mut(&ch).unwrap() = (rb_id, rb_ch);
+      //map[&ltb.ltb_dsi][&ltb.ltb_j].insert((rb_id, rb_ch);
+    }
+  }
+  map
+}
 //---------------------------------------------------------
 
 /// This represents an entire TOF panel
@@ -476,6 +543,7 @@ impl fmt::Display for PaddleEnd {
 
 //---------------------------------------------------------
 
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub struct DSICard {
   pub dsi_id     : u8, 
   pub j1_rat_id  : u8, 
@@ -496,17 +564,41 @@ impl DSICard {
       j5_rat_id  : 0, 
     }
   }
+
+  pub fn get_rat_id_for_j(&self, j : u8) -> u8 {
+    let rat_id : u8;
+    match j {
+      1 => {rat_id = self.j1_rat_id;},
+      2 => {rat_id = self.j2_rat_id;},
+      3 => {rat_id = self.j3_rat_id;},
+      4 => {rat_id = self.j4_rat_id;},
+      5 => {rat_id = self.j5_rat_id;},
+      _ => { 
+        error!("No j > 5! Returning 0");
+        rat_id = 0;
+      }
+    }
+    rat_id
+  }
 }
 
 impl Default for DSICard {
-  fn default() -> DSICard {
-    DSICard::new()
+  fn default() -> Self {
+    Self::new()
   }
 }
 
 impl fmt::Display for DSICard {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { 
-    write!(f, "<DSICard: DSI ID {}>", self.dsi_id)
+    let mut repr = String::from("<DSICard:");
+    repr += &(format!("\n  DSI ID  : {}", self.dsi_id)   );
+    repr += &(format!("\n  J1 RAT  : {}", self.j1_rat_id)); 
+    repr += &(format!("\n  J2 RAT  : {}", self.j2_rat_id)); 
+    repr += &(format!("\n  J3 RAT  : {}", self.j3_rat_id)); 
+    repr += &(format!("\n  J4 RAT  : {}", self.j4_rat_id)); 
+    repr += &(format!("\n  J5 RAT  : {}", self.j5_rat_id)); 
+    repr += &String::from(">");
+    write!(f, "{}", repr)
   }
 }
 
