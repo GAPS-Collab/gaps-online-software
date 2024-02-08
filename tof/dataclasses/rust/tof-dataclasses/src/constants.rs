@@ -3,6 +3,11 @@
 //!
 //!
 
+/// Number of AVAILABLE slots for LocalTriggerBoards
+pub const N_LTBS : usize = 25;
+
+/// Number of AVAILABLE channels per each LocalTriggerBoard
+pub const N_CHN_PER_LTB : usize = 16;
 
 /// Number of Channels on the readoutboards
 pub const NCHN          : usize = 9;  

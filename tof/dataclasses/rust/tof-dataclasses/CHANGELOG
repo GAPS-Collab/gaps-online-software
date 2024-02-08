@@ -1,6 +1,7 @@
 # HAHALUA series
 
 ## v0.9.1
+* removes deprecated MasterTriggerMapping 
 * reworks manifests and allows to get ltb-rb map from 
   db
 

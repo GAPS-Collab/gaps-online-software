@@ -13,9 +13,6 @@ use std::fs::File;
 use std::io::{self, BufRead, BufReader};
 use std::path::Path;
 use std::fmt;
-use std::time::{SystemTime,
-                Duration,
-                UNIX_EPOCH};
 use chrono::{DateTime, Utc, TimeZone};
 //extern crate streaming_stats;
 //use streaming_stats::{OnlineStats, OrderStats};
@@ -1075,9 +1072,6 @@ impl RBCalibrations {
   }
 
   pub fn new(rb_id : u8) -> Self {
-    // FIXME
-    //let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap_or(Duration::from_secs(0));
-    //let timestamp = now.as_secs() as u32;
     let timestamp = 0;
     Self {
       rb_id     : rb_id,
@@ -1353,7 +1347,8 @@ impl Default for RBCalibrations {
 
 impl fmt::Display for RBCalibrations {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let datetime_utc: DateTime<Utc> = Utc.timestamp(self.timestamp as i64, 0);
+    // FIXME - this is ugly
+    let datetime_utc: DateTime<Utc> = Utc.timestamp_opt(self.timestamp as i64, 0).earliest().unwrap_or(DateTime::<Utc>::from_timestamp_millis(0).unwrap());
     let timestamp_str = datetime_utc.format("%Y/%m/%d %H:%M:%S").to_string();
     write!(f, 
   "<ReadoutboardCalibration [{} UTC]:

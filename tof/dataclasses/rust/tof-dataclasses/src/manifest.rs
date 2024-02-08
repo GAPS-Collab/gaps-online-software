@@ -11,16 +11,16 @@ cfg_if::cfg_if! {
     use std::path::Path;
     use std::str::FromStr;
     use std::collections::HashMap;
+    use crate::DsiLtbRBMapping;
     extern crate sqlite;
   }
 }
 
 use regex::Regex;
 use glob::glob;
-use chrono::{NaiveDateTime, Utc};
+use chrono::NaiveDateTime;
 
 use crate::calibrations::RBCalibrations;
-use crate::DsiLtbRBMapping;
     
 /// Summary of DSI/J/LTBCH (0-319)
 #[cfg(feature = "database")]
@@ -816,9 +816,9 @@ impl ReadoutBoard {
       error!("No matching calibration available for board {}!", self.rb_id);
     } else {
       let file_to_load = self.calib_file_path.clone() + "/" + &newest_file.0;
-      println!("==> Loading calibration from file: {}", file_to_load);
+      println!("== ==> Loading calibration from file: {}", file_to_load);
       self.calibration = RBCalibrations::from_file(file_to_load)?;
-      println!("==> Loaded calibration {}", self.calibration);
+      //println!("==> Loaded calibration {}", self.calibration);
     }
     Ok(())
   }
