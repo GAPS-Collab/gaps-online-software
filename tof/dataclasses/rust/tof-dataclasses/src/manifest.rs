@@ -21,6 +21,121 @@ use chrono::{NaiveDateTime, Utc};
 
 use crate::calibrations::RBCalibrations;
 use crate::DsiLtbRBMapping;
+    
+/// Summary of DSI/J/LTBCH (0-319)
+#[cfg(feature = "database")]
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub struct MTBChannel {
+  pub mtb_channel : u16, 
+  pub dsi         : u8 , 
+  pub j           : u8 , 
+  pub ltb_id      : u8 , 
+  pub ltb_channel : u8 , 
+  pub hg_channel  : u16, 
+  pub lg_channel  : u16, 
+  pub rb_id       : u8 , 
+  pub rb_channel  : u8 , 
+  pub p_end_id    : u16, 
+}
+
+impl MTBChannel {
+  pub fn new() -> Self {
+    Self {
+      mtb_channel : 0, 
+      dsi         : 0, 
+      j           : 0, 
+      ltb_id      : 0, 
+      ltb_channel : 0, 
+      hg_channel  : 0, 
+      lg_channel  : 0, 
+      rb_id       : 0, 
+      rb_channel  : 0, 
+      p_end_id    : 0, 
+    }
+  }
+}
+
+impl Default for MTBChannel {
+  fn default() -> Self {
+      Self::new()
+  }
+}
+
+impl fmt::Display for MTBChannel {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut repr = String::from("<MTBChannel:");
+    repr += &(format!("\n  DSI/J/LTB  : {}/{}/{}", self.dsi, self.j, self.ltb_id)); 
+    repr += &String::from("\n  LTB CH => RB ID/RB CH");
+    repr += &(format!("\n   |-> {} => {}/{}", self.ltb_channel, self.rb_id, self.rb_channel));
+    repr += &String::from("\n  LG CH => HG CH");
+    repr += &(format!("\n   |-> {} => {}", self.lg_channel , self.hg_channel));
+    repr += &(format!("\n  Paddle End : {}", self.p_end_id));
+    write!(f,"{}", repr)
+  }
+}
+
+#[cfg(feature = "database")]
+pub fn get_all_mtbchannels(filename : &Path) -> Vec <MTBChannel> {
+  let mut mtb_channels = Vec::<MTBChannel>::new();
+  let connection = sqlite::open(filename).unwrap();
+  let query = "SELECT * FROM tof_db_mtbchannel";
+  match connection.iterate(query, |pairs| {
+    let mut mtbch = MTBChannel::new();
+    for &(name, value) in pairs.iter() {
+      match value {
+        None    => {continue;},
+        Some(v) => {
+          println!("{} = {}", name, v);
+          match name {
+            "mtb_channel"  => {mtbch.mtb_channel = u16::from_str(v).unwrap_or(0);},
+            "dsi"          => {mtbch.dsi         = u8::from_str(v).unwrap_or(0);},
+            "j"            => {mtbch.j           = u8::from_str(v).unwrap_or(0);},
+            "ltb_id"       => {mtbch.ltb_id      = u8::from_str(v).unwrap_or(0);},
+            "ltb_channel"  => {mtbch.ltb_channel = u8::from_str(v).unwrap_or(0);},
+            "hg_channel"   => {mtbch.hg_channel  = u16::from_str(v).unwrap_or(0);},
+            "lg_channel"   => {mtbch.lg_channel  = u16::from_str(v).unwrap_or(0);},
+            "rb_id"        => {mtbch.rb_id       = u8::from_str(v).unwrap_or(0);},
+            "rb_channel"   => {mtbch.rb_channel  = u8::from_str(v).unwrap_or(0);},
+            "p_end_id"     => {mtbch.p_end_id    = u16::from_str(v).unwrap_or(0);},
+            _ => {warn!("Found name {}, but not mapping it to self!", name);}                         
+          }
+        }
+      }
+    } // end loop over rbs
+    mtb_channels.push(mtbch);
+    true
+  }) {
+    Err(err) => {
+      error!("Unable to query DB! {err}");
+    },
+    Ok(_) => {
+      debug!("DB query successful!");
+    }
+  }
+  info!("We found {} MTBChannels in the database", mtb_channels.len()); 
+  mtb_channels
+}
+
+#[cfg(feature = "database")]
+pub fn get_hg_lg_map(filename : &Path) -> HashMap<u16, MTBChannel> {
+  let channels = get_all_mtbchannels(filename);
+  let mut mapping = HashMap::<u16, MTBChannel>::new();
+  for ch in channels {
+    mapping.insert(ch.hg_channel, ch);
+  }
+  mapping
+}
+
+#[cfg(feature = "database")]
+pub fn get_lg_hg_map(filename : &Path) -> HashMap<u16, MTBChannel> {
+  let channels = get_all_mtbchannels(filename);
+  let mut mapping = HashMap::<u16, MTBChannel>::new();
+  for ch in channels {
+    mapping.insert(ch.lg_channel, ch);
+  }
+  mapping
+}
+
 
 #[derive(Copy, Clone, Debug)]
 pub struct LocalTriggerBoard {
