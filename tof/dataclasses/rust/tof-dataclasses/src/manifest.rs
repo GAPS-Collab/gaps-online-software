@@ -38,6 +38,7 @@ pub struct MTBChannel {
   pub p_end_id    : u16, 
 }
 
+#[cfg(feature = "database")]
 impl MTBChannel {
   pub fn new() -> Self {
     Self {
@@ -55,12 +56,14 @@ impl MTBChannel {
   }
 }
 
+#[cfg(feature = "database")]
 impl Default for MTBChannel {
   fn default() -> Self {
       Self::new()
   }
 }
 
+#[cfg(feature = "database")]
 impl fmt::Display for MTBChannel {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let mut repr = String::from("<MTBChannel:");
@@ -85,7 +88,7 @@ pub fn get_all_mtbchannels(filename : &Path) -> Vec <MTBChannel> {
       match value {
         None    => {continue;},
         Some(v) => {
-          println!("{} = {}", name, v);
+          //println!("{} = {}", name, v);
           match name {
             "mtb_channel"  => {mtbch.mtb_channel = u16::from_str(v).unwrap_or(0);},
             "dsi"          => {mtbch.dsi         = u8::from_str(v).unwrap_or(0);},
@@ -223,7 +226,7 @@ pub fn get_rbs_from_sqlite(filename : &Path) -> Vec<ReadoutBoard> {
       match value {
         None    => {continue;},
         Some(v) => {
-          println!("{} = {}", name, v);
+          //println!("{} = {}", name, v);
           match name {
             "rb_id"      => {rb.rb_id  = u8::from_str(v).unwrap_or(0);},
             "ch1_paddle_id" => {rb.set_paddle_end_id_for_rb_channel(1, u16::from_str(v).unwrap_or(0));},
@@ -755,12 +758,12 @@ impl fmt::Display for RAT {
 
 #[derive(Clone, Debug)]
 pub struct ReadoutBoard {
-  pub rb_id                : u8,  
-  pub dna                  : u64, 
-  channel_to_paddle_end_id : [u16;8],
-  pub calib_file_path      : String,
-  pub calibration          : RBCalibrations,       
-  pub trig_ch_mask         : [bool;8],
+  pub rb_id                    : u8,  
+  pub dna                      : u64, 
+  pub channel_to_paddle_end_id : [u16;8],
+  pub calib_file_path          : String,
+  pub calibration              : RBCalibrations,       
+  pub trig_ch_mask             : [bool;8],
 }
 
 impl ReadoutBoard {
@@ -798,7 +801,7 @@ impl ReadoutBoard {
         }
         if let Some(caps) = re.captures(&filename) {
           if let Some(timestamp_str) = caps.get(0).map(|m| m.as_str()) {
-            println!("{}",timestamp_str);
+            //println!("{}",timestamp_str);
             let timestamp = NaiveDateTime::parse_from_str(timestamp_str, "%Y_%m_%d-%H_%M_%S")?;
             if timestamp > newest_file.1 {
               newest_file.1 = timestamp;
@@ -818,18 +821,6 @@ impl ReadoutBoard {
       println!("==> Loaded calibration {}", self.calibration);
     }
     Ok(())
-  }
-
-  #[deprecated(note="Won't work with tmiestamped cali files!")]
-  pub fn guess_calibration_filename(&self) -> String {
-    let mut cali = String::from("");
-    cali += "rb_";
-    if self.rb_id < 10 {
-      cali += "0";
-    }
-    cali += &self.rb_id.to_string();
-    cali += ".cali.tof.gaps";
-    cali
   }
 
   /// The address the RB is publishing packets on 
