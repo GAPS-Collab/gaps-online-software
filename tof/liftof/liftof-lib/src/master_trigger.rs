@@ -38,7 +38,7 @@ use tof_dataclasses::errors::{IPBusError, MasterTriggerError};
 
 const MT_MAX_PACKSIZE   : usize = 1024;
 
-use tof_dataclasses::events::master_trigger::{
+use tof_dataclasses::constants::{
     N_LTBS,
     N_CHN_PER_LTB,
 };
@@ -545,12 +545,6 @@ pub fn master_trigger(mt_address        : String,
   //  }
   //}
   
-  // step 1 - reset daq
-  debug!("Resetting master trigger");
-  match reset_daq(&socket) {//, &mt_address) {
-    Err(err) => error!("Can not reset DAQ, error {err}"),
-    Ok(_)    => ()
-  }
 
   // configure MTB here
   let trace_suppression = settings.trace_suppression;
@@ -574,7 +568,11 @@ pub fn master_trigger(mt_address        : String,
     } 
   }
 
-  info!("Resetting trigger!");
+  debug!("Resetting master trigger DAQ");
+  match reset_daq(&socket) {//, &mt_address) {
+    Err(err) => error!("Can not reset DAQ, error {err}"),
+    Ok(_)    => ()
+  }
   match settings.trigger_type {
     TriggerType::Poisson => {
       unset_all_triggers(&socket); 
@@ -925,13 +923,22 @@ pub fn reset_daq(socket : &UdpSocket)
   Ok(())
 }
 
+pub fn get_tiu_link_status(socket : &UdpSocket)
+  -> Result<bool, Box<dyn Error>> {
+  let mut tiu_good = 0x1u32;
+  let mut buffer   = [0u8;MT_MAX_PACKSIZE];
+  let mut value    = read_register(socket, 0xf, &mut buffer)?;
+  tiu_good         = tiu_good & ( value & 0x1);
+  Ok(tiu_good > 0)
+}
+
 /// FIXME
 pub fn set_rb_int_window(socket : &UdpSocket, wind : u8)
   -> Result<(), Box<dyn Error>> {
   info!("Setting RB_INT_WINDOW to {}!", wind);
   let mut buffer = [0u8;MT_MAX_PACKSIZE];
   let mut value =  read_register(socket, 0xf , &mut buffer)?;
-  let mask  = !((0xf as u32) << 8);
+  let mut mask = 0xfffff0ff;
   // switch the bins off
   value = value & mask;
   let wind_bits = (wind as u32) << 8;
@@ -993,8 +1000,8 @@ pub fn unset_all_triggers(socket : &UdpSocket)
   // first the GAPS trigger, whcih is a more 
   // complicated register, where we only have
   // to flip 1 bit
-  let mut trig_settings =  read_register(socket, 0x14 , &mut buffer)?;
-  trig_settings = trig_settings & !u32::pow(2,24);
+  let mut trig_settings = read_register(socket, 0x14 , &mut buffer)?;
+  trig_settings         = trig_settings & !u32::pow(2,24);
   write_register(socket,
                  0x14,
                  trig_settings,
