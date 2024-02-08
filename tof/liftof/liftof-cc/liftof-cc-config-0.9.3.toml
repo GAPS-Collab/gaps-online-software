@@ -12,7 +12,7 @@ calibration_dir       = "/tofdata/calibration/latest/"
 # location of the database
 db_path               = "/home/gaps/config/gaps_flight.db"
 # default runtime of the program
-runtime_sec           = 600
+runtime_sec           = 300
 # number of tofpackets per file before a new file
 # gets started
 packs_per_file        = 100000
@@ -28,15 +28,10 @@ fc_sub_address        = "tcp://192.168.37.200:41662"
 mtb_address           = "10.0.1.10:50001"
 # Receive MtbMoniData every X secs
 mtb_moni_interval_sec = 20
-# if false, we will ALWAYS read out ALL RB, wether 
-# they have pulses or not
-mtb_trace_suppression = false
 # Query the TOF computer for CPUMoniData every X secs
 cpu_moni_interval_sec = 20
 # Non existent/broken RBs (in range 1-50)
 rb_ignorelist         = [10, 12, 37, 38, 43, 45, 47, 48, 49, 50]
-# DSI/J/RB-CH mapping (in the future this will come from the DB)
-dsi_j_rbch_map        = "/home/gaps/config/dsi_j_ch_map.gaps.json"
 # should TofHits be calculated for RBEvents? [should be true for flight]
 run_analysis_engine   = true
 
@@ -44,14 +39,16 @@ run_analysis_engine   = true
 # can be either Gaps, Track, Any or Poisson
 # set it to "Unknown" if you want to use 
 # pico_hal.py to set the trigger conditions
-trigger_type          = "Track"
+trigger_type          = "Unknown"
 # prescale is between 0 and 1
 trigger_prescale      = 0.1
 poisson_trigger_rate  = 0
 gaps_trigger_use_beta = true
-trace_suppression     = true
+trace_suppression     = false
 mtb_moni_interval     = 30
 mtb_timeout_sec       = 60
+rb_int_window         = 1
+tiu_emulation_mode    = true
 
 # not supported yet
 [event_builder_settings]
