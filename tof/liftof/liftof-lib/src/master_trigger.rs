@@ -247,15 +247,16 @@ pub struct MTBSettings {
   /// In case it is disabled, ALL RBs will readout events
   /// ALL the time. For this, we need also the eventbuilder
   /// strategy "WaitForNBoards(40)"
-  pub trace_suppression      : bool,
+  pub trace_suppression  : bool,
   /// Time in seconds between housekkeping 
   /// packets
-  pub mtb_moni_interval : u64,
+  pub mtb_moni_interval  : u64,
   /// The number of seconds we want to wait
   /// without hearing from the MTB before
   /// we attempt a reconnect
-  pub mtb_timeout_sec   : u64,
-  pub rb_int_window     : u8,
+  pub mtb_timeout_sec    : u64,
+  pub rb_int_window      : u8,
+  pub tiu_emulation_mode : bool,
 }
 
 impl MTBSettings {
@@ -269,6 +270,7 @@ impl MTBSettings {
       mtb_moni_interval      : 30,
       mtb_timeout_sec        : 60,
       rb_int_window          : 1,
+      tiu_emulation_mode     : false,
     }
   }
 }
@@ -305,7 +307,7 @@ impl Default for MTBSettings {
 pub fn get_mtevent(socket  : &UdpSocket,
                    buffer  : &mut [u8;MT_MAX_PACKSIZE]) -> Result<MasterTriggerEvent, MasterTriggerError> {
   let mut mte = MasterTriggerEvent::new(0,0);
-  let mut n_daq_words : u32;
+  let mut n_daq_words  : u32;
   let mut hits_a       : [bool;N_CHN_PER_LTB];
   let mut hits_b       : [bool;N_CHN_PER_LTB];
   let sleeptime = Duration::from_micros(10);
@@ -944,8 +946,11 @@ pub fn set_rb_int_window(socket : &UdpSocket, wind : u8)
 /// Set the poisson trigger with a prescale
 pub fn set_poisson_trigger(socket : &UdpSocket, rate : u32) 
   -> Result<(), Box<dyn Error>> {
-  let clk_period = 1.0e8; 
-  let rate_val = (u32::MAX as f32*rate as f32/(1.0/ clk_period)).floor() as u32;
+  //let clk_period = 1e8u32; 
+  let clk_period = 100000000;
+  let rate_val = (u32::MAX*rate)/clk_period;//(1.0/ clk_period)).floor() as u32;
+  
+  //let rate_val   = (rate as f32 * u32::MAX as f32/1.0e8) as u32; 
   info!("Setting poisson trigger with rate {}!", rate);
   let mut buffer = [0u8;MT_MAX_PACKSIZE];
   write_register(socket,
