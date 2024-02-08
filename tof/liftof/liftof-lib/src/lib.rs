@@ -494,7 +494,7 @@ pub fn waveform_analysis(event         : &mut RBEvent,
     let mut ch_times    : Vec<f32>= vec![0.0; NWORDS];
     rb.calibration.voltages(ch.into(),
                             event.header.stop_cell as usize,
-                            &event.adc[ch as usize],
+                            &event.adc[raw_ch as usize],
                             &mut ch_voltages);
     //warn!("We have to rework the spike cleaning!");
     //match RBCalibrations::spike_cleaning(&mut ch_voltages,
