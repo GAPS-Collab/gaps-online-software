@@ -1,5 +1,63 @@
 from django.db import models
-# Create your models here.
+
+class MTBChannel(models.Model):
+    """
+    Summary of DSI/J/LTBCH (0-319)
+    """
+    mtb_channel = models.PositiveBigIntegerField(primary_key=True, unique=True)
+    dsi         = models.PositiveSmallIntegerField()
+    j           = models.PositiveSmallIntegerField()
+    ltb_id      = models.PositiveSmallIntegerField()
+    ltb_channel = models.PositiveSmallIntegerField()
+    hg_channel  = models.PositiveSmallIntegerField(unique=True)
+    lg_channel  = models.PositiveSmallIntegerField(unique=True)
+    rb_id       = models.PositiveSmallIntegerField()
+    rb_channel  = models.PositiveSmallIntegerField()
+    p_end_id    = models.PositiveSmallIntegerField()
+
+    def set_lg_channel(self):
+        if self.dsi is None or self.j is None or self.ltb_channel is None:
+            self.lg_channel = None
+            return
+        self.lg_channel = ((self.dsi - 1)*80) + ((self.j - 1)*16) + (self.ltb_channel-1)
+    
+    def set_hg_channel(self):
+        if self. rb_id is None or self.rb_channel is None:
+            self.hg_channel = None
+            return
+        self.hg_channel = ((self.rb_id - 1)*9) + (self.rb_channel - 1)
+
+    def __repr__(self):
+        _repr  = '<MTBChannel:'
+        _repr += f'\n  DSI/J/LTB  : {self.dsi}/{self.j}/{self.ltb_id}' 
+        _repr += '\n  LTB CH => RB ID/RB CH'
+        _repr += f'\n   |-> {self.ltb_channel} => {self.rb_id}/{self.rb_channel}'
+        _repr += '\n  LG CH => HG CH'
+        _repr += f'\n   |-> {self.lg_channel} => {self.hg_channel}'
+        _repr += f'\n  Paddle End : {self.p_end_id}'
+        return _repr
+    
+    def __str__(self):
+        return self.__repr__()
+
+#class MTBHGChannel(models.Model):
+#    """
+#    Summary of RBID/RBCH (0-319)
+#    """
+#    pk         = models.positivesmallintegerfield(primary_key=True, unique=true)
+#    channel_id = models.PositiveSmallIntegerField(unique=True)
+#    rb_id      = models.PositiveSmallIntegerField()
+#    rb_channel = models.PositiveSmallIntegerField()
+#    lg_channel = models.PositiveSmallIntegerField(unique=True)
+#
+#    @staticmethod
+#    def flatten(rb_id, rb_ch):
+#        return rb_id*9 + rb_ch
+#
+#    def set_channel_id(self):
+#        self.channel_id = MTBHGChannel.flatten(self.rb_id,self.rb_ch)
+
+
 class LTB(models.Model):
     """
     Representation of a local trigger board
@@ -43,10 +101,6 @@ class LTB(models.Model):
     ltb_ch14_rb_ch  = models.PositiveSmallIntegerField(null=True)
     ltb_ch15_rb_ch  = models.PositiveSmallIntegerField(null=True)
     ltb_ch16_rb_ch  = models.PositiveSmallIntegerField(null=True)
-    ltb_ch17_rb_ch  = models.PositiveSmallIntegerField(null=True)
-    ltb_ch18_rb_ch  = models.PositiveSmallIntegerField(null=True)
-    ltb_ch19_rb_ch  = models.PositiveSmallIntegerField(null=True)
-    ltb_ch20_rb_ch  = models.PositiveSmallIntegerField(null=True)
 
     def get_channels_to_rb(self):
         """
@@ -54,7 +108,7 @@ class LTB(models.Model):
         LTB channel -> [RB_id, RB_channel]
         """
         ch_to_rb = dict()
-        for ch in range(1,21):
+        for ch in range(1,17):
             this_rb    = self.__getattribute__(f'ltb_ch{ch}_rb')
             this_rb_ch = self.__getattribute__(f'ltb_ch{ch}_rb_ch')
             ch_to_rb[ch] = [this_rb, this_rb_ch]
@@ -81,50 +135,27 @@ class LTB(models.Model):
         return self.__repr__()
 
     def __repr__(self):
-        _repr = '<LTB:\n'
-        _repr += f'ID  : {self.ltb_id}\n'             
-        _repr += f'DSI : {self.ltb_dsi}\n'           
-        _repr += f'J   : {self.ltb_j}\n'              
-        _repr += f'ch1_rb : {self.ltb_ch1_rb}\n'      
-        _repr += f'ch2_rb : {self.ltb_ch2_rb}\n'      
-        _repr += f'ch3_rb : {self.ltb_ch3_rb}\n'      
-        _repr += f'ch4_rb : {self.ltb_ch4_rb}\n'      
-        _repr += f'ch5_rb : {self.ltb_ch5_rb}\n'      
-        _repr += f'ch6_rb : {self.ltb_ch6_rb}\n'      
-        _repr += f'ch7_rb : {self.ltb_ch7_rb}\n'      
-        _repr += f'ch8_rb : {self.ltb_ch8_rb}\n'      
-        _repr += f'ch9_rb : {self.ltb_ch9_rb}\n'      
-        _repr += f'ch10_rb : {self.ltb_ch10_rb}\n'    
-        _repr += f'ch11_rb : {self.ltb_ch11_rb}\n'    
-        _repr += f'ch12_rb : {self.ltb_ch12_rb}\n'    
-        _repr += f'ch13_rb : {self.ltb_ch13_rb}\n'    
-        _repr += f'ch14_rb : {self.ltb_ch14_rb}\n'    
-        _repr += f'ch15_rb : {self.ltb_ch15_rb}\n'    
-        _repr += f'ch16_rb : {self.ltb_ch16_rb}\n'    
-        _repr += f'ch17_rb : {self.ltb_ch17_rb}\n'    
-        _repr += f'ch18_rb : {self.ltb_ch18_rb}\n'    
-        _repr += f'ch19_rb : {self.ltb_ch19_rb}\n'    
-        _repr += f'ch20_rb : {self.ltb_ch20_rb}\n'    
-        _repr += f'ch1_rb_ch: {self.ltb_ch1_rb_ch}\n' 
-        _repr += f'ch2_rb_ch: {self.ltb_ch2_rb_ch}\n' 
-        _repr += f'ch3_rb_ch: {self.ltb_ch3_rb_ch}\n' 
-        _repr += f'ch4_rb_ch: {self.ltb_ch4_rb_ch}\n' 
-        _repr += f'ch5_rb_ch: {self.ltb_ch5_rb_ch}\n' 
-        _repr += f'ch6_rb_ch: {self.ltb_ch6_rb_ch}\n' 
-        _repr += f'ch7_rb_ch: {self.ltb_ch7_rb_ch}\n' 
-        _repr += f'ch8_rb_ch: {self.ltb_ch8_rb_ch}\n' 
-        _repr += f'ch9_rb_ch: {self.ltb_ch9_rb_ch}\n' 
-        _repr += f'ch10_rb_ch: {self.ltb_ch10_rb_ch}\n'  
-        _repr += f'ch11_rb_ch: {self.ltb_ch11_rb_ch}\n'  
-        _repr += f'ch12_rb_ch: {self.ltb_ch12_rb_ch}\n'  
-        _repr += f'ch13_rb_ch: {self.ltb_ch13_rb_ch}\n'  
-        _repr += f'ch14_rb_ch: {self.ltb_ch14_rb_ch}\n'  
-        _repr += f'ch15_rb_ch: {self.ltb_ch15_rb_ch}\n'  
-        _repr += f'ch16_rb_ch: {self.ltb_ch16_rb_ch}\n'  
-        _repr += f'ch17_rb_ch: {self.ltb_ch17_rb_ch}\n'  
-        _repr += f'ch18_rb_ch: {self.ltb_ch18_rb_ch}\n'  
-        _repr += f'ch19_rb_ch: {self.ltb_ch19_rb_ch}\n'  
-        _repr += f'ch20_rb_ch: {self.ltb_ch20_rb_ch}\n'  
+        _repr = '<LocalTriggerBoard:'
+        _repr += f'\n  ID  : {self.ltb_id}'             
+        _repr += f'\n  DSI/J : {self.ltb_dsi}/{self.ltb_j}'           
+        _repr += '\n  LTBCH => RB ID/RB CH'
+        _repr += '\n  -- -- -- -- -- -- --'
+        _repr += f'\n   1 => {self.ltb_ch1_rb}/{self.ltb_ch1_rb_ch}'
+        _repr += f'\n   2 => {self.ltb_ch2_rb}/{self.ltb_ch2_rb_ch}'
+        _repr += f'\n   3 => {self.ltb_ch3_rb}/{self.ltb_ch3_rb_ch}'
+        _repr += f'\n   4 => {self.ltb_ch4_rb}/{self.ltb_ch4_rb_ch}'
+        _repr += f'\n   5 => {self.ltb_ch5_rb}/{self.ltb_ch5_rb_ch}'
+        _repr += f'\n   6 => {self.ltb_ch6_rb}/{self.ltb_ch6_rb_ch}'
+        _repr += f'\n   7 => {self.ltb_ch7_rb}/{self.ltb_ch7_rb_ch}'
+        _repr += f'\n   8 => {self.ltb_ch8_rb}/{self.ltb_ch8_rb_ch}'
+        _repr += f'\n   9 => {self.ltb_ch9_rb}/{self.ltb_ch9_rb_ch}'
+        _repr += f'\n  10 => {self.ltb_ch10_rb}/{self.ltb_ch10_rb_ch}'
+        _repr += f'\n  11 => {self.ltb_ch11_rb}/{self.ltb_ch11_rb_ch}'
+        _repr += f'\n  12 => {self.ltb_ch12_rb}/{self.ltb_ch12_rb_ch}'
+        _repr += f'\n  13 => {self.ltb_ch13_rb}/{self.ltb_ch13_rb_ch}'
+        _repr += f'\n  14 => {self.ltb_ch14_rb}/{self.ltb_ch14_rb_ch}'
+        _repr += f'\n  15 => {self.ltb_ch15_rb}/{self.ltb_ch15_rb_ch}'
+        _repr += f'\n  16 => {self.ltb_ch16_rb}/{self.ltb_ch16_rb_ch}'
         return _repr
 
 

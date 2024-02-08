@@ -47,8 +47,10 @@ if __name__ == '__main__':
                         help="(Re)create the LTB table from the spreadsheet")
     parser.add_argument('--create-pid-table',      action='store_true', default=False,\
                         help="(Re)create the Paddle ID table from the spreadsheet")
-    parser.add_argument('--create-all-tables',       action='store_true', default=False,\
-                        help="(Re)create all tables")
+    parser.add_argument('--create-mtbchannel-table',      action='store_true', default=False,\
+                        help="(Re)create the MTB channel table")
+    parser.add_argument('--create-all-tables',      action='store_true', default=False,\
+                        help="(Re)create the complete DB")
 
     args = parser.parse_args()
     if args.create_all_tables:
@@ -59,6 +61,7 @@ if __name__ == '__main__':
         args.create_rb_table         = True
         args.create_ltb_table        = True
         args.create_pid_table        = True
+        args.create_mtbchannel_table = True
     
     if not args.volid_map or not args.level0_geo:
         args.create_pid_table = False
@@ -258,221 +261,6 @@ if __name__ == '__main__':
             ltb_ch = paddle_end.ltb_ch
             data   = {ltb_ch : [paddle_end.rb_id, paddle_end.rb_ch]}
             ltbs[ltb_id].set_channels_to_rb(data)
-        ##ltbs[k].get_designated_ip()
-        #    #try:
-        #    #    lbts[k].ltb
-        #    #    pass
-        #    #except Exception as e:
-        #    #    print (f'Can not get DSI card for LTB {k}')
-
-
-        #    try:
-        #        ltbs[k].ltb_ch1_rb = [j.rb_id for j in paddle_ends if j.ltb_id == k and j.ltb_ch == 1][0]
-        #        #print (f'Filled {ltbs[k].ch1_rb}')
-        #    except Exception as e: 
-        #        print (f"Can't add paddle end for ltb ch1, exception {e}")
-        #        #print (f'Filled {ltbs[k].ltb_ch1_rb}')
-        #    try:
-        #        ltbs[k].ltb_ch1_rb_ch = [j.rb_ch for j in paddle_ends if j.ltb_id == k and j.ltb_ch == 1][0]
-        #        #print (f'Filled {ltbs[k].ch1_rb}')
-        #    except Exception as e: 
-        #        print (f"Can't add paddle end for ltb ch1 RB, exception {e}")
-        #    
-        #    # ch2
-        #    try:
-        #        ltbs[k].ltb_ch2_rb = [j.rb_id for j in paddle_ends if j.ltb_id == k and j.ltb_ch == 2][0]
-        #        #print (f'Filled {ltbs[k].ch1_rb}')
-        #    except Exception as e: 
-        #        print (f"Can't add paddle end for ltb ch2, exception {e}")
-        #        #print (f'Filled {ltbs[k].ltb_ch1_rb}')
-        #    try:
-        #        ltbs[k].ltb_ch2_rb_ch = [j.rb_ch for j in paddle_ends if j.ltb_id == k and j.ltb_ch == 2][0]
-        #        #print (f'Filled {ltbs[k].ch1_rb}')
-        #    except Exception as e: 
-        #        print (f"Can't add paddle end for ltb ch2 RB, exception {e}")
-
-
-        #    # ch3
-        #    try:
-        #        ltbs[k].ltb_ch3_rb = [j.rb_id for j in paddle_ends if j.ltb_id == k and j.ltb_ch == 3][0]
-        #        #print (f'Filled {ltbs[k].ch1_rb}')
-        #    except Exception as e: 
-        #        print (f"Can't add paddle end for ltb ch3, exception {e}")
-        #        #print (f'Filled {ltbs[k].ltb_ch1_rb}')
-        #    try:
-        #        ltbs[k].ltb_ch3_rb_ch = [j.rb_ch for j in paddle_ends if j.ltb_id == k and j.ltb_ch == 3][0]
-        #        #print (f'Filled {ltbs[k].ch1_rb}')
-        #    except Exception as e: 
-        #        print (f"Can't add paddle end for ltb ch3 RB, exception {e}")
-        #    
-        #    # ch4
-        #    try:
-        #        ltbs[k].ltb_ch4_rb = [j.rb_id for j in paddle_ends if j.ltb_id == k and j.ltb_ch == 4][0]
-        #        #print (f'Filled {ltbs[k].ch1_rb}')
-        #    except Exception as e: 
-        #        print (f"Can't add paddle end for ltb ch4, exception {e}")
-        #        #print (f'Filled {ltbs[k].ltb_ch1_rb}')
-        #    try:
-        #        ltbs[k].ltb_ch4_rb_ch = [j.rb_ch for j in paddle_ends if j.ltb_id == k and j.ltb_ch == 4][0]
-        #        #print (f'Filled {ltbs[k].ch1_rb}')
-        #    except Exception as e: 
-        #        print (f"Can't add paddle end for ltb ch4 RB, exception {e}")
-
-        #    # ch5
-        #    try:
-        #        ltbs[k].ltb_ch5_rb = [j.rb_id for j in paddle_ends if j.ltb_id == k and j.ltb_ch == 5][0]
-        #        #print (f'Filled {ltbs[k].ch1_rb}')
-        #    except Exception as e: 
-        #        print (f"Can't add paddle end for ltb ch5, exception {e}")
-        #        #print (f'Filled {ltbs[k].ltb_ch1_rb}')
-        #    try:
-        #        ltbs[k].ltb_ch5_rb_ch = [j.rb_ch for j in paddle_ends if j.ltb_id == k and j.ltb_ch == 5][0]
-        #        #print (f'Filled {ltbs[k].ch1_rb}')
-        #    except Exception as e: 
-        #        print (f"Can't add paddle end for ltb ch5 RB, exception {e}")
-        #    
-        #    # ch6
-        #    try:
-        #        ltbs[k].ltb_ch6_rb = [j.rb_id for j in paddle_ends if j.ltb_id == k and j.ltb_ch == 6][0]
-        #        #print (f'Filled {ltbs[k].ch1_rb}')
-        #    except Exception as e: 
-        #        print (f"Can't add paddle end for ltb ch6, exception {e}")
-        #        #print (f'Filled {ltbs[k].ltb_ch1_rb}')
-        #    try:
-        #        ltbs[k].ltb_ch6_rb_ch = [j.rb_ch for j in paddle_ends if j.ltb_id == k and j.ltb_ch == 6][0]
-        #        #print (f'Filled {ltbs[k].ch1_rb}')
-        #    except Exception as e: 
-        #        print (f"Can't add paddle end for ltb ch6 RB, exception {e}")
-        #    
-        #    # ch7
-        #    try:
-        #        ltbs[k].ltb_ch7_rb = [j.rb_id for j in paddle_ends if j.ltb_id == k and j.ltb_ch == 7][0]
-        #        #print (f'Filled {ltbs[k].ch1_rb}')
-        #    except Exception as e: 
-        #        print (f"Can't add paddle end for ltb ch7, exception {e}")
-        #        #print (f'Filled {ltbs[k].ltb_ch1_rb}')
-        #    try:
-        #        ltbs[k].ltb_ch7_rb_ch = [j.rb_ch for j in paddle_ends if j.ltb_id == k and j.ltb_ch == 7][0]
-        #        #print (f'Filled {ltbs[k].ch1_rb}')
-        #    except Exception as e: 
-        #        print (f"Can't add paddle end for ltb ch7 RB, exception {e}")
-        #   
-        #    # ch8
-        #    try:
-        #        ltbs[k].ltb_ch8_rb = [j.rb_id for j in paddle_ends if j.ltb_id == k and j.ltb_ch == 8][0]
-        #        #print (f'Filled {ltbs[k].ch1_rb}')
-        #    except Exception as e: 
-        #        print (f"Can't add paddle end for ltb ch8, exception {e}")
-        #        #print (f'Filled {ltbs[k].ltb_ch1_rb}')
-        #    try:
-        #        ltbs[k].ltb_ch8_rb_ch = [j.rb_ch for j in paddle_ends if j.ltb_id == k and j.ltb_ch == 8][0]
-        #        #print (f'Filled {ltbs[k].ch1_rb}')
-        #    except Exception as e: 
-        #        print (f"Can't add paddle end for ltb ch8 RB, exception {e}")
-        #   
-        #    # ch9
-        #    try:
-        #        ltbs[k].ltb_ch9_rb = [j.rb_id for j in paddle_ends if j.ltb_id == k and j.ltb_ch == 9][0]
-        #        #print (f'Filled {ltbs[k].ch1_rb}')
-        #    except Exception as e: 
-        #        print (f"Can't add paddle end for ltb ch9, exception {e}")
-        #        #print (f'Filled {ltbs[k].ltb_ch1_rb}')
-        #    try:
-        #        ltbs[k].ltb_ch9_rb_ch = [j.rb_ch for j in paddle_ends if j.ltb_id == k and j.ltb_ch == 9][0]
-        #        #print (f'Filled {ltbs[k].ch1_rb}')
-        #    except Exception as e: 
-        #        print (f"Can't add paddle end for ltb ch9 RB, exception {e}")
-        #    
-        #    # ch10
-        #    try:
-        #        ltbs[k].ltb_ch10_rb = [j.rb_id for j in paddle_ends if j.ltb_id == k and j.ltb_ch == 10][0]
-        #        #print (f'Filled {ltbs[k].ch1_rb}')
-        #    except Exception as e: 
-        #        print (f"Can't add paddle end for ltb ch10, exception {e}")
-        #        #print (f'Filled {ltbs[k].ltb_ch1_rb}')
-        #    try:
-        #        ltbs[k].ltb_ch10_rb_ch = [j.rb_ch for j in paddle_ends if j.ltb_id == k and j.ltb_ch == 10][0]
-        #        #print (f'Filled {ltbs[k].ch1_rb}')
-        #    except Exception as e: 
-        #        print (f"Can't add paddle end for ltb ch10 RB, exception {e}")
-        #    
-        #    # ch11
-        #    try:
-        #        ltbs[k].ltb_ch11_rb = [j.rb_id for j in paddle_ends if j.ltb_id == k and j.ltb_ch == 11][0]
-        #        #print (f'Filled {ltbs[k].ch1_rb}')
-        #    except Exception as e: 
-        #        print (f"Can't add paddle end for ltb ch11, exception {e}")
-        #        #print (f'Filled {ltbs[k].ltb_ch1_rb}')
-        #    try:
-        #        ltbs[k].ltb_ch11_rb_ch = [j.rb_ch for j in paddle_ends if j.ltb_id == k and j.ltb_ch == 11][0]
-        #        #print (f'Filled {ltbs[k].ch1_rb}')
-        #    except Exception as e: 
-        #        print (f"Can't add paddle end for ltb ch11 RB, exception {e}")
-        #    
-        #    # ch12 
-        #    try:
-        #        ltbs[k].ltb_ch12_rb = [j.rb_id for j in paddle_ends if j.ltb_id == k and j.ltb_ch == 12][0]
-        #        #print (f'Filled {ltbs[k].ch1_rb}')
-        #    except Exception as e: 
-        #        print (f"Can't add paddle end for ltb ch12, exception {e}")
-        #        #print (f'Filled {ltbs[k].ltb_ch1_rb}')
-        #    try:
-        #        ltbs[k].ltb_ch12_rb_ch = [j.rb_ch for j in paddle_ends if j.ltb_id == k and j.ltb_ch == 12][0]
-        #        #print (f'Filled {ltbs[k].ch1_rb}')
-        #    except Exception as e: 
-        #        print (f"Can't add paddle end for ltb ch12 RB, exception {e}")
-        #    
-        #    # ch13
-        #    try:
-        #        ltbs[k].ltb_ch13_rb = [j.rb_id for j in paddle_ends if j.ltb_id == k and j.ltb_ch == 13][0]
-        #        #print (f'Filled {ltbs[k].ch1_rb}')
-        #    except Exception as e: 
-        #        print (f"Can't add paddle end for ltb ch13, exception {e}")
-        #        #print (f'Filled {ltbs[k].ltb_ch1_rb}')
-        #    try:
-        #        ltbs[k].ltb_ch13_rb_ch = [j.rb_ch for j in paddle_ends if j.ltb_id == k and j.ltb_ch == 13][0]
-        #        #print (f'Filled {ltbs[k].ch1_rb}')
-        #    except Exception as e: 
-        #        print (f"Can't add paddle end for ltb ch13 RB, exception {e}")
-        #    
-        #    # ch14
-        #    try:
-        #        ltbs[k].ltb_ch14_rb = [j.rb_id for j in paddle_ends if j.ltb_id == k and j.ltb_ch == 14][0]
-        #        #print (f'Filled {ltbs[k].ch1_rb}')
-        #    except Exception as e: 
-        #        print (f"Can't add paddle end for ltb ch14, exception {e}")
-        #        #print (f'Filled {ltbs[k].ltb_ch1_rb}')
-        #    try:
-        #        ltbs[k].ltb_ch14_rb_ch = [j.rb_ch for j in paddle_ends if j.ltb_id == k and j.ltb_ch == 14][0]
-        #        #print (f'Filled {ltbs[k].ch1_rb}')
-        #    except Exception as e: 
-        #        print (f"Can't add paddle end for ltb ch14 RB, exception {e}")
-        #    
-        #    # ch15
-        #    try:
-        #        ltbs[k].ltb_ch15_rb = [j.rb_id for j in paddle_ends if j.ltb_id == k and j.ltb_ch == 15][0]
-        #        #print (f'Filled {ltbs[k].ch1_rb}')
-        #    except Exception as e: 
-        #        print (f"Can't add paddle end for ltb ch15, exception {e}")
-        #        #print (f'Filled {ltbs[k].ltb_ch1_rb}')
-        #    try:
-        #        ltbs[k].ltb_ch15_rb_ch = [j.rb_ch for j in paddle_ends if j.ltb_id == k and j.ltb_ch == 15][0]
-        #        #print (f'Filled {ltbs[k].ch1_rb}')
-        #    except Exception as e: 
-        #        print (f"Can't add paddle end for ltb ch15 RB, exception {e}")
-        #    
-        #    # ch16
-        #    try:
-        #        ltbs[k].ltb_ch16_rb = [j.rb_id for j in paddle_ends if j.ltb_id == k and j.ltb_ch == 16][0]
-        #        #print (f'Filled {ltbs[k].ch1_rb}')
-        #    except Exception as e: 
-        #        print (f"Can't add paddle end for ltb ch16, exception {e}")
-        #        #print (f'Filled {ltbs[k].ltb_ch1_rb}')
-        #    try:
-        #        ltbs[k].ltb_ch16_rb_ch = [j.rb_ch for j in paddle_ends if j.ltb_id == k and j.ltb_ch == 16][0]
-        #        #print (f'Filled {ltbs[k].ch1_rb}')
-        #    except Exception as e: 
-        #        print (f"Can't add paddle end for ltb ch16 RB, exception {e}")
         
         rats = m.RAT.objects.all()
         for ltb in ltbs:
@@ -482,3 +270,46 @@ if __name__ == '__main__':
             print (ltbs[ltb])
             if not args.dry_run:
                 ltbs[ltb].save()
+
+    if args.create_mtbchannel_table:
+        ltbs = m.LTB.objects.all()
+        mtbch = 0
+        for ltb in ltbs:
+            channels = ltb.get_channels_to_rb()
+            for ch in channels:
+                mtb             = m.MTBChannel()
+                mtb.mtb_channel = mtbch
+                mtb.dsi         = ltb.ltb_dsi
+                mtb.j           = ltb.ltb_j
+                mtb.ltb_id      = ltb.ltb_id
+                mtb.ltb_channel = ch
+                mtb.rb_id       = channels[ch][0]
+                mtb.rb_channel  = channels[ch][1] 
+                mtb.set_hg_channel()
+                mtb.set_lg_channel()
+                mtbch += 1
+                if mtb.hg_channel is None or mtb.lg_channel is None:
+                    print (f"WARN - not enough information for {ltb}, {ch} => {channels[ch]}")
+                    print (mtb)
+                    continue
+
+                ltb_pend = m.PaddleEnd.objects.filter(ltb_id = ltb.ltb_id, ltb_ch = ch)
+                assert (len(ltb_pend) == 1)
+                ltb_pend = ltb_pend[0]
+                rb_pend  = m.PaddleEnd.objects.filter(rb_id  = mtb.rb_id, rb_ch = mtb.rb_channel)
+                assert (len(rb_pend) == 1)
+                rb_pend  = rb_pend[0]
+                assert(ltb_pend.paddle_end_id == rb_pend.paddle_end_id)
+                mtb.p_end_id = rb_pend.paddle_end_id
+                if not args.dry_run:
+                    print (mtb)
+                    try:
+                        mtb.save()
+                    except Exception as e:
+                        print (e)
+                        foo = m.MTBChannel.objects.filter(lg_channel = mtb.lg_channel)
+                        for k in foo:
+                            print (k)
+                        raise 
+                else:
+                    print (mtb)
