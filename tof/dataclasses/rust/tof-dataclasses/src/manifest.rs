@@ -353,12 +353,12 @@ pub fn get_dsi_j_ltbch_vs_rbch_map(filename : &Path) -> DsiLtbRBMapping {
       let mut rbidch_map : HashMap<u8, (u8,u8)> = HashMap::new();
       for ch in 1..17 {
         let rbidch = (0,0);
-        rbidch_map.insert(ch,rbidch).unwrap();
+        rbidch_map.insert(ch,rbidch);
         //map[dsi] = 
       }
-      jmap.insert(j,rbidch_map).unwrap();
+      jmap.insert(j,rbidch_map);
     }
-    map.insert(dsi,jmap).unwrap();
+    map.insert(dsi,jmap);
   }
   for ltb in ltbs {
     for ch in 1..17 {
