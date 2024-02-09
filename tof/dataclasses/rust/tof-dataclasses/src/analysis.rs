@@ -4,7 +4,7 @@
 //!
   
 use crate::errors::WaveformError;
-
+use crate::constants::NWORDS;
 
 #[cfg(feature="advanced-algorithms")]
 extern crate smoothed_z_score;
@@ -16,7 +16,12 @@ use smoothed_z_score::{Peak, PeaksDetector, PeaksFilter};
 pub fn get_max_bin(voltages    : &Vec<f32>,
                    lower_bound : usize,
                    window      : usize) -> Result<usize, WaveformError> {
-  if lower_bound + window > voltages.len() {
+  if lower_bound >= voltages.len() {
+    error!("Invalid value for lower_bound {}", lower_bound);
+    return Err(WaveformError::OutOfRangeLowerBound);
+  }
+  if lower_bound + window >= voltages.len() {
+    error!("Lower bound {} + window {} is too large!", lower_bound, window); 
     return Err(WaveformError::OutOfRangeUpperBound);
   }
   let mut maxval = voltages[lower_bound];
@@ -156,7 +161,7 @@ pub fn cfd_simple(voltages    : &Vec<f32>,
                   start_peak  : usize,
                   end_peak    : usize) -> Result<f32, WaveformError> {
 
-  let idx = get_max_bin(voltages,start_peak,end_peak-start_peak)?;
+  let idx = get_max_bin(voltages, start_peak, end_peak-start_peak)?;
   let mut sum : f32 = 0.0;
   for n in idx-1..idx+1{
     sum += voltages[n];
@@ -183,7 +188,7 @@ pub fn cfd_simple(voltages    : &Vec<f32>,
       n -= 1;
     }  
   } else {
-    error!("We require that the peak is at least 10 bins away from the start!");
+    debug!("We require that the peak is at least 10 bins away from the start!");
     return Err(WaveformError::OutOfRangeLowerBound);
   }
 
@@ -227,9 +232,12 @@ pub fn find_peaks(voltages       : &Vec<f32>,
                   threshold      : f32,
                   max_peaks      : usize)
 -> Result<Vec<(usize,usize)>, WaveformError> {
-  let mut peaks = Vec::<(usize,usize)>::new();
-
-  let start_bin  = time2bin(nanoseconds, start_time)?;
+  let mut peaks      = Vec::<(usize,usize)>::new();
+  let mut start_bin  = time2bin(nanoseconds, start_time)?;
+  if start_bin <= 10 {
+    debug!("We deliberatly do not search for peaks within the first 10 bins! Correcting..");
+    start_bin = 10;
+  }
   let window_bin = time2bin(nanoseconds, start_time + window_size)? - start_bin;
 
   let mut pos = 0usize;
@@ -293,6 +301,13 @@ pub fn find_peaks(voltages       : &Vec<f32>,
       }
       nbins_peak = 0;
     }
+  }
+  // FIXME - remove invalid peaks
+  let len_pks_dirty = peaks.len();
+  peaks.retain(|&x| {(x.0 < NWORDS - 1) & (x.1 <= NWORDS - 1)});
+  let len_pks_clean = peaks.len();
+  if len_pks_clean != len_pks_dirty {
+    debug!("We removed {} pks because they had values outside of 0-{}!", len_pks_dirty - len_pks_clean, NWORDS);
   }
   Ok(peaks)
 }
