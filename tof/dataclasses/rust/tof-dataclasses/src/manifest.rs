@@ -883,7 +883,7 @@ impl ReadoutBoard {
       return 0;
     }
     let p_end_id = self.channel_to_paddle_end_id[channel -1];
-    if p_end_id % 2000 > 0 {
+    if p_end_id > 2000 {
       return (p_end_id - 2000) as u8;
     } else {
       return (p_end_id - 1000) as u8;
