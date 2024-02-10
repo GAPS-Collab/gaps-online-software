@@ -161,13 +161,15 @@ impl Error for DecodingError {
 
 /// Error to be used for issues with 
 /// the communication to the MTB.
-#[derive(Debug, Copy, Clone, serde::Deserialize, serde::Serialize)]
+#[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 #[repr(u8)]
 pub enum MasterTriggerError {
+  Unknown,
   QueueEmpty,
   MaskTooLarge,
   BrokenPackage,
   DAQNotAvailable,
+  PackageFormatIncorrect,
   PackageHeaderIncorrect,
   PackageFooterIncorrect,
   FailedOperation,

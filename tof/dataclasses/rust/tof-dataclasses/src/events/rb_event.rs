@@ -544,11 +544,13 @@ impl Serialization for RBEvent {
       error!("Event {} has lost trigger! Disregarding channel data..", event.header.event_id);
       return Ok(event);
     }
+    let mut decoded_ch = Vec::<u8>::new();
     for ch in event.header.get_channels().iter() {
       if *pos + 2*NWORDS >= stream_len {
-        error!("The channel data for ch {} seems corrupt!", ch);
+        error!("The channel data for event {} ch {} seems corrupt! We want to get channels {:?}, but have decoded only {:?}, because the stream ends {} bytes too early!",event.header.event_id, ch, event.header.get_channels(), decoded_ch, *pos + 2*NWORDS - stream_len);
         return Err(SerializationError::WrongByteSize {})
       }
+      decoded_ch.push(*ch);
       // 2*NWORDS because stream is Vec::<u8> and it is 16 bit words.
       let data = &stream[*pos..*pos+2*NWORDS];
       //event.adc[k as usize] = u8_to_u16(data);
@@ -736,8 +738,7 @@ impl From<&TofPacket> for RBEvent {
             return event;
           }
           Err(err) => { 
-            error!("Can not decode RBEvent! Error {err}!");
-            error!("Returning empty event!");
+            error!("Can not decode RBEvent - will return empty event! {err}");
             return RBEvent::new();
           }
         }
