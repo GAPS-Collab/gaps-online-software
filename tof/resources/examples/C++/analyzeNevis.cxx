@@ -128,13 +128,6 @@ int main(int argc, char *argv[]){
   float TCFDS[NTOT];
   bool  IsHit[NTOT] = {false} ;
 
-  // Instantiate our class that holds analysis results and set some
-  // initial values
-  auto Event = EventGAPS();
-  Event.SetThreshold(CThresh);
-  Event.SetCFDFraction(CFDS_frac);
-  Event.InitializeHistograms();
-  
   char label[50], line[500];
   int status;
   float value;
@@ -153,6 +146,41 @@ int main(int argc, char *argv[]){
     status = fscanf(fp,"%[^\n]",line); // Scan the rest of the line
   }
   fclose(fp); 
+
+  // Another kludgy read is getting the RB-ch to paddle map from the
+  // rbch-vs-paddle.json file. Achim has a way to do this via rust,
+  // but I need the map for development purposes here.
+  int paddle_map[NRB][NCH] = { 0 }; // Stored value will be paddle ID;
+  int rb_num, ch_num;
+  fp = fopen("/home/gaps/software/gaps-online-software/src/gaps-db/resources/master-spreadsheet/rbch-vs-paddle.json", "r");
+  if ( fscanf(fp, "%s", label) != EOF ) { // Read in first "{"
+    while (fscanf(fp, "%s %[^\n]", label, line) != EOF) { 
+      if (strncmp(label, "\"", 1) == 0) { // Found an RB line
+	int rb_len = strlen(label)-3;     // RB<=9 or RB>=10
+	char tmp[6];
+	if (rb_len == 1) snprintf(tmp, sizeof(tmp), "%.1s", label+1);
+	if (rb_len == 2) snprintf(tmp, sizeof(tmp), "%.2s", label+1);
+	rb_num = atoi(tmp);
+	for(int i=0;i<NCH;i++) {
+	  fscanf(fp, "%s %s", label, line);
+	  snprintf(tmp, sizeof(tmp), "%.4s", line);
+	  int pad_id = atoi(tmp);
+	  //printf("RBnum = %s %s %d; %d %d\n",label,line,rb_num,i,pad_id);
+	  paddle_map[rb_num][i] = pad_id;
+	}
+	fscanf(fp, "%s", line); // read in the closing "}" for RB
+      }
+    }
+  }
+  fclose(fp); // Finished with file
+  
+  // Instantiate our class that holds analysis results and set some
+  // initial values
+  auto Event = EventGAPS();
+  Event.SetPaddleMap(paddle_map);
+  Event.SetThreshold(CThresh);
+  Event.SetCFDFraction(CFDS_frac);
+  Event.InitializeHistograms();
 
   // the reader is something for the future, when the 
   // files get bigger so they might not fit into memory
@@ -204,7 +232,9 @@ int main(int argc, char *argv[]){
 	// initialize and delete them with each new event
 	GAPS::Waveform *wave[NTOT];
 	GAPS::Waveform *wch9[NRB];
-
+	for (int i=0;i<NTOT;i++) wave[i] = NULL;
+	for (int i=0;i<NRB;i++)  wch9[i] = NULL;
+	
         auto ev = TofEvent::from_bytestream(p.payload, pos);
 	unsigned long int evt_ctr = ev.mt_event.event_id;
 	//printf("Event %ld: RBs -", evt_ctr);

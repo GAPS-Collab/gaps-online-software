@@ -260,7 +260,7 @@ int main(int argc, char *argv[]){
 
 	      usize cw = c+ch_start; 
 	      wave[cw] = new Waveplot(ch_volts.data(),ch_times.data(), cw,0);
-	      wave[cw]->SetThreshold(15.0);
+	      wave[cw]->SetThreshold(5.0);
 	      
 	      // Calculate the pedestal
 	      wave[cw]->SetPedBegin(10);

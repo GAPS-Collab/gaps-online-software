@@ -31,6 +31,7 @@ public:
 
   void    InitializeWaveforms(GAPS::Waveform *wave[], GAPS::Waveform *wch9[]);
   void    UnsetWaveforms(void);
+  void    SetPaddleMap(int paddle_map[NRB][NCH]);
 
   // Stuff related to the actual data
   void    AnalyzePedestals(float Ped_begin, float Ped_win);
@@ -59,6 +60,11 @@ private:
   float   Threshold;                 // PMT Threshold in DC (for now...)
   float   CFDFraction;               // CFD Fraction for TDC calculation
 
+  // Since paddles start at 1, we include one extra value
+  int     Paddle_A[NPAD+1];            // Channel for this PadddleA
+  int     Paddle_B[NPAD+1];            // Channel for this PadddleB
+  int     ChnlMap[NRB][NCH];           // Maps SiPM channel to Paddle
+  
   float   Pedestal[NTOT];             // Pedestal values
   float   PedRMS[NTOT];               // Pedestal RMS values
   float   ClockPedestal[NRB];         // Pedestal values
