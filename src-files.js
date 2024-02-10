@@ -35,7 +35,7 @@ var srcIndex = JSON.parse('{\
 "debug_registers":["",[],["debug_registers.rs"]],\
 "deranged":["",[],["lib.rs","traits.rs","unsafe_wrapper.rs"]],\
 "drawille":["",[],["lib.rs"]],\
-"either":["",[],["lib.rs"]],\
+"either":["",[],["iterator.rs","lib.rs"]],\
 "env_logger":["",[["filter",[],["mod.rs","regex.rs"]],["fmt",[["writer",[["buffer",[],["mod.rs","termcolor.rs"]]],["atty.rs","mod.rs"]]],["humantime.rs","mod.rs","style.rs"]]],["lib.rs","logger.rs"]],\
 "equivalent":["",[],["lib.rs"]],\
 "fnv":["",[],["lib.rs"]],\
@@ -67,7 +67,6 @@ var srcIndex = JSON.parse('{\
 "liftof_rb":["",[["threads",[],["cmd_responder.rs","data_publisher.rs","event_processing.rs","monitoring.rs","runner.rs"]]],["api.rs","control.rs","lib.rs","memory.rs","registers.rs","threads.rs"]],\
 "liftof_robin_reader":["",[],["robin_reader.rs"]],\
 "liftof_tui":["",[["tabs",[],["tab_cpu.rs","tab_events.rs","tab_home.rs","tab_mt.rs","tab_settings.rs","tab_status.rs"]]],["colors.rs","lib.rs","menu.rs","tabs.rs","widgets.rs"]],\
-"linux_raw_sys":["",[["x86_64",[],["errno.rs","general.rs","ioctl.rs"]]],["elf.rs","lib.rs"]],\
 "local_ip_address":["",[],["error.rs","lib.rs","linux.rs"]],\
 "lock_api":["",[],["lib.rs","mutex.rs","remutex.rs","rwlock.rs"]],\
 "log":["",[],["__private_api.rs","lib.rs","macros.rs"]],\
@@ -116,7 +115,6 @@ var srcIndex = JSON.parse('{\
 "regex_automata":["",[["dfa",[],["mod.rs","onepass.rs","remapper.rs"]],["hybrid",[],["dfa.rs","error.rs","id.rs","mod.rs","regex.rs","search.rs"]],["meta",[],["error.rs","limited.rs","literal.rs","mod.rs","regex.rs","reverse_inner.rs","stopat.rs","strategy.rs","wrappers.rs"]],["nfa",[["thompson",[],["backtrack.rs","builder.rs","compiler.rs","error.rs","literal_trie.rs","map.rs","mod.rs","nfa.rs","pikevm.rs","range_trie.rs"]]],["mod.rs"]],["util",[["determinize",[],["mod.rs","state.rs"]],["prefilter",[],["aho_corasick.rs","byteset.rs","memchr.rs","memmem.rs","mod.rs","teddy.rs"]],["unicode_data",[],["mod.rs"]]],["alphabet.rs","captures.rs","empty.rs","escape.rs","int.rs","interpolate.rs","iter.rs","lazy.rs","look.rs","memchr.rs","mod.rs","pool.rs","primitives.rs","search.rs","sparse_set.rs","start.rs","syntax.rs","utf8.rs","wire.rs"]]],["lib.rs","macros.rs"]],\
 "regex_syntax":["",[["ast",[],["mod.rs","parse.rs","print.rs","visitor.rs"]],["hir",[],["interval.rs","literal.rs","mod.rs","print.rs","translate.rs","visitor.rs"]],["unicode_tables",[],["age.rs","case_folding_simple.rs","general_category.rs","grapheme_cluster_break.rs","mod.rs","perl_word.rs","property_bool.rs","property_names.rs","property_values.rs","script.rs","script_extension.rs","sentence_break.rs","word_break.rs"]]],["debug.rs","either.rs","error.rs","lib.rs","parser.rs","rank.rs","unicode.rs","utf8.rs"]],\
 "rgb":["",[["internal",[["convert",[],["array.rs","mod.rs","tuple.rs"]]],["ops.rs","pixel.rs","rgb.rs","rgba.rs"]]],["alt.rs","lib.rs"]],\
-"rustix":["",[["backend",[["linux_raw",[["arch",[],["mod.rs","x86_64.rs"]],["io",[],["errno.rs","mod.rs","syscalls.rs","types.rs"]],["termios",[],["mod.rs","syscalls.rs"]]],["c.rs","conv.rs","mod.rs","reg.rs"]]]],["io",[],["close.rs","dup.rs","errno.rs","fcntl.rs","ioctl.rs","mod.rs","read_write.rs"]],["ioctl",[],["linux.rs","mod.rs","patterns.rs"]],["maybe_polyfill",[["std",[],["mod.rs"]]]],["termios",[],["ioctl.rs","mod.rs","tc.rs","tty.rs","types.rs"]]],["bitcast.rs","buffer.rs","cstr.rs","ffi.rs","lib.rs","pid.rs","utils.rs","weak.rs"]],\
 "rustversion":["",[],["attr.rs","bound.rs","constfn.rs","date.rs","error.rs","expand.rs","expr.rs","iter.rs","lib.rs","release.rs","time.rs","token.rs","version.rs"]],\
 "ryu":["",[["buffer",[],["mod.rs"]],["pretty",[],["exponent.rs","mantissa.rs","mod.rs"]]],["common.rs","d2s.rs","d2s_full_table.rs","d2s_intrinsics.rs","digit_table.rs","f2s.rs","f2s_intrinsics.rs","lib.rs"]],\
 "scan_uio_buffers":["",[],["scan_uio_buffers.rs"]],\
