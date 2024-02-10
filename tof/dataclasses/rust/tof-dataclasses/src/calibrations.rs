@@ -1076,7 +1076,7 @@ impl RBCalibrations {
 
   pub fn new(rb_id : u8) -> Self {
     // FIXME
-    let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap_or(Duration::from_secs(0));
+    //let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap_or(Duration::from_secs(0));
     //let timestamp = now.as_secs() as u32;
     let timestamp = 0;
     Self {

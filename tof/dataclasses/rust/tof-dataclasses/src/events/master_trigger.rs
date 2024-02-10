@@ -27,6 +27,35 @@ use crate::manifest::{LocalTriggerBoard,
 pub const N_LTBS : usize = 25;
 pub const N_CHN_PER_LTB : usize = 16;
 
+//he default values used where thus:
+//  INNER_TOF_THRESH = 3
+//  OUTER_TOF_THRESH = 3
+//  TOTAL_TOF_THRESH =8
+//  REQUIRE_BETA =1
+//
+//so this corresponds to the BETA being set (required) and the loose settings for the number of hits.
+//Is this correct?
+//
+//If so, at some point (not yet because we are not getting data through the system), I'd like us to run
+//for a while with these three settings:
+//
+//  INNER_TOF_THRESH = 3
+//  OUTER_TOF_THRESH = 3
+//  TOTAL_TOF_THRESH =8
+//  REQUIRE_BETA =1
+//
+//  INNER_TOF_THRESH = 3
+//  OUTER_TOF_THRESH = 3
+//  TOTAL_TOF_THRESH =8
+//  REQUIRE_BETA =0
+//
+//  INNER_TOF_THRESH = 0
+//  OUTER_TOF_THRESH = 0
+//  TOTAL_TOF_THRESH =0
+//  REQUIRE_BETA =1
+//
+
+
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 #[repr(u8)]
 pub enum TriggerType {
@@ -477,6 +506,21 @@ impl MasterTriggerEvent {
   pub fn invalidate(&mut self) {
     self.valid = false;
   }
+
+  /// combine the tiu gps 16 and 32bit timestamps 
+  /// into a 48bit timestamp
+  pub fn get_gpstimestamp48(&self) -> u64 {
+    ((self.tiu_gps_16 as u64) << 32) | self.tiu_gps_32 as u64 
+  }
+
+  //pub fn get_absolute_time(&self) -> u64 {
+  //  let gps = self.get_gpstimestamp48()
+  //  let mt_ts : u64;
+  //  if self.timestamp < self.tiu_timestamp {
+  //    // it has wrapped
+  //  }
+  //  let ts  = 1e9u64 * gps + self
+  //}
 }
 
 impl Serialization for MasterTriggerEvent {
@@ -603,10 +647,11 @@ impl fmt::Display for MasterTriggerEvent {
     repr += &self.timestamp.to_string(); 
     repr += "\n  tiu_timestamp               ";
     repr += &self.tiu_timestamp.to_string(); 
-    repr += "\n  tiu_gps_32                  ";
-    repr += &self.tiu_gps_32.to_string(); 
-    repr += "\n  tiu_gps_16                  ";
+    repr += "\n  tiu_gps16 (slow)            ";
     repr += &self.tiu_gps_16.to_string(); 
+    repr += "\n  tiu_gps32 (fast)            ";
+    repr += &self.tiu_gps_32.to_string(); 
+    repr += &(format!("\n  |-> tiu_gps48        {}", self.get_gpstimestamp48()));
     repr += "\n  n_paddles                   ";
     repr += &self.n_paddles.to_string(); 
     repr += "\n  crc                         ";

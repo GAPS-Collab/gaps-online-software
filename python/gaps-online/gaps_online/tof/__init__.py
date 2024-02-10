@@ -4,6 +4,7 @@ TOF dataclasses & more
 
 
 from .events import RBEvent
+from .calibrations import RBCalibration
 from .mapping import DsiJChRBMap
 from gaps_tof import TofPacket,\
                      get_tofpackets

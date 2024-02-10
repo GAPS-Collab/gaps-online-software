@@ -28,6 +28,7 @@ if(BUILD_ROOTCOMPONENTS)
 endif(BUILD_ROOTCOMPONENTS)
 
 set(GAPSTOF_LIBRARY_SHARED GapsTof CACHE INTERNAL "GapsTof shared library" FORCE)
+
 add_library(${GAPSTOF_LIBRARY_SHARED} SHARED
     dataclasses/C++/src/tof_packet.cxx
     dataclasses/C++/src/tof_event_header.cxx
@@ -174,9 +175,14 @@ install(FILES ${python_example_scripts}
 install(TARGETS ${GAPSTOF_LIBRARY_SHARED}
     EXPORT GAPSTargets         
     LIBRARY DESTINATION ${INSTALL_LIBRARY_DIR}
-    PUBLIC_HEADER DESTINATION ${INSTALL_INCLUDE_DIR}
+    #PUBLIC_HEADER DESTINATION ${INSTALL_INCLUDE_DIR}
     #INCLUDES DESTINATION "${GAPS_HEADER_OUTPUT_DIRECTORY}/lib/include"
 )
+
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
+    DESTINATION ${CMAKE_INSTALL_PREFIX})
+
+
 
 install(TARGETS ${pybindings}
     EXPORT GAPSTargets         

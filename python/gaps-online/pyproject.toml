@@ -16,6 +16,7 @@ scipy = "^1.11.3"
 tqdm = "^4.66.1"
 fpdf2 = "^2.7.6"
 h5py = "^3.10.0"
+hermes-py = "^0.2.0"
 
 
 [build-system]
