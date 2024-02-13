@@ -232,11 +232,11 @@ impl Error for WaveformError {
 /// sending UDP packets with a header.
 /// This is used by the MTB to send its
 /// packets over UDP
-// TODO Isnt it too overkill to have an enum for this?
-#[derive(Debug, Copy, Clone, serde::Deserialize, serde::Serialize)]
+#[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 #[repr(u8)]
 pub enum IPBusError {
   DecodingFailed,
+  InvalidTransactionID,
 }
 
 impl fmt::Display for IPBusError {
@@ -252,9 +252,6 @@ impl Error for IPBusError {
 
 ////////////////////////////////////////
 
-/// Errors when converting events to PaddlePackets
-/// or more general, when doing any kind of analysis
-///
 #[derive(Debug,Copy,Clone, serde::Deserialize, serde::Serialize)]
 #[repr(u8)]
 pub enum AnalysisError {

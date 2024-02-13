@@ -489,7 +489,7 @@ PYBIND11_MODULE(gaps_tof, m) {
         .def_property_readonly("timestamp48",   &TofHit::get_timestamp48,
                "Complete timestamp (48 bits)")
         .def("__repr__",          [](const TofHit &th) {
-                                  return "<TofHit : " + th.to_string() + "'>";
+                                  return th.to_string();
                                   }) 
 
     ;
