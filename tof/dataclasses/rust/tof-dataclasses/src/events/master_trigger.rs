@@ -58,11 +58,13 @@ use crate::constants::{
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 #[repr(u8)]
 pub enum TriggerType {
-  Unknown   = 0u8,
+  Unknown      = 0u8,
   /// -> 1-10 "pysics" triggers
-  Any       = 1u8,
-  Track     = 2u8,
-  Gaps      = 3u8,
+  Any          = 1u8,
+  Track        = 2u8,
+  TrackCentral = 3u8,
+  Gaps         = 4u8,
+  
   /// > 100 -> Debug triggers
   Poisson   = 100u8,
 }
@@ -82,7 +84,8 @@ impl From<u8> for TriggerType {
       100u8 => TriggerType::Poisson,
       1u8   => TriggerType::Any,
       2u8   => TriggerType::Track,
-      3u8   => TriggerType::Gaps,
+      3u8   => TriggerType::TrackCentral,
+      4u8   => TriggerType::TrackCentral,
       _     => TriggerType::Unknown
     }
   }
@@ -97,6 +100,7 @@ impl FromRandom for TriggerType {
       TriggerType::Poisson,
       TriggerType::Any,
       TriggerType::Track,
+      TriggerType::TrackCentral,
       TriggerType::Gaps,
     ];
     let mut rng  = rand::thread_rng();
