@@ -77,12 +77,10 @@ int main(int argc, char *argv[]){
 	spdlog::info("We loaded {} packets from {}", packet.size(), f_str);
 	// Loop over the packets (should only be 1) and read into storage
 	for (auto const &p : packet) {
-	  int ctr=0;
 	  if (p.packet_type == PacketType::RBCalibration) {
 	    // Should have the one calibration tofpacket stored in "packet".
 	    usize pos = 0;
-	    if (++ctr == 4)  // 4th packet is the one we want
-	      cali[i] = RBCalibration::from_bytestream(p.payload, pos); 
+	    cali[i] = RBCalibration::from_bytestream(p.payload, pos); 
 	  }
 	}
       } //else {printf("File does not exist: %s\n", f_str.c_str());}
@@ -242,7 +240,7 @@ int main(int argc, char *argv[]){
 	    }
 	  }
 	}
-	printf("\n");
+	//printf("\n");
 	// Now that we have all the waveforms in place, we can analyze
 	// the event. Start by looping over all paddles, and process
 	// any paddles with hits

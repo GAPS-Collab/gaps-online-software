@@ -72,6 +72,38 @@ void EventGAPS::UnsetWaveforms(void) {
 ////////////////////////////////////////////////////////////////////////////
 
 
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+// Set up our Waveforms
+void EventGAPS::SetPaddleMap(int paddle_map[NRB][NCH]) {
+
+  // This subroutine stores the SiPM channel for each paddle end (A,B)
+  for (int i=0; i<NRB; i++) {
+    for (int j=0; j<NCH; j++) {
+      // Store the paddle for each RB/CH
+      ChnlMap[i][j] = paddle_map[i][j];
+
+      // Store the SiPM Channel for each Paddle end
+      int paddle = paddle_map[i][j] % 1000;
+      int ch_num = i*NCH+j; // Map the value to NTOT
+      if (paddle_map[i][j] > 2000) { // We have a paddle ID for B
+	Paddle_B[paddle] = ch_num; 
+	//printf("B -> %d %d %d %d %d\n", i,j,ch_num, paddle,paddle_map[i][j]);
+      } else if (paddle_map[i][j] > 1000) { //We have a paddle ID for A
+	Paddle_A[paddle] = ch_num;
+      }
+    }
+  }
+  /*
+  for (int i=0; i<NPAD; i++) 
+    printf("PadID %d  -> RB_A %d %d; RB_B %d %d\n", i,
+	   (int)Paddle_A[i]/NCH, Paddle_A[i]%NCH, 
+	   (int)Paddle_B[i]/NCH, Paddle_B[i]%NCH); 
+  */
+}
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+
 
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
@@ -252,7 +284,7 @@ void EventGAPS::AnalyzePedestals(float Ped_low, float Ped_win) {
       wData[i]->SubtractPedestal();     // Subtract pedestals
       // Now store the values
       Pedestal[i] = wData[i]->GetPedestal(); 
-      PedRMS[i] = wData[i]->GetPedsigma();
+      PedRMS[i]   = wData[i]->GetPedsigma();
 
       //if ( PedRMS[i] > 15 ) printf("Channel %d: %8.1f\n", i, PedRMS[i]);
     }

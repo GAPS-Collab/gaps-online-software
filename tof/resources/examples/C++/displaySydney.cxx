@@ -110,12 +110,10 @@ int main(int argc, char *argv[]){
 	spdlog::info("We loaded {} packets from {}", packet.size(), f_str);
 	// Loop over the packets (should only be 1) and read into storage
 	for (auto const &p : packet) {
-	  int ctr=0;
 	  if (p.packet_type == PacketType::RBCalibration) {
 	    // Should have the one calibration tofpacket stored in "packet".
 	    usize pos = 0;
-	    if (++ctr == 4)  // 4th packet is the one we want
-	      cali[i] = RBCalibration::from_bytestream(p.payload, pos); 
+	    cali[i] = RBCalibration::from_bytestream(p.payload, pos); 
 	  }
 	}
       } //else {printf("File does not exist: %s\n", f_str.c_str());}
@@ -260,13 +258,12 @@ int main(int argc, char *argv[]){
 
 	      usize cw = c+ch_start; 
 	      wave[cw] = new Waveplot(ch_volts.data(),ch_times.data(), cw,0);
-	      wave[cw]->SetThreshold(15.0);
+	      wave[cw]->SetThreshold(5.0);
 	      
 	      // Calculate the pedestal
 	      wave[cw]->SetPedBegin(10);
 	      wave[cw]->SetPedRange(80);
 	      wave[cw]->CalcPedestalRange(); 
-	      double tmp_adc = wave[cw]->GetBin(1020);
 	      wave[cw]->SubtractPedestal(); 
 	    }
 	  }
