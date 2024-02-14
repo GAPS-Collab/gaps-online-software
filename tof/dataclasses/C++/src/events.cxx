@@ -1010,13 +1010,13 @@ TofHit TofHit::from_bytestream(const Vec<u8> &bytestream,
 
  hit.ctr_etx = bytestream[pos]; pos+=1;
 
- hit.timestamp32 = Gaps::parse_u16(bytestream, pos);
+ hit.timestamp32 = Gaps::parse_u32(bytestream, pos);
  hit.timestamp16 = Gaps::parse_u16(bytestream, pos);
 
  // FIXME checks - packetlength, checksum ?
  u16 tail = Gaps::parse_u16(bytestream, pos);
  if (tail != TAIL) {
-   log_error("Tail signature is incorrect!");
+   log_error("TofHit TAIL signature " << tail << " is incorrect!");
  }
  //if (tail != 0xF0F) {
  //  broken = true;
