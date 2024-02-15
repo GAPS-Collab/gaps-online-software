@@ -216,6 +216,9 @@ if __name__ == '__main__':
             pid_dict[k].global_pos_x_l0 = x
             pid_dict[k].global_pos_y_l0 = y
             pid_dict[k].global_pos_z_l0 = z
+            pid_dict[k].length          = l0_coord['length']
+            pid_dict[k].height          = l0_coord['height']
+            pid_dict[k].width           = l0_coord['width']
             if not args.dry_run:
                 print (f'{pid_dict[k]}')
                 pid_dict[k].save()

@@ -217,8 +217,8 @@ class Paddle(models.Model):
                                                  null=True,
                                                  default="")
     height                    = models.FloatField(null=True)
-    width                     = models.PositiveSmallIntegerField(null=True)
-    length                    = models.PositiveSmallIntegerField(null=True)
+    width                     = models.FloatField(null=True)
+    length                    = models.FloatField(null=True)
     unit                      = models.CharField(
                                     null=True,
                                     max_length=2)
