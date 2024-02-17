@@ -224,18 +224,24 @@ int main(int argc, char *argv[]){
 	printf("%ld.", evt_ctr);
 	for (auto const &rbid : ev.get_rbids()) {
 	  RBEvent rb_event = ev.get_rbevent(rbid);
-	  // Now that we know the RBID, we can set the starting ch_no
-	  // Eventually we will use a function to map RB_ch to GAPS_ch
-	  ch_start = (rbid-1)*NCH; // first RB is #1
-	  nrbs++;
-	  //printf("Event %ld: RB %d: start %ld\n", evt_ctr, rbid, ch_start);
 	  if (verbose) {
 	    std::cout << rb_event << std::endl;
           }
+	  // Now that we know the RBID, we can set the starting ch_no
+	  // Eventually we will use a function to map RB_ch to GAPS_ch
+	  ch_start = (rbid-1)*NCH; // first RB is #1
+	  //printf("Event %ld: RB %d: start %ld\n", evt_ctr, rbid, ch_start);
+
 	  Vec<Vec<f32>> volts;
 	  Vec<Vec<f32>> times;
 	  //if ((calname != "") && cali.rb_id == rbid ){
 	  if (calname != "") { // For combined data all boards calibrated
+	  /*if (calname != "" &&  // For combined data all boards calibrated
+	      ( rbid==3  || rbid==14 || rbid==15 || rbid==32 || // Umb-cen
+		rbid==16 || rbid==25 || rbid==44 || rbid==46 || // cube-top
+		rbid==1  || rbid==11 || rbid==41 || rbid==42 ) ) {// cube-bot
+	  */
+	    nrbs++;
 	    // Vec<f32> is a typedef for std::vector<float32>
 	    volts = cali[rbid].voltages(rb_event, false); // second argument is for spike cleaning
 	    // (C++ implementation causes a segfault sometimes when "true"
@@ -482,10 +488,7 @@ void plotall(int n_ch, int nrbs) {
     if (restrict_range)
       wave[ch]->PlotWaveform(0, x_scr_lo, x_scr_hi, y_scr_lo, y_scr_hi);
     else
-      if ( ch%9 == 8)
-        wave[ch]->PlotWaveform(0, x_sc_lo, x_sc_hi, -400, +400);
-      else
-        wave[ch]->PlotWaveform(0, x_sc_lo, x_sc_hi, y_sc_lo, y_sc_hi);
+      wave[ch]->PlotWaveform(0, x_sc_lo, x_sc_hi, y_sc_lo, y_sc_hi);
   }
   
   if (plot_flag == ALLCH) {
