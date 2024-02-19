@@ -22,6 +22,7 @@ pub use rb_event::{
     RBEventHeader,
     RBEvent,
     RBMissingHit,
+    RBWaveform,
     EventStatus
 };
 
