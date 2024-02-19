@@ -1048,11 +1048,47 @@ std::string TofHit::to_string() const {
   return repr;
 }
 
+RBWaveform RBWaveform::from_bytestream(const Vec<u8> &stream,
+                                       u64 &pos) {
+  RBWaveform wf = RBWaveform();
+  u16 head = Gaps::parse_u16(stream, pos);
+  if (head != RBWaveform::HEAD)  {
+    //log_error("[RBEvent::from_bytestream] Header signature invalid!");  
+    return wf;
+  }
+  wf.event_id   = Gaps::parse_u16(stream, pos);
+  wf.rb_id      = Gaps::parse_u8(stream, pos);
+  wf.rb_channel = Gaps::parse_u8(stream, pos); 
+  Vec<u8>::const_iterator start = stream.begin() + pos;
+  Vec<u8>::const_iterator end   = stream.begin() + pos + 2*NWORDS;    // 2*NWORDS because stream is Vec::<u8> and it is 16 bit words.
+  Vec<u8> data(start, end);
+  wf.adc = u8_to_u16(data);
+  pos += 2*NWORDS;
+  u16 tail   = Gaps::parse_u16(stream, pos);
+  if (tail != RBWaveform::TAIL) {
+    log_error("After parsing, we found an invalid tail signature " << tail);
+  }
+  return wf;
+} 
+
+std::string RBWaveform::to_string() const {
+  std::string repr = "<RBWaveform";
+  //repr += std::format("\n  format test {:.2f}", get_time_a() );
+  repr += std::format("\n  Event ID : {}", event_id);
+  repr += std::format("\n  RB       : {}", rb_id);
+  repr += std::format("\n  Channel  : {}", rb_channel);
+  if (adc.size() >= 273) {
+    repr += std::format("\n  adc[{}]    : .. {} {} {} ..", adc.size(), adc[270], adc[271], adc[272]);
+  } else {
+    repr += std::format("\n  adc [{}/corrupt?]", adc.size());
+  }
+  return repr;
+}
+
 std::ostream& operator<<(std::ostream& os, const TofHit& th) {
   os << th.to_string();
   return os;
 }
-
 
 std::ostream& operator<<(std::ostream& os, const MasterTriggerEvent& mt) {
   os << mt.to_string();
@@ -1071,6 +1107,11 @@ std::ostream& operator<<(std::ostream& os, const RBEvent& re) {
 
 std::ostream& operator<<(std::ostream& os, const RBEventHeader& rh) {
   os << rh.to_string();
+  return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const RBWaveform& wf) {
+  os << wf.to_string();
   return os;
 }
 

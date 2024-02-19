@@ -320,6 +320,8 @@ struct MasterTriggerEvent {
   // these fields won't get serialized
   bool broken       ;
   bool valid        ;
+  
+  LtbRBMap channel_map;
 
   MasterTriggerEvent();
   
@@ -521,6 +523,34 @@ struct TofHit  {
     // don't serialize
 };
 
+/************************
+ * A part of a TofEvent 
+ * - a single waveform 
+ *
+ * That is a waveform for 
+ * a specific channel for a 
+ * specific id.
+ *
+ * Each paddle has 2 waveforms
+ *
+ *
+ */ 
+struct RBWaveform {
+  static const u16 HEAD = 0xAAAA;
+  static const u16 TAIL = 0x5555;
+
+  u32       event_id  ; 
+  u8        rb_id     ; 
+  u8        rb_channel; 
+  Vec<u16>  adc       ; 
+  
+  static RBWaveform from_bytestream(const Vec<u8> &bytestream, 
+                                    u64 &pos);
+  
+  std::string to_string() const;
+};
+
+
 std::ostream& operator<<(std::ostream& os, const TofHit& pad);
 
 std::ostream& operator<<(std::ostream& os, const MasterTriggerEvent& mt);
@@ -530,5 +560,7 @@ std::ostream& operator<<(std::ostream& os, const TofEvent& et);
 std::ostream& operator<<(std::ostream& os, const RBEvent& re);
 
 std::ostream& operator<<(std::ostream& os, const RBEventHeader& rh);
+
+std::ostream& operator<<(std::ostream& os, const RBWaveform& rh);
 
 #endif 

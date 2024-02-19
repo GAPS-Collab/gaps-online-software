@@ -210,6 +210,20 @@ PYBIND11_MODULE(gaps_tof, m) {
 
     ;
 
+    py::class_<RBWaveform>(m, "RBWaveform", "RBWaveform is a single waveform for a single RB channel and needs to be assembled back to RBEvents/TofEvents")
+      .def(py::init())
+      .def_readonly("rb_id"              ,&RBWaveform::rb_id,
+           "RB id (between 1-50). Internal TOF identifier for RB")
+      .def_readonly("rb_channel"         ,&RBWaveform::rb_channel,
+           "Channel id (between 0-9). Internal TOF identifier for RB channel. Each paddle has 2 channels")
+      .def_readonly("event_id"           ,&RBWaveform::event_id,
+           "Global event id")
+      .def_readonly("adc"                ,&RBWaveform::adc,
+           "Channel adc")
+      .def("__repr__",        [](const RBWaveform &wf) {
+                                 return wf.to_string(); 
+                                 }) 
+    ;
 
 
     py::class_<MasterTriggerEvent>(m, "MasterTriggerEvent", "The MasterTriggerEvent contains the information from the MTB.")
