@@ -24,7 +24,6 @@
 #include "./include/constants.h"
 #include "./include/EventGAPS.h"
 
-
 int main(int argc, char *argv[]){
   spdlog::cfg::load_env_levels();
     
@@ -174,10 +173,44 @@ int main(int argc, char *argv[]){
   }
   fclose(fp); // Finished with file
   
+  // Another kludgy read is getting the Paddle to volume location from
+  // the paddleid_vs_volid.json adn level0_coordinates.json
+  // files. Achim has a way to do this via rust, but I need the map
+  // for development purposes here.
+  float paddle_location[NPAD][3] = { 0 }; // X, Y, Z coords in detector
+  int   paddle_vid[NPAD] = { 0 }; // VID with same counter
+  // First, read the paddle to volume ID map
+  int tmp_pad, tmp_vol, vol_id[NPAD] = { 0 }; 
+  int tmp_vid;
+  float tmp_x, tmp_y, tmp_z;
+  fp = fopen("/home/gaps/software/gaps-online-software/src/gaps-db/resources/master-spreadsheet/paddleid_vs_volid.json", "r");
+  if ( fscanf(fp, "%s", label) != EOF ) { // Read in first "{"
+    while (fscanf(fp,"%*[^-0-9]%d  %*[^-0-9] %d", &tmp_pad, &tmp_vol) != EOF) { 
+      vol_id[tmp_pad] = tmp_vol;
+      //printf("%d %d\n", tmp_pad, vol_id[tmp_pad]);
+    }
+  }
+  fclose(fp); // Finished with file
+  // Now that we have the vol_id for each paddle, map read in the
+  // vol_id to location map.
+  fp = fopen("/home/gaps/software/gaps-online-software/src/gaps-db/resources/master-spreadsheet/level0_coordinates.json", "r");
+  int ctr=0;
+  if ( fscanf(fp, "%s", label) != EOF ) { // Read in first "{"
+    while (fscanf(fp,"%*[^-0-9]%d  %*[^-0-9]%f %*[^-0-9]%f  %*[^-0-9]%f ",
+		  &tmp_vid, &tmp_x, &tmp_y, &tmp_z) != EOF) { 
+      //printf("%d %.2f %.2f %.2f\n", tmp_vid, tmp_x, tmp_y, tmp_z);
+      paddle_vid[ctr]         = tmp_vid;
+      paddle_location[ctr][1] = tmp_x;
+      paddle_location[ctr][2] = tmp_y;
+      paddle_location[ctr++][3] = tmp_z;
+    }
+  }  
+  fclose(fp); // Finished with file
+  
   // Instantiate our class that holds analysis results and set some
   // initial values
   auto Event = EventGAPS();
-  Event.SetPaddleMap(paddle_map);
+  Event.SetPaddleMap(paddle_map, vol_id, paddle_vid, paddle_location);
   Event.SetThreshold(CThresh);
   Event.SetCFDFraction(CFDS_frac);
   Event.InitializeHistograms();
@@ -278,16 +311,25 @@ int main(int argc, char *argv[]){
 	}
 	//printf("\n");
 
-	// Now that we have all the waveforms in place, we can analyze
-	// the event.
+	// Now that we have the waveforms in place, analyze the event.
+	Event.InitializeVariables();
 	Event.InitializeWaveforms(wave, wch9);
+
 	// Calculate and store pedestals/RMSs for each channel
 	Event.AnalyzePedestals(Ped_low, Ped_win);
+
 	// Analyze the pulses in each channel
 	Event.SetThreshold(CThresh);
 	Event.SetCFDFraction(CFDS_frac);
 	Event.AnalyzePulses(Qwin_low, Qwin_size);
+	for (int i=0;i<NTOT;i++) {
+	  float tdc = Event.GetTDC(i);
+	  if (tdc > 5) printf("%ld: %d -> %.2f\n", evt_ctr, i, tdc);
+	}
 	
+	// Analyze each paddle: position on paddle, hitmask, etc
+	Event.AnalyzePaddles(10.0, 5.0); //Args: Peak and Charge cuts
+
 	// Now calculate beta, charge, and inner/outer tof x,y,z, etc.
 	Event.AnalyzeEvent();
 	
@@ -296,13 +338,6 @@ int main(int argc, char *argv[]){
 	Event.FillPaddleHistos();
 
 	Event.UnsetWaveforms();
-	// Run 54 bombs around event 2192924 so this provides a way to
-	// write the file and exit before that.
-	
-	/*if(evt_ctr == 2192924) {
-	Event.WriteHistograms();
-	return (0);
-	} */
 	
 	n_tofevents++;
         break;

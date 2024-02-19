@@ -21,9 +21,7 @@ using namespace std;
 EventGAPS::EventGAPS(void) {
 
   // Initialize any values necessary for a new event
-  
-  // Initialize some variables
-  InitializeVariables(ch);
+  InitializeVariables();
 
 }
 ////////////////////////////////////////////////////////////////////////////
@@ -39,6 +37,43 @@ EventGAPS::~EventGAPS(void) {
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
 
+
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+void EventGAPS::InitializeVariables(void) {
+  
+  // Reset everything that is stored by SiPM channel number
+  for (int i=0; i<NTOT; i++) {
+    Pedestal[i] = -999.0;
+    PedRMS[i]   = -999.0;
+    VPeak[i]    = -999.0;
+    QInt[i]     = -999.0;
+    TDC[i]      = -999.0;
+  }
+
+  // Reset everything that is stored by RB number
+  for (int i=0; i<NRB; i++) {
+    ClockPedestal[i] = -999.0;
+    ClockPedRMS[i]   = -999.0;
+  }
+
+  // Reset everything that is stored by Paddle number (1-160)
+  for (int i=0; i<NPAD; i++) {
+    Hits[i]   = -999;
+    HitX[i]   = -999;
+    HitY[i]   = -999;
+    HitZ[i]   = -999;
+  }
+
+  // Reset everything that is stored by event
+  NPadCube  = 0;
+  NPadUpper = 0;
+  NPadLower = 0;
+  NPadOuter = 0;
+       
+}
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
@@ -74,8 +109,9 @@ void EventGAPS::UnsetWaveforms(void) {
 
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
-// Set up our Waveforms
-void EventGAPS::SetPaddleMap(int paddle_map[NRB][NCH]) {
+// Set up our SiPM channel to Paddle map to Location in detector
+void EventGAPS::SetPaddleMap(int paddle_map[NRB][NCH], int pad2volid[NPAD],
+			     int padvid[NPAD], float padLocation[NPAD][3]) {
 
   // This subroutine stores the SiPM channel for each paddle end (A,B)
   for (int i=0; i<NRB; i++) {
@@ -100,20 +136,29 @@ void EventGAPS::SetPaddleMap(int paddle_map[NRB][NCH]) {
 	   (int)Paddle_A[i]/NCH, Paddle_A[i]%NCH, 
 	   (int)Paddle_B[i]/NCH, Paddle_B[i]%NCH); 
   */
+
+  // For each paddle, we want to set the X, Y, Z locations. So, index
+  // through the pad2volid[] array, find matching volid in
+  // padLocation[][] array, and set x,y,z from appropriate values
+  for (int i=0; i<NPAD; i++) { 
+    int tmp_id = pad2volid[i];
+    if (tmp_id > 0) { // Valid Volume ID
+      for (int j=0; j<NPAD; j++) {
+	if (tmp_id == padvid[j]) { // Found a match
+	  PadVID[i] = tmp_id;
+	  PadX[i]   = padLocation[j][1];
+	  PadY[i]   = padLocation[j][2];
+	  PadZ[i]   = padLocation[j][3];
+	  //printf("  Pad %d: %d  %.2f %.2f %.2f\n", i, PadVID[i],
+	  //	 PadX[i], PadY[i], PadZ[i]);
+	}
+      }
+    }
+  }
 }
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
 
-
-////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////
-void EventGAPS::InitializeVariables(int no_acq) {
-  
-  // stuff related to the peaks
-
-}
-////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
@@ -196,6 +241,10 @@ void EventGAPS::InitializeHistograms(void) {
   }
 
   //rao  number of paddles hit upper, lower and outer
+  NPaddlesCube = new TH1D("NPaddles Hit Cube", "", 12, -1.5, 10.5);
+  NPaddlesCube->GetXaxis()->SetTitle("NPaddes Hit Cube");
+  NPaddlesCube->GetYaxis()->SetTitle("Counts");
+  
   NPaddlesUpper = new TH1D("NPaddles Hit Upper", "", 12, -1.5, 10.5);
   NPaddlesUpper->GetXaxis()->SetTitle("NPaddes Hit Upper");
   NPaddlesUpper->GetYaxis()->SetTitle("Counts");
@@ -313,19 +362,77 @@ void EventGAPS::AnalyzePulses(float Pulse_low, float Pulse_win) {
 
   for (int i=0; i<NTOT; i++) {
     if (wData[i] != NULL) { 
+      // Verify that quantities are set correctly
       wData[i]->SetThreshold(Threshold);
       wData[i]->SetCFDSFraction(CFDFraction);
+      // Find the pulse height
       VPeak[i] = wData[i]->GetPeakValue(Pulse_low, Pulse_win);
+      // Find the charge
       QInt[i]  = wData[i]->Integrate(Pulse_low, Pulse_win);
+      // If we have a pulse above threshold, find the TDC value
       wData[i]->FindPeaks(Pulse_low, Pulse_win);
       //if ( (wData[i]->GetNumPeaks() > 0) && (Qint[i] > 5.0) ) {
       if ( (wData[i]->GetNumPeaks() > 0) ) {
 	wData[i]->FindTdc(0, GAPS::CFD_SIMPLE);     // Simple CFD
 	TDC[i] = wData[i]->GetTdcs(0);
-	printf("ch %3d: %.2f -- %.2f, %.2f\n", i, TDC[i], VPeak[i], QInt[i]);
       }
     }
   }
+}
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+void EventGAPS::AnalyzePaddles(float pk_cut = -999, float ch_cut = -999.0) {
+  // Assuming previous calls to AnalyzePedestals and AnalyzePulses,
+  // you have access to Pedestals, charges, Peaks, TDCs etc so
+  // calculate quantities related to paddles.
+
+  float Vpeak_cut  = 10.0;
+  float Charge_cut =  5.0;
+  int ahit, bhit;
+  float sspeed = 15.4; // in cm/s
+  
+  int cube=0, upper=0, outer=0, lower=0;
+
+  // If passed non-negative values, use the arguments instead of defaults
+  if (pk_cut > 0) Vpeak_cut  = pk_cut;
+  if (ch_cut > 0) Charge_cut = ch_cut;
+    
+  for (int i=0; i<NPAD; i++) {
+    int chA = Paddle_A[i]; // SiPM channel of A end
+    int chB = Paddle_B[i]; // SiPM channel of B end
+    ahit = (VPeak[chA] > Vpeak_cut) ? 1 : 0 ;   
+    bhit = (VPeak[chB] > Vpeak_cut) ? 2 : 0 ;   
+    Hits[i] = ahit + bhit;
+
+    if (Hits[i] > 2) { // We have hits on both ends of paddle
+      float tdc_diff = TDC[chA] - TDC[chB];
+      float delta_pos = tdc_diff*sspeed/2.0;
+      // Now, use the position of the paddle to find the hit location
+      int orient = 0; // 0->x, 1->y, 2->z
+      HitX[i] = PadX[i];
+      HitY[i] = PadY[i];
+      HitZ[i] = PadZ[i];
+      if (orient ==0) HitX[i] += delta_pos;
+      if (orient ==1) HitY[i] += delta_pos;
+      if (orient ==2) HitZ[i] += delta_pos;
+    }
+    
+    if (Hits[i]>0) {
+      // First determine if paddle is in the cube
+      if (i>10 && i<26) cube++;
+      if (i<40) upper++;
+      else if (i>120) lower++;
+      else outer++;
+    }
+  }
+
+  NPadCube    = cube;
+  NPadUpper   = upper;
+  NPadLower   = lower;
+  NPadOuter   = outer;
 }
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
@@ -391,28 +498,17 @@ void EventGAPS::FillChannelHistos(void) {
 ////////////////////////////////////////////////////////////////////////////
 void EventGAPS::FillPaddleHistos(void) {
   
-  float Vpeak_cut = 10.0;
-  int ahit, bhit, hmask;
-
-  int upper=0, outer=0, lower=0;
-  
   for (int i=0; i<NPAD; i++) {
-    QEnd2End[i]->Fill(QInt[i*2], QInt[i*2+1]);
-
-    ahit = (VPeak[i*2] > Vpeak_cut) ? 1 : 0 ;   
-    bhit = (VPeak[i*2+1] > Vpeak_cut) ? 2 : 0 ;   
-    hmask = ahit + bhit;
-    HitMask[i]->Fill(hmask);
-
-    if (hmask>0) {
-      if (i<40) upper++;
-      else if (i>120) lower++;
-      else outer++;
+    if (Paddle_A[i] < 1) { // Non existent paddle
+      QEnd2End[i]->Fill(QInt[Paddle_A[i]], QInt[Paddle_B[i]]);
+      HitMask[i]->Fill(Hits[i]);
     }
   }
-  NPaddlesUpper->Fill(upper);
-  NPaddlesLower->Fill(lower);
-  NPaddlesOuter->Fill(outer);
+
+  NPaddlesCube->Fill(NPadCube);
+  NPaddlesUpper->Fill(NPadUpper);
+  NPaddlesLower->Fill(NPadLower);
+  NPaddlesOuter->Fill(NPadOuter);
 }
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////

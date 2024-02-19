@@ -328,7 +328,9 @@ void Waveplot::PlotWaveform(int npoints, float x_lo, float x_hi,
   TH1F *h1, *trace;
   h1 = (TH1F*)gROOT->FindObject("trace"); if (h1) h1->Delete(); h1=0;
 
-  trace = new TH1F("trace", "", npoints-1, WaveTime); 
+  char text[10];
+  snprintf(text, 9, "Ch %3d", ch);
+  trace = new TH1F("trace", text, npoints-1, WaveTime); 
   for(int i=0;i<npoints-1;i++) {
     trace->Fill(WaveTime[i], WaveData[i]);
   }
@@ -338,8 +340,13 @@ void Waveplot::PlotWaveform(int npoints, float x_lo, float x_hi,
   trace->SetAxisRange(y_sc_lo, y_sc_hi, "Y");
   trace->SetLineColor(1);
   trace->SetStats(kFALSE);
+  //trace->SetLabelSize(0.08,"txy");
+  trace->SetTitleSize(0.15,"txy");
+  trace->SetTitleOffset(0.3,"txy");
+  trace->GetYaxis()->SetTitle(text);
   trace->DrawCopy("HIST");
-
+  
+  
   float px[2],py[2];
   px[0]=0;
   px[1]=2048;
