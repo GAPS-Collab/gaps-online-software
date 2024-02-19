@@ -51,16 +51,20 @@ Vec<u32> get_event_ids_from_raw_stream(const Vec<u8> &bytestream, u64 &start_pos
  *
  * @param bytestream : Binary TofPacket data.
  * @param start_pos  : Byte position to start searching from in bytestream
+ * @param filter     : Only get TofPackets of this type. If set to 
+ *                     PacketType::Unknown, get all packets
  */
-Vec<TofPacket> get_tofpackets(const Vec<u8> &bytestream, u64 start_pos);
+Vec<TofPacket> get_tofpackets(const Vec<u8> &bytestream, u64 start_pos, PacketType filter=PacketType::Unknown);
 
 /**
  * Extract TofPackets from a file on disk
  *
  * @param bytestream : Binary TofPacket data.
  * @param start_pos  : Byte position to start searching from in bytestream
+ * @param filter     : Only get TofPackets of this type. If set to 
+ *                     PacketType::Unknown, get all packets
  */
-Vec<TofPacket> get_tofpackets(const String filename);
+Vec<TofPacket> get_tofpackets(const String filename, PacketType filter = PacketType::Unknown);
 
 /**
  * Directly gets TofEvents from a stream with tofpackets, assuming all

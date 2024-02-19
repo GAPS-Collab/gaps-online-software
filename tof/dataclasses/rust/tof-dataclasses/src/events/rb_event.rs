@@ -13,6 +13,11 @@
 //!
 //! - RBMissingHit   - a placeholder for debugging. If the MTB claims there is a hit,
 //!                    but we do not see it, RBMissingHit accounts for the fact
+//!
+//! - RBWaveform     - a single waveform from a single RB. This can be used to 
+//!                    deconstruct TofEvents so that the flight computer does not
+//!                    struggle with the large packet size.
+//!
 //! 
 //! * features: "random" - provides "::from_random" for all structs allowing to 
 //!   populate them with random data for tests.
@@ -309,6 +314,22 @@ impl RBEvent {
     }
   }
 
+  /// Deconstruct the RBEvent to form RBWaveforms
+  pub fn disassemble(&self) -> Vec<RBWaveform> {
+    let mut waveforms = Vec::<RBWaveform>::new();
+    for ch in self.header.get_channels() {
+      let mut wf     = RBWaveform::new();
+      wf.rb_id       = self.header.rb_id;
+      wf.rb_channel  = ch;
+      wf.event_id    = self.header.event_id;
+      // FIXME - can we move this somehow instead of 
+      // cloning?
+      wf.adc         = self.adc[ch as usize].clone();
+      waveforms.push(wf);
+    }
+    waveforms
+  }
+
   /// Get the datatype from a bytestream when we know
   /// that it is an RBEvent
   ///
@@ -544,11 +565,13 @@ impl Serialization for RBEvent {
       error!("Event {} has lost trigger! Disregarding channel data..", event.header.event_id);
       return Ok(event);
     }
+    let mut decoded_ch = Vec::<u8>::new();
     for ch in event.header.get_channels().iter() {
       if *pos + 2*NWORDS >= stream_len {
-        error!("The channel data for ch {} seems corrupt!", ch);
+        error!("The channel data for event {} ch {} seems corrupt! We want to get channels {:?}, but have decoded only {:?}, because the stream ends {} bytes too early!",event.header.event_id, ch, event.header.get_channels(), decoded_ch, *pos + 2*NWORDS - stream_len);
         return Err(SerializationError::WrongByteSize {})
       }
+      decoded_ch.push(*ch);
       // 2*NWORDS because stream is Vec::<u8> and it is 16 bit words.
       let data = &stream[*pos..*pos+2*NWORDS];
       //event.adc[k as usize] = u8_to_u16(data);
@@ -736,8 +759,7 @@ impl From<&TofPacket> for RBEvent {
             return event;
           }
           Err(err) => { 
-            error!("Can not decode RBEvent! Error {err}!");
-            error!("Returning empty event!");
+            error!("Can not decode RBEvent - will return empty event! {err}");
             return RBEvent::new();
           }
         }
@@ -1142,13 +1164,110 @@ impl FromRandom for RBEventHeader {
   }
 }
 
+#[derive(Debug, Clone, PartialEq)]
+pub struct RBWaveform {
+  pub event_id   : u32,
+  pub rb_id      : u8,
+  pub rb_channel : u8,
+  pub adc        : Vec<u16>,
+}
+
+impl RBWaveform {
+  
+  pub fn new() -> Self {
+    Self {
+      event_id   : 0,
+      rb_id      : 0,
+      rb_channel : 0,
+      adc        : Vec::<u16>::new(),
+    }
+  }
+}
+
+impl Serialization for RBWaveform {
+  const HEAD               : u16    = 43690; //0xAAAA
+  const TAIL               : u16    = 21845; //0x5555
+  
+  fn from_bytestream(stream : &Vec<u8>, pos : &mut usize)
+    -> Result<Self, SerializationError> {
+    let mut wf           = RBWaveform::new();
+    if parse_u16(stream, pos) != Self::HEAD {
+      error!("The given position {} does not point to a valid header signature of {}", pos, Self::HEAD);
+      return Err(SerializationError::HeadInvalid {});
+    }
+    wf.event_id          = parse_u32(stream, pos);
+    wf.rb_id             = parse_u8 (stream, pos);
+    wf.rb_channel        = parse_u8 (stream, pos);
+    let data             = &stream[*pos..*pos+2*NWORDS];
+    wf.adc               = u8_to_u16(data);
+    *pos += 2*NWORDS;
+    if parse_u16(stream, pos) != Self::TAIL {
+      error!("The given position {} does not point to a tail signature of {}", pos, Self::TAIL);
+      return Err(SerializationError::TailInvalid);
+    }
+    Ok(wf)
+  }
+
+  fn to_bytestream(&self) -> Vec<u8> {
+    let mut stream = Vec::<u8>::new();
+    stream.extend_from_slice(&Self::HEAD.to_le_bytes());
+    stream.extend_from_slice(&self.event_id.to_le_bytes());
+    stream.extend_from_slice(&self.rb_id.to_le_bytes());
+    stream.extend_from_slice(&self.rb_channel.to_le_bytes());
+    //stream.extend_from_slice(&self.ltb_dsi.to_le_bytes());
+    //stream.extend_from_slice(&self.ltb_j.to_le_bytes());
+    //stream.extend_from_slice(&self.ltb_ch.to_le_bytes());
+    //stream.extend_from_slice(&self.rb_id.to_le_bytes());
+    //stream.extend_from_slice(&self.rb_ch.to_le_bytes());
+    if self.adc.len() != 0 {
+      for k in 0..NWORDS {
+        stream.extend_from_slice(&self.adc[k].to_le_bytes());  
+      }
+    }
+    stream.extend_from_slice(&Self::TAIL.to_le_bytes());
+    stream
+  }
+}
+
+impl fmt::Display for RBWaveform {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut repr = String::from("<RBWaveform:");
+    repr += &(format!("\n  Event ID : {}", self.event_id));
+    repr += &(format!("\n  RB       : {}", self.rb_id));
+    repr += &(format!("\n  Channel  : {}", self.rb_channel));
+    if self.adc.len() >= 273 {
+      repr += &(format!("\n  adc [{}]      : .. {} {} {} ..",self.adc.len(), self.adc[270], self.adc[271], self.adc[272]));
+    } else {
+      repr += &(String::from("\n  adc [EMPTY]"));
+    }
+    write!(f, "{}", repr)
+  }
+}
+
+#[cfg(feature = "random")]
+impl FromRandom for RBWaveform {
+    
+  fn from_random() -> Self {
+    let mut wf    = Self::new();
+    let mut rng   = rand::thread_rng();
+    wf.event_id   = rng.gen::<u32>();
+    wf.rb_id      = rng.gen::<u8>();
+    wf.rb_channel = rng.gen::<u8>();
+    let random_numbers: Vec<u16> = (0..NWORDS).map(|_| rng.gen()).collect();
+    wf.adc        = random_numbers;
+    wf
+  }
+}
 #[cfg(all(test,feature = "random"))]
 mod test_rbevents {
   use crate::serialization::Serialization;
   use crate::FromRandom;
-  use crate::events::{RBEvent,
-                      RBMissingHit,
-                      RBEventHeader};
+  use crate::events::{
+      RBEvent,
+      RBMissingHit,
+      RBEventHeader,
+      RBWaveform
+  };
   #[test]
   fn serialization_rbeventheader() {
     let mut pos = 0usize;
@@ -1214,6 +1333,16 @@ mod test_rbevents {
     }
   }
   
+  #[test]
+  fn serialization_rbwaveform() {
+    for _ in 0..100 {
+      let wf     = RBWaveform::from_random();
+      let stream = wf.to_bytestream();
+      let test   = RBWaveform::from_bytestream(&stream, &mut 0).unwrap();
+      assert_eq!(wf, test);
+    }
+  }
+
   #[test]
   fn serialization_rbmissinghit() {
     let mut pos = 0usize;

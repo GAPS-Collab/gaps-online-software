@@ -10,15 +10,135 @@ cfg_if::cfg_if! {
   if #[cfg(feature = "database")]  {
     use std::path::Path;
     use std::str::FromStr;
+    use std::collections::HashMap;
+    use crate::DsiLtbRBMapping;
     extern crate sqlite;
   }
 }
 
 use regex::Regex;
 use glob::glob;
-use chrono::{NaiveDateTime, Utc};
+use chrono::NaiveDateTime;
 
 use crate::calibrations::RBCalibrations;
+    
+/// Summary of DSI/J/LTBCH (0-319)
+#[cfg(feature = "database")]
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub struct MTBChannel {
+  pub mtb_channel : u16, 
+  pub dsi         : u8 , 
+  pub j           : u8 , 
+  pub ltb_id      : u8 , 
+  pub ltb_channel : u8 , 
+  pub hg_channel  : u16, 
+  pub lg_channel  : u16, 
+  pub rb_id       : u8 , 
+  pub rb_channel  : u8 , 
+  pub p_end_id    : u16, 
+}
+
+#[cfg(feature = "database")]
+impl MTBChannel {
+  pub fn new() -> Self {
+    Self {
+      mtb_channel : 0, 
+      dsi         : 0, 
+      j           : 0, 
+      ltb_id      : 0, 
+      ltb_channel : 0, 
+      hg_channel  : 0, 
+      lg_channel  : 0, 
+      rb_id       : 0, 
+      rb_channel  : 0, 
+      p_end_id    : 0, 
+    }
+  }
+}
+
+#[cfg(feature = "database")]
+impl Default for MTBChannel {
+  fn default() -> Self {
+      Self::new()
+  }
+}
+
+#[cfg(feature = "database")]
+impl fmt::Display for MTBChannel {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut repr = String::from("<MTBChannel:");
+    repr += &(format!("\n  DSI/J/LTB  : {}/{}/{}", self.dsi, self.j, self.ltb_id)); 
+    repr += &String::from("\n  LTB CH => RB ID/RB CH");
+    repr += &(format!("\n   |-> {} => {}/{}", self.ltb_channel, self.rb_id, self.rb_channel));
+    repr += &String::from("\n  LG CH => HG CH");
+    repr += &(format!("\n   |-> {} => {}", self.lg_channel , self.hg_channel));
+    repr += &(format!("\n  Paddle End : {}", self.p_end_id));
+    write!(f,"{}", repr)
+  }
+}
+
+#[cfg(feature = "database")]
+pub fn get_all_mtbchannels(filename : &Path) -> Vec <MTBChannel> {
+  let mut mtb_channels = Vec::<MTBChannel>::new();
+  let connection = sqlite::open(filename).unwrap();
+  let query = "SELECT * FROM tof_db_mtbchannel";
+  match connection.iterate(query, |pairs| {
+    let mut mtbch = MTBChannel::new();
+    for &(name, value) in pairs.iter() {
+      match value {
+        None    => {continue;},
+        Some(v) => {
+          //println!("{} = {}", name, v);
+          match name {
+            "mtb_channel"  => {mtbch.mtb_channel = u16::from_str(v).unwrap_or(0);},
+            "dsi"          => {mtbch.dsi         = u8::from_str(v).unwrap_or(0);},
+            "j"            => {mtbch.j           = u8::from_str(v).unwrap_or(0);},
+            "ltb_id"       => {mtbch.ltb_id      = u8::from_str(v).unwrap_or(0);},
+            "ltb_channel"  => {mtbch.ltb_channel = u8::from_str(v).unwrap_or(0);},
+            "hg_channel"   => {mtbch.hg_channel  = u16::from_str(v).unwrap_or(0);},
+            "lg_channel"   => {mtbch.lg_channel  = u16::from_str(v).unwrap_or(0);},
+            "rb_id"        => {mtbch.rb_id       = u8::from_str(v).unwrap_or(0);},
+            "rb_channel"   => {mtbch.rb_channel  = u8::from_str(v).unwrap_or(0);},
+            "p_end_id"     => {mtbch.p_end_id    = u16::from_str(v).unwrap_or(0);},
+            _ => {warn!("Found name {}, but not mapping it to self!", name);}                         
+          }
+        }
+      }
+    } // end loop over rbs
+    mtb_channels.push(mtbch);
+    true
+  }) {
+    Err(err) => {
+      error!("Unable to query DB! {err}");
+    },
+    Ok(_) => {
+      debug!("DB query successful!");
+    }
+  }
+  info!("We found {} MTBChannels in the database", mtb_channels.len()); 
+  mtb_channels
+}
+
+#[cfg(feature = "database")]
+pub fn get_hg_lg_map(filename : &Path) -> HashMap<u16, MTBChannel> {
+  let channels = get_all_mtbchannels(filename);
+  let mut mapping = HashMap::<u16, MTBChannel>::new();
+  for ch in channels {
+    mapping.insert(ch.hg_channel, ch);
+  }
+  mapping
+}
+
+#[cfg(feature = "database")]
+pub fn get_lg_hg_map(filename : &Path) -> HashMap<u16, MTBChannel> {
+  let channels = get_all_mtbchannels(filename);
+  let mut mapping = HashMap::<u16, MTBChannel>::new();
+  for ch in channels {
+    mapping.insert(ch.lg_channel, ch);
+  }
+  mapping
+}
+
 
 #[derive(Copy, Clone, Debug)]
 pub struct LocalTriggerBoard {
@@ -106,7 +226,7 @@ pub fn get_rbs_from_sqlite(filename : &Path) -> Vec<ReadoutBoard> {
       match value {
         None    => {continue;},
         Some(v) => {
-          println!("{} = {}", name, v);
+          //println!("{} = {}", name, v);
           match name {
             "rb_id"      => {rb.rb_id  = u8::from_str(v).unwrap_or(0);},
             "ch1_paddle_id" => {rb.set_paddle_end_id_for_rb_channel(1, u16::from_str(v).unwrap_or(0));},
@@ -302,7 +422,72 @@ pub fn get_ltbs_from_sqlite(filename : &Path) -> Vec<LocalTriggerBoard> {
   ltbs
 }
 
+///////////////////////////////////////////////////////////
+#[cfg(feature = "database")]
+pub fn get_dsi_from_sqlite(filename : &Path) -> Vec<DSICard> {
+  let connection    = sqlite::open(filename).expect("Unable to open DB file!");
+  let query         = "SELECT * FROM tof_db_dsicard";
+  let mut dsi_cards = Vec::<DSICard>::new();
+  match connection.iterate(query, |pairs| {
+    let mut dsi  = DSICard::new();
+    for &(name, value) in pairs.iter() {
+      match value {
+        None    => {continue;},
+        Some(v) => {
+          //println!("{} = {}", name, v);
+          match name {
+            "dsi_id"         => {dsi.dsi_id    = u8::from_str(v).unwrap_or(0);},
+            "j1_rat_id"      => {dsi.j1_rat_id = u8::from_str(v).unwrap_or(0);},
+            "j2_rat_id"      => {dsi.j2_rat_id = u8::from_str(v).unwrap_or(0);},
+            "j3_rat_id"      => {dsi.j3_rat_id = u8::from_str(v).unwrap_or(0);},
+            "j4_rat_id"      => {dsi.j4_rat_id = u8::from_str(v).unwrap_or(0);},
+            "j5_rat_id"      => {dsi.j5_rat_id = u8::from_str(v).unwrap_or(0);},
+            _                => () 
+          }
+        }
+      }
+      dsi_cards.push(dsi);
+    }
+    true
+  }) {
+    Err(err) => {
+      error!("Unable to query DB for DSILtbRBMap! {err}");
+    },
+    Ok(_) => {
+      debug!("DB query successful!");
+    }
+  }
+  dsi_cards
+}
 
+/// Dsi -> J -> (RBID,RBCH)
+#[cfg(feature = "database")]
+pub fn get_dsi_j_ltbch_vs_rbch_map(filename : &Path) -> DsiLtbRBMapping {
+  let mut map = DsiLtbRBMapping::new();
+  let ltbs    = get_ltbs_from_sqlite(filename);
+  for dsi in 1..6 {
+    let mut jmap = HashMap::<u8, HashMap<u8, (u8, u8)>>::new();
+    for j in 1..6 {
+      let mut rbidch_map : HashMap<u8, (u8,u8)> = HashMap::new();
+      for ch in 1..17 {
+        let rbidch = (0,0);
+        rbidch_map.insert(ch,rbidch);
+        //map[dsi] = 
+      }
+      jmap.insert(j,rbidch_map);
+    }
+    map.insert(dsi,jmap);
+  }
+  for ltb in ltbs {
+    for ch in 1..17 {
+      let rb_id = ltb.get_rb_id(ch as u8);
+      let rb_ch = ltb.get_rb_ch(ch as u8);
+      *map.get_mut(&ltb.ltb_dsi).unwrap().get_mut(&ltb.ltb_j).unwrap().get_mut(&ch).unwrap() = (rb_id, rb_ch);
+      //map[&ltb.ltb_dsi][&ltb.ltb_j].insert((rb_id, rb_ch);
+    }
+  }
+  map
+}
 //---------------------------------------------------------
 
 /// This represents an entire TOF panel
@@ -476,6 +661,7 @@ impl fmt::Display for PaddleEnd {
 
 //---------------------------------------------------------
 
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub struct DSICard {
   pub dsi_id     : u8, 
   pub j1_rat_id  : u8, 
@@ -496,17 +682,41 @@ impl DSICard {
       j5_rat_id  : 0, 
     }
   }
+
+  pub fn get_rat_id_for_j(&self, j : u8) -> u8 {
+    let rat_id : u8;
+    match j {
+      1 => {rat_id = self.j1_rat_id;},
+      2 => {rat_id = self.j2_rat_id;},
+      3 => {rat_id = self.j3_rat_id;},
+      4 => {rat_id = self.j4_rat_id;},
+      5 => {rat_id = self.j5_rat_id;},
+      _ => { 
+        error!("No j > 5! Returning 0");
+        rat_id = 0;
+      }
+    }
+    rat_id
+  }
 }
 
 impl Default for DSICard {
-  fn default() -> DSICard {
-    DSICard::new()
+  fn default() -> Self {
+    Self::new()
   }
 }
 
 impl fmt::Display for DSICard {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { 
-    write!(f, "<DSICard: DSI ID {}>", self.dsi_id)
+    let mut repr = String::from("<DSICard:");
+    repr += &(format!("\n  DSI ID  : {}", self.dsi_id)   );
+    repr += &(format!("\n  J1 RAT  : {}", self.j1_rat_id)); 
+    repr += &(format!("\n  J2 RAT  : {}", self.j2_rat_id)); 
+    repr += &(format!("\n  J3 RAT  : {}", self.j3_rat_id)); 
+    repr += &(format!("\n  J4 RAT  : {}", self.j4_rat_id)); 
+    repr += &(format!("\n  J5 RAT  : {}", self.j5_rat_id)); 
+    repr += &String::from(">");
+    write!(f, "{}", repr)
   }
 }
 
@@ -548,12 +758,12 @@ impl fmt::Display for RAT {
 
 #[derive(Clone, Debug)]
 pub struct ReadoutBoard {
-  pub rb_id                : u8,  
-  pub dna                  : u64, 
-  channel_to_paddle_end_id : [u16;8],
-  pub calib_file_path      : String,
-  pub calibration          : RBCalibrations,       
-  pub trig_ch_mask         : [bool;8],
+  pub rb_id                    : u8,  
+  pub dna                      : u64, 
+  pub channel_to_paddle_end_id : [u16;8],
+  pub calib_file_path          : String,
+  pub calibration              : RBCalibrations,       
+  pub trig_ch_mask             : [bool;8],
 }
 
 impl ReadoutBoard {
@@ -591,7 +801,8 @@ impl ReadoutBoard {
         }
         if let Some(caps) = re.captures(&filename) {
           if let Some(timestamp_str) = caps.get(0).map(|m| m.as_str()) {
-            let timestamp = NaiveDateTime::parse_from_str(timestamp_str, "%Y_%m_%d_%H_%M")?;
+            //println!("{}",timestamp_str);
+            let timestamp = NaiveDateTime::parse_from_str(timestamp_str, "%Y_%m_%d-%H_%M_%S")?;
             if timestamp > newest_file.1 {
               newest_file.1 = timestamp;
               newest_file.0 = filename.clone();
@@ -604,23 +815,12 @@ impl ReadoutBoard {
     if newest_file.0.is_empty() {
       error!("No matching calibration available for board {}!", self.rb_id);
     } else {
-      println!("==> Loading calibration from file: {}", newest_file.0);
-      self.calibration = RBCalibrations::from_file(newest_file.0)?;
-      println!("==> Loaded calibration {}", self.calibration);
+      let file_to_load = self.calib_file_path.clone() + "/" + &newest_file.0;
+      println!("== ==> Loading calibration from file: {}", file_to_load);
+      self.calibration = RBCalibrations::from_file(file_to_load)?;
+      //println!("==> Loaded calibration {}", self.calibration);
     }
     Ok(())
-  }
-
-  #[deprecated(note="Won't work with tmiestamped cali files!")]
-  pub fn guess_calibration_filename(&self) -> String {
-    let mut cali = String::from("");
-    cali += "rb_";
-    if self.rb_id < 10 {
-      cali += "0";
-    }
-    cali += &self.rb_id.to_string();
-    cali += ".cali.tof.gaps";
-    cali
   }
 
   /// The address the RB is publishing packets on 
@@ -683,7 +883,7 @@ impl ReadoutBoard {
       return 0;
     }
     let p_end_id = self.channel_to_paddle_end_id[channel -1];
-    if p_end_id % 2000 > 0 {
+    if p_end_id > 2000 {
       return (p_end_id - 2000) as u8;
     } else {
       return (p_end_id - 1000) as u8;

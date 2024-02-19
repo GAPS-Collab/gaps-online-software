@@ -68,7 +68,7 @@ use crate::packets::{
     TofPacket,
     PacketType,
 };
-
+use crate::constants::NWORDS;
 use crate::serialization::{
     Serialization,
     SerializationError,
@@ -130,10 +130,10 @@ pub fn get_runfilename(run : u32, subrun : u64, rb_id : Option<u8>) -> String {
   let fname : String;
   match rb_id {
     None => {
-      fname = format!("Run{run}_{subrun}.{ts}.gaps.tof");
+      fname = format!("Run{run}_{subrun}.{ts}.tof.gaps");
     }
     Some(rbid) => {
-      fname = format!("Run{run}_{subrun}.{ts}.RB{rbid:02}.gaps.tof");
+      fname = format!("Run{run}_{subrun}.{ts}.RB{rbid:02}.tof.gaps");
     }
   }
   fname
@@ -361,7 +361,9 @@ impl RBEventMemoryStreamer {
     self.is_depleted = false;
     // FIXME: append can panic
     // we use it here, since it does not clone
+    //println!("[io.rs] consuming {} bytes", stream.len());
     self.stream.append(stream);
+    //println!("[io.rs] stream has now {} bytes", self.stream.len());
     //self.create_event_index();
   }
 
@@ -521,7 +523,28 @@ impl RBEventMemoryStreamer {
     //                           + header.get_channels().len()*4;
     for ch in header.get_channels().iter() {
       let ch_id = parse_u16(&self.stream, &mut self.pos);
-      if ch_id == *ch as u16 {
+      if ch_id != *ch as u16 {
+        // check where is the next header
+        let search_pos = self.pos;
+        match search_for_u16(TofPacket::HEAD, &self.stream, search_pos) {
+          Err(_) => (),
+          Ok(result) => {
+            println!("The channel data is corrupt, but we found a header at {} for remaining stream len {}", result, self.stream.len()); 
+          }
+        }
+        let mut stream_view = Vec::<u8>::new();
+        let foo_pos = self.pos;
+        for k in foo_pos -3..foo_pos + 3 {
+          stream_view.push(self.stream[k]);
+        }
+        error!("We got {ch_id} but expected {ch} for event {}. The parsed ch id is not in the channel mask! We will fill this channel with u16::MAX .... Stream view +- 3 around the ch id {:?}", header.event_id, stream_view);
+        event_status = EventStatus::ChannelIDWrong;
+        // we fill the channel with MAX values:
+        event.adc[*ch as usize] = vec![u16::MAX;NWORDS];
+        self.pos += 2*nwords + 4;
+        continue;
+      } else {
+      //if ch_id == *ch as u16 {
         //println!("Got ch id {}", ch_id);
         //let header = parse_u16(&self.stream, &mut self.pos);
         // noice!!
@@ -558,15 +581,6 @@ impl RBEventMemoryStreamer {
           }
           println!("== ==> Checksum {}, channel checksum {}!", checksum, crc32); 
         }
-      } else {
-        if ch_id > 9 {
-          error!("Channel id {} in data outside of requested channel mask! Skipping..", ch_id);
-          error!(" - - Header of this event: {}", header);
-          event_status = EventStatus::ChannelIDWrong;
-        } else {
-          warn!("Channel id {} in data outside of requested channel mask! Skipping..", ch_id);
-        }
-        self.pos += 2*nwords + 4;
       }
     }
     
@@ -598,13 +612,16 @@ impl RBEventMemoryStreamer {
     
     let tail         = parse_u16(&self.stream, &mut self.pos);
     if tail != 0x5555 {
-      error!("Tail signature is wrong! Got {} for board {}", tail, header.rb_id);
+      error!("Tail signature {} for event {} is invalid!", tail, header.event_id);
       event_status = EventStatus::TailWrong;
     } 
     //self.stream.drain(0..self.pos);
     self.pos_at_head = false;
     event.header = header;
     event.status = event_status;
+    if event_status == EventStatus::TailWrong {
+      println!("{}", event);
+    }
     Some(event)
   }
 
@@ -642,58 +659,6 @@ impl Iterator for RBEventMemoryStreamer {
     let begin_pos : usize; // in case we need
                                // to rewind
      
-    // if there are requests, we will serve the 
-    // next request
-    if self.request_mode {
-      if self.request_cache.len() > 0 {
-        loop {
-          match self.request_cache.pop_front() {
-            Some(req) => {
-              //println!("== ==> Got next request");
-              if req.0 < self.first_evid {
-                self.is_ahead_by = (self.first_evid - req.0) as usize;
-                self.is_behind_by = 0;
-                //println!("<RBEventMemoryStreamer> {} IS AHEAD BY {}!", req.0, self.is_ahead_by);
-                //return None;
-                continue;
-              } else if req.0 > self.first_evid && req.0 < self.last_evid {
-                let ch_mask = 1u16 << 8 | req.1 as u16; 
-                //println!("== ==> checking {}", req.0);
-                return self.get_event_at_id(req.0, Some(ch_mask));
-              }
-              if req.0 > self.last_evid {
-                // we don't have it
-                self.is_behind_by = (req.0 - self.last_evid) as usize;
-                self.is_ahead_by  = 0;
-                // drain the events which are behind
-                if self.event_map.contains_key(&self.last_evid) {
-                  let last_pos = self.event_map[&self.last_evid];
-                  self.stream.drain(0..last_pos.0);
-                }
-                self.event_map.clear();
-                self.is_depleted = true;
-                //println!("<RBEventMemoryStreamer> : {} IS BEHIND BY {}", req.0,self.is_behind_by);
-                return None;
-              }
-            },
-            None => {
-              self.is_depleted = true;
-              self.is_behind_by = 50; // event buffer size
-              self.is_ahead_by  = 0;
-              //println!("Cache is exchausted!");
-              //self.stream.drain(0..self.event_map[&self.last_evid].0);
-              //self.event_map.clear();
-              return None;  
-            }
-          }
-        }
-      } else {
-        //println!("Event request cache exhausted");
-        self.is_behind_by = 1;
-        self.is_ahead_by  = 0;
-        return None;
-      }
-    }
     self.pos_at_head = false;
     begin_pos = self.pos; // in case we need
                                 // to reset the position
@@ -712,13 +677,11 @@ impl Iterator for RBEventMemoryStreamer {
       }
     }
     
-    let event = self.get_event_at_pos_unchecked(None)?;
+    let event          = self.get_event_at_pos_unchecked(None)?;
     self.n_events_ext += 1;
     self.stream.drain(0..self.pos);
-    self.pos = 0;
-    self.pos_at_head = false;
-    self.is_ahead_by = 0;
-    self.is_behind_by = 0;
+    self.pos           = 0;
+    self.pos_at_head   = false;
     Some(event)
   }
 }
@@ -751,10 +714,10 @@ impl TofPacketReader {
   pub fn get_next_packet_size(&self, stream : &Vec<u8>) -> u32 {
     // cursor needs at HEAD position and then we have to 
     // add one byte for the packet type
-    let mut pos = self.cursor + 2;
+    let mut pos    = self.cursor + 2;
     let ptype_int  = parse_u8(stream, &mut pos);
     let next_psize = parse_u32(stream, &mut pos);
-    let ptype = ptype_int as u8;
+    let ptype      = ptype_int as u8;
     debug!("We anticpate a TofPacket of type {:?} and size {} (bytes)",ptype, next_psize);
     next_psize
   }

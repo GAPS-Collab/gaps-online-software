@@ -40,7 +40,11 @@ use liftof_lib::{
 use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::events::MasterTriggerEvent;
 use tof_dataclasses::serialization::Serialization;
-use liftof_lib::master_trigger;
+use liftof_lib::{
+    master_trigger,
+    MTBSettings
+};
+
 use crossbeam_channel as cbc;
 //use std::io::Write;
 
@@ -125,6 +129,10 @@ fn main() {
   let relay_rbs           = args.relay_rbs;
   let trace_suppression   = args.trace_suppression;
 
+  //FIXME - just make it work now
+  let mut settings = MTBSettings::new();
+  settings.trace_suppression = trace_suppression;
+
   if args.send_requests {
     match args.json_ltb_rb_map {
       None => {
@@ -143,9 +151,7 @@ fn main() {
                            &mte_send,
                            &tp_send_req,
                            &tp_send_moni,
-                           1,
-                           60,
-                           trace_suppression,
+                           settings,
                            verbose,
                            send_requests);
          })

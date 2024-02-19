@@ -33,9 +33,9 @@ LTBMoniData LTBMoniData::from_bytestream(const Vec<u8> &stream,
   
 std::string LTBMoniData::to_string() const {
   std::string repr = "<LTBMoniData   : ";
-  repr += "\n  board_id              : " + std::to_string(board_id   );
-  repr += "\n  trenz temp       [C]  : " + std::to_string(trenz_temp );
-  repr += "\n  LTB   temp       [C]  : " + std::to_string(ltb_temp         );
+  repr += std::format("\n  board_id              : {}"      ,board_id   );
+  repr += std::format("\n  trenz temp      [\u00B0C]  : {:.2}" ,trenz_temp );
+  repr += std::format("\n  LTB   temp      [\u00B0C]  : {:.2}" ,ltb_temp   );
   repr += "\n  ** Thresholds **";
   repr += "\n  THR1, THR2, THR3 [mV] : " + std::to_string(thresh[0]) 
        +  " " + std::to_string(thresh[1])
@@ -90,7 +90,7 @@ RBMoniData::RBMoniData() {
 RBMoniData RBMoniData::from_bytestream(const Vec<u8> &payload,
                                        usize &pos) {
   //usize pos = start_pos; 
-  RBMoniData moni = RBMoniData();
+  RBMoniData moni   = RBMoniData();
   u16 head          = Gaps::parse_u16(payload, pos);
   if (head != RBMoniData::HEAD) {
     log_error("No header signature (0xAAAA) found for decoding of RBMoniData!");   

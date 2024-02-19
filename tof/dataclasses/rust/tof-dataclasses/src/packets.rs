@@ -14,7 +14,6 @@
 //! The total packet size is thus 13 + SIZE
 
 
-use crate::constants::EVENT_TIMEOUT;
 
 // re-imports
 use std::time::Instant;
@@ -50,15 +49,6 @@ use crate::calibrations::RBCalibrations;
 
 pub mod packet_type;
 pub use packet_type::PacketType;
-
-pub enum PacketQuality {
-  Perfect,
-  Good,
-  NotSoGood,
-  Bad,
-  Rubbish, 
-  UtterRubish
-}
 
 /// The most basic of all packets
 ///  
@@ -150,11 +140,6 @@ impl TofPacket {
       return Err(Box::new(PacketError::WrongPacketType));
     }
     Ok(RBEvent::from_bytestream(&self.payload, &mut 0)?)
-  }
-
-  /// Event can time out after specified time
-  pub fn has_timed_out(&self) -> bool {
-    return self.age() > EVENT_TIMEOUT;
   }
 
   pub fn age(&self) -> u64 {

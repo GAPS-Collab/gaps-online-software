@@ -12,8 +12,12 @@ use constants::{DEFAULT_CALIB_VOLTAGE,
                 //DEFAULT_RUN_TIME,
                 PREAMP_MIN_BIAS,
                 PREAMP_MAX_BIAS};
-pub use master_trigger::{connect_to_mtb,
-                         master_trigger};
+pub use master_trigger::{
+    connect_to_mtb,
+    master_trigger,
+    MTBSettings
+};
+
 pub mod constants;
 
 use std::error::Error;
@@ -47,13 +51,16 @@ extern crate env_logger;
 
 //use tof_dataclasses::manifest as mf;
 use tof_dataclasses::DsiLtbRBMapping;
+use tof_dataclasses::manifest::ReadoutBoard;
 use tof_dataclasses::constants::NWORDS;
 use tof_dataclasses::calibrations::{
     RBCalibrations,
     find_zero_crossings,
 };
-use tof_dataclasses::packets::{TofPacket,
-                               PacketType};
+use tof_dataclasses::packets::{
+    TofPacket,
+    PacketType,
+};
 use tof_dataclasses::errors::{
     AnalysisError,
     SetError
@@ -388,13 +395,10 @@ pub fn get_peaks() -> Vec<Peak> {
 ///
 /// * event       : current RBEvent with waveforms to 
 ///                 work on
-/// * channel_map : (HashMap) mapping providing channel
-///                 to paddle ID information
-/// * calibration : latest readoutboard calibration for 
-///                 the same board
+/// * rb          : ReadoutBoard as loaded from the DB, 
+///                 with latest calibration attached
 pub fn waveform_analysis(event         : &mut RBEvent,
-                         channel_map   : &RBChannelPaddleEndIDMap,
-                         calibration   : &RBCalibrations)
+                         rb            : &ReadoutBoard)
 -> Result<(), AnalysisError> {
   //if event.status != EventStatus::Perfect {
   //if event.header.broken {
@@ -410,6 +414,8 @@ pub fn waveform_analysis(event         : &mut RBEvent,
   let mut pid        : u8;
   // will become a parameter
   let fit_sinus = true;
+  
+  // FIXME - don't do this per every event
   for raw_ch in channels {
     if raw_ch == 8 {
       continue;
@@ -417,17 +423,13 @@ pub fn waveform_analysis(event         : &mut RBEvent,
     // +1 channel convention
     let ch = raw_ch + 1;
     //let mut TofHit::new();
-    let p_end_id = channel_map.get(&ch).unwrap_or(&0);
-    if p_end_id < &1000 {
+    //let p_end_id = channel_map.get(&ch).unwrap_or(&0);
+    let p_end_id = rb.channel_to_paddle_end_id[raw_ch as usize];
+    if p_end_id < 1000 {
       //error!("Invalid paddle end id {} for channel {}!", p_end_id, ch);
       continue;
     }
-    if p_end_id > &2000 {
-      // it is the B side then
-      pid = (p_end_id - 2000) as u8;
-    } else {
-      pid = (p_end_id - 1000) as u8;
-    }
+    pid = rb.get_pid_for_ch(ch as usize);
     if !paddles.contains_key(&pid) {
       let mut hit   = TofHit::new();
       hit.paddle_id = pid;
@@ -437,6 +439,11 @@ pub fn waveform_analysis(event         : &mut RBEvent,
   // second loop over channels. Now we have
   // all the paddles set up in the hashmap
   for raw_ch in channels_c {
+    if event.adc[raw_ch as usize].len() == 0 {
+      // we are most likely running in trace suppression mode, 
+      // this channel is simply not populated
+      continue;
+    }
     if raw_ch == 8 {
       if fit_sinus {
         // +1 channel convention
@@ -444,10 +451,10 @@ pub fn waveform_analysis(event         : &mut RBEvent,
         
         let mut ch_voltages : Vec<f32>= vec![0.0; NWORDS];
         let mut ch_times    : Vec<f32>= vec![0.0; NWORDS];
-        calibration.voltages(ch.into(),
-                             event.header.stop_cell as usize,
-                             &event.adc[8],
-                             &mut ch_voltages);
+        rb.calibration.voltages(ch.into(),
+                                event.header.stop_cell as usize,
+                                &event.adc[8],
+                                &mut ch_voltages);
         //warn!("We have to rework the spike cleaning!");
         //match RBCalibrations::spike_cleaning(&mut ch_voltages,
         //                                     event.header.stop_cell) {
@@ -456,9 +463,9 @@ pub fn waveform_analysis(event         : &mut RBEvent,
         //  }
         //  Ok(_)    => ()
         //}
-        calibration.nanoseconds(ch.into(),
-                                event.header.stop_cell as usize,
-                                &mut ch_times);
+        rb.calibration.nanoseconds(ch.into(),
+                                   event.header.stop_cell as usize,
+                                   &mut ch_times);
         let fit_result = fit_sine(ch_times, ch_voltages);
         //println!("FIT RESULT = {:?}", fit_result);
         event.header.set_sine_fit(fit_result);
@@ -471,26 +478,24 @@ pub fn waveform_analysis(event         : &mut RBEvent,
     let ch = raw_ch + 1;
     // FIXME - copy/paste from above, wrap in a 
     // function
-    let p_end_id  = channel_map.get(&ch).unwrap_or(&0);
+    let p_end_id = rb.channel_to_paddle_end_id[raw_ch as usize];
+    pid = rb.get_pid_for_ch(ch as usize);
+    //let p_end_id  = channel_map.get(&ch).unwrap_or(&0);
     let mut is_a_side = false; 
-    if p_end_id < &1000 {
+    if p_end_id < 1000 {
       //error!("Invalid paddle end id: {}!" ,p_end_id);
       continue;
     }
-    if p_end_id > &2000 {
-      // it is the B side then
-      pid = (p_end_id - 2000) as u8;
-    } else {
-      pid = (p_end_id - &1000) as u8;
+    if p_end_id <= 2000 {
       is_a_side = true;
     }
     // allocate memory for the calbration results
     let mut ch_voltages : Vec<f32>= vec![0.0; NWORDS];
     let mut ch_times    : Vec<f32>= vec![0.0; NWORDS];
-    calibration.voltages(ch.into(),
-                         event.header.stop_cell as usize,
-                         &event.adc[ch as usize],
-                         &mut ch_voltages);
+    rb.calibration.voltages(ch.into(),
+                            event.header.stop_cell as usize,
+                            &event.adc[raw_ch as usize],
+                            &mut ch_voltages);
     //warn!("We have to rework the spike cleaning!");
     //match RBCalibrations::spike_cleaning(&mut ch_voltages,
     //                                     event.header.stop_cell) {
@@ -499,9 +504,9 @@ pub fn waveform_analysis(event         : &mut RBEvent,
     //  }
     //  Ok(_)    => ()
     //}
-    calibration.nanoseconds(ch.into(),
-                            event.header.stop_cell as usize,
-                            &mut ch_times);
+    rb.calibration.nanoseconds(ch.into(),
+                               event.header.stop_cell as usize,
+                               &mut ch_times);
     let (ped, ped_err) = calculate_pedestal(&ch_voltages,
                                             10.0, 10, 50);
     debug!("Got pedestal of {} +- {}", ped, ped_err);

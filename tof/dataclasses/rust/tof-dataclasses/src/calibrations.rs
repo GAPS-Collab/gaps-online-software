@@ -13,10 +13,7 @@ use std::fs::File;
 use std::io::{self, BufRead, BufReader};
 use std::path::Path;
 use std::fmt;
-use std::time::{SystemTime,
-                Duration,
-                UNIX_EPOCH};
-use chrono::{DateTime, Utc, TimeZone};
+use chrono::{DateTime, Utc, TimeZone, LocalResult};
 //extern crate streaming_stats;
 //use streaming_stats::{OnlineStats, OrderStats};
 
@@ -721,10 +718,10 @@ impl RBCalibrations {
       for ev in 0..traces[ch].len() {
         for n in 0..traces[ch][ev].len() {
           let mut dval : f32;
-          if n == 0 {
+          if n == traces[ch][ev].len() - 1 {
             dval = rolled_traces[ch][ev][0] - rolled_traces[ch][ev][traces[ch][ev].len() -1];
           } else {
-            dval = rolled_traces[ch][ev][n] - rolled_traces[ch][ev][n-1];      
+            dval = rolled_traces[ch][ev][n + 1] - rolled_traces[ch][ev][n];      
           }
           match edge {
             Edge::Rising | Edge::Average => {
@@ -1075,9 +1072,7 @@ impl RBCalibrations {
   }
 
   pub fn new(rb_id : u8) -> Self {
-    // FIXME
-    let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap_or(Duration::from_secs(0));
-    let timestamp = now.as_secs() as u32;
+    let timestamp = Utc::now().timestamp() as u32;
     Self {
       rb_id     : rb_id,
       d_v       : 182.0, // FIXME - this needs to be a constant
@@ -1352,10 +1347,25 @@ impl Default for RBCalibrations {
 
 impl fmt::Display for RBCalibrations {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let datetime_utc: DateTime<Utc> = Utc.timestamp(self.timestamp as i64, 0);
-    let timestamp_str = datetime_utc.format("%Y/%m/%d %H:%M:%S").to_string();
+    let mut timestamp_str = String::from("?");
+    println!("Self.timestamp {}", self.timestamp);
+    match Utc.timestamp_opt(self.timestamp.into(), 0) {
+      LocalResult::Single(datetime_utc) => {
+        timestamp_str = datetime_utc.format("%Y/%m/%d %H:%M:%S").to_string();
+        //println!("UTC datetime: {}", datetime_utc);
+      },
+      LocalResult::Ambiguous(_, _) => {
+        println!("The given timestamp is ambiguous.");
+      },
+      LocalResult::None => {
+        println!("The given timestamp is not valid.");
+      },
+    }
+
+
+    //let datetime_utc: DateTime<Utc> = Utc.timestamp_opt(self.timestamp as i64, 0).earliest().unwrap_or(DateTime::<Utc>::from_timestamp_millis(0).unwrap());
     write!(f, 
-  "<ReadoutboardCalibration [{}]:
+  "<ReadoutboardCalibration [{} UTC]:
       RB             : {}
       VCalData       : {} (events)
       TCalData       : {} (events)

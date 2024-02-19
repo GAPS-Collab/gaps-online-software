@@ -3,6 +3,11 @@
 //!
 //!
 
+/// Number of AVAILABLE slots for LocalTriggerBoards
+pub const N_LTBS : usize = 25;
+
+/// Number of AVAILABLE channels per each LocalTriggerBoard
+pub const N_CHN_PER_LTB : usize = 16;
 
 /// Number of Channels on the readoutboards
 pub const NCHN          : usize = 9;  
@@ -50,9 +55,6 @@ pub const MAX_TRIGGER_RATE : usize = 200;
 ///
 /// This might NOT be relevant when we run 
 /// with the master trigger.
-///
-//pub const EVENT_TIMEOUT : u128 = 30000000;
-pub const EVENT_TIMEOUT : u64 = 60;
 
 /// When should TofPackets time out? (sec)
 pub const TOFPACKET_TIMEOUT : u64 = 60;

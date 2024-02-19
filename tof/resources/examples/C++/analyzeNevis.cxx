@@ -21,12 +21,8 @@
 #include "legacy.h"
 #include <vector>
 
+#include "./include/constants.h"
 #include "./include/EventGAPS.h"
-
-const int NRB   = 50; // Technically, it is 49, but we don't use 0
-const int NCH   = 8;
-const int NTOT  = NCH * NRB; // NTOT is the number of SiPMs
-const int NPADS = NTOT/2;        // NPAD: 1 per 2 SiPMs
 
 int main(int argc, char *argv[]){
   spdlog::cfg::load_env_levels();
@@ -58,6 +54,7 @@ int main(int argc, char *argv[]){
 
   // To read calibration data from individual binary files, when -c is
   // given with the directory of the calibration files
+  bool RB_Calibrated[NRB] = { false };
   if (calname != "") {
     for (int i=1; i<NRB; i++) {
       // First, determine the proper RB filename from its number
@@ -79,15 +76,16 @@ int main(int argc, char *argv[]){
 	spdlog::info("We loaded {} packets from {}", packet.size(), f_str);
 	// Loop over the packets (should only be 1) and read into storage
 	for (auto const &p : packet) {
-	  int ctr=0;
+	  //int ctr=0;
 	  if (p.packet_type == PacketType::RBCalibration) {
 	    // Should have the one calibration tofpacket stored in "packet".
 	    usize pos = 0;
-	    if (++ctr == 4)  // 4th packet is the one we want
-	      cali[i] = RBCalibration::from_bytestream(p.payload, pos); 
+	    //if (++ctr == 4)  // 4th packet is the one we want
+	    cali[i] = RBCalibration::from_bytestream(p.payload, pos); 
+	    RB_Calibrated[i] = true;
 	  }
 	}
-      } //else {printf("File does not exist: %s\n", f_str.c_str());}
+      } 
     }
   }
   
@@ -111,7 +109,8 @@ int main(int argc, char *argv[]){
     }
     }*/
 
-  // Some useful variables (some initialized to default values
+  // Some useful variables (some initialized to default values)
+  // but overwritten from file (if it exists)
   float Ped_low   = 10;
   float Ped_win   = 90;
   float CThresh   = 5.0;
@@ -119,6 +118,8 @@ int main(int argc, char *argv[]){
   float Qwin_low  = 100;
   float Qwin_size = 100;
   float CHmin     = 4.0;
+
+  // Some useful analysis quantities
   float Ped[NTOT];
   float PedRMS[NTOT];
   float Qint[NTOT];
@@ -144,6 +145,75 @@ int main(int argc, char *argv[]){
     status = fscanf(fp,"%[^\n]",line); // Scan the rest of the line
   }
   fclose(fp); 
+
+  // Another kludgy read is getting the RB-ch to paddle map from the
+  // rbch-vs-paddle.json file. Achim has a way to do this via rust,
+  // but I need the map for development purposes here.
+  int paddle_map[NRB][NCH] = { 0 }; // Stored value will be paddle ID;
+  int rb_num, ch_num;
+  fp = fopen("/home/gaps/software/gaps-online-software/src/gaps-db/resources/master-spreadsheet/rbch-vs-paddle.json", "r");
+  if ( fscanf(fp, "%s", label) != EOF ) { // Read in first "{"
+    while (fscanf(fp, "%s %[^\n]", label, line) != EOF) { 
+      if (strncmp(label, "\"", 1) == 0) { // Found an RB line
+	int rb_len = strlen(label)-3;     // RB<=9 or RB>=10
+	char tmp[6];
+	if (rb_len == 1) snprintf(tmp, sizeof(tmp), "%.1s", label+1);
+	if (rb_len == 2) snprintf(tmp, sizeof(tmp), "%.2s", label+1);
+	rb_num = atoi(tmp);
+	for(int i=0;i<NCH;i++) {
+	  fscanf(fp, "%s %s", label, line);
+	  snprintf(tmp, sizeof(tmp), "%.4s", line);
+	  int pad_id = atoi(tmp);
+	  //printf("RBnum = %s %s %d; %d %d\n",label,line,rb_num,i,pad_id);
+	  paddle_map[rb_num][i] = pad_id;
+	}
+	fscanf(fp, "%s", line); // read in the closing "}" for RB
+      }
+    }
+  }
+  fclose(fp); // Finished with file
+  
+  // Another kludgy read is getting the Paddle to volume location from
+  // the paddleid_vs_volid.json adn level0_coordinates.json
+  // files. Achim has a way to do this via rust, but I need the map
+  // for development purposes here.
+  float paddle_location[NPAD][3] = { 0 }; // X, Y, Z coords in detector
+  int   paddle_vid[NPAD] = { 0 }; // VID with same counter
+  // First, read the paddle to volume ID map
+  int tmp_pad, tmp_vol, vol_id[NPAD] = { 0 }; 
+  int tmp_vid;
+  float tmp_x, tmp_y, tmp_z;
+  fp = fopen("/home/gaps/software/gaps-online-software/src/gaps-db/resources/master-spreadsheet/paddleid_vs_volid.json", "r");
+  if ( fscanf(fp, "%s", label) != EOF ) { // Read in first "{"
+    while (fscanf(fp,"%*[^-0-9]%d  %*[^-0-9] %d", &tmp_pad, &tmp_vol) != EOF) { 
+      vol_id[tmp_pad] = tmp_vol;
+      //printf("%d %d\n", tmp_pad, vol_id[tmp_pad]);
+    }
+  }
+  fclose(fp); // Finished with file
+  // Now that we have the vol_id for each paddle, map read in the
+  // vol_id to location map.
+  fp = fopen("/home/gaps/software/gaps-online-software/src/gaps-db/resources/master-spreadsheet/level0_coordinates.json", "r");
+  int ctr=0;
+  if ( fscanf(fp, "%s", label) != EOF ) { // Read in first "{"
+    while (fscanf(fp,"%*[^-0-9]%d  %*[^-0-9]%f %*[^-0-9]%f  %*[^-0-9]%f ",
+		  &tmp_vid, &tmp_x, &tmp_y, &tmp_z) != EOF) { 
+      //printf("%d %.2f %.2f %.2f\n", tmp_vid, tmp_x, tmp_y, tmp_z);
+      paddle_vid[ctr]         = tmp_vid;
+      paddle_location[ctr][1] = tmp_x;
+      paddle_location[ctr][2] = tmp_y;
+      paddle_location[ctr++][3] = tmp_z;
+    }
+  }  
+  fclose(fp); // Finished with file
+  
+  // Instantiate our class that holds analysis results and set some
+  // initial values
+  auto Event = EventGAPS();
+  Event.SetPaddleMap(paddle_map, vol_id, paddle_vid, paddle_location);
+  Event.SetThreshold(CThresh);
+  Event.SetCFDFraction(CFDS_frac);
+  Event.InitializeHistograms();
 
   // the reader is something for the future, when the 
   // files get bigger so they might not fit into memory
@@ -195,12 +265,14 @@ int main(int argc, char *argv[]){
 	// initialize and delete them with each new event
 	GAPS::Waveform *wave[NTOT];
 	GAPS::Waveform *wch9[NRB];
+	for (int i=0;i<NTOT;i++) wave[i] = NULL;
+	for (int i=0;i<NRB;i++)  wch9[i] = NULL;
 	
         auto ev = TofEvent::from_bytestream(p.payload, pos);
 	unsigned long int evt_ctr = ev.mt_event.event_id;
 	//printf("Event %ld: RBs -", evt_ctr);
+	printf("%ld.", evt_ctr);
 	for (auto const &rbid : ev.get_rbids()) {
-	  printf("Getting RB %d event data\n", rbid); fflush(stdout);
 	  RBEvent rb_event = ev.get_rbevent(rbid);
 	  // Now that we know the RBID, we can set the starting ch_no
 	  // Eventually we will use a function to map RB_ch to GAPS_ch
@@ -211,7 +283,8 @@ int main(int argc, char *argv[]){
 	  Vec<Vec<f32>> volts;
 	  Vec<Vec<f32>> times;
 	  //if ((calname != "") && cali.rb_id == rbid ){
-	  if (calname != "") { // For combined data all boards calibrated
+	  //if (calname != "") { // For combined data all boards calibrated
+	  if (RB_Calibrated[rbid]) { // Have cali data for this RBID
 	    // Vec<f32> is a typedef for std::vector<float32>
 	    volts = cali[rbid].voltages(rb_event, false); //second argument is for spike cleaning
 	    // (C++ implementation causes a segfault sometimes when "true"
@@ -221,71 +294,51 @@ int main(int argc, char *argv[]){
 	    // First, store the waveform for channel 9
 	    Vec<f64> ch9_volts(volts[8].begin(), volts[8].end());
 	    Vec<f64> ch9_times(times[8].begin(), times[8].end());
-	    //wch9[rbid] = new GAPS::Waveform(ch9_volts.data(),ch9_times.data(),rbid,0);
-	    //wch9[rbid]->SetPedBegin(Ped_low);
-	    //wch9[rbid]->SetPedRange(Ped_win);
-	    //wch9[rbid]->CalcPedestalRange(); 
-	    //float ch9RMS = wch9[rbid]->GetPedsigma();
-	    //printf(" %d(%.1f)", rbid, ch9RMS);
-	    // printf(" %d", rbid);
-	      
+	    wch9[rbid] = new GAPS::Waveform(ch9_volts.data(),
+					    ch9_times.data(), rbid,0);
+	    //printf(" %d", rbid);
+	    
 	    // Now, deal with all the SiPM data
 	    for(int c=0;c<NCH;c++) {
 	      usize cw = c+ch_start; 
-
+	      
 	      Vec<f64> ch_volts(volts[c].begin(), volts[c].end());
 	      Vec<f64> ch_times(times[c].begin(), times[c].end());
-	      //wave[cw] = new GAPS::Waveform(ch_volts.data(),ch_times.data() ,cw,0);
-	      
-	      // Calculate the pedestal
-	      /*wave[cw]->SetPedBegin(Ped_low);
-	      wave[cw]->SetPedRange(Ped_win);
-	      wave[cw]->CalcPedestalRange(); 
-	      wave[cw]->SubtractPedestal(); 
-	      Ped[cw] = wave[cw]->GetPedestal();
-	      PedRMS[cw] = wave[cw]->GetPedsigma();
-	      if ( c==0 && (PedRMS[cw] > 15) && (ch9RMS < 190) ) {
-		// RMS_ch1 has ch9 data && RMS_ch9 has normal data        
-		printf(" %ld Row %d: %8.1f %8.1f\n", evt_ctr, rbid, ch9RMS, PedRMS[cw]);
-		}*/
-
-	      // Set thresholds and find pulses
-	      /*wave[cw]->SetThreshold(CThresh);
-	      wave[cw]->SetCFDSFraction(CFDS_frac);
-	      VPeak[cw] = wave[cw]->GetPeakValue(Qwin_low, Qwin_size);
-	      Qint[cw]  = wave[cw]->Integrate(Qwin_low, Qwin_size);
-	      wave[cw]->FindPeaks(Qwin_low, Qwin_size);
-	      //if ( (wave[cw]->GetNumPeaks() > 0) && (Qint[cw] > 5.0) ) {
-	      if ( (wave[cw]->GetNumPeaks() > 0) ) {
-		wave[cw]->FindTdc(0, GAPS::CFD_SIMPLE);       // Simple CFD
-		TCFDS[cw] = wave[cw]->GetTdcs(0);
-		printf("EVT %12ld - ch %3ld: %10.5f -- %.2f\n", evt_ctr, cw, TCFDS[cw], wave[cw]->GetPedsigma());
-	      }	*/	
+	      wave[cw] = new GAPS::Waveform(ch_volts.data(),
+					    ch_times.data(), cw,0);
 	    }
 	  }
 	}
-	printf("\n");
-	// Now that we have all the waveforms in place, we can analyze
-	// the event.
-	//auto Event = EventGAPS(wave, wch9);
-	
-	for (int k=0; k<NPADS; k++) {
-	  //First, check with the MTB data to see if paddle is hit
+	//printf("\n");
 
-	  // Then find the pulse information from each SiPM
-	  int ch0 = k*2, ch1 = k*2+1;
-	  /*
-	  Paddle[k].time_a = wave[ch0].FindTdc(1,CFD_SIMPLE);
-	  Paddle[k].time_b = wave[ch1].FindTdc(1,CFD_SIMPLE);
-	  Paddle[k].peak_a = wave[ch0].GetPeakValue(100, 200);
-	  Paddle[k].peak_b = wave[ch1].GetPeakValue(100, 200);
-	  Paddle[k].charge_a = wave[ch0].Integrate(100, 200);
-	  Paddle[k].charge_b = wave[ch1].Integrate(100, 200);
-	  // Also hit position, min_i, and t_avg
-	  */
+	// Now that we have the waveforms in place, analyze the event.
+	Event.InitializeVariables();
+	Event.InitializeWaveforms(wave, wch9);
+
+	// Calculate and store pedestals/RMSs for each channel
+	Event.AnalyzePedestals(Ped_low, Ped_win);
+
+	// Analyze the pulses in each channel
+	Event.SetThreshold(CThresh);
+	Event.SetCFDFraction(CFDS_frac);
+	Event.AnalyzePulses(Qwin_low, Qwin_size);
+	for (int i=0;i<NTOT;i++) {
+	  float tdc = Event.GetTDC(i);
+	  if (tdc > 5) printf("%ld: %d -> %.2f\n", evt_ctr, i, tdc);
 	}
-	// Now calculate beta, charge, and inner/outer tof x,y,z
+	
+	// Analyze each paddle: position on paddle, hitmask, etc
+	Event.AnalyzePaddles(10.0, 5.0); //Args: Peak and Charge cuts
 
+	// Now calculate beta, charge, and inner/outer tof x,y,z, etc.
+	Event.AnalyzeEvent();
+	
+	// Now fill out histograms
+	Event.FillChannelHistos();
+	Event.FillPaddleHistos();
+
+	Event.UnsetWaveforms();
+	
 	n_tofevents++;
         break;
       }
@@ -325,6 +378,8 @@ int main(int argc, char *argv[]){
       }
     }
   }
+  
+  Event.WriteHistograms();
   
   std::cout << "-- -- packets summary:" << std::endl;
   

@@ -11,7 +11,6 @@ pub mod data_type;
 pub mod tof_hit;
 
 pub use master_trigger::MasterTriggerEvent;
-pub use master_trigger::MasterTriggerMapping;
 pub use tof_event::{TofEvent,
                     TofEventHeader};
 pub use tof_hit::TofHit;
@@ -23,6 +22,7 @@ pub use rb_event::{
     RBEventHeader,
     RBEvent,
     RBMissingHit,
+    RBWaveform,
     EventStatus
 };
 

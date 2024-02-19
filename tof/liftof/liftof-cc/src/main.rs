@@ -54,16 +54,15 @@ use tof_dataclasses::threading::{
 use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::manifest::{
     //ReadoutBoard,
-    get_rbs_from_sqlite
+    get_rbs_from_sqlite,
+    get_dsi_j_ltbch_vs_rbch_map,
 };
-use tof_dataclasses::DsiLtbRBMapping;
 use tof_dataclasses::commands::TofCommand;
 use tof_dataclasses::commands::TofCommandCode;
 use liftof_lib::{
     master_trigger,
     readoutboard_commander,
     color_log,
-    get_ltb_dsi_j_ch_mapping,
     LIFTOF_LOGO_SHOW,
     RunCmd, CalibrationCmd, PowerCmd, PowerStatusEnum, TofComponent, SetCmd
 };
@@ -83,7 +82,7 @@ struct LiftofCCArgs {
   #[arg(short, long, default_value_t = false)]
   write_stream: bool,
   /// Define a run id for later identification
-  #[arg(short, long, default_value_t = 0)]
+  #[arg(short, long, default_value_t=0)]
   run_id: usize,
   /// More detailed output for debugging
   #[arg(short, long, default_value_t = false)]
@@ -92,9 +91,6 @@ struct LiftofCCArgs {
   /// event builder and general settings.
   #[arg(short, long)]
   config: Option<String>,
-  /// A json file wit the ltb(dsi, j, ch) -> rb_id, rb_ch mapping.
-  #[arg(long)]
-  json_ltb_rb_map : Option<PathBuf>,
   /// For cmd debug purposes
   #[arg(short, long)]
   only_cmd : bool,
@@ -124,10 +120,12 @@ fn main() {
   println!(" >> for the GAPS experiment \u{1F496}");
   println!(" >> This is the Command&Control server");
   println!(" >> It connects to the MasterTriggerBoard and the ReadoutBoards");
+
+  // settings 
+  //let foo = LiftofCCSettings::new();
+  //foo.to_toml(String::from("foo-settings.toml"));
+  //exit(0);
   
-  // deal with command line arguments
-  let args = LiftofCCArgs::parse();
-  let verbose = args.verbose;
   // log testing
   //error!("error");
   //warn!("warn");
@@ -135,17 +133,13 @@ fn main() {
   //debug!("debug");
   //trace!("trace");
  
-  let write_stream = args.write_stream;
-  if write_stream {
-    info!("Will write the entire stream to files");
-  }
 
+  // deal with command line arguments
   let config          : LiftofCCSettings;
   let nboards         : usize;
-
-  //let foo_settings = LiftofCCSettings::new();
-  //foo_settings.to_toml(String::from("foo"));
-  //exit(0);
+  
+  let args = LiftofCCArgs::parse();
+  let verbose = args.verbose;
 
   match args.config {
     None => panic!("No config file provided! Please provide a config file with --config or -c flag!"),
@@ -165,31 +159,35 @@ fn main() {
   println!("=> Using the following config as parsed from the config file:\n{}", config);
   //exit(0);
 
-  let ltb_rb_map : DsiLtbRBMapping;// = HashMap::<u8,HashMap::<u8,HashMap::<u8,(u8,u8)>>>::new();
-  match args.json_ltb_rb_map {
-    None => {
-      panic!("Will need json ltb -> rb mapping when MasterTrigger shall be used")
-    },
-    Some(_json_ltb_rb_map) => {
-      ltb_rb_map = get_ltb_dsi_j_ch_mapping(_json_ltb_rb_map);
-    }
-  }
+  //match args.json_ltb_rb_map {
+  //  None => {
+  //    panic!("Will need json ltb -> rb mapping when MasterTrigger shall be used")
+  //  },
+  //  Some(_json_ltb_rb_map) => {
+  //    ltb_rb_map = get_ltb_dsi_j_ch_mapping(_json_ltb_rb_map);
+  //  }
+  //}
 
-  let mtb_address           = config.mtb_address;
+  let mtb_address           = config.mtb_address.clone();
   info!("Will connect to the master trigger board at {}!", mtb_address);
  
   // FIXME
-  let runid               = args.run_id;
-  let mut write_stream_path = config.data_dir;
-  let calib_file_path            = config.calibration_dir;
+  let runid                 = args.run_id;
+  let write_stream          = args.write_stream;
+  if write_stream && runid == 0 {
+    panic!("Writing data to disk requires a run id != 0! Please specify runid through the --run_id parameter!");
+  }
+  // clone the strings, so we can save the config later
+  let mut write_stream_path = config.data_dir.clone();
+  let calib_file_path       = config.calibration_dir.clone();
   let runtime_nseconds      = config.runtime_sec;
   let write_npack_file      = config.packs_per_file;
   let db_path               = Path::new(&config.db_path);
-  let mtb_moni_interval     = config.mtb_moni_interval_sec;
-  let cpu_moni_interval          = config.cpu_moni_interval_sec;
-  let flight_address        = config.fc_pub_address;
-  let mtb_trace_suppression = config.mtb_trace_suppression;
+  let cpu_moni_interval     = config.cpu_moni_interval_sec;
+  let flight_address        = config.fc_pub_address.clone();
+  let mtb_settings          = config.mtb_settings;
   let run_analysis_engine   = config.run_analysis_engine;
+  let ltb_rb_map            = get_dsi_j_ltbch_vs_rbch_map(db_path);
   let mut rb_list           = get_rbs_from_sqlite(db_path);
   //let mut rb_list           = vec![ReadoutBoard::new();50];
   for k in 0..rb_list.len() {
@@ -201,15 +199,15 @@ fn main() {
     let bad_rb = rb_ignorelist[k];
     rb_list.retain(|x| x.rb_id != bad_rb);
   }
-  let rb_list_c = rb_list.clone();
-  for k in rb_list_c {
-    println!("{}", k);
-  }
   nboards = rb_list.len();
   println!("=> Expecting {} readoutboards!", rb_list.len());
   info!("--> Following RBs are expected:");
   for rb in &rb_list {
+    //rb.load_latest_calibration();
     info!("     -{}", rb);
+    if verbose {
+      println!("{}", rb);
+    }
   }
 
   // A global kill timer
@@ -233,6 +231,12 @@ fn main() {
         Err(err) => panic!("Failed to create directory: {}! {}", stream_files_path.display(), err),
       }
     }
+    // Write the settings to the directory where 
+    // we want to save the run to
+    let settings_fname = format!("{}/run{}.toml",stream_files_path.display(), runid); 
+    println!("=> Writing data to {}!", stream_files_path.display());
+    println!("=> Writing settings to {}!", settings_fname);
+    config.to_toml(settings_fname);
   }
   //let matches = command!() // requires `cargo` feature
   //     //.arg(arg!([name] "Optional name to operate on"))
@@ -288,8 +292,6 @@ fn main() {
   //}
 
   println!(" .. .. .. .. .. .. .. ..");
-  
-
   // prepare channels for inter thread communications
  
   let (tp_to_sink, tp_from_client) : (cbc::Sender<TofPacket>, cbc::Receiver<TofPacket>) = cbc::unbounded();
@@ -399,6 +401,7 @@ fn main() {
                           event_builder(&master_ev_rec,
                                         &ev_from_rb,
                                         &tp_to_sink,
+                                        runid as u32,
                                         settings);
             })
           .expect("Failed to spawn cpu-monitoring thread!");
@@ -407,15 +410,16 @@ fn main() {
           .name("master-trigger".into())
           .spawn(move || {
                           master_trigger(mtb_address, 
-                                          &ltb_rb_map,
-                                          &master_ev_send,
-                                          &cmd_sender_2,
-                                          &mtb_moni_sender,
-                                          mtb_moni_interval,
-                                          60, // allowed mtb timeout
-                                          mtb_trace_suppression,
-                                          false,
-                                          false);
+                                        &ltb_rb_map,
+                                        &master_ev_send,
+                                        &cmd_sender_2,
+                                        &mtb_moni_sender,
+                                        mtb_settings,
+                                        // verbosity is currently too much 
+                                        // output
+                                        false,
+                                        // currently never set requets
+                                        false); 
             })
           .expect("Failed to spawn cpu-monitoring thread!");
     

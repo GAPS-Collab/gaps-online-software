@@ -1,5 +1,12 @@
 # HAHALUA series
 
+# v0.9.3
+* get the dsi_j_ltbch_rbidch map from the 
+  DB and remove the extra argument
+* more fine graned configuration of the MTB 
+  through the .toml file, e.g. introduction
+  of rb_int_window 
+
 # v0.9.2
 * adds another eventbuilder setting
   tofevent_time = () 

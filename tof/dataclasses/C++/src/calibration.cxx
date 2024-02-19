@@ -75,8 +75,10 @@ void spike_cleaning_drs4(Vec<Vec<f32>> &wf, u16 tCell, i32 spikes[]) {
     }
   }
   for (usize ch=0;ch<9;ch++) {
-    log_info("Found " << n_sp[ch] << " spikes in channel " << ch << "!");
+    // be less verbose for now, FIXME
+    //log_info("Found " << n_sp[ch] << " spikes in channel " << ch << "!");
   }
+
   /* find spikes at cell #0 and #1023
   for (i = 0; i < nChn; i++) {
     if (wf[i][0] + wf[i][1] - 2*wf[i][2] > 20) {
@@ -356,19 +358,19 @@ RBCalibration RBCalibration::from_bytestream(const Vec<u8> &stream,
   }
   if (serialize_event_data) {
     u16 n_noi = Gaps::parse_u16(stream, pos);
-    log_info("Decoding " << n_noi << " no input data events..");
+    //log_info("Decoding " << n_noi << " no input data events..");
     for (u16 k=0; k<n_noi; k++) {
       auto ev = RBEvent::from_bytestream(stream, pos);
       calibration.noi_data.push_back(ev); 
     }
     u16 n_vcal = Gaps::parse_u16(stream, pos);
-    log_info("Decoding " << n_vcal << " VCAL data events...");
+    //log_info("Decoding " << n_vcal << " VCAL data events...");
     for (u16 k=0; k<n_vcal; k++) {
       auto ev = RBEvent::from_bytestream(stream, pos);
       calibration.vcal_data.push_back(ev); 
     }
     u16 n_tcal = Gaps::parse_u16(stream, pos);
-    log_info("Decoding " << n_tcal << " TCAL data events...");
+    //log_info("Decoding " << n_tcal << " TCAL data events...");
     for (u16 k=0; k<n_tcal; k++) {
       auto ev = RBEvent::from_bytestream(stream, pos);
       calibration.tcal_data.push_back(ev); 

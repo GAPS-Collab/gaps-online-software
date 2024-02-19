@@ -36,12 +36,14 @@ pub mod manifest;
 pub mod run;
 pub mod io;
 pub mod analysis;
+pub mod ipbus;
 
 #[macro_use] extern crate log;
 
 use std::collections::HashMap;
 
 /// A type for the master trigger mappings
+/// Dsi -> J -> (RBID,RBCH)
 pub type DsiLtbRBMapping      = HashMap<u8,HashMap<u8,HashMap<u8,(u8,u8)>>>;
 
 /// A type for the mappings of RB channels - paddle edn ids

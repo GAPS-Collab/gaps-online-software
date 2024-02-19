@@ -195,7 +195,8 @@ struct RBEvent {
 
   const Vec<u16>& get_channel_adc(u8 channel) const; 
  
-  Vec<f32> get_baselines(const RBCalibration &cali, usize min_bin, usize max_bin); 
+  /// Get the baseline for a single channel
+  static f32 calc_baseline(const Vec<f32> &volts, usize min_bin, usize max_bin); 
 
   static RBEvent from_bytestream(const Vec<u8> &bytestream,
                                  u64 &pos);
@@ -319,6 +320,8 @@ struct MasterTriggerEvent {
   // these fields won't get serialized
   bool broken       ;
   bool valid        ;
+  
+  LtbRBMap channel_map;
 
   MasterTriggerEvent();
   
@@ -395,8 +398,10 @@ struct TofEvent {
   static const u16 HEAD = 0xAAAA;
   static const u16 TAIL = 0x5555;
 
+  EventStatus status;
   TofEventHeader header;
   MasterTriggerEvent mt_event;
+
 
   /// A container holding the individual events from all RBs with 
   /// triggers in this event  
@@ -406,6 +411,7 @@ struct TofEvent {
   /// get an associated RBEvent within a timeout
   Vec<RBMissingHit> missing_hits;
 
+  TofEvent();
 
   /**
    * Factory function for TofEvents.
@@ -517,6 +523,34 @@ struct TofHit  {
     // don't serialize
 };
 
+/************************
+ * A part of a TofEvent 
+ * - a single waveform 
+ *
+ * That is a waveform for 
+ * a specific channel for a 
+ * specific id.
+ *
+ * Each paddle has 2 waveforms
+ *
+ *
+ */ 
+struct RBWaveform {
+  static const u16 HEAD = 0xAAAA;
+  static const u16 TAIL = 0x5555;
+
+  u32       event_id  ; 
+  u8        rb_id     ; 
+  u8        rb_channel; 
+  Vec<u16>  adc       ; 
+  
+  static RBWaveform from_bytestream(const Vec<u8> &bytestream, 
+                                    u64 &pos);
+  
+  std::string to_string() const;
+};
+
+
 std::ostream& operator<<(std::ostream& os, const TofHit& pad);
 
 std::ostream& operator<<(std::ostream& os, const MasterTriggerEvent& mt);
@@ -526,5 +560,7 @@ std::ostream& operator<<(std::ostream& os, const TofEvent& et);
 std::ostream& operator<<(std::ostream& os, const RBEvent& re);
 
 std::ostream& operator<<(std::ostream& os, const RBEventHeader& rh);
+
+std::ostream& operator<<(std::ostream& os, const RBWaveform& rh);
 
 #endif 

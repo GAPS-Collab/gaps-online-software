@@ -78,6 +78,14 @@ pub fn parse_u16_deque(bs : &VecDeque::<u8>, pos : &mut usize) -> u16 {
   value
 }
 
+/// BIG Endian version of parse_u32. NOT for botched event id decoding!
+/// Used for network communications
+pub fn parse_u32_be(bs : &Vec::<u8>, pos : &mut usize) -> u32 {
+  let value = u32::from_be_bytes([bs[*pos], bs[*pos+1], bs[*pos+2], bs[*pos+3]]);
+  *pos += 4;
+  value
+}
+
 pub fn parse_u32(bs : &Vec::<u8>, pos : &mut usize) -> u32 {
   let value = u32::from_le_bytes([bs[*pos], bs[*pos+1], bs[*pos+2], bs[*pos+3]]);
   *pos += 4;

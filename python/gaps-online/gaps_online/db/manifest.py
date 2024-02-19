@@ -35,3 +35,18 @@ def get_paddle(rb_id, rb_ch):
     rbs = m.RB.object.filter(rb_id=rb_id)
     return rbs.get_channel(rb_ch)
 
+def tof_paddle_manifest():
+    """
+    Get all TOF paddles
+    """
+    paddles = m.Paddle.objects.all()
+    pids    = [(k.paddle_id, k) for k in paddles]
+    result  = dict()
+    for pid in pids:
+        ends  = m.PaddleEnd.objects.filter(paddle_id = pid[0])
+        assert (len (ends) == 2)
+        panel = m.Panel.objects.filter(panel_id = ends[0].panel_id)
+        ends  = (ends[0], ends[1])
+        result[pid[0]] = {'paddle' : pid[1], 'ends' : ends, 'panel' : panel }
+
+    return result

@@ -1,3 +1,14 @@
+# HAHALUA series
+
+## v0.9.2
+* adds the ipbus library. Port from liftof-lib
+* new packet types for deconstructed TofEvent
+
+## v0.9.1
+* removes deprecated MasterTriggerMapping 
+* reworks manifests and allows to get ltb-rb map from 
+  db
+
 # NIUHI series
 
 ## 0.8.4

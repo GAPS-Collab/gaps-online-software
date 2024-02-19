@@ -11,9 +11,9 @@ namespace py = pybind11;
 
 RBCalibration  get_from_califile(const String filename);
 
-Vec<TofPacket> wrap_get_tofpackets_from_file(const String filename);
+Vec<TofPacket> wrap_get_tofpackets_from_file(const String filename, PacketType filter = PacketType::Unknown);
 
-Vec<TofPacket> wrap_get_tofpackets_from_stream(const Vec<u8> &stream, u64 pos);
+Vec<TofPacket> wrap_get_tofpackets_from_stream(const Vec<u8> &stream, u64 pos, PacketType filter = PacketType::Unknown);
 
 Vec<TofEvent> wrap_unpack_tofevents_from_tofpackets_from_file(const String filename);
 
