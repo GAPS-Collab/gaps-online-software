@@ -353,7 +353,7 @@ pub fn send_moni(cmd_sender: Sender<TofPacket>,
 pub fn send_moni_response(cmd_sender: Sender<TofPacket>)
                           -> Result<TofCommandCode, CmdError> {
   let mut tp = TofPacket::new();
-  tp.packet_type = PacketType::Monitor;
+  tp.packet_type = PacketType::CPUMoniData;
   tp.payload = vec![TofComponent::TofCpu as u8, 0u8];
   match cmd_sender.send(tp) {
     Err(err) => {
