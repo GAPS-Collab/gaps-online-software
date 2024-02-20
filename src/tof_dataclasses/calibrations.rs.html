@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/calibrations.rs`."><title>calibrations.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/calibrations.rs`."><title>calibrations.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1513,6 +1514,20 @@
 <a href="#1513" id="1513">1513</a>
 <a href="#1514" id="1514">1514</a>
 <a href="#1515" id="1515">1515</a>
+<a href="#1516" id="1516">1516</a>
+<a href="#1517" id="1517">1517</a>
+<a href="#1518" id="1518">1518</a>
+<a href="#1519" id="1519">1519</a>
+<a href="#1520" id="1520">1520</a>
+<a href="#1521" id="1521">1521</a>
+<a href="#1522" id="1522">1522</a>
+<a href="#1523" id="1523">1523</a>
+<a href="#1524" id="1524">1524</a>
+<a href="#1525" id="1525">1525</a>
+<a href="#1526" id="1526">1526</a>
+<a href="#1527" id="1527">1527</a>
+<a href="#1528" id="1528">1528</a>
+<a href="#1529" id="1529">1529</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! The ReadoutBoardCalibration is 
 //! the first stage in a 3 stage 
 //! calibration process for the tof
@@ -1528,10 +1543,12 @@
 <span class="kw">use </span>std::io::{<span class="self">self</span>, BufRead, BufReader};
 <span class="kw">use </span>std::path::Path;
 <span class="kw">use </span>std::fmt;
-<span class="kw">use </span>std::time::{SystemTime,
-                Duration,
-                UNIX_EPOCH};
-<span class="kw">use </span>chrono::{DateTime, Utc, TimeZone};
+<span class="kw">use </span>chrono::{
+    <span class="comment">//DateTime,
+    </span>Utc,
+    TimeZone,
+    LocalResult
+};
 <span class="comment">//extern crate streaming_stats;
 //use streaming_stats::{OnlineStats, OrderStats};
 
@@ -1556,7 +1573,7 @@
 };
 
 <span class="macro">cfg_if::cfg_if! </span>{
-  <span class="kw">if </span><span class="attr">#[cfg(feature = <span class="string">&quot;random&quot;</span>)]  </span>{
+  <span class="kw">if </span><span class="attr">#[cfg(feature = <span class="string">"random"</span>)]  </span>{
     <span class="kw">use </span><span class="kw">crate</span>::FromRandom;
     <span class="kw">extern crate </span>rand;
     <span class="kw">use </span>rand::Rng;
@@ -1583,8 +1600,8 @@
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>Edge {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
     <span class="kw">let </span>r = serde_json::to_string(<span class="self">self</span>).unwrap_or(
-      String::from(<span class="string">&quot;Error: cannot unwrap this Edge&quot;</span>));
-    <span class="macro">write!</span>(f, <span class="string">&quot;&lt;Edge: {}&gt;&quot;</span>, r)
+      String::from(<span class="string">"Error: cannot unwrap this Edge"</span>));
+    <span class="macro">write!</span>(f, <span class="string">"&lt;Edge: {}&gt;"</span>, r)
   }
 }
 
@@ -1601,7 +1618,7 @@
   }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;random&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"random"</span>)]
 </span><span class="kw">impl </span>FromRandom <span class="kw">for </span>Edge {
   
   <span class="kw">fn </span>from_random() -&gt; <span class="self">Self </span>{
@@ -1645,7 +1662,7 @@
 
 </span><span class="doccomment">/// Simplified version of spike cleaning 
 ///
-/// Taken over from Jamie&#39;s python code
+/// Taken over from Jamie's python code
 </span><span class="kw">fn </span>clean_spikes(traces : <span class="kw-2">&amp;mut </span>Vec&lt;Vec&lt;Vec&lt;f32&gt;&gt;&gt;,vcaldone : bool) {
   <span class="comment">//# TODO: make robust (symmetric, doubles, fixed/estimated spike height)
   </span><span class="kw">let </span><span class="kw-2">mut </span>thresh : f32 = <span class="number">360.0</span>;
@@ -1741,7 +1758,7 @@
   }
   <span class="kw">let </span>firstbin : usize = <span class="number">20</span>;
   <span class="kw">let </span>lastbin = firstbin + (nperiod * (<span class="number">900.0</span>/nperiod).floor()).floor() <span class="kw">as </span>usize;
-  <span class="comment">//info!(&quot;firstbin {} lastbin {}&quot;, firstbin, lastbin);
+  <span class="comment">//info!("firstbin {} lastbin {}", firstbin, lastbin);
   </span><span class="kw">let </span><span class="kw-2">mut </span>vec_for_median = Vec::&lt;f32&gt;::new();
   <span class="kw">for </span>bin <span class="kw">in </span>firstbin..lastbin {
     <span class="kw">if </span>trace[bin].is_nan() {
@@ -1750,12 +1767,12 @@
     vec_for_median.push(trace[bin]);
   }
   <span class="kw">let </span>median_val = median(<span class="kw-2">&amp;</span>vec_for_median);
-  <span class="macro">debug!</span>(<span class="string">&quot;median val {median_val}&quot;</span>);
+  <span class="macro">debug!</span>(<span class="string">"median val {median_val}"</span>);
   <span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..trace_c.len() {
     trace_c[k] -= median_val;
   }
   <span class="kw">let </span><span class="kw-2">mut </span>zcs = find_zero_crossings(<span class="kw-2">&amp;</span>trace_c);
-  <span class="comment">//trace!(&quot;Found {} zero crossings!&quot;, zcs.len());
+  <span class="comment">//trace!("Found {} zero crossings!", zcs.len());
   </span><span class="kw">let </span><span class="kw-2">mut </span>zcs_nskip = Vec::&lt;usize&gt;::with_capacity(zcs.len());
   <span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..zcs.len() {
     <span class="kw">if </span>zcs[k] &gt; nskip <span class="kw">as </span>usize {
@@ -1778,17 +1795,17 @@
         }
       },
       Edge::None =&gt; {
-        <span class="macro">warn!</span>(<span class="string">&quot;Unsure what to do for Edge::None&quot;</span>);
+        <span class="macro">warn!</span>(<span class="string">"Unsure what to do for Edge::None"</span>);
       },
       Edge::Average =&gt; {
-        <span class="macro">warn!</span>(<span class="string">&quot;Unsure what to do for Edge::Average&quot;</span>);
+        <span class="macro">warn!</span>(<span class="string">"Unsure what to do for Edge::Average"</span>);
       },
       Edge::Unknown =&gt; {
-        <span class="macro">warn!</span>(<span class="string">&quot;Unsure what to do for Edge::Unknown&quot;</span>);
+        <span class="macro">warn!</span>(<span class="string">"Unsure what to do for Edge::Unknown"</span>);
       }
     }
   }
-  <span class="macro">debug!</span>(<span class="string">&quot;Found {} zero crossings!&quot;</span>, zcs_filter.len()); 
+  <span class="macro">debug!</span>(<span class="string">"Found {} zero crossings!"</span>, zcs_filter.len()); 
   zcs = zcs_filter;
   <span class="kw">if </span>zcs.len() &lt; <span class="number">3 </span>{
     <span class="kw">return </span>(zcs, periods);
@@ -1811,7 +1828,7 @@
     period += dts[<span class="kw-2">*</span>zcs_a]<span class="kw-2">*</span>f32::abs(tr_a[<span class="number">1</span>]/(tr_a[<span class="number">1</span>] - tr_a[<span class="number">0</span>])); <span class="comment">// first semi bin
     </span>period += dts[<span class="kw-2">*</span>zcs_b]<span class="kw-2">*</span>f32::abs(tr_b[<span class="number">0</span>]/(tr_b[<span class="number">1</span>] - tr_b[<span class="number">0</span>])); <span class="comment">// first semi bin
     </span><span class="kw">if </span>period.is_nan() {
-      <span class="macro">error!</span>(<span class="string">&quot;NAN in period found!&quot;</span>);
+      <span class="macro">error!</span>(<span class="string">"NAN in period found!"</span>);
       <span class="kw">continue</span>;
     }
     
@@ -1821,10 +1838,10 @@
       zcs = zcs_tmp;
       <span class="kw">break</span>;
     }
-    <span class="macro">trace!</span>(<span class="string">&quot;zcs_a, zcs_b, period, nperiod {} {} {} {}&quot;</span>, zcs_a, zcs_b, period, nperiod);
+    <span class="macro">trace!</span>(<span class="string">"zcs_a, zcs_b, period, nperiod {} {} {} {}"</span>, zcs_a, zcs_b, period, nperiod);
     periods.push(period);
   }
-  <span class="macro">debug!</span>(<span class="string">&quot;Calculated {} zero-crossings and {} periods!&quot;</span>, zcs.len(), periods.len());
+  <span class="macro">debug!</span>(<span class="string">"Calculated {} zero-crossings and {} periods!"</span>, zcs.len(), periods.len());
   (zcs, periods)
 }
 
@@ -1832,7 +1849,7 @@
 
 </span><span class="kw">fn </span>mean(input: <span class="kw-2">&amp;</span>Vec&lt;f32&gt;) -&gt; f32 {
   <span class="kw">if </span>input.len() == <span class="number">0 </span>{
-    <span class="macro">error!</span>(<span class="string">&quot;Vector is empty, can not calculate mean!&quot;</span>);
+    <span class="macro">error!</span>(<span class="string">"Vector is empty, can not calculate mean!"</span>);
     <span class="kw">return </span>f32::NAN;
   }
   <span class="kw">let </span><span class="kw-2">mut </span>n_entries : f32 = <span class="number">0.0</span>;
@@ -1856,7 +1873,7 @@
   //
   //let len = data.len();
   //if len == 0 {
-  //  error!(&quot;Vector is empty, can not calculate median!&quot;);
+  //  error!("Vector is empty, can not calculate median!");
   //  return f32::NAN;
   //}
   //// TODO This might panic! Is it ok?
@@ -1885,8 +1902,8 @@
   <span class="kw">let </span>num_rows    = data.len();
   <span class="comment">// Initialize a Vec to store the column-wise medians
   </span><span class="kw">let </span><span class="kw-2">mut </span>column_medians: Vec&lt;f32&gt; = <span class="macro">vec!</span>[<span class="number">0.0</span>; num_columns];
-  <span class="macro">debug!</span>(<span class="string">&quot;Calculating medians for {} columns!&quot;</span>, num_columns);
-  <span class="macro">debug!</span>(<span class="string">&quot;Calculating medians for {} rows!&quot;</span>, num_rows);
+  <span class="macro">debug!</span>(<span class="string">"Calculating medians for {} columns!"</span>, num_columns);
+  <span class="macro">debug!</span>(<span class="string">"Calculating medians for {} rows!"</span>, num_rows);
   <span class="comment">// Calculate the median for each column across all sub-vectors, ignoring NaN values
   </span><span class="kw">for </span>col <span class="kw">in </span><span class="number">0</span>..num_columns  {
     <span class="kw">let </span><span class="kw-2">mut </span>col_vals = <span class="macro">vec!</span>[<span class="number">0.0</span>; num_rows];
@@ -1911,7 +1928,7 @@
   <span class="comment">// Get the number of columns (assuming all sub-vectors have the same length)
   </span><span class="kw">let </span>num_columns = data[<span class="number">0</span>].len();
   <span class="kw">let </span>num_rows    = data.len();
-  <span class="macro">info!</span>(<span class="string">&quot;Calculating means for {} columns and {} rows&quot;</span>, num_columns, num_rows);
+  <span class="macro">info!</span>(<span class="string">"Calculating means for {} columns and {} rows"</span>, num_columns, num_rows);
   <span class="comment">// Initialize a Vec to store the column-wise medians
   </span><span class="kw">let </span><span class="kw-2">mut </span>column_means: Vec&lt;f32&gt; = <span class="macro">vec!</span>[<span class="number">0.0</span>; num_columns];
   <span class="comment">// Calculate the median for each column across all sub-vectors, ignoring NaN values
@@ -1988,10 +2005,10 @@
   //let len = vec.len() as isize;
   //
   //// Calculate the effective shift by taking the remainder of the shift
-  //// operation with the length of the vector to ensure it&#39;s within bounds.
+  //// operation with the length of the vector to ensure it's within bounds.
   //let effective_shift = (shift % len + len) % len;
   //
-  //// If the shift is zero, there&#39;s nothing to do.
+  //// If the shift is zero, there's nothing to do.
   //if effective_shift == 0 {
   //  return;
   //}
@@ -2023,7 +2040,7 @@
   </span><span class="kw">pub </span>serialize_event_data : bool,
   <span class="comment">// calibration constants
   </span><span class="kw">pub </span>v_offsets : [[f32;NWORDS];NCHN], <span class="comment">// voltage offset
-  </span><span class="kw">pub </span>v_dips    : [[f32;NWORDS];NCHN], <span class="comment">// voltage &quot;dip&quot; (time-dependent correction)
+  </span><span class="kw">pub </span>v_dips    : [[f32;NWORDS];NCHN], <span class="comment">// voltage "dip" (time-dependent correction)
   </span><span class="kw">pub </span>v_inc     : [[f32;NWORDS];NCHN], <span class="comment">// voltage increment (mV/ADC unit)
   </span><span class="kw">pub </span>tbin      : [[f32;NWORDS];NCHN], <span class="comment">// cell width (ns)
 
@@ -2121,7 +2138,7 @@
     <span class="kw">let </span><span class="kw-2">mut </span>all_v_dips    = Vec::&lt;Vec::&lt;f32&gt;&gt;::new();
     <span class="kw">let </span>nchn = input_vcal_data[<span class="number">0</span>].header.get_nchan();
 
-    <span class="macro">info!</span>(<span class="string">&quot;Found {nchn} channels!&quot;</span>);
+    <span class="macro">info!</span>(<span class="string">"Found {nchn} channels!"</span>);
     <span class="kw">for _ in </span><span class="number">0</span>..nchn {
       <span class="kw">let </span>empty_vec_off : Vec&lt;f32&gt; = <span class="macro">vec!</span>[<span class="number">0.0</span>;NWORDS];
       all_v_offsets.push(empty_vec_off);  
@@ -2140,14 +2157,14 @@
           rolled_traces[ch][n][k] = f32::NAN;
         }
         <span class="comment">// the traces are filled and the first 2 bins
-        // marked with nan, now need to get &quot;rolled over&quot;,
+        // marked with nan, now need to get "rolled over",
         // so that they start with the stop cell
         </span>roll(<span class="kw-2">&amp;mut </span>rolled_traces[ch][n],
              input_vcal_data[n].header.stop_cell <span class="kw">as </span>isize); 
       }<span class="comment">// first loop over events done
       </span>all_v_offsets[ch] = calculate_column_means(<span class="kw-2">&amp;</span>rolled_traces[ch]);
       <span class="comment">//let v_offsets = calculate_column_medians(&amp;rolled_traces[ch]);
-      </span><span class="macro">debug!</span>(<span class="string">&quot;We calculated {} voltage offset values for ch {}&quot;</span>, all_v_offsets[ch].len(), ch);
+      </span><span class="macro">debug!</span>(<span class="string">"We calculated {} voltage offset values for ch {}"</span>, all_v_offsets[ch].len(), ch);
       <span class="comment">// fill these in the prepared array structure
       //for k in 0..v_offsets.len() {
       //  all_v_offsets[ch][k] = v_offsets[k];
@@ -2184,7 +2201,7 @@
                             apply_vcal : bool) 
   -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Vec&lt;f32&gt;&gt;, CalibrationError&gt; {
     <span class="kw">if </span><span class="self">self</span>.tcal_data.len() == <span class="number">0 </span>{
-      <span class="macro">error!</span>(<span class="string">&quot;Input data for timing calibration is empty!&quot;</span>);
+      <span class="macro">error!</span>(<span class="string">"Input data for timing calibration is empty!"</span>);
       <span class="kw">return </span><span class="prelude-val">Err</span>(CalibrationError::EmptyInputData);
     }
     <span class="comment">// tcal values are [channel][adc_cell] 
@@ -2200,7 +2217,7 @@
       traces     = result.<span class="number">0</span>;
       stop_cells = result.<span class="number">1</span>;
     } <span class="kw">else </span>{
-      <span class="macro">warn!</span>(<span class="string">&quot;Not applying voltage calibration to tcal data. This most likely makes no sense!&quot;</span>);
+      <span class="macro">warn!</span>(<span class="string">"Not applying voltage calibration to tcal data. This most likely makes no sense!"</span>);
       traces  = unpack_traces_f32(<span class="kw-2">&amp;</span><span class="self">self</span>.tcal_data);
       <span class="kw">for </span>ev <span class="kw">in </span><span class="self">self</span>.tcal_data.iter() {
         stop_cells.push(ev.header.event_id <span class="kw">as </span>isize);
@@ -2254,7 +2271,7 @@
             },
             <span class="kw">_ </span>=&gt; {
               <span class="comment">// FIXME - better error handling
-              </span><span class="macro">error!</span>(<span class="string">&quot;Only average, rising or falling edge supported!&quot;</span>);
+              </span><span class="macro">error!</span>(<span class="string">"Only average, rising or falling edge supported!"</span>);
             }
           } <span class="comment">// end match
           </span>dval = f32::abs(dval); 
@@ -2283,7 +2300,7 @@
     </span>|| <span class="self">self</span>.noi_data.len() == <span class="number">0 </span>{
       <span class="kw">return </span><span class="prelude-val">Err</span>(CalibrationError::EmptyInputData);
     }
-    <span class="macro">info!</span>(<span class="string">&quot;Starting voltage calibration!&quot;</span>);
+    <span class="macro">info!</span>(<span class="string">"Starting voltage calibration!"</span>);
     <span class="kw">let </span>(v_offsets_high, _v_dips_high) 
         = <span class="self">Self</span>::voltage_offset_and_dips(<span class="kw-2">&amp;</span><span class="self">self</span>.vcal_data)<span class="question-mark">?</span>;
     <span class="kw">let </span>(v_offsets_low, v_dips_low) 
@@ -2297,9 +2314,9 @@
       }
     }
     <span class="comment">// at this point, the voltage calibration is complete
-    </span><span class="macro">info!</span>(<span class="string">&quot;Voltage calibration complete!&quot;</span>);
-    <span class="macro">info!</span>(<span class="string">&quot;Begin timing calibration!&quot;</span>);
-    <span class="macro">warn!</span>(<span class="string">&quot;Calibration only supported for Edge::Average!&quot;</span>);
+    </span><span class="macro">info!</span>(<span class="string">"Voltage calibration complete!"</span>);
+    <span class="macro">info!</span>(<span class="string">"Begin timing calibration!"</span>);
+    <span class="macro">warn!</span>(<span class="string">"Calibration only supported for Edge::Average!"</span>);
     <span class="comment">// this just suppresses a warning
     // We have to think if edge will be
     // a parameter or a constant.
@@ -2321,7 +2338,7 @@
       <span class="comment">// for further calibration procedure
       </span>edge = Edge::Rising;
     } <span class="kw">else </span>{
-      <span class="macro">error!</span>(<span class="string">&quot;This is not implemented for any other case yet!&quot;</span>);
+      <span class="macro">error!</span>(<span class="string">"This is not implemented for any other case yet!"</span>);
       <span class="macro">todo!</span>();
     }
     
@@ -2355,13 +2372,13 @@
                                            nperiod,
                                            <span class="self">Self</span>::NSKIP <span class="kw">as </span>f32,
                                            <span class="kw-2">&amp;</span>edge);
-          <span class="macro">debug!</span>(<span class="string">&quot;Will iterate over {} periods!&quot;</span>, periods.len());
+          <span class="macro">debug!</span>(<span class="string">"Will iterate over {} periods!"</span>, periods.len());
           <span class="kw">for </span>(n_p,period) <span class="kw">in </span>periods.iter().enumerate() {
             <span class="kw">if </span><span class="kw-2">*</span>period == <span class="number">0.0 </span>{
-              <span class="macro">warn!</span>(<span class="string">&quot;period is 0 {:?}&quot;</span>, periods);
+              <span class="macro">warn!</span>(<span class="string">"period is 0 {:?}"</span>, periods);
             }
             <span class="kw">if </span>period.is_nan() {
-              <span class="macro">warn!</span>(<span class="string">&quot;period is nan! {:?}&quot;</span>, periods);
+              <span class="macro">warn!</span>(<span class="string">"period is nan! {:?}"</span>, periods);
             }
             <span class="kw">let </span>zcs_a = zcs[n_p]     + stop_cell <span class="kw">as </span>usize;
             <span class="kw">let </span>zcs_b = zcs[n_p + <span class="number">1</span>] + stop_cell <span class="kw">as </span>usize;
@@ -2550,11 +2567,11 @@
                   waveform  : <span class="kw-2">&amp;mut </span>Vec&lt;f32&gt;) {
                   <span class="comment">//waveform  : &amp;mut [f32;NWORDS]) {
     </span><span class="kw">if </span>channel &gt; <span class="number">9 </span>|| channel == <span class="number">0 </span>{
-      <span class="macro">error!</span>(<span class="string">&quot;There is no channel larger than 9 and no channel 0! Channel {channel} was requested. Can not perform voltage calibration!&quot;</span>);
+      <span class="macro">error!</span>(<span class="string">"There is no channel larger than 9 and no channel 0! Channel {channel} was requested. Can not perform voltage calibration!"</span>);
       <span class="kw">return</span>;
     }
     <span class="kw">if </span>adc.len() != waveform.len() {
-      <span class="macro">error!</span>(<span class="string">&quot;Input len {} and output len {} don&#39;t match!&quot;</span>, adc.len(), waveform.len());
+      <span class="macro">error!</span>(<span class="string">"Input len {} and output len {} don't match!"</span>, adc.len(), waveform.len());
       <span class="kw">return</span>;
     }
 
@@ -2582,7 +2599,7 @@
                      stop_cell : usize,
                      times     : <span class="kw-2">&amp;mut </span>Vec&lt;f32&gt;) {
     <span class="kw">if </span>channel &gt; <span class="number">9 </span>|| channel == <span class="number">0 </span>{
-      <span class="macro">error!</span>(<span class="string">&quot;There is no channel larger than 9 and no channel 0! Channel {channel} was requested. Can not perform timing calibration!&quot;</span>);
+      <span class="macro">error!</span>(<span class="string">"There is no channel larger than 9 and no channel 0! Channel {channel} was requested. Can not perform timing calibration!"</span>);
     }
     <span class="kw">for </span>k <span class="kw">in </span><span class="number">1</span>..NWORDS { 
       times[k] = times[k-<span class="number">1</span>] + <span class="self">self</span>.tbin[channel -<span class="number">1</span>][(k-<span class="number">1</span>+(stop_cell))%NWORDS];
@@ -2590,15 +2607,12 @@
   }
 
   <span class="kw">pub fn </span>new(rb_id : u8) -&gt; <span class="self">Self </span>{
-    <span class="comment">// FIXME
-    //let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap_or(Duration::from_secs(0));
-    //let timestamp = now.as_secs() as u32;
-    </span><span class="kw">let </span>timestamp = <span class="number">0</span>;
+    <span class="kw">let </span>timestamp = Utc::now().timestamp() <span class="kw">as </span>u32;
     <span class="self">Self </span>{
       rb_id     : rb_id,
       d_v       : <span class="number">182.0</span>, <span class="comment">// FIXME - this needs to be a constant
       </span>timestamp : timestamp,
-      serialize_event_data : <span class="bool-val">false</span>, <span class="comment">// per default, don&#39;t serialize the data 
+      serialize_event_data : <span class="bool-val">false</span>, <span class="comment">// per default, don't serialize the data 
       </span>v_offsets : [[<span class="number">0.0</span>;NWORDS];NCHN], 
       v_dips    : [[<span class="number">0.0</span>;NWORDS];NCHN], 
       v_inc     : [[<span class="number">0.0</span>;NWORDS];NCHN], 
@@ -2619,7 +2633,7 @@
     <span class="kw">loop </span>{
       <span class="kw">match </span>reader.next() {
         <span class="prelude-val">None </span>=&gt; {
-          <span class="macro">error!</span>(<span class="string">&quot;Can&#39;t load calibration!&quot;</span>);
+          <span class="macro">error!</span>(<span class="string">"Can't load calibration!"</span>);
           <span class="kw">break</span>;
         },
         <span class="prelude-val">Some</span>(pack) =&gt; {
@@ -2638,15 +2652,15 @@
   <span class="kw">pub fn </span>from_txtfile(filename : <span class="kw-2">&amp;</span>Path) -&gt; <span class="self">Self </span>{
     <span class="kw">let </span><span class="kw-2">mut </span>rb_cal = <span class="self">Self</span>::new(<span class="number">0</span>);
     rb_cal.get_id_from_filename(<span class="kw-2">&amp;</span>filename);
-    <span class="macro">info!</span>(<span class="string">&quot;Attempting to open file {}&quot;</span>, filename.display());
-    <span class="kw">let </span>file = BufReader::new(File::open(filename).expect(<span class="string">&quot;Unable to open file {}&quot;</span>));
+    <span class="macro">info!</span>(<span class="string">"Attempting to open file {}"</span>, filename.display());
+    <span class="kw">let </span>file = BufReader::new(File::open(filename).expect(<span class="string">"Unable to open file {}"</span>));
     <span class="comment">// count lines and check if we have 4 lines per channel
     </span><span class="kw">let </span><span class="kw-2">mut </span>cnt  = <span class="number">0</span>;
     <span class="kw">for _ in </span>file.lines() {
       cnt += <span class="number">1</span>;
     }
     <span class="kw">if </span>cnt != NCHN<span class="kw-2">*</span><span class="number">4 </span>{
-      <span class="macro">panic! </span>(<span class="string">&quot;The calibration file {} does not have the proper format! It has {} lines&quot;</span>, filename.display(), cnt);
+      <span class="macro">panic! </span>(<span class="string">"The calibration file {} does not have the proper format! It has {} lines"</span>, filename.display(), cnt);
     }
     cnt = <span class="number">0</span>;
     <span class="kw">let </span><span class="kw-2">mut </span>vals = <span class="number">0usize</span>;
@@ -2654,7 +2668,7 @@
     <span class="kw">if let </span><span class="prelude-val">Ok</span>(lines) = read_lines(filename) {
       <span class="comment">// we have NCHN-1*4 lines (no calibration data for channel 9)
       </span><span class="kw">for </span>data <span class="kw">in </span>lines.flatten() {       
-        <span class="kw">let </span>values: Vec&lt;<span class="kw-2">&amp;</span>str&gt; = data.split(<span class="string">&#39; &#39;</span>).collect();
+        <span class="kw">let </span>values: Vec&lt;<span class="kw-2">&amp;</span>str&gt; = data.split(<span class="string">' '</span>).collect();
         <span class="kw">if </span>values.len() == NWORDS {
           <span class="kw">if </span>vals == <span class="number">0 </span>{
             <span class="kw">for </span>n <span class="kw">in </span><span class="number">0</span>..NWORDS {
@@ -2707,7 +2721,7 @@
             <span class="kw">continue</span>;
           }
         } <span class="kw">else </span>{
-          <span class="macro">panic!</span>(<span class="string">&quot;Invalid input line {}&quot;</span>, data)
+          <span class="macro">panic!</span>(<span class="string">"Invalid input line {}"</span>, data)
         }
         vals += <span class="number">1</span>;
       }
@@ -2717,13 +2731,13 @@
 
   <span class="doccomment">/// Infer the readoutboard id from the filename
   ///
-  /// Assuming a certain naming scheme for the filename &quot;rbXX_cal.txt&quot;
+  /// Assuming a certain naming scheme for the filename "rbXX_cal.txt"
   /// we extract the readoutboard id
   </span><span class="kw">pub fn </span>get_id_from_filename(<span class="kw-2">&amp;mut </span><span class="self">self</span>, filename : <span class="kw-2">&amp;</span>Path) -&gt; u8 {
     <span class="kw">let </span>rb_id : u8;
     <span class="kw">match </span>filename.file_name() {
       <span class="prelude-val">None   </span>=&gt; {
-        <span class="macro">error!</span>(<span class="string">&quot;Path {} seems non-sensical!&quot;</span>, filename.display());
+        <span class="macro">error!</span>(<span class="string">"Path {} seems non-sensical!"</span>, filename.display());
         <span class="self">self</span>.rb_id = <span class="number">0</span>;
         <span class="kw">return </span><span class="number">0</span>;
       }
@@ -2733,7 +2747,7 @@
         <span class="kw">let </span>id    = <span class="kw-2">&amp;</span>fname[<span class="number">2</span>..<span class="number">4</span>];
         <span class="comment">// TODO This might panic! Is it ok?
         </span>rb_id     = id.parse::&lt;u8&gt;().unwrap();
-        <span class="macro">debug!</span>(<span class="string">&quot;Extracted RB ID {} from filename {}&quot;</span>, rb_id, fname);
+        <span class="macro">debug!</span>(<span class="string">"Extracted RB ID {} from filename {}"</span>, rb_id, fname);
       }
     }
   <span class="self">self</span>.rb_id = rb_id;
@@ -2772,24 +2786,24 @@
     <span class="kw">if </span>rb_cal.serialize_event_data {
       <span class="kw">let </span>broken_event = RBEvent::new();
       <span class="kw">let </span>n_noi  = parse_u16(bytestream, pos);
-      <span class="macro">info!</span>(<span class="string">&quot;Found {n_noi} no input data events!&quot;</span>);
+      <span class="macro">info!</span>(<span class="string">"Found {n_noi} no input data events!"</span>);
       <span class="kw">for _ in </span><span class="number">0</span>..n_noi {
         <span class="kw">match </span>RBEvent::from_bytestream(bytestream, pos) {
           <span class="prelude-val">Ok</span>(ev) =&gt; {
             rb_cal.noi_data.push(ev);            
           }
           <span class="prelude-val">Err</span>(err) =&gt; {
-            <span class="macro">error!</span>(<span class="string">&quot;Unable to read RBEvent! {err}&quot;</span>);
+            <span class="macro">error!</span>(<span class="string">"Unable to read RBEvent! {err}"</span>);
           }
         }
-        <span class="comment">// FIXME - broken event won&#39;t advance the pos marker
+        <span class="comment">// FIXME - broken event won't advance the pos marker
       </span>}
       <span class="kw">let </span>n_vcal = parse_u16(bytestream, pos); 
-      <span class="macro">info!</span>(<span class="string">&quot;Found {n_vcal} VCal data events!&quot;</span>);
+      <span class="macro">info!</span>(<span class="string">"Found {n_vcal} VCal data events!"</span>);
       <span class="kw">for _ in </span><span class="number">0</span>..n_vcal {
         <span class="kw">match </span>RBEvent::from_bytestream(bytestream, pos) {
           <span class="prelude-val">Err</span>(err) =&gt; {
-            <span class="macro">error!</span>(<span class="string">&quot;Found broken event {err}&quot;</span>);
+            <span class="macro">error!</span>(<span class="string">"Found broken event {err}"</span>);
           },
           <span class="prelude-val">Ok</span>(good_ev) =&gt; {
             rb_cal.vcal_data.push(good_ev);
@@ -2797,7 +2811,7 @@
         }
       }
       <span class="kw">let </span>n_tcal = parse_u16(bytestream, pos); 
-      <span class="macro">info!</span>(<span class="string">&quot;Found {n_tcal} TCal data events!&quot;</span>);
+      <span class="macro">info!</span>(<span class="string">"Found {n_tcal} TCal data events!"</span>);
       <span class="kw">for _ in </span><span class="number">0</span>..n_tcal {
         rb_cal.tcal_data.push(RBEvent::from_bytestream(bytestream, pos).unwrap_or(broken_event.clone()));
       }
@@ -2829,7 +2843,7 @@
       }
     }
     <span class="kw">if </span><span class="self">self</span>.serialize_event_data {
-      <span class="macro">info!</span>(<span class="string">&quot;Serializing calibration event data!&quot;</span>);
+      <span class="macro">info!</span>(<span class="string">"Serializing calibration event data!"</span>);
       <span class="kw">let </span>n_noi  = <span class="self">self</span>.noi_data.len()  <span class="kw">as </span>u16;
       <span class="kw">let </span>n_vcal = <span class="self">self</span>.vcal_data.len() <span class="kw">as </span>u16;
       <span class="kw">let </span>n_tcal = <span class="self">self</span>.tcal_data.len() <span class="kw">as </span>u16;
@@ -2845,7 +2859,7 @@
       <span class="kw">for </span>ev <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.tcal_data {
         bs.extend_from_slice(<span class="kw-2">&amp;</span>ev.to_bytestream());
       }
-    } <span class="kw">else </span>{ <span class="comment">// if we don&#39;t serialize event data, write 0 
+    } <span class="kw">else </span>{ <span class="comment">// if we don't serialize event data, write 0 
              // for the empty data
       // (3 16bit 0s) for noi, vcal, tcal
       </span><span class="kw">for _ in </span><span class="number">0</span>..<span class="number">6 </span>{
@@ -2868,10 +2882,25 @@
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>RBCalibrations {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
-    <span class="kw">let </span>datetime_utc: DateTime&lt;Utc&gt; = Utc.timestamp(<span class="self">self</span>.timestamp <span class="kw">as </span>i64, <span class="number">0</span>);
-    <span class="kw">let </span>timestamp_str = datetime_utc.format(<span class="string">&quot;%Y/%m/%d %H:%M:%S&quot;</span>).to_string();
-    <span class="macro">write!</span>(f, 
-  <span class="string">&quot;&lt;ReadoutboardCalibration [{} UTC]:
+    <span class="kw">let </span><span class="kw-2">mut </span>timestamp_str = String::from(<span class="string">"?"</span>);
+    <span class="macro">println!</span>(<span class="string">"Self.timestamp {}"</span>, <span class="self">self</span>.timestamp);
+    <span class="kw">match </span>Utc.timestamp_opt(<span class="self">self</span>.timestamp.into(), <span class="number">0</span>) {
+      LocalResult::Single(datetime_utc) =&gt; {
+        timestamp_str = datetime_utc.format(<span class="string">"%Y/%m/%d %H:%M:%S"</span>).to_string();
+        <span class="comment">//println!("UTC datetime: {}", datetime_utc);
+      </span>},
+      LocalResult::Ambiguous(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; {
+        <span class="macro">println!</span>(<span class="string">"The given timestamp is ambiguous."</span>);
+      },
+      LocalResult::None =&gt; {
+        <span class="macro">println!</span>(<span class="string">"The given timestamp is not valid."</span>);
+      },
+    }
+
+
+    <span class="comment">//let datetime_utc: DateTime&lt;Utc&gt; = Utc.timestamp_opt(self.timestamp as i64, 0).earliest().unwrap_or(DateTime::&lt;Utc&gt;::from_timestamp_millis(0).unwrap());
+    </span><span class="macro">write!</span>(f, 
+  <span class="string">"&lt;ReadoutboardCalibration [{} UTC]:
       RB             : {}
       VCalData       : {} (events)
       TCalData       : {} (events)
@@ -2879,7 +2908,7 @@
       V Offsets [ch0]: .. {:?} {:?} ..
       V Incrmts [ch0]: .. {:?} {:?} ..
       V Dips    [ch0]: .. {:?} {:?} ..
-      T Bins    [ch0]: .. {:?} {:?} ..&gt;&quot;</span>,
+      T Bins    [ch0]: .. {:?} {:?} ..&gt;"</span>,
       timestamp_str,
       <span class="self">self</span>.rb_id,
       <span class="self">self</span>.vcal_data.len(),
@@ -2902,27 +2931,27 @@
   <span class="doccomment">/// Read an asci text file with calibration constants.
   </span><span class="kw">fn </span>from(path : <span class="kw-2">&amp;</span>Path) -&gt; <span class="self">Self </span>{
     <span class="kw">let </span><span class="kw-2">mut </span>cali = RBCalibrations::new(<span class="number">0</span>);
-    <span class="kw">if </span>path.ends_with(<span class="string">&quot;.txt&quot;</span>) {
+    <span class="kw">if </span>path.ends_with(<span class="string">".txt"</span>) {
       <span class="kw">return </span>RBCalibrations::from_txtfile(path);
     } <span class="kw">else </span>{
       <span class="kw">match </span>read_file(path) {
         <span class="prelude-val">Err</span>(err) =&gt; {
-          <span class="macro">error!</span>(<span class="string">&quot;Can not open {}! Err {err}&quot;</span>, path.display());
+          <span class="macro">error!</span>(<span class="string">"Can not open {}! Err {err}"</span>, path.display());
         },
         <span class="prelude-val">Ok</span>(stream) =&gt; {
           <span class="comment">// assume this is wrapped in a tof packet
           </span><span class="kw">match </span>TofPacket::from_bytestream(<span class="kw-2">&amp;</span>stream, <span class="kw-2">&amp;mut </span><span class="number">0</span>) {
             <span class="prelude-val">Err</span>(err) =&gt; {
-              <span class="macro">error!</span>(<span class="string">&quot;Can not read TofPacket, error {err}&quot;</span>);
+              <span class="macro">error!</span>(<span class="string">"Can not read TofPacket, error {err}"</span>);
             }
             <span class="prelude-val">Ok</span>(pk) =&gt; {
               <span class="kw">if </span>pk.packet_type != PacketType::RBCalibration {
-                <span class="macro">error!</span>(<span class="string">&quot;TofPacket does not contain calibration data! Packet: {}&quot;</span>, pk);
+                <span class="macro">error!</span>(<span class="string">"TofPacket does not contain calibration data! Packet: {}"</span>, pk);
                 <span class="kw">return </span>cali;
               }
               <span class="kw">match </span>RBCalibrations::from_bytestream(<span class="kw-2">&amp;</span>pk.payload, <span class="kw-2">&amp;mut </span><span class="number">0</span>) {
                 <span class="prelude-val">Err</span>(err) =&gt; {
-                  <span class="macro">error!</span>(<span class="string">&quot;Can not read calibration from binary file {}, Error {err}!&quot;</span>, path.display());
+                  <span class="macro">error!</span>(<span class="string">"Can not read calibration from binary file {}, Error {err}!"</span>, path.display());
                 },
                 <span class="prelude-val">Ok</span>(c) =&gt; {
                   cali = c;
@@ -2937,7 +2966,7 @@
   }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;random&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"random"</span>)]
 </span><span class="kw">impl </span>FromRandom <span class="kw">for </span>RBCalibrations {
     
   <span class="kw">fn </span>from_random() -&gt; <span class="self">Self </span>{
@@ -2968,7 +2997,7 @@
   }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;random&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"random"</span>)]
 #[test]
 </span><span class="kw">fn </span>serialization_rbcalibration_noeventpayload() {
   <span class="kw">let </span><span class="kw-2">mut </span>calis = Vec::&lt;RBCalibrations&gt;::new();
@@ -2984,7 +3013,7 @@
   <span class="macro">assert_eq!</span>(calis[<span class="number">0</span>], test);
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;random&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"random"</span>)]
 #[test]
 </span><span class="kw">fn </span>serialization_rbcalibration_witheventpayload() {
   <span class="kw">let </span><span class="kw-2">mut </span>calis = Vec::&lt;RBCalibrations&gt;::new();

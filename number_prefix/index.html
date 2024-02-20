@@ -1,5 +1,6 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="This is a library for formatting numbers with numeric prefixes, such as turning “3000 metres” into “3 kilometres”, or “8705 bytes” into “8.5 KiB”."><title>number_prefix - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="number_prefix" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../number_prefix/index.html">number_prefix</a><span class="version">0.4.0</span></h2></div><div class="sidebar-elems"><ul class="block">
-            <li><a id="all-types" href="all.html">All Items</a></li></ul><section><ul class="block"><li><a href="#enums">Enums</a></li><li><a href="#traits">Traits</a></li></ul></section></div></nav><main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Crate <a class="mod" href="#">number_prefix</a><button id="copy-path" title="Copy item path to clipboard"><img src="../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="src" href="../src/number_prefix/lib.rs.html#1-553">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>This is a library for formatting numbers with numeric prefixes, such as
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="This is a library for formatting numbers with numeric prefixes, such as turning “3000 metres” into “3 kilometres”, or “8705 bytes” into “8.5 KiB”."><title>number_prefix - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="number_prefix" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../number_prefix/index.html">number_prefix</a><span class="version">0.4.0</span></h2></div><div class="sidebar-elems"><ul class="block">
+            <li><a id="all-types" href="all.html">All Items</a></li></ul><section><ul class="block"><li><a href="#enums">Enums</a></li><li><a href="#traits">Traits</a></li></ul></section></div></nav><div class="sidebar-resizer"></div>
+    <main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../number_prefix/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Crate <a class="mod" href="#">number_prefix</a><button id="copy-path" title="Copy item path to clipboard"><img src="../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="src" href="../src/number_prefix/lib.rs.html#1-553">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>This is a library for formatting numbers with numeric prefixes, such as
 turning “3000 metres” into “3 kilometres”, or “8705 bytes” into “8.5 KiB”.</p>
 <h2 id="usage"><a href="#usage">Usage</a></h2>
 <p>The function <a href="enum.NumberPrefix.html#method.decimal"><code>NumberPrefix::decimal</code></a>
@@ -12,14 +13,14 @@ example:</p>
 <span class="kw">let </span>amount = <span class="number">8542_f32</span>;
 <span class="kw">let </span>result = <span class="kw">match </span>NumberPrefix::decimal(amount) {
     NumberPrefix::Standalone(bytes) =&gt; {
-        <span class="macro">format!</span>(<span class="string">&quot;The file is {} bytes in size&quot;</span>, bytes)
+        <span class="macro">format!</span>(<span class="string">"The file is {} bytes in size"</span>, bytes)
     }
     NumberPrefix::Prefixed(prefix, n) =&gt; {
-        <span class="macro">format!</span>(<span class="string">&quot;The file is {:.1} {}B in size&quot;</span>, n, prefix)
+        <span class="macro">format!</span>(<span class="string">"The file is {:.1} {}B in size"</span>, n, prefix)
     }
 };
 
-<span class="macro">assert_eq!</span>(<span class="string">&quot;The file is 8.5 kB in size&quot;</span>, result);</code></pre></div>
+<span class="macro">assert_eq!</span>(<span class="string">"The file is 8.5 kB in size"</span>, result);</code></pre></div>
 <p>The <code>{:.1}</code> part of the formatting string tells it to restrict the
 output to only one decimal place. This value is calculated by repeatedly
 dividing the number by 1000 until it becomes less than that, which in this
@@ -35,14 +36,14 @@ if it’s under 1000 — then the standalone value will be returned:</p>
 <span class="kw">let </span>amount = <span class="number">705_f32</span>;
 <span class="kw">let </span>result = <span class="kw">match </span>NumberPrefix::decimal(amount) {
     NumberPrefix::Standalone(bytes) =&gt; {
-        <span class="macro">format!</span>(<span class="string">&quot;The file is {} bytes in size&quot;</span>, bytes)
+        <span class="macro">format!</span>(<span class="string">"The file is {} bytes in size"</span>, bytes)
     }
     NumberPrefix::Prefixed(prefix, n) =&gt; {
-        <span class="macro">format!</span>(<span class="string">&quot;The file is {:.1} {}B in size&quot;</span>, n, prefix)
+        <span class="macro">format!</span>(<span class="string">"The file is {:.1} {}B in size"</span>, n, prefix)
     }
 };
 
-<span class="macro">assert_eq!</span>(<span class="string">&quot;The file is 705 bytes in size&quot;</span>, result);</code></pre></div>
+<span class="macro">assert_eq!</span>(<span class="string">"The file is 705 bytes in size"</span>, result);</code></pre></div>
 <p>In this particular example, the user expects different formatting for
 both bytes and kilobytes: while prefixed values are given more precision,
 there’s no point using anything other than whole numbers for just byte
@@ -60,14 +61,14 @@ For example:</p>
 <span class="kw">let </span>amount = <span class="number">8542_f32</span>;
 <span class="kw">let </span>result = <span class="kw">match </span>NumberPrefix::binary(amount) {
     NumberPrefix::Standalone(bytes) =&gt; {
-        <span class="macro">format!</span>(<span class="string">&quot;The file is {} bytes in size&quot;</span>, bytes)
+        <span class="macro">format!</span>(<span class="string">"The file is {} bytes in size"</span>, bytes)
     }
     NumberPrefix::Prefixed(prefix, n) =&gt; {
-        <span class="macro">format!</span>(<span class="string">&quot;The file is {:.1} {}B in size&quot;</span>, n, prefix)
+        <span class="macro">format!</span>(<span class="string">"The file is {:.1} {}B in size"</span>, n, prefix)
     }
 };
 
-<span class="macro">assert_eq!</span>(<span class="string">&quot;The file is 8.3 KiB in size&quot;</span>, result);</code></pre></div>
+<span class="macro">assert_eq!</span>(<span class="string">"The file is 8.3 KiB in size"</span>, result);</code></pre></div>
 <p>A kibibyte is slightly larger than a kilobyte, so the number is smaller
 in the result; but other than that, it works in exactly the same way, with
 the binary prefix being converted to a symbol automatically.</p>
@@ -87,14 +88,14 @@ prefix in a variety of formats. For example:</p>
 <span class="kw">let </span>amount = <span class="number">8542_f32</span>;
 <span class="kw">let </span>result = <span class="kw">match </span>NumberPrefix::decimal(amount) {
     NumberPrefix::Standalone(bytes) =&gt; {
-        <span class="macro">format!</span>(<span class="string">&quot;The file is {} bytes in size&quot;</span>, bytes)
+        <span class="macro">format!</span>(<span class="string">"The file is {} bytes in size"</span>, bytes)
     }
     NumberPrefix::Prefixed(prefix, n) =&gt; {
-        <span class="macro">format!</span>(<span class="string">&quot;The file is {:.1} {}bytes in size&quot;</span>, n, prefix.lower())
+        <span class="macro">format!</span>(<span class="string">"The file is {:.1} {}bytes in size"</span>, n, prefix.lower())
     }
 };
 
-<span class="macro">assert_eq!</span>(<span class="string">&quot;The file is 8.5 kilobytes in size&quot;</span>, result);</code></pre></div>
+<span class="macro">assert_eq!</span>(<span class="string">"The file is 8.5 kilobytes in size"</span>, result);</code></pre></div>
 <h3 id="string-parsing"><a href="#string-parsing">String Parsing</a></h3>
 <p>There is a <code>FromStr</code> implementation for <code>NumberPrefix</code> that parses
 strings containing numbers and trailing prefixes, such as <code>7.5E</code>.</p>
@@ -103,14 +104,14 @@ metres. Whitespace is allowed between the number and the rest of the string.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>number_prefix::{NumberPrefix, Prefix};
 
-<span class="macro">assert_eq!</span>(<span class="string">&quot;7.05E&quot;</span>.parse::&lt;NumberPrefix&lt;<span class="kw">_</span>&gt;&gt;(),
+<span class="macro">assert_eq!</span>(<span class="string">"7.05E"</span>.parse::&lt;NumberPrefix&lt;<span class="kw">_</span>&gt;&gt;(),
            <span class="prelude-val">Ok</span>(NumberPrefix::Prefixed(Prefix::Exa, <span class="number">7.05_f64</span>)));
 
-<span class="macro">assert_eq!</span>(<span class="string">&quot;7.05&quot;</span>.parse::&lt;NumberPrefix&lt;<span class="kw">_</span>&gt;&gt;(),
+<span class="macro">assert_eq!</span>(<span class="string">"7.05"</span>.parse::&lt;NumberPrefix&lt;<span class="kw">_</span>&gt;&gt;(),
            <span class="prelude-val">Ok</span>(NumberPrefix::Standalone(<span class="number">7.05_f64</span>)));
 
-<span class="macro">assert_eq!</span>(<span class="string">&quot;7.05 GiB&quot;</span>.parse::&lt;NumberPrefix&lt;<span class="kw">_</span>&gt;&gt;(),
+<span class="macro">assert_eq!</span>(<span class="string">"7.05 GiB"</span>.parse::&lt;NumberPrefix&lt;<span class="kw">_</span>&gt;&gt;(),
            <span class="prelude-val">Ok</span>(NumberPrefix::Prefixed(Prefix::Gibi, <span class="number">7.05_f64</span>)));</code></pre></div>
-</div></details><h2 id="enums" class="small-section-header"><a href="#enums">Enums</a></h2><ul class="item-table"><li><div class="item-name"><a class="enum" href="enum.NumberPrefix.html" title="enum number_prefix::NumberPrefix">NumberPrefix</a></div><div class="desc docblock-short">The result of trying to apply a prefix to a floating-point value.</div></li><li><div class="item-name"><a class="enum" href="enum.Prefix.html" title="enum number_prefix::Prefix">Prefix</a></div><div class="desc docblock-short">A numeric prefix, either binary or decimal.</div></li></ul><h2 id="traits" class="small-section-header"><a href="#traits">Traits</a></h2><ul class="item-table"><li><div class="item-name"><a class="trait" href="trait.Amounts.html" title="trait number_prefix::Amounts">Amounts</a></div><div class="desc docblock-short">Traits for floating-point values for both the possible multipliers. They
+</div></details><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2><ul class="item-table"><li><div class="item-name"><a class="enum" href="enum.NumberPrefix.html" title="enum number_prefix::NumberPrefix">NumberPrefix</a></div><div class="desc docblock-short">The result of trying to apply a prefix to a floating-point value.</div></li><li><div class="item-name"><a class="enum" href="enum.Prefix.html" title="enum number_prefix::Prefix">Prefix</a></div><div class="desc docblock-short">A numeric prefix, either binary or decimal.</div></li></ul><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2><ul class="item-table"><li><div class="item-name"><a class="trait" href="trait.Amounts.html" title="trait number_prefix::Amounts">Amounts</a></div><div class="desc docblock-short">Traits for floating-point values for both the possible multipliers. They
 need to be Copy, have defined 1000 and 1024s, and implement a bunch of
 operators.</div></li></ul></section></div></main></body></html>

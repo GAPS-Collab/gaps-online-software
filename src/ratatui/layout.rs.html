@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.25.0/src/layout.rs`."><title>layout.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.25.0/src/layout.rs`."><title>layout.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><a class="sub-logo-container" href="../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1778,8 +1779,8 @@
 ///         [Constraint::Length(5), Constraint::Min(0)],
 ///     )
 ///     .split(Rect::new(0, 0, 10, 10));
-///     frame.render_widget(Paragraph::new(&quot;foo&quot;), layout[0]);
-///     frame.render_widget(Paragraph::new(&quot;bar&quot;), layout[1]);
+///     frame.render_widget(Paragraph::new("foo"), layout[0]);
+///     frame.render_widget(Paragraph::new("bar"), layout[1]);
 /// }
 /// ```
 ///
@@ -1933,14 +1934,14 @@
 /// chunks or to not distribute extra space at all (which is the default used for laying out the
 /// columns for [`Table`] widgets).
 ///
-/// Note: If you&#39;re using this feature please help us come up with a good name. See [Issue
+/// Note: If you're using this feature please help us come up with a good name. See [Issue
 /// #536](https://github.com/ratatui-org/ratatui/issues/536) for more information.
 ///
 /// [`Table`]: crate::widgets::Table
 </span><span class="attr">#[stability::unstable(
-    feature = <span class="string">&quot;segment-size&quot;</span>,
-    reason = <span class="string">&quot;The name for this feature is not final and may change in the future&quot;</span>,
-    issue = <span class="string">&quot;https://github.com/ratatui-org/ratatui/issues/536&quot;
+    feature = <span class="string">"segment-size"</span>,
+    reason = <span class="string">"The name for this feature is not final and may change in the future"</span>,
+    issue = <span class="string">"https://github.com/ratatui-org/ratatui/issues/536"
 </span>)]
 #[derive(Copy, Debug, Default, Display, EnumString, Clone, Eq, PartialEq, Hash)]
 </span><span class="kw">pub enum </span>SegmentSize {
@@ -2005,8 +2006,8 @@
     /// that subsequent calls with the same parameters are faster. The cache is a LruCache, and
     /// grows until `cache_size` is reached.
     ///
-    /// Returns true if the cell&#39;s value was set by this call.
-    /// Returns false if the cell&#39;s value was not set by this call, this means that another thread
+    /// Returns true if the cell's value was set by this call.
+    /// Returns false if the cell's value was not set by this call, this means that another thread
     /// has set this value or that the cache size is already initialized.
     ///
     /// Note that a custom cache size will be set only if this function:
@@ -2041,7 +2042,7 @@
     ///     .split(Rect::new(0, 0, 10, 10));
     /// assert_eq!(layout[..], [Rect::new(0, 0, 10, 5), Rect::new(0, 5, 10, 5)]);
     /// ```
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub const fn </span>direction(<span class="kw-2">mut </span><span class="self">self</span>, direction: Direction) -&gt; Layout {
         <span class="self">self</span>.direction = direction;
         <span class="self">self
@@ -2087,7 +2088,7 @@
     /// let layout = Layout::default().constraints([Constraint::Min(0)].iter().filter(|_| true));
     /// let layout = Layout::default().constraints([1, 2, 3].iter().map(|&amp;c| Constraint::Length(c)));
     /// ```
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>constraints&lt;I&gt;(<span class="kw-2">mut </span><span class="self">self</span>, constraints: I) -&gt; Layout
     <span class="kw">where
         </span>I: IntoIterator,
@@ -2109,7 +2110,7 @@
     ///     .split(Rect::new(0, 0, 10, 10));
     /// assert_eq!(layout[..], [Rect::new(2, 2, 6, 6)]);
     /// ```
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub const fn </span>margin(<span class="kw-2">mut </span><span class="self">self</span>, margin: u16) -&gt; Layout {
         <span class="self">self</span>.margin = Margin {
             horizontal: margin,
@@ -2130,7 +2131,7 @@
     ///     .split(Rect::new(0, 0, 10, 10));
     /// assert_eq!(layout[..], [Rect::new(2, 0, 6, 10)]);
     /// ```
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub const fn </span>horizontal_margin(<span class="kw-2">mut </span><span class="self">self</span>, horizontal: u16) -&gt; Layout {
         <span class="self">self</span>.margin.horizontal = horizontal;
         <span class="self">self
@@ -2148,7 +2149,7 @@
     ///     .split(Rect::new(0, 0, 10, 10));
     /// assert_eq!(layout[..], [Rect::new(0, 2, 10, 6)]);
     /// ```
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub const fn </span>vertical_margin(<span class="kw-2">mut </span><span class="self">self</span>, vertical: u16) -&gt; Layout {
         <span class="self">self</span>.margin.vertical = vertical;
         <span class="self">self
@@ -2161,16 +2162,16 @@
     /// equal chunks or to not distribute extra space at all (which is the default used for laying
     /// out the columns for [`Table`] widgets).
     ///
-    /// Note: If you&#39;re using this feature please help us come up with a good name. See [Issue
+    /// Note: If you're using this feature please help us come up with a good name. See [Issue
     /// #536](https://github.com/ratatui-org/ratatui/issues/536) for more information.
     ///
     /// [`Table`]: crate::widgets::Table
     </span><span class="attr">#[stability::unstable(
-        feature = <span class="string">&quot;segment-size&quot;</span>,
-        reason = <span class="string">&quot;The name for this feature is not final and may change in the future&quot;</span>,
-        issue = <span class="string">&quot;https://github.com/ratatui-org/ratatui/issues/536&quot;
+        feature = <span class="string">"segment-size"</span>,
+        reason = <span class="string">"The name for this feature is not final and may change in the future"</span>,
+        issue = <span class="string">"https://github.com/ratatui-org/ratatui/issues/536"
     </span>)]
-    #[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
+    #[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub const fn </span>segment_size(<span class="kw-2">mut </span><span class="self">self</span>, segment_size: SegmentSize) -&gt; Layout {
         <span class="self">self</span>.segment_size = segment_size;
         <span class="self">self
@@ -2214,7 +2215,7 @@
             })
             .borrow_mut()
             .get_or_insert((area, <span class="self">self</span>.clone()), || {
-                <span class="self">Self</span>::try_split(area, <span class="self">self</span>).expect(<span class="string">&quot;failed to split&quot;</span>)
+                <span class="self">Self</span>::try_split(area, <span class="self">self</span>).expect(<span class="string">"failed to split"</span>)
             })
             .clone()
         })
@@ -2298,10 +2299,10 @@
 
         <span class="kw">let </span>changes: HashMap&lt;Variable, f64&gt; = solver.fetch_changes().iter().copied().collect();
 
-        <span class="comment">// please leave this comment here as it&#39;s useful for debugging unit tests when we make any
+        <span class="comment">// please leave this comment here as it's useful for debugging unit tests when we make any
         // changes to layout code - we should replace this with tracing in the future.
         // let ends = format!(
-        //     &quot;{:?}&quot;,
+        //     "{:?}",
         //     elements
         //         .iter()
         //         .map(|e| changes.get(&amp;e.end).unwrap_or(&amp;0.0))
@@ -2346,8 +2347,8 @@
 }
 
 <span class="kw">impl </span>Display <span class="kw">for </span>Margin {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
-        <span class="macro">write!</span>(f, <span class="string">&quot;{}x{}&quot;</span>, <span class="self">self</span>.horizontal, <span class="self">self</span>.vertical)
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">"{}x{}"</span>, <span class="self">self</span>.horizontal, <span class="self">self</span>.vertical)
     }
 }
 
@@ -2477,13 +2478,13 @@
 }
 
 <span class="kw">impl </span>Display <span class="kw">for </span>Constraint {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
         <span class="kw">match </span><span class="self">self </span>{
-            Constraint::Percentage(p) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Percentage({})&quot;</span>, p),
-            Constraint::Ratio(n, d) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Ratio({}, {})&quot;</span>, n, d),
-            Constraint::Length(l) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Length({})&quot;</span>, l),
-            Constraint::Max(m) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Max({})&quot;</span>, m),
-            Constraint::Min(m) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Min({})&quot;</span>, m),
+            Constraint::Percentage(p) =&gt; <span class="macro">write!</span>(f, <span class="string">"Percentage({})"</span>, p),
+            Constraint::Ratio(n, d) =&gt; <span class="macro">write!</span>(f, <span class="string">"Ratio({}, {})"</span>, n, d),
+            Constraint::Length(l) =&gt; <span class="macro">write!</span>(f, <span class="string">"Length({})"</span>, l),
+            Constraint::Max(m) =&gt; <span class="macro">write!</span>(f, <span class="string">"Max({})"</span>, m),
+            Constraint::Min(m) =&gt; <span class="macro">write!</span>(f, <span class="string">"Min({})"</span>, m),
         }
     }
 }
@@ -2609,7 +2610,7 @@
         <span class="macro">assert_eq!</span>(
             Layout::default().constraints(fixed_size_array).constraints,
             CONSTRAINTS,
-            <span class="string">&quot;constraints should be settable with an array&quot;
+            <span class="string">"constraints should be settable with an array"
         </span>);
 
         <span class="kw">let </span>slice_of_fixed_size_array = <span class="kw-2">&amp;</span>CONSTRAINTS;
@@ -2618,7 +2619,7 @@
                 .constraints(slice_of_fixed_size_array)
                 .constraints,
             CONSTRAINTS,
-            <span class="string">&quot;constraints should be settable with a slice&quot;
+            <span class="string">"constraints should be settable with a slice"
         </span>);
 
         <span class="kw">let </span>vec = CONSTRAINTS.to_vec();
@@ -2626,34 +2627,34 @@
         <span class="macro">assert_eq!</span>(
             Layout::default().constraints(slice_of_vec).constraints,
             CONSTRAINTS,
-            <span class="string">&quot;constraints should be settable with a slice&quot;
+            <span class="string">"constraints should be settable with a slice"
         </span>);
 
         <span class="macro">assert_eq!</span>(
             Layout::default().constraints(vec).constraints,
             CONSTRAINTS,
-            <span class="string">&quot;constraints should be settable with a Vec&quot;
+            <span class="string">"constraints should be settable with a Vec"
         </span>);
 
         <span class="kw">let </span>iter = CONSTRAINTS.iter();
         <span class="macro">assert_eq!</span>(
             Layout::default().constraints(iter).constraints,
             CONSTRAINTS,
-            <span class="string">&quot;constraints should be settable with an iter&quot;
+            <span class="string">"constraints should be settable with an iter"
         </span>);
 
         <span class="kw">let </span>iterator = CONSTRAINTS.iter().map(|c| c.to_owned());
         <span class="macro">assert_eq!</span>(
             Layout::default().constraints(iterator).constraints,
             CONSTRAINTS,
-            <span class="string">&quot;constraints should be settable with an iterator&quot;
+            <span class="string">"constraints should be settable with an iterator"
         </span>);
 
         <span class="kw">let </span>iterator_ref = CONSTRAINTS.iter().map(|c| c.as_ref());
         <span class="macro">assert_eq!</span>(
             Layout::default().constraints(iterator_ref).constraints,
             CONSTRAINTS,
-            <span class="string">&quot;constraints should be settable with an iterator of refs&quot;
+            <span class="string">"constraints should be settable with an iterator of refs"
         </span>);
     }
 
@@ -2708,32 +2709,32 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>corner_to_string() {
-        <span class="macro">assert_eq!</span>(Corner::BottomLeft.to_string(), <span class="string">&quot;BottomLeft&quot;</span>);
-        <span class="macro">assert_eq!</span>(Corner::BottomRight.to_string(), <span class="string">&quot;BottomRight&quot;</span>);
-        <span class="macro">assert_eq!</span>(Corner::TopLeft.to_string(), <span class="string">&quot;TopLeft&quot;</span>);
-        <span class="macro">assert_eq!</span>(Corner::TopRight.to_string(), <span class="string">&quot;TopRight&quot;</span>);
+        <span class="macro">assert_eq!</span>(Corner::BottomLeft.to_string(), <span class="string">"BottomLeft"</span>);
+        <span class="macro">assert_eq!</span>(Corner::BottomRight.to_string(), <span class="string">"BottomRight"</span>);
+        <span class="macro">assert_eq!</span>(Corner::TopLeft.to_string(), <span class="string">"TopLeft"</span>);
+        <span class="macro">assert_eq!</span>(Corner::TopRight.to_string(), <span class="string">"TopRight"</span>);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>corner_from_str() {
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;BottomLeft&quot;</span>.parse::&lt;Corner&gt;(), <span class="prelude-val">Ok</span>(Corner::BottomLeft));
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;BottomRight&quot;</span>.parse::&lt;Corner&gt;(), <span class="prelude-val">Ok</span>(Corner::BottomRight));
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;TopLeft&quot;</span>.parse::&lt;Corner&gt;(), <span class="prelude-val">Ok</span>(Corner::TopLeft));
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;TopRight&quot;</span>.parse::&lt;Corner&gt;(), <span class="prelude-val">Ok</span>(Corner::TopRight));
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;&quot;</span>.parse::&lt;Corner&gt;(), <span class="prelude-val">Err</span>(ParseError::VariantNotFound));
+        <span class="macro">assert_eq!</span>(<span class="string">"BottomLeft"</span>.parse::&lt;Corner&gt;(), <span class="prelude-val">Ok</span>(Corner::BottomLeft));
+        <span class="macro">assert_eq!</span>(<span class="string">"BottomRight"</span>.parse::&lt;Corner&gt;(), <span class="prelude-val">Ok</span>(Corner::BottomRight));
+        <span class="macro">assert_eq!</span>(<span class="string">"TopLeft"</span>.parse::&lt;Corner&gt;(), <span class="prelude-val">Ok</span>(Corner::TopLeft));
+        <span class="macro">assert_eq!</span>(<span class="string">"TopRight"</span>.parse::&lt;Corner&gt;(), <span class="prelude-val">Ok</span>(Corner::TopRight));
+        <span class="macro">assert_eq!</span>(<span class="string">""</span>.parse::&lt;Corner&gt;(), <span class="prelude-val">Err</span>(ParseError::VariantNotFound));
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>direction_to_string() {
-        <span class="macro">assert_eq!</span>(Direction::Horizontal.to_string(), <span class="string">&quot;Horizontal&quot;</span>);
-        <span class="macro">assert_eq!</span>(Direction::Vertical.to_string(), <span class="string">&quot;Vertical&quot;</span>);
+        <span class="macro">assert_eq!</span>(Direction::Horizontal.to_string(), <span class="string">"Horizontal"</span>);
+        <span class="macro">assert_eq!</span>(Direction::Vertical.to_string(), <span class="string">"Vertical"</span>);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>direction_from_str() {
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;Horizontal&quot;</span>.parse::&lt;Direction&gt;(), <span class="prelude-val">Ok</span>(Direction::Horizontal));
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;Vertical&quot;</span>.parse::&lt;Direction&gt;(), <span class="prelude-val">Ok</span>(Direction::Vertical));
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;&quot;</span>.parse::&lt;Direction&gt;(), <span class="prelude-val">Err</span>(ParseError::VariantNotFound));
+        <span class="macro">assert_eq!</span>(<span class="string">"Horizontal"</span>.parse::&lt;Direction&gt;(), <span class="prelude-val">Ok</span>(Direction::Horizontal));
+        <span class="macro">assert_eq!</span>(<span class="string">"Vertical"</span>.parse::&lt;Direction&gt;(), <span class="prelude-val">Ok</span>(Direction::Vertical));
+        <span class="macro">assert_eq!</span>(<span class="string">""</span>.parse::&lt;Direction&gt;(), <span class="prelude-val">Err</span>(ParseError::VariantNotFound));
     }
 
     <span class="kw">mod </span>constraint {
@@ -2746,11 +2747,11 @@
 
         <span class="attr">#[test]
         </span><span class="kw">fn </span>to_string() {
-            <span class="macro">assert_eq!</span>(Constraint::Percentage(<span class="number">50</span>).to_string(), <span class="string">&quot;Percentage(50)&quot;</span>);
-            <span class="macro">assert_eq!</span>(Constraint::Ratio(<span class="number">1</span>, <span class="number">2</span>).to_string(), <span class="string">&quot;Ratio(1, 2)&quot;</span>);
-            <span class="macro">assert_eq!</span>(Constraint::Length(<span class="number">10</span>).to_string(), <span class="string">&quot;Length(10)&quot;</span>);
-            <span class="macro">assert_eq!</span>(Constraint::Max(<span class="number">10</span>).to_string(), <span class="string">&quot;Max(10)&quot;</span>);
-            <span class="macro">assert_eq!</span>(Constraint::Min(<span class="number">10</span>).to_string(), <span class="string">&quot;Min(10)&quot;</span>);
+            <span class="macro">assert_eq!</span>(Constraint::Percentage(<span class="number">50</span>).to_string(), <span class="string">"Percentage(50)"</span>);
+            <span class="macro">assert_eq!</span>(Constraint::Ratio(<span class="number">1</span>, <span class="number">2</span>).to_string(), <span class="string">"Ratio(1, 2)"</span>);
+            <span class="macro">assert_eq!</span>(Constraint::Length(<span class="number">10</span>).to_string(), <span class="string">"Length(10)"</span>);
+            <span class="macro">assert_eq!</span>(Constraint::Max(<span class="number">10</span>).to_string(), <span class="string">"Max(10)"</span>);
+            <span class="macro">assert_eq!</span>(Constraint::Min(<span class="number">10</span>).to_string(), <span class="string">"Min(10)"</span>);
         }
 
         <span class="attr">#[test]
@@ -2843,7 +2844,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>margin_to_string() {
-        <span class="macro">assert_eq!</span>(Margin::new(<span class="number">1</span>, <span class="number">2</span>).to_string(), <span class="string">&quot;1x2&quot;</span>);
+        <span class="macro">assert_eq!</span>(Margin::new(<span class="number">1</span>, <span class="number">2</span>).to_string(), <span class="string">"1x2"</span>);
     }
 
     <span class="attr">#[test]
@@ -2859,44 +2860,44 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>alignment_to_string() {
-        <span class="macro">assert_eq!</span>(Alignment::Left.to_string(), <span class="string">&quot;Left&quot;</span>);
-        <span class="macro">assert_eq!</span>(Alignment::Center.to_string(), <span class="string">&quot;Center&quot;</span>);
-        <span class="macro">assert_eq!</span>(Alignment::Right.to_string(), <span class="string">&quot;Right&quot;</span>);
+        <span class="macro">assert_eq!</span>(Alignment::Left.to_string(), <span class="string">"Left"</span>);
+        <span class="macro">assert_eq!</span>(Alignment::Center.to_string(), <span class="string">"Center"</span>);
+        <span class="macro">assert_eq!</span>(Alignment::Right.to_string(), <span class="string">"Right"</span>);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>alignment_from_str() {
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;Left&quot;</span>.parse::&lt;Alignment&gt;(), <span class="prelude-val">Ok</span>(Alignment::Left));
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;Center&quot;</span>.parse::&lt;Alignment&gt;(), <span class="prelude-val">Ok</span>(Alignment::Center));
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;Right&quot;</span>.parse::&lt;Alignment&gt;(), <span class="prelude-val">Ok</span>(Alignment::Right));
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;&quot;</span>.parse::&lt;Alignment&gt;(), <span class="prelude-val">Err</span>(ParseError::VariantNotFound));
+        <span class="macro">assert_eq!</span>(<span class="string">"Left"</span>.parse::&lt;Alignment&gt;(), <span class="prelude-val">Ok</span>(Alignment::Left));
+        <span class="macro">assert_eq!</span>(<span class="string">"Center"</span>.parse::&lt;Alignment&gt;(), <span class="prelude-val">Ok</span>(Alignment::Center));
+        <span class="macro">assert_eq!</span>(<span class="string">"Right"</span>.parse::&lt;Alignment&gt;(), <span class="prelude-val">Ok</span>(Alignment::Right));
+        <span class="macro">assert_eq!</span>(<span class="string">""</span>.parse::&lt;Alignment&gt;(), <span class="prelude-val">Err</span>(ParseError::VariantNotFound));
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>segment_size_to_string() {
         <span class="macro">assert_eq!</span>(
             SegmentSize::EvenDistribution.to_string(),
-            <span class="string">&quot;EvenDistribution&quot;
+            <span class="string">"EvenDistribution"
         </span>);
         <span class="macro">assert_eq!</span>(
             SegmentSize::LastTakesRemainder.to_string(),
-            <span class="string">&quot;LastTakesRemainder&quot;
+            <span class="string">"LastTakesRemainder"
         </span>);
-        <span class="macro">assert_eq!</span>(SegmentSize::None.to_string(), <span class="string">&quot;None&quot;</span>);
+        <span class="macro">assert_eq!</span>(SegmentSize::None.to_string(), <span class="string">"None"</span>);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>segment_size_from_string() {
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;EvenDistribution&quot;</span>.parse::&lt;SegmentSize&gt;(),
+            <span class="string">"EvenDistribution"</span>.parse::&lt;SegmentSize&gt;(),
             <span class="prelude-val">Ok</span>(EvenDistribution)
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;LastTakesRemainder&quot;</span>.parse::&lt;SegmentSize&gt;(),
+            <span class="string">"LastTakesRemainder"</span>.parse::&lt;SegmentSize&gt;(),
             <span class="prelude-val">Ok</span>(LastTakesRemainder)
         );
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;None&quot;</span>.parse::&lt;SegmentSize&gt;(), <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>));
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;&quot;</span>.parse::&lt;SegmentSize&gt;(), <span class="prelude-val">Err</span>(ParseError::VariantNotFound));
+        <span class="macro">assert_eq!</span>(<span class="string">"None"</span>.parse::&lt;SegmentSize&gt;(), <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>));
+        <span class="macro">assert_eq!</span>(<span class="string">""</span>.parse::&lt;SegmentSize&gt;(), <span class="prelude-val">Err</span>(ParseError::VariantNotFound));
     }
 
     <span class="kw">fn </span>get_x_width_with_segment_size(
@@ -3020,7 +3021,7 @@
         ///
         /// This approach is used rather than testing the resulting rects directly because it is
         /// easier to visualize the result, and it leads to more concise tests that are easier to
-        /// compare against each other. E.g. `&quot;abc&quot;` is much more concise than `[Rect::new(0, 0, 1,
+        /// compare against each other. E.g. `"abc"` is much more concise than `[Rect::new(0, 0, 1,
         /// 1), Rect::new(1, 0, 1, 1), Rect::new(2, 0, 1, 1)]`.
         </span><span class="attr">#[track_caller]
         </span><span class="kw">fn </span>test(area: Rect, constraints: <span class="kw-2">&amp;</span>[Constraint], expected: <span class="kw-2">&amp;</span>str) {
@@ -3029,7 +3030,7 @@
                 .constraints(constraints)
                 .split(area);
             <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(area);
-            <span class="kw">for </span>(i, c) <span class="kw">in </span>(<span class="string">&#39;a&#39;</span>..=<span class="string">&#39;z&#39;</span>).take(constraints.len()).enumerate() {
+            <span class="kw">for </span>(i, c) <span class="kw">in </span>(<span class="string">'a'</span>..=<span class="string">'z'</span>).take(constraints.len()).enumerate() {
                 <span class="kw">let </span>s: String = c.to_string().repeat(area.width <span class="kw">as </span>usize);
                 Paragraph::new(s).render(layout[i], <span class="kw-2">&amp;mut </span>buffer);
             }
@@ -3039,116 +3040,116 @@
 
         <span class="attr">#[test]
         </span><span class="kw">fn </span>length() {
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">0</span>)], <span class="string">&quot;a&quot;</span>); <span class="comment">// zero
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">1</span>)], <span class="string">&quot;a&quot;</span>); <span class="comment">// exact
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">2</span>)], <span class="string">&quot;a&quot;</span>); <span class="comment">// overflow
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">0</span>)], <span class="string">"a"</span>); <span class="comment">// zero
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">1</span>)], <span class="string">"a"</span>); <span class="comment">// exact
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">2</span>)], <span class="string">"a"</span>); <span class="comment">// overflow
 
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">0</span>)], <span class="string">&quot;aa&quot;</span>); <span class="comment">// zero
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">1</span>)], <span class="string">&quot;aa&quot;</span>); <span class="comment">// underflow
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">2</span>)], <span class="string">&quot;aa&quot;</span>); <span class="comment">// exact
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">3</span>)], <span class="string">&quot;aa&quot;</span>); <span class="comment">// overflow
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">0</span>)], <span class="string">"aa"</span>); <span class="comment">// zero
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">1</span>)], <span class="string">"aa"</span>); <span class="comment">// underflow
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">2</span>)], <span class="string">"aa"</span>); <span class="comment">// exact
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">3</span>)], <span class="string">"aa"</span>); <span class="comment">// overflow
 
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">0</span>), Length(<span class="number">0</span>)], <span class="string">&quot;b&quot;</span>); <span class="comment">// zero, zero
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">0</span>), Length(<span class="number">1</span>)], <span class="string">&quot;b&quot;</span>); <span class="comment">// zero, exact
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">0</span>), Length(<span class="number">2</span>)], <span class="string">&quot;b&quot;</span>); <span class="comment">// zero, overflow
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">1</span>), Length(<span class="number">0</span>)], <span class="string">&quot;a&quot;</span>); <span class="comment">// exact, zero
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">1</span>), Length(<span class="number">1</span>)], <span class="string">&quot;a&quot;</span>); <span class="comment">// exact, exact
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">1</span>), Length(<span class="number">2</span>)], <span class="string">&quot;a&quot;</span>); <span class="comment">// exact, overflow
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">2</span>), Length(<span class="number">0</span>)], <span class="string">&quot;a&quot;</span>); <span class="comment">// overflow, zero
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">2</span>), Length(<span class="number">1</span>)], <span class="string">&quot;a&quot;</span>); <span class="comment">// overflow, exact
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">2</span>), Length(<span class="number">2</span>)], <span class="string">&quot;a&quot;</span>); <span class="comment">// overflow, overflow
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">0</span>), Length(<span class="number">0</span>)], <span class="string">"b"</span>); <span class="comment">// zero, zero
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">0</span>), Length(<span class="number">1</span>)], <span class="string">"b"</span>); <span class="comment">// zero, exact
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">0</span>), Length(<span class="number">2</span>)], <span class="string">"b"</span>); <span class="comment">// zero, overflow
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">1</span>), Length(<span class="number">0</span>)], <span class="string">"a"</span>); <span class="comment">// exact, zero
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">1</span>), Length(<span class="number">1</span>)], <span class="string">"a"</span>); <span class="comment">// exact, exact
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">1</span>), Length(<span class="number">2</span>)], <span class="string">"a"</span>); <span class="comment">// exact, overflow
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">2</span>), Length(<span class="number">0</span>)], <span class="string">"a"</span>); <span class="comment">// overflow, zero
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">2</span>), Length(<span class="number">1</span>)], <span class="string">"a"</span>); <span class="comment">// overflow, exact
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">2</span>), Length(<span class="number">2</span>)], <span class="string">"a"</span>); <span class="comment">// overflow, overflow
 
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">0</span>), Length(<span class="number">0</span>)], <span class="string">&quot;bb&quot;</span>); <span class="comment">// zero, zero
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">0</span>), Length(<span class="number">1</span>)], <span class="string">&quot;bb&quot;</span>); <span class="comment">// zero, underflow
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">0</span>), Length(<span class="number">2</span>)], <span class="string">&quot;bb&quot;</span>); <span class="comment">// zero, exact
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">0</span>), Length(<span class="number">3</span>)], <span class="string">&quot;bb&quot;</span>); <span class="comment">// zero, overflow
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">1</span>), Length(<span class="number">0</span>)], <span class="string">&quot;ab&quot;</span>); <span class="comment">// underflow, zero
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">1</span>), Length(<span class="number">1</span>)], <span class="string">&quot;ab&quot;</span>); <span class="comment">// underflow, underflow
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">1</span>), Length(<span class="number">2</span>)], <span class="string">&quot;ab&quot;</span>); <span class="comment">// underflow, exact
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">1</span>), Length(<span class="number">3</span>)], <span class="string">&quot;ab&quot;</span>); <span class="comment">// underflow, overflow
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">2</span>), Length(<span class="number">0</span>)], <span class="string">&quot;aa&quot;</span>); <span class="comment">// exact, zero
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">2</span>), Length(<span class="number">1</span>)], <span class="string">&quot;aa&quot;</span>); <span class="comment">// exact, underflow
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">2</span>), Length(<span class="number">2</span>)], <span class="string">&quot;aa&quot;</span>); <span class="comment">// exact, exact
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">2</span>), Length(<span class="number">3</span>)], <span class="string">&quot;aa&quot;</span>); <span class="comment">// exact, overflow
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">3</span>), Length(<span class="number">0</span>)], <span class="string">&quot;aa&quot;</span>); <span class="comment">// overflow, zero
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">3</span>), Length(<span class="number">1</span>)], <span class="string">&quot;aa&quot;</span>); <span class="comment">// overflow, underflow
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">3</span>), Length(<span class="number">2</span>)], <span class="string">&quot;aa&quot;</span>); <span class="comment">// overflow, exact
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">3</span>), Length(<span class="number">3</span>)], <span class="string">&quot;aa&quot;</span>); <span class="comment">// overflow, overflow
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">0</span>), Length(<span class="number">0</span>)], <span class="string">"bb"</span>); <span class="comment">// zero, zero
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">0</span>), Length(<span class="number">1</span>)], <span class="string">"bb"</span>); <span class="comment">// zero, underflow
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">0</span>), Length(<span class="number">2</span>)], <span class="string">"bb"</span>); <span class="comment">// zero, exact
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">0</span>), Length(<span class="number">3</span>)], <span class="string">"bb"</span>); <span class="comment">// zero, overflow
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">1</span>), Length(<span class="number">0</span>)], <span class="string">"ab"</span>); <span class="comment">// underflow, zero
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">1</span>), Length(<span class="number">1</span>)], <span class="string">"ab"</span>); <span class="comment">// underflow, underflow
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">1</span>), Length(<span class="number">2</span>)], <span class="string">"ab"</span>); <span class="comment">// underflow, exact
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">1</span>), Length(<span class="number">3</span>)], <span class="string">"ab"</span>); <span class="comment">// underflow, overflow
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">2</span>), Length(<span class="number">0</span>)], <span class="string">"aa"</span>); <span class="comment">// exact, zero
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">2</span>), Length(<span class="number">1</span>)], <span class="string">"aa"</span>); <span class="comment">// exact, underflow
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">2</span>), Length(<span class="number">2</span>)], <span class="string">"aa"</span>); <span class="comment">// exact, exact
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">2</span>), Length(<span class="number">3</span>)], <span class="string">"aa"</span>); <span class="comment">// exact, overflow
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">3</span>), Length(<span class="number">0</span>)], <span class="string">"aa"</span>); <span class="comment">// overflow, zero
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">3</span>), Length(<span class="number">1</span>)], <span class="string">"aa"</span>); <span class="comment">// overflow, underflow
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">3</span>), Length(<span class="number">2</span>)], <span class="string">"aa"</span>); <span class="comment">// overflow, exact
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">3</span>), Length(<span class="number">3</span>)], <span class="string">"aa"</span>); <span class="comment">// overflow, overflow
 
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">3</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">2</span>), Length(<span class="number">2</span>)], <span class="string">&quot;aab&quot;</span>);
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">3</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Length(<span class="number">2</span>), Length(<span class="number">2</span>)], <span class="string">"aab"</span>);
         }
 
         <span class="attr">#[test]
         </span><span class="kw">fn </span>max() {
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">0</span>)], <span class="string">&quot;a&quot;</span>); <span class="comment">// zero
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">1</span>)], <span class="string">&quot;a&quot;</span>); <span class="comment">// exact
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">2</span>)], <span class="string">&quot;a&quot;</span>); <span class="comment">// overflow
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">0</span>)], <span class="string">"a"</span>); <span class="comment">// zero
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">1</span>)], <span class="string">"a"</span>); <span class="comment">// exact
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">2</span>)], <span class="string">"a"</span>); <span class="comment">// overflow
 
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">0</span>)], <span class="string">&quot;aa&quot;</span>); <span class="comment">// zero
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">1</span>)], <span class="string">&quot;aa&quot;</span>); <span class="comment">// underflow
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">2</span>)], <span class="string">&quot;aa&quot;</span>); <span class="comment">// exact
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">3</span>)], <span class="string">&quot;aa&quot;</span>); <span class="comment">// overflow
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">0</span>)], <span class="string">"aa"</span>); <span class="comment">// zero
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">1</span>)], <span class="string">"aa"</span>); <span class="comment">// underflow
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">2</span>)], <span class="string">"aa"</span>); <span class="comment">// exact
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">3</span>)], <span class="string">"aa"</span>); <span class="comment">// overflow
 
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">0</span>), Max(<span class="number">0</span>)], <span class="string">&quot;b&quot;</span>); <span class="comment">// zero, zero
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">0</span>), Max(<span class="number">1</span>)], <span class="string">&quot;b&quot;</span>); <span class="comment">// zero, exact
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">0</span>), Max(<span class="number">2</span>)], <span class="string">&quot;b&quot;</span>); <span class="comment">// zero, overflow
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">1</span>), Max(<span class="number">0</span>)], <span class="string">&quot;a&quot;</span>); <span class="comment">// exact, zero
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">1</span>), Max(<span class="number">1</span>)], <span class="string">&quot;a&quot;</span>); <span class="comment">// exact, exact
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">1</span>), Max(<span class="number">2</span>)], <span class="string">&quot;a&quot;</span>); <span class="comment">// exact, overflow
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">2</span>), Max(<span class="number">0</span>)], <span class="string">&quot;a&quot;</span>); <span class="comment">// overflow, zero
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">2</span>), Max(<span class="number">1</span>)], <span class="string">&quot;a&quot;</span>); <span class="comment">// overflow, exact
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">2</span>), Max(<span class="number">2</span>)], <span class="string">&quot;a&quot;</span>); <span class="comment">// overflow, overflow
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">0</span>), Max(<span class="number">0</span>)], <span class="string">"b"</span>); <span class="comment">// zero, zero
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">0</span>), Max(<span class="number">1</span>)], <span class="string">"b"</span>); <span class="comment">// zero, exact
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">0</span>), Max(<span class="number">2</span>)], <span class="string">"b"</span>); <span class="comment">// zero, overflow
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">1</span>), Max(<span class="number">0</span>)], <span class="string">"a"</span>); <span class="comment">// exact, zero
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">1</span>), Max(<span class="number">1</span>)], <span class="string">"a"</span>); <span class="comment">// exact, exact
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">1</span>), Max(<span class="number">2</span>)], <span class="string">"a"</span>); <span class="comment">// exact, overflow
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">2</span>), Max(<span class="number">0</span>)], <span class="string">"a"</span>); <span class="comment">// overflow, zero
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">2</span>), Max(<span class="number">1</span>)], <span class="string">"a"</span>); <span class="comment">// overflow, exact
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">2</span>), Max(<span class="number">2</span>)], <span class="string">"a"</span>); <span class="comment">// overflow, overflow
 
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">0</span>), Max(<span class="number">0</span>)], <span class="string">&quot;bb&quot;</span>); <span class="comment">// zero, zero
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">0</span>), Max(<span class="number">1</span>)], <span class="string">&quot;bb&quot;</span>); <span class="comment">// zero, underflow
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">0</span>), Max(<span class="number">2</span>)], <span class="string">&quot;bb&quot;</span>); <span class="comment">// zero, exact
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">0</span>), Max(<span class="number">3</span>)], <span class="string">&quot;bb&quot;</span>); <span class="comment">// zero, overflow
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">1</span>), Max(<span class="number">0</span>)], <span class="string">&quot;ab&quot;</span>); <span class="comment">// underflow, zero
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">1</span>), Max(<span class="number">1</span>)], <span class="string">&quot;ab&quot;</span>); <span class="comment">// underflow, underflow
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">1</span>), Max(<span class="number">2</span>)], <span class="string">&quot;ab&quot;</span>); <span class="comment">// underflow, exact
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">1</span>), Max(<span class="number">3</span>)], <span class="string">&quot;ab&quot;</span>); <span class="comment">// underflow, overflow
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">2</span>), Max(<span class="number">0</span>)], <span class="string">&quot;aa&quot;</span>); <span class="comment">// exact, zero
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">2</span>), Max(<span class="number">1</span>)], <span class="string">&quot;aa&quot;</span>); <span class="comment">// exact, underflow
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">2</span>), Max(<span class="number">2</span>)], <span class="string">&quot;aa&quot;</span>); <span class="comment">// exact, exact
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">2</span>), Max(<span class="number">3</span>)], <span class="string">&quot;aa&quot;</span>); <span class="comment">// exact, overflow
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">3</span>), Max(<span class="number">0</span>)], <span class="string">&quot;aa&quot;</span>); <span class="comment">// overflow, zero
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">3</span>), Max(<span class="number">1</span>)], <span class="string">&quot;aa&quot;</span>); <span class="comment">// overflow, underflow
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">3</span>), Max(<span class="number">2</span>)], <span class="string">&quot;aa&quot;</span>); <span class="comment">// overflow, exact
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">3</span>), Max(<span class="number">3</span>)], <span class="string">&quot;aa&quot;</span>); <span class="comment">// overflow, overflow
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">0</span>), Max(<span class="number">0</span>)], <span class="string">"bb"</span>); <span class="comment">// zero, zero
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">0</span>), Max(<span class="number">1</span>)], <span class="string">"bb"</span>); <span class="comment">// zero, underflow
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">0</span>), Max(<span class="number">2</span>)], <span class="string">"bb"</span>); <span class="comment">// zero, exact
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">0</span>), Max(<span class="number">3</span>)], <span class="string">"bb"</span>); <span class="comment">// zero, overflow
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">1</span>), Max(<span class="number">0</span>)], <span class="string">"ab"</span>); <span class="comment">// underflow, zero
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">1</span>), Max(<span class="number">1</span>)], <span class="string">"ab"</span>); <span class="comment">// underflow, underflow
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">1</span>), Max(<span class="number">2</span>)], <span class="string">"ab"</span>); <span class="comment">// underflow, exact
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">1</span>), Max(<span class="number">3</span>)], <span class="string">"ab"</span>); <span class="comment">// underflow, overflow
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">2</span>), Max(<span class="number">0</span>)], <span class="string">"aa"</span>); <span class="comment">// exact, zero
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">2</span>), Max(<span class="number">1</span>)], <span class="string">"aa"</span>); <span class="comment">// exact, underflow
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">2</span>), Max(<span class="number">2</span>)], <span class="string">"aa"</span>); <span class="comment">// exact, exact
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">2</span>), Max(<span class="number">3</span>)], <span class="string">"aa"</span>); <span class="comment">// exact, overflow
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">3</span>), Max(<span class="number">0</span>)], <span class="string">"aa"</span>); <span class="comment">// overflow, zero
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">3</span>), Max(<span class="number">1</span>)], <span class="string">"aa"</span>); <span class="comment">// overflow, underflow
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">3</span>), Max(<span class="number">2</span>)], <span class="string">"aa"</span>); <span class="comment">// overflow, exact
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">3</span>), Max(<span class="number">3</span>)], <span class="string">"aa"</span>); <span class="comment">// overflow, overflow
 
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">3</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">2</span>), Max(<span class="number">2</span>)], <span class="string">&quot;aab&quot;</span>);
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">3</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Max(<span class="number">2</span>), Max(<span class="number">2</span>)], <span class="string">"aab"</span>);
         }
 
         <span class="attr">#[test]
         </span><span class="kw">fn </span>min() {
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">0</span>), Min(<span class="number">0</span>)], <span class="string">&quot;b&quot;</span>); <span class="comment">// zero, zero
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">0</span>), Min(<span class="number">1</span>)], <span class="string">&quot;b&quot;</span>); <span class="comment">// zero, exact
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">0</span>), Min(<span class="number">2</span>)], <span class="string">&quot;b&quot;</span>); <span class="comment">// zero, overflow
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">1</span>), Min(<span class="number">0</span>)], <span class="string">&quot;a&quot;</span>); <span class="comment">// exact, zero
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">1</span>), Min(<span class="number">1</span>)], <span class="string">&quot;a&quot;</span>); <span class="comment">// exact, exact
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">1</span>), Min(<span class="number">2</span>)], <span class="string">&quot;a&quot;</span>); <span class="comment">// exact, overflow
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">2</span>), Min(<span class="number">0</span>)], <span class="string">&quot;a&quot;</span>); <span class="comment">// overflow, zero
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">2</span>), Min(<span class="number">1</span>)], <span class="string">&quot;a&quot;</span>); <span class="comment">// overflow, exact
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">2</span>), Min(<span class="number">2</span>)], <span class="string">&quot;a&quot;</span>); <span class="comment">// overflow, overflow
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">0</span>), Min(<span class="number">0</span>)], <span class="string">"b"</span>); <span class="comment">// zero, zero
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">0</span>), Min(<span class="number">1</span>)], <span class="string">"b"</span>); <span class="comment">// zero, exact
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">0</span>), Min(<span class="number">2</span>)], <span class="string">"b"</span>); <span class="comment">// zero, overflow
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">1</span>), Min(<span class="number">0</span>)], <span class="string">"a"</span>); <span class="comment">// exact, zero
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">1</span>), Min(<span class="number">1</span>)], <span class="string">"a"</span>); <span class="comment">// exact, exact
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">1</span>), Min(<span class="number">2</span>)], <span class="string">"a"</span>); <span class="comment">// exact, overflow
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">2</span>), Min(<span class="number">0</span>)], <span class="string">"a"</span>); <span class="comment">// overflow, zero
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">2</span>), Min(<span class="number">1</span>)], <span class="string">"a"</span>); <span class="comment">// overflow, exact
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">2</span>), Min(<span class="number">2</span>)], <span class="string">"a"</span>); <span class="comment">// overflow, overflow
 
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">0</span>), Min(<span class="number">0</span>)], <span class="string">&quot;bb&quot;</span>); <span class="comment">// zero, zero
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">0</span>), Min(<span class="number">1</span>)], <span class="string">&quot;bb&quot;</span>); <span class="comment">// zero, underflow
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">0</span>), Min(<span class="number">2</span>)], <span class="string">&quot;bb&quot;</span>); <span class="comment">// zero, exact
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">0</span>), Min(<span class="number">3</span>)], <span class="string">&quot;bb&quot;</span>); <span class="comment">// zero, overflow
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">1</span>), Min(<span class="number">0</span>)], <span class="string">&quot;ab&quot;</span>); <span class="comment">// underflow, zero
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">1</span>), Min(<span class="number">1</span>)], <span class="string">&quot;ab&quot;</span>); <span class="comment">// underflow, underflow
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">1</span>), Min(<span class="number">2</span>)], <span class="string">&quot;ab&quot;</span>); <span class="comment">// underflow, exact
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">1</span>), Min(<span class="number">3</span>)], <span class="string">&quot;ab&quot;</span>); <span class="comment">// underflow, overflow
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">2</span>), Min(<span class="number">0</span>)], <span class="string">&quot;aa&quot;</span>); <span class="comment">// exact, zero
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">2</span>), Min(<span class="number">1</span>)], <span class="string">&quot;aa&quot;</span>); <span class="comment">// exact, underflow
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">2</span>), Min(<span class="number">2</span>)], <span class="string">&quot;aa&quot;</span>); <span class="comment">// exact, exact
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">2</span>), Min(<span class="number">3</span>)], <span class="string">&quot;aa&quot;</span>); <span class="comment">// exact, overflow
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">3</span>), Min(<span class="number">0</span>)], <span class="string">&quot;aa&quot;</span>); <span class="comment">// overflow, zero
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">3</span>), Min(<span class="number">1</span>)], <span class="string">&quot;aa&quot;</span>); <span class="comment">// overflow, underflow
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">3</span>), Min(<span class="number">2</span>)], <span class="string">&quot;aa&quot;</span>); <span class="comment">// overflow, exact
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">3</span>), Min(<span class="number">3</span>)], <span class="string">&quot;aa&quot;</span>); <span class="comment">// overflow, overflow
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">0</span>), Min(<span class="number">0</span>)], <span class="string">"bb"</span>); <span class="comment">// zero, zero
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">0</span>), Min(<span class="number">1</span>)], <span class="string">"bb"</span>); <span class="comment">// zero, underflow
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">0</span>), Min(<span class="number">2</span>)], <span class="string">"bb"</span>); <span class="comment">// zero, exact
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">0</span>), Min(<span class="number">3</span>)], <span class="string">"bb"</span>); <span class="comment">// zero, overflow
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">1</span>), Min(<span class="number">0</span>)], <span class="string">"ab"</span>); <span class="comment">// underflow, zero
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">1</span>), Min(<span class="number">1</span>)], <span class="string">"ab"</span>); <span class="comment">// underflow, underflow
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">1</span>), Min(<span class="number">2</span>)], <span class="string">"ab"</span>); <span class="comment">// underflow, exact
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">1</span>), Min(<span class="number">3</span>)], <span class="string">"ab"</span>); <span class="comment">// underflow, overflow
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">2</span>), Min(<span class="number">0</span>)], <span class="string">"aa"</span>); <span class="comment">// exact, zero
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">2</span>), Min(<span class="number">1</span>)], <span class="string">"aa"</span>); <span class="comment">// exact, underflow
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">2</span>), Min(<span class="number">2</span>)], <span class="string">"aa"</span>); <span class="comment">// exact, exact
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">2</span>), Min(<span class="number">3</span>)], <span class="string">"aa"</span>); <span class="comment">// exact, overflow
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">3</span>), Min(<span class="number">0</span>)], <span class="string">"aa"</span>); <span class="comment">// overflow, zero
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">3</span>), Min(<span class="number">1</span>)], <span class="string">"aa"</span>); <span class="comment">// overflow, underflow
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">3</span>), Min(<span class="number">2</span>)], <span class="string">"aa"</span>); <span class="comment">// overflow, exact
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">3</span>), Min(<span class="number">3</span>)], <span class="string">"aa"</span>); <span class="comment">// overflow, overflow
 
-            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">3</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">2</span>), Min(<span class="number">2</span>)], <span class="string">&quot;aab&quot;</span>);
+            </span>test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">3</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[Min(<span class="number">2</span>), Min(<span class="number">2</span>)], <span class="string">"aab"</span>);
         }
 
         <span class="attr">#[test]
@@ -3167,83 +3168,83 @@
             <span class="kw">const </span>FULL: Constraint = Percentage(<span class="number">100</span>);
             <span class="kw">const </span>DOUBLE: Constraint = Percentage(<span class="number">200</span>);
 
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO], <span class="string">&quot;a&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[QUARTER], <span class="string">&quot;a&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[HALF], <span class="string">&quot;a&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[NINETY], <span class="string">&quot;a&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[FULL], <span class="string">&quot;a&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[DOUBLE], <span class="string">&quot;a&quot;</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO], <span class="string">"a"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[QUARTER], <span class="string">"a"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[HALF], <span class="string">"a"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[NINETY], <span class="string">"a"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[FULL], <span class="string">"a"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[DOUBLE], <span class="string">"a"</span>);
 
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO], <span class="string">&quot;aa&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TEN], <span class="string">&quot;aa&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[QUARTER], <span class="string">&quot;aa&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[HALF], <span class="string">&quot;aa&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TWO_THIRDS], <span class="string">&quot;aa&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[FULL], <span class="string">&quot;aa&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[DOUBLE], <span class="string">&quot;aa&quot;</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO], <span class="string">"aa"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TEN], <span class="string">"aa"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[QUARTER], <span class="string">"aa"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[HALF], <span class="string">"aa"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TWO_THIRDS], <span class="string">"aa"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[FULL], <span class="string">"aa"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[DOUBLE], <span class="string">"aa"</span>);
 
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO, ZERO], <span class="string">&quot;b&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO, TEN], <span class="string">&quot;b&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO, HALF], <span class="string">&quot;b&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO, NINETY], <span class="string">&quot;b&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO, FULL], <span class="string">&quot;b&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO, DOUBLE], <span class="string">&quot;b&quot;</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO, ZERO], <span class="string">"b"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO, TEN], <span class="string">"b"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO, HALF], <span class="string">"b"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO, NINETY], <span class="string">"b"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO, FULL], <span class="string">"b"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO, DOUBLE], <span class="string">"b"</span>);
 
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TEN, ZERO], <span class="string">&quot;b&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TEN, TEN], <span class="string">&quot;b&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TEN, HALF], <span class="string">&quot;b&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TEN, NINETY], <span class="string">&quot;b&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TEN, FULL], <span class="string">&quot;b&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TEN, DOUBLE], <span class="string">&quot;b&quot;</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TEN, ZERO], <span class="string">"b"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TEN, TEN], <span class="string">"b"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TEN, HALF], <span class="string">"b"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TEN, NINETY], <span class="string">"b"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TEN, FULL], <span class="string">"b"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TEN, DOUBLE], <span class="string">"b"</span>);
 
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[HALF, ZERO], <span class="string">&quot;a&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[HALF, HALF], <span class="string">&quot;a&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[HALF, FULL], <span class="string">&quot;a&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[HALF, DOUBLE], <span class="string">&quot;a&quot;</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[HALF, ZERO], <span class="string">"a"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[HALF, HALF], <span class="string">"a"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[HALF, FULL], <span class="string">"a"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[HALF, DOUBLE], <span class="string">"a"</span>);
 
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[NINETY, ZERO], <span class="string">&quot;a&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[NINETY, HALF], <span class="string">&quot;a&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[NINETY, FULL], <span class="string">&quot;a&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[NINETY, DOUBLE], <span class="string">&quot;a&quot;</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[NINETY, ZERO], <span class="string">"a"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[NINETY, HALF], <span class="string">"a"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[NINETY, FULL], <span class="string">"a"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[NINETY, DOUBLE], <span class="string">"a"</span>);
 
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[FULL, ZERO], <span class="string">&quot;a&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[FULL, HALF], <span class="string">&quot;a&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[FULL, FULL], <span class="string">&quot;a&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[FULL, DOUBLE], <span class="string">&quot;a&quot;</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[FULL, ZERO], <span class="string">"a"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[FULL, HALF], <span class="string">"a"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[FULL, FULL], <span class="string">"a"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[FULL, DOUBLE], <span class="string">"a"</span>);
 
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO, ZERO], <span class="string">&quot;bb&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO, QUARTER], <span class="string">&quot;bb&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO, HALF], <span class="string">&quot;bb&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO, FULL], <span class="string">&quot;bb&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO, DOUBLE], <span class="string">&quot;bb&quot;</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO, ZERO], <span class="string">"bb"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO, QUARTER], <span class="string">"bb"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO, HALF], <span class="string">"bb"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO, FULL], <span class="string">"bb"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO, DOUBLE], <span class="string">"bb"</span>);
 
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TEN, ZERO], <span class="string">&quot;bb&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TEN, QUARTER], <span class="string">&quot;bb&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TEN, HALF], <span class="string">&quot;bb&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TEN, FULL], <span class="string">&quot;bb&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TEN, DOUBLE], <span class="string">&quot;bb&quot;</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TEN, ZERO], <span class="string">"bb"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TEN, QUARTER], <span class="string">"bb"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TEN, HALF], <span class="string">"bb"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TEN, FULL], <span class="string">"bb"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TEN, DOUBLE], <span class="string">"bb"</span>);
 
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[QUARTER, ZERO], <span class="string">&quot;ab&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[QUARTER, QUARTER], <span class="string">&quot;ab&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[QUARTER, HALF], <span class="string">&quot;ab&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[QUARTER, FULL], <span class="string">&quot;ab&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[QUARTER, DOUBLE], <span class="string">&quot;ab&quot;</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[QUARTER, ZERO], <span class="string">"ab"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[QUARTER, QUARTER], <span class="string">"ab"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[QUARTER, HALF], <span class="string">"ab"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[QUARTER, FULL], <span class="string">"ab"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[QUARTER, DOUBLE], <span class="string">"ab"</span>);
 
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[THIRD, ZERO], <span class="string">&quot;ab&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[THIRD, QUARTER], <span class="string">&quot;ab&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[THIRD, HALF], <span class="string">&quot;ab&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[THIRD, FULL], <span class="string">&quot;ab&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[THIRD, DOUBLE], <span class="string">&quot;ab&quot;</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[THIRD, ZERO], <span class="string">"ab"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[THIRD, QUARTER], <span class="string">"ab"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[THIRD, HALF], <span class="string">"ab"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[THIRD, FULL], <span class="string">"ab"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[THIRD, DOUBLE], <span class="string">"ab"</span>);
 
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[HALF, ZERO], <span class="string">&quot;ab&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[HALF, HALF], <span class="string">&quot;ab&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[HALF, FULL], <span class="string">&quot;ab&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[FULL, ZERO], <span class="string">&quot;aa&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[FULL, HALF], <span class="string">&quot;aa&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[FULL, FULL], <span class="string">&quot;aa&quot;</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[HALF, ZERO], <span class="string">"ab"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[HALF, HALF], <span class="string">"ab"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[HALF, FULL], <span class="string">"ab"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[FULL, ZERO], <span class="string">"aa"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[FULL, HALF], <span class="string">"aa"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[FULL, FULL], <span class="string">"aa"</span>);
 
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">3</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[THIRD, THIRD], <span class="string">&quot;abb&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">3</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[THIRD, TWO_THIRDS], <span class="string">&quot;abb&quot;</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">3</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[THIRD, THIRD], <span class="string">"abb"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">3</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[THIRD, TWO_THIRDS], <span class="string">"abb"</span>);
         }
 
         <span class="attr">#[test]
@@ -3262,83 +3263,83 @@
             <span class="kw">const </span>FULL: Constraint = Ratio(<span class="number">1</span>, <span class="number">1</span>);
             <span class="kw">const </span>DOUBLE: Constraint = Ratio(<span class="number">2</span>, <span class="number">1</span>);
 
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO], <span class="string">&quot;a&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[QUARTER], <span class="string">&quot;a&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[HALF], <span class="string">&quot;a&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[NINETY], <span class="string">&quot;a&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[FULL], <span class="string">&quot;a&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[DOUBLE], <span class="string">&quot;a&quot;</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO], <span class="string">"a"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[QUARTER], <span class="string">"a"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[HALF], <span class="string">"a"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[NINETY], <span class="string">"a"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[FULL], <span class="string">"a"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[DOUBLE], <span class="string">"a"</span>);
 
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO], <span class="string">&quot;aa&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TEN], <span class="string">&quot;aa&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[QUARTER], <span class="string">&quot;aa&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[HALF], <span class="string">&quot;aa&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TWO_THIRDS], <span class="string">&quot;aa&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[FULL], <span class="string">&quot;aa&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[DOUBLE], <span class="string">&quot;aa&quot;</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO], <span class="string">"aa"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TEN], <span class="string">"aa"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[QUARTER], <span class="string">"aa"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[HALF], <span class="string">"aa"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TWO_THIRDS], <span class="string">"aa"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[FULL], <span class="string">"aa"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[DOUBLE], <span class="string">"aa"</span>);
 
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO, ZERO], <span class="string">&quot;b&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO, TEN], <span class="string">&quot;b&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO, HALF], <span class="string">&quot;b&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO, NINETY], <span class="string">&quot;b&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO, FULL], <span class="string">&quot;b&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO, DOUBLE], <span class="string">&quot;b&quot;</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO, ZERO], <span class="string">"b"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO, TEN], <span class="string">"b"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO, HALF], <span class="string">"b"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO, NINETY], <span class="string">"b"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO, FULL], <span class="string">"b"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO, DOUBLE], <span class="string">"b"</span>);
 
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TEN, ZERO], <span class="string">&quot;b&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TEN, TEN], <span class="string">&quot;b&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TEN, HALF], <span class="string">&quot;b&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TEN, NINETY], <span class="string">&quot;b&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TEN, FULL], <span class="string">&quot;b&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TEN, DOUBLE], <span class="string">&quot;b&quot;</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TEN, ZERO], <span class="string">"b"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TEN, TEN], <span class="string">"b"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TEN, HALF], <span class="string">"b"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TEN, NINETY], <span class="string">"b"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TEN, FULL], <span class="string">"b"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TEN, DOUBLE], <span class="string">"b"</span>);
 
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[HALF, ZERO], <span class="string">&quot;a&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[HALF, HALF], <span class="string">&quot;a&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[HALF, FULL], <span class="string">&quot;a&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[HALF, DOUBLE], <span class="string">&quot;a&quot;</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[HALF, ZERO], <span class="string">"a"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[HALF, HALF], <span class="string">"a"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[HALF, FULL], <span class="string">"a"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[HALF, DOUBLE], <span class="string">"a"</span>);
 
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[NINETY, ZERO], <span class="string">&quot;a&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[NINETY, HALF], <span class="string">&quot;a&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[NINETY, FULL], <span class="string">&quot;a&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[NINETY, DOUBLE], <span class="string">&quot;a&quot;</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[NINETY, ZERO], <span class="string">"a"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[NINETY, HALF], <span class="string">"a"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[NINETY, FULL], <span class="string">"a"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[NINETY, DOUBLE], <span class="string">"a"</span>);
 
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[FULL, ZERO], <span class="string">&quot;a&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[FULL, HALF], <span class="string">&quot;a&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[FULL, FULL], <span class="string">&quot;a&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[FULL, DOUBLE], <span class="string">&quot;a&quot;</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[FULL, ZERO], <span class="string">"a"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[FULL, HALF], <span class="string">"a"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[FULL, FULL], <span class="string">"a"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[FULL, DOUBLE], <span class="string">"a"</span>);
 
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO, ZERO], <span class="string">&quot;bb&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO, QUARTER], <span class="string">&quot;bb&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO, HALF], <span class="string">&quot;bb&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO, FULL], <span class="string">&quot;bb&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO, DOUBLE], <span class="string">&quot;bb&quot;</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO, ZERO], <span class="string">"bb"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO, QUARTER], <span class="string">"bb"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO, HALF], <span class="string">"bb"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO, FULL], <span class="string">"bb"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[ZERO, DOUBLE], <span class="string">"bb"</span>);
 
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TEN, ZERO], <span class="string">&quot;bb&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TEN, QUARTER], <span class="string">&quot;bb&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TEN, HALF], <span class="string">&quot;bb&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TEN, FULL], <span class="string">&quot;bb&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TEN, DOUBLE], <span class="string">&quot;bb&quot;</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TEN, ZERO], <span class="string">"bb"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TEN, QUARTER], <span class="string">"bb"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TEN, HALF], <span class="string">"bb"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TEN, FULL], <span class="string">"bb"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[TEN, DOUBLE], <span class="string">"bb"</span>);
 
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[QUARTER, ZERO], <span class="string">&quot;ab&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[QUARTER, QUARTER], <span class="string">&quot;ab&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[QUARTER, HALF], <span class="string">&quot;ab&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[QUARTER, FULL], <span class="string">&quot;ab&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[QUARTER, DOUBLE], <span class="string">&quot;ab&quot;</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[QUARTER, ZERO], <span class="string">"ab"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[QUARTER, QUARTER], <span class="string">"ab"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[QUARTER, HALF], <span class="string">"ab"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[QUARTER, FULL], <span class="string">"ab"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[QUARTER, DOUBLE], <span class="string">"ab"</span>);
 
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[THIRD, ZERO], <span class="string">&quot;ab&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[THIRD, QUARTER], <span class="string">&quot;ab&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[THIRD, HALF], <span class="string">&quot;ab&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[THIRD, FULL], <span class="string">&quot;ab&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[THIRD, DOUBLE], <span class="string">&quot;ab&quot;</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[THIRD, ZERO], <span class="string">"ab"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[THIRD, QUARTER], <span class="string">"ab"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[THIRD, HALF], <span class="string">"ab"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[THIRD, FULL], <span class="string">"ab"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[THIRD, DOUBLE], <span class="string">"ab"</span>);
 
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[HALF, ZERO], <span class="string">&quot;ab&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[HALF, HALF], <span class="string">&quot;ab&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[HALF, FULL], <span class="string">&quot;ab&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[FULL, ZERO], <span class="string">&quot;aa&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[FULL, HALF], <span class="string">&quot;aa&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[FULL, FULL], <span class="string">&quot;aa&quot;</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[HALF, ZERO], <span class="string">"ab"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[HALF, HALF], <span class="string">"ab"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[HALF, FULL], <span class="string">"ab"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[FULL, ZERO], <span class="string">"aa"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[FULL, HALF], <span class="string">"aa"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[FULL, FULL], <span class="string">"aa"</span>);
 
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">3</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[THIRD, THIRD], <span class="string">&quot;abb&quot;</span>);
-            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">3</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[THIRD, TWO_THIRDS], <span class="string">&quot;abb&quot;</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">3</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[THIRD, THIRD], <span class="string">"abb"</span>);
+            test(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">3</span>, <span class="number">1</span>), <span class="kw-2">&amp;</span>[THIRD, TWO_THIRDS], <span class="string">"abb"</span>);
         }
 
         <span class="attr">#[test]

@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sqlite-0.30.5/src/statement.rs`."><title>statement.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="sqlite" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sqlite-0.30.5/src/statement.rs`."><title>statement.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="sqlite" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -632,11 +633,11 @@
 );
 
 <span class="doccomment">/// A prepared statement.
-</span><span class="kw">pub struct </span>Statement&lt;<span class="lifetime">&#39;l</span>&gt; {
+</span><span class="kw">pub struct </span>Statement&lt;<span class="lifetime">'l</span>&gt; {
     raw: (<span class="kw-2">*mut </span>ffi::sqlite3_stmt, <span class="kw-2">*mut </span>ffi::sqlite3),
     column_names: Vec&lt;String&gt;,
     column_mapping: Rc&lt;HashMap&lt;String, usize&gt;&gt;,
-    phantom: PhantomData&lt;(ffi::sqlite3_stmt, <span class="kw-2">&amp;</span><span class="lifetime">&#39;l </span>ffi::sqlite3)&gt;,
+    phantom: PhantomData&lt;(ffi::sqlite3_stmt, <span class="kw-2">&amp;</span><span class="lifetime">'l </span>ffi::sqlite3)&gt;,
 }
 
 <span class="doccomment">/// A type suitable for binding to a prepared statement.
@@ -686,7 +687,7 @@
     </span>Done,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;l</span>&gt; Statement&lt;<span class="lifetime">&#39;l</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'l</span>&gt; Statement&lt;<span class="lifetime">'l</span>&gt; {
     <span class="doccomment">/// Bind values to parameters.
     ///
     /// In case of integer indices, the first parameter has index 1.
@@ -694,50 +695,50 @@
     /// # Examples
     ///
     /// ```
-    /// # let connection = sqlite::open(&quot;:memory:&quot;).unwrap();
-    /// # connection.execute(&quot;CREATE TABLE users (id INTEGER, name STRING)&quot;);
-    /// let query = &quot;SELECT * FROM users WHERE name = ?&quot;;
+    /// # let connection = sqlite::open(":memory:").unwrap();
+    /// # connection.execute("CREATE TABLE users (id INTEGER, name STRING)");
+    /// let query = "SELECT * FROM users WHERE name = ?";
     /// let mut statement = connection.prepare(query)?;
-    /// statement.bind((1, &quot;Bob&quot;))?;
+    /// statement.bind((1, "Bob"))?;
     /// # Ok::&lt;(), sqlite::Error&gt;(())
     /// ```
     ///
     /// ```
-    /// # let connection = sqlite::open(&quot;:memory:&quot;).unwrap();
-    /// # connection.execute(&quot;CREATE TABLE users (id INTEGER, name STRING)&quot;);
-    /// let query = &quot;SELECT * FROM users WHERE name = ?&quot;;
+    /// # let connection = sqlite::open(":memory:").unwrap();
+    /// # connection.execute("CREATE TABLE users (id INTEGER, name STRING)");
+    /// let query = "SELECT * FROM users WHERE name = ?";
     /// let mut statement = connection.prepare(query)?;
-    /// statement.bind(&amp;[(1, &quot;Bob&quot;)][..])?;
+    /// statement.bind(&amp;[(1, "Bob")][..])?;
     /// # Ok::&lt;(), sqlite::Error&gt;(())
     /// ```
     ///
     /// ```
-    /// # let connection = sqlite::open(&quot;:memory:&quot;).unwrap();
-    /// # connection.execute(&quot;CREATE TABLE users (id INTEGER, name STRING)&quot;);
-    /// let query = &quot;SELECT * FROM users WHERE name = :name&quot;;
+    /// # let connection = sqlite::open(":memory:").unwrap();
+    /// # connection.execute("CREATE TABLE users (id INTEGER, name STRING)");
+    /// let query = "SELECT * FROM users WHERE name = :name";
     /// let mut statement = connection.prepare(query)?;
-    /// statement.bind((&quot;:name&quot;, &quot;Bob&quot;))?;
+    /// statement.bind((":name", "Bob"))?;
     /// # Ok::&lt;(), sqlite::Error&gt;(())
     /// ```
     ///
     /// ```
-    /// # let connection = sqlite::open(&quot;:memory:&quot;).unwrap();
-    /// # connection.execute(&quot;CREATE TABLE users (id INTEGER, name STRING)&quot;);
-    /// let query = &quot;SELECT * FROM users WHERE name = :name&quot;;
+    /// # let connection = sqlite::open(":memory:").unwrap();
+    /// # connection.execute("CREATE TABLE users (id INTEGER, name STRING)");
+    /// let query = "SELECT * FROM users WHERE name = :name";
     /// let mut statement = connection.prepare(query)?;
-    /// statement.bind(&amp;[(&quot;:name&quot;, &quot;Bob&quot;)][..])?;
+    /// statement.bind(&amp;[(":name", "Bob")][..])?;
     /// # Ok::&lt;(), sqlite::Error&gt;(())
     /// ```
     ///
     /// ```
     /// # use sqlite::Value;
-    /// # let connection = sqlite::open(&quot;:memory:&quot;).unwrap();
-    /// # connection.execute(&quot;CREATE TABLE users (id INTEGER, name STRING)&quot;);
-    /// let query = &quot;SELECT * FROM users WHERE id = :id AND name = :name&quot;;
+    /// # let connection = sqlite::open(":memory:").unwrap();
+    /// # connection.execute("CREATE TABLE users (id INTEGER, name STRING)");
+    /// let query = "SELECT * FROM users WHERE id = :id AND name = :name";
     /// let mut statement = connection.prepare(query)?;
     /// statement.bind::&lt;&amp;[(_, Value)]&gt;(&amp;[
-    ///     (&quot;:id&quot;, 1.into()),
-    ///     (&quot;:name&quot;, &quot;Bob&quot;.into()),
+    ///     (":id", 1.into()),
+    ///     (":name", "Bob".into()),
     /// ][..])?;
     /// # Ok::&lt;(), sqlite::Error&gt;(())
     /// ```
@@ -753,13 +754,13 @@
     ///
     /// ```
     /// # use sqlite::Value;
-    /// # let connection = sqlite::open(&quot;:memory:&quot;).unwrap();
-    /// # connection.execute(&quot;CREATE TABLE users (id INTEGER, name STRING)&quot;);
-    /// let query = &quot;INSERT INTO users VALUES (:id, :name)&quot;;
+    /// # let connection = sqlite::open(":memory:").unwrap();
+    /// # connection.execute("CREATE TABLE users (id INTEGER, name STRING)");
+    /// let query = "INSERT INTO users VALUES (:id, :name)";
     /// let mut statement = connection.prepare(query)?;
     /// statement.bind_iter::&lt;_, (_, Value)&gt;([
-    ///     (&quot;:name&quot;, &quot;Bob&quot;.into()),
-    ///     (&quot;:id&quot;, 42.into()),
+    ///     (":name", "Bob".into()),
+    ///     (":id", 42.into()),
     /// ])?;
     /// # Ok::&lt;(), sqlite::Error&gt;(())
     /// ```
@@ -819,7 +820,7 @@
 
     <span class="doccomment">/// Create a cursor.
     </span><span class="attr">#[inline]
-    </span><span class="kw">pub fn </span>iter(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; Cursor&lt;<span class="lifetime">&#39;l</span>, <span class="lifetime">&#39;_</span>&gt; {
+    </span><span class="kw">pub fn </span>iter(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; Cursor&lt;<span class="lifetime">'l</span>, <span class="lifetime">'_</span>&gt; {
         <span class="self">self</span>.into()
     }
 
@@ -841,12 +842,12 @@
     /// # Examples
     ///
     /// ```
-    /// # let connection = sqlite::open(&quot;:memory:&quot;).unwrap();
-    /// # connection.execute(&quot;CREATE TABLE users (name STRING)&quot;);
-    /// let query = &quot;SELECT * FROM users WHERE name = :name&quot;;
+    /// # let connection = sqlite::open(":memory:").unwrap();
+    /// # connection.execute("CREATE TABLE users (name STRING)");
+    /// let query = "SELECT * FROM users WHERE name = :name";
     /// let statement = connection.prepare(query)?;
-    /// assert_eq!(statement.parameter_index(&quot;:name&quot;)?.unwrap(), 1);
-    /// assert_eq!(statement.parameter_index(&quot;:asdf&quot;)?, None);
+    /// assert_eq!(statement.parameter_index(":name")?.unwrap(), 1);
+    /// assert_eq!(statement.parameter_index(":asdf")?, None);
     /// # Ok::&lt;(), sqlite::Error&gt;(())
     /// ```
     </span><span class="attr">#[inline]
@@ -886,23 +887,23 @@
     </span>}
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;l</span>&gt; Drop <span class="kw">for </span>Statement&lt;<span class="lifetime">&#39;l</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'l</span>&gt; Drop <span class="kw">for </span>Statement&lt;<span class="lifetime">'l</span>&gt; {
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="kw">unsafe </span>{ ffi::sqlite3_finalize(<span class="self">self</span>.raw.<span class="number">0</span>) };
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;l</span>, <span class="lifetime">&#39;m</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;m </span><span class="kw-2">mut </span>Statement&lt;<span class="lifetime">&#39;l</span>&gt;&gt; <span class="kw">for </span>Cursor&lt;<span class="lifetime">&#39;l</span>, <span class="lifetime">&#39;m</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'l</span>, <span class="lifetime">'m</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">'m </span><span class="kw-2">mut </span>Statement&lt;<span class="lifetime">'l</span>&gt;&gt; <span class="kw">for </span>Cursor&lt;<span class="lifetime">'l</span>, <span class="lifetime">'m</span>&gt; {
     <span class="attr">#[inline]
-    </span><span class="kw">fn </span>from(statement: <span class="kw-2">&amp;</span><span class="lifetime">&#39;m </span><span class="kw-2">mut </span>Statement&lt;<span class="lifetime">&#39;l</span>&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">fn </span>from(statement: <span class="kw-2">&amp;</span><span class="lifetime">'m </span><span class="kw-2">mut </span>Statement&lt;<span class="lifetime">'l</span>&gt;) -&gt; <span class="self">Self </span>{
         ::cursor::new(statement)
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;l</span>&gt; IntoIterator <span class="kw">for </span>Statement&lt;<span class="lifetime">&#39;l</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'l</span>&gt; IntoIterator <span class="kw">for </span>Statement&lt;<span class="lifetime">'l</span>&gt; {
     <span class="kw">type </span>Item = <span class="prelude-ty">Result</span>&lt;Row&gt;;
-    <span class="kw">type </span>IntoIter = CursorWithOwnership&lt;<span class="lifetime">&#39;l</span>&gt;;
+    <span class="kw">type </span>IntoIter = CursorWithOwnership&lt;<span class="lifetime">'l</span>&gt;;
 
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
@@ -1082,7 +1083,7 @@
         <span class="kw">if </span>statement.column_mapping.contains_key(<span class="self">self</span>) {
             <span class="prelude-val">Ok</span>(statement.column_mapping[<span class="self">self</span>])
         } <span class="kw">else </span>{
-            <span class="macro">raise!</span>(<span class="string">&quot;the index is out of range ({})&quot;</span>, <span class="self">self</span>);
+            <span class="macro">raise!</span>(<span class="string">"the index is out of range ({})"</span>, <span class="self">self</span>);
         }
     }
 }
@@ -1093,7 +1094,7 @@
         <span class="kw">if </span><span class="self">self </span>&lt; statement.column_count() {
             <span class="prelude-val">Ok</span>(<span class="self">self</span>)
         } <span class="kw">else </span>{
-            <span class="macro">raise!</span>(<span class="string">&quot;the index is out of range ({})&quot;</span>, <span class="self">self</span>);
+            <span class="macro">raise!</span>(<span class="string">"the index is out of range ({})"</span>, <span class="self">self</span>);
         }
     }
 }
@@ -1103,7 +1104,7 @@
     </span><span class="kw">fn </span>index(<span class="self">self</span>, statement: <span class="kw-2">&amp;</span>Statement) -&gt; <span class="prelude-ty">Result</span>&lt;usize&gt; {
         <span class="kw">match </span>statement.parameter_index(<span class="self">self</span>)<span class="question-mark">? </span>{
             <span class="prelude-val">Some</span>(index) =&gt; <span class="prelude-val">Ok</span>(index),
-            <span class="kw">_ </span>=&gt; <span class="macro">raise!</span>(<span class="string">&quot;the index is out of range ({})&quot;</span>, <span class="self">self</span>),
+            <span class="kw">_ </span>=&gt; <span class="macro">raise!</span>(<span class="string">"the index is out of range ({})"</span>, <span class="self">self</span>),
         }
     }
 }
@@ -1114,7 +1115,7 @@
         <span class="kw">if </span><span class="self">self </span>&gt; <span class="number">0 </span>{
             <span class="prelude-val">Ok</span>(<span class="self">self</span>)
         } <span class="kw">else </span>{
-            <span class="macro">raise!</span>(<span class="string">&quot;the index is out of range ({})&quot;</span>, <span class="self">self</span>);
+            <span class="macro">raise!</span>(<span class="string">"the index is out of range ({})"</span>, <span class="self">self</span>);
         }
     }
 }
@@ -1158,7 +1159,7 @@
             <span class="kw">let </span>pointer =
                 ffi::sqlite3_column_text(statement.raw.<span class="number">0</span>, index.index(statement)<span class="question-mark">? </span><span class="kw">as </span>c_int);
             <span class="kw">if </span>pointer.is_null() {
-                <span class="macro">raise!</span>(<span class="string">&quot;cannot read a text column&quot;</span>);
+                <span class="macro">raise!</span>(<span class="string">"cannot read a text column"</span>);
             }
             <span class="prelude-val">Ok</span>(<span class="macro">c_str_to_string!</span>(pointer))
         }
@@ -1197,7 +1198,7 @@
 }
 
 <span class="attr">#[inline]
-</span><span class="kw">pub fn </span>new&lt;<span class="lifetime">&#39;l</span>, T&gt;(raw_connection: <span class="kw-2">*mut </span>ffi::sqlite3, statement: T) -&gt; <span class="prelude-ty">Result</span>&lt;Statement&lt;<span class="lifetime">&#39;l</span>&gt;&gt;
+</span><span class="kw">pub fn </span>new&lt;<span class="lifetime">'l</span>, T&gt;(raw_connection: <span class="kw-2">*mut </span>ffi::sqlite3, statement: T) -&gt; <span class="prelude-ty">Result</span>&lt;Statement&lt;<span class="lifetime">'l</span>&gt;&gt;
 <span class="kw">where
     </span>T: AsRef&lt;str&gt;,
 {

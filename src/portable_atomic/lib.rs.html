@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/portable-atomic-1.6.0/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="portable_atomic" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/portable-atomic-1.6.0/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="portable_atomic" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -3985,9 +3986,9 @@ Portable atomic types including support for 128-bit atomics, atomic float, etc.
 - Provide `AtomicF32` and `AtomicF64`. ([optional, requires the `float` feature](#optional-features-float))
 - Provide atomic load/store for targets where atomic is not available at all in the standard library. (RISC-V without A-extension, MSP430, AVR)
 - Provide atomic CAS for targets where atomic CAS is not available in the standard library. (thumbv6m, pre-v6 ARM, RISC-V without A-extension, MSP430, AVR, Xtensa, etc.) (always enabled for MSP430 and AVR, [optional](#optional-features-critical-section) otherwise)
-- Provide stable equivalents of the standard library&#39;s atomic types&#39; unstable APIs, such as [`AtomicPtr::fetch_*`](https://github.com/rust-lang/rust/issues/99108), [`AtomicBool::fetch_not`](https://github.com/rust-lang/rust/issues/98485).
+- Provide stable equivalents of the standard library's atomic types' unstable APIs, such as [`AtomicPtr::fetch_*`](https://github.com/rust-lang/rust/issues/99108), [`AtomicBool::fetch_not`](https://github.com/rust-lang/rust/issues/98485).
 - Make features that require newer compilers, such as [`fetch_{max,min}`](https://doc.rust-lang.org/std/sync/atomic/struct.AtomicUsize.html#method.fetch_max), [`fetch_update`](https://doc.rust-lang.org/std/sync/atomic/struct.AtomicUsize.html#method.fetch_update), [`as_ptr`](https://doc.rust-lang.org/std/sync/atomic/struct.AtomicUsize.html#method.as_ptr), [`from_ptr`](https://doc.rust-lang.org/std/sync/atomic/struct.AtomicUsize.html#method.from_ptr) and [stronger CAS failure ordering](https://github.com/rust-lang/rust/pull/98383) available on Rust 1.34+.
-- Provide workaround for bugs in the standard library&#39;s atomic-related APIs, such as [rust-lang/rust#100650], `fence`/`compiler_fence` on MSP430 that cause LLVM error, etc.
+- Provide workaround for bugs in the standard library's atomic-related APIs, such as [rust-lang/rust#100650], `fence`/`compiler_fence` on MSP430 that cause LLVM error, etc.
 
 &lt;!-- TODO:
 - mention Atomic{I,U}*::fetch_neg, Atomic{I*,U*,Ptr}::bit_*, etc.
@@ -4000,22 +4001,22 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-portable-atomic = &quot;1&quot;
+portable-atomic = "1"
 ```
 
 The default features are mainly for users who use atomics larger than the pointer width.
-If you don&#39;t need them, disabling the default features may reduce code size and compile time slightly.
+If you don't need them, disabling the default features may reduce code size and compile time slightly.
 
 ```toml
 [dependencies]
-portable-atomic = { version = &quot;1&quot;, default-features = false }
+portable-atomic = { version = "1", default-features = false }
 ```
 
 If your crate supports no-std environment and requires atomic CAS, enabling the `require-cas` feature will allow the `portable-atomic` to display helpful error messages to users on targets requiring additional action on the user side to provide atomic CAS.
 
 ```toml
 [dependencies]
-portable-atomic = { version = &quot;1.3&quot;, default-features = false, features = [&quot;require-cas&quot;] }
+portable-atomic = { version = "1.3", default-features = false, features = ["require-cas"] }
 ```
 
 *Compiler support: requires rustc 1.34+*
@@ -4028,7 +4029,7 @@ On x86_64, even if `cmpxchg16b` is not available at compile-time (note: `cmpxchg
 
 They are usually implemented using inline assembly, and when using Miri or ThreadSanitizer that do not support inline assembly, core intrinsics are used instead of inline assembly if possible.
 
-See the [`atomic128` module&#39;s readme](https://github.com/taiki-e/portable-atomic/blob/HEAD/src/imp/atomic128/README.md) for details.
+See the [`atomic128` module's readme](https://github.com/taiki-e/portable-atomic/blob/HEAD/src/imp/atomic128/README.md) for details.
 
 ## Optional features
 
@@ -4037,7 +4038,7 @@ See the [`atomic128` module&#39;s readme](https://github.com/taiki-e/portable-at
 
   Disabling this allows only atomic types for which the platform natively supports atomic operations.
 
-- &lt;a name=&quot;optional-features-float&quot;&gt;&lt;/a&gt;**`float`**&lt;br&gt;
+- &lt;a name="optional-features-float"&gt;&lt;/a&gt;**`float`**&lt;br&gt;
   Provide `AtomicF{32,64}`.
 
   Note that most of `fetch_*` operations of atomic floats are implemented using CAS loops, which can be slower than equivalent operations of atomic integers. ([GPU targets have atomic instructions for float, so we plan to use these instructions for GPU targets in the future.](https://github.com/taiki-e/portable-atomic/issues/34))
@@ -4045,26 +4046,26 @@ See the [`atomic128` module&#39;s readme](https://github.com/taiki-e/portable-at
 - **`std`**&lt;br&gt;
   Use `std`.
 
-- &lt;a name=&quot;optional-features-require-cas&quot;&gt;&lt;/a&gt;**`require-cas`**&lt;br&gt;
+- &lt;a name="optional-features-require-cas"&gt;&lt;/a&gt;**`require-cas`**&lt;br&gt;
   Emit compile error if atomic CAS is not available. See [Usage](#usage) section and [#100](https://github.com/taiki-e/portable-atomic/pull/100) for more.
 
-- &lt;a name=&quot;optional-features-serde&quot;&gt;&lt;/a&gt;**`serde`**&lt;br&gt;
+- &lt;a name="optional-features-serde"&gt;&lt;/a&gt;**`serde`**&lt;br&gt;
   Implement `serde::{Serialize,Deserialize}` for atomic types.
 
   Note:
   - The MSRV when this feature is enabled depends on the MSRV of [serde].
 
-- &lt;a name=&quot;optional-features-critical-section&quot;&gt;&lt;/a&gt;**`critical-section`**&lt;br&gt;
+- &lt;a name="optional-features-critical-section"&gt;&lt;/a&gt;**`critical-section`**&lt;br&gt;
   When this feature is enabled, this crate uses [critical-section] to provide atomic CAS for targets where
   it is not natively available. When enabling it, you should provide a suitable critical section implementation
   for the current target, see the [critical-section] documentation for details on how to do so.
 
-  `critical-section` support is useful to get atomic CAS when the [`unsafe-assume-single-core` feature](#optional-features-unsafe-assume-single-core) can&#39;t be used,
+  `critical-section` support is useful to get atomic CAS when the [`unsafe-assume-single-core` feature](#optional-features-unsafe-assume-single-core) can't be used,
   such as multi-core targets, unprivileged code running under some RTOS, or environments where disabling interrupts
   needs extra care due to e.g. real-time requirements.
 
   Note that with the `critical-section` feature, critical sections are taken for all atomic operations, while with
-  [`unsafe-assume-single-core` feature](#optional-features-unsafe-assume-single-core) some operations don&#39;t require disabling interrupts (loads and stores, but
+  [`unsafe-assume-single-core` feature](#optional-features-unsafe-assume-single-core) some operations don't require disabling interrupts (loads and stores, but
   additionally on MSP430 `add`, `sub`, `and`, `or`, `xor`, `not`). Therefore, for better performance, if
   all the `critical-section` implementation for your target does is disable interrupts, prefer using
   `unsafe-assume-single-core` feature instead.
@@ -4077,29 +4078,29 @@ See the [`atomic128` module&#39;s readme](https://github.com/taiki-e/portable-at
 
     The recommended approach for libraries is to leave it up to the end user whether or not to enable this feature. (However, it may make sense to enable this feature by default for libraries specific to a platform where other implementations are known not to work.)
 
-    As an example, the end-user&#39;s `Cargo.toml` that uses a crate that provides a critical-section implementation and a crate that depends on portable-atomic as an option would be expected to look like this:
+    As an example, the end-user's `Cargo.toml` that uses a crate that provides a critical-section implementation and a crate that depends on portable-atomic as an option would be expected to look like this:
 
     ```toml
     [dependencies]
-    portable-atomic = { version = &quot;1&quot;, default-features = false, features = [&quot;critical-section&quot;] }
-    crate-provides-critical-section-impl = &quot;...&quot;
-    crate-uses-portable-atomic-as-feature = { version = &quot;...&quot;, features = [&quot;portable-atomic&quot;] }
+    portable-atomic = { version = "1", default-features = false, features = ["critical-section"] }
+    crate-provides-critical-section-impl = "..."
+    crate-uses-portable-atomic-as-feature = { version = "...", features = ["portable-atomic"] }
     ```
 
-- &lt;a name=&quot;optional-features-unsafe-assume-single-core&quot;&gt;&lt;/a&gt;**`unsafe-assume-single-core`**&lt;br&gt;
+- &lt;a name="optional-features-unsafe-assume-single-core"&gt;&lt;/a&gt;**`unsafe-assume-single-core`**&lt;br&gt;
   Assume that the target is single-core.
   When this feature is enabled, this crate provides atomic CAS for targets where atomic CAS is not available in the standard library by disabling interrupts.
 
   This feature is `unsafe`, and note the following safety requirements:
   - Enabling this feature for multi-core systems is always **unsound**.
-  - This uses privileged instructions to disable interrupts, so it usually doesn&#39;t work on unprivileged mode.
+  - This uses privileged instructions to disable interrupts, so it usually doesn't work on unprivileged mode.
     Enabling this feature in an environment where privileged instructions are not available, or if the instructions used are not sufficient to disable interrupts in the system, it is also usually considered **unsound**, although the details are system-dependent.
 
     The following are known cases:
     - On pre-v6 ARM, this disables only IRQs by default. For many systems (e.g., GBA) this is enough. If the system need to disable both IRQs and FIQs, you need to enable the `disable-fiq` feature together.
     - On RISC-V without A-extension, this generates code for machine-mode (M-mode) by default. If you enable the `s-mode` together, this generates code for supervisor-mode (S-mode). In particular, `qemu-system-riscv*` uses [OpenSBI](https://github.com/riscv-software-src/opensbi) as the default firmware.
 
-    See also [the `interrupt` module&#39;s readme](https://github.com/taiki-e/portable-atomic/blob/HEAD/src/imp/interrupt/README.md).
+    See also [the `interrupt` module's readme](https://github.com/taiki-e/portable-atomic/blob/HEAD/src/imp/interrupt/README.md).
 
   Consider using the [`critical-section` feature](#optional-features-critical-section) for systems that cannot use this feature.
 
@@ -4120,21 +4121,21 @@ One of the ways to enable cfg is to set [rustflags in the cargo config](https://
 ```toml
 # .cargo/config.toml
 [target.&lt;target&gt;]
-rustflags = [&quot;--cfg&quot;, &quot;portable_atomic_no_outline_atomics&quot;]
+rustflags = ["--cfg", "portable_atomic_no_outline_atomics"]
 ```
 
 Or set environment variable:
 
 ```sh
-RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
+RUSTFLAGS="--cfg portable_atomic_no_outline_atomics" cargo ...
 ```
 
-- &lt;a name=&quot;optional-cfg-unsafe-assume-single-core&quot;&gt;&lt;/a&gt;**`--cfg portable_atomic_unsafe_assume_single_core`**&lt;br&gt;
+- &lt;a name="optional-cfg-unsafe-assume-single-core"&gt;&lt;/a&gt;**`--cfg portable_atomic_unsafe_assume_single_core`**&lt;br&gt;
   Since 1.4.0, this cfg is an alias of [`unsafe-assume-single-core` feature](#optional-features-unsafe-assume-single-core).
 
   Originally, we were providing these as cfgs instead of features, but based on a strong request from the embedded ecosystem, we have agreed to provide them as features as well. See [#94](https://github.com/taiki-e/portable-atomic/pull/94) for more.
 
-- &lt;a name=&quot;optional-cfg-no-outline-atomics&quot;&gt;&lt;/a&gt;**`--cfg portable_atomic_no_outline_atomics`**&lt;br&gt;
+- &lt;a name="optional-cfg-no-outline-atomics"&gt;&lt;/a&gt;**`--cfg portable_atomic_no_outline_atomics`**&lt;br&gt;
   Disable dynamic dispatching by run-time CPU feature detection.
 
   If dynamic dispatching by run-time CPU feature detection is enabled, it allows maintaining support for older CPUs while using features that are not supported on older CPUs, such as CMPXCHG16B (x86_64) and FEAT_LSE (aarch64).
@@ -4144,9 +4145,9 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
   - If the required target features are enabled at compile-time, the atomic operations are inlined.
   - This is compatible with no-std (as with all features except `std`).
   - On some targets, run-time detection is disabled by default mainly for compatibility with older versions of operating systems or incomplete build environments, and can be enabled by `--cfg portable_atomic_outline_atomics`. (When both cfg are enabled, `*_no_*` cfg is preferred.)
-  - Some aarch64 targets enable LLVM&#39;s `outline-atomics` target feature by default, so if you set this cfg, you may want to disable that as well. (portable-atomic&#39;s outline-atomics does not depend on the compiler-rt symbols, so even if you need to disable LLVM&#39;s outline-atomics, you may not need to disable portable-atomic&#39;s outline-atomics.)
+  - Some aarch64 targets enable LLVM's `outline-atomics` target feature by default, so if you set this cfg, you may want to disable that as well. (portable-atomic's outline-atomics does not depend on the compiler-rt symbols, so even if you need to disable LLVM's outline-atomics, you may not need to disable portable-atomic's outline-atomics.)
 
-  See also the [`atomic128` module&#39;s readme](https://github.com/taiki-e/portable-atomic/blob/HEAD/src/imp/atomic128/README.md).
+  See also the [`atomic128` module's readme](https://github.com/taiki-e/portable-atomic/blob/HEAD/src/imp/atomic128/README.md).
 
 ## Related Projects
 
@@ -4185,7 +4186,7 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
     clippy::std_instead_of_alloc,
     clippy::std_instead_of_core,
 )]
-#![cfg_attr(not(portable_atomic_no_asm), warn(missing_docs))] </span><span class="comment">// module-level #![allow(missing_docs)] doesn&#39;t work for macros on old rustc
+#![cfg_attr(not(portable_atomic_no_asm), warn(missing_docs))] </span><span class="comment">// module-level #![allow(missing_docs)] doesn't work for macros on old rustc
 </span><span class="attr">#![allow(
     clippy::cast_lossless,
     clippy::inline_always,
@@ -4200,11 +4201,11 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
     all(
         not(portable_atomic_no_asm),
         any(
-            target_arch = <span class="string">&quot;avr&quot;</span>,
-            target_arch = <span class="string">&quot;msp430&quot;</span>,
-            all(target_arch = <span class="string">&quot;xtensa&quot;</span>, portable_atomic_unsafe_assume_single_core),
-            all(target_arch = <span class="string">&quot;powerpc64&quot;</span>, portable_atomic_unstable_asm_experimental_arch),
-            all(target_arch = <span class="string">&quot;s390x&quot;</span>, portable_atomic_unstable_asm_experimental_arch),
+            target_arch = <span class="string">"avr"</span>,
+            target_arch = <span class="string">"msp430"</span>,
+            all(target_arch = <span class="string">"xtensa"</span>, portable_atomic_unsafe_assume_single_core),
+            all(target_arch = <span class="string">"powerpc64"</span>, portable_atomic_unstable_asm_experimental_arch),
+            all(target_arch = <span class="string">"s390x"</span>, portable_atomic_unstable_asm_experimental_arch),
         ),
     ),
     feature(asm_experimental_arch)
@@ -4213,18 +4214,18 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
 // These features are already stabilized or have already been removed from compilers,
 // and can safely be enabled for old nightly as long as version detection works.
 // - cfg(target_has_atomic)
-// - #[target_feature(enable = &quot;cmpxchg16b&quot;)] on x86_64
+// - #[target_feature(enable = "cmpxchg16b")] on x86_64
 // - asm! on ARM, AArch64, RISC-V, x86_64
 // - llvm_asm! on AVR (tier 3) and MSP430 (tier 3)
 // - #[instruction_set] on non-Linux/Android pre-v6 ARM (tier 3)
 </span><span class="attr">#![cfg_attr(portable_atomic_unstable_cfg_target_has_atomic, feature(cfg_target_has_atomic))]
 #![cfg_attr(
     all(
-        target_arch = <span class="string">&quot;x86_64&quot;</span>,
+        target_arch = <span class="string">"x86_64"</span>,
         portable_atomic_unstable_cmpxchg16b_target_feature,
         not(portable_atomic_no_outline_atomics),
-        not(any(target_env = <span class="string">&quot;sgx&quot;</span>, miri)),
-        feature = <span class="string">&quot;fallback&quot;</span>,
+        not(any(target_env = <span class="string">"sgx"</span>, miri)),
+        feature = <span class="string">"fallback"</span>,
     ),
     feature(cmpxchg16b_target_feature)
 )]
@@ -4232,26 +4233,26 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
     all(
         portable_atomic_unstable_asm,
         any(
-            target_arch = <span class="string">&quot;aarch64&quot;</span>,
-            target_arch = <span class="string">&quot;arm&quot;</span>,
-            target_arch = <span class="string">&quot;riscv32&quot;</span>,
-            target_arch = <span class="string">&quot;riscv64&quot;</span>,
-            target_arch = <span class="string">&quot;x86_64&quot;</span>,
+            target_arch = <span class="string">"aarch64"</span>,
+            target_arch = <span class="string">"arm"</span>,
+            target_arch = <span class="string">"riscv32"</span>,
+            target_arch = <span class="string">"riscv64"</span>,
+            target_arch = <span class="string">"x86_64"</span>,
         ),
     ),
     feature(asm)
 )]
 #![cfg_attr(
-    all(any(target_arch = <span class="string">&quot;avr&quot;</span>, target_arch = <span class="string">&quot;msp430&quot;</span>), portable_atomic_no_asm),
+    all(any(target_arch = <span class="string">"avr"</span>, target_arch = <span class="string">"msp430"</span>), portable_atomic_no_asm),
     feature(llvm_asm)
 )]
 #![cfg_attr(
     all(
-        target_arch = <span class="string">&quot;arm&quot;</span>,
+        target_arch = <span class="string">"arm"</span>,
         portable_atomic_unstable_isa_attribute,
         any(test, portable_atomic_unsafe_assume_single_core),
-        not(any(target_feature = <span class="string">&quot;v6&quot;</span>, portable_atomic_target_feature = <span class="string">&quot;v6&quot;</span>)),
-        not(target_has_atomic = <span class="string">&quot;ptr&quot;</span>),
+        not(any(target_feature = <span class="string">"v6"</span>, portable_atomic_target_feature = <span class="string">"v6"</span>)),
+        not(target_has_atomic = <span class="string">"ptr"</span>),
     ),
     feature(isa_attribute)
 )]
@@ -4260,7 +4261,7 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
 // Since they require nightly compilers anyway, we can use the unstable features.
 </span><span class="attr">#![cfg_attr(
     all(
-        any(target_arch = <span class="string">&quot;aarch64&quot;</span>, target_arch = <span class="string">&quot;powerpc64&quot;</span>, target_arch = <span class="string">&quot;s390x&quot;</span>),
+        any(target_arch = <span class="string">"aarch64"</span>, target_arch = <span class="string">"powerpc64"</span>, target_arch = <span class="string">"s390x"</span>),
         any(miri, portable_atomic_sanitize_thread),
     ),
     feature(core_intrinsics)
@@ -4268,7 +4269,7 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
 </span><span class="comment">// This feature is only enabled for old nightly because cmpxchg16b_intrinsic has been stabilized.
 </span><span class="attr">#![cfg_attr(
     all(
-        target_arch = <span class="string">&quot;x86_64&quot;</span>,
+        target_arch = <span class="string">"x86_64"</span>,
         portable_atomic_unstable_cmpxchg16b_intrinsic,
         any(miri, portable_atomic_sanitize_thread),
     ),
@@ -4280,12 +4281,12 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
     all(
         portable_atomic_no_atomic_load_store,
         not(any(
-            target_arch = <span class="string">&quot;avr&quot;</span>,
-            target_arch = <span class="string">&quot;bpf&quot;</span>,
-            target_arch = <span class="string">&quot;msp430&quot;</span>,
-            target_arch = <span class="string">&quot;riscv32&quot;</span>,
-            target_arch = <span class="string">&quot;riscv64&quot;</span>,
-            feature = <span class="string">&quot;critical-section&quot;</span>,
+            target_arch = <span class="string">"avr"</span>,
+            target_arch = <span class="string">"bpf"</span>,
+            target_arch = <span class="string">"msp430"</span>,
+            target_arch = <span class="string">"riscv32"</span>,
+            target_arch = <span class="string">"riscv64"</span>,
+            feature = <span class="string">"critical-section"</span>,
         )),
     ),
     allow(unused_imports, unused_macros)
@@ -4296,14 +4297,14 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
 // addition of 128-bit targets in mind.)
 // Note that Rust (and C99) pointers must be at least 16-bits: https://github.com/rust-lang/rust/pull/49305
 </span><span class="attr">#[cfg(not(any(
-    target_pointer_width = <span class="string">&quot;16&quot;</span>,
-    target_pointer_width = <span class="string">&quot;32&quot;</span>,
-    target_pointer_width = <span class="string">&quot;64&quot;</span>,
+    target_pointer_width = <span class="string">"16"</span>,
+    target_pointer_width = <span class="string">"32"</span>,
+    target_pointer_width = <span class="string">"64"</span>,
 )))]
 </span><span class="macro">compile_error!</span>(
-    <span class="string">&quot;portable-atomic currently only supports targets with {16,32,64}-bit pointer width; \
+    <span class="string">"portable-atomic currently only supports targets with {16,32,64}-bit pointer width; \
      if you need support for others, \
-     please submit an issue at &lt;https://github.com/taiki-e/portable-atomic&gt;&quot;
+     please submit an issue at &lt;https://github.com/taiki-e/portable-atomic&gt;"
 </span>);
 
 <span class="attr">#[cfg(portable_atomic_unsafe_assume_single_core)]
@@ -4312,119 +4313,119 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
     cfg(any(
         not(portable_atomic_no_atomic_cas),
         not(any(
-            target_arch = <span class="string">&quot;arm&quot;</span>,
-            target_arch = <span class="string">&quot;avr&quot;</span>,
-            target_arch = <span class="string">&quot;msp430&quot;</span>,
-            target_arch = <span class="string">&quot;riscv32&quot;</span>,
-            target_arch = <span class="string">&quot;riscv64&quot;</span>,
-            target_arch = <span class="string">&quot;xtensa&quot;</span>,
+            target_arch = <span class="string">"arm"</span>,
+            target_arch = <span class="string">"avr"</span>,
+            target_arch = <span class="string">"msp430"</span>,
+            target_arch = <span class="string">"riscv32"</span>,
+            target_arch = <span class="string">"riscv64"</span>,
+            target_arch = <span class="string">"xtensa"</span>,
         )),
     ))
 )]
 #[cfg_attr(
     not(portable_atomic_no_cfg_target_has_atomic),
     cfg(any(
-        target_has_atomic = <span class="string">&quot;ptr&quot;</span>,
+        target_has_atomic = <span class="string">"ptr"</span>,
         not(any(
-            target_arch = <span class="string">&quot;arm&quot;</span>,
-            target_arch = <span class="string">&quot;avr&quot;</span>,
-            target_arch = <span class="string">&quot;msp430&quot;</span>,
-            target_arch = <span class="string">&quot;riscv32&quot;</span>,
-            target_arch = <span class="string">&quot;riscv64&quot;</span>,
-            target_arch = <span class="string">&quot;xtensa&quot;</span>,
+            target_arch = <span class="string">"arm"</span>,
+            target_arch = <span class="string">"avr"</span>,
+            target_arch = <span class="string">"msp430"</span>,
+            target_arch = <span class="string">"riscv32"</span>,
+            target_arch = <span class="string">"riscv64"</span>,
+            target_arch = <span class="string">"xtensa"</span>,
         )),
     ))
 )]
 </span><span class="macro">compile_error!</span>(
-    <span class="string">&quot;cfg(portable_atomic_unsafe_assume_single_core) does not compatible with this target;\n\
+    <span class="string">"cfg(portable_atomic_unsafe_assume_single_core) does not compatible with this target;\n\
      if you need cfg(portable_atomic_unsafe_assume_single_core) support for this target,\n\
-     please submit an issue at &lt;https://github.com/taiki-e/portable-atomic&gt;&quot;
+     please submit an issue at &lt;https://github.com/taiki-e/portable-atomic&gt;"
 </span>);
 
 <span class="attr">#[cfg(portable_atomic_no_outline_atomics)]
 #[cfg(not(any(
-    target_arch = <span class="string">&quot;aarch64&quot;</span>,
-    target_arch = <span class="string">&quot;arm&quot;</span>,
-    target_arch = <span class="string">&quot;powerpc64&quot;</span>,
-    target_arch = <span class="string">&quot;x86_64&quot;</span>,
+    target_arch = <span class="string">"aarch64"</span>,
+    target_arch = <span class="string">"arm"</span>,
+    target_arch = <span class="string">"powerpc64"</span>,
+    target_arch = <span class="string">"x86_64"</span>,
 )))]
-</span><span class="macro">compile_error!</span>(<span class="string">&quot;cfg(portable_atomic_no_outline_atomics) does not compatible with this target&quot;</span>);
+</span><span class="macro">compile_error!</span>(<span class="string">"cfg(portable_atomic_no_outline_atomics) does not compatible with this target"</span>);
 <span class="attr">#[cfg(portable_atomic_outline_atomics)]
-#[cfg(not(any(target_arch = <span class="string">&quot;aarch64&quot;</span>, target_arch = <span class="string">&quot;powerpc64&quot;</span>)))]
-</span><span class="macro">compile_error!</span>(<span class="string">&quot;cfg(portable_atomic_outline_atomics) does not compatible with this target&quot;</span>);
+#[cfg(not(any(target_arch = <span class="string">"aarch64"</span>, target_arch = <span class="string">"powerpc64"</span>)))]
+</span><span class="macro">compile_error!</span>(<span class="string">"cfg(portable_atomic_outline_atomics) does not compatible with this target"</span>);
 <span class="attr">#[cfg(portable_atomic_disable_fiq)]
 #[cfg(not(all(
-    target_arch = <span class="string">&quot;arm&quot;</span>,
-    not(any(target_feature = <span class="string">&quot;mclass&quot;</span>, portable_atomic_target_feature = <span class="string">&quot;mclass&quot;</span>)),
+    target_arch = <span class="string">"arm"</span>,
+    not(any(target_feature = <span class="string">"mclass"</span>, portable_atomic_target_feature = <span class="string">"mclass"</span>)),
 )))]
-</span><span class="macro">compile_error!</span>(<span class="string">&quot;cfg(portable_atomic_disable_fiq) does not compatible with this target&quot;</span>);
+</span><span class="macro">compile_error!</span>(<span class="string">"cfg(portable_atomic_disable_fiq) does not compatible with this target"</span>);
 <span class="attr">#[cfg(portable_atomic_s_mode)]
-#[cfg(not(any(target_arch = <span class="string">&quot;riscv32&quot;</span>, target_arch = <span class="string">&quot;riscv64&quot;</span>)))]
-</span><span class="macro">compile_error!</span>(<span class="string">&quot;cfg(portable_atomic_s_mode) does not compatible with this target&quot;</span>);
+#[cfg(not(any(target_arch = <span class="string">"riscv32"</span>, target_arch = <span class="string">"riscv64"</span>)))]
+</span><span class="macro">compile_error!</span>(<span class="string">"cfg(portable_atomic_s_mode) does not compatible with this target"</span>);
 <span class="attr">#[cfg(portable_atomic_force_amo)]
-#[cfg(not(any(target_arch = <span class="string">&quot;riscv32&quot;</span>, target_arch = <span class="string">&quot;riscv64&quot;</span>)))]
-</span><span class="macro">compile_error!</span>(<span class="string">&quot;cfg(portable_atomic_force_amo) does not compatible with this target&quot;</span>);
+#[cfg(not(any(target_arch = <span class="string">"riscv32"</span>, target_arch = <span class="string">"riscv64"</span>)))]
+</span><span class="macro">compile_error!</span>(<span class="string">"cfg(portable_atomic_force_amo) does not compatible with this target"</span>);
 
 <span class="attr">#[cfg(portable_atomic_disable_fiq)]
 #[cfg(not(portable_atomic_unsafe_assume_single_core))]
 </span><span class="macro">compile_error!</span>(
-    <span class="string">&quot;cfg(portable_atomic_disable_fiq) may only be used together with cfg(portable_atomic_unsafe_assume_single_core)&quot;
+    <span class="string">"cfg(portable_atomic_disable_fiq) may only be used together with cfg(portable_atomic_unsafe_assume_single_core)"
 </span>);
 <span class="attr">#[cfg(portable_atomic_s_mode)]
 #[cfg(not(portable_atomic_unsafe_assume_single_core))]
 </span><span class="macro">compile_error!</span>(
-    <span class="string">&quot;cfg(portable_atomic_s_mode) may only be used together with cfg(portable_atomic_unsafe_assume_single_core)&quot;
+    <span class="string">"cfg(portable_atomic_s_mode) may only be used together with cfg(portable_atomic_unsafe_assume_single_core)"
 </span>);
 <span class="attr">#[cfg(portable_atomic_force_amo)]
 #[cfg(not(portable_atomic_unsafe_assume_single_core))]
 </span><span class="macro">compile_error!</span>(
-    <span class="string">&quot;cfg(portable_atomic_force_amo) may only be used together with cfg(portable_atomic_unsafe_assume_single_core)&quot;
+    <span class="string">"cfg(portable_atomic_force_amo) may only be used together with cfg(portable_atomic_unsafe_assume_single_core)"
 </span>);
 
-<span class="attr">#[cfg(all(portable_atomic_unsafe_assume_single_core, feature = <span class="string">&quot;critical-section&quot;</span>))]
+<span class="attr">#[cfg(all(portable_atomic_unsafe_assume_single_core, feature = <span class="string">"critical-section"</span>))]
 </span><span class="macro">compile_error!</span>(
-    <span class="string">&quot;you may not enable feature `critical-section` and cfg(portable_atomic_unsafe_assume_single_core) at the same time&quot;
+    <span class="string">"you may not enable feature `critical-section` and cfg(portable_atomic_unsafe_assume_single_core) at the same time"
 </span>);
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;require-cas&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"require-cas"</span>)]
 #[cfg_attr(
     portable_atomic_no_cfg_target_has_atomic,
     cfg(not(any(
         not(portable_atomic_no_atomic_cas),
         portable_atomic_unsafe_assume_single_core,
-        feature = <span class="string">&quot;critical-section&quot;</span>,
-        target_arch = <span class="string">&quot;avr&quot;</span>,
-        target_arch = <span class="string">&quot;msp430&quot;</span>,
+        feature = <span class="string">"critical-section"</span>,
+        target_arch = <span class="string">"avr"</span>,
+        target_arch = <span class="string">"msp430"</span>,
     )))
 )]
 #[cfg_attr(
     not(portable_atomic_no_cfg_target_has_atomic),
     cfg(not(any(
-        target_has_atomic = <span class="string">&quot;ptr&quot;</span>,
+        target_has_atomic = <span class="string">"ptr"</span>,
         portable_atomic_unsafe_assume_single_core,
-        feature = <span class="string">&quot;critical-section&quot;</span>,
-        target_arch = <span class="string">&quot;avr&quot;</span>,
-        target_arch = <span class="string">&quot;msp430&quot;</span>,
+        feature = <span class="string">"critical-section"</span>,
+        target_arch = <span class="string">"avr"</span>,
+        target_arch = <span class="string">"msp430"</span>,
     )))
 )]
 </span><span class="macro">compile_error!</span>(
-    <span class="string">&quot;dependents require atomic CAS but not available on this target by default;\n\
+    <span class="string">"dependents require atomic CAS but not available on this target by default;\n\
     consider enabling one of the `unsafe-assume-single-core` or `critical-section` Cargo features.\n\
-    see &lt;https://docs.rs/portable-atomic/latest/portable_atomic/#optional-features&gt; for more.&quot;
+    see &lt;https://docs.rs/portable-atomic/latest/portable_atomic/#optional-features&gt; for more."
 </span>);
 
-<span class="attr">#[cfg(any(test, feature = <span class="string">&quot;std&quot;</span>))]
+<span class="attr">#[cfg(any(test, feature = <span class="string">"std"</span>))]
 </span><span class="kw">extern crate </span>std;
 
 <span class="attr">#[macro_use]
 </span><span class="kw">mod </span>cfgs;
-<span class="attr">#[cfg(target_pointer_width = <span class="string">&quot;128&quot;</span>)]
+<span class="attr">#[cfg(target_pointer_width = <span class="string">"128"</span>)]
 </span><span class="kw">pub use </span>{cfg_has_atomic_128 <span class="kw">as </span>cfg_has_atomic_ptr, cfg_no_atomic_128 <span class="kw">as </span>cfg_no_atomic_ptr};
-<span class="attr">#[cfg(target_pointer_width = <span class="string">&quot;16&quot;</span>)]
+<span class="attr">#[cfg(target_pointer_width = <span class="string">"16"</span>)]
 </span><span class="kw">pub use </span>{cfg_has_atomic_16 <span class="kw">as </span>cfg_has_atomic_ptr, cfg_no_atomic_16 <span class="kw">as </span>cfg_no_atomic_ptr};
-<span class="attr">#[cfg(target_pointer_width = <span class="string">&quot;32&quot;</span>)]
+<span class="attr">#[cfg(target_pointer_width = <span class="string">"32"</span>)]
 </span><span class="kw">pub use </span>{cfg_has_atomic_32 <span class="kw">as </span>cfg_has_atomic_ptr, cfg_no_atomic_32 <span class="kw">as </span>cfg_no_atomic_ptr};
-<span class="attr">#[cfg(target_pointer_width = <span class="string">&quot;64&quot;</span>)]
+<span class="attr">#[cfg(target_pointer_width = <span class="string">"64"</span>)]
 </span><span class="kw">pub use </span>{cfg_has_atomic_64 <span class="kw">as </span>cfg_has_atomic_ptr, cfg_no_atomic_64 <span class="kw">as </span>cfg_no_atomic_ptr};
 
 <span class="attr">#[macro_use]
@@ -4438,10 +4439,10 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
 </span><span class="kw">pub use </span>core::sync::atomic::Ordering;
 
 <span class="attr">#[doc(no_inline)]
-</span><span class="comment">// LLVM doesn&#39;t support fence/compiler_fence for MSP430.
-</span><span class="attr">#[cfg(not(target_arch = <span class="string">&quot;msp430&quot;</span>))]
+</span><span class="comment">// LLVM doesn't support fence/compiler_fence for MSP430.
+</span><span class="attr">#[cfg(not(target_arch = <span class="string">"msp430"</span>))]
 </span><span class="kw">pub use </span>core::sync::atomic::{compiler_fence, fence};
-<span class="attr">#[cfg(target_arch = <span class="string">&quot;msp430&quot;</span>)]
+<span class="attr">#[cfg(target_arch = <span class="string">"msp430"</span>)]
 </span><span class="kw">pub use </span>imp::msp430::{compiler_fence, fence};
 
 <span class="kw">mod </span>imp;
@@ -4462,13 +4463,13 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
     </span><span class="kw">pub use </span>core::hint::<span class="kw-2">*</span>;
 
     <span class="doccomment">/// Emits a machine instruction to signal the processor that it is running in
-    /// a busy-wait spin-loop (&quot;spin lock&quot;).
+    /// a busy-wait spin-loop ("spin lock").
     ///
     /// Upon receiving the spin-loop signal the processor can optimize its behavior by,
     /// for example, saving power or switching hyper-threads.
     ///
     /// This function is different from [`thread::yield_now`] which directly
-    /// yields to the system&#39;s scheduler, whereas `spin_loop` does not interact
+    /// yields to the system's scheduler, whereas `spin_loop` does not interact
     /// with the operating system.
     ///
     /// A common use case for `spin_loop` is implementing bounded optimistic
@@ -4503,12 +4504,12 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
 </span><span class="attr">#[cfg(portable_atomic_no_cfg_target_has_atomic)]
 </span><span class="kw">const </span>EMULATE_ATOMIC_BOOL: bool = <span class="macro">cfg!</span>(all(
     not(portable_atomic_no_atomic_cas),
-    any(target_arch = <span class="string">&quot;riscv32&quot;</span>, target_arch = <span class="string">&quot;riscv64&quot;</span>, target_arch = <span class="string">&quot;loongarch64&quot;</span>),
+    any(target_arch = <span class="string">"riscv32"</span>, target_arch = <span class="string">"riscv64"</span>, target_arch = <span class="string">"loongarch64"</span>),
 ));
 <span class="attr">#[cfg(not(portable_atomic_no_cfg_target_has_atomic))]
 </span><span class="kw">const </span>EMULATE_ATOMIC_BOOL: bool = <span class="macro">cfg!</span>(all(
-    target_has_atomic = <span class="string">&quot;8&quot;</span>,
-    any(target_arch = <span class="string">&quot;riscv32&quot;</span>, target_arch = <span class="string">&quot;riscv64&quot;</span>, target_arch = <span class="string">&quot;loongarch64&quot;</span>),
+    target_has_atomic = <span class="string">"8"</span>,
+    any(target_arch = <span class="string">"riscv32"</span>, target_arch = <span class="string">"riscv64"</span>, target_arch = <span class="string">"loongarch64"</span>),
 ));
 } <span class="comment">// cfg_has_atomic_cas!
 
@@ -4517,7 +4518,7 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
 /// This type has the same in-memory representation as a [`bool`].
 ///
 /// If the compiler and the platform support atomic loads and stores of `u8`,
-/// this type is a wrapper for the standard library&#39;s
+/// this type is a wrapper for the standard library's
 /// [`AtomicBool`](core::sync::atomic::AtomicBool). If the platform supports it
 /// but the compiler does not, atomic operations are implemented using inline
 /// assembly.
@@ -4550,7 +4551,7 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
 <span class="comment">// UnwindSafe is implicitly implemented.
 </span><span class="attr">#[cfg(not(portable_atomic_no_core_unwind_safe))]
 </span><span class="kw">impl </span>core::panic::RefUnwindSafe <span class="kw">for </span>AtomicBool {}
-<span class="attr">#[cfg(all(portable_atomic_no_core_unwind_safe, feature = <span class="string">&quot;std&quot;</span>))]
+<span class="attr">#[cfg(all(portable_atomic_no_core_unwind_safe, feature = <span class="string">"std"</span>))]
 </span><span class="kw">impl </span>std::panic::RefUnwindSafe <span class="kw">for </span>AtomicBool {}
 
 <span class="macro">impl_debug_and_serde!</span>(AtomicBool);
@@ -4579,20 +4580,20 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
     ///
     /// * `ptr` must be aligned to `align_of::&lt;AtomicBool&gt;()` (note that on some platforms this can
     ///   be bigger than `align_of::&lt;bool&gt;()`).
-    /// * `ptr` must be [valid] for both reads and writes for the whole lifetime `&#39;a`.
+    /// * `ptr` must be [valid] for both reads and writes for the whole lifetime `'a`.
     /// * If this atomic type is [lock-free](Self::is_lock_free), non-atomic accesses to the value
     ///   behind `ptr` must have a happens-before relationship with atomic accesses via the returned
     ///   value (or vice-versa).
     ///   * In other words, time periods where the value is accessed atomically may not overlap
     ///     with periods where the value is accessed non-atomically.
     ///   * This requirement is trivially satisfied if `ptr` is never used non-atomically for the
-    ///     duration of lifetime `&#39;a`. Most use cases should be able to follow this guideline.
+    ///     duration of lifetime `'a`. Most use cases should be able to follow this guideline.
     ///   * This requirement is also trivially satisfied if all accesses (atomic or not) are done
     ///     from the same thread.
     /// * If this atomic type is *not* lock-free:
     ///   * Any accesses to the value behind `ptr` must have a happens-before relationship
     ///     with accesses via the returned value (or vice-versa).
-    ///   * Any concurrent accesses to the value behind `ptr` for the duration of lifetime `&#39;a` must
+    ///   * Any concurrent accesses to the value behind `ptr` for the duration of lifetime `'a` must
     ///     be compatible with operations performed by this atomic type.
     /// * This method must not be used to create overlapping or mixed-size atomic accesses, as
     ///   these are not supported by the memory model.
@@ -4600,7 +4601,7 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
     /// [valid]: core::ptr#safety
     </span><span class="attr">#[inline]
     #[must_use]
-    </span><span class="kw">pub unsafe fn </span>from_ptr&lt;<span class="lifetime">&#39;a</span>&gt;(ptr: <span class="kw-2">*mut </span>bool) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">Self </span>{
+    </span><span class="kw">pub unsafe fn </span>from_ptr&lt;<span class="lifetime">'a</span>&gt;(ptr: <span class="kw-2">*mut </span>bool) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="self">Self </span>{
         <span class="attr">#[allow(clippy::cast_ptr_alignment)]
         </span><span class="comment">// SAFETY: guaranteed by the caller
         </span><span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span>(ptr <span class="kw">as </span><span class="kw-2">*mut </span><span class="self">Self</span>) }
@@ -4608,7 +4609,7 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
 
     <span class="doccomment">/// Returns `true` if operations on values of this type are lock-free.
     ///
-    /// If the compiler or the platform doesn&#39;t support the necessary
+    /// If the compiler or the platform doesn't support the necessary
     /// atomic instructions, global locks for every potentially
     /// concurrent atomic operation will be used.
     ///
@@ -4627,7 +4628,7 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
 
     <span class="doccomment">/// Returns `true` if operations on values of this type are lock-free.
     ///
-    /// If the compiler or the platform doesn&#39;t support the necessary
+    /// If the compiler or the platform doesn't support the necessary
     /// atomic instructions, global locks for every potentially
     /// concurrent atomic operation will be used.
     ///
@@ -4809,7 +4810,7 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
     /// assert_eq!(some_bool.load(Ordering::Relaxed), false);
     /// ```
     </span><span class="attr">#[inline]
-    #[cfg_attr(portable_atomic_doc_cfg, doc(alias = <span class="string">&quot;compare_and_swap&quot;</span>))]
+    #[cfg_attr(portable_atomic_doc_cfg, doc(alias = <span class="string">"compare_and_swap"</span>))]
     #[cfg_attr(
         any(all(debug_assertions, not(portable_atomic_no_track_caller)), miri),
         track_caller
@@ -4877,7 +4878,7 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
     /// }
     /// ```
     </span><span class="attr">#[inline]
-    #[cfg_attr(portable_atomic_doc_cfg, doc(alias = <span class="string">&quot;compare_and_swap&quot;</span>))]
+    #[cfg_attr(portable_atomic_doc_cfg, doc(alias = <span class="string">"compare_and_swap"</span>))]
     #[cfg_attr(
         any(all(debug_assertions, not(portable_atomic_no_track_caller)), miri),
         track_caller
@@ -4900,9 +4901,9 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
         }
     }
 
-    <span class="doccomment">/// Logical &quot;and&quot; with a boolean value.
+    <span class="doccomment">/// Logical "and" with a boolean value.
     ///
-    /// Performs a logical &quot;and&quot; operation on the current value and the argument `val`, and sets
+    /// Performs a logical "and" operation on the current value and the argument `val`, and sets
     /// the new value to the result.
     ///
     /// Returns the previous value.
@@ -4935,9 +4936,9 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
         <span class="self">self</span>.as_atomic_u8().fetch_and(val <span class="kw">as </span>u8, order) != <span class="number">0
     </span>}
 
-    <span class="doccomment">/// Logical &quot;and&quot; with a boolean value.
+    <span class="doccomment">/// Logical "and" with a boolean value.
     ///
-    /// Performs a logical &quot;and&quot; operation on the current value and the argument `val`, and sets
+    /// Performs a logical "and" operation on the current value and the argument `val`, and sets
     /// the new value to the result.
     ///
     /// Unlike `fetch_and`, this does not return the previous value.
@@ -4979,9 +4980,9 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
         <span class="self">self</span>.as_atomic_u8().and(val <span class="kw">as </span>u8, order);
     }
 
-    <span class="doccomment">/// Logical &quot;nand&quot; with a boolean value.
+    <span class="doccomment">/// Logical "nand" with a boolean value.
     ///
-    /// Performs a logical &quot;nand&quot; operation on the current value and the argument `val`, and sets
+    /// Performs a logical "nand" operation on the current value and the argument `val`, and sets
     /// the new value to the result.
     ///
     /// Returns the previous value.
@@ -5024,9 +5025,9 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
         }
     }
 
-    <span class="doccomment">/// Logical &quot;or&quot; with a boolean value.
+    <span class="doccomment">/// Logical "or" with a boolean value.
     ///
-    /// Performs a logical &quot;or&quot; operation on the current value and the argument `val`, and sets the
+    /// Performs a logical "or" operation on the current value and the argument `val`, and sets the
     /// new value to the result.
     ///
     /// Returns the previous value.
@@ -5059,9 +5060,9 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
         <span class="self">self</span>.as_atomic_u8().fetch_or(val <span class="kw">as </span>u8, order) != <span class="number">0
     </span>}
 
-    <span class="doccomment">/// Logical &quot;or&quot; with a boolean value.
+    <span class="doccomment">/// Logical "or" with a boolean value.
     ///
-    /// Performs a logical &quot;or&quot; operation on the current value and the argument `val`, and sets the
+    /// Performs a logical "or" operation on the current value and the argument `val`, and sets the
     /// new value to the result.
     ///
     /// Unlike `fetch_or`, this does not return the previous value.
@@ -5103,9 +5104,9 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
         <span class="self">self</span>.as_atomic_u8().or(val <span class="kw">as </span>u8, order);
     }
 
-    <span class="doccomment">/// Logical &quot;xor&quot; with a boolean value.
+    <span class="doccomment">/// Logical "xor" with a boolean value.
     ///
-    /// Performs a logical &quot;xor&quot; operation on the current value and the argument `val`, and sets
+    /// Performs a logical "xor" operation on the current value and the argument `val`, and sets
     /// the new value to the result.
     ///
     /// Returns the previous value.
@@ -5138,9 +5139,9 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
         <span class="self">self</span>.as_atomic_u8().fetch_xor(val <span class="kw">as </span>u8, order) != <span class="number">0
     </span>}
 
-    <span class="doccomment">/// Logical &quot;xor&quot; with a boolean value.
+    <span class="doccomment">/// Logical "xor" with a boolean value.
     ///
-    /// Performs a logical &quot;xor&quot; operation on the current value and the argument `val`, and sets
+    /// Performs a logical "xor" operation on the current value and the argument `val`, and sets
     /// the new value to the result.
     ///
     /// Unlike `fetch_xor`, this does not return the previous value.
@@ -5182,9 +5183,9 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
         <span class="self">self</span>.as_atomic_u8().xor(val <span class="kw">as </span>u8, order);
     }
 
-    <span class="doccomment">/// Logical &quot;not&quot; with a boolean value.
+    <span class="doccomment">/// Logical "not" with a boolean value.
     ///
-    /// Performs a logical &quot;not&quot; operation on the current value, and sets
+    /// Performs a logical "not" operation on the current value, and sets
     /// the new value to the result.
     ///
     /// Returns the previous value.
@@ -5213,9 +5214,9 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
         <span class="self">self</span>.fetch_xor(<span class="bool-val">true</span>, order)
     }
 
-    <span class="doccomment">/// Logical &quot;not&quot; with a boolean value.
+    <span class="doccomment">/// Logical "not" with a boolean value.
     ///
-    /// Performs a logical &quot;not&quot; operation on the current value, and sets
+    /// Performs a logical "not" operation on the current value, and sets
     /// the new value to the result.
     ///
     /// Unlike `fetch_not`, this does not return the previous value.
@@ -5361,16 +5362,16 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
 /// This type has the same in-memory representation as a `*mut T`.
 ///
 /// If the compiler and the platform support atomic loads and stores of pointers,
-/// this type is a wrapper for the standard library&#39;s
+/// this type is a wrapper for the standard library's
 /// [`AtomicPtr`](core::sync::atomic::AtomicPtr). If the platform supports it
 /// but the compiler does not, atomic operations are implemented using inline
 /// assembly.
 </span><span class="comment">// We can use #[repr(transparent)] here, but #[repr(C, align(N))]
 // will show clearer docs.
-</span><span class="attr">#[cfg_attr(target_pointer_width = <span class="string">&quot;16&quot;</span>, repr(C, align(<span class="number">2</span>)))]
-#[cfg_attr(target_pointer_width = <span class="string">&quot;32&quot;</span>, repr(C, align(<span class="number">4</span>)))]
-#[cfg_attr(target_pointer_width = <span class="string">&quot;64&quot;</span>, repr(C, align(<span class="number">8</span>)))]
-#[cfg_attr(target_pointer_width = <span class="string">&quot;128&quot;</span>, repr(C, align(<span class="number">16</span>)))]
+</span><span class="attr">#[cfg_attr(target_pointer_width = <span class="string">"16"</span>, repr(C, align(<span class="number">2</span>)))]
+#[cfg_attr(target_pointer_width = <span class="string">"32"</span>, repr(C, align(<span class="number">4</span>)))]
+#[cfg_attr(target_pointer_width = <span class="string">"64"</span>, repr(C, align(<span class="number">8</span>)))]
+#[cfg_attr(target_pointer_width = <span class="string">"128"</span>, repr(C, align(<span class="number">16</span>)))]
 </span><span class="kw">pub struct </span>AtomicPtr&lt;T&gt; {
     inner: imp::AtomicPtr&lt;T&gt;,
 }
@@ -5392,7 +5393,7 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
 
 <span class="kw">impl</span>&lt;T&gt; fmt::Debug <span class="kw">for </span>AtomicPtr&lt;T&gt; {
     <span class="attr">#[allow(clippy::missing_inline_in_public_items)] </span><span class="comment">// fmt is not hot path
-    </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+    </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
         <span class="comment">// std atomic types use Relaxed in Debug::fmt: https://github.com/rust-lang/rust/blob/1.70.0/library/core/src/sync/atomic.rs#L2024
         </span>fmt::Debug::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.load(Ordering::Relaxed), f)
     }
@@ -5400,7 +5401,7 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
 
 <span class="kw">impl</span>&lt;T&gt; fmt::Pointer <span class="kw">for </span>AtomicPtr&lt;T&gt; {
     <span class="attr">#[allow(clippy::missing_inline_in_public_items)] </span><span class="comment">// fmt is not hot path
-    </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+    </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
         <span class="comment">// std atomic types use Relaxed in Debug::fmt: https://github.com/rust-lang/rust/blob/1.70.0/library/core/src/sync/atomic.rs#L2024
         </span>fmt::Pointer::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.load(Ordering::Relaxed), f)
     }
@@ -5409,7 +5410,7 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
 <span class="comment">// UnwindSafe is implicitly implemented.
 </span><span class="attr">#[cfg(not(portable_atomic_no_core_unwind_safe))]
 </span><span class="kw">impl</span>&lt;T&gt; core::panic::RefUnwindSafe <span class="kw">for </span>AtomicPtr&lt;T&gt; {}
-<span class="attr">#[cfg(all(portable_atomic_no_core_unwind_safe, feature = <span class="string">&quot;std&quot;</span>))]
+<span class="attr">#[cfg(all(portable_atomic_no_core_unwind_safe, feature = <span class="string">"std"</span>))]
 </span><span class="kw">impl</span>&lt;T&gt; std::panic::RefUnwindSafe <span class="kw">for </span>AtomicPtr&lt;T&gt; {}
 
 <span class="kw">impl</span>&lt;T&gt; AtomicPtr&lt;T&gt; {
@@ -5436,20 +5437,20 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
     ///
     /// * `ptr` must be aligned to `align_of::&lt;AtomicPtr&lt;T&gt;&gt;()` (note that on some platforms this
     ///   can be bigger than `align_of::&lt;*mut T&gt;()`).
-    /// * `ptr` must be [valid] for both reads and writes for the whole lifetime `&#39;a`.
+    /// * `ptr` must be [valid] for both reads and writes for the whole lifetime `'a`.
     /// * If this atomic type is [lock-free](Self::is_lock_free), non-atomic accesses to the value
     ///   behind `ptr` must have a happens-before relationship with atomic accesses via the returned
     ///   value (or vice-versa).
     ///   * In other words, time periods where the value is accessed atomically may not overlap
     ///     with periods where the value is accessed non-atomically.
     ///   * This requirement is trivially satisfied if `ptr` is never used non-atomically for the
-    ///     duration of lifetime `&#39;a`. Most use cases should be able to follow this guideline.
+    ///     duration of lifetime `'a`. Most use cases should be able to follow this guideline.
     ///   * This requirement is also trivially satisfied if all accesses (atomic or not) are done
     ///     from the same thread.
     /// * If this atomic type is *not* lock-free:
     ///   * Any accesses to the value behind `ptr` must have a happens-before relationship
     ///     with accesses via the returned value (or vice-versa).
-    ///   * Any concurrent accesses to the value behind `ptr` for the duration of lifetime `&#39;a` must
+    ///   * Any concurrent accesses to the value behind `ptr` for the duration of lifetime `'a` must
     ///     be compatible with operations performed by this atomic type.
     /// * This method must not be used to create overlapping or mixed-size atomic accesses, as
     ///   these are not supported by the memory model.
@@ -5457,7 +5458,7 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
     /// [valid]: core::ptr#safety
     </span><span class="attr">#[inline]
     #[must_use]
-    </span><span class="kw">pub unsafe fn </span>from_ptr&lt;<span class="lifetime">&#39;a</span>&gt;(ptr: <span class="kw-2">*mut *mut </span>T) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">Self </span>{
+    </span><span class="kw">pub unsafe fn </span>from_ptr&lt;<span class="lifetime">'a</span>&gt;(ptr: <span class="kw-2">*mut *mut </span>T) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="self">Self </span>{
         <span class="attr">#[allow(clippy::cast_ptr_alignment)]
         </span><span class="comment">// SAFETY: guaranteed by the caller
         </span><span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span>(ptr <span class="kw">as </span><span class="kw-2">*mut </span><span class="self">Self</span>) }
@@ -5465,7 +5466,7 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
 
     <span class="doccomment">/// Returns `true` if operations on values of this type are lock-free.
     ///
-    /// If the compiler or the platform doesn&#39;t support the necessary
+    /// If the compiler or the platform doesn't support the necessary
     /// atomic instructions, global locks for every potentially
     /// concurrent atomic operation will be used.
     ///
@@ -5484,7 +5485,7 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
 
     <span class="doccomment">/// Returns `true` if operations on values of this type are lock-free.
     ///
-    /// If the compiler or the platform doesn&#39;t support the necessary
+    /// If the compiler or the platform doesn't support the necessary
     /// atomic instructions, global locks for every potentially
     /// concurrent atomic operation will be used.
     ///
@@ -5661,7 +5662,7 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
     /// let value = some_ptr.compare_exchange(ptr, other_ptr, Ordering::SeqCst, Ordering::Relaxed);
     /// ```
     </span><span class="attr">#[inline]
-    #[cfg_attr(portable_atomic_doc_cfg, doc(alias = <span class="string">&quot;compare_and_swap&quot;</span>))]
+    #[cfg_attr(portable_atomic_doc_cfg, doc(alias = <span class="string">"compare_and_swap"</span>))]
     #[cfg_attr(
         any(all(debug_assertions, not(portable_atomic_no_track_caller)), miri),
         track_caller
@@ -5712,7 +5713,7 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
     /// }
     /// ```
     </span><span class="attr">#[inline]
-    #[cfg_attr(portable_atomic_doc_cfg, doc(alias = <span class="string">&quot;compare_and_swap&quot;</span>))]
+    #[cfg_attr(portable_atomic_doc_cfg, doc(alias = <span class="string">"compare_and_swap"</span>))]
     #[cfg_attr(
         any(all(debug_assertions, not(portable_atomic_no_track_caller)), miri),
         track_caller
@@ -5823,7 +5824,7 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
         }
     }
 
-    <span class="doccomment">/// Offsets the pointer&#39;s address by adding `val` (in units of `T`),
+    <span class="doccomment">/// Offsets the pointer's address by adding `val` (in units of `T`),
     /// returning the previous pointer.
     ///
     /// This is equivalent to using [`wrapping_add`] to atomically perform the
@@ -5860,7 +5861,7 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
         <span class="self">self</span>.fetch_byte_add(val.wrapping_mul(core::mem::size_of::&lt;T&gt;()), order)
     }
 
-    <span class="doccomment">/// Offsets the pointer&#39;s address by subtracting `val` (in units of `T`),
+    <span class="doccomment">/// Offsets the pointer's address by subtracting `val` (in units of `T`),
     /// returning the previous pointer.
     ///
     /// This is equivalent to using [`wrapping_sub`] to atomically perform the
@@ -5896,7 +5897,7 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
         <span class="self">self</span>.fetch_byte_sub(val.wrapping_mul(core::mem::size_of::&lt;T&gt;()), order)
     }
 
-    <span class="doccomment">/// Offsets the pointer&#39;s address by adding `val` *bytes*, returning the
+    <span class="doccomment">/// Offsets the pointer's address by adding `val` *bytes*, returning the
     /// previous pointer.
     ///
     /// This is equivalent to using [`wrapping_add`] and [`cast`] to atomically
@@ -5941,7 +5942,7 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
         }
     }
 
-    <span class="doccomment">/// Offsets the pointer&#39;s address by subtracting `val` *bytes*, returning the
+    <span class="doccomment">/// Offsets the pointer's address by subtracting `val` *bytes*, returning the
     /// previous pointer.
     ///
     /// This is equivalent to using [`wrapping_sub`] and [`cast`] to atomically
@@ -5985,7 +5986,7 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
         }
     }
 
-    <span class="doccomment">/// Performs a bitwise &quot;or&quot; operation on the address of the current pointer,
+    <span class="doccomment">/// Performs a bitwise "or" operation on the address of the current pointer,
     /// and the argument `val`, and stores a pointer with provenance of the
     /// current pointer and the resulting address.
     ///
@@ -6044,7 +6045,7 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
         }
     }
 
-    <span class="doccomment">/// Performs a bitwise &quot;and&quot; operation on the address of the current
+    <span class="doccomment">/// Performs a bitwise "and" operation on the address of the current
     /// pointer, and the argument `val`, and stores a pointer with provenance of
     /// the current pointer and the resulting address.
     ///
@@ -6101,7 +6102,7 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
         }
     }
 
-    <span class="doccomment">/// Performs a bitwise &quot;xor&quot; operation on the address of the current
+    <span class="doccomment">/// Performs a bitwise "xor" operation on the address of the current
     /// pointer, and the argument `val`, and stores a pointer with provenance of
     /// the current pointer and the resulting address.
     ///
@@ -6166,7 +6167,7 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
     /// [`Acquire`] makes the store part of this operation [`Relaxed`], and
     /// using [`Release`] makes the load part [`Relaxed`].
     ///
-    /// This corresponds to x86&#39;s `lock bts`, and the implementation calls them on x86/x86_64.
+    /// This corresponds to x86's `lock bts`, and the implementation calls them on x86/x86_64.
     ///
     /// # Examples
     ///
@@ -6214,7 +6215,7 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
     /// [`Acquire`] makes the store part of this operation [`Relaxed`], and
     /// using [`Release`] makes the load part [`Relaxed`].
     ///
-    /// This corresponds to x86&#39;s `lock btr`, and the implementation calls them on x86/x86_64.
+    /// This corresponds to x86's `lock btr`, and the implementation calls them on x86/x86_64.
     ///
     /// # Examples
     ///
@@ -6259,7 +6260,7 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
     /// [`Acquire`] makes the store part of this operation [`Relaxed`], and
     /// using [`Release`] makes the load part [`Relaxed`].
     ///
-    /// This corresponds to x86&#39;s `lock btc`, and the implementation calls them on x86/x86_64.
+    /// This corresponds to x86's `lock btc`, and the implementation calls them on x86/x86_64.
     ///
     /// # Examples
     ///
@@ -6338,12 +6339,12 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
     <span class="comment">// TODO: support AtomicF{16,128} once https://github.com/rust-lang/rust/issues/116909 stabilized.
     </span>(AtomicU32, <span class="macro-nonterminal">$int_type</span>:ident, <span class="macro-nonterminal">$align</span>:literal) =&gt; {
         <span class="macro">atomic_int!</span>(int, AtomicU32, <span class="macro-nonterminal">$int_type</span>, <span class="macro-nonterminal">$align</span>);
-        <span class="attr">#[cfg(feature = <span class="string">&quot;float&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">"float"</span>)]
         </span><span class="macro">atomic_int!</span>(float, AtomicF32, f32, AtomicU32, <span class="macro-nonterminal">$int_type</span>, <span class="macro-nonterminal">$align</span>);
     };
     (AtomicU64, <span class="macro-nonterminal">$int_type</span>:ident, <span class="macro-nonterminal">$align</span>:literal) =&gt; {
         <span class="macro">atomic_int!</span>(int, AtomicU64, <span class="macro-nonterminal">$int_type</span>, <span class="macro-nonterminal">$align</span>);
-        <span class="attr">#[cfg(feature = <span class="string">&quot;float&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">"float"</span>)]
         </span><span class="macro">atomic_int!</span>(float, AtomicF64, f64, AtomicU64, <span class="macro-nonterminal">$int_type</span>, <span class="macro-nonterminal">$align</span>);
     };
     (<span class="macro-nonterminal">$atomic_type</span>:ident, <span class="macro-nonterminal">$int_type</span>:ident, <span class="macro-nonterminal">$align</span>:literal) =&gt; {
@@ -6353,18 +6354,18 @@ RUSTFLAGS=&quot;--cfg portable_atomic_no_outline_atomics&quot; cargo ...
     <span class="comment">// Atomic{I,U}* impls
     </span>(int, <span class="macro-nonterminal">$atomic_type</span>:ident, <span class="macro-nonterminal">$int_type</span>:ident, <span class="macro-nonterminal">$align</span>:literal) =&gt; {
         <span class="macro">doc_comment! </span>{
-            <span class="macro">concat!</span>(<span class="string">&quot;An integer type which can be safely shared between threads.
+            <span class="macro">concat!</span>(<span class="string">"An integer type which can be safely shared between threads.
 
 This type has the same in-memory representation as the underlying integer type,
-[`&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$int_type</span>), <span class="string">&quot;`].
+[`"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$int_type</span>), <span class="string">"`].
 
-If the compiler and the platform support atomic loads and stores of [`&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$int_type</span>),
-<span class="string">&quot;`], this type is a wrapper for the standard library&#39;s `&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>),
-<span class="string">&quot;`. If the platform supports it but the compiler does not, atomic operations are implemented using
+If the compiler and the platform support atomic loads and stores of [`"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$int_type</span>),
+<span class="string">"`], this type is a wrapper for the standard library's `"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>),
+<span class="string">"`. If the platform supports it but the compiler does not, atomic operations are implemented using
 inline assembly. Otherwise synchronizes using global locks.
-You can call [`&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;::is_lock_free()`] to check whether
+You can call [`"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">"::is_lock_free()`] to check whether
 atomic instructions or locks will be used.
-&quot;
+"
             </span>),
             <span class="comment">// We can use #[repr(transparent)] here, but #[repr(C, align(N))]
             // will show clearer docs.
@@ -6391,7 +6392,7 @@ atomic instructions or locks will be used.
         <span class="comment">// UnwindSafe is implicitly implemented.
         </span><span class="attr">#[cfg(not(portable_atomic_no_core_unwind_safe))]
         </span><span class="kw">impl </span>core::panic::RefUnwindSafe <span class="kw">for </span><span class="macro-nonterminal">$atomic_type </span>{}
-        <span class="attr">#[cfg(all(portable_atomic_no_core_unwind_safe, feature = <span class="string">&quot;std&quot;</span>))]
+        <span class="attr">#[cfg(all(portable_atomic_no_core_unwind_safe, feature = <span class="string">"std"</span>))]
         </span><span class="kw">impl </span>std::panic::RefUnwindSafe <span class="kw">for </span><span class="macro-nonterminal">$atomic_type </span>{}
 
         <span class="macro">impl_debug_and_serde!</span>(<span class="macro-nonterminal">$atomic_type</span>);
@@ -6399,15 +6400,15 @@ atomic instructions or locks will be used.
         <span class="kw">impl </span><span class="macro-nonterminal">$atomic_type </span>{
             <span class="macro">doc_comment! </span>{
                 <span class="macro">concat!</span>(
-                    <span class="string">&quot;Creates a new atomic integer.
+                    <span class="string">"Creates a new atomic integer.
 
 # Examples
 
 ```
-use portable_atomic::&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;;
+use portable_atomic::"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">";
 
-let atomic_forty_two = &quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;::new(42);
-```&quot;
+let atomic_forty_two = "</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">"::new(42);
+```"
                 </span>),
                 <span class="attr">#[inline]
                 #[must_use]
@@ -6418,35 +6419,35 @@ let atomic_forty_two = &quot;</span>, <span class="macro">stringify!</span>(<spa
             }
 
             <span class="macro">doc_comment! </span>{
-                <span class="macro">concat!</span>(<span class="string">&quot;Creates a new reference to an atomic integer from a pointer.
+                <span class="macro">concat!</span>(<span class="string">"Creates a new reference to an atomic integer from a pointer.
 
 # Safety
 
-* `ptr` must be aligned to `align_of::&lt;&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;&gt;()` (note that on some platforms this
-  can be bigger than `align_of::&lt;&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$int_type</span>), <span class="string">&quot;&gt;()`).
-* `ptr` must be [valid] for both reads and writes for the whole lifetime `&#39;a`.
+* `ptr` must be aligned to `align_of::&lt;"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">"&gt;()` (note that on some platforms this
+  can be bigger than `align_of::&lt;"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$int_type</span>), <span class="string">"&gt;()`).
+* `ptr` must be [valid] for both reads and writes for the whole lifetime `'a`.
 * If this atomic type is [lock-free](Self::is_lock_free), non-atomic accesses to the value
   behind `ptr` must have a happens-before relationship with atomic accesses via
   the returned value (or vice-versa).
   * In other words, time periods where the value is accessed atomically may not
     overlap with periods where the value is accessed non-atomically.
   * This requirement is trivially satisfied if `ptr` is never used non-atomically
-    for the duration of lifetime `&#39;a`. Most use cases should be able to follow
+    for the duration of lifetime `'a`. Most use cases should be able to follow
     this guideline.
   * This requirement is also trivially satisfied if all accesses (atomic or not) are
     done from the same thread.
 * If this atomic type is *not* lock-free:
   * Any accesses to the value behind `ptr` must have a happens-before relationship
     with accesses via the returned value (or vice-versa).
-  * Any concurrent accesses to the value behind `ptr` for the duration of lifetime `&#39;a` must
+  * Any concurrent accesses to the value behind `ptr` for the duration of lifetime `'a` must
     be compatible with operations performed by this atomic type.
 * This method must not be used to create overlapping or mixed-size atomic
   accesses, as these are not supported by the memory model.
 
-[valid]: core::ptr#safety&quot;</span>),
+[valid]: core::ptr#safety"</span>),
                 <span class="attr">#[inline]
                 #[must_use]
-                </span><span class="kw">pub unsafe fn </span>from_ptr&lt;<span class="lifetime">&#39;a</span>&gt;(ptr: <span class="kw-2">*mut </span><span class="macro-nonterminal">$int_type</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">Self </span>{
+                </span><span class="kw">pub unsafe fn </span>from_ptr&lt;<span class="lifetime">'a</span>&gt;(ptr: <span class="kw-2">*mut </span><span class="macro-nonterminal">$int_type</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="self">Self </span>{
                     <span class="attr">#[allow(clippy::cast_ptr_alignment)]
                     </span><span class="comment">// SAFETY: guaranteed by the caller
                     </span><span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span>(ptr <span class="kw">as </span><span class="kw-2">*mut </span><span class="self">Self</span>) }
@@ -6454,19 +6455,19 @@ let atomic_forty_two = &quot;</span>, <span class="macro">stringify!</span>(<spa
             }
 
             <span class="macro">doc_comment! </span>{
-                <span class="macro">concat!</span>(<span class="string">&quot;Returns `true` if operations on values of this type are lock-free.
+                <span class="macro">concat!</span>(<span class="string">"Returns `true` if operations on values of this type are lock-free.
 
-If the compiler or the platform doesn&#39;t support the necessary
+If the compiler or the platform doesn't support the necessary
 atomic instructions, global locks for every potentially
 concurrent atomic operation will be used.
 
 # Examples
 
 ```
-use portable_atomic::&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;;
+use portable_atomic::"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">";
 
-let is_lock_free = &quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;::is_lock_free();
-```&quot;</span>),
+let is_lock_free = "</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">"::is_lock_free();
+```"</span>),
                 <span class="attr">#[inline]
                 #[must_use]
                 </span><span class="kw">pub fn </span>is_lock_free() -&gt; bool {
@@ -6475,9 +6476,9 @@ let is_lock_free = &quot;</span>, <span class="macro">stringify!</span>(<span cl
             }
 
             <span class="macro">doc_comment! </span>{
-                <span class="macro">concat!</span>(<span class="string">&quot;Returns `true` if operations on values of this type are lock-free.
+                <span class="macro">concat!</span>(<span class="string">"Returns `true` if operations on values of this type are lock-free.
 
-If the compiler or the platform doesn&#39;t support the necessary
+If the compiler or the platform doesn't support the necessary
 atomic instructions, global locks for every potentially
 concurrent atomic operation will be used.
 
@@ -6487,10 +6488,10 @@ this type may be lock-free even if the function returns false.
 # Examples
 
 ```
-use portable_atomic::&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;;
+use portable_atomic::"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">";
 
-const IS_ALWAYS_LOCK_FREE: bool = &quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;::is_always_lock_free();
-```&quot;</span>),
+const IS_ALWAYS_LOCK_FREE: bool = "</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">"::is_always_lock_free();
+```"</span>),
                 <span class="attr">#[inline]
                 #[must_use]
                 </span><span class="kw">pub const fn </span>is_always_lock_free() -&gt; bool {
@@ -6499,20 +6500,20 @@ const IS_ALWAYS_LOCK_FREE: bool = &quot;</span>, <span class="macro">stringify!<
             }
 
             <span class="macro">doc_comment! </span>{
-                <span class="macro">concat!</span>(<span class="string">&quot;Returns a mutable reference to the underlying integer.\n
+                <span class="macro">concat!</span>(<span class="string">"Returns a mutable reference to the underlying integer.\n
 This is safe because the mutable reference guarantees that no other threads are
 concurrently accessing the atomic data.
 
 # Examples
 
 ```
-use portable_atomic::{&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;, Ordering};
+use portable_atomic::{"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">", Ordering};
 
-let mut some_var = &quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;::new(10);
+let mut some_var = "</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">"::new(10);
 assert_eq!(*some_var.get_mut(), 10);
 *some_var.get_mut() = 5;
 assert_eq!(some_var.load(Ordering::SeqCst), 5);
-```&quot;</span>),
+```"</span>),
                 <span class="attr">#[inline]
                 </span><span class="kw">pub fn </span>get_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="macro-nonterminal">$int_type </span>{
                     <span class="self">self</span>.inner.get_mut()
@@ -6523,7 +6524,7 @@ assert_eq!(some_var.load(Ordering::SeqCst), 5);
             // https://github.com/rust-lang/rust/issues/76314
 
             </span><span class="macro">doc_comment! </span>{
-                <span class="macro">concat!</span>(<span class="string">&quot;Consumes the atomic and returns the contained value.
+                <span class="macro">concat!</span>(<span class="string">"Consumes the atomic and returns the contained value.
 
 This is safe because passing `self` by value guarantees that no other threads are
 concurrently accessing the atomic data.
@@ -6531,11 +6532,11 @@ concurrently accessing the atomic data.
 # Examples
 
 ```
-use portable_atomic::&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;;
+use portable_atomic::"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">";
 
-let some_var = &quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;::new(5);
+let some_var = "</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">"::new(5);
 assert_eq!(some_var.into_inner(), 5);
-```&quot;</span>),
+```"</span>),
                 <span class="attr">#[inline]
                 </span><span class="kw">pub fn </span>into_inner(<span class="self">self</span>) -&gt; <span class="macro-nonterminal">$int_type </span>{
                     <span class="self">self</span>.inner.into_inner()
@@ -6543,7 +6544,7 @@ assert_eq!(some_var.into_inner(), 5);
             }
 
             <span class="macro">doc_comment! </span>{
-                <span class="macro">concat!</span>(<span class="string">&quot;Loads a value from the atomic integer.
+                <span class="macro">concat!</span>(<span class="string">"Loads a value from the atomic integer.
 
 `load` takes an [`Ordering`] argument which describes the memory ordering of this operation.
 Possible values are [`SeqCst`], [`Acquire`] and [`Relaxed`].
@@ -6555,12 +6556,12 @@ Panics if `order` is [`Release`] or [`AcqRel`].
 # Examples
 
 ```
-use portable_atomic::{&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;, Ordering};
+use portable_atomic::{"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">", Ordering};
 
-let some_var = &quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;::new(5);
+let some_var = "</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">"::new(5);
 
 assert_eq!(some_var.load(Ordering::Relaxed), 5);
-```&quot;</span>),
+```"</span>),
                 <span class="attr">#[inline]
                 #[cfg_attr(
                     any(all(debug_assertions, not(portable_atomic_no_track_caller)), miri),
@@ -6572,7 +6573,7 @@ assert_eq!(some_var.load(Ordering::Relaxed), 5);
             }
 
             <span class="macro">doc_comment! </span>{
-                <span class="macro">concat!</span>(<span class="string">&quot;Stores a value into the atomic integer.
+                <span class="macro">concat!</span>(<span class="string">"Stores a value into the atomic integer.
 
 `store` takes an [`Ordering`] argument which describes the memory ordering of this operation.
 Possible values are [`SeqCst`], [`Release`] and [`Relaxed`].
@@ -6584,13 +6585,13 @@ Panics if `order` is [`Acquire`] or [`AcqRel`].
 # Examples
 
 ```
-use portable_atomic::{&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;, Ordering};
+use portable_atomic::{"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">", Ordering};
 
-let some_var = &quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;::new(5);
+let some_var = "</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">"::new(5);
 
 some_var.store(10, Ordering::Relaxed);
 assert_eq!(some_var.load(Ordering::Relaxed), 10);
-```&quot;</span>),
+```"</span>),
                 <span class="attr">#[inline]
                 #[cfg_attr(
                     any(all(debug_assertions, not(portable_atomic_no_track_caller)), miri),
@@ -6603,7 +6604,7 @@ assert_eq!(some_var.load(Ordering::Relaxed), 10);
 
             <span class="macro">cfg_has_atomic_cas! </span>{
             <span class="macro">doc_comment! </span>{
-                <span class="macro">concat!</span>(<span class="string">&quot;Stores a value into the atomic integer, returning the previous value.
+                <span class="macro">concat!</span>(<span class="string">"Stores a value into the atomic integer, returning the previous value.
 
 `swap` takes an [`Ordering`] argument which describes the memory ordering
 of this operation. All ordering modes are possible. Note that using
@@ -6613,12 +6614,12 @@ using [`Release`] makes the load part [`Relaxed`].
 # Examples
 
 ```
-use portable_atomic::{&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;, Ordering};
+use portable_atomic::{"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">", Ordering};
 
-let some_var = &quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;::new(5);
+let some_var = "</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">"::new(5);
 
 assert_eq!(some_var.swap(10, Ordering::Relaxed), 5);
-```&quot;</span>),
+```"</span>),
                 <span class="attr">#[inline]
                 #[cfg_attr(miri, track_caller)] </span><span class="comment">// even without panics, this helps for Miri backtraces
                 </span><span class="kw">pub fn </span>swap(<span class="kw-2">&amp;</span><span class="self">self</span>, val: <span class="macro-nonterminal">$int_type</span>, order: Ordering) -&gt; <span class="macro-nonterminal">$int_type </span>{
@@ -6627,7 +6628,7 @@ assert_eq!(some_var.swap(10, Ordering::Relaxed), 5);
             }
 
             <span class="macro">doc_comment! </span>{
-                <span class="macro">concat!</span>(<span class="string">&quot;Stores a value into the atomic integer if the current value is the same as
+                <span class="macro">concat!</span>(<span class="string">"Stores a value into the atomic integer if the current value is the same as
 the `current` value.
 
 The return value is a result indicating whether the new value was written and
@@ -6649,9 +6650,9 @@ Panics if `failure` is [`Release`], [`AcqRel`].
 # Examples
 
 ```
-use portable_atomic::{&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;, Ordering};
+use portable_atomic::{"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">", Ordering};
 
-let some_var = &quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;::new(5);
+let some_var = "</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">"::new(5);
 
 assert_eq!(
     some_var.compare_exchange(5, 10, Ordering::Acquire, Ordering::Relaxed),
@@ -6664,9 +6665,9 @@ assert_eq!(
     Err(10),
 );
 assert_eq!(some_var.load(Ordering::Relaxed), 10);
-```&quot;</span>),
+```"</span>),
                 <span class="attr">#[inline]
-                #[cfg_attr(portable_atomic_doc_cfg, doc(alias = <span class="string">&quot;compare_and_swap&quot;</span>))]
+                #[cfg_attr(portable_atomic_doc_cfg, doc(alias = <span class="string">"compare_and_swap"</span>))]
                 #[cfg_attr(
                     any(all(debug_assertions, not(portable_atomic_no_track_caller)), miri),
                     track_caller
@@ -6683,7 +6684,7 @@ assert_eq!(some_var.load(Ordering::Relaxed), 10);
             }
 
             <span class="macro">doc_comment! </span>{
-                <span class="macro">concat!</span>(<span class="string">&quot;Stores a value into the atomic integer if the current value is the same as
+                <span class="macro">concat!</span>(<span class="string">"Stores a value into the atomic integer if the current value is the same as
 the `current` value.
 Unlike [`compare_exchange`](Self::compare_exchange)
 this function is allowed to spuriously fail even
@@ -6706,9 +6707,9 @@ Panics if `failure` is [`Release`], [`AcqRel`].
 # Examples
 
 ```
-use portable_atomic::{&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;, Ordering};
+use portable_atomic::{"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">", Ordering};
 
-let val = &quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;::new(4);
+let val = "</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">"::new(4);
 
 let mut old = val.load(Ordering::Relaxed);
 loop {
@@ -6718,9 +6719,9 @@ loop {
         Err(x) =&gt; old = x,
     }
 }
-```&quot;</span>),
+```"</span>),
                 <span class="attr">#[inline]
-                #[cfg_attr(portable_atomic_doc_cfg, doc(alias = <span class="string">&quot;compare_and_swap&quot;</span>))]
+                #[cfg_attr(portable_atomic_doc_cfg, doc(alias = <span class="string">"compare_and_swap"</span>))]
                 #[cfg_attr(
                     any(all(debug_assertions, not(portable_atomic_no_track_caller)), miri),
                     track_caller
@@ -6737,7 +6738,7 @@ loop {
             }
 
             <span class="macro">doc_comment! </span>{
-                <span class="macro">concat!</span>(<span class="string">&quot;Adds to the current value, returning the previous value.
+                <span class="macro">concat!</span>(<span class="string">"Adds to the current value, returning the previous value.
 
 This operation wraps around on overflow.
 
@@ -6749,12 +6750,12 @@ using [`Release`] makes the load part [`Relaxed`].
 # Examples
 
 ```
-use portable_atomic::{&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;, Ordering};
+use portable_atomic::{"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">", Ordering};
 
-let foo = &quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;::new(0);
+let foo = "</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">"::new(0);
 assert_eq!(foo.fetch_add(10, Ordering::SeqCst), 0);
 assert_eq!(foo.load(Ordering::SeqCst), 10);
-```&quot;</span>),
+```"</span>),
                 <span class="attr">#[inline]
                 #[cfg_attr(miri, track_caller)] </span><span class="comment">// even without panics, this helps for Miri backtraces
                 </span><span class="kw">pub fn </span>fetch_add(<span class="kw-2">&amp;</span><span class="self">self</span>, val: <span class="macro-nonterminal">$int_type</span>, order: Ordering) -&gt; <span class="macro-nonterminal">$int_type </span>{
@@ -6763,7 +6764,7 @@ assert_eq!(foo.load(Ordering::SeqCst), 10);
             }
 
             <span class="macro">doc_comment! </span>{
-                <span class="macro">concat!</span>(<span class="string">&quot;Adds to the current value.
+                <span class="macro">concat!</span>(<span class="string">"Adds to the current value.
 
 This operation wraps around on overflow.
 
@@ -6781,12 +6782,12 @@ This function may generate more efficient code than `fetch_add` on some platform
 # Examples
 
 ```
-use portable_atomic::{&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;, Ordering};
+use portable_atomic::{"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">", Ordering};
 
-let foo = &quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;::new(0);
+let foo = "</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">"::new(0);
 foo.add(10, Ordering::SeqCst);
 assert_eq!(foo.load(Ordering::SeqCst), 10);
-```&quot;</span>),
+```"</span>),
                 <span class="attr">#[inline]
                 #[cfg_attr(miri, track_caller)] </span><span class="comment">// even without panics, this helps for Miri backtraces
                 </span><span class="kw">pub fn </span>add(<span class="kw-2">&amp;</span><span class="self">self</span>, val: <span class="macro-nonterminal">$int_type</span>, order: Ordering) {
@@ -6795,7 +6796,7 @@ assert_eq!(foo.load(Ordering::SeqCst), 10);
             }
 
             <span class="macro">doc_comment! </span>{
-                <span class="macro">concat!</span>(<span class="string">&quot;Subtracts from the current value, returning the previous value.
+                <span class="macro">concat!</span>(<span class="string">"Subtracts from the current value, returning the previous value.
 
 This operation wraps around on overflow.
 
@@ -6807,12 +6808,12 @@ using [`Release`] makes the load part [`Relaxed`].
 # Examples
 
 ```
-use portable_atomic::{&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;, Ordering};
+use portable_atomic::{"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">", Ordering};
 
-let foo = &quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;::new(20);
+let foo = "</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">"::new(20);
 assert_eq!(foo.fetch_sub(10, Ordering::SeqCst), 20);
 assert_eq!(foo.load(Ordering::SeqCst), 10);
-```&quot;</span>),
+```"</span>),
                 <span class="attr">#[inline]
                 #[cfg_attr(miri, track_caller)] </span><span class="comment">// even without panics, this helps for Miri backtraces
                 </span><span class="kw">pub fn </span>fetch_sub(<span class="kw-2">&amp;</span><span class="self">self</span>, val: <span class="macro-nonterminal">$int_type</span>, order: Ordering) -&gt; <span class="macro-nonterminal">$int_type </span>{
@@ -6821,7 +6822,7 @@ assert_eq!(foo.load(Ordering::SeqCst), 10);
             }
 
             <span class="macro">doc_comment! </span>{
-                <span class="macro">concat!</span>(<span class="string">&quot;Subtracts from the current value.
+                <span class="macro">concat!</span>(<span class="string">"Subtracts from the current value.
 
 This operation wraps around on overflow.
 
@@ -6839,12 +6840,12 @@ This function may generate more efficient code than `fetch_sub` on some platform
 # Examples
 
 ```
-use portable_atomic::{&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;, Ordering};
+use portable_atomic::{"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">", Ordering};
 
-let foo = &quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;::new(20);
+let foo = "</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">"::new(20);
 foo.sub(10, Ordering::SeqCst);
 assert_eq!(foo.load(Ordering::SeqCst), 10);
-```&quot;</span>),
+```"</span>),
                 <span class="attr">#[inline]
                 #[cfg_attr(miri, track_caller)] </span><span class="comment">// even without panics, this helps for Miri backtraces
                 </span><span class="kw">pub fn </span>sub(<span class="kw-2">&amp;</span><span class="self">self</span>, val: <span class="macro-nonterminal">$int_type</span>, order: Ordering) {
@@ -6853,9 +6854,9 @@ assert_eq!(foo.load(Ordering::SeqCst), 10);
             }
 
             <span class="macro">doc_comment! </span>{
-                <span class="macro">concat!</span>(<span class="string">&quot;Bitwise \&quot;and\&quot; with the current value.
+                <span class="macro">concat!</span>(<span class="string">"Bitwise \"and\" with the current value.
 
-Performs a bitwise \&quot;and\&quot; operation on the current value and the argument `val`, and
+Performs a bitwise \"and\" operation on the current value and the argument `val`, and
 sets the new value to the result.
 
 Returns the previous value.
@@ -6868,12 +6869,12 @@ using [`Release`] makes the load part [`Relaxed`].
 # Examples
 
 ```
-use portable_atomic::{&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;, Ordering};
+use portable_atomic::{"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">", Ordering};
 
-let foo = &quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;::new(0b101101);
+let foo = "</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">"::new(0b101101);
 assert_eq!(foo.fetch_and(0b110011, Ordering::SeqCst), 0b101101);
 assert_eq!(foo.load(Ordering::SeqCst), 0b100001);
-```&quot;</span>),
+```"</span>),
                 <span class="attr">#[inline]
                 #[cfg_attr(miri, track_caller)] </span><span class="comment">// even without panics, this helps for Miri backtraces
                 </span><span class="kw">pub fn </span>fetch_and(<span class="kw-2">&amp;</span><span class="self">self</span>, val: <span class="macro-nonterminal">$int_type</span>, order: Ordering) -&gt; <span class="macro-nonterminal">$int_type </span>{
@@ -6882,9 +6883,9 @@ assert_eq!(foo.load(Ordering::SeqCst), 0b100001);
             }
 
             <span class="macro">doc_comment! </span>{
-                <span class="macro">concat!</span>(<span class="string">&quot;Bitwise \&quot;and\&quot; with the current value.
+                <span class="macro">concat!</span>(<span class="string">"Bitwise \"and\" with the current value.
 
-Performs a bitwise \&quot;and\&quot; operation on the current value and the argument `val`, and
+Performs a bitwise \"and\" operation on the current value and the argument `val`, and
 sets the new value to the result.
 
 Unlike `fetch_and`, this does not return the previous value.
@@ -6906,12 +6907,12 @@ where the result is unused.
 # Examples
 
 ```
-use portable_atomic::{&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;, Ordering};
+use portable_atomic::{"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">", Ordering};
 
-let foo = &quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;::new(0b101101);
+let foo = "</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">"::new(0b101101);
 assert_eq!(foo.fetch_and(0b110011, Ordering::SeqCst), 0b101101);
 assert_eq!(foo.load(Ordering::SeqCst), 0b100001);
-```&quot;</span>),
+```"</span>),
                 <span class="attr">#[inline]
                 #[cfg_attr(miri, track_caller)] </span><span class="comment">// even without panics, this helps for Miri backtraces
                 </span><span class="kw">pub fn </span>and(<span class="kw-2">&amp;</span><span class="self">self</span>, val: <span class="macro-nonterminal">$int_type</span>, order: Ordering) {
@@ -6920,9 +6921,9 @@ assert_eq!(foo.load(Ordering::SeqCst), 0b100001);
             }
 
             <span class="macro">doc_comment! </span>{
-                <span class="macro">concat!</span>(<span class="string">&quot;Bitwise \&quot;nand\&quot; with the current value.
+                <span class="macro">concat!</span>(<span class="string">"Bitwise \"nand\" with the current value.
 
-Performs a bitwise \&quot;nand\&quot; operation on the current value and the argument `val`, and
+Performs a bitwise \"nand\" operation on the current value and the argument `val`, and
 sets the new value to the result.
 
 Returns the previous value.
@@ -6935,12 +6936,12 @@ using [`Release`] makes the load part [`Relaxed`].
 # Examples
 
 ```
-use portable_atomic::{&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;, Ordering};
+use portable_atomic::{"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">", Ordering};
 
-let foo = &quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;::new(0x13);
+let foo = "</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">"::new(0x13);
 assert_eq!(foo.fetch_nand(0x31, Ordering::SeqCst), 0x13);
 assert_eq!(foo.load(Ordering::SeqCst), !(0x13 &amp; 0x31));
-```&quot;</span>),
+```"</span>),
                 <span class="attr">#[inline]
                 #[cfg_attr(miri, track_caller)] </span><span class="comment">// even without panics, this helps for Miri backtraces
                 </span><span class="kw">pub fn </span>fetch_nand(<span class="kw-2">&amp;</span><span class="self">self</span>, val: <span class="macro-nonterminal">$int_type</span>, order: Ordering) -&gt; <span class="macro-nonterminal">$int_type </span>{
@@ -6949,9 +6950,9 @@ assert_eq!(foo.load(Ordering::SeqCst), !(0x13 &amp; 0x31));
             }
 
             <span class="macro">doc_comment! </span>{
-                <span class="macro">concat!</span>(<span class="string">&quot;Bitwise \&quot;or\&quot; with the current value.
+                <span class="macro">concat!</span>(<span class="string">"Bitwise \"or\" with the current value.
 
-Performs a bitwise \&quot;or\&quot; operation on the current value and the argument `val`, and
+Performs a bitwise \"or\" operation on the current value and the argument `val`, and
 sets the new value to the result.
 
 Returns the previous value.
@@ -6964,12 +6965,12 @@ using [`Release`] makes the load part [`Relaxed`].
 # Examples
 
 ```
-use portable_atomic::{&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;, Ordering};
+use portable_atomic::{"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">", Ordering};
 
-let foo = &quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;::new(0b101101);
+let foo = "</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">"::new(0b101101);
 assert_eq!(foo.fetch_or(0b110011, Ordering::SeqCst), 0b101101);
 assert_eq!(foo.load(Ordering::SeqCst), 0b111111);
-```&quot;</span>),
+```"</span>),
                 <span class="attr">#[inline]
                 #[cfg_attr(miri, track_caller)] </span><span class="comment">// even without panics, this helps for Miri backtraces
                 </span><span class="kw">pub fn </span>fetch_or(<span class="kw-2">&amp;</span><span class="self">self</span>, val: <span class="macro-nonterminal">$int_type</span>, order: Ordering) -&gt; <span class="macro-nonterminal">$int_type </span>{
@@ -6978,9 +6979,9 @@ assert_eq!(foo.load(Ordering::SeqCst), 0b111111);
             }
 
             <span class="macro">doc_comment! </span>{
-                <span class="macro">concat!</span>(<span class="string">&quot;Bitwise \&quot;or\&quot; with the current value.
+                <span class="macro">concat!</span>(<span class="string">"Bitwise \"or\" with the current value.
 
-Performs a bitwise \&quot;or\&quot; operation on the current value and the argument `val`, and
+Performs a bitwise \"or\" operation on the current value and the argument `val`, and
 sets the new value to the result.
 
 Unlike `fetch_or`, this does not return the previous value.
@@ -7002,12 +7003,12 @@ where the result is unused.
 # Examples
 
 ```
-use portable_atomic::{&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;, Ordering};
+use portable_atomic::{"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">", Ordering};
 
-let foo = &quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;::new(0b101101);
+let foo = "</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">"::new(0b101101);
 assert_eq!(foo.fetch_or(0b110011, Ordering::SeqCst), 0b101101);
 assert_eq!(foo.load(Ordering::SeqCst), 0b111111);
-```&quot;</span>),
+```"</span>),
                 <span class="attr">#[inline]
                 #[cfg_attr(miri, track_caller)] </span><span class="comment">// even without panics, this helps for Miri backtraces
                 </span><span class="kw">pub fn </span>or(<span class="kw-2">&amp;</span><span class="self">self</span>, val: <span class="macro-nonterminal">$int_type</span>, order: Ordering) {
@@ -7016,9 +7017,9 @@ assert_eq!(foo.load(Ordering::SeqCst), 0b111111);
             }
 
             <span class="macro">doc_comment! </span>{
-                <span class="macro">concat!</span>(<span class="string">&quot;Bitwise \&quot;xor\&quot; with the current value.
+                <span class="macro">concat!</span>(<span class="string">"Bitwise \"xor\" with the current value.
 
-Performs a bitwise \&quot;xor\&quot; operation on the current value and the argument `val`, and
+Performs a bitwise \"xor\" operation on the current value and the argument `val`, and
 sets the new value to the result.
 
 Returns the previous value.
@@ -7031,12 +7032,12 @@ using [`Release`] makes the load part [`Relaxed`].
 # Examples
 
 ```
-use portable_atomic::{&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;, Ordering};
+use portable_atomic::{"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">", Ordering};
 
-let foo = &quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;::new(0b101101);
+let foo = "</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">"::new(0b101101);
 assert_eq!(foo.fetch_xor(0b110011, Ordering::SeqCst), 0b101101);
 assert_eq!(foo.load(Ordering::SeqCst), 0b011110);
-```&quot;</span>),
+```"</span>),
                 <span class="attr">#[inline]
                 #[cfg_attr(miri, track_caller)] </span><span class="comment">// even without panics, this helps for Miri backtraces
                 </span><span class="kw">pub fn </span>fetch_xor(<span class="kw-2">&amp;</span><span class="self">self</span>, val: <span class="macro-nonterminal">$int_type</span>, order: Ordering) -&gt; <span class="macro-nonterminal">$int_type </span>{
@@ -7045,9 +7046,9 @@ assert_eq!(foo.load(Ordering::SeqCst), 0b011110);
             }
 
             <span class="macro">doc_comment! </span>{
-                <span class="macro">concat!</span>(<span class="string">&quot;Bitwise \&quot;xor\&quot; with the current value.
+                <span class="macro">concat!</span>(<span class="string">"Bitwise \"xor\" with the current value.
 
-Performs a bitwise \&quot;xor\&quot; operation on the current value and the argument `val`, and
+Performs a bitwise \"xor\" operation on the current value and the argument `val`, and
 sets the new value to the result.
 
 Unlike `fetch_xor`, this does not return the previous value.
@@ -7069,12 +7070,12 @@ where the result is unused.
 # Examples
 
 ```
-use portable_atomic::{&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;, Ordering};
+use portable_atomic::{"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">", Ordering};
 
-let foo = &quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;::new(0b101101);
+let foo = "</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">"::new(0b101101);
 foo.xor(0b110011, Ordering::SeqCst);
 assert_eq!(foo.load(Ordering::SeqCst), 0b011110);
-```&quot;</span>),
+```"</span>),
                 <span class="attr">#[inline]
                 #[cfg_attr(miri, track_caller)] </span><span class="comment">// even without panics, this helps for Miri backtraces
                 </span><span class="kw">pub fn </span>xor(<span class="kw-2">&amp;</span><span class="self">self</span>, val: <span class="macro-nonterminal">$int_type</span>, order: Ordering) {
@@ -7083,7 +7084,7 @@ assert_eq!(foo.load(Ordering::SeqCst), 0b011110);
             }
 
             <span class="macro">doc_comment! </span>{
-                <span class="macro">concat!</span>(<span class="string">&quot;Fetches the value, and applies a function to it that returns an optional
+                <span class="macro">concat!</span>(<span class="string">"Fetches the value, and applies a function to it that returns an optional
 new value. Returns a `Result` of `Ok(previous_value)` if the function returned `Some(_)`, else
 `Err(previous_value)`.
 
@@ -7116,14 +7117,14 @@ In particular, this method will not circumvent the [ABA Problem].
 # Examples
 
 ```rust
-use portable_atomic::{&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;, Ordering};
+use portable_atomic::{"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">", Ordering};
 
-let x = &quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;::new(7);
+let x = "</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">"::new(7);
 assert_eq!(x.fetch_update(Ordering::SeqCst, Ordering::SeqCst, |_| None), Err(7));
 assert_eq!(x.fetch_update(Ordering::SeqCst, Ordering::SeqCst, |x| Some(x + 1)), Ok(7));
 assert_eq!(x.fetch_update(Ordering::SeqCst, Ordering::SeqCst, |x| Some(x + 1)), Ok(8));
 assert_eq!(x.load(Ordering::SeqCst), 9);
-```&quot;</span>),
+```"</span>),
                 <span class="attr">#[inline]
                 #[cfg_attr(
                     any(all(debug_assertions, not(portable_atomic_no_track_caller)), miri),
@@ -7150,7 +7151,7 @@ assert_eq!(x.load(Ordering::SeqCst), 9);
             }
 
             <span class="macro">doc_comment! </span>{
-                <span class="macro">concat!</span>(<span class="string">&quot;Maximum with the current value.
+                <span class="macro">concat!</span>(<span class="string">"Maximum with the current value.
 
 Finds the maximum of the current value and the argument `val`, and
 sets the new value to the result.
@@ -7165,9 +7166,9 @@ using [`Release`] makes the load part [`Relaxed`].
 # Examples
 
 ```
-use portable_atomic::{&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;, Ordering};
+use portable_atomic::{"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">", Ordering};
 
-let foo = &quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;::new(23);
+let foo = "</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">"::new(23);
 assert_eq!(foo.fetch_max(42, Ordering::SeqCst), 23);
 assert_eq!(foo.load(Ordering::SeqCst), 42);
 ```
@@ -7175,13 +7176,13 @@ assert_eq!(foo.load(Ordering::SeqCst), 42);
 If you want to obtain the maximum value in one step, you can use the following:
 
 ```
-use portable_atomic::{&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;, Ordering};
+use portable_atomic::{"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">", Ordering};
 
-let foo = &quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;::new(23);
+let foo = "</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">"::new(23);
 let bar = 42;
 let max_foo = foo.fetch_max(bar, Ordering::SeqCst).max(bar);
 assert!(max_foo == 42);
-```&quot;</span>),
+```"</span>),
                 <span class="attr">#[inline]
                 #[cfg_attr(miri, track_caller)] </span><span class="comment">// even without panics, this helps for Miri backtraces
                 </span><span class="kw">pub fn </span>fetch_max(<span class="kw-2">&amp;</span><span class="self">self</span>, val: <span class="macro-nonterminal">$int_type</span>, order: Ordering) -&gt; <span class="macro-nonterminal">$int_type </span>{
@@ -7190,7 +7191,7 @@ assert!(max_foo == 42);
             }
 
             <span class="macro">doc_comment! </span>{
-                <span class="macro">concat!</span>(<span class="string">&quot;Minimum with the current value.
+                <span class="macro">concat!</span>(<span class="string">"Minimum with the current value.
 
 Finds the minimum of the current value and the argument `val`, and
 sets the new value to the result.
@@ -7205,9 +7206,9 @@ using [`Release`] makes the load part [`Relaxed`].
 # Examples
 
 ```
-use portable_atomic::{&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;, Ordering};
+use portable_atomic::{"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">", Ordering};
 
-let foo = &quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;::new(23);
+let foo = "</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">"::new(23);
 assert_eq!(foo.fetch_min(42, Ordering::Relaxed), 23);
 assert_eq!(foo.load(Ordering::Relaxed), 23);
 assert_eq!(foo.fetch_min(22, Ordering::Relaxed), 23);
@@ -7217,13 +7218,13 @@ assert_eq!(foo.load(Ordering::Relaxed), 22);
 If you want to obtain the minimum value in one step, you can use the following:
 
 ```
-use portable_atomic::{&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;, Ordering};
+use portable_atomic::{"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">", Ordering};
 
-let foo = &quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;::new(23);
+let foo = "</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">"::new(23);
 let bar = 12;
 let min_foo = foo.fetch_min(bar, Ordering::SeqCst).min(bar);
 assert_eq!(min_foo, 12);
-```&quot;</span>),
+```"</span>),
                 <span class="attr">#[inline]
                 #[cfg_attr(miri, track_caller)] </span><span class="comment">// even without panics, this helps for Miri backtraces
                 </span><span class="kw">pub fn </span>fetch_min(<span class="kw-2">&amp;</span><span class="self">self</span>, val: <span class="macro-nonterminal">$int_type</span>, order: Ordering) -&gt; <span class="macro-nonterminal">$int_type </span>{
@@ -7232,7 +7233,7 @@ assert_eq!(min_foo, 12);
             }
 
             <span class="macro">doc_comment! </span>{
-                <span class="macro">concat!</span>(<span class="string">&quot;Sets the bit at the specified bit-position to 1.
+                <span class="macro">concat!</span>(<span class="string">"Sets the bit at the specified bit-position to 1.
 
 Returns `true` if the specified bit was previously set to 1.
 
@@ -7241,19 +7242,19 @@ of this operation. All ordering modes are possible. Note that using
 [`Acquire`] makes the store part of this operation [`Relaxed`], and
 using [`Release`] makes the load part [`Relaxed`].
 
-This corresponds to x86&#39;s `lock bts`, and the implementation calls them on x86/x86_64.
+This corresponds to x86's `lock bts`, and the implementation calls them on x86/x86_64.
 
 # Examples
 
 ```
-use portable_atomic::{&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;, Ordering};
+use portable_atomic::{"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">", Ordering};
 
-let foo = &quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;::new(0b0000);
+let foo = "</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">"::new(0b0000);
 assert!(!foo.bit_set(0, Ordering::Relaxed));
 assert_eq!(foo.load(Ordering::Relaxed), 0b0001);
 assert!(foo.bit_set(0, Ordering::Relaxed));
 assert_eq!(foo.load(Ordering::Relaxed), 0b0001);
-```&quot;</span>),
+```"</span>),
                 <span class="attr">#[inline]
                 #[cfg_attr(miri, track_caller)] </span><span class="comment">// even without panics, this helps for Miri backtraces
                 </span><span class="kw">pub fn </span>bit_set(<span class="kw-2">&amp;</span><span class="self">self</span>, bit: u32, order: Ordering) -&gt; bool {
@@ -7262,7 +7263,7 @@ assert_eq!(foo.load(Ordering::Relaxed), 0b0001);
             }
 
             <span class="macro">doc_comment! </span>{
-                <span class="macro">concat!</span>(<span class="string">&quot;Clears the bit at the specified bit-position to 1.
+                <span class="macro">concat!</span>(<span class="string">"Clears the bit at the specified bit-position to 1.
 
 Returns `true` if the specified bit was previously set to 1.
 
@@ -7271,17 +7272,17 @@ of this operation. All ordering modes are possible. Note that using
 [`Acquire`] makes the store part of this operation [`Relaxed`], and
 using [`Release`] makes the load part [`Relaxed`].
 
-This corresponds to x86&#39;s `lock btr`, and the implementation calls them on x86/x86_64.
+This corresponds to x86's `lock btr`, and the implementation calls them on x86/x86_64.
 
 # Examples
 
 ```
-use portable_atomic::{&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;, Ordering};
+use portable_atomic::{"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">", Ordering};
 
-let foo = &quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;::new(0b0001);
+let foo = "</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">"::new(0b0001);
 assert!(foo.bit_clear(0, Ordering::Relaxed));
 assert_eq!(foo.load(Ordering::Relaxed), 0b0000);
-```&quot;</span>),
+```"</span>),
                 <span class="attr">#[inline]
                 #[cfg_attr(miri, track_caller)] </span><span class="comment">// even without panics, this helps for Miri backtraces
                 </span><span class="kw">pub fn </span>bit_clear(<span class="kw-2">&amp;</span><span class="self">self</span>, bit: u32, order: Ordering) -&gt; bool {
@@ -7290,7 +7291,7 @@ assert_eq!(foo.load(Ordering::Relaxed), 0b0000);
             }
 
             <span class="macro">doc_comment! </span>{
-                <span class="macro">concat!</span>(<span class="string">&quot;Toggles the bit at the specified bit-position.
+                <span class="macro">concat!</span>(<span class="string">"Toggles the bit at the specified bit-position.
 
 Returns `true` if the specified bit was previously set to 1.
 
@@ -7299,19 +7300,19 @@ of this operation. All ordering modes are possible. Note that using
 [`Acquire`] makes the store part of this operation [`Relaxed`], and
 using [`Release`] makes the load part [`Relaxed`].
 
-This corresponds to x86&#39;s `lock btc`, and the implementation calls them on x86/x86_64.
+This corresponds to x86's `lock btc`, and the implementation calls them on x86/x86_64.
 
 # Examples
 
 ```
-use portable_atomic::{&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;, Ordering};
+use portable_atomic::{"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">", Ordering};
 
-let foo = &quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;::new(0b0000);
+let foo = "</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">"::new(0b0000);
 assert!(!foo.bit_toggle(0, Ordering::Relaxed));
 assert_eq!(foo.load(Ordering::Relaxed), 0b0001);
 assert!(foo.bit_toggle(0, Ordering::Relaxed));
 assert_eq!(foo.load(Ordering::Relaxed), 0b0000);
-```&quot;</span>),
+```"</span>),
                 <span class="attr">#[inline]
                 #[cfg_attr(miri, track_caller)] </span><span class="comment">// even without panics, this helps for Miri backtraces
                 </span><span class="kw">pub fn </span>bit_toggle(<span class="kw-2">&amp;</span><span class="self">self</span>, bit: u32, order: Ordering) -&gt; bool {
@@ -7320,7 +7321,7 @@ assert_eq!(foo.load(Ordering::Relaxed), 0b0000);
             }
 
             <span class="macro">doc_comment! </span>{
-                <span class="macro">concat!</span>(<span class="string">&quot;Logical negates the current value, and sets the new value to the result.
+                <span class="macro">concat!</span>(<span class="string">"Logical negates the current value, and sets the new value to the result.
 
 Returns the previous value.
 
@@ -7332,12 +7333,12 @@ using [`Release`] makes the load part [`Relaxed`].
 # Examples
 
 ```
-use portable_atomic::{&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;, Ordering};
+use portable_atomic::{"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">", Ordering};
 
-let foo = &quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;::new(0);
+let foo = "</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">"::new(0);
 assert_eq!(foo.fetch_not(Ordering::Relaxed), 0);
 assert_eq!(foo.load(Ordering::Relaxed), !0);
-```&quot;</span>),
+```"</span>),
                 <span class="attr">#[inline]
                 #[cfg_attr(miri, track_caller)] </span><span class="comment">// even without panics, this helps for Miri backtraces
                 </span><span class="kw">pub fn </span>fetch_not(<span class="kw-2">&amp;</span><span class="self">self</span>, order: Ordering) -&gt; <span class="macro-nonterminal">$int_type </span>{
@@ -7345,7 +7346,7 @@ assert_eq!(foo.load(Ordering::Relaxed), !0);
                 }
 
                 <span class="macro">doc_comment! </span>{
-                    <span class="macro">concat!</span>(<span class="string">&quot;Logical negates the current value, and sets the new value to the result.
+                    <span class="macro">concat!</span>(<span class="string">"Logical negates the current value, and sets the new value to the result.
 
 Unlike `fetch_not`, this does not return the previous value.
 
@@ -7362,12 +7363,12 @@ This function may generate more efficient code than `fetch_not` on some platform
 # Examples
 
 ```
-use portable_atomic::{&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;, Ordering};
+use portable_atomic::{"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">", Ordering};
 
-let foo = &quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;::new(0);
+let foo = "</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">"::new(0);
 foo.not(Ordering::Relaxed);
 assert_eq!(foo.load(Ordering::Relaxed), !0);
-```&quot;</span>),
+```"</span>),
                     <span class="attr">#[inline]
                     #[cfg_attr(miri, track_caller)] </span><span class="comment">// even without panics, this helps for Miri backtraces
                     </span><span class="kw">pub fn </span>not(<span class="kw-2">&amp;</span><span class="self">self</span>, order: Ordering) {
@@ -7377,7 +7378,7 @@ assert_eq!(foo.load(Ordering::Relaxed), !0);
             }
 
             <span class="macro">doc_comment! </span>{
-                <span class="macro">concat!</span>(<span class="string">&quot;Negates the current value, and sets the new value to the result.
+                <span class="macro">concat!</span>(<span class="string">"Negates the current value, and sets the new value to the result.
 
 Returns the previous value.
 
@@ -7389,14 +7390,14 @@ using [`Release`] makes the load part [`Relaxed`].
 # Examples
 
 ```
-use portable_atomic::{&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;, Ordering};
+use portable_atomic::{"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">", Ordering};
 
-let foo = &quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;::new(5);
+let foo = "</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">"::new(5);
 assert_eq!(foo.fetch_neg(Ordering::Relaxed), 5);
-assert_eq!(foo.load(Ordering::Relaxed), 5_&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$int_type</span>), <span class="string">&quot;.wrapping_neg());
-assert_eq!(foo.fetch_neg(Ordering::Relaxed), 5_&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$int_type</span>), <span class="string">&quot;.wrapping_neg());
+assert_eq!(foo.load(Ordering::Relaxed), 5_"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$int_type</span>), <span class="string">".wrapping_neg());
+assert_eq!(foo.fetch_neg(Ordering::Relaxed), 5_"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$int_type</span>), <span class="string">".wrapping_neg());
 assert_eq!(foo.load(Ordering::Relaxed), 5);
-```&quot;</span>),
+```"</span>),
                 <span class="attr">#[inline]
                 #[cfg_attr(miri, track_caller)] </span><span class="comment">// even without panics, this helps for Miri backtraces
                 </span><span class="kw">pub fn </span>fetch_neg(<span class="kw-2">&amp;</span><span class="self">self</span>, order: Ordering) -&gt; <span class="macro-nonterminal">$int_type </span>{
@@ -7404,7 +7405,7 @@ assert_eq!(foo.load(Ordering::Relaxed), 5);
                 }
 
                 <span class="macro">doc_comment! </span>{
-                    <span class="macro">concat!</span>(<span class="string">&quot;Negates the current value, and sets the new value to the result.
+                    <span class="macro">concat!</span>(<span class="string">"Negates the current value, and sets the new value to the result.
 
 Unlike `fetch_neg`, this does not return the previous value.
 
@@ -7420,14 +7421,14 @@ This function may generate more efficient code than `fetch_neg` on some platform
 # Examples
 
 ```
-use portable_atomic::{&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;, Ordering};
+use portable_atomic::{"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">", Ordering};
 
-let foo = &quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;::new(5);
+let foo = "</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">"::new(5);
 foo.neg(Ordering::Relaxed);
-assert_eq!(foo.load(Ordering::Relaxed), 5_&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$int_type</span>), <span class="string">&quot;.wrapping_neg());
+assert_eq!(foo.load(Ordering::Relaxed), 5_"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$int_type</span>), <span class="string">".wrapping_neg());
 foo.neg(Ordering::Relaxed);
 assert_eq!(foo.load(Ordering::Relaxed), 5);
-```&quot;</span>),
+```"</span>),
                     <span class="attr">#[inline]
                     #[cfg_attr(miri, track_caller)] </span><span class="comment">// even without panics, this helps for Miri backtraces
                     </span><span class="kw">pub fn </span>neg(<span class="kw-2">&amp;</span><span class="self">self</span>, order: Ordering) {
@@ -7470,13 +7471,13 @@ assert_eq!(foo.load(Ordering::Relaxed), 5);
         <span class="macro-nonterminal">$align</span>:literal
     ) =&gt; {
         <span class="macro">doc_comment! </span>{
-            <span class="macro">concat!</span>(<span class="string">&quot;A floating point type which can be safely shared between threads.
+            <span class="macro">concat!</span>(<span class="string">"A floating point type which can be safely shared between threads.
 
 This type has the same in-memory representation as the underlying floating point type,
-[`&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$float_type</span>), <span class="string">&quot;`].
-&quot;
+[`"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$float_type</span>), <span class="string">"`].
+"
             </span>),
-            <span class="attr">#[cfg_attr(portable_atomic_doc_cfg, doc(cfg(feature = <span class="string">&quot;float&quot;</span>)))]
+            <span class="attr">#[cfg_attr(portable_atomic_doc_cfg, doc(cfg(feature = <span class="string">"float"</span>)))]
             </span><span class="comment">// We can use #[repr(transparent)] here, but #[repr(C, align(N))]
             // will show clearer docs.
             </span><span class="attr">#[repr(C, align(<span class="macro-nonterminal">$align</span>))]
@@ -7502,7 +7503,7 @@ This type has the same in-memory representation as the underlying floating point
         <span class="comment">// UnwindSafe is implicitly implemented.
         </span><span class="attr">#[cfg(not(portable_atomic_no_core_unwind_safe))]
         </span><span class="kw">impl </span>core::panic::RefUnwindSafe <span class="kw">for </span><span class="macro-nonterminal">$atomic_type </span>{}
-        <span class="attr">#[cfg(all(portable_atomic_no_core_unwind_safe, feature = <span class="string">&quot;std&quot;</span>))]
+        <span class="attr">#[cfg(all(portable_atomic_no_core_unwind_safe, feature = <span class="string">"std"</span>))]
         </span><span class="kw">impl </span>std::panic::RefUnwindSafe <span class="kw">for </span><span class="macro-nonterminal">$atomic_type </span>{}
 
         <span class="macro">impl_debug_and_serde!</span>(<span class="macro-nonterminal">$atomic_type</span>);
@@ -7517,35 +7518,35 @@ This type has the same in-memory representation as the underlying floating point
             }
 
             <span class="macro">doc_comment! </span>{
-                <span class="macro">concat!</span>(<span class="string">&quot;Creates a new reference to an atomic float from a pointer.
+                <span class="macro">concat!</span>(<span class="string">"Creates a new reference to an atomic float from a pointer.
 
 # Safety
 
-* `ptr` must be aligned to `align_of::&lt;&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">&quot;&gt;()` (note that on some platforms this
-  can be bigger than `align_of::&lt;&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$float_type</span>), <span class="string">&quot;&gt;()`).
-* `ptr` must be [valid] for both reads and writes for the whole lifetime `&#39;a`.
+* `ptr` must be aligned to `align_of::&lt;"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_type</span>), <span class="string">"&gt;()` (note that on some platforms this
+  can be bigger than `align_of::&lt;"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$float_type</span>), <span class="string">"&gt;()`).
+* `ptr` must be [valid] for both reads and writes for the whole lifetime `'a`.
 * If this atomic type is [lock-free](Self::is_lock_free), non-atomic accesses to the value
   behind `ptr` must have a happens-before relationship with atomic accesses via
   the returned value (or vice-versa).
   * In other words, time periods where the value is accessed atomically may not
     overlap with periods where the value is accessed non-atomically.
   * This requirement is trivially satisfied if `ptr` is never used non-atomically
-    for the duration of lifetime `&#39;a`. Most use cases should be able to follow
+    for the duration of lifetime `'a`. Most use cases should be able to follow
     this guideline.
   * This requirement is also trivially satisfied if all accesses (atomic or not) are
     done from the same thread.
 * If this atomic type is *not* lock-free:
   * Any accesses to the value behind `ptr` must have a happens-before relationship
     with accesses via the returned value (or vice-versa).
-  * Any concurrent accesses to the value behind `ptr` for the duration of lifetime `&#39;a` must
+  * Any concurrent accesses to the value behind `ptr` for the duration of lifetime `'a` must
     be compatible with operations performed by this atomic type.
 * This method must not be used to create overlapping or mixed-size atomic
   accesses, as these are not supported by the memory model.
 
-[valid]: core::ptr#safety&quot;</span>),
+[valid]: core::ptr#safety"</span>),
                 <span class="attr">#[inline]
                 #[must_use]
-                </span><span class="kw">pub unsafe fn </span>from_ptr&lt;<span class="lifetime">&#39;a</span>&gt;(ptr: <span class="kw-2">*mut </span><span class="macro-nonterminal">$float_type</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">Self </span>{
+                </span><span class="kw">pub unsafe fn </span>from_ptr&lt;<span class="lifetime">'a</span>&gt;(ptr: <span class="kw-2">*mut </span><span class="macro-nonterminal">$float_type</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="self">Self </span>{
                     <span class="attr">#[allow(clippy::cast_ptr_alignment)]
                     </span><span class="comment">// SAFETY: guaranteed by the caller
                     </span><span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span>(ptr <span class="kw">as </span><span class="kw-2">*mut </span><span class="self">Self</span>) }
@@ -7554,7 +7555,7 @@ This type has the same in-memory representation as the underlying floating point
 
             <span class="doccomment">/// Returns `true` if operations on values of this type are lock-free.
             ///
-            /// If the compiler or the platform doesn&#39;t support the necessary
+            /// If the compiler or the platform doesn't support the necessary
             /// atomic instructions, global locks for every potentially
             /// concurrent atomic operation will be used.
             </span><span class="attr">#[inline]
@@ -7565,7 +7566,7 @@ This type has the same in-memory representation as the underlying floating point
 
             <span class="doccomment">/// Returns `true` if operations on values of this type are lock-free.
             ///
-            /// If the compiler or the platform doesn&#39;t support the necessary
+            /// If the compiler or the platform doesn't support the necessary
             /// atomic instructions, global locks for every potentially
             /// concurrent atomic operation will be used.
             ///
@@ -7664,7 +7665,7 @@ This type has the same in-memory representation as the underlying floating point
             ///
             /// Panics if `failure` is [`Release`], [`AcqRel`].
             </span><span class="attr">#[inline]
-            #[cfg_attr(portable_atomic_doc_cfg, doc(alias = <span class="string">&quot;compare_and_swap&quot;</span>))]
+            #[cfg_attr(portable_atomic_doc_cfg, doc(alias = <span class="string">"compare_and_swap"</span>))]
             #[cfg_attr(
                 any(all(debug_assertions, not(portable_atomic_no_track_caller)), miri),
                 track_caller
@@ -7699,7 +7700,7 @@ This type has the same in-memory representation as the underlying floating point
             ///
             /// Panics if `failure` is [`Release`], [`AcqRel`].
             </span><span class="attr">#[inline]
-            #[cfg_attr(portable_atomic_doc_cfg, doc(alias = <span class="string">&quot;compare_and_swap&quot;</span>))]
+            #[cfg_attr(portable_atomic_doc_cfg, doc(alias = <span class="string">"compare_and_swap"</span>))]
             #[cfg_attr(
                 any(all(debug_assertions, not(portable_atomic_no_track_caller)), miri),
                 track_caller
@@ -7861,12 +7862,12 @@ This type has the same in-memory representation as the underlying floating point
 
             </span><span class="attr">#[cfg(not(portable_atomic_no_const_raw_ptr_deref))]
             </span><span class="macro">doc_comment! </span>{
-                <span class="macro">concat!</span>(<span class="string">&quot;Raw transmutation to `&amp;&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_int_type</span>), <span class="string">&quot;`.
+                <span class="macro">concat!</span>(<span class="string">"Raw transmutation to `&amp;"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_int_type</span>), <span class="string">"`.
 
-See [`&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$float_type</span>) ,<span class="string">&quot;::from_bits`] for some discussion of the
+See [`"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$float_type</span>) ,<span class="string">"::from_bits`] for some discussion of the
 portability of this operation (there are almost no issues).
 
-This is `const fn` on Rust 1.58+.&quot;</span>),
+This is `const fn` on Rust 1.58+."</span>),
                 <span class="attr">#[inline]
                 </span><span class="kw">pub const fn </span>as_bits(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="macro-nonterminal">$atomic_int_type </span>{
                     <span class="self">self</span>.inner.as_bits()
@@ -7874,12 +7875,12 @@ This is `const fn` on Rust 1.58+.&quot;</span>),
             }
             <span class="attr">#[cfg(portable_atomic_no_const_raw_ptr_deref)]
             </span><span class="macro">doc_comment! </span>{
-                <span class="macro">concat!</span>(<span class="string">&quot;Raw transmutation to `&amp;&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_int_type</span>), <span class="string">&quot;`.
+                <span class="macro">concat!</span>(<span class="string">"Raw transmutation to `&amp;"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$atomic_int_type</span>), <span class="string">"`.
 
-See [`&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$float_type</span>) ,<span class="string">&quot;::from_bits`] for some discussion of the
+See [`"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$float_type</span>) ,<span class="string">"::from_bits`] for some discussion of the
 portability of this operation (there are almost no issues).
 
-This is `const fn` on Rust 1.58+.&quot;</span>),
+This is `const fn` on Rust 1.58+."</span>),
                 <span class="attr">#[inline]
                 </span><span class="kw">pub fn </span>as_bits(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="macro-nonterminal">$atomic_int_type </span>{
                     <span class="self">self</span>.inner.as_bits()
@@ -7912,21 +7913,21 @@ This is `const fn` on Rust 1.58+.&quot;</span>),
 }
 
 <span class="macro">cfg_has_atomic_ptr! </span>{
-    <span class="attr">#[cfg(target_pointer_width = <span class="string">&quot;16&quot;</span>)]
+    <span class="attr">#[cfg(target_pointer_width = <span class="string">"16"</span>)]
     </span><span class="macro">atomic_int!</span>(AtomicIsize, isize, <span class="number">2</span>);
-    <span class="attr">#[cfg(target_pointer_width = <span class="string">&quot;16&quot;</span>)]
+    <span class="attr">#[cfg(target_pointer_width = <span class="string">"16"</span>)]
     </span><span class="macro">atomic_int!</span>(AtomicUsize, usize, <span class="number">2</span>);
-    <span class="attr">#[cfg(target_pointer_width = <span class="string">&quot;32&quot;</span>)]
+    <span class="attr">#[cfg(target_pointer_width = <span class="string">"32"</span>)]
     </span><span class="macro">atomic_int!</span>(AtomicIsize, isize, <span class="number">4</span>);
-    <span class="attr">#[cfg(target_pointer_width = <span class="string">&quot;32&quot;</span>)]
+    <span class="attr">#[cfg(target_pointer_width = <span class="string">"32"</span>)]
     </span><span class="macro">atomic_int!</span>(AtomicUsize, usize, <span class="number">4</span>);
-    <span class="attr">#[cfg(target_pointer_width = <span class="string">&quot;64&quot;</span>)]
+    <span class="attr">#[cfg(target_pointer_width = <span class="string">"64"</span>)]
     </span><span class="macro">atomic_int!</span>(AtomicIsize, isize, <span class="number">8</span>);
-    <span class="attr">#[cfg(target_pointer_width = <span class="string">&quot;64&quot;</span>)]
+    <span class="attr">#[cfg(target_pointer_width = <span class="string">"64"</span>)]
     </span><span class="macro">atomic_int!</span>(AtomicUsize, usize, <span class="number">8</span>);
-    <span class="attr">#[cfg(target_pointer_width = <span class="string">&quot;128&quot;</span>)]
+    <span class="attr">#[cfg(target_pointer_width = <span class="string">"128"</span>)]
     </span><span class="macro">atomic_int!</span>(AtomicIsize, isize, <span class="number">16</span>);
-    <span class="attr">#[cfg(target_pointer_width = <span class="string">&quot;128&quot;</span>)]
+    <span class="attr">#[cfg(target_pointer_width = <span class="string">"128"</span>)]
     </span><span class="macro">atomic_int!</span>(AtomicUsize, usize, <span class="number">16</span>);
 }
 

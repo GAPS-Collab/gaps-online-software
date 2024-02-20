@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/zmq-0.10.0/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="zmq" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/zmq-0.10.0/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="zmq" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1440,7 +1441,7 @@
             zmq_sys::ZMQ_XPUB =&gt; XPUB,
             zmq_sys::ZMQ_XSUB =&gt; XSUB,
             zmq_sys::ZMQ_STREAM =&gt; STREAM,
-            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;socket type is out of range!&quot;</span>),
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">"socket type is out of range!"</span>),
         }
     }
 }
@@ -1493,7 +1494,7 @@
             zmq_sys::ZMQ_EVENT_HANDSHAKE_FAILED_PROTOCOL =&gt; HANDSHAKE_FAILED_PROTOCOL,
             zmq_sys::ZMQ_EVENT_HANDSHAKE_FAILED_AUTH =&gt; HANDSHAKE_FAILED_AUTH,
             zmq_sys::ZMQ_EVENT_ALL =&gt; ALL,
-            x =&gt; <span class="macro">panic!</span>(<span class="string">&quot;unknown event type {}&quot;</span>, x),
+            x =&gt; <span class="macro">panic!</span>(<span class="string">"unknown event type {}"</span>, x),
         }
     }
 }
@@ -1612,7 +1613,7 @@
             errno::EADDRNOTAVAIL =&gt; Error::EADDRNOTAVAIL,
             errno::EINTR =&gt; Error::EINTR,
 
-            <span class="comment">// These may turn up on platforms that don&#39;t support these
+            <span class="comment">// These may turn up on platforms that don't support these
             // errno codes natively (Windows)
             </span>errno::ENOTSUP_ALT =&gt; Error::ENOTSUP,
             errno::EPROTONOSUPPORT_ALT =&gt; Error::EPROTONOSUPPORT,
@@ -1646,7 +1647,7 @@
             x =&gt; <span class="kw">unsafe </span>{
                 <span class="kw">let </span>s = zmq_sys::zmq_strerror(x);
                 <span class="macro">panic!</span>(
-                    <span class="string">&quot;unknown error [{}]: {}&quot;</span>,
+                    <span class="string">"unknown error [{}]: {}"</span>,
                     x,
                     str::from_utf8(ffi::CStr::from_ptr(s).to_bytes()).unwrap()
                 )
@@ -1655,10 +1656,10 @@
     }
 
     <span class="doccomment">/// Returns the error message provided by 0MQ.
-    </span><span class="kw">pub fn </span>message(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+    </span><span class="kw">pub fn </span>message(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str {
         <span class="kw">unsafe </span>{
             <span class="kw">let </span>s = zmq_sys::zmq_strerror(<span class="self">self</span>.to_raw());
-            <span class="kw">let </span>v: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[u8] = mem::transmute(ffi::CStr::from_ptr(s).to_bytes());
+            <span class="kw">let </span>v: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>[u8] = mem::transmute(ffi::CStr::from_ptr(s).to_bytes());
             str::from_utf8(v).unwrap()
         }
     }
@@ -1672,14 +1673,14 @@
 
 <span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>Error {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
-        <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.message())
+        <span class="macro">write!</span>(f, <span class="string">"{}"</span>, <span class="self">self</span>.message())
     }
 }
 
 <span class="kw">impl </span>fmt::Debug <span class="kw">for </span>Error {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
         <span class="comment">// FIXME: An unquoted string is not a good `Debug` output.
-        </span><span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.message())
+        </span><span class="macro">write!</span>(f, <span class="string">"{}"</span>, <span class="self">self</span>.message())
     }
 }
 
@@ -1844,7 +1845,7 @@
 <span class="kw">impl </span>Drop <span class="kw">for </span>Socket {
     <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="kw">if </span><span class="self">self</span>.owned &amp;&amp; <span class="kw">unsafe </span>{ zmq_sys::zmq_close(<span class="self">self</span>.sock) } == -<span class="number">1 </span>{
-            <span class="macro">panic!</span>(<span class="string">&quot;{}&quot;</span>, errno_to_error());
+            <span class="macro">panic!</span>(<span class="string">"{}"</span>, errno_to_error());
         }
     }
 }
@@ -2039,12 +2040,12 @@
     }
 
     <span class="doccomment">/// Send a `Message` message.
-    </span><span class="attr">#[deprecated(since = <span class="string">&quot;0.9.0&quot;</span>, note = <span class="string">&quot;Use `send` instead&quot;</span>)]
+    </span><span class="attr">#[deprecated(since = <span class="string">"0.9.0"</span>, note = <span class="string">"Use `send` instead"</span>)]
     </span><span class="kw">pub fn </span>send_msg(<span class="kw-2">&amp;</span><span class="self">self</span>, msg: Message, flags: i32) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.send(msg, flags)
     }
 
-    <span class="attr">#[deprecated(since = <span class="string">&quot;0.9.0&quot;</span>, note = <span class="string">&quot;Use `send` instead&quot;</span>)]
+    <span class="attr">#[deprecated(since = <span class="string">"0.9.0"</span>, note = <span class="string">"Use `send` instead"</span>)]
     </span><span class="kw">pub fn </span>send_str(<span class="kw-2">&amp;</span><span class="self">self</span>, data: <span class="kw-2">&amp;</span>str, flags: i32) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.send(data, flags)
     }
@@ -2196,7 +2197,7 @@
         /// let socket = ctx.socket(zmq::REQ).unwrap();
         /// let events = socket.get_events().unwrap();
         /// if events.contains(zmq::POLLIN) {
-        ///   println!(&quot;socket readable&quot;)
+        ///   println!("socket readable")
         /// }
         /// drop(socket);
         /// ```
@@ -2219,7 +2220,7 @@
         (get_tcp_keepalive_idle, set_tcp_keepalive_idle) =&gt; ZMQ_TCP_KEEPALIVE_IDLE <span class="kw">as </span>i32,
         (get_tcp_keepalive_intvl, set_tcp_keepalive_intvl) =&gt; ZMQ_TCP_KEEPALIVE_INTVL <span class="kw">as </span>i32,
         (get_handshake_ivl, set_handshake_ivl) =&gt; ZMQ_HANDSHAKE_IVL <span class="kw">as </span>i32,
-        <span class="comment">// TODO: deprecate to align with ZMQ&#39;s preferred naming
+        <span class="comment">// TODO: deprecate to align with ZMQ's preferred naming
         </span>(<span class="kw">_</span>, set_identity) =&gt; ZMQ_ROUTING_ID <span class="kw">as </span><span class="kw-2">&amp;</span>[u8],
         (<span class="kw">_</span>, set_subscribe) =&gt; ZMQ_SUBSCRIBE <span class="kw">as </span><span class="kw-2">&amp;</span>[u8],
         (<span class="kw">_</span>, set_unsubscribe) =&gt; ZMQ_UNSUBSCRIBE <span class="kw">as </span><span class="kw-2">&amp;</span>[u8],
@@ -2229,7 +2230,7 @@
         (get_connect_timeout, set_connect_timeout) =&gt; ZMQ_CONNECT_TIMEOUT <span class="kw">as </span>i32,
     }
 
-    <span class="comment">// TODO: deprecate to align with ZMQ&#39;s preferred naming
+    <span class="comment">// TODO: deprecate to align with ZMQ's preferred naming
     </span><span class="kw">pub fn </span>get_identity(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;&gt; {
         <span class="comment">// 255 = identity max length
         </span>sockopt::get_bytes(<span class="self">self</span>.sock, zmq_sys::ZMQ_ROUTING_ID <span class="kw">as </span>c_int, <span class="number">255</span>)
@@ -2247,7 +2248,7 @@
             zmq_sys::ZMQ_PLAIN =&gt; Mechanism::ZMQ_PLAIN,
             zmq_sys::ZMQ_CURVE =&gt; Mechanism::ZMQ_CURVE,
             zmq_sys::ZMQ_GSSAPI =&gt; Mechanism::ZMQ_GSSAPI,
-            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Mechanism is out of range!&quot;</span>),
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">"Mechanism is out of range!"</span>),
         })
     }
 
@@ -2271,11 +2272,11 @@
     /// Note that the returned address is not guaranteed to be the
     /// same as the one used with `bind`, and might also not be
     /// directly usable with `connect`. In particular, when `bind` is
-    /// used with the wildcard address (`&quot;*&quot;`), in the address
+    /// used with the wildcard address (`"*"`), in the address
     /// returned, the wildcard will be expanded into the any address
     /// (i.e. `0.0.0.0` with IPv4).
     </span><span class="kw">pub fn </span>get_last_endpoint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;result::Result&lt;String, Vec&lt;u8&gt;&gt;&gt; {
-        <span class="comment">// 256 + 9 + 1 = maximum inproc name size (= 256) + &quot;inproc://&quot;.len() (= 9), plus null byte
+        <span class="comment">// 256 + 9 + 1 = maximum inproc name size (= 256) + "inproc://".len() (= 9), plus null byte
         </span>sockopt::get_string(
             <span class="self">self</span>.sock,
             zmq_sys::ZMQ_LAST_ENDPOINT <span class="kw">as </span>c_int,
@@ -2398,18 +2399,18 @@
 /// Apart from that it contains the requested event mask, and is updated
 /// with the occurred events after `poll()` finishes.
 </span><span class="attr">#[repr(C)]
-</span><span class="kw">pub struct </span>PollItem&lt;<span class="lifetime">&#39;a</span>&gt; {
+</span><span class="kw">pub struct </span>PollItem&lt;<span class="lifetime">'a</span>&gt; {
     socket: <span class="kw-2">*mut </span>c_void,
     fd: RawFd,
     events: c_short,
     revents: c_short,
-    marker: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Socket&gt;,
+    marker: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>Socket&gt;,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; PollItem&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; PollItem&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Construct a PollItem from a non-0MQ socket, given by its file
     /// descriptor and the events that should be polled.
-    </span><span class="kw">pub fn </span>from_fd(fd: RawFd, events: PollEvents) -&gt; PollItem&lt;<span class="lifetime">&#39;a</span>&gt; {
+    </span><span class="kw">pub fn </span>from_fd(fd: RawFd, events: PollEvents) -&gt; PollItem&lt;<span class="lifetime">'a</span>&gt; {
         PollItem {
             socket: ptr::null_mut(),
             fd,
@@ -2483,7 +2484,7 @@
 /// A proxy connects a frontend socket with a backend socket, where the exact
 /// behavior depends on the type of both sockets.
 ///
-/// This function only returns (always with an `Err`) when the sockets&#39; context
+/// This function only returns (always with an `Err`) when the sockets' context
 /// has been closed.
 </span><span class="kw">pub fn </span>proxy(frontend: <span class="kw-2">&amp;</span>Socket, backend: <span class="kw-2">&amp;</span>Socket) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
     <span class="macro">zmq_try!</span>(<span class="kw">unsafe </span>{ zmq_sys::zmq_proxy(frontend.sock, backend.sock, ptr::null_mut()) });
@@ -2537,7 +2538,7 @@
 <span class="doccomment">/// Return true if the used 0MQ library has the given capability.
 ///
 /// The return value is always the `Some` variant; it used to return
-/// `None` for older, now unsupported versions of 0MQ that didn&#39;t have
+/// `None` for older, now unsupported versions of 0MQ that didn't have
 /// the wrapped `zmq_has` function. Thus, for code that requires `zmq`
 /// version 0.9.0 or newer, you can safely call `unwrap` on the return
 /// value.
@@ -2616,8 +2617,8 @@
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>EncodeError {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
         <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
-            EncodeError::BadLength =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Invalid data length. Should be multiple of 4.&quot;</span>),
-            EncodeError::FromUtf8Error(<span class="kw-2">ref </span>e) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;UTF8 conversion error: {}&quot;</span>, e),
+            EncodeError::BadLength =&gt; <span class="macro">write!</span>(f, <span class="string">"Invalid data length. Should be multiple of 4."</span>),
+            EncodeError::FromUtf8Error(<span class="kw-2">ref </span>e) =&gt; <span class="macro">write!</span>(f, <span class="string">"UTF8 conversion error: {}"</span>, e),
         }
     }
 }
@@ -2653,7 +2654,7 @@
 <span class="doccomment">/// Errors that can occur while decoding Z85.
 </span><span class="attr">#[derive(Debug)]
 </span><span class="kw">pub enum </span>DecodeError {
-    <span class="doccomment">/// The input string slice&#39;s length was not a multiple of 5.
+    <span class="doccomment">/// The input string slice's length was not a multiple of 5.
     </span>BadLength,
     <span class="doccomment">/// The input string slice had embedded NUL bytes.
     </span>NulError(ffi::NulError),
@@ -2668,8 +2669,8 @@
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>DecodeError {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
         <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
-            DecodeError::BadLength =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Invalid data length. Should be multiple of 5.&quot;</span>),
-            DecodeError::NulError(<span class="kw-2">ref </span>e) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Nul byte error: {}&quot;</span>, e),
+            DecodeError::BadLength =&gt; <span class="macro">write!</span>(f, <span class="string">"Invalid data length. Should be multiple of 5."</span>),
+            DecodeError::NulError(<span class="kw-2">ref </span>e) =&gt; <span class="macro">write!</span>(f, <span class="string">"Nul byte error: {}"</span>, e),
         }
     }
 }

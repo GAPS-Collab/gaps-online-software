@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-analysis/src/bin/robin_reader.rs`."><title>robin_reader.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="liftof_robin_reader" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-analysis/src/bin/robin_reader.rs`."><title>robin_reader.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="liftof_robin_reader" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -447,7 +448,7 @@
 <a href="#447" id="447">447</a>
 <a href="#448" id="448">448</a>
 <a href="#449" id="449">449</a>
-</pre></div><pre class="rust"><code><span class="doccomment">//! Read &quot;old&quot; blobfiles and combine them offline into 
+</pre></div><pre class="rust"><code><span class="doccomment">//! Read "old" blobfiles and combine them offline into 
 //! TofEvents
 //!
 //! This can be used for NTS data
@@ -480,8 +481,8 @@
                                TofPacket};
 <span class="kw">use </span>tof_dataclasses::events::{TofEvent,
                               RBEvent,
-                              MasterTriggerMapping,
-                              MasterTriggerEvent};
+                              <span class="comment">//MasterTriggerMapping,
+                              </span>MasterTriggerEvent};
 <span class="kw">use </span>tof_dataclasses::manifest::{get_ltbs_from_sqlite,
                                 get_rbs_from_sqlite};
 <span class="kw">use </span>tof_dataclasses::serialization::Serialization;
@@ -498,7 +499,7 @@
 
 
 <span class="attr">#[derive(Parser, Default, Debug)]
-#[command(author = <span class="string">&quot;J.A.Stoessl&quot;</span>, version, about, long_about = <span class="prelude-val">None</span>)]
+#[command(author = <span class="string">"J.A.Stoessl"</span>, version, about, long_about = <span class="prelude-val">None</span>)]
 </span><span class="kw">struct </span>Args {
   <span class="doccomment">/// input folder with files to analyze (with RBEvent dataa)
   </span>robin_data: String,
@@ -524,9 +525,9 @@
   
   env_logger::builder()
     .format(|buf, record| {
-    <span class="macro">writeln!</span>( buf, <span class="string">&quot;[{level}][{module_path}:{line}] {args}&quot;</span>,
+    <span class="macro">writeln!</span>( buf, <span class="string">"[{level}][{module_path}:{line}] {args}"</span>,
       level = color_log(<span class="kw-2">&amp;</span>record.level()),
-      module_path = record.module_path().unwrap_or(<span class="string">&quot;&lt;unknown&gt;&quot;</span>),
+      module_path = record.module_path().unwrap_or(<span class="string">"&lt;unknown&gt;"</span>),
       <span class="comment">//target = record.target(),
       </span>line = record.line().unwrap_or(<span class="number">0</span>),
       args = record.args()
@@ -541,7 +542,7 @@
   <span class="kw">let </span>use_calibrations : bool;
   <span class="kw">let </span><span class="kw-2">mut </span>calibrations = HashMap::&lt;u8, RBCalibrations&gt;::new();
   <span class="kw">if </span><span class="macro">matches!</span>(args.stream, <span class="prelude-val">None</span>) {
-    <span class="macro">println!</span>(<span class="string">&quot;==&gt; We can&#39;t identify missing hits without the MasterTrigger!&quot;</span>);
+    <span class="macro">println!</span>(<span class="string">"==&gt; We can't identify missing hits without the MasterTrigger!"</span>);
   }
 
   <span class="kw">match </span>args.calibrations {
@@ -550,15 +551,15 @@
     },
     <span class="prelude-val">Some</span>(directory) =&gt; {
       use_calibrations = <span class="bool-val">true</span>;
-      <span class="macro">println!</span>(<span class="string">&quot;=&gt; Using calibrations from directory {}&quot;</span>, directory.display());
+      <span class="macro">println!</span>(<span class="string">"=&gt; Using calibrations from directory {}"</span>, directory.display());
       <span class="kw">let </span><span class="kw-2">mut </span>calib_dir = directory;
-      calib_dir.push(<span class="string">&quot;rb*_cal.txt&quot;</span>);
-      <span class="macro">println!</span>(<span class="string">&quot;=&gt; Looklng for files with pattern {}&quot;</span>, calib_dir.display());
+      calib_dir.push(<span class="string">"rb*_cal.txt"</span>);
+      <span class="macro">println!</span>(<span class="string">"=&gt; Looklng for files with pattern {}"</span>, calib_dir.display());
       <span class="kw">if let </span><span class="prelude-val">Ok</span>(entries) = glob(calib_dir.to_str().unwrap()) { 
         <span class="kw">for </span>entry <span class="kw">in </span>entries {
           <span class="kw">if let </span><span class="prelude-val">Ok</span>(path) = entry {
             <span class="kw">let </span>rb_calib = RBCalibrations::from_txtfile(path.as_path());            
-            <span class="macro">println!</span>(<span class="string">&quot;=&gt; Loaded RB calibration: {} from file {:?}&quot;</span>, rb_calib, path.display());
+            <span class="macro">println!</span>(<span class="string">"=&gt; Loaded RB calibration: {} from file {:?}"</span>, rb_calib, path.display());
             calibrations.insert(rb_calib.rb_id, rb_calib);
             <span class="comment">//let filename = path.into_os_string().into_string().unwrap();
             //if let Some(mat) = re.captures(&amp;filename) {
@@ -566,51 +567,51 @@
             //  let mut this_reader = RobinReader::new(filename);
             //  this_reader.cache_all_events();
             //  robin_readers.insert(rb_id, this_reader);
-            //  //println!(&quot;First one or two-digit number: {}&quot;, mat.get(1).unwrap().as_str());
+            //  //println!("First one or two-digit number: {}", mat.get(1).unwrap().as_str());
             //  available_rbs.push(rb_id);
             //} else {
-            //  error!(&quot;Can not recognize pattern!!&quot;);
+            //  error!("Can not recognize pattern!!");
             //}
           </span>} <span class="kw">else </span>{
-            <span class="macro">println!</span>(<span class="string">&quot;Error globbing files&quot;</span>);
+            <span class="macro">println!</span>(<span class="string">"Error globbing files"</span>);
           }
         }
       } <span class="kw">else </span>{
-        <span class="macro">error!</span>(<span class="string">&quot;No calibration files found in path!&quot;</span>);
+        <span class="macro">error!</span>(<span class="string">"No calibration files found in path!"</span>);
       }
     }
   }
   <span class="kw">match </span>args.json_config {
-    <span class="prelude-val">None </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;No .json config file provided! Please provide a config file with --json-config or -j flag!&quot;</span>),
+    <span class="prelude-val">None </span>=&gt; <span class="macro">panic!</span>(<span class="string">"No .json config file provided! Please provide a config file with --json-config or -j flag!"</span>),
     <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; {
-      json_content = std::fs::read_to_string(args.json_config.as_ref().unwrap()).expect(<span class="string">&quot;Can not open json file&quot;</span>);
-      config = json::parse(<span class="kw-2">&amp;</span>json_content).expect(<span class="string">&quot;Unable to parse json file&quot;</span>);
+      json_content = std::fs::read_to_string(args.json_config.as_ref().unwrap()).expect(<span class="string">"Can not open json file"</span>);
+      config = json::parse(<span class="kw-2">&amp;</span>json_content).expect(<span class="string">"Unable to parse json file"</span>);
     } <span class="comment">// end Some
   </span>} <span class="comment">// end match
-  </span><span class="kw">let </span>db_path               = Path::new(config[<span class="string">&quot;db_path&quot;</span>].as_str().unwrap());
+  </span><span class="kw">let </span>db_path               = Path::new(config[<span class="string">"db_path"</span>].as_str().unwrap());
   <span class="kw">let </span>db_path_c             = db_path.clone();
   <span class="kw">let </span>ltb_list              = get_ltbs_from_sqlite(db_path);
   <span class="kw">let </span>rb_list               = get_rbs_from_sqlite(db_path_c);
-  <span class="kw">let </span>mapping = MasterTriggerMapping::new(ltb_list, rb_list);
+  <span class="comment">//let mapping = MasterTriggerMapping::new(ltb_list, rb_list);
 
-  <span class="kw">let </span><span class="kw-2">mut </span>packet_reader = TofPacketReader::default();
+  </span><span class="kw">let </span><span class="kw-2">mut </span>packet_reader = TofPacketReader::default();
   <span class="kw">let </span><span class="kw-2">mut </span>has_stream = <span class="bool-val">false</span>;
   <span class="kw">if </span>args.stream.is_some() {
-    <span class="kw">let </span>stream_filename = args.stream.unwrap().into_os_string().into_string().expect(<span class="string">&quot;Not able to read input stream file!&quot;</span>);
+    <span class="kw">let </span>stream_filename = args.stream.unwrap().into_os_string().into_string().expect(<span class="string">"Not able to read input stream file!"</span>);
     packet_reader = TofPacketReader::new(stream_filename);
     has_stream = <span class="bool-val">true</span>;
   }
-  <span class="comment">//info!(&quot;Found start position in stream {}&quot;, start_pos);
-  </span><span class="macro">info!</span>(<span class="string">&quot;Got input directory {}&quot;</span>, args.robin_data);
+  <span class="comment">//info!("Found start position in stream {}", start_pos);
+  </span><span class="macro">info!</span>(<span class="string">"Got input directory {}"</span>, args.robin_data);
   <span class="kw">let </span><span class="kw-2">mut </span>robin_readers = HashMap::&lt;u8, RobinReader&gt;::new();
-  <span class="kw">let </span>pattern = <span class="string">r#&quot;/RB(\d{1,2})&quot;#</span>; 
+  <span class="kw">let </span>pattern = <span class="string">r#"/RB(\d{1,2})"#</span>; 
   <span class="kw">let </span>re = Regex::new(pattern).unwrap();
  
   <span class="kw">let </span><span class="kw-2">mut </span>available_rbs = Vec::&lt;u8&gt;::new();
   <span class="kw">if let </span><span class="prelude-val">Ok</span>(entries) = glob(<span class="kw-2">&amp;</span>args.robin_data) {
     <span class="kw">for </span>entry <span class="kw">in </span>entries {
       <span class="kw">if let </span><span class="prelude-val">Ok</span>(path) = entry {
-        <span class="macro">println!</span>(<span class="string">&quot;Matched file: {:?}&quot;</span>, path.display());
+        <span class="macro">println!</span>(<span class="string">"Matched file: {:?}"</span>, path.display());
         <span class="kw">let </span>filename = path.into_os_string().into_string().unwrap();
         <span class="kw">if let </span><span class="prelude-val">Some</span>(mat) = re.captures(<span class="kw-2">&amp;</span>filename) {
           <span class="kw">let </span>rb_id = mat.get(<span class="number">1</span>).unwrap().as_str().parse::&lt;u8&gt;().unwrap();
@@ -618,7 +619,7 @@
           //  continue;
           //}
           </span><span class="kw">if </span>available_rbs.contains(<span class="kw-2">&amp;</span>rb_id) {
-            <span class="comment">//println!(&quot;=&gt; Omiting {}&quot;, filename);
+            <span class="comment">//println!("=&gt; Omiting {}", filename);
             </span>robin_readers.get_mut(<span class="kw-2">&amp;</span>rb_id).unwrap().add_file(filename);
             <span class="kw">continue</span>;
           }
@@ -628,28 +629,28 @@
           this_reader.cache_all_events();
           <span class="comment">// exit(1);
           </span>robin_readers.insert(rb_id, this_reader);
-          <span class="comment">//println!(&quot;First one or two-digit number: {}&quot;, mat.get(1).unwrap().as_str());
+          <span class="comment">//println!("First one or two-digit number: {}", mat.get(1).unwrap().as_str());
           //break;
         </span>} <span class="kw">else </span>{
-          <span class="macro">error!</span>(<span class="string">&quot;Can not recognize pattern!!&quot;</span>);
+          <span class="macro">error!</span>(<span class="string">"Can not recognize pattern!!"</span>);
         }
       } <span class="kw">else </span>{
-        <span class="macro">println!</span>(<span class="string">&quot;Error globbing files&quot;</span>);
+        <span class="macro">println!</span>(<span class="string">"Error globbing files"</span>);
       }
     }
   }
-  <span class="macro">println!</span>(<span class="string">&quot;available rbs {:?}&quot;</span>, available_rbs);
+  <span class="macro">println!</span>(<span class="string">"available rbs {:?}"</span>, available_rbs);
   <span class="comment">//let mut max_evids = Vec::&lt;u32&gt;::new();
   //let mut min_evids = Vec::&lt;u32&gt;::new();
   </span><span class="kw">for </span>k <span class="kw">in </span>available_rbs.iter() {
-    <span class="macro">println!</span>(<span class="string">&quot;==&gt; For board {}, we read file {} and extraced {} events!&quot;</span>, k, robin_readers[k].filename, robin_readers[k].get_cache_size());
-    <span class="macro">println!</span>(<span class="string">&quot;==&gt; We cached events with number from {} to {}&quot;</span>, robin_readers[k].min_cached_event_id().unwrap(), robin_readers[k].max_cached_event_id().unwrap());
+    <span class="macro">println!</span>(<span class="string">"==&gt; For board {}, we read file {} and extraced {} events!"</span>, k, robin_readers[k].filename, robin_readers[k].get_cache_size());
+    <span class="macro">println!</span>(<span class="string">"==&gt; We cached events with number from {} to {}"</span>, robin_readers[k].min_cached_event_id().unwrap(), robin_readers[k].max_cached_event_id().unwrap());
     <span class="comment">//min_evids.push(robin_readers[k].min_cached_event_id().unwrap());
     //max_evids.push(robin_readers[k].max_cached_event_id().unwrap());
 
     </span><span class="kw">let </span>cached_eventids = robin_readers[k].event_ids_in_cache();
     <span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..<span class="number">5 </span>{
-      <span class="macro">println!</span>(<span class="string">&quot;== ==&gt; evid {}&quot;</span>, cached_eventids[k]);
+      <span class="macro">println!</span>(<span class="string">"== ==&gt; evid {}"</span>, cached_eventids[k]);
     }
   }
 
@@ -662,7 +663,7 @@
   //reader.precache_events(chunk);
   // FIXME - this can be optimized. For now, cache 
   // everything in memory
-  //println!(&quot;=&gt; Cached {} events!&quot;, reader.get_cache_size());
+  //println!("=&gt; Cached {} events!", reader.get_cache_size());
 
   </span><span class="kw">let </span>r_events   = Vec::&lt;RBEvent&gt;::new();
   <span class="kw">let </span><span class="kw-2">mut </span>seen_evids = Vec::&lt;u32&gt;::new(); 
@@ -671,11 +672,11 @@
   <span class="kw">let </span><span class="kw-2">mut </span>mtp_events_tot  = <span class="number">0</span>;
 
   <span class="kw">let </span>ftype      = FileType::RunFile(<span class="number">1</span>); 
-  <span class="kw">let </span><span class="kw-2">mut </span>writer = TofPacketWriter::new(String::from(<span class="string">&quot;&quot;</span>), ftype);
+  <span class="kw">let </span><span class="kw-2">mut </span>writer = TofPacketWriter::new(String::from(<span class="string">""</span>), ftype);
   <span class="kw">let </span><span class="kw-2">mut </span>n_events = <span class="number">0u64</span>;
   <span class="kw">if </span>has_stream {
     <span class="kw">for </span>packet <span class="kw">in </span>packet_reader {
-      <span class="comment">//println!(&quot;{}&quot;, packet);
+      <span class="comment">//println!("{}", packet);
       </span><span class="kw">match </span>packet.packet_type {
         PacketType::MasterTrigger =&gt;  {
           <span class="kw">let </span>mt_packet = MasterTriggerEvent::from_bytestream(<span class="kw-2">&amp;</span>packet.payload, <span class="kw-2">&amp;mut </span><span class="number">0</span>); 
@@ -684,99 +685,99 @@
               <span class="kw">continue</span>;
             }
             <span class="kw">let </span><span class="kw-2">mut </span>master_tof_event = TofEvent::new();
-            <span class="kw">let </span>rb_ids_debug = mapping.get_rb_ids_debug(<span class="kw-2">&amp;</span>mtp, <span class="bool-val">false</span>);
-            mtp_events_tot += <span class="number">1</span>;
-            <span class="kw">if </span>args.no_missing_hits {
-              <span class="kw">if </span>rb_ids_debug.<span class="number">1</span>.len() &gt; <span class="number">0 </span>{
-                ev_with_missing += <span class="number">1</span>;
-                <span class="kw">continue
-              </span>}
-            }
-            <span class="comment">// we are done with the mtb_event and push it to the event
+            <span class="comment">//let rb_ids_debug = mapping.get_rb_ids_debug(&amp;mtp, false);
+            //mtp_events_tot += 1;
+            //if args.no_missing_hits {
+            //  if rb_ids_debug.1.len() &gt; 0 {
+            //    ev_with_missing += 1;
+            //    continue
+            //  }
+            //}
+            // we are done with the mtb_event and push it to the event
             </span>master_tof_event.mt_event = mtp;
 
-            <span class="macro">println!</span>(<span class="string">&quot;MTE: rbids {:?}&quot;</span>, rb_ids_debug);
-            <span class="macro">println!</span>(<span class="string">&quot;MTE: evid {}&quot;</span>, mtp.event_id);
-            <span class="comment">//println!(&quot;available_rbs {:?}&quot;, available_rbs);
-            //println!(&quot;MTE: ltbids {:?}&quot;, mapping.get_ltb_ids(&amp;mtp));
-            </span><span class="kw">for </span>k <span class="kw">in </span>rb_ids_debug.<span class="number">0 </span>{
-              <span class="kw">let </span>this_ev_rbid = k.<span class="number">0</span>;
-              <span class="kw">let </span>this_ev_rbch = k.<span class="number">1</span>;
-              <span class="kw">if </span>!available_rbs.contains(<span class="kw-2">&amp;</span>this_ev_rbid) {
-                <span class="kw">if </span>this_ev_rbid != <span class="number">0 </span>{
-                  <span class="macro">println!</span>(<span class="string">&quot;Requesting to read from RB {}, but we don&#39;t have data for that!&quot;</span>, this_ev_rbid);
-                  <span class="comment">//panic!(&quot;Requesting to read from RB {}, but we don&#39;t have data for that!&quot;, this_ev_rbid);
-                  </span><span class="kw">continue</span>;
-                }
-              }
-              <span class="comment">//println!(&quot;Getting RB {}&quot;, this_ev_rbid);
-              </span><span class="kw">let </span>reader = robin_readers.get_mut(<span class="kw-2">&amp;</span>this_ev_rbid).unwrap();
-              <span class="comment">//panic!(&quot;{}&quot;, reader.get_cache_size());
-              </span><span class="kw">match </span>reader.get_from_cache(<span class="kw-2">&amp;</span>mtp.event_id) {
-                <span class="prelude-val">None     </span>=&gt; {
-                  <span class="comment">//reader.print_index();
-                  //println!(&quot;Events: {:?}&quot;, reader.event_ids_in_cache());
-                  //println!(&quot;Reader has {} events&quot;, reader.event_ids_in_cache().len());
-                  //println!(&quot;==&gt; We cached events with number from {} to {}&quot;, robin_readers[&amp;this_ev_rbid].min_cached_event_id().unwrap(), robin_readers[&amp;this_ev_rbid].max_cached_event_id().unwrap());
-                  </span><span class="macro">error!</span>(<span class="string">&quot;We do not have that event {}!&quot;</span>, mtp.event_id);
-                  <span class="comment">//exit(1);
-                  </span><span class="kw">continue</span>;
-                }
-                <span class="prelude-val">Some</span>(rbevent) =&gt; {
-                  <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, rbevent.adc);
-                  <span class="comment">//if !rbevent.is_over_adc_threshold(this_ev_rbch, 8000) {
-                  //  continue;
-                  //}
-                  //exit(1);
-                  </span><span class="kw">if </span>use_calibrations {
-                    <span class="comment">//let mut channel_data : [f32;1024] = [0.0;1024];
-                    </span><span class="kw">let </span><span class="kw-2">mut </span>channel_data = <span class="macro">vec!</span>[<span class="number">0.0f32</span>;<span class="number">1024</span>];
-                    <span class="kw">let </span>channel_adc = <span class="kw-2">&amp;</span>rbevent.adc[this_ev_rbch <span class="kw">as </span>usize -<span class="number">1</span>]; <span class="comment">//get_adc_ch(this_ev_rbch);
-                    //let mut channel_adc  : [u16;1024] = rbevent.get_adc_ch(this_ev_rbch).try_into().expect(&quot;Waveform does not have expected len of 1024!&quot;);
-                    </span>calibrations[<span class="kw-2">&amp;</span>this_ev_rbid].voltages(this_ev_rbch <span class="kw">as </span>usize,
-                                                         rbevent.header.stop_cell <span class="kw">as </span>usize,
-                                                         <span class="kw-2">&amp;</span>channel_adc,
-                                                         <span class="kw-2">&amp;mut </span>channel_data);
-                    <span class="kw">let </span><span class="kw-2">mut </span>data = Vec::&lt;(f32, f32)&gt;::with_capacity(<span class="number">1024</span>);
-                    <span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..<span class="number">800 </span>{
-                      data.push((k <span class="kw">as </span>f32, channel_data[k]));
-                    }
-                    <span class="comment">//let data = [(0.0, 0.0), (1.0, 1.0), (2.0, 0.5), (3.0, 1.5)];
-                    //Chart::new(240, 60, 0.0, 1024.0)
-                    //  .lineplot(&amp;Shape::Lines(data.as_slice())).display();
-                  </span>} <span class="kw">else </span>{
-                    <span class="kw">let </span>channel_data = <span class="kw-2">&amp;</span>rbevent.adc[this_ev_rbch <span class="kw">as </span>usize - <span class="number">1</span>];<span class="comment">//get_adc_ch(this_ev_rbch);
-                    //println!(&quot;ch {}&quot;, this_ev_rbch);
-                    //println!(&quot;{:?}&quot;, channel_data);
-                    //println!(&quot;{}&quot;, channel_data.len());
-                    </span><span class="kw">if </span>channel_data.len() == <span class="number">0 </span>{
-                      <span class="macro">error!</span>(<span class="string">&quot;There is no channel data for ch {}!&quot;</span>, this_ev_rbch);
-                    } <span class="kw">else </span>{
-                      <span class="kw">let </span><span class="kw-2">mut </span>data = Vec::&lt;(f32, f32)&gt;::with_capacity(<span class="number">1024</span>);
-                      <span class="kw">if </span>channel_data.len() &lt; <span class="number">1024 </span>{
-                        <span class="macro">error!</span>(<span class="string">&quot;Corrupt channel data!&quot;</span>);
-                        <span class="kw">continue</span>;
-                      }
-                      <span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..<span class="number">800 </span>{
-                        data.push((k <span class="kw">as </span>f32, channel_data[k] <span class="kw">as </span>f32));
-                      }
-                      <span class="comment">//let data = [(0.0, 0.0), (1.0, 1.0), (2.0, 0.5), (3.0, 1.5)];
-                      </span>Chart::new(<span class="number">240</span>, <span class="number">60</span>, <span class="number">0.0</span>, <span class="number">1024.0</span>)
-                        .lineplot(<span class="kw-2">&amp;</span>Shape::Lines(data.as_slice())).display();
-                      <span class="comment">//panic!(&quot;e basta!&quot;);
-                    </span>}
-                  }
-                  <span class="comment">//r_events.push(rbevent);
-                  </span>master_tof_event.rb_events.push(rbevent);
-                  <span class="comment">//master_tof_event.missing_hits = rb_ids_debug.1;
-                  </span><span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..rb_ids_debug.<span class="number">1</span>.len() {
-                    master_tof_event.missing_hits.push(rb_ids_debug.<span class="number">1</span>[k]);
-                  }
-                  seen_evids.push(mtp.event_id);
-                }
-              }
-            } 
-            <span class="comment">//match reader.get_from_cache(&amp;mtp.event_id) {
+            <span class="comment">//println!("MTE: rbids {:?}", rb_ids_debug);
+            </span><span class="macro">println!</span>(<span class="string">"MTE: evid {}"</span>, mtp.event_id);
+            <span class="comment">//println!("available_rbs {:?}", available_rbs);
+            //println!("MTE: ltbids {:?}", mapping.get_ltb_ids(&amp;mtp));
+            //for k in rb_ids_debug.0 {
+            //  let this_ev_rbid = k.0;
+            //  let this_ev_rbch = k.1;
+            //  if !available_rbs.contains(&amp;this_ev_rbid) {
+            //    if this_ev_rbid != 0 {
+            //      println!("Requesting to read from RB {}, but we don't have data for that!", this_ev_rbid);
+            //      //panic!("Requesting to read from RB {}, but we don't have data for that!", this_ev_rbid);
+            //      continue;
+            //    }
+            //  }
+            //  //println!("Getting RB {}", this_ev_rbid);
+            //  let reader = robin_readers.get_mut(&amp;this_ev_rbid).unwrap();
+            //  //panic!("{}", reader.get_cache_size());
+            //  match reader.get_from_cache(&amp;mtp.event_id) {
+            //    None     =&gt; {
+            //      //reader.print_index();
+            //      //println!("Events: {:?}", reader.event_ids_in_cache());
+            //      //println!("Reader has {} events", reader.event_ids_in_cache().len());
+            //      //println!("==&gt; We cached events with number from {} to {}", robin_readers[&amp;this_ev_rbid].min_cached_event_id().unwrap(), robin_readers[&amp;this_ev_rbid].max_cached_event_id().unwrap());
+            //      error!("We do not have that event {}!", mtp.event_id);
+            //      //exit(1);
+            //      continue;
+            //    }
+            //    Some(rbevent) =&gt; {
+            //      println!("{:?}", rbevent.adc);
+            //      //if !rbevent.is_over_adc_threshold(this_ev_rbch, 8000) {
+            //      //  continue;
+            //      //}
+            //      //exit(1);
+            //      if use_calibrations {
+            //        //let mut channel_data : [f32;1024] = [0.0;1024];
+            //        let mut channel_data = vec![0.0f32;1024];
+            //        let channel_adc = &amp;rbevent.adc[this_ev_rbch as usize -1]; //get_adc_ch(this_ev_rbch);
+            //        //let mut channel_adc  : [u16;1024] = rbevent.get_adc_ch(this_ev_rbch).try_into().expect("Waveform does not have expected len of 1024!");
+            //        calibrations[&amp;this_ev_rbid].voltages(this_ev_rbch as usize,
+            //                                             rbevent.header.stop_cell as usize,
+            //                                             &amp;channel_adc,
+            //                                             &amp;mut channel_data);
+            //        let mut data = Vec::&lt;(f32, f32)&gt;::with_capacity(1024);
+            //        for k in 0..800 {
+            //          data.push((k as f32, channel_data[k]));
+            //        }
+            //        //let data = [(0.0, 0.0), (1.0, 1.0), (2.0, 0.5), (3.0, 1.5)];
+            //        //Chart::new(240, 60, 0.0, 1024.0)
+            //        //  .lineplot(&amp;Shape::Lines(data.as_slice())).display();
+            //      } else {
+            //        let channel_data = &amp;rbevent.adc[this_ev_rbch as usize - 1];//get_adc_ch(this_ev_rbch);
+            //        //println!("ch {}", this_ev_rbch);
+            //        //println!("{:?}", channel_data);
+            //        //println!("{}", channel_data.len());
+            //        if channel_data.len() == 0 {
+            //          error!("There is no channel data for ch {}!", this_ev_rbch);
+            //        } else {
+            //          let mut data = Vec::&lt;(f32, f32)&gt;::with_capacity(1024);
+            //          if channel_data.len() &lt; 1024 {
+            //            error!("Corrupt channel data!");
+            //            continue;
+            //          }
+            //          for k in 0..800 {
+            //            data.push((k as f32, channel_data[k] as f32));
+            //          }
+            //          //let data = [(0.0, 0.0), (1.0, 1.0), (2.0, 0.5), (3.0, 1.5)];
+            //          Chart::new(240, 60, 0.0, 1024.0)
+            //            .lineplot(&amp;Shape::Lines(data.as_slice())).display();
+            //          //panic!("e basta!");
+            //        }
+            //      }
+            //      //r_events.push(rbevent);
+            //      master_tof_event.rb_events.push(rbevent);
+            //      //master_tof_event.missing_hits = rb_ids_debug.1;
+            //      for k in 0..rb_ids_debug.1.len() {
+            //        master_tof_event.missing_hits.push(rb_ids_debug.1[k]);
+            //      }
+            //      seen_evids.push(mtp.event_id);
+            //    }
+            //  }
+            //} 
+            //match reader.get_from_cache(&amp;mtp.event_id) {
             //  None     =&gt; continue,
             //  Some(rbevent) =&gt; {
             //    r_events.push(rbevent);
@@ -785,11 +786,11 @@
             //}
             // this is if the reader has no double events
             //if reader.is_indexed(&amp;mtp.event_id) {
-            //  println!(&quot;--&gt; Found {} in robin data!&quot;, mtp.event_id);
+            //  println!("--&gt; Found {} in robin data!", mtp.event_id);
             //  let ev = reader.get_in_order(&amp;mtp.event_id);
             //  match ev {
             //    None          =&gt; {
-            //      error!(&quot;Can not get {}&quot;, mtp.event_id);
+            //      error!("Can not get {}", mtp.event_id);
             //      if seen_evids.contains(&amp;mtp.event_id) {
             //        reader.rewind();
             //        continue;
@@ -798,22 +799,22 @@
             //      }
             //    }
             //    Some(rbevent) =&gt; {
-            //      println!(&quot;{}&quot;, rbevent);
+            //      println!("{}", rbevent);
             //      r_events.push(rbevent);
             //      seen_evids.push(mtp.event_id);
             //    },
             //  }
             //}
             //let bss = master_tof_event.to_bytestream();
-            </span><span class="macro">println!</span>(<span class="string">&quot;{}&quot;</span>, master_tof_event);
-            <span class="comment">//panic!(&quot;Size {}&quot;, bss.len());
+            </span><span class="macro">println!</span>(<span class="string">"{}"</span>, master_tof_event);
+            <span class="comment">//panic!("Size {}", bss.len());
             
             </span><span class="kw">let </span>tof_packet = TofPacket::from(<span class="kw-2">&amp;</span>master_tof_event);
             writer.add_tof_packet(<span class="kw-2">&amp;</span>tof_packet);
             <span class="comment">//exit(0);
 
           </span>} <span class="kw">else </span>{
-            <span class="macro">error!</span>(<span class="string">&quot;Error decoding MasterTriggerPacket!&quot;</span>);
+            <span class="macro">error!</span>(<span class="string">"Error decoding MasterTriggerPacket!"</span>);
           }
         }
         <span class="kw">_ </span>=&gt; ()
@@ -826,20 +827,20 @@
       }
     }
   } <span class="kw">else </span>{
-    <span class="macro">println!</span>(<span class="string">&quot;=&gt; Will merge events without master trigger information!&quot;</span>);
+    <span class="macro">println!</span>(<span class="string">"=&gt; Will merge events without master trigger information!"</span>);
     <span class="kw">let </span><span class="kw-2">mut </span>alleventids = Vec::&lt;u32&gt;::new();
     <span class="comment">//let mut tofevents   = Vec::&lt;TofEvent&gt;::new();
     </span><span class="kw">for </span>rb <span class="kw">in </span><span class="kw-2">&amp;</span>available_rbs {
-      <span class="comment">//println!(&quot;RB {}&quot;, rb);
-      </span>alleventids.extend(robin_readers.get(<span class="kw-2">&amp;</span>rb).expect(<span class="string">&quot;We do not have a file for RB&quot;</span>).event_ids_in_cache());
+      <span class="comment">//println!("RB {}", rb);
+      </span>alleventids.extend(robin_readers.get(<span class="kw-2">&amp;</span>rb).expect(<span class="string">"We do not have a file for RB"</span>).event_ids_in_cache());
     }
     alleventids.sort();
     alleventids.dedup();
-    <span class="kw">let </span>template_bar   : <span class="kw-2">&amp;</span>str = <span class="string">&quot;[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.blue/grey} {human_pos:&gt;7}/{human_len:7} &quot;</span>;
+    <span class="kw">let </span>template_bar   : <span class="kw-2">&amp;</span>str = <span class="string">"[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.blue/grey} {human_pos:&gt;7}/{human_len:7} "</span>;
     <span class="kw">let </span>bar                   = ProgressBar::new(alleventids.len() <span class="kw">as </span>u64);
     <span class="kw">let </span>sty_bar               = ProgressStyle::with_template(template_bar).unwrap();
-    bar.set_message(<span class="string">&quot;Merging events...&quot;</span>);
-    bar.set_prefix(<span class="string">&quot;&quot;</span>);
+    bar.set_message(<span class="string">"Merging events..."</span>);
+    bar.set_prefix(<span class="string">""</span>);
     bar.set_style(sty_bar);
     <span class="kw">let </span><span class="kw-2">mut </span>n_processed = <span class="number">0u64</span>;
     <span class="kw">let </span><span class="kw-2">mut </span>n_tofpackets = <span class="number">0u64</span>;
@@ -849,7 +850,7 @@
       mt_event.event_id = ev;
       t_event.mt_event = mt_event;
       <span class="kw">for </span>rb <span class="kw">in </span><span class="kw-2">&amp;</span>available_rbs {
-        <span class="kw">match </span>robin_readers.get_mut(<span class="kw-2">&amp;</span>rb).expect(<span class="string">&quot;We do not have a file for this RB&quot;</span>).get_event_by_id(<span class="kw-2">&amp;</span>ev) {
+        <span class="kw">match </span>robin_readers.get_mut(<span class="kw-2">&amp;</span>rb).expect(<span class="string">"We do not have a file for this RB"</span>).get_event_by_id(<span class="kw-2">&amp;</span>ev) {
           <span class="prelude-val">None </span>=&gt; (),
           <span class="prelude-val">Some</span>(rbevent) =&gt; {
             t_event.rb_events.push(rbevent);
@@ -871,13 +872,13 @@
         }
       }
     }
-    <span class="macro">println!</span>(<span class="string">&quot;=&gt; We have written {} TofPackets!&quot;</span>, n_tofpackets);
+    <span class="macro">println!</span>(<span class="string">"=&gt; We have written {} TofPackets!"</span>, n_tofpackets);
     bar.finish();
   }
-  <span class="macro">println!</span>(<span class="string">&quot;=&gt; In total, we saw {} events recorded by the MTB&quot;</span>, mtp_events_tot);
-  <span class="macro">println!</span>(<span class="string">&quot;=&gt; Extracted {} events where we have corresponding MTB information&quot;</span>, r_events.len());
+  <span class="macro">println!</span>(<span class="string">"=&gt; In total, we saw {} events recorded by the MTB"</span>, mtp_events_tot);
+  <span class="macro">println!</span>(<span class="string">"=&gt; Extracted {} events where we have corresponding MTB information"</span>, r_events.len());
   <span class="kw">if </span>args.no_missing_hits {
-    <span class="macro">println!</span>(<span class="string">&quot;=&gt; We did found {ev_with_missing} events which had missing hits, these events were discarded!&quot;</span>);
+    <span class="macro">println!</span>(<span class="string">"=&gt; We did found {ev_with_missing} events which had missing hits, these events were discarded!"</span>);
   }
 
   <span class="kw">let </span>data = [(<span class="number">0.0</span>, <span class="number">0.0</span>), (<span class="number">1.0</span>, <span class="number">1.0</span>), (<span class="number">2.0</span>, <span class="number">0.5</span>), (<span class="number">3.0</span>, <span class="number">1.5</span>)];
@@ -885,15 +886,15 @@
               .lineplot(<span class="kw-2">&amp;</span>Shape::Lines(<span class="kw-2">&amp;</span>data)).display();
   <span class="comment">//plot.display();
 
-  //println!(&quot;{:?}&quot;, plot);
+  //println!("{:?}", plot);
 
   //for k in 0..r_events.len() {
   //  if r_events[k].header.channel_mask != 255 {
-  //    println!(&quot;{}&quot;, r_events[k].header.channel_mask);
+  //    println!("{}", r_events[k].header.channel_mask);
   //  }
   //}
   //for event in reader {
-  //  println!(&quot;{}&quot;, event);
+  //  println!("{}", event);
   //}
 </span>}
 </code></pre></div></section></main></body></html>

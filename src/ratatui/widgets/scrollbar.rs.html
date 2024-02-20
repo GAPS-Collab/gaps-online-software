@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.25.0/src/widgets/scrollbar.rs`."><title>scrollbar.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.25.0/src/widgets/scrollbar.rs`."><title>scrollbar.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><a class="sub-logo-container" href="../../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1047,7 +1048,7 @@
 ///
 /// # Important
 ///
-/// It&#39;s essential to set the `content_length` field when using this struct. This field
+/// It's essential to set the `content_length` field when using this struct. This field
 /// represents the total length of the scrollable content. The default value is zero
 /// which will result in the Scrollbar not rendering.
 ///
@@ -1066,8 +1067,8 @@
 /// └───────────────┘
 /// ```
 ///
-/// If you don&#39;t have multi-line content, you can leave the `viewport_content_length` set to the
-/// default of 0 and it&#39;ll use the track size as a `viewport_content_length`.
+/// If you don't have multi-line content, you can leave the `viewport_content_length` set to the
+/// default of 0 and it'll use the track size as a `viewport_content_length`.
 </span><span class="attr">#[derive(Debug, Default, Clone, Copy, Eq, PartialEq, Hash)]
 </span><span class="kw">pub struct </span>ScrollbarState {
     <span class="comment">// The total length of the scrollable content.
@@ -1087,32 +1088,32 @@
         }
     }
     <span class="doccomment">/// Sets the scroll position of the scrollbar and returns the modified ScrollbarState.
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>position(<span class="kw-2">mut </span><span class="self">self</span>, position: usize) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.position = position;
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Sets the length of the scrollable content and returns the modified ScrollbarState.
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>content_length(<span class="kw-2">mut </span><span class="self">self</span>, content_length: usize) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.content_length = content_length;
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Sets the length of the viewport content and returns the modified ScrollbarState.
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>viewport_content_length(<span class="kw-2">mut </span><span class="self">self</span>, viewport_content_length: usize) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.viewport_content_length = viewport_content_length;
         <span class="self">self
     </span>}
 
-    <span class="doccomment">/// Decrements the scroll position by one, ensuring it doesn&#39;t go below zero.
+    <span class="doccomment">/// Decrements the scroll position by one, ensuring it doesn't go below zero.
     </span><span class="kw">pub fn </span>prev(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="self">self</span>.position = <span class="self">self</span>.position.saturating_sub(<span class="number">1</span>);
     }
 
-    <span class="doccomment">/// Increments the scroll position by one, ensuring it doesn&#39;t exceed the length of the content.
+    <span class="doccomment">/// Increments the scroll position by one, ensuring it doesn't exceed the length of the content.
     </span><span class="kw">pub fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="self">self</span>.position = <span class="self">self
             </span>.position
@@ -1176,9 +1177,9 @@
 /// let vertical_scroll = 0; // from app state
 ///
 /// let items = vec![
-///     Line::from(&quot;Item 1&quot;),
-///     Line::from(&quot;Item 2&quot;),
-///     Line::from(&quot;Item 3&quot;),
+///     Line::from("Item 1"),
+///     Line::from("Item 2"),
+///     Line::from("Item 3"),
 /// ];
 /// let paragraph = Paragraph::new(items.clone())
 ///     .scroll((vertical_scroll as u16, 0))
@@ -1186,8 +1187,8 @@
 ///
 /// let scrollbar = Scrollbar::default()
 ///     .orientation(ScrollbarOrientation::VerticalRight)
-///     .begin_symbol(Some(&quot;↑&quot;))
-///     .end_symbol(Some(&quot;↓&quot;));
+///     .begin_symbol(Some("↑"))
+///     .end_symbol(Some("↓"));
 /// let mut scrollbar_state = ScrollbarState::new(items.iter().len()).position(vertical_scroll);
 ///
 /// let area = frame.size();
@@ -1203,19 +1204,19 @@
 /// # }
 /// ```
 </span><span class="attr">#[derive(Debug, Clone, Eq, PartialEq, Hash)]
-</span><span class="kw">pub struct </span>Scrollbar&lt;<span class="lifetime">&#39;a</span>&gt; {
+</span><span class="kw">pub struct </span>Scrollbar&lt;<span class="lifetime">'a</span>&gt; {
     orientation: ScrollbarOrientation,
     thumb_style: Style,
-    thumb_symbol: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+    thumb_symbol: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str,
     track_style: Style,
-    track_symbol: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;,
-    begin_symbol: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;,
+    track_symbol: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt;,
+    begin_symbol: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt;,
     begin_style: Style,
-    end_symbol: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;,
+    end_symbol: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt;,
     end_style: Style,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Default <span class="kw">for </span>Scrollbar&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Default <span class="kw">for </span>Scrollbar&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             orientation: ScrollbarOrientation::default(),
@@ -1231,14 +1232,14 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Scrollbar&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Scrollbar&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">pub fn </span>new(orientation: ScrollbarOrientation) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::default().orientation(orientation)
     }
 
     <span class="doccomment">/// Sets the orientation of the scrollbar.
     /// Resets the symbols to [`DOUBLE_VERTICAL`] or [`DOUBLE_HORIZONTAL`] based on orientation
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>orientation(<span class="kw-2">mut </span><span class="self">self</span>, orientation: ScrollbarOrientation) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.orientation = orientation;
         <span class="kw">let </span>set = <span class="kw">if </span><span class="self">self</span>.is_vertical() {
@@ -1250,63 +1251,63 @@
     }
 
     <span class="doccomment">/// Sets the orientation and symbols for the scrollbar from a [`Set`].
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>orientation_and_symbol(<span class="kw-2">mut </span><span class="self">self</span>, orientation: ScrollbarOrientation, set: Set) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.orientation = orientation;
         <span class="self">self</span>.symbols(set)
     }
 
     <span class="doccomment">/// Sets the symbol that represents the thumb of the scrollbar.
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
-    </span><span class="kw">pub fn </span>thumb_symbol(<span class="kw-2">mut </span><span class="self">self</span>, thumb_symbol: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>thumb_symbol(<span class="kw-2">mut </span><span class="self">self</span>, thumb_symbol: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.thumb_symbol = thumb_symbol;
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Sets the style that represents the thumb of the scrollbar.
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>thumb_style(<span class="kw-2">mut </span><span class="self">self</span>, thumb_style: Style) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.thumb_style = thumb_style;
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Sets the symbol that represents the track of the scrollbar.
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
-    </span><span class="kw">pub fn </span>track_symbol(<span class="kw-2">mut </span><span class="self">self</span>, track_symbol: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>track_symbol(<span class="kw-2">mut </span><span class="self">self</span>, track_symbol: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.track_symbol = track_symbol;
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Sets the style that is used for the track of the scrollbar.
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>track_style(<span class="kw-2">mut </span><span class="self">self</span>, track_style: Style) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.track_style = track_style;
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Sets the symbol that represents the beginning of the scrollbar.
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
-    </span><span class="kw">pub fn </span>begin_symbol(<span class="kw-2">mut </span><span class="self">self</span>, begin_symbol: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>begin_symbol(<span class="kw-2">mut </span><span class="self">self</span>, begin_symbol: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.begin_symbol = begin_symbol;
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Sets the style that is used for the beginning of the scrollbar.
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>begin_style(<span class="kw-2">mut </span><span class="self">self</span>, begin_style: Style) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.begin_style = begin_style;
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Sets the symbol that represents the end of the scrollbar.
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
-    </span><span class="kw">pub fn </span>end_symbol(<span class="kw-2">mut </span><span class="self">self</span>, end_symbol: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>end_symbol(<span class="kw-2">mut </span><span class="self">self</span>, end_symbol: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.end_symbol = end_symbol;
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Sets the style that is used for the end of the scrollbar.
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>end_style(<span class="kw-2">mut </span><span class="self">self</span>, end_style: Style) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.end_style = end_style;
         <span class="self">self
@@ -1325,7 +1326,7 @@
     ///
     /// Only sets begin_symbol, end_symbol and track_symbol if they already contain a value.
     /// If they were set to `None` explicitly, this function will respect that choice.
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>symbols(<span class="kw-2">mut </span><span class="self">self</span>, symbol: Set) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.thumb_symbol = symbol.thumb;
         <span class="kw">if </span><span class="self">self</span>.track_symbol.is_some() {
@@ -1349,7 +1350,7 @@
     /// │  └──────── thumb
     /// └─────────── begin
     /// ```
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>style(<span class="kw-2">mut </span><span class="self">self</span>, style: Style) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.track_style = style;
         <span class="self">self</span>.thumb_style = style;
@@ -1424,7 +1425,7 @@
 
     <span class="doccomment">/// Calculate the starting and ending position of a scrollbar thumb.
     ///
-    /// The scrollbar thumb&#39;s position and size are determined based on the current state of the
+    /// The scrollbar thumb's position and size are determined based on the current state of the
     /// scrollbar, and the dimensions of the scrollbar track.
     ///
     /// This function returns a tuple `(thumb_start, thumb_end)` where `thumb_start` is the position
@@ -1475,7 +1476,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; StatefulWidget <span class="kw">for </span>Scrollbar&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; StatefulWidget <span class="kw">for </span>Scrollbar&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">type </span>State = ScrollbarState;
 
     <span class="kw">fn </span>render(<span class="self">self</span>, area: Rect, buf: <span class="kw-2">&amp;mut </span>Buffer, state: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::State) {
@@ -1560,22 +1561,22 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>scroll_direction_to_string() {
-        <span class="macro">assert_eq!</span>(ScrollDirection::Forward.to_string(), <span class="string">&quot;Forward&quot;</span>);
-        <span class="macro">assert_eq!</span>(ScrollDirection::Backward.to_string(), <span class="string">&quot;Backward&quot;</span>);
+        <span class="macro">assert_eq!</span>(ScrollDirection::Forward.to_string(), <span class="string">"Forward"</span>);
+        <span class="macro">assert_eq!</span>(ScrollDirection::Backward.to_string(), <span class="string">"Backward"</span>);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>scroll_direction_from_str() {
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;Forward&quot;</span>.parse::&lt;ScrollDirection&gt;(),
+            <span class="string">"Forward"</span>.parse::&lt;ScrollDirection&gt;(),
             <span class="prelude-val">Ok</span>(ScrollDirection::Forward)
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;Backward&quot;</span>.parse::&lt;ScrollDirection&gt;(),
+            <span class="string">"Backward"</span>.parse::&lt;ScrollDirection&gt;(),
             <span class="prelude-val">Ok</span>(ScrollDirection::Backward)
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;&quot;</span>.parse::&lt;ScrollDirection&gt;(),
+            <span class="string">""</span>.parse::&lt;ScrollDirection&gt;(),
             <span class="prelude-val">Err</span>(ParseError::VariantNotFound)
         );
     }
@@ -1584,42 +1585,42 @@
     </span><span class="kw">fn </span>scrollbar_orientation_to_string() {
         <span class="macro">assert_eq!</span>(
             ScrollbarOrientation::VerticalRight.to_string(),
-            <span class="string">&quot;VerticalRight&quot;
+            <span class="string">"VerticalRight"
         </span>);
         <span class="macro">assert_eq!</span>(
             ScrollbarOrientation::VerticalLeft.to_string(),
-            <span class="string">&quot;VerticalLeft&quot;
+            <span class="string">"VerticalLeft"
         </span>);
         <span class="macro">assert_eq!</span>(
             ScrollbarOrientation::HorizontalBottom.to_string(),
-            <span class="string">&quot;HorizontalBottom&quot;
+            <span class="string">"HorizontalBottom"
         </span>);
         <span class="macro">assert_eq!</span>(
             ScrollbarOrientation::HorizontalTop.to_string(),
-            <span class="string">&quot;HorizontalTop&quot;
+            <span class="string">"HorizontalTop"
         </span>);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>scrollbar_orientation_from_str() {
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;VerticalRight&quot;</span>.parse::&lt;ScrollbarOrientation&gt;(),
+            <span class="string">"VerticalRight"</span>.parse::&lt;ScrollbarOrientation&gt;(),
             <span class="prelude-val">Ok</span>(ScrollbarOrientation::VerticalRight)
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;VerticalLeft&quot;</span>.parse::&lt;ScrollbarOrientation&gt;(),
+            <span class="string">"VerticalLeft"</span>.parse::&lt;ScrollbarOrientation&gt;(),
             <span class="prelude-val">Ok</span>(ScrollbarOrientation::VerticalLeft)
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;HorizontalBottom&quot;</span>.parse::&lt;ScrollbarOrientation&gt;(),
+            <span class="string">"HorizontalBottom"</span>.parse::&lt;ScrollbarOrientation&gt;(),
             <span class="prelude-val">Ok</span>(ScrollbarOrientation::HorizontalBottom)
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;HorizontalTop&quot;</span>.parse::&lt;ScrollbarOrientation&gt;(),
+            <span class="string">"HorizontalTop"</span>.parse::&lt;ScrollbarOrientation&gt;(),
             <span class="prelude-val">Ok</span>(ScrollbarOrientation::HorizontalTop)
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;&quot;</span>.parse::&lt;ScrollbarOrientation&gt;(),
+            <span class="string">""</span>.parse::&lt;ScrollbarOrientation&gt;(),
             <span class="prelude-val">Err</span>(ParseError::VariantNotFound)
         );
     }
@@ -1634,7 +1635,7 @@
             .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
         <span class="macro">assert_buffer_eq!</span>(
             buffer,
-            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;  &quot;</span>, <span class="string">&quot;  &quot;</span>, <span class="string">&quot;  &quot;</span>, <span class="string">&quot;  &quot;</span>, <span class="string">&quot;  &quot;</span>, <span class="string">&quot;  &quot;</span>, <span class="string">&quot;  &quot;</span>, <span class="string">&quot;  &quot;</span>])
+            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"  "</span>, <span class="string">"  "</span>, <span class="string">"  "</span>, <span class="string">"  "</span>, <span class="string">"  "</span>, <span class="string">"  "</span>, <span class="string">"  "</span>, <span class="string">"  "</span>])
         );
 
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">8</span>));
@@ -1645,7 +1646,7 @@
             .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
         <span class="macro">assert_buffer_eq!</span>(
             buffer,
-            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot; █&quot;</span>, <span class="string">&quot; █&quot;</span>, <span class="string">&quot; █&quot;</span>, <span class="string">&quot; █&quot;</span>, <span class="string">&quot; █&quot;</span>, <span class="string">&quot; █&quot;</span>, <span class="string">&quot; █&quot;</span>, <span class="string">&quot; █&quot;</span>])
+            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">" █"</span>, <span class="string">" █"</span>, <span class="string">" █"</span>, <span class="string">" █"</span>, <span class="string">" █"</span>, <span class="string">" █"</span>, <span class="string">" █"</span>, <span class="string">" █"</span>])
         );
     }
 
@@ -1678,7 +1679,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">4</span>, <span class="number">2</span>));
         <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::default().position(<span class="number">0</span>).content_length(<span class="number">1</span>);
         Scrollbar::default().render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
-        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;    &quot;</span>, <span class="string">&quot;    &quot;</span>]));
+        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"    "</span>, <span class="string">"    "</span>]));
     }
 
     <span class="attr">#[test]
@@ -1689,7 +1690,7 @@
             .begin_symbol(<span class="prelude-val">None</span>)
             .end_symbol(<span class="prelude-val">None</span>)
             .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
-        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;   █&quot;</span>, <span class="string">&quot;   █&quot;</span>]));
+        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"   █"</span>, <span class="string">"   █"</span>]));
     }
 
     <span class="attr">#[test]
@@ -1700,7 +1701,7 @@
             .begin_symbol(<span class="prelude-val">None</span>)
             .end_symbol(<span class="prelude-val">None</span>)
             .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
-        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;█&quot;</span>, <span class="string">&quot;█&quot;</span>]));
+        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"█"</span>, <span class="string">"█"</span>]));
     }
 
     <span class="attr">#[test]
@@ -1708,7 +1709,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">4</span>, <span class="number">3</span>));
         <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::default().position(<span class="number">0</span>).content_length(<span class="number">1</span>);
         Scrollbar::default().render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
-        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;   ▲&quot;</span>, <span class="string">&quot;   █&quot;</span>, <span class="string">&quot;   ▼&quot;</span>]));
+        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"   ▲"</span>, <span class="string">"   █"</span>, <span class="string">"   ▼"</span>]));
     }
 
     <span class="attr">#[test]
@@ -1716,7 +1717,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">2</span>));
         <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::default().position(<span class="number">0</span>).content_length(<span class="number">0</span>);
         Scrollbar::default().render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
-        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;  &quot;</span>, <span class="string">&quot;  &quot;</span>]));
+        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"  "</span>, <span class="string">"  "</span>]));
     }
 
     <span class="attr">#[test]
@@ -1727,7 +1728,7 @@
             .begin_symbol(<span class="prelude-val">None</span>)
             .end_symbol(<span class="prelude-val">None</span>)
             .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
-        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot; █&quot;</span>, <span class="string">&quot; █&quot;</span>]));
+        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">" █"</span>, <span class="string">" █"</span>]));
 
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">8</span>));
         <span class="kw">let </span><span class="kw-2">mut </span>state = ScrollbarState::default().position(<span class="number">0</span>).content_length(<span class="number">8</span>);
@@ -1737,7 +1738,7 @@
             .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
         <span class="macro">assert_buffer_eq!</span>(
             buffer,
-            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot; █&quot;</span>, <span class="string">&quot; █&quot;</span>, <span class="string">&quot; █&quot;</span>, <span class="string">&quot; █&quot;</span>, <span class="string">&quot; █&quot;</span>, <span class="string">&quot; █&quot;</span>, <span class="string">&quot; █&quot;</span>, <span class="string">&quot; █&quot;</span>])
+            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">" █"</span>, <span class="string">" █"</span>, <span class="string">" █"</span>, <span class="string">" █"</span>, <span class="string">" █"</span>, <span class="string">" █"</span>, <span class="string">" █"</span>, <span class="string">" █"</span>])
         );
     }
 
@@ -1751,13 +1752,13 @@
                 .end_symbol(<span class="prelude-val">None</span>)
                 .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
             <span class="kw">let </span>expected = <span class="kw">if </span>i &lt;= <span class="number">2 </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot; █&quot;</span>, <span class="string">&quot; ║&quot;</span>, <span class="string">&quot; ║&quot;</span>, <span class="string">&quot; ║&quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">" █"</span>, <span class="string">" ║"</span>, <span class="string">" ║"</span>, <span class="string">" ║"</span>]
             } <span class="kw">else if </span>i &lt;= <span class="number">7 </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot; ║&quot;</span>, <span class="string">&quot; █&quot;</span>, <span class="string">&quot; ║&quot;</span>, <span class="string">&quot; ║&quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">" ║"</span>, <span class="string">" █"</span>, <span class="string">" ║"</span>, <span class="string">" ║"</span>]
             } <span class="kw">else if </span>i &lt;= <span class="number">13 </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot; ║&quot;</span>, <span class="string">&quot; ║&quot;</span>, <span class="string">&quot; █&quot;</span>, <span class="string">&quot; ║&quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">" ║"</span>, <span class="string">" ║"</span>, <span class="string">" █"</span>, <span class="string">" ║"</span>]
             } <span class="kw">else </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot; ║&quot;</span>, <span class="string">&quot; ║&quot;</span>, <span class="string">&quot; ║&quot;</span>, <span class="string">&quot; █&quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">" ║"</span>, <span class="string">" ║"</span>, <span class="string">" ║"</span>, <span class="string">" █"</span>]
             };
             <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(expected.clone()));
         }
@@ -1774,13 +1775,13 @@
                 .orientation(ScrollbarOrientation::HorizontalBottom)
                 .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
             <span class="kw">let </span>expected = <span class="kw">if </span>i &lt;= <span class="number">2 </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot;    &quot;</span>, <span class="string">&quot;█═══&quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">"    "</span>, <span class="string">"█═══"</span>]
             } <span class="kw">else if </span>i &lt;= <span class="number">7 </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot;    &quot;</span>, <span class="string">&quot;═█══&quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">"    "</span>, <span class="string">"═█══"</span>]
             } <span class="kw">else if </span>i &lt;= <span class="number">13 </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot;    &quot;</span>, <span class="string">&quot;══█═&quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">"    "</span>, <span class="string">"══█═"</span>]
             } <span class="kw">else </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot;    &quot;</span>, <span class="string">&quot;═══█&quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">"    "</span>, <span class="string">"═══█"</span>]
             };
             <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(expected.clone()));
         }
@@ -1795,7 +1796,7 @@
             .end_symbol(<span class="prelude-val">None</span>)
             .orientation(ScrollbarOrientation::HorizontalBottom)
             .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
-        <span class="kw">let </span>expected = <span class="macro">vec!</span>[<span class="string">&quot;    &quot;</span>, <span class="string">&quot;█═══&quot;</span>];
+        <span class="kw">let </span>expected = <span class="macro">vec!</span>[<span class="string">"    "</span>, <span class="string">"█═══"</span>];
         <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(expected.clone()));
 
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">4</span>, <span class="number">2</span>));
@@ -1805,7 +1806,7 @@
             .end_symbol(<span class="prelude-val">None</span>)
             .orientation(ScrollbarOrientation::HorizontalBottom)
             .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
-        <span class="kw">let </span>expected = <span class="macro">vec!</span>[<span class="string">&quot;    &quot;</span>, <span class="string">&quot;══█═&quot;</span>];
+        <span class="kw">let </span>expected = <span class="macro">vec!</span>[<span class="string">"    "</span>, <span class="string">"══█═"</span>];
         <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(expected.clone()));
     }
 
@@ -1819,11 +1820,11 @@
                 .end_symbol(<span class="prelude-val">None</span>)
                 .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
             <span class="kw">let </span>expected = <span class="kw">if </span>i &lt;= <span class="number">1 </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot; █&quot;</span>, <span class="string">&quot; █&quot;</span>, <span class="string">&quot; ║&quot;</span>, <span class="string">&quot; ║&quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">" █"</span>, <span class="string">" █"</span>, <span class="string">" ║"</span>, <span class="string">" ║"</span>]
             } <span class="kw">else if </span>i &lt;= <span class="number">5 </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot; ║&quot;</span>, <span class="string">&quot; █&quot;</span>, <span class="string">&quot; █&quot;</span>, <span class="string">&quot; ║&quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">" ║"</span>, <span class="string">" █"</span>, <span class="string">" █"</span>, <span class="string">" ║"</span>]
             } <span class="kw">else </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot; ║&quot;</span>, <span class="string">&quot; ║&quot;</span>, <span class="string">&quot; █&quot;</span>, <span class="string">&quot; █&quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">" ║"</span>, <span class="string">" ║"</span>, <span class="string">" █"</span>, <span class="string">" █"</span>]
             };
             <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(expected.clone()));
         }
@@ -1840,11 +1841,11 @@
                 .end_symbol(<span class="prelude-val">None</span>)
                 .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
             <span class="kw">let </span>expected = <span class="kw">if </span>i &lt;= <span class="number">1 </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot; █&quot;</span>, <span class="string">&quot; █&quot;</span>, <span class="string">&quot; │&quot;</span>, <span class="string">&quot; │&quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">" █"</span>, <span class="string">" █"</span>, <span class="string">" │"</span>, <span class="string">" │"</span>]
             } <span class="kw">else if </span>i &lt;= <span class="number">5 </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot; │&quot;</span>, <span class="string">&quot; █&quot;</span>, <span class="string">&quot; █&quot;</span>, <span class="string">&quot; │&quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">" │"</span>, <span class="string">" █"</span>, <span class="string">" █"</span>, <span class="string">" │"</span>]
             } <span class="kw">else </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot; │&quot;</span>, <span class="string">&quot; │&quot;</span>, <span class="string">&quot; █&quot;</span>, <span class="string">&quot; █&quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">" │"</span>, <span class="string">" │"</span>, <span class="string">" █"</span>, <span class="string">" █"</span>]
             };
             <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(expected.clone()));
         }
@@ -1861,11 +1862,11 @@
                 .end_symbol(<span class="prelude-val">None</span>)
                 .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
             <span class="kw">let </span>expected = <span class="kw">if </span>i &lt;= <span class="number">1 </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot;    &quot;</span>, <span class="string">&quot;██══&quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">"    "</span>, <span class="string">"██══"</span>]
             } <span class="kw">else if </span>i &lt;= <span class="number">5 </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot;    &quot;</span>, <span class="string">&quot;═██═&quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">"    "</span>, <span class="string">"═██═"</span>]
             } <span class="kw">else </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot;    &quot;</span>, <span class="string">&quot;══██&quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">"    "</span>, <span class="string">"══██"</span>]
             };
             <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(expected.clone()));
         }
@@ -1883,11 +1884,11 @@
                 .end_symbol(<span class="prelude-val">None</span>)
                 .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
             <span class="kw">let </span>expected = <span class="kw">if </span>i &lt;= <span class="number">1 </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot;    &quot;</span>, <span class="string">&quot;██──&quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">"    "</span>, <span class="string">"██──"</span>]
             } <span class="kw">else if </span>i &lt;= <span class="number">5 </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot;    &quot;</span>, <span class="string">&quot;─██─&quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">"    "</span>, <span class="string">"─██─"</span>]
             } <span class="kw">else </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot;    &quot;</span>, <span class="string">&quot;──██&quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">"    "</span>, <span class="string">"──██"</span>]
             };
             <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(expected.clone()));
         }
@@ -1907,15 +1908,15 @@
                 .end_symbol(<span class="prelude-val">Some</span>(DOUBLE_HORIZONTAL.end))
                 .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
             <span class="kw">let </span>expected = <span class="kw">if </span>i &lt;= <span class="number">1 </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot;        &quot;</span>, <span class="string">&quot;◄██════►&quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄██════►"</span>]
             } <span class="kw">else if </span>i &lt;= <span class="number">5 </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot;        &quot;</span>, <span class="string">&quot;◄═██═══►&quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄═██═══►"</span>]
             } <span class="kw">else if </span>i &lt;= <span class="number">9 </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot;        &quot;</span>, <span class="string">&quot;◄══██══►&quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄══██══►"</span>]
             } <span class="kw">else if </span>i &lt;= <span class="number">13 </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot;        &quot;</span>, <span class="string">&quot;◄═══██═►&quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄═══██═►"</span>]
             } <span class="kw">else </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot;        &quot;</span>, <span class="string">&quot;◄════██►&quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄════██►"</span>]
             };
             <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(expected.clone()));
         }
@@ -1933,17 +1934,17 @@
                 .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
             <span class="macro">dbg!</span>(i);
             <span class="kw">let </span>expected = <span class="kw">if </span>i &lt;= <span class="number">1 </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot;        &quot;</span>, <span class="string">&quot;◄█═════►&quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄█═════►"</span>]
             } <span class="kw">else if </span>i &lt;= <span class="number">4 </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot;        &quot;</span>, <span class="string">&quot;◄═█════►&quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄═█════►"</span>]
             } <span class="kw">else if </span>i &lt;= <span class="number">7 </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot;        &quot;</span>, <span class="string">&quot;◄══█═══►&quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄══█═══►"</span>]
             } <span class="kw">else if </span>i &lt;= <span class="number">11 </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot;        &quot;</span>, <span class="string">&quot;◄═══█══►&quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄═══█══►"</span>]
             } <span class="kw">else if </span>i &lt;= <span class="number">14 </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot;        &quot;</span>, <span class="string">&quot;◄════█═►&quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄════█═►"</span>]
             } <span class="kw">else </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot;        &quot;</span>, <span class="string">&quot;◄═════█►&quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄═════█►"</span>]
             };
             <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(expected.clone()));
         }
@@ -1960,15 +1961,15 @@
                 .end_symbol(<span class="prelude-val">Some</span>(DOUBLE_HORIZONTAL.end))
                 .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
             <span class="kw">let </span>expected = <span class="kw">if </span>i &lt;= <span class="number">1 </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot;        &quot;</span>, <span class="string">&quot;◄██════►&quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄██════►"</span>]
             } <span class="kw">else if </span>i &lt;= <span class="number">5 </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot;        &quot;</span>, <span class="string">&quot;◄═██═══►&quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄═██═══►"</span>]
             } <span class="kw">else if </span>i &lt;= <span class="number">9 </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot;        &quot;</span>, <span class="string">&quot;◄══██══►&quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄══██══►"</span>]
             } <span class="kw">else if </span>i &lt;= <span class="number">13 </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot;        &quot;</span>, <span class="string">&quot;◄═══██═►&quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄═══██═►"</span>]
             } <span class="kw">else </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot;        &quot;</span>, <span class="string">&quot;◄════██►&quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄════██►"</span>]
             };
             <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(expected.clone()));
         }
@@ -1985,15 +1986,15 @@
                 .end_symbol(<span class="prelude-val">Some</span>(DOUBLE_HORIZONTAL.end))
                 .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
             <span class="kw">let </span>expected = <span class="kw">if </span>i &lt;= <span class="number">1 </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot;◄██════►&quot;</span>, <span class="string">&quot;        &quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">"◄██════►"</span>, <span class="string">"        "</span>]
             } <span class="kw">else if </span>i &lt;= <span class="number">5 </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot;◄═██═══►&quot;</span>, <span class="string">&quot;        &quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">"◄═██═══►"</span>, <span class="string">"        "</span>]
             } <span class="kw">else if </span>i &lt;= <span class="number">9 </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot;◄══██══►&quot;</span>, <span class="string">&quot;        &quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">"◄══██══►"</span>, <span class="string">"        "</span>]
             } <span class="kw">else if </span>i &lt;= <span class="number">13 </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot;◄═══██═►&quot;</span>, <span class="string">&quot;        &quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">"◄═══██═►"</span>, <span class="string">"        "</span>]
             } <span class="kw">else </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot;◄════██►&quot;</span>, <span class="string">&quot;        &quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">"◄════██►"</span>, <span class="string">"        "</span>]
             };
             <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(expected.clone()));
         }
@@ -2010,15 +2011,15 @@
                 .end_symbol(<span class="prelude-val">None</span>)
                 .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
             <span class="kw">let </span>expected = <span class="kw">if </span>i &lt;= <span class="number">1 </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot;        &quot;</span>, <span class="string">&quot;◄███════&quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄███════"</span>]
             } <span class="kw">else if </span>i &lt;= <span class="number">5 </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot;        &quot;</span>, <span class="string">&quot;◄═███═══&quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄═███═══"</span>]
             } <span class="kw">else if </span>i &lt;= <span class="number">9 </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot;        &quot;</span>, <span class="string">&quot;◄══███══&quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄══███══"</span>]
             } <span class="kw">else if </span>i &lt;= <span class="number">13 </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot;        &quot;</span>, <span class="string">&quot;◄═══███═&quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄═══███═"</span>]
             } <span class="kw">else </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot;        &quot;</span>, <span class="string">&quot;◄════███&quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄════███"</span>]
             };
             <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(expected.clone()));
         }
@@ -2034,15 +2035,15 @@
                 .track_symbol(<span class="prelude-val">None</span>)
                 .render(buffer.area, <span class="kw-2">&amp;mut </span>buffer, <span class="kw-2">&amp;mut </span>state);
             <span class="kw">let </span>expected = <span class="kw">if </span>i &lt;= <span class="number">1 </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot;        &quot;</span>, <span class="string">&quot;◄██    ►&quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄██    ►"</span>]
             } <span class="kw">else if </span>i &lt;= <span class="number">5 </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot;        &quot;</span>, <span class="string">&quot;◄ ██   ►&quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄ ██   ►"</span>]
             } <span class="kw">else if </span>i &lt;= <span class="number">9 </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot;        &quot;</span>, <span class="string">&quot;◄  ██  ►&quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄  ██  ►"</span>]
             } <span class="kw">else if </span>i &lt;= <span class="number">13 </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot;        &quot;</span>, <span class="string">&quot;◄   ██ ►&quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄   ██ ►"</span>]
             } <span class="kw">else </span>{
-                <span class="macro">vec!</span>[<span class="string">&quot;        &quot;</span>, <span class="string">&quot;◄    ██►&quot;</span>]
+                <span class="macro">vec!</span>[<span class="string">"        "</span>, <span class="string">"◄    ██►"</span>]
             };
             <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(expected.clone()));
         }

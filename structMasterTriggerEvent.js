@@ -7,6 +7,7 @@ var structMasterTriggerEvent =
     [ "to_string", "structMasterTriggerEvent.html#aabc131f9d53ef6256b235d953f6c3f3b", null ],
     [ "board_mask", "structMasterTriggerEvent.html#a3e2850cccfd9056e60da6512216a7aff", null ],
     [ "broken", "structMasterTriggerEvent.html#a4901de4e4dfafbdc9395d90a0719d3c0", null ],
+    [ "channel_map", "structMasterTriggerEvent.html#a53f023548abd013d74ced49590a488aa", null ],
     [ "crc", "structMasterTriggerEvent.html#ab438df14fccd804df45411f51a85719b", null ],
     [ "event_id", "structMasterTriggerEvent.html#a2fc1e8b3d4f1e769b4bce8a58a166c78", null ],
     [ "hits", "structMasterTriggerEvent.html#aa92539d1bcffb9b8cadf5f909a11d916", null ],

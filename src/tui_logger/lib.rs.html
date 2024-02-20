@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/tui-logger-0.10.1/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tui_logger" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/tui-logger-0.10.1/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tui_logger" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1526,7 +1527,7 @@
 <a href="#1526" id="1526">1526</a>
 <a href="#1527" id="1527">1527</a>
 <a href="#1528" id="1528">1528</a>
-</pre></div><pre class="rust"><code><span class="comment">// Generate README by gawk &#39;substr($0,1,3) == &quot;//!&quot;{print(substr($0,4))}&#39; src/lib.rs
+</pre></div><pre class="rust"><code><span class="comment">// Generate README by gawk 'substr($0,1,3) == "//!"{print(substr($0,4))}' src/lib.rs
 
 </span><span class="doccomment">//! # Logger with smart widget for the `tui` and `ratatui` crate
 //!
@@ -1568,7 +1569,7 @@
 //! - [X] `tracing` support
 //! - [ ] Allow configuration of target dependent loglevel specifically for file logging
 //! - [ ] Avoid duplicating of target, module and filename in every log record
-//! - [ ] Simultaneous modification of all targets&#39; display/hot logging loglevel by key command
+//! - [ ] Simultaneous modification of all targets' display/hot logging loglevel by key command
 //!
 //! ## Smart Widget
 //!
@@ -1592,7 +1593,7 @@
 //!   + Inverted characters (EWIDT) are enabled log levels in the view
 //!   + Normal characters show enabled capturing of a log level per target
 //!   + If any of EWIDT are not shown, then the respective log level is not captured
-//! - Target of the log events can be defined in the log e.g. `warn!(target: &quot;demo&quot;, &quot;Log message&quot;);`
+//! - Target of the log events can be defined in the log e.g. `warn!(target: "demo", "Log message");`
 //!
 //! ## Smart Widget Key Commands
 //! ```ignore
@@ -1615,7 +1616,7 @@
 //! The mapping of key to action has to be done in the application. The respective TuiWidgetEvent
 //! has to be provided to TuiWidgetState::transition().
 //!
-//! Remark to the page mode: The timestamp of the event at event history&#39;s bottom line is used as
+//! Remark to the page mode: The timestamp of the event at event history's bottom line is used as
 //! reference. This means, changing the filters in the EWIDT/focus from the target selector window
 //! should work as expected without jumps in the history. The page next/forward advances as
 //! per visibility of the events.
@@ -1666,7 +1667,7 @@
 //! `tui-logger` provides a TuiSlogDrain which implements `slog::Drain` and will route all records
 //! it receives to the `tui-logger` widget.
 //!
-//! Enabled by feature &quot;slog-support&quot;
+//! Enabled by feature "slog-support"
 //!
 //! ## `tracing-subscriber` support
 //!
@@ -1674,7 +1675,7 @@
 //! `tracing_subscriber::Layer` and will collect all events
 //! it receives to the `tui-logger` widget
 //!
-//! Enabled by feature &quot;tracing-support&quot;
+//! Enabled by feature "tracing-support"
 //!
 //! ## Custom filtering
 //! ```rust
@@ -1742,15 +1743,15 @@
 <span class="kw">use </span>parking_lot::Mutex;
 
 <span class="kw">mod </span>circular;
-<span class="attr">#[cfg(feature = <span class="string">&quot;slog-support&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"slog-support"</span>)]
 </span><span class="kw">mod </span>slog;
-<span class="attr">#[cfg(feature = <span class="string">&quot;tracing-support&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"tracing-support"</span>)]
 </span><span class="kw">mod </span>tracing_subscriber;
 
 <span class="kw">pub use </span><span class="kw">crate</span>::circular::CircularBuffer;
-<span class="attr">#[cfg(feature = <span class="string">&quot;slog-support&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"slog-support"</span>)]
 </span><span class="kw">pub use </span><span class="kw">crate</span>::slog::TuiSlogDrain;
-<span class="attr">#[cfg(feature = <span class="string">&quot;tracing-support&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"tracing-support"</span>)]
 </span><span class="kw">pub use </span><span class="kw">crate</span>::tracing_subscriber::TuiTracingSubscriberLayer;
 
 <span class="kw">struct </span>ExtLogRecord {
@@ -1776,7 +1777,7 @@
 <span class="doccomment">/// LevelConfig stores the relation target-&gt;LevelFilter in a hash table.
 ///
 /// The table supports copying from the logger system LevelConfig to
-/// a widget&#39;s LevelConfig. In order to detect changes, the generation
+/// a widget's LevelConfig. In order to detect changes, the generation
 /// of the hash table is compared with any previous copied table.
 /// On every change the generation is incremented.
 </span><span class="attr">#[derive(Default)]
@@ -1901,11 +1902,11 @@
             </span><span class="kw">let </span>new_log_entry = ExtLogRecord {
                 timestamp: reversed[reversed.len() - <span class="number">1</span>].timestamp,
                 level: Level::Warn,
-                target: <span class="string">&quot;TuiLogger&quot;</span>.to_string(),
-                file: <span class="string">&quot;?&quot;</span>.to_string(),
+                target: <span class="string">"TuiLogger"</span>.to_string(),
+                file: <span class="string">"?"</span>.to_string(),
                 line: <span class="number">0</span>,
                 msg: <span class="macro">format!</span>(
-                    <span class="string">&quot;There have been {} events lost, {} recorded out of {}&quot;</span>,
+                    <span class="string">"There have been {} events lost, {} recorded out of {}"</span>,
                     total - elements,
                     elements,
                     total
@@ -1921,8 +1922,8 @@
             <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref mut </span>file) = tli.dump {
                 <span class="kw">if let </span><span class="prelude-val">Err</span>(_e) = <span class="macro">writeln!</span>(
                     file,
-                    <span class="string">&quot;{}:{}:{}:{}:{}:{}&quot;</span>,
-                    <span class="kw-2">&amp;</span>log_entry.timestamp.format(<span class="string">&quot;[%Y:%m:%d %H:%M:%S]&quot;</span>),
+                    <span class="string">"{}:{}:{}:{}:{}:{}"</span>,
+                    <span class="kw-2">&amp;</span>log_entry.timestamp.format(<span class="string">"[%Y:%m:%d %H:%M:%S]"</span>),
                     log_entry.level,
                     log_entry.target,
                     <span class="kw-2">&amp;</span>log_entry.file,
@@ -1967,12 +1968,12 @@
     log::set_logger(<span class="kw-2">&amp;*</span>TUI_LOGGER)
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;slog-support&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"slog-support"</span>)]
 </span><span class="kw">pub fn </span>slog_drain() -&gt; TuiSlogDrain {
     TuiSlogDrain
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;tracing-support&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"tracing-support"</span>)]
 </span><span class="kw">pub fn </span>tracing_subscriber_layer() -&gt; TuiTracingSubscriberLayer {
     TuiTracingSubscriberLayer
 }
@@ -2020,9 +2021,9 @@
             timestamp: chrono::Local::now(),
             level: record.level(),
             target: record.target().to_string(),
-            file: record.file().unwrap_or(<span class="string">&quot;?&quot;</span>).to_string(),
+            file: record.file().unwrap_or(<span class="string">"?"</span>).to_string(),
             line: record.line().unwrap_or(<span class="number">0</span>),
-            msg: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, record.args()),
+            msg: <span class="macro">format!</span>(<span class="string">"{}"</span>, record.args()),
         };
         <span class="self">self</span>.hot_log.lock().events.push(log_entry);
     }
@@ -2187,8 +2188,8 @@
 
 <span class="doccomment">/// This is the definition for the TuiLoggerTargetWidget,
 /// which allows configuration of the logger system and selection of log messages.
-</span><span class="kw">pub struct </span>TuiLoggerTargetWidget&lt;<span class="lifetime">&#39;b</span>&gt; {
-    block: <span class="prelude-ty">Option</span>&lt;Block&lt;<span class="lifetime">&#39;b</span>&gt;&gt;,
+</span><span class="kw">pub struct </span>TuiLoggerTargetWidget&lt;<span class="lifetime">'b</span>&gt; {
+    block: <span class="prelude-ty">Option</span>&lt;Block&lt;<span class="lifetime">'b</span>&gt;&gt;,
     <span class="doccomment">/// Base style of the widget
     </span>style: Style,
     style_show: Style,
@@ -2198,8 +2199,8 @@
     state: Arc&lt;Mutex&lt;TuiWidgetInnerState&gt;&gt;,
     targets: Vec&lt;String&gt;,
 }
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;b</span>&gt; Default <span class="kw">for </span>TuiLoggerTargetWidget&lt;<span class="lifetime">&#39;b</span>&gt; {
-    <span class="kw">fn </span>default() -&gt; TuiLoggerTargetWidget&lt;<span class="lifetime">&#39;b</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'b</span>&gt; Default <span class="kw">for </span>TuiLoggerTargetWidget&lt;<span class="lifetime">'b</span>&gt; {
+    <span class="kw">fn </span>default() -&gt; TuiLoggerTargetWidget&lt;<span class="lifetime">'b</span>&gt; {
         TUI_LOGGER.move_events();
         TuiLoggerTargetWidget {
             block: <span class="prelude-val">None</span>,
@@ -2213,71 +2214,71 @@
         }
     }
 }
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;b</span>&gt; TuiLoggerTargetWidget&lt;<span class="lifetime">&#39;b</span>&gt; {
-    <span class="kw">pub fn </span>block(<span class="kw-2">mut </span><span class="self">self</span>, block: Block&lt;<span class="lifetime">&#39;b</span>&gt;) -&gt; TuiLoggerTargetWidget&lt;<span class="lifetime">&#39;b</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'b</span>&gt; TuiLoggerTargetWidget&lt;<span class="lifetime">'b</span>&gt; {
+    <span class="kw">pub fn </span>block(<span class="kw-2">mut </span><span class="self">self</span>, block: Block&lt;<span class="lifetime">'b</span>&gt;) -&gt; TuiLoggerTargetWidget&lt;<span class="lifetime">'b</span>&gt; {
         <span class="self">self</span>.block = <span class="prelude-val">Some</span>(block);
         <span class="self">self
     </span>}
-    <span class="kw">fn </span>opt_style(<span class="kw-2">mut </span><span class="self">self</span>, style: <span class="prelude-ty">Option</span>&lt;Style&gt;) -&gt; TuiLoggerTargetWidget&lt;<span class="lifetime">&#39;b</span>&gt; {
+    <span class="kw">fn </span>opt_style(<span class="kw-2">mut </span><span class="self">self</span>, style: <span class="prelude-ty">Option</span>&lt;Style&gt;) -&gt; TuiLoggerTargetWidget&lt;<span class="lifetime">'b</span>&gt; {
         <span class="kw">if let </span><span class="prelude-val">Some</span>(s) = style {
             <span class="self">self</span>.style = s;
         }
         <span class="self">self
     </span>}
-    <span class="kw">fn </span>opt_style_off(<span class="kw-2">mut </span><span class="self">self</span>, style: <span class="prelude-ty">Option</span>&lt;Style&gt;) -&gt; TuiLoggerTargetWidget&lt;<span class="lifetime">&#39;b</span>&gt; {
+    <span class="kw">fn </span>opt_style_off(<span class="kw-2">mut </span><span class="self">self</span>, style: <span class="prelude-ty">Option</span>&lt;Style&gt;) -&gt; TuiLoggerTargetWidget&lt;<span class="lifetime">'b</span>&gt; {
         <span class="kw">if </span>style.is_some() {
             <span class="self">self</span>.style_off = style;
         }
         <span class="self">self
     </span>}
-    <span class="kw">fn </span>opt_style_hide(<span class="kw-2">mut </span><span class="self">self</span>, style: <span class="prelude-ty">Option</span>&lt;Style&gt;) -&gt; TuiLoggerTargetWidget&lt;<span class="lifetime">&#39;b</span>&gt; {
+    <span class="kw">fn </span>opt_style_hide(<span class="kw-2">mut </span><span class="self">self</span>, style: <span class="prelude-ty">Option</span>&lt;Style&gt;) -&gt; TuiLoggerTargetWidget&lt;<span class="lifetime">'b</span>&gt; {
         <span class="kw">if let </span><span class="prelude-val">Some</span>(s) = style {
             <span class="self">self</span>.style_hide = s;
         }
         <span class="self">self
     </span>}
-    <span class="kw">fn </span>opt_style_show(<span class="kw-2">mut </span><span class="self">self</span>, style: <span class="prelude-ty">Option</span>&lt;Style&gt;) -&gt; TuiLoggerTargetWidget&lt;<span class="lifetime">&#39;b</span>&gt; {
+    <span class="kw">fn </span>opt_style_show(<span class="kw-2">mut </span><span class="self">self</span>, style: <span class="prelude-ty">Option</span>&lt;Style&gt;) -&gt; TuiLoggerTargetWidget&lt;<span class="lifetime">'b</span>&gt; {
         <span class="kw">if let </span><span class="prelude-val">Some</span>(s) = style {
             <span class="self">self</span>.style_show = s;
         }
         <span class="self">self
     </span>}
-    <span class="kw">fn </span>opt_highlight_style(<span class="kw-2">mut </span><span class="self">self</span>, style: <span class="prelude-ty">Option</span>&lt;Style&gt;) -&gt; TuiLoggerTargetWidget&lt;<span class="lifetime">&#39;b</span>&gt; {
+    <span class="kw">fn </span>opt_highlight_style(<span class="kw-2">mut </span><span class="self">self</span>, style: <span class="prelude-ty">Option</span>&lt;Style&gt;) -&gt; TuiLoggerTargetWidget&lt;<span class="lifetime">'b</span>&gt; {
         <span class="kw">if let </span><span class="prelude-val">Some</span>(s) = style {
             <span class="self">self</span>.highlight_style = s;
         }
         <span class="self">self
     </span>}
-    <span class="kw">pub fn </span>style(<span class="kw-2">mut </span><span class="self">self</span>, style: Style) -&gt; TuiLoggerTargetWidget&lt;<span class="lifetime">&#39;b</span>&gt; {
+    <span class="kw">pub fn </span>style(<span class="kw-2">mut </span><span class="self">self</span>, style: Style) -&gt; TuiLoggerTargetWidget&lt;<span class="lifetime">'b</span>&gt; {
         <span class="self">self</span>.style = style;
         <span class="self">self
     </span>}
-    <span class="kw">pub fn </span>style_off(<span class="kw-2">mut </span><span class="self">self</span>, style: Style) -&gt; TuiLoggerTargetWidget&lt;<span class="lifetime">&#39;b</span>&gt; {
+    <span class="kw">pub fn </span>style_off(<span class="kw-2">mut </span><span class="self">self</span>, style: Style) -&gt; TuiLoggerTargetWidget&lt;<span class="lifetime">'b</span>&gt; {
         <span class="self">self</span>.style_off = <span class="prelude-val">Some</span>(style);
         <span class="self">self
     </span>}
-    <span class="kw">pub fn </span>style_hide(<span class="kw-2">mut </span><span class="self">self</span>, style: Style) -&gt; TuiLoggerTargetWidget&lt;<span class="lifetime">&#39;b</span>&gt; {
+    <span class="kw">pub fn </span>style_hide(<span class="kw-2">mut </span><span class="self">self</span>, style: Style) -&gt; TuiLoggerTargetWidget&lt;<span class="lifetime">'b</span>&gt; {
         <span class="self">self</span>.style_hide = style;
         <span class="self">self
     </span>}
-    <span class="kw">pub fn </span>style_show(<span class="kw-2">mut </span><span class="self">self</span>, style: Style) -&gt; TuiLoggerTargetWidget&lt;<span class="lifetime">&#39;b</span>&gt; {
+    <span class="kw">pub fn </span>style_show(<span class="kw-2">mut </span><span class="self">self</span>, style: Style) -&gt; TuiLoggerTargetWidget&lt;<span class="lifetime">'b</span>&gt; {
         <span class="self">self</span>.style_show = style;
         <span class="self">self
     </span>}
-    <span class="kw">pub fn </span>highlight_style(<span class="kw-2">mut </span><span class="self">self</span>, style: Style) -&gt; TuiLoggerTargetWidget&lt;<span class="lifetime">&#39;b</span>&gt; {
+    <span class="kw">pub fn </span>highlight_style(<span class="kw-2">mut </span><span class="self">self</span>, style: Style) -&gt; TuiLoggerTargetWidget&lt;<span class="lifetime">'b</span>&gt; {
         <span class="self">self</span>.highlight_style = style;
         <span class="self">self
     </span>}
-    <span class="kw">fn </span>inner_state(<span class="kw-2">mut </span><span class="self">self</span>, state: Arc&lt;Mutex&lt;TuiWidgetInnerState&gt;&gt;) -&gt; TuiLoggerTargetWidget&lt;<span class="lifetime">&#39;b</span>&gt; {
+    <span class="kw">fn </span>inner_state(<span class="kw-2">mut </span><span class="self">self</span>, state: Arc&lt;Mutex&lt;TuiWidgetInnerState&gt;&gt;) -&gt; TuiLoggerTargetWidget&lt;<span class="lifetime">'b</span>&gt; {
         <span class="self">self</span>.state = state;
         <span class="self">self
     </span>}
-    <span class="kw">pub fn </span>state(<span class="kw-2">mut </span><span class="self">self</span>, state: <span class="kw-2">&amp;</span>TuiWidgetState) -&gt; TuiLoggerTargetWidget&lt;<span class="lifetime">&#39;b</span>&gt; {
+    <span class="kw">pub fn </span>state(<span class="kw-2">mut </span><span class="self">self</span>, state: <span class="kw-2">&amp;</span>TuiWidgetState) -&gt; TuiLoggerTargetWidget&lt;<span class="lifetime">'b</span>&gt; {
         <span class="self">self</span>.state = state.inner.clone();
         <span class="self">self
     </span>}
 }
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;b</span>&gt; Widget <span class="kw">for </span>TuiLoggerTargetWidget&lt;<span class="lifetime">&#39;b</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'b</span>&gt; Widget <span class="kw">for </span>TuiLoggerTargetWidget&lt;<span class="lifetime">'b</span>&gt; {
     <span class="kw">fn </span>render(<span class="kw-2">mut </span><span class="self">self</span>, area: Rect, buf: <span class="kw-2">&amp;mut </span>Buffer) {
         buf.set_style(area, <span class="self">self</span>.style);
         <span class="kw">let </span>list_area = <span class="kw">match </span><span class="self">self</span>.block.take() {
@@ -2360,11 +2361,11 @@
                 <span class="kw">let </span>hot_level_filter = hot_targets.get(t).unwrap();
                 <span class="kw">let </span>level_filter = targets.get(t).unwrap();
                 <span class="kw">for </span>(j, sym, lev) <span class="kw">in </span><span class="kw-2">&amp;</span>[
-                    (<span class="number">0</span>, <span class="string">&quot;E&quot;</span>, Level::Error),
-                    (<span class="number">1</span>, <span class="string">&quot;W&quot;</span>, Level::Warn),
-                    (<span class="number">2</span>, <span class="string">&quot;I&quot;</span>, Level::Info),
-                    (<span class="number">3</span>, <span class="string">&quot;D&quot;</span>, Level::Debug),
-                    (<span class="number">4</span>, <span class="string">&quot;T&quot;</span>, Level::Trace),
+                    (<span class="number">0</span>, <span class="string">"E"</span>, Level::Error),
+                    (<span class="number">1</span>, <span class="string">"W"</span>, Level::Warn),
+                    (<span class="number">2</span>, <span class="string">"I"</span>, Level::Info),
+                    (<span class="number">3</span>, <span class="string">"D"</span>, Level::Debug),
+                    (<span class="number">4</span>, <span class="string">"T"</span>, Level::Trace),
                 ] {
                     <span class="kw">let </span>cell = buf.get_mut(la_left + j, la_top + i <span class="kw">as </span>u16);
                     <span class="kw">let </span>cell_style = <span class="kw">if </span><span class="kw-2">*</span>hot_level_filter &gt;= <span class="kw-2">*</span>lev {
@@ -2380,13 +2381,13 @@
                     } <span class="kw">else if let </span><span class="prelude-val">Some</span>(style_off) = <span class="self">self</span>.style_off {
                         style_off
                     } <span class="kw">else </span>{
-                        cell.set_symbol(<span class="string">&quot; &quot;</span>);
+                        cell.set_symbol(<span class="string">" "</span>);
                         <span class="kw">continue</span>;
                     };
                     cell.set_style(cell_style);
                     cell.set_symbol(sym);
                 }
-                buf.set_stringn(la_left + <span class="number">5</span>, la_top + i <span class="kw">as </span>u16, <span class="string">&quot;:&quot;</span>, la_width, <span class="self">self</span>.style);
+                buf.set_stringn(la_left + <span class="number">5</span>, la_top + i <span class="kw">as </span>u16, <span class="string">":"</span>, la_width, <span class="self">self</span>.style);
                 buf.set_stringn(
                     la_left + <span class="number">6</span>,
                     la_top + i <span class="kw">as </span>u16,
@@ -2411,8 +2412,8 @@
     Long,
 }
 
-<span class="kw">pub struct </span>TuiLoggerWidget&lt;<span class="lifetime">&#39;b</span>&gt; {
-    block: <span class="prelude-ty">Option</span>&lt;Block&lt;<span class="lifetime">&#39;b</span>&gt;&gt;,
+<span class="kw">pub struct </span>TuiLoggerWidget&lt;<span class="lifetime">'b</span>&gt; {
+    block: <span class="prelude-ty">Option</span>&lt;Block&lt;<span class="lifetime">'b</span>&gt;&gt;,
     <span class="doccomment">/// Base style of the widget
     </span>style: Style,
     <span class="doccomment">/// Level based style
@@ -2429,8 +2430,8 @@
     format_output_line: bool,
     state: Arc&lt;Mutex&lt;TuiWidgetInnerState&gt;&gt;,
 }
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;b</span>&gt; Default <span class="kw">for </span>TuiLoggerWidget&lt;<span class="lifetime">&#39;b</span>&gt; {
-    <span class="kw">fn </span>default() -&gt; TuiLoggerWidget&lt;<span class="lifetime">&#39;b</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'b</span>&gt; Default <span class="kw">for </span>TuiLoggerWidget&lt;<span class="lifetime">'b</span>&gt; {
+    <span class="kw">fn </span>default() -&gt; TuiLoggerWidget&lt;<span class="lifetime">'b</span>&gt; {
         TUI_LOGGER.move_events();
         TuiLoggerWidget {
             block: <span class="prelude-val">None</span>,
@@ -2440,8 +2441,8 @@
             style_debug: <span class="prelude-val">None</span>,
             style_trace: <span class="prelude-val">None</span>,
             style_info: <span class="prelude-val">None</span>,
-            format_separator: <span class="string">&#39;:&#39;</span>,
-            format_timestamp: <span class="prelude-val">Some</span>(<span class="string">&quot;%H:%M:%S&quot;</span>.to_string()),
+            format_separator: <span class="string">':'</span>,
+            format_timestamp: <span class="prelude-val">Some</span>(<span class="string">"%H:%M:%S"</span>.to_string()),
             format_output_level: <span class="prelude-val">Some</span>(TuiLoggerLevelOutput::Long),
             format_output_target: <span class="bool-val">true</span>,
             format_output_file: <span class="bool-val">true</span>,
@@ -2450,8 +2451,8 @@
         }
     }
 }
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;b</span>&gt; TuiLoggerWidget&lt;<span class="lifetime">&#39;b</span>&gt; {
-    <span class="kw">pub fn </span>block(<span class="kw-2">mut </span><span class="self">self</span>, block: Block&lt;<span class="lifetime">&#39;b</span>&gt;) -&gt; <span class="self">Self </span>{
+<span class="kw">impl</span>&lt;<span class="lifetime">'b</span>&gt; TuiLoggerWidget&lt;<span class="lifetime">'b</span>&gt; {
+    <span class="kw">pub fn </span>block(<span class="kw-2">mut </span><span class="self">self</span>, block: Block&lt;<span class="lifetime">'b</span>&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.block = <span class="prelude-val">Some</span>(block);
         <span class="self">self
     </span>}
@@ -2522,7 +2523,7 @@
         <span class="self">self
     </span>}
     <span class="doccomment">/// Separator character between field.
-    /// Default is &#39;:&#39;
+    /// Default is ':'
     </span><span class="kw">pub fn </span>output_separator(<span class="kw-2">mut </span><span class="self">self</span>, sep: char) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.format_separator = sep;
         <span class="self">self
@@ -2610,14 +2611,14 @@
     <span class="kw">fn </span>format_event(<span class="kw-2">&amp;</span><span class="self">self</span>, evt: <span class="kw-2">&amp;</span>ExtLogRecord) -&gt; (String, <span class="prelude-ty">Option</span>&lt;Style&gt;) {
         <span class="kw">let </span><span class="kw-2">mut </span>output = String::new();
         <span class="kw">let </span>(col_style, lev_long, lev_abbr, with_loc) = <span class="kw">match </span>evt.level {
-            log::Level::Error =&gt; (<span class="self">self</span>.style_error, <span class="string">&quot;ERROR&quot;</span>, <span class="string">&quot;E&quot;</span>, <span class="bool-val">true</span>),
-            log::Level::Warn =&gt; (<span class="self">self</span>.style_warn, <span class="string">&quot;WARN &quot;</span>, <span class="string">&quot;W&quot;</span>, <span class="bool-val">true</span>),
-            log::Level::Info =&gt; (<span class="self">self</span>.style_info, <span class="string">&quot;INFO &quot;</span>, <span class="string">&quot;I&quot;</span>, <span class="bool-val">false</span>),
-            log::Level::Debug =&gt; (<span class="self">self</span>.style_debug, <span class="string">&quot;DEBUG&quot;</span>, <span class="string">&quot;D&quot;</span>, <span class="bool-val">true</span>),
-            log::Level::Trace =&gt; (<span class="self">self</span>.style_trace, <span class="string">&quot;TRACE&quot;</span>, <span class="string">&quot;T&quot;</span>, <span class="bool-val">true</span>),
+            log::Level::Error =&gt; (<span class="self">self</span>.style_error, <span class="string">"ERROR"</span>, <span class="string">"E"</span>, <span class="bool-val">true</span>),
+            log::Level::Warn =&gt; (<span class="self">self</span>.style_warn, <span class="string">"WARN "</span>, <span class="string">"W"</span>, <span class="bool-val">true</span>),
+            log::Level::Info =&gt; (<span class="self">self</span>.style_info, <span class="string">"INFO "</span>, <span class="string">"I"</span>, <span class="bool-val">false</span>),
+            log::Level::Debug =&gt; (<span class="self">self</span>.style_debug, <span class="string">"DEBUG"</span>, <span class="string">"D"</span>, <span class="bool-val">true</span>),
+            log::Level::Trace =&gt; (<span class="self">self</span>.style_trace, <span class="string">"TRACE"</span>, <span class="string">"T"</span>, <span class="bool-val">true</span>),
         };
         <span class="kw">if let </span><span class="prelude-val">Some</span>(fmt) = <span class="self">self</span>.format_timestamp.as_ref() {
-            output.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, evt.timestamp.format(fmt)));
+            output.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"{}"</span>, evt.timestamp.format(fmt)));
             output.push(<span class="self">self</span>.format_separator);
         }
         <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.format_output_level {
@@ -2641,14 +2642,14 @@
                 output.push(<span class="self">self</span>.format_separator);
             }
             <span class="kw">if </span><span class="self">self</span>.format_output_line {
-                output.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, evt.line));
+                output.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"{}"</span>, evt.line));
                 output.push(<span class="self">self</span>.format_separator);
             }
         }
         (output, col_style)
     }
 }
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;b</span>&gt; Widget <span class="kw">for </span>TuiLoggerWidget&lt;<span class="lifetime">&#39;b</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'b</span>&gt; Widget <span class="kw">for </span>TuiLoggerWidget&lt;<span class="lifetime">'b</span>&gt; {
     <span class="kw">fn </span>render(<span class="kw-2">mut </span><span class="self">self</span>, area: Rect, buf: <span class="kw-2">&amp;mut </span>Buffer) {
         buf.set_style(area, <span class="self">self</span>.style);
         <span class="kw">let </span>list_area = <span class="kw">match </span><span class="self">self</span>.block.take() {
@@ -2763,9 +2764,9 @@
 /// into a nice combo, where the TuiLoggerTargetWidget can be shown/hidden.
 ///
 /// In the title the number of logging messages/s in the whole buffer is shown.
-</span><span class="kw">pub struct </span>TuiLoggerSmartWidget&lt;<span class="lifetime">&#39;a</span>&gt; {
-    title_log: Line&lt;<span class="lifetime">&#39;a</span>&gt;,
-    title_target: Line&lt;<span class="lifetime">&#39;a</span>&gt;,
+</span><span class="kw">pub struct </span>TuiLoggerSmartWidget&lt;<span class="lifetime">'a</span>&gt; {
+    title_log: Line&lt;<span class="lifetime">'a</span>&gt;,
+    title_target: Line&lt;<span class="lifetime">'a</span>&gt;,
     style: <span class="prelude-ty">Option</span>&lt;Style&gt;,
     border_style: Style,
     border_type: BorderType,
@@ -2786,12 +2787,12 @@
     format_output_line: <span class="prelude-ty">Option</span>&lt;bool&gt;,
     state: Arc&lt;Mutex&lt;TuiWidgetInnerState&gt;&gt;,
 }
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Default <span class="kw">for </span>TuiLoggerSmartWidget&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Default <span class="kw">for </span>TuiLoggerSmartWidget&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
         TUI_LOGGER.move_events();
         TuiLoggerSmartWidget {
-            title_log: Line::from(<span class="string">&quot;Tui Log&quot;</span>),
-            title_target: Line::from(<span class="string">&quot;Tui Target Selector&quot;</span>),
+            title_log: Line::from(<span class="string">"Tui Log"</span>),
+            title_target: Line::from(<span class="string">"Tui Target Selector"</span>),
             style: <span class="prelude-val">None</span>,
             border_style: Style::default(),
             border_type: BorderType::Plain,
@@ -2814,7 +2815,7 @@
         }
     }
 }
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; TuiLoggerSmartWidget&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; TuiLoggerSmartWidget&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">pub fn </span>highlight_style(<span class="kw-2">mut </span><span class="self">self</span>, style: Style) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.highlight_style = <span class="prelude-val">Some</span>(style);
         <span class="self">self
@@ -2864,7 +2865,7 @@
         <span class="self">self
     </span>}
     <span class="doccomment">/// Separator character between field.
-    /// Default is &#39;:&#39;
+    /// Default is ':'
     </span><span class="kw">pub fn </span>output_separator(<span class="kw-2">mut </span><span class="self">self</span>, sep: char) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.format_separator = <span class="prelude-val">Some</span>(sep);
         <span class="self">self
@@ -2913,14 +2914,14 @@
     </span>}
     <span class="kw">pub fn </span>title_target&lt;T&gt;(<span class="kw-2">mut </span><span class="self">self</span>, title: T) -&gt; <span class="self">Self
     </span><span class="kw">where
-        </span>T: Into&lt;Line&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+        </span>T: Into&lt;Line&lt;<span class="lifetime">'a</span>&gt;&gt;,
     {
         <span class="self">self</span>.title_target = title.into();
         <span class="self">self
     </span>}
     <span class="kw">pub fn </span>title_log&lt;T&gt;(<span class="kw-2">mut </span><span class="self">self</span>, title: T) -&gt; <span class="self">Self
     </span><span class="kw">where
-        </span>T: Into&lt;Line&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+        </span>T: Into&lt;Line&lt;<span class="lifetime">'a</span>&gt;&gt;,
     {
         <span class="self">self</span>.title_log = title.into();
         <span class="self">self
@@ -2930,7 +2931,7 @@
         <span class="self">self
     </span>}
 }
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Widget <span class="kw">for </span>TuiLoggerSmartWidget&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Widget <span class="kw">for </span>TuiLoggerSmartWidget&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Nothing to draw for combo widget
     </span><span class="kw">fn </span>render(<span class="self">self</span>, area: Rect, buf: <span class="kw-2">&amp;mut </span>Buffer) {
         <span class="kw">let </span>entries_s = {
@@ -2964,7 +2965,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>title_log = <span class="self">self</span>.title_log.clone();
         title_log
             .spans
-            .push(<span class="macro">format!</span>(<span class="string">&quot; [log={:.1}/s]&quot;</span>, entries_s).into());
+            .push(<span class="macro">format!</span>(<span class="string">" [log={:.1}/s]"</span>, entries_s).into());
 
         <span class="kw">let </span>hide_target = <span class="self">self</span>.state.lock().hide_target;
         <span class="kw">if </span>hide_target {

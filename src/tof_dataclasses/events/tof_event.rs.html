@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/events/tof_event.rs`."><title>tof_event.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/events/tof_event.rs`."><title>tof_event.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -553,7 +554,7 @@
 //!
 //! Compressed format containing analysis results of 
 //! the waveforms for individual paddles.
-//! Each paddle has a &quot;paddle packet&quot;
+//! Each paddle has a "paddle packet"
 //!
 //!
 
@@ -561,7 +562,7 @@
 <span class="kw">use </span>std::fmt;
 
 <span class="macro">cfg_if::cfg_if! </span>{
-  <span class="kw">if </span><span class="attr">#[cfg(feature = <span class="string">&quot;random&quot;</span>)]  </span>{
+  <span class="kw">if </span><span class="attr">#[cfg(feature = <span class="string">"random"</span>)]  </span>{
     <span class="kw">use </span><span class="kw">crate</span>::FromRandom;
     <span class="kw">use </span>rand::Rng;
   }
@@ -589,8 +590,8 @@
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>CompressionLevel {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
     <span class="kw">let </span>r = serde_json::to_string(<span class="self">self</span>).unwrap_or(
-      String::from(<span class="string">&quot;Error: cannot unwrap this CompressionLevel&quot;</span>));
-    <span class="macro">write!</span>(f, <span class="string">&quot;&lt;CompressionLevel: {}&gt;&quot;</span>, r)
+      String::from(<span class="string">"Error: cannot unwrap this CompressionLevel"</span>));
+    <span class="macro">write!</span>(f, <span class="string">"&lt;CompressionLevel: {}&gt;"</span>, r)
   }
 }
 
@@ -617,8 +618,8 @@
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>EventQuality {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
     <span class="kw">let </span>r = serde_json::to_string(<span class="self">self</span>).unwrap_or(
-      String::from(<span class="string">&quot;Error: cannot unwrap this EventQuality&quot;</span>));
-    <span class="macro">write!</span>(f, <span class="string">&quot;&lt;EventQuality: {}&gt;&quot;</span>, r)
+      String::from(<span class="string">"Error: cannot unwrap this EventQuality"</span>));
+    <span class="macro">write!</span>(f, <span class="string">"&lt;EventQuality: {}&gt;"</span>, r)
   }
 }
 
@@ -647,7 +648,7 @@
   <span class="kw">pub </span>rb_events         : Vec::&lt;RBEvent&gt;,
   <span class="kw">pub </span>missing_hits      : Vec::&lt;RBMissingHit&gt;, 
   
-  <span class="comment">// won&#39;t get serialized
+  <span class="comment">// won't get serialized
   </span><span class="kw">pub </span>creation_time     : Instant,
   <span class="kw">pub </span>valid             : bool, 
 }
@@ -655,12 +656,12 @@
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>TofEvent {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
     <span class="macro">write!</span>(f, 
-<span class="string">&quot;&lt;TofEvent:
+<span class="string">"&lt;TofEvent:
      quality        :  {}
      {} 
      {}
      n RBEvents      : {}
-     n RBMissingHit  : {} &gt;&quot;
+     n RBMissingHit  : {} &gt;"
             </span>,<span class="self">self</span>.quality,
             <span class="self">self</span>.header,
             <span class="self">self</span>.mt_event,
@@ -777,7 +778,7 @@
     <span class="kw">let </span>v_sizes = <span class="self">Self</span>::decode_size_header(<span class="kw-2">&amp;</span>parse_u32(stream, pos));
     <span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..v_sizes.<span class="number">0 </span>{
       <span class="kw">match </span>RBEvent::from_bytestream(stream, pos) {
-        <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Expected RBEvent {} of {}, but got serialization error {}!&quot;</span>, k,  v_sizes.<span class="number">0</span>, err),
+        <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Expected RBEvent {} of {}, but got serialization error {}!"</span>, k,  v_sizes.<span class="number">0</span>, err),
         <span class="prelude-val">Ok</span>(ev) =&gt; {
           event.rb_events.push(ev);
         }
@@ -785,7 +786,7 @@
     }
     <span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..v_sizes.<span class="number">1 </span>{
       <span class="kw">match </span>RBMissingHit::from_bytestream(stream, pos) {
-        <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Expected RBMissingHit {} of {}, but got serialization error {}!&quot;</span>, k,  v_sizes.<span class="number">1</span>, err),
+        <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Expected RBMissingHit {} of {}, but got serialization error {}!"</span>, k,  v_sizes.<span class="number">1</span>, err),
         <span class="prelude-val">Ok</span>(miss) =&gt; {
           event.missing_hits.push(miss);
         }
@@ -793,13 +794,13 @@
     }
     <span class="kw">let </span>tail = parse_u16(stream, pos);
     <span class="kw">if </span>tail != <span class="self">Self</span>::TAIL {
-      <span class="macro">error!</span>(<span class="string">&quot;Decoding of TAIL failed! Got {} instead!&quot;</span>, tail);
+      <span class="macro">error!</span>(<span class="string">"Decoding of TAIL failed! Got {} instead!"</span>, tail);
     }
     <span class="prelude-val">Ok</span>(event)
   }
 }
 
-<span class="attr">#[cfg(feature=<span class="string">&quot;random&quot;</span>)]
+<span class="attr">#[cfg(feature=<span class="string">"random"</span>)]
 </span><span class="kw">impl </span>FromRandom <span class="kw">for </span>TofEvent {
 
   <span class="kw">fn </span>from_random() -&gt; <span class="self">Self </span>{
@@ -867,7 +868,7 @@
   // that for de/serialization, 
   // we need to know the length 
   // of the expected bytestream.
-  </span><span class="kw">pub </span>n_paddles           : u8, <span class="comment">// we don&#39;t have more than 
+  </span><span class="kw">pub </span>n_paddles           : u8, <span class="comment">// we don't have more than 
                                // 256 paddles.
 </span>}
 
@@ -932,7 +933,7 @@
 
 <span class="kw">impl </span>TofEventHeader {
   
-  <span class="kw">pub const </span>VERSION            : <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;1.1&quot;</span>;
+  <span class="kw">pub const </span>VERSION            : <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str = <span class="string">"1.1"</span>;
   
   <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
     <span class="self">Self </span>{
@@ -977,28 +978,28 @@
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>TofEventHeader {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
-  <span class="kw">let </span><span class="kw-2">mut </span>repr = String::from(<span class="string">&quot;&lt;TofEventHeader&quot;</span>); 
-  repr += <span class="kw-2">&amp;</span>(<span class="string">&quot;\n  Run   ID          : &quot;</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.run_id              .to_string());
-  repr += <span class="kw-2">&amp;</span>(<span class="string">&quot;\n  Event ID          : &quot;</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.event_id            .to_string());
-  repr += <span class="kw-2">&amp;</span>(<span class="string">&quot;\n  Timestamp 32      : &quot;</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.timestamp_32        .to_string());
-  repr += <span class="kw-2">&amp;</span>(<span class="string">&quot;\n  Timestamp 16      : &quot;</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.timestamp_16        .to_string());
-  repr += <span class="kw-2">&amp;</span>(<span class="string">&quot;\n  Prim. Beta        : &quot;</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_beta        .to_string());
-  repr += <span class="kw-2">&amp;</span>(<span class="string">&quot;\n  Prim. Beta Unc    : &quot;</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_beta_unc    .to_string());
-  repr += <span class="kw-2">&amp;</span>(<span class="string">&quot;\n  Prim. Charge      : &quot;</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_charge      .to_string());
-  repr += <span class="kw-2">&amp;</span>(<span class="string">&quot;\n  Prim. Charge unc  : &quot;</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_charge_unc  .to_string());
-  repr += <span class="kw-2">&amp;</span>(<span class="string">&quot;\n  Prim. Outer Tof X : &quot;</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_outer_tof_x .to_string());
-  repr += <span class="kw-2">&amp;</span>(<span class="string">&quot;\n  Prim. Outer Tof Y : &quot;</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_outer_tof_y .to_string());
-  repr += <span class="kw-2">&amp;</span>(<span class="string">&quot;\n  Prim. Outer Tof Z : &quot;</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_outer_tof_z .to_string());
-  repr += <span class="kw-2">&amp;</span>(<span class="string">&quot;\n  Prim. Inner Tof X : &quot;</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_inner_tof_x .to_string());
-  repr += <span class="kw-2">&amp;</span>(<span class="string">&quot;\n  Prim. Inner Tof Y : &quot;</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_inner_tof_y .to_string());
-  repr += <span class="kw-2">&amp;</span>(<span class="string">&quot;\n  Prim. Inner Tof Z : &quot;</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_inner_tof_z .to_string());
-  repr += <span class="kw-2">&amp;</span>(<span class="string">&quot;\n  NHit  Outer Tof   : &quot;</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.nhit_outer_tof      .to_string());
-  repr += <span class="kw-2">&amp;</span>(<span class="string">&quot;\n  NHit  Inner Tof   : &quot;</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.nhit_inner_tof      .to_string());
-  repr += <span class="kw-2">&amp;</span>(<span class="string">&quot;\n  TriggerInfo       : &quot;</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.trigger_info        .to_string());
-  repr += <span class="kw-2">&amp;</span>(<span class="string">&quot;\n  Ctr ETX           : &quot;</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.ctr_etx             .to_string());
-  repr += <span class="kw-2">&amp;</span>(<span class="string">&quot;\n  NPaddles          : &quot;</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.n_paddles           .to_string());
-  repr += <span class="string">&quot;&gt;&quot;</span>;
-  <span class="macro">write!</span>(f,<span class="string">&quot;{}&quot;</span>, repr)
+  <span class="kw">let </span><span class="kw-2">mut </span>repr = String::from(<span class="string">"&lt;TofEventHeader"</span>); 
+  repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Run   ID          : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.run_id              .to_string());
+  repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Event ID          : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.event_id            .to_string());
+  repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Timestamp 32      : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.timestamp_32        .to_string());
+  repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Timestamp 16      : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.timestamp_16        .to_string());
+  repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Prim. Beta        : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_beta        .to_string());
+  repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Prim. Beta Unc    : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_beta_unc    .to_string());
+  repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Prim. Charge      : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_charge      .to_string());
+  repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Prim. Charge unc  : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_charge_unc  .to_string());
+  repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Prim. Outer Tof X : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_outer_tof_x .to_string());
+  repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Prim. Outer Tof Y : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_outer_tof_y .to_string());
+  repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Prim. Outer Tof Z : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_outer_tof_z .to_string());
+  repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Prim. Inner Tof X : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_inner_tof_x .to_string());
+  repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Prim. Inner Tof Y : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_inner_tof_y .to_string());
+  repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Prim. Inner Tof Z : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.primary_inner_tof_z .to_string());
+  repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  NHit  Outer Tof   : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.nhit_outer_tof      .to_string());
+  repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  NHit  Inner Tof   : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.nhit_inner_tof      .to_string());
+  repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  TriggerInfo       : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.trigger_info        .to_string());
+  repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  Ctr ETX           : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.ctr_etx             .to_string());
+  repr += <span class="kw-2">&amp;</span>(<span class="string">"\n  NPaddles          : "</span>.to_owned() + <span class="kw-2">&amp;</span><span class="self">self</span>.n_paddles           .to_string());
+  repr += <span class="string">"&gt;"</span>;
+  <span class="macro">write!</span>(f,<span class="string">"{}"</span>, repr)
   <span class="comment">//run_id       : u32,
   //event_id     : u32,
   //timestamp_32 : u32,
@@ -1017,11 +1018,11 @@
   //nhit_inner_tof       : u8, 
   //trigger_info         : u8,
   //ctr_etx              : u8,
-  //n_paddles           : u8, // we don&#39;t have more than 
+  //n_paddles           : u8, // we don't have more than 
   </span>}
 }
 
-<span class="attr">#[cfg(feature=<span class="string">&quot;random&quot;</span>)]
+<span class="attr">#[cfg(feature=<span class="string">"random"</span>)]
 </span><span class="kw">impl </span>FromRandom <span class="kw">for </span>TofEventHeader {
 
   <span class="kw">fn </span>from_random() -&gt; <span class="self">Self </span>{
@@ -1056,7 +1057,7 @@
 //
 // ============================================
 
-</span><span class="attr">#[cfg(all(test,feature = <span class="string">&quot;random&quot;</span>))]
+</span><span class="attr">#[cfg(all(test,feature = <span class="string">"random"</span>))]
 </span><span class="kw">mod </span>test_tofevents {
   <span class="kw">use </span><span class="kw">crate</span>::serialization::Serialization;
   <span class="kw">use </span><span class="kw">crate</span>::FromRandom;
@@ -1095,7 +1096,7 @@
       <span class="macro">assert_eq!</span>(data.missing_hits, test.missing_hits);
       <span class="macro">assert_eq!</span>(data.rb_events, test.rb_events);
       <span class="comment">//assert_eq!(data, test);
-      //println!(&quot;{}&quot;, data);
+      //println!("{}", data);
     </span>}
   }
 }

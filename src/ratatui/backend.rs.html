@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.25.0/src/backend.rs`."><title>backend.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.25.0/src/backend.rs`."><title>backend.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><a class="sub-logo-container" href="../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -393,7 +394,7 @@
 //! terminal-based games, and more.
 //!
 //! Each backend handles raw mode differently, so the behavior may vary depending on the backend
-//! being used. Be sure to consult the backend&#39;s specific documentation for exact details on how it
+//! being used. Be sure to consult the backend's specific documentation for exact details on how it
 //! implements raw mode.
 
 //! # Alternate Screen
@@ -412,7 +413,7 @@
 //!
 //! Note that not all terminal emulators support the alternate screen, and even those that do may
 //! handle it differently. As a result, the behavior may vary depending on the backend being used.
-//! Always consult the specific backend&#39;s documentation to understand how it implements the
+//! Always consult the specific backend's documentation to understand how it implements the
 //! alternate screen.
 //!
 //! # Mouse Capture
@@ -420,13 +421,13 @@
 //! Mouse capture is a mode where the terminal captures mouse events such as clicks, scrolls, and
 //! movement, and sends them to the application as special sequences or events. This enables the
 //! application to handle and respond to mouse actions, providing a more interactive and graphical
-//! user experience within the terminal. It&#39;s particularly useful for applications like
+//! user experience within the terminal. It's particularly useful for applications like
 //! terminal-based games, text editors, or other programs that require more direct interaction from
 //! the user.
 //!
 //! Each backend handles mouse capture differently, with variations in the types of events that can
 //! be captured and how they are represented. As such, the behavior may vary depending on the
-//! backend being used, and developers should consult the specific backend&#39;s documentation to
+//! backend being used, and developers should consult the specific backend's documentation to
 //! understand how it implements mouse capture.
 //!
 //! [`TermionBackend`]: termion/struct.TermionBackend.html
@@ -445,19 +446,19 @@
 
 <span class="kw">use crate</span>::{buffer::Cell, layout::Size, prelude::Rect};
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;termion&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"termion"</span>)]
 </span><span class="kw">mod </span>termion;
-<span class="attr">#[cfg(feature = <span class="string">&quot;termion&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"termion"</span>)]
 </span><span class="kw">pub use </span><span class="self">self</span>::termion::TermionBackend;
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;crossterm&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"crossterm"</span>)]
 </span><span class="kw">mod </span>crossterm;
-<span class="attr">#[cfg(feature = <span class="string">&quot;crossterm&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"crossterm"</span>)]
 </span><span class="kw">pub use </span><span class="self">self</span>::crossterm::CrosstermBackend;
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;termwiz&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"termwiz"</span>)]
 </span><span class="kw">mod </span>termwiz;
-<span class="attr">#[cfg(feature = <span class="string">&quot;termwiz&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"termwiz"</span>)]
 </span><span class="kw">pub use </span><span class="self">self</span>::termwiz::TermwizBackend;
 
 <span class="kw">mod </span>test;
@@ -487,8 +488,8 @@
     <span class="doccomment">/// Size of the window in pixels.
     ///
     /// The `pixels` fields may not be implemented by all terminals and return `0,0`. See
-    /// &lt;https://man7.org/linux/man-pages/man4/tty_ioctl.4.html&gt; under section &quot;Get and set window
-    /// size&quot; / TIOCGWINSZ where the fields are commented as &quot;unused&quot;.
+    /// &lt;https://man7.org/linux/man-pages/man4/tty_ioctl.4.html&gt; under section "Get and set window
+    /// size" / TIOCGWINSZ where the fields are commented as "unused".
     </span><span class="kw">pub </span>pixels: Size,
 }
 
@@ -505,9 +506,9 @@
     /// The content is provided as an iterator over `(u16, u16, &amp;Cell)` tuples, where the first two
     /// elements represent the x and y coordinates, and the third element is a reference to the
     /// [`Cell`] to be drawn.
-    </span><span class="kw">fn </span>draw&lt;<span class="lifetime">&#39;a</span>, I&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: I) -&gt; io::Result&lt;()&gt;
+    </span><span class="kw">fn </span>draw&lt;<span class="lifetime">'a</span>, I&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: I) -&gt; io::Result&lt;()&gt;
     <span class="kw">where
-        </span>I: Iterator&lt;Item = (u16, u16, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Cell)&gt;;
+        </span>I: Iterator&lt;Item = (u16, u16, <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Cell)&gt;;
 
     <span class="doccomment">/// Insert `n` line breaks to the terminal screen.
     ///
@@ -609,7 +610,7 @@
             | ClearType::CurrentLine
             | ClearType::UntilNewLine =&gt; <span class="prelude-val">Err</span>(io::Error::new(
                 io::ErrorKind::Other,
-                <span class="macro">format!</span>(<span class="string">&quot;clear_type [{clear_type:?}] not supported with this backend&quot;</span>),
+                <span class="macro">format!</span>(<span class="string">"clear_type [{clear_type:?}] not supported with this backend"</span>),
             )),
         }
     }
@@ -647,33 +648,33 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>clear_type_tostring() {
-        <span class="macro">assert_eq!</span>(ClearType::All.to_string(), <span class="string">&quot;All&quot;</span>);
-        <span class="macro">assert_eq!</span>(ClearType::AfterCursor.to_string(), <span class="string">&quot;AfterCursor&quot;</span>);
-        <span class="macro">assert_eq!</span>(ClearType::BeforeCursor.to_string(), <span class="string">&quot;BeforeCursor&quot;</span>);
-        <span class="macro">assert_eq!</span>(ClearType::CurrentLine.to_string(), <span class="string">&quot;CurrentLine&quot;</span>);
-        <span class="macro">assert_eq!</span>(ClearType::UntilNewLine.to_string(), <span class="string">&quot;UntilNewLine&quot;</span>);
+        <span class="macro">assert_eq!</span>(ClearType::All.to_string(), <span class="string">"All"</span>);
+        <span class="macro">assert_eq!</span>(ClearType::AfterCursor.to_string(), <span class="string">"AfterCursor"</span>);
+        <span class="macro">assert_eq!</span>(ClearType::BeforeCursor.to_string(), <span class="string">"BeforeCursor"</span>);
+        <span class="macro">assert_eq!</span>(ClearType::CurrentLine.to_string(), <span class="string">"CurrentLine"</span>);
+        <span class="macro">assert_eq!</span>(ClearType::UntilNewLine.to_string(), <span class="string">"UntilNewLine"</span>);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>clear_type_from_str() {
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;All&quot;</span>.parse::&lt;ClearType&gt;(), <span class="prelude-val">Ok</span>(ClearType::All));
+        <span class="macro">assert_eq!</span>(<span class="string">"All"</span>.parse::&lt;ClearType&gt;(), <span class="prelude-val">Ok</span>(ClearType::All));
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;AfterCursor&quot;</span>.parse::&lt;ClearType&gt;(),
+            <span class="string">"AfterCursor"</span>.parse::&lt;ClearType&gt;(),
             <span class="prelude-val">Ok</span>(ClearType::AfterCursor)
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;BeforeCursor&quot;</span>.parse::&lt;ClearType&gt;(),
+            <span class="string">"BeforeCursor"</span>.parse::&lt;ClearType&gt;(),
             <span class="prelude-val">Ok</span>(ClearType::BeforeCursor)
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;CurrentLine&quot;</span>.parse::&lt;ClearType&gt;(),
+            <span class="string">"CurrentLine"</span>.parse::&lt;ClearType&gt;(),
             <span class="prelude-val">Ok</span>(ClearType::CurrentLine)
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;UntilNewLine&quot;</span>.parse::&lt;ClearType&gt;(),
+            <span class="string">"UntilNewLine"</span>.parse::&lt;ClearType&gt;(),
             <span class="prelude-val">Ok</span>(ClearType::UntilNewLine)
         );
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;&quot;</span>.parse::&lt;ClearType&gt;(), <span class="prelude-val">Err</span>(ParseError::VariantNotFound));
+        <span class="macro">assert_eq!</span>(<span class="string">""</span>.parse::&lt;ClearType&gt;(), <span class="prelude-val">Err</span>(ParseError::VariantNotFound));
     }
 }
 </code></pre></div></section></main></body></html>

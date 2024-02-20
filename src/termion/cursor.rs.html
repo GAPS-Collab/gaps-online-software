@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/termion-2.0.3/src/cursor.rs`."><title>cursor.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="termion" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/termion-2.0.3/src/cursor.rs`."><title>cursor.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="termion" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -237,18 +238,18 @@
 <span class="kw">use </span>raw::CONTROL_SEQUENCE_TIMEOUT;
 <span class="kw">use </span>numtoa::NumToA;
 
-<span class="macro">derive_csi_sequence!</span>(<span class="string">&quot;Hide the cursor.&quot;</span>, Hide, <span class="string">&quot;?25l&quot;</span>);
-<span class="macro">derive_csi_sequence!</span>(<span class="string">&quot;Show the cursor.&quot;</span>, Show, <span class="string">&quot;?25h&quot;</span>);
+<span class="macro">derive_csi_sequence!</span>(<span class="string">"Hide the cursor."</span>, Hide, <span class="string">"?25l"</span>);
+<span class="macro">derive_csi_sequence!</span>(<span class="string">"Show the cursor."</span>, Show, <span class="string">"?25h"</span>);
 
-<span class="macro">derive_csi_sequence!</span>(<span class="string">&quot;Restore the cursor.&quot;</span>, Restore, <span class="string">&quot;u&quot;</span>);
-<span class="macro">derive_csi_sequence!</span>(<span class="string">&quot;Save the cursor.&quot;</span>, Save, <span class="string">&quot;s&quot;</span>);
+<span class="macro">derive_csi_sequence!</span>(<span class="string">"Restore the cursor."</span>, Restore, <span class="string">"u"</span>);
+<span class="macro">derive_csi_sequence!</span>(<span class="string">"Save the cursor."</span>, Save, <span class="string">"s"</span>);
 
-<span class="macro">derive_csi_sequence!</span>(<span class="string">&quot;Change the cursor style to blinking block&quot;</span>, BlinkingBlock, <span class="string">&quot;\x31 q&quot;</span>);
-<span class="macro">derive_csi_sequence!</span>(<span class="string">&quot;Change the cursor style to steady block&quot;</span>, SteadyBlock, <span class="string">&quot;\x32 q&quot;</span>);
-<span class="macro">derive_csi_sequence!</span>(<span class="string">&quot;Change the cursor style to blinking underline&quot;</span>, BlinkingUnderline, <span class="string">&quot;\x33 q&quot;</span>);
-<span class="macro">derive_csi_sequence!</span>(<span class="string">&quot;Change the cursor style to steady underline&quot;</span>, SteadyUnderline, <span class="string">&quot;\x34 q&quot;</span>);
-<span class="macro">derive_csi_sequence!</span>(<span class="string">&quot;Change the cursor style to blinking bar&quot;</span>, BlinkingBar, <span class="string">&quot;\x35 q&quot;</span>);
-<span class="macro">derive_csi_sequence!</span>(<span class="string">&quot;Change the cursor style to steady bar&quot;</span>, SteadyBar, <span class="string">&quot;\x36 q&quot;</span>);
+<span class="macro">derive_csi_sequence!</span>(<span class="string">"Change the cursor style to blinking block"</span>, BlinkingBlock, <span class="string">"\x31 q"</span>);
+<span class="macro">derive_csi_sequence!</span>(<span class="string">"Change the cursor style to steady block"</span>, SteadyBlock, <span class="string">"\x32 q"</span>);
+<span class="macro">derive_csi_sequence!</span>(<span class="string">"Change the cursor style to blinking underline"</span>, BlinkingUnderline, <span class="string">"\x33 q"</span>);
+<span class="macro">derive_csi_sequence!</span>(<span class="string">"Change the cursor style to steady underline"</span>, SteadyUnderline, <span class="string">"\x34 q"</span>);
+<span class="macro">derive_csi_sequence!</span>(<span class="string">"Change the cursor style to blinking bar"</span>, BlinkingBar, <span class="string">"\x35 q"</span>);
+<span class="macro">derive_csi_sequence!</span>(<span class="string">"Change the cursor style to steady bar"</span>, SteadyBar, <span class="string">"\x36 q"</span>);
 
 <span class="doccomment">/// Goto some position ((1,1)-based).
 ///
@@ -264,7 +265,7 @@
 /// extern crate termion;
 ///
 /// fn main() {
-///     print!(&quot;{}{}Stuff&quot;, termion::clear::All, termion::cursor::Goto(5, 3));
+///     print!("{}{}Stuff", termion::clear::All, termion::cursor::Goto(5, 3));
 /// }
 /// ```
 </span><span class="attr">#[derive(Copy, Clone, PartialEq, Eq)]
@@ -273,7 +274,7 @@
 <span class="kw">impl </span>From&lt;Goto&gt; <span class="kw">for </span>String {
     <span class="kw">fn </span>from(this: Goto) -&gt; String {
         <span class="kw">let </span>(<span class="kw-2">mut </span>x, <span class="kw-2">mut </span>y) = ([<span class="number">0u8</span>; <span class="number">20</span>], [<span class="number">0u8</span>; <span class="number">20</span>]);
-        [<span class="string">&quot;\x1B[&quot;</span>, this.<span class="number">1</span>.numtoa_str(<span class="number">10</span>, <span class="kw-2">&amp;mut </span>x), <span class="string">&quot;;&quot;</span>, this.<span class="number">0</span>.numtoa_str(<span class="number">10</span>, <span class="kw-2">&amp;mut </span>y), <span class="string">&quot;H&quot;</span>].concat()
+        [<span class="string">"\x1B["</span>, this.<span class="number">1</span>.numtoa_str(<span class="number">10</span>, <span class="kw-2">&amp;mut </span>x), <span class="string">";"</span>, this.<span class="number">0</span>.numtoa_str(<span class="number">10</span>, <span class="kw-2">&amp;mut </span>y), <span class="string">"H"</span>].concat()
     }
 }
 
@@ -285,8 +286,8 @@
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>Goto {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
-        <span class="macro">debug_assert!</span>(<span class="self">self </span>!= <span class="kw-2">&amp;</span>Goto(<span class="number">0</span>, <span class="number">0</span>), <span class="string">&quot;Goto is one-based.&quot;</span>);
-        <span class="macro">write!</span>(f, <span class="string">&quot;\x1B[{};{}H&quot;</span>, <span class="self">self</span>.<span class="number">1</span>, <span class="self">self</span>.<span class="number">0</span>)
+        <span class="macro">debug_assert!</span>(<span class="self">self </span>!= <span class="kw-2">&amp;</span>Goto(<span class="number">0</span>, <span class="number">0</span>), <span class="string">"Goto is one-based."</span>);
+        <span class="macro">write!</span>(f, <span class="string">"\x1B[{};{}H"</span>, <span class="self">self</span>.<span class="number">1</span>, <span class="self">self</span>.<span class="number">0</span>)
     }
 }
 
@@ -297,13 +298,13 @@
 <span class="kw">impl </span>From&lt;Left&gt; <span class="kw">for </span>String {
     <span class="kw">fn </span>from(this: Left) -&gt; String {
         <span class="kw">let </span><span class="kw-2">mut </span>buf = [<span class="number">0u8</span>; <span class="number">20</span>];
-        [<span class="string">&quot;\x1B[&quot;</span>, this.<span class="number">0</span>.numtoa_str(<span class="number">10</span>, <span class="kw-2">&amp;mut </span>buf), <span class="string">&quot;D&quot;</span>].concat()
+        [<span class="string">"\x1B["</span>, this.<span class="number">0</span>.numtoa_str(<span class="number">10</span>, <span class="kw-2">&amp;mut </span>buf), <span class="string">"D"</span>].concat()
     }
 }
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>Left {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
-        <span class="macro">write!</span>(f, <span class="string">&quot;\x1B[{}D&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)
+        <span class="macro">write!</span>(f, <span class="string">"\x1B[{}D"</span>, <span class="self">self</span>.<span class="number">0</span>)
     }
 }
 
@@ -314,13 +315,13 @@
 <span class="kw">impl </span>From&lt;Right&gt; <span class="kw">for </span>String {
     <span class="kw">fn </span>from(this: Right) -&gt; String {
         <span class="kw">let </span><span class="kw-2">mut </span>buf = [<span class="number">0u8</span>; <span class="number">20</span>];
-        [<span class="string">&quot;\x1B[&quot;</span>, this.<span class="number">0</span>.numtoa_str(<span class="number">10</span>, <span class="kw-2">&amp;mut </span>buf), <span class="string">&quot;C&quot;</span>].concat()
+        [<span class="string">"\x1B["</span>, this.<span class="number">0</span>.numtoa_str(<span class="number">10</span>, <span class="kw-2">&amp;mut </span>buf), <span class="string">"C"</span>].concat()
     }
 }
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>Right {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
-        <span class="macro">write!</span>(f, <span class="string">&quot;\x1B[{}C&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)
+        <span class="macro">write!</span>(f, <span class="string">"\x1B[{}C"</span>, <span class="self">self</span>.<span class="number">0</span>)
     }
 }
 
@@ -331,13 +332,13 @@
 <span class="kw">impl </span>From&lt;Up&gt; <span class="kw">for </span>String {
     <span class="kw">fn </span>from(this: Up) -&gt; String {
         <span class="kw">let </span><span class="kw-2">mut </span>buf = [<span class="number">0u8</span>; <span class="number">20</span>];
-        [<span class="string">&quot;\x1B[&quot;</span>, this.<span class="number">0</span>.numtoa_str(<span class="number">10</span>, <span class="kw-2">&amp;mut </span>buf), <span class="string">&quot;A&quot;</span>].concat()
+        [<span class="string">"\x1B["</span>, this.<span class="number">0</span>.numtoa_str(<span class="number">10</span>, <span class="kw-2">&amp;mut </span>buf), <span class="string">"A"</span>].concat()
     }
 }
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>Up {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
-        <span class="macro">write!</span>(f, <span class="string">&quot;\x1B[{}A&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)
+        <span class="macro">write!</span>(f, <span class="string">"\x1B[{}A"</span>, <span class="self">self</span>.<span class="number">0</span>)
     }
 }
 
@@ -348,13 +349,13 @@
 <span class="kw">impl </span>From&lt;Down&gt; <span class="kw">for </span>String {
     <span class="kw">fn </span>from(this: Down) -&gt; String {
         <span class="kw">let </span><span class="kw-2">mut </span>buf = [<span class="number">0u8</span>; <span class="number">20</span>];
-        [<span class="string">&quot;\x1B[&quot;</span>, this.<span class="number">0</span>.numtoa_str(<span class="number">10</span>, <span class="kw-2">&amp;mut </span>buf), <span class="string">&quot;B&quot;</span>].concat()
+        [<span class="string">"\x1B["</span>, this.<span class="number">0</span>.numtoa_str(<span class="number">10</span>, <span class="kw-2">&amp;mut </span>buf), <span class="string">"B"</span>].concat()
     }
 }
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>Down {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
-        <span class="macro">write!</span>(f, <span class="string">&quot;\x1B[{}B&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)
+        <span class="macro">write!</span>(f, <span class="string">"\x1B[{}B"</span>, <span class="self">self</span>.<span class="number">0</span>)
     }
 }
 
@@ -366,12 +367,12 @@
 
 <span class="kw">impl</span>&lt;W: Write&gt; DetectCursorPos <span class="kw">for </span>W {
     <span class="kw">fn </span>cursor_pos(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; io::Result&lt;(u16, u16)&gt; {
-        <span class="kw">let </span>delimiter = <span class="string">b&#39;R&#39;</span>;
+        <span class="kw">let </span>delimiter = <span class="string">b'R'</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>stdin = async_stdin_until(delimiter);
 
         <span class="comment">// Where is the cursor?
         // Use `ESC [ 6 n`.
-        </span><span class="macro">write!</span>(<span class="self">self</span>, <span class="string">&quot;\x1B[6n&quot;</span>)<span class="question-mark">?</span>;
+        </span><span class="macro">write!</span>(<span class="self">self</span>, <span class="string">"\x1B[6n"</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.flush()<span class="question-mark">?</span>;
 
         <span class="kw">let </span><span class="kw-2">mut </span>buf: [u8; <span class="number">1</span>] = [<span class="number">0</span>];
@@ -388,16 +389,16 @@
         }
 
         <span class="kw">if </span>read_chars.is_empty() {
-            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::new(ErrorKind::Other, <span class="string">&quot;Cursor position detection timed out.&quot;</span>));
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::new(ErrorKind::Other, <span class="string">"Cursor position detection timed out."</span>));
         }
 
         <span class="comment">// The answer will look like `ESC [ Cy ; Cx R`.
 
         </span>read_chars.pop(); <span class="comment">// remove trailing R.
         </span><span class="kw">let </span>read_str = String::from_utf8(read_chars).unwrap();
-        <span class="kw">let </span>beg = read_str.rfind(<span class="string">&#39;[&#39;</span>).unwrap();
+        <span class="kw">let </span>beg = read_str.rfind(<span class="string">'['</span>).unwrap();
         <span class="kw">let </span>coords: String = read_str.chars().skip(beg + <span class="number">1</span>).collect();
-        <span class="kw">let </span><span class="kw-2">mut </span>nums = coords.split(<span class="string">&#39;;&#39;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>nums = coords.split(<span class="string">';'</span>);
 
         <span class="kw">let </span>cy = nums.next()
             .unwrap()
@@ -422,14 +423,14 @@
 <span class="kw">impl</span>&lt;W: Write&gt; HideCursor&lt;W&gt; {
     <span class="doccomment">/// Create a hide cursor wrapper struct for the provided output and hides the cursor.
     </span><span class="kw">pub fn </span>from(<span class="kw-2">mut </span>output: W) -&gt; <span class="self">Self </span>{
-        <span class="macro">write!</span>(output, <span class="string">&quot;{}&quot;</span>, Hide).expect(<span class="string">&quot;hide the cursor&quot;</span>);
+        <span class="macro">write!</span>(output, <span class="string">"{}"</span>, Hide).expect(<span class="string">"hide the cursor"</span>);
         HideCursor { output: output }
     }
 }
 
 <span class="kw">impl</span>&lt;W: Write&gt; Drop <span class="kw">for </span>HideCursor&lt;W&gt; {
     <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-        <span class="macro">write!</span>(<span class="self">self</span>, <span class="string">&quot;{}&quot;</span>, Show).expect(<span class="string">&quot;show the cursor&quot;</span>);
+        <span class="macro">write!</span>(<span class="self">self</span>, <span class="string">"{}"</span>, Show).expect(<span class="string">"show the cursor"</span>);
     }
 }
 

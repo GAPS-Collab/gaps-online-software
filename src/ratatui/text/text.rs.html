@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.25.0/src/text/text.rs`."><title>text.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.25.0/src/text/text.rs`."><title>text.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><a class="sub-logo-container" href="../../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -419,40 +420,40 @@
 ///     .add_modifier(Modifier::ITALIC);
 ///
 /// // An initial two lines of `Text` built from a `&amp;str`
-/// let mut text = Text::from(&quot;The first line\nThe second line&quot;);
+/// let mut text = Text::from("The first line\nThe second line");
 /// assert_eq!(2, text.height());
 ///
 /// // Adding two more unstyled lines
-/// text.extend(Text::raw(&quot;These are two\nmore lines!&quot;));
+/// text.extend(Text::raw("These are two\nmore lines!"));
 /// assert_eq!(4, text.height());
 ///
 /// // Adding a final two styled lines
-/// text.extend(Text::styled(&quot;Some more lines\nnow with more style!&quot;, style));
+/// text.extend(Text::styled("Some more lines\nnow with more style!", style));
 /// assert_eq!(6, text.height());
 /// ```
 </span><span class="attr">#[derive(Debug, Default, Clone, Eq, PartialEq, Hash)]
-</span><span class="kw">pub struct </span>Text&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">pub </span>lines: Vec&lt;Line&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+</span><span class="kw">pub struct </span>Text&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">pub </span>lines: Vec&lt;Line&lt;<span class="lifetime">'a</span>&gt;&gt;,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Text&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Text&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Create some text (potentially multiple lines) with no style.
     ///
     /// ## Examples
     ///
     /// ```rust
     /// # use ratatui::prelude::*;
-    /// Text::raw(&quot;The first line\nThe second line&quot;);
-    /// Text::raw(String::from(&quot;The first line\nThe second line&quot;));
+    /// Text::raw("The first line\nThe second line");
+    /// Text::raw(String::from("The first line\nThe second line"));
     /// ```
-    </span><span class="kw">pub fn </span>raw&lt;T&gt;(content: T) -&gt; Text&lt;<span class="lifetime">&#39;a</span>&gt;
+    </span><span class="kw">pub fn </span>raw&lt;T&gt;(content: T) -&gt; Text&lt;<span class="lifetime">'a</span>&gt;
     <span class="kw">where
-        </span>T: Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
+        </span>T: Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
     {
         <span class="kw">let </span>lines: Vec&lt;<span class="kw">_</span>&gt; = <span class="kw">match </span>content.into() {
-            Cow::Borrowed(<span class="string">&quot;&quot;</span>) =&gt; <span class="macro">vec!</span>[Line::from(<span class="string">&quot;&quot;</span>)],
+            Cow::Borrowed(<span class="string">""</span>) =&gt; <span class="macro">vec!</span>[Line::from(<span class="string">""</span>)],
             Cow::Borrowed(s) =&gt; s.lines().map(Line::from).collect(),
-            Cow::Owned(s) <span class="kw">if </span>s.is_empty() =&gt; <span class="macro">vec!</span>[Line::from(<span class="string">&quot;&quot;</span>)],
+            Cow::Owned(s) <span class="kw">if </span>s.is_empty() =&gt; <span class="macro">vec!</span>[Line::from(<span class="string">""</span>)],
             Cow::Owned(s) =&gt; s.lines().map(|l| Line::from(l.to_owned())).collect(),
         };
 
@@ -468,12 +469,12 @@
     /// let style = Style::default()
     ///     .fg(Color::Yellow)
     ///     .add_modifier(Modifier::ITALIC);
-    /// Text::styled(&quot;The first line\nThe second line&quot;, style);
-    /// Text::styled(String::from(&quot;The first line\nThe second line&quot;), style);
+    /// Text::styled("The first line\nThe second line", style);
+    /// Text::styled(String::from("The first line\nThe second line"), style);
     /// ```
-    </span><span class="kw">pub fn </span>styled&lt;T&gt;(content: T, style: Style) -&gt; Text&lt;<span class="lifetime">&#39;a</span>&gt;
+    </span><span class="kw">pub fn </span>styled&lt;T&gt;(content: T, style: Style) -&gt; Text&lt;<span class="lifetime">'a</span>&gt;
     <span class="kw">where
-        </span>T: Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
+        </span>T: Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
     {
         <span class="kw">let </span><span class="kw-2">mut </span>text = Text::raw(content);
         text.patch_style(style);
@@ -486,7 +487,7 @@
     ///
     /// ```rust
     /// # use ratatui::prelude::*;
-    /// let text = Text::from(&quot;The first line\nThe second line&quot;);
+    /// let text = Text::from("The first line\nThe second line");
     /// assert_eq!(15, text.width());
     /// ```
     </span><span class="kw">pub fn </span>width(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
@@ -499,7 +500,7 @@
     ///
     /// ```rust
     /// # use ratatui::prelude::*;
-    /// let text = Text::from(&quot;The first line\nThe second line&quot;);
+    /// let text = Text::from("The first line\nThe second line");
     /// assert_eq!(2, text.height());
     /// ```
     </span><span class="kw">pub fn </span>height(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
@@ -515,8 +516,8 @@
     /// let style = Style::default()
     ///     .fg(Color::Yellow)
     ///     .add_modifier(Modifier::ITALIC);
-    /// let mut raw_text = Text::raw(&quot;The first line\nThe second line&quot;);
-    /// let styled_text = Text::styled(String::from(&quot;The first line\nThe second line&quot;), style);
+    /// let mut raw_text = Text::raw("The first line\nThe second line");
+    /// let styled_text = Text::styled(String::from("The first line\nThe second line"), style);
     /// assert_ne!(raw_text, styled_text);
     ///
     /// raw_text.patch_style(style);
@@ -538,7 +539,7 @@
     /// let style = Style::default()
     ///     .fg(Color::Yellow)
     ///     .add_modifier(Modifier::ITALIC);
-    /// let mut text = Text::styled(&quot;The first line\nThe second line&quot;, style);
+    /// let mut text = Text::styled("The first line\nThe second line", style);
     ///
     /// text.reset_style();
     /// for line in &amp;text.lines {
@@ -554,46 +555,46 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;String&gt; <span class="kw">for </span>Text&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">fn </span>from(s: String) -&gt; Text&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;String&gt; <span class="kw">for </span>Text&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">fn </span>from(s: String) -&gt; Text&lt;<span class="lifetime">'a</span>&gt; {
         Text::raw(s)
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; <span class="kw">for </span>Text&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">fn </span>from(s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; Text&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt; <span class="kw">for </span>Text&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">fn </span>from(s: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str) -&gt; Text&lt;<span class="lifetime">'a</span>&gt; {
         Text::raw(s)
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt; <span class="kw">for </span>Text&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">fn </span>from(s: Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;) -&gt; Text&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt; <span class="kw">for </span>Text&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">fn </span>from(s: Cow&lt;<span class="lifetime">'a</span>, str&gt;) -&gt; Text&lt;<span class="lifetime">'a</span>&gt; {
         Text::raw(s)
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;Span&lt;<span class="lifetime">&#39;a</span>&gt;&gt; <span class="kw">for </span>Text&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">fn </span>from(span: Span&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; Text&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;Span&lt;<span class="lifetime">'a</span>&gt;&gt; <span class="kw">for </span>Text&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">fn </span>from(span: Span&lt;<span class="lifetime">'a</span>&gt;) -&gt; Text&lt;<span class="lifetime">'a</span>&gt; {
         Text {
             lines: <span class="macro">vec!</span>[Line::from(span)],
         }
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;Line&lt;<span class="lifetime">&#39;a</span>&gt;&gt; <span class="kw">for </span>Text&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">fn </span>from(line: Line&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; Text&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;Line&lt;<span class="lifetime">'a</span>&gt;&gt; <span class="kw">for </span>Text&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">fn </span>from(line: Line&lt;<span class="lifetime">'a</span>&gt;) -&gt; Text&lt;<span class="lifetime">'a</span>&gt; {
         Text { lines: <span class="macro">vec!</span>[line] }
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;Vec&lt;Line&lt;<span class="lifetime">&#39;a</span>&gt;&gt;&gt; <span class="kw">for </span>Text&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">fn </span>from(lines: Vec&lt;Line&lt;<span class="lifetime">&#39;a</span>&gt;&gt;) -&gt; Text&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;Vec&lt;Line&lt;<span class="lifetime">'a</span>&gt;&gt;&gt; <span class="kw">for </span>Text&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">fn </span>from(lines: Vec&lt;Line&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; Text&lt;<span class="lifetime">'a</span>&gt; {
         Text { lines }
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IntoIterator <span class="kw">for </span>Text&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">type </span>Item = Line&lt;<span class="lifetime">&#39;a</span>&gt;;
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; IntoIterator <span class="kw">for </span>Text&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">type </span>Item = Line&lt;<span class="lifetime">'a</span>&gt;;
     <span class="kw">type </span>IntoIter = std::vec::IntoIter&lt;<span class="self">Self</span>::Item&gt;;
 
     <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
@@ -601,9 +602,9 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T&gt; Extend&lt;T&gt; <span class="kw">for </span>Text&lt;<span class="lifetime">&#39;a</span>&gt;
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, T&gt; Extend&lt;T&gt; <span class="kw">for </span>Text&lt;<span class="lifetime">'a</span>&gt;
 <span class="kw">where
-    </span>T: Into&lt;Line&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    </span>T: Into&lt;Line&lt;<span class="lifetime">'a</span>&gt;&gt;,
 {
     <span class="kw">fn </span>extend&lt;I: IntoIterator&lt;Item = T&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, iter: I) {
         <span class="kw">let </span>lines = iter.into_iter().map(Into::into);
@@ -618,35 +619,35 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>raw() {
-        <span class="kw">let </span>text = Text::raw(<span class="string">&quot;The first line\nThe second line&quot;</span>);
+        <span class="kw">let </span>text = Text::raw(<span class="string">"The first line\nThe second line"</span>);
         <span class="macro">assert_eq!</span>(
             text.lines,
-            <span class="macro">vec!</span>[Line::from(<span class="string">&quot;The first line&quot;</span>), Line::from(<span class="string">&quot;The second line&quot;</span>)]
+            <span class="macro">vec!</span>[Line::from(<span class="string">"The first line"</span>), Line::from(<span class="string">"The second line"</span>)]
         );
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>styled() {
         <span class="kw">let </span>style = Style::new().yellow().italic();
-        <span class="kw">let </span>text = Text::styled(<span class="string">&quot;The first line\nThe second line&quot;</span>, style);
+        <span class="kw">let </span>text = Text::styled(<span class="string">"The first line\nThe second line"</span>, style);
         <span class="macro">assert_eq!</span>(
             text.lines,
             <span class="macro">vec!</span>[
-                Line::from(Span::styled(<span class="string">&quot;The first line&quot;</span>, style)),
-                Line::from(Span::styled(<span class="string">&quot;The second line&quot;</span>, style))
+                Line::from(Span::styled(<span class="string">"The first line"</span>, style)),
+                Line::from(Span::styled(<span class="string">"The second line"</span>, style))
             ]
         );
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>width() {
-        <span class="kw">let </span>text = Text::from(<span class="string">&quot;The first line\nThe second line&quot;</span>);
+        <span class="kw">let </span>text = Text::from(<span class="string">"The first line\nThe second line"</span>);
         <span class="macro">assert_eq!</span>(<span class="number">15</span>, text.width());
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>height() {
-        <span class="kw">let </span>text = Text::from(<span class="string">&quot;The first line\nThe second line&quot;</span>);
+        <span class="kw">let </span>text = Text::from(<span class="string">"The first line\nThe second line"</span>);
         <span class="macro">assert_eq!</span>(<span class="number">2</span>, text.height());
     }
 
@@ -654,15 +655,15 @@
     </span><span class="kw">fn </span>patch_style() {
         <span class="kw">let </span>style = Style::new().yellow().italic();
         <span class="kw">let </span>style2 = Style::new().red().underlined();
-        <span class="kw">let </span><span class="kw-2">mut </span>text = Text::styled(<span class="string">&quot;The first line\nThe second line&quot;</span>, style);
+        <span class="kw">let </span><span class="kw-2">mut </span>text = Text::styled(<span class="string">"The first line\nThe second line"</span>, style);
 
         text.patch_style(style2);
         <span class="kw">let </span>expected_style = Style::new().red().italic().underlined();
         <span class="macro">assert_eq!</span>(
             text.lines,
             <span class="macro">vec!</span>[
-                Line::from(Span::styled(<span class="string">&quot;The first line&quot;</span>, expected_style)),
-                Line::from(Span::styled(<span class="string">&quot;The second line&quot;</span>, expected_style))
+                Line::from(Span::styled(<span class="string">"The first line"</span>, expected_style)),
+                Line::from(Span::styled(<span class="string">"The second line"</span>, expected_style))
             ]
         );
     }
@@ -670,53 +671,53 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>reset_style() {
         <span class="kw">let </span>style = Style::new().yellow().italic();
-        <span class="kw">let </span><span class="kw-2">mut </span>text = Text::styled(<span class="string">&quot;The first line\nThe second line&quot;</span>, style);
+        <span class="kw">let </span><span class="kw-2">mut </span>text = Text::styled(<span class="string">"The first line\nThe second line"</span>, style);
 
         text.reset_style();
         <span class="macro">assert_eq!</span>(
             text.lines,
             <span class="macro">vec!</span>[
-                Line::from(Span::styled(<span class="string">&quot;The first line&quot;</span>, Style::reset())),
-                Line::from(Span::styled(<span class="string">&quot;The second line&quot;</span>, Style::reset()))
+                Line::from(Span::styled(<span class="string">"The first line"</span>, Style::reset())),
+                Line::from(Span::styled(<span class="string">"The second line"</span>, Style::reset()))
             ]
         );
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>from_string() {
-        <span class="kw">let </span>text = Text::from(String::from(<span class="string">&quot;The first line\nThe second line&quot;</span>));
+        <span class="kw">let </span>text = Text::from(String::from(<span class="string">"The first line\nThe second line"</span>));
         <span class="macro">assert_eq!</span>(
             text.lines,
-            <span class="macro">vec!</span>[Line::from(<span class="string">&quot;The first line&quot;</span>), Line::from(<span class="string">&quot;The second line&quot;</span>)]
+            <span class="macro">vec!</span>[Line::from(<span class="string">"The first line"</span>), Line::from(<span class="string">"The second line"</span>)]
         );
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>from_str() {
-        <span class="kw">let </span>text = Text::from(<span class="string">&quot;The first line\nThe second line&quot;</span>);
+        <span class="kw">let </span>text = Text::from(<span class="string">"The first line\nThe second line"</span>);
         <span class="macro">assert_eq!</span>(
             text.lines,
-            <span class="macro">vec!</span>[Line::from(<span class="string">&quot;The first line&quot;</span>), Line::from(<span class="string">&quot;The second line&quot;</span>)]
+            <span class="macro">vec!</span>[Line::from(<span class="string">"The first line"</span>), Line::from(<span class="string">"The second line"</span>)]
         );
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>from_cow() {
-        <span class="kw">let </span>text = Text::from(Cow::Borrowed(<span class="string">&quot;The first line\nThe second line&quot;</span>));
+        <span class="kw">let </span>text = Text::from(Cow::Borrowed(<span class="string">"The first line\nThe second line"</span>));
         <span class="macro">assert_eq!</span>(
             text.lines,
-            <span class="macro">vec!</span>[Line::from(<span class="string">&quot;The first line&quot;</span>), Line::from(<span class="string">&quot;The second line&quot;</span>)]
+            <span class="macro">vec!</span>[Line::from(<span class="string">"The first line"</span>), Line::from(<span class="string">"The second line"</span>)]
         );
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>from_span() {
         <span class="kw">let </span>style = Style::new().yellow().italic();
-        <span class="kw">let </span>text = Text::from(Span::styled(<span class="string">&quot;The first line\nThe second line&quot;</span>, style));
+        <span class="kw">let </span>text = Text::from(Span::styled(<span class="string">"The first line\nThe second line"</span>, style));
         <span class="macro">assert_eq!</span>(
             text.lines,
             <span class="macro">vec!</span>[Line::from(Span::styled(
-                <span class="string">&quot;The first line\nThe second line&quot;</span>,
+                <span class="string">"The first line\nThe second line"</span>,
                 style
             ))]
         );
@@ -724,78 +725,78 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>from_line() {
-        <span class="kw">let </span>text = Text::from(Line::from(<span class="string">&quot;The first line&quot;</span>));
-        <span class="macro">assert_eq!</span>(text.lines, <span class="macro">vec!</span>[Line::from(<span class="string">&quot;The first line&quot;</span>)]);
+        <span class="kw">let </span>text = Text::from(Line::from(<span class="string">"The first line"</span>));
+        <span class="macro">assert_eq!</span>(text.lines, <span class="macro">vec!</span>[Line::from(<span class="string">"The first line"</span>)]);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>from_vec_line() {
         <span class="kw">let </span>text = Text::from(<span class="macro">vec!</span>[
-            Line::from(<span class="string">&quot;The first line&quot;</span>),
-            Line::from(<span class="string">&quot;The second line&quot;</span>),
+            Line::from(<span class="string">"The first line"</span>),
+            Line::from(<span class="string">"The second line"</span>),
         ]);
         <span class="macro">assert_eq!</span>(
             text.lines,
-            <span class="macro">vec!</span>[Line::from(<span class="string">&quot;The first line&quot;</span>), Line::from(<span class="string">&quot;The second line&quot;</span>)]
+            <span class="macro">vec!</span>[Line::from(<span class="string">"The first line"</span>), Line::from(<span class="string">"The second line"</span>)]
         );
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>into_iter() {
-        <span class="kw">let </span>text = Text::from(<span class="string">&quot;The first line\nThe second line&quot;</span>);
+        <span class="kw">let </span>text = Text::from(<span class="string">"The first line\nThe second line"</span>);
         <span class="kw">let </span><span class="kw-2">mut </span>iter = text.into_iter();
-        <span class="macro">assert_eq!</span>(iter.next(), <span class="prelude-val">Some</span>(Line::from(<span class="string">&quot;The first line&quot;</span>)));
-        <span class="macro">assert_eq!</span>(iter.next(), <span class="prelude-val">Some</span>(Line::from(<span class="string">&quot;The second line&quot;</span>)));
+        <span class="macro">assert_eq!</span>(iter.next(), <span class="prelude-val">Some</span>(Line::from(<span class="string">"The first line"</span>)));
+        <span class="macro">assert_eq!</span>(iter.next(), <span class="prelude-val">Some</span>(Line::from(<span class="string">"The second line"</span>)));
         <span class="macro">assert_eq!</span>(iter.next(), <span class="prelude-val">None</span>);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>extend() {
-        <span class="kw">let </span><span class="kw-2">mut </span>text = Text::from(<span class="string">&quot;The first line\nThe second line&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>text = Text::from(<span class="string">"The first line\nThe second line"</span>);
         text.extend(<span class="macro">vec!</span>[
-            Line::from(<span class="string">&quot;The third line&quot;</span>),
-            Line::from(<span class="string">&quot;The fourth line&quot;</span>),
+            Line::from(<span class="string">"The third line"</span>),
+            Line::from(<span class="string">"The fourth line"</span>),
         ]);
         <span class="macro">assert_eq!</span>(
             text.lines,
             <span class="macro">vec!</span>[
-                Line::from(<span class="string">&quot;The first line&quot;</span>),
-                Line::from(<span class="string">&quot;The second line&quot;</span>),
-                Line::from(<span class="string">&quot;The third line&quot;</span>),
-                Line::from(<span class="string">&quot;The fourth line&quot;</span>),
+                Line::from(<span class="string">"The first line"</span>),
+                Line::from(<span class="string">"The second line"</span>),
+                Line::from(<span class="string">"The third line"</span>),
+                Line::from(<span class="string">"The fourth line"</span>),
             ]
         );
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>extend_from_iter() {
-        <span class="kw">let </span><span class="kw-2">mut </span>text = Text::from(<span class="string">&quot;The first line\nThe second line&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>text = Text::from(<span class="string">"The first line\nThe second line"</span>);
         text.extend(<span class="macro">vec!</span>[
-            Line::from(<span class="string">&quot;The third line&quot;</span>),
-            Line::from(<span class="string">&quot;The fourth line&quot;</span>),
+            Line::from(<span class="string">"The third line"</span>),
+            Line::from(<span class="string">"The fourth line"</span>),
         ]);
         <span class="macro">assert_eq!</span>(
             text.lines,
             <span class="macro">vec!</span>[
-                Line::from(<span class="string">&quot;The first line&quot;</span>),
-                Line::from(<span class="string">&quot;The second line&quot;</span>),
-                Line::from(<span class="string">&quot;The third line&quot;</span>),
-                Line::from(<span class="string">&quot;The fourth line&quot;</span>),
+                Line::from(<span class="string">"The first line"</span>),
+                Line::from(<span class="string">"The second line"</span>),
+                Line::from(<span class="string">"The third line"</span>),
+                Line::from(<span class="string">"The fourth line"</span>),
             ]
         );
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>extend_from_iter_str() {
-        <span class="kw">let </span><span class="kw-2">mut </span>text = Text::from(<span class="string">&quot;The first line\nThe second line&quot;</span>);
-        text.extend(<span class="macro">vec!</span>[<span class="string">&quot;The third line&quot;</span>, <span class="string">&quot;The fourth line&quot;</span>]);
+        <span class="kw">let </span><span class="kw-2">mut </span>text = Text::from(<span class="string">"The first line\nThe second line"</span>);
+        text.extend(<span class="macro">vec!</span>[<span class="string">"The third line"</span>, <span class="string">"The fourth line"</span>]);
         <span class="macro">assert_eq!</span>(
             text.lines,
             <span class="macro">vec!</span>[
-                Line::from(<span class="string">&quot;The first line&quot;</span>),
-                Line::from(<span class="string">&quot;The second line&quot;</span>),
-                Line::from(<span class="string">&quot;The third line&quot;</span>),
-                Line::from(<span class="string">&quot;The fourth line&quot;</span>),
+                Line::from(<span class="string">"The first line"</span>),
+                Line::from(<span class="string">"The second line"</span>),
+                Line::from(<span class="string">"The third line"</span>),
+                Line::from(<span class="string">"The fourth line"</span>),
             ]
         );
     }

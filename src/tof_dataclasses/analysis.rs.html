@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/analysis.rs`."><title>analysis.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/analysis.rs`."><title>analysis.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -416,17 +417,32 @@
 <a href="#416" id="416">416</a>
 <a href="#417" id="417">417</a>
 <a href="#418" id="418">418</a>
+<a href="#419" id="419">419</a>
+<a href="#420" id="420">420</a>
+<a href="#421" id="421">421</a>
+<a href="#422" id="422">422</a>
+<a href="#423" id="423">423</a>
+<a href="#424" id="424">424</a>
+<a href="#425" id="425">425</a>
+<a href="#426" id="426">426</a>
+<a href="#427" id="427">427</a>
+<a href="#428" id="428">428</a>
+<a href="#429" id="429">429</a>
+<a href="#430" id="430">430</a>
+<a href="#431" id="431">431</a>
+<a href="#432" id="432">432</a>
+<a href="#433" id="433">433</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Implementations of analysis engine
 //! This is based on the original code 
 //! by J.Zweerink
 //!
   
 </span><span class="kw">use </span><span class="kw">crate</span>::errors::WaveformError;
+<span class="kw">use </span><span class="kw">crate</span>::constants::NWORDS;
 
-
-<span class="attr">#[cfg(feature=<span class="string">&quot;advanced-algorithms&quot;</span>)]
+<span class="attr">#[cfg(feature=<span class="string">"advanced-algorithms"</span>)]
 </span><span class="kw">extern crate </span>smoothed_z_score;
-<span class="attr">#[cfg(feature=<span class="string">&quot;advanced-algorithms&quot;</span>)]
+<span class="attr">#[cfg(feature=<span class="string">"advanced-algorithms"</span>)]
 </span><span class="kw">use </span>smoothed_z_score::{Peak, PeaksDetector, PeaksFilter};
 
 <span class="comment">// Return the bin with the maximum DC value
@@ -434,7 +450,12 @@
 </span><span class="kw">pub fn </span>get_max_bin(voltages    : <span class="kw-2">&amp;</span>Vec&lt;f32&gt;,
                    lower_bound : usize,
                    window      : usize) -&gt; <span class="prelude-ty">Result</span>&lt;usize, WaveformError&gt; {
-  <span class="kw">if </span>lower_bound + window &gt; voltages.len() {
+  <span class="kw">if </span>lower_bound &gt;= voltages.len() {
+    <span class="macro">error!</span>(<span class="string">"Invalid value for lower_bound {}"</span>, lower_bound);
+    <span class="kw">return </span><span class="prelude-val">Err</span>(WaveformError::OutOfRangeLowerBound);
+  }
+  <span class="kw">if </span>lower_bound + window &gt;= voltages.len() {
+    <span class="macro">error!</span>(<span class="string">"Lower bound {} + window {} is too large!"</span>, lower_bound, window); 
     <span class="kw">return </span><span class="prelude-val">Err</span>(WaveformError::OutOfRangeUpperBound);
   }
   <span class="kw">let </span><span class="kw-2">mut </span>maxval = voltages[lower_bound];
@@ -445,7 +466,7 @@
       maxbin  = n;
     }
   } <span class="comment">// end for
-  </span><span class="macro">trace!</span>(<span class="string">&quot;Got maxbin {} with a value of {}&quot;</span>, maxbin, maxval);
+  </span><span class="macro">trace!</span>(<span class="string">"Got maxbin {} with a value of {}"</span>, maxbin, maxval);
   <span class="prelude-val">Ok</span>(maxbin)
 } <span class="comment">// end fn
 
@@ -508,7 +529,7 @@
   <span class="kw">let </span><span class="kw-2">mut </span>size_bin    = time2bin(nanoseconds,lower_bound + size)<span class="question-mark">?</span>;
   size_bin = size_bin - lo_bin;
   <span class="kw">if </span>lo_bin + size_bin &gt; voltages.len() {
-    <span class="macro">warn!</span>(<span class="string">&quot;Limiting integration range to waveform size!&quot;</span>);
+    <span class="macro">warn!</span>(<span class="string">"Limiting integration range to waveform size!"</span>);
     size_bin = voltages.len() - lo_bin;
   }
   <span class="kw">let </span><span class="kw-2">mut </span>sum = <span class="number">0f32</span>;
@@ -528,7 +549,7 @@
       <span class="kw">return </span><span class="prelude-val">Ok</span>(n-<span class="number">1</span>);
     }
   }
-  <span class="macro">error!</span>(<span class="string">&quot;Did not find a bin corresponding to the given time {}!&quot;</span>, t_ns);
+  <span class="macro">error!</span>(<span class="string">"Did not find a bin corresponding to the given time {}!"</span>, t_ns);
   <span class="kw">return </span><span class="prelude-val">Err</span>(WaveformError::TimesTooSmall);
 }
 
@@ -574,21 +595,21 @@
                   start_peak  : usize,
                   end_peak    : usize) -&gt; <span class="prelude-ty">Result</span>&lt;f32, WaveformError&gt; {
 
-  <span class="kw">let </span>idx = get_max_bin(voltages,start_peak,end_peak-start_peak)<span class="question-mark">?</span>;
+  <span class="kw">let </span>idx = get_max_bin(voltages, start_peak, end_peak-start_peak)<span class="question-mark">?</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>sum : f32 = <span class="number">0.0</span>;
   <span class="kw">for </span>n <span class="kw">in </span>idx-<span class="number">1</span>..idx+<span class="number">1</span>{
     sum += voltages[n];
   }
   <span class="kw">let </span>tmp_thresh : f32 = f32::abs(cfd_frac * (sum / <span class="number">3.0</span>));
-  <span class="macro">trace!</span>(<span class="string">&quot;Calculated tmp threshold of {}&quot;</span>, tmp_thresh);
+  <span class="macro">trace!</span>(<span class="string">"Calculated tmp threshold of {}"</span>, tmp_thresh);
   <span class="comment">// Now scan through the waveform around the peak to find the bin
   // crossing the calculated threshold. Bin idx is the peak so it is
-  // definitely above threshold. So let&#39;s walk backwards through the
+  // definitely above threshold. So let's walk backwards through the
   // trace until we find a bin value less than the threshold.
   </span><span class="kw">let </span><span class="kw-2">mut </span>lo_bin : usize = voltages.len();
   <span class="kw">let </span><span class="kw-2">mut </span>n = idx;
   <span class="kw">if </span>idx &lt; start_peak {
-    <span class="macro">error!</span>(<span class="string">&quot;The index {} is smaller than the beginning of the peak {}!&quot;</span>, idx, start_peak);
+    <span class="macro">error!</span>(<span class="string">"The index {} is smaller than the beginning of the peak {}!"</span>, idx, start_peak);
     <span class="kw">return </span><span class="prelude-val">Err</span>(WaveformError::OutOfRangeLowerBound);
   }
   <span class="kw">if </span>start_peak &gt;= <span class="number">10 </span>{
@@ -601,11 +622,11 @@
       n -= <span class="number">1</span>;
     }  
   } <span class="kw">else </span>{
-    <span class="macro">error!</span>(<span class="string">&quot;We require that the peak is at least 10 bins away from the start!&quot;</span>);
+    <span class="macro">debug!</span>(<span class="string">"We require that the peak is at least 10 bins away from the start!"</span>);
     <span class="kw">return </span><span class="prelude-val">Err</span>(WaveformError::OutOfRangeLowerBound);
   }
 
-  <span class="macro">trace!</span>(<span class="string">&quot;Lo bin {} , start peak {}&quot;</span>, lo_bin, start_peak);
+  <span class="macro">trace!</span>(<span class="string">"Lo bin {} , start peak {}"</span>, lo_bin, start_peak);
   <span class="kw">let </span>cfd_time : f32;
   <span class="kw">if </span>lo_bin &lt; nanoseconds.len() -<span class="number">1 </span>{
     cfd_time = interpolate_time(voltages, nanoseconds, tmp_thresh, lo_bin, <span class="number">1</span>)<span class="question-mark">?</span>;  
@@ -645,9 +666,12 @@
                   threshold      : f32,
                   max_peaks      : usize)
 -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;(usize,usize)&gt;, WaveformError&gt; {
-  <span class="kw">let </span><span class="kw-2">mut </span>peaks = Vec::&lt;(usize,usize)&gt;::new();
-
-  <span class="kw">let </span>start_bin  = time2bin(nanoseconds, start_time)<span class="question-mark">?</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>peaks      = Vec::&lt;(usize,usize)&gt;::new();
+  <span class="kw">let </span><span class="kw-2">mut </span>start_bin  = time2bin(nanoseconds, start_time)<span class="question-mark">?</span>;
+  <span class="kw">if </span>start_bin &lt;= <span class="number">10 </span>{
+    <span class="macro">debug!</span>(<span class="string">"We deliberatly do not search for peaks within the first 10 bins! Correcting.."</span>);
+    start_bin = <span class="number">10</span>;
+  }
   <span class="kw">let </span>window_bin = time2bin(nanoseconds, start_time + window_size)<span class="question-mark">? </span>- start_bin;
 
   <span class="kw">let </span><span class="kw-2">mut </span>pos = <span class="number">0usize</span>;
@@ -677,7 +701,7 @@
                             // if it is still positive, we
                             // continue to count the bins
       </span><span class="kw">if </span>nbins_peak == min_peak_width {
-        <span class="comment">// in this case, we don&#39;t care about the slope
+        <span class="comment">// in this case, we don't care about the slope
         </span>begin_peak  = k - min_peak_width -<span class="number">1</span>;
       } <span class="kw">else if </span>nbins_peak &gt; min_peak_width {
         <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..min_peak_width {
@@ -712,6 +736,13 @@
       nbins_peak = <span class="number">0</span>;
     }
   }
+  <span class="comment">// FIXME - remove invalid peaks
+  </span><span class="kw">let </span>len_pks_dirty = peaks.len();
+  peaks.retain(|<span class="kw-2">&amp;</span>x| {(x.<span class="number">0 </span>&lt; NWORDS - <span class="number">1</span>) &amp; (x.<span class="number">1 </span>&lt;= NWORDS - <span class="number">1</span>)});
+  <span class="kw">let </span>len_pks_clean = peaks.len();
+  <span class="kw">if </span>len_pks_clean != len_pks_dirty {
+    <span class="macro">debug!</span>(<span class="string">"We removed {} pks because they had values outside of 0-{}!"</span>, len_pks_dirty - len_pks_clean, NWORDS);
+  }
   <span class="prelude-val">Ok</span>(peaks)
 }
 <span class="comment">// 
@@ -719,7 +750,7 @@
 
 
 
-</span><span class="attr">#[cfg(feature = <span class="string">&quot;advanced-algorithms&quot;</span>)]
+</span><span class="attr">#[cfg(feature = <span class="string">"advanced-algorithms"</span>)]
 </span><span class="kw">fn </span>find_sequence_ranges(vec: Vec&lt;usize&gt;) -&gt; Vec&lt;(usize, usize)&gt; {
   <span class="kw">let </span><span class="kw-2">mut </span>ranges = Vec::new();
   <span class="kw">let </span><span class="kw-2">mut </span>start = vec[<span class="number">0</span>];
@@ -742,11 +773,11 @@
   ranges
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;advanced-algorithms&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"advanced-algorithms"</span>)]
 </span><span class="doccomment">/// Z-scores peak finding algorithm
 ///
 /// Brakel, J.P.G. van (2014).
-/// &quot;Robust peak detection algorithm using z-scores&quot;. 
+/// "Robust peak detection algorithm using z-scores". 
 /// Stack Overflow.
 /// Available at: https://stackoverflow.com/questions/
 /// 22583391/peak-signal-detection-in-realtime-timeseries-data/
@@ -779,7 +810,7 @@
 ///                   more quickly.
 ///                   For example, a lag of 5 will use the last 5 observations
 ///                   to smooth the data.
-/// * threshold     : The &quot;z-score&quot; at which the algorithm signals.
+/// * threshold     : The "z-score" at which the algorithm signals.
 ///                   Simply put, if the distance between a new datapoint
 ///                   and the moving mean is larger than the threshold
 ///                   multiplied with the moving standard deviation of the data,

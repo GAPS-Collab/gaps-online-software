@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/neli-0.6.4/src/err.rs`."><title>err.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="neli" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/neli-0.6.4/src/err.rs`."><title>err.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="neli" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -409,9 +410,9 @@
 /// will be returned), this data structure relies on the total
 /// packet size for deserialization.
 </span><span class="attr">#[derive(Debug, PartialEq, Eq, Size, ToBytes, FromBytesWithInput, Header)]
-#[neli(header_bound = <span class="string">&quot;T: TypeSize&quot;</span>)]
-#[neli(from_bytes_bound = <span class="string">&quot;T: TypeSize + FromBytes&quot;</span>)]
-#[neli(from_bytes_bound = <span class="string">&quot;P: FromBytesWithInput&lt;Input = usize&gt;&quot;</span>)]
+#[neli(header_bound = <span class="string">"T: TypeSize"</span>)]
+#[neli(from_bytes_bound = <span class="string">"T: TypeSize + FromBytes"</span>)]
+#[neli(from_bytes_bound = <span class="string">"P: FromBytesWithInput&lt;Input = usize&gt;"</span>)]
 </span><span class="kw">pub struct </span>NlmsghdrErr&lt;T, P&gt; {
     <span class="doccomment">/// Length of the netlink message
     </span><span class="kw">pub </span>nl_len: u32,
@@ -425,25 +426,25 @@
     /// responses.
     </span><span class="kw">pub </span>nl_pid: u32,
     <span class="doccomment">/// Payload of netlink message
-    </span><span class="attr">#[neli(input = <span class="string">&quot;input - Self::header_size()&quot;</span>)]
+    </span><span class="attr">#[neli(input = <span class="string">"input - Self::header_size()"</span>)]
     </span><span class="kw">pub </span>nl_payload: P,
 }
 
 <span class="doccomment">/// Struct representing netlink packets containing errors
 </span><span class="attr">#[derive(Debug, PartialEq, Eq, Size, FromBytesWithInput, ToBytes, Header)]
-#[neli(from_bytes_bound = <span class="string">&quot;T: NlType&quot;</span>)]
-#[neli(from_bytes_bound = <span class="string">&quot;P: FromBytesWithInput&lt;Input = usize&gt;&quot;</span>)]
+#[neli(from_bytes_bound = <span class="string">"T: NlType"</span>)]
+#[neli(from_bytes_bound = <span class="string">"P: FromBytesWithInput&lt;Input = usize&gt;"</span>)]
 </span><span class="kw">pub struct </span>Nlmsgerr&lt;T, P&gt; {
     <span class="doccomment">/// Error code
     </span><span class="kw">pub </span>error: libc::c_int,
     <span class="doccomment">/// Packet header for request that failed
-    </span><span class="attr">#[neli(input = <span class="string">&quot;input - Self::header_size()&quot;</span>)]
+    </span><span class="attr">#[neli(input = <span class="string">"input - Self::header_size()"</span>)]
     </span><span class="kw">pub </span>nlmsg: NlmsghdrErr&lt;T, P&gt;,
 }
 
 <span class="kw">impl</span>&lt;T, P&gt; Display <span class="kw">for </span>Nlmsgerr&lt;T, P&gt; {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
-        <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, io::Error::from_raw_os_error(-<span class="self">self</span>.error))
+        <span class="macro">write!</span>(f, <span class="string">"{}"</span>, io::Error::from_raw_os_error(-<span class="self">self</span>.error))
     }
 }
 
@@ -551,20 +552,20 @@
 {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
         <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
-            NlError::Msg(<span class="kw-2">ref </span>msg) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, msg),
+            NlError::Msg(<span class="kw-2">ref </span>msg) =&gt; <span class="macro">write!</span>(f, <span class="string">"{}"</span>, msg),
             NlError::Nlmsgerr(<span class="kw-2">ref </span>err) =&gt; {
-                <span class="macro">write!</span>(f, <span class="string">&quot;Error response received from netlink: {}&quot;</span>, err)
+                <span class="macro">write!</span>(f, <span class="string">"Error response received from netlink: {}"</span>, err)
             }
             NlError::Ser(<span class="kw-2">ref </span>err) =&gt; {
-                <span class="macro">write!</span>(f, <span class="string">&quot;Serialization error: {}&quot;</span>, err)
+                <span class="macro">write!</span>(f, <span class="string">"Serialization error: {}"</span>, err)
             }
             NlError::De(<span class="kw-2">ref </span>err) =&gt; {
-                <span class="macro">write!</span>(f, <span class="string">&quot;Deserialization error: {}&quot;</span>, err)
+                <span class="macro">write!</span>(f, <span class="string">"Deserialization error: {}"</span>, err)
             }
-            NlError::NoAck =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;No ack received&quot;</span>),
-            NlError::BadSeq =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Sequence number does not match the request&quot;</span>),
-            NlError::BadPid =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;PID does not match the socket&quot;</span>),
-            NlError::Wrapped(<span class="kw-2">ref </span>e) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Netlink failure due to error: {}&quot;</span>, e),
+            NlError::NoAck =&gt; <span class="macro">write!</span>(f, <span class="string">"No ack received"</span>),
+            NlError::BadSeq =&gt; <span class="macro">write!</span>(f, <span class="string">"Sequence number does not match the request"</span>),
+            NlError::BadPid =&gt; <span class="macro">write!</span>(f, <span class="string">"PID does not match the socket"</span>),
+            NlError::Wrapped(<span class="kw-2">ref </span>e) =&gt; <span class="macro">write!</span>(f, <span class="string">"Netlink failure due to error: {}"</span>, e),
         }
     }
 }
@@ -611,16 +612,16 @@
 <span class="kw">impl </span>Display <span class="kw">for </span>SerError {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
         <span class="kw">match </span><span class="self">self </span>{
-            SerError::Msg(<span class="kw-2">ref </span>s) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, s),
-            SerError::Wrapped(<span class="kw-2">ref </span>e) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Error while serializing: {}&quot;</span>, e),
+            SerError::Msg(<span class="kw-2">ref </span>s) =&gt; <span class="macro">write!</span>(f, <span class="string">"{}"</span>, s),
+            SerError::Wrapped(<span class="kw-2">ref </span>e) =&gt; <span class="macro">write!</span>(f, <span class="string">"Error while serializing: {}"</span>, e),
             SerError::UnexpectedEOB =&gt; <span class="macro">write!</span>(
                 f,
-                <span class="string">&quot;The buffer was too small for the requested serialization operation&quot;</span>,
+                <span class="string">"The buffer was too small for the requested serialization operation"</span>,
             ),
             SerError::BufferNotFilled =&gt; <span class="macro">write!</span>(
                 f,
-                <span class="string">&quot;The number of bytes written to the buffer did not fill the \
-                 given space&quot;</span>,
+                <span class="string">"The number of bytes written to the buffer did not fill the \
+                 given space"</span>,
             ),
         }
     }
@@ -671,16 +672,16 @@
 <span class="kw">impl </span>Display <span class="kw">for </span>DeError {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
         <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
-            DeError::Msg(<span class="kw-2">ref </span>s) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, s),
+            DeError::Msg(<span class="kw-2">ref </span>s) =&gt; <span class="macro">write!</span>(f, <span class="string">"{}"</span>, s),
             DeError::UnexpectedEOB =&gt; <span class="macro">write!</span>(
                 f,
-                <span class="string">&quot;The buffer was not large enough to complete the deserialize \
-                 operation&quot;</span>,
+                <span class="string">"The buffer was not large enough to complete the deserialize \
+                 operation"</span>,
             ),
-            DeError::BufferNotParsed =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Unparsed data left in buffer&quot;</span>),
-            DeError::NullError =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;A null was found before the end of the buffer&quot;</span>),
-            DeError::NoNullError =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;No terminating null byte was found in the buffer&quot;</span>),
-            DeError::Wrapped(<span class="kw-2">ref </span>e) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Error while deserializing: {}&quot;</span>, e),
+            DeError::BufferNotParsed =&gt; <span class="macro">write!</span>(f, <span class="string">"Unparsed data left in buffer"</span>),
+            DeError::NullError =&gt; <span class="macro">write!</span>(f, <span class="string">"A null was found before the end of the buffer"</span>),
+            DeError::NoNullError =&gt; <span class="macro">write!</span>(f, <span class="string">"No terminating null byte was found in the buffer"</span>),
+            DeError::Wrapped(<span class="kw-2">ref </span>e) =&gt; <span class="macro">write!</span>(f, <span class="string">"Error while deserializing: {}"</span>, e),
         }
     }
 }
@@ -704,10 +705,10 @@
 <span class="kw">impl </span>Display <span class="kw">for </span>WrappedError {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
         <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
-            WrappedError::IOError(<span class="kw-2">ref </span>e) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Wrapped IO error: {}&quot;</span>, e),
-            WrappedError::StrUtf8Error(<span class="kw-2">ref </span>e) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Wrapped &amp;str error: {}&quot;</span>, e),
-            WrappedError::StringUtf8Error(<span class="kw-2">ref </span>e) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Wrapped String error: {}&quot;</span>, e),
-            WrappedError::FFINullError(<span class="kw-2">ref </span>e) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Wrapped null error: {}&quot;</span>, e),
+            WrappedError::IOError(<span class="kw-2">ref </span>e) =&gt; <span class="macro">write!</span>(f, <span class="string">"Wrapped IO error: {}"</span>, e),
+            WrappedError::StrUtf8Error(<span class="kw-2">ref </span>e) =&gt; <span class="macro">write!</span>(f, <span class="string">"Wrapped &amp;str error: {}"</span>, e),
+            WrappedError::StringUtf8Error(<span class="kw-2">ref </span>e) =&gt; <span class="macro">write!</span>(f, <span class="string">"Wrapped String error: {}"</span>, e),
+            WrappedError::FFINullError(<span class="kw-2">ref </span>e) =&gt; <span class="macro">write!</span>(f, <span class="string">"Wrapped null error: {}"</span>, e),
         }
     }
 }

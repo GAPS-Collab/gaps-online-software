@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/commands.rs`."><title>commands.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/commands.rs`."><title>commands.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -881,6 +882,16 @@
 <a href="#881" id="881">881</a>
 <a href="#882" id="882">882</a>
 <a href="#883" id="883">883</a>
+<a href="#884" id="884">884</a>
+<a href="#885" id="885">885</a>
+<a href="#886" id="886">886</a>
+<a href="#887" id="887">887</a>
+<a href="#888" id="888">888</a>
+<a href="#889" id="889">889</a>
+<a href="#890" id="890">890</a>
+<a href="#891" id="891">891</a>
+<a href="#892" id="892">892</a>
+<a href="#893" id="893">893</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Commmands which can be issued
 //! to the various components of 
 //! the tof system.
@@ -914,7 +925,7 @@
                      PacketType};
 
 <span class="macro">cfg_if::cfg_if! </span>{
-  <span class="kw">if </span><span class="attr">#[cfg(feature = <span class="string">&quot;random&quot;</span>)]  </span>{
+  <span class="kw">if </span><span class="attr">#[cfg(feature = <span class="string">"random"</span>)]  </span>{
     <span class="kw">use </span><span class="kw">crate</span>::FromRandom;
     <span class="kw">extern crate </span>rand;
     <span class="kw">use </span>rand::Rng;
@@ -931,30 +942,30 @@
   </span>CmdMoni                    = <span class="number">2u8</span>,
   <span class="doccomment">/// command code for power management
   </span>CmdPower                   = <span class="number">10u8</span>,
-  <span class="doccomment">/// command code for &quot;Set LTB Thresholds&quot;
+  <span class="doccomment">/// command code for "Set LTB Thresholds"
   </span>CmdSetThresholds           = <span class="number">21u8</span>,         
-  <span class="doccomment">/// command code for &quot;Configure MTB&quot;
+  <span class="doccomment">/// command code for "Configure MTB"
   </span>CmdSetMTConfig             = <span class="number">22u8</span>,        
-  <span class="doccomment">/// command code for &quot;Set preamp bias&quot;
+  <span class="doccomment">/// command code for "Set preamp bias"
   </span>CmdSetPreampBias           = <span class="number">28u8</span>,         
-  <span class="doccomment">/// command code for &quot;Stop Data taking&quot;
+  <span class="doccomment">/// command code for "Stop Data taking"
   </span>CmdDataRunStop             = <span class="number">30u8</span>,  
-  <span class="doccomment">/// command code for &quot;Start Data taking&quot;
+  <span class="doccomment">/// command code for "Start Data taking"
   </span>CmdDataRunStart            = <span class="number">31u8</span>,    
-  <span class="doccomment">/// command code for &quot;Start validation run&quot;
+  <span class="doccomment">/// command code for "Start validation run"
   </span>CmdStartValidationRun      = <span class="number">32u8</span>,         
-  <span class="doccomment">/// command code for &quot;Get all waveforms&quot;
+  <span class="doccomment">/// command code for "Get all waveforms"
   </span>CmdGetFullWaveforms        = <span class="number">41u8</span>,
-  <span class="doccomment">/// command code for &quot;Run no input calibration&quot;
+  <span class="doccomment">/// command code for "Run no input calibration"
   </span>CmdNoiCalibration          = <span class="number">50u8</span>,       
-  <span class="doccomment">/// command code for &quot;Run voltage calibration&quot;
+  <span class="doccomment">/// command code for "Run voltage calibration"
   </span>CmdVoltageCalibration      = <span class="number">51u8</span>,       
-  <span class="doccomment">/// command code for &quot;Run timing calibration&quot;
+  <span class="doccomment">/// command code for "Run timing calibration"
   </span>CmdTimingCalibration       = <span class="number">52u8</span>,
-  <span class="doccomment">/// command code for &quot;Run full calibration&quot;
+  <span class="doccomment">/// command code for "Run full calibration"
   </span>CmdDefaultCalibration      = <span class="number">53u8</span>, 
 
-  <span class="doccomment">/// command code for &quot;Send the whole event cache over the wire&quot;
+  <span class="doccomment">/// command code for "Send the whole event cache over the wire"
   </span>CmdUnspoolEventCache       = <span class="number">44u8</span>,
 
   <span class="doccomment">/// command code for setting the size of the rb buffers.
@@ -969,14 +980,16 @@
   </span>CmdTriggerModeForcedMTB    = <span class="number">25u8</span>,
 
   <span class="doccomment">/// command code for restarting systemd
-  </span>CmdSystemdReboot           = <span class="number">60u8
+  </span>CmdSystemdReboot           = <span class="number">60u8</span>,
+  <span class="doccomment">/// command code for putting liftof-cc in listening mode
+  </span>CmdListen                  = <span class="number">70u8
 </span>}
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>TofCommandCode {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
     <span class="kw">let </span>r = serde_json::to_string(<span class="self">self</span>).unwrap_or(
-      String::from(<span class="string">&quot;Error: cannot unwrap this TofCommandCodes&quot;</span>));
-    <span class="macro">write!</span>(f, <span class="string">&quot;&lt;TofCommandCodes: {}&gt;&quot;</span>, r)
+      String::from(<span class="string">"Error: cannot unwrap this TofCommandCodes"</span>));
+    <span class="macro">write!</span>(f, <span class="string">"&lt;TofCommandCodes: {}&gt;"</span>, r)
   }
 }
 
@@ -1008,7 +1021,7 @@
   }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;random&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"random"</span>)]
 </span><span class="kw">impl </span>FromRandom <span class="kw">for </span>TofCommandCode {
   <span class="kw">fn </span>from_random() -&gt; <span class="self">Self </span>{
     <span class="kw">let </span>choices = [
@@ -1072,9 +1085,9 @@
   /// THIS DOES NOT GUARANTEE THAT SERVER IS ACTUALLY DOING 
   /// SOMETHING USEFUL, IT JUST ACKNOWLEDGES EXECUTION.
   </span>RespSuccFingersCrossed             = <span class="number">200u32</span>,
-  <span class="doccomment">/// The command can&#39;t be executed since currently data taking is not active
+  <span class="doccomment">/// The command can't be executed since currently data taking is not active
   </span>RespErrNoRunActive                 = <span class="number">501u32</span>,
-  <span class="doccomment">/// The command can&#39;t be executed since currently data taking is active
+  <span class="doccomment">/// The command can't be executed since currently data taking is active
   </span>RespErrRunActive                   = <span class="number">502u32</span>,
   <span class="doccomment">/// The command got stuck somewhere and did not make it to the intended receiver
   </span>RespErrCmdStuck                    = <span class="number">503u32
@@ -1083,8 +1096,8 @@
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>TofCommandResp {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
     <span class="kw">let </span>r = serde_json::to_string(<span class="self">self</span>).unwrap_or(
-      String::from(<span class="string">&quot;Error: cannot unwrap this TofCommandResp&quot;</span>));
-    <span class="macro">write!</span>(f, <span class="string">&quot;&lt;TofCommandResp: {}&gt;&quot;</span>, r)
+      String::from(<span class="string">"Error: cannot unwrap this TofCommandResp"</span>));
+    <span class="macro">write!</span>(f, <span class="string">"&lt;TofCommandResp: {}&gt;"</span>, r)
   }
 }
 
@@ -1108,7 +1121,7 @@
   }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;random&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"random"</span>)]
 </span><span class="kw">impl </span>FromRandom <span class="kw">for </span>TofCommandResp {
   
   <span class="kw">fn </span>from_random() -&gt; <span class="self">Self </span>{
@@ -1141,11 +1154,12 @@
 #[repr(u8)]
 </span><span class="kw">pub enum </span>TofOperationMode {
   Unknown          = <span class="number">0u8</span>,
-  <span class="attr">#[deprecated(since=<span class="string">&quot;0.8.3&quot;</span>)] 
+  Default          = <span class="number">1u8</span>,
+  <span class="attr">#[deprecated(since=<span class="string">"0.8.3"</span>)] 
   </span>StreamAny        = <span class="number">10u8</span>,
-  <span class="attr">#[deprecated(since=<span class="string">&quot;0.8.3&quot;</span>)] 
+  <span class="attr">#[deprecated(since=<span class="string">"0.8.3"</span>)] 
   </span>RequestReply     = <span class="number">20u8</span>,
-  <span class="doccomment">/// Don&#39;t decode any of the event 
+  <span class="doccomment">/// Don't decode any of the event 
   /// data on the RB, just push it 
   /// onward
   </span>RBHighThroughput = <span class="number">30u8</span>,
@@ -1156,8 +1170,8 @@
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>TofOperationMode {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
     <span class="kw">let </span>r = serde_json::to_string(<span class="self">self</span>).unwrap_or(
-      String::from(<span class="string">&quot;Error: cannot unwrap this TofOperationMode&quot;</span>));
-    <span class="macro">write!</span>(f, <span class="string">&quot;&lt;TofOperationMode: {}&gt;&quot;</span>, r)
+      String::from(<span class="string">"Error: cannot unwrap this TofOperationMode"</span>));
+    <span class="macro">write!</span>(f, <span class="string">"&lt;TofOperationMode: {}&gt;"</span>, r)
   }
 }
 
@@ -1165,6 +1179,7 @@
   <span class="kw">fn </span>from(value: u8) -&gt; <span class="self">Self </span>{
     <span class="kw">match </span>value {
       <span class="number">0u8  </span>=&gt; TofOperationMode::Unknown,
+      <span class="number">1u8  </span>=&gt; TofOperationMode::Default,
       <span class="number">10u8 </span>=&gt; TofOperationMode::StreamAny,
       <span class="number">20u8 </span>=&gt; TofOperationMode::RequestReply,
       <span class="number">30u8 </span>=&gt; TofOperationMode::RBHighThroughput,
@@ -1175,12 +1190,13 @@
   }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;random&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"random"</span>)]
 </span><span class="kw">impl </span>FromRandom <span class="kw">for </span>TofOperationMode {
   
   <span class="kw">fn </span>from_random() -&gt; <span class="self">Self </span>{
     <span class="kw">let </span>choices = [
       TofOperationMode::Unknown,
+      TofOperationMode::Default,
       TofOperationMode::RequestReply,
       TofOperationMode::StreamAny,
       TofOperationMode::RBHighThroughput,
@@ -1221,10 +1237,10 @@
   <span class="kw">pub fn </span>command_code_to_string(cc : u8) -&gt; String {
     <span class="kw">match </span>cc {
       <span class="self">Self</span>::REQUEST_EVENT =&gt; {
-        <span class="kw">return </span>String::from(<span class="string">&quot;GetReducedDataPacket&quot;</span>);
+        <span class="kw">return </span>String::from(<span class="string">"GetReducedDataPacket"</span>);
       }
       <span class="kw">_ </span>=&gt; {
-        <span class="kw">return </span>String::from(<span class="string">&quot;Unknown&quot;</span>);
+        <span class="kw">return </span>String::from(<span class="string">"Unknown"</span>);
       }
     }
   }
@@ -1239,7 +1255,7 @@
           cmd = _cmd;
         },
         <span class="prelude-val">Err</span>(err) =&gt; {
-          <span class="macro">error!</span>(<span class="string">&quot;Can not get RBCommand from TofPacket, error {err}&quot;</span>);
+          <span class="macro">error!</span>(<span class="string">"Can not get RBCommand from TofPacket, error {err}"</span>);
         }
       }
     }
@@ -1249,7 +1265,7 @@
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>RBCommand {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
     <span class="kw">let </span>cc = RBCommand::command_code_to_string(<span class="self">self</span>.command_code);
-    <span class="macro">write!</span>(f, <span class="string">&quot;&lt;RBCommand: {}; RB ID {}; CH MASK {}; PAYLOAD {}&gt;&quot;</span>, cc, <span class="self">self</span>.rb_id, <span class="self">self</span>.channel_mask, <span class="self">self</span>.payload)
+    <span class="macro">write!</span>(f, <span class="string">"&lt;RBCommand: {}; RB ID {}; CH MASK {}; PAYLOAD {}&gt;"</span>, cc, <span class="self">self</span>.rb_id, <span class="self">self</span>.channel_mask, <span class="self">self</span>.payload)
   }
 }
 
@@ -1290,7 +1306,7 @@
   }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;random&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"random"</span>)]
 </span><span class="kw">impl </span>FromRandom <span class="kw">for </span>RBCommand {    
   <span class="kw">fn </span>from_random() -&gt; <span class="self">Self </span>{
     <span class="kw">let </span><span class="kw-2">mut </span>rng = rand::thread_rng();
@@ -1331,13 +1347,14 @@
   TriggerModeForced       (u32),
   TriggerModeForcedMTB    (u32),
   SystemdReboot           (u32),
+  Listen                  (u32),
 }
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>TofCommand {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
     <span class="kw">let </span>r = serde_json::to_string(<span class="self">self</span>).unwrap_or(
-      String::from(<span class="string">&quot;Error: cannot unwrap this TofCommand&quot;</span>));
-    <span class="macro">write!</span>(f, <span class="string">&quot;&lt;TofCommand: {}&gt;&quot;</span>, r)
+      String::from(<span class="string">"Error: cannot unwrap this TofCommand"</span>));
+    <span class="macro">write!</span>(f, <span class="string">"&lt;TofCommand: {}&gt;"</span>, r)
   }
 }
 
@@ -1371,7 +1388,7 @@
     bytes[<span class="number">0</span>] = <span class="number">0xAA</span>;
     bytes[<span class="number">1</span>] = <span class="number">0xAA</span>;
     bytes[<span class="number">2</span>] = TofCommand::to_command_code(<span class="kw-2">&amp;</span><span class="self">self</span>)
-      .expect(<span class="string">&quot;This can&#39;t fail, since this is implemented on MYSELF and I am a TofCommand!&quot;</span>) <span class="kw">as </span>u8; 
+      .expect(<span class="string">"This can't fail, since this is implemented on MYSELF and I am a TofCommand!"</span>) <span class="kw">as </span>u8; 
     <span class="kw">let </span>value_bytes = <span class="self">self</span>.get_value().to_le_bytes();
    
     <span class="kw">for </span>n <span class="kw">in </span><span class="number">0</span>..<span class="number">4 </span>{
@@ -1389,7 +1406,7 @@
     stream[<span class="number">0</span>] = <span class="number">0xAA</span>;
     stream[<span class="number">1</span>] = <span class="number">0xAA</span>;
     stream[<span class="number">2</span>] = TofCommand::to_command_code(<span class="kw-2">&amp;</span><span class="self">self</span>)
-      .expect(<span class="string">&quot;This can&#39;t fail, since this is implemented on MYSELF and I am a TofCommand!&quot;</span>) <span class="kw">as </span>u8; 
+      .expect(<span class="string">"This can't fail, since this is implemented on MYSELF and I am a TofCommand!"</span>) <span class="kw">as </span>u8; 
     <span class="kw">let </span>value_bytes = <span class="self">self</span>.get_value().to_le_bytes();
    
     <span class="kw">for </span>n <span class="kw">in </span><span class="number">0</span>..<span class="number">4 </span>{
@@ -1425,6 +1442,7 @@
       TofCommand::TriggerModeForced       (data) =&gt; { value = <span class="kw-2">*</span>data;},
       TofCommand::TriggerModeForcedMTB    (data) =&gt; { value = <span class="kw-2">*</span>data;},
       TofCommand::SystemdReboot           (data) =&gt; { value = <span class="kw-2">*</span>data;},
+      TofCommand::Listen                  (data) =&gt; { value = <span class="kw-2">*</span>data;}
     }
     value
   }  
@@ -1452,7 +1470,8 @@
       TofCommandCode::CmdSetRBDataBufSize        =&gt; TofCommand::SetRBDataBufSize        (<span class="number">0u32</span>),
       TofCommandCode::CmdTriggerModeForced       =&gt; TofCommand::TriggerModeForced       (<span class="number">0u32</span>),
       TofCommandCode::CmdTriggerModeForcedMTB    =&gt; TofCommand::TriggerModeForcedMTB    (<span class="number">0u32</span>),
-      TofCommandCode::CmdSystemdReboot           =&gt; TofCommand::SystemdReboot           (<span class="number">0u32</span>)
+      TofCommandCode::CmdSystemdReboot           =&gt; TofCommand::SystemdReboot           (<span class="number">0u32</span>),
+      TofCommandCode::CmdListen                  =&gt; TofCommand::Listen                  (<span class="number">0u32</span>)
     }
   }
     
@@ -1478,7 +1497,8 @@
       TofCommand::SetRBDataBufSize        (<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(TofCommandCode::CmdSetRBDataBufSize),
       TofCommand::TriggerModeForced       (<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(TofCommandCode::CmdTriggerModeForced),
       TofCommand::TriggerModeForcedMTB    (<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(TofCommandCode::CmdTriggerModeForcedMTB),
-      TofCommand::SystemdReboot           (<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(TofCommandCode::CmdSystemdReboot)
+      TofCommand::SystemdReboot           (<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(TofCommandCode::CmdSystemdReboot),
+      TofCommand::Listen                  (<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(TofCommandCode::CmdListen)
     }
   }
 
@@ -1487,14 +1507,14 @@
     <span class="kw">match </span>packet.packet_type {
       PacketType::TofCommand =&gt; (),
       <span class="kw">_ </span>=&gt; {
-        <span class="macro">debug!</span>(<span class="string">&quot;Packet doesn&#39;t have PacketType::TofCommand&quot;</span>);
+        <span class="macro">debug!</span>(<span class="string">"Packet doesn't have PacketType::TofCommand"</span>);
         <span class="kw">return </span><span class="prelude-val">None</span>;
         }
     } <span class="comment">// end match
     </span><span class="kw">let </span>cmd_pk = TofCommand::from_bytestream(<span class="kw-2">&amp;</span>packet.payload, <span class="kw-2">&amp;mut </span><span class="number">0</span>);
     <span class="kw">match </span>cmd_pk {
       <span class="prelude-val">Err</span>(err) =&gt; {
-        <span class="macro">warn!</span>(<span class="string">&quot;Could not decode CMD packet, err {:?}&quot;</span>, err);
+        <span class="macro">warn!</span>(<span class="string">"Could not decode CMD packet, err {:?}"</span>, err);
         <span class="kw">return </span><span class="prelude-val">None</span>;
       }
       <span class="prelude-val">Ok</span>(cmd) =&gt; {
@@ -1512,12 +1532,12 @@
   /// second the specific value of the command.
   </span><span class="kw">fn </span>from(pair : (u8, u32)) -&gt; TofCommand {
     <span class="kw">let </span>(input, value) = pair;
-    <span class="macro">trace!</span>(<span class="string">&quot;Got in input {:?}&quot;</span>, pair);
+    <span class="macro">trace!</span>(<span class="string">"Got in input {:?}"</span>, pair);
     TofCommand::from_command_code(TofCommandCode::try_from(input).unwrap(), value)
   }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;random&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"random"</span>)]
 </span><span class="kw">impl </span>FromRandom <span class="kw">for </span>TofCommand {
   
   <span class="kw">fn </span>from_random() -&gt; <span class="self">Self </span>{
@@ -1543,7 +1563,8 @@
       TofCommand::SetRBDataBufSize        (val),
       TofCommand::TriggerModeForced       (val),
       TofCommand::TriggerModeForcedMTB    (val),
-      TofCommand::SystemdReboot           (val)
+      TofCommand::SystemdReboot           (val),
+      TofCommand::Listen                  (val)
     ];
     <span class="kw">let </span>idx = rng.gen_range(<span class="number">0</span>..choices.len());
     choices[idx]
@@ -1574,7 +1595,7 @@
                  stream[<span class="kw-2">*</span>pos+<span class="number">1</span>]];
     <span class="kw-2">*</span>pos += <span class="number">2</span>;
     <span class="kw">if </span><span class="self">Self</span>::HEAD != u16::from_le_bytes(two_bytes) {
-      <span class="macro">error!</span>(<span class="string">&quot;Packet does not start with HEAD signature&quot;</span>);
+      <span class="macro">error!</span>(<span class="string">"Packet does not start with HEAD signature"</span>);
       <span class="kw">return </span><span class="prelude-val">Err</span>(SerializationError::HeadInvalid {});
     }
    
@@ -1591,7 +1612,7 @@
     <span class="kw">let </span>pair    = (cc, value);
     <span class="kw">let </span>command = <span class="self">Self</span>::from(pair);
     <span class="kw">if </span><span class="self">Self</span>::TAIL != u16::from_le_bytes(two_bytes) {
-      <span class="macro">error!</span>(<span class="string">&quot;Packet does not end with TAIL signature&quot;</span>);
+      <span class="macro">error!</span>(<span class="string">"Packet does not end with TAIL signature"</span>);
       <span class="kw">return </span><span class="prelude-val">Err</span>(SerializationError::TailInvalid {});
     }
     <span class="prelude-val">Ok</span>(command)
@@ -1630,12 +1651,12 @@
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>TofResponse {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
     <span class="kw">let </span>r = serde_json::to_string(<span class="self">self</span>).unwrap_or(
-      String::from(<span class="string">&quot;Error: cannot unwrap this TofResponse&quot;</span>));
-    <span class="macro">write!</span>(f, <span class="string">&quot;&lt;TofResponse: {}&gt;&quot;</span>, r)
+      String::from(<span class="string">"Error: cannot unwrap this TofResponse"</span>));
+    <span class="macro">write!</span>(f, <span class="string">"&lt;TofResponse: {}&gt;"</span>, r)
   }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;random&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"random"</span>)]
 </span><span class="kw">impl </span>FromRandom <span class="kw">for </span>TofResponse {
   
   <span class="kw">fn </span>from_random() -&gt; <span class="self">Self </span>{
@@ -1693,7 +1714,7 @@
                  stream[<span class="kw-2">*</span>pos+<span class="number">1</span>]];
     <span class="kw-2">*</span>pos += <span class="number">2</span>;
     <span class="kw">if </span>TofResponse::HEAD != u16::from_le_bytes(two_bytes) {
-      <span class="macro">warn!</span>(<span class="string">&quot;Packet does not start with HEAD signature&quot;</span>);
+      <span class="macro">warn!</span>(<span class="string">"Packet does not start with HEAD signature"</span>);
       <span class="kw">return </span><span class="prelude-val">Err</span>(SerializationError::HeadInvalid {});
     }
    
@@ -1710,7 +1731,7 @@
     <span class="kw">let </span>pair = (cc, value);
     <span class="kw">let </span>response = TofResponse::from(pair);
     <span class="kw">if </span>TofResponse::TAIL != u16::from_le_bytes(two_bytes) {
-      <span class="macro">warn!</span>(<span class="string">&quot;Packet does not end with TAIL signature&quot;</span>);
+      <span class="macro">warn!</span>(<span class="string">"Packet does not end with TAIL signature"</span>);
       <span class="kw">return </span><span class="prelude-val">Err</span>(SerializationError::TailInvalid {});
     }
     <span class="prelude-val">Ok</span>(response)
@@ -1745,7 +1766,7 @@
   }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;random&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"random"</span>)]
 #[test]
 </span><span class="kw">fn </span>test_tofoperationmode() {
   <span class="kw">let </span><span class="kw-2">mut </span>type_codes = Vec::&lt;u8&gt;::new();
@@ -1757,7 +1778,7 @@
   }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;random&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"random"</span>)]
 #[test]
 </span><span class="kw">fn </span>serialization_rbcommand() {
   <span class="kw">let </span>cmd  = RBCommand::from_random();

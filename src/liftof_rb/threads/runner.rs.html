@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-rb/src/threads/runner.rs`."><title>runner.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="liftof_rb" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-rb/src/threads/runner.rs`."><title>runner.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="liftof_rb" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -933,16 +934,16 @@
                                      prog_b        : <span class="kw-2">&amp;</span>ProgressBar,
                                      show_progress : bool,
                                      streamer      : <span class="kw-2">&amp;mut </span>RBEventMemoryStreamer) {
-  <span class="macro">info!</span>(<span class="string">&quot;Calling termination sequence, will end current run!&quot;</span>);
+  <span class="macro">info!</span>(<span class="string">"Calling termination sequence, will end current run!"</span>);
   <span class="comment">// just to be sure we set the self trigger rate to 0 
   // this is for the poisson trigger)
   </span><span class="kw">match </span>set_self_trig_rate(<span class="number">0</span>) {
-    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Resetting self trigger rate to 0Hz failed! Err {err}&quot;</span>),
+    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Resetting self trigger rate to 0Hz failed! Err {err}"</span>),
     <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
   }
   <span class="kw">match </span>disable_trigger() {
-    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Can not disable triggers, error {err}&quot;</span>),
-    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">&quot;Disabling triggers! Stopping current run!&quot;</span>)
+    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Can not disable triggers, error {err}"</span>),
+    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">"Disabling triggers! Stopping current run!"</span>)
   }
   <span class="kw">if </span>show_progress {
     prog_ev.finish();
@@ -952,11 +953,11 @@
   <span class="kw">match </span>experimental_ram_buffer_handler(<span class="number">1</span>,
                                         streamer) { 
     <span class="prelude-val">Err</span>(err)   =&gt; {
-      <span class="macro">error!</span>(<span class="string">&quot;Can not deal with RAM buffers {err}&quot;</span>);
+      <span class="macro">error!</span>(<span class="string">"Can not deal with RAM buffers {err}"</span>);
     },
     <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; ()
   }
-  <span class="macro">info!</span>(<span class="string">&quot;Termination sequence complete!&quot;</span>);
+  <span class="macro">info!</span>(<span class="string">"Termination sequence complete!"</span>);
 }
 
 <span class="doccomment">/// Shutdown a run within the runner thread
@@ -965,16 +966,16 @@
                         prog_b        : <span class="kw-2">&amp;</span>ProgressBar,
                         show_progress : bool,
                         bs_sender     : <span class="kw-2">&amp;</span>Sender&lt;Vec&lt;u8&gt;&gt;) {
-  <span class="macro">info!</span>(<span class="string">&quot;Calling termination sequence, will end current run!&quot;</span>);
+  <span class="macro">info!</span>(<span class="string">"Calling termination sequence, will end current run!"</span>);
   <span class="comment">// just to be sure we set the self trigger rate to 0 
   // this is for the poisson trigger)
   </span><span class="kw">match </span>set_self_trig_rate(<span class="number">0</span>) {
-    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Resetting self trigger rate to 0Hz failed! Err {err}&quot;</span>),
+    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Resetting self trigger rate to 0Hz failed! Err {err}"</span>),
     <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
   }
   <span class="kw">match </span>disable_trigger() {
-    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Can not disable triggers, error {err}&quot;</span>),
-    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">&quot;Disabling triggers! Stopping current run!&quot;</span>)
+    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Can not disable triggers, error {err}"</span>),
+    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">"Disabling triggers! Stopping current run!"</span>)
   }
   <span class="kw">if </span>show_progress {
     prog_ev.finish();
@@ -984,11 +985,11 @@
   <span class="kw">match </span>ram_buffer_handler(<span class="number">1</span>,
                            <span class="kw-2">&amp;</span>bs_sender) { 
     <span class="prelude-val">Err</span>(err)   =&gt; {
-      <span class="macro">error!</span>(<span class="string">&quot;Can not deal with RAM buffers {err}&quot;</span>);
+      <span class="macro">error!</span>(<span class="string">"Can not deal with RAM buffers {err}"</span>);
     },
     <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; ()
   }
-  <span class="macro">info!</span>(<span class="string">&quot;Termination sequence complete!&quot;</span>);
+  <span class="macro">info!</span>(<span class="string">"Termination sequence complete!"</span>);
 }
 
 
@@ -1046,10 +1047,10 @@
   <span class="kw">let </span><span class="kw-2">mut </span>prog_a  = ProgressBar::hidden();
   <span class="kw">let </span><span class="kw-2">mut </span>prog_b  = ProgressBar::hidden();
   <span class="kw">let </span><span class="kw-2">mut </span>prog_ev = ProgressBar::hidden();
-  <span class="kw">let </span>template_bar_a   : <span class="kw-2">&amp;</span>str = <span class="string">&quot;[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.blue/grey} {bytes:&gt;7}/{total_bytes:7} &quot;</span>;
-  <span class="kw">let </span>template_bar_b   : <span class="kw-2">&amp;</span>str = <span class="string">&quot;[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.green/grey} {bytes:&gt;7}/{total_bytes:7} &quot;</span>;
-  <span class="kw">let </span>label_a   = String::from(<span class="string">&quot;Buff A&quot;</span>);
-  <span class="kw">let </span>label_b   = String::from(<span class="string">&quot;Buff B&quot;</span>);
+  <span class="kw">let </span>template_bar_a   : <span class="kw-2">&amp;</span>str = <span class="string">"[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.blue/grey} {bytes:&gt;7}/{total_bytes:7} "</span>;
+  <span class="kw">let </span>template_bar_b   : <span class="kw-2">&amp;</span>str = <span class="string">"[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.green/grey} {bytes:&gt;7}/{total_bytes:7} "</span>;
+  <span class="kw">let </span>label_a   = String::from(<span class="string">"Buff A"</span>);
+  <span class="kw">let </span>label_b   = String::from(<span class="string">"Buff B"</span>);
   <span class="kw">let </span>sty_a = ProgressStyle::with_template(template_bar_a)
   .unwrap();
   <span class="kw">let </span>sty_b = ProgressStyle::with_template(template_bar_b)
@@ -1069,7 +1070,7 @@
     <span class="kw">match </span>thread_control.lock() {
       <span class="prelude-val">Ok</span>(tc) =&gt; {
         <span class="kw">if </span>tc.stop_flag {
-          <span class="macro">info!</span>(<span class="string">&quot;Received stop signal. Will stop thread!&quot;</span>);
+          <span class="macro">info!</span>(<span class="string">"Received stop signal. Will stop thread!"</span>);
           termination_seqeunce(<span class="kw-2">&amp;</span>prog_ev     ,
                                <span class="kw-2">&amp;</span>prog_a      ,
                                <span class="kw-2">&amp;</span>prog_b      ,
@@ -1079,12 +1080,12 @@
         }
       },
       <span class="prelude-val">Err</span>(err) =&gt; {
-        <span class="macro">trace!</span>(<span class="string">&quot;Can&#39;t acquire lock! {err}&quot;</span>);
+        <span class="macro">trace!</span>(<span class="string">"Can't acquire lock! {err}"</span>);
       },
     }
     <span class="kw">match </span>run_config.try_recv() {
       <span class="prelude-val">Err</span>(err) =&gt; {
-        <span class="macro">trace!</span>(<span class="string">&quot;Did not receive a new RunConfig! Err {err}&quot;</span>);
+        <span class="macro">trace!</span>(<span class="string">"Did not receive a new RunConfig! Err {err}"</span>);
         <span class="comment">// in this case, we just wait until we get a new run config!
         </span><span class="kw">if </span>listen_for_new_config {
           thread::sleep(one_sec);
@@ -1097,7 +1098,7 @@
         // In that case, we will end and listen for the next
         // config
         </span>listen_for_new_config = <span class="bool-val">false</span>;
-        <span class="macro">println!</span>(<span class="string">&quot;==&gt; Received a new set of RunConfig\n {}!&quot;</span>, new_config);
+        <span class="macro">println!</span>(<span class="string">"==&gt; Received a new set of RunConfig\n {}!"</span>, new_config);
 
         <span class="comment">// reset some variables for the loop
         </span>first_iter   = <span class="bool-val">true</span>; 
@@ -1125,8 +1126,8 @@
         </span>buffer_trip = (rc.rb_buff_size <span class="kw">as </span>usize)<span class="kw-2">*</span>EVENT_SIZE; 
         <span class="kw">if </span>(buffer_trip &gt; uio1_total_size) 
         || (buffer_trip &gt; uio2_total_size) {
-          <span class="macro">error!</span>(<span class="string">&quot;Tripsize of {buffer_trip} exceeds buffer sizes of A : {uio1_total_size} or B : {uio2_total_size}. The EVENT_SIZE is {EVENT_SIZE}&quot;</span>);
-          <span class="macro">warn!</span>(<span class="string">&quot;Will set buffer_trip to {DATABUF_TOTAL_SIZE}&quot;</span>);
+          <span class="macro">error!</span>(<span class="string">"Tripsize of {buffer_trip} exceeds buffer sizes of A : {uio1_total_size} or B : {uio2_total_size}. The EVENT_SIZE is {EVENT_SIZE}"</span>);
+          <span class="macro">warn!</span>(<span class="string">"Will set buffer_trip to {DATABUF_TOTAL_SIZE}"</span>);
           buffer_trip = DATABUF_TOTAL_SIZE;
         } <span class="kw">else </span>{
           uio1_total_size = buffer_trip;
@@ -1139,20 +1140,20 @@
         //}
         </span><span class="kw">match </span>opmode_to_cache.send(rc.tof_op_mode.clone()) {
           <span class="prelude-val">Err</span>(err) =&gt; {
-            <span class="macro">error!</span>(<span class="string">&quot;Unable to send TofOperationMode to the event cache! Err {err}&quot;</span>);
+            <span class="macro">error!</span>(<span class="string">"Unable to send TofOperationMode to the event cache! Err {err}"</span>);
           }
           <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
-            <span class="macro">info!</span>(<span class="string">&quot;Send TofOperationMode {} to event processing thread!&quot;</span>, rc.tof_op_mode);
+            <span class="macro">info!</span>(<span class="string">"Send TofOperationMode {} to event processing thread!"</span>, rc.tof_op_mode);
           }
         }
 
         <span class="kw">let </span>dt_c = rc.data_type.clone();
         <span class="kw">match </span>dtf_to_evproc.send(dt_c) {
           <span class="prelude-val">Err</span>(err) =&gt; {
-            <span class="macro">error!</span>(<span class="string">&quot;Unable to send dataformat to event processing thread! {err}&quot;</span>);
+            <span class="macro">error!</span>(<span class="string">"Unable to send dataformat to event processing thread! {err}"</span>);
           }
           <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
-            <span class="macro">info!</span>(<span class="string">&quot;Sent dataformat {} to event processing thread!&quot;</span>, rc.data_type);
+            <span class="macro">info!</span>(<span class="string">"Sent dataformat {} to event processing thread!"</span>, rc.data_type);
           }
         }
 
@@ -1175,38 +1176,38 @@
         <span class="kw">if </span>rc.trigger_fixed_rate&gt;<span class="number">0 </span>{
           force_trigger = <span class="bool-val">true</span>;
           time_between_events = <span class="prelude-val">Some</span>(<span class="number">1.0</span>/(rc.trigger_fixed_rate <span class="kw">as </span>f32));
-          <span class="macro">warn!</span>(<span class="string">&quot;Will run in forced trigger mode with a rate of {} Hz!&quot;</span>, rc.trigger_fixed_rate);
-          <span class="macro">debug!</span>(<span class="string">&quot;Will call trigger() every {} seconds...&quot;</span>, time_between_events.unwrap());
+          <span class="macro">warn!</span>(<span class="string">"Will run in forced trigger mode with a rate of {} Hz!"</span>, rc.trigger_fixed_rate);
+          <span class="macro">debug!</span>(<span class="string">"Will call trigger() every {} seconds..."</span>, time_between_events.unwrap());
           latch_to_mtb = <span class="bool-val">false</span>;
         }
         <span class="kw">match </span>disable_trigger() {
-          <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Can not disable triggers! {err}&quot;</span>),
-          <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">&quot;Triggers disabled awaiting SOFT_RESET!&quot;</span>),
+          <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Can not disable triggers! {err}"</span>),
+          <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">"Triggers disabled awaiting SOFT_RESET!"</span>),
         }
-        <span class="macro">info!</span>(<span class="string">&quot;Attempting soft reset...&quot;</span>);
+        <span class="macro">info!</span>(<span class="string">"Attempting soft reset..."</span>);
         <span class="kw">match </span>soft_reset_board() {
-          <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Unable to reset board! {err}&quot;</span>),
-          <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">&quot;SOFT_RESET succesful!&quot;</span>),
+          <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to reset board! {err}"</span>),
+          <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">"SOFT_RESET succesful!"</span>),
         }
-        <span class="comment">// preparations done, let&#39;s gooo
+        <span class="comment">// preparations done, let's gooo
         //reset_dma_and_buffers();
 
         </span><span class="kw">if </span>latch_to_mtb {
           <span class="kw">match </span>set_master_trigger_mode() {
-            <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Can not initialize master trigger mode, Err {err}&quot;</span>),
-            <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">&quot;Latching to MasterTrigger&quot;</span>)
+            <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Can not initialize master trigger mode, Err {err}"</span>),
+            <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">"Latching to MasterTrigger"</span>)
           }
         } <span class="kw">else </span>{
           <span class="kw">match </span>disable_master_trigger_mode() {
-            <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Can not disable master trigger mode, Err {err}&quot;</span>),
-            <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">&quot;Master trigger mode didsabled!&quot;</span>)
+            <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Can not disable master trigger mode, Err {err}"</span>),
+            <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">"Master trigger mode didsabled!"</span>)
           }
         }
         
-        <span class="comment">// this basically signals &quot;RUNSTART&quot;
+        <span class="comment">// this basically signals "RUNSTART"
         </span><span class="kw">match </span>enable_trigger() {
-          <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Can not enable triggers! Err {err}&quot;</span>),
-          <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">&quot;Triggers enabled - Run start!&quot;</span>)
+          <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Can not enable triggers! Err {err}"</span>),
+          <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">"Triggers enabled - Run start!"</span>)
         }
         <span class="kw">if </span>rc.trigger_poisson_rate &gt; <span class="number">0 </span>{
           enable_poisson_self_trigger(rc.trigger_poisson_rate <span class="kw">as </span>f32);
@@ -1219,15 +1220,15 @@
           // for a short bit
           </span>thread::sleep(one_sec);
           <span class="kw">match </span>get_trigger_rate() {
-            <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Unable to obtain trigger rate! Err {err}&quot;</span>),
-            <span class="prelude-val">Ok</span>(rate) =&gt; <span class="macro">info!</span>(<span class="string">&quot;Seing MTB trigger rate of {rate} Hz&quot;</span>)
+            <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to obtain trigger rate! Err {err}"</span>),
+            <span class="prelude-val">Ok</span>(rate) =&gt; <span class="macro">info!</span>(<span class="string">"Seing MTB trigger rate of {rate} Hz"</span>)
           }
         }
         <span class="kw">if </span>show_progress {
           <span class="kw">if </span>rc.runs_forever() {
-            template_bar_n_ev = <span class="string">&quot;[{elapsed_precise}] {prefix} {msg} {spinner} &quot;</span>;
+            template_bar_n_ev = <span class="string">"[{elapsed_precise}] {prefix} {msg} {spinner} "</span>;
           } <span class="kw">else </span>{
-            template_bar_n_ev = <span class="string">&quot;[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.red/grey} {pos:&gt;7}/{len:7}&quot;</span>;
+            template_bar_n_ev = <span class="string">"[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.red/grey} {pos:&gt;7}/{len:7}"</span>;
           }
           sty_ev = ProgressStyle::with_template(template_bar_n_ev)
           .unwrap();
@@ -1239,18 +1240,18 @@
           prog_ev = multi_prog
                     .insert_after(<span class="kw-2">&amp;</span>prog_b, ProgressBar::new(rc.nevents <span class="kw">as </span>u64)); 
           prog_a.set_message (label_a.clone());
-          prog_a.set_prefix  (<span class="string">&quot;\u{1F4BE}&quot;</span>);
+          prog_a.set_prefix  (<span class="string">"\u{1F4BE}"</span>);
           prog_a.set_style   (sty_a.clone());
           prog_a.set_position(<span class="number">0</span>);
           prog_b.set_message (label_b.clone());
-          prog_b.set_prefix  (<span class="string">&quot;\u{1F4BE}&quot;</span>);
+          prog_b.set_prefix  (<span class="string">"\u{1F4BE}"</span>);
           prog_b.set_style   (sty_b.clone());
           prog_b.set_position(<span class="number">0</span>);
           prog_ev.set_style  (sty_ev.clone());
-          prog_ev.set_prefix (<span class="string">&quot;\u{2728}&quot;</span>);
-          prog_ev.set_message(<span class="string">&quot;EVENTS&quot;</span>);
+          prog_ev.set_prefix (<span class="string">"\u{2728}"</span>);
+          prog_ev.set_message(<span class="string">"EVENTS"</span>);
           prog_ev.set_position(<span class="number">0</span>);
-          <span class="macro">info!</span>(<span class="string">&quot;Preparations complete. Run start should be imminent.&quot;</span>);
+          <span class="macro">info!</span>(<span class="string">"Preparations complete. Run start should be imminent."</span>);
         }
         <span class="kw">continue</span>; <span class="comment">// start loop again
       </span>} <span class="comment">// end Ok(RunConfig) 
@@ -1264,24 +1265,24 @@
                              <span class="kw-2">&amp;</span>prog_b      ,
                              show_progress,
                              <span class="kw-2">&amp;</span>bs_sender   );
-        <span class="macro">info!</span>(<span class="string">&quot;Run stopped! The runner has processed {n_events} events!&quot;</span>);
+        <span class="macro">info!</span>(<span class="string">"Run stopped! The runner has processed {n_events} events!"</span>);
         <span class="kw">continue</span>;
       } <span class="comment">// end if terminate
       
       // We did not terminate the run,
       // that means we are still going!
       </span><span class="kw">if </span>force_trigger {
-        <span class="comment">//println!(&quot;Forcing trigger!&quot;);
-        //println!(&quot;Time between events {}&quot;, time_between_events.unwrap());
+        <span class="comment">//println!("Forcing trigger!");
+        //println!("Time between events {}", time_between_events.unwrap());
         </span><span class="kw">let </span>elapsed = timer.elapsed().as_secs_f32();
-        <span class="comment">//println!(&quot;Elapsed {}&quot;, elapsed);
-        </span><span class="macro">trace!</span>(<span class="string">&quot;Forced trigger mode, {} seconds since last trigger&quot;</span>, elapsed);
+        <span class="comment">//println!("Elapsed {}", elapsed);
+        </span><span class="macro">trace!</span>(<span class="string">"Forced trigger mode, {} seconds since last trigger"</span>, elapsed);
         <span class="comment">// decide if we have to issue the trigger signal NOW!
         </span><span class="kw">if </span>elapsed &gt; time_between_events.unwrap() {
           timer = Instant::now(); 
           <span class="kw">match </span>trigger() {
-            <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Error when triggering! {err}&quot;</span>),
-            <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">trace!</span>(<span class="string">&quot;Firing trigger!&quot;</span>)
+            <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Error when triggering! {err}"</span>),
+            <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">trace!</span>(<span class="string">"Firing trigger!"</span>)
           }
         } <span class="kw">else </span>{ <span class="comment">// not enough time has yet passed for the next trigger signal
           // FIXME - we could sleep here for a bit!
@@ -1295,7 +1296,7 @@
         //match get_event_count_mt() {
         </span><span class="kw">match </span>get_event_count() {
           <span class="prelude-val">Err </span>(err) =&gt; {
-            <span class="macro">error!</span>(<span class="string">&quot;Can not obtain event count! Err {:?}&quot;</span>, err);
+            <span class="macro">error!</span>(<span class="string">"Can not obtain event count! Err {:?}"</span>, err);
             <span class="kw">continue</span>;
           }
           <span class="prelude-val">Ok </span>(cnt) =&gt; {
@@ -1307,7 +1308,7 @@
             }
             <span class="kw">if </span>evt_cnt == last_evt_cnt {
               thread::sleep(one_milli);
-              <span class="macro">trace!</span>(<span class="string">&quot;We didn&#39;t get an updated event count!&quot;</span>);
+              <span class="macro">trace!</span>(<span class="string">"We didn't get an updated event count!"</span>);
               <span class="kw">continue</span>; <span class="comment">// only continue after we see a new event!
             </span>}
           } <span class="comment">// end ok
@@ -1319,7 +1320,7 @@
       </span><span class="kw">match </span>ram_buffer_handler(buffer_trip,
                                <span class="kw-2">&amp;</span>bs_sender) { 
         <span class="prelude-val">Err</span>(err)   =&gt; {
-          <span class="macro">error!</span>(<span class="string">&quot;Can not deal with RAM buffers {err}&quot;</span>);
+          <span class="macro">error!</span>(<span class="string">"Can not deal with RAM buffers {err}"</span>);
           <span class="kw">continue</span>;
         }
         <span class="prelude-val">Ok</span>(result) =&gt; {
@@ -1435,10 +1436,10 @@
   <span class="kw">let </span><span class="kw-2">mut </span>prog_a  = ProgressBar::hidden();
   <span class="kw">let </span><span class="kw-2">mut </span>prog_b  = ProgressBar::hidden();
   <span class="kw">let </span><span class="kw-2">mut </span>prog_ev = ProgressBar::hidden();
-  <span class="kw">let </span>template_bar_a   : <span class="kw-2">&amp;</span>str = <span class="string">&quot;[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.blue/grey} {bytes:&gt;7}/{total_bytes:7} &quot;</span>;
-  <span class="kw">let </span>template_bar_b   : <span class="kw-2">&amp;</span>str = <span class="string">&quot;[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.green/grey} {bytes:&gt;7}/{total_bytes:7} &quot;</span>;
-  <span class="kw">let </span>label_a   = String::from(<span class="string">&quot;Buff A&quot;</span>);
-  <span class="kw">let </span>label_b   = String::from(<span class="string">&quot;Buff B&quot;</span>);
+  <span class="kw">let </span>template_bar_a   : <span class="kw-2">&amp;</span>str = <span class="string">"[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.blue/grey} {bytes:&gt;7}/{total_bytes:7} "</span>;
+  <span class="kw">let </span>template_bar_b   : <span class="kw-2">&amp;</span>str = <span class="string">"[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.green/grey} {bytes:&gt;7}/{total_bytes:7} "</span>;
+  <span class="kw">let </span>label_a   = String::from(<span class="string">"Buff A"</span>);
+  <span class="kw">let </span>label_b   = String::from(<span class="string">"Buff B"</span>);
   <span class="kw">let </span>sty_a = ProgressStyle::with_template(template_bar_a)
   .unwrap();
   <span class="kw">let </span>sty_b = ProgressStyle::with_template(template_bar_b)
@@ -1457,7 +1458,7 @@
   <span class="kw">loop </span>{
     <span class="kw">match </span>run_config.try_recv() {
       <span class="prelude-val">Err</span>(err) =&gt; {
-        <span class="macro">trace!</span>(<span class="string">&quot;Did not receive a new RunConfig! Err {err}&quot;</span>);
+        <span class="macro">trace!</span>(<span class="string">"Did not receive a new RunConfig! Err {err}"</span>);
         <span class="comment">// in this case, we just wait until we get a new run config!
         </span><span class="kw">if </span>listen_for_new_config {
           thread::sleep(one_sec);
@@ -1470,7 +1471,7 @@
         // In that case, we will end and listen for the next
         // config
         </span>listen_for_new_config = <span class="bool-val">false</span>;
-        <span class="macro">println!</span>(<span class="string">&quot;==&gt; Received a new set of RunConfig\n {}!&quot;</span>, new_config);
+        <span class="macro">println!</span>(<span class="string">"==&gt; Received a new set of RunConfig\n {}!"</span>, new_config);
 
         <span class="comment">// reset some variables for the loop
         </span>first_iter   = <span class="bool-val">true</span>; 
@@ -1492,7 +1493,7 @@
           <span class="kw">loop </span>{
             <span class="kw">match </span>streamer.next() {
               <span class="prelude-val">None </span>=&gt; {
-                <span class="macro">debug!</span>(<span class="string">&quot;Streamer drained!&quot;</span>);
+                <span class="macro">debug!</span>(<span class="string">"Streamer drained!"</span>);
                 <span class="kw">break</span>;
               },
               <span class="prelude-val">Some</span>(ev) =&gt; {
@@ -1501,7 +1502,7 @@
                 <span class="kw">let </span>tp = TofPacket::from(<span class="kw-2">&amp;</span>ev_to_send);
                 <span class="kw">match </span>tp_sender.send(tp) {
                   <span class="prelude-val">Err</span>(err) =&gt; {
-                    <span class="macro">error!</span>(<span class="string">&quot;Can&#39;t send TofPacket! {err}&quot;</span>);
+                    <span class="macro">error!</span>(<span class="string">"Can't send TofPacket! {err}"</span>);
                   },
                   <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; (),
                 }
@@ -1522,8 +1523,8 @@
         </span>buffer_trip = (rc.rb_buff_size <span class="kw">as </span>usize)<span class="kw-2">*</span>EVENT_SIZE; 
         <span class="kw">if </span>(buffer_trip &gt; uio1_total_size) 
         || (buffer_trip &gt; uio2_total_size) {
-          <span class="macro">error!</span>(<span class="string">&quot;Tripsize of {buffer_trip} exceeds buffer sizes of A : {uio1_total_size} or B : {uio2_total_size}. The EVENT_SIZE is {EVENT_SIZE}&quot;</span>);
-          <span class="macro">warn!</span>(<span class="string">&quot;Will set buffer_trip to {DATABUF_TOTAL_SIZE}&quot;</span>);
+          <span class="macro">error!</span>(<span class="string">"Tripsize of {buffer_trip} exceeds buffer sizes of A : {uio1_total_size} or B : {uio2_total_size}. The EVENT_SIZE is {EVENT_SIZE}"</span>);
+          <span class="macro">warn!</span>(<span class="string">"Will set buffer_trip to {DATABUF_TOTAL_SIZE}"</span>);
           buffer_trip = DATABUF_TOTAL_SIZE;
         } <span class="kw">else </span>{
           uio1_total_size = buffer_trip;
@@ -1536,7 +1537,7 @@
         //}
         </span><span class="kw">match </span>opmode_to_cache.send(rc.tof_op_mode.clone()) {
           <span class="prelude-val">Err</span>(err) =&gt; {
-            <span class="macro">error!</span>(<span class="string">&quot;Unable to send TofOperationMode to the event cache! Err {err}&quot;</span>);
+            <span class="macro">error!</span>(<span class="string">"Unable to send TofOperationMode to the event cache! Err {err}"</span>);
           }
           <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
         }
@@ -1544,7 +1545,7 @@
         <span class="kw">let </span>dt_c = rc.data_type.clone();
         <span class="kw">match </span>dtf_to_evproc.send(dt_c) {
           <span class="prelude-val">Err</span>(err) =&gt; {
-            <span class="macro">error!</span>(<span class="string">&quot;Unable to send dataformat &amp; type to the event processing subroutine! Err {err}&quot;</span>);
+            <span class="macro">error!</span>(<span class="string">"Unable to send dataformat &amp; type to the event processing subroutine! Err {err}"</span>);
           }
           <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; ()
         }
@@ -1568,29 +1569,29 @@
         <span class="kw">if </span>rc.trigger_fixed_rate&gt;<span class="number">0 </span>{
           force_trigger = <span class="bool-val">true</span>;
           time_between_events = <span class="prelude-val">Some</span>(<span class="number">1.0</span>/(rc.trigger_fixed_rate <span class="kw">as </span>f32));
-          <span class="macro">warn!</span>(<span class="string">&quot;Will run in forced trigger mode with a rate of {} Hz!&quot;</span>, rc.trigger_fixed_rate);
-          <span class="macro">debug!</span>(<span class="string">&quot;Will call trigger() every {} seconds...&quot;</span>, time_between_events.unwrap());
+          <span class="macro">warn!</span>(<span class="string">"Will run in forced trigger mode with a rate of {} Hz!"</span>, rc.trigger_fixed_rate);
+          <span class="macro">debug!</span>(<span class="string">"Will call trigger() every {} seconds..."</span>, time_between_events.unwrap());
           latch_to_mtb = <span class="bool-val">false</span>;
         }
 
-        <span class="comment">// preparations done, let&#39;s gooo
+        <span class="comment">// preparations done, let's gooo
         </span>reset_dma_and_buffers();
 
         <span class="kw">if </span>latch_to_mtb {
           <span class="kw">match </span>set_master_trigger_mode() {
-            <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Can not initialize master trigger mode, Err {err}&quot;</span>),
-            <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">&quot;Latching to MasterTrigger&quot;</span>)
+            <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Can not initialize master trigger mode, Err {err}"</span>),
+            <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">"Latching to MasterTrigger"</span>)
           }
         } <span class="kw">else </span>{
           <span class="kw">match </span>disable_master_trigger_mode() {
-            <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Can not disable master trigger mode, Err {err}&quot;</span>),
-            <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">&quot;Master trigger mode didsabled!&quot;</span>)
+            <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Can not disable master trigger mode, Err {err}"</span>),
+            <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">"Master trigger mode didsabled!"</span>)
           }
         }
-        <span class="comment">// this basically signals &quot;RUNSTART&quot;
+        <span class="comment">// this basically signals "RUNSTART"
         </span><span class="kw">match </span>enable_trigger() {
-          <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Can not enable triggers! Err {err}&quot;</span>),
-          <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">&quot;Triggers enabled - Run start!&quot;</span>)
+          <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Can not enable triggers! Err {err}"</span>),
+          <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">"Triggers enabled - Run start!"</span>)
         }
         <span class="comment">// FIXME - only if above call Ok()
         </span>is_running = <span class="bool-val">true</span>;
@@ -1600,19 +1601,19 @@
           // for a short bit
           </span>thread::sleep(one_sec);
           <span class="kw">match </span>get_trigger_rate() {
-            <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Unable to obtain trigger rate! Err {err}&quot;</span>),
-            <span class="prelude-val">Ok</span>(rate) =&gt; <span class="macro">println!</span>(<span class="string">&quot;Seing RB trigger rate of {rate} Hz&quot;</span>)
+            <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to obtain trigger rate! Err {err}"</span>),
+            <span class="prelude-val">Ok</span>(rate) =&gt; <span class="macro">println!</span>(<span class="string">"Seing RB trigger rate of {rate} Hz"</span>)
           }
           <span class="kw">match </span>get_event_rate_mt() {
-            <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Unable to obtain MT trigger rate! Err {err}&quot;</span>),
-            <span class="prelude-val">Ok</span>(rate) =&gt; <span class="macro">println!</span>(<span class="string">&quot;Seing MTB trigger rate of {rate} Hz&quot;</span>)
+            <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to obtain MT trigger rate! Err {err}"</span>),
+            <span class="prelude-val">Ok</span>(rate) =&gt; <span class="macro">println!</span>(<span class="string">"Seing MTB trigger rate of {rate} Hz"</span>)
           }
         }
         <span class="kw">if </span>show_progress {
           <span class="kw">if </span>rc.runs_forever() {
-            template_bar_n_ev = <span class="string">&quot;[{elapsed_precise}] {prefix} {msg} {spinner} &quot;</span>;
+            template_bar_n_ev = <span class="string">"[{elapsed_precise}] {prefix} {msg} {spinner} "</span>;
           } <span class="kw">else </span>{
-            template_bar_n_ev = <span class="string">&quot;[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.red/grey} {pos:&gt;7}/{len:7}&quot;</span>;
+            template_bar_n_ev = <span class="string">"[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.red/grey} {pos:&gt;7}/{len:7}"</span>;
           }
           sty_ev = ProgressStyle::with_template(template_bar_n_ev)
           .unwrap();
@@ -1624,18 +1625,18 @@
           prog_ev = multi_prog
                     .insert_after(<span class="kw-2">&amp;</span>prog_b, ProgressBar::new(rc.nevents <span class="kw">as </span>u64)); 
           prog_a.set_message (label_a.clone());
-          prog_a.set_prefix  (<span class="string">&quot;\u{1F4BE}&quot;</span>);
+          prog_a.set_prefix  (<span class="string">"\u{1F4BE}"</span>);
           prog_a.set_style   (sty_a.clone());
           prog_a.set_position(<span class="number">0</span>);
           prog_b.set_message (label_b.clone());
-          prog_b.set_prefix  (<span class="string">&quot;\u{1F4BE}&quot;</span>);
+          prog_b.set_prefix  (<span class="string">"\u{1F4BE}"</span>);
           prog_b.set_style   (sty_b.clone());
           prog_b.set_position(<span class="number">0</span>);
           prog_ev.set_style  (sty_ev.clone());
-          prog_ev.set_prefix (<span class="string">&quot;\u{2728}&quot;</span>);
-          prog_ev.set_message(<span class="string">&quot;EVENTS&quot;</span>);
+          prog_ev.set_prefix (<span class="string">"\u{2728}"</span>);
+          prog_ev.set_message(<span class="string">"EVENTS"</span>);
           prog_ev.set_position(<span class="number">0</span>);
-          <span class="macro">info!</span>(<span class="string">&quot;Preparations complete. Run start should be imminent.&quot;</span>);
+          <span class="macro">info!</span>(<span class="string">"Preparations complete. Run start should be imminent."</span>);
         }
         <span class="kw">continue</span>; <span class="comment">// start loop again
       </span>} <span class="comment">// end Ok(RunConfig) 
@@ -1649,11 +1650,11 @@
                                           <span class="kw-2">&amp;</span>prog_b      ,
                                           show_progress,
                                           <span class="kw-2">&amp;mut </span>streamer   );
-        <span class="macro">info!</span>(<span class="string">&quot;Run stopped! The runner has processed {n_events} events!&quot;</span>);
+        <span class="macro">info!</span>(<span class="string">"Run stopped! The runner has processed {n_events} events!"</span>);
         <span class="kw">loop </span>{
           <span class="kw">match </span>streamer.next() {
             <span class="prelude-val">None </span>=&gt; {
-              <span class="macro">debug!</span>(<span class="string">&quot;Streamer drained!&quot;</span>);
+              <span class="macro">debug!</span>(<span class="string">"Streamer drained!"</span>);
               <span class="kw">break</span>;
             },
             <span class="prelude-val">Some</span>(ev) =&gt; {
@@ -1662,7 +1663,7 @@
               <span class="kw">let </span>tp = TofPacket::from(<span class="kw-2">&amp;</span>ev_to_send);
               <span class="kw">match </span>tp_sender.send(tp) {
                 <span class="prelude-val">Err</span>(err) =&gt; {
-                  <span class="macro">error!</span>(<span class="string">&quot;Can&#39;t send TofPacket! {err}&quot;</span>);
+                  <span class="macro">error!</span>(<span class="string">"Can't send TofPacket! {err}"</span>);
                 },
                 <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; (),
               }
@@ -1675,17 +1676,17 @@
       // We did not terminate the run,
       // that means we are still going!
       </span><span class="kw">if </span>force_trigger {
-        <span class="comment">//println!(&quot;Forcing trigger!&quot;);
-        //println!(&quot;Time between events {}&quot;, time_between_events.unwrap());
+        <span class="comment">//println!("Forcing trigger!");
+        //println!("Time between events {}", time_between_events.unwrap());
         </span><span class="kw">let </span>elapsed = timer.elapsed().as_secs_f32();
-        <span class="comment">//println!(&quot;Elapsed {}&quot;, elapsed);
-        </span><span class="macro">trace!</span>(<span class="string">&quot;Forced trigger mode, {} seconds since last trigger&quot;</span>, elapsed);
+        <span class="comment">//println!("Elapsed {}", elapsed);
+        </span><span class="macro">trace!</span>(<span class="string">"Forced trigger mode, {} seconds since last trigger"</span>, elapsed);
         <span class="comment">// decide if we have to issue the trigger signal NOW!
         </span><span class="kw">if </span>elapsed &gt; time_between_events.unwrap() {
           timer = Instant::now(); 
           <span class="kw">match </span>trigger() {
-            <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Error when triggering! {err}&quot;</span>),
-            <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">trace!</span>(<span class="string">&quot;Firing trigger!&quot;</span>)
+            <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Error when triggering! {err}"</span>),
+            <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">trace!</span>(<span class="string">"Firing trigger!"</span>)
           }
         } <span class="kw">else </span>{ <span class="comment">// not enough time has yet passed for the next trigger signal
           // FIXME - we could sleep here for a bit!
@@ -1698,7 +1699,7 @@
         <span class="comment">// this checks if we have seen a new event
         </span><span class="kw">match </span>get_event_count() {
           <span class="prelude-val">Err </span>(err) =&gt; {
-            <span class="macro">error!</span>(<span class="string">&quot;Can not obtain event count! Err {:?}&quot;</span>, err);
+            <span class="macro">error!</span>(<span class="string">"Can not obtain event count! Err {:?}"</span>, err);
             <span class="kw">continue</span>;
           }
           <span class="prelude-val">Ok </span>(cnt) =&gt; {
@@ -1710,7 +1711,7 @@
             }
             <span class="kw">if </span>evt_cnt == last_evt_cnt {
               thread::sleep(one_milli);
-              <span class="macro">trace!</span>(<span class="string">&quot;We didn&#39;t get an updated event count!&quot;</span>);
+              <span class="macro">trace!</span>(<span class="string">"We didn't get an updated event count!"</span>);
               <span class="kw">continue</span>; <span class="comment">// only continue after we see a new event!
             </span>}
           } <span class="comment">// end ok
@@ -1722,7 +1723,7 @@
       </span><span class="kw">match </span>experimental_ram_buffer_handler(buffer_trip,
                                             <span class="kw-2">&amp;mut </span>streamer) { 
         <span class="prelude-val">Err</span>(err)   =&gt; {
-          <span class="macro">error!</span>(<span class="string">&quot;Can not deal with RAM buffers {err}&quot;</span>);
+          <span class="macro">error!</span>(<span class="string">"Can not deal with RAM buffers {err}"</span>);
           <span class="kw">continue</span>;
         }
         <span class="prelude-val">Ok</span>(result) =&gt; {
@@ -1733,7 +1734,7 @@
       <span class="kw">loop </span>{
         <span class="kw">match </span>streamer.next() {
           <span class="prelude-val">None </span>=&gt; {
-            <span class="macro">debug!</span>(<span class="string">&quot;Streamer drained!&quot;</span>);
+            <span class="macro">debug!</span>(<span class="string">"Streamer drained!"</span>);
             <span class="kw">break</span>;
           },
           <span class="prelude-val">Some</span>(ev) =&gt; {
@@ -1743,10 +1744,10 @@
             <span class="kw">let </span>tp = TofPacket::from(<span class="kw-2">&amp;</span>ev_to_send);
             <span class="kw">match </span>tp_sender.send(tp) {
               <span class="prelude-val">Err</span>(err) =&gt; {
-                <span class="macro">error!</span>(<span class="string">&quot;Can&#39;t send TofPacket! {err}&quot;</span>);
+                <span class="macro">error!</span>(<span class="string">"Can't send TofPacket! {err}"</span>);
               },
               <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
-                <span class="macro">info!</span>(<span class="string">&quot;Event {} sent!&quot;</span>, this_evid);
+                <span class="macro">info!</span>(<span class="string">"Event {} sent!"</span>, this_evid);
               },
             }
           }

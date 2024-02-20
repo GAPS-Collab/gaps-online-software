@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.25.0/src/style/color.rs`."><title>color.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.25.0/src/style/color.rs`."><title>color.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><a class="sub-logo-container" href="../../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -406,26 +407,26 @@
 ///
 /// use ratatui::prelude::*;
 ///
-/// assert_eq!(Color::from_str(&quot;red&quot;), Ok(Color::Red));
-/// assert_eq!(&quot;red&quot;.parse(), Ok(Color::Red));
-/// assert_eq!(&quot;lightred&quot;.parse(), Ok(Color::LightRed));
-/// assert_eq!(&quot;light red&quot;.parse(), Ok(Color::LightRed));
-/// assert_eq!(&quot;light-red&quot;.parse(), Ok(Color::LightRed));
-/// assert_eq!(&quot;light_red&quot;.parse(), Ok(Color::LightRed));
-/// assert_eq!(&quot;lightRed&quot;.parse(), Ok(Color::LightRed));
-/// assert_eq!(&quot;bright red&quot;.parse(), Ok(Color::LightRed));
-/// assert_eq!(&quot;bright-red&quot;.parse(), Ok(Color::LightRed));
-/// assert_eq!(&quot;silver&quot;.parse(), Ok(Color::Gray));
-/// assert_eq!(&quot;dark-grey&quot;.parse(), Ok(Color::DarkGray));
-/// assert_eq!(&quot;dark gray&quot;.parse(), Ok(Color::DarkGray));
-/// assert_eq!(&quot;light-black&quot;.parse(), Ok(Color::DarkGray));
-/// assert_eq!(&quot;white&quot;.parse(), Ok(Color::White));
-/// assert_eq!(&quot;bright white&quot;.parse(), Ok(Color::White));
+/// assert_eq!(Color::from_str("red"), Ok(Color::Red));
+/// assert_eq!("red".parse(), Ok(Color::Red));
+/// assert_eq!("lightred".parse(), Ok(Color::LightRed));
+/// assert_eq!("light red".parse(), Ok(Color::LightRed));
+/// assert_eq!("light-red".parse(), Ok(Color::LightRed));
+/// assert_eq!("light_red".parse(), Ok(Color::LightRed));
+/// assert_eq!("lightRed".parse(), Ok(Color::LightRed));
+/// assert_eq!("bright red".parse(), Ok(Color::LightRed));
+/// assert_eq!("bright-red".parse(), Ok(Color::LightRed));
+/// assert_eq!("silver".parse(), Ok(Color::Gray));
+/// assert_eq!("dark-grey".parse(), Ok(Color::DarkGray));
+/// assert_eq!("dark gray".parse(), Ok(Color::DarkGray));
+/// assert_eq!("light-black".parse(), Ok(Color::DarkGray));
+/// assert_eq!("white".parse(), Ok(Color::White));
+/// assert_eq!("bright white".parse(), Ok(Color::White));
 /// ```
 ///
 /// [ANSI color table]: https://en.wikipedia.org/wiki/ANSI_escape_code#Colors
 </span><span class="attr">#[derive(Debug, Default, Clone, Copy, Eq, PartialEq, Hash)]
-#[cfg_attr(feature = <span class="string">&quot;serde&quot;</span>, derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = <span class="string">"serde"</span>, derive(serde::Serialize, serde::Deserialize))]
 </span><span class="kw">pub enum </span>Color {
     <span class="doccomment">/// Resets the foreground or background color
     </span><span class="attr">#[default]
@@ -493,8 +494,8 @@
 </span><span class="kw">pub struct </span>ParseColorError;
 
 <span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>ParseColorError {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
-        <span class="macro">write!</span>(f, <span class="string">&quot;Failed to parse Colors&quot;</span>)
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">"Failed to parse Colors"</span>)
     }
 }
 
@@ -515,16 +516,16 @@
 ///
 /// use ratatui::prelude::*;
 ///
-/// let color: Color = Color::from_str(&quot;blue&quot;).unwrap();
+/// let color: Color = Color::from_str("blue").unwrap();
 /// assert_eq!(color, Color::Blue);
 ///
-/// let color: Color = Color::from_str(&quot;#FF0000&quot;).unwrap();
+/// let color: Color = Color::from_str("#FF0000").unwrap();
 /// assert_eq!(color, Color::Rgb(255, 0, 0));
 ///
-/// let color: Color = Color::from_str(&quot;10&quot;).unwrap();
+/// let color: Color = Color::from_str("10").unwrap();
 /// assert_eq!(color, Color::Indexed(10));
 ///
-/// let color: Result&lt;Color, _&gt; = Color::from_str(&quot;invalid_color&quot;);
+/// let color: Result&lt;Color, _&gt; = Color::from_str("invalid_color");
 /// assert!(color.is_err());
 /// ```
 </span><span class="kw">impl </span>FromStr <span class="kw">for </span>Color {
@@ -536,37 +537,37 @@
             // This is an attempt to support as many as possible.
             </span><span class="kw">match </span>s
                 .to_lowercase()
-                .replace([<span class="string">&#39; &#39;</span>, <span class="string">&#39;-&#39;</span>, <span class="string">&#39;_&#39;</span>], <span class="string">&quot;&quot;</span>)
-                .replace(<span class="string">&quot;bright&quot;</span>, <span class="string">&quot;light&quot;</span>)
-                .replace(<span class="string">&quot;grey&quot;</span>, <span class="string">&quot;gray&quot;</span>)
-                .replace(<span class="string">&quot;silver&quot;</span>, <span class="string">&quot;gray&quot;</span>)
-                .replace(<span class="string">&quot;lightblack&quot;</span>, <span class="string">&quot;darkgray&quot;</span>)
-                .replace(<span class="string">&quot;lightwhite&quot;</span>, <span class="string">&quot;white&quot;</span>)
-                .replace(<span class="string">&quot;lightgray&quot;</span>, <span class="string">&quot;white&quot;</span>)
+                .replace([<span class="string">' '</span>, <span class="string">'-'</span>, <span class="string">'_'</span>], <span class="string">""</span>)
+                .replace(<span class="string">"bright"</span>, <span class="string">"light"</span>)
+                .replace(<span class="string">"grey"</span>, <span class="string">"gray"</span>)
+                .replace(<span class="string">"silver"</span>, <span class="string">"gray"</span>)
+                .replace(<span class="string">"lightblack"</span>, <span class="string">"darkgray"</span>)
+                .replace(<span class="string">"lightwhite"</span>, <span class="string">"white"</span>)
+                .replace(<span class="string">"lightgray"</span>, <span class="string">"white"</span>)
                 .as_ref()
             {
-                <span class="string">&quot;reset&quot; </span>=&gt; <span class="self">Self</span>::Reset,
-                <span class="string">&quot;black&quot; </span>=&gt; <span class="self">Self</span>::Black,
-                <span class="string">&quot;red&quot; </span>=&gt; <span class="self">Self</span>::Red,
-                <span class="string">&quot;green&quot; </span>=&gt; <span class="self">Self</span>::Green,
-                <span class="string">&quot;yellow&quot; </span>=&gt; <span class="self">Self</span>::Yellow,
-                <span class="string">&quot;blue&quot; </span>=&gt; <span class="self">Self</span>::Blue,
-                <span class="string">&quot;magenta&quot; </span>=&gt; <span class="self">Self</span>::Magenta,
-                <span class="string">&quot;cyan&quot; </span>=&gt; <span class="self">Self</span>::Cyan,
-                <span class="string">&quot;gray&quot; </span>=&gt; <span class="self">Self</span>::Gray,
-                <span class="string">&quot;darkgray&quot; </span>=&gt; <span class="self">Self</span>::DarkGray,
-                <span class="string">&quot;lightred&quot; </span>=&gt; <span class="self">Self</span>::LightRed,
-                <span class="string">&quot;lightgreen&quot; </span>=&gt; <span class="self">Self</span>::LightGreen,
-                <span class="string">&quot;lightyellow&quot; </span>=&gt; <span class="self">Self</span>::LightYellow,
-                <span class="string">&quot;lightblue&quot; </span>=&gt; <span class="self">Self</span>::LightBlue,
-                <span class="string">&quot;lightmagenta&quot; </span>=&gt; <span class="self">Self</span>::LightMagenta,
-                <span class="string">&quot;lightcyan&quot; </span>=&gt; <span class="self">Self</span>::LightCyan,
-                <span class="string">&quot;white&quot; </span>=&gt; <span class="self">Self</span>::White,
+                <span class="string">"reset" </span>=&gt; <span class="self">Self</span>::Reset,
+                <span class="string">"black" </span>=&gt; <span class="self">Self</span>::Black,
+                <span class="string">"red" </span>=&gt; <span class="self">Self</span>::Red,
+                <span class="string">"green" </span>=&gt; <span class="self">Self</span>::Green,
+                <span class="string">"yellow" </span>=&gt; <span class="self">Self</span>::Yellow,
+                <span class="string">"blue" </span>=&gt; <span class="self">Self</span>::Blue,
+                <span class="string">"magenta" </span>=&gt; <span class="self">Self</span>::Magenta,
+                <span class="string">"cyan" </span>=&gt; <span class="self">Self</span>::Cyan,
+                <span class="string">"gray" </span>=&gt; <span class="self">Self</span>::Gray,
+                <span class="string">"darkgray" </span>=&gt; <span class="self">Self</span>::DarkGray,
+                <span class="string">"lightred" </span>=&gt; <span class="self">Self</span>::LightRed,
+                <span class="string">"lightgreen" </span>=&gt; <span class="self">Self</span>::LightGreen,
+                <span class="string">"lightyellow" </span>=&gt; <span class="self">Self</span>::LightYellow,
+                <span class="string">"lightblue" </span>=&gt; <span class="self">Self</span>::LightBlue,
+                <span class="string">"lightmagenta" </span>=&gt; <span class="self">Self</span>::LightMagenta,
+                <span class="string">"lightcyan" </span>=&gt; <span class="self">Self</span>::LightCyan,
+                <span class="string">"white" </span>=&gt; <span class="self">Self</span>::White,
                 <span class="kw">_ </span>=&gt; {
                     <span class="kw">if let </span><span class="prelude-val">Ok</span>(index) = s.parse::&lt;u8&gt;() {
                         <span class="self">Self</span>::Indexed(index)
                     } <span class="kw">else if let </span>(<span class="prelude-val">Ok</span>(r), <span class="prelude-val">Ok</span>(g), <span class="prelude-val">Ok</span>(b)) = {
-                        <span class="kw">if </span>!s.starts_with(<span class="string">&#39;#&#39;</span>) || s.len() != <span class="number">7 </span>{
+                        <span class="kw">if </span>!s.starts_with(<span class="string">'#'</span>) || s.len() != <span class="number">7 </span>{
                             <span class="kw">return </span><span class="prelude-val">Err</span>(ParseColorError);
                         }
                         (
@@ -586,27 +587,27 @@
 }
 
 <span class="kw">impl </span>Display <span class="kw">for </span>Color {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
         <span class="kw">match </span><span class="self">self </span>{
-            Color::Reset =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Reset&quot;</span>),
-            Color::Black =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Black&quot;</span>),
-            Color::Red =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Red&quot;</span>),
-            Color::Green =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Green&quot;</span>),
-            Color::Yellow =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Yellow&quot;</span>),
-            Color::Blue =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Blue&quot;</span>),
-            Color::Magenta =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Magenta&quot;</span>),
-            Color::Cyan =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Cyan&quot;</span>),
-            Color::Gray =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Gray&quot;</span>),
-            Color::DarkGray =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;DarkGray&quot;</span>),
-            Color::LightRed =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;LightRed&quot;</span>),
-            Color::LightGreen =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;LightGreen&quot;</span>),
-            Color::LightYellow =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;LightYellow&quot;</span>),
-            Color::LightBlue =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;LightBlue&quot;</span>),
-            Color::LightMagenta =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;LightMagenta&quot;</span>),
-            Color::LightCyan =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;LightCyan&quot;</span>),
-            Color::White =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;White&quot;</span>),
-            Color::Rgb(r, g, b) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;#{:02X}{:02X}{:02X}&quot;</span>, r, g, b),
-            Color::Indexed(i) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, i),
+            Color::Reset =&gt; <span class="macro">write!</span>(f, <span class="string">"Reset"</span>),
+            Color::Black =&gt; <span class="macro">write!</span>(f, <span class="string">"Black"</span>),
+            Color::Red =&gt; <span class="macro">write!</span>(f, <span class="string">"Red"</span>),
+            Color::Green =&gt; <span class="macro">write!</span>(f, <span class="string">"Green"</span>),
+            Color::Yellow =&gt; <span class="macro">write!</span>(f, <span class="string">"Yellow"</span>),
+            Color::Blue =&gt; <span class="macro">write!</span>(f, <span class="string">"Blue"</span>),
+            Color::Magenta =&gt; <span class="macro">write!</span>(f, <span class="string">"Magenta"</span>),
+            Color::Cyan =&gt; <span class="macro">write!</span>(f, <span class="string">"Cyan"</span>),
+            Color::Gray =&gt; <span class="macro">write!</span>(f, <span class="string">"Gray"</span>),
+            Color::DarkGray =&gt; <span class="macro">write!</span>(f, <span class="string">"DarkGray"</span>),
+            Color::LightRed =&gt; <span class="macro">write!</span>(f, <span class="string">"LightRed"</span>),
+            Color::LightGreen =&gt; <span class="macro">write!</span>(f, <span class="string">"LightGreen"</span>),
+            Color::LightYellow =&gt; <span class="macro">write!</span>(f, <span class="string">"LightYellow"</span>),
+            Color::LightBlue =&gt; <span class="macro">write!</span>(f, <span class="string">"LightBlue"</span>),
+            Color::LightMagenta =&gt; <span class="macro">write!</span>(f, <span class="string">"LightMagenta"</span>),
+            Color::LightCyan =&gt; <span class="macro">write!</span>(f, <span class="string">"LightCyan"</span>),
+            Color::White =&gt; <span class="macro">write!</span>(f, <span class="string">"White"</span>),
+            Color::Rgb(r, g, b) =&gt; <span class="macro">write!</span>(f, <span class="string">"#{:02X}{:02X}{:02X}"</span>, r, g, b),
+            Color::Indexed(i) =&gt; <span class="macro">write!</span>(f, <span class="string">"{}"</span>, i),
         }
     }
 }
@@ -619,67 +620,67 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>from_rgb_color() {
-        <span class="kw">let </span>color: Color = Color::from_str(<span class="string">&quot;#FF0000&quot;</span>).unwrap();
+        <span class="kw">let </span>color: Color = Color::from_str(<span class="string">"#FF0000"</span>).unwrap();
         <span class="macro">assert_eq!</span>(color, Color::Rgb(<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>));
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>from_indexed_color() {
-        <span class="kw">let </span>color: Color = Color::from_str(<span class="string">&quot;10&quot;</span>).unwrap();
+        <span class="kw">let </span>color: Color = Color::from_str(<span class="string">"10"</span>).unwrap();
         <span class="macro">assert_eq!</span>(color, Color::Indexed(<span class="number">10</span>));
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>from_ansi_color() -&gt; <span class="prelude-ty">Result</span>&lt;(), Box&lt;<span class="kw">dyn </span>Error&gt;&gt; {
-        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">&quot;reset&quot;</span>)<span class="question-mark">?</span>, Color::Reset);
-        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">&quot;black&quot;</span>)<span class="question-mark">?</span>, Color::Black);
-        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">&quot;red&quot;</span>)<span class="question-mark">?</span>, Color::Red);
-        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">&quot;green&quot;</span>)<span class="question-mark">?</span>, Color::Green);
-        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">&quot;yellow&quot;</span>)<span class="question-mark">?</span>, Color::Yellow);
-        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">&quot;blue&quot;</span>)<span class="question-mark">?</span>, Color::Blue);
-        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">&quot;magenta&quot;</span>)<span class="question-mark">?</span>, Color::Magenta);
-        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">&quot;cyan&quot;</span>)<span class="question-mark">?</span>, Color::Cyan);
-        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">&quot;gray&quot;</span>)<span class="question-mark">?</span>, Color::Gray);
-        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">&quot;darkgray&quot;</span>)<span class="question-mark">?</span>, Color::DarkGray);
-        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">&quot;lightred&quot;</span>)<span class="question-mark">?</span>, Color::LightRed);
-        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">&quot;lightgreen&quot;</span>)<span class="question-mark">?</span>, Color::LightGreen);
-        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">&quot;lightyellow&quot;</span>)<span class="question-mark">?</span>, Color::LightYellow);
-        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">&quot;lightblue&quot;</span>)<span class="question-mark">?</span>, Color::LightBlue);
-        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">&quot;lightmagenta&quot;</span>)<span class="question-mark">?</span>, Color::LightMagenta);
-        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">&quot;lightcyan&quot;</span>)<span class="question-mark">?</span>, Color::LightCyan);
-        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">&quot;white&quot;</span>)<span class="question-mark">?</span>, Color::White);
+        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">"reset"</span>)<span class="question-mark">?</span>, Color::Reset);
+        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">"black"</span>)<span class="question-mark">?</span>, Color::Black);
+        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">"red"</span>)<span class="question-mark">?</span>, Color::Red);
+        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">"green"</span>)<span class="question-mark">?</span>, Color::Green);
+        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">"yellow"</span>)<span class="question-mark">?</span>, Color::Yellow);
+        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">"blue"</span>)<span class="question-mark">?</span>, Color::Blue);
+        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">"magenta"</span>)<span class="question-mark">?</span>, Color::Magenta);
+        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">"cyan"</span>)<span class="question-mark">?</span>, Color::Cyan);
+        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">"gray"</span>)<span class="question-mark">?</span>, Color::Gray);
+        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">"darkgray"</span>)<span class="question-mark">?</span>, Color::DarkGray);
+        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">"lightred"</span>)<span class="question-mark">?</span>, Color::LightRed);
+        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">"lightgreen"</span>)<span class="question-mark">?</span>, Color::LightGreen);
+        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">"lightyellow"</span>)<span class="question-mark">?</span>, Color::LightYellow);
+        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">"lightblue"</span>)<span class="question-mark">?</span>, Color::LightBlue);
+        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">"lightmagenta"</span>)<span class="question-mark">?</span>, Color::LightMagenta);
+        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">"lightcyan"</span>)<span class="question-mark">?</span>, Color::LightCyan);
+        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">"white"</span>)<span class="question-mark">?</span>, Color::White);
 
         <span class="comment">// aliases
-        </span><span class="macro">assert_eq!</span>(Color::from_str(<span class="string">&quot;lightblack&quot;</span>)<span class="question-mark">?</span>, Color::DarkGray);
-        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">&quot;lightwhite&quot;</span>)<span class="question-mark">?</span>, Color::White);
-        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">&quot;lightgray&quot;</span>)<span class="question-mark">?</span>, Color::White);
+        </span><span class="macro">assert_eq!</span>(Color::from_str(<span class="string">"lightblack"</span>)<span class="question-mark">?</span>, Color::DarkGray);
+        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">"lightwhite"</span>)<span class="question-mark">?</span>, Color::White);
+        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">"lightgray"</span>)<span class="question-mark">?</span>, Color::White);
 
         <span class="comment">// silver = grey = gray
-        </span><span class="macro">assert_eq!</span>(Color::from_str(<span class="string">&quot;grey&quot;</span>)<span class="question-mark">?</span>, Color::Gray);
-        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">&quot;silver&quot;</span>)<span class="question-mark">?</span>, Color::Gray);
+        </span><span class="macro">assert_eq!</span>(Color::from_str(<span class="string">"grey"</span>)<span class="question-mark">?</span>, Color::Gray);
+        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">"silver"</span>)<span class="question-mark">?</span>, Color::Gray);
 
         <span class="comment">// spaces are ignored
-        </span><span class="macro">assert_eq!</span>(Color::from_str(<span class="string">&quot;light black&quot;</span>)<span class="question-mark">?</span>, Color::DarkGray);
-        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">&quot;light white&quot;</span>)<span class="question-mark">?</span>, Color::White);
-        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">&quot;light gray&quot;</span>)<span class="question-mark">?</span>, Color::White);
+        </span><span class="macro">assert_eq!</span>(Color::from_str(<span class="string">"light black"</span>)<span class="question-mark">?</span>, Color::DarkGray);
+        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">"light white"</span>)<span class="question-mark">?</span>, Color::White);
+        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">"light gray"</span>)<span class="question-mark">?</span>, Color::White);
 
         <span class="comment">// dashes are ignored
-        </span><span class="macro">assert_eq!</span>(Color::from_str(<span class="string">&quot;light-black&quot;</span>)<span class="question-mark">?</span>, Color::DarkGray);
-        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">&quot;light-white&quot;</span>)<span class="question-mark">?</span>, Color::White);
-        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">&quot;light-gray&quot;</span>)<span class="question-mark">?</span>, Color::White);
+        </span><span class="macro">assert_eq!</span>(Color::from_str(<span class="string">"light-black"</span>)<span class="question-mark">?</span>, Color::DarkGray);
+        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">"light-white"</span>)<span class="question-mark">?</span>, Color::White);
+        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">"light-gray"</span>)<span class="question-mark">?</span>, Color::White);
 
         <span class="comment">// underscores are ignored
-        </span><span class="macro">assert_eq!</span>(Color::from_str(<span class="string">&quot;light_black&quot;</span>)<span class="question-mark">?</span>, Color::DarkGray);
-        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">&quot;light_white&quot;</span>)<span class="question-mark">?</span>, Color::White);
-        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">&quot;light_gray&quot;</span>)<span class="question-mark">?</span>, Color::White);
+        </span><span class="macro">assert_eq!</span>(Color::from_str(<span class="string">"light_black"</span>)<span class="question-mark">?</span>, Color::DarkGray);
+        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">"light_white"</span>)<span class="question-mark">?</span>, Color::White);
+        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">"light_gray"</span>)<span class="question-mark">?</span>, Color::White);
 
         <span class="comment">// bright = light
-        </span><span class="macro">assert_eq!</span>(Color::from_str(<span class="string">&quot;bright-black&quot;</span>)<span class="question-mark">?</span>, Color::DarkGray);
-        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">&quot;bright-white&quot;</span>)<span class="question-mark">?</span>, Color::White);
+        </span><span class="macro">assert_eq!</span>(Color::from_str(<span class="string">"bright-black"</span>)<span class="question-mark">?</span>, Color::DarkGray);
+        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">"bright-white"</span>)<span class="question-mark">?</span>, Color::White);
 
         <span class="comment">// bright = light
-        </span><span class="macro">assert_eq!</span>(Color::from_str(<span class="string">&quot;brightblack&quot;</span>)<span class="question-mark">?</span>, Color::DarkGray);
-        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">&quot;brightwhite&quot;</span>)<span class="question-mark">?</span>, Color::White);
+        </span><span class="macro">assert_eq!</span>(Color::from_str(<span class="string">"brightblack"</span>)<span class="question-mark">?</span>, Color::DarkGray);
+        <span class="macro">assert_eq!</span>(Color::from_str(<span class="string">"brightwhite"</span>)<span class="question-mark">?</span>, Color::White);
 
         <span class="prelude-val">Ok</span>(())
     }
@@ -687,43 +688,43 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>from_invalid_colors() {
         <span class="kw">let </span>bad_colors = [
-            <span class="string">&quot;invalid_color&quot;</span>, <span class="comment">// not a color string
-            </span><span class="string">&quot;abcdef0&quot;</span>,       <span class="comment">// 7 chars is not a color
-            </span><span class="string">&quot; bcdefa&quot;</span>,       <span class="comment">// doesn&#39;t start with a &#39;#&#39;
-            </span><span class="string">&quot;#abcdef00&quot;</span>,     <span class="comment">// too many chars
-            </span><span class="string">&quot;resett&quot;</span>,        <span class="comment">// typo
-            </span><span class="string">&quot;lightblackk&quot;</span>,   <span class="comment">// typo
+            <span class="string">"invalid_color"</span>, <span class="comment">// not a color string
+            </span><span class="string">"abcdef0"</span>,       <span class="comment">// 7 chars is not a color
+            </span><span class="string">" bcdefa"</span>,       <span class="comment">// doesn't start with a '#'
+            </span><span class="string">"#abcdef00"</span>,     <span class="comment">// too many chars
+            </span><span class="string">"resett"</span>,        <span class="comment">// typo
+            </span><span class="string">"lightblackk"</span>,   <span class="comment">// typo
         </span>];
 
         <span class="kw">for </span>bad_color <span class="kw">in </span>bad_colors {
             <span class="macro">assert!</span>(
                 Color::from_str(bad_color).is_err(),
-                <span class="string">&quot;bad color: &#39;{bad_color}&#39;&quot;
+                <span class="string">"bad color: '{bad_color}'"
             </span>);
         }
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>display() {
-        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, Color::Black), <span class="string">&quot;Black&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, Color::Red), <span class="string">&quot;Red&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, Color::Green), <span class="string">&quot;Green&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, Color::Yellow), <span class="string">&quot;Yellow&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, Color::Blue), <span class="string">&quot;Blue&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, Color::Magenta), <span class="string">&quot;Magenta&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, Color::Cyan), <span class="string">&quot;Cyan&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, Color::Gray), <span class="string">&quot;Gray&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, Color::DarkGray), <span class="string">&quot;DarkGray&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, Color::LightRed), <span class="string">&quot;LightRed&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, Color::LightGreen), <span class="string">&quot;LightGreen&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, Color::LightYellow), <span class="string">&quot;LightYellow&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, Color::LightBlue), <span class="string">&quot;LightBlue&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, Color::LightMagenta), <span class="string">&quot;LightMagenta&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, Color::LightCyan), <span class="string">&quot;LightCyan&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, Color::White), <span class="string">&quot;White&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, Color::Indexed(<span class="number">10</span>)), <span class="string">&quot;10&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, Color::Rgb(<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>)), <span class="string">&quot;#FF0000&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, Color::Reset), <span class="string">&quot;Reset&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{}"</span>, Color::Black), <span class="string">"Black"</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{}"</span>, Color::Red), <span class="string">"Red"</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{}"</span>, Color::Green), <span class="string">"Green"</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{}"</span>, Color::Yellow), <span class="string">"Yellow"</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{}"</span>, Color::Blue), <span class="string">"Blue"</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{}"</span>, Color::Magenta), <span class="string">"Magenta"</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{}"</span>, Color::Cyan), <span class="string">"Cyan"</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{}"</span>, Color::Gray), <span class="string">"Gray"</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{}"</span>, Color::DarkGray), <span class="string">"DarkGray"</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{}"</span>, Color::LightRed), <span class="string">"LightRed"</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{}"</span>, Color::LightGreen), <span class="string">"LightGreen"</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{}"</span>, Color::LightYellow), <span class="string">"LightYellow"</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{}"</span>, Color::LightBlue), <span class="string">"LightBlue"</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{}"</span>, Color::LightMagenta), <span class="string">"LightMagenta"</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{}"</span>, Color::LightCyan), <span class="string">"LightCyan"</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{}"</span>, Color::White), <span class="string">"White"</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{}"</span>, Color::Indexed(<span class="number">10</span>)), <span class="string">"10"</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{}"</span>, Color::Rgb(<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>)), <span class="string">"#FF0000"</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{}"</span>, Color::Reset), <span class="string">"Reset"</span>);
     }
 }
 </code></pre></div></section></main></body></html>

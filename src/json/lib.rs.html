@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/json-0.12.4/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="json" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/json-0.12.4/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="json" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -450,31 +451,31 @@
 //! ```rust
 //! # #[macro_use] extern crate json;
 //! # fn main() {
-//! let parsed = json::parse(r#&quot;
+//! let parsed = json::parse(r#"
 //!
 //! {
-//!     &quot;code&quot;: 200,
-//!     &quot;success&quot;: true,
-//!     &quot;payload&quot;: {
-//!         &quot;features&quot;: [
-//!             &quot;awesome&quot;,
-//!             &quot;easyAPI&quot;,
-//!             &quot;lowLearningCurve&quot;
+//!     "code": 200,
+//!     "success": true,
+//!     "payload": {
+//!         "features": [
+//!             "awesome",
+//!             "easyAPI",
+//!             "lowLearningCurve"
 //!         ]
 //!     }
 //! }
 //!
-//! &quot;#).unwrap();
+//! "#).unwrap();
 //!
 //! let instantiated = object!{
 //!     // quotes on keys are optional
-//!     &quot;code&quot;: 200,
+//!     "code": 200,
 //!     success: true,
 //!     payload: {
 //!         features: [
-//!             &quot;awesome&quot;,
-//!             &quot;easyAPI&quot;,
-//!             &quot;lowLearningCurve&quot;
+//!             "awesome",
+//!             "easyAPI",
+//!             "lowLearningCurve"
 //!         ]
 //!     }
 //! };
@@ -485,7 +486,7 @@
 //!
 //! ## First class citizen
 //!
-//! Using macros and indexing, it&#39;s easy to work with the data.
+//! Using macros and indexing, it's easy to work with the data.
 //!
 //! ```rust
 //! # #[macro_use] extern crate json;
@@ -494,36 +495,36 @@
 //!     foo: false,
 //!     bar: null,
 //!     answer: 42,
-//!     list: [null, &quot;world&quot;, true]
+//!     list: [null, "world", true]
 //! };
 //!
 //! // Partial equality is implemented for most raw types:
-//! assert!(data[&quot;foo&quot;] == false);
+//! assert!(data["foo"] == false);
 //!
-//! // And it&#39;s type aware, `null` and `false` are different values:
-//! assert!(data[&quot;bar&quot;] != false);
+//! // And it's type aware, `null` and `false` are different values:
+//! assert!(data["bar"] != false);
 //!
 //! // But you can use any Rust number types:
-//! assert!(data[&quot;answer&quot;] == 42);
-//! assert!(data[&quot;answer&quot;] == 42.0);
-//! assert!(data[&quot;answer&quot;] == 42isize);
+//! assert!(data["answer"] == 42);
+//! assert!(data["answer"] == 42.0);
+//! assert!(data["answer"] == 42isize);
 //!
 //! // Access nested structures, arrays and objects:
-//! assert!(data[&quot;list&quot;][0].is_null());
-//! assert!(data[&quot;list&quot;][1] == &quot;world&quot;);
-//! assert!(data[&quot;list&quot;][2] == true);
+//! assert!(data["list"][0].is_null());
+//! assert!(data["list"][1] == "world");
+//! assert!(data["list"][2] == true);
 //!
-//! // Error resilient - accessing properties that don&#39;t exist yield null:
-//! assert!(data[&quot;this&quot;][&quot;does&quot;][&quot;not&quot;][&quot;exist&quot;].is_null());
+//! // Error resilient - accessing properties that don't exist yield null:
+//! assert!(data["this"]["does"]["not"]["exist"].is_null());
 //!
 //! // Mutate by assigning:
-//! data[&quot;list&quot;][0] = &quot;Hello&quot;.into();
+//! data["list"][0] = "Hello".into();
 //!
 //! // Use the `dump` method to serialize the data:
-//! assert_eq!(data.dump(), r#&quot;{&quot;foo&quot;:false,&quot;bar&quot;:null,&quot;answer&quot;:42,&quot;list&quot;:[&quot;Hello&quot;,&quot;world&quot;,true]}&quot;#);
+//! assert_eq!(data.dump(), r#"{"foo":false,"bar":null,"answer":42,"list":["Hello","world",true]}"#);
 //!
 //! // Or pretty print it out:
-//! println!(&quot;{:#}&quot;, data);
+//! println!("{:#}", data);
 //! # }
 //! ```
 //!
@@ -533,47 +534,47 @@
 //!
 //! ```
 //! // str slices
-//! assert_eq!(json::stringify(&quot;foobar&quot;), &quot;\&quot;foobar\&quot;&quot;);
+//! assert_eq!(json::stringify("foobar"), "\"foobar\"");
 //!
 //! // Owned strings
-//! assert_eq!(json::stringify(&quot;foobar&quot;.to_string()), &quot;\&quot;foobar\&quot;&quot;);
+//! assert_eq!(json::stringify("foobar".to_string()), "\"foobar\"");
 //!
 //! // Any number types
-//! assert_eq!(json::stringify(42), &quot;42&quot;);
+//! assert_eq!(json::stringify(42), "42");
 //!
 //! // Booleans
-//! assert_eq!(json::stringify(true), &quot;true&quot;);
-//! assert_eq!(json::stringify(false), &quot;false&quot;);
+//! assert_eq!(json::stringify(true), "true");
+//! assert_eq!(json::stringify(false), "false");
 //! ```
 //!
 //! Explicit `null` type `json::Null`:
 //!
 //! ```
-//! assert_eq!(json::stringify(json::Null), &quot;null&quot;);
+//! assert_eq!(json::stringify(json::Null), "null");
 //! ```
 //!
 //! Optional types:
 //!
 //! ```
-//! let value: Option&lt;String&gt; = Some(&quot;foo&quot;.to_string());
-//! assert_eq!(json::stringify(value), &quot;\&quot;foo\&quot;&quot;);
+//! let value: Option&lt;String&gt; = Some("foo".to_string());
+//! assert_eq!(json::stringify(value), "\"foo\"");
 //!
 //! let no_value: Option&lt;String&gt; = None;
-//! assert_eq!(json::stringify(no_value), &quot;null&quot;);
+//! assert_eq!(json::stringify(no_value), "null");
 //! ```
 //!
 //! Vector:
 //!
 //! ```
 //! let data = vec![1,2,3];
-//! assert_eq!(json::stringify(data), &quot;[1,2,3]&quot;);
+//! assert_eq!(json::stringify(data), "[1,2,3]");
 //! ```
 //!
 //! Vector with optional values:
 //!
 //! ```
 //! let data = vec![Some(1), None, Some(2), None, Some(3)];
-//! assert_eq!(json::stringify(data), &quot;[1,null,2,null,3]&quot;);
+//! assert_eq!(json::stringify(data), "[1,null,2,null,3]");
 //! ```
 //!
 //! Pushing to arrays:
@@ -582,10 +583,10 @@
 //! let mut data = json::JsonValue::new_array();
 //!
 //! data.push(10);
-//! data.push(&quot;foo&quot;);
+//! data.push("foo");
 //! data.push(false);
 //!
-//! assert_eq!(data.dump(), r#&quot;[10,&quot;foo&quot;,false]&quot;#);
+//! assert_eq!(data.dump(), r#"[10,"foo",false]"#);
 //! ```
 //!
 //! Putting fields on objects:
@@ -593,10 +594,10 @@
 //! ```
 //! let mut data = json::JsonValue::new_object();
 //!
-//! data[&quot;answer&quot;] = 42.into();
-//! data[&quot;foo&quot;] = &quot;bar&quot;.into();
+//! data["answer"] = 42.into();
+//! data["foo"] = "bar".into();
 //!
-//! assert_eq!(data.dump(), r#&quot;{&quot;answer&quot;:42,&quot;foo&quot;:&quot;bar&quot;}&quot;#);
+//! assert_eq!(data.dump(), r#"{"answer":42,"foo":"bar"}"#);
 //! ```
 //!
 //! `array!` macro:
@@ -604,8 +605,8 @@
 //! ```
 //! # #[macro_use] extern crate json;
 //! # fn main() {
-//! let data = array![&quot;foo&quot;, &quot;bar&quot;, 100, true, null];
-//! assert_eq!(data.dump(), r#&quot;[&quot;foo&quot;,&quot;bar&quot;,100,true,null]&quot;#);
+//! let data = array!["foo", "bar", 100, true, null];
+//! assert_eq!(data.dump(), r#"["foo","bar",100,true,null]"#);
 //! # }
 //! ```
 //!
@@ -615,13 +616,13 @@
 //! # #[macro_use] extern crate json;
 //! # fn main() {
 //! let data = object!{
-//!     name: &quot;John Doe&quot;,
+//!     name: "John Doe",
 //!     age: 30,
 //!     canJSON: true
 //! };
 //! assert_eq!(
 //!     data.dump(),
-//!     r#&quot;{&quot;name&quot;:&quot;John Doe&quot;,&quot;age&quot;:30,&quot;canJSON&quot;:true}&quot;#
+//!     r#"{"name":"John Doe","age":30,"canJSON":true}"#
 //! );
 //! # }
 //! ```
@@ -651,22 +652,22 @@
 
 <span class="kw">pub mod </span>iterators {
     <span class="doccomment">/// Iterator over members of `JsonValue::Array`.
-    </span><span class="kw">pub type </span>Members&lt;<span class="lifetime">&#39;a</span>&gt; = ::std::slice::Iter&lt;<span class="lifetime">&#39;a</span>, <span class="kw">super</span>::JsonValue&gt;;
+    </span><span class="kw">pub type </span>Members&lt;<span class="lifetime">'a</span>&gt; = ::std::slice::Iter&lt;<span class="lifetime">'a</span>, <span class="kw">super</span>::JsonValue&gt;;
 
     <span class="doccomment">/// Mutable iterator over members of `JsonValue::Array`.
-    </span><span class="kw">pub type </span>MembersMut&lt;<span class="lifetime">&#39;a</span>&gt; = ::std::slice::IterMut&lt;<span class="lifetime">&#39;a</span>, <span class="kw">super</span>::JsonValue&gt;;
+    </span><span class="kw">pub type </span>MembersMut&lt;<span class="lifetime">'a</span>&gt; = ::std::slice::IterMut&lt;<span class="lifetime">'a</span>, <span class="kw">super</span>::JsonValue&gt;;
 
     <span class="doccomment">/// Iterator over key value pairs of `JsonValue::Object`.
-    </span><span class="kw">pub type </span>Entries&lt;<span class="lifetime">&#39;a</span>&gt; = <span class="kw">super</span>::object::Iter&lt;<span class="lifetime">&#39;a</span>&gt;;
+    </span><span class="kw">pub type </span>Entries&lt;<span class="lifetime">'a</span>&gt; = <span class="kw">super</span>::object::Iter&lt;<span class="lifetime">'a</span>&gt;;
 
     <span class="doccomment">/// Mutable iterator over key value pairs of `JsonValue::Object`.
-    </span><span class="kw">pub type </span>EntriesMut&lt;<span class="lifetime">&#39;a</span>&gt; = <span class="kw">super</span>::object::IterMut&lt;<span class="lifetime">&#39;a</span>&gt;;
+    </span><span class="kw">pub type </span>EntriesMut&lt;<span class="lifetime">'a</span>&gt; = <span class="kw">super</span>::object::IterMut&lt;<span class="lifetime">'a</span>&gt;;
 }
 
-<span class="attr">#[deprecated(since=<span class="string">&quot;0.9.0&quot;</span>, note=<span class="string">&quot;use `json::Error` instead&quot;</span>)]
+<span class="attr">#[deprecated(since=<span class="string">"0.9.0"</span>, note=<span class="string">"use `json::Error` instead"</span>)]
 </span><span class="kw">pub use </span>Error <span class="kw">as </span>JsonError;
 
-<span class="attr">#[deprecated(since=<span class="string">&quot;0.9.0&quot;</span>, note=<span class="string">&quot;use `json::Result` instead&quot;</span>)]
+<span class="attr">#[deprecated(since=<span class="string">"0.9.0"</span>, note=<span class="string">"use `json::Result` instead"</span>)]
 </span><span class="kw">pub use </span><span class="kw">crate</span>::Result <span class="kw">as </span>JsonResult;
 
 <span class="kw">pub use </span>parser::parse;
@@ -696,13 +697,13 @@
 /// ```
 /// # #[macro_use] extern crate json;
 /// # fn main() {
-/// let data = array![&quot;foo&quot;, 42, false];
+/// let data = array!["foo", 42, false];
 ///
-/// assert_eq!(data[0], &quot;foo&quot;);
+/// assert_eq!(data[0], "foo");
 /// assert_eq!(data[1], 42);
 /// assert_eq!(data[2], false);
 ///
-/// assert_eq!(data.dump(), r#&quot;[&quot;foo&quot;,42,false]&quot;#);
+/// assert_eq!(data.dump(), r#"["foo",42,false]"#);
 /// # }
 /// ```
 </span><span class="attr">#[macro_export]
@@ -756,7 +757,7 @@
 }
 
 <span class="attr">#[macro_export]
-</span><span class="doccomment">/// Helper crate for converting types into `JsonValue`. It&#39;s used
+</span><span class="doccomment">/// Helper crate for converting types into `JsonValue`. It's used
 /// internally by the `object!` and `array!` macros.
 </span><span class="macro">macro_rules! </span>value {
     ( null ) =&gt; { <span class="macro-nonterminal">$crate::Null </span>};
@@ -780,10 +781,10 @@
 ///     bar: false,
 /// };
 ///
-/// assert_eq!(data[&quot;foo&quot;], 42);
-/// assert_eq!(data[&quot;bar&quot;], false);
+/// assert_eq!(data["foo"], 42);
+/// assert_eq!(data["bar"], false);
 ///
-/// assert_eq!(data.dump(), r#&quot;{&quot;foo&quot;:42,&quot;bar&quot;:false}&quot;#);
+/// assert_eq!(data.dump(), r#"{"foo":42,"bar":false}"#);
 /// # }
 /// ```
 </span><span class="attr">#[macro_export]

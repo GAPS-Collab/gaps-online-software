@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/indicatif-0.17.8/src/style.rs`."><title>style.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="indicatif" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/indicatif-0.17.8/src/style.rs`."><title>style.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="indicatif" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -997,13 +998,13 @@
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::HashMap;
 <span class="kw">use </span>std::fmt::{<span class="self">self</span>, Write};
 <span class="kw">use </span>std::mem;
-<span class="attr">#[cfg(not(target_arch = <span class="string">&quot;wasm32&quot;</span>))]
+<span class="attr">#[cfg(not(target_arch = <span class="string">"wasm32"</span>))]
 </span><span class="kw">use </span>std::time::Instant;
 
 <span class="kw">use </span>console::{measure_text_width, Style};
-<span class="attr">#[cfg(target_arch = <span class="string">&quot;wasm32&quot;</span>)]
+<span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span>instant::Instant;
-<span class="attr">#[cfg(feature = <span class="string">&quot;unicode-segmentation&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"unicode-segmentation"</span>)]
 </span><span class="kw">use </span>unicode_segmentation::UnicodeSegmentation;
 
 <span class="kw">use </span><span class="kw">crate</span>::format::{
@@ -1020,27 +1021,27 @@
     <span class="comment">// how unicode-big each char in progress_chars is
     </span>char_width: usize,
     tab_width: usize,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) format_map: HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, Box&lt;<span class="kw">dyn </span>ProgressTracker&gt;&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) format_map: HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, Box&lt;<span class="kw">dyn </span>ProgressTracker&gt;&gt;,
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;unicode-segmentation&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"unicode-segmentation"</span>)]
 </span><span class="kw">fn </span>segment(s: <span class="kw-2">&amp;</span>str) -&gt; Vec&lt;Box&lt;str&gt;&gt; {
     UnicodeSegmentation::graphemes(s, <span class="bool-val">true</span>)
         .map(|s| s.into())
         .collect()
 }
 
-<span class="attr">#[cfg(not(feature = <span class="string">&quot;unicode-segmentation&quot;</span>))]
+<span class="attr">#[cfg(not(feature = <span class="string">"unicode-segmentation"</span>))]
 </span><span class="kw">fn </span>segment(s: <span class="kw-2">&amp;</span>str) -&gt; Vec&lt;Box&lt;str&gt;&gt; {
     s.chars().map(|x| x.to_string().into()).collect()
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;unicode-width&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"unicode-width"</span>)]
 </span><span class="kw">fn </span>measure(s: <span class="kw-2">&amp;</span>str) -&gt; usize {
     unicode_width::UnicodeWidthStr::width(s)
 }
 
-<span class="attr">#[cfg(not(feature = <span class="string">&quot;unicode-width&quot;</span>))]
+<span class="attr">#[cfg(not(feature = <span class="string">"unicode-width"</span>))]
 </span><span class="kw">fn </span>measure(s: <span class="kw-2">&amp;</span>str) -&gt; usize {
     s.chars().count()
 }
@@ -1053,7 +1054,7 @@
         .fold(<span class="prelude-val">None</span>, |acc, new| {
             <span class="kw">match </span>acc {
                 <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Some</span>(new),
-                <span class="prelude-val">Some</span>(old) =&gt; <span class="macro">assert_eq!</span>(old, new, <span class="string">&quot;got passed un-equal width progress characters&quot;</span>),
+                <span class="prelude-val">Some</span>(old) =&gt; <span class="macro">assert_eq!</span>(old, new, <span class="string">"got passed un-equal width progress characters"</span>),
             }
             acc
         })
@@ -1063,12 +1064,12 @@
 <span class="kw">impl </span>ProgressStyle {
     <span class="doccomment">/// Returns the default progress bar style for bars
     </span><span class="kw">pub fn </span>default_bar() -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::new(Template::from_str(<span class="string">&quot;{wide_bar} {pos}/{len}&quot;</span>).unwrap())
+        <span class="self">Self</span>::new(Template::from_str(<span class="string">"{wide_bar} {pos}/{len}"</span>).unwrap())
     }
 
     <span class="doccomment">/// Returns the default progress bar style for spinners
     </span><span class="kw">pub fn </span>default_spinner() -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::new(Template::from_str(<span class="string">&quot;{spinner} {msg}&quot;</span>).unwrap())
+        <span class="self">Self</span>::new(Template::from_str(<span class="string">"{spinner} {msg}"</span>).unwrap())
     }
 
     <span class="doccomment">/// Sets the template string for the progress bar
@@ -1084,10 +1085,10 @@
     }
 
     <span class="kw">fn </span>new(template: Template) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span>progress_chars = segment(<span class="string">&quot;█░&quot;</span>);
+        <span class="kw">let </span>progress_chars = segment(<span class="string">"█░"</span>);
         <span class="kw">let </span>char_width = width(<span class="kw-2">&amp;</span>progress_chars);
         <span class="self">Self </span>{
-            tick_strings: <span class="string">&quot;⠁⠁⠉⠙⠚⠒⠂⠂⠒⠲⠴⠤⠄⠄⠤⠠⠠⠤⠦⠖⠒⠐⠐⠒⠓⠋⠉⠈⠈ &quot;
+            tick_strings: <span class="string">"⠁⠁⠉⠙⠚⠒⠂⠂⠒⠲⠴⠤⠄⠄⠤⠠⠠⠤⠦⠖⠒⠐⠐⠒⠓⠋⠉⠈⠈ "
                 </span>.chars()
                 .map(|c| c.to_string().into())
                 .collect(),
@@ -1109,7 +1110,7 @@
         // with a message explicitly informing of the problem
         </span><span class="macro">assert!</span>(
             <span class="self">self</span>.tick_strings.len() &gt;= <span class="number">2</span>,
-            <span class="string">&quot;at least 2 tick chars required&quot;
+            <span class="string">"at least 2 tick chars required"
         </span>);
         <span class="self">self
     </span>}
@@ -1124,7 +1125,7 @@
         // with a message explicitly informing of the problem
         </span><span class="macro">assert!</span>(
             <span class="self">self</span>.progress_chars.len() &gt;= <span class="number">2</span>,
-            <span class="string">&quot;at least 2 tick strings required&quot;
+            <span class="string">"at least 2 tick strings required"
         </span>);
         <span class="self">self
     </span>}
@@ -1139,14 +1140,14 @@
         // with a message explicitly informing of the problem
         </span><span class="macro">assert!</span>(
             <span class="self">self</span>.progress_chars.len() &gt;= <span class="number">2</span>,
-            <span class="string">&quot;at least 2 progress chars required&quot;
+            <span class="string">"at least 2 progress chars required"
         </span>);
         <span class="self">self</span>.char_width = width(<span class="kw-2">&amp;</span><span class="self">self</span>.progress_chars);
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Adds a custom key that owns a [`ProgressTracker`] to the template
-    </span><span class="kw">pub fn </span>with_key&lt;S: ProgressTracker + <span class="lifetime">&#39;static</span>&gt;(<span class="kw-2">mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, f: S) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>with_key&lt;S: ProgressTracker + <span class="lifetime">'static</span>&gt;(<span class="kw-2">mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str, f: S) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.format_map.insert(key, Box::new(f));
         <span class="self">self
     </span>}
@@ -1176,23 +1177,23 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>.tick_strings[<span class="self">self</span>.tick_strings.len() - <span class="number">1</span>]
     }
 
-    <span class="kw">fn </span>format_bar(<span class="kw-2">&amp;</span><span class="self">self</span>, fract: f32, width: usize, alt_style: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Style&gt;) -&gt; BarDisplay&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>format_bar(<span class="kw-2">&amp;</span><span class="self">self</span>, fract: f32, width: usize, alt_style: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Style&gt;) -&gt; BarDisplay&lt;<span class="lifetime">'_</span>&gt; {
         <span class="comment">// The number of clusters from progress_chars to write (rounding down).
         </span><span class="kw">let </span>width = width / <span class="self">self</span>.char_width;
         <span class="comment">// The number of full clusters (including a fractional component for a partially-full one).
         </span><span class="kw">let </span>fill = fract * width <span class="kw">as </span>f32;
         <span class="comment">// The number of entirely full clusters (by truncating `fill`).
         </span><span class="kw">let </span>entirely_filled = fill <span class="kw">as </span>usize;
-        <span class="comment">// 1 if the bar is not entirely empty or full (meaning we need to draw the &quot;current&quot;
-        // character between the filled and &quot;to do&quot; segment), 0 otherwise.
+        <span class="comment">// 1 if the bar is not entirely empty or full (meaning we need to draw the "current"
+        // character between the filled and "to do" segment), 0 otherwise.
         </span><span class="kw">let </span>head = usize::from(fill &gt; <span class="number">0.0 </span>&amp;&amp; entirely_filled &lt; width);
 
         <span class="kw">let </span>cur = <span class="kw">if </span>head == <span class="number">1 </span>{
             <span class="comment">// Number of fine-grained progress entries in progress_chars.
             </span><span class="kw">let </span>n = <span class="self">self</span>.progress_chars.len().saturating_sub(<span class="number">2</span>);
             <span class="kw">let </span>cur_char = <span class="kw">if </span>n &lt;= <span class="number">1 </span>{
-                <span class="comment">// No fine-grained entries. 1 is the single &quot;current&quot; entry if we have one, the &quot;to
-                // do&quot; entry if not.
+                <span class="comment">// No fine-grained entries. 1 is the single "current" entry if we have one, the "to
+                // do" entry if not.
                 </span><span class="number">1
             </span>} <span class="kw">else </span>{
                 <span class="comment">// Pick a fine-grained entry, ranging from the last one (n) if the fractional part
@@ -1246,13 +1247,13 @@
                         tracker.write(state, <span class="kw-2">&amp;mut </span>TabRewriter(<span class="kw-2">&amp;mut </span>buf, <span class="self">self</span>.tab_width));
                     } <span class="kw">else </span>{
                         <span class="kw">match </span>key.as_str() {
-                            <span class="string">&quot;wide_bar&quot; </span>=&gt; {
+                            <span class="string">"wide_bar" </span>=&gt; {
                                 wide = <span class="prelude-val">Some</span>(WideElement::Bar { alt_style });
-                                buf.push(<span class="string">&#39;\x00&#39;</span>);
+                                buf.push(<span class="string">'\x00'</span>);
                             }
-                            <span class="string">&quot;bar&quot; </span>=&gt; buf
+                            <span class="string">"bar" </span>=&gt; buf
                                 .write_fmt(<span class="macro">format_args!</span>(
-                                    <span class="string">&quot;{}&quot;</span>,
+                                    <span class="string">"{}"</span>,
                                     <span class="self">self</span>.format_bar(
                                         state.fraction(),
                                         width.unwrap_or(<span class="number">20</span>) <span class="kw">as </span>usize,
@@ -1260,78 +1261,78 @@
                                     )
                                 ))
                                 .unwrap(),
-                            <span class="string">&quot;spinner&quot; </span>=&gt; buf.push_str(<span class="self">self</span>.current_tick_str(state)),
-                            <span class="string">&quot;wide_msg&quot; </span>=&gt; {
+                            <span class="string">"spinner" </span>=&gt; buf.push_str(<span class="self">self</span>.current_tick_str(state)),
+                            <span class="string">"wide_msg" </span>=&gt; {
                                 wide = <span class="prelude-val">Some</span>(WideElement::Message { align });
-                                buf.push(<span class="string">&#39;\x00&#39;</span>);
+                                buf.push(<span class="string">'\x00'</span>);
                             }
-                            <span class="string">&quot;msg&quot; </span>=&gt; buf.push_str(state.message.expanded()),
-                            <span class="string">&quot;prefix&quot; </span>=&gt; buf.push_str(state.prefix.expanded()),
-                            <span class="string">&quot;pos&quot; </span>=&gt; buf.write_fmt(<span class="macro">format_args!</span>(<span class="string">&quot;{pos}&quot;</span>)).unwrap(),
-                            <span class="string">&quot;human_pos&quot; </span>=&gt; {
-                                buf.write_fmt(<span class="macro">format_args!</span>(<span class="string">&quot;{}&quot;</span>, HumanCount(pos))).unwrap();
+                            <span class="string">"msg" </span>=&gt; buf.push_str(state.message.expanded()),
+                            <span class="string">"prefix" </span>=&gt; buf.push_str(state.prefix.expanded()),
+                            <span class="string">"pos" </span>=&gt; buf.write_fmt(<span class="macro">format_args!</span>(<span class="string">"{pos}"</span>)).unwrap(),
+                            <span class="string">"human_pos" </span>=&gt; {
+                                buf.write_fmt(<span class="macro">format_args!</span>(<span class="string">"{}"</span>, HumanCount(pos))).unwrap();
                             }
-                            <span class="string">&quot;len&quot; </span>=&gt; buf.write_fmt(<span class="macro">format_args!</span>(<span class="string">&quot;{len}&quot;</span>)).unwrap(),
-                            <span class="string">&quot;human_len&quot; </span>=&gt; {
-                                buf.write_fmt(<span class="macro">format_args!</span>(<span class="string">&quot;{}&quot;</span>, HumanCount(len))).unwrap();
+                            <span class="string">"len" </span>=&gt; buf.write_fmt(<span class="macro">format_args!</span>(<span class="string">"{len}"</span>)).unwrap(),
+                            <span class="string">"human_len" </span>=&gt; {
+                                buf.write_fmt(<span class="macro">format_args!</span>(<span class="string">"{}"</span>, HumanCount(len))).unwrap();
                             }
-                            <span class="string">&quot;percent&quot; </span>=&gt; buf
-                                .write_fmt(<span class="macro">format_args!</span>(<span class="string">&quot;{:.*}&quot;</span>, <span class="number">0</span>, state.fraction() * <span class="number">100f32</span>))
+                            <span class="string">"percent" </span>=&gt; buf
+                                .write_fmt(<span class="macro">format_args!</span>(<span class="string">"{:.*}"</span>, <span class="number">0</span>, state.fraction() * <span class="number">100f32</span>))
                                 .unwrap(),
-                            <span class="string">&quot;percent_precise&quot; </span>=&gt; buf
-                                .write_fmt(<span class="macro">format_args!</span>(<span class="string">&quot;{:.*}&quot;</span>, <span class="number">3</span>, state.fraction() * <span class="number">100f32</span>))
+                            <span class="string">"percent_precise" </span>=&gt; buf
+                                .write_fmt(<span class="macro">format_args!</span>(<span class="string">"{:.*}"</span>, <span class="number">3</span>, state.fraction() * <span class="number">100f32</span>))
                                 .unwrap(),
-                            <span class="string">&quot;bytes&quot; </span>=&gt; buf.write_fmt(<span class="macro">format_args!</span>(<span class="string">&quot;{}&quot;</span>, HumanBytes(pos))).unwrap(),
-                            <span class="string">&quot;total_bytes&quot; </span>=&gt; {
-                                buf.write_fmt(<span class="macro">format_args!</span>(<span class="string">&quot;{}&quot;</span>, HumanBytes(len))).unwrap();
+                            <span class="string">"bytes" </span>=&gt; buf.write_fmt(<span class="macro">format_args!</span>(<span class="string">"{}"</span>, HumanBytes(pos))).unwrap(),
+                            <span class="string">"total_bytes" </span>=&gt; {
+                                buf.write_fmt(<span class="macro">format_args!</span>(<span class="string">"{}"</span>, HumanBytes(len))).unwrap();
                             }
-                            <span class="string">&quot;decimal_bytes&quot; </span>=&gt; buf
-                                .write_fmt(<span class="macro">format_args!</span>(<span class="string">&quot;{}&quot;</span>, DecimalBytes(pos)))
+                            <span class="string">"decimal_bytes" </span>=&gt; buf
+                                .write_fmt(<span class="macro">format_args!</span>(<span class="string">"{}"</span>, DecimalBytes(pos)))
                                 .unwrap(),
-                            <span class="string">&quot;decimal_total_bytes&quot; </span>=&gt; buf
-                                .write_fmt(<span class="macro">format_args!</span>(<span class="string">&quot;{}&quot;</span>, DecimalBytes(len)))
+                            <span class="string">"decimal_total_bytes" </span>=&gt; buf
+                                .write_fmt(<span class="macro">format_args!</span>(<span class="string">"{}"</span>, DecimalBytes(len)))
                                 .unwrap(),
-                            <span class="string">&quot;binary_bytes&quot; </span>=&gt; {
-                                buf.write_fmt(<span class="macro">format_args!</span>(<span class="string">&quot;{}&quot;</span>, BinaryBytes(pos))).unwrap();
+                            <span class="string">"binary_bytes" </span>=&gt; {
+                                buf.write_fmt(<span class="macro">format_args!</span>(<span class="string">"{}"</span>, BinaryBytes(pos))).unwrap();
                             }
-                            <span class="string">&quot;binary_total_bytes&quot; </span>=&gt; {
-                                buf.write_fmt(<span class="macro">format_args!</span>(<span class="string">&quot;{}&quot;</span>, BinaryBytes(len))).unwrap();
+                            <span class="string">"binary_total_bytes" </span>=&gt; {
+                                buf.write_fmt(<span class="macro">format_args!</span>(<span class="string">"{}"</span>, BinaryBytes(len))).unwrap();
                             }
-                            <span class="string">&quot;elapsed_precise&quot; </span>=&gt; buf
-                                .write_fmt(<span class="macro">format_args!</span>(<span class="string">&quot;{}&quot;</span>, FormattedDuration(state.elapsed())))
+                            <span class="string">"elapsed_precise" </span>=&gt; buf
+                                .write_fmt(<span class="macro">format_args!</span>(<span class="string">"{}"</span>, FormattedDuration(state.elapsed())))
                                 .unwrap(),
-                            <span class="string">&quot;elapsed&quot; </span>=&gt; buf
-                                .write_fmt(<span class="macro">format_args!</span>(<span class="string">&quot;{:#}&quot;</span>, HumanDuration(state.elapsed())))
+                            <span class="string">"elapsed" </span>=&gt; buf
+                                .write_fmt(<span class="macro">format_args!</span>(<span class="string">"{:#}"</span>, HumanDuration(state.elapsed())))
                                 .unwrap(),
-                            <span class="string">&quot;per_sec&quot; </span>=&gt; buf
-                                .write_fmt(<span class="macro">format_args!</span>(<span class="string">&quot;{}/s&quot;</span>, HumanFloatCount(state.per_sec())))
+                            <span class="string">"per_sec" </span>=&gt; buf
+                                .write_fmt(<span class="macro">format_args!</span>(<span class="string">"{}/s"</span>, HumanFloatCount(state.per_sec())))
                                 .unwrap(),
-                            <span class="string">&quot;bytes_per_sec&quot; </span>=&gt; buf
-                                .write_fmt(<span class="macro">format_args!</span>(<span class="string">&quot;{}/s&quot;</span>, HumanBytes(state.per_sec() <span class="kw">as </span>u64)))
+                            <span class="string">"bytes_per_sec" </span>=&gt; buf
+                                .write_fmt(<span class="macro">format_args!</span>(<span class="string">"{}/s"</span>, HumanBytes(state.per_sec() <span class="kw">as </span>u64)))
                                 .unwrap(),
-                            <span class="string">&quot;decimal_bytes_per_sec&quot; </span>=&gt; buf
+                            <span class="string">"decimal_bytes_per_sec" </span>=&gt; buf
                                 .write_fmt(<span class="macro">format_args!</span>(
-                                    <span class="string">&quot;{}/s&quot;</span>,
+                                    <span class="string">"{}/s"</span>,
                                     DecimalBytes(state.per_sec() <span class="kw">as </span>u64)
                                 ))
                                 .unwrap(),
-                            <span class="string">&quot;binary_bytes_per_sec&quot; </span>=&gt; buf
+                            <span class="string">"binary_bytes_per_sec" </span>=&gt; buf
                                 .write_fmt(<span class="macro">format_args!</span>(
-                                    <span class="string">&quot;{}/s&quot;</span>,
+                                    <span class="string">"{}/s"</span>,
                                     BinaryBytes(state.per_sec() <span class="kw">as </span>u64)
                                 ))
                                 .unwrap(),
-                            <span class="string">&quot;eta_precise&quot; </span>=&gt; buf
-                                .write_fmt(<span class="macro">format_args!</span>(<span class="string">&quot;{}&quot;</span>, FormattedDuration(state.eta())))
+                            <span class="string">"eta_precise" </span>=&gt; buf
+                                .write_fmt(<span class="macro">format_args!</span>(<span class="string">"{}"</span>, FormattedDuration(state.eta())))
                                 .unwrap(),
-                            <span class="string">&quot;eta&quot; </span>=&gt; buf
-                                .write_fmt(<span class="macro">format_args!</span>(<span class="string">&quot;{:#}&quot;</span>, HumanDuration(state.eta())))
+                            <span class="string">"eta" </span>=&gt; buf
+                                .write_fmt(<span class="macro">format_args!</span>(<span class="string">"{:#}"</span>, HumanDuration(state.eta())))
                                 .unwrap(),
-                            <span class="string">&quot;duration_precise&quot; </span>=&gt; buf
-                                .write_fmt(<span class="macro">format_args!</span>(<span class="string">&quot;{}&quot;</span>, FormattedDuration(state.duration())))
+                            <span class="string">"duration_precise" </span>=&gt; buf
+                                .write_fmt(<span class="macro">format_args!</span>(<span class="string">"{}"</span>, FormattedDuration(state.duration())))
                                 .unwrap(),
-                            <span class="string">&quot;duration&quot; </span>=&gt; buf
-                                .write_fmt(<span class="macro">format_args!</span>(<span class="string">&quot;{:#}&quot;</span>, HumanDuration(state.duration())))
+                            <span class="string">"duration" </span>=&gt; buf
+                                .write_fmt(<span class="macro">format_args!</span>(<span class="string">"{:#}"</span>, HumanDuration(state.duration())))
                                 .unwrap(),
                             <span class="kw">_ </span>=&gt; (),
                         }
@@ -1347,13 +1348,13 @@
                             };
                             <span class="kw">match </span>style {
                                 <span class="prelude-val">Some</span>(s) =&gt; cur
-                                    .write_fmt(<span class="macro">format_args!</span>(<span class="string">&quot;{}&quot;</span>, s.apply_to(padded)))
+                                    .write_fmt(<span class="macro">format_args!</span>(<span class="string">"{}"</span>, s.apply_to(padded)))
                                     .unwrap(),
-                                <span class="prelude-val">None </span>=&gt; cur.write_fmt(<span class="macro">format_args!</span>(<span class="string">&quot;{padded}&quot;</span>)).unwrap(),
+                                <span class="prelude-val">None </span>=&gt; cur.write_fmt(<span class="macro">format_args!</span>(<span class="string">"{padded}"</span>)).unwrap(),
                             }
                         }
                         <span class="prelude-val">None </span>=&gt; <span class="kw">match </span>style {
-                            <span class="prelude-val">Some</span>(s) =&gt; cur.write_fmt(<span class="macro">format_args!</span>(<span class="string">&quot;{}&quot;</span>, s.apply_to(<span class="kw-2">&amp;</span>buf))).unwrap(),
+                            <span class="prelude-val">Some</span>(s) =&gt; cur.write_fmt(<span class="macro">format_args!</span>(<span class="string">"{}"</span>, s.apply_to(<span class="kw-2">&amp;</span>buf))).unwrap(),
                             <span class="prelude-val">None </span>=&gt; cur.push_str(<span class="kw-2">&amp;</span>buf),
                         },
                     }
@@ -1385,9 +1386,9 @@
         };
 
         <span class="comment">// If there are newlines, we need to split them up
-        // and add the lines separately so that they&#39;re counted
+        // and add the lines separately so that they're counted
         // correctly on re-render.
-        </span><span class="kw">for </span>(i, line) <span class="kw">in </span>expanded.split(<span class="string">&#39;\n&#39;</span>).enumerate() {
+        </span><span class="kw">for </span>(i, line) <span class="kw">in </span>expanded.split(<span class="string">'\n'</span>).enumerate() {
             <span class="comment">// No newlines found in this case
             </span><span class="kw">if </span>i == <span class="number">0 </span>&amp;&amp; line.len() == expanded.len() {
                 lines.push(expanded);
@@ -1399,22 +1400,22 @@
     }
 }
 
-<span class="kw">struct </span>TabRewriter&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="kw">dyn </span>fmt::Write, usize);
+<span class="kw">struct </span>TabRewriter&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span><span class="kw">dyn </span>fmt::Write, usize);
 
-<span class="kw">impl </span>Write <span class="kw">for </span>TabRewriter&lt;<span class="lifetime">&#39;_</span>&gt; {
+<span class="kw">impl </span>Write <span class="kw">for </span>TabRewriter&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">fn </span>write_str(<span class="kw-2">&amp;mut </span><span class="self">self</span>, s: <span class="kw-2">&amp;</span>str) -&gt; fmt::Result {
         <span class="self">self</span>.<span class="number">0
-            </span>.write_str(s.replace(<span class="string">&#39;\t&#39;</span>, <span class="kw-2">&amp;</span><span class="string">&quot; &quot;</span>.repeat(<span class="self">self</span>.<span class="number">1</span>)).as_str())
+            </span>.write_str(s.replace(<span class="string">'\t'</span>, <span class="kw-2">&amp;</span><span class="string">" "</span>.repeat(<span class="self">self</span>.<span class="number">1</span>)).as_str())
     }
 }
 
 <span class="attr">#[derive(Clone, Copy)]
-</span><span class="kw">enum </span>WideElement&lt;<span class="lifetime">&#39;a</span>&gt; {
-    Bar { alt_style: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="prelude-ty">Option</span>&lt;Style&gt; },
-    Message { align: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Alignment },
+</span><span class="kw">enum </span>WideElement&lt;<span class="lifetime">'a</span>&gt; {
+    Bar { alt_style: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="prelude-ty">Option</span>&lt;Style&gt; },
+    Message { align: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Alignment },
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; WideElement&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; WideElement&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">fn </span>expand(
         <span class="self">self</span>,
         cur: String,
@@ -1423,19 +1424,19 @@
         buf: <span class="kw-2">&amp;mut </span>String,
         width: u16,
     ) -&gt; String {
-        <span class="kw">let </span>left = (width <span class="kw">as </span>usize).saturating_sub(measure_text_width(<span class="kw-2">&amp;</span>cur.replace(<span class="string">&#39;\x00&#39;</span>, <span class="string">&quot;&quot;</span>)));
+        <span class="kw">let </span>left = (width <span class="kw">as </span>usize).saturating_sub(measure_text_width(<span class="kw-2">&amp;</span>cur.replace(<span class="string">'\x00'</span>, <span class="string">""</span>)));
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Bar { alt_style } =&gt; cur.replace(
-                <span class="string">&#39;\x00&#39;</span>,
+                <span class="string">'\x00'</span>,
                 <span class="kw-2">&amp;</span><span class="macro">format!</span>(
-                    <span class="string">&quot;{}&quot;</span>,
+                    <span class="string">"{}"</span>,
                     style.format_bar(state.fraction(), left, alt_style.as_ref())
                 ),
             ),
             WideElement::Message { align } =&gt; {
                 buf.clear();
                 buf.write_fmt(<span class="macro">format_args!</span>(
-                    <span class="string">&quot;{}&quot;</span>,
+                    <span class="string">"{}"</span>,
                     PaddedStringDisplay {
                         str: state.message.expanded(),
                         width: left,
@@ -1445,12 +1446,12 @@
                 ))
                 .unwrap();
 
-                <span class="kw">let </span>trimmed = <span class="kw">match </span>cur.as_bytes().last() == <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;\x00&#39;</span>) {
+                <span class="kw">let </span>trimmed = <span class="kw">match </span>cur.as_bytes().last() == <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b'\x00'</span>) {
                     <span class="bool-val">true </span>=&gt; buf.trim_end(),
                     <span class="bool-val">false </span>=&gt; buf,
                 };
 
-                cur.replace(<span class="string">&#39;\x00&#39;</span>, trimmed)
+                cur.replace(<span class="string">'\x00'</span>, trimmed)
             }
         }
     }
@@ -1467,8 +1468,8 @@
         <span class="kw">let </span>(<span class="kw-2">mut </span>state, <span class="kw-2">mut </span>parts, <span class="kw-2">mut </span>buf) = (Literal, <span class="macro">vec!</span>[], String::new());
         <span class="kw">for </span>c <span class="kw">in </span>s.chars() {
             <span class="kw">let </span>new = <span class="kw">match </span>(state, c) {
-                (Literal, <span class="string">&#39;{&#39;</span>) =&gt; (MaybeOpen, <span class="prelude-val">None</span>),
-                (Literal, <span class="string">&#39;\n&#39;</span>) =&gt; {
+                (Literal, <span class="string">'{'</span>) =&gt; (MaybeOpen, <span class="prelude-val">None</span>),
+                (Literal, <span class="string">'\n'</span>) =&gt; {
                     <span class="kw">if </span>!buf.is_empty() {
                         parts.push(TemplatePart::Literal(TabExpandedString::new(
                             mem::take(<span class="kw-2">&amp;mut </span>buf).into(),
@@ -1478,15 +1479,15 @@
                     parts.push(TemplatePart::NewLine);
                     (Literal, <span class="prelude-val">None</span>)
                 }
-                (Literal, <span class="string">&#39;}&#39;</span>) =&gt; (DoubleClose, <span class="prelude-val">Some</span>(<span class="string">&#39;}&#39;</span>)),
+                (Literal, <span class="string">'}'</span>) =&gt; (DoubleClose, <span class="prelude-val">Some</span>(<span class="string">'}'</span>)),
                 (Literal, c) =&gt; (Literal, <span class="prelude-val">Some</span>(c)),
-                (DoubleClose, <span class="string">&#39;}&#39;</span>) =&gt; (Literal, <span class="prelude-val">None</span>),
-                (MaybeOpen, <span class="string">&#39;{&#39;</span>) =&gt; (Literal, <span class="prelude-val">Some</span>(<span class="string">&#39;{&#39;</span>)),
+                (DoubleClose, <span class="string">'}'</span>) =&gt; (Literal, <span class="prelude-val">None</span>),
+                (MaybeOpen, <span class="string">'{'</span>) =&gt; (Literal, <span class="prelude-val">Some</span>(<span class="string">'{'</span>)),
                 (MaybeOpen | Key, c) <span class="kw">if </span>c.is_ascii_whitespace() =&gt; {
                     <span class="comment">// If we find whitespace where the variable key is supposed to go,
                     // backtrack and act as if this was a literal.
                     </span>buf.push(c);
-                    <span class="kw">let </span><span class="kw-2">mut </span>new = String::from(<span class="string">&quot;{&quot;</span>);
+                    <span class="kw">let </span><span class="kw-2">mut </span>new = String::from(<span class="string">"{"</span>);
                     new.push_str(<span class="kw-2">&amp;</span>buf);
                     buf.clear();
                     parts.push(TemplatePart::Literal(TabExpandedString::new(
@@ -1495,11 +1496,11 @@
                     )));
                     (Literal, <span class="prelude-val">None</span>)
                 }
-                (MaybeOpen, c) <span class="kw">if </span>c != <span class="string">&#39;}&#39; </span>&amp;&amp; c != <span class="string">&#39;:&#39; </span>=&gt; (Key, <span class="prelude-val">Some</span>(c)),
-                (Key, c) <span class="kw">if </span>c != <span class="string">&#39;}&#39; </span>&amp;&amp; c != <span class="string">&#39;:&#39; </span>=&gt; (Key, <span class="prelude-val">Some</span>(c)),
-                (Key, <span class="string">&#39;:&#39;</span>) =&gt; (Align, <span class="prelude-val">None</span>),
-                (Key, <span class="string">&#39;}&#39;</span>) =&gt; (Literal, <span class="prelude-val">None</span>),
-                (Key, <span class="string">&#39;!&#39;</span>) <span class="kw">if </span>!buf.is_empty() =&gt; {
+                (MaybeOpen, c) <span class="kw">if </span>c != <span class="string">'}' </span>&amp;&amp; c != <span class="string">':' </span>=&gt; (Key, <span class="prelude-val">Some</span>(c)),
+                (Key, c) <span class="kw">if </span>c != <span class="string">'}' </span>&amp;&amp; c != <span class="string">':' </span>=&gt; (Key, <span class="prelude-val">Some</span>(c)),
+                (Key, <span class="string">':'</span>) =&gt; (Align, <span class="prelude-val">None</span>),
+                (Key, <span class="string">'}'</span>) =&gt; (Literal, <span class="prelude-val">None</span>),
+                (Key, <span class="string">'!'</span>) <span class="kw">if </span>!buf.is_empty() =&gt; {
                     parts.push(TemplatePart::Placeholder {
                         key: mem::take(<span class="kw-2">&amp;mut </span>buf),
                         align: Alignment::Left,
@@ -1510,34 +1511,34 @@
                     });
                     (Width, <span class="prelude-val">None</span>)
                 }
-                (Align, c) <span class="kw">if </span>c == <span class="string">&#39;&lt;&#39; </span>|| c == <span class="string">&#39;^&#39; </span>|| c == <span class="string">&#39;&gt;&#39; </span>=&gt; {
+                (Align, c) <span class="kw">if </span>c == <span class="string">'&lt;' </span>|| c == <span class="string">'^' </span>|| c == <span class="string">'&gt;' </span>=&gt; {
                     <span class="kw">if let </span><span class="prelude-val">Some</span>(TemplatePart::Placeholder { align, .. }) = parts.last_mut() {
                         <span class="kw">match </span>c {
-                            <span class="string">&#39;&lt;&#39; </span>=&gt; <span class="kw-2">*</span>align = Alignment::Left,
-                            <span class="string">&#39;^&#39; </span>=&gt; <span class="kw-2">*</span>align = Alignment::Center,
-                            <span class="string">&#39;&gt;&#39; </span>=&gt; <span class="kw-2">*</span>align = Alignment::Right,
+                            <span class="string">'&lt;' </span>=&gt; <span class="kw-2">*</span>align = Alignment::Left,
+                            <span class="string">'^' </span>=&gt; <span class="kw-2">*</span>align = Alignment::Center,
+                            <span class="string">'&gt;' </span>=&gt; <span class="kw-2">*</span>align = Alignment::Right,
                             <span class="kw">_ </span>=&gt; (),
                         }
                     }
 
                     (Width, <span class="prelude-val">None</span>)
                 }
-                (Align, c @ <span class="string">&#39;0&#39;</span>..=<span class="string">&#39;9&#39;</span>) =&gt; (Width, <span class="prelude-val">Some</span>(c)),
-                (Align | Width, <span class="string">&#39;!&#39;</span>) =&gt; {
+                (Align, c @ <span class="string">'0'</span>..=<span class="string">'9'</span>) =&gt; (Width, <span class="prelude-val">Some</span>(c)),
+                (Align | Width, <span class="string">'!'</span>) =&gt; {
                     <span class="kw">if let </span><span class="prelude-val">Some</span>(TemplatePart::Placeholder { truncate, .. }) = parts.last_mut() {
                         <span class="kw-2">*</span>truncate = <span class="bool-val">true</span>;
                     }
                     (Width, <span class="prelude-val">None</span>)
                 }
-                (Align, <span class="string">&#39;.&#39;</span>) =&gt; (FirstStyle, <span class="prelude-val">None</span>),
-                (Align, <span class="string">&#39;}&#39;</span>) =&gt; (Literal, <span class="prelude-val">None</span>),
-                (Width, c @ <span class="string">&#39;0&#39;</span>..=<span class="string">&#39;9&#39;</span>) =&gt; (Width, <span class="prelude-val">Some</span>(c)),
-                (Width, <span class="string">&#39;.&#39;</span>) =&gt; (FirstStyle, <span class="prelude-val">None</span>),
-                (Width, <span class="string">&#39;}&#39;</span>) =&gt; (Literal, <span class="prelude-val">None</span>),
-                (FirstStyle, <span class="string">&#39;/&#39;</span>) =&gt; (AltStyle, <span class="prelude-val">None</span>),
-                (FirstStyle, <span class="string">&#39;}&#39;</span>) =&gt; (Literal, <span class="prelude-val">None</span>),
+                (Align, <span class="string">'.'</span>) =&gt; (FirstStyle, <span class="prelude-val">None</span>),
+                (Align, <span class="string">'}'</span>) =&gt; (Literal, <span class="prelude-val">None</span>),
+                (Width, c @ <span class="string">'0'</span>..=<span class="string">'9'</span>) =&gt; (Width, <span class="prelude-val">Some</span>(c)),
+                (Width, <span class="string">'.'</span>) =&gt; (FirstStyle, <span class="prelude-val">None</span>),
+                (Width, <span class="string">'}'</span>) =&gt; (Literal, <span class="prelude-val">None</span>),
+                (FirstStyle, <span class="string">'/'</span>) =&gt; (AltStyle, <span class="prelude-val">None</span>),
+                (FirstStyle, <span class="string">'}'</span>) =&gt; (Literal, <span class="prelude-val">None</span>),
                 (FirstStyle, c) =&gt; (FirstStyle, <span class="prelude-val">Some</span>(c)),
-                (AltStyle, <span class="string">&#39;}&#39;</span>) =&gt; (Literal, <span class="prelude-val">None</span>),
+                (AltStyle, <span class="string">'}'</span>) =&gt; (Literal, <span class="prelude-val">None</span>),
                 (AltStyle, c) =&gt; (AltStyle, <span class="prelude-val">Some</span>(c)),
                 (st, c) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(TemplateError { next: c, state: st }),
             };
@@ -1613,10 +1614,10 @@
 }
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>TemplateError {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
         <span class="macro">write!</span>(
             f,
-            <span class="string">&quot;TemplateError: unexpected character {:?} in state {:?}&quot;</span>,
+            <span class="string">"TemplateError: unexpected character {:?} in state {:?}"</span>,
             <span class="self">self</span>.next, <span class="self">self</span>.state
         )
     }
@@ -1650,15 +1651,15 @@
     AltStyle,
 }
 
-<span class="kw">struct </span>BarDisplay&lt;<span class="lifetime">&#39;a</span>&gt; {
-    chars: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[Box&lt;str&gt;],
+<span class="kw">struct </span>BarDisplay&lt;<span class="lifetime">'a</span>&gt; {
+    chars: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>[Box&lt;str&gt;],
     filled: usize,
     cur: <span class="prelude-ty">Option</span>&lt;usize&gt;,
-    rest: console::StyledObject&lt;RepeatedStringDisplay&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    rest: console::StyledObject&lt;RepeatedStringDisplay&lt;<span class="lifetime">'a</span>&gt;&gt;,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; fmt::Display <span class="kw">for </span>BarDisplay&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; fmt::Display <span class="kw">for </span>BarDisplay&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
         <span class="kw">for _ in </span><span class="number">0</span>..<span class="self">self</span>.filled {
             f.write_str(<span class="kw-2">&amp;</span><span class="self">self</span>.chars[<span class="number">0</span>])<span class="question-mark">?</span>;
         }
@@ -1669,13 +1670,13 @@
     }
 }
 
-<span class="kw">struct </span>RepeatedStringDisplay&lt;<span class="lifetime">&#39;a</span>&gt; {
-    str: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+<span class="kw">struct </span>RepeatedStringDisplay&lt;<span class="lifetime">'a</span>&gt; {
+    str: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str,
     num: usize,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; fmt::Display <span class="kw">for </span>RepeatedStringDisplay&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; fmt::Display <span class="kw">for </span>RepeatedStringDisplay&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
         <span class="kw">for _ in </span><span class="number">0</span>..<span class="self">self</span>.num {
             f.write_str(<span class="self">self</span>.str)<span class="question-mark">?</span>;
         }
@@ -1683,15 +1684,15 @@
     }
 }
 
-<span class="kw">struct </span>PaddedStringDisplay&lt;<span class="lifetime">&#39;a</span>&gt; {
-    str: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+<span class="kw">struct </span>PaddedStringDisplay&lt;<span class="lifetime">'a</span>&gt; {
+    str: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str,
     width: usize,
     align: Alignment,
     truncate: bool,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; fmt::Display <span class="kw">for </span>PaddedStringDisplay&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; fmt::Display <span class="kw">for </span>PaddedStringDisplay&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
         <span class="kw">let </span>cols = measure_text_width(<span class="self">self</span>.str);
         <span class="kw">let </span>excess = cols.saturating_sub(<span class="self">self</span>.width);
         <span class="kw">if </span>excess &gt; <span class="number">0 </span>&amp;&amp; !<span class="self">self</span>.truncate {
@@ -1717,11 +1718,11 @@
         };
 
         <span class="kw">for _ in </span><span class="number">0</span>..left_pad {
-            f.write_char(<span class="string">&#39; &#39;</span>)<span class="question-mark">?</span>;
+            f.write_char(<span class="string">' '</span>)<span class="question-mark">?</span>;
         }
         f.write_str(<span class="self">self</span>.str)<span class="question-mark">?</span>;
         <span class="kw">for _ in </span><span class="number">0</span>..right_pad {
-            f.write_char(<span class="string">&#39; &#39;</span>)<span class="question-mark">?</span>;
+            f.write_char(<span class="string">' '</span>)<span class="question-mark">?</span>;
         }
         <span class="prelude-val">Ok</span>(())
     }
@@ -1754,7 +1755,7 @@
 
 <span class="kw">impl</span>&lt;F&gt; ProgressTracker <span class="kw">for </span>F
 <span class="kw">where
-    </span>F: Fn(<span class="kw-2">&amp;</span>ProgressState, <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>fmt::Write) + Send + Sync + Clone + <span class="lifetime">&#39;static</span>,
+    </span>F: Fn(<span class="kw-2">&amp;</span>ProgressState, <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>fmt::Write) + Send + Sync + Clone + <span class="lifetime">'static</span>,
 {
     <span class="kw">fn </span>clone_box(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Box&lt;<span class="kw">dyn </span>ProgressTracker&gt; {
         Box::new(<span class="self">self</span>.clone())
@@ -1790,7 +1791,7 @@
             <span class="kw">fn </span>tick(<span class="kw-2">&amp;mut </span><span class="self">self</span>, state: <span class="kw-2">&amp;</span>ProgressState, <span class="kw">_</span>: Instant) {
                 <span class="kw">let </span><span class="kw-2">mut </span>m = <span class="self">self</span>.<span class="number">0</span>.lock().unwrap();
                 m.clear();
-                m.push_str(<span class="macro">format!</span>(<span class="string">&quot;{} {}&quot;</span>, state.len().unwrap(), state.pos()).as_str());
+                m.push_str(<span class="macro">format!</span>(<span class="string">"{} {}"</span>, state.len().unwrap(), state.pos()).as_str());
             }
 
             <span class="kw">fn </span>reset(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _state: <span class="kw-2">&amp;</span>ProgressState, <span class="kw">_</span>: Instant) {
@@ -1807,25 +1808,25 @@
 
         <span class="kw">let </span>pb = ProgressBar::new(<span class="number">1</span>);
         pb.set_style(
-            ProgressStyle::with_template(<span class="string">&quot;{{ {foo} }}&quot;</span>)
+            ProgressStyle::with_template(<span class="string">"{{ {foo} }}"</span>)
                 .unwrap()
-                .with_key(<span class="string">&quot;foo&quot;</span>, TestTracker(Arc::new(Mutex::new(String::default()))))
-                .progress_chars(<span class="string">&quot;#&gt;-&quot;</span>),
+                .with_key(<span class="string">"foo"</span>, TestTracker(Arc::new(Mutex::new(String::default()))))
+                .progress_chars(<span class="string">"#&gt;-"</span>),
         );
 
         <span class="kw">let </span><span class="kw-2">mut </span>buf = Vec::new();
         <span class="kw">let </span>style = pb.clone().style();
 
         style.format_state(<span class="kw-2">&amp;</span>pb.state().state, <span class="kw-2">&amp;mut </span>buf, <span class="number">16</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buf[<span class="number">0</span>], <span class="string">&quot;{  }&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buf[<span class="number">0</span>], <span class="string">"{  }"</span>);
         buf.clear();
         pb.inc(<span class="number">1</span>);
         style.format_state(<span class="kw-2">&amp;</span>pb.state().state, <span class="kw-2">&amp;mut </span>buf, <span class="number">16</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buf[<span class="number">0</span>], <span class="string">&quot;{ 1 1 }&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buf[<span class="number">0</span>], <span class="string">"{ 1 1 }"</span>);
         pb.reset();
         buf.clear();
         style.format_state(<span class="kw-2">&amp;</span>pb.state().state, <span class="kw-2">&amp;mut </span>buf, <span class="number">16</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buf[<span class="number">0</span>], <span class="string">&quot;{  }&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buf[<span class="number">0</span>], <span class="string">"{  }"</span>);
         pb.finish_and_clear();
     }
 
@@ -1840,22 +1841,22 @@
 
         <span class="kw">let </span><span class="kw-2">mut </span>style = ProgressStyle::default_bar();
         style.format_map.insert(
-            <span class="string">&quot;foo&quot;</span>,
-            Box::new(|<span class="kw">_</span>: <span class="kw-2">&amp;</span>ProgressState, w: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>Write| <span class="macro">write!</span>(w, <span class="string">&quot;FOO&quot;</span>).unwrap()),
+            <span class="string">"foo"</span>,
+            Box::new(|<span class="kw">_</span>: <span class="kw-2">&amp;</span>ProgressState, w: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>Write| <span class="macro">write!</span>(w, <span class="string">"FOO"</span>).unwrap()),
         );
         style.format_map.insert(
-            <span class="string">&quot;bar&quot;</span>,
-            Box::new(|<span class="kw">_</span>: <span class="kw-2">&amp;</span>ProgressState, w: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>Write| <span class="macro">write!</span>(w, <span class="string">&quot;BAR&quot;</span>).unwrap()),
+            <span class="string">"bar"</span>,
+            Box::new(|<span class="kw">_</span>: <span class="kw-2">&amp;</span>ProgressState, w: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>Write| <span class="macro">write!</span>(w, <span class="string">"BAR"</span>).unwrap()),
         );
 
-        style.template = Template::from_str(<span class="string">&quot;{{ {foo} {bar} }}&quot;</span>).unwrap();
+        style.template = Template::from_str(<span class="string">"{{ {foo} {bar} }}"</span>).unwrap();
         style.format_state(<span class="kw-2">&amp;</span>state, <span class="kw-2">&amp;mut </span>buf, WIDTH);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buf[<span class="number">0</span>], <span class="string">&quot;{ FOO BAR }&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buf[<span class="number">0</span>], <span class="string">"{ FOO BAR }"</span>);
 
         buf.clear();
-        style.template = Template::from_str(<span class="string">r#&quot;{ &quot;foo&quot;: &quot;{foo}&quot;, &quot;bar&quot;: {bar} }&quot;#</span>).unwrap();
+        style.template = Template::from_str(<span class="string">r#"{ "foo": "{foo}", "bar": {bar} }"#</span>).unwrap();
         style.format_state(<span class="kw-2">&amp;</span>state, <span class="kw-2">&amp;mut </span>buf, WIDTH);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buf[<span class="number">0</span>], <span class="string">r#&quot;{ &quot;foo&quot;: &quot;FOO&quot;, &quot;bar&quot;: BAR }&quot;#</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buf[<span class="number">0</span>], <span class="string">r#"{ "foo": "FOO", "bar": BAR }"#</span>);
     }
 
     <span class="attr">#[test]
@@ -1870,28 +1871,28 @@
 
         <span class="kw">let </span><span class="kw-2">mut </span>style = ProgressStyle::default_bar();
         style.format_map.insert(
-            <span class="string">&quot;foo&quot;</span>,
-            Box::new(|<span class="kw">_</span>: <span class="kw-2">&amp;</span>ProgressState, w: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>Write| <span class="macro">write!</span>(w, <span class="string">&quot;XXX&quot;</span>).unwrap()),
+            <span class="string">"foo"</span>,
+            Box::new(|<span class="kw">_</span>: <span class="kw-2">&amp;</span>ProgressState, w: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>Write| <span class="macro">write!</span>(w, <span class="string">"XXX"</span>).unwrap()),
         );
 
-        style.template = Template::from_str(<span class="string">&quot;{foo:5}&quot;</span>).unwrap();
+        style.template = Template::from_str(<span class="string">"{foo:5}"</span>).unwrap();
         style.format_state(<span class="kw-2">&amp;</span>state, <span class="kw-2">&amp;mut </span>buf, WIDTH);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buf[<span class="number">0</span>], <span class="string">&quot;XXX  &quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buf[<span class="number">0</span>], <span class="string">"XXX  "</span>);
 
         buf.clear();
-        style.template = Template::from_str(<span class="string">&quot;{foo:.red.on_blue}&quot;</span>).unwrap();
+        style.template = Template::from_str(<span class="string">"{foo:.red.on_blue}"</span>).unwrap();
         style.format_state(<span class="kw-2">&amp;</span>state, <span class="kw-2">&amp;mut </span>buf, WIDTH);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buf[<span class="number">0</span>], <span class="string">&quot;\u{1b}[31m\u{1b}[44mXXX\u{1b}[0m&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buf[<span class="number">0</span>], <span class="string">"\u{1b}[31m\u{1b}[44mXXX\u{1b}[0m"</span>);
 
         buf.clear();
-        style.template = Template::from_str(<span class="string">&quot;{foo:^5.red.on_blue}&quot;</span>).unwrap();
+        style.template = Template::from_str(<span class="string">"{foo:^5.red.on_blue}"</span>).unwrap();
         style.format_state(<span class="kw-2">&amp;</span>state, <span class="kw-2">&amp;mut </span>buf, WIDTH);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buf[<span class="number">0</span>], <span class="string">&quot;\u{1b}[31m\u{1b}[44m XXX \u{1b}[0m&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buf[<span class="number">0</span>], <span class="string">"\u{1b}[31m\u{1b}[44m XXX \u{1b}[0m"</span>);
 
         buf.clear();
-        style.template = Template::from_str(<span class="string">&quot;{foo:^5.red.on_blue/green.on_cyan}&quot;</span>).unwrap();
+        style.template = Template::from_str(<span class="string">"{foo:^5.red.on_blue/green.on_cyan}"</span>).unwrap();
         style.format_state(<span class="kw-2">&amp;</span>state, <span class="kw-2">&amp;mut </span>buf, WIDTH);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buf[<span class="number">0</span>], <span class="string">&quot;\u{1b}[31m\u{1b}[44m XXX \u{1b}[0m&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buf[<span class="number">0</span>], <span class="string">"\u{1b}[31m\u{1b}[44m XXX \u{1b}[0m"</span>);
     }
 
     <span class="attr">#[test]
@@ -1901,27 +1902,27 @@
         <span class="kw">let </span><span class="kw-2">mut </span>state = ProgressState::new(<span class="prelude-val">Some</span>(<span class="number">10</span>), pos);
         <span class="kw">let </span><span class="kw-2">mut </span>buf = Vec::new();
 
-        <span class="kw">let </span>style = ProgressStyle::with_template(<span class="string">&quot;{wide_msg}&quot;</span>).unwrap();
-        state.message = TabExpandedString::NoTabs(<span class="string">&quot;abcdefghijklmnopqrst&quot;</span>.into());
+        <span class="kw">let </span>style = ProgressStyle::with_template(<span class="string">"{wide_msg}"</span>).unwrap();
+        state.message = TabExpandedString::NoTabs(<span class="string">"abcdefghijklmnopqrst"</span>.into());
         style.format_state(<span class="kw-2">&amp;</span>state, <span class="kw-2">&amp;mut </span>buf, WIDTH);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buf[<span class="number">0</span>], <span class="string">&quot;abcdefghij&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buf[<span class="number">0</span>], <span class="string">"abcdefghij"</span>);
 
         buf.clear();
-        <span class="kw">let </span>style = ProgressStyle::with_template(<span class="string">&quot;{wide_msg:&gt;}&quot;</span>).unwrap();
-        state.message = TabExpandedString::NoTabs(<span class="string">&quot;abcdefghijklmnopqrst&quot;</span>.into());
+        <span class="kw">let </span>style = ProgressStyle::with_template(<span class="string">"{wide_msg:&gt;}"</span>).unwrap();
+        state.message = TabExpandedString::NoTabs(<span class="string">"abcdefghijklmnopqrst"</span>.into());
         style.format_state(<span class="kw-2">&amp;</span>state, <span class="kw-2">&amp;mut </span>buf, WIDTH);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buf[<span class="number">0</span>], <span class="string">&quot;klmnopqrst&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buf[<span class="number">0</span>], <span class="string">"klmnopqrst"</span>);
 
         buf.clear();
-        <span class="kw">let </span>style = ProgressStyle::with_template(<span class="string">&quot;{wide_msg:^}&quot;</span>).unwrap();
-        state.message = TabExpandedString::NoTabs(<span class="string">&quot;abcdefghijklmnopqrst&quot;</span>.into());
+        <span class="kw">let </span>style = ProgressStyle::with_template(<span class="string">"{wide_msg:^}"</span>).unwrap();
+        state.message = TabExpandedString::NoTabs(<span class="string">"abcdefghijklmnopqrst"</span>.into());
         style.format_state(<span class="kw-2">&amp;</span>state, <span class="kw-2">&amp;mut </span>buf, WIDTH);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buf[<span class="number">0</span>], <span class="string">&quot;fghijklmno&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buf[<span class="number">0</span>], <span class="string">"fghijklmno"</span>);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>wide_element_style() {
-        <span class="kw">const </span>CHARS: <span class="kw-2">&amp;</span>str = <span class="string">&quot;=&gt;-&quot;</span>;
+        <span class="kw">const </span>CHARS: <span class="kw-2">&amp;</span>str = <span class="string">"=&gt;-"</span>;
         <span class="kw">const </span>WIDTH: u16 = <span class="number">8</span>;
         <span class="kw">let </span>pos = Arc::new(AtomicPosition::new());
         <span class="comment">// half finished
@@ -1929,27 +1930,27 @@
         <span class="kw">let </span><span class="kw-2">mut </span>state = ProgressState::new(<span class="prelude-val">Some</span>(<span class="number">4</span>), pos);
         <span class="kw">let </span><span class="kw-2">mut </span>buf = Vec::new();
 
-        <span class="kw">let </span>style = ProgressStyle::with_template(<span class="string">&quot;{wide_bar}&quot;</span>)
+        <span class="kw">let </span>style = ProgressStyle::with_template(<span class="string">"{wide_bar}"</span>)
             .unwrap()
             .progress_chars(CHARS);
         style.format_state(<span class="kw-2">&amp;</span>state, <span class="kw-2">&amp;mut </span>buf, WIDTH);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buf[<span class="number">0</span>], <span class="string">&quot;====&gt;---&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buf[<span class="number">0</span>], <span class="string">"====&gt;---"</span>);
 
         buf.clear();
-        <span class="kw">let </span>style = ProgressStyle::with_template(<span class="string">&quot;{wide_bar:.red.on_blue/green.on_cyan}&quot;</span>)
+        <span class="kw">let </span>style = ProgressStyle::with_template(<span class="string">"{wide_bar:.red.on_blue/green.on_cyan}"</span>)
             .unwrap()
             .progress_chars(CHARS);
         style.format_state(<span class="kw-2">&amp;</span>state, <span class="kw-2">&amp;mut </span>buf, WIDTH);
         <span class="macro">assert_eq!</span>(
             <span class="kw-2">&amp;</span>buf[<span class="number">0</span>],
-            <span class="string">&quot;\u{1b}[31m\u{1b}[44m====&gt;\u{1b}[32m\u{1b}[46m---\u{1b}[0m\u{1b}[0m&quot;
+            <span class="string">"\u{1b}[31m\u{1b}[44m====&gt;\u{1b}[32m\u{1b}[46m---\u{1b}[0m\u{1b}[0m"
         </span>);
 
         buf.clear();
-        <span class="kw">let </span>style = ProgressStyle::with_template(<span class="string">&quot;{wide_msg:^.red.on_blue}&quot;</span>).unwrap();
-        state.message = TabExpandedString::NoTabs(<span class="string">&quot;foobar&quot;</span>.into());
+        <span class="kw">let </span>style = ProgressStyle::with_template(<span class="string">"{wide_msg:^.red.on_blue}"</span>).unwrap();
+        state.message = TabExpandedString::NoTabs(<span class="string">"foobar"</span>.into());
         style.format_state(<span class="kw-2">&amp;</span>state, <span class="kw-2">&amp;mut </span>buf, WIDTH);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buf[<span class="number">0</span>], <span class="string">&quot;\u{1b}[31m\u{1b}[44m foobar \u{1b}[0m&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buf[<span class="number">0</span>], <span class="string">"\u{1b}[31m\u{1b}[44m foobar \u{1b}[0m"</span>);
     }
 
     <span class="attr">#[test]
@@ -1960,34 +1961,34 @@
         <span class="kw">let </span><span class="kw-2">mut </span>buf = Vec::new();
 
         <span class="kw">let </span><span class="kw-2">mut </span>style = ProgressStyle::default_bar();
-        state.message = TabExpandedString::new(<span class="string">&quot;foo\nbar\nbaz&quot;</span>.into(), <span class="number">2</span>);
-        style.template = Template::from_str(<span class="string">&quot;{msg}&quot;</span>).unwrap();
+        state.message = TabExpandedString::new(<span class="string">"foo\nbar\nbaz"</span>.into(), <span class="number">2</span>);
+        style.template = Template::from_str(<span class="string">"{msg}"</span>).unwrap();
         style.format_state(<span class="kw-2">&amp;</span>state, <span class="kw-2">&amp;mut </span>buf, WIDTH);
 
         <span class="macro">assert_eq!</span>(buf.len(), <span class="number">3</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buf[<span class="number">0</span>], <span class="string">&quot;foo&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buf[<span class="number">1</span>], <span class="string">&quot;bar&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buf[<span class="number">2</span>], <span class="string">&quot;baz&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buf[<span class="number">0</span>], <span class="string">"foo"</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buf[<span class="number">1</span>], <span class="string">"bar"</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buf[<span class="number">2</span>], <span class="string">"baz"</span>);
 
         buf.clear();
-        style.template = Template::from_str(<span class="string">&quot;{wide_msg}&quot;</span>).unwrap();
+        style.template = Template::from_str(<span class="string">"{wide_msg}"</span>).unwrap();
         style.format_state(<span class="kw-2">&amp;</span>state, <span class="kw-2">&amp;mut </span>buf, WIDTH);
 
         <span class="macro">assert_eq!</span>(buf.len(), <span class="number">3</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buf[<span class="number">0</span>], <span class="string">&quot;foo&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buf[<span class="number">1</span>], <span class="string">&quot;bar&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buf[<span class="number">2</span>], <span class="string">&quot;baz&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buf[<span class="number">0</span>], <span class="string">"foo"</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buf[<span class="number">1</span>], <span class="string">"bar"</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buf[<span class="number">2</span>], <span class="string">"baz"</span>);
 
         buf.clear();
-        state.prefix = TabExpandedString::new(<span class="string">&quot;prefix\nprefix&quot;</span>.into(), <span class="number">2</span>);
-        style.template = Template::from_str(<span class="string">&quot;{prefix} {wide_msg}&quot;</span>).unwrap();
+        state.prefix = TabExpandedString::new(<span class="string">"prefix\nprefix"</span>.into(), <span class="number">2</span>);
+        style.template = Template::from_str(<span class="string">"{prefix} {wide_msg}"</span>).unwrap();
         style.format_state(<span class="kw-2">&amp;</span>state, <span class="kw-2">&amp;mut </span>buf, WIDTH);
 
         <span class="macro">assert_eq!</span>(buf.len(), <span class="number">4</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buf[<span class="number">0</span>], <span class="string">&quot;prefix&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buf[<span class="number">1</span>], <span class="string">&quot;prefix foo&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buf[<span class="number">2</span>], <span class="string">&quot;bar&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buf[<span class="number">3</span>], <span class="string">&quot;baz&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buf[<span class="number">0</span>], <span class="string">"prefix"</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buf[<span class="number">1</span>], <span class="string">"prefix foo"</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buf[<span class="number">2</span>], <span class="string">"bar"</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>buf[<span class="number">3</span>], <span class="string">"baz"</span>);
     }
 }
 </code></pre></div></section></main></body></html>

@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/memmap-0.7.0/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="memmap" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/memmap-0.7.0/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="memmap" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1008,7 +1009,7 @@
 <a href="#1008" id="1008">1008</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A cross-platform Rust API for memory mapped buffers.
 
-</span><span class="attr">#![doc(html_root_url = <span class="string">&quot;https://docs.rs/memmap/0.7.0&quot;</span>)]
+</span><span class="attr">#![doc(html_root_url = <span class="string">"https://docs.rs/memmap/0.7.0"</span>)]
 
 #[cfg(windows)]
 </span><span class="kw">extern crate </span>winapi;
@@ -1060,7 +1061,7 @@
     /// let mut mmap: MmapMut = mmap_options.len(36).map_anon()?;
     ///
     /// // Use the memory map:
-    /// mmap.copy_from_slice(b&quot;...data to copy to the memory map...&quot;);
+    /// mmap.copy_from_slice(b"...data to copy to the memory map...");
     /// # let _ = mmap_options;
     /// # Ok(())
     /// # }
@@ -1085,9 +1086,9 @@
     /// let mmap = unsafe {
     ///     MmapOptions::new()
     ///                 .offset(10)
-    ///                 .map(&amp;File::open(&quot;README.md&quot;)?)?
+    ///                 .map(&amp;File::open("README.md")?)?
     /// };
-    /// assert_eq!(&amp;b&quot;A Rust library for cross-platform memory mapped IO.&quot;[..],
+    /// assert_eq!(&amp;b"A Rust library for cross-platform memory mapped IO."[..],
     ///            &amp;mmap[..51]);
     /// # Ok(())
     /// # }
@@ -1113,9 +1114,9 @@
     /// let mmap = unsafe {
     ///     MmapOptions::new()
     ///                 .len(8)
-    ///                 .map(&amp;File::open(&quot;README.md&quot;)?)?
+    ///                 .map(&amp;File::open("README.md")?)?
     /// };
-    /// assert_eq!(&amp;b&quot;# memmap&quot;[..], &amp;mmap[..]);
+    /// assert_eq!(&amp;b"# memmap"[..], &amp;mmap[..]);
     /// # Ok(())
     /// # }
     /// ```
@@ -1131,7 +1132,7 @@
             <span class="kw">if </span>len &gt; (usize::MAX <span class="kw">as </span>u64) {
                 <span class="kw">return </span><span class="prelude-val">Err</span>(Error::new(
                     ErrorKind::InvalidData,
-                    <span class="string">&quot;memory map length overflows usize&quot;</span>,
+                    <span class="string">"memory map length overflows usize"</span>,
                 ));
             }
             <span class="prelude-val">Ok</span>(len <span class="kw">as </span>usize)
@@ -1174,7 +1175,7 @@
     /// use std::io::Read;
     ///
     /// # fn main() -&gt; std::io::Result&lt;()&gt; {
-    /// let mut file = File::open(&quot;README.md&quot;)?;
+    /// let mut file = File::open("README.md")?;
     ///
     /// let mut contents = Vec::new();
     /// file.read_to_end(&amp;mut contents)?;
@@ -1221,9 +1222,9 @@
     /// use memmap::MmapOptions;
     /// #
     /// # fn main() -&gt; std::io::Result&lt;()&gt; {
-    /// # let tempdir = tempdir::TempDir::new(&quot;mmap&quot;)?;
+    /// # let tempdir = tempdir::TempDir::new("mmap")?;
     /// let path: PathBuf = /* path to file */
-    /// #   tempdir.path().join(&quot;map_mut&quot;);
+    /// #   tempdir.path().join("map_mut");
     /// let file = OpenOptions::new().read(true).write(true).create(true).open(&amp;path)?;
     /// file.set_len(13)?;
     ///
@@ -1231,7 +1232,7 @@
     ///     MmapOptions::new().map_mut(&amp;file)?
     /// };
     ///
-    /// mmap.copy_from_slice(b&quot;Hello, world!&quot;);
+    /// mmap.copy_from_slice(b"Hello, world!");
     /// # Ok(())
     /// # }
     /// ```
@@ -1258,9 +1259,9 @@
     /// use std::io::Write;
     ///
     /// # fn main() -&gt; std::io::Result&lt;()&gt; {
-    /// let file = File::open(&quot;README.md&quot;)?;
+    /// let file = File::open("README.md")?;
     /// let mut mmap = unsafe { MmapOptions::new().map_copy(&amp;file)? };
-    /// (&amp;mut mmap[..]).write_all(b&quot;Hello, world!&quot;)?;
+    /// (&amp;mut mmap[..]).write_all(b"Hello, world!")?;
     /// # Ok(())
     /// # }
     /// ```
@@ -1298,9 +1299,9 @@
 /// use std::fs::File;
 ///
 /// # fn main() -&gt; std::io::Result&lt;()&gt; {
-/// let file = File::open(&quot;README.md&quot;)?;
+/// let file = File::open("README.md")?;
 /// let mmap = unsafe { MmapOptions::new().map(&amp;file)? };
-/// assert_eq!(b&quot;# memmap&quot;, &amp;mmap[0..8]);
+/// assert_eq!(b"# memmap", &amp;mmap[0..8]);
 /// # Ok(())
 /// # }
 /// ```
@@ -1329,7 +1330,7 @@
     /// use memmap::Mmap;
     ///
     /// # fn main() -&gt; std::io::Result&lt;()&gt; {
-    /// let mut file = File::open(&quot;README.md&quot;)?;
+    /// let mut file = File::open("README.md")?;
     ///
     /// let mut contents = Vec::new();
     /// file.read_to_end(&amp;mut contents)?;
@@ -1365,19 +1366,19 @@
     /// # use std::fs::OpenOptions;
     ///
     /// # fn main() -&gt; std::io::Result&lt;()&gt; {
-    /// # let tempdir = tempdir::TempDir::new(&quot;mmap&quot;)?;
+    /// # let tempdir = tempdir::TempDir::new("mmap")?;
     /// let file = /* file opened with write permissions */
     /// #          OpenOptions::new()
     /// #                      .read(true)
     /// #                      .write(true)
     /// #                      .create(true)
     /// #                      .open(tempdir.path()
-    /// #                      .join(&quot;make_mut&quot;))?;
+    /// #                      .join("make_mut"))?;
     /// # file.set_len(128)?;
     /// let mmap = unsafe { Mmap::map(&amp;file)? };
     /// // ... use the read-only memory map ...
     /// let mut mut_mmap = mmap.make_mut()?;
-    /// mut_mmap.deref_mut().write_all(b&quot;hello, world!&quot;)?;
+    /// mut_mmap.deref_mut().write_all(b"hello, world!")?;
     /// # Ok(())
     /// # }
     /// ```
@@ -1405,9 +1406,9 @@
 
 <span class="kw">impl </span>fmt::Debug <span class="kw">for </span>Mmap {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
-        fmt.debug_struct(<span class="string">&quot;Mmap&quot;</span>)
-            .field(<span class="string">&quot;ptr&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.as_ptr())
-            .field(<span class="string">&quot;len&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.len())
+        fmt.debug_struct(<span class="string">"Mmap"</span>)
+            .field(<span class="string">"ptr"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.as_ptr())
+            .field(<span class="string">"len"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.len())
             .finish()
     }
 }
@@ -1445,9 +1446,9 @@
     /// use memmap::MmapMut;
     /// #
     /// # fn main() -&gt; std::io::Result&lt;()&gt; {
-    /// # let tempdir = tempdir::TempDir::new(&quot;mmap&quot;)?;
+    /// # let tempdir = tempdir::TempDir::new("mmap")?;
     /// let path: PathBuf = /* path to file */
-    /// #   tempdir.path().join(&quot;map_mut&quot;);
+    /// #   tempdir.path().join("map_mut");
     /// let file = OpenOptions::new()
     ///                        .read(true)
     ///                        .write(true)
@@ -1457,7 +1458,7 @@
     ///
     /// let mut mmap = unsafe { MmapMut::map_mut(&amp;file)? };
     ///
-    /// mmap.copy_from_slice(b&quot;Hello, world!&quot;);
+    /// mmap.copy_from_slice(b"Hello, world!");
     /// # Ok(())
     /// # }
     /// ```
@@ -1479,7 +1480,7 @@
     <span class="doccomment">/// Flushes outstanding memory map modifications to disk.
     ///
     /// When this method returns with a non-error result, all outstanding changes to a file-backed
-    /// memory map are guaranteed to be durably stored. The file&#39;s metadata (including last
+    /// memory map are guaranteed to be durably stored. The file's metadata (including last
     /// modification timestamp) may not be updated.
     ///
     /// # Example
@@ -1495,15 +1496,15 @@
     /// use memmap::MmapMut;
     ///
     /// # fn main() -&gt; std::io::Result&lt;()&gt; {
-    /// # let tempdir = tempdir::TempDir::new(&quot;mmap&quot;)?;
+    /// # let tempdir = tempdir::TempDir::new("mmap")?;
     /// let path: PathBuf = /* path to file */
-    /// #   tempdir.path().join(&quot;flush&quot;);
+    /// #   tempdir.path().join("flush");
     /// let file = OpenOptions::new().read(true).write(true).create(true).open(&amp;path)?;
     /// file.set_len(128)?;
     ///
     /// let mut mmap = unsafe { MmapMut::map_mut(&amp;file)? };
     ///
-    /// (&amp;mut mmap[..]).write_all(b&quot;Hello, world!&quot;)?;
+    /// (&amp;mut mmap[..]).write_all(b"Hello, world!")?;
     /// mmap.flush()?;
     /// # Ok(())
     /// # }
@@ -1516,7 +1517,7 @@
     <span class="doccomment">/// Asynchronously flushes outstanding memory map modifications to disk.
     ///
     /// This method initiates flushing modified pages to durable storage, but it will not wait for
-    /// the operation to complete before returning. The file&#39;s metadata (including last
+    /// the operation to complete before returning. The file's metadata (including last
     /// modification timestamp) may not be updated.
     </span><span class="kw">pub fn </span>flush_async(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">let </span>len = <span class="self">self</span>.len();
@@ -1528,7 +1529,7 @@
     /// The offset and length must be in the bounds of the memory map.
     ///
     /// When this method returns with a non-error result, all outstanding changes to a file-backed
-    /// memory in the range are guaranteed to be durable stored. The file&#39;s metadata (including
+    /// memory in the range are guaranteed to be durable stored. The file's metadata (including
     /// last modification timestamp) may not be updated. It is not guaranteed the only the changes
     /// in the specified range are flushed; other outstanding changes to the memory map may be
     /// flushed as well.
@@ -1541,7 +1542,7 @@
     /// The offset and length must be in the bounds of the memory map.
     ///
     /// This method initiates flushing modified pages to durable storage, but it will not wait for
-    /// the operation to complete before returning. The file&#39;s metadata (including last
+    /// the operation to complete before returning. The file's metadata (including last
     /// modification timestamp) may not be updated. It is not guaranteed that the only changes
     /// flushed are those in the specified range; other outstanding changes to the memory map may
     /// be flushed as well.
@@ -1571,7 +1572,7 @@
     /// # fn main() -&gt; std::io::Result&lt;()&gt; {
     /// let mut mmap = MmapMut::map_anon(128)?;
     ///
-    /// (&amp;mut mmap[..]).write(b&quot;Hello, world!&quot;)?;
+    /// (&amp;mut mmap[..]).write(b"Hello, world!")?;
     ///
     /// let mmap: Mmap = mmap.make_read_only()?;
     /// # Ok(())
@@ -1628,9 +1629,9 @@
 
 <span class="kw">impl </span>fmt::Debug <span class="kw">for </span>MmapMut {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
-        fmt.debug_struct(<span class="string">&quot;MmapMut&quot;</span>)
-            .field(<span class="string">&quot;ptr&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.as_ptr())
-            .field(<span class="string">&quot;len&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.len())
+        fmt.debug_struct(<span class="string">"MmapMut"</span>)
+            .field(<span class="string">"ptr"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.as_ptr())
+            .field(<span class="string">"len"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.len())
             .finish()
     }
 }
@@ -1657,8 +1658,8 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>map_file() {
         <span class="kw">let </span>expected_len = <span class="number">128</span>;
-        <span class="kw">let </span>tempdir = tempdir::TempDir::new(<span class="string">&quot;mmap&quot;</span>).unwrap();
-        <span class="kw">let </span>path = tempdir.path().join(<span class="string">&quot;mmap&quot;</span>);
+        <span class="kw">let </span>tempdir = tempdir::TempDir::new(<span class="string">"mmap"</span>).unwrap();
+        <span class="kw">let </span>path = tempdir.path().join(<span class="string">"mmap"</span>);
 
         <span class="kw">let </span>file = OpenOptions::new()
             .read(<span class="bool-val">true</span>)
@@ -1689,8 +1690,8 @@
     <span class="doccomment">/// Checks that a 0-length file will not be mapped.
     </span><span class="attr">#[test]
     </span><span class="kw">fn </span>map_empty_file() {
-        <span class="kw">let </span>tempdir = tempdir::TempDir::new(<span class="string">&quot;mmap&quot;</span>).unwrap();
-        <span class="kw">let </span>path = tempdir.path().join(<span class="string">&quot;mmap&quot;</span>);
+        <span class="kw">let </span>tempdir = tempdir::TempDir::new(<span class="string">"mmap"</span>).unwrap();
+        <span class="kw">let </span>path = tempdir.path().join(<span class="string">"mmap"</span>);
 
         <span class="kw">let </span>file = OpenOptions::new()
             .read(<span class="bool-val">true</span>)
@@ -1729,8 +1730,8 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>file_write() {
-        <span class="kw">let </span>tempdir = tempdir::TempDir::new(<span class="string">&quot;mmap&quot;</span>).unwrap();
-        <span class="kw">let </span>path = tempdir.path().join(<span class="string">&quot;mmap&quot;</span>);
+        <span class="kw">let </span>tempdir = tempdir::TempDir::new(<span class="string">"mmap"</span>).unwrap();
+        <span class="kw">let </span>path = tempdir.path().join(<span class="string">"mmap"</span>);
 
         <span class="kw">let </span><span class="kw-2">mut </span>file = OpenOptions::new()
             .read(<span class="bool-val">true</span>)
@@ -1740,7 +1741,7 @@
             .unwrap();
         file.set_len(<span class="number">128</span>).unwrap();
 
-        <span class="kw">let </span>write = <span class="string">b&quot;abc123&quot;</span>;
+        <span class="kw">let </span>write = <span class="string">b"abc123"</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>read = [<span class="number">0u8</span>; <span class="number">6</span>];
 
         <span class="kw">let </span><span class="kw-2">mut </span>mmap = <span class="kw">unsafe </span>{ MmapMut::map_mut(<span class="kw-2">&amp;</span>file).unwrap() };
@@ -1753,8 +1754,8 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>flush_range() {
-        <span class="kw">let </span>tempdir = tempdir::TempDir::new(<span class="string">&quot;mmap&quot;</span>).unwrap();
-        <span class="kw">let </span>path = tempdir.path().join(<span class="string">&quot;mmap&quot;</span>);
+        <span class="kw">let </span>tempdir = tempdir::TempDir::new(<span class="string">"mmap"</span>).unwrap();
+        <span class="kw">let </span>path = tempdir.path().join(<span class="string">"mmap"</span>);
 
         <span class="kw">let </span>file = OpenOptions::new()
             .read(<span class="bool-val">true</span>)
@@ -1763,7 +1764,7 @@
             .open(<span class="kw-2">&amp;</span>path)
             .unwrap();
         file.set_len(<span class="number">128</span>).unwrap();
-        <span class="kw">let </span>write = <span class="string">b&quot;abc123&quot;</span>;
+        <span class="kw">let </span>write = <span class="string">b"abc123"</span>;
 
         <span class="kw">let </span><span class="kw-2">mut </span>mmap = <span class="kw">unsafe </span>{
             MmapOptions::new()
@@ -1778,8 +1779,8 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>map_copy() {
-        <span class="kw">let </span>tempdir = tempdir::TempDir::new(<span class="string">&quot;mmap&quot;</span>).unwrap();
-        <span class="kw">let </span>path = tempdir.path().join(<span class="string">&quot;mmap&quot;</span>);
+        <span class="kw">let </span>tempdir = tempdir::TempDir::new(<span class="string">"mmap"</span>).unwrap();
+        <span class="kw">let </span>path = tempdir.path().join(<span class="string">"mmap"</span>);
 
         <span class="kw">let </span><span class="kw-2">mut </span>file = OpenOptions::new()
             .read(<span class="bool-val">true</span>)
@@ -1789,8 +1790,8 @@
             .unwrap();
         file.set_len(<span class="number">128</span>).unwrap();
 
-        <span class="kw">let </span>nulls = <span class="string">b&quot;\0\0\0\0\0\0&quot;</span>;
-        <span class="kw">let </span>write = <span class="string">b&quot;abc123&quot;</span>;
+        <span class="kw">let </span>nulls = <span class="string">b"\0\0\0\0\0\0"</span>;
+        <span class="kw">let </span>write = <span class="string">b"abc123"</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>read = [<span class="number">0u8</span>; <span class="number">6</span>];
 
         <span class="kw">let </span><span class="kw-2">mut </span>mmap = <span class="kw">unsafe </span>{ MmapOptions::new().map_copy(<span class="kw-2">&amp;</span>file).unwrap() };
@@ -1814,8 +1815,8 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>map_offset() {
-        <span class="kw">let </span>tempdir = tempdir::TempDir::new(<span class="string">&quot;mmap&quot;</span>).unwrap();
-        <span class="kw">let </span>path = tempdir.path().join(<span class="string">&quot;mmap&quot;</span>);
+        <span class="kw">let </span>tempdir = tempdir::TempDir::new(<span class="string">"mmap"</span>).unwrap();
+        <span class="kw">let </span>path = tempdir.path().join(<span class="string">"mmap"</span>);
 
         <span class="kw">let </span>file = OpenOptions::new()
             .read(<span class="bool-val">true</span>)
@@ -1870,7 +1871,7 @@
         });
     }
 
-    <span class="attr">#[cfg(any(target_arch = <span class="string">&quot;x86&quot;</span>, target_arch = <span class="string">&quot;x86_64&quot;</span>))]
+    <span class="attr">#[cfg(any(target_arch = <span class="string">"x86"</span>, target_arch = <span class="string">"x86_64"</span>))]
     </span><span class="kw">fn </span>jit_x86(<span class="kw-2">mut </span>mmap: MmapMut) {
         <span class="kw">use </span>std::mem;
         mmap[<span class="number">0</span>] = <span class="number">0xB8</span>; <span class="comment">// mov eax, 0xAB
@@ -1880,22 +1881,22 @@
         mmap[<span class="number">4</span>] = <span class="number">0x00</span>;
         mmap[<span class="number">5</span>] = <span class="number">0xC3</span>; <span class="comment">// ret
 
-        </span><span class="kw">let </span>mmap = mmap.make_exec().expect(<span class="string">&quot;make_exec&quot;</span>);
+        </span><span class="kw">let </span>mmap = mmap.make_exec().expect(<span class="string">"make_exec"</span>);
 
-        <span class="kw">let </span>jitfn: <span class="kw">extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn</span>() -&gt; u8 = <span class="kw">unsafe </span>{ mem::transmute(mmap.as_ptr()) };
+        <span class="kw">let </span>jitfn: <span class="kw">extern </span><span class="string">"C" </span><span class="kw">fn</span>() -&gt; u8 = <span class="kw">unsafe </span>{ mem::transmute(mmap.as_ptr()) };
         <span class="macro">assert_eq!</span>(jitfn(), <span class="number">0xab</span>);
     }
 
     <span class="attr">#[test]
-    #[cfg(any(target_arch = <span class="string">&quot;x86&quot;</span>, target_arch = <span class="string">&quot;x86_64&quot;</span>))]
+    #[cfg(any(target_arch = <span class="string">"x86"</span>, target_arch = <span class="string">"x86_64"</span>))]
     </span><span class="kw">fn </span>jit_x86_anon() {
         jit_x86(MmapMut::map_anon(<span class="number">4096</span>).unwrap());
     }
 
     <span class="attr">#[test]
-    #[cfg(any(target_arch = <span class="string">&quot;x86&quot;</span>, target_arch = <span class="string">&quot;x86_64&quot;</span>))]
+    #[cfg(any(target_arch = <span class="string">"x86"</span>, target_arch = <span class="string">"x86_64"</span>))]
     </span><span class="kw">fn </span>jit_x86_file() {
-        <span class="kw">let </span>tempdir = tempdir::TempDir::new(<span class="string">&quot;mmap&quot;</span>).unwrap();
+        <span class="kw">let </span>tempdir = tempdir::TempDir::new(<span class="string">"mmap"</span>).unwrap();
         <span class="kw">let </span><span class="kw-2">mut </span>options = OpenOptions::new();
         <span class="attr">#[cfg(windows)]
         </span>options.access_mode(GENERIC_ALL);
@@ -1904,17 +1905,17 @@
             .read(<span class="bool-val">true</span>)
             .write(<span class="bool-val">true</span>)
             .create(<span class="bool-val">true</span>)
-            .open(<span class="kw-2">&amp;</span>tempdir.path().join(<span class="string">&quot;jit_x86&quot;</span>))
-            .expect(<span class="string">&quot;open&quot;</span>);
+            .open(<span class="kw-2">&amp;</span>tempdir.path().join(<span class="string">"jit_x86"</span>))
+            .expect(<span class="string">"open"</span>);
 
-        file.set_len(<span class="number">4096</span>).expect(<span class="string">&quot;set_len&quot;</span>);
-        jit_x86(<span class="kw">unsafe </span>{ MmapMut::map_mut(<span class="kw-2">&amp;</span>file).expect(<span class="string">&quot;map_mut&quot;</span>) });
+        file.set_len(<span class="number">4096</span>).expect(<span class="string">"set_len"</span>);
+        jit_x86(<span class="kw">unsafe </span>{ MmapMut::map_mut(<span class="kw-2">&amp;</span>file).expect(<span class="string">"map_mut"</span>) });
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>mprotect_file() {
-        <span class="kw">let </span>tempdir = tempdir::TempDir::new(<span class="string">&quot;mmap&quot;</span>).unwrap();
-        <span class="kw">let </span>path = tempdir.path().join(<span class="string">&quot;mmap&quot;</span>);
+        <span class="kw">let </span>tempdir = tempdir::TempDir::new(<span class="string">"mmap"</span>).unwrap();
+        <span class="kw">let </span>path = tempdir.path().join(<span class="string">"mmap"</span>);
 
         <span class="kw">let </span><span class="kw-2">mut </span>options = OpenOptions::new();
         <span class="attr">#[cfg(windows)]
@@ -1925,15 +1926,15 @@
             .write(<span class="bool-val">true</span>)
             .create(<span class="bool-val">true</span>)
             .open(<span class="kw-2">&amp;</span>path)
-            .expect(<span class="string">&quot;open&quot;</span>);
-        file.set_len(<span class="number">256 </span><span class="kw">as </span>u64).expect(<span class="string">&quot;set_len&quot;</span>);
+            .expect(<span class="string">"open"</span>);
+        file.set_len(<span class="number">256 </span><span class="kw">as </span>u64).expect(<span class="string">"set_len"</span>);
 
-        <span class="kw">let </span>mmap = <span class="kw">unsafe </span>{ MmapMut::map_mut(<span class="kw-2">&amp;</span>file).expect(<span class="string">&quot;map_mut&quot;</span>) };
+        <span class="kw">let </span>mmap = <span class="kw">unsafe </span>{ MmapMut::map_mut(<span class="kw-2">&amp;</span>file).expect(<span class="string">"map_mut"</span>) };
 
-        <span class="kw">let </span>mmap = mmap.make_read_only().expect(<span class="string">&quot;make_read_only&quot;</span>);
-        <span class="kw">let </span><span class="kw-2">mut </span>mmap = mmap.make_mut().expect(<span class="string">&quot;make_mut&quot;</span>);
+        <span class="kw">let </span>mmap = mmap.make_read_only().expect(<span class="string">"make_read_only"</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>mmap = mmap.make_mut().expect(<span class="string">"make_mut"</span>);
 
-        <span class="kw">let </span>write = <span class="string">b&quot;abc123&quot;</span>;
+        <span class="kw">let </span>write = <span class="string">b"abc123"</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>read = [<span class="number">0u8</span>; <span class="number">6</span>];
 
         (<span class="kw-2">&amp;mut </span>mmap[..]).write(write).unwrap();
@@ -1952,15 +1953,15 @@
         (<span class="kw-2">&amp;</span>mmap2[..]).read(<span class="kw-2">&amp;mut </span>read).unwrap();
         <span class="macro">assert_eq!</span>(write, <span class="kw-2">&amp;</span>read);
 
-        <span class="kw">let </span>mmap = mmap.make_exec().expect(<span class="string">&quot;make_exec&quot;</span>);
+        <span class="kw">let </span>mmap = mmap.make_exec().expect(<span class="string">"make_exec"</span>);
 
         drop(mmap);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>mprotect_copy() {
-        <span class="kw">let </span>tempdir = tempdir::TempDir::new(<span class="string">&quot;mmap&quot;</span>).unwrap();
-        <span class="kw">let </span>path = tempdir.path().join(<span class="string">&quot;mmap&quot;</span>);
+        <span class="kw">let </span>tempdir = tempdir::TempDir::new(<span class="string">"mmap"</span>).unwrap();
+        <span class="kw">let </span>path = tempdir.path().join(<span class="string">"mmap"</span>);
 
         <span class="kw">let </span><span class="kw-2">mut </span>options = OpenOptions::new();
         <span class="attr">#[cfg(windows)]
@@ -1971,16 +1972,16 @@
             .write(<span class="bool-val">true</span>)
             .create(<span class="bool-val">true</span>)
             .open(<span class="kw-2">&amp;</span>path)
-            .expect(<span class="string">&quot;open&quot;</span>);
-        file.set_len(<span class="number">256 </span><span class="kw">as </span>u64).expect(<span class="string">&quot;set_len&quot;</span>);
+            .expect(<span class="string">"open"</span>);
+        file.set_len(<span class="number">256 </span><span class="kw">as </span>u64).expect(<span class="string">"set_len"</span>);
 
-        <span class="kw">let </span>mmap = <span class="kw">unsafe </span>{ MmapOptions::new().map_copy(<span class="kw-2">&amp;</span>file).expect(<span class="string">&quot;map_mut&quot;</span>) };
+        <span class="kw">let </span>mmap = <span class="kw">unsafe </span>{ MmapOptions::new().map_copy(<span class="kw-2">&amp;</span>file).expect(<span class="string">"map_mut"</span>) };
 
-        <span class="kw">let </span>mmap = mmap.make_read_only().expect(<span class="string">&quot;make_read_only&quot;</span>);
-        <span class="kw">let </span><span class="kw-2">mut </span>mmap = mmap.make_mut().expect(<span class="string">&quot;make_mut&quot;</span>);
+        <span class="kw">let </span>mmap = mmap.make_read_only().expect(<span class="string">"make_read_only"</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>mmap = mmap.make_mut().expect(<span class="string">"make_mut"</span>);
 
-        <span class="kw">let </span>nulls = <span class="string">b&quot;\0\0\0\0\0\0&quot;</span>;
-        <span class="kw">let </span>write = <span class="string">b&quot;abc123&quot;</span>;
+        <span class="kw">let </span>nulls = <span class="string">b"\0\0\0\0\0\0"</span>;
+        <span class="kw">let </span>write = <span class="string">b"abc123"</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>read = [<span class="number">0u8</span>; <span class="number">6</span>];
 
         (<span class="kw-2">&amp;mut </span>mmap[..]).write(write).unwrap();
@@ -1999,18 +2000,18 @@
         (<span class="kw-2">&amp;</span>mmap2[..]).read(<span class="kw-2">&amp;mut </span>read).unwrap();
         <span class="macro">assert_eq!</span>(nulls, <span class="kw-2">&amp;</span>read);
 
-        <span class="kw">let </span>mmap = mmap.make_exec().expect(<span class="string">&quot;make_exec&quot;</span>);
+        <span class="kw">let </span>mmap = mmap.make_exec().expect(<span class="string">"make_exec"</span>);
 
         drop(mmap);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>mprotect_anon() {
-        <span class="kw">let </span>mmap = MmapMut::map_anon(<span class="number">256</span>).expect(<span class="string">&quot;map_mut&quot;</span>);
+        <span class="kw">let </span>mmap = MmapMut::map_anon(<span class="number">256</span>).expect(<span class="string">"map_mut"</span>);
 
-        <span class="kw">let </span>mmap = mmap.make_read_only().expect(<span class="string">&quot;make_read_only&quot;</span>);
-        <span class="kw">let </span>mmap = mmap.make_mut().expect(<span class="string">&quot;make_mut&quot;</span>);
-        <span class="kw">let </span>mmap = mmap.make_exec().expect(<span class="string">&quot;make_exec&quot;</span>);
+        <span class="kw">let </span>mmap = mmap.make_read_only().expect(<span class="string">"make_read_only"</span>);
+        <span class="kw">let </span>mmap = mmap.make_mut().expect(<span class="string">"make_mut"</span>);
+        <span class="kw">let </span>mmap = mmap.make_exec().expect(<span class="string">"make_exec"</span>);
         drop(mmap);
     }
 }

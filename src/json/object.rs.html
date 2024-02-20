@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/json-0.12.4/src/object.rs`."><title>object.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="json" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/json-0.12.4/src/object.rs`."><title>object.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="json" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -747,7 +748,7 @@
 // Comparing a hashed `u64` is faster than comparing `&amp;str` or even `&amp;[u8]`,
 // for larger objects this yields non-trivial performance benefits.
 //
-// Additionally this &quot;randomizes&quot; the keys a bit. Should the keys in an object
+// Additionally this "randomizes" the keys a bit. Should the keys in an object
 // be inserted in alphabetical order (an example of such a use case would be
 // using an object as a store for entries by ids, where ids are sorted), this
 // will prevent the tree from being constructed in a way where the same branch
@@ -756,10 +757,10 @@
 // Example:
 //
 // ```
-// println!(&quot;{}&quot;, hash_key(b&quot;10000056&quot;));
-// println!(&quot;{}&quot;, hash_key(b&quot;10000057&quot;));
-// println!(&quot;{}&quot;, hash_key(b&quot;10000058&quot;));
-// println!(&quot;{}&quot;, hash_key(b&quot;10000059&quot;));
+// println!("{}", hash_key(b"10000056"));
+// println!("{}", hash_key(b"10000057"));
+// println!("{}", hash_key(b"10000058"));
+// println!("{}", hash_key(b"10000059"));
 // ```
 //
 // Produces:
@@ -823,8 +824,8 @@
     }
 
     <span class="comment">// The `buf` on the `Key` can only be filled after the struct
-    // is already on the `Vec`&#39;s heap (along with the `Node`).
-    // For that reason it&#39;s not set in `Key::new` but only after
+    // is already on the `Vec`'s heap (along with the `Node`).
+    // For that reason it's not set in `Key::new` but only after
     // the `Node` is created and allocated.
     </span><span class="attr">#[inline]
     </span><span class="kw">fn </span>attach(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>[u8]) {
@@ -861,7 +862,7 @@
 <span class="kw">unsafe impl </span>Send <span class="kw">for </span>Key {}
 
 <span class="comment">// Because long keys _can_ be stored separately from the `Key` on heap,
-// it&#39;s essential to clean up the heap allocation when the `Key` is dropped.
+// it's essential to clean up the heap allocation when the `Key` is dropped.
 </span><span class="kw">impl </span>Drop <span class="kw">for </span>Key {
     <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="kw">unsafe </span>{
@@ -917,7 +918,7 @@
 
     <span class="comment">// Store vector index pointing to the `Node` for which `key_hash` is smaller
     // than that of this `Node`.
-    // Will default to 0 as root node can&#39;t be referenced anywhere else.
+    // Will default to 0 as root node can't be referenced anywhere else.
     </span><span class="kw">pub </span>left: usize,
 
     <span class="comment">// Same as above but for `Node`s with hash larger than this one. If the
@@ -952,7 +953,7 @@
     }
 }
 
-<span class="doccomment">/// A binary tree implementation of a string -&gt; `JsonValue` map. You normally don&#39;t
+<span class="doccomment">/// A binary tree implementation of a string -&gt; `JsonValue` map. You normally don't
 /// have to interact with instances of `Object`, much more likely you will be
 /// using the `JsonValue::Object` variant, which wraps around this struct.
 </span><span class="attr">#[derive(Debug)]
@@ -989,7 +990,7 @@
         <span class="kw">let </span>index = <span class="self">self</span>.store.len();
 
         <span class="kw">if </span>index &lt; <span class="self">self</span>.store.capacity() {
-            <span class="comment">// Because we&#39;ve just checked the capacity, we can avoid
+            <span class="comment">// Because we've just checked the capacity, we can avoid
             // using `push`, and instead do unsafe magic to memcpy
             // the new node at the correct index without additional
             // capacity or bound checks.
@@ -998,7 +999,7 @@
                 <span class="self">self</span>.store.set_len(index + <span class="number">1</span>);
 
                 <span class="comment">// To whomever gets concerned: I got better results with
-                // copy than write. Difference in benchmarks wasn&#39;t big though.
+                // copy than write. Difference in benchmarks wasn't big though.
                 </span>ptr::copy_nonoverlapping(
                     <span class="kw-2">&amp;</span>node <span class="kw">as </span><span class="kw-2">*const </span>Node,
                     <span class="self">self</span>.store.as_mut_ptr().offset(index <span class="kw">as </span>isize),
@@ -1016,7 +1017,7 @@
 
             <span class="kw">unsafe </span>{ <span class="self">self</span>.store.get_unchecked_mut(index).key.attach(key) };
 
-            <span class="comment">// Index up to the index (old length), we don&#39;t need to fix
+            <span class="comment">// Index up to the index (old length), we don't need to fix
             // anything on the Node that just got pushed.
             </span><span class="kw">for </span>node <span class="kw">in </span><span class="self">self</span>.store.iter_mut().take(index) {
                 node.key.fix_ptr();
@@ -1082,7 +1083,7 @@
     }
 
     <span class="attr">#[inline]
-    #[deprecated(since=<span class="string">&quot;0.11.11&quot;</span>, note=<span class="string">&quot;Was only meant for internal use&quot;</span>)]
+    #[deprecated(since=<span class="string">"0.11.11"</span>, note=<span class="string">"Was only meant for internal use"</span>)]
     </span><span class="kw">pub fn </span>override_last(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: JsonValue) {
         <span class="kw">if let </span><span class="prelude-val">Some</span>(node) = <span class="self">self</span>.store.last_mut() {
             node.value = value;
@@ -1186,16 +1187,16 @@
             }
         }
 
-        <span class="comment">// Removing a node would screw the tree badly, it&#39;s easier to just
+        <span class="comment">// Removing a node would screw the tree badly, it's easier to just
         // recreate it. This is a very costly operation, but removing nodes
-        // in JSON shouldn&#39;t happen very often if at all. Optimizing this
+        // in JSON shouldn't happen very often if at all. Optimizing this
         // can wait for better times.
         </span><span class="kw">let </span><span class="kw-2">mut </span>new_object = Object::with_capacity(<span class="self">self</span>.store.len() - <span class="number">1</span>);
         <span class="kw">let </span><span class="kw-2">mut </span>removed = <span class="prelude-val">None</span>;
 
         <span class="kw">for </span>(i, node) <span class="kw">in </span><span class="self">self</span>.store.iter_mut().enumerate() {
             <span class="kw">if </span>i == index {
-                <span class="comment">// Rust doesn&#39;t like us moving things from `node`, even if
+                <span class="comment">// Rust doesn't like us moving things from `node`, even if
                 // it is owned. Replace fixes that.
                 </span>removed = <span class="prelude-val">Some</span>(mem::replace(<span class="kw-2">&amp;mut </span>node.value, JsonValue::Null));
             } <span class="kw">else </span>{
@@ -1242,15 +1243,15 @@
     <span class="doccomment">/// Prints out the value as JSON string.
     </span><span class="kw">pub fn </span>dump(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         <span class="kw">let </span><span class="kw-2">mut </span>gen = DumpGenerator::new();
-        gen.write_object(<span class="self">self</span>).expect(<span class="string">&quot;Can&#39;t fail&quot;</span>);
+        gen.write_object(<span class="self">self</span>).expect(<span class="string">"Can't fail"</span>);
         gen.consume()
     }
 
-    <span class="doccomment">/// Pretty prints out the value as JSON string. Takes an argument that&#39;s
+    <span class="doccomment">/// Pretty prints out the value as JSON string. Takes an argument that's
     /// number of spaces to indent new blocks with.
     </span><span class="kw">pub fn </span>pretty(<span class="kw-2">&amp;</span><span class="self">self</span>, spaces: u16) -&gt; String {
         <span class="kw">let </span><span class="kw-2">mut </span>gen = PrettyGenerator::new(spaces);
-        gen.write_object(<span class="self">self</span>).expect(<span class="string">&quot;Can&#39;t fail&quot;</span>);
+        gen.write_object(<span class="self">self</span>).expect(<span class="string">"Can't fail"</span>);
         gen.consume()
     }
 }
@@ -1304,11 +1305,11 @@
     </span>}
 }
 
-<span class="kw">pub struct </span>Iter&lt;<span class="lifetime">&#39;a</span>&gt; {
-    inner: slice::Iter&lt;<span class="lifetime">&#39;a</span>, Node&gt;
+<span class="kw">pub struct </span>Iter&lt;<span class="lifetime">'a</span>&gt; {
+    inner: slice::Iter&lt;<span class="lifetime">'a</span>, Node&gt;
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iter&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Iter&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Create an empty iterator that always returns `None`
     </span><span class="kw">pub fn </span>empty() -&gt; <span class="self">Self </span>{
         Iter {
@@ -1317,8 +1318,8 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>Iter&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">type </span>Item = (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>JsonValue);
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Iterator <span class="kw">for </span>Iter&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">type </span>Item = (<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str, <span class="kw-2">&amp;</span><span class="lifetime">'a </span>JsonValue);
 
     <span class="attr">#[inline(always)]
     </span><span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
@@ -1326,24 +1327,24 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; DoubleEndedIterator <span class="kw">for </span>Iter&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; DoubleEndedIterator <span class="kw">for </span>Iter&lt;<span class="lifetime">'a</span>&gt; {
     <span class="attr">#[inline(always)]
     </span><span class="kw">fn </span>next_back(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
         <span class="self">self</span>.inner.next_back().map(|node| (node.key.as_str(), <span class="kw-2">&amp;</span>node.value))
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ExactSizeIterator <span class="kw">for </span>Iter&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; ExactSizeIterator <span class="kw">for </span>Iter&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
         <span class="self">self</span>.inner.len()
     }
 }
 
-<span class="kw">pub struct </span>IterMut&lt;<span class="lifetime">&#39;a</span>&gt; {
-    inner: slice::IterMut&lt;<span class="lifetime">&#39;a</span>, Node&gt;
+<span class="kw">pub struct </span>IterMut&lt;<span class="lifetime">'a</span>&gt; {
+    inner: slice::IterMut&lt;<span class="lifetime">'a</span>, Node&gt;
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IterMut&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; IterMut&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Create an empty iterator that always returns `None`
     </span><span class="kw">pub fn </span>empty() -&gt; <span class="self">Self </span>{
         IterMut {
@@ -1352,8 +1353,8 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>IterMut&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">type </span>Item = (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>JsonValue);
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Iterator <span class="kw">for </span>IterMut&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">type </span>Item = (<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str, <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>JsonValue);
 
     <span class="attr">#[inline(always)]
     </span><span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
@@ -1361,14 +1362,14 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; DoubleEndedIterator <span class="kw">for </span>IterMut&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; DoubleEndedIterator <span class="kw">for </span>IterMut&lt;<span class="lifetime">'a</span>&gt; {
     <span class="attr">#[inline(always)]
     </span><span class="kw">fn </span>next_back(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
         <span class="self">self</span>.inner.next_back().map(|node| (node.key.as_str(), <span class="kw-2">&amp;mut </span>node.value))
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ExactSizeIterator <span class="kw">for </span>IterMut&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; ExactSizeIterator <span class="kw">for </span>IterMut&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
         <span class="self">self</span>.inner.len()
     }
@@ -1385,16 +1386,16 @@
 /// #
 /// # fn main() {
 /// let value = object!{
-///     foo: &quot;bar&quot;
+///     foo: "bar"
 /// };
 ///
 /// if let JsonValue::Object(object) = value {
-///   assert!(object[&quot;foo&quot;] == &quot;bar&quot;);
+///   assert!(object["foo"] == "bar");
 /// }
 /// # }
 /// ```
 </span><span class="comment">// TODO: doc
-</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Index&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; <span class="kw">for </span>Object {
+</span><span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Index&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt; <span class="kw">for </span>Object {
     <span class="kw">type </span>Output = JsonValue;
 
     <span class="kw">fn </span>index(<span class="kw-2">&amp;</span><span class="self">self</span>, index: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw-2">&amp;</span>JsonValue {
@@ -1413,7 +1414,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Index&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>String&gt; <span class="kw">for </span>Object {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Index&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>String&gt; <span class="kw">for </span>Object {
     <span class="kw">type </span>Output = JsonValue;
 
     <span class="kw">fn </span>index(<span class="kw-2">&amp;</span><span class="self">self</span>, index: <span class="kw-2">&amp;</span>String) -&gt; <span class="kw-2">&amp;</span>JsonValue {
@@ -1434,13 +1435,13 @@
 /// let value = object!{};
 ///
 /// if let JsonValue::Object(mut object) = value {
-///   object[&quot;foo&quot;] = 42.into();
+///   object["foo"] = 42.into();
 ///
-///   assert!(object[&quot;foo&quot;] == 42);
+///   assert!(object["foo"] == 42);
 /// }
 /// # }
 /// ```
-</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IndexMut&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; <span class="kw">for </span>Object {
+</span><span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; IndexMut&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt; <span class="kw">for </span>Object {
     <span class="kw">fn </span>index_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw-2">&amp;mut </span>JsonValue {
         <span class="kw">if </span><span class="self">self</span>.get(index).is_none() {
             <span class="self">self</span>.insert(index, JsonValue::Null);
@@ -1455,7 +1456,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IndexMut&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>String&gt; <span class="kw">for </span>Object {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; IndexMut&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>String&gt; <span class="kw">for </span>Object {
     <span class="kw">fn </span>index_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: <span class="kw-2">&amp;</span>String) -&gt; <span class="kw-2">&amp;mut </span>JsonValue {
         <span class="self">self</span>.index_mut(index.deref())
     }

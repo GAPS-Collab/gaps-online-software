@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["monitoring"]};
+window.SIDEBAR_ITEMS = {"fn":["get_ltb_moni","get_pb_moni","get_preamp_moni","get_rb_moni","monitoring"]};

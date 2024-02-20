@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/winnow-0.5.39/src/combinator/parser.rs`."><title>parser.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="winnow" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/winnow-0.6.2/src/combinator/parser.rs`."><title>parser.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="winnow" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1094,15 +1095,15 @@
 <a href="#1094" id="1094">1094</a>
 <a href="#1095" id="1095">1095</a>
 <a href="#1096" id="1096">1096</a>
-<a href="#1097" id="1097">1097</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::combinator::trace;
 <span class="kw">use </span><span class="kw">crate</span>::combinator::trace_result;
-<span class="attr">#[cfg(feature = <span class="string">&quot;unstable-recover&quot;</span>)]
+<span class="kw">use </span><span class="kw">crate</span>::combinator::DisplayDebug;
+<span class="attr">#[cfg(feature = <span class="string">"unstable-recover"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::error::FromRecoverableError;
 <span class="kw">use </span><span class="kw">crate</span>::error::{AddContext, ErrMode, ErrorKind, FromExternalError, ParserError};
 <span class="kw">use </span><span class="kw">crate</span>::lib::std::borrow::Borrow;
 <span class="kw">use </span><span class="kw">crate</span>::lib::std::ops::Range;
-<span class="attr">#[cfg(feature = <span class="string">&quot;unstable-recover&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"unstable-recover"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::stream::Recover;
 <span class="kw">use </span><span class="kw">crate</span>::stream::StreamIsPartial;
 <span class="kw">use </span><span class="kw">crate</span>::stream::{Location, Stream};
@@ -1110,18 +1111,18 @@
 
 <span class="doccomment">/// Implementation of [`Parser::by_ref`]
 </span><span class="attr">#[cfg_attr(nightly, warn(rustdoc::missing_doc_code_examples))]
-</span><span class="kw">pub struct </span>ByRef&lt;<span class="lifetime">&#39;p</span>, P&gt; {
-    p: <span class="kw-2">&amp;</span><span class="lifetime">&#39;p </span><span class="kw-2">mut </span>P,
+</span><span class="kw">pub struct </span>ByRef&lt;<span class="lifetime">'p</span>, P&gt; {
+    p: <span class="kw-2">&amp;</span><span class="lifetime">'p </span><span class="kw-2">mut </span>P,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;p</span>, P&gt; ByRef&lt;<span class="lifetime">&#39;p</span>, P&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'p</span>, P&gt; ByRef&lt;<span class="lifetime">'p</span>, P&gt; {
     <span class="attr">#[inline(always)]
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(p: <span class="kw-2">&amp;</span><span class="lifetime">&#39;p </span><span class="kw-2">mut </span>P) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(p: <span class="kw-2">&amp;</span><span class="lifetime">'p </span><span class="kw-2">mut </span>P) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{ p }
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;p</span>, I, O, E, P&gt; Parser&lt;I, O, E&gt; <span class="kw">for </span>ByRef&lt;<span class="lifetime">&#39;p</span>, P&gt;
+<span class="kw">impl</span>&lt;<span class="lifetime">'p</span>, I, O, E, P&gt; Parser&lt;I, O, E&gt; <span class="kw">for </span>ByRef&lt;<span class="lifetime">'p</span>, P&gt;
 <span class="kw">where
     </span>P: Parser&lt;I, O, E&gt;,
 {
@@ -1229,10 +1230,10 @@
         <span class="kw">let </span>start = input.checkpoint();
         <span class="kw">let </span>o = <span class="self">self</span>.parser.parse_next(input)<span class="question-mark">?</span>;
         <span class="kw">let </span>res = (<span class="self">self</span>.map)(o).map_err(|err| {
-            input.reset(start);
+            input.reset(<span class="kw-2">&amp;</span>start);
             ErrMode::from_external_error(input, ErrorKind::Verify, err)
         });
-        trace_result(<span class="string">&quot;verify&quot;</span>, <span class="kw-2">&amp;</span>res);
+        trace_result(<span class="string">"verify"</span>, <span class="kw-2">&amp;</span>res);
         res
     }
 }
@@ -1286,10 +1287,10 @@
         <span class="kw">let </span>start = input.checkpoint();
         <span class="kw">let </span>o = <span class="self">self</span>.parser.parse_next(input)<span class="question-mark">?</span>;
         <span class="kw">let </span>res = (<span class="self">self</span>.map)(o).ok_or_else(|| {
-            input.reset(start);
+            input.reset(<span class="kw-2">&amp;</span>start);
             ErrMode::from_error_kind(input, ErrorKind::Verify)
         });
-        trace_result(<span class="string">&quot;verify&quot;</span>, <span class="kw-2">&amp;</span>res);
+        trace_result(<span class="string">"verify"</span>, <span class="kw-2">&amp;</span>res);
         res
     }
 }
@@ -1344,7 +1345,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>o = <span class="self">self</span>.outer.parse_next(i)<span class="question-mark">?</span>;
         <span class="kw">let _ </span>= o.complete();
         <span class="kw">let </span>o2 = <span class="self">self</span>.inner.parse_next(<span class="kw-2">&amp;mut </span>o).map_err(|err| {
-            i.reset(start);
+            i.reset(<span class="kw-2">&amp;</span>start);
             err
         })<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(o2)
@@ -1398,10 +1399,10 @@
         <span class="kw">let </span>start = i.checkpoint();
         <span class="kw">let </span>o = <span class="self">self</span>.p.parse_next(i)<span class="question-mark">?</span>;
         <span class="kw">let </span>res = o.parse_slice().ok_or_else(|| {
-            i.reset(start);
+            i.reset(<span class="kw-2">&amp;</span>start);
             ErrMode::from_error_kind(i, ErrorKind::Verify)
         });
-        trace_result(<span class="string">&quot;verify&quot;</span>, <span class="kw-2">&amp;</span>res);
+        trace_result(<span class="string">"verify"</span>, <span class="kw-2">&amp;</span>res);
         res
     }
 }
@@ -1477,7 +1478,7 @@
 {
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>parse_next(<span class="kw-2">&amp;mut </span><span class="self">self</span>, input: <span class="kw-2">&amp;mut </span>I) -&gt; PResult&lt;O, E&gt; {
-        trace(<span class="string">&quot;complete_err&quot;</span>, |input: <span class="kw-2">&amp;mut </span>I| {
+        trace(<span class="string">"complete_err"</span>, |input: <span class="kw-2">&amp;mut </span>I| {
             <span class="kw">match </span>(<span class="self">self</span>.f).parse_next(input) {
                 <span class="prelude-val">Err</span>(ErrMode::Incomplete(<span class="kw">_</span>)) =&gt; {
                     <span class="prelude-val">Err</span>(ErrMode::from_error_kind(input, ErrorKind::Complete))
@@ -1544,10 +1545,10 @@
         <span class="kw">let </span>start = input.checkpoint();
         <span class="kw">let </span>o = <span class="self">self</span>.parser.parse_next(input)<span class="question-mark">?</span>;
         <span class="kw">let </span>res = (<span class="self">self</span>.filter)(o.borrow()).then_some(o).ok_or_else(|| {
-            input.reset(start);
+            input.reset(<span class="kw-2">&amp;</span>start);
             ErrMode::from_error_kind(input, ErrorKind::Verify)
         });
-        trace_result(<span class="string">&quot;verify&quot;</span>, <span class="kw-2">&amp;</span>res);
+        trace_result(<span class="string">"verify"</span>, <span class="kw-2">&amp;</span>res);
         res
     }
 }
@@ -1713,7 +1714,7 @@
         <span class="kw">match </span>(<span class="self">self</span>.parser).parse_next(input) {
             <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
                 <span class="kw">let </span>offset = input.offset_from(<span class="kw-2">&amp;</span>checkpoint);
-                input.reset(checkpoint);
+                input.reset(<span class="kw-2">&amp;</span>checkpoint);
                 <span class="kw">let </span>recognized = input.next_slice(offset);
                 <span class="prelude-val">Ok</span>(recognized)
             }
@@ -1762,7 +1763,7 @@
         <span class="kw">match </span>(<span class="self">self</span>.parser).parse_next(input) {
             <span class="prelude-val">Ok</span>(result) =&gt; {
                 <span class="kw">let </span>offset = input.offset_from(<span class="kw-2">&amp;</span>checkpoint);
-                input.reset(checkpoint);
+                input.reset(<span class="kw-2">&amp;</span>checkpoint);
                 <span class="kw">let </span>recognized = input.next_slice(offset);
                 <span class="prelude-val">Ok</span>((result, recognized))
             }
@@ -1992,14 +1993,12 @@
 {
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>parse_next(<span class="kw-2">&amp;mut </span><span class="self">self</span>, i: <span class="kw-2">&amp;mut </span>I) -&gt; PResult&lt;O, E&gt; {
-        <span class="attr">#[cfg(feature = <span class="string">&quot;debug&quot;</span>)]
-        </span><span class="kw">let </span>name = <span class="macro">format!</span>(<span class="string">&quot;context={:?}&quot;</span>, <span class="self">self</span>.context);
-        <span class="attr">#[cfg(not(feature = <span class="string">&quot;debug&quot;</span>))]
-        </span><span class="kw">let </span>name = <span class="string">&quot;context&quot;</span>;
-        trace(name, <span class="kw">move </span>|i: <span class="kw-2">&amp;mut </span>I| {
+        <span class="kw">let </span>context = <span class="self">self</span>.context.clone();
+        trace(DisplayDebug(<span class="self">self</span>.context.clone()), <span class="kw">move </span>|i: <span class="kw-2">&amp;mut </span>I| {
+            <span class="kw">let </span>start = i.checkpoint();
             (<span class="self">self</span>.parser)
                 .parse_next(i)
-                .map_err(|err| err.add_context(i, <span class="self">self</span>.context.clone()))
+                .map_err(|err| err.add_context(i, <span class="kw-2">&amp;</span>start, context.clone()))
         })
         .parse_next(i)
     }
@@ -2007,7 +2006,7 @@
 
 <span class="doccomment">/// Implementation of [`Parser::retry_after`]
 </span><span class="attr">#[cfg_attr(nightly, warn(rustdoc::missing_doc_code_examples))]
-#[cfg(feature = <span class="string">&quot;unstable-recover&quot;</span>)]
+#[cfg(feature = <span class="string">"unstable-recover"</span>)]
 </span><span class="kw">pub struct </span>RetryAfter&lt;P, R, I, O, E&gt;
 <span class="kw">where
     </span>P: Parser&lt;I, O, E&gt;,
@@ -2023,7 +2022,7 @@
     e: core::marker::PhantomData&lt;E&gt;,
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;unstable-recover&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"unstable-recover"</span>)]
 </span><span class="kw">impl</span>&lt;P, R, I, O, E&gt; RetryAfter&lt;P, R, I, O, E&gt;
 <span class="kw">where
     </span>P: Parser&lt;I, O, E&gt;,
@@ -2044,7 +2043,7 @@
     }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;unstable-recover&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"unstable-recover"</span>)]
 </span><span class="kw">impl</span>&lt;P, R, I, O, E&gt; Parser&lt;I, O, E&gt; <span class="kw">for </span>RetryAfter&lt;P, R, I, O, E&gt;
 <span class="kw">where
     </span>P: Parser&lt;I, O, E&gt;,
@@ -2063,7 +2062,7 @@
     }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;unstable-recover&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"unstable-recover"</span>)]
 </span><span class="kw">fn </span>retry_after_inner&lt;P, R, I, O, E&gt;(parser: <span class="kw-2">&amp;mut </span>P, recover: <span class="kw-2">&amp;mut </span>R, i: <span class="kw-2">&amp;mut </span>I) -&gt; PResult&lt;O, E&gt;
 <span class="kw">where
     </span>P: Parser&lt;I, O, E&gt;,
@@ -2086,7 +2085,7 @@
         <span class="kw">if </span>recover.parse_next(i).is_ok() {
             <span class="kw">let </span>i_eof_offset = i.eof_offset();
             <span class="kw">if </span>err_start_eof_offset == i_eof_offset {
-                <span class="comment">// Didn&#39;t advance so bubble the error up
+                <span class="comment">// Didn't advance so bubble the error up
             </span>} <span class="kw">else if let </span><span class="prelude-val">Err</span>(err_) = i.record_err(<span class="kw-2">&amp;</span>token_start, <span class="kw-2">&amp;</span>err_start, err) {
                 err = err_;
             } <span class="kw">else </span>{
@@ -2094,14 +2093,14 @@
             }
         }
 
-        i.reset(err_start.clone());
+        i.reset(<span class="kw-2">&amp;</span>err_start);
         err = err.map(|err| E::from_recoverable_error(<span class="kw-2">&amp;</span>token_start, <span class="kw-2">&amp;</span>err_start, i, err));
         <span class="kw">return </span><span class="prelude-val">Err</span>(err);
     }
 }
 
 <span class="doccomment">/// Implementation of [`Parser::resume_after`]
-</span><span class="attr">#[cfg(feature = <span class="string">&quot;unstable-recover&quot;</span>)]
+</span><span class="attr">#[cfg(feature = <span class="string">"unstable-recover"</span>)]
 #[cfg_attr(nightly, warn(rustdoc::missing_doc_code_examples))]
 </span><span class="kw">pub struct </span>ResumeAfter&lt;P, R, I, O, E&gt;
 <span class="kw">where
@@ -2118,7 +2117,7 @@
     e: core::marker::PhantomData&lt;E&gt;,
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;unstable-recover&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"unstable-recover"</span>)]
 </span><span class="kw">impl</span>&lt;P, R, I, O, E&gt; ResumeAfter&lt;P, R, I, O, E&gt;
 <span class="kw">where
     </span>P: Parser&lt;I, O, E&gt;,
@@ -2139,7 +2138,7 @@
     }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;unstable-recover&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"unstable-recover"</span>)]
 </span><span class="kw">impl</span>&lt;P, R, I, O, E&gt; Parser&lt;I, <span class="prelude-ty">Option</span>&lt;O&gt;, E&gt; <span class="kw">for </span>ResumeAfter&lt;P, R, I, O, E&gt;
 <span class="kw">where
     </span>P: Parser&lt;I, O, E&gt;,
@@ -2158,7 +2157,7 @@
     }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;unstable-recover&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"unstable-recover"</span>)]
 </span><span class="kw">fn </span>resume_after_inner&lt;P, R, I, O, E&gt;(
     parser: <span class="kw-2">&amp;mut </span>P,
     recover: <span class="kw-2">&amp;mut </span>R,
@@ -2188,7 +2187,7 @@
         }
     }
 
-    i.reset(err_start.clone());
+    i.reset(<span class="kw-2">&amp;</span>err_start);
     err = err.map(|err| E::from_recoverable_error(<span class="kw-2">&amp;</span>token_start, <span class="kw-2">&amp;</span>err_start, i, err));
     <span class="prelude-val">Err</span>(err)
 }

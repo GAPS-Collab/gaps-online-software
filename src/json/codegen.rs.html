@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/json-0.12.4/src/codegen.rs`."><title>codegen.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="json" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/json-0.12.4/src/codegen.rs`."><title>codegen.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="json" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -423,14 +424,14 @@
 <span class="kw">use </span><span class="kw">crate</span>::object::Object;
 <span class="kw">use </span><span class="kw">crate</span>::util::print_dec;
 
-<span class="kw">const </span>QU: u8 = <span class="string">b&#39;&quot;&#39;</span>;
-<span class="kw">const </span>BS: u8 = <span class="string">b&#39;\\&#39;</span>;
-<span class="kw">const </span>BB: u8 = <span class="string">b&#39;b&#39;</span>;
-<span class="kw">const </span>TT: u8 = <span class="string">b&#39;t&#39;</span>;
-<span class="kw">const </span>NN: u8 = <span class="string">b&#39;n&#39;</span>;
-<span class="kw">const </span>FF: u8 = <span class="string">b&#39;f&#39;</span>;
-<span class="kw">const </span>RR: u8 = <span class="string">b&#39;r&#39;</span>;
-<span class="kw">const </span>UU: u8 = <span class="string">b&#39;u&#39;</span>;
+<span class="kw">const </span>QU: u8 = <span class="string">b'"'</span>;
+<span class="kw">const </span>BS: u8 = <span class="string">b'\\'</span>;
+<span class="kw">const </span>BB: u8 = <span class="string">b'b'</span>;
+<span class="kw">const </span>TT: u8 = <span class="string">b't'</span>;
+<span class="kw">const </span>NN: u8 = <span class="string">b'n'</span>;
+<span class="kw">const </span>FF: u8 = <span class="string">b'f'</span>;
+<span class="kw">const </span>RR: u8 = <span class="string">b'r'</span>;
+<span class="kw">const </span>UU: u8 = <span class="string">b'u'</span>;
 <span class="kw">const </span>__: u8 = <span class="number">0</span>;
 
 <span class="comment">// Look up table for characters that need escaping in a product string
@@ -489,21 +490,21 @@
             <span class="kw">let </span>escape = ESCAPED[ch <span class="kw">as </span>usize];
             <span class="kw">if </span>escape &gt; <span class="number">0 </span>{
                 <span class="self">self</span>.write(<span class="kw-2">&amp;</span>string.as_bytes()[start .. index])<span class="question-mark">?</span>;
-                <span class="self">self</span>.write(<span class="kw-2">&amp;</span>[<span class="string">b&#39;\\&#39;</span>, escape])<span class="question-mark">?</span>;
+                <span class="self">self</span>.write(<span class="kw-2">&amp;</span>[<span class="string">b'\\'</span>, escape])<span class="question-mark">?</span>;
                 start = index + <span class="number">1</span>;
             }
-            <span class="kw">if </span>escape == <span class="string">b&#39;u&#39; </span>{
-                <span class="macro">write!</span>(<span class="self">self</span>.get_writer(), <span class="string">&quot;{:04x}&quot;</span>, ch)<span class="question-mark">?</span>;
+            <span class="kw">if </span>escape == <span class="string">b'u' </span>{
+                <span class="macro">write!</span>(<span class="self">self</span>.get_writer(), <span class="string">"{:04x}"</span>, ch)<span class="question-mark">?</span>;
             }
         }
         <span class="self">self</span>.write(<span class="kw-2">&amp;</span>string.as_bytes()[start ..])<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.write_char(<span class="string">b&#39;&quot;&#39;</span>)
+        <span class="self">self</span>.write_char(<span class="string">b'"'</span>)
     }
 
     <span class="attr">#[inline(always)]
     </span><span class="kw">fn </span>write_string(<span class="kw-2">&amp;mut </span><span class="self">self</span>, string: <span class="kw-2">&amp;</span>str) -&gt; io::Result&lt;()&gt; {
-        <span class="self">self</span>.write_char(<span class="string">b&#39;&quot;&#39;</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.write_char(<span class="string">b'"'</span>)<span class="question-mark">?</span>;
 
         <span class="kw">for </span>(index, ch) <span class="kw">in </span>string.bytes().enumerate() {
             <span class="kw">if </span>ESCAPED[ch <span class="kw">as </span>usize] &gt; <span class="number">0 </span>{
@@ -512,13 +513,13 @@
         }
 
         <span class="self">self</span>.write(string.as_bytes())<span class="question-mark">?</span>;
-        <span class="self">self</span>.write_char(<span class="string">b&#39;&quot;&#39;</span>)
+        <span class="self">self</span>.write_char(<span class="string">b'"'</span>)
     }
 
     <span class="attr">#[inline(always)]
     </span><span class="kw">fn </span>write_number(<span class="kw-2">&amp;mut </span><span class="self">self</span>, num: <span class="kw-2">&amp;</span>Number) -&gt; io::Result&lt;()&gt; {
         <span class="kw">if </span>num.is_nan() {
-            <span class="kw">return </span><span class="self">self</span>.write(<span class="string">b&quot;null&quot;</span>);
+            <span class="kw">return </span><span class="self">self</span>.write(<span class="string">b"null"</span>);
         }
         <span class="kw">let </span>(positive, mantissa, exponent) = num.as_parts();
         <span class="kw">unsafe </span>{
@@ -533,43 +534,43 @@
 
     <span class="attr">#[inline(always)]
     </span><span class="kw">fn </span>write_object(<span class="kw-2">&amp;mut </span><span class="self">self</span>, object: <span class="kw-2">&amp;</span>Object) -&gt; io::Result&lt;()&gt; {
-        <span class="self">self</span>.write_char(<span class="string">b&#39;{&#39;</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.write_char(<span class="string">b'{'</span>)<span class="question-mark">?</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>iter = object.iter();
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>((key, value)) = iter.next() {
             <span class="self">self</span>.indent();
             <span class="self">self</span>.new_line()<span class="question-mark">?</span>;
             <span class="self">self</span>.write_string(key)<span class="question-mark">?</span>;
-            <span class="self">self</span>.write_min(<span class="string">b&quot;: &quot;</span>, <span class="string">b&#39;:&#39;</span>)<span class="question-mark">?</span>;
+            <span class="self">self</span>.write_min(<span class="string">b": "</span>, <span class="string">b':'</span>)<span class="question-mark">?</span>;
             <span class="self">self</span>.write_json(value)<span class="question-mark">?</span>;
         } <span class="kw">else </span>{
-            <span class="self">self</span>.write_char(<span class="string">b&#39;}&#39;</span>)<span class="question-mark">?</span>;
+            <span class="self">self</span>.write_char(<span class="string">b'}'</span>)<span class="question-mark">?</span>;
             <span class="kw">return </span><span class="prelude-val">Ok</span>(());
         }
 
         <span class="kw">for </span>(key, value) <span class="kw">in </span>iter {
-            <span class="self">self</span>.write_char(<span class="string">b&#39;,&#39;</span>)<span class="question-mark">?</span>;
+            <span class="self">self</span>.write_char(<span class="string">b','</span>)<span class="question-mark">?</span>;
             <span class="self">self</span>.new_line()<span class="question-mark">?</span>;
             <span class="self">self</span>.write_string(key)<span class="question-mark">?</span>;
-            <span class="self">self</span>.write_min(<span class="string">b&quot;: &quot;</span>, <span class="string">b&#39;:&#39;</span>)<span class="question-mark">?</span>;
+            <span class="self">self</span>.write_min(<span class="string">b": "</span>, <span class="string">b':'</span>)<span class="question-mark">?</span>;
             <span class="self">self</span>.write_json(value)<span class="question-mark">?</span>;
         }
 
         <span class="self">self</span>.dedent();
         <span class="self">self</span>.new_line()<span class="question-mark">?</span>;
-        <span class="self">self</span>.write_char(<span class="string">b&#39;}&#39;</span>)
+        <span class="self">self</span>.write_char(<span class="string">b'}'</span>)
     }
 
     <span class="kw">fn </span>write_json(<span class="kw-2">&amp;mut </span><span class="self">self</span>, json: <span class="kw-2">&amp;</span>JsonValue) -&gt; io::Result&lt;()&gt; {
         <span class="kw">match </span><span class="kw-2">*</span>json {
-            JsonValue::Null               =&gt; <span class="self">self</span>.write(<span class="string">b&quot;null&quot;</span>),
+            JsonValue::Null               =&gt; <span class="self">self</span>.write(<span class="string">b"null"</span>),
             JsonValue::Short(<span class="kw-2">ref </span>short)   =&gt; <span class="self">self</span>.write_string(short.as_str()),
             JsonValue::String(<span class="kw-2">ref </span>string) =&gt; <span class="self">self</span>.write_string(string),
             JsonValue::Number(<span class="kw-2">ref </span>number) =&gt; <span class="self">self</span>.write_number(number),
-            JsonValue::Boolean(<span class="bool-val">true</span>)      =&gt; <span class="self">self</span>.write(<span class="string">b&quot;true&quot;</span>),
-            JsonValue::Boolean(<span class="bool-val">false</span>)     =&gt; <span class="self">self</span>.write(<span class="string">b&quot;false&quot;</span>),
+            JsonValue::Boolean(<span class="bool-val">true</span>)      =&gt; <span class="self">self</span>.write(<span class="string">b"true"</span>),
+            JsonValue::Boolean(<span class="bool-val">false</span>)     =&gt; <span class="self">self</span>.write(<span class="string">b"false"</span>),
             JsonValue::Array(<span class="kw-2">ref </span>array)   =&gt; {
-                <span class="self">self</span>.write_char(<span class="string">b&#39;[&#39;</span>)<span class="question-mark">?</span>;
+                <span class="self">self</span>.write_char(<span class="string">b'['</span>)<span class="question-mark">?</span>;
                 <span class="kw">let </span><span class="kw-2">mut </span>iter = array.iter();
 
                 <span class="kw">if let </span><span class="prelude-val">Some</span>(item) = iter.next() {
@@ -577,19 +578,19 @@
                     <span class="self">self</span>.new_line()<span class="question-mark">?</span>;
                     <span class="self">self</span>.write_json(item)<span class="question-mark">?</span>;
                 } <span class="kw">else </span>{
-                    <span class="self">self</span>.write_char(<span class="string">b&#39;]&#39;</span>)<span class="question-mark">?</span>;
+                    <span class="self">self</span>.write_char(<span class="string">b']'</span>)<span class="question-mark">?</span>;
                     <span class="kw">return </span><span class="prelude-val">Ok</span>(());
                 }
 
                 <span class="kw">for </span>item <span class="kw">in </span>iter {
-                    <span class="self">self</span>.write_char(<span class="string">b&#39;,&#39;</span>)<span class="question-mark">?</span>;
+                    <span class="self">self</span>.write_char(<span class="string">b','</span>)<span class="question-mark">?</span>;
                     <span class="self">self</span>.new_line()<span class="question-mark">?</span>;
                     <span class="self">self</span>.write_json(item)<span class="question-mark">?</span>;
                 }
 
                 <span class="self">self</span>.dedent();
                 <span class="self">self</span>.new_line()<span class="question-mark">?</span>;
-                <span class="self">self</span>.write_char(<span class="string">b&#39;]&#39;</span>)
+                <span class="self">self</span>.write_char(<span class="string">b']'</span>)
             },
             JsonValue::Object(<span class="kw-2">ref </span>object) =&gt; {
                 <span class="self">self</span>.write_object(object)
@@ -691,9 +692,9 @@
     }
 
     <span class="kw">fn </span>new_line(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; io::Result&lt;()&gt; {
-        <span class="self">self</span>.code.push(<span class="string">b&#39;\n&#39;</span>);
+        <span class="self">self</span>.code.push(<span class="string">b'\n'</span>);
         <span class="kw">for _ in </span><span class="number">0</span>..(<span class="self">self</span>.dent * <span class="self">self</span>.spaces_per_indent) {
-            <span class="self">self</span>.code.push(<span class="string">b&#39; &#39;</span>);
+            <span class="self">self</span>.code.push(<span class="string">b' '</span>);
         }
         <span class="prelude-val">Ok</span>(())
     }
@@ -708,19 +709,19 @@
 }
 
 <span class="doccomment">/// Writer Generator, this uses a custom writer to store the JSON result.
-</span><span class="kw">pub struct </span>WriterGenerator&lt;<span class="lifetime">&#39;a</span>, W: <span class="lifetime">&#39;a </span>+ Write&gt; {
-    writer: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>W
+</span><span class="kw">pub struct </span>WriterGenerator&lt;<span class="lifetime">'a</span>, W: <span class="lifetime">'a </span>+ Write&gt; {
+    writer: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>W
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, W&gt; WriterGenerator&lt;<span class="lifetime">&#39;a</span>, W&gt; <span class="kw">where </span>W: <span class="lifetime">&#39;a </span>+ Write {
-    <span class="kw">pub fn </span>new(writer: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>W) -&gt; <span class="self">Self </span>{
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, W&gt; WriterGenerator&lt;<span class="lifetime">'a</span>, W&gt; <span class="kw">where </span>W: <span class="lifetime">'a </span>+ Write {
+    <span class="kw">pub fn </span>new(writer: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>W) -&gt; <span class="self">Self </span>{
         WriterGenerator {
             writer: writer
         }
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, W&gt; Generator <span class="kw">for </span>WriterGenerator&lt;<span class="lifetime">&#39;a</span>, W&gt; <span class="kw">where </span>W: Write {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, W&gt; Generator <span class="kw">for </span>WriterGenerator&lt;<span class="lifetime">'a</span>, W&gt; <span class="kw">where </span>W: Write {
     <span class="kw">type </span>T = W;
 
     <span class="attr">#[inline(always)]
@@ -735,14 +736,14 @@
 }
 
 <span class="doccomment">/// Pretty Writer Generator, this uses a custom writer to store the JSON result and add indent.
-</span><span class="kw">pub struct </span>PrettyWriterGenerator&lt;<span class="lifetime">&#39;a</span>, W: <span class="lifetime">&#39;a </span>+ Write&gt; {
-    writer: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>W,
+</span><span class="kw">pub struct </span>PrettyWriterGenerator&lt;<span class="lifetime">'a</span>, W: <span class="lifetime">'a </span>+ Write&gt; {
+    writer: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>W,
     dent: u16,
     spaces_per_indent: u16,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, W&gt; PrettyWriterGenerator&lt;<span class="lifetime">&#39;a</span>, W&gt; <span class="kw">where </span>W: <span class="lifetime">&#39;a </span>+ Write {
-    <span class="kw">pub fn </span>new(writer: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>W, spaces: u16) -&gt; <span class="self">Self </span>{
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, W&gt; PrettyWriterGenerator&lt;<span class="lifetime">'a</span>, W&gt; <span class="kw">where </span>W: <span class="lifetime">'a </span>+ Write {
+    <span class="kw">pub fn </span>new(writer: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>W, spaces: u16) -&gt; <span class="self">Self </span>{
         PrettyWriterGenerator {
             writer: writer,
             dent: <span class="number">0</span>,
@@ -751,7 +752,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, W&gt; Generator <span class="kw">for </span>PrettyWriterGenerator&lt;<span class="lifetime">&#39;a</span>, W&gt; <span class="kw">where </span>W: Write {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, W&gt; Generator <span class="kw">for </span>PrettyWriterGenerator&lt;<span class="lifetime">'a</span>, W&gt; <span class="kw">where </span>W: Write {
     <span class="kw">type </span>T = W;
 
     <span class="attr">#[inline(always)]
@@ -765,9 +766,9 @@
     }
 
     <span class="kw">fn </span>new_line(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; io::Result&lt;()&gt; {
-        <span class="self">self</span>.write_char(<span class="string">b&#39;\n&#39;</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.write_char(<span class="string">b'\n'</span>)<span class="question-mark">?</span>;
         <span class="kw">for _ in </span><span class="number">0</span>..(<span class="self">self</span>.dent * <span class="self">self</span>.spaces_per_indent) {
-            <span class="self">self</span>.write_char(<span class="string">b&#39; &#39;</span>)<span class="question-mark">?</span>;
+            <span class="self">self</span>.write_char(<span class="string">b' '</span>)<span class="question-mark">?</span>;
         }
         <span class="prelude-val">Ok</span>(())
     }
@@ -821,7 +822,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>should_not_panic_on_bad_bytes_2() {
-        <span class="kw">let </span>data = <span class="string">b&quot;\x48\x48\x48\x57\x03\xE8\x48\x48\xE8\x03\x8F\x48\x29\x48\x48&quot;</span>;
+        <span class="kw">let </span>data = <span class="string">b"\x48\x48\x48\x57\x03\xE8\x48\x48\xE8\x03\x8F\x48\x29\x48\x48"</span>;
         <span class="kw">let </span>s = <span class="kw">unsafe </span>{
             String::from_utf8_unchecked(data.to_vec())
         };

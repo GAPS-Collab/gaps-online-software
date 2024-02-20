@@ -8,5 +8,6 @@ var searchData=
   ['rbeventheader_45',['RBEventHeader',['../structRBEventHeader.html',1,'']]],
   ['rbeventmemoryview_46',['RBEventMemoryView',['../structRBEventMemoryView.html',1,'']]],
   ['rbmissinghit_47',['RBMissingHit',['../structRBMissingHit.html',1,'']]],
-  ['rbmonidata_48',['RBMoniData',['../structRBMoniData.html',1,'']]]
+  ['rbmonidata_48',['RBMoniData',['../structRBMoniData.html',1,'']]],
+  ['rbwaveform_49',['RBWaveform',['../structRBWaveform.html',1,'']]]
 ];

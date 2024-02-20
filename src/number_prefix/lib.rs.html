@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/number_prefix-0.4.0/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="number_prefix" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/number_prefix-0.4.0/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="number_prefix" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -578,14 +579,14 @@
 //! let amount = 8542_f32;
 //! let result = match NumberPrefix::decimal(amount) {
 //!     NumberPrefix::Standalone(bytes) =&gt; {
-//!         format!(&quot;The file is {} bytes in size&quot;, bytes)
+//!         format!("The file is {} bytes in size", bytes)
 //!     }
 //!     NumberPrefix::Prefixed(prefix, n) =&gt; {
-//!         format!(&quot;The file is {:.1} {}B in size&quot;, n, prefix)
+//!         format!("The file is {:.1} {}B in size", n, prefix)
 //!     }
 //! };
 //!
-//! assert_eq!(&quot;The file is 8.5 kB in size&quot;, result);
+//! assert_eq!("The file is 8.5 kB in size", result);
 //! ```
 //!
 //! The `{:.1}` part of the formatting string tells it to restrict the
@@ -605,14 +606,14 @@
 //! let amount = 705_f32;
 //! let result = match NumberPrefix::decimal(amount) {
 //!     NumberPrefix::Standalone(bytes) =&gt; {
-//!         format!(&quot;The file is {} bytes in size&quot;, bytes)
+//!         format!("The file is {} bytes in size", bytes)
 //!     }
 //!     NumberPrefix::Prefixed(prefix, n) =&gt; {
-//!         format!(&quot;The file is {:.1} {}B in size&quot;, n, prefix)
+//!         format!("The file is {:.1} {}B in size", n, prefix)
 //!     }
 //! };
 //!
-//! assert_eq!(&quot;The file is 705 bytes in size&quot;, result);
+//! assert_eq!("The file is 705 bytes in size", result);
 //! ```
 //!
 //! In this particular example, the user expects different formatting for
@@ -636,14 +637,14 @@
 //! let amount = 8542_f32;
 //! let result = match NumberPrefix::binary(amount) {
 //!     NumberPrefix::Standalone(bytes) =&gt; {
-//!         format!(&quot;The file is {} bytes in size&quot;, bytes)
+//!         format!("The file is {} bytes in size", bytes)
 //!     }
 //!     NumberPrefix::Prefixed(prefix, n) =&gt; {
-//!         format!(&quot;The file is {:.1} {}B in size&quot;, n, prefix)
+//!         format!("The file is {:.1} {}B in size", n, prefix)
 //!     }
 //! };
 //!
-//! assert_eq!(&quot;The file is 8.3 KiB in size&quot;, result);
+//! assert_eq!("The file is 8.3 KiB in size", result);
 //! ```
 //!
 //! A kibibyte is slightly larger than a kilobyte, so the number is smaller
@@ -672,14 +673,14 @@
 //! let amount = 8542_f32;
 //! let result = match NumberPrefix::decimal(amount) {
 //!     NumberPrefix::Standalone(bytes) =&gt; {
-//!         format!(&quot;The file is {} bytes in size&quot;, bytes)
+//!         format!("The file is {} bytes in size", bytes)
 //!     }
 //!     NumberPrefix::Prefixed(prefix, n) =&gt; {
-//!         format!(&quot;The file is {:.1} {}bytes in size&quot;, n, prefix.lower())
+//!         format!("The file is {:.1} {}bytes in size", n, prefix.lower())
 //!     }
 //! };
 //!
-//! assert_eq!(&quot;The file is 8.5 kilobytes in size&quot;, result);
+//! assert_eq!("The file is 8.5 kilobytes in size", result);
 //! ```
 //!
 //!
@@ -694,26 +695,26 @@
 //! ```
 //! use number_prefix::{NumberPrefix, Prefix};
 //!
-//! assert_eq!(&quot;7.05E&quot;.parse::&lt;NumberPrefix&lt;_&gt;&gt;(),
+//! assert_eq!("7.05E".parse::&lt;NumberPrefix&lt;_&gt;&gt;(),
 //!            Ok(NumberPrefix::Prefixed(Prefix::Exa, 7.05_f64)));
 //!
-//! assert_eq!(&quot;7.05&quot;.parse::&lt;NumberPrefix&lt;_&gt;&gt;(),
+//! assert_eq!("7.05".parse::&lt;NumberPrefix&lt;_&gt;&gt;(),
 //!            Ok(NumberPrefix::Standalone(7.05_f64)));
 //!
-//! assert_eq!(&quot;7.05 GiB&quot;.parse::&lt;NumberPrefix&lt;_&gt;&gt;(),
+//! assert_eq!("7.05 GiB".parse::&lt;NumberPrefix&lt;_&gt;&gt;(),
 //!            Ok(NumberPrefix::Prefixed(Prefix::Gibi, 7.05_f64)));
 //! ```
 
 
-</span><span class="attr">#![cfg_attr(not(feature = <span class="string">&quot;std&quot;</span>), no_std)]
+</span><span class="attr">#![cfg_attr(not(feature = <span class="string">"std"</span>), no_std)]
 
-#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+#[cfg(feature = <span class="string">"std"</span>)]
 </span><span class="kw">mod </span>parse;
 
-<span class="attr">#[cfg(not(feature = <span class="string">&quot;std&quot;</span>))]
+<span class="attr">#[cfg(not(feature = <span class="string">"std"</span>))]
 </span><span class="kw">use </span>core::ops::{Neg, Div};
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"std"</span>)]
 </span><span class="kw">use </span>std::{fmt, ops::{Neg, Div}};
 
 
@@ -865,10 +866,10 @@
     }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"std"</span>)]
 </span><span class="kw">impl </span>fmt::Display <span class="kw">for </span>Prefix {
 	<span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
-		<span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.symbol())
+		<span class="macro">write!</span>(f, <span class="string">"{}"</span>, <span class="self">self</span>.symbol())
 	}
 }
 
@@ -881,16 +882,16 @@
 	/// ```
 	/// use number_prefix::Prefix;
 	///
-	/// assert_eq!(&quot;GIGA&quot;, Prefix::Giga.upper());
-	/// assert_eq!(&quot;GIBI&quot;, Prefix::Gibi.upper());
+	/// assert_eq!("GIGA", Prefix::Giga.upper());
+	/// assert_eq!("GIBI", Prefix::Gibi.upper());
 	/// ```
-    </span><span class="kw">pub fn </span>upper(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+    </span><span class="kw">pub fn </span>upper(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str {
         <span class="kw">use </span><span class="self">self</span>::Prefix::<span class="kw-2">*</span>;
         <span class="kw">match </span><span class="self">self </span>{
-            Kilo =&gt; <span class="string">&quot;KILO&quot;</span>,  Mega =&gt; <span class="string">&quot;MEGA&quot;</span>,  Giga  =&gt; <span class="string">&quot;GIGA&quot;</span>,   Tera  =&gt; <span class="string">&quot;TERA&quot;</span>,
-            Peta =&gt; <span class="string">&quot;PETA&quot;</span>,  Exa  =&gt; <span class="string">&quot;EXA&quot;</span>,   Zetta =&gt; <span class="string">&quot;ZETTA&quot;</span>,  Yotta =&gt; <span class="string">&quot;YOTTA&quot;</span>,
-            Kibi =&gt; <span class="string">&quot;KIBI&quot;</span>,  Mebi =&gt; <span class="string">&quot;MEBI&quot;</span>,  Gibi  =&gt; <span class="string">&quot;GIBI&quot;</span>,   Tebi  =&gt; <span class="string">&quot;TEBI&quot;</span>,
-            Pebi =&gt; <span class="string">&quot;PEBI&quot;</span>,  Exbi =&gt; <span class="string">&quot;EXBI&quot;</span>,  Zebi  =&gt; <span class="string">&quot;ZEBI&quot;</span>,   Yobi  =&gt; <span class="string">&quot;YOBI&quot;</span>,
+            Kilo =&gt; <span class="string">"KILO"</span>,  Mega =&gt; <span class="string">"MEGA"</span>,  Giga  =&gt; <span class="string">"GIGA"</span>,   Tera  =&gt; <span class="string">"TERA"</span>,
+            Peta =&gt; <span class="string">"PETA"</span>,  Exa  =&gt; <span class="string">"EXA"</span>,   Zetta =&gt; <span class="string">"ZETTA"</span>,  Yotta =&gt; <span class="string">"YOTTA"</span>,
+            Kibi =&gt; <span class="string">"KIBI"</span>,  Mebi =&gt; <span class="string">"MEBI"</span>,  Gibi  =&gt; <span class="string">"GIBI"</span>,   Tebi  =&gt; <span class="string">"TEBI"</span>,
+            Pebi =&gt; <span class="string">"PEBI"</span>,  Exbi =&gt; <span class="string">"EXBI"</span>,  Zebi  =&gt; <span class="string">"ZEBI"</span>,   Yobi  =&gt; <span class="string">"YOBI"</span>,
         }
     }
 
@@ -901,16 +902,16 @@
 	/// ```
 	/// use number_prefix::Prefix;
 	///
-	/// assert_eq!(&quot;Giga&quot;, Prefix::Giga.caps());
-	/// assert_eq!(&quot;Gibi&quot;, Prefix::Gibi.caps());
+	/// assert_eq!("Giga", Prefix::Giga.caps());
+	/// assert_eq!("Gibi", Prefix::Gibi.caps());
 	/// ```
-    </span><span class="kw">pub fn </span>caps(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+    </span><span class="kw">pub fn </span>caps(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str {
         <span class="kw">use </span><span class="self">self</span>::Prefix::<span class="kw-2">*</span>;
         <span class="kw">match </span><span class="self">self </span>{
-            Kilo =&gt; <span class="string">&quot;Kilo&quot;</span>,  Mega =&gt; <span class="string">&quot;Mega&quot;</span>,  Giga  =&gt; <span class="string">&quot;Giga&quot;</span>,   Tera  =&gt; <span class="string">&quot;Tera&quot;</span>,
-            Peta =&gt; <span class="string">&quot;Peta&quot;</span>,  Exa  =&gt; <span class="string">&quot;Exa&quot;</span>,   Zetta =&gt; <span class="string">&quot;Zetta&quot;</span>,  Yotta =&gt; <span class="string">&quot;Yotta&quot;</span>,
-            Kibi =&gt; <span class="string">&quot;Kibi&quot;</span>,  Mebi =&gt; <span class="string">&quot;Mebi&quot;</span>,  Gibi  =&gt; <span class="string">&quot;Gibi&quot;</span>,   Tebi  =&gt; <span class="string">&quot;Tebi&quot;</span>,
-            Pebi =&gt; <span class="string">&quot;Pebi&quot;</span>,  Exbi =&gt; <span class="string">&quot;Exbi&quot;</span>,  Zebi  =&gt; <span class="string">&quot;Zebi&quot;</span>,   Yobi  =&gt; <span class="string">&quot;Yobi&quot;</span>,
+            Kilo =&gt; <span class="string">"Kilo"</span>,  Mega =&gt; <span class="string">"Mega"</span>,  Giga  =&gt; <span class="string">"Giga"</span>,   Tera  =&gt; <span class="string">"Tera"</span>,
+            Peta =&gt; <span class="string">"Peta"</span>,  Exa  =&gt; <span class="string">"Exa"</span>,   Zetta =&gt; <span class="string">"Zetta"</span>,  Yotta =&gt; <span class="string">"Yotta"</span>,
+            Kibi =&gt; <span class="string">"Kibi"</span>,  Mebi =&gt; <span class="string">"Mebi"</span>,  Gibi  =&gt; <span class="string">"Gibi"</span>,   Tebi  =&gt; <span class="string">"Tebi"</span>,
+            Pebi =&gt; <span class="string">"Pebi"</span>,  Exbi =&gt; <span class="string">"Exbi"</span>,  Zebi  =&gt; <span class="string">"Zebi"</span>,   Yobi  =&gt; <span class="string">"Yobi"</span>,
         }
     }
 
@@ -921,16 +922,16 @@
     /// ```
     /// use number_prefix::Prefix;
     ///
-    /// assert_eq!(&quot;giga&quot;, Prefix::Giga.lower());
-    /// assert_eq!(&quot;gibi&quot;, Prefix::Gibi.lower());
+    /// assert_eq!("giga", Prefix::Giga.lower());
+    /// assert_eq!("gibi", Prefix::Gibi.lower());
     /// ```
-    </span><span class="kw">pub fn </span>lower(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+    </span><span class="kw">pub fn </span>lower(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str {
         <span class="kw">use </span><span class="self">self</span>::Prefix::<span class="kw-2">*</span>;
         <span class="kw">match </span><span class="self">self </span>{
-            Kilo =&gt; <span class="string">&quot;kilo&quot;</span>,  Mega =&gt; <span class="string">&quot;mega&quot;</span>,  Giga  =&gt; <span class="string">&quot;giga&quot;</span>,   Tera  =&gt; <span class="string">&quot;tera&quot;</span>,
-            Peta =&gt; <span class="string">&quot;peta&quot;</span>,  Exa  =&gt; <span class="string">&quot;exa&quot;</span>,   Zetta =&gt; <span class="string">&quot;zetta&quot;</span>,  Yotta =&gt; <span class="string">&quot;yotta&quot;</span>,
-            Kibi =&gt; <span class="string">&quot;kibi&quot;</span>,  Mebi =&gt; <span class="string">&quot;mebi&quot;</span>,  Gibi  =&gt; <span class="string">&quot;gibi&quot;</span>,   Tebi  =&gt; <span class="string">&quot;tebi&quot;</span>,
-            Pebi =&gt; <span class="string">&quot;pebi&quot;</span>,  Exbi =&gt; <span class="string">&quot;exbi&quot;</span>,  Zebi  =&gt; <span class="string">&quot;zebi&quot;</span>,   Yobi  =&gt; <span class="string">&quot;yobi&quot;</span>,
+            Kilo =&gt; <span class="string">"kilo"</span>,  Mega =&gt; <span class="string">"mega"</span>,  Giga  =&gt; <span class="string">"giga"</span>,   Tera  =&gt; <span class="string">"tera"</span>,
+            Peta =&gt; <span class="string">"peta"</span>,  Exa  =&gt; <span class="string">"exa"</span>,   Zetta =&gt; <span class="string">"zetta"</span>,  Yotta =&gt; <span class="string">"yotta"</span>,
+            Kibi =&gt; <span class="string">"kibi"</span>,  Mebi =&gt; <span class="string">"mebi"</span>,  Gibi  =&gt; <span class="string">"gibi"</span>,   Tebi  =&gt; <span class="string">"tebi"</span>,
+            Pebi =&gt; <span class="string">"pebi"</span>,  Exbi =&gt; <span class="string">"exbi"</span>,  Zebi  =&gt; <span class="string">"zebi"</span>,   Yobi  =&gt; <span class="string">"yobi"</span>,
         }
     }
 
@@ -941,16 +942,16 @@
 	/// ```
 	/// use number_prefix::Prefix;
 	///
-	/// assert_eq!(&quot;G&quot;,  Prefix::Giga.symbol());
-	/// assert_eq!(&quot;Gi&quot;, Prefix::Gibi.symbol());
+	/// assert_eq!("G",  Prefix::Giga.symbol());
+	/// assert_eq!("Gi", Prefix::Gibi.symbol());
 	/// ```
-    </span><span class="kw">pub fn </span>symbol(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+    </span><span class="kw">pub fn </span>symbol(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str {
         <span class="kw">use </span><span class="self">self</span>::Prefix::<span class="kw-2">*</span>;
         <span class="kw">match </span><span class="self">self </span>{
-            Kilo =&gt; <span class="string">&quot;k&quot;</span>,   Mega =&gt; <span class="string">&quot;M&quot;</span>,   Giga  =&gt; <span class="string">&quot;G&quot;</span>,   Tera  =&gt; <span class="string">&quot;T&quot;</span>,
-            Peta =&gt; <span class="string">&quot;P&quot;</span>,   Exa  =&gt; <span class="string">&quot;E&quot;</span>,   Zetta =&gt; <span class="string">&quot;Z&quot;</span>,   Yotta =&gt; <span class="string">&quot;Y&quot;</span>,
-            Kibi =&gt; <span class="string">&quot;Ki&quot;</span>,  Mebi =&gt; <span class="string">&quot;Mi&quot;</span>,  Gibi  =&gt; <span class="string">&quot;Gi&quot;</span>,  Tebi  =&gt; <span class="string">&quot;Ti&quot;</span>,
-            Pebi =&gt; <span class="string">&quot;Pi&quot;</span>,  Exbi =&gt; <span class="string">&quot;Ei&quot;</span>,  Zebi  =&gt; <span class="string">&quot;Zi&quot;</span>,  Yobi  =&gt; <span class="string">&quot;Yi&quot;</span>,
+            Kilo =&gt; <span class="string">"k"</span>,   Mega =&gt; <span class="string">"M"</span>,   Giga  =&gt; <span class="string">"G"</span>,   Tera  =&gt; <span class="string">"T"</span>,
+            Peta =&gt; <span class="string">"P"</span>,   Exa  =&gt; <span class="string">"E"</span>,   Zetta =&gt; <span class="string">"Z"</span>,   Yotta =&gt; <span class="string">"Y"</span>,
+            Kibi =&gt; <span class="string">"Ki"</span>,  Mebi =&gt; <span class="string">"Mi"</span>,  Gibi  =&gt; <span class="string">"Gi"</span>,  Tebi  =&gt; <span class="string">"Ti"</span>,
+            Pebi =&gt; <span class="string">"Pi"</span>,  Exbi =&gt; <span class="string">"Ei"</span>,  Zebi  =&gt; <span class="string">"Zi"</span>,  Yobi  =&gt; <span class="string">"Yi"</span>,
         }
     }
 }
@@ -1099,7 +1100,7 @@
     <span class="attr">#[test]
     #[allow(overflowing_literals)]
     </span><span class="kw">fn </span>and_so_on() {
-    	<span class="comment">// When you hit yotta, don&#39;t keep going
+    	<span class="comment">// When you hit yotta, don't keep going
 		</span><span class="macro">assert_eq!</span>(NumberPrefix::decimal(<span class="number">1_000_000_000_000_000_000_000_000_000f64</span>),
 		           NumberPrefix::Prefixed(Prefix::Yotta, <span class="number">1000f64</span>))
     }

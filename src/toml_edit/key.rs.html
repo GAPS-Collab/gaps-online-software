@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/toml_edit-0.22.4/src/key.rs`."><title>key.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="toml_edit" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/toml_edit-0.22.6/src/key.rs`."><title>key.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="toml_edit" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -434,6 +435,19 @@
 <a href="#434" id="434">434</a>
 <a href="#435" id="435">435</a>
 <a href="#436" id="436">436</a>
+<a href="#437" id="437">437</a>
+<a href="#438" id="438">438</a>
+<a href="#439" id="439">439</a>
+<a href="#440" id="440">440</a>
+<a href="#441" id="441">441</a>
+<a href="#442" id="442">442</a>
+<a href="#443" id="443">443</a>
+<a href="#444" id="444">444</a>
+<a href="#445" id="445">445</a>
+<a href="#446" id="446">446</a>
+<a href="#447" id="447">447</a>
+<a href="#448" id="448">448</a>
+<a href="#449" id="449">449</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::str::FromStr;
 
@@ -445,23 +459,23 @@
 /// # Examples
 ///
 /// ```notrust
-/// [dependencies.&quot;nom&quot;]
-/// version = &quot;5.0&quot;
-/// &#39;literal key&#39; = &quot;nonsense&quot;
-/// &quot;basic string key&quot; = 42
+/// [dependencies."nom"]
+/// version = "5.0"
+/// 'literal key' = "nonsense"
+/// "basic string key" = 42
 /// ```
 ///
 /// There are 3 types of keys:
 ///
 /// 1. Bare keys (`version` and `dependencies`)
 ///
-/// 2. Basic quoted keys (`&quot;basic string key&quot;` and `&quot;nom&quot;`)
+/// 2. Basic quoted keys (`"basic string key"` and `"nom"`)
 ///
-/// 3. Literal quoted keys (`&#39;literal key&#39;`)
+/// 3. Literal quoted keys (`'literal key'`)
 ///
 /// For details see [toml spec](https://github.com/toml-lang/toml/#keyvalue-pair).
 ///
-/// To parse a key use `FromStr` trait implementation: `&quot;string&quot;.parse::&lt;Key&gt;()`.
+/// To parse a key use `FromStr` trait implementation: `"string".parse::&lt;Key&gt;()`.
 </span><span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>Key {
     key: InternalString,
@@ -483,8 +497,8 @@
 
     <span class="doccomment">/// Parse a TOML key expression
     ///
-    /// Unlike `&quot;&quot;.parse&lt;Key&gt;()`, this supports dotted keys.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;parse&quot;</span>)]
+    /// Unlike `"".parse&lt;Key&gt;()`, this supports dotted keys.
+    </span><span class="attr">#[cfg(feature = <span class="string">"parse"</span>)]
     </span><span class="kw">pub fn </span>parse(repr: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;<span class="self">Self</span>&gt;, <span class="kw">crate</span>::TomlError&gt; {
         <span class="self">Self</span>::try_parse_path(repr)
     }
@@ -495,7 +509,7 @@
     </span>}
 
     <span class="doccomment">/// While creating the `Key`, add `Decor` to it
-    </span><span class="attr">#[deprecated(since = <span class="string">&quot;0.21.1&quot;</span>, note = <span class="string">&quot;Replaced with `with_leaf_decor`&quot;</span>)]
+    </span><span class="attr">#[deprecated(since = <span class="string">"0.21.1"</span>, note = <span class="string">"Replaced with `with_leaf_decor`"</span>)]
     </span><span class="kw">pub fn </span>with_decor(<span class="self">self</span>, decor: Decor) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.with_leaf_decor(decor)
     }
@@ -513,7 +527,7 @@
     </span>}
 
     <span class="doccomment">/// Access a mutable proxy for the `Key`.
-    </span><span class="kw">pub fn </span>as_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; KeyMut&lt;<span class="lifetime">&#39;_</span>&gt; {
+    </span><span class="kw">pub fn </span>as_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; KeyMut&lt;<span class="lifetime">'_</span>&gt; {
         KeyMut { key: <span class="self">self </span>}
     }
 
@@ -532,14 +546,14 @@
     }
 
     <span class="doccomment">/// Returns the default raw representation.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;display&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">"display"</span>)]
     </span><span class="kw">pub fn </span>default_repr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Repr {
         to_key_repr(<span class="kw-2">&amp;</span><span class="self">self</span>.key)
     }
 
     <span class="doccomment">/// Returns a raw representation.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;display&quot;</span>)]
-    </span><span class="kw">pub fn </span>display_repr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Cow&lt;<span class="lifetime">&#39;_</span>, str&gt; {
+    </span><span class="attr">#[cfg(feature = <span class="string">"display"</span>)]
+    </span><span class="kw">pub fn </span>display_repr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Cow&lt;<span class="lifetime">'_</span>, str&gt; {
         <span class="self">self</span>.as_repr()
             .and_then(|r| r.as_raw().as_str())
             .map(Cow::Borrowed)
@@ -549,7 +563,10 @@
     }
 
     <span class="doccomment">/// Returns the surrounding whitespace
-    </span><span class="attr">#[deprecated(since = <span class="string">&quot;0.21.1&quot;</span>, note = <span class="string">&quot;Replaced with `decor_mut`&quot;</span>)]
+    </span><span class="attr">#[deprecated(
+        since = <span class="string">"0.21.1"</span>,
+        note = <span class="string">"Replaced with `dotted_decor_mut`, `leaf_decor_mut"
+    </span>)]
     </span><span class="kw">pub fn </span>decor_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>Decor {
         <span class="self">self</span>.leaf_decor_mut()
     }
@@ -565,7 +582,7 @@
     }
 
     <span class="doccomment">/// Returns the surrounding whitespace
-    </span><span class="attr">#[deprecated(since = <span class="string">&quot;0.21.1&quot;</span>, note = <span class="string">&quot;Replaced with `decor`&quot;</span>)]
+    </span><span class="attr">#[deprecated(since = <span class="string">"0.21.1"</span>, note = <span class="string">"Replaced with `dotted_decor`, `leaf_decor"</span>)]
     </span><span class="kw">pub fn </span>decor(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Decor {
         <span class="self">self</span>.leaf_decor()
     }
@@ -581,7 +598,7 @@
     }
 
     <span class="doccomment">/// Returns the location within the original document
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;serde&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">"serde"</span>)]
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>span(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;std::ops::Range&lt;usize&gt;&gt; {
         <span class="self">self</span>.repr.as_ref().and_then(|r| r.span())
     }
@@ -601,14 +618,14 @@
         <span class="self">self</span>.dotted_decor.clear();
     }
 
-    <span class="attr">#[cfg(feature = <span class="string">&quot;parse&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">"parse"</span>)]
     </span><span class="kw">fn </span>try_parse_simple(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Key, <span class="kw">crate</span>::TomlError&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>key = <span class="kw">crate</span>::parser::parse_key(s)<span class="question-mark">?</span>;
         key.despan(s);
         <span class="prelude-val">Ok</span>(key)
     }
 
-    <span class="attr">#[cfg(feature = <span class="string">&quot;parse&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">"parse"</span>)]
     </span><span class="kw">fn </span>try_parse_path(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Key&gt;, <span class="kw">crate</span>::TomlError&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>keys = <span class="kw">crate</span>::parser::parse_key_path(s)<span class="question-mark">?</span>;
         <span class="kw">for </span>key <span class="kw">in </span><span class="kw-2">&amp;mut </span>keys {
@@ -672,7 +689,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;s</span>&gt; PartialEq&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;s </span>str&gt; <span class="kw">for </span>Key {
+<span class="kw">impl</span>&lt;<span class="lifetime">'s</span>&gt; PartialEq&lt;<span class="kw-2">&amp;</span><span class="lifetime">'s </span>str&gt; <span class="kw">for </span>Key {
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: &amp;&amp;str) -&gt; bool {
         PartialEq::eq(<span class="self">self</span>.get(), <span class="kw-2">*</span>other)
@@ -686,28 +703,28 @@
     }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;display&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"display"</span>)]
 </span><span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>Key {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; std::fmt::Result {
         <span class="kw">crate</span>::encode::encode_key(<span class="self">self</span>, f, <span class="prelude-val">None</span>)
     }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;parse&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"parse"</span>)]
 </span><span class="kw">impl </span>FromStr <span class="kw">for </span>Key {
     <span class="kw">type </span><span class="prelude-val">Err </span>= <span class="kw">crate</span>::TomlError;
 
     <span class="doccomment">/// Tries to parse a key from a &amp;str,
-    /// if fails, tries as basic quoted key (surrounds with &quot;&quot;)
-    /// and then literal quoted key (surrounds with &#39;&#39;)
+    /// if fails, tries as basic quoted key (surrounds with "")
+    /// and then literal quoted key (surrounds with '')
     </span><span class="kw">fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Err&gt; {
         Key::try_parse_simple(s)
     }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;display&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"display"</span>)]
 </span><span class="kw">fn </span>to_key_repr(key: <span class="kw-2">&amp;</span>str) -&gt; Repr {
-    <span class="attr">#[cfg(feature = <span class="string">&quot;parse&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">"parse"</span>)]
     </span>{
         <span class="kw">if </span>key
             .as_bytes()
@@ -725,7 +742,7 @@
             )
         }
     }
-    <span class="attr">#[cfg(not(feature = <span class="string">&quot;parse&quot;</span>))]
+    <span class="attr">#[cfg(not(feature = <span class="string">"parse"</span>))]
     </span>{
         <span class="kw">crate</span>::encode::to_string_repr(
             key,
@@ -735,14 +752,14 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;b</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>str&gt; <span class="kw">for </span>Key {
-    <span class="kw">fn </span>from(s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>str) -&gt; <span class="self">Self </span>{
+<span class="kw">impl</span>&lt;<span class="lifetime">'b</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">'b </span>str&gt; <span class="kw">for </span>Key {
+    <span class="kw">fn </span>from(s: <span class="kw-2">&amp;</span><span class="lifetime">'b </span>str) -&gt; <span class="self">Self </span>{
         Key::new(s)
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;b</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>String&gt; <span class="kw">for </span>Key {
-    <span class="kw">fn </span>from(s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>String) -&gt; <span class="self">Self </span>{
+<span class="kw">impl</span>&lt;<span class="lifetime">'b</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">'b </span>String&gt; <span class="kw">for </span>Key {
+    <span class="kw">fn </span>from(s: <span class="kw-2">&amp;</span><span class="lifetime">'b </span>String) -&gt; <span class="self">Self </span>{
         Key::new(s)
     }
 }
@@ -766,13 +783,13 @@
     }
 }
 
-<span class="doccomment">/// A mutable reference to a `Key`&#39;s formatting
+<span class="doccomment">/// A mutable reference to a `Key`'s formatting
 </span><span class="attr">#[derive(Debug, Eq, PartialEq, PartialOrd, Ord, Hash)]
-</span><span class="kw">pub struct </span>KeyMut&lt;<span class="lifetime">&#39;k</span>&gt; {
-    key: <span class="kw-2">&amp;</span><span class="lifetime">&#39;k </span><span class="kw-2">mut </span>Key,
+</span><span class="kw">pub struct </span>KeyMut&lt;<span class="lifetime">'k</span>&gt; {
+    key: <span class="kw-2">&amp;</span><span class="lifetime">'k </span><span class="kw-2">mut </span>Key,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;k</span>&gt; KeyMut&lt;<span class="lifetime">&#39;k</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'k</span>&gt; KeyMut&lt;<span class="lifetime">'k</span>&gt; {
     <span class="doccomment">/// Returns the parsed key value.
     </span><span class="kw">pub fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
         <span class="self">self</span>.key.get()
@@ -784,19 +801,22 @@
     }
 
     <span class="doccomment">/// Returns the default raw representation.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;display&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">"display"</span>)]
     </span><span class="kw">pub fn </span>default_repr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Repr {
         <span class="self">self</span>.key.default_repr()
     }
 
     <span class="doccomment">/// Returns a raw representation.
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;display&quot;</span>)]
+    </span><span class="attr">#[cfg(feature = <span class="string">"display"</span>)]
     </span><span class="kw">pub fn </span>display_repr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Cow&lt;str&gt; {
         <span class="self">self</span>.key.display_repr()
     }
 
     <span class="doccomment">/// Returns the surrounding whitespace
-    </span><span class="attr">#[deprecated(since = <span class="string">&quot;0.21.1&quot;</span>, note = <span class="string">&quot;Replaced with `decor_mut`&quot;</span>)]
+    </span><span class="attr">#[deprecated(
+        since = <span class="string">"0.21.1"</span>,
+        note = <span class="string">"Replaced with `dotted_decor_mut`, `leaf_decor_mut"
+    </span>)]
     </span><span class="kw">pub fn </span>decor_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>Decor {
         <span class="attr">#![allow(deprecated)]
         </span><span class="self">self</span>.key.decor_mut()
@@ -813,7 +833,7 @@
     }
 
     <span class="doccomment">/// Returns the surrounding whitespace
-    </span><span class="attr">#[deprecated(since = <span class="string">&quot;0.21.1&quot;</span>, note = <span class="string">&quot;Replaced with `decor`&quot;</span>)]
+    </span><span class="attr">#[deprecated(since = <span class="string">"0.21.1"</span>, note = <span class="string">"Replaced with `dotted_decor`, `leaf_decor"</span>)]
     </span><span class="kw">pub fn </span>decor(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Decor {
         <span class="attr">#![allow(deprecated)]
         </span><span class="self">self</span>.key.decor()
@@ -835,7 +855,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;k</span>&gt; std::ops::Deref <span class="kw">for </span>KeyMut&lt;<span class="lifetime">&#39;k</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'k</span>&gt; std::ops::Deref <span class="kw">for </span>KeyMut&lt;<span class="lifetime">'k</span>&gt; {
     <span class="kw">type </span>Target = str;
 
     <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
@@ -843,31 +863,38 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;s</span>&gt; PartialEq&lt;str&gt; <span class="kw">for </span>KeyMut&lt;<span class="lifetime">&#39;s</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'s</span>&gt; PartialEq&lt;str&gt; <span class="kw">for </span>KeyMut&lt;<span class="lifetime">'s</span>&gt; {
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>str) -&gt; bool {
         PartialEq::eq(<span class="self">self</span>.get(), other)
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;s</span>&gt; PartialEq&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;s </span>str&gt; <span class="kw">for </span>KeyMut&lt;<span class="lifetime">&#39;s</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'s</span>&gt; PartialEq&lt;<span class="kw-2">&amp;</span><span class="lifetime">'s </span>str&gt; <span class="kw">for </span>KeyMut&lt;<span class="lifetime">'s</span>&gt; {
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: &amp;&amp;str) -&gt; bool {
         PartialEq::eq(<span class="self">self</span>.get(), <span class="kw-2">*</span>other)
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;s</span>&gt; PartialEq&lt;String&gt; <span class="kw">for </span>KeyMut&lt;<span class="lifetime">&#39;s</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'s</span>&gt; PartialEq&lt;String&gt; <span class="kw">for </span>KeyMut&lt;<span class="lifetime">'s</span>&gt; {
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>String) -&gt; bool {
         PartialEq::eq(<span class="self">self</span>.get(), other.as_str())
     }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;display&quot;</span>)]
-</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;k</span>&gt; std::fmt::Display <span class="kw">for </span>KeyMut&lt;<span class="lifetime">&#39;k</span>&gt; {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+<span class="attr">#[cfg(feature = <span class="string">"display"</span>)]
+</span><span class="kw">impl</span>&lt;<span class="lifetime">'k</span>&gt; std::fmt::Display <span class="kw">for </span>KeyMut&lt;<span class="lifetime">'k</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; std::fmt::Result {
         std::fmt::Display::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.key, f)
     }
+}
+
+<span class="attr">#[test]
+#[cfg(feature = <span class="string">"parse"</span>)]
+#[cfg(feature = <span class="string">"display"</span>)]
+</span><span class="kw">fn </span>string_roundtrip() {
+    Key::new(<span class="string">"hello"</span>).to_string().parse::&lt;Key&gt;().unwrap();
 }
 </code></pre></div></section></main></body></html>

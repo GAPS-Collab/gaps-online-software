@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-rb/src/memory.rs`."><title>memory.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="liftof_rb" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-rb/src/memory.rs`."><title>memory.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="liftof_rb" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -319,9 +320,9 @@
 
 <span class="kw">use </span>tof_dataclasses::io::RBEventMemoryStreamer;
 
-<span class="kw">pub const </span>UIO0 : <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;/dev/uio0&quot;</span>;
-<span class="kw">pub const </span>UIO1 : <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;/dev/uio1&quot;</span>;
-<span class="kw">pub const </span>UIO2 : <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;/dev/uio2&quot;</span>;
+<span class="kw">pub const </span>UIO0 : <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str = <span class="string">"/dev/uio0"</span>;
+<span class="kw">pub const </span>UIO1 : <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str = <span class="string">"/dev/uio1"</span>;
+<span class="kw">pub const </span>UIO2 : <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str = <span class="string">"/dev/uio2"</span>;
 
 <span class="doccomment">/// Data buffer related constants
 /// The data buffer is /dev/uio1 
@@ -357,16 +358,16 @@
     <span class="kw">let </span>etype : String;
     <span class="kw">match </span><span class="self">self </span>{
       RegisterError::RegisterTimeOut =&gt; {
-        etype = String::from(<span class="string">&quot;RegisterTimeOut&quot;</span>);
+        etype = String::from(<span class="string">"RegisterTimeOut"</span>);
       },
       RegisterError::Unknown =&gt; {
-        etype = String::from(<span class="string">&quot;Unknown&quot;</span>);
+        etype = String::from(<span class="string">"Unknown"</span>);
       },
       <span class="kw">_ </span>=&gt; {
-        etype = String::from(<span class="string">&quot;not defined&quot;</span>);
+        etype = String::from(<span class="string">"not defined"</span>);
       }
     }
-    <span class="macro">write!</span>(f, <span class="string">&quot;&lt;RegisterError: {}&gt;&quot;</span>, etype)
+    <span class="macro">write!</span>(f, <span class="string">"&lt;RegisterError: {}&gt;"</span>, etype)
   }
 }
 
@@ -375,7 +376,7 @@
 
 
 <span class="doccomment">///! There are 2 data buffers, commonly 
-///  denoted as &quot;A&quot; and &quot;B&quot;.
+///  denoted as "A" and "B".
 ///  A -&gt; /dev/uio1
 ///  B -&gt; /dev/uio2
 </span><span class="attr">#[derive(Debug, Copy, Clone)]
@@ -398,7 +399,7 @@
 ///
 /// This means if the given size is too small
 /// make sure that at least the whole next
-/// event &quot;fits in&quot;
+/// event "fits in"
 </span><span class="kw">pub fn </span>size_in_events(size : usize) -&gt; usize {
   size/EVENT_SIZE
 }
@@ -465,7 +466,7 @@
   </span><span class="kw">let </span>m = <span class="kw">match </span>map_physical_mem_read(UIO0, addr, SIZEOF_U32) {
     <span class="prelude-val">Ok</span>(m) =&gt; m,
     <span class="prelude-val">Err</span>(err) =&gt; {
-      <span class="macro">error!</span>(<span class="string">&quot;Failed to mmap: {:?}&quot;</span>, err);
+      <span class="macro">error!</span>(<span class="string">"Failed to mmap: {:?}"</span>, err);
       <span class="kw">return </span><span class="prelude-val">Err</span>(RegisterError::MMapFail);
     }
   };
@@ -484,12 +485,12 @@
   <span class="kw">where
     </span>u32: std::fmt::LowerHex, {
   
-  <span class="macro">trace!</span>(<span class="string">&quot;Attempting to write {data} at addr {addr}&quot;</span>);
+  <span class="macro">trace!</span>(<span class="string">"Attempting to write {data} at addr {addr}"</span>);
   <span class="comment">//let sz = std::mem::size_of::&lt;u32&gt;();
   </span><span class="kw">let </span>m = <span class="kw">match </span>map_physical_mem_write(UIO0,addr,SIZEOF_U32) {
     <span class="prelude-val">Ok</span>(m) =&gt; m,
     <span class="prelude-val">Err</span>(err) =&gt; {
-      <span class="macro">warn!</span>(<span class="string">&quot;[write_control_reg] Failed to mmap! {:?}&quot;</span>, err);
+      <span class="macro">warn!</span>(<span class="string">"[write_control_reg] Failed to mmap! {:?}"</span>, err);
       <span class="kw">return </span><span class="prelude-val">Err</span>(RegisterError::MMapFail);
     }
   };
@@ -530,7 +531,7 @@
     </span><span class="prelude-val">Ok</span>(m) =&gt; m,
     <span class="prelude-val">Err</span>(err) =&gt; {
       <span class="comment">//let error = RegisterError {};
-      </span><span class="macro">warn!</span>(<span class="string">&quot;Failed to mmap! {:?}&quot;</span>, err);
+      </span><span class="macro">warn!</span>(<span class="string">"Failed to mmap! {:?}"</span>, err);
       <span class="kw">return </span><span class="prelude-val">Err</span>(RegisterError::MMapFail);
     }
   };
@@ -571,22 +572,22 @@
   <span class="comment">//let mut m = match map_physical_mem_write(addr_space, 0x0, size) {
     </span><span class="prelude-val">Ok</span>(m) =&gt; m,
     <span class="prelude-val">Err</span>(err) =&gt; {
-      <span class="macro">warn!</span>(<span class="string">&quot;Failed to mmap: {:?}&quot;</span>, err);
+      <span class="macro">warn!</span>(<span class="string">"Failed to mmap: {:?}"</span>, err);
       <span class="kw">return </span><span class="prelude-val">Err</span>(RegisterError::MMapFail);
     }
   };
   <span class="kw">let </span>p = m.as_ptr() <span class="kw">as </span><span class="kw-2">*const </span>u8;
-  <span class="comment">//println!(&quot;Trying to get slice from raw parts&quot;);
+  <span class="comment">//println!("Trying to get slice from raw parts");
   </span><span class="kw">let </span>slice = ptr::slice_from_raw_parts(p, size);
   <span class="comment">//let mut bytestream : Vec::&lt;u8&gt;;
   </span><span class="kw">let </span><span class="kw-2">mut </span>bytestream = Vec::&lt;u8&gt;::with_capacity(<span class="number">200000</span>);
-  <span class="macro">println!</span>(<span class="string">&quot;Trying to get bytestream from raw parts!&quot;</span>);
+  <span class="macro">println!</span>(<span class="string">"Trying to get bytestream from raw parts!"</span>);
   <span class="kw">unsafe </span>{
     <span class="comment">//bytestream = Vec::from_raw_parts(p as *mut u8, size, size);
     </span>bytestream.extend_from_slice(<span class="kw-2">&amp;*</span>slice); 
   }
   streamer.consume(<span class="kw-2">&amp;mut </span>bytestream);
-  <span class="macro">println!</span>(<span class="string">&quot;.. done!&quot;</span>);
+  <span class="macro">println!</span>(<span class="string">".. done!"</span>);
   <span class="comment">//Ok(bytestream)
   </span><span class="prelude-val">Ok</span>(())
 }

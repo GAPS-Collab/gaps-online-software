@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/indicatif-0.17.8/src/multi.rs`."><title>multi.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="indicatif" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/indicatif-0.17.8/src/multi.rs`."><title>multi.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="indicatif" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -700,14 +701,14 @@
 <span class="kw">use </span>std::io;
 <span class="kw">use </span>std::sync::{Arc, RwLock};
 <span class="kw">use </span>std::thread::panicking;
-<span class="attr">#[cfg(not(target_arch = <span class="string">&quot;wasm32&quot;</span>))]
+<span class="attr">#[cfg(not(target_arch = <span class="string">"wasm32"</span>))]
 </span><span class="kw">use </span>std::time::Instant;
 
 <span class="kw">use </span><span class="kw">crate</span>::draw_target::{
     visual_line_count, DrawState, DrawStateWrapper, LineAdjust, ProgressDrawTarget, VisualLines,
 };
 <span class="kw">use </span><span class="kw">crate</span>::progress_bar::ProgressBar;
-<span class="attr">#[cfg(target_arch = <span class="string">&quot;wasm32&quot;</span>)]
+<span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span>instant::Instant;
 
 <span class="doccomment">/// Manages multiple progress bars from different threads
@@ -875,7 +876,7 @@
 
     <span class="doccomment">/// Hide all progress bars temporarily, execute `f`, then redraw the [`MultiProgress`]
     ///
-    /// Executes &#39;f&#39; even if the draw target is hidden.
+    /// Executes 'f' even if the draw target is hidden.
     ///
     /// Useful for external code that writes to the standard output.
     ///
@@ -954,7 +955,7 @@
         <span class="comment">// Track the total number of zombie lines on the screen
         </span><span class="self">self</span>.zombie_lines_count = <span class="self">self</span>.zombie_lines_count.saturating_add(line_count);
 
-        <span class="comment">// Make `DrawTarget` forget about the zombie lines so that they aren&#39;t cleared on next draw.
+        <span class="comment">// Make `DrawTarget` forget about the zombie lines so that they aren't cleared on next draw.
         </span><span class="self">self</span>.draw_target
             .adjust_last_line_count(LineAdjust::Keep(line_count));
 
@@ -984,7 +985,7 @@
 
         <span class="kw">let </span><span class="kw-2">mut </span>reap_indices = <span class="macro">vec!</span>[];
 
-        <span class="comment">// Reap all consecutive &#39;zombie&#39; progress bars from head of the list.
+        <span class="comment">// Reap all consecutive 'zombie' progress bars from head of the list.
         </span><span class="kw">let </span><span class="kw-2">mut </span>adjust = VisualLines::default();
         <span class="kw">for </span><span class="kw-2">&amp;</span>index <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.ordering {
             <span class="kw">let </span>member = <span class="kw-2">&amp;</span><span class="self">self</span>.members[index];
@@ -1049,7 +1050,7 @@
         }
 
         <span class="comment">// The zombie lines were drawn for the last time, so make `DrawTarget` forget about them
-        // so they aren&#39;t cleared on next draw.
+        // so they aren't cleared on next draw.
         </span><span class="kw">if </span>extra_lines.is_none() {
             <span class="self">self</span>.draw_target
                 .adjust_last_line_count(LineAdjust::Keep(adjust));
@@ -1061,7 +1062,7 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>println&lt;I: AsRef&lt;str&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, msg: I, now: Instant) -&gt; io::Result&lt;()&gt; {
         <span class="kw">let </span>msg = msg.as_ref();
 
-        <span class="comment">// If msg is &quot;&quot;, make sure a line is still printed
+        <span class="comment">// If msg is "", make sure a line is still printed
         </span><span class="kw">let </span>lines: Vec&lt;String&gt; = <span class="kw">match </span>msg.is_empty() {
             <span class="bool-val">false </span>=&gt; msg.lines().map(Into::into).collect(),
             <span class="bool-val">true </span>=&gt; <span class="macro">vec!</span>[String::new()],
@@ -1070,9 +1071,9 @@
         <span class="self">self</span>.draw(<span class="bool-val">true</span>, <span class="prelude-val">Some</span>(lines), now)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>draw_state(<span class="kw-2">&amp;mut </span><span class="self">self</span>, idx: usize) -&gt; DrawStateWrapper&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>draw_state(<span class="kw-2">&amp;mut </span><span class="self">self</span>, idx: usize) -&gt; DrawStateWrapper&lt;<span class="lifetime">'_</span>&gt; {
         <span class="kw">let </span>member = <span class="self">self</span>.members.get_mut(idx).unwrap();
-        <span class="comment">// alignment is handled by the `MultiProgress`&#39;s underlying draw target, so there is no
+        <span class="comment">// alignment is handled by the `MultiProgress`'s underlying draw target, so there is no
         // point in propagating it here.
         </span><span class="kw">let </span>state = member.draw_state.get_or_insert(DrawState {
             move_cursor: <span class="self">self</span>.move_cursor,
@@ -1129,7 +1130,7 @@
         <span class="macro">assert_eq!</span>(
             <span class="self">self</span>.len(),
             <span class="self">self</span>.ordering.len(),
-            <span class="string">&quot;Draw state is inconsistent&quot;
+            <span class="string">"Draw state is inconsistent"
         </span>);
 
         idx
@@ -1159,7 +1160,7 @@
         <span class="macro">assert_eq!</span>(
             <span class="self">self</span>.len(),
             <span class="self">self</span>.ordering.len(),
-            <span class="string">&quot;Draw state is inconsistent&quot;
+            <span class="string">"Draw state is inconsistent"
         </span>);
     }
 
@@ -1170,7 +1171,7 @@
 
 <span class="attr">#[derive(Default)]
 </span><span class="kw">struct </span>MultiStateMember {
-    <span class="doccomment">/// Draw state will be `None` for members that haven&#39;t been drawn before, or for entries that
+    <span class="doccomment">/// Draw state will be `None` for members that haven't been drawn before, or for entries that
     /// correspond to something in the free set.
     </span>draw_state: <span class="prelude-ty">Option</span>&lt;DrawState&gt;,
     <span class="doccomment">/// Whether the corresponding progress bar (more precisely, `BarState`) has been dropped.
@@ -1178,10 +1179,10 @@
 }
 
 <span class="kw">impl </span>Debug <span class="kw">for </span>MultiStateMember {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
-        f.debug_struct(<span class="string">&quot;MultiStateElement&quot;</span>)
-            .field(<span class="string">&quot;draw_state&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.draw_state)
-            .field(<span class="string">&quot;is_zombie&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.is_zombie)
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; std::fmt::Result {
+        f.debug_struct(<span class="string">"MultiStateElement"</span>)
+            .field(<span class="string">"draw_state"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.draw_state)
+            .field(<span class="string">"is_zombie"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.is_zombie)
             .finish_non_exhaustive()
     }
 }

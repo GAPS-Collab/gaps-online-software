@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.25.0/src/text/span.rs`."><title>span.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.25.0/src/text/span.rs`."><title>span.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><a class="sub-logo-container" href="../../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -430,12 +431,12 @@
 /// ```rust
 /// use ratatui::prelude::*;
 ///
-/// let span = Span::raw(&quot;test content&quot;);
-/// let span = Span::raw(String::from(&quot;test content&quot;));
-/// let span = Span::from(&quot;test content&quot;);
-/// let span = Span::from(String::from(&quot;test content&quot;));
-/// let span: Span = &quot;test content&quot;.into();
-/// let span: Span = String::from(&quot;test content&quot;).into();
+/// let span = Span::raw("test content");
+/// let span = Span::raw(String::from("test content"));
+/// let span = Span::from("test content");
+/// let span = Span::from(String::from("test content"));
+/// let span: Span = "test content".into();
+/// let span: Span = String::from("test content").into();
 /// ```
 ///
 /// Styled spans can be created using [`Span::styled`] or by converting strings using methods from
@@ -444,12 +445,12 @@
 /// ```rust
 /// use ratatui::prelude::*;
 ///
-/// let span = Span::styled(&quot;test content&quot;, Style::new().green());
-/// let span = Span::styled(String::from(&quot;test content&quot;), Style::new().green());
+/// let span = Span::styled("test content", Style::new().green());
+/// let span = Span::styled(String::from("test content"), Style::new().green());
 ///
 /// // using Stylize trait shortcuts
-/// let span = &quot;test content&quot;.green();
-/// let span = String::from(&quot;test content&quot;).green();
+/// let span = "test content".green();
+/// let span = String::from("test content").green();
 /// ```
 ///
 /// `Span` implements the [`Styled`] trait, which allows it to be styled using the shortcut methods
@@ -458,8 +459,8 @@
 /// ```rust
 /// use ratatui::prelude::*;
 ///
-/// let span = Span::raw(&quot;test content&quot;).green().on_yellow().italic();
-/// let span = Span::raw(String::from(&quot;test content&quot;))
+/// let span = Span::raw("test content").green().on_yellow().italic();
+/// let span = Span::raw(String::from("test content"))
 ///     .green()
 ///     .on_yellow()
 ///     .italic();
@@ -469,26 +470,26 @@
 /// [`Stylize`]: crate::style::Stylize
 /// [`Cow&lt;str&gt;`]: std::borrow::Cow
 </span><span class="attr">#[derive(Debug, Default, Clone, Eq, PartialEq, Hash)]
-</span><span class="kw">pub struct </span>Span&lt;<span class="lifetime">&#39;a</span>&gt; {
+</span><span class="kw">pub struct </span>Span&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// The content of the span as a Clone-on-write string.
-    </span><span class="kw">pub </span>content: Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;,
+    </span><span class="kw">pub </span>content: Cow&lt;<span class="lifetime">'a</span>, str&gt;,
     <span class="doccomment">/// The style of the span.
     </span><span class="kw">pub </span>style: Style,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Span&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Span&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Create a span with the default style.
     ///
     /// # Examples
     ///
     /// ```rust
     /// # use ratatui::prelude::*;
-    /// Span::raw(&quot;test content&quot;);
-    /// Span::raw(String::from(&quot;test content&quot;));
+    /// Span::raw("test content");
+    /// Span::raw(String::from("test content"));
     /// ```
-    </span><span class="kw">pub fn </span>raw&lt;T&gt;(content: T) -&gt; Span&lt;<span class="lifetime">&#39;a</span>&gt;
+    </span><span class="kw">pub fn </span>raw&lt;T&gt;(content: T) -&gt; Span&lt;<span class="lifetime">'a</span>&gt;
     <span class="kw">where
-        </span>T: Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
+        </span>T: Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
     {
         Span {
             content: content.into(),
@@ -503,12 +504,12 @@
     /// ```rust
     /// # use ratatui::prelude::*;
     /// let style = Style::new().yellow().on_green().italic();
-    /// Span::styled(&quot;test content&quot;, style);
-    /// Span::styled(String::from(&quot;test content&quot;), style);
+    /// Span::styled("test content", style);
+    /// Span::styled(String::from("test content"), style);
     /// ```
-    </span><span class="kw">pub fn </span>styled&lt;T&gt;(content: T, style: Style) -&gt; Span&lt;<span class="lifetime">&#39;a</span>&gt;
+    </span><span class="kw">pub fn </span>styled&lt;T&gt;(content: T, style: Style) -&gt; Span&lt;<span class="lifetime">'a</span>&gt;
     <span class="kw">where
-        </span>T: Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
+        </span>T: Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
     {
         Span {
             content: content.into(),
@@ -527,12 +528,12 @@
     ///
     /// ```rust
     /// # use ratatui::prelude::*;
-    /// let mut span = Span::default().content(&quot;content&quot;);
+    /// let mut span = Span::default().content("content");
     /// ```
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>content&lt;T&gt;(<span class="kw-2">mut </span><span class="self">self</span>, content: T) -&gt; <span class="self">Self
     </span><span class="kw">where
-        </span>T: Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
+        </span>T: Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
     {
         <span class="self">self</span>.content = content.into();
         <span class="self">self
@@ -553,7 +554,7 @@
     /// # use ratatui::prelude::*;
     /// let mut span = Span::default().style(Style::new().green());
     /// ```
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>style&lt;T&gt;(<span class="kw-2">mut </span><span class="self">self</span>, style: T) -&gt; <span class="self">Self
     </span><span class="kw">where
         </span>T: Into&lt;Style&gt;,
@@ -568,7 +569,7 @@
     ///
     /// ```rust
     /// # use ratatui::prelude::*;
-    /// let mut span = Span::styled(&quot;test content&quot;, Style::new().green().italic());
+    /// let mut span = Span::styled("test content", Style::new().green().italic());
     /// span.patch_style(Style::new().red().on_yellow().bold());
     /// assert_eq!(span.style, Style::new().red().on_yellow().italic().bold());
     /// ```
@@ -584,7 +585,7 @@
     ///
     /// ```rust
     /// # use ratatui::prelude::*;
-    /// let mut span = Span::styled(&quot;Test Content&quot;, Style::new().green().on_yellow().italic());
+    /// let mut span = Span::styled("Test Content", Style::new().green().on_yellow().italic());
     /// span.reset_style();
     /// assert_eq!(span.style, Style::reset());
     /// ```
@@ -599,7 +600,7 @@
 
     <span class="doccomment">/// Returns an iterator over the graphemes held by this span.
     ///
-    /// `base_style` is the [`Style`] that will be patched with the `Span`&#39;s `style` to get the
+    /// `base_style` is the [`Style`] that will be patched with the `Span`'s `style` to get the
     /// resulting [`Style`].
     ///
     /// # Example
@@ -609,27 +610,27 @@
     ///
     /// use ratatui::{prelude::*, text::StyledGrapheme};
     ///
-    /// let span = Span::styled(&quot;Test&quot;, Style::new().green().italic());
+    /// let span = Span::styled("Test", Style::new().green().italic());
     /// let style = Style::new().red().on_yellow();
     /// assert_eq!(
     ///     span.styled_graphemes(style)
     ///         .collect::&lt;Vec&lt;StyledGrapheme&gt;&gt;(),
     ///     vec![
-    ///         StyledGrapheme::new(&quot;T&quot;, Style::new().green().on_yellow().italic()),
-    ///         StyledGrapheme::new(&quot;e&quot;, Style::new().green().on_yellow().italic()),
-    ///         StyledGrapheme::new(&quot;s&quot;, Style::new().green().on_yellow().italic()),
-    ///         StyledGrapheme::new(&quot;t&quot;, Style::new().green().on_yellow().italic()),
+    ///         StyledGrapheme::new("T", Style::new().green().on_yellow().italic()),
+    ///         StyledGrapheme::new("e", Style::new().green().on_yellow().italic()),
+    ///         StyledGrapheme::new("s", Style::new().green().on_yellow().italic()),
+    ///         StyledGrapheme::new("t", Style::new().green().on_yellow().italic()),
     ///     ],
     /// );
     /// ```
     </span><span class="kw">pub fn </span>styled_graphemes(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
+        <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="self">self</span>,
         base_style: Style,
-    ) -&gt; <span class="kw">impl </span>Iterator&lt;Item = StyledGrapheme&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+    ) -&gt; <span class="kw">impl </span>Iterator&lt;Item = StyledGrapheme&lt;<span class="lifetime">'a</span>&gt;&gt; {
         <span class="self">self</span>.content
             .as_ref()
             .graphemes(<span class="bool-val">true</span>)
-            .filter(|g| <span class="kw-2">*</span>g != <span class="string">&quot;\n&quot;</span>)
+            .filter(|g| <span class="kw-2">*</span>g != <span class="string">"\n"</span>)
             .map(<span class="kw">move </span>|g| StyledGrapheme {
                 symbol: g,
                 style: base_style.patch(<span class="self">self</span>.style),
@@ -637,17 +638,17 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T&gt; From&lt;T&gt; <span class="kw">for </span>Span&lt;<span class="lifetime">&#39;a</span>&gt;
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, T&gt; From&lt;T&gt; <span class="kw">for </span>Span&lt;<span class="lifetime">'a</span>&gt;
 <span class="kw">where
-    </span>T: Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
+    </span>T: Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
 {
     <span class="kw">fn </span>from(s: T) -&gt; <span class="self">Self </span>{
         Span::raw(s.into())
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Styled <span class="kw">for </span>Span&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">type </span>Item = Span&lt;<span class="lifetime">&#39;a</span>&gt;;
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Styled <span class="kw">for </span>Span&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">type </span>Item = Span&lt;<span class="lifetime">'a</span>&gt;;
 
     <span class="kw">fn </span>style(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Style {
         <span class="self">self</span>.style
@@ -667,20 +668,20 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>default() {
         <span class="kw">let </span>span = Span::default();
-        <span class="macro">assert_eq!</span>(span.content, Cow::Borrowed(<span class="string">&quot;&quot;</span>));
+        <span class="macro">assert_eq!</span>(span.content, Cow::Borrowed(<span class="string">""</span>));
         <span class="macro">assert_eq!</span>(span.style, Style::default());
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>raw_str() {
-        <span class="kw">let </span>span = Span::raw(<span class="string">&quot;test content&quot;</span>);
-        <span class="macro">assert_eq!</span>(span.content, Cow::Borrowed(<span class="string">&quot;test content&quot;</span>));
+        <span class="kw">let </span>span = Span::raw(<span class="string">"test content"</span>);
+        <span class="macro">assert_eq!</span>(span.content, Cow::Borrowed(<span class="string">"test content"</span>));
         <span class="macro">assert_eq!</span>(span.style, Style::default());
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>raw_string() {
-        <span class="kw">let </span>content = String::from(<span class="string">&quot;test content&quot;</span>);
+        <span class="kw">let </span>content = String::from(<span class="string">"test content"</span>);
         <span class="kw">let </span>span = Span::raw(content.clone());
         <span class="macro">assert_eq!</span>(span.content, Cow::Owned::&lt;str&gt;(content));
         <span class="macro">assert_eq!</span>(span.style, Style::default());
@@ -689,14 +690,14 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>styled_str() {
         <span class="kw">let </span>style = Style::new().red();
-        <span class="kw">let </span>span = Span::styled(<span class="string">&quot;test content&quot;</span>, style);
-        <span class="macro">assert_eq!</span>(span.content, Cow::Borrowed(<span class="string">&quot;test content&quot;</span>));
+        <span class="kw">let </span>span = Span::styled(<span class="string">"test content"</span>, style);
+        <span class="macro">assert_eq!</span>(span.content, Cow::Borrowed(<span class="string">"test content"</span>));
         <span class="macro">assert_eq!</span>(span.style, Style::new().red());
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>styled_string() {
-        <span class="kw">let </span>content = String::from(<span class="string">&quot;test content&quot;</span>);
+        <span class="kw">let </span>content = String::from(<span class="string">"test content"</span>);
         <span class="kw">let </span>style = Style::new().green();
         <span class="kw">let </span>span = Span::styled(content.clone(), style);
         <span class="macro">assert_eq!</span>(span.content, Cow::Owned::&lt;str&gt;(content));
@@ -705,8 +706,8 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>set_content() {
-        <span class="kw">let </span>span = Span::default().content(<span class="string">&quot;test content&quot;</span>);
-        <span class="macro">assert_eq!</span>(span.content, Cow::Borrowed(<span class="string">&quot;test content&quot;</span>));
+        <span class="kw">let </span>span = Span::default().content(<span class="string">"test content"</span>);
+        <span class="macro">assert_eq!</span>(span.content, Cow::Borrowed(<span class="string">"test content"</span>));
     }
 
     <span class="attr">#[test]
@@ -717,7 +718,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>from_ref_str_borrowed_cow() {
-        <span class="kw">let </span>content = <span class="string">&quot;test content&quot;</span>;
+        <span class="kw">let </span>content = <span class="string">"test content"</span>;
         <span class="kw">let </span>span = Span::from(content);
         <span class="macro">assert_eq!</span>(span.content, Cow::Borrowed(content));
         <span class="macro">assert_eq!</span>(span.style, Style::default());
@@ -725,7 +726,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>from_string_ref_str_borrowed_cow() {
-        <span class="kw">let </span>content = String::from(<span class="string">&quot;test content&quot;</span>);
+        <span class="kw">let </span>content = String::from(<span class="string">"test content"</span>);
         <span class="kw">let </span>span = Span::from(content.as_str());
         <span class="macro">assert_eq!</span>(span.content, Cow::Borrowed(content.as_str()));
         <span class="macro">assert_eq!</span>(span.style, Style::default());
@@ -733,7 +734,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>from_string_owned_cow() {
-        <span class="kw">let </span>content = String::from(<span class="string">&quot;test content&quot;</span>);
+        <span class="kw">let </span>content = String::from(<span class="string">"test content"</span>);
         <span class="kw">let </span>span = Span::from(content.clone());
         <span class="macro">assert_eq!</span>(span.content, Cow::Owned::&lt;str&gt;(content));
         <span class="macro">assert_eq!</span>(span.style, Style::default());
@@ -741,7 +742,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>from_ref_string_borrowed_cow() {
-        <span class="kw">let </span>content = String::from(<span class="string">&quot;test content&quot;</span>);
+        <span class="kw">let </span>content = String::from(<span class="string">"test content"</span>);
         <span class="kw">let </span>span = Span::from(<span class="kw-2">&amp;</span>content);
         <span class="macro">assert_eq!</span>(span.content, Cow::Borrowed(content.as_str()));
         <span class="macro">assert_eq!</span>(span.style, Style::default());
@@ -749,34 +750,34 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>reset_style() {
-        <span class="kw">let </span><span class="kw-2">mut </span>span = Span::styled(<span class="string">&quot;test content&quot;</span>, Style::new().green());
+        <span class="kw">let </span><span class="kw-2">mut </span>span = Span::styled(<span class="string">"test content"</span>, Style::new().green());
         span.reset_style();
         <span class="macro">assert_eq!</span>(span.style, Style::reset());
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>patch_style() {
-        <span class="kw">let </span><span class="kw-2">mut </span>span = Span::styled(<span class="string">&quot;test content&quot;</span>, Style::new().green().on_yellow());
+        <span class="kw">let </span><span class="kw-2">mut </span>span = Span::styled(<span class="string">"test content"</span>, Style::new().green().on_yellow());
         span.patch_style(Style::new().red().bold());
         <span class="macro">assert_eq!</span>(span.style, Style::new().red().on_yellow().bold());
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>width() {
-        <span class="macro">assert_eq!</span>(Span::raw(<span class="string">&quot;&quot;</span>).width(), <span class="number">0</span>);
-        <span class="macro">assert_eq!</span>(Span::raw(<span class="string">&quot;test&quot;</span>).width(), <span class="number">4</span>);
-        <span class="macro">assert_eq!</span>(Span::raw(<span class="string">&quot;test content&quot;</span>).width(), <span class="number">12</span>);
+        <span class="macro">assert_eq!</span>(Span::raw(<span class="string">""</span>).width(), <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(Span::raw(<span class="string">"test"</span>).width(), <span class="number">4</span>);
+        <span class="macro">assert_eq!</span>(Span::raw(<span class="string">"test content"</span>).width(), <span class="number">12</span>);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>stylize() {
-        <span class="kw">let </span>span = Span::raw(<span class="string">&quot;test content&quot;</span>).green();
-        <span class="macro">assert_eq!</span>(span.content, Cow::Borrowed(<span class="string">&quot;test content&quot;</span>));
+        <span class="kw">let </span>span = Span::raw(<span class="string">"test content"</span>).green();
+        <span class="macro">assert_eq!</span>(span.content, Cow::Borrowed(<span class="string">"test content"</span>));
         <span class="macro">assert_eq!</span>(span.style, Style::new().green());
 
-        <span class="kw">let </span>span = Span::styled(<span class="string">&quot;test content&quot;</span>, Style::new().green());
+        <span class="kw">let </span>span = Span::styled(<span class="string">"test content"</span>, Style::new().green());
         <span class="kw">let </span>stylized = span.on_yellow().bold();
-        <span class="macro">assert_eq!</span>(stylized.content, Cow::Borrowed(<span class="string">&quot;test content&quot;</span>));
+        <span class="macro">assert_eq!</span>(stylized.content, Cow::Borrowed(<span class="string">"test content"</span>));
         <span class="macro">assert_eq!</span>(stylized.style, Style::new().green().on_yellow().bold());
     }
 }

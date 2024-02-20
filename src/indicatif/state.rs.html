@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/indicatif-0.17.8/src/state.rs`."><title>state.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="indicatif" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/indicatif-0.17.8/src/state.rs`."><title>state.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="indicatif" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -804,10 +805,10 @@
 <span class="kw">use </span>std::io;
 <span class="kw">use </span>std::sync::Arc;
 <span class="kw">use </span>std::time::Duration;
-<span class="attr">#[cfg(not(target_arch = <span class="string">&quot;wasm32&quot;</span>))]
+<span class="attr">#[cfg(not(target_arch = <span class="string">"wasm32"</span>))]
 </span><span class="kw">use </span>std::time::Instant;
 
-<span class="attr">#[cfg(target_arch = <span class="string">&quot;wasm32&quot;</span>)]
+<span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span>instant::Instant;
 <span class="kw">use </span>portable_atomic::{AtomicU64, AtomicU8, Ordering};
 
@@ -865,7 +866,7 @@
             }
         }
 
-        <span class="comment">// There&#39;s no need to update the estimate here; once the `status` is no longer
+        <span class="comment">// There's no need to update the estimate here; once the `status` is no longer
         // `InProgress`, we will use the length and elapsed time to estimate.
         </span><span class="kw">let _ </span>= <span class="self">self</span>.draw(<span class="bool-val">true</span>, now);
     }
@@ -984,7 +985,7 @@
         <span class="kw">let </span>width = <span class="self">self</span>.draw_target.width();
 
         <span class="comment">// `|= self.is_finished()` should not be needed here, but we used to always draw for
-        // finished progress bars, so it&#39;s kept as to not cause compatibility issues in weird cases.
+        // finished progress bars, so it's kept as to not cause compatibility issues in weird cases.
         </span>force_draw |= <span class="self">self</span>.state.is_finished();
         <span class="kw">let </span><span class="kw-2">mut </span>drawable = <span class="kw">match </span><span class="self">self</span>.draw_target.drawable(force_draw, now) {
             <span class="prelude-val">Some</span>(drawable) =&gt; drawable,
@@ -1008,7 +1009,7 @@
 <span class="kw">impl </span>Drop <span class="kw">for </span>BarState {
     <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="comment">// Progress bar is already finished.  Do not need to do anything other than notify
-        // the `MultiProgress` that we&#39;re now a zombie.
+        // the `MultiProgress` that we're now a zombie.
         </span><span class="kw">if </span><span class="self">self</span>.state.is_finished() {
             <span class="self">self</span>.draw_target.mark_zombie();
             <span class="kw">return</span>;
@@ -1016,7 +1017,7 @@
 
         <span class="self">self</span>.finish_using_style(Instant::now(), <span class="self">self</span>.on_finish.clone());
 
-        <span class="comment">// Notify the `MultiProgress` that we&#39;re now a zombie.
+        <span class="comment">// Notify the `MultiProgress` that we're now a zombie.
         </span><span class="self">self</span>.draw_target.mark_zombie();
     }
 }
@@ -1050,8 +1051,8 @@
             status: Status::InProgress,
             started: now,
             est: Estimator::new(now),
-            message: TabExpandedString::NoTabs(<span class="string">&quot;&quot;</span>.into()),
-            prefix: TabExpandedString::NoTabs(<span class="string">&quot;&quot;</span>.into()),
+            message: TabExpandedString::NoTabs(<span class="string">""</span>.into()),
+            prefix: TabExpandedString::NoTabs(<span class="string">""</span>.into()),
         }
     }
 
@@ -1091,7 +1092,7 @@
 
         <span class="kw">let </span>sps = <span class="self">self</span>.est.steps_per_second(Instant::now());
 
-        <span class="comment">// Infinite duration should only ever happen at the beginning, so in this case it&#39;s okay to
+        <span class="comment">// Infinite duration should only ever happen at the beginning, so in this case it's okay to
         // just show an ETA of 0 until progress starts to occur.
         </span><span class="kw">if </span>sps == <span class="number">0.0 </span>{
             <span class="kw">return </span>Duration::new(<span class="number">0</span>, <span class="number">0</span>);
@@ -1141,17 +1142,17 @@
 
 <span class="attr">#[derive(Debug, PartialEq, Eq, Clone)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>TabExpandedString {
-    NoTabs(Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;),
+    NoTabs(Cow&lt;<span class="lifetime">'static</span>, str&gt;),
     WithTabs {
-        original: Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;,
+        original: Cow&lt;<span class="lifetime">'static</span>, str&gt;,
         expanded: String,
         tab_width: usize,
     },
 }
 
 <span class="kw">impl </span>TabExpandedString {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(s: Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;, tab_width: usize) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span>expanded = s.replace(<span class="string">&#39;\t&#39;</span>, <span class="kw-2">&amp;</span><span class="string">&quot; &quot;</span>.repeat(tab_width));
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(s: Cow&lt;<span class="lifetime">'static</span>, str&gt;, tab_width: usize) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>expanded = s.replace(<span class="string">'\t'</span>, <span class="kw-2">&amp;</span><span class="string">" "</span>.repeat(tab_width));
         <span class="kw">if </span>s == expanded {
             <span class="self">Self</span>::NoTabs(s)
         } <span class="kw">else </span>{
@@ -1166,7 +1167,7 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>expanded(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
         <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self </span>{
             <span class="self">Self</span>::NoTabs(s) =&gt; {
-                <span class="macro">debug_assert!</span>(!s.contains(<span class="string">&#39;\t&#39;</span>));
+                <span class="macro">debug_assert!</span>(!s.contains(<span class="string">'\t'</span>));
                 s
             }
             <span class="self">Self</span>::WithTabs { expanded, .. } =&gt; expanded,
@@ -1182,7 +1183,7 @@
         </span>{
             <span class="kw">if </span><span class="kw-2">*</span>tab_width != new_tab_width {
                 <span class="kw-2">*</span>tab_width = new_tab_width;
-                <span class="kw-2">*</span>expanded = original.replace(<span class="string">&#39;\t&#39;</span>, <span class="kw-2">&amp;</span><span class="string">&quot; &quot;</span>.repeat(new_tab_width));
+                <span class="kw-2">*</span>expanded = original.replace(<span class="string">'\t'</span>, <span class="kw-2">&amp;</span><span class="string">" "</span>.repeat(new_tab_width));
             }
         }
     }
@@ -1225,7 +1226,7 @@
     }
 
     <span class="kw">fn </span>record(<span class="kw-2">&amp;mut </span><span class="self">self</span>, new_steps: u64, now: Instant) {
-        <span class="comment">// sanity check: don&#39;t record data if time or steps have not advanced
+        <span class="comment">// sanity check: don't record data if time or steps have not advanced
         </span><span class="kw">if </span>new_steps &lt;= <span class="self">self</span>.prev_steps || now &lt;= <span class="self">self</span>.prev_time {
             <span class="comment">// Reset on backwards seek to prevent breakage from seeking to the end for length determination
             // See https://github.com/console-rs/indicatif/issues/480
@@ -1355,7 +1356,7 @@
 
         <span class="comment">// We now calculate `new`, the number of ms, in ns, since we last returned `true`,
         // and `remainder`, which represents a number of ns less than 1ms which we cannot
-        // convert into capacity now, so we&#39;re saving it for later. We do this by
+        // convert into capacity now, so we're saving it for later. We do this by
         // substracting this from `elapsed` before storing it into `self.prev`.
         </span><span class="kw">let </span>(new, remainder) = ((diff / INTERVAL), (diff % INTERVAL));
         <span class="comment">// We add `new` to `capacity`, subtract one for returning `true` from here,
@@ -1403,7 +1404,7 @@
     <span class="doccomment">/// Finishes the progress bar and sets a message
     ///
     /// Same behavior as calling [`ProgressBar::finish_with_message()`](crate::ProgressBar::finish_with_message).
-    </span>WithMessage(Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;),
+    </span>WithMessage(Cow&lt;<span class="lifetime">'static</span>, str&gt;),
     <span class="doccomment">/// Finishes the progress bar and completely clears it (this is the default)
     ///
     /// Same behavior as calling [`ProgressBar::finish_and_clear()`](crate::ProgressBar::finish_and_clear).
@@ -1415,7 +1416,7 @@
     <span class="doccomment">/// Finishes the progress bar and sets a message, and leaves the current progress
     ///
     /// Same behavior as calling [`ProgressBar::abandon_with_message()`](crate::ProgressBar::abandon_with_message).
-    </span>AbandonWithMessage(Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;),
+    </span>AbandonWithMessage(Cow&lt;<span class="lifetime">'static</span>, str&gt;),
 }
 
 <span class="kw">impl </span>Default <span class="kw">for </span>ProgressFinish {
@@ -1424,7 +1425,7 @@
     }
 }
 
-<span class="doccomment">/// Get the appropriate dilution weight for Estimator data given the data&#39;s age (in seconds)
+<span class="doccomment">/// Get the appropriate dilution weight for Estimator data given the data's age (in seconds)
 ///
 /// Whenever an update occurs, we will create a new estimate using a weight `w_i` like so:
 ///
@@ -1500,7 +1501,7 @@
             <span class="kw">let </span>relative_error = absolute_error / items_per_second <span class="kw">as </span>f64;
             <span class="macro">assert!</span>(
                 relative_error &lt; <span class="number">1.0 </span>/ <span class="number">1e9</span>,
-                <span class="string">&quot;Expected rate: {}, actual: {}, relative error: {}&quot;</span>,
+                <span class="string">"Expected rate: {}, actual: {}, relative error: {}"</span>,
                 items_per_second,
                 avg_steps_per_second,
                 relative_error

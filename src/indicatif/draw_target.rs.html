@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/indicatif-0.17.8/src/draw_target.rs`."><title>draw_target.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="indicatif" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/indicatif-0.17.8/src/draw_target.rs`."><title>draw_target.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="indicatif" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -732,11 +733,11 @@
 <span class="kw">use </span>std::sync::{Arc, RwLock, RwLockWriteGuard};
 <span class="kw">use </span>std::thread::panicking;
 <span class="kw">use </span>std::time::Duration;
-<span class="attr">#[cfg(not(target_arch = <span class="string">&quot;wasm32&quot;</span>))]
+<span class="attr">#[cfg(not(target_arch = <span class="string">"wasm32"</span>))]
 </span><span class="kw">use </span>std::time::Instant;
 
 <span class="kw">use </span>console::Term;
-<span class="attr">#[cfg(target_arch = <span class="string">&quot;wasm32&quot;</span>)]
+<span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span>instant::Instant;
 
 <span class="kw">use </span><span class="kw">crate</span>::multi::{MultiProgressAlignment, MultiState};
@@ -875,7 +876,7 @@
     }
 
     <span class="doccomment">/// Apply the given draw state (draws it).
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>drawable(<span class="kw-2">&amp;mut </span><span class="self">self</span>, force_draw: bool, now: Instant) -&gt; <span class="prelude-ty">Option</span>&lt;Drawable&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>drawable(<span class="kw-2">&amp;mut </span><span class="self">self</span>, force_draw: bool, now: Instant) -&gt; <span class="prelude-ty">Option</span>&lt;Drawable&lt;<span class="lifetime">'_</span>&gt;&gt; {
         <span class="kw">match </span><span class="kw-2">&amp;mut </span><span class="self">self</span>.kind {
             TargetKind::Term {
                 term,
@@ -995,26 +996,26 @@
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>Drawable&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>Drawable&lt;<span class="lifetime">'a</span>&gt; {
     Term {
-        term: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Term,
-        last_line_count: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>VisualLines,
-        draw_state: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>DrawState,
+        term: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Term,
+        last_line_count: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>VisualLines,
+        draw_state: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>DrawState,
     },
     Multi {
-        state: RwLockWriteGuard&lt;<span class="lifetime">&#39;a</span>, MultiState&gt;,
+        state: RwLockWriteGuard&lt;<span class="lifetime">'a</span>, MultiState&gt;,
         idx: usize,
         force_draw: bool,
         now: Instant,
     },
     TermLike {
-        term_like: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw">dyn </span>TermLike,
-        last_line_count: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>VisualLines,
-        draw_state: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>DrawState,
+        term_like: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw">dyn </span>TermLike,
+        last_line_count: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>VisualLines,
+        draw_state: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>DrawState,
     },
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Drawable&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Drawable&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Adjust `last_line_count` such that the next draw operation keeps/clears additional lines
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>adjust_last_line_count(<span class="kw-2">&amp;mut </span><span class="self">self</span>, adjust: LineAdjust) {
         <span class="kw">let </span>last_line_count: <span class="kw-2">&amp;mut </span>VisualLines = <span class="kw">match </span><span class="self">self </span>{
@@ -1033,7 +1034,7 @@
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>state(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; DrawStateWrapper&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>state(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; DrawStateWrapper&lt;<span class="lifetime">'_</span>&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>state = <span class="kw">match </span><span class="self">self </span>{
             Drawable::Term { draw_state, .. } =&gt; DrawStateWrapper::for_term(draw_state),
             Drawable::Multi { state, idx, .. } =&gt; state.draw_state(<span class="kw-2">*</span>idx),
@@ -1079,20 +1080,20 @@
     </span>Keep(VisualLines),
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>DrawStateWrapper&lt;<span class="lifetime">&#39;a</span>&gt; {
-    state: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>DrawState,
-    orphan_lines: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Vec&lt;String&gt;&gt;,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>DrawStateWrapper&lt;<span class="lifetime">'a</span>&gt; {
+    state: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>DrawState,
+    orphan_lines: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>Vec&lt;String&gt;&gt;,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; DrawStateWrapper&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>for_term(state: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>DrawState) -&gt; <span class="self">Self </span>{
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; DrawStateWrapper&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>for_term(state: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>DrawState) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             state,
             orphan_lines: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>for_multi(state: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>DrawState, orphan_lines: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Vec&lt;String&gt;) -&gt; <span class="self">Self </span>{
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>for_multi(state: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>DrawState, orphan_lines: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>Vec&lt;String&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             state,
             orphan_lines: <span class="prelude-val">Some</span>(orphan_lines),
@@ -1100,7 +1101,7 @@
     }
 }
 
-<span class="kw">impl </span>std::ops::Deref <span class="kw">for </span>DrawStateWrapper&lt;<span class="lifetime">&#39;_</span>&gt; {
+<span class="kw">impl </span>std::ops::Deref <span class="kw">for </span>DrawStateWrapper&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">type </span>Target = DrawState;
 
     <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
@@ -1108,13 +1109,13 @@
     }
 }
 
-<span class="kw">impl </span>std::ops::DerefMut <span class="kw">for </span>DrawStateWrapper&lt;<span class="lifetime">&#39;_</span>&gt; {
+<span class="kw">impl </span>std::ops::DerefMut <span class="kw">for </span>DrawStateWrapper&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">fn </span>deref_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Target {
         <span class="self">self</span>.state
     }
 }
 
-<span class="kw">impl </span>Drop <span class="kw">for </span>DrawStateWrapper&lt;<span class="lifetime">&#39;_</span>&gt; {
+<span class="kw">impl </span>Drop <span class="kw">for </span>DrawStateWrapper&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="kw">if let </span><span class="prelude-val">Some</span>(orphaned) = <span class="kw-2">&amp;mut </span><span class="self">self</span>.orphan_lines {
             orphaned.extend(<span class="self">self</span>.state.lines.drain(..<span class="self">self</span>.state.orphan_lines_count));
@@ -1155,7 +1156,7 @@
 
         <span class="comment">// We now calculate `new`, the number of ms, since we last returned `true`,
         // and `remainder`, which represents a number of ns less than 1ms which we cannot
-        // convert into capacity now, so we&#39;re saving it for later.
+        // convert into capacity now, so we're saving it for later.
         </span><span class="kw">let </span>(new, remainder) = (
             elapsed.as_millis() / <span class="self">self</span>.interval <span class="kw">as </span>u128,
             elapsed.as_nanos() % (<span class="self">self</span>.interval <span class="kw">as </span>u128 * <span class="number">1_000_000</span>),
@@ -1165,7 +1166,7 @@
         // then make sure it does not exceed a maximum of `MAX_BURST`, then store it.
         </span><span class="self">self</span>.capacity = Ord::min(MAX_BURST <span class="kw">as </span>u128, (<span class="self">self</span>.capacity <span class="kw">as </span>u128) + new - <span class="number">1</span>) <span class="kw">as </span>u8;
         <span class="comment">// Store `prev` for the next iteration after subtracting the `remainder`.
-        // Just use `unwrap` here because it shouldn&#39;t be possible for this to underflow.
+        // Just use `unwrap` here because it shouldn't be possible for this to underflow.
         </span><span class="self">self</span>.prev = now
             .checked_sub(Duration::from_nanos(remainder <span class="kw">as </span>u64))
             .unwrap();
@@ -1180,7 +1181,7 @@
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>DrawState {
     <span class="doccomment">/// The lines to print (can contain ANSI codes)
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) lines: Vec&lt;String&gt;,
-    <span class="doccomment">/// The number [`Self::lines`] entries that shouldn&#39;t be reaped by the next tick.
+    <span class="doccomment">/// The number [`Self::lines`] entries that shouldn't be reaped by the next tick.
     ///
     /// Note that this number may be different than the number of visual lines required to draw [`Self::lines`].
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) orphan_lines_count: usize,
@@ -1203,7 +1204,7 @@
         <span class="kw">if </span>!<span class="self">self</span>.lines.is_empty() &amp;&amp; <span class="self">self</span>.move_cursor {
             term.move_cursor_up(last_line_count.as_usize())<span class="question-mark">?</span>;
         } <span class="kw">else </span>{
-            <span class="comment">// Fork of console::clear_last_lines that assumes that the last line doesn&#39;t contain a &#39;\n&#39;
+            <span class="comment">// Fork of console::clear_last_lines that assumes that the last line doesn't contain a '\n'
             </span><span class="kw">let </span>n = last_line_count.as_usize();
             term.move_cursor_up(n.saturating_sub(<span class="number">1</span>))<span class="question-mark">?</span>;
             <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..n {
@@ -1221,7 +1222,7 @@
             MultiProgressAlignment::Bottom <span class="kw">if </span>visual_lines &lt; <span class="kw-2">*</span>last_line_count =&gt; {
                 <span class="kw">let </span>shift = <span class="kw-2">*</span>last_line_count - visual_lines;
                 <span class="kw">for _ in </span><span class="number">0</span>..shift.as_usize() {
-                    term.write_line(<span class="string">&quot;&quot;</span>)<span class="question-mark">?</span>;
+                    term.write_line(<span class="string">""</span>)<span class="question-mark">?</span>;
                 }
                 shift
             }
@@ -1257,14 +1258,14 @@
             </span><span class="kw">if </span><span class="self">self</span>.orphan_lines_count &lt;= idx {
                 <span class="comment">// If so, then `real_len` should be at least `orphan_visual_line_count`.
                 </span><span class="macro">debug_assert!</span>(orphan_visual_line_count &lt;= real_len);
-                <span class="comment">// Don&#39;t consider orphan lines when comparing to terminal height.
+                <span class="comment">// Don't consider orphan lines when comparing to terminal height.
                 </span><span class="kw">if </span>real_len - orphan_visual_line_count + diff &gt; term_height.into() {
                     <span class="kw">break</span>;
                 }
             }
             real_len += diff;
             <span class="kw">if </span>idx != <span class="number">0 </span>{
-                term.write_line(<span class="string">&quot;&quot;</span>)<span class="question-mark">?</span>;
+                term.write_line(<span class="string">""</span>)<span class="question-mark">?</span>;
             }
             term.write_str(line)<span class="question-mark">?</span>;
             <span class="kw">if </span>idx + <span class="number">1 </span>== len {
@@ -1273,7 +1274,7 @@
                 </span>last_line_filler = term_width.saturating_sub(line_width);
             }
         }
-        term.write_str(<span class="kw-2">&amp;</span><span class="string">&quot; &quot;</span>.repeat(last_line_filler))<span class="question-mark">?</span>;
+        term.write_str(<span class="kw-2">&amp;</span><span class="string">" "</span>.repeat(last_line_filler))<span class="question-mark">?</span>;
 
         term.flush()<span class="question-mark">?</span>;
         <span class="kw-2">*</span>last_line_count = real_len - orphan_visual_line_count + shift;
@@ -1371,68 +1372,68 @@
     </span><span class="kw">fn </span>real_line_count_test() {
         <span class="attr">#[derive(Debug)]
         </span><span class="kw">struct </span>Case {
-            lines: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str],
+            lines: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>[<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str],
             expectation: usize,
             width: usize,
         }
 
         <span class="kw">let </span>lines_and_expectations = [
             Case {
-                lines: <span class="kw-2">&amp;</span>[<span class="string">&quot;1234567890&quot;</span>],
+                lines: <span class="kw-2">&amp;</span>[<span class="string">"1234567890"</span>],
                 expectation: <span class="number">1</span>,
                 width: <span class="number">10</span>,
             },
             Case {
-                lines: <span class="kw-2">&amp;</span>[<span class="string">&quot;1234567890&quot;</span>],
+                lines: <span class="kw-2">&amp;</span>[<span class="string">"1234567890"</span>],
                 expectation: <span class="number">2</span>,
                 width: <span class="number">5</span>,
             },
             Case {
-                lines: <span class="kw-2">&amp;</span>[<span class="string">&quot;1234567890&quot;</span>],
+                lines: <span class="kw-2">&amp;</span>[<span class="string">"1234567890"</span>],
                 expectation: <span class="number">3</span>,
                 width: <span class="number">4</span>,
             },
             Case {
-                lines: <span class="kw-2">&amp;</span>[<span class="string">&quot;1234567890&quot;</span>],
+                lines: <span class="kw-2">&amp;</span>[<span class="string">"1234567890"</span>],
                 expectation: <span class="number">4</span>,
                 width: <span class="number">3</span>,
             },
             Case {
-                lines: <span class="kw-2">&amp;</span>[<span class="string">&quot;1234567890&quot;</span>, <span class="string">&quot;&quot;</span>, <span class="string">&quot;1234567890&quot;</span>],
+                lines: <span class="kw-2">&amp;</span>[<span class="string">"1234567890"</span>, <span class="string">""</span>, <span class="string">"1234567890"</span>],
                 expectation: <span class="number">3</span>,
                 width: <span class="number">10</span>,
             },
             Case {
-                lines: <span class="kw-2">&amp;</span>[<span class="string">&quot;1234567890&quot;</span>, <span class="string">&quot;&quot;</span>, <span class="string">&quot;1234567890&quot;</span>],
+                lines: <span class="kw-2">&amp;</span>[<span class="string">"1234567890"</span>, <span class="string">""</span>, <span class="string">"1234567890"</span>],
                 expectation: <span class="number">5</span>,
                 width: <span class="number">5</span>,
             },
             Case {
-                lines: <span class="kw-2">&amp;</span>[<span class="string">&quot;1234567890&quot;</span>, <span class="string">&quot;&quot;</span>, <span class="string">&quot;1234567890&quot;</span>],
+                lines: <span class="kw-2">&amp;</span>[<span class="string">"1234567890"</span>, <span class="string">""</span>, <span class="string">"1234567890"</span>],
                 expectation: <span class="number">7</span>,
                 width: <span class="number">4</span>,
             },
             Case {
-                lines: <span class="kw-2">&amp;</span>[<span class="string">&quot;aaaaaaaaaaaaa&quot;</span>, <span class="string">&quot;&quot;</span>, <span class="string">&quot;bbbbbbbbbbbbbbbbb&quot;</span>, <span class="string">&quot;&quot;</span>, <span class="string">&quot;ccccccc&quot;</span>],
+                lines: <span class="kw-2">&amp;</span>[<span class="string">"aaaaaaaaaaaaa"</span>, <span class="string">""</span>, <span class="string">"bbbbbbbbbbbbbbbbb"</span>, <span class="string">""</span>, <span class="string">"ccccccc"</span>],
                 expectation: <span class="number">8</span>,
                 width: <span class="number">7</span>,
             },
             Case {
-                lines: <span class="kw-2">&amp;</span>[<span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>],
+                lines: <span class="kw-2">&amp;</span>[<span class="string">""</span>, <span class="string">""</span>, <span class="string">""</span>, <span class="string">""</span>, <span class="string">""</span>],
                 expectation: <span class="number">5</span>,
                 width: <span class="number">6</span>,
             },
             Case {
                 <span class="comment">// These lines contain only ANSI escape sequences, so they should only count as 1 line
-                </span>lines: <span class="kw-2">&amp;</span>[<span class="string">&quot;\u{1b}[1m\u{1b}[1m\u{1b}[1m&quot;</span>, <span class="string">&quot;\u{1b}[1m\u{1b}[1m\u{1b}[1m&quot;</span>],
+                </span>lines: <span class="kw-2">&amp;</span>[<span class="string">"\u{1b}[1m\u{1b}[1m\u{1b}[1m"</span>, <span class="string">"\u{1b}[1m\u{1b}[1m\u{1b}[1m"</span>],
                 expectation: <span class="number">2</span>,
                 width: <span class="number">5</span>,
             },
             Case {
                 <span class="comment">// These lines contain  ANSI escape sequences and two effective chars, so they should only count as 1 line still
                 </span>lines: <span class="kw-2">&amp;</span>[
-                    <span class="string">&quot;a\u{1b}[1m\u{1b}[1m\u{1b}[1ma&quot;</span>,
-                    <span class="string">&quot;a\u{1b}[1m\u{1b}[1m\u{1b}[1ma&quot;</span>,
+                    <span class="string">"a\u{1b}[1m\u{1b}[1m\u{1b}[1ma"</span>,
+                    <span class="string">"a\u{1b}[1m\u{1b}[1m\u{1b}[1ma"</span>,
                 ],
                 expectation: <span class="number">2</span>,
                 width: <span class="number">5</span>,
@@ -1440,8 +1441,8 @@
             Case {
                 <span class="comment">// These lines contain ANSI escape sequences and six effective chars, so they should count as 2 lines each
                 </span>lines: <span class="kw-2">&amp;</span>[
-                    <span class="string">&quot;aa\u{1b}[1m\u{1b}[1m\u{1b}[1mabcd&quot;</span>,
-                    <span class="string">&quot;aa\u{1b}[1m\u{1b}[1m\u{1b}[1mabcd&quot;</span>,
+                    <span class="string">"aa\u{1b}[1m\u{1b}[1m\u{1b}[1mabcd"</span>,
+                    <span class="string">"aa\u{1b}[1m\u{1b}[1m\u{1b}[1mabcd"</span>,
                 ],
                 expectation: <span class="number">4</span>,
                 width: <span class="number">5</span>,
@@ -1450,7 +1451,7 @@
 
         <span class="kw">for </span>case <span class="kw">in </span>lines_and_expectations.iter() {
             <span class="kw">let </span>result = <span class="kw">super</span>::visual_line_count(case.lines, case.width);
-            <span class="macro">assert_eq!</span>(result, case.expectation.into(), <span class="string">&quot;case: {:?}&quot;</span>, case);
+            <span class="macro">assert_eq!</span>(result, case.expectation.into(), <span class="string">"case: {:?}"</span>, case);
         }
     }
 }

@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.25.0/src/backend/test.rs`."><title>test.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.25.0/src/backend/test.rs`."><title>test.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><a class="sub-logo-container" href="../../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -713,11 +714,11 @@
 ///
 /// let mut backend = TestBackend::new(10, 2);
 /// backend.clear()?;
-/// backend.assert_buffer(&amp;Buffer::with_lines(vec![&quot;          &quot;; 2]));
+/// backend.assert_buffer(&amp;Buffer::with_lines(vec!["          "; 2]));
 /// # std::io::Result::Ok(())
 /// ```
 </span><span class="attr">#[derive(Debug, Clone, Eq, PartialEq, Hash)]
-#[cfg_attr(feature = <span class="string">&quot;serde&quot;</span>, derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = <span class="string">"serde"</span>, derive(serde::Serialize, serde::Deserialize))]
 </span><span class="kw">pub struct </span>TestBackend {
     width: u16,
     buffer: Buffer,
@@ -729,7 +730,7 @@
 <span class="doccomment">/// Returns a string representation of the given buffer for debugging purpose.
 ///
 /// This function is used to visualize the buffer content in a human-readable format.
-/// It iterates through the buffer content and appends each cell&#39;s symbol to the view string.
+/// It iterates through the buffer content and appends each cell's symbol to the view string.
 /// If a cell is hidden by a multi-width symbol, it is added to the overwritten vector and
 /// displayed at the end of the line.
 </span><span class="kw">fn </span>buffer_view(buffer: <span class="kw-2">&amp;</span>Buffer) -&gt; String {
@@ -737,7 +738,7 @@
     <span class="kw">for </span>cells <span class="kw">in </span>buffer.content.chunks(buffer.area.width <span class="kw">as </span>usize) {
         <span class="kw">let </span><span class="kw-2">mut </span>overwritten = <span class="macro">vec!</span>[];
         <span class="kw">let </span><span class="kw-2">mut </span>skip: usize = <span class="number">0</span>;
-        view.push(<span class="string">&#39;&quot;&#39;</span>);
+        view.push(<span class="string">'"'</span>);
         <span class="kw">for </span>(x, c) <span class="kw">in </span>cells.iter().enumerate() {
             <span class="kw">if </span>skip == <span class="number">0 </span>{
                 view.push_str(c.symbol());
@@ -746,11 +747,11 @@
             }
             skip = std::cmp::max(skip, c.symbol().width()).saturating_sub(<span class="number">1</span>);
         }
-        view.push(<span class="string">&#39;&quot;&#39;</span>);
+        view.push(<span class="string">'"'</span>);
         <span class="kw">if </span>!overwritten.is_empty() {
-            <span class="macro">write!</span>(<span class="kw-2">&amp;mut </span>view, <span class="string">&quot; Hidden by multi-width symbols: {overwritten:?}&quot;</span>).unwrap();
+            <span class="macro">write!</span>(<span class="kw-2">&amp;mut </span>view, <span class="string">" Hidden by multi-width symbols: {overwritten:?}"</span>).unwrap();
         }
-        view.push(<span class="string">&#39;\n&#39;</span>);
+        view.push(<span class="string">'\n'</span>);
     }
     view
 }
@@ -779,7 +780,7 @@
         <span class="self">self</span>.height = height;
     }
 
-    <span class="doccomment">/// Asserts that the TestBackend&#39;s buffer is equal to the expected buffer.
+    <span class="doccomment">/// Asserts that the TestBackend's buffer is equal to the expected buffer.
     /// If the buffers are not equal, a panic occurs with a detailed error message
     /// showing the differences between the expected and actual buffers.
     </span><span class="attr">#[track_caller]
@@ -790,47 +791,47 @@
             <span class="kw">return</span>;
         }
 
-        <span class="kw">let </span><span class="kw-2">mut </span>debug_info = String::from(<span class="string">&quot;Buffers are not equal&quot;</span>);
-        debug_info.push(<span class="string">&#39;\n&#39;</span>);
-        debug_info.push_str(<span class="string">&quot;Expected:&quot;</span>);
-        debug_info.push(<span class="string">&#39;\n&#39;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>debug_info = String::from(<span class="string">"Buffers are not equal"</span>);
+        debug_info.push(<span class="string">'\n'</span>);
+        debug_info.push_str(<span class="string">"Expected:"</span>);
+        debug_info.push(<span class="string">'\n'</span>);
         <span class="kw">let </span>expected_view = buffer_view(expected);
         debug_info.push_str(<span class="kw-2">&amp;</span>expected_view);
-        debug_info.push(<span class="string">&#39;\n&#39;</span>);
-        debug_info.push_str(<span class="string">&quot;Got:&quot;</span>);
-        debug_info.push(<span class="string">&#39;\n&#39;</span>);
+        debug_info.push(<span class="string">'\n'</span>);
+        debug_info.push_str(<span class="string">"Got:"</span>);
+        debug_info.push(<span class="string">'\n'</span>);
         <span class="kw">let </span>view = buffer_view(<span class="kw-2">&amp;</span><span class="self">self</span>.buffer);
         debug_info.push_str(<span class="kw-2">&amp;</span>view);
-        debug_info.push(<span class="string">&#39;\n&#39;</span>);
+        debug_info.push(<span class="string">'\n'</span>);
 
-        debug_info.push_str(<span class="string">&quot;Diff:&quot;</span>);
-        debug_info.push(<span class="string">&#39;\n&#39;</span>);
+        debug_info.push_str(<span class="string">"Diff:"</span>);
+        debug_info.push(<span class="string">'\n'</span>);
         <span class="kw">let </span>nice_diff = diff
             .iter()
             .enumerate()
             .map(|(i, (x, y, cell))| {
                 <span class="kw">let </span>expected_cell = expected.get(<span class="kw-2">*</span>x, <span class="kw-2">*</span>y);
-                <span class="macro">format!</span>(<span class="string">&quot;{i}: at ({x}, {y}) expected {expected_cell:?} got {cell:?}&quot;</span>)
+                <span class="macro">format!</span>(<span class="string">"{i}: at ({x}, {y}) expected {expected_cell:?} got {cell:?}"</span>)
             })
             .collect::&lt;Vec&lt;String&gt;&gt;()
-            .join(<span class="string">&quot;\n&quot;</span>);
+            .join(<span class="string">"\n"</span>);
         debug_info.push_str(<span class="kw-2">&amp;</span>nice_diff);
-        <span class="macro">panic!</span>(<span class="string">&quot;{debug_info}&quot;</span>);
+        <span class="macro">panic!</span>(<span class="string">"{debug_info}"</span>);
     }
 }
 
 <span class="kw">impl </span>Display <span class="kw">for </span>TestBackend {
     <span class="doccomment">/// Formats the TestBackend for display by calling the buffer_view function
     /// on its internal buffer.
-    </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
-        <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, buffer_view(<span class="kw-2">&amp;</span><span class="self">self</span>.buffer))
+    </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">"{}"</span>, buffer_view(<span class="kw-2">&amp;</span><span class="self">self</span>.buffer))
     }
 }
 
 <span class="kw">impl </span>Backend <span class="kw">for </span>TestBackend {
-    <span class="kw">fn </span>draw&lt;<span class="lifetime">&#39;a</span>, I&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: I) -&gt; <span class="prelude-ty">Result</span>&lt;(), io::Error&gt;
+    <span class="kw">fn </span>draw&lt;<span class="lifetime">'a</span>, I&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, content: I) -&gt; <span class="prelude-ty">Result</span>&lt;(), io::Error&gt;
     <span class="kw">where
-        </span>I: Iterator&lt;Item = (u16, u16, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Cell)&gt;,
+        </span>I: Iterator&lt;Item = (u16, u16, <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Cell)&gt;,
     {
         <span class="kw">for </span>(x, y, c) <span class="kw">in </span>content {
             <span class="kw">let </span>cell = <span class="self">self</span>.buffer.get_mut(x, y);
@@ -890,20 +891,20 @@
 
     <span class="doccomment">/// Inserts n line breaks at the current cursor position.
     ///
-    /// After the insertion, the cursor x position will be incremented by 1 (unless it&#39;s already
+    /// After the insertion, the cursor x position will be incremented by 1 (unless it's already
     /// at the end of line). This is a common behaviour of terminals in raw mode.
     ///
     /// If the number of lines to append is fewer than the number of lines in the buffer after the
     /// cursor y position then the cursor is moved down by n rows.
     ///
     /// If the number of lines to append is greater than the number of lines in the buffer after
-    /// the cursor y position then that number of empty lines (at most the buffer&#39;s height in this
+    /// the cursor y position then that number of empty lines (at most the buffer's height in this
     /// case but this limit is instead replaced with scrolling in most backend implementations) will
     /// be added after the current position and the cursor will be moved to the last row.
     </span><span class="kw">fn </span>append_lines(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: u16) -&gt; io::Result&lt;()&gt; {
         <span class="kw">let </span>(cur_x, cur_y) = <span class="self">self</span>.get_cursor()<span class="question-mark">?</span>;
 
-        <span class="comment">// the next column ensuring that we don&#39;t go past the last column
+        <span class="comment">// the next column ensuring that we don't go past the last column
         </span><span class="kw">let </span>new_cursor_x = cur_x.saturating_add(<span class="number">1</span>).min(<span class="self">self</span>.width.saturating_sub(<span class="number">1</span>));
 
         <span class="kw">let </span>max_y = <span class="self">self</span>.height.saturating_sub(<span class="number">1</span>);
@@ -933,7 +934,7 @@
     }
 
     <span class="kw">fn </span>window_size(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;WindowSize, io::Error&gt; {
-        <span class="comment">// Some arbitrary window pixel size, probably doesn&#39;t need much testing.
+        <span class="comment">// Some arbitrary window pixel size, probably doesn't need much testing.
         </span><span class="kw">static </span>WINDOW_PIXEL_SIZE: Size = Size {
             width: <span class="number">640</span>,
             height: <span class="number">480</span>,
@@ -960,7 +961,7 @@
             TestBackend {
                 width: <span class="number">10</span>,
                 height: <span class="number">2</span>,
-                buffer: Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;          &quot;</span>; <span class="number">2</span>]),
+                buffer: Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"          "</span>; <span class="number">2</span>]),
                 cursor: <span class="bool-val">false</span>,
                 pos: (<span class="number">0</span>, <span class="number">0</span>),
             }
@@ -968,19 +969,19 @@
     }
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_buffer_view() {
-        <span class="kw">let </span>buffer = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;aaaa&quot;</span>; <span class="number">2</span>]);
-        <span class="macro">assert_eq!</span>(buffer_view(<span class="kw-2">&amp;</span>buffer), <span class="string">&quot;\&quot;aaaa\&quot;\n\&quot;aaaa\&quot;\n&quot;</span>);
+        <span class="kw">let </span>buffer = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"aaaa"</span>; <span class="number">2</span>]);
+        <span class="macro">assert_eq!</span>(buffer_view(<span class="kw-2">&amp;</span>buffer), <span class="string">"\"aaaa\"\n\"aaaa\"\n"</span>);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>buffer_view_with_overwrites() {
-        <span class="kw">let </span>multi_byte_char = <span class="string">&quot;👨‍👩‍👧‍👦&quot;</span>; <span class="comment">// renders 8 wide
+        <span class="kw">let </span>multi_byte_char = <span class="string">"👨‍👩‍👧‍👦"</span>; <span class="comment">// renders 8 wide
         </span><span class="kw">let </span>buffer = Buffer::with_lines(<span class="macro">vec!</span>[multi_byte_char]);
         <span class="macro">assert_eq!</span>(
             buffer_view(<span class="kw-2">&amp;</span>buffer),
             <span class="macro">format!</span>(
-                <span class="string">r#&quot;&quot;{multi_byte_char}&quot; Hidden by multi-width symbols: [(1, &quot; &quot;), (2, &quot; &quot;), (3, &quot; &quot;), (4, &quot; &quot;), (5, &quot; &quot;), (6, &quot; &quot;), (7, &quot; &quot;)]
-&quot;#</span>,
+                <span class="string">r#""{multi_byte_char}" Hidden by multi-width symbols: [(1, " "), (2, " "), (3, " "), (4, " "), (5, " "), (6, " "), (7, " ")]
+"#</span>,
                 multi_byte_char = multi_byte_char
             )
         );
@@ -989,20 +990,20 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>buffer() {
         <span class="kw">let </span>backend = TestBackend::new(<span class="number">10</span>, <span class="number">2</span>);
-        <span class="macro">assert_eq!</span>(backend.buffer(), <span class="kw-2">&amp;</span>Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;          &quot;</span>; <span class="number">2</span>]));
+        <span class="macro">assert_eq!</span>(backend.buffer(), <span class="kw-2">&amp;</span>Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"          "</span>; <span class="number">2</span>]));
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>resize() {
         <span class="kw">let </span><span class="kw-2">mut </span>backend = TestBackend::new(<span class="number">10</span>, <span class="number">2</span>);
         backend.resize(<span class="number">5</span>, <span class="number">5</span>);
-        <span class="macro">assert_eq!</span>(backend.buffer(), <span class="kw-2">&amp;</span>Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;     &quot;</span>; <span class="number">5</span>]));
+        <span class="macro">assert_eq!</span>(backend.buffer(), <span class="kw-2">&amp;</span>Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"     "</span>; <span class="number">5</span>]));
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>assert_buffer() {
         <span class="kw">let </span>backend = TestBackend::new(<span class="number">10</span>, <span class="number">2</span>);
-        <span class="kw">let </span>buffer = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;          &quot;</span>; <span class="number">2</span>]);
+        <span class="kw">let </span>buffer = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"          "</span>; <span class="number">2</span>]);
         backend.assert_buffer(<span class="kw-2">&amp;</span>buffer);
     }
 
@@ -1010,24 +1011,24 @@
     #[should_panic]
     </span><span class="kw">fn </span>assert_buffer_panics() {
         <span class="kw">let </span>backend = TestBackend::new(<span class="number">10</span>, <span class="number">2</span>);
-        <span class="kw">let </span>buffer = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;aaaaaaaaaa&quot;</span>; <span class="number">2</span>]);
+        <span class="kw">let </span>buffer = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"aaaaaaaaaa"</span>; <span class="number">2</span>]);
         backend.assert_buffer(<span class="kw-2">&amp;</span>buffer);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>display() {
         <span class="kw">let </span>backend = TestBackend::new(<span class="number">10</span>, <span class="number">2</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, backend), <span class="string">&quot;\&quot;          \&quot;\n\&quot;          \&quot;\n&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{}"</span>, backend), <span class="string">"\"          \"\n\"          \"\n"</span>);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>draw() {
         <span class="kw">let </span><span class="kw-2">mut </span>backend = TestBackend::new(<span class="number">10</span>, <span class="number">2</span>);
         <span class="kw">let </span><span class="kw-2">mut </span>cell = Cell::default();
-        cell.set_symbol(<span class="string">&quot;a&quot;</span>);
+        cell.set_symbol(<span class="string">"a"</span>);
         backend.draw([(<span class="number">0</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span>cell)].into_iter()).unwrap();
         backend.draw([(<span class="number">0</span>, <span class="number">1</span>, <span class="kw-2">&amp;</span>cell)].into_iter()).unwrap();
-        backend.assert_buffer(<span class="kw-2">&amp;</span>Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;a         &quot;</span>; <span class="number">2</span>]));
+        backend.assert_buffer(<span class="kw-2">&amp;</span>Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"a         "</span>; <span class="number">2</span>]));
     }
 
     <span class="attr">#[test]
@@ -1061,15 +1062,15 @@
     </span><span class="kw">fn </span>clear() {
         <span class="kw">let </span><span class="kw-2">mut </span>backend = TestBackend::new(<span class="number">10</span>, <span class="number">4</span>);
         <span class="kw">let </span><span class="kw-2">mut </span>cell = Cell::default();
-        cell.set_symbol(<span class="string">&quot;a&quot;</span>);
+        cell.set_symbol(<span class="string">"a"</span>);
         backend.draw([(<span class="number">0</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span>cell)].into_iter()).unwrap();
         backend.draw([(<span class="number">0</span>, <span class="number">1</span>, <span class="kw-2">&amp;</span>cell)].into_iter()).unwrap();
         backend.clear().unwrap();
         backend.assert_buffer(<span class="kw-2">&amp;</span>Buffer::with_lines(<span class="macro">vec!</span>[
-            <span class="string">&quot;          &quot;</span>,
-            <span class="string">&quot;          &quot;</span>,
-            <span class="string">&quot;          &quot;</span>,
-            <span class="string">&quot;          &quot;</span>,
+            <span class="string">"          "</span>,
+            <span class="string">"          "</span>,
+            <span class="string">"          "</span>,
+            <span class="string">"          "</span>,
         ]));
     }
 
@@ -1077,20 +1078,20 @@
     </span><span class="kw">fn </span>clear_region_all() {
         <span class="kw">let </span><span class="kw-2">mut </span>backend = TestBackend::new(<span class="number">10</span>, <span class="number">5</span>);
         backend.buffer = Buffer::with_lines(<span class="macro">vec!</span>[
-            <span class="string">&quot;aaaaaaaaaa&quot;</span>,
-            <span class="string">&quot;aaaaaaaaaa&quot;</span>,
-            <span class="string">&quot;aaaaaaaaaa&quot;</span>,
-            <span class="string">&quot;aaaaaaaaaa&quot;</span>,
-            <span class="string">&quot;aaaaaaaaaa&quot;</span>,
+            <span class="string">"aaaaaaaaaa"</span>,
+            <span class="string">"aaaaaaaaaa"</span>,
+            <span class="string">"aaaaaaaaaa"</span>,
+            <span class="string">"aaaaaaaaaa"</span>,
+            <span class="string">"aaaaaaaaaa"</span>,
         ]);
 
         backend.clear_region(ClearType::All).unwrap();
         backend.assert_buffer(<span class="kw-2">&amp;</span>Buffer::with_lines(<span class="macro">vec!</span>[
-            <span class="string">&quot;          &quot;</span>,
-            <span class="string">&quot;          &quot;</span>,
-            <span class="string">&quot;          &quot;</span>,
-            <span class="string">&quot;          &quot;</span>,
-            <span class="string">&quot;          &quot;</span>,
+            <span class="string">"          "</span>,
+            <span class="string">"          "</span>,
+            <span class="string">"          "</span>,
+            <span class="string">"          "</span>,
+            <span class="string">"          "</span>,
         ]));
     }
 
@@ -1098,21 +1099,21 @@
     </span><span class="kw">fn </span>clear_region_after_cursor() {
         <span class="kw">let </span><span class="kw-2">mut </span>backend = TestBackend::new(<span class="number">10</span>, <span class="number">5</span>);
         backend.buffer = Buffer::with_lines(<span class="macro">vec!</span>[
-            <span class="string">&quot;aaaaaaaaaa&quot;</span>,
-            <span class="string">&quot;aaaaaaaaaa&quot;</span>,
-            <span class="string">&quot;aaaaaaaaaa&quot;</span>,
-            <span class="string">&quot;aaaaaaaaaa&quot;</span>,
-            <span class="string">&quot;aaaaaaaaaa&quot;</span>,
+            <span class="string">"aaaaaaaaaa"</span>,
+            <span class="string">"aaaaaaaaaa"</span>,
+            <span class="string">"aaaaaaaaaa"</span>,
+            <span class="string">"aaaaaaaaaa"</span>,
+            <span class="string">"aaaaaaaaaa"</span>,
         ]);
 
         backend.set_cursor(<span class="number">3</span>, <span class="number">2</span>).unwrap();
         backend.clear_region(ClearType::AfterCursor).unwrap();
         backend.assert_buffer(<span class="kw-2">&amp;</span>Buffer::with_lines(<span class="macro">vec!</span>[
-            <span class="string">&quot;aaaaaaaaaa&quot;</span>,
-            <span class="string">&quot;aaaaaaaaaa&quot;</span>,
-            <span class="string">&quot;aaaa      &quot;</span>,
-            <span class="string">&quot;          &quot;</span>,
-            <span class="string">&quot;          &quot;</span>,
+            <span class="string">"aaaaaaaaaa"</span>,
+            <span class="string">"aaaaaaaaaa"</span>,
+            <span class="string">"aaaa      "</span>,
+            <span class="string">"          "</span>,
+            <span class="string">"          "</span>,
         ]));
     }
 
@@ -1120,21 +1121,21 @@
     </span><span class="kw">fn </span>clear_region_before_cursor() {
         <span class="kw">let </span><span class="kw-2">mut </span>backend = TestBackend::new(<span class="number">10</span>, <span class="number">5</span>);
         backend.buffer = Buffer::with_lines(<span class="macro">vec!</span>[
-            <span class="string">&quot;aaaaaaaaaa&quot;</span>,
-            <span class="string">&quot;aaaaaaaaaa&quot;</span>,
-            <span class="string">&quot;aaaaaaaaaa&quot;</span>,
-            <span class="string">&quot;aaaaaaaaaa&quot;</span>,
-            <span class="string">&quot;aaaaaaaaaa&quot;</span>,
+            <span class="string">"aaaaaaaaaa"</span>,
+            <span class="string">"aaaaaaaaaa"</span>,
+            <span class="string">"aaaaaaaaaa"</span>,
+            <span class="string">"aaaaaaaaaa"</span>,
+            <span class="string">"aaaaaaaaaa"</span>,
         ]);
 
         backend.set_cursor(<span class="number">5</span>, <span class="number">3</span>).unwrap();
         backend.clear_region(ClearType::BeforeCursor).unwrap();
         backend.assert_buffer(<span class="kw-2">&amp;</span>Buffer::with_lines(<span class="macro">vec!</span>[
-            <span class="string">&quot;          &quot;</span>,
-            <span class="string">&quot;          &quot;</span>,
-            <span class="string">&quot;          &quot;</span>,
-            <span class="string">&quot;     aaaaa&quot;</span>,
-            <span class="string">&quot;aaaaaaaaaa&quot;</span>,
+            <span class="string">"          "</span>,
+            <span class="string">"          "</span>,
+            <span class="string">"          "</span>,
+            <span class="string">"     aaaaa"</span>,
+            <span class="string">"aaaaaaaaaa"</span>,
         ]));
     }
 
@@ -1142,21 +1143,21 @@
     </span><span class="kw">fn </span>clear_region_current_line() {
         <span class="kw">let </span><span class="kw-2">mut </span>backend = TestBackend::new(<span class="number">10</span>, <span class="number">5</span>);
         backend.buffer = Buffer::with_lines(<span class="macro">vec!</span>[
-            <span class="string">&quot;aaaaaaaaaa&quot;</span>,
-            <span class="string">&quot;aaaaaaaaaa&quot;</span>,
-            <span class="string">&quot;aaaaaaaaaa&quot;</span>,
-            <span class="string">&quot;aaaaaaaaaa&quot;</span>,
-            <span class="string">&quot;aaaaaaaaaa&quot;</span>,
+            <span class="string">"aaaaaaaaaa"</span>,
+            <span class="string">"aaaaaaaaaa"</span>,
+            <span class="string">"aaaaaaaaaa"</span>,
+            <span class="string">"aaaaaaaaaa"</span>,
+            <span class="string">"aaaaaaaaaa"</span>,
         ]);
 
         backend.set_cursor(<span class="number">3</span>, <span class="number">1</span>).unwrap();
         backend.clear_region(ClearType::CurrentLine).unwrap();
         backend.assert_buffer(<span class="kw-2">&amp;</span>Buffer::with_lines(<span class="macro">vec!</span>[
-            <span class="string">&quot;aaaaaaaaaa&quot;</span>,
-            <span class="string">&quot;          &quot;</span>,
-            <span class="string">&quot;aaaaaaaaaa&quot;</span>,
-            <span class="string">&quot;aaaaaaaaaa&quot;</span>,
-            <span class="string">&quot;aaaaaaaaaa&quot;</span>,
+            <span class="string">"aaaaaaaaaa"</span>,
+            <span class="string">"          "</span>,
+            <span class="string">"aaaaaaaaaa"</span>,
+            <span class="string">"aaaaaaaaaa"</span>,
+            <span class="string">"aaaaaaaaaa"</span>,
         ]));
     }
 
@@ -1164,21 +1165,21 @@
     </span><span class="kw">fn </span>clear_region_until_new_line() {
         <span class="kw">let </span><span class="kw-2">mut </span>backend = TestBackend::new(<span class="number">10</span>, <span class="number">5</span>);
         backend.buffer = Buffer::with_lines(<span class="macro">vec!</span>[
-            <span class="string">&quot;aaaaaaaaaa&quot;</span>,
-            <span class="string">&quot;aaaaaaaaaa&quot;</span>,
-            <span class="string">&quot;aaaaaaaaaa&quot;</span>,
-            <span class="string">&quot;aaaaaaaaaa&quot;</span>,
-            <span class="string">&quot;aaaaaaaaaa&quot;</span>,
+            <span class="string">"aaaaaaaaaa"</span>,
+            <span class="string">"aaaaaaaaaa"</span>,
+            <span class="string">"aaaaaaaaaa"</span>,
+            <span class="string">"aaaaaaaaaa"</span>,
+            <span class="string">"aaaaaaaaaa"</span>,
         ]);
 
         backend.set_cursor(<span class="number">3</span>, <span class="number">0</span>).unwrap();
         backend.clear_region(ClearType::UntilNewLine).unwrap();
         backend.assert_buffer(<span class="kw-2">&amp;</span>Buffer::with_lines(<span class="macro">vec!</span>[
-            <span class="string">&quot;aaa       &quot;</span>,
-            <span class="string">&quot;aaaaaaaaaa&quot;</span>,
-            <span class="string">&quot;aaaaaaaaaa&quot;</span>,
-            <span class="string">&quot;aaaaaaaaaa&quot;</span>,
-            <span class="string">&quot;aaaaaaaaaa&quot;</span>,
+            <span class="string">"aaa       "</span>,
+            <span class="string">"aaaaaaaaaa"</span>,
+            <span class="string">"aaaaaaaaaa"</span>,
+            <span class="string">"aaaaaaaaaa"</span>,
+            <span class="string">"aaaaaaaaaa"</span>,
         ]));
     }
 
@@ -1186,11 +1187,11 @@
     </span><span class="kw">fn </span>append_lines_not_at_last_line() {
         <span class="kw">let </span><span class="kw-2">mut </span>backend = TestBackend::new(<span class="number">10</span>, <span class="number">5</span>);
         backend.buffer = Buffer::with_lines(<span class="macro">vec!</span>[
-            <span class="string">&quot;aaaaaaaaaa&quot;</span>,
-            <span class="string">&quot;bbbbbbbbbb&quot;</span>,
-            <span class="string">&quot;cccccccccc&quot;</span>,
-            <span class="string">&quot;dddddddddd&quot;</span>,
-            <span class="string">&quot;eeeeeeeeee&quot;</span>,
+            <span class="string">"aaaaaaaaaa"</span>,
+            <span class="string">"bbbbbbbbbb"</span>,
+            <span class="string">"cccccccccc"</span>,
+            <span class="string">"dddddddddd"</span>,
+            <span class="string">"eeeeeeeeee"</span>,
         ]);
 
         backend.set_cursor(<span class="number">0</span>, <span class="number">0</span>).unwrap();
@@ -1212,11 +1213,11 @@
 
         <span class="comment">// As such the buffer should remain unchanged
         </span>backend.assert_buffer(<span class="kw-2">&amp;</span>Buffer::with_lines(<span class="macro">vec!</span>[
-            <span class="string">&quot;aaaaaaaaaa&quot;</span>,
-            <span class="string">&quot;bbbbbbbbbb&quot;</span>,
-            <span class="string">&quot;cccccccccc&quot;</span>,
-            <span class="string">&quot;dddddddddd&quot;</span>,
-            <span class="string">&quot;eeeeeeeeee&quot;</span>,
+            <span class="string">"aaaaaaaaaa"</span>,
+            <span class="string">"bbbbbbbbbb"</span>,
+            <span class="string">"cccccccccc"</span>,
+            <span class="string">"dddddddddd"</span>,
+            <span class="string">"eeeeeeeeee"</span>,
         ]));
     }
 
@@ -1224,11 +1225,11 @@
     </span><span class="kw">fn </span>append_lines_at_last_line() {
         <span class="kw">let </span><span class="kw-2">mut </span>backend = TestBackend::new(<span class="number">10</span>, <span class="number">5</span>);
         backend.buffer = Buffer::with_lines(<span class="macro">vec!</span>[
-            <span class="string">&quot;aaaaaaaaaa&quot;</span>,
-            <span class="string">&quot;bbbbbbbbbb&quot;</span>,
-            <span class="string">&quot;cccccccccc&quot;</span>,
-            <span class="string">&quot;dddddddddd&quot;</span>,
-            <span class="string">&quot;eeeeeeeeee&quot;</span>,
+            <span class="string">"aaaaaaaaaa"</span>,
+            <span class="string">"bbbbbbbbbb"</span>,
+            <span class="string">"cccccccccc"</span>,
+            <span class="string">"dddddddddd"</span>,
+            <span class="string">"eeeeeeeeee"</span>,
         ]);
 
         <span class="comment">// If the cursor is at the last line in the terminal the addition of a
@@ -1238,11 +1239,11 @@
         backend.append_lines(<span class="number">1</span>).unwrap();
 
         backend.buffer = Buffer::with_lines(<span class="macro">vec!</span>[
-            <span class="string">&quot;bbbbbbbbbb&quot;</span>,
-            <span class="string">&quot;cccccccccc&quot;</span>,
-            <span class="string">&quot;dddddddddd&quot;</span>,
-            <span class="string">&quot;eeeeeeeeee&quot;</span>,
-            <span class="string">&quot;          &quot;</span>,
+            <span class="string">"bbbbbbbbbb"</span>,
+            <span class="string">"cccccccccc"</span>,
+            <span class="string">"dddddddddd"</span>,
+            <span class="string">"eeeeeeeeee"</span>,
+            <span class="string">"          "</span>,
         ]);
 
         <span class="comment">// It also moves the cursor to the right, as is common of the behaviour of
@@ -1254,11 +1255,11 @@
     </span><span class="kw">fn </span>append_multiple_lines_not_at_last_line() {
         <span class="kw">let </span><span class="kw-2">mut </span>backend = TestBackend::new(<span class="number">10</span>, <span class="number">5</span>);
         backend.buffer = Buffer::with_lines(<span class="macro">vec!</span>[
-            <span class="string">&quot;aaaaaaaaaa&quot;</span>,
-            <span class="string">&quot;bbbbbbbbbb&quot;</span>,
-            <span class="string">&quot;cccccccccc&quot;</span>,
-            <span class="string">&quot;dddddddddd&quot;</span>,
-            <span class="string">&quot;eeeeeeeeee&quot;</span>,
+            <span class="string">"aaaaaaaaaa"</span>,
+            <span class="string">"bbbbbbbbbb"</span>,
+            <span class="string">"cccccccccc"</span>,
+            <span class="string">"dddddddddd"</span>,
+            <span class="string">"eeeeeeeeee"</span>,
         ]);
 
         backend.set_cursor(<span class="number">0</span>, <span class="number">0</span>).unwrap();
@@ -1271,11 +1272,11 @@
 
         <span class="comment">// As such the buffer should remain unchanged
         </span>backend.assert_buffer(<span class="kw-2">&amp;</span>Buffer::with_lines(<span class="macro">vec!</span>[
-            <span class="string">&quot;aaaaaaaaaa&quot;</span>,
-            <span class="string">&quot;bbbbbbbbbb&quot;</span>,
-            <span class="string">&quot;cccccccccc&quot;</span>,
-            <span class="string">&quot;dddddddddd&quot;</span>,
-            <span class="string">&quot;eeeeeeeeee&quot;</span>,
+            <span class="string">"aaaaaaaaaa"</span>,
+            <span class="string">"bbbbbbbbbb"</span>,
+            <span class="string">"cccccccccc"</span>,
+            <span class="string">"dddddddddd"</span>,
+            <span class="string">"eeeeeeeeee"</span>,
         ]));
     }
 
@@ -1283,11 +1284,11 @@
     </span><span class="kw">fn </span>append_multiple_lines_past_last_line() {
         <span class="kw">let </span><span class="kw-2">mut </span>backend = TestBackend::new(<span class="number">10</span>, <span class="number">5</span>);
         backend.buffer = Buffer::with_lines(<span class="macro">vec!</span>[
-            <span class="string">&quot;aaaaaaaaaa&quot;</span>,
-            <span class="string">&quot;bbbbbbbbbb&quot;</span>,
-            <span class="string">&quot;cccccccccc&quot;</span>,
-            <span class="string">&quot;dddddddddd&quot;</span>,
-            <span class="string">&quot;eeeeeeeeee&quot;</span>,
+            <span class="string">"aaaaaaaaaa"</span>,
+            <span class="string">"bbbbbbbbbb"</span>,
+            <span class="string">"cccccccccc"</span>,
+            <span class="string">"dddddddddd"</span>,
+            <span class="string">"eeeeeeeeee"</span>,
         ]);
 
         backend.set_cursor(<span class="number">0</span>, <span class="number">3</span>).unwrap();
@@ -1296,11 +1297,11 @@
         <span class="macro">assert_eq!</span>(backend.get_cursor().unwrap(), (<span class="number">1</span>, <span class="number">4</span>));
 
         backend.assert_buffer(<span class="kw-2">&amp;</span>Buffer::with_lines(<span class="macro">vec!</span>[
-            <span class="string">&quot;cccccccccc&quot;</span>,
-            <span class="string">&quot;dddddddddd&quot;</span>,
-            <span class="string">&quot;eeeeeeeeee&quot;</span>,
-            <span class="string">&quot;          &quot;</span>,
-            <span class="string">&quot;          &quot;</span>,
+            <span class="string">"cccccccccc"</span>,
+            <span class="string">"dddddddddd"</span>,
+            <span class="string">"eeeeeeeeee"</span>,
+            <span class="string">"          "</span>,
+            <span class="string">"          "</span>,
         ]));
     }
 
@@ -1308,11 +1309,11 @@
     </span><span class="kw">fn </span>append_multiple_lines_where_cursor_at_end_appends_height_lines() {
         <span class="kw">let </span><span class="kw-2">mut </span>backend = TestBackend::new(<span class="number">10</span>, <span class="number">5</span>);
         backend.buffer = Buffer::with_lines(<span class="macro">vec!</span>[
-            <span class="string">&quot;aaaaaaaaaa&quot;</span>,
-            <span class="string">&quot;bbbbbbbbbb&quot;</span>,
-            <span class="string">&quot;cccccccccc&quot;</span>,
-            <span class="string">&quot;dddddddddd&quot;</span>,
-            <span class="string">&quot;eeeeeeeeee&quot;</span>,
+            <span class="string">"aaaaaaaaaa"</span>,
+            <span class="string">"bbbbbbbbbb"</span>,
+            <span class="string">"cccccccccc"</span>,
+            <span class="string">"dddddddddd"</span>,
+            <span class="string">"eeeeeeeeee"</span>,
         ]);
 
         backend.set_cursor(<span class="number">0</span>, <span class="number">4</span>).unwrap();
@@ -1321,11 +1322,11 @@
         <span class="macro">assert_eq!</span>(backend.get_cursor().unwrap(), (<span class="number">1</span>, <span class="number">4</span>));
 
         backend.assert_buffer(<span class="kw-2">&amp;</span>Buffer::with_lines(<span class="macro">vec!</span>[
-            <span class="string">&quot;          &quot;</span>,
-            <span class="string">&quot;          &quot;</span>,
-            <span class="string">&quot;          &quot;</span>,
-            <span class="string">&quot;          &quot;</span>,
-            <span class="string">&quot;          &quot;</span>,
+            <span class="string">"          "</span>,
+            <span class="string">"          "</span>,
+            <span class="string">"          "</span>,
+            <span class="string">"          "</span>,
+            <span class="string">"          "</span>,
         ]));
     }
 
@@ -1333,11 +1334,11 @@
     </span><span class="kw">fn </span>append_multiple_lines_where_cursor_appends_height_lines() {
         <span class="kw">let </span><span class="kw-2">mut </span>backend = TestBackend::new(<span class="number">10</span>, <span class="number">5</span>);
         backend.buffer = Buffer::with_lines(<span class="macro">vec!</span>[
-            <span class="string">&quot;aaaaaaaaaa&quot;</span>,
-            <span class="string">&quot;bbbbbbbbbb&quot;</span>,
-            <span class="string">&quot;cccccccccc&quot;</span>,
-            <span class="string">&quot;dddddddddd&quot;</span>,
-            <span class="string">&quot;eeeeeeeeee&quot;</span>,
+            <span class="string">"aaaaaaaaaa"</span>,
+            <span class="string">"bbbbbbbbbb"</span>,
+            <span class="string">"cccccccccc"</span>,
+            <span class="string">"dddddddddd"</span>,
+            <span class="string">"eeeeeeeeee"</span>,
         ]);
 
         backend.set_cursor(<span class="number">0</span>, <span class="number">0</span>).unwrap();
@@ -1346,11 +1347,11 @@
         <span class="macro">assert_eq!</span>(backend.get_cursor().unwrap(), (<span class="number">1</span>, <span class="number">4</span>));
 
         backend.assert_buffer(<span class="kw-2">&amp;</span>Buffer::with_lines(<span class="macro">vec!</span>[
-            <span class="string">&quot;bbbbbbbbbb&quot;</span>,
-            <span class="string">&quot;cccccccccc&quot;</span>,
-            <span class="string">&quot;dddddddddd&quot;</span>,
-            <span class="string">&quot;eeeeeeeeee&quot;</span>,
-            <span class="string">&quot;          &quot;</span>,
+            <span class="string">"bbbbbbbbbb"</span>,
+            <span class="string">"cccccccccc"</span>,
+            <span class="string">"dddddddddd"</span>,
+            <span class="string">"eeeeeeeeee"</span>,
+            <span class="string">"          "</span>,
         ]));
     }
 

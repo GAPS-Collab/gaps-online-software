@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.25.0/src/widgets/barchart.rs`."><title>barchart.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.25.0/src/widgets/barchart.rs`."><title>barchart.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><a class="sub-logo-container" href="../../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1390,21 +1391,21 @@
 /// use ratatui::{prelude::*, widgets::*};
 ///
 /// BarChart::default()
-///     .block(Block::default().title(&quot;BarChart&quot;).borders(Borders::ALL))
+///     .block(Block::default().title("BarChart").borders(Borders::ALL))
 ///     .bar_width(3)
 ///     .bar_gap(1)
 ///     .group_gap(3)
 ///     .bar_style(Style::new().yellow().on_red())
 ///     .value_style(Style::new().red().bold())
 ///     .label_style(Style::new().white())
-///     .data(&amp;[(&quot;B0&quot;, 0), (&quot;B1&quot;, 2), (&quot;B2&quot;, 4), (&quot;B3&quot;, 3)])
+///     .data(&amp;[("B0", 0), ("B1", 2), ("B2", 4), ("B3", 3)])
 ///     .data(BarGroup::default().bars(&amp;[Bar::default().value(10), Bar::default().value(20)]))
 ///     .max(4);
 /// ```
 </span><span class="attr">#[derive(Debug, Clone, Eq, PartialEq, Hash)]
-</span><span class="kw">pub struct </span>BarChart&lt;<span class="lifetime">&#39;a</span>&gt; {
+</span><span class="kw">pub struct </span>BarChart&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Block to wrap the widget in
-    </span>block: <span class="prelude-ty">Option</span>&lt;Block&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    </span>block: <span class="prelude-ty">Option</span>&lt;Block&lt;<span class="lifetime">'a</span>&gt;&gt;,
     <span class="doccomment">/// The width of each bar
     </span>bar_width: u16,
     <span class="doccomment">/// The gap between each bar
@@ -1422,7 +1423,7 @@
     <span class="doccomment">/// Style for the widget
     </span>style: Style,
     <span class="doccomment">/// vector of groups containing bars
-    </span>data: Vec&lt;BarGroup&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    </span>data: Vec&lt;BarGroup&lt;<span class="lifetime">'a</span>&gt;&gt;,
     <span class="doccomment">/// Value necessary for a bar to reach the maximum height (if no value is specified,
     /// the maximum value in the data is taken as reference)
     </span>max: <span class="prelude-ty">Option</span>&lt;u64&gt;,
@@ -1430,8 +1431,8 @@
     </span>direction: Direction,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Default <span class="kw">for </span>BarChart&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">fn </span>default() -&gt; BarChart&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Default <span class="kw">for </span>BarChart&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">fn </span>default() -&gt; BarChart&lt;<span class="lifetime">'a</span>&gt; {
         BarChart {
             block: <span class="prelude-val">None</span>,
             max: <span class="prelude-val">None</span>,
@@ -1449,7 +1450,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; BarChart&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; BarChart&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Add group of bars to the BarChart
     ///
     /// # Examples
@@ -1460,10 +1461,10 @@
     /// ```
     /// # use ratatui::{prelude::*, widgets::*};
     /// BarChart::default()
-    ///     .data(&amp;[(&quot;B0&quot;, 0), (&quot;B1&quot;, 2), (&quot;B2&quot;, 4), (&quot;B3&quot;, 3)])
+    ///     .data(&amp;[("B0", 0), ("B1", 2), ("B2", 4), ("B3", 3)])
     ///     .data(BarGroup::default().bars(&amp;[Bar::default().value(10), Bar::default().value(20)]));
     /// ```
-    </span><span class="kw">pub fn </span>data(<span class="kw-2">mut </span><span class="self">self</span>, data: <span class="kw">impl </span>Into&lt;BarGroup&lt;<span class="lifetime">&#39;a</span>&gt;&gt;) -&gt; BarChart&lt;<span class="lifetime">&#39;a</span>&gt; {
+    </span><span class="kw">pub fn </span>data(<span class="kw-2">mut </span><span class="self">self</span>, data: <span class="kw">impl </span>Into&lt;BarGroup&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; BarChart&lt;<span class="lifetime">'a</span>&gt; {
         <span class="kw">let </span>group: BarGroup = data.into();
         <span class="kw">if </span>!group.bars.is_empty() {
             <span class="self">self</span>.data.push(group);
@@ -1472,8 +1473,8 @@
     </span>}
 
     <span class="doccomment">/// Surround the [`BarChart`] with a [`Block`].
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
-    </span><span class="kw">pub fn </span>block(<span class="kw-2">mut </span><span class="self">self</span>, block: Block&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; BarChart&lt;<span class="lifetime">&#39;a</span>&gt; {
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>block(<span class="kw-2">mut </span><span class="self">self</span>, block: Block&lt;<span class="lifetime">'a</span>&gt;) -&gt; BarChart&lt;<span class="lifetime">'a</span>&gt; {
         <span class="self">self</span>.block = <span class="prelude-val">Some</span>(block);
         <span class="self">self
     </span>}
@@ -1488,7 +1489,7 @@
     /// The maximum value in the dataset is taken (here, `100`).
     /// ```
     /// # use ratatui::{prelude::*, widgets::*};
-    /// BarChart::default().data(&amp;[(&quot;foo&quot;, 1), (&quot;bar&quot;, 2), (&quot;baz&quot;, 100)]);
+    /// BarChart::default().data(&amp;[("foo", 1), ("bar", 2), ("baz", 100)]);
     /// // Renders
     /// //     █
     /// //     █
@@ -1500,15 +1501,15 @@
     /// ```
     /// # use ratatui::{prelude::*, widgets::*};
     /// BarChart::default()
-    ///     .data(&amp;[(&quot;foo&quot;, 1), (&quot;bar&quot;, 2), (&quot;baz&quot;, 100)])
+    ///     .data(&amp;[("foo", 1), ("bar", 2), ("baz", 100)])
     ///     .max(2);
     /// // Renders
     /// //   █ █
     /// // █ █ █
     /// // f b b
     /// ```
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
-    </span><span class="kw">pub fn </span>max(<span class="kw-2">mut </span><span class="self">self</span>, max: u64) -&gt; BarChart&lt;<span class="lifetime">&#39;a</span>&gt; {
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>max(<span class="kw-2">mut </span><span class="self">self</span>, max: u64) -&gt; BarChart&lt;<span class="lifetime">'a</span>&gt; {
         <span class="self">self</span>.max = <span class="prelude-val">Some</span>(max);
         <span class="self">self
     </span>}
@@ -1517,8 +1518,8 @@
     ///
     /// It is also possible to set individually the style of each [`Bar`].
     /// In this case the default style will be patched by the individual style
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
-    </span><span class="kw">pub fn </span>bar_style(<span class="kw-2">mut </span><span class="self">self</span>, style: Style) -&gt; BarChart&lt;<span class="lifetime">&#39;a</span>&gt; {
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>bar_style(<span class="kw-2">mut </span><span class="self">self</span>, style: Style) -&gt; BarChart&lt;<span class="lifetime">'a</span>&gt; {
         <span class="self">self</span>.bar_style = style;
         <span class="self">self
     </span>}
@@ -1530,8 +1531,8 @@
     ///
     /// If not set, this defaults to `1`.  
     /// The bar label also uses this value as its width.
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
-    </span><span class="kw">pub fn </span>bar_width(<span class="kw-2">mut </span><span class="self">self</span>, width: u16) -&gt; BarChart&lt;<span class="lifetime">&#39;a</span>&gt; {
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>bar_width(<span class="kw-2">mut </span><span class="self">self</span>, width: u16) -&gt; BarChart&lt;<span class="lifetime">'a</span>&gt; {
         <span class="self">self</span>.bar_width = width;
         <span class="self">self
     </span>}
@@ -1547,15 +1548,15 @@
     /// ```
     /// # use ratatui::{prelude::*, widgets::*};
     /// BarChart::default()
-    ///     .data(&amp;[(&quot;foo&quot;, 1), (&quot;bar&quot;, 2)])
+    ///     .data(&amp;[("foo", 1), ("bar", 2)])
     ///     .bar_gap(3);
     /// // Renders
     /// //     █
     /// // █   █
     /// // f   b
     /// ```
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
-    </span><span class="kw">pub fn </span>bar_gap(<span class="kw-2">mut </span><span class="self">self</span>, gap: u16) -&gt; BarChart&lt;<span class="lifetime">&#39;a</span>&gt; {
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>bar_gap(<span class="kw-2">mut </span><span class="self">self</span>, gap: u16) -&gt; BarChart&lt;<span class="lifetime">'a</span>&gt; {
         <span class="self">self</span>.bar_gap = gap;
         <span class="self">self
     </span>}
@@ -1563,8 +1564,8 @@
     <span class="doccomment">/// The [`bar::Set`](crate::symbols::bar::Set) to use for displaying the bars.
     ///
     /// If not set, the default is [`bar::NINE_LEVELS`](crate::symbols::bar::NINE_LEVELS).
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
-    </span><span class="kw">pub fn </span>bar_set(<span class="kw-2">mut </span><span class="self">self</span>, bar_set: symbols::bar::Set) -&gt; BarChart&lt;<span class="lifetime">&#39;a</span>&gt; {
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>bar_set(<span class="kw-2">mut </span><span class="self">self</span>, bar_set: symbols::bar::Set) -&gt; BarChart&lt;<span class="lifetime">'a</span>&gt; {
         <span class="self">self</span>.bar_set = bar_set;
         <span class="self">self
     </span>}
@@ -1577,8 +1578,8 @@
     /// # See also
     ///
     /// [Bar::value_style] to set the value style individually.
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
-    </span><span class="kw">pub fn </span>value_style(<span class="kw-2">mut </span><span class="self">self</span>, style: Style) -&gt; BarChart&lt;<span class="lifetime">&#39;a</span>&gt; {
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>value_style(<span class="kw-2">mut </span><span class="self">self</span>, style: Style) -&gt; BarChart&lt;<span class="lifetime">'a</span>&gt; {
         <span class="self">self</span>.value_style = style;
         <span class="self">self
     </span>}
@@ -1591,24 +1592,24 @@
     /// # See also
     ///
     /// [Bar::label] to set the label style individually.
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
-    </span><span class="kw">pub fn </span>label_style(<span class="kw-2">mut </span><span class="self">self</span>, style: Style) -&gt; BarChart&lt;<span class="lifetime">&#39;a</span>&gt; {
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>label_style(<span class="kw-2">mut </span><span class="self">self</span>, style: Style) -&gt; BarChart&lt;<span class="lifetime">'a</span>&gt; {
         <span class="self">self</span>.label_style = style;
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Set the gap between [`BarGroup`].
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
-    </span><span class="kw">pub fn </span>group_gap(<span class="kw-2">mut </span><span class="self">self</span>, gap: u16) -&gt; BarChart&lt;<span class="lifetime">&#39;a</span>&gt; {
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>group_gap(<span class="kw-2">mut </span><span class="self">self</span>, gap: u16) -&gt; BarChart&lt;<span class="lifetime">'a</span>&gt; {
         <span class="self">self</span>.group_gap = gap;
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Set the style of the entire chart.
     ///
-    /// The style will be applied to everything that isn&#39;t styled (borders, bars, labels, ...).
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
-    </span><span class="kw">pub fn </span>style(<span class="kw-2">mut </span><span class="self">self</span>, style: Style) -&gt; BarChart&lt;<span class="lifetime">&#39;a</span>&gt; {
+    /// The style will be applied to everything that isn't styled (borders, bars, labels, ...).
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>style(<span class="kw-2">mut </span><span class="self">self</span>, style: Style) -&gt; BarChart&lt;<span class="lifetime">'a</span>&gt; {
         <span class="self">self</span>.style = style;
         <span class="self">self
     </span>}
@@ -1632,8 +1633,8 @@
     ///
     /// █bar██
     /// ```
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
-    </span><span class="kw">pub fn </span>direction(<span class="kw-2">mut </span><span class="self">self</span>, direction: Direction) -&gt; BarChart&lt;<span class="lifetime">&#39;a</span>&gt; {
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>direction(<span class="kw-2">mut </span><span class="self">self</span>, direction: Direction) -&gt; BarChart&lt;<span class="lifetime">'a</span>&gt; {
         <span class="self">self</span>.direction = direction;
         <span class="self">self
     </span>}
@@ -1645,7 +1646,7 @@
     height: u16,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; BarChart&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; BarChart&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Returns the visible bars length in ticks. A cell contains 8 ticks.
     /// `available_space` used to calculate how many bars can fit in the space
     /// `bar_max_length` is the maximal length a bar can take.
@@ -1919,7 +1920,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Widget <span class="kw">for </span>BarChart&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Widget <span class="kw">for </span>BarChart&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">fn </span>render(<span class="kw-2">mut </span><span class="self">self</span>, <span class="kw-2">mut </span>area: Rect, buf: <span class="kw-2">&amp;mut </span>Buffer) {
         buf.set_style(area, <span class="self">self</span>.style);
 
@@ -1936,8 +1937,8 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Styled <span class="kw">for </span>BarChart&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">type </span>Item = BarChart&lt;<span class="lifetime">&#39;a</span>&gt;;
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Styled <span class="kw">for </span>BarChart&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">type </span>Item = BarChart&lt;<span class="lifetime">'a</span>&gt;;
     <span class="kw">fn </span>style(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Style {
         <span class="self">self</span>.style
     }
@@ -1962,20 +1963,20 @@
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="number">3</span>));
         <span class="kw">let </span>widget = BarChart::default();
         widget.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;          &quot;</span>; <span class="number">3</span>]));
+        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"          "</span>; <span class="number">3</span>]));
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>data() {
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>));
-        <span class="kw">let </span>widget = BarChart::default().data(<span class="kw-2">&amp;</span>[(<span class="string">&quot;foo&quot;</span>, <span class="number">1</span>), (<span class="string">&quot;bar&quot;</span>, <span class="number">2</span>)]);
+        <span class="kw">let </span>widget = BarChart::default().data(<span class="kw-2">&amp;</span>[(<span class="string">"foo"</span>, <span class="number">1</span>), (<span class="string">"bar"</span>, <span class="number">2</span>)]);
         widget.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
         <span class="macro">assert_buffer_eq!</span>(
             buffer,
             Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">&quot;  █            &quot;</span>,
-                <span class="string">&quot;1 2            &quot;</span>,
-                <span class="string">&quot;f b            &quot;</span>,
+                <span class="string">"  █            "</span>,
+                <span class="string">"1 2            "</span>,
+                <span class="string">"f b            "</span>,
             ])
         );
     }
@@ -1984,21 +1985,21 @@
     </span><span class="kw">fn </span>block() {
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">5</span>));
         <span class="kw">let </span>block = Block::default()
-            .title(<span class="string">&quot;Block&quot;</span>)
+            .title(<span class="string">"Block"</span>)
             .border_type(BorderType::Double)
             .borders(Borders::ALL);
         <span class="kw">let </span>widget = BarChart::default()
-            .data(<span class="kw-2">&amp;</span>[(<span class="string">&quot;foo&quot;</span>, <span class="number">1</span>), (<span class="string">&quot;bar&quot;</span>, <span class="number">2</span>)])
+            .data(<span class="kw-2">&amp;</span>[(<span class="string">"foo"</span>, <span class="number">1</span>), (<span class="string">"bar"</span>, <span class="number">2</span>)])
             .block(block);
         widget.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
         <span class="macro">assert_buffer_eq!</span>(
             buffer,
             Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">&quot;╔Block════════╗&quot;</span>,
-                <span class="string">&quot;║  █          ║&quot;</span>,
-                <span class="string">&quot;║1 2          ║&quot;</span>,
-                <span class="string">&quot;║f b          ║&quot;</span>,
-                <span class="string">&quot;╚═════════════╝&quot;</span>,
+                <span class="string">"╔Block════════╗"</span>,
+                <span class="string">"║  █          ║"</span>,
+                <span class="string">"║1 2          ║"</span>,
+                <span class="string">"║f b          ║"</span>,
+                <span class="string">"╚═════════════╝"</span>,
             ])
         );
     }
@@ -2006,26 +2007,26 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>max() {
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>));
-        <span class="kw">let </span>without_max = BarChart::default().data(<span class="kw-2">&amp;</span>[(<span class="string">&quot;foo&quot;</span>, <span class="number">1</span>), (<span class="string">&quot;bar&quot;</span>, <span class="number">2</span>), (<span class="string">&quot;baz&quot;</span>, <span class="number">100</span>)]);
+        <span class="kw">let </span>without_max = BarChart::default().data(<span class="kw-2">&amp;</span>[(<span class="string">"foo"</span>, <span class="number">1</span>), (<span class="string">"bar"</span>, <span class="number">2</span>), (<span class="string">"baz"</span>, <span class="number">100</span>)]);
         without_max.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
         <span class="macro">assert_buffer_eq!</span>(
             buffer,
             Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">&quot;    █          &quot;</span>,
-                <span class="string">&quot;    █          &quot;</span>,
-                <span class="string">&quot;f b b          &quot;</span>,
+                <span class="string">"    █          "</span>,
+                <span class="string">"    █          "</span>,
+                <span class="string">"f b b          "</span>,
             ])
         );
         <span class="kw">let </span>with_max = BarChart::default()
-            .data(<span class="kw-2">&amp;</span>[(<span class="string">&quot;foo&quot;</span>, <span class="number">1</span>), (<span class="string">&quot;bar&quot;</span>, <span class="number">2</span>), (<span class="string">&quot;baz&quot;</span>, <span class="number">100</span>)])
+            .data(<span class="kw-2">&amp;</span>[(<span class="string">"foo"</span>, <span class="number">1</span>), (<span class="string">"bar"</span>, <span class="number">2</span>), (<span class="string">"baz"</span>, <span class="number">100</span>)])
             .max(<span class="number">2</span>);
         with_max.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
         <span class="macro">assert_buffer_eq!</span>(
             buffer,
             Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">&quot;  █ █          &quot;</span>,
-                <span class="string">&quot;1 2 █          &quot;</span>,
-                <span class="string">&quot;f b b          &quot;</span>,
+                <span class="string">"  █ █          "</span>,
+                <span class="string">"1 2 █          "</span>,
+                <span class="string">"f b b          "</span>,
             ])
         );
     }
@@ -2034,13 +2035,13 @@
     </span><span class="kw">fn </span>bar_style() {
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>));
         <span class="kw">let </span>widget = BarChart::default()
-            .data(<span class="kw-2">&amp;</span>[(<span class="string">&quot;foo&quot;</span>, <span class="number">1</span>), (<span class="string">&quot;bar&quot;</span>, <span class="number">2</span>)])
+            .data(<span class="kw-2">&amp;</span>[(<span class="string">"foo"</span>, <span class="number">1</span>), (<span class="string">"bar"</span>, <span class="number">2</span>)])
             .bar_style(Style::new().red());
         widget.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
         <span class="kw">let </span><span class="kw-2">mut </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[
-            <span class="string">&quot;  █            &quot;</span>,
-            <span class="string">&quot;1 2            &quot;</span>,
-            <span class="string">&quot;f b            &quot;</span>,
+            <span class="string">"  █            "</span>,
+            <span class="string">"1 2            "</span>,
+            <span class="string">"f b            "</span>,
         ]);
         <span class="kw">for </span>(x, y) <span class="kw">in </span><span class="macro">iproduct!</span>([<span class="number">0</span>, <span class="number">2</span>], [<span class="number">0</span>, <span class="number">1</span>]) {
             expected.get_mut(x, y).set_fg(Color::Red);
@@ -2052,15 +2053,15 @@
     </span><span class="kw">fn </span>bar_width() {
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>));
         <span class="kw">let </span>widget = BarChart::default()
-            .data(<span class="kw-2">&amp;</span>[(<span class="string">&quot;foo&quot;</span>, <span class="number">1</span>), (<span class="string">&quot;bar&quot;</span>, <span class="number">2</span>)])
+            .data(<span class="kw-2">&amp;</span>[(<span class="string">"foo"</span>, <span class="number">1</span>), (<span class="string">"bar"</span>, <span class="number">2</span>)])
             .bar_width(<span class="number">3</span>);
         widget.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
         <span class="macro">assert_buffer_eq!</span>(
             buffer,
             Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">&quot;    ███        &quot;</span>,
-                <span class="string">&quot;█1█ █2█        &quot;</span>,
-                <span class="string">&quot;foo bar        &quot;</span>,
+                <span class="string">"    ███        "</span>,
+                <span class="string">"█1█ █2█        "</span>,
+                <span class="string">"foo bar        "</span>,
             ])
         );
     }
@@ -2069,15 +2070,15 @@
     </span><span class="kw">fn </span>bar_gap() {
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>));
         <span class="kw">let </span>widget = BarChart::default()
-            .data(<span class="kw-2">&amp;</span>[(<span class="string">&quot;foo&quot;</span>, <span class="number">1</span>), (<span class="string">&quot;bar&quot;</span>, <span class="number">2</span>)])
+            .data(<span class="kw-2">&amp;</span>[(<span class="string">"foo"</span>, <span class="number">1</span>), (<span class="string">"bar"</span>, <span class="number">2</span>)])
             .bar_gap(<span class="number">2</span>);
         widget.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
         <span class="macro">assert_buffer_eq!</span>(
             buffer,
             Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">&quot;   █           &quot;</span>,
-                <span class="string">&quot;1  2           &quot;</span>,
-                <span class="string">&quot;f  b           &quot;</span>,
+                <span class="string">"   █           "</span>,
+                <span class="string">"1  2           "</span>,
+                <span class="string">"f  b           "</span>,
             ])
         );
     }
@@ -2086,15 +2087,15 @@
     </span><span class="kw">fn </span>bar_set() {
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>));
         <span class="kw">let </span>widget = BarChart::default()
-            .data(<span class="kw-2">&amp;</span>[(<span class="string">&quot;foo&quot;</span>, <span class="number">0</span>), (<span class="string">&quot;bar&quot;</span>, <span class="number">1</span>), (<span class="string">&quot;baz&quot;</span>, <span class="number">3</span>)])
+            .data(<span class="kw-2">&amp;</span>[(<span class="string">"foo"</span>, <span class="number">0</span>), (<span class="string">"bar"</span>, <span class="number">1</span>), (<span class="string">"baz"</span>, <span class="number">3</span>)])
             .bar_set(symbols::bar::THREE_LEVELS);
         widget.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
         <span class="macro">assert_buffer_eq!</span>(
             buffer,
             Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">&quot;    █          &quot;</span>,
-                <span class="string">&quot;  ▄ 3          &quot;</span>,
-                <span class="string">&quot;f b b          &quot;</span>,
+                <span class="string">"    █          "</span>,
+                <span class="string">"  ▄ 3          "</span>,
+                <span class="string">"f b b          "</span>,
             ])
         );
     }
@@ -2104,24 +2105,24 @@
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">18</span>, <span class="number">3</span>));
         <span class="kw">let </span>widget = BarChart::default()
             .data(<span class="kw-2">&amp;</span>[
-                (<span class="string">&quot;a&quot;</span>, <span class="number">0</span>),
-                (<span class="string">&quot;b&quot;</span>, <span class="number">1</span>),
-                (<span class="string">&quot;c&quot;</span>, <span class="number">2</span>),
-                (<span class="string">&quot;d&quot;</span>, <span class="number">3</span>),
-                (<span class="string">&quot;e&quot;</span>, <span class="number">4</span>),
-                (<span class="string">&quot;f&quot;</span>, <span class="number">5</span>),
-                (<span class="string">&quot;g&quot;</span>, <span class="number">6</span>),
-                (<span class="string">&quot;h&quot;</span>, <span class="number">7</span>),
-                (<span class="string">&quot;i&quot;</span>, <span class="number">8</span>),
+                (<span class="string">"a"</span>, <span class="number">0</span>),
+                (<span class="string">"b"</span>, <span class="number">1</span>),
+                (<span class="string">"c"</span>, <span class="number">2</span>),
+                (<span class="string">"d"</span>, <span class="number">3</span>),
+                (<span class="string">"e"</span>, <span class="number">4</span>),
+                (<span class="string">"f"</span>, <span class="number">5</span>),
+                (<span class="string">"g"</span>, <span class="number">6</span>),
+                (<span class="string">"h"</span>, <span class="number">7</span>),
+                (<span class="string">"i"</span>, <span class="number">8</span>),
             ])
             .bar_set(symbols::bar::NINE_LEVELS);
         widget.render(Rect::new(<span class="number">0</span>, <span class="number">1</span>, <span class="number">18</span>, <span class="number">2</span>), <span class="kw-2">&amp;mut </span>buffer);
         <span class="macro">assert_buffer_eq!</span>(
             buffer,
             Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">&quot;                  &quot;</span>,
-                <span class="string">&quot;  ▁ ▂ ▃ ▄ ▅ ▆ ▇ 8 &quot;</span>,
-                <span class="string">&quot;a b c d e f g h i &quot;</span>,
+                <span class="string">"                  "</span>,
+                <span class="string">"  ▁ ▂ ▃ ▄ ▅ ▆ ▇ 8 "</span>,
+                <span class="string">"a b c d e f g h i "</span>,
             ])
         );
     }
@@ -2130,14 +2131,14 @@
     </span><span class="kw">fn </span>value_style() {
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>));
         <span class="kw">let </span>widget = BarChart::default()
-            .data(<span class="kw-2">&amp;</span>[(<span class="string">&quot;foo&quot;</span>, <span class="number">1</span>), (<span class="string">&quot;bar&quot;</span>, <span class="number">2</span>)])
+            .data(<span class="kw-2">&amp;</span>[(<span class="string">"foo"</span>, <span class="number">1</span>), (<span class="string">"bar"</span>, <span class="number">2</span>)])
             .bar_width(<span class="number">3</span>)
             .value_style(Style::new().red());
         widget.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
         <span class="kw">let </span><span class="kw-2">mut </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[
-            <span class="string">&quot;    ███        &quot;</span>,
-            <span class="string">&quot;█1█ █2█        &quot;</span>,
-            <span class="string">&quot;foo bar        &quot;</span>,
+            <span class="string">"    ███        "</span>,
+            <span class="string">"█1█ █2█        "</span>,
+            <span class="string">"foo bar        "</span>,
         ]);
         expected.get_mut(<span class="number">1</span>, <span class="number">1</span>).set_fg(Color::Red);
         expected.get_mut(<span class="number">5</span>, <span class="number">1</span>).set_fg(Color::Red);
@@ -2148,13 +2149,13 @@
     </span><span class="kw">fn </span>label_style() {
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>));
         <span class="kw">let </span>widget = BarChart::default()
-            .data(<span class="kw-2">&amp;</span>[(<span class="string">&quot;foo&quot;</span>, <span class="number">1</span>), (<span class="string">&quot;bar&quot;</span>, <span class="number">2</span>)])
+            .data(<span class="kw-2">&amp;</span>[(<span class="string">"foo"</span>, <span class="number">1</span>), (<span class="string">"bar"</span>, <span class="number">2</span>)])
             .label_style(Style::new().red());
         widget.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
         <span class="kw">let </span><span class="kw-2">mut </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[
-            <span class="string">&quot;  █            &quot;</span>,
-            <span class="string">&quot;1 2            &quot;</span>,
-            <span class="string">&quot;f b            &quot;</span>,
+            <span class="string">"  █            "</span>,
+            <span class="string">"1 2            "</span>,
+            <span class="string">"f b            "</span>,
         ]);
         expected.get_mut(<span class="number">0</span>, <span class="number">2</span>).set_fg(Color::Red);
         expected.get_mut(<span class="number">2</span>, <span class="number">2</span>).set_fg(Color::Red);
@@ -2165,13 +2166,13 @@
     </span><span class="kw">fn </span>style() {
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">15</span>, <span class="number">3</span>));
         <span class="kw">let </span>widget = BarChart::default()
-            .data(<span class="kw-2">&amp;</span>[(<span class="string">&quot;foo&quot;</span>, <span class="number">1</span>), (<span class="string">&quot;bar&quot;</span>, <span class="number">2</span>)])
+            .data(<span class="kw-2">&amp;</span>[(<span class="string">"foo"</span>, <span class="number">1</span>), (<span class="string">"bar"</span>, <span class="number">2</span>)])
             .style(Style::new().red());
         widget.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
         <span class="kw">let </span><span class="kw-2">mut </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[
-            <span class="string">&quot;  █            &quot;</span>,
-            <span class="string">&quot;1 2            &quot;</span>,
-            <span class="string">&quot;f b            &quot;</span>,
+            <span class="string">"  █            "</span>,
+            <span class="string">"1 2            "</span>,
+            <span class="string">"f b            "</span>,
         ]);
         <span class="kw">for </span>(x, y) <span class="kw">in </span><span class="macro">iproduct!</span>(<span class="number">0</span>..<span class="number">15</span>, <span class="number">0</span>..<span class="number">3</span>) {
             expected.get_mut(x, y).set_fg(Color::Red);
@@ -2193,27 +2194,27 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_empty_group() {
         <span class="kw">let </span>chart = BarChart::default()
-            .data(BarGroup::default().label(<span class="string">&quot;invisible&quot;</span>.into()))
+            .data(BarGroup::default().label(<span class="string">"invisible"</span>.into()))
             .data(
                 BarGroup::default()
-                    .label(<span class="string">&quot;G&quot;</span>.into())
+                    .label(<span class="string">"G"</span>.into())
                     .bars(<span class="kw-2">&amp;</span>[Bar::default().value(<span class="number">1</span>), Bar::default().value(<span class="number">2</span>)]),
             );
 
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">3</span>, <span class="number">3</span>));
         chart.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-        <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;  █&quot;</span>, <span class="string">&quot;1 2&quot;</span>, <span class="string">&quot;G  &quot;</span>]);
+        <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"  █"</span>, <span class="string">"1 2"</span>, <span class="string">"G  "</span>]);
         <span class="macro">assert_buffer_eq!</span>(buffer, expected);
     }
 
-    <span class="kw">fn </span>build_test_barchart&lt;<span class="lifetime">&#39;a</span>&gt;() -&gt; BarChart&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>build_test_barchart&lt;<span class="lifetime">'a</span>&gt;() -&gt; BarChart&lt;<span class="lifetime">'a</span>&gt; {
         BarChart::default()
-            .data(BarGroup::default().label(<span class="string">&quot;G1&quot;</span>.into()).bars(<span class="kw-2">&amp;</span>[
+            .data(BarGroup::default().label(<span class="string">"G1"</span>.into()).bars(<span class="kw-2">&amp;</span>[
                 Bar::default().value(<span class="number">2</span>),
                 Bar::default().value(<span class="number">3</span>),
                 Bar::default().value(<span class="number">4</span>),
             ]))
-            .data(BarGroup::default().label(<span class="string">&quot;G2&quot;</span>.into()).bars(<span class="kw-2">&amp;</span>[
+            .data(BarGroup::default().label(<span class="string">"G2"</span>.into()).bars(<span class="kw-2">&amp;</span>[
                 Bar::default().value(<span class="number">3</span>),
                 Bar::default().value(<span class="number">4</span>),
                 Bar::default().value(<span class="number">5</span>),
@@ -2225,19 +2226,19 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_horizontal_bars() {
-        <span class="kw">let </span>chart: BarChart&lt;<span class="lifetime">&#39;_</span>&gt; = build_test_barchart();
+        <span class="kw">let </span>chart: BarChart&lt;<span class="lifetime">'_</span>&gt; = build_test_barchart();
 
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">5</span>, <span class="number">8</span>));
         chart.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
         <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[
-            <span class="string">&quot;2█   &quot;</span>,
-            <span class="string">&quot;3██  &quot;</span>,
-            <span class="string">&quot;4███ &quot;</span>,
-            <span class="string">&quot;G1   &quot;</span>,
-            <span class="string">&quot;3██  &quot;</span>,
-            <span class="string">&quot;4███ &quot;</span>,
-            <span class="string">&quot;5████&quot;</span>,
-            <span class="string">&quot;G2   &quot;</span>,
+            <span class="string">"2█   "</span>,
+            <span class="string">"3██  "</span>,
+            <span class="string">"4███ "</span>,
+            <span class="string">"G1   "</span>,
+            <span class="string">"3██  "</span>,
+            <span class="string">"4███ "</span>,
+            <span class="string">"5████"</span>,
+            <span class="string">"G2   "</span>,
         ]);
 
         <span class="macro">assert_buffer_eq!</span>(buffer, expected);
@@ -2245,18 +2246,18 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_horizontal_bars_no_space_for_group_label() {
-        <span class="kw">let </span>chart: BarChart&lt;<span class="lifetime">&#39;_</span>&gt; = build_test_barchart();
+        <span class="kw">let </span>chart: BarChart&lt;<span class="lifetime">'_</span>&gt; = build_test_barchart();
 
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">5</span>, <span class="number">7</span>));
         chart.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
         <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[
-            <span class="string">&quot;2█   &quot;</span>,
-            <span class="string">&quot;3██  &quot;</span>,
-            <span class="string">&quot;4███ &quot;</span>,
-            <span class="string">&quot;G1   &quot;</span>,
-            <span class="string">&quot;3██  &quot;</span>,
-            <span class="string">&quot;4███ &quot;</span>,
-            <span class="string">&quot;5████&quot;</span>,
+            <span class="string">"2█   "</span>,
+            <span class="string">"3██  "</span>,
+            <span class="string">"4███ "</span>,
+            <span class="string">"G1   "</span>,
+            <span class="string">"3██  "</span>,
+            <span class="string">"4███ "</span>,
+            <span class="string">"5████"</span>,
         ]);
 
         <span class="macro">assert_buffer_eq!</span>(buffer, expected);
@@ -2264,11 +2265,11 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_horizontal_bars_no_space_for_all_bars() {
-        <span class="kw">let </span>chart: BarChart&lt;<span class="lifetime">&#39;_</span>&gt; = build_test_barchart();
+        <span class="kw">let </span>chart: BarChart&lt;<span class="lifetime">'_</span>&gt; = build_test_barchart();
 
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">5</span>, <span class="number">5</span>));
         chart.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-        <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;2█   &quot;</span>, <span class="string">&quot;3██  &quot;</span>, <span class="string">&quot;4███ &quot;</span>, <span class="string">&quot;G1   &quot;</span>, <span class="string">&quot;3██  &quot;</span>]);
+        <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"2█   "</span>, <span class="string">"3██  "</span>, <span class="string">"4███ "</span>, <span class="string">"G1   "</span>, <span class="string">"3██  "</span>]);
 
         <span class="macro">assert_buffer_eq!</span>(buffer, expected);
     }
@@ -2276,14 +2277,14 @@
     <span class="kw">fn </span>test_horizontal_bars_label_width_greater_than_bar(bar_color: <span class="prelude-ty">Option</span>&lt;Color&gt;) {
         <span class="kw">let </span><span class="kw-2">mut </span>bar = Bar::default()
             .value(<span class="number">2</span>)
-            .text_value(<span class="string">&quot;label&quot;</span>.into())
+            .text_value(<span class="string">"label"</span>.into())
             .value_style(Style::default().red());
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(color) = bar_color {
             bar = bar.style(Style::default().fg(color));
         }
 
-        <span class="kw">let </span>chart: BarChart&lt;<span class="lifetime">&#39;_</span>&gt; = BarChart::default()
+        <span class="kw">let </span>chart: BarChart&lt;<span class="lifetime">'_</span>&gt; = BarChart::default()
             .data(BarGroup::default().bars(<span class="kw-2">&amp;</span>[bar, Bar::default().value(<span class="number">5</span>)]))
             .direction(Direction::Horizontal)
             .bar_style(Style::default().yellow())
@@ -2293,9 +2294,9 @@
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">5</span>, <span class="number">2</span>));
         chart.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
 
-        <span class="kw">let </span><span class="kw-2">mut </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;label&quot;</span>, <span class="string">&quot;5████&quot;</span>]);
+        <span class="kw">let </span><span class="kw-2">mut </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"label"</span>, <span class="string">"5████"</span>]);
 
-        <span class="comment">// first line has a yellow foreground. first cell contains italic &quot;5&quot;
+        <span class="comment">// first line has a yellow foreground. first cell contains italic "5"
         </span>expected.get_mut(<span class="number">0</span>, <span class="number">1</span>).modifier.insert(Modifier::ITALIC);
         <span class="kw">for </span>x <span class="kw">in </span><span class="number">0</span>..<span class="number">5 </span>{
             expected.get_mut(x, <span class="number">1</span>).set_fg(Color::Yellow);
@@ -2307,9 +2308,9 @@
             Color::Yellow
         };
 
-        <span class="comment">// second line contains the word &quot;label&quot;. Since the bar value is 2,
-        // then the first 2 characters of &quot;label&quot; are italic red.
-        // the rest is white (using the Bar&#39;s style).
+        <span class="comment">// second line contains the word "label". Since the bar value is 2,
+        // then the first 2 characters of "label" are italic red.
+        // the rest is white (using the Bar's style).
         </span><span class="kw">let </span>cell = expected.get_mut(<span class="number">0</span>, <span class="number">0</span>).set_fg(Color::Red);
         cell.modifier.insert(Modifier::ITALIC);
         <span class="kw">let </span>cell = expected.get_mut(<span class="number">1</span>, <span class="number">0</span>).set_fg(Color::Red);
@@ -2337,21 +2338,21 @@
         <span class="kw">let </span>chart = BarChart::default()
             .direction(Direction::Horizontal)
             .bar_gap(<span class="number">0</span>)
-            .data(<span class="kw-2">&amp;</span>[(<span class="string">&quot;Jan&quot;</span>, <span class="number">10</span>), (<span class="string">&quot;Feb&quot;</span>, <span class="number">20</span>), (<span class="string">&quot;Mar&quot;</span>, <span class="number">5</span>)]);
+            .data(<span class="kw-2">&amp;</span>[(<span class="string">"Jan"</span>, <span class="number">10</span>), (<span class="string">"Feb"</span>, <span class="number">20</span>), (<span class="string">"Mar"</span>, <span class="number">5</span>)]);
 
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">10</span>, <span class="number">3</span>));
         chart.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
-        <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;Jan 10█   &quot;</span>, <span class="string">&quot;Feb 20████&quot;</span>, <span class="string">&quot;Mar 5     &quot;</span>]);
+        <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"Jan 10█   "</span>, <span class="string">"Feb 20████"</span>, <span class="string">"Mar 5     "</span>]);
 
         <span class="macro">assert_buffer_eq!</span>(buffer, expected);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_group_label_style() {
-        <span class="kw">let </span>chart: BarChart&lt;<span class="lifetime">&#39;_</span>&gt; = BarChart::default()
+        <span class="kw">let </span>chart: BarChart&lt;<span class="lifetime">'_</span>&gt; = BarChart::default()
             .data(
                 BarGroup::default()
-                    .label(Span::from(<span class="string">&quot;G1&quot;</span>).red().into())
+                    .label(Span::from(<span class="string">"G1"</span>).red().into())
                     .bars(<span class="kw-2">&amp;</span>[Bar::default().value(<span class="number">2</span>)]),
             )
             .group_gap(<span class="number">1</span>)
@@ -2364,7 +2365,7 @@
         <span class="comment">// G1 should have the bold red style
         // bold: because of BarChart::label_style
         // red: is included with the label itself
-        </span><span class="kw">let </span><span class="kw-2">mut </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;2████&quot;</span>, <span class="string">&quot;G1   &quot;</span>]);
+        </span><span class="kw">let </span><span class="kw-2">mut </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"2████"</span>, <span class="string">"G1   "</span>]);
         <span class="kw">let </span>cell = expected.get_mut(<span class="number">0</span>, <span class="number">1</span>).set_fg(Color::Red);
         cell.modifier.insert(Modifier::BOLD);
         <span class="kw">let </span>cell = expected.get_mut(<span class="number">1</span>, <span class="number">1</span>).set_fg(Color::Red);
@@ -2376,14 +2377,14 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_group_label_center() {
         <span class="comment">// test the centered group position when one bar is outside the group
-        </span><span class="kw">let </span>group = BarGroup::from(<span class="kw-2">&amp;</span>[(<span class="string">&quot;a&quot;</span>, <span class="number">1</span>), (<span class="string">&quot;b&quot;</span>, <span class="number">2</span>), (<span class="string">&quot;c&quot;</span>, <span class="number">3</span>), (<span class="string">&quot;c&quot;</span>, <span class="number">4</span>)]);
+        </span><span class="kw">let </span>group = BarGroup::from(<span class="kw-2">&amp;</span>[(<span class="string">"a"</span>, <span class="number">1</span>), (<span class="string">"b"</span>, <span class="number">2</span>), (<span class="string">"c"</span>, <span class="number">3</span>), (<span class="string">"c"</span>, <span class="number">4</span>)]);
         <span class="kw">let </span>chart = BarChart::default()
             .data(
                 group
                     .clone()
-                    .label(Line::from(<span class="string">&quot;G1&quot;</span>).alignment(Alignment::Center)),
+                    .label(Line::from(<span class="string">"G1"</span>).alignment(Alignment::Center)),
             )
-            .data(group.label(Line::from(<span class="string">&quot;G2&quot;</span>).alignment(Alignment::Center)));
+            .data(group.label(Line::from(<span class="string">"G2"</span>).alignment(Alignment::Center)));
 
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">13</span>, <span class="number">5</span>));
         chart.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
@@ -2391,27 +2392,27 @@
         <span class="macro">assert_buffer_eq!</span>(
             buffer,
             Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">&quot;    ▂ █     ▂&quot;</span>,
-                <span class="string">&quot;  ▄ █ █   ▄ █&quot;</span>,
-                <span class="string">&quot;▆ 2 3 4 ▆ 2 3&quot;</span>,
-                <span class="string">&quot;a b c c a b c&quot;</span>,
-                <span class="string">&quot;  G1     G2  &quot;</span>,
+                <span class="string">"    ▂ █     ▂"</span>,
+                <span class="string">"  ▄ █ █   ▄ █"</span>,
+                <span class="string">"▆ 2 3 4 ▆ 2 3"</span>,
+                <span class="string">"a b c c a b c"</span>,
+                <span class="string">"  G1     G2  "</span>,
             ])
         );
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_group_label_right() {
-        <span class="kw">let </span>chart: BarChart&lt;<span class="lifetime">&#39;_</span>&gt; = BarChart::default().data(
+        <span class="kw">let </span>chart: BarChart&lt;<span class="lifetime">'_</span>&gt; = BarChart::default().data(
             BarGroup::default()
-                .label(Line::from(Span::from(<span class="string">&quot;G&quot;</span>)).alignment(Alignment::Right))
+                .label(Line::from(Span::from(<span class="string">"G"</span>)).alignment(Alignment::Right))
                 .bars(<span class="kw-2">&amp;</span>[Bar::default().value(<span class="number">2</span>), Bar::default().value(<span class="number">5</span>)]),
         );
 
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">3</span>, <span class="number">3</span>));
         chart.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
 
-        <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;  █&quot;</span>, <span class="string">&quot;▆ 5&quot;</span>, <span class="string">&quot;  G&quot;</span>]);
+        <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"  █"</span>, <span class="string">"▆ 5"</span>, <span class="string">"  G"</span>]);
         <span class="macro">assert_buffer_eq!</span>(buffer, expected);
     }
 
@@ -2420,16 +2421,16 @@
         <span class="kw">let </span>group = BarGroup::default().bars(<span class="kw-2">&amp;</span>[
             Bar::default()
                 .value(<span class="number">123</span>)
-                .label(<span class="string">&quot;B1&quot;</span>.into())
-                .text_value(<span class="string">&quot;写&quot;</span>.into()),
+                .label(<span class="string">"B1"</span>.into())
+                .text_value(<span class="string">"写"</span>.into()),
             Bar::default()
                 .value(<span class="number">321</span>)
-                .label(<span class="string">&quot;B2&quot;</span>.into())
-                .text_value(<span class="string">&quot;写&quot;</span>.into()),
+                .label(<span class="string">"B2"</span>.into())
+                .text_value(<span class="string">"写"</span>.into()),
             Bar::default()
                 .value(<span class="number">333</span>)
-                .label(<span class="string">&quot;B2&quot;</span>.into())
-                .text_value(<span class="string">&quot;写&quot;</span>.into()),
+                .label(<span class="string">"B2"</span>.into())
+                .text_value(<span class="string">"写"</span>.into()),
         ]);
         <span class="kw">let </span>chart = BarChart::default().data(group).bar_width(<span class="number">3</span>).bar_gap(<span class="number">1</span>);
 
@@ -2437,11 +2438,11 @@
         chart.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
 
         <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[
-            <span class="string">&quot;    ▆▆▆ ███&quot;</span>,
-            <span class="string">&quot;    ███ ███&quot;</span>,
-            <span class="string">&quot;▃▃▃ ███ ███&quot;</span>,
-            <span class="string">&quot;写█ 写█ 写█&quot;</span>,
-            <span class="string">&quot;B1  B2  B2 &quot;</span>,
+            <span class="string">"    ▆▆▆ ███"</span>,
+            <span class="string">"    ███ ███"</span>,
+            <span class="string">"▃▃▃ ███ ███"</span>,
+            <span class="string">"写█ 写█ 写█"</span>,
+            <span class="string">"B1  B2  B2 "</span>,
         ]);
         <span class="macro">assert_buffer_eq!</span>(buffer, expected);
     }
@@ -2450,7 +2451,7 @@
     </span><span class="kw">fn </span>handles_zero_width() {
         <span class="comment">// this test is to ensure that a BarChart with zero bar / gap width does not panic
         </span><span class="kw">let </span>chart = BarChart::default()
-            .data(<span class="kw-2">&amp;</span>[(<span class="string">&quot;A&quot;</span>, <span class="number">1</span>)])
+            .data(<span class="kw-2">&amp;</span>[(<span class="string">"A"</span>, <span class="number">1</span>)])
             .bar_width(<span class="number">0</span>)
             .bar_gap(<span class="number">0</span>);
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">10</span>));
@@ -2461,18 +2462,18 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>single_line() {
         <span class="kw">let </span><span class="kw-2">mut </span>group: BarGroup = (<span class="kw-2">&amp;</span>[
-            (<span class="string">&quot;a&quot;</span>, <span class="number">0</span>),
-            (<span class="string">&quot;b&quot;</span>, <span class="number">1</span>),
-            (<span class="string">&quot;c&quot;</span>, <span class="number">2</span>),
-            (<span class="string">&quot;d&quot;</span>, <span class="number">3</span>),
-            (<span class="string">&quot;e&quot;</span>, <span class="number">4</span>),
-            (<span class="string">&quot;f&quot;</span>, <span class="number">5</span>),
-            (<span class="string">&quot;g&quot;</span>, <span class="number">6</span>),
-            (<span class="string">&quot;h&quot;</span>, <span class="number">7</span>),
-            (<span class="string">&quot;i&quot;</span>, <span class="number">8</span>),
+            (<span class="string">"a"</span>, <span class="number">0</span>),
+            (<span class="string">"b"</span>, <span class="number">1</span>),
+            (<span class="string">"c"</span>, <span class="number">2</span>),
+            (<span class="string">"d"</span>, <span class="number">3</span>),
+            (<span class="string">"e"</span>, <span class="number">4</span>),
+            (<span class="string">"f"</span>, <span class="number">5</span>),
+            (<span class="string">"g"</span>, <span class="number">6</span>),
+            (<span class="string">"h"</span>, <span class="number">7</span>),
+            (<span class="string">"i"</span>, <span class="number">8</span>),
         ])
             .into();
-        group = group.label(<span class="string">&quot;Group&quot;</span>.into());
+        group = group.label(<span class="string">"Group"</span>.into());
 
         <span class="kw">let </span>chart = BarChart::default()
             .data(group)
@@ -2481,24 +2482,24 @@
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">17</span>, <span class="number">1</span>));
         chart.render(buffer.area, <span class="kw-2">&amp;mut </span>buffer);
 
-        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;  ▁ ▂ ▃ ▄ ▅ ▆ ▇ 8&quot;</span>]));
+        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"  ▁ ▂ ▃ ▄ ▅ ▆ ▇ 8"</span>]));
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>two_lines() {
         <span class="kw">let </span><span class="kw-2">mut </span>group: BarGroup = (<span class="kw-2">&amp;</span>[
-            (<span class="string">&quot;a&quot;</span>, <span class="number">0</span>),
-            (<span class="string">&quot;b&quot;</span>, <span class="number">1</span>),
-            (<span class="string">&quot;c&quot;</span>, <span class="number">2</span>),
-            (<span class="string">&quot;d&quot;</span>, <span class="number">3</span>),
-            (<span class="string">&quot;e&quot;</span>, <span class="number">4</span>),
-            (<span class="string">&quot;f&quot;</span>, <span class="number">5</span>),
-            (<span class="string">&quot;g&quot;</span>, <span class="number">6</span>),
-            (<span class="string">&quot;h&quot;</span>, <span class="number">7</span>),
-            (<span class="string">&quot;i&quot;</span>, <span class="number">8</span>),
+            (<span class="string">"a"</span>, <span class="number">0</span>),
+            (<span class="string">"b"</span>, <span class="number">1</span>),
+            (<span class="string">"c"</span>, <span class="number">2</span>),
+            (<span class="string">"d"</span>, <span class="number">3</span>),
+            (<span class="string">"e"</span>, <span class="number">4</span>),
+            (<span class="string">"f"</span>, <span class="number">5</span>),
+            (<span class="string">"g"</span>, <span class="number">6</span>),
+            (<span class="string">"h"</span>, <span class="number">7</span>),
+            (<span class="string">"i"</span>, <span class="number">8</span>),
         ])
             .into();
-        group = group.label(<span class="string">&quot;Group&quot;</span>.into());
+        group = group.label(<span class="string">"Group"</span>.into());
 
         <span class="kw">let </span>chart = BarChart::default()
             .data(group)
@@ -2510,9 +2511,9 @@
         <span class="macro">assert_buffer_eq!</span>(
             buffer,
             Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">&quot;                 &quot;</span>,
-                <span class="string">&quot;  ▁ ▂ ▃ ▄ ▅ ▆ ▇ 8&quot;</span>,
-                <span class="string">&quot;a b c d e f g h i&quot;</span>,
+                <span class="string">"                 "</span>,
+                <span class="string">"  ▁ ▂ ▃ ▄ ▅ ▆ ▇ 8"</span>,
+                <span class="string">"a b c d e f g h i"</span>,
             ])
         );
     }
@@ -2520,18 +2521,18 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>three_lines() {
         <span class="kw">let </span><span class="kw-2">mut </span>group: BarGroup = (<span class="kw-2">&amp;</span>[
-            (<span class="string">&quot;a&quot;</span>, <span class="number">0</span>),
-            (<span class="string">&quot;b&quot;</span>, <span class="number">1</span>),
-            (<span class="string">&quot;c&quot;</span>, <span class="number">2</span>),
-            (<span class="string">&quot;d&quot;</span>, <span class="number">3</span>),
-            (<span class="string">&quot;e&quot;</span>, <span class="number">4</span>),
-            (<span class="string">&quot;f&quot;</span>, <span class="number">5</span>),
-            (<span class="string">&quot;g&quot;</span>, <span class="number">6</span>),
-            (<span class="string">&quot;h&quot;</span>, <span class="number">7</span>),
-            (<span class="string">&quot;i&quot;</span>, <span class="number">8</span>),
+            (<span class="string">"a"</span>, <span class="number">0</span>),
+            (<span class="string">"b"</span>, <span class="number">1</span>),
+            (<span class="string">"c"</span>, <span class="number">2</span>),
+            (<span class="string">"d"</span>, <span class="number">3</span>),
+            (<span class="string">"e"</span>, <span class="number">4</span>),
+            (<span class="string">"f"</span>, <span class="number">5</span>),
+            (<span class="string">"g"</span>, <span class="number">6</span>),
+            (<span class="string">"h"</span>, <span class="number">7</span>),
+            (<span class="string">"i"</span>, <span class="number">8</span>),
         ])
             .into();
-        group = group.label(Line::from(<span class="string">&quot;Group&quot;</span>).alignment(Alignment::Center));
+        group = group.label(Line::from(<span class="string">"Group"</span>).alignment(Alignment::Center));
 
         <span class="kw">let </span>chart = BarChart::default()
             .data(group)
@@ -2543,9 +2544,9 @@
         <span class="macro">assert_buffer_eq!</span>(
             buffer,
             Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">&quot;  ▁ ▂ ▃ ▄ ▅ ▆ ▇ 8&quot;</span>,
-                <span class="string">&quot;a b c d e f g h i&quot;</span>,
-                <span class="string">&quot;      Group      &quot;</span>,
+                <span class="string">"  ▁ ▂ ▃ ▄ ▅ ▆ ▇ 8"</span>,
+                <span class="string">"a b c d e f g h i"</span>,
+                <span class="string">"      Group      "</span>,
             ])
         );
     }
@@ -2553,17 +2554,17 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>three_lines_double_width() {
         <span class="kw">let </span><span class="kw-2">mut </span>group = BarGroup::from(<span class="kw-2">&amp;</span>[
-            (<span class="string">&quot;a&quot;</span>, <span class="number">0</span>),
-            (<span class="string">&quot;b&quot;</span>, <span class="number">1</span>),
-            (<span class="string">&quot;c&quot;</span>, <span class="number">2</span>),
-            (<span class="string">&quot;d&quot;</span>, <span class="number">3</span>),
-            (<span class="string">&quot;e&quot;</span>, <span class="number">4</span>),
-            (<span class="string">&quot;f&quot;</span>, <span class="number">5</span>),
-            (<span class="string">&quot;g&quot;</span>, <span class="number">6</span>),
-            (<span class="string">&quot;h&quot;</span>, <span class="number">7</span>),
-            (<span class="string">&quot;i&quot;</span>, <span class="number">8</span>),
+            (<span class="string">"a"</span>, <span class="number">0</span>),
+            (<span class="string">"b"</span>, <span class="number">1</span>),
+            (<span class="string">"c"</span>, <span class="number">2</span>),
+            (<span class="string">"d"</span>, <span class="number">3</span>),
+            (<span class="string">"e"</span>, <span class="number">4</span>),
+            (<span class="string">"f"</span>, <span class="number">5</span>),
+            (<span class="string">"g"</span>, <span class="number">6</span>),
+            (<span class="string">"h"</span>, <span class="number">7</span>),
+            (<span class="string">"i"</span>, <span class="number">8</span>),
         ]);
-        group = group.label(Line::from(<span class="string">&quot;Group&quot;</span>).alignment(Alignment::Center));
+        group = group.label(Line::from(<span class="string">"Group"</span>).alignment(Alignment::Center));
 
         <span class="kw">let </span>chart = BarChart::default()
             .data(group)
@@ -2576,9 +2577,9 @@
         <span class="macro">assert_buffer_eq!</span>(
             buffer,
             Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">&quot;   1▁ 2▂ 3▃ 4▄ 5▅ 6▆ 7▇ 8█&quot;</span>,
-                <span class="string">&quot;a  b  c  d  e  f  g  h  i &quot;</span>,
-                <span class="string">&quot;          Group           &quot;</span>,
+                <span class="string">"   1▁ 2▂ 3▃ 4▄ 5▅ 6▆ 7▇ 8█"</span>,
+                <span class="string">"a  b  c  d  e  f  g  h  i "</span>,
+                <span class="string">"          Group           "</span>,
             ])
         );
     }
@@ -2586,18 +2587,18 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>four_lines() {
         <span class="kw">let </span><span class="kw-2">mut </span>group: BarGroup = (<span class="kw-2">&amp;</span>[
-            (<span class="string">&quot;a&quot;</span>, <span class="number">0</span>),
-            (<span class="string">&quot;b&quot;</span>, <span class="number">1</span>),
-            (<span class="string">&quot;c&quot;</span>, <span class="number">2</span>),
-            (<span class="string">&quot;d&quot;</span>, <span class="number">3</span>),
-            (<span class="string">&quot;e&quot;</span>, <span class="number">4</span>),
-            (<span class="string">&quot;f&quot;</span>, <span class="number">5</span>),
-            (<span class="string">&quot;g&quot;</span>, <span class="number">6</span>),
-            (<span class="string">&quot;h&quot;</span>, <span class="number">7</span>),
-            (<span class="string">&quot;i&quot;</span>, <span class="number">8</span>),
+            (<span class="string">"a"</span>, <span class="number">0</span>),
+            (<span class="string">"b"</span>, <span class="number">1</span>),
+            (<span class="string">"c"</span>, <span class="number">2</span>),
+            (<span class="string">"d"</span>, <span class="number">3</span>),
+            (<span class="string">"e"</span>, <span class="number">4</span>),
+            (<span class="string">"f"</span>, <span class="number">5</span>),
+            (<span class="string">"g"</span>, <span class="number">6</span>),
+            (<span class="string">"h"</span>, <span class="number">7</span>),
+            (<span class="string">"i"</span>, <span class="number">8</span>),
         ])
             .into();
-        group = group.label(Line::from(<span class="string">&quot;Group&quot;</span>).alignment(Alignment::Center));
+        group = group.label(Line::from(<span class="string">"Group"</span>).alignment(Alignment::Center));
 
         <span class="kw">let </span>chart = BarChart::default()
             .data(group)
@@ -2609,10 +2610,10 @@
         <span class="macro">assert_buffer_eq!</span>(
             buffer,
             Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">&quot;          ▂ ▄ ▆ █&quot;</span>,
-                <span class="string">&quot;  ▂ ▄ ▆ 4 5 6 7 8&quot;</span>,
-                <span class="string">&quot;a b c d e f g h i&quot;</span>,
-                <span class="string">&quot;      Group      &quot;</span>,
+                <span class="string">"          ▂ ▄ ▆ █"</span>,
+                <span class="string">"  ▂ ▄ ▆ 4 5 6 7 8"</span>,
+                <span class="string">"a b c d e f g h i"</span>,
+                <span class="string">"      Group      "</span>,
             ])
         );
     }
@@ -2620,7 +2621,7 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>two_lines_without_bar_labels() {
         <span class="kw">let </span>group = BarGroup::default()
-            .label(Line::from(<span class="string">&quot;Group&quot;</span>).alignment(Alignment::Center))
+            .label(Line::from(<span class="string">"Group"</span>).alignment(Alignment::Center))
             .bars(<span class="kw-2">&amp;</span>[
                 Bar::default().value(<span class="number">0</span>),
                 Bar::default().value(<span class="number">1</span>),
@@ -2641,9 +2642,9 @@
         <span class="macro">assert_buffer_eq!</span>(
             buffer,
             Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">&quot;                 &quot;</span>,
-                <span class="string">&quot;  ▁ ▂ ▃ ▄ ▅ ▆ ▇ 8&quot;</span>,
-                <span class="string">&quot;      Group      &quot;</span>,
+                <span class="string">"                 "</span>,
+                <span class="string">"  ▁ ▂ ▃ ▄ ▅ ▆ ▇ 8"</span>,
+                <span class="string">"      Group      "</span>,
             ])
         );
     }
@@ -2660,7 +2661,7 @@
         <span class="macro">assert_buffer_eq!</span>(
             buffer,
             Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">&quot;        ▁ ▁ ▁ ▁ ▂ ▂ ▂ ▃ ▃ ▃ ▃ ▄ ▄ ▄ ▄ ▅ ▅ ▅ ▆ ▆ ▆ ▆ ▇ ▇ ▇ █&quot;</span>,
+                <span class="string">"        ▁ ▁ ▁ ▁ ▂ ▂ ▂ ▃ ▃ ▃ ▃ ▄ ▄ ▄ ▄ ▅ ▅ ▅ ▆ ▆ ▆ ▆ ▇ ▇ ▇ █"</span>,
             ])
         );
     }
@@ -2668,8 +2669,8 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>first_bar_of_the_group_is_half_outside_view() {
         <span class="kw">let </span>chart = BarChart::default()
-            .data(<span class="kw-2">&amp;</span>[(<span class="string">&quot;a&quot;</span>, <span class="number">1</span>), (<span class="string">&quot;b&quot;</span>, <span class="number">2</span>)])
-            .data(<span class="kw-2">&amp;</span>[(<span class="string">&quot;a&quot;</span>, <span class="number">1</span>), (<span class="string">&quot;b&quot;</span>, <span class="number">2</span>)])
+            .data(<span class="kw-2">&amp;</span>[(<span class="string">"a"</span>, <span class="number">1</span>), (<span class="string">"b"</span>, <span class="number">2</span>)])
+            .data(<span class="kw-2">&amp;</span>[(<span class="string">"a"</span>, <span class="number">1</span>), (<span class="string">"b"</span>, <span class="number">2</span>)])
             .bar_width(<span class="number">2</span>);
 
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">7</span>, <span class="number">6</span>));
@@ -2678,12 +2679,12 @@
         <span class="macro">assert_buffer_eq!</span>(
             buffer,
             Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">&quot;   ██  &quot;</span>,
-                <span class="string">&quot;   ██  &quot;</span>,
-                <span class="string">&quot;▄▄ ██  &quot;</span>,
-                <span class="string">&quot;██ ██  &quot;</span>,
-                <span class="string">&quot;1█ 2█  &quot;</span>,
-                <span class="string">&quot;a  b   &quot;</span>,
+                <span class="string">"   ██  "</span>,
+                <span class="string">"   ██  "</span>,
+                <span class="string">"▄▄ ██  "</span>,
+                <span class="string">"██ ██  "</span>,
+                <span class="string">"1█ 2█  "</span>,
+                <span class="string">"a  b   "</span>,
             ])
         );
     }

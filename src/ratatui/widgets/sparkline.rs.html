@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.25.0/src/widgets/sparkline.rs`."><title>sparkline.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.25.0/src/widgets/sparkline.rs`."><title>sparkline.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><a class="sub-logo-container" href="../../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -342,7 +343,7 @@
 /// # Setter methods
 ///
 /// - [`Sparkline::block`] wraps the sparkline in a [`Block`]
-/// - [`Sparkline::data`] defines the dataset, you&#39;ll almost always want to use it
+/// - [`Sparkline::data`] defines the dataset, you'll almost always want to use it
 /// - [`Sparkline::max`] sets the maximum value of bars
 /// - [`Sparkline::direction`] sets the render direction
 ///
@@ -352,20 +353,20 @@
 /// use ratatui::{prelude::*, widgets::*};
 ///
 /// Sparkline::default()
-///     .block(Block::default().title(&quot;Sparkline&quot;).borders(Borders::ALL))
+///     .block(Block::default().title("Sparkline").borders(Borders::ALL))
 ///     .data(&amp;[0, 2, 3, 4, 1, 4, 10])
 ///     .max(5)
 ///     .direction(RenderDirection::RightToLeft)
 ///     .style(Style::default().red().on_white());
 /// ```
 </span><span class="attr">#[derive(Debug, Clone, Eq, PartialEq)]
-</span><span class="kw">pub struct </span>Sparkline&lt;<span class="lifetime">&#39;a</span>&gt; {
+</span><span class="kw">pub struct </span>Sparkline&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// A block to wrap the widget in
-    </span>block: <span class="prelude-ty">Option</span>&lt;Block&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    </span>block: <span class="prelude-ty">Option</span>&lt;Block&lt;<span class="lifetime">'a</span>&gt;&gt;,
     <span class="doccomment">/// Widget style
     </span>style: Style,
     <span class="doccomment">/// A slice of the data to display
-    </span>data: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u64],
+    </span>data: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>[u64],
     <span class="doccomment">/// The maximum value to take to compute the maximum bar height (if nothing is specified, the
     /// widget uses the max of the dataset)
     </span>max: <span class="prelude-ty">Option</span>&lt;u64&gt;,
@@ -387,8 +388,8 @@
     </span>RightToLeft,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Default <span class="kw">for </span>Sparkline&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">fn </span>default() -&gt; Sparkline&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Default <span class="kw">for </span>Sparkline&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">fn </span>default() -&gt; Sparkline&lt;<span class="lifetime">'a</span>&gt; {
         Sparkline {
             block: <span class="prelude-val">None</span>,
             style: Style::default(),
@@ -400,10 +401,10 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Sparkline&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Sparkline&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Wraps the sparkline with the given `block`.
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
-    </span><span class="kw">pub fn </span>block(<span class="kw-2">mut </span><span class="self">self</span>, block: Block&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; Sparkline&lt;<span class="lifetime">&#39;a</span>&gt; {
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>block(<span class="kw-2">mut </span><span class="self">self</span>, block: Block&lt;<span class="lifetime">'a</span>&gt;) -&gt; Sparkline&lt;<span class="lifetime">'a</span>&gt; {
         <span class="self">self</span>.block = <span class="prelude-val">Some</span>(block);
         <span class="self">self
     </span>}
@@ -411,8 +412,8 @@
     <span class="doccomment">/// Sets the style of the entire widget.
     ///
     /// The foreground corresponds to the bars while the background is everything else.
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
-    </span><span class="kw">pub fn </span>style(<span class="kw-2">mut </span><span class="self">self</span>, style: Style) -&gt; Sparkline&lt;<span class="lifetime">&#39;a</span>&gt; {
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>style(<span class="kw-2">mut </span><span class="self">self</span>, style: Style) -&gt; Sparkline&lt;<span class="lifetime">'a</span>&gt; {
         <span class="self">self</span>.style = style;
         <span class="self">self
     </span>}
@@ -429,8 +430,8 @@
     /// frame.render_widget(sparkline, area);
     /// # }
     /// ```
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
-    </span><span class="kw">pub fn </span>data(<span class="kw-2">mut </span><span class="self">self</span>, data: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u64]) -&gt; Sparkline&lt;<span class="lifetime">&#39;a</span>&gt; {
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>data(<span class="kw-2">mut </span><span class="self">self</span>, data: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>[u64]) -&gt; Sparkline&lt;<span class="lifetime">'a</span>&gt; {
         <span class="self">self</span>.data = data;
         <span class="self">self
     </span>}
@@ -439,8 +440,8 @@
     ///
     /// Every bar will be scaled accordingly. If no max is given, this will be the max in the
     /// dataset.
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
-    </span><span class="kw">pub fn </span>max(<span class="kw-2">mut </span><span class="self">self</span>, max: u64) -&gt; Sparkline&lt;<span class="lifetime">&#39;a</span>&gt; {
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>max(<span class="kw-2">mut </span><span class="self">self</span>, max: u64) -&gt; Sparkline&lt;<span class="lifetime">'a</span>&gt; {
         <span class="self">self</span>.max = <span class="prelude-val">Some</span>(max);
         <span class="self">self
     </span>}
@@ -449,8 +450,8 @@
     ///
     /// Can be [`symbols::bar::THREE_LEVELS`], [`symbols::bar::NINE_LEVELS`] (default) or a custom
     /// [`Set`](symbols::bar::Set).
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
-    </span><span class="kw">pub fn </span>bar_set(<span class="kw-2">mut </span><span class="self">self</span>, bar_set: symbols::bar::Set) -&gt; Sparkline&lt;<span class="lifetime">&#39;a</span>&gt; {
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>bar_set(<span class="kw-2">mut </span><span class="self">self</span>, bar_set: symbols::bar::Set) -&gt; Sparkline&lt;<span class="lifetime">'a</span>&gt; {
         <span class="self">self</span>.bar_set = bar_set;
         <span class="self">self
     </span>}
@@ -458,15 +459,15 @@
     <span class="doccomment">/// Sets the direction of the sparkline.
     ///
     /// [`RenderDirection::LeftToRight`] by default.
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
-    </span><span class="kw">pub fn </span>direction(<span class="kw-2">mut </span><span class="self">self</span>, direction: RenderDirection) -&gt; Sparkline&lt;<span class="lifetime">&#39;a</span>&gt; {
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>direction(<span class="kw-2">mut </span><span class="self">self</span>, direction: RenderDirection) -&gt; Sparkline&lt;<span class="lifetime">'a</span>&gt; {
         <span class="self">self</span>.direction = direction;
         <span class="self">self
     </span>}
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Styled <span class="kw">for </span>Sparkline&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">type </span>Item = Sparkline&lt;<span class="lifetime">&#39;a</span>&gt;;
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Styled <span class="kw">for </span>Sparkline&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">type </span>Item = Sparkline&lt;<span class="lifetime">'a</span>&gt;;
 
     <span class="kw">fn </span>style(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Style {
         <span class="self">self</span>.style
@@ -477,7 +478,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Widget <span class="kw">for </span>Sparkline&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Widget <span class="kw">for </span>Sparkline&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">fn </span>render(<span class="kw-2">mut </span><span class="self">self</span>, area: Rect, buf: <span class="kw-2">&amp;mut </span>Buffer) {
         <span class="kw">let </span>spark_area = <span class="kw">match </span><span class="self">self</span>.block.take() {
             <span class="prelude-val">Some</span>(b) =&gt; {
@@ -553,22 +554,22 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>render_direction_to_string() {
-        <span class="macro">assert_eq!</span>(RenderDirection::LeftToRight.to_string(), <span class="string">&quot;LeftToRight&quot;</span>);
-        <span class="macro">assert_eq!</span>(RenderDirection::RightToLeft.to_string(), <span class="string">&quot;RightToLeft&quot;</span>);
+        <span class="macro">assert_eq!</span>(RenderDirection::LeftToRight.to_string(), <span class="string">"LeftToRight"</span>);
+        <span class="macro">assert_eq!</span>(RenderDirection::RightToLeft.to_string(), <span class="string">"RightToLeft"</span>);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>render_direction_from_str() {
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;LeftToRight&quot;</span>.parse::&lt;RenderDirection&gt;(),
+            <span class="string">"LeftToRight"</span>.parse::&lt;RenderDirection&gt;(),
             <span class="prelude-val">Ok</span>(RenderDirection::LeftToRight)
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;RightToLeft&quot;</span>.parse::&lt;RenderDirection&gt;(),
+            <span class="string">"RightToLeft"</span>.parse::&lt;RenderDirection&gt;(),
             <span class="prelude-val">Ok</span>(RenderDirection::RightToLeft)
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;&quot;</span>.parse::&lt;RenderDirection&gt;(),
+            <span class="string">""</span>.parse::&lt;RenderDirection&gt;(),
             <span class="prelude-val">Err</span>(ParseError::VariantNotFound)
         );
     }
@@ -578,7 +579,7 @@
     </span><span class="kw">fn </span>render(widget: Sparkline, width: u16) -&gt; Buffer {
         <span class="kw">let </span>area = Rect::new(<span class="number">0</span>, <span class="number">0</span>, width, <span class="number">1</span>);
         <span class="kw">let </span><span class="kw-2">mut </span>cell = Cell::default();
-        cell.set_symbol(<span class="string">&quot;x&quot;</span>);
+        cell.set_symbol(<span class="string">"x"</span>);
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = Buffer::filled(area, <span class="kw-2">&amp;</span>cell);
         widget.render(area, <span class="kw-2">&amp;mut </span>buffer);
         buffer
@@ -588,21 +589,21 @@
     </span><span class="kw">fn </span>it_does_not_panic_if_max_is_zero() {
         <span class="kw">let </span>widget = Sparkline::default().data(<span class="kw-2">&amp;</span>[<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>]);
         <span class="kw">let </span>buffer = render(widget, <span class="number">6</span>);
-        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;   xxx&quot;</span>]));
+        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"   xxx"</span>]));
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>it_does_not_panic_if_max_is_set_to_zero() {
         <span class="kw">let </span>widget = Sparkline::default().data(<span class="kw-2">&amp;</span>[<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>]).max(<span class="number">0</span>);
         <span class="kw">let </span>buffer = render(widget, <span class="number">6</span>);
-        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;   xxx&quot;</span>]));
+        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"   xxx"</span>]));
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>it_draws() {
         <span class="kw">let </span>widget = Sparkline::default().data(<span class="kw-2">&amp;</span>[<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>]);
         <span class="kw">let </span>buffer = render(widget, <span class="number">12</span>);
-        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot; ▁▂▃▄▅▆▇█xxx&quot;</span>]));
+        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">" ▁▂▃▄▅▆▇█xxx"</span>]));
     }
 
     <span class="attr">#[test]
@@ -611,7 +612,7 @@
             .data(<span class="kw-2">&amp;</span>[<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>])
             .direction(RenderDirection::LeftToRight);
         <span class="kw">let </span>buffer = render(widget, <span class="number">12</span>);
-        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot; ▁▂▃▄▅▆▇█xxx&quot;</span>]));
+        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">" ▁▂▃▄▅▆▇█xxx"</span>]));
     }
 
     <span class="attr">#[test]
@@ -620,7 +621,7 @@
             .data(<span class="kw-2">&amp;</span>[<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>])
             .direction(RenderDirection::RightToLeft);
         <span class="kw">let </span>buffer = render(widget, <span class="number">12</span>);
-        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;xxx█▇▆▅▄▃▂▁ &quot;</span>]));
+        <span class="macro">assert_buffer_eq!</span>(buffer, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"xxx█▇▆▅▄▃▂▁ "</span>]));
     }
 
     <span class="attr">#[test]

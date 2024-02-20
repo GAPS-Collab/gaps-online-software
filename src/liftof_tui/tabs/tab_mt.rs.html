@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-tui/src/tabs/tab_mt.rs`."><title>tab_mt.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="liftof_tui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-tui/src/tabs/tab_mt.rs`."><title>tab_mt.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="liftof_tui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -455,16 +456,16 @@
 };
 
 
-<span class="kw">pub const </span>HIST_LABELS : [<span class="kw-2">&amp;</span>str;<span class="number">100</span>]  = [<span class="string">&quot;0&quot;</span>,   <span class="string">&quot;1&quot;</span>, <span class="string">&quot;2&quot;</span>,  <span class="string">&quot;3&quot;</span>,  <span class="string">&quot;4&quot;</span>,  <span class="string">&quot;5&quot;</span>,  <span class="string">&quot;6&quot;</span>,  <span class="string">&quot;7&quot;</span>,  <span class="string">&quot;8&quot;</span>,  <span class="string">&quot;9&quot;</span>,
-                                       <span class="string">&quot;10&quot;</span>, <span class="string">&quot;11&quot;</span>, <span class="string">&quot;12&quot;</span>, <span class="string">&quot;13&quot;</span>, <span class="string">&quot;14&quot;</span>, <span class="string">&quot;15&quot;</span>, <span class="string">&quot;16&quot;</span>, <span class="string">&quot;17&quot;</span>, <span class="string">&quot;18&quot;</span>, <span class="string">&quot;19&quot;</span>,
-                                       <span class="string">&quot;20&quot;</span>, <span class="string">&quot;21&quot;</span>, <span class="string">&quot;22&quot;</span>, <span class="string">&quot;23&quot;</span>, <span class="string">&quot;24&quot;</span>, <span class="string">&quot;25&quot;</span>, <span class="string">&quot;26&quot;</span>, <span class="string">&quot;27&quot;</span>, <span class="string">&quot;28&quot;</span>, <span class="string">&quot;29&quot;</span>, 
-                                       <span class="string">&quot;30&quot;</span>, <span class="string">&quot;31&quot;</span>, <span class="string">&quot;32&quot;</span>, <span class="string">&quot;33&quot;</span>, <span class="string">&quot;34&quot;</span>, <span class="string">&quot;35&quot;</span>, <span class="string">&quot;36&quot;</span>, <span class="string">&quot;37&quot;</span>, <span class="string">&quot;38&quot;</span>, <span class="string">&quot;39&quot;</span>,
-                                       <span class="string">&quot;40&quot;</span>, <span class="string">&quot;41&quot;</span>, <span class="string">&quot;42&quot;</span>, <span class="string">&quot;43&quot;</span>, <span class="string">&quot;44&quot;</span>, <span class="string">&quot;45&quot;</span>, <span class="string">&quot;46&quot;</span>, <span class="string">&quot;47&quot;</span>, <span class="string">&quot;48&quot;</span>, <span class="string">&quot;49&quot;</span>,
-                                       <span class="string">&quot;50&quot;</span>, <span class="string">&quot;51&quot;</span>, <span class="string">&quot;52&quot;</span>, <span class="string">&quot;53&quot;</span>, <span class="string">&quot;54&quot;</span>, <span class="string">&quot;55&quot;</span>, <span class="string">&quot;56&quot;</span>, <span class="string">&quot;57&quot;</span>, <span class="string">&quot;58&quot;</span>, <span class="string">&quot;59&quot;</span>,
-                                       <span class="string">&quot;60&quot;</span>, <span class="string">&quot;61&quot;</span>, <span class="string">&quot;62&quot;</span>, <span class="string">&quot;63&quot;</span>, <span class="string">&quot;64&quot;</span>, <span class="string">&quot;65&quot;</span>, <span class="string">&quot;66&quot;</span>, <span class="string">&quot;67&quot;</span>, <span class="string">&quot;68&quot;</span>, <span class="string">&quot;69&quot;</span>,
-                                       <span class="string">&quot;70&quot;</span>, <span class="string">&quot;71&quot;</span>, <span class="string">&quot;72&quot;</span>, <span class="string">&quot;73&quot;</span>, <span class="string">&quot;74&quot;</span>, <span class="string">&quot;75&quot;</span>, <span class="string">&quot;76&quot;</span>, <span class="string">&quot;77&quot;</span>, <span class="string">&quot;78&quot;</span>, <span class="string">&quot;79&quot;</span>,
-                                       <span class="string">&quot;80&quot;</span>, <span class="string">&quot;81&quot;</span>, <span class="string">&quot;82&quot;</span>, <span class="string">&quot;83&quot;</span>, <span class="string">&quot;84&quot;</span>, <span class="string">&quot;85&quot;</span>, <span class="string">&quot;86&quot;</span>, <span class="string">&quot;87&quot;</span>, <span class="string">&quot;88&quot;</span>, <span class="string">&quot;89&quot;</span>,
-                                       <span class="string">&quot;90&quot;</span>, <span class="string">&quot;91&quot;</span>, <span class="string">&quot;92&quot;</span>, <span class="string">&quot;93&quot;</span>, <span class="string">&quot;94&quot;</span>, <span class="string">&quot;95&quot;</span>, <span class="string">&quot;96&quot;</span>, <span class="string">&quot;97&quot;</span>, <span class="string">&quot;98&quot;</span>, <span class="string">&quot;99&quot;</span>,
+<span class="kw">pub const </span>HIST_LABELS : [<span class="kw-2">&amp;</span>str;<span class="number">100</span>]  = [<span class="string">"0"</span>,   <span class="string">"1"</span>, <span class="string">"2"</span>,  <span class="string">"3"</span>,  <span class="string">"4"</span>,  <span class="string">"5"</span>,  <span class="string">"6"</span>,  <span class="string">"7"</span>,  <span class="string">"8"</span>,  <span class="string">"9"</span>,
+                                       <span class="string">"10"</span>, <span class="string">"11"</span>, <span class="string">"12"</span>, <span class="string">"13"</span>, <span class="string">"14"</span>, <span class="string">"15"</span>, <span class="string">"16"</span>, <span class="string">"17"</span>, <span class="string">"18"</span>, <span class="string">"19"</span>,
+                                       <span class="string">"20"</span>, <span class="string">"21"</span>, <span class="string">"22"</span>, <span class="string">"23"</span>, <span class="string">"24"</span>, <span class="string">"25"</span>, <span class="string">"26"</span>, <span class="string">"27"</span>, <span class="string">"28"</span>, <span class="string">"29"</span>, 
+                                       <span class="string">"30"</span>, <span class="string">"31"</span>, <span class="string">"32"</span>, <span class="string">"33"</span>, <span class="string">"34"</span>, <span class="string">"35"</span>, <span class="string">"36"</span>, <span class="string">"37"</span>, <span class="string">"38"</span>, <span class="string">"39"</span>,
+                                       <span class="string">"40"</span>, <span class="string">"41"</span>, <span class="string">"42"</span>, <span class="string">"43"</span>, <span class="string">"44"</span>, <span class="string">"45"</span>, <span class="string">"46"</span>, <span class="string">"47"</span>, <span class="string">"48"</span>, <span class="string">"49"</span>,
+                                       <span class="string">"50"</span>, <span class="string">"51"</span>, <span class="string">"52"</span>, <span class="string">"53"</span>, <span class="string">"54"</span>, <span class="string">"55"</span>, <span class="string">"56"</span>, <span class="string">"57"</span>, <span class="string">"58"</span>, <span class="string">"59"</span>,
+                                       <span class="string">"60"</span>, <span class="string">"61"</span>, <span class="string">"62"</span>, <span class="string">"63"</span>, <span class="string">"64"</span>, <span class="string">"65"</span>, <span class="string">"66"</span>, <span class="string">"67"</span>, <span class="string">"68"</span>, <span class="string">"69"</span>,
+                                       <span class="string">"70"</span>, <span class="string">"71"</span>, <span class="string">"72"</span>, <span class="string">"73"</span>, <span class="string">"74"</span>, <span class="string">"75"</span>, <span class="string">"76"</span>, <span class="string">"77"</span>, <span class="string">"78"</span>, <span class="string">"79"</span>,
+                                       <span class="string">"80"</span>, <span class="string">"81"</span>, <span class="string">"82"</span>, <span class="string">"83"</span>, <span class="string">"84"</span>, <span class="string">"85"</span>, <span class="string">"86"</span>, <span class="string">"87"</span>, <span class="string">"88"</span>, <span class="string">"89"</span>,
+                                       <span class="string">"90"</span>, <span class="string">"91"</span>, <span class="string">"92"</span>, <span class="string">"93"</span>, <span class="string">"94"</span>, <span class="string">"95"</span>, <span class="string">"96"</span>, <span class="string">"97"</span>, <span class="string">"98"</span>, <span class="string">"99"</span>,
                                        ];
 
 
@@ -536,13 +537,13 @@
         }
       },
       <span class="prelude-val">Ok</span>(pack)    =&gt; {
-        <span class="macro">info!</span>(<span class="string">&quot;Got next packet {}!&quot;</span>, pack);
+        <span class="macro">info!</span>(<span class="string">"Got next packet {}!"</span>, pack);
         <span class="kw">match </span>pack.packet_type {
           PacketType::MasterTrigger =&gt; {
             mte = MasterTriggerEvent::from_bytestream(<span class="kw-2">&amp;</span>pack.payload, <span class="kw-2">&amp;mut </span><span class="number">0</span>)<span class="question-mark">?</span>;
           },
           PacketType::MonitorMtb   =&gt; {
-            <span class="macro">info!</span>(<span class="string">&quot;Got new MtbMoniData!&quot;</span>);
+            <span class="macro">info!</span>(<span class="string">"Got new MtbMoniData!"</span>);
             <span class="kw">let </span>moni = MtbMoniData::from_bytestream(<span class="kw-2">&amp;</span>pack.payload, <span class="kw-2">&amp;mut </span><span class="number">0</span>)<span class="question-mark">?</span>;
             <span class="self">self</span>.n_moni += <span class="number">1</span>;
             <span class="self">self</span>.moni_queue.push_back(moni);
@@ -648,7 +649,7 @@
                             (r_min + <span class="number">5</span><span class="kw-2">*</span>rate_spacing).to_string()];
      
      <span class="kw">let </span>rate_dataset = <span class="macro">vec!</span>[Dataset::default()
-         .name(<span class="string">&quot;MTB Rate&quot;</span>)
+         .name(<span class="string">"MTB Rate"</span>)
          .marker(symbols::Marker::Braille)
          .graph_type(GraphType::Line)
          <span class="comment">//.style(Style::default().fg(pl.get_fg_light()).bg(pl.get_bg_dark()))
@@ -660,17 +661,17 @@
         Block::default()
           .borders(Borders::ALL)
           .style(Style::default().patch(<span class="self">self</span>.theme.style()))
-          .title(<span class="string">&quot;MT rate &quot;</span>.to_owned() )
+          .title(<span class="string">"MT rate "</span>.to_owned() )
           .border_type(BorderType::Double),
       )
       .x_axis(Axis::default()
-        .title(Span::styled(<span class="string">&quot;MET [s]&quot;</span>, Style::default().patch(<span class="self">self</span>.theme.style())))
+        .title(Span::styled(<span class="string">"MET [s]"</span>, Style::default().patch(<span class="self">self</span>.theme.style())))
         .style(Style::default().patch(<span class="self">self</span>.theme.style()))
         .bounds([t_min <span class="kw">as </span>f64, t_max <span class="kw">as </span>f64])
         <span class="comment">//.bounds([0.0, 1000.0])
         </span>.labels(t_labels.clone().iter().cloned().map(Span::from).collect()))
       .y_axis(Axis::default()
-        .title(Span::styled(<span class="string">&quot;Hz&quot;</span>, Style::default().patch(<span class="self">self</span>.theme.style())))
+        .title(Span::styled(<span class="string">"Hz"</span>, Style::default().patch(<span class="self">self</span>.theme.style())))
         .style(Style::default().patch(<span class="self">self</span>.theme.style()))
         .bounds([r_min <span class="kw">as </span>f64, r_max <span class="kw">as </span>f64])
         <span class="comment">//.bounds([0.0,1000.0])
@@ -691,14 +692,14 @@
     }
     bins.retain(|<span class="kw-2">&amp;</span>(x,<span class="kw">_</span>)| x &lt;= max_pop_bin);
     <span class="kw">let </span><span class="kw-2">mut </span>bins_for_bc = Vec::&lt;(<span class="kw-2">&amp;</span>str, u64)&gt;::new();
-    <span class="macro">debug!</span>(<span class="string">&quot;bins: {:?}&quot;</span>, bins);
+    <span class="macro">debug!</span>(<span class="string">"bins: {:?}"</span>, bins);
     <span class="kw">for </span>n <span class="kw">in </span>bins.iter() {
       bins_for_bc.push((HIST_LABELS[n.<span class="number">0 </span><span class="kw">as </span>usize], n.<span class="number">1</span>));
       <span class="comment">//bins_for_bc.push((foo, n.1));
       //n_iter += 1;
     </span>}
     <span class="kw">let </span>nch_chart = BarChart::default()
-      .block(Block::default().title(<span class="string">&quot;N Hits (N CH)&quot;</span>).borders(Borders::ALL))
+      .block(Block::default().title(<span class="string">"N Hits (N CH)"</span>).borders(Borders::ALL))
       .data(bins_for_bc.as_slice())
       .bar_width(<span class="number">1</span>)
       .bar_gap(<span class="number">1</span>)
@@ -726,7 +727,7 @@
                          (tmp_min + <span class="number">4</span><span class="kw-2">*</span>tmp_spacing).to_string(),
                          (tmp_min + <span class="number">5</span><span class="kw-2">*</span>tmp_spacing).to_string()];
     <span class="kw">let </span>fpga_temp_dataset = <span class="macro">vec!</span>[Dataset::default()
-        .name(<span class="string">&quot;FPGA T&quot;</span>)
+        .name(<span class="string">"FPGA T"</span>)
         .marker(symbols::Marker::Braille)
         .graph_type(GraphType::Line)
         .style(Style::default().patch(<span class="self">self</span>.theme.style()))
@@ -736,16 +737,16 @@
         Block::default()
           .borders(Borders::ALL)
           .style(Style::default().patch(<span class="self">self</span>.theme.style()))
-          .title(<span class="string">&quot;FPGA T [\u{00B0}C] &quot;</span>.to_owned() )
+          .title(<span class="string">"FPGA T [\u{00B0}C] "</span>.to_owned() )
           .border_type(BorderType::Double),
       )
       .x_axis(Axis::default()
-        .title(Span::styled(<span class="string">&quot;MET [s]&quot;</span>, Style::default().fg(Color::White)))
+        .title(Span::styled(<span class="string">"MET [s]"</span>, Style::default().fg(Color::White)))
         .style(Style::default().patch(<span class="self">self</span>.theme.style()))
         .bounds([t_min <span class="kw">as </span>f64, t_max <span class="kw">as </span>f64])
         .labels(t_labels.clone().iter().cloned().map(Span::from).collect()))
       .y_axis(Axis::default()
-        <span class="comment">//.title(Span::styled(&quot;T [\u{00B0}C]&quot;, Style::default().fg(Color::White)))
+        <span class="comment">//.title(Span::styled("T [\u{00B0}C]", Style::default().fg(Color::White)))
         </span>.style(<span class="self">self</span>.theme.style())
         .bounds([tmp_min <span class="kw">as </span>f64, tmp_max <span class="kw">as </span>f64])
         .labels(tmp_labels.clone().iter().cloned().map(Span::from).collect()))
@@ -758,7 +759,7 @@
         view_string = event.to_string();
       }, 
       <span class="prelude-val">None </span>=&gt; {
-        view_string = String::from(<span class="string">&quot;EVT QUEUE EMPTY!&quot;</span>);
+        view_string = String::from(<span class="string">"EVT QUEUE EMPTY!"</span>);
       }
     }
     <span class="kw">let </span>event_view = Paragraph::new(view_string)
@@ -769,7 +770,7 @@
       Block::default()
         .borders(Borders::ALL)
         .style(<span class="self">self</span>.theme.style())
-        .title(<span class="string">&quot;Last MasterTriggerEvent&quot;</span>)
+        .title(<span class="string">"Last MasterTriggerEvent"</span>)
         .border_type(BorderType::Rounded),
     );
 
@@ -780,7 +781,7 @@
         view_moni = moni.to_string();
       }, 
       <span class="prelude-val">None </span>=&gt; {
-        view_moni = String::from(<span class="string">&quot;MTBMONI QUEUE EMPTY!&quot;</span>);
+        view_moni = String::from(<span class="string">"MTBMONI QUEUE EMPTY!"</span>);
       }
     }
     
@@ -791,16 +792,16 @@
       Block::default()
         .borders(Borders::ALL)
         .style(<span class="self">self</span>.theme.style())
-        .title(<span class="string">&quot;Last MtbMoniData&quot;</span>)
+        .title(<span class="string">"Last MtbMoniData"</span>)
         .border_type(BorderType::Rounded),
     );
     
     <span class="kw">let </span>met = <span class="self">self</span>.met_queue.back().unwrap_or(<span class="kw-2">&amp;</span><span class="number">0.0</span>);
-    <span class="kw">let </span>view_summary = <span class="macro">format!</span>(<span class="string">&quot;Summary Statistics:
+    <span class="kw">let </span>view_summary = <span class="macro">format!</span>(<span class="string">"Summary Statistics:
   N_Events                         : {}
   N_Moni                           : {}
   Mission Elapsed Time (MET) [sec] : {:.3}
-  N EventID Missed                 : {}&quot;</span>,
+  N EventID Missed                 : {}"</span>,
                               <span class="self">self</span>.n_events,
                               <span class="self">self</span>.n_moni,
                               met,
@@ -812,7 +813,7 @@
       Block::default()
         .borders(Borders::ALL)
         .style(<span class="self">self</span>.theme.style())
-        .title(<span class="string">&quot;Overview&quot;</span>)
+        .title(<span class="string">"Overview"</span>)
         .border_type(BorderType::Rounded),
     );
 
@@ -832,7 +833,7 @@
 //      Block::default()
 //        .borders(Borders::ALL)
 //        .style(Style::default().fg(Color::White))
-//        .title(&quot;Network I/O&quot;)
+//        .title("Network I/O")
 //        .border_type(BorderType::Double),
 //    ) // or THREE_LEVELS
 //    .bar_set(tui::symbols::bar::NINE_LEVELS)

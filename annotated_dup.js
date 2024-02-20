@@ -20,6 +20,7 @@ var annotated_dup =
     [ "RBEventMemoryView", "structRBEventMemoryView.html", "structRBEventMemoryView" ],
     [ "RBMissingHit", "structRBMissingHit.html", "structRBMissingHit" ],
     [ "RBMoniData", "structRBMoniData.html", "structRBMoniData" ],
+    [ "RBWaveform", "structRBWaveform.html", "structRBWaveform" ],
     [ "SimPrimary", "structSimPrimary.html", "structSimPrimary" ],
     [ "TofEvent", "structTofEvent.html", "structTofEvent" ],
     [ "TofEventHeader", "structTofEventHeader.html", "structTofEventHeader" ],

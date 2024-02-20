@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.25.0/src/widgets/paragraph.rs`."><title>paragraph.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.25.0/src/widgets/paragraph.rs`."><title>paragraph.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><a class="sub-logo-container" href="../../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -952,29 +953,29 @@
 ///
 /// let text = vec![
 ///     Line::from(vec![
-///         Span::raw(&quot;First&quot;),
-///         Span::styled(&quot;line&quot;, Style::new().green().italic()),
-///         &quot;.&quot;.into(),
+///         Span::raw("First"),
+///         Span::styled("line", Style::new().green().italic()),
+///         ".".into(),
 ///     ]),
-///     Line::from(&quot;Second line&quot;.red()),
-///     &quot;Third line&quot;.into(),
+///     Line::from("Second line".red()),
+///     "Third line".into(),
 /// ];
 /// Paragraph::new(text)
-///     .block(Block::new().title(&quot;Paragraph&quot;).borders(Borders::ALL))
+///     .block(Block::new().title("Paragraph").borders(Borders::ALL))
 ///     .style(Style::new().white().on_black())
 ///     .alignment(Alignment::Center)
 ///     .wrap(Wrap { trim: true });
 /// ```
 </span><span class="attr">#[derive(Debug, Default, Clone, Eq, PartialEq, Hash)]
-</span><span class="kw">pub struct </span>Paragraph&lt;<span class="lifetime">&#39;a</span>&gt; {
+</span><span class="kw">pub struct </span>Paragraph&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// A block to wrap the widget in
-    </span>block: <span class="prelude-ty">Option</span>&lt;Block&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    </span>block: <span class="prelude-ty">Option</span>&lt;Block&lt;<span class="lifetime">'a</span>&gt;&gt;,
     <span class="doccomment">/// Widget style
     </span>style: Style,
     <span class="doccomment">/// How to wrap the text
     </span>wrap: <span class="prelude-ty">Option</span>&lt;Wrap&gt;,
     <span class="doccomment">/// The text to display
-    </span>text: Text&lt;<span class="lifetime">&#39;a</span>&gt;,
+    </span>text: Text&lt;<span class="lifetime">'a</span>&gt;,
     <span class="doccomment">/// Scroll
     </span>scroll: (u16, u16),
     <span class="doccomment">/// Alignment of the text
@@ -989,9 +990,9 @@
 /// use ratatui::{prelude::*, widgets::*};
 ///
 /// let bullet_points = Text::from(
-///     r#&quot;Some indented points:
+///     r#"Some indented points:
 ///     - First thing goes here and is long so that it wraps
-///     - Here is another point that is long enough to wrap&quot;#,
+///     - Here is another point that is long enough to wrap"#,
 /// );
 ///
 /// // With leading spaces trimmed (window width of 30 chars):
@@ -1019,7 +1020,7 @@
 <span class="kw">type </span>Horizontal = u16;
 <span class="kw">type </span>Vertical = u16;
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Paragraph&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Paragraph&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Creates a new [`Paragraph`] widget with the given text.
     ///
     /// The `text` parameter can be a [`Text`] or any type that can be converted into a [`Text`]. By
@@ -1029,15 +1030,15 @@
     ///
     /// ```rust
     /// # use ratatui::{prelude::*, widgets::*};
-    /// let paragraph = Paragraph::new(&quot;Hello, world!&quot;);
-    /// let paragraph = Paragraph::new(String::from(&quot;Hello, world!&quot;));
-    /// let paragraph = Paragraph::new(Text::raw(&quot;Hello, world!&quot;));
-    /// let paragraph = Paragraph::new(Text::styled(&quot;Hello, world!&quot;, Style::default()));
-    /// let paragraph = Paragraph::new(Line::from(vec![&quot;Hello, &quot;.into(), &quot;world!&quot;.red()]));
+    /// let paragraph = Paragraph::new("Hello, world!");
+    /// let paragraph = Paragraph::new(String::from("Hello, world!"));
+    /// let paragraph = Paragraph::new(Text::raw("Hello, world!"));
+    /// let paragraph = Paragraph::new(Text::styled("Hello, world!", Style::default()));
+    /// let paragraph = Paragraph::new(Line::from(vec!["Hello, ".into(), "world!".red()]));
     /// ```
-    </span><span class="kw">pub fn </span>new&lt;T&gt;(text: T) -&gt; Paragraph&lt;<span class="lifetime">&#39;a</span>&gt;
+    </span><span class="kw">pub fn </span>new&lt;T&gt;(text: T) -&gt; Paragraph&lt;<span class="lifetime">'a</span>&gt;
     <span class="kw">where
-        </span>T: Into&lt;Text&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+        </span>T: Into&lt;Text&lt;<span class="lifetime">'a</span>&gt;&gt;,
     {
         Paragraph {
             block: <span class="prelude-val">None</span>,
@@ -1055,11 +1056,11 @@
     ///
     /// ```rust
     /// # use ratatui::{prelude::*, widgets::*};
-    /// let paragraph = Paragraph::new(&quot;Hello, world!&quot;)
-    ///     .block(Block::default().title(&quot;Paragraph&quot;).borders(Borders::ALL));
+    /// let paragraph = Paragraph::new("Hello, world!")
+    ///     .block(Block::default().title("Paragraph").borders(Borders::ALL));
     /// ```
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
-    </span><span class="kw">pub fn </span>block(<span class="kw-2">mut </span><span class="self">self</span>, block: Block&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; Paragraph&lt;<span class="lifetime">&#39;a</span>&gt; {
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>block(<span class="kw-2">mut </span><span class="self">self</span>, block: Block&lt;<span class="lifetime">'a</span>&gt;) -&gt; Paragraph&lt;<span class="lifetime">'a</span>&gt; {
         <span class="self">self</span>.block = <span class="prelude-val">Some</span>(block);
         <span class="self">self
     </span>}
@@ -1073,10 +1074,10 @@
     ///
     /// ```rust
     /// # use ratatui::{prelude::*, widgets::*};
-    /// let paragraph = Paragraph::new(&quot;Hello, world!&quot;).style(Style::new().red().on_white());
+    /// let paragraph = Paragraph::new("Hello, world!").style(Style::new().red().on_white());
     /// ```
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
-    </span><span class="kw">pub fn </span>style(<span class="kw-2">mut </span><span class="self">self</span>, style: Style) -&gt; Paragraph&lt;<span class="lifetime">&#39;a</span>&gt; {
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>style(<span class="kw-2">mut </span><span class="self">self</span>, style: Style) -&gt; Paragraph&lt;<span class="lifetime">'a</span>&gt; {
         <span class="self">self</span>.style = style;
         <span class="self">self
     </span>}
@@ -1089,10 +1090,10 @@
     ///
     /// ```rust
     /// # use ratatui::{prelude::*, widgets::*};
-    /// let paragraph = Paragraph::new(&quot;Hello, world!&quot;).wrap(Wrap { trim: true });
+    /// let paragraph = Paragraph::new("Hello, world!").wrap(Wrap { trim: true });
     /// ```
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
-    </span><span class="kw">pub fn </span>wrap(<span class="kw-2">mut </span><span class="self">self</span>, wrap: Wrap) -&gt; Paragraph&lt;<span class="lifetime">&#39;a</span>&gt; {
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>wrap(<span class="kw-2">mut </span><span class="self">self</span>, wrap: Wrap) -&gt; Paragraph&lt;<span class="lifetime">'a</span>&gt; {
         <span class="self">self</span>.wrap = <span class="prelude-val">Some</span>(wrap);
         <span class="self">self
     </span>}
@@ -1108,8 +1109,8 @@
     ///
     /// For more information about future scrolling design and concerns, see [RFC: Design of
     /// Scrollable Widgets](https://github.com/ratatui-org/ratatui/issues/174) on GitHub.
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
-    </span><span class="kw">pub fn </span>scroll(<span class="kw-2">mut </span><span class="self">self</span>, offset: (Vertical, Horizontal)) -&gt; Paragraph&lt;<span class="lifetime">&#39;a</span>&gt; {
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>scroll(<span class="kw-2">mut </span><span class="self">self</span>, offset: (Vertical, Horizontal)) -&gt; Paragraph&lt;<span class="lifetime">'a</span>&gt; {
         <span class="self">self</span>.scroll = offset;
         <span class="self">self
     </span>}
@@ -1123,10 +1124,10 @@
     ///
     /// ```rust
     /// # use ratatui::{prelude::*, widgets::*};
-    /// let paragraph = Paragraph::new(&quot;Hello World&quot;).alignment(Alignment::Center);
+    /// let paragraph = Paragraph::new("Hello World").alignment(Alignment::Center);
     /// ```
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
-    </span><span class="kw">pub fn </span>alignment(<span class="kw-2">mut </span><span class="self">self</span>, alignment: Alignment) -&gt; Paragraph&lt;<span class="lifetime">&#39;a</span>&gt; {
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>alignment(<span class="kw-2">mut </span><span class="self">self</span>, alignment: Alignment) -&gt; Paragraph&lt;<span class="lifetime">'a</span>&gt; {
         <span class="self">self</span>.alignment = alignment;
         <span class="self">self
     </span>}
@@ -1141,15 +1142,15 @@
     ///
     /// ```ignore
     /// # use ratatui::{prelude::*, widgets::*};
-    /// let paragraph = Paragraph::new(&quot;Hello World&quot;)
+    /// let paragraph = Paragraph::new("Hello World")
     ///     .wrap(Wrap { trim: false });
     /// assert_eq!(paragraph.line_count(20), 1);
     /// assert_eq!(paragraph.line_count(10), 2);
     /// ```
     </span><span class="attr">#[stability::unstable(
-        feature = <span class="string">&quot;rendered-line-info&quot;</span>,
-        reason = <span class="string">&quot;The design for text wrapping is not stable and might affect this API.&quot;</span>,
-        issue = <span class="string">&quot;https://github.com/ratatui-org/ratatui/issues/293&quot;
+        feature = <span class="string">"rendered-line-info"</span>,
+        reason = <span class="string">"The design for text wrapping is not stable and might affect this API."</span>,
+        issue = <span class="string">"https://github.com/ratatui-org/ratatui/issues/293"
     </span>)]
     </span><span class="kw">pub fn </span>line_count(<span class="kw-2">&amp;</span><span class="self">self</span>, width: u16) -&gt; usize {
         <span class="kw">if </span>width &lt; <span class="number">1 </span>{
@@ -1182,16 +1183,16 @@
     ///
     /// ```ignore
     /// # use ratatui::{prelude::*, widgets::*};
-    /// let paragraph = Paragraph::new(&quot;Hello World&quot;);
+    /// let paragraph = Paragraph::new("Hello World");
     /// assert_eq!(paragraph.line_width(), 11);
     ///
-    /// let paragraph = Paragraph::new(&quot;Hello World\nhi\nHello World!!!&quot;);
+    /// let paragraph = Paragraph::new("Hello World\nhi\nHello World!!!");
     /// assert_eq!(paragraph.line_width(), 14);
     /// ```
     </span><span class="attr">#[stability::unstable(
-        feature = <span class="string">&quot;rendered-line-info&quot;</span>,
-        reason = <span class="string">&quot;The design for text wrapping is not stable and might affect this API.&quot;</span>,
-        issue = <span class="string">&quot;https://github.com/ratatui-org/ratatui/issues/293&quot;
+        feature = <span class="string">"rendered-line-info"</span>,
+        reason = <span class="string">"The design for text wrapping is not stable and might affect this API."</span>,
+        issue = <span class="string">"https://github.com/ratatui-org/ratatui/issues/293"
     </span>)]
     </span><span class="kw">pub fn </span>line_width(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
         <span class="self">self</span>.text
@@ -1203,7 +1204,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Widget <span class="kw">for </span>Paragraph&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Widget <span class="kw">for </span>Paragraph&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">fn </span>render(<span class="kw-2">mut </span><span class="self">self</span>, area: Rect, buf: <span class="kw-2">&amp;mut </span>Buffer) {
         buf.set_style(area, <span class="self">self</span>.style);
         <span class="kw">let </span>text_area = <span class="kw">match </span><span class="self">self</span>.block.take() {
@@ -1239,8 +1240,8 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Paragraph&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">fn </span>render_text&lt;C: LineComposer&lt;<span class="lifetime">&#39;a</span>&gt;&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut </span>composer: C, area: Rect, buf: <span class="kw-2">&amp;mut </span>Buffer) {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Paragraph&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">fn </span>render_text&lt;C: LineComposer&lt;<span class="lifetime">'a</span>&gt;&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut </span>composer: C, area: Rect, buf: <span class="kw-2">&amp;mut </span>Buffer) {
         <span class="kw">let </span><span class="kw-2">mut </span>y = <span class="number">0</span>;
         <span class="kw">while let </span><span class="prelude-val">Some</span>(WrappedLine {
             line: current_line,
@@ -1256,8 +1257,8 @@
                         <span class="kw">continue</span>;
                     }
                     <span class="comment">// If the symbol is empty, the last char which rendered last time will
-                    // leave on the line. It&#39;s a quick fix.
-                    </span><span class="kw">let </span>symbol = <span class="kw">if </span>symbol.is_empty() { <span class="string">&quot; &quot; </span>} <span class="kw">else </span>{ symbol };
+                    // leave on the line. It's a quick fix.
+                    </span><span class="kw">let </span>symbol = <span class="kw">if </span>symbol.is_empty() { <span class="string">" " </span>} <span class="kw">else </span>{ symbol };
                     buf.get_mut(area.left() + x, area.top() + y - <span class="self">self</span>.scroll.<span class="number">0</span>)
                         .set_symbol(symbol)
                         .set_style(<span class="kw-2">*</span>style);
@@ -1272,8 +1273,8 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Styled <span class="kw">for </span>Paragraph&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">type </span>Item = Paragraph&lt;<span class="lifetime">&#39;a</span>&gt;;
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Styled <span class="kw">for </span>Paragraph&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">type </span>Item = Paragraph&lt;<span class="lifetime">'a</span>&gt;;
 
     <span class="kw">fn </span>style(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Style {
         <span class="self">self</span>.style
@@ -1315,7 +1316,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>zero_width_char_at_end_of_line() {
-        <span class="kw">let </span>line = <span class="string">&quot;foo\0&quot;</span>;
+        <span class="kw">let </span>line = <span class="string">"foo\0"</span>;
         <span class="kw">let </span>paragraphs = <span class="macro">vec!</span>[
             Paragraph::new(line),
             Paragraph::new(line).wrap(Wrap { trim: <span class="bool-val">false </span>}),
@@ -1323,32 +1324,32 @@
         ];
 
         <span class="kw">for </span>paragraph <span class="kw">in </span>paragraphs {
-            test_case(<span class="kw-2">&amp;</span>paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;foo&quot;</span>]));
-            test_case(<span class="kw-2">&amp;</span>paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;foo   &quot;</span>]));
-            test_case(<span class="kw-2">&amp;</span>paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;foo   &quot;</span>, <span class="string">&quot;      &quot;</span>]));
-            test_case(<span class="kw-2">&amp;</span>paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;   &quot;</span>]));
+            test_case(<span class="kw-2">&amp;</span>paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"foo"</span>]));
+            test_case(<span class="kw-2">&amp;</span>paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"foo   "</span>]));
+            test_case(<span class="kw-2">&amp;</span>paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"foo   "</span>, <span class="string">"      "</span>]));
+            test_case(<span class="kw-2">&amp;</span>paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"foo"</span>, <span class="string">"   "</span>]));
         }
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_render_empty_paragraph() {
         <span class="kw">let </span>paragraphs = <span class="macro">vec!</span>[
-            Paragraph::new(<span class="string">&quot;&quot;</span>),
-            Paragraph::new(<span class="string">&quot;&quot;</span>).wrap(Wrap { trim: <span class="bool-val">false </span>}),
-            Paragraph::new(<span class="string">&quot;&quot;</span>).wrap(Wrap { trim: <span class="bool-val">true </span>}),
+            Paragraph::new(<span class="string">""</span>),
+            Paragraph::new(<span class="string">""</span>).wrap(Wrap { trim: <span class="bool-val">false </span>}),
+            Paragraph::new(<span class="string">""</span>).wrap(Wrap { trim: <span class="bool-val">true </span>}),
         ];
 
         <span class="kw">for </span>paragraph <span class="kw">in </span>paragraphs {
-            test_case(<span class="kw-2">&amp;</span>paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot; &quot;</span>]));
-            test_case(<span class="kw-2">&amp;</span>paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;          &quot;</span>]));
-            test_case(<span class="kw-2">&amp;</span>paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;     &quot;</span>; <span class="number">10</span>]));
-            test_case(<span class="kw-2">&amp;</span>paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot; &quot;</span>, <span class="string">&quot; &quot;</span>]));
+            test_case(<span class="kw-2">&amp;</span>paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">" "</span>]));
+            test_case(<span class="kw-2">&amp;</span>paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"          "</span>]));
+            test_case(<span class="kw-2">&amp;</span>paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"     "</span>; <span class="number">10</span>]));
+            test_case(<span class="kw-2">&amp;</span>paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">" "</span>, <span class="string">" "</span>]));
         }
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_render_single_line_paragraph() {
-        <span class="kw">let </span>text = <span class="string">&quot;Hello, world!&quot;</span>;
+        <span class="kw">let </span>text = <span class="string">"Hello, world!"</span>;
         <span class="kw">let </span>truncated_paragraph = Paragraph::new(text);
         <span class="kw">let </span>wrapped_paragraph = Paragraph::new(text).wrap(Wrap { trim: <span class="bool-val">false </span>});
         <span class="kw">let </span>trimmed_paragraph = Paragraph::new(text).wrap(Wrap { trim: <span class="bool-val">true </span>});
@@ -1356,22 +1357,22 @@
         <span class="kw">let </span>paragraphs = <span class="macro">vec!</span>[<span class="kw-2">&amp;</span>truncated_paragraph, <span class="kw-2">&amp;</span>wrapped_paragraph, <span class="kw-2">&amp;</span>trimmed_paragraph];
 
         <span class="kw">for </span>paragraph <span class="kw">in </span>paragraphs {
-            test_case(paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;Hello, world!  &quot;</span>]));
-            test_case(paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;Hello, world!&quot;</span>]));
+            test_case(paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"Hello, world!  "</span>]));
+            test_case(paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"Hello, world!"</span>]));
             test_case(
                 paragraph,
-                Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;Hello, world!  &quot;</span>, <span class="string">&quot;               &quot;</span>]),
+                Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"Hello, world!  "</span>, <span class="string">"               "</span>]),
             );
             test_case(
                 paragraph,
-                Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;Hello, world!&quot;</span>, <span class="string">&quot;             &quot;</span>]),
+                Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"Hello, world!"</span>, <span class="string">"             "</span>]),
             );
         }
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_render_multi_line_paragraph() {
-        <span class="kw">let </span>text = <span class="string">&quot;This is a\nmultiline\nparagraph.&quot;</span>;
+        <span class="kw">let </span>text = <span class="string">"This is a\nmultiline\nparagraph."</span>;
 
         <span class="kw">let </span>paragraphs = <span class="macro">vec!</span>[
             Paragraph::new(text),
@@ -1382,24 +1383,24 @@
         <span class="kw">for </span>paragraph <span class="kw">in </span>paragraphs {
             test_case(
                 <span class="kw-2">&amp;</span>paragraph,
-                Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;This is a &quot;</span>, <span class="string">&quot;multiline &quot;</span>, <span class="string">&quot;paragraph.&quot;</span>]),
+                Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"This is a "</span>, <span class="string">"multiline "</span>, <span class="string">"paragraph."</span>]),
             );
             test_case(
                 <span class="kw-2">&amp;</span>paragraph,
                 Buffer::with_lines(<span class="macro">vec!</span>[
-                    <span class="string">&quot;This is a      &quot;</span>,
-                    <span class="string">&quot;multiline      &quot;</span>,
-                    <span class="string">&quot;paragraph.     &quot;</span>,
+                    <span class="string">"This is a      "</span>,
+                    <span class="string">"multiline      "</span>,
+                    <span class="string">"paragraph.     "</span>,
                 ]),
             );
             test_case(
                 <span class="kw-2">&amp;</span>paragraph,
                 Buffer::with_lines(<span class="macro">vec!</span>[
-                    <span class="string">&quot;This is a      &quot;</span>,
-                    <span class="string">&quot;multiline      &quot;</span>,
-                    <span class="string">&quot;paragraph.     &quot;</span>,
-                    <span class="string">&quot;               &quot;</span>,
-                    <span class="string">&quot;               &quot;</span>,
+                    <span class="string">"This is a      "</span>,
+                    <span class="string">"multiline      "</span>,
+                    <span class="string">"paragraph.     "</span>,
+                    <span class="string">"               "</span>,
+                    <span class="string">"               "</span>,
                 ]),
             );
         }
@@ -1407,11 +1408,11 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_render_paragraph_with_block() {
-        <span class="comment">// We use the slightly unconventional &quot;worlds&quot; instead of &quot;world&quot; here to make sure when we
+        <span class="comment">// We use the slightly unconventional "worlds" instead of "world" here to make sure when we
         // can truncate this without triggering the typos linter.
-        </span><span class="kw">let </span>text = <span class="string">&quot;Hello, worlds!&quot;</span>;
+        </span><span class="kw">let </span>text = <span class="string">"Hello, worlds!"</span>;
         <span class="kw">let </span>truncated_paragraph =
-            Paragraph::new(text).block(Block::default().title(<span class="string">&quot;Title&quot;</span>).borders(Borders::ALL));
+            Paragraph::new(text).block(Block::default().title(<span class="string">"Title"</span>).borders(Borders::ALL));
         <span class="kw">let </span>wrapped_paragraph = truncated_paragraph.clone().wrap(Wrap { trim: <span class="bool-val">false </span>});
         <span class="kw">let </span>trimmed_paragraph = truncated_paragraph.clone().wrap(Wrap { trim: <span class="bool-val">true </span>});
 
@@ -1421,26 +1422,26 @@
             test_case(
                 paragraph,
                 Buffer::with_lines(<span class="macro">vec!</span>[
-                    <span class="string">&quot;┌Title─────────┐&quot;</span>,
-                    <span class="string">&quot;│Hello, worlds!│&quot;</span>,
-                    <span class="string">&quot;└──────────────┘&quot;</span>,
+                    <span class="string">"┌Title─────────┐"</span>,
+                    <span class="string">"│Hello, worlds!│"</span>,
+                    <span class="string">"└──────────────┘"</span>,
                 ]),
             );
             test_case(
                 paragraph,
                 Buffer::with_lines(<span class="macro">vec!</span>[
-                    <span class="string">&quot;┌Title───────────┐&quot;</span>,
-                    <span class="string">&quot;│Hello, worlds!  │&quot;</span>,
-                    <span class="string">&quot;└────────────────┘&quot;</span>,
+                    <span class="string">"┌Title───────────┐"</span>,
+                    <span class="string">"│Hello, worlds!  │"</span>,
+                    <span class="string">"└────────────────┘"</span>,
                 ]),
             );
             test_case(
                 paragraph,
                 Buffer::with_lines(<span class="macro">vec!</span>[
-                    <span class="string">&quot;┌Title────────────┐&quot;</span>,
-                    <span class="string">&quot;│Hello, worlds!   │&quot;</span>,
-                    <span class="string">&quot;│                 │&quot;</span>,
-                    <span class="string">&quot;└─────────────────┘&quot;</span>,
+                    <span class="string">"┌Title────────────┐"</span>,
+                    <span class="string">"│Hello, worlds!   │"</span>,
+                    <span class="string">"│                 │"</span>,
+                    <span class="string">"└─────────────────┘"</span>,
                 ]),
             );
         }
@@ -1448,28 +1449,28 @@
         test_case(
             <span class="kw-2">&amp;</span>truncated_paragraph,
             Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">&quot;┌Title───────┐&quot;</span>,
-                <span class="string">&quot;│Hello, world│&quot;</span>,
-                <span class="string">&quot;│            │&quot;</span>,
-                <span class="string">&quot;└────────────┘&quot;</span>,
+                <span class="string">"┌Title───────┐"</span>,
+                <span class="string">"│Hello, world│"</span>,
+                <span class="string">"│            │"</span>,
+                <span class="string">"└────────────┘"</span>,
             ]),
         );
         test_case(
             <span class="kw-2">&amp;</span>wrapped_paragraph,
             Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">&quot;┌Title──────┐&quot;</span>,
-                <span class="string">&quot;│Hello,     │&quot;</span>,
-                <span class="string">&quot;│worlds!    │&quot;</span>,
-                <span class="string">&quot;└───────────┘&quot;</span>,
+                <span class="string">"┌Title──────┐"</span>,
+                <span class="string">"│Hello,     │"</span>,
+                <span class="string">"│worlds!    │"</span>,
+                <span class="string">"└───────────┘"</span>,
             ]),
         );
         test_case(
             <span class="kw-2">&amp;</span>trimmed_paragraph,
             Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">&quot;┌Title──────┐&quot;</span>,
-                <span class="string">&quot;│Hello,     │&quot;</span>,
-                <span class="string">&quot;│worlds!    │&quot;</span>,
-                <span class="string">&quot;└───────────┘&quot;</span>,
+                <span class="string">"┌Title──────┐"</span>,
+                <span class="string">"│Hello,     │"</span>,
+                <span class="string">"│worlds!    │"</span>,
+                <span class="string">"└───────────┘"</span>,
             ]),
         );
     }
@@ -1477,102 +1478,102 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_render_paragraph_with_block_with_bottom_title_and_border() {
         <span class="kw">let </span>block = Block::default()
-            .title(<span class="string">&quot;Title&quot;</span>)
+            .title(<span class="string">"Title"</span>)
             .title_position(Position::Bottom)
             .borders(Borders::BOTTOM);
-        <span class="kw">let </span>paragraph = Paragraph::new(<span class="string">&quot;Hello, world!&quot;</span>).block(block);
+        <span class="kw">let </span>paragraph = Paragraph::new(<span class="string">"Hello, world!"</span>).block(block);
 
         test_case(
             <span class="kw-2">&amp;</span>paragraph,
-            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;Hello, world!  &quot;</span>, <span class="string">&quot;Title──────────&quot;</span>]),
+            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"Hello, world!  "</span>, <span class="string">"Title──────────"</span>]),
         );
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_render_paragraph_with_word_wrap() {
-        <span class="kw">let </span>text = <span class="string">&quot;This is a long line of text that should wrap      and contains a superultramegagigalong word.&quot;</span>;
+        <span class="kw">let </span>text = <span class="string">"This is a long line of text that should wrap      and contains a superultramegagigalong word."</span>;
         <span class="kw">let </span>wrapped_paragraph = Paragraph::new(text).wrap(Wrap { trim: <span class="bool-val">false </span>});
         <span class="kw">let </span>trimmed_paragraph = Paragraph::new(text).wrap(Wrap { trim: <span class="bool-val">true </span>});
 
         test_case(
             <span class="kw-2">&amp;</span>wrapped_paragraph,
             Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">&quot;This is a long line&quot;</span>,
-                <span class="string">&quot;of text that should&quot;</span>,
-                <span class="string">&quot;wrap      and      &quot;</span>,
-                <span class="string">&quot;contains a         &quot;</span>,
-                <span class="string">&quot;superultramegagigal&quot;</span>,
-                <span class="string">&quot;ong word.          &quot;</span>,
+                <span class="string">"This is a long line"</span>,
+                <span class="string">"of text that should"</span>,
+                <span class="string">"wrap      and      "</span>,
+                <span class="string">"contains a         "</span>,
+                <span class="string">"superultramegagigal"</span>,
+                <span class="string">"ong word.          "</span>,
             ]),
         );
         test_case(
             <span class="kw-2">&amp;</span>wrapped_paragraph,
             Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">&quot;This is a   &quot;</span>,
-                <span class="string">&quot;long line of&quot;</span>,
-                <span class="string">&quot;text that   &quot;</span>,
-                <span class="string">&quot;should wrap &quot;</span>,
-                <span class="string">&quot;    and     &quot;</span>,
-                <span class="string">&quot;contains a  &quot;</span>,
-                <span class="string">&quot;superultrame&quot;</span>,
-                <span class="string">&quot;gagigalong  &quot;</span>,
-                <span class="string">&quot;word.       &quot;</span>,
+                <span class="string">"This is a   "</span>,
+                <span class="string">"long line of"</span>,
+                <span class="string">"text that   "</span>,
+                <span class="string">"should wrap "</span>,
+                <span class="string">"    and     "</span>,
+                <span class="string">"contains a  "</span>,
+                <span class="string">"superultrame"</span>,
+                <span class="string">"gagigalong  "</span>,
+                <span class="string">"word.       "</span>,
             ]),
         );
 
         test_case(
             <span class="kw-2">&amp;</span>trimmed_paragraph,
             Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">&quot;This is a long line&quot;</span>,
-                <span class="string">&quot;of text that should&quot;</span>,
-                <span class="string">&quot;wrap      and      &quot;</span>,
-                <span class="string">&quot;contains a         &quot;</span>,
-                <span class="string">&quot;superultramegagigal&quot;</span>,
-                <span class="string">&quot;ong word.          &quot;</span>,
+                <span class="string">"This is a long line"</span>,
+                <span class="string">"of text that should"</span>,
+                <span class="string">"wrap      and      "</span>,
+                <span class="string">"contains a         "</span>,
+                <span class="string">"superultramegagigal"</span>,
+                <span class="string">"ong word.          "</span>,
             ]),
         );
         test_case(
             <span class="kw-2">&amp;</span>trimmed_paragraph,
             Buffer::with_lines(<span class="macro">vec!</span>[
-                <span class="string">&quot;This is a   &quot;</span>,
-                <span class="string">&quot;long line of&quot;</span>,
-                <span class="string">&quot;text that   &quot;</span>,
-                <span class="string">&quot;should wrap &quot;</span>,
-                <span class="string">&quot;and contains&quot;</span>,
-                <span class="string">&quot;a           &quot;</span>,
-                <span class="string">&quot;superultrame&quot;</span>,
-                <span class="string">&quot;gagigalong  &quot;</span>,
-                <span class="string">&quot;word.       &quot;</span>,
+                <span class="string">"This is a   "</span>,
+                <span class="string">"long line of"</span>,
+                <span class="string">"text that   "</span>,
+                <span class="string">"should wrap "</span>,
+                <span class="string">"and contains"</span>,
+                <span class="string">"a           "</span>,
+                <span class="string">"superultrame"</span>,
+                <span class="string">"gagigalong  "</span>,
+                <span class="string">"word.       "</span>,
             ]),
         );
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_render_paragraph_with_line_truncation() {
-        <span class="kw">let </span>text = <span class="string">&quot;This is a long line of text that should be truncated.&quot;</span>;
+        <span class="kw">let </span>text = <span class="string">"This is a long line of text that should be truncated."</span>;
         <span class="kw">let </span>truncated_paragraph = Paragraph::new(text);
 
         test_case(
             <span class="kw-2">&amp;</span>truncated_paragraph,
-            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;This is a long line of&quot;</span>]),
+            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"This is a long line of"</span>]),
         );
         test_case(
             <span class="kw-2">&amp;</span>truncated_paragraph,
-            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;This is a long line of te&quot;</span>]),
+            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"This is a long line of te"</span>]),
         );
         test_case(
             <span class="kw-2">&amp;</span>truncated_paragraph,
-            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;This is a long line of &quot;</span>]),
+            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"This is a long line of "</span>]),
         );
         test_case(
             <span class="kw-2">&amp;</span>truncated_paragraph.clone().scroll((<span class="number">0</span>, <span class="number">2</span>)),
-            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;is is a long line of te&quot;</span>]),
+            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"is is a long line of te"</span>]),
         );
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_render_paragraph_with_left_alignment() {
-        <span class="kw">let </span>text = <span class="string">&quot;Hello, world!&quot;</span>;
+        <span class="kw">let </span>text = <span class="string">"Hello, world!"</span>;
         <span class="kw">let </span>truncated_paragraph = Paragraph::new(text).alignment(Alignment::Left);
         <span class="kw">let </span>wrapped_paragraph = truncated_paragraph.clone().wrap(Wrap { trim: <span class="bool-val">false </span>});
         <span class="kw">let </span>trimmed_paragraph = truncated_paragraph.clone().wrap(Wrap { trim: <span class="bool-val">true </span>});
@@ -1580,24 +1581,24 @@
         <span class="kw">let </span>paragraphs = <span class="macro">vec!</span>[<span class="kw-2">&amp;</span>truncated_paragraph, <span class="kw-2">&amp;</span>wrapped_paragraph, <span class="kw-2">&amp;</span>trimmed_paragraph];
 
         <span class="kw">for </span>paragraph <span class="kw">in </span>paragraphs {
-            test_case(paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;Hello, world!  &quot;</span>]));
-            test_case(paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;Hello, world!&quot;</span>]));
+            test_case(paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"Hello, world!  "</span>]));
+            test_case(paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"Hello, world!"</span>]));
         }
 
-        test_case(<span class="kw-2">&amp;</span>truncated_paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;Hello, wor&quot;</span>]));
+        test_case(<span class="kw-2">&amp;</span>truncated_paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"Hello, wor"</span>]));
         test_case(
             <span class="kw-2">&amp;</span>wrapped_paragraph,
-            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;Hello,    &quot;</span>, <span class="string">&quot;world!    &quot;</span>]),
+            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"Hello,    "</span>, <span class="string">"world!    "</span>]),
         );
         test_case(
             <span class="kw-2">&amp;</span>trimmed_paragraph,
-            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;Hello,    &quot;</span>, <span class="string">&quot;world!    &quot;</span>]),
+            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"Hello,    "</span>, <span class="string">"world!    "</span>]),
         );
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_render_paragraph_with_center_alignment() {
-        <span class="kw">let </span>text = <span class="string">&quot;Hello, world!&quot;</span>;
+        <span class="kw">let </span>text = <span class="string">"Hello, world!"</span>;
         <span class="kw">let </span>truncated_paragraph = Paragraph::new(text).alignment(Alignment::Center);
         <span class="kw">let </span>wrapped_paragraph = truncated_paragraph.clone().wrap(Wrap { trim: <span class="bool-val">false </span>});
         <span class="kw">let </span>trimmed_paragraph = truncated_paragraph.clone().wrap(Wrap { trim: <span class="bool-val">true </span>});
@@ -1605,26 +1606,26 @@
         <span class="kw">let </span>paragraphs = <span class="macro">vec!</span>[<span class="kw-2">&amp;</span>truncated_paragraph, <span class="kw-2">&amp;</span>wrapped_paragraph, <span class="kw-2">&amp;</span>trimmed_paragraph];
 
         <span class="kw">for </span>paragraph <span class="kw">in </span>paragraphs {
-            test_case(paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot; Hello, world! &quot;</span>]));
-            test_case(paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;  Hello, world! &quot;</span>]));
-            test_case(paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;  Hello, world!  &quot;</span>]));
-            test_case(paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;Hello, world!&quot;</span>]));
+            test_case(paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">" Hello, world! "</span>]));
+            test_case(paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"  Hello, world! "</span>]));
+            test_case(paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"  Hello, world!  "</span>]));
+            test_case(paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"Hello, world!"</span>]));
         }
 
-        test_case(<span class="kw-2">&amp;</span>truncated_paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;Hello, wor&quot;</span>]));
+        test_case(<span class="kw-2">&amp;</span>truncated_paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"Hello, wor"</span>]));
         test_case(
             <span class="kw-2">&amp;</span>wrapped_paragraph,
-            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;  Hello,  &quot;</span>, <span class="string">&quot;  world!  &quot;</span>]),
+            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"  Hello,  "</span>, <span class="string">"  world!  "</span>]),
         );
         test_case(
             <span class="kw-2">&amp;</span>trimmed_paragraph,
-            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;  Hello,  &quot;</span>, <span class="string">&quot;  world!  &quot;</span>]),
+            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"  Hello,  "</span>, <span class="string">"  world!  "</span>]),
         );
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_render_paragraph_with_right_alignment() {
-        <span class="kw">let </span>text = <span class="string">&quot;Hello, world!&quot;</span>;
+        <span class="kw">let </span>text = <span class="string">"Hello, world!"</span>;
         <span class="kw">let </span>truncated_paragraph = Paragraph::new(text).alignment(Alignment::Right);
         <span class="kw">let </span>wrapped_paragraph = truncated_paragraph.clone().wrap(Wrap { trim: <span class="bool-val">false </span>});
         <span class="kw">let </span>trimmed_paragraph = truncated_paragraph.clone().wrap(Wrap { trim: <span class="bool-val">true </span>});
@@ -1632,24 +1633,24 @@
         <span class="kw">let </span>paragraphs = <span class="macro">vec!</span>[<span class="kw-2">&amp;</span>truncated_paragraph, <span class="kw-2">&amp;</span>wrapped_paragraph, <span class="kw-2">&amp;</span>trimmed_paragraph];
 
         <span class="kw">for </span>paragraph <span class="kw">in </span>paragraphs {
-            test_case(paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;  Hello, world!&quot;</span>]));
-            test_case(paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;Hello, world!&quot;</span>]));
+            test_case(paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"  Hello, world!"</span>]));
+            test_case(paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"Hello, world!"</span>]));
         }
 
-        test_case(<span class="kw-2">&amp;</span>truncated_paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;Hello, wor&quot;</span>]));
+        test_case(<span class="kw-2">&amp;</span>truncated_paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"Hello, wor"</span>]));
         test_case(
             <span class="kw-2">&amp;</span>wrapped_paragraph,
-            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;    Hello,&quot;</span>, <span class="string">&quot;    world!&quot;</span>]),
+            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"    Hello,"</span>, <span class="string">"    world!"</span>]),
         );
         test_case(
             <span class="kw-2">&amp;</span>trimmed_paragraph,
-            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;    Hello,&quot;</span>, <span class="string">&quot;    world!&quot;</span>]),
+            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"    Hello,"</span>, <span class="string">"    world!"</span>]),
         );
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_render_paragraph_with_scroll_offset() {
-        <span class="kw">let </span>text = <span class="string">&quot;This is a\ncool\nmultiline\nparagraph.&quot;</span>;
+        <span class="kw">let </span>text = <span class="string">"This is a\ncool\nmultiline\nparagraph."</span>;
         <span class="kw">let </span>truncated_paragraph = Paragraph::new(text).scroll((<span class="number">2</span>, <span class="number">0</span>));
         <span class="kw">let </span>wrapped_paragraph = truncated_paragraph.clone().wrap(Wrap { trim: <span class="bool-val">false </span>});
         <span class="kw">let </span>trimmed_paragraph = truncated_paragraph.clone().wrap(Wrap { trim: <span class="bool-val">true </span>});
@@ -1659,24 +1660,24 @@
         <span class="kw">for </span>paragraph <span class="kw">in </span>paragraphs {
             test_case(
                 paragraph,
-                Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;multiline   &quot;</span>, <span class="string">&quot;paragraph.  &quot;</span>, <span class="string">&quot;            &quot;</span>]),
+                Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"multiline   "</span>, <span class="string">"paragraph.  "</span>, <span class="string">"            "</span>]),
             );
-            test_case(paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;multiline   &quot;</span>]));
+            test_case(paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"multiline   "</span>]));
         }
 
         test_case(
             <span class="kw-2">&amp;</span>truncated_paragraph.clone().scroll((<span class="number">2</span>, <span class="number">4</span>)),
-            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;iline   &quot;</span>, <span class="string">&quot;graph.  &quot;</span>]),
+            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"iline   "</span>, <span class="string">"graph.  "</span>]),
         );
         test_case(
             <span class="kw-2">&amp;</span>wrapped_paragraph,
-            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;cool   &quot;</span>, <span class="string">&quot;multili&quot;</span>, <span class="string">&quot;ne     &quot;</span>]),
+            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"cool   "</span>, <span class="string">"multili"</span>, <span class="string">"ne     "</span>]),
         );
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_render_paragraph_with_zero_width_area() {
-        <span class="kw">let </span>text = <span class="string">&quot;Hello, world!&quot;</span>;
+        <span class="kw">let </span>text = <span class="string">"Hello, world!"</span>;
 
         <span class="kw">let </span>paragraphs = <span class="macro">vec!</span>[
             Paragraph::new(text),
@@ -1693,7 +1694,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_render_paragraph_with_zero_height_area() {
-        <span class="kw">let </span>text = <span class="string">&quot;Hello, world!&quot;</span>;
+        <span class="kw">let </span>text = <span class="string">"Hello, world!"</span>;
 
         <span class="kw">let </span>paragraphs = <span class="macro">vec!</span>[
             Paragraph::new(text),
@@ -1711,8 +1712,8 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_render_paragraph_with_styled_text() {
         <span class="kw">let </span>text = Line::from(<span class="macro">vec!</span>[
-            Span::styled(<span class="string">&quot;Hello, &quot;</span>, Style::default().fg(Color::Red)),
-            Span::styled(<span class="string">&quot;world!&quot;</span>, Style::default().fg(Color::Blue)),
+            Span::styled(<span class="string">"Hello, "</span>, Style::default().fg(Color::Red)),
+            Span::styled(<span class="string">"world!"</span>, Style::default().fg(Color::Blue)),
         ]);
 
         <span class="kw">let </span>paragraphs = <span class="macro">vec!</span>[
@@ -1721,7 +1722,7 @@
             Paragraph::new(text.clone()).wrap(Wrap { trim: <span class="bool-val">true </span>}),
         ];
 
-        <span class="kw">let </span><span class="kw-2">mut </span>expected_buffer = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;Hello, world!&quot;</span>]);
+        <span class="kw">let </span><span class="kw-2">mut </span>expected_buffer = Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"Hello, world!"</span>]);
         expected_buffer.set_style(
             Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">7</span>, <span class="number">1</span>),
             Style::default().fg(Color::Red).bg(Color::Green),
@@ -1740,7 +1741,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_render_paragraph_with_special_characters() {
-        <span class="kw">let </span>text = <span class="string">&quot;Hello, &lt;world&gt;!&quot;</span>;
+        <span class="kw">let </span>text = <span class="string">"Hello, &lt;world&gt;!"</span>;
         <span class="kw">let </span>paragraphs = <span class="macro">vec!</span>[
             Paragraph::new(text),
             Paragraph::new(text).wrap(Wrap { trim: <span class="bool-val">false </span>}),
@@ -1748,22 +1749,22 @@
         ];
 
         <span class="kw">for </span>paragraph <span class="kw">in </span>paragraphs {
-            test_case(<span class="kw-2">&amp;</span>paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;Hello, &lt;world&gt;!&quot;</span>]));
-            test_case(<span class="kw-2">&amp;</span>paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;Hello, &lt;world&gt;!     &quot;</span>]));
+            test_case(<span class="kw-2">&amp;</span>paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"Hello, &lt;world&gt;!"</span>]));
+            test_case(<span class="kw-2">&amp;</span>paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"Hello, &lt;world&gt;!     "</span>]));
             test_case(
                 <span class="kw-2">&amp;</span>paragraph,
-                Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;Hello, &lt;world&gt;!     &quot;</span>, <span class="string">&quot;                    &quot;</span>]),
+                Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"Hello, &lt;world&gt;!     "</span>, <span class="string">"                    "</span>]),
             );
             test_case(
                 <span class="kw-2">&amp;</span>paragraph,
-                Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;Hello, &lt;world&gt;!&quot;</span>, <span class="string">&quot;               &quot;</span>]),
+                Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"Hello, &lt;world&gt;!"</span>, <span class="string">"               "</span>]),
             );
         }
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_render_paragraph_with_unicode_characters() {
-        <span class="kw">let </span>text = <span class="string">&quot;こんにちは, 世界! 😃&quot;</span>;
+        <span class="kw">let </span>text = <span class="string">"こんにちは, 世界! 😃"</span>;
         <span class="kw">let </span>truncated_paragraph = Paragraph::new(text);
         <span class="kw">let </span>wrapped_paragraph = Paragraph::new(text).wrap(Wrap { trim: <span class="bool-val">false </span>});
         <span class="kw">let </span>trimmed_paragraph = Paragraph::new(text).wrap(Wrap { trim: <span class="bool-val">true </span>});
@@ -1771,31 +1772,31 @@
         <span class="kw">let </span>paragraphs = <span class="macro">vec!</span>[<span class="kw-2">&amp;</span>truncated_paragraph, <span class="kw-2">&amp;</span>wrapped_paragraph, <span class="kw-2">&amp;</span>trimmed_paragraph];
 
         <span class="kw">for </span>paragraph <span class="kw">in </span>paragraphs {
-            test_case(paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;こんにちは, 世界! 😃&quot;</span>]));
+            test_case(paragraph, Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"こんにちは, 世界! 😃"</span>]));
             test_case(
                 paragraph,
-                Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;こんにちは, 世界! 😃     &quot;</span>]),
+                Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"こんにちは, 世界! 😃     "</span>]),
             );
         }
 
         test_case(
             <span class="kw-2">&amp;</span>truncated_paragraph,
-            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;こんにちは, 世 &quot;</span>]),
+            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"こんにちは, 世 "</span>]),
         );
         test_case(
             <span class="kw-2">&amp;</span>wrapped_paragraph,
-            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;こんにちは,    &quot;</span>, <span class="string">&quot;世界! 😃      &quot;</span>]),
+            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"こんにちは,    "</span>, <span class="string">"世界! 😃      "</span>]),
         );
         test_case(
             <span class="kw-2">&amp;</span>trimmed_paragraph,
-            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">&quot;こんにちは,    &quot;</span>, <span class="string">&quot;世界! 😃      &quot;</span>]),
+            Buffer::with_lines(<span class="macro">vec!</span>[<span class="string">"こんにちは,    "</span>, <span class="string">"世界! 😃      "</span>]),
         );
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>can_be_stylized() {
         <span class="macro">assert_eq!</span>(
-            Paragraph::new(<span class="string">&quot;&quot;</span>).black().on_white().bold().not_dim().style,
+            Paragraph::new(<span class="string">""</span>).black().on_white().bold().not_dim().style,
             Style::default()
                 .fg(Color::Black)
                 .bg(Color::White)
@@ -1806,17 +1807,17 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>widgets_paragraph_count_rendered_lines() {
-        <span class="kw">let </span>paragraph = Paragraph::new(<span class="string">&quot;Hello World&quot;</span>);
+        <span class="kw">let </span>paragraph = Paragraph::new(<span class="string">"Hello World"</span>);
         <span class="macro">assert_eq!</span>(paragraph.line_count(<span class="number">20</span>), <span class="number">1</span>);
         <span class="macro">assert_eq!</span>(paragraph.line_count(<span class="number">10</span>), <span class="number">1</span>);
-        <span class="kw">let </span>paragraph = Paragraph::new(<span class="string">&quot;Hello World&quot;</span>).wrap(Wrap { trim: <span class="bool-val">false </span>});
+        <span class="kw">let </span>paragraph = Paragraph::new(<span class="string">"Hello World"</span>).wrap(Wrap { trim: <span class="bool-val">false </span>});
         <span class="macro">assert_eq!</span>(paragraph.line_count(<span class="number">20</span>), <span class="number">1</span>);
         <span class="macro">assert_eq!</span>(paragraph.line_count(<span class="number">10</span>), <span class="number">2</span>);
-        <span class="kw">let </span>paragraph = Paragraph::new(<span class="string">&quot;Hello World&quot;</span>).wrap(Wrap { trim: <span class="bool-val">true </span>});
+        <span class="kw">let </span>paragraph = Paragraph::new(<span class="string">"Hello World"</span>).wrap(Wrap { trim: <span class="bool-val">true </span>});
         <span class="macro">assert_eq!</span>(paragraph.line_count(<span class="number">20</span>), <span class="number">1</span>);
         <span class="macro">assert_eq!</span>(paragraph.line_count(<span class="number">10</span>), <span class="number">2</span>);
 
-        <span class="kw">let </span>text = <span class="string">&quot;Hello World &quot;</span>.repeat(<span class="number">100</span>);
+        <span class="kw">let </span>text = <span class="string">"Hello World "</span>.repeat(<span class="number">100</span>);
         <span class="kw">let </span>paragraph = Paragraph::new(text.trim());
         <span class="macro">assert_eq!</span>(paragraph.line_count(<span class="number">11</span>), <span class="number">1</span>);
         <span class="macro">assert_eq!</span>(paragraph.line_count(<span class="number">6</span>), <span class="number">1</span>);
@@ -1830,14 +1831,14 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>widgets_paragraph_line_width() {
-        <span class="kw">let </span>paragraph = Paragraph::new(<span class="string">&quot;Hello World&quot;</span>);
+        <span class="kw">let </span>paragraph = Paragraph::new(<span class="string">"Hello World"</span>);
         <span class="macro">assert_eq!</span>(paragraph.line_width(), <span class="number">11</span>);
-        <span class="kw">let </span>paragraph = Paragraph::new(<span class="string">&quot;Hello World&quot;</span>).wrap(Wrap { trim: <span class="bool-val">false </span>});
+        <span class="kw">let </span>paragraph = Paragraph::new(<span class="string">"Hello World"</span>).wrap(Wrap { trim: <span class="bool-val">false </span>});
         <span class="macro">assert_eq!</span>(paragraph.line_width(), <span class="number">11</span>);
-        <span class="kw">let </span>paragraph = Paragraph::new(<span class="string">&quot;Hello World&quot;</span>).wrap(Wrap { trim: <span class="bool-val">true </span>});
+        <span class="kw">let </span>paragraph = Paragraph::new(<span class="string">"Hello World"</span>).wrap(Wrap { trim: <span class="bool-val">true </span>});
         <span class="macro">assert_eq!</span>(paragraph.line_width(), <span class="number">11</span>);
 
-        <span class="kw">let </span>text = <span class="string">&quot;Hello World &quot;</span>.repeat(<span class="number">100</span>);
+        <span class="kw">let </span>text = <span class="string">"Hello World "</span>.repeat(<span class="number">100</span>);
         <span class="kw">let </span>paragraph = Paragraph::new(text);
         <span class="macro">assert_eq!</span>(paragraph.line_width(), <span class="number">1200</span>);
         <span class="kw">let </span>paragraph = paragraph.wrap(Wrap { trim: <span class="bool-val">false </span>});

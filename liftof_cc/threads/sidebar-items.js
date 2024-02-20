@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["event_builder","flight_comms","monitoring","readoutboard_comm"]};
+window.SIDEBAR_ITEMS = {"mod":["event_builder","flight_comms","flight_cpu_listener","monitoring","readoutboard_comm"]};

@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/portable-atomic-1.6.0/src/imp/core_atomic.rs`."><title>core_atomic.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="portable_atomic" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/portable-atomic-1.6.0/src/imp/core_atomic.rs`."><title>core_atomic.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="portable_atomic" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -448,7 +449,7 @@
 <a href="#448" id="448">448</a>
 </pre></div><pre class="rust"><code><span class="comment">// SPDX-License-Identifier: Apache-2.0 OR MIT
 
-// Wrap the standard library&#39;s atomic types in newtype.
+// Wrap the standard library's atomic types in newtype.
 //
 // This is not a reexport, because we want to backport changes like
 // https://github.com/rust-lang/rust/pull/98383 to old compilers.
@@ -456,16 +457,16 @@
 </span><span class="kw">use </span>core::{cell::UnsafeCell, marker::PhantomData, sync::atomic::Ordering};
 
 <span class="comment">// core::panic::RefUnwindSafe is only available on Rust 1.56+, so on pre-1.56
-// Rust, we implement RefUnwindSafe when &quot;std&quot; feature is enabled.
-// However, on pre-1.56 Rust, the standard library&#39;s atomic types implement
-// RefUnwindSafe when &quot;linked to std&quot;, and that&#39;s behavior that our other atomic
-// implementations can&#39;t emulate, so use PhantomData&lt;NotRefUnwindSafe&gt; to match
+// Rust, we implement RefUnwindSafe when "std" feature is enabled.
+// However, on pre-1.56 Rust, the standard library's atomic types implement
+// RefUnwindSafe when "linked to std", and that's behavior that our other atomic
+// implementations can't emulate, so use PhantomData&lt;NotRefUnwindSafe&gt; to match
 // conditions where our other atomic implementations implement RefUnwindSafe.
 // If we do not do this, for example, downstream that is only tested on x86_64
 // may incorrectly assume that AtomicU64 always implements RefUnwindSafe even on
 // older rustc, and may be broken on platforms where std AtomicU64 is not available.
 </span><span class="kw">struct </span>NotRefUnwindSafe(UnsafeCell&lt;()&gt;);
-<span class="comment">// SAFETY: this is a marker type and we&#39;ll never access the value.
+<span class="comment">// SAFETY: this is a marker type and we'll never access the value.
 </span><span class="kw">unsafe impl </span>Sync <span class="kw">for </span>NotRefUnwindSafe {}
 
 <span class="attr">#[repr(transparent)]
@@ -525,7 +526,7 @@
     }
 }
 <span class="attr">#[cfg_attr(portable_atomic_no_cfg_target_has_atomic, cfg(not(portable_atomic_no_atomic_cas)))]
-#[cfg_attr(not(portable_atomic_no_cfg_target_has_atomic), cfg(target_has_atomic = <span class="string">&quot;ptr&quot;</span>))]
+#[cfg_attr(not(portable_atomic_no_cfg_target_has_atomic), cfg(target_has_atomic = <span class="string">"ptr"</span>))]
 </span><span class="kw">impl</span>&lt;T&gt; AtomicPtr&lt;T&gt; {
     <span class="attr">#[inline]
     #[cfg_attr(
@@ -583,10 +584,10 @@
             portable_atomic_no_cfg_target_has_atomic,
             cfg(not(portable_atomic_no_atomic_cas))
         )]
-        #[cfg_attr(not(portable_atomic_no_cfg_target_has_atomic), cfg(target_has_atomic = <span class="string">&quot;ptr&quot;</span>))]
+        #[cfg_attr(not(portable_atomic_no_cfg_target_has_atomic), cfg(target_has_atomic = <span class="string">"ptr"</span>))]
         </span><span class="macro">impl_default_no_fetch_ops!</span>(<span class="macro-nonterminal">$atomic_type</span>, <span class="macro-nonterminal">$int_type</span>);
         <span class="attr">#[cfg(not(all(
-            any(target_arch = <span class="string">&quot;x86&quot;</span>, target_arch = <span class="string">&quot;x86_64&quot;</span>),
+            any(target_arch = <span class="string">"x86"</span>, target_arch = <span class="string">"x86_64"</span>),
             not(any(miri, portable_atomic_sanitize_thread)),
             not(portable_atomic_no_asm),
         )))]
@@ -594,7 +595,7 @@
             portable_atomic_no_cfg_target_has_atomic,
             cfg(not(portable_atomic_no_atomic_cas))
         )]
-        #[cfg_attr(not(portable_atomic_no_cfg_target_has_atomic), cfg(target_has_atomic = <span class="string">&quot;ptr&quot;</span>))]
+        #[cfg_attr(not(portable_atomic_no_cfg_target_has_atomic), cfg(target_has_atomic = <span class="string">"ptr"</span>))]
         </span><span class="macro">impl_default_bit_opts!</span>(<span class="macro-nonterminal">$atomic_type</span>, <span class="macro-nonterminal">$int_type</span>);
         <span class="kw">impl </span><span class="macro-nonterminal">$atomic_type </span>{
             <span class="attr">#[inline]
@@ -610,11 +611,11 @@
             }
             <span class="attr">#[inline]
             </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const fn </span>is_always_lock_free() -&gt; bool {
-                <span class="comment">// ESP-IDF targets&#39; 64-bit atomics are not lock-free.
+                <span class="comment">// ESP-IDF targets' 64-bit atomics are not lock-free.
                 // https://github.com/rust-lang/rust/pull/115577#issuecomment-1732259297
                 </span><span class="macro">cfg!</span>(not(all(
-                    any(target_arch = <span class="string">&quot;riscv32&quot;</span>, target_arch = <span class="string">&quot;xtensa&quot;</span>),
-                    target_os = <span class="string">&quot;espidf&quot;</span>,
+                    any(target_arch = <span class="string">"riscv32"</span>, target_arch = <span class="string">"xtensa"</span>),
+                    target_os = <span class="string">"espidf"</span>,
                 ))) | (core::mem::size_of::&lt;<span class="macro-nonterminal">$int_type</span>&gt;() &lt; <span class="number">8</span>)
             }
             <span class="attr">#[inline]
@@ -660,7 +661,7 @@
             portable_atomic_no_cfg_target_has_atomic,
             cfg(not(portable_atomic_no_atomic_cas))
         )]
-        #[cfg_attr(not(portable_atomic_no_cfg_target_has_atomic), cfg(target_has_atomic = <span class="string">&quot;ptr&quot;</span>))]
+        #[cfg_attr(not(portable_atomic_no_cfg_target_has_atomic), cfg(target_has_atomic = <span class="string">"ptr"</span>))]
         </span><span class="kw">impl </span><span class="macro-nonterminal">$atomic_type </span>{
             <span class="attr">#[inline]
             #[cfg_attr(
@@ -721,34 +722,34 @@
                 </span>{
                     <span class="attr">#[cfg(any(
                         all(
-                            target_arch = <span class="string">&quot;aarch64&quot;</span>,
-                            any(target_feature = <span class="string">&quot;lse&quot;</span>, portable_atomic_target_feature = <span class="string">&quot;lse&quot;</span>),
+                            target_arch = <span class="string">"aarch64"</span>,
+                            any(target_feature = <span class="string">"lse"</span>, portable_atomic_target_feature = <span class="string">"lse"</span>),
                         ),
                         all(
-                            target_arch = <span class="string">&quot;arm&quot;</span>,
+                            target_arch = <span class="string">"arm"</span>,
                             not(any(
-                                target_feature = <span class="string">&quot;v6&quot;</span>,
-                                portable_atomic_target_feature = <span class="string">&quot;v6&quot;</span>,
+                                target_feature = <span class="string">"v6"</span>,
+                                portable_atomic_target_feature = <span class="string">"v6"</span>,
                             )),
                         ),
-                        target_arch = <span class="string">&quot;mips&quot;</span>,
-                        target_arch = <span class="string">&quot;mips32r6&quot;</span>,
-                        target_arch = <span class="string">&quot;mips64&quot;</span>,
-                        target_arch = <span class="string">&quot;mips64r6&quot;</span>,
-                        target_arch = <span class="string">&quot;powerpc&quot;</span>,
-                        target_arch = <span class="string">&quot;powerpc64&quot;</span>,
+                        target_arch = <span class="string">"mips"</span>,
+                        target_arch = <span class="string">"mips32r6"</span>,
+                        target_arch = <span class="string">"mips64"</span>,
+                        target_arch = <span class="string">"mips64r6"</span>,
+                        target_arch = <span class="string">"powerpc"</span>,
+                        target_arch = <span class="string">"powerpc64"</span>,
                     ))]
                     </span>{
                         <span class="comment">// HACK: the following operations are currently broken (at least on qemu-user):
-                        // - aarch64&#39;s `AtomicI{8,16}::fetch_{max,min}` (release mode + lse)
-                        // - armv5te&#39;s `Atomic{I,U}{8,16}::fetch_{max,min}`
-                        // - mips&#39;s `AtomicI8::fetch_{max,min}` (release mode)
-                        // - mipsel&#39;s `AtomicI{8,16}::fetch_{max,min}` (debug mode, at least)
-                        // - mips64&#39;s `AtomicI8::fetch_{max,min}` (release mode)
-                        // - mips64el&#39;s `AtomicI{8,16}::fetch_{max,min}` (debug mode, at least)
-                        // - powerpc&#39;s `AtomicI{8,16}::fetch_{max,min}`
-                        // - powerpc64&#39;s `AtomicI{8,16}::fetch_{max,min}` (debug mode, at least)
-                        // - powerpc64le&#39;s `AtomicU{8,16}::fetch_{max,min}` (release mode + fat LTO)
+                        // - aarch64's `AtomicI{8,16}::fetch_{max,min}` (release mode + lse)
+                        // - armv5te's `Atomic{I,U}{8,16}::fetch_{max,min}`
+                        // - mips's `AtomicI8::fetch_{max,min}` (release mode)
+                        // - mipsel's `AtomicI{8,16}::fetch_{max,min}` (debug mode, at least)
+                        // - mips64's `AtomicI8::fetch_{max,min}` (release mode)
+                        // - mips64el's `AtomicI{8,16}::fetch_{max,min}` (debug mode, at least)
+                        // - powerpc's `AtomicI{8,16}::fetch_{max,min}`
+                        // - powerpc64's `AtomicI{8,16}::fetch_{max,min}` (debug mode, at least)
+                        // - powerpc64le's `AtomicU{8,16}::fetch_{max,min}` (release mode + fat LTO)
                         // See also:
                         // https://github.com/llvm/llvm-project/issues/61880
                         // https://github.com/llvm/llvm-project/issues/61881
@@ -773,34 +774,34 @@
                 </span>{
                     <span class="attr">#[cfg(any(
                         all(
-                            target_arch = <span class="string">&quot;aarch64&quot;</span>,
-                            any(target_feature = <span class="string">&quot;lse&quot;</span>, portable_atomic_target_feature = <span class="string">&quot;lse&quot;</span>),
+                            target_arch = <span class="string">"aarch64"</span>,
+                            any(target_feature = <span class="string">"lse"</span>, portable_atomic_target_feature = <span class="string">"lse"</span>),
                         ),
                         all(
-                            target_arch = <span class="string">&quot;arm&quot;</span>,
+                            target_arch = <span class="string">"arm"</span>,
                             not(any(
-                                target_feature = <span class="string">&quot;v6&quot;</span>,
-                                portable_atomic_target_feature = <span class="string">&quot;v6&quot;</span>,
+                                target_feature = <span class="string">"v6"</span>,
+                                portable_atomic_target_feature = <span class="string">"v6"</span>,
                             )),
                         ),
-                        target_arch = <span class="string">&quot;mips&quot;</span>,
-                        target_arch = <span class="string">&quot;mips32r6&quot;</span>,
-                        target_arch = <span class="string">&quot;mips64&quot;</span>,
-                        target_arch = <span class="string">&quot;mips64r6&quot;</span>,
-                        target_arch = <span class="string">&quot;powerpc&quot;</span>,
-                        target_arch = <span class="string">&quot;powerpc64&quot;</span>,
+                        target_arch = <span class="string">"mips"</span>,
+                        target_arch = <span class="string">"mips32r6"</span>,
+                        target_arch = <span class="string">"mips64"</span>,
+                        target_arch = <span class="string">"mips64r6"</span>,
+                        target_arch = <span class="string">"powerpc"</span>,
+                        target_arch = <span class="string">"powerpc64"</span>,
                     ))]
                     </span>{
                         <span class="comment">// HACK: the following operations are currently broken (at least on qemu-user):
-                        // - aarch64&#39;s `AtomicI{8,16}::fetch_{max,min}` (release mode + lse)
-                        // - armv5te&#39;s `Atomic{I,U}{8,16}::fetch_{max,min}`
-                        // - mips&#39;s `AtomicI8::fetch_{max,min}` (release mode)
-                        // - mipsel&#39;s `AtomicI{8,16}::fetch_{max,min}` (debug mode, at least)
-                        // - mips64&#39;s `AtomicI8::fetch_{max,min}` (release mode)
-                        // - mips64el&#39;s `AtomicI{8,16}::fetch_{max,min}` (debug mode, at least)
-                        // - powerpc&#39;s `AtomicI{8,16}::fetch_{max,min}`
-                        // - powerpc64&#39;s `AtomicI{8,16}::fetch_{max,min}` (debug mode, at least)
-                        // - powerpc64le&#39;s `AtomicU{8,16}::fetch_{max,min}` (release mode + fat LTO)
+                        // - aarch64's `AtomicI{8,16}::fetch_{max,min}` (release mode + lse)
+                        // - armv5te's `Atomic{I,U}{8,16}::fetch_{max,min}`
+                        // - mips's `AtomicI8::fetch_{max,min}` (release mode)
+                        // - mipsel's `AtomicI{8,16}::fetch_{max,min}` (debug mode, at least)
+                        // - mips64's `AtomicI8::fetch_{max,min}` (release mode)
+                        // - mips64el's `AtomicI{8,16}::fetch_{max,min}` (debug mode, at least)
+                        // - powerpc's `AtomicI{8,16}::fetch_{max,min}`
+                        // - powerpc64's `AtomicI{8,16}::fetch_{max,min}` (debug mode, at least)
+                        // - powerpc64le's `AtomicU{8,16}::fetch_{max,min}` (release mode + fat LTO)
                         // See also:
                         // https://github.com/llvm/llvm-project/issues/61880
                         // https://github.com/llvm/llvm-project/issues/61881
@@ -824,7 +825,7 @@
                 <span class="self">self</span>.fetch_xor(!<span class="number">0</span>, order)
             }
             <span class="attr">#[cfg(not(all(
-                any(target_arch = <span class="string">&quot;x86&quot;</span>, target_arch = <span class="string">&quot;x86_64&quot;</span>),
+                any(target_arch = <span class="string">"x86"</span>, target_arch = <span class="string">"x86_64"</span>),
                 not(any(miri, portable_atomic_sanitize_thread)),
                 not(portable_atomic_no_asm),
             )))]
@@ -839,7 +840,7 @@
                 <span class="self">self</span>.fetch_update_(order, <span class="macro-nonterminal">$int_type::wrapping_neg</span>)
             }
             <span class="attr">#[cfg(not(all(
-                any(target_arch = <span class="string">&quot;x86&quot;</span>, target_arch = <span class="string">&quot;x86_64&quot;</span>),
+                any(target_arch = <span class="string">"x86"</span>, target_arch = <span class="string">"x86_64"</span>),
                 not(any(miri, portable_atomic_sanitize_thread)),
                 not(portable_atomic_no_asm),
             )))]
@@ -871,17 +872,17 @@
 <span class="attr">#[cfg(not(portable_atomic_no_atomic_load_store))]
 </span><span class="macro">atomic_int!</span>(AtomicU16, u16);
 <span class="attr">#[cfg(not(portable_atomic_no_atomic_load_store))]
-#[cfg(not(target_pointer_width = <span class="string">&quot;16&quot;</span>))]
+#[cfg(not(target_pointer_width = <span class="string">"16"</span>))]
 </span><span class="macro">atomic_int!</span>(AtomicI32, i32);
 <span class="attr">#[cfg(not(portable_atomic_no_atomic_load_store))]
-#[cfg(not(target_pointer_width = <span class="string">&quot;16&quot;</span>))]
+#[cfg(not(target_pointer_width = <span class="string">"16"</span>))]
 </span><span class="macro">atomic_int!</span>(AtomicU32, u32);
 <span class="attr">#[cfg_attr(portable_atomic_no_cfg_target_has_atomic, cfg(not(portable_atomic_no_atomic_64)))]
 #[cfg_attr(
     not(portable_atomic_no_cfg_target_has_atomic),
     cfg(any(
-        target_has_atomic = <span class="string">&quot;64&quot;</span>,
-        not(any(target_pointer_width = <span class="string">&quot;16&quot;</span>, target_pointer_width = <span class="string">&quot;32&quot;</span>)),
+        target_has_atomic = <span class="string">"64"</span>,
+        not(any(target_pointer_width = <span class="string">"16"</span>, target_pointer_width = <span class="string">"32"</span>)),
     ))
 )]
 </span><span class="macro">atomic_int!</span>(AtomicI64, i64);
@@ -889,8 +890,8 @@
 #[cfg_attr(
     not(portable_atomic_no_cfg_target_has_atomic),
     cfg(any(
-        target_has_atomic = <span class="string">&quot;64&quot;</span>,
-        not(any(target_pointer_width = <span class="string">&quot;16&quot;</span>, target_pointer_width = <span class="string">&quot;32&quot;</span>)),
+        target_has_atomic = <span class="string">"64"</span>,
+        not(any(target_pointer_width = <span class="string">"16"</span>, target_pointer_width = <span class="string">"32"</span>)),
     ))
 )]
 </span><span class="macro">atomic_int!</span>(AtomicU64, u64);

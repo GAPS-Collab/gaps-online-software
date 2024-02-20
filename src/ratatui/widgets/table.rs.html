@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.25.0/src/widgets/table.rs`."><title>table.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.25.0/src/widgets/table.rs`."><title>table.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><a class="sub-logo-container" href="../../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1941,7 +1942,7 @@
 /// ```rust
 /// use ratatui::{prelude::*, widgets::*};
 ///
-/// let rows = [Row::new(vec![&quot;Cell1&quot;, &quot;Cell2&quot;, &quot;Cell3&quot;])];
+/// let rows = [Row::new(vec!["Cell1", "Cell2", "Cell3"])];
 /// // Columns widths are constrained in the same way as Layout...
 /// let widths = [
 ///     Constraint::Length(5),
@@ -1955,17 +1956,17 @@
 ///     .style(Style::new().blue())
 ///     // It has an optional header, which is simply a Row always visible at the top.
 ///     .header(
-///         Row::new(vec![&quot;Col1&quot;, &quot;Col2&quot;, &quot;Col3&quot;])
+///         Row::new(vec!["Col1", "Col2", "Col3"])
 ///             .style(Style::new().bold())
 ///             // To add space between the header and the rest of the rows, specify the margin
 ///             .bottom_margin(1),
 ///     )
 ///     // As any other widget, a Table can be wrapped in a Block.
-///     .block(Block::default().title(&quot;Table&quot;))
+///     .block(Block::default().title("Table"))
 ///     // The selected row and its content can also be styled.
 ///     .highlight_style(Style::new().reversed())
 ///     // ...and potentially show a symbol in front of the selection.
-///     .highlight_symbol(&quot;&gt;&gt;&quot;);
+///     .highlight_symbol("&gt;&gt;");
 /// ```
 ///
 /// Rows can be created from an iterator of [`Cell`]s. Each row can have an associated height,
@@ -1974,26 +1975,26 @@
 /// ```rust
 /// # use ratatui::{prelude::*, widgets::*};
 /// // a Row can be created from simple strings.
-/// let row = Row::new(vec![&quot;Row11&quot;, &quot;Row12&quot;, &quot;Row13&quot;]);
+/// let row = Row::new(vec!["Row11", "Row12", "Row13"]);
 ///
 /// // You can style the entire row.
-/// let row = Row::new(vec![&quot;Row21&quot;, &quot;Row22&quot;, &quot;Row23&quot;]).style(Style::new().red());
+/// let row = Row::new(vec!["Row21", "Row22", "Row23"]).style(Style::new().red());
 ///
 /// // If you need more control over the styling, create Cells directly
 /// let row = Row::new(vec![
-///     Cell::from(&quot;Row31&quot;),
-///     Cell::from(&quot;Row32&quot;).style(Style::default().fg(Color::Yellow)),
+///     Cell::from("Row31"),
+///     Cell::from("Row32").style(Style::default().fg(Color::Yellow)),
 ///     Cell::from(Line::from(vec![
-///         Span::raw(&quot;Row&quot;),
-///         Span::styled(&quot;33&quot;, Style::default().fg(Color::Green)),
+///         Span::raw("Row"),
+///         Span::styled("33", Style::default().fg(Color::Green)),
 ///     ])),
 /// ]);
 ///
 /// // If a Row need to display some content over multiple lines, specify the height.
 /// let row = Row::new(vec![
-///     Cell::from(&quot;Row\n41&quot;),
-///     Cell::from(&quot;Row\n42&quot;),
-///     Cell::from(&quot;Row\n43&quot;),
+///     Cell::from("Row\n41"),
+///     Cell::from("Row\n42"),
+///     Cell::from("Row\n43"),
 /// ])
 /// .height(2);
 /// ```
@@ -2003,15 +2004,15 @@
 ///
 /// ```rust
 /// # use ratatui::{prelude::*, widgets::*};
-/// Cell::from(&quot;simple string&quot;);
-/// Cell::from(&quot;simple styled span&quot;.red());
-/// Cell::from(Span::raw(&quot;raw span&quot;));
-/// Cell::from(Span::styled(&quot;styled span&quot;, Style::new().red()));
+/// Cell::from("simple string");
+/// Cell::from("simple styled span".red());
+/// Cell::from(Span::raw("raw span"));
+/// Cell::from(Span::styled("styled span", Style::new().red()));
 /// Cell::from(Line::from(vec![
-///     Span::raw(&quot;a vec of &quot;),
-///     Span::styled(&quot;spans&quot;, Style::new().bold()),
+///     Span::raw("a vec of "),
+///     Span::styled("spans", Style::new().bold()),
 /// ]));
-/// Cell::from(Text::from(&quot;text&quot;));
+/// Cell::from(Text::from("text"));
 /// ```
 ///
 /// `Table` also implements the [`Styled`] trait, which means you can use style shorthands from
@@ -2020,7 +2021,7 @@
 /// ```rust
 /// use ratatui::{prelude::*, widgets::*};
 ///
-/// let rows = [Row::new(vec![&quot;Cell1&quot;, &quot;Cell2&quot;, &quot;Cell3&quot;])];
+/// let rows = [Row::new(vec!["Cell1", "Cell2", "Cell3"])];
 /// let widths = [
 ///     Constraint::Length(5),
 ///     Constraint::Length(5),
@@ -2042,25 +2043,25 @@
 /// // method) so that the selected row is preserved across renders
 /// let mut table_state = TableState::default();
 /// let rows = [
-///     Row::new(vec![&quot;Row11&quot;, &quot;Row12&quot;, &quot;Row13&quot;]),
-///     Row::new(vec![&quot;Row21&quot;, &quot;Row22&quot;, &quot;Row23&quot;]),
-///     Row::new(vec![&quot;Row31&quot;, &quot;Row32&quot;, &quot;Row33&quot;]),
+///     Row::new(vec!["Row11", "Row12", "Row13"]),
+///     Row::new(vec!["Row21", "Row22", "Row23"]),
+///     Row::new(vec!["Row31", "Row32", "Row33"]),
 /// ];
 /// let widths = [Constraint::Length(5), Constraint::Length(5), Constraint::Length(10)];
 /// let table = Table::new(rows, widths)
-///     .block(Block::default().title(&quot;Table&quot;))
+///     .block(Block::default().title("Table"))
 ///     .highlight_style(Style::new().add_modifier(Modifier::REVERSED))
-///     .highlight_symbol(&quot;&gt;&gt;&quot;);
+///     .highlight_symbol("&gt;&gt;");
 ///
 /// frame.render_stateful_widget(table, area, &amp;mut table_state);
 /// # }
 </span><span class="attr">#[derive(Debug, Default, Clone, Eq, PartialEq, Hash)]
-</span><span class="kw">pub struct </span>Table&lt;<span class="lifetime">&#39;a</span>&gt; {
+</span><span class="kw">pub struct </span>Table&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Data to display in each row
-    </span>rows: Vec&lt;Row&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    </span>rows: Vec&lt;Row&lt;<span class="lifetime">'a</span>&gt;&gt;,
 
     <span class="doccomment">/// Optional header
-    </span>header: <span class="prelude-ty">Option</span>&lt;Row&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    </span>header: <span class="prelude-ty">Option</span>&lt;Row&lt;<span class="lifetime">'a</span>&gt;&gt;,
 
     <span class="doccomment">/// Width constraints for each column
     </span>widths: Vec&lt;Constraint&gt;,
@@ -2069,7 +2070,7 @@
     </span>column_spacing: u16,
 
     <span class="doccomment">/// A block to wrap the widget in
-    </span>block: <span class="prelude-ty">Option</span>&lt;Block&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    </span>block: <span class="prelude-ty">Option</span>&lt;Block&lt;<span class="lifetime">'a</span>&gt;&gt;,
 
     <span class="doccomment">/// Base style for the widget
     </span>style: Style,
@@ -2078,7 +2079,7 @@
     </span>highlight_style: Style,
 
     <span class="doccomment">/// Symbol in front of the selected rom
-    </span>highlight_symbol: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;,
+    </span>highlight_symbol: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt;,
 
     <span class="doccomment">/// Decides when to allocate spacing for the row selection
     </span>highlight_spacing: HighlightSpacing,
@@ -2104,7 +2105,7 @@
 /// ```rust
 /// use ratatui::{prelude::*, widgets::*};
 ///
-/// Row::new(vec![&quot;Cell1&quot;, &quot;Cell2&quot;, &quot;Cell3&quot;]);
+/// Row::new(vec!["Cell1", "Cell2", "Cell3"]);
 /// ```
 ///
 /// If you need a bit more control over individual cells, you can explicitly create [`Cell`]s:
@@ -2113,8 +2114,8 @@
 /// use ratatui::{prelude::*, widgets::*};
 ///
 /// Row::new(vec![
-///     Cell::from(&quot;Cell1&quot;),
-///     Cell::from(&quot;Cell2&quot;).style(Style::default().fg(Color::Yellow)),
+///     Cell::from("Cell1"),
+///     Cell::from("Cell2").style(Style::default().fg(Color::Yellow)),
 /// ]);
 /// ```
 ///
@@ -2126,8 +2127,8 @@
 /// use ratatui::{prelude::*, widgets::*};
 ///
 /// Row::new(vec![
-///     Cow::Borrowed(&quot;hello&quot;),
-///     Cow::Owned(&quot;world&quot;.to_uppercase()),
+///     Cow::Borrowed("hello"),
+///     Cow::Owned("world".to_uppercase()),
 /// ]);
 /// ```
 ///
@@ -2136,12 +2137,12 @@
 ///
 /// ```rust
 /// use ratatui::{prelude::*, widgets::*};
-/// let cells = vec![&quot;Cell1&quot;, &quot;Cell2&quot;, &quot;Cell3&quot;];
+/// let cells = vec!["Cell1", "Cell2", "Cell3"];
 /// Row::new(cells).red().italic();
 /// ```
 </span><span class="attr">#[derive(Debug, Default, Clone, Eq, PartialEq, Hash)]
-</span><span class="kw">pub struct </span>Row&lt;<span class="lifetime">&#39;a</span>&gt; {
-    cells: Vec&lt;Cell&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+</span><span class="kw">pub struct </span>Row&lt;<span class="lifetime">'a</span>&gt; {
+    cells: Vec&lt;Cell&lt;<span class="lifetime">'a</span>&gt;&gt;,
     height: u16,
     bottom_margin: u16,
     style: Style,
@@ -2163,14 +2164,14 @@
 ///
 /// use ratatui::{prelude::*, widgets::*};
 ///
-/// Cell::from(&quot;simple string&quot;);
-/// Cell::from(Span::from(&quot;span&quot;));
+/// Cell::from("simple string");
+/// Cell::from(Span::from("span"));
 /// Cell::from(Line::from(vec![
-///     Span::raw(&quot;a vec of &quot;),
-///     Span::styled(&quot;spans&quot;, Style::default().add_modifier(Modifier::BOLD)),
+///     Span::raw("a vec of "),
+///     Span::styled("spans", Style::default().add_modifier(Modifier::BOLD)),
 /// ]));
-/// Cell::from(Text::from(&quot;a text&quot;));
-/// Cell::from(Text::from(Cow::Borrowed(&quot;hello&quot;)));
+/// Cell::from(Text::from("a text"));
+/// Cell::from(Text::from(Cow::Borrowed("hello")));
 /// ```
 ///
 /// `Cell` implements [`Styled`] which means you can use style shorthands from the [`Stylize`] trait
@@ -2178,15 +2179,15 @@
 ///
 /// ```rust
 /// use ratatui::{prelude::*, widgets::*};
-/// Cell::new(&quot;Cell 1&quot;).red().italic();
+/// Cell::new("Cell 1").red().italic();
 /// ```
 </span><span class="attr">#[derive(Debug, Default, Clone, Eq, PartialEq, Hash)]
-</span><span class="kw">pub struct </span>Cell&lt;<span class="lifetime">&#39;a</span>&gt; {
-    content: Text&lt;<span class="lifetime">&#39;a</span>&gt;,
+</span><span class="kw">pub struct </span>Cell&lt;<span class="lifetime">'a</span>&gt; {
+    content: Text&lt;<span class="lifetime">'a</span>&gt;,
     style: Style,
 }
 
-<span class="doccomment">/// This option allows the user to configure the &quot;highlight symbol&quot; column width spacing
+<span class="doccomment">/// This option allows the user to configure the "highlight symbol" column width spacing
 </span><span class="attr">#[derive(Debug, Display, EnumString, PartialEq, Eq, Clone, Default, Hash)]
 </span><span class="kw">pub enum </span>HighlightSpacing {
     <span class="doccomment">/// Always add spacing for the selection symbol column
@@ -2235,7 +2236,7 @@
 /// # use ratatui::{prelude::*, widgets::*};
 /// # fn ui(frame: &amp;mut Frame) {
 /// # let area = Rect::default();
-/// # let rows = [Row::new(vec![&quot;Cell1&quot;, &quot;Cell2&quot;])];
+/// # let rows = [Row::new(vec!["Cell1", "Cell2"])];
 /// # let widths = [Constraint::Length(5), Constraint::Length(5)];
 /// let table = Table::new(rows, widths).widths(widths);
 ///
@@ -2254,7 +2255,7 @@
     selected: <span class="prelude-ty">Option</span>&lt;usize&gt;,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Table&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Table&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Creates a new [`Table`] widget with the given rows.
     ///
     /// The `rows` parameter accepts any value that can be converted into an iterator of [`Row`]s.
@@ -2268,15 +2269,15 @@
     /// ```rust
     /// # use ratatui::{prelude::*, widgets::*};
     /// let rows = [
-    ///     Row::new(vec![&quot;Cell1&quot;, &quot;Cell2&quot;]),
-    ///     Row::new(vec![&quot;Cell3&quot;, &quot;Cell4&quot;]),
+    ///     Row::new(vec!["Cell1", "Cell2"]),
+    ///     Row::new(vec!["Cell3", "Cell4"]),
     /// ];
     /// let widths = [Constraint::Length(5), Constraint::Length(5)];
     /// let table = Table::new(rows, widths);
     /// ```
     </span><span class="kw">pub fn </span>new&lt;R, C&gt;(rows: R, widths: C) -&gt; <span class="self">Self
     </span><span class="kw">where
-        </span>R: IntoIterator&lt;Item = Row&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+        </span>R: IntoIterator&lt;Item = Row&lt;<span class="lifetime">'a</span>&gt;&gt;,
         C: IntoIterator,
         C::Item: AsRef&lt;Constraint&gt;,
     {
@@ -2309,15 +2310,15 @@
     /// ```rust
     /// # use ratatui::{prelude::*, widgets::*};
     /// let rows = [
-    ///     Row::new(vec![&quot;Cell1&quot;, &quot;Cell2&quot;]),
-    ///     Row::new(vec![&quot;Cell3&quot;, &quot;Cell4&quot;]),
+    ///     Row::new(vec!["Cell1", "Cell2"]),
+    ///     Row::new(vec!["Cell3", "Cell4"]),
     /// ];
     /// let table = Table::default().rows(rows);
     /// ```
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>rows&lt;T&gt;(<span class="kw-2">mut </span><span class="self">self</span>, rows: T) -&gt; <span class="self">Self
     </span><span class="kw">where
-        </span>T: IntoIterator&lt;Item = Row&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+        </span>T: IntoIterator&lt;Item = Row&lt;<span class="lifetime">'a</span>&gt;&gt;,
     {
         <span class="self">self</span>.rows = rows.into_iter().collect();
         <span class="self">self
@@ -2334,13 +2335,13 @@
     /// ```rust
     /// # use ratatui::{prelude::*, widgets::*};
     /// let header = Row::new(vec![
-    ///     Cell::from(&quot;Header Cell 1&quot;),
-    ///     Cell::from(&quot;Header Cell 2&quot;),
+    ///     Cell::from("Header Cell 1"),
+    ///     Cell::from("Header Cell 2"),
     /// ]);
     /// let table = Table::default().header(header);
     /// ```
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
-    </span><span class="kw">pub fn </span>header(<span class="kw-2">mut </span><span class="self">self</span>, header: Row&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>header(<span class="kw-2">mut </span><span class="self">self</span>, header: Row&lt;<span class="lifetime">'a</span>&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.header = <span class="prelude-val">Some</span>(header);
         <span class="self">self
     </span>}
@@ -2363,7 +2364,7 @@
     /// let widths = [10, 10, 20].into_iter().map(|c| Constraint::Length(c));
     /// let table = Table::default().widths(widths);
     /// ```
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>widths&lt;I&gt;(<span class="kw-2">mut </span><span class="self">self</span>, widths: I) -&gt; <span class="self">Self
     </span><span class="kw">where
         </span>I: IntoIterator,
@@ -2383,11 +2384,11 @@
     ///
     /// ```rust
     /// # use ratatui::{prelude::*, widgets::*};
-    /// # let rows = [Row::new(vec![&quot;Cell1&quot;, &quot;Cell2&quot;])];
+    /// # let rows = [Row::new(vec!["Cell1", "Cell2"])];
     /// # let widths = [Constraint::Length(5), Constraint::Length(5)];
     /// let table = Table::new(rows, widths).column_spacing(1);
     /// ```
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>column_spacing(<span class="kw-2">mut </span><span class="self">self</span>, spacing: u16) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.column_spacing = spacing;
         <span class="self">self
@@ -2404,13 +2405,13 @@
     ///
     /// ```rust
     /// # use ratatui::{prelude::*, widgets::*};
-    /// # let rows = [Row::new(vec![&quot;Cell1&quot;, &quot;Cell2&quot;])];
+    /// # let rows = [Row::new(vec!["Cell1", "Cell2"])];
     /// # let widths = [Constraint::Length(5), Constraint::Length(5)];
-    /// let block = Block::default().title(&quot;Table&quot;).borders(Borders::ALL);
+    /// let block = Block::default().title("Table").borders(Borders::ALL);
     /// let table = Table::new(rows, widths).block(block);
     /// ```
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
-    </span><span class="kw">pub fn </span>block(<span class="kw-2">mut </span><span class="self">self</span>, block: Block&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>block(<span class="kw-2">mut </span><span class="self">self</span>, block: Block&lt;<span class="lifetime">'a</span>&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.block = <span class="prelude-val">Some</span>(block);
         <span class="self">self
     </span>}
@@ -2418,7 +2419,7 @@
     <span class="doccomment">/// Sets the base style of the widget
     ///
     /// All text rendered by the widget will use this style, unless overridden by [`Block::style`],
-    /// [`Row::style`], [`Cell::style`], or the styles of cell&#39;s content.
+    /// [`Row::style`], [`Cell::style`], or the styles of cell's content.
     ///
     /// This is a fluent setter method which must be chained or used as it consumes self
     ///
@@ -2426,7 +2427,7 @@
     ///
     /// ```rust
     /// # use ratatui::{prelude::*, widgets::*};
-    /// # let rows = [Row::new(vec![&quot;Cell1&quot;, &quot;Cell2&quot;])];
+    /// # let rows = [Row::new(vec!["Cell1", "Cell2"])];
     /// # let widths = [Constraint::Length(5), Constraint::Length(5)];
     /// let table = Table::new(rows, widths).style(Style::new().red().italic());
     /// ```
@@ -2436,11 +2437,11 @@
     ///
     /// ```rust
     /// # use ratatui::{prelude::*, widgets::*};
-    /// # let rows = [Row::new(vec![&quot;Cell1&quot;, &quot;Cell2&quot;])];
+    /// # let rows = [Row::new(vec!["Cell1", "Cell2"])];
     /// # let widths = vec![Constraint::Length(5), Constraint::Length(5)];
     /// let table = Table::new(rows, widths).red().italic();
     /// ```
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>style(<span class="kw-2">mut </span><span class="self">self</span>, style: Style) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.style = style;
         <span class="self">self
@@ -2457,11 +2458,11 @@
     ///
     /// ```rust
     /// # use ratatui::{prelude::*, widgets::*};
-    /// # let rows = [Row::new(vec![&quot;Cell1&quot;, &quot;Cell2&quot;])];
+    /// # let rows = [Row::new(vec!["Cell1", "Cell2"])];
     /// # let widths = [Constraint::Length(5), Constraint::Length(5)];
     /// let table = Table::new(rows, widths).highlight_style(Style::new().red().italic());
     /// ```
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>highlight_style(<span class="kw-2">mut </span><span class="self">self</span>, highlight_style: Style) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.highlight_style = highlight_style;
         <span class="self">self
@@ -2475,12 +2476,12 @@
     ///
     /// ```rust
     /// # use ratatui::{prelude::*, widgets::*};
-    /// # let rows = [Row::new(vec![&quot;Cell1&quot;, &quot;Cell2&quot;])];
+    /// # let rows = [Row::new(vec!["Cell1", "Cell2"])];
     /// # let widths = [Constraint::Length(5), Constraint::Length(5)];
-    /// let table = Table::new(rows, widths).highlight_symbol(&quot;&gt;&gt;&quot;);
+    /// let table = Table::new(rows, widths).highlight_symbol("&gt;&gt;");
     /// ```
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
-    </span><span class="kw">pub fn </span>highlight_symbol(<span class="kw-2">mut </span><span class="self">self</span>, highlight_symbol: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>highlight_symbol(<span class="kw-2">mut </span><span class="self">self</span>, highlight_symbol: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.highlight_symbol = <span class="prelude-val">Some</span>(highlight_symbol);
         <span class="self">self
     </span>}
@@ -2507,11 +2508,11 @@
     ///
     /// ```rust
     /// # use ratatui::{prelude::*, widgets::*};
-    /// # let rows = [Row::new(vec![&quot;Cell1&quot;, &quot;Cell2&quot;])];
+    /// # let rows = [Row::new(vec!["Cell1", "Cell2"])];
     /// # let widths = [Constraint::Length(5), Constraint::Length(5)];
     /// let table = Table::new(rows, widths).highlight_spacing(HighlightSpacing::Always);
     /// ```
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>highlight_spacing(<span class="kw-2">mut </span><span class="self">self</span>, value: HighlightSpacing) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.highlight_spacing = value;
         <span class="self">self
@@ -2529,8 +2530,8 @@
     ///
     /// Create a table that needs at least 30 columns to display.  Any extra space will be assigned
     /// to the last column.
-    </span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;unstable&quot;</span>, doc = <span class="string">&quot; ```&quot;</span>)]
-    #[cfg_attr(not(feature = <span class="string">&quot;unstable&quot;</span>), doc = <span class="string">&quot; ```ignore&quot;</span>)]
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">"unstable"</span>, doc = <span class="string">" ```"</span>)]
+    #[cfg_attr(not(feature = <span class="string">"unstable"</span>), doc = <span class="string">" ```ignore"</span>)]
     </span><span class="doccomment">/// # use ratatui::layout::Constraint;
     /// # use ratatui::layout::SegmentSize;
     /// # use ratatui::widgets::Table;
@@ -2539,9 +2540,9 @@
     ///     .segment_size(SegmentSize::LastTakesRemainder);
     /// ```
     </span><span class="attr">#[stability::unstable(
-        feature = <span class="string">&quot;segment-size&quot;</span>,
-        reason = <span class="string">&quot;The name for this feature is not final and may change in the future&quot;</span>,
-        issue = <span class="string">&quot;https://github.com/ratatui-org/ratatui/issues/536&quot;
+        feature = <span class="string">"segment-size"</span>,
+        reason = <span class="string">"The name for this feature is not final and may change in the future"</span>,
+        issue = <span class="string">"https://github.com/ratatui-org/ratatui/issues/536"
     </span>)]
     </span><span class="kw">pub const fn </span>segment_size(<span class="kw-2">mut </span><span class="self">self</span>, segment_size: SegmentSize) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.segment_size = segment_size;
@@ -2549,27 +2550,27 @@
     </span>}
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Row&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Row&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Creates a new [`Row`]
     ///
     /// The `cells` parameter accepts any value that can be converted into an iterator of anything
-    /// that can be converted into a [`Cell`] (e.g. `Vec&lt;&amp;str&gt;`, `&amp;[Cell&lt;&#39;a&gt;]`, `Vec&lt;String&gt;`, etc.)
+    /// that can be converted into a [`Cell`] (e.g. `Vec&lt;&amp;str&gt;`, `&amp;[Cell&lt;'a&gt;]`, `Vec&lt;String&gt;`, etc.)
     ///
     /// # Examples
     ///
     /// ```rust
     /// # use ratatui::{prelude::*, widgets::*};
-    /// let row = Row::new(vec![&quot;Cell 1&quot;, &quot;Cell 2&quot;, &quot;Cell 3&quot;]);
+    /// let row = Row::new(vec!["Cell 1", "Cell 2", "Cell 3"]);
     /// let row = Row::new(vec![
-    ///     Cell::new(&quot;Cell 1&quot;),
-    ///     Cell::new(&quot;Cell 2&quot;),
-    ///     Cell::new(&quot;Cell 3&quot;),
+    ///     Cell::new("Cell 1"),
+    ///     Cell::new("Cell 2"),
+    ///     Cell::new("Cell 3"),
     /// ]);
     /// ```
     </span><span class="kw">pub fn </span>new&lt;T&gt;(cells: T) -&gt; <span class="self">Self
     </span><span class="kw">where
         </span>T: IntoIterator,
-        T::Item: Into&lt;Cell&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+        T::Item: Into&lt;Cell&lt;<span class="lifetime">'a</span>&gt;&gt;,
     {
         <span class="self">Self </span>{
             cells: cells.into_iter().map(Into::into).collect(),
@@ -2581,7 +2582,7 @@
     <span class="doccomment">/// Set the cells of the [`Row`]
     ///
     /// The `cells` parameter accepts any value that can be converted into an iterator of anything
-    /// that can be converted into a [`Cell`] (e.g. `Vec&lt;&amp;str&gt;`, `&amp;[Cell&lt;&#39;a&gt;]`, `Vec&lt;String&gt;`, etc.)
+    /// that can be converted into a [`Cell`] (e.g. `Vec&lt;&amp;str&gt;`, `&amp;[Cell&lt;'a&gt;]`, `Vec&lt;String&gt;`, etc.)
     ///
     /// This is a fluent setter method which must be chained or used as it consumes self
     ///
@@ -2589,18 +2590,18 @@
     ///
     /// ```rust
     /// # use ratatui::{prelude::*, widgets::*};
-    /// let row = Row::default().cells(vec![&quot;Cell 1&quot;, &quot;Cell 2&quot;, &quot;Cell 3&quot;]);
+    /// let row = Row::default().cells(vec!["Cell 1", "Cell 2", "Cell 3"]);
     /// let row = Row::default().cells(vec![
-    ///     Cell::new(&quot;Cell 1&quot;),
-    ///     Cell::new(&quot;Cell 2&quot;),
-    ///     Cell::new(&quot;Cell 3&quot;),
+    ///     Cell::new("Cell 1"),
+    ///     Cell::new("Cell 2"),
+    ///     Cell::new("Cell 3"),
     /// ]);
     /// ```
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>cells&lt;T&gt;(<span class="kw-2">mut </span><span class="self">self</span>, cells: T) -&gt; <span class="self">Self
     </span><span class="kw">where
         </span>T: IntoIterator,
-        T::Item: Into&lt;Cell&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+        T::Item: Into&lt;Cell&lt;<span class="lifetime">'a</span>&gt;&gt;,
     {
         <span class="self">self</span>.cells = cells.into_iter().map(Into::into).collect();
         <span class="self">self
@@ -2618,10 +2619,10 @@
     ///
     /// ```rust
     /// # use ratatui::{prelude::*, widgets::*};
-    /// let cells = vec![&quot;Cell 1\nline 2&quot;, &quot;Cell 2&quot;, &quot;Cell 3&quot;];
+    /// let cells = vec!["Cell 1\nline 2", "Cell 2", "Cell 3"];
     /// let row = Row::new(cells).height(2);
     /// ```
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>height(<span class="kw-2">mut </span><span class="self">self</span>, height: u16) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.height = height;
         <span class="self">self
@@ -2637,10 +2638,10 @@
     ///
     /// ```rust
     /// # use ratatui::{prelude::*, widgets::*};
-    /// # let cells = vec![&quot;Cell 1&quot;, &quot;Cell 2&quot;, &quot;Cell 3&quot;];
+    /// # let cells = vec!["Cell 1", "Cell 2", "Cell 3"];
     /// let row = Row::default().bottom_margin(1);
     /// ```
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>bottom_margin(<span class="kw-2">mut </span><span class="self">self</span>, margin: u16) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.bottom_margin = margin;
         <span class="self">self
@@ -2657,7 +2658,7 @@
     ///
     /// ```rust
     /// # use ratatui::{prelude::*, widgets::*};
-    /// let cells = vec![&quot;Cell 1&quot;, &quot;Cell 2&quot;, &quot;Cell 3&quot;];
+    /// let cells = vec!["Cell 1", "Cell 2", "Cell 3"];
     /// let row = Row::new(cells).style(Style::new().red().italic());
     /// ```
     ///
@@ -2666,17 +2667,17 @@
     ///
     /// ```rust
     /// # use ratatui::{prelude::*, widgets::*};
-    /// let cells = vec![&quot;Cell 1&quot;, &quot;Cell 2&quot;, &quot;Cell 3&quot;];
+    /// let cells = vec!["Cell 1", "Cell 2", "Cell 3"];
     /// let row = Row::new(cells).red().italic();
     /// ```
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>style(<span class="kw-2">mut </span><span class="self">self</span>, style: Style) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.style = style;
         <span class="self">self
     </span>}
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Cell&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Cell&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Creates a new [`Cell`]
     ///
     /// The `content` parameter accepts any value that can be converted into a [`Text`].
@@ -2685,17 +2686,17 @@
     ///
     /// ```rust
     /// # use ratatui::{prelude::*, widgets::*};
-    /// Cell::new(&quot;simple string&quot;);
-    /// Cell::new(Span::from(&quot;span&quot;));
+    /// Cell::new("simple string");
+    /// Cell::new(Span::from("span"));
     /// Cell::new(Line::from(vec![
-    ///     Span::raw(&quot;a vec of &quot;),
-    ///     Span::styled(&quot;spans&quot;, Style::default().add_modifier(Modifier::BOLD)),
+    ///     Span::raw("a vec of "),
+    ///     Span::styled("spans", Style::default().add_modifier(Modifier::BOLD)),
     /// ]));
-    /// Cell::new(Text::from(&quot;a text&quot;));
+    /// Cell::new(Text::from("a text"));
     /// ```
     </span><span class="kw">pub fn </span>new&lt;T&gt;(content: T) -&gt; <span class="self">Self
     </span><span class="kw">where
-        </span>T: Into&lt;Text&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+        </span>T: Into&lt;Text&lt;<span class="lifetime">'a</span>&gt;&gt;,
     {
         <span class="self">Self </span>{
             content: content.into(),
@@ -2713,18 +2714,18 @@
     ///
     /// ```rust
     /// # use ratatui::{prelude::*, widgets::*};
-    /// Cell::default().content(&quot;simple string&quot;);
-    /// Cell::default().content(Span::from(&quot;span&quot;));
+    /// Cell::default().content("simple string");
+    /// Cell::default().content(Span::from("span"));
     /// Cell::default().content(Line::from(vec![
-    ///     Span::raw(&quot;a vec of &quot;),
-    ///     Span::styled(&quot;spans&quot;, Style::new().bold()),
+    ///     Span::raw("a vec of "),
+    ///     Span::styled("spans", Style::new().bold()),
     /// ]));
-    /// Cell::default().content(Text::from(&quot;a text&quot;));
+    /// Cell::default().content(Text::from("a text"));
     /// ```
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>content&lt;T&gt;(<span class="kw-2">mut </span><span class="self">self</span>, content: T) -&gt; <span class="self">Self
     </span><span class="kw">where
-        </span>T: Into&lt;Text&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+        </span>T: Into&lt;Text&lt;<span class="lifetime">'a</span>&gt;&gt;,
     {
         <span class="self">self</span>.content = content.into();
         <span class="self">self
@@ -2741,7 +2742,7 @@
     ///
     /// ```rust
     /// # use ratatui::{prelude::*, widgets::*};
-    /// Cell::new(&quot;Cell 1&quot;).style(Style::new().red().italic());
+    /// Cell::new("Cell 1").style(Style::new().red().italic());
     /// ```
     ///
     /// `Cell` also implements the [`Styled`] trait, which means you can use style shorthands from
@@ -2749,9 +2750,9 @@
     ///
     /// ```rust
     /// # use ratatui::{prelude::*, widgets::*};
-    /// Cell::new(&quot;Cell 1&quot;).red().italic();
+    /// Cell::new("Cell 1").red().italic();
     /// ```
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>style(<span class="kw-2">mut </span><span class="self">self</span>, style: Style) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.style = style;
         <span class="self">self
@@ -2796,7 +2797,7 @@
     /// # use ratatui::{prelude::*, widgets::*};
     /// let state = TableState::new().with_offset(1);
     /// ```
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>with_offset(<span class="kw-2">mut </span><span class="self">self</span>, offset: usize) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.offset = offset;
         <span class="self">self
@@ -2812,7 +2813,7 @@
     /// # use ratatui::{prelude::*, widgets::*};
     /// let state = TableState::new().with_selected(Some(1));
     /// ```
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
     </span><span class="kw">pub fn </span>with_selected(<span class="kw-2">mut </span><span class="self">self</span>, selected: <span class="prelude-ty">Option</span>&lt;usize&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.selected = selected;
         <span class="self">self
@@ -2893,14 +2894,14 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Widget <span class="kw">for </span>Table&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Widget <span class="kw">for </span>Table&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">fn </span>render(<span class="self">self</span>, area: Rect, buf: <span class="kw-2">&amp;mut </span>Buffer) {
         <span class="kw">let </span><span class="kw-2">mut </span>state = TableState::default();
         StatefulWidget::render(<span class="self">self</span>, area, buf, <span class="kw-2">&amp;mut </span>state);
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; StatefulWidget <span class="kw">for </span>Table&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; StatefulWidget <span class="kw">for </span>Table&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">type </span>State = TableState;
 
     <span class="kw">fn </span>render(<span class="kw-2">mut </span><span class="self">self</span>, area: Rect, buf: <span class="kw-2">&amp;mut </span>Buffer, state: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::State) {
@@ -2923,7 +2924,7 @@
             <span class="number">0
         </span>};
         <span class="kw">let </span>columns_widths = <span class="self">self</span>.get_columns_widths(table_area.width, selection_width);
-        <span class="kw">let </span>highlight_symbol = <span class="self">self</span>.highlight_symbol.unwrap_or(<span class="string">&quot;&quot;</span>);
+        <span class="kw">let </span>highlight_symbol = <span class="self">self</span>.highlight_symbol.unwrap_or(<span class="string">""</span>);
         <span class="kw">let </span><span class="kw-2">mut </span>current_height = <span class="number">0</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>rows_height = table_area.height;
 
@@ -2979,8 +2980,8 @@
             buf.set_style(table_row_area, table_row.style);
             <span class="kw">let </span>is_selected = state.selected.map_or(<span class="bool-val">false</span>, |s| s == i);
             <span class="kw">if </span>selection_width &gt; <span class="number">0 </span>&amp;&amp; is_selected {
-                <span class="comment">// this should in normal cases be safe, because &quot;get_columns_widths&quot; allocates
-                // &quot;highlight_symbol.width()&quot; space but &quot;get_columns_widths&quot;
+                <span class="comment">// this should in normal cases be safe, because "get_columns_widths" allocates
+                // "highlight_symbol.width()" space but "get_columns_widths"
                 // currently does not bind it to max table.width()
                 </span>buf.set_stringn(
                     inner_offset,
@@ -3009,7 +3010,7 @@
 }
 
 <span class="comment">// private methods for rendering
-</span><span class="kw">impl </span>Table&lt;<span class="lifetime">&#39;_</span>&gt; {
+</span><span class="kw">impl </span>Table&lt;<span class="lifetime">'_</span>&gt; {
     <span class="doccomment">/// Get all offsets and widths of all user specified columns
     /// Returns (x, width)
     </span><span class="kw">fn </span>get_columns_widths(<span class="kw-2">&amp;</span><span class="self">self</span>, max_width: u16, selection_width: u16) -&gt; Vec&lt;(u16, u16)&gt; {
@@ -3076,14 +3077,14 @@
         <span class="kw">if let </span>Constraint::Percentage(p) = w {
             <span class="macro">assert!</span>(
                 p &lt;= <span class="number">100</span>,
-                <span class="string">&quot;Percentages should be between 0 and 100 inclusively.&quot;
+                <span class="string">"Percentages should be between 0 and 100 inclusively."
             </span>)
         }
     });
 }
 
 <span class="comment">// private methods for rendering
-</span><span class="kw">impl </span>Row&lt;<span class="lifetime">&#39;_</span>&gt; {
+</span><span class="kw">impl </span>Row&lt;<span class="lifetime">'_</span>&gt; {
     <span class="doccomment">/// Returns the total height of the row.
     </span><span class="kw">fn </span>total_height(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u16 {
         <span class="self">self</span>.height.saturating_add(<span class="self">self</span>.bottom_margin)
@@ -3091,7 +3092,7 @@
 }
 
 <span class="comment">// private methods for rendering
-</span><span class="kw">impl </span>Cell&lt;<span class="lifetime">&#39;_</span>&gt; {
+</span><span class="kw">impl </span>Cell&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">fn </span>render(<span class="kw-2">&amp;</span><span class="self">self</span>, buf: <span class="kw-2">&amp;mut </span>Buffer, area: Rect) {
         buf.set_style(area, <span class="self">self</span>.style);
         <span class="kw">for </span>(i, line) <span class="kw">in </span><span class="self">self</span>.content.lines.iter().enumerate() {
@@ -3115,11 +3116,11 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T&gt; From&lt;T&gt; <span class="kw">for </span>Cell&lt;<span class="lifetime">&#39;a</span>&gt;
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, T&gt; From&lt;T&gt; <span class="kw">for </span>Cell&lt;<span class="lifetime">'a</span>&gt;
 <span class="kw">where
-    </span>T: Into&lt;Text&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    </span>T: Into&lt;Text&lt;<span class="lifetime">'a</span>&gt;&gt;,
 {
-    <span class="kw">fn </span>from(content: T) -&gt; Cell&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>from(content: T) -&gt; Cell&lt;<span class="lifetime">'a</span>&gt; {
         Cell {
             content: content.into(),
             style: Style::default(),
@@ -3127,8 +3128,8 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Styled <span class="kw">for </span>Cell&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">type </span>Item = Cell&lt;<span class="lifetime">&#39;a</span>&gt;;
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Styled <span class="kw">for </span>Cell&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">type </span>Item = Cell&lt;<span class="lifetime">'a</span>&gt;;
 
     <span class="kw">fn </span>style(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Style {
         <span class="self">self</span>.style
@@ -3139,8 +3140,8 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Styled <span class="kw">for </span>Row&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">type </span>Item = Row&lt;<span class="lifetime">&#39;a</span>&gt;;
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Styled <span class="kw">for </span>Row&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">type </span>Item = Row&lt;<span class="lifetime">'a</span>&gt;;
 
     <span class="kw">fn </span>style(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Style {
         <span class="self">self</span>.style
@@ -3151,8 +3152,8 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Styled <span class="kw">for </span>Table&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">type </span>Item = Table&lt;<span class="lifetime">&#39;a</span>&gt;;
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Styled <span class="kw">for </span>Table&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">type </span>Item = Table&lt;<span class="lifetime">'a</span>&gt;;
 
     <span class="kw">fn </span>style(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Style {
         <span class="self">self</span>.style
@@ -3183,24 +3184,24 @@
     </span><span class="kw">fn </span>widths_conversions() {
         <span class="kw">let </span>array = [Constraint::Percentage(<span class="number">100</span>)];
         <span class="kw">let </span>table = Table::new(<span class="macro">vec!</span>[], array);
-        <span class="macro">assert_eq!</span>(table.widths, <span class="macro">vec!</span>[Constraint::Percentage(<span class="number">100</span>)], <span class="string">&quot;array&quot;</span>);
+        <span class="macro">assert_eq!</span>(table.widths, <span class="macro">vec!</span>[Constraint::Percentage(<span class="number">100</span>)], <span class="string">"array"</span>);
 
         <span class="kw">let </span>array_ref = <span class="kw-2">&amp;</span>[Constraint::Percentage(<span class="number">100</span>)];
         <span class="kw">let </span>table = Table::new(<span class="macro">vec!</span>[], array_ref);
-        <span class="macro">assert_eq!</span>(table.widths, <span class="macro">vec!</span>[Constraint::Percentage(<span class="number">100</span>)], <span class="string">&quot;array ref&quot;</span>);
+        <span class="macro">assert_eq!</span>(table.widths, <span class="macro">vec!</span>[Constraint::Percentage(<span class="number">100</span>)], <span class="string">"array ref"</span>);
 
         <span class="kw">let </span>vec = <span class="macro">vec!</span>[Constraint::Percentage(<span class="number">100</span>)];
         <span class="kw">let </span>slice = vec.as_slice();
         <span class="kw">let </span>table = Table::new(<span class="macro">vec!</span>[], slice);
-        <span class="macro">assert_eq!</span>(table.widths, <span class="macro">vec!</span>[Constraint::Percentage(<span class="number">100</span>)], <span class="string">&quot;slice&quot;</span>);
+        <span class="macro">assert_eq!</span>(table.widths, <span class="macro">vec!</span>[Constraint::Percentage(<span class="number">100</span>)], <span class="string">"slice"</span>);
 
         <span class="kw">let </span>vec = <span class="macro">vec!</span>[Constraint::Percentage(<span class="number">100</span>)];
         <span class="kw">let </span>table = Table::new(<span class="macro">vec!</span>[], vec);
-        <span class="macro">assert_eq!</span>(table.widths, <span class="macro">vec!</span>[Constraint::Percentage(<span class="number">100</span>)], <span class="string">&quot;vec&quot;</span>);
+        <span class="macro">assert_eq!</span>(table.widths, <span class="macro">vec!</span>[Constraint::Percentage(<span class="number">100</span>)], <span class="string">"vec"</span>);
 
         <span class="kw">let </span>vec_ref = <span class="kw-2">&amp;</span><span class="macro">vec!</span>[Constraint::Percentage(<span class="number">100</span>)];
         <span class="kw">let </span>table = Table::new(<span class="macro">vec!</span>[], vec_ref);
-        <span class="macro">assert_eq!</span>(table.widths, <span class="macro">vec!</span>[Constraint::Percentage(<span class="number">100</span>)], <span class="string">&quot;vec ref&quot;</span>);
+        <span class="macro">assert_eq!</span>(table.widths, <span class="macro">vec!</span>[Constraint::Percentage(<span class="number">100</span>)], <span class="string">"vec ref"</span>);
     }
 
     <span class="comment">// test how constraints interact with table column width allocation
@@ -3303,8 +3304,8 @@
 
         <span class="attr">#[test]
         </span><span class="kw">fn </span>min_constraint() {
-            <span class="comment">// in its currently stage, the &quot;Min&quot; constraint does not grow to use the possible
-            // available length and enabling &quot;expand_to_fill&quot; will just stretch the last
+            <span class="comment">// in its currently stage, the "Min" constraint does not grow to use the possible
+            // available length and enabling "expand_to_fill" will just stretch the last
             // constraint and not split it with all available constraints
 
             // without selection, more than needed width
@@ -3463,9 +3464,9 @@
         <span class="kw">let </span><span class="kw-2">mut </span>buf = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">20</span>, <span class="number">3</span>));
         <span class="kw">let </span>table = Table::new(
             <span class="macro">vec!</span>[
-                Row::new(<span class="macro">vec!</span>[Line::from(<span class="string">&quot;Left&quot;</span>).alignment(Alignment::Left)]),
-                Row::new(<span class="macro">vec!</span>[Line::from(<span class="string">&quot;Center&quot;</span>).alignment(Alignment::Center)]),
-                Row::new(<span class="macro">vec!</span>[Line::from(<span class="string">&quot;Right&quot;</span>).alignment(Alignment::Right)]),
+                Row::new(<span class="macro">vec!</span>[Line::from(<span class="string">"Left"</span>).alignment(Alignment::Left)]),
+                Row::new(<span class="macro">vec!</span>[Line::from(<span class="string">"Center"</span>).alignment(Alignment::Center)]),
+                Row::new(<span class="macro">vec!</span>[Line::from(<span class="string">"Right"</span>).alignment(Alignment::Right)]),
             ],
             [Percentage(<span class="number">100</span>)],
         );
@@ -3473,9 +3474,9 @@
         Widget::render(table, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">20</span>, <span class="number">3</span>), <span class="kw-2">&amp;mut </span>buf);
 
         <span class="kw">let </span>expected = Buffer::with_lines(<span class="macro">vec!</span>[
-            <span class="string">&quot;Left                &quot;</span>,
-            <span class="string">&quot;       Center       &quot;</span>,
-            <span class="string">&quot;               Right&quot;</span>,
+            <span class="string">"Left                "</span>,
+            <span class="string">"       Center       "</span>,
+            <span class="string">"               Right"</span>,
         ]);
 
         <span class="macro">assert_eq!</span>(buf, expected);
@@ -3485,7 +3486,7 @@
     </span><span class="kw">fn </span>test_render_table_when_overflow() {
         <span class="kw">let </span><span class="kw-2">mut </span>buf = Buffer::empty(Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">20</span>, <span class="number">3</span>));
         <span class="kw">let </span>table = Table::new(<span class="macro">vec!</span>[], [Constraint::Min(<span class="number">20</span>); <span class="number">1</span>])
-            .header(Row::new([Line::from(<span class="string">&quot;&quot;</span>).alignment(Alignment::Right)]));
+            .header(Row::new([Line::from(<span class="string">""</span>).alignment(Alignment::Right)]));
 
         Widget::render(table, Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">20</span>, <span class="number">3</span>), <span class="kw-2">&amp;mut </span>buf);
     }
@@ -3493,7 +3494,7 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>cell_can_be_stylized() {
         <span class="macro">assert_eq!</span>(
-            Cell::from(<span class="string">&quot;&quot;</span>).black().on_white().bold().not_dim().style,
+            Cell::from(<span class="string">""</span>).black().on_white().bold().not_dim().style,
             Style::default()
                 .fg(Color::Black)
                 .bg(Color::White)
@@ -3505,7 +3506,7 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>row_can_be_stylized() {
         <span class="macro">assert_eq!</span>(
-            Row::new(<span class="macro">vec!</span>[Cell::from(<span class="string">&quot;&quot;</span>)])
+            Row::new(<span class="macro">vec!</span>[Cell::from(<span class="string">""</span>)])
                 .black()
                 .on_white()
                 .bold()
@@ -3522,7 +3523,7 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>table_can_be_stylized() {
         <span class="macro">assert_eq!</span>(
-            Table::new(<span class="macro">vec!</span>[Row::new(<span class="macro">vec!</span>[Cell::from(<span class="string">&quot;&quot;</span>)])], [Percentage(<span class="number">100</span>)])
+            Table::new(<span class="macro">vec!</span>[Row::new(<span class="macro">vec!</span>[Cell::from(<span class="string">""</span>)])], [Percentage(<span class="number">100</span>)])
                 .black()
                 .on_white()
                 .bold()
@@ -3538,30 +3539,30 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>highlight_spacing_to_string() {
-        <span class="macro">assert_eq!</span>(HighlightSpacing::Always.to_string(), <span class="string">&quot;Always&quot;</span>.to_string());
+        <span class="macro">assert_eq!</span>(HighlightSpacing::Always.to_string(), <span class="string">"Always"</span>.to_string());
         <span class="macro">assert_eq!</span>(
             HighlightSpacing::WhenSelected.to_string(),
-            <span class="string">&quot;WhenSelected&quot;</span>.to_string()
+            <span class="string">"WhenSelected"</span>.to_string()
         );
-        <span class="macro">assert_eq!</span>(HighlightSpacing::Never.to_string(), <span class="string">&quot;Never&quot;</span>.to_string());
+        <span class="macro">assert_eq!</span>(HighlightSpacing::Never.to_string(), <span class="string">"Never"</span>.to_string());
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>highlight_spacing_from_str() {
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;Always&quot;</span>.parse::&lt;HighlightSpacing&gt;(),
+            <span class="string">"Always"</span>.parse::&lt;HighlightSpacing&gt;(),
             <span class="prelude-val">Ok</span>(HighlightSpacing::Always)
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;WhenSelected&quot;</span>.parse::&lt;HighlightSpacing&gt;(),
+            <span class="string">"WhenSelected"</span>.parse::&lt;HighlightSpacing&gt;(),
             <span class="prelude-val">Ok</span>(HighlightSpacing::WhenSelected)
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;Never&quot;</span>.parse::&lt;HighlightSpacing&gt;(),
+            <span class="string">"Never"</span>.parse::&lt;HighlightSpacing&gt;(),
             <span class="prelude-val">Ok</span>(HighlightSpacing::Never)
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;&quot;</span>.parse::&lt;HighlightSpacing&gt;(),
+            <span class="string">""</span>.parse::&lt;HighlightSpacing&gt;(),
             <span class="prelude-val">Err</span>(strum::ParseError::VariantNotFound)
         );
     }
@@ -3572,7 +3573,7 @@
 
         <span class="attr">#[test]
         </span><span class="kw">fn </span>table_new() {
-            <span class="kw">let </span>rows = [Row::new(<span class="macro">vec!</span>[Cell::from(<span class="string">&quot;&quot;</span>)])];
+            <span class="kw">let </span>rows = [Row::new(<span class="macro">vec!</span>[Cell::from(<span class="string">""</span>)])];
             <span class="kw">let </span>widths = [Constraint::Percentage(<span class="number">100</span>)];
             <span class="kw">let </span>table = Table::new(rows.clone(), widths);
             <span class="macro">assert_eq!</span>(table.rows, rows);
@@ -3600,7 +3601,7 @@
 
         <span class="attr">#[test]
         </span><span class="kw">fn </span>table_rows() {
-            <span class="kw">let </span>rows = [Row::new(<span class="macro">vec!</span>[Cell::from(<span class="string">&quot;&quot;</span>)])];
+            <span class="kw">let </span>rows = [Row::new(<span class="macro">vec!</span>[Cell::from(<span class="string">""</span>)])];
             <span class="kw">let </span>table = Table::default().rows(rows.clone());
             <span class="macro">assert_eq!</span>(table.rows, rows);
         }
@@ -3613,14 +3614,14 @@
 
         <span class="attr">#[test]
         </span><span class="kw">fn </span>table_block() {
-            <span class="kw">let </span>block = Block::default().title(<span class="string">&quot;Table&quot;</span>).borders(Borders::ALL);
+            <span class="kw">let </span>block = Block::default().title(<span class="string">"Table"</span>).borders(Borders::ALL);
             <span class="kw">let </span>table = Table::default().block(block.clone());
             <span class="macro">assert_eq!</span>(table.block, <span class="prelude-val">Some</span>(block));
         }
 
         <span class="attr">#[test]
         </span><span class="kw">fn </span>table_header() {
-            <span class="kw">let </span>header = Row::new(<span class="macro">vec!</span>[Cell::from(<span class="string">&quot;&quot;</span>)]);
+            <span class="kw">let </span>header = Row::new(<span class="macro">vec!</span>[Cell::from(<span class="string">""</span>)]);
             <span class="kw">let </span>table = Table::default().header(header.clone());
             <span class="macro">assert_eq!</span>(table.header, <span class="prelude-val">Some</span>(header));
         }
@@ -3634,8 +3635,8 @@
 
         <span class="attr">#[test]
         </span><span class="kw">fn </span>table_highlight_symbol() {
-            <span class="kw">let </span>table = Table::default().highlight_symbol(<span class="string">&quot;&gt;&gt;&quot;</span>);
-            <span class="macro">assert_eq!</span>(table.highlight_symbol, <span class="prelude-val">Some</span>(<span class="string">&quot;&gt;&gt;&quot;</span>));
+            <span class="kw">let </span>table = Table::default().highlight_symbol(<span class="string">"&gt;&gt;"</span>);
+            <span class="macro">assert_eq!</span>(table.highlight_symbol, <span class="prelude-val">Some</span>(<span class="string">"&gt;&gt;"</span>));
         }
 
         <span class="attr">#[test]
@@ -3650,14 +3651,14 @@
 
         <span class="attr">#[test]
         </span><span class="kw">fn </span>row_new() {
-            <span class="kw">let </span>cells = <span class="macro">vec!</span>[Cell::from(<span class="string">&quot;&quot;</span>)];
+            <span class="kw">let </span>cells = <span class="macro">vec!</span>[Cell::from(<span class="string">""</span>)];
             <span class="kw">let </span>row = Row::new(cells.clone());
             <span class="macro">assert_eq!</span>(row.cells, cells);
         }
 
         <span class="attr">#[test]
         </span><span class="kw">fn </span>row_cells() {
-            <span class="kw">let </span>cells = <span class="macro">vec!</span>[Cell::from(<span class="string">&quot;&quot;</span>)];
+            <span class="kw">let </span>cells = <span class="macro">vec!</span>[Cell::from(<span class="string">""</span>)];
             <span class="kw">let </span>row = Row::default().cells(cells.clone());
             <span class="macro">assert_eq!</span>(row.cells, cells);
         }
@@ -3687,14 +3688,14 @@
 
         <span class="attr">#[test]
         </span><span class="kw">fn </span>cell_new() {
-            <span class="kw">let </span>cell = Cell::new(<span class="string">&quot;&quot;</span>);
-            <span class="macro">assert_eq!</span>(cell.content, Text::from(<span class="string">&quot;&quot;</span>));
+            <span class="kw">let </span>cell = Cell::new(<span class="string">""</span>);
+            <span class="macro">assert_eq!</span>(cell.content, Text::from(<span class="string">""</span>));
         }
 
         <span class="attr">#[test]
         </span><span class="kw">fn </span>cell_content() {
-            <span class="kw">let </span>cell = Cell::default().content(<span class="string">&quot;&quot;</span>);
-            <span class="macro">assert_eq!</span>(cell.content, Text::from(<span class="string">&quot;&quot;</span>));
+            <span class="kw">let </span>cell = Cell::default().content(<span class="string">""</span>);
+            <span class="macro">assert_eq!</span>(cell.content, Text::from(<span class="string">""</span>));
         }
 
         <span class="attr">#[test]

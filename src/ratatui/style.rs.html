@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.25.0/src/style.rs`."><title>style.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.25.0/src/style.rs`."><title>style.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><a class="sub-logo-container" href="../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -662,7 +663,7 @@
 //!
 //! There are two ways to set styles:
 //! - Creating and using the [`Style`] struct. (e.g. `Style::new().fg(Color::Red)`).
-//! - Using style shorthands. (e.g. `&quot;hello&quot;.red()`).
+//! - Using style shorthands. (e.g. `"hello".red()`).
 //!
 //! # Using the `Style` struct
 //!
@@ -679,7 +680,7 @@
 //!     .fg(Color::Black)
 //!     .bg(Color::Green)
 //!     .add_modifier(Modifier::ITALIC | Modifier::BOLD);
-//! let span = Span::styled(&quot;hello&quot;, heading_style);
+//! let span = Span::styled("hello", heading_style);
 //! ```
 //!
 //! # Using style shorthands
@@ -704,9 +705,9 @@
 //! use ratatui::{prelude::*, widgets::*};
 //!
 //! assert_eq!(
-//!     &quot;hello&quot;.red().on_blue().bold(),
+//!     "hello".red().on_blue().bold(),
 //!     Span::styled(
-//!         &quot;hello&quot;,
+//!         "hello",
 //!         Style::default()
 //!             .fg(Color::Red)
 //!             .bg(Color::Blue)
@@ -715,8 +716,8 @@
 //! );
 //!
 //! assert_eq!(
-//!     Paragraph::new(&quot;hello&quot;).red().on_blue().bold(),
-//!     Paragraph::new(&quot;hello&quot;).style(
+//!     Paragraph::new("hello").red().on_blue().bold(),
+//!     Paragraph::new("hello").style(
 //!         Style::default()
 //!             .fg(Color::Red)
 //!             .bg(Color::Blue)
@@ -749,7 +750,7 @@
     ///
     /// let m = Modifier::BOLD | Modifier::ITALIC;
     /// ```
-    </span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;serde&quot;</span>, derive(serde::Serialize, serde::Deserialize))]
+    </span><span class="attr">#[cfg_attr(feature = <span class="string">"serde"</span>, derive(serde::Serialize, serde::Deserialize))]
     #[derive(Default, Clone, Copy, Eq, PartialEq, Hash)]
     </span><span class="kw">pub struct </span>Modifier: u16 {
         <span class="kw">const </span>BOLD              = <span class="number">0b0000_0000_0001</span>;
@@ -766,13 +767,13 @@
 
 <span class="doccomment">/// Implement the `Debug` trait for `Modifier` manually.
 ///
-/// This will avoid printing the empty modifier as &#39;Borders(0x0)&#39; and instead print it as &#39;NONE&#39;.
+/// This will avoid printing the empty modifier as 'Borders(0x0)' and instead print it as 'NONE'.
 </span><span class="kw">impl </span>fmt::Debug <span class="kw">for </span>Modifier {
     <span class="doccomment">/// Format the modifier as `NONE` if the modifier is empty or as a list of flags separated by
     /// `|` otherwise.
     </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
         <span class="kw">if </span><span class="self">self</span>.is_empty() {
-            <span class="kw">return </span><span class="macro">write!</span>(f, <span class="string">&quot;NONE&quot;</span>);
+            <span class="kw">return </span><span class="macro">write!</span>(f, <span class="string">"NONE"</span>);
         }
         fmt::Debug::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, f)
     }
@@ -812,7 +813,7 @@
 ///     Style::default()
 ///         .bg(Color::Red)
 ///         .add_modifier(Modifier::UNDERLINED),
-///     #[cfg(feature = &quot;underline-color&quot;)]
+///     #[cfg(feature = "underline-color")]
 ///     Style::default().underline_color(Color::Green),
 ///     Style::default()
 ///         .fg(Color::Yellow)
@@ -826,7 +827,7 @@
 ///     Style {
 ///         fg: Some(Color::Yellow),
 ///         bg: Some(Color::Red),
-///         #[cfg(feature = &quot;underline-color&quot;)]
+///         #[cfg(feature = "underline-color")]
 ///         underline_color: Some(Color::Green),
 ///         add_modifier: Modifier::BOLD | Modifier::UNDERLINED,
 ///         sub_modifier: Modifier::empty(),
@@ -855,7 +856,7 @@
 ///     Style {
 ///         fg: Some(Color::Yellow),
 ///         bg: Some(Color::Reset),
-///         #[cfg(feature = &quot;underline-color&quot;)]
+///         #[cfg(feature = "underline-color")]
 ///         underline_color: Some(Color::Reset),
 ///         add_modifier: Modifier::empty(),
 ///         sub_modifier: Modifier::empty(),
@@ -864,11 +865,11 @@
 /// );
 /// ```
 </span><span class="attr">#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
-#[cfg_attr(feature = <span class="string">&quot;serde&quot;</span>, derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = <span class="string">"serde"</span>, derive(serde::Serialize, serde::Deserialize))]
 </span><span class="kw">pub struct </span>Style {
     <span class="kw">pub </span>fg: <span class="prelude-ty">Option</span>&lt;Color&gt;,
     <span class="kw">pub </span>bg: <span class="prelude-ty">Option</span>&lt;Color&gt;,
-    <span class="attr">#[cfg(feature = <span class="string">&quot;underline-color&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">"underline-color"</span>)]
     </span><span class="kw">pub </span>underline_color: <span class="prelude-ty">Option</span>&lt;Color&gt;,
     <span class="kw">pub </span>add_modifier: Modifier,
     <span class="kw">pub </span>sub_modifier: Modifier,
@@ -896,7 +897,7 @@
         Style {
             fg: <span class="prelude-val">None</span>,
             bg: <span class="prelude-val">None</span>,
-            <span class="attr">#[cfg(feature = <span class="string">&quot;underline-color&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">"underline-color"</span>)]
             </span>underline_color: <span class="prelude-val">None</span>,
             add_modifier: Modifier::empty(),
             sub_modifier: Modifier::empty(),
@@ -908,7 +909,7 @@
         Style {
             fg: <span class="prelude-val">Some</span>(Color::Reset),
             bg: <span class="prelude-val">Some</span>(Color::Reset),
-            <span class="attr">#[cfg(feature = <span class="string">&quot;underline-color&quot;</span>)]
+            <span class="attr">#[cfg(feature = <span class="string">"underline-color"</span>)]
             </span>underline_color: <span class="prelude-val">Some</span>(Color::Reset),
             add_modifier: Modifier::empty(),
             sub_modifier: Modifier::all(),
@@ -925,7 +926,7 @@
     /// let diff = Style::default().fg(Color::Red);
     /// assert_eq!(style.patch(diff), Style::default().fg(Color::Red));
     /// ```
-    </span><span class="attr">#[must_use = <span class="string">&quot;`fg` returns the modified style without modifying the original&quot;</span>]
+    </span><span class="attr">#[must_use = <span class="string">"`fg` returns the modified style without modifying the original"</span>]
     </span><span class="kw">pub const fn </span>fg(<span class="kw-2">mut </span><span class="self">self</span>, color: Color) -&gt; Style {
         <span class="self">self</span>.fg = <span class="prelude-val">Some</span>(color);
         <span class="self">self
@@ -941,7 +942,7 @@
     /// let diff = Style::default().bg(Color::Red);
     /// assert_eq!(style.patch(diff), Style::default().bg(Color::Red));
     /// ```
-    </span><span class="attr">#[must_use = <span class="string">&quot;`bg` returns the modified style without modifying the original&quot;</span>]
+    </span><span class="attr">#[must_use = <span class="string">"`bg` returns the modified style without modifying the original"</span>]
     </span><span class="kw">pub const fn </span>bg(<span class="kw-2">mut </span><span class="self">self</span>, color: Color) -&gt; Style {
         <span class="self">self</span>.bg = <span class="prelude-val">Some</span>(color);
         <span class="self">self
@@ -974,8 +975,8 @@
     ///         .add_modifier(Modifier::UNDERLINED)
     /// );
     /// ```
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;underline-color&quot;</span>)]
-    #[must_use = <span class="string">&quot;`underline_color` returns the modified style without modifying the original&quot;</span>]
+    </span><span class="attr">#[cfg(feature = <span class="string">"underline-color"</span>)]
+    #[must_use = <span class="string">"`underline_color` returns the modified style without modifying the original"</span>]
     </span><span class="kw">pub const fn </span>underline_color(<span class="kw-2">mut </span><span class="self">self</span>, color: Color) -&gt; Style {
         <span class="self">self</span>.underline_color = <span class="prelude-val">Some</span>(color);
         <span class="self">self
@@ -995,7 +996,7 @@
     /// assert_eq!(patched.add_modifier, Modifier::BOLD | Modifier::ITALIC);
     /// assert_eq!(patched.sub_modifier, Modifier::empty());
     /// ```
-    </span><span class="attr">#[must_use = <span class="string">&quot;`add_modifier` returns the modified style without modifying the original&quot;</span>]
+    </span><span class="attr">#[must_use = <span class="string">"`add_modifier` returns the modified style without modifying the original"</span>]
     </span><span class="kw">pub const fn </span>add_modifier(<span class="kw-2">mut </span><span class="self">self</span>, modifier: Modifier) -&gt; Style {
         <span class="self">self</span>.sub_modifier = <span class="self">self</span>.sub_modifier.difference(modifier);
         <span class="self">self</span>.add_modifier = <span class="self">self</span>.add_modifier.union(modifier);
@@ -1016,7 +1017,7 @@
     /// assert_eq!(patched.add_modifier, Modifier::BOLD);
     /// assert_eq!(patched.sub_modifier, Modifier::ITALIC);
     /// ```
-    </span><span class="attr">#[must_use = <span class="string">&quot;`remove_modifier` returns the modified style without modifying the original&quot;</span>]
+    </span><span class="attr">#[must_use = <span class="string">"`remove_modifier` returns the modified style without modifying the original"</span>]
     </span><span class="kw">pub const fn </span>remove_modifier(<span class="kw-2">mut </span><span class="self">self</span>, modifier: Modifier) -&gt; Style {
         <span class="self">self</span>.add_modifier = <span class="self">self</span>.add_modifier.difference(modifier);
         <span class="self">self</span>.sub_modifier = <span class="self">self</span>.sub_modifier.union(modifier);
@@ -1037,12 +1038,12 @@
     ///     Style::default().patch(combined)
     /// );
     /// ```
-    </span><span class="attr">#[must_use = <span class="string">&quot;`patch` returns the modified style without modifying the original&quot;</span>]
+    </span><span class="attr">#[must_use = <span class="string">"`patch` returns the modified style without modifying the original"</span>]
     </span><span class="kw">pub fn </span>patch(<span class="kw-2">mut </span><span class="self">self</span>, other: Style) -&gt; Style {
         <span class="self">self</span>.fg = other.fg.or(<span class="self">self</span>.fg);
         <span class="self">self</span>.bg = other.bg.or(<span class="self">self</span>.bg);
 
-        <span class="attr">#[cfg(feature = <span class="string">&quot;underline-color&quot;</span>)]
+        <span class="attr">#[cfg(feature = <span class="string">"underline-color"</span>)]
         </span>{
             <span class="self">self</span>.underline_color = other.underline_color.or(<span class="self">self</span>.underline_color);
         }
@@ -1124,23 +1125,23 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>modifier_debug() {
-        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, Modifier::empty()), <span class="string">&quot;NONE&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, Modifier::BOLD), <span class="string">&quot;BOLD&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, Modifier::DIM), <span class="string">&quot;DIM&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, Modifier::ITALIC), <span class="string">&quot;ITALIC&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, Modifier::UNDERLINED), <span class="string">&quot;UNDERLINED&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, Modifier::SLOW_BLINK), <span class="string">&quot;SLOW_BLINK&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, Modifier::RAPID_BLINK), <span class="string">&quot;RAPID_BLINK&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, Modifier::REVERSED), <span class="string">&quot;REVERSED&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, Modifier::HIDDEN), <span class="string">&quot;HIDDEN&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, Modifier::CROSSED_OUT), <span class="string">&quot;CROSSED_OUT&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{:?}"</span>, Modifier::empty()), <span class="string">"NONE"</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{:?}"</span>, Modifier::BOLD), <span class="string">"BOLD"</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{:?}"</span>, Modifier::DIM), <span class="string">"DIM"</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{:?}"</span>, Modifier::ITALIC), <span class="string">"ITALIC"</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{:?}"</span>, Modifier::UNDERLINED), <span class="string">"UNDERLINED"</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{:?}"</span>, Modifier::SLOW_BLINK), <span class="string">"SLOW_BLINK"</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{:?}"</span>, Modifier::RAPID_BLINK), <span class="string">"RAPID_BLINK"</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{:?}"</span>, Modifier::REVERSED), <span class="string">"REVERSED"</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{:?}"</span>, Modifier::HIDDEN), <span class="string">"HIDDEN"</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{:?}"</span>, Modifier::CROSSED_OUT), <span class="string">"CROSSED_OUT"</span>);
         <span class="macro">assert_eq!</span>(
-            <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, Modifier::BOLD | Modifier::DIM),
-            <span class="string">&quot;BOLD | DIM&quot;
+            <span class="macro">format!</span>(<span class="string">"{:?}"</span>, Modifier::BOLD | Modifier::DIM),
+            <span class="string">"BOLD | DIM"
         </span>);
         <span class="macro">assert_eq!</span>(
-            <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, Modifier::all()),
-            <span class="string">&quot;BOLD | DIM | ITALIC | UNDERLINED | SLOW_BLINK | RAPID_BLINK | REVERSED | HIDDEN | CROSSED_OUT&quot;
+            <span class="macro">format!</span>(<span class="string">"{:?}"</span>, Modifier::all()),
+            <span class="string">"BOLD | DIM | ITALIC | UNDERLINED | SLOW_BLINK | RAPID_BLINK | REVERSED | HIDDEN | CROSSED_OUT"
         </span>);
     }
 

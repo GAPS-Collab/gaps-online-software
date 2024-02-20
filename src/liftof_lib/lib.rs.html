@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-lib/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="liftof_lib" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-lib/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="liftof_lib" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1284,6 +1285,21 @@
 <a href="#1284" id="1284">1284</a>
 <a href="#1285" id="1285">1285</a>
 <a href="#1286" id="1286">1286</a>
+<a href="#1287" id="1287">1287</a>
+<a href="#1288" id="1288">1288</a>
+<a href="#1289" id="1289">1289</a>
+<a href="#1290" id="1290">1290</a>
+<a href="#1291" id="1291">1291</a>
+<a href="#1292" id="1292">1292</a>
+<a href="#1293" id="1293">1293</a>
+<a href="#1294" id="1294">1294</a>
+<a href="#1295" id="1295">1295</a>
+<a href="#1296" id="1296">1296</a>
+<a href="#1297" id="1297">1297</a>
+<a href="#1298" id="1298">1298</a>
+<a href="#1299" id="1299">1299</a>
+<a href="#1300" id="1300">1300</a>
+<a href="#1301" id="1301">1301</a>
 </pre></div><pre class="rust"><code><span class="kw">pub mod </span>master_trigger;
 <span class="kw">use </span>constants::{DEFAULT_CALIB_VOLTAGE,
                 DEFAULT_CALIB_EXTRA,
@@ -1337,13 +1353,16 @@
 
 //use tof_dataclasses::manifest as mf;
 </span><span class="kw">use </span>tof_dataclasses::DsiLtbRBMapping;
+<span class="kw">use </span>tof_dataclasses::manifest::ReadoutBoard;
 <span class="kw">use </span>tof_dataclasses::constants::NWORDS;
 <span class="kw">use </span>tof_dataclasses::calibrations::{
     RBCalibrations,
     find_zero_crossings,
 };
-<span class="kw">use </span>tof_dataclasses::packets::{TofPacket,
-                               PacketType};
+<span class="kw">use </span>tof_dataclasses::packets::{
+    TofPacket,
+    PacketType,
+};
 <span class="kw">use </span>tof_dataclasses::errors::{
     AnalysisError,
     SetError
@@ -1373,8 +1392,8 @@
 
 <span class="kw">pub const </span>MT_MAX_PACKSIZE   : usize = <span class="number">512</span>;
 <span class="kw">pub const </span>DATAPORT          : u32   = <span class="number">42000</span>;
-<span class="kw">pub const </span>ASSET_DIR         : <span class="kw-2">&amp;</span>str  = <span class="string">&quot;/home/gaps/assets/&quot;</span>; 
-<span class="kw">pub const </span>LIFTOF_LOGO_SHOW  : <span class="kw-2">&amp;</span>str  = <span class="string">&quot;
+<span class="kw">pub const </span>ASSET_DIR         : <span class="kw-2">&amp;</span>str  = <span class="string">"/home/gaps/assets/"</span>; 
+<span class="kw">pub const </span>LIFTOF_LOGO_SHOW  : <span class="kw-2">&amp;</span>str  = <span class="string">"
                                   ___                         ___           ___     
                                  /\\__\\                       /\\  \\         /\\__\\    
                     ___         /:/ _/_         ___         /::\\  \\       /:/ _/_   
@@ -1387,22 +1406,22 @@
       \\::/  /        /:/  /     \\:\\__\\          \\:\\__\\      \\::/  /       \\:\\__\\    
        \\/__/         \\/__/       \\/__/           \\/__/       \\/__/         \\/__/    
 
-          (LIFTOF - liftof is for tof, Version 0.9 &#39;HAHALUA&#39;, Dec 2023)
+          (LIFTOF - liftof is for tof, Version 0.9 'HAHALUA', Dec 2023)
 
           * Documentation
           ==&gt; GitHub   https://github.com/GAPS-Collab/gaps-online-software/tree/HAHALUA-0.9
           ==&gt; API docs https://gaps-collab.github.io/gaps-online-software/
 
-  &quot;</span>;
+  "</span>;
 
 <span class="doccomment">/// Make sure that the loglevel is in color, even though not using pretty_env logger
 </span><span class="kw">pub fn </span>color_log(level : <span class="kw-2">&amp;</span>Level) -&gt; ColoredString {
   <span class="kw">match </span>level {
-    Level::Error    =&gt; String::from(<span class="string">&quot; ERROR!&quot;</span>).red(),
-    Level::Warn     =&gt; String::from(<span class="string">&quot; WARN  &quot;</span>).yellow(),
-    Level::Info     =&gt; String::from(<span class="string">&quot; Info  &quot;</span>).green(),
-    Level::Debug    =&gt; String::from(<span class="string">&quot; debug &quot;</span>).blue(),
-    Level::Trace    =&gt; String::from(<span class="string">&quot; trace &quot;</span>).cyan(),
+    Level::Error    =&gt; String::from(<span class="string">" ERROR!"</span>).red(),
+    Level::Warn     =&gt; String::from(<span class="string">" WARN  "</span>).yellow(),
+    Level::Info     =&gt; String::from(<span class="string">" Info  "</span>).green(),
+    Level::Debug    =&gt; String::from(<span class="string">" debug "</span>).blue(),
+    Level::Trace    =&gt; String::from(<span class="string">" trace "</span>).cyan(),
   }
 }
 
@@ -1414,9 +1433,9 @@
 </span><span class="kw">pub fn </span>init_env_logger() {
   env_logger::builder()
     .format(|buf, record| {
-    <span class="macro">writeln!</span>( buf, <span class="string">&quot;[{level}][{module_path}:{line}] {args}&quot;</span>,
+    <span class="macro">writeln!</span>( buf, <span class="string">"[{level}][{module_path}:{line}] {args}"</span>,
       level = color_log(<span class="kw-2">&amp;</span>record.level()),
-      module_path = record.module_path().unwrap_or(<span class="string">&quot;&lt;unknown&gt;&quot;</span>),
+      module_path = record.module_path().unwrap_or(<span class="string">"&lt;unknown&gt;"</span>),
       line = record.line().unwrap_or(<span class="number">0</span>),
       args = record.args()
       )
@@ -1482,17 +1501,17 @@
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>RunStatistics {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
-    <span class="kw">let </span><span class="kw-2">mut </span>resp = String::from(<span class="string">&quot;&lt;RunStatistics:\n&quot;</span>);
-    resp += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">&quot;  first event id : {}\n&quot;</span>, <span class="self">self</span>.first_evid));
-    resp += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">&quot;  last  event id : {}\n&quot;</span>, <span class="self">self</span>.last_evid));
-    resp += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">&quot;  --&gt; expected {} event (ids)\n&quot;</span>, <span class="self">self</span>.get_n_anticipated()));
-    resp += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">&quot;  event_processing #packets : {}\n&quot;</span>, <span class="self">self</span>.evproc_npack));
+    <span class="kw">let </span><span class="kw-2">mut </span>resp = String::from(<span class="string">"&lt;RunStatistics:\n"</span>);
+    resp += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"  first event id : {}\n"</span>, <span class="self">self</span>.first_evid));
+    resp += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"  last  event id : {}\n"</span>, <span class="self">self</span>.last_evid));
+    resp += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"  --&gt; expected {} event (ids)\n"</span>, <span class="self">self</span>.get_n_anticipated()));
+    resp += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"  event_processing #packets : {}\n"</span>, <span class="self">self</span>.evproc_npack));
     <span class="kw">if </span><span class="self">self</span>.get_n_anticipated() != <span class="self">self</span>.evproc_npack <span class="kw">as </span>i32 {
-      resp += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">&quot;  --&gt; discrepancy of {} event (ids)\n&quot;</span>, <span class="self">self</span>.get_n_anticipated() - <span class="self">self</span>.evproc_npack <span class="kw">as </span>i32))
+      resp += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"  --&gt; discrepancy of {} event (ids)\n"</span>, <span class="self">self</span>.get_n_anticipated() - <span class="self">self</span>.evproc_npack <span class="kw">as </span>i32))
     }
-    resp += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">&quot;  event_processing n tail err : {}\n&quot;</span>, <span class="self">self</span>.n_err_tail_wrong));
-    resp += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">&quot;  event_processing n chid err : {}\n&quot;</span>, <span class="self">self</span>.n_err_chid_wrong));
-    <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, resp)
+    resp += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"  event_processing n tail err : {}\n"</span>, <span class="self">self</span>.n_err_tail_wrong));
+    resp += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"  event_processing n chid err : {}\n"</span>, <span class="self">self</span>.n_err_chid_wrong));
+    <span class="macro">write!</span>(f, <span class="string">"{}"</span>, resp)
   }
 }
 
@@ -1566,7 +1585,7 @@
 </span><span class="doccomment">/// Helper function to generate a proper tcp string starting
 /// from the ip one.
 </span><span class="kw">pub fn </span>build_tcp_from_ip(ip: String, port: String) -&gt; String {
-  String::from(<span class="string">&quot;tcp://&quot;</span>) + <span class="kw-2">&amp;</span>ip + <span class="string">&quot;:&quot; </span>+ <span class="kw-2">&amp;</span>port
+  String::from(<span class="string">"tcp://"</span>) + <span class="kw-2">&amp;</span>ip + <span class="string">":" </span>+ <span class="kw-2">&amp;</span>port
 }
 
 <span class="doccomment">/// Broadcast commands over the tof-computer network
@@ -1584,45 +1603,45 @@
 /// * cmd        : a \[crossbeam\] receiver, to receive 
 ///                TofCommands.
 </span><span class="kw">pub fn </span>readoutboard_commander(cmd : <span class="kw-2">&amp;</span>Receiver&lt;TofPacket&gt;){
-  <span class="macro">debug!</span>(<span class="string">&quot;.. started!&quot;</span>);
+  <span class="macro">debug!</span>(<span class="string">".. started!"</span>);
   <span class="kw">let </span>ctx = zmq::Context::new();
-  <span class="comment">//let this_board_ip = local_ip().expect(&quot;Unable to obtainl local board IP. Something is messed up!&quot;);
+  <span class="comment">//let this_board_ip = local_ip().expect("Unable to obtainl local board IP. Something is messed up!");
   </span><span class="kw">let </span>this_board_ip = IpAddr::V4(Ipv4Addr::new(<span class="number">10</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>));
 
   <span class="kw">let </span>address_ip;
   <span class="kw">match </span>this_board_ip {
     IpAddr::V4(ip) =&gt; address_ip = ip.to_string().clone(),
-    IpAddr::V6(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Currently, we do not support IPV6!&quot;</span>)
+    IpAddr::V6(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">"Currently, we do not support IPV6!"</span>)
   }
   <span class="kw">let </span>data_address : String = build_tcp_from_ip(address_ip,DATAPORT.to_string());
-  <span class="kw">let </span>data_socket = ctx.socket(zmq::PUB).expect(<span class="string">&quot;Unable to create 0MQ PUB socket!&quot;</span>);
-  data_socket.bind(<span class="kw-2">&amp;</span>data_address).expect(<span class="string">&quot;Unable to bind to data (PUB) socket {data_adress}&quot;</span>);
-  <span class="macro">println!</span>(<span class="string">&quot;==&gt; 0MQ PUB socket bound to address {data_address}&quot;</span>);
+  <span class="kw">let </span>data_socket = ctx.socket(zmq::PUB).expect(<span class="string">"Unable to create 0MQ PUB socket!"</span>);
+  data_socket.bind(<span class="kw-2">&amp;</span>data_address).expect(<span class="string">"Unable to bind to data (PUB) socket {data_adress}"</span>);
+  <span class="macro">println!</span>(<span class="string">"==&gt; 0MQ PUB socket bound to address {data_address}"</span>);
   <span class="kw">loop </span>{
     <span class="comment">// check if we get a command from the main 
     // thread
     </span><span class="kw">match </span>cmd.try_recv() {
-      <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">trace!</span>(<span class="string">&quot;Did not receive a new command, error {err}&quot;</span>),
+      <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">trace!</span>(<span class="string">"Did not receive a new command, error {err}"</span>),
       <span class="prelude-val">Ok</span>(packet) =&gt; {
         <span class="comment">// now we have several options
         </span><span class="kw">match </span>packet.packet_type {
           PacketType::TofCommand =&gt; {
-            <span class="macro">info!</span>(<span class="string">&quot;Received TofCommand! Broadcasting to all TOF entities who are listening!&quot;</span>);
-            <span class="kw">let </span><span class="kw-2">mut </span>payload  = String::from(<span class="string">&quot;BRCT&quot;</span>).into_bytes();
+            <span class="macro">info!</span>(<span class="string">"Received TofCommand! Broadcasting to all TOF entities who are listening!"</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>payload  = String::from(<span class="string">"BRCT"</span>).into_bytes();
             payload.append(<span class="kw-2">&amp;mut </span>packet.to_bytestream());
             <span class="kw">match </span>data_socket.send(<span class="kw-2">&amp;</span>payload,<span class="number">0</span>) {
-              <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Unable to send command! Error {err}&quot;</span>),
-              <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">&quot;BRCT command sent!&quot;</span>)
+              <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to send command! Error {err}"</span>),
+              <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">"BRCT command sent!"</span>)
             }
           },
           PacketType::RBCommand =&gt; {
-            <span class="macro">debug!</span>(<span class="string">&quot;Received RBCommand!&quot;</span>);
-            <span class="kw">let </span><span class="kw-2">mut </span>payload_str  = String::from(<span class="string">&quot;RB&quot;</span>);
+            <span class="macro">debug!</span>(<span class="string">"Received RBCommand!"</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>payload_str  = String::from(<span class="string">"RB"</span>);
             <span class="kw">match </span>RBCommand::from_bytestream(<span class="kw-2">&amp;</span>packet.payload, <span class="kw-2">&amp;mut </span><span class="number">0</span>) {
               <span class="prelude-val">Ok</span>(rb_cmd) =&gt; {
                 <span class="kw">let </span>to_rb_id = rb_cmd.rb_id;
                 <span class="kw">if </span>rb_cmd.rb_id &lt; <span class="number">10 </span>{
-                  payload_str += <span class="kw-2">&amp;</span>String::from(<span class="string">&quot;0&quot;</span>);
+                  payload_str += <span class="kw-2">&amp;</span>String::from(<span class="string">"0"</span>);
                   payload_str += <span class="kw-2">&amp;</span>to_rb_id.to_string();
                 } <span class="kw">else </span>{
                   payload_str += <span class="kw-2">&amp;</span>to_rb_id.to_string();
@@ -1631,17 +1650,17 @@
                 <span class="kw">let </span><span class="kw-2">mut </span>payload = payload_str.into_bytes();
                 payload.append(<span class="kw-2">&amp;mut </span>packet.to_bytestream());
                 <span class="kw">match </span>data_socket.send(<span class="kw-2">&amp;</span>payload,<span class="number">0</span>) {
-                  <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Unable to send command {}! Error {err}&quot;</span>, rb_cmd),
-                  <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">debug!</span>(<span class="string">&quot;Making event request! {}&quot;</span>, rb_cmd)
+                  <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to send command {}! Error {err}"</span>, rb_cmd),
+                  <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">debug!</span>(<span class="string">"Making event request! {}"</span>, rb_cmd)
                 }
               }
               <span class="prelude-val">Err</span>(err) =&gt; {
-                <span class="macro">error!</span>(<span class="string">&quot;Can not construct RBCommand, error {err}&quot;</span>);
+                <span class="macro">error!</span>(<span class="string">"Can not construct RBCommand, error {err}"</span>);
               }
             }
           },
           <span class="kw">_ </span>=&gt; {
-            <span class="macro">error!</span>(<span class="string">&quot;Received garbage package! {}&quot;</span>, packet);
+            <span class="macro">error!</span>(<span class="string">"Received garbage package! {}"</span>, packet);
           }
         }<span class="comment">// end match
       </span>}
@@ -1678,13 +1697,10 @@
 ///
 /// * event       : current RBEvent with waveforms to 
 ///                 work on
-/// * channel_map : (HashMap) mapping providing channel
-///                 to paddle ID information
-/// * calibration : latest readoutboard calibration for 
-///                 the same board
+/// * rb          : ReadoutBoard as loaded from the DB, 
+///                 with latest calibration attached
 </span><span class="kw">pub fn </span>waveform_analysis(event         : <span class="kw-2">&amp;mut </span>RBEvent,
-                         channel_map   : <span class="kw-2">&amp;</span>RBChannelPaddleEndIDMap,
-                         calibration   : <span class="kw-2">&amp;</span>RBCalibrations)
+                         rb            : <span class="kw-2">&amp;</span>ReadoutBoard)
 -&gt; <span class="prelude-ty">Result</span>&lt;(), AnalysisError&gt; {
   <span class="comment">//if event.status != EventStatus::Perfect {
   //if event.header.broken {
@@ -1701,7 +1717,9 @@
   <span class="comment">// will become a parameter
   </span><span class="kw">let </span>fit_sinus = <span class="bool-val">true</span>;
   
-  <span class="comment">// FIXME - don&#39;t do this per every event
+  <span class="comment">// FIXME - don't do this per every event
+  // We might have to though because the number
+  // of active paddles is changing every event
   </span><span class="kw">for </span>raw_ch <span class="kw">in </span>channels {
     <span class="kw">if </span>raw_ch == <span class="number">8 </span>{
       <span class="kw">continue</span>;
@@ -1709,17 +1727,13 @@
     <span class="comment">// +1 channel convention
     </span><span class="kw">let </span>ch = raw_ch + <span class="number">1</span>;
     <span class="comment">//let mut TofHit::new();
-    </span><span class="kw">let </span>p_end_id = channel_map.get(<span class="kw-2">&amp;</span>ch).unwrap_or(<span class="kw-2">&amp;</span><span class="number">0</span>);
-    <span class="kw">if </span>p_end_id &lt; <span class="kw-2">&amp;</span><span class="number">1000 </span>{
-      <span class="comment">//error!(&quot;Invalid paddle end id {} for channel {}!&quot;, p_end_id, ch);
-      </span><span class="kw">continue</span>;
-    }
-    <span class="kw">if </span>p_end_id &gt; <span class="kw-2">&amp;</span><span class="number">2000 </span>{
-      <span class="comment">// it is the B side then
-      </span>pid = (p_end_id - <span class="number">2000</span>) <span class="kw">as </span>u8;
-    } <span class="kw">else </span>{
-      pid = (p_end_id - <span class="number">1000</span>) <span class="kw">as </span>u8;
-    }
+    //let p_end_id = channel_map.get(&amp;ch).unwrap_or(&amp;0);
+    //let p_end_id = rb.channel_to_paddle_end_id[raw_ch as usize];
+    //if p_end_id &lt; 1000 {
+    //  //error!("Invalid paddle end id {} for channel {}!", p_end_id, ch);
+    //  continue;
+    //}
+    </span>pid = rb.get_pid_for_ch(ch <span class="kw">as </span>usize);
     <span class="kw">if </span>!paddles.contains_key(<span class="kw-2">&amp;</span>pid) {
       <span class="kw">let </span><span class="kw-2">mut </span>hit   = TofHit::new();
       hit.paddle_id = pid;
@@ -1741,23 +1755,23 @@
         
         <span class="kw">let </span><span class="kw-2">mut </span>ch_voltages : Vec&lt;f32&gt;= <span class="macro">vec!</span>[<span class="number">0.0</span>; NWORDS];
         <span class="kw">let </span><span class="kw-2">mut </span>ch_times    : Vec&lt;f32&gt;= <span class="macro">vec!</span>[<span class="number">0.0</span>; NWORDS];
-        calibration.voltages(ch.into(),
-                             event.header.stop_cell <span class="kw">as </span>usize,
-                             <span class="kw-2">&amp;</span>event.adc[<span class="number">8</span>],
-                             <span class="kw-2">&amp;mut </span>ch_voltages);
-        <span class="comment">//warn!(&quot;We have to rework the spike cleaning!&quot;);
+        rb.calibration.voltages(ch.into(),
+                                event.header.stop_cell <span class="kw">as </span>usize,
+                                <span class="kw-2">&amp;</span>event.adc[<span class="number">8</span>],
+                                <span class="kw-2">&amp;mut </span>ch_voltages);
+        <span class="comment">//warn!("We have to rework the spike cleaning!");
         //match RBCalibrations::spike_cleaning(&amp;mut ch_voltages,
         //                                     event.header.stop_cell) {
         //  Err(err) =&gt; {
-        //    error!(&quot;Spike cleaning failed! {err}&quot;);
+        //    error!("Spike cleaning failed! {err}");
         //  }
         //  Ok(_)    =&gt; ()
         //}
-        </span>calibration.nanoseconds(ch.into(),
-                                event.header.stop_cell <span class="kw">as </span>usize,
-                                <span class="kw-2">&amp;mut </span>ch_times);
+        </span>rb.calibration.nanoseconds(ch.into(),
+                                   event.header.stop_cell <span class="kw">as </span>usize,
+                                   <span class="kw-2">&amp;mut </span>ch_times);
         <span class="kw">let </span>fit_result = fit_sine(ch_times, ch_voltages);
-        <span class="comment">//println!(&quot;FIT RESULT = {:?}&quot;, fit_result);
+        <span class="comment">//println!("FIT RESULT = {:?}", fit_result);
         </span>event.header.set_sine_fit(fit_result);
         <span class="kw">continue</span>;
       } <span class="kw">else </span>{
@@ -1768,50 +1782,48 @@
     </span><span class="kw">let </span>ch = raw_ch + <span class="number">1</span>;
     <span class="comment">// FIXME - copy/paste from above, wrap in a 
     // function
-    </span><span class="kw">let </span>p_end_id  = channel_map.get(<span class="kw-2">&amp;</span>ch).unwrap_or(<span class="kw-2">&amp;</span><span class="number">0</span>);
-    <span class="kw">let </span><span class="kw-2">mut </span>is_a_side = <span class="bool-val">false</span>; 
-    <span class="kw">if </span>p_end_id &lt; <span class="kw-2">&amp;</span><span class="number">1000 </span>{
-      <span class="comment">//error!(&quot;Invalid paddle end id: {}!&quot; ,p_end_id);
+    </span><span class="kw">let </span>p_end_id = rb.channel_to_paddle_end_id[raw_ch <span class="kw">as </span>usize];
+    pid = rb.get_pid_for_ch(ch <span class="kw">as </span>usize);
+    <span class="comment">//let p_end_id  = channel_map.get(&amp;ch).unwrap_or(&amp;0);
+    </span><span class="kw">let </span><span class="kw-2">mut </span>is_a_side = <span class="bool-val">false</span>; 
+    <span class="kw">if </span>p_end_id &lt; <span class="number">1000 </span>{
+      <span class="comment">//error!("Invalid paddle end id: {}!" ,p_end_id);
       </span><span class="kw">continue</span>;
     }
-    <span class="kw">if </span>p_end_id &gt; <span class="kw-2">&amp;</span><span class="number">2000 </span>{
-      <span class="comment">// it is the B side then
-      </span>pid = (p_end_id - <span class="number">2000</span>) <span class="kw">as </span>u8;
-    } <span class="kw">else </span>{
-      pid = (p_end_id - <span class="kw-2">&amp;</span><span class="number">1000</span>) <span class="kw">as </span>u8;
+    <span class="kw">if </span>p_end_id &lt;= <span class="number">2000 </span>{
       is_a_side = <span class="bool-val">true</span>;
     }
     <span class="comment">// allocate memory for the calbration results
     </span><span class="kw">let </span><span class="kw-2">mut </span>ch_voltages : Vec&lt;f32&gt;= <span class="macro">vec!</span>[<span class="number">0.0</span>; NWORDS];
     <span class="kw">let </span><span class="kw-2">mut </span>ch_times    : Vec&lt;f32&gt;= <span class="macro">vec!</span>[<span class="number">0.0</span>; NWORDS];
-    calibration.voltages(ch.into(),
-                         event.header.stop_cell <span class="kw">as </span>usize,
-                         <span class="kw-2">&amp;</span>event.adc[ch <span class="kw">as </span>usize],
-                         <span class="kw-2">&amp;mut </span>ch_voltages);
-    <span class="comment">//warn!(&quot;We have to rework the spike cleaning!&quot;);
+    rb.calibration.voltages(ch.into(),
+                            event.header.stop_cell <span class="kw">as </span>usize,
+                            <span class="kw-2">&amp;</span>event.adc[raw_ch <span class="kw">as </span>usize],
+                            <span class="kw-2">&amp;mut </span>ch_voltages);
+    <span class="comment">//warn!("We have to rework the spike cleaning!");
     //match RBCalibrations::spike_cleaning(&amp;mut ch_voltages,
     //                                     event.header.stop_cell) {
     //  Err(err) =&gt; {
-    //    error!(&quot;Spike cleaning failed! {err}&quot;);
+    //    error!("Spike cleaning failed! {err}");
     //  }
     //  Ok(_)    =&gt; ()
     //}
-    </span>calibration.nanoseconds(ch.into(),
-                            event.header.stop_cell <span class="kw">as </span>usize,
-                            <span class="kw-2">&amp;mut </span>ch_times);
+    </span>rb.calibration.nanoseconds(ch.into(),
+                               event.header.stop_cell <span class="kw">as </span>usize,
+                               <span class="kw-2">&amp;mut </span>ch_times);
     <span class="kw">let </span>(ped, ped_err) = calculate_pedestal(<span class="kw-2">&amp;</span>ch_voltages,
                                             <span class="number">10.0</span>, <span class="number">10</span>, <span class="number">50</span>);
-    <span class="macro">debug!</span>(<span class="string">&quot;Got pedestal of {} +- {}&quot;</span>, ped, ped_err);
+    <span class="macro">debug!</span>(<span class="string">"Got pedestal of {} +- {}"</span>, ped, ped_err);
     <span class="kw">for </span>n <span class="kw">in </span><span class="number">0</span>..ch_voltages.len() {
       ch_voltages[n] -= ped;
     }
     <span class="kw">let </span><span class="kw-2">mut </span>charge : f32 = <span class="number">0.0</span>;
-    <span class="macro">warn!</span>(<span class="string">&quot;Check impedance value! Just using 50 [Ohm]&quot;</span>);
+    <span class="macro">debug!</span>(<span class="string">"Check impedance value! Just using 50 [Ohm]"</span>);
     <span class="kw">match </span>integrate(<span class="kw-2">&amp;</span>ch_voltages,
                     <span class="kw-2">&amp;</span>ch_times,
                     <span class="number">270.0</span>, <span class="number">70.0</span>, <span class="number">50.0</span>) {
       <span class="prelude-val">Err</span>(err) =&gt; {
-        <span class="macro">error!</span>(<span class="string">&quot;Integration failed! Err {err}&quot;</span>);
+        <span class="macro">error!</span>(<span class="string">"Integration failed! Err {err}"</span>);
       }
       <span class="prelude-val">Ok</span>(chrg)   =&gt; {
         charge = chrg;
@@ -1830,17 +1842,17 @@
                      <span class="number">10.0 </span>,
                      <span class="number">5      </span>) {
       <span class="prelude-val">Err</span>(err) =&gt; {
-        <span class="macro">error!</span>(<span class="string">&quot;Unable to find peaks for ch {ch}! Ignoring this channel!&quot;</span>);
-        <span class="macro">error!</span>(<span class="string">&quot;We won&#39;t be able to calculate timing information for this channel! Err {err}&quot;</span>);
+        <span class="macro">error!</span>(<span class="string">"Unable to find peaks for ch {ch}! Ignoring this channel!"</span>);
+        <span class="macro">error!</span>(<span class="string">"We won't be able to calculate timing information for this channel! Err {err}"</span>);
       },
       <span class="prelude-val">Ok</span>(peaks)  =&gt; {
         <span class="comment">//peaks = pks;
         </span><span class="kw">for </span>pk <span class="kw">in </span>peaks.iter() {
           <span class="kw">match </span>cfd_simple(<span class="kw-2">&amp;</span>ch_voltages,
                            <span class="kw-2">&amp;</span>ch_times,
-                           <span class="number">0.2</span>,pk.<span class="number">0</span>, pk.<span class="number">1</span>) {
+                           <span class="number">0.2</span>, pk.<span class="number">0</span>, pk.<span class="number">1</span>) {
             <span class="prelude-val">Err</span>(err) =&gt; {
-              <span class="macro">error!</span>(<span class="string">&quot;Unable to calculate cfd for peak {} {}! Err {}&quot;</span>, pk.<span class="number">0</span>, pk.<span class="number">1</span>, err);
+              <span class="macro">debug!</span>(<span class="string">"Unable to calculate cfd for peak {} {}! {}"</span>, pk.<span class="number">0</span>, pk.<span class="number">1</span>, err);
             }
             <span class="prelude-val">Ok</span>(cfd) =&gt; {
               cfd_times.push(cfd);
@@ -1885,9 +1897,9 @@
 /// ///
 /// /// Boards will only send paddle information when this request string is received
 </span><span class="kw">pub fn </span>construct_event_request(rb_id : u8) -&gt; String {
-  <span class="kw">let </span><span class="kw-2">mut </span>request = String::from(<span class="string">&quot;RB&quot;</span>);
+  <span class="kw">let </span><span class="kw-2">mut </span>request = String::from(<span class="string">"RB"</span>);
   <span class="kw">if </span>rb_id &lt; <span class="number">10 </span>{
-    request += <span class="string">&quot;0&quot;</span>;
+    request += <span class="string">"0"</span>;
   }
   request += <span class="kw-2">&amp;</span>rb_id.to_string();
   request
@@ -1903,8 +1915,8 @@
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>ReadoutBoardError {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
     <span class="kw">let </span>r = serde_json::to_string(<span class="self">self</span>).unwrap_or(
-      String::from(<span class="string">&quot;Error: cannot unwrap this ReadoutBoardError&quot;</span>));
-    <span class="macro">write!</span>(f, <span class="string">&quot;&lt;ReadoutBoardError: {}&gt;&quot;</span>, r)
+      String::from(<span class="string">"Error: cannot unwrap this ReadoutBoardError"</span>));
+    <span class="macro">write!</span>(f, <span class="string">"&lt;ReadoutBoardError: {}&gt;"</span>, r)
   }
 }
 
@@ -1925,7 +1937,7 @@
       json_content = _json_content;
     },
     <span class="prelude-val">Err</span>(err) =&gt; { 
-      <span class="macro">error!</span>(<span class="string">&quot;Unable to parse json file {}. Error {err}&quot;</span>, map_file.display());
+      <span class="macro">error!</span>(<span class="string">"Unable to parse json file {}. Error {err}"</span>, map_file.display());
       <span class="kw">return </span>mapping;
     }      
   }
@@ -1935,7 +1947,7 @@
       json = _json;
     },
     <span class="prelude-val">Err</span>(err) =&gt; { 
-      <span class="macro">error!</span>(<span class="string">&quot;Unable to parse json file {}. Error {err}&quot;</span>, map_file.display());
+      <span class="macro">error!</span>(<span class="string">"Unable to parse json file {}. Error {err}"</span>, map_file.display());
       <span class="kw">return </span>mapping;
     }
   }
@@ -1964,7 +1976,7 @@
       json_content = _json_content;
     },
     <span class="prelude-val">Err</span>(err) =&gt; { 
-      <span class="macro">error!</span>(<span class="string">&quot;Unable to parse json file {}. Error {err}&quot;</span>, mapping_file.display());
+      <span class="macro">error!</span>(<span class="string">"Unable to parse json file {}. Error {err}"</span>, mapping_file.display());
       <span class="kw">return </span>mapping;
     }      
   }
@@ -1974,7 +1986,7 @@
       json = _json;
     },
     <span class="prelude-val">Err</span>(err) =&gt; { 
-      <span class="macro">error!</span>(<span class="string">&quot;Unable to parse json file {}. Error {err}&quot;</span>, mapping_file.display());
+      <span class="macro">error!</span>(<span class="string">"Unable to parse json file {}. Error {err}"</span>, mapping_file.display());
       <span class="kw">return </span>mapping;
     }
   }
@@ -1982,25 +1994,27 @@
     <span class="kw">for </span>j <span class="kw">in </span><span class="number">1</span>..<span class="number">6 </span>{
       <span class="kw">for </span>ch <span class="kw">in </span><span class="number">1</span>..<span class="number">17 </span>{
         <span class="kw">let </span>val = mapping.get_mut(<span class="kw-2">&amp;</span>dsi).unwrap().get_mut(<span class="kw-2">&amp;</span>j).unwrap().get_mut(<span class="kw-2">&amp;</span>ch).unwrap();
-        <span class="comment">//println!(&quot;Checking {} {} {}&quot;, dsi, j, ch);
+        <span class="comment">//println!("Checking {} {} {}", dsi, j, ch);
         </span><span class="kw">let </span>tmp_val = <span class="kw-2">&amp;</span>json[dsi.to_string()][j.to_string()][ch.to_string()];
         <span class="kw-2">*</span>val = (tmp_val[<span class="number">0</span>].to_string().parse::&lt;u8&gt;().unwrap_or(<span class="number">0</span>), tmp_val[<span class="number">1</span>].to_string().parse::&lt;u8&gt;().unwrap_or(<span class="number">0</span>));
       }
     }
   }
-  <span class="macro">debug!</span>(<span class="string">&quot;Mapping {:?}&quot;</span>, mapping);
+  <span class="macro">debug!</span>(<span class="string">"Mapping {:?}"</span>, mapping);
   mapping
 }
 
 <span class="doccomment">/// Convert an int value to the board ID string.
 </span><span class="kw">pub fn </span>to_board_id_string(rb_id: u32) -&gt; String {
-  String::from(<span class="string">&quot;RB&quot;</span>) + <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{:02}&quot;</span>, rb_id)
+  String::from(<span class="string">"RB"</span>) + <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"{:02}"</span>, rb_id)
 }
 
 <span class="comment">/**********************************************************/
 </span><span class="doccomment">/// Command Enums and stucts
 </span><span class="attr">#[derive(Debug, Parser, PartialEq)]
 </span><span class="kw">pub enum </span>Command {
+  <span class="doccomment">/// Listen for flight CPU commands.
+  </span>Listen(ListenCmd),
   <span class="doccomment">/// Ping a TOF sub-system.
   </span>Ping(PingCmd),
   <span class="doccomment">/// Monitor a TOF sub-system.
@@ -2021,8 +2035,25 @@
   </span>Run(RunCmd)
 }
 
+<span class="doccomment">/// Command Enums and stucts
+</span><span class="attr">#[derive(Debug, Parser, PartialEq)]
+</span><span class="kw">pub enum </span>CommandRB {
+  <span class="doccomment">/// Remotely trigger the readoutboards to run the calibration routines (tcal, vcal).
+  </span><span class="attr">#[command(subcommand)]
+  </span>Calibration(CalibrationCmd),
+  <span class="doccomment">/// Remotely set LTB thresholds or preamp bias.
+  </span><span class="attr">#[command(subcommand)]
+  </span>Set(SetCmd),
+  <span class="doccomment">/// Start/stop data taking run.
+  </span><span class="attr">#[command(subcommand)]
+  </span>Run(RunCmd)
+}
+
 <span class="doccomment">/// TOF SW cmds ====================================================
 </span><span class="attr">#[derive(Debug, Args, PartialEq)]
+</span><span class="kw">pub struct </span>ListenCmd { }
+
+<span class="attr">#[derive(Debug, Args, PartialEq)]
 </span><span class="kw">pub struct </span>PingCmd {
   <span class="doccomment">/// Component to target
   </span><span class="attr">#[arg(value_parser = clap::builder::PossibleValuesParser::new([
@@ -2134,7 +2165,7 @@
       LTBThresholdName::Beta    =&gt; <span class="prelude-val">Ok</span>(<span class="number">1u8</span>),
       LTBThresholdName::Veto    =&gt; <span class="prelude-val">Ok</span>(<span class="number">2u8</span>),
       LTBThresholdName::Unknown =&gt; {
-        <span class="macro">error!</span>(<span class="string">&quot;Not able to get a LTB threshold from Unknown&quot;</span>);
+        <span class="macro">error!</span>(<span class="string">"Not able to get a LTB threshold from Unknown"</span>);
         <span class="prelude-val">Err</span>(SetError::EmptyInputData)
       }
     }
@@ -2144,8 +2175,8 @@
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>LTBThresholdName {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
     <span class="kw">let </span>r = serde_json::to_string(<span class="self">self</span>).unwrap_or(
-      String::from(<span class="string">&quot;Error: cannot unwrap this PowerStatusEnum&quot;</span>));
-    <span class="macro">write!</span>(f, <span class="string">&quot;&lt;PowerStatusEnum: {}&gt;&quot;</span>, r)
+      String::from(<span class="string">"Error: cannot unwrap this PowerStatusEnum"</span>));
+    <span class="macro">write!</span>(f, <span class="string">"&lt;PowerStatusEnum: {}&gt;"</span>, r)
   }
 }
 
@@ -2344,8 +2375,8 @@
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>TofComponent {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
     <span class="kw">let </span>r = serde_json::to_string(<span class="self">self</span>).unwrap_or(
-      String::from(<span class="string">&quot;Error: cannot unwrap this TofComponent&quot;</span>));
-    <span class="macro">write!</span>(f, <span class="string">&quot;&lt;TofComponent: {}&gt;&quot;</span>, r)
+      String::from(<span class="string">"Error: cannot unwrap this TofComponent"</span>));
+    <span class="macro">write!</span>(f, <span class="string">"&lt;TofComponent: {}&gt;"</span>, r)
   }
 }
 
@@ -2369,15 +2400,15 @@
 <span class="kw">impl </span>From&lt;TofComponent&gt; <span class="kw">for </span>clap::builder::Str {
   <span class="kw">fn </span>from(value: TofComponent) -&gt; <span class="self">Self </span>{
     <span class="kw">match </span>value {
-      TofComponent::Unknown  =&gt; clap::builder::Str::from(<span class="string">&quot;Unknown&quot;</span>),
-      TofComponent::All      =&gt; clap::builder::Str::from(<span class="string">&quot;All&quot;</span>),
-      TofComponent::AllButMT =&gt; clap::builder::Str::from(<span class="string">&quot;AllButMT&quot;</span>),
-      TofComponent::TofCpu   =&gt; clap::builder::Str::from(<span class="string">&quot;TofCpu&quot;</span>),
-      TofComponent::MT       =&gt; clap::builder::Str::from(<span class="string">&quot;MT&quot;</span>),
-      TofComponent::RB       =&gt; clap::builder::Str::from(<span class="string">&quot;RB&quot;</span>),
-      TofComponent::PB       =&gt; clap::builder::Str::from(<span class="string">&quot;PB&quot;</span>),
-      TofComponent::LTB      =&gt; clap::builder::Str::from(<span class="string">&quot;LTB&quot;</span>),
-      TofComponent::Preamp   =&gt; clap::builder::Str::from(<span class="string">&quot;Preamp&quot;</span>)
+      TofComponent::Unknown  =&gt; clap::builder::Str::from(<span class="string">"Unknown"</span>),
+      TofComponent::All      =&gt; clap::builder::Str::from(<span class="string">"All"</span>),
+      TofComponent::AllButMT =&gt; clap::builder::Str::from(<span class="string">"AllButMT"</span>),
+      TofComponent::TofCpu   =&gt; clap::builder::Str::from(<span class="string">"TofCpu"</span>),
+      TofComponent::MT       =&gt; clap::builder::Str::from(<span class="string">"MT"</span>),
+      TofComponent::RB       =&gt; clap::builder::Str::from(<span class="string">"RB"</span>),
+      TofComponent::PB       =&gt; clap::builder::Str::from(<span class="string">"PB"</span>),
+      TofComponent::LTB      =&gt; clap::builder::Str::from(<span class="string">"LTB"</span>),
+      TofComponent::Preamp   =&gt; clap::builder::Str::from(<span class="string">"Preamp"</span>)
     }
   }
 }
@@ -2395,8 +2426,8 @@
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>PowerStatusEnum {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
     <span class="kw">let </span>r = serde_json::to_string(<span class="self">self</span>).unwrap_or(
-      String::from(<span class="string">&quot;Error: cannot unwrap this PowerStatusEnum&quot;</span>));
-    <span class="macro">write!</span>(f, <span class="string">&quot;&lt;PowerStatusEnum: {}&gt;&quot;</span>, r)
+      String::from(<span class="string">"Error: cannot unwrap this PowerStatusEnum"</span>));
+    <span class="macro">write!</span>(f, <span class="string">"&lt;PowerStatusEnum: {}&gt;"</span>, r)
   }
 }
 
@@ -2415,10 +2446,10 @@
 <span class="kw">impl </span>From&lt;PowerStatusEnum&gt; <span class="kw">for </span>clap::builder::Str {
   <span class="kw">fn </span>from(value: PowerStatusEnum) -&gt; <span class="self">Self </span>{
     <span class="kw">match </span>value {
-      PowerStatusEnum::Unknown =&gt; clap::builder::Str::from(<span class="string">&quot;Unknown&quot;</span>),
-      PowerStatusEnum::OFF     =&gt; clap::builder::Str::from(<span class="string">&quot;OFF&quot;</span>),
-      PowerStatusEnum::ON      =&gt; clap::builder::Str::from(<span class="string">&quot;ON&quot;</span>),
-      PowerStatusEnum::Cycle   =&gt; clap::builder::Str::from(<span class="string">&quot;Cycle&quot;</span>)
+      PowerStatusEnum::Unknown =&gt; clap::builder::Str::from(<span class="string">"Unknown"</span>),
+      PowerStatusEnum::OFF     =&gt; clap::builder::Str::from(<span class="string">"OFF"</span>),
+      PowerStatusEnum::ON      =&gt; clap::builder::Str::from(<span class="string">"ON"</span>),
+      PowerStatusEnum::Cycle   =&gt; clap::builder::Str::from(<span class="string">"Cycle"</span>)
     }
   }
 }
@@ -2565,7 +2596,7 @@
 </span><span class="attr">#[test]
 </span><span class="kw">fn </span>test_display() {
   <span class="kw">let </span>rb = ReadoutBoard::default();
-  <span class="macro">println!</span>(<span class="string">&quot;Readout board {}&quot;</span>, rb);
+  <span class="macro">println!</span>(<span class="string">"Readout board {}"</span>, rb);
   <span class="macro">assert_eq!</span>(<span class="number">1</span>,<span class="number">1</span>);
 }
 

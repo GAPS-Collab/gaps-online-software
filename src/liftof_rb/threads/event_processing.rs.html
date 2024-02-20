@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-rb/src/threads/event_processing.rs`."><title>event_processing.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="liftof_rb" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-rb/src/threads/event_processing.rs`."><title>event_processing.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="liftof_rb" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -317,68 +318,6 @@
 <a href="#317" id="317">317</a>
 <a href="#318" id="318">318</a>
 <a href="#319" id="319">319</a>
-<a href="#320" id="320">320</a>
-<a href="#321" id="321">321</a>
-<a href="#322" id="322">322</a>
-<a href="#323" id="323">323</a>
-<a href="#324" id="324">324</a>
-<a href="#325" id="325">325</a>
-<a href="#326" id="326">326</a>
-<a href="#327" id="327">327</a>
-<a href="#328" id="328">328</a>
-<a href="#329" id="329">329</a>
-<a href="#330" id="330">330</a>
-<a href="#331" id="331">331</a>
-<a href="#332" id="332">332</a>
-<a href="#333" id="333">333</a>
-<a href="#334" id="334">334</a>
-<a href="#335" id="335">335</a>
-<a href="#336" id="336">336</a>
-<a href="#337" id="337">337</a>
-<a href="#338" id="338">338</a>
-<a href="#339" id="339">339</a>
-<a href="#340" id="340">340</a>
-<a href="#341" id="341">341</a>
-<a href="#342" id="342">342</a>
-<a href="#343" id="343">343</a>
-<a href="#344" id="344">344</a>
-<a href="#345" id="345">345</a>
-<a href="#346" id="346">346</a>
-<a href="#347" id="347">347</a>
-<a href="#348" id="348">348</a>
-<a href="#349" id="349">349</a>
-<a href="#350" id="350">350</a>
-<a href="#351" id="351">351</a>
-<a href="#352" id="352">352</a>
-<a href="#353" id="353">353</a>
-<a href="#354" id="354">354</a>
-<a href="#355" id="355">355</a>
-<a href="#356" id="356">356</a>
-<a href="#357" id="357">357</a>
-<a href="#358" id="358">358</a>
-<a href="#359" id="359">359</a>
-<a href="#360" id="360">360</a>
-<a href="#361" id="361">361</a>
-<a href="#362" id="362">362</a>
-<a href="#363" id="363">363</a>
-<a href="#364" id="364">364</a>
-<a href="#365" id="365">365</a>
-<a href="#366" id="366">366</a>
-<a href="#367" id="367">367</a>
-<a href="#368" id="368">368</a>
-<a href="#369" id="369">369</a>
-<a href="#370" id="370">370</a>
-<a href="#371" id="371">371</a>
-<a href="#372" id="372">372</a>
-<a href="#373" id="373">373</a>
-<a href="#374" id="374">374</a>
-<a href="#375" id="375">375</a>
-<a href="#376" id="376">376</a>
-<a href="#377" id="377">377</a>
-<a href="#378" id="378">378</a>
-<a href="#379" id="379">379</a>
-<a href="#380" id="380">380</a>
-<a href="#381" id="381">381</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::fs;
 <span class="kw">use </span>std::path::PathBuf;
 <span class="kw">use </span>std::sync::{
@@ -428,10 +367,10 @@
 ///                          bytestream comes directly from 
 ///                          the data buffers.
 ///  * get_op_mode         : The TOF operation mode. Typically,
-///                          this is &quot;StreamAny&quot;, meaning that 
+///                          this is "StreamAny", meaning that 
 ///                          whatever the TOF produceds, it gets
 ///                          wrapped in TofPackets and send away.
-///                          In &quot;RequestReply&quot; mode, liftof-rb
+///                          In "RequestReply" mode, liftof-rb
 ///                          waits for event requests sent by 
 ///                          a third party
 ///  * tp_sender           : Send the resulting data product to 
@@ -463,13 +402,13 @@
   <span class="comment">// load calibration just in case?
   </span><span class="kw">let </span><span class="kw-2">mut </span>cali_loaded = <span class="bool-val">false</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>cali        = RBCalibrations::new(<span class="number">0</span>);
-  <span class="kw">let </span>cali_path       = <span class="macro">format!</span>(<span class="string">&quot;/home/gaps/calib/rb_{:0&gt;2}.cali.tof.gaps&quot;</span>, board_id);
+  <span class="kw">let </span>cali_path       = <span class="macro">format!</span>(<span class="string">"/home/gaps/calib/rb_{:0&gt;2}.cali.tof.gaps"</span>, board_id);
   <span class="kw">let </span>cali_path_buf   = PathBuf::from(<span class="kw-2">&amp;</span>cali_path);
   <span class="kw">if </span>fs::metadata(cali_path_buf.clone()).is_ok() {
-    <span class="macro">info!</span>(<span class="string">&quot;Found valid calibration file path {cali_path_buf:?}&quot;</span>);
+    <span class="macro">info!</span>(<span class="string">"Found valid calibration file path {cali_path_buf:?}"</span>);
     <span class="kw">match </span>RBCalibrations::from_file(cali_path) {
       <span class="prelude-val">Err</span>(err) =&gt; {
-        <span class="macro">error!</span>(<span class="string">&quot;Can&#39;t load calibration! {err}&quot;</span>);
+        <span class="macro">error!</span>(<span class="string">"Can't load calibration! {err}"</span>);
       },
       <span class="prelude-val">Ok</span>(_c) =&gt; {
         cali = _c;
@@ -477,7 +416,7 @@
       }
     }
   } <span class="kw">else </span>{
-    <span class="macro">warn!</span>(<span class="string">&quot;Calibration file not available!&quot;</span>);
+    <span class="macro">warn!</span>(<span class="string">"Calibration file not available!"</span>);
     cali_loaded = <span class="bool-val">false</span>;
   }
   <span class="comment">// FIXME - deprecate!
@@ -491,33 +430,29 @@
   // receive data over bs_recv, we have received 50 more 
   // events. This means we might want to wait for 50 MTE
   // events?
-  </span><span class="kw">let </span><span class="kw-2">mut </span>n_request = <span class="number">0</span>;
+  </span><span class="kw">let </span><span class="kw-2">mut </span>skipped_events : usize = <span class="number">0</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>n_request = <span class="number">0</span>;
   <span class="kw">let </span>ev_buff_size = <span class="number">50</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>n_events = <span class="number">0usize</span>;
-  <span class="lifetime">&#39;main </span>: <span class="kw">loop </span>{
+  <span class="lifetime">'main </span>: <span class="kw">loop </span>{
     <span class="kw">match </span>thread_control.lock() {
       <span class="prelude-val">Ok</span>(tc) =&gt; {
         <span class="kw">if </span>tc.stop_flag {
-          <span class="macro">info!</span>(<span class="string">&quot;Received stop signal. Will stop thread!&quot;</span>);
+          <span class="macro">info!</span>(<span class="string">"Received stop signal. Will stop thread!"</span>);
           <span class="kw">break</span>;
         }
       },
       <span class="prelude-val">Err</span>(err) =&gt; {
-        <span class="macro">trace!</span>(<span class="string">&quot;Can&#39;t acquire lock! {err}&quot;</span>);
+        <span class="macro">trace!</span>(<span class="string">"Can't acquire lock! {err}"</span>);
       },
     }
 
     <span class="kw">if </span>!get_op_mode.is_empty() {
       <span class="kw">match </span>get_op_mode.try_recv() {
-        <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">trace!</span>(<span class="string">&quot;No op mode change detected! Err {err}&quot;</span>),
+        <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">trace!</span>(<span class="string">"No op mode change detected! Err {err}"</span>),
         <span class="prelude-val">Ok</span>(mode) =&gt; {
-          <span class="macro">warn!</span>(<span class="string">&quot;Will change operation mode to {:?}!&quot;</span>, mode);
+          <span class="macro">warn!</span>(<span class="string">"Will change operation mode to {:?}!"</span>, mode);
           <span class="kw">match </span>mode {
-            TofOperationMode::RequestReply =&gt; {
-              streamer.request_mode = <span class="bool-val">true</span>;
-              op_mode_stream = <span class="bool-val">false</span>;
-              op_mode = mode;
-            },
             TofOperationMode::StreamAny    =&gt; {
               op_mode_stream = <span class="bool-val">true</span>;
               streamer.request_mode = <span class="bool-val">false</span>;
@@ -525,9 +460,9 @@
             },
             TofOperationMode::RBWaveform   =&gt; {
               <span class="kw">if </span>!cali_loaded {
-                <span class="macro">error!</span>(<span class="string">&quot;Requesting waveform analysis without having a calibration loaded!&quot;</span>);
-                <span class="macro">error!</span>(<span class="string">&quot;Can&#39;t do waveform analysis without calibration!&quot;</span>);
-                <span class="macro">error!</span>(<span class="string">&quot;Switching mode to StreamAny&quot;</span>);
+                <span class="macro">error!</span>(<span class="string">"Requesting waveform analysis without having a calibration loaded!"</span>);
+                <span class="macro">error!</span>(<span class="string">"Can't do waveform analysis without calibration!"</span>);
+                <span class="macro">error!</span>(<span class="string">"Switching mode to StreamAny"</span>);
                 op_mode = TofOperationMode::StreamAny;
               }
             }
@@ -539,89 +474,52 @@
     <span class="kw">if </span>!dtf_fr_runner.is_empty() {
       <span class="kw">match </span>dtf_fr_runner.try_recv() {
         <span class="prelude-val">Err</span>(err) =&gt; {
-          <span class="macro">error!</span>(<span class="string">&quot;Issues receiving datatype/format! Err {err}&quot;</span>);
+          <span class="macro">error!</span>(<span class="string">"Issues receiving datatype/format! Err {err}"</span>);
         }
         <span class="prelude-val">Ok</span>(dtf) =&gt; {
           data_type = dtf; 
-          <span class="macro">info!</span>(<span class="string">&quot;Will process events for data type {}!&quot;</span>, data_type);
+          <span class="macro">info!</span>(<span class="string">"Will process events for data type {}!"</span>, data_type);
         }
       }
     }
-    <span class="kw">if </span>!tp_recv.is_empty() &amp;&amp; !op_mode_stream {
-      <span class="comment">//println!(&quot;==&gt; We see that our streamer is ahead by {}&quot;, streamer.is_ahead_by);
-      //println!(&quot;==&gt; We see that our streamer is behind by {}&quot;, streamer.is_behind_by);
-      </span><span class="kw">let </span><span class="kw-2">mut </span>max_request = streamer.is_ahead_by + ev_buff_size;
-      <span class="kw">if </span>streamer.is_behind_by &gt; <span class="number">0 </span>&amp;&amp; streamer.request_cache.len() != <span class="number">0 </span>{
-        max_request = <span class="number">0</span>;
-      }
-      <span class="comment">//println!(&quot;==&gt; max request {}, n request {}&quot;, max_request, n_request);
-      </span><span class="kw">while </span>n_request &lt; max_request {
-        <span class="kw">match </span>tp_recv.recv() {
-          <span class="prelude-val">Err</span>(_err) =&gt; (),
-          <span class="prelude-val">Ok</span>(tp) =&gt; {
-            <span class="kw">match </span>tp.packet_type {
-              PacketType::RBCommand =&gt; {
-                <span class="kw">match </span>RBCommand::from_bytestream(<span class="kw-2">&amp;</span>tp.payload, <span class="kw-2">&amp;mut </span><span class="number">0</span>) {
-                  <span class="prelude-val">Err</span>(err) =&gt; {
-                    <span class="macro">error!</span>(<span class="string">&quot;Can&#39;t decode RBCommand! {err}&quot;</span>);
-                  },
-                  <span class="prelude-val">Ok</span>(request) =&gt; {
-                    <span class="comment">//println!(&quot;=&gt; Got request {}&quot;,request);
-                    </span>n_request += <span class="number">1</span>;
-                    <span class="comment">//request_cache.push_back((request.payload, request.channel_mask));
-                    </span>streamer.request_cache.push_back((request.payload, request.channel_mask));
-                  }
-                }
-              },
-              <span class="kw">_ </span>=&gt; (),
-            }
-          }
-        }
-      }
-      <span class="comment">//println!(&quot;== ==&gt; Digtested {} requests!&quot;, {n_request});
-    </span>}
-    n_request = <span class="number">0</span>;
-    <span class="comment">//request_cache = request_cache.sort();
-    //println!(&quot;==&gt; Request cache {:?}&quot;, request_cache);
-    //request_cache.clear();
-    //println!(&quot;Len of BS RECV {}&quot;,bs_recv.len());
-    </span><span class="kw">if </span>bs_recv.is_empty() {
-      <span class="comment">//println!(&quot;--&gt; Empty bs_rec&quot;);
+    <span class="kw">if </span>bs_recv.is_empty() {
+      <span class="comment">//println!("--&gt; Empty bs_rec");
       // FIXME - benchmark
       //thread::sleep(one_milli/2);
-      </span><span class="kw">continue </span><span class="lifetime">&#39;main</span>;
+      </span><span class="kw">continue </span><span class="lifetime">'main</span>;
     }
-    <span class="comment">// this can&#39;t be blocking anymore, since 
+    <span class="comment">// this can't be blocking anymore, since 
     // otherwise we miss the datatype
-    </span><span class="kw">let </span><span class="kw-2">mut </span>skipped_events : usize = <span class="number">0</span>;
-    <span class="kw">let </span><span class="kw-2">mut </span>bytestream : Vec&lt;u8&gt;;
+    </span><span class="kw">let </span><span class="kw-2">mut </span>bytestream : Vec&lt;u8&gt;;
+    <span class="kw">if </span>events_not_sent &gt; <span class="number">0 </span>{
+      <span class="macro">error!</span>(<span class="string">"There were {events_not_sent} for this iteration of received bytes!"</span>);
+    }
+    <span class="kw">if </span>skipped_events &gt; <span class="number">0 </span>{
+      <span class="macro">error!</span>(<span class="string">"We skipped {} events!"</span>, skipped_events);
+    }
+    <span class="comment">// reset skipped events and events not sent, 
+    // these are per iteration
+    </span>events_not_sent = <span class="number">0</span>;
+    skipped_events  = <span class="number">0</span>;
     <span class="kw">match </span>bs_recv.recv() {
       <span class="prelude-val">Err</span>(err) =&gt; {
-        <span class="macro">error!</span>(<span class="string">&quot;Received Garbage! Err {err}&quot;</span>);
-        <span class="kw">continue </span><span class="lifetime">&#39;main</span>;
+        <span class="macro">error!</span>(<span class="string">"Received Garbage! Err {err}"</span>);
+        <span class="kw">continue </span><span class="lifetime">'main</span>;
       }
       <span class="prelude-val">Ok</span>(_stream) =&gt; {
-        <span class="macro">info!</span>(<span class="string">&quot;Received {} bytes!&quot;</span>, _stream.len());
+        <span class="macro">info!</span>(<span class="string">"Received {} bytes!"</span>, _stream.len());
         bytestream = _stream;
         <span class="comment">//streamer.add(&amp;bytestream, bytestream.len());
         </span>streamer.consume(<span class="kw-2">&amp;mut </span>bytestream);
-        <span class="kw">if </span>!op_mode_stream {
-          streamer.create_event_index();
-          <span class="kw">if </span>streamer.is_behind_by &gt; ev_buff_size {
-            <span class="comment">// we probably have not consumed enough
-            // events yet
-            //println!(&quot;--&gt; Streamer is still behind, will consume more {}&quot;, streamer.is_behind_by);
-            </span>streamer.is_behind_by -= ev_buff_size;
-            <span class="kw">continue </span><span class="lifetime">&#39;main</span>;
-          }
-        }
         <span class="kw">let </span><span class="kw-2">mut </span>packets_in_stream : u32 = <span class="number">0</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>last_event_id     : u32 = <span class="number">0</span>;
-        <span class="comment">//println!(&quot;Streamer::stream size {}&quot;, streamer.stream.len());
-        </span><span class="lifetime">&#39;event_reader </span>: <span class="kw">loop </span>{
+        <span class="comment">//println!("Streamer::stream size {}", streamer.stream.len());
+        </span><span class="lifetime">'event_reader </span>: <span class="kw">loop </span>{
           <span class="kw">if </span>streamer.is_depleted {
-            <span class="macro">info!</span>(<span class="string">&quot;Streamer exhausted after sending {} packets!&quot;</span>, packets_in_stream);
-            <span class="kw">break </span><span class="lifetime">&#39;event_reader</span>;
+            <span class="macro">info!</span>(<span class="string">"Streamer exhausted after sending {} packets!"</span>, packets_in_stream);
+            <span class="comment">//break 'event_reader;
+            // we immediatly want more data in the streamer
+            </span><span class="kw">continue </span><span class="lifetime">'main</span>;
           }
           <span class="comment">// FIXME - here we have the choice. 
           // streamer.next() will yield the next event,
@@ -647,32 +545,17 @@
             TofOperationMode::RBWaveform =&gt; {
               <span class="kw">match </span>streamer.next() {
                 <span class="prelude-val">None </span>=&gt; {
-                  <span class="kw">if </span>streamer.request_mode {
-                    <span class="comment">//info!(&quot;Streamer exhausted after sending {} packets!&quot;, packets_in_stream);
-                    </span><span class="kw">if </span>streamer.request_cache.len() == <span class="number">0 </span>{
-                      <span class="kw">break </span><span class="lifetime">&#39;event_reader</span>;
-                    }
-                    <span class="kw">if </span>streamer.is_ahead_by &gt; <span class="number">0 </span>{
-                      <span class="kw">break</span>;
-                    }
-                    <span class="comment">//println!(&quot;Streamer behind {}&quot;, streamer.is_behind_by);
-                    //println!(&quot;Streamer ahead  {}&quot;, streamer.is_ahead_by);
-                    //println!(&quot;Streamer is depeleted {}&quot;, streamer.is_depleted);
-                    //println!(&quot;Streamer requests {}&quot;, streamer.request_cache.len());
-                    // we need to go the whole loop, so trigger streamer.is_depleted, 
-                    // even though it might not
-                    </span>streamer.is_behind_by = <span class="number">0</span>;
-                  }
                   streamer.is_depleted = <span class="bool-val">true</span>;
-                  <span class="kw">continue</span>;
+                  <span class="kw">continue </span><span class="lifetime">'main</span>;
                 },
                 <span class="prelude-val">Some</span>(<span class="kw-2">mut </span>event) =&gt; {
-                  <span class="kw">if </span>last_event_id != <span class="number">0 </span>{
+                  <span class="comment">//println!("Got event id {}", event.header.event_id);
+                  </span><span class="kw">if </span>last_event_id != <span class="number">0 </span>{
                     <span class="kw">if </span>event.header.event_id != last_event_id + <span class="number">1 </span>{
                       <span class="kw">if </span>event.header.event_id &gt; last_event_id {
                           skipped_events += (event.header.event_id - last_event_id) <span class="kw">as </span>usize;
                       } <span class="kw">else </span>{
-                        <span class="macro">error!</span>(<span class="string">&quot;Something with the event counter is messed up. Got event id {}, but the last event id was {}&quot;</span>, event.header.event_id, last_event_id);
+                        <span class="macro">error!</span>(<span class="string">"Something with the event counter is messed up. Got event id {}, but the last event id was {}"</span>, event.header.event_id, last_event_id);
                       }
                     }
                   }
@@ -680,7 +563,7 @@
                   event.data_type = data_type;
                   <span class="kw">if </span>verbose {
                     <span class="kw">match </span>stat.lock() {
-                      <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Unable to acquire lock on shared memory for RunStatisitcis! {err}&quot;</span>),
+                      <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to acquire lock on shared memory for RunStatisitcis! {err}"</span>),
                       <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>s) =&gt; {
                         <span class="kw">if </span>s.first_evid == <span class="number">0 </span>{
                           s.first_evid = event.header.event_id;
@@ -697,37 +580,37 @@
                   }
                   <span class="kw">if </span>event.status != EventStatus::Unknown {
                     <span class="kw">if </span>only_perfect_events &amp;&amp; event.status != EventStatus::Perfect {
-                      <span class="macro">info!</span>(<span class="string">&quot;Not sending this event, because it&#39;s event status is {} and we requested to send only events with EventStatus::Perfect!&quot;</span>, event.status);
+                      <span class="macro">info!</span>(<span class="string">"Not sending this event, because it's event status is {} and we requested to send only events with EventStatus::Perfect!"</span>, event.status);
                       <span class="kw">continue</span>;
                     }
                   }
                   <span class="kw">if </span>op_mode == TofOperationMode::RBWaveform {
-                    <span class="macro">debug!</span>(<span class="string">&quot;Using paddle map {:?}&quot;</span>, paddle_map);
-                    <span class="kw">match </span>waveform_analysis(<span class="kw-2">&amp;mut </span>event, <span class="kw-2">&amp;</span>paddle_map, <span class="kw-2">&amp;</span>cali) {
-                      <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Waveform analysis failed! {err}&quot;</span>),
-                      <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
-                    }
-                  }
+                    <span class="comment">//debug!("Using paddle map {:?}", paddle_map);
+                    //match waveform_analysis(&amp;mut event, &amp;paddle_map, &amp;cali) {
+                    //  Err(err) =&gt; error!("Waveform analysis failed! {err}"),
+                    //  Ok(_)    =&gt; ()
+                    //}
+                  </span>}
                   n_events += <span class="number">1</span>;
                   <span class="kw">if </span>verbose &amp;&amp; n_events % <span class="number">100 </span>== <span class="number">0 </span>{
-                    <span class="macro">println!</span>(<span class="string">&quot;[EVTPROC (verbose)] =&gt; Sending event {}&quot;</span>, event);
+                    <span class="macro">println!</span>(<span class="string">"[EVTPROC (verbose)] =&gt; Sending event {}"</span>, event);
                   }
                   tp_to_send = TofPacket::from(<span class="kw-2">&amp;</span>event);
                 },
               } 
             }, <span class="comment">// end op mode ~ waveform/event
             </span><span class="kw">_ </span>=&gt; {
-              <span class="macro">error!</span>(<span class="string">&quot;Operation mode {} not available yet!&quot;</span>, op_mode);
+              <span class="macro">error!</span>(<span class="string">"Operation mode {} not available yet!"</span>, op_mode);
             }
           }
           <span class="kw">if </span>verbose {
             <span class="kw">match </span>stat.lock() {
-              <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Unable to acquire lock on shared memory for RunStatisitcis! {err}&quot;</span>),
+              <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to acquire lock on shared memory for RunStatisitcis! {err}"</span>),
               <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>_st)  =&gt; {
                 _st.evproc_npack += <span class="number">1</span>; 
               }
             }
-            <span class="comment">//println!(&quot;[EVTPROC (verbose)] =&gt; Sending TofPacket {}&quot;, tp_to_send);
+            <span class="comment">//println!("[EVTPROC (verbose)] =&gt; Sending TofPacket {}", tp_to_send);
           </span>}
           <span class="comment">// set flags
           </span><span class="kw">match </span>data_type {
@@ -744,20 +627,14 @@
               packets_in_stream += <span class="number">1</span>;
             },
             <span class="prelude-val">Err</span>(err) =&gt; {
-              <span class="macro">error!</span>(<span class="string">&quot;Problem sending TofPacket over channel! {err}&quot;</span>);
+              <span class="macro">error!</span>(<span class="string">"Problem sending TofPacket over channel! {err}"</span>);
               events_not_sent += <span class="number">1</span>;
             }
           }
-        }
-      }, <span class="comment">// end OK(recv)
+        } <span class="comment">// end 'event_reader
+      </span>}, <span class="comment">// end OK(recv)
     </span>}<span class="comment">// end match 
-    </span><span class="kw">if </span>events_not_sent &gt; <span class="number">0 </span>{
-      <span class="macro">error!</span>(<span class="string">&quot;There were {events_not_sent} unsent events!&quot;</span>);
-    }
-    <span class="kw">if </span>skipped_events &gt; <span class="number">0 </span>{
-      <span class="macro">error!</span>(<span class="string">&quot;We skipped {} events!&quot;</span>, skipped_events);
-    }
-  } <span class="comment">// end outer loop
+  </span>} <span class="comment">// end outer loop
 </span>}
 
 </code></pre></div></section></main></body></html>

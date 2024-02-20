@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/termion-2.0.3/src/input.rs`."><title>input.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="termion" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/termion-2.0.3/src/input.rs`."><title>input.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="termion" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -466,7 +467,7 @@
             <span class="prelude-val">Ok</span>(<span class="number">0</span>) =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
             <span class="prelude-val">Ok</span>(<span class="number">1</span>) =&gt; {
                 <span class="kw">match </span>buf[<span class="number">0</span>] {
-                    <span class="string">b&#39;\x1B&#39; </span>=&gt; <span class="prelude-val">Ok</span>((Event::Key(Key::Esc), <span class="macro">vec!</span>[<span class="string">b&#39;\x1B&#39;</span>])),
+                    <span class="string">b'\x1B' </span>=&gt; <span class="prelude-val">Ok</span>((Event::Key(Key::Esc), <span class="macro">vec!</span>[<span class="string">b'\x1B'</span>])),
                     c =&gt; parse_event(c, <span class="kw-2">&amp;mut </span>source.bytes()),
                 }
             }
@@ -476,7 +477,7 @@
                     <span class="kw">let </span><span class="kw-2">mut </span>iter = option_iter.map(|c| <span class="prelude-val">Ok</span>(c)).chain(source.bytes());
                     parse_event(buf[<span class="number">0</span>], <span class="kw-2">&amp;mut </span>iter)
                 };
-                <span class="comment">// If the option_iter wasn&#39;t consumed, keep the byte for later.
+                <span class="comment">// If the option_iter wasn't consumed, keep the byte for later.
                 </span><span class="self">self</span>.leftover = option_iter.next();
                 result
             }
@@ -547,7 +548,7 @@
                 <span class="prelude-val">Ok</span>(<span class="number">0x7f</span>) =&gt; {
                     buf.pop();
                 }
-                <span class="prelude-val">Ok</span>(<span class="string">b&#39;\n&#39;</span>) | <span class="prelude-val">Ok</span>(<span class="string">b&#39;\r&#39;</span>) =&gt; <span class="kw">break</span>,
+                <span class="prelude-val">Ok</span>(<span class="string">b'\n'</span>) | <span class="prelude-val">Ok</span>(<span class="string">b'\r'</span>) =&gt; <span class="kw">break</span>,
                 <span class="prelude-val">Ok</span>(c) =&gt; buf.push(c),
             }
         }
@@ -574,10 +575,10 @@
 }
 
 <span class="doccomment">/// A sequence of escape codes to enable terminal mouse support.
-</span><span class="kw">const </span>ENTER_MOUSE_SEQUENCE: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="macro">csi!</span>(<span class="string">&quot;?1000h\x1b[?1002h\x1b[?1015h\x1b[?1006h&quot;</span>);
+</span><span class="kw">const </span>ENTER_MOUSE_SEQUENCE: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str = <span class="macro">csi!</span>(<span class="string">"?1000h\x1b[?1002h\x1b[?1015h\x1b[?1006h"</span>);
 
 <span class="doccomment">/// A sequence of escape codes to disable terminal mouse support.
-</span><span class="kw">const </span>EXIT_MOUSE_SEQUENCE: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="macro">csi!</span>(<span class="string">&quot;?1006l\x1b[?1015l\x1b[?1002l\x1b[?1000l&quot;</span>);
+</span><span class="kw">const </span>EXIT_MOUSE_SEQUENCE: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str = <span class="macro">csi!</span>(<span class="string">"?1006l\x1b[?1015l\x1b[?1002l\x1b[?1000l"</span>);
 
 <span class="doccomment">/// A terminal with added mouse support.
 ///
@@ -644,11 +645,11 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_keys() {
-        <span class="kw">let </span><span class="kw-2">mut </span>i = <span class="string">b&quot;\x1Bayo\x7F\x1B[D&quot;</span>.keys();
+        <span class="kw">let </span><span class="kw-2">mut </span>i = <span class="string">b"\x1Bayo\x7F\x1B[D"</span>.keys();
 
-        <span class="macro">assert_eq!</span>(i.next().unwrap().unwrap(), Key::Alt(<span class="string">&#39;a&#39;</span>));
-        <span class="macro">assert_eq!</span>(i.next().unwrap().unwrap(), Key::Char(<span class="string">&#39;y&#39;</span>));
-        <span class="macro">assert_eq!</span>(i.next().unwrap().unwrap(), Key::Char(<span class="string">&#39;o&#39;</span>));
+        <span class="macro">assert_eq!</span>(i.next().unwrap().unwrap(), Key::Alt(<span class="string">'a'</span>));
+        <span class="macro">assert_eq!</span>(i.next().unwrap().unwrap(), Key::Char(<span class="string">'y'</span>));
+        <span class="macro">assert_eq!</span>(i.next().unwrap().unwrap(), Key::Char(<span class="string">'o'</span>));
         <span class="macro">assert_eq!</span>(i.next().unwrap().unwrap(), Key::Backspace);
         <span class="macro">assert_eq!</span>(i.next().unwrap().unwrap(), Key::Left);
         <span class="macro">assert!</span>(i.next().is_none());
@@ -657,14 +658,14 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_events() {
         <span class="kw">let </span><span class="kw-2">mut </span>i =
-            <span class="string">b&quot;\x1B[\x00bc\x7F\x1B[D\
-                    \x1B[M\x00\x22\x24\x1B[&lt;0;2;4;M\x1B[32;2;4M\x1B[&lt;0;2;4;m\x1B[35;2;4Mb&quot;
+            <span class="string">b"\x1B[\x00bc\x7F\x1B[D\
+                    \x1B[M\x00\x22\x24\x1B[&lt;0;2;4;M\x1B[32;2;4M\x1B[&lt;0;2;4;m\x1B[35;2;4Mb"
                     </span>.events();
 
         <span class="macro">assert_eq!</span>(i.next().unwrap().unwrap(),
-                   Event::Unsupported(<span class="macro">vec!</span>[<span class="number">0x1B</span>, <span class="string">b&#39;[&#39;</span>, <span class="number">0x00</span>]));
-        <span class="macro">assert_eq!</span>(i.next().unwrap().unwrap(), Event::Key(Key::Char(<span class="string">&#39;b&#39;</span>)));
-        <span class="macro">assert_eq!</span>(i.next().unwrap().unwrap(), Event::Key(Key::Char(<span class="string">&#39;c&#39;</span>)));
+                   Event::Unsupported(<span class="macro">vec!</span>[<span class="number">0x1B</span>, <span class="string">b'['</span>, <span class="number">0x00</span>]));
+        <span class="macro">assert_eq!</span>(i.next().unwrap().unwrap(), Event::Key(Key::Char(<span class="string">'b'</span>)));
+        <span class="macro">assert_eq!</span>(i.next().unwrap().unwrap(), Event::Key(Key::Char(<span class="string">'c'</span>)));
         <span class="macro">assert_eq!</span>(i.next().unwrap().unwrap(), Event::Key(Key::Backspace));
         <span class="macro">assert_eq!</span>(i.next().unwrap().unwrap(), Event::Key(Key::Left));
         <span class="macro">assert_eq!</span>(i.next().unwrap().unwrap(),
@@ -677,23 +678,23 @@
                    Event::Mouse(MouseEvent::Release(<span class="number">2</span>, <span class="number">4</span>)));
         <span class="macro">assert_eq!</span>(i.next().unwrap().unwrap(),
                    Event::Mouse(MouseEvent::Release(<span class="number">2</span>, <span class="number">4</span>)));
-        <span class="macro">assert_eq!</span>(i.next().unwrap().unwrap(), Event::Key(Key::Char(<span class="string">&#39;b&#39;</span>)));
+        <span class="macro">assert_eq!</span>(i.next().unwrap().unwrap(), Event::Key(Key::Char(<span class="string">'b'</span>)));
         <span class="macro">assert!</span>(i.next().is_none());
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_events_and_raw() {
-        <span class="kw">let </span>input = <span class="string">b&quot;\x1B[\x00bc\x7F\x1B[D\
-                    \x1B[M\x00\x22\x24\x1B[&lt;0;2;4;M\x1B[32;2;4M\x1B[&lt;0;2;4;m\x1B[35;2;4Mb&quot;</span>;
+        <span class="kw">let </span>input = <span class="string">b"\x1B[\x00bc\x7F\x1B[D\
+                    \x1B[M\x00\x22\x24\x1B[&lt;0;2;4;M\x1B[32;2;4M\x1B[&lt;0;2;4;m\x1B[35;2;4Mb"</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>output = Vec::&lt;u8&gt;::new();
         {
             <span class="kw">let </span><span class="kw-2">mut </span>i = input.events_and_raw().map(|res| res.unwrap())
                 .inspect(|<span class="kw-2">&amp;</span>(<span class="kw">_</span>, <span class="kw-2">ref </span>raw)| { output.extend(raw); }).map(|(event, <span class="kw">_</span>)| event);
 
             <span class="macro">assert_eq!</span>(i.next().unwrap(),
-            Event::Unsupported(<span class="macro">vec!</span>[<span class="number">0x1B</span>, <span class="string">b&#39;[&#39;</span>, <span class="number">0x00</span>]));
-            <span class="macro">assert_eq!</span>(i.next().unwrap(), Event::Key(Key::Char(<span class="string">&#39;b&#39;</span>)));
-            <span class="macro">assert_eq!</span>(i.next().unwrap(), Event::Key(Key::Char(<span class="string">&#39;c&#39;</span>)));
+            Event::Unsupported(<span class="macro">vec!</span>[<span class="number">0x1B</span>, <span class="string">b'['</span>, <span class="number">0x00</span>]));
+            <span class="macro">assert_eq!</span>(i.next().unwrap(), Event::Key(Key::Char(<span class="string">'b'</span>)));
+            <span class="macro">assert_eq!</span>(i.next().unwrap(), Event::Key(Key::Char(<span class="string">'c'</span>)));
             <span class="macro">assert_eq!</span>(i.next().unwrap(), Event::Key(Key::Backspace));
             <span class="macro">assert_eq!</span>(i.next().unwrap(), Event::Key(Key::Left));
             <span class="macro">assert_eq!</span>(i.next().unwrap(),
@@ -706,7 +707,7 @@
             Event::Mouse(MouseEvent::Release(<span class="number">2</span>, <span class="number">4</span>)));
             <span class="macro">assert_eq!</span>(i.next().unwrap(),
             Event::Mouse(MouseEvent::Release(<span class="number">2</span>, <span class="number">4</span>)));
-            <span class="macro">assert_eq!</span>(i.next().unwrap(), Event::Key(Key::Char(<span class="string">&#39;b&#39;</span>)));
+            <span class="macro">assert_eq!</span>(i.next().unwrap(), Event::Key(Key::Char(<span class="string">'b'</span>)));
             <span class="macro">assert!</span>(i.next().is_none());
         }
 
@@ -715,13 +716,13 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_function_keys() {
-        <span class="kw">let </span><span class="kw-2">mut </span>st = <span class="string">b&quot;\x1BOP\x1BOQ\x1BOR\x1BOS&quot;</span>.keys();
+        <span class="kw">let </span><span class="kw-2">mut </span>st = <span class="string">b"\x1BOP\x1BOQ\x1BOR\x1BOS"</span>.keys();
         <span class="kw">for </span>i <span class="kw">in </span><span class="number">1</span>..<span class="number">5 </span>{
             <span class="macro">assert_eq!</span>(st.next().unwrap().unwrap(), Key::F(i));
         }
 
-        <span class="kw">let </span><span class="kw-2">mut </span>st = <span class="string">b&quot;\x1B[11~\x1B[12~\x1B[13~\x1B[14~\x1B[15~\
-        \x1B[17~\x1B[18~\x1B[19~\x1B[20~\x1B[21~\x1B[23~\x1B[24~&quot;
+        <span class="kw">let </span><span class="kw-2">mut </span>st = <span class="string">b"\x1B[11~\x1B[12~\x1B[13~\x1B[14~\x1B[15~\
+        \x1B[17~\x1B[18~\x1B[19~\x1B[20~\x1B[21~\x1B[23~\x1B[24~"
                 </span>.keys();
         <span class="kw">for </span>i <span class="kw">in </span><span class="number">1</span>..<span class="number">13 </span>{
             <span class="macro">assert_eq!</span>(st.next().unwrap().unwrap(), Key::F(i));
@@ -730,7 +731,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_special_keys() {
-        <span class="kw">let </span><span class="kw-2">mut </span>st = <span class="string">b&quot;\x1B[2~\x1B[H\x1B[7~\x1B[5~\x1B[3~\x1B[F\x1B[8~\x1B[6~&quot;</span>.keys();
+        <span class="kw">let </span><span class="kw-2">mut </span>st = <span class="string">b"\x1B[2~\x1B[H\x1B[7~\x1B[5~\x1B[3~\x1B[F\x1B[8~\x1B[6~"</span>.keys();
         <span class="macro">assert_eq!</span>(st.next().unwrap().unwrap(), Key::Insert);
         <span class="macro">assert_eq!</span>(st.next().unwrap().unwrap(), Key::Home);
         <span class="macro">assert_eq!</span>(st.next().unwrap().unwrap(), Key::Home);
@@ -744,7 +745,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_esc_key() {
-        <span class="kw">let </span><span class="kw-2">mut </span>st = <span class="string">b&quot;\x1B&quot;</span>.keys();
+        <span class="kw">let </span><span class="kw-2">mut </span>st = <span class="string">b"\x1B"</span>.keys();
         <span class="macro">assert_eq!</span>(st.next().unwrap().unwrap(), Key::Esc);
         <span class="macro">assert!</span>(st.next().is_none());
     }
@@ -768,8 +769,8 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_read() {
-        <span class="kw">let </span>test1 = <span class="string">&quot;this is the first test&quot;</span>;
-        <span class="kw">let </span>test2 = <span class="string">&quot;this is the second test&quot;</span>;
+        <span class="kw">let </span>test1 = <span class="string">"this is the first test"</span>;
+        <span class="kw">let </span>test2 = <span class="string">"this is the second test"</span>;
 
         line_match(test1, <span class="prelude-val">Some</span>(test1));
         line_match(test2, <span class="prelude-val">Some</span>(test2));
@@ -777,24 +778,24 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_backspace() {
-        line_match(<span class="string">&quot;this is the\x7f first\x7f\x7f test&quot;</span>,
-                   <span class="prelude-val">Some</span>(<span class="string">&quot;this is th fir test&quot;</span>));
-        line_match(<span class="string">&quot;this is the seco\x7fnd test\x7f&quot;</span>,
-                   <span class="prelude-val">Some</span>(<span class="string">&quot;this is the secnd tes&quot;</span>));
+        line_match(<span class="string">"this is the\x7f first\x7f\x7f test"</span>,
+                   <span class="prelude-val">Some</span>(<span class="string">"this is th fir test"</span>));
+        line_match(<span class="string">"this is the seco\x7fnd test\x7f"</span>,
+                   <span class="prelude-val">Some</span>(<span class="string">"this is the secnd tes"</span>));
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_end() {
-        line_match(<span class="string">&quot;abc\nhttps://www.youtube.com/watch?v=dQw4w9WgXcQ&quot;</span>,
-                   <span class="prelude-val">Some</span>(<span class="string">&quot;abc&quot;</span>));
-        line_match(<span class="string">&quot;hello\rhttps://www.youtube.com/watch?v=yPYZpwSpKmA&quot;</span>,
-                   <span class="prelude-val">Some</span>(<span class="string">&quot;hello&quot;</span>));
+        line_match(<span class="string">"abc\nhttps://www.youtube.com/watch?v=dQw4w9WgXcQ"</span>,
+                   <span class="prelude-val">Some</span>(<span class="string">"abc"</span>));
+        line_match(<span class="string">"hello\rhttps://www.youtube.com/watch?v=yPYZpwSpKmA"</span>,
+                   <span class="prelude-val">Some</span>(<span class="string">"hello"</span>));
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_abort() {
-        line_match(<span class="string">&quot;abc\x03https://www.youtube.com/watch?v=dQw4w9WgXcQ&quot;</span>, <span class="prelude-val">None</span>);
-        line_match(<span class="string">&quot;hello\x04https://www.youtube.com/watch?v=yPYZpwSpKmA&quot;</span>, <span class="prelude-val">None</span>);
+        line_match(<span class="string">"abc\x03https://www.youtube.com/watch?v=dQw4w9WgXcQ"</span>, <span class="prelude-val">None</span>);
+        line_match(<span class="string">"hello\x04https://www.youtube.com/watch?v=yPYZpwSpKmA"</span>, <span class="prelude-val">None</span>);
     }
 
 }

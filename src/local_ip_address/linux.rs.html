@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/local-ip-address-0.5.7/src/linux.rs`."><title>linux.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="local_ip_address" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/local-ip-address-0.5.7/src/linux.rs`."><title>linux.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="local_ip_address" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -503,9 +504,9 @@
 
 <span class="kw">use </span><span class="kw">crate</span>::Error;
 
-<span class="attr">#[cfg(target_env = <span class="string">&quot;gnu&quot;</span>)]
+<span class="attr">#[cfg(target_env = <span class="string">"gnu"</span>)]
 </span><span class="kw">const </span>RTM_FLAGS_LOOKUP: <span class="kw-2">&amp;</span>[RtmF] = <span class="kw-2">&amp;</span>[RtmF::LookupTable];
-<span class="attr">#[cfg(not(target_env = <span class="string">&quot;gnu&quot;</span>))]
+<span class="attr">#[cfg(not(target_env = <span class="string">"gnu"</span>))]
 </span><span class="kw">const </span>RTM_FLAGS_LOOKUP: <span class="kw-2">&amp;</span>[RtmF] = <span class="kw-2">&amp;</span>[];
 
 <span class="doccomment">/// Retrieves the local IPv4 address for this system
@@ -534,7 +535,7 @@
             Rtattr::new(<span class="prelude-val">None</span>, Rta::Dst, raw_dstip)
         }
         <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(Error::StrategyError(<span class="macro">format!</span>(
-            <span class="string">&quot;Invalid address family given: {:#?}&quot;</span>,
+            <span class="string">"Invalid address family given: {:#?}"</span>,
             family
         )))<span class="question-mark">?</span>,
     };
@@ -575,7 +576,7 @@
                 }
             }
             Error::StrategyError(<span class="macro">format!</span>(
-                <span class="string">&quot;An error occurred retrieving Netlink&#39;s socket response: {err}&quot;</span>,
+                <span class="string">"An error occurred retrieving Netlink's socket response: {err}"</span>,
             ))
         })<span class="question-mark">?</span>;
 
@@ -585,13 +586,13 @@
 
         <span class="kw">if </span>header.nl_type != Rtm::Newroute {
             <span class="kw">return </span><span class="prelude-val">Err</span>(Error::StrategyError(String::from(
-                <span class="string">&quot;The Netlink header type is not the expected&quot;</span>,
+                <span class="string">"The Netlink header type is not the expected"</span>,
             )));
         }
 
         <span class="kw">let </span>p = header.get_payload().map_err(|<span class="kw">_</span>| {
             Error::StrategyError(String::from(
-                <span class="string">&quot;An error occurred getting Netlink&#39;s header payload&quot;</span>,
+                <span class="string">"An error occurred getting Netlink's header payload"</span>,
             ))
         })<span class="question-mark">?</span>;
 
@@ -601,7 +602,7 @@
 
         <span class="kw">if </span>p.rtm_family != family {
             <span class="prelude-val">Err</span>(Error::StrategyError(<span class="macro">format!</span>(
-                <span class="string">&quot;Invalid address family in Netlink payload: {:?}&quot;</span>,
+                <span class="string">"Invalid address family in Netlink payload: {:?}"</span>,
                 p.rtm_family
             )))<span class="question-mark">?
         </span>}
@@ -612,7 +613,7 @@
                     <span class="kw">let </span>addr = Ipv4Addr::from(u32::from_be(
                         rtattr.get_payload_as::&lt;u32&gt;().map_err(|<span class="kw">_</span>| {
                             Error::StrategyError(String::from(
-                                <span class="string">&quot;An error occurred retrieving Netlink&#39;s route payload attribute&quot;</span>,
+                                <span class="string">"An error occurred retrieving Netlink's route payload attribute"</span>,
                             ))
                         })<span class="question-mark">?</span>,
                     ));
@@ -621,7 +622,7 @@
                     <span class="kw">let </span>addr = Ipv6Addr::from(u128::from_be(
                         rtattr.get_payload_as::&lt;u128&gt;().map_err(|<span class="kw">_</span>| {
                             Error::StrategyError(String::from(
-                                <span class="string">&quot;An error occurred retrieving Netlink&#39;s route payload attribute&quot;</span>,
+                                <span class="string">"An error occurred retrieving Netlink's route payload attribute"</span>,
                             ))
                         })<span class="question-mark">?</span>,
                     ));
@@ -655,7 +656,7 @@
     <span class="kw">for </span>response <span class="kw">in </span>netlink_socket.iter(<span class="bool-val">false</span>) {
         <span class="kw">let </span>header: Nlmsghdr&lt;Rtm, Ifaddrmsg&gt; = response.map_err(|<span class="kw">_</span>| {
             Error::StrategyError(String::from(
-                <span class="string">&quot;An error occurred retrieving Netlink&#39;s socket response&quot;</span>,
+                <span class="string">"An error occurred retrieving Netlink's socket response"</span>,
             ))
         })<span class="question-mark">?</span>;
 
@@ -665,13 +666,13 @@
 
         <span class="kw">if </span>header.nl_type != Rtm::Newaddr {
             <span class="kw">return </span><span class="prelude-val">Err</span>(Error::StrategyError(String::from(
-                <span class="string">&quot;The Netlink header type is not the expected&quot;</span>,
+                <span class="string">"The Netlink header type is not the expected"</span>,
             )));
         }
 
         <span class="kw">let </span>p = header.get_payload().map_err(|<span class="kw">_</span>| {
             Error::StrategyError(String::from(
-                <span class="string">&quot;An error occurred getting Netlink&#39;s header payload&quot;</span>,
+                <span class="string">"An error occurred getting Netlink's header payload"</span>,
             ))
         })<span class="question-mark">?</span>;
 
@@ -681,7 +682,7 @@
 
         <span class="kw">if </span>p.ifa_family != family {
             <span class="prelude-val">Err</span>(Error::StrategyError(<span class="macro">format!</span>(
-                <span class="string">&quot;Invalid family in Netlink payload: {:?}&quot;</span>,
+                <span class="string">"Invalid family in Netlink payload: {:?}"</span>,
                 p.ifa_family
             )))<span class="question-mark">?
         </span>}
@@ -692,7 +693,7 @@
                     <span class="kw">let </span>addr = Ipv4Addr::from(u32::from_be(
                         rtattr.get_payload_as::&lt;u32&gt;().map_err(|<span class="kw">_</span>| {
                             Error::StrategyError(String::from(
-                                <span class="string">&quot;An error occurred retrieving Netlink&#39;s route payload attribute&quot;</span>,
+                                <span class="string">"An error occurred retrieving Netlink's route payload attribute"</span>,
                             ))
                         })<span class="question-mark">?</span>,
                     ));
@@ -701,7 +702,7 @@
                     <span class="kw">let </span>addr = Ipv6Addr::from(u128::from_be(
                         rtattr.get_payload_as::&lt;u128&gt;().map_err(|<span class="kw">_</span>| {
                             Error::StrategyError(String::from(
-                                <span class="string">&quot;An error occurred retrieving Netlink&#39;s route payload attribute&quot;</span>,
+                                <span class="string">"An error occurred retrieving Netlink's route payload attribute"</span>,
                             ))
                         })<span class="question-mark">?</span>,
                     ));
@@ -714,7 +715,7 @@
     <span class="prelude-val">Err</span>(Error::LocalIpAddressNotFound)
 }
 
-<span class="doccomment">/// Perform a search over the system&#39;s network interfaces using Netlink Route information,
+<span class="doccomment">/// Perform a search over the system's network interfaces using Netlink Route information,
 /// retrieved network interfaces belonging to both socket address families
 /// `AF_INET` and `AF_INET6` are retrieved along with the interface address name.
 ///
@@ -728,9 +729,9 @@
 ///
 /// if let Some((_, ipaddr)) = ifas
 /// .iter()
-/// .find(|(name, ipaddr)| *name == &quot;en0&quot; &amp;&amp; matches!(ipaddr, IpAddr::V4(_))) {
+/// .find(|(name, ipaddr)| *name == "en0" &amp;&amp; matches!(ipaddr, IpAddr::V4(_))) {
 ///     // This is your local IP address: 192.168.1.111
-///     println!(&quot;This is your local IP address: {:?}&quot;, ipaddr);
+///     println!("This is your local IP address: {:?}", ipaddr);
 /// }
 /// ```
 </span><span class="kw">pub fn </span>list_afinet_netifas() -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;(String, IpAddr)&gt;, Error&gt; {
@@ -766,7 +767,7 @@
     <span class="kw">for </span>response <span class="kw">in </span>netlink_socket.iter(<span class="bool-val">false</span>) {
         <span class="kw">let </span>header: Nlmsghdr&lt;Rtm, Ifinfomsg&gt; = response.map_err(|<span class="kw">_</span>| {
             Error::StrategyError(String::from(
-                <span class="string">&quot;An error occurred retrieving Netlink&#39;s socket response&quot;</span>,
+                <span class="string">"An error occurred retrieving Netlink's socket response"</span>,
             ))
         })<span class="question-mark">?</span>;
 
@@ -776,13 +777,13 @@
 
         <span class="kw">if </span>header.nl_type != Rtm::Newlink {
             <span class="kw">return </span><span class="prelude-val">Err</span>(Error::StrategyError(String::from(
-                <span class="string">&quot;The Netlink header type is not the expected&quot;</span>,
+                <span class="string">"The Netlink header type is not the expected"</span>,
             )));
         }
 
         <span class="kw">let </span>p = header.get_payload().map_err(|<span class="kw">_</span>| {
             Error::StrategyError(String::from(
-                <span class="string">&quot;An error occurred getting Netlink&#39;s header payload&quot;</span>,
+                <span class="string">"An error occurred getting Netlink's header payload"</span>,
             ))
         })<span class="question-mark">?</span>;
 
@@ -823,7 +824,7 @@
     <span class="kw">for </span>response <span class="kw">in </span>netlink_socket.iter(<span class="bool-val">false</span>) {
         <span class="kw">let </span>header: Nlmsghdr&lt;Rtm, Ifaddrmsg&gt; = response.map_err(|err| {
             Error::StrategyError(<span class="macro">format!</span>(
-                <span class="string">&quot;An error occurred retrieving Netlink&#39;s socket response: {err}&quot;
+                <span class="string">"An error occurred retrieving Netlink's socket response: {err}"
             </span>))
         })<span class="question-mark">?</span>;
 
@@ -833,19 +834,19 @@
 
         <span class="kw">if </span>header.nl_type != Rtm::Newaddr {
             <span class="kw">return </span><span class="prelude-val">Err</span>(Error::StrategyError(String::from(
-                <span class="string">&quot;The Netlink header type is not the expected&quot;</span>,
+                <span class="string">"The Netlink header type is not the expected"</span>,
             )));
         }
 
         <span class="kw">let </span>p = header.get_payload().map_err(|<span class="kw">_</span>| {
             Error::StrategyError(String::from(
-                <span class="string">&quot;An error occurred getting Netlink&#39;s header payload&quot;</span>,
+                <span class="string">"An error occurred getting Netlink's header payload"</span>,
             ))
         })<span class="question-mark">?</span>;
 
         <span class="kw">if </span>p.ifa_family != Inet6 &amp;&amp; p.ifa_family != Inet {
             <span class="prelude-val">Err</span>(Error::StrategyError(<span class="macro">format!</span>(
-                <span class="string">&quot;Netlink payload has unsupported family: {:?}&quot;</span>,
+                <span class="string">"Netlink payload has unsupported family: {:?}"</span>,
                 p.ifa_family
             )))<span class="question-mark">?
         </span>}
@@ -866,7 +867,7 @@
                     <span class="kw">let </span>rtaddr = Ipv6Addr::from(u128::from_be(
                         rtattr.get_payload_as::&lt;u128&gt;().map_err(|<span class="kw">_</span>| {
                             Error::StrategyError(String::from(
-                                <span class="string">&quot;An error occurred retrieving Netlink&#39;s route payload attribute&quot;</span>,
+                                <span class="string">"An error occurred retrieving Netlink's route payload attribute"</span>,
                             ))
                         })<span class="question-mark">?</span>,
                     ));
@@ -875,7 +876,7 @@
                     <span class="kw">let </span>rtaddr = Ipv4Addr::from(u32::from_be(
                         rtattr.get_payload_as::&lt;u32&gt;().map_err(|<span class="kw">_</span>| {
                             Error::StrategyError(String::from(
-                                <span class="string">&quot;An error occurred retrieving Netlink&#39;s route payload attribute&quot;</span>,
+                                <span class="string">"An error occurred retrieving Netlink's route payload attribute"</span>,
                             ))
                         })<span class="question-mark">?</span>,
                     ));
@@ -886,7 +887,7 @@
                     <span class="kw">let </span>rtlocal = Ipv6Addr::from(u128::from_be(
                         rtattr.get_payload_as::&lt;u128&gt;().map_err(|<span class="kw">_</span>| {
                             Error::StrategyError(String::from(
-                                <span class="string">&quot;An error occurred retrieving Netlink&#39;s route payload attribute&quot;</span>,
+                                <span class="string">"An error occurred retrieving Netlink's route payload attribute"</span>,
                             ))
                         })<span class="question-mark">?</span>,
                     ));
@@ -895,7 +896,7 @@
                     <span class="kw">let </span>rtlocal = Ipv4Addr::from(u32::from_be(
                         rtattr.get_payload_as::&lt;u32&gt;().map_err(|<span class="kw">_</span>| {
                             Error::StrategyError(String::from(
-                                <span class="string">&quot;An error occurred retrieving Netlink&#39;s route payload attribute&quot;</span>,
+                                <span class="string">"An error occurred retrieving Netlink's route payload attribute"</span>,
                             ))
                         })<span class="question-mark">?</span>,
                     ));
@@ -917,13 +918,13 @@
 }
 
 <span class="doccomment">/// Parse network interface name of slice type to string type.
-/// If the slice is suffixed with &#39;\0&#39;, this suffix will be removed when parsing.
+/// If the slice is suffixed with '\0', this suffix will be removed when parsing.
 </span><span class="kw">fn </span>parse_ifname(bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;String, Error&gt; {
     <span class="kw">let </span>ifname = <span class="kw">if </span>bytes.ends_with(<span class="kw-2">&amp;</span>[<span class="number">0u8</span>]) {
         CStr::from_bytes_with_nul(bytes)
             .map_err(|err| {
                 Error::StrategyError(<span class="macro">format!</span>(
-                    <span class="string">&quot;An error occurred converting interface name to string: {err}&quot;</span>,
+                    <span class="string">"An error occurred converting interface name to string: {err}"</span>,
                 ))
             })<span class="question-mark">?
             </span>.to_string_lossy()
@@ -941,7 +942,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>parse_ifname_without_nul() {
-        <span class="kw">let </span>expected = <span class="string">&quot;hello, world&quot;</span>;
+        <span class="kw">let </span>expected = <span class="string">"hello, world"</span>;
         <span class="kw">let </span>bytes = [<span class="number">104</span>, <span class="number">101</span>, <span class="number">108</span>, <span class="number">108</span>, <span class="number">111</span>, <span class="number">44</span>, <span class="number">32</span>, <span class="number">119</span>, <span class="number">111</span>, <span class="number">114</span>, <span class="number">108</span>, <span class="number">100</span>];
         <span class="kw">let </span>res = parse_ifname(<span class="kw-2">&amp;</span>bytes);
         <span class="macro">assert!</span>(res.is_ok());
@@ -950,7 +951,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>parse_ifname_with_nul() {
-        <span class="kw">let </span>expected = <span class="string">&quot;hello, world&quot;</span>;
+        <span class="kw">let </span>expected = <span class="string">"hello, world"</span>;
         <span class="kw">let </span>bytes = [<span class="number">104</span>, <span class="number">101</span>, <span class="number">108</span>, <span class="number">108</span>, <span class="number">111</span>, <span class="number">44</span>, <span class="number">32</span>, <span class="number">119</span>, <span class="number">111</span>, <span class="number">114</span>, <span class="number">108</span>, <span class="number">100</span>, <span class="number">0</span>];
         <span class="kw">let </span>res = parse_ifname(<span class="kw-2">&amp;</span>bytes);
         <span class="macro">assert!</span>(res.is_ok());
@@ -959,7 +960,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>parse_ifname_only_nul() {
-        <span class="kw">let </span>expected = <span class="string">&quot;&quot;</span>;
+        <span class="kw">let </span>expected = <span class="string">""</span>;
         <span class="kw">let </span>bytes = [<span class="number">0u8</span>];
         <span class="kw">let </span>res = parse_ifname(<span class="kw-2">&amp;</span>bytes);
         <span class="macro">assert!</span>(res.is_ok());

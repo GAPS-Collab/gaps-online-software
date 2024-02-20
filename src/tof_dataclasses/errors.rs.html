@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/errors.rs`."><title>errors.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/errors.rs`."><title>errors.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -310,6 +311,36 @@
 <a href="#310" id="310">310</a>
 <a href="#311" id="311">311</a>
 <a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
+<a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
+<a href="#323" id="323">323</a>
+<a href="#324" id="324">324</a>
+<a href="#325" id="325">325</a>
+<a href="#326" id="326">326</a>
+<a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
+<a href="#329" id="329">329</a>
+<a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
+<a href="#333" id="333">333</a>
+<a href="#334" id="334">334</a>
+<a href="#335" id="335">335</a>
+<a href="#336" id="336">336</a>
+<a href="#337" id="337">337</a>
+<a href="#338" id="338">338</a>
+<a href="#339" id="339">339</a>
+<a href="#340" id="340">340</a>
+<a href="#341" id="341">341</a>
+<a href="#342" id="342">342</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Specific error types
 //!
 //!
@@ -330,8 +361,8 @@
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>PacketError {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
     <span class="kw">let </span>disp = serde_json::to_string(<span class="self">self</span>).unwrap_or(
-      String::from(<span class="string">&quot;Error: cannot unwrap this SensorError&quot;</span>));
-    <span class="macro">write!</span>(f, <span class="string">&quot;&lt;PacketError : {}&gt;&quot;</span>, disp)
+      String::from(<span class="string">"Error: cannot unwrap this SensorError"</span>));
+    <span class="macro">write!</span>(f, <span class="string">"&lt;PacketError : {}&gt;"</span>, disp)
   }
 }
 
@@ -349,8 +380,8 @@
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>SensorError {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
     <span class="kw">let </span>disp = serde_json::to_string(<span class="self">self</span>).unwrap_or(
-      String::from(<span class="string">&quot;Error: cannot unwrap this SensorError&quot;</span>));
-    <span class="macro">write!</span>(f, <span class="string">&quot;&lt;ReadoutError : {}&gt;&quot;</span>, disp)
+      String::from(<span class="string">"Error: cannot unwrap this SensorError"</span>));
+    <span class="macro">write!</span>(f, <span class="string">"&lt;ReadoutError : {}&gt;"</span>, disp)
   }
 }
 
@@ -363,14 +394,15 @@
 #[repr(u8)]
 </span><span class="kw">pub enum </span>CalibrationError {
   EmptyInputData,
-  CanNotConnectToMyOwnZMQSocket  
+  CanNotConnectToMyOwnZMQSocket,
+  CalibrationFailed
 }
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>CalibrationError {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
     <span class="kw">let </span>disp = serde_json::to_string(<span class="self">self</span>).unwrap_or(
-      String::from(<span class="string">&quot;Error: cannot unwrap this CalibrationError&quot;</span>));
-    <span class="macro">write!</span>(f, <span class="string">&quot;&lt;CalibrationError : {}&gt;&quot;</span>, disp)
+      String::from(<span class="string">"Error: cannot unwrap this CalibrationError"</span>));
+    <span class="macro">write!</span>(f, <span class="string">"&lt;CalibrationError : {}&gt;"</span>, disp)
   }
 }
 
@@ -389,8 +421,8 @@
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>RunError {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
     <span class="kw">let </span>disp = serde_json::to_string(<span class="self">self</span>).unwrap_or(
-      String::from(<span class="string">&quot;Error: cannot unwrap this RunError&quot;</span>));
-    <span class="macro">write!</span>(f, <span class="string">&quot;&lt;RunError : {}&gt;&quot;</span>, disp)
+      String::from(<span class="string">"Error: cannot unwrap this RunError"</span>));
+    <span class="macro">write!</span>(f, <span class="string">"&lt;RunError : {}&gt;"</span>, disp)
   }
 }
 
@@ -408,8 +440,8 @@
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>EventError {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
     <span class="kw">let </span>disp = serde_json::to_string(<span class="self">self</span>).unwrap_or(
-      String::from(<span class="string">&quot;Error: cannot unwrap this EventError&quot;</span>));
-    <span class="macro">write!</span>(f, <span class="string">&quot;&lt;EventError : {}&gt;&quot;</span>, disp)
+      String::from(<span class="string">"Error: cannot unwrap this EventError"</span>));
+    <span class="macro">write!</span>(f, <span class="string">"&lt;EventError : {}&gt;"</span>, disp)
   }
 }
 
@@ -440,8 +472,8 @@
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>SerializationError {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
     <span class="kw">let </span>disp = serde_json::to_string(<span class="self">self</span>).unwrap_or(
-      String::from(<span class="string">&quot;Error: cannot unwrap this SerializationError&quot;</span>));
-    <span class="macro">write!</span>(f, <span class="string">&quot;&lt;Serialization Error : {}&gt;&quot;</span>, disp)
+      String::from(<span class="string">"Error: cannot unwrap this SerializationError"</span>));
+    <span class="macro">write!</span>(f, <span class="string">"&lt;Serialization Error : {}&gt;"</span>, disp)
   }
 }
 
@@ -461,8 +493,8 @@
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>DecodingError {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
     <span class="kw">let </span>disp = serde_json::to_string(<span class="self">self</span>).unwrap_or(
-      String::from(<span class="string">&quot;Error: cannot unwrap this DecodingError&quot;</span>));
-    <span class="macro">write!</span>(f, <span class="string">&quot;&lt;DecodingError Error : {}&gt;&quot;</span>, disp)
+      String::from(<span class="string">"Error: cannot unwrap this DecodingError"</span>));
+    <span class="macro">write!</span>(f, <span class="string">"&lt;DecodingError Error : {}&gt;"</span>, disp)
   }
 }
 
@@ -473,13 +505,15 @@
 
 </span><span class="doccomment">/// Error to be used for issues with 
 /// the communication to the MTB.
-</span><span class="attr">#[derive(Debug, Copy, Clone, serde::Deserialize, serde::Serialize)]
+</span><span class="attr">#[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 #[repr(u8)]
 </span><span class="kw">pub enum </span>MasterTriggerError {
+  Unknown,
   QueueEmpty,
   MaskTooLarge,
   BrokenPackage,
   DAQNotAvailable,
+  PackageFormatIncorrect,
   PackageHeaderIncorrect,
   PackageFooterIncorrect,
   FailedOperation,
@@ -489,8 +523,8 @@
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>MasterTriggerError {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
     <span class="kw">let </span>disp = serde_json::to_string(<span class="self">self</span>).unwrap_or(
-      String::from(<span class="string">&quot;Error: cannot unwrap this MasterTriggerError&quot;</span>));
-    <span class="macro">write!</span>(f, <span class="string">&quot;&lt;MasterTriggerError : {}&gt;&quot;</span>, disp)
+      String::from(<span class="string">"Error: cannot unwrap this MasterTriggerError"</span>));
+    <span class="macro">write!</span>(f, <span class="string">"&lt;MasterTriggerError : {}&gt;"</span>, disp)
   }
 }
 
@@ -500,7 +534,7 @@
 <span class="comment">// Implement the From trait to convert from Box&lt;dyn StdError&gt;
 </span><span class="kw">impl </span>From&lt;Box&lt;<span class="kw">dyn </span>std::error::Error&gt;&gt; <span class="kw">for </span>MasterTriggerError {
   <span class="kw">fn </span>from(err: Box&lt;<span class="kw">dyn </span>std::error::Error&gt;) -&gt; <span class="self">Self </span>{
-    <span class="macro">error!</span>(<span class="string">&quot;Converting {err} to MasterTriggerError! Exact error type might be incorrect!&quot;</span>);
+    <span class="macro">error!</span>(<span class="string">"Converting {err} to MasterTriggerError! Exact error type might be incorrect!"</span>);
     MasterTriggerError::FailedOperation
   }
 }
@@ -524,8 +558,8 @@
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>WaveformError {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
     <span class="kw">let </span>disp = serde_json::to_string(<span class="self">self</span>).unwrap_or(
-      String::from(<span class="string">&quot;Error: cannot unwrap this WaveformError&quot;</span>));
-    <span class="macro">write!</span>(f, <span class="string">&quot;&lt;WaveformError: {}&gt;&quot;</span>, disp)
+      String::from(<span class="string">"Error: cannot unwrap this WaveformError"</span>));
+    <span class="macro">write!</span>(f, <span class="string">"&lt;WaveformError: {}&gt;"</span>, disp)
   }
 }
 
@@ -542,18 +576,18 @@
 /// sending UDP packets with a header.
 /// This is used by the MTB to send its
 /// packets over UDP
-</span><span class="comment">// TODO Isnt it too overkill to have an enum for this?
-</span><span class="attr">#[derive(Debug, Copy, Clone, serde::Deserialize, serde::Serialize)]
+</span><span class="attr">#[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 #[repr(u8)]
 </span><span class="kw">pub enum </span>IPBusError {
   DecodingFailed,
+  InvalidTransactionID,
 }
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>IPBusError {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
     <span class="kw">let </span>disp = serde_json::to_string(<span class="self">self</span>).unwrap_or(
-      String::from(<span class="string">&quot;Error: cannot unwrap this IPBusError&quot;</span>));
-    <span class="macro">write!</span>(f, <span class="string">&quot;&lt;IPBusError Error : {}&gt;&quot;</span>, disp)
+      String::from(<span class="string">"Error: cannot unwrap this IPBusError"</span>));
+    <span class="macro">write!</span>(f, <span class="string">"&lt;IPBusError Error : {}&gt;"</span>, disp)
   }
 }
 
@@ -562,9 +596,6 @@
 
 <span class="comment">////////////////////////////////////////
 
-</span><span class="doccomment">/// Errors when converting events to PaddlePackets
-/// or more general, when doing any kind of analysis
-///
 </span><span class="attr">#[derive(Debug,Copy,Clone, serde::Deserialize, serde::Serialize)]
 #[repr(u8)]
 </span><span class="kw">pub enum </span>AnalysisError {
@@ -575,8 +606,8 @@
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>AnalysisError {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
     <span class="kw">let </span>disp = serde_json::to_string(<span class="self">self</span>).unwrap_or(
-      String::from(<span class="string">&quot;Error: cannot unwrap this AnalysisError&quot;</span>));
-    <span class="macro">write!</span>(f, <span class="string">&quot;&lt;AnalysisError : {}&gt;&quot;</span>, disp)
+      String::from(<span class="string">"Error: cannot unwrap this AnalysisError"</span>));
+    <span class="macro">write!</span>(f, <span class="string">"&lt;AnalysisError : {}&gt;"</span>, disp)
   }
 }
 
@@ -595,8 +626,8 @@
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>UserError {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
     <span class="kw">let </span>disp = serde_json::to_string(<span class="self">self</span>).unwrap_or(
-      String::from(<span class="string">&quot;Error: cannot unwrap this UserError&quot;</span>));
-    <span class="macro">write!</span>(f, <span class="string">&quot;&lt;UserError : {}&gt;&quot;</span>, disp)
+      String::from(<span class="string">"Error: cannot unwrap this UserError"</span>));
+    <span class="macro">write!</span>(f, <span class="string">"&lt;UserError : {}&gt;"</span>, disp)
   }
 }
 
@@ -615,11 +646,41 @@
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>SetError {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
     <span class="kw">let </span>disp = serde_json::to_string(<span class="self">self</span>).unwrap_or(
-      String::from(<span class="string">&quot;Error: cannot unwrap this SetError&quot;</span>));
-    <span class="macro">write!</span>(f, <span class="string">&quot;&lt;SetError : {}&gt;&quot;</span>, disp)
+      String::from(<span class="string">"Error: cannot unwrap this SetError"</span>));
+    <span class="macro">write!</span>(f, <span class="string">"&lt;SetError : {}&gt;"</span>, disp)
   }
 }
 
 <span class="kw">impl </span>Error <span class="kw">for </span>SetError {
+}
+
+<span class="comment">////////////////////////////////////////
+
+</span><span class="attr">#[derive(Debug, Copy, Clone, serde::Deserialize, serde::Serialize)]
+#[repr(u8)]
+</span><span class="kw">pub enum </span>CmdError {
+  UnknownError,
+  ListenError,
+  PingError,
+  MoniError,
+  SystemdRebootError,
+  PowerError,
+  CalibrationError,
+  ThresholdSetError,
+  PreampBiasSetError,
+  RunStopError,
+  RunStartError,
+  NotImplementedError
+}
+
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>CmdError {
+  <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+    <span class="kw">let </span>disp = serde_json::to_string(<span class="self">self</span>).unwrap_or(
+      String::from(<span class="string">"Error: cannot unwrap this CmdError"</span>));
+    <span class="macro">write!</span>(f, <span class="string">"&lt;CmdError : {}&gt;"</span>, disp)
+  }
+}
+
+<span class="kw">impl </span>Error <span class="kw">for </span>CmdError {
 }
 </code></pre></div></section></main></body></html>

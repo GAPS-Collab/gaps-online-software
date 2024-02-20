@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-tui/src/tabs/tab_status.rs`."><title>tab_status.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="liftof_tui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-tui/src/tabs/tab_status.rs`."><title>tab_status.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="liftof_tui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -834,7 +835,7 @@
 }
 
 <span class="attr">#[derive(Debug, Clone)]
-</span><span class="kw">pub struct </span>RBTab&lt;<span class="lifetime">&#39;a</span>&gt;  {
+</span><span class="kw">pub struct </span>RBTab&lt;<span class="lifetime">'a</span>&gt;  {
   <span class="kw">pub </span>tp_receiver    : Receiver&lt;TofPacket&gt;,
   <span class="kw">pub </span>rb_receiver    : Receiver&lt;RBEvent&gt;,
   <span class="kw">pub </span>rb_selector    : u8,
@@ -873,18 +874,18 @@
 
   <span class="comment">// list for the rb selector
   </span><span class="kw">pub </span>rbl_state      : ListState,
-  <span class="kw">pub </span>rbl_items      : Vec::&lt;ListItem&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+  <span class="kw">pub </span>rbl_items      : Vec::&lt;ListItem&lt;<span class="lifetime">'a</span>&gt;&gt;,
   <span class="kw">pub </span>rbl_active     : bool,
 }
 
-<span class="kw">impl </span>RBTab&lt;<span class="lifetime">&#39;_</span>&gt;  {
+<span class="kw">impl </span>RBTab&lt;<span class="lifetime">'_</span>&gt;  {
 
   <span class="kw">pub fn </span>new(tp_receiver : Receiver&lt;TofPacket&gt;,
              rb_receiver : Receiver&lt;RBEvent&gt;,
-             theme       : ColorTheme2) -&gt; RBTab&lt;<span class="lifetime">&#39;static</span>&gt;  {
+             theme       : ColorTheme2) -&gt; RBTab&lt;<span class="lifetime">'static</span>&gt;  {
     <span class="kw">let </span><span class="kw-2">mut </span>rb_select_items = Vec::&lt;ListItem&gt;::new();
     <span class="kw">for </span>k <span class="kw">in </span><span class="number">1</span>..<span class="number">51 </span>{
-      <span class="kw">let </span>this_item = <span class="macro">format!</span>(<span class="string">&quot;RB{:0&gt;2}&quot;</span>, k);
+      <span class="kw">let </span>this_item = <span class="macro">format!</span>(<span class="string">"RB{:0&gt;2}"</span>, k);
       rb_select_items.push(ListItem::new(Line::from(this_item)));
     }
 
@@ -960,10 +961,10 @@
           <span class="self">self</span>.cali_loaded = <span class="bool-val">false</span>;
         }, 
         <span class="prelude-val">Some</span>(_rb_id) =&gt; {
-          <span class="kw">let </span>cali_path = <span class="macro">format!</span>(<span class="string">&quot;calibrations/rb_{:02}.cali.tof.gaps&quot;</span>, _rb_id + <span class="number">1</span>);
+          <span class="kw">let </span>cali_path = <span class="macro">format!</span>(<span class="string">"calibrations/rb_{:02}.cali.tof.gaps"</span>, _rb_id + <span class="number">1</span>);
           <span class="kw">if </span>fs::metadata(cali_path.clone()).is_ok() {
             <span class="kw">match </span>RBCalibrations::from_file(cali_path.clone()) {
-              <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Unable to load RBCalibration from file {}! {err}&quot;</span>, cali_path),
+              <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to load RBCalibration from file {}! {err}"</span>, cali_path),
               <span class="prelude-val">Ok</span>(cali) =&gt; {
                 <span class="self">self</span>.rb_calibration = cali;
                 <span class="self">self</span>.cali_loaded    = <span class="bool-val">true</span>;
@@ -988,10 +989,10 @@
       <span class="kw">match </span><span class="self">self</span>.tp_receiver.try_recv() {
         <span class="prelude-val">Err</span>(_err) =&gt; (),
         <span class="prelude-val">Ok</span>(pack)    =&gt; {
-          <span class="macro">debug!</span>(<span class="string">&quot;Got next packet {}!&quot;</span>, pack);
+          <span class="macro">debug!</span>(<span class="string">"Got next packet {}!"</span>, pack);
           <span class="kw">match </span>pack.packet_type {
             PacketType::RBMoni   =&gt; {
-              <span class="macro">trace!</span>(<span class="string">&quot;Got new RBMoniData!&quot;</span>);
+              <span class="macro">trace!</span>(<span class="string">"Got new RBMoniData!"</span>);
               <span class="kw">let </span>moni = RBMoniData::from_bytestream(<span class="kw-2">&amp;</span>pack.payload, <span class="kw-2">&amp;mut </span><span class="number">0</span>)<span class="question-mark">?</span>;
               <span class="self">self</span>.n_moni += <span class="number">1</span>;
               <span class="kw">if </span>moni.board_id == <span class="self">self</span>.rb_selector {
@@ -1040,11 +1041,11 @@
             },
             PacketType::RBEventMemoryView =&gt; {
               <span class="kw">let </span><span class="kw-2">mut </span>streamer = RBEventMemoryStreamer::new();
-              <span class="comment">//println!(&quot;{:?}&quot;,&amp;pack.payload[0..10]);
+              <span class="comment">//println!("{:?}",&amp;pack.payload[0..10]);
               </span>streamer.add(<span class="kw-2">&amp;</span>pack.payload, pack.payload.len());
               <span class="kw">match </span>streamer.get_event_at_pos_unchecked(<span class="prelude-val">None</span>) {
                 <span class="prelude-val">None </span>=&gt; {
-                  <span class="macro">error!</span>(<span class="string">&quot;Not able to obtain RBEvent from RBEventMemoryView packet!&quot;</span>);
+                  <span class="macro">error!</span>(<span class="string">"Not able to obtain RBEvent from RBEventMemoryView packet!"</span>);
                   <span class="kw">return </span><span class="prelude-val">Ok</span>(());
                 }
                 <span class="prelude-val">Some</span>(_ev) =&gt; {
@@ -1077,7 +1078,7 @@
             <span class="kw">let </span>vals = (k <span class="kw">as </span>f64, ev.adc[ch <span class="kw">as </span>usize][k] <span class="kw">as </span>f64);
             <span class="self">self</span>.ch_data[ch <span class="kw">as </span>usize][k] = vals;
           }
-          <span class="comment">//println!(&quot;{:?}&quot;, self.ch_data[ch as usize]);
+          <span class="comment">//println!("{:?}", self.ch_data[ch as usize]);
         </span>}
       }
 
@@ -1146,7 +1147,7 @@
               [Constraint::Percentage(<span class="number">20</span>), Constraint::Percentage(<span class="number">80</span>)].as_ref(),
           )
           .split(<span class="kw-2">*</span>main_window);
-        <span class="kw">let </span>par_title_string = String::from(<span class="string">&quot;Select ReadoutBoard (RB)&quot;</span>);
+        <span class="kw">let </span>par_title_string = String::from(<span class="string">"Select ReadoutBoard (RB)"</span>);
         <span class="kw">let </span>(first, rest) = par_title_string.split_at(<span class="number">1</span>);
         <span class="kw">let </span>par_title = Line::from(<span class="macro">vec!</span>[
           Span::styled(
@@ -1164,7 +1165,7 @@
           .border_type(BorderType::Plain);
         <span class="kw">let </span>rb_select_list = List::new(<span class="self">self</span>.rbl_items.clone()).block(rbs)
           .highlight_style(<span class="self">self</span>.theme.highlight().add_modifier(Modifier::BOLD))
-          .highlight_symbol(<span class="string">&quot;&gt;&gt;&quot;</span>)
+          .highlight_symbol(<span class="string">"&gt;&gt;"</span>)
           .repeat_highlight_symbol(<span class="bool-val">true</span>);
         <span class="kw">match </span><span class="self">self</span>.rbl_state.selected() {
           <span class="prelude-val">None    </span>=&gt; {
@@ -1236,7 +1237,7 @@
         ch_chunks.append(<span class="kw-2">&amp;mut </span>ch_chunks_2);
         <span class="comment">// the waveform plots
         </span><span class="kw">for </span>ch <span class="kw">in </span><span class="number">0</span>..<span class="number">9 </span>{
-          <span class="kw">let </span>label          = <span class="macro">format!</span>(<span class="string">&quot;Ch{}&quot;</span>, ch);
+          <span class="kw">let </span>label          = <span class="macro">format!</span>(<span class="string">"Ch{}"</span>, ch);
           <span class="kw">let </span>ch_tc_theme    = <span class="self">self</span>.theme.clone();
           <span class="kw">let </span><span class="kw-2">mut </span>ch_ts_data = VecDeque::from(<span class="self">self</span>.ch_data[ch].clone());
           <span class="kw">let </span>ch_ts = timeseries(<span class="kw-2">&amp;mut </span>ch_ts_data,
@@ -1261,7 +1262,7 @@
             view_string = event.to_string();
           }, 
           <span class="prelude-val">None </span>=&gt; {
-            view_string = String::from(<span class="string">&quot;EVT QUEUE EMPTY!&quot;</span>);
+            view_string = String::from(<span class="string">"EVT QUEUE EMPTY!"</span>);
           }
         }
         <span class="kw">let </span>event_view = Paragraph::new(view_string)
@@ -1272,7 +1273,7 @@
           Block::default()
             .borders(Borders::ALL)
             .style(<span class="self">self</span>.theme.style())
-            .title(<span class="string">&quot;Last RBEvent&quot;</span>)
+            .title(<span class="string">"Last RBEvent"</span>)
             .border_type(BorderType::Rounded),
         );
         frame.render_widget(event_view, detail_and_ch9_chunks[<span class="number">1</span>]);
@@ -1325,7 +1326,7 @@
             view_string = _moni.to_string();
           }, 
           <span class="prelude-val">None </span>=&gt; {
-            view_string = String::from(<span class="string">&quot;MONI QUEUE EMPTY!&quot;</span>);
+            view_string = String::from(<span class="string">"MONI QUEUE EMPTY!"</span>);
           }
         }
         
@@ -1337,13 +1338,13 @@
           Block::default()
             .borders(Borders::ALL)
             .style(<span class="self">self</span>.theme.style())
-            .title(<span class="string">&quot;Last RBMoniData&quot;</span>)
+            .title(<span class="string">"Last RBMoniData"</span>)
             .border_type(BorderType::Rounded),
         );
         frame.render_widget(moni_view, columns[<span class="number">0</span>]);
        
-        <span class="kw">let </span>fpga_ds_name   = String::from(<span class="string">&quot;FPGA T&quot;</span>);
-        <span class="kw">let </span>fpga_ds_title  = String::from(<span class="string">&quot;FPGA T [\u{00B0}C] &quot;</span>);
+        <span class="kw">let </span>fpga_ds_name   = String::from(<span class="string">"FPGA T"</span>);
+        <span class="kw">let </span>fpga_ds_title  = String::from(<span class="string">"FPGA T [\u{00B0}C] "</span>);
         <span class="kw">let </span>fpga_tc_theme  = <span class="self">self</span>.theme.clone();
         <span class="kw">let </span>fpga_tc = timeseries(<span class="kw-2">&amp;mut </span><span class="self">self</span>.fpgatmp_queue,
                                  fpga_ds_name,
@@ -1351,8 +1352,8 @@
                                  <span class="kw-2">&amp;</span>fpga_tc_theme  );
         frame.render_widget(fpga_tc, col1[<span class="number">0</span>]);
         
-        <span class="kw">let </span>humi_ds_name   = String::from(<span class="string">&quot;Humidity %&quot;</span>);
-        <span class="kw">let </span>humi_ds_title  = String::from(<span class="string">&quot;Humidity %&quot;</span>);
+        <span class="kw">let </span>humi_ds_name   = String::from(<span class="string">"Humidity %"</span>);
+        <span class="kw">let </span>humi_ds_title  = String::from(<span class="string">"Humidity %"</span>);
         <span class="kw">let </span>humi_tc_theme  = <span class="self">self</span>.theme.clone();
         <span class="kw">let </span>humi_tc = timeseries(<span class="kw-2">&amp;mut </span><span class="self">self</span>.humidity,
                                  humi_ds_name,
@@ -1360,8 +1361,8 @@
                                  <span class="kw-2">&amp;</span>humi_tc_theme);
         frame.render_widget(humi_tc, col2[<span class="number">0</span>]);
         
-        <span class="kw">let </span>pres_ds_name   = String::from(<span class="string">&quot;Pressure [hPa]&quot;</span>);
-        <span class="kw">let </span>pres_ds_title  = String::from(<span class="string">&quot;Pressure [hPa]&quot;</span>);
+        <span class="kw">let </span>pres_ds_name   = String::from(<span class="string">"Pressure [hPa]"</span>);
+        <span class="kw">let </span>pres_ds_title  = String::from(<span class="string">"Pressure [hPa]"</span>);
         <span class="kw">let </span>pres_tc_theme  = <span class="self">self</span>.theme.clone();
         <span class="kw">let </span>pres_tc = timeseries(<span class="kw-2">&amp;mut </span><span class="self">self</span>.pressure,
                                  pres_ds_name,
@@ -1369,8 +1370,8 @@
                                  <span class="kw-2">&amp;</span>pres_tc_theme);
         frame.render_widget(pres_tc, col2[<span class="number">1</span>]);
         
-        <span class="kw">let </span>mag_ds_x_name   = String::from(<span class="string">&quot;Magnetic x [G]&quot;</span>);
-        <span class="kw">let </span>mag_ds_x_title  = String::from(<span class="string">&quot;Magnetic x [G}&quot;</span>);
+        <span class="kw">let </span>mag_ds_x_name   = String::from(<span class="string">"Magnetic x [G]"</span>);
+        <span class="kw">let </span>mag_ds_x_title  = String::from(<span class="string">"Magnetic x [G}"</span>);
         <span class="kw">let </span>mag_tc_x_theme  = <span class="self">self</span>.theme.clone();
         <span class="kw">let </span>mag_tc_x = timeseries(<span class="kw-2">&amp;mut </span><span class="self">self</span>.mag_x,
                                   mag_ds_x_name,
@@ -1378,8 +1379,8 @@
                                   <span class="kw-2">&amp;</span>mag_tc_x_theme);
         frame.render_widget(mag_tc_x, col3[<span class="number">0</span>]);
         
-        <span class="kw">let </span>mag_ds_y_name   = String::from(<span class="string">&quot;Magnetic y [G]&quot;</span>);
-        <span class="kw">let </span>mag_ds_y_title  = String::from(<span class="string">&quot;Magnetic y [G}&quot;</span>);
+        <span class="kw">let </span>mag_ds_y_name   = String::from(<span class="string">"Magnetic y [G]"</span>);
+        <span class="kw">let </span>mag_ds_y_title  = String::from(<span class="string">"Magnetic y [G}"</span>);
         <span class="kw">let </span>mag_tc_y_theme  = <span class="self">self</span>.theme.clone();
         <span class="kw">let </span>mag_tc_y = timeseries(<span class="kw-2">&amp;mut </span><span class="self">self</span>.mag_y,
                                   mag_ds_y_name,
@@ -1387,8 +1388,8 @@
                                   <span class="kw-2">&amp;</span>mag_tc_y_theme);
         frame.render_widget(mag_tc_y, col3[<span class="number">1</span>]);
         
-        <span class="kw">let </span>mag_ds_z_name   = String::from(<span class="string">&quot;Magnetic z [G]&quot;</span>);
-        <span class="kw">let </span>mag_ds_z_title  = String::from(<span class="string">&quot;Magnetic z [G}&quot;</span>);
+        <span class="kw">let </span>mag_ds_z_name   = String::from(<span class="string">"Magnetic z [G]"</span>);
+        <span class="kw">let </span>mag_ds_z_title  = String::from(<span class="string">"Magnetic z [G}"</span>);
         <span class="kw">let </span>mag_tc_z_theme  = <span class="self">self</span>.theme.clone();
         <span class="kw">let </span>mag_tc_z = timeseries(<span class="kw-2">&amp;mut </span><span class="self">self</span>.mag_z,
                                   mag_ds_z_name,
@@ -1396,8 +1397,8 @@
                                   <span class="kw-2">&amp;</span>mag_tc_z_theme);
         frame.render_widget(mag_tc_z, col3[<span class="number">2</span>]);
         
-        <span class="kw">let </span>mag_ds_tot_name   = String::from(<span class="string">&quot;Magnetic TOT [G]&quot;</span>);
-        <span class="kw">let </span>mag_ds_tot_title  = String::from(<span class="string">&quot;Magnetic TOT [G}&quot;</span>);
+        <span class="kw">let </span>mag_ds_tot_name   = String::from(<span class="string">"Magnetic TOT [G]"</span>);
+        <span class="kw">let </span>mag_ds_tot_title  = String::from(<span class="string">"Magnetic TOT [G}"</span>);
         <span class="kw">let </span>mag_tc_tot_theme  = <span class="self">self</span>.theme.clone();
         <span class="kw">let </span>mag_tc_tot = timeseries(<span class="kw-2">&amp;mut </span><span class="self">self</span>.mag_tot,
                                      mag_ds_tot_name,
@@ -1413,10 +1414,10 @@
               [Constraint::Percentage(<span class="number">30</span>), Constraint::Percentage(<span class="number">70</span>)].as_ref(),
           )
           .split(<span class="kw-2">*</span>main_window);
-        <span class="kw">let </span>view_info = <span class="macro">format!</span>(<span class="string">&quot;Summary Statistics:
+        <span class="kw">let </span>view_info = <span class="macro">format!</span>(<span class="string">"Summary Statistics:
            N_Events                         : {}
            N_Moni                           : {}
-           N EventID Missed                 : {}&quot;</span>,
+           N EventID Missed                 : {}"</span>,
                               <span class="self">self</span>.n_events,
                               <span class="self">self</span>.n_moni,
                               <span class="self">self</span>.miss_evid);
@@ -1427,7 +1428,7 @@
           Block::default()
             .borders(Borders::ALL)
             .style(<span class="self">self</span>.theme.style())
-            .title(<span class="string">&quot;Overview&quot;</span>)
+            .title(<span class="string">"Overview"</span>)
             .border_type(BorderType::Rounded),
         );
 
@@ -1439,28 +1440,28 @@
 }
 
 <span class="comment">//#[derive(Debug, Clone)]
-//pub struct StatusTab&lt;&#39;a&gt; {
+//pub struct StatusTab&lt;'a&gt; {
 //
-//  pub detail       : Paragraph&lt;&#39;a&gt;,
+//  pub detail       : Paragraph&lt;'a&gt;,
 //  rb_list          : Vec::&lt;ReadoutBoard&gt;,
-//  pub list_widget  : List&lt;&#39;a&gt;,
+//  pub list_widget  : List&lt;'a&gt;,
 //  pub list_rect    : Rect,
 //  pub detail_rect  : Rect,
 //  pub ch_rect      : Vec&lt;Rect&gt;,
 //  pub ch9_rect     : Rect,
 //  //message_queue    : VecDeque&lt;String&gt;, 
 //  //rb_list_state    : ListState,
-//  //pub ch_datasets  : Vec&lt;Dataset&lt;&#39;a&gt;&gt;,
-//  //pub ch_charts    : Vec&lt;Chart&lt;&#39;a&gt;&gt;
+//  //pub ch_datasets  : Vec&lt;Dataset&lt;'a&gt;&gt;,
+//  //pub ch_charts    : Vec&lt;Chart&lt;'a&gt;&gt;
 //}
 //
-//impl StatusTab&lt;&#39;_&gt; {
+//impl StatusTab&lt;'_&gt; {
 //
 //
-//  pub fn new&lt;&#39;a&gt; (main_window   : Rect,
+//  pub fn new&lt;'a&gt; (main_window   : Rect,
 //                  rb_list       : &amp;Vec&lt;ReadoutBoard&gt;,
 //                  rb_list_state : ListState)
-//    -&gt; StatusTab&lt;&#39;a&gt; {
+//    -&gt; StatusTab&lt;'a&gt; {
 //    let empty_data = vec![(0.0,0.0);1024]; 
 //    let data = vec![empty_data;9];
 //    //let data     = Vec::&lt;Vec&lt;(f64,f64)&gt;&gt;::new();
@@ -1518,7 +1519,7 @@
 //      .iter()
 //      .map(|rb| {
 //        ListItem::new(Line::from(vec![Span::styled(
-//          &quot;RB &quot;.to_owned() + &amp;rb.rb_id.to_string(),
+//          "RB ".to_owned() + &amp;rb.rb_id.to_string(),
 //          Style::default(),
 //        )]))
 //      })
@@ -1528,14 +1529,14 @@
 //    // .get(
 //    //   rb_list_state
 //    //     .selected()
-//    //     .expect(&quot;there is always a selected pet&quot;),
+//    //     .expect("there is always a selected pet"),
 //    // )
-//    // .expect(&quot;exists&quot;)
+//    // .expect("exists")
 //     .clone();
 //    let rbs = Block::default()
 //    .borders(Borders::ALL)
 //    .style(Style::default().fg(Color::White))
-//    .title(&quot;ReadoutBoards&quot;)
+//    .title("ReadoutBoards")
 //    .border_type(BorderType::Plain);
 //
 //    let list = List::new(items).block(rbs).highlight_style(
@@ -1554,7 +1555,7 @@
 //       Block::default()
 //         .borders(Borders::ALL)
 //         .style(Style::default().fg(Color::White))
-//         .title(&quot;Detail&quot;)
+//         .title("Detail")
 //         .border_type(BorderType::Double),
 //    );
 //    let mut st = StatusTab {

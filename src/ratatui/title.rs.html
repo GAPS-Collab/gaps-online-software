@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.25.0/src/widgets/../title.rs`."><title>title.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.25.0/src/widgets/../title.rs`."><title>title.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><a class="sub-logo-container" href="../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -155,21 +156,21 @@
 /// ```
 /// use ratatui::widgets::block::Title;
 ///
-/// Title::from(&quot;Title&quot;);
+/// Title::from("Title");
 /// ```
 ///
 /// Blue title on a white background (via [`Stylize`](crate::style::Stylize) trait).
 /// ```
 /// use ratatui::{prelude::*, widgets::block::*};
 ///
-/// Title::from(&quot;Title&quot;.blue().on_white());
+/// Title::from("Title".blue().on_white());
 /// ```
 ///
 /// Title with multiple styles (see [`Line`] and [`Stylize`](crate::style::Stylize)).
 /// ```
 /// use ratatui::{prelude::*, widgets::block::*};
 ///
-/// Title::from(Line::from(vec![&quot;Q&quot;.white().underlined(), &quot;uit&quot;.gray()]));
+/// Title::from(Line::from(vec!["Q".white().underlined(), "uit".gray()]));
 /// ```
 ///
 /// Complete example
@@ -179,14 +180,14 @@
 ///     widgets::{block::*, *},
 /// };
 ///
-/// Title::from(&quot;Title&quot;)
+/// Title::from("Title")
 ///     .position(Position::Top)
 ///     .alignment(Alignment::Right);
 /// ```
 </span><span class="attr">#[derive(Debug, Default, Clone, Eq, PartialEq, Hash)]
-</span><span class="kw">pub struct </span>Title&lt;<span class="lifetime">&#39;a</span>&gt; {
+</span><span class="kw">pub struct </span>Title&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Title content
-    </span><span class="kw">pub </span>content: Line&lt;<span class="lifetime">&#39;a</span>&gt;,
+    </span><span class="kw">pub </span>content: Line&lt;<span class="lifetime">'a</span>&gt;,
     <span class="doccomment">/// Title alignment
     ///
     /// If [`None`], defaults to the alignment defined with
@@ -212,7 +213,7 @@
 /// ```
 /// use ratatui::widgets::{block::*, *};
 ///
-/// Block::new().title(Title::from(&quot;title&quot;).position(Position::Bottom));
+/// Block::new().title(Title::from("title").position(Position::Bottom));
 /// ```
 </span><span class="attr">#[derive(Debug, Default, Display, EnumString, Clone, Copy, PartialEq, Eq, Hash)]
 </span><span class="kw">pub enum </span>Position {
@@ -225,34 +226,34 @@
     </span>Bottom,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Title&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Title&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Set the title content.
-    </span><span class="kw">pub fn </span>content&lt;T&gt;(<span class="kw-2">mut </span><span class="self">self</span>, content: T) -&gt; Title&lt;<span class="lifetime">&#39;a</span>&gt;
+    </span><span class="kw">pub fn </span>content&lt;T&gt;(<span class="kw-2">mut </span><span class="self">self</span>, content: T) -&gt; Title&lt;<span class="lifetime">'a</span>&gt;
     <span class="kw">where
-        </span>T: Into&lt;Line&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+        </span>T: Into&lt;Line&lt;<span class="lifetime">'a</span>&gt;&gt;,
     {
         <span class="self">self</span>.content = content.into();
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Set the title alignment.
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
-    </span><span class="kw">pub fn </span>alignment(<span class="kw-2">mut </span><span class="self">self</span>, alignment: Alignment) -&gt; Title&lt;<span class="lifetime">&#39;a</span>&gt; {
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>alignment(<span class="kw-2">mut </span><span class="self">self</span>, alignment: Alignment) -&gt; Title&lt;<span class="lifetime">'a</span>&gt; {
         <span class="self">self</span>.alignment = <span class="prelude-val">Some</span>(alignment);
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Set the title position.
-    </span><span class="attr">#[must_use = <span class="string">&quot;method moves the value of self and returns the modified value&quot;</span>]
-    </span><span class="kw">pub fn </span>position(<span class="kw-2">mut </span><span class="self">self</span>, position: Position) -&gt; Title&lt;<span class="lifetime">&#39;a</span>&gt; {
+    </span><span class="attr">#[must_use = <span class="string">"method moves the value of self and returns the modified value"</span>]
+    </span><span class="kw">pub fn </span>position(<span class="kw-2">mut </span><span class="self">self</span>, position: Position) -&gt; Title&lt;<span class="lifetime">'a</span>&gt; {
         <span class="self">self</span>.position = <span class="prelude-val">Some</span>(position);
         <span class="self">self
     </span>}
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T&gt; From&lt;T&gt; <span class="kw">for </span>Title&lt;<span class="lifetime">&#39;a</span>&gt;
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, T&gt; From&lt;T&gt; <span class="kw">for </span>Title&lt;<span class="lifetime">'a</span>&gt;
 <span class="kw">where
-    </span>T: Into&lt;Line&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    </span>T: Into&lt;Line&lt;<span class="lifetime">'a</span>&gt;&gt;,
 {
     <span class="kw">fn </span>from(value: T) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::default().content(value.into())
@@ -267,15 +268,15 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>position_tostring() {
-        <span class="macro">assert_eq!</span>(Position::Top.to_string(), <span class="string">&quot;Top&quot;</span>);
-        <span class="macro">assert_eq!</span>(Position::Bottom.to_string(), <span class="string">&quot;Bottom&quot;</span>);
+        <span class="macro">assert_eq!</span>(Position::Top.to_string(), <span class="string">"Top"</span>);
+        <span class="macro">assert_eq!</span>(Position::Bottom.to_string(), <span class="string">"Bottom"</span>);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>position_from_str() {
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;Top&quot;</span>.parse::&lt;Position&gt;(), <span class="prelude-val">Ok</span>(Position::Top));
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;Bottom&quot;</span>.parse::&lt;Position&gt;(), <span class="prelude-val">Ok</span>(Position::Bottom));
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;&quot;</span>.parse::&lt;Position&gt;(), <span class="prelude-val">Err</span>(ParseError::VariantNotFound));
+        <span class="macro">assert_eq!</span>(<span class="string">"Top"</span>.parse::&lt;Position&gt;(), <span class="prelude-val">Ok</span>(Position::Top));
+        <span class="macro">assert_eq!</span>(<span class="string">"Bottom"</span>.parse::&lt;Position&gt;(), <span class="prelude-val">Ok</span>(Position::Bottom));
+        <span class="macro">assert_eq!</span>(<span class="string">""</span>.parse::&lt;Position&gt;(), <span class="prelude-val">Err</span>(ParseError::VariantNotFound));
     }
 }
 </code></pre></div></section></main></body></html>

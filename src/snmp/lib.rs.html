@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/snmp-0.2.2/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="snmp" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/snmp-0.2.2/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="snmp" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1333,14 +1334,14 @@
 //! use snmp::{SyncSession, Value};
 //!
 //! let sys_descr_oid = &amp;[1,3,6,1,2,1,1,1,];
-//! let agent_addr    = &quot;198.51.100.123:161&quot;;
-//! let community     = b&quot;f00b4r&quot;;
+//! let agent_addr    = "198.51.100.123:161";
+//! let community     = b"f00b4r";
 //! let timeout       = Duration::from_secs(2);
 //!
 //! let mut sess = SyncSession::new(agent_addr, community, Some(timeout), 0).unwrap();
 //! let mut response = sess.getnext(sys_descr_oid).unwrap();
 //! if let Some((_oid, Value::OctetString(sys_descr))) = response.varbinds.next() {
-//!     println!(&quot;myrouter sysDescr: {}&quot;, String::from_utf8_lossy(sys_descr));
+//!     println!("myrouter sysDescr: {}", String::from_utf8_lossy(sys_descr));
 //! }
 //! ```
 //! ## GET BULK
@@ -1349,17 +1350,17 @@
 //! use snmp::SyncSession;
 //!
 //! let system_oid      = &amp;[1,3,6,1,2,1,1,];
-//! let agent_addr      = &quot;[2001:db8:f00:b413::abc]:161&quot;;
-//! let community       = b&quot;f00b4r&quot;;
+//! let agent_addr      = "[2001:db8:f00:b413::abc]:161";
+//! let community       = b"f00b4r";
 //! let timeout         = Duration::from_secs(2);
 //! let non_repeaters   = 0;
-//! let max_repetitions = 7; // number of items in &quot;system&quot; OID
+//! let max_repetitions = 7; // number of items in "system" OID
 //!
 //! let mut sess = SyncSession::new(agent_addr, community, Some(timeout), 0).unwrap();
 //! let response = sess.getbulk(&amp;[system_oid], non_repeaters, max_repetitions).unwrap();
 //!
 //! for (name, val) in response.varbinds {
-//!     println!(&quot;{} =&gt; {:?}&quot;, name, val);
+//!     println!("{} =&gt; {:?}", name, val);
 //! }
 //! ```
 //! ## SET
@@ -1368,9 +1369,9 @@
 //! use snmp::{SyncSession, Value};
 //!
 //! let syscontact_oid  = &amp;[1,3,6,1,2,1,1,4,0];
-//! let contact         = Value::OctetString(b&quot;Thomas A. Anderson&quot;);
-//! let agent_addr      = &quot;[2001:db8:f00:b413::abc]:161&quot;;
-//! let community       = b&quot;f00b4r&quot;;
+//! let contact         = Value::OctetString(b"Thomas A. Anderson");
+//! let agent_addr      = "[2001:db8:f00:b413::abc]:161";
+//! let community       = b"f00b4r";
 //! let timeout         = Duration::from_secs(2);
 //!
 //! let mut sess = SyncSession::new(agent_addr, community, Some(timeout), 0).unwrap();
@@ -1378,11 +1379,11 @@
 //!
 //! assert_eq!(response.error_status, snmp::snmp::ERRSTATUS_NOERROR);
 //! for (name, val) in response.varbinds {
-//!     println!(&quot;{} =&gt; {:?}&quot;, name, val);
+//!     println!("{} =&gt; {:?}", name, val);
 //! }
 //! ```
 
-</span><span class="attr">#![cfg_attr(feature = <span class="string">&quot;private-tests&quot;</span>, feature(test))]
+</span><span class="attr">#![cfg_attr(feature = <span class="string">"private-tests"</span>, feature(test))]
 #![allow(unknown_lints, doc_markdown)]
 
 </span><span class="kw">use </span>std::fmt;
@@ -1393,9 +1394,9 @@
 <span class="kw">use </span>std::ptr;
 <span class="kw">use </span>std::time::Duration;
 
-<span class="attr">#[cfg(target_pointer_width=<span class="string">&quot;32&quot;</span>)]
+<span class="attr">#[cfg(target_pointer_width=<span class="string">"32"</span>)]
 </span><span class="kw">const </span>USIZE_LEN: usize = <span class="number">4</span>;
-<span class="attr">#[cfg(target_pointer_width=<span class="string">&quot;64&quot;</span>)]
+<span class="attr">#[cfg(target_pointer_width=<span class="string">"64"</span>)]
 </span><span class="kw">const </span>USIZE_LEN: usize = <span class="number">8</span>;
 
 <span class="attr">#[cfg(test)]
@@ -1846,11 +1847,11 @@
 
 <span class="doccomment">/// Wrapper around raw bytes representing an ASN.1 OBJECT IDENTIFIER.
 </span><span class="attr">#[derive(PartialEq)]
-</span><span class="kw">pub struct </span>ObjectIdentifier&lt;<span class="lifetime">&#39;a</span>&gt; {
-    inner: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8],
+</span><span class="kw">pub struct </span>ObjectIdentifier&lt;<span class="lifetime">'a</span>&gt; {
+    inner: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>[u8],
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; fmt::Debug <span class="kw">for </span>ObjectIdentifier&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; fmt::Debug <span class="kw">for </span>ObjectIdentifier&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
         f.debug_list().entries(<span class="self">self</span>.inner).finish()
     }
@@ -1858,7 +1859,7 @@
 
 <span class="kw">pub type </span>ObjIdBuf = [u32; <span class="number">128</span>];
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; fmt::Display <span class="kw">for </span>ObjectIdentifier&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; fmt::Display <span class="kw">for </span>ObjectIdentifier&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
         <span class="kw">let </span><span class="kw-2">mut </span>buf: ObjIdBuf = <span class="kw">unsafe </span>{ mem::uninitialized() };
         <span class="kw">let </span><span class="kw-2">mut </span>first = <span class="bool-val">true</span>;
@@ -1867,19 +1868,19 @@
                 <span class="kw">for </span>subid <span class="kw">in </span>name {
                     <span class="kw">if </span>first {
                         first = <span class="bool-val">false</span>;
-                        f.write_fmt(<span class="macro">format_args!</span>(<span class="string">&quot;{}&quot;</span>, subid))<span class="question-mark">?</span>;
+                        f.write_fmt(<span class="macro">format_args!</span>(<span class="string">"{}"</span>, subid))<span class="question-mark">?</span>;
                     } <span class="kw">else </span>{
-                        f.write_fmt(<span class="macro">format_args!</span>(<span class="string">&quot;.{}&quot;</span>, subid))<span class="question-mark">?</span>;
+                        f.write_fmt(<span class="macro">format_args!</span>(<span class="string">".{}"</span>, subid))<span class="question-mark">?</span>;
                     }
                 }
                 <span class="prelude-val">Ok</span>(())
             }
-            <span class="prelude-val">Err</span>(err) =&gt; f.write_fmt(<span class="macro">format_args!</span>(<span class="string">&quot;Invalid OID: {:?}&quot;</span>, err))
+            <span class="prelude-val">Err</span>(err) =&gt; f.write_fmt(<span class="macro">format_args!</span>(<span class="string">"Invalid OID: {:?}"</span>, err))
         }
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; PartialEq&lt;[u32]&gt; <span class="kw">for </span>ObjectIdentifier&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; PartialEq&lt;[u32]&gt; <span class="kw">for </span>ObjectIdentifier&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>[u32]) -&gt; bool {
         <span class="kw">let </span><span class="kw-2">mut </span>buf: ObjIdBuf = <span class="kw">unsafe </span>{ mem::uninitialized() };
         <span class="kw">if let </span><span class="prelude-val">Ok</span>(name) = <span class="self">self</span>.read_name(<span class="kw-2">&amp;mut </span>buf) {
@@ -1890,13 +1891,13 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; PartialEq&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>[u32]&gt; <span class="kw">for </span>ObjectIdentifier&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, <span class="lifetime">'b</span>&gt; PartialEq&lt;<span class="kw-2">&amp;</span><span class="lifetime">'b </span>[u32]&gt; <span class="kw">for </span>ObjectIdentifier&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: &amp;&amp;[u32]) -&gt; bool {
         <span class="self">self </span>== <span class="kw-2">*</span>other
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ObjectIdentifier&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; ObjectIdentifier&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">fn </span>from_bytes(bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; ObjectIdentifier {
         ObjectIdentifier {
             inner: bytes,
@@ -1905,7 +1906,7 @@
 
     <span class="doccomment">/// Reads out the OBJECT IDENTIFIER sub-IDs as a slice of u32s.
     /// Caller must provide storage for 128 sub-IDs.
-    </span><span class="kw">pub fn </span>read_name&lt;<span class="lifetime">&#39;b</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, out: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span><span class="kw-2">mut </span>ObjIdBuf) -&gt; SnmpResult&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>[u32]&gt; {
+    </span><span class="kw">pub fn </span>read_name&lt;<span class="lifetime">'b</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, out: <span class="kw-2">&amp;</span><span class="lifetime">'b </span><span class="kw-2">mut </span>ObjIdBuf) -&gt; SnmpResult&lt;<span class="kw-2">&amp;</span><span class="lifetime">'b </span>[u32]&gt; {
         <span class="kw">let </span>input = <span class="self">self</span>.inner;
         <span class="kw">let </span>output = <span class="kw-2">&amp;mut </span>out[..];
         <span class="kw">if </span>input.len() &lt; <span class="number">2 </span>{
@@ -1939,7 +1940,7 @@
         }
     }
 
-    <span class="kw">pub fn </span>raw(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8] {
+    <span class="kw">pub fn </span>raw(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'a </span>[u8] {
         <span class="self">self</span>.inner
     }
 }
@@ -1955,25 +1956,25 @@
 /// - extended tag IDs.
 /// - indefinite lengths (disallowed by DER).
 /// - INTEGER values not representable by i64.
-</span><span class="kw">pub struct </span>AsnReader&lt;<span class="lifetime">&#39;a</span>&gt; {
-    inner: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8],
+</span><span class="kw">pub struct </span>AsnReader&lt;<span class="lifetime">'a</span>&gt; {
+    inner: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>[u8],
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Clone <span class="kw">for </span>AsnReader&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; AsnReader&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Clone <span class="kw">for </span>AsnReader&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; AsnReader&lt;<span class="lifetime">'a</span>&gt; {
         AsnReader {
             inner: <span class="self">self</span>.inner,
         }
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; fmt::Debug <span class="kw">for </span>AsnReader&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; fmt::Debug <span class="kw">for </span>AsnReader&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
         f.debug_list().entries(<span class="self">self</span>.clone()).finish()
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; AsnReader&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; AsnReader&lt;<span class="lifetime">'a</span>&gt; {
 
     <span class="kw">pub fn </span>from_bytes(bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; AsnReader {
         AsnReader {inner: bytes}
@@ -2042,7 +2043,7 @@
         decode_i64(val)
     }
 
-    <span class="kw">pub fn </span>read_raw(<span class="kw-2">&amp;mut </span><span class="self">self</span>, expected_ident: u8) -&gt; SnmpResult&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]&gt; {
+    <span class="kw">pub fn </span>read_raw(<span class="kw-2">&amp;mut </span><span class="self">self</span>, expected_ident: u8) -&gt; SnmpResult&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>[u8]&gt; {
         <span class="kw">let </span>ident = <span class="self">self</span>.read_byte()<span class="question-mark">?</span>;
         <span class="kw">if </span>ident != expected_ident {
             <span class="kw">return </span><span class="prelude-val">Err</span>(SnmpError::AsnWrongType);
@@ -2097,7 +2098,7 @@
         <span class="self">self</span>.read_i64_type(asn1::TYPE_INTEGER)
     }
 
-    <span class="kw">pub fn </span>read_asn_octetstring(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; SnmpResult&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]&gt; {
+    <span class="kw">pub fn </span>read_asn_octetstring(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; SnmpResult&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>[u8]&gt; {
         <span class="self">self</span>.read_raw(asn1::TYPE_OCTETSTRING)
     }
 
@@ -2114,7 +2115,7 @@
         }
     }
 
-    <span class="kw">pub fn </span>read_asn_objectidentifier(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; SnmpResult&lt;ObjectIdentifier&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+    <span class="kw">pub fn </span>read_asn_objectidentifier(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; SnmpResult&lt;ObjectIdentifier&lt;<span class="lifetime">'a</span>&gt;&gt; {
         <span class="kw">let </span>ident = <span class="self">self</span>.read_byte()<span class="question-mark">?</span>;
         <span class="kw">if </span>ident != asn1::TYPE_OBJECTIDENTIFIER {
             <span class="kw">return </span><span class="prelude-val">Err</span>(SnmpError::AsnWrongType);
@@ -2161,7 +2162,7 @@
         <span class="self">self</span>.read_i64_type(snmp::TYPE_COUNTER64).map(|v| v <span class="kw">as </span>u64)
     }
 
-    <span class="kw">pub fn </span>read_snmp_opaque(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; SnmpResult&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]&gt; {
+    <span class="kw">pub fn </span>read_snmp_opaque(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; SnmpResult&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>[u8]&gt; {
         <span class="self">self</span>.read_raw(snmp::TYPE_OPAQUE)
     }
 
@@ -2227,69 +2228,69 @@
 </span>}
 
 
-<span class="kw">pub enum </span>Value&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">pub enum </span>Value&lt;<span class="lifetime">'a</span>&gt; {
     Boolean(bool),
     Null,
     Integer(i64),
-    OctetString(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]),
-    ObjectIdentifier(ObjectIdentifier&lt;<span class="lifetime">&#39;a</span>&gt;),
-    Sequence(AsnReader&lt;<span class="lifetime">&#39;a</span>&gt;),
-    Set(AsnReader&lt;<span class="lifetime">&#39;a</span>&gt;),
-    Constructed(u8, AsnReader&lt;<span class="lifetime">&#39;a</span>&gt;),
+    OctetString(<span class="kw-2">&amp;</span><span class="lifetime">'a </span>[u8]),
+    ObjectIdentifier(ObjectIdentifier&lt;<span class="lifetime">'a</span>&gt;),
+    Sequence(AsnReader&lt;<span class="lifetime">'a</span>&gt;),
+    Set(AsnReader&lt;<span class="lifetime">'a</span>&gt;),
+    Constructed(u8, AsnReader&lt;<span class="lifetime">'a</span>&gt;),
 
     IpAddress([u8;<span class="number">4</span>]),
     Counter32(u32),
     Unsigned32(u32),
     Timeticks(u32),
-    Opaque(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]),
+    Opaque(<span class="kw-2">&amp;</span><span class="lifetime">'a </span>[u8]),
     Counter64(u64),
 
-    SnmpGetRequest(AsnReader&lt;<span class="lifetime">&#39;a</span>&gt;),
-    SnmpGetNextRequest(AsnReader&lt;<span class="lifetime">&#39;a</span>&gt;),
-    SnmpGetBulkRequest(AsnReader&lt;<span class="lifetime">&#39;a</span>&gt;),
-    SnmpResponse(AsnReader&lt;<span class="lifetime">&#39;a</span>&gt;),
-    SnmpSetRequest(AsnReader&lt;<span class="lifetime">&#39;a</span>&gt;),
-    SnmpInformRequest(AsnReader&lt;<span class="lifetime">&#39;a</span>&gt;),
-    SnmpTrap(AsnReader&lt;<span class="lifetime">&#39;a</span>&gt;),
-    SnmpReport(AsnReader&lt;<span class="lifetime">&#39;a</span>&gt;),
+    SnmpGetRequest(AsnReader&lt;<span class="lifetime">'a</span>&gt;),
+    SnmpGetNextRequest(AsnReader&lt;<span class="lifetime">'a</span>&gt;),
+    SnmpGetBulkRequest(AsnReader&lt;<span class="lifetime">'a</span>&gt;),
+    SnmpResponse(AsnReader&lt;<span class="lifetime">'a</span>&gt;),
+    SnmpSetRequest(AsnReader&lt;<span class="lifetime">'a</span>&gt;),
+    SnmpInformRequest(AsnReader&lt;<span class="lifetime">'a</span>&gt;),
+    SnmpTrap(AsnReader&lt;<span class="lifetime">'a</span>&gt;),
+    SnmpReport(AsnReader&lt;<span class="lifetime">'a</span>&gt;),
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; fmt::Debug <span class="kw">for </span>Value&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; fmt::Debug <span class="kw">for </span>Value&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
         <span class="kw">use </span>Value::<span class="kw-2">*</span>;
         <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
-            Boolean(v)                   =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;BOOLEAN: {}&quot;</span>, v),
-            Integer(n)                   =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;INTEGER: {}&quot;</span>, n),
-            OctetString(slice)           =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;OCTET STRING: {}&quot;</span>, String::from_utf8_lossy(slice)),
-            ObjectIdentifier(<span class="kw-2">ref </span>obj_id) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;OBJECT IDENTIFIER: {}&quot;</span>, obj_id),
-            Null                         =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;NULL&quot;</span>),
-            Sequence(<span class="kw-2">ref </span>val)            =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;SEQUENCE: {:#?}&quot;</span>, val),
-            Set(<span class="kw-2">ref </span>val)                 =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;SET: {:?}&quot;</span>, val),
-            Constructed(ident, <span class="kw-2">ref </span>val)  =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;CONSTRUCTED-{}: {:#?}&quot;</span>, ident, val),
+            Boolean(v)                   =&gt; <span class="macro">write!</span>(f, <span class="string">"BOOLEAN: {}"</span>, v),
+            Integer(n)                   =&gt; <span class="macro">write!</span>(f, <span class="string">"INTEGER: {}"</span>, n),
+            OctetString(slice)           =&gt; <span class="macro">write!</span>(f, <span class="string">"OCTET STRING: {}"</span>, String::from_utf8_lossy(slice)),
+            ObjectIdentifier(<span class="kw-2">ref </span>obj_id) =&gt; <span class="macro">write!</span>(f, <span class="string">"OBJECT IDENTIFIER: {}"</span>, obj_id),
+            Null                         =&gt; <span class="macro">write!</span>(f, <span class="string">"NULL"</span>),
+            Sequence(<span class="kw-2">ref </span>val)            =&gt; <span class="macro">write!</span>(f, <span class="string">"SEQUENCE: {:#?}"</span>, val),
+            Set(<span class="kw-2">ref </span>val)                 =&gt; <span class="macro">write!</span>(f, <span class="string">"SET: {:?}"</span>, val),
+            Constructed(ident, <span class="kw-2">ref </span>val)  =&gt; <span class="macro">write!</span>(f, <span class="string">"CONSTRUCTED-{}: {:#?}"</span>, ident, val),
 
-            IpAddress(val)               =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;IP ADDRESS: {}.{}.{}.{}&quot;</span>, val[<span class="number">0</span>], val[<span class="number">1</span>], val[<span class="number">2</span>], val[<span class="number">3</span>]),
-            Counter32(val)               =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;COUNTER32: {}&quot;</span>, val),
-            Unsigned32(val)              =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;UNSIGNED32: {}&quot;</span>, val),
-            Timeticks(val)               =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;TIMETICKS: {}&quot;</span>, val),
-            Opaque(val)                  =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;OPAQUE: {:?}&quot;</span>, val),
-            Counter64(val)               =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;COUNTER64: {}&quot;</span>, val),
+            IpAddress(val)               =&gt; <span class="macro">write!</span>(f, <span class="string">"IP ADDRESS: {}.{}.{}.{}"</span>, val[<span class="number">0</span>], val[<span class="number">1</span>], val[<span class="number">2</span>], val[<span class="number">3</span>]),
+            Counter32(val)               =&gt; <span class="macro">write!</span>(f, <span class="string">"COUNTER32: {}"</span>, val),
+            Unsigned32(val)              =&gt; <span class="macro">write!</span>(f, <span class="string">"UNSIGNED32: {}"</span>, val),
+            Timeticks(val)               =&gt; <span class="macro">write!</span>(f, <span class="string">"TIMETICKS: {}"</span>, val),
+            Opaque(val)                  =&gt; <span class="macro">write!</span>(f, <span class="string">"OPAQUE: {:?}"</span>, val),
+            Counter64(val)               =&gt; <span class="macro">write!</span>(f, <span class="string">"COUNTER64: {}"</span>, val),
 
-            SnmpGetRequest(<span class="kw-2">ref </span>val)      =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;SNMP GET REQUEST: {:#?}&quot;</span>, val),
-            SnmpGetNextRequest(<span class="kw-2">ref </span>val)  =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;SNMP GET NEXT REQUEST: {:#?}&quot;</span>, val),
-            SnmpGetBulkRequest(<span class="kw-2">ref </span>val)  =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;SNMP GET BULK REQUEST: {:#?}&quot;</span>, val),
-            SnmpResponse(<span class="kw-2">ref </span>val)        =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;SNMP RESPONSE: {:#?}&quot;</span>, val),
-            SnmpSetRequest(<span class="kw-2">ref </span>val)      =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;SNMP SET REQUEST: {:#?}&quot;</span>, val),
-            SnmpInformRequest(<span class="kw-2">ref </span>val)   =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;SNMP INFORM REQUEST: {:#?}&quot;</span>, val),
-            SnmpTrap(<span class="kw-2">ref </span>val)            =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;SNMP TRAP: {:#?}&quot;</span>, val),
-            SnmpReport(<span class="kw-2">ref </span>val)          =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;SNMP REPORT: {:#?}&quot;</span>, val),
+            SnmpGetRequest(<span class="kw-2">ref </span>val)      =&gt; <span class="macro">write!</span>(f, <span class="string">"SNMP GET REQUEST: {:#?}"</span>, val),
+            SnmpGetNextRequest(<span class="kw-2">ref </span>val)  =&gt; <span class="macro">write!</span>(f, <span class="string">"SNMP GET NEXT REQUEST: {:#?}"</span>, val),
+            SnmpGetBulkRequest(<span class="kw-2">ref </span>val)  =&gt; <span class="macro">write!</span>(f, <span class="string">"SNMP GET BULK REQUEST: {:#?}"</span>, val),
+            SnmpResponse(<span class="kw-2">ref </span>val)        =&gt; <span class="macro">write!</span>(f, <span class="string">"SNMP RESPONSE: {:#?}"</span>, val),
+            SnmpSetRequest(<span class="kw-2">ref </span>val)      =&gt; <span class="macro">write!</span>(f, <span class="string">"SNMP SET REQUEST: {:#?}"</span>, val),
+            SnmpInformRequest(<span class="kw-2">ref </span>val)   =&gt; <span class="macro">write!</span>(f, <span class="string">"SNMP INFORM REQUEST: {:#?}"</span>, val),
+            SnmpTrap(<span class="kw-2">ref </span>val)            =&gt; <span class="macro">write!</span>(f, <span class="string">"SNMP TRAP: {:#?}"</span>, val),
+            SnmpReport(<span class="kw-2">ref </span>val)          =&gt; <span class="macro">write!</span>(f, <span class="string">"SNMP REPORT: {:#?}"</span>, val),
         }
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>AsnReader&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">type </span>Item = Value&lt;<span class="lifetime">&#39;a</span>&gt;;
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Iterator <span class="kw">for </span>AsnReader&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">type </span>Item = Value&lt;<span class="lifetime">'a</span>&gt;;
 
-    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Value&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Value&lt;<span class="lifetime">'a</span>&gt;&gt; {
         <span class="kw">use </span>Value::<span class="kw-2">*</span>;
         <span class="kw">if let </span><span class="prelude-val">Ok</span>(ident) = <span class="self">self</span>.peek_byte() {
             <span class="kw">let </span>ret: SnmpResult&lt;Value&gt; = <span class="kw">match </span>ident {
@@ -2341,7 +2342,7 @@
         <span class="kw">let </span>socket = <span class="kw">match </span>destination.to_socket_addrs()<span class="question-mark">?</span>.next() {
             <span class="prelude-val">Some</span>(SocketAddr::V4(<span class="kw">_</span>)) =&gt; UdpSocket::bind((Ipv4Addr::new(<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>), <span class="number">0</span>))<span class="question-mark">?</span>,
             <span class="prelude-val">Some</span>(SocketAddr::V6(<span class="kw">_</span>)) =&gt; UdpSocket::bind((Ipv6Addr::new(<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>), <span class="number">0</span>))<span class="question-mark">?</span>,
-            <span class="prelude-val">None </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;empty list of socket addrs&quot;</span>),
+            <span class="prelude-val">None </span>=&gt; <span class="macro">panic!</span>(<span class="string">"empty list of socket addrs"</span>),
         };
         socket.set_read_timeout(timeout)<span class="question-mark">?</span>;
         socket.connect(destination)<span class="question-mark">?</span>;
@@ -2455,18 +2456,18 @@
 }
 
 <span class="attr">#[derive(Debug)]
-</span><span class="kw">pub struct </span>SnmpPdu&lt;<span class="lifetime">&#39;a</span>&gt; {
+</span><span class="kw">pub struct </span>SnmpPdu&lt;<span class="lifetime">'a</span>&gt; {
     version: i64,
-    community: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8],
+    community: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>[u8],
     <span class="kw">pub </span>message_type: SnmpMessageType,
     <span class="kw">pub </span>req_id: i32,
     <span class="kw">pub </span>error_status: u32,
     <span class="kw">pub </span>error_index: u32,
-    <span class="kw">pub </span>varbinds: Varbinds&lt;<span class="lifetime">&#39;a</span>&gt;,
+    <span class="kw">pub </span>varbinds: Varbinds&lt;<span class="lifetime">'a</span>&gt;,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; SnmpPdu&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">pub fn </span>from_bytes(bytes: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]) -&gt; SnmpResult&lt;SnmpPdu&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; SnmpPdu&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">pub fn </span>from_bytes(bytes: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>[u8]) -&gt; SnmpResult&lt;SnmpPdu&lt;<span class="lifetime">'a</span>&gt;&gt; {
         <span class="kw">let </span>seq = AsnReader::from_bytes(bytes).read_raw(asn1::TYPE_SEQUENCE)<span class="question-mark">?</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>rdr = AsnReader::from_bytes(seq);
         <span class="kw">let </span>version = rdr.read_asn_integer()<span class="question-mark">?</span>;
@@ -2543,31 +2544,31 @@
 }
 
 <span class="attr">#[derive(Clone)]
-</span><span class="kw">pub struct </span>Varbinds&lt;<span class="lifetime">&#39;a</span>&gt; {
-    inner:  AsnReader&lt;<span class="lifetime">&#39;a</span>&gt;,
+</span><span class="kw">pub struct </span>Varbinds&lt;<span class="lifetime">'a</span>&gt; {
+    inner:  AsnReader&lt;<span class="lifetime">'a</span>&gt;,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; fmt::Debug <span class="kw">for </span>Varbinds&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; fmt::Debug <span class="kw">for </span>Varbinds&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
         <span class="comment">// f.debug_list().entries(self.clone()).finish()
-        </span><span class="kw">let </span><span class="kw-2">mut </span>ds = f.debug_struct(<span class="string">&quot;Varbinds&quot;</span>);
+        </span><span class="kw">let </span><span class="kw-2">mut </span>ds = f.debug_struct(<span class="string">"Varbinds"</span>);
         <span class="kw">for </span>(name, val) <span class="kw">in </span><span class="self">self</span>.clone() {
-            ds.field(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, name), <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, val));
+            ds.field(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"{}"</span>, name), <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">"{:?}"</span>, val));
         }
         ds.finish()
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Varbinds&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">fn </span>from_bytes(bytes: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]) -&gt; Varbinds&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Varbinds&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">fn </span>from_bytes(bytes: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>[u8]) -&gt; Varbinds&lt;<span class="lifetime">'a</span>&gt; {
         Varbinds {
             inner: AsnReader::from_bytes(bytes)
         }
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>Varbinds&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">type </span>Item = (ObjectIdentifier&lt;<span class="lifetime">&#39;a</span>&gt;, Value&lt;<span class="lifetime">&#39;a</span>&gt;);
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Iterator <span class="kw">for </span>Varbinds&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">type </span>Item = (ObjectIdentifier&lt;<span class="lifetime">'a</span>&gt;, Value&lt;<span class="lifetime">'a</span>&gt;);
     <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
         <span class="kw">if let </span><span class="prelude-val">Ok</span>(seq) = <span class="self">self</span>.inner.read_raw(asn1::TYPE_SEQUENCE) {
             <span class="kw">let </span><span class="kw-2">mut </span>pair = AsnReader::from_bytes(seq);

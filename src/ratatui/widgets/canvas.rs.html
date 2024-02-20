@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.25.0/src/widgets/canvas.rs`."><title>canvas.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.25.0/src/widgets/canvas.rs`."><title>canvas.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><a class="sub-logo-container" href="../../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -905,10 +906,10 @@
 
 <span class="doccomment">/// Label to draw some text on the canvas
 </span><span class="attr">#[derive(Debug, Default, Clone, PartialEq)]
-</span><span class="kw">pub struct </span>Label&lt;<span class="lifetime">&#39;a</span>&gt; {
+</span><span class="kw">pub struct </span>Label&lt;<span class="lifetime">'a</span>&gt; {
     x: f64,
     y: f64,
-    line: TextLine&lt;<span class="lifetime">&#39;a</span>&gt;,
+    line: TextLine&lt;<span class="lifetime">'a</span>&gt;,
 }
 
 <span class="doccomment">/// A single layer of the canvas.
@@ -935,7 +936,7 @@
     </span><span class="kw">fn </span>width(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u16;
     <span class="doccomment">/// Get the height of the grid in number of terminal rows
     </span><span class="kw">fn </span>height(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u16;
-    <span class="doccomment">/// Get the resolution of the grid in number of dots. This doesn&#39;t have to be the same as the
+    <span class="doccomment">/// Get the resolution of the grid in number of dots. This doesn't have to be the same as the
     /// number of rows and columns of the grid. For example, a grid of Braille patterns will have a
     /// resolution of 2x4 dots per cell. This means that a grid of 10x10 cells will have a
     /// resolution of 20x40 dots.
@@ -969,7 +970,7 @@
     /// this is converted to a utf16 string when converting to a layer. See
     /// &lt;https://en.wikipedia.org/wiki/Braille_Patterns&gt; for more info.
     </span>utf16_code_points: Vec&lt;u16&gt;,
-    <span class="doccomment">/// The color of each cell only supports foreground colors for now as there&#39;s no way to
+    <span class="doccomment">/// The color of each cell only supports foreground colors for now as there's no way to
     /// individually set the background color of each dot in the braille pattern.
     </span>colors: Vec&lt;Color&gt;,
 }
@@ -1016,7 +1017,7 @@
     <span class="kw">fn </span>paint(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x: usize, y: usize, color: Color) {
         <span class="kw">let </span>index = y / <span class="number">4 </span>* <span class="self">self</span>.width <span class="kw">as </span>usize + x / <span class="number">2</span>;
         <span class="comment">// using get_mut here because we are indexing the vector with usize values
-        // and we want to make sure we don&#39;t panic if the index is out of bounds
+        // and we want to make sure we don't panic if the index is out of bounds
         </span><span class="kw">if let </span><span class="prelude-val">Some</span>(c) = <span class="self">self</span>.utf16_code_points.get_mut(index) {
             <span class="kw-2">*</span>c |= symbols::braille::DOTS[y % <span class="number">4</span>][x % <span class="number">2</span>];
         }
@@ -1052,7 +1053,7 @@
         CharGrid {
             width,
             height,
-            cells: <span class="macro">vec!</span>[<span class="string">&#39; &#39;</span>; length],
+            cells: <span class="macro">vec!</span>[<span class="string">' '</span>; length],
             colors: <span class="macro">vec!</span>[Color::Reset; length],
             cell_char,
         }
@@ -1080,14 +1081,14 @@
     }
 
     <span class="kw">fn </span>reset(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-        <span class="self">self</span>.cells.fill(<span class="string">&#39; &#39;</span>);
+        <span class="self">self</span>.cells.fill(<span class="string">' '</span>);
         <span class="self">self</span>.colors.fill(Color::Reset);
     }
 
     <span class="kw">fn </span>paint(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x: usize, y: usize, color: Color) {
         <span class="kw">let </span>index = y * <span class="self">self</span>.width <span class="kw">as </span>usize + x;
         <span class="comment">// using get_mut here because we are indexing the vector with usize values
-        // and we want to make sure we don&#39;t panic if the index is out of bounds
+        // and we want to make sure we don't panic if the index is out of bounds
         </span><span class="kw">if let </span><span class="prelude-val">Some</span>(c) = <span class="self">self</span>.cells.get_mut(index) {
             <span class="kw-2">*</span>c = <span class="self">self</span>.cell_char;
         }
@@ -1100,11 +1101,11 @@
 <span class="doccomment">/// The HalfBlockGrid is a grid made up of cells each containing a half block character.
 ///
 /// In terminals, each character is usually twice as tall as it is wide. Unicode has a couple of
-/// vertical half block characters, the upper half block &#39;▀&#39; and lower half block &#39;▄&#39; which take up
-/// half the height of a normal character but the full width. Together with an empty space &#39; &#39; and a
-/// full block &#39;█&#39;, we can effectively double the resolution of a single cell. In addition, because
+/// vertical half block characters, the upper half block '▀' and lower half block '▄' which take up
+/// half the height of a normal character but the full width. Together with an empty space ' ' and a
+/// full block '█', we can effectively double the resolution of a single cell. In addition, because
 /// each character can have a foreground and background color, we can control the color of the upper
-/// and lower half of each cell. This allows us to draw shapes with a resolution of 1x2 &quot;pixels&quot; per
+/// and lower half of each cell. This allows us to draw shapes with a resolution of 1x2 "pixels" per
 /// cell.
 ///
 /// This allows for more flexibility than the BrailleGrid which only supports a single
@@ -1116,7 +1117,7 @@
     </span>width: u16,
     <span class="doccomment">/// height of the grid in number of terminal rows
     </span>height: u16,
-    <span class="doccomment">/// represents a single color for each &quot;pixel&quot; arranged in column, row order
+    <span class="doccomment">/// represents a single color for each "pixel" arranged in column, row order
     </span>pixels: Vec&lt;Vec&lt;Color&gt;&gt;,
 }
 
@@ -1152,10 +1153,10 @@
         // what character to print in each cell. So these are the 4 states we use to represent each
         // cell:
         //
-        // 1. upper: reset, lower: reset =&gt; &#39; &#39; fg: reset / bg: reset
-        // 2. upper: reset, lower: color =&gt; &#39;▄&#39; fg: lower color / bg: reset
-        // 3. upper: color, lower: reset =&gt; &#39;▀&#39; fg: upper color / bg: reset
-        // 4. upper: color, lower: color =&gt; &#39;▀&#39; fg: upper color / bg: lower color
+        // 1. upper: reset, lower: reset =&gt; ' ' fg: reset / bg: reset
+        // 2. upper: reset, lower: color =&gt; '▄' fg: lower color / bg: reset
+        // 3. upper: color, lower: reset =&gt; '▀' fg: upper color / bg: reset
+        // 4. upper: color, lower: color =&gt; '▀' fg: upper color / bg: lower color
         //
         // Note that because the foreground reset color (i.e. default foreground color) is usually
         // not the same as the background reset color (i.e. default background color), we need to
@@ -1177,7 +1178,7 @@
         </span><span class="kw">let </span>string = vertical_color_pairs
             .clone()
             .map(|(upper, lower)| <span class="kw">match </span>(upper, lower) {
-                (Color::Reset, Color::Reset) =&gt; <span class="string">&#39; &#39;</span>,
+                (Color::Reset, Color::Reset) =&gt; <span class="string">' '</span>,
                 (Color::Reset, <span class="kw">_</span>) =&gt; symbols::half_block::LOWER,
                 (<span class="kw">_</span>, Color::Reset) =&gt; symbols::half_block::UPPER,
                 (<span class="kw-2">&amp;</span>lower, <span class="kw-2">&amp;</span>upper) =&gt; {
@@ -1220,12 +1221,12 @@
 /// It is used by the [`Shape`] trait to draw shapes on the grid. It can be useful to think of this
 /// as similar to the [`Buffer`] struct that is used to draw widgets on the terminal.
 </span><span class="attr">#[derive(Debug)]
-</span><span class="kw">pub struct </span>Painter&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; {
-    context: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Context&lt;<span class="lifetime">&#39;b</span>&gt;,
+</span><span class="kw">pub struct </span>Painter&lt;<span class="lifetime">'a</span>, <span class="lifetime">'b</span>&gt; {
+    context: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>Context&lt;<span class="lifetime">'b</span>&gt;,
     resolution: (f64, f64),
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; Painter&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, <span class="lifetime">'b</span>&gt; Painter&lt;<span class="lifetime">'a</span>, <span class="lifetime">'b</span>&gt; {
     <span class="doccomment">/// Convert the (x, y) coordinates to location of a point on the grid
     ///
     /// (x, y) coordinates are expressed in the coordinate system of the canvas. The origin is in
@@ -1289,8 +1290,8 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Context&lt;<span class="lifetime">&#39;b</span>&gt;&gt; <span class="kw">for </span>Painter&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; {
-    <span class="kw">fn </span>from(context: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Context&lt;<span class="lifetime">&#39;b</span>&gt;) -&gt; Painter&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, <span class="lifetime">'b</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>Context&lt;<span class="lifetime">'b</span>&gt;&gt; <span class="kw">for </span>Painter&lt;<span class="lifetime">'a</span>, <span class="lifetime">'b</span>&gt; {
+    <span class="kw">fn </span>from(context: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>Context&lt;<span class="lifetime">'b</span>&gt;) -&gt; Painter&lt;<span class="lifetime">'a</span>, <span class="lifetime">'b</span>&gt; {
         <span class="kw">let </span>resolution = context.grid.resolution();
         Painter {
             context,
@@ -1306,16 +1307,16 @@
 ///
 /// [`Frame`]: crate::prelude::Frame
 </span><span class="attr">#[derive(Debug)]
-</span><span class="kw">pub struct </span>Context&lt;<span class="lifetime">&#39;a</span>&gt; {
+</span><span class="kw">pub struct </span>Context&lt;<span class="lifetime">'a</span>&gt; {
     x_bounds: [f64; <span class="number">2</span>],
     y_bounds: [f64; <span class="number">2</span>],
     grid: Box&lt;<span class="kw">dyn </span>Grid&gt;,
     dirty: bool,
     layers: Vec&lt;Layer&gt;,
-    labels: Vec&lt;Label&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    labels: Vec&lt;Label&lt;<span class="lifetime">'a</span>&gt;&gt;,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Context&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Context&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Create a new Context with the given width and height measured in terminal columns and rows
     /// respectively. The x and y bounds define the specific area of some coordinate system that
     /// will be drawn on the canvas. The marker defines the type of points used to draw the shapes.
@@ -1344,7 +1345,7 @@
         x_bounds: [f64; <span class="number">2</span>],
         y_bounds: [f64; <span class="number">2</span>],
         marker: symbols::Marker,
-    ) -&gt; Context&lt;<span class="lifetime">&#39;a</span>&gt; {
+    ) -&gt; Context&lt;<span class="lifetime">'a</span>&gt; {
         <span class="kw">let </span>dot = symbols::DOT.chars().next().unwrap();
         <span class="kw">let </span>block = symbols::block::FULL.chars().next().unwrap();
         <span class="kw">let </span>bar = symbols::bar::HALF.chars().next().unwrap();
@@ -1387,7 +1388,7 @@
     /// on top of the canvas and is not affected by the layers.
     </span><span class="kw">pub fn </span>print&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x: f64, y: f64, line: T)
     <span class="kw">where
-        </span>T: Into&lt;TextLine&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+        </span>T: Into&lt;TextLine&lt;<span class="lifetime">'a</span>&gt;&gt;,
     {
         <span class="self">self</span>.labels.push(Label {
             x,
@@ -1439,7 +1440,7 @@
 /// };
 ///
 /// Canvas::default()
-///     .block(Block::default().title(&quot;Canvas&quot;).borders(Borders::ALL))
+///     .block(Block::default().title("Canvas").borders(Borders::ALL))
 ///     .x_bounds([-180.0, 180.0])
 ///     .y_bounds([-90.0, 90.0])
 ///     .paint(|ctx| {
@@ -1467,11 +1468,11 @@
 ///
 /// [`marker`]: #method.marker
 </span><span class="attr">#[derive(Debug, Clone, PartialEq)]
-</span><span class="kw">pub struct </span>Canvas&lt;<span class="lifetime">&#39;a</span>, F&gt;
+</span><span class="kw">pub struct </span>Canvas&lt;<span class="lifetime">'a</span>, F&gt;
 <span class="kw">where
     </span>F: Fn(<span class="kw-2">&amp;mut </span>Context),
 {
-    block: <span class="prelude-ty">Option</span>&lt;Block&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    block: <span class="prelude-ty">Option</span>&lt;Block&lt;<span class="lifetime">'a</span>&gt;&gt;,
     x_bounds: [f64; <span class="number">2</span>],
     y_bounds: [f64; <span class="number">2</span>],
     paint_func: <span class="prelude-ty">Option</span>&lt;F&gt;,
@@ -1479,11 +1480,11 @@
     marker: symbols::Marker,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, F&gt; Default <span class="kw">for </span>Canvas&lt;<span class="lifetime">&#39;a</span>, F&gt;
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, F&gt; Default <span class="kw">for </span>Canvas&lt;<span class="lifetime">'a</span>, F&gt;
 <span class="kw">where
     </span>F: Fn(<span class="kw-2">&amp;mut </span>Context),
 {
-    <span class="kw">fn </span>default() -&gt; Canvas&lt;<span class="lifetime">&#39;a</span>, F&gt; {
+    <span class="kw">fn </span>default() -&gt; Canvas&lt;<span class="lifetime">'a</span>, F&gt; {
         Canvas {
             block: <span class="prelude-val">None</span>,
             x_bounds: [<span class="number">0.0</span>, <span class="number">0.0</span>],
@@ -1495,41 +1496,41 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, F&gt; Canvas&lt;<span class="lifetime">&#39;a</span>, F&gt;
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, F&gt; Canvas&lt;<span class="lifetime">'a</span>, F&gt;
 <span class="kw">where
     </span>F: Fn(<span class="kw-2">&amp;mut </span>Context),
 {
     <span class="doccomment">/// Set the block that will be rendered around the canvas
-    </span><span class="kw">pub fn </span>block(<span class="kw-2">mut </span><span class="self">self</span>, block: Block&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; Canvas&lt;<span class="lifetime">&#39;a</span>, F&gt; {
+    </span><span class="kw">pub fn </span>block(<span class="kw-2">mut </span><span class="self">self</span>, block: Block&lt;<span class="lifetime">'a</span>&gt;) -&gt; Canvas&lt;<span class="lifetime">'a</span>, F&gt; {
         <span class="self">self</span>.block = <span class="prelude-val">Some</span>(block);
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Define the viewport of the canvas.
-    /// If you were to &quot;zoom&quot; to a certain part of the world you may want to choose different
+    /// If you were to "zoom" to a certain part of the world you may want to choose different
     /// bounds.
-    </span><span class="kw">pub fn </span>x_bounds(<span class="kw-2">mut </span><span class="self">self</span>, bounds: [f64; <span class="number">2</span>]) -&gt; Canvas&lt;<span class="lifetime">&#39;a</span>, F&gt; {
+    </span><span class="kw">pub fn </span>x_bounds(<span class="kw-2">mut </span><span class="self">self</span>, bounds: [f64; <span class="number">2</span>]) -&gt; Canvas&lt;<span class="lifetime">'a</span>, F&gt; {
         <span class="self">self</span>.x_bounds = bounds;
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Define the viewport of the canvas.
     ///
-    /// If you were to &quot;zoom&quot; to a certain part of the world you may want to choose different
+    /// If you were to "zoom" to a certain part of the world you may want to choose different
     /// bounds.
-    </span><span class="kw">pub fn </span>y_bounds(<span class="kw-2">mut </span><span class="self">self</span>, bounds: [f64; <span class="number">2</span>]) -&gt; Canvas&lt;<span class="lifetime">&#39;a</span>, F&gt; {
+    </span><span class="kw">pub fn </span>y_bounds(<span class="kw-2">mut </span><span class="self">self</span>, bounds: [f64; <span class="number">2</span>]) -&gt; Canvas&lt;<span class="lifetime">'a</span>, F&gt; {
         <span class="self">self</span>.y_bounds = bounds;
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Store the closure that will be used to draw to the Canvas
-    </span><span class="kw">pub fn </span>paint(<span class="kw-2">mut </span><span class="self">self</span>, f: F) -&gt; Canvas&lt;<span class="lifetime">&#39;a</span>, F&gt; {
+    </span><span class="kw">pub fn </span>paint(<span class="kw-2">mut </span><span class="self">self</span>, f: F) -&gt; Canvas&lt;<span class="lifetime">'a</span>, F&gt; {
         <span class="self">self</span>.paint_func = <span class="prelude-val">Some</span>(f);
         <span class="self">self
     </span>}
 
     <span class="doccomment">/// Change the background color of the canvas
-    </span><span class="kw">pub fn </span>background_color(<span class="kw-2">mut </span><span class="self">self</span>, color: Color) -&gt; Canvas&lt;<span class="lifetime">&#39;a</span>, F&gt; {
+    </span><span class="kw">pub fn </span>background_color(<span class="kw-2">mut </span><span class="self">self</span>, color: Color) -&gt; Canvas&lt;<span class="lifetime">'a</span>, F&gt; {
         <span class="self">self</span>.background_color = color;
         <span class="self">self
     </span>}
@@ -1561,13 +1562,13 @@
     ///     .marker(symbols::Marker::Block)
     ///     .paint(|ctx| {});
     /// ```
-    </span><span class="kw">pub fn </span>marker(<span class="kw-2">mut </span><span class="self">self</span>, marker: symbols::Marker) -&gt; Canvas&lt;<span class="lifetime">&#39;a</span>, F&gt; {
+    </span><span class="kw">pub fn </span>marker(<span class="kw-2">mut </span><span class="self">self</span>, marker: symbols::Marker) -&gt; Canvas&lt;<span class="lifetime">'a</span>, F&gt; {
         <span class="self">self</span>.marker = marker;
         <span class="self">self
     </span>}
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, F&gt; Widget <span class="kw">for </span>Canvas&lt;<span class="lifetime">&#39;a</span>, F&gt;
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, F&gt; Widget <span class="kw">for </span>Canvas&lt;<span class="lifetime">'a</span>, F&gt;
 <span class="kw">where
     </span>F: Fn(<span class="kw-2">&amp;mut </span>Context),
 {
@@ -1604,7 +1605,7 @@
         <span class="comment">// Retrieve painted points for each layer
         </span><span class="kw">for </span>layer <span class="kw">in </span>ctx.layers {
             <span class="kw">for </span>(index, (ch, colors)) <span class="kw">in </span>layer.string.chars().zip(layer.colors).enumerate() {
-                <span class="kw">if </span>ch != <span class="string">&#39; &#39; </span>&amp;&amp; ch != <span class="string">&#39;\u{2800}&#39; </span>{
+                <span class="kw">if </span>ch != <span class="string">' ' </span>&amp;&amp; ch != <span class="string">'\u{2800}' </span>{
                     <span class="kw">let </span>(x, y) = (
                         (index % width) <span class="kw">as </span>u16 + canvas_area.left(),
                         (index / width) <span class="kw">as </span>u16 + canvas_area.top(),
@@ -1656,7 +1657,7 @@
     </span><span class="kw">fn </span>test_marker(marker: Marker, expected: <span class="kw-2">&amp;</span>str) {
         <span class="kw">let </span>area = Rect::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">5</span>, <span class="number">5</span>);
         <span class="kw">let </span><span class="kw-2">mut </span>cell = Cell::default();
-        cell.set_char(<span class="string">&#39;x&#39;</span>);
+        cell.set_char(<span class="string">'x'</span>);
         <span class="kw">let </span><span class="kw-2">mut </span>buf = Buffer::filled(area, <span class="kw-2">&amp;</span>cell);
         <span class="kw">let </span>horizontal_line = Line {
             x1: <span class="number">0.0</span>,
@@ -1689,12 +1690,12 @@
         test_marker(
             Marker::Bar,
             <span class="macro">indoc!</span>(
-                <span class="string">&quot;
+                <span class="string">"
                 ▄xxxx
                 ▄xxxx
                 ▄xxxx
                 ▄xxxx
-                ▄▄▄▄▄&quot;
+                ▄▄▄▄▄"
             </span>),
         );
     }
@@ -1704,12 +1705,12 @@
         test_marker(
             Marker::Block,
             <span class="macro">indoc!</span>(
-                <span class="string">&quot;
+                <span class="string">"
                 █xxxx
                 █xxxx
                 █xxxx
                 █xxxx
-                █████&quot;
+                █████"
             </span>),
         );
     }
@@ -1719,12 +1720,12 @@
         test_marker(
             Marker::Braille,
             <span class="macro">indoc!</span>(
-                <span class="string">&quot;
+                <span class="string">"
                 ⡇xxxx
                 ⡇xxxx
                 ⡇xxxx
                 ⡇xxxx
-                ⣇⣀⣀⣀⣀&quot;
+                ⣇⣀⣀⣀⣀"
             </span>),
         );
     }
@@ -1734,12 +1735,12 @@
         test_marker(
             Marker::Dot,
             <span class="macro">indoc!</span>(
-                <span class="string">&quot;
+                <span class="string">"
                 •xxxx
                 •xxxx
                 •xxxx
                 •xxxx
-                •••••&quot;
+                •••••"
             </span>),
         );
     }

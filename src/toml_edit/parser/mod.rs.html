@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/toml_edit-0.22.4/src/parser/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="toml_edit" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/toml_edit-0.22.6/src/parser/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="toml_edit" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -348,19 +349,19 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>winnow::PResult;
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>winnow::Parser;
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type </span>Input&lt;<span class="lifetime">&#39;b</span>&gt; = winnow::Located&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>winnow::BStr&gt;;
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type </span>Input&lt;<span class="lifetime">'b</span>&gt; = winnow::Located&lt;<span class="kw-2">&amp;</span><span class="lifetime">'b </span>winnow::BStr&gt;;
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new_input(s: <span class="kw-2">&amp;</span>str) -&gt; Input&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new_input(s: <span class="kw-2">&amp;</span>str) -&gt; Input&lt;<span class="lifetime">'_</span>&gt; {
         winnow::Located::new(winnow::BStr::new(s))
     }
 
-    <span class="attr">#[cfg(not(feature = <span class="string">&quot;unbounded&quot;</span>))]
+    <span class="attr">#[cfg(not(feature = <span class="string">"unbounded"</span>))]
     #[derive(Copy, Clone, Debug, Default)]
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>RecursionCheck {
         current: usize,
     }
 
-    <span class="attr">#[cfg(not(feature = <span class="string">&quot;unbounded&quot;</span>))]
+    <span class="attr">#[cfg(not(feature = <span class="string">"unbounded"</span>))]
     </span><span class="kw">impl </span>RecursionCheck {
         <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>check_depth(depth: usize) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="kw">super</span>::error::CustomError&gt; {
             <span class="kw">if </span>depth &lt; <span class="number">128 </span>{
@@ -372,7 +373,7 @@
 
         <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>recursing(
             <span class="kw-2">mut </span><span class="self">self</span>,
-            input: <span class="kw-2">&amp;mut </span>Input&lt;<span class="lifetime">&#39;_</span>&gt;,
+            input: <span class="kw-2">&amp;mut </span>Input&lt;<span class="lifetime">'_</span>&gt;,
         ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, winnow::error::ErrMode&lt;ContextError&gt;&gt; {
             <span class="self">self</span>.current += <span class="number">1</span>;
             <span class="kw">if </span><span class="self">self</span>.current &lt; <span class="number">128 </span>{
@@ -387,11 +388,11 @@
         }
     }
 
-    <span class="attr">#[cfg(feature = <span class="string">&quot;unbounded&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">"unbounded"</span>)]
     #[derive(Copy, Clone, Debug, Default)]
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>RecursionCheck {}
 
-    <span class="attr">#[cfg(feature = <span class="string">&quot;unbounded&quot;</span>)]
+    <span class="attr">#[cfg(feature = <span class="string">"unbounded"</span>)]
     </span><span class="kw">impl </span>RecursionCheck {
         <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>check_depth(_depth: usize) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="kw">super</span>::error::CustomError&gt; {
             <span class="prelude-val">Ok</span>(())
@@ -399,7 +400,7 @@
 
         <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>recursing(
             <span class="self">self</span>,
-            _input: <span class="kw-2">&amp;mut </span>Input&lt;<span class="lifetime">&#39;_</span>&gt;,
+            _input: <span class="kw-2">&amp;mut </span>Input&lt;<span class="lifetime">'_</span>&gt;,
         ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, winnow::error::ErrMode&lt;ContextError&gt;&gt; {
             <span class="prelude-val">Ok</span>(<span class="self">self</span>)
         }
@@ -407,26 +408,26 @@
 }
 
 <span class="attr">#[cfg(test)]
-#[cfg(feature = <span class="string">&quot;parse&quot;</span>)]
-#[cfg(feature = <span class="string">&quot;display&quot;</span>)]
+#[cfg(feature = <span class="string">"parse"</span>)]
+#[cfg(feature = <span class="string">"display"</span>)]
 </span><span class="kw">mod </span>test {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>documents() {
         <span class="kw">let </span>documents = [
-            <span class="string">&quot;&quot;</span>,
-            <span class="string">r#&quot;
+            <span class="string">""</span>,
+            <span class="string">r#"
 # This is a TOML document.
 
-title = &quot;TOML Example&quot;
+title = "TOML Example"
 
     [owner]
-    name = &quot;Tom Preston-Werner&quot;
+    name = "Tom Preston-Werner"
     dob = 1979-05-27T07:32:00-08:00 # First class dates
 
     [database]
-    server = &quot;192.168.1.1&quot;
+    server = "192.168.1.1"
     ports = [ 8001, 8001, 8002 ]
     connection_max = 5000
     enabled = true
@@ -435,42 +436,42 @@ title = &quot;TOML Example&quot;
 
     # Indentation (tabs and/or spaces) is allowed but not required
 [servers.alpha]
-    ip = &quot;10.0.0.1&quot;
-    dc = &quot;eqdc10&quot;
+    ip = "10.0.0.1"
+    dc = "eqdc10"
 
     [servers.beta]
-    ip = &quot;10.0.0.2&quot;
-    dc = &quot;eqdc10&quot;
+    ip = "10.0.0.2"
+    dc = "eqdc10"
 
     [clients]
-    data = [ [&quot;gamma&quot;, &quot;delta&quot;], [1, 2] ]
+    data = [ ["gamma", "delta"], [1, 2] ]
 
     # Line breaks are OK when inside arrays
 hosts = [
-    &quot;alpha&quot;,
-    &quot;omega&quot;
+    "alpha",
+    "omega"
 ]
 
-   &#39;some.weird .stuff&#39;   =  &quot;&quot;&quot;
+   'some.weird .stuff'   =  """
                          like
                          that
-                      #   &quot;&quot;&quot; # this broke my syntax highlighting
-   &quot; also. like &quot; = &#39;&#39;&#39;
+                      #   """ # this broke my syntax highlighting
+   " also. like " = '''
 that
-&#39;&#39;&#39;
+'''
    double = 2e39 # this number looks familiar
-# trailing comment&quot;#</span>,
-            <span class="string">r#&quot;&quot;#</span>,
-            <span class="string">r#&quot;  &quot;#</span>,
-            <span class="string">r#&quot; hello = &#39;darkness&#39; # my old friend
-&quot;#</span>,
-            <span class="string">r#&quot;[parent . child]
-key = &quot;value&quot;
-&quot;#</span>,
-            <span class="string">r#&quot;hello.world = &quot;a&quot;
-&quot;#</span>,
-            <span class="string">r#&quot;foo = 1979-05-27 # Comment
-&quot;#</span>,
+# trailing comment"#</span>,
+            <span class="string">r#""#</span>,
+            <span class="string">r#"  "#</span>,
+            <span class="string">r#" hello = 'darkness' # my old friend
+"#</span>,
+            <span class="string">r#"[parent . child]
+key = "value"
+"#</span>,
+            <span class="string">r#"hello.world = "a"
+"#</span>,
+            <span class="string">r#"foo = 1979-05-27 # Comment
+"#</span>,
         ];
         <span class="kw">for </span>input <span class="kw">in </span>documents {
             <span class="macro">dbg!</span>(input);
@@ -482,7 +483,7 @@ key = &quot;value&quot;
                 <span class="prelude-val">Ok</span>(doc) =&gt; doc,
                 <span class="prelude-val">Err</span>(err) =&gt; {
                     <span class="macro">panic!</span>(
-                        <span class="string">&quot;Parse error: {:?}\nFailed to parse:\n```\n{}\n```&quot;</span>,
+                        <span class="string">"Parse error: {:?}\nFailed to parse:\n```\n{}\n```"</span>,
                         err, input
                     )
                 }
@@ -494,12 +495,12 @@ key = &quot;value&quot;
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>documents_parse_only() {
-        <span class="kw">let </span>parse_only = [<span class="string">&quot;\u{FEFF}
+        <span class="kw">let </span>parse_only = [<span class="string">"\u{FEFF}
 [package]
-name = \&quot;foo\&quot;
-version = \&quot;0.0.1\&quot;
+name = \"foo\"
+version = \"0.0.1\"
 authors = []
-&quot;</span>];
+"</span>];
         <span class="kw">for </span>input <span class="kw">in </span>parse_only {
             <span class="macro">dbg!</span>(input);
             <span class="kw">let </span><span class="kw-2">mut </span>parsed = parse_document(input);
@@ -510,7 +511,7 @@ authors = []
                 <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; (),
                 <span class="prelude-val">Err</span>(err) =&gt; {
                     <span class="macro">panic!</span>(
-                        <span class="string">&quot;Parse error: {:?}\nFailed to parse:\n```\n{}\n```&quot;</span>,
+                        <span class="string">"Parse error: {:?}\nFailed to parse:\n```\n{}\n```"</span>,
                         err, input
                     )
                 }
@@ -520,15 +521,15 @@ authors = []
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>invalid_documents() {
-        <span class="kw">let </span>invalid_inputs = [<span class="string">r#&quot; hello = &#39;darkness&#39; # my old friend
-$&quot;#</span>];
+        <span class="kw">let </span>invalid_inputs = [<span class="string">r#" hello = 'darkness' # my old friend
+$"#</span>];
         <span class="kw">for </span>input <span class="kw">in </span>invalid_inputs {
             <span class="macro">dbg!</span>(input);
             <span class="kw">let </span><span class="kw-2">mut </span>parsed = parse_document(input);
             <span class="kw">if let </span><span class="prelude-val">Ok</span>(parsed) = <span class="kw-2">&amp;mut </span>parsed {
                 parsed.despan();
             }
-            <span class="macro">assert!</span>(parsed.is_err(), <span class="string">&quot;Input: {:?}&quot;</span>, input);
+            <span class="macro">assert!</span>(parsed.is_err(), <span class="string">"Input: {:?}"</span>, input);
         }
     }
 }

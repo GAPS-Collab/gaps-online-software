@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.25.0/src/style/stylize.rs`."><title>stylize.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.25.0/src/style/stylize.rs`."><title>stylize.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><a class="sub-logo-container" href="../../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -450,12 +451,12 @@
 ///
 /// // generates
 ///
-/// #[doc = &quot;Sets the foreground color to [`black`](Color::Black).&quot;]
+/// #[doc = "Sets the foreground color to [`black`](Color::Black)."]
 /// fn black(self) -&gt; T {
 ///     self.fg(Color::Black)
 /// }
 ///
-/// #[doc = &quot;Sets the background color to [`black`](Color::Black).&quot;]
+/// #[doc = "Sets the background color to [`black`](Color::Black)."]
 /// fn on_black(self) -&gt; T {
 ///     self.bg(Color::Black)
 /// }
@@ -463,14 +464,14 @@
 </span><span class="macro">macro_rules! </span>color {
     ( <span class="macro-nonterminal">$color</span>:ident ) =&gt; {
         <span class="macro">paste! </span>{
-            <span class="attr">#[doc = <span class="string">&quot;Sets the foreground color to [`&quot; </span><span class="macro-nonterminal">$color </span><span class="string">&quot;`](Color::&quot; </span><span class="macro-nonterminal">$color</span>:camel <span class="string">&quot;).&quot;</span>]
-            #[must_use = <span class="macro">concat!</span>(<span class="string">&quot;`&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$color</span>), <span class="string">&quot;` returns the modified style without modifying the original&quot;</span>)]
+            <span class="attr">#[doc = <span class="string">"Sets the foreground color to [`" </span><span class="macro-nonterminal">$color </span><span class="string">"`](Color::" </span><span class="macro-nonterminal">$color</span>:camel <span class="string">")."</span>]
+            #[must_use = <span class="macro">concat!</span>(<span class="string">"`"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$color</span>), <span class="string">"` returns the modified style without modifying the original"</span>)]
             </span><span class="kw">fn </span><span class="macro-nonterminal">$color</span>(<span class="self">self</span>) -&gt; T {
                 <span class="self">self</span>.fg(Color::[&lt;<span class="macro-nonterminal">$color</span>:camel&gt;])
             }
 
-            <span class="attr">#[doc = <span class="string">&quot;Sets the background color to [`&quot; </span><span class="macro-nonterminal">$color </span><span class="string">&quot;`](Color::&quot; </span><span class="macro-nonterminal">$color</span>:camel <span class="string">&quot;).&quot;</span>]
-            #[must_use = <span class="macro">concat!</span>(<span class="string">&quot;`on_&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$color</span>), <span class="string">&quot;` returns the modified style without modifying the original&quot;</span>)]
+            <span class="attr">#[doc = <span class="string">"Sets the background color to [`" </span><span class="macro-nonterminal">$color </span><span class="string">"`](Color::" </span><span class="macro-nonterminal">$color</span>:camel <span class="string">")."</span>]
+            #[must_use = <span class="macro">concat!</span>(<span class="string">"`on_"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$color</span>), <span class="string">"` returns the modified style without modifying the original"</span>)]
             </span><span class="kw">fn </span>[&lt;on_ <span class="macro-nonterminal">$color</span>&gt;](<span class="self">self</span>) -&gt; T {
                 <span class="self">self</span>.bg(Color::[&lt;<span class="macro-nonterminal">$color</span>:camel&gt;])
             }
@@ -488,12 +489,12 @@
 ///
 /// // generates
 ///
-/// #[doc = &quot;Adds the [`BOLD`](Modifier::BOLD) modifier.&quot;]
+/// #[doc = "Adds the [`BOLD`](Modifier::BOLD) modifier."]
 /// fn bold(self) -&gt; T {
 ///     self.add_modifier(Modifier::BOLD)
 /// }
 ///
-/// #[doc = &quot;Removes the [`BOLD`](Modifier::BOLD) modifier.&quot;]
+/// #[doc = "Removes the [`BOLD`](Modifier::BOLD) modifier."]
 /// fn not_bold(self) -&gt; T {
 ///     self.remove_modifier(Modifier::BOLD)
 /// }
@@ -501,16 +502,16 @@
 </span><span class="macro">macro_rules! </span>modifier {
     ( <span class="macro-nonterminal">$modifier</span>:ident ) =&gt; {
         <span class="macro">paste! </span>{
-            <span class="attr">#[doc = <span class="string">&quot;Adds the [`&quot; </span><span class="macro-nonterminal">$modifier</span>:upper <span class="string">&quot;`](Modifier::&quot; </span><span class="macro-nonterminal">$modifier</span>:upper <span class="string">&quot;) modifier.&quot;</span>]
-            #[must_use = <span class="macro">concat!</span>(<span class="string">&quot;`&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$modifier</span>), <span class="string">&quot;` returns the modified style without modifying the original&quot;</span>)]
+            <span class="attr">#[doc = <span class="string">"Adds the [`" </span><span class="macro-nonterminal">$modifier</span>:upper <span class="string">"`](Modifier::" </span><span class="macro-nonterminal">$modifier</span>:upper <span class="string">") modifier."</span>]
+            #[must_use = <span class="macro">concat!</span>(<span class="string">"`"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$modifier</span>), <span class="string">"` returns the modified style without modifying the original"</span>)]
             </span><span class="kw">fn </span>[&lt;<span class="macro-nonterminal">$modifier</span>&gt;](<span class="self">self</span>) -&gt; T {
                 <span class="self">self</span>.add_modifier(Modifier::[&lt;<span class="macro-nonterminal">$modifier</span>:upper&gt;])
             }
         }
 
         <span class="macro">paste! </span>{
-            <span class="attr">#[doc = <span class="string">&quot;Removes the [`&quot; </span><span class="macro-nonterminal">$modifier</span>:upper <span class="string">&quot;`](Modifier::&quot; </span><span class="macro-nonterminal">$modifier</span>:upper <span class="string">&quot;) modifier.&quot;</span>]
-            #[must_use = <span class="macro">concat!</span>(<span class="string">&quot;`not_&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$modifier</span>), <span class="string">&quot;` returns the modified style without modifying the original&quot;</span>)]
+            <span class="attr">#[doc = <span class="string">"Removes the [`" </span><span class="macro-nonterminal">$modifier</span>:upper <span class="string">"`](Modifier::" </span><span class="macro-nonterminal">$modifier</span>:upper <span class="string">") modifier."</span>]
+            #[must_use = <span class="macro">concat!</span>(<span class="string">"`not_"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$modifier</span>), <span class="string">"` returns the modified style without modifying the original"</span>)]
             </span><span class="kw">fn </span>[&lt;not_ <span class="macro-nonterminal">$modifier</span>&gt;](<span class="self">self</span>) -&gt; T {
                 <span class="self">self</span>.remove_modifier(Modifier::[&lt;<span class="macro-nonterminal">$modifier</span>:upper&gt;])
             }
@@ -528,13 +529,13 @@
 /// writing:
 ///
 /// ```rust,ignore
-/// let text = Span::styled(&quot;Hello&quot;, Style::default().fg(Color::Red).bg(Color::Blue));
+/// let text = Span::styled("Hello", Style::default().fg(Color::Red).bg(Color::Blue));
 /// ```
 ///
 /// You can write:
 ///
 /// ```rust,ignore
-/// let text = &quot;Hello&quot;.red().on_blue();
+/// let text = "Hello".red().on_blue();
 /// ```
 ///
 /// This trait implements a provided method for every color as both foreground and background
@@ -545,28 +546,28 @@
 /// ```
 /// use ratatui::{prelude::*, widgets::*};
 ///
-/// let span = &quot;hello&quot;.red().on_blue().bold();
+/// let span = "hello".red().on_blue().bold();
 /// let line = Line::from(vec![
-///     &quot;hello&quot;.red().on_blue().bold(),
-///     &quot;world&quot;.green().on_yellow().not_bold(),
+///     "hello".red().on_blue().bold(),
+///     "world".green().on_yellow().not_bold(),
 /// ]);
 /// let paragraph = Paragraph::new(line).italic().underlined();
 /// let block = Block::default()
-///     .title(&quot;Title&quot;)
+///     .title("Title")
 ///     .borders(Borders::ALL)
 ///     .on_white()
 ///     .bold();
 /// ```
-</span><span class="kw">pub trait </span>Stylize&lt;<span class="lifetime">&#39;a</span>, T&gt;: Sized {
-    <span class="attr">#[must_use = <span class="string">&quot;`bg` returns the modified style without modifying the original&quot;</span>]
+</span><span class="kw">pub trait </span>Stylize&lt;<span class="lifetime">'a</span>, T&gt;: Sized {
+    <span class="attr">#[must_use = <span class="string">"`bg` returns the modified style without modifying the original"</span>]
     </span><span class="kw">fn </span>bg(<span class="self">self</span>, color: Color) -&gt; T;
-    <span class="attr">#[must_use = <span class="string">&quot;`fg` returns the modified style without modifying the original&quot;</span>]
+    <span class="attr">#[must_use = <span class="string">"`fg` returns the modified style without modifying the original"</span>]
     </span><span class="kw">fn </span>fg&lt;S: Into&lt;Color&gt;&gt;(<span class="self">self</span>, color: S) -&gt; T;
-    <span class="attr">#[must_use = <span class="string">&quot;`reset` returns the modified style without modifying the original&quot;</span>]
+    <span class="attr">#[must_use = <span class="string">"`reset` returns the modified style without modifying the original"</span>]
     </span><span class="kw">fn </span>reset(<span class="self">self</span>) -&gt; T;
-    <span class="attr">#[must_use = <span class="string">&quot;`add_modifier` returns the modified style without modifying the original&quot;</span>]
+    <span class="attr">#[must_use = <span class="string">"`add_modifier` returns the modified style without modifying the original"</span>]
     </span><span class="kw">fn </span>add_modifier(<span class="self">self</span>, modifier: Modifier) -&gt; T;
-    <span class="attr">#[must_use = <span class="string">&quot;`remove_modifier` returns the modified style without modifying the original&quot;</span>]
+    <span class="attr">#[must_use = <span class="string">"`remove_modifier` returns the modified style without modifying the original"</span>]
     </span><span class="kw">fn </span>remove_modifier(<span class="self">self</span>, modifier: Modifier) -&gt; T;
 
     <span class="macro">color!</span>(black);
@@ -597,7 +598,7 @@
     <span class="macro">modifier!</span>(crossed_out);
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T, U&gt; Stylize&lt;<span class="lifetime">&#39;a</span>, T&gt; <span class="kw">for </span>U
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, T, U&gt; Stylize&lt;<span class="lifetime">'a</span>, T&gt; <span class="kw">for </span>U
 <span class="kw">where
     </span>U: Styled&lt;Item = T&gt;,
 {
@@ -626,8 +627,8 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Styled <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str {
-    <span class="kw">type </span>Item = Span&lt;<span class="lifetime">&#39;a</span>&gt;;
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Styled <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">'a </span>str {
+    <span class="kw">type </span>Item = Span&lt;<span class="lifetime">'a</span>&gt;;
 
     <span class="kw">fn </span>style(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Style {
         Style::default()
@@ -639,7 +640,7 @@
 }
 
 <span class="kw">impl </span>Styled <span class="kw">for </span>String {
-    <span class="kw">type </span>Item = Span&lt;<span class="lifetime">&#39;static</span>&gt;;
+    <span class="kw">type </span>Item = Span&lt;<span class="lifetime">'static</span>&gt;;
 
     <span class="kw">fn </span>style(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Style {
         Style::default()
@@ -658,124 +659,124 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>str_styled() {
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.style(), Style::default());
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.style(), Style::default());
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;hello&quot;</span>.set_style(Style::new().cyan()),
-            Span::styled(<span class="string">&quot;hello&quot;</span>, Style::new().cyan())
+            <span class="string">"hello"</span>.set_style(Style::new().cyan()),
+            Span::styled(<span class="string">"hello"</span>, Style::new().cyan())
         );
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.black(), Span::from(<span class="string">&quot;hello&quot;</span>).black());
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.red(), Span::from(<span class="string">&quot;hello&quot;</span>).red());
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.green(), Span::from(<span class="string">&quot;hello&quot;</span>).green());
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.yellow(), Span::from(<span class="string">&quot;hello&quot;</span>).yellow());
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.blue(), Span::from(<span class="string">&quot;hello&quot;</span>).blue());
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.magenta(), Span::from(<span class="string">&quot;hello&quot;</span>).magenta());
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.cyan(), Span::from(<span class="string">&quot;hello&quot;</span>).cyan());
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.gray(), Span::from(<span class="string">&quot;hello&quot;</span>).gray());
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.dark_gray(), Span::from(<span class="string">&quot;hello&quot;</span>).dark_gray());
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.light_red(), Span::from(<span class="string">&quot;hello&quot;</span>).light_red());
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.light_green(), Span::from(<span class="string">&quot;hello&quot;</span>).light_green());
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.light_yellow(), Span::from(<span class="string">&quot;hello&quot;</span>).light_yellow());
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.light_blue(), Span::from(<span class="string">&quot;hello&quot;</span>).light_blue());
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.light_magenta(), Span::from(<span class="string">&quot;hello&quot;</span>).light_magenta());
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.light_cyan(), Span::from(<span class="string">&quot;hello&quot;</span>).light_cyan());
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.white(), Span::from(<span class="string">&quot;hello&quot;</span>).white());
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.black(), Span::from(<span class="string">"hello"</span>).black());
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.red(), Span::from(<span class="string">"hello"</span>).red());
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.green(), Span::from(<span class="string">"hello"</span>).green());
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.yellow(), Span::from(<span class="string">"hello"</span>).yellow());
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.blue(), Span::from(<span class="string">"hello"</span>).blue());
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.magenta(), Span::from(<span class="string">"hello"</span>).magenta());
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.cyan(), Span::from(<span class="string">"hello"</span>).cyan());
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.gray(), Span::from(<span class="string">"hello"</span>).gray());
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.dark_gray(), Span::from(<span class="string">"hello"</span>).dark_gray());
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.light_red(), Span::from(<span class="string">"hello"</span>).light_red());
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.light_green(), Span::from(<span class="string">"hello"</span>).light_green());
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.light_yellow(), Span::from(<span class="string">"hello"</span>).light_yellow());
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.light_blue(), Span::from(<span class="string">"hello"</span>).light_blue());
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.light_magenta(), Span::from(<span class="string">"hello"</span>).light_magenta());
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.light_cyan(), Span::from(<span class="string">"hello"</span>).light_cyan());
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.white(), Span::from(<span class="string">"hello"</span>).white());
 
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.on_black(), Span::from(<span class="string">&quot;hello&quot;</span>).on_black());
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.on_red(), Span::from(<span class="string">&quot;hello&quot;</span>).on_red());
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.on_green(), Span::from(<span class="string">&quot;hello&quot;</span>).on_green());
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.on_yellow(), Span::from(<span class="string">&quot;hello&quot;</span>).on_yellow());
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.on_blue(), Span::from(<span class="string">&quot;hello&quot;</span>).on_blue());
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.on_magenta(), Span::from(<span class="string">&quot;hello&quot;</span>).on_magenta());
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.on_cyan(), Span::from(<span class="string">&quot;hello&quot;</span>).on_cyan());
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.on_gray(), Span::from(<span class="string">&quot;hello&quot;</span>).on_gray());
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.on_dark_gray(), Span::from(<span class="string">&quot;hello&quot;</span>).on_dark_gray());
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.on_light_red(), Span::from(<span class="string">&quot;hello&quot;</span>).on_light_red());
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.on_black(), Span::from(<span class="string">"hello"</span>).on_black());
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.on_red(), Span::from(<span class="string">"hello"</span>).on_red());
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.on_green(), Span::from(<span class="string">"hello"</span>).on_green());
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.on_yellow(), Span::from(<span class="string">"hello"</span>).on_yellow());
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.on_blue(), Span::from(<span class="string">"hello"</span>).on_blue());
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.on_magenta(), Span::from(<span class="string">"hello"</span>).on_magenta());
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.on_cyan(), Span::from(<span class="string">"hello"</span>).on_cyan());
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.on_gray(), Span::from(<span class="string">"hello"</span>).on_gray());
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.on_dark_gray(), Span::from(<span class="string">"hello"</span>).on_dark_gray());
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.on_light_red(), Span::from(<span class="string">"hello"</span>).on_light_red());
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;hello&quot;</span>.on_light_green(),
-            Span::from(<span class="string">&quot;hello&quot;</span>).on_light_green()
+            <span class="string">"hello"</span>.on_light_green(),
+            Span::from(<span class="string">"hello"</span>).on_light_green()
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;hello&quot;</span>.on_light_yellow(),
-            Span::from(<span class="string">&quot;hello&quot;</span>).on_light_yellow()
+            <span class="string">"hello"</span>.on_light_yellow(),
+            Span::from(<span class="string">"hello"</span>).on_light_yellow()
         );
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.on_light_blue(), Span::from(<span class="string">&quot;hello&quot;</span>).on_light_blue());
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.on_light_blue(), Span::from(<span class="string">"hello"</span>).on_light_blue());
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;hello&quot;</span>.on_light_magenta(),
-            Span::from(<span class="string">&quot;hello&quot;</span>).on_light_magenta()
+            <span class="string">"hello"</span>.on_light_magenta(),
+            Span::from(<span class="string">"hello"</span>).on_light_magenta()
         );
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.on_light_cyan(), Span::from(<span class="string">&quot;hello&quot;</span>).on_light_cyan());
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.on_white(), Span::from(<span class="string">&quot;hello&quot;</span>).on_white());
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.on_light_cyan(), Span::from(<span class="string">"hello"</span>).on_light_cyan());
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.on_white(), Span::from(<span class="string">"hello"</span>).on_white());
 
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.bold(), Span::from(<span class="string">&quot;hello&quot;</span>).bold());
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.dim(), Span::from(<span class="string">&quot;hello&quot;</span>).dim());
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.italic(), Span::from(<span class="string">&quot;hello&quot;</span>).italic());
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.underlined(), Span::from(<span class="string">&quot;hello&quot;</span>).underlined());
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.slow_blink(), Span::from(<span class="string">&quot;hello&quot;</span>).slow_blink());
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.rapid_blink(), Span::from(<span class="string">&quot;hello&quot;</span>).rapid_blink());
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.reversed(), Span::from(<span class="string">&quot;hello&quot;</span>).reversed());
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.hidden(), Span::from(<span class="string">&quot;hello&quot;</span>).hidden());
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.crossed_out(), Span::from(<span class="string">&quot;hello&quot;</span>).crossed_out());
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.bold(), Span::from(<span class="string">"hello"</span>).bold());
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.dim(), Span::from(<span class="string">"hello"</span>).dim());
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.italic(), Span::from(<span class="string">"hello"</span>).italic());
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.underlined(), Span::from(<span class="string">"hello"</span>).underlined());
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.slow_blink(), Span::from(<span class="string">"hello"</span>).slow_blink());
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.rapid_blink(), Span::from(<span class="string">"hello"</span>).rapid_blink());
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.reversed(), Span::from(<span class="string">"hello"</span>).reversed());
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.hidden(), Span::from(<span class="string">"hello"</span>).hidden());
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.crossed_out(), Span::from(<span class="string">"hello"</span>).crossed_out());
 
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.not_bold(), Span::from(<span class="string">&quot;hello&quot;</span>).not_bold());
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.not_dim(), Span::from(<span class="string">&quot;hello&quot;</span>).not_dim());
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.not_italic(), Span::from(<span class="string">&quot;hello&quot;</span>).not_italic());
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.not_bold(), Span::from(<span class="string">"hello"</span>).not_bold());
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.not_dim(), Span::from(<span class="string">"hello"</span>).not_dim());
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.not_italic(), Span::from(<span class="string">"hello"</span>).not_italic());
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;hello&quot;</span>.not_underlined(),
-            Span::from(<span class="string">&quot;hello&quot;</span>).not_underlined()
+            <span class="string">"hello"</span>.not_underlined(),
+            Span::from(<span class="string">"hello"</span>).not_underlined()
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;hello&quot;</span>.not_slow_blink(),
-            Span::from(<span class="string">&quot;hello&quot;</span>).not_slow_blink()
+            <span class="string">"hello"</span>.not_slow_blink(),
+            Span::from(<span class="string">"hello"</span>).not_slow_blink()
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;hello&quot;</span>.not_rapid_blink(),
-            Span::from(<span class="string">&quot;hello&quot;</span>).not_rapid_blink()
+            <span class="string">"hello"</span>.not_rapid_blink(),
+            Span::from(<span class="string">"hello"</span>).not_rapid_blink()
         );
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.not_reversed(), Span::from(<span class="string">&quot;hello&quot;</span>).not_reversed());
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.not_hidden(), Span::from(<span class="string">&quot;hello&quot;</span>).not_hidden());
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.not_reversed(), Span::from(<span class="string">"hello"</span>).not_reversed());
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.not_hidden(), Span::from(<span class="string">"hello"</span>).not_hidden());
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;hello&quot;</span>.not_crossed_out(),
-            Span::from(<span class="string">&quot;hello&quot;</span>).not_crossed_out()
+            <span class="string">"hello"</span>.not_crossed_out(),
+            Span::from(<span class="string">"hello"</span>).not_crossed_out()
         );
 
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.reset(), Span::from(<span class="string">&quot;hello&quot;</span>).reset());
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.reset(), Span::from(<span class="string">"hello"</span>).reset());
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>string_styled() {
-        <span class="kw">let </span>s = String::from(<span class="string">&quot;hello&quot;</span>);
+        <span class="kw">let </span>s = String::from(<span class="string">"hello"</span>);
         <span class="macro">assert_eq!</span>(s.style(), Style::default());
         <span class="macro">assert_eq!</span>(
             s.clone().set_style(Style::new().cyan()),
-            Span::styled(<span class="string">&quot;hello&quot;</span>, Style::new().cyan())
+            Span::styled(<span class="string">"hello"</span>, Style::new().cyan())
         );
-        <span class="macro">assert_eq!</span>(s.clone().black(), Span::from(<span class="string">&quot;hello&quot;</span>).black());
-        <span class="macro">assert_eq!</span>(s.clone().on_black(), Span::from(<span class="string">&quot;hello&quot;</span>).on_black());
-        <span class="macro">assert_eq!</span>(s.clone().bold(), Span::from(<span class="string">&quot;hello&quot;</span>).bold());
-        <span class="macro">assert_eq!</span>(s.clone().not_bold(), Span::from(<span class="string">&quot;hello&quot;</span>).not_bold());
-        <span class="macro">assert_eq!</span>(s.clone().reset(), Span::from(<span class="string">&quot;hello&quot;</span>).reset());
+        <span class="macro">assert_eq!</span>(s.clone().black(), Span::from(<span class="string">"hello"</span>).black());
+        <span class="macro">assert_eq!</span>(s.clone().on_black(), Span::from(<span class="string">"hello"</span>).on_black());
+        <span class="macro">assert_eq!</span>(s.clone().bold(), Span::from(<span class="string">"hello"</span>).bold());
+        <span class="macro">assert_eq!</span>(s.clone().not_bold(), Span::from(<span class="string">"hello"</span>).not_bold());
+        <span class="macro">assert_eq!</span>(s.clone().reset(), Span::from(<span class="string">"hello"</span>).reset());
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>temporary_string_styled() {
         <span class="comment">// to_string() is used to create a temporary String, which is then styled. Without the
-        // `Styled` trait impl for `String`, this would fail to compile with the error: &quot;temporary
-        // value dropped while borrowed&quot;
-        </span><span class="kw">let </span>s = <span class="string">&quot;hello&quot;</span>.to_string().red();
-        <span class="macro">assert_eq!</span>(s, Span::from(<span class="string">&quot;hello&quot;</span>).red());
+        // `Styled` trait impl for `String`, this would fail to compile with the error: "temporary
+        // value dropped while borrowed"
+        </span><span class="kw">let </span>s = <span class="string">"hello"</span>.to_string().red();
+        <span class="macro">assert_eq!</span>(s, Span::from(<span class="string">"hello"</span>).red());
 
         <span class="comment">// format!() is used to create a temporary String inside a closure, which suffers the same
         // issue as above without the `Styled` trait impl for `String`
-        </span><span class="kw">let </span>items = <span class="macro">vec!</span>[String::from(<span class="string">&quot;a&quot;</span>), String::from(<span class="string">&quot;b&quot;</span>)];
-        <span class="kw">let </span>sss = items.iter().map(|s| <span class="macro">format!</span>(<span class="string">&quot;{s}{s}&quot;</span>).red()).collect_vec();
-        <span class="macro">assert_eq!</span>(sss, <span class="macro">vec!</span>[Span::from(<span class="string">&quot;aa&quot;</span>).red(), Span::from(<span class="string">&quot;bb&quot;</span>).red()]);
+        </span><span class="kw">let </span>items = <span class="macro">vec!</span>[String::from(<span class="string">"a"</span>), String::from(<span class="string">"b"</span>)];
+        <span class="kw">let </span>sss = items.iter().map(|s| <span class="macro">format!</span>(<span class="string">"{s}{s}"</span>).red()).collect_vec();
+        <span class="macro">assert_eq!</span>(sss, <span class="macro">vec!</span>[Span::from(<span class="string">"aa"</span>).red(), Span::from(<span class="string">"bb"</span>).red()]);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>reset() {
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;hello&quot;</span>.on_cyan().light_red().bold().underlined().reset(),
-            Span::styled(<span class="string">&quot;hello&quot;</span>, Style::reset())
+            <span class="string">"hello"</span>.on_cyan().light_red().bold().underlined().reset(),
+            Span::styled(<span class="string">"hello"</span>, Style::reset())
         );
     }
 
@@ -783,14 +784,14 @@
     </span><span class="kw">fn </span>fg() {
         <span class="kw">let </span>cyan_fg = Style::default().fg(Color::Cyan);
 
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.cyan(), Span::styled(<span class="string">&quot;hello&quot;</span>, cyan_fg));
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.cyan(), Span::styled(<span class="string">"hello"</span>, cyan_fg));
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>bg() {
         <span class="kw">let </span>cyan_bg = Style::default().bg(Color::Cyan);
 
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.on_cyan(), Span::styled(<span class="string">&quot;hello&quot;</span>, cyan_bg));
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.on_cyan(), Span::styled(<span class="string">"hello"</span>, cyan_bg));
     }
 
     <span class="attr">#[test]
@@ -799,14 +800,14 @@
             .fg(Color::Cyan)
             .add_modifier(Modifier::BOLD);
 
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.cyan().bold(), Span::styled(<span class="string">&quot;hello&quot;</span>, cyan_bold));
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.cyan().bold(), Span::styled(<span class="string">"hello"</span>, cyan_bold));
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>fg_bg() {
         <span class="kw">let </span>cyan_fg_bg = Style::default().bg(Color::Cyan).fg(Color::Cyan);
 
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.cyan().on_cyan(), Span::styled(<span class="string">&quot;hello&quot;</span>, cyan_fg_bg));
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.cyan().on_cyan(), Span::styled(<span class="string">"hello"</span>, cyan_fg_bg));
     }
 
     <span class="attr">#[test]
@@ -815,8 +816,8 @@
         <span class="kw">let </span>cyan_fg = Style::default().fg(Color::Cyan);
 
         <span class="comment">// Behavior: the last one set is the definitive one
-        </span><span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.on_red().on_cyan(), Span::styled(<span class="string">&quot;hello&quot;</span>, cyan_bg));
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;hello&quot;</span>.red().cyan(), Span::styled(<span class="string">&quot;hello&quot;</span>, cyan_fg));
+        </span><span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.on_red().on_cyan(), Span::styled(<span class="string">"hello"</span>, cyan_bg));
+        <span class="macro">assert_eq!</span>(<span class="string">"hello"</span>.red().cyan(), Span::styled(<span class="string">"hello"</span>, cyan_fg));
     }
 
     <span class="attr">#[test]
@@ -833,7 +834,7 @@
                     | Modifier::CROSSED_OUT,
             );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;hello&quot;
+            <span class="string">"hello"
                 </span>.on_black()
                 .black()
                 .bold()
@@ -842,7 +843,7 @@
                 .slow_blink()
                 .crossed_out()
                 .reversed(),
-            Span::styled(<span class="string">&quot;hello&quot;</span>, all_modifier_black)
+            Span::styled(<span class="string">"hello"</span>, all_modifier_black)
         );
     }
 }

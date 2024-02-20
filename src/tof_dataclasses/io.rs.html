@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/io.rs`."><title>io.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/io.rs`."><title>io.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1350,41 +1351,6 @@
 <a href="#1350" id="1350">1350</a>
 <a href="#1351" id="1351">1351</a>
 <a href="#1352" id="1352">1352</a>
-<a href="#1353" id="1353">1353</a>
-<a href="#1354" id="1354">1354</a>
-<a href="#1355" id="1355">1355</a>
-<a href="#1356" id="1356">1356</a>
-<a href="#1357" id="1357">1357</a>
-<a href="#1358" id="1358">1358</a>
-<a href="#1359" id="1359">1359</a>
-<a href="#1360" id="1360">1360</a>
-<a href="#1361" id="1361">1361</a>
-<a href="#1362" id="1362">1362</a>
-<a href="#1363" id="1363">1363</a>
-<a href="#1364" id="1364">1364</a>
-<a href="#1365" id="1365">1365</a>
-<a href="#1366" id="1366">1366</a>
-<a href="#1367" id="1367">1367</a>
-<a href="#1368" id="1368">1368</a>
-<a href="#1369" id="1369">1369</a>
-<a href="#1370" id="1370">1370</a>
-<a href="#1371" id="1371">1371</a>
-<a href="#1372" id="1372">1372</a>
-<a href="#1373" id="1373">1373</a>
-<a href="#1374" id="1374">1374</a>
-<a href="#1375" id="1375">1375</a>
-<a href="#1376" id="1376">1376</a>
-<a href="#1377" id="1377">1377</a>
-<a href="#1378" id="1378">1378</a>
-<a href="#1379" id="1379">1379</a>
-<a href="#1380" id="1380">1380</a>
-<a href="#1381" id="1381">1381</a>
-<a href="#1382" id="1382">1382</a>
-<a href="#1383" id="1383">1383</a>
-<a href="#1384" id="1384">1384</a>
-<a href="#1385" id="1385">1385</a>
-<a href="#1386" id="1386">1386</a>
-<a href="#1387" id="1387">1387</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Dataio - readino/writing of different types
 //! of TOF data products.
 //!
@@ -1394,10 +1360,10 @@
 //!
 //! * RobinReader: Read (old) RB data files, where 
 //!   the file is simply a dump of the internal 
-//!   buffers (&quot;RBEventMemoryView&quot;).
+//!   buffers ("RBEventMemoryView").
 //!
-//! * RBEventMemoryStreamer: Walk over &quot;raw&quot; RBEvents
-//!   representations (&quot;RBEventMemoryView&quot;) and extract
+//! * RBEventMemoryStreamer: Walk over "raw" RBEvents
+//!   representations ("RBEventMemoryView") and extract
 //!   RBEvents
 //!
 
@@ -1455,7 +1421,7 @@
     TofPacket,
     PacketType,
 };
-
+<span class="kw">use </span><span class="kw">crate</span>::constants::NWORDS;
 <span class="kw">use </span><span class="kw">crate</span>::serialization::{
     Serialization,
     SerializationError,
@@ -1478,8 +1444,8 @@
 <span class="doccomment">/// Get a human readable timestamp
 </span><span class="kw">pub fn </span>get_utc_timestamp() -&gt; String {
   <span class="kw">let </span>now: DateTime&lt;Utc&gt; = Utc::now();
-  <span class="comment">// Format the timestamp as &quot;YYYY_MM_DD_HH_MM&quot;
-  </span><span class="kw">let </span>timestamp_str = now.format(<span class="string">&quot;%Y_%m_%d-%H_%M_%S&quot;</span>).to_string();
+  <span class="comment">// Format the timestamp as "YYYY_MM_DD_HH_MM"
+  </span><span class="kw">let </span>timestamp_str = now.format(<span class="string">"%Y_%m_%d-%H_%M_%S"</span>).to_string();
   timestamp_str
 }
 
@@ -1491,14 +1457,14 @@
 /// * rb_id   : unique identfier for the 
 ///             Readoutboard (1-50)
 /// * default : if default, just add 
-///             &quot;latest&quot; instead of 
+///             "latest" instead of 
 ///             a timestamp
 </span><span class="kw">pub fn </span>get_califilename(rb_id : u8, latest : bool) -&gt; String {
   <span class="kw">let </span>ts = get_utc_timestamp();
   <span class="kw">if </span>latest {
-    <span class="macro">format!</span>(<span class="string">&quot;RB{rb_id:02}_latest.cali.tof.gaps&quot;</span>)
+    <span class="macro">format!</span>(<span class="string">"RB{rb_id:02}_latest.cali.tof.gaps"</span>)
   } <span class="kw">else </span>{
-    <span class="macro">format!</span>(<span class="string">&quot;RB{rb_id:02}_{ts}.cali.tof.gaps&quot;</span>)
+    <span class="macro">format!</span>(<span class="string">"RB{rb_id:02}_{ts}.cali.tof.gaps"</span>)
   }
 }
 
@@ -1517,10 +1483,10 @@
   <span class="kw">let </span>fname : String;
   <span class="kw">match </span>rb_id {
     <span class="prelude-val">None </span>=&gt; {
-      fname = <span class="macro">format!</span>(<span class="string">&quot;Run{run}_{subrun}.{ts}.tof.gaps&quot;</span>);
+      fname = <span class="macro">format!</span>(<span class="string">"Run{run}_{subrun}.{ts}.tof.gaps"</span>);
     }
     <span class="prelude-val">Some</span>(rbid) =&gt; {
-      fname = <span class="macro">format!</span>(<span class="string">&quot;Run{run}_{subrun}.{ts}.RB{rbid:02}.tof.gaps&quot;</span>);
+      fname = <span class="macro">format!</span>(<span class="string">"Run{run}_{subrun}.{ts}.RB{rbid:02}.tof.gaps"</span>);
     }
   }
   fname
@@ -1537,7 +1503,7 @@
       <span class="kw">return </span><span class="prelude-val">Ok</span>(buffer);
     },
     <span class="prelude-val">Err</span>(err) =&gt; {
-      <span class="macro">error!</span>(<span class="string">&quot;Can not read {n} bytes from file! Error {err}&quot;</span>);
+      <span class="macro">error!</span>(<span class="string">"Can not read {n} bytes from file! Error {err}"</span>);
       <span class="kw">return </span><span class="prelude-val">Err</span>(err);
     },
     <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; ()
@@ -1554,11 +1520,11 @@
 ///
 /// * filename : full path to the file to be read
 </span><span class="kw">pub fn </span>read_file(filename: <span class="kw-2">&amp;</span>Path) -&gt; io::Result&lt;Vec&lt;u8&gt;&gt; {
-  <span class="macro">info!</span>(<span class="string">&quot;Reading file {}&quot;</span>, filename.display());
+  <span class="macro">info!</span>(<span class="string">"Reading file {}"</span>, filename.display());
   <span class="kw">let </span><span class="kw-2">mut </span>f = File::open(<span class="kw-2">&amp;</span>filename)<span class="question-mark">?</span>;
   <span class="kw">let </span>metadata = fs::metadata(<span class="kw-2">&amp;</span>filename)<span class="question-mark">?</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>buffer = <span class="macro">vec!</span>[<span class="number">0</span>; metadata.len() <span class="kw">as </span>usize];
-  <span class="macro">info!</span>(<span class="string">&quot;Read {} bytes from {}&quot;</span>, buffer.len(), filename.display());
+  <span class="macro">info!</span>(<span class="string">"Read {} bytes from {}"</span>, buffer.len(), filename.display());
   <span class="comment">// read_exact if the amount is not specified
   </span>f.read_exact(<span class="kw-2">&amp;mut </span>buffer)<span class="question-mark">?</span>;
   <span class="prelude-val">Ok</span>(buffer)
@@ -1646,7 +1612,7 @@
     </span><span class="kw">loop </span>{
       <span class="kw">let </span><span class="kw-2">mut </span>result = (<span class="number">0usize</span>, <span class="number">0usize</span>);
       <span class="kw">if </span>!<span class="self">self</span>.seek_next_header(<span class="number">0xaaaa</span>) {
-        <span class="macro">debug!</span>(<span class="string">&quot;Could not find another header...&quot;</span>);
+        <span class="macro">debug!</span>(<span class="string">"Could not find another header..."</span>);
         <span class="self">self</span>.pos = begin_pos;
         <span class="self">self</span>.last_evid = event_id;
         <span class="kw">if </span>result.<span class="number">0 </span>+ result.<span class="number">1 </span>&gt; <span class="self">self</span>.stream.len() - <span class="number">1 </span>{
@@ -1654,7 +1620,7 @@
         } <span class="kw">else </span>{
           <span class="self">self</span>.last_event_complete = <span class="bool-val">true</span>;
         }
-        <span class="macro">info!</span>(<span class="string">&quot;Indexed {} events from {} to {}&quot;</span>, <span class="self">self</span>.event_map.len(), <span class="self">self</span>.first_evid, <span class="self">self</span>.last_evid);
+        <span class="macro">info!</span>(<span class="string">"Indexed {} events from {} to {}"</span>, <span class="self">self</span>.event_map.len(), <span class="self">self</span>.first_evid, <span class="self">self</span>.last_evid);
         <span class="kw">return</span>;
       }
       result.<span class="number">0 </span>= <span class="self">self</span>.pos;
@@ -1664,7 +1630,7 @@
         <span class="comment">//self.is_depleted = true;
         </span><span class="self">self</span>.pos = begin_pos;
         <span class="self">self</span>.last_evid = event_id;
-        <span class="macro">info!</span>(<span class="string">&quot;Indexed {} events from {} to {}&quot;</span>, <span class="self">self</span>.event_map.len(), <span class="self">self</span>.first_evid, <span class="self">self</span>.last_evid);
+        <span class="macro">info!</span>(<span class="string">"Indexed {} events from {} to {}"</span>, <span class="self">self</span>.event_map.len(), <span class="self">self</span>.first_evid, <span class="self">self</span>.last_evid);
         <span class="kw">return</span>;
         <span class="comment">//return Err(SerializationError::StreamTooShort);
       </span>}
@@ -1672,7 +1638,7 @@
       <span class="kw">if </span>packet_len &lt; <span class="number">6 </span>{
         <span class="self">self</span>.pos = begin_pos;
         <span class="self">self</span>.last_evid = event_id;
-        <span class="macro">info!</span>(<span class="string">&quot;Indexed {} events from {} to {}&quot;</span>, <span class="self">self</span>.event_map.len(), <span class="self">self</span>.first_evid, <span class="self">self</span>.last_evid);
+        <span class="macro">info!</span>(<span class="string">"Indexed {} events from {} to {}"</span>, <span class="self">self</span>.event_map.len(), <span class="self">self</span>.first_evid, <span class="self">self</span>.last_evid);
         <span class="kw">return</span>;
         <span class="comment">//return Err(SerializationError::StreamTooShort);
       </span>}
@@ -1698,7 +1664,7 @@
   <span class="kw">pub fn </span>print_event_map(<span class="kw-2">&amp;</span><span class="self">self</span>) {
     <span class="kw">for </span>k <span class="kw">in </span><span class="self">self</span>.event_map.keys() {
       <span class="kw">let </span>pos = <span class="self">self</span>.event_map[<span class="kw-2">&amp;</span>k];
-      <span class="macro">println!</span>(<span class="string">&quot;-- --&gt; {} -&gt; {},{}&quot;</span>, k, pos.<span class="number">0</span>, pos.<span class="number">1</span>);
+      <span class="macro">println!</span>(<span class="string">"-- --&gt; {} -&gt; {},{}"</span>, k, pos.<span class="number">0</span>, pos.<span class="number">1</span>);
     }
   }
 
@@ -1712,15 +1678,15 @@
     <span class="kw">loop </span>{
       <span class="kw">match </span><span class="self">self</span>.next() {
         <span class="prelude-val">None </span>=&gt; {
-          <span class="macro">info!</span>(<span class="string">&quot;Streamer drained!&quot;</span>);
+          <span class="macro">info!</span>(<span class="string">"Streamer drained!"</span>);
           <span class="kw">break</span>;
         },
         <span class="prelude-val">Some</span>(ev) =&gt; {
           <span class="kw">let </span>tp = TofPacket::from(<span class="kw-2">&amp;</span>ev);
-          <span class="kw">match </span><span class="self">self</span>.tp_sender.as_ref().expect(<span class="string">&quot;Sender needs to be initialized first!&quot;</span>).send(tp) {
+          <span class="kw">match </span><span class="self">self</span>.tp_sender.as_ref().expect(<span class="string">"Sender needs to be initialized first!"</span>).send(tp) {
             <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; (),
             <span class="prelude-val">Err</span>(err) =&gt; {
-              <span class="macro">error!</span>(<span class="string">&quot;Unable to send TofPacket! {err}&quot;</span>);
+              <span class="macro">error!</span>(<span class="string">"Unable to send TofPacket! {err}"</span>);
             }
           }
         }
@@ -1729,17 +1695,17 @@
   }
 
 
-  <span class="comment">// FIXME - performance. Don&#39;t extend it. It would be
-  // better if we&#39;d consume the stream without 
+  <span class="comment">// FIXME - performance. Don't extend it. It would be
+  // better if we'd consume the stream without 
   // reallocating memory.
   </span><span class="kw">pub fn </span>add(<span class="kw-2">&amp;mut </span><span class="self">self</span>, stream : <span class="kw-2">&amp;</span>Vec&lt;u8&gt;, nbytes : usize) {
     <span class="comment">//self.stream.extend(stream.iter().copied());
-    //println!(&quot;self.pos {}&quot;, self.pos);
-    //println!(&quot;Stream before {}&quot;,self.stream.len());
+    //println!("self.pos {}", self.pos);
+    //println!("Stream before {}",self.stream.len());
     </span><span class="self">self</span>.is_depleted = <span class="bool-val">false</span>;
     <span class="self">self</span>.stream.extend_from_slice(<span class="kw-2">&amp;</span>stream[<span class="number">0</span>..nbytes]);
     <span class="comment">//self.create_event_index();
-    //println!(&quot;Stream after {}&quot;,self.stream.len());
+    //println!("Stream after {}",self.stream.len());
   </span>}
 
   <span class="doccomment">/// Take in a stream by consuming it, that means moving
@@ -1748,8 +1714,10 @@
     <span class="self">self</span>.is_depleted = <span class="bool-val">false</span>;
     <span class="comment">// FIXME: append can panic
     // we use it here, since it does not clone
+    //println!("[io.rs] consuming {} bytes", stream.len());
     </span><span class="self">self</span>.stream.append(stream);
-    <span class="comment">//self.create_event_index();
+    <span class="comment">//println!("[io.rs] stream has now {} bytes", self.stream.len());
+    //self.create_event_index();
   </span>}
 
   <span class="doccomment">/// Headers are expected to be a 2byte signature, 
@@ -1780,12 +1748,12 @@
     </span><span class="kw">let </span>foot_pos : usize;
     <span class="kw">let </span>head_pos : usize;
     <span class="kw">if </span><span class="self">self</span>.stream.len() == <span class="number">0 </span>{
-      <span class="macro">trace!</span>(<span class="string">&quot;Stream empty!&quot;</span>);
+      <span class="macro">trace!</span>(<span class="string">"Stream empty!"</span>);
       <span class="kw">return </span><span class="prelude-val">None</span>;
     }
     <span class="kw">if </span>!<span class="self">self</span>.pos_at_head {
       <span class="kw">if </span>!<span class="self">self</span>.seek_next_header(<span class="number">0xaaaa</span>) {
-        <span class="macro">debug!</span>(<span class="string">&quot;Could not find another header...&quot;</span>);
+        <span class="macro">debug!</span>(<span class="string">"Could not find another header..."</span>);
         <span class="self">self</span>.pos = begin_pos;
         <span class="kw">return </span><span class="prelude-val">None</span>;
       }
@@ -1794,11 +1762,11 @@
     <span class="comment">//let mut foot_pos  = self.pos;
     //head_pos = self.pos;
     </span><span class="kw">if </span>!<span class="self">self</span>.seek_next_header(<span class="number">0x5555</span>) {
-      <span class="macro">debug!</span>(<span class="string">&quot;Could not find another footer...&quot;</span>);
+      <span class="macro">debug!</span>(<span class="string">"Could not find another footer..."</span>);
       <span class="self">self</span>.pos = begin_pos;
       <span class="kw">return </span><span class="prelude-val">None</span>;
     }
-    <span class="comment">//println!(&quot;{} {} {}&quot;, self.stream.len(), head_pos, foot_pos);
+    <span class="comment">//println!("{} {} {}", self.stream.len(), head_pos, foot_pos);
     </span>foot_pos = <span class="self">self</span>.pos;
     <span class="self">self</span>.n_events_ext += <span class="number">1</span>;
     <span class="kw">let </span><span class="kw-2">mut </span>tp = TofPacket::new();
@@ -1835,7 +1803,7 @@
     //let first_pos = self.pos;
     </span><span class="kw">let </span>head   = parse_u16(<span class="kw-2">&amp;</span><span class="self">self</span>.stream, <span class="kw-2">&amp;mut </span><span class="self">self</span>.pos);
     <span class="kw">if </span>head != RBEventHeader::HEAD {
-      <span class="macro">error!</span>(<span class="string">&quot;Event does not start with {}&quot;</span>, RBEventHeader::HEAD);
+      <span class="macro">error!</span>(<span class="string">"Event does not start with {}"</span>, RBEventHeader::HEAD);
       <span class="kw">return </span><span class="prelude-val">None</span>;
     }
 
@@ -1846,7 +1814,7 @@
     <span class="kw">let </span>packet_len = parse_u16(<span class="kw-2">&amp;</span><span class="self">self</span>.stream, <span class="kw-2">&amp;mut </span><span class="self">self</span>.pos) <span class="kw">as </span>usize * <span class="number">2</span>;
     <span class="kw">let </span>nwords     = parse_u16(<span class="kw-2">&amp;</span><span class="self">self</span>.stream, <span class="kw-2">&amp;mut </span><span class="self">self</span>.pos) <span class="kw">as </span>usize + <span class="number">1</span>; <span class="comment">// the field will tell you the 
     </span><span class="kw">if </span><span class="self">self</span>.pos - <span class="number">8 </span>+ packet_len &gt; <span class="self">self</span>.stream.len() { <span class="comment">// -1?
-      </span><span class="macro">error!</span>(<span class="string">&quot;Stream is too short! Stream len is {}, packet len is {}. We are at pos {}&quot;</span>, <span class="self">self</span>.stream.len(), packet_len, <span class="self">self</span>.pos);
+      </span><span class="macro">error!</span>(<span class="string">"Stream is too short! Stream len is {}, packet len is {}. We are at pos {}"</span>, <span class="self">self</span>.stream.len(), packet_len, <span class="self">self</span>.pos);
       <span class="self">self</span>.is_depleted = <span class="bool-val">true</span>;
       <span class="self">self</span>.pos -= <span class="number">8</span>;
       <span class="kw">return </span><span class="prelude-val">None</span>;
@@ -1860,7 +1828,7 @@
     <span class="kw">match </span>replace_channel_mask {
       <span class="prelude-val">None </span>=&gt; (),
       <span class="prelude-val">Some</span>(mask) =&gt; {
-        <span class="macro">println!</span>(<span class="string">&quot;==&gt; Replacing ch mask {} with {}&quot;</span>, header.channel_mask, mask);
+        <span class="macro">println!</span>(<span class="string">"==&gt; Replacing ch mask {} with {}"</span>, header.channel_mask, mask);
         header.channel_mask    = mask; 
       }
     }
@@ -1881,7 +1849,7 @@
     <span class="kw">let </span>timestamp0   = parse_u16(<span class="kw-2">&amp;</span><span class="self">self</span>.stream, <span class="kw-2">&amp;mut </span><span class="self">self</span>.pos);
     <span class="kw">let </span>timestamp1   = parse_u16(<span class="kw-2">&amp;</span><span class="self">self</span>.stream, <span class="kw-2">&amp;mut </span><span class="self">self</span>.pos);
     <span class="kw">let </span>timestamp2   = parse_u16(<span class="kw-2">&amp;</span><span class="self">self</span>.stream, <span class="kw-2">&amp;mut </span><span class="self">self</span>.pos);
-    <span class="comment">//println!(&quot;TIMESTAMPS {} {} {}&quot;, timestamp0, timestamp1, timestamp2);
+    <span class="comment">//println!("TIMESTAMPS {} {} {}", timestamp0, timestamp1, timestamp2);
     </span><span class="kw">let </span>timestamp16 : u16;
     <span class="kw">let </span>timestamp32 : u32;
     <span class="kw">if </span>REVERSE_WORDS {
@@ -1894,8 +1862,8 @@
     header.timestamp16 = timestamp16;
     header.timestamp32 = timestamp32;
     <span class="comment">// now the payload
-    //println!(&quot;{}&quot;, header);
-    //println!(&quot;{}&quot;, nwords);
+    //println!("{}", header);
+    //println!("{}", nwords);
     </span><span class="kw">if </span>header.drs_lost_trigger() {
       event.status = EventStatus::IncompleteReadout;
       event.header = header;
@@ -1909,14 +1877,28 @@
     </span><span class="kw">for </span>ch <span class="kw">in </span>header.get_channels().iter() {
       <span class="kw">let </span>ch_id = parse_u16(<span class="kw-2">&amp;</span><span class="self">self</span>.stream, <span class="kw-2">&amp;mut </span><span class="self">self</span>.pos);
       <span class="kw">if </span>ch_id != <span class="kw-2">*</span>ch <span class="kw">as </span>u16 {
-        <span class="macro">error!</span>(<span class="string">&quot;We got {ch_id} but where expecting {ch}&quot;</span>);
+        <span class="comment">// check where is the next header
+        </span><span class="kw">let </span>search_pos = <span class="self">self</span>.pos;
+        <span class="kw">match </span>search_for_u16(TofPacket::HEAD, <span class="kw-2">&amp;</span><span class="self">self</span>.stream, search_pos) {
+          <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; (),
+          <span class="prelude-val">Ok</span>(result) =&gt; {
+            <span class="macro">println!</span>(<span class="string">"The channel data is corrupt, but we found a header at {} for remaining stream len {}"</span>, result, <span class="self">self</span>.stream.len()); 
+          }
+        }
+        <span class="kw">let </span><span class="kw-2">mut </span>stream_view = Vec::&lt;u8&gt;::new();
+        <span class="kw">let </span>foo_pos = <span class="self">self</span>.pos;
+        <span class="kw">for </span>k <span class="kw">in </span>foo_pos -<span class="number">3</span>..foo_pos + <span class="number">3 </span>{
+          stream_view.push(<span class="self">self</span>.stream[k]);
+        }
+        <span class="macro">error!</span>(<span class="string">"We got {ch_id} but expected {ch} for event {}. The parsed ch id is not in the channel mask! We will fill this channel with u16::MAX .... Stream view +- 3 around the ch id {:?}"</span>, header.event_id, stream_view);
         event_status = EventStatus::ChannelIDWrong;
-        <span class="macro">error!</span>(<span class="string">&quot;Channel id {} in data outside of requested channel mask! Skipping..&quot;</span>, ch_id);
+        <span class="comment">// we fill the channel with MAX values:
+        </span>event.adc[<span class="kw-2">*</span>ch <span class="kw">as </span>usize] = <span class="macro">vec!</span>[u16::MAX;NWORDS];
         <span class="self">self</span>.pos += <span class="number">2</span><span class="kw-2">*</span>nwords + <span class="number">4</span>;
         <span class="kw">continue</span>;
       } <span class="kw">else </span>{
       <span class="comment">//if ch_id == *ch as u16 {
-        //println!(&quot;Got ch id {}&quot;, ch_id);
+        //println!("Got ch id {}", ch_id);
         //let header = parse_u16(&amp;self.stream, &amp;mut self.pos);
         // noice!!
         //let data : Vec&lt;u8&gt; = self.stream.iter().skip(self.pos).take(2*nwords).map(|&amp;x| x).collect();
@@ -1950,7 +1932,7 @@
           <span class="kw">if </span>checksum != crc32 {
             event_status = EventStatus::CRC32Wrong;
           }
-          <span class="macro">println!</span>(<span class="string">&quot;== ==&gt; Checksum {}, channel checksum {}!&quot;</span>, checksum, crc32); 
+          <span class="macro">println!</span>(<span class="string">"== ==&gt; Checksum {}, channel checksum {}!"</span>, checksum, crc32); 
         }
       }
     }
@@ -1975,39 +1957,42 @@
     //  } else {
     //    crc32 = u32::from(crc321) &lt;&lt; 16 | u32::from(crc320);
     //  }
-    //  warn!(&quot;Checksum test for the whole event is not yet implemented!&quot;);
+    //  warn!("Checksum test for the whole event is not yet implemented!");
     //  //if event.header.crc32 != crc32 {
-    //  //  trace!(&quot;Checksum test for the whole event is not yet implemented!&quot;);
+    //  //  trace!("Checksum test for the whole event is not yet implemented!");
     //  //}
     //}
     
     </span><span class="kw">let </span>tail         = parse_u16(<span class="kw-2">&amp;</span><span class="self">self</span>.stream, <span class="kw-2">&amp;mut </span><span class="self">self</span>.pos);
     <span class="kw">if </span>tail != <span class="number">0x5555 </span>{
-      <span class="macro">error!</span>(<span class="string">&quot;Tail signature is wrong! Got {} for board {}&quot;</span>, tail, header.rb_id);
+      <span class="macro">error!</span>(<span class="string">"Tail signature {} for event {} is invalid!"</span>, tail, header.event_id);
       event_status = EventStatus::TailWrong;
     } 
     <span class="comment">//self.stream.drain(0..self.pos);
     </span><span class="self">self</span>.pos_at_head = <span class="bool-val">false</span>;
     event.header = header;
     event.status = event_status;
+    <span class="kw">if </span>event_status == EventStatus::TailWrong {
+      <span class="macro">println!</span>(<span class="string">"{}"</span>, event);
+    }
     <span class="prelude-val">Some</span>(event)
   }
 
   <span class="kw">pub fn </span>get_event_at_id(<span class="kw-2">&amp;mut </span><span class="self">self</span>, event_id : u32, replace_channel_mask : <span class="prelude-ty">Option</span>&lt;u16&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;RBEvent&gt; {
     <span class="kw">let </span>begin_pos = <span class="self">self</span>.pos; <span class="comment">// in case we need
                               // to reset the position
-    //println!(&quot;--&gt; Requested {}&quot;, event_id);
+    //println!("--&gt; Requested {}", event_id);
     //if self.event_map.contains_key(&amp;event_id) {
-    //  //println!(&quot;-- We have it!&quot;);
+    //  //println!("-- We have it!");
     //} else {
-    //  //println!(&quot;-- We DON&#39;T have it, event_map len {}&quot;, self.event_map.len());
+    //  //println!("-- We DON'T have it, event_map len {}", self.event_map.len());
     //  //self.print_event_map();
-    //  //println!(&quot;-- last event id {}&quot;, self.last_evid);
-    //  //println!(&quot;-- first event id {}&quot;, self.first_evid);
+    //  //println!("-- last event id {}", self.last_evid);
+    //  //println!("-- first event id {}", self.first_evid);
     //}
     </span><span class="kw">let </span>pos = <span class="self">self</span>.event_map.remove(<span class="kw-2">&amp;</span>event_id)<span class="question-mark">?</span>;
     <span class="kw">if </span><span class="self">self</span>.stream.len() &lt; pos.<span class="number">0 </span>+ pos.<span class="number">1 </span>{
-      <span class="macro">trace!</span>(<span class="string">&quot;Stream is too short!&quot;</span>);
+      <span class="macro">trace!</span>(<span class="string">"Stream is too short!"</span>);
       <span class="self">self</span>.is_depleted = <span class="bool-val">true</span>;
       <span class="self">self</span>.pos = begin_pos;
       <span class="kw">return </span><span class="prelude-val">None</span>;
@@ -2027,83 +2012,29 @@
     </span><span class="kw">let </span>begin_pos : usize; <span class="comment">// in case we need
                                // to rewind
      
-    // if there are requests, we will serve the 
-    // next request
-    </span><span class="kw">if </span><span class="self">self</span>.request_mode {
-      <span class="kw">if </span><span class="self">self</span>.request_cache.len() &gt; <span class="number">0 </span>{
-        <span class="kw">loop </span>{
-          <span class="kw">match </span><span class="self">self</span>.request_cache.pop_front() {
-            <span class="prelude-val">Some</span>(req) =&gt; {
-              <span class="comment">//println!(&quot;== ==&gt; Got next request&quot;);
-              </span><span class="kw">if </span>req.<span class="number">0 </span>&lt; <span class="self">self</span>.first_evid {
-                <span class="self">self</span>.is_ahead_by = (<span class="self">self</span>.first_evid - req.<span class="number">0</span>) <span class="kw">as </span>usize;
-                <span class="self">self</span>.is_behind_by = <span class="number">0</span>;
-                <span class="comment">//println!(&quot;&lt;RBEventMemoryStreamer&gt; {} IS AHEAD BY {}!&quot;, req.0, self.is_ahead_by);
-                //return None;
-                </span><span class="kw">continue</span>;
-              } <span class="kw">else if </span>req.<span class="number">0 </span>&gt; <span class="self">self</span>.first_evid &amp;&amp; req.<span class="number">0 </span>&lt; <span class="self">self</span>.last_evid {
-                <span class="kw">let </span>ch_mask = <span class="number">1u16 </span>&lt;&lt; <span class="number">8 </span>| req.<span class="number">1 </span><span class="kw">as </span>u16; 
-                <span class="comment">//println!(&quot;== ==&gt; checking {}&quot;, req.0);
-                </span><span class="kw">return </span><span class="self">self</span>.get_event_at_id(req.<span class="number">0</span>, <span class="prelude-val">Some</span>(ch_mask));
-              }
-              <span class="kw">if </span>req.<span class="number">0 </span>&gt; <span class="self">self</span>.last_evid {
-                <span class="comment">// we don&#39;t have it
-                </span><span class="self">self</span>.is_behind_by = (req.<span class="number">0 </span>- <span class="self">self</span>.last_evid) <span class="kw">as </span>usize;
-                <span class="self">self</span>.is_ahead_by  = <span class="number">0</span>;
-                <span class="comment">// drain the events which are behind
-                </span><span class="kw">if </span><span class="self">self</span>.event_map.contains_key(<span class="kw-2">&amp;</span><span class="self">self</span>.last_evid) {
-                  <span class="kw">let </span>last_pos = <span class="self">self</span>.event_map[<span class="kw-2">&amp;</span><span class="self">self</span>.last_evid];
-                  <span class="self">self</span>.stream.drain(<span class="number">0</span>..last_pos.<span class="number">0</span>);
-                }
-                <span class="self">self</span>.event_map.clear();
-                <span class="self">self</span>.is_depleted = <span class="bool-val">true</span>;
-                <span class="comment">//println!(&quot;&lt;RBEventMemoryStreamer&gt; : {} IS BEHIND BY {}&quot;, req.0,self.is_behind_by);
-                </span><span class="kw">return </span><span class="prelude-val">None</span>;
-              }
-            },
-            <span class="prelude-val">None </span>=&gt; {
-              <span class="self">self</span>.is_depleted = <span class="bool-val">true</span>;
-              <span class="self">self</span>.is_behind_by = <span class="number">50</span>; <span class="comment">// event buffer size
-              </span><span class="self">self</span>.is_ahead_by  = <span class="number">0</span>;
-              <span class="comment">//println!(&quot;Cache is exchausted!&quot;);
-              //self.stream.drain(0..self.event_map[&amp;self.last_evid].0);
-              //self.event_map.clear();
-              </span><span class="kw">return </span><span class="prelude-val">None</span>;  
-            }
-          }
-        }
-      } <span class="kw">else </span>{
-        <span class="comment">//println!(&quot;Event request cache exhausted&quot;);
-        </span><span class="self">self</span>.is_behind_by = <span class="number">1</span>;
-        <span class="self">self</span>.is_ahead_by  = <span class="number">0</span>;
-        <span class="kw">return </span><span class="prelude-val">None</span>;
-      }
-    }
-    <span class="self">self</span>.pos_at_head = <span class="bool-val">false</span>;
+    </span><span class="self">self</span>.pos_at_head = <span class="bool-val">false</span>;
     begin_pos = <span class="self">self</span>.pos; <span class="comment">// in case we need
                                 // to reset the position
     </span><span class="kw">if </span><span class="self">self</span>.stream.len() == <span class="number">0 </span>{
-      <span class="macro">trace!</span>(<span class="string">&quot;Stream empty!&quot;</span>);
+      <span class="macro">trace!</span>(<span class="string">"Stream empty!"</span>);
       <span class="self">self</span>.is_depleted = <span class="bool-val">true</span>;
       <span class="self">self</span>.pos = <span class="number">0</span>;
       <span class="kw">return </span><span class="prelude-val">None</span>;
     }
     <span class="kw">if </span>!<span class="self">self</span>.pos_at_head {
       <span class="kw">if </span>!<span class="self">self</span>.seek_next_header(<span class="number">0xaaaa</span>) {
-        <span class="macro">debug!</span>(<span class="string">&quot;Could not find another header...&quot;</span>);
+        <span class="macro">debug!</span>(<span class="string">"Could not find another header..."</span>);
         <span class="self">self</span>.pos = begin_pos;
         <span class="self">self</span>.is_depleted = <span class="bool-val">true</span>;
         <span class="kw">return </span><span class="prelude-val">None</span>;
       }
     }
     
-    <span class="kw">let </span>event = <span class="self">self</span>.get_event_at_pos_unchecked(<span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span>event          = <span class="self">self</span>.get_event_at_pos_unchecked(<span class="prelude-val">None</span>)<span class="question-mark">?</span>;
     <span class="self">self</span>.n_events_ext += <span class="number">1</span>;
     <span class="self">self</span>.stream.drain(<span class="number">0</span>..<span class="self">self</span>.pos);
-    <span class="self">self</span>.pos = <span class="number">0</span>;
-    <span class="self">self</span>.pos_at_head = <span class="bool-val">false</span>;
-    <span class="self">self</span>.is_ahead_by = <span class="number">0</span>;
-    <span class="self">self</span>.is_behind_by = <span class="number">0</span>;
+    <span class="self">self</span>.pos           = <span class="number">0</span>;
+    <span class="self">self</span>.pos_at_head   = <span class="bool-val">false</span>;
     <span class="prelude-val">Some</span>(event)
   }
 }
@@ -2140,20 +2071,20 @@
     <span class="kw">let </span>ptype_int  = parse_u8(stream, <span class="kw-2">&amp;mut </span>pos);
     <span class="kw">let </span>next_psize = parse_u32(stream, <span class="kw-2">&amp;mut </span>pos);
     <span class="kw">let </span>ptype      = ptype_int <span class="kw">as </span>u8;
-    <span class="macro">debug!</span>(<span class="string">&quot;We anticpate a TofPacket of type {:?} and size {} (bytes)&quot;</span>,ptype, next_psize);
+    <span class="macro">debug!</span>(<span class="string">"We anticpate a TofPacket of type {:?} and size {} (bytes)"</span>,ptype, next_psize);
     next_psize
   }
 
   <span class="kw">pub fn </span>open(<span class="kw-2">&amp;mut </span><span class="self">self</span>, filename : String) {
-    <span class="kw">if </span><span class="self">self</span>.filename != <span class="string">&quot;&quot; </span>{
-      <span class="macro">warn!</span>(<span class="string">&quot;Overiding previously set filename {}&quot;</span>, <span class="self">self</span>.filename);
+    <span class="kw">if </span><span class="self">self</span>.filename != <span class="string">"" </span>{
+      <span class="macro">warn!</span>(<span class="string">"Overiding previously set filename {}"</span>, <span class="self">self</span>.filename);
     }
     <span class="kw">let </span>self_filename = filename.clone();
     <span class="self">self</span>.filename     = self_filename;
-    <span class="kw">if </span>filename != <span class="string">&quot;&quot; </span>{
+    <span class="kw">if </span>filename != <span class="string">"" </span>{
       <span class="kw">let </span>path = Path::new(<span class="kw-2">&amp;</span>filename); 
-      <span class="macro">info!</span>(<span class="string">&quot;Reading from {}&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.filename);
-      <span class="kw">let </span>file = OpenOptions::new().create(<span class="bool-val">false</span>).append(<span class="bool-val">false</span>).read(<span class="bool-val">true</span>).open(path).expect(<span class="string">&quot;Unable to open file {filename}&quot;</span>);
+      <span class="macro">info!</span>(<span class="string">"Reading from {}"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.filename);
+      <span class="kw">let </span>file = OpenOptions::new().create(<span class="bool-val">false</span>).append(<span class="bool-val">false</span>).read(<span class="bool-val">true</span>).open(path).expect(<span class="string">"Unable to open file {filename}"</span>);
       <span class="self">self</span>.file_reader    = <span class="prelude-val">Some</span>(BufReader::new(file));
       <span class="self">self</span>.init();
     }
@@ -2162,8 +2093,8 @@
   <span class="kw">fn </span>init(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
     <span class="kw">match </span><span class="self">self</span>.search_start() {
       <span class="prelude-val">Err</span>(err) =&gt; {
-        <span class="macro">error!</span>(<span class="string">&quot;Can not find any header signature (typically 0xAAAA) in file! Err {err}&quot;</span>);
-        <span class="macro">panic!</span>(<span class="string">&quot;This is most likely a useless endeavour! Hence, I panic!&quot;</span>);
+        <span class="macro">error!</span>(<span class="string">"Can not find any header signature (typically 0xAAAA) in file! Err {err}"</span>);
+        <span class="macro">panic!</span>(<span class="string">"This is most likely a useless endeavour! Hence, I panic!"</span>);
       }
       <span class="prelude-val">Ok</span>(start_pos) =&gt; {
         <span class="self">self</span>.cursor = start_pos;
@@ -2176,17 +2107,17 @@
     <span class="kw">let </span><span class="kw-2">mut </span>start_pos = <span class="number">0usize</span>; 
     <span class="comment">//let mut stream  = Vec::&lt;u8&gt;::new();
     </span><span class="kw">let </span>max_bytes   = <span class="self">self</span>.get_file_nbytes();
-    <span class="macro">info!</span>(<span class="string">&quot;Using file with {max_bytes} bytes!&quot;</span>);
+    <span class="macro">info!</span>(<span class="string">"Using file with {max_bytes} bytes!"</span>);
     <span class="kw">let </span>chunk       = <span class="number">10usize</span>;
     <span class="kw">while </span>pos &lt; max_bytes {
       <span class="kw">match </span>read_n_bytes(<span class="self">self</span>.file_reader.as_mut().unwrap(), chunk) {
         <span class="prelude-val">Err</span>(err) =&gt; {
-          <span class="macro">error!</span>(<span class="string">&quot;Can not read from file, error {err}&quot;</span>);
-          <span class="macro">error!</span>(<span class="string">&quot;Most likely, the file/stream is too short!&quot;</span>);
+          <span class="macro">error!</span>(<span class="string">"Can not read from file, error {err}"</span>);
+          <span class="macro">error!</span>(<span class="string">"Most likely, the file/stream is too short!"</span>);
           <span class="kw">return </span><span class="prelude-val">Err</span>(SerializationError::StreamTooShort);
         }
         <span class="prelude-val">Ok</span>(stream) =&gt; {
-          <span class="macro">debug!</span>(<span class="string">&quot;Got stream {:?}&quot;</span>, stream);
+          <span class="macro">debug!</span>(<span class="string">"Got stream {:?}"</span>, stream);
           <span class="kw">match </span>search_for_u16(TofPacket::HEAD, <span class="kw-2">&amp;</span>stream, <span class="number">0</span>) {
             <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
               pos += chunk <span class="kw">as </span>u64;
@@ -2205,10 +2136,10 @@
     </span>} <span class="comment">// end while
     </span><span class="kw">let </span><span class="kw-2">mut </span>rewind : i64 = pos.try_into().unwrap();
     rewind = -<span class="number">1</span><span class="kw-2">*</span>rewind + start_pos <span class="kw">as </span>i64;
-    <span class="macro">debug!</span>(<span class="string">&quot;Rewinding {rewind} bytes&quot;</span>);
+    <span class="macro">debug!</span>(<span class="string">"Rewinding {rewind} bytes"</span>);
     <span class="kw">match </span><span class="self">self</span>.file_reader.as_mut().unwrap().seek(SeekFrom::Current(rewind)) {
       <span class="prelude-val">Err</span>(err) =&gt; {
-        <span class="macro">error!</span>(<span class="string">&quot;Can not rewind file buffer! Error {err}&quot;</span>);
+        <span class="macro">error!</span>(<span class="string">"Can not rewind file buffer! Error {err}"</span>);
       }
       <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; ()
     }
@@ -2224,7 +2155,7 @@
 
 <span class="kw">impl </span>Default <span class="kw">for </span>TofPacketReader {
   <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
-    TofPacketReader::new(String::from(<span class="string">&quot;&quot;</span>))
+    TofPacketReader::new(String::from(<span class="string">""</span>))
   }
 }
 
@@ -2235,35 +2166,35 @@
   </span><span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
     <span class="kw">let </span>packet : TofPacket;
     <span class="kw">match </span>read_n_bytes(<span class="self">self</span>.file_reader.as_mut().unwrap(), <span class="number">7</span>) { 
-    <span class="comment">//match self.file_reader.as_mut().expect(&quot;No file available!&quot;).read_until(b&#39;\n&#39;, &amp;mut line) {
+    <span class="comment">//match self.file_reader.as_mut().expect("No file available!").read_until(b'\n', &amp;mut line) {
       </span><span class="prelude-val">Err</span>(err) =&gt; {
-        <span class="macro">error!</span>(<span class="string">&quot;Error reading from file {} error: {}&quot;</span>, <span class="self">self</span>.filename, err);
+        <span class="macro">error!</span>(<span class="string">"Error reading from file {} error: {}"</span>, <span class="self">self</span>.filename, err);
       },
       <span class="prelude-val">Ok</span>(chunk) =&gt; {
         <span class="kw">if </span>chunk.len() &lt; <span class="number">7 </span>{
-          <span class="macro">error!</span>(<span class="string">&quot;The stream is too short!&quot;</span>);
+          <span class="macro">error!</span>(<span class="string">"The stream is too short!"</span>);
           <span class="kw">return </span><span class="prelude-val">None</span>;
         }
         <span class="kw">else </span>{
-          <span class="macro">trace!</span>(<span class="string">&quot;Read {} bytes&quot;</span>, chunk.len());
+          <span class="macro">trace!</span>(<span class="string">"Read {} bytes"</span>, chunk.len());
           <span class="kw">let </span>expected_payload_size = <span class="self">self</span>.get_next_packet_size(<span class="kw-2">&amp;</span>chunk) <span class="kw">as </span>usize; 
           <span class="kw">match </span>read_n_bytes(<span class="self">self</span>.file_reader.as_mut().unwrap(), expected_payload_size + <span class="number">2</span>) {
             <span class="prelude-val">Err</span>(err) =&gt; {
-              <span class="macro">error!</span>(<span class="string">&quot;Unable to read {} requested bytes to decode tof packet! Err {err}&quot;</span>, expected_payload_size - <span class="number">7 </span>);
+              <span class="macro">error!</span>(<span class="string">"Unable to read {} requested bytes to decode tof packet! Err {err}"</span>, expected_payload_size - <span class="number">7 </span>);
               <span class="kw">return </span><span class="prelude-val">None</span>;
             },
             <span class="prelude-val">Ok</span>(data) =&gt; {
               <span class="kw">let </span><span class="kw-2">mut </span>stream = Vec::&lt;u8&gt;::with_capacity(expected_payload_size + <span class="number">9</span>);
               stream.extend_from_slice(<span class="kw-2">&amp;</span>chunk);
               stream.extend_from_slice(<span class="kw-2">&amp;</span>data);
-              <span class="comment">//println!(&quot;{:?}&quot;, stream);
+              <span class="comment">//println!("{:?}", stream);
               </span><span class="kw">match </span>TofPacket::from_bytestream(<span class="kw-2">&amp;</span>stream, <span class="kw-2">&amp;mut </span><span class="number">0</span>) {
                 <span class="prelude-val">Ok</span>(pack) =&gt; {
                   packet = pack;
                   <span class="kw">return </span><span class="prelude-val">Some</span>(packet);
                 }
                 <span class="prelude-val">Err</span>(err) =&gt; { 
-                  <span class="macro">error!</span>(<span class="string">&quot;Error getting packet from file {err}&quot;</span>);
+                  <span class="macro">error!</span>(<span class="string">"Error getting packet from file {err}"</span>);
                   <span class="kw">return </span><span class="prelude-val">None</span>;
                 }
               }
@@ -2311,29 +2242,29 @@
   /// * file_type       : control the behaviour of how the filename is
   ///                     assigned.
   </span><span class="kw">pub fn </span>new(<span class="kw-2">mut </span>file_path : String, file_type : FileType) -&gt; <span class="self">Self </span>{
-    <span class="comment">//let filename = file_prefix.clone() + &quot;_0.tof.gaps&quot;;
+    <span class="comment">//let filename = file_prefix.clone() + "_0.tof.gaps";
     </span><span class="kw">let </span>file : File;
-    <span class="kw">if </span>!file_path.ends_with(<span class="string">&quot;/&quot;</span>) {
-      file_path += <span class="string">&quot;/&quot;</span>;
+    <span class="kw">if </span>!file_path.ends_with(<span class="string">"/"</span>) {
+      file_path += <span class="string">"/"</span>;
     }
     <span class="kw">match </span>file_type {
       FileType::Unknown =&gt; {
-        <span class="kw">let </span>filename = file_path.clone() + <span class="string">&quot;Data.tof.gaps&quot;</span>;
+        <span class="kw">let </span>filename = file_path.clone() + <span class="string">"Data.tof.gaps"</span>;
         <span class="kw">let </span>path     = Path::new(<span class="kw-2">&amp;</span>filename); 
-        <span class="macro">info!</span>(<span class="string">&quot;Writing to file {filename}&quot;</span>);
-        file = OpenOptions::new().create(<span class="bool-val">true</span>).append(<span class="bool-val">true</span>).open(path).expect(<span class="string">&quot;Unable to open file {filename}&quot;</span>);
+        <span class="macro">info!</span>(<span class="string">"Writing to file {filename}"</span>);
+        file = OpenOptions::new().create(<span class="bool-val">true</span>).append(<span class="bool-val">true</span>).open(path).expect(<span class="string">"Unable to open file {filename}"</span>);
       }
       FileType::RunFile(runid) =&gt; {
         <span class="kw">let </span>filename = file_path.clone() + <span class="kw-2">&amp;</span>get_runfilename(runid,<span class="number">1</span>, <span class="prelude-val">None</span>);
         <span class="kw">let </span>path     = Path::new(<span class="kw-2">&amp;</span>filename); 
-        <span class="macro">info!</span>(<span class="string">&quot;Writing to file {filename}&quot;</span>);
-        file = OpenOptions::new().create(<span class="bool-val">true</span>).append(<span class="bool-val">true</span>).open(path).expect(<span class="string">&quot;Unable to open file {filename}&quot;</span>);
+        <span class="macro">info!</span>(<span class="string">"Writing to file {filename}"</span>);
+        file = OpenOptions::new().create(<span class="bool-val">true</span>).append(<span class="bool-val">true</span>).open(path).expect(<span class="string">"Unable to open file {filename}"</span>);
       }
       FileType::CalibrationFile(rbid) =&gt; {
         <span class="kw">let </span>filename = file_path.clone() + <span class="kw-2">&amp;</span>get_califilename(rbid,<span class="bool-val">false</span>);
         <span class="kw">let </span>path     = Path::new(<span class="kw-2">&amp;</span>filename); 
-        <span class="macro">info!</span>(<span class="string">&quot;Writing to file {filename}&quot;</span>);
-        file = OpenOptions::new().create(<span class="bool-val">true</span>).append(<span class="bool-val">true</span>).open(path).expect(<span class="string">&quot;Unable to open file {filename}&quot;</span>);
+        <span class="macro">info!</span>(<span class="string">"Writing to file {filename}"</span>);
+        file = OpenOptions::new().create(<span class="bool-val">true</span>).append(<span class="bool-val">true</span>).open(path).expect(<span class="string">"Unable to open file {filename}"</span>);
       }
     }
     <span class="self">Self </span>{
@@ -2350,22 +2281,22 @@
     <span class="kw">let </span>file : File;
     <span class="kw">match </span><span class="self">self</span>.file_type {
       FileType::Unknown =&gt; {
-        <span class="kw">let </span>filename = <span class="self">self</span>.file_path.clone() + <span class="string">&quot;Data.tof.gaps&quot;</span>;
+        <span class="kw">let </span>filename = <span class="self">self</span>.file_path.clone() + <span class="string">"Data.tof.gaps"</span>;
         <span class="kw">let </span>path     = Path::new(<span class="kw-2">&amp;</span>filename); 
-        <span class="macro">info!</span>(<span class="string">&quot;Writing to file {filename}&quot;</span>);
-        file = OpenOptions::new().create(<span class="bool-val">true</span>).append(<span class="bool-val">true</span>).open(path).expect(<span class="string">&quot;Unable to open file {filename}&quot;</span>);
+        <span class="macro">info!</span>(<span class="string">"Writing to file {filename}"</span>);
+        file = OpenOptions::new().create(<span class="bool-val">true</span>).append(<span class="bool-val">true</span>).open(path).expect(<span class="string">"Unable to open file {filename}"</span>);
       }
       FileType::RunFile(runid) =&gt; {
         <span class="kw">let </span>filename = <span class="self">self</span>.file_path.clone() + <span class="kw-2">&amp;</span>get_runfilename(runid,<span class="self">self</span>.file_id <span class="kw">as </span>u64, <span class="prelude-val">None</span>);
         <span class="kw">let </span>path     = Path::new(<span class="kw-2">&amp;</span>filename); 
-        <span class="macro">info!</span>(<span class="string">&quot;Writing to file {filename}&quot;</span>);
-        file = OpenOptions::new().create(<span class="bool-val">true</span>).append(<span class="bool-val">true</span>).open(path).expect(<span class="string">&quot;Unable to open file {filename}&quot;</span>);
+        <span class="macro">info!</span>(<span class="string">"Writing to file {filename}"</span>);
+        file = OpenOptions::new().create(<span class="bool-val">true</span>).append(<span class="bool-val">true</span>).open(path).expect(<span class="string">"Unable to open file {filename}"</span>);
       }
       FileType::CalibrationFile(rbid) =&gt; {
         <span class="kw">let </span>filename = <span class="self">self</span>.file_path.clone() + <span class="kw-2">&amp;</span>get_califilename(rbid,<span class="bool-val">false</span>);
         <span class="kw">let </span>path     = Path::new(<span class="kw-2">&amp;</span>filename); 
-        <span class="macro">info!</span>(<span class="string">&quot;Writing to file {filename}&quot;</span>);
-        file = OpenOptions::new().create(<span class="bool-val">true</span>).append(<span class="bool-val">true</span>).open(path).expect(<span class="string">&quot;Unable to open file {filename}&quot;</span>);
+        <span class="macro">info!</span>(<span class="string">"Writing to file {filename}"</span>);
+        file = OpenOptions::new().create(<span class="bool-val">true</span>).append(<span class="bool-val">true</span>).open(path).expect(<span class="string">"Unable to open file {filename}"</span>);
       }
     }
     file
@@ -2377,15 +2308,15 @@
   </span><span class="kw">pub fn </span>add_tof_packet(<span class="kw-2">&amp;mut </span><span class="self">self</span>, packet : <span class="kw-2">&amp;</span>TofPacket) {
     <span class="kw">let </span>buffer = packet.to_bytestream();
     <span class="kw">match </span><span class="self">self</span>.file.write_all(buffer.as_slice()) {
-      <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Writing to file to path {} failed! {}&quot;</span>, <span class="self">self</span>.file_path, err),
+      <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Writing to file to path {} failed! {}"</span>, <span class="self">self</span>.file_path, err),
       <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
     }
     <span class="self">self</span>.n_packets += <span class="number">1</span>;
     <span class="kw">if </span><span class="self">self</span>.n_packets == <span class="self">self</span>.pkts_per_file {
-      <span class="comment">//let filename = self.file_prefix.clone() + &quot;_&quot; + &amp;self.file_id.to_string() + &quot;.tof.gaps&quot;;
+      <span class="comment">//let filename = self.file_prefix.clone() + "_" + &amp;self.file_id.to_string() + ".tof.gaps";
       </span><span class="kw">match </span><span class="self">self</span>.file.sync_all() {
         <span class="prelude-val">Err</span>(err) =&gt; {
-          <span class="macro">error!</span>(<span class="string">&quot;Unable to sync file to disc! {err}&quot;</span>);
+          <span class="macro">error!</span>(<span class="string">"Unable to sync file to disc! {err}"</span>);
         },
         <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; ()
       }
@@ -2393,23 +2324,23 @@
       <span class="self">self</span>.n_packets = <span class="number">0</span>;
       <span class="self">self</span>.file_id += <span class="number">1</span>;
       <span class="comment">//let path  = Path::new(&amp;filename);
-      //println!(&quot;==&gt; [TOFPACKETWRITER] Will start a new file {}&quot;, path.display());
-      //self.file = OpenOptions::new().create(true).append(true).open(path).expect(&quot;Unable to open file {filename}&quot;);
+      //println!("==&gt; [TOFPACKETWRITER] Will start a new file {}", path.display());
+      //self.file = OpenOptions::new().create(true).append(true).open(path).expect("Unable to open file {filename}");
       //self.n_packets = 0;
       //self.file_id += 1;
     </span>}
-  <span class="macro">debug!</span>(<span class="string">&quot;TofPacket written!&quot;</span>);
+  <span class="macro">debug!</span>(<span class="string">"TofPacket written!"</span>);
   }
 }
 
 <span class="kw">impl </span>Default <span class="kw">for </span>TofPacketWriter {
   <span class="kw">fn </span>default() -&gt; TofPacketWriter {
-    TofPacketWriter::new(String::from(<span class="string">&quot;&quot;</span>), FileType::Unknown)
+    TofPacketWriter::new(String::from(<span class="string">""</span>), FileType::Unknown)
   }
 }
 
 <span class="doccomment">/// Read RB binary (robin) files. These are also 
-/// known as &quot;blob&quot; files
+/// known as "blob" files
 ///
 /// The robin reader consumes a file. 
 ///
@@ -2432,7 +2363,7 @@
 
 <span class="kw">impl </span>RobinReader {
 
-  <span class="doccomment">/// The &quot;old&quot; Robin files have a fixed 
+  <span class="doccomment">/// The "old" Robin files have a fixed 
   /// bytesize by design
   </span><span class="kw">const </span>EVENT_SIZE : usize = <span class="number">18530</span>;
 
@@ -2440,7 +2371,7 @@
     <span class="kw">let </span>filename_c = filename.clone();
     <span class="kw">let </span><span class="kw-2">mut </span>robin_reader = <span class="self">Self </span>{ 
       streamer        : RBEventMemoryStreamer::new(),
-      filename        : String::from(<span class="string">&quot;&quot;</span>),
+      filename        : String::from(<span class="string">""</span>),
       file_reader     : <span class="prelude-val">None</span>,
       board_id        : <span class="number">0</span>,
       cache           : HashMap::&lt;u32,RBEvent&gt;::new(),
@@ -2462,8 +2393,8 @@
   <span class="kw">fn </span>init(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
     <span class="comment">//match self.search_start() {
     //  Err(err) =&gt; {
-    //    error!(&quot;Can not find any header signature (typically 0xAAAA) in file! Err {err}&quot;);
-    //    panic!(&quot;This is most likely a useless endeavour! Hence, I panic!&quot;);
+    //    error!("Can not find any header signature (typically 0xAAAA) in file! Err {err}");
+    //    panic!("This is most likely a useless endeavour! Hence, I panic!");
     //  }
     //  Ok(start_pos) =&gt; {
     //    self.cursor = start_pos;
@@ -2472,11 +2403,11 @@
     // get the first event to infer board id, then rewind
     </span><span class="kw">if let </span><span class="prelude-val">Some</span>(ev) = <span class="self">self</span>.next() {
       <span class="self">self</span>.board_id = ev.header.rb_id;  
-      <span class="kw">let </span>rewind : i64 = RobinReader::EVENT_SIZE.try_into().expect(<span class="string">&quot;That needs to fit!&quot;</span>);
+      <span class="kw">let </span>rewind : i64 = RobinReader::EVENT_SIZE.try_into().expect(<span class="string">"That needs to fit!"</span>);
       <span class="kw">match </span><span class="self">self</span>.file_reader.as_mut().unwrap().seek(SeekFrom::Current(rewind)) {
         <span class="prelude-val">Err</span>(err) =&gt; {
-          <span class="macro">error!</span>(<span class="string">&quot;Read first event, but can not rewind stream! Err {}&quot;</span>, err);
-          <span class="macro">panic!</span>(<span class="string">&quot;I don&#39;t understand, panicking...&quot;</span>);
+          <span class="macro">error!</span>(<span class="string">"Read first event, but can not rewind stream! Err {}"</span>, err);
+          <span class="macro">panic!</span>(<span class="string">"I don't understand, panicking..."</span>);
         }
         <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
           <span class="self">self</span>.n_bytes_read  = <span class="number">0</span>;
@@ -2484,7 +2415,7 @@
         }
       }
     } <span class="kw">else </span>{
-      <span class="macro">panic!</span>(<span class="string">&quot;I can not find a single event in this file! Panicking!&quot;</span>);
+      <span class="macro">panic!</span>(<span class="string">"I can not find a single event in this file! Panicking!"</span>);
     }
     <span class="comment">//self.generate_index();
   </span>}
@@ -2501,12 +2432,12 @@
           <span class="kw">break</span>;
         }
         <span class="prelude-val">Some</span>(ev) =&gt; {
-          <span class="comment">//println!(&quot;{}&quot;, ev.header.event_id); 
+          <span class="comment">//println!("{}", ev.header.event_id); 
           </span><span class="self">self</span>.cache.insert(ev.header.event_id, ev);
         }
       }
     }
-    <span class="macro">info!</span>(<span class="string">&quot;Cached {} events!&quot;</span>, <span class="self">self</span>.cache.len());
+    <span class="macro">info!</span>(<span class="string">"Cached {} events!"</span>, <span class="self">self</span>.cache.len());
   }
 
   <span class="doccomment">/// Loop over the whole file and create a mapping event_id -&gt; position
@@ -2515,18 +2446,18 @@
   ///
   </span><span class="kw">pub fn </span>generate_index(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
     <span class="kw">if </span><span class="self">self</span>.n_events_read &gt; <span class="number">0 </span>{
-      <span class="macro">error!</span>(<span class="string">&quot;Can not generate index when events have already been read! Use ::rewind() first!&quot;</span>);
+      <span class="macro">error!</span>(<span class="string">"Can not generate index when events have already been read! Use ::rewind() first!"</span>);
       <span class="kw">return</span>;
     }
     <span class="self">self</span>.n_events_read  = <span class="number">0</span>;
     <span class="kw">let </span>pb = ProgressBar::new_spinner();
-    pb.set_style(ProgressStyle::default_spinner().template(<span class="string">&quot;{spinner:.green} Generating eventid index...&quot;</span>).unwrap());
+    pb.set_style(ProgressStyle::default_spinner().template(<span class="string">"{spinner:.green} Generating eventid index..."</span>).unwrap());
     <span class="kw">let </span><span class="kw-2">mut </span>seen_before  = <span class="number">0usize</span>;
     <span class="kw">let </span><span class="kw-2">mut </span>total_events = <span class="number">0usize</span>;
     <span class="kw">while </span>!<span class="self">self</span>.eof_reached { 
       <span class="kw">if let </span><span class="prelude-val">Some</span>(ev) = <span class="self">self</span>.next() {
         <span class="kw">if </span><span class="self">self</span>.index.contains_key(<span class="kw-2">&amp;</span>ev.header.event_id) {
-          <span class="macro">debug!</span>(<span class="string">&quot;We have seen this event id {} before!&quot;</span>, ev.header.event_id);
+          <span class="macro">debug!</span>(<span class="string">"We have seen this event id {} before!"</span>, ev.header.event_id);
           seen_before += <span class="number">1</span>;
         }
         <span class="self">self</span>.index.insert(ev.header.event_id,<span class="self">self</span>.n_events_read);
@@ -2536,11 +2467,11 @@
       pb.tick();
     }
     <span class="kw">if </span>seen_before &gt; <span class="number">0 </span>{
-      <span class="macro">error!</span>(<span class="string">&quot;There have been duplicate event ids! In total, we discard {}/{}&quot;</span>, seen_before, total_events);
+      <span class="macro">error!</span>(<span class="string">"There have been duplicate event ids! In total, we discard {}/{}"</span>, seen_before, total_events);
     }
-    <span class="macro">info!</span>(<span class="string">&quot;Generated index by reading {} events!&quot;</span>, <span class="self">self</span>.n_events_read);
+    <span class="macro">info!</span>(<span class="string">"Generated index by reading {} events!"</span>, <span class="self">self</span>.n_events_read);
     <span class="self">self</span>.rewind();
-    <span class="macro">info!</span>(<span class="string">&quot;Generated index for {} events!&quot;</span>, <span class="self">self</span>.index.len());
+    <span class="macro">info!</span>(<span class="string">"Generated index for {} events!"</span>, <span class="self">self</span>.index.len());
   }
 
   <span class="kw">pub fn </span>get_cache_size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
@@ -2552,16 +2483,16 @@
     <span class="kw">for </span>k <span class="kw">in </span><span class="self">self</span>.index.keys() {
       reverse_index.insert(<span class="self">self</span>.index[k], <span class="kw-2">*</span>k);
     }
-    <span class="macro">debug!</span>(<span class="string">&quot;Generated reversed index of size {}&quot;</span>, reverse_index.len());
-    <span class="comment">//println!(&quot;Index [reversed]:&quot;);
-    //println!(&quot;\t pos -&gt; event id&quot;);
-    //println!(&quot;{:?}&quot;, reverse_index);
-    //println!(&quot;{:?}&quot;, self.index);
+    <span class="macro">debug!</span>(<span class="string">"Generated reversed index of size {}"</span>, reverse_index.len());
+    <span class="comment">//println!("Index [reversed]:");
+    //println!("\t pos -&gt; event id");
+    //println!("{:?}", reverse_index);
+    //println!("{:?}", self.index);
     </span><span class="kw">let </span><span class="kw-2">mut </span>sorted_keys: Vec&lt;<span class="kw-2">&amp;</span>usize&gt; = reverse_index.keys().collect();
     sorted_keys.sort();
     <span class="comment">//let mut n = 0u32;
     //for k in sorted_keys {
-      //println!(&quot;{k} -&gt; {}&quot;, reverse_index[&amp;k]);
+      //println!("{k} -&gt; {}", reverse_index[&amp;k]);
       //n += 1;
       //if n == 8000 {break;}
     //}
@@ -2577,12 +2508,12 @@
   /// In case the event_id jumps, this function is not suitable
   </span><span class="kw">pub fn </span>get_in_order(<span class="kw-2">&amp;mut </span><span class="self">self</span>, event_id : <span class="kw-2">&amp;</span>u32) -&gt; <span class="prelude-ty">Option</span>&lt;RBEvent&gt; {
     <span class="kw">if </span>!<span class="self">self</span>.is_indexed(event_id) {
-      <span class="macro">error!</span>(<span class="string">&quot;Can not get event {} since it is not in the index!&quot;</span>, event_id);
+      <span class="macro">error!</span>(<span class="string">"Can not get event {} since it is not in the index!"</span>, event_id);
       <span class="kw">return </span><span class="prelude-val">None</span>;
     }
     <span class="kw">let </span>event_idx = <span class="self">self</span>.index.remove(event_id).unwrap();
     <span class="kw">if </span><span class="self">self</span>.n_events_read &gt; event_idx {
-      <span class="macro">error!</span>(<span class="string">&quot;Can not get event {} since we have already read it. You can use ::rewind() and try again!&quot;</span>, event_id);
+      <span class="macro">error!</span>(<span class="string">"Can not get event {} since we have already read it. You can use ::rewind() and try again!"</span>, event_id);
       <span class="kw">return </span><span class="prelude-val">None</span>;
     } <span class="kw">else </span>{
       <span class="kw">let </span>delta = event_idx - <span class="self">self</span>.n_events_read;
@@ -2607,16 +2538,16 @@
   
   <span class="doccomment">/// Rewind the underlying file back to the beginning
   </span><span class="kw">pub fn </span>rewind(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-    <span class="macro">warn!</span>(<span class="string">&quot;Rewinding {}&quot;</span>, <span class="self">self</span>.filename);
+    <span class="macro">warn!</span>(<span class="string">"Rewinding {}"</span>, <span class="self">self</span>.filename);
     <span class="kw">let </span><span class="kw-2">mut </span>rewind : i64 = <span class="self">self</span>.n_bytes_read.try_into().unwrap();
     rewind = -<span class="number">1</span><span class="kw-2">*</span>rewind;
-    <span class="macro">debug!</span>(<span class="string">&quot;Attempting to rewind {rewind} bytes&quot;</span>);
+    <span class="macro">debug!</span>(<span class="string">"Attempting to rewind {rewind} bytes"</span>);
     <span class="kw">match </span><span class="self">self</span>.file_reader.as_mut().unwrap().seek(SeekFrom::Current(rewind)) {
       <span class="prelude-val">Err</span>(err) =&gt; {
-        <span class="macro">error!</span>(<span class="string">&quot;Can not rewind file buffer! Error {err}&quot;</span>);
+        <span class="macro">error!</span>(<span class="string">"Can not rewind file buffer! Error {err}"</span>);
       }
       <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
-        <span class="macro">info!</span>(<span class="string">&quot;File rewound by {rewind} bytes!&quot;</span>);
+        <span class="macro">info!</span>(<span class="string">"File rewound by {rewind} bytes!"</span>);
         <span class="self">self</span>.n_events_read = <span class="number">0</span>;
         <span class="self">self</span>.n_bytes_read  = <span class="number">0</span>;
       }
@@ -2625,15 +2556,15 @@
   }
 
   <span class="kw">pub fn </span>open(<span class="kw-2">&amp;mut </span><span class="self">self</span>, filename : String) {
-    <span class="kw">if </span><span class="self">self</span>.filename != <span class="string">&quot;&quot; </span>{
-      <span class="macro">warn!</span>(<span class="string">&quot;Overiding previously set filename {}&quot;</span>, <span class="self">self</span>.filename);
+    <span class="kw">if </span><span class="self">self</span>.filename != <span class="string">"" </span>{
+      <span class="macro">warn!</span>(<span class="string">"Overiding previously set filename {}"</span>, <span class="self">self</span>.filename);
     }
     <span class="kw">let </span>self_filename = filename.clone();
     <span class="self">self</span>.filename     = self_filename;
-    <span class="kw">if </span>filename != <span class="string">&quot;&quot; </span>{
+    <span class="kw">if </span>filename != <span class="string">"" </span>{
       <span class="kw">let </span>path = Path::new(<span class="kw-2">&amp;</span>filename); 
-      <span class="macro">info!</span>(<span class="string">&quot;Reading from {}&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.filename);
-      <span class="kw">let </span>file = OpenOptions::new().create(<span class="bool-val">false</span>).append(<span class="bool-val">true</span>).read(<span class="bool-val">true</span>).open(path).expect(<span class="string">&quot;Unable to open file {filename}&quot;</span>);
+      <span class="macro">info!</span>(<span class="string">"Reading from {}"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.filename);
+      <span class="kw">let </span>file = OpenOptions::new().create(<span class="bool-val">false</span>).append(<span class="bool-val">true</span>).read(<span class="bool-val">true</span>).open(path).expect(<span class="string">"Unable to open file {filename}"</span>);
       <span class="self">self</span>.file_reader = <span class="prelude-val">Some</span>(BufReader::new(file));
     }
   }
@@ -2650,7 +2581,7 @@
       <span class="kw">if let </span><span class="prelude-val">Some</span>(ev) = event {
         <span class="self">self</span>.cache.insert(ev.header.event_id, ev);
       } <span class="kw">else </span>{
-        <span class="macro">error!</span>(<span class="string">&quot;Can not cache {}th event!&quot;</span>, n_ev);
+        <span class="macro">error!</span>(<span class="string">"Can not cache {}th event!"</span>, n_ev);
         <span class="self">self</span>.eof_reached = <span class="bool-val">true</span>;
         <span class="kw">break
       </span>}
@@ -2681,9 +2612,9 @@
   </span>}
 
   <span class="kw">pub fn </span>event_ids_in_cache(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;u32&gt; {
-    <span class="macro">trace!</span>(<span class="string">&quot;We have {} elements in the cache!&quot;</span>, <span class="self">self</span>.cache.len());
+    <span class="macro">trace!</span>(<span class="string">"We have {} elements in the cache!"</span>, <span class="self">self</span>.cache.len());
     <span class="kw">let </span><span class="kw-2">mut </span>keys : Vec&lt;u32&gt; = <span class="self">self</span>.cache.keys().cloned().collect();
-    <span class="macro">trace!</span>(<span class="string">&quot;We have {} elements in the cache!&quot;</span>, keys.len());
+    <span class="macro">trace!</span>(<span class="string">"We have {} elements in the cache!"</span>, keys.len());
     keys.sort();
     keys
   }
@@ -2696,7 +2627,7 @@
     <span class="kw">let </span>metadata  = <span class="self">self</span>.file_reader.as_ref().unwrap().get_ref().metadata().unwrap();
     <span class="kw">let </span>file_size = metadata.len();
     <span class="kw">let </span>n_packets =  file_size/RobinReader::EVENT_SIZE <span class="kw">as </span>u64; 
-    <span class="macro">info!</span>(<span class="string">&quot;The file {} contains likely ~{} event packets!&quot;</span>, <span class="self">self</span>.filename, n_packets);
+    <span class="macro">info!</span>(<span class="string">"The file {} contains likely ~{} event packets!"</span>, <span class="self">self</span>.filename, n_packets);
     n_packets
   }
 }
@@ -2704,7 +2635,7 @@
 <span class="kw">impl </span>Default <span class="kw">for </span>RobinReader {
 
   <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
-    RobinReader::new(String::from(<span class="string">&quot;&quot;</span>))
+    RobinReader::new(String::from(<span class="string">""</span>))
   }
 }
 
@@ -2723,7 +2654,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>buffer      = [<span class="number">0u8</span>;CHUNKSIZE];
         <span class="kw">match </span><span class="self">self</span>.file_reader.as_mut().unwrap().read(<span class="kw-2">&amp;mut </span>buffer) {
           <span class="prelude-val">Err</span>(err) =&gt; {
-            <span class="macro">error!</span>(<span class="string">&quot;Unable to read any bytes from file {}, {}&quot;</span>, <span class="self">self</span>.filename, err);
+            <span class="macro">error!</span>(<span class="string">"Unable to read any bytes from file {}, {}"</span>, <span class="self">self</span>.filename, err);
             <span class="kw">return </span><span class="prelude-val">None</span>;
           },
           <span class="prelude-val">Ok</span>(_nbytes) =&gt; {
@@ -2736,7 +2667,7 @@
                 <span class="self">self</span>.eof_reached = <span class="bool-val">false</span>;
                 <span class="kw">match </span><span class="self">self</span>.file_reader.as_mut().unwrap().read(<span class="kw-2">&amp;mut </span>buffer) {
                   <span class="prelude-val">Err</span>(err) =&gt; {
-                    <span class="macro">error!</span>(<span class="string">&quot;Failed reading bytes from buffer! {}&quot;</span>, err);
+                    <span class="macro">error!</span>(<span class="string">"Failed reading bytes from buffer! {}"</span>, err);
                   },
                   <span class="prelude-val">Ok</span>(_nbytes2) =&gt; {}
                 }
@@ -2746,12 +2677,12 @@
             <span class="self">self</span>.streamer.add(<span class="kw-2">&amp;</span>buffer.to_vec(), _nbytes);
             <span class="kw">match </span><span class="self">self</span>.streamer.next() {
               <span class="prelude-val">None </span>=&gt; {
-                <span class="comment">//println!(&quot;none..&quot;);
+                <span class="comment">//println!("none..");
                 </span><span class="kw">return </span><span class="prelude-val">None</span>;
               },
               <span class="prelude-val">Some</span>(event) =&gt; {
                 <span class="kw">return </span><span class="prelude-val">Some</span>(event);
-                <span class="comment">//println!(&quot;{}&quot;, event);
+                <span class="comment">//println!("{}", event);
               </span>} 
             }
           }

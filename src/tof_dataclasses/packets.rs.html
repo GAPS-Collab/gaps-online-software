@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/packets.rs`."><title>packets.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/packets.rs`."><title>packets.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -449,15 +450,6 @@
 <a href="#449" id="449">449</a>
 <a href="#450" id="450">450</a>
 <a href="#451" id="451">451</a>
-<a href="#452" id="452">452</a>
-<a href="#453" id="453">453</a>
-<a href="#454" id="454">454</a>
-<a href="#455" id="455">455</a>
-<a href="#456" id="456">456</a>
-<a href="#457" id="457">457</a>
-<a href="#458" id="458">458</a>
-<a href="#459" id="459">459</a>
-<a href="#460" id="460">460</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Packets are a way to send data over the network.
 //!
 //! Data gets serialized to a bytestream and then 
@@ -510,15 +502,6 @@
 <span class="kw">pub mod </span>packet_type;
 <span class="kw">pub use </span>packet_type::PacketType;
 
-<span class="kw">pub enum </span>PacketQuality {
-  Perfect,
-  Good,
-  NotSoGood,
-  Bad,
-  Rubbish, 
-  UtterRubish
-}
-
 <span class="doccomment">/// The most basic of all packets
 ///  
 /// A type and a payload. This wraps
@@ -540,7 +523,7 @@
   <span class="comment">// FUTURE EXTENSION: Be able to send
   </span><span class="doccomment">/// packets which contain multiple of the same packets
   </span><span class="kw">pub </span>is_multi_packet    : bool,
-  <span class="comment">// fields which won&#39;t get serialized
+  <span class="comment">// fields which won't get serialized
   </span><span class="doccomment">/// mark a packet as not eligible to be written to disk
   </span><span class="kw">pub </span>no_write_to_disk   : bool,
   <span class="doccomment">/// mark a packet as not eligible to be sent over network 
@@ -555,9 +538,9 @@
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
     <span class="kw">let </span>p_len = <span class="self">self</span>.payload.len();
     <span class="kw">if </span>p_len &lt; <span class="number">4 </span>{
-      <span class="macro">write!</span>(f, <span class="string">&quot;&lt;TofPacket: type {:?}, payload size {}&gt;&quot;</span>, <span class="self">self</span>.packet_type, p_len)
+      <span class="macro">write!</span>(f, <span class="string">"&lt;TofPacket: type {:?}, payload size {}&gt;"</span>, <span class="self">self</span>.packet_type, p_len)
     } <span class="kw">else </span>{
-      <span class="macro">write!</span>(f, <span class="string">&quot;&lt;TofPacket: type {:?}, multi {}, payload [ {} {} {} {} .. {} {} {} {}] of size {} &gt;&quot;</span>,
+      <span class="macro">write!</span>(f, <span class="string">"&lt;TofPacket: type {:?}, multi {}, payload [ {} {} {} {} .. {} {} {} {}] of size {} &gt;"</span>,
              <span class="self">self</span>.packet_type,
              <span class="self">self</span>.is_multi_packet,
              <span class="self">self</span>.payload[<span class="number">0</span>], <span class="self">self</span>.payload[<span class="number">1</span>], <span class="self">self</span>.payload[<span class="number">2</span>], <span class="self">self</span>.payload[<span class="number">3</span>],
@@ -605,7 +588,7 @@
   <span class="doccomment">/// Unpack possible content
   </span><span class="kw">pub fn </span>unpack_rbevent(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;RBEvent, Box&lt;<span class="kw">dyn </span>Error&gt;&gt; {
     <span class="kw">if </span><span class="self">self</span>.packet_type != PacketType::RBEvent {
-      <span class="macro">error!</span>(<span class="string">&quot;We expeckt packet type {}, but got packet type {} instead!&quot;</span>, PacketType::RBEvent, <span class="self">self</span>.packet_type);
+      <span class="macro">error!</span>(<span class="string">"We expeckt packet type {}, but got packet type {} instead!"</span>, PacketType::RBEvent, <span class="self">self</span>.packet_type);
       <span class="kw">return </span><span class="prelude-val">Err</span>(Box::new(PacketError::WrongPacketType));
     }
     <span class="prelude-val">Ok</span>(RBEvent::from_bytestream(<span class="kw-2">&amp;</span><span class="self">self</span>.payload, <span class="kw-2">&amp;mut </span><span class="number">0</span>)<span class="question-mark">?</span>)
@@ -619,7 +602,7 @@
     <span class="kw">if </span>!<span class="self">self</span>.is_multi_packet {
       <span class="kw">return </span><span class="number">1</span>; 
     }
-    <span class="macro">todo!</span>(<span class="string">&quot;Can not deal with multipackets right now!&quot;</span>);
+    <span class="macro">todo!</span>(<span class="string">"Can not deal with multipackets right now!"</span>);
     <span class="attr">#[allow(unreachable_code)] </span>{
       <span class="kw">return </span><span class="number">1</span>;
     }
@@ -770,7 +753,7 @@
   -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, SerializationError&gt; {
     <span class="kw">let </span>head = parse_u16(stream, pos);
     <span class="kw">if </span><span class="self">Self</span>::HEAD != head {
-      <span class="macro">error!</span>(<span class="string">&quot;Packet does not start with HEAD signature&quot;</span>);
+      <span class="macro">error!</span>(<span class="string">"Packet does not start with HEAD signature"</span>);
       <span class="kw">return </span><span class="prelude-val">Err</span>(SerializationError::HeadInvalid {});
     }
     <span class="kw">let </span>packet_type : PacketType;
@@ -778,14 +761,14 @@
     <span class="kw">match </span>PacketType::try_from(packet_type_enc) {
       <span class="prelude-val">Ok</span>(pt) =&gt; packet_type = pt,
       <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
-        <span class="macro">error!</span>(<span class="string">&quot;Can not decode packet with packet type {}&quot;</span>, packet_type_enc);
+        <span class="macro">error!</span>(<span class="string">"Can not decode packet with packet type {}"</span>, packet_type_enc);
         <span class="kw">return </span><span class="prelude-val">Err</span>(SerializationError::UnknownPayload);}
     }
     <span class="kw">let </span>payload_size = parse_u32(stream, pos);
     <span class="kw-2">*</span>pos += payload_size <span class="kw">as </span>usize; 
     <span class="kw">let </span>tail = parse_u16(stream, pos);
     <span class="kw">if </span><span class="self">Self</span>::TAIL != tail {
-      <span class="macro">error!</span>(<span class="string">&quot;Packet does not end with TAIL signature&quot;</span>);
+      <span class="macro">error!</span>(<span class="string">"Packet does not end with TAIL signature"</span>);
       <span class="kw">return </span><span class="prelude-val">Err</span>(SerializationError::TailInvalid {});
     }
     <span class="kw-2">*</span>pos -= <span class="number">2</span>; <span class="comment">// for tail parsing
@@ -800,7 +783,7 @@
   <span class="kw">fn </span>to_bytestream(<span class="kw-2">&amp;</span><span class="self">self</span>) 
     -&gt; Vec&lt;u8&gt; {
     <span class="kw">if </span><span class="self">self</span>.is_multi_packet {
-      <span class="macro">todo!</span>(<span class="string">&quot;Can not deal with multipackets right now!&quot;</span>);
+      <span class="macro">todo!</span>(<span class="string">"Can not deal with multipackets right now!"</span>);
     }
     <span class="kw">let </span><span class="kw-2">mut </span>bytestream = Vec::&lt;u8&gt;::with_capacity(<span class="number">6 </span>+ <span class="self">self</span>.payload.len());
     bytestream.extend_from_slice(<span class="kw-2">&amp;</span>TofPacket::HEAD.to_le_bytes());
@@ -812,7 +795,7 @@
     // the same TofPacket (in case we do that)
     </span><span class="kw">let </span>payload_len = <span class="self">self</span>.payload.len() <span class="kw">as </span>u32;
     <span class="comment">//let foo = &amp;payload_len.to_le_bytes();
-    //debug!(&quot;TofPacket binary payload: {foo:?}&quot;);
+    //debug!("TofPacket binary payload: {foo:?}");
     </span>bytestream.extend_from_slice(<span class="kw-2">&amp;</span>payload_len.to_le_bytes());
     bytestream.extend_from_slice(<span class="self">self</span>.payload.as_slice());
     bytestream.extend_from_slice(<span class="kw-2">&amp;</span>TofPacket::TAIL.to_le_bytes());
@@ -820,7 +803,7 @@
   }
 }
 
-<span class="attr">#[cfg(feature=<span class="string">&quot;random&quot;</span>)]
+<span class="attr">#[cfg(feature=<span class="string">"random"</span>)]
 #[test] 
 </span><span class="kw">fn </span>tofpacket_from_rbevent() {
   <span class="kw">let </span>data = RBEvent::new();
@@ -832,7 +815,7 @@
   <span class="macro">assert_eq!</span>(data, data_test);
 }
 
-<span class="attr">#[cfg(feature=<span class="string">&quot;random&quot;</span>)]
+<span class="attr">#[cfg(feature=<span class="string">"random"</span>)]
 #[test] 
 </span><span class="kw">fn </span>tofpacket_from_tofevent() {
   <span class="kw">let </span>data = TofEvent::new();
@@ -840,12 +823,12 @@
   <span class="kw">let </span>test = TofPacket::from_bytestream(<span class="kw-2">&amp;</span>pk.to_bytestream(),<span class="kw-2">&amp;mut </span><span class="number">0</span>).unwrap();
   <span class="macro">assert_eq!</span>(pk.packet_type, PacketType::TofEvent);
   <span class="macro">assert_eq!</span>(pk, test);
-  <span class="macro">warn!</span>(<span class="string">&quot;PartialEq missing for TofEvent!&quot;</span>);
+  <span class="macro">warn!</span>(<span class="string">"PartialEq missing for TofEvent!"</span>);
   <span class="comment">//let data_test = TofEvent::from_bytestream(&amp;pk.payload, &amp;mut 0).unwrap();
   //assert_eq!(data, data_test);
 </span>}
 
-<span class="attr">#[cfg(feature=<span class="string">&quot;random&quot;</span>)]
+<span class="attr">#[cfg(feature=<span class="string">"random"</span>)]
 #[test] 
 </span><span class="kw">fn </span>tofpacket_from_mtevent() {
   <span class="kw">let </span>data = MasterTriggerEvent::new(<span class="number">0</span>,<span class="number">0</span>);
@@ -857,7 +840,7 @@
   <span class="macro">assert_eq!</span>(data, data_test);
 }
 
-<span class="attr">#[cfg(feature=<span class="string">&quot;random&quot;</span>)]
+<span class="attr">#[cfg(feature=<span class="string">"random"</span>)]
 #[test] 
 </span><span class="kw">fn </span>tofpacket_from_rbmonidata() {
   <span class="kw">let </span>data = RBMoniData::new();
@@ -869,7 +852,7 @@
   <span class="macro">assert_eq!</span>(data, data_test);
 }
 
-<span class="attr">#[cfg(feature=<span class="string">&quot;random&quot;</span>)]
+<span class="attr">#[cfg(feature=<span class="string">"random"</span>)]
 #[test] 
 </span><span class="kw">fn </span>tofpacket_from_ltbmonidata() {
   <span class="kw">let </span>data = LTBMoniData::new();
@@ -881,7 +864,7 @@
   <span class="macro">assert_eq!</span>(data, data_test);
 }
 
-<span class="attr">#[cfg(feature=<span class="string">&quot;random&quot;</span>)]
+<span class="attr">#[cfg(feature=<span class="string">"random"</span>)]
 #[test] 
 </span><span class="kw">fn </span>tofpacket_from_pbmonidata() {
   <span class="kw">let </span>data = PBMoniData::new();
@@ -893,7 +876,7 @@
   <span class="macro">assert_eq!</span>(data, data_test);
 }
 
-<span class="attr">#[cfg(feature=<span class="string">&quot;random&quot;</span>)]
+<span class="attr">#[cfg(feature=<span class="string">"random"</span>)]
 #[test] 
 </span><span class="kw">fn </span>tofpacket_from_pamonidata() {
   <span class="kw">let </span>data = PAMoniData::new();
@@ -905,7 +888,7 @@
   <span class="macro">assert_eq!</span>(data, data_test);
 }
 
-<span class="attr">#[cfg(feature=<span class="string">&quot;random&quot;</span>)]
+<span class="attr">#[cfg(feature=<span class="string">"random"</span>)]
 #[test] 
 </span><span class="kw">fn </span>tofpacket_from_mtbmonidata() {
   <span class="kw">let </span>data = MtbMoniData::new();

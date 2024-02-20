@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/winnow-0.5.39/src/combinator/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="winnow" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/winnow-0.6.2/src/combinator/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="winnow" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -180,45 +181,45 @@
 //!
 //! ## Basic elements
 //!
-//! Those are used to recognize the lowest level elements of your grammar, like, &quot;here is a dot&quot;, or &quot;here is an big endian integer&quot;.
+//! Those are used to recognize the lowest level elements of your grammar, like, "here is a dot", or "here is an big endian integer".
 //!
 //! | combinator | usage | input | new input | output | comment |
 //! |---|---|---|---|---|---|
-//! | [`one_of`][crate::token::one_of] | `one_of([&#39;a&#39;, &#39;b&#39;, &#39;c&#39;])` |  `&quot;abc&quot;` |  `&quot;bc&quot;` | `Ok(&#39;a&#39;)` |Matches one of the provided characters (works with non ASCII characters too)|
-//! | [`none_of`][crate::token::none_of] | `none_of([&#39;a&#39;, &#39;b&#39;, &#39;c&#39;])` |  `&quot;xyab&quot;` |  `&quot;yab&quot;` | `Ok(&#39;x&#39;)` |Matches anything but the provided characters|
-//! | [`tag`][crate::token::tag] | `&quot;hello&quot;` |  `&quot;hello world&quot;` |  `&quot; world&quot;` | `Ok(&quot;hello&quot;)` |Recognizes a specific suite of characters or bytes (see also [`Caseless`][crate::ascii::Caseless])|
-//! | [`take`][crate::token::take] | `take(4)` |  `&quot;hello&quot;` |  `&quot;o&quot;` | `Ok(&quot;hell&quot;)` |Takes a specific number of bytes or characters|
-//! | [`take_while`][crate::token::take_while] | `take_while(0.., is_alphabetic)` |  `&quot;abc123&quot;` |  `&quot;123&quot;` | `Ok(&quot;abc&quot;)` |Returns the longest list of bytes for which the provided pattern matches.|
-//! | [`take_till0`][crate::token::take_till0] | `take_till0(is_alphabetic)` |  `&quot;123abc&quot;` |  `&quot;abc&quot;` | `Ok(&quot;123&quot;)` |Returns the longest list of bytes or characters until the provided pattern matches. `take_till1` does the same, but must return at least one character. This is the reverse behaviour from `take_while`: `take_till(f)` is equivalent to `take_while(0.., \|c\| !f(c))`|
-//! | [`take_until`][crate::token::take_until] | `take_until(0.., &quot;world&quot;)` |  `&quot;Hello world&quot;` |  `&quot;world&quot;` | `Ok(&quot;Hello &quot;)` |Returns the longest list of bytes or characters until the provided tag is found.|
+//! | [`one_of`][crate::token::one_of] | `one_of(['a', 'b', 'c'])` |  `"abc"` |  `"bc"` | `Ok('a')` |Matches one of the provided characters (works with non ASCII characters too)|
+//! | [`none_of`][crate::token::none_of] | `none_of(['a', 'b', 'c'])` |  `"xyab"` |  `"yab"` | `Ok('x')` |Matches anything but the provided characters|
+//! | [`literal`][crate::token::literal] | `"hello"` |  `"hello world"` |  `" world"` | `Ok("hello")` |Recognizes a specific suite of characters or bytes (see also [`Caseless`][crate::ascii::Caseless])|
+//! | [`take`][crate::token::take] | `take(4)` |  `"hello"` |  `"o"` | `Ok("hell")` |Takes a specific number of bytes or characters|
+//! | [`take_while`][crate::token::take_while] | `take_while(0.., is_alphabetic)` |  `"abc123"` |  `"123"` | `Ok("abc")` |Returns the longest list of bytes for which the provided pattern matches.|
+//! | [`take_till`][crate::token::take_till] | `take_till(0.., is_alphabetic)` |  `"123abc"` |  `"abc"` | `Ok("123")` |Returns the longest list of bytes or characters until the provided pattern matches. This is the reverse behaviour from `take_while`: `take_till(f)` is equivalent to `take_while(0.., \|c\| !f(c))`|
+//! | [`take_until`][crate::token::take_until] | `take_until(0.., "world")` |  `"Hello world"` |  `"world"` | `Ok("Hello ")` |Returns the longest list of bytes or characters until the provided literal is found.|
 //!
 //! ## Choice combinators
 //!
 //! | combinator | usage | input | new input | output | comment |
 //! |---|---|---|---|---|---|
-//! | [`alt`] | `alt((&quot;ab&quot;, &quot;cd&quot;))` |  `&quot;cdef&quot;` |  `&quot;ef&quot;` | `Ok(&quot;cd&quot;)` |Try a list of parsers and return the result of the first successful one|
+//! | [`alt`] | `alt(("ab", "cd"))` |  `"cdef"` |  `"ef"` | `Ok("cd")` |Try a list of parsers and return the result of the first successful one|
 //! | [`dispatch`] | \- | \- | \- | \- | `match` for parsers |
-//! | [`permutation`] | `permutation((&quot;ab&quot;, &quot;cd&quot;, &quot;12&quot;))` | `&quot;cd12abc&quot;` | `&quot;c&quot;` | `Ok((&quot;ab&quot;, &quot;cd&quot;, &quot;12&quot;))` |Succeeds when all its child parser have succeeded, whatever the order|
+//! | [`permutation`] | `permutation(("ab", "cd", "12"))` | `"cd12abc"` | `"c"` | `Ok(("ab", "cd", "12"))` |Succeeds when all its child parser have succeeded, whatever the order|
 //!
 //! ## Sequence combinators
 //!
 //! | combinator | usage | input | new input | output | comment |
 //! |---|---|---|---|---|---|
-//! | [`(...)` (tuples)][crate::Parser] | `(&quot;ab&quot;, &quot;XY&quot;, take(1))` | `&quot;abXYZ!&quot;` | `&quot;!&quot;` | `Ok((&quot;ab&quot;, &quot;XY&quot;, &quot;Z&quot;))` |Chains parsers and assemble the sub results in a tuple. You can use as many child parsers as you can put elements in a tuple|
-//! | [`seq!`] | `seq!(_: char(&#39;(&#39;), take(2), _: char(&#39;)&#39;))` | `&quot;(ab)cd&quot;` | `&quot;cd&quot;` | `Ok(&quot;ab&quot;)` ||
-//! | [`delimited`] | `delimited(char(&#39;(&#39;), take(2), char(&#39;)&#39;))` | `&quot;(ab)cd&quot;` | `&quot;cd&quot;` | `Ok(&quot;ab&quot;)` ||
-//! | [`preceded`] | `preceded(&quot;ab&quot;, &quot;XY&quot;)` | `&quot;abXYZ&quot;` | `&quot;Z&quot;` | `Ok(&quot;XY&quot;)` ||
-//! | [`terminated`] | `terminated(&quot;ab&quot;, &quot;XY&quot;)` | `&quot;abXYZ&quot;` | `&quot;Z&quot;` | `Ok(&quot;ab&quot;)` ||
-//! | [`separated_pair`] | `separated_pair(&quot;hello&quot;, char(&#39;,&#39;), &quot;world&quot;)` | `&quot;hello,world!&quot;` | `&quot;!&quot;` | `Ok((&quot;hello&quot;, &quot;world&quot;))` ||
+//! | [`(...)` (tuples)][crate::Parser] | `("ab", "XY", take(1))` | `"abXYZ!"` | `"!"` | `Ok(("ab", "XY", "Z"))` |Chains parsers and assemble the sub results in a tuple. You can use as many child parsers as you can put elements in a tuple|
+//! | [`seq!`] | `seq!(_: char('('), take(2), _: char(')'))` | `"(ab)cd"` | `"cd"` | `Ok("ab")` ||
+//! | [`delimited`] | `delimited(char('('), take(2), char(')'))` | `"(ab)cd"` | `"cd"` | `Ok("ab")` ||
+//! | [`preceded`] | `preceded("ab", "XY")` | `"abXYZ"` | `"Z"` | `Ok("XY")` ||
+//! | [`terminated`] | `terminated("ab", "XY")` | `"abXYZ"` | `"Z"` | `Ok("ab")` ||
+//! | [`separated_pair`] | `separated_pair("hello", char(','), "world")` | `"hello,world!"` | `"!"` | `Ok(("hello", "world"))` ||
 //!
 //! ## Applying a parser multiple times
 //!
 //! | combinator | usage | input | new input | output | comment |
 //! |---|---|---|---|---|---|
-//! | [`repeat`] | `repeat(1..=3, &quot;ab&quot;)` | `&quot;ababc&quot;` | `&quot;c&quot;` | `Ok(vec![&quot;ab&quot;, &quot;ab&quot;])` |Applies the parser between m and n times (n included) and returns the list of results in a Vec|
-//! | [`repeat_till`] | `repeat_till(0.., tag( &quot;ab&quot; ), tag( &quot;ef&quot; ))` | `&quot;ababefg&quot;` | `&quot;g&quot;` | `Ok((vec![&quot;ab&quot;, &quot;ab&quot;], &quot;ef&quot;))` |Applies the first parser until the second applies. Returns a tuple containing the list of results from the first in a Vec and the result of the second|
-//! | [`separated`] | `separated(1..=3, &quot;ab&quot;, &quot;,&quot;)` | `&quot;ab,ab,ab.&quot;` | `&quot;.&quot;` | `Ok(vec![&quot;ab&quot;, &quot;ab&quot;, &quot;ab&quot;])` |Applies the parser and separator between m and n times (n included) and returns the list of results in a Vec|
-//! | [`fold_repeat`] | `fold_repeat(1..=2, be_u8, \|\| 0, \|acc, item\| acc + item)` | `[1, 2, 3]` | `[3]` | `Ok(3)` |Applies the parser between m and n times (n included) and folds the list of return value|
+//! | [`repeat`] | `repeat(1..=3, "ab")` | `"ababc"` | `"c"` | `Ok(vec!["ab", "ab"])` |Applies the parser between m and n times (n included) and returns the list of results in a Vec|
+//! | [`repeat_till`] | `repeat_till(0.., literal( "ab" ), literal( "ef" ))` | `"ababefg"` | `"g"` | `Ok((vec!["ab", "ab"], "ef"))` |Applies the first parser until the second applies. Returns a tuple containing the list of results from the first in a Vec and the result of the second|
+//! | [`separated`] | `separated(1..=3, "ab", ",")` | `"ab,ab,ab."` | `"."` | `Ok(vec!["ab", "ab", "ab"])` |Applies the parser and separator between m and n times (n included) and returns the list of results in a Vec|
+//! | [`Repeat::fold`] | `repeat(1..=2, be_u8).fold(\|\| 0, \|acc, item\| acc + item)` | `[1, 2, 3]` | `[3]` | `Ok(3)` |Applies the parser between m and n times (n included) and folds the list of return value|
 //!
 //! ## Partial related
 //!
@@ -257,8 +258,8 @@
 //!
 //! ## Remaining combinators
 //!
-//! - [`success`]: Returns a value without consuming any input, always succeeds
-//! - [`fail`]: Inversion of `success`. Always fails.
+//! - [`empty`]: Returns a value without consuming any input, always succeeds
+//! - [`fail`]: Inversion of [`empty`]. Always fails.
 //! - [`Parser::by_ref`]: Allow moving `&amp;mut impl Parser` into other parsers
 //!
 //! ## Text parsing
@@ -301,9 +302,9 @@
 //!
 //! ## Binary format parsing
 //!
-//! - [`length_count`][crate::binary::length_count] Gets a number from the first parser, then applies the second parser that many times
-//! - [`length_data`][crate::binary::length_data]: Gets a number from the first parser, then takes a subslice of the input of that size, and returns that subslice
-//! - [`length_value`][crate::binary::length_value]: Gets a number from the first parser, takes a subslice of the input of that size, then applies the second parser on that subslice. If the second parser returns `Incomplete`, `length_value` will return an error
+//! - [`length_repeat`][crate::binary::length_repeat] Gets a number from the first parser, then applies the second parser that many times
+//! - [`length_take`][crate::binary::length_take]: Gets a number from the first parser, then takes a subslice of the input of that size, and returns that subslice
+//! - [`length_and_then`][crate::binary::length_and_then]: Gets a number from the first parser, takes a subslice of the input of that size, then applies the second parser on that subslice. If the second parser returns `Incomplete`, `length_value` will return an error
 //!
 //! ### Integers
 //!
@@ -328,7 +329,7 @@
 //! - [`bits`][crate::binary::bits::bits]: Transforms the current input type (byte slice `&amp;[u8]`) to a bit stream on which bit specific parsers and more general combinators can be applied
 //! - [`bytes`][crate::binary::bits::bytes]: Transforms its bits stream input back into a byte slice for the underlying parser
 //! - [`take`][crate::binary::bits::take]: Take a set number of bits
-//! - [`tag`][crate::binary::bits::tag]: Check if a set number of bits matches a pattern
+//! - [`pattern`][crate::binary::bits::pattern]: Check if a set number of bits matches a pattern
 //! - [`bool`][crate::binary::bits::bool]: Match any one bit
 
 </span><span class="kw">mod </span>branch;

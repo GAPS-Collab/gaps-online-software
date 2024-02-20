@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-analysis/src/bin/rb_calibration.rs`."><title>rb_calibration.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="rb_calibration" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-analysis/src/bin/rb_calibration.rs`."><title>rb_calibration.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="rb_calibration" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -153,10 +154,10 @@
     FileType,
 };
 <span class="attr">#[derive(Parser, Default, Debug)]
-#[command(author = <span class="string">&quot;J.A.Stoessl&quot;</span>, version, about, long_about = <span class="prelude-val">None</span>)]
+#[command(author = <span class="string">"J.A.Stoessl"</span>, version, about, long_about = <span class="prelude-val">None</span>)]
 </span><span class="kw">struct </span>Args {
   <span class="doccomment">/// Recalibrate an existing calibration (re-calculate the calibration constants)
-  </span><span class="attr">#[arg(long, default_value_t=String::from(<span class="string">&quot;&quot;</span>))]
+  </span><span class="attr">#[arg(long, default_value_t=String::from(<span class="string">""</span>))]
   </span>recalibrate: String,
   <span class="doccomment">/// File with No-input data
   </span>noi_file: <span class="prelude-ty">Option</span>&lt;String&gt;,
@@ -170,9 +171,9 @@
   
   env_logger::builder()
     .format(|buf, record| {
-    <span class="macro">writeln!</span>( buf, <span class="string">&quot;[{level}][{module_path}:{line}] {args}&quot;</span>,
+    <span class="macro">writeln!</span>( buf, <span class="string">"[{level}][{module_path}:{line}] {args}"</span>,
       level = color_log(<span class="kw-2">&amp;</span>record.level()),
-      module_path = record.module_path().unwrap_or(<span class="string">&quot;&lt;unknown&gt;&quot;</span>),
+      module_path = record.module_path().unwrap_or(<span class="string">"&lt;unknown&gt;"</span>),
       <span class="comment">//target = record.target(),
       </span>line = record.line().unwrap_or(<span class="number">0</span>),
       args = record.args()
@@ -180,38 +181,38 @@
     }).init();
  
   <span class="kw">let </span>args = Args::parse(); 
-  <span class="kw">if </span>args.recalibrate != String::from(<span class="string">&quot;&quot;</span>) {
-    <span class="macro">println!</span>(<span class="string">&quot;=&gt; Will recalibrate {}&quot;</span>, args.recalibrate);
+  <span class="kw">if </span>args.recalibrate != String::from(<span class="string">""</span>) {
+    <span class="macro">println!</span>(<span class="string">"=&gt; Will recalibrate {}"</span>, args.recalibrate);
     <span class="kw">let </span><span class="kw-2">mut </span>reader = TofPacketReader::new(args.recalibrate);
     <span class="kw">let </span><span class="kw-2">mut </span>cali   : RBCalibrations;
     <span class="kw">match </span>reader.next() {
       <span class="prelude-val">None </span>=&gt; {
-        <span class="macro">error!</span>(<span class="string">&quot;Can not read from inputfile!&quot;</span>);
+        <span class="macro">error!</span>(<span class="string">"Can not read from inputfile!"</span>);
       },
       <span class="prelude-val">Some</span>(tp) =&gt; {
         <span class="kw">match </span>RBCalibrations::from_bytestream(<span class="kw-2">&amp;</span>tp.payload, <span class="kw-2">&amp;mut </span><span class="number">0</span>) {
-          <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Can not decode RBCalibration from input file! {err}&quot;</span>),
+          <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Can not decode RBCalibration from input file! {err}"</span>),
           <span class="prelude-val">Ok</span>(_cali) =&gt; {
             cali = _cali;
             <span class="kw">match </span>cali.calibrate() {
               <span class="prelude-val">Err</span>(err) =&gt; {
-                <span class="macro">error!</span>(<span class="string">&quot;Calibration failed, exiting! {err}&quot;</span>);
+                <span class="macro">error!</span>(<span class="string">"Calibration failed, exiting! {err}"</span>);
                 exit(<span class="number">1</span>);
               },
               <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; ()
             }
             <span class="kw">let </span>rb_id = cali.rb_id;
-            <span class="kw">let </span><span class="kw-2">mut </span>outfile = String::from(<span class="string">&quot;rb&quot;</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>outfile = String::from(<span class="string">"rb"</span>);
             <span class="kw">if </span>rb_id &lt; <span class="number">10 </span>{
-              outfile += <span class="string">&quot;0&quot;</span>;
+              outfile += <span class="string">"0"</span>;
             }
             outfile += <span class="kw-2">&amp;</span>rb_id.to_string();
-            outfile += <span class="string">&quot;.cali&quot;</span>;
+            outfile += <span class="string">".cali"</span>;
             <span class="kw">let </span>ftype = FileType::CalibrationFile(rb_id);
             <span class="kw">let </span><span class="kw-2">mut </span>writer  = TofPacketWriter::new(outfile, ftype);
             <span class="kw">let </span>pack        = TofPacket::from(<span class="kw-2">&amp;</span>cali);
             writer.add_tof_packet(<span class="kw-2">&amp;</span>pack);
-            <span class="macro">println!</span>(<span class="string">&quot;=&gt; Done, exciting!&quot;</span>);
+            <span class="macro">println!</span>(<span class="string">"=&gt; Done, exciting!"</span>);
             exit(<span class="number">0</span>); 
           }
         }
@@ -221,11 +222,11 @@
 
   <span class="kw">let </span><span class="kw-2">mut </span>cali = RBCalibrations::new(<span class="number">27</span>);
   <span class="kw">let </span><span class="kw-2">mut </span>inputfiles : Vec&lt;String&gt; = Vec::&lt;String&gt;::new();
-  inputfiles.push(args.noi_file. expect(<span class="string">&quot;Please specify noi data path&quot;</span>).clone());
-  inputfiles.push(args.vcal_file.expect(<span class="string">&quot;Please specify vcal data path&quot;</span>).clone());
-  inputfiles.push(args.tcal_file.expect(<span class="string">&quot;Please specify tcal data path&quot;</span>).clone());
+  inputfiles.push(args.noi_file. expect(<span class="string">"Please specify noi data path"</span>).clone());
+  inputfiles.push(args.vcal_file.expect(<span class="string">"Please specify vcal data path"</span>).clone());
+  inputfiles.push(args.tcal_file.expect(<span class="string">"Please specify tcal data path"</span>).clone());
   <span class="kw">for </span>f <span class="kw">in </span>inputfiles.iter().enumerate() {
-    <span class="macro">info!</span>(<span class="string">&quot;Processing {}&quot;</span>, f.<span class="number">1</span>);
+    <span class="macro">info!</span>(<span class="string">"Processing {}"</span>, f.<span class="number">1</span>);
     <span class="kw">let </span><span class="kw-2">mut </span>reader = TofPacketReader::new(f.<span class="number">1</span>.to_string());
     <span class="kw">loop </span>{
       <span class="kw">match </span>reader.next() {
@@ -235,7 +236,7 @@
         <span class="prelude-val">Some</span>(tp) =&gt; {
           <span class="kw">match </span>tp.unpack_rbevent() {
             <span class="prelude-val">Err</span>(err) =&gt; {
-              <span class="macro">error!</span>(<span class="string">&quot;Issues with packet {err}&quot;</span>);
+              <span class="macro">error!</span>(<span class="string">"Issues with packet {err}"</span>);
             }
             <span class="prelude-val">Ok</span>(event) =&gt; { 
               <span class="kw">if </span>f.<span class="number">0 </span>== <span class="number">0 </span>{
@@ -258,13 +259,13 @@
   }
   <span class="kw">match </span>cali.calibrate() {
     <span class="prelude-val">Err</span>(err) =&gt; {
-      <span class="macro">error!</span>(<span class="string">&quot;Calibration failed, exiting! {err}&quot;</span>);
+      <span class="macro">error!</span>(<span class="string">"Calibration failed, exiting! {err}"</span>);
       exit(<span class="number">1</span>);
     },
     <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; ()
   }
   <span class="kw">let </span>ftype = FileType::CalibrationFile(cali.rb_id);
-  <span class="kw">let </span><span class="kw-2">mut </span>writer = TofPacketWriter::new(<span class="string">&quot;&quot;</span>.to_string(), ftype);
+  <span class="kw">let </span><span class="kw-2">mut </span>writer = TofPacketWriter::new(<span class="string">""</span>.to_string(), ftype);
   <span class="kw">let </span>pack       = TofPacket::from(<span class="kw-2">&amp;</span>cali);
   writer.add_tof_packet(<span class="kw-2">&amp;</span>pack);
 }

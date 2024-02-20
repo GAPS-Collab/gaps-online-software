@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-cc/src/threads/event_builder.rs`."><title>event_builder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="liftof_cc" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-cc/src/threads/event_builder.rs`."><title>event_builder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="liftof_cc" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -288,6 +289,25 @@
 <a href="#288" id="288">288</a>
 <a href="#289" id="289">289</a>
 <a href="#290" id="290">290</a>
+<a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
+<a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
+<a href="#295" id="295">295</a>
+<a href="#296" id="296">296</a>
+<a href="#297" id="297">297</a>
+<a href="#298" id="298">298</a>
+<a href="#299" id="299">299</a>
+<a href="#300" id="300">300</a>
+<a href="#301" id="301">301</a>
+<a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::time::Instant;
 
 <span class="kw">use </span>crossbeam_channel::{
@@ -297,6 +317,7 @@
 
 <span class="kw">use </span>std::collections::VecDeque;
 <span class="kw">use </span>std::collections::HashMap;
+<span class="kw">use </span>std::path::Path;
 
 <span class="kw">use </span>tof_dataclasses::events::{MasterTriggerEvent,
                               TofEvent,
@@ -307,7 +328,7 @@
     BuildStrategy
 };
 <span class="kw">use </span>tof_dataclasses::packets::TofPacket;
-
+<span class="kw">use </span>tof_dataclasses::manifest::get_dsi_j_ltbch_vs_rbch_map;
 
 <span class="doccomment">/// Events ... assemble! 
 ///
@@ -339,14 +360,15 @@
                       ev_from_rb     : <span class="kw-2">&amp;</span>Receiver&lt;RBEvent&gt;,
                       data_sink      : <span class="kw-2">&amp;</span>Sender&lt;TofPacket&gt;,
                       run_id         : u32,
+                      db_path        : String,
                       <span class="kw-2">mut </span>settings   : TofEventBuilderSettings) { 
   <span class="comment">// event caches for assembled events
-  </span><span class="kw">let </span><span class="kw-2">mut </span>event_cache      = HashMap::&lt;u32, TofEvent&gt;::new();
-  <span class="kw">let </span><span class="kw-2">mut </span>event_id_cache   = VecDeque::&lt;u32&gt;::with_capacity(EVENT_BUILDER_EVID_CACHE_SIZE);
-  
+  </span><span class="kw">let </span><span class="kw-2">mut </span>event_cache        = HashMap::&lt;u32, TofEvent&gt;::new();
+  <span class="kw">let </span><span class="kw-2">mut </span>event_id_cache     = VecDeque::&lt;u32&gt;::with_capacity(EVENT_BUILDER_EVID_CACHE_SIZE);
+  <span class="kw">let </span>dsi_map                = get_dsi_j_ltbch_vs_rbch_map(db_path.as_ref()); 
   <span class="kw">let </span><span class="kw-2">mut </span>n_received         : usize;
-  <span class="comment">//let mut clear_cache        = 0; // clear cache every 
-  //let mut event_sending      = 0;
+  <span class="comment">//let mut clear_cache      = 0; // clear cache every 
+  //let mut event_sending    = 0;
   </span><span class="kw">let </span><span class="kw-2">mut </span>n_mte_received_tot = <span class="number">0u64</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>n_rbe_received_tot = <span class="number">0u64</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>first_evid         : u32;
@@ -365,11 +387,11 @@
       <span class="comment">// every iteration, we welcome a new master event
       </span><span class="kw">match </span>m_trig_ev.try_recv() {
         <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
-          <span class="macro">trace!</span>(<span class="string">&quot;No new event ready yet!&quot;</span>);
+          <span class="macro">trace!</span>(<span class="string">"No new event ready yet!"</span>);
           <span class="kw">continue</span>;
         }   
         <span class="prelude-val">Ok</span>(mt) =&gt; {
-          <span class="macro">debug!</span>(<span class="string">&quot;Got master trigger for event {} with {} expected hit paddles&quot;
+          <span class="macro">debug!</span>(<span class="string">"Got master trigger for event {} with {} expected hit paddles"
                  </span>, mt.event_id
                  , mt.n_paddles);
           <span class="comment">// construct RB requests
@@ -378,7 +400,7 @@
           event.header.run_id = run_id;
           <span class="kw">if </span>event.mt_event.event_id != last_evid + <span class="number">1 </span>{
             <span class="kw">let </span>delta_id = event.mt_event.event_id - last_evid;
-            <span class="macro">error!</span>(<span class="string">&quot;We skipped event ids {}&quot;</span>, delta_id );
+            <span class="macro">error!</span>(<span class="string">"We skipped event ids {}"</span>, delta_id );
           }
           last_evid = event.mt_event.event_id;
           event_cache.insert(last_evid, event);
@@ -389,11 +411,11 @@
       } <span class="comment">// end match Ok(mt)
       </span>n_received  += <span class="number">1</span>;
       <span class="comment">//if n_received % 10 == 0 {
-      //  println!(&quot;==&gt; Received 10 more MasterTriggerEvents&quot;);
+      //  println!("==&gt; Received 10 more MasterTriggerEvents");
       //}
       </span>n_mte_received_tot += <span class="number">1</span>;
     } <span class="comment">// end getting MTEvents
-    </span><span class="macro">trace!</span>(<span class="string">&quot;Debug timer MTE received! {:?}&quot;</span>, debug_timer.elapsed());
+    </span><span class="macro">trace!</span>(<span class="string">"Debug timer MTE received! {:?}"</span>, debug_timer.elapsed());
     first_evid = event_id_cache[<span class="number">0</span>]; 
     
     <span class="comment">// check this timeout
@@ -401,66 +423,83 @@
     //let mut iter_ev           = 0usize;
     //let mut rb_events_dropped = 0usize;
     </span>n_received = <span class="number">0</span>;
-    <span class="lifetime">&#39;main</span>: <span class="kw">while </span>!ev_from_rb.is_empty() &amp;&amp; n_received &lt; settings.n_rbe_per_loop {
+    <span class="lifetime">'main</span>: <span class="kw">while </span>!ev_from_rb.is_empty() &amp;&amp; n_received &lt; settings.n_rbe_per_loop {
     <span class="comment">// try to catch up
     //while !ev_from_rb.is_empty() &amp;&amp; last_rb_evid &lt; last_evid {
       </span><span class="kw">match </span>ev_from_rb.try_recv() {
         <span class="prelude-val">Err</span>(err) =&gt; {
-          <span class="macro">error!</span>(<span class="string">&quot;Can&#39;t receive RBEvent! Err {err}&quot;</span>);
+          <span class="macro">error!</span>(<span class="string">"Can't receive RBEvent! Err {err}"</span>);
         },
         <span class="prelude-val">Ok</span>(rb_ev) =&gt; {
           <span class="comment">// FIXME - this is technically a bit risky, but 
           // mt event should arrive so much earlier (seconds)
-          // I hope it won&#39;t be a problem. Otherwise we have
+          // I hope it won't be a problem. Otherwise we have
           // to add another cache.
-          //println!(&quot;==&gt; Len evt cache {}&quot;, event_cache.len());
+          //println!("==&gt; Len evt cache {}", event_cache.len());
           </span>n_rbe_received_tot += <span class="number">1</span>;
           n_received += <span class="number">1</span>;
           <span class="comment">//iter_ev = 0;
           </span>last_rb_evid = rb_ev.header.event_id;
           <span class="kw">if </span>last_rb_evid &lt; first_evid {
             n_received -= <span class="number">1</span>;
-            <span class="macro">debug!</span>(<span class="string">&quot;.. re-synchrnoizing ..&quot;</span>);
+            <span class="macro">debug!</span>(<span class="string">".. re-synchrnoizing .."</span>);
             <span class="kw">continue</span>;
           }
           <span class="kw">match </span>event_cache.get_mut(<span class="kw-2">&amp;</span>last_rb_evid) {
             <span class="prelude-val">None </span>=&gt; {
               <span class="comment">//FIXME - big issue!
-              //println!(&quot;Surprisingly we don&#39;t have that!&quot;);
+              //println!("Surprisingly we don't have that!");
               // insert a new TofEvent
               //let new_ev = TofEvent::new();
               </span>rb_ev_wo_mte += <span class="number">1</span>;
-              <span class="kw">continue </span><span class="lifetime">&#39;main</span>;
+              <span class="kw">continue </span><span class="lifetime">'main</span>;
             },
             <span class="prelude-val">Some</span>(ev) =&gt; {
-              ev.rb_events.push(rb_ev);
+              <span class="kw">if </span>settings.build_strategy == BuildStrategy::AdaptiveThorough {
+                <span class="kw">let </span>lg_hits   = ev.mt_event.get_dsi_j_ch_for_triggered_ltbs(); 
+                <span class="kw">let </span><span class="kw-2">mut </span>found = <span class="bool-val">false</span>;
+                <span class="kw">let </span>ev_rbid   = rb_ev.header.rb_id; 
+                <span class="kw">for </span>h <span class="kw">in </span><span class="kw-2">&amp;</span>lg_hits {
+                  <span class="kw">if </span>dsi_map[<span class="kw-2">&amp;</span>h.<span class="number">0</span>][<span class="kw-2">&amp;</span>h.<span class="number">1</span>][<span class="kw-2">&amp;</span>h.<span class="number">2</span>].<span class="number">0 </span>== rb_ev.header.rb_id {
+                    ev.rb_events.push(rb_ev);
+                    found = <span class="bool-val">true</span>;
+                    <span class="kw">break</span>;
+                  }
+                }
+                <span class="kw">if </span>!found {
+                  <span class="macro">println!</span>(<span class="string">"== ==&gt; We saw {:?}, but {} is not part of that!"</span>, lg_hits, ev_rbid);
+                }
+              } <span class="kw">else </span>{
+                ev.rb_events.push(rb_ev);
+              }
               <span class="comment">//break;
             </span>}
           }
     
           <span class="comment">//for ev in event_cache.iter_mut() {
           //  //iter_ev += 1;
-          //  //println!(&quot;==&gt; mt event id {}, rb event id {}&quot;, ev.mt_event.event_id, rb_ev.header.event_id);
-          //  //println!(&quot;==&gt; rb event id {}&quot;, rb_ev.header.event_id);
+          //  //println!("==&gt; mt event id {}, rb event id {}", ev.mt_event.event_id, rb_ev.header.event_id);
+          //  //println!("==&gt; rb event id {}", rb_ev.header.event_id);
           //  if ev.mt_event.event_id == rb_ev.header.event_id {
           //    ev.rb_events.push(rb_ev);
           //    break;
           //    //rb_events_added += 1;
-          //    //println!(&quot;==&gt; RBEvent added!&quot;);
+          //    //println!("==&gt; RBEvent added!");
           //    //break;
           //  }
           //}
           //if iter_ev == event_cache.len() {
-          //  info!(&quot;We dropped {}&quot;, rb_ev);
+          //  info!("We dropped {}", rb_ev);
           //}
           //if n_received % 10 == 0 {
-          //  println!(&quot;==&gt; Received 10 more RBEvents&quot;);
+          //  println!("==&gt; Received 10 more RBEvents");
           //}
         </span>}
       }
     }
     <span class="kw">let </span>av_rb_ev = n_rbs_per_ev <span class="kw">as </span>f64 / n_sent <span class="kw">as </span>f64;
-    <span class="kw">if </span>settings.build_strategy == BuildStrategy::Adaptive {
+    <span class="kw">if </span>settings.build_strategy == BuildStrategy::Adaptive || 
+       settings.build_strategy == BuildStrategy::AdaptiveThorough {
       settings.n_rbe_per_loop = av_rb_ev.ceil() <span class="kw">as </span>usize;
       <span class="kw">if </span>settings.n_rbe_per_loop == <span class="number">0 </span>{
         <span class="comment">// failsafe
@@ -474,45 +513,45 @@
         </span>settings.n_rbe_per_loop = <span class="number">40</span>;
       }
     }
-    <span class="kw">if </span>n_mte_received_tot % <span class="number">10000 </span>== <span class="number">0 </span>{
-      <span class="macro">println!</span>(<span class="string">&quot;[EVTBLDR] ==&gt; Received {} MTE&quot;</span>, n_mte_received_tot);
-      <span class="macro">println!</span>(<span class="string">&quot;[EVTBLDR] ==&gt; Received {n_rbe_received_tot} RBEvents!&quot;</span>);
-      <span class="macro">println!</span>(<span class="string">&quot;[EVTBLDR] ==&gt; Delta Last MTE evid - Last RB evid  {}&quot;</span>, last_evid - last_rb_evid);
-      <span class="macro">println!</span>(<span class="string">&quot;[EVTBLDR] ==&gt; Size of event cache {}&quot;</span>, event_cache.len());
-      <span class="macro">println!</span>(<span class="string">&quot;[EVTBLDR] ==&gt; Size of event ID cache {}&quot;</span>, event_id_cache.len());
-      <span class="macro">println!</span>(<span class="string">&quot;[EVTBLDR] ==&gt; Get MTE from cache for RB ev failed {rb_ev_wo_mte} times!&quot;</span>);
-      <span class="macro">println!</span>(<span class="string">&quot;[EVTBLDR] ==&gt; Sent {n_sent} events!&quot;</span>);
-      <span class="macro">println!</span>(<span class="string">&quot;[EVTBLDR] ==&gt; Chn len MTE receiver {}&quot;</span>,m_trig_ev.len() );
-      <span class="macro">println!</span>(<span class="string">&quot;[EVTBLDR] ==&gt; Chn len RBE receiver {}&quot;</span>,ev_from_rb.len());
-      <span class="macro">println!</span>(<span class="string">&quot;[EVTBLDR] ==&gt; Chn len TP  sender   {}&quot;</span>,data_sink.len());
+    <span class="kw">if </span>n_mte_received_tot % <span class="number">50 </span>== <span class="number">0 </span>{
+      <span class="macro">println!</span>(<span class="string">"[EVTBLDR] ==&gt; Received {} MTE"</span>, n_mte_received_tot);
+      <span class="macro">println!</span>(<span class="string">"[EVTBLDR] ==&gt; Received {n_rbe_received_tot} RBEvents!"</span>);
+      <span class="macro">println!</span>(<span class="string">"[EVTBLDR] ==&gt; Delta Last MTE evid - Last RB evid  {}"</span>, last_evid - last_rb_evid);
+      <span class="macro">println!</span>(<span class="string">"[EVTBLDR] ==&gt; Size of event cache {}"</span>, event_cache.len());
+      <span class="macro">println!</span>(<span class="string">"[EVTBLDR] ==&gt; Size of event ID cache {}"</span>, event_id_cache.len());
+      <span class="macro">println!</span>(<span class="string">"[EVTBLDR] ==&gt; Get MTE from cache for RB ev failed {rb_ev_wo_mte} times!"</span>);
+      <span class="macro">println!</span>(<span class="string">"[EVTBLDR] ==&gt; Sent {n_sent} events!"</span>);
+      <span class="macro">println!</span>(<span class="string">"[EVTBLDR] ==&gt; Chn len MTE receiver {}"</span>,m_trig_ev.len() );
+      <span class="macro">println!</span>(<span class="string">"[EVTBLDR] ==&gt; Chn len RBE receiver {}"</span>,ev_from_rb.len());
+      <span class="macro">println!</span>(<span class="string">"[EVTBLDR] ==&gt; Chn len TP  sender   {}"</span>,data_sink.len());
       
       <span class="kw">if </span>n_sent &gt; <span class="number">0 </span>{
         <span class="kw">let </span>av_rb_ev = n_rbs_per_ev <span class="kw">as </span>f64 / n_sent <span class="kw">as </span>f64;
-        <span class="macro">println!</span>(<span class="string">&quot;[EVTBLDR] ==&gt; Average number of RBEvents/TofEvent {:4.2}&quot;</span>, av_rb_ev);
+        <span class="macro">println!</span>(<span class="string">"[EVTBLDR] ==&gt; Average number of RBEvents/TofEvent {:4.2}"</span>, av_rb_ev);
       }
       <span class="kw">if </span>n_mte_received_tot &gt; <span class="number">0 </span>{
         <span class="kw">let </span>to_frac = n_timed_out <span class="kw">as </span>f64 / n_mte_received_tot <span class="kw">as </span>f64;
-        <span class="macro">println!</span>(<span class="string">&quot;[EVTBLDR] ==&gt; Fraction of timed out events {:4.2}&quot;</span>, to_frac);
+        <span class="macro">println!</span>(<span class="string">"[EVTBLDR] ==&gt; Fraction of timed out events {:4.2}"</span>, to_frac);
       }
-      <span class="comment">//println!(&quot;[EVTBLDR] ==&gt; Last RB evid {last_rb_evid}&quot;);
+      <span class="comment">//println!("[EVTBLDR] ==&gt; Last RB evid {last_rb_evid}");
     </span>}
-    <span class="macro">trace!</span>(<span class="string">&quot;Debug timer RBE received! {:?}&quot;</span>, debug_timer.elapsed());
+    <span class="macro">trace!</span>(<span class="string">"Debug timer RBE received! {:?}"</span>, debug_timer.elapsed());
     <span class="comment">//if event_sending == send_every_x_event {
     </span><span class="kw">if </span><span class="bool-val">true </span>{
       <span class="comment">//for ev in event_cache.iter_mut() {
       </span><span class="kw">let </span>this_cache_size = event_id_cache.len();
       <span class="kw">for _ in </span><span class="number">0</span>..this_cache_size {
-        <span class="comment">// if there wasn&#39;t a first element, size would be 0
+        <span class="comment">// if there wasn't a first element, size would be 0
         </span><span class="kw">let </span>evid = event_id_cache.pop_front().unwrap();
         <span class="kw">match </span>event_cache.get(<span class="kw-2">&amp;</span>evid) {
           <span class="prelude-val">None </span>=&gt; {
-            <span class="macro">error!</span>(<span class="string">&quot;This should not happen!&quot;</span>);
+            <span class="macro">error!</span>(<span class="string">"This should not happen!"</span>);
             event_id_cache.push_back(evid);
             <span class="kw">continue</span>;
           },
           <span class="prelude-val">Some</span>(ev) =&gt; {
           <span class="comment">//for evid in event_id_cache.iter() {
-            //println!(&quot;{}&quot;,ev.age());
+            //println!("{}",ev.age());
             </span><span class="kw">let </span>ev_timed_out = ev.age() &gt;= settings.te_timeout_sec <span class="kw">as </span>u64;
             <span class="kw">let </span>cache_it : bool;
             <span class="kw">if </span>ev_timed_out {
@@ -525,7 +564,7 @@
                 cache_it = <span class="bool-val">true</span>;
               }
             } <span class="kw">else </span>{
-              <span class="comment">// &quot;normal&quot; build strategy
+              <span class="comment">// "normal" build strategy
               </span><span class="kw">if </span>ev.is_complete() || ev_timed_out {
                 cache_it = <span class="bool-val">false</span>;
               } <span class="kw">else </span>{
@@ -535,16 +574,16 @@
             <span class="kw">if </span>cache_it {
               event_id_cache.push_back(evid);
             } <span class="kw">else </span>{
-              <span class="comment">// if we don&#39;t cache it, we have to send it. 
+              <span class="comment">// if we don't cache it, we have to send it. 
               </span><span class="kw">let </span>ev_to_send = event_cache.remove(<span class="kw-2">&amp;</span>evid).unwrap();
               n_rbs_per_ev  += ev_to_send.rb_events.len(); 
               <span class="kw">let </span>pack = TofPacket::from(<span class="kw-2">&amp;</span>ev_to_send);
               <span class="kw">match </span>data_sink.send(pack) {
                 <span class="prelude-val">Err</span>(err) =&gt; {
-                  <span class="macro">error!</span>(<span class="string">&quot;Packet sending failed! Err {}&quot;</span>, err);
+                  <span class="macro">error!</span>(<span class="string">"Packet sending failed! Err {}"</span>, err);
                 }
                 <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
-                  <span class="macro">debug!</span>(<span class="string">&quot;Event with id {} send!&quot;</span>, evid);
+                  <span class="macro">debug!</span>(<span class="string">"Event with id {} send!"</span>, evid);
                   n_sent += <span class="number">1</span>;
                 }
               }
@@ -554,7 +593,7 @@
       }
       <span class="comment">//event_sending = 0;
       //event_cache.retain(|ev| ev.valid);
-      </span><span class="macro">debug!</span>(<span class="string">&quot;Debug timer! EVT SENDING {:?}&quot;</span>, debug_timer.elapsed());
+      </span><span class="macro">debug!</span>(<span class="string">"Debug timer! EVT SENDING {:?}"</span>, debug_timer.elapsed());
     } 
 
     <span class="comment">//// remove sent events! 

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["AnalysisError","CalibrationError","DecodingError","EventError","IPBusError","MasterTriggerError","PacketError","RunError","SensorError","SerializationError","SetError","UserError","WaveformError"]};
+window.SIDEBAR_ITEMS = {"enum":["AnalysisError","CalibrationError","CmdError","DecodingError","EventError","IPBusError","MasterTriggerError","PacketError","RunError","SensorError","SerializationError","SetError","UserError","WaveformError"]};

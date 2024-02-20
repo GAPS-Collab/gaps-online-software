@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/systemstat-0.2.3/src/platform/linux.rs`."><title>linux.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="systemstat" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/systemstat-0.2.3/src/platform/linux.rs`."><title>linux.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="systemstat" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -862,12 +863,12 @@
 
 <span class="kw">fn </span>value_from_file&lt;T: str::FromStr&gt;(path: <span class="kw-2">&amp;</span>str) -&gt; io::Result&lt;T&gt; {
     read_file(path)<span class="question-mark">?
-        </span>.trim_end_matches(<span class="string">&#39;\n&#39;</span>)
+        </span>.trim_end_matches(<span class="string">'\n'</span>)
         .parse()
         .map_err(|<span class="kw">_</span>| {
             io::Error::new(
                 io::ErrorKind::Other,
-                <span class="macro">format!</span>(<span class="string">&quot;File: \&quot;{}\&quot; doesn&#39;t contain an int value&quot;</span>, <span class="kw-2">&amp;</span>path),
+                <span class="macro">format!</span>(<span class="string">"File: \"{}\" doesn't contain an int value"</span>, <span class="kw-2">&amp;</span>path),
             )
         })
 }
@@ -894,11 +895,11 @@
 
 <span class="doccomment">/// A combinator that takes a parser `inner` and produces a parser that also consumes both leading and
 /// trailing whitespace, returning the output of `inner`.
-</span><span class="kw">fn </span>ws&lt;<span class="lifetime">&#39;a</span>, F: <span class="lifetime">&#39;a</span>, O, E: ParseError&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;&gt;(
+</span><span class="kw">fn </span>ws&lt;<span class="lifetime">'a</span>, F: <span class="lifetime">'a</span>, O, E: ParseError&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt;&gt;(
     inner: F,
-) -&gt; <span class="kw">impl </span>FnMut(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, O, E&gt;
+) -&gt; <span class="kw">impl </span>FnMut(<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str, O, E&gt;
 <span class="kw">where
-    </span>F: Parser&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, O, E&gt;,
+    </span>F: Parser&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str, O, E&gt;,
 {
     delimited(multispace0, inner, multispace0)
 }
@@ -913,7 +914,7 @@
 
 <span class="comment">// Parse `cpuX`, where X is a number
 </span><span class="kw">fn </span>proc_stat_cpu_prefix(input: <span class="kw-2">&amp;</span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span>str, ()&gt; {
-    map(tuple((tag(<span class="string">&quot;cpu&quot;</span>), digit1)), |<span class="kw">_</span>| ())(input)
+    map(tuple((tag(<span class="string">"cpu"</span>), digit1)), |<span class="kw">_</span>| ())(input)
 }
 
 <span class="comment">// Parse a `/proc/stat` CPU line into a `CpuTime` struct
@@ -936,7 +937,7 @@
 
 <span class="comment">// Parse the top CPU load aggregate line of `/proc/stat`
 </span><span class="kw">fn </span>proc_stat_cpu_aggregate(input: <span class="kw-2">&amp;</span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span>str, ()&gt; {
-    map(tuple((tag(<span class="string">&quot;cpu&quot;</span>), space1)), |<span class="kw">_</span>| ())(input)
+    map(tuple((tag(<span class="string">"cpu"</span>), space1)), |<span class="kw">_</span>| ())(input)
 }
 
 <span class="comment">// Parse `/proc/stat` to extract per-CPU loads
@@ -953,7 +954,7 @@
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_proc_stat_cpu_times() {
-    <span class="kw">let </span>input = <span class="string">&quot;cpu  5972658 30964 2383250 392840200 70075 0 43945 0 0 0
+    <span class="kw">let </span>input = <span class="string">"cpu  5972658 30964 2383250 392840200 70075 0 43945 0 0 0
 cpu0 444919 3155 198700 24405593 4622 0 36738 0 0 0
 cpu1 296558 428 76249 24715635 1426 0 1280 0 0 0
 cpu2 402963 949 231689 24417433 6386 0 1780 0 0 0
@@ -977,7 +978,7 @@ processes 1360293
 procs_running 1
 procs_blocked 0
 softirq 81473629 1251347 8827732 10 325789 37 0 177903 43807896 2777 27080138
-&quot;</span>;
+"</span>;
     <span class="kw">let </span>result = proc_stat_cpu_times(input).unwrap().<span class="number">1</span>;
     <span class="macro">assert_eq!</span>(result.len(), <span class="number">16</span>);
     <span class="macro">assert_eq!</span>(result[<span class="number">0</span>].user, <span class="number">444919</span>);
@@ -990,7 +991,7 @@ softirq 81473629 1251347 8827732 10 325789 37 0 177903 43807896 2777 27080138
 
 <span class="doccomment">/// Get the current per-CPU `CpuTime` statistics
 </span><span class="kw">fn </span>cpu_time() -&gt; io::Result&lt;Vec&lt;CpuTime&gt;&gt; {
-    read_file(<span class="string">&quot;/proc/stat&quot;</span>).and_then(|data| {
+    read_file(<span class="string">"/proc/stat"</span>).and_then(|data| {
         proc_stat_cpu_times(<span class="kw-2">&amp;</span>data)
             .map(|(<span class="kw">_</span>, res)| res)
             .map_err(|err| io::Error::new(io::ErrorKind::InvalidData, err.to_string()))
@@ -1000,7 +1001,7 @@ softirq 81473629 1251347 8827732 10 325789 37 0 177903 43807896 2777 27080138
 <span class="comment">// Parse a `/proc/meminfo` line into (key, ByteSize)
 </span><span class="kw">fn </span>proc_meminfo_line(input: <span class="kw-2">&amp;</span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span>str, (<span class="kw-2">&amp;</span>str, ByteSize)&gt; {
     complete(map(
-        tuple((take_until(<span class="string">&quot;:&quot;</span>), delimited(tag(<span class="string">&quot;:&quot;</span>), usize_s, ws(tag(<span class="string">&quot;kB&quot;</span>))))),
+        tuple((take_until(<span class="string">":"</span>), delimited(tag(<span class="string">":"</span>), usize_s, ws(tag(<span class="string">"kB"</span>))))),
         |(key, value)| (key, ByteSize::kib(value <span class="kw">as </span>u64)),
     ))(input)
 }
@@ -1033,7 +1034,7 @@ softirq 81473629 1251347 8827732 10 325789 37 0 177903 43807896 2777 27080138
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_proc_meminfo() {
-    <span class="kw">let </span>input = <span class="string">&quot;MemTotal:       32345596 kB
+    <span class="kw">let </span>input = <span class="string">"MemTotal:       32345596 kB
 MemFree:        13160208 kB
 MemAvailable:   27792164 kB
 Buffers:            4724 kB
@@ -1084,22 +1085,22 @@ Hugetlb:               0 kB
 DirectMap4k:     1696884 kB
 DirectMap2M:    17616896 kB
 DirectMap1G:    13631488 kB
-&quot;</span>;
+"</span>;
     <span class="kw">let </span>result = proc_meminfo(input).unwrap().<span class="number">1</span>;
     <span class="macro">assert_eq!</span>(result.len(), <span class="number">47</span>);
     <span class="macro">assert_eq!</span>(
-        result.get(<span class="kw-2">&amp;</span><span class="string">&quot;Buffers&quot;</span>.to_string()),
+        result.get(<span class="kw-2">&amp;</span><span class="string">"Buffers"</span>.to_string()),
         <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>ByteSize::kib(<span class="number">4724</span>))
     );
     <span class="macro">assert_eq!</span>(
-        result.get(<span class="kw-2">&amp;</span><span class="string">&quot;KReclaimable&quot;</span>.to_string()),
+        result.get(<span class="kw-2">&amp;</span><span class="string">"KReclaimable"</span>.to_string()),
         <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>ByteSize::kib(<span class="number">427080</span>))
     );
 }
 
 <span class="doccomment">/// Get memory statistics
 </span><span class="kw">fn </span>memory_stats() -&gt; io::Result&lt;BTreeMap&lt;String, ByteSize&gt;&gt; {
-    read_file(<span class="string">&quot;/proc/meminfo&quot;</span>).and_then(|data| {
+    read_file(<span class="string">"/proc/meminfo"</span>).and_then(|data| {
         proc_meminfo(<span class="kw-2">&amp;</span>data)
             .map(|(<span class="kw">_</span>, res)| res)
             .map_err(|err| io::Error::new(io::ErrorKind::InvalidData, err.to_string()))
@@ -1143,35 +1144,35 @@ DirectMap1G:    13631488 kB
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_proc_mounts() {
-    <span class="kw">let </span>test_input_1 = <span class="string">r#&quot;/dev/md0 / btrfs rw,noatime,space_cache,subvolid=15192,subvol=/var/lib/docker/btrfs/subvolumes/df6eb8d3ce1a295bcc252e51ba086cb7705a046a79a342b74729f3f738129f04 0 0
+    <span class="kw">let </span>test_input_1 = <span class="string">r#"/dev/md0 / btrfs rw,noatime,space_cache,subvolid=15192,subvol=/var/lib/docker/btrfs/subvolumes/df6eb8d3ce1a295bcc252e51ba086cb7705a046a79a342b74729f3f738129f04 0 0
 proc /proc proc rw,nosuid,nodev,noexec,relatime 0 0
 tmpfs /dev tmpfs rw,nosuid,size=65536k,mode=755,inode64 0 0
 devpts /dev/pts devpts rw,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=666 0 0
 sysfs /sys sysfs ro,nosuid,nodev,noexec,relatime 0 0
-tmpfs /sys/fs/cgroup tmpfs rw,nosuid,nodev,noexec,relatime,mode=755,inode64 0 0&quot;#</span>;
+tmpfs /sys/fs/cgroup tmpfs rw,nosuid,nodev,noexec,relatime,mode=755,inode64 0 0"#</span>;
     <span class="kw">let </span>mounts = proc_mounts(test_input_1).unwrap().<span class="number">1</span>;
     <span class="macro">assert!</span>(mounts.len() == <span class="number">6</span>);
-    <span class="kw">let </span>root = mounts.iter().find(|m| m.target == <span class="string">&quot;/&quot;</span>).unwrap();
-    <span class="macro">assert!</span>(root.source == <span class="string">&quot;/dev/md0&quot;</span>);
-    <span class="macro">assert!</span>(root.target == <span class="string">&quot;/&quot;</span>);
-    <span class="macro">assert!</span>(root.fstype == <span class="string">&quot;btrfs&quot;</span>);
+    <span class="kw">let </span>root = mounts.iter().find(|m| m.target == <span class="string">"/"</span>).unwrap();
+    <span class="macro">assert!</span>(root.source == <span class="string">"/dev/md0"</span>);
+    <span class="macro">assert!</span>(root.target == <span class="string">"/"</span>);
+    <span class="macro">assert!</span>(root.fstype == <span class="string">"btrfs"</span>);
 
-    <span class="kw">let </span>test_input_2 = <span class="string">r#&quot;proc /proc proc rw,nosuid,nodev,noexec,relatime 0 0
+    <span class="kw">let </span>test_input_2 = <span class="string">r#"proc /proc proc rw,nosuid,nodev,noexec,relatime 0 0
 tmpfs /dev tmpfs rw,nosuid,size=65536k,mode=755,inode64 0 0
 devpts /dev/pts devpts rw,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=666 0 0
 sysfs /sys sysfs ro,nosuid,nodev,noexec,relatime 0 0
 tmpfs /sys/fs/cgroup tmpfs rw,nosuid,nodev,noexec,relatime,mode=755,inode64 0 0
-/dev/md0 / btrfs rw,noatime,space_cache,subvolid=15192,subvol=/var/lib/docker/btrfs/subvolumes/df6eb8d3ce1a295bcc252e51ba086cb7705a046a79a342b74729f3f738129f04 0 0&quot;#</span>;
+/dev/md0 / btrfs rw,noatime,space_cache,subvolid=15192,subvol=/var/lib/docker/btrfs/subvolumes/df6eb8d3ce1a295bcc252e51ba086cb7705a046a79a342b74729f3f738129f04 0 0"#</span>;
     <span class="kw">let </span>mounts = proc_mounts(test_input_2).unwrap().<span class="number">1</span>;
     <span class="macro">assert!</span>(mounts.len() == <span class="number">6</span>);
-    <span class="kw">let </span>root = mounts.iter().find(|m| m.target == <span class="string">&quot;/&quot;</span>).unwrap();
-    <span class="macro">assert!</span>(root.source == <span class="string">&quot;/dev/md0&quot;</span>);
-    <span class="macro">assert!</span>(root.target == <span class="string">&quot;/&quot;</span>);
-    <span class="macro">assert!</span>(root.fstype == <span class="string">&quot;btrfs&quot;</span>);
+    <span class="kw">let </span>root = mounts.iter().find(|m| m.target == <span class="string">"/"</span>).unwrap();
+    <span class="macro">assert!</span>(root.source == <span class="string">"/dev/md0"</span>);
+    <span class="macro">assert!</span>(root.target == <span class="string">"/"</span>);
+    <span class="macro">assert!</span>(root.fstype == <span class="string">"btrfs"</span>);
 
     <span class="comment">// On some distros, there is a blank line at the end of `/proc/mounts`,
     // so we test here to make sure we do not crash on that
-    </span><span class="kw">let </span>test_input_3 = <span class="string">r#&quot;proc /proc proc rw,nosuid,nodev,noexec,relatime 0 0
+    </span><span class="kw">let </span>test_input_3 = <span class="string">r#"proc /proc proc rw,nosuid,nodev,noexec,relatime 0 0
 sys /sys sysfs rw,nosuid,nodev,noexec,relatime 0 0
 dev /dev devtmpfs rw,nosuid,relatime,size=16131864k,nr_inodes=4032966,mode=755,inode64 0 0
 run /run tmpfs rw,nosuid,nodev,relatime,mode=755,inode64 0 0
@@ -1179,13 +1180,13 @@ efivarfs /sys/firmware/efi/efivars efivarfs rw,nosuid,nodev,noexec,relatime 0 0
 /dev/nvme0n1p3 / btrfs rw,noatime,ssd,space_cache,subvolid=5,subvol=/ 0 0
 securityfs /sys/kernel/security securityfs rw,nosuid,nodev,noexec,relatime 0 0
 tmpfs /dev/shm tmpfs rw,nosuid,nodev,inode64 0 0
-&quot;#</span>;
+"#</span>;
     <span class="kw">let </span>mounts = proc_mounts(test_input_3).unwrap().<span class="number">1</span>;
     <span class="macro">assert!</span>(mounts.len() == <span class="number">8</span>);
-    <span class="kw">let </span>root = mounts.iter().find(|m| m.target == <span class="string">&quot;/&quot;</span>).unwrap();
-    <span class="macro">assert!</span>(root.source == <span class="string">&quot;/dev/nvme0n1p3&quot;</span>);
-    <span class="macro">assert!</span>(root.target == <span class="string">&quot;/&quot;</span>);
-    <span class="macro">assert!</span>(root.fstype == <span class="string">&quot;btrfs&quot;</span>);
+    <span class="kw">let </span>root = mounts.iter().find(|m| m.target == <span class="string">"/"</span>).unwrap();
+    <span class="macro">assert!</span>(root.source == <span class="string">"/dev/nvme0n1p3"</span>);
+    <span class="macro">assert!</span>(root.target == <span class="string">"/"</span>);
+    <span class="macro">assert!</span>(root.fstype == <span class="string">"btrfs"</span>);
 }
 
 <span class="doccomment">/// `/proc/net/sockstat` data
@@ -1201,9 +1202,9 @@ tmpfs /dev/shm tmpfs rw,nosuid,nodev,inode64 0 0
         preceded(
             not_line_ending,
             tuple((
-                preceded(ws(tag(<span class="string">&quot;TCP: inuse&quot;</span>)), usize_s),
-                delimited(ws(tag(<span class="string">&quot;orphan&quot;</span>)), usize_s, not_line_ending),
-                preceded(ws(tag(<span class="string">&quot;UDP: inuse&quot;</span>)), usize_s),
+                preceded(ws(tag(<span class="string">"TCP: inuse"</span>)), usize_s),
+                delimited(ws(tag(<span class="string">"orphan"</span>)), usize_s, not_line_ending),
+                preceded(ws(tag(<span class="string">"UDP: inuse"</span>)), usize_s),
             )),
         ),
         |(tcp_in_use, tcp_orphaned, udp_in_use)| ProcNetSockStat {
@@ -1216,13 +1217,13 @@ tmpfs /dev/shm tmpfs rw,nosuid,nodev,inode64 0 0
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_proc_net_sockstat() {
-    <span class="kw">let </span>input = <span class="string">&quot;sockets: used 925
+    <span class="kw">let </span>input = <span class="string">"sockets: used 925
 TCP: inuse 20 orphan 0 tw 12 alloc 23 mem 2
 UDP: inuse 1 mem 2
 UDPLITE: inuse 0
 RAW: inuse 0
 FRAG: inuse 0 memory 0
-&quot;</span>;
+"</span>;
     <span class="kw">let </span>result = proc_net_sockstat(input).unwrap().<span class="number">1</span>;
     <span class="macro">assert_eq!</span>(result.tcp_in_use, <span class="number">20</span>);
     <span class="macro">assert_eq!</span>(result.tcp_orphaned, <span class="number">0</span>);
@@ -1239,8 +1240,8 @@ FRAG: inuse 0 memory 0
 </span><span class="kw">fn </span>proc_net_sockstat6(input: <span class="kw-2">&amp;</span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span>str, ProcNetSockStat6&gt; {
     map(
         ws(tuple((
-            preceded(tag(<span class="string">&quot;TCP6: inuse&quot;</span>), usize_s),
-            preceded(tag(<span class="string">&quot;UDP6: inuse&quot;</span>), usize_s),
+            preceded(tag(<span class="string">"TCP6: inuse"</span>), usize_s),
+            preceded(tag(<span class="string">"UDP6: inuse"</span>), usize_s),
         ))),
         |(tcp_in_use, udp_in_use)| ProcNetSockStat6 {
             tcp_in_use,
@@ -1251,12 +1252,12 @@ FRAG: inuse 0 memory 0
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_proc_net_sockstat6() {
-    <span class="kw">let </span>input = <span class="string">&quot;TCP6: inuse 3
+    <span class="kw">let </span>input = <span class="string">"TCP6: inuse 3
 UDP6: inuse 1
 UDPLITE6: inuse 0
 RAW6: inuse 1
 FRAG6: inuse 0 memory 0
-&quot;</span>;
+"</span>;
     <span class="kw">let </span>result = proc_net_sockstat6(input).unwrap().<span class="number">1</span>;
     <span class="macro">assert_eq!</span>(result.tcp_in_use, <span class="number">3</span>);
     <span class="macro">assert_eq!</span>(result.udp_in_use, <span class="number">1</span>);
@@ -1265,7 +1266,7 @@ FRAG6: inuse 0 memory 0
 <span class="doccomment">/// Stat a mountpoint to gather filesystem statistics
 </span><span class="kw">fn </span>stat_mount(mount: ProcMountsData) -&gt; io::Result&lt;Filesystem&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>info: statvfs = <span class="kw">unsafe </span>{ mem::zeroed() };
-    <span class="kw">let </span>target = <span class="macro">format!</span>(<span class="string">&quot;{}\0&quot;</span>, mount.target);
+    <span class="kw">let </span>target = <span class="macro">format!</span>(<span class="string">"{}\0"</span>, mount.target);
     <span class="kw">let </span>result = <span class="kw">unsafe </span>{ statvfs(target.as_ptr() <span class="kw">as </span><span class="kw-2">*const </span>c_char, <span class="kw-2">&amp;mut </span>info) };
     <span class="kw">match </span>result {
         <span class="number">0 </span>=&gt; <span class="prelude-val">Ok</span>(Filesystem {
@@ -1334,14 +1335,14 @@ FRAG6: inuse 0 memory 0
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_proc_diskstats() {
-    <span class="kw">let </span>input = <span class="string">&quot; 259       0 nvme0n1 142537 3139 15957288 470540 1235382 57191 140728002 5369037 0 1801270 5898257 0 0 0 0 102387 58679
+    <span class="kw">let </span>input = <span class="string">" 259       0 nvme0n1 142537 3139 15957288 470540 1235382 57191 140728002 5369037 0 1801270 5898257 0 0 0 0 102387 58679
  259       1 nvme0n1p1 767 2505 20416 1330 2 0 2 38 0 200 1369 0 0 0 0 0 0
  259       2 nvme0n1p2 65 0 4680 37 0 0 0 0 0 44 37 0 0 0 0 0 0
  259       3 nvme0n1p3 141532 634 15927512 469040 1132993 57191 140728000 5308878 0 1801104 5777919 0 0 0 0 0 0
-&quot;</span>;
+"</span>;
     <span class="kw">let </span>result = proc_diskstats(input).unwrap().<span class="number">1</span>;
     <span class="macro">assert_eq!</span>(result.len(), <span class="number">4</span>);
-    <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>result[<span class="number">3</span>].name, <span class="string">&quot;nvme0n1p3&quot;</span>);
+    <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>result[<span class="number">3</span>].name, <span class="string">"nvme0n1p3"</span>);
     <span class="macro">assert_eq!</span>(result[<span class="number">3</span>].read_ios, <span class="number">141532</span>);
     <span class="macro">assert_eq!</span>(result[<span class="number">3</span>].write_ios, <span class="number">1132993</span>);
 }
@@ -1394,17 +1395,17 @@ FRAG6: inuse 0 memory 0
     }
 
     <span class="kw">fn </span>boot_time(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; io::Result&lt;OffsetDateTime&gt; {
-        read_file(<span class="string">&quot;/proc/stat&quot;</span>).and_then(|data| {
+        read_file(<span class="string">"/proc/stat"</span>).and_then(|data| {
             data.lines()
-                .find(|line| line.starts_with(<span class="string">&quot;btime &quot;</span>))
+                .find(|line| line.starts_with(<span class="string">"btime "</span>))
                 .ok_or(io::Error::new(
                     io::ErrorKind::InvalidData,
-                    <span class="string">&quot;Could not find btime in /proc/stat&quot;</span>,
+                    <span class="string">"Could not find btime in /proc/stat"</span>,
                 ))
                 .and_then(|line| {
                     <span class="kw">let </span>timestamp_str = line
-                        .strip_prefix(<span class="string">&quot;btime &quot;</span>)
-                        .expect(<span class="string">&quot;line starts with &#39;btime &#39;&quot;</span>);
+                        .strip_prefix(<span class="string">"btime "</span>)
+                        .expect(<span class="string">"line starts with 'btime '"</span>);
                     timestamp_str
                         .parse::&lt;i64&gt;()
                         .map_err(|err| io::Error::new(io::ErrorKind::InvalidData, err.to_string()))
@@ -1418,7 +1419,7 @@ FRAG6: inuse 0 memory 0
     }
 
     <span class="kw">fn </span>battery_life(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; io::Result&lt;BatteryLife&gt; {
-        <span class="kw">let </span>dir = <span class="string">&quot;/sys/class/power_supply&quot;</span>;
+        <span class="kw">let </span>dir = <span class="string">"/sys/class/power_supply"</span>;
         <span class="kw">let </span>entries = fs::read_dir(<span class="kw-2">&amp;</span>dir)<span class="question-mark">?</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>full = <span class="number">0</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>now = <span class="number">0</span>;
@@ -1426,16 +1427,16 @@ FRAG6: inuse 0 memory 0
         <span class="kw">for </span>e <span class="kw">in </span>entries {
             <span class="kw">let </span>p = e.unwrap().path();
             <span class="kw">let </span>s = p.to_str().unwrap();
-            <span class="kw">if </span>value_from_file::&lt;String&gt;(<span class="kw-2">&amp;</span>(s.to_string() + <span class="string">&quot;/type&quot;</span>))
-                .map(|t| t == <span class="string">&quot;Battery&quot;</span>)
+            <span class="kw">if </span>value_from_file::&lt;String&gt;(<span class="kw-2">&amp;</span>(s.to_string() + <span class="string">"/type"</span>))
+                .map(|t| t == <span class="string">"Battery"</span>)
                 .unwrap_or(<span class="bool-val">false</span>)
             {
-                <span class="kw">let </span>f = value_from_file::&lt;i32&gt;(<span class="kw-2">&amp;</span>(s.to_string() + <span class="string">&quot;/energy_full&quot;</span>))
-                    .or_else(|<span class="kw">_</span>| value_from_file::&lt;i32&gt;(<span class="kw-2">&amp;</span>(s.to_string() + <span class="string">&quot;/charge_full&quot;</span>)));
-                <span class="kw">let </span>n = value_from_file::&lt;i32&gt;(<span class="kw-2">&amp;</span>(s.to_string() + <span class="string">&quot;/energy_now&quot;</span>))
-                    .or_else(|<span class="kw">_</span>| value_from_file::&lt;i32&gt;(<span class="kw-2">&amp;</span>(s.to_string() + <span class="string">&quot;/charge_now&quot;</span>)));
-                <span class="kw">let </span>c = value_from_file::&lt;i32&gt;(<span class="kw-2">&amp;</span>(s.to_string() + <span class="string">&quot;/power_now&quot;</span>))
-                    .or_else(|<span class="kw">_</span>| value_from_file::&lt;i32&gt;(<span class="kw-2">&amp;</span>(s.to_string() + <span class="string">&quot;/current_now&quot;</span>)));
+                <span class="kw">let </span>f = value_from_file::&lt;i32&gt;(<span class="kw-2">&amp;</span>(s.to_string() + <span class="string">"/energy_full"</span>))
+                    .or_else(|<span class="kw">_</span>| value_from_file::&lt;i32&gt;(<span class="kw-2">&amp;</span>(s.to_string() + <span class="string">"/charge_full"</span>)));
+                <span class="kw">let </span>n = value_from_file::&lt;i32&gt;(<span class="kw-2">&amp;</span>(s.to_string() + <span class="string">"/energy_now"</span>))
+                    .or_else(|<span class="kw">_</span>| value_from_file::&lt;i32&gt;(<span class="kw-2">&amp;</span>(s.to_string() + <span class="string">"/charge_now"</span>)));
+                <span class="kw">let </span>c = value_from_file::&lt;i32&gt;(<span class="kw-2">&amp;</span>(s.to_string() + <span class="string">"/power_now"</span>))
+                    .or_else(|<span class="kw">_</span>| value_from_file::&lt;i32&gt;(<span class="kw-2">&amp;</span>(s.to_string() + <span class="string">"/current_now"</span>)));
                 <span class="kw">if let </span>(<span class="prelude-val">Ok</span>(f), <span class="prelude-val">Ok</span>(n), <span class="prelude-val">Ok</span>(c)) = (f, n, c) {
                     full += f;
                     now += n;
@@ -1452,30 +1453,30 @@ FRAG6: inuse 0 memory 0
         } <span class="kw">else </span>{
             <span class="prelude-val">Err</span>(io::Error::new(
                 io::ErrorKind::Other,
-                <span class="string">&quot;Missing battery information&quot;</span>,
+                <span class="string">"Missing battery information"</span>,
             ))
         }
     }
 
     <span class="kw">fn </span>on_ac_power(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; io::Result&lt;bool&gt; {
-        <span class="kw">let </span>dir = <span class="string">&quot;/sys/class/power_supply&quot;</span>;
+        <span class="kw">let </span>dir = <span class="string">"/sys/class/power_supply"</span>;
         <span class="kw">let </span>entries = fs::read_dir(<span class="kw-2">&amp;</span>dir)<span class="question-mark">?</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>on_ac = <span class="bool-val">false</span>;
         <span class="kw">for </span>e <span class="kw">in </span>entries {
             <span class="kw">let </span>p = e.unwrap().path();
             <span class="kw">let </span>s = p.to_str().unwrap();
-            <span class="kw">if </span>value_from_file::&lt;String&gt;(<span class="kw-2">&amp;</span>(s.to_string() + <span class="string">&quot;/type&quot;</span>))
-                .map(|t| t == <span class="string">&quot;Mains&quot;</span>)
+            <span class="kw">if </span>value_from_file::&lt;String&gt;(<span class="kw-2">&amp;</span>(s.to_string() + <span class="string">"/type"</span>))
+                .map(|t| t == <span class="string">"Mains"</span>)
                 .unwrap_or(<span class="bool-val">false</span>)
             {
-                on_ac |= value_from_file::&lt;i32&gt;(<span class="kw-2">&amp;</span>(s.to_string() + <span class="string">&quot;/online&quot;</span>)).map(|v| v == <span class="number">1</span>)<span class="question-mark">?
+                on_ac |= value_from_file::&lt;i32&gt;(<span class="kw-2">&amp;</span>(s.to_string() + <span class="string">"/online"</span>)).map(|v| v == <span class="number">1</span>)<span class="question-mark">?
             </span>}
         }
         <span class="prelude-val">Ok</span>(on_ac)
     }
 
     <span class="kw">fn </span>mounts(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; io::Result&lt;Vec&lt;Filesystem&gt;&gt; {
-        read_file(<span class="string">&quot;/proc/mounts&quot;</span>)
+        read_file(<span class="string">"/proc/mounts"</span>)
             .and_then(|data| {
                 proc_mounts(<span class="kw-2">&amp;</span>data)
                     .map(|(<span class="kw">_</span>, res)| res)
@@ -1490,7 +1491,7 @@ FRAG6: inuse 0 memory 0
     }
 
     <span class="kw">fn </span>mount_at&lt;P: AsRef&lt;path::Path&gt;&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, path: P) -&gt; io::Result&lt;Filesystem&gt; {
-        read_file(<span class="string">&quot;/proc/mounts&quot;</span>)
+        read_file(<span class="string">"/proc/mounts"</span>)
             .and_then(|data| {
                 proc_mounts(<span class="kw-2">&amp;</span>data)
                     .map(|(<span class="kw">_</span>, res)| res)
@@ -1500,14 +1501,14 @@ FRAG6: inuse 0 memory 0
                 mounts
                     .into_iter()
                     .find(|mount| Path::new(<span class="kw-2">&amp;</span>mount.target) == path.as_ref())
-                    .ok_or_else(|| io::Error::new(io::ErrorKind::NotFound, <span class="string">&quot;No such mount&quot;</span>))
+                    .ok_or_else(|| io::Error::new(io::ErrorKind::NotFound, <span class="string">"No such mount"</span>))
             })
             .and_then(stat_mount)
     }
 
     <span class="kw">fn </span>block_device_statistics(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; io::Result&lt;BTreeMap&lt;String, BlockDeviceStats&gt;&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>result: BTreeMap&lt;String, BlockDeviceStats&gt; = BTreeMap::new();
-        <span class="kw">let </span>stats: Vec&lt;BlockDeviceStats&gt; = read_file(<span class="string">&quot;/proc/diskstats&quot;</span>).and_then(|data| {
+        <span class="kw">let </span>stats: Vec&lt;BlockDeviceStats&gt; = read_file(<span class="string">"/proc/diskstats"</span>).and_then(|data| {
             proc_diskstats(<span class="kw-2">&amp;</span>data)
                 .map(|(<span class="kw">_</span>, res)| res)
                 .map_err(|err| io::Error::new(io::ErrorKind::InvalidData, err.to_string()))
@@ -1524,15 +1525,15 @@ FRAG6: inuse 0 memory 0
     }
 
     <span class="kw">fn </span>network_stats(<span class="kw-2">&amp;</span><span class="self">self</span>, interface: <span class="kw-2">&amp;</span>str) -&gt; io::Result&lt;NetworkStats&gt; {
-        <span class="kw">let </span>path_root: String = (<span class="string">&quot;/sys/class/net/&quot;</span>.to_string() + interface) + <span class="string">&quot;/statistics/&quot;</span>;
+        <span class="kw">let </span>path_root: String = (<span class="string">"/sys/class/net/"</span>.to_string() + interface) + <span class="string">"/statistics/"</span>;
         <span class="kw">let </span>stats_file = |file: <span class="kw-2">&amp;</span>str| (<span class="kw-2">&amp;</span>path_root).to_string() + file;
 
-        <span class="kw">let </span>rx_bytes: u64 = value_from_file::&lt;u64&gt;(<span class="kw-2">&amp;</span>stats_file(<span class="string">&quot;rx_bytes&quot;</span>))<span class="question-mark">?</span>;
-        <span class="kw">let </span>tx_bytes: u64 = value_from_file::&lt;u64&gt;(<span class="kw-2">&amp;</span>stats_file(<span class="string">&quot;tx_bytes&quot;</span>))<span class="question-mark">?</span>;
-        <span class="kw">let </span>rx_packets: u64 = value_from_file::&lt;u64&gt;(<span class="kw-2">&amp;</span>stats_file(<span class="string">&quot;rx_packets&quot;</span>))<span class="question-mark">?</span>;
-        <span class="kw">let </span>tx_packets: u64 = value_from_file::&lt;u64&gt;(<span class="kw-2">&amp;</span>stats_file(<span class="string">&quot;tx_packets&quot;</span>))<span class="question-mark">?</span>;
-        <span class="kw">let </span>rx_errors: u64 = value_from_file::&lt;u64&gt;(<span class="kw-2">&amp;</span>stats_file(<span class="string">&quot;rx_errors&quot;</span>))<span class="question-mark">?</span>;
-        <span class="kw">let </span>tx_errors: u64 = value_from_file::&lt;u64&gt;(<span class="kw-2">&amp;</span>stats_file(<span class="string">&quot;tx_errors&quot;</span>))<span class="question-mark">?</span>;
+        <span class="kw">let </span>rx_bytes: u64 = value_from_file::&lt;u64&gt;(<span class="kw-2">&amp;</span>stats_file(<span class="string">"rx_bytes"</span>))<span class="question-mark">?</span>;
+        <span class="kw">let </span>tx_bytes: u64 = value_from_file::&lt;u64&gt;(<span class="kw-2">&amp;</span>stats_file(<span class="string">"tx_bytes"</span>))<span class="question-mark">?</span>;
+        <span class="kw">let </span>rx_packets: u64 = value_from_file::&lt;u64&gt;(<span class="kw-2">&amp;</span>stats_file(<span class="string">"rx_packets"</span>))<span class="question-mark">?</span>;
+        <span class="kw">let </span>tx_packets: u64 = value_from_file::&lt;u64&gt;(<span class="kw-2">&amp;</span>stats_file(<span class="string">"tx_packets"</span>))<span class="question-mark">?</span>;
+        <span class="kw">let </span>rx_errors: u64 = value_from_file::&lt;u64&gt;(<span class="kw-2">&amp;</span>stats_file(<span class="string">"rx_errors"</span>))<span class="question-mark">?</span>;
+        <span class="kw">let </span>tx_errors: u64 = value_from_file::&lt;u64&gt;(<span class="kw-2">&amp;</span>stats_file(<span class="string">"tx_errors"</span>))<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(NetworkStats {
             rx_bytes: ByteSize::b(rx_bytes),
@@ -1545,25 +1546,25 @@ FRAG6: inuse 0 memory 0
     }
 
     <span class="kw">fn </span>cpu_temp(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; io::Result&lt;f32&gt; {
-        read_file(<span class="string">&quot;/sys/class/thermal/thermal_zone0/temp&quot;</span>)
-            .or(read_file(<span class="string">&quot;/sys/class/hwmon/hwmon0/temp1_input&quot;</span>))
+        read_file(<span class="string">"/sys/class/thermal/thermal_zone0/temp"</span>)
+            .or(read_file(<span class="string">"/sys/class/hwmon/hwmon0/temp1_input"</span>))
             .and_then(|data| <span class="kw">match </span>data.trim().parse::&lt;f32&gt;() {
                 <span class="prelude-val">Ok</span>(x) =&gt; <span class="prelude-val">Ok</span>(x),
                 <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(io::Error::new(
                     io::ErrorKind::Other,
-                    <span class="string">&quot;Could not parse float&quot;</span>,
+                    <span class="string">"Could not parse float"</span>,
                 )),
             })
             .map(|num| num / <span class="number">1000.0</span>)
     }
 
     <span class="kw">fn </span>socket_stats(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; io::Result&lt;SocketStats&gt; {
-        <span class="kw">let </span>sockstats: ProcNetSockStat = read_file(<span class="string">&quot;/proc/net/sockstat&quot;</span>).and_then(|data| {
+        <span class="kw">let </span>sockstats: ProcNetSockStat = read_file(<span class="string">"/proc/net/sockstat"</span>).and_then(|data| {
             proc_net_sockstat(<span class="kw-2">&amp;</span>data)
                 .map(|(<span class="kw">_</span>, res)| res)
                 .map_err(|err| io::Error::new(io::ErrorKind::InvalidData, err.to_string()))
         })<span class="question-mark">?</span>;
-        <span class="kw">let </span>sockstats6: ProcNetSockStat6 = read_file(<span class="string">&quot;/proc/net/sockstat6&quot;</span>).and_then(|data| {
+        <span class="kw">let </span>sockstats6: ProcNetSockStat6 = read_file(<span class="string">"/proc/net/sockstat6"</span>).and_then(|data| {
             proc_net_sockstat6(<span class="kw-2">&amp;</span>data)
                 .map(|(<span class="kw">_</span>, res)| res)
                 .map_err(|err| io::Error::new(io::ErrorKind::InvalidData, err.to_string()))
@@ -1584,33 +1585,33 @@ FRAG6: inuse 0 memory 0
     </span><span class="kw">fn </span>new() -&gt; io::Result&lt;<span class="self">Self</span>&gt; {
         memory_stats()
             .or_else(|<span class="kw">_</span>| {
-                <span class="comment">// If there&#39;s no procfs, e.g. in a chroot without mounting it or something
+                <span class="comment">// If there's no procfs, e.g. in a chroot without mounting it or something
                 </span><span class="kw">let </span><span class="kw-2">mut </span>meminfo = BTreeMap::new();
                 <span class="kw">let </span><span class="kw-2">mut </span>info: sysinfo = <span class="kw">unsafe </span>{ mem::zeroed() };
                 <span class="kw">unsafe </span>{ sysinfo(<span class="kw-2">&amp;mut </span>info) };
                 <span class="kw">let </span>unit = info.mem_unit <span class="kw">as </span>u64;
                 meminfo.insert(
-                    <span class="string">&quot;MemTotal&quot;</span>.to_owned(),
+                    <span class="string">"MemTotal"</span>.to_owned(),
                     ByteSize::b(info.totalram <span class="kw">as </span>u64 * unit),
                 );
                 meminfo.insert(
-                    <span class="string">&quot;MemFree&quot;</span>.to_owned(),
+                    <span class="string">"MemFree"</span>.to_owned(),
                     ByteSize::b(info.freeram <span class="kw">as </span>u64 * unit),
                 );
                 meminfo.insert(
-                    <span class="string">&quot;Shmem&quot;</span>.to_owned(),
+                    <span class="string">"Shmem"</span>.to_owned(),
                     ByteSize::b(info.sharedram <span class="kw">as </span>u64 * unit),
                 );
                 meminfo.insert(
-                    <span class="string">&quot;Buffers&quot;</span>.to_owned(),
+                    <span class="string">"Buffers"</span>.to_owned(),
                     ByteSize::b(info.bufferram <span class="kw">as </span>u64 * unit),
                 );
                 meminfo.insert(
-                    <span class="string">&quot;SwapTotal&quot;</span>.to_owned(),
+                    <span class="string">"SwapTotal"</span>.to_owned(),
                     ByteSize::b(info.totalswap <span class="kw">as </span>u64 * unit),
                 );
                 meminfo.insert(
-                    <span class="string">&quot;SwapFree&quot;</span>.to_owned(),
+                    <span class="string">"SwapFree"</span>.to_owned(),
                     ByteSize::b(info.freeswap <span class="kw">as </span>u64 * unit),
                 );
                 <span class="prelude-val">Ok</span>(meminfo)
@@ -1622,16 +1623,16 @@ FRAG6: inuse 0 memory 0
     </span><span class="kw">fn </span>to_memory(<span class="self">self</span>) -&gt; Memory {
         <span class="kw">let </span>meminfo = <span class="kw-2">&amp;</span><span class="self">self</span>.meminfo;
         Memory {
-            total: meminfo.get(<span class="string">&quot;MemTotal&quot;</span>).copied().unwrap_or(ByteSize::b(<span class="number">0</span>)),
+            total: meminfo.get(<span class="string">"MemTotal"</span>).copied().unwrap_or(ByteSize::b(<span class="number">0</span>)),
             free: saturating_sub_bytes(
-                meminfo.get(<span class="string">&quot;MemFree&quot;</span>).copied().unwrap_or(ByteSize::b(<span class="number">0</span>))
-                    + meminfo.get(<span class="string">&quot;Buffers&quot;</span>).copied().unwrap_or(ByteSize::b(<span class="number">0</span>))
-                    + meminfo.get(<span class="string">&quot;Cached&quot;</span>).copied().unwrap_or(ByteSize::b(<span class="number">0</span>))
+                meminfo.get(<span class="string">"MemFree"</span>).copied().unwrap_or(ByteSize::b(<span class="number">0</span>))
+                    + meminfo.get(<span class="string">"Buffers"</span>).copied().unwrap_or(ByteSize::b(<span class="number">0</span>))
+                    + meminfo.get(<span class="string">"Cached"</span>).copied().unwrap_or(ByteSize::b(<span class="number">0</span>))
                     + meminfo
-                        .get(<span class="string">&quot;SReclaimable&quot;</span>)
+                        .get(<span class="string">"SReclaimable"</span>)
                         .copied()
                         .unwrap_or(ByteSize::b(<span class="number">0</span>)),
-                meminfo.get(<span class="string">&quot;Shmem&quot;</span>).copied().unwrap_or(ByteSize::b(<span class="number">0</span>)),
+                meminfo.get(<span class="string">"Shmem"</span>).copied().unwrap_or(ByteSize::b(<span class="number">0</span>)),
             ),
             platform_memory: <span class="self">self</span>,
         }
@@ -1641,8 +1642,8 @@ FRAG6: inuse 0 memory 0
     </span><span class="kw">fn </span>to_swap(<span class="self">self</span>) -&gt; Swap {
         <span class="kw">let </span>meminfo = <span class="kw-2">&amp;</span><span class="self">self</span>.meminfo;
         Swap {
-            total: meminfo.get(<span class="string">&quot;SwapTotal&quot;</span>).copied().unwrap_or(ByteSize::b(<span class="number">0</span>)),
-            free: meminfo.get(<span class="string">&quot;SwapFree&quot;</span>).copied().unwrap_or(ByteSize::b(<span class="number">0</span>)),
+            total: meminfo.get(<span class="string">"SwapTotal"</span>).copied().unwrap_or(ByteSize::b(<span class="number">0</span>)),
+            free: meminfo.get(<span class="string">"SwapFree"</span>).copied().unwrap_or(ByteSize::b(<span class="number">0</span>)),
             platform_swap: <span class="self">self</span>,
         }
     }
@@ -1666,8 +1667,8 @@ FRAG6: inuse 0 memory 0
     padding: [c_schar; <span class="number">8</span>],
 }
 
-<span class="attr">#[link(name = <span class="string">&quot;c&quot;</span>)]
-</span><span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+<span class="attr">#[link(name = <span class="string">"c"</span>)]
+</span><span class="kw">extern </span><span class="string">"C" </span>{
     <span class="kw">fn </span>sysinfo(info: <span class="kw-2">*mut </span>sysinfo);
 }
 </code></pre></div></section></main></body></html>

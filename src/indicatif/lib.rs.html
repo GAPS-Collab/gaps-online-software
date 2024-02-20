@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/indicatif-0.17.8/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="indicatif" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/indicatif-0.17.8/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="indicatif" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -302,7 +303,7 @@
 //! # Progress Bars and Spinners
 //!
 //! indicatif comes with a [`ProgressBar`] type that supports both bounded
-//! progress bar uses as well as unbounded &quot;spinner&quot; type progress reports.
+//! progress bar uses as well as unbounded "spinner" type progress reports.
 //! Progress bars are [`Sync`] and [`Send`] objects which means that they are
 //! internally locked and can be passed from thread to thread.
 //!
@@ -311,7 +312,7 @@
 //!
 //! To whet your appetite, this is what this can look like:
 //!
-//! &lt;img src=&quot;https://github.com/console-rs/indicatif/raw/main/screenshots/yarn.gif?raw=true&quot; width=&quot;60%&quot;&gt;
+//! &lt;img src="https://github.com/console-rs/indicatif/raw/main/screenshots/yarn.gif?raw=true" width="60%"&gt;
 //!
 //! Progress bars are manually advanced and by default draw to stderr.
 //! When you are done, the progress bar can be finished either visibly
@@ -373,11 +374,11 @@
 //! methods to configure the number of elements in the iterator or change
 //! the progress bar style. Indicatif also has optional support for parallel
 //! iterators with [Rayon](https://github.com/rayon-rs/rayon). In your
-//! `Cargo.toml`, use the &quot;rayon&quot; feature:
+//! `Cargo.toml`, use the "rayon" feature:
 //!
 //! ```toml
 //! [dependencies]
-//! indicatif = {version = &quot;*&quot;, features = [&quot;rayon&quot;]}
+//! indicatif = {version = "*", features = ["rayon"]}
 //! ```
 //!
 //! And then use it like this:
@@ -392,7 +393,7 @@
 //! assert_eq!(v2[0], 1);
 //! ```
 //!
-//! Or if you&#39;d like to customize the progress bar:
+//! Or if you'd like to customize the progress bar:
 //!
 //! ```rust,ignore
 //! # extern crate rayon;
@@ -439,9 +440,9 @@
 //! ```rust
 //! # use indicatif::{ProgressBar, ProgressStyle};
 //! # let bar = ProgressBar::new(0);
-//! bar.set_style(ProgressStyle::with_template(&quot;[{elapsed_precise}] {bar:40.cyan/blue} {pos:&gt;7}/{len:7} {msg}&quot;)
+//! bar.set_style(ProgressStyle::with_template("[{elapsed_precise}] {bar:40.cyan/blue} {pos:&gt;7}/{len:7} {msg}")
 //!     .unwrap()
-//!     .progress_chars(&quot;##-&quot;));
+//!     .progress_chars("##-"));
 //! ```
 //!
 //! The following keys exist:
@@ -502,10 +503,10 @@
 //! # use std::time::Duration;
 //! use indicatif::{HumanBytes, HumanCount, HumanDuration, HumanFloatCount};
 //!
-//! assert_eq!(&quot;3.00 MiB&quot;, HumanBytes(3*1024*1024).to_string());
-//! assert_eq!(&quot;8 seconds&quot;, HumanDuration(Duration::from_secs(8)).to_string());
-//! assert_eq!(&quot;33,857,009&quot;, HumanCount(33857009).to_string());
-//! assert_eq!(&quot;33,857,009.1235&quot;, HumanFloatCount(33857009.123456).to_string());
+//! assert_eq!("3.00 MiB", HumanBytes(3*1024*1024).to_string());
+//! assert_eq!("8 seconds", HumanDuration(Duration::from_secs(8)).to_string());
+//! assert_eq!("33,857,009", HumanCount(33857009).to_string());
+//! assert_eq!("33,857,009.1235", HumanFloatCount(33857009.123456).to_string());
 //! ```
 //!
 //! # Feature Flags
@@ -518,12 +519,12 @@
 
 </span><span class="kw">mod </span>draw_target;
 <span class="kw">mod </span>format;
-<span class="attr">#[cfg(feature = <span class="string">&quot;in_memory&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"in_memory"</span>)]
 </span><span class="kw">mod </span>in_memory;
 <span class="kw">mod </span>iter;
 <span class="kw">mod </span>multi;
 <span class="kw">mod </span>progress_bar;
-<span class="attr">#[cfg(feature = <span class="string">&quot;rayon&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"rayon"</span>)]
 </span><span class="kw">mod </span>rayon;
 <span class="kw">mod </span>state;
 <span class="kw">pub mod </span>style;
@@ -534,12 +535,12 @@
     BinaryBytes, DecimalBytes, FormattedDuration, HumanBytes, HumanCount, HumanDuration,
     HumanFloatCount,
 };
-<span class="attr">#[cfg(feature = <span class="string">&quot;in_memory&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"in_memory"</span>)]
 </span><span class="kw">pub use </span><span class="kw">crate</span>::in_memory::InMemoryTerm;
 <span class="kw">pub use </span><span class="kw">crate</span>::iter::{ProgressBarIter, ProgressIterator};
 <span class="kw">pub use </span><span class="kw">crate</span>::multi::{MultiProgress, MultiProgressAlignment};
 <span class="kw">pub use </span><span class="kw">crate</span>::progress_bar::{ProgressBar, WeakProgressBar};
-<span class="attr">#[cfg(feature = <span class="string">&quot;rayon&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"rayon"</span>)]
 </span><span class="kw">pub use </span><span class="kw">crate</span>::rayon::ParallelProgressIterator;
 <span class="kw">pub use </span><span class="kw">crate</span>::state::{ProgressFinish, ProgressState};
 <span class="kw">pub use </span><span class="kw">crate</span>::style::ProgressStyle;

@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/zmq-0.10.0/src/message.rs`."><title>message.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="zmq" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/zmq-0.10.0/src/message.rs`."><title>message.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="zmq" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -266,7 +267,7 @@
 /// sent over the wire. Multipart messages are transmitted as multiple
 /// `Message`s.
 ///
-/// In rust-zmq, you aren&#39;t required to create message objects if you use the
+/// In rust-zmq, you aren't required to create message objects if you use the
 /// convenience APIs provided (e.g. `Socket::recv_bytes()` or
 /// `Socket::send()`). However, using message objects can make multiple
 /// operations in a loop more efficient, since allocated memory can be reused.
@@ -285,11 +286,11 @@
 
 <span class="kw">impl </span>fmt::Debug <span class="kw">for </span>Message {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
-        <span class="macro">write!</span>(f, <span class="string">&quot;{:?}&quot;</span>, <span class="self">self</span>.deref())
+        <span class="macro">write!</span>(f, <span class="string">"{:?}"</span>, <span class="self">self</span>.deref())
     }
 }
 
-<span class="kw">unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>drop_msg_data_box(data: <span class="kw-2">*mut </span>c_void, hint: <span class="kw-2">*mut </span>c_void) {
+<span class="kw">unsafe extern </span><span class="string">"C" </span><span class="kw">fn </span>drop_msg_data_box(data: <span class="kw-2">*mut </span>c_void, hint: <span class="kw-2">*mut </span>c_void) {
     <span class="kw">let _ </span>= Box::from_raw(slice::from_raw_parts_mut(data <span class="kw">as </span><span class="kw-2">*mut </span>u8, hint <span class="kw">as </span>usize));
 }
 
@@ -301,7 +302,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>msg = zmq_sys::zmq_msg_t::default();
         <span class="kw">let </span>rc = f(<span class="kw-2">&amp;mut </span>msg);
         <span class="kw">if </span>rc == -<span class="number">1 </span>{
-            <span class="macro">panic!</span>(<span class="string">&quot;{}&quot;</span>, errno_to_error())
+            <span class="macro">panic!</span>(<span class="string">"{}"</span>, errno_to_error())
         }
         Message { msg }
     }
@@ -326,8 +327,8 @@
     /// basically not usable safely, unless you happen to invoke C code that
     /// takes a raw message pointer and initializes its contents.
     </span><span class="attr">#[deprecated(
-        since = <span class="string">&quot;0.9.1&quot;</span>,
-        note = <span class="string">&quot;This method has an unintuitive name, and should not be needed.&quot;
+        since = <span class="string">"0.9.1"</span>,
+        note = <span class="string">"This method has an unintuitive name, and should not be needed."
     </span>)]
     </span><span class="kw">pub unsafe fn </span>with_capacity_unallocated(len: usize) -&gt; Message {
         <span class="self">Self</span>::alloc(|msg| zmq_sys::zmq_msg_init_size(msg, len <span class="kw">as </span>size_t))
@@ -348,8 +349,8 @@
 
     <span class="doccomment">/// Create a `Message` with space for `len` bytes that are initialized to 0.
     </span><span class="attr">#[deprecated(
-        since = <span class="string">&quot;0.9.1&quot;</span>,
-        note = <span class="string">&quot;This method has a name which does not match its semantics. Use `with_size` instead&quot;
+        since = <span class="string">"0.9.1"</span>,
+        note = <span class="string">"This method has a name which does not match its semantics. Use `with_size` instead"
     </span>)]
     </span><span class="kw">pub fn </span>with_capacity(len: usize) -&gt; Message {
         <span class="self">Self</span>::with_size(len)
@@ -358,7 +359,7 @@
     <span class="doccomment">/// Create a `Message` from a `&amp;[u8]`. This will copy `data` into the message.
     ///
     /// This is equivalent to using the `From&lt;&amp;[u8]&gt;` trait.
-    </span><span class="attr">#[deprecated(since = <span class="string">&quot;0.9.1&quot;</span>, note = <span class="string">&quot;Use the `From` trait instead.&quot;</span>)]
+    </span><span class="attr">#[deprecated(since = <span class="string">"0.9.1"</span>, note = <span class="string">"Use the `From` trait instead."</span>)]
     </span><span class="kw">pub fn </span>from_slice(data: <span class="kw-2">&amp;</span>[u8]) -&gt; Message {
         <span class="self">Self</span>::from(data)
     }
@@ -379,15 +380,15 @@
     ///
     /// # Non-UTF8 values
     ///
-    /// The `zmq_msg_gets` man page notes &quot;The encoding of the property and
-    /// value shall be UTF8&quot;. However, this is not actually enforced. For API
+    /// The `zmq_msg_gets` man page notes "The encoding of the property and
+    /// value shall be UTF8". However, this is not actually enforced. For API
     /// compatibility reasons, this function will return `None` when
     /// encountering a non-UTF8 value; so a missing and a non-UTF8 value cannot
     /// currently be distinguished.
     ///
     /// This is considered a bug in the bindings, and will be fixed with the
     /// next API-breaking release.
-    </span><span class="kw">pub fn </span>gets&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, property: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; {
+    </span><span class="kw">pub fn </span>gets&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span><span class="self">self</span>, property: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt; {
         <span class="kw">let </span>c_str = ffi::CString::new(property.as_bytes()).unwrap();
 
         <span class="kw">let </span>value = <span class="kw">unsafe </span>{ zmq_sys::zmq_msg_gets(<span class="kw-2">&amp;</span><span class="self">self</span>.msg, c_str.as_ptr()) };
@@ -404,7 +405,7 @@
     <span class="kw">type </span>Target = [u8];
 
     <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
-        <span class="comment">// This is safe because we&#39;re constraining the slice to the lifetime of
+        <span class="comment">// This is safe because we're constraining the slice to the lifetime of
         // this message.
         </span><span class="kw">unsafe </span>{
             <span class="kw">let </span>ptr = <span class="kw-2">&amp;</span><span class="self">self</span>.msg <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span><span class="kw-2">*mut </span><span class="kw">_</span>;
@@ -425,7 +426,7 @@
 
 <span class="kw">impl </span>DerefMut <span class="kw">for </span>Message {
     <span class="kw">fn </span>deref_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>[u8] {
-        <span class="comment">// This is safe because we&#39;re constraining the slice to the lifetime of
+        <span class="comment">// This is safe because we're constraining the slice to the lifetime of
         // this message.
         </span><span class="kw">unsafe </span>{
             <span class="kw">let </span>data = zmq_sys::zmq_msg_data(<span class="kw-2">&amp;mut </span><span class="self">self</span>.msg);
@@ -435,9 +436,9 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]&gt; <span class="kw">for </span>Message {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>[u8]&gt; <span class="kw">for </span>Message {
     <span class="doccomment">/// Construct a message from a byte slice by copying the data.
-    </span><span class="kw">fn </span>from(data: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">fn </span>from(data: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>[u8]) -&gt; <span class="self">Self </span>{
         <span class="kw">unsafe </span>{
             <span class="kw">let </span><span class="kw-2">mut </span>msg = Message::with_size_uninit(data.len());
             ptr::copy_nonoverlapping(data.as_ptr(), msg.as_mut_ptr(), data.len());
@@ -475,25 +476,25 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; <span class="kw">for </span>Message {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt; <span class="kw">for </span>Message {
     <span class="doccomment">/// Construct a message from a string slice by copying the UTF-8 data.
     </span><span class="kw">fn </span>from(msg: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
         Message::from(msg.as_bytes())
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>String&gt; <span class="kw">for </span>Message {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>String&gt; <span class="kw">for </span>Message {
     <span class="doccomment">/// Construct a message from a string slice by copying the UTF-8 data.
     </span><span class="kw">fn </span>from(msg: <span class="kw-2">&amp;</span>String) -&gt; <span class="self">Self </span>{
         Message::from(msg.as_bytes())
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T&gt; <span class="kw">for </span>Message
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, T&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>T&gt; <span class="kw">for </span>Message
 <span class="kw">where
     </span>T: Into&lt;Message&gt; + Clone,
 {
-    <span class="kw">fn </span>from(v: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T) -&gt; <span class="self">Self </span>{
+    <span class="kw">fn </span>from(v: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>T) -&gt; <span class="self">Self </span>{
         v.clone().into()
     }
 }

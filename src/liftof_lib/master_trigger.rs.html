@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-lib/src/master_trigger.rs`."><title>master_trigger.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="liftof_lib" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-lib/src/master_trigger.rs`."><title>master_trigger.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="liftof_lib" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1084,6 +1085,33 @@
 <a href="#1084" id="1084">1084</a>
 <a href="#1085" id="1085">1085</a>
 <a href="#1086" id="1086">1086</a>
+<a href="#1087" id="1087">1087</a>
+<a href="#1088" id="1088">1088</a>
+<a href="#1089" id="1089">1089</a>
+<a href="#1090" id="1090">1090</a>
+<a href="#1091" id="1091">1091</a>
+<a href="#1092" id="1092">1092</a>
+<a href="#1093" id="1093">1093</a>
+<a href="#1094" id="1094">1094</a>
+<a href="#1095" id="1095">1095</a>
+<a href="#1096" id="1096">1096</a>
+<a href="#1097" id="1097">1097</a>
+<a href="#1098" id="1098">1098</a>
+<a href="#1099" id="1099">1099</a>
+<a href="#1100" id="1100">1100</a>
+<a href="#1101" id="1101">1101</a>
+<a href="#1102" id="1102">1102</a>
+<a href="#1103" id="1103">1103</a>
+<a href="#1104" id="1104">1104</a>
+<a href="#1105" id="1105">1105</a>
+<a href="#1106" id="1106">1106</a>
+<a href="#1107" id="1107">1107</a>
+<a href="#1108" id="1108">1108</a>
+<a href="#1109" id="1109">1109</a>
+<a href="#1110" id="1110">1110</a>
+<a href="#1111" id="1111">1111</a>
+<a href="#1112" id="1112">1112</a>
+<a href="#1113" id="1113">1113</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! MasterTriggerBoard communications
 //!
 //! The MTB (MasterTriggerBoard) is currently
@@ -1124,7 +1152,7 @@
 
 <span class="kw">const </span>MT_MAX_PACKSIZE   : usize = <span class="number">1024</span>;
 
-<span class="kw">use </span>tof_dataclasses::events::master_trigger::{
+<span class="kw">use </span>tof_dataclasses::constants::{
     N_LTBS,
     N_CHN_PER_LTB,
 };
@@ -1148,8 +1176,8 @@
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>IPBusPacketType {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
     <span class="kw">let </span>r = serde_json::to_string(<span class="self">self</span>).unwrap_or(
-      String::from(<span class="string">&quot;Error: cannot unwrap this IPBusPacketType&quot;</span>));
-    <span class="macro">write!</span>(f, <span class="string">&quot;&lt;IPBusPacketType: {}&gt;&quot;</span>, r)
+      String::from(<span class="string">"Error: cannot unwrap this IPBusPacketType"</span>));
+    <span class="macro">write!</span>(f, <span class="string">"&lt;IPBusPacketType: {}&gt;"</span>, r)
   }
 }
 
@@ -1165,14 +1193,14 @@
       <span class="number">3 </span>=&gt; <span class="prelude-val">Ok</span>(IPBusPacketType::WriteNonIncrement),
       <span class="number">4 </span>=&gt; <span class="prelude-val">Ok</span>(IPBusPacketType::RMW),
       <span class="kw">_ </span>=&gt; {
-        <span class="macro">error!</span>(<span class="string">&quot;Unable to decode packet type {}&quot;</span>, pt);
+        <span class="macro">error!</span>(<span class="string">"Unable to decode packet type {}"</span>, pt);
         <span class="kw">return </span><span class="prelude-val">Err</span>(IPBusError::DecodingFailed);
       }
     }
   }
 }
 
-<span class="comment">//#[cfg(feature = &quot;random&quot;)]
+<span class="comment">//#[cfg(feature = "random")]
 //impl FromRandom for IPBusPacketType {
 //  
 //  fn from_random() -&gt; Self {
@@ -1206,7 +1234,7 @@
   // if the message is that long, then 
   // most likely there will be a 
   // problem elsewhere, so we 
-  // don&#39;t care
+  // don't care
   </span><span class="kw">let </span>size = data.len() <span class="kw">as </span>u8;
 
   <span class="kw">let </span>packet_id = <span class="number">0u8</span>;
@@ -1242,7 +1270,7 @@
     }
   }
   <span class="comment">//for n in 0..udp_data.len() {
-  //    println!(&quot;-- -- {}&quot;,udp_data[n]);
+  //    println!("-- -- {}",udp_data[n]);
   //}
   </span>udp_data
 }
@@ -1285,20 +1313,20 @@
       },
       IPBusPacketType::Write =&gt; data.push(<span class="number">0</span>),
       IPBusPacketType::WriteNonIncrement
-        =&gt; <span class="macro">error!</span>(<span class="string">&quot;I am sorry, I don&#39;t know what to do with this packet!&quot;</span>),
+        =&gt; <span class="macro">error!</span>(<span class="string">"I am sorry, I don't know what to do with this packet!"</span>),
       IPBusPacketType::RMW
-        =&gt; <span class="macro">error!</span>(<span class="string">&quot;I am sorry, I don&#39;t know what to do with this packet!&quot;</span>)
+        =&gt; <span class="macro">error!</span>(<span class="string">"I am sorry, I don't know what to do with this packet!"</span>)
     }
 
     <span class="kw">if </span>verbose { 
-      <span class="macro">println!</span>(<span class="string">&quot;Decoding IPBus Packet:&quot;</span>);
-      <span class="macro">println!</span>(<span class="string">&quot; &gt; Msg = {:?}&quot;</span>, message);
-      <span class="macro">println!</span>(<span class="string">&quot; &gt; IPBus version = {}&quot;</span>, ipbus_version);
-      <span class="macro">println!</span>(<span class="string">&quot; &gt; ID = {}&quot;</span>, id);
-      <span class="macro">println!</span>(<span class="string">&quot; &gt; Size = {}&quot;</span>, size);
-      <span class="macro">println!</span>(<span class="string">&quot; &gt; Type = {:?}&quot;</span>, packet_type);
-      <span class="macro">println!</span>(<span class="string">&quot; &gt; Info = {}&quot;</span>, info_code);
-      <span class="macro">println!</span>(<span class="string">&quot; &gt; data = {:?}&quot;</span>, data);
+      <span class="macro">println!</span>(<span class="string">"Decoding IPBus Packet:"</span>);
+      <span class="macro">println!</span>(<span class="string">" &gt; Msg = {:?}"</span>, message);
+      <span class="macro">println!</span>(<span class="string">" &gt; IPBus version = {}"</span>, ipbus_version);
+      <span class="macro">println!</span>(<span class="string">" &gt; ID = {}"</span>, id);
+      <span class="macro">println!</span>(<span class="string">" &gt; Size = {}"</span>, size);
+      <span class="macro">println!</span>(<span class="string">" &gt; Type = {:?}"</span>, packet_type);
+      <span class="macro">println!</span>(<span class="string">" &gt; Info = {}"</span>, info_code);
+      <span class="macro">println!</span>(<span class="string">" &gt; data = {:?}"</span>, data);
     }
     <span class="prelude-val">Ok</span>(data)
 }
@@ -1315,9 +1343,9 @@
   /// THIS DOES NOT APPLY TO THE GAPS OR POISSON 
   /// TRIGGER!
   </span><span class="kw">pub </span>trigger_prescale               : f32,
-  <span class="doccomment">/// in case trigger_type = &quot;Poisson&quot;, set rate here
+  <span class="doccomment">/// in case trigger_type = "Poisson", set rate here
   </span><span class="kw">pub </span>poisson_trigger_rate           : u32,
-  <span class="doccomment">/// in case trigger_type = &quot;Gaps&quot;, set if we want to use 
+  <span class="doccomment">/// in case trigger_type = "Gaps", set if we want to use 
   /// beta
   </span><span class="kw">pub </span>gaps_trigger_use_beta     : bool,
   <span class="doccomment">/// not sure
@@ -1332,16 +1360,17 @@
   /// only those RB which hits will read out waveforms.
   /// In case it is disabled, ALL RBs will readout events
   /// ALL the time. For this, we need also the eventbuilder
-  /// strategy &quot;WaitForNBoards(40)&quot;
-  </span><span class="kw">pub </span>trace_suppression      : bool,
+  /// strategy "WaitForNBoards(40)"
+  </span><span class="kw">pub </span>trace_suppression  : bool,
   <span class="doccomment">/// Time in seconds between housekkeping 
   /// packets
-  </span><span class="kw">pub </span>mtb_moni_interval : u64,
+  </span><span class="kw">pub </span>mtb_moni_interval  : u64,
   <span class="doccomment">/// The number of seconds we want to wait
   /// without hearing from the MTB before
   /// we attempt a reconnect
-  </span><span class="kw">pub </span>mtb_timeout_sec   : u64,
-  <span class="kw">pub </span>rb_int_window     : u8,
+  </span><span class="kw">pub </span>mtb_timeout_sec    : u64,
+  <span class="kw">pub </span>rb_int_window      : u8,
+  <span class="kw">pub </span>tiu_emulation_mode : bool,
 }
 
 <span class="kw">impl </span>MTBSettings {
@@ -1355,6 +1384,7 @@
       mtb_moni_interval      : <span class="number">30</span>,
       mtb_timeout_sec        : <span class="number">60</span>,
       rb_int_window          : <span class="number">1</span>,
+      tiu_emulation_mode     : <span class="bool-val">false</span>,
     }
   }
 }
@@ -1362,8 +1392,8 @@
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>MTBSettings {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
     <span class="kw">let </span>disp = toml::to_string(<span class="self">self</span>).unwrap_or(
-      String::from(<span class="string">&quot;-- DESERIALIZATION ERROR! --&quot;</span>));
-    <span class="macro">write!</span>(f, <span class="string">&quot;&lt;MTBSettings :\n{}&gt;&quot;</span>, disp)
+      String::from(<span class="string">"-- DESERIALIZATION ERROR! --"</span>));
+    <span class="macro">write!</span>(f, <span class="string">"&lt;MTBSettings :\n{}&gt;"</span>, disp)
   }
 }
 
@@ -1391,7 +1421,7 @@
 </span><span class="kw">pub fn </span>get_mtevent(socket  : <span class="kw-2">&amp;</span>UdpSocket,
                    buffer  : <span class="kw-2">&amp;mut </span>[u8;MT_MAX_PACKSIZE]) -&gt; <span class="prelude-ty">Result</span>&lt;MasterTriggerEvent, MasterTriggerError&gt; {
   <span class="kw">let </span><span class="kw-2">mut </span>mte = MasterTriggerEvent::new(<span class="number">0</span>,<span class="number">0</span>);
-  <span class="kw">let </span><span class="kw-2">mut </span>n_daq_words : u32;
+  <span class="kw">let </span><span class="kw-2">mut </span>n_daq_words  : u32;
   <span class="kw">let </span><span class="kw-2">mut </span>hits_a       : [bool;N_CHN_PER_LTB];
   <span class="kw">let </span><span class="kw-2">mut </span>hits_b       : [bool;N_CHN_PER_LTB];
   <span class="kw">let </span>sleeptime = Duration::from_micros(<span class="number">10</span>);
@@ -1404,7 +1434,7 @@
         <span class="comment">// A timeout does not ncecessarily mean that there 
         // is no event, it can also just mean that 
         // the rate is low.
-        </span><span class="macro">debug!</span>(<span class="string">&quot;Timeout in read_register for MTB! {err}&quot;</span>);
+        </span><span class="macro">debug!</span>(<span class="string">"Timeout in read_register for MTB! {err}"</span>);
         <span class="kw">continue</span>;
       },
       <span class="prelude-val">Ok</span>(_n_words) =&gt; {
@@ -1412,7 +1442,7 @@
         <span class="kw">if </span>_n_words == <span class="number">0 </span>{
           <span class="kw">continue</span>;
         }
-        <span class="macro">debug!</span>(<span class="string">&quot;Got n_daq_words {n_daq_words}&quot;</span>);
+        <span class="macro">debug!</span>(<span class="string">"Got n_daq_words {n_daq_words}"</span>);
         n_daq_words /= <span class="number">2</span>; <span class="comment">//mtb internally operates in 16bit words, but 
                           //registers return 32bit words.
         </span><span class="kw">break</span>;
@@ -1426,16 +1456,16 @@
                                     IPBusPacketType::ReadNonIncrement,
                                     n_daq_words <span class="kw">as </span>usize)<span class="question-mark">?</span>;
   <span class="kw">if </span>data[<span class="number">0</span>] != <span class="number">0xAAAAAAAA </span>{
-    <span class="macro">error!</span>(<span class="string">&quot;Got MTB data, but the header is incorrect {}&quot;</span>, data[<span class="number">0</span>]);
+    <span class="macro">error!</span>(<span class="string">"Got MTB data, but the header is incorrect {}"</span>, data[<span class="number">0</span>]);
     <span class="kw">return </span><span class="prelude-val">Err</span>(MasterTriggerError::PackageHeaderIncorrect);
   }
   <span class="kw">let </span>foot_pos = (n_daq_words - <span class="number">1</span>) <span class="kw">as </span>usize;
   <span class="kw">if </span>data.len() &lt;= foot_pos {
-    <span class="macro">error!</span>(<span class="string">&quot;Got MTB data, but the format is not correct&quot;</span>);
+    <span class="macro">error!</span>(<span class="string">"Got MTB data, but the format is not correct"</span>);
     <span class="kw">return </span><span class="prelude-val">Err</span>(MasterTriggerError::PackageHeaderIncorrect);
   }
   <span class="kw">if </span>data[foot_pos] != <span class="number">0x55555555 </span>{
-    <span class="macro">error!</span>(<span class="string">&quot;Got MTB data, but the footer is incorrect {}&quot;</span>, data[foot_pos]);
+    <span class="macro">error!</span>(<span class="string">"Got MTB data, but the footer is incorrect {}"</span>, data[foot_pos]);
     <span class="kw">return </span><span class="prelude-val">Err</span>(MasterTriggerError::PackageFooterIncorrect);
   }
 
@@ -1443,7 +1473,7 @@
   // Min event size is +1 word for hits
   </span><span class="kw">const </span>MTB_DAQ_PACKET_FIXED_N_WORDS : u32 = <span class="number">9</span>; 
   <span class="kw">let </span>n_hit_packets = n_daq_words - MTB_DAQ_PACKET_FIXED_N_WORDS;
-  <span class="comment">//println!(&quot;We are expecting {}&quot;, n_hit_packets);
+  <span class="comment">//println!("We are expecting {}", n_hit_packets);
   </span>mte.event_id      = data[<span class="number">1</span>];
   mte.timestamp     = data[<span class="number">2</span>];
   mte.tiu_timestamp = data[<span class="number">3</span>];
@@ -1452,7 +1482,7 @@
   mte.board_mask    = decode_board_mask(data[<span class="number">6</span>]);
   <span class="kw">let </span><span class="kw-2">mut </span>hitmasks = VecDeque::&lt;[bool;N_CHN_PER_LTB]&gt;::new();
   <span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..n_hit_packets {
-    <span class="comment">//println!(&quot;hit packet {:?}&quot;, data[7usize + k as usize]);
+    <span class="comment">//println!("hit packet {:?}", data[7usize + k as usize]);
     </span>(hits_a, hits_b) = decode_hit_mask(data[<span class="number">7usize </span>+ k <span class="kw">as </span>usize]);
     hitmasks.push_back(hits_a);
     hitmasks.push_back(hits_b);
@@ -1461,7 +1491,7 @@
     <span class="kw">if </span>mte.board_mask[k] {
       <span class="kw">match </span>hitmasks.pop_front() { 
         <span class="prelude-val">None </span>=&gt; {
-          <span class="macro">error!</span>(<span class="string">&quot;MTE hit assignment wrong. We expect hits for a certain LTB, but we don&#39;t see any!&quot;</span>);
+          <span class="macro">error!</span>(<span class="string">"MTE hit assignment wrong. We expect hits for a certain LTB, but we don't see any!"</span>);
         },
         <span class="prelude-val">Some</span>(_hits) =&gt; {
           mte.hits[k] = _hits;
@@ -1498,24 +1528,24 @@
   <span class="kw">let </span>socket : UdpSocket;
   <span class="kw">match </span>local_socket {
     <span class="prelude-val">Err</span>(err)   =&gt; {
-      <span class="macro">error!</span>(<span class="string">&quot;Can not create local UDP socket for master trigger connection!, err {}&quot;</span>, err);
+      <span class="macro">error!</span>(<span class="string">"Can not create local UDP socket for master trigger connection!, err {}"</span>, err);
       <span class="kw">return </span><span class="prelude-val">Err</span>(err);
     }
     <span class="prelude-val">Ok</span>(value)  =&gt; {
-      <span class="macro">info!</span>(<span class="string">&quot;Successfully bound UDP socket for master trigger communcations to {:?}&quot;</span>, value);
+      <span class="macro">info!</span>(<span class="string">"Successfully bound UDP socket for master trigger communcations to {:?}"</span>, value);
       socket = value;
       <span class="comment">// this is not strrictly necessary, but 
       // it is nice to limit communications
       </span><span class="kw">match </span>socket.set_read_timeout(<span class="prelude-val">Some</span>(Duration::from_millis(<span class="number">1</span>))) {
-        <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Can not set read timeout for Udp socket! Error {err}&quot;</span>),
+        <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Can not set read timeout for Udp socket! Error {err}"</span>),
         <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
       }
       <span class="kw">match </span>socket.connect(<span class="kw-2">&amp;</span>mt_address) {
         <span class="prelude-val">Err</span>(err) =&gt; {
-          <span class="macro">error!</span>(<span class="string">&quot;Can not connect to master trigger at {}, err {}&quot;</span>, mt_address, err);
+          <span class="macro">error!</span>(<span class="string">"Can not connect to master trigger at {}, err {}"</span>, mt_address, err);
           <span class="kw">return </span><span class="prelude-val">Err</span>(err);
         }
-        <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">&quot;Successfully connected to the master trigger at {}&quot;</span>, mt_address)
+        <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">"Successfully connected to the master trigger at {}"</span>, mt_address)
       }
       <span class="kw">return </span><span class="prelude-val">Ok</span>(socket);
     }
@@ -1542,7 +1572,7 @@
   }
   <span class="kw">let </span>first_word   = <span class="number">0x00000fff</span>;
   <span class="kw">let </span>second_word  = <span class="number">0x0fff0000</span>;
-  <span class="comment">//println!(&quot;{:?} data&quot;, data);
+  <span class="comment">//println!("{:?} data", data);
   </span>moni.calibration = ( data[<span class="number">0</span>] &amp; first_word  ) <span class="kw">as </span>u16;
   moni.vccpint     = ((data[<span class="number">0</span>] &amp; second_word ) &gt;&gt; <span class="number">16</span>) <span class="kw">as </span>u16;  
   moni.vccpaux     = ( data[<span class="number">1</span>] &amp; first_word  ) <span class="kw">as </span>u16;  
@@ -1559,7 +1589,7 @@
                                             IPBusPacketType::Read,
                                             <span class="number">2</span>)<span class="question-mark">?</span>;
   <span class="comment">// FIXME - technically, the rate is 24bit, however, we just
-  // read out 16 here (if the rate is beyond ~65kHz, we don&#39;t need 
+  // read out 16 here (if the rate is beyond ~65kHz, we don't need 
   // to know with precision
   </span><span class="kw">let </span>mask        = <span class="number">0x0000ffff</span>;
   moni.rate       = (rate[<span class="number">0</span>] &amp; mask) <span class="kw">as </span>u16;
@@ -1589,10 +1619,10 @@
 /// * mtb_moni_interval : time in seconds when we 
 ///                       are acquiring mtb moni data.
 ///
-/// * mtb_timeout_sec   : reconnect to mtb when we don&#39;t
+/// * mtb_timeout_sec   : reconnect to mtb when we don't
 ///                       see events in mtb_timeout seconds.
 ///
-/// * verbose           : Print &quot;heartbeat&quot; output 
+/// * verbose           : Print "heartbeat" output 
 ///
 /// * send_requests     : Send RBCommand instances with event 
 ///                       requests in TofPackets to the 
@@ -1602,9 +1632,7 @@
                       mt_sender         : <span class="kw-2">&amp;</span>Sender&lt;MasterTriggerEvent&gt;,
                       rb_request_tp     : <span class="kw-2">&amp;</span>Sender&lt;TofPacket&gt;,
                       moni_sender       : <span class="kw-2">&amp;</span>Sender&lt;TofPacket&gt;,
-                      <span class="comment">// FIXME - eventually merge these settings
-                      // to trigger settings
-                      </span>settings          : MTBSettings,
+                      settings          : MTBSettings,
                       verbose           : bool,
                       send_requests     : bool) {
 
@@ -1612,55 +1640,53 @@
   </span><span class="kw">let </span><span class="kw-2">mut </span>buffer = [<span class="number">0u8</span>;MT_MAX_PACKSIZE];  
   
   <span class="comment">// FIXME - this panics. However, it seems there is no way to init an UdpSocket 
-  // without binding it. And if it can&#39;t bind, it panics.
-  </span><span class="kw">let </span><span class="kw-2">mut </span>socket = connect_to_mtb(<span class="kw-2">&amp;</span>mt_address).expect(<span class="string">&quot;Can not establish initial connection to MTB&quot;</span>);
-  <span class="comment">// unfortunatly something like this won&#39;t compile
+  // without binding it. And if it can't bind, it panics.
+  </span><span class="kw">let </span><span class="kw-2">mut </span>socket = connect_to_mtb(<span class="kw-2">&amp;</span>mt_address).expect(<span class="string">"Can not establish initial connection to MTB"</span>);
+  <span class="comment">// unfortunatly something like this won't compile
   //let mut socket : UdpSocket; 
   //while !connected {
   //  match connect_to_mtb(&amp;mt_address) {
   //    Err(err) =&gt; {
-  //      error!(&quot;Can not create local UDP socket fro MTB connections!, {err}&quot;);
+  //      error!("Can not create local UDP socket fro MTB connections!, {err}");
   //      thread::sleep(connection_timeout);
   //      continue;
   //    },
   //    Ok(_sock) =&gt; {
-  //      info!(&quot;Successfully created local UDP socket for MTB connection!&quot;);
+  //      info!("Successfully created local UDP socket for MTB connection!");
   //      socket = _sock;
   //      connected = true;
   //    }
   //  }
   //}
   
-  // step 1 - reset daq
-  </span><span class="macro">debug!</span>(<span class="string">&quot;Resetting master trigger&quot;</span>);
-  <span class="kw">match </span>reset_daq(<span class="kw-2">&amp;</span>socket) {<span class="comment">//, &amp;mt_address) {
-    </span><span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Can not reset DAQ, error {err}&quot;</span>),
-    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
-  }
 
-  <span class="comment">// configure MTB here
+  // configure MTB here
   </span><span class="kw">let </span>trace_suppression = settings.trace_suppression;
   <span class="kw">match </span>set_trace_suppression(<span class="kw-2">&amp;</span>socket, trace_suppression) {
-    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Unable to set trace suppression mode! {err}&quot;</span>),
+    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to set trace suppression mode! {err}"</span>),
     <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
       <span class="kw">if </span>trace_suppression {
-        <span class="macro">println!</span>(<span class="string">&quot;==&gt; Setting MTB to trace suppression mode!&quot;</span>);
+        <span class="macro">println!</span>(<span class="string">"==&gt; Setting MTB to trace suppression mode!"</span>);
       } <span class="kw">else </span>{
-        <span class="macro">println!</span>(<span class="string">&quot;==&gt; Setting MTB to ALL_RB_READOUT mode!&quot;</span>);
-        <span class="macro">warn!</span>(<span class="string">&quot;Reading out all events from all RBs! Data might be very large!&quot;</span>);
+        <span class="macro">println!</span>(<span class="string">"==&gt; Setting MTB to ALL_RB_READOUT mode!"</span>);
+        <span class="macro">warn!</span>(<span class="string">"Reading out all events from all RBs! Data might be very large!"</span>);
       }
     }
   }
-  <span class="macro">info!</span>(<span class="string">&quot;Settting rb integration window!&quot;</span>);
+  <span class="macro">info!</span>(<span class="string">"Settting rb integration window!"</span>);
   <span class="kw">let </span>int_wind = settings.rb_int_window;
   <span class="kw">match </span>set_rb_int_window(<span class="kw-2">&amp;</span>socket, int_wind) {
-    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Unable to set rb integration window! {err}&quot;</span>),
+    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to set rb integration window! {err}"</span>),
     <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
-      <span class="macro">info!</span>(<span class="string">&quot;rb integration window set to {}&quot;</span>, int_wind); 
+      <span class="macro">info!</span>(<span class="string">"rb integration window set to {}"</span>, int_wind); 
     } 
   }
 
-  <span class="macro">info!</span>(<span class="string">&quot;Resetting trigger!&quot;</span>);
+  <span class="macro">debug!</span>(<span class="string">"Resetting master trigger DAQ"</span>);
+  <span class="kw">match </span>reset_daq(<span class="kw-2">&amp;</span>socket) {<span class="comment">//, &amp;mt_address) {
+    </span><span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Can not reset DAQ, error {err}"</span>),
+    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
+  }
   <span class="kw">match </span>settings.trigger_type {
     TriggerType::Poisson =&gt; {
       unset_all_triggers(<span class="kw-2">&amp;</span>socket); 
@@ -1674,18 +1700,22 @@
       unset_all_triggers(<span class="kw-2">&amp;</span>socket); 
       set_track_trigger(<span class="kw-2">&amp;</span>socket, settings.trigger_prescale);
     }
+    TriggerType::TrackCentral   =&gt; {
+      unset_all_triggers(<span class="kw-2">&amp;</span>socket); 
+      set_central_track_trigger(<span class="kw-2">&amp;</span>socket, settings.trigger_prescale);
+    }
     TriggerType::Gaps    =&gt; {
       unset_all_triggers(<span class="kw-2">&amp;</span>socket); 
       set_gaps_trigger(<span class="kw-2">&amp;</span>socket, settings.gaps_trigger_use_beta);
     }
     TriggerType::Unknown =&gt; {
-      <span class="macro">println!</span>(<span class="string">&quot;== ==&gt; Not setting any trigger condition. You can set it through pico_hal.py&quot;</span>);
-      <span class="macro">warn!</span>(<span class="string">&quot;Trigger condition undefined! Not setting anything!&quot;</span>);
-      <span class="macro">error!</span>(<span class="string">&quot;Trigger conditions unknown!&quot;</span>);
+      <span class="macro">println!</span>(<span class="string">"== ==&gt; Not setting any trigger condition. You can set it through pico_hal.py"</span>);
+      <span class="macro">warn!</span>(<span class="string">"Trigger condition undefined! Not setting anything!"</span>);
+      <span class="macro">error!</span>(<span class="string">"Trigger conditions unknown!"</span>);
     }
     <span class="kw">_ </span>=&gt; {
       <span class="comment">// actually panic here since this does not make sense
-      </span><span class="macro">panic!</span>(<span class="string">&quot;Can&#39;t set trigger for trigger type {}&quot;</span>, settings.trigger_type);
+      </span><span class="macro">panic!</span>(<span class="string">"Can't set trigger for trigger type {}"</span>, settings.trigger_type);
     }
   }
 
@@ -1708,13 +1738,13 @@
   <span class="kw">let </span><span class="kw-2">mut </span>n_ev_missed   = <span class="number">0u64</span>;
   <span class="kw">loop </span>{
     <span class="kw">if </span>mtb_timeout.elapsed().as_secs() &gt; mtb_timeout_sec {
-      <span class="macro">error!</span>(<span class="string">&quot;MTB timed out! Attempting to reconnnect...&quot;</span>);
+      <span class="macro">error!</span>(<span class="string">"MTB timed out! Attempting to reconnnect..."</span>);
       <span class="kw">match </span>connect_to_mtb(<span class="kw-2">&amp;</span>mt_address) {
         <span class="prelude-val">Err</span>(err) =&gt; {
-          <span class="macro">error!</span>(<span class="string">&quot;Can not establish initial connection to MTB! {err}&quot;</span>);
+          <span class="macro">error!</span>(<span class="string">"Can not establish initial connection to MTB! {err}"</span>);
         }
         <span class="prelude-val">Ok</span>(_sock) =&gt; {
-          <span class="macro">info!</span>(<span class="string">&quot;.. connected!&quot;</span>);
+          <span class="macro">info!</span>(<span class="string">".. connected!"</span>);
           socket = _sock;
         }
       }
@@ -1724,18 +1754,18 @@
                             <span class="comment">//&amp;mt_address,
                             </span><span class="kw-2">&amp;mut </span>buffer) {
         <span class="prelude-val">Err</span>(err) =&gt; {
-          <span class="macro">error!</span>(<span class="string">&quot;Can not get MtbMoniData! {err}&quot;</span>);
+          <span class="macro">error!</span>(<span class="string">"Can not get MtbMoniData! {err}"</span>);
         },
         <span class="prelude-val">Ok</span>(_moni) =&gt; {
           <span class="kw">let </span>tp = TofPacket::from(<span class="kw-2">&amp;</span>_moni);
           <span class="kw">match </span>moni_sender.send(tp) {
             <span class="prelude-val">Err</span>(err) =&gt; {
-              <span class="macro">error!</span>(<span class="string">&quot;Can not send MtbMoniData over channel! {err}&quot;</span>);
+              <span class="macro">error!</span>(<span class="string">"Can not send MtbMoniData over channel! {err}"</span>);
             },
             <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; ()
           }
           <span class="kw">if </span>verbose {
-            <span class="macro">println!</span>(<span class="string">&quot;{}&quot;</span>, _moni);
+            <span class="macro">println!</span>(<span class="string">"{}"</span>, _moni);
             rate_from_reg = <span class="prelude-val">Some</span>(_moni.rate <span class="kw">as </span>u32);
           }
         }
@@ -1746,17 +1776,17 @@
                       <span class="comment">//&amp;mt_address,
                       </span><span class="kw-2">&amp;mut </span>buffer) {
       <span class="prelude-val">Err</span>(err) =&gt; {
-        <span class="macro">error!</span>(<span class="string">&quot;Unable to get MasterTriggerEvent! {err}&quot;</span>);
+        <span class="macro">error!</span>(<span class="string">"Unable to get MasterTriggerEvent! {err}"</span>);
         <span class="kw">continue</span>;
       },
       <span class="prelude-val">Ok</span>(_ev) =&gt; {
         <span class="kw">if </span>_ev.event_id == last_event_id {
-          <span class="macro">error!</span>(<span class="string">&quot;We got a duplicate event from the MTB!&quot;</span>);
+          <span class="macro">error!</span>(<span class="string">"We got a duplicate event from the MTB!"</span>);
           <span class="kw">continue</span>;
         }
         <span class="kw">if </span>_ev.event_id &gt; last_event_id + <span class="number">1 </span>{
           <span class="kw">if </span>last_event_id != <span class="number">0 </span>{
-            <span class="macro">error!</span>(<span class="string">&quot;We skipped {} events!&quot;</span>, _ev.event_id - last_event_id); 
+            <span class="macro">error!</span>(<span class="string">"We skipped {} events!"</span>, _ev.event_id - last_event_id); 
             n_ev_missed += (_ev.event_id - last_event_id) <span class="kw">as </span>u64;
           }
         }
@@ -1767,27 +1797,27 @@
         </span>mtb_timeout = Instant::now();
         n_events += <span class="number">1</span>;
         <span class="kw">if </span>send_requests {
-          <span class="macro">trace!</span>(<span class="string">&quot;Got new event id from master trigger {}&quot;</span>,_ev.event_id);
+          <span class="macro">trace!</span>(<span class="string">"Got new event id from master trigger {}"</span>,_ev.event_id);
           <span class="kw">let </span>hits = _ev.get_dsi_j_ch_for_triggered_ltbs();
-          <span class="comment">//println!(&quot;HITS {:?}&quot;, hits);
+          <span class="comment">//println!("HITS {:?}", hits);
           </span><span class="kw">let </span><span class="kw-2">mut </span>rbs_ch = HashMap::&lt;u8, Vec&lt;u8&gt;&gt;::new();
           <span class="kw">for </span>h <span class="kw">in </span>hits.iter() {
             <span class="comment">// h is dsi,j, ch
             </span><span class="kw">if </span>!dsi_j_mapping.contains_key(<span class="kw-2">&amp;</span>h.<span class="number">0</span>) {
-              <span class="macro">error!</span>(<span class="string">&quot;Don&#39;t have RB connection information for {:?}.&quot;</span>, h);
+              <span class="macro">error!</span>(<span class="string">"Don't have RB connection information for {:?}."</span>, h);
               <span class="kw">continue</span>;
             }
             <span class="kw">if </span>!dsi_j_mapping[<span class="kw-2">&amp;</span>h.<span class="number">0</span>].contains_key(<span class="kw-2">&amp;</span>h.<span class="number">1</span>) {
-              <span class="macro">error!</span>(<span class="string">&quot;Don&#39;t have RB connection information for {:?}.&quot;</span>, h);
+              <span class="macro">error!</span>(<span class="string">"Don't have RB connection information for {:?}."</span>, h);
               <span class="kw">continue</span>;
             }
             <span class="kw">if </span>!dsi_j_mapping[<span class="kw-2">&amp;</span>h.<span class="number">1</span>].contains_key(<span class="kw-2">&amp;</span>h.<span class="number">2</span>) {
-              <span class="macro">error!</span>(<span class="string">&quot;Don&#39;t have RB connection information for {:?}.&quot;</span>, h);
+              <span class="macro">error!</span>(<span class="string">"Don't have RB connection information for {:?}."</span>, h);
               <span class="kw">continue</span>;
             }
             <span class="kw">let </span>rb  = dsi_j_mapping[<span class="kw-2">&amp;</span>h.<span class="number">0</span>][<span class="kw-2">&amp;</span>h.<span class="number">1</span>][<span class="kw-2">&amp;</span>h.<span class="number">2</span>];
             <span class="kw">if </span>rb.<span class="number">1 </span>&lt; <span class="number">1 </span>{
-              <span class="macro">warn!</span>(<span class="string">&quot;Invalid channel 0 found in DSI/J/CH (LTB-&gt;RB) map!&quot;</span>);
+              <span class="macro">warn!</span>(<span class="string">"Invalid channel 0 found in DSI/J/CH (LTB-&gt;RB) map!"</span>);
               <span class="kw">continue
             </span>}
             <span class="kw">if </span>rbs_ch.contains_key(<span class="kw-2">&amp;</span>rb.<span class="number">0</span>) {
@@ -1800,14 +1830,14 @@
               rbs_ch.insert(rb.<span class="number">0</span>, new_vec);
             }
           }
-          <span class="comment">//println!(&quot;RBS CH KEYS {:?}&quot;, rbs_ch.keys());
+          <span class="comment">//println!("RBS CH KEYS {:?}", rbs_ch.keys());
           </span><span class="kw">for </span>k <span class="kw">in </span>rbs_ch.keys() { 
             <span class="kw">let </span><span class="kw-2">mut </span>rb_cmd      = RBCommand::new();
             rb_cmd.command_code = RBCommand::REQUEST_EVENT;
             rb_cmd.payload      = _ev.event_id;
             rb_cmd.rb_id        = <span class="kw-2">*</span>k;
             <span class="kw">for </span>ch <span class="kw">in </span>rbs_ch[<span class="kw-2">&amp;</span>k].iter() {
-              <span class="comment">//println!(&quot;{}&quot;, ch);
+              <span class="comment">//println!("{}", ch);
               // here we have to subtract 1 because in the db and 
               // also in the json RB channels will be 1-9
               </span>rb_cmd.channel_mask = rb_cmd.channel_mask | <span class="number">2u8</span>.pow((ch -<span class="number">1</span>).into());
@@ -1816,14 +1846,14 @@
             <span class="kw">match </span>rb_request_tp.send(request_pk) {
               <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {},
               <span class="prelude-val">Err</span>(err) =&gt; {
-                <span class="macro">error!</span>(<span class="string">&quot;Unable to send request packet to rb {} for event {}! Error {err}&quot;</span>, rb_cmd.rb_id, rb_cmd.payload);
+                <span class="macro">error!</span>(<span class="string">"Unable to send request packet to rb {} for event {}! Error {err}"</span>, rb_cmd.rb_id, rb_cmd.payload);
               }
             }
           } 
         } <span class="comment">// end if request
         </span><span class="kw">match </span>mt_sender.send(_ev) {
           <span class="prelude-val">Err</span>(err) =&gt; {
-            <span class="macro">error!</span>(<span class="string">&quot;Can not send MasterTriggerEvent over channel! {err}&quot;</span>);
+            <span class="macro">error!</span>(<span class="string">"Can not send MasterTriggerEvent over channel! {err}"</span>);
             n_ev_unsent += <span class="number">1</span>;
           },
           <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; ()
@@ -1835,23 +1865,23 @@
       <span class="kw">let </span>verbose_timer_elapsed = verbose_timer.elapsed().as_secs_f64();
       <span class="kw">if </span>verbose_timer_elapsed &gt; <span class="number">20.0 </span>{
         total_elapsed += verbose_timer_elapsed;
-        <span class="macro">println!</span>(<span class="string">&quot;  {}&quot;</span>, <span class="string">&quot;&gt;&gt; == == == == ==  MT HEARTBEAT   == == == == == &lt;&lt;&quot;</span>.bright_blue().bold());
-        <span class="macro">println!</span>(<span class="string">&quot;  {}{:.1}{}&quot;</span>, <span class="string">&quot;&gt;&gt; ==&gt; &quot;</span>.bright_blue(),total_elapsed, <span class="string">&quot; mission elapsed time (sec)           &lt;&lt;&quot;</span>.bright_blue());
-        <span class="macro">println!</span>(<span class="string">&quot;  {}{}{}&quot;</span>, <span class="string">&quot;&gt;&gt; ==&gt; &quot;</span>.bright_blue(),n_events, <span class="string">&quot; events recorded                       &lt;&lt;&quot;</span>.bright_blue());
+        <span class="macro">println!</span>(<span class="string">"  {}"</span>, <span class="string">"&gt;&gt; == == == == ==  MT HEARTBEAT   == == == == == &lt;&lt;"</span>.bright_blue().bold());
+        <span class="macro">println!</span>(<span class="string">"  {}{:.1}{}"</span>, <span class="string">"&gt;&gt; ==&gt; "</span>.bright_blue(),total_elapsed, <span class="string">" mission elapsed time (sec)           &lt;&lt;"</span>.bright_blue());
+        <span class="macro">println!</span>(<span class="string">"  {}{}{}"</span>, <span class="string">"&gt;&gt; ==&gt; "</span>.bright_blue(),n_events, <span class="string">" events recorded                       &lt;&lt;"</span>.bright_blue());
         <span class="kw">if </span>n_ev_unsent &gt; <span class="number">0 </span>{
-          <span class="macro">println!</span>(<span class="string">&quot;  {}{}{}&quot;</span>, <span class="string">&quot;&gt;&gt; ==&gt; &quot;</span>.yellow().bold(),n_ev_unsent, <span class="string">&quot; sent errors                       &lt;&lt;&quot;</span>.yellow().bold());
+          <span class="macro">println!</span>(<span class="string">"  {}{}{}"</span>, <span class="string">"&gt;&gt; ==&gt; "</span>.yellow().bold(),n_ev_unsent, <span class="string">" sent errors                       &lt;&lt;"</span>.yellow().bold());
         }
         <span class="kw">if </span>n_ev_missed &gt; <span class="number">0 </span>{
-          <span class="macro">println!</span>(<span class="string">&quot;  {}{}{}&quot;</span>, <span class="string">&quot;&gt;&gt; ==&gt; &quot;</span>.yellow().bold(),n_events, <span class="string">&quot; missed events                       &lt;&lt;&quot;</span>.yellow().bold());
+          <span class="macro">println!</span>(<span class="string">"  {}{}{}"</span>, <span class="string">"&gt;&gt; ==&gt; "</span>.yellow().bold(),n_events, <span class="string">" missed events                       &lt;&lt;"</span>.yellow().bold());
         }
-        <span class="macro">println!</span>(<span class="string">&quot;  {}{:.2}{}&quot;</span>, <span class="string">&quot;&gt;&gt; ==&gt; -- trigger rate: &quot;</span>.bright_blue(), n_events <span class="kw">as </span>f64/total_elapsed, <span class="string">&quot; Hz                 &lt;&lt;&quot;</span>.bright_blue());
+        <span class="macro">println!</span>(<span class="string">"  {}{:.2}{}"</span>, <span class="string">"&gt;&gt; ==&gt; -- trigger rate: "</span>.bright_blue(), n_events <span class="kw">as </span>f64/total_elapsed, <span class="string">" Hz                 &lt;&lt;"</span>.bright_blue());
         <span class="kw">match </span>rate_from_reg {
           <span class="prelude-val">None </span>=&gt; (),
           <span class="prelude-val">Some</span>(_rate) =&gt; {
-            <span class="macro">println!</span>(<span class="string">&quot;  {}{:.3}{}&quot;</span>,<span class="string">&quot;&gt;&gt; ==&gt; -- expected rate &quot;</span>.bright_blue(),_rate,<span class="string">&quot; Hz (from register)    &lt;&lt;&quot;</span>.bright_blue());   
+            <span class="macro">println!</span>(<span class="string">"  {}{:.3}{}"</span>,<span class="string">"&gt;&gt; ==&gt; -- expected rate "</span>.bright_blue(),_rate,<span class="string">" Hz (from register)    &lt;&lt;"</span>.bright_blue());   
           }
         }
-        <span class="macro">println!</span>(<span class="string">&quot;  {}&quot;</span>,<span class="string">&quot;&gt;&gt; == == == == ==  END HEARTBEAT! == == == == == &lt;&lt;&quot;</span>.bright_blue().bold());
+        <span class="macro">println!</span>(<span class="string">"  {}"</span>,<span class="string">"&gt;&gt; == == == == ==  END HEARTBEAT! == == == == == &lt;&lt;"</span>.bright_blue().bold());
         verbose_timer = Instant::now();
       }
     }
@@ -1862,7 +1892,7 @@
 ///
 /// # Arguments
 ///
-/// * socket      : A valid UDP socket, &quot;connected&quot; to 
+/// * socket      : A valid UDP socket, "connected" to 
 ///                 the MTB through UdpSocket::connect
 /// * reg_addr    : The address of the MTB register to 
 ///                 be read
@@ -1878,7 +1908,7 @@
                                <span class="kw-2">&amp;</span>send_data);
   socket.send(message.as_slice())<span class="question-mark">?</span>;
   <span class="kw">let </span>(number_of_bytes, <span class="kw">_</span>) = socket.recv_from(buffer)<span class="question-mark">?</span>;
-  <span class="macro">trace!</span>(<span class="string">&quot;Received {} bytes from master trigger&quot;</span>, number_of_bytes);
+  <span class="macro">trace!</span>(<span class="string">"Received {} bytes from master trigger"</span>, number_of_bytes);
   <span class="comment">// this one can actually succeed, but return an emtpy vector
   </span><span class="kw">let </span>data = decode_ipbus(buffer, <span class="bool-val">false</span>)<span class="question-mark">?</span>;
   <span class="kw">if </span>data.len() == <span class="number">0 
@@ -1906,15 +1936,15 @@
   }
   socket.send(message.as_slice())<span class="question-mark">?</span>;
   <span class="kw">let </span>(number_of_bytes, <span class="kw">_</span>) = socket.recv_from(buffer)<span class="question-mark">?</span>;
-  <span class="macro">trace!</span>(<span class="string">&quot;Received {} bytes from master trigger&quot;</span>, number_of_bytes);
+  <span class="macro">trace!</span>(<span class="string">"Received {} bytes from master trigger"</span>, number_of_bytes);
   <span class="comment">// this one can actually succeed, but return an emtpy vector
   </span><span class="kw">let </span>data = decode_ipbus(buffer, <span class="bool-val">false</span>)<span class="question-mark">?</span>;
   <span class="kw">if </span>data.len() == <span class="number">0 </span>{ 
-    <span class="macro">error!</span>(<span class="string">&quot;Empty data!&quot;</span>);
+    <span class="macro">error!</span>(<span class="string">"Empty data!"</span>);
     <span class="kw">return </span><span class="prelude-val">Err</span>(Box::new(IPBusError::DecodingFailed));
   }
   <span class="kw">if </span>data.len() != nwords {
-    <span class="macro">error!</span>(<span class="string">&quot;Data too short!&quot;</span>);
+    <span class="macro">error!</span>(<span class="string">"Data too short!"</span>);
     <span class="kw">return </span><span class="prelude-val">Err</span>(Box::new(MasterTriggerError::DataTooShort));
   }
   <span class="comment">// this supports up to 100 Hz
@@ -1925,7 +1955,7 @@
 ///
 /// # Arguments
 ///
-/// * socket      : A valid UDP socket, &quot;connected&quot; to
+/// * socket      : A valid UDP socket, "connected" to
 ///                 the MTB through UdpSocket::connect
 /// * reg_addr    : The address of the MTB register to 
 ///                 be written
@@ -1945,7 +1975,7 @@
                                <span class="kw-2">&amp;</span>send_data);
   socket.send(message.as_slice())<span class="question-mark">?</span>;
   <span class="kw">let </span>(number_of_bytes, <span class="kw">_</span>) = socket.recv_from(buffer)<span class="question-mark">?</span>;
-  <span class="macro">trace!</span>(<span class="string">&quot;Received {} bytes from master trigger&quot;</span>, number_of_bytes);
+  <span class="macro">trace!</span>(<span class="string">"Received {} bytes from master trigger"</span>, number_of_bytes);
   <span class="prelude-val">Ok</span>(())
 }
 
@@ -1959,7 +1989,7 @@
                                <span class="kw-2">&amp;</span>data);
   socket.send(message.as_slice())<span class="question-mark">?</span>;
   <span class="kw">let </span>(number_of_bytes, <span class="kw">_</span>) = socket.recv_from(buffer)<span class="question-mark">?</span>;
-  <span class="macro">trace!</span>(<span class="string">&quot;Received {} bytes from master trigger&quot;</span>, number_of_bytes);
+  <span class="macro">trace!</span>(<span class="string">"Received {} bytes from master trigger"</span>, number_of_bytes);
   <span class="prelude-val">Ok</span>(())
 }
 
@@ -1970,7 +2000,7 @@
   <span class="kw">let </span>event_count = read_register(socket,
                                   <span class="comment">//target_address,
                                   </span><span class="number">0xd</span>, buffer)<span class="question-mark">?</span>;
-  <span class="macro">trace!</span>(<span class="string">&quot;Got event count! {} &quot;</span>, event_count);
+  <span class="macro">trace!</span>(<span class="string">"Got event count! {} "</span>, event_count);
   <span class="prelude-val">Ok</span>(event_count)
 }
 
@@ -1981,7 +2011,7 @@
 </span><span class="kw">pub fn </span>set_trace_suppression(socket : <span class="kw-2">&amp;</span>UdpSocket,
                              sup    : bool) 
   -&gt; <span class="prelude-ty">Result</span>&lt;(), Box&lt;<span class="kw">dyn </span>Error&gt;&gt; {
-  <span class="macro">info!</span>(<span class="string">&quot;Setting MTB trace suppression {}!&quot;</span>, sup);
+  <span class="macro">info!</span>(<span class="string">"Setting MTB trace suppression {}!"</span>, sup);
   <span class="kw">let </span><span class="kw-2">mut </span>buffer = [<span class="number">0u8</span>;MT_MAX_PACKSIZE];
   <span class="kw">let </span><span class="kw-2">mut </span>value = read_register(socket, <span class="number">0xf</span>, <span class="kw-2">&amp;mut </span>buffer)<span class="question-mark">?</span>;
   <span class="comment">// bit 13 has to be 1 for read all channels
@@ -2004,23 +2034,32 @@
 <span class="doccomment">/// Reset the state of the MTB DAQ
 </span><span class="kw">pub fn </span>reset_daq(socket : <span class="kw-2">&amp;</span>UdpSocket) 
   -&gt; <span class="prelude-ty">Result</span>&lt;(), Box&lt;<span class="kw">dyn </span>Error&gt;&gt; {
-  <span class="macro">info!</span>(<span class="string">&quot;Resetting DAQ!&quot;</span>);
+  <span class="macro">info!</span>(<span class="string">"Resetting DAQ!"</span>);
   <span class="kw">let </span><span class="kw-2">mut </span>buffer = [<span class="number">0u8</span>;MT_MAX_PACKSIZE];
   write_register(socket,
                  <span class="number">0x10</span>, <span class="number">1</span>,<span class="kw-2">&amp;mut </span>buffer)<span class="question-mark">?</span>;
   <span class="prelude-val">Ok</span>(())
 }
 
+<span class="kw">pub fn </span>get_tiu_link_status(socket : <span class="kw-2">&amp;</span>UdpSocket)
+  -&gt; <span class="prelude-ty">Result</span>&lt;bool, Box&lt;<span class="kw">dyn </span>Error&gt;&gt; {
+  <span class="kw">let </span><span class="kw-2">mut </span>tiu_good = <span class="number">0x1u32</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>buffer   = [<span class="number">0u8</span>;MT_MAX_PACKSIZE];
+  <span class="kw">let </span><span class="kw-2">mut </span>value    = read_register(socket, <span class="number">0xf</span>, <span class="kw-2">&amp;mut </span>buffer)<span class="question-mark">?</span>;
+  tiu_good         = tiu_good &amp; ( value &amp; <span class="number">0x1</span>);
+  <span class="prelude-val">Ok</span>(tiu_good &gt; <span class="number">0</span>)
+}
+
 <span class="doccomment">/// FIXME
 </span><span class="kw">pub fn </span>set_rb_int_window(socket : <span class="kw-2">&amp;</span>UdpSocket, wind : u8)
   -&gt; <span class="prelude-ty">Result</span>&lt;(), Box&lt;<span class="kw">dyn </span>Error&gt;&gt; {
-  <span class="macro">info!</span>(<span class="string">&quot;Setting RB_INT_WINDOW to {}!&quot;</span>, wind);
+  <span class="macro">info!</span>(<span class="string">"Setting RB_INT_WINDOW to {}!"</span>, wind);
   <span class="kw">let </span><span class="kw-2">mut </span>buffer = [<span class="number">0u8</span>;MT_MAX_PACKSIZE];
-  <span class="kw">let </span><span class="kw-2">mut </span>value =  read_register(socket, <span class="number">0xf </span>, <span class="kw-2">&amp;mut </span>buffer)<span class="question-mark">?</span>;
-  <span class="kw">let </span>mask  = !((<span class="number">0xf </span><span class="kw">as </span>u32) &lt;&lt; <span class="number">8</span>);
+  <span class="kw">let </span><span class="kw-2">mut </span>value  =  read_register(socket, <span class="number">0xf </span>, <span class="kw-2">&amp;mut </span>buffer)<span class="question-mark">?</span>;
+  <span class="kw">let </span><span class="kw-2">mut </span>mask   = <span class="number">0xfffff0ff</span>;
   <span class="comment">// switch the bins off
-  </span>value = value &amp; mask;
-  <span class="kw">let </span>wind_bits = (wind <span class="kw">as </span>u32) &lt;&lt; <span class="number">8</span>;
+  </span>value          = value &amp; mask;
+  <span class="kw">let </span>wind_bits  = (wind <span class="kw">as </span>u32) &lt;&lt; <span class="number">8</span>;
   value = value | wind_bits;
   write_register(socket,
                  <span class="number">0xf</span>,
@@ -2032,9 +2071,12 @@
 <span class="doccomment">/// Set the poisson trigger with a prescale
 </span><span class="kw">pub fn </span>set_poisson_trigger(socket : <span class="kw-2">&amp;</span>UdpSocket, rate : u32) 
   -&gt; <span class="prelude-ty">Result</span>&lt;(), Box&lt;<span class="kw">dyn </span>Error&gt;&gt; {
-  <span class="kw">let </span>clk_period = <span class="number">1.0e8</span>; 
-  <span class="kw">let </span>rate_val = (u32::MAX <span class="kw">as </span>f32<span class="kw-2">*</span>rate <span class="kw">as </span>f32/(<span class="number">1.0</span>/ clk_period)).floor() <span class="kw">as </span>u32;
-  <span class="macro">info!</span>(<span class="string">&quot;Setting poisson trigger with rate {}!&quot;</span>, rate);
+  <span class="comment">//let clk_period = 1e8u32; 
+  </span><span class="kw">let </span>clk_period = <span class="number">100000000</span>;
+  <span class="kw">let </span>rate_val = (u32::MAX<span class="kw-2">*</span>rate)/clk_period;<span class="comment">//(1.0/ clk_period)).floor() as u32;
+  
+  //let rate_val   = (rate as f32 * u32::MAX as f32/1.0e8) as u32; 
+  </span><span class="macro">info!</span>(<span class="string">"Setting poisson trigger with rate {}!"</span>, rate);
   <span class="kw">let </span><span class="kw-2">mut </span>buffer = [<span class="number">0u8</span>;MT_MAX_PACKSIZE];
   write_register(socket,
                  <span class="number">0x9</span>,
@@ -2047,7 +2089,7 @@
 </span><span class="kw">pub fn </span>set_any_trigger(socket : <span class="kw-2">&amp;</span>UdpSocket, prescale : f32) 
   -&gt; <span class="prelude-ty">Result</span>&lt;(), Box&lt;<span class="kw">dyn </span>Error&gt;&gt; {
   <span class="kw">let </span>prescale_val = (u32::MAX <span class="kw">as </span>f32 * prescale).floor() <span class="kw">as </span>u32;
-  <span class="macro">info!</span>(<span class="string">&quot;Setting any trigger with prescale {}!&quot;</span>, prescale);
+  <span class="macro">info!</span>(<span class="string">"Setting any trigger with prescale {}!"</span>, prescale);
   <span class="kw">let </span><span class="kw-2">mut </span>buffer = [<span class="number">0u8</span>;MT_MAX_PACKSIZE];
   write_register(socket,
                  <span class="number">0x40</span>,
@@ -2060,10 +2102,23 @@
 </span><span class="kw">pub fn </span>set_track_trigger(socket : <span class="kw-2">&amp;</span>UdpSocket, prescale : f32) 
   -&gt; <span class="prelude-ty">Result</span>&lt;(), Box&lt;<span class="kw">dyn </span>Error&gt;&gt; {
   <span class="kw">let </span>prescale_val = (u32::MAX <span class="kw">as </span>f32 * prescale).floor() <span class="kw">as </span>u32;
-  <span class="macro">info!</span>(<span class="string">&quot;Setting track trigger with prescale {}!&quot;</span>, prescale);
+  <span class="macro">info!</span>(<span class="string">"Setting track trigger with prescale {}!"</span>, prescale);
   <span class="kw">let </span><span class="kw-2">mut </span>buffer = [<span class="number">0u8</span>;MT_MAX_PACKSIZE];
   write_register(socket,
                  <span class="number">0x41</span>,
+                 prescale_val,
+                 <span class="kw-2">&amp;mut </span>buffer)<span class="question-mark">?</span>;
+  <span class="prelude-val">Ok</span>(())
+}
+
+<span class="doccomment">/// Set the CENTRAL track trigger with a prescale
+</span><span class="kw">pub fn </span>set_central_track_trigger(socket : <span class="kw-2">&amp;</span>UdpSocket, prescale : f32) 
+  -&gt; <span class="prelude-ty">Result</span>&lt;(), Box&lt;<span class="kw">dyn </span>Error&gt;&gt; {
+  <span class="kw">let </span>prescale_val = (u32::MAX <span class="kw">as </span>f32 * prescale).floor() <span class="kw">as </span>u32;
+  <span class="macro">info!</span>(<span class="string">"Setting track trigger with prescale {}!"</span>, prescale);
+  <span class="kw">let </span><span class="kw-2">mut </span>buffer = [<span class="number">0u8</span>;MT_MAX_PACKSIZE];
+  write_register(socket,
+                 <span class="number">0x42</span>,
                  prescale_val,
                  <span class="kw-2">&amp;mut </span>buffer)<span class="question-mark">?</span>;
   <span class="prelude-val">Ok</span>(())
@@ -2076,8 +2131,8 @@
   <span class="comment">// first the GAPS trigger, whcih is a more 
   // complicated register, where we only have
   // to flip 1 bit
-  </span><span class="kw">let </span><span class="kw-2">mut </span>trig_settings =  read_register(socket, <span class="number">0x14 </span>, <span class="kw-2">&amp;mut </span>buffer)<span class="question-mark">?</span>;
-  trig_settings = trig_settings &amp; !u32::pow(<span class="number">2</span>,<span class="number">24</span>);
+  </span><span class="kw">let </span><span class="kw-2">mut </span>trig_settings = read_register(socket, <span class="number">0x14 </span>, <span class="kw-2">&amp;mut </span>buffer)<span class="question-mark">?</span>;
+  trig_settings         = trig_settings &amp; !u32::pow(<span class="number">2</span>,<span class="number">24</span>);
   write_register(socket,
                  <span class="number">0x14</span>,
                  trig_settings,
@@ -2091,7 +2146,7 @@
 <span class="doccomment">/// Set the gaps trigger with a prescale
 </span><span class="kw">pub fn </span>set_gaps_trigger(socket : <span class="kw-2">&amp;</span>UdpSocket, use_beta : bool) 
   -&gt; <span class="prelude-ty">Result</span>&lt;(), Box&lt;<span class="kw">dyn </span>Error&gt;&gt; {
-  <span class="macro">info!</span>(<span class="string">&quot;Setting GAPS Antiparticle trigger, use beta {}!&quot;</span>, use_beta);
+  <span class="macro">info!</span>(<span class="string">"Setting GAPS Antiparticle trigger, use beta {}!"</span>, use_beta);
   <span class="kw">let </span><span class="kw-2">mut </span>buffer = [<span class="number">0u8</span>;MT_MAX_PACKSIZE];
   <span class="kw">let </span><span class="kw-2">mut </span>trig_settings =  read_register(socket, <span class="number">0x14 </span>, <span class="kw-2">&amp;mut </span>buffer)<span class="question-mark">?</span>;
   trig_settings = trig_settings | u32::pow(<span class="number">2</span>,<span class="number">24</span>);
@@ -2110,7 +2165,7 @@
   <span class="kw">let </span><span class="kw-2">mut </span>decoded_mask = [<span class="bool-val">false</span>;N_LTBS];
   <span class="comment">// FIXME this implicitly asserts that the fields for non available LTBs 
   // will be 0 and all the fields will be in order
-  //println!(&quot;BOARD MASK {}&quot;, board_mask);
+  //println!("BOARD MASK {}", board_mask);
   </span><span class="kw">let </span><span class="kw-2">mut </span>index = N_LTBS - <span class="number">1</span>;
   <span class="kw">for </span>n <span class="kw">in </span><span class="number">0</span>..N_LTBS {
     <span class="kw">let </span>mask = <span class="number">1 </span>&lt;&lt; n;
@@ -2121,7 +2176,7 @@
     }
     <span class="comment">//decoded_mask[N_LTBS-1 - n] = bit_is_set;
   </span>}
-  <span class="comment">//println!(&quot;DECODED MASK {:?}&quot;, decoded_mask);
+  <span class="comment">//println!("DECODED MASK {:?}", decoded_mask);
   // reverse the mask, so actually RAT0 is at position 0
   </span>decoded_mask.reverse();
   decoded_mask
@@ -2129,7 +2184,7 @@
 
 <span class="doccomment">/// Helper to get the number of the triggered LTB from the bitmask
 </span><span class="kw">pub fn </span>decode_hit_mask(hit_mask : u32) -&gt; ([bool;N_CHN_PER_LTB],[bool;N_CHN_PER_LTB]) {
-  <span class="comment">//println!(&quot;HITMASK NON DECODED :{}&quot;, hit_mask);
+  <span class="comment">//println!("HITMASK NON DECODED :{}", hit_mask);
   </span><span class="kw">let </span><span class="kw-2">mut </span>decoded_mask_0 = [<span class="bool-val">false</span>;N_CHN_PER_LTB];
   <span class="kw">let </span><span class="kw-2">mut </span>decoded_mask_1 = [<span class="bool-val">false</span>;N_CHN_PER_LTB];
   <span class="comment">// FIXME this implicitly asserts that the fields for non available LTBs 
@@ -2137,9 +2192,9 @@
   </span><span class="kw">let </span><span class="kw-2">mut </span>index = N_CHN_PER_LTB - <span class="number">1</span>;
   <span class="kw">for </span>n <span class="kw">in </span><span class="number">0</span>..N_CHN_PER_LTB {
     <span class="kw">let </span>mask = <span class="number">1 </span>&lt;&lt; n;
-    <span class="comment">//println!(&quot;MASK {:?}&quot;, mask);
+    <span class="comment">//println!("MASK {:?}", mask);
     </span><span class="kw">let </span>bit_is_set = (mask &amp; hit_mask) &gt; <span class="number">0</span>;
-    <span class="comment">//println!(&quot;bit is set {}, index {}&quot;, bit_is_set, index);
+    <span class="comment">//println!("bit is set {}, index {}", bit_is_set, index);
     //decoded_mask_0[N_CHN_PER_LTB-1 - n] = bit_is_set;
     </span>decoded_mask_0[index] = bit_is_set;
     <span class="kw">if </span>index != <span class="number">0 </span>{
@@ -2151,18 +2206,18 @@
     <span class="kw">let </span>mask = <span class="number">1 </span>&lt;&lt; n;
     <span class="kw">let </span>bit_is_set = (mask &amp; hit_mask) &gt; <span class="number">0</span>;
     <span class="comment">//FIXME - this is buggy and panics. Until this is fixed,
-    //I&#39;ll revive my cringy way to do things.
+    //I'll revive my cringy way to do things.
     //decoded_mask_1[N_CHN_PER_LTB-1 - n] = bit_is_set;
     </span>decoded_mask_1[index] = bit_is_set;
     <span class="kw">if </span>index != <span class="number">0 </span>{
       index -= <span class="number">1</span>;
     }
   }
-  <span class="comment">//println!(&quot;DECODED HITMASK 0 {:?}&quot;, decoded_mask_0);
-  //println!(&quot;DECODED HITMASK 1 {:?}&quot;, decoded_mask_1);
+  <span class="comment">//println!("DECODED HITMASK 0 {:?}", decoded_mask_0);
+  //println!("DECODED HITMASK 1 {:?}", decoded_mask_1);
   // reverse everything 
   // so decoded_mask_0 is still for the first board, but 
-  // let&#39;s do the channels so that they count up
+  // let's do the channels so that they count up
   </span>decoded_mask_0.reverse();
   decoded_mask_1.reverse();
   (decoded_mask_0, decoded_mask_1)

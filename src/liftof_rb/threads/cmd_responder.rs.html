@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-rb/src/threads/cmd_responder.rs`."><title>cmd_responder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="liftof_rb" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-rb/src/threads/cmd_responder.rs`."><title>cmd_responder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="liftof_rb" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -603,81 +604,6 @@
 <a href="#603" id="603">603</a>
 <a href="#604" id="604">604</a>
 <a href="#605" id="605">605</a>
-<a href="#606" id="606">606</a>
-<a href="#607" id="607">607</a>
-<a href="#608" id="608">608</a>
-<a href="#609" id="609">609</a>
-<a href="#610" id="610">610</a>
-<a href="#611" id="611">611</a>
-<a href="#612" id="612">612</a>
-<a href="#613" id="613">613</a>
-<a href="#614" id="614">614</a>
-<a href="#615" id="615">615</a>
-<a href="#616" id="616">616</a>
-<a href="#617" id="617">617</a>
-<a href="#618" id="618">618</a>
-<a href="#619" id="619">619</a>
-<a href="#620" id="620">620</a>
-<a href="#621" id="621">621</a>
-<a href="#622" id="622">622</a>
-<a href="#623" id="623">623</a>
-<a href="#624" id="624">624</a>
-<a href="#625" id="625">625</a>
-<a href="#626" id="626">626</a>
-<a href="#627" id="627">627</a>
-<a href="#628" id="628">628</a>
-<a href="#629" id="629">629</a>
-<a href="#630" id="630">630</a>
-<a href="#631" id="631">631</a>
-<a href="#632" id="632">632</a>
-<a href="#633" id="633">633</a>
-<a href="#634" id="634">634</a>
-<a href="#635" id="635">635</a>
-<a href="#636" id="636">636</a>
-<a href="#637" id="637">637</a>
-<a href="#638" id="638">638</a>
-<a href="#639" id="639">639</a>
-<a href="#640" id="640">640</a>
-<a href="#641" id="641">641</a>
-<a href="#642" id="642">642</a>
-<a href="#643" id="643">643</a>
-<a href="#644" id="644">644</a>
-<a href="#645" id="645">645</a>
-<a href="#646" id="646">646</a>
-<a href="#647" id="647">647</a>
-<a href="#648" id="648">648</a>
-<a href="#649" id="649">649</a>
-<a href="#650" id="650">650</a>
-<a href="#651" id="651">651</a>
-<a href="#652" id="652">652</a>
-<a href="#653" id="653">653</a>
-<a href="#654" id="654">654</a>
-<a href="#655" id="655">655</a>
-<a href="#656" id="656">656</a>
-<a href="#657" id="657">657</a>
-<a href="#658" id="658">658</a>
-<a href="#659" id="659">659</a>
-<a href="#660" id="660">660</a>
-<a href="#661" id="661">661</a>
-<a href="#662" id="662">662</a>
-<a href="#663" id="663">663</a>
-<a href="#664" id="664">664</a>
-<a href="#665" id="665">665</a>
-<a href="#666" id="666">666</a>
-<a href="#667" id="667">667</a>
-<a href="#668" id="668">668</a>
-<a href="#669" id="669">669</a>
-<a href="#670" id="670">670</a>
-<a href="#671" id="671">671</a>
-<a href="#672" id="672">672</a>
-<a href="#673" id="673">673</a>
-<a href="#674" id="674">674</a>
-<a href="#675" id="675">675</a>
-<a href="#676" id="676">676</a>
-<a href="#677" id="677">677</a>
-<a href="#678" id="678">678</a>
-<a href="#679" id="679">679</a>
-<a href="#680" id="680">680</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::path::Path;
 <span class="kw">use </span>std::sync::{
     Arc,
@@ -687,9 +613,8 @@
 <span class="comment">//use std::time::Instant;
 </span><span class="kw">use </span>crossbeam_channel::Sender;
 
-<span class="kw">use </span>tof_dataclasses::commands::{TofCommand,
-                                TofResponse, TofCommandResp};
-<span class="kw">use </span>tof_dataclasses::errors::SetError;
+<span class="kw">use </span>tof_dataclasses::commands::{TofCommand, TofCommandCode, TofCommandResp, TofResponse};
+<span class="kw">use </span>tof_dataclasses::errors::CmdError;
 <span class="kw">use </span>tof_dataclasses::packets::{TofPacket,
                                PacketType};
 <span class="kw">use </span>tof_dataclasses::run::RunConfig;
@@ -699,9 +624,7 @@
 <span class="kw">use </span>liftof_lib::{build_tcp_from_ip, TofComponent, PowerStatusEnum, LTBThresholdName};
 
 <span class="kw">use </span>tof_dataclasses::constants::{MASK_CMD_8BIT,
-                                  MASK_CMD_16BIT,
-                                  MASK_CMD_24BIT,
-                                  MASK_CMD_32BIT};
+                                  MASK_CMD_16BIT};
 
 <span class="kw">use </span><span class="kw">crate</span>::api::{rb_calibration,
                  rb_noi_subcalibration,
@@ -714,6 +637,7 @@
                  get_runconfig,
                  prefix_board_id,
                  DATAPORT};
+<span class="kw">use </span><span class="kw">crate</span>::threads::monitoring::{get_ltb_moni, get_pb_moni, get_rb_moni};
 
 <span class="kw">use </span>liftof_lib::constants::DEFAULT_RB_ID;
 
@@ -751,70 +675,70 @@
   <span class="kw">let </span>cmd_address = build_tcp_from_ip(cmd_server_ip,port);
   <span class="comment">// we will subscribe to two types of messages, BRCT and RB + 2 digits 
   // of board id
-  </span><span class="kw">let </span>topic_board = get_board_id_string().expect(<span class="string">&quot;Can not get board id!&quot;</span>);
-  <span class="kw">let </span>topic_broadcast = String::from(<span class="string">&quot;BRCT&quot;</span>);
+  </span><span class="kw">let </span>topic_board = get_board_id_string().expect(<span class="string">"Can not get board id!"</span>);
+  <span class="kw">let </span>topic_broadcast = String::from(<span class="string">"BRCT"</span>);
   <span class="kw">let </span>ctx = zmq::Context::new();
   <span class="comment">// I guess expect is fine here, see above
-  </span><span class="kw">let </span>cmd_socket = ctx.socket(zmq::SUB).expect(<span class="string">&quot;Unable to create 0MQ SUB socket!&quot;</span>);
-  <span class="macro">info!</span>(<span class="string">&quot;Will set up 0MQ SUB socket to listen for commands at address {cmd_address}&quot;</span>);
+  </span><span class="kw">let </span>cmd_socket = ctx.socket(zmq::SUB).expect(<span class="string">"Unable to create 0MQ SUB socket!"</span>);
+  <span class="macro">info!</span>(<span class="string">"Will set up 0MQ SUB socket to listen for commands at address {cmd_address}"</span>);
   <span class="kw">let </span><span class="kw-2">mut </span>is_connected = <span class="bool-val">false</span>;
   <span class="kw">match </span>cmd_socket.connect(<span class="kw-2">&amp;</span>cmd_address) {
-    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">&quot;Not able to connect to {}, Error {err}&quot;</span>, cmd_address),
+    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">"Not able to connect to {}, Error {err}"</span>, cmd_address),
     <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
-      <span class="macro">info!</span>(<span class="string">&quot;Connected to CnC server at {}&quot;</span>, cmd_address);
+      <span class="macro">info!</span>(<span class="string">"Connected to CnC server at {}"</span>, cmd_address);
       is_connected = <span class="bool-val">true</span>;
     }
   }
   <span class="kw">if </span>is_connected {
     <span class="kw">match </span>cmd_socket.set_subscribe(<span class="kw-2">&amp;</span>topic_broadcast.as_bytes()) {
-      <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Can not subscribe to {topic_broadcast}, err {err}&quot;</span>),
+      <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Can not subscribe to {topic_broadcast}, err {err}"</span>),
       <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
     }
     <span class="kw">match </span>cmd_socket.set_subscribe(<span class="kw-2">&amp;</span>topic_board.as_bytes()) {
-      <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Can not subscribe to {topic_board}, err {err}&quot;</span>),
+      <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Can not subscribe to {topic_board}, err {err}"</span>),
       <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
     }
   }
   
   <span class="comment">//let mut heartbeat     = Instant::now();
 
-  // I don&#39;t know if we need this, maybe the whole block can go away.
+  // I don't know if we need this, maybe the whole block can go away.
   // Originally I thought the RBs get pinged every x seconds and if we
-  // don&#39;t see the ping, we reconnect to the socket. But I don&#39;t know
+  // don't see the ping, we reconnect to the socket. But I don't know
   // if that scenario actually occurs.
   // Paolo: instead of leaving the connection always open we might
   //  want to reopen it if its not reachable anymore (so like command-oriented)...
-  //warn!(&quot;TODO: Heartbeat feature not yet implemented on C&amp;C side&quot;);
+  //warn!("TODO: Heartbeat feature not yet implemented on C&amp;C side");
   //let heartbeat_received = false;
   </span><span class="kw">loop </span>{
     <span class="kw">match </span>thread_control.lock() {
       <span class="prelude-val">Ok</span>(tc) =&gt; {
         <span class="kw">if </span>tc.stop_flag {
-          <span class="macro">info!</span>(<span class="string">&quot;Received stop signal. Will stop thread!&quot;</span>);
+          <span class="macro">info!</span>(<span class="string">"Received stop signal. Will stop thread!"</span>);
           <span class="kw">break</span>;
         }
       },
       <span class="prelude-val">Err</span>(err) =&gt; {
-        <span class="macro">trace!</span>(<span class="string">&quot;Can&#39;t acquire lock! {err}&quot;</span>);
+        <span class="macro">trace!</span>(<span class="string">"Can't acquire lock! {err}"</span>);
       },
     }
     <span class="comment">// Not sure how to deal with the connection. Poll? Or wait blocking?
-    // Or don&#39;t block? Set a timeout? I guess technically since we are not doing
+    // Or don't block? Set a timeout? I guess technically since we are not doing
     // anything else here, we can block until we get something, this saves resources.
     // (in that case the DONTWAIT can go away)
     // Paolo: I would say that either blocking or setting a timeout is the best opt.
     //  Probably setting a timeout is the best practice since, else, we might die.
-    //  If we wouldn&#39;t block some other commands might be sent and get stuck in the
+    //  If we wouldn't block some other commands might be sent and get stuck in the
     //  process (?).
     </span><span class="kw">match </span>cmd_socket.recv_bytes(<span class="number">0</span>) {
     <span class="comment">//match cmd_socket.recv_bytes(zmq::DONTWAIT) {
-      </span><span class="prelude-val">Err</span>(err) =&gt; <span class="macro">trace!</span>(<span class="string">&quot;Problem receiving command over 0MQ ! Err {err}&quot;</span>),
+      </span><span class="prelude-val">Err</span>(err) =&gt; <span class="macro">trace!</span>(<span class="string">"Problem receiving command over 0MQ ! Err {err}"</span>),
       <span class="prelude-val">Ok</span>(cmd_bytes)  =&gt; {
-        <span class="macro">debug!</span>(<span class="string">&quot;Received bytes {}&quot;</span>, cmd_bytes.len());
+        <span class="macro">debug!</span>(<span class="string">"Received bytes {}"</span>, cmd_bytes.len());
         <span class="comment">// it will always be a tof packet
         </span><span class="kw">match </span>TofPacket::from_bytestream(<span class="kw-2">&amp;</span>cmd_bytes, <span class="kw-2">&amp;mut </span><span class="number">4</span>) {
           <span class="prelude-val">Err</span>(err) =&gt; {
-            <span class="macro">error!</span>(<span class="string">&quot;Can not decode TofPacket! bytes {:?}, error {err}&quot;</span>, cmd_bytes);
+            <span class="macro">error!</span>(<span class="string">"Can not decode TofPacket! bytes {:?}, error {err}"</span>, cmd_bytes);
           },
           <span class="prelude-val">Ok</span>(tp) =&gt; {
             <span class="kw">match </span>tp.packet_type {
@@ -822,7 +746,7 @@
                 <span class="comment">// we have to strip off the topic
                 </span><span class="kw">match </span>TofCommand::from_bytestream(<span class="kw-2">&amp;</span>tp.payload, <span class="kw-2">&amp;mut </span><span class="number">0</span>) {
                   <span class="prelude-val">Err</span>(err) =&gt; {
-                    <span class="macro">error!</span>(<span class="string">&quot;Problem decoding command {}&quot;</span>, err);
+                    <span class="macro">error!</span>(<span class="string">"Problem decoding command {err}"</span>);
                   }
                   <span class="prelude-val">Ok</span>(cmd)  =&gt; {
                     <span class="comment">// we got a valid tof command, forward it and wait for the 
@@ -830,32 +754,38 @@
                     </span><span class="kw">let </span>tof_resp  = TofResponse::GeneralFail(TofCommandResp::RespErrNotImplemented <span class="kw">as </span>u32);
                     <span class="kw">let </span>resp_not_implemented = prefix_board_id(<span class="kw-2">&amp;mut </span>tof_resp.to_bytestream());
                     <span class="comment">//let resp_not_implemented = TofResponse::GeneralFail(RESP_ERR_NOTIMPLEMENTED);
-                    </span><span class="kw">match </span>cmd {
+                    </span><span class="kw">let </span>return_val: <span class="prelude-ty">Result</span>&lt;TofCommandCode, CmdError&gt;;
+                    <span class="kw">match </span>cmd {
                       TofCommand::Unknown (<span class="kw">_</span>) =&gt; {
-                        <span class="macro">info!</span>(<span class="string">&quot;Received unknown command&quot;</span>);
-                        <span class="kw">let </span>r = TofResponse::GeneralFail(TofCommandResp::RespErrUnexecutable <span class="kw">as </span>u32);
-                        <span class="kw">match </span>cmd_socket.send(r.to_bytestream(),<span class="number">0</span>) {
-                          <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">&quot;Can not send response!, Err {err}&quot;</span>),
-                          <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">&quot;Responded to Uknown!&quot;</span>)
-                        }
-                        <span class="macro">warn!</span>(<span class="string">&quot;Can not interpret Unknown command!&quot;</span>);
-                        <span class="kw">continue</span>;
+                        <span class="macro">info!</span>(<span class="string">"Received unknown command"</span>);
+                        <span class="macro">error!</span>(<span class="string">"Cannot interpret unknown command"</span>);
+                        return_val = <span class="prelude-val">Err</span>(CmdError::UnknownError);
+                      },
+                      TofCommand::Listen (<span class="kw">_</span>) =&gt; {
+                        <span class="macro">info!</span>(<span class="string">"Received listen command"</span>);
+                        <span class="macro">error!</span>(<span class="string">"Listening inception!"</span>);
+                        return_val = <span class="prelude-val">Err</span>(CmdError::ListenError);
                       },
                       TofCommand::Ping (value) =&gt; {
+                        <span class="macro">info!</span>(<span class="string">"Received ping command"</span>);
                         <span class="comment">// MSB third 8 bits are 
                         </span><span class="kw">let </span>tof_component: TofComponent = TofComponent::from(((value | MASK_CMD_8BIT &lt;&lt; <span class="number">8</span>) &gt;&gt; <span class="number">8</span>) <span class="kw">as </span>u8);
                         <span class="comment">// MSB fourth 8 bits are 
                         </span><span class="kw">let </span>id: u8 = (value | MASK_CMD_8BIT) <span class="kw">as </span>u8;
+                        <span class="comment">// Function that just replies to a ping command send to tofcpu
+                        // get_board_id PANICS!! TODO
+                        </span><span class="kw">let </span>rb_id = get_board_id().unwrap() <span class="kw">as </span>u8;
 
-                        <span class="kw">let </span>return_val;
-                        <span class="kw">match </span>tof_component {
-                          TofComponent::RB =&gt; {
-                            <span class="macro">info!</span>(<span class="string">&quot;Received moni command&quot;</span>);
-                            <span class="comment">// Function that just replies to a ping command send to tofcpu
-                            // get_board_id PANICS!! TODO
-                            </span><span class="kw">let </span>rb_id = get_board_id().unwrap() <span class="kw">as </span>u8;
-
-                            <span class="kw">if </span>rb_id == id {
+                        <span class="kw">if </span>tof_component != TofComponent::MT &amp;&amp;
+                           tof_component != TofComponent::TofCpu &amp;&amp;
+                           tof_component != TofComponent::Unknown &amp;&amp;
+                           rb_id != id {
+                          <span class="comment">// The packet was not for this RB so bye
+                          </span><span class="kw">continue</span>;
+                        } <span class="kw">else </span>{
+                          <span class="kw">match </span>tof_component {
+                            TofComponent::RB =&gt; {
+                              <span class="macro">info!</span>(<span class="string">"Received ping command"</span>);
                               <span class="kw">let </span><span class="kw-2">mut </span>tp = TofPacket::new();
                               tp.packet_type = PacketType::Ping;
                               <span class="comment">// TODO what do we want here
@@ -863,138 +793,104 @@
 
                               <span class="kw">match </span>ev_request_to_cache.send(tp) {
                                 <span class="prelude-val">Err</span>(err) =&gt; {
-                                  <span class="macro">error!</span>(<span class="string">&quot;TofCpu moni sending failed! Err {}&quot;</span>, err);
-                                  return_val = <span class="prelude-val">Err</span>(SetError::CanNotConnectToMyOwnZMQSocket);
+                                  <span class="macro">error!</span>(<span class="string">"RB ping sending failed! Err {err}"</span>);
+                                  return_val = <span class="prelude-val">Err</span>(CmdError::PingError);
                                 }
                                 <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
-                                  return_val = <span class="prelude-val">Ok</span>(());
+                                  <span class="macro">info!</span>(<span class="string">"RB ping sent!"</span>);
+                                  return_val = <span class="prelude-val">Ok</span>(TofCommandCode::CmdPing);
                                 }
                               };
-                            } <span class="kw">else </span>{
-                              <span class="comment">// The packet was not for this RB so bye
-                              </span><span class="kw">continue</span>;
-                            }
-                            
-                            <span class="kw">match </span>return_val {
-                              <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
-                                <span class="kw">let </span>r = TofResponse::GeneralFail(TofCommandResp::RespErrUnexecutable <span class="kw">as </span>u32);
-                                <span class="kw">match </span>cmd_socket.send(r.to_bytestream(),<span class="number">0</span>) {
-                                  <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">&quot;Can not send response!, Err {err}&quot;</span>),
-                                  <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">&quot;Responded to Moni!&quot;</span>)
-                                }
-                              },
-                              <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
-                                <span class="kw">let </span>r = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed <span class="kw">as </span>u32);
-                                <span class="kw">match </span>cmd_socket.send(r.to_bytestream(),<span class="number">0</span>) {
-                                  <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">&quot;Can not send response!, Err {err}&quot;</span>),
-                                  <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">&quot;Responded to Moni!&quot;</span>)
-                                }
-                              }
-                            }
-                            <span class="kw">continue</span>;
-                          },
-                          TofComponent::PB  =&gt; {
-                            return_val = <span class="prelude-val">Err</span>(SetError::EmptyInputData);
-                            <span class="macro">warn!</span>(<span class="string">&quot;Not implemented for PB yet&quot;</span>)
-                          },
-                          TofComponent::LTB =&gt; {
-                            return_val = <span class="prelude-val">Err</span>(SetError::EmptyInputData);
-                            <span class="macro">warn!</span>(<span class="string">&quot;Not implemented for LTB yet&quot;</span>)
-                          },
-                          <span class="kw">_                 </span>=&gt; {
-                            return_val = <span class="prelude-val">Err</span>(SetError::EmptyInputData);
-                            <span class="macro">error!</span>(<span class="string">&quot;An RB can control just PBs and LTBs.&quot;</span>)
-                          }
-                        }
-
-                        <span class="kw">match </span>return_val {
-                          <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
-                            <span class="kw">let </span>r = TofResponse::GeneralFail(TofCommandResp::RespErrUnexecutable <span class="kw">as </span>u32);
-                            <span class="kw">match </span>cmd_socket.send(r.to_bytestream(),<span class="number">0</span>) {
-                              <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">&quot;Can not send response!, Err {err}&quot;</span>),
-                              <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">&quot;Responded to Power!&quot;</span>)
-                            }
-                          },
-                          <span class="prelude-val">Ok</span>(<span class="kw">_</span>)  =&gt; {
-                            <span class="kw">let </span>r = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed <span class="kw">as </span>u32);
-                            <span class="kw">match </span>cmd_socket.send(r.to_bytestream(),<span class="number">0</span>) {
-                              <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">&quot;Can not send response!, Err {err}&quot;</span>),
-                              <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">&quot;Responded to Moni!&quot;</span>)
+                            },
+                            TofComponent::PB  =&gt; {
+                              return_val = <span class="prelude-val">Err</span>(CmdError::PingError);
+                              <span class="macro">warn!</span>(<span class="string">"Not implemented for PB yet"</span>)
+                            },
+                            TofComponent::LTB =&gt; {
+                              return_val = <span class="prelude-val">Err</span>(CmdError::PingError);
+                              <span class="macro">warn!</span>(<span class="string">"Not implemented for LTB yet"</span>)
+                            },
+                            <span class="kw">_                 </span>=&gt; {
+                              return_val = <span class="prelude-val">Err</span>(CmdError::PingError);
+                              <span class="macro">error!</span>(<span class="string">"An RB can control just PBs and LTBs."</span>)
                             }
                           }
                         }
-                        <span class="kw">continue</span>;
                       },
                       TofCommand::Moni (value) =&gt; {
                         <span class="comment">// MSB third 8 bits are 
                         </span><span class="kw">let </span>tof_component: TofComponent = TofComponent::from(((value | MASK_CMD_8BIT &lt;&lt; <span class="number">8</span>) &gt;&gt; <span class="number">8</span>) <span class="kw">as </span>u8);
                         <span class="comment">// MSB fourth 8 bits are 
                         </span><span class="kw">let </span>id: u8 = (value | MASK_CMD_8BIT) <span class="kw">as </span>u8;
+                        <span class="comment">// Function that just replies to a ping command send to tofcpu
+                        // get_board_id PANICS!! TODO
+                        </span><span class="kw">let </span>rb_id = get_board_id().unwrap() <span class="kw">as </span>u8;
 
-                        <span class="comment">// TODO implement proper routines
-                        </span><span class="kw">let </span>return_val;
-                        <span class="kw">match </span>tof_component {
-                          TofComponent::RB =&gt; {
-                            <span class="macro">info!</span>(<span class="string">&quot;Received moni command&quot;</span>);
-                            <span class="comment">// Function that just replies to a ping command send to tofcpu
-                            // get_board_id PANICS!! TODO
-                            </span><span class="kw">let </span>rb_id = get_board_id().unwrap() <span class="kw">as </span>u8;
+                        <span class="kw">if </span>tof_component != TofComponent::MT &amp;&amp;
+                           tof_component != TofComponent::TofCpu &amp;&amp;
+                           tof_component != TofComponent::Unknown &amp;&amp;
+                           rb_id != id {
+                          <span class="comment">// The packet was not for this RB so bye
+                          </span><span class="kw">continue</span>;
+                        } <span class="kw">else </span>{
+                          <span class="kw">match </span>tof_component {
+                            TofComponent::RB =&gt; {
+                              <span class="macro">info!</span>(<span class="string">"Received RB moni command"</span>);
+                              <span class="kw">let </span>moni = get_rb_moni(id).unwrap();
+                              <span class="kw">let </span>tp = TofPacket::from(<span class="kw-2">&amp;</span>moni);
 
-                            <span class="kw">if </span>rb_id == id {
-                              <span class="kw">let </span><span class="kw-2">mut </span>tp = TofPacket::new();
-                              tp.packet_type = PacketType::Monitor;
-                              tp.payload = <span class="macro">vec!</span>[TofComponent::RB <span class="kw">as </span>u8, rb_id];
-
-                              <span class="comment">// JUST A PLACEHOLDER TODO! WHAT DO WE WANT TO HAVE HERE
-
-                              </span><span class="kw">match </span>ev_request_to_cache.send(tp) {
+                              <span class="kw">match </span>ev_request_to_cache.send(tp) {
                                 <span class="prelude-val">Err</span>(err) =&gt; {
-                                  <span class="macro">error!</span>(<span class="string">&quot;TofCpu moni sending failed! Err {}&quot;</span>, err);
-                                  return_val = <span class="prelude-val">Err</span>(SetError::CanNotConnectToMyOwnZMQSocket);
+                                  <span class="macro">error!</span>(<span class="string">"RB moni sending failed! Err {err}"</span>);
+                                  return_val = <span class="prelude-val">Err</span>(CmdError::MoniError);
                                 }
                                 <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
-                                  return_val = <span class="prelude-val">Ok</span>(());
+                                  <span class="macro">info!</span>(<span class="string">"RB moni sent"</span>);
+                                  return_val = <span class="prelude-val">Ok</span>(TofCommandCode::CmdMoni);
                                 }
                               };
-                            } <span class="kw">else </span>{
-                              <span class="comment">// The packet was not for this RB so bye
-                              </span><span class="kw">continue</span>;
-                            }
-                          },
-                          TofComponent::PB  =&gt; {
-                            return_val = <span class="prelude-val">Err</span>(SetError::EmptyInputData);
-                            <span class="macro">warn!</span>(<span class="string">&quot;Not implemented for PB yet&quot;</span>)
-                          },
-                          TofComponent::LTB =&gt; {
-                            return_val = <span class="prelude-val">Err</span>(SetError::EmptyInputData);
-                            <span class="macro">warn!</span>(<span class="string">&quot;Not implemented for LTB yet&quot;</span>)
-                          },
-                          <span class="kw">_                 </span>=&gt; {
-                            return_val = <span class="prelude-val">Err</span>(SetError::EmptyInputData);
-                            <span class="macro">error!</span>(<span class="string">&quot;An RB can control just PBs and LTBs.&quot;</span>)
-                          }
-                        }
+                            },
+                            TofComponent::PB  =&gt; {
+                              <span class="macro">info!</span>(<span class="string">"Received PB moni command"</span>);
+                              <span class="kw">let </span>moni = get_pb_moni(id).unwrap();
+                              <span class="kw">let </span>tp = TofPacket::from(<span class="kw-2">&amp;</span>moni);
 
-                        <span class="kw">match </span>return_val {
-                          <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
-                            <span class="kw">let </span>r = TofResponse::GeneralFail(TofCommandResp::RespErrUnexecutable <span class="kw">as </span>u32);
-                            <span class="kw">match </span>cmd_socket.send(r.to_bytestream(),<span class="number">0</span>) {
-                              <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">&quot;Can not send response!, Err {err}&quot;</span>),
-                              <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">&quot;Responded to Power!&quot;</span>)
-                            }
-                          },
-                          <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
-                            <span class="kw">let </span>r = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed <span class="kw">as </span>u32);
-                            <span class="kw">match </span>cmd_socket.send(r.to_bytestream(),<span class="number">0</span>) {
-                              <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">&quot;Can not send response!, Err {err}&quot;</span>),
-                              <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">&quot;Responded to Moni!&quot;</span>)
+                              <span class="kw">match </span>ev_request_to_cache.send(tp) {
+                                <span class="prelude-val">Err</span>(err) =&gt; {
+                                  <span class="macro">error!</span>(<span class="string">"PB moni sending failed! Err {err}"</span>);
+                                  return_val = <span class="prelude-val">Err</span>(CmdError::MoniError);
+                                }
+                                <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
+                                  <span class="macro">info!</span>(<span class="string">"PB moni sent"</span>);
+                                  return_val = <span class="prelude-val">Ok</span>(TofCommandCode::CmdMoni);
+                                }
+                              };
+                            },
+                            TofComponent::LTB =&gt; {
+                              <span class="macro">info!</span>(<span class="string">"Received LTB moni command"</span>);
+                              <span class="kw">let </span>moni = get_ltb_moni(id).unwrap();
+                              <span class="kw">let </span>tp = TofPacket::from(<span class="kw-2">&amp;</span>moni);
+
+                              <span class="kw">match </span>ev_request_to_cache.send(tp) {
+                                <span class="prelude-val">Err</span>(err) =&gt; {
+                                  <span class="macro">error!</span>(<span class="string">"LTB moni sending failed! Err {err}"</span>);
+                                  return_val = <span class="prelude-val">Err</span>(CmdError::MoniError);
+                                }
+                                <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
+                                  <span class="macro">info!</span>(<span class="string">"LTB moni sent"</span>);
+                                  return_val = <span class="prelude-val">Ok</span>(TofCommandCode::CmdMoni);
+                                }
+                              };
+                            },
+                            <span class="kw">_                 </span>=&gt; {
+                              return_val = <span class="prelude-val">Err</span>(CmdError::MoniError);
+                              <span class="macro">error!</span>(<span class="string">"An RB can control just PBs and LTBs."</span>)
                             }
                           }
                         }
-                        <span class="kw">continue</span>;
                       },
                       TofCommand::Power   (value) =&gt; {
-                        <span class="macro">info!</span>(<span class="string">&quot;Received set threshold command! Will communicate to LTBs&quot;</span>);
+                        <span class="macro">info!</span>(<span class="string">"Received power command"</span>);
                         <span class="comment">// MSB second 8 bits are tof component
                         </span><span class="kw">let </span>tof_component: TofComponent = TofComponent::from(((value | (MASK_CMD_8BIT &lt;&lt; <span class="number">16</span>)) &gt;&gt; <span class="number">16</span>) <span class="kw">as </span>u8);
                         <span class="comment">// MSB third 8 bits are 
@@ -1002,59 +898,41 @@
                         <span class="comment">// MSB fourth 8 bits are 
                         </span><span class="kw">let </span>status: PowerStatusEnum = PowerStatusEnum::from((value | MASK_CMD_8BIT) <span class="kw">as </span>u8);
                         <span class="comment">// TODO implement proper routines
-                        </span><span class="kw">let </span>return_val;
-                        <span class="kw">match </span>tof_component {
+                        </span><span class="kw">match </span>tof_component {
                           TofComponent::All      =&gt; {
-                            return_val = <span class="prelude-val">Err</span>(SetError::EmptyInputData);
-                            <span class="macro">warn!</span>(<span class="string">&quot;Not implemented for All yet&quot;</span>)
+                            return_val = <span class="prelude-val">Err</span>(CmdError::PowerError);
+                            <span class="macro">warn!</span>(<span class="string">"Not implemented for All yet"</span>)
                           }, <span class="comment">//power_all(cmd_socket, component_id, status),
                           </span>TofComponent::MT       =&gt; {
-                            return_val = <span class="prelude-val">Err</span>(SetError::EmptyInputData);
-                            <span class="macro">warn!</span>(<span class="string">&quot;Not implemented for MT yet&quot;</span>)
+                            return_val = <span class="prelude-val">Err</span>(CmdError::PowerError);
+                            <span class="macro">warn!</span>(<span class="string">"Not implemented for MT yet"</span>)
                           }, <span class="comment">//power_mt(cmd_socket, component_id, status),
                           </span>TofComponent::AllButMT =&gt; {
-                            return_val = <span class="prelude-val">Err</span>(SetError::EmptyInputData);
-                            <span class="macro">warn!</span>(<span class="string">&quot;Not implemented for AllButMT yet&quot;</span>)
+                            return_val = <span class="prelude-val">Err</span>(CmdError::PowerError);
+                            <span class="macro">warn!</span>(<span class="string">"Not implemented for AllButMT yet"</span>)
                           }, <span class="comment">//power_allbutmt(cmd_socket, component_id, status),
                           </span>TofComponent::LTB      =&gt; {
                             return_val = power_ltb(component_id, status);
                             <span class="kw">match </span>return_val {
-                              <span class="prelude-val">Ok</span>(<span class="kw">_</span>)  =&gt; <span class="macro">trace!</span>(<span class="string">&quot;LTB powered up!&quot;</span>),
-                              <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="macro">warn!</span>(<span class="string">&quot;Not able to power up LTB!&quot;</span>)
+                              <span class="prelude-val">Ok</span>(<span class="kw">_</span>)  =&gt; <span class="macro">info!</span>(<span class="string">"LTB powered up!"</span>),
+                              <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="macro">error!</span>(<span class="string">"Not able to power up LTB!"</span>)
                             };
                           },
                           TofComponent::Preamp   =&gt; {
                             return_val = power_preamp(component_id, status);
                             <span class="kw">match </span>return_val {
-                              <span class="prelude-val">Ok</span>(<span class="kw">_</span>)  =&gt; <span class="macro">trace!</span>(<span class="string">&quot;Preamp powered up!&quot;</span>),
-                              <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="macro">warn!</span>(<span class="string">&quot;Not able to power up Preamp!&quot;</span>)
+                              <span class="prelude-val">Ok</span>(<span class="kw">_</span>)  =&gt; <span class="macro">info!</span>(<span class="string">"Preamp powered up!"</span>),
+                              <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="macro">error!</span>(<span class="string">"Not able to power up Preamp!"</span>)
                             };
                           },
                           <span class="kw">_                      </span>=&gt; {
-                            return_val = <span class="prelude-val">Err</span>(SetError::EmptyInputData);
-                            <span class="macro">error!</span>(<span class="string">&quot;Power operation not implemented for Unknown!&quot;</span>)
+                            <span class="macro">error!</span>(<span class="string">"Power operation not implemented for Unknown!"</span>);
+                            return_val = <span class="prelude-val">Err</span>(CmdError::PowerError);
                           }
                         }
-                        <span class="kw">match </span>return_val {
-                          <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
-                            <span class="kw">let </span>r = TofResponse::GeneralFail(TofCommandResp::RespErrUnexecutable <span class="kw">as </span>u32);
-                            <span class="kw">match </span>cmd_socket.send(r.to_bytestream(),<span class="number">0</span>) {
-                              <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">&quot;Can not send response!, Err {err}&quot;</span>),
-                              <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">&quot;Responded to Power!&quot;</span>)
-                            }
-                          },
-                          <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
-                            <span class="kw">let </span>r = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed <span class="kw">as </span>u32);
-                            <span class="kw">match </span>cmd_socket.send(r.to_bytestream(),<span class="number">0</span>) {
-                              <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">&quot;Can not send response!, Err {err}&quot;</span>),
-                              <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">&quot;Responded to Power!&quot;</span>)
-                            }
-                          }
-                        }
-                        <span class="kw">continue</span>;
                       },
                       TofCommand::SetThresholds   (value) =&gt;  {
-                        <span class="macro">info!</span>(<span class="string">&quot;Received set threshold command! Will communicate to LTBs&quot;</span>);
+                        <span class="macro">info!</span>(<span class="string">"Received set threshold command! Will communicate to LTBs"</span>);
                         <span class="comment">// MSB first 8 bits are LTB ID
                         </span><span class="kw">let </span>ltb_id: u8 = ((value | (MASK_CMD_8BIT &lt;&lt; <span class="number">24</span>)) &gt;&gt; <span class="number">24</span>) <span class="kw">as </span>u8;
                         <span class="comment">// MSB second 8 bits are LTB ID
@@ -1062,58 +940,36 @@
                         <span class="comment">// MSB third 16 bits are extra (not used)
                         </span><span class="kw">let </span>threshold_level: u16 = (value | MASK_CMD_16BIT) <span class="kw">as </span>u16;
                         <span class="kw">match </span>send_ltb_threshold_set(ltb_id, threshold_name, threshold_level) {
-                          <span class="prelude-val">Err</span>(err) =&gt; {
-                            <span class="kw">let </span>r = TofResponse::GeneralFail(TofCommandResp::RespErrUnexecutable <span class="kw">as </span>u32);
-                            <span class="kw">match </span>cmd_socket.send(r.to_bytestream(),<span class="number">0</span>) {
-                              <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">&quot;Can not send response!, Err {err}&quot;</span>),
-                              <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">&quot;Responded to SetThreshold!&quot;</span>)
-                            }
-                            <span class="macro">warn!</span>(<span class="string">&quot;Can not set ltb threshold! Err {err}&quot;</span>)
-                          },
                           <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
-                            <span class="kw">let </span>r = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed <span class="kw">as </span>u32);
-                            <span class="kw">match </span>cmd_socket.send(r.to_bytestream(),<span class="number">0</span>) {
-                              <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">&quot;Can not send response!, Err {err}&quot;</span>),
-                              <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">&quot;Responded to SetThreshold!&quot;</span>)
-                            }
-                            <span class="macro">trace!</span>(<span class="string">&quot;Resp sent!&quot;</span>)
+                            <span class="macro">info!</span>(<span class="string">"Threshold sent to LTB!"</span>);
+                            return_val = <span class="prelude-val">Ok</span>(TofCommandCode::CmdSetThresholds);
+                          },
+                          <span class="prelude-val">Err</span>(err) =&gt; {
+                            <span class="macro">error!</span>(<span class="string">"LTB threshold sending failed! Err {err}"</span>);
+                            return_val = <span class="prelude-val">Err</span>(CmdError::ThresholdSetError);
                           }
                         }
-                        <span class="kw">continue</span>;
                       },
                       TofCommand::SetMTConfig  (<span class="kw">_</span>) =&gt; {
-                        <span class="macro">warn!</span>(<span class="string">&quot;Not implemented&quot;</span>);
-                        <span class="kw">match </span>cmd_socket.send(resp_not_implemented,<span class="number">0</span>) {
-                          <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">&quot;Can not send response! Err {err}&quot;</span>),
-                          <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">trace!</span>(<span class="string">&quot;Resp sent!&quot;</span>)
-                        }
-                        <span class="kw">continue</span>;
+                        <span class="macro">warn!</span>(<span class="string">"Not implemented"</span>);
+                        return_val = <span class="prelude-val">Err</span>(CmdError::NotImplementedError);
                       },
                       TofCommand::SetPreampBias   (value) =&gt;  {
-                        <span class="macro">info!</span>(<span class="string">&quot;Received set preamp bias command! Will communicate to preamps&quot;</span>);
+                        <span class="macro">info!</span>(<span class="string">"Received set preamp bias command! Will communicate to preamps"</span>);
                         <span class="comment">// MSB second 8 bits are LTB ID
                         </span><span class="kw">let </span>preamp_id: u8 = ((value | (MASK_CMD_8BIT &lt;&lt; <span class="number">16</span>)) &gt;&gt; <span class="number">16</span>) <span class="kw">as </span>u8;
                         <span class="comment">// MSB third 16 bits are extra (not used)
                         </span><span class="kw">let </span>preamp_bias: u16 = (value | MASK_CMD_16BIT) <span class="kw">as </span>u16;
                         <span class="kw">match </span>send_preamp_bias_set(preamp_id, preamp_bias) {
-                          <span class="prelude-val">Err</span>(err) =&gt; {
-                            <span class="kw">let </span>r = TofResponse::GeneralFail(TofCommandResp::RespErrUnexecutable <span class="kw">as </span>u32);
-                            <span class="kw">match </span>cmd_socket.send(r.to_bytestream(),<span class="number">0</span>) {
-                              <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">&quot;Can not send response!, Err {err}&quot;</span>),
-                              <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">&quot;Responded to SetPreampBias!&quot;</span>)
-                            }
-                            <span class="macro">warn!</span>(<span class="string">&quot;Can not set ltb threshold! Err {err}&quot;</span>)
-                          },
                           <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
-                            <span class="kw">let </span>r = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed <span class="kw">as </span>u32);
-                            <span class="kw">match </span>cmd_socket.send(r.to_bytestream(),<span class="number">0</span>) {
-                              <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">&quot;Can not send response!, Err {err}&quot;</span>),
-                              <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">&quot;Responded to SetPreampBias!&quot;</span>)
-                            }
-                            <span class="macro">trace!</span>(<span class="string">&quot;Resp sent!&quot;</span>)
+                            <span class="macro">info!</span>(<span class="string">"Bias sent to preamp!"</span>);
+                            return_val = <span class="prelude-val">Ok</span>(TofCommandCode::CmdSetPreampBias);
+                          },
+                          <span class="prelude-val">Err</span>(err) =&gt; {
+                            <span class="macro">error!</span>(<span class="string">"Preamp bias sending failed! Err {err}"</span>);
+                            return_val = <span class="prelude-val">Err</span>(CmdError::PreampBiasSetError);
                           }
                         }
-                        <span class="kw">continue</span>;
                       },
                       TofCommand::DataRunStop(value)   =&gt; {
                         <span class="comment">// MSB fourth 8 bits are RB ID
@@ -1122,21 +978,24 @@
                         <span class="kw">let </span>my_rb_id = get_board_id().unwrap() <span class="kw">as </span>u8;
                         <span class="comment">// if this RB is the one then do stuff
                         </span><span class="kw">if </span>rb_id == DEFAULT_RB_ID || rb_id == my_rb_id {
-                          <span class="macro">println!</span>(<span class="string">&quot;Received command to end run!&quot;</span>);
+                          <span class="macro">println!</span>(<span class="string">"Received command to end run!"</span>);
                           <span class="comment">// default is not active for run config
 
                           </span><span class="kw">let </span>rc = RunConfig::new();
                           <span class="kw">match </span>run_config.send(rc) {
-                            <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Error stopping run! {err}&quot;</span>),
-                            <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
+                            <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
+                              <span class="macro">info!</span>(<span class="string">"Run stopped successfully!"</span>);
+                              return_val = <span class="prelude-val">Ok</span>(TofCommandCode::CmdDataRunStop);
+                            },
+                            <span class="prelude-val">Err</span>(err) =&gt; {
+                              <span class="macro">error!</span>(<span class="string">"Error stopping run! {err}"</span>);
+                              return_val = <span class="prelude-val">Err</span>(CmdError::RunStopError);
+                            }
                           }
-                          <span class="kw">let </span>resp_good = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed <span class="kw">as </span>u32);
-                          <span class="kw">match </span>cmd_socket.send(resp_good.to_bytestream(),<span class="number">0</span>) {
-                            <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">&quot;Can not send response! Err {err}&quot;</span>),
-                            <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">trace!</span>(<span class="string">&quot;Resp sent!&quot;</span>)
-                          }
+                        } <span class="kw">else </span>{
+                          <span class="comment">// The packet was not for this RB so bye
+                          </span><span class="kw">continue</span>;
                         }
-                        <span class="kw">continue</span>;
                       },
                       TofCommand::DataRunStart (value) =&gt; {
                         <span class="comment">// MSB second 8 bits are run_type
@@ -1145,41 +1004,36 @@
                         </span><span class="kw">let </span>rb_id: u8    = ((value | (MASK_CMD_8BIT &lt;&lt; <span class="number">8</span>)) &gt;&gt; <span class="number">8</span>) <span class="kw">as </span>u8;
                         <span class="comment">// MSB fourth 8 bits are event number
                         </span><span class="kw">let </span>event_no: u8 = (value | MASK_CMD_8BIT) <span class="kw">as </span>u8;
-                        <span class="comment">// let&#39;s start a run. The value of the TofCommnad shall be 
+                        <span class="comment">// let's start a run. The value of the TofCommnad shall be 
                         // nevents
 
                         </span><span class="kw">let </span>my_rb_id = get_board_id().unwrap() <span class="kw">as </span>u8;
                         <span class="comment">// if this RB is the one then do stuff
                         </span><span class="kw">if </span>rb_id == DEFAULT_RB_ID || rb_id == my_rb_id {
-                          <span class="macro">println!</span>(<span class="string">&quot;==&gt; Will initialize new run!&quot;</span>);
+                          <span class="macro">println!</span>(<span class="string">"==&gt; Will initialize new run!"</span>);
                           <span class="kw">let </span>rc    = get_runconfig(<span class="kw-2">&amp;</span>run_config_file);
                           <span class="kw">match </span>run_config.send(rc) {
-                            <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Error initializing run! {err}&quot;</span>),
-                            <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
+                            <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
+                              <span class="macro">info!</span>(<span class="string">"Run started successfully!"</span>);
+                              return_val = <span class="prelude-val">Ok</span>(TofCommandCode::CmdDataRunStart);
+                            },
+                            <span class="prelude-val">Err</span>(err) =&gt; {
+                              <span class="macro">error!</span>(<span class="string">"Error starting run! {err}"</span>);
+                              return_val = <span class="prelude-val">Err</span>(CmdError::RunStartError);
+                            }
                           };
-                          <span class="kw">let </span>resp_good = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed <span class="kw">as </span>u32);
-                          <span class="kw">match </span>cmd_socket.send(resp_good.to_bytestream(),<span class="number">0</span>) {
-                            <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">&quot;Can not send response! Err {err}&quot;</span>),
-                            <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">trace!</span>(<span class="string">&quot;Resp sent!&quot;</span>)
-                          }
+                        } <span class="kw">else </span>{
+                          <span class="comment">// The packet was not for this RB so bye
+                          </span><span class="kw">continue</span>;
                         }
-                        <span class="kw">continue</span>;
                       },
                       TofCommand::StartValidationRun  (<span class="kw">_</span>) =&gt; {
-                        <span class="macro">warn!</span>(<span class="string">&quot;Not implemented&quot;</span>);
-                        <span class="kw">match </span>cmd_socket.send(resp_not_implemented,<span class="number">0</span>) {
-                          <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">&quot;Can not send response! Err {err}&quot;</span>),
-                          <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">trace!</span>(<span class="string">&quot;Resp sent!&quot;</span>)
-                        }
-                        <span class="kw">continue</span>;
+                        <span class="macro">warn!</span>(<span class="string">"Not implemented"</span>);
+                        return_val = <span class="prelude-val">Err</span>(CmdError::NotImplementedError);
                       },
                       TofCommand::GetFullWaveforms  (<span class="kw">_</span>) =&gt; {
-                        <span class="macro">warn!</span>(<span class="string">&quot;Not implemented&quot;</span>);
-                        <span class="kw">match </span>cmd_socket.send(resp_not_implemented,<span class="number">0</span>) {
-                          <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">&quot;Can not send response! Err {err}&quot;</span>),
-                          <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">trace!</span>(<span class="string">&quot;Resp sent!&quot;</span>)
-                        }
-                        <span class="kw">continue</span>;
+                        <span class="macro">warn!</span>(<span class="string">"Not implemented"</span>);
+                        return_val = <span class="prelude-val">Err</span>(CmdError::NotImplementedError);
                       },
                       <span class="comment">// Voltage and timing calibration is connected now
                       </span>TofCommand::NoiCalibration (value) =&gt; {
@@ -1192,22 +1046,22 @@
                         <span class="comment">// if this RB is the one then do stuff
                         </span><span class="kw">if </span>rb_id == DEFAULT_RB_ID || rb_id == my_rb_id {
                           <span class="kw">match </span>rb_noi_subcalibration(<span class="kw-2">&amp;</span>run_config, <span class="kw-2">&amp;</span>ev_request_to_cache) {
-                            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; (),
+                            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
+                              <span class="macro">info!</span>(<span class="string">"No input data taking successful!"</span>);
+                              return_val = <span class="prelude-val">Ok</span>(TofCommandCode::CmdNoiCalibration);
+                            },
                             <span class="prelude-val">Err</span>(err) =&gt; {
-                              <span class="macro">error!</span>(<span class="string">&quot;Noi data taking failed! Error {err}!&quot;</span>);
+                              <span class="macro">error!</span>(<span class="string">"No input data taking failed! Error {err}!"</span>);
+                              return_val = <span class="prelude-val">Err</span>(CmdError::CalibrationError);
                             }
                           }
-
-                          <span class="kw">let </span>resp_good = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed <span class="kw">as </span>u32);
-                          <span class="kw">match </span>cmd_socket.send(resp_good.to_bytestream(),<span class="number">0</span>) {
-                            <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">&quot;Can not send response! Err {err}&quot;</span>),
-                            <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">trace!</span>(<span class="string">&quot;Resp sent!&quot;</span>)
-                          }
+                        } <span class="kw">else </span>{
+                          <span class="comment">// The packet was not for this RB so bye
+                          </span><span class="kw">continue</span>;
                         }
-                        <span class="kw">continue</span>;
                       },
                       TofCommand::VoltageCalibration (value) =&gt; {
-                        <span class="macro">trace!</span>(<span class="string">&quot;Got voltage calibration command with {value} value&quot;</span>);
+                        <span class="macro">trace!</span>(<span class="string">"Got voltage calibration command with {value} value"</span>);
                         <span class="comment">// MSB first 16 bits are voltage level
                         </span><span class="kw">let </span>voltage_val: u16 = ((value | (MASK_CMD_16BIT &lt;&lt; <span class="number">16</span>)) &gt;&gt; <span class="number">16</span>) <span class="kw">as </span>u16;
                         <span class="comment">// MSB third 8 bits are RB ID
@@ -1219,19 +1073,19 @@
                         <span class="comment">// if this RB is the one then do stuff
                         </span><span class="kw">if </span>rb_id == DEFAULT_RB_ID || rb_id == my_rb_id {
                           <span class="kw">match </span>rb_voltage_subcalibration(<span class="kw-2">&amp;</span>run_config, <span class="kw-2">&amp;</span>ev_request_to_cache, voltage_val) {
-                            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; (),
+                            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
+                              <span class="macro">info!</span>(<span class="string">"Voltage data taking successful!"</span>);
+                              return_val = <span class="prelude-val">Ok</span>(TofCommandCode::CmdVoltageCalibration);
+                            },
                             <span class="prelude-val">Err</span>(err) =&gt; {
-                              <span class="macro">error!</span>(<span class="string">&quot;Noi data taking failed! Error {err}!&quot;</span>);
+                              <span class="macro">error!</span>(<span class="string">"Voltage data taking failed! Error {err}!"</span>);
+                              return_val = <span class="prelude-val">Err</span>(CmdError::CalibrationError);
                             }
                           }
-
-                          <span class="kw">let </span>resp_good = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed <span class="kw">as </span>u32);
-                          <span class="kw">match </span>cmd_socket.send(resp_good.to_bytestream(),<span class="number">0</span>) {
-                            <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">&quot;Can not send response! Err {err}&quot;</span>),
-                            <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">trace!</span>(<span class="string">&quot;Resp sent!&quot;</span>)
-                          }
+                        } <span class="kw">else </span>{
+                          <span class="comment">// The packet was not for this RB so bye
+                          </span><span class="kw">continue</span>;
                         }
-                        <span class="kw">continue</span>;
                       },
                       TofCommand::TimingCalibration  (value) =&gt; {
                         <span class="comment">// MSB first 16 bits are voltage level
@@ -1245,19 +1099,19 @@
                         <span class="comment">// if this RB is the one then do stuff
                         </span><span class="kw">if </span>rb_id == DEFAULT_RB_ID || rb_id == my_rb_id {
                           <span class="kw">match </span>rb_timing_subcalibration(<span class="kw-2">&amp;</span>run_config, <span class="kw-2">&amp;</span>ev_request_to_cache, voltage_val) {
-                            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; (),
+                            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
+                              <span class="macro">info!</span>(<span class="string">"Timing data taking successful!"</span>);
+                              return_val = <span class="prelude-val">Ok</span>(TofCommandCode::CmdTimingCalibration);
+                            },
                             <span class="prelude-val">Err</span>(err) =&gt; {
-                              <span class="macro">error!</span>(<span class="string">&quot;Noi data taking failed! Error {err}!&quot;</span>);
+                              <span class="macro">error!</span>(<span class="string">"Timing data taking failed! Error {err}!"</span>);
+                              return_val = <span class="prelude-val">Err</span>(CmdError::CalibrationError);
                             }
                           }
-
-                          <span class="kw">let </span>resp_good = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed <span class="kw">as </span>u32);
-                          <span class="kw">match </span>cmd_socket.send(resp_good.to_bytestream(),<span class="number">0</span>) {
-                            <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">&quot;Can not send response! Err {err}&quot;</span>),
-                            <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">trace!</span>(<span class="string">&quot;Resp sent!&quot;</span>)
-                          }
+                        } <span class="kw">else </span>{
+                          <span class="comment">// The packet was not for this RB so bye
+                          </span><span class="kw">continue</span>;
                         }
-                        <span class="kw">continue</span>;
                       },
                       TofCommand::DefaultCalibration  (value) =&gt; {
                         <span class="comment">// MSB first 16 bits are voltage level
@@ -1271,77 +1125,74 @@
                         <span class="comment">// if this RB is the one then do stuff
                         </span><span class="kw">if </span>rb_id == DEFAULT_RB_ID || rb_id == my_rb_id {
                           <span class="kw">match </span>rb_calibration(<span class="kw-2">&amp;</span>run_config, <span class="kw-2">&amp;</span>ev_request_to_cache, address_for_cali.clone()) {
-                            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; (),
+                            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
+                              <span class="macro">info!</span>(<span class="string">"Default calibration data taking successful!"</span>);
+                              return_val = <span class="prelude-val">Ok</span>(TofCommandCode::CmdDefaultCalibration);
+                            },
                             <span class="prelude-val">Err</span>(err) =&gt; {
-                              <span class="macro">error!</span>(<span class="string">&quot;Calibration failed! Error {err}!&quot;</span>);
+                              <span class="macro">error!</span>(<span class="string">"Default calibration data taking failed! Error {err}!"</span>);
+                              return_val = <span class="prelude-val">Err</span>(CmdError::CalibrationError);
                             }
                           }
-
-                          <span class="kw">let </span>resp_good = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed <span class="kw">as </span>u32);
-                          <span class="kw">match </span>cmd_socket.send(resp_good.to_bytestream(),<span class="number">0</span>) {
-                            <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">&quot;Can not send response! Err {err}&quot;</span>),
-                            <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">trace!</span>(<span class="string">&quot;Resp sent!&quot;</span>)
-                          }
+                        } <span class="kw">else </span>{
+                          <span class="comment">// The packet was not for this RB so bye
+                          </span><span class="kw">continue</span>;
                         }
-                        <span class="kw">continue</span>;
                       },
                       TofCommand::SetRBDataBufSize   (<span class="kw">_</span>) =&gt; {
-                        <span class="macro">warn!</span>(<span class="string">&quot;Not implemented&quot;</span>);
-                        <span class="kw">match </span>cmd_socket.send(resp_not_implemented,<span class="number">0</span>) {
-                          <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">&quot;Can not send response! Err {err}&quot;</span>),
-                          <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">trace!</span>(<span class="string">&quot;Resp sent!&quot;</span>)
-                        }
-                        <span class="kw">continue</span>;
+                        <span class="macro">warn!</span>(<span class="string">"Not implemented"</span>);
+                        return_val = <span class="prelude-val">Err</span>(CmdError::NotImplementedError);
                       },
                       TofCommand::TriggerModeForced  (<span class="kw">_</span>) =&gt; {
-                        <span class="macro">warn!</span>(<span class="string">&quot;Not implemented&quot;</span>);
-                        <span class="kw">match </span>cmd_socket.send(resp_not_implemented,<span class="number">0</span>) {
-                          <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">&quot;Can not send response! Err {err}&quot;</span>),
-                          <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">trace!</span>(<span class="string">&quot;Resp sent!&quot;</span>)
-                        }
-                        <span class="kw">continue</span>;
+                        <span class="macro">warn!</span>(<span class="string">"Not implemented"</span>);
+                        return_val = <span class="prelude-val">Err</span>(CmdError::NotImplementedError);
                       },
                       TofCommand::TriggerModeForcedMTB   (<span class="kw">_</span>) =&gt; {
-                        <span class="macro">warn!</span>(<span class="string">&quot;Not implemented&quot;</span>);
-                        <span class="kw">match </span>cmd_socket.send(resp_not_implemented,<span class="number">0</span>) {
-                          <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">&quot;Can not send response! Err {err}&quot;</span>),
-                          <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">trace!</span>(<span class="string">&quot;Resp sent!&quot;</span>)
-                        }
-                        <span class="kw">continue</span>;
+                        <span class="macro">warn!</span>(<span class="string">"Not implemented"</span>);
+                        return_val = <span class="prelude-val">Err</span>(CmdError::NotImplementedError);
                       },
                       TofCommand::UnspoolEventCache  (<span class="kw">_</span>) =&gt; {
-                        <span class="macro">warn!</span>(<span class="string">&quot;Not implemented&quot;</span>);
-                        <span class="kw">match </span>cmd_socket.send(resp_not_implemented,<span class="number">0</span>) {
-                          <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">&quot;Can not send response! Err {err}&quot;</span>),
-                          <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">trace!</span>(<span class="string">&quot;Resp sent!&quot;</span>)
-                        }
-                        <span class="kw">continue</span>;
+                        <span class="macro">warn!</span>(<span class="string">"Not implemented"</span>);
+                        return_val = <span class="prelude-val">Err</span>(CmdError::NotImplementedError);
                       },
                       TofCommand::SystemdReboot  (<span class="kw">_</span>) =&gt; {
-                        <span class="macro">warn!</span>(<span class="string">&quot;Not implemented&quot;</span>);
-                        <span class="kw">match </span>cmd_socket.send(resp_not_implemented,<span class="number">0</span>) {
-                          <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">&quot;Can not send response! Err {err}&quot;</span>),
-                          <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">trace!</span>(<span class="string">&quot;Resp sent!&quot;</span>)
+                        <span class="macro">warn!</span>(<span class="string">"Not implemented"</span>);
+                        return_val = <span class="prelude-val">Err</span>(CmdError::NotImplementedError);
+                      }
+                    }
+                    <span class="comment">// deal with return values
+                    </span><span class="kw">match </span>return_val {
+                      <span class="prelude-val">Err</span>(cmd_error) =&gt; {
+                        <span class="kw">let </span>r = TofResponse::GeneralFail(TofCommandResp::RespErrUnexecutable <span class="kw">as </span>u32);
+                        <span class="kw">match </span>cmd_socket.send(r.to_bytestream(),<span class="number">0</span>) {
+                          <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">"Can not send response!, Err {err}"</span>),
+                          <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">"Responded to {cmd_error}!"</span>)
                         }
-                        <span class="kw">continue</span>;
+                      },
+                      <span class="prelude-val">Ok</span>(tof_command)  =&gt; {
+                        <span class="kw">let </span>r = TofResponse::Success(TofCommandResp::RespSuccFingersCrossed <span class="kw">as </span>u32);
+                        <span class="kw">match </span>cmd_socket.send(r.to_bytestream(),<span class="number">0</span>) {
+                          <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">"Can not send response!, Err {err}"</span>),
+                          <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">"Responded to {tof_command}!"</span>)
+                        }
                       }
                     }
                   }
                 }  
               },
               PacketType::RBCommand  =&gt; {
-                <span class="macro">trace!</span>(<span class="string">&quot;Received RBCommand!&quot;</span>);
+                <span class="macro">trace!</span>(<span class="string">"Received RBCommand!"</span>);
                 <span class="comment">// just forward the packet now, the cache 
                 // can understand if it is an event request or not
                 </span><span class="kw">match </span>ev_request_to_cache.send(tp) {
                   <span class="prelude-val">Err</span>(err) =&gt; {
-                    <span class="macro">error!</span>(<span class="string">&quot;Can not send event request! Err {err}&quot;</span>);
+                    <span class="macro">error!</span>(<span class="string">"Can not send event request! Err {err}"</span>);
                   },
                   <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; ()
                 }
                 <span class="comment">// FIXME - notify this about TofOperation mode.
                 // if the TofOperation mode is StreamAny, 
-                // we won&#39;t do this.
+                // we won't do this.
                 // It might not needed, since if we are in 
                 // StreamAny mode, we should not be sending 
                 // these requests from the C&amp;C server.
@@ -1349,7 +1200,7 @@
                 // FIXME - do we want to acknowledge this?
               </span>},
               <span class="kw">_ </span>=&gt; {
-                <span class="macro">error!</span>(<span class="string">&quot;Can not respond to {}&quot;</span>, tp);
+                <span class="macro">error!</span>(<span class="string">"Can not respond to {}"</span>, tp);
               }
             }
           }

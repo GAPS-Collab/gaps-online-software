@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.25.0/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.25.0/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><a class="sub-logo-container" href="../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -365,7 +366,7 @@
 
 </span><span class="doccomment">//! ![Demo](https://raw.githubusercontent.com/ratatui-org/ratatui/b33c878808c4c40591d7a2d9f9d94d6fee95a96f/examples/demo2.gif)
 //!
-//! &lt;div align=&quot;center&quot;&gt;
+//! &lt;div align="center"&gt;
 //!
 //! [![Crate Badge]](https://crates.io/crates/ratatui)
 //! [![License Badge]](./LICENSE)
@@ -413,7 +414,7 @@
 //!
 //! ## Other documentation
 //!
-//! - [Ratatui Website] - explains the library&#39;s concepts and provides step-by-step tutorials
+//! - [Ratatui Website] - explains the library's concepts and provides step-by-step tutorials
 //! - [Examples] - a collection of examples that demonstrate how to use the library.
 //! - [API Documentation] - the full API documentation for the library on docs.rs.
 //! - [Changelog] - generated by [git-cliff] utilizing [Conventional Commits].
@@ -423,7 +424,7 @@
 //! ## Quickstart
 //!
 //! The following example demonstrates the minimal amount of code necessary to setup a terminal and
-//! render &quot;Hello World!&quot;. The full code for this example which contains a little more detail is in
+//! render "Hello World!". The full code for this example which contains a little more detail is in
 //! [hello_world.rs]. For more guidance on different ways to structure your application see the
 //! [Application Patterns] and [Hello World tutorial] sections in the [Ratatui Website] and the
 //! various [Examples]. There are also several starter templates available:
@@ -500,7 +501,7 @@
 //! fn handle_events() -&gt; io::Result&lt;bool&gt; {
 //!     if event::poll(std::time::Duration::from_millis(50))? {
 //!         if let Event::Key(key) = event::read()? {
-//!             if key.kind == event::KeyEventKind::Press &amp;&amp; key.code == KeyCode::Char(&#39;q&#39;) {
+//!             if key.kind == event::KeyEventKind::Press &amp;&amp; key.code == KeyCode::Char('q') {
 //!                 return Ok(true);
 //!             }
 //!         }
@@ -510,8 +511,8 @@
 //!
 //! fn ui(frame: &amp;mut Frame) {
 //!     frame.render_widget(
-//!         Paragraph::new(&quot;Hello World!&quot;)
-//!             .block(Block::default().title(&quot;Greeting&quot;).borders(Borders::ALL)),
+//!         Paragraph::new("Hello World!")
+//!             .block(Block::default().title("Greeting").borders(Borders::ALL)),
 //!         frame.size(),
 //!     );
 //! }
@@ -542,11 +543,11 @@
 //!     )
 //!     .split(frame.size());
 //!     frame.render_widget(
-//!         Block::new().borders(Borders::TOP).title(&quot;Title Bar&quot;),
+//!         Block::new().borders(Borders::TOP).title("Title Bar"),
 //!         main_layout[0],
 //!     );
 //!     frame.render_widget(
-//!         Block::new().borders(Borders::TOP).title(&quot;Status Bar&quot;),
+//!         Block::new().borders(Borders::TOP).title("Status Bar"),
 //!         main_layout[2],
 //!     );
 //!
@@ -556,11 +557,11 @@
 //!     )
 //!     .split(main_layout[1]);
 //!     frame.render_widget(
-//!         Block::default().borders(Borders::ALL).title(&quot;Left&quot;),
+//!         Block::default().borders(Borders::ALL).title("Left"),
 //!         inner_layout[0],
 //!     );
 //!     frame.render_widget(
-//!         Block::default().borders(Borders::ALL).title(&quot;Right&quot;),
+//!         Block::default().borders(Borders::ALL).title("Right"),
 //!         inner_layout[1],
 //!     );
 //! }
@@ -598,15 +599,15 @@
 //!     )
 //!     .split(frame.size());
 //!
-//!     let span1 = Span::raw(&quot;Hello &quot;);
+//!     let span1 = Span::raw("Hello ");
 //!     let span2 = Span::styled(
-//!         &quot;World&quot;,
+//!         "World",
 //!         Style::new()
 //!             .fg(Color::Green)
 //!             .bg(Color::White)
 //!             .add_modifier(Modifier::BOLD),
 //!     );
-//!     let span3 = &quot;!&quot;.red().on_light_yellow().italic();
+//!     let span3 = "!".red().on_light_yellow().italic();
 //!
 //!     let line = Line::from(vec![span1, span2, span3]);
 //!     let text: Text = Text::from(vec![line]);
@@ -614,40 +615,40 @@
 //!     frame.render_widget(Paragraph::new(text), areas[0]);
 //!     // or using the short-hand syntax and implicit conversions
 //!     frame.render_widget(
-//!         Paragraph::new(&quot;Hello World!&quot;.red().on_white().bold()),
+//!         Paragraph::new("Hello World!".red().on_white().bold()),
 //!         areas[1],
 //!     );
 //!
 //!     // to style the whole widget instead of just the text
 //!     frame.render_widget(
-//!         Paragraph::new(&quot;Hello World!&quot;).style(Style::new().red().on_white()),
+//!         Paragraph::new("Hello World!").style(Style::new().red().on_white()),
 //!         areas[2],
 //!     );
 //!     // or using the short-hand syntax
-//!     frame.render_widget(Paragraph::new(&quot;Hello World!&quot;).blue().on_yellow(), areas[3]);
+//!     frame.render_widget(Paragraph::new("Hello World!").blue().on_yellow(), areas[3]);
 //! }
 //! ```
 //!
 //! Running this example produces the following output:
 //!
 //! ![docsrs-styling]
-</span><span class="attr">#![cfg_attr(feature = <span class="string">&quot;document-features&quot;</span>, doc = <span class="string">&quot;\n## Features&quot;</span>)]
-#![cfg_attr(feature = <span class="string">&quot;document-features&quot;</span>, doc = <span class="macro">document_features::document_features!</span>())]
+</span><span class="attr">#![cfg_attr(feature = <span class="string">"document-features"</span>, doc = <span class="string">"\n## Features"</span>)]
+#![cfg_attr(feature = <span class="string">"document-features"</span>, doc = <span class="macro">document_features::document_features!</span>())]
 #![cfg_attr(
-    feature = <span class="string">&quot;document-features&quot;</span>,
-    doc = <span class="string">&quot;[`CrossTermBackend`]: backend::CrosstermBackend&quot;
+    feature = <span class="string">"document-features"</span>,
+    doc = <span class="string">"[`CrossTermBackend`]: backend::CrosstermBackend"
 </span>)]
 #![cfg_attr(
-    feature = <span class="string">&quot;document-features&quot;</span>,
-    doc = <span class="string">&quot;[`TermionBackend`]: backend::TermionBackend&quot;
+    feature = <span class="string">"document-features"</span>,
+    doc = <span class="string">"[`TermionBackend`]: backend::TermionBackend"
 </span>)]
 #![cfg_attr(
-    feature = <span class="string">&quot;document-features&quot;</span>,
-    doc = <span class="string">&quot;[`TermwizBackend`]: backend::TermwizBackend&quot;
+    feature = <span class="string">"document-features"</span>,
+    doc = <span class="string">"[`TermwizBackend`]: backend::TermwizBackend"
 </span>)]
 #![cfg_attr(
-    feature = <span class="string">&quot;document-features&quot;</span>,
-    doc = <span class="string">&quot;[`calendar`]: widgets::calendar::Monthly&quot;
+    feature = <span class="string">"document-features"</span>,
+    doc = <span class="string">"[`calendar`]: widgets::calendar::Monthly"
 </span>)]
 </span><span class="doccomment">//!
 //! [Ratatui Website]: https://ratatui.rs/
@@ -707,8 +708,8 @@
 </span><span class="comment">// show the feature flags in the generated documentation
 </span><span class="attr">#![cfg_attr(docsrs, feature(doc_auto_cfg))]
 #![doc(
-    html_logo_url = <span class="string">&quot;https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png&quot;</span>,
-    html_favicon_url = <span class="string">&quot;https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico&quot;
+    html_logo_url = <span class="string">"https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png"</span>,
+    html_favicon_url = <span class="string">"https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"
 </span>)]
 
 </span><span class="kw">pub mod </span>backend;

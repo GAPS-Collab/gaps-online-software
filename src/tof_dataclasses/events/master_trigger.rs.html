@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/events/master_trigger.rs`."><title>master_trigger.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/events/master_trigger.rs`."><title>master_trigger.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -560,186 +561,10 @@
 <a href="#560" id="560">560</a>
 <a href="#561" id="561">561</a>
 <a href="#562" id="562">562</a>
-<a href="#563" id="563">563</a>
-<a href="#564" id="564">564</a>
-<a href="#565" id="565">565</a>
-<a href="#566" id="566">566</a>
-<a href="#567" id="567">567</a>
-<a href="#568" id="568">568</a>
-<a href="#569" id="569">569</a>
-<a href="#570" id="570">570</a>
-<a href="#571" id="571">571</a>
-<a href="#572" id="572">572</a>
-<a href="#573" id="573">573</a>
-<a href="#574" id="574">574</a>
-<a href="#575" id="575">575</a>
-<a href="#576" id="576">576</a>
-<a href="#577" id="577">577</a>
-<a href="#578" id="578">578</a>
-<a href="#579" id="579">579</a>
-<a href="#580" id="580">580</a>
-<a href="#581" id="581">581</a>
-<a href="#582" id="582">582</a>
-<a href="#583" id="583">583</a>
-<a href="#584" id="584">584</a>
-<a href="#585" id="585">585</a>
-<a href="#586" id="586">586</a>
-<a href="#587" id="587">587</a>
-<a href="#588" id="588">588</a>
-<a href="#589" id="589">589</a>
-<a href="#590" id="590">590</a>
-<a href="#591" id="591">591</a>
-<a href="#592" id="592">592</a>
-<a href="#593" id="593">593</a>
-<a href="#594" id="594">594</a>
-<a href="#595" id="595">595</a>
-<a href="#596" id="596">596</a>
-<a href="#597" id="597">597</a>
-<a href="#598" id="598">598</a>
-<a href="#599" id="599">599</a>
-<a href="#600" id="600">600</a>
-<a href="#601" id="601">601</a>
-<a href="#602" id="602">602</a>
-<a href="#603" id="603">603</a>
-<a href="#604" id="604">604</a>
-<a href="#605" id="605">605</a>
-<a href="#606" id="606">606</a>
-<a href="#607" id="607">607</a>
-<a href="#608" id="608">608</a>
-<a href="#609" id="609">609</a>
-<a href="#610" id="610">610</a>
-<a href="#611" id="611">611</a>
-<a href="#612" id="612">612</a>
-<a href="#613" id="613">613</a>
-<a href="#614" id="614">614</a>
-<a href="#615" id="615">615</a>
-<a href="#616" id="616">616</a>
-<a href="#617" id="617">617</a>
-<a href="#618" id="618">618</a>
-<a href="#619" id="619">619</a>
-<a href="#620" id="620">620</a>
-<a href="#621" id="621">621</a>
-<a href="#622" id="622">622</a>
-<a href="#623" id="623">623</a>
-<a href="#624" id="624">624</a>
-<a href="#625" id="625">625</a>
-<a href="#626" id="626">626</a>
-<a href="#627" id="627">627</a>
-<a href="#628" id="628">628</a>
-<a href="#629" id="629">629</a>
-<a href="#630" id="630">630</a>
-<a href="#631" id="631">631</a>
-<a href="#632" id="632">632</a>
-<a href="#633" id="633">633</a>
-<a href="#634" id="634">634</a>
-<a href="#635" id="635">635</a>
-<a href="#636" id="636">636</a>
-<a href="#637" id="637">637</a>
-<a href="#638" id="638">638</a>
-<a href="#639" id="639">639</a>
-<a href="#640" id="640">640</a>
-<a href="#641" id="641">641</a>
-<a href="#642" id="642">642</a>
-<a href="#643" id="643">643</a>
-<a href="#644" id="644">644</a>
-<a href="#645" id="645">645</a>
-<a href="#646" id="646">646</a>
-<a href="#647" id="647">647</a>
-<a href="#648" id="648">648</a>
-<a href="#649" id="649">649</a>
-<a href="#650" id="650">650</a>
-<a href="#651" id="651">651</a>
-<a href="#652" id="652">652</a>
-<a href="#653" id="653">653</a>
-<a href="#654" id="654">654</a>
-<a href="#655" id="655">655</a>
-<a href="#656" id="656">656</a>
-<a href="#657" id="657">657</a>
-<a href="#658" id="658">658</a>
-<a href="#659" id="659">659</a>
-<a href="#660" id="660">660</a>
-<a href="#661" id="661">661</a>
-<a href="#662" id="662">662</a>
-<a href="#663" id="663">663</a>
-<a href="#664" id="664">664</a>
-<a href="#665" id="665">665</a>
-<a href="#666" id="666">666</a>
-<a href="#667" id="667">667</a>
-<a href="#668" id="668">668</a>
-<a href="#669" id="669">669</a>
-<a href="#670" id="670">670</a>
-<a href="#671" id="671">671</a>
-<a href="#672" id="672">672</a>
-<a href="#673" id="673">673</a>
-<a href="#674" id="674">674</a>
-<a href="#675" id="675">675</a>
-<a href="#676" id="676">676</a>
-<a href="#677" id="677">677</a>
-<a href="#678" id="678">678</a>
-<a href="#679" id="679">679</a>
-<a href="#680" id="680">680</a>
-<a href="#681" id="681">681</a>
-<a href="#682" id="682">682</a>
-<a href="#683" id="683">683</a>
-<a href="#684" id="684">684</a>
-<a href="#685" id="685">685</a>
-<a href="#686" id="686">686</a>
-<a href="#687" id="687">687</a>
-<a href="#688" id="688">688</a>
-<a href="#689" id="689">689</a>
-<a href="#690" id="690">690</a>
-<a href="#691" id="691">691</a>
-<a href="#692" id="692">692</a>
-<a href="#693" id="693">693</a>
-<a href="#694" id="694">694</a>
-<a href="#695" id="695">695</a>
-<a href="#696" id="696">696</a>
-<a href="#697" id="697">697</a>
-<a href="#698" id="698">698</a>
-<a href="#699" id="699">699</a>
-<a href="#700" id="700">700</a>
-<a href="#701" id="701">701</a>
-<a href="#702" id="702">702</a>
-<a href="#703" id="703">703</a>
-<a href="#704" id="704">704</a>
-<a href="#705" id="705">705</a>
-<a href="#706" id="706">706</a>
-<a href="#707" id="707">707</a>
-<a href="#708" id="708">708</a>
-<a href="#709" id="709">709</a>
-<a href="#710" id="710">710</a>
-<a href="#711" id="711">711</a>
-<a href="#712" id="712">712</a>
-<a href="#713" id="713">713</a>
-<a href="#714" id="714">714</a>
-<a href="#715" id="715">715</a>
-<a href="#716" id="716">716</a>
-<a href="#717" id="717">717</a>
-<a href="#718" id="718">718</a>
-<a href="#719" id="719">719</a>
-<a href="#720" id="720">720</a>
-<a href="#721" id="721">721</a>
-<a href="#722" id="722">722</a>
-<a href="#723" id="723">723</a>
-<a href="#724" id="724">724</a>
-<a href="#725" id="725">725</a>
-<a href="#726" id="726">726</a>
-<a href="#727" id="727">727</a>
-<a href="#728" id="728">728</a>
-<a href="#729" id="729">729</a>
-<a href="#730" id="730">730</a>
-<a href="#731" id="731">731</a>
-<a href="#732" id="732">732</a>
-<a href="#733" id="733">733</a>
-<a href="#734" id="734">734</a>
-<a href="#735" id="735">735</a>
-<a href="#736" id="736">736</a>
-<a href="#737" id="737">737</a>
-<a href="#738" id="738">738</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! MasterTriggerEvent
 
 </span><span class="macro">cfg_if::cfg_if! </span>{
-  <span class="kw">if </span><span class="attr">#[cfg(feature = <span class="string">&quot;random&quot;</span>)]  </span>{
+  <span class="kw">if </span><span class="attr">#[cfg(feature = <span class="string">"random"</span>)]  </span>{
     <span class="kw">use </span><span class="kw">crate</span>::FromRandom;
     <span class="kw">extern crate </span>rand;
     <span class="kw">use </span>rand::Rng;
@@ -758,12 +583,11 @@
     parse_u32
 };
 
-<span class="kw">use </span><span class="kw">crate</span>::events::RBMissingHit;
-<span class="kw">use </span><span class="kw">crate</span>::manifest::{LocalTriggerBoard,
-                      ReadoutBoard};
-
-<span class="kw">pub const </span>N_LTBS : usize = <span class="number">25</span>;
-<span class="kw">pub const </span>N_CHN_PER_LTB : usize = <span class="number">16</span>;
+<span class="comment">//use crate::events::RBMissingHit;
+</span><span class="kw">use </span><span class="kw">crate</span>::constants::{
+  N_LTBS,
+  N_CHN_PER_LTB,
+};
 
 <span class="comment">//he default values used where thus:
 //  INNER_TOF_THRESH = 3
@@ -774,7 +598,7 @@
 //so this corresponds to the BETA being set (required) and the loose settings for the number of hits.
 //Is this correct?
 //
-//If so, at some point (not yet because we are not getting data through the system), I&#39;d like us to run
+//If so, at some point (not yet because we are not getting data through the system), I'd like us to run
 //for a while with these three settings:
 //
 //  INNER_TOF_THRESH = 3
@@ -797,11 +621,13 @@
 </span><span class="attr">#[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 #[repr(u8)]
 </span><span class="kw">pub enum </span>TriggerType {
-  Unknown   = <span class="number">0u8</span>,
-  <span class="doccomment">/// -&gt; 1-10 &quot;pysics&quot; triggers
-  </span>Any       = <span class="number">1u8</span>,
-  Track     = <span class="number">2u8</span>,
-  Gaps      = <span class="number">3u8</span>,
+  Unknown      = <span class="number">0u8</span>,
+  <span class="doccomment">/// -&gt; 1-10 "pysics" triggers
+  </span>Any          = <span class="number">1u8</span>,
+  Track        = <span class="number">2u8</span>,
+  TrackCentral = <span class="number">3u8</span>,
+  Gaps         = <span class="number">4u8</span>,
+  
   <span class="doccomment">/// &gt; 100 -&gt; Debug triggers
   </span>Poisson   = <span class="number">100u8</span>,
 }
@@ -809,8 +635,8 @@
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>TriggerType {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
     <span class="kw">let </span>r = serde_json::to_string(<span class="self">self</span>).unwrap_or(
-      String::from(<span class="string">&quot;ERROR: DeserializationError!&quot;</span>));
-    <span class="macro">write!</span>(f, <span class="string">&quot;&lt;TriggerType: {}&gt;&quot;</span>, r)
+      String::from(<span class="string">"ERROR: DeserializationError!"</span>));
+    <span class="macro">write!</span>(f, <span class="string">"&lt;TriggerType: {}&gt;"</span>, r)
   }
 }
 
@@ -821,13 +647,14 @@
       <span class="number">100u8 </span>=&gt; TriggerType::Poisson,
       <span class="number">1u8   </span>=&gt; TriggerType::Any,
       <span class="number">2u8   </span>=&gt; TriggerType::Track,
-      <span class="number">3u8   </span>=&gt; TriggerType::Gaps,
+      <span class="number">3u8   </span>=&gt; TriggerType::TrackCentral,
+      <span class="number">4u8   </span>=&gt; TriggerType::TrackCentral,
       <span class="kw">_     </span>=&gt; TriggerType::Unknown
     }
   }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;random&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"random"</span>)]
 </span><span class="kw">impl </span>FromRandom <span class="kw">for </span>TriggerType {
   
   <span class="kw">fn </span>from_random() -&gt; <span class="self">Self </span>{
@@ -836,6 +663,7 @@
       TriggerType::Poisson,
       TriggerType::Any,
       TriggerType::Track,
+      TriggerType::TrackCentral,
       TriggerType::Gaps,
     ];
     <span class="kw">let </span><span class="kw-2">mut </span>rng  = rand::thread_rng();
@@ -865,184 +693,6 @@
   <span class="kw">pub </span>total_tof_thresh   : u32,
   <span class="kw">pub </span>any_trig_is_glob   : bool,
   <span class="kw">pub </span>track_trig_is_glob : bool
-}
-
-<span class="doccomment">/// MasterTrigger related mapping
-///
-/// Caches ltb/rb relevant information 
-/// and can generate rb/ltb id lists
-</span><span class="attr">#[derive(Debug, Clone)]
-#[deprecated(since=<span class="string">&quot;0.9.1&quot;</span>, note=<span class="string">&quot;Not used and overkill&quot;</span>)]
-</span><span class="kw">pub struct </span>MasterTriggerMapping {
-  <span class="kw">pub </span>ltb_list : Vec&lt;LocalTriggerBoard&gt;,
-  <span class="kw">pub </span>rb_list  : Vec&lt;ReadoutBoard&gt;,
-
-  <span class="doccomment">/// Holds RB id at the position where 
-  /// it is supposed to be in the MTB 
-  /// trigger mask
-  </span><span class="kw">pub </span>ltb_mapping  : [LocalTriggerBoard;N_LTBS]
-
-  <span class="comment">// 
-  //ltb_rb_mapping : HashMap&lt;u8;ReadoutBoard&gt;;
-</span>}
-
-<span class="kw">impl </span>MasterTriggerMapping {
-
-  <span class="kw">pub fn </span>new(ltb_list : Vec&lt;LocalTriggerBoard&gt;, rb_list : Vec&lt;ReadoutBoard&gt;) 
-    -&gt; MasterTriggerMapping {
-    <span class="kw">let </span><span class="kw-2">mut </span>mtm = MasterTriggerMapping {
-      ltb_list,
-      rb_list,
-      ltb_mapping : [LocalTriggerBoard::new();N_LTBS]
-    };
-    mtm.construct_ltb_mapping();
-    mtm
-  }
-
-
-
-  <span class="doccomment">/// Map LTBs to the internal mask to identify which 
-  /// LTB has been hit 
-  ///
-  /// LTB id = RAT id
-  </span><span class="kw">pub fn </span>construct_ltb_mapping(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-    <span class="macro">info!</span>(<span class="string">&quot;Construction LTB mapping for {} LTBs&quot;</span>, <span class="self">self</span>.ltb_list.len());
-    <span class="kw">for </span>ltb <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.ltb_list {
-      <span class="kw">if </span>ltb.ltb_dsi == <span class="number">0 </span>&amp;&amp; ltb.ltb_j == <span class="number">0 </span>{
-        <span class="macro">error!</span>(<span class="string">&quot;Found ltb with invalid connection information! {:?}&quot;</span>, ltb);
-        <span class="kw">continue</span>;
-      }
-      <span class="kw">let </span>index = ((ltb.ltb_dsi - <span class="number">1</span>) * <span class="number">5</span>) + (ltb.ltb_j - <span class="number">1</span>);
-      <span class="self">self</span>.ltb_mapping[index <span class="kw">as </span>usize] = <span class="kw-2">*</span>ltb;
-    }
-    <span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..N_LTBS {
-      <span class="macro">debug! </span>(<span class="string">&quot;{k} -&gt; {}&quot;</span>, <span class="self">self</span>.ltb_mapping[k]);
-    }
-  }
-
-  <span class="doccomment">/// Mapping trigger LTB board mask - LTB ids
-  </span><span class="kw">pub fn </span>get_ltb_ids(<span class="kw-2">&amp;</span><span class="self">self</span>) 
-    -&gt; Vec&lt;u8&gt; {
-    <span class="kw">let </span><span class="kw-2">mut </span>ltbs = Vec::&lt;u8&gt;::new();
-    <span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..N_LTBS {
-      <span class="kw">if </span><span class="self">self</span>.ltb_mapping[k].ltb_id &gt; <span class="number">0 </span>{
-        ltbs.push(<span class="self">self</span>.ltb_mapping[k].ltb_id)
-      }
-    }
-    ltbs
-  }
-
-
-  <span class="doccomment">/// Get the rb ids for the hits in the MasterTrigger Event
-  ///
-  /// This is the same as ::get_rb_ids, however, with additional
-  /// debug information.
-  /// It will also emit missing hits.
-  ///
-  /// FIXME - in the future, include a &quot;debug&quot; feature.
-  </span><span class="kw">pub fn </span>get_rb_ids_debug(<span class="kw-2">&amp;</span><span class="self">self</span>, 
-                          mt_ev   : <span class="kw-2">&amp;</span>MasterTriggerEvent,
-                          verbose : bool)
-    -&gt; (Vec::&lt;(u8,u8)&gt;,Vec::&lt;RBMissingHit&gt;) {
-    <span class="kw">let </span><span class="kw-2">mut </span>missing_hits = Vec::&lt;RBMissingHit&gt;::new();
-    <span class="kw">let </span><span class="kw-2">mut </span>rb_ids       = Vec::&lt;(u8,u8)&gt;::new();
-    <span class="kw">if </span>verbose {
-      <span class="macro">println!</span>(<span class="string">&quot;-- DEBUG - get_rb_ids_debug --&quot;</span>);
-      <span class="macro">println!</span>(<span class="string">&quot;--&gt; MTEV BRD MASK {:?}&quot;</span>, mt_ev.board_mask);
-    }
-    <span class="kw">let </span><span class="kw-2">mut </span>board_has_hits : bool;
-    <span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..mt_ev.board_mask.len() {
-      board_has_hits = <span class="bool-val">false</span>;
-      <span class="kw">if </span>mt_ev.board_mask[k] {
-        <span class="kw">let </span>hits = mt_ev.hits[k];<span class="comment">//ltb_hit_index];
-        </span><span class="kw">if </span>verbose {
-          <span class="macro">println!</span>(<span class="string">&quot;--&gt; MTEV HITS {:?}&quot;</span>, hits);
-        }
-        <span class="comment">// search for corresponding hits in the hit mask
-        </span><span class="kw">for </span>ltb_ch <span class="kw">in </span><span class="number">0</span>..hits.len() {
-          <span class="kw">if </span>hits[ltb_ch] {
-            board_has_hits = <span class="bool-val">true</span>;
-            <span class="kw">if </span>verbose {
-              <span class="macro">println!</span>(<span class="string">&quot;--&gt; Found hit at {ltb_ch} [+1] [LTB CH]&quot;</span>);
-              <span class="macro">println!</span>(<span class="string">&quot;--&gt; LTB REGISTERED FOR THIS HIT {k} {:?} with id {}&quot;</span>, <span class="self">self</span>.ltb_mapping[k], <span class="self">self</span>.ltb_mapping[k].ltb_id);
-            }
-            <span class="kw">let </span>rb_id = <span class="self">self</span>.ltb_mapping[k].get_rb_id(ltb_ch <span class="kw">as </span>u8 +<span class="number">1</span>);
-            <span class="kw">if </span>rb_id == <span class="number">0 </span>{
-              <span class="kw">let </span><span class="kw-2">mut </span>missing       = RBMissingHit::new();
-              missing.event_id      = mt_ev.event_id;
-              missing.ltb_hit_index = k <span class="kw">as </span>u8;
-              missing.ltb_id        = <span class="self">self</span>.ltb_mapping[k].ltb_id;
-              missing.ltb_dsi       = <span class="self">self</span>.ltb_mapping[k].ltb_dsi;
-              missing.ltb_j         = <span class="self">self</span>.ltb_mapping[k].ltb_j;
-              missing_hits.push(missing);
-              <span class="macro">error!</span>(<span class="string">&quot;Got invalid rb_id 0, LTB {} at index {k}&quot;</span>, <span class="self">self</span>.ltb_mapping[k]);
-              <span class="kw">continue</span>;
-            }
-            <span class="kw">let </span>rb_ch = <span class="self">self</span>.ltb_mapping[k].get_rb_ch(ltb_ch <span class="kw">as </span>u8 +<span class="number">1</span>);
-            <span class="kw">let </span>id_ch = (rb_id, rb_ch);
-            <span class="kw">if </span>rb_ids.contains(<span class="kw-2">&amp;</span>id_ch) {
-              <span class="kw">continue</span>;
-            } <span class="kw">else </span>{
-              rb_ids.push(id_ch);
-            }
-          }
-        }
-        <span class="kw">if </span>!board_has_hits {
-          <span class="kw">if </span>verbose {
-            <span class="macro">println!</span>(<span class="string">&quot;--&gt; {}&quot;</span>, mt_ev);
-          }
-          <span class="kw">let </span><span class="kw-2">mut </span>missing       = RBMissingHit::new();
-          missing.event_id      = mt_ev.event_id;
-          missing.ltb_hit_index = k <span class="kw">as </span>u8;
-          missing.ltb_id        = <span class="self">self</span>.ltb_mapping[k].ltb_id;
-          missing.ltb_dsi       = <span class="self">self</span>.ltb_mapping[k].ltb_dsi;
-          missing.ltb_j         = <span class="self">self</span>.ltb_mapping[k].ltb_j;
-          missing_hits.push(missing);
-          <span class="macro">error!</span>(<span class="string">&quot;We were expecting hits for LTB {}, but we did not see any!&quot;</span>, <span class="self">self</span>.ltb_mapping[k]);
-        }
-      }
-    }
-    (rb_ids,missing_hits)
-  }
-
-  <span class="doccomment">/// Return the ids of the readoutboards which are connected to the LTBs which participated in the
-  /// trigger.
-  </span><span class="kw">pub fn </span>get_rb_ids(<span class="kw-2">&amp;</span><span class="self">self</span>,
-                    mt_ev    : <span class="kw-2">&amp;</span>MasterTriggerEvent)
-                    <span class="comment">//ltb_mask : &amp;[bool; N_LTBS],
-                    //hit_mask : [[bool; N_CHN_PER_LTB]; N_LTBS])
-    </span>-&gt; Vec&lt;(u8, u8)&gt; {
-    <span class="kw">let </span><span class="kw-2">mut </span>rb_ids = Vec::&lt;(u8,u8)&gt;::new();
-    <span class="kw">let </span><span class="kw-2">mut </span>board_has_hits : bool;
-    <span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..mt_ev.board_mask.len() {
-      board_has_hits = <span class="bool-val">false</span>;
-      <span class="kw">if </span>mt_ev.board_mask[k] {
-        <span class="kw">let </span>hits = mt_ev.hits[k];<span class="comment">//ltb_hit_index];
-        // search for corresponding hits in the hit mask
-        </span><span class="kw">for </span>ltb_ch <span class="kw">in </span><span class="number">0</span>..hits.len() {
-          <span class="kw">if </span>hits[ltb_ch] {
-            board_has_hits = <span class="bool-val">true</span>;
-            <span class="kw">let </span>rb_id = <span class="self">self</span>.ltb_mapping[k].get_rb_id(ltb_ch <span class="kw">as </span>u8 +<span class="number">1</span>);
-            <span class="kw">if </span>rb_id == <span class="number">0 </span>{
-              <span class="macro">error!</span>(<span class="string">&quot;Got invalid rb_id 0, LTB {} at index {k}&quot;</span>, <span class="self">self</span>.ltb_mapping[k]);
-              <span class="kw">continue</span>;
-            }
-            <span class="kw">let </span>rb_ch = <span class="self">self</span>.ltb_mapping[k].get_rb_ch(ltb_ch <span class="kw">as </span>u8 +<span class="number">1</span>);
-            <span class="kw">let </span>id_ch = (rb_id, rb_ch);
-            <span class="kw">if </span>rb_ids.contains(<span class="kw-2">&amp;</span>id_ch) {
-              <span class="kw">continue</span>;
-            } <span class="kw">else </span>{
-              rb_ids.push(id_ch);
-            }
-          }
-        }
-        <span class="kw">if </span>!board_has_hits {
-          <span class="macro">error!</span>(<span class="string">&quot;We were expecting hits for LTB {}, but we did not see any!&quot;</span>, <span class="self">self</span>.ltb_mapping[k]);
-        }
-      }
-    }
-    rb_ids
-  } 
 }
 
 
@@ -1108,10 +758,10 @@
 
   <span class="kw">pub fn </span>get_n_rbs_expected(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
     <span class="kw">let </span><span class="kw-2">mut </span>n_rbs = <span class="number">0u8</span>;
-    <span class="comment">//println!(&quot;SELF HITS : {:?}&quot;, self.hits);
+    <span class="comment">//println!("SELF HITS : {:?}", self.hits);
     </span><span class="kw">for </span>h <span class="kw">in </span><span class="self">self</span>.hits {
       <span class="kw">let </span>count = h.iter().filter(|&amp;&amp;x| x).count();
-      <span class="comment">//println!(&quot;COUNT! {count}&quot;); 
+      <span class="comment">//println!("COUNT! {count}"); 
       </span><span class="kw">if </span>count &gt;= <span class="number">1 </span>{
         n_rbs += <span class="number">1</span>;
       } 
@@ -1170,12 +820,12 @@
 
 
   <span class="kw">fn </span>bitmask_to_str(mask : <span class="kw-2">&amp;</span>[bool]) -&gt; String {
-    <span class="kw">let </span><span class="kw-2">mut </span>m_str = String::from(<span class="string">&quot;&quot;</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>m_str = String::from(<span class="string">""</span>);
     <span class="kw">for </span>n <span class="kw">in </span>mask {
       <span class="kw">if </span><span class="kw-2">*</span>n {
-        m_str += <span class="string">&quot;1&quot;</span>;
+        m_str += <span class="string">"1"</span>;
       } <span class="kw">else </span>{
-        m_str += <span class="string">&quot;0&quot;</span>;
+        m_str += <span class="string">"0"</span>;
       }
     }
     m_str
@@ -1187,9 +837,9 @@
   }
 
   <span class="kw">pub fn </span>hits_to_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
-    <span class="kw">let </span><span class="kw-2">mut </span>hits_str = String::from(<span class="string">&quot;&quot;</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>hits_str = String::from(<span class="string">""</span>);
     <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..<span class="self">self</span>.hits.len() {
-      hits_str += <span class="kw-2">&amp;</span>(j.to_string() + <span class="string">&quot;: [&quot; </span>+ <span class="kw-2">&amp;</span>MasterTriggerEvent::bitmask_to_str(<span class="kw-2">&amp;</span><span class="self">self</span>.hits[j]) + <span class="string">&quot;]\n&quot;</span>);
+      hits_str += <span class="kw-2">&amp;</span>(j.to_string() + <span class="string">": [" </span>+ <span class="kw-2">&amp;</span>MasterTriggerEvent::bitmask_to_str(<span class="kw-2">&amp;</span><span class="self">self</span>.hits[j]) + <span class="string">"]\n"</span>);
     }
     hits_str
   }
@@ -1236,7 +886,7 @@
   <span class="kw">pub fn </span>check(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
     <span class="kw">let </span>good = <span class="self">self</span>.n_paddles == <span class="self">self</span>.get_hit_paddles();
     <span class="kw">if </span>!good {
-      <span class="macro">error!</span>(<span class="string">&quot;Missmatch in expected and registered hit paddles! Expected : {}, seen {}&quot;</span>, <span class="self">self</span>.n_paddles, <span class="self">self</span>.get_hit_paddles());
+      <span class="macro">error!</span>(<span class="string">"Missmatch in expected and registered hit paddles! Expected : {}, seen {}"</span>, <span class="self">self</span>.n_paddles, <span class="self">self</span>.get_hit_paddles());
     }
     good
   }
@@ -1301,7 +951,6 @@
     bs
   }
 
-
   <span class="kw">fn </span>from_bytestream(bytestream : <span class="kw-2">&amp;</span>Vec&lt;u8&gt;,
                      pos        : <span class="kw-2">&amp;mut </span>usize)
     -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, SerializationError&gt; {
@@ -1328,14 +977,14 @@
     <span class="kw">let </span>tail_a              = parse_u8(bs, pos);
     <span class="kw">let </span>tail_b              = parse_u8(bs, pos);
     <span class="kw">if </span>tail_a == <span class="number">85 </span>&amp;&amp; tail_b == <span class="number">85 </span>{
-      <span class="macro">trace!</span>(<span class="string">&quot;Correct tail found!&quot;</span>);
+      <span class="macro">trace!</span>(<span class="string">"Correct tail found!"</span>);
     }
     <span class="kw">else if </span>tail_a == <span class="number">85 </span>&amp;&amp; tail_b == <span class="number">5 </span>{
-      <span class="macro">warn!</span>(<span class="string">&quot;This is specific to data written with &lt;= 0.6.0 KIHIKIHI! This is a BUG! It needs to be fixed in future versions! Version 0.6.1 should already fix ::to_bytestream, but leaves a modded ::from_bytestream for current analysis.&quot;</span>);
-      <span class="macro">warn!</span>(<span class="string">&quot;Tail for version 0.6.0/0.6.1 found&quot;</span>);  
+      <span class="macro">warn!</span>(<span class="string">"This is specific to data written with &lt;= 0.6.0 KIHIKIHI! This is a BUG! It needs to be fixed in future versions! Version 0.6.1 should already fix ::to_bytestream, but leaves a modded ::from_bytestream for current analysis."</span>);
+      <span class="macro">warn!</span>(<span class="string">"Tail for version 0.6.0/0.6.1 found"</span>);  
     } <span class="kw">else </span>{
-      <span class="macro">error!</span>(<span class="string">&quot;Tail is messed up. See comment for version 0.6.0/0.6.1 in CHANGELOG! We got {} {} but were expecting 85 5&quot;</span>, tail_a, tail_b);
-      <span class="comment">//error!(&quot;Got {} for MTE tail signature! Expecting {}&quot;, tail, MasterTriggerEvent::TAIL);
+      <span class="macro">error!</span>(<span class="string">"Tail is messed up. See comment for version 0.6.0/0.6.1 in CHANGELOG! We got {} {} but were expecting 85 5"</span>, tail_a, tail_b);
+      <span class="comment">//error!("Got {} for MTE tail signature! Expecting {}", tail, MasterTriggerEvent::TAIL);
       </span><span class="kw">return </span><span class="prelude-val">Err</span>(SerializationError::TailInvalid);
     }
     <span class="prelude-val">Ok</span>(mt)
@@ -1351,91 +1000,91 @@
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>MasterTriggerEvent {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
     <span class="kw">let </span><span class="kw-2">mut </span>dsi_j = HashMap::&lt;u8, <span class="kw-2">&amp;</span>str&gt;::new();
-    dsi_j.insert(<span class="number">0  </span>, <span class="string">&quot;1/1&quot;</span>);
-    dsi_j.insert(<span class="number">1  </span>, <span class="string">&quot;1/2&quot;</span>);
-    dsi_j.insert(<span class="number">2  </span>, <span class="string">&quot;1/3&quot;</span>);
-    dsi_j.insert(<span class="number">3  </span>, <span class="string">&quot;1/4&quot;</span>);
-    dsi_j.insert(<span class="number">4  </span>, <span class="string">&quot;1/5&quot;</span>);
-    dsi_j.insert(<span class="number">5  </span>, <span class="string">&quot;2/1&quot;</span>);
-    dsi_j.insert(<span class="number">6  </span>, <span class="string">&quot;2/2&quot;</span>);
-    dsi_j.insert(<span class="number">7  </span>, <span class="string">&quot;2/3&quot;</span>);
-    dsi_j.insert(<span class="number">8  </span>, <span class="string">&quot;2/4&quot;</span>);
-    dsi_j.insert(<span class="number">9  </span>, <span class="string">&quot;2/5&quot;</span>);
-    dsi_j.insert(<span class="number">10 </span>, <span class="string">&quot;3/1&quot;</span>);
-    dsi_j.insert(<span class="number">11 </span>, <span class="string">&quot;3/2&quot;</span>);
-    dsi_j.insert(<span class="number">12 </span>, <span class="string">&quot;3/3&quot;</span>);
-    dsi_j.insert(<span class="number">13 </span>, <span class="string">&quot;3/4&quot;</span>);
-    dsi_j.insert(<span class="number">14 </span>, <span class="string">&quot;3/5&quot;</span>);
-    dsi_j.insert(<span class="number">15 </span>, <span class="string">&quot;4/1&quot;</span>);
-    dsi_j.insert(<span class="number">16 </span>, <span class="string">&quot;4/2&quot;</span>);
-    dsi_j.insert(<span class="number">16 </span>, <span class="string">&quot;4/3&quot;</span>);
-    dsi_j.insert(<span class="number">17 </span>, <span class="string">&quot;4/4&quot;</span>);
-    dsi_j.insert(<span class="number">19 </span>, <span class="string">&quot;4/5&quot;</span>);
-    dsi_j.insert(<span class="number">20 </span>, <span class="string">&quot;5/1&quot;</span>);
-    dsi_j.insert(<span class="number">21 </span>, <span class="string">&quot;5/2&quot;</span>);
-    dsi_j.insert(<span class="number">22 </span>, <span class="string">&quot;5/3&quot;</span>);
-    dsi_j.insert(<span class="number">23 </span>, <span class="string">&quot;5/4&quot;</span>);
-    dsi_j.insert(<span class="number">24 </span>, <span class="string">&quot;5/5&quot;</span>);
+    dsi_j.insert(<span class="number">0  </span>, <span class="string">"1/1"</span>);
+    dsi_j.insert(<span class="number">1  </span>, <span class="string">"1/2"</span>);
+    dsi_j.insert(<span class="number">2  </span>, <span class="string">"1/3"</span>);
+    dsi_j.insert(<span class="number">3  </span>, <span class="string">"1/4"</span>);
+    dsi_j.insert(<span class="number">4  </span>, <span class="string">"1/5"</span>);
+    dsi_j.insert(<span class="number">5  </span>, <span class="string">"2/1"</span>);
+    dsi_j.insert(<span class="number">6  </span>, <span class="string">"2/2"</span>);
+    dsi_j.insert(<span class="number">7  </span>, <span class="string">"2/3"</span>);
+    dsi_j.insert(<span class="number">8  </span>, <span class="string">"2/4"</span>);
+    dsi_j.insert(<span class="number">9  </span>, <span class="string">"2/5"</span>);
+    dsi_j.insert(<span class="number">10 </span>, <span class="string">"3/1"</span>);
+    dsi_j.insert(<span class="number">11 </span>, <span class="string">"3/2"</span>);
+    dsi_j.insert(<span class="number">12 </span>, <span class="string">"3/3"</span>);
+    dsi_j.insert(<span class="number">13 </span>, <span class="string">"3/4"</span>);
+    dsi_j.insert(<span class="number">14 </span>, <span class="string">"3/5"</span>);
+    dsi_j.insert(<span class="number">15 </span>, <span class="string">"4/1"</span>);
+    dsi_j.insert(<span class="number">16 </span>, <span class="string">"4/2"</span>);
+    dsi_j.insert(<span class="number">16 </span>, <span class="string">"4/3"</span>);
+    dsi_j.insert(<span class="number">17 </span>, <span class="string">"4/4"</span>);
+    dsi_j.insert(<span class="number">19 </span>, <span class="string">"4/5"</span>);
+    dsi_j.insert(<span class="number">20 </span>, <span class="string">"5/1"</span>);
+    dsi_j.insert(<span class="number">21 </span>, <span class="string">"5/2"</span>);
+    dsi_j.insert(<span class="number">22 </span>, <span class="string">"5/3"</span>);
+    dsi_j.insert(<span class="number">23 </span>, <span class="string">"5/4"</span>);
+    dsi_j.insert(<span class="number">24 </span>, <span class="string">"5/5"</span>);
     <span class="kw">let </span><span class="kw-2">mut </span>hit_boards = Vec::&lt;u8&gt;::with_capacity(<span class="number">20</span>);
     
-    <span class="kw">let </span><span class="kw-2">mut </span>repr = String::from(<span class="string">&quot;&lt;MasterTriggerEvent&quot;</span>);
-    repr += <span class="string">&quot;\n  event_id                    &quot;</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>repr = String::from(<span class="string">"&lt;MasterTriggerEvent"</span>);
+    repr += <span class="string">"\n  event_id                    "</span>;
     repr += <span class="kw-2">&amp;</span><span class="self">self</span>.event_id.to_string(); 
-    repr += <span class="string">&quot;\n  timestamp                   &quot;</span>;
+    repr += <span class="string">"\n  timestamp                   "</span>;
     repr += <span class="kw-2">&amp;</span><span class="self">self</span>.timestamp.to_string(); 
-    repr += <span class="string">&quot;\n  tiu_timestamp               &quot;</span>;
+    repr += <span class="string">"\n  tiu_timestamp               "</span>;
     repr += <span class="kw-2">&amp;</span><span class="self">self</span>.tiu_timestamp.to_string(); 
-    repr += <span class="string">&quot;\n  tiu_gps16 (slow)            &quot;</span>;
+    repr += <span class="string">"\n  tiu_gps16 (slow)            "</span>;
     repr += <span class="kw-2">&amp;</span><span class="self">self</span>.tiu_gps_16.to_string(); 
-    repr += <span class="string">&quot;\n  tiu_gps32 (fast)            &quot;</span>;
+    repr += <span class="string">"\n  tiu_gps32 (fast)            "</span>;
     repr += <span class="kw-2">&amp;</span><span class="self">self</span>.tiu_gps_32.to_string(); 
-    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">&quot;\n  |-&gt; tiu_gps48        {}&quot;</span>, <span class="self">self</span>.get_gpstimestamp48()));
-    repr += <span class="string">&quot;\n  n_paddles                   &quot;</span>;
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  |-&gt; tiu_gps48        {}"</span>, <span class="self">self</span>.get_gpstimestamp48()));
+    repr += <span class="string">"\n  n_paddles                   "</span>;
     repr += <span class="kw-2">&amp;</span><span class="self">self</span>.n_paddles.to_string(); 
-    repr += <span class="string">&quot;\n  crc                         &quot;</span>;
+    repr += <span class="string">"\n  crc                         "</span>;
     repr += <span class="kw-2">&amp;</span><span class="self">self</span>.crc.to_string();
-    repr += <span class="string">&quot;\n  broken                      &quot;</span>;
+    repr += <span class="string">"\n  broken                      "</span>;
     repr += <span class="kw-2">&amp;</span><span class="self">self</span>.broken.to_string();
-    repr += <span class="string">&quot;\n  valid                       &quot;</span>;
+    repr += <span class="string">"\n  valid                       "</span>;
     repr += <span class="kw-2">&amp;</span><span class="self">self</span>.valid.to_string();
     <span class="comment">// a bit too excessive representation, might 
     // be useful for debugging though?
-    //repr += &quot;\n -- hit mask --&quot;;
-    //repr += &quot;\n [DSI/J]&quot;;
-    //repr += &quot;\n 1/1 - 1/2 - 1/3 - 1/4 - 1/5 - 2/1 - 2/2 - 2/3 - 2/4 - 2/5 - 3/1 - 3/2 - 3/3 - 3/4 - 3/5 - 4/1 - 4/2 - 4/3 - 4/4 - 4/5 \n&quot;;
-    //repr += &quot; &quot;;
-    //println!(&quot;SELFBOARDMASK {:?}&quot;, self.board_mask);
+    //repr += "\n -- hit mask --";
+    //repr += "\n [DSI/J]";
+    //repr += "\n 1/1 - 1/2 - 1/3 - 1/4 - 1/5 - 2/1 - 2/2 - 2/3 - 2/4 - 2/5 - 3/1 - 3/2 - 3/3 - 3/4 - 3/5 - 4/1 - 4/2 - 4/3 - 4/4 - 4/5 \n";
+    //repr += " ";
+    //println!("SELFBOARDMASK {:?}", self.board_mask);
     </span><span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..N_LTBS {
       <span class="kw">if </span><span class="self">self</span>.board_mask[k] {
-    <span class="comment">//    repr += &quot;-X-   &quot;;
+    <span class="comment">//    repr += "-X-   ";
         </span>hit_boards.push(k <span class="kw">as </span>u8);
       } <span class="kw">else </span>{
-    <span class="comment">//    repr += &quot;-0-   &quot;;
+    <span class="comment">//    repr += "-0-   ";
       </span>}
     }
-    repr += <span class="string">&quot;\n  == == LTB HITS [BRD CH] == ==\n&quot;</span>;
+    repr += <span class="string">"\n  == == LTB HITS [BRD CH] == ==\n"</span>;
     <span class="kw">for  </span>k <span class="kw">in </span>hit_boards.iter() {
-      repr += <span class="string">&quot;\t DSI/J &quot;</span>;
+      repr += <span class="string">"\t DSI/J "</span>;
       repr += dsi_j[k];
-      repr += <span class="string">&quot;\t=&gt; &quot;</span>;
+      repr += <span class="string">"\t=&gt; "</span>;
       <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..N_CHN_PER_LTB {
         <span class="kw">if </span><span class="self">self</span>.hits[<span class="kw-2">*</span>k <span class="kw">as </span>usize][j] {
-          repr += <span class="string">&quot; &quot;</span>;
+          repr += <span class="string">" "</span>;
           repr += <span class="kw-2">&amp;</span>(j + <span class="number">1</span>).to_string();
-          repr += <span class="string">&quot; &quot;</span>;
+          repr += <span class="string">" "</span>;
         } <span class="kw">else </span>{
           <span class="kw">continue</span>;
-          <span class="comment">//repr += &quot; N.A. &quot;;
+          <span class="comment">//repr += " N.A. ";
         </span>} 
       }
-      repr += <span class="string">&quot;\n&quot;</span>;
+      repr += <span class="string">"\n"</span>;
     }  
-    repr += <span class="string">&quot;&gt;&quot;</span>;
-    <span class="macro">write!</span>(f,<span class="string">&quot;{}&quot;</span>, repr)
+    repr += <span class="string">"&gt;"</span>;
+    <span class="macro">write!</span>(f,<span class="string">"{}"</span>, repr)
   }
 }
 
-<span class="attr">#[cfg(feature=<span class="string">&quot;random&quot;</span>)]
+<span class="attr">#[cfg(feature=<span class="string">"random"</span>)]
 </span><span class="kw">impl </span>FromRandom <span class="kw">for </span>MasterTriggerEvent {
 
   <span class="kw">fn </span>from_random() -&gt; <span class="self">Self </span>{
@@ -1447,7 +1096,7 @@
     event.tiu_gps_32    = rng.gen::&lt;u32&gt;();
     event.tiu_gps_16    = rng.gen::&lt;u32&gt;();
     event.n_paddles     = rng.gen::&lt;u8&gt;(); 
-    <span class="comment">// broken will not get serializad, so this won&#39;t
+    <span class="comment">// broken will not get serializad, so this won't
     // be set randomly here
     </span><span class="kw">for </span>k <span class="kw">in </span><span class="number">0</span>..N_LTBS {
       event.board_mask[k] = rng.gen::&lt;bool&gt;();
@@ -1460,7 +1109,7 @@
 }
 
 
-<span class="attr">#[cfg(all(test,feature = <span class="string">&quot;random&quot;</span>))]
+<span class="attr">#[cfg(all(test,feature = <span class="string">"random"</span>))]
 </span><span class="kw">mod </span>test_mastertriggerevent {
   <span class="kw">use </span><span class="kw">crate</span>::serialization::Serialization;
   <span class="kw">use </span><span class="kw">crate</span>::FromRandom;

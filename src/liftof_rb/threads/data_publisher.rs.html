@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-rb/src/threads/data_publisher.rs`."><title>data_publisher.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="liftof_rb" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-rb/src/threads/data_publisher.rs`."><title>data_publisher.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="liftof_rb" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -334,20 +335,20 @@
                       print_packets  : bool,
                       thread_control : Arc&lt;Mutex&lt;ThreadControl&gt;&gt;) {
   <span class="kw">if </span>testing {
-    <span class="macro">warn!</span>(<span class="string">&quot;Testing mode!&quot;</span>);
+    <span class="macro">warn!</span>(<span class="string">"Testing mode!"</span>);
   }
 
   <span class="kw">let </span>ctx = zmq::Context::new();
-  <span class="kw">let </span>data_socket = ctx.socket(zmq::PUB).expect(<span class="string">&quot;Unable to create 0MQ PUB socket!&quot;</span>);
-  data_socket.bind(<span class="kw-2">&amp;</span>address).expect(<span class="string">&quot;Unable to bind to data (PUB) socket {data_adress}&quot;</span>);
-  <span class="macro">info!</span>(<span class="string">&quot;0MQ PUB socket bound to address {address}&quot;</span>);
+  <span class="kw">let </span>data_socket = ctx.socket(zmq::PUB).expect(<span class="string">"Unable to create 0MQ PUB socket!"</span>);
+  data_socket.bind(<span class="kw-2">&amp;</span>address).expect(<span class="string">"Unable to bind to data (PUB) socket {data_adress}"</span>);
+  <span class="macro">info!</span>(<span class="string">"0MQ PUB socket bound to address {address}"</span>);
 
   <span class="kw">let </span><span class="kw-2">mut </span>file_on_disk : <span class="prelude-ty">Option</span>&lt;File&gt; = <span class="prelude-val">None</span>;<span class="comment">//let mut output = File::create(path)?;
   </span><span class="kw">if </span>write_to_disk {
     <span class="kw">let </span>fname : String;
     <span class="kw">match </span>output_fname {
       <span class="prelude-val">None </span>=&gt; {
-        fname = String::from(<span class="string">&quot;Unknown.tof.gaps&quot;</span>);
+        fname = String::from(<span class="string">"Unknown.tof.gaps"</span>);
       }
       <span class="prelude-val">Some</span>(_fname) =&gt; {
         fname = _fname;
@@ -356,33 +357,33 @@
     <span class="kw">let </span>datafile_output_file = Path::new(<span class="kw-2">&amp;</span>fname);
     <span class="comment">// in case it is a calibration file, delete any old 
     // calibration and write it to a specific location
-    </span><span class="kw">let </span>home      = env::var_os(<span class="string">&quot;HOME&quot;</span>).unwrap_or(OsString::from(<span class="string">&quot;/home/gaps&quot;</span>));
-    <span class="kw">let </span>calib_dir = home.to_string_lossy().to_string() + <span class="string">&quot;/calib&quot;</span>; 
-    <span class="kw">if </span>fname.ends_with(<span class="string">&quot;cali.tof.gaps&quot;</span>) {
+    </span><span class="kw">let </span>home      = env::var_os(<span class="string">"HOME"</span>).unwrap_or(OsString::from(<span class="string">"/home/gaps"</span>));
+    <span class="kw">let </span>calib_dir = home.to_string_lossy().to_string() + <span class="string">"/calib"</span>; 
+    <span class="kw">if </span>fname.ends_with(<span class="string">"cali.tof.gaps"</span>) {
       <span class="kw">match </span>fs::metadata(<span class="kw-2">&amp;</span>calib_dir) {
         <span class="prelude-val">Ok</span>(metadata) =&gt; {
           <span class="comment">// Check if the metadata is for a directory
           </span><span class="kw">if </span>!metadata.is_dir() {
-            <span class="macro">error!</span>(<span class="string">&quot;The path exists, but it is not a directory.&quot;</span>);
+            <span class="macro">error!</span>(<span class="string">"The path exists, but it is not a directory."</span>);
           }
         }
         <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
           <span class="comment">// An error occurred, which typically means the directory does not exist
-          </span><span class="macro">warn!</span>(<span class="string">&quot;No calibration directory found. Will create {}&quot;</span>, calib_dir);
+          </span><span class="macro">warn!</span>(<span class="string">"No calibration directory found. Will create {}"</span>, calib_dir);
           <span class="kw">match </span>fs::create_dir(calib_dir.clone()) {
             <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; (),
             <span class="prelude-val">Err</span>(err) =&gt; {
-              <span class="macro">error!</span>(<span class="string">&quot;Can not create {}! Err {err}&quot;</span>, calib_dir)
+              <span class="macro">error!</span>(<span class="string">"Can not create {}! Err {err}"</span>, calib_dir)
             }
           }
         }
       } <span class="comment">// end match
       </span><span class="kw">let </span>calib_file = Path::new(<span class="kw-2">&amp;</span>calib_dir);
       <span class="kw">let </span>local_file = calib_file.join(fname);
-      <span class="macro">info!</span>(<span class="string">&quot;Writing calibration to {}&quot;</span>, local_file.display() );
+      <span class="macro">info!</span>(<span class="string">"Writing calibration to {}"</span>, local_file.display() );
       file_on_disk = OpenOptions::new().create(<span class="bool-val">true</span>).write(<span class="bool-val">true</span>).open(local_file).ok()
     } <span class="kw">else </span>{
-      <span class="macro">info!</span>(<span class="string">&quot;Writing to local file {}!&quot;</span>, fname );
+      <span class="macro">info!</span>(<span class="string">"Writing to local file {}!"</span>, fname );
       file_on_disk = OpenOptions::new().append(<span class="bool-val">true</span>).create(<span class="bool-val">true</span>).open(datafile_output_file).ok()
     }
   }
@@ -396,31 +397,31 @@
   <span class="kw">let </span><span class="kw-2">mut </span>n_sent   : u64 = <span class="number">0</span>;
   <span class="kw">let </span>board_id     = get_board_id().unwrap_or(<span class="number">0</span>) <span class="kw">as </span>u8;
   <span class="kw">if </span>board_id == <span class="number">0 </span>{
-    <span class="macro">error!</span>(<span class="string">&quot;We could not get the board id!&quot;</span>);
+    <span class="macro">error!</span>(<span class="string">"We could not get the board id!"</span>);
   }
   <span class="kw">let </span><span class="kw-2">mut </span>sigint_received = <span class="bool-val">false</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>kill_timer      = Instant::now();
   <span class="kw">loop </span>{
     <span class="comment">// check if we should end this
     </span><span class="kw">if </span>sigint_received &amp;&amp; kill_timer.elapsed().as_secs() &gt; <span class="number">10 </span>{
-      <span class="macro">info!</span>(<span class="string">&quot;Kill timer expired. Ending thread!&quot;</span>);
+      <span class="macro">info!</span>(<span class="string">"Kill timer expired. Ending thread!"</span>);
       <span class="kw">break</span>;
     }
     <span class="kw">match </span>thread_control.lock() {
       <span class="prelude-val">Ok</span>(tc) =&gt; {
         <span class="kw">if </span>tc.stop_flag {
-          <span class="macro">info!</span>(<span class="string">&quot;Received stop signal. Will stop thread!&quot;</span>);
+          <span class="macro">info!</span>(<span class="string">"Received stop signal. Will stop thread!"</span>);
           sigint_received = <span class="bool-val">true</span>;
           kill_timer      = Instant::now();
         }
       },
       <span class="prelude-val">Err</span>(err) =&gt; {
-        <span class="macro">trace!</span>(<span class="string">&quot;Can&#39;t acquire lock! {err}&quot;</span>);
+        <span class="macro">trace!</span>(<span class="string">"Can't acquire lock! {err}"</span>);
       },
     }
     <span class="kw">let </span><span class="kw-2">mut </span>data_type = DataType::Unknown;
     <span class="kw">match </span>data.recv() {
-      <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">trace!</span>(<span class="string">&quot;Error receiving TofPacket {err}&quot;</span>),
+      <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">trace!</span>(<span class="string">"Error receiving TofPacket {err}"</span>),
       <span class="prelude-val">Ok</span>(packet)    =&gt; {
         <span class="kw">if </span><span class="macro">matches!</span>(packet.packet_type, PacketType::RBEvent) {
           <span class="kw">match </span>RBEvent::extract_datatype(<span class="kw-2">&amp;</span>packet.payload) {
@@ -428,16 +429,16 @@
               data_type = dtype;
             }
             <span class="prelude-val">Err</span>(err) =&gt; {
-              <span class="macro">error!</span>(<span class="string">&quot;Unable to extract data type! Err {err}&quot;</span>);
+              <span class="macro">error!</span>(<span class="string">"Unable to extract data type! Err {err}"</span>);
             }
           }
         }
         <span class="kw">if </span>write_to_disk &amp;&amp; !packet.no_write_to_disk {
           <span class="kw">match </span><span class="kw-2">&amp;mut </span>file_on_disk {
-            <span class="prelude-val">None </span>=&gt; <span class="macro">error!</span>(<span class="string">&quot;We want to write data, however the file is invalid!&quot;</span>),
+            <span class="prelude-val">None </span>=&gt; <span class="macro">error!</span>(<span class="string">"We want to write data, however the file is invalid!"</span>),
             <span class="prelude-val">Some</span>(f) =&gt; {
               <span class="kw">match </span>f.write_all(packet.to_bytestream().as_slice()) {
-                <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Writing file to disk failed! Err {err}&quot;</span>),
+                <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Writing file to disk failed! Err {err}"</span>),
                 <span class="prelude-val">Ok</span>(()) =&gt; ()
               }
             }
@@ -451,40 +452,40 @@
               last_10k_evids.push(event.header.event_id);
             },
             <span class="prelude-val">Err</span>(err) =&gt; {
-               <span class="macro">warn!</span>(<span class="string">&quot;Error occured during testing! {err}&quot;</span>);
-               <span class="macro">warn!</span>(<span class="string">&quot;We are seing a payload of {} bytes&quot;</span>, packet.payload.len());
-               <span class="comment">//warn!(&quot;Last few bytes:&quot;);
+               <span class="macro">warn!</span>(<span class="string">"Error occured during testing! {err}"</span>);
+               <span class="macro">warn!</span>(<span class="string">"We are seing a payload of {} bytes"</span>, packet.payload.len());
+               <span class="comment">//warn!("Last few bytes:");
                //for k in packet.payload.len() - 20..packet.payload.len() {
-               //  warn!(&quot;-- {}&quot;, packet.payload[k]);
+               //  warn!("-- {}", packet.payload[k]);
                //}
             </span>}
           }
           <span class="kw">if </span>n_tested == <span class="number">10000 </span>{
-            <span class="macro">println!</span>(<span class="string">&quot;Testing batch complete! Will check the last 10000 events!&quot;</span>);
-            <span class="macro">println!</span>(<span class="string">&quot;-- first event id {}&quot;</span>,  last_10k_evids[<span class="number">0</span>]);
-            <span class="macro">println!</span>(<span class="string">&quot;-- last event id {}&quot;</span>, last_10k_evids[last_10k_evids.len() - <span class="number">1</span>]);
+            <span class="macro">println!</span>(<span class="string">"Testing batch complete! Will check the last 10000 events!"</span>);
+            <span class="macro">println!</span>(<span class="string">"-- first event id {}"</span>,  last_10k_evids[<span class="number">0</span>]);
+            <span class="macro">println!</span>(<span class="string">"-- last event id {}"</span>, last_10k_evids[last_10k_evids.len() - <span class="number">1</span>]);
             <span class="comment">// this is not efficient, but this is a testing case anyway
             </span><span class="kw">let </span><span class="kw-2">mut </span>duplicates = <span class="bool-val">false</span>;
             <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..last_10k_evids.len() {
               <span class="kw">for </span>j <span class="kw">in </span>(i + <span class="number">1</span>)..last_10k_evids.len() {
                 <span class="kw">if </span>last_10k_evids[i] == last_10k_evids[j] {
-                  <span class="macro">println!</span>(<span class="string">&quot;FAIL : Found eventid {} at positions {} and {}&quot;</span>, last_10k_evids[i], i, j);
+                  <span class="macro">println!</span>(<span class="string">"FAIL : Found eventid {} at positions {} and {}"</span>, last_10k_evids[i], i, j);
                   duplicates = <span class="bool-val">true</span>;
                 }
               }
             }
             <span class="kw">if </span>!duplicates {
-              <span class="macro">println!</span>(<span class="string">&quot;PASS - we did not observe any duplicate entries!&quot;</span>);
+              <span class="macro">println!</span>(<span class="string">"PASS - we did not observe any duplicate entries!"</span>);
             }
             <span class="kw">let </span>missing = find_missing_elements(<span class="kw-2">&amp;</span>last_10k_evids);
             <span class="kw">if </span>missing.is_empty() {
-              <span class="macro">println!</span>(<span class="string">&quot;PASS - we did not miss any event ids!&quot;</span>);
+              <span class="macro">println!</span>(<span class="string">"PASS - we did not miss any event ids!"</span>);
             } <span class="kw">else </span>{
-              <span class="macro">println!</span>(<span class="string">&quot;FAIL - we missed {} event ids ({}/100)&quot;</span>, missing.len(), missing.len() <span class="kw">as </span>f32/<span class="number">10000.0</span>);
-              <span class="macro">println!</span>(<span class="string">&quot;MISSING {:?}&quot;</span>, missing);
+              <span class="macro">println!</span>(<span class="string">"FAIL - we missed {} event ids ({}/100)"</span>, missing.len(), missing.len() <span class="kw">as </span>f32/<span class="number">10000.0</span>);
+              <span class="macro">println!</span>(<span class="string">"MISSING {:?}"</span>, missing);
             }
-            <span class="macro">println!</span>(<span class="string">&quot;----&quot;</span>);
-            <span class="macro">println!</span>(<span class="string">&quot;---- last 10k evids {:?}&quot;</span>, last_10k_evids);
+            <span class="macro">println!</span>(<span class="string">"----"</span>);
+            <span class="macro">println!</span>(<span class="string">"---- last 10k evids {:?}"</span>, last_10k_evids);
             last_10k_evids.clear();
           }
         } <span class="comment">// end testing
@@ -510,14 +511,14 @@
         }
         <span class="kw">match </span>data_socket.send(tp_payload,zmq::DONTWAIT) {
           <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
-            <span class="macro">trace!</span>(<span class="string">&quot;0MQ PUB socket.send() SUCCESS!&quot;</span>);
+            <span class="macro">trace!</span>(<span class="string">"0MQ PUB socket.send() SUCCESS!"</span>);
             n_sent += <span class="number">1</span>;
           },
-          <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Not able to send over 0MQ PUB socket! Err {err}&quot;</span>),
+          <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Not able to send over 0MQ PUB socket! Err {err}"</span>),
         }
         <span class="kw">if </span>n_sent % <span class="number">1000 </span>== <span class="number">0 </span>&amp;&amp; n_sent &gt; <span class="number">0 </span>&amp;&amp; print_packets {
-          <span class="macro">println!</span>(<span class="string">&quot;==&gt; We sent {n_sent} packets!&quot;</span>);
-          <span class="macro">println!</span>(<span class="string">&quot;==&gt; Last Tofpacket type: {} with {} bytes!&quot;</span>, packet.packet_type, packet.payload.len());
+          <span class="macro">println!</span>(<span class="string">"==&gt; We sent {n_sent} packets!"</span>);
+          <span class="macro">println!</span>(<span class="string">"==&gt; Last Tofpacket type: {} with {} bytes!"</span>, packet.packet_type, packet.payload.len());
         }
       }
     }

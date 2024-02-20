@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/monitoring.rs`."><title>monitoring.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/monitoring.rs`."><title>monitoring.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1284,26 +1285,26 @@
 
 </span><span class="kw">use </span>std::fmt;
 
-<span class="comment">// Takeru&#39;s tof-control code
-</span><span class="attr">#[cfg(feature = <span class="string">&quot;tof-control&quot;</span>)]
+<span class="comment">// Takeru's tof-control code
+</span><span class="attr">#[cfg(feature = <span class="string">"tof-control"</span>)]
 </span><span class="kw">use </span>tof_control::helper::pb_type::{
     PBTemp,
     PBVcp,
 };
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;tof-control&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"tof-control"</span>)]
 </span><span class="kw">use </span>tof_control::helper::preamp_type::{
     PreampTemp,
     PreampReadBias,
 };
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;tof-control&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"tof-control"</span>)]
 </span><span class="kw">use </span>tof_control::helper::ltb_type::{
     LTBTemp,
     LTBThreshold,
 };
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;tof-control&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"tof-control"</span>)]
 </span><span class="kw">use </span>tof_control::helper::rb_type::{
     RBTempDebug,
     RBMag,
@@ -1312,13 +1313,13 @@
 };
 
 <span class="macro">cfg_if::cfg_if! </span>{
-  <span class="kw">if </span><span class="attr">#[cfg(feature = <span class="string">&quot;random&quot;</span>)]  </span>{
+  <span class="kw">if </span><span class="attr">#[cfg(feature = <span class="string">"random"</span>)]  </span>{
     <span class="kw">use </span><span class="kw">crate</span>::FromRandom;
     <span class="kw">extern crate </span>rand;
     <span class="kw">use </span>rand::Rng;
   }
 }
-<span class="attr">#[cfg(feature = <span class="string">&quot;tof-control&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"tof-control"</span>)]
 </span><span class="kw">use </span>tof_control::helper::cpu_type::{
     CPUTempDebug,
     CPUInfo,
@@ -1370,7 +1371,7 @@
     }
   }
   
-  <span class="attr">#[cfg(feature = <span class="string">&quot;tof-control&quot;</span>)]
+  <span class="attr">#[cfg(feature = <span class="string">"tof-control"</span>)]
   </span><span class="kw">pub fn </span>add_temps(<span class="kw-2">&amp;mut </span><span class="self">self</span>, pbtmp : <span class="kw-2">&amp;</span>PBTemp) {
     <span class="self">self</span>.pds_temp = pbtmp.pds_temp; 
     <span class="self">self</span>.pas_temp = pbtmp.pas_temp; 
@@ -1378,7 +1379,7 @@
     <span class="self">self</span>.shv_temp = pbtmp.shv_temp; 
   }
   
-  <span class="attr">#[cfg(feature = <span class="string">&quot;tof-control&quot;</span>)]
+  <span class="attr">#[cfg(feature = <span class="string">"tof-control"</span>)]
   </span><span class="kw">pub fn </span>add_vcp(<span class="kw-2">&amp;mut </span><span class="self">self</span>, pbvcp : <span class="kw-2">&amp;</span>PBVcp) {
     <span class="self">self</span>.p3v6_preamp_vcp = pbvcp.p3v6_preamp_vcp; 
     <span class="self">self</span>.n1v6_preamp_vcp = pbvcp.n1v6_preamp_vcp;  
@@ -1398,7 +1399,7 @@
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>PBMoniData {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
-    <span class="macro">write!</span>(f, <span class="string">&quot;&lt;PBMoniData:
+    <span class="macro">write!</span>(f, <span class="string">"&lt;PBMoniData:
   BOARD ID     :  {}
   ** Temperatures **
   PDS TMP      :  {:.2} [\u{00B0}C]
@@ -1411,34 +1412,34 @@
   P3V4f LTB    :  {:.3}  [V] | {:.3} [A] | {:.3} [W]
   P3V4d LTB    :  {:.3}  [V] | {:.3} [A] | {:.3} [W]
   P3V6  LTB    :  {:.3}  [V] | {:.3} [A] | {:.3} [W]
-  N1V6  LTB    : {:.3}  [V] | {:.3} [A] | {:.3} [W]&gt;&quot;</span>,
+  N1V6  LTB    : {:.3}  [V] | {:.3} [A] | {:.3} [W]&gt;"</span>,
            <span class="self">self</span>.board_id       , 
-           <span class="kw">if </span><span class="self">self</span>.pds_temp != f32::MAX {<span class="self">self</span>.pds_temp.to_string()} <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
-           <span class="kw">if </span><span class="self">self</span>.pas_temp != f32::MAX {<span class="self">self</span>.pas_temp.to_string()} <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
-           <span class="kw">if </span><span class="self">self</span>.nas_temp != f32::MAX {<span class="self">self</span>.nas_temp.to_string()} <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
-           <span class="kw">if </span><span class="self">self</span>.shv_temp != f32::MAX {<span class="self">self</span>.shv_temp.to_string()} <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
-           <span class="kw">if </span><span class="self">self</span>.p3v6_preamp_vcp[<span class="number">0</span>] != f32::MAX {<span class="self">self</span>.p3v6_preamp_vcp[<span class="number">0</span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
-           <span class="kw">if </span><span class="self">self</span>.p3v6_preamp_vcp[<span class="number">1</span>] != f32::MAX {<span class="self">self</span>.p3v6_preamp_vcp[<span class="number">1</span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
-           <span class="kw">if </span><span class="self">self</span>.p3v6_preamp_vcp[<span class="number">2</span>] != f32::MAX {<span class="self">self</span>.p3v6_preamp_vcp[<span class="number">2</span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
-           <span class="kw">if </span><span class="self">self</span>.n1v6_preamp_vcp[<span class="number">0</span>] != f32::MAX {<span class="self">self</span>.n1v6_preamp_vcp[<span class="number">0</span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
-           <span class="kw">if </span><span class="self">self</span>.n1v6_preamp_vcp[<span class="number">1</span>] != f32::MAX {<span class="self">self</span>.n1v6_preamp_vcp[<span class="number">1</span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
-           <span class="kw">if </span><span class="self">self</span>.n1v6_preamp_vcp[<span class="number">2</span>] != f32::MAX {<span class="self">self</span>.n1v6_preamp_vcp[<span class="number">2</span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
-           <span class="kw">if </span><span class="self">self</span>.p3v4f_ltb_vcp[<span class="number">0</span>]   != f32::MAX {<span class="self">self</span>.p3v4f_ltb_vcp[<span class="number">0</span>].to_string()  } <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
-           <span class="kw">if </span><span class="self">self</span>.p3v4f_ltb_vcp[<span class="number">1</span>]   != f32::MAX {<span class="self">self</span>.p3v4f_ltb_vcp[<span class="number">1</span>].to_string()  } <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
-           <span class="kw">if </span><span class="self">self</span>.p3v4f_ltb_vcp[<span class="number">2</span>]   != f32::MAX {<span class="self">self</span>.p3v4f_ltb_vcp[<span class="number">2</span>].to_string()  } <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
-           <span class="kw">if </span><span class="self">self</span>.p3v4d_ltb_vcp[<span class="number">0</span>]   != f32::MAX {<span class="self">self</span>.p3v4d_ltb_vcp[<span class="number">0</span>].to_string()  } <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
-           <span class="kw">if </span><span class="self">self</span>.p3v4d_ltb_vcp[<span class="number">1</span>]   != f32::MAX {<span class="self">self</span>.p3v4d_ltb_vcp[<span class="number">1</span>].to_string()  } <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
-           <span class="kw">if </span><span class="self">self</span>.p3v4d_ltb_vcp[<span class="number">2</span>]   != f32::MAX {<span class="self">self</span>.p3v4d_ltb_vcp[<span class="number">2</span>].to_string()  } <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
-           <span class="kw">if </span><span class="self">self</span>.p3v6_ltb_vcp[<span class="number">0</span>]    != f32::MAX {<span class="self">self</span>.p3v6_ltb_vcp[<span class="number">0</span>].to_string()   } <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
-           <span class="kw">if </span><span class="self">self</span>.p3v6_ltb_vcp[<span class="number">1</span>]    != f32::MAX {<span class="self">self</span>.p3v6_ltb_vcp[<span class="number">1</span>].to_string()   } <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
-           <span class="kw">if </span><span class="self">self</span>.p3v6_ltb_vcp[<span class="number">2</span>]    != f32::MAX {<span class="self">self</span>.p3v6_ltb_vcp[<span class="number">2</span>].to_string()   } <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
-           <span class="kw">if </span><span class="self">self</span>.n1v6_ltb_vcp[<span class="number">0</span>]    != f32::MAX {<span class="self">self</span>.n1v6_ltb_vcp[<span class="number">0</span>].to_string()   } <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
-           <span class="kw">if </span><span class="self">self</span>.n1v6_ltb_vcp[<span class="number">1</span>]    != f32::MAX {<span class="self">self</span>.n1v6_ltb_vcp[<span class="number">1</span>].to_string()   } <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
-           <span class="kw">if </span><span class="self">self</span>.n1v6_ltb_vcp[<span class="number">2</span>]    != f32::MAX {<span class="self">self</span>.n1v6_ltb_vcp[<span class="number">2</span>].to_string()   } <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)})
+           <span class="kw">if </span><span class="self">self</span>.pds_temp != f32::MAX {<span class="self">self</span>.pds_temp.to_string()} <span class="kw">else </span>{String::from(<span class="string">"f32::MAX (ERR)"</span>)},
+           <span class="kw">if </span><span class="self">self</span>.pas_temp != f32::MAX {<span class="self">self</span>.pas_temp.to_string()} <span class="kw">else </span>{String::from(<span class="string">"f32::MAX (ERR)"</span>)},
+           <span class="kw">if </span><span class="self">self</span>.nas_temp != f32::MAX {<span class="self">self</span>.nas_temp.to_string()} <span class="kw">else </span>{String::from(<span class="string">"f32::MAX (ERR)"</span>)},
+           <span class="kw">if </span><span class="self">self</span>.shv_temp != f32::MAX {<span class="self">self</span>.shv_temp.to_string()} <span class="kw">else </span>{String::from(<span class="string">"f32::MAX (ERR)"</span>)},
+           <span class="kw">if </span><span class="self">self</span>.p3v6_preamp_vcp[<span class="number">0</span>] != f32::MAX {<span class="self">self</span>.p3v6_preamp_vcp[<span class="number">0</span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">"f32::MAX (ERR)"</span>)},
+           <span class="kw">if </span><span class="self">self</span>.p3v6_preamp_vcp[<span class="number">1</span>] != f32::MAX {<span class="self">self</span>.p3v6_preamp_vcp[<span class="number">1</span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">"f32::MAX (ERR)"</span>)},
+           <span class="kw">if </span><span class="self">self</span>.p3v6_preamp_vcp[<span class="number">2</span>] != f32::MAX {<span class="self">self</span>.p3v6_preamp_vcp[<span class="number">2</span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">"f32::MAX (ERR)"</span>)},
+           <span class="kw">if </span><span class="self">self</span>.n1v6_preamp_vcp[<span class="number">0</span>] != f32::MAX {<span class="self">self</span>.n1v6_preamp_vcp[<span class="number">0</span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">"f32::MAX (ERR)"</span>)},
+           <span class="kw">if </span><span class="self">self</span>.n1v6_preamp_vcp[<span class="number">1</span>] != f32::MAX {<span class="self">self</span>.n1v6_preamp_vcp[<span class="number">1</span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">"f32::MAX (ERR)"</span>)},
+           <span class="kw">if </span><span class="self">self</span>.n1v6_preamp_vcp[<span class="number">2</span>] != f32::MAX {<span class="self">self</span>.n1v6_preamp_vcp[<span class="number">2</span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">"f32::MAX (ERR)"</span>)},
+           <span class="kw">if </span><span class="self">self</span>.p3v4f_ltb_vcp[<span class="number">0</span>]   != f32::MAX {<span class="self">self</span>.p3v4f_ltb_vcp[<span class="number">0</span>].to_string()  } <span class="kw">else </span>{String::from(<span class="string">"f32::MAX (ERR)"</span>)},
+           <span class="kw">if </span><span class="self">self</span>.p3v4f_ltb_vcp[<span class="number">1</span>]   != f32::MAX {<span class="self">self</span>.p3v4f_ltb_vcp[<span class="number">1</span>].to_string()  } <span class="kw">else </span>{String::from(<span class="string">"f32::MAX (ERR)"</span>)},
+           <span class="kw">if </span><span class="self">self</span>.p3v4f_ltb_vcp[<span class="number">2</span>]   != f32::MAX {<span class="self">self</span>.p3v4f_ltb_vcp[<span class="number">2</span>].to_string()  } <span class="kw">else </span>{String::from(<span class="string">"f32::MAX (ERR)"</span>)},
+           <span class="kw">if </span><span class="self">self</span>.p3v4d_ltb_vcp[<span class="number">0</span>]   != f32::MAX {<span class="self">self</span>.p3v4d_ltb_vcp[<span class="number">0</span>].to_string()  } <span class="kw">else </span>{String::from(<span class="string">"f32::MAX (ERR)"</span>)},
+           <span class="kw">if </span><span class="self">self</span>.p3v4d_ltb_vcp[<span class="number">1</span>]   != f32::MAX {<span class="self">self</span>.p3v4d_ltb_vcp[<span class="number">1</span>].to_string()  } <span class="kw">else </span>{String::from(<span class="string">"f32::MAX (ERR)"</span>)},
+           <span class="kw">if </span><span class="self">self</span>.p3v4d_ltb_vcp[<span class="number">2</span>]   != f32::MAX {<span class="self">self</span>.p3v4d_ltb_vcp[<span class="number">2</span>].to_string()  } <span class="kw">else </span>{String::from(<span class="string">"f32::MAX (ERR)"</span>)},
+           <span class="kw">if </span><span class="self">self</span>.p3v6_ltb_vcp[<span class="number">0</span>]    != f32::MAX {<span class="self">self</span>.p3v6_ltb_vcp[<span class="number">0</span>].to_string()   } <span class="kw">else </span>{String::from(<span class="string">"f32::MAX (ERR)"</span>)},
+           <span class="kw">if </span><span class="self">self</span>.p3v6_ltb_vcp[<span class="number">1</span>]    != f32::MAX {<span class="self">self</span>.p3v6_ltb_vcp[<span class="number">1</span>].to_string()   } <span class="kw">else </span>{String::from(<span class="string">"f32::MAX (ERR)"</span>)},
+           <span class="kw">if </span><span class="self">self</span>.p3v6_ltb_vcp[<span class="number">2</span>]    != f32::MAX {<span class="self">self</span>.p3v6_ltb_vcp[<span class="number">2</span>].to_string()   } <span class="kw">else </span>{String::from(<span class="string">"f32::MAX (ERR)"</span>)},
+           <span class="kw">if </span><span class="self">self</span>.n1v6_ltb_vcp[<span class="number">0</span>]    != f32::MAX {<span class="self">self</span>.n1v6_ltb_vcp[<span class="number">0</span>].to_string()   } <span class="kw">else </span>{String::from(<span class="string">"f32::MAX (ERR)"</span>)},
+           <span class="kw">if </span><span class="self">self</span>.n1v6_ltb_vcp[<span class="number">1</span>]    != f32::MAX {<span class="self">self</span>.n1v6_ltb_vcp[<span class="number">1</span>].to_string()   } <span class="kw">else </span>{String::from(<span class="string">"f32::MAX (ERR)"</span>)},
+           <span class="kw">if </span><span class="self">self</span>.n1v6_ltb_vcp[<span class="number">2</span>]    != f32::MAX {<span class="self">self</span>.n1v6_ltb_vcp[<span class="number">2</span>].to_string()   } <span class="kw">else </span>{String::from(<span class="string">"f32::MAX (ERR)"</span>)})
   }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;random&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"random"</span>)]
 </span><span class="kw">impl </span>FromRandom <span class="kw">for </span>PBMoniData {
     
   <span class="kw">fn </span>from_random() -&gt; PBMoniData {
@@ -1570,12 +1571,12 @@
     }
   }
 
-  <span class="attr">#[cfg(feature = <span class="string">&quot;tof-control&quot;</span>)]
+  <span class="attr">#[cfg(feature = <span class="string">"tof-control"</span>)]
   </span><span class="kw">pub fn </span>add_temps(<span class="kw-2">&amp;mut </span><span class="self">self</span>, pt : <span class="kw-2">&amp;</span>PreampTemp ) {
     <span class="self">self</span>.temps = pt.preamp_temps;
   }
 
-  <span class="attr">#[cfg(feature = <span class="string">&quot;tof-control&quot;</span>)]
+  <span class="attr">#[cfg(feature = <span class="string">"tof-control"</span>)]
   </span><span class="kw">pub fn </span>add_biases(<span class="kw-2">&amp;mut </span><span class="self">self</span>, pb : <span class="kw-2">&amp;</span>PreampReadBias) {
     <span class="self">self</span>.biases = pb.read_biases;
   }
@@ -1589,7 +1590,7 @@
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>PAMoniData {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
-    <span class="macro">write!</span>(f, <span class="string">&quot;&lt;PAMoniData:
+    <span class="macro">write!</span>(f, <span class="string">"&lt;PAMoniData:
   Board ID : {}
   **16 Temp values**
   T1   : {:.2} [\u{00B0}C]
@@ -1624,24 +1625,24 @@
   V13  : {:.3} [V]
   V14  : {:.3} [V]
   V15  : {:.3} [V]
-  V16  : {:.3} [V]&gt;&quot;</span>,
+  V16  : {:.3} [V]&gt;"</span>,
   <span class="self">self</span>.board_id,
-  <span class="kw">if </span><span class="self">self</span>.temps[<span class="number">0</span>]  != f32::MAX {<span class="self">self</span>.temps[<span class="number">0 </span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
-  <span class="kw">if </span><span class="self">self</span>.temps[<span class="number">1</span>]  != f32::MAX {<span class="self">self</span>.temps[<span class="number">1 </span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
-  <span class="kw">if </span><span class="self">self</span>.temps[<span class="number">2</span>]  != f32::MAX {<span class="self">self</span>.temps[<span class="number">2 </span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
-  <span class="kw">if </span><span class="self">self</span>.temps[<span class="number">3</span>]  != f32::MAX {<span class="self">self</span>.temps[<span class="number">3 </span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
-  <span class="kw">if </span><span class="self">self</span>.temps[<span class="number">4</span>]  != f32::MAX {<span class="self">self</span>.temps[<span class="number">4 </span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
-  <span class="kw">if </span><span class="self">self</span>.temps[<span class="number">5</span>]  != f32::MAX {<span class="self">self</span>.temps[<span class="number">5 </span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
-  <span class="kw">if </span><span class="self">self</span>.temps[<span class="number">6</span>]  != f32::MAX {<span class="self">self</span>.temps[<span class="number">6 </span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
-  <span class="kw">if </span><span class="self">self</span>.temps[<span class="number">7</span>]  != f32::MAX {<span class="self">self</span>.temps[<span class="number">7 </span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
-  <span class="kw">if </span><span class="self">self</span>.temps[<span class="number">8</span>]  != f32::MAX {<span class="self">self</span>.temps[<span class="number">8 </span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
-  <span class="kw">if </span><span class="self">self</span>.temps[<span class="number">9</span>]  != f32::MAX {<span class="self">self</span>.temps[<span class="number">9 </span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
-  <span class="kw">if </span><span class="self">self</span>.temps[<span class="number">10</span>] != f32::MAX {<span class="self">self</span>.temps[<span class="number">10</span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
-  <span class="kw">if </span><span class="self">self</span>.temps[<span class="number">11</span>] != f32::MAX {<span class="self">self</span>.temps[<span class="number">11</span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
-  <span class="kw">if </span><span class="self">self</span>.temps[<span class="number">12</span>] != f32::MAX {<span class="self">self</span>.temps[<span class="number">12</span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
-  <span class="kw">if </span><span class="self">self</span>.temps[<span class="number">13</span>] != f32::MAX {<span class="self">self</span>.temps[<span class="number">13</span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
-  <span class="kw">if </span><span class="self">self</span>.temps[<span class="number">14</span>] != f32::MAX {<span class="self">self</span>.temps[<span class="number">14</span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
-  <span class="kw">if </span><span class="self">self</span>.temps[<span class="number">15</span>] != f32::MAX {<span class="self">self</span>.temps[<span class="number">15</span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">&quot;f32::MAX (ERR)&quot;</span>)},
+  <span class="kw">if </span><span class="self">self</span>.temps[<span class="number">0</span>]  != f32::MAX {<span class="self">self</span>.temps[<span class="number">0 </span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">"f32::MAX (ERR)"</span>)},
+  <span class="kw">if </span><span class="self">self</span>.temps[<span class="number">1</span>]  != f32::MAX {<span class="self">self</span>.temps[<span class="number">1 </span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">"f32::MAX (ERR)"</span>)},
+  <span class="kw">if </span><span class="self">self</span>.temps[<span class="number">2</span>]  != f32::MAX {<span class="self">self</span>.temps[<span class="number">2 </span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">"f32::MAX (ERR)"</span>)},
+  <span class="kw">if </span><span class="self">self</span>.temps[<span class="number">3</span>]  != f32::MAX {<span class="self">self</span>.temps[<span class="number">3 </span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">"f32::MAX (ERR)"</span>)},
+  <span class="kw">if </span><span class="self">self</span>.temps[<span class="number">4</span>]  != f32::MAX {<span class="self">self</span>.temps[<span class="number">4 </span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">"f32::MAX (ERR)"</span>)},
+  <span class="kw">if </span><span class="self">self</span>.temps[<span class="number">5</span>]  != f32::MAX {<span class="self">self</span>.temps[<span class="number">5 </span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">"f32::MAX (ERR)"</span>)},
+  <span class="kw">if </span><span class="self">self</span>.temps[<span class="number">6</span>]  != f32::MAX {<span class="self">self</span>.temps[<span class="number">6 </span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">"f32::MAX (ERR)"</span>)},
+  <span class="kw">if </span><span class="self">self</span>.temps[<span class="number">7</span>]  != f32::MAX {<span class="self">self</span>.temps[<span class="number">7 </span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">"f32::MAX (ERR)"</span>)},
+  <span class="kw">if </span><span class="self">self</span>.temps[<span class="number">8</span>]  != f32::MAX {<span class="self">self</span>.temps[<span class="number">8 </span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">"f32::MAX (ERR)"</span>)},
+  <span class="kw">if </span><span class="self">self</span>.temps[<span class="number">9</span>]  != f32::MAX {<span class="self">self</span>.temps[<span class="number">9 </span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">"f32::MAX (ERR)"</span>)},
+  <span class="kw">if </span><span class="self">self</span>.temps[<span class="number">10</span>] != f32::MAX {<span class="self">self</span>.temps[<span class="number">10</span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">"f32::MAX (ERR)"</span>)},
+  <span class="kw">if </span><span class="self">self</span>.temps[<span class="number">11</span>] != f32::MAX {<span class="self">self</span>.temps[<span class="number">11</span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">"f32::MAX (ERR)"</span>)},
+  <span class="kw">if </span><span class="self">self</span>.temps[<span class="number">12</span>] != f32::MAX {<span class="self">self</span>.temps[<span class="number">12</span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">"f32::MAX (ERR)"</span>)},
+  <span class="kw">if </span><span class="self">self</span>.temps[<span class="number">13</span>] != f32::MAX {<span class="self">self</span>.temps[<span class="number">13</span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">"f32::MAX (ERR)"</span>)},
+  <span class="kw">if </span><span class="self">self</span>.temps[<span class="number">14</span>] != f32::MAX {<span class="self">self</span>.temps[<span class="number">14</span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">"f32::MAX (ERR)"</span>)},
+  <span class="kw">if </span><span class="self">self</span>.temps[<span class="number">15</span>] != f32::MAX {<span class="self">self</span>.temps[<span class="number">15</span>].to_string()} <span class="kw">else </span>{String::from(<span class="string">"f32::MAX (ERR)"</span>)},
   <span class="self">self</span>.biases[<span class="number">0</span>],
   <span class="self">self</span>.biases[<span class="number">1</span>],
   <span class="self">self</span>.biases[<span class="number">2</span>],
@@ -1661,7 +1662,7 @@
   }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;random&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"random"</span>)]
 </span><span class="kw">impl </span>FromRandom <span class="kw">for </span>PAMoniData {
     
   <span class="kw">fn </span>from_random() -&gt; <span class="self">Self </span>{
@@ -1739,13 +1740,13 @@
     }
   }
 
-  <span class="attr">#[cfg(feature = <span class="string">&quot;tof-control&quot;</span>)]
+  <span class="attr">#[cfg(feature = <span class="string">"tof-control"</span>)]
   </span><span class="kw">pub fn </span>add_temps(<span class="kw-2">&amp;mut </span><span class="self">self</span>, lt : <span class="kw-2">&amp;</span>LTBTemp) {
     <span class="self">self</span>.trenz_temp = lt.trenz_temp;
     <span class="self">self</span>.ltb_temp   = lt.board_temp;
   }
 
-  <span class="attr">#[cfg(feature = <span class="string">&quot;tof-control&quot;</span>)]
+  <span class="attr">#[cfg(feature = <span class="string">"tof-control"</span>)]
   </span><span class="kw">pub fn </span>add_thresh(<span class="kw-2">&amp;mut </span><span class="self">self</span>, lt : <span class="kw-2">&amp;</span>LTBThreshold) {
     <span class="self">self</span>.thresh = lt.thresholds;
   }
@@ -1759,13 +1760,13 @@
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>LTBMoniData {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
-    <span class="macro">write!</span>(f, <span class="string">&quot;&lt;LTBMoniData:
+    <span class="macro">write!</span>(f, <span class="string">"&lt;LTBMoniData:
   Board ID  : {}
   ** Temperatures **
   TRENZ TMP : {:.2} [\u{00B0}C]
   LTB   TMP : {:.2} [\u{00B0}C]
   ** Threshold Voltages **
-  THR1, THR2, THR3 : {:.3} | {:.3} | {:.3} [V]&gt;&quot;</span>,
+  THR1, THR2, THR3 : {:.3} | {:.3} | {:.3} [V]&gt;"</span>,
   <span class="self">self</span>.board_id,
   <span class="self">self</span>.trenz_temp,
   <span class="self">self</span>.ltb_temp,
@@ -1775,7 +1776,7 @@
   }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;random&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"random"</span>)]
 </span><span class="kw">impl </span>FromRandom <span class="kw">for </span>LTBMoniData {
     
   <span class="kw">fn </span>from_random() -&gt; LTBMoniData {
@@ -1881,7 +1882,7 @@
 
 <span class="kw">impl </span>RBMoniData {
 
-  <span class="attr">#[cfg(feature = <span class="string">&quot;tof-control&quot;</span>)]
+  <span class="attr">#[cfg(feature = <span class="string">"tof-control"</span>)]
   </span><span class="kw">pub fn </span>add_rbtemp(<span class="kw-2">&amp;mut </span><span class="self">self</span>, rb_temp : <span class="kw-2">&amp;</span>RBTempDebug) {
     <span class="self">self</span>.tmp_drs         = rb_temp.drs_temp      ; 
     <span class="self">self</span>.tmp_clk         = rb_temp.clk_temp      ; 
@@ -1892,7 +1893,7 @@
     <span class="self">self</span>.tmp_bm280       = rb_temp.bme280_temp   ; 
   }
 
-  <span class="attr">#[cfg(feature = <span class="string">&quot;tof-control&quot;</span>)] 
+  <span class="attr">#[cfg(feature = <span class="string">"tof-control"</span>)] 
   </span><span class="kw">pub fn </span>add_rbmag(<span class="kw-2">&amp;mut </span><span class="self">self</span>, rb_mag   : <span class="kw-2">&amp;</span>RBMag) {
     <span class="self">self</span>.mag_x   = rb_mag.mag_xyz[<span class="number">0</span>];
     <span class="self">self</span>.mag_y   = rb_mag.mag_xyz[<span class="number">1</span>];
@@ -1904,7 +1905,7 @@
   }
 
 
-  <span class="attr">#[cfg(feature = <span class="string">&quot;tof-control&quot;</span>)]
+  <span class="attr">#[cfg(feature = <span class="string">"tof-control"</span>)]
   </span><span class="kw">pub fn </span>add_rbvcp(<span class="kw-2">&amp;mut </span><span class="self">self</span>, rb_vcp   : <span class="kw-2">&amp;</span>RBVcp) {
     <span class="self">self</span>.drs_dvdd_voltage = rb_vcp.drs_dvdd_vcp[<span class="number">0</span>] ;
     <span class="self">self</span>.drs_dvdd_current = rb_vcp.drs_dvdd_vcp[<span class="number">1</span>] ;
@@ -1932,7 +1933,7 @@
     <span class="self">self</span>.n1v5_power       = rb_vcp.n1v5_vcp[<span class="number">2</span>]      ;
   }
   
-  <span class="attr">#[cfg(feature = <span class="string">&quot;tof-control&quot;</span>)] 
+  <span class="attr">#[cfg(feature = <span class="string">"tof-control"</span>)] 
   </span><span class="kw">pub fn </span>add_rbph(<span class="kw-2">&amp;mut </span><span class="self">self</span>, rb_ph   : <span class="kw-2">&amp;</span>RBPh) {
     <span class="self">self</span>.pressure = rb_ph.pressure;
     <span class="self">self</span>.humidity = rb_ph.humidity;
@@ -1989,7 +1990,7 @@
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>RBMoniData {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
-    <span class="macro">write!</span>(f, <span class="string">&quot;&lt;RBMoniData:
+    <span class="macro">write!</span>(f, <span class="string">"&lt;RBMoniData:
   BOARD ID       {}
   RATE           {}    [Hz] 
   ** Temperatures **
@@ -2012,7 +2013,7 @@
   DRS4 Digital 2.5V Power:  {:.3}  [V] | {:.3} [A] | {:.3} [W]
   DRS4 Analog 2.5V  Power:  {:.3}  [V] | {:.3} [A] | {:.3} [W]
   ADC Digital 2.5V  Power:  {:.3}  [V] | {:.3} [A] | {:.3} [W]
-  ADC Analog 3.0V   Power:  {:.3}  [V] | {:.3} [A] | {:.3} [W]&gt;&quot;</span>,
+  ADC Analog 3.0V   Power:  {:.3}  [V] | {:.3} [A] | {:.3} [W]&gt;"</span>,
            <span class="self">self</span>.board_id        , 
            <span class="self">self</span>.rate            ,
            <span class="self">self</span>.tmp_drs         ,
@@ -2054,7 +2055,7 @@
   }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;random&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"random"</span>)]
 </span><span class="kw">impl </span>FromRandom <span class="kw">for </span>RBMoniData {
     
   <span class="kw">fn </span>from_random() -&gt; RBMoniData {
@@ -2237,7 +2238,7 @@
     <span class="macro">vec!</span>[<span class="self">self</span>.cpu0_temp, <span class="self">self</span>.cpu1_temp, <span class="self">self</span>.cpu_temp, <span class="self">self</span>.mb_temp]
   }
 
-  <span class="attr">#[cfg(feature = <span class="string">&quot;tof-control&quot;</span>)]
+  <span class="attr">#[cfg(feature = <span class="string">"tof-control"</span>)]
   </span><span class="kw">pub fn </span>add_temps(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cpu_temps : <span class="kw-2">&amp;</span>CPUTempDebug) {
     <span class="self">self</span>.cpu_temp   = cpu_temps.cpu_temp;
     <span class="self">self</span>.cpu0_temp  = cpu_temps.cpu0_temp;
@@ -2245,7 +2246,7 @@
     <span class="self">self</span>.mb_temp    = cpu_temps.mb_temp;
   }
 
-  <span class="attr">#[cfg(feature = <span class="string">&quot;tof-control&quot;</span>)]
+  <span class="attr">#[cfg(feature = <span class="string">"tof-control"</span>)]
   </span><span class="kw">pub fn </span>add_info(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cpu_info : <span class="kw-2">&amp;</span>CPUInfo) {
     <span class="self">self</span>.uptime = cpu_info.uptime;
     <span class="self">self</span>.disk_usage = cpu_info.disk_usage;
@@ -2261,14 +2262,14 @@
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>CPUMoniData {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
-    <span class="macro">write!</span>(f, <span class="string">&quot;&lt;CPUMoniData:
+    <span class="macro">write!</span>(f, <span class="string">"&lt;CPUMoniData:
   core0   temp [\u{00B0}C] : {:.2} 
   core1   temp [\u{00B0}C] : {:.2} 
   CPU     temp [\u{00B0}C] : {:.2} 
   MB      temp [\u{00B0}C] : {:.2} 
   CPU (4) freq [Hz] : {} | {} | {} | {} 
   Disc usage   [%]  : {} 
-  Uptime       [s]  : {}&gt;&quot;</span>,
+  Uptime       [s]  : {}&gt;"</span>,
            <span class="self">self</span>.cpu0_temp,
            <span class="self">self</span>.cpu1_temp,
            <span class="self">self</span>.cpu_temp,
@@ -2324,7 +2325,7 @@
 
 <span class="comment">///////////////////////////////////////////////////////
 
-</span><span class="attr">#[cfg(feature = <span class="string">&quot;random&quot;</span>)]
+</span><span class="attr">#[cfg(feature = <span class="string">"random"</span>)]
 </span><span class="kw">impl </span>FromRandom <span class="kw">for </span>CPUMoniData {
     
   <span class="kw">fn </span>from_random() -&gt; <span class="self">Self </span>{
@@ -2397,7 +2398,7 @@
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>MtbMoniData {
   <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
-    <span class="macro">write!</span>(f, <span class="string">&quot;&lt;MtbMoniData:
+    <span class="macro">write!</span>(f, <span class="string">"&lt;MtbMoniData:
   MTB  EVT RATE  [Hz] {}
   LOST EVT RATE  [Hz] {}
   CALIBRATION  [ADC?] {}
@@ -2407,7 +2408,7 @@
   FPGA TEMP      [\u{00B0}C] {:.2}
   VCCINT          [V] {:.3}
   VCCAUX          [V] {:.3}
-  VCCBRAM         [V] {:.3}&gt;&quot;</span>,
+  VCCBRAM         [V] {:.3}&gt;"</span>,
            <span class="self">self</span>.rate,
            <span class="self">self</span>.lost_rate,
            <span class="self">self</span>.calibration,
@@ -2460,12 +2461,12 @@
     moni_data.rate         = parse_u16(<span class="kw-2">&amp;</span>stream, pos);
     moni_data.lost_rate    = parse_u16(<span class="kw-2">&amp;</span>stream, pos);
     <span class="kw-2">*</span>pos += <span class="number">2</span>; <span class="comment">// since we deserialized the tail earlier and 
-              // didn&#39;t account for it
+              // didn't account for it
     </span><span class="prelude-val">Ok</span>(moni_data)
   }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;random&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"random"</span>)]
 </span><span class="kw">impl </span>FromRandom <span class="kw">for </span>MtbMoniData {
   <span class="kw">fn </span>from_random() -&gt; <span class="self">Self </span>{
     <span class="kw">let </span><span class="kw-2">mut </span>moni      = <span class="self">Self</span>::new();
@@ -2484,7 +2485,7 @@
   }
 }
 
-<span class="attr">#[cfg(all(test,feature = <span class="string">&quot;random&quot;</span>))]
+<span class="attr">#[cfg(all(test,feature = <span class="string">"random"</span>))]
 </span><span class="kw">mod </span>test_monitoring {
   <span class="kw">use </span><span class="kw">crate</span>::serialization::Serialization;
   <span class="kw">use </span><span class="kw">crate</span>::FromRandom;

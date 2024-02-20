@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/json-0.12.4/src/parser.rs`."><title>parser.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="json" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/json-0.12.4/src/parser.rs`."><title>parser.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="json" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -900,14 +901,14 @@
 //
 // Making a fast parser is hard. This is a _not so naive_ implementation of
 // recursive descent that does almost nothing. _There is no backtracking_, the
-// whole parsing is 100% predictive, even though it&#39;s not BNF, and will have
+// whole parsing is 100% predictive, even though it's not BNF, and will have
 // linear performance based on the length of the source!
 //
 // There is a lot of macros here! Like, woah! This is mostly due to the fact
-// that Rust isn&#39;t very cool about optimizing inlined functions that return
+// that Rust isn't very cool about optimizing inlined functions that return
 // a `Result` type. Since different functions will have different `Result`
 // signatures, the `try!` macro will always have to repackage our results.
-// With macros those issues don&#39;t exist, the macro will return an unpackaged
+// With macros those issues don't exist, the macro will return an unpackaged
 // result - whatever it is - and if we ever stumble upon the error, we can
 // return an `Err` without worrying about the exact signature of `Result`.
 //
@@ -933,13 +934,13 @@
 <span class="comment">// The `Parser` struct keeps track of indexing over our buffer. All niceness
 // has been abandoned in favor of raw pointer magic. Does that make you feel
 // dirty? _Good._
-</span><span class="kw">struct </span>Parser&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="comment">// Helper buffer for parsing strings that can&#39;t be just memcopied from
+</span><span class="kw">struct </span>Parser&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="comment">// Helper buffer for parsing strings that can't be just memcopied from
     // the original source (escaped characters)
     </span>buffer: Vec&lt;u8&gt;,
 
     <span class="comment">// String slice to parse
-    </span>source: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+    </span>source: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str,
 
     <span class="comment">// Byte pointer to the slice above
     </span>byte_ptr: <span class="kw-2">*const </span>u8,
@@ -970,9 +971,9 @@
 <span class="comment">// Expect a sequence of specific bytes in specific order, error otherwise.
 // This is useful for reading the 3 JSON identifiers:
 //
-// - &quot;t&quot; has to be followed by &quot;rue&quot;
-// - &quot;f&quot; has to be followed by &quot;alse&quot;
-// - &quot;n&quot; has to be followed by &quot;ull&quot;
+// - "t" has to be followed by "rue"
+// - "f" has to be followed by "alse"
+// - "n" has to be followed by "ull"
 //
 // Anything else is an error.
 </span><span class="macro">macro_rules! </span>expect_sequence {
@@ -987,13 +988,13 @@
 }
 
 
-<span class="comment">// A drop in macro for when we expect to read a byte, but we don&#39;t care
+<span class="comment">// A drop in macro for when we expect to read a byte, but we don't care
 // about any whitespace characters that might occur before it.
 </span><span class="macro">macro_rules! </span>expect_byte_ignore_whitespace {
     (<span class="macro-nonterminal">$parser</span>:ident) =&gt; ({
         <span class="kw">let </span><span class="kw-2">mut </span>ch = <span class="macro">expect_byte!</span>(<span class="macro-nonterminal">$parser</span>);
 
-        <span class="comment">// Don&#39;t go straight for the loop, assume we are in the clear first.
+        <span class="comment">// Don't go straight for the loop, assume we are in the clear first.
         </span><span class="kw">match </span>ch {
             <span class="comment">// whitespace
             </span><span class="number">9 </span>..= <span class="number">13 </span>| <span class="number">32 </span>=&gt; {
@@ -1098,7 +1099,7 @@
             <span class="kw">if </span>ALLOWED[ch <span class="kw">as </span>usize] {
                 <span class="kw">continue</span>;
             }
-            <span class="kw">if </span>ch == <span class="string">b&#39;&quot;&#39; </span>{
+            <span class="kw">if </span>ch == <span class="string">b'"' </span>{
                 <span class="kw">unsafe </span>{
                     <span class="kw">let </span>ptr = <span class="macro-nonterminal">$parser</span>.byte_ptr.offset(start <span class="kw">as </span>isize);
                     <span class="kw">let </span>len = <span class="macro-nonterminal">$parser</span>.index - <span class="number">1 </span>- start;
@@ -1106,7 +1107,7 @@
                 }
                 <span class="kw">break</span>;
             }
-            <span class="kw">if </span>ch == <span class="string">b&#39;\\&#39; </span>{
+            <span class="kw">if </span>ch == <span class="string">b'\\' </span>{
                 result = <span class="macro-nonterminal">$parser</span>.read_complex_string(start)<span class="question-mark">?</span>;
                 <span class="kw">break</span>;
             }
@@ -1122,7 +1123,7 @@
 <span class="comment">// Expect a number. Of some kind.
 </span><span class="macro">macro_rules! </span>expect_number {
     (<span class="macro-nonterminal">$parser</span>:ident, <span class="macro-nonterminal">$first</span>:ident) =&gt; ({
-        <span class="kw">let </span><span class="kw-2">mut </span>num = (<span class="macro-nonterminal">$first </span>- <span class="string">b&#39;0&#39;</span>) <span class="kw">as </span>u64;
+        <span class="kw">let </span><span class="kw-2">mut </span>num = (<span class="macro-nonterminal">$first </span>- <span class="string">b'0'</span>) <span class="kw">as </span>u64;
 
         <span class="kw">let </span>result: Number;
 
@@ -1142,9 +1143,9 @@
             <span class="kw">let </span>ch = <span class="macro-nonterminal">$parser</span>.read_byte();
 
             <span class="kw">match </span>ch {
-                <span class="string">b&#39;0&#39; </span>..= <span class="string">b&#39;9&#39; </span>=&gt; {
+                <span class="string">b'0' </span>..= <span class="string">b'9' </span>=&gt; {
                     <span class="macro-nonterminal">$parser</span>.bump();
-                    num = num * <span class="number">10 </span>+ (ch - <span class="string">b&#39;0&#39;</span>) <span class="kw">as </span>u64;
+                    num = num * <span class="number">10 </span>+ (ch - <span class="string">b'0'</span>) <span class="kw">as </span>u64;
                 },
                 <span class="kw">_             </span>=&gt; {
                     <span class="kw">let </span><span class="kw-2">mut </span>e = <span class="number">0</span>;
@@ -1164,11 +1165,11 @@
 </span><span class="macro">macro_rules! </span>allow_number_extensions {
     (<span class="macro-nonterminal">$parser</span>:ident, <span class="macro-nonterminal">$num</span>:ident, <span class="macro-nonterminal">$e</span>:ident, <span class="macro-nonterminal">$ch</span>:ident) =&gt; ({
         <span class="kw">match </span><span class="macro-nonterminal">$ch </span>{
-            <span class="string">b&#39;.&#39;        </span>=&gt; {
+            <span class="string">b'.'        </span>=&gt; {
                 <span class="macro-nonterminal">$parser</span>.bump();
                 <span class="macro">expect_fraction!</span>(<span class="macro-nonterminal">$parser</span>, <span class="macro-nonterminal">$num</span>, <span class="macro-nonterminal">$e</span>)
             },
-            <span class="string">b&#39;e&#39; </span>| <span class="string">b&#39;E&#39; </span>=&gt; {
+            <span class="string">b'e' </span>| <span class="string">b'E' </span>=&gt; {
                 <span class="macro-nonterminal">$parser</span>.bump();
                 <span class="macro-nonterminal">$parser</span>.expect_exponent(<span class="macro-nonterminal">$num</span>, <span class="macro-nonterminal">$e</span>)<span class="question-mark">?
             </span>},
@@ -1192,7 +1193,7 @@
 }
 
 
-<span class="comment">// If a dot `b&quot;.&quot;` byte has been read, start reading the decimal fraction
+<span class="comment">// If a dot `b"."` byte has been read, start reading the decimal fraction
 // of the number.
 </span><span class="macro">macro_rules! </span>expect_fraction {
     (<span class="macro-nonterminal">$parser</span>:ident, <span class="macro-nonterminal">$num</span>:ident, <span class="macro-nonterminal">$e</span>:ident) =&gt; ({
@@ -1201,13 +1202,13 @@
         <span class="kw">let </span>ch = <span class="macro">expect_byte!</span>(<span class="macro-nonterminal">$parser</span>);
 
         <span class="kw">match </span>ch {
-            <span class="string">b&#39;0&#39; </span>..= <span class="string">b&#39;9&#39; </span>=&gt; {
+            <span class="string">b'0' </span>..= <span class="string">b'9' </span>=&gt; {
                 <span class="kw">if </span><span class="macro-nonterminal">$num </span>&lt; MAX_PRECISION {
-                    <span class="macro-nonterminal">$num </span>= <span class="macro-nonterminal">$num </span>* <span class="number">10 </span>+ (ch - <span class="string">b&#39;0&#39;</span>) <span class="kw">as </span>u64;
+                    <span class="macro-nonterminal">$num </span>= <span class="macro-nonterminal">$num </span>* <span class="number">10 </span>+ (ch - <span class="string">b'0'</span>) <span class="kw">as </span>u64;
                     <span class="macro-nonterminal">$e </span>-= <span class="number">1</span>;
                 } <span class="kw">else </span>{
                     <span class="kw">match </span><span class="macro-nonterminal">$num</span>.checked_mul(<span class="number">10</span>).and_then(|num| {
-                        num.checked_add((ch - <span class="string">b&#39;0&#39;</span>) <span class="kw">as </span>u64)
+                        num.checked_add((ch - <span class="string">b'0'</span>) <span class="kw">as </span>u64)
                     }) {
                         <span class="prelude-val">Some</span>(result) =&gt; {
                             <span class="macro-nonterminal">$num </span>= result;
@@ -1228,14 +1229,14 @@
             <span class="kw">let </span>ch = <span class="macro-nonterminal">$parser</span>.read_byte();
 
             <span class="kw">match </span>ch {
-                <span class="string">b&#39;0&#39; </span>..= <span class="string">b&#39;9&#39; </span>=&gt; {
+                <span class="string">b'0' </span>..= <span class="string">b'9' </span>=&gt; {
                     <span class="macro-nonterminal">$parser</span>.bump();
                     <span class="kw">if </span><span class="macro-nonterminal">$num </span>&lt; MAX_PRECISION {
-                        <span class="macro-nonterminal">$num </span>= <span class="macro-nonterminal">$num </span>* <span class="number">10 </span>+ (ch - <span class="string">b&#39;0&#39;</span>) <span class="kw">as </span>u64;
+                        <span class="macro-nonterminal">$num </span>= <span class="macro-nonterminal">$num </span>* <span class="number">10 </span>+ (ch - <span class="string">b'0'</span>) <span class="kw">as </span>u64;
                         <span class="macro-nonterminal">$e </span>-= <span class="number">1</span>;
                     } <span class="kw">else </span>{
                         <span class="kw">match </span><span class="macro-nonterminal">$num</span>.checked_mul(<span class="number">10</span>).and_then(|num| {
-                            num.checked_add((ch - <span class="string">b&#39;0&#39;</span>) <span class="kw">as </span>u64)
+                            num.checked_add((ch - <span class="string">b'0'</span>) <span class="kw">as </span>u64)
                         }) {
                             <span class="prelude-val">Some</span>(result) =&gt; {
                                 <span class="macro-nonterminal">$num </span>= result;
@@ -1245,7 +1246,7 @@
                         }
                     }
                 },
-                <span class="string">b&#39;e&#39; </span>| <span class="string">b&#39;E&#39; </span>=&gt; {
+                <span class="string">b'e' </span>| <span class="string">b'E' </span>=&gt; {
                     <span class="macro-nonterminal">$parser</span>.bump();
                     result = <span class="macro-nonterminal">$parser</span>.expect_exponent(<span class="macro-nonterminal">$num</span>, <span class="macro-nonterminal">$e</span>)<span class="question-mark">?</span>;
                     <span class="kw">break</span>;
@@ -1261,8 +1262,8 @@
     })
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Parser&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">pub fn </span>new(source: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Parser&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">pub fn </span>new(source: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str) -&gt; <span class="self">Self </span>{
         Parser {
             buffer: Vec::with_capacity(<span class="number">30</span>),
             source: source,
@@ -1286,7 +1287,7 @@
     // is virtually irrelevant.
     </span><span class="attr">#[inline(always)]
     </span><span class="kw">fn </span>read_byte(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; u8 {
-        <span class="macro">debug_assert!</span>(<span class="self">self</span>.index &lt; <span class="self">self</span>.length, <span class="string">&quot;Reading out of bounds&quot;</span>);
+        <span class="macro">debug_assert!</span>(<span class="self">self</span>.index &lt; <span class="self">self</span>.length, <span class="string">"Reading out of bounds"</span>);
 
         <span class="kw">unsafe </span>{ <span class="kw-2">*</span><span class="self">self</span>.byte_ptr.offset(<span class="self">self</span>.index <span class="kw">as </span>isize) }
     }
@@ -1306,13 +1307,13 @@
         <span class="kw">let </span>ch = <span class="self">self</span>.source[at..]
                      .chars()
                      .next()
-                     .expect(<span class="string">&quot;Must have a character&quot;</span>);
+                     .expect(<span class="string">"Must have a character"</span>);
 
         <span class="kw">let </span>(lineno, col) = <span class="self">self</span>.source[..at]
                                 .lines()
                                 .enumerate()
                                 .last()
-                                .unwrap_or((<span class="number">0</span>, <span class="string">&quot;&quot;</span>));
+                                .unwrap_or((<span class="number">0</span>, <span class="string">""</span>));
 
         <span class="kw">let </span>colno = col.chars().count();
 
@@ -1327,9 +1328,9 @@
     </span><span class="kw">fn </span>read_hexdec_digit(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;u16&gt; {
         <span class="kw">let </span>ch = <span class="macro">expect_byte!</span>(<span class="self">self</span>);
         <span class="prelude-val">Ok</span>(<span class="kw">match </span>ch {
-            <span class="string">b&#39;0&#39; </span>..= <span class="string">b&#39;9&#39; </span>=&gt; (ch - <span class="string">b&#39;0&#39;</span>),
-            <span class="string">b&#39;a&#39; </span>..= <span class="string">b&#39;f&#39; </span>=&gt; (ch + <span class="number">10 </span>- <span class="string">b&#39;a&#39;</span>),
-            <span class="string">b&#39;A&#39; </span>..= <span class="string">b&#39;F&#39; </span>=&gt; (ch + <span class="number">10 </span>- <span class="string">b&#39;A&#39;</span>),
+            <span class="string">b'0' </span>..= <span class="string">b'9' </span>=&gt; (ch - <span class="string">b'0'</span>),
+            <span class="string">b'a' </span>..= <span class="string">b'f' </span>=&gt; (ch + <span class="number">10 </span>- <span class="string">b'a'</span>),
+            <span class="string">b'A' </span>..= <span class="string">b'F' </span>=&gt; (ch + <span class="number">10 </span>- <span class="string">b'A'</span>),
             <span class="kw">_             </span>=&gt; <span class="kw">return </span><span class="self">self</span>.unexpected_character(),
         } <span class="kw">as </span>u16)
     }
@@ -1355,7 +1356,7 @@
             <span class="prelude-val">Ok</span>(code) =&gt; code,
             <span class="comment">// Handle surrogate pairs
             </span><span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
-                <span class="macro">expect_sequence!</span>(<span class="self">self</span>, <span class="string">b&#39;\\&#39;</span>, <span class="string">b&#39;u&#39;</span>);
+                <span class="macro">expect_sequence!</span>(<span class="self">self</span>, <span class="string">b'\\'</span>, <span class="string">b'u'</span>);
 
                 <span class="kw">match </span>decode_utf16(
                     [codepoint, <span class="self">self</span>.read_hexdec_codepoint()<span class="question-mark">?</span>].iter().copied()
@@ -1371,17 +1372,17 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="comment">// What&#39;s so complex about strings you may ask? Not that much really.
+    <span class="comment">// What's so complex about strings you may ask? Not that much really.
     // This method is called if the `expect_string!` macro encounters an
     // escape. The added complexity is that it will have to use an internal
     // buffer to read all the escaped characters into, before finally
-    // producing a usable slice. What it means it that parsing &quot;foo\bar&quot;
-    // is whole lot slower than parsing &quot;foobar&quot;, as the former suffers from
+    // producing a usable slice. What it means it that parsing "foo\bar"
+    // is whole lot slower than parsing "foobar", as the former suffers from
     // having to be read from source to a buffer and then from a buffer to
     // our target string. Nothing to be done about this, really.
-    </span><span class="kw">fn </span>read_complex_string&lt;<span class="lifetime">&#39;b</span>&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, start: usize) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>str&gt; {
+    </span><span class="kw">fn </span>read_complex_string&lt;<span class="lifetime">'b</span>&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, start: usize) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'b </span>str&gt; {
         <span class="comment">// Since string slices are returned by this function that are created via pointers into `self.buffer`
-        // we shouldn&#39;t be clearing or modifying the buffer in consecutive calls to this function. Instead
+        // we shouldn't be clearing or modifying the buffer in consecutive calls to this function. Instead
         // we continuously append bytes to `self.buffer` and keep track of the starting offset of the buffer on each
         // call to this function. Later when creating string slices that point to the contents of this buffer
         // we use this starting offset to make sure that newly created slices point only to the bytes that were
@@ -1390,7 +1391,7 @@
         // Failing to do this can result in the StackBlock `key` values being modified in place later.
         </span><span class="kw">let </span>len = <span class="self">self</span>.buffer.len();
         <span class="comment">//self.buffer.clear();
-        </span><span class="kw">let </span><span class="kw-2">mut </span>ch = <span class="string">b&#39;\\&#39;</span>;
+        </span><span class="kw">let </span><span class="kw-2">mut </span>ch = <span class="string">b'\\'</span>;
 
         <span class="comment">// TODO: Use fastwrite here as well
         </span><span class="self">self</span>.buffer.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.source.as_bytes()[start .. <span class="self">self</span>.index - <span class="number">1</span>]);
@@ -1402,23 +1403,23 @@
                 <span class="kw">continue</span>;
             }
             <span class="kw">match </span>ch {
-                <span class="string">b&#39;&quot;&#39;  </span>=&gt; <span class="kw">break</span>,
-                <span class="string">b&#39;\\&#39; </span>=&gt; {
+                <span class="string">b'"'  </span>=&gt; <span class="kw">break</span>,
+                <span class="string">b'\\' </span>=&gt; {
                     <span class="kw">let </span>escaped = <span class="macro">expect_byte!</span>(<span class="self">self</span>);
                     <span class="kw">let </span>escaped = <span class="kw">match </span>escaped {
-                        <span class="string">b&#39;u&#39;  </span>=&gt; {
+                        <span class="string">b'u'  </span>=&gt; {
                             <span class="self">self</span>.read_codepoint()<span class="question-mark">?</span>;
                             ch = <span class="macro">expect_byte!</span>(<span class="self">self</span>);
                             <span class="kw">continue</span>;
                         },
-                        <span class="string">b&#39;&quot;&#39;  </span>|
-                        <span class="string">b&#39;\\&#39; </span>|
-                        <span class="string">b&#39;/&#39;  </span>=&gt; escaped,
-                        <span class="string">b&#39;b&#39;  </span>=&gt; <span class="number">0x8</span>,
-                        <span class="string">b&#39;f&#39;  </span>=&gt; <span class="number">0xC</span>,
-                        <span class="string">b&#39;t&#39;  </span>=&gt; <span class="string">b&#39;\t&#39;</span>,
-                        <span class="string">b&#39;r&#39;  </span>=&gt; <span class="string">b&#39;\r&#39;</span>,
-                        <span class="string">b&#39;n&#39;  </span>=&gt; <span class="string">b&#39;\n&#39;</span>,
+                        <span class="string">b'"'  </span>|
+                        <span class="string">b'\\' </span>|
+                        <span class="string">b'/'  </span>=&gt; escaped,
+                        <span class="string">b'b'  </span>=&gt; <span class="number">0x8</span>,
+                        <span class="string">b'f'  </span>=&gt; <span class="number">0xC</span>,
+                        <span class="string">b't'  </span>=&gt; <span class="string">b'\t'</span>,
+                        <span class="string">b'r'  </span>=&gt; <span class="string">b'\r'</span>,
+                        <span class="string">b'n'  </span>=&gt; <span class="string">b'\n'</span>,
                         <span class="kw">_     </span>=&gt; <span class="kw">return </span><span class="self">self</span>.unexpected_character()
                     };
                     <span class="self">self</span>.buffer.push(escaped);
@@ -1434,7 +1435,7 @@
             str::from_utf8_unchecked(
                 <span class="comment">// Because the buffer is stored on the parser, returning it
                 // as a slice here freaks out the borrow checker. The compiler
-                // can&#39;t know that the buffer isn&#39;t used till the result
+                // can't know that the buffer isn't used till the result
                 // of this function is long used and irrelevant. To avoid
                 // issues here, we construct a new slice from raw parts, which
                 // then has lifetime bound to the outer function scope instead
@@ -1458,20 +1459,20 @@
             }
             <span class="kw">let </span>ch = <span class="self">self</span>.read_byte();
             <span class="kw">match </span>ch {
-                <span class="string">b&#39;0&#39; </span>..= <span class="string">b&#39;9&#39; </span>=&gt; {
+                <span class="string">b'0' </span>..= <span class="string">b'9' </span>=&gt; {
                     <span class="self">self</span>.bump();
                     <span class="kw">match </span>num.checked_mul(<span class="number">10</span>).and_then(|num| {
-                        num.checked_add((ch - <span class="string">b&#39;0&#39;</span>) <span class="kw">as </span>u64)
+                        num.checked_add((ch - <span class="string">b'0'</span>) <span class="kw">as </span>u64)
                     }) {
                         <span class="prelude-val">Some</span>(result) =&gt; num = result,
                         <span class="prelude-val">None         </span>=&gt; e = e.checked_add(<span class="number">1</span>).ok_or_else(|| Error::ExceededDepthLimit)<span class="question-mark">?</span>,
                     }
                 },
-                <span class="string">b&#39;.&#39; </span>=&gt; {
+                <span class="string">b'.' </span>=&gt; {
                     <span class="self">self</span>.bump();
                     <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="macro">expect_fraction!</span>(<span class="self">self</span>, num, e));
                 },
-                <span class="string">b&#39;e&#39; </span>| <span class="string">b&#39;E&#39; </span>=&gt; {
+                <span class="string">b'e' </span>| <span class="string">b'E' </span>=&gt; {
                     <span class="self">self</span>.bump();
                     <span class="kw">return </span><span class="self">self</span>.expect_exponent(num, e);
                 }
@@ -1487,11 +1488,11 @@
     </span><span class="kw">fn </span>expect_exponent(<span class="kw-2">&amp;mut </span><span class="self">self</span>, num: u64, big_e: i16) -&gt; <span class="prelude-ty">Result</span>&lt;Number&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>ch = <span class="macro">expect_byte!</span>(<span class="self">self</span>);
         <span class="kw">let </span>sign = <span class="kw">match </span>ch {
-            <span class="string">b&#39;-&#39; </span>=&gt; {
+            <span class="string">b'-' </span>=&gt; {
                 ch = <span class="macro">expect_byte!</span>(<span class="self">self</span>);
                 -<span class="number">1
             </span>},
-            <span class="string">b&#39;+&#39; </span>=&gt; {
+            <span class="string">b'+' </span>=&gt; {
                 ch = <span class="macro">expect_byte!</span>(<span class="self">self</span>);
                 <span class="number">1
             </span>},
@@ -1499,7 +1500,7 @@
         </span>};
 
         <span class="kw">let </span><span class="kw-2">mut </span>e = <span class="kw">match </span>ch {
-            <span class="string">b&#39;0&#39; </span>..= <span class="string">b&#39;9&#39; </span>=&gt; (ch - <span class="string">b&#39;0&#39;</span>) <span class="kw">as </span>i16,
+            <span class="string">b'0' </span>..= <span class="string">b'9' </span>=&gt; (ch - <span class="string">b'0'</span>) <span class="kw">as </span>i16,
             <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="self">self</span>.unexpected_character(),
         };
 
@@ -1509,9 +1510,9 @@
             }
             <span class="kw">let </span>ch = <span class="self">self</span>.read_byte();
             <span class="kw">match </span>ch {
-                <span class="string">b&#39;0&#39; </span>..= <span class="string">b&#39;9&#39; </span>=&gt; {
+                <span class="string">b'0' </span>..= <span class="string">b'9' </span>=&gt; {
                     <span class="self">self</span>.bump();
-                    e = e.saturating_mul(<span class="number">10</span>).saturating_add((ch - <span class="string">b&#39;0&#39;</span>) <span class="kw">as </span>i16);
+                    e = e.saturating_mul(<span class="number">10</span>).saturating_add((ch - <span class="string">b'0'</span>) <span class="kw">as </span>i16);
                 },
                 <span class="kw">_  </span>=&gt; <span class="kw">break
             </span>}
@@ -1525,77 +1526,77 @@
         <span class="kw">let </span><span class="kw-2">mut </span>stack = Vec::with_capacity(<span class="number">3</span>);
         <span class="kw">let </span><span class="kw-2">mut </span>ch = <span class="macro">expect_byte_ignore_whitespace!</span>(<span class="self">self</span>);
 
-        <span class="lifetime">&#39;parsing</span>: <span class="kw">loop </span>{
+        <span class="lifetime">'parsing</span>: <span class="kw">loop </span>{
             <span class="kw">let </span><span class="kw-2">mut </span>value = <span class="kw">match </span>ch {
-                <span class="string">b&#39;[&#39; </span>=&gt; {
+                <span class="string">b'[' </span>=&gt; {
                     ch = <span class="macro">expect_byte_ignore_whitespace!</span>(<span class="self">self</span>);
 
-                    <span class="kw">if </span>ch != <span class="string">b&#39;]&#39; </span>{
+                    <span class="kw">if </span>ch != <span class="string">b']' </span>{
                         <span class="kw">if </span>stack.len() == DEPTH_LIMIT {
                             <span class="kw">return </span><span class="prelude-val">Err</span>(Error::ExceededDepthLimit);
                         }
 
                         stack.push(StackBlock(JsonValue::Array(Vec::with_capacity(<span class="number">2</span>)), <span class="number">0</span>));
-                        <span class="kw">continue </span><span class="lifetime">&#39;parsing</span>;
+                        <span class="kw">continue </span><span class="lifetime">'parsing</span>;
                     }
 
                     JsonValue::Array(Vec::new())
                 },
-                <span class="string">b&#39;{&#39; </span>=&gt; {
+                <span class="string">b'{' </span>=&gt; {
                     ch = <span class="macro">expect_byte_ignore_whitespace!</span>(<span class="self">self</span>);
 
-                    <span class="kw">if </span>ch != <span class="string">b&#39;}&#39; </span>{
+                    <span class="kw">if </span>ch != <span class="string">b'}' </span>{
                         <span class="kw">if </span>stack.len() == DEPTH_LIMIT {
                             <span class="kw">return </span><span class="prelude-val">Err</span>(Error::ExceededDepthLimit);
                         }
 
                         <span class="kw">let </span><span class="kw-2">mut </span>object = Object::with_capacity(<span class="number">3</span>);
 
-                        <span class="kw">if </span>ch != <span class="string">b&#39;&quot;&#39; </span>{
+                        <span class="kw">if </span>ch != <span class="string">b'"' </span>{
                             <span class="kw">return </span><span class="self">self</span>.unexpected_character()
                         }
 
                         <span class="kw">let </span>index = object.insert_index(<span class="macro">expect_string!</span>(<span class="self">self</span>), JsonValue::Null);
-                        <span class="macro">expect!</span>(<span class="self">self</span>, <span class="string">b&#39;:&#39;</span>);
+                        <span class="macro">expect!</span>(<span class="self">self</span>, <span class="string">b':'</span>);
 
                         stack.push(StackBlock(JsonValue::Object(object), index));
 
                         ch = <span class="macro">expect_byte_ignore_whitespace!</span>(<span class="self">self</span>);
 
-                        <span class="kw">continue </span><span class="lifetime">&#39;parsing</span>;
+                        <span class="kw">continue </span><span class="lifetime">'parsing</span>;
                     }
 
                     JsonValue::Object(Object::new())
                 },
-                <span class="string">b&#39;&quot;&#39; </span>=&gt; <span class="macro">expect_string!</span>(<span class="self">self</span>).into(),
-                <span class="string">b&#39;0&#39; </span>=&gt; JsonValue::Number(<span class="macro">allow_number_extensions!</span>(<span class="self">self</span>)),
-                <span class="string">b&#39;1&#39; </span>..= <span class="string">b&#39;9&#39; </span>=&gt; {
+                <span class="string">b'"' </span>=&gt; <span class="macro">expect_string!</span>(<span class="self">self</span>).into(),
+                <span class="string">b'0' </span>=&gt; JsonValue::Number(<span class="macro">allow_number_extensions!</span>(<span class="self">self</span>)),
+                <span class="string">b'1' </span>..= <span class="string">b'9' </span>=&gt; {
                     JsonValue::Number(<span class="macro">expect_number!</span>(<span class="self">self</span>, ch))
                 },
-                <span class="string">b&#39;-&#39; </span>=&gt; {
+                <span class="string">b'-' </span>=&gt; {
                     <span class="kw">let </span>ch = <span class="macro">expect_byte!</span>(<span class="self">self</span>);
                     JsonValue::Number(- <span class="kw">match </span>ch {
-                        <span class="string">b&#39;0&#39; </span>=&gt; <span class="macro">allow_number_extensions!</span>(<span class="self">self</span>),
-                        <span class="string">b&#39;1&#39; </span>..= <span class="string">b&#39;9&#39; </span>=&gt; <span class="macro">expect_number!</span>(<span class="self">self</span>, ch),
+                        <span class="string">b'0' </span>=&gt; <span class="macro">allow_number_extensions!</span>(<span class="self">self</span>),
+                        <span class="string">b'1' </span>..= <span class="string">b'9' </span>=&gt; <span class="macro">expect_number!</span>(<span class="self">self</span>, ch),
                         <span class="kw">_    </span>=&gt; <span class="kw">return </span><span class="self">self</span>.unexpected_character()
                     })
                 }
-                <span class="string">b&#39;t&#39; </span>=&gt; {
-                    <span class="macro">expect_sequence!</span>(<span class="self">self</span>, <span class="string">b&#39;r&#39;</span>, <span class="string">b&#39;u&#39;</span>, <span class="string">b&#39;e&#39;</span>);
+                <span class="string">b't' </span>=&gt; {
+                    <span class="macro">expect_sequence!</span>(<span class="self">self</span>, <span class="string">b'r'</span>, <span class="string">b'u'</span>, <span class="string">b'e'</span>);
                     JsonValue::Boolean(<span class="bool-val">true</span>)
                 },
-                <span class="string">b&#39;f&#39; </span>=&gt; {
-                    <span class="macro">expect_sequence!</span>(<span class="self">self</span>, <span class="string">b&#39;a&#39;</span>, <span class="string">b&#39;l&#39;</span>, <span class="string">b&#39;s&#39;</span>, <span class="string">b&#39;e&#39;</span>);
+                <span class="string">b'f' </span>=&gt; {
+                    <span class="macro">expect_sequence!</span>(<span class="self">self</span>, <span class="string">b'a'</span>, <span class="string">b'l'</span>, <span class="string">b's'</span>, <span class="string">b'e'</span>);
                     JsonValue::Boolean(<span class="bool-val">false</span>)
                 },
-                <span class="string">b&#39;n&#39; </span>=&gt; {
-                    <span class="macro">expect_sequence!</span>(<span class="self">self</span>, <span class="string">b&#39;u&#39;</span>, <span class="string">b&#39;l&#39;</span>, <span class="string">b&#39;l&#39;</span>);
+                <span class="string">b'n' </span>=&gt; {
+                    <span class="macro">expect_sequence!</span>(<span class="self">self</span>, <span class="string">b'u'</span>, <span class="string">b'l'</span>, <span class="string">b'l'</span>);
                     JsonValue::Null
                 },
                 <span class="kw">_    </span>=&gt; <span class="kw">return </span><span class="self">self</span>.unexpected_character()
             };
 
-            <span class="lifetime">&#39;popping</span>: <span class="kw">loop </span>{
+            <span class="lifetime">'popping</span>: <span class="kw">loop </span>{
                 <span class="kw">match </span>stack.last_mut() {
                     <span class="prelude-val">None </span>=&gt; {
                         <span class="macro">expect_eof!</span>(<span class="self">self</span>);
@@ -1609,12 +1610,12 @@
                         ch = <span class="macro">expect_byte_ignore_whitespace!</span>(<span class="self">self</span>);
 
                         <span class="kw">match </span>ch {
-                            <span class="string">b&#39;,&#39; </span>=&gt; {
+                            <span class="string">b',' </span>=&gt; {
                                 ch = <span class="macro">expect_byte_ignore_whitespace!</span>(<span class="self">self</span>);
 
-                                <span class="kw">continue </span><span class="lifetime">&#39;parsing</span>;
+                                <span class="kw">continue </span><span class="lifetime">'parsing</span>;
                             },
-                            <span class="string">b&#39;]&#39; </span>=&gt; {},
+                            <span class="string">b']' </span>=&gt; {},
                             <span class="kw">_    </span>=&gt; <span class="kw">return </span><span class="self">self</span>.unexpected_character()
                         }
                     },
@@ -1625,16 +1626,16 @@
                         ch = <span class="macro">expect_byte_ignore_whitespace!</span>(<span class="self">self</span>);
 
                         <span class="kw">match </span>ch {
-                            <span class="string">b&#39;,&#39; </span>=&gt; {
-                                <span class="macro">expect!</span>(<span class="self">self</span>, <span class="string">b&#39;&quot;&#39;</span>);
+                            <span class="string">b',' </span>=&gt; {
+                                <span class="macro">expect!</span>(<span class="self">self</span>, <span class="string">b'"'</span>);
                                 <span class="kw-2">*</span>index = object.insert_index(<span class="macro">expect_string!</span>(<span class="self">self</span>), JsonValue::Null);
-                                <span class="macro">expect!</span>(<span class="self">self</span>, <span class="string">b&#39;:&#39;</span>);
+                                <span class="macro">expect!</span>(<span class="self">self</span>, <span class="string">b':'</span>);
 
                                 ch = <span class="macro">expect_byte_ignore_whitespace!</span>(<span class="self">self</span>);
 
-                                <span class="kw">continue </span><span class="lifetime">&#39;parsing</span>;
+                                <span class="kw">continue </span><span class="lifetime">'parsing</span>;
                             },
-                            <span class="string">b&#39;}&#39; </span>=&gt; {},
+                            <span class="string">b'}' </span>=&gt; {},
                             <span class="kw">_    </span>=&gt; <span class="kw">return </span><span class="self">self</span>.unexpected_character()
                         }
                     },
@@ -1644,7 +1645,7 @@
 
                 value = <span class="kw">match </span>stack.pop() {
                     <span class="prelude-val">Some</span>(StackBlock(value, <span class="kw">_</span>)) =&gt; value,
-                    <span class="prelude-val">None                       </span>=&gt; <span class="kw">break </span><span class="lifetime">&#39;popping
+                    <span class="prelude-val">None                       </span>=&gt; <span class="kw">break </span><span class="lifetime">'popping
                 </span>}
             }
         }
@@ -1653,7 +1654,7 @@
 
 <span class="kw">struct </span>StackBlock(JsonValue, usize);
 
-<span class="comment">// All that hard work, and in the end it&#39;s just a single function in the API.
+<span class="comment">// All that hard work, and in the end it's just a single function in the API.
 </span><span class="attr">#[inline]
 </span><span class="kw">pub fn </span>parse(source: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;JsonValue&gt; {
     Parser::new(source).parse()
@@ -1674,8 +1675,8 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>it_should_parse_escaped_forward_slashes_with_quotes() {
-        <span class="comment">// used to get around the fact that rust strings don&#39;t escape forward slashes
-        </span><span class="kw">let </span><span class="kw-2">mut </span>file = File::open(<span class="string">&quot;tests/test_json_slashes_quotes&quot;</span>).unwrap();
+        <span class="comment">// used to get around the fact that rust strings don't escape forward slashes
+        </span><span class="kw">let </span><span class="kw-2">mut </span>file = File::open(<span class="string">"tests/test_json_slashes_quotes"</span>).unwrap();
         <span class="kw">let </span><span class="kw-2">mut </span>contents = String::new();
         file.read_to_string(<span class="kw-2">&amp;mut </span>contents).unwrap();
 
@@ -1687,7 +1688,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>it_should_parse_escaped_quotes() {
-        <span class="kw">let </span>contents = String::from(<span class="string">&quot;{\&quot;ab\&quot;:\&quot;c\\\&quot;d\\\&quot;e\&quot;}&quot;</span>);
+        <span class="kw">let </span>contents = String::from(<span class="string">"{\"ab\":\"c\\\"d\\\"e\"}"</span>);
 
         <span class="kw">let </span>actual = parse(<span class="kw-2">&amp;</span>contents).unwrap();
         <span class="kw">let </span>serialized = stringify(actual.clone());
@@ -1697,7 +1698,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>it_should_parse_basic_json_values() {
-        <span class="kw">let </span>s = <span class="string">&quot;{\&quot;a\&quot;:1,\&quot;b\&quot;:true,\&quot;c\&quot;:false,\&quot;d\&quot;:null,\&quot;e\&quot;:2}&quot;</span>;
+        <span class="kw">let </span>s = <span class="string">"{\"a\":1,\"b\":true,\"c\":false,\"d\":null,\"e\":2}"</span>;
         <span class="kw">let </span>actual = parse(s).unwrap();
         <span class="kw">let </span><span class="kw-2">mut </span>expected = <span class="macro">object! </span>{
             a: <span class="number">1</span>,
@@ -1705,14 +1706,14 @@
             c: <span class="bool-val">false</span>,
             e: <span class="number">2</span>,
         };
-        expected[<span class="string">&quot;d&quot;</span>] = JsonValue::Null;
+        expected[<span class="string">"d"</span>] = JsonValue::Null;
 
         <span class="macro">assert_eq!</span>(actual, expected);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>it_should_parse_json_arrays() {
-        <span class="kw">let </span>s = <span class="string">&quot;{\&quot;a\&quot;:1,\&quot;b\&quot;:true,\&quot;c\&quot;:false,\&quot;d\&quot;:null,\&quot;e\&quot;:2,\&quot;f\&quot;:[1,2,3,false,true,[],{}]}&quot;</span>;
+        <span class="kw">let </span>s = <span class="string">"{\"a\":1,\"b\":true,\"c\":false,\"d\":null,\"e\":2,\"f\":[1,2,3,false,true,[],{}]}"</span>;
         <span class="kw">let </span>actual = parse(s).unwrap();
         <span class="kw">let </span><span class="kw-2">mut </span>expected = <span class="macro">object! </span>{
             a: <span class="number">1</span>,
@@ -1720,8 +1721,8 @@
             c: <span class="bool-val">false</span>,
             e: <span class="number">2</span>,
         };
-        expected[<span class="string">&quot;d&quot;</span>] = JsonValue::Null;
-        expected[<span class="string">&quot;f&quot;</span>] = <span class="macro">array!</span>[
+        expected[<span class="string">"d"</span>] = JsonValue::Null;
+        expected[<span class="string">"f"</span>] = <span class="macro">array!</span>[
             <span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,
             <span class="bool-val">false</span>,
             <span class="bool-val">true</span>,
@@ -1734,7 +1735,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>it_should_parse_json_nested_object() {
-        <span class="kw">let </span>s = <span class="string">&quot;{\&quot;a\&quot;:1,\&quot;b\&quot;:{\&quot;c\&quot;:2,\&quot;d\&quot;:{\&quot;e\&quot;:{\&quot;f\&quot;:{\&quot;g\&quot;:3,\&quot;h\&quot;:[]}}},\&quot;i\&quot;:4,\&quot;j\&quot;:[],\&quot;k\&quot;:{\&quot;l\&quot;:5,\&quot;m\&quot;:{}}}}&quot;</span>;
+        <span class="kw">let </span>s = <span class="string">"{\"a\":1,\"b\":{\"c\":2,\"d\":{\"e\":{\"f\":{\"g\":3,\"h\":[]}}},\"i\":4,\"j\":[],\"k\":{\"l\":5,\"m\":{}}}}"</span>;
         <span class="kw">let </span>actual = parse(s).unwrap();
         <span class="kw">let </span>expected = <span class="macro">object! </span>{
             a: <span class="number">1</span>,
@@ -1762,7 +1763,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>it_should_parse_json_complex_object() {
-        <span class="kw">let </span>s = <span class="string">&quot;{\&quot;a\&quot;:1,\&quot;b\&quot;:{\&quot;c\&quot;:2,\&quot;d\&quot;:{\&quot;e\&quot;:{\&quot;f\&quot;:{\&quot;g\&quot;:3,\&quot;h\&quot;:[{\&quot;z\&quot;:1},{\&quot;y\&quot;:2,\&quot;x\&quot;:[{},{}]}]}}},\&quot;i\&quot;:4,\&quot;j\&quot;:[],\&quot;k\&quot;:{\&quot;l\&quot;:5,\&quot;m\&quot;:{}}}}&quot;</span>;
+        <span class="kw">let </span>s = <span class="string">"{\"a\":1,\"b\":{\"c\":2,\"d\":{\"e\":{\"f\":{\"g\":3,\"h\":[{\"z\":1},{\"y\":2,\"x\":[{},{}]}]}}},\"i\":4,\"j\":[],\"k\":{\"l\":5,\"m\":{}}}}"</span>;
         <span class="kw">let </span>actual = parse(s).unwrap();
         <span class="kw">let </span>expected = <span class="macro">object! </span>{
             a: <span class="number">1</span>,

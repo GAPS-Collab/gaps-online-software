@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/indicatif-0.17.8/src/progress_bar.rs`."><title>progress_bar.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="indicatif" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/indicatif-0.17.8/src/progress_bar.rs`."><title>progress_bar.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="indicatif" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -818,11 +819,11 @@
 <span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::sync::{Arc, Condvar, Mutex, MutexGuard, Weak};
 <span class="kw">use </span>std::time::Duration;
-<span class="attr">#[cfg(not(target_arch = <span class="string">&quot;wasm32&quot;</span>))]
+<span class="attr">#[cfg(not(target_arch = <span class="string">"wasm32"</span>))]
 </span><span class="kw">use </span>std::time::Instant;
 <span class="kw">use </span>std::{fmt, io, thread};
 
-<span class="attr">#[cfg(target_arch = <span class="string">&quot;wasm32&quot;</span>)]
+<span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span>instant::Instant;
 <span class="attr">#[cfg(test)]
 </span><span class="kw">use </span>once_cell::sync::Lazy;
@@ -844,8 +845,8 @@
 }
 
 <span class="kw">impl </span>fmt::Debug <span class="kw">for </span>ProgressBar {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
-        f.debug_struct(<span class="string">&quot;ProgressBar&quot;</span>).finish()
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">"ProgressBar"</span>).finish()
     }
 }
 
@@ -901,7 +902,7 @@
     ///
     /// For the prefix to be visible, the `{prefix}` placeholder must be present in the template
     /// (see [`ProgressStyle`]).
-    </span><span class="kw">pub fn </span>with_prefix(<span class="self">self</span>, prefix: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>with_prefix(<span class="self">self</span>, prefix: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'static</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span><span class="kw-2">mut </span>state = <span class="self">self</span>.state();
         state.state.prefix = TabExpandedString::new(prefix.into(), state.tab_width);
         drop(state);
@@ -912,7 +913,7 @@
     ///
     /// For the message to be visible, the `{msg}` placeholder must be present in the template (see
     /// [`ProgressStyle`]).
-    </span><span class="kw">pub fn </span>with_message(<span class="self">self</span>, message: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>with_message(<span class="self">self</span>, message: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'static</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span><span class="kw-2">mut </span>state = <span class="self">self</span>.state();
         state.state.message = TabExpandedString::new(message.into(), state.tab_width);
         drop(state);
@@ -936,7 +937,7 @@
     /// This behavior is invoked when [`ProgressBar`] or
     /// [`ProgressBarIter`] completes and
     /// [`ProgressBar::is_finished()`] is false.
-    /// If you don&#39;t want the progress bar to be automatically finished then
+    /// If you don't want the progress bar to be automatically finished then
     /// call `with_finish(Abandon)`.
     ///
     /// [`ProgressBar`]: crate::ProgressBar
@@ -980,7 +981,7 @@
     </span><span class="kw">pub fn </span>enable_steady_tick(<span class="kw-2">&amp;</span><span class="self">self</span>, interval: Duration) {
         <span class="comment">// The way we test for ticker termination is with a single static `AtomicBool`. Since cargo
         // runs tests concurrently, we have a `TICKER_TEST` lock to make sure tests using ticker
-        // don&#39;t step on each other. This check catches attempts to use tickers in tests without
+        // don't step on each other. This check catches attempts to use tickers in tests without
         // acquiring the lock.
         </span><span class="attr">#[cfg(test)]
         </span>{
@@ -990,7 +991,7 @@
             // ticker tests to fail)
             </span>drop(guard);
             <span class="kw">if </span>lock_acquired {
-                <span class="macro">panic!</span>(<span class="string">&quot;you must acquire the TICKER_TEST lock in your test to use this method&quot;</span>);
+                <span class="macro">panic!</span>(<span class="string">"you must acquire the TICKER_TEST lock in your test to use this method"</span>);
             }
         }
 
@@ -1023,7 +1024,7 @@
     }
 
     <span class="kw">fn </span>tick_inner(<span class="kw-2">&amp;</span><span class="self">self</span>, now: Instant) {
-        <span class="comment">// Only tick if a `Ticker` isn&#39;t installed
+        <span class="comment">// Only tick if a `Ticker` isn't installed
         </span><span class="kw">if </span><span class="self">self</span>.ticker.lock().unwrap().is_none() {
             <span class="self">self</span>.state().tick(now);
         }
@@ -1063,7 +1064,7 @@
         <span class="self">self</span>.state().println(Instant::now(), msg.as_ref());
     }
 
-    <span class="doccomment">/// Update the `ProgressBar`&#39;s inner [`ProgressState`]
+    <span class="doccomment">/// Update the `ProgressBar`'s inner [`ProgressState`]
     </span><span class="kw">pub fn </span>update(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;mut </span>ProgressState)) {
         <span class="self">self</span>.state()
             .update(Instant::now(), f, <span class="self">self</span>.ticker.lock().unwrap().is_none());
@@ -1092,7 +1093,7 @@
     ///
     /// For the prefix to be visible, the `{prefix}` placeholder must be present in the template
     /// (see [`ProgressStyle`]).
-    </span><span class="kw">pub fn </span>set_prefix(<span class="kw-2">&amp;</span><span class="self">self</span>, prefix: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;&gt;) {
+    </span><span class="kw">pub fn </span>set_prefix(<span class="kw-2">&amp;</span><span class="self">self</span>, prefix: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'static</span>, str&gt;&gt;) {
         <span class="kw">let </span><span class="kw-2">mut </span>state = <span class="self">self</span>.state();
         state.state.prefix = TabExpandedString::new(prefix.into(), state.tab_width);
         state.update_estimate_and_draw(Instant::now());
@@ -1102,7 +1103,7 @@
     ///
     /// For the message to be visible, the `{msg}` placeholder must be present in the template (see
     /// [`ProgressStyle`]).
-    </span><span class="kw">pub fn </span>set_message(<span class="kw-2">&amp;</span><span class="self">self</span>, msg: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;&gt;) {
+    </span><span class="kw">pub fn </span>set_message(<span class="kw-2">&amp;</span><span class="self">self</span>, msg: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'static</span>, str&gt;&gt;) {
         <span class="kw">let </span><span class="kw-2">mut </span>state = <span class="self">self</span>.state();
         state.state.message = TabExpandedString::new(msg.into(), state.tab_width);
         state.update_estimate_and_draw(Instant::now());
@@ -1145,7 +1146,7 @@
     ///
     /// For the message to be visible, the `{msg}` placeholder must be present in the template (see
     /// [`ProgressStyle`]).
-    </span><span class="kw">pub fn </span>finish_with_message(<span class="kw-2">&amp;</span><span class="self">self</span>, msg: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;&gt;) {
+    </span><span class="kw">pub fn </span>finish_with_message(<span class="kw-2">&amp;</span><span class="self">self</span>, msg: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'static</span>, str&gt;&gt;) {
         <span class="self">self</span>.state()
             .finish_using_style(Instant::now(), ProgressFinish::WithMessage(msg.into()));
     }
@@ -1166,7 +1167,7 @@
     ///
     /// For the message to be visible, the `{msg}` placeholder must be present in the template (see
     /// [`ProgressStyle`]).
-    </span><span class="kw">pub fn </span>abandon_with_message(<span class="kw-2">&amp;</span><span class="self">self</span>, msg: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;&gt;) {
+    </span><span class="kw">pub fn </span>abandon_with_message(<span class="kw-2">&amp;</span><span class="self">self</span>, msg: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'static</span>, str&gt;&gt;) {
         <span class="self">self</span>.state().finish_using_style(
             Instant::now(),
             ProgressFinish::AbandonWithMessage(msg.into()),
@@ -1193,7 +1194,7 @@
     /// ```
     ///
     /// **Note:** Calling this method on a [`ProgressBar`] linked with a [`MultiProgress`] (after
-    /// running [`MultiProgress::add()`]) will unlink this progress bar. If you don&#39;t want this
+    /// running [`MultiProgress::add()`]) will unlink this progress bar. If you don't want this
     /// behavior, call [`MultiProgress::set_draw_target()`] instead.
     ///
     /// Use [`ProgressBar::with_draw_target()`] to set the draw target during creation.
@@ -1221,7 +1222,7 @@
     /// # use indicatif::ProgressBar;
     /// let mut pb = ProgressBar::new(3);
     /// pb.suspend(|| {
-    ///     println!(&quot;Log message&quot;);
+    ///     println!("Log message");
     /// })
     /// ```
     ///
@@ -1251,8 +1252,8 @@
     /// # use std::io;
     /// # use indicatif::ProgressBar;
     /// # fn test () -&gt; io::Result&lt;()&gt; {
-    /// let source = File::open(&quot;work.txt&quot;)?;
-    /// let mut target = File::create(&quot;done.txt&quot;)?;
+    /// let source = File::open("work.txt")?;
+    /// let mut target = File::create("done.txt")?;
     /// let pb = ProgressBar::new(source.metadata()?.len());
     /// io::copy(&amp;mut pb.wrap_read(source), &amp;mut target);
     /// # Ok(())
@@ -1272,8 +1273,8 @@
     /// # use std::io;
     /// # use indicatif::ProgressBar;
     /// # fn test () -&gt; io::Result&lt;()&gt; {
-    /// let mut source = File::open(&quot;work.txt&quot;)?;
-    /// let target = File::create(&quot;done.txt&quot;)?;
+    /// let mut source = File::open("work.txt")?;
+    /// let target = File::create("done.txt")?;
     /// let pb = ProgressBar::new(source.metadata()?.len());
     /// io::copy(&amp;mut source, &amp;mut pb.wrap_write(target));
     /// # Ok(())
@@ -1286,8 +1287,8 @@
         }
     }
 
-    <span class="attr">#[cfg(feature = <span class="string">&quot;tokio&quot;</span>)]
-    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;tokio&quot;</span>)))]
+    <span class="attr">#[cfg(feature = <span class="string">"tokio"</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"tokio"</span>)))]
     </span><span class="doccomment">/// Wraps an [`tokio::io::AsyncWrite`] with the progress bar
     ///
     /// ```rust,no_run
@@ -1295,8 +1296,8 @@
     /// # use tokio::io;
     /// # use indicatif::ProgressBar;
     /// # async fn test() -&gt; io::Result&lt;()&gt; {
-    /// let mut source = File::open(&quot;work.txt&quot;).await?;
-    /// let mut target = File::open(&quot;done.txt&quot;).await?;
+    /// let mut source = File::open("work.txt").await?;
+    /// let mut target = File::open("done.txt").await?;
     /// let pb = ProgressBar::new(source.metadata().await?.len());
     /// io::copy(&amp;mut source, &amp;mut pb.wrap_async_write(target)).await?;
     /// # Ok(())
@@ -1312,8 +1313,8 @@
         }
     }
 
-    <span class="attr">#[cfg(feature = <span class="string">&quot;tokio&quot;</span>)]
-    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;tokio&quot;</span>)))]
+    <span class="attr">#[cfg(feature = <span class="string">"tokio"</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"tokio"</span>)))]
     </span><span class="doccomment">/// Wraps an [`tokio::io::AsyncRead`] with the progress bar
     ///
     /// ```rust,no_run
@@ -1321,8 +1322,8 @@
     /// # use tokio::io;
     /// # use indicatif::ProgressBar;
     /// # async fn test() -&gt; io::Result&lt;()&gt; {
-    /// let mut source = File::open(&quot;work.txt&quot;).await?;
-    /// let mut target = File::open(&quot;done.txt&quot;).await?;
+    /// let mut source = File::open("work.txt").await?;
+    /// let mut target = File::open("done.txt").await?;
     /// let pb = ProgressBar::new(source.metadata().await?.len());
     /// io::copy(&amp;mut pb.wrap_async_read(source), &amp;mut target).await?;
     /// # Ok(())
@@ -1342,14 +1343,14 @@
     /// # futures::executor::block_on(async {
     /// use futures::stream::{self, StreamExt};
     /// let pb = ProgressBar::new(10);
-    /// let mut stream = pb.wrap_stream(stream::iter(&#39;a&#39;..=&#39;z&#39;));
+    /// let mut stream = pb.wrap_stream(stream::iter('a'..='z'));
     ///
-    /// assert_eq!(stream.next().await, Some(&#39;a&#39;));
+    /// assert_eq!(stream.next().await, Some('a'));
     /// assert_eq!(stream.count().await, 25);
     /// # }); // block_on
     /// ```
-    </span><span class="attr">#[cfg(feature = <span class="string">&quot;futures&quot;</span>)]
-    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;futures&quot;</span>)))]
+    </span><span class="attr">#[cfg(feature = <span class="string">"futures"</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">"futures"</span>)))]
     </span><span class="kw">pub fn </span>wrap_stream&lt;S: futures_core::Stream&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, stream: S) -&gt; ProgressBarIter&lt;S&gt; {
         ProgressBarIter {
             progress: <span class="self">self</span>.clone(),
@@ -1403,7 +1404,7 @@
     }
 
     <span class="attr">#[inline]
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>state(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; MutexGuard&lt;<span class="lifetime">&#39;_</span>, BarState&gt; {
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>state(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; MutexGuard&lt;<span class="lifetime">'_</span>, BarState&gt; {
         <span class="self">self</span>.state.lock().unwrap()
     }
 }
@@ -1498,8 +1499,8 @@
 
             state.tick(Instant::now());
 
-            drop(state); <span class="comment">// Don&#39;t forget to drop the lock before sleeping
-            </span>drop(arc); <span class="comment">// Also need to drop Arc otherwise BarState won&#39;t be dropped
+            drop(state); <span class="comment">// Don't forget to drop the lock before sleeping
+            </span>drop(arc); <span class="comment">// Also need to drop Arc otherwise BarState won't be dropped
 
             // Wait for `interval` but return early if we are notified to stop
             </span><span class="kw">let </span>result = <span class="self">self
@@ -1510,7 +1511,7 @@
                 })
                 .unwrap();
 
-            <span class="comment">// If the wait didn&#39;t time out, it means we were notified to stop
+            <span class="comment">// If the wait didn't time out, it means we were notified to stop
             </span><span class="kw">if </span>!result.<span class="number">1</span>.timed_out() {
                 <span class="kw">break</span>;
             }
@@ -1571,7 +1572,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>it_can_wrap_a_reader() {
-        <span class="kw">let </span>bytes = <span class="kw-2">&amp;</span><span class="string">b&quot;I am an implementation of io::Read&quot;</span>[..];
+        <span class="kw">let </span>bytes = <span class="kw-2">&amp;</span><span class="string">b"I am an implementation of io::Read"</span>[..];
         <span class="kw">let </span>pb = ProgressBar::new(bytes.len() <span class="kw">as </span>u64);
         <span class="kw">let </span><span class="kw-2">mut </span>reader = pb.wrap_read(bytes);
         <span class="kw">let </span><span class="kw-2">mut </span>writer = Vec::new();
@@ -1581,7 +1582,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>it_can_wrap_a_writer() {
-        <span class="kw">let </span>bytes = <span class="string">b&quot;implementation of io::Read&quot;</span>;
+        <span class="kw">let </span>bytes = <span class="string">b"implementation of io::Read"</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>reader = <span class="kw-2">&amp;</span>bytes[..];
         <span class="kw">let </span>pb = ProgressBar::new(bytes.len() <span class="kw">as </span>u64);
         <span class="kw">let </span>writer = Vec::new();

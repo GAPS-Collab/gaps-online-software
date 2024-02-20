@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/textplots-0.8.6/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="textplots" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/textplots-0.8.6/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="textplots" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -697,13 +698,13 @@
 //! # Usage
 //! ```toml
 //! [dependencies]
-//! textplots = &quot;0.8&quot;
+//! textplots = "0.8"
 //! ```
 //!
 //! ```rust
 //! use textplots::{Chart, Plot, Shape};
 //!
-//! println!(&quot;y = sin(x) / x&quot;);
+//! println!("y = sin(x) / x");
 //!
 //! Chart::default()
 //!     .lineplot(&amp;Shape::Continuous(Box::new(|x| x.sin() / x)))
@@ -712,7 +713,7 @@
 //!
 //! It will display something like this:
 //!
-//! &lt;img src=&quot;https://github.com/loony-bean/textplots-rs/blob/master/doc/demo.png?raw=true&quot;/&gt;
+//! &lt;img src="https://github.com/loony-bean/textplots-rs/blob/master/doc/demo.png?raw=true"/&gt;
 //!
 //! Default viewport size is 120 x 60 points, with X values ranging from -10 to 10.
 //! You can override the defaults calling `new`.
@@ -720,7 +721,7 @@
 //! ```rust
 //! use textplots::{Chart, Plot, Shape};
 //!
-//! println!(&quot;y = cos(x), y = sin(x) / 2&quot;);
+//! println!("y = cos(x), y = sin(x) / 2");
 //!
 //! Chart::new(180, 60, -5.0, 5.0)
 //!     .lineplot(&amp;Shape::Continuous(Box::new(|x| x.cos())))
@@ -728,11 +729,11 @@
 //!     .display();
 //! ```
 //!
-//! &lt;img src=&quot;https://github.com/loony-bean/textplots-rs/blob/master/doc/demo2.png?raw=true&quot;/&gt;
+//! &lt;img src="https://github.com/loony-bean/textplots-rs/blob/master/doc/demo2.png?raw=true"/&gt;
 //!
 //! You could also plot series of points. See [Shape](enum.Shape.html) and [examples](https://github.com/loony-bean/textplots-rs/tree/master/examples) for more details.
 //!
-//! &lt;img src=&quot;https://github.com/loony-bean/textplots-rs/blob/master/doc/demo3.png?raw=true&quot;/&gt;
+//! &lt;img src="https://github.com/loony-bean/textplots-rs/blob/master/doc/demo3.png?raw=true"/&gt;
 
 </span><span class="kw">pub mod </span>scale;
 <span class="kw">pub mod </span>utils;
@@ -756,7 +757,7 @@
 }
 
 <span class="doccomment">/// Controls the drawing.
-</span><span class="kw">pub struct </span>Chart&lt;<span class="lifetime">&#39;a</span>&gt; {
+</span><span class="kw">pub struct </span>Chart&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Canvas width in points.
     </span>width: u32,
     <span class="doccomment">/// Canvas height in points.
@@ -769,10 +770,10 @@
     </span>ymin: f32,
     <span class="doccomment">/// Y-axis end value (potentially calculated automatically).
     </span>ymax: f32,
-    <span class="doccomment">/// The type of y axis ranging we&#39;ll do
+    <span class="doccomment">/// The type of y axis ranging we'll do
     </span>y_ranging: ChartRangeMethod,
     <span class="doccomment">/// Collection of shapes to be presented on the canvas.
-    </span>shapes: Vec&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Shape&lt;<span class="lifetime">&#39;a</span>&gt;, <span class="prelude-ty">Option</span>&lt;RGB8&gt;)&gt;,
+    </span>shapes: Vec&lt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span>Shape&lt;<span class="lifetime">'a</span>&gt;, <span class="prelude-ty">Option</span>&lt;RGB8&gt;)&gt;,
     <span class="doccomment">/// Underlying canvas object.
     </span>canvas: BrailleCanvas,
     <span class="doccomment">/// X-axis style.
@@ -788,58 +789,58 @@
 }
 
 <span class="doccomment">/// Specifies different kinds of plotted data.
-</span><span class="kw">pub enum </span>Shape&lt;<span class="lifetime">&#39;a</span>&gt; {
+</span><span class="kw">pub enum </span>Shape&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Real value function.
-    </span>Continuous(Box&lt;<span class="kw">dyn </span>Fn(f32) -&gt; f32 + <span class="lifetime">&#39;a</span>&gt;),
+    </span>Continuous(Box&lt;<span class="kw">dyn </span>Fn(f32) -&gt; f32 + <span class="lifetime">'a</span>&gt;),
     <span class="doccomment">/// Points of a scatter plot.
-    </span>Points(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[(f32, f32)]),
+    </span>Points(<span class="kw-2">&amp;</span><span class="lifetime">'a </span>[(f32, f32)]),
     <span class="doccomment">/// Points connected with lines.
-    </span>Lines(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[(f32, f32)]),
+    </span>Lines(<span class="kw-2">&amp;</span><span class="lifetime">'a </span>[(f32, f32)]),
     <span class="doccomment">/// Points connected in step fashion.
-    </span>Steps(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[(f32, f32)]),
+    </span>Steps(<span class="kw-2">&amp;</span><span class="lifetime">'a </span>[(f32, f32)]),
     <span class="doccomment">/// Points represented with bars.
-    </span>Bars(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[(f32, f32)]),
+    </span>Bars(<span class="kw-2">&amp;</span><span class="lifetime">'a </span>[(f32, f32)]),
 }
 
 <span class="doccomment">/// Provides an interface for drawing plots.
-</span><span class="kw">pub trait </span>Plot&lt;<span class="lifetime">&#39;a</span>&gt; {
+</span><span class="kw">pub trait </span>Plot&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Draws a [line chart](https://en.wikipedia.org/wiki/Line_chart) of points connected by straight line segments.
-    </span><span class="kw">fn </span>lineplot(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, shape: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Shape) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Chart;
+    </span><span class="kw">fn </span>lineplot(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span><span class="self">self</span>, shape: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Shape) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>Chart;
 }
 
 <span class="doccomment">/// Provides an interface for drawing colored plots.
-</span><span class="kw">pub trait </span>ColorPlot&lt;<span class="lifetime">&#39;a</span>&gt; {
+</span><span class="kw">pub trait </span>ColorPlot&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Draws a [line chart](https://en.wikipedia.org/wiki/Line_chart) of points connected by straight line segments using the specified color
-    </span><span class="kw">fn </span>linecolorplot(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, shape: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Shape, color: RGB8) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Chart;
+    </span><span class="kw">fn </span>linecolorplot(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span><span class="self">self</span>, shape: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Shape, color: RGB8) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>Chart;
 }
 
 <span class="doccomment">/// Provides a builder interface for styling axis.
-</span><span class="kw">pub trait </span>AxisBuilder&lt;<span class="lifetime">&#39;a</span>&gt; {
+</span><span class="kw">pub trait </span>AxisBuilder&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Specifies the style of x-axis.
-    </span><span class="kw">fn </span>x_axis_style(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, style: LineStyle) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Chart&lt;<span class="lifetime">&#39;a</span>&gt;;
+    </span><span class="kw">fn </span>x_axis_style(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span><span class="self">self</span>, style: LineStyle) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>Chart&lt;<span class="lifetime">'a</span>&gt;;
 
     <span class="doccomment">/// Specifies the style of y-axis.
-    </span><span class="kw">fn </span>y_axis_style(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, style: LineStyle) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Chart&lt;<span class="lifetime">&#39;a</span>&gt;;
+    </span><span class="kw">fn </span>y_axis_style(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span><span class="self">self</span>, style: LineStyle) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>Chart&lt;<span class="lifetime">'a</span>&gt;;
 }
 
-<span class="kw">pub trait </span>LabelBuilder&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">pub trait </span>LabelBuilder&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Specifies the label format of x-axis.
-    </span><span class="kw">fn </span>x_label_format(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, format: LabelFormat) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Chart&lt;<span class="lifetime">&#39;a</span>&gt;;
+    </span><span class="kw">fn </span>x_label_format(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span><span class="self">self</span>, format: LabelFormat) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>Chart&lt;<span class="lifetime">'a</span>&gt;;
 
     <span class="doccomment">/// Specifies the label format of y-axis.
-    </span><span class="kw">fn </span>y_label_format(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, format: LabelFormat) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Chart&lt;<span class="lifetime">&#39;a</span>&gt;;
+    </span><span class="kw">fn </span>y_label_format(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span><span class="self">self</span>, format: LabelFormat) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>Chart&lt;<span class="lifetime">'a</span>&gt;;
 }
 
 <span class="doccomment">/// Provides an interface for adding tick labels to the y-axis
-</span><span class="kw">pub trait </span>TickDisplayBuilder&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="comment">// Horizontal labels don&#39;t allow for support of x-axis tick labels
+</span><span class="kw">pub trait </span>TickDisplayBuilder&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="comment">// Horizontal labels don't allow for support of x-axis tick labels
     </span><span class="doccomment">/// Specifies the tick label density of y-axis.
     /// TickDisplay::Sparse will change the canvas height to the nearest multiple of 16
     /// TickDisplay::Dense will change the canvas height to the nearest multiple of 8
-    </span><span class="kw">fn </span>y_tick_display(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, density: TickDisplay) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Chart&lt;<span class="lifetime">&#39;a</span>&gt;;
+    </span><span class="kw">fn </span>y_tick_display(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span><span class="self">self</span>, density: TickDisplay) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>Chart&lt;<span class="lifetime">'a</span>&gt;;
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Default <span class="kw">for </span>Chart&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Default <span class="kw">for </span>Chart&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::new(<span class="number">120</span>, <span class="number">60</span>, -<span class="number">10.0</span>, <span class="number">10.0</span>)
     }
@@ -891,16 +892,16 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Display <span class="kw">for </span>Chart&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result </span>{
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Display <span class="kw">for </span>Chart&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result </span>{
         <span class="comment">// get frame and replace space with U+2800 (BRAILLE PATTERN BLANK)
-        </span><span class="kw">let </span><span class="kw-2">mut </span>frame = <span class="self">self</span>.canvas.frame().replace(<span class="string">&#39; &#39;</span>, <span class="string">&quot;\u{2800}&quot;</span>);
+        </span><span class="kw">let </span><span class="kw-2">mut </span>frame = <span class="self">self</span>.canvas.frame().replace(<span class="string">' '</span>, <span class="string">"\u{2800}"</span>);
 
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(idx) = frame.find(<span class="string">&#39;\n&#39;</span>) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(idx) = frame.find(<span class="string">'\n'</span>) {
             <span class="kw">let </span>xmin = <span class="self">self</span>.format_x_axis_tick(<span class="self">self</span>.xmin);
             <span class="kw">let </span>xmax = <span class="self">self</span>.format_x_axis_tick(<span class="self">self</span>.xmax);
 
-            frame.insert_str(idx, <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot; {0}&quot;</span>, <span class="self">self</span>.format_y_axis_tick(<span class="self">self</span>.ymax)));
+            frame.insert_str(idx, <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">" {0}"</span>, <span class="self">self</span>.format_y_axis_tick(<span class="self">self</span>.ymax)));
 
             <span class="comment">// Display y-axis ticks if requested
             </span><span class="kw">match </span><span class="self">self</span>.y_tick_display {
@@ -911,14 +912,14 @@
                     </span><span class="kw">let </span>step_size = (<span class="self">self</span>.ymax - <span class="self">self</span>.ymin) / (num_steps) <span class="kw">as </span>f32;
                     <span class="kw">for </span>i <span class="kw">in </span><span class="number">1</span>..(num_steps) {
                         <span class="kw">if let </span><span class="prelude-val">Some</span>(index) = frame
-                            .match_indices(<span class="string">&#39;\n&#39;</span>)
+                            .match_indices(<span class="string">'\n'</span>)
                             .collect::&lt;Vec&lt;(usize, <span class="kw-2">&amp;</span>str)&gt;&gt;()
                             .get((i * row_spacing) <span class="kw">as </span>usize)
                         {
                             frame.insert_str(
                                 index.<span class="number">0</span>,
                                 <span class="kw-2">&amp;</span><span class="macro">format!</span>(
-                                    <span class="string">&quot; {0}&quot;</span>,
+                                    <span class="string">" {0}"</span>,
                                     <span class="self">self</span>.format_y_axis_tick(<span class="self">self</span>.ymax - (step_size * i <span class="kw">as </span>f32))
                                 ),
                             );
@@ -928,18 +929,18 @@
             }
 
             frame.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
-                <span class="string">&quot; {0}\n{1: &lt;width$}{2}\n&quot;</span>,
+                <span class="string">" {0}\n{1: &lt;width$}{2}\n"</span>,
                 <span class="self">self</span>.format_y_axis_tick(<span class="self">self</span>.ymin),
                 xmin,
                 xmax,
                 width = (<span class="self">self</span>.width <span class="kw">as </span>usize) / <span class="number">2 </span>- xmax.len()
             ));
         }
-        <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, frame)
+        <span class="macro">write!</span>(f, <span class="string">"{}"</span>, frame)
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Chart&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Chart&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Creates a new `Chart` object.
     ///
     /// # Panics
@@ -947,11 +948,11 @@
     /// Panics if `width` is less than 32 or `height` is less than 3.
     </span><span class="kw">pub fn </span>new(width: u32, height: u32, xmin: f32, xmax: f32) -&gt; <span class="self">Self </span>{
         <span class="kw">if </span>width &lt; <span class="number">32 </span>{
-            <span class="macro">panic!</span>(<span class="string">&quot;width should be at least 32&quot;</span>);
+            <span class="macro">panic!</span>(<span class="string">"width should be at least 32"</span>);
         }
 
         <span class="kw">if </span>height &lt; <span class="number">3 </span>{
-            <span class="macro">panic!</span>(<span class="string">&quot;height should be at least 3&quot;</span>);
+            <span class="macro">panic!</span>(<span class="string">"height should be at least 3"</span>);
         }
 
         <span class="self">Self </span>{
@@ -986,11 +987,11 @@
         ymax: f32,
     ) -&gt; <span class="self">Self </span>{
         <span class="kw">if </span>width &lt; <span class="number">32 </span>{
-            <span class="macro">panic!</span>(<span class="string">&quot;width should be at least 32&quot;</span>);
+            <span class="macro">panic!</span>(<span class="string">"width should be at least 32"</span>);
         }
 
         <span class="kw">if </span>height &lt; <span class="number">3 </span>{
-            <span class="macro">panic!</span>(<span class="string">&quot;height should be at least 3&quot;</span>);
+            <span class="macro">panic!</span>(<span class="string">"height should be at least 3"</span>);
         }
 
         <span class="self">Self </span>{
@@ -1093,7 +1094,7 @@
         <span class="self">self</span>.axis();
         <span class="self">self</span>.figures();
 
-        <span class="macro">println!</span>(<span class="string">&quot;{}&quot;</span>, <span class="self">self</span>);
+        <span class="macro">println!</span>(<span class="string">"{}"</span>, <span class="self">self</span>);
     }
 
     <span class="doccomment">/// Prints canvas content with some additional visual elements (like borders).
@@ -1129,8 +1130,8 @@
     <span class="doccomment">/// Performs formatting of the x axis.
     </span><span class="kw">fn </span>format_x_axis_tick(<span class="kw-2">&amp;</span><span class="self">self</span>, value: f32) -&gt; String {
         <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.x_label_format {
-            LabelFormat::None =&gt; <span class="string">&quot;&quot;</span>.to_owned(),
-            LabelFormat::Value =&gt; <span class="macro">format!</span>(<span class="string">&quot;{:.1}&quot;</span>, value),
+            LabelFormat::None =&gt; <span class="string">""</span>.to_owned(),
+            LabelFormat::Value =&gt; <span class="macro">format!</span>(<span class="string">"{:.1}"</span>, value),
             LabelFormat::Custom(f) =&gt; f(value),
         }
     }
@@ -1138,8 +1139,8 @@
     <span class="doccomment">/// Performs formatting of the y axis.
     </span><span class="kw">fn </span>format_y_axis_tick(<span class="kw-2">&amp;</span><span class="self">self</span>, value: f32) -&gt; String {
         <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.y_label_format {
-            LabelFormat::None =&gt; <span class="string">&quot;&quot;</span>.to_owned(),
-            LabelFormat::Value =&gt; <span class="macro">format!</span>(<span class="string">&quot;{:.1}&quot;</span>, value),
+            LabelFormat::None =&gt; <span class="string">""</span>.to_owned(),
+            LabelFormat::Value =&gt; <span class="macro">format!</span>(<span class="string">"{:.1}"</span>, value),
             LabelFormat::Custom(f) =&gt; f(value),
         }
     }
@@ -1287,8 +1288,8 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ColorPlot&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>Chart&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">fn </span>linecolorplot(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, shape: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Shape, color: RGB8) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Chart {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; ColorPlot&lt;<span class="lifetime">'a</span>&gt; <span class="kw">for </span>Chart&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">fn </span>linecolorplot(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span><span class="self">self</span>, shape: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Shape, color: RGB8) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>Chart {
         <span class="self">self</span>.shapes.push((shape, <span class="prelude-val">Some</span>(color)));
         <span class="kw">if </span><span class="self">self</span>.y_ranging == ChartRangeMethod::AutoRange {
             <span class="self">self</span>.rescale(shape);
@@ -1297,8 +1298,8 @@
     </span>}
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Plot&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>Chart&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">fn </span>lineplot(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, shape: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Shape) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Chart {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Plot&lt;<span class="lifetime">'a</span>&gt; <span class="kw">for </span>Chart&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">fn </span>lineplot(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span><span class="self">self</span>, shape: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Shape) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>Chart {
         <span class="self">self</span>.shapes.push((shape, <span class="prelude-val">None</span>));
         <span class="kw">if </span><span class="self">self</span>.y_ranging == ChartRangeMethod::AutoRange {
             <span class="self">self</span>.rescale(shape);
@@ -1315,19 +1316,19 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; AxisBuilder&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>Chart&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">fn </span>x_axis_style(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, style: LineStyle) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Chart {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; AxisBuilder&lt;<span class="lifetime">'a</span>&gt; <span class="kw">for </span>Chart&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">fn </span>x_axis_style(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span><span class="self">self</span>, style: LineStyle) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>Chart {
         <span class="self">self</span>.x_style = style;
         <span class="self">self
     </span>}
 
-    <span class="kw">fn </span>y_axis_style(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, style: LineStyle) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Chart {
+    <span class="kw">fn </span>y_axis_style(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span><span class="self">self</span>, style: LineStyle) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>Chart {
         <span class="self">self</span>.y_style = style;
         <span class="self">self
     </span>}
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; LabelBuilder&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>Chart&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; LabelBuilder&lt;<span class="lifetime">'a</span>&gt; <span class="kw">for </span>Chart&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Specifies a formater for the x-axis label.
     </span><span class="kw">fn </span>x_label_format(<span class="kw-2">&amp;mut </span><span class="self">self</span>, format: LabelFormat) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="self">self</span>.x_label_format = format;
@@ -1341,7 +1342,7 @@
     </span>}
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; TickDisplayBuilder&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>Chart&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; TickDisplayBuilder&lt;<span class="lifetime">'a</span>&gt; <span class="kw">for </span>Chart&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Specifies the density of y-axis tick labels
     </span><span class="kw">fn </span>y_tick_display(<span class="kw-2">&amp;mut </span><span class="self">self</span>, density: TickDisplay) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="comment">// Round the canvas height to the nearest multiple using integer division

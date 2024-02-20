@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-rb/src/api.rs`."><title>api.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="liftof_rb" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-rb/src/api.rs`."><title>api.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="liftof_rb" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1392,14 +1393,6 @@
 <a href="#1392" id="1392">1392</a>
 <a href="#1393" id="1393">1393</a>
 <a href="#1394" id="1394">1394</a>
-<a href="#1395" id="1395">1395</a>
-<a href="#1396" id="1396">1396</a>
-<a href="#1397" id="1397">1397</a>
-<a href="#1398" id="1398">1398</a>
-<a href="#1399" id="1399">1399</a>
-<a href="#1400" id="1400">1400</a>
-<a href="#1401" id="1401">1401</a>
-<a href="#1402" id="1402">1402</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Higher level functions, to deal with events/binary reprentation of it, 
 //! configure the drs4, etc.
 </span><span class="kw">use </span>std::fs::read_to_string;
@@ -1426,14 +1419,13 @@
 <span class="kw">use </span>tof_dataclasses::events::{RBEvent,
                               DataType};
 <span class="kw">use </span>tof_dataclasses::commands::{
-    TofCommand,
-    TofOperationMode,
+    TofCommand, TofCommandCode, TofOperationMode
 };
 <span class="kw">use </span>tof_dataclasses::packets::TofPacket;
-<span class="kw">use </span>tof_dataclasses::errors::SerializationError;
+<span class="kw">use </span>tof_dataclasses::errors::{CmdError, SerializationError};
 <span class="kw">use </span>tof_dataclasses::run::RunConfig;
 
-<span class="comment">// Takeru&#39;s tof-control
+<span class="comment">// Takeru's tof-control
 </span><span class="kw">use </span>tof_dataclasses::calibrations::RBCalibrations;
 <span class="kw">use </span>tof_dataclasses::errors::{CalibrationError,
                               RunError,
@@ -1446,14 +1438,12 @@
                                       select_tcal_mode,
                                       select_sma_mode};
 
-<span class="comment">// for threshold setting
-</span><span class="kw">use </span>tof_control::preamp_control::preamp_bias;
-<span class="comment">// for preamp bias
-</span><span class="kw">use </span>tof_control::helper::preamp_type::{PreampReadBias, PreampSetBias, PreampTemp, PreampBiasError};
+<span class="comment">// for general control over rb, ltb and pb
+</span><span class="kw">use </span>tof_control::helper::preamp_type::PreampSetBias;
 <span class="comment">// for power
 </span><span class="kw">use </span>liftof_lib::{PowerStatusEnum,
                   LTBThresholdName};
-<span class="kw">use </span>zmq::Socket;
+
 <span class="kw">use </span>liftof_lib::constants::{DEFAULT_PREAMP_BIAS,
                             DEFAULT_PREAMP_ID,
                             DEFAULT_LTB_ID};
@@ -1461,21 +1451,21 @@
 <span class="kw">const </span>FIVE_SECONDS: Duration = time::Duration::from_millis(<span class="number">5000</span>);
 
 <span class="doccomment">/// The poisson self trigger mode of the board
-/// triggers automatically, this means we don&#39;t 
+/// triggers automatically, this means we don't 
 /// have to send a forced trigger signal every
 /// 1/rate.
 ///
 /// It just sets the respective registers here
 </span><span class="kw">pub fn </span>enable_poisson_self_trigger(rate : f32) {
-  <span class="comment">// we have to calculate the actual rate with Andrew&#39;s formula
+  <span class="comment">// we have to calculate the actual rate with Andrew's formula
   //let clk_period : f64 = 1.0/33e6;
   </span><span class="kw">let </span>max_val  : f32 = <span class="number">4294967295.0</span>;
   <span class="kw">let </span>reg_val = (rate/(<span class="number">33e6</span>/max_val)) <span class="kw">as </span>u32;
-  <span class="macro">info!</span>(<span class="string">&quot;Will use random self trigger with rate {reg_val} value for register, corresponding to {rate} Hz&quot;</span>);
+  <span class="macro">info!</span>(<span class="string">"Will use random self trigger with rate {reg_val} value for register, corresponding to {rate} Hz"</span>);
   <span class="kw">match </span>set_self_trig_rate(reg_val) {
     <span class="prelude-val">Err</span>(err) =&gt; {
-      <span class="macro">error!</span>(<span class="string">&quot;Setting self trigger failed! Er {err}&quot;</span>);
-      <span class="macro">error!</span>(<span class="string">&quot;To be clear, we are NOT RUNNING IN POISSON SELF-TRIGGER MODE!&quot;</span>);
+      <span class="macro">error!</span>(<span class="string">"Setting self trigger failed! Er {err}"</span>);
+      <span class="macro">error!</span>(<span class="string">"To be clear, we are NOT RUNNING IN POISSON SELF-TRIGGER MODE!"</span>);
     }
     <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
   }
@@ -1500,7 +1490,7 @@
 ///                  register. If reached, break.
 /// * interval     : Check the trigger register every
 ///                  interval
-/// * n_events_exp : Don&#39;t return before we have seen
+/// * n_events_exp : Don't return before we have seen
 ///                  this many events
 </span><span class="kw">pub fn </span>wait_while_run_active(n_errors     : u32,
                              interval     : Duration,
@@ -1515,23 +1505,23 @@
   <span class="kw">let </span><span class="kw-2">mut </span>kill_timer = Instant::now();
   <span class="kw">loop </span>{
     <span class="comment">// listen to zmq here
-    </span><span class="macro">debug!</span>(<span class="string">&quot;Waiting for 0MQ socket...&quot;</span>);
+    </span><span class="macro">debug!</span>(<span class="string">"Waiting for 0MQ socket..."</span>);
     <span class="kw">match </span>socket.recv_bytes(<span class="number">0</span>) {
       <span class="prelude-val">Err</span>(err) =&gt; {
-        <span class="macro">error!</span>(<span class="string">&quot;Unable to recv on socket! Err {err}&quot;</span>);
+        <span class="macro">error!</span>(<span class="string">"Unable to recv on socket! Err {err}"</span>);
       },
       <span class="prelude-val">Ok</span>(bytes) =&gt; {
         <span class="comment">// the first 5 bytes are the identifier, in this case
         // LOCAL
-        </span><span class="macro">debug!</span>(<span class="string">&quot;Received {} bytes over 0MQ!&quot;</span>, bytes.len());
+        </span><span class="macro">debug!</span>(<span class="string">"Received {} bytes over 0MQ!"</span>, bytes.len());
         <span class="kw">match </span>TofPacket::from_bytestream(<span class="kw-2">&amp;</span>bytes, <span class="kw-2">&amp;mut </span><span class="number">5</span>) {
           <span class="prelude-val">Err</span>(err) =&gt; {
-            <span class="macro">error!</span>(<span class="string">&quot;Can&#39;t unpack TofPacket, err {err}&quot;</span>);
+            <span class="macro">error!</span>(<span class="string">"Can't unpack TofPacket, err {err}"</span>);
           },
           <span class="prelude-val">Ok</span>(tp) =&gt; {
             <span class="kw">match </span>RBEvent::from_bytestream(<span class="kw-2">&amp;</span>tp.payload, <span class="kw-2">&amp;mut </span><span class="number">0</span>) {
               <span class="prelude-val">Err</span>(err) =&gt; {
-                <span class="macro">error!</span>(<span class="string">&quot;Can&#39;t unpack RBEvent, error {err}&quot;</span>);
+                <span class="macro">error!</span>(<span class="string">"Can't unpack RBEvent, error {err}"</span>);
               },
               <span class="prelude-val">Ok</span>(ev) =&gt; {
                 <span class="kw">if </span>ev.data_type == <span class="kw-2">*</span>data_type {
@@ -1544,13 +1534,13 @@
       }
     }
     <span class="kw">if </span>events.len() &gt;= n_events_exp <span class="kw">as </span>usize {
-      <span class="macro">info!</span>(<span class="string">&quot;Acquired {} events!&quot;</span>, events.len());
+      <span class="macro">info!</span>(<span class="string">"Acquired {} events!"</span>, events.len());
       <span class="kw">return </span>events;
     }
     <span class="kw">if </span>triggers_have_stopped {
       <span class="comment">// wait for 10 more seconds..
       </span><span class="kw">if </span>kill_timer.elapsed().as_secs() &gt; <span class="number">10 </span>{
-        <span class="macro">info!</span>(<span class="string">&quot;Kill timer expired!&quot;</span>);
+        <span class="macro">info!</span>(<span class="string">"Kill timer expired!"</span>);
         <span class="kw">return </span>events;
       } <span class="kw">else </span>{
         <span class="kw">continue</span>;
@@ -1559,24 +1549,24 @@
     <span class="kw">if </span>start.elapsed() &gt; interval {
       <span class="kw">match </span>get_triggers_enabled() {
         <span class="prelude-val">Err</span>(err) =&gt; {
-          <span class="macro">error!</span>(<span class="string">&quot;Unable to obtain trigger status! Err {err}&quot;</span>);
+          <span class="macro">error!</span>(<span class="string">"Unable to obtain trigger status! Err {err}"</span>);
           errs += <span class="number">1</span>;
         },
         <span class="prelude-val">Ok</span>(running) =&gt; {
           <span class="kw">if </span>!running {
-            <span class="macro">info!</span>(<span class="string">&quot;Run has apparently terminated!&quot;</span>);
+            <span class="macro">info!</span>(<span class="string">"Run has apparently terminated!"</span>);
             triggers_have_stopped = <span class="bool-val">true</span>;
             kill_timer = Instant::now();
             <span class="comment">//break;
           </span>} <span class="kw">else </span>{ 
-            <span class="macro">info!</span>(<span class="string">&quot;We have waited the expected time, but there are still triggers...&quot;</span>);
+            <span class="macro">info!</span>(<span class="string">"We have waited the expected time, but there are still triggers..."</span>);
             thread::sleep(interval);
           }
         }
       }
       <span class="comment">//thread::sleep(interval);
       </span><span class="kw">if </span>errs == n_errors {
-        <span class="macro">info!</span>(<span class="string">&quot;Can&#39;t wait anymore since we have seen the configured number of errors! {n_errors}&quot;</span>);
+        <span class="macro">info!</span>(<span class="string">"Can't wait anymore since we have seen the configured number of errors! {n_errors}"</span>);
         <span class="kw">return </span>events;
       }
     <span class="comment">//start = Instant::now();
@@ -1607,7 +1597,7 @@
 ///                     to the runner thread
 /// * tp_to_publisher : send calibration packets (wrapped 
 ///                     in TofPacket) to publisher thread
-/// * address         : the publisher&#39;s data address
+/// * address         : the publisher's data address
 ///                     We use a trick to get the event
 ///                     packets for the calibration:
 ///                     We are subscribing to the PUB 
@@ -1616,7 +1606,7 @@
                       tp_to_publisher : <span class="kw-2">&amp;</span>Sender&lt;TofPacket&gt;,
                       address         : String)
 -&gt; <span class="prelude-ty">Result</span>&lt;(), CalibrationError&gt; {
-  <span class="macro">warn!</span>(<span class="string">&quot;Commencing full RB calibration routine! This will take the board out of datataking for a few minutes!&quot;</span>);
+  <span class="macro">warn!</span>(<span class="string">"Commencing full RB calibration routine! This will take the board out of datataking for a few minutes!"</span>);
   <span class="comment">// TODO this should become something that can be read from a local json file
   </span><span class="kw">let </span>five_seconds   = time::Duration::from_millis(<span class="number">5000</span>);
   <span class="kw">let </span><span class="kw-2">mut </span>run_config = RunConfig {
@@ -1639,7 +1629,7 @@
   </span><span class="kw">let </span><span class="kw-2">mut </span>board_id = <span class="number">0u8</span>;
   <span class="kw">match </span>get_board_id() {
     <span class="prelude-val">Err</span>(err) =&gt; {
-      <span class="macro">error!</span>(<span class="string">&quot;Unable to obtain board id. Calibration might be orphaned. Err {err}&quot;</span>);
+      <span class="macro">error!</span>(<span class="string">"Unable to obtain board id. Calibration might be orphaned. Err {err}"</span>);
     },
     <span class="prelude-val">Ok</span>(rb_id) =&gt; {
       board_id = rb_id <span class="kw">as </span>u8;
@@ -1653,7 +1643,7 @@
   <span class="kw">let </span>socket : zmq::Socket; 
   <span class="kw">match </span>ctx.socket(zmq::SUB) {
     <span class="prelude-val">Err</span>(err) =&gt; {
-      <span class="macro">error!</span>(<span class="string">&quot;Unable to create zmq socket! Err {err}. This is BAD!&quot;</span>);
+      <span class="macro">error!</span>(<span class="string">"Unable to create zmq socket! Err {err}. This is BAD!"</span>);
       <span class="kw">return </span><span class="prelude-val">Err</span>(CalibrationError::CanNotConnectToMyOwnZMQSocket);
     }
     <span class="prelude-val">Ok</span>(sock) =&gt; {
@@ -1662,103 +1652,101 @@
   }
   <span class="kw">match </span>socket.connect(<span class="kw-2">&amp;</span>address) {
     <span class="prelude-val">Err</span>(err) =&gt; {
-      <span class="macro">error!</span>(<span class="string">&quot;Unable to connect to data (PUB) socket {address}, Err {err}&quot;</span>);
+      <span class="macro">error!</span>(<span class="string">"Unable to connect to data (PUB) socket {address}, Err {err}"</span>);
       <span class="kw">return </span><span class="prelude-val">Err</span>(CalibrationError::CanNotConnectToMyOwnZMQSocket);
     },
     <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; ()
   }
   
   <span class="comment">// The packets relevant for us here in this context, will 
-  // all be prefixed with &quot;LOCAL&quot;
+  // all be prefixed with "LOCAL"
   // See the respective section in data_publisher 
   // (search for prefix_local)
-  </span><span class="kw">let </span>topic_local = String::from(<span class="string">&quot;LOCAL&quot;</span>);
+  </span><span class="kw">let </span>topic_local = String::from(<span class="string">"LOCAL"</span>);
   <span class="kw">match </span>socket.set_subscribe(<span class="kw-2">&amp;</span>topic_local.as_bytes()) {
-    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Can not subscribe to {topic_local}, err {err}&quot;</span>),
-    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">&quot;Subscribing to local packages!&quot;</span>),
+    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Can not subscribe to {topic_local}, err {err}"</span>),
+    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">"Subscribing to local packages!"</span>),
   }
   <span class="comment">// at this point, the zmq socket should be set up!
-  </span><span class="macro">info!</span>(<span class="string">&quot;Will set board to no input mode!&quot;</span>);
-  <span class="kw">match </span>select_noi_mode() {
-    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Unable to select SMA mode! {err:?}&quot;</span>),
-    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)     =&gt; (),
-  }
-  <span class="kw">match </span>rc_to_runner.send(run_config) {
-    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">&quot;Can not send runconfig!, Err {err}&quot;</span>),
-    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">trace!</span>(<span class="string">&quot;Success!&quot;</span>)
-  }
-  <span class="kw">let </span><span class="kw-2">mut </span>cal_dtype = DataType::Noi;
-  calibration.noi_data = wait_while_run_active(<span class="number">20</span>, <span class="number">4</span><span class="kw-2">*</span>five_seconds, <span class="number">1000</span>, <span class="kw-2">&amp;</span>cal_dtype, <span class="kw-2">&amp;</span>socket);
-  <span class="macro">println!</span>(<span class="string">&quot;==&gt; No input (Voltage calibration) data taken!&quot;</span>);
+  </span>run_config.data_type = DataType::Noi; 
+  <span class="kw">match </span>run_noi_calibration(rc_to_runner, <span class="kw-2">&amp;</span>socket, <span class="kw-2">&amp;mut </span>calibration, run_config) {
+    <span class="prelude-val">Err</span>(err) =&gt; {
+      <span class="macro">error!</span>(<span class="string">"Unable to run no input calibration step. Err {err}"</span>);
+      <span class="kw">return </span><span class="prelude-val">Err</span>(CalibrationError::CalibrationFailed);
+    },
+    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
+      <span class="macro">info!</span>(<span class="string">"Noi calibration step done!"</span>)
+    }
+  };
 
-  <span class="macro">info!</span>(<span class="string">&quot;Will set board to vcal mode!&quot;</span>);
-  <span class="kw">match </span>select_vcal_mode() {
-    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Unable to select VCAL mode! {err:?}&quot;</span>),
-    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)     =&gt; ()
-  }
-  run_config.data_type = DataType::VoltageCalibration;  
-  <span class="kw">match </span>rc_to_runner.send(run_config) {
-    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">&quot;Can not send runconfig! {err}&quot;</span>),
-    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">trace!</span>(<span class="string">&quot;Success!&quot;</span>)
-  }  
-  cal_dtype             = DataType::VoltageCalibration;
-  calibration.vcal_data = wait_while_run_active(<span class="number">20</span>, <span class="number">4</span><span class="kw-2">*</span>five_seconds, <span class="number">1000</span>, <span class="kw-2">&amp;</span>cal_dtype, <span class="kw-2">&amp;</span>socket);
+  run_config.data_type = DataType::VoltageCalibration; 
+  <span class="kw">match </span>run_voltage_calibration(rc_to_runner, <span class="kw-2">&amp;</span>socket, <span class="kw-2">&amp;mut </span>calibration, run_config) {
+    <span class="prelude-val">Err</span>(err) =&gt; {
+      <span class="macro">error!</span>(<span class="string">"Unable to run voltage calibration step. Err {err}"</span>);
+      <span class="kw">return </span><span class="prelude-val">Err</span>(CalibrationError::CalibrationFailed);
+    },
+    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
+      <span class="macro">info!</span>(<span class="string">"Voltage calibration step done!"</span>)
+    }
+  };
   
-  <span class="macro">println!</span>(<span class="string">&quot;==&gt; Voltage calibration data taken!&quot;</span>);
-  <span class="macro">info!</span>(<span class="string">&quot;Will set board to tcal mode!&quot;</span>);
-  run_config.trigger_poisson_rate  = <span class="number">80</span>;
-  run_config.nevents               = <span class="number">1800</span>; <span class="comment">// make sure we get 1000 events
-  </span>run_config.trigger_fixed_rate    = <span class="number">0</span>;
-  <span class="comment">//run_config.rb_buff_size          = 500;
-  </span>run_config.data_type = DataType::TimingCalibration;  
-  <span class="kw">match </span>select_tcal_mode() {
-    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Can not set board to TCAL mode! {err:?}&quot;</span>),
-    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)     =&gt; (),
-  }
-  <span class="kw">match </span>rc_to_runner.send(run_config) {
-    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">&quot;Can not send runconfig! {err}&quot;</span>),
-    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">trace!</span>(<span class="string">&quot;Success!&quot;</span>)
-  }
-  
-  cal_dtype             = DataType::TimingCalibration;
-  calibration.tcal_data = wait_while_run_active(<span class="number">20</span>, <span class="number">4</span><span class="kw-2">*</span>five_seconds, <span class="number">1000</span>,<span class="kw-2">&amp;</span>cal_dtype, <span class="kw-2">&amp;</span>socket);
+  run_config.data_type = DataType::TimingCalibration;
+  <span class="kw">match </span>run_timing_calibration(rc_to_runner, <span class="kw-2">&amp;</span>socket, <span class="kw-2">&amp;mut </span>calibration, run_config) {
+    <span class="prelude-val">Err</span>(err) =&gt; {
+      <span class="macro">error!</span>(<span class="string">"Unable to run timing calibration step. Err {err}"</span>);
+      <span class="kw">return </span><span class="prelude-val">Err</span>(CalibrationError::CalibrationFailed);
+    },
+    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
+      <span class="macro">info!</span>(<span class="string">"Timing calibration step done!"</span>)
+    }
+  };
+
+  <span class="macro">println!</span>(<span class="string">"==&gt; Calibration data taking complete!"</span>); 
+  <span class="macro">println!</span>(<span class="string">"Calibration : {}"</span>, calibration);
+  <span class="macro">println!</span>(<span class="string">"Cleaning data..."</span>);
+  calibration.clean_input_data();
+  <span class="macro">println!</span>(<span class="string">"Calibration : {}"</span>, calibration);
+
+  <span class="macro">info!</span>(<span class="string">"Will set board to sma mode!"</span>);
+  <span class="kw">match </span>select_sma_mode() {
+    <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
+      <span class="macro">error!</span>(<span class="string">"Unable to set sma mode."</span>);
+      <span class="kw">return </span><span class="prelude-val">Err</span>(CalibrationError::CalibrationFailed);
+    },
+    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
+      <span class="macro">info!</span>(<span class="string">"Timing calibration step done!"</span>)
+    }
+  };
   run_config.is_active = <span class="bool-val">false</span>;  
   <span class="kw">match </span>rc_to_runner.send(run_config) {
-    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">&quot;Can not send runconfig! {err}&quot;</span>),
-    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">trace!</span>(<span class="string">&quot;Success!&quot;</span>)
+    <span class="prelude-val">Err</span>(err) =&gt; {
+      <span class="macro">warn!</span>(<span class="string">"Can not send runconfig!, Err {err}"</span>);
+      <span class="kw">return </span><span class="prelude-val">Err</span>(CalibrationError::CalibrationFailed);
+    }
+    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">trace!</span>(<span class="string">"Success!"</span>)
   }
-  <span class="macro">info!</span>(<span class="string">&quot;Waiting 5 seconds&quot;</span>);
-  thread::sleep(five_seconds);
-  <span class="macro">info!</span>(<span class="string">&quot;Will set board to sma mode!&quot;</span>);
-  <span class="kw">match </span>select_sma_mode() {
-    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Can not set SMA mode! {err:?}&quot;</span>),
-    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; (),
-  }
-  <span class="macro">println!</span>(<span class="string">&quot;==&gt; Timing calibration data taken!&quot;</span>);
-  <span class="macro">println!</span>(<span class="string">&quot;==&gt; Calibration data taking complete!&quot;</span>); 
-  <span class="macro">println!</span>(<span class="string">&quot;Calibration : {}&quot;</span>, calibration);
-  <span class="macro">println!</span>(<span class="string">&quot;Cleaning data...&quot;</span>);
-  calibration.clean_input_data();
-  <span class="macro">println!</span>(<span class="string">&quot;Calibration : {}&quot;</span>, calibration);
+  thread::sleep(FIVE_SECONDS);
 
-  calibration.calibrate()<span class="question-mark">?</span>;
-  <span class="macro">println!</span>(<span class="string">&quot;Calibration : {}&quot;</span>, calibration);
+  <span class="comment">// Do this only with the full calib
+  </span>calibration.calibrate()<span class="question-mark">?</span>;
+  <span class="macro">println!</span>(<span class="string">"Calibration : {}"</span>, calibration);
   <span class="comment">// now it just needs to be send to 
   // the publisher
   //for k in 0..10 {
-  //  println!(&quot;cali vcal  {}&quot;, calibration.v_offsets[0][k]);
-  //  println!(&quot;cali vincs {}&quot;, calibration.v_inc[0][k]);
-  //  println!(&quot;cali vdips {}&quot;, calibration.v_dips[0][k]);
-  //  println!(&quot;cali tbins {}&quot;, calibration.tbin[0][k]);
+  //  println!("cali vcal  {}", calibration.v_offsets[0][k]);
+  //  println!("cali vincs {}", calibration.v_inc[0][k]);
+  //  println!("cali vdips {}", calibration.v_dips[0][k]);
+  //  println!("cali tbins {}", calibration.tbin[0][k]);
   //}
   </span><span class="kw">let </span>calib_pack = TofPacket::from(<span class="kw-2">&amp;</span>calibration);
   <span class="kw">match </span>tp_to_publisher.send(calib_pack) {
     <span class="prelude-val">Err</span>(err) =&gt; {
-      <span class="macro">error!</span>(<span class="string">&quot;Unable to send RBCalibration package! Error {err}&quot;</span>);
+      <span class="macro">error!</span>(<span class="string">"Unable to send RBCalibration package! Error {err}"</span>);
+      <span class="kw">return </span><span class="prelude-val">Err</span>(CalibrationError::CanNotConnectToMyOwnZMQSocket);
     },
     <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; ()
   }
-  <span class="macro">info!</span>(<span class="string">&quot;Calibration done!&quot;</span>);
+  <span class="macro">info!</span>(<span class="string">"Calibration done!"</span>);
   <span class="prelude-val">Ok</span>(())
 }
 
@@ -1769,7 +1757,7 @@
 </span><span class="kw">pub fn </span>rb_noi_subcalibration(rc_to_runner    : <span class="kw-2">&amp;</span>Sender&lt;RunConfig&gt;,
                              tp_to_publisher : <span class="kw-2">&amp;</span>Sender&lt;TofPacket&gt;)
 -&gt; <span class="prelude-ty">Result</span>&lt;(), CalibrationError&gt; {
-  <span class="macro">warn!</span>(<span class="string">&quot;Commencing RB No input sub-calibration routine! This will take the board out of datataking for a few minutes!&quot;</span>);
+  <span class="macro">warn!</span>(<span class="string">"Commencing RB No input sub-calibration routine! This will take the board out of datataking for a few minutes!"</span>);
   <span class="comment">// TODO this should become something that can be read from a local json file
   </span><span class="kw">let </span><span class="kw-2">mut </span>run_config = RunConfig {
     runid                   : <span class="number">0</span>,
@@ -1782,12 +1770,12 @@
     data_type               : DataType::Noi,
     rb_buff_size            : <span class="number">100
   </span>}; 
-  <span class="kw">let </span>socket = connect_to_zmq().expect(<span class="string">&quot;Not able to connect to socket, something REAL strange happened.&quot;</span>);
+  <span class="kw">let </span>socket = connect_to_zmq().expect(<span class="string">"Not able to connect to socket, something REAL strange happened."</span>);
 
   <span class="kw">let </span><span class="kw-2">mut </span>board_id = <span class="number">0u8</span>;
   <span class="kw">match </span>get_board_id() {
     <span class="prelude-val">Err</span>(err) =&gt; {
-      <span class="macro">error!</span>(<span class="string">&quot;Unable to obtain board id. Calibration might be orphaned. Err {err}&quot;</span>);
+      <span class="macro">error!</span>(<span class="string">"Unable to obtain board id. Calibration might be orphaned. Err {err}"</span>);
     },
     <span class="prelude-val">Ok</span>(rb_id) =&gt; {
       board_id = rb_id <span class="kw">as </span>u8;
@@ -1797,50 +1785,55 @@
   calibration.serialize_event_data = <span class="bool-val">true</span>;
 
   run_config.data_type = DataType::Noi; 
-  <span class="kw">match </span>run_noi_calibration(rc_to_runner, tp_to_publisher, <span class="kw-2">&amp;</span>socket, <span class="kw-2">&amp;mut </span>calibration, run_config) {
+  <span class="kw">match </span>run_noi_calibration(rc_to_runner, <span class="kw-2">&amp;</span>socket, <span class="kw-2">&amp;mut </span>calibration, run_config) {
     <span class="prelude-val">Err</span>(err) =&gt; {
-      <span class="macro">error!</span>(<span class="string">&quot;Unable to run noi calibration step. Err {err}&quot;</span>);
+      <span class="macro">error!</span>(<span class="string">"Unable to run noi calibration step. Err {err}"</span>);
+      <span class="kw">return </span><span class="prelude-val">Err</span>(CalibrationError::CalibrationFailed);
     },
     <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
-      <span class="macro">info!</span>(<span class="string">&quot;Noi calibration step done!&quot;</span>)
+      <span class="macro">info!</span>(<span class="string">"Noi calibration step done!"</span>);
     }
   };
 
-  <span class="macro">println!</span>(<span class="string">&quot;==&gt; No input data taking complete!&quot;</span>); 
-  <span class="macro">println!</span>(<span class="string">&quot;Calibration : {}&quot;</span>, calibration);
-  <span class="macro">println!</span>(<span class="string">&quot;Cleaning data...&quot;</span>);
+  <span class="macro">println!</span>(<span class="string">"==&gt; No input data taking complete!"</span>); 
+  <span class="macro">println!</span>(<span class="string">"Calibration : {}"</span>, calibration);
+  <span class="macro">println!</span>(<span class="string">"Cleaning data..."</span>);
   calibration.clean_input_data();
-  <span class="macro">println!</span>(<span class="string">&quot;Calibration : {}&quot;</span>, calibration);
+  <span class="macro">println!</span>(<span class="string">"Calibration : {}"</span>, calibration);
 
-  <span class="macro">info!</span>(<span class="string">&quot;Will set board to sma mode!&quot;</span>);
+  <span class="macro">info!</span>(<span class="string">"Will set board to sma mode!"</span>);
   select_sma_mode();
   run_config.is_active = <span class="bool-val">false</span>;  
   <span class="kw">match </span>rc_to_runner.send(run_config) {
-    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">&quot;Can not send runconfig!, Err {err}&quot;</span>),
-    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">trace!</span>(<span class="string">&quot;Success!&quot;</span>)
+    <span class="prelude-val">Err</span>(err) =&gt; {
+      <span class="macro">warn!</span>(<span class="string">"Can not send runconfig!, Err {err}"</span>);
+      <span class="kw">return </span><span class="prelude-val">Err</span>(CalibrationError::CanNotConnectToMyOwnZMQSocket);
+    },
+    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">trace!</span>(<span class="string">"Success!"</span>)
   }
   thread::sleep(FIVE_SECONDS);
 
-  <span class="macro">println!</span>(<span class="string">&quot;Calibration won&#39;t start cause the calibration datataking chain is not complete!&quot;</span>);
+  <span class="macro">println!</span>(<span class="string">"Calibration won't start cause the calibration data taking chain is not complete!"</span>);
 
   <span class="comment">// Send it
   </span><span class="kw">let </span>calib_pack = TofPacket::from(<span class="kw-2">&amp;</span>calibration);
   <span class="kw">match </span>tp_to_publisher.send(calib_pack) {
     <span class="prelude-val">Err</span>(err) =&gt; {
-      <span class="macro">error!</span>(<span class="string">&quot;Unable to send RBCalibration package! Error {err}&quot;</span>);
+      <span class="macro">error!</span>(<span class="string">"Unable to send RBCalibration package! Error {err}"</span>);
+      <span class="kw">return </span><span class="prelude-val">Err</span>(CalibrationError::CanNotConnectToMyOwnZMQSocket);
     },
     <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; ()
   }
-  <span class="macro">info!</span>(<span class="string">&quot;Calibration done!&quot;</span>);
+  <span class="macro">info!</span>(<span class="string">"Calibration done!"</span>);
   <span class="prelude-val">Ok</span>(())
 }
 
 <span class="comment">// Noi -&gt; Voltage chain and publish.
 </span><span class="kw">pub fn </span>rb_voltage_subcalibration(rc_to_runner    : <span class="kw-2">&amp;</span>Sender&lt;RunConfig&gt;,
-                                     tp_to_publisher : <span class="kw-2">&amp;</span>Sender&lt;TofPacket&gt;,
-                                     voltage_level   : u16) <span class="comment">// where do we put this bad boi?
+                                 tp_to_publisher : <span class="kw-2">&amp;</span>Sender&lt;TofPacket&gt;,
+                                 voltage_level   : u16) <span class="comment">// where do we put this bad boi?
 </span>-&gt; <span class="prelude-ty">Result</span>&lt;(), CalibrationError&gt; {
-  <span class="macro">warn!</span>(<span class="string">&quot;Commencing RB no input + voltage sub-calibration routine! This will take the board out of datataking for a few minutes!&quot;</span>);
+  <span class="macro">warn!</span>(<span class="string">"Commencing RB no input + voltage sub-calibration routine! This will take the board out of datataking for a few minutes!"</span>);
   <span class="comment">// TODO this should become something that can be read from a local json file
   </span><span class="kw">let </span><span class="kw-2">mut </span>run_config = RunConfig {
     runid                   : <span class="number">0</span>,
@@ -1853,12 +1846,12 @@
     data_type               : DataType::VoltageCalibration,
     rb_buff_size            : <span class="number">1000
   </span>}; 
-  <span class="kw">let </span>socket = connect_to_zmq().expect(<span class="string">&quot;Not able to connect to socket, something REAL strange happened.&quot;</span>);
+  <span class="kw">let </span>socket = connect_to_zmq().expect(<span class="string">"Not able to connect to socket, something REAL strange happened."</span>);
 
   <span class="kw">let </span><span class="kw-2">mut </span>board_id = <span class="number">0u8</span>;
   <span class="kw">match </span>get_board_id() {
     <span class="prelude-val">Err</span>(err) =&gt; {
-      <span class="macro">error!</span>(<span class="string">&quot;Unable to obtain board id. Calibration might be orphaned. Err {err}&quot;</span>);
+      <span class="macro">error!</span>(<span class="string">"Unable to obtain board id. Calibration might be orphaned. Err {err}"</span>);
     },
     <span class="prelude-val">Ok</span>(rb_id) =&gt; {
       board_id = rb_id <span class="kw">as </span>u8;
@@ -1868,51 +1861,57 @@
   calibration.serialize_event_data = <span class="bool-val">true</span>;
 
   run_config.data_type = DataType::Noi; 
-  <span class="kw">match </span>run_noi_calibration(rc_to_runner, tp_to_publisher, <span class="kw-2">&amp;</span>socket, <span class="kw-2">&amp;mut </span>calibration, run_config) {
+  <span class="kw">match </span>run_noi_calibration(rc_to_runner, <span class="kw-2">&amp;</span>socket, <span class="kw-2">&amp;mut </span>calibration, run_config) {
     <span class="prelude-val">Err</span>(err) =&gt; {
-      <span class="macro">error!</span>(<span class="string">&quot;Unable to run noi calibration step. Err {err}&quot;</span>);
+      <span class="macro">error!</span>(<span class="string">"Unable to run noi calibration step. Err {err}"</span>);
+      <span class="kw">return </span><span class="prelude-val">Err</span>(CalibrationError::CalibrationFailed);
     },
     <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
-      <span class="macro">info!</span>(<span class="string">&quot;Noi calibration step done!&quot;</span>)
+      <span class="macro">info!</span>(<span class="string">"Noi calibration step done!"</span>)
     }
   };
 
   run_config.data_type = DataType::VoltageCalibration; 
-  <span class="kw">match </span>run_voltage_calibration(rc_to_runner, tp_to_publisher, <span class="kw-2">&amp;</span>socket, <span class="kw-2">&amp;mut </span>calibration, run_config) {
+  <span class="kw">match </span>run_voltage_calibration(rc_to_runner, <span class="kw-2">&amp;</span>socket, <span class="kw-2">&amp;mut </span>calibration, run_config) {
     <span class="prelude-val">Err</span>(err) =&gt; {
-      <span class="macro">error!</span>(<span class="string">&quot;Unable to run voltage calibration step. Err {err}&quot;</span>);
+      <span class="macro">error!</span>(<span class="string">"Unable to run voltage calibration step. Err {err}"</span>);
+      <span class="kw">return </span><span class="prelude-val">Err</span>(CalibrationError::CalibrationFailed);
     },
     <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
-      <span class="macro">info!</span>(<span class="string">&quot;Voltage calibration step done!&quot;</span>)
+      <span class="macro">info!</span>(<span class="string">"Voltage calibration step done!"</span>)
     }
   };
 
-  <span class="macro">println!</span>(<span class="string">&quot;==&gt; No input + voltage data taking complete!&quot;</span>); 
-  <span class="macro">println!</span>(<span class="string">&quot;Calibration : {}&quot;</span>, calibration);
-  <span class="macro">println!</span>(<span class="string">&quot;Cleaning data...&quot;</span>);
+  <span class="macro">println!</span>(<span class="string">"==&gt; No input + voltage data taking complete!"</span>); 
+  <span class="macro">println!</span>(<span class="string">"Calibration : {}"</span>, calibration);
+  <span class="macro">println!</span>(<span class="string">"Cleaning data..."</span>);
   calibration.clean_input_data();
-  <span class="macro">println!</span>(<span class="string">&quot;Calibration : {}&quot;</span>, calibration);
+  <span class="macro">println!</span>(<span class="string">"Calibration : {}"</span>, calibration);
 
-  <span class="macro">info!</span>(<span class="string">&quot;Will set board to sma mode!&quot;</span>);
+  <span class="macro">info!</span>(<span class="string">"Will set board to sma mode!"</span>);
   select_sma_mode();
   run_config.is_active = <span class="bool-val">false</span>;  
   <span class="kw">match </span>rc_to_runner.send(run_config) {
-    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">&quot;Can not send runconfig!, Err {err}&quot;</span>),
-    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">trace!</span>(<span class="string">&quot;Success!&quot;</span>)
+    <span class="prelude-val">Err</span>(err) =&gt; {
+      <span class="macro">warn!</span>(<span class="string">"Can not send runconfig!, Err {err}"</span>);
+      <span class="kw">return </span><span class="prelude-val">Err</span>(CalibrationError::CanNotConnectToMyOwnZMQSocket);
+    },
+    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">trace!</span>(<span class="string">"Success!"</span>)
   }
   thread::sleep(FIVE_SECONDS);
 
-  <span class="macro">println!</span>(<span class="string">&quot;Calibration won&#39;t start cause the calibration datataking chain is not complete!&quot;</span>);
+  <span class="macro">println!</span>(<span class="string">"Calibration won't start cause the calibration data taking chain is not complete!"</span>);
 
   <span class="comment">// Send it
   </span><span class="kw">let </span>calib_pack = TofPacket::from(<span class="kw-2">&amp;</span>calibration);
   <span class="kw">match </span>tp_to_publisher.send(calib_pack) {
     <span class="prelude-val">Err</span>(err) =&gt; {
-      <span class="macro">error!</span>(<span class="string">&quot;Unable to send RBCalibration package! Error {err}&quot;</span>);
+      <span class="macro">error!</span>(<span class="string">"Unable to send RBCalibration package! Error {err}"</span>);
+      <span class="kw">return </span><span class="prelude-val">Err</span>(CalibrationError::CanNotConnectToMyOwnZMQSocket);
     },
     <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; ()
   }
-  <span class="macro">info!</span>(<span class="string">&quot;Calibration done!&quot;</span>);
+  <span class="macro">info!</span>(<span class="string">"Calibration done!"</span>);
   <span class="prelude-val">Ok</span>(())
 }
 
@@ -1921,7 +1920,7 @@
                                 tp_to_publisher : <span class="kw-2">&amp;</span>Sender&lt;TofPacket&gt;,
                                 voltage_level   : u16)
 -&gt; <span class="prelude-ty">Result</span>&lt;(), CalibrationError&gt; {
-  <span class="macro">warn!</span>(<span class="string">&quot;Commencing RB no input + voltage + timing sub-calibration routine! This will take the board out of datataking for a few minutes!&quot;</span>);
+  <span class="macro">warn!</span>(<span class="string">"Commencing RB no input + voltage + timing sub-calibration routine! This will take the board out of datataking for a few minutes!"</span>);
   <span class="comment">// TODO this should become something that can be read from a local json file
   </span><span class="kw">let </span><span class="kw-2">mut </span>run_config = RunConfig {
     runid                   : <span class="number">0</span>,
@@ -1934,12 +1933,12 @@
     data_type               : DataType::TimingCalibration,
     rb_buff_size            : <span class="number">1000
   </span>}; 
-  <span class="kw">let </span>socket = connect_to_zmq().expect(<span class="string">&quot;Not able to connect to socket, something REAL strange happened.&quot;</span>);
+  <span class="kw">let </span>socket = connect_to_zmq().expect(<span class="string">"Not able to connect to socket, something REAL strange happened."</span>);
 
   <span class="kw">let </span><span class="kw-2">mut </span>board_id = <span class="number">0u8</span>;
   <span class="kw">match </span>get_board_id() {
     <span class="prelude-val">Err</span>(err) =&gt; {
-      <span class="macro">error!</span>(<span class="string">&quot;Unable to obtain board id. Calibration might be orphaned. Err {err}&quot;</span>);
+      <span class="macro">error!</span>(<span class="string">"Unable to obtain board id. Calibration might be orphaned. Err {err}"</span>);
     },
     <span class="prelude-val">Ok</span>(rb_id) =&gt; {
       board_id = rb_id <span class="kw">as </span>u8;
@@ -1949,61 +1948,68 @@
   calibration.serialize_event_data = <span class="bool-val">true</span>;
 
   run_config.data_type = DataType::Noi; 
-  <span class="kw">match </span>run_noi_calibration(rc_to_runner, tp_to_publisher, <span class="kw-2">&amp;</span>socket, <span class="kw-2">&amp;mut </span>calibration, run_config) {
+  <span class="kw">match </span>run_noi_calibration(rc_to_runner, <span class="kw-2">&amp;</span>socket, <span class="kw-2">&amp;mut </span>calibration, run_config) {
     <span class="prelude-val">Err</span>(err) =&gt; {
-      <span class="macro">error!</span>(<span class="string">&quot;Unable to run no input calibration step. Err {err}&quot;</span>);
+      <span class="macro">error!</span>(<span class="string">"Unable to run no input calibration step. Err {err}"</span>);
+      <span class="kw">return </span><span class="prelude-val">Err</span>(CalibrationError::CalibrationFailed);
     },
     <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
-      <span class="macro">info!</span>(<span class="string">&quot;Noi calibration step done!&quot;</span>)
+      <span class="macro">info!</span>(<span class="string">"Noi calibration step done!"</span>)
     }
   };
 
   run_config.data_type = DataType::VoltageCalibration; 
-  <span class="kw">match </span>run_voltage_calibration(rc_to_runner, tp_to_publisher, <span class="kw-2">&amp;</span>socket, <span class="kw-2">&amp;mut </span>calibration, run_config) {
+  <span class="kw">match </span>run_voltage_calibration(rc_to_runner, <span class="kw-2">&amp;</span>socket, <span class="kw-2">&amp;mut </span>calibration, run_config) {
     <span class="prelude-val">Err</span>(err) =&gt; {
-      <span class="macro">error!</span>(<span class="string">&quot;Unable to run voltage calibration step. Err {err}&quot;</span>);
+      <span class="macro">error!</span>(<span class="string">"Unable to run voltage calibration step. Err {err}"</span>);
+      <span class="kw">return </span><span class="prelude-val">Err</span>(CalibrationError::CalibrationFailed);
     },
     <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
-      <span class="macro">info!</span>(<span class="string">&quot;Voltage calibration step done!&quot;</span>)
+      <span class="macro">info!</span>(<span class="string">"Voltage calibration step done!"</span>)
     }
   };
   
   run_config.data_type = DataType::TimingCalibration;
-  <span class="kw">match </span>run_timing_calibration(rc_to_runner, tp_to_publisher, <span class="kw-2">&amp;</span>socket, <span class="kw-2">&amp;mut </span>calibration, run_config) {
+  <span class="kw">match </span>run_timing_calibration(rc_to_runner, <span class="kw-2">&amp;</span>socket, <span class="kw-2">&amp;mut </span>calibration, run_config) {
     <span class="prelude-val">Err</span>(err) =&gt; {
-      <span class="macro">error!</span>(<span class="string">&quot;Unable to run timing calibration step. Err {err}&quot;</span>);
+      <span class="macro">error!</span>(<span class="string">"Unable to run timing calibration step. Err {err}"</span>);
+      <span class="kw">return </span><span class="prelude-val">Err</span>(CalibrationError::CalibrationFailed);
     },
     <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
-      <span class="macro">info!</span>(<span class="string">&quot;Timing calibration step done!&quot;</span>)
+      <span class="macro">info!</span>(<span class="string">"Timing calibration step done!"</span>)
     }
   };
 
-  <span class="macro">println!</span>(<span class="string">&quot;==&gt; No input + voltage + timing data taking complete!&quot;</span>); 
-  <span class="macro">println!</span>(<span class="string">&quot;Calibration : {}&quot;</span>, calibration);
-  <span class="macro">println!</span>(<span class="string">&quot;Cleaning data...&quot;</span>);
+  <span class="macro">println!</span>(<span class="string">"==&gt; No input + voltage + timing data taking complete!"</span>); 
+  <span class="macro">println!</span>(<span class="string">"Calibration : {}"</span>, calibration);
+  <span class="macro">println!</span>(<span class="string">"Cleaning data..."</span>);
   calibration.clean_input_data();
-  <span class="macro">println!</span>(<span class="string">&quot;Calibration : {}&quot;</span>, calibration);
+  <span class="macro">println!</span>(<span class="string">"Calibration : {}"</span>, calibration);
 
-  <span class="macro">info!</span>(<span class="string">&quot;Will set board to sma mode!&quot;</span>);
+  <span class="macro">info!</span>(<span class="string">"Will set board to sma mode!"</span>);
   select_sma_mode();
   run_config.is_active = <span class="bool-val">false</span>;  
   <span class="kw">match </span>rc_to_runner.send(run_config) {
-    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">&quot;Can not send runconfig!, Err {err}&quot;</span>),
-    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">trace!</span>(<span class="string">&quot;Success!&quot;</span>)
+    <span class="prelude-val">Err</span>(err) =&gt; {
+      <span class="macro">warn!</span>(<span class="string">"Can not send runconfig!, Err {err}"</span>);
+      <span class="kw">return </span><span class="prelude-val">Err</span>(CalibrationError::CanNotConnectToMyOwnZMQSocket);
+    },
+    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">trace!</span>(<span class="string">"Success!"</span>)
   }
   thread::sleep(FIVE_SECONDS);
 
-  <span class="macro">println!</span>(<span class="string">&quot;Calibration won&#39;t start. The data taking chain is complete, but a sub-calibration routine was called!&quot;</span>);
+  <span class="macro">println!</span>(<span class="string">"Calibration won't start. The data taking chain is complete, but a sub-calibration routine was called!"</span>);
 
   <span class="comment">// Send it
   </span><span class="kw">let </span>calib_pack = TofPacket::from(<span class="kw-2">&amp;</span>calibration);
   <span class="kw">match </span>tp_to_publisher.send(calib_pack) {
     <span class="prelude-val">Err</span>(err) =&gt; {
-      <span class="macro">error!</span>(<span class="string">&quot;Unable to send RBCalibration package! Error {err}&quot;</span>);
+      <span class="macro">error!</span>(<span class="string">"Unable to send RBCalibration package! Error {err}"</span>);
+      <span class="kw">return </span><span class="prelude-val">Err</span>(CalibrationError::CanNotConnectToMyOwnZMQSocket);
     },
     <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; ()
   }
-  <span class="macro">info!</span>(<span class="string">&quot;Calibration done!&quot;</span>);
+  <span class="macro">info!</span>(<span class="string">"Calibration done!"</span>);
   <span class="prelude-val">Ok</span>(())
 }
 
@@ -2014,24 +2020,24 @@
   // and we simply have to send it back to the 
   // data publisher.
   // This saves us a mutex!!
-  //let this_board_ip = local_ip().expect(&quot;Unable to obtain local board IP. Something is messed up!&quot;);
+  //let this_board_ip = local_ip().expect("Unable to obtain local board IP. Something is messed up!");
   </span><span class="kw">let </span><span class="kw-2">mut </span>board_id = <span class="number">0u8</span>;
   <span class="kw">match </span>get_board_id() {
     <span class="prelude-val">Err</span>(err) =&gt; {
-      <span class="macro">error!</span>(<span class="string">&quot;Unable to obtain board id. Calibration might be orphaned. Err {err}&quot;</span>);
+      <span class="macro">error!</span>(<span class="string">"Unable to obtain board id. Calibration might be orphaned. Err {err}"</span>);
     },
     <span class="prelude-val">Ok</span>(rb_id) =&gt; {
       board_id = rb_id <span class="kw">as </span>u8;
     }
   }
-  <span class="kw">let </span>data_address = <span class="macro">format!</span>(<span class="string">&quot;tcp://10.0.1.1{:02}:{}&quot;</span>, board_id, DATAPORT);
+  <span class="kw">let </span>data_address = <span class="macro">format!</span>(<span class="string">"tcp://10.0.1.1{:02}:{}"</span>, board_id, DATAPORT);
   <span class="comment">//let data_address = liftof_lib::build_tcp_from_ip(this_board_ip.to_string(), DATAPORT.to_string());
 
   </span><span class="kw">let </span>ctx = zmq::Context::new();
   <span class="kw">let </span>socket : zmq::Socket; 
   <span class="kw">match </span>ctx.socket(zmq::SUB) {
     <span class="prelude-val">Err</span>(err) =&gt; {
-      <span class="macro">error!</span>(<span class="string">&quot;Unable to create zmq socket! Err {err}. This is BAD!&quot;</span>);
+      <span class="macro">error!</span>(<span class="string">"Unable to create zmq socket! Err {err}. This is BAD!"</span>);
       <span class="kw">return </span><span class="prelude-val">Err</span>(CalibrationError::CanNotConnectToMyOwnZMQSocket);
     }
     <span class="prelude-val">Ok</span>(sock) =&gt; {
@@ -2040,156 +2046,127 @@
   }
   <span class="kw">match </span>socket.connect(<span class="kw-2">&amp;</span>data_address) {
     <span class="prelude-val">Err</span>(err) =&gt; {
-      <span class="macro">error!</span>(<span class="string">&quot;Unable to connect to data (PUB) socket {data_address}, Err {err}&quot;</span>);
+      <span class="macro">error!</span>(<span class="string">"Unable to connect to data (PUB) socket {data_address}, Err {err}"</span>);
       <span class="kw">return </span><span class="prelude-val">Err</span>(CalibrationError::CanNotConnectToMyOwnZMQSocket);
     },
     <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; ()
   }
   
   <span class="comment">// The packets relevant for us here in this context, will 
-  // all be prefixed with &quot;LOCAL&quot;
+  // all be prefixed with "LOCAL"
   // See the respective section in data_publisher 
   // (search for prefix_local)
-  </span><span class="kw">let </span>topic_local = String::from(<span class="string">&quot;LOCAL&quot;</span>);
+  </span><span class="kw">let </span>topic_local = String::from(<span class="string">"LOCAL"</span>);
   <span class="kw">match </span>socket.set_subscribe(<span class="kw-2">&amp;</span>topic_local.as_bytes()) {
-    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Can not subscribe to {topic_local}, err {err}&quot;</span>),
-    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">&quot;Subscribing to local packages!&quot;</span>),
+    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Can not subscribe to {topic_local}, err {err}"</span>),
+    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">"Subscribing to local packages!"</span>),
   }
   <span class="prelude-val">Ok</span>(socket)
 }
 
 <span class="kw">fn </span>run_noi_calibration(rc_to_runner: <span class="kw-2">&amp;</span>Sender&lt;RunConfig&gt;,
-                       tp_to_publisher : <span class="kw-2">&amp;</span>Sender&lt;TofPacket&gt;,
                        socket: <span class="kw-2">&amp;</span>zmq::Socket,
                        calibration: <span class="kw-2">&amp;mut </span>RBCalibrations,
                        run_config: RunConfig)
                        -&gt; <span class="prelude-ty">Result</span>&lt;(), CalibrationError&gt; {
-  <span class="macro">info!</span>(<span class="string">&quot;Will set board to no input mode!&quot;</span>);
+  <span class="macro">info!</span>(<span class="string">"Will set board to no input mode!"</span>);
   <span class="kw">match </span>select_noi_mode() {
-    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Unable to select SMA mode! {err:?}&quot;</span>),
+    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to select SMA mode! {err:?}"</span>),
     <span class="prelude-val">Ok</span>(<span class="kw">_</span>)     =&gt; (),
   }
   <span class="kw">match </span>rc_to_runner.send(run_config) {
-    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">&quot;Can not send runconfig!, Err {err}&quot;</span>),
-    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">trace!</span>(<span class="string">&quot;Success!&quot;</span>)
+    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">"Can not send runconfig!, Err {err}"</span>),
+    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">trace!</span>(<span class="string">"Success!"</span>)
   }
   <span class="kw">let </span><span class="kw-2">mut </span>cal_dtype = DataType::Noi;
   calibration.noi_data = wait_while_run_active(<span class="number">20</span>, <span class="number">4</span><span class="kw-2">*</span>FIVE_SECONDS, <span class="number">1000</span>, <span class="kw-2">&amp;</span>cal_dtype, <span class="kw-2">&amp;</span>socket);
-  
-  <span class="kw">let </span>calib_unmut = calibration.clone();
-  <span class="kw">let </span>calib_pack = TofPacket::from(<span class="kw-2">&amp;</span>calib_unmut);
-  <span class="kw">match </span>tp_to_publisher.send(calib_pack) {
-    <span class="prelude-val">Err</span>(err) =&gt; {
-      <span class="macro">error!</span>(<span class="string">&quot;Unable to send RBCalibration package! Error {err}&quot;</span>);
-    },
-    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; ()
-  }
 
-  <span class="macro">println!</span>(<span class="string">&quot;==&gt; No input (Voltage calibration) data taken!&quot;</span>);
+  <span class="macro">println!</span>(<span class="string">"==&gt; No input (Voltage calibration) data taken!"</span>);
   <span class="prelude-val">Ok</span>(())
 }
 
 <span class="kw">fn </span>run_voltage_calibration(rc_to_runner: <span class="kw-2">&amp;</span>Sender&lt;RunConfig&gt;,
-                           tp_to_publisher : <span class="kw-2">&amp;</span>Sender&lt;TofPacket&gt;,
                            socket: <span class="kw-2">&amp;</span>zmq::Socket,
                            calibration: <span class="kw-2">&amp;mut </span>RBCalibrations,
                            <span class="kw-2">mut </span>run_config: RunConfig)
                            -&gt; <span class="prelude-ty">Result</span>&lt;(), CalibrationError&gt; {
-  <span class="macro">info!</span>(<span class="string">&quot;Will set board to vcal mode!&quot;</span>);
+  <span class="macro">info!</span>(<span class="string">"Will set board to vcal mode!"</span>);
   <span class="kw">match </span>select_vcal_mode() {
-    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Unable to select VCAL mode! {err:?}&quot;</span>),
+    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to select VCAL mode! {err:?}"</span>),
     <span class="prelude-val">Ok</span>(<span class="kw">_</span>)     =&gt; ()
   }
   run_config.data_type = DataType::VoltageCalibration;
   <span class="kw">match </span>rc_to_runner.send(run_config) {
-    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">&quot;Can not send runconfig! {err}&quot;</span>),
-    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">trace!</span>(<span class="string">&quot;Success!&quot;</span>)
+    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">"Can not send runconfig! {err}"</span>),
+    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">trace!</span>(<span class="string">"Success!"</span>)
   }  
   <span class="kw">let </span>cal_dtype             = DataType::VoltageCalibration;
   calibration.vcal_data = wait_while_run_active(<span class="number">20</span>, <span class="number">4</span><span class="kw-2">*</span>FIVE_SECONDS, <span class="number">1000</span>, <span class="kw-2">&amp;</span>cal_dtype, <span class="kw-2">&amp;</span>socket);
-
-  <span class="kw">let </span>calib_unmut = calibration.clone();
-  <span class="kw">let </span>calib_pack = TofPacket::from(<span class="kw-2">&amp;</span>calib_unmut);
-  <span class="kw">match </span>tp_to_publisher.send(calib_pack) {
-    <span class="prelude-val">Err</span>(err) =&gt; {
-      <span class="macro">error!</span>(<span class="string">&quot;Unable to send RBCalibration package! Error {err}&quot;</span>);
-    },
-    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; ()
-  }
   
-  <span class="macro">println!</span>(<span class="string">&quot;==&gt; Voltage calibration data taken!&quot;</span>);
+  <span class="macro">println!</span>(<span class="string">"==&gt; Voltage calibration data taken!"</span>);
   <span class="prelude-val">Ok</span>(())
 }
 
 <span class="kw">fn </span>run_timing_calibration(rc_to_runner: <span class="kw-2">&amp;</span>Sender&lt;RunConfig&gt;,
-                          tp_to_publisher : <span class="kw-2">&amp;</span>Sender&lt;TofPacket&gt;,
                           socket: <span class="kw-2">&amp;</span>zmq::Socket,
                           calibration: <span class="kw-2">&amp;mut </span>RBCalibrations,
                           <span class="kw-2">mut </span>run_config: RunConfig)
                           -&gt; <span class="prelude-ty">Result</span>&lt;(), CalibrationError&gt; {
-  <span class="macro">info!</span>(<span class="string">&quot;Will set board to tcal mode!&quot;</span>);
+  <span class="macro">info!</span>(<span class="string">"Will set board to tcal mode!"</span>);
   run_config.trigger_poisson_rate  = <span class="number">80</span>;
   run_config.nevents               = <span class="number">1800</span>; <span class="comment">// make sure we get 1000 events
   </span>run_config.trigger_fixed_rate    = <span class="number">0</span>;
   <span class="comment">//run_config.rb_buff_size          = 500;
   </span>run_config.data_type = DataType::TimingCalibration;  
   <span class="kw">match </span>select_tcal_mode() {
-    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Can not set board to TCAL mode! {err:?}&quot;</span>),
+    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Can not set board to TCAL mode! {err:?}"</span>),
     <span class="prelude-val">Ok</span>(<span class="kw">_</span>)     =&gt; (),
   }
   <span class="kw">match </span>rc_to_runner.send(run_config) {
-    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">&quot;Can not send runconfig! {err}&quot;</span>),
-    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">trace!</span>(<span class="string">&quot;Success!&quot;</span>)
+    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">"Can not send runconfig! {err}"</span>),
+    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">trace!</span>(<span class="string">"Success!"</span>)
   }
   
   <span class="kw">let </span>cal_dtype             = DataType::TimingCalibration;
   calibration.tcal_data = wait_while_run_active(<span class="number">20</span>, <span class="number">4</span><span class="kw-2">*</span>FIVE_SECONDS, <span class="number">1000</span>,<span class="kw-2">&amp;</span>cal_dtype, <span class="kw-2">&amp;</span>socket);
   run_config.is_active = <span class="bool-val">false</span>;  
   <span class="kw">match </span>rc_to_runner.send(run_config) {
-    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">&quot;Can not send runconfig! {err}&quot;</span>),
-    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">trace!</span>(<span class="string">&quot;Success!&quot;</span>)
+    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">"Can not send runconfig! {err}"</span>),
+    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">trace!</span>(<span class="string">"Success!"</span>)
   }
-  <span class="macro">info!</span>(<span class="string">&quot;Waiting 5 seconds&quot;</span>);
+  <span class="macro">info!</span>(<span class="string">"Waiting 5 seconds"</span>);
   thread::sleep(FIVE_SECONDS);
-  <span class="macro">info!</span>(<span class="string">&quot;Will set board to sma mode!&quot;</span>);
+  <span class="macro">info!</span>(<span class="string">"Will set board to sma mode!"</span>);
   <span class="kw">match </span>select_sma_mode() {
-    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Can not set SMA mode! {err:?}&quot;</span>),
+    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Can not set SMA mode! {err:?}"</span>),
     <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; (),
   }
-  <span class="macro">println!</span>(<span class="string">&quot;==&gt; Timing calibration data taken!&quot;</span>);
-  <span class="macro">println!</span>(<span class="string">&quot;==&gt; Calibration data taking complete!&quot;</span>); 
-  <span class="macro">println!</span>(<span class="string">&quot;Calibration : {}&quot;</span>, calibration);
-  <span class="macro">println!</span>(<span class="string">&quot;Cleaning data...&quot;</span>);
+  <span class="macro">println!</span>(<span class="string">"==&gt; Timing calibration data taken!"</span>);
+  <span class="macro">println!</span>(<span class="string">"==&gt; Calibration data taking complete!"</span>); 
+  <span class="macro">println!</span>(<span class="string">"Calibration : {}"</span>, calibration);
+  <span class="macro">println!</span>(<span class="string">"Cleaning data..."</span>);
   calibration.clean_input_data();
-  <span class="macro">println!</span>(<span class="string">&quot;Calibration : {}&quot;</span>, calibration);
+  <span class="macro">println!</span>(<span class="string">"Calibration : {}"</span>, calibration);
 
-  <span class="macro">info!</span>(<span class="string">&quot;Will set board to sma mode!&quot;</span>);
+  <span class="macro">info!</span>(<span class="string">"Will set board to sma mode!"</span>);
   select_sma_mode();
   run_config.is_active = <span class="bool-val">false</span>;  
   <span class="kw">match </span>rc_to_runner.send(run_config) {
-    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">&quot;Can not send runconfig!, Err {err}&quot;</span>),
-    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">trace!</span>(<span class="string">&quot;Success!&quot;</span>)
+    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">warn!</span>(<span class="string">"Can not send runconfig!, Err {err}"</span>),
+    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">trace!</span>(<span class="string">"Success!"</span>)
   }
   thread::sleep(FIVE_SECONDS);
   calibration.calibrate()<span class="question-mark">?</span>;
-  <span class="macro">println!</span>(<span class="string">&quot;Calibration : {}&quot;</span>, calibration);
+  <span class="macro">println!</span>(<span class="string">"Calibration : {}"</span>, calibration);
   <span class="comment">// now it just needs to be send to 
   // the publisher
   //for k in 0..10 {
-  //  println!(&quot;cali vcal  {}&quot;, calibration.v_offsets[0][k]);
-  //  println!(&quot;cali vincs {}&quot;, calibration.v_inc[0][k]);
-  //  println!(&quot;cali vdips {}&quot;, calibration.v_dips[0][k]);
-  //  println!(&quot;cali tbins {}&quot;, calibration.tbin[0][k]);
+  //  println!("cali vcal  {}", calibration.v_offsets[0][k]);
+  //  println!("cali vincs {}", calibration.v_inc[0][k]);
+  //  println!("cali vdips {}", calibration.v_dips[0][k]);
+  //  println!("cali tbins {}", calibration.tbin[0][k]);
   //}
-  </span><span class="kw">let </span>calib_unmut = calibration.clone();
-  <span class="kw">let </span>calib_pack = TofPacket::from(<span class="kw-2">&amp;</span>calib_unmut);
-  <span class="kw">match </span>tp_to_publisher.send(calib_pack) {
-    <span class="prelude-val">Err</span>(err) =&gt; {
-      <span class="macro">error!</span>(<span class="string">&quot;Unable to send RBCalibration package! Error {err}&quot;</span>);
-    },
-    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; ()
-  }
-  <span class="macro">info!</span>(<span class="string">&quot;Calibration done!&quot;</span>);
+  </span><span class="macro">info!</span>(<span class="string">"Calibration done!"</span>);
   <span class="prelude-val">Ok</span>(())
 }
 <span class="comment">// END Calibration stuff ======================================================
@@ -2200,33 +2177,33 @@
                     run_type        : u8,
                     rb_id           : u8,
                     event_no        : u8) -&gt; <span class="prelude-ty">Result</span>&lt;(), RunError&gt; {
-  <span class="macro">println!</span>(<span class="string">&quot;==&gt; Will initialize new run!&quot;</span>);
+  <span class="macro">println!</span>(<span class="string">"==&gt; Will initialize new run!"</span>);
   <span class="kw">match </span>rc_to_runner.send(rc_config) {
-    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Error initializing run! {err}&quot;</span>),
+    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Error initializing run! {err}"</span>),
     <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
   };
-  <span class="macro">println!</span>(<span class="string">&quot;==&gt; Run successfully started!&quot;</span>);
+  <span class="macro">println!</span>(<span class="string">"==&gt; Run successfully started!"</span>);
   <span class="prelude-val">Ok</span>(())
 }
 
 <span class="kw">pub fn </span>rb_stop_run(rc_to_runner    : <span class="kw-2">&amp;</span>Sender&lt;RunConfig&gt;,
                    rb_id           : u8) -&gt; <span class="prelude-ty">Result</span>&lt;(), RunError&gt; {
-  <span class="macro">println!</span>(<span class="string">&quot;==&gt; Will initialize new run!&quot;</span>);
-  <span class="macro">println!</span>(<span class="string">&quot;Received command to end run!&quot;</span>);
+  <span class="macro">println!</span>(<span class="string">"==&gt; Will initialize new run!"</span>);
+  <span class="macro">println!</span>(<span class="string">"Received command to end run!"</span>);
   <span class="comment">// default is not active for run config
 
   </span><span class="kw">let  </span>rc = RunConfig::new();
   <span class="kw">match </span>rc_to_runner.send(rc) {
-    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Error stopping run! {err}&quot;</span>),
+    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Error stopping run! {err}"</span>),
     <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
   }
-  <span class="macro">println!</span>(<span class="string">&quot;==&gt; Run successfully stopped!&quot;</span>);
+  <span class="macro">println!</span>(<span class="string">"==&gt; Run successfully stopped!"</span>);
   <span class="prelude-val">Ok</span>(())
 }
 <span class="comment">// END Run stuff ==============================================================
 
 </span><span class="kw">const </span>DMA_RESET_TRIES : u8 = <span class="number">10</span>;   <span class="comment">// if we can not reset the DMA after this number
-                                   // of retries, we&#39;ll panic!
+                                   // of retries, we'll panic!
 
 
 // Using the same approach as the flight computer, we use
@@ -2254,11 +2231,11 @@
 </span><span class="kw">pub fn </span>is_systemd_process() -&gt; bool {
   <span class="comment">// this custom variable must be set in the 
   // liftof.service file!!
-  </span><span class="kw">if </span>env::var(<span class="string">&quot;LIFTOF_IS_SYSTEMD&quot;</span>).is_ok() {
-    <span class="macro">info!</span>(<span class="string">&quot;Running under systemd&quot;</span>);
+  </span><span class="kw">if </span>env::var(<span class="string">"LIFTOF_IS_SYSTEMD"</span>).is_ok() {
+    <span class="macro">info!</span>(<span class="string">"Running under systemd"</span>);
     <span class="bool-val">true
   </span>} <span class="kw">else </span>{
-    <span class="macro">info!</span>(<span class="string">&quot;Not running under systemd&quot;</span>);
+    <span class="macro">info!</span>(<span class="string">"Not running under systemd"</span>);
     <span class="bool-val">false
   </span>}
 }
@@ -2270,12 +2247,12 @@
   <span class="comment">//match get_json_from_file(rcfile) {
   </span><span class="kw">match </span>read_to_string(rcfile) {
     <span class="prelude-val">Err</span>(err) =&gt; {
-      <span class="macro">panic!</span>(<span class="string">&quot;Unable to read the configuration file! Error {err}&quot;</span>);
+      <span class="macro">panic!</span>(<span class="string">"Unable to read the configuration file! Error {err}"</span>);
     }
     <span class="prelude-val">Ok</span>(rc_from_file) =&gt; {
-      <span class="macro">println!</span>(<span class="string">&quot;==&gt; Found configuration file {}!&quot;</span>, rcfile.display());
+      <span class="macro">println!</span>(<span class="string">"==&gt; Found configuration file {}!"</span>, rcfile.display());
       <span class="kw">match </span>serde_json::from_str(<span class="kw-2">&amp;</span>rc_from_file) {
-        <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Can not read json from configuration file. Error {err}&quot;</span>),
+        <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">panic!</span>(<span class="string">"Can not read json from configuration file. Error {err}"</span>),
         <span class="prelude-val">Ok</span>(rc_json) =&gt; {
           rc_json
         }
@@ -2298,14 +2275,14 @@
   <span class="prelude-val">Ok</span>(RamBuffer::A)
 }
 
-<span class="doccomment">/// Add the prefix &quot;LOCAL&quot; to a bytestream.
+<span class="doccomment">/// Add the prefix "LOCAL" to a bytestream.
 ///
 /// This will allow for the central C&amp;C server 
 /// to ignore this packet, but the board can 
 /// still send it to itself
 </span><span class="kw">pub fn </span>prefix_local(input : <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) -&gt; Vec&lt;u8&gt; {
   <span class="kw">let </span><span class="kw-2">mut </span>bytestream : Vec::&lt;u8&gt;;
-  <span class="kw">let </span>local = String::from(<span class="string">&quot;LOCAL&quot;</span>);
+  <span class="kw">let </span>local = String::from(<span class="string">"LOCAL"</span>);
   bytestream = local.as_bytes().to_vec();
   bytestream.append(input);
   bytestream
@@ -2315,13 +2292,13 @@
   <span class="comment">// FIUXME - this should not panic
   </span><span class="kw">let </span>board_id = get_board_id()<span class="comment">//
                  </span>.unwrap_or(<span class="number">0</span>);
-                               <span class="comment">//.expect(&quot;Need to be able to obtain board id!&quot;);
+                               <span class="comment">//.expect("Need to be able to obtain board id!");
   </span><span class="kw">let </span><span class="kw-2">mut </span>bytestream : Vec::&lt;u8&gt;;
   <span class="kw">let </span>board : String;
   <span class="kw">if </span>board_id &lt; <span class="number">10 </span>{
-    board = String::from(<span class="string">&quot;RB0&quot;</span>) + <span class="kw-2">&amp;</span>board_id.to_string();
+    board = String::from(<span class="string">"RB0"</span>) + <span class="kw-2">&amp;</span>board_id.to_string();
   } <span class="kw">else </span>{
-    board = String::from(<span class="string">&quot;RB&quot;</span>)  + <span class="kw-2">&amp;</span>board_id.to_string();
+    board = String::from(<span class="string">"RB"</span>)  + <span class="kw-2">&amp;</span>board_id.to_string();
   }
   <span class="comment">//let mut response = 
   </span>bytestream = board.as_bytes().to_vec();
@@ -2336,13 +2313,13 @@
   <span class="comment">// FIUXME - this should not panic
   //let board_id = get_board_id()//
   //               .unwrap_or(0);
-  //                             //.expect(&quot;Need to be able to obtain board id!&quot;);
+  //                             //.expect("Need to be able to obtain board id!");
   </span><span class="kw">let </span><span class="kw-2">mut </span>bytestream : Vec::&lt;u8&gt;;
   <span class="kw">let </span>board : String;
   <span class="kw">if </span>board_id &lt; <span class="number">10 </span>{
-    board = String::from(<span class="string">&quot;RB0&quot;</span>) + <span class="kw-2">&amp;</span>board_id.to_string();
+    board = String::from(<span class="string">"RB0"</span>) + <span class="kw-2">&amp;</span>board_id.to_string();
   } <span class="kw">else </span>{
-    board = String::from(<span class="string">&quot;RB&quot;</span>)  + <span class="kw-2">&amp;</span>board_id.to_string();
+    board = String::from(<span class="string">"RB"</span>)  + <span class="kw-2">&amp;</span>board_id.to_string();
   }
   <span class="comment">//let mut response = 
   </span>bytestream = board.as_bytes().to_vec();
@@ -2382,7 +2359,7 @@
       <span class="kw">match </span>reset_dma() {
         <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; (),
         <span class="prelude-val">Err</span>(err) =&gt; {
-          <span class="macro">error!</span>(<span class="string">&quot;Resetting dma failed, err {:?}&quot;</span>, err);
+          <span class="macro">error!</span>(<span class="string">"Resetting dma failed, err {:?}"</span>, err);
           n_tries += <span class="number">1</span>;
           thread::sleep(one_milli);
           <span class="kw">continue</span>;
@@ -2391,7 +2368,7 @@
       <span class="kw">match </span>reset_ram_buffer_occ(<span class="kw-2">&amp;</span>buf_a) {
         <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; (), 
         <span class="prelude-val">Err</span>(err) =&gt; {
-          <span class="macro">error!</span>(<span class="string">&quot;Problem resetting buffer /dev/uio1 {:?}&quot;</span>, err);
+          <span class="macro">error!</span>(<span class="string">"Problem resetting buffer /dev/uio1 {:?}"</span>, err);
           n_tries += <span class="number">1</span>;
           thread::sleep(one_milli);
           <span class="kw">continue</span>;
@@ -2400,7 +2377,7 @@
       <span class="kw">match </span>reset_ram_buffer_occ(<span class="kw-2">&amp;</span>buf_b) {
         <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; (), 
         <span class="prelude-val">Err</span>(err) =&gt; {
-          <span class="macro">error!</span>(<span class="string">&quot;Problem resetting buffer /dev/uio2 {:?}&quot;</span>, err);
+          <span class="macro">error!</span>(<span class="string">"Problem resetting buffer /dev/uio2 {:?}"</span>, err);
           n_tries += <span class="number">1</span>;
           thread::sleep(one_milli);
           <span class="kw">continue</span>;
@@ -2417,7 +2394,7 @@
 
 <span class="doccomment">/// Check if the buffers are actually filling
 /// 
-///  - if not, panic. We can&#39;t go on like that
+///  - if not, panic. We can't go on like that
 </span><span class="kw">pub fn </span>run_check() {
   <span class="kw">let </span>buf_a = BlobBuffer::A;
   <span class="kw">let </span>buf_b = BlobBuffer::B;
@@ -2428,8 +2405,8 @@
   <span class="kw">let </span><span class="kw-2">mut </span>last_occ_a = get_blob_buffer_occ(<span class="kw-2">&amp;</span>buf_a).unwrap();
   <span class="kw">let </span><span class="kw-2">mut </span>last_occ_b = get_blob_buffer_occ(<span class="kw-2">&amp;</span>buf_b).unwrap();
   <span class="kw">match </span>enable_trigger() {
-    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Unable to enable trigger! Err {err}&quot;</span>),
-    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">&quot;Triggers enabled&quot;</span>)
+    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to enable trigger! Err {err}"</span>),
+    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">"Triggers enabled"</span>)
   }
   <span class="kw">loop </span>{
     n_iter += <span class="number">1</span>;
@@ -2437,11 +2414,11 @@
     <span class="kw">let </span>occ_a = get_blob_buffer_occ(<span class="kw-2">&amp;</span>buf_a).unwrap();
     <span class="kw">let </span>occ_b = get_blob_buffer_occ(<span class="kw-2">&amp;</span>buf_b).unwrap();
     <span class="kw">if </span>occ_a - last_occ_a == <span class="number">0 </span>&amp;&amp; occ_b - last_occ_b == <span class="number">0 </span>{
-      <span class="macro">panic!</span>(<span class="string">&quot;We did not observe a change in occupancy for either one of the buffers!&quot;</span>);
+      <span class="macro">panic!</span>(<span class="string">"We did not observe a change in occupancy for either one of the buffers!"</span>);
     }
-    <span class="macro">println!</span>(<span class="string">&quot;-- buff size A {}&quot;</span>, occ_a - last_occ_a);
-    <span class="macro">println!</span>(<span class="string">&quot;-- buff size B {}&quot;</span>, occ_b - last_occ_b);
-    <span class="macro">println!</span>(<span class="string">&quot;---&gt; Iter {n_iter}&quot;</span>);
+    <span class="macro">println!</span>(<span class="string">"-- buff size A {}"</span>, occ_a - last_occ_a);
+    <span class="macro">println!</span>(<span class="string">"-- buff size B {}"</span>, occ_b - last_occ_b);
+    <span class="macro">println!</span>(<span class="string">"---&gt; Iter {n_iter}"</span>);
     last_occ_a = occ_a;
     last_occ_b = occ_b;
   }
@@ -2451,7 +2428,7 @@
 ///
 ///  Read out the occupancy register and compare to 
 ///  a previously recoreded value. 
-///  Everything is u32 (the register can&#39;t hold more)
+///  Everything is u32 (the register can't hold more)
 ///
 ///  The size of the buffer can only be defined compared
 ///  to a start value. If the value rools over, the 
@@ -2463,7 +2440,7 @@
 </span><span class="kw">pub fn </span>get_buff_size(which : <span class="kw-2">&amp;</span>BlobBuffer) -&gt;<span class="prelude-ty">Result</span>&lt;usize, RegisterError&gt; {
   <span class="kw">let </span>size : u32;
   <span class="kw">let </span>occ = get_blob_buffer_occ(<span class="kw-2">&amp;</span>which)<span class="question-mark">?</span>;
-  <span class="macro">trace!</span>(<span class="string">&quot;Got occupancy of {occ} for buff {which:?}&quot;</span>);
+  <span class="macro">trace!</span>(<span class="string">"Got occupancy of {occ} for buff {which:?}"</span>);
 
   <span class="comment">// the buffer sizes is UIO1_MAX_OCCUPANCY -  occ
   </span><span class="kw">match </span>which {
@@ -2511,26 +2488,26 @@
   <span class="kw">let </span>which          = get_active_buffer()<span class="question-mark">?</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>buff_size  = get_buff_size(<span class="kw-2">&amp;</span>which)<span class="question-mark">?</span>;
   <span class="kw">if </span>buff_size &gt;= buff_trip {
-    <span class="macro">info!</span>(<span class="string">&quot;Buff {which:?} tripped at a size of {buff_size}&quot;</span>);  
-    <span class="macro">debug!</span>(<span class="string">&quot;Buff handler switch buffers {switch_buff}&quot;</span>);
+    <span class="macro">info!</span>(<span class="string">"Buff {which:?} tripped at a size of {buff_size}"</span>);  
+    <span class="macro">debug!</span>(<span class="string">"Buff handler switch buffers {switch_buff}"</span>);
     <span class="comment">// 1) switch buffer
     // 2) read out
     // 3) reset
     </span><span class="kw">if </span>switch_buff {
       <span class="kw">match </span>switch_ram_buffer() {
         <span class="prelude-val">Ok</span>(<span class="kw">_</span>)  =&gt; {
-          <span class="macro">info!</span>(<span class="string">&quot;Ram buffer switched!&quot;</span>);
+          <span class="macro">info!</span>(<span class="string">"Ram buffer switched!"</span>);
         },
-        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Unable to switch RAM buffers!&quot;</span>) 
+        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to switch RAM buffers!"</span>) 
       }
     }
     <span class="kw">match </span>read_buffer_into_streamer(<span class="kw-2">&amp;</span>which, buff_size <span class="kw">as </span>usize, streamer) {
-      <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Can not read data buffer into RBEventMemoryStreamer! {err}&quot;</span>),
+      <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Can not read data buffer into RBEventMemoryStreamer! {err}"</span>),
       <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; (),
     }
     <span class="kw">match </span>reset_ram_buffer_occ(<span class="kw-2">&amp;</span>which) {
-      <span class="prelude-val">Ok</span>(<span class="kw">_</span>)  =&gt; <span class="macro">debug!</span>(<span class="string">&quot;Successfully reset the buffer occupancy value&quot;</span>),
-      <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Unable to reset buffer!&quot;</span>)
+      <span class="prelude-val">Ok</span>(<span class="kw">_</span>)  =&gt; <span class="macro">debug!</span>(<span class="string">"Successfully reset the buffer occupancy value"</span>),
+      <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to reset buffer!"</span>)
     }
     buff_size = <span class="number">0</span>;
   }
@@ -2540,7 +2517,7 @@
 <span class="doccomment">/// Manage the RAM buffers for event data
 ///
 /// This will make a decision based on the 
-/// buff_trip value if a buffer is &quot;full&quot;, 
+/// buff_trip value if a buffer is "full", 
 /// and in that case, read it out, send 
 /// the data over the channel elsewhere 
 /// and switch to the other half of the 
@@ -2562,34 +2539,34 @@
   <span class="kw">let </span>which          = get_active_buffer()<span class="question-mark">?</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>buff_size  = get_buff_size(<span class="kw-2">&amp;</span>which)<span class="question-mark">?</span>;
   <span class="kw">if </span>buff_size &gt;= buff_trip {
-    <span class="macro">info!</span>(<span class="string">&quot;Buff {which:?} tripped at a size of {buff_size}&quot;</span>);  
-    <span class="macro">debug!</span>(<span class="string">&quot;Buff handler switch buffers {switch_buff}&quot;</span>);
+    <span class="macro">info!</span>(<span class="string">"Buff {which:?} tripped at a size of {buff_size}"</span>);  
+    <span class="macro">debug!</span>(<span class="string">"Buff handler switch buffers {switch_buff}"</span>);
     <span class="comment">// 1) switch buffer
     // 2) read out
     // 3) reset
     </span><span class="kw">if </span>switch_buff {
       <span class="kw">match </span>switch_ram_buffer() {
         <span class="prelude-val">Ok</span>(<span class="kw">_</span>)  =&gt; {
-          <span class="macro">info!</span>(<span class="string">&quot;Ram buffer switched!&quot;</span>);
+          <span class="macro">info!</span>(<span class="string">"Ram buffer switched!"</span>);
         },
-        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Unable to switch RAM buffers!&quot;</span>) 
+        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to switch RAM buffers!"</span>) 
       }
     }
     <span class="kw">let </span><span class="kw-2">mut </span>bytestream = Vec::&lt;u8&gt;::new(); 
     <span class="kw">match </span>read_data_buffer(<span class="kw-2">&amp;</span>which, buff_size <span class="kw">as </span>usize) {
-      <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Can not read data buffer {err}&quot;</span>),
+      <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Can not read data buffer {err}"</span>),
       <span class="prelude-val">Ok</span>(bs)    =&gt; bytestream = bs,
     }
     <span class="kw">let </span>bs_len = bytestream.len();
     <span class="kw">match </span>bs_sender.send(bytestream) {
-      <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;error sending {err}&quot;</span>),
+      <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"error sending {err}"</span>),
       <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
-        <span class="macro">info!</span>(<span class="string">&quot;We are sending {} event bytes for further processing!&quot;</span>, bs_len);
+        <span class="macro">info!</span>(<span class="string">"We are sending {} event bytes for further processing!"</span>, bs_len);
       }
     }
     <span class="kw">match </span>reset_ram_buffer_occ(<span class="kw-2">&amp;</span>which) {
-      <span class="prelude-val">Ok</span>(<span class="kw">_</span>)  =&gt; <span class="macro">debug!</span>(<span class="string">&quot;Successfully reset the buffer occupancy value&quot;</span>),
-      <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Unable to reset buffer!&quot;</span>)
+      <span class="prelude-val">Ok</span>(<span class="kw">_</span>)  =&gt; <span class="macro">debug!</span>(<span class="string">"Successfully reset the buffer occupancy value"</span>),
+      <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to reset buffer!"</span>)
     }
     buff_size = <span class="number">0</span>;
   }
@@ -2649,9 +2626,9 @@
   
   <span class="comment">// for some reason, sometimes it 
   // takes a bit until the blob
-  // buffers reset. Let&#39;s try a 
+  // buffers reset. Let's try a 
   // few times
-  </span><span class="macro">info!</span>(<span class="string">&quot;Resetting event memory buffers..&quot;</span>);
+  </span><span class="macro">info!</span>(<span class="string">"Resetting event memory buffers.."</span>);
   <span class="kw">for _ in </span><span class="number">0</span>..<span class="number">5 </span>{
     reset_ram_buffer_occ(<span class="kw-2">&amp;</span>buf_a)<span class="question-mark">?</span>;
     thread::sleep(one_milli);
@@ -2670,7 +2647,7 @@
     thread::sleep(one_milli);
   }
  
-  <span class="comment">// we don&#39;t want to do that anymore
+  <span class="comment">// we don't want to do that anymore
   //set_readout_all_channels_and_ch9()?;
   </span>thread::sleep(one_milli);
   set_master_trigger_mode()<span class="question-mark">?</span>;
@@ -2683,7 +2660,7 @@
   <span class="kw">match </span>PreampSetBias::set_manual_bias(<span class="prelude-val">None</span>, bias_voltage <span class="kw">as </span>f32) {
     <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; (),
     <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
-      <span class="macro">error!</span>(<span class="string">&quot;Unable to set preamp bias! Error LTBThresholdError!&quot;</span>);
+      <span class="macro">error!</span>(<span class="string">"Unable to set preamp bias! Error LTBThresholdError!"</span>);
     }
   };
   <span class="prelude-val">Ok</span>(())
@@ -2695,7 +2672,7 @@
   </span><span class="kw">match </span>PreampSetBias::set_manual_bias(<span class="prelude-val">Some</span>(preamp_id), bias_voltage <span class="kw">as </span>f32) {
     <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; (),
     <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
-      <span class="macro">error!</span>(<span class="string">&quot;Unable to set preamp bias! Error LTBThresholdError!&quot;</span>);
+      <span class="macro">error!</span>(<span class="string">"Unable to set preamp bias! Error LTBThresholdError!"</span>);
     }
   };
   <span class="prelude-val">Ok</span>(())
@@ -2704,12 +2681,12 @@
 
 <span class="kw">pub fn </span>send_ltb_all_thresholds_set() -&gt; <span class="prelude-ty">Result</span>&lt;(), SetError&gt; {
   <span class="kw">match </span>ltb_threshold::set_default_threshold() {
-    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; (),
+    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(()),
     <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
-      <span class="macro">error!</span>(<span class="string">&quot;Unable to set preamp bias! Error LTBThresholdError!&quot;</span>);
+      <span class="macro">error!</span>(<span class="string">"Unable to set preamp bias! Error LTBThresholdError!"</span>);
+      <span class="kw">return </span><span class="prelude-val">Err</span>(SetError::CanNotConnectToMyOwnZMQSocket)
     }
   };
-  <span class="prelude-val">Ok</span>(())
 }
 
 
@@ -2717,7 +2694,7 @@
   <span class="kw">match </span>ltb_threshold::reset_threshold() {
     <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; (),
     <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
-      <span class="macro">error!</span>(<span class="string">&quot;Unable to set preamp bias! Error LTBThresholdError!&quot;</span>);
+      <span class="macro">error!</span>(<span class="string">"Unable to set preamp bias! Error LTBThresholdError!"</span>);
     }
   };
   <span class="prelude-val">Ok</span>(())
@@ -2730,14 +2707,14 @@
   <span class="kw">match </span>ltb_threshold::set_threshold(ch, threshold_level <span class="kw">as </span>f32) {
     <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; (),
     <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
-      <span class="macro">error!</span>(<span class="string">&quot;Unable to set preamp bias! Error LTBThresholdError!&quot;</span>);
+      <span class="macro">error!</span>(<span class="string">"Unable to set preamp bias! Error LTBThresholdError!"</span>);
     }
   };
   <span class="prelude-val">Ok</span>(())
 }
 
 
-<span class="kw">pub fn </span>power_preamp(preamp_id: u8, status: PowerStatusEnum) -&gt; <span class="prelude-ty">Result</span>&lt;(), SetError&gt; {
+<span class="kw">pub fn </span>power_preamp(preamp_id: u8, status: PowerStatusEnum) -&gt; <span class="prelude-ty">Result</span>&lt;TofCommandCode, CmdError&gt; {
   <span class="kw">let </span><span class="kw-2">mut </span>result = <span class="prelude-val">Ok</span>(());
   <span class="kw">match </span>status {
     PowerStatusEnum::ON =&gt; {
@@ -2756,22 +2733,26 @@
     },
     PowerStatusEnum::Cycle =&gt; {
       <span class="comment">// about this command.How long is it right to power cycle stuff??? TODO
-      </span><span class="macro">error!</span>(<span class="string">&quot;Not implemented.&quot;</span>)
+      </span><span class="macro">error!</span>(<span class="string">"Not implemented."</span>);
+      <span class="kw">return </span><span class="prelude-val">Err</span>(CmdError::PowerError)
     },
-    <span class="kw">_ </span>=&gt; <span class="macro">error!</span>(<span class="string">&quot;The power status is not specified or outside expected values.&quot;</span>)
+    <span class="kw">_ </span>=&gt; {
+      <span class="macro">error!</span>(<span class="string">"The power status is not specified or outside expected values."</span>);
+      <span class="kw">return </span><span class="prelude-val">Err</span>(CmdError::PowerError)
+    }
   }
 
   <span class="kw">match </span>result {
-    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; (),
+    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(TofCommandCode::CmdPower),
     <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
-      <span class="macro">error!</span>(<span class="string">&quot;Unable to set preamp bias! Error LTBThresholdError!&quot;</span>);
+      <span class="macro">error!</span>(<span class="string">"Unable to set preamp bias! Error LTBThresholdError!"</span>);
+      <span class="kw">return </span><span class="prelude-val">Err</span>(CmdError::PowerError)
     }
   };
-  <span class="prelude-val">Ok</span>(())
 }
 
 
-<span class="kw">pub fn </span>power_ltb(ltb_id: u8, status: PowerStatusEnum) -&gt; <span class="prelude-ty">Result</span>&lt;(), SetError&gt; {
+<span class="kw">pub fn </span>power_ltb(ltb_id: u8, status: PowerStatusEnum) -&gt; <span class="prelude-ty">Result</span>&lt;TofCommandCode, CmdError&gt; {
   <span class="kw">let </span><span class="kw-2">mut </span>result = <span class="prelude-val">Ok</span>(());
   <span class="comment">// the differentiation between all and single ltb is done intrinsically by the fact that 1 RB -&gt; 1 LTB
   </span><span class="kw">match </span>status {
@@ -2789,17 +2770,21 @@
     },
     PowerStatusEnum::Cycle =&gt; {
       <span class="comment">// about this command.How long is it right to power cycle stuff??? TODO
-      </span><span class="macro">error!</span>(<span class="string">&quot;Not implemented.&quot;</span>)
+      </span><span class="macro">error!</span>(<span class="string">"Not implemented."</span>);
+      <span class="kw">return </span><span class="prelude-val">Err</span>(CmdError::PowerError)
     },
-    <span class="kw">_ </span>=&gt; <span class="macro">error!</span>(<span class="string">&quot;The power status is not specified or outside expected values.&quot;</span>)
+    <span class="kw">_ </span>=&gt; {
+      <span class="macro">error!</span>(<span class="string">"The power status is not specified or outside expected values."</span>);
+      <span class="kw">return </span><span class="prelude-val">Err</span>(CmdError::PowerError)
+    }
   }
 
   <span class="kw">match </span>result {
-    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; (),
+    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(TofCommandCode::CmdPower),
     <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
-      <span class="macro">error!</span>(<span class="string">&quot;Unable to set preamp bias! Error LTBThresholdError!&quot;</span>);
+      <span class="macro">error!</span>(<span class="string">"Unable to set preamp bias! Error LTBThresholdError!"</span>);
+      <span class="kw">return </span><span class="prelude-val">Err</span>(CmdError::PowerError)
     }
   };
-  <span class="prelude-val">Ok</span>(())
 }
 </code></pre></div></section></main></body></html>

@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.25.0/src/text/line.rs`."><title>line.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ratatui-0.25.0/src/text/line.rs`."><title>line.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><a class="sub-logo-container" href="../../../ratatui/index.html"><img src="https://raw.githubusercontent.com/ratatui-org/ratatui/main/assets/logo.png" alt="ratatui"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -354,24 +355,24 @@
 <span class="kw">use </span><span class="kw">crate</span>::layout::Alignment;
 
 <span class="attr">#[derive(Debug, Default, Clone, Eq, PartialEq, Hash)]
-</span><span class="kw">pub struct </span>Line&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">pub </span>spans: Vec&lt;Span&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+</span><span class="kw">pub struct </span>Line&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">pub </span>spans: Vec&lt;Span&lt;<span class="lifetime">'a</span>&gt;&gt;,
     <span class="kw">pub </span>alignment: <span class="prelude-ty">Option</span>&lt;Alignment&gt;,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Line&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Line&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Create a line with the default style.
     ///
     /// # Examples
     ///
     /// ```rust
     /// # use ratatui::prelude::*;
-    /// Line::raw(&quot;test content&quot;);
-    /// Line::raw(String::from(&quot;test content&quot;));
+    /// Line::raw("test content");
+    /// Line::raw(String::from("test content"));
     /// ```
-    </span><span class="kw">pub fn </span>raw&lt;T&gt;(content: T) -&gt; Line&lt;<span class="lifetime">&#39;a</span>&gt;
+    </span><span class="kw">pub fn </span>raw&lt;T&gt;(content: T) -&gt; Line&lt;<span class="lifetime">'a</span>&gt;
     <span class="kw">where
-        </span>T: Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
+        </span>T: Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
     {
         Line {
             spans: content
@@ -392,12 +393,12 @@
     /// let style = Style::default()
     ///     .fg(Color::Yellow)
     ///     .add_modifier(Modifier::ITALIC);
-    /// Line::styled(&quot;My text&quot;, style);
-    /// Line::styled(String::from(&quot;My text&quot;), style);
+    /// Line::styled("My text", style);
+    /// Line::styled(String::from("My text"), style);
     /// ```
-    </span><span class="kw">pub fn </span>styled&lt;T&gt;(content: T, style: Style) -&gt; Line&lt;<span class="lifetime">&#39;a</span>&gt;
+    </span><span class="kw">pub fn </span>styled&lt;T&gt;(content: T, style: Style) -&gt; Line&lt;<span class="lifetime">'a</span>&gt;
     <span class="kw">where
-        </span>T: Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
+        </span>T: Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
     {
         Line::from(Span::styled(content, style))
     }
@@ -409,8 +410,8 @@
     /// ```rust
     /// # use ratatui::prelude::*;
     /// let line = Line::from(vec![
-    ///     Span::styled(&quot;My&quot;, Style::default().fg(Color::Yellow)),
-    ///     Span::raw(&quot; text&quot;),
+    ///     Span::styled("My", Style::default().fg(Color::Yellow)),
+    ///     Span::raw(" text"),
     /// ]);
     /// assert_eq!(7, line.width());
     /// ```
@@ -430,23 +431,23 @@
     ///
     /// use ratatui::{prelude::*, text::StyledGrapheme};
     ///
-    /// let line = Line::styled(&quot;Text&quot;, Style::default().fg(Color::Yellow));
+    /// let line = Line::styled("Text", Style::default().fg(Color::Yellow));
     /// let style = Style::default().fg(Color::Green).bg(Color::Black);
     /// assert_eq!(
     ///     line.styled_graphemes(style)
     ///         .collect::&lt;Vec&lt;StyledGrapheme&gt;&gt;(),
     ///     vec![
-    ///         StyledGrapheme::new(&quot;T&quot;, Style::default().fg(Color::Yellow).bg(Color::Black)),
-    ///         StyledGrapheme::new(&quot;e&quot;, Style::default().fg(Color::Yellow).bg(Color::Black)),
-    ///         StyledGrapheme::new(&quot;x&quot;, Style::default().fg(Color::Yellow).bg(Color::Black)),
-    ///         StyledGrapheme::new(&quot;t&quot;, Style::default().fg(Color::Yellow).bg(Color::Black)),
+    ///         StyledGrapheme::new("T", Style::default().fg(Color::Yellow).bg(Color::Black)),
+    ///         StyledGrapheme::new("e", Style::default().fg(Color::Yellow).bg(Color::Black)),
+    ///         StyledGrapheme::new("x", Style::default().fg(Color::Yellow).bg(Color::Black)),
+    ///         StyledGrapheme::new("t", Style::default().fg(Color::Yellow).bg(Color::Black)),
     ///     ]
     /// );
     /// ```
     </span><span class="kw">pub fn </span>styled_graphemes(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
+        <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="self">self</span>,
         base_style: Style,
-    ) -&gt; <span class="kw">impl </span>Iterator&lt;Item = StyledGrapheme&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+    ) -&gt; <span class="kw">impl </span>Iterator&lt;Item = StyledGrapheme&lt;<span class="lifetime">'a</span>&gt;&gt; {
         <span class="self">self</span>.spans
             .iter()
             .flat_map(<span class="kw">move </span>|span| span.styled_graphemes(base_style))
@@ -461,10 +462,10 @@
     /// let style = Style::default()
     ///     .fg(Color::Yellow)
     ///     .add_modifier(Modifier::ITALIC);
-    /// let mut raw_line = Line::from(vec![Span::raw(&quot;My&quot;), Span::raw(&quot; text&quot;)]);
+    /// let mut raw_line = Line::from(vec![Span::raw("My"), Span::raw(" text")]);
     /// let mut styled_line = Line::from(vec![
-    ///     Span::styled(&quot;My&quot;, style),
-    ///     Span::styled(&quot; text&quot;, style),
+    ///     Span::styled("My", style),
+    ///     Span::styled(" text", style),
     /// ]);
     ///
     /// assert_ne!(raw_line, styled_line);
@@ -486,8 +487,8 @@
     /// ```rust
     /// # use ratatui::prelude::*;
     /// let mut line = Line::from(vec![
-    ///     Span::styled(&quot;My&quot;, Style::default().fg(Color::Yellow)),
-    ///     Span::styled(&quot; text&quot;, Style::default().add_modifier(Modifier::BOLD)),
+    ///     Span::styled("My", Style::default().fg(Color::Yellow)),
+    ///     Span::styled(" text", Style::default().add_modifier(Modifier::BOLD)),
     /// ]);
     ///
     /// line.reset_style();
@@ -507,7 +508,7 @@
     ///
     /// ```rust
     /// # use ratatui::prelude::*;
-    /// let mut line = Line::from(&quot;Hi, what&#39;s up?&quot;);
+    /// let mut line = Line::from("Hi, what's up?");
     /// assert_eq!(None, line.alignment);
     /// assert_eq!(
     ///     Some(Alignment::Right),
@@ -522,20 +523,20 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;String&gt; <span class="kw">for </span>Line&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;String&gt; <span class="kw">for </span>Line&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">fn </span>from(s: String) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::from(<span class="macro">vec!</span>[Span::from(s)])
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; <span class="kw">for </span>Line&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">fn </span>from(s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt; <span class="kw">for </span>Line&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">fn </span>from(s: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::from(<span class="macro">vec!</span>[Span::from(s)])
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;Vec&lt;Span&lt;<span class="lifetime">&#39;a</span>&gt;&gt;&gt; <span class="kw">for </span>Line&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">fn </span>from(spans: Vec&lt;Span&lt;<span class="lifetime">&#39;a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;Vec&lt;Span&lt;<span class="lifetime">'a</span>&gt;&gt;&gt; <span class="kw">for </span>Line&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">fn </span>from(spans: Vec&lt;Span&lt;<span class="lifetime">'a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             spans,
             ..Default::default()
@@ -543,14 +544,14 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;Span&lt;<span class="lifetime">&#39;a</span>&gt;&gt; <span class="kw">for </span>Line&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">fn </span>from(span: Span&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="self">Self </span>{
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;Span&lt;<span class="lifetime">'a</span>&gt;&gt; <span class="kw">for </span>Line&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">fn </span>from(span: Span&lt;<span class="lifetime">'a</span>&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::from(<span class="macro">vec!</span>[span])
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;Line&lt;<span class="lifetime">&#39;a</span>&gt;&gt; <span class="kw">for </span>String {
-    <span class="kw">fn </span>from(line: Line&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; String {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; From&lt;Line&lt;<span class="lifetime">'a</span>&gt;&gt; <span class="kw">for </span>String {
+    <span class="kw">fn </span>from(line: Line&lt;<span class="lifetime">'a</span>&gt;) -&gt; String {
         line.spans.iter().fold(String::new(), |<span class="kw-2">mut </span>acc, s| {
             acc.push_str(s.content.as_ref());
             acc
@@ -569,8 +570,8 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_width() {
         <span class="kw">let </span>line = Line::from(<span class="macro">vec!</span>[
-            Span::styled(<span class="string">&quot;My&quot;</span>, Style::default().fg(Color::Yellow)),
-            Span::raw(<span class="string">&quot; text&quot;</span>),
+            Span::styled(<span class="string">"My"</span>, Style::default().fg(Color::Yellow)),
+            Span::raw(<span class="string">" text"</span>),
         ]);
         <span class="macro">assert_eq!</span>(<span class="number">7</span>, line.width());
 
@@ -583,10 +584,10 @@
         <span class="kw">let </span>style = Style::default()
             .fg(Color::Yellow)
             .add_modifier(Modifier::ITALIC);
-        <span class="kw">let </span><span class="kw-2">mut </span>raw_line = Line::from(<span class="macro">vec!</span>[Span::raw(<span class="string">&quot;My&quot;</span>), Span::raw(<span class="string">&quot; text&quot;</span>)]);
+        <span class="kw">let </span><span class="kw-2">mut </span>raw_line = Line::from(<span class="macro">vec!</span>[Span::raw(<span class="string">"My"</span>), Span::raw(<span class="string">" text"</span>)]);
         <span class="kw">let </span>styled_line = Line::from(<span class="macro">vec!</span>[
-            Span::styled(<span class="string">&quot;My&quot;</span>, style),
-            Span::styled(<span class="string">&quot; text&quot;</span>, style),
+            Span::styled(<span class="string">"My"</span>, style),
+            Span::styled(<span class="string">" text"</span>, style),
         ]);
 
         <span class="macro">assert_ne!</span>(raw_line, styled_line);
@@ -598,8 +599,8 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_reset_style() {
         <span class="kw">let </span><span class="kw-2">mut </span>line = Line::from(<span class="macro">vec!</span>[
-            Span::styled(<span class="string">&quot;My&quot;</span>, Style::default().fg(Color::Yellow)),
-            Span::styled(<span class="string">&quot; text&quot;</span>, Style::default().add_modifier(Modifier::BOLD)),
+            Span::styled(<span class="string">"My"</span>, Style::default().fg(Color::Yellow)),
+            Span::styled(<span class="string">" text"</span>, Style::default().add_modifier(Modifier::BOLD)),
         ]);
 
         line.reset_style();
@@ -609,23 +610,23 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_from_string() {
-        <span class="kw">let </span>s = String::from(<span class="string">&quot;Hello, world!&quot;</span>);
+        <span class="kw">let </span>s = String::from(<span class="string">"Hello, world!"</span>);
         <span class="kw">let </span>line = Line::from(s);
-        <span class="macro">assert_eq!</span>(<span class="macro">vec!</span>[Span::from(<span class="string">&quot;Hello, world!&quot;</span>)], line.spans);
+        <span class="macro">assert_eq!</span>(<span class="macro">vec!</span>[Span::from(<span class="string">"Hello, world!"</span>)], line.spans);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_from_str() {
-        <span class="kw">let </span>s = <span class="string">&quot;Hello, world!&quot;</span>;
+        <span class="kw">let </span>s = <span class="string">"Hello, world!"</span>;
         <span class="kw">let </span>line = Line::from(s);
-        <span class="macro">assert_eq!</span>(<span class="macro">vec!</span>[Span::from(<span class="string">&quot;Hello, world!&quot;</span>)], line.spans);
+        <span class="macro">assert_eq!</span>(<span class="macro">vec!</span>[Span::from(<span class="string">"Hello, world!"</span>)], line.spans);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_from_vec() {
         <span class="kw">let </span>spans = <span class="macro">vec!</span>[
-            Span::styled(<span class="string">&quot;Hello,&quot;</span>, Style::default().fg(Color::Red)),
-            Span::styled(<span class="string">&quot; world!&quot;</span>, Style::default().fg(Color::Green)),
+            Span::styled(<span class="string">"Hello,"</span>, Style::default().fg(Color::Red)),
+            Span::styled(<span class="string">" world!"</span>, Style::default().fg(Color::Green)),
         ];
         <span class="kw">let </span>line = Line::from(spans.clone());
         <span class="macro">assert_eq!</span>(spans, line.spans);
@@ -633,7 +634,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_from_span() {
-        <span class="kw">let </span>span = Span::styled(<span class="string">&quot;Hello, world!&quot;</span>, Style::default().fg(Color::Yellow));
+        <span class="kw">let </span>span = Span::styled(<span class="string">"Hello, world!"</span>, Style::default().fg(Color::Yellow));
         <span class="kw">let </span>line = Line::from(span.clone());
         <span class="macro">assert_eq!</span>(<span class="macro">vec!</span>[span], line.spans);
     }
@@ -641,19 +642,19 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_into_string() {
         <span class="kw">let </span>line = Line::from(<span class="macro">vec!</span>[
-            Span::styled(<span class="string">&quot;Hello,&quot;</span>, Style::default().fg(Color::Red)),
-            Span::styled(<span class="string">&quot; world!&quot;</span>, Style::default().fg(Color::Green)),
+            Span::styled(<span class="string">"Hello,"</span>, Style::default().fg(Color::Red)),
+            Span::styled(<span class="string">" world!"</span>, Style::default().fg(Color::Green)),
         ]);
         <span class="kw">let </span>s: String = line.into();
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;Hello, world!&quot;</span>, s);
+        <span class="macro">assert_eq!</span>(<span class="string">"Hello, world!"</span>, s);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_alignment() {
-        <span class="kw">let </span>line = Line::from(<span class="string">&quot;This is left&quot;</span>).alignment(Alignment::Left);
+        <span class="kw">let </span>line = Line::from(<span class="string">"This is left"</span>).alignment(Alignment::Left);
         <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(Alignment::Left), line.alignment);
 
-        <span class="kw">let </span>line = Line::from(<span class="string">&quot;This is default&quot;</span>);
+        <span class="kw">let </span>line = Line::from(<span class="string">"This is default"</span>);
         <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, line.alignment);
     }
 
@@ -667,9 +668,9 @@
         <span class="kw">const </span>BLUE_ON_WHITE: Style = Style::new().fg(Color::Blue).bg(Color::White);
 
         <span class="kw">let </span>line = Line::from(<span class="macro">vec!</span>[
-            Span::styled(<span class="string">&quot;He&quot;</span>, RED),
-            Span::styled(<span class="string">&quot;ll&quot;</span>, GREEN),
-            Span::styled(<span class="string">&quot;o!&quot;</span>, BLUE),
+            Span::styled(<span class="string">"He"</span>, RED),
+            Span::styled(<span class="string">"ll"</span>, GREEN),
+            Span::styled(<span class="string">"o!"</span>, BLUE),
         ]);
         <span class="kw">let </span>styled_graphemes = line
             .styled_graphemes(Style::new().bg(Color::White))
@@ -677,24 +678,24 @@
         <span class="macro">assert_eq!</span>(
             styled_graphemes,
             <span class="macro">vec!</span>[
-                StyledGrapheme::new(<span class="string">&quot;H&quot;</span>, RED_ON_WHITE),
-                StyledGrapheme::new(<span class="string">&quot;e&quot;</span>, RED_ON_WHITE),
-                StyledGrapheme::new(<span class="string">&quot;l&quot;</span>, GREEN_ON_WHITE),
-                StyledGrapheme::new(<span class="string">&quot;l&quot;</span>, GREEN_ON_WHITE),
-                StyledGrapheme::new(<span class="string">&quot;o&quot;</span>, BLUE_ON_WHITE),
-                StyledGrapheme::new(<span class="string">&quot;!&quot;</span>, BLUE_ON_WHITE),
+                StyledGrapheme::new(<span class="string">"H"</span>, RED_ON_WHITE),
+                StyledGrapheme::new(<span class="string">"e"</span>, RED_ON_WHITE),
+                StyledGrapheme::new(<span class="string">"l"</span>, GREEN_ON_WHITE),
+                StyledGrapheme::new(<span class="string">"l"</span>, GREEN_ON_WHITE),
+                StyledGrapheme::new(<span class="string">"o"</span>, BLUE_ON_WHITE),
+                StyledGrapheme::new(<span class="string">"!"</span>, BLUE_ON_WHITE),
             ],
         );
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>raw_str() {
-        <span class="kw">let </span>line = Line::raw(<span class="string">&quot;test content&quot;</span>);
-        <span class="macro">assert_eq!</span>(line.spans, <span class="macro">vec!</span>[Span::raw(<span class="string">&quot;test content&quot;</span>)]);
+        <span class="kw">let </span>line = Line::raw(<span class="string">"test content"</span>);
+        <span class="macro">assert_eq!</span>(line.spans, <span class="macro">vec!</span>[Span::raw(<span class="string">"test content"</span>)]);
         <span class="macro">assert_eq!</span>(line.alignment, <span class="prelude-val">None</span>);
 
-        <span class="kw">let </span>line = Line::raw(<span class="string">&quot;a\nb&quot;</span>);
-        <span class="macro">assert_eq!</span>(line.spans, <span class="macro">vec!</span>[Span::raw(<span class="string">&quot;a&quot;</span>), Span::raw(<span class="string">&quot;b&quot;</span>)]);
+        <span class="kw">let </span>line = Line::raw(<span class="string">"a\nb"</span>);
+        <span class="macro">assert_eq!</span>(line.spans, <span class="macro">vec!</span>[Span::raw(<span class="string">"a"</span>), Span::raw(<span class="string">"b"</span>)]);
         <span class="macro">assert_eq!</span>(line.alignment, <span class="prelude-val">None</span>);
     }
 }

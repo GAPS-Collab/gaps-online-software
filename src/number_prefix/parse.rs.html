@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/number_prefix-0.4.0/src/parse.rs`."><title>parse.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="number_prefix" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/number_prefix-0.4.0/src/parse.rs`."><title>parse.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="number_prefix" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -95,8 +96,8 @@
 
     <span class="kw">fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Err&gt; {
         <span class="kw">let </span>splitted = s.find(|p| {
-            p == <span class="string">&#39;k&#39; </span>|| p == <span class="string">&#39;K&#39; </span>|| p == <span class="string">&#39;M&#39; </span>|| p == <span class="string">&#39;G&#39; </span>|| p == <span class="string">&#39;T&#39; </span>||
-            p == <span class="string">&#39;P&#39; </span>|| p == <span class="string">&#39;E&#39; </span>|| p == <span class="string">&#39;Z&#39; </span>|| p == <span class="string">&#39;Y&#39;
+            p == <span class="string">'k' </span>|| p == <span class="string">'K' </span>|| p == <span class="string">'M' </span>|| p == <span class="string">'G' </span>|| p == <span class="string">'T' </span>||
+            p == <span class="string">'P' </span>|| p == <span class="string">'E' </span>|| p == <span class="string">'Z' </span>|| p == <span class="string">'Y'
         </span>});
 
         <span class="kw">let </span>num_prefix = s.split_at(splitted.unwrap_or(s.len()));
@@ -106,28 +107,28 @@
         };
 
         <span class="kw">let </span>prefix_unit = num_prefix.<span class="number">1</span>.trim_matches(|p|
-                p == <span class="string">&#39;b&#39; </span>|| p == <span class="string">&#39;B&#39; </span>|| p == <span class="string">&#39;m&#39;
+                p == <span class="string">'b' </span>|| p == <span class="string">'B' </span>|| p == <span class="string">'m'
             </span>);
 
         <span class="kw">let </span>prefix = <span class="kw">match </span>prefix_unit {
-            <span class="string">&quot;k&quot;  </span>|
-            <span class="string">&quot;K&quot;  </span>=&gt; Prefix::Kilo,
-            <span class="string">&quot;M&quot;  </span>=&gt; Prefix::Mega,
-            <span class="string">&quot;G&quot;  </span>=&gt; Prefix::Giga,
-            <span class="string">&quot;T&quot;  </span>=&gt; Prefix::Tera,
-            <span class="string">&quot;P&quot;  </span>=&gt; Prefix::Peta,
-            <span class="string">&quot;E&quot;  </span>=&gt; Prefix::Exa,
-            <span class="string">&quot;Z&quot;  </span>=&gt; Prefix::Zetta,
-            <span class="string">&quot;Y&quot;  </span>=&gt; Prefix::Yotta,
-            <span class="string">&quot;Ki&quot; </span>=&gt; Prefix::Kibi,
-            <span class="string">&quot;Mi&quot; </span>=&gt; Prefix::Mebi,
-            <span class="string">&quot;Gi&quot; </span>=&gt; Prefix::Gibi,
-            <span class="string">&quot;Ti&quot; </span>=&gt; Prefix::Tebi,
-            <span class="string">&quot;Pi&quot; </span>=&gt; Prefix::Pebi,
-            <span class="string">&quot;Ei&quot; </span>=&gt; Prefix::Exbi,
-            <span class="string">&quot;Zi&quot; </span>=&gt; Prefix::Zebi,
-            <span class="string">&quot;Yi&quot; </span>=&gt; Prefix::Yobi,
-            <span class="string">&quot;&quot;   </span>=&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(NumberPrefix::Standalone(num)),
+            <span class="string">"k"  </span>|
+            <span class="string">"K"  </span>=&gt; Prefix::Kilo,
+            <span class="string">"M"  </span>=&gt; Prefix::Mega,
+            <span class="string">"G"  </span>=&gt; Prefix::Giga,
+            <span class="string">"T"  </span>=&gt; Prefix::Tera,
+            <span class="string">"P"  </span>=&gt; Prefix::Peta,
+            <span class="string">"E"  </span>=&gt; Prefix::Exa,
+            <span class="string">"Z"  </span>=&gt; Prefix::Zetta,
+            <span class="string">"Y"  </span>=&gt; Prefix::Yotta,
+            <span class="string">"Ki" </span>=&gt; Prefix::Kibi,
+            <span class="string">"Mi" </span>=&gt; Prefix::Mebi,
+            <span class="string">"Gi" </span>=&gt; Prefix::Gibi,
+            <span class="string">"Ti" </span>=&gt; Prefix::Tebi,
+            <span class="string">"Pi" </span>=&gt; Prefix::Pebi,
+            <span class="string">"Ei" </span>=&gt; Prefix::Exbi,
+            <span class="string">"Zi" </span>=&gt; Prefix::Zebi,
+            <span class="string">"Yi" </span>=&gt; Prefix::Yobi,
+            <span class="string">""   </span>=&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(NumberPrefix::Standalone(num)),
             <span class="kw">_    </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(NumberPrefixParseError(())),
         };
 
@@ -141,8 +142,8 @@
 </span><span class="kw">pub struct </span>NumberPrefixParseError(());
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>NumberPrefixParseError {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
-        fmt.write_str(<span class="string">&quot;invalid prefix syntax&quot;</span>)
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
+        fmt.write_str(<span class="string">"invalid prefix syntax"</span>)
     }
 }
 
@@ -156,9 +157,9 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>parse_examples() {
-        <span class="kw">let </span>parse_example_a = <span class="string">&quot;7.05E&quot;</span>.parse::&lt;NumberPrefix&lt;f64&gt;&gt;();
-        <span class="kw">let </span>parse_example_b = <span class="string">&quot;7.05&quot;</span>.parse::&lt;NumberPrefix&lt;f64&gt;&gt;();
-        <span class="kw">let </span>parse_example_c = <span class="string">&quot;7.05 GiB&quot;</span>.parse::&lt;NumberPrefix&lt;f64&gt;&gt;();
+        <span class="kw">let </span>parse_example_a = <span class="string">"7.05E"</span>.parse::&lt;NumberPrefix&lt;f64&gt;&gt;();
+        <span class="kw">let </span>parse_example_b = <span class="string">"7.05"</span>.parse::&lt;NumberPrefix&lt;f64&gt;&gt;();
+        <span class="kw">let </span>parse_example_c = <span class="string">"7.05 GiB"</span>.parse::&lt;NumberPrefix&lt;f64&gt;&gt;();
 
         <span class="macro">assert_eq!</span>(parse_example_a, <span class="prelude-val">Ok</span>(NumberPrefix::Prefixed(Prefix::Exa, <span class="number">7.05_f64</span>)));
         <span class="macro">assert_eq!</span>(parse_example_b, <span class="prelude-val">Ok</span>(NumberPrefix::Standalone(<span class="number">7.05_f64</span>)));
@@ -167,7 +168,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>bad_parse() {
-        <span class="kw">let </span>parsed = <span class="string">&quot;bogo meters per second&quot;</span>.parse::&lt;NumberPrefix&lt;f64&gt;&gt;();
+        <span class="kw">let </span>parsed = <span class="string">"bogo meters per second"</span>.parse::&lt;NumberPrefix&lt;f64&gt;&gt;();
 
         <span class="macro">assert_ne!</span>(parsed, <span class="prelude-val">Ok</span>(NumberPrefix::Prefixed(Prefix::Kilo, <span class="number">7.05_f64</span>)));
     }

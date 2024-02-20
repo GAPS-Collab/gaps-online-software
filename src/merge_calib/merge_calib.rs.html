@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-analysis/src/bin/merge_calib.rs`."><title>merge_calib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="merge_calib" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-analysis/src/bin/merge_calib.rs`."><title>merge_calib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="merge_calib" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -187,7 +188,7 @@
 
 
 <span class="attr">#[derive(Parser, Default, Debug)]
-#[command(author = <span class="string">&quot;J.A.Stoessl&quot;</span>, version, about, long_about = <span class="prelude-val">None</span>)]
+#[command(author = <span class="string">"J.A.Stoessl"</span>, version, about, long_about = <span class="prelude-val">None</span>)]
 </span><span class="kw">struct </span>Args {
   <span class="doccomment">/// input folder with noi, vcal and tcal files
   </span>cali_data: PathBuf,
@@ -197,9 +198,9 @@
 <span class="kw">fn </span>main() {
   env_logger::builder()
   .format(|buf, record| {
-  <span class="macro">writeln!</span>( buf, <span class="string">&quot;[{level}][{module_path}:{line}] {args}&quot;</span>,
+  <span class="macro">writeln!</span>( buf, <span class="string">"[{level}][{module_path}:{line}] {args}"</span>,
     level = color_log(<span class="kw-2">&amp;</span>record.level()),
-    module_path = record.module_path().unwrap_or(<span class="string">&quot;&lt;unknown&gt;&quot;</span>),
+    module_path = record.module_path().unwrap_or(<span class="string">"&lt;unknown&gt;"</span>),
     <span class="comment">//target = record.target(),
     </span>line = record.line().unwrap_or(<span class="number">0</span>),
     args = record.args()
@@ -210,11 +211,11 @@
   <span class="kw">let </span>args               = Args::parse();
   <span class="kw">let </span><span class="kw-2">mut </span>board_ids      = Vec::&lt;u8&gt;::new(); 
   <span class="kw">let </span><span class="kw-2">mut </span>calibrations   = HashMap::&lt;u8, RBCalibrations&gt;::new();
-  <span class="kw">let </span>rb_pattern = <span class="string">r#&quot;rb(\d{1,2})&quot;#</span>; 
+  <span class="kw">let </span>rb_pattern = <span class="string">r#"rb(\d{1,2})"#</span>; 
   <span class="kw">let </span>rb_regex   = Regex::new(rb_pattern).unwrap();
-  <span class="kw">let </span>template_bar   : <span class="kw-2">&amp;</span>str = <span class="string">&quot;[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.blue/grey} {human_pos:&gt;7}/{human_len:7} &quot;</span>;
+  <span class="kw">let </span>template_bar   : <span class="kw-2">&amp;</span>str = <span class="string">"[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.blue/grey} {human_pos:&gt;7}/{human_len:7} "</span>;
   <span class="kw">let </span><span class="kw-2">mut </span>files = Vec::&lt;String&gt;::new();
-  <span class="kw">if let </span><span class="prelude-val">Ok</span>(entries) = glob(<span class="kw-2">&amp;</span>(args.cali_data.to_str().unwrap().to_owned() + <span class="string">&quot;/*&quot;</span>)){
+  <span class="kw">if let </span><span class="prelude-val">Ok</span>(entries) = glob(<span class="kw-2">&amp;</span>(args.cali_data.to_str().unwrap().to_owned() + <span class="string">"/*"</span>)){
     <span class="kw">for </span>entry <span class="kw">in </span>entries {
       <span class="kw">let </span>filename = entry.as_ref().unwrap().to_str().unwrap();
       files.push(filename.to_string());
@@ -222,13 +223,13 @@
   } 
   <span class="kw">let </span>bar                   = ProgressBar::new(files.len() <span class="kw">as </span>u64);
   <span class="kw">let </span>sty_bar               = ProgressStyle::with_template(template_bar).unwrap();
-  bar.set_message(<span class="string">&quot;Processing calibrations...&quot;</span>);
-  bar.set_prefix(<span class="string">&quot;&quot;</span>);
+  bar.set_message(<span class="string">"Processing calibrations..."</span>);
+  bar.set_prefix(<span class="string">""</span>);
   bar.set_style(sty_bar);
   bar.set_position(<span class="number">0</span>);
   <span class="kw">let </span><span class="kw-2">mut </span>n_processed = <span class="number">0</span>;
   <span class="kw">for </span>filename <span class="kw">in </span>files.iter() {
-    bar.println(<span class="string">&quot;Checking &quot;</span>.to_owned() + filename + <span class="string">&quot; ..&quot;</span>);
+    bar.println(<span class="string">"Checking "</span>.to_owned() + filename + <span class="string">" .."</span>);
     <span class="kw">if let </span><span class="prelude-val">Some</span>(mat) = rb_regex.captures(<span class="kw-2">&amp;</span>filename) {
       <span class="kw">let </span>rb_id = mat.get(<span class="number">1</span>).unwrap().as_str().parse::&lt;u8&gt;().unwrap();
       <span class="comment">//if rb_id != 1 {
@@ -239,34 +240,34 @@
         calibrations.insert(rb_id, RBCalibrations::new(rb_id));
       }
       <span class="kw">let </span>cali   = calibrations.get_mut(<span class="kw-2">&amp;</span>rb_id).unwrap();
-      <span class="kw">if </span>filename.to_string().ends_with(<span class="string">&quot;.vcal&quot;</span>) {
+      <span class="kw">if </span>filename.to_string().ends_with(<span class="string">".vcal"</span>) {
         <span class="kw">let </span><span class="kw-2">mut </span>reader    = RobinReader::new(filename.to_string());
         reader.cache_all_events();
         <span class="kw">let </span><span class="kw-2">mut </span>events = reader.get_events();
-        <span class="macro">println!</span>(<span class="string">&quot;=&gt; file {}&quot;</span>, filename);
-        <span class="macro">println!</span>(<span class="string">&quot;=&gt; Cache of size {}&quot;</span>, reader.get_cache_size());
+        <span class="macro">println!</span>(<span class="string">"=&gt; file {}"</span>, filename);
+        <span class="macro">println!</span>(<span class="string">"=&gt; Cache of size {}"</span>, reader.get_cache_size());
         events.dedup();
         cali.vcal_data = events;
-      } <span class="kw">else if </span>filename.to_string().ends_with(<span class="string">&quot;.tcal&quot;</span>) {
+      } <span class="kw">else if </span>filename.to_string().ends_with(<span class="string">".tcal"</span>) {
         <span class="kw">let </span><span class="kw-2">mut </span>reader    = RobinReader::new(filename.to_string());
         reader.cache_all_events();
         <span class="kw">let </span><span class="kw-2">mut </span>events = reader.get_events();
         events.dedup();
         events.sort_by(|a, b| a.header.event_id.cmp(<span class="kw-2">&amp;</span>b.header.event_id));
         cali.tcal_data = events;
-      } <span class="kw">else if </span>filename.to_string().ends_with(<span class="string">&quot;.noi&quot;</span>) {
+      } <span class="kw">else if </span>filename.to_string().ends_with(<span class="string">".noi"</span>) {
         <span class="kw">let </span><span class="kw-2">mut </span>reader    = RobinReader::new(filename.to_string());
         reader.cache_all_events();
         <span class="kw">let </span><span class="kw-2">mut </span>events = reader.get_events();
         events.dedup();
         cali.noi_data = events;
       } <span class="kw">else </span>{
-        <span class="macro">println!</span>(<span class="string">&quot;=&gt; Unable to identify file type of {}&quot;</span>, filename);
+        <span class="macro">println!</span>(<span class="string">"=&gt; Unable to identify file type of {}"</span>, filename);
       }
       <span class="comment">//values().cloned().collect()
     </span>} <span class="kw">else </span>{
-      <span class="macro">warn!</span>(<span class="string">&quot;Can&#39;t process {}&quot;</span>, filename);
-      <span class="comment">//panic!(&quot;=&gt; Unable to find calibration files in {}&quot;, args.cali_data.display());
+      <span class="macro">warn!</span>(<span class="string">"Can't process {}"</span>, filename);
+      <span class="comment">//panic!("=&gt; Unable to find calibration files in {}", args.cali_data.display());
     </span>}
     n_processed += <span class="number">1</span>;
     bar.set_position(n_processed);
@@ -275,25 +276,25 @@
   // remove tripled board ids
   </span>board_ids.dedup();
   <span class="kw">for </span>rb <span class="kw">in </span>board_ids.iter() {
-    <span class="macro">println!</span>(<span class="string">&quot;=&gt; Cali: {}&quot;</span>,calibrations[<span class="kw-2">&amp;</span>rb]);
+    <span class="macro">println!</span>(<span class="string">"=&gt; Cali: {}"</span>,calibrations[<span class="kw-2">&amp;</span>rb]);
     calibrations.get_mut(<span class="kw-2">&amp;</span>rb).unwrap().clean_input_data();
     <span class="kw">match </span>calibrations.get_mut(<span class="kw-2">&amp;</span>rb).unwrap().calibrate() {
       <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; (),
       <span class="prelude-val">Err</span>(err) =&gt; {
-        <span class="macro">error!</span>(<span class="string">&quot;Can not calibrate data for RB {}! {err}&quot;</span>, rb);
+        <span class="macro">error!</span>(<span class="string">"Can not calibrate data for RB {}! {err}"</span>, rb);
         exit(<span class="number">1</span>);
       }
     }
-    <span class="macro">println!</span>(<span class="string">&quot;=&gt; Cali: {}&quot;</span>,calibrations[<span class="kw-2">&amp;</span>rb]);
+    <span class="macro">println!</span>(<span class="string">"=&gt; Cali: {}"</span>,calibrations[<span class="kw-2">&amp;</span>rb]);
     calibrations.get_mut(<span class="kw-2">&amp;</span>rb).unwrap().serialize_event_data = <span class="bool-val">true</span>;
     <span class="kw">let </span>ftype = FileType::CalibrationFile(<span class="kw-2">*</span>rb);
     <span class="kw">let </span>tp   = TofPacket::from(<span class="kw-2">&amp;</span>calibrations[<span class="kw-2">&amp;</span>rb]);
-    <span class="kw">let </span>cali_filename = <span class="macro">format!</span>(<span class="string">&quot;rb{:02}.cali&quot;</span>, rb);
+    <span class="kw">let </span>cali_filename = <span class="macro">format!</span>(<span class="string">"rb{:02}.cali"</span>, rb);
     <span class="kw">let </span><span class="kw-2">mut </span>writer = TofPacketWriter::new(cali_filename,ftype);
     writer.add_tof_packet(<span class="kw-2">&amp;</span>tp);
-    <span class="macro">println!</span>(<span class="string">&quot;=&gt; Calibration saved!&quot;</span>);
+    <span class="macro">println!</span>(<span class="string">"=&gt; Calibration saved!"</span>);
   }
-<span class="macro">println!</span>(<span class="string">&quot;=&gt; Done!&quot;</span>);
+<span class="macro">println!</span>(<span class="string">"=&gt; Done!"</span>);
 }
 
 </code></pre></div></section></main></body></html>

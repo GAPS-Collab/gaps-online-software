@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-cc/src/bin/liftof_mt.rs`."><title>liftof_mt.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="liftof_mt" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-cc/src/bin/liftof_mt.rs`."><title>liftof_mt.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="liftof_mt" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -291,7 +292,7 @@
 <span class="kw">use </span>clap::Parser;
 
 <span class="attr">#[derive(Parser, Default, Debug)]
-#[command(author = <span class="string">&quot;J.A.Stoessl&quot;</span>, version, about, long_about = <span class="prelude-val">None</span>)]
+#[command(author = <span class="string">"J.A.Stoessl"</span>, version, about, long_about = <span class="prelude-val">None</span>)]
 </span><span class="kw">struct </span>Args {
   <span class="doccomment">/// More printout to std::out
   </span><span class="attr">#[arg(long, default_value_t=<span class="bool-val">false</span>)]
@@ -316,20 +317,20 @@
 
 <span class="kw">fn </span>rb_relay() {
   <span class="kw">let </span>ctx = zmq::Context::new();
-  <span class="kw">let </span>socket = ctx.socket(zmq::SUB).expect(<span class="string">&quot;Unable to create 0MQ SUB socket!&quot;</span>);
-  <span class="kw">let </span>socket_out = ctx.socket(zmq::PUB).expect(<span class="string">&quot;Unable to create 0MQ PUB socket!&quot;</span>);
+  <span class="kw">let </span>socket = ctx.socket(zmq::SUB).expect(<span class="string">"Unable to create 0MQ SUB socket!"</span>);
+  <span class="kw">let </span>socket_out = ctx.socket(zmq::PUB).expect(<span class="string">"Unable to create 0MQ PUB socket!"</span>);
   <span class="kw">for </span>rb_id <span class="kw">in </span><span class="number">1</span>..<span class="number">41 </span>{
-    <span class="kw">let </span>address = <span class="macro">format!</span>(<span class="string">&quot;tcp://10.0.1.1{:02}:42000&quot;</span>, rb_id);
-    socket.connect(<span class="kw-2">&amp;</span>address).expect(<span class="string">&quot;Unable to bind to data (PUB) socket {adress}&quot;</span>);
-    <span class="macro">println!</span>(<span class="string">&quot;==&gt; 0MQ PUB socket bound to address {address}&quot;</span>);
+    <span class="kw">let </span>address = <span class="macro">format!</span>(<span class="string">"tcp://10.0.1.1{:02}:42000"</span>, rb_id);
+    socket.connect(<span class="kw-2">&amp;</span>address).expect(<span class="string">"Unable to bind to data (PUB) socket {adress}"</span>);
+    <span class="macro">println!</span>(<span class="string">"==&gt; 0MQ PUB socket bound to address {address}"</span>);
   }
-  <span class="kw">match </span>socket.set_subscribe(<span class="string">b&quot;&quot;</span>) {
-    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Unable to subscribe to any message! {err}&quot;</span>),
+  <span class="kw">match </span>socket.set_subscribe(<span class="string">b""</span>) {
+    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to subscribe to any message! {err}"</span>),
     <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
   }
-  <span class="kw">let </span>address_out : <span class="kw-2">&amp;</span>str = <span class="string">&quot;tcp://100.96.207.91:42001&quot;</span>;
+  <span class="kw">let </span>address_out : <span class="kw-2">&amp;</span>str = <span class="string">"tcp://100.96.207.91:42001"</span>;
   <span class="kw">match </span>socket_out.bind(address_out) {
-    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Unable to bind to PUB socket at {}! {err}&quot;</span>, address_out),
+    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to bind to PUB socket at {}! {err}"</span>, address_out),
     <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
   }
   <span class="kw">loop </span>{
@@ -349,7 +350,7 @@
 <span class="kw">fn </span>main() {
 
   init_env_logger();
-  <span class="macro">info!</span>(<span class="string">&quot;Logging initialized!&quot;</span>);
+  <span class="macro">info!</span>(<span class="string">"Logging initialized!"</span>);
   <span class="kw">let </span>(mte_send, mte_rec): (cbc::Sender&lt;MasterTriggerEvent&gt;, cbc::Receiver&lt;MasterTriggerEvent&gt;) = cbc::unbounded(); 
   <span class="kw">let </span>(tp_send_moni, tp_rec_moni): (cbc::Sender&lt;TofPacket&gt;, cbc::Receiver&lt;TofPacket&gt;) = cbc::unbounded(); 
   <span class="kw">let </span>(tp_send_req, tp_rec_req): (cbc::Sender&lt;TofPacket&gt;, cbc::Receiver&lt;TofPacket&gt;) = cbc::unbounded(); 
@@ -358,7 +359,7 @@
   //let thread_control = Arc::new(Mutex::new(ThreadControl::default()));
 
   </span><span class="kw">let </span><span class="kw-2">mut </span>ltb_rb_map : DsiLtbRBMapping = HashMap::&lt;u8,HashMap::&lt;u8,HashMap::&lt;u8,(u8,u8)&gt;&gt;&gt;::new();
-  <span class="kw">let </span>mt_address          = String::from(<span class="string">&quot;10.0.1.10:50001&quot;</span>);
+  <span class="kw">let </span>mt_address          = String::from(<span class="string">"10.0.1.10:50001"</span>);
 
   <span class="kw">let </span>args                = Args::parse();
   <span class="kw">let </span>verbose             = args.verbose;
@@ -374,7 +375,7 @@
   <span class="kw">if </span>args.send_requests {
     <span class="kw">match </span>args.json_ltb_rb_map {
       <span class="prelude-val">None </span>=&gt; {
-        <span class="macro">panic!</span>(<span class="string">&quot;Will need json ltb -&gt; rb mapping when we want to send requests!&quot;</span>)
+        <span class="macro">panic!</span>(<span class="string">"Will need json ltb -&gt; rb mapping when we want to send requests!"</span>)
       },
       <span class="prelude-val">Some</span>(_json_ltb_rb_map) =&gt; {
         ltb_rb_map = get_ltb_dsi_j_ch_mapping(_json_ltb_rb_map);
@@ -382,7 +383,7 @@
     }
   }
   <span class="kw">let </span>_worker_thread = thread::Builder::new()
-         .name(<span class="string">&quot;master_trigger&quot;</span>.into())
+         .name(<span class="string">"master_trigger"</span>.into())
          .spawn(<span class="kw">move </span>|| {
             master_trigger(mt_address, 
                            <span class="kw-2">&amp;</span>ltb_rb_map,
@@ -393,81 +394,81 @@
                            verbose,
                            send_requests);
          })
-         .expect(<span class="string">&quot;Failed to spawn master_trigger thread!&quot;</span>);
+         .expect(<span class="string">"Failed to spawn master_trigger thread!"</span>);
  <span class="kw">if </span>send_requests {
    <span class="kw">let </span>_rbcmd_thread = thread::Builder::new()
-                       .name(<span class="string">&quot;rb_commander&quot;</span>.into())
+                       .name(<span class="string">"rb_commander"</span>.into())
                        .spawn(<span class="kw">move </span>|| {
                          readoutboard_commander(<span class="kw-2">&amp;</span>tp_rec_req); 
                         })
-                       .expect(<span class="string">&quot;Failed to spawn rb_commander thread!&quot;</span>);
+                       .expect(<span class="string">"Failed to spawn rb_commander thread!"</span>);
  }
  <span class="kw">if </span>relay_rbs {
    <span class="kw">let </span>_relay_thread = thread::Builder::new()
-                       .name(<span class="string">&quot;rb_relay&quot;</span>.into())
+                       .name(<span class="string">"rb_relay"</span>.into())
                        .spawn(<span class="kw">move </span>|| {
                          rb_relay(); 
                         })
-                       .expect(<span class="string">&quot;Failed to spawn rb_relay thread!&quot;</span>);
+                       .expect(<span class="string">"Failed to spawn rb_relay thread!"</span>);
  
  }
  <span class="kw">let </span><span class="kw-2">mut </span>n_events = <span class="number">0u64</span>;
  <span class="kw">let </span>ctx = zmq::Context::new();
- <span class="kw">let </span>address : <span class="kw-2">&amp;</span>str = <span class="string">&quot;tcp://100.96.207.91:42000&quot;</span>;
- <span class="kw">let </span>data_socket = ctx.socket(zmq::PUB).expect(<span class="string">&quot;Unable to create 0MQ PUB socket!&quot;</span>);
+ <span class="kw">let </span>address : <span class="kw-2">&amp;</span>str = <span class="string">"tcp://100.96.207.91:42000"</span>;
+ <span class="kw">let </span>data_socket = ctx.socket(zmq::PUB).expect(<span class="string">"Unable to create 0MQ PUB socket!"</span>);
  <span class="kw">if </span>publish_packets {
-   data_socket.bind(address).expect(<span class="string">&quot;Unable to bind to data (PUB) socket {adress}&quot;</span>);
-   <span class="macro">println!</span>(<span class="string">&quot;==&gt; 0MQ PUB socket bound to address {address}&quot;</span>);
+   data_socket.bind(address).expect(<span class="string">"Unable to bind to data (PUB) socket {adress}"</span>);
+   <span class="macro">println!</span>(<span class="string">"==&gt; 0MQ PUB socket bound to address {address}"</span>);
  }
  <span class="kw">loop </span>{
    <span class="kw">match </span>mte_rec.recv() {
-     <span class="prelude-val">Err</span>(err)  =&gt; <span class="macro">debug!</span>(<span class="string">&quot;Can not receive events! Error {err}&quot;</span>),
+     <span class="prelude-val">Err</span>(err)  =&gt; <span class="macro">debug!</span>(<span class="string">"Can not receive events! Error {err}"</span>),
      <span class="prelude-val">Ok</span>(_ev)    =&gt; {
        <span class="comment">//if ev.n_paddles &gt; 0 {
-       //  println!(&quot;Received event {}&quot;, ev);
+       //  println!("Received event {}", ev);
        //}
        </span><span class="kw">if </span>publish_packets {
          <span class="kw">let </span>tp = TofPacket::from(<span class="kw-2">&amp;</span>_ev);
          <span class="kw">match </span>data_socket.send(tp.to_bytestream(), <span class="number">0</span>) {
-           <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Can&#39;t send TofPacket! {err}&quot;</span>),
+           <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Can't send TofPacket! {err}"</span>),
            <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
          }
        }
        <span class="kw">if </span>n_events % <span class="number">100 </span>== <span class="number">0 </span>{
          <span class="kw">if </span>verbose {
-           <span class="macro">println!</span>(<span class="string">&quot;{}&quot;</span>, _ev);
+           <span class="macro">println!</span>(<span class="string">"{}"</span>, _ev);
          }
        } 
        n_events += <span class="number">1</span>;
      }
    }
    <span class="kw">match </span>tp_rec_moni.try_recv() {
-     <span class="prelude-val">Err</span>(err)  =&gt; <span class="macro">debug!</span>(<span class="string">&quot;Can not receive events! Error {err}&quot;</span>),
+     <span class="prelude-val">Err</span>(err)  =&gt; <span class="macro">debug!</span>(<span class="string">"Can not receive events! Error {err}"</span>),
      <span class="prelude-val">Ok</span>(_moni)    =&gt; {
        <span class="kw">if </span>publish_packets {
          <span class="comment">//let tp = TofPacket::from(&amp;_moni);
          </span><span class="kw">match </span>data_socket.send(_moni.to_bytestream(), <span class="number">0</span>) {
-           <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Can&#39;t send TofPacket! {err}&quot;</span>),
+           <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Can't send TofPacket! {err}"</span>),
            <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
          }
        }
        <span class="kw">if </span>verbose {
-         <span class="macro">println!</span>(<span class="string">&quot;{}&quot;</span>, _moni);
+         <span class="macro">println!</span>(<span class="string">"{}"</span>, _moni);
        }
        n_events += <span class="number">1</span>;
      }
    }
    <span class="comment">//match tp_rec_req.recv() {
-   //  Err(err) =&gt; debug!(&quot;Can not receive requests! {err}&quot;),
+   //  Err(err) =&gt; debug!("Can not receive requests! {err}"),
    //  Ok(req) =&gt; {
    //    let cmd = RBCommand::from(&amp;req);
-   //    println!(&quot;==&gt; Received requeest {}&quot;, cmd);
+   //    println!("==&gt; Received requeest {}", cmd);
    //    //match RBCommand::from(req) {
    //    //  Ok(cmd) =&gt; {
-   //    //    println!(&quot;==&gt; Received request {}&quot;, cmd);
+   //    //    println!("==&gt; Received request {}", cmd);
    //    //  },
    //    //  Err(err) =&gt; {
-   //    //    error!(&quot;Can&#39;t decode rb command!&quot;);
+   //    //    error!("Can't decode rb command!");
    //    //  }
    //    //}
    //  }

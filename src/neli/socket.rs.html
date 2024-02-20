@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/neli-0.6.4/src/socket.rs`."><title>socket.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="neli" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/neli-0.6.4/src/socket.rs`."><title>socket.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="neli" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -962,13 +963,13 @@
 //!
 //! ## Features
 //! The `async` feature exposed by `cargo` allows the socket to use
-//! Rust&#39;s [tokio](https://tokio.rs) for async IO.
+//! Rust's [tokio](https://tokio.rs) for async IO.
 //!
 //! ## Additional methods
 //!
 //! There are methods for blocking and non-blocking, resolving
 //! generic netlink multicast group IDs, and other convenience
-//! functions so see if your use case is supported. If it isn&#39;t,
+//! functions so see if your use case is supported. If it isn't,
 //! please open a Github issue and submit a feature request.
 //!
 //! ## Design decisions
@@ -1361,7 +1362,7 @@
         family_name: <span class="kw-2">&amp;</span>str,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;u16, NlError&lt;GenlId, Genlmsghdr&lt;CtrlCmd, CtrlAttr&gt;&gt;&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>res = <span class="prelude-val">Err</span>(NlError::new(<span class="macro">format!</span>(
-            <span class="string">&quot;Generic netlink family {} was not found&quot;</span>,
+            <span class="string">"Generic netlink family {} was not found"</span>,
             family_name
         )));
 
@@ -1386,7 +1387,7 @@
         mcast_name: <span class="kw-2">&amp;</span>str,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;u32, NlError&lt;GenlId, Genlmsghdr&lt;CtrlCmd, CtrlAttr&gt;&gt;&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>res = <span class="prelude-val">Err</span>(NlError::new(<span class="macro">format!</span>(
-            <span class="string">&quot;Failed to resolve multicast group ID for family name {}, multicast group name {}&quot;</span>,
+            <span class="string">"Failed to resolve multicast group ID for family name {}, multicast group name {}"</span>,
             family_name, mcast_name,
         )));
 
@@ -1421,7 +1422,7 @@
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         id: u32,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;(String, String), NlError&lt;GenlId, Genlmsghdr&lt;CtrlCmd, CtrlAttr&gt;&gt;&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>res = <span class="prelude-val">Err</span>(NlError::new(<span class="string">&quot;ID does not correspond to a multicast group&quot;</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>res = <span class="prelude-val">Err</span>(NlError::new(<span class="string">"ID does not correspond to a multicast group"</span>));
 
         <span class="kw">let </span>attrs = GenlBuffer::new();
         <span class="kw">let </span>genlhdr = Genlmsghdr::&lt;CtrlCmd, CtrlAttr&gt;::new(CtrlCmd::Getfamily, <span class="number">2</span>, attrs);
@@ -1469,7 +1470,7 @@
         </span>T: NlType + Debug,
         P: ToBytes + Debug,
     {
-        <span class="macro">debug!</span>(<span class="string">&quot;Message sent:\n{:?}&quot;</span>, msg);
+        <span class="macro">debug!</span>(<span class="string">"Message sent:\n{:?}"</span>, msg);
 
         <span class="kw">if </span>msg.nl_flags.contains(<span class="kw-2">&amp;</span>NlmF::Ack) &amp;&amp; !msg.nl_flags.contains(<span class="kw-2">&amp;</span>NlmF::Dump) {
             <span class="self">self</span>.needs_ack = <span class="bool-val">true</span>;
@@ -1490,10 +1491,10 @@
     /// Returns [`None`] only in non-blocking contexts if no
     /// message can be immediately returned or if the socket
     /// has been closed.
-    </span><span class="kw">pub fn </span>recv&lt;<span class="lifetime">&#39;a</span>, T, P&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Nlmsghdr&lt;T, P&gt;&gt;, NlError&lt;T, P&gt;&gt;
+    </span><span class="kw">pub fn </span>recv&lt;<span class="lifetime">'a</span>, T, P&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Nlmsghdr&lt;T, P&gt;&gt;, NlError&lt;T, P&gt;&gt;
     <span class="kw">where
         </span>T: NlType + Debug,
-        P: FromBytesWithInput&lt;<span class="lifetime">&#39;a</span>, Input = usize&gt; + Debug,
+        P: FromBytesWithInput&lt;<span class="lifetime">'a</span>, Input = usize&gt; + Debug,
     {
         <span class="kw">if </span><span class="self">self</span>.end == <span class="self">self</span>.position {
             <span class="comment">// Read the buffer from the socket and fail if nothing
@@ -1524,7 +1525,7 @@
             // read into the buffer, return an error; something
             // has gone wrong.
             </span><span class="kw">if </span><span class="self">self</span>.position + next_packet_len &gt; end {
-                <span class="kw">return </span><span class="prelude-val">Err</span>(NlError::new(<span class="string">&quot;Incomplete packet received from socket&quot;</span>));
+                <span class="kw">return </span><span class="prelude-val">Err</span>(NlError::new(<span class="string">"Incomplete packet received from socket"</span>));
             }
 
             <span class="comment">// Deserialize the next Nlmsghdr struct.
@@ -1546,7 +1547,7 @@
             <span class="prelude-val">Err</span>(e) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(NlError::De(e)),
         };
 
-        <span class="macro">debug!</span>(<span class="string">&quot;Message received: {:?}&quot;</span>, packet);
+        <span class="macro">debug!</span>(<span class="string">"Message received: {:?}"</span>, packet);
 
         <span class="kw">if let </span>NlPayload::Err(e) = packet.nl_payload {
             <span class="kw">return </span><span class="prelude-val">Err</span>(NlError::&lt;T, P&gt;::from(e));
@@ -1555,7 +1556,7 @@
                 <span class="self">self</span>.needs_ack = <span class="bool-val">false</span>;
             } <span class="kw">else </span>{
                 <span class="kw">return </span><span class="prelude-val">Err</span>(NlError::new(
-                    <span class="string">&quot;Socket did not expect an ACK but one was received&quot;</span>,
+                    <span class="string">"Socket did not expect an ACK but one was received"</span>,
                 ));
             }
         }
@@ -1573,15 +1574,15 @@
     /// error. This method checks for ACKs. For a more granular
     /// approach, use either [`NlSocketHandle::recv`] or
     /// [`NlSocketHandle::iter`].
-    </span><span class="kw">pub fn </span>recv_all&lt;<span class="lifetime">&#39;a</span>, T, P&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;NlBuffer&lt;T, P&gt;, NlError&gt;
+    </span><span class="kw">pub fn </span>recv_all&lt;<span class="lifetime">'a</span>, T, P&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;NlBuffer&lt;T, P&gt;, NlError&gt;
     <span class="kw">where
         </span>T: NlType + Debug,
-        P: FromBytesWithInput&lt;<span class="lifetime">&#39;a</span>, Input = usize&gt; + Debug,
+        P: FromBytesWithInput&lt;<span class="lifetime">'a</span>, Input = usize&gt; + Debug,
     {
         <span class="kw">if </span><span class="self">self</span>.position == <span class="self">self</span>.end {
             <span class="kw">let </span>mem_read = <span class="self">self</span>.socket.recv(<span class="kw-2">&amp;mut </span><span class="self">self</span>.buffer, <span class="number">0</span>)<span class="question-mark">?</span>;
             <span class="kw">if </span>mem_read == <span class="number">0 </span>{
-                <span class="kw">return </span><span class="prelude-val">Err</span>(NlError::new(<span class="string">&quot;No data could be read from the socket&quot;</span>));
+                <span class="kw">return </span><span class="prelude-val">Err</span>(NlError::new(<span class="string">"No data could be read from the socket"</span>));
             }
             <span class="self">self</span>.end = mem_read;
         }
@@ -1589,7 +1590,7 @@
         <span class="kw">let </span>vec =
             NlBuffer::from_bytes_with_input(<span class="kw-2">&amp;mut </span>Cursor::new(<span class="kw-2">&amp;</span><span class="self">self</span>.buffer[<span class="number">0</span>..<span class="self">self</span>.end]), <span class="self">self</span>.end)<span class="question-mark">?</span>;
 
-        <span class="macro">debug!</span>(<span class="string">&quot;Messages received: {:?}&quot;</span>, vec);
+        <span class="macro">debug!</span>(<span class="string">"Messages received: {:?}"</span>, vec);
 
         <span class="self">self</span>.position = <span class="number">0</span>;
         <span class="self">self</span>.end = <span class="number">0</span>;
@@ -1600,10 +1601,10 @@
     ///
     /// The argument `iterate_indefinitely` is documented
     /// in more detail in [`NlMessageIter`]
-    </span><span class="kw">pub fn </span>iter&lt;<span class="lifetime">&#39;a</span>, T, P&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, iter_indefinitely: bool) -&gt; NlMessageIter&lt;<span class="lifetime">&#39;a</span>, T, P&gt;
+    </span><span class="kw">pub fn </span>iter&lt;<span class="lifetime">'a</span>, T, P&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span><span class="self">self</span>, iter_indefinitely: bool) -&gt; NlMessageIter&lt;<span class="lifetime">'a</span>, T, P&gt;
     <span class="kw">where
         </span>T: NlType + Debug,
-        P: FromBytesWithInput&lt;<span class="lifetime">&#39;a</span>, Input = usize&gt; + Debug,
+        P: FromBytesWithInput&lt;<span class="lifetime">'a</span>, Input = usize&gt; + Debug,
     {
         <span class="kw">let </span>behavior = <span class="kw">if </span>iter_indefinitely {
             IterationBehavior::IterIndefinitely
@@ -1638,7 +1639,7 @@
     }
 }
 
-<span class="attr">#[cfg(all(feature = <span class="string">&quot;async&quot;</span>, not(no_std)))]
+<span class="attr">#[cfg(all(feature = <span class="string">"async"</span>, not(no_std)))]
 </span><span class="kw">pub mod </span>tokio {
     <span class="doccomment">//! Tokio-specific features for neli
     //!
@@ -1730,13 +1731,13 @@
         }
 
         <span class="doccomment">/// Receive a message from the socket asynchronously.
-        </span><span class="kw">pub async fn </span>recv&lt;<span class="lifetime">&#39;a</span>, T, P&gt;(
+        </span><span class="kw">pub async fn </span>recv&lt;<span class="lifetime">'a</span>, T, P&gt;(
             <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-            buffer: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Vec&lt;u8&gt;,
+            buffer: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>Vec&lt;u8&gt;,
         ) -&gt; <span class="prelude-ty">Result</span>&lt;NlBuffer&lt;T, P&gt;, DeError&gt;
         <span class="kw">where
             </span>T: NlType,
-            P: FromBytesWithInput&lt;<span class="lifetime">&#39;a</span>, Input = usize&gt;,
+            P: FromBytesWithInput&lt;<span class="lifetime">'a</span>, Input = usize&gt;,
         {
             <span class="kw">if </span>buffer.len() != MAX_NL_LENGTH {
                 buffer.resize(MAX_NL_LENGTH, <span class="number">0</span>);
@@ -1791,7 +1792,7 @@
 
         <span class="kw">let </span><span class="kw-2">mut </span>attrs = GenlBuffer::new();
         attrs.push(Nlattr::new(<span class="bool-val">false</span>, <span class="bool-val">false</span>, CtrlAttr::FamilyId, <span class="number">5u32</span>).unwrap());
-        attrs.push(Nlattr::new(<span class="bool-val">false</span>, <span class="bool-val">false</span>, CtrlAttr::FamilyName, <span class="string">&quot;my_family_name&quot;</span>).unwrap());
+        attrs.push(Nlattr::new(<span class="bool-val">false</span>, <span class="bool-val">false</span>, CtrlAttr::FamilyName, <span class="string">"my_family_name"</span>).unwrap());
         <span class="kw">let </span>nl1 = Nlmsghdr::new(
             <span class="prelude-val">None</span>,
             NlTypeWrapper::Nlmsg(Nlmsg::Noop),
@@ -1804,7 +1805,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>attrs = GenlBuffer::new();
         attrs.push(Nlattr::new(<span class="bool-val">false</span>, <span class="bool-val">false</span>, CtrlAttr::FamilyId, <span class="number">6u32</span>).unwrap());
         attrs
-            .push(Nlattr::new(<span class="bool-val">false</span>, <span class="bool-val">false</span>, CtrlAttr::FamilyName, <span class="string">&quot;my_other_family_name&quot;</span>).unwrap());
+            .push(Nlattr::new(<span class="bool-val">false</span>, <span class="bool-val">false</span>, CtrlAttr::FamilyName, <span class="string">"my_other_family_name"</span>).unwrap());
         <span class="kw">let </span>nl2 = Nlmsghdr::new(
             <span class="prelude-val">None</span>,
             NlTypeWrapper::Nlmsg(Nlmsg::Noop),
@@ -1834,12 +1835,12 @@
         <span class="kw">let </span>nl_next1 = <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(nl_next)) = iter.next() {
             nl_next
         } <span class="kw">else </span>{
-            <span class="macro">panic!</span>(<span class="string">&quot;Expected message not found&quot;</span>);
+            <span class="macro">panic!</span>(<span class="string">"Expected message not found"</span>);
         };
         <span class="kw">let </span>nl_next2 = <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(nl_next)) = iter.next() {
             nl_next
         } <span class="kw">else </span>{
-            <span class="macro">panic!</span>(<span class="string">&quot;Expected message not found&quot;</span>);
+            <span class="macro">panic!</span>(<span class="string">"Expected message not found"</span>);
         };
         <span class="kw">let </span><span class="kw-2">mut </span>nl = NlBuffer::new();
         nl.push(nl_next1);
@@ -1852,8 +1853,8 @@
         setup();
 
         <span class="kw">let </span><span class="kw-2">mut </span>sock = NlSocketHandle::new(NlFamily::Generic).unwrap();
-        <span class="kw">let </span>notify_id_result = sock.resolve_nl_mcast_group(<span class="string">&quot;nlctrl&quot;</span>, <span class="string">&quot;notify&quot;</span>);
-        <span class="kw">let </span>config_id_result = sock.resolve_nl_mcast_group(<span class="string">&quot;devlink&quot;</span>, <span class="string">&quot;config&quot;</span>);
+        <span class="kw">let </span>notify_id_result = sock.resolve_nl_mcast_group(<span class="string">"nlctrl"</span>, <span class="string">"notify"</span>);
+        <span class="kw">let </span>config_id_result = sock.resolve_nl_mcast_group(<span class="string">"devlink"</span>, <span class="string">"config"</span>);
 
         <span class="kw">let </span>ids = <span class="kw">match </span>(notify_id_result, config_id_result) {
             (<span class="prelude-val">Ok</span>(ni), <span class="prelude-val">Ok</span>(ci)) =&gt; {
@@ -1871,8 +1872,8 @@
             (<span class="prelude-val">Err</span>(NlError::Nlmsgerr(<span class="kw">_</span>)), <span class="prelude-val">Err</span>(NlError::Nlmsgerr(<span class="kw">_</span>))) =&gt; {
                 <span class="kw">return</span>;
             }
-            (<span class="prelude-val">Err</span>(e), <span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unexpected result from resolve_nl_mcast_group: {:?}&quot;</span>, e),
-            (<span class="kw">_</span>, <span class="prelude-val">Err</span>(e)) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unexpected result from resolve_nl_mcast_group: {:?}&quot;</span>, e),
+            (<span class="prelude-val">Err</span>(e), <span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">"Unexpected result from resolve_nl_mcast_group: {:?}"</span>, e),
+            (<span class="kw">_</span>, <span class="prelude-val">Err</span>(e)) =&gt; <span class="macro">panic!</span>(<span class="string">"Unexpected result from resolve_nl_mcast_group: {:?}"</span>, e),
         };
 
         <span class="kw">let </span>groups = sock.list_mcast_membership().unwrap();

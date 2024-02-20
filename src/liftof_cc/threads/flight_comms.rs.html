@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-cc/src/threads/flight_comms.rs`."><title>flight_comms.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="liftof_cc" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0 (82e1608df 2023-12-21)" data-channel="1.75.0" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `liftof-cc/src/threads/flight_comms.rs`."><title>flight_comms.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="liftof_cc" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -194,7 +195,7 @@
     FileType
 };
 
-<span class="doccomment">/// Manages &quot;outgoing&quot; 0MQ PUB socket
+<span class="doccomment">/// Manages "outgoing" 0MQ PUB socket
 ///
 /// Everything should send to here, and 
 /// then it gets passed on over the 
@@ -219,21 +220,21 @@
 
   <span class="kw">let </span>ctx = zmq::Context::new();
   <span class="comment">// FIXME - should we just move to another socket if that one is not working?
-  </span><span class="kw">let </span>data_socket = ctx.socket(zmq::PUB).expect(<span class="string">&quot;Can not create socket!&quot;</span>);
+  </span><span class="kw">let </span>data_socket = ctx.socket(zmq::PUB).expect(<span class="string">"Can not create socket!"</span>);
   <span class="kw">let </span>unlim : i32 = <span class="number">1000000</span>;
   data_socket.set_sndhwm(unlim).unwrap();
   <span class="kw">match </span>data_socket.bind(flight_address) {
-    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Can not bind to address {}! {}&quot;</span>, flight_address, err),
+    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">panic!</span>(<span class="string">"Can not bind to address {}! {}"</span>, flight_address, err),
     <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
   }
-  <span class="macro">info!</span>(<span class="string">&quot;ZMQ PUB Socket for global data sink bound to {flight_address}&quot;</span>);
+  <span class="macro">info!</span>(<span class="string">"ZMQ PUB Socket for global data sink bound to {flight_address}"</span>);
 
   <span class="kw">let </span><span class="kw-2">mut </span>writer : <span class="prelude-ty">Option</span>&lt;TofPacketWriter&gt; = <span class="prelude-val">None</span>;
   <span class="kw">if </span>write_stream {
-    <span class="comment">//let mut streamfile_name = write_stream_path + &quot;/run_&quot;;
+    <span class="comment">//let mut streamfile_name = write_stream_path + "/run_";
     //streamfile_name += &amp;runid.to_string();
     </span><span class="kw">let </span>file_type = FileType::RunFile(runid <span class="kw">as </span>u32);
-    <span class="comment">//println!(&quot;==&gt; Writing stream to file with prefix {}&quot;, streamfile_name);
+    <span class="comment">//println!("==&gt; Writing stream to file with prefix {}", streamfile_name);
     </span>writer = <span class="prelude-val">Some</span>(TofPacketWriter::new(write_stream_path, file_type));
     writer.as_mut().unwrap().pkts_per_file = write_npack_file;
   }
@@ -246,9 +247,9 @@
   </span><span class="kw">let </span><span class="kw-2">mut </span>timer = Instant::now();
   <span class="kw">loop </span>{
     <span class="kw">match </span>incoming.recv() {
-      <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">trace!</span>(<span class="string">&quot;No new packet, err {err}&quot;</span>),
+      <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">trace!</span>(<span class="string">"No new packet, err {err}"</span>),
       <span class="prelude-val">Ok</span>(pack) =&gt; {
-        <span class="macro">debug!</span>(<span class="string">&quot;Got new tof packet {}&quot;</span>, pack.packet_type);
+        <span class="macro">debug!</span>(<span class="string">"Got new tof packet {}"</span>, pack.packet_type);
         <span class="kw">if </span>writer.is_some() {
           writer.as_mut().unwrap().add_tof_packet(<span class="kw-2">&amp;</span>pack);
         }
@@ -260,22 +261,22 @@
               <span class="kw">let </span>moni = RBMoniData::from_bytestream(<span class="kw-2">&amp;</span>pack.payload, <span class="kw-2">&amp;mut </span>pos);
               <span class="kw">match </span>moni {
                 <span class="prelude-val">Ok</span>(data) =&gt; {
-                  <span class="macro">debug!</span>(<span class="string">&quot;Sending RBMoniData {}&quot;</span>, data);
+                  <span class="macro">debug!</span>(<span class="string">"Sending RBMoniData {}"</span>, data);
                 },
-                <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Can not unpack RBMoniData! {err}&quot;</span>)}
+                <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Can not unpack RBMoniData! {err}"</span>)}
               }, 
             PacketType::CPUMoniData =&gt; {
               <span class="kw">let </span>moni = CPUMoniData::from_bytestream(<span class="kw-2">&amp;</span>pack.payload, <span class="kw-2">&amp;mut </span>pos);
               <span class="kw">match </span>moni {
-                <span class="prelude-val">Ok</span>(data) =&gt; {<span class="macro">println!</span>(<span class="string">&quot;{}&quot;</span>, data);},
-                <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Can not unpack TofCmpData! {err}&quot;</span>)}
+                <span class="prelude-val">Ok</span>(data) =&gt; {<span class="macro">println!</span>(<span class="string">"{}"</span>, data);},
+                <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Can not unpack TofCmpData! {err}"</span>)}
               },
             PacketType::MonitorMtb =&gt; {
               <span class="kw">let </span>moni = MtbMoniData::from_bytestream(<span class="kw-2">&amp;</span>pack.payload, <span class="kw-2">&amp;mut </span>pos);
               <span class="kw">match </span>moni {
-                <span class="prelude-val">Ok</span>(data) =&gt; {<span class="macro">println!</span>(<span class="string">&quot;{}&quot;</span>, data);},
-                <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">&quot;Can not unpack MtbMoniData! {err}&quot;</span>)}
-              }, 
+                <span class="prelude-val">Ok</span>(data) =&gt; {<span class="macro">println!</span>(<span class="string">"{}"</span>, data);},
+                <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Can not unpack MtbMoniData! {err}"</span>)}
+              },
             <span class="kw">_ </span>=&gt; ()
           } <span class="comment">// end match 
         </span>}
@@ -285,7 +286,7 @@
         //    continue;
         //  } else {
         //    if n_pack_sent % 1000 == 0 &amp;&amp; n_pack_sent != 0 {
-        //      println!(&quot;=&gt; [SINK] Sent {n_pack_sent}, last evid {last_evid} ===&quot;);
+        //      println!("=&gt; [SINK] Sent {n_pack_sent}, last evid {last_evid} ===");
         //    }
         //    // sort the cache
         //    // FIXME - at this step, we should have checked if the 
@@ -296,9 +297,9 @@
         //    for ev in event_cache.iter() {
         //      last_evid = TofEvent::extract_event_id_from_stream(&amp;ev.payload).unwrap();
         //      match data_socket.send(&amp;ev.to_bytestream(),0) {
-        //        Err(err) =&gt; error!(&quot;Not able to send packet over 0MQ PUB, {err}&quot;),
+        //        Err(err) =&gt; error!("Not able to send packet over 0MQ PUB, {err}"),
         //        Ok(_)    =&gt; { 
-        //          trace!(&quot;TofPacket sent&quot;);
+        //          trace!("TofPacket sent");
         //          n_pack_sent += 1;
         //        }
         //      }
@@ -309,9 +310,9 @@
         //} else {
         // FIXME - disentangle network and disk I/O?
         </span><span class="kw">match </span>data_socket.send(pack.to_bytestream(),<span class="number">0</span>) {
-          <span class="prelude-val">Err</span>(err) =&gt; error !(<span class="string">&quot;Not able to send packet over 0MQ PUB! {err}&quot;</span>),
+          <span class="prelude-val">Err</span>(err) =&gt; error !(<span class="string">"Not able to send packet over 0MQ PUB! {err}"</span>),
           <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
-            <span class="macro">trace!</span>(<span class="string">&quot;TofPacket sent&quot;</span>);
+            <span class="macro">trace!</span>(<span class="string">"TofPacket sent"</span>);
             n_pack_sent += <span class="number">1</span>;
           }
         } <span class="comment">// end match
@@ -319,7 +320,7 @@
       </span>} <span class="comment">// end if pk == event packet
     </span>} <span class="comment">// end incoming.recv 
     </span><span class="kw">if </span>n_pack_sent % <span class="number">1000 </span>== <span class="number">0 </span>{
-      <span class="macro">println!</span>(<span class="string">&quot;[FLIGHT] Sent {n_pack_sent} TofPacket in {} sec!&quot;</span>, timer.elapsed().as_secs());
+      <span class="macro">println!</span>(<span class="string">"[FLIGHT] Sent {n_pack_sent} TofPacket in {} sec!"</span>, timer.elapsed().as_secs());
       timer = Instant::now();
     }
   }

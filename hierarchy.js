@@ -16,6 +16,7 @@ var hierarchy =
     [ "RBEventMemoryView", "structRBEventMemoryView.html", null ],
     [ "RBMissingHit", "structRBMissingHit.html", null ],
     [ "RBMoniData", "structRBMoniData.html", null ],
+    [ "RBWaveform", "structRBWaveform.html", null ],
     [ "SimPrimary", "structSimPrimary.html", null ],
     [ "TofEvent", "structTofEvent.html", null ],
     [ "TofEventHeader", "structTofEventHeader.html", null ],
