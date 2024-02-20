@@ -31,7 +31,7 @@ use tof_dataclasses::packets::{PacketType,
                                TofPacket};
 use tof_dataclasses::events::{TofEvent,
                               RBEvent,
-                              MasterTriggerMapping,
+                              //MasterTriggerMapping,
                               MasterTriggerEvent};
 use tof_dataclasses::manifest::{get_ltbs_from_sqlite,
                                 get_rbs_from_sqlite};
@@ -142,7 +142,7 @@ fn main() {
   let db_path_c             = db_path.clone();
   let ltb_list              = get_ltbs_from_sqlite(db_path);
   let rb_list               = get_rbs_from_sqlite(db_path_c);
-  let mapping = MasterTriggerMapping::new(ltb_list, rb_list);
+  //let mapping = MasterTriggerMapping::new(ltb_list, rb_list);
 
   let mut packet_reader = TofPacketReader::default();
   let mut has_stream = false;
@@ -235,98 +235,98 @@ fn main() {
               continue;
             }
             let mut master_tof_event = TofEvent::new();
-            let rb_ids_debug = mapping.get_rb_ids_debug(&mtp, false);
-            mtp_events_tot += 1;
-            if args.no_missing_hits {
-              if rb_ids_debug.1.len() > 0 {
-                ev_with_missing += 1;
-                continue
-              }
-            }
+            //let rb_ids_debug = mapping.get_rb_ids_debug(&mtp, false);
+            //mtp_events_tot += 1;
+            //if args.no_missing_hits {
+            //  if rb_ids_debug.1.len() > 0 {
+            //    ev_with_missing += 1;
+            //    continue
+            //  }
+            //}
             // we are done with the mtb_event and push it to the event
             master_tof_event.mt_event = mtp;
 
-            println!("MTE: rbids {:?}", rb_ids_debug);
+            //println!("MTE: rbids {:?}", rb_ids_debug);
             println!("MTE: evid {}", mtp.event_id);
             //println!("available_rbs {:?}", available_rbs);
             //println!("MTE: ltbids {:?}", mapping.get_ltb_ids(&mtp));
-            for k in rb_ids_debug.0 {
-              let this_ev_rbid = k.0;
-              let this_ev_rbch = k.1;
-              if !available_rbs.contains(&this_ev_rbid) {
-                if this_ev_rbid != 0 {
-                  println!("Requesting to read from RB {}, but we don't have data for that!", this_ev_rbid);
-                  //panic!("Requesting to read from RB {}, but we don't have data for that!", this_ev_rbid);
-                  continue;
-                }
-              }
-              //println!("Getting RB {}", this_ev_rbid);
-              let reader = robin_readers.get_mut(&this_ev_rbid).unwrap();
-              //panic!("{}", reader.get_cache_size());
-              match reader.get_from_cache(&mtp.event_id) {
-                None     => {
-                  //reader.print_index();
-                  //println!("Events: {:?}", reader.event_ids_in_cache());
-                  //println!("Reader has {} events", reader.event_ids_in_cache().len());
-                  //println!("==> We cached events with number from {} to {}", robin_readers[&this_ev_rbid].min_cached_event_id().unwrap(), robin_readers[&this_ev_rbid].max_cached_event_id().unwrap());
-                  error!("We do not have that event {}!", mtp.event_id);
-                  //exit(1);
-                  continue;
-                }
-                Some(rbevent) => {
-                  println!("{:?}", rbevent.adc);
-                  //if !rbevent.is_over_adc_threshold(this_ev_rbch, 8000) {
-                  //  continue;
-                  //}
-                  //exit(1);
-                  if use_calibrations {
-                    //let mut channel_data : [f32;1024] = [0.0;1024];
-                    let mut channel_data = vec![0.0f32;1024];
-                    let channel_adc = &rbevent.adc[this_ev_rbch as usize -1]; //get_adc_ch(this_ev_rbch);
-                    //let mut channel_adc  : [u16;1024] = rbevent.get_adc_ch(this_ev_rbch).try_into().expect("Waveform does not have expected len of 1024!");
-                    calibrations[&this_ev_rbid].voltages(this_ev_rbch as usize,
-                                                         rbevent.header.stop_cell as usize,
-                                                         &channel_adc,
-                                                         &mut channel_data);
-                    let mut data = Vec::<(f32, f32)>::with_capacity(1024);
-                    for k in 0..800 {
-                      data.push((k as f32, channel_data[k]));
-                    }
-                    //let data = [(0.0, 0.0), (1.0, 1.0), (2.0, 0.5), (3.0, 1.5)];
-                    //Chart::new(240, 60, 0.0, 1024.0)
-                    //  .lineplot(&Shape::Lines(data.as_slice())).display();
-                  } else {
-                    let channel_data = &rbevent.adc[this_ev_rbch as usize - 1];//get_adc_ch(this_ev_rbch);
-                    //println!("ch {}", this_ev_rbch);
-                    //println!("{:?}", channel_data);
-                    //println!("{}", channel_data.len());
-                    if channel_data.len() == 0 {
-                      error!("There is no channel data for ch {}!", this_ev_rbch);
-                    } else {
-                      let mut data = Vec::<(f32, f32)>::with_capacity(1024);
-                      if channel_data.len() < 1024 {
-                        error!("Corrupt channel data!");
-                        continue;
-                      }
-                      for k in 0..800 {
-                        data.push((k as f32, channel_data[k] as f32));
-                      }
-                      //let data = [(0.0, 0.0), (1.0, 1.0), (2.0, 0.5), (3.0, 1.5)];
-                      Chart::new(240, 60, 0.0, 1024.0)
-                        .lineplot(&Shape::Lines(data.as_slice())).display();
-                      //panic!("e basta!");
-                    }
-                  }
-                  //r_events.push(rbevent);
-                  master_tof_event.rb_events.push(rbevent);
-                  //master_tof_event.missing_hits = rb_ids_debug.1;
-                  for k in 0..rb_ids_debug.1.len() {
-                    master_tof_event.missing_hits.push(rb_ids_debug.1[k]);
-                  }
-                  seen_evids.push(mtp.event_id);
-                }
-              }
-            } 
+            //for k in rb_ids_debug.0 {
+            //  let this_ev_rbid = k.0;
+            //  let this_ev_rbch = k.1;
+            //  if !available_rbs.contains(&this_ev_rbid) {
+            //    if this_ev_rbid != 0 {
+            //      println!("Requesting to read from RB {}, but we don't have data for that!", this_ev_rbid);
+            //      //panic!("Requesting to read from RB {}, but we don't have data for that!", this_ev_rbid);
+            //      continue;
+            //    }
+            //  }
+            //  //println!("Getting RB {}", this_ev_rbid);
+            //  let reader = robin_readers.get_mut(&this_ev_rbid).unwrap();
+            //  //panic!("{}", reader.get_cache_size());
+            //  match reader.get_from_cache(&mtp.event_id) {
+            //    None     => {
+            //      //reader.print_index();
+            //      //println!("Events: {:?}", reader.event_ids_in_cache());
+            //      //println!("Reader has {} events", reader.event_ids_in_cache().len());
+            //      //println!("==> We cached events with number from {} to {}", robin_readers[&this_ev_rbid].min_cached_event_id().unwrap(), robin_readers[&this_ev_rbid].max_cached_event_id().unwrap());
+            //      error!("We do not have that event {}!", mtp.event_id);
+            //      //exit(1);
+            //      continue;
+            //    }
+            //    Some(rbevent) => {
+            //      println!("{:?}", rbevent.adc);
+            //      //if !rbevent.is_over_adc_threshold(this_ev_rbch, 8000) {
+            //      //  continue;
+            //      //}
+            //      //exit(1);
+            //      if use_calibrations {
+            //        //let mut channel_data : [f32;1024] = [0.0;1024];
+            //        let mut channel_data = vec![0.0f32;1024];
+            //        let channel_adc = &rbevent.adc[this_ev_rbch as usize -1]; //get_adc_ch(this_ev_rbch);
+            //        //let mut channel_adc  : [u16;1024] = rbevent.get_adc_ch(this_ev_rbch).try_into().expect("Waveform does not have expected len of 1024!");
+            //        calibrations[&this_ev_rbid].voltages(this_ev_rbch as usize,
+            //                                             rbevent.header.stop_cell as usize,
+            //                                             &channel_adc,
+            //                                             &mut channel_data);
+            //        let mut data = Vec::<(f32, f32)>::with_capacity(1024);
+            //        for k in 0..800 {
+            //          data.push((k as f32, channel_data[k]));
+            //        }
+            //        //let data = [(0.0, 0.0), (1.0, 1.0), (2.0, 0.5), (3.0, 1.5)];
+            //        //Chart::new(240, 60, 0.0, 1024.0)
+            //        //  .lineplot(&Shape::Lines(data.as_slice())).display();
+            //      } else {
+            //        let channel_data = &rbevent.adc[this_ev_rbch as usize - 1];//get_adc_ch(this_ev_rbch);
+            //        //println!("ch {}", this_ev_rbch);
+            //        //println!("{:?}", channel_data);
+            //        //println!("{}", channel_data.len());
+            //        if channel_data.len() == 0 {
+            //          error!("There is no channel data for ch {}!", this_ev_rbch);
+            //        } else {
+            //          let mut data = Vec::<(f32, f32)>::with_capacity(1024);
+            //          if channel_data.len() < 1024 {
+            //            error!("Corrupt channel data!");
+            //            continue;
+            //          }
+            //          for k in 0..800 {
+            //            data.push((k as f32, channel_data[k] as f32));
+            //          }
+            //          //let data = [(0.0, 0.0), (1.0, 1.0), (2.0, 0.5), (3.0, 1.5)];
+            //          Chart::new(240, 60, 0.0, 1024.0)
+            //            .lineplot(&Shape::Lines(data.as_slice())).display();
+            //          //panic!("e basta!");
+            //        }
+            //      }
+            //      //r_events.push(rbevent);
+            //      master_tof_event.rb_events.push(rbevent);
+            //      //master_tof_event.missing_hits = rb_ids_debug.1;
+            //      for k in 0..rb_ids_debug.1.len() {
+            //        master_tof_event.missing_hits.push(rb_ids_debug.1[k]);
+            //      }
+            //      seen_evids.push(mtp.event_id);
+            //    }
+            //  }
+            //} 
             //match reader.get_from_cache(&mtp.event_id) {
             //  None     => continue,
             //  Some(rbevent) => {
