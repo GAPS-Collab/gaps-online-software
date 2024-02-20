@@ -258,6 +258,7 @@ impl FromRandom for TofCommandResp {
 #[repr(u8)]
 pub enum TofOperationMode {
   Unknown          = 0u8,
+  Default          = 1u8,
   #[deprecated(since="0.8.3")] 
   StreamAny        = 10u8,
   #[deprecated(since="0.8.3")] 
@@ -282,6 +283,7 @@ impl From<u8> for TofOperationMode {
   fn from(value: u8) -> Self {
     match value {
       0u8  => TofOperationMode::Unknown,
+      1u8  => TofOperationMode::Default,
       10u8 => TofOperationMode::StreamAny,
       20u8 => TofOperationMode::RequestReply,
       30u8 => TofOperationMode::RBHighThroughput,
@@ -298,6 +300,7 @@ impl FromRandom for TofOperationMode {
   fn from_random() -> Self {
     let choices = [
       TofOperationMode::Unknown,
+      TofOperationMode::Default,
       TofOperationMode::RequestReply,
       TofOperationMode::StreamAny,
       TofOperationMode::RBHighThroughput,

@@ -7,8 +7,14 @@
 //!
 
 use std::fmt;
-use std::net::UdpSocket;
+use std::io;
+use std::net::{
+    UdpSocket,
+    SocketAddr
+};
+
 use std::error::Error;
+use std::time::Duration;
 
 use crate::errors::IPBusError;
 use crate::serialization::parse_u32_be;
@@ -112,29 +118,67 @@ pub struct IPBus {
 
 impl IPBus {
   
-  pub fn new(socket : UdpSocket) -> Self {
-    Self {
+  pub fn new(target_address : String) 
+    -> io::Result<Self> {
+    let socket = Self::connect(target_address)?;
+    Ok(Self {
       socket       : socket,
       packet_type  : IPBusPacketType::Read,
       /// actually the transaction id should be the packet id
       tid          : 0,
       expected_tid : 0,
       buffer       : [0;MT_MAX_PACKSIZE]
-    }
+    })
   }
+
+  /// Connect to MTB Utp socket
+  ///
+  /// This will try a number of options to bind 
+  /// to the local port.
+  /// 
+  /// # Arguments 
+  ///
+  /// * target_address  : IP/port of the target 
+  ///                     probably some kind of
+  ///                     FPGA
+  pub fn connect(target_address : String) 
+    ->io::Result<UdpSocket> {
+    // provide a number of local ports to try
+    let local_addrs = [
+      SocketAddr::from(([0, 0, 0, 0], 50100)),
+      SocketAddr::from(([0, 0, 0, 0], 50101)),
+      SocketAddr::from(([0, 0, 0, 0], 50102)),
+      SocketAddr::from(([0, 0, 0, 0], 50103)),
+      SocketAddr::from(([0, 0, 0, 0], 50104)),
+    ];
+    let local_socket = UdpSocket::bind(&local_addrs[..]);
+    let socket : UdpSocket;
+    match local_socket {
+      Err(err)   => {
+        error!("Can not create local UDP socket for master trigger connection!, err {}", err);
+        return Err(err);
+      }
+      Ok(value)  => {
+        info!("Successfully bound UDP socket for master trigger communcations to {:?}", value);
+        socket = value;
+        // this is not strrictly necessary, but 
+        // it is nice to limit communications
+        match socket.set_read_timeout(Some(Duration::from_millis(1))) {
+          Err(err) => error!("Can not set read timeout for Udp socket! Error {err}"),
+          Ok(_)    => ()
+        }
+        match socket.connect(&target_address) {
+          Err(err) => {
+            error!("Can not connect to IPBus socket to target address {}! {}", target_address, err);
+            return Err(err);
+          }
+          Ok(_)    => info!("Successfully connected IPBus to target address {}!", target_address)
+        }
+        return Ok(socket);
+      }
+    } // end match
+}  
   
-  fn assemble_tid(tid : (u8,u8)) -> u16 {
-    let tidu16 = (tid.1 as u16) << 8 | tid.0 as u16;
-    return tidu16;
-  }
-
-  fn disassemble_tid(tid : u16) -> (u8,u8) {
-    let tid0 : u8 = (0x0ff  & tid) as u8;
-    let tid1 : u8 = ((0xf00 & tid) >> 8) as u8;
-    return (tid0, tid1);
-  }
-
-
   /// Get the next 12bit transaction ID. 
   /// If we ran out, wrap around and 
   /// start at 0
@@ -143,11 +187,11 @@ impl IPBus {
     let tid = self.tid;
     self.expected_tid = self.tid;
     //// get the next transaction id 
-    //self.tid += 1;
-    //// wrap around
-    //if self.tid > 0xfff {
-    //  self.tid = 0;
-    //}
+    self.tid += 1;
+    // wrap around
+    if self.tid > 0xfff {
+      self.tid = 0;
+    }
     return tid;
   }
 
@@ -157,7 +201,7 @@ impl IPBus {
     phead = phead & 0xfffffff0;
     phead = phead | 0x00000001;
     udp_data.extend_from_slice(&phead.to_be_bytes());
-    for k in 0..16 {
+    for _ in 0..16 {
       udp_data.push(0);
       udp_data.push(0);
       udp_data.push(0);
@@ -166,7 +210,7 @@ impl IPBus {
     self.socket.send(udp_data.as_slice()).unwrap();
     println!("[IPBus::get_status => message {:?} sent!", udp_data);
     let (number_of_bytes, _) = self.socket.recv_from(&mut self.buffer).unwrap();
-    println!("[IPBus::get_status] => data received!");
+    println!("[IPBus::get_status] => {} bytes received!", number_of_bytes);
     println!("[IPBus::get_status] => buffer {:?}", self. buffer);
   }
 
@@ -189,8 +233,8 @@ impl IPBus {
   }
 
   fn create_transactionheader(&self, nwords : u8) -> u32 {
-    /// FIXME - for now, let's have transaction
-    /// id always to be 0
+    // FIXME - for now, let's have transaction
+    // id always to be 0
     let header = (0x2 << 28) as u32
                | (0x0 << 24) as u32
                | (0x0 << 20) as u32
@@ -357,17 +401,17 @@ impl IPBus {
         error!("Decoding of RMW packet not supported!!");
       }
     }
-    //if verbose { 
-    //  println!("Decoding IPBus Packet:");
-    //  println!(" >> Msg            : {:?}", self.buffer);
-    //  println!(" >> IPBus version  : {}", ipbus_version);
-    //  println!(" >> Transaction ID : {}", tid);
-    //  println!(" >> ID             : {}", id);
-    //  println!(" >> Size           : {}", size);
-    //  println!(" >> Type           : {:?}", packet_type);
-    //  println!(" >> Info           : {}", info_code);
-    //  println!(" >> data           : {:?}", data);
-    //}
+    if verbose { 
+      println!("[IPBus::decode_payload] ==> Decoding IPBus Packet:");
+      println!(" >> Msg            : {:?}", self.buffer);
+      //println!(" >> IPBus version  : {}", ipbus_version);
+      //println!(" >> Transaction ID : {}", tid);
+      //println!(" >> ID             : {}", id);
+      //println!(" >> Size           : {}", size);
+      //println!(" >> Type           : {:?}", packet_type);
+      //println!(" >> Info           : {}", info_code);
+      println!(" >> data           : {:?}", data);
+    }
     Ok(data)
   }
 
@@ -375,13 +419,13 @@ impl IPBus {
     -> Result<u32, Box<dyn Error>> {
     let send_data = Vec::<u32>::from([0]);
     let message   = self.encode_payload(addr, &send_data);
-    //println!("[IPBus::read => messasge {:?}", message);
+    println!("[IPBus::read => messasge {:?}", message);
     self.socket.send(message.as_slice())?;
     //println!("[IPBus::read => message sent!");
     let mut data = Vec::<u32>::new();
     loop {
       let (number_of_bytes, _) = self.socket.recv_from(&mut self.buffer)?;
-      //println!("[IPBus::read] => Received {} bytes from master trigger! Message {:?}", number_of_bytes, self.buffer);
+      trace!("[IPBus::read] => Received {} bytes from master trigger! Message {:?}", number_of_bytes, self.buffer);
       // this one can actually succeed, but return an emtpy vector
       match self.decode_payload(false) { 
         Err(err) => {
@@ -427,12 +471,11 @@ impl IPBus {
     //println!("Sending message ...");
     self.socket.send(message.as_slice())?;
     //println!("... done");
-    //let (number_of_bytes, _) = self.socket.recv_from(&mut self.buffer)?;
     //trace!("Received {} bytes from master trigger", number_of_bytes);
     let mut data = Vec::<u32>::new();
     loop {
       let (number_of_bytes, _) = self.socket.recv_from(&mut self.buffer)?;
-      //println!("[read_multiple] Received {} bytes from master trigger. Buffer {:?}", number_of_bytes, self.buffer);
+      trace!("[read_multiple] Received {} bytes from master trigger. Buffer {:?}", number_of_bytes, self.buffer);
       // this one can actually succeed, but return an emtpy vector
       match self.decode_payload(false) { 
         Err(err) => {
@@ -472,16 +515,10 @@ impl IPBus {
     -> Result<(), Box<dyn Error>> {
     let send_data = Vec::<u32>::from([data]);
     self.packet_type = IPBusPacketType::Write;
-    //println!("1tid {}", self.tid);
     let message = self.encode_payload(addr, &send_data);
-    //println!("mess {:?}", message);
-    //println!("2tid {}", self.tid);
-    //println!("Sending...");
     self.socket.send(message.as_slice())?;
-    //println!("tid {}", self.tid);
-    //println!("..done...receiving..");
     let (number_of_bytes, _) = self.socket.recv_from(&mut self.buffer)?;
-    //println!("Received {} bytes from master trigger", number_of_bytes);
+    trace!("Received {} bytes from master trigger", number_of_bytes);
     Ok(())
   }
 

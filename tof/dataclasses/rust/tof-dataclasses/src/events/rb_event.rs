@@ -1214,11 +1214,6 @@ impl Serialization for RBWaveform {
     stream.extend_from_slice(&self.event_id.to_le_bytes());
     stream.extend_from_slice(&self.rb_id.to_le_bytes());
     stream.extend_from_slice(&self.rb_channel.to_le_bytes());
-    //stream.extend_from_slice(&self.ltb_dsi.to_le_bytes());
-    //stream.extend_from_slice(&self.ltb_j.to_le_bytes());
-    //stream.extend_from_slice(&self.ltb_ch.to_le_bytes());
-    //stream.extend_from_slice(&self.rb_id.to_le_bytes());
-    //stream.extend_from_slice(&self.rb_ch.to_le_bytes());
     if self.adc.len() != 0 {
       for k in 0..NWORDS {
         stream.extend_from_slice(&self.adc[k].to_le_bytes());  
