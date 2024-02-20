@@ -51,7 +51,8 @@ impl Error for SensorError {
 #[repr(u8)]
 pub enum CalibrationError {
   EmptyInputData,
-  CanNotConnectToMyOwnZMQSocket  
+  CanNotConnectToMyOwnZMQSocket,
+  CalibrationFailed
 }
 
 impl fmt::Display for CalibrationError {
@@ -308,4 +309,34 @@ impl fmt::Display for SetError {
 }
 
 impl Error for SetError {
+}
+
+////////////////////////////////////////
+
+#[derive(Debug, Copy, Clone, serde::Deserialize, serde::Serialize)]
+#[repr(u8)]
+pub enum CmdError {
+  UnknownError,
+  ListenError,
+  PingError,
+  MoniError,
+  SystemdRebootError,
+  PowerError,
+  CalibrationError,
+  ThresholdSetError,
+  PreampBiasSetError,
+  RunStopError,
+  RunStartError,
+  NotImplementedError
+}
+
+impl fmt::Display for CmdError {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let disp = serde_json::to_string(self).unwrap_or(
+      String::from("Error: cannot unwrap this CmdError"));
+    write!(f, "<CmdError : {}>", disp)
+  }
+}
+
+impl Error for CmdError {
 }

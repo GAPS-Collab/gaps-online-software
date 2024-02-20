@@ -711,6 +711,8 @@ pub fn to_board_id_string(rb_id: u32) -> String {
 /// Command Enums and stucts
 #[derive(Debug, Parser, PartialEq)]
 pub enum Command {
+  /// Listen for flight CPU commands.
+  Listen(ListenCmd),
   /// Ping a TOF sub-system.
   Ping(PingCmd),
   /// Monitor a TOF sub-system.
@@ -731,7 +733,24 @@ pub enum Command {
   Run(RunCmd)
 }
 
+/// Command Enums and stucts
+#[derive(Debug, Parser, PartialEq)]
+pub enum CommandRB {
+  /// Remotely trigger the readoutboards to run the calibration routines (tcal, vcal).
+  #[command(subcommand)]
+  Calibration(CalibrationCmd),
+  /// Remotely set LTB thresholds or preamp bias.
+  #[command(subcommand)]
+  Set(SetCmd),
+  /// Start/stop data taking run.
+  #[command(subcommand)]
+  Run(RunCmd)
+}
+
 /// TOF SW cmds ====================================================
+#[derive(Debug, Args, PartialEq)]
+pub struct ListenCmd { }
+
 #[derive(Debug, Args, PartialEq)]
 pub struct PingCmd {
   /// Component to target
