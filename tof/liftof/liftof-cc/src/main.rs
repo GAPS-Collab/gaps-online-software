@@ -189,9 +189,9 @@ fn main() {
   let ltb_rb_map            = get_dsi_j_ltbch_vs_rbch_map(db_path);
   let mut rb_list           = get_rbs_from_sqlite(db_path);
   //let mut rb_list           = vec![ReadoutBoard::new();50];
-  for k in 0..rb_list.len() {
-    rb_list[k].rb_id = k as u8 + 1;
-  }
+  //for k in 0..rb_list.len() {
+  //  rb_list[k].rb_id = k as u8 + 1;
+  //}
   let rb_ignorelist         = config.rb_ignorelist.clone();
   for k in 0..rb_ignorelist.len() {
     println!("=> We will remove RB {} due to it being marked as IGNORE in the config file!", rb_ignorelist[k]);
@@ -303,7 +303,7 @@ fn main() {
   
   // readout boards <-> paddle cache communications 
   let (ev_to_builder, ev_from_rb) : (cbc::Sender<RBEvent>, cbc::Receiver<RBEvent>) = cbc::unbounded();
-  let (cmd_sender, cmd_receiver) : (cbc::Sender<TofPacket>, cbc::Receiver<TofPacket>) = cbc::unbounded();
+  let (cmd_sender, cmd_receiver)  : (cbc::Sender<TofPacket>, cbc::Receiver<TofPacket>) = cbc::unbounded();
 
   let ctx = zmq::Context::new();
   // I guess expect is fine here, see above
@@ -388,15 +388,17 @@ fn main() {
          .expect("Failed to spawn rb-commander thread!");
   // start the event builder thread
   println!("==> Starting event builder and master trigger threads...");
-  let cmd_sender_2 = cmd_sender.clone();
-  let settings = config.event_builder_settings;
-    let _evb_thread = thread::Builder::new()
-         .name("cpu-monitoring".into())
+  let cmd_sender_2   = cmd_sender.clone();
+  let db_path_string = config.db_path.clone();
+  let settings       = config.event_builder_settings;
+  let _evb_thread = thread::Builder::new()
+         .name("event-builder".into())
          .spawn(move || {
                          event_builder(&master_ev_rec,
                                        &ev_from_rb,
                                        &tp_to_sink,
                                        runid as u32,
+                                       db_path_string,
                                        settings);
           })
          .expect("Failed to spawn cpu-monitoring thread!");
@@ -567,6 +569,7 @@ fn main() {
     if program_start.elapsed().as_secs_f64() > runtime_nseconds as f64 {
       println!("=> Runtime seconds of {} have expired!", runtime_nseconds);
       println!("=> Ending program. If you don't want that behaviour, change the confifguration file.");
+      println!(">> So long and thanks for all the \u{1F41F} <<"); 
       exit(0);    
     }
   }

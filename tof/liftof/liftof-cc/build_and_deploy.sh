@@ -20,8 +20,8 @@ compile_and_deploy_target() {
   cargo clean
   #CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" cargo build --bin $1 --features=tofcontrol --release && scp ../target/release/$1 $2:~/bin/ 
   
-  CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" cross build --target=x86_64-unknown-linux-musl --bin $1 --release && scp ../target/x86_64-unknown-linux-musl/release/$1 $2:~/bin/liftof-cc-0.9.1 
-  scp liftof-cc-config-0.9.1.toml $2:~/config/
+  CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" cross build --target=x86_64-unknown-linux-musl --bin $1 --release && scp ../target/x86_64-unknown-linux-musl/release/$1 $2:~/bin/liftof-cc-0.9.3 
+  #scp liftof-cc-config-0.9.3.toml $2:~/config/
   cargo clean
 }
 
@@ -29,4 +29,4 @@ compile_and_deploy_target() {
 rm -rf ../target/x86_64-unknown-linux-musl/*
 
 compile_and_deploy_target liftof-cc nevis-tof
-
+#compile_and_deploy_target liftof-cc tof-computer-tailscale

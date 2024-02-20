@@ -7,6 +7,7 @@ use crossbeam_channel::{
 
 use std::collections::VecDeque;
 use std::collections::HashMap;
+use std::path::Path;
 
 use tof_dataclasses::events::{MasterTriggerEvent,
                               TofEvent,
@@ -17,7 +18,7 @@ use crate::settings::{
     BuildStrategy
 };
 use tof_dataclasses::packets::TofPacket;
-
+use tof_dataclasses::manifest::get_dsi_j_ltbch_vs_rbch_map;
 
 /// Events ... assemble! 
 ///
@@ -49,14 +50,15 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
                       ev_from_rb     : &Receiver<RBEvent>,
                       data_sink      : &Sender<TofPacket>,
                       run_id         : u32,
+                      db_path        : String,
                       mut settings   : TofEventBuilderSettings) { 
   // event caches for assembled events
-  let mut event_cache      = HashMap::<u32, TofEvent>::new();
-  let mut event_id_cache   = VecDeque::<u32>::with_capacity(EVENT_BUILDER_EVID_CACHE_SIZE);
-  
+  let mut event_cache        = HashMap::<u32, TofEvent>::new();
+  let mut event_id_cache     = VecDeque::<u32>::with_capacity(EVENT_BUILDER_EVID_CACHE_SIZE);
+  let dsi_map                = get_dsi_j_ltbch_vs_rbch_map(db_path.as_ref()); 
   let mut n_received         : usize;
-  //let mut clear_cache        = 0; // clear cache every 
-  //let mut event_sending      = 0;
+  //let mut clear_cache      = 0; // clear cache every 
+  //let mut event_sending    = 0;
   let mut n_mte_received_tot = 0u64;
   let mut n_rbe_received_tot = 0u64;
   let mut first_evid         : u32;
@@ -143,7 +145,23 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
               continue 'main;
             },
             Some(ev) => {
-              ev.rb_events.push(rb_ev);
+              if settings.build_strategy == BuildStrategy::AdaptiveThorough {
+                let lg_hits   = ev.mt_event.get_dsi_j_ch_for_triggered_ltbs(); 
+                let mut found = false;
+                let ev_rbid   = rb_ev.header.rb_id; 
+                for h in &lg_hits {
+                  if dsi_map[&h.0][&h.1][&h.2].0 == rb_ev.header.rb_id {
+                    ev.rb_events.push(rb_ev);
+                    found = true;
+                    break;
+                  }
+                }
+                if !found {
+                  println!("== ==> We saw {:?}, but {} is not part of that!", lg_hits, ev_rbid);
+                }
+              } else {
+                ev.rb_events.push(rb_ev);
+              }
               //break;
             }
           }
@@ -170,7 +188,8 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
       }
     }
     let av_rb_ev = n_rbs_per_ev as f64 / n_sent as f64;
-    if settings.build_strategy == BuildStrategy::Adaptive {
+    if settings.build_strategy == BuildStrategy::Adaptive || 
+       settings.build_strategy == BuildStrategy::AdaptiveThorough {
       settings.n_rbe_per_loop = av_rb_ev.ceil() as usize;
       if settings.n_rbe_per_loop == 0 {
         // failsafe
@@ -184,7 +203,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<MasterTriggerEvent>,
         settings.n_rbe_per_loop = 40;
       }
     }
-    if n_mte_received_tot % 10000 == 0 {
+    if n_mte_received_tot % 50 == 0 {
       println!("[EVTBLDR] ==> Received {} MTE", n_mte_received_tot);
       println!("[EVTBLDR] ==> Received {n_rbe_received_tot} RBEvents!");
       println!("[EVTBLDR] ==> Delta Last MTE evid - Last RB evid  {}", last_evid - last_rb_evid);
