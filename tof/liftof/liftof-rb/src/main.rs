@@ -181,6 +181,8 @@ fn main() {
     error!("Board ID field has been set to error state of {}", rb_info.board_id);
     panic!("Unable to obtain board id! This is a CRITICAL error! Abort!");
   }
+
+
   let ltb_connected = rb_info.sub_board == 1;
   let pb_connected  = rb_info.sub_board == 2;
   // General parameters, readout board id,, 
@@ -217,6 +219,20 @@ fn main() {
   println!(" => We will CONNECT to the following port on the C&C server at address: {}", cmd_server_ip);
   println!(" => -- -- PORT {} (0MQ SUB) where we will be listening for commands", DATAPORT);
   println!("-----------------------------------------------");
+  
+  // check if the board has received the correct link id from the mtb
+  match get_mtb_link_id() {
+    Err(err) => error!("Unable to obtain MTB link id!"),
+    Ok(link_id) => {
+      if link_id == rb_info.board_id as u32 {
+        println!("=> We received the correct link id from the MTB!");
+      } else {
+        error!("Received unexpected MTB link ID {}!", link_id);
+        error!("Incorrect link ID. This might hint to issues with the MTB mapping!");
+        error!("******************************************************************");
+      }
+    }
+  }
   
   if test_eventids {
     warn!("Testing mode! Only for debugging!");
