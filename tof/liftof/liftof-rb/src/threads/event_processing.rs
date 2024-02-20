@@ -110,6 +110,7 @@ pub fn event_processing(board_id            : u8,
   // receive data over bs_recv, we have received 50 more 
   // events. This means we might want to wait for 50 MTE
   // events?
+  let mut skipped_events : usize = 0;
   let mut n_request = 0;
   let ev_buff_size = 50;
   let mut n_events = 0usize;
@@ -132,11 +133,6 @@ pub fn event_processing(board_id            : u8,
         Ok(mode) => {
           warn!("Will change operation mode to {:?}!", mode);
           match mode {
-            TofOperationMode::RequestReply => {
-              streamer.request_mode = true;
-              op_mode_stream = false;
-              op_mode = mode;
-            },
             TofOperationMode::StreamAny    => {
               op_mode_stream = true;
               streamer.request_mode = false;
@@ -166,44 +162,6 @@ pub fn event_processing(board_id            : u8,
         }
       }
     }
-    if !tp_recv.is_empty() && !op_mode_stream {
-      //println!("==> We see that our streamer is ahead by {}", streamer.is_ahead_by);
-      //println!("==> We see that our streamer is behind by {}", streamer.is_behind_by);
-      let mut max_request = streamer.is_ahead_by + ev_buff_size;
-      if streamer.is_behind_by > 0 && streamer.request_cache.len() != 0 {
-        max_request = 0;
-      }
-      //println!("==> max request {}, n request {}", max_request, n_request);
-      while n_request < max_request {
-        match tp_recv.recv() {
-          Err(_err) => (),
-          Ok(tp) => {
-            match tp.packet_type {
-              PacketType::RBCommand => {
-                match RBCommand::from_bytestream(&tp.payload, &mut 0) {
-                  Err(err) => {
-                    error!("Can't decode RBCommand! {err}");
-                  },
-                  Ok(request) => {
-                    //println!("=> Got request {}",request);
-                    n_request += 1;
-                    //request_cache.push_back((request.payload, request.channel_mask));
-                    streamer.request_cache.push_back((request.payload, request.channel_mask));
-                  }
-                }
-              },
-              _ => (),
-            }
-          }
-        }
-      }
-      //println!("== ==> Digtested {} requests!", {n_request});
-    }
-    n_request = 0;
-    //request_cache = request_cache.sort();
-    //println!("==> Request cache {:?}", request_cache);
-    //request_cache.clear();
-    //println!("Len of BS RECV {}",bs_recv.len());
     if bs_recv.is_empty() {
       //println!("--> Empty bs_rec");
       // FIXME - benchmark
@@ -212,8 +170,17 @@ pub fn event_processing(board_id            : u8,
     }
     // this can't be blocking anymore, since 
     // otherwise we miss the datatype
-    let mut skipped_events : usize = 0;
     let mut bytestream : Vec<u8>;
+    if events_not_sent > 0 {
+      error!("There were {events_not_sent} for this iteration of received bytes!");
+    }
+    if skipped_events > 0 {
+      error!("We skipped {} events!", skipped_events);
+    }
+    // reset skipped events and events not sent, 
+    // these are per iteration
+    events_not_sent = 0;
+    skipped_events  = 0;
     match bs_recv.recv() {
       Err(err) => {
         error!("Received Garbage! Err {err}");
@@ -224,23 +191,15 @@ pub fn event_processing(board_id            : u8,
         bytestream = _stream;
         //streamer.add(&bytestream, bytestream.len());
         streamer.consume(&mut bytestream);
-        if !op_mode_stream {
-          streamer.create_event_index();
-          if streamer.is_behind_by > ev_buff_size {
-            // we probably have not consumed enough
-            // events yet
-            //println!("--> Streamer is still behind, will consume more {}", streamer.is_behind_by);
-            streamer.is_behind_by -= ev_buff_size;
-            continue 'main;
-          }
-        }
         let mut packets_in_stream : u32 = 0;
         let mut last_event_id     : u32 = 0;
         //println!("Streamer::stream size {}", streamer.stream.len());
         'event_reader : loop {
           if streamer.is_depleted {
             info!("Streamer exhausted after sending {} packets!", packets_in_stream);
-            break 'event_reader;
+            //break 'event_reader;
+            // we immediatly want more data in the streamer
+            continue 'main;
           }
           // FIXME - here we have the choice. 
           // streamer.next() will yield the next event,
@@ -266,26 +225,11 @@ pub fn event_processing(board_id            : u8,
             TofOperationMode::RBWaveform => {
               match streamer.next() {
                 None => {
-                  if streamer.request_mode {
-                    //info!("Streamer exhausted after sending {} packets!", packets_in_stream);
-                    if streamer.request_cache.len() == 0 {
-                      break 'event_reader;
-                    }
-                    if streamer.is_ahead_by > 0 {
-                      break;
-                    }
-                    //println!("Streamer behind {}", streamer.is_behind_by);
-                    //println!("Streamer ahead  {}", streamer.is_ahead_by);
-                    //println!("Streamer is depeleted {}", streamer.is_depleted);
-                    //println!("Streamer requests {}", streamer.request_cache.len());
-                    // we need to go the whole loop, so trigger streamer.is_depleted, 
-                    // even though it might not
-                    streamer.is_behind_by = 0;
-                  }
                   streamer.is_depleted = true;
-                  continue;
+                  continue 'main;
                 },
                 Some(mut event) => {
+                  //println!("Got event id {}", event.header.event_id);
                   if last_event_id != 0 {
                     if event.header.event_id != last_event_id + 1 {
                       if event.header.event_id > last_event_id {
@@ -321,11 +265,11 @@ pub fn event_processing(board_id            : u8,
                     }
                   }
                   if op_mode == TofOperationMode::RBWaveform {
-                    debug!("Using paddle map {:?}", paddle_map);
-                    match waveform_analysis(&mut event, &paddle_map, &cali) {
-                      Err(err) => error!("Waveform analysis failed! {err}"),
-                      Ok(_)    => ()
-                    }
+                    //debug!("Using paddle map {:?}", paddle_map);
+                    //match waveform_analysis(&mut event, &paddle_map, &cali) {
+                    //  Err(err) => error!("Waveform analysis failed! {err}"),
+                    //  Ok(_)    => ()
+                    //}
                   }
                   n_events += 1;
                   if verbose && n_events % 100 == 0 {
@@ -367,15 +311,9 @@ pub fn event_processing(board_id            : u8,
               events_not_sent += 1;
             }
           }
-        }
+        } // end 'event_reader
       }, // end OK(recv)
     }// end match 
-    if events_not_sent > 0 {
-      error!("There were {events_not_sent} unsent events!");
-    }
-    if skipped_events > 0 {
-      error!("We skipped {} events!", skipped_events);
-    }
   } // end outer loop
 }
 
