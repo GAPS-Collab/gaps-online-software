@@ -4,19 +4,24 @@ use pyo3::exceptions::PyValueError;
 extern crate pyo3_log;
 use numpy::PyArray1;
 
-use tof_dataclasses::analysis::{find_peaks,
-                                find_peaks_zscore,
-                                interpolate_time,
-                                cfd_simple,
-                                integrate,
-                                time2bin};
+use std::net::UdpSocket;
+
+use tof_dataclasses::analysis::{
+    find_peaks,
+    find_peaks_zscore,
+    interpolate_time,
+    cfd_simple,
+    integrate,
+    time2bin
+};
 
 use tof_dataclasses::calibrations::{
     find_zero_crossings,
     get_periods,
     Edge,
 };
-    
+
+use tof_dataclasses::ipbus as ipbus;
 
 ///helper
 fn convert_pyarray1(arr : &PyArray1<f32>) -> Vec<f32> {
@@ -43,7 +48,6 @@ pub fn wrap_get_periods(trace   : &PyArray1<f32>,
   Ok(result)
 }
 
-
 #[pyfunction]
 #[pyo3(name="find_zero_crossings")]
 /// Get a vector with the indizes where 
@@ -54,8 +58,6 @@ pub fn wrap_find_zero_crossings(trace : &PyArray1<f32>)
   let zcs = find_zero_crossings(&tr);
   Ok(zcs)
 }
-
-
 
 #[pyfunction]
 #[pyo3(name="cfd_simple")]
@@ -223,9 +225,77 @@ fn wrap_find_peaks_zscore(voltages       : &PyArray1<f32>,
                          influence) {
    Ok(result) => Ok(result),
    Err(err)   => {
-    return Err(PyValueError::new_err(err.to_string()));
+     return Err(PyValueError::new_err(err.to_string()));
    }
  }
+}
+
+#[pyclass]
+pub struct IPBus {
+  //#[pyo3(get, set)]
+  //value: i32,
+  ipbus : ipbus::IPBus,
+}
+//
+#[pymethods]
+impl IPBus {
+  #[new]
+  fn new(target_address : String) -> Self {
+    let ipbus = ipbus::IPBus::new(target_address).expect("Unable to connect to {target_address}");
+    Self {
+      ipbus : ipbus,
+    }
+  }
+
+  pub fn get_status(&mut self) {
+    self.ipbus.get_status();
+  }
+  
+  pub fn read_multiple(&mut self,
+                       addr           : u32,
+                       nwords         : usize,
+                       increment_addr : bool,
+                       verify_tid     : bool) 
+    -> PyResult<Vec<u32>> {
+  
+    match self.ipbus.read_multiple(addr,
+                                   nwords,
+                                   increment_addr,
+                                   verify_tid) {
+      Ok(result) => {
+        return Ok(result);
+      },
+      Err(err)   => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+
+  pub fn write(&mut self,
+               addr   : u32,
+               data   : u32) 
+    -> PyResult<()> {
+    
+    match self.ipbus.write(addr, data) {
+      Ok(_) => Ok(()),
+      Err(err)   => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+ 
+
+  pub fn read(&mut self, addr   : u32, verify_tid : bool) 
+    -> PyResult<u32> {
+    match self.ipbus.read(addr, verify_tid) {
+      Ok(result) => {
+        return Ok(result);
+      },
+      Err(err)   => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
 }
 
 /// Python API to rust version of tof-dataclasses.
@@ -244,5 +314,6 @@ fn rust_dataclasses(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(wrap_cfd_simple,m)?)?;
     m.add_function(wrap_pyfunction!(wrap_find_zero_crossings,m)?)?;
     m.add_function(wrap_pyfunction!(wrap_get_periods,m)?)?;
+    m.add_class::<IPBus>()?;
     Ok(())
 }
