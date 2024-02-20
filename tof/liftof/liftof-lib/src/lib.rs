@@ -416,6 +416,8 @@ pub fn waveform_analysis(event         : &mut RBEvent,
   let fit_sinus = true;
   
   // FIXME - don't do this per every event
+  // We might have to though because the number
+  // of active paddles is changing every event
   for raw_ch in channels {
     if raw_ch == 8 {
       continue;
@@ -424,11 +426,11 @@ pub fn waveform_analysis(event         : &mut RBEvent,
     let ch = raw_ch + 1;
     //let mut TofHit::new();
     //let p_end_id = channel_map.get(&ch).unwrap_or(&0);
-    let p_end_id = rb.channel_to_paddle_end_id[raw_ch as usize];
-    if p_end_id < 1000 {
-      //error!("Invalid paddle end id {} for channel {}!", p_end_id, ch);
-      continue;
-    }
+    //let p_end_id = rb.channel_to_paddle_end_id[raw_ch as usize];
+    //if p_end_id < 1000 {
+    //  //error!("Invalid paddle end id {} for channel {}!", p_end_id, ch);
+    //  continue;
+    //}
     pid = rb.get_pid_for_ch(ch as usize);
     if !paddles.contains_key(&pid) {
       let mut hit   = TofHit::new();
@@ -514,7 +516,7 @@ pub fn waveform_analysis(event         : &mut RBEvent,
       ch_voltages[n] -= ped;
     }
     let mut charge : f32 = 0.0;
-    warn!("Check impedance value! Just using 50 [Ohm]");
+    debug!("Check impedance value! Just using 50 [Ohm]");
     match integrate(&ch_voltages,
                     &ch_times,
                     270.0, 70.0, 50.0) {
@@ -546,9 +548,9 @@ pub fn waveform_analysis(event         : &mut RBEvent,
         for pk in peaks.iter() {
           match cfd_simple(&ch_voltages,
                            &ch_times,
-                           0.2,pk.0, pk.1) {
+                           0.2, pk.0, pk.1) {
             Err(err) => {
-              error!("Unable to calculate cfd for peak {} {}! Err {}", pk.0, pk.1, err);
+              debug!("Unable to calculate cfd for peak {} {}! {}", pk.0, pk.1, err);
             }
             Ok(cfd) => {
               cfd_times.push(cfd);
