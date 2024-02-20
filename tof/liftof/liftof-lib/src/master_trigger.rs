@@ -586,6 +586,10 @@ pub fn master_trigger(mt_address        : String,
       unset_all_triggers(&socket); 
       set_track_trigger(&socket, settings.trigger_prescale);
     }
+    TriggerType::TrackCentral   => {
+      unset_all_triggers(&socket); 
+      set_central_track_trigger(&socket, settings.trigger_prescale);
+    }
     TriggerType::Gaps    => {
       unset_all_triggers(&socket); 
       set_gaps_trigger(&socket, settings.gaps_trigger_use_beta);
@@ -937,11 +941,11 @@ pub fn set_rb_int_window(socket : &UdpSocket, wind : u8)
   -> Result<(), Box<dyn Error>> {
   info!("Setting RB_INT_WINDOW to {}!", wind);
   let mut buffer = [0u8;MT_MAX_PACKSIZE];
-  let mut value =  read_register(socket, 0xf , &mut buffer)?;
-  let mut mask = 0xfffff0ff;
+  let mut value  =  read_register(socket, 0xf , &mut buffer)?;
+  let mut mask   = 0xfffff0ff;
   // switch the bins off
-  value = value & mask;
-  let wind_bits = (wind as u32) << 8;
+  value          = value & mask;
+  let wind_bits  = (wind as u32) << 8;
   value = value | wind_bits;
   write_register(socket,
                  0xf,
@@ -988,6 +992,19 @@ pub fn set_track_trigger(socket : &UdpSocket, prescale : f32)
   let mut buffer = [0u8;MT_MAX_PACKSIZE];
   write_register(socket,
                  0x41,
+                 prescale_val,
+                 &mut buffer)?;
+  Ok(())
+}
+
+/// Set the CENTRAL track trigger with a prescale
+pub fn set_central_track_trigger(socket : &UdpSocket, prescale : f32) 
+  -> Result<(), Box<dyn Error>> {
+  let prescale_val = (u32::MAX as f32 * prescale).floor() as u32;
+  info!("Setting track trigger with prescale {}!", prescale);
+  let mut buffer = [0u8;MT_MAX_PACKSIZE];
+  write_register(socket,
+                 0x42,
                  prescale_val,
                  &mut buffer)?;
   Ok(())
