@@ -575,33 +575,59 @@ pub fn master_trigger(mt_address        : String,
   }
   match settings.trigger_type {
     TriggerType::Poisson => {
-      unset_all_triggers(&socket); 
-      set_poisson_trigger(&socket,settings.poisson_trigger_rate);
+      match unset_all_triggers(&socket) {
+        Err(err) => error!("Unable to undo previous trigger settings! {err}"),
+        Ok(_)    => ()
+      }
+      match set_poisson_trigger(&socket,settings.poisson_trigger_rate) {
+        Err(err) => error!("Unable to set the POISSON trigger! {err}"),
+        Ok(_)    => ()
+      }
     }
     TriggerType::Any     => {
-      unset_all_triggers(&socket); 
-      set_any_trigger(&socket,settings.trigger_prescale); 
+      match unset_all_triggers(&socket) {
+        Err(err) => error!("Unable to undo previous trigger settings! {err}"),
+        Ok(_)    => ()
+      }
+      match set_any_trigger(&socket,settings.trigger_prescale) {
+        Err(err) => error!("Unable to set the ANY trigger! {err}"),
+        Ok(_)    => ()
+      }
     }
     TriggerType::Track   => {
-      unset_all_triggers(&socket); 
-      set_track_trigger(&socket, settings.trigger_prescale);
+      match unset_all_triggers(&socket) {
+        Err(err) => error!("Unable to undo previous trigger settings! {err}"),
+        Ok(_)    => ()
+      }
+      match set_track_trigger(&socket, settings.trigger_prescale) {
+        Err(err) => error!("Unable to set the TRACK trigger! {err}"),
+        Ok(_)    => ()
+      }
     }
     TriggerType::TrackCentral   => {
-      unset_all_triggers(&socket); 
-      set_central_track_trigger(&socket, settings.trigger_prescale);
+      match unset_all_triggers(&socket) {
+        Err(err) => error!("Unable to undo previous trigger settings! {err}"),
+        Ok(_)    => ()
+      }
+      match set_central_track_trigger(&socket, settings.trigger_prescale) {
+        Err(err) => error!("Unable to set the CENTRAL TRACK trigger! {err}"),
+        Ok(_)    => ()
+      }
     }
     TriggerType::Gaps    => {
-      unset_all_triggers(&socket); 
-      set_gaps_trigger(&socket, settings.gaps_trigger_use_beta);
+      match unset_all_triggers(&socket) {
+        Err(err) => error!("Unable to undo previous trigger settings! {err}"),
+        Ok(_)    => ()
+      }
+      match set_gaps_trigger(&socket, settings.gaps_trigger_use_beta) {
+        Err(err) => error!("Unable to set the GAPS trigger! {err}"),
+        Ok(_)    => ()
+      }
     }
     TriggerType::Unknown => {
       println!("== ==> Not setting any trigger condition. You can set it through pico_hal.py");
       warn!("Trigger condition undefined! Not setting anything!");
       error!("Trigger conditions unknown!");
-    }
-    _ => {
-      // actually panic here since this does not make sense
-      panic!("Can't set trigger for trigger type {}", settings.trigger_type);
     }
   }
 
@@ -901,7 +927,7 @@ pub fn set_trace_suppression(socket : &UdpSocket,
   let mut buffer = [0u8;MT_MAX_PACKSIZE];
   let mut value = read_register(socket, 0xf, &mut buffer)?;
   // bit 13 has to be 1 for read all channels
-  let mut read_all_ch = u32::pow(2, 13);
+  let read_all_ch = u32::pow(2, 13);
   if sup { // sup means !read_all_ch
     value = value & !read_all_ch;
   }
@@ -931,7 +957,7 @@ pub fn get_tiu_link_status(socket : &UdpSocket)
   -> Result<bool, Box<dyn Error>> {
   let mut tiu_good = 0x1u32;
   let mut buffer   = [0u8;MT_MAX_PACKSIZE];
-  let mut value    = read_register(socket, 0xf, &mut buffer)?;
+  let value        = read_register(socket, 0xf, &mut buffer)?;
   tiu_good         = tiu_good & ( value & 0x1);
   Ok(tiu_good > 0)
 }
@@ -943,7 +969,7 @@ pub fn set_rb_int_window(socket : &UdpSocket, wind : u8)
   let mut buffer = [0u8;MT_MAX_PACKSIZE];
   let mut value  =  read_register(socket, 0xf , &mut buffer)?;
   println!("==> Getting value {value} from register 0xf on MTB");
-  let mut mask   = 0xffffe0ff;
+  let mask   = 0xffffe0ff;
   // switch the bins off
   value          = value & mask;
   let wind_bits  = (wind as u32) << 8;
@@ -1027,9 +1053,9 @@ pub fn unset_all_triggers(socket : &UdpSocket)
                  0x14,
                  trig_settings,
                  &mut buffer)?;
-  set_poisson_trigger(socket, 0);
-  set_any_trigger    (socket, 0.0);
-  set_track_trigger  (socket, 0.0);
+  set_poisson_trigger(socket, 0)?;
+  set_any_trigger    (socket, 0.0)?;
+  set_track_trigger  (socket, 0.0)?;
   Ok(())
 }
 
