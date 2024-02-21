@@ -25,6 +25,7 @@ use crate::errors::SerializationError;
 
 use crate::events::{MasterTriggerEvent,
                     RBEvent,
+                    TofHit,
                     RBMissingHit};
 
 // This looks like a TODO
@@ -497,6 +498,33 @@ impl FromRandom for TofEventHeader {
       n_paddles            : rng.gen::<u8>()  
     }
   }
+}
+
+/// Smaller packet for in-flight telemetry stream
+pub struct TofEventSummary {
+  pub status            : u8,
+  pub quality           : u8,
+  pub trigger_setting   : u8,
+  /// the number of triggered paddles coming
+  /// from the MTB directly. This might NOT be
+  /// the same as the number of hits!
+  pub n_trigger_paddles : u8,
+  pub event_id          : u32,
+  pub timestamp32       : u32,
+  pub timestamp16       : u16,
+  /// reconstructed primary beta
+  pub primary_beta      : u16, 
+  /// reconstructed primary charge
+  pub primary_charge    : u16, 
+  pub hits : Vec<TofHit>,
+  //u16         primary_outer_tof_x  , 
+  //u16         primary_outer_tof_y  , 
+  //u16         primary_outer_tof_z  , 
+  //u16         primary_inner_tof_x  , 
+  //u16         primary_inner_tof_y  , 
+  //u16         primary_inner_tof_z  ,  
+  //u16         nhit_outer_tof       ,  
+  //u16         nhit_inner_tof       , 
 }
 
 

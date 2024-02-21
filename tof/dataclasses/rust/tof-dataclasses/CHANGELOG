@@ -2,7 +2,8 @@
 
 ## v0.9.2
 * adds the ipbus library. Port from liftof-lib
-* new packet types for deconstructed TofEvent
+* new packet types for deconstructed TofEvent, TofEventSummary
+  and RBWaveform
 
 ## v0.9.1
 * removes deprecated MasterTriggerMapping 

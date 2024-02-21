@@ -1084,6 +1084,36 @@ std::string RBWaveform::to_string() const {
   }
   return repr;
 }
+  
+TofEventSummary TofEventSummary::from_bytestream(const Vec<u8> &stream, 
+                                                 u64 &pos) {
+  TofEventSummary tes;
+  return tes;
+}
+u64 TofEventSummary::get_timestamp48() const {
+  return ((u64)timestamp16 << 32) | (u64)timestamp32;
+}
+
+std::string TofEventSummary::to_string() const {
+  std::string repr = "<TofEventSummary";
+  //repr += std::format("\n  format test {:.2f}", get_time_a() );
+  repr += std::format("\n  Status             : {}", status);
+  repr += std::format("\n  Quality            : {}", quality);
+  repr += std::format("\n  Trigger            : {}", trigger_setting);
+  repr += std::format("\n  N trig paddles     : {}", n_trigger_paddles);
+  repr += std::format("\n  Event ID           : {}", event_id);
+  repr += std::format("\n  timestamp32        : {}", timestamp32)      ;
+  repr += std::format("\n  timestamp16        : {}", timestamp16)      ;
+  repr += std::format("\n  |->timestamp48     : {}", get_timestamp48());
+  repr += std::format("\n  NHits       (reco) : {}", hits.size());
+  repr += std::format("\n  Prim Beta   (reco) : {}", primary_beta);
+  repr += std::format("\n  Prim Charge (reco) : {}", primary_beta);
+  repr += "\n  **** **** ****";
+  for (auto const &h : hits) {
+    repr += std::format("\n  {}",h.to_string()); 
+  }
+  return repr;
+}
 
 std::ostream& operator<<(std::ostream& os, const TofHit& th) {
   os << th.to_string();
@@ -1112,6 +1142,11 @@ std::ostream& operator<<(std::ostream& os, const RBEventHeader& rh) {
 
 std::ostream& operator<<(std::ostream& os, const RBWaveform& wf) {
   os << wf.to_string();
+  return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const TofEventSummary& tes) {
+  os << tes.to_string();
   return os;
 }
 
