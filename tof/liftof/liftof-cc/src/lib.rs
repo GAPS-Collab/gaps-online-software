@@ -2,9 +2,14 @@ use crossbeam_channel::Sender;
 use liftof_lib::{PowerStatusEnum, TofComponent, LTBThresholdName};
 use tof_dataclasses::errors::CmdError;
 use tof_dataclasses::packets::{TofPacket, PacketType};
-use tof_dataclasses::commands::{TofCommand, TofCommandCode, TofCommandResp, TofResponse};
+use tof_dataclasses::commands::{
+    TofCommand,
+    TofCommandCode,
+    //TofCommandResp,
+    //TofResponse
+};
 use tof_dataclasses::constants::PAD_CMD_32BIT;
-use zmq::Socket;
+//use zmq::Socket;
 
 #[macro_use] extern crate log;
 extern crate clap;

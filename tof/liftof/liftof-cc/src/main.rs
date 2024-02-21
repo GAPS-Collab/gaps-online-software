@@ -9,7 +9,7 @@
 extern crate env_logger;
 extern crate clap;
 extern crate ctrlc;
-extern crate zmq;
+//extern crate zmq;
 extern crate tof_dataclasses;
 extern crate local_ip_address;
 extern crate crossbeam_channel;
@@ -306,10 +306,7 @@ fn main() {
   let (ev_to_builder, ev_from_rb) : (cbc::Sender<RBEvent>, cbc::Receiver<RBEvent>) = cbc::unbounded();
   let (cmd_sender, cmd_receiver)  : (cbc::Sender<TofPacket>, cbc::Receiver<TofPacket>) = cbc::unbounded();
 
-  let ctx = zmq::Context::new();
   // I guess expect is fine here, see above
-  let socket = ctx.socket(zmq::SUB).expect("Unable to create 0MQ SUB socket!");
-
   let thread_control = Arc::new(Mutex::new(ThreadControl::new()));
 
   let one_minute = time::Duration::from_millis(60000);

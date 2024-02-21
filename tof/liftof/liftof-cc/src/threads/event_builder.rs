@@ -7,7 +7,7 @@ use crossbeam_channel::{
 
 use std::collections::VecDeque;
 use std::collections::HashMap;
-use std::path::Path;
+//use std::path::Path;
 
 use tof_dataclasses::events::{MasterTriggerEvent,
                               TofEvent,

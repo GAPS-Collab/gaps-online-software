@@ -1,10 +1,10 @@
 //! Routines for RB commiunication and data reception 
 
 //use std::time::{SystemTime, UNIX_EPOCH};
-use std::path::{
-    Path,
-    PathBuf,
-};
+//use std::path::{
+//    Path,
+//    PathBuf,
+//};
 use crossbeam_channel::Sender;
 
 use tof_dataclasses::manifest::ReadoutBoard;
@@ -13,7 +13,6 @@ use tof_dataclasses::packets::{
     TofPacket,
     PacketType
 };
-use tof_dataclasses::calibrations::RBCalibrations;
 use tof_dataclasses::serialization::Serialization;
 //use tof_dataclasses::RBChannelPaddleEndIDMap;
 
@@ -21,7 +20,6 @@ use liftof_lib::{
     //build_tcp_from_ip,
     //get_rb_ch_pid_map,
     waveform_analysis,
-    ASSET_DIR,
 };
 
 /*************************************/
@@ -61,14 +59,6 @@ pub fn readoutboard_communicator(ev_to_builder       : &Sender<RBEvent>,
   // how many chunks ("buffers") we dealt with
   let mut n_chunk  = 0usize;
   // in case we want to do calibratoins
-  let mut calibrations = RBCalibrations::new(rb.rb_id);
-  if run_analysis_engine {
-    if rb.calibration.rb_id == 0 {
-      error!("Requested to run analysis engine for board {}, but we did not load a valid calibration!", board_id);
-    } else {
-      //calibrations = rb.calibration;
-    }
-  }
   let address = rb.guess_address();
 
   // FIXME - this panics, however, if we can't set up the socket, what's 

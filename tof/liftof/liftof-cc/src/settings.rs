@@ -13,7 +13,7 @@ use std::fmt;
 
 extern crate toml;
 use tof_dataclasses::errors::SerializationError;
-use tof_dataclasses::events::master_trigger::TriggerType;
+//use tof_dataclasses::events::master_trigger::TriggerType;
 
 use liftof_lib::master_trigger::MTBSettings;
 
