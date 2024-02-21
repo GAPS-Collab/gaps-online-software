@@ -261,10 +261,10 @@ impl FromRandom for TofCommandResp {
 pub enum TofOperationMode {
   Unknown          = 0u8,
   Default          = 1u8,
-  #[deprecated(since="0.8.3")] 
-  StreamAny        = 10u8,
-  #[deprecated(since="0.8.3")] 
-  RequestReply     = 20u8,
+  //#[deprecated(since="0.8.3")] 
+  //StreamAny        = 10u8,
+  //#[deprecated(since="0.8.3")] 
+  //RequestReply     = 20u8,
   /// Don't decode any of the event 
   /// data on the RB, just push it 
   /// onward
@@ -286,8 +286,8 @@ impl From<u8> for TofOperationMode {
     match value {
       0u8  => TofOperationMode::Unknown,
       1u8  => TofOperationMode::Default,
-      10u8 => TofOperationMode::StreamAny,
-      20u8 => TofOperationMode::RequestReply,
+      //10u8 => TofOperationMode::StreamAny,
+      //20u8 => TofOperationMode::RequestReply,
       30u8 => TofOperationMode::RBHighThroughput,
       40u8 => TofOperationMode::RBCalcCRC32,
       50u8 => TofOperationMode::RBWaveform,
@@ -303,8 +303,8 @@ impl FromRandom for TofOperationMode {
     let choices = [
       TofOperationMode::Unknown,
       TofOperationMode::Default,
-      TofOperationMode::RequestReply,
-      TofOperationMode::StreamAny,
+      //TofOperationMode::RequestReply,
+      //TofOperationMode::StreamAny,
       TofOperationMode::RBHighThroughput,
       TofOperationMode::RBCalcCRC32,
       TofOperationMode::RBWaveform,

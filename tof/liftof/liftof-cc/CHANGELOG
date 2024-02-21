@@ -1,5 +1,8 @@
 # HAHALUA series
 
+# v0.9.4
+* fixes a bug when setting RB_INTEGRATION_WINDOW
+
 # v0.9.3
 * get the dsi_j_ltbch_rbidch map from the 
   DB and remove the extra argument

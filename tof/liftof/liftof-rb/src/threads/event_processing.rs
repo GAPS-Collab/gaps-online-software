@@ -47,12 +47,14 @@ use crate::control::get_board_id;
 ///                          bytestream comes directly from 
 ///                          the data buffers.
 ///  * get_op_mode         : The TOF operation mode. Typically,
-///                          this is "StreamAny", meaning that 
-///                          whatever the TOF produceds, it gets
-///                          wrapped in TofPackets and send away.
-///                          In "RequestReply" mode, liftof-rb
-///                          waits for event requests sent by 
-///                          a third party
+///                          this is "Default", meaning that the
+///                          RBs will sent what is in the memory 
+///                          buffer translated into RBEvents.
+///                          In "RBHighThrougput" mode, it will not
+///                          translate them into RBEvents, but just
+///                          transmits the content of the buffers, and 
+///                          RBWaveform mode will do waveform analysis
+///                          on the boards
 ///  * tp_sender           : Send the resulting data product to 
 ///                          get processed further
 ///  * data_type           : If different from 0, do some processing
@@ -76,8 +78,7 @@ pub fn event_processing(board_id            : u8,
                         thread_control      : Arc<Mutex<ThreadControl>>,
                         stat                : Arc<Mutex<RunStatistics>>,
                         only_perfect_events : bool) {
-  // reasonable default ? 
-  let mut op_mode = TofOperationMode::StreamAny;
+  let mut op_mode = TofOperationMode::Default;
 
   // load calibration just in case?
   let mut cali_loaded = false;
@@ -133,7 +134,7 @@ pub fn event_processing(board_id            : u8,
         Ok(mode) => {
           warn!("Will change operation mode to {:?}!", mode);
           match mode {
-            TofOperationMode::StreamAny    => {
+            TofOperationMode::Default    => {
               op_mode_stream = true;
               streamer.request_mode = false;
               op_mode = mode;
@@ -142,8 +143,8 @@ pub fn event_processing(board_id            : u8,
               if !cali_loaded {
                 error!("Requesting waveform analysis without having a calibration loaded!");
                 error!("Can't do waveform analysis without calibration!");
-                error!("Switching mode to StreamAny");
-                op_mode = TofOperationMode::StreamAny;
+                error!("Switching mode to Default");
+                op_mode = TofOperationMode::Default;
               }
             }
             _ => (),
@@ -154,7 +155,7 @@ pub fn event_processing(board_id            : u8,
     if !dtf_fr_runner.is_empty() {
       match dtf_fr_runner.try_recv() {
         Err(err) => {
-          error!("Issues receiving datatype/format! Err {err}");
+          error!("Issues receiving datatype/format! {err}");
         }
         Ok(dtf) => {
           data_type = dtf; 
@@ -220,8 +221,7 @@ pub fn event_processing(board_id            : u8,
                 }
               }
             },
-            TofOperationMode::StreamAny |
-            TofOperationMode::RequestReply |
+            TofOperationMode::Default |
             TofOperationMode::RBWaveform => {
               match streamer.next() {
                 None => {

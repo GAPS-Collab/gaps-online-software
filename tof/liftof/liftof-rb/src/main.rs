@@ -78,6 +78,8 @@ use tof_dataclasses::io::{
 use liftof_lib::{
     LIFTOF_LOGO_SHOW,
     DATAPORT,
+    //Command,
+    CommandRB,
     color_log,
     get_rb_ch_pid_map,
     RunStatistics,
@@ -96,9 +98,6 @@ use liftof_rb::threads::{
 use liftof_rb::api::*;
 use liftof_rb::control::*;
 
-use liftof_lib::{Command,
-                 CommandRB};
-
 #[derive(Parser, Debug)]
 #[command(author = "J.A.Stoessl", version, about, long_about = None)]
 struct Args {
@@ -106,11 +105,11 @@ struct Args {
   /// this program is run manually without systemd and not controlled by a central server. 
   /// If in this configuration one wants to take data, ONE HAS TO SUPPLY A RUNCONFIG!
   #[arg(short, long)]
-  run_config: Option<std::path::PathBuf>,
+  run_config: Option<PathBuf>,
   /// Paddle map - this is only needed when the RBs 
   /// should do waveform analysis
   #[arg(short, long)]
-  paddle_map: Option<std::path::PathBuf>,
+  paddle_map: Option<PathBuf>,
   /// Listen to remote input from the TOF computer at 
   /// the expected IP address
   #[arg(short, long, default_value_t = false)]
@@ -223,7 +222,7 @@ fn main() {
   
   // check if the board has received the correct link id from the mtb
   match get_mtb_link_id() {
-    Err(err) => error!("Unable to obtain MTB link id!"),
+    Err(err) => error!("Unable to obtain MTB link id! {err}"),
     Ok(link_id) => {
       if link_id == rb_info.board_id as u32 {
         println!("=> We received the correct link id from the MTB!");
@@ -240,7 +239,7 @@ fn main() {
   }
 
   let mut rc_config     = RunConfig::new();
-  let mut rc_file_path  = std::path::PathBuf::new();
+  let mut rc_file_path  = PathBuf::new();
   let mut end_after_run = false;
   let mut calibration = false;
   match args.command {
@@ -435,7 +434,7 @@ fn main() {
   // should this program end after it is done?
   let mut end = false;
   
-  let mut do_monitoring = true;
+  let do_monitoring : bool;
   // We can only start a run here, if this is not
   // run through systemd
   // if we are not as systemd, 
@@ -449,7 +448,7 @@ fn main() {
       // BEGIN Matching calibration command
       CommandRB::Calibration(calib_cmd) => {
         match calib_cmd {
-          CalibrationCmd::Default(default_opts) => {
+          CalibrationCmd::Default(_default_opts) => {
             match rb_calibration(&rc_to_runner_cal, 
                 &tp_to_pub_cal,
                                   ip_address) {
@@ -459,7 +458,7 @@ fn main() {
               }
             }
           },
-          CalibrationCmd::Noi(noi_opts) => {
+          CalibrationCmd::Noi(_noi_opts) => {
             match rb_noi_subcalibration(&rc_to_runner_cal, 
                         &tp_to_pub_cal) {
               Ok(_) => (),
@@ -554,7 +553,7 @@ fn main() {
         }
       },
       // END Matching run commmand
-      _ => ()
+      //_ => ()
     }
     do_monitoring = false;
     end = true; // in case of we have done the calibration
