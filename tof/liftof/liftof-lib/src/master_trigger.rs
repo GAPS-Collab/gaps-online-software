@@ -942,7 +942,8 @@ pub fn set_rb_int_window(socket : &UdpSocket, wind : u8)
   info!("Setting RB_INT_WINDOW to {}!", wind);
   let mut buffer = [0u8;MT_MAX_PACKSIZE];
   let mut value  =  read_register(socket, 0xf , &mut buffer)?;
-  let mut mask   = 0xfffff0ff;
+  println!("==> Getting value {value} from register 0xf on MTB");
+  let mut mask   = 0xffffe0ff;
   // switch the bins off
   value          = value & mask;
   let wind_bits  = (wind as u32) << 8;
@@ -951,6 +952,9 @@ pub fn set_rb_int_window(socket : &UdpSocket, wind : u8)
                  0xf,
                  value,
                  &mut buffer)?;
+  println!("++ Writing to register ++");
+  value  =  read_register(socket, 0xf , &mut buffer)?;
+  println!("==> Reading back value {value} from register 0xf on MTB after writing to it!");
   Ok(())
 }
 
