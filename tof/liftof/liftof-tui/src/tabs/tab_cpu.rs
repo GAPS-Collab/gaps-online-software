@@ -6,7 +6,7 @@ use crossbeam_channel::Receiver;
 use ratatui::symbols::line::*;
 use ratatui::{
     //backend::CrosstermBackend,
-    symbols, 
+    //symbols, 
     terminal::Frame,
     layout::{
         Alignment,
@@ -19,7 +19,9 @@ use ratatui::{
     style::{Modifier, Color, Style},
     //text::{Span, Line},
     widgets::{
-        Block, BorderType, Borders, LineGauge, List, ListItem, ListState, Paragraph},
+        Block, BorderType, Borders, LineGauge,
+        //List, ListItem, ListState,
+        Paragraph},
 };
 
 use tof_dataclasses::packets::{
@@ -93,7 +95,7 @@ impl CPUTab {
   }
   
   pub fn receive_packet(&mut self) -> Result<(), SerializationError> {
-    let mut moni = CPUMoniData::new();
+    let moni : CPUMoniData;// CPUMoniData::new();
     let met      = self.timer.elapsed().as_secs_f64();
     match self.tp_recv.try_recv() {
       Err(err)   => {
@@ -148,7 +150,7 @@ impl CPUTab {
           )
           .split(main_chunks[0]);
       
-        let mut graph_chunks = Layout::default()
+        let graph_chunks = Layout::default()
           .direction(Direction::Horizontal)
           .constraints(
               [Constraint::Percentage(50),
@@ -157,7 +159,7 @@ impl CPUTab {
           .split(main_chunks[1]).to_vec();
 
         
-        let mut freq_chunks = Layout::default()
+        let freq_chunks = Layout::default()
           .direction(Direction::Vertical)
           .constraints(
               [Constraint::Percentage(25),
@@ -167,7 +169,7 @@ impl CPUTab {
           )
           .split(graph_chunks[0]).to_vec();
         
-        let mut temp_chunks = Layout::default()
+        let temp_chunks = Layout::default()
           .direction(Direction::Vertical)
           .constraints(
               [Constraint::Percentage(25),
@@ -178,11 +180,11 @@ impl CPUTab {
           .split(graph_chunks[1]).to_vec();
 
 
-        let foo1 = String::from("foo1");
-        let foo3 = String::from("foo3");
-        let foo4 = String::from("foo4");
+        let info_view_str = String::from("foo1");
+        //let foo3 = String::from("foo3");
+        //let foo4 = String::from("foo4");
 
-        let info_view = Paragraph::new(foo1)
+        let info_view = Paragraph::new(info_view_str)
         .style(self.theme.style())
         .alignment(Alignment::Left)
         .block(
@@ -192,16 +194,16 @@ impl CPUTab {
             .title("Info")
             .border_type(BorderType::Rounded),
         );
-        let foo_par3 = Paragraph::new(foo3)
-        .style(self.theme.style())
-        .alignment(Alignment::Left)
-        .block(
-          Block::default()
-            .borders(Borders::ALL)
-            .style(self.theme.style())
-            .title("Overview")
-            .border_type(BorderType::Rounded),
-        );
+        //let foo_par3 = Paragraph::new(foo3)
+        //.style(self.theme.style())
+        //.alignment(Alignment::Left)
+        //.block(
+        //  Block::default()
+        //    .borders(Borders::ALL)
+        //    .style(self.theme.style())
+        //    .title("Overview")
+        //    .border_type(BorderType::Rounded),
+        //);
         
         // disc usage gauge
         //self.disk_usage = 42;
@@ -240,16 +242,16 @@ impl CPUTab {
           .line_set(LG_LINE)
           //.percent(self.disk_usage as u16);
           .ratio(ratio);
-        let foo_par4 = Paragraph::new(foo4)
-        .style(self.theme.style())
-        .alignment(Alignment::Left)
-        .block(
-          Block::default()
-            .borders(Borders::ALL)
-            .style(self.theme.style())
-            .title("Overview")
-            .border_type(BorderType::Rounded),
-        );
+        //let foo_par4 = Paragraph::new(foo4)
+        //.style(self.theme.style())
+        //.alignment(Alignment::Left)
+        //.block(
+        //  Block::default()
+        //    .borders(Borders::ALL)
+        //    .style(self.theme.style())
+        //    .title("Overview")
+        //    .border_type(BorderType::Rounded),
+        //);
         for core in 0..4 {
           let label            = format!("Core{} freq. [GHz]", core);
           let core_theme       = self.theme.clone();
