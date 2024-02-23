@@ -184,7 +184,9 @@ fn main() {
   let write_npack_file      = config.packs_per_file;
   let db_path               = Path::new(&config.db_path);
   let cpu_moni_interval     = config.cpu_moni_interval_sec;
-  let flight_address        = config.fc_pub_address.clone();
+  let flight_address_pub        = config.fc_pub_address.clone();
+  let flight_address_sub        = config.fc_sub_address.clone();
+  let cmd_listener_interval_sec    = config.cmd_listener_interval_sec;
   let mtb_settings          = config.mtb_settings;
   let run_analysis_engine   = config.run_analysis_engine;
   let ltb_rb_map            = get_dsi_j_ltbch_vs_rbch_map(db_path);
@@ -307,8 +309,6 @@ fn main() {
   let (cmd_sender, cmd_receiver) : (cbc::Sender<TofPacket>, cbc::Receiver<TofPacket>) = cbc::unbounded();
 
   let ctx = zmq::Context::new();
-  // I guess expect is fine here, see above
-  let socket = ctx.socket(zmq::SUB).expect("Unable to create 0MQ SUB socket!");
 
   let thread_control = Arc::new(Mutex::new(ThreadControl::new()));
 
@@ -337,11 +337,11 @@ fn main() {
     write_stream_path = String::from(stream_files_path.into_os_string().into_string().expect("Somehow the paths are messed up very badly! So I can't help it and I quit!"));
 
     // this is the tailscale address
-    //let flight_address = format!("tcp://100.101.96.10:{}", DATAPORT);
+    //let flight_address_pub = format!("tcp://100.101.96.10:{}", DATAPORT);
     // this is the address in the flight network
-    // flight_address = format!("tcp://10.0.1.1:{}", DATAPORT);
+    // flight_address_pub = format!("tcp://10.0.1.1:{}", DATAPORT);
     println!("==> Starting data sink thread!");
-    let flight_address_c = flight_address.clone();
+    let flight_address_c = flight_address_pub.clone();
     let _data_sink_thread = thread::Builder::new()
         .name("data-sink".into())
         .spawn(move || {
@@ -450,18 +450,20 @@ fn main() {
   let mut dont_stop = false;
   match args.command {
     Command::Listen(_) => {
-      let _flight_address_c = flight_address.clone();
+      let _flight_address_sub_c = flight_address_sub.clone();
+      let _flight_address_pub_c = flight_address_pub.clone();
       let _thread_control_c = thread_control.clone();
-      let _cmd_interval: u64 = 1000;
       let _cmd_sender_c = cmd_sender.clone();
       let _cmd_receiver_c = cmd_receiver.clone();
+      let _cmd_interval_sec: u64 = cmd_listener_interval_sec;
       let _flight_cpu_listener = thread::Builder::new()
                     .name("flight-cpu-listener".into())
                     .spawn(move || {
-                                    flight_cpu_listener(&_flight_address_c,
+                                    flight_cpu_listener(&_flight_address_sub_c,
+                                                        &_flight_address_pub_c,
                                                         &_cmd_receiver_c,
                                                         &_cmd_sender_c,
-                                                        _cmd_interval,
+                                                        _cmd_interval_sec,
                                                         _thread_control_c);
                     })
                     .expect("Failed to spawn flight-cpu-listener thread!");
@@ -470,10 +472,13 @@ fn main() {
     },
     Command::Ping(ping_cmd) => {
       match ping_cmd.component {
-        TofComponent::TofCpu => return_val = liftof_cc::send_ping_response(cmd_sender_c),
+        TofComponent::TofCpu => return_val = liftof_cc::send_ping_response(None),
         TofComponent::RB  |
         TofComponent::LTB |
-        TofComponent::MT     => return_val = liftof_cc::send_ping(cmd_sender_c, ping_cmd.component, ping_cmd.id),
+        TofComponent::MT     => return_val = liftof_cc::send_ping(None,
+                                                                  cmd_sender_c,
+                                                                  ping_cmd.component,
+                                                                  ping_cmd.id),
         _                    => {
           error!("The ping command is not implemented for this TofComponent!");
           return_val = Err(CmdError::NotImplementedError);
@@ -482,10 +487,13 @@ fn main() {
     },
     Command::Moni(moni_cmd) => {
       match moni_cmd.component {
-        TofComponent::TofCpu => return_val = liftof_cc::send_moni_response(cmd_sender_c),
+        TofComponent::TofCpu => return_val = liftof_cc::send_moni_response(None),
         TofComponent::RB    |
         TofComponent::LTB   |
-        TofComponent::MT     => return_val = liftof_cc::send_moni(cmd_sender_c, moni_cmd.component, moni_cmd.id),
+        TofComponent::MT     => return_val = liftof_cc::send_moni(None,
+                                                                  cmd_sender_c,
+                                                                  moni_cmd.component,
+                                                                  moni_cmd.id),
         _                    => {
           error!("The moni command is not implemented for this TofComponent!");
           return_val = Err(CmdError::NotImplementedError);
@@ -494,32 +502,51 @@ fn main() {
     },
     Command::SystemdReboot(systemd_reboot_cmd) => {
       let rb_id = systemd_reboot_cmd.id;
-      return_val = liftof_cc::send_systemd_reboot(cmd_sender_c, rb_id);
+      return_val = liftof_cc::send_systemd_reboot(None,
+                                                                  cmd_sender_c,
+                                                                  rb_id);
     },
     Command::Power(power_cmd) => {
       match power_cmd {
         PowerCmd::All(power_status) => {
           let power_status_enum: PowerStatusEnum = power_status.status;
-          return_val = liftof_cc::send_power(cmd_sender_c, TofComponent::All, power_status_enum);
+          return_val = liftof_cc::send_power(None,
+                                                                  cmd_sender_c,
+                                                                  TofComponent::All,
+                                                                  power_status_enum);
         },
         PowerCmd::MT(power_status) => {
           let power_status_enum: PowerStatusEnum = power_status.status;
-          return_val = liftof_cc::send_power(cmd_sender_c, TofComponent::MT, power_status_enum);
+          return_val = liftof_cc::send_power(None,
+                                                                  cmd_sender_c,
+                                                                  TofComponent::MT,
+                                                                  power_status_enum);
         },
         PowerCmd::AllButMT(power_status) => {
           let power_status_enum: PowerStatusEnum = power_status.status;
-          return_val = liftof_cc::send_power(cmd_sender_c, TofComponent::AllButMT, power_status_enum);
+          return_val = liftof_cc::send_power(None,
+                                                                  cmd_sender_c,
+                                                                  TofComponent::AllButMT,
+                                                                  power_status_enum);
         },
         PowerCmd::LTB(ltb_power_opts) => {
           let power_status_enum: PowerStatusEnum = ltb_power_opts.status;
           let ltb_id = ltb_power_opts.id;
-          return_val = liftof_cc::send_power_id(cmd_sender_c, TofComponent::LTB, power_status_enum, ltb_id);
+          return_val = liftof_cc::send_power_id(None,
+                                                                  cmd_sender_c,
+                                                                  TofComponent::LTB,
+                                                                  power_status_enum,
+                                                                  ltb_id);
         },
         PowerCmd::Preamp(preamp_power_opts) => {
           let power_status_enum: PowerStatusEnum = preamp_power_opts.status;
           let preamp_id = preamp_power_opts.id;
           let preamp_bias = preamp_power_opts.bias;
-          return_val = liftof_cc::send_power_preamp(cmd_sender_c, power_status_enum, preamp_id, preamp_bias);
+          return_val = liftof_cc::send_power_preamp(None,
+                                                                  cmd_sender_c,
+                                                                  power_status_enum,
+                                                                  preamp_id,
+                                                                  preamp_bias);
         }
       }
     },
@@ -529,24 +556,39 @@ fn main() {
           let voltage_level = default_opts.level;
           let rb_id = default_opts.id;
           let extra = default_opts.extra;
-          return_val = liftof_cc::send_default_calibration(cmd_sender_c, voltage_level, rb_id, extra);
+          return_val = liftof_cc::send_default_calibration(None,
+                                                                  cmd_sender_c,
+                                                                  voltage_level,
+                                                                  rb_id,
+                                                                  extra);
         },
         CalibrationCmd::Noi(noi_opts) => {
           let rb_id = noi_opts.id;
           let extra = noi_opts.extra;
-          return_val = liftof_cc::send_noi_calibration(cmd_sender_c, rb_id, extra);
+          return_val = liftof_cc::send_noi_calibration(None,
+                                                                  cmd_sender_c,
+                                                                  rb_id,
+                                                                  extra);
         },
         CalibrationCmd::Voltage(voltage_opts) => {
           let voltage_level = voltage_opts.level;
           let rb_id = voltage_opts.id;
           let extra = voltage_opts.extra;
-          return_val = liftof_cc::send_voltage_calibration(cmd_sender_c, voltage_level, rb_id, extra);
+          return_val = liftof_cc::send_voltage_calibration(None,
+                                                                  cmd_sender_c,
+                                                                  voltage_level,
+                                                                  rb_id,
+                                                                  extra);
         },
         CalibrationCmd::Timing(timing_opts) => {
           let voltage_level = timing_opts.level;
           let rb_id = timing_opts.id;
           let extra = timing_opts.extra;
-          return_val = liftof_cc::send_timing_calibration(cmd_sender_c, voltage_level, rb_id, extra);
+          return_val = liftof_cc::send_timing_calibration(None,
+                                                                  cmd_sender_c,
+                                                                  voltage_level,
+                                                                  rb_id,
+                                                                  extra);
         }
       }
     }
@@ -556,12 +598,19 @@ fn main() {
           let ltb_id = ltb_threshold_opts.id;
           let threshold_name = ltb_threshold_opts.name;
           let threshold_level = ltb_threshold_opts.level;
-          return_val = liftof_cc::send_ltb_threshold_set(cmd_sender_c, ltb_id, threshold_name, threshold_level);
+          return_val = liftof_cc::send_ltb_threshold_set(None,
+                                                                  cmd_sender_c,
+                                                                  ltb_id,
+                                                                  threshold_name,
+                                                                  threshold_level);
         },
         SetCmd::PreampBias(preamp_bias_opts) => {
           let preamp_id = preamp_bias_opts.id;
           let preamp_bias = preamp_bias_opts.bias;
-          return_val = liftof_cc::send_preamp_bias_set(cmd_sender_c, preamp_id, preamp_bias);
+          return_val = liftof_cc::send_preamp_bias_set(None,
+                                                                  cmd_sender_c,
+                                                                  preamp_id,
+                                                                  preamp_bias);
         }
       }
     },
@@ -571,11 +620,17 @@ fn main() {
           let run_type = run_start_opts.run_type;
           let rb_id = run_start_opts.id;
           let event_no = run_start_opts.no;
-          return_val = liftof_cc::send_run_start(cmd_sender_c, run_type, rb_id, event_no);
+          return_val = liftof_cc::send_run_start(None,
+                                                                  cmd_sender_c,
+                                                                  run_type,
+                                                                  rb_id,
+                                                                  event_no);
         },
         RunCmd::Stop(run_stop_opts) => {
           let rb_id = run_stop_opts.id;
-          return_val = liftof_cc::send_run_stop(cmd_sender_c, rb_id);
+          return_val = liftof_cc::send_run_stop(None,
+                                                                  cmd_sender_c,
+                                                                  rb_id);
         }
       }
     }
