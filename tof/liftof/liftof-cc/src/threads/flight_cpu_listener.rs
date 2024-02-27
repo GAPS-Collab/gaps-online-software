@@ -48,7 +48,7 @@ pub fn flight_cpu_listener(flight_address_sub  : &str,
   let cmd_socket = ctx.socket(zmq::SUB).expect("Unable to create 0MQ SUB socket!");
   cmd_socket.set_subscribe(b"").expect("Unable to subscribe to empty topic!");
   info!("Will set up 0MQ SUB socket to listen for flight cpu commands at address {flight_address_sub}");
-  cmd_socket.connect(flight_address_sub).expect("Unable to bind to data (SUB) socket {data_adress}");
+  cmd_socket.bind(flight_address_sub).expect("Unable to bind to data (SUB) socket {flight_address_sub}");
   info!("ZMQ SUB Socket for flight cpu listener bound to {flight_address_sub}");
 
   let mut timer     = Instant::now();
@@ -62,7 +62,7 @@ pub fn flight_cpu_listener(flight_address_sub  : &str,
       match cmd_socket.recv_bytes(0) {
         Err(err) => trace!("No new packet, err {err}"),
         Ok(buffer) => {
-          match TofPacket::from_bytestream(&buffer, &mut 4) {
+          match TofPacket::from_bytestream(&buffer, &mut 1) {
             Err(err) => {
               error!("Unknown packet...{:?}", err);
               continue;  

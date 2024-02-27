@@ -23,7 +23,7 @@ packs_per_file        = 1000 # if it gets too large change (10 GB)
 fc_pub_address        = "tcp://192.168.37.20:42000"
 # TOF computer needs to subscribe to this address to 
 # recieve commands
-fc_sub_address        = "tcp://192.168.37.200:42000"
+fc_sub_address        = "tcp://10.97.108.30:42000"
 # Interval of time that will elapse from a cmd check to the other
 cmd_listener_interval_sec = 10
 # UDP connection to the MTB (does NOT start with tcp://)
