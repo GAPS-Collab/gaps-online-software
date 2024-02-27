@@ -23,6 +23,44 @@ pub mod constants;
 pub mod threads;
 pub mod settings;
 
+/// Function that just replies to a moni command send to tofcpu
+pub fn send_power_response(resp_socket_opt: Option<Socket>,
+                           power_status: PowerStatusEnum)
+                           -> Result<TofCommandCode, CmdError> {
+
+  match power_status {
+    PowerStatusEnum::ON  => (), // nothing to do here, its already on if it received
+    PowerStatusEnum::OFF => {
+      error!("Command not implemented"); // TODO HOW DO WE SOFT REB
+      return Err(CmdError::PowerError);
+    },
+    _ => {
+      error!("Command not supported");
+      return Err(CmdError::PowerError);
+    }
+  }
+  let mut tp = TofPacket::new();
+  tp.packet_type = PacketType::CPUMoniData;
+  tp.payload = vec![TofComponent::TofCpu as u8, 0u8];
+  // TODO HOW TO SOF REBOOT TOFCPU
+  
+  match resp_socket_opt {
+    None => Ok(TofCommandCode::CmdPower),
+    Some(resp_socket) => {
+      match resp_socket.send(tp.to_bytestream(), 0) {
+        Err(err) => {
+          error!("Unable to reply to command, error{err}");
+          return Err(CmdError::MoniError);
+        },
+        Ok(_)    => {
+          info!("Replied to moni command");
+          return Ok(TofCommandCode::CmdMoni)
+        }
+      }
+    }
+  }
+}
+
 /// Power function that targets the component specified, no ID
 pub fn send_power(resp_socket_opt: Option<Socket>,
                   outgoing: Sender<TofPacket>,

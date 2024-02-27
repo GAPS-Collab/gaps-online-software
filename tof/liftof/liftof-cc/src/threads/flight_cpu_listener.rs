@@ -54,6 +54,7 @@ pub fn flight_cpu_listener(flight_address_sub  : &str,
   let mut timer     = Instant::now();
   let sleep_time    = Duration::from_secs(cmd_interval);
   'main: loop {
+    info!("Main loop tof listener executing");
     if timer.elapsed().as_secs() >= cmd_interval {
       info!("Listening for flight CPU comms");
       timer     = Instant::now();
@@ -156,20 +157,17 @@ pub fn flight_cpu_listener(flight_address_sub  : &str,
                           // TODO implement proper routines
 
                           match tof_component {
-                            TofComponent::All      => {
-                              return_val = crate::send_power(Some(resp_socket), outgoing_c,  TofComponent::All, power_status);
-                            }, //power_all(cmd_socket, component_id, status),
-                            TofComponent::MT       => {
-                              return_val = crate::send_power(Some(resp_socket), outgoing_c,  TofComponent::MT, power_status);
-                            }, //power_mt(cmd_socket, component_id, status),
+                            TofComponent::All      |
+                            TofComponent::MT       |
                             TofComponent::AllButMT => {
-                              return_val = crate::send_power(Some(resp_socket), outgoing_c,  TofComponent::AllButMT, power_status);
-                            }, //power_allbutmt(cmd_socket, component_id, status),
-                            TofComponent::LTB      => {
-                              return_val = crate::send_power_id(Some(resp_socket), outgoing_c,  TofComponent::LTB, power_status, component_id);
+                              return_val = crate::send_power(Some(resp_socket), outgoing_c,  tof_component, power_status);
                             },
+                            TofComponent::LTB      |
                             TofComponent::Preamp   => {
-                              return_val = crate::send_power_id(Some(resp_socket), outgoing_c,  TofComponent::Preamp, power_status, component_id);
+                              return_val = crate::send_power_id(Some(resp_socket), outgoing_c,  tof_component, power_status, component_id);
+                            },
+                            TofComponent::TofCpu   => {
+                              return_val = crate::send_power_response(Some(resp_socket), power_status);
                             },
                             _                      => {
                               return_val = Err(CmdError::NotImplementedError);
