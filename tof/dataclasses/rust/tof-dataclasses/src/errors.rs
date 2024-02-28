@@ -174,6 +174,7 @@ pub enum MasterTriggerError {
   PackageHeaderIncorrect,
   PackageFooterIncorrect,
   FailedOperation,
+  UdpTimeOut,
   DataTooShort
 }
 
@@ -238,6 +239,8 @@ impl Error for WaveformError {
 pub enum IPBusError {
   DecodingFailed,
   InvalidTransactionID,
+  InvalidPacketID,
+  ConnectionTimeout,
 }
 
 impl fmt::Display for IPBusError {

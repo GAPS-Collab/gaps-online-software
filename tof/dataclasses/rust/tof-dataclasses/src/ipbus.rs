@@ -337,11 +337,11 @@ impl IPBus {
     if pid != self.expected_pid {
       error!("Invalid packet ID. Expected {}, received {}", self.expected_pid, pid);
       // we do know that the next expected packet id should be the latest one + 1
-      if pid == u16::MAX {
-        self.expected_pid = 0; 
-      } else {
-        self.expected_pid = pid + 1;
-      }
+      //if pid == u16::MAX {
+      //  self.expected_pid = 0; 
+      //} else {
+      //  self.expected_pid = pid + 1;
+      //}
       return Err(IPBusError::InvalidPacketID);
     }
     match packet_type {
@@ -417,6 +417,7 @@ impl IPBus {
           if err == IPBusError::InvalidPacketID {
             debug!("--> invalid packet id, trying again");
             if verify_tid {
+              self.realign_packet_id();
               continue;
             } else {
               break;
@@ -465,6 +466,7 @@ impl IPBus {
           if err == IPBusError::InvalidPacketID {
             error!("--> invalid packet id, trying again");
             if verify_tid {
+              self.realign_packet_id();
               continue;
             } else {
               break;
