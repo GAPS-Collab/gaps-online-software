@@ -315,7 +315,7 @@ impl RBEvent {
   }
 
   /// Deconstruct the RBEvent to form RBWaveforms
-  pub fn disassemble(&self) -> Vec<RBWaveform> {
+  pub fn get_rbwaveforms(&self) -> Vec<RBWaveform> {
     let mut waveforms = Vec::<RBWaveform>::new();
     for ch in self.header.get_channels() {
       let mut wf     = RBWaveform::new();

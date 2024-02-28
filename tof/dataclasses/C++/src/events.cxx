@@ -1082,14 +1082,39 @@ std::string RBWaveform::to_string() const {
   } else {
     repr += std::format("\n  adc [{}/corrupt?]", adc.size());
   }
+  repr += ">";
   return repr;
 }
   
 TofEventSummary TofEventSummary::from_bytestream(const Vec<u8> &stream, 
                                                  u64 &pos) {
   TofEventSummary tes;
+  u16 head = Gaps::parse_u16(stream, pos);
+  if (head != TofEventSummary::HEAD) {
+    log_error("Decoding of HEAD failed! Got " << head << "instead!");
+    //return Err(SerializationError::HeadInvalid);
+  }
+  tes.status            = Gaps::parse_u8(stream, pos);
+  tes.quality           = Gaps::parse_u8(stream, pos);
+  tes.trigger_setting   = Gaps::parse_u8(stream, pos);
+  tes.n_trigger_paddles = Gaps::parse_u8(stream, pos);
+  tes.event_id          = Gaps::parse_u32(stream, pos);
+  tes.timestamp32       = Gaps::parse_u32(stream, pos);
+  tes.timestamp16       = Gaps::parse_u16(stream, pos);
+  tes.primary_beta      = Gaps::parse_u16(stream, pos); 
+  tes.primary_charge    = Gaps::parse_u16(stream, pos); 
+  u16 nhits             = Gaps::parse_u16(stream, pos);
+  for (u16 k=0; k<nhits; k++) {
+    TofHit h = TofHit::from_bytestream(stream, pos);
+    tes.hits.push_back(h);
+  }
+  u16 tail = Gaps::parse_u16(stream, pos);
+  if (tail != TofEventSummary::TAIL) {
+    log_error("Decoding of TAIL failed! Got " << tail << " instead!");
+  }
   return tes;
 }
+
 u64 TofEventSummary::get_timestamp48() const {
   return ((u64)timestamp16 << 32) | (u64)timestamp32;
 }
@@ -1112,6 +1137,7 @@ std::string TofEventSummary::to_string() const {
   for (auto const &h : hits) {
     repr += std::format("\n  {}",h.to_string()); 
   }
+  repr += ">";
   return repr;
 }
 

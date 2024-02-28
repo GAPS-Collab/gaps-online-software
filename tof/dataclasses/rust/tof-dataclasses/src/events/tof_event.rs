@@ -23,10 +23,13 @@ use crate::serialization::{Serialization,
                            search_for_u16};
 use crate::errors::SerializationError;
 
-use crate::events::{MasterTriggerEvent,
-                    RBEvent,
-                    TofHit,
-                    RBMissingHit};
+use crate::events::{
+    MasterTriggerEvent,
+    RBEvent,
+    TofHit,
+    RBWaveform,
+    RBMissingHit
+};
 
 // This looks like a TODO
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
@@ -187,6 +190,35 @@ impl TofEvent {
     self.rb_events.len() 
     + self.missing_hits.len() 
   }
+
+  pub fn get_rbwaveforms(&self) -> Vec<RBWaveform> {
+    let mut wf = Vec::<RBWaveform>::new();
+    for ev in &self.rb_events {
+      wf.extend_from_slice(&ev.get_rbwaveforms());
+    }
+    wf
+  }
+
+  pub fn get_summary(&self) -> TofEventSummary {
+    let mut summary = TofEventSummary::new();
+    //summary.status            = self.header.status;
+    //summary.quality           = self.header.quality;
+    //summary.trigger_setting   = self.;
+    summary.n_trigger_paddles = self.mt_event.n_paddles;
+    summary.event_id          = self.header.event_id;
+    summary.timestamp32       = self.header.timestamp_32;
+    summary.timestamp16       = self.header.timestamp_16;
+    summary.primary_beta      = self.header.primary_beta; 
+    summary.primary_charge    = self.header.primary_charge; 
+    summary.hits              = Vec::<TofHit>::new();
+    for ev in &self.rb_events {
+      for hit in &ev.hits {
+        summary.hits.push(hit.clone());
+      }
+    }
+    summary
+  }
+
 }
 
 impl Serialization for TofEvent {
