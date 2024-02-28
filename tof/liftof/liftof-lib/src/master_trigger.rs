@@ -329,11 +329,11 @@ pub fn get_mtevent(bus : &mut IPBus)
   //let sleeptime = Duration::from_micros(10);
   //FIXME - reduce polling rate. 10micros is the 
   //fasterst
-  let sleeptime = Duration::from_micros(1000);
+  //let sleeptime = Duration::from_micros(1000);
   let mut timeout = Instant::now();
   loop {
-    thread::sleep(sleeptime);
-    match bus.read(0x13, false) {
+    //thread::sleep(sleeptime);
+    match bus.read(0x13, true) {
     //match read_register(socket, 
     //                    //address,
     //                    0x13 , buffer) {
@@ -365,13 +365,28 @@ pub fn get_mtevent(bus : &mut IPBus)
       }
     }
   }
-  //let data = read_register_multiple(socket,
-  //                                  //address,
-  //                                  0x11,
-  //                                  buffer,
-  //                                  IPBusPacketType::ReadNonIncrement,
-  //                                  n_daq_words as usize)?;
-  let data = bus.read_multiple(0x11, n_daq_words as usize, false, true)?;  
+  
+  let mut n_iter = 0usize;
+  let data : Vec<u32>;
+  loop {
+    n_iter += 1;
+    if n_iter == 4 {
+      return Err(MasterTriggerError::DAQNotAvailable);
+    }
+    match bus.read_multiple(0x11, n_daq_words as usize, false, true) {
+      Err(err) => {
+        // this is most likely the timeout error, because the packet
+        // id is not correct
+        let _ = bus.realign_packet_id();
+        continue;
+      }
+      Ok(_data) => {
+        data = _data;
+        break;
+      }
+    }
+  }
+  //let data = bus.read_multiple(0x11, n_daq_words as usize, false, true)?;  
   if data[0] != 0xAAAAAAAA {
     error!("Got MTB data, but the header is incorrect {}", data[0]);
     return Err(MasterTriggerError::PackageHeaderIncorrect);
@@ -683,6 +698,7 @@ pub fn master_trigger(mt_address        : String,
   let mut n_ev_unsent    = 0u64;
   let mut n_ev_missed    = 0u64;
   let mut init_reconnect = false;
+  let mut first          = true;
   loop {
     if mtb_timeout.elapsed().as_secs() > mtb_timeout_sec || init_reconnect {
       println!("==> [master_trigger] reconnection timer elapsed");
@@ -693,9 +709,16 @@ pub fn master_trigger(mt_address        : String,
         }
         Ok(_bus) => {
           bus = _bus;
+          thread::sleep(Duration::from_micros(1000));
           debug!("Resetting master trigger DAQ");
+          // We'll reset the pid as well
+          bus.pid = 0;
           match reset_daq(&mut bus) {//, &mt_address) {
             Err(err) => error!("Can not reset DAQ, error {err}"),
+            Ok(_)    => ()
+          }
+          match bus.realign_packet_id() {
+            Err(err) => error!("Can not realign packet ID"),
             Ok(_)    => ()
           }
         }
@@ -707,7 +730,10 @@ pub fn master_trigger(mt_address        : String,
       //  Ok(_)    => ()
       //}
     }
-    if moni_interval.elapsed().as_secs() > mtb_moni_interval {
+    if moni_interval.elapsed().as_secs() > mtb_moni_interval || first {
+      if first {
+        first = false;
+      }
       match get_mtbmonidata(&mut bus) { 
                             //&mut buffer) {
         Err(err) => {
@@ -747,7 +773,6 @@ pub fn master_trigger(mt_address        : String,
                 error!("Can not convert .json to string!");
               }
             }
-
           }
           let tp = TofPacket::from(&_moni);
           match moni_sender.send(tp) {
@@ -768,19 +793,6 @@ pub fn master_trigger(mt_address        : String,
       Err(err) => {
         error!("Unable to get MasterTriggerEvent! {err}");
         init_reconnect = true;
-        //// HACK for now let's reset the DAQ - this will get 
-        //// better in the future
-        //error!("Reconnecting...");
-        //match bus.reconnect() {//, &mt_address) {
-        //  Err(err) => error!("Can not reconnect NTB! {err}"),
-        //  Ok(_)    => ()
-        //}
-
-        //error!("Resetting master trigger DAQ");
-        //match reset_daq(&mut bus) {//, &mt_address) {
-        //  Err(err) => error!("Can not reset DAQ, error {err}"),
-        //  Ok(_)    => ()
-        //}
         continue;
       },
       Ok(_ev) => {
