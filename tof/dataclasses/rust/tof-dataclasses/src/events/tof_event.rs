@@ -501,6 +501,7 @@ impl FromRandom for TofEventHeader {
 }
 
 /// Smaller packet for in-flight telemetry stream
+#[derive(Debug, Clone, PartialEq)]
 pub struct TofEventSummary {
   pub status            : u8,
   pub quality           : u8,
@@ -517,16 +518,152 @@ pub struct TofEventSummary {
   /// reconstructed primary charge
   pub primary_charge    : u16, 
   pub hits : Vec<TofHit>,
-  //u16         primary_outer_tof_x  , 
-  //u16         primary_outer_tof_y  , 
-  //u16         primary_outer_tof_z  , 
-  //u16         primary_inner_tof_x  , 
-  //u16         primary_inner_tof_y  , 
-  //u16         primary_inner_tof_z  ,  
-  //u16         nhit_outer_tof       ,  
-  //u16         nhit_inner_tof       , 
 }
 
+impl TofEventSummary {
+
+  pub fn new() -> Self {
+    Self {
+      status            : 0,
+      quality           : 0,
+      trigger_setting   : 0,
+      n_trigger_paddles : 0,
+      event_id          : 0,
+      timestamp32       : 0,
+      timestamp16       : 0,
+      primary_beta      : 0, 
+      primary_charge    : 0, 
+      hits              : Vec::<TofHit>::new(),
+    }
+  }
+  
+  pub fn get_timestamp48(&self) -> u64 {
+    ((self.timestamp16 as u64) << 32) | self.timestamp32 as u64
+  }
+
+  pub fn set_beta(&mut self, beta : f32) {
+    // expecting beta in range of 0-1. If larger
+    // than 1, we will save 1
+    if beta > 1.0 {
+      self.primary_beta = 1;
+    }
+    let pbeta = beta*(u16::MAX as f32).floor();
+    // safe, bc of multiplication with u16::MAX
+    self.primary_beta = pbeta as u16;
+  }
+
+  pub fn get_beta(&self) -> f32 {
+    self.primary_beta as f32/u32::MAX as f32 
+  }
+}
+
+impl Serialization for TofEventSummary {
+  
+  const HEAD               : u16   = 43690; //0xAAAA
+  const TAIL               : u16   = 21845; //0x5555
+  
+  fn to_bytestream(&self) -> Vec<u8> {
+    let mut stream = Vec::<u8>::new();
+    stream.extend_from_slice(&Self::HEAD.to_le_bytes());
+    stream.extend_from_slice(&self.status.to_le_bytes());
+    stream.extend_from_slice(&self.quality.to_le_bytes());
+    stream.extend_from_slice(&self.trigger_setting.to_le_bytes());
+    stream.extend_from_slice(&self.n_trigger_paddles.to_le_bytes());
+    stream.extend_from_slice(&self.event_id.to_le_bytes());
+    stream.extend_from_slice(&self.timestamp32.to_le_bytes());
+    stream.extend_from_slice(&self.timestamp16.to_le_bytes());
+    stream.extend_from_slice(&self.primary_beta.to_le_bytes());
+    stream.extend_from_slice(&self.primary_charge.to_le_bytes());
+    let nhits = self.hits.len() as u16;
+    stream.extend_from_slice(&nhits.to_le_bytes());
+    for k in 0..self.hits.len() {
+      stream.extend_from_slice(&self.hits[k].to_bytestream());
+    }
+    stream.extend_from_slice(&Self::TAIL.to_le_bytes());
+    stream
+  }
+  
+  fn from_bytestream(stream    : &Vec<u8>, 
+                     pos       : &mut usize) 
+    -> Result<Self, SerializationError>{
+    let mut summary           = Self::new();
+    let head = parse_u16(stream, pos);
+    if head != Self::HEAD {
+      error!("Decoding of HEAD failed! Got {} instead!", head);
+      return Err(SerializationError::HeadInvalid);
+    }
+    summary.status            = parse_u8(stream, pos);
+    summary.quality           = parse_u8(stream, pos);
+    summary.trigger_setting   = parse_u8(stream, pos);
+    summary.n_trigger_paddles = parse_u8(stream, pos);
+    summary.event_id          = parse_u32(stream, pos);
+    summary.timestamp32       = parse_u32(stream, pos);
+    summary.timestamp16       = parse_u16(stream, pos);
+    summary.primary_beta      = parse_u16(stream, pos); 
+    summary.primary_charge    = parse_u16(stream, pos); 
+    let nhits                 = parse_u16(stream, pos);
+    for _ in 0..nhits {
+      summary.hits.push(TofHit::from_bytestream(stream, pos)?);
+    }
+    let tail = parse_u16(stream, pos);
+    if tail != Self::TAIL {
+      error!("Decoding of TAIL failed! Got {} instead!", tail);
+      return Err(SerializationError::TailInvalid);
+    }
+    Ok(summary)
+  }
+}
+    
+impl Default for TofEventSummary {
+  fn default() -> Self {
+    Self::new()
+  }
+}
+
+impl fmt::Display for TofEventSummary {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut repr = String::from("<TofEventSummary");
+    repr += &(format!("\n  Status           : {}", self.status));
+    repr += &(format!("\n  TriggerSetting   : {}", self.trigger_setting));
+    repr += &(format!("\n  NTrigPaddles     : {}", self.n_trigger_paddles));
+    repr += &(format!("\n  EventID          : {}", self.event_id));
+    repr += &(format!("\n  timestamp32      : {}", self.timestamp32)); 
+    repr += &(format!("\n  timestamp16      : {}", self.timestamp16)); 
+    repr += &(format!("\n   |-> timestamp48 : {}", self.get_timestamp48())); 
+    repr += &(format!("\n  PrimaryBeta      : {}", self.get_beta())); 
+    repr += &(format!("\n  PrimaryCharge    : {}", self.primary_charge));
+    repr += &String::from("********* HITS *********");
+    for h in &self.hits {
+      repr += &(format!("\n  {}", h));
+    }
+    write!(f, "{}", repr)
+  }
+}
+
+#[cfg(feature="random")]
+impl FromRandom for TofEventSummary {
+
+  fn from_random() -> Self {
+    let mut summary = Self::new();
+    let mut rng     = rand::thread_rng();
+
+    summary.status            = rng.gen::<u8>();
+    summary.quality           = rng.gen::<u8>();
+    summary.trigger_setting   = rng.gen::<u8>();
+    summary.n_trigger_paddles = rng.gen::<u8>();
+    summary.event_id          = rng.gen::<u32>();
+    summary.timestamp32       = rng.gen::<u32>();
+    summary.timestamp16       = rng.gen::<u16>();
+    summary.primary_beta      = rng.gen::<u16>(); 
+    summary.primary_charge    = rng.gen::<u16>(); 
+    let nhits                 = rng.gen::<u8>();
+    for _ in 0..nhits {
+      summary.hits.push(TofHit::from_random());
+    }
+    //hits : Vec<TofHit>,
+    summary
+  }
+}
 
 //
 // TESTS
@@ -538,7 +675,8 @@ mod test_tofevents {
   use crate::serialization::Serialization;
   use crate::FromRandom;
   use crate::events::{TofEvent,
-                      TofEventHeader};
+                      TofEventHeader,
+                      TofEventSummary};
 
   #[test]
   fn serialize_tofeventheader() {
@@ -573,6 +711,15 @@ mod test_tofevents {
       assert_eq!(data.rb_events, test.rb_events);
       //assert_eq!(data, test);
       //println!("{}", data);
+    }
+  }
+  
+  #[test]
+  fn serialization_tofeventsummary() {
+    for _ in 0..100 {
+      let data = TofEventSummary::from_random();
+      let test = TofEventSummary::from_bytestream(&data.to_bytestream(), &mut 0).unwrap();
+      assert_eq!(data, test);
     }
   }
 }
