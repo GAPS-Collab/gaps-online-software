@@ -2,6 +2,10 @@
 
 # v0.9.4
 * fixes a bug when setting RB_INTEGRATION_WINDOW
+* completly revamps IPBus communication with the 
+  MTB, supports now individual packet IDs != 0 
+  for ipbus verification mechanism. (See ipbus 
+  manual)
 
 # v0.9.3
 * get the dsi_j_ltbch_rbidch map from the 

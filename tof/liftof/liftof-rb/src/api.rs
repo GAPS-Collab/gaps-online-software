@@ -35,8 +35,6 @@ use tof_dataclasses::calibrations::RBCalibrations;
 use tof_dataclasses::errors::{CalibrationError,
                               RunError,
                               SetError};
-use std::net::IpAddr;
-//use local_ip_address::local_ip;
 // for calibration
 use tof_control::rb_control::rb_mode::{select_noi_mode,
                                       select_vcal_mode,
@@ -213,7 +211,8 @@ pub fn rb_calibration(rc_to_runner    : &Sender<RunConfig>,
 -> Result<(), CalibrationError> {
   warn!("Commencing full RB calibration routine! This will take the board out of datataking for a few minutes!");
   // TODO this should become something that can be read from a local json file
-  let five_seconds   = time::Duration::from_millis(5000);
+  // - I think this run config should be some standard setting
+  //let five_seconds   = time::Duration::from_millis(5000);
   let mut run_config = RunConfig {
     runid                   : 0,
     nevents                 : 1300,
@@ -683,7 +682,7 @@ fn run_noi_calibration(rc_to_runner: &Sender<RunConfig>,
     Err(err) => warn!("Can not send runconfig!, Err {err}"),
     Ok(_)    => trace!("Success!")
   }
-  let mut cal_dtype = DataType::Noi;
+  let cal_dtype = DataType::Noi;
   calibration.noi_data = wait_while_run_active(20, 4*FIVE_SECONDS, 1000, &cal_dtype, &socket);
 
   println!("==> No input (Voltage calibration) data taken!");

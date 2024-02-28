@@ -17,23 +17,12 @@ extern crate tof_dataclasses;
 extern crate liftof_cc;
 extern crate liftof_lib;
 
-use std::collections::HashMap;
-
-//use std::sync::{
-//    Arc,
-//    Mutex
-//};
-
 use std::thread;
-use std::path::PathBuf;
 
-use tof_dataclasses::DsiLtbRBMapping;
 //use tof_dataclasses::threading::ThreadControl;
 
 //use tof_dataclasses::commands::RBCommand;
 use liftof_lib::{
-    get_ltb_dsi_j_ch_mapping,
-    readoutboard_commander,
     init_env_logger
 };
 
@@ -42,8 +31,9 @@ use tof_dataclasses::events::MasterTriggerEvent;
 use tof_dataclasses::serialization::Serialization;
 use liftof_lib::{
     master_trigger,
-    MTBSettings
 };
+
+use liftof_cc::settings::LiftofCCSettings;
 
 use crossbeam_channel as cbc;
 //use std::io::Write;
@@ -59,28 +49,25 @@ struct Args {
   #[arg(long, default_value_t=false)]
   verbose : bool,
   /// Send RB request packets
-  #[arg(long, default_value_t=false)]
-  send_requests : bool,
   /// Relay RB network traffic through 
   /// open poart
   #[arg(long, default_value_t=false)]
   relay_rbs : bool,
-  /// Apply trace suppression 
-  #[arg(long, default_value_t=false)]
-  trace_suppression : bool,
   /// Publish TofPackets at port 42000
   #[arg(long, default_value_t=false)]
   publish_packets : bool,
-  /// A json file wit the ltb(dsi, j, ch) -> rb_id, rb_ch mapping.
-  #[arg(long)]
-  json_ltb_rb_map : Option<PathBuf>,
+  /// Configuration of liftof-mt. 
+  /// Use the same config 
+  #[arg(short, long)]
+  config: Option<String>,
+
 }
 
 fn rb_relay() {
   let ctx = zmq::Context::new();
   let socket = ctx.socket(zmq::SUB).expect("Unable to create 0MQ SUB socket!");
   let socket_out = ctx.socket(zmq::PUB).expect("Unable to create 0MQ PUB socket!");
-  for rb_id in 1..41 {
+  for rb_id in 1..51 {
     let address = format!("tcp://10.0.1.1{:02}:42000", rb_id);
     socket.connect(&address).expect("Unable to bind to data (PUB) socket {adress}");
     println!("==> 0MQ PUB socket bound to address {address}");
@@ -114,56 +101,47 @@ fn main() {
   info!("Logging initialized!");
   let (mte_send, mte_rec): (cbc::Sender<MasterTriggerEvent>, cbc::Receiver<MasterTriggerEvent>) = cbc::unbounded(); 
   let (tp_send_moni, tp_rec_moni): (cbc::Sender<TofPacket>, cbc::Receiver<TofPacket>) = cbc::unbounded(); 
-  let (tp_send_req, tp_rec_req): (cbc::Sender<TofPacket>, cbc::Receiver<TofPacket>) = cbc::unbounded(); 
  
   // Create shared data wrapped in an Arc and a Mutex for synchronization
   //let thread_control = Arc::new(Mutex::new(ThreadControl::default()));
+  // deal with command line arguments
+  let config          : LiftofCCSettings;
+  let args    = Args::parse();
+  match args.config {
+    None => panic!("No config file provided! Please provide a config file with --config or -c flag!"),
+    Some(cfg_file) => {
+      match LiftofCCSettings::from_toml(cfg_file) {
+        Err(err) => {
+          error!("CRITICAL! Unable to parse .toml settings file! {}", err);
+          panic!("Unable to parse config file!");
+        }
+        Ok(_cfg) => {
+          config = _cfg;
+        }
+      }
+    } // end Some
+  } // end match
+  let mtb_settings          = config.mtb_settings.clone();
+  
+  println!("=> Using the following config as parsed from the config file:\n{}", config);
 
-  let mut ltb_rb_map : DsiLtbRBMapping = HashMap::<u8,HashMap::<u8,HashMap::<u8,(u8,u8)>>>::new();
   let mt_address          = String::from("10.0.1.10:50001");
 
   let args                = Args::parse();
   let verbose             = args.verbose;
   let publish_packets     = args.publish_packets;
-  let send_requests       = args.send_requests;
   let relay_rbs           = args.relay_rbs;
-  let trace_suppression   = args.trace_suppression;
 
-  //FIXME - just make it work now
-  let mut settings = MTBSettings::new();
-  settings.trace_suppression = trace_suppression;
-
-  if args.send_requests {
-    match args.json_ltb_rb_map {
-      None => {
-        panic!("Will need json ltb -> rb mapping when we want to send requests!")
-      },
-      Some(_json_ltb_rb_map) => {
-        ltb_rb_map = get_ltb_dsi_j_ch_mapping(_json_ltb_rb_map);
-      }
-    }
-  }
   let _worker_thread = thread::Builder::new()
          .name("master_trigger".into())
          .spawn(move || {
             master_trigger(mt_address, 
-                           &ltb_rb_map,
                            &mte_send,
-                           &tp_send_req,
                            &tp_send_moni,
-                           settings,
-                           verbose,
-                           send_requests);
+                           mtb_settings,
+                           verbose);
          })
          .expect("Failed to spawn master_trigger thread!");
- if send_requests {
-   let _rbcmd_thread = thread::Builder::new()
-                       .name("rb_commander".into())
-                       .spawn(move || {
-                         readoutboard_commander(&tp_rec_req); 
-                        })
-                       .expect("Failed to spawn rb_commander thread!");
- }
  if relay_rbs {
    let _relay_thread = thread::Builder::new()
                        .name("rb_relay".into())
@@ -195,7 +173,7 @@ fn main() {
            Ok(_)    => ()
          }
        }
-       if n_events % 100 == 0 {
+       if n_events % 1000 == 0 {
          if verbose {
            println!("{}", _ev);
          }

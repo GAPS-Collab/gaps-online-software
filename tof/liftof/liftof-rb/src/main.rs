@@ -422,13 +422,6 @@ fn main() {
                             cmd_control)
             })
            .expect("Failed to spawn cmd_responder thread!");
-           //workforce.execute(move || {
-           //                  cmd_responder(cmd_server_ip,
-           //                                &rc_file_path,
-           //                                &rc_to_runner_c,
-           //                                &tp_to_cache_c)
-           //
-           //});
   }
 
   // should this program end after it is done?
