@@ -17,12 +17,15 @@ use std::error::Error;
 use std::time::Duration;
 
 use crate::errors::IPBusError;
-use crate::serialization::parse_u32_be;
+use crate::serialization::{
+    //parse_u32,
+    parse_u32_be
+};
 
 // we have some header and then the board mask (4byte)
 // + at max 20*2 byte for the individual LTBs.
 // -> guestimate says 128 byte are enough
-const MT_MAX_PACKSIZE   : usize = 128;
+pub const MT_MAX_PACKSIZE   : usize = 128;
 
 
 /// The IPBus standard encodes several packet types.
@@ -105,14 +108,23 @@ impl fmt::Display for IPBusPacketType {
   }
 }
 
+#[derive(Debug, Clone)]
+pub struct IPBusPacket {
+  pub pid   : u16,
+  pub ptype : IPBusPacketType,
+  pub data  : [u8;MT_MAX_PACKSIZE]
+}
+
 /// Implementation of an IPBus control packet
 #[derive(Debug)]
 pub struct IPBus {
   pub socket         : UdpSocket,
+  pub target_address : String,
   pub packet_type    : IPBusPacketType,
   /// IPBus Transaction ID (12bit)
-  pub tid            : u16,
-  pub expected_tid   : u16,
+  pub pid            : u16,
+  pub expected_pid   : u16,
+  pub last_pid       : u16,
   pub buffer         : [u8;MT_MAX_PACKSIZE]
 }
 
@@ -120,15 +132,19 @@ impl IPBus {
   
   pub fn new(target_address : String) 
     -> io::Result<Self> {
-    let socket = Self::connect(target_address)?;
-    Ok(Self {
-      socket       : socket,
-      packet_type  : IPBusPacketType::Read,
+    let socket = Self::connect(&target_address)?;
+    let mut bus = Self {
+      socket         : socket,
+      target_address : target_address,
+      packet_type    : IPBusPacketType::Read,
       /// actually the transaction id should be the packet id
-      tid          : 0,
-      expected_tid : 0,
-      buffer       : [0;MT_MAX_PACKSIZE]
-    })
+      pid            : 0,
+      expected_pid   : 0,
+      last_pid       : 0,
+      buffer         : [0;MT_MAX_PACKSIZE]
+    };
+    bus.realign_packet_id();
+    Ok(bus)
   }
 
   /// Connect to MTB Utp socket
@@ -141,7 +157,7 @@ impl IPBus {
   /// * target_address  : IP/port of the target 
   ///                     probably some kind of
   ///                     FPGA
-  pub fn connect(target_address : String) 
+  pub fn connect(target_address : &String) 
     ->io::Result<UdpSocket> {
     // provide a number of local ports to try
     let local_addrs = [
@@ -177,70 +193,85 @@ impl IPBus {
         return Ok(socket);
       }
     } // end match
-}  
-  
+  }  
+
+  /// Reconnect to the same address after timeout
+  pub fn reconnect(&mut self) 
+    -> io::Result<()> {
+    self.socket = Self::connect(&self.target_address)?;
+    Ok(())
+  }
+
+
   /// Get the next 12bit transaction ID. 
   /// If we ran out, wrap around and 
   /// start at 0
-  fn get_next_tid(&mut self) -> u16 {
-    //let tid = Self::disassemble_tid(self.tid);
-    let tid = self.tid;
-    self.expected_tid = self.tid;
+  fn get_next_pid(&mut self) -> u16 {
+    //let tid = Self::disassemble_tid(self.pid);
+    let tid = self.pid;
+    self.expected_pid = self.pid;
     //// get the next transaction id 
-    self.tid += 1;
+    self.pid += 1;
     // wrap around
-    if self.tid > 0xfff {
-      self.tid = 0;
+    if self.pid > u16::MAX {
+      self.pid = 0;
+      return 0;
     }
     return tid;
   }
 
   pub fn get_status(&mut self) {
     let mut udp_data = Vec::<u8>::new();
-    let mut phead  = self.create_packetheader();
+    let mut phead  = self.create_packetheader(true);
     phead = phead & 0xfffffff0;
     phead = phead | 0x00000001;
     udp_data.extend_from_slice(&phead.to_be_bytes());
-    for _ in 0..16 {
+    for _ in 0..15 {
       udp_data.push(0);
       udp_data.push(0);
       udp_data.push(0);
       udp_data.push(0);
     }
     self.socket.send(udp_data.as_slice()).unwrap();
-    println!("[IPBus::get_status => message {:?} sent!", udp_data);
+    trace!("[IPBus::get_status => message {:?} sent!", udp_data);
     let (number_of_bytes, _) = self.socket.recv_from(&mut self.buffer).unwrap();
-    println!("[IPBus::get_status] => {} bytes received!", number_of_bytes);
-    println!("[IPBus::get_status] => buffer {:?}", self. buffer);
+    trace!("[IPBus::get_status] => {} bytes received!", number_of_bytes);
+    //println!("[IPBus::get_status] => buffer {:?}", self. buffer);
+    for word in 0..16 {
+      trace!("[IPBus::get_status] => WORD {word} : [{},{},{},{}]", self.buffer[word*4], self.buffer[word*4 + 1], self.buffer[word*4+2], self.buffer[word*4+3]);
+    }
   }
 
-  fn create_packetheader(&mut self) -> u32 {
+  fn create_packetheader(&mut self, status : bool) -> u32 {
     // we use this to switch the byteorder
-    let pid       = self.get_next_tid();
-    let pid_bytes = pid.to_be_bytes(); // technically tid is pid here
-    //println!("[create_packetheader] => Will use packet ID {pid}");
-    let pid_be0   = (pid_bytes[1] as u32) << 16;
-    let pid_be1   = (pid_bytes[0] as u32) << 8;
+    let pid : u16;
+    if status {
+      pid = 0;
+    } else {
+      pid = self.get_next_pid();
+    }
+    let pid_bytes = pid.to_be_bytes(); 
+    let pid_be0   = (pid_bytes[0] as u32) << 16;
+    let pid_be1   = (pid_bytes[1] as u32) << 8;
     let header = (0x2 << 28) as u32
                | (0x0 << 24) as u32
-               //| (pid_be  << 8) as u32
                | pid_be0
                | pid_be1
                | (0xf << 4) as u32
                | 0x0 as u32; // 0 means control packet, we will 
                              // only use control packets in GAPS
+    trace!("[IPBus::create_packetheader] => Will use packet ID {pid}");
+    trace!("[IPBus::create_packetheader] => Generated header {:?}", header.to_be_bytes());
     header
   }
 
   fn create_transactionheader(&self, nwords : u8) -> u32 {
-    // FIXME - for now, let's have transaction
-    // id always to be 0
     let header = (0x2 << 28) as u32
                | (0x0 << 24) as u32
                | (0x0 << 20) as u32
                | (0x0 << 16) as u32
                | (nwords as u32) << 8
-               | (self.packet_type.to_u8() & 0xf << 4) as u32
+               | ((self.packet_type.to_u8() & 0xf) << 4) as u32
                | 0xf as u32; // 0xf is for outbound request 
     header
   }
@@ -259,12 +290,10 @@ impl IPBus {
   fn encode_payload(&mut self,
                     addr        : u32,
                     data        : &Vec<u32>) -> Vec<u8> {
-    // get a new transaction id
-    //let tid = self.get_next_tid();
     let mut udp_data = Vec::<u8>::new();
-
-    let pheader = self.create_packetheader();
+    let pheader = self.create_packetheader(false);
     let nwords  = data.len() as u8;
+    trace!("[IPBus::encode_payload] => Encoding payload for packet type {}!", self.packet_type);
     let theader = self.create_transactionheader(nwords);
     udp_data.extend_from_slice(&pheader.to_be_bytes());
     udp_data.extend_from_slice(&theader.to_be_bytes());
@@ -275,52 +304,7 @@ impl IPBus {
         udp_data.extend_from_slice(&i.to_be_bytes());
       }
     }
-    //// this will silently overflow, but 
-    //// if the message is that long, then 
-    //// most likely there will be a 
-    //// problem elsewhere, so we 
-    //// don't care
-    //let size      = data.len() as u8;
-    //let packet_id = 0u8;
-    //// we go byte-by-byte here
-    //let mut udp_data = Vec::<u8>::from([
-    //  // Transaction Header
-    //  0x20 as u8, // Protocol version & RSVD
-    //  //0x00 as u8, // Transaction ID (0 or bug)
-    //  //0x00 as u8, // Transaction ID (0 or bug)
-    //  tid.1, // Transaction ID (0 or bug)
-    //  tid.0, // Transaction ID (0 or bug)
-    //  0xf0 as u8, // Packet order & packet_type
-    //  // Packet Header
-    //  //
-    //  // FIXME - in the original python script, 
-    //  // the 0xf0 is a 0xf00, but this does not
-    //  // make any sense in my eyes...
-    //  (0x20 as u8 | ((packet_id & 0xf0 as u8) as u32 >> 8) as u8), // Protocol version & Packet ID MSB
-    //  (packet_id & 0xff as u8), // Packet ID LSB,
-    //  size, // Words
-    //  (((self.packet_type as u8 & 0xf as u8) << 4) | 0xf as u8), // Packet_Type & Info code
-    //  // Address
-    //  ((addr & 0xff000000 as u32) >> 24) as u8,
-  
-    //  ((addr & 0x00ff0000 as u32) >> 16) as u8,
-    //  ((addr & 0x0000ff00 as u32) >> 8)  as u8,
-    //  (addr  & 0x000000ff as u32) as u8]);
-  
-    //if self.packet_type    == IPBusPacketType::Write
-    //   || self.packet_type == IPBusPacketType::WriteNonIncrement {
-    //  for i in 0..size as usize {
-    //    udp_data.push (((data[i] & 0xff000000 as u32) >> 24) as u8);
-    //    udp_data.push (((data[i] & 0x00ff0000 as u32) >> 16) as u8);
-    //    udp_data.push (((data[i] & 0x0000ff00 as u32) >> 8)  as u8);
-    //    udp_data.push ( (data[i] & 0x000000ff as u32)        as u8);
-    //  }
-    //}
-    // fill up with 0s
-    //while udp_data.len() != MT_MAX_PACKSIZE {
-    //  udp_data.push(0);
-    //}
-    //println!("[encode_payload] UDPDATA {:?}", udp_data);
+    trace!("[IPBus::encode_payload] => payload {:?}", udp_data);
     udp_data
   }
   
@@ -334,50 +318,32 @@ impl IPBus {
   ///
   /// FIXME - currently this is always successful.
   /// Should we check for garbage?
-  fn decode_payload(&self,
+  fn decode_payload(&mut self,
                     verbose : bool)
     -> Result<Vec<u32>, IPBusError> {
     let mut pos  : usize = 0;
     let mut data = Vec::<u32>::new();
     let buffer   = self.buffer.to_vec();
-//    let mut ipbus_version = message[0] >> 4;
-//    let id            = (((message[4] & 0xf as u8) as u16) << 8) as u8 | message[5];
-//    let size          = message[6];
-//    let pt_val        = (message[7] & 0xf0 as u8) >> 4;
-//    let info_code     = message[7] & 0xf as u8;
-//    let mut data      = Vec::<u32>::new(); //[None]*size
-//
-    
+    trace!("[IPBus::decode_payload] => buffer (vec) {:?}", buffer); 
     let pheader  = parse_u32_be(&buffer, &mut pos);
     let theader  = parse_u32_be(&buffer, &mut pos);
-    let pid      = ((0x00ff0000 & pheader) >> 16) as u16;
+    trace!("[IPBus::decode_payload] => pheader {pheader}"); 
+    trace!("[IPBus::decode_payload] => theader {theader}"); 
+    let pid      = ((0x00ffff00 & pheader) >> 8) as u16;
     let size     = ((0x0000ff00 & theader) >> 8) as u16;
     let ptype    = ((0x000000f0 & theader) >> 4) as u8;
-    if pid != self.expected_tid {
-      error!("Invalid transaction ID. Expected {}, received {}", self.expected_tid, pid);
-      return Err(IPBusError::InvalidTransactionID);
-    }
     let packet_type = IPBusPacketType::from_u8(ptype);
-    //println!("PID, SIZE, PTYPE : {} {} {}", pid, size, ptype);
-    //println!("[decode_payload] BUFFER {:?}", buffer);
-    //// Response
-    //let ipbus_version = self.buffer[0] >> 4;
-    //// re-assemble the transaction ID
-    //let tid1          = self.buffer[1];
-    //let tid0          = self.buffer[2];
-    //let tid           = Self::assemble_tid((tid0,tid1));
-    //let id            = (((self.buffer[4] & 0xf as u8) as u16) << 8) as u8 | self.buffer[5];
-    //let size          = self.buffer[6];
-    //let pt_val        = (self.buffer[7] & 0xf0 as u8) >> 4;
-    //let info_code     = self.buffer[7] & 0xf as u8;
-    //let mut data      = Vec::<u32>::new(); //[None]*size
-  
-    //let packet_type = IPBusPacketType::from_u8(pt_val);
-    //if packet_type == IPBusPacketType::Unknown {
-    //  return Err(IPBusError::DecodingFailed);
-    //}
-    //// Read
-    //println!("[decode_payload] => PacketType {}", packet_type); 
+    trace!("[IPBus::decode_payload] => PID, SIZE, PTYPE : {} {} {}", pid, size, packet_type);
+    if pid != self.expected_pid {
+      error!("Invalid packet ID. Expected {}, received {}", self.expected_pid, pid);
+      // we do know that the next expected packet id should be the latest one + 1
+      if pid == u16::MAX {
+        self.expected_pid = 0; 
+      } else {
+        self.expected_pid = pid + 1;
+      }
+      return Err(IPBusError::InvalidPacketID);
+    }
     match packet_type {
       IPBusPacketType::Unknown => {
         return Err(IPBusError::DecodingFailed);
@@ -415,11 +381,30 @@ impl IPBus {
     Ok(data)
   }
 
+  /// Set the packet id to that what is expected from the targetr
+  pub fn realign_packet_id(&mut self) {
+    self.pid = self.get_target_next_expected_packet_id();
+    self.expected_pid = self.pid;
+  }
+
+  /// Get the packet id which is expected by the target
+  pub fn get_target_next_expected_packet_id(&mut self) -> u16 {
+    self.get_status();
+    // the expected packet id is in WORD 3
+    let word = 3usize;
+    trace!("[IPBus::get_status] => WORD {word} : [{},{},{},{}]", self.buffer[word*4], self.buffer[word*4 + 1], self.buffer[word*4+2], self.buffer[word*4+3]);
+    let word3 = [self.buffer[word*4], self.buffer[word*4 + 1], self.buffer[word*4 + 2], self.buffer[word*4 + 3]];
+    let target_exp_pid = u16::from_be_bytes([word3[1], word3[2]]);
+    trace!("[IPBus::target_next_pid] => Get expected packet id {target_exp_pid}");
+    target_exp_pid
+  }
+
   pub fn read(&mut self, addr   : u32, verify_tid : bool) 
     -> Result<u32, Box<dyn Error>> {
     let send_data = Vec::<u32>::from([0]);
+    self.packet_type = IPBusPacketType::Read;
     let message   = self.encode_payload(addr, &send_data);
-    println!("[IPBus::read => messasge {:?}", message);
+    trace!("[IPBus::read => sending message {:?}", message);
     self.socket.send(message.as_slice())?;
     //println!("[IPBus::read => message sent!");
     let mut data = Vec::<u32>::new();
@@ -429,15 +414,15 @@ impl IPBus {
       // this one can actually succeed, but return an emtpy vector
       match self.decode_payload(false) { 
         Err(err) => {
-          if err == IPBusError::InvalidTransactionID {
-            println!("--> invalid transaction id, trying again");
+          if err == IPBusError::InvalidPacketID {
+            debug!("--> invalid packet id, trying again");
             if verify_tid {
               continue;
             } else {
               break;
             }
           } else {
-            println!("[IPBus::read] Received error {err}");
+            error!("[IPBus::read] Received error {err}");
           }
         }
         Ok(_data) => {
@@ -447,7 +432,7 @@ impl IPBus {
       } 
     }
     if data.len() == 0 {
-      println!("[IPBus::read] Data has size 0");
+      error!("[IPBus::read] Data has size 0");
       return Err(Box::new(IPBusError::DecodingFailed));
     }
     Ok(data[0])
@@ -468,20 +453,17 @@ impl IPBus {
     }
     // FIXME - we assume nwords != 1
     message = self.encode_payload(addr, &send_data);
-    //println!("Sending message ...");
     self.socket.send(message.as_slice())?;
-    //println!("... done");
-    //trace!("Received {} bytes from master trigger", number_of_bytes);
     let mut data = Vec::<u32>::new();
     loop {
       let (number_of_bytes, _) = self.socket.recv_from(&mut self.buffer)?;
-      trace!("[read_multiple] Received {} bytes from master trigger. Buffer {:?}", number_of_bytes, self.buffer);
+      trace!("[IPBus::read_multiple] Received {} bytes from master trigger. Buffer {:?}", number_of_bytes, self.buffer);
       // this one can actually succeed, but return an emtpy vector
       match self.decode_payload(false) { 
         Err(err) => {
           error!("Got error {err}!");
-          if err == IPBusError::InvalidTransactionID {
-            println!("--> invalid transaction id, trying again");
+          if err == IPBusError::InvalidPacketID {
+            error!("--> invalid packet id, trying again");
             if verify_tid {
               continue;
             } else {
@@ -492,7 +474,6 @@ impl IPBus {
         }
         Ok(_data) => {
           data = _data;
-          //println!("... break... ");
           break;
         }
       } 
@@ -501,11 +482,6 @@ impl IPBus {
       error!("Received empty data!");
       return Err(Box::new(IPBusError::DecodingFailed));
     }
-    //if data.len() < nwords {
-    //  error!("Received data of size {}, but was expecting {}!", data.len(), nwords);
-    //  return Err(Box::new(IPBusError::DecodingFailed));
-    //}
-    //println!("returning");
     Ok(data)
   }
   
@@ -527,7 +503,7 @@ impl IPBus {
 impl fmt::Display for IPBus {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let mut repr  = String::from("<IPBus:");
-    repr         += &(format!("  tid : {}>", self.tid)); 
+    repr         += &(format!("  pid : {}>", self.pid)); 
     write!(f, "{}", repr)
   }
 }
