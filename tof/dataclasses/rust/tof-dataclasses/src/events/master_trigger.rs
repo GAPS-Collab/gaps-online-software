@@ -454,8 +454,8 @@ impl fmt::Display for MasterTriggerEvent {
     dsi_j.insert(14 , "3/5");
     dsi_j.insert(15 , "4/1");
     dsi_j.insert(16 , "4/2");
-    dsi_j.insert(16 , "4/3");
-    dsi_j.insert(17 , "4/4");
+    dsi_j.insert(17 , "4/3");
+    dsi_j.insert(18 , "4/4");
     dsi_j.insert(19 , "4/5");
     dsi_j.insert(20 , "5/1");
     dsi_j.insert(21 , "5/2");
@@ -475,7 +475,7 @@ impl fmt::Display for MasterTriggerEvent {
     repr += &self.tiu_gps_16.to_string(); 
     repr += "\n  tiu_gps32 (fast)            ";
     repr += &self.tiu_gps_32.to_string(); 
-    repr += &(format!("\n  |-> tiu_gps48        {}", self.get_gpstimestamp48()));
+    repr += &(format!("\n  |-> tiu_gps48               {}", self.get_gpstimestamp48()));
     repr += "\n  n_paddles                   ";
     repr += &self.n_paddles.to_string(); 
     repr += "\n  crc                         ";
@@ -499,11 +499,12 @@ impl fmt::Display for MasterTriggerEvent {
     //    repr += "-0-   ";
       }
     }
-    repr += "\n  == == LTB HITS [BRD CH] == ==\n";
+    repr += "\n  == == LTB HITS == ==\n";
     for  k in hit_boards.iter() {
-      repr += "\t DSI/J ";
+      //println!("Getting {}", k);
+      repr += "\t DSI/J/CHANNEL ";
       repr += dsi_j[k];
-      repr += "\t=> ";
+      //repr += "\t=> ";
       for j in 0..N_CHN_PER_LTB {
         if self.hits[*k as usize][j] {
           repr += " ";
