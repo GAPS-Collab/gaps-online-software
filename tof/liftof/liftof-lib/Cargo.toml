@@ -34,7 +34,9 @@ log = "0.4"
 colored = "2.0"
 env_logger = "0.10"
 
-local-ip-address = "0.5"
+ureq = "2.1"
+
+#local-ip-address = "0.5"
 
 # this is just for fun
 indicatif = "0.17"

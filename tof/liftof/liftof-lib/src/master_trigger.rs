@@ -26,9 +26,9 @@ use std::collections::VecDeque;
 use std::thread;
 use crossbeam_channel::Sender;
 use colored::Colorize;
+use serde_json::json;
 
-
-use tof_dataclasses::DsiLtbRBMapping;
+//use tof_dataclasses::DsiLtbRBMapping;
 use tof_dataclasses::packets::TofPacket;
 use tof_dataclasses::monitoring::MtbMoniData;
 //use tof_dataclasses::commands::RBCommand;
@@ -49,6 +49,17 @@ use tof_dataclasses::constants::{
     N_LTBS,
     N_CHN_PER_LTB,
 };
+
+/// helper function to parse output for TofBot
+fn remove_from_word(s: String, word: &str) -> String {
+  if let Some(index) = s.find(word) {
+    // Keep everything up to the found index (not including the word itself)
+    s[..index].to_string()
+  } else {
+    // If the word isn't found, return the original string
+    s
+  }
+}
 
 ///// The IPBus standard encodes several packet types.
 /////
@@ -225,7 +236,7 @@ use tof_dataclasses::constants::{
 //}
 
 /// Configure the trigger
-#[derive(Debug, Copy, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct MTBSettings {
   /// Select the trigger type for this run
   pub trigger_type           : TriggerType,
@@ -264,7 +275,7 @@ pub struct MTBSettings {
   pub mtb_timeout_sec    : u64,
   pub rb_int_window      : u8,
   pub tiu_emulation_mode : bool,
-}
+  pub tofbot_webhook     : String,}
 
 impl MTBSettings {
   pub fn new() -> Self {
@@ -278,6 +289,7 @@ impl MTBSettings {
       mtb_timeout_sec        : 60,
       rb_int_window          : 1,
       tiu_emulation_mode     : false,
+      tofbot_webhook         : String::from(""),
     }
   }
 }
@@ -702,6 +714,41 @@ pub fn master_trigger(mt_address        : String,
           error!("Can not get MtbMoniData! {err}");
         },
         Ok(_moni) => {
+          if settings.tofbot_webhook != String::from("")  {
+            let url  = &settings.tofbot_webhook;
+            let message = format!("\u{1F916}\u{1F680}\u{1F388} [LIFTOF (Bot)]\n rate - {}[Hz]\n {}", _moni.rate, settings);
+            let clean_message = remove_from_word(message, "tofbot_webhook");
+            let data = json!({
+              "text" : clean_message
+            });
+            match serde_json::to_string(&data) {
+              Ok(data_string) => {
+                match ureq::post(url)
+                    .set("Content-Type", "application/json")
+                    .send_string(&data_string) {
+                  Err(err) => { 
+                    error!("Unable to send {} to TofBot! {err}", data_string);
+                  }
+                  Ok(response) => {
+                    match response.into_string() {
+                      Err(err) => {
+                        error!("Not able to read response! {err}");
+                      }
+                      Ok(body) => {
+                        if verbose {
+                          println!("[master_trigger] - TofBot responded with {}", body);
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              Err(err) => {
+                error!("Can not convert .json to string!");
+              }
+            }
+
+          }
           let tp = TofPacket::from(&_moni);
           match moni_sender.send(tp) {
             Err(err) => {
