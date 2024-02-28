@@ -240,6 +240,7 @@ pub enum IPBusError {
   DecodingFailed,
   InvalidTransactionID,
   InvalidPacketID,
+  NotAStatusPacket,
   ConnectionTimeout,
 }
 
