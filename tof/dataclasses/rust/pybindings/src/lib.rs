@@ -1,10 +1,10 @@
+use std::collections::VecDeque;
+
 use pyo3::prelude::*;
 use pyo3::exceptions::PyValueError;
 
 extern crate pyo3_log;
 use numpy::PyArray1;
-
-use std::net::UdpSocket;
 
 use tof_dataclasses::analysis::{
     find_peaks,
@@ -15,11 +15,15 @@ use tof_dataclasses::analysis::{
     time2bin
 };
 
+use tof_dataclasses::constants::N_CHN_PER_LTB;
+
 use tof_dataclasses::calibrations::{
     find_zero_crossings,
     get_periods,
     Edge,
 };
+
+use tof_dataclasses::events::MasterTriggerEvent;
 
 use tof_dataclasses::ipbus as ipbus;
 
@@ -232,11 +236,9 @@ fn wrap_find_peaks_zscore(voltages       : &PyArray1<f32>,
 
 #[pyclass]
 pub struct IPBus {
-  //#[pyo3(get, set)]
-  //value: i32,
   ipbus : ipbus::IPBus,
 }
-//
+
 #[pymethods]
 impl IPBus {
   #[new]
@@ -247,10 +249,45 @@ impl IPBus {
     }
   }
 
+  /// Make a IPBus status query
   pub fn get_status(&mut self) {
     self.ipbus.get_status();
   }
+ 
+  pub fn get_buffer(&self) -> [u8;ipbus::MT_MAX_PACKSIZE] {
+    return self.ipbus.buffer.clone();
+  }
+
+  pub fn set_packet_id(&mut self, pid : u16) {
+    self.ipbus.pid = pid;
+  }
+ 
+  pub fn get_packet_id(&self) -> u16 {
+    self.ipbus.pid
+  }
+
+  pub fn get_expected_packet_id(&self) -> u16 {
+    self.ipbus.expected_pid
+  }
+
+  /// Set the packet id to that what is expected from the targetr
+  pub fn realign_packet_id(&mut self) {
+    self.ipbus.realign_packet_id();
+  }
   
+  /// Get the next packet id, which is expected by the target
+  pub fn get_target_next_expected_packet_id(&mut self) 
+    -> PyResult<u16> {
+    match self.ipbus.get_target_next_expected_packet_id() {
+      Ok(result) => {
+        return Ok(result);
+      },
+      Err(err)   => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+
   pub fn read_multiple(&mut self,
                        addr           : u32,
                        nwords         : usize,
@@ -298,6 +335,155 @@ impl IPBus {
   }
 }
 
+
+#[pyclass]
+pub struct MasterTrigger {
+  ipbus : ipbus::IPBus,
+}
+
+#[pymethods]
+impl MasterTrigger {
+  #[new]
+  fn new(target_address : String) -> Self {
+    let ipbus = ipbus::IPBus::new(target_address).expect("Unable to connect to {target_address}");
+    Self {
+      ipbus : ipbus,
+    }
+  }
+
+  fn reset_daq(&mut self) {
+    self.ipbus.write(0x10,1);
+  }
+
+
+  fn get_expected_pid(&mut self) -> PyResult<u16> {
+    match self.ipbus.get_target_next_expected_packet_id(){
+      Ok(result) => {
+        return Ok(result); 
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+
+  fn realign_packet_id(&mut self) {
+    self.ipbus.realign_packet_id();
+  }
+
+  fn set_packet_id(&mut self, pid : u16) {
+    self.ipbus.pid = pid;
+  }
+
+  fn get_packet_id(&mut self) -> u16 {
+    self.ipbus.pid
+  }
+
+  fn get_mtevent(&mut self) {
+    let mut n_daq_words : u16;
+    loop {
+      match self.ipbus.read(0x13, true) { 
+        Err(_err) => {
+          // A timeout does not ncecessarily mean that there 
+          // is no event, it can also just mean that 
+          // the rate is low.
+          //trace!("Timeout in read_register for MTB! {err}");
+          continue;
+        },
+        Ok(_n_words) => {
+          n_daq_words = (_n_words >> 16) as u16;
+          if _n_words == 0 {
+            continue;
+          }
+          //trace!("Got n_daq_words {n_daq_words}");
+          n_daq_words /= 2; //mtb internally operates in 16bit words, but 
+          //                  //registers return 32bit words.
+          break;
+        }
+      }
+    }
+    let data : Vec<u32>;
+    println!("[MasterTrigger::get_mtevent] => Will query DAQ for {n_daq_words} words!");
+    match self.ipbus.read_multiple(
+                                   0x11,
+                                   n_daq_words as usize,
+                                   false,
+                                   false) {
+      Err(err) => {
+        println!("[MasterTrigger::get_mtevent] => failed! {err}");
+        return;
+      }
+      Ok(_data) => {
+        data = _data;
+        for word in data.iter() {
+          println!("[MasterTrigger::get_mtevent] => DAQ word {:x}", word);
+        }
+      }
+    }
+    if data[0] != 0xAAAAAAAA {
+      println!("[MasterTrigger::get_mtevent] => Got MTB data, but the header is incorrect {}", data[0]);
+      //return Err(MasterTriggerError::PackageHeaderIncorrect);
+      return;
+    }
+    let foot_pos = (n_daq_words - 1) as usize;
+    if data.len() <= foot_pos {
+      println!("[MasterTrigger::get_mtevent] => Got MTB data, but the format is not correct");
+      //return Err(MasterTriggerError::PackageHeaderIncorrect);
+      return;
+    }
+    if data[foot_pos] != 0x55555555 {
+      println!("[MasterTrigger::get_mtevent] => Got MTB data, but the footer is incorrect {}", data[foot_pos]);
+      //return Err(MasterTriggerError::PackageFooterIncorrect);
+      return;
+    }
+
+    // Number of words which will be always there. 
+    // Min event size is +1 word for hits
+    const MTB_DAQ_PACKET_FIXED_N_WORDS : u32 = 9; 
+    let n_hit_packets = n_daq_words as u32 - MTB_DAQ_PACKET_FIXED_N_WORDS;
+    //println!("We are expecting {}", n_hit_packets);
+    let mut mte = MasterTriggerEvent::new(0,0);
+    mte.event_id      = data[1];
+    mte.timestamp     = data[2];
+    mte.tiu_timestamp = data[3];
+    mte.tiu_gps_32    = data[4];
+    mte.tiu_gps_16    = data[5] & 0x0000ffff;
+    //mte.board_mask    = decode_board_mask(data[6]);
+    //let mut hitmasks = VecDeque::<[bool;N_CHN_PER_LTB]>::new();
+    //for k in 0..n_hit_packets {
+    //  //println!("hit packet {:?}", data[7usize + k as usize]);
+    //  (hits_a, hits_b) = decode_hit_mask(data[7usize + k as usize]);
+    //  hitmasks.push_back(hits_a);
+    //  hitmasks.push_back(hits_b);
+    //}
+    //for k in 0..mte.board_mask.len() {
+    //  if mte.board_mask[k] {
+    //    match hitmasks.pop_front() { 
+    //      None => {
+    //        //error!("MTE hit assignment wrong. We expect hits for a certain LTB, but we don't see any!");
+    //      },
+    //      Some(_hits) => {
+    //        mte.hits[k] = _hits;
+    //      }
+    //    }
+    //  }
+    //}
+    mte.n_paddles = mte.get_hit_paddles(); 
+    println!("[MasterTrigger::get_mtevent] => Got MTE {}", mte);
+  }
+
+  fn get_rate(&mut self, verify : bool) -> PyResult<u32> {
+    match self.ipbus.read(0x17,verify) {
+      Ok(rate) => {
+        return Ok(rate & 0x00ffffff); 
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+}
+
 /// Python API to rust version of tof-dataclasses.
 ///
 /// Currently, this contains only the analysis 
@@ -315,5 +501,6 @@ fn rust_dataclasses(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(wrap_find_zero_crossings,m)?)?;
     m.add_function(wrap_pyfunction!(wrap_get_periods,m)?)?;
     m.add_class::<IPBus>()?;
+    m.add_class::<MasterTrigger>()?;
     Ok(())
 }
