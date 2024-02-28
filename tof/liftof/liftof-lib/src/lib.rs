@@ -13,7 +13,7 @@ use constants::{DEFAULT_CALIB_VOLTAGE,
                 PREAMP_MIN_BIAS,
                 PREAMP_MAX_BIAS};
 pub use master_trigger::{
-    connect_to_mtb,
+    //connect_to_mtb,
     master_trigger,
     MTBSettings
 };
@@ -303,7 +303,6 @@ pub fn build_tcp_from_ip(ip: String, port: String) -> String {
 pub fn readoutboard_commander(cmd : &Receiver<TofPacket>){
   debug!(".. started!");
   let ctx = zmq::Context::new();
-  //let this_board_ip = local_ip().expect("Unable to obtainl local board IP. Something is messed up!");
   let this_board_ip = IpAddr::V4(Ipv4Addr::new(10, 0, 1, 1));
 
   let address_ip;
