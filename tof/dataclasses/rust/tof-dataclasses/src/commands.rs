@@ -877,8 +877,12 @@ impl From<(u8, u32)> for TofResponse {
 fn test_tofoperationmode() {
   let mut type_codes = Vec::<u8>::new();
   type_codes.push(TofOperationMode::Unknown as u8); 
-  type_codes.push(TofOperationMode::StreamAny as u8); 
-  type_codes.push(TofOperationMode::RequestReply as u8); 
+  type_codes.push(TofOperationMode::Default as u8); 
+  type_codes.push(TofOperationMode::RBHighThroughput as u8); 
+  type_codes.push(TofOperationMode::RBWaveform as u8); 
+  type_codes.push(TofOperationMode::RBCalcCRC32 as u8); 
+  //type_codes.push(TofOperationMode::StreamAny as u8); 
+  //type_codes.push(TofOperationMode::RequestReply as u8); 
   for tc in type_codes.iter() {
     assert_eq!(*tc,TofOperationMode::try_from(*tc).unwrap() as u8);  
   }
