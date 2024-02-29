@@ -291,10 +291,11 @@ PYBIND11_MODULE(gaps_tof, m) {
       .value("PAMoniData",       PacketType::PAMoniData)
       .value("PBMoniData",       PacketType::PBMoniData)
       .value("LTBMoniData",      PacketType::LTBMoniData)
-      .value("HeartBeat",        PacketType::HeartBeat )
-      .value("CPUMoniData",      PacketType::CPUMoniData)
+      .value("HeartBeat",        PacketType::HeartBeat     )
+      .value("CPUMoniData",      PacketType::CPUMoniData   )
       .value("MasterTrigger",    PacketType::MasterTrigger )
-      .value("MtbMoniData",      PacketType::MTBMoni)
+      .value("RBCalibration",    PacketType::RBCalibration )
+      .value("MtbMoniData",      PacketType::MTBMoni       )
       ;
       //.export_values();
 
