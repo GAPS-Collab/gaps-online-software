@@ -22,7 +22,7 @@
 #include <vector>
 
 #include "./include/constants.h"
-#include "./include/EventGAPS.h"
+#include "./include/EventRene.h"
 
 int main(int argc, char *argv[]){
   spdlog::cfg::load_env_levels();

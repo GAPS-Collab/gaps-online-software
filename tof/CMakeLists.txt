@@ -322,7 +322,7 @@ if (BUILD_EXAMPLES)
     set(analyze-rene "analyzeRene")
     add_executable(${analyze-rene}
         ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/analyzeRene.cxx
-        ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/src/EventGAPS.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/src/EventRene.cpp
     )
     target_include_directories(${analyze-rene} 
                               PUBLIC
