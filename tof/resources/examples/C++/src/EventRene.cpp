@@ -7,7 +7,7 @@
 #include <TMath.h>
 
 /* Waveform stuff. */
-#include "../include/EventGAPS.h"
+#include "../include/EventRene.h"
 
 // Some useful macros
 #define SQR(A)               ( (A) * (A) )
@@ -274,7 +274,7 @@ void EventGAPS::InitializeHistograms(void) {
 ////////////////////////////////////////////////////////////////////////////
 void EventGAPS::WriteHistograms() {
   
-  TFile *outfile = TFile::Open("/home/gaps/zweerink/outfile.root","RECREATE"); 
+  TFile *outfile = TFile::Open("/home/gaps/rene/outfile.root","RECREATE"); 
   
   // For reasons I don't understand, the code to make subdirectories
   // is not compiling properly and gives an error (below) when run

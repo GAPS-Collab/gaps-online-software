@@ -55,11 +55,11 @@ double FitSine(std::vector<double> volts, std::vector<double> times)
   {
 
 // condition left over from when the sine wave was truncated 
-//    if (volts[i] > -80.0)
+//    if (volts[i] > -260.0)
 //    {
 
-      xi = cos(2*pi*0.025*(times[i+1]-times[0]));  //for this fit we know the frequency is 0.025 waves/ns
-      yi = sin(2*pi*0.025*(times[i+1]-times[0]));
+      xi = cos(2*pi*0.025*(times[i]));  //for this fit we know the frequency is 0.025 waves/ns
+      yi = sin(2*pi*0.025*(times[i]));
       zi = volts[i];
       XiYi += xi*yi;
       XiZi += xi*zi;
@@ -230,7 +230,7 @@ int main(int argc, char *argv[]){
 
   for (auto const &p : packets) {
     // print it
-    //std::cout << p << std::endl;
+    //std::cout << p.packet_type << std::endl;
     // there will be a more generic way to unpack TofPackets in the future
     // for now we have to use the packet_type field
     switch (p.packet_type) {
@@ -263,11 +263,11 @@ int main(int argc, char *argv[]){
 	GAPS::Waveform *wave[NTOT];
 	GAPS::Waveform *wch9[NRB];
 	float Ped_low   = 10;
-	float Ped_win   = 90;
+	float Ped_win   = 50;
 	float CThresh   = 5.0;
 	float CFDS_frac = 0.40;
-	float Qwin_low  = 100;
-	float Qwin_size = 100;
+	float Qwin_low  = 55;
+	float Qwin_size = 400;
 	float Ped[NTOT];
 	float PedRMS[NTOT];
 	float Qint[NTOT];
@@ -331,10 +331,10 @@ int main(int argc, char *argv[]){
 		//printf("\n");
 	      //}
 	      
-	      //if (PedRMS[cw] > 2.0) {
-		//highrms++;
-		//continue;
-	      //}
+	      if (PedRMS[cw] > 2.0) {
+		highrms++;
+		continue;
+	      }
 
 	      // Set thresholds and find pulses
 	      wave[cw]->SetThreshold(CThresh);
@@ -347,6 +347,7 @@ int main(int argc, char *argv[]){
 		IsHit[cw] = true;
 		wave[cw]->FindTdc(0, GAPS::CFD_SIMPLE);       // Simple CFD
 		TCFDS[cw] = wave[cw]->GetTdcs(0);
+		//printf("%ld hit\n",cw);
 
 		phi[rbid] = FitSine(ch9_volts,ch9_times);
 		//printf("EVT %12ld - ch %3ld: %10.5f\n", evt_ctr, cw, TCFDS[cw]);
@@ -384,13 +385,13 @@ int main(int argc, char *argv[]){
 	
 	// start with just looking at U1B signal: ch0 is 324 in wave vector, ch1 is 325
         
-        /*
+        
 	if (IsHit[324] && IsHit[325]) {
 
-	  if (TCFDS[324] < 100.0 || TCFDS[325] < 100.0) {
+	  if (TCFDS[324] < 390.0 || TCFDS[325] < 390.0) {
 
 	    std::ofstream file2;
-            file2.open ("U1B_tdc0.csv", std::ios::app);
+            file2.open ("U1B_tdc0_feb.csv", std::ios::app);
             file2 << evt_ctr;
             file2 << "," << TCFDS[324] << "," << TCFDS[325] << std::endl;
             file2.close();
@@ -398,7 +399,7 @@ int main(int argc, char *argv[]){
 
 	  else {
             std::ofstream myfile;
-            myfile.open ("U1B.csv", std::ios::app);
+            myfile.open ("U1B_feb.csv", std::ios::app);
             myfile << evt_ctr;
             myfile << "," << TCFDS[324] << "," << TCFDS[325] << std::endl;
             myfile.close();
@@ -411,9 +412,9 @@ int main(int argc, char *argv[]){
   
         if (IsHit[414] && IsHit[423]) {
 
-          if (TCFDS[414] < 100.0 || TCFDS[423] < 100.0) {
+          if (TCFDS[414] < 90.0 || TCFDS[423] < 90.0) {
             std::ofstream file3;
-            file3.open ("U1A_tdc0.csv", std::ios::app);
+            file3.open ("U1A_tdc0_feb.csv", std::ios::app);
             file3 << evt_ctr;
             file3 << "," << TCFDS[414] << "," << TCFDS[423] << std::endl;
             file3.close();
@@ -421,43 +422,44 @@ int main(int argc, char *argv[]){
 
           else {
 
-            std::ofstream myfile;
-            myfile.open ("U1A.csv", std::ios::app);
-            myfile << evt_ctr;
-            myfile << "," << TCFDS[414] << "," << TCFDS[423] << "," << phi[47] << "," << phi[48] << std::endl;
-            myfile.close();
+            std::ofstream myfile4;
+            myfile4.open ("U1A_feb.csv", std::ios::app);
+            myfile4 << evt_ctr;
+            myfile4 << "," << TCFDS[414] << "," << TCFDS[423] << "," << phi[47] << "," << phi[48] << std::endl;
+            myfile4.close();
           }
                   
         }
-	*/
 
+	
+/*
 	std::ofstream myfile;
         myfile.open ("PEDs.csv", std::ios::app);
 	myfile << evt_ctr;
 	for (int i; i++; i<NTOT){
           myfile << Ped[i] << ",";
-          myfile.close();
         }
 	myfile << std::endl;
+	myfile.close();
 
 	std::ofstream myfile2;
         myfile2.open ("PEDRMS.csv", std::ios::app);
         myfile2 << evt_ctr;
         for (int i; i++; i<NTOT){
           myfile2 << PedRMS[i] << ",";
-          myfile2.close();
         }
         myfile2 << std::endl;
+	myfile2.close();
 
 	std::ofstream myfile3;
         myfile3.open ("Vpeaks.csv", std::ios::app);
         myfile3 << evt_ctr;
         for (int i; i++; i<NTOT){
           myfile3 << VPeak[i] << ",";
-          myfile3.close();
         }
         myfile3 << std::endl;
-
+	myfile3.close();
+*/
 	n_tofevents++;
         break;
       }
@@ -478,6 +480,15 @@ int main(int argc, char *argv[]){
         }
         n_mte++;
         break;
+      }
+      case PacketType::CPUMoniData : {
+        usize pos = 0;
+        auto tcmoni = CPUMoniData::from_bytestream(p.payload, pos);
+        if (verbose) {
+          std::cout << tcmoni << std::endl;
+	}
+        n_tcmoni++;
+	break;
       }
       case PacketType::MTBMoni : {
         usize pos = 0;
@@ -507,7 +518,7 @@ int main(int argc, char *argv[]){
   std::cout << "-- -- TofCmpMoniData    : " << n_tcmoni  << "\t (packets) " <<  std::endl;
   std::cout << "-- -- MtbMoniData       : " << n_mtbmoni << "\t (packets) " <<  std::endl;
   std::cout << "-- -- undecoded         : " << n_unknown << "\t (packets) " <<  std::endl;
-  //std::cout << "-- -- High RMS         : " << highrms << "\t (RB events) " <<  std::endl;
+  std::cout << "-- -- High RMS         : " << highrms << "\t (RB events) " <<  std::endl;
 
   spdlog::info("Finished");
   return EXIT_SUCCESS;
