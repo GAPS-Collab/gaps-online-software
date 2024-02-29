@@ -9,7 +9,7 @@
 extern crate env_logger;
 extern crate clap;
 extern crate ctrlc;
-extern crate zmq;
+//extern crate zmq;
 extern crate tof_dataclasses;
 extern crate local_ip_address;
 extern crate crossbeam_channel;
@@ -44,6 +44,7 @@ use clap::{arg,
 use crossbeam_channel as cbc; 
 //use colored::Colorize;
 
+use tof_dataclasses::errors::CmdError;
 use tof_dataclasses::events::{MasterTriggerEvent,
                               RBEvent};
 use tof_dataclasses::threading::{
@@ -65,10 +66,7 @@ use liftof_lib::{
     LIFTOF_LOGO_SHOW,
     RunCmd, CalibrationCmd, PowerCmd, PowerStatusEnum, TofComponent, SetCmd
 };
-use liftof_cc::threads::{readoutboard_communicator,
-                         event_builder,
-                         global_data_sink,
-                         monitor_cpu };
+use liftof_cc::threads::{event_builder, flight_cpu_listener, global_data_sink, monitor_cpu, readoutboard_communicator};
 use liftof_cc::settings::{
     LiftofCCSettings,
 };
@@ -93,6 +91,9 @@ struct LiftofCCArgs {
   /// event builder and general settings.
   #[arg(short, long)]
   config: Option<String>,
+  /// For cmd debug purposes
+  #[arg(short, long)]
+  only_cmd : bool,
   /// List of possible commands
   #[command(subcommand)]
   command: Command,
@@ -189,9 +190,9 @@ fn main() {
   let ltb_rb_map            = get_dsi_j_ltbch_vs_rbch_map(db_path);
   let mut rb_list           = get_rbs_from_sqlite(db_path);
   //let mut rb_list           = vec![ReadoutBoard::new();50];
-  for k in 0..rb_list.len() {
-    rb_list[k].rb_id = k as u8 + 1;
-  }
+  //for k in 0..rb_list.len() {
+  //  rb_list[k].rb_id = k as u8 + 1;
+  //}
   let rb_ignorelist         = config.rb_ignorelist.clone();
   for k in 0..rb_ignorelist.len() {
     println!("=> We will remove RB {} due to it being marked as IGNORE in the config file!", rb_ignorelist[k]);
@@ -303,258 +304,288 @@ fn main() {
   
   // readout boards <-> paddle cache communications 
   let (ev_to_builder, ev_from_rb) : (cbc::Sender<RBEvent>, cbc::Receiver<RBEvent>) = cbc::unbounded();
-  let (cmd_sender, cmd_receiver) : (cbc::Sender<TofPacket>, cbc::Receiver<TofPacket>) = cbc::unbounded();
+  let (cmd_sender, cmd_receiver)  : (cbc::Sender<TofPacket>, cbc::Receiver<TofPacket>) = cbc::unbounded();
 
-  let ctx = zmq::Context::new();
   // I guess expect is fine here, see above
-  let socket = ctx.socket(zmq::SUB).expect("Unable to create 0MQ SUB socket!");
-
   let thread_control = Arc::new(Mutex::new(ThreadControl::new()));
 
-  if cpu_moni_interval > 0 {
-    println!("==> Starting main monitoring thread...");
-    let tp_to_sink_c = tp_to_sink.clone();
-    // this is anonymus, but we control the thread
-    // through the thread control mechanism, so we
-    // can still end it.
-    let _cpu_moni_thread = thread::Builder::new()
-         .name("cpu-monitoring".into())
-         .spawn(move || {
-           monitor_cpu(
-             tp_to_sink_c,
-             cpu_moni_interval,
-             thread_control,
-             verbose)
+  let one_minute = time::Duration::from_millis(60000);
+  let only_cmd = args.only_cmd;
+  if !only_cmd {
+    if cpu_moni_interval > 0 {
+      println!("==> Starting main monitoring thread...");
+      let tp_to_sink_c = tp_to_sink.clone();
+      let _thread_control_c = thread_control.clone();
+      // this is anonymus, but we control the thread
+      // through the thread control mechanism, so we
+      // can still end it.
+      let _cpu_moni_thread = thread::Builder::new()
+          .name("cpu-monitoring".into())
+          .spawn(move || {
+            monitor_cpu(
+              tp_to_sink_c,
+              cpu_moni_interval,
+              _thread_control_c,
+              verbose)
+            })
+          .expect("Failed to spawn cpu-monitoring thread!");
+    }
+
+    write_stream_path = String::from(stream_files_path.into_os_string().into_string().expect("Somehow the paths are messed up very badly! So I can't help it and I quit!"));
+
+    // this is the tailscale address
+    //let flight_address = format!("tcp://100.101.96.10:{}", DATAPORT);
+    // this is the address in the flight network
+    // flight_address = format!("tcp://10.0.1.1:{}", DATAPORT);
+    println!("==> Starting data sink thread!");
+    let flight_address_c = flight_address.clone();
+    let _data_sink_thread = thread::Builder::new()
+        .name("data-sink".into())
+        .spawn(move || {
+          global_data_sink(&tp_from_client,
+                            &flight_address_c,
+                            write_stream,
+                            write_stream_path,
+                            write_npack_file,
+                            runid,
+                            verbose);
           })
-         .expect("Failed to spawn cpu-monitoring thread!");
-  }
+        .expect("Failed to spawn data-sink thread!");
+    println!("==> data sink thread started!");
+    println!("==> Will now start rb threads..");
 
-  write_stream_path = String::from(stream_files_path.into_os_string().into_string().expect("Somehow the paths are messed up very badly! So I can't help it and I quit!"));
-
-  // this is the tailscale address
-  //let flight_address = format!("tcp://100.101.96.10:{}", DATAPORT);
-  // this is the address in the flight network
-  // flight_address = format!("tcp://10.0.1.1:{}", DATAPORT);
-  println!("==> Starting data sink thread!");
-  let _data_sink_thread = thread::Builder::new()
-       .name("data-sink".into())
-       .spawn(move || {
-         global_data_sink(&tp_from_client,
-                          &flight_address,
-                          write_stream,
-                          write_stream_path,
-                          write_npack_file,
-                          runid,
-                          verbose);
-        })
-       .expect("Failed to spawn data-sink thread!");
-  println!("==> data sink thread started!");
-  println!("==> Will now start rb threads..");
-
-  for n in 0..nboards {
-    let mut this_rb           = rb_list[n].clone();
-    let this_tp_to_sink_clone = tp_to_sink.clone();
-    this_rb.calib_file_path   = calib_file_path.clone();
-    if run_analysis_engine { 
+    for n in 0..nboards {
+      let mut this_rb           = rb_list[n].clone();
+      let this_tp_to_sink_clone = tp_to_sink.clone();
+      this_rb.calib_file_path   = calib_file_path.clone();
       match this_rb.load_latest_calibration() {
         Err(err) => error!("Unable to load calibration for RB {}! {}", this_rb.rb_id, err),
         Ok(_)    => ()
       }
-    }
-    println!("==> Starting RB thread for {}", this_rb);
-    let ev_to_builder_c = ev_to_builder.clone();
-    let thread_name = format!("rb-comms-{}", this_rb.rb_id);
-    let _rb_comm_thread = thread::Builder::new()
-         .name(thread_name)
-         .spawn(move || {
-      readoutboard_communicator(&ev_to_builder_c,
-                                this_tp_to_sink_clone,
-                                &this_rb,
-                                runid,
-                                false,
-                                run_analysis_engine);
-          })
-         .expect("Failed to spawn readoutboard-communicator thread!");
-  } // end for loop over nboards
-  println!("==> All RB threads started!");
-  
-  let one_second = time::Duration::from_millis(1000);
-  println!("==> Starting RB commander thread!");
+      println!("==> Starting RB thread for {}", this_rb);
+      let ev_to_builder_c = ev_to_builder.clone();
+      let thread_name = format!("rb-comms-{}", this_rb.rb_id);
+      let _rb_comm_thread = thread::Builder::new()
+           .name(thread_name)
+           .spawn(move || {
+        readoutboard_communicator(&ev_to_builder_c,
+                                  this_tp_to_sink_clone,
+                                  &this_rb,
+                                  runid,
+                                  false,
+                                  run_analysis_engine);
+            })
+           .expect("Failed to spawn readoutboard-communicator thread!");
+    } // end for loop over nboards
+    println!("==> All RB threads started!");
+    
+    let one_second = time::Duration::from_millis(1000);
+    println!("==> Starting RB commander thread!");
+    let _cmd_receiver_rb_comms = cmd_receiver.clone();
     let _rb_cmd_thread = thread::Builder::new()
-         .name("rb-commander".into())
-         .spawn(move || {
-            readoutboard_commander(&cmd_receiver);
-          })
-         .expect("Failed to spawn rb-commander thread!");
-  // start the event builder thread
-  println!("==> Starting event builder and master trigger threads...");
-  let cmd_sender_2 = cmd_sender.clone();
-  let settings = config.event_builder_settings;
+      .name("rb-commander".into())
+      .spawn(move || {
+         readoutboard_commander(&_cmd_receiver_rb_comms);
+       })
+      .expect("Failed to spawn rb-commander thread!");
+    // start the event builder thread
+    println!("==> Starting event builder and master trigger threads...");
+    let cmd_sender_2   = cmd_sender.clone();
+    let db_path_string = config.db_path.clone();
+    let settings       = config.event_builder_settings;
     let _evb_thread = thread::Builder::new()
-         .name("cpu-monitoring".into())
-         .spawn(move || {
-                         event_builder(&master_ev_rec,
-                                       &ev_from_rb,
-                                       &tp_to_sink,
-                                       runid as u32,
-                                       settings);
-          })
-         .expect("Failed to spawn cpu-monitoring thread!");
-  // master trigger
+      .name("event-builder".into())
+      .spawn(move || {
+                      event_builder(&master_ev_rec,
+                                    &ev_from_rb,
+                                    &tp_to_sink,
+                                    runid as u32,
+                                    db_path_string,
+                                    settings);
+       })
+      .expect("Failed to spawn cpu-monitoring thread!");
+    // master trigger
     let _mtb_thread = thread::Builder::new()
-         .name("master-trigger".into())
-         .spawn(move || {
-                         master_trigger(mtb_address, 
-                                        &ltb_rb_map,
-                                        &master_ev_send,
-                                        &cmd_sender_2,
-                                        &mtb_moni_sender,
-                                        mtb_settings,
-                                        // verbosity is currently too much 
-                                        // output
-                                        false,
-                                        // currently never set requets
-                                        false); 
-          })
-         .expect("Failed to spawn cpu-monitoring thread!");
+      .name("master-trigger".into())
+      .spawn(move || {
+                      master_trigger(mtb_address, 
+                                     &ltb_rb_map,
+                                     &master_ev_send,
+                                     &cmd_sender_2,
+                                     &mtb_moni_sender,
+                                     mtb_settings,
+                                     // verbosity is currently too much 
+                                     // output
+                                     false,
+                                     // currently never set requets
+                                     false); 
+         })
+      .expect("Failed to spawn cpu-monitoring thread!");
+    
+    println!("==> Sleeping 10 seconds to give the rb's a chance to fire up..");
+    thread::sleep(10*one_second);
+    println!("==> Sleeping done!");
 
-  let one_minute = time::Duration::from_millis(60000);
-  
-  println!("==> Sleeping 10 seconds to give the rb's a chance to fire up..");
-  thread::sleep(10*one_second);
-  println!("==> Sleeping done!");
+    // set the handler for SIGINT
+    let cmd_sender_1 = cmd_sender.clone();
+    ctrlc::set_handler(move || {
+      println!("==> \u{1F6D1} received Ctrl+C! We will stop triggers and end the run!");
+      let end_run =
+        TofCommand::from_command_code(TofCommandCode::CmdDataRunStop,0u32);
+      let tp = TofPacket::from(&end_run);
+      match cmd_sender_1.send(tp) {
+      Err(err) => error!("Can not send end run command! {err}"),
+      Ok(_)    => ()
+      }
+      thread::sleep(one_second);
+      println!(">> So long and thanks for all the \u{1F41F} <<"); 
+      exit(0);
+    })
+    .expect("Error setting Ctrl-C handler");
 
-  // set the handler for SIGINT
-  let cmd_sender_c = cmd_sender.clone();
-  ctrlc::set_handler(move || {
-    println!("==> \u{1F6D1} received Ctrl+C! We will stop triggers and end the run!");
-    let end_run =
-      TofCommand::from_command_code(TofCommandCode::CmdDataRunStop,0u32);
-    let tp = TofPacket::from(&end_run);
-    match cmd_sender_c.send(tp) {
-     Err(err) => error!("Can not send end run command! {err}"),
-     Ok(_)    => ()
+    let return_val: Result<TofCommandCode, CmdError>;
+    let cmd_sender_c = cmd_sender.clone();
+    let mut dont_stop = false;
+    match args.command {
+      Command::Listen(_) => {
+        let _flight_address_c    = flight_address.clone();
+        let _thread_control_c    = thread_control.clone();
+        let _cmd_interval: u64   = 1000;
+        let _cmd_sender_c        = cmd_sender.clone();
+        let _cmd_receiver_c      = cmd_receiver.clone();
+        let _flight_cpu_listener = thread::Builder::new()
+                      .name("flight-cpu-listener".into())
+                      .spawn(move || {
+                                      flight_cpu_listener(&_flight_address_c,
+                                                          &_cmd_receiver_c,
+                                                          &_cmd_sender_c,
+                                                          _cmd_interval,
+                                                          _thread_control_c);
+                      })
+                      .expect("Failed to spawn flight-cpu-listener thread!");
+        dont_stop = true;
+        return_val = Ok(TofCommandCode::CmdListen);
+      },
+      Command::Ping(ping_cmd) => {
+        match ping_cmd.component {
+          TofComponent::TofCpu => return_val = liftof_cc::send_ping_response(cmd_sender_c),
+          TofComponent::RB  |
+          TofComponent::LTB |
+          TofComponent::MT     => return_val = liftof_cc::send_ping(cmd_sender_c, ping_cmd.component, ping_cmd.id),
+          _                    => {
+            error!("The ping command is not implemented for this TofComponent!");
+            return_val = Err(CmdError::NotImplementedError);
+          }
+        }
+      },
+      Command::Moni(moni_cmd) => {
+        match moni_cmd.component {
+          TofComponent::TofCpu => return_val = liftof_cc::send_moni_response(cmd_sender_c),
+          TofComponent::RB    |
+          TofComponent::LTB   |
+          TofComponent::MT     => return_val = liftof_cc::send_moni(cmd_sender_c, moni_cmd.component, moni_cmd.id),
+          _                    => {
+            error!("The moni command is not implemented for this TofComponent!");
+            return_val = Err(CmdError::NotImplementedError);
+          }
+        }
+      },
+      Command::SystemdReboot(systemd_reboot_cmd) => {
+        let rb_id = systemd_reboot_cmd.id;
+        return_val = liftof_cc::send_systemd_reboot(cmd_sender_c, rb_id);
+      },
+      Command::Power(power_cmd) => {
+        match power_cmd {
+          PowerCmd::All(power_status) => {
+            let power_status_enum: PowerStatusEnum = power_status.status;
+            return_val = liftof_cc::send_power(cmd_sender_c, TofComponent::All, power_status_enum);
+          },
+          PowerCmd::MT(power_status) => {
+            let power_status_enum: PowerStatusEnum = power_status.status;
+            return_val = liftof_cc::send_power(cmd_sender_c, TofComponent::MT, power_status_enum);
+          },
+          PowerCmd::AllButMT(power_status) => {
+            let power_status_enum: PowerStatusEnum = power_status.status;
+            return_val = liftof_cc::send_power(cmd_sender_c, TofComponent::AllButMT, power_status_enum);
+          },
+          PowerCmd::LTB(ltb_power_opts) => {
+            let power_status_enum: PowerStatusEnum = ltb_power_opts.status;
+            let ltb_id = ltb_power_opts.id;
+            return_val = liftof_cc::send_power_id(cmd_sender_c, TofComponent::LTB, power_status_enum, ltb_id);
+          },
+          PowerCmd::Preamp(preamp_power_opts) => {
+            let power_status_enum: PowerStatusEnum = preamp_power_opts.status;
+            let preamp_id = preamp_power_opts.id;
+            let preamp_bias = preamp_power_opts.bias;
+            return_val = liftof_cc::send_power_preamp(cmd_sender_c, power_status_enum, preamp_id, preamp_bias);
+          }
+        }
+      },
+      Command::Calibration(calibration_cmd) => {
+        match calibration_cmd {
+          CalibrationCmd::Default(default_opts) => {
+            let voltage_level = default_opts.level;
+            let rb_id = default_opts.id;
+            let extra = default_opts.extra;
+            return_val = liftof_cc::send_default_calibration(cmd_sender_c, voltage_level, rb_id, extra);
+          },
+          CalibrationCmd::Noi(noi_opts) => {
+            let rb_id = noi_opts.id;
+            let extra = noi_opts.extra;
+            return_val = liftof_cc::send_noi_calibration(cmd_sender_c, rb_id, extra);
+          },
+          CalibrationCmd::Voltage(voltage_opts) => {
+            let voltage_level = voltage_opts.level;
+            let rb_id = voltage_opts.id;
+            let extra = voltage_opts.extra;
+            return_val = liftof_cc::send_voltage_calibration(cmd_sender_c, voltage_level, rb_id, extra);
+          },
+          CalibrationCmd::Timing(timing_opts) => {
+            let voltage_level = timing_opts.level;
+            let rb_id = timing_opts.id;
+            let extra = timing_opts.extra;
+            return_val = liftof_cc::send_timing_calibration(cmd_sender_c, voltage_level, rb_id, extra);
+          }
+        }
+      }
+      Command::Set(set_cmd) => {
+        match set_cmd {
+          SetCmd::LtbThreshold(ltb_threshold_opts) => {
+            let ltb_id = ltb_threshold_opts.id;
+            let threshold_name = ltb_threshold_opts.name;
+            let threshold_level = ltb_threshold_opts.level;
+            return_val = liftof_cc::send_ltb_threshold_set(cmd_sender_c, ltb_id, threshold_name, threshold_level);
+          },
+          SetCmd::PreampBias(preamp_bias_opts) => {
+            let preamp_id = preamp_bias_opts.id;
+            let preamp_bias = preamp_bias_opts.bias;
+            return_val = liftof_cc::send_preamp_bias_set(cmd_sender_c, preamp_id, preamp_bias);
+          }
+        }
+      },
+      Command::Run(run_cmd) => {
+        match run_cmd {
+          RunCmd::Start(run_start_opts) => {
+            let run_type = run_start_opts.run_type;
+            let rb_id = run_start_opts.id;
+            let event_no = run_start_opts.no;
+            return_val = liftof_cc::send_run_start(cmd_sender_c, run_type, rb_id, event_no);
+          },
+          RunCmd::Stop(run_stop_opts) => {
+            let rb_id = run_stop_opts.id;
+            return_val = liftof_cc::send_run_stop(cmd_sender_c, rb_id);
+          }
+        }
+      }
     }
-    thread::sleep(one_second);
-    println!(">> So long and thanks for all the \u{1F41F} <<"); 
-    exit(0);
-  })
-  .expect("Error setting Ctrl-C handler");
-
-  let cmd_sender_c = cmd_sender.clone();
-  match args.command {
-    Command::Ping(ping_cmd) => {
-      match ping_cmd.component {
-        TofComponent::TofCpu => liftof_cc::send_ping_response(cmd_sender_c, socket),
-        TofComponent::RB  |
-        TofComponent::LTB |
-        TofComponent::MT     => liftof_cc::send_ping(cmd_sender_c, ping_cmd.component, ping_cmd.id),
-        _                    => error!("The ping command is not implemented for this TofComponent!")
-      }
+  // deal with return values
+  match return_val {
+    Err(cmd_error) => {
+      error!("Error in sending command {cmd_error}");
     },
-    Command::Moni(moni_cmd) => {
-      match moni_cmd.component {
-        TofComponent::TofCpu => liftof_cc::send_moni_response(cmd_sender_c, socket),
-        TofComponent::RB  |
-        TofComponent::LTB |
-        TofComponent::MT     => liftof_cc::send_moni(cmd_sender_c, moni_cmd.component, moni_cmd.id),
-        _                    => error!("The moni command is not implemented for this TofComponent!")
-      }
-    },
-    Command::SystemdReboot(systemd_reboot_cmd) => {
-      let rb_id = systemd_reboot_cmd.id;
-      liftof_cc::send_systemd_reboot(cmd_sender_c, rb_id);
-    },
-    Command::Power(power_cmd) => {
-      match power_cmd {
-        PowerCmd::All(power_status) => {
-          let power_status_enum: PowerStatusEnum = power_status.status;
-          liftof_cc::send_power(cmd_sender_c, TofComponent::All, power_status_enum);
-        },
-        PowerCmd::MT(power_status) => {
-          let power_status_enum: PowerStatusEnum = power_status.status;
-          liftof_cc::send_power(cmd_sender_c, TofComponent::MT, power_status_enum);
-        },
-        PowerCmd::AllButMT(power_status) => {
-          let power_status_enum: PowerStatusEnum = power_status.status;
-          liftof_cc::send_power(cmd_sender_c, TofComponent::AllButMT, power_status_enum);
-        },
-        PowerCmd::LTB(ltb_power_opts) => {
-          let power_status_enum: PowerStatusEnum = ltb_power_opts.status;
-          let ltb_id = ltb_power_opts.id;
-          liftof_cc::send_power_ID(cmd_sender_c, TofComponent::LTB, power_status_enum, ltb_id);
-        },
-        PowerCmd::Preamp(preamp_power_opts) => {
-          let power_status_enum: PowerStatusEnum = preamp_power_opts.status;
-          let preamp_id = preamp_power_opts.id;
-          let preamp_bias = preamp_power_opts.bias;
-          liftof_cc::send_power_preamp(cmd_sender_c, power_status_enum, preamp_id, preamp_bias);
-        }
-      }
-    },
-    Command::Calibration(calibration_cmd) => {
-      match calibration_cmd {
-        CalibrationCmd::Default(default_opts) => {
-          let voltage_level = default_opts.level;
-          let rb_id         = default_opts.id;
-          let extra         = default_opts.extra;
-          liftof_cc::send_default_calibration(cmd_sender_c, voltage_level, rb_id, extra);
-        },
-        CalibrationCmd::Noi(noi_opts) => {
-          let rb_id = noi_opts.id;
-          let extra = noi_opts.extra;
-          liftof_cc::send_noi_calibration(cmd_sender_c, rb_id, extra);
-        },
-        CalibrationCmd::Voltage(voltage_opts) => {
-          let voltage_level = voltage_opts.level;
-          let rb_id = voltage_opts.id;
-          let extra = voltage_opts.extra;
-          liftof_cc::send_voltage_calibration(cmd_sender_c, voltage_level, rb_id, extra);
-        },
-        CalibrationCmd::Timing(timing_opts) => {
-          let voltage_level = timing_opts.level;
-          let rb_id = timing_opts.id;
-          let extra = timing_opts.extra;
-          liftof_cc::send_timing_calibration(cmd_sender_c, voltage_level, rb_id, extra);
-        }
-      }
+    Ok(tof_command)  => {
+      info!("Successfully sent command {tof_command}");
     }
-    Command::Set(set_cmd) => {
-      match set_cmd {
-        SetCmd::LtbThreshold(ltb_threshold_opts) => {
-          let ltb_id = ltb_threshold_opts.id;
-          let threshold_name = ltb_threshold_opts.name;
-          let threshold_level = ltb_threshold_opts.level;
-          liftof_cc::send_ltb_threshold_set(cmd_sender_c, ltb_id, threshold_name, threshold_level);
-        },
-        SetCmd::PreampBias(preamp_bias_opts) => {
-          let preamp_id = preamp_bias_opts.id;
-          let preamp_bias = preamp_bias_opts.bias;
-          liftof_cc::send_preamp_bias_set(cmd_sender_c, preamp_id, preamp_bias);
-        }
-      }
-    },
-    Command::Run(run_cmd) => {
-      match run_cmd {
-        RunCmd::Start(run_start_opts) => {
-          let run_type = run_start_opts.run_type;
-          let rb_id = run_start_opts.id;
-          let event_no = run_start_opts.no;
-          liftof_cc::send_run_start(cmd_sender_c, run_type, rb_id, event_no);
-        },
-        RunCmd::Stop(run_stop_opts) => {
-          let rb_id = run_stop_opts.id;
-          liftof_cc::send_run_stop(cmd_sender_c, rb_id);
-        }
-      }
-    }
-  }
-  // start a new data run 
-  let start_run = TofCommand::DataRunStart(1000);
-  let tp = TofPacket::from(&start_run);
-  match cmd_sender.send(tp) {
-    Err(err) => error!("Unable to send command, error{err}"),
-    Ok(_)    => ()
   }
 
   println!("==> All threads initialized!");
@@ -564,10 +595,15 @@ fn main() {
     //cmd_sender.send(start_run);
     thread::sleep(1*one_minute);
     println!("...");
-    if program_start.elapsed().as_secs_f64() > runtime_nseconds as f64 {
+    // I think the main shouldn't die if we are in listening mode
+    if dont_stop {
+      continue;
+    } else if program_start.elapsed().as_secs_f64() > runtime_nseconds as f64 {
       println!("=> Runtime seconds of {} have expired!", runtime_nseconds);
       println!("=> Ending program. If you don't want that behaviour, change the confifguration file.");
+      println!(">> So long and thanks for all the \u{1F41F} <<"); 
       exit(0);    
     }
+  }
   }
 }

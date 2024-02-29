@@ -78,6 +78,8 @@ use tof_dataclasses::io::{
 use liftof_lib::{
     LIFTOF_LOGO_SHOW,
     DATAPORT,
+    //Command,
+    CommandRB,
     color_log,
     get_rb_ch_pid_map,
     RunStatistics,
@@ -96,8 +98,6 @@ use liftof_rb::threads::{
 use liftof_rb::api::*;
 use liftof_rb::control::*;
 
-use liftof_lib::Command;
-
 #[derive(Parser, Debug)]
 #[command(author = "J.A.Stoessl", version, about, long_about = None)]
 struct Args {
@@ -105,11 +105,11 @@ struct Args {
   /// this program is run manually without systemd and not controlled by a central server. 
   /// If in this configuration one wants to take data, ONE HAS TO SUPPLY A RUNCONFIG!
   #[arg(short, long)]
-  run_config: Option<std::path::PathBuf>,
+  run_config: Option<PathBuf>,
   /// Paddle map - this is only needed when the RBs 
   /// should do waveform analysis
   #[arg(short, long)]
-  paddle_map: Option<std::path::PathBuf>,
+  paddle_map: Option<PathBuf>,
   /// Listen to remote input from the TOF computer at 
   /// the expected IP address
   #[arg(short, long, default_value_t = false)]
@@ -141,7 +141,7 @@ struct Args {
   calc_crc32: bool,
   /// List of possible commands
   #[command(subcommand)]
-  command: Command
+  command: CommandRB
 }
 
 /**********************************************************/
@@ -181,6 +181,8 @@ fn main() {
     error!("Board ID field has been set to error state of {}", rb_info.board_id);
     panic!("Unable to obtain board id! This is a CRITICAL error! Abort!");
   }
+
+
   let ltb_connected = rb_info.sub_board == 1;
   let pb_connected  = rb_info.sub_board == 2;
   // General parameters, readout board id,, 
@@ -218,17 +220,31 @@ fn main() {
   println!(" => -- -- PORT {} (0MQ SUB) where we will be listening for commands", DATAPORT);
   println!("-----------------------------------------------");
   
+  // check if the board has received the correct link id from the mtb
+  match get_mtb_link_id() {
+    Err(err) => error!("Unable to obtain MTB link id! {err}"),
+    Ok(link_id) => {
+      if link_id == rb_info.board_id as u32 {
+        println!("=> We received the correct link id from the MTB!");
+      } else {
+        error!("Received unexpected MTB link ID {}!", link_id);
+        error!("Incorrect link ID. This might hint to issues with the MTB mapping!");
+        error!("******************************************************************");
+      }
+    }
+  }
+  
   if test_eventids {
     warn!("Testing mode! Only for debugging!");
   }
 
   let mut rc_config     = RunConfig::new();
-  let mut rc_file_path  = std::path::PathBuf::new();
+  let mut rc_file_path  = PathBuf::new();
   let mut end_after_run = false;
   let mut calibration = false;
   match args.command {
     // Matching calibration command
-    Command::Calibration(_) => calibration = true,
+    CommandRB::Calibration(_) => calibration = true,
     _ => ()
   }
   let run_stat          = Arc::new(Mutex::new(RunStatistics::new()));
@@ -406,19 +422,12 @@ fn main() {
                             cmd_control)
             })
            .expect("Failed to spawn cmd_responder thread!");
-           //workforce.execute(move || {
-           //                  cmd_responder(cmd_server_ip,
-           //                                &rc_file_path,
-           //                                &rc_to_runner_c,
-           //                                &tp_to_cache_c)
-           //
-           //});
   }
 
   // should this program end after it is done?
   let mut end = false;
   
-  let mut do_monitoring = true;
+  let do_monitoring : bool;
   // We can only start a run here, if this is not
   // run through systemd
   // if we are not as systemd, 
@@ -430,20 +439,21 @@ fn main() {
     // can go into our loop listening for input
     match args.command {
       // BEGIN Matching calibration command
-      Command::Calibration(calib_cmd) => {
+      CommandRB::Calibration(calib_cmd) => {
         match calib_cmd {
-          CalibrationCmd::Default(default_opts) => {
-            match rb_calibration(&rc_to_runner_cal,
-                                 &tp_to_pub_cal,
-                                 ip_address) {
+          CalibrationCmd::Default(_default_opts) => {
+            match rb_calibration(&rc_to_runner_cal, 
+                &tp_to_pub_cal,
+                                  ip_address) {
               Ok(_) => (),
               Err(err) => {
                 error!("Calibration failed! Error {err}!");
               }
             }
           },
-          CalibrationCmd::Noi(noi_opts) => {
-            match rb_noi_subcalibration(&rc_to_runner_cal, &tp_to_pub_cal) {
+          CalibrationCmd::Noi(_noi_opts) => {
+            match rb_noi_subcalibration(&rc_to_runner_cal, 
+                        &tp_to_pub_cal) {
               Ok(_) => (),
               Err(err) => {
                 error!("Noi data taking failed! Error {err}!");
@@ -452,7 +462,9 @@ fn main() {
           },
           CalibrationCmd::Voltage(voltage_opts) => {
             let voltage_level = voltage_opts.level;
-            match rb_voltage_subcalibration(&rc_to_runner_cal, &tp_to_pub_cal, voltage_level) {
+            match rb_voltage_subcalibration(&rc_to_runner_cal, 
+                            &tp_to_pub_cal,
+                                            voltage_level) {
               Ok(_) => (),
               Err(err) => {
                 error!("Voltage calibration data taking failed! Error {err}!");
@@ -461,7 +473,9 @@ fn main() {
           },
           CalibrationCmd::Timing(timing_opts) => {
             let voltage_level = timing_opts.level;
-            match rb_timing_subcalibration(&rc_to_runner_cal, &tp_to_pub_cal, voltage_level) {
+            match rb_timing_subcalibration(&rc_to_runner_cal, 
+                            &tp_to_pub_cal,
+                                            voltage_level) {
               Ok(_) => (),
               Err(err) => {
                 error!("Timing calibration data taking failed! Error {err}!");
@@ -472,23 +486,26 @@ fn main() {
       },
       // END Matching calibration command
       // BEGIN Matching set command
-      Command::Set(set_cmd) => {
+      CommandRB::Set(set_cmd) => {
         match set_cmd {
           liftof_lib::SetCmd::LtbThreshold(lbt_threshold_opts) => {
             let ltb_id = lbt_threshold_opts.id;
             let threshold_name = lbt_threshold_opts.name;
             let threshold_level: u16 = lbt_threshold_opts.level;
-            match send_ltb_threshold_set(ltb_id, threshold_name, threshold_level) {
+            match send_ltb_threshold_set(ltb_id,
+                                          threshold_name,
+                                          threshold_level) {
               Ok(_) => (),
               Err(err) => {
-                error!("Unable to set preamp bias! Error {err}!");
+                error!("Unable to set LTB thresholds! Error {err}!");
               }
             }
           },
           liftof_lib::SetCmd::PreampBias(preamp_bias_opts) => {
             let preamp_id = preamp_bias_opts.id;
             let preamp_bias = preamp_bias_opts.bias;
-            match send_preamp_bias_set(preamp_id, preamp_bias) {
+            match send_preamp_bias_set(preamp_id, 
+                                        preamp_bias) {
               Ok(_) => (),
               Err(err) => {
                 error!("Unable to set preamp bias! Error {err}!");
@@ -499,32 +516,37 @@ fn main() {
       },
       // END Matching set commmand
       // BEGIN Matching run command
-      Command::Run(run_cmd) => {
+      CommandRB::Run(run_cmd) => {
         match run_cmd {
           liftof_lib::RunCmd::Start(run_start_opts) => {
             let run_type = run_start_opts.run_type;
             let rb_id    = run_start_opts.id;
             let event_no = run_start_opts.no;
-            match rb_start_run(&rc_to_runner_cal, rc_config, run_type, rb_id, event_no) {
+            match rb_start_run(&rc_to_runner_cal,
+                                rc_config,
+                                run_type,
+                                rb_id,
+                                event_no) {
               Ok(_) => (),
               Err(err) => {
-                error!("Run start failed! {err}!");
+                error!("Run start failed! Error {err}!");
               }
             }
           },
           liftof_lib::RunCmd::Stop(run_stop_opts) => {
             let rb_id = run_stop_opts.id;
-            match rb_stop_run(&rc_to_runner_cal, rb_id) {
+            match rb_stop_run(&rc_to_runner_cal,
+                              rb_id) {
               Ok(_) => (),
               Err(err) => {
-                error!("Run stop failed! {err}!");
+                error!("Run stop failed! Error {err}!");
               }
             }
           }
         }
       },
       // END Matching run commmand
-      _ => ()
+      //_ => ()
     }
     do_monitoring = false;
     end = true; // in case of we have done the calibration

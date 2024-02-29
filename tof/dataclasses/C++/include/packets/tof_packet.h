@@ -10,7 +10,7 @@ static const u8 UNKNOWN            =  0;
 static const u8 COMMAND            = 10;
 static const u8 RBEVENT            = 20;
 static const u8 TOFEVENT           = 21;
-static const u8 MONITOR            = 30;
+static const u8 RBWAVEFORM         = 22;
 static const u8 HEARTBEAT          = 40;
 static const u8 SCALAR             = 50;
 static const u8 MT                 = 60;
@@ -31,7 +31,7 @@ enum class PacketType : u8 {
   Command           = COMMAND            ,
   RBEvent           = RBEVENT            ,
   TofEvent          = TOFEVENT           ,
-  Monitor           = MONITOR            ,
+  RBWaveform        = RBWAVEFORM         ,
   HeartBeat         = HEARTBEAT          ,
   Scalar            = SCALAR             ,
   MasterTrigger     = MT                 ,

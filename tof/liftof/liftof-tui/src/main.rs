@@ -166,9 +166,6 @@ fn packet_sorter(packet_type : &PacketType,
         PacketType::TofEvent           => { 
           *pm.get_mut("TofEvent").unwrap() += 1;
         },
-        PacketType::Monitor            => { 
-          *pm.get_mut("Monitor").unwrap() += 1;
-        },
         PacketType::HeartBeat          => { 
           *pm.get_mut("HeartBeat").unwrap() += 1;
         },
@@ -213,6 +210,9 @@ fn packet_sorter(packet_type : &PacketType,
         },
         PacketType::Ping               => {
           *pm.get_mut("PingPacket").unwrap() += 1;
+        }
+        _ => {
+          error!("Packet type {packet_type} currently not supported!");
         }
       }
     },
@@ -353,7 +353,6 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   pm.insert(String::from("Unknown"          ) ,0);
   pm.insert(String::from("RBEvent"          ) ,0); 
   pm.insert(String::from("TofEvent"         ) ,0); 
-  pm.insert(String::from("Monitor"          ) ,0);
   pm.insert(String::from("HeartBeat"        ) ,0); 
   pm.insert(String::from("MasterTrigger"    ) ,0);
   pm.insert(String::from("RBEventHeader"    ) ,0);

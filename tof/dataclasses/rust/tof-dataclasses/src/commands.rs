@@ -86,7 +86,9 @@ pub enum TofCommandCode {
   CmdTriggerModeForcedMTB    = 25u8,
 
   /// command code for restarting systemd
-  CmdSystemdReboot           = 60u8
+  CmdSystemdReboot           = 60u8,
+  /// command code for putting liftof-cc in listening mode
+  CmdListen                  = 70u8
 }
 
 impl fmt::Display for TofCommandCode {
@@ -258,10 +260,11 @@ impl FromRandom for TofCommandResp {
 #[repr(u8)]
 pub enum TofOperationMode {
   Unknown          = 0u8,
-  #[deprecated(since="0.8.3")] 
-  StreamAny        = 10u8,
-  #[deprecated(since="0.8.3")] 
-  RequestReply     = 20u8,
+  Default          = 1u8,
+  //#[deprecated(since="0.8.3")] 
+  //StreamAny        = 10u8,
+  //#[deprecated(since="0.8.3")] 
+  //RequestReply     = 20u8,
   /// Don't decode any of the event 
   /// data on the RB, just push it 
   /// onward
@@ -282,8 +285,9 @@ impl From<u8> for TofOperationMode {
   fn from(value: u8) -> Self {
     match value {
       0u8  => TofOperationMode::Unknown,
-      10u8 => TofOperationMode::StreamAny,
-      20u8 => TofOperationMode::RequestReply,
+      1u8  => TofOperationMode::Default,
+      //10u8 => TofOperationMode::StreamAny,
+      //20u8 => TofOperationMode::RequestReply,
       30u8 => TofOperationMode::RBHighThroughput,
       40u8 => TofOperationMode::RBCalcCRC32,
       50u8 => TofOperationMode::RBWaveform,
@@ -298,8 +302,9 @@ impl FromRandom for TofOperationMode {
   fn from_random() -> Self {
     let choices = [
       TofOperationMode::Unknown,
-      TofOperationMode::RequestReply,
-      TofOperationMode::StreamAny,
+      TofOperationMode::Default,
+      //TofOperationMode::RequestReply,
+      //TofOperationMode::StreamAny,
       TofOperationMode::RBHighThroughput,
       TofOperationMode::RBCalcCRC32,
       TofOperationMode::RBWaveform,
@@ -448,6 +453,7 @@ pub enum TofCommand {
   TriggerModeForced       (u32),
   TriggerModeForcedMTB    (u32),
   SystemdReboot           (u32),
+  Listen                  (u32),
 }
 
 impl fmt::Display for TofCommand {
@@ -542,6 +548,7 @@ impl TofCommand {
       TofCommand::TriggerModeForced       (data) => { value = *data;},
       TofCommand::TriggerModeForcedMTB    (data) => { value = *data;},
       TofCommand::SystemdReboot           (data) => { value = *data;},
+      TofCommand::Listen                  (data) => { value = *data;}
     }
     value
   }  
@@ -569,7 +576,8 @@ impl TofCommand {
       TofCommandCode::CmdSetRBDataBufSize        => TofCommand::SetRBDataBufSize        (0u32),
       TofCommandCode::CmdTriggerModeForced       => TofCommand::TriggerModeForced       (0u32),
       TofCommandCode::CmdTriggerModeForcedMTB    => TofCommand::TriggerModeForcedMTB    (0u32),
-      TofCommandCode::CmdSystemdReboot           => TofCommand::SystemdReboot           (0u32)
+      TofCommandCode::CmdSystemdReboot           => TofCommand::SystemdReboot           (0u32),
+      TofCommandCode::CmdListen                  => TofCommand::Listen                  (0u32)
     }
   }
     
@@ -595,7 +603,8 @@ impl TofCommand {
       TofCommand::SetRBDataBufSize        (_) => Some(TofCommandCode::CmdSetRBDataBufSize),
       TofCommand::TriggerModeForced       (_) => Some(TofCommandCode::CmdTriggerModeForced),
       TofCommand::TriggerModeForcedMTB    (_) => Some(TofCommandCode::CmdTriggerModeForcedMTB),
-      TofCommand::SystemdReboot           (_) => Some(TofCommandCode::CmdSystemdReboot)
+      TofCommand::SystemdReboot           (_) => Some(TofCommandCode::CmdSystemdReboot),
+      TofCommand::Listen                  (_) => Some(TofCommandCode::CmdListen)
     }
   }
 
@@ -660,7 +669,8 @@ impl FromRandom for TofCommand {
       TofCommand::SetRBDataBufSize        (val),
       TofCommand::TriggerModeForced       (val),
       TofCommand::TriggerModeForcedMTB    (val),
-      TofCommand::SystemdReboot           (val)
+      TofCommand::SystemdReboot           (val),
+      TofCommand::Listen                  (val)
     ];
     let idx = rng.gen_range(0..choices.len());
     choices[idx]
@@ -867,8 +877,12 @@ impl From<(u8, u32)> for TofResponse {
 fn test_tofoperationmode() {
   let mut type_codes = Vec::<u8>::new();
   type_codes.push(TofOperationMode::Unknown as u8); 
-  type_codes.push(TofOperationMode::StreamAny as u8); 
-  type_codes.push(TofOperationMode::RequestReply as u8); 
+  type_codes.push(TofOperationMode::Default as u8); 
+  type_codes.push(TofOperationMode::RBHighThroughput as u8); 
+  type_codes.push(TofOperationMode::RBWaveform as u8); 
+  type_codes.push(TofOperationMode::RBCalcCRC32 as u8); 
+  //type_codes.push(TofOperationMode::StreamAny as u8); 
+  //type_codes.push(TofOperationMode::RequestReply as u8); 
   for tc in type_codes.iter() {
     assert_eq!(*tc,TofOperationMode::try_from(*tc).unwrap() as u8);  
   }

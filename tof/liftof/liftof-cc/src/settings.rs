@@ -13,7 +13,7 @@ use std::fmt;
 
 extern crate toml;
 use tof_dataclasses::errors::SerializationError;
-use tof_dataclasses::events::master_trigger::TriggerType;
+//use tof_dataclasses::events::master_trigger::TriggerType;
 
 use liftof_lib::master_trigger::MTBSettings;
 
@@ -23,6 +23,9 @@ pub enum BuildStrategy {
   Smart,
   /// adjust the number of boards based on nrbes/mtb
   Adaptive,
+  /// Same as adaptive, but check if the rb events follow the 
+  /// mapping
+  AdaptiveThorough,
   /// like adaptive, but add usize to the expected number of boards
   AdaptiveGreedy(usize),
   WaitForNBoards(usize)

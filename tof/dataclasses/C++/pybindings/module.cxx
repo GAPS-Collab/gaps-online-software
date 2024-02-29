@@ -210,7 +210,50 @@ PYBIND11_MODULE(gaps_tof, m) {
 
     ;
 
+    py::class_<RBWaveform>(m, "RBWaveform", "RBWaveform is a single waveform for a single RB channel and needs to be assembled back to RBEvents/TofEvents")
+      .def(py::init())
+      .def_readonly("rb_id"              ,&RBWaveform::rb_id,
+           "RB id (between 1-50). Internal TOF identifier for RB")
+      .def_readonly("rb_channel"         ,&RBWaveform::rb_channel,
+           "Channel id (between 0-9). Internal TOF identifier for RB channel. Each paddle has 2 channels")
+      .def_readonly("event_id"           ,&RBWaveform::event_id,
+           "Global event id")
+      .def_readonly("adc"                ,&RBWaveform::adc,
+           "Channel adc")
+      .def("__repr__",        [](const RBWaveform &wf) {
+                                 return wf.to_string(); 
+                                 }) 
+    ;
 
+    py::class_<TofEventSummary>(m, "TofEventSummary", "The short version of a TofEvent. Only summary information + hits")
+      .def(py::init())
+      .def_readonly("status"            ,&TofEventSummary::status,
+           "Event Status byte")
+      .def_readonly("quality"           ,&TofEventSummary::quality,
+           "Event Quality byte")
+      .def_readonly("trigger_setting"   ,&TofEventSummary::trigger_setting,
+           "Active Trigger Setting")
+      .def_readonly("n_trigger_paddles" ,&TofEventSummary::n_trigger_paddles,
+           "Number of triggered paddles (hits)")
+      .def_readonly("event_id"          ,&TofEventSummary::event_id,
+           "Master trigger event id")
+      .def_readonly("timestamp16"       ,&TofEventSummary::timestamp16,
+           "Timestamp 16bit (slow)")
+      .def_readonly("timestamp32"       ,&TofEventSummary::timestamp32,
+           "Timestamp 32bit (fast)")
+      .def_property_readonly("timestamp48",   &TofEventSummary::get_timestamp48,
+           "Complete timestamp (48 bits)")
+      //.def_property_readonly("primary_beta",  &TofEventSummary::get_prim,
+      //     "Complete timestamp (48 bits)")
+      // primary charge and beta missing
+      .def_readonly("hits"              ,&TofEventSummary::hits,
+           "TofHits")
+      //.def_readonly("timestamp32"       ,&TofEventSummary::timestamp32,
+      //     "Timestamp 32bit (fast)")
+      .def("__repr__",        [](const TofEventSummary &tes) {
+                                 return tes.to_string(); 
+                                 }) 
+    ;
 
     py::class_<MasterTriggerEvent>(m, "MasterTriggerEvent", "The MasterTriggerEvent contains the information from the MTB.")
       .def(py::init())

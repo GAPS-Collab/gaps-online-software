@@ -13,7 +13,7 @@ use constants::{DEFAULT_CALIB_VOLTAGE,
                 PREAMP_MIN_BIAS,
                 PREAMP_MAX_BIAS};
 pub use master_trigger::{
-    connect_to_mtb,
+    //connect_to_mtb,
     master_trigger,
     MTBSettings
 };
@@ -54,7 +54,7 @@ use tof_dataclasses::DsiLtbRBMapping;
 use tof_dataclasses::manifest::ReadoutBoard;
 use tof_dataclasses::constants::NWORDS;
 use tof_dataclasses::calibrations::{
-    RBCalibrations,
+    //RBCalibrations,
     find_zero_crossings,
 };
 use tof_dataclasses::packets::{
@@ -303,7 +303,6 @@ pub fn build_tcp_from_ip(ip: String, port: String) -> String {
 pub fn readoutboard_commander(cmd : &Receiver<TofPacket>){
   debug!(".. started!");
   let ctx = zmq::Context::new();
-  //let this_board_ip = local_ip().expect("Unable to obtainl local board IP. Something is messed up!");
   let this_board_ip = IpAddr::V4(Ipv4Addr::new(10, 0, 1, 1));
 
   let address_ip;
@@ -416,6 +415,8 @@ pub fn waveform_analysis(event         : &mut RBEvent,
   let fit_sinus = true;
   
   // FIXME - don't do this per every event
+  // We might have to though because the number
+  // of active paddles is changing every event
   for raw_ch in channels {
     if raw_ch == 8 {
       continue;
@@ -424,11 +425,11 @@ pub fn waveform_analysis(event         : &mut RBEvent,
     let ch = raw_ch + 1;
     //let mut TofHit::new();
     //let p_end_id = channel_map.get(&ch).unwrap_or(&0);
-    let p_end_id = rb.channel_to_paddle_end_id[raw_ch as usize];
-    if p_end_id < 1000 {
-      //error!("Invalid paddle end id {} for channel {}!", p_end_id, ch);
-      continue;
-    }
+    //let p_end_id = rb.channel_to_paddle_end_id[raw_ch as usize];
+    //if p_end_id < 1000 {
+    //  //error!("Invalid paddle end id {} for channel {}!", p_end_id, ch);
+    //  continue;
+    //}
     pid = rb.get_pid_for_ch(ch as usize);
     if !paddles.contains_key(&pid) {
       let mut hit   = TofHit::new();
@@ -514,7 +515,7 @@ pub fn waveform_analysis(event         : &mut RBEvent,
       ch_voltages[n] -= ped;
     }
     let mut charge : f32 = 0.0;
-    warn!("Check impedance value! Just using 50 [Ohm]");
+    debug!("Check impedance value! Just using 50 [Ohm]");
     match integrate(&ch_voltages,
                     &ch_times,
                     270.0, 70.0, 50.0) {
@@ -546,9 +547,9 @@ pub fn waveform_analysis(event         : &mut RBEvent,
         for pk in peaks.iter() {
           match cfd_simple(&ch_voltages,
                            &ch_times,
-                           0.2,pk.0, pk.1) {
+                           0.2, pk.0, pk.1) {
             Err(err) => {
-              error!("Unable to calculate cfd for peak {} {}! Err {}", pk.0, pk.1, err);
+              debug!("Unable to calculate cfd for peak {} {}! {}", pk.0, pk.1, err);
             }
             Ok(cfd) => {
               cfd_times.push(cfd);
@@ -709,6 +710,8 @@ pub fn to_board_id_string(rb_id: u32) -> String {
 /// Command Enums and stucts
 #[derive(Debug, Parser, PartialEq)]
 pub enum Command {
+  /// Listen for flight CPU commands.
+  Listen(ListenCmd),
   /// Ping a TOF sub-system.
   Ping(PingCmd),
   /// Monitor a TOF sub-system.
@@ -729,7 +732,24 @@ pub enum Command {
   Run(RunCmd)
 }
 
+/// Command Enums and stucts
+#[derive(Debug, Parser, PartialEq)]
+pub enum CommandRB {
+  /// Remotely trigger the readoutboards to run the calibration routines (tcal, vcal).
+  #[command(subcommand)]
+  Calibration(CalibrationCmd),
+  /// Remotely set LTB thresholds or preamp bias.
+  #[command(subcommand)]
+  Set(SetCmd),
+  /// Start/stop data taking run.
+  #[command(subcommand)]
+  Run(RunCmd)
+}
+
 /// TOF SW cmds ====================================================
+#[derive(Debug, Args, PartialEq)]
+pub struct ListenCmd { }
+
 #[derive(Debug, Args, PartialEq)]
 pub struct PingCmd {
   /// Component to target

@@ -11,6 +11,7 @@ use std::thread;
 
 use crossbeam_channel::Sender;
 
+use tof_dataclasses::errors::SensorError;
 use tof_dataclasses::monitoring::{
     RBMoniData,
     PAMoniData,
@@ -120,33 +121,14 @@ pub fn monitoring(board_id          : u8,
       },
     }
 
+    // RB monitoring routine
     if rb_moni_timer.elapsed().as_secs_f32() > rb_moni_interval {
-      // get tof-control data
-      let mut moni_dt = RBMoniData::new();
-      moni_dt.board_id = board_id; 
-      let rb_temp = RBTempDebug::new();
-      let rb_mag  = RBMag::new();
-      let rb_vcp  = RBVcp::new();
-      let rb_ph   = RBPh::new();
-      moni_dt.add_rbtemp(&rb_temp);
-      moni_dt.add_rbmag(&rb_mag);
-      moni_dt.add_rbvcp(&rb_vcp);
-      moni_dt.add_rbph(&rb_ph);
-      
-      let rate_query = get_trigger_rate();
-      match rate_query {
-        Ok(rate) => {
-          debug!("Monitoring thread -> Rate: {rate}Hz ");
-          moni_dt.rate = rate as u16;
-        },
-        Err(_)   => {
-          warn!("Can not send rate monitoring packet, register problem");
-        }
-      }
-   
+      let moni_dt = get_rb_moni(board_id).unwrap();
+
       if verbose {
         println!("{}", moni_dt);
       }
+
       let tp = TofPacket::from(&moni_dt);
       match tp_sender.try_send(tp) {
         Err(err) => error!("Issue sending RBMoniData {:?}", err),
@@ -154,19 +136,15 @@ pub fn monitoring(board_id          : u8,
       }
       rb_moni_timer = Instant::now();
     }
+
+    // Preamp monitoring routine
     if pa_moni_timer.elapsed().as_secs_f32() > rb_moni_interval*pa_moni_every_x {
-      let mut moni = PAMoniData::new();
-      moni.board_id = board_id;
-      // FIXME - this won't fail, however, if there
-      // is an issue it will silently set all values
-      // to f32::MAX
-      let pa_tmp = PreampTemp::new();
-      let pa_bia = PreampReadBias::new();
-      moni.add_temps(&pa_tmp);
-      moni.add_biases(&pa_bia);
+      let mut moni = get_preamp_moni(board_id).unwrap();
+
       if verbose {
         println!("{}", moni);
       }
+
       let tp = TofPacket::from(&moni);
       match tp_sender.try_send(tp) {
         Err(err) => error!("Issue sending PAMoniData {:?}", err),
@@ -174,16 +152,15 @@ pub fn monitoring(board_id          : u8,
       }
       pa_moni_timer = Instant::now();
     }
+
+    // PB monitoring routine
     if pb_moni_timer.elapsed().as_secs_f32() > rb_moni_interval*pb_moni_every_x {
-      let mut moni = PBMoniData::new();
-      moni.board_id = board_id;
-      let pb_temp = PBTemp::new();
-      let pb_vcp  = PBVcp::new();
-      moni.add_temps(&pb_temp);
-      moni.add_vcp(&pb_vcp);
+      let mut moni = get_pb_moni(board_id).unwrap();
+
       if verbose {
         println!("{}", moni);
       }
+
       let tp = TofPacket::from(&moni);
       match tp_sender.try_send(tp) {
         Err(err) => error!("Issue sending PBMoniData {:?}", err),
@@ -191,16 +168,15 @@ pub fn monitoring(board_id          : u8,
       }
       pb_moni_timer = Instant::now();
     }
+
+    // LTB monitoring routine
     if ltb_moni_timer.elapsed().as_secs_f32() > rb_moni_interval*ltb_moni_every_x {
-      let mut moni = LTBMoniData::new();
-      moni.board_id = board_id;
-      let ltb_temp = LTBTemp::new();
-      let ltb_thrs = LTBThreshold::new();
-      moni.add_temps(&ltb_temp);
-      moni.add_thresh(&ltb_thrs);
+      let mut moni = get_ltb_moni(board_id).unwrap();
+
       if verbose {
         println!("{}", moni);
       }
+
       let tp = TofPacket::from(&moni);
       match tp_sender.try_send(tp) {
         Err(err) => error!("Issue sending LTBMoniData {:?}", err),
@@ -212,3 +188,65 @@ pub fn monitoring(board_id          : u8,
   }
 }
 
+/// Get RB monitoring data for a RB board_id
+pub fn get_rb_moni(board_id: u8) -> Result<RBMoniData, SensorError> {
+  // get tof-control data
+  let mut moni_dt = RBMoniData::new();
+  moni_dt.board_id = board_id; 
+  let rb_temp = RBTempDebug::new();
+  let rb_mag  = RBMag::new();
+  let rb_vcp  = RBVcp::new();
+  let rb_ph   = RBPh::new();
+  moni_dt.add_rbtemp(&rb_temp);
+  moni_dt.add_rbmag(&rb_mag);
+  moni_dt.add_rbvcp(&rb_vcp);
+  moni_dt.add_rbph(&rb_ph);
+  
+  let rate_query = get_trigger_rate();
+  match rate_query {
+    Ok(rate) => {
+      debug!("Monitoring thread -> Rate: {rate}Hz ");
+      moni_dt.rate = rate as u16;
+    },
+    Err(_)   => {
+      warn!("Can not send rate monitoring packet, register problem");
+    }
+  }
+  Ok(moni_dt)
+}
+
+/// Get Preamp monitoring data for an RB board_id
+pub fn get_preamp_moni(board_id: u8) -> Result<PAMoniData, SensorError> {
+  let mut moni = PAMoniData::new();
+  moni.board_id = board_id;
+  // FIXME - this won't fail, however, if there
+  // is an issue it will silently set all values
+  // to f32::MAX
+  let pa_tmp = PreampTemp::new();
+  let pa_bia = PreampReadBias::new();
+  moni.add_temps(&pa_tmp);
+  moni.add_biases(&pa_bia);
+  Ok(moni)
+}
+
+/// Get PB monitoring data for an RB board_id
+pub fn get_pb_moni(board_id: u8) -> Result<PBMoniData, SensorError> {
+  let mut moni = PBMoniData::new();
+  moni.board_id = board_id;
+  let pb_temp = PBTemp::new();
+  let pb_vcp  = PBVcp::new();
+  moni.add_temps(&pb_temp);
+  moni.add_vcp(&pb_vcp);
+  Ok(moni)
+}
+
+/// Get LTB monitoring data for an RB board_id
+pub fn get_ltb_moni(board_id: u8) -> Result<LTBMoniData, SensorError> {
+  let mut moni = LTBMoniData::new();
+  moni.board_id = board_id;
+  let ltb_temp = LTBTemp::new();
+  let ltb_thrs = LTBThreshold::new();
+  moni.add_temps(&ltb_temp);
+  moni.add_thresh(&ltb_thrs);
+  Ok(moni)
+}

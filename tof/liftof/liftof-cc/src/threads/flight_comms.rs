@@ -112,7 +112,7 @@ pub fn global_data_sink(incoming           : &Receiver<TofPacket>,
               match moni {
                 Ok(data) => {println!("{}", data);},
                 Err(err) => error!("Can not unpack MtbMoniData! {err}")}
-              }, 
+              },
             _ => ()
           } // end match 
         }

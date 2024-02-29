@@ -43,5 +43,7 @@ using Vec = std::vector<T>;
 template <typename T, typename U>
 using HashMap = std::map<T,U>;
 
+typedef HashMap<u8,HashMap<u8,HashMap<u8, std::pair<u8,u8>>>> LtbRBMap;
+
 typedef Vec<u8> bytestream;
 #endif

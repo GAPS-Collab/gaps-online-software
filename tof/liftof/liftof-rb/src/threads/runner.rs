@@ -232,10 +232,6 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
           uio2_total_size = buffer_trip;
         }
         
-        //let mut tof_op_mode = TofOperationMode::RequestReply;
-        //if rc.stream_any {
-        //  tof_op_mode = TofOperationMode::StreamAny;
-        //}
         match opmode_to_cache.send(rc.tof_op_mode.clone()) {
           Err(err) => {
             error!("Unable to send TofOperationMode to the event cache! Err {err}");

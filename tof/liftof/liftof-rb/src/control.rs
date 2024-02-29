@@ -17,10 +17,12 @@ extern crate liftof_lib;
 /// Read the link ID from the MTB 
 ///
 /// THe link ID comes from the MTB
-pub fn mtb_link_id() -> Result<u32, RegisterError> {
+pub fn get_mtb_link_id() -> Result<u32, RegisterError> {
   trace!("Getting MTB Link ID!");
-  let val = read_control_reg(MT_LINK_ID)?;
-  Ok(val & 0x01F8) 
+  let mut val = read_control_reg(MT_LINK_ID)?;
+  val = val & 0x01F8;
+  val = val >> 3;
+  Ok(val) 
 }
 
 
@@ -135,6 +137,7 @@ pub fn get_blob_buffer_occ(which : &BlobBuffer) -> Result<u32, RegisterError> {
   let value = read_control_reg(address)?;
   Ok(value)
 }
+
 
 /// Check if teh TRIGGER_ENABLE register is set
 pub fn get_triggers_enabled() -> Result<bool, RegisterError> {

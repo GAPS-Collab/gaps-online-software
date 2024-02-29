@@ -50,15 +50,6 @@ use crate::calibrations::RBCalibrations;
 pub mod packet_type;
 pub use packet_type::PacketType;
 
-pub enum PacketQuality {
-  Perfect,
-  Good,
-  NotSoGood,
-  Bad,
-  Rubbish, 
-  UtterRubish
-}
-
 /// The most basic of all packets
 ///  
 /// A type and a payload. This wraps

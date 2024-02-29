@@ -217,8 +217,8 @@ class Paddle(models.Model):
                                                  null=True,
                                                  default="")
     height                    = models.FloatField(null=True)
-    width                     = models.PositiveSmallIntegerField(null=True)
-    length                    = models.PositiveSmallIntegerField(null=True)
+    width                     = models.FloatField(null=True)
+    length                    = models.FloatField(null=True)
     unit                      = models.CharField(
                                     null=True,
                                     max_length=2)
@@ -242,7 +242,10 @@ class Paddle(models.Model):
         _repr  = '<Paddle:\n'
         _repr += f'  pid            : {self.paddle_id}\n'
         _repr += f'  vid            : {self.volume_id}\n'
-        _repr += f'  L0 coord (sim) : [{self.global_pos_x_l0}, {self.global_pos_y_l0}, {self.global_pos_z_l0}] >'
+        _repr += f'  length, width, height\n'
+        _repr += f'    \u21B3 [{self.length}, {self.width}, {self.height}]\n'
+        _repr += f'  L0 coord (sim)\n'
+        _repr += f'    \u21B3 [{self.global_pos_x_l0}, {self.global_pos_y_l0}, {self.global_pos_z_l0}] >'
         return _repr
 
 class PaddleEnd(models.Model):

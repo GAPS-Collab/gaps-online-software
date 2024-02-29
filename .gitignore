@@ -1,3 +1,6 @@
+# other files which might be in the repositor
+data/*
+dataclasses/*
 
 # CMAKE 
 CMakeCache.txt

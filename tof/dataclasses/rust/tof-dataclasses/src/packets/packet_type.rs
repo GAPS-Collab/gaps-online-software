@@ -16,33 +16,42 @@ cfg_if::cfg_if! {
 #[derive(Debug, PartialEq, Clone, Copy, serde::Deserialize, serde::Serialize)]
 #[repr(u8)]
 pub enum PacketType {
-  Unknown            = 0u8, 
-  RBEvent            = 20u8,
-  TofEvent           = 21u8,
-  Monitor            = 30u8,    // needs to go away
-  HeartBeat          = 40u8,    // might probably go away
-  MasterTrigger      = 60u8,    // needs to be renamed to either MasterTriggerEvent or MTEvent
-  RBEventHeader      = 70u8,    // needs to go away
-  CPUMoniData        = 80u8,
-  MonitorMtb         = 90u8,
-  RBMoni             = 100u8,
-  PBMoniData         = 101u8,
-  LTBMoniData        = 102u8,
-  PAMoniData         = 103u8,
-  RBEventMemoryView  = 120u8, // We'll keep it for now - indicates that the event
-                              // still needs to be processed.
-  RBCalibration      = 130u8,
-  TofCommand         = 140u8,
-  RBCommand          = 150u8,
-  Ping               = 160u8,
+  Unknown             = 0u8, 
+  RBEvent             = 20u8,
+  TofEvent            = 21u8,
+  RBWaveform          = 22u8,
+  TofSummary          = 23u8,
+  //Monitor             = 30u8,    // needs to go away
+  HeartBeat           = 40u8,    // might probably go away
+  MasterTrigger       = 60u8,    // needs to be renamed to either MasterTriggerEvent or MTEvent
+  RBEventHeader       = 70u8,    // needs to go away
+  CPUMoniData         = 80u8,
+  MonitorMtb          = 90u8,
+  RBMoni              = 100u8,
+  PBMoniData          = 101u8,
+  LTBMoniData         = 102u8,
+  PAMoniData          = 103u8,
+  RBEventMemoryView   = 120u8, // We'll keep it for now - indicates that the event
+                               // still needs to be processed.
+  RBCalibration       = 130u8,
+  TofCommand          = 140u8,
+  RBCommand           = 150u8,
+  Ping                = 160u8,
+  // use the > 200 values for transmitting
+  // various binary files
+  ConfigBinary        = 201u8,
+  LiftofRBBinary      = 202u8,
+  LiftofBinaryService = 203u8,
+  LiftofCCBinary      = 204u8,
+
   /// a MultiPacket consists of other TofPackets
-  MultiPacket        = 255u8,
+  MultiPacket         = 255u8,
 }
 
 impl fmt::Display for PacketType {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let r = serde_json::to_string(self).unwrap_or(
-      String::from("Error: cannot unwrap this PacketType"));
+      String::from("Error - Don't understand packet type!"));
     write!(f, "<PacketType: {}>", r)
   }
 }
@@ -53,7 +62,9 @@ impl From<u8> for PacketType {
       0u8   => PacketType::Unknown,
       20u8  => PacketType::RBEvent,
       21u8  => PacketType::TofEvent,
-      30u8  => PacketType::Monitor,
+      22u8  => PacketType::RBWaveform,
+      23u8  => PacketType::TofSummary,
+      //30u8  => PacketType::Monitor,
       40u8  => PacketType::HeartBeat,
       60u8  => PacketType::MasterTrigger,
       70u8  => PacketType::RBEventHeader,
@@ -68,6 +79,10 @@ impl From<u8> for PacketType {
       140u8 => PacketType::TofCommand,
       150u8 => PacketType::RBCommand,
       160u8 => PacketType::Ping,
+      201u8 => PacketType::ConfigBinary,
+      202u8 => PacketType::LiftofRBBinary,
+      203u8 => PacketType::LiftofBinaryService,
+      204u8 => PacketType::LiftofCCBinary,
       255u8 => PacketType::MultiPacket,
       _     => PacketType::Unknown
     }
@@ -81,7 +96,9 @@ impl FromRandom for PacketType {
     let choices = [
       PacketType::Unknown,
       PacketType::TofEvent,
-      PacketType::Monitor,
+      PacketType::RBWaveform,
+      PacketType::TofSummary,
+      //PacketType::Monitor,
       PacketType::MasterTrigger,
       PacketType::HeartBeat,
       PacketType::RBEventHeader,
@@ -95,7 +112,11 @@ impl FromRandom for PacketType {
       PacketType::PAMoniData,
       PacketType::CPUMoniData,
       PacketType::MonitorMtb,
-      PacketType::RBCalibration
+      PacketType::RBCalibration,
+      PacketType::ConfigBinary,
+      PacketType::LiftofRBBinary,
+      PacketType::LiftofBinaryService,
+      PacketType::LiftofCCBinary,
     ];
     let mut rng  = rand::thread_rng();
     let idx = rng.gen_range(0..choices.len());
@@ -108,7 +129,9 @@ fn test_packet_types() {
   let mut type_codes = Vec::<u8>::new();
   type_codes.push(PacketType::Unknown as u8);
   type_codes.push(PacketType::TofEvent as u8);
-  type_codes.push(PacketType::Monitor as u8);
+  type_codes.push(PacketType::RBWaveform as u8);
+  type_codes.push(PacketType::TofSummary as u8);
+  //type_codes.push(PacketType::Monitor as u8);
   type_codes.push(PacketType::MasterTrigger as u8);
   type_codes.push(PacketType::HeartBeat as u8);
   type_codes.push(PacketType::RBEventHeader as u8);
@@ -123,6 +146,10 @@ fn test_packet_types() {
   type_codes.push(PacketType::CPUMoniData as u8);
   type_codes.push(PacketType::MonitorMtb as u8);
   type_codes.push(PacketType::RBCalibration as u8);
+  type_codes.push(PacketType::ConfigBinary as u8);
+  type_codes.push(PacketType::LiftofCCBinary as u8);
+  type_codes.push(PacketType::LiftofRBBinary as u8);
+  type_codes.push(PacketType::LiftofBinaryService as u8);
   for tc in type_codes.iter() {
     assert_eq!(*tc,PacketType::try_from(*tc).unwrap() as u8);  
   }

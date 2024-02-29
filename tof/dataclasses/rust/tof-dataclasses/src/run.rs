@@ -69,7 +69,7 @@ impl RunConfig {
       is_active               : false,
       nevents                 : 0,
       nseconds                : 0,
-      tof_op_mode             : TofOperationMode::StreamAny,
+      tof_op_mode             : TofOperationMode::Default,
       trigger_poisson_rate    : 0,
       trigger_fixed_rate      : 0,
       data_type               : DataType::Unknown, 

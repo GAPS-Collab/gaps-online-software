@@ -30,6 +30,11 @@ const static HashMap<u8, std::pair<u8,u8>> LTB_DSI_MAP {
   {17,{4,3}},
   {18,{4,4}},
   {19,{4,5}},
+  {20,{5,1}},
+  {21,{5,2}},
+  {22,{5,3}},
+  {23,{5,4}},
+  {24,{5,5}},
 };
 
 
@@ -1048,11 +1053,103 @@ std::string TofHit::to_string() const {
   return repr;
 }
 
+RBWaveform RBWaveform::from_bytestream(const Vec<u8> &stream,
+                                       u64 &pos) {
+  RBWaveform wf = RBWaveform();
+  u16 head = Gaps::parse_u16(stream, pos);
+  if (head != RBWaveform::HEAD)  {
+    //log_error("[RBEvent::from_bytestream] Header signature invalid!");  
+    return wf;
+  }
+  wf.event_id   = Gaps::parse_u16(stream, pos);
+  wf.rb_id      = Gaps::parse_u8(stream, pos);
+  wf.rb_channel = Gaps::parse_u8(stream, pos); 
+  Vec<u8>::const_iterator start = stream.begin() + pos;
+  Vec<u8>::const_iterator end   = stream.begin() + pos + 2*NWORDS;    // 2*NWORDS because stream is Vec::<u8> and it is 16 bit words.
+  Vec<u8> data(start, end);
+  wf.adc = u8_to_u16(data);
+  pos += 2*NWORDS;
+  u16 tail   = Gaps::parse_u16(stream, pos);
+  if (tail != RBWaveform::TAIL) {
+    log_error("After parsing, we found an invalid tail signature " << tail);
+  }
+  return wf;
+} 
+
+std::string RBWaveform::to_string() const {
+  std::string repr = "<RBWaveform";
+  //repr += std::format("\n  format test {:.2f}", get_time_a() );
+  repr += std::format("\n  Event ID : {}", event_id);
+  repr += std::format("\n  RB       : {}", rb_id);
+  repr += std::format("\n  Channel  : {}", rb_channel);
+  if (adc.size() >= 273) {
+    repr += std::format("\n  adc[{}]    : .. {} {} {} ..", adc.size(), adc[270], adc[271], adc[272]);
+  } else {
+    repr += std::format("\n  adc [{}/corrupt?]", adc.size());
+  }
+  repr += ">";
+  return repr;
+}
+  
+TofEventSummary TofEventSummary::from_bytestream(const Vec<u8> &stream, 
+                                                 u64 &pos) {
+  TofEventSummary tes;
+  u16 head = Gaps::parse_u16(stream, pos);
+  if (head != TofEventSummary::HEAD) {
+    log_error("Decoding of HEAD failed! Got " << head << "instead!");
+    //return Err(SerializationError::HeadInvalid);
+  }
+  tes.status            = Gaps::parse_u8(stream, pos);
+  tes.quality           = Gaps::parse_u8(stream, pos);
+  tes.trigger_setting   = Gaps::parse_u8(stream, pos);
+  tes.n_trigger_paddles = Gaps::parse_u8(stream, pos);
+  tes.event_id          = Gaps::parse_u32(stream, pos);
+  tes.timestamp32       = Gaps::parse_u32(stream, pos);
+  tes.timestamp16       = Gaps::parse_u16(stream, pos);
+  tes.primary_beta      = Gaps::parse_u16(stream, pos); 
+  tes.primary_charge    = Gaps::parse_u16(stream, pos); 
+  u16 nhits             = Gaps::parse_u16(stream, pos);
+  for (u16 k=0; k<nhits; k++) {
+    TofHit h = TofHit::from_bytestream(stream, pos);
+    tes.hits.push_back(h);
+  }
+  u16 tail = Gaps::parse_u16(stream, pos);
+  if (tail != TofEventSummary::TAIL) {
+    log_error("Decoding of TAIL failed! Got " << tail << " instead!");
+  }
+  return tes;
+}
+
+u64 TofEventSummary::get_timestamp48() const {
+  return ((u64)timestamp16 << 32) | (u64)timestamp32;
+}
+
+std::string TofEventSummary::to_string() const {
+  std::string repr = "<TofEventSummary";
+  //repr += std::format("\n  format test {:.2f}", get_time_a() );
+  repr += std::format("\n  Status             : {}", status);
+  repr += std::format("\n  Quality            : {}", quality);
+  repr += std::format("\n  Trigger            : {}", trigger_setting);
+  repr += std::format("\n  N trig paddles     : {}", n_trigger_paddles);
+  repr += std::format("\n  Event ID           : {}", event_id);
+  repr += std::format("\n  timestamp32        : {}", timestamp32)      ;
+  repr += std::format("\n  timestamp16        : {}", timestamp16)      ;
+  repr += std::format("\n  |->timestamp48     : {}", get_timestamp48());
+  repr += std::format("\n  NHits       (reco) : {}", hits.size());
+  repr += std::format("\n  Prim Beta   (reco) : {}", primary_beta);
+  repr += std::format("\n  Prim Charge (reco) : {}", primary_beta);
+  repr += "\n  **** **** ****";
+  for (auto const &h : hits) {
+    repr += std::format("\n  {}",h.to_string()); 
+  }
+  repr += ">";
+  return repr;
+}
+
 std::ostream& operator<<(std::ostream& os, const TofHit& th) {
   os << th.to_string();
   return os;
 }
-
 
 std::ostream& operator<<(std::ostream& os, const MasterTriggerEvent& mt) {
   os << mt.to_string();
@@ -1071,6 +1168,16 @@ std::ostream& operator<<(std::ostream& os, const RBEvent& re) {
 
 std::ostream& operator<<(std::ostream& os, const RBEventHeader& rh) {
   os << rh.to_string();
+  return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const RBWaveform& wf) {
+  os << wf.to_string();
+  return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const TofEventSummary& tes) {
+  os << tes.to_string();
   return os;
 }
 

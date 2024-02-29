@@ -320,6 +320,8 @@ struct MasterTriggerEvent {
   // these fields won't get serialized
   bool broken       ;
   bool valid        ;
+  
+  LtbRBMap channel_map;
 
   MasterTriggerEvent();
   
@@ -521,6 +523,68 @@ struct TofHit  {
     // don't serialize
 };
 
+/************************
+ * A part of a TofEvent 
+ * - a single waveform 
+ *
+ * That is a waveform for 
+ * a specific channel for a 
+ * specific id.
+ *
+ * Each paddle has 2 waveforms
+ *
+ *
+ */ 
+struct RBWaveform {
+  static const u16 HEAD = 0xAAAA;
+  static const u16 TAIL = 0x5555;
+
+  u32       event_id  ; 
+  u8        rb_id     ; 
+  u8        rb_channel; 
+  Vec<u16>  adc       ; 
+  
+  static RBWaveform from_bytestream(const Vec<u8> &bytestream, 
+                                    u64 &pos);
+  
+  std::string to_string() const;
+};
+
+
+/**
+ * Concise summary for the flight computer and 
+ * telemtry stream
+ *
+ *
+ */
+struct TofEventSummary {
+  static const u16 HEAD = 0xAAAA;
+  static const u16 TAIL = 0x5555;
+
+  u8          status            ; 
+  u8          quality           ; 
+  u8          trigger_setting   ; 
+  /// the number of triggered paddles coming
+  /// from the MTB directly. This might NOT be
+  /// the same as the number of hits!
+  u8          n_trigger_paddles ; 
+  u32         event_id          ; 
+  u32         timestamp32       ; 
+  u16         timestamp16       ; 
+  /// reconstructed primary beta
+  u16         primary_beta      ; 
+  /// reconstructed primary charge
+  u16         primary_charge    ; 
+  Vec<TofHit> hits              ;
+  
+  static TofEventSummary from_bytestream(const Vec<u8> &stream, 
+                                         u64 &pos);
+  // combined timestamp
+  u64  get_timestamp48()    const;
+  
+  std::string to_string() const;
+};
+
 std::ostream& operator<<(std::ostream& os, const TofHit& pad);
 
 std::ostream& operator<<(std::ostream& os, const MasterTriggerEvent& mt);
@@ -530,5 +594,9 @@ std::ostream& operator<<(std::ostream& os, const TofEvent& et);
 std::ostream& operator<<(std::ostream& os, const RBEvent& re);
 
 std::ostream& operator<<(std::ostream& os, const RBEventHeader& rh);
+
+std::ostream& operator<<(std::ostream& os, const RBWaveform& rh);
+
+std::ostream& operator<<(std::ostream& os, const TofEventSummary& tes);
 
 #endif 
