@@ -62,11 +62,6 @@ int main(int argc, char *argv[]){
     fnames[j++] = fname;
   }
 
-  // Print out the filenames as a sanity check
-  //std::cout << fnames[0] << std::endl;
-  //for(int k=1;k<j;k++) std::cout << fnames[k] << std::endl;
-  //return (0);
-  
   // -> Gaps relevant code starts here
   auto calname = result["calibration"].as<std::string>();
   RBCalibration cali[NRB]; // "cali" stores values for one RB
@@ -107,26 +102,6 @@ int main(int argc, char *argv[]){
       } 
     }
   }
-  
-  // To read calibration data from individual text files, when -c is
-  // given with the directory of the calibration files
-  /*if (calname != "") {
-    // obviously here we have to get all the calibration files, 
-    // but for the sake of the example let's use only one
-    // Ultimatly, they will be stored in the stream.
-    for (int i=1; i<NRB; i++) {
-      std::string f_str;
-      if (i<10) // Little Kludgy, but it works
-	f_str = calname + "/txt-files/rb0" + std::to_string(i) + "_cal.txt";
-      else
-	f_str = calname + "/txt-files/rb" + std::to_string(i) + "_cal.txt";
-      
-      //spdlog::info("Will use calibration file {}", calname);
-      //cali[i] = RBCalibration::from_txtfile(calname);
-      spdlog::info("Will use calibration file {}", f_str);
-      cali[i] = RBCalibration::from_txtfile(f_str);
-    }
-    }*/
 
   // Some useful variables (some initialized to default values)
   // but overwritten from file (if it exists)
@@ -291,7 +266,6 @@ int main(int argc, char *argv[]){
 	
         auto ev = TofEvent::from_bytestream(p.payload, pos);
 	unsigned long int evt_ctr = ev.mt_event.event_id;
-	//printf("Event %ld: RBs -", evt_ctr);
 	//printf("%ld.", evt_ctr);
 	for (auto const &rbid : ev.get_rbids()) {
 	  RBEvent rb_event = ev.get_rbevent(rbid);
@@ -303,8 +277,6 @@ int main(int argc, char *argv[]){
           }
 	  Vec<Vec<f32>> volts;
 	  Vec<Vec<f32>> times;
-	  //if ((calname != "") && cali.rb_id == rbid ){
-	  //if (calname != "") { // For combined data all boards calibrated
 	  if (RB_Calibrated[rbid]) { // Have cali data for this RBID
 	    // Vec<f32> is a typedef for std::vector<float32>
 	    volts = cali[rbid].voltages(rb_event, false); //second argument is for spike cleaning

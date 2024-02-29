@@ -319,6 +319,27 @@ if (BUILD_EXAMPLES)
             DESTINATION ${INSTALL_EXAMPLES_DIR}
     )
 
+    set(analyze-rene "analyzeRene")
+    add_executable(${analyze-rene}
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/analyzeRene.cxx
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/src/EventGAPS.cpp
+    )
+    target_include_directories(${analyze-rene} 
+                              PUBLIC
+                              ${CMAKE_CURRENT_SOURCE_DIR}/../resources/example/spdlog/include
+                              ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/cxxopts/include
+                              ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
+                              )
+    target_link_libraries(${analyze-rene}
+                          PRIVATE
+                          ${GAPSTOF_LIBRARY_SHARED}
+      			  $<$<BOOL:${BUILD_ROOTCOMPONENTS}>:${ROOT_LIBRARY_SHARED}>
+      			  ROOT::Gui ROOT::Core ROOT::RIO ROOT::Net ROOT::Hist ROOT::Tree ROOT::Rint
+			  )
+    install(TARGETS ${analyze-rene}
+            DESTINATION ${INSTALL_EXAMPLES_DIR}
+    )
+
   endif(BUILD_ROOTCOMPONENTS)
 endif()
 

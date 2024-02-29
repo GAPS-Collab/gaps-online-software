@@ -21,7 +21,7 @@ using namespace std;
 EventGAPS::EventGAPS(void) {
 
   // Initialize any values necessary for a new event
-  InitializeVariables();
+  InitializeVariables(0);
 
 }
 ////////////////////////////////////////////////////////////////////////////
@@ -40,7 +40,9 @@ EventGAPS::~EventGAPS(void) {
 
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
-void EventGAPS::InitializeVariables(void) {
+void EventGAPS::InitializeVariables(unsigned long int evt_ctr=0) {
+
+  evtno = evt_ctr;
   
   // Reset everything that is stored by SiPM channel number
   for (int i=0; i<NTOT; i++) {
@@ -217,11 +219,18 @@ void EventGAPS::InitializeHistograms(void) {
 
   for (int b = 0; b < NTOT; b++) {
     sprintf(text, "tdcCFD[%d]", b);
-    tdcCFD[b] = new TH1D(text, "", 400, 250.0, 350.0);
+    tdcCFD[b] = new TH1D(text, "", 400, 10.0, 200.0);
     tdcCFD[b]->GetXaxis()->SetTitle("Pulse Time (ns)");
     tdcCFD[b]->GetYaxis()->SetTitle("Counts");
   }
   
+  //rao  TDC diffs
+  for (int b = 0; b < NPAD; b++) {
+    sprintf(text, "tDiff[%d]", b);
+    tDiff[b] = new TH1D(text, "", 400, -100, 100);
+    tDiff[b]->GetXaxis()->SetTitle("TDC Difference");
+    tDiff[b]->GetYaxis()->SetTitle("Counts");
+  }
   // Histograms comparing the charge measured at both ends of the paddle.
   //TH2D *QEnd2End[l->n_chan/2];
   for (int b = 0; b < NPAD; b++) {
@@ -265,7 +274,7 @@ void EventGAPS::InitializeHistograms(void) {
 ////////////////////////////////////////////////////////////////////////////
 void EventGAPS::WriteHistograms() {
   
-  TFile *outfile = TFile::Open("/home/gaps/zweerink/anevis.root", "RECREATE"); 
+  TFile *outfile = TFile::Open("/home/gaps/zweerink/outfile.root","RECREATE"); 
   
   // For reasons I don't understand, the code to make subdirectories
   // is not compiling properly and gives an error (below) when run
@@ -276,14 +285,15 @@ void EventGAPS::WriteHistograms() {
   // For now, I am simply writing all the plots to the main directory.
   
   //create directories for the raw plots
-  /*TDirectory *savdir = gDirectory;
-    TDirectory *Peddir = savdir->mkdir("Pedestals");
-    TDirectory *Peakdir = savdir->mkdir("VPeakplots");
-    TDirectory *Chargedir = savdir->mkdir("Chargeplots");
-    TDirectory *Hitmaskdir = savdir->mkdir("Hitmasks");
-    
-    TDirectory *TDCdir = savdir->mkdir("TDCplots");
-  */
+  //TDirectory *savdir = gDirectory; 
+  //outfile->cd();
+  //TDirectory *Peddir = outfile->mkdir("Pedestals");
+  //TDirectory *Peakdir = outfile->mkdir("VPeakplots");
+  //TDirectory *Chargedir = outfile->mkdir("Chargeplots");
+  //TDirectory *Hitmaskdir = outfile->mkdir("Hitmasks");
+  
+  //TDirectory *TDCdir = outfile->mkdir("TDCplots");
+
   // Plots made using simple CFD timing
   //TDirectory *CFDTimingdir = savdir->mkdir("CFDTimingplots");
   //TDirectory *CFDTimeVsQdir = savdir->mkdir("CFDTimeVsQplots");
@@ -308,6 +318,7 @@ void EventGAPS::WriteHistograms() {
   
   //TDCdir->cd();
   for (int i = 0; i < NTOT; i++) tdcCFD[i]->Write();
+  for (int j = 0; j < NPAD; j++) tDiff[j]->Write();
   
   //Hitmaskdir->cd();
   NPaddlesUpper->Write();
@@ -335,7 +346,13 @@ void EventGAPS::AnalyzePedestals(float Ped_low, float Ped_win) {
       Pedestal[i] = wData[i]->GetPedestal(); 
       PedRMS[i]   = wData[i]->GetPedsigma();
 
+
       //if ( PedRMS[i] > 15 ) printf("Channel %d: %8.1f\n", i, PedRMS[i]);
+      if ( PedRMS[i] > 3 ) {
+	if ( i%NCH==7 && PedRMS[i-1]>3 && PedRMS[i-2]>3 && PedRMS[i-3]>3 ) {
+	  //printf("Data Mangled Event %ld: RB %d\n", evtno, i/NCH);
+	}
+      }
     }
   }
   // This does the same thing for the clock data if so desired
@@ -362,6 +379,7 @@ void EventGAPS::AnalyzePulses(float Pulse_low, float Pulse_win) {
 
   for (int i=0; i<NTOT; i++) {
     if (wData[i] != NULL) { 
+      //if (wData[i] != NULL && PedRMS[i] < 3.0 ) { 
       // Verify that quantities are set correctly
       wData[i]->SetThreshold(Threshold);
       wData[i]->SetCFDSFraction(CFDFraction);
@@ -486,7 +504,7 @@ void EventGAPS::FillChannelHistos(void) {
     pedRMSHist[i]->Fill(PedRMS[i]);
     Peak[i]->Fill(VPeak[i]);
     Charge[i]->Fill(QInt[i]);
-    if (QInt[i]>0.5) Charge_cut[i]->Fill(QInt[i]);
+    if (QInt[i]>1.0) Charge_cut[i]->Fill(QInt[i]);
 
     tdcCFD[i]->Fill(TDC[i]);
   }
@@ -499,10 +517,12 @@ void EventGAPS::FillChannelHistos(void) {
 void EventGAPS::FillPaddleHistos(void) {
   
   for (int i=0; i<NPAD; i++) {
-    if (Paddle_A[i] < 1) { // Non existent paddle
-      QEnd2End[i]->Fill(QInt[Paddle_A[i]], QInt[Paddle_B[i]]);
+    //if (Paddle_A[i] < 1) { // Non existent paddle
+      //QEnd2End[i]->Fill(QInt[Paddle_A[i]], QInt[Paddle_B[i]]);
+      QEnd2End[i]->Fill(QInt[2*i], QInt[2*i+1]);
       HitMask[i]->Fill(Hits[i]);
-    }
+      if (TDC[2*i]>0 && TDC[2*i+1]>0) tDiff[i]->Fill(TDC[2*i] - TDC[2*i+1]);
+      //}
   }
 
   NPaddlesCube->Fill(NPadCube);

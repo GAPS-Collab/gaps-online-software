@@ -1,4 +1,5 @@
 /* ROOT Stuff for plotting traces */
+#include <TDirectory.h>
 #include <TGraph.h>
 #include <TGraphErrors.h>
 #include <TGraphAsymmErrors.h>
@@ -29,7 +30,7 @@ public:
 
   // MEMBER FUNCTIONS
 
-  void    InitializeVariables(void);
+  void    InitializeVariables(unsigned long int evt_ctr);
   void    InitializeWaveforms(GAPS::Waveform *wave[], GAPS::Waveform *wch9[]);
   void    UnsetWaveforms(void);
   void    SetPaddleMap(int paddle_map[NRB][NCH], int pad2volid[NPAD],
@@ -62,6 +63,7 @@ private:
 
   int     ch;                        // channel we are working with
   int     runno;                     // Run Number
+  unsigned long int  evtno;          // Event Number
   float   Threshold;                 // PMT Threshold in DC (for now...)
   float   CFDFraction;               // CFD Fraction for TDC calculation
 
@@ -103,6 +105,7 @@ private:
 
   TH2D    *QEnd2End[NPAD];             // End 2 End charge 
   TH1D    *HitMask[NPAD];              // Hit mask of paddle
+  TH1D    *tDiff[NPAD];                // TDC diff for paddle
   TH1D    *NPaddlesCube;
   TH1D    *NPaddlesUpper;
   TH1D    *NPaddlesLower;
