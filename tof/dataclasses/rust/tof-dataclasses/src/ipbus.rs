@@ -148,6 +148,7 @@ impl IPBus {
     };
     match bus.realign_packet_id() {
       Err(err) => {
+        error!("Packet ID realign failed! {}", err); 
         return Err(std::io::Error::new(std::io::ErrorKind::Other, "Can not realign packet id"));
       },
       Ok(_) => ()
@@ -188,7 +189,11 @@ impl IPBus {
         // this is not strrictly necessary, but 
         // it is nice to limit communications
         match socket.set_read_timeout(Some(Duration::from_millis(1))) {
-          Err(err) => error!("Can not set read timeout for Udp socket! Error {err}"),
+          Err(err) => error!("Can not set read timeout for Udp socket! {err}"),
+          Ok(_)    => ()
+        }
+        match socket.set_write_timeout(Some(Duration::from_millis(1))) {
+          Err(err) => error!("Can not set write timeout for Udp socket! {err}"),
           Ok(_)    => ()
         }
         match socket.connect(&target_address) {
@@ -197,6 +202,12 @@ impl IPBus {
             return Err(err);
           }
           Ok(_)    => info!("Successfully connected IPBus to target address {}!", target_address)
+        }
+        match socket.set_nonblocking(false) {
+          Err(err) => {
+            error!("Can not set socket to blocking mode! {err}");
+          },
+          Ok(_) => ()
         }
         return Ok(socket);
       }
@@ -229,18 +240,55 @@ impl IPBus {
 
   /// Receive number_of_bytes from UdpSocket and sleep after
   /// to avoid too many queries
-  pub fn receive(&mut self) -> Result<usize, Box<dyn Error>> {
-    let (number_of_bytes, _) = self.socket.recv_from(&mut self.buffer)?;
+  pub fn receive(&mut self) -> io::Result<usize> {
+    let number_of_bytes = self.socket.recv(&mut self.buffer)?;
     //thread::sleep(Duration::from_micros(UDP_SOCKET_SLEEP_USEC));
     Ok(number_of_bytes)
   }
-  
+ 
+
   /// Receive number_of_bytes from UdpSocket and sleep after
   /// to avoid too many queries
-  pub fn send(&mut self, data : &Vec<u8>) -> Result<(), Box<dyn Error>> {
+  pub fn send(&mut self, data : &Vec<u8>) -> io::Result<()> {
     self.socket.send(data.as_slice())?;
     thread::sleep(Duration::from_micros(UDP_SOCKET_SLEEP_USEC));
     Ok(())
+  }
+  
+  /// A combined send-receive with error checking
+  //pub fn query(&mut self, data : &Vec<u8>) -> Result<(), Box<dyn Error>> {
+  pub fn write(&mut self,
+               addr   : u32,
+               data   : u32) -> Result<(), Box<dyn Error>> {
+    // we don't expect any issues with sending the data
+    let send_data = Vec::<u32>::from([data]);
+    self.packet_type = IPBusPacketType::Write;
+    let message = self.encode_payload(addr, &send_data);
+    match self.send(&message) {
+      Err(err) => {
+        error!("Sending Udp message failed! {err}");
+        return Err(Box::new(IPBusError::UdpSendFailed));
+      },
+      Ok(_) => ()
+    }
+    match self.receive() {
+      // this can have two failure modes
+      // 1) we receive nothing (timeout)
+      Err(err) => {
+        //if err.kind = std::io::ErrorKind  
+        error!("Unable to receive data! i/o error : {}", err.kind());
+        let target_exp_pid = self.get_target_next_expected_packet_id()?;
+        let buffer_pid = self.get_pid_from_current_buffer();
+        error!("self.pid {}, self.expected.pid {}, target expects pid {:?}, buffer pid {} ", self.pid, self.expected_pid, target_exp_pid, buffer_pid);
+        return Err(Box::new(IPBusError::UdpReceiveFailed));
+        //if err == IPBusError::InvalidPacketID {
+      }
+      Ok(_data) => {
+        // _data is tne number of bytes received
+        trace!("[ipbus::write] => Got buffer {:?}", self.buffer);
+        return Ok(());  
+      }
+    }
   }
 
   pub fn get_status(&mut self) 
@@ -258,7 +306,7 @@ impl IPBus {
     }
     //self.socket.send(udp_data.as_slice())?;
     match self.send(&udp_data) {
-      Err(err) => error!("Unable to send udp data!"),
+      Err(err) => error!("Unable to send udp data! {err}"),
       Ok(_)    => ()
     }
     trace!("[IPBus::get_status => message {:?} sent!", udp_data);
@@ -268,7 +316,7 @@ impl IPBus {
     let number_of_bytes : usize;
     match self.receive() {
       Err(err) => {
-        error!("Can not receive from Udp Socket");
+        error!("Can not receive from Udp Socket! {err}");
         return Err(Box::new(IPBusError::NotAStatusPacket));
       },
       Ok(_number_of_bytes)    => {
@@ -354,7 +402,14 @@ impl IPBus {
     trace!("[IPBus::encode_payload] => payload {:?}", udp_data);
     udp_data
   }
-  
+ 
+  pub fn get_pid_from_current_buffer(&self) -> u16 {
+    let buffer   = self.buffer.to_vec();
+    let pheader  = parse_u32_be(&buffer, &mut 0);
+    let pid      = ((0x00ffff00 & pheader) >> 8) as u16;
+    pid
+  }
+
   /// Unpack a binary representation of an IPBusPacket
   ///
   /// # Arguments:
@@ -443,7 +498,7 @@ impl IPBus {
         self.pid = pid;
       }
       Err(err) => {
-        error!("Can not get next expected packet id from target, will use 0");
+        error!("Can not get next expected packet id from target, will use 0! {err}");
         self.pid = 0;
       }
     }
@@ -471,9 +526,9 @@ impl IPBus {
 
   pub fn read(&mut self, addr   : u32, verify_tid : bool) 
     -> Result<u32, Box<dyn Error>> {
-    let send_data = Vec::<u32>::from([0]);
+    let send_data    = Vec::<u32>::from([0]);
     self.packet_type = IPBusPacketType::Read;
-    let message   = self.encode_payload(addr, &send_data);
+    let message      = self.encode_payload(addr, &send_data);
     trace!("[IPBus::read => sending message {:?}", message);
     //self.socket.send(message.as_slice())?;
     self.send(&message)?;
@@ -482,9 +537,20 @@ impl IPBus {
     let mut debug_pid = 0u16;
     let mut notify_success = false;
     let mut ntries    = 4usize;
+    let mut number_of_bytes : usize;
     loop {
       //let (number_of_bytes, _) = self.socket.recv_from(&mut self.buffer)?;
-      let number_of_bytes = self.receive()?;
+      match self.receive() {
+        Err(err) => {
+          let pid_from_buffer = self.get_pid_from_current_buffer();
+          error!("Can not receive from socket! {err}. self.pid {}, self.expected_pid {}, buffer pid {}", self.pid, self.expected_pid, pid_from_buffer);
+          return Err(Box::new(IPBusError::UdpReceiveFailed));
+        }
+        Ok(_number_of_bytes) => {
+          number_of_bytes = _number_of_bytes;
+        }
+      }
+      //let number_of_bytes = self.receive()?;
       trace!("[IPBus::read] => Received {} bytes from master trigger! Message {:?}", number_of_bytes, self.buffer);
       if self.buffer_is_status() {
         continue;
@@ -568,7 +634,7 @@ impl IPBus {
           n_send_failures += 1;
           if n_send_failures == 4 {
             error!("allowed send failures exceeded!");
-            return Err(err);
+            return Err(Box::new(err));
           }
           if self.buffer_is_status() {
             continue;
@@ -618,16 +684,14 @@ impl IPBus {
     Ok(data)
   }
   
-  pub fn write(&mut self,
+  pub fn write_deprecated(&mut self,
                addr   : u32,
                data   : u32) 
     -> Result<(), Box<dyn Error>> {
     let send_data = Vec::<u32>::from([data]);
     self.packet_type = IPBusPacketType::Write;
     let message = self.encode_payload(addr, &send_data);
-    //self.socket.send(message.as_slice())?;
     self.send(&message)?;
-    //let (number_of_bytes, _) = self.socket.recv_from(&mut self.buffer)?;
     let number_of_bytes = self.receive()?;
     trace!("Received {} bytes from master trigger", number_of_bytes);
     Ok(())
