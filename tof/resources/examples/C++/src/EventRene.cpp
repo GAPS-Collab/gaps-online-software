@@ -517,12 +517,12 @@ void EventGAPS::FillChannelHistos(void) {
 void EventGAPS::FillPaddleHistos(void) {
   
   for (int i=0; i<NPAD; i++) {
-    //if (Paddle_A[i] < 1) { // Non existent paddle
-      //QEnd2End[i]->Fill(QInt[Paddle_A[i]], QInt[Paddle_B[i]]);
-      QEnd2End[i]->Fill(QInt[2*i], QInt[2*i+1]);
+    if (Paddle_A[i] > 0) { // Paddle-channel map exists                    
+      QEnd2End[i]->Fill(QInt[Paddle_A[i]], QInt[Paddle_B[i]]);
       HitMask[i]->Fill(Hits[i]);
-      if (TDC[2*i]>0 && TDC[2*i+1]>0) tDiff[i]->Fill(TDC[2*i] - TDC[2*i+1]);
-      //}
+      if ( TDC[Paddle_A[i]] > 0 && TDC[Paddle_B[i]] > 0 )
+        tDiff[i]->Fill(TDC[Paddle_A[i]] - TDC[Paddle_B[i]]);
+    }
   }
 
   NPaddlesCube->Fill(NPadCube);
