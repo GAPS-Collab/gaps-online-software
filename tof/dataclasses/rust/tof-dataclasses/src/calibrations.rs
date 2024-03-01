@@ -398,7 +398,7 @@ fn calculate_column_means(data: &Vec<Vec<f32>>) -> Vec<f32> {
   // Get the number of columns (assuming all sub-vectors have the same length)
   let num_columns = data[0].len();
   let num_rows    = data.len();
-  info!("Calculating means for {} columns and {} rows", num_columns, num_rows);
+  debug!("Calculating means for {} columns and {} rows", num_columns, num_rows);
   // Initialize a Vec to store the column-wise medians
   let mut column_means: Vec<f32> = vec![0.0; num_columns];
   // Calculate the median for each column across all sub-vectors, ignoring NaN values
@@ -770,7 +770,7 @@ impl RBCalibrations {
     || self.noi_data.len() == 0 {
       return Err(CalibrationError::EmptyInputData);
     }
-    info!("Starting voltage calibration!");
+    info!("Starting calculating voltage calibration constants!");
     let (v_offsets_high, _v_dips_high) 
         = Self::voltage_offset_and_dips(&self.vcal_data)?;
     let (v_offsets_low, v_dips_low) 
@@ -784,8 +784,8 @@ impl RBCalibrations {
       }
     }
     // at this point, the voltage calibration is complete
-    info!("Voltage calibration complete!");
-    info!("Begin timing calibration!");
+    info!("Filnished calculating voltage calibration constants!");
+    info!("Starting calculating timing calibration constants!");
     warn!("Calibration only supported for Edge::Average!");
     // this just suppresses a warning
     // We have to think if edge will be
@@ -1353,11 +1353,9 @@ impl Default for RBCalibrations {
 impl fmt::Display for RBCalibrations {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let mut timestamp_str = String::from("?");
-    println!("Self.timestamp {}", self.timestamp);
     match Utc.timestamp_opt(self.timestamp.into(), 0) {
       LocalResult::Single(datetime_utc) => {
         timestamp_str = datetime_utc.format("%Y/%m/%d %H:%M:%S").to_string();
-        //println!("UTC datetime: {}", datetime_utc);
       },
       LocalResult::Ambiguous(_, _) => {
         println!("The given timestamp is ambiguous.");

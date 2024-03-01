@@ -242,6 +242,8 @@ pub enum IPBusError {
   InvalidPacketID,
   NotAStatusPacket,
   ConnectionTimeout,
+  UdpSendFailed,
+  UdpReceiveFailed
 }
 
 impl fmt::Display for IPBusError {

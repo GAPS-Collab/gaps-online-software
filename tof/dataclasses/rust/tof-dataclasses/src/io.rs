@@ -529,7 +529,7 @@ impl RBEventMemoryStreamer {
         match search_for_u16(TofPacket::HEAD, &self.stream, search_pos) {
           Err(_) => (),
           Ok(result) => {
-            println!("The channel data is corrupt, but we found a header at {} for remaining stream len {}", result, self.stream.len()); 
+            info!("The channel data is corrupt, but we found a header at {} for remaining stream len {}", result, self.stream.len()); 
           }
         }
         let mut stream_view = Vec::<u8>::new();
@@ -620,7 +620,7 @@ impl RBEventMemoryStreamer {
     event.header = header;
     event.status = event_status;
     if event_status == EventStatus::TailWrong {
-      println!("{}", event);
+      info!("{}", event);
     }
     Some(event)
   }
