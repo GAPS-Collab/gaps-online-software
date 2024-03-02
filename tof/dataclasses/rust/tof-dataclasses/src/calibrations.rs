@@ -608,7 +608,7 @@ impl RBCalibrations {
     let mut all_v_dips    = Vec::<Vec::<f32>>::new();
     let nchn = input_vcal_data[0].header.get_nchan();
 
-    info!("Found {nchn} channels!");
+    debug!("Found {nchn} channels!");
     for _ in 0..nchn {
       let empty_vec_off : Vec<f32> = vec![0.0;NWORDS];
       all_v_offsets.push(empty_vec_off);  
