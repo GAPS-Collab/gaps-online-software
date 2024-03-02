@@ -1,4 +1,7 @@
 pub mod master_trigger;
+pub mod settings;
+pub mod constants;
+
 use constants::{DEFAULT_CALIB_VOLTAGE,
                 DEFAULT_CALIB_EXTRA,
                 DEFAULT_RB_ID,
@@ -18,10 +21,11 @@ pub use master_trigger::{
     MTBSettings
 };
 
-pub mod constants;
+pub use settings::LiftofSettings;
 
 use std::error::Error;
 use std::fmt;
+
 use std::{
     fs::File,
 };
@@ -733,7 +737,7 @@ pub enum Command {
 }
 
 /// Command Enums and stucts
-#[derive(Debug, Parser, PartialEq)]
+#[derive(Debug, Clone, Parser, PartialEq)]
 pub enum CommandRB {
   /// Remotely trigger the readoutboards to run the calibration routines (tcal, vcal).
   #[command(subcommand)]
@@ -743,11 +747,13 @@ pub enum CommandRB {
   Set(SetCmd),
   /// Start/stop data taking run.
   #[command(subcommand)]
-  Run(RunCmd)
+  Run(RunCmd),
+  /// Listen to commands from the central C&C server (liftof-cc).
+  Listen(ListenCmd),
 }
 
 /// TOF SW cmds ====================================================
-#[derive(Debug, Args, PartialEq)]
+#[derive(Debug, Copy, Clone, Args, PartialEq)]
 pub struct ListenCmd { }
 
 #[derive(Debug, Args, PartialEq)]
@@ -792,7 +798,7 @@ pub struct SystemdRebootCmd {
 
 
 /// Set cmds ====================================================
-#[derive(Debug, Subcommand, PartialEq)]
+#[derive(Debug, Clone, Subcommand, PartialEq)]
 pub enum SetCmd {
   /// Set MT configuration (WHAT SHOULD I DO WITH THIS TODO)
   //MTConfig(MTConfigOpts),
@@ -822,7 +828,7 @@ pub enum SetCmd {
 //   }
 // }
 
-#[derive(Debug, Args, PartialEq)]
+#[derive(Debug, Clone, Args, PartialEq)]
 pub struct LtbThresholdOpts {
   /// ID of the LTB to target
   #[arg(short, long, default_value_t = DEFAULT_LTB_ID)]
@@ -889,7 +895,7 @@ impl From<u8> for LTBThresholdName {
   }
 }
 
-#[derive(Debug, Args, PartialEq)]
+#[derive(Debug, Clone, Args, PartialEq)]
 pub struct PreampBiasOpts {
   /// RB to target in voltage calibration run.
   #[arg(short, long, default_value_t = DEFAULT_RB_ID)]
@@ -911,7 +917,7 @@ impl PreampBiasOpts {
 /// END Set cmds ================================================
 
 /// Calibration cmds ====================================================
-#[derive(Debug, Subcommand, PartialEq)]
+#[derive(Debug, Clone, Subcommand, PartialEq)]
 pub enum CalibrationCmd {
   /// Default calibration run, meaning 2 voltage calibrations and one timing calibration on all RBs with the default values.
   Default(DefaultOpts),
@@ -923,7 +929,7 @@ pub enum CalibrationCmd {
   Timing(TimingOpts)
 }
 
-#[derive(Debug, Args, PartialEq)]
+#[derive(Debug, Clone, Args, PartialEq)]
 pub struct DefaultOpts {
   /// Voltage level to be set in default calibration run.
   #[arg(short, long, default_value_t = DEFAULT_CALIB_VOLTAGE)]
@@ -946,7 +952,7 @@ impl DefaultOpts {
   }
 }
 
-#[derive(Debug, Args, PartialEq)]
+#[derive(Debug, Clone, Args, PartialEq)]
 pub struct NoiOpts {
   /// ID of the RB to target in no input calibration run.
   #[arg(short, long, default_value_t = DEFAULT_RB_ID)]
@@ -965,7 +971,7 @@ impl NoiOpts {
   }
 }
 
-#[derive(Debug, Args, PartialEq)]
+#[derive(Debug, Copy, Clone, Args, PartialEq)]
 pub struct VoltageOpts {
   /// Voltage level to be set in voltage calibration run.
   #[arg(short, long, default_value_t = DEFAULT_CALIB_VOLTAGE)]
@@ -988,7 +994,7 @@ impl VoltageOpts {
   }
 }
 
-#[derive(Debug, Args, PartialEq)]
+#[derive(Debug, Copy, Clone, Args, PartialEq)]
 pub struct TimingOpts {
   /// Voltage level to be set in voltage calibration run.
   #[arg(short, long, default_value_t = DEFAULT_CALIB_VOLTAGE)]
@@ -1243,7 +1249,7 @@ impl PreampPowerOpts {
 /// END Power cmds ================================================
 
 /// Run cmds ======================================================
-#[derive(Debug, Subcommand, PartialEq)]
+#[derive(Debug, Clone, Subcommand, PartialEq)]
 pub enum RunCmd {
   /// Start data taking
   Start(StartRunOpts),
@@ -1251,7 +1257,7 @@ pub enum RunCmd {
   Stop(StopRunOpts)
 }
 
-#[derive(Debug, Args, PartialEq)]
+#[derive(Debug, Clone, Args, PartialEq)]
 pub struct StartRunOpts {
   /// Which kind of run is to be launched
   #[arg(short, long, default_value_t = DEFAULT_RUN_TYPE)]
@@ -1274,7 +1280,7 @@ impl StartRunOpts {
   }
 }
 
-#[derive(Debug, Args, PartialEq)]
+#[derive(Debug, Clone, Args, PartialEq)]
 pub struct StopRunOpts {
   /// ID of the RB where to run data taking
   #[arg(short, long, default_value_t = DEFAULT_RB_ID)]
