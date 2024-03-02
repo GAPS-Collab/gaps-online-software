@@ -96,11 +96,11 @@ void EventGAPS::InitializeWaveforms(GAPS::Waveform *wave[],
 void EventGAPS::UnsetWaveforms(void) {
   // Store pointers to the waveforms locally
   for (int i=0; i<NTOT; i++) {
-    delete wData[i];
+    //delete wData[i];
     wData[i]  = NULL;
   }
   for (int i=0; i<NRB;  i++) {
-    delete wData[i];
+    //delete wData[i];
     wClock[i] = NULL;
   }
   
@@ -134,9 +134,9 @@ void EventGAPS::SetPaddleMap(int paddle_map[NRB][NCH], int pad2volid[NPAD],
   }
   /*
   for (int i=0; i<NPAD; i++) 
-    printf("PadID %d  -> RB_A %d %d; RB_B %d %d\n", i,
-	   (int)Paddle_A[i]/NCH, Paddle_A[i]%NCH, 
-	   (int)Paddle_B[i]/NCH, Paddle_B[i]%NCH); 
+    printf("PadID %d  -> RB_A %d %d %d; RB_B %d %d %d\n", i,
+ 	   Paddle_A[i], (int)Paddle_A[i]/NCH, Paddle_A[i]%NCH, 
+ 	   Paddle_B[i], (int)Paddle_B[i]/NCH, Paddle_B[i]%NCH);
   */
 
   // For each paddle, we want to set the X, Y, Z locations. So, index

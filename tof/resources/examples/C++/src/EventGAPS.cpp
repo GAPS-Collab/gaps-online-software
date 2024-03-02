@@ -96,11 +96,11 @@ void EventGAPS::InitializeWaveforms(GAPS::Waveform *wave[],
 void EventGAPS::UnsetWaveforms(void) {
   // Store pointers to the waveforms locally
   for (int i=0; i<NTOT; i++) {
-    delete wData[i];
+    //delete wData[i];
     wData[i]  = NULL;
   }
   for (int i=0; i<NRB;  i++) {
-    delete wData[i];
+    //delete wData[i];
     wClock[i] = NULL;
   }
   
