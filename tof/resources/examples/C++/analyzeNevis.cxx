@@ -359,6 +359,8 @@ int main(int argc, char *argv[]){
 	Event.FillPaddleHistos();
 
 	Event.UnsetWaveforms();
+	for (int i=0;i<NTOT;i++) {delete wave[i]; wave[i] = NULL;}
+	for (int i=0;i<NRB;i++)  {delete wch9[i]; wch9[i] = NULL;}
 	
 	n_tofevents++;
         break;

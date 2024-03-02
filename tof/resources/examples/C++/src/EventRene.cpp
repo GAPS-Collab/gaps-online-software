@@ -96,11 +96,11 @@ void EventGAPS::InitializeWaveforms(GAPS::Waveform *wave[],
 void EventGAPS::UnsetWaveforms(void) {
   // Store pointers to the waveforms locally
   for (int i=0; i<NTOT; i++) {
-    delete wData[i];
+    //delete wData[i];
     wData[i]  = NULL;
   }
   for (int i=0; i<NRB;  i++) {
-    delete wData[i];
+    //delete wData[i];
     wClock[i] = NULL;
   }
   
@@ -134,9 +134,9 @@ void EventGAPS::SetPaddleMap(int paddle_map[NRB][NCH], int pad2volid[NPAD],
   }
   /*
   for (int i=0; i<NPAD; i++) 
-    printf("PadID %d  -> RB_A %d %d; RB_B %d %d\n", i,
-	   (int)Paddle_A[i]/NCH, Paddle_A[i]%NCH, 
-	   (int)Paddle_B[i]/NCH, Paddle_B[i]%NCH); 
+    printf("PadID %d  -> RB_A %d %d %d; RB_B %d %d %d\n", i,
+ 	   Paddle_A[i], (int)Paddle_A[i]/NCH, Paddle_A[i]%NCH, 
+ 	   Paddle_B[i], (int)Paddle_B[i]/NCH, Paddle_B[i]%NCH);
   */
 
   // For each paddle, we want to set the X, Y, Z locations. So, index
@@ -517,12 +517,12 @@ void EventGAPS::FillChannelHistos(void) {
 void EventGAPS::FillPaddleHistos(void) {
   
   for (int i=0; i<NPAD; i++) {
-    //if (Paddle_A[i] < 1) { // Non existent paddle
-      //QEnd2End[i]->Fill(QInt[Paddle_A[i]], QInt[Paddle_B[i]]);
-      QEnd2End[i]->Fill(QInt[2*i], QInt[2*i+1]);
+    if (Paddle_A[i] > 0) { // Paddle-channel map exists                    
+      QEnd2End[i]->Fill(QInt[Paddle_A[i]], QInt[Paddle_B[i]]);
       HitMask[i]->Fill(Hits[i]);
-      if (TDC[2*i]>0 && TDC[2*i+1]>0) tDiff[i]->Fill(TDC[2*i] - TDC[2*i+1]);
-      //}
+      if ( TDC[Paddle_A[i]] > 0 && TDC[Paddle_B[i]] > 0 )
+        tDiff[i]->Fill(TDC[Paddle_A[i]] - TDC[Paddle_B[i]]);
+    }
   }
 
   NPaddlesCube->Fill(NPadCube);
